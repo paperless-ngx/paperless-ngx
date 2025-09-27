@@ -1,15 +1,15 @@
 # Advanced Topics
 
-Paperless offers a couple of features that automate certain tasks and make
+Paperless-ngx offers a couple of features that automate certain tasks and make
 your life easier.
 
 ## Matching tags, correspondents, document types, and storage paths {#matching}
 
-Paperless will compare the matching algorithms defined by every tag,
+Paperless-ngx will compare the matching algorithms defined by every tag,
 correspondent, document type, and storage path in your database to see
 if they apply to the text in a document. In other words, if you define a
 tag called `Home Utility` that had a `match` property of `bc hydro` and
-a `matching_algorithm` of `Exact`, Paperless will automatically tag
+a `matching_algorithm` of `Exact`, Paperless-ngx will automatically tag
 your newly-consumed document with your `Home Utility` tag so long as the
 text `bc hydro` appears in the body of the document somewhere.
 
@@ -65,13 +65,13 @@ Bank of America are tagged with the tag "bofa123" and the matching
 algorithm of this tag is set to _Auto_, this neural network will examine
 your documents and automatically learn when to assign this tag.
 
-Paperless tries to hide much of the involved complexity with this
+Paperless-ngx tries to hide much of the involved complexity with this
 approach. However, there are a couple caveats you need to keep in mind
 when using this feature:
 
 -   Changes to your documents are not immediately reflected by the
     matching algorithm. The neural network needs to be _trained_ on your
-    documents after changes. Paperless periodically (default: once each
+    documents after changes. Paperless-ngx periodically (default: once each
     hour) checks for changes and does this automatically for you.
 -   The Auto matching algorithm only takes documents into account which
     are NOT placed in your inbox (i.e. have any inbox tags assigned to
@@ -89,22 +89,22 @@ when using this feature:
     "Very obscure web shop I bought something five years ago", it will
     probably not assign this correspondent automatically if you buy
     something from them again. The more documents, the better.
--   Paperless also needs a reasonable amount of negative examples to
+-   Paperless-ngx also needs a reasonable amount of negative examples to
     decide when not to assign a certain tag, correspondent, document
     type, or storage path. This will usually be the case as you start
-    filling up paperless with documents. Example: If all your documents
-    are either from "Webshop" or "Bank", paperless will assign one
+    filling up Paperless-ngx with documents. Example: If all your documents
+    are either from "Webshop" or "Bank", Paperless-ngx will assign one
     of these correspondents to ANY new document, if both are set to
     automatic matching.
 
 ## Hooking into the consumption process {#consume-hooks}
 
 Sometimes you may want to do something arbitrary whenever a document is
-consumed. Rather than try to predict what you may want to do, Paperless
+consumed. Rather than try to predict what you may want to do, Paperless-ngx
 lets you execute scripts of your own choosing just before or after a
 document is consumed using a couple of simple hooks.
 
-Just write a script, put it somewhere that Paperless can read & execute,
+Just write a script, put it somewhere that Paperless-ngx can read & execute,
 and then put the path to that script in `paperless.conf` or
 `docker-compose.env` with the variable name of either
 [`PAPERLESS_PRE_CONSUME_SCRIPT`](configuration.md#PAPERLESS_PRE_CONSUME_SCRIPT) or [`PAPERLESS_POST_CONSUME_SCRIPT`](configuration.md#PAPERLESS_POST_CONSUME_SCRIPT).
@@ -172,7 +172,7 @@ webserver log, along with the exit code of the script.
 ### Post-consumption script {#post-consume-script}
 
 Executed after the consumer has successfully processed a document and
-has moved it into paperless. It receives the following environment
+has moved it into Paperless-ngx. It receives the following environment
 variables:
 
 | Environment Variable         | Description                                    |
@@ -252,14 +252,14 @@ Troubleshooting:
 
 ## File name handling {#file-name-handling}
 
-By default, paperless stores your documents in the media directory and
+By default, Paperless-ngx stores your documents in the media directory and
 renames them using the identifier which it has assigned to each
 document. You will end up getting files like `0000123.pdf` in your media
 directory. This isn't necessarily a bad thing, because you normally
 don't have to access these files manually. However, if you wish to name
 your files differently, you can do that by adjusting the
 [`PAPERLESS_FILENAME_FORMAT`](configuration.md#PAPERLESS_FILENAME_FORMAT) configuration option
-or using [storage paths (see below)](#storage-paths). Paperless adds the
+or using [storage paths (see below)](#storage-paths). Paperless-ngx adds the
 correct file extension e.g. `.pdf`, `.jpg` automatically.
 
 This variable allows you to configure the filename (folders are allowed)
@@ -287,14 +287,14 @@ will create a directory structure as follows:
 
 !!! warning
 
-    Do not manually move your files in the media folder. Paperless remembers
+    Do not manually move your files in the media folder. Paperless-ngx remembers
     the last filename a document was stored as. If you do rename a file,
-    paperless will report your files as missing and won't be able to find
+    Paperless-ngx will report your files as missing and won't be able to find
     them.
 
 !!! tip
 
-    Paperless checks the filename of a document whenever it is saved. Changing (or deleting)
+    Paperless-ngx checks the filename of a document whenever it is saved. Changing (or deleting)
     a [storage path](#storage-paths) will automatically be reflected in the file system. However,
     when changing `PAPERLESS_FILENAME_FORMAT` you will need to manually run the
     [`document renamer`](administration.md#renamer) to move any existing documents.
@@ -320,7 +320,7 @@ Paperless provides the following variables for use within filenames:
     locale
 -   `{{ created_day }}`: Day created only (number 01-31).
 -   `{{ added }}`: The full date (ISO format) the document was added to
-    paperless.
+    Paperless-ngx.
 -   `{{ added_year }}`: Year added only.
 -   `{{ added_year_short }}`: Year added only, formatted as the year without
     century, zero padded.
@@ -331,7 +331,7 @@ Paperless provides the following variables for use within filenames:
 -   `{{ added_day }}`: Day added only (number 01-31).
 -   `{{ owner_username }}`: Username of document owner, if any, or "none"
 -   `{{ original_name }}`: Document original filename, minus the extension, if any, or "none"
--   `{{ doc_pk }}`: The paperless identifier (primary key) for the document.
+-   `{{ doc_pk }}`: The Paperless-ngx identifier (primary key) for the document.
 
 !!! warning
 
@@ -344,22 +344,22 @@ Paperless provides the following variables for use within filenames:
     These variables are all simple strings, but the format can be a full template.
     See [Filename Templates](#filename-templates) for even more advanced formatting.
 
-Paperless will try to conserve the information from your database as
+Paperless-ngx will try to conserve the information from your database as
 much as possible. However, some characters that you can use in document
 titles and correspondent names (such as `: \ /` and a couple more) are
 not allowed in filenames and will be replaced with dashes.
 
-If paperless detects that two documents share the same filename,
-paperless will automatically append `_01`, `_02`, etc to the filename.
+If Paperless-ngx detects that two documents share the same filename,
+Paperless-ngx will automatically append `_01`, `_02`, etc to the filename.
 This happens if all the placeholders in a filename evaluate to the same
 value.
 
 If there are any errors in the placeholders included in `PAPERLESS_FILENAME_FORMAT`,
-paperless will fall back to using the default naming scheme instead.
+Paperless-ngx will fall back to using the default naming scheme instead.
 
 !!! caution
 
-    As of now, you could potentially tell paperless to store your files anywhere
+    As of now, you could potentially tell Paperless-ngx to store your files anywhere
     outside the media directory by setting
 
     ```
@@ -758,7 +758,7 @@ MariaDB: `mariadb-tzinfo-to-sql /usr/share/zoneinfo | mariadb -u root mysql -p`
 
 ## Barcodes {#barcodes}
 
-Paperless is able to utilize barcodes for automatically performing some tasks.
+Paperless-ngx is able to utilize barcodes for automatically performing some tasks.
 
 At this time, the library utilized for detection of barcodes supports the following types:
 
@@ -774,7 +774,7 @@ At this time, the library utilized for detection of barcodes supports the follow
 -   SQ Code
 
 You may check for updates on the [zbar library homepage](https://github.com/mchehab/zbar).
-For usage in Paperless, the type of barcode does not matter, only the contents of it.
+For usage in Paperless-ngx, the type of barcode does not matter, only the contents of it.
 
 For how to enable barcode usage, see [the configuration](configuration.md#barcodes).
 The two settings may be enabled independently, but do have interactions as explained
@@ -782,7 +782,7 @@ below.
 
 ### Document Splitting {#document-splitting}
 
-When enabled, Paperless will look for a barcode with the configured value and create a new document
+When enabled, Paperless-ngx will look for a barcode with the configured value and create a new document
 starting from the next page. The page with the barcode on it will _not_ be retained. It
 is expected to be a page existing only for triggering the split.
 
@@ -798,7 +798,7 @@ one which holds data to keep in the document.
 
 ### Tag Assignment
 
-When enabled, Paperless will parse barcodes and attempt to interpret and assign tags.
+When enabled, Paperless-ngx will parse barcodes and attempt to interpret and assign tags.
 
 See the relevant settings [`PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE`](configuration.md#PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE)
 and [`PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING`](configuration.md#PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING)
@@ -824,12 +824,12 @@ Suppose you have a double-sided document with 6 pages (3 sheets of paper). First
 put the stack into your ADF as normal, ensuring that page 1 is scanned first. Your ADF
 will now scan pages 1, 3, and 5. Then you (or your scanner, if it supports it) upload
 the scan into the correct sub-directory of the consume folder (`double-sided` by default;
-keep in mind that Paperless will _not_ automatically create the directory for you.)
-Paperless will then process the scan and move it into an internal staging area.
+keep in mind that Paperless-ngx will _not_ automatically create the directory for you.)
+Paperless-ngx will then process the scan and move it into an internal staging area.
 
 The next step is to turn your stack upside down (without reordering the sheets of paper),
 and scan it once again, your ADF will now scan pages 6, 4, and 2, in that order. Once this
-scan is copied into the sub-directory, Paperless will collate the previous scan with the
+scan is copied into the sub-directory, Paperless-ngx will collate the previous scan with the
 new one, reversing the order of the pages on the second, "even numbered" scan. The
 resulting document will have the pages 1-6 in the correct order, and this new file will
 then be processed as normal.
@@ -842,21 +842,21 @@ then be processed as normal.
 
 ### Things that could go wrong
 
-Paperless will notice when the first, "odd numbered" scan has less pages than the second
+Paperless-ngx will notice when the first, "odd numbered" scan has less pages than the second
 scan (this can happen when e.g. the ADF skipped a few pages in the first pass). In that
-case, Paperless will remove the staging copy as well as the scan, and give you an error
+case, Paperless-ngx will remove the staging copy as well as the scan, and give you an error
 message asking you to restart the process from scratch, by scanning the odd pages again,
 followed by the even pages.
 
 It's important that the scan files get consumed in the correct order, and one at a time.
-You therefore need to make sure that Paperless is running while you upload the files into
+You therefore need to make sure that Paperless-ngx is running while you upload the files into
 the directory; and if you're using [polling](configuration.md#polling), make sure that
 `CONSUMER_POLLING` is set to a value lower than it takes for the second scan to appear,
 like 5-10 or even lower.
 
 Another thing that might happen is that you start a double sided scan, but then forget
 to upload the second file. To avoid collating the wrong documents if you then come back
-a day later to scan a new double-sided document, Paperless will only keep an "odd numbered
+a day later to scan a new double-sided document, Paperless-ngx will only keep an "odd numbered
 pages" file for up to 30 minutes. If more time passes, it will consider the next incoming
 scan a completely new "odd numbered pages" one. The old staging file will get discarded.
 
