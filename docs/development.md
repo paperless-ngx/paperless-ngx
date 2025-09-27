@@ -162,7 +162,7 @@ $ ng build --configuration production
 
 ### Package Management
 
-Paperless uses `uv` to manage packages and virtual environments for both development and production.
+Paperless-ngx uses `uv` to manage packages and virtual environments for both development and production.
 To accomplish some common tasks using `uv`, follow the shortcuts below:
 
 To upgrade all locked packages to the latest allowed versions: `uv lock --upgrade`
