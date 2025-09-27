@@ -7,10 +7,6 @@
     <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
 </div>
 <div class="modal-body">
-  <div class="alert alert-warning mb-3">
-    <i-bs width="0.9em" height="0.9em" name="exclamation-triangle-fill"></i-bs>&nbsp;<strong i18n>Large Attachment Warning</strong><br>
-    <ng-container i18n>Some email providers may reject messages with large attachments. Paperless may not be able to catch this.</ng-container>
-  </div>
     <div class="mb-1">
         <label for="email" class="form-label" i18n>Email address(es)</label>
         <input type="email" class="form-control" id="email" [(ngModel)]="emailAddress">
@@ -36,5 +32,8 @@
             }
             <ng-container i18n>Send email</ng-container>
         </button>
+    </div>
+    <div class="text-light fst-italic small mt-2">
+        <ng-container i18n>Some email servers may reject messages with large attachments.</ng-container>
     </div>
 </div>

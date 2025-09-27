@@ -557,6 +557,7 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             404: None,
             500: None,
         },
+        deprecated=True,
     ),
     email_documents=extend_schema(
         operation_id="email_documents",

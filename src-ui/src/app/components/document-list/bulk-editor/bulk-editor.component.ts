@@ -905,12 +905,9 @@ export class BulkEditorComponent
   }
 
   emailSelected() {
-    const selectedDocuments = this.list.documents.filter((d) =>
-      this.list.selected.has(d.id)
-    )
-    const allHaveArchiveVersion = selectedDocuments.every(
-      (doc) => !!doc.archived_file_name
-    )
+    const allHaveArchiveVersion = this.list.documents
+      .filter((d) => this.list.selected.has(d.id))
+      .every((doc) => !!doc.archived_file_name)
 
     const modal = this.modalService.open(EmailDocumentDialogComponent, {
       backdrop: 'static',
