@@ -1119,14 +1119,8 @@ class DocumentViewSet(
 
     @action(methods=["post"], detail=True, url_path="email")
     def email_document(self, request, pk=None):
-        request_data = {
-            "addresses": request.data.get("addresses"),
-            "subject": request.data.get("subject"),
-            "message": request.data.get("message"),
-            "use_archive_version": request.data.get("use_archive_version", True),
-            "documents": [pk],
-        }
-
+        request_data = request.data.copy()
+        request_data.setlist("documents", [pk])
         return self._send_email_with_request_data(request, request_data)
 
     @action(
