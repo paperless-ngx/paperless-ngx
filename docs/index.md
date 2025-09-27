@@ -31,7 +31,7 @@ physical documents into a searchable online archive so you can keep, well, _less
 -   Documents are saved as PDF/A format which is designed for long term storage, alongside the unaltered originals.
 -   Uses machine-learning to automatically add tags, correspondents and document types to your documents.
 -   Supports PDF documents, images, plain text files, Office documents (Word, Excel, PowerPoint, and LibreOffice equivalents)[^1] and more.
--   Paperless stores your documents plain on disk. Filenames and folders are managed by paperless and their format can be configured freely with different configurations assigned to different documents.
+-   Paperless-ngx stores your documents plain on disk. Filenames and folders are managed by Paperless-ngx and their format can be configured freely with different configurations assigned to different documents.
 -   **Beautiful, modern web application** that features:
     -   Customizable dashboard with statistics.
     -   Filtering by tags, correspondents, types, and more.
@@ -47,7 +47,7 @@ physical documents into a searchable online archive so you can keep, well, _less
     -   Searching for similar documents ("More like this")
 -   **Email processing**[^1]: import documents from your email accounts:
     -   Configure multiple accounts and rules for each account.
-    -   After processing, paperless can perform actions on the messages such as marking as read, deleting and more.
+    -   After processing, Paperless-ngx can perform actions on the messages such as marking as read, deleting and more.
 -   A built-in robust **multi-user permissions** system that supports 'global' permissions as well as per document or object.
 -   A powerful workflow system that gives you even more control.
 -   **Optimized** for multi core systems: Paperless-ngx consumes multiple documents in parallel.
@@ -55,7 +55,7 @@ physical documents into a searchable online archive so you can keep, well, _less
 
 [^1]: Office document and email consumption support is optional and provided by Apache Tika (see [configuration](https://docs.paperless-ngx.com/configuration/#tika))
 
-## Paperless, a history
+## Paperless-ngx, a history
 
 Paperless-ngx is the official successor to the original [Paperless](https://github.com/the-paperless-project/paperless) & [Paperless-ng](https://github.com/jonaswinkler/paperless-ng) projects and is designed to distribute the responsibility of advancing and supporting the project among a team of people. [Consider joining us!](https://github.com/paperless-ngx/paperless-ngx#community-support)
 
@@ -193,11 +193,11 @@ For bugs please [open an issue](https://github.com/paperless-ngx/paperless-ngx/i
 
 ## Contributing
 
-People interested in continuing the work on paperless-ngx are encouraged to reach out on [GitHub](https://github.com/paperless-ngx/paperless-ngx) or [the Matrix chat room](https://matrix.to/#/#paperless:matrix.org). If you would like to contribute to the project on an ongoing basis there are multiple teams (frontend, ci/cd, etc) that could use your help so please reach out!
+People interested in continuing the work on Paperless-ngx are encouraged to reach out on [GitHub](https://github.com/paperless-ngx/paperless-ngx) or [the Matrix chat room](https://matrix.to/#/#paperless:matrix.org). If you would like to contribute to the project on an ongoing basis there are multiple teams (frontend, ci/cd, etc) that could use your help so please reach out!
 
 ### Translation
 
-Paperless-ngx is available in many languages that are coordinated on [Crowdin](https://crowdin.com/project/paperless-ngx). If you want to help out by translating paperless-ngx into your language, please head over to the [Paperless-ngx project at Crowdin](https://crowdin.com/project/paperless-ngx), and thank you!
+Paperless-ngx is available in many languages that are coordinated on [Crowdin](https://crowdin.com/project/paperless-ngx). If you want to help out by translating Paperless-ngx into your language, please head over to the [Paperless-ngx project at Crowdin](https://crowdin.com/project/paperless-ngx), and thank you!
 
 ## Scanners & Software
 
