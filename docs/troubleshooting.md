@@ -5,12 +5,12 @@
 Check for the following issues:
 
 -   Ensure that the directory you're putting your documents in is the
-    folder paperless is watching. With docker, this setting is performed
+    folder Paperless-ngx is watching. With docker, this setting is performed
     in the `docker-compose.yml` file. Without Docker, look at the
     `CONSUMPTION_DIR` setting. Don't adjust this setting if you're
     using docker.
 
--   Ensure that redis is up and running. Paperless does its task
+-   Ensure that redis is up and running. Paperless-ngx does its task
     processing asynchronously, and for documents to arrive at the task
     processor, it needs redis to run.
 
@@ -21,7 +21,7 @@ Check for the following issues:
     celery --app paperless worker
     ```
 
--   Look at the output of paperless and inspect it for any errors.
+-   Look at the output of Paperless-ngx and inspect it for any errors.
 
 -   Go to the admin interface, and check if there are failed tasks. If
     so, the tasks will contain an error message.
@@ -49,12 +49,12 @@ later, you will need to enable filesystem polling with the configuration
 option [`PAPERLESS_CONSUMER_POLLING`](configuration.md#PAPERLESS_CONSUMER_POLLING).
 
 This will disable listening to filesystem changes with inotify and
-paperless will manually check the consumption directory for changes
+Paperless-ngx will manually check the consumption directory for changes
 instead.
 
-## Paperless always redirects to /admin
+## Paperless-ngx always redirects to /admin
 
-You probably had the old paperless installed at some point. Paperless
+You probably had the old Paperless installed at some point. Paperless-ngx
 installed a permanent redirect to /admin in your browser, and you need
 to clear your browsing data / cache to fix that.
 
@@ -67,7 +67,7 @@ chown: changing ownership of '../export': Operation not permitted
 ```
 
 The container tries to set file ownership on the listed directories.
-This is required so that the user running paperless inside docker has
+This is required so that the user running Paperless-ngx inside docker has
 write permissions to these folders. This happens when pointing these
 directories to NFS shares, for example.
 
@@ -95,15 +95,15 @@ UserWarning: Trying to unpickle estimator CountVectorizer from version 0.23.2 wh
 This might lead to breaking code or invalid results. Use at your own risk.
 ```
 
-This happens when certain dependencies of paperless that are responsible
+This happens when certain dependencies of Paperless-ngx that are responsible
 for the auto matching algorithm are updated. After updating these, your
 current training data _might_ not be compatible anymore. This can be
 ignored in most cases. This warning will disappear automatically when
-paperless updates the training data.
+Paperless-ngx updates the training data.
 
 If you want to get rid of the warning or actually experience issues with
 automatic matching, delete the file `classification_model.pickle` in the
-data directory and let paperless recreate it.
+data directory and let Paperless-ngx recreate it.
 
 ## 504 Server Error: Gateway Timeout when adding Office documents
 
@@ -141,7 +141,7 @@ You might encounter errors such as:
 The following error occurred while consuming document.pdf: [Errno 13] Permission denied: '/usr/src/paperless/src/../consume/document.pdf'
 ```
 
-This happens when paperless does not have permission to delete files
+This happens when Paperless-ngx does not have permission to delete files
 inside the consumption directory. Ensure that `USERMAP_UID` and
 `USERMAP_GID` are set to the user id and group id you use on the host
 operating system, if these are different from `1000`. See [Docker setup](setup.md#docker).
@@ -171,10 +171,10 @@ File "/usr/src/paperless/src/documents/consumer.py", line 271, in try_consume_fi
 raise ConsumerError(e)
 ```
 
-Paperless uses a search index to provide better and faster full text
+Paperless-ngx uses a search index to provide better and faster full text
 searching. This search index is stored inside the `data` folder. The
 search index uses memory-mapped files (mmap). The above error indicates
-that paperless was unable to create and open these files.
+that Paperless-ngx was unable to create and open these files.
 
 This happens when you're trying to store the data directory on certain
 file systems (mostly network shares) that don't support memory-mapped
@@ -203,9 +203,9 @@ You might find messages like these in your log files:
 [WARNING] [paperless.parsing.tesseract] Error while reading metadata
 ```
 
-This indicates that paperless failed to read PDF metadata from one of
+This indicates that Paperless-ngx failed to read PDF metadata from one of
 your documents. This happens when you open the affected documents in
-paperless for editing. Paperless will continue to work, and will simply
+Paperless-ngx for editing. Paperless-ngx will continue to work, and will simply
 not show the invalid metadata.
 
 ## Consumer fails with a FileNotFoundError
@@ -232,9 +232,9 @@ Traceback (most recent call last):
 FileNotFoundError: [Errno 2] No such file or directory: '/tmp/ocrmypdf.io.yhk3zbv0/origin.pdf'
 ```
 
-This probably indicates paperless tried to consume the same file twice.
+This probably indicates Paperless-ngx tried to consume the same file twice.
 This can happen for a number of reasons, depending on how documents are
-placed into the consume folder. If paperless is using inotify (the
+placed into the consume folder. If Paperless-ngx is using inotify (the
 default) to check for documents, try adjusting the
 [inotify configuration](configuration.md#inotify). If polling is enabled, try adjusting the
 [polling configuration](configuration.md#polling).
@@ -247,7 +247,7 @@ You might find messages like these in your log files:
 [ERROR] [paperless.management.consumer] Timeout while waiting on file /usr/src/paperless/src/../consume/SCN_0001.pdf to remain unmodified.
 ```
 
-This indicates paperless timed out while waiting for the file to be
+This indicates Paperless-ngx timed out while waiting for the file to be
 completely written to the consume folder. Adjusting
 [polling configuration](configuration.md#polling) values should resolve the issue.
 
@@ -264,9 +264,9 @@ You might find messages like these in your log files:
 [WARNING] [paperless.management.consumer] Not consuming file /usr/src/paperless/src/../consume/SCN_0001.pdf: OS reports file as busy still
 ```
 
-This indicates paperless was unable to open the file, as the OS reported
-the file as still being in use. To prevent a crash, paperless did not
-try to consume the file. If paperless is using inotify (the default) to
+This indicates Paperless-ngx was unable to open the file, as the OS reported
+the file as still being in use. To prevent a crash, Paperless-ngx did not
+try to consume the file. If Paperless-ngx is using inotify (the default) to
 check for documents, try adjusting the
 [inotify configuration](configuration.md#inotify). If polling is enabled, try adjusting the
 [polling configuration](configuration.md#polling).
@@ -300,7 +300,7 @@ prevent database locking issues.
 
 You are likely running using Kubernetes, which automatically creates an
 environment variable named `${serviceName}_PORT`. This is
-the same environment variable which is used by Paperless to optionally
+the same environment variable which is used by Paperless-ngx to optionally
 change the port granian listens on.
 
 To fix this, set [`PAPERLESS_PORT`](configuration.md#PAPERLESS_PORT) again to your desired port, or the
@@ -316,7 +316,7 @@ DETAIL:  Key (name)=(NameF) already exists.
 STATEMENT:  INSERT INTO "documents_tag" ("owner_id", "name", "match", "matching_algorithm", "is_insensitive", "color", "is_inbox_tag") VALUES (NULL, 'NameF', '', 1, true, '#a6cee3', false) RETURNING "documents_tag"."id"
 ```
 
-This can happen during heavy consumption when using polling. Paperless will handle it correctly and the file
+This can happen during heavy consumption when using polling. Paperless-ngx will handle it correctly and the file
 will still be consumed
 
 ## Consumption fails with "Ghostscript PDF/A rendering failed"
