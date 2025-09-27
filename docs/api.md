@@ -23,7 +23,7 @@ The REST api provides four different forms of authentication.
 
 2.  Session authentication
 
-    When you're logged into paperless in your browser, you're
+    When you're logged into Paperless-ngx in your browser, you're
     automatically logged into the API as well and don't need to provide
     any authorization headers.
 
@@ -33,10 +33,10 @@ The REST api provides four different forms of authentication.
     link in the user dropdown found in the web UI and clicking the circular
     arrow button.
 
-    Paperless also offers an endpoint to acquire authentication tokens.
+    Paperless-ngx also offers an endpoint to acquire authentication tokens.
 
     POST a username and password as a form or json string to
-    `/api/token/` and paperless will respond with a token, if the login
+    `/api/token/` and Paperless-ngx will respond with a token, if the login
     data is correct. This token can be used to authenticate other
     requests with the following HTTP header:
 
@@ -174,7 +174,7 @@ The API provides a special endpoint for file uploads:
 `/api/documents/post_document/`
 
 POST a multipart form to this endpoint, where the form field `document`
-contains the document that you want to upload to paperless. The filename
+contains the document that you want to upload to Paperless-ngx. The filename
 is sanitized and then used to store the document in a temporary
 directory, and the consumer will be instructed to consume the document
 from there.
@@ -344,11 +344,11 @@ The REST API is versioned since Paperless-ngx 1.3.0.
 -   Versioning ensures that changes to the API don't break older
     clients.
 -   Clients specify the specific version of the API they wish to use
-    with every request and Paperless will handle the request using the
+    with every request and Paperless-ngx will handle the request using the
     specified API version.
 -   Even if the underlying data model changes, older API versions will
     always serve compatible data.
--   If no version is specified, Paperless will serve version 1 to ensure
+-   If no version is specified, Paperless-ngx will serve version 1 to ensure
     compatibility with older clients that do not request a specific API
     version.
 
@@ -359,9 +359,9 @@ header with every request:
 Accept: application/json; version=6
 ```
 
-If an invalid version is specified, Paperless 1.3.0 will respond with
+If an invalid version is specified, Paperless-ngx 1.3.0 will respond with
 "406 Not Acceptable" and an error message in the body. Earlier
-versions of Paperless will serve API version 1 regardless of whether a
+versions of Paperless-ngx will serve API version 1 regardless of whether a
 version is specified via the `Accept` header.
 
 If a client wishes to verify whether it is compatible with any given
