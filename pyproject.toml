@@ -31,7 +31,7 @@ dependencies = [
   "django-cachalot~=2.8.0",
   "django-celery-results~=2.6.0",
   "django-compression-middleware~=0.5.0",
-  "django-cors-headers~=4.8.0",
+  "django-cors-headers~=4.9.0",
   "django-extensions~=4.1",
   "django-filter~=25.1",
   "django-guardian~=3.1.2",
@@ -257,7 +257,6 @@ PAPERLESS_DISABLE_DBHANDLER = "true"
 PAPERLESS_CACHE_BACKEND = "django.core.cache.backends.locmem.LocMemCache"
 
 [tool.coverage.run]
-relative_files = true
 source = [
   "src/",
 ]
