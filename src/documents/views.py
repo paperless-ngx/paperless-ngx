@@ -538,15 +538,7 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     ),
     email_document=extend_schema(
         description="Email the document to one or more recipients as an attachment.",
-        request=inline_serializer(
-            name="EmailRequest",
-            fields={
-                "addresses": serializers.CharField(),
-                "subject": serializers.CharField(),
-                "message": serializers.CharField(),
-                "use_archive_version": serializers.BooleanField(default=True),
-            },
-        ),
+        request=EmailSerializer,
         responses={
             200: inline_serializer(
                 name="EmailDocumentResponse",
