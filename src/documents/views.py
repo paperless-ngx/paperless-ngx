@@ -1070,8 +1070,20 @@ class DocumentViewSet(
 
         return Response(sorted(entries, key=lambda x: x["timestamp"], reverse=True))
 
-    def _send_email_with_request_data(self, request, request_data):
-        serializer = EmailSerializer(data=request_data)
+    @action(methods=["post"], detail=True, url_path="email")
+    def email_document(self, request, pk=None):
+        request_data = request.data.copy()
+        request_data.setlist("documents", [pk])
+        return self.email_documents(request=request_data)
+
+    @action(
+        methods=["post"],
+        detail=False,
+        url_path="email",
+        serializer_class=EmailSerializer,
+    )
+    def email_documents(self, request):
+        serializer = EmailSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         validated_data = serializer.validated_data
@@ -1117,21 +1129,6 @@ class DocumentViewSet(
             return HttpResponseServerError(
                 "Error emailing documents, check logs for more detail.",
             )
-
-    @action(methods=["post"], detail=True, url_path="email")
-    def email_document(self, request, pk=None):
-        request_data = request.data.copy()
-        request_data.setlist("documents", [pk])
-        return self._send_email_with_request_data(request, request_data)
-
-    @action(
-        methods=["post"],
-        detail=False,
-        url_path="email",
-        serializer_class=EmailSerializer,
-    )
-    def email_documents(self, request):
-        return self._send_email_with_request_data(request, request.data)
 
 
 @extend_schema_view(
