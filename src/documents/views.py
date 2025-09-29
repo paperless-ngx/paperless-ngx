@@ -54,6 +54,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
 from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema_serializer
 from drf_spectacular.utils import extend_schema_view
 from drf_spectacular.utils import inline_serializer
 from langdetect import detect
@@ -369,6 +370,14 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
 
 
+@extend_schema_serializer(
+    component_name="EmailDocumentRequest",
+    exclude_fields=("documents",),
+)
+class EmailDocumentDetailSchema(EmailSerializer):
+    pass
+
+
 @extend_schema_view(
     retrieve=extend_schema(
         description="Retrieve a single document",
@@ -538,7 +547,7 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     ),
     email_document=extend_schema(
         description="Email the document to one or more recipients as an attachment.",
-        request=EmailSerializer,
+        request=EmailDocumentDetailSchema,
         responses={
             200: inline_serializer(
                 name="EmailDocumentResponse",
