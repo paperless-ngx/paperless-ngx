@@ -1074,7 +1074,7 @@ class DocumentViewSet(
     def email_document(self, request, pk=None):
         request_data = request.data.copy()
         request_data.setlist("documents", [pk])
-        return self.email_documents(request=request_data)
+        return self.email_documents(request, data=request_data)
 
     @action(
         methods=["post"],
@@ -1082,8 +1082,8 @@ class DocumentViewSet(
         url_path="email",
         serializer_class=EmailSerializer,
     )
-    def email_documents(self, request):
-        serializer = EmailSerializer(data=request.data)
+    def email_documents(self, request, data=None):
+        serializer = EmailSerializer(data=data or request.data)
         serializer.is_valid(raise_exception=True)
 
         validated_data = serializer.validated_data
