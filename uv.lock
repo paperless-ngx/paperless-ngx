@@ -782,15 +782,15 @@ wheels = [
 
 [[package]]
 name = "django-guardian"
-version = "3.1.3"
+version = "3.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "typing-extensions", marker = "(python_full_version < '3.13' and sys_platform == 'darwin') or (python_full_version < '3.13' and sys_platform == 'linux')" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/81/d3/436a44c7688fce1a978224c349ba66c95bf9103d548596b7a2694fd58c03/django_guardian-3.1.3.tar.gz", hash = "sha256:12b5e66c18c97088b0adfa033ab14be68c321c170fd3ec438898271f00a71699", size = 93571, upload-time = "2025-09-10T08:36:23.928Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e2/f9/bcff6a931298b9eb55e1550b55ab964fab747f594ba6d2d81cbe19736c5f/django_guardian-3.2.0.tar.gz", hash = "sha256:9e18ecd2e211b665972690c2d03d27bce0ea4932b5efac24a4bb9d526950a69e", size = 99940, upload-time = "2025-09-16T10:35:53.609Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/83/fc/6fd7b8bc7c52cbbfd1714673cfd28ff0b3fae32265c52d492ec0dee22cb8/django_guardian-3.1.3-py3-none-any.whl", hash = "sha256:90e28b40eea65c326a3a961908cc300f9e1cd69b74e88d38317a9befa167b71c", size = 127687, upload-time = "2025-09-10T08:36:22.533Z" },
+    { url = "https://files.pythonhosted.org/packages/2f/23/63a7d868373a73d25c4a5c2dd3cce3aaeb22fbee82560d42b6e93ba01403/django_guardian-3.2.0-py3-none-any.whl", hash = "sha256:0768565a057988a93fc4a1d93649c4a794abfd7473a8408a079cfbf83c559d77", size = 134674, upload-time = "2025-09-16T10:35:51.69Z" },
 ]
 
 [[package]]
@@ -2185,7 +2185,7 @@ requires-dist = [
     { name = "django-cors-headers", specifier = "~=4.9.0" },
     { name = "django-extensions", specifier = "~=4.1" },
     { name = "django-filter", specifier = "~=25.1" },
-    { name = "django-guardian", specifier = "~=3.1.2" },
+    { name = "django-guardian", specifier = "~=3.2.0" },
     { name = "django-multiselectfield", specifier = "~=1.0.1" },
     { name = "django-soft-delete", specifier = "~=1.0.18" },
     { name = "django-treenode", specifier = ">=0.23.2" },
