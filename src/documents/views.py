@@ -1071,6 +1071,7 @@ class DocumentViewSet(
         return Response(sorted(entries, key=lambda x: x["timestamp"], reverse=True))
 
     @action(methods=["post"], detail=True, url_path="email")
+    # TODO: deprecated as of 2.19, remove in future release
     def email_document(self, request, pk=None):
         request_data = request.data.copy()
         request_data.setlist("documents", [pk])
