@@ -256,9 +256,9 @@ class OwnedObjectSerializer(
     def _get_perms(self, obj, codename: str, target: Literal["users", "groups"]):
         """
         Get the given permissions from context or from django-guardian.
-        Parameters:
-        - codename: e.g. 'view_tag' or 'change_tag'
-        - target: 'users' or 'groups'
+
+        :param codename: The permission codename, e.g. 'view' or 'change'
+        :param target: 'users' or 'groups'
         """
         key = f"{target}_{codename}_perms"
         cached = self.context.get(key, {}).get(obj.pk)
