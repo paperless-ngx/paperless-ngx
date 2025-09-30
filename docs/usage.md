@@ -92,6 +92,16 @@ and more. These areas allow you to view, add, edit, delete and manage permission
 for these objects. You can also manage saved views, mail accounts, mail rules,
 workflows and more from the management sections.
 
+### Nested Tags
+
+Paperless-ngx v2.19 introduces support for nested tags, allowing you to create a
+hierarchy of tags, which may be useful for organizing your documents. Tags can
+have a 'parent' tag, creating a tree-like structure, to a maximum depth of 5. When
+a tag is added to a document, all of its parent tags are also added automatically
+and similarly, when a tag is removed from a document, all of its child tags are
+also removed. Additionally, assigning a parent to an existing tag will automatically
+update all documents that have this tag assigned, adding the parent tag as well.
+
 ## Adding documents to Paperless-ngx
 
 Once you've got Paperless setup, you need to start feeding documents
@@ -250,6 +260,10 @@ different means. These are as follows:
 
 Paperless is set up to check your mails every 10 minutes. This can be
 configured via [`PAPERLESS_EMAIL_TASK_CRON`](configuration.md#PAPERLESS_EMAIL_TASK_CRON)
+
+#### Processed Mail
+
+Paperless keeps track of emails it has processed in order to avoid processing the same mail multiple times. This uses the message `UID` provided by the mail server, which should be unique for each message. You can view and manage processed mails from the web UI under Mail > Processed Mails. If you need to re-process a message, you can delete the corresponding processed mail entry, which will allow Paperless-ngx to process the email again the next time the mail fetch task runs.
 
 #### OAuth Email Setup
 

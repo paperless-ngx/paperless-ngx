@@ -6,9 +6,11 @@ import platform
 import re
 import tempfile
 import zipfile
+from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 from time import mktime
+from typing import Literal
 from unicodedata import normalize
 from urllib.parse import quote
 from urllib.parse import urlparse
@@ -21,6 +23,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.db import connections
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
@@ -60,6 +63,8 @@ from drf_spectacular.utils import OpenApiParameter
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import extend_schema_view
 from drf_spectacular.utils import inline_serializer
+from guardian.utils import get_group_obj_perms_model
+from guardian.utils import get_user_obj_perms_model
 from langdetect import detect
 from packaging import version as packaging_version
 from redis import Redis
@@ -175,6 +180,7 @@ from documents.tasks import empty_trash
 from documents.tasks import index_optimize
 from documents.tasks import sanity_check
 from documents.tasks import train_classifier
+from documents.tasks import update_document_parent_tags
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.utils import get_boolean
 from paperless import version
@@ -268,7 +274,101 @@ class PassUserMixin(GenericAPIView):
         return super().get_serializer(*args, **kwargs)
 
 
-class PermissionsAwareDocumentCountMixin(PassUserMixin):
+class BulkPermissionMixin:
+    """
+    Prefetch Django-Guardian permissions for a list before serialization, to avoid N+1 queries.
+    """
+
+    def get_permission_codenames(self):
+        model_name = self.queryset.model.__name__.lower()
+        return {
+            "view": f"view_{model_name}",
+            "change": f"change_{model_name}",
+        }
+
+    def _get_object_perms(
+        self,
+        objects: list,
+        perm_codenames: list[str],
+        actor: Literal["users", "groups"],
+    ) -> dict[int, dict[str, list[int]]]:
+        """
+        Collect object-level permissions for either users or groups.
+        """
+        model = self.queryset.model
+        obj_perm_model = (
+            get_user_obj_perms_model(model)
+            if actor == "users"
+            else get_group_obj_perms_model(model)
+        )
+        id_field = "user_id" if actor == "users" else "group_id"
+        ctype = ContentType.objects.get_for_model(model)
+        object_pks = [obj.pk for obj in objects]
+
+        perms_qs = obj_perm_model.objects.filter(
+            content_type=ctype,
+            object_pk__in=object_pks,
+            permission__codename__in=perm_codenames,
+        ).values_list("object_pk", id_field, "permission__codename")
+
+        perms: dict[int, dict[str, list[int]]] = defaultdict(lambda: defaultdict(list))
+        for object_pk, actor_id, codename in perms_qs:
+            perms[int(object_pk)][codename].append(actor_id)
+
+        # Ensure that all objects have all codenames, even if empty
+        for pk in object_pks:
+            for codename in perm_codenames:
+                perms[pk][codename]
+
+        return perms
+
+    def get_serializer_context(self):
+        """
+        Get all permissions of the current list of objects at once and pass them to the serializer.
+        This avoid fetching permissions object by object in database.
+        """
+        context = super().get_serializer_context()
+        try:
+            full_perms = get_boolean(
+                str(self.request.query_params.get("full_perms", "false")),
+            )
+        except ValueError:
+            full_perms = False
+
+        if not full_perms:
+            return context
+
+        # Check which objects are being paginated
+        page = getattr(self, "paginator", None)
+        if page and hasattr(page, "page"):
+            queryset = page.page.object_list
+        elif hasattr(self, "page"):
+            queryset = self.page
+        else:
+            queryset = self.filter_queryset(self.get_queryset())
+
+        codenames = self.get_permission_codenames()
+        perm_names = [codenames["view"], codenames["change"]]
+        user_perms = self._get_object_perms(queryset, perm_names, actor="users")
+        group_perms = self._get_object_perms(queryset, perm_names, actor="groups")
+
+        context["users_view_perms"] = {
+            pk: user_perms[pk][codenames["view"]] for pk in user_perms
+        }
+        context["users_change_perms"] = {
+            pk: user_perms[pk][codenames["change"]] for pk in user_perms
+        }
+        context["groups_view_perms"] = {
+            pk: group_perms[pk][codenames["view"]] for pk in group_perms
+        }
+        context["groups_change_perms"] = {
+            pk: group_perms[pk][codenames["change"]] for pk in group_perms
+        }
+
+        return context
+
+
+class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
     """
     Mixin to add document count to queryset, permissions-aware if needed
     """
@@ -355,6 +455,13 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     )
     filterset_class = TagFilterSet
     ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
+
+    def perform_update(self, serializer):
+        old_parent = self.get_object().get_parent()
+        tag = serializer.save()
+        new_parent = tag.get_parent()
+        if new_parent and old_parent != new_parent:
+            update_document_parent_tags(tag, new_parent)
 
 
 @extend_schema_view(**generate_object_with_permissions_schema(DocumentTypeSerializer))
@@ -1624,7 +1731,7 @@ class PostDocumentView(GenericAPIView):
         title = serializer.validated_data.get("title")
         created = serializer.validated_data.get("created")
         archive_serial_number = serializer.validated_data.get("archive_serial_number")
-        custom_field_ids = serializer.validated_data.get("custom_fields")
+        cf = serializer.validated_data.get("custom_fields")
         from_webui = serializer.validated_data.get("from_webui")
 
         t = int(mktime(datetime.now().timetuple()))
@@ -1643,6 +1750,11 @@ class PostDocumentView(GenericAPIView):
             source=DocumentSource.WebUI if from_webui else DocumentSource.ApiUpload,
             original_file=temp_file_path,
         )
+        custom_fields = None
+        if isinstance(cf, dict) and cf:
+            custom_fields = cf
+        elif isinstance(cf, list) and cf:
+            custom_fields = dict.fromkeys(cf, None)
         input_doc_overrides = DocumentMetadataOverrides(
             filename=doc_name,
             title=title,
@@ -1653,10 +1765,7 @@ class PostDocumentView(GenericAPIView):
             created=created,
             asn=archive_serial_number,
             owner_id=request.user.id,
-            # TODO: set values
-            custom_fields={cf_id: None for cf_id in custom_field_ids}
-            if custom_field_ids
-            else None,
+            custom_fields=custom_fields,
         )
 
         async_task = consume_file.delay(

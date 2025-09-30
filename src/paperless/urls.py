@@ -58,6 +58,7 @@ from paperless.views import UserViewSet
 from paperless_mail.views import MailAccountViewSet
 from paperless_mail.views import MailRuleViewSet
 from paperless_mail.views import OauthCallbackView
+from paperless_mail.views import ProcessedMailViewSet
 
 api_router = DefaultRouter()
 api_router.register(r"correspondents", CorrespondentViewSet)
@@ -78,6 +79,7 @@ api_router.register(r"workflow_actions", WorkflowActionViewSet)
 api_router.register(r"workflows", WorkflowViewSet)
 api_router.register(r"custom_fields", CustomFieldViewSet)
 api_router.register(r"config", ApplicationConfigurationViewSet)
+api_router.register(r"processed_mail", ProcessedMailViewSet)
 
 
 urlpatterns = [

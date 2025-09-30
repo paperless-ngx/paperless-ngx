@@ -177,4 +177,59 @@ describe('TagsComponent', () => {
     component.onFilterDocuments()
     expect(emitSpy).toHaveBeenCalledWith([tags[2]])
   })
+
+  it('should remove all descendants from selection', () => {
+    const c: Tag = { id: 4, name: 'c' }
+    const b: Tag = { id: 3, name: 'b', children: [c] }
+    const a: Tag = { id: 2, name: 'a' }
+    const root: Tag = { id: 1, name: 'root', children: [a, b] }
+
+    const inputIDs = [2, 3, 4, 99]
+    const result = (component as any).removeChildren(inputIDs, root)
+    expect(result).toEqual([99])
+  })
+
+  it('should append all parents recursively', () => {
+    const root: Tag = { id: 1, name: 'root' }
+    const mid: Tag = { id: 2, name: 'mid', parent: 1 }
+    const leaf: Tag = { id: 3, name: 'leaf', parent: 2 }
+    component.tags = [root, mid, leaf]
+
+    component.value = []
+    component.onAdd(leaf)
+    expect(component.value).toEqual([2, 1])
+
+    // Calling onAdd on a root should not change value
+    component.onAdd(root)
+    expect(component.value).toEqual([2, 1])
+  })
+
+  it('should return ancestors from root to parent using getParentChain', () => {
+    const root: Tag = { id: 1, name: 'root' }
+    const mid: Tag = { id: 2, name: 'mid', parent: 1 }
+    const leaf: Tag = { id: 3, name: 'leaf', parent: 2 }
+    component.tags = [root, mid, leaf]
+
+    expect(component.getParentChain(3).map((t) => t.id)).toEqual([1, 2])
+    expect(component.getParentChain(2).map((t) => t.id)).toEqual([1])
+    expect(component.getParentChain(1).map((t) => t.id)).toEqual([])
+    // Non-existent id
+    expect(component.getParentChain(999).map((t) => t.id)).toEqual([])
+  })
+
+  it('should handle cyclic parents via guard in getParentChain', () => {
+    const one: Tag = { id: 1, name: 'one', parent: 2 }
+    const two: Tag = { id: 2, name: 'two', parent: 1 }
+    component.tags = [one, two]
+
+    const chain = component.getParentChain(1)
+    // Guard avoids infinite loop; chain contains both nodes once
+    expect(chain.map((t) => t.id)).toEqual([1, 2])
+  })
+
+  it('should stop when parent does not exist in getParentChain', () => {
+    const lone: Tag = { id: 5, name: 'lone', parent: 999 }
+    component.tags = [lone]
+    expect(component.getParentChain(5)).toEqual([])
+  })
 })

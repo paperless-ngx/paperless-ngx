@@ -1,3 +1,4 @@
+import json
 import tempfile
 from datetime import timedelta
 from pathlib import Path
@@ -5,11 +6,15 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.db import connection
 from django.test import TestCase
 from django.test import override_settings
+from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
+from guardian.shortcuts import assign_perm
 from rest_framework import status
 
 from documents.caching import get_llm_suggestion_cache
@@ -163,6 +168,116 @@ class TestViews(DirectoriesMixin, TestCase):
         response.render()
         self.assertEqual(response.request["PATH_INFO"], "/accounts/login/")
         self.assertContains(response, b"Share link has expired")
+
+    def test_list_with_full_permissions(self):
+        """
+        GIVEN:
+            - Tags with different permissions
+        WHEN:
+            - Request to get tag list with full permissions is made
+        THEN:
+            - Tag list is returned with the right permission information
+        """
+        user2 = User.objects.create(username="user2")
+        user3 = User.objects.create(username="user3")
+        group1 = Group.objects.create(name="group1")
+        group2 = Group.objects.create(name="group2")
+        group3 = Group.objects.create(name="group3")
+        t1 = Tag.objects.create(name="invoice", pk=1)
+        assign_perm("view_tag", self.user, t1)
+        assign_perm("view_tag", user2, t1)
+        assign_perm("view_tag", user3, t1)
+        assign_perm("view_tag", group1, t1)
+        assign_perm("view_tag", group2, t1)
+        assign_perm("view_tag", group3, t1)
+        assign_perm("change_tag", self.user, t1)
+        assign_perm("change_tag", user2, t1)
+        assign_perm("change_tag", group1, t1)
+        assign_perm("change_tag", group2, t1)
+
+        Tag.objects.create(name="bank statement", pk=2)
+        d1 = Document.objects.create(
+            title="Invoice 1",
+            content="This is the invoice of a very expensive item",
+            checksum="A",
+        )
+        d1.tags.add(t1)
+        d2 = Document.objects.create(
+            title="Invoice 2",
+            content="Internet invoice, I should pay it to continue contributing",
+            checksum="B",
+        )
+        d2.tags.add(t1)
+
+        view_permissions = Permission.objects.filter(
+            codename__contains="view_tag",
+        )
+        self.user.user_permissions.add(*view_permissions)
+        self.user.save()
+
+        self.client.force_login(self.user)
+        response = self.client.get("/api/tags/?page=1&full_perms=true")
+        results = json.loads(response.content)["results"]
+        for tag in results:
+            if tag["name"] == "invoice":
+                assert tag["permissions"] == {
+                    "view": {
+                        "users": [self.user.pk, user2.pk, user3.pk],
+                        "groups": [group1.pk, group2.pk, group3.pk],
+                    },
+                    "change": {
+                        "users": [self.user.pk, user2.pk],
+                        "groups": [group1.pk, group2.pk],
+                    },
+                }
+            elif tag["name"] == "bank statement":
+                assert tag["permissions"] == {
+                    "view": {"users": [], "groups": []},
+                    "change": {"users": [], "groups": []},
+                }
+            else:
+                assert False, f"Unexpected tag found: {tag['name']}"
+
+    def test_list_no_n_plus_1_queries(self):
+        """
+        GIVEN:
+            - Tags with different permissions
+        WHEN:
+            - Request to get tag list with full permissions is made
+        THEN:
+            - Permissions are not queries in database tag by tag,
+             i.e. there are no N+1 queries
+        """
+        view_permissions = Permission.objects.filter(
+            codename__contains="view_tag",
+        )
+        self.user.user_permissions.add(*view_permissions)
+        self.user.save()
+        self.client.force_login(self.user)
+
+        # Start by a small list, and count the number of SQL queries
+        for i in range(2):
+            Tag.objects.create(name=f"tag_{i}")
+
+        with CaptureQueriesContext(connection) as ctx_small:
+            response_small = self.client.get("/api/tags/?full_perms=true")
+            assert response_small.status_code == 200
+        num_queries_small = len(ctx_small.captured_queries)
+
+        # Complete the list, and count the number of SQL queries again
+        for i in range(2, 50):
+            Tag.objects.create(name=f"tag_{i}")
+
+        with CaptureQueriesContext(connection) as ctx_large:
+            response_large = self.client.get("/api/tags/?full_perms=true")
+            assert response_large.status_code == 200
+        num_queries_large = len(ctx_large.captured_queries)
+
+        # A few additional queries are allowed, but not a linear explosion
+        assert num_queries_large <= num_queries_small + 5, (
+            f"Possible N+1 queries detected: {num_queries_small} queries for 2 tags, "
+            f"but {num_queries_large} queries for 50 tags"
+        )
 
 
 class TestAISuggestions(DirectoriesMixin, TestCase):

@@ -1759,6 +1759,11 @@ started by the container.
 
 : Path to an image file in the /media/logo directory, must include 'logo', e.g. `/logo/Atari_logo.svg`
 
+!!! note
+
+    The logo file will be viewable by anyone with access to the Paperless instance login page,
+    so consider your choice of logo carefully and removing exif data from images before uploading.
+
 #### [`PAPERLESS_ENABLE_UPDATE_CHECK=<bool>`](#PAPERLESS_ENABLE_UPDATE_CHECK) {#PAPERLESS_ENABLE_UPDATE_CHECK}
 
 !!! note
