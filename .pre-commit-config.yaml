@@ -49,7 +49,7 @@ repos:
           - 'prettier-plugin-organize-imports@4.1.0'
   # Python hooks
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.13.0
+    rev: v0.13.2
     hooks:
       - id: ruff-check
       - id: ruff-format
@@ -59,7 +59,7 @@ repos:
       - id: pyproject-fmt
   # Dockerfile hooks
   - repo: https://github.com/AleksaC/hadolint-py
-    rev: v2.12.1b3
+    rev: v2.14.0
     hooks:
       - id: hadolint
   # Shell script hooks
