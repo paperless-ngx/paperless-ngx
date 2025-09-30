@@ -31,6 +31,7 @@ import {
   map,
   switchMap,
   takeUntil,
+  tap,
 } from 'rxjs/operators'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
@@ -738,20 +739,27 @@ export class DocumentDetailComponent
     if (newName) modal.componentInstance.object = { name: newName }
     modal.componentInstance.succeeded
       .pipe(
-        switchMap((newTag) => {
+        tap((newTag: Tag) => {
+          // remove from suggestions if present
+          if (this.suggestions) {
+            this.suggestions = {
+              ...this.suggestions,
+              suggested_tags: this.suggestions.suggested_tags.filter(
+                (tag) => tag !== newTag.name
+              ),
+            }
+          }
+        }),
+        switchMap((newTag: Tag) => {
           return this.tagService
             .listAll()
             .pipe(map((tags) => ({ newTag, tags })))
-        })
+        }),
+        takeUntil(this.unsubscribeNotifier)
       )
-      .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(({ newTag, tags }) => {
         this.tagsInput.tags = tags.results
         this.tagsInput.addTag(newTag.id)
-        if (this.suggestions) {
-          this.suggestions.suggested_tags =
-            this.suggestions.suggested_tags.filter((tag) => tag !== newName)
-        }
       })
   }
 

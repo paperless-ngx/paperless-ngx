@@ -409,7 +409,7 @@ describe('DocumentDetailComponent', () => {
       color: '#ff0000',
       text_color: '#000000',
     })
-    expect(component.documentForm.get('tags').value).toContain(12)
+    expect(component.tagsInput.value).toContain(12)
     expect(component.suggestions.suggested_tags).not.toContain('NewTag12')
   })
 
