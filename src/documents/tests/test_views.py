@@ -237,7 +237,7 @@ class TestViews(DirectoriesMixin, TestCase):
         WHEN:
             - Request to get tag list with full permissions is made
         THEN:
-            - Permissions are not queries in database tag by tag,
+            - Permissions are not queried in database tag by tag,
              i.e. there are no N+1 queries
         """
         view_permissions = Permission.objects.filter(
