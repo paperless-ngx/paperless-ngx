@@ -24,6 +24,7 @@ jobs:
       should_run: ${{ steps.check.outputs.should_run }}
     steps:
       - run: echo $GITHUB_HEAD_REF
+      - run: echo $GITHUB_REF
       - name: Check if workflow should run
         id: check
         uses: actions/github-script@v7
