@@ -1,5 +1,5 @@
 <pngx-page-header [title]="getTitle()">
-  <div ngbDropdown class="btn-group flex-fill d-sm-none">
+  <div ngbDropdown class="btn-group flex-fill">
     <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle>
       <i-bs name="text-indent-left"></i-bs>
       <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Select</ng-container></div>
@@ -11,24 +11,6 @@
       <button ngbDropdownItem (click)="list.selectNone()" i18n>Select none</button>
       <button ngbDropdownItem (click)="list.selectPage()" i18n>Select page</button>
       <button ngbDropdownItem (click)="list.selectAll()" i18n>Select all</button>
-    </div>
-  </div>
-  <div class="d-none d-sm-flex flex-fill me-3">
-    <div class="input-group input-group-sm">
-      <span class="input-group-text border-0">Select:</span>
-    </div>
-    <div class="btn-group btn-group-sm flex-nowrap">
-      @if (list.selected.size > 0) {
-        <button class="btn btn-sm btn-outline-secondary" (click)="list.selectNone()">
-          <i-bs name="slash-circle"></i-bs>&nbsp;<ng-container i18n>None</ng-container>
-        </button>
-      }
-      <button class="btn btn-sm btn-outline-primary" (click)="list.selectPage()">
-        <i-bs name="file-earmark-check"></i-bs>&nbsp;<ng-container i18n>Page</ng-container>
-      </button>
-      <button class="btn btn-sm btn-outline-primary" (click)="list.selectAll()">
-        <i-bs name="check-all"></i-bs>&nbsp;<ng-container i18n>All</ng-container>
-      </button>
     </div>
   </div>
   <div ngbDropdown class="btn-group flex-fill">
