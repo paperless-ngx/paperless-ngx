@@ -68,7 +68,7 @@
     "prettier-plugin-organize-imports": "^4.3.0",
     "ts-node": "~10.9.1",
     "typescript": "^5.8.3",
-    "webpack": "^5.101.3"
+    "webpack": "^5.102.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
