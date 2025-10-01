@@ -166,8 +166,8 @@ importers:
         specifier: ^2.5.0
         version: 2.5.0
       prettier-plugin-organize-imports:
-        specifier: ^4.2.0
-        version: 4.2.0(prettier@3.4.2)(typescript@5.8.3)
+        specifier: ^4.3.0
+        version: 4.3.0(prettier@3.4.2)(typescript@5.8.3)
       ts-node:
         specifier: ~10.9.1
         version: 10.9.2(@types/node@24.6.1)(typescript@5.8.3)
@@ -5815,8 +5815,8 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  prettier-plugin-organize-imports@4.2.0:
-    resolution: {integrity: sha512-Zdy27UhlmyvATZi67BTnLcKTo8fm6Oik59Sz6H64PgZJVs6NJpPD1mT240mmJn62c98/QaL+r3kx9Q3gRpDajg==}
+  prettier-plugin-organize-imports@4.3.0:
+    resolution: {integrity: sha512-FxFz0qFhyBsGdIsb697f/EkvHzi5SZOhWAjxcx2dLt+Q532bAlhswcXGYB1yzjZ69kW8UoadFBw7TyNwlq96Iw==}
     peerDependencies:
       prettier: '>=2.0'
       typescript: '>=2.9'
@@ -13341,7 +13341,7 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-organize-imports@4.2.0(prettier@3.4.2)(typescript@5.8.3):
+  prettier-plugin-organize-imports@4.3.0(prettier@3.4.2)(typescript@5.8.3):
     dependencies:
       prettier: 3.4.2
       typescript: 5.8.3

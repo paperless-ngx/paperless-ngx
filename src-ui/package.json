@@ -65,7 +65,7 @@
     "jest-junit": "^16.0.0",
     "jest-preset-angular": "^15.0.2",
     "jest-websocket-mock": "^2.5.0",
-    "prettier-plugin-organize-imports": "^4.2.0",
+    "prettier-plugin-organize-imports": "^4.3.0",
     "ts-node": "~10.9.1",
     "typescript": "^5.8.3",
     "webpack": "^5.101.3"
