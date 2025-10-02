@@ -643,6 +643,10 @@ You can also use a custom `slugify` filter to slufigy text:
 {{ title | slugify }}
 ```
 
+!!! note
+
+    The `slugify` filter uses Django's built-in slugify function and will strip Unicode characters.
+
 ## Automatic recovery of invalid PDFs {#pdf-recovery}
 
 Paperless will attempt to "clean" certain invalid PDFs with `qpdf` before processing if, for example, the mime_type
