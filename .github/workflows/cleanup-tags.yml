@@ -6,10 +6,9 @@
 # This workflow will not trigger runs on forked repos.
 name: Cleanup Image Tags
 on:
-  delete:
-  push:
-    paths:
-      - ".github/workflows/cleanup-tags.yml"
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'
 concurrency:
   group: registry-tags-cleanup
   cancel-in-progress: false
