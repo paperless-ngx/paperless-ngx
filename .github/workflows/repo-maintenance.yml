@@ -15,7 +15,7 @@ jobs:
     if: github.repository_owner == 'paperless-ngx'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/stale@v9
+      - uses: actions/stale@v10
         with:
           days-before-stale: 7
           days-before-close: 14
@@ -57,7 +57,7 @@ jobs:
     if: github.repository_owner == 'paperless-ngx'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/github-script@v7
+      - uses: actions/github-script@v8
         with:
           script: |
             function sleep(ms) {
@@ -114,7 +114,7 @@ jobs:
     if: github.repository_owner == 'paperless-ngx'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/github-script@v7
+      - uses: actions/github-script@v8
         with:
           script: |
             function sleep(ms) {
@@ -206,7 +206,7 @@ jobs:
     if: github.repository_owner == 'paperless-ngx'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/github-script@v7
+      - uses: actions/github-script@v8
         with:
           script: |
             function sleep(ms) {
@@ -241,6 +241,7 @@ jobs:
                 ) {
                   nodes {
                     id,
+                    createdAt,
                     number,
                     updatedAt,
                     upvoteCount,

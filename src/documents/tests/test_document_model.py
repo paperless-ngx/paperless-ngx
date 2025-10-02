@@ -6,6 +6,7 @@ from unittest import mock
 
 from django.test import TestCase
 from django.test import override_settings
+from faker import Faker
 
 from documents.models import Correspondent
 from documents.models import Document
@@ -17,14 +18,17 @@ class TestDocument(TestCase):
         self.originals_dir = tempfile.mkdtemp()
         self.thumb_dir = tempfile.mkdtemp()
 
-        override_settings(
+        self.overrides = override_settings(
             ORIGINALS_DIR=self.originals_dir,
             THUMBNAIL_DIR=self.thumb_dir,
-        ).enable()
+        )
+
+        self.overrides.enable()
 
     def tearDown(self) -> None:
         shutil.rmtree(self.originals_dir)
         shutil.rmtree(self.thumb_dir)
+        self.overrides.disable()
 
     def test_file_deletion(self):
         document = Document.objects.create(
@@ -105,3 +109,27 @@ class TestDocument(TestCase):
             created=date(2020, 12, 25),
         )
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test")
+
+
+def test_suggestion_content():
+    """
+    Check that the document for suggestion is cropped, only if it exceeds the length limit.
+    """
+    fake_text = Faker().text(max_nb_chars=1201000)
+
+    # Do not crop content under 1.2M chars
+    content_under_limit = fake_text[:1200000]
+    doc = Document(
+        title="test",
+        created=date(2025, 6, 1),
+        content=content_under_limit,
+    )
+    assert doc.suggestion_content == content_under_limit
+
+    # If over the limit, crop to 1M char (800K from the beginning, 200K from the end)
+    content_over_limit = fake_text[:1200001]
+    expected_cropped_content = (
+        content_over_limit[:800000] + " " + content_over_limit[-200000:]
+    )
+    doc.content = content_over_limit
+    assert doc.suggestion_content == expected_cropped_content

@@ -41,7 +41,11 @@ def log_reason(
 
 
 def match_correspondents(document: Document, classifier: DocumentClassifier, user=None):
-    pred_id = classifier.predict_correspondent(document.content) if classifier else None
+    pred_id = (
+        classifier.predict_correspondent(document.suggestion_content)
+        if classifier
+        else None
+    )
 
     if user is None and document.owner is not None:
         user = document.owner
@@ -65,8 +69,11 @@ def match_correspondents(document: Document, classifier: DocumentClassifier, use
 
 
 def match_document_types(document: Document, classifier: DocumentClassifier, user=None):
-    pred_id = classifier.predict_document_type(document.content) if classifier else None
-
+    pred_id = (
+        classifier.predict_document_type(document.suggestion_content)
+        if classifier
+        else None
+    )
     if user is None and document.owner is not None:
         user = document.owner
 
@@ -89,7 +96,9 @@ def match_document_types(document: Document, classifier: DocumentClassifier, use
 
 
 def match_tags(document: Document, classifier: DocumentClassifier, user=None):
-    predicted_tag_ids = classifier.predict_tags(document.content) if classifier else []
+    predicted_tag_ids = (
+        classifier.predict_tags(document.suggestion_content) if classifier else []
+    )
 
     if user is None and document.owner is not None:
         user = document.owner
@@ -112,7 +121,11 @@ def match_tags(document: Document, classifier: DocumentClassifier, user=None):
 
 
 def match_storage_paths(document: Document, classifier: DocumentClassifier, user=None):
-    pred_id = classifier.predict_storage_path(document.content) if classifier else None
+    pred_id = (
+        classifier.predict_storage_path(document.suggestion_content)
+        if classifier
+        else None
+    )
 
     if user is None and document.owner is not None:
         user = document.owner
@@ -301,11 +314,19 @@ def consumable_document_matches_workflow(
         trigger_matched = False
 
     # Document path vs trigger path
+
+    # Use the original_path if set, else us the original_file
+    match_against = (
+        document.original_path
+        if document.original_path is not None
+        else document.original_file
+    )
+
     if (
         trigger.filter_path is not None
         and len(trigger.filter_path) > 0
         and not fnmatch(
-            document.original_file,
+            match_against,
             trigger.filter_path,
         )
     ):
@@ -373,6 +394,16 @@ def existing_document_matches_workflow(
         )
         trigger_matched = False
 
+    # Document storage_path vs trigger has_storage_path
+    if (
+        trigger.filter_has_storage_path is not None
+        and document.storage_path != trigger.filter_has_storage_path
+    ):
+        reason = (
+            f"Document storage path {document.storage_path} does not match {trigger.filter_has_storage_path}",
+        )
+        trigger_matched = False
+
     # Document original_filename vs trigger filename
     if (
         trigger.filter_filename is not None
@@ -415,6 +446,11 @@ def prefilter_documents_by_workflowtrigger(
     if trigger.filter_has_document_type is not None:
         documents = documents.filter(
             document_type=trigger.filter_has_document_type,
+        )
+
+    if trigger.filter_has_storage_path is not None:
+        documents = documents.filter(
+            storage_path=trigger.filter_has_storage_path,
         )
 
     if trigger.filter_filename is not None and len(trigger.filter_filename) > 0:

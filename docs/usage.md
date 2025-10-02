@@ -92,6 +92,16 @@ and more. These areas allow you to view, add, edit, delete and manage permission
 for these objects. You can also manage saved views, mail accounts, mail rules,
 workflows and more from the management sections.
 
+### Nested Tags
+
+Paperless-ngx v2.19 introduces support for nested tags, allowing you to create a
+hierarchy of tags, which may be useful for organizing your documents. Tags can
+have a 'parent' tag, creating a tree-like structure, to a maximum depth of 5. When
+a tag is added to a document, all of its parent tags are also added automatically
+and similarly, when a tag is removed from a document, all of its child tags are
+also removed. Additionally, assigning a parent to an existing tag will automatically
+update all documents that have this tag assigned, adding the parent tag as well.
+
 ## Adding documents to Paperless-ngx
 
 Once you've got Paperless setup, you need to start feeding documents
@@ -251,6 +261,10 @@ different means. These are as follows:
 Paperless is set up to check your mails every 10 minutes. This can be
 configured via [`PAPERLESS_EMAIL_TASK_CRON`](configuration.md#PAPERLESS_EMAIL_TASK_CRON)
 
+#### Processed Mail
+
+Paperless keeps track of emails it has processed in order to avoid processing the same mail multiple times. This uses the message `UID` provided by the mail server, which should be unique for each message. You can view and manage processed mails from the web UI under Mail > Processed Mails. If you need to re-process a message, you can delete the corresponding processed mail entry, which will allow Paperless-ngx to process the email again the next time the mail fetch task runs.
+
 #### OAuth Email Setup
 
 Paperless-ngx supports OAuth2 authentication for Gmail and Outlook email accounts. To set up an email account with OAuth2, you will need to create a 'developer' app with the respective provider and obtain the client ID and client secret and set the appropriate [configuration variables](configuration.md#email_oauth). You will also need to set either [`PAPERLESS_OAUTH_CALLBACK_BASE_URL`](configuration.md#PAPERLESS_OAUTH_CALLBACK_BASE_URL) or [`PAPERLESS_URL`](configuration.md#PAPERLESS_URL) to the correct value for the OAuth2 flow to work correctly.
@@ -408,7 +422,7 @@ Currently, there are four events that correspond to workflow trigger 'types':
    but the document content has been extracted and metadata such as document type, tags, etc. have been set, so these can now
    be used for filtering.
 3. **Document Updated**: when a document is updated. Similar to 'added' events, triggers can include filtering by content matching,
-   tags, doc type, or correspondent.
+   tags, doc type, correspondent or storage path.
 4. **Scheduled**: a scheduled trigger that can be used to run workflows at a specific time. The date used can be either the document
    added, created, updated date or you can specify a (date) custom field. You can also specify a day offset from the date (positive
    offsets will trigger after the date, negative offsets will trigger before).
@@ -452,10 +466,11 @@ Workflows allow you to filter by:
 -   File path, including wildcards. Note that enabling `PAPERLESS_CONSUMER_RECURSIVE` would allow, for
     example, automatically assigning documents to different owners based on the upload directory.
 -   Mail rule. Choosing this option will force 'mail fetch' to be the workflow source.
--   Content matching (`Added` and `Updated` triggers only). Filter document content using the matching settings.
--   Tags (`Added` and `Updated` triggers only). Filter for documents with any of the specified tags
--   Document type (`Added` and `Updated` triggers only). Filter documents with this doc type
--   Correspondent (`Added` and `Updated` triggers only). Filter documents with this correspondent
+-   Content matching (`Added`, `Updated` and `Scheduled` triggers only). Filter document content using the matching settings.
+-   Tags (`Added`, `Updated` and `Scheduled` triggers only). Filter for documents with any of the specified tags
+-   Document type (`Added`, `Updated` and `Scheduled` triggers only). Filter documents with this doc type
+-   Correspondent (`Added`, `Updated` and `Scheduled` triggers only). Filter documents with this correspondent
+-   Storage path (`Added`, `Updated` and `Scheduled` triggers only). Filter documents with this storage path
 
 ### Workflow Actions
 
@@ -505,35 +520,52 @@ you may want to adjust these settings to prevent abuse.
 
 #### Workflow placeholders
 
-Some workflow text can include placeholders but the available options differ depending on the type of
-workflow trigger. This is because at the time of consumption (when the text is to be set), no automatic tags etc. have been
-applied. You can use the following placeholders with any trigger type:
+Titles can be assigned by workflows using [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/templates/).
+This allows for complex logic to be used to generate the title, including [logical structures](https://jinja.palletsprojects.com/en/3.1.x/templates/#list-of-control-structures)
+and [filters](https://jinja.palletsprojects.com/en/3.1.x/templates/#id11).
+The template is provided as a string.
 
--   `{correspondent}`: assigned correspondent name
--   `{document_type}`: assigned document type name
--   `{owner_username}`: assigned owner username
--   `{added}`: added datetime
--   `{added_year}`: added year
--   `{added_year_short}`: added year
--   `{added_month}`: added month
--   `{added_month_name}`: added month name
--   `{added_month_name_short}`: added month short name
--   `{added_day}`: added day
--   `{added_time}`: added time in HH:MM format
--   `{original_filename}`: original file name without extension
--   `{filename}`: current file name without extension
+Using Jinja2 Templates is also useful for [Date localization](advanced_usage.md#Date-Localization) in the title.
+
+The available inputs differ depending on the type of workflow trigger.
+This is because at the time of consumption (when the text is to be set), no automatic tags etc. have been
+applied. You can use the following placeholders in the template with any trigger type:
+
+-   `{{correspondent}}`: assigned correspondent name
+-   `{{document_type}}`: assigned document type name
+-   `{{owner_username}}`: assigned owner username
+-   `{{added}}`: added datetime
+-   `{{added_year}}`: added year
+-   `{{added_year_short}}`: added year
+-   `{{added_month}}`: added month
+-   `{{added_month_name}}`: added month name
+-   `{{added_month_name_short}}`: added month short name
+-   `{{added_day}}`: added day
+-   `{{added_time}}`: added time in HH:MM format
+-   `{{original_filename}}`: original file name without extension
+-   `{{filename}}`: current file name without extension
 
 The following placeholders are only available for "added" or "updated" triggers
 
--   `{created}`: created datetime
--   `{created_year}`: created year
--   `{created_year_short}`: created year
--   `{created_month}`: created month
--   `{created_month_name}`: created month name
--   `{created_month_name_short}`: created month short name
--   `{created_day}`: created day
--   `{created_time}`: created time in HH:MM format
--   `{doc_url}`: URL to the document in the web UI. Requires the `PAPERLESS_URL` setting to be set.
+-   `{{created}}`: created datetime
+-   `{{created_year}}`: created year
+-   `{{created_year_short}}`: created year
+-   `{{created_month}}`: created month
+-   `{{created_month_name}}`: created month name
+-   `{created_month_name_short}}`: created month short name
+-   `{{created_day}}`: created day
+-   `{{created_time}}`: created time in HH:MM format
+-   `{{doc_url}}`: URL to the document in the web UI. Requires the `PAPERLESS_URL` setting to be set.
+
+##### Examples
+
+```jinja2
+{{ created | localize_date('MMMM', 'en_US') }}
+<!-- Output: "January" -->
+
+{{ added | localize_date('MMMM', 'de_DE') }}
+<!-- Output: "Juni" --> # codespell:ignore
+```
 
 ### Workflow permissions
 
@@ -605,7 +637,7 @@ When you first delete a document it is moved to the 'trash' until either it is e
 You can set how long documents remain in the trash before being automatically deleted with [`PAPERLESS_EMPTY_TRASH_DELAY`](configuration.md#PAPERLESS_EMPTY_TRASH_DELAY), which defaults
 to 30 days. Until the file is actually deleted (e.g. the trash is emptied), all files and database content remains intact and can be restored at any point up until that time.
 
-Additionally you may configure a directory where deleted files are moved to when they the trash is emptied with [`PAPERLESS_EMPTY_TRASH_DIR`](configuration.md#PAPERLESS_EMPTY_TRASH_DIR).
+Additionally you may configure a directory where deleted files are moved to when the trash is emptied with [`PAPERLESS_EMPTY_TRASH_DIR`](configuration.md#PAPERLESS_EMPTY_TRASH_DIR).
 Note that the empty trash directory only stores the original file, the archive file and all database information is permanently removed once a document is fully deleted.
 
 ## Best practices {#basic-searching}

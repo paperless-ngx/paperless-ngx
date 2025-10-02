@@ -7,12 +7,14 @@ from celery import states
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from multiselectfield import MultiSelectField
+from treenode.models import TreeNodeModel
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
@@ -96,8 +98,10 @@ class Correspondent(MatchingModel):
         verbose_name_plural = _("correspondents")
 
 
-class Tag(MatchingModel):
+class Tag(MatchingModel, TreeNodeModel):
     color = models.CharField(_("color"), max_length=7, default="#a6cee3")
+    # Maximum allowed nesting depth for tags (root = 1, max depth = 5)
+    MAX_NESTING_DEPTH: Final[int] = 5
 
     is_inbox_tag = models.BooleanField(
         _("is inbox tag"),
@@ -108,9 +112,29 @@ class Tag(MatchingModel):
         ),
     )
 
-    class Meta(MatchingModel.Meta):
+    class Meta(MatchingModel.Meta, TreeNodeModel.Meta):
         verbose_name = _("tag")
         verbose_name_plural = _("tags")
+
+    def clean(self):
+        # Prevent self-parenting and assigning a descendant as parent
+        parent = self.get_parent()
+        if parent == self:
+            raise ValidationError({"parent": _("Cannot set itself as parent.")})
+        if parent and self.pk is not None and self.is_ancestor_of(parent):
+            raise ValidationError({"parent": _("Cannot set parent to a descendant.")})
+
+        # Enforce maximum nesting depth
+        new_parent_depth = 0
+        if parent:
+            new_parent_depth = parent.get_ancestors_count() + 1
+
+        height = 0 if self.pk is None else self.get_depth()
+        deepest_new_depth = (new_parent_depth + 1) + height
+        if deepest_new_depth > self.MAX_NESTING_DEPTH:
+            raise ValidationError(_("Maximum nesting depth exceeded."))
+
+        return super().clean()
 
 
 class DocumentType(MatchingModel):
@@ -306,6 +330,28 @@ class Document(SoftDeleteModel, ModelWithOwner):
         return res
 
     @property
+    def suggestion_content(self):
+        """
+        Returns the document text used to generate suggestions.
+
+        If the document content length exceeds a specified limit,
+        the text is cropped to include the start and end segments.
+        Otherwise, the full content is returned.
+
+        This improves processing speed for large documents while keeping
+        enough context for accurate suggestions.
+        """
+        if not self.content or len(self.content) <= 1200000:
+            return self.content
+        else:
+            # Use 80% from the start and 20% from the end
+            # to preserve both opening and closing context.
+            head_len = 800000
+            tail_len = 200000
+
+            return " ".join((self.content[:head_len], self.content[-tail_len:]))
+
+    @property
     def source_path(self) -> Path:
         if self.filename:
             fname = str(self.filename)
@@ -375,6 +421,15 @@ class Document(SoftDeleteModel, ModelWithOwner):
     @property
     def created_date(self):
         return self.created
+
+    def add_nested_tags(self, tags):
+        tag_ids = set()
+        for tag in tags:
+            tag_ids.add(tag.id)
+            tag_ids.update(tag.get_ancestors_pks())
+
+        tags_to_add = self.tags.model.objects.filter(id__in=tag_ids)
+        self.tags.add(*tags_to_add)
 
 
 class SavedView(ModelWithOwner):
@@ -737,6 +792,7 @@ class CustomField(models.Model):
         MONETARY = ("monetary", _("Monetary"))
         DOCUMENTLINK = ("documentlink", _("Document Link"))
         SELECT = ("select", _("Select"))
+        LONG_TEXT = ("longtext", _("Long Text"))
 
     created = models.DateTimeField(
         _("created"),
@@ -794,6 +850,7 @@ class CustomFieldInstance(SoftDeleteModel):
         CustomField.FieldDataType.MONETARY: "value_monetary",
         CustomField.FieldDataType.DOCUMENTLINK: "value_document_ids",
         CustomField.FieldDataType.SELECT: "value_select",
+        CustomField.FieldDataType.LONG_TEXT: "value_long_text",
     }
 
     created = models.DateTimeField(
@@ -860,6 +917,8 @@ class CustomFieldInstance(SoftDeleteModel):
     value_document_ids = models.JSONField(null=True)
 
     value_select = models.CharField(null=True, max_length=16)
+
+    value_long_text = models.TextField(null=True)
 
     class Meta:
         ordering = ("created",)
@@ -1020,6 +1079,14 @@ class WorkflowTrigger(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
         verbose_name=_("has this correspondent"),
+    )
+
+    filter_has_storage_path = models.ForeignKey(
+        StoragePath,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("has this storage path"),
     )
 
     schedule_offset_days = models.IntegerField(
@@ -1185,14 +1252,12 @@ class WorkflowAction(models.Model):
         default=WorkflowActionType.ASSIGNMENT,
     )
 
-    assign_title = models.CharField(
+    assign_title = models.TextField(
         _("assign title"),
-        max_length=256,
         null=True,
         blank=True,
         help_text=_(
-            "Assign a document title, can include some placeholders, "
-            "see documentation.",
+            "Assign a document title, must  be a Jinja2 template, see documentation.",
         ),
     )
 

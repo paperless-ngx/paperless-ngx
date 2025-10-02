@@ -97,6 +97,7 @@ import {
   CustomFieldQueryExpression,
 } from 'src/app/utils/custom-field-query-element'
 import { filterRulesDiffer } from 'src/app/utils/filter-rules'
+import { flattenTags } from 'src/app/utils/flatten-tags'
 import {
   CustomFieldQueriesModel,
   CustomFieldsQueryDropdownComponent,
@@ -1134,7 +1135,7 @@ export class FilterEditorComponent
     ) {
       this.loadingCountTotal++
       this.tagService.listAll().subscribe((result) => {
-        this.tagSelectionModel.items = result.results
+        this.tagSelectionModel.items = flattenTags(result.results)
         this.maybeCompleteLoading()
       })
     }

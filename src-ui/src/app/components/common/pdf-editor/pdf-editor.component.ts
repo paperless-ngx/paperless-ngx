@@ -67,8 +67,9 @@ export class PDFEditorComponent extends ConfirmDialogComponent {
     this.pages[i].selected = !this.pages[i].selected
   }
 
-  rotate(i: number) {
-    this.pages[i].rotate = (this.pages[i].rotate + 90) % 360
+  rotate(i: number, counterclockwise: boolean = false) {
+    this.pages[i].rotate =
+      (this.pages[i].rotate + (counterclockwise ? -90 : 90) + 360) % 360
   }
 
   rotateSelected(dir: number) {

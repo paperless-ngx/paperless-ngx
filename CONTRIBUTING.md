@@ -135,7 +135,7 @@ community members. That said, in an effort to keep the repository organized and 
 - Issues, pull requests and discussions that are closed will be locked after 30 days of inactivity.
 - Discussions with a marked answer will be automatically closed.
 - Discussions in the 'General' or 'Support' categories will be closed after 180 days of inactivity.
-- Feature requests that do not meet the following thresholds will be closed: 180 days of inactivity, < 5 "up-votes" after 180 days, < 20 "up-votes" after 1 year or < 80 "up-votes" at 2 years.
+- Feature requests that do not meet the following thresholds will be closed: 180 days of inactivity with less than 80 "up-votes", < 5 "up-votes" after 180 days, < 20 "up-votes" after 1 year or < 40 "up-votes" at 2 years.
 
 In all cases, threads can be re-opened by project maintainers and, of course, users can always create a new discussion for related concerns.
 Finally, remember that all information remains searchable and 'closed' feature requests can still serve as inspiration for new features.

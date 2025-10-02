@@ -506,6 +506,7 @@ for the possible codes and their meanings.
 The `localize_date` filter formats a date or datetime object into a localized string using Babel internationalization.
 This takes into account the provided locale for translation. Since this must be used on a date or datetime object,
 you must access the field directly, i.e. `document.created`.
+An ISO string can also be provided to control the output format.
 
 ###### Syntax
 
@@ -516,7 +517,7 @@ you must access the field directly, i.e. `document.created`.
 
 ###### Parameters
 
--   `value` (date | datetime): Date or datetime object to format (datetime should be timezone-aware)
+-   `value` (date | datetime | str): Date, datetime object or ISO string to format (datetime should be timezone-aware)
 -   `format` (str): Format type - either a Babel preset ('short', 'medium', 'long', 'full') or custom pattern
 -   `locale` (str): Locale code for localization (e.g., 'en_US', 'fr_FR', 'de_DE')
 
