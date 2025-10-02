@@ -279,13 +279,6 @@ class BulkPermissionMixin:
     Prefetch Django-Guardian permissions for a list before serialization, to avoid N+1 queries.
     """
 
-    def get_permission_codenames(self):
-        model_name = self.queryset.model.__name__.lower()
-        return {
-            "view": f"view_{model_name}",
-            "change": f"change_{model_name}",
-        }
-
     def _get_object_perms(
         self,
         objects: list,
@@ -347,22 +340,32 @@ class BulkPermissionMixin:
         else:
             queryset = self.filter_queryset(self.get_queryset())
 
-        codenames = self.get_permission_codenames()
-        perm_names = [codenames["view"], codenames["change"]]
-        user_perms = self._get_object_perms(queryset, perm_names, actor="users")
-        group_perms = self._get_object_perms(queryset, perm_names, actor="groups")
+        model_name = self.queryset.model.__name__.lower()
+        permission_name_view = f"view_{model_name}"
+        permission_name_change = f"change_{model_name}"
+
+        user_perms = self._get_object_perms(
+            objects=queryset,
+            perm_codenames=[permission_name_view, permission_name_change],
+            actor="users",
+        )
+        group_perms = self._get_object_perms(
+            objects=queryset,
+            perm_codenames=[permission_name_view, permission_name_change],
+            actor="groups",
+        )
 
         context["users_view_perms"] = {
-            pk: user_perms[pk][codenames["view"]] for pk in user_perms
+            pk: user_perms[pk][permission_name_view] for pk in user_perms
         }
         context["users_change_perms"] = {
-            pk: user_perms[pk][codenames["change"]] for pk in user_perms
+            pk: user_perms[pk][permission_name_change] for pk in user_perms
         }
         context["groups_view_perms"] = {
-            pk: group_perms[pk][codenames["view"]] for pk in group_perms
+            pk: group_perms[pk][permission_name_view] for pk in group_perms
         }
         context["groups_change_perms"] = {
-            pk: group_perms[pk][codenames["change"]] for pk in group_perms
+            pk: group_perms[pk][permission_name_change] for pk in group_perms
         }
 
         return context
