@@ -55,7 +55,6 @@ dependencies = [
   "ocrmypdf~=16.11.0",
   "pathvalidate~=3.3.1",
   "pdf2image~=1.17.0",
-  "psycopg-pool",
   "python-dateutil~=2.9.0",
   "python-dotenv~=1.1.0",
   "python-gnupg~=0.5.4",
