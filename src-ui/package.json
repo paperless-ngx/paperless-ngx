@@ -70,6 +70,7 @@
     "typescript": "^5.8.3",
     "webpack": "^5.102.0"
   },
+  "packageManager": "pnpm@10.17.1",
   "pnpm": {
     "onlyBuiltDependencies": [
       "@parcel/watcher",
