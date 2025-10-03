@@ -156,6 +156,16 @@ describe('DocumentDetailComponent', () => {
         {
           provide: TagService,
           useValue: {
+            getCachedMany: (ids: number[]) =>
+              of(
+                ids.map((id) => ({
+                  id,
+                  name: `Tag${id}`,
+                  is_inbox_tag: true,
+                  color: '#ff0000',
+                  text_color: '#000000',
+                }))
+              ),
             listAll: () =>
               of({
                 count: 3,
@@ -382,8 +392,32 @@ describe('DocumentDetailComponent', () => {
     currentUserCan = true
   })
 
-  it('should support creating document type', () => {
+  it('should support creating tag, remove from suggestions', () => {
     initNormally()
+    component.suggestions = {
+      suggested_tags: ['Tag1', 'NewTag12'],
+    }
+    let openModal: NgbModalRef
+    modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
+    const modalSpy = jest.spyOn(modalService, 'open')
+    component.createTag('NewTag12')
+    expect(modalSpy).toHaveBeenCalled()
+    openModal.componentInstance.succeeded.next({
+      id: 12,
+      name: 'NewTag12',
+      is_inbox_tag: true,
+      color: '#ff0000',
+      text_color: '#000000',
+    })
+    expect(component.tagsInput.value).toContain(12)
+    expect(component.suggestions.suggested_tags).not.toContain('NewTag12')
+  })
+
+  it('should support creating document type, remove from suggestions', () => {
+    initNormally()
+    component.suggestions = {
+      suggested_document_types: ['DocumentType1', 'NewDocType2'],
+    }
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const modalSpy = jest.spyOn(modalService, 'open')
@@ -391,10 +425,16 @@ describe('DocumentDetailComponent', () => {
     expect(modalSpy).toHaveBeenCalled()
     openModal.componentInstance.succeeded.next({ id: 12, name: 'NewDocType12' })
     expect(component.documentForm.get('document_type').value).toEqual(12)
+    expect(component.suggestions.suggested_document_types).not.toContain(
+      'NewDocType2'
+    )
   })
 
-  it('should support creating correspondent', () => {
+  it('should support creating correspondent, remove from suggestions', () => {
     initNormally()
+    component.suggestions = {
+      suggested_correspondents: ['Correspondent1', 'NewCorrrespondent12'],
+    }
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const modalSpy = jest.spyOn(modalService, 'open')
@@ -405,6 +445,9 @@ describe('DocumentDetailComponent', () => {
       name: 'NewCorrrespondent12',
     })
     expect(component.documentForm.get('correspondent').value).toEqual(12)
+    expect(component.suggestions.suggested_correspondents).not.toContain(
+      'NewCorrrespondent12'
+    )
   })
 
   it('should support creating storage path', () => {
@@ -995,7 +1038,7 @@ describe('DocumentDetailComponent', () => {
     expect(component.document.custom_fields).toHaveLength(initialLength - 1)
     expect(component.customFieldFormFields).toHaveLength(initialLength - 1)
     expect(
-      fixture.debugElement.query(By.css('form')).nativeElement.textContent
+      fixture.debugElement.query(By.css('form ul')).nativeElement.textContent
     ).not.toContain('Field 1')
     const patchSpy = jest.spyOn(documentService, 'patch')
     component.save(true)
@@ -1086,10 +1129,22 @@ describe('DocumentDetailComponent', () => {
 
   it('should get suggestions', () => {
     const suggestionsSpy = jest.spyOn(documentService, 'getSuggestions')
-    suggestionsSpy.mockReturnValue(of({ tags: [42, 43] }))
+    suggestionsSpy.mockReturnValue(
+      of({
+        tags: [42, 43],
+        suggested_tags: [],
+        suggested_document_types: [],
+        suggested_correspondents: [],
+      })
+    )
     initNormally()
     expect(suggestionsSpy).toHaveBeenCalled()
-    expect(component.suggestions).toEqual({ tags: [42, 43] })
+    expect(component.suggestions).toEqual({
+      tags: [42, 43],
+      suggested_tags: [],
+      suggested_document_types: [],
+      suggested_correspondents: [],
+    })
   })
 
   it('should show error if needed for get suggestions', () => {
