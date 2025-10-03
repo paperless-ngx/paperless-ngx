@@ -36,7 +36,7 @@ jobs:
           scheme: "branch"
           repo_name: "paperless-ngx"
           match_regex: "(feature|fix)"
-          do_delete: "false"
+          do_delete: "true"
   cleanup-untagged-images:
     name: Cleanup Untagged Images Tags for ${{ matrix.primary-name }}
     if: github.repository_owner == 'paperless-ngx'
@@ -59,4 +59,4 @@ jobs:
           owner: "${{ github.repository_owner }}"
           is_org: "true"
           package_name: "${{ matrix.primary-name }}"
-          do_delete: "false"
+          do_delete: "true"
