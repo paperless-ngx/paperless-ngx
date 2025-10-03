@@ -1162,12 +1162,14 @@ def run_workflows(
             else ""
         )
         try:
+            attachments = []
+            if action.email.include_document and original_file:
+                attachments = [(original_file, document.mime_type)]
             n_messages = send_email(
                 subject=subject,
                 body=body,
                 to=action.email.to.split(","),
-                attachment=original_file if action.email.include_document else None,
-                attachment_mime_type=document.mime_type,
+                attachments=attachments,
             )
             logger.debug(
                 f"Sent {n_messages} notification email(s) to {action.email.to}",

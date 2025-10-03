@@ -1,5 +1,9 @@
 <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">{{title}}</h4>
+    <h4 class="modal-title" id="modal-basic-title" i18n>{
+      documentIds.length,
+      plural,
+      =1 {Email Document} other {Email {{documentIds.length}} Documents}
+    }</h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
 </div>
 <div class="modal-body">
@@ -22,11 +26,14 @@
             <input class="form-check-input mt-0 me-2" type="checkbox" role="switch" id="useArchiveVersion" [disabled]="!hasArchiveVersion" [(ngModel)]="useArchiveVersion">
             <label class="form-check-label w-100 text-start" for="useArchiveVersion" i18n>Use archive version</label>
         </div>
-        <button type="submit" class="btn btn-outline-primary" (click)="emailDocument()" [disabled]="loading || emailAddress.length === 0 || emailMessage.length === 0 || emailSubject.length === 0">
+        <button type="submit" class="btn btn-outline-primary" (click)="emailDocuments()" [disabled]="loading || emailAddress.length === 0 || emailMessage.length === 0 || emailSubject.length === 0">
             @if (loading) {
                 <div class="spinner-border spinner-border-sm me-2" role="status"></div>
             }
             <ng-container i18n>Send email</ng-container>
         </button>
+    </div>
+    <div class="text-light fst-italic small mt-2">
+        <ng-container i18n>Some email servers may reject messages with large attachments.</ng-container>
     </div>
 </div>

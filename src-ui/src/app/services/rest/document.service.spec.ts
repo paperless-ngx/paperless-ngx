@@ -357,17 +357,15 @@ it('should include custom fields in sort fields if user has permission', () => {
 
 it('should call appropriate api endpoint for email document', () => {
   subscription = service
-    .emailDocument(
-      documents[0].id,
+    .emailDocuments(
+      [documents[0].id],
       'hello@paperless-ngx.com',
       'hello',
       'world',
       true
     )
     .subscribe()
-  httpTestingController.expectOne(
-    `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/email/`
-  )
+  httpTestingController.expectOne(`${environment.apiBaseUrl}${endpoint}/email/`)
 })
 
 afterEach(() => {
