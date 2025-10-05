@@ -361,18 +361,26 @@ def existing_document_matches_workflow(
         trigger_matched = False
 
     # Document tags vs trigger has_tags
-    if (
-        trigger.filter_has_tags.all().count() > 0
-        and document.tags.filter(
-            id__in=trigger.filter_has_tags.all().values_list("id"),
-        ).count()
-        == 0
-    ):
-        reason = (
-            f"Document tags {document.tags.all()} do not include"
-            f" {trigger.filter_has_tags.all()}",
-        )
-        trigger_matched = False
+    if trigger.filter_has_tags.all().count() > 0:
+        required_tag_ids = list(trigger.filter_has_tags.all().values_list("id", flat=True))
+        document_tag_ids = list(document.tags.values_list("id", flat=True))
+        
+        if trigger.filter_tags_require_all:
+            # AND logic: document must have ALL required tags
+            if not all(tag_id in document_tag_ids for tag_id in required_tag_ids):
+                reason = (
+                    f"Document tags {document.tags.all()} do not include ALL required tags"
+                    f" {trigger.filter_has_tags.all()}",
+                )
+                trigger_matched = False
+        else:
+            # OR logic: document must have ANY of the required tags (original behavior)
+            if not any(tag_id in document_tag_ids for tag_id in required_tag_ids):
+                reason = (
+                    f"Document tags {document.tags.all()} do not include ANY of"
+                    f" {trigger.filter_has_tags.all()}",
+                )
+                trigger_matched = False
 
     # Document correspondent vs trigger has_correspondent
     if (

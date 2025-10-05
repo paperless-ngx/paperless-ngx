@@ -2194,6 +2194,7 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             "match",
             "is_insensitive",
             "filter_has_tags",
+            "filter_tags_require_all",
             "filter_has_correspondent",
             "filter_has_document_type",
             "filter_has_storage_path",

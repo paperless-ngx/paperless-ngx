@@ -1065,6 +1065,15 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has these tag(s)"),
     )
 
+    filter_tags_require_all = models.BooleanField(
+        _("require all tags"),
+        default=False,
+        help_text=_(
+            "If checked, document must have ALL selected tags. "
+            "If unchecked, document needs ANY of the selected tags."
+        ),
+    )
+
     filter_has_document_type = models.ForeignKey(
         DocumentType,
         null=True,

@@ -406,6 +406,7 @@ export class WorkflowEditDialogComponent
         match: new FormControl(trigger.match),
         is_insensitive: new FormControl(trigger.is_insensitive),
         filter_has_tags: new FormControl(trigger.filter_has_tags),
+        filter_tags_require_all: new FormControl(trigger.filter_tags_require_all),
         filter_has_correspondent: new FormControl(
           trigger.filter_has_correspondent
         ),
@@ -537,6 +538,7 @@ export class WorkflowEditDialogComponent
       filter_path: null,
       filter_mailrule: null,
       filter_has_tags: [],
+      filter_tags_require_all: false,
       filter_has_correspondent: null,
       filter_has_document_type: null,
       filter_has_storage_path: null,
