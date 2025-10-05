@@ -435,7 +435,7 @@ def existing_document_matches_workflow(
                 break
                 
             # Get the actual value from the document instance
-            value_field_name = document_instance.get_value_field_name()
+            value_field_name = document_instance.get_value_field_name(document_instance.field.data_type)
             actual_value = getattr(document_instance, value_field_name, None)
             
             # Compare values
