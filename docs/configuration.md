@@ -980,21 +980,10 @@ paperless will process in parallel on a single document.
         process very large documents faster, use a higher thread per worker
         count.
 
-    The default is a balance between the two, according to your CPU core
-    count, with a slight favor towards threads per worker:
-
-    | CPU core count | Workers | Threads |
-    | -------------- | ------- | ------- |
-    | > 1            | > 1     | > 1     |
-    | > 2            | > 2     | > 1     |
-    | > 4            | > 2     | > 2     |
-    | > 6            | > 2     | > 3     |
-    | > 8            | > 2     | > 4     |
-    | > 12           | > 3     | > 4     |
-    | > 16           | > 4     | > 4     |
-
-    If you only specify PAPERLESS_TASK_WORKERS, paperless will adjust
-    PAPERLESS_THREADS_PER_WORKER automatically.
+    The default depends on `PAPERLESS_THREADS_PER_WORKER` and is
+    calculated so that the total number of threads is at most
+    equal to the total number of (logical) CPU cores (and possibly
+    less due to rounding).
 
 #### [`PAPERLESS_WORKER_TIMEOUT=<num>`](#PAPERLESS_WORKER_TIMEOUT) {#PAPERLESS_WORKER_TIMEOUT}
 
