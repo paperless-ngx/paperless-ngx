@@ -412,6 +412,41 @@ def existing_document_matches_workflow(
         )
         trigger_matched = False
 
+    # Document custom fields vs trigger has_custom_fields
+    if trigger.filter_has_custom_fields.exists():
+        required_custom_fields = trigger.filter_has_custom_fields.all()
+        document_custom_field_instances = document.custom_fields.all()
+        
+        for custom_field in required_custom_fields:
+            # Get the expected value from trigger
+            expected_value = trigger.filter_custom_fields_values.get(str(custom_field.pk), None)
+            if expected_value is None:
+                continue
+                
+            # Find the document's custom field instance for this field
+            document_instance = document_custom_field_instances.filter(field=custom_field).first()
+            
+            if document_instance is None:
+                reason = (
+                    f"Document does not have custom field '{custom_field.name}' "
+                    f"with value '{expected_value}'",
+                )
+                trigger_matched = False
+                break
+                
+            # Get the actual value from the document instance
+            value_field_name = document_instance.get_value_field_name()
+            actual_value = getattr(document_instance, value_field_name, None)
+            
+            # Compare values
+            if actual_value != expected_value:
+                reason = (
+                    f"Document custom field '{custom_field.name}' has value '{actual_value}' "
+                    f"but trigger expects '{expected_value}'",
+                )
+                trigger_matched = False
+                break
+
     # Document original_filename vs trigger filename
     if (
         trigger.filter_filename is not None

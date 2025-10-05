@@ -2196,6 +2196,8 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             "filter_has_tags",
             "filter_tags_require_all",
             "filter_has_correspondent",
+            "filter_has_custom_fields",
+            "filter_custom_fields_values",
             "filter_has_document_type",
             "filter_has_storage_path",
             "schedule_offset_days",

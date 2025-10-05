@@ -179,6 +179,8 @@
           <pngx-input-select i18n-title title="Has correspondent" [items]="correspondents" [allowNull]="true" formControlName="filter_has_correspondent"></pngx-input-select>
           <pngx-input-select i18n-title title="Has document type" [items]="documentTypes" [allowNull]="true" formControlName="filter_has_document_type"></pngx-input-select>
           <pngx-input-select i18n-title title="Has storage path" [items]="storagePaths" [allowNull]="true" formControlName="filter_has_storage_path"></pngx-input-select>
+          <pngx-input-select i18n-title title="Has custom fields" multiple="true" [items]="customFields" [allowNull]="true" formControlName="filter_has_custom_fields"></pngx-input-select>
+          <pngx-input-custom-fields-values formControlName="filter_custom_fields_values" [selectedFields]="formGroup.get('filter_has_custom_fields').value" (removeSelectedField)="removeSelectedCustomField($event, formGroup)"></pngx-input-custom-fields-values>
         </div>
       }
     </div>

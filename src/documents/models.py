@@ -1098,6 +1098,24 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has this storage path"),
     )
 
+    filter_has_custom_fields = models.ManyToManyField(
+        CustomField,
+        blank=True,
+        related_name="+",
+        verbose_name=_("has these custom fields"),
+    )
+
+    filter_custom_fields_values = models.JSONField(
+        _("custom field values"),
+        null=True,
+        blank=True,
+        help_text=_(
+            "Values to match against the custom fields. "
+            "Document must have custom field instances with these values."
+        ),
+        default=dict,
+    )
+
     schedule_offset_days = models.IntegerField(
         _("schedule offset days"),
         default=0,
