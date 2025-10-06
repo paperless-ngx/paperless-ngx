@@ -11219,6 +11219,30 @@
         </context-group>
         <target state="translated">Завершено.</target>
       </trans-unit>
+      <trans-unit id="1234567890123456789" datatype="html">
+        <source>Apply to documents that have any of the selected tags (OR logic). Check the box below to require ALL selected tags (AND logic).</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
+          <context context-type="linenumber">177</context>
+        </context-group>
+        <target state="needs-translation">Застосовувати до документів, які мають будь-який з вибраних тегів (логіка АБО). Встановіть прапорець нижче, щоб вимагати ВСІ вибрані теги (логіка І).</target>
+      </trans-unit>
+      <trans-unit id="1234567890123456790" datatype="html">
+        <source>When checked, document must have ALL selected tags. When unchecked, document needs ANY of the selected tags.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
+          <context context-type="linenumber">178</context>
+        </context-group>
+        <target state="needs-translation">Коли встановлено, документ повинен мати ВСІ вибрані теги. Коли знято, документу потрібен БУДЬ-ЯКИЙ з вибраних тегів.</target>
+      </trans-unit>
+      <trans-unit id="1234567890123456791" datatype="html">
+        <source>Apply to documents that have custom field instances with the specified values. Select multiple fields and set their expected values below.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
+          <context context-type="linenumber">182</context>
+        </context-group>
+        <target state="needs-translation">Застосовувати до документів, які мають екземпляри користувацьких полів з вказаними значеннями. Виберіть кілька полів та встановіть їх очікувані значення нижче.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -11218,6 +11218,30 @@
         </context-group>
         <target state="final">Terminé.</target>
       </trans-unit>
+      <trans-unit id="1234567890123456789" datatype="html">
+        <source>Apply to documents that have any of the selected tags (OR logic). Check the box below to require ALL selected tags (AND logic).</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
+          <context context-type="linenumber">177</context>
+        </context-group>
+        <target state="needs-translation">Appliquer aux documents qui ont l'un des tags sélectionnés (logique OU). Cochez la case ci-dessous pour exiger TOUS les tags sélectionnés (logique ET).</target>
+      </trans-unit>
+      <trans-unit id="1234567890123456790" datatype="html">
+        <source>When checked, document must have ALL selected tags. When unchecked, document needs ANY of the selected tags.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
+          <context context-type="linenumber">178</context>
+        </context-group>
+        <target state="needs-translation">Quand coché, le document doit avoir TOUS les tags sélectionnés. Quand décoché, le document a besoin d'UN des tags sélectionnés.</target>
+      </trans-unit>
+      <trans-unit id="1234567890123456791" datatype="html">
+        <source>Apply to documents that have custom field instances with the specified values. Select multiple fields and set their expected values below.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
+          <context context-type="linenumber">182</context>
+        </context-group>
+        <target state="needs-translation">Appliquer aux documents qui ont des instances de champs personnalisés avec les valeurs spécifiées. Sélectionnez plusieurs champs et définissez leurs valeurs attendues ci-dessous.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
