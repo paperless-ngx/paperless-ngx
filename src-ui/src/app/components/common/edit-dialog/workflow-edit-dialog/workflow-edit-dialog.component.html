@@ -174,12 +174,12 @@
       </div>
       @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated || formGroup.get('type').value === WorkflowTriggerType.Scheduled) {
         <div class="col-md-6">
-          <pngx-input-tags [allowCreate]="false" i18n-title title="Has tags" formControlName="filter_has_tags"></pngx-input-tags>
-          <pngx-input-check i18n-title title="Require all selected tags (AND logic)" formControlName="filter_tags_require_all"></pngx-input-check>
+          <pngx-input-tags [allowCreate]="false" i18n-title title="Has tags" i18n-hint hint="Apply to documents that have any of the selected tags (OR logic). Check the box below to require ALL selected tags (AND logic)." formControlName="filter_has_tags"></pngx-input-tags>
+          <pngx-input-check i18n-title title="Require all selected tags (AND logic)" i18n-hint hint="When checked, document must have ALL selected tags. When unchecked, document needs ANY of the selected tags." formControlName="filter_tags_require_all"></pngx-input-check>
           <pngx-input-select i18n-title title="Has correspondent" [items]="correspondents" [allowNull]="true" formControlName="filter_has_correspondent"></pngx-input-select>
           <pngx-input-select i18n-title title="Has document type" [items]="documentTypes" [allowNull]="true" formControlName="filter_has_document_type"></pngx-input-select>
           <pngx-input-select i18n-title title="Has storage path" [items]="storagePaths" [allowNull]="true" formControlName="filter_has_storage_path"></pngx-input-select>
-          <pngx-input-select i18n-title title="Has custom fields" multiple="true" [items]="customFields" [allowNull]="true" formControlName="filter_has_custom_fields"></pngx-input-select>
+          <pngx-input-select i18n-title title="Has custom fields" i18n-hint hint="Apply to documents that have custom field instances with the specified values. Select multiple fields and set their expected values below." multiple="true" [items]="customFields" [allowNull]="true" formControlName="filter_has_custom_fields"></pngx-input-select>
           <pngx-input-custom-fields-values formControlName="filter_custom_fields_values" [selectedFields]="formGroup.get('filter_has_custom_fields').value" (removeSelectedField)="removeSelectedCustomField($event, formGroup)"></pngx-input-custom-fields-values>
         </div>
       }
