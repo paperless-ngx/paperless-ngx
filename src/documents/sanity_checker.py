@@ -76,7 +76,9 @@ def check_sanity(*, progress=False, scheduled=True) -> SanityCheckMessages:
     messages = SanityCheckMessages()
 
     present_files = {
-        x.resolve() for x in Path(settings.MEDIA_ROOT).glob("**/*") if not x.is_dir()
+        x.resolve()
+        for x in Path(settings.MEDIA_ROOT).glob("**/*")
+        if not x.is_dir() and x.name not in settings.IGNORABLE_FILES
     }
 
     lockfile = Path(settings.MEDIA_LOCK).resolve()
