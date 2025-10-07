@@ -13,6 +13,8 @@
   </picture>
 </p>
 
+# So we pass lint =)
+
 <!-- omit in toc -->
 
 # Paperless-ngx
