@@ -11,7 +11,9 @@ import {
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of } from 'rxjs'
+import { CustomFieldQueriesModel } from 'src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
 import { CustomFieldDataType } from 'src/app/data/custom-field'
+import { CustomFieldQueryLogicalOperator } from 'src/app/data/custom-field-query'
 import {
   MATCHING_ALGORITHMS,
   MATCH_AUTO,
@@ -35,6 +37,7 @@ import { DocumentTypeService } from 'src/app/services/rest/document-type.service
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { CustomFieldQueryExpression } from 'src/app/utils/custom-field-query-element'
 import { ConfirmButtonComponent } from '../../confirm-button/confirm-button.component'
 import { NumberComponent } from '../../input/number/number.component'
 import { PermissionsGroupComponent } from '../../input/permissions/permissions-group/permissions-group.component'
@@ -466,6 +469,49 @@ describe('WorkflowEditDialogComponent', () => {
     expect(formValues.triggers[0].conditions).toBeUndefined()
   })
 
+  it('should ignore empty and null condition values when mapping filters', () => {
+    component.object = undefined
+    component.addTrigger()
+    const triggerGroup = component.triggerFields.at(0) as FormGroup
+
+    const tagsCondition = component.addCondition(triggerGroup)
+    tagsCondition.get('type').setValue(TriggerConditionType.TagsAny)
+    tagsCondition.get('values').setValue([])
+
+    const correspondentCondition = component.addCondition(triggerGroup)
+    correspondentCondition
+      .get('type')
+      .setValue(TriggerConditionType.CorrespondentIs)
+    correspondentCondition.get('values').setValue(null)
+
+    const formValues = component['getFormValues']()
+
+    expect(formValues.triggers[0].filter_has_tags).toEqual([])
+    expect(formValues.triggers[0].filter_has_correspondent).toBeNull()
+  })
+
+  it('should derive single select filters from array values', () => {
+    component.object = undefined
+    component.addTrigger()
+    const triggerGroup = component.triggerFields.at(0) as FormGroup
+
+    const addConditionOfType = (type: TriggerConditionType, value: any) => {
+      const condition = component.addCondition(triggerGroup)
+      condition.get('type').setValue(type)
+      condition.get('values').setValue(value)
+    }
+
+    addConditionOfType(TriggerConditionType.CorrespondentIs, [5])
+    addConditionOfType(TriggerConditionType.DocumentTypeIs, [6])
+    addConditionOfType(TriggerConditionType.StoragePathIs, [7])
+
+    const formValues = component['getFormValues']()
+
+    expect(formValues.triggers[0].filter_has_correspondent).toEqual(5)
+    expect(formValues.triggers[0].filter_has_document_type).toEqual(6)
+    expect(formValues.triggers[0].filter_has_storage_path).toEqual(7)
+  })
+
   it('should reuse cached condition type options and update disabled state', () => {
     component.object = undefined
     component.addTrigger()
@@ -498,6 +544,111 @@ describe('WorkflowEditDialogComponent', () => {
       (option) => option.id === TriggerConditionType.CorrespondentIs
     )
     expect(correspondentOptionAfter.disabled).toBe(false)
+  })
+
+  it('should keep multi-entry condition options enabled and allow duplicates', () => {
+    component.object = undefined
+    component.addTrigger()
+    const triggerGroup = component.triggerFields.at(0) as FormGroup
+
+    component.conditionDefinitions = [
+      {
+        id: TriggerConditionType.TagsAny,
+        name: 'Any tags',
+        inputType: 'tags',
+        allowMultipleEntries: true,
+        allowMultipleValues: true,
+      } as any,
+      {
+        id: TriggerConditionType.CorrespondentIs,
+        name: 'Correspondent is',
+        inputType: 'select',
+        allowMultipleEntries: false,
+        allowMultipleValues: false,
+        selectItems: 'correspondents',
+      } as any,
+    ]
+
+    const firstCondition = component.addCondition(triggerGroup)
+    firstCondition.get('type').setValue(TriggerConditionType.TagsAny)
+
+    const secondCondition = component.addCondition(triggerGroup)
+    expect(secondCondition).not.toBeNull()
+
+    const options = component.getConditionTypeOptions(triggerGroup, 1)
+    const multiEntryOption = options.find(
+      (option) => option.id === TriggerConditionType.TagsAny
+    )
+
+    expect(multiEntryOption.disabled).toBe(false)
+    expect(component.canAddCondition(triggerGroup)).toBe(true)
+  })
+
+  it('should return null when no condition definitions remain available', () => {
+    component.object = undefined
+    component.addTrigger()
+    const triggerGroup = component.triggerFields.at(0) as FormGroup
+
+    component.conditionDefinitions = [
+      {
+        id: TriggerConditionType.TagsAny,
+        name: 'Any tags',
+        inputType: 'tags',
+        allowMultipleEntries: false,
+        allowMultipleValues: true,
+      } as any,
+      {
+        id: TriggerConditionType.CorrespondentIs,
+        name: 'Correspondent is',
+        inputType: 'select',
+        allowMultipleEntries: false,
+        allowMultipleValues: false,
+        selectItems: 'correspondents',
+      } as any,
+    ]
+
+    const firstCondition = component.addCondition(triggerGroup)
+    firstCondition.get('type').setValue(TriggerConditionType.TagsAny)
+    const secondCondition = component.addCondition(triggerGroup)
+    secondCondition.get('type').setValue(TriggerConditionType.CorrespondentIs)
+
+    expect(component.canAddCondition(triggerGroup)).toBe(false)
+    expect(component.addCondition(triggerGroup)).toBeNull()
+  })
+
+  it('should return null when adding condition for unknown trigger form group', () => {
+    expect(component.addCondition(new FormGroup({}) as any)).toBeNull()
+  })
+
+  it('should ignore remove condition calls for unknown trigger form group', () => {
+    expect(() =>
+      component.removeCondition(new FormGroup({}) as any, 0)
+    ).not.toThrow()
+  })
+
+  it('should teardown custom field query model when removing a custom field condition', () => {
+    component.object = undefined
+    component.addTrigger()
+    const triggerGroup = component.triggerFields.at(0) as FormGroup
+
+    component.addCondition(triggerGroup)
+    const conditions = component.getConditionsFormArray(triggerGroup)
+    const conditionGroup = conditions.at(0) as FormGroup
+    conditionGroup.get('type').setValue(TriggerConditionType.CustomFieldQuery)
+
+    const model = component.getCustomFieldQueryModel(conditionGroup)
+    expect(model).toBeDefined()
+    expect(component['customFieldQueryModels'].has(conditionGroup)).toBe(true)
+
+    component.removeCondition(triggerGroup, 0)
+    expect(component['customFieldQueryModels'].has(conditionGroup)).toBe(false)
+  })
+
+  it('should return readable condition names', () => {
+    expect(component.getConditionName(TriggerConditionType.TagsAny)).toBe(
+      'Has any of these tags'
+    )
+    expect(component.getConditionName(999 as any)).toBe('')
   })
 
   it('should build condition form array from existing trigger filters', () => {
@@ -559,6 +710,100 @@ describe('WorkflowEditDialogComponent', () => {
         TriggerConditionType.CustomFieldQuery
       )
     ).toBe(true)
+  })
+
+  it('should handle custom field query selection change and validation states', () => {
+    const formGroup = new FormGroup({
+      values: new FormControl(null),
+    })
+    const model = new CustomFieldQueriesModel()
+
+    const changeSpy = jest.spyOn(
+      component as any,
+      'onCustomFieldQueryModelChanged'
+    )
+
+    component.onCustomFieldQuerySelectionChange(formGroup, model)
+    expect(changeSpy).toHaveBeenCalledWith(formGroup, model)
+
+    const map = component['customFieldQueryModels']
+
+    expect(component.isCustomFieldQueryValid(formGroup)).toBe(true)
+    map.set(formGroup, model)
+
+    const validSpy = jest.spyOn(model, 'isValid').mockReturnValue(false)
+    const emptySpy = jest.spyOn(model, 'isEmpty').mockReturnValue(false)
+    expect(component.isCustomFieldQueryValid(formGroup)).toBe(false)
+    expect(validSpy).toHaveBeenCalled()
+
+    validSpy.mockReturnValue(true)
+    emptySpy.mockReturnValue(true)
+    expect(component.isCustomFieldQueryValid(formGroup)).toBe(true)
+
+    emptySpy.mockReturnValue(false)
+    expect(component.isCustomFieldQueryValid(formGroup)).toBe(true)
+
+    map.delete(formGroup)
+  })
+
+  it('should recover from invalid custom field query json and update control on changes', () => {
+    const conditionGroup = new FormGroup({
+      values: new FormControl('not-json'),
+    })
+
+    component['ensureCustomFieldQueryModel'](conditionGroup, 'not-json')
+
+    const model = component['customFieldQueryModels'].get(conditionGroup)
+    expect(model).toBeDefined()
+    expect(model.queries.length).toBeGreaterThan(0)
+
+    const valuesControl = conditionGroup.get('values')
+    expect(valuesControl.value).toBeNull()
+
+    const expression = new CustomFieldQueryExpression([
+      CustomFieldQueryLogicalOperator.And,
+      [[1, 'exact', 'value']],
+    ])
+    model.queries = [expression]
+
+    jest.spyOn(model, 'isValid').mockReturnValue(true)
+    jest.spyOn(model, 'isEmpty').mockReturnValue(false)
+
+    model.changed.next(model)
+
+    expect(valuesControl.value).toEqual(JSON.stringify(expression.serialize()))
+
+    component['teardownCustomFieldQueryModel'](conditionGroup)
+  })
+
+  it('should handle custom field query model change edge cases', () => {
+    const groupWithoutControl = new FormGroup({})
+    const dummyModel = {
+      isValid: jest.fn().mockReturnValue(true),
+      isEmpty: jest.fn().mockReturnValue(false),
+    }
+
+    expect(() =>
+      component['onCustomFieldQueryModelChanged'](
+        groupWithoutControl as any,
+        dummyModel as any
+      )
+    ).not.toThrow()
+
+    const groupWithControl = new FormGroup({
+      values: new FormControl('initial'),
+    })
+    const emptyModel = {
+      isValid: jest.fn().mockReturnValue(true),
+      isEmpty: jest.fn().mockReturnValue(true),
+    }
+
+    component['onCustomFieldQueryModelChanged'](
+      groupWithControl as any,
+      emptyModel as any
+    )
+
+    expect(groupWithControl.get('values').value).toBeNull()
   })
 
   it('should normalize condition values for single and multi selects', () => {
