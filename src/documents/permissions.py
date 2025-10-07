@@ -161,3 +161,21 @@ class PaperlessNotePermissions(BasePermission):
         perms = self.perms_map[request.method]
 
         return request.user.has_perms(perms)
+
+
+class AcknowledgeTasksPermissions(BasePermission):
+    """
+    Permissions class that checks for model permissions for acknowledging tasks.
+    """
+
+    perms_map = {
+        "POST": ["documents.change_paperlesstask"],
+    }
+
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:  # pragma: no cover
+            return False
+
+        perms = self.perms_map.get(request.method, [])
+
+        return request.user.has_perms(perms)
