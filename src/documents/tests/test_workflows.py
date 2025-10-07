@@ -1083,6 +1083,82 @@ class TestWorkflows(
             expected_str = f"Document tags {doc.tags.all()} do not include {trigger.filter_has_tags.all()}"
             self.assertIn(expected_str, cm.output[1])
 
+    def test_document_added_no_match_all_tags(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        trigger.filter_has_all_tags.set([self.t1, self.t2])
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        doc.tags.set([self.t1])
+        doc.save()
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = (
+                f"Document tags {doc.tags.all()} do not contain all of"
+                f" {trigger.filter_has_all_tags.all()}"
+            )
+            self.assertIn(expected_str, cm.output[1])
+
+    def test_document_added_excluded_tags(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        trigger.filter_has_not_tags.set([self.t3])
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        doc.tags.set([self.t3])
+        doc.save()
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = (
+                f"Document tags {doc.tags.all()} include excluded tags"
+                f" {trigger.filter_has_not_tags.all()}"
+            )
+            self.assertIn(expected_str, cm.output[1])
+
     def test_document_added_no_match_doctype(self):
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,

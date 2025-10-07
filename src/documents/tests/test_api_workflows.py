@@ -184,6 +184,8 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                             "filter_filename": "*",
                             "filter_path": "*/samples/*",
                             "filter_has_tags": [self.t1.id],
+                            "filter_has_all_tags": [self.t2.id],
+                            "filter_has_not_tags": [self.t3.id],
                             "filter_has_document_type": self.dt.id,
                             "filter_has_correspondent": self.c.id,
                             "filter_has_storage_path": self.sp.id,
@@ -223,6 +225,20 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Workflow.objects.count(), 2)
+        workflow = Workflow.objects.get(name="Workflow 2")
+        trigger = workflow.triggers.first()
+        self.assertSetEqual(
+            set(trigger.filter_has_tags.values_list("id", flat=True)),
+            {self.t1.id},
+        )
+        self.assertSetEqual(
+            set(trigger.filter_has_all_tags.values_list("id", flat=True)),
+            {self.t2.id},
+        )
+        self.assertSetEqual(
+            set(trigger.filter_has_not_tags.values_list("id", flat=True)),
+            {self.t3.id},
+        )
 
     def test_api_create_invalid_workflow_trigger(self):
         """
@@ -376,6 +392,8 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                         {
                             "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
                             "filter_has_tags": [self.t1.id],
+                            "filter_has_all_tags": [self.t2.id],
+                            "filter_has_not_tags": [self.t3.id],
                             "filter_has_correspondent": self.c.id,
                             "filter_has_document_type": self.dt.id,
                         },
@@ -393,6 +411,14 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         workflow = Workflow.objects.get(id=response.data["id"])
         self.assertEqual(workflow.name, "Workflow Updated")
         self.assertEqual(workflow.triggers.first().filter_has_tags.first(), self.t1)
+        self.assertEqual(
+            workflow.triggers.first().filter_has_all_tags.first(),
+            self.t2,
+        )
+        self.assertEqual(
+            workflow.triggers.first().filter_has_not_tags.first(),
+            self.t3,
+        )
         self.assertEqual(workflow.actions.first().assign_title, "Action New Title")
 
     def test_api_update_workflow_no_trigger_actions(self):

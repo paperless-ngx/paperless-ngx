@@ -1065,6 +1065,20 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has these tag(s)"),
     )
 
+    filter_has_all_tags = models.ManyToManyField(
+        Tag,
+        blank=True,
+        related_name="workflowtriggers_has_all",
+        verbose_name=_("has all of these tag(s)"),
+    )
+
+    filter_has_not_tags = models.ManyToManyField(
+        Tag,
+        blank=True,
+        related_name="workflowtriggers_has_not",
+        verbose_name=_("does not have these tag(s)"),
+    )
+
     filter_has_document_type = models.ForeignKey(
         DocumentType,
         null=True,

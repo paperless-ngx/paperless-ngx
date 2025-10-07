@@ -135,6 +135,30 @@ export const WORKFLOW_ACTION_OPTIONS = [
   },
 ]
 
+export enum TagConditionType {
+  Any = 'any',
+  All = 'all',
+  None = 'none',
+}
+
+const TAG_CONDITION_OPTIONS = [
+  {
+    id: TagConditionType.Any,
+    name: $localize`Has any of these tags`,
+    hint: $localize`Trigger matches when the document has at least one of the selected tags.`,
+  },
+  {
+    id: TagConditionType.All,
+    name: $localize`Has all of these tags`,
+    hint: $localize`Trigger matches when the document has every tag in the selection.`,
+  },
+  {
+    id: TagConditionType.None,
+    name: $localize`Does not have these tags`,
+    hint: $localize`Trigger matches when the document has none of the selected tags.`,
+  },
+]
+
 const TRIGGER_MATCHING_ALGORITHMS = MATCHING_ALGORITHMS.filter(
   (a) => a.id !== MATCH_AUTO
 )
@@ -170,6 +194,8 @@ export class WorkflowEditDialogComponent
 {
   public WorkflowTriggerType = WorkflowTriggerType
   public WorkflowActionType = WorkflowActionType
+  public TagConditionType = TagConditionType
+  public tagConditionOptions = TAG_CONDITION_OPTIONS
 
   private correspondentService: CorrespondentService
   private documentTypeService: DocumentTypeService
@@ -390,6 +416,149 @@ export class WorkflowEditDialogComponent
     return this.objectForm.get('actions') as FormArray
   }
 
+  protected override getFormValues(): any {
+    const formValues = super.getFormValues()
+
+    if (formValues?.triggers?.length) {
+      formValues.triggers = formValues.triggers.map(
+        (trigger: any, index: number) => {
+          const triggerFormGroup = this.triggerFields.at(index) as FormGroup
+          const conditions = this.getTagConditionsFormArray(triggerFormGroup)
+
+          const tagBuckets: Record<TagConditionType, number[]> = {
+            [TagConditionType.Any]: [],
+            [TagConditionType.All]: [],
+            [TagConditionType.None]: [],
+          }
+
+          conditions.controls.forEach((control) => {
+            const type = control.get('type').value as TagConditionType
+            const tags = control.get('tags').value as number[]
+            if (tags?.length) {
+              tagBuckets[type] = [...tags]
+            } else {
+              tagBuckets[type] = []
+            }
+          })
+
+          trigger.filter_has_tags = tagBuckets[TagConditionType.Any]
+          trigger.filter_has_all_tags = tagBuckets[TagConditionType.All]
+          trigger.filter_has_not_tags = tagBuckets[TagConditionType.None]
+
+          delete trigger.tagConditions
+
+          return trigger
+        }
+      )
+    }
+
+    return formValues
+  }
+
+  private createTagConditionFormGroup(
+    type: TagConditionType,
+    tags: number[] = []
+  ): FormGroup {
+    return new FormGroup({
+      type: new FormControl(type),
+      tags: new FormControl(tags ?? []),
+    })
+  }
+
+  private buildTagConditionsFormArray(trigger: WorkflowTrigger): FormArray {
+    const conditions = new FormArray([])
+
+    if (trigger.filter_has_tags && trigger.filter_has_tags.length > 0) {
+      conditions.push(
+        this.createTagConditionFormGroup(TagConditionType.Any, [
+          ...trigger.filter_has_tags,
+        ])
+      )
+    }
+
+    if (trigger.filter_has_all_tags && trigger.filter_has_all_tags.length > 0) {
+      conditions.push(
+        this.createTagConditionFormGroup(TagConditionType.All, [
+          ...trigger.filter_has_all_tags,
+        ])
+      )
+    }
+
+    if (trigger.filter_has_not_tags && trigger.filter_has_not_tags.length > 0) {
+      conditions.push(
+        this.createTagConditionFormGroup(TagConditionType.None, [
+          ...trigger.filter_has_not_tags,
+        ])
+      )
+    }
+
+    return conditions
+  }
+
+  getTagConditionsFormArray(formGroup: FormGroup): FormArray {
+    return formGroup.get('tagConditions') as FormArray
+  }
+
+  getTagConditionLabel(type: TagConditionType): string {
+    return (
+      this.tagConditionOptions.find((option) => option.id === type)?.name ?? ''
+    )
+  }
+
+  getTagConditionHint(formGroup: FormGroup, conditionIndex: number): string {
+    const conditions = this.getTagConditionsFormArray(formGroup)
+    const type = conditions.at(conditionIndex).get('type')
+      .value as TagConditionType
+    return (
+      this.tagConditionOptions.find((option) => option.id === type)?.hint ?? ''
+    )
+  }
+
+  getTagConditionSelectItems(formGroup: FormGroup, conditionIndex: number) {
+    const conditions = this.getTagConditionsFormArray(formGroup)
+    return this.tagConditionOptions.map((option) => ({
+      ...option,
+      disabled: conditions.controls.some((control, idx) => {
+        if (idx === conditionIndex) {
+          return false
+        }
+        return control.get('type').value === option.id
+      }),
+    }))
+  }
+
+  canAddTagCondition(formGroup: FormGroup): boolean {
+    const conditions = this.getTagConditionsFormArray(formGroup)
+    return conditions.length < this.tagConditionOptions.length
+  }
+
+  addTagCondition(triggerIndex: number) {
+    const triggerFormGroup = this.triggerFields.at(triggerIndex) as FormGroup
+    const conditions = this.getTagConditionsFormArray(triggerFormGroup)
+    const availableTypes = this.tagConditionOptions
+      .map((option) => option.id)
+      .filter(
+        (type) =>
+          !conditions.controls.some(
+            (control) => control.get('type').value === type
+          )
+      )
+    if (availableTypes.length === 0) {
+      return
+    }
+    conditions.push(this.createTagConditionFormGroup(availableTypes[0]))
+    triggerFormGroup.markAsDirty()
+    triggerFormGroup.markAsTouched()
+  }
+
+  removeTagCondition(triggerIndex: number, conditionIndex: number) {
+    const triggerFormGroup = this.triggerFields.at(triggerIndex) as FormGroup
+    const conditions = this.getTagConditionsFormArray(triggerFormGroup)
+    conditions.removeAt(conditionIndex)
+    triggerFormGroup.markAsDirty()
+    triggerFormGroup.markAsTouched()
+  }
+
   private createTriggerField(
     trigger: WorkflowTrigger,
     emitEvent: boolean = false
@@ -405,7 +574,6 @@ export class WorkflowEditDialogComponent
         matching_algorithm: new FormControl(trigger.matching_algorithm),
         match: new FormControl(trigger.match),
         is_insensitive: new FormControl(trigger.is_insensitive),
-        filter_has_tags: new FormControl(trigger.filter_has_tags),
         filter_has_correspondent: new FormControl(
           trigger.filter_has_correspondent
         ),
@@ -415,6 +583,7 @@ export class WorkflowEditDialogComponent
         filter_has_storage_path: new FormControl(
           trigger.filter_has_storage_path
         ),
+        tagConditions: this.buildTagConditionsFormArray(trigger),
         schedule_offset_days: new FormControl(trigger.schedule_offset_days),
         schedule_is_recurring: new FormControl(trigger.schedule_is_recurring),
         schedule_recurring_interval_days: new FormControl(
@@ -537,6 +706,8 @@ export class WorkflowEditDialogComponent
       filter_path: null,
       filter_mailrule: null,
       filter_has_tags: [],
+      filter_has_all_tags: [],
+      filter_has_not_tags: [],
       filter_has_correspondent: null,
       filter_has_document_type: null,
       filter_has_storage_path: null,

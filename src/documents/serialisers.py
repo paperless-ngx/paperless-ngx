@@ -2194,6 +2194,8 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             "match",
             "is_insensitive",
             "filter_has_tags",
+            "filter_has_all_tags",
+            "filter_has_not_tags",
             "filter_has_correspondent",
             "filter_has_document_type",
             "filter_has_storage_path",
@@ -2414,6 +2416,8 @@ class WorkflowSerializer(serializers.ModelSerializer):
         if triggers is not None and triggers is not serializers.empty:
             for trigger in triggers:
                 filter_has_tags = trigger.pop("filter_has_tags", None)
+                filter_has_all_tags = trigger.pop("filter_has_all_tags", None)
+                filter_has_not_tags = trigger.pop("filter_has_not_tags", None)
                 # Convert sources to strings to handle django-multiselectfield v1.0 changes
                 WorkflowTriggerSerializer.normalize_workflow_trigger_sources(trigger)
                 trigger_instance, _ = WorkflowTrigger.objects.update_or_create(
@@ -2422,6 +2426,10 @@ class WorkflowSerializer(serializers.ModelSerializer):
                 )
                 if filter_has_tags is not None:
                     trigger_instance.filter_has_tags.set(filter_has_tags)
+                if filter_has_all_tags is not None:
+                    trigger_instance.filter_has_all_tags.set(filter_has_all_tags)
+                if filter_has_not_tags is not None:
+                    trigger_instance.filter_has_not_tags.set(filter_has_not_tags)
                 set_triggers.append(trigger_instance)
 
         if actions is not None and actions is not serializers.empty:

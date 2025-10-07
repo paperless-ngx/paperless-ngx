@@ -375,6 +375,31 @@ describe('WorkflowEditDialogComponent', () => {
     expect(component.objectForm.get('actions').value[0].webhook).toBeNull()
   })
 
+  it('should map tag condition builder values into trigger filters on save', () => {
+    component.object = undefined
+    component.addTrigger()
+    const triggerGroup = component.triggerFields.at(0)
+    component.addTagCondition(0)
+    component.addTagCondition(0)
+    component.addTagCondition(0)
+
+    const tagConditions = component.getTagConditionsFormArray(
+      triggerGroup as FormGroup
+    )
+    expect(tagConditions.length).toBe(3)
+
+    tagConditions.at(0).get('tags').setValue([1])
+    tagConditions.at(1).get('tags').setValue([2, 3])
+    tagConditions.at(2).get('tags').setValue([4])
+
+    const formValues = component['getFormValues']()
+
+    expect(formValues.triggers[0].filter_has_tags).toEqual([1])
+    expect(formValues.triggers[0].filter_has_all_tags).toEqual([2, 3])
+    expect(formValues.triggers[0].filter_has_not_tags).toEqual([4])
+    expect(formValues.triggers[0].tagConditions).toBeUndefined()
+  })
+
   it('should remove selected custom field from the form group', () => {
     const formGroup = new FormGroup({
       assign_custom_fields: new FormControl([1, 2, 3]),

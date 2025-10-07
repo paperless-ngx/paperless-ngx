@@ -360,10 +360,9 @@ def existing_document_matches_workflow(
         )
         trigger_matched = False
 
-    # Document tags vs trigger has_tags
-    if (
-        trigger.filter_has_tags.all().count() > 0
-        and document.tags.filter(
+    # Document tags vs trigger has_tags (any of)
+    if trigger.filter_has_tags.all().count() > 0 and (
+        document.tags.filter(
             id__in=trigger.filter_has_tags.all().values_list("id"),
         ).count()
         == 0
@@ -371,6 +370,36 @@ def existing_document_matches_workflow(
         reason = (
             f"Document tags {document.tags.all()} do not include"
             f" {trigger.filter_has_tags.all()}",
+        )
+        trigger_matched = False
+
+    # Document tags vs trigger has_all_tags (all of)
+    if trigger.filter_has_all_tags.all().count() > 0 and trigger_matched:
+        required_tag_ids = set(
+            trigger.filter_has_all_tags.all().values_list("id", flat=True),
+        )
+        document_tag_ids = set(
+            document.tags.all().values_list("id", flat=True),
+        )
+        missing_tags = required_tag_ids - document_tag_ids
+        if missing_tags:
+            reason = (
+                f"Document tags {document.tags.all()} do not contain all of"
+                f" {trigger.filter_has_all_tags.all()}",
+            )
+            trigger_matched = False
+
+    # Document tags vs trigger has_not_tags (none of)
+    if (
+        trigger.filter_has_not_tags.all().count() > 0
+        and trigger_matched
+        and document.tags.filter(
+            id__in=trigger.filter_has_not_tags.all().values_list("id"),
+        ).exists()
+    ):
+        reason = (
+            f"Document tags {document.tags.all()} include excluded tags"
+            f" {trigger.filter_has_not_tags.all()}",
         )
         trigger_matched = False
 
@@ -436,6 +465,16 @@ def prefilter_documents_by_workflowtrigger(
     if trigger.filter_has_tags.all().count() > 0:
         documents = documents.filter(
             tags__in=trigger.filter_has_tags.all(),
+        ).distinct()
+
+    if trigger.filter_has_all_tags.all().count() > 0:
+        for tag_id in trigger.filter_has_all_tags.all().values_list("id", flat=True):
+            documents = documents.filter(tags__id=tag_id)
+        documents = documents.distinct()
+
+    if trigger.filter_has_not_tags.all().count() > 0:
+        documents = documents.exclude(
+            tags__in=trigger.filter_has_not_tags.all(),
         ).distinct()
 
     if trigger.filter_has_correspondent is not None:
