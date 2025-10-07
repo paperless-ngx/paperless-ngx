@@ -780,15 +780,17 @@ export class WorkflowEditDialogComponent
 
   canAddCondition(formGroup: FormGroup): boolean {
     const conditions = this.getConditionsFormArray(formGroup)
-    const usedTypes = conditions.controls.map(
-      (control) => control.get('type').value as TriggerConditionType
+    const usedTypes = new Set(
+      conditions.controls.map(
+        (control) => control.get('type').value as TriggerConditionType
+      )
     )
 
     return this.conditionDefinitions.some((definition) => {
       if (definition.allowMultipleEntries) {
         return true
       }
-      return !usedTypes.includes(definition.id)
+      return !usedTypes.has(definition.id)
     })
   }
 
