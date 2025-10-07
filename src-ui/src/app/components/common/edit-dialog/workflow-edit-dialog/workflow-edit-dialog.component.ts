@@ -426,7 +426,7 @@ export class WorkflowEditDialogComponent
 
   private allowedActionTypes = []
 
-  private triggerConditionOptionsMap = new WeakMap<
+  private readonly triggerConditionOptionsMap = new WeakMap<
     FormArray,
     TriggerConditionOption[]
   >()
@@ -654,21 +654,21 @@ export class WorkflowEditDialogComponent
             filter_custom_field_query: null,
           }
 
-          conditions.controls.forEach((control) => {
+          for (const control of conditions.controls) {
             const type = control.get('type').value as TriggerConditionType
             const values = control.get('values').value
 
             if (values === null || values === undefined) {
-              return
+              continue
             }
 
             if (Array.isArray(values) && values.length === 0) {
-              return
+              continue
             }
 
             const handler = CONDITION_FILTER_HANDLERS[type]
             handler?.apply(aggregate, values)
-          })
+          }
 
           trigger.filter_has_tags = aggregate.filter_has_tags
           trigger.filter_has_all_tags = aggregate.filter_has_all_tags
@@ -734,19 +734,19 @@ export class WorkflowEditDialogComponent
   private buildConditionFormArray(trigger: WorkflowTrigger): FormArray {
     const conditions = new FormArray([])
 
-    this.conditionDefinitions.forEach((definition) => {
+    for (const definition of this.conditionDefinitions) {
       const handler = CONDITION_FILTER_HANDLERS[definition.id]
       if (!handler) {
-        return
+        continue
       }
 
       const value = handler.extract(trigger)
       if (!handler.hasValue(value)) {
-        return
+        continue
       }
 
       conditions.push(this.createConditionFormGroup(definition.id, value))
-    })
+    }
 
     return conditions
   }
@@ -760,25 +760,20 @@ export class WorkflowEditDialogComponent
     const options = this.getConditionTypeOptionsForArray(conditions)
     const currentType = conditions.at(conditionIndex).get('type')
       .value as TriggerConditionType
-    const usedTypes = conditions.controls.map(
-      (control) => control.get('type').value as TriggerConditionType
+    const usedTypes = new Set(
+      conditions.controls.map(
+        (control) => control.get('type').value as TriggerConditionType
+      )
     )
 
-    options.forEach((option) => {
+    for (const option of options) {
       if (option.allowMultipleEntries) {
         option.disabled = false
-        return
+        continue
       }
 
-      const usedElsewhere = usedTypes.some((type, idx) => {
-        if (idx === conditionIndex) {
-          return false
-        }
-        return type === option.id
-      })
-
-      option.disabled = usedElsewhere && option.id !== currentType
-    })
+      option.disabled = usedTypes.has(option.id) && option.id !== currentType
+    }
 
     return options
   }
@@ -822,7 +817,7 @@ export class WorkflowEditDialogComponent
     triggerFormGroup.markAsDirty()
     triggerFormGroup.markAsTouched()
 
-    return conditions.at(conditions.length - 1) as FormGroup
+    return conditions.at(-1) as FormGroup
   }
 
   removeCondition(triggerFormGroup: FormGroup, conditionIndex: number) {
@@ -956,7 +951,7 @@ export class WorkflowEditDialogComponent
         const parsed = JSON.parse(rawValue)
         const expression = new CustomFieldQueryExpression(parsed)
         model.queries = [expression]
-      } catch (error) {
+      } catch {
         model.clear(false)
         model.addInitialAtom()
       }
