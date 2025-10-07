@@ -7,3 +7,7 @@
 .accordion-button {
     font-size: 1rem;
 }
+
+:host ::ng-deep .conditions .paperless-input-select.mb-3 {
+    margin-bottom: 0 !important;
+}

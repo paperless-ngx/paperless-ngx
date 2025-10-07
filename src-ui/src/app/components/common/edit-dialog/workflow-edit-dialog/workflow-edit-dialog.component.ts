@@ -150,20 +150,17 @@ export enum TriggerConditionType {
 interface TriggerConditionDefinition {
   id: TriggerConditionType
   name: string
-  hint?: string
-  valueLabel: string
   inputType: 'tags' | 'select'
   allowMultipleEntries: boolean
   allowMultipleValues: boolean
   selectItems?: 'correspondents' | 'documentTypes' | 'storagePaths'
+  disabled?: boolean
 }
 
 const TRIGGER_CONDITION_DEFINITIONS: TriggerConditionDefinition[] = [
   {
     id: TriggerConditionType.TagsAny,
     name: $localize`Has any of these tags`,
-    hint: $localize`Trigger matches when the document has at least one of the selected tags.`,
-    valueLabel: $localize`Tags`,
     inputType: 'tags',
     allowMultipleEntries: false,
     allowMultipleValues: true,
@@ -171,8 +168,6 @@ const TRIGGER_CONDITION_DEFINITIONS: TriggerConditionDefinition[] = [
   {
     id: TriggerConditionType.TagsAll,
     name: $localize`Has all of these tags`,
-    hint: $localize`Trigger matches only when every selected tag is present.`,
-    valueLabel: $localize`Tags`,
     inputType: 'tags',
     allowMultipleEntries: false,
     allowMultipleValues: true,
@@ -180,8 +175,6 @@ const TRIGGER_CONDITION_DEFINITIONS: TriggerConditionDefinition[] = [
   {
     id: TriggerConditionType.TagsNone,
     name: $localize`Does not have these tags`,
-    hint: $localize`Trigger matches only when none of the selected tags are present.`,
-    valueLabel: $localize`Tags`,
     inputType: 'tags',
     allowMultipleEntries: false,
     allowMultipleValues: true,
@@ -189,8 +182,6 @@ const TRIGGER_CONDITION_DEFINITIONS: TriggerConditionDefinition[] = [
   {
     id: TriggerConditionType.CorrespondentIs,
     name: $localize`Has correspondent`,
-    hint: $localize`Trigger matches when the document has the selected correspondent.`,
-    valueLabel: $localize`Correspondent`,
     inputType: 'select',
     allowMultipleEntries: false,
     allowMultipleValues: false,
@@ -199,8 +190,6 @@ const TRIGGER_CONDITION_DEFINITIONS: TriggerConditionDefinition[] = [
   {
     id: TriggerConditionType.CorrespondentNot,
     name: $localize`Does not have correspondents`,
-    hint: $localize`Trigger matches when the document does not have any of the selected correspondents.`,
-    valueLabel: $localize`Correspondents`,
     inputType: 'select',
     allowMultipleEntries: false,
     allowMultipleValues: true,
@@ -209,8 +198,6 @@ const TRIGGER_CONDITION_DEFINITIONS: TriggerConditionDefinition[] = [
   {
     id: TriggerConditionType.DocumentTypeIs,
     name: $localize`Has document type`,
-    hint: $localize`Trigger matches when the document has the selected document type.`,
-    valueLabel: $localize`Document type`,
     inputType: 'select',
     allowMultipleEntries: false,
     allowMultipleValues: false,
@@ -219,8 +206,6 @@ const TRIGGER_CONDITION_DEFINITIONS: TriggerConditionDefinition[] = [
   {
     id: TriggerConditionType.DocumentTypeNot,
     name: $localize`Does not have document types`,
-    hint: $localize`Trigger matches when the document does not have any of the selected document types.`,
-    valueLabel: $localize`Document types`,
     inputType: 'select',
     allowMultipleEntries: false,
     allowMultipleValues: true,
@@ -229,8 +214,6 @@ const TRIGGER_CONDITION_DEFINITIONS: TriggerConditionDefinition[] = [
   {
     id: TriggerConditionType.StoragePathIs,
     name: $localize`Has storage path`,
-    hint: $localize`Trigger matches when the document has the selected storage path.`,
-    valueLabel: $localize`Storage path`,
     inputType: 'select',
     allowMultipleEntries: false,
     allowMultipleValues: false,
@@ -239,8 +222,6 @@ const TRIGGER_CONDITION_DEFINITIONS: TriggerConditionDefinition[] = [
   {
     id: TriggerConditionType.StoragePathNot,
     name: $localize`Does not have storage paths`,
-    hint: $localize`Trigger matches when the document does not have any of the selected storage paths.`,
-    valueLabel: $localize`Storage paths`,
     inputType: 'select',
     allowMultipleEntries: false,
     allowMultipleValues: true,
@@ -303,6 +284,11 @@ export class WorkflowEditDialogComponent
   expandedItem: number = null
 
   private allowedActionTypes = []
+
+  private conditionTypeOptionCache = new WeakMap<
+    FormArray,
+    TriggerConditionDefinition[]
+  >()
 
   constructor() {
     super()
@@ -723,19 +709,30 @@ export class WorkflowEditDialogComponent
 
   getConditionTypeOptions(formGroup: FormGroup, conditionIndex: number) {
     const conditions = this.getConditionsFormArray(formGroup)
+    const options = this.getConditionTypeOptionsForArray(conditions)
+    const currentType = conditions.at(conditionIndex).get('type')
+      .value as TriggerConditionType
+    const usedTypes = conditions.controls.map(
+      (control) => control.get('type').value as TriggerConditionType
+    )
 
-    return this.conditionDefinitions.map((definition) => ({
-      id: definition.id,
-      name: definition.name,
-      disabled:
-        !definition.allowMultipleEntries &&
-        conditions.controls.some((control, idx) => {
-          if (idx === conditionIndex) {
-            return false
-          }
-          return control.get('type').value === definition.id
-        }),
-    }))
+    options.forEach((option) => {
+      if (option.allowMultipleEntries) {
+        option.disabled = false
+        return
+      }
+
+      const usedElsewhere = usedTypes.some((type, idx) => {
+        if (idx === conditionIndex) {
+          return false
+        }
+        return type === option.id
+      })
+
+      option.disabled = usedElsewhere && option.id !== currentType
+    })
+
+    return options
   }
 
   canAddCondition(formGroup: FormGroup): boolean {
@@ -802,17 +799,6 @@ export class WorkflowEditDialogComponent
     return this.getConditionDefinition(type)?.name ?? ''
   }
 
-  getConditionHint(formGroup: FormGroup, conditionIndex: number): string {
-    const conditions = this.getConditionsFormArray(formGroup)
-    const type = conditions.at(conditionIndex).get('type')
-      .value as TriggerConditionType
-    return this.getConditionDefinition(type)?.hint ?? ''
-  }
-
-  getConditionValueLabel(type: TriggerConditionType): string {
-    return this.getConditionDefinition(type)?.valueLabel ?? ''
-  }
-
   isTagsCondition(type: TriggerConditionType): boolean {
     return this.getConditionDefinition(type)?.inputType === 'tags'
   }
@@ -874,6 +860,20 @@ export class WorkflowEditDialogComponent
     }
 
     return value
+  }
+
+  private getConditionTypeOptionsForArray(
+    conditions: FormArray
+  ): TriggerConditionDefinition[] {
+    let cached = this.conditionTypeOptionCache.get(conditions)
+    if (!cached) {
+      cached = this.conditionDefinitions.map((definition) => ({
+        ...definition,
+        disabled: false,
+      }))
+      this.conditionTypeOptionCache.set(conditions, cached)
+    }
+    return cached
   }
 
   private createTriggerField(

@@ -188,50 +188,45 @@
                 <i-bs name="plus-circle"></i-bs>&nbsp;<span i18n>Add condition</span>
               </button>
             </div>
-            <div class="mt-2" formArrayName="conditions">
+            <div class="mt-2 conditions" formArrayName="conditions">
               @if (getConditionsFormArray(formGroup).length === 0) {
                 <p class="text-muted small" i18n>No conditions added. Add one to define document filters.</p>
               }
               @for (condition of getConditionsFormArray(formGroup).controls; track condition; let conditionIndex = $index) {
                 <div [formGroupName]="conditionIndex" class="border rounded p-3 mb-2">
-                  <div class="d-flex align-items-start gap-2 mb-2">
-                    <div class="flex-grow-1">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="w-25">
                       <pngx-input-select
                         i18n-title
-                        title="Condition type"
                         [items]="getConditionTypeOptions(formGroup, conditionIndex)"
                         formControlName="type"
                         [allowNull]="false"
-                        horizontal="true"
                       ></pngx-input-select>
+                    </div>
+                    <div class="flex-grow-1">
+                      @if (isTagsCondition(condition.get('type').value)) {
+                        <pngx-input-tags
+                          [allowCreate]="false"
+                          [title]="null"
+                          formControlName="values"
+                        ></pngx-input-tags>
+                      } @else {
+                        <pngx-input-select
+                          [items]="getConditionSelectItems(condition.get('type').value)"
+                          [allowNull]="true"
+                          [multiple]="isSelectMultiple(condition.get('type').value)"
+                          formControlName="values"
+                        ></pngx-input-select>
+                      }
                     </div>
                     <button
                       type="button"
-                      class="btn btn-link text-danger p-0 ms-1"
+                      class="btn btn-link text-danger p-0"
                       (click)="removeCondition(formGroup, conditionIndex)"
                     >
                       <i-bs name="trash"></i-bs><span class="ms-1" i18n>Delete</span>
                     </button>
                   </div>
-                  @if (isTagsCondition(condition.get('type').value)) {
-                    <pngx-input-tags
-                      [allowCreate]="false"
-                      [title]="getConditionValueLabel(condition.get('type').value)"
-                      [hint]="getConditionHint(formGroup, conditionIndex)"
-                      formControlName="values"
-                      horizontal="true"
-                    ></pngx-input-tags>
-                  } @else {
-                    <pngx-input-select
-                      [title]="getConditionValueLabel(condition.get('type').value)"
-                      [items]="getConditionSelectItems(condition.get('type').value)"
-                      [hint]="getConditionHint(formGroup, conditionIndex)"
-                      [allowNull]="true"
-                      [multiple]="isSelectMultiple(condition.get('type').value)"
-                      formControlName="values"
-                      horizontal="true"
-                    ></pngx-input-select>
-                  }
                 </div>
               }
             </div>
