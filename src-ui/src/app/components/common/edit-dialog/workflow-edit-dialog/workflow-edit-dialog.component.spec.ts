@@ -784,6 +784,26 @@ describe('WorkflowEditDialogComponent', () => {
     component.conditionDefinitions = originalDefinitions
   })
 
+  it('should return empty select items when definition has unknown source', () => {
+    const originalDefinitions = component.conditionDefinitions
+    component.conditionDefinitions = [
+      {
+        id: TriggerConditionType.CorrespondentIs,
+        name: 'Correspondent is',
+        inputType: 'select',
+        allowMultipleEntries: false,
+        allowMultipleValues: false,
+        selectItems: 'unknown',
+      } as any,
+    ]
+
+    expect(
+      component.getConditionSelectItems(TriggerConditionType.CorrespondentIs)
+    ).toEqual([])
+
+    component.conditionDefinitions = originalDefinitions
+  })
+
   it('should handle custom field query selection change and validation states', () => {
     const formGroup = new FormGroup({
       values: new FormControl(null),
@@ -907,6 +927,21 @@ describe('WorkflowEditDialogComponent', () => {
         customFieldJson
       )
     ).toEqual(customFieldJson)
+
+    const customFieldObject = ['AND', [[1, 'exact', 'other']]]
+    expect(
+      component['normalizeConditionValue'](
+        TriggerConditionType.CustomFieldQuery,
+        customFieldObject
+      )
+    ).toEqual(JSON.stringify(customFieldObject))
+
+    expect(
+      component['normalizeConditionValue'](
+        TriggerConditionType.CustomFieldQuery,
+        false
+      )
+    ).toBeNull()
   })
 
   it('should add and remove condition form groups', () => {
