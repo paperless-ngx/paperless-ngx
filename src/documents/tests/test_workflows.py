@@ -1392,6 +1392,17 @@ class TestWorkflows(
             [str(error) for error in errors],
         )
 
+    def test_workflow_trigger_serializer_clears_empty_custom_field_query(self):
+        serializer = WorkflowTriggerSerializer(
+            data={
+                "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+                "filter_custom_field_query": "",
+            },
+        )
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertIsNone(serializer.validated_data.get("filter_custom_field_query"))
+
     def test_existing_document_invalid_custom_field_query_configuration(self):
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
