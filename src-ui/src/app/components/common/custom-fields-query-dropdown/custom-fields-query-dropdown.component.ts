@@ -206,6 +206,9 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
   @Input()
   applyOnClose = false
 
+  @Input()
+  useDropdown: boolean = true
+
   get name(): string {
     return this.title ? this.title.replace(/\s/g, '_').toLowerCase() : null
   }

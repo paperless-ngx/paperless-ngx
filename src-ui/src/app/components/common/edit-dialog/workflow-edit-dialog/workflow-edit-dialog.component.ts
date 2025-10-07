@@ -6,6 +6,7 @@ import {
 import { NgTemplateOutlet } from '@angular/common'
 import { Component, OnInit, inject } from '@angular/core'
 import {
+  AbstractControl,
   FormArray,
   FormControl,
   FormGroup,
@@ -45,7 +46,12 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { CustomFieldQueryExpression } from 'src/app/utils/custom-field-query-element'
 import { ConfirmButtonComponent } from '../../confirm-button/confirm-button.component'
+import {
+  CustomFieldQueriesModel,
+  CustomFieldsQueryDropdownComponent,
+} from '../../custom-fields-query-dropdown/custom-fields-query-dropdown.component'
 import { CheckComponent } from '../../input/check/check.component'
 import { CustomFieldsValuesComponent } from '../../input/custom-fields-values/custom-fields-values.component'
 import { EntriesComponent } from '../../input/entries/entries.component'
@@ -145,15 +151,20 @@ export enum TriggerConditionType {
   DocumentTypeNot = 'document_type_not',
   StoragePathIs = 'storage_path_is',
   StoragePathNot = 'storage_path_not',
+  CustomFieldQuery = 'custom_field_query',
 }
 
 interface TriggerConditionDefinition {
   id: TriggerConditionType
   name: string
-  inputType: 'tags' | 'select'
+  inputType: 'tags' | 'select' | 'customFieldQuery'
   allowMultipleEntries: boolean
   allowMultipleValues: boolean
   selectItems?: 'correspondents' | 'documentTypes' | 'storagePaths'
+  disabled?: boolean
+}
+
+type TriggerConditionOption = TriggerConditionDefinition & {
   disabled?: boolean
 }
 
@@ -227,6 +238,13 @@ const TRIGGER_CONDITION_DEFINITIONS: TriggerConditionDefinition[] = [
     allowMultipleValues: true,
     selectItems: 'storagePaths',
   },
+  {
+    id: TriggerConditionType.CustomFieldQuery,
+    name: $localize`Matches custom field query`,
+    inputType: 'customFieldQuery',
+    allowMultipleEntries: false,
+    allowMultipleValues: false,
+  },
 ]
 
 const TRIGGER_MATCHING_ALGORITHMS = MATCHING_ALGORITHMS.filter(
@@ -247,6 +265,7 @@ const TRIGGER_MATCHING_ALGORITHMS = MATCHING_ALGORITHMS.filter(
     TextAreaComponent,
     TagsComponent,
     CustomFieldsValuesComponent,
+    CustomFieldsQueryDropdownComponent,
     PermissionsGroupComponent,
     PermissionsUserComponent,
     ConfirmButtonComponent,
@@ -287,7 +306,12 @@ export class WorkflowEditDialogComponent
 
   private conditionTypeOptionCache = new WeakMap<
     FormArray,
-    TriggerConditionDefinition[]
+    TriggerConditionOption[]
+  >()
+
+  private customFieldQueryModels = new WeakMap<
+    FormGroup,
+    CustomFieldQueriesModel
   >()
 
   constructor() {
@@ -510,6 +534,7 @@ export class WorkflowEditDialogComponent
             filter_has_correspondent: null as number | null,
             filter_has_document_type: null as number | null,
             filter_has_storage_path: null as number | null,
+            filter_custom_field_query: null as string | null,
           }
 
           conditions.controls.forEach((control) => {
@@ -558,6 +583,9 @@ export class WorkflowEditDialogComponent
               case TriggerConditionType.StoragePathNot:
                 aggregate.filter_has_not_storage_paths = [...values]
                 break
+              case TriggerConditionType.CustomFieldQuery:
+                aggregate.filter_custom_field_query = values as string
+                break
             }
           })
 
@@ -576,6 +604,8 @@ export class WorkflowEditDialogComponent
             aggregate.filter_has_document_type ?? null
           trigger.filter_has_storage_path =
             aggregate.filter_has_storage_path ?? null
+          trigger.filter_custom_field_query =
+            aggregate.filter_custom_field_query ?? null
 
           delete trigger.conditions
 
@@ -593,7 +623,7 @@ export class WorkflowEditDialogComponent
 
   private createConditionFormGroup(
     type: TriggerConditionType,
-    initialValue?: number | number[]
+    initialValue?: any
   ): FormGroup {
     const group = new FormGroup({
       type: new FormControl(type),
@@ -603,10 +633,19 @@ export class WorkflowEditDialogComponent
     group
       .get('type')
       .valueChanges.subscribe((newType: TriggerConditionType) => {
-        group.get('values').setValue(this.getDefaultConditionValue(newType), {
-          emitEvent: false,
-        })
+        if (newType === TriggerConditionType.CustomFieldQuery) {
+          this.ensureCustomFieldQueryModel(group)
+        } else {
+          this.teardownCustomFieldQueryModel(group)
+          group.get('values').setValue(this.getDefaultConditionValue(newType), {
+            emitEvent: false,
+          })
+        }
       })
+
+    if (type === TriggerConditionType.CustomFieldQuery) {
+      this.ensureCustomFieldQueryModel(group, initialValue)
+    }
 
     return group
   }
@@ -704,6 +743,15 @@ export class WorkflowEditDialogComponent
       )
     }
 
+    if (trigger.filter_custom_field_query) {
+      conditions.push(
+        this.createConditionFormGroup(
+          TriggerConditionType.CustomFieldQuery,
+          trigger.filter_custom_field_query
+        )
+      )
+    }
+
     return conditions
   }
 
@@ -753,10 +801,10 @@ export class WorkflowEditDialogComponent
     })
   }
 
-  addCondition(triggerFormGroup: FormGroup) {
+  addCondition(triggerFormGroup: FormGroup): FormGroup | null {
     const triggerIndex = this.triggerFields.controls.indexOf(triggerFormGroup)
     if (triggerIndex === -1) {
-      return
+      return null
     }
 
     const conditions = this.getConditionsFormArray(triggerFormGroup)
@@ -771,12 +819,14 @@ export class WorkflowEditDialogComponent
     })
 
     if (!availableDefinition) {
-      return
+      return null
     }
 
     conditions.push(this.createConditionFormGroup(availableDefinition.id))
     triggerFormGroup.markAsDirty()
     triggerFormGroup.markAsTouched()
+
+    return conditions.at(conditions.length - 1) as FormGroup
   }
 
   removeCondition(triggerFormGroup: FormGroup, conditionIndex: number) {
@@ -786,6 +836,13 @@ export class WorkflowEditDialogComponent
     }
 
     const conditions = this.getConditionsFormArray(triggerFormGroup)
+    const conditionGroup = conditions.at(conditionIndex) as FormGroup
+    if (
+      conditionGroup?.get('type').value ===
+      TriggerConditionType.CustomFieldQuery
+    ) {
+      this.teardownCustomFieldQueryModel(conditionGroup)
+    }
     conditions.removeAt(conditionIndex)
     triggerFormGroup.markAsDirty()
     triggerFormGroup.markAsTouched()
@@ -805,6 +862,10 @@ export class WorkflowEditDialogComponent
 
   isTagsCondition(type: TriggerConditionType): boolean {
     return this.getConditionDefinition(type)?.inputType === 'tags'
+  }
+
+  isCustomFieldQueryCondition(type: TriggerConditionType): boolean {
+    return this.getConditionDefinition(type)?.inputType === 'customFieldQuery'
   }
 
   isMultiValueCondition(type: TriggerConditionType): boolean {
@@ -843,16 +904,122 @@ export class WorkflowEditDialogComponent
     }
   }
 
+  getCustomFieldQueryModel(control: AbstractControl): CustomFieldQueriesModel {
+    const conditionGroup = control as FormGroup
+    this.ensureCustomFieldQueryModel(conditionGroup)
+    return this.customFieldQueryModels.get(conditionGroup)
+  }
+
+  onCustomFieldQuerySelectionChange(
+    control: AbstractControl,
+    model: CustomFieldQueriesModel
+  ) {
+    this.onCustomFieldQueryModelChanged(control as FormGroup, model)
+  }
+
+  isCustomFieldQueryValid(control: AbstractControl): boolean {
+    const model = this.customFieldQueryModels.get(control as FormGroup)
+    if (!model) {
+      return true
+    }
+
+    return model.isEmpty() || model.isValid()
+  }
+
+  private getConditionTypeOptionsForArray(
+    conditions: FormArray
+  ): TriggerConditionOption[] {
+    let cached = this.conditionTypeOptionCache.get(conditions)
+    if (!cached) {
+      cached = this.conditionDefinitions.map((definition) => ({
+        ...definition,
+        disabled: false,
+      }))
+      this.conditionTypeOptionCache.set(conditions, cached)
+    }
+    return cached
+  }
+
+  private ensureCustomFieldQueryModel(
+    conditionGroup: FormGroup,
+    initialValue?: any
+  ) {
+    if (this.customFieldQueryModels.has(conditionGroup)) {
+      return
+    }
+
+    const model = new CustomFieldQueriesModel()
+    this.customFieldQueryModels.set(conditionGroup, model)
+
+    const rawValue =
+      typeof initialValue === 'string'
+        ? initialValue
+        : (conditionGroup.get('values').value as string)
+
+    if (rawValue) {
+      try {
+        const parsed = JSON.parse(rawValue)
+        const expression = new CustomFieldQueryExpression(parsed)
+        model.queries = [expression]
+      } catch (error) {
+        model.clear(false)
+      }
+    }
+
+    model.changed.subscribe(() => {
+      this.onCustomFieldQueryModelChanged(conditionGroup, model)
+    })
+
+    this.onCustomFieldQueryModelChanged(conditionGroup, model)
+  }
+
+  private teardownCustomFieldQueryModel(conditionGroup: FormGroup) {
+    if (!this.customFieldQueryModels.has(conditionGroup)) {
+      return
+    }
+    this.customFieldQueryModels.delete(conditionGroup)
+  }
+
+  private onCustomFieldQueryModelChanged(
+    conditionGroup: FormGroup,
+    model: CustomFieldQueriesModel
+  ) {
+    const control = conditionGroup.get('values')
+    if (!control) {
+      return
+    }
+
+    if (!model.isValid()) {
+      control.setValue(null, { emitEvent: false })
+      return
+    }
+
+    if (model.isEmpty()) {
+      control.setValue(null, { emitEvent: false })
+      return
+    }
+
+    const serialized = JSON.stringify(model.queries[0].serialize())
+    control.setValue(serialized, { emitEvent: false })
+  }
+
   private getDefaultConditionValue(type: TriggerConditionType) {
+    if (type === TriggerConditionType.CustomFieldQuery) {
+      return null
+    }
     return this.isMultiValueCondition(type) ? [] : null
   }
 
-  private normalizeConditionValue(
-    type: TriggerConditionType,
-    value?: number | number[]
-  ) {
+  private normalizeConditionValue(type: TriggerConditionType, value?: any) {
     if (value === undefined || value === null) {
       return this.getDefaultConditionValue(type)
+    }
+
+    if (type === TriggerConditionType.CustomFieldQuery) {
+      if (typeof value === 'string') {
+        return value
+      }
+      return value ? JSON.stringify(value) : null
     }
 
     if (this.isMultiValueCondition(type)) {
@@ -864,20 +1031,6 @@ export class WorkflowEditDialogComponent
     }
 
     return value
-  }
-
-  private getConditionTypeOptionsForArray(
-    conditions: FormArray
-  ): TriggerConditionDefinition[] {
-    let cached = this.conditionTypeOptionCache.get(conditions)
-    if (!cached) {
-      cached = this.conditionDefinitions.map((definition) => ({
-        ...definition,
-        disabled: false,
-      }))
-      this.conditionTypeOptionCache.set(conditions, cached)
-    }
-    return cached
   }
 
   private createTriggerField(
@@ -1032,6 +1185,7 @@ export class WorkflowEditDialogComponent
       filter_has_not_correspondents: [],
       filter_has_not_document_types: [],
       filter_has_not_storage_paths: [],
+      filter_custom_field_query: null,
       filter_has_correspondent: null,
       filter_has_document_type: null,
       filter_has_storage_path: null,

@@ -189,6 +189,12 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                             "filter_has_not_correspondents": [self.c2.id],
                             "filter_has_not_document_types": [self.dt2.id],
                             "filter_has_not_storage_paths": [self.sp2.id],
+                            "filter_custom_field_query": json.dumps(
+                                [
+                                    "AND",
+                                    [[self.cf1.id, "exact", "value"]],
+                                ],
+                            ),
                             "filter_has_document_type": self.dt.id,
                             "filter_has_correspondent": self.c.id,
                             "filter_has_storage_path": self.sp.id,
@@ -253,6 +259,10 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertSetEqual(
             set(trigger.filter_has_not_storage_paths.values_list("id", flat=True)),
             {self.sp2.id},
+        )
+        self.assertEqual(
+            trigger.filter_custom_field_query,
+            json.dumps(["AND", [[self.cf1.id, "exact", "value"]]]),
         )
 
     def test_api_create_invalid_workflow_trigger(self):
@@ -412,6 +422,9 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                             "filter_has_not_correspondents": [self.c2.id],
                             "filter_has_not_document_types": [self.dt2.id],
                             "filter_has_not_storage_paths": [self.sp2.id],
+                            "filter_custom_field_query": json.dumps(
+                                ["AND", [[self.cf1.id, "exact", "value"]]],
+                            ),
                             "filter_has_correspondent": self.c.id,
                             "filter_has_document_type": self.dt.id,
                         },
@@ -448,6 +461,10 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(
             workflow.triggers.first().filter_has_not_storage_paths.first(),
             self.sp2,
+        )
+        self.assertEqual(
+            workflow.triggers.first().filter_custom_field_query,
+            json.dumps(["AND", [[self.cf1.id, "exact", "value"]]]),
         )
         self.assertEqual(workflow.actions.first().assign_title, "Action New Title")
 

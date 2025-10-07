@@ -43,6 +43,7 @@ if settings.AUDIT_LOG_ENABLED:
 
 from documents import bulk_edit
 from documents.data_models import DocumentSource
+from documents.filters import CustomFieldQueryParser
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -2196,6 +2197,7 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             "filter_has_tags",
             "filter_has_all_tags",
             "filter_has_not_tags",
+            "filter_custom_field_query",
             "filter_has_not_correspondents",
             "filter_has_not_document_types",
             "filter_has_not_storage_paths",
@@ -2223,6 +2225,20 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             and len(attrs["filter_path"]) == 0
         ):
             attrs["filter_path"] = None
+
+        if (
+            "filter_custom_field_query" in attrs
+            and attrs["filter_custom_field_query"] is not None
+            and len(attrs["filter_custom_field_query"]) == 0
+        ):
+            attrs["filter_custom_field_query"] = None
+
+        if (
+            "filter_custom_field_query" in attrs
+            and attrs["filter_custom_field_query"] is not None
+        ):
+            parser = CustomFieldQueryParser("filter_custom_field_query")
+            parser.parse(attrs["filter_custom_field_query"])
 
         trigger_type = attrs.get("type", getattr(self.instance, "type", None))
         if (

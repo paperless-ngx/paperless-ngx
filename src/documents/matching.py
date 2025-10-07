@@ -6,8 +6,11 @@ from fnmatch import fnmatch
 from fnmatch import translate as fnmatch_translate
 from typing import TYPE_CHECKING
 
+from rest_framework import serializers
+
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
+from documents.filters import CustomFieldQueryParser
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
@@ -475,6 +478,25 @@ def existing_document_matches_workflow(
             )
             trigger_matched = False
 
+    if trigger_matched and trigger.filter_custom_field_query:
+        parser = CustomFieldQueryParser("filter_custom_field_query")
+        try:
+            custom_field_q, annotations = parser.parse(
+                trigger.filter_custom_field_query,
+            )
+        except serializers.ValidationError:
+            reason = "Invalid custom field query configuration"
+            trigger_matched = False
+        else:
+            qs = (
+                Document.objects.filter(id=document.id)
+                .annotate(**annotations)
+                .filter(custom_field_q)
+            )
+            if not qs.exists():
+                reason = "Document custom fields do not match the configured custom field query"
+                trigger_matched = False
+
     # Document original_filename vs trigger filename
     if (
         trigger.filter_filename is not None
@@ -548,6 +570,17 @@ def prefilter_documents_by_workflowtrigger(
         documents = documents.exclude(
             storage_path__in=trigger.filter_has_not_storage_paths.all(),
         )
+
+    if trigger.filter_custom_field_query:
+        parser = CustomFieldQueryParser("filter_custom_field_query")
+        try:
+            custom_field_q, annotations = parser.parse(
+                trigger.filter_custom_field_query,
+            )
+        except serializers.ValidationError:
+            return documents.none()
+
+        documents = documents.annotate(**annotations).filter(custom_field_q)
 
     if trigger.filter_filename is not None and len(trigger.filter_filename) > 0:
         # the true fnmatch will actually run later so we just want a loose filter here

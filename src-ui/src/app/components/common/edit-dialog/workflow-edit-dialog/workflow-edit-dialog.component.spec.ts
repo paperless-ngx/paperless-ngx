@@ -410,11 +410,7 @@ describe('WorkflowEditDialogComponent', () => {
     conditions.at(2).get('values').setValue([4])
 
     const addConditionOfType = (type: TriggerConditionType) => {
-      component.addCondition(triggerGroup as FormGroup)
-      const conditionArray = component.getConditionsFormArray(
-        triggerGroup as FormGroup
-      )
-      const newCondition = conditionArray.at(conditionArray.length - 1)
+      const newCondition = component.addCondition(triggerGroup as FormGroup)
       newCondition.get('type').setValue(type)
       return newCondition
     }
@@ -447,6 +443,12 @@ describe('WorkflowEditDialogComponent', () => {
     )
     storagePathNot.get('values').setValue([1])
 
+    const customFieldCondition = addConditionOfType(
+      TriggerConditionType.CustomFieldQuery
+    )
+    const customFieldQuery = JSON.stringify(['AND', [[1, 'exact', 'test']]])
+    customFieldCondition.get('values').setValue(customFieldQuery)
+
     const formValues = component['getFormValues']()
 
     expect(formValues.triggers[0].filter_has_tags).toEqual([1])
@@ -458,6 +460,9 @@ describe('WorkflowEditDialogComponent', () => {
     expect(formValues.triggers[0].filter_has_not_document_types).toEqual([1])
     expect(formValues.triggers[0].filter_has_storage_path).toEqual(1)
     expect(formValues.triggers[0].filter_has_not_storage_paths).toEqual([1])
+    expect(formValues.triggers[0].filter_custom_field_query).toEqual(
+      customFieldQuery
+    )
     expect(formValues.triggers[0].conditions).toBeUndefined()
   })
 
@@ -506,12 +511,22 @@ describe('WorkflowEditDialogComponent', () => {
     trigger.filter_has_not_document_types = [8] as any
     trigger.filter_has_storage_path = 9 as any
     trigger.filter_has_not_storage_paths = [10] as any
+    trigger.filter_custom_field_query = JSON.stringify([
+      'AND',
+      [[1, 'exact', 'value']],
+    ]) as any
 
     component.object = workflow
     component.ngOnInit()
     const triggerGroup = component.triggerFields.at(0) as FormGroup
     const conditions = component.getConditionsFormArray(triggerGroup)
-    expect(conditions.length).toBe(9)
+    expect(conditions.length).toBe(10)
+    const customFieldCondition = conditions.at(9) as FormGroup
+    expect(customFieldCondition.get('type').value).toBe(
+      TriggerConditionType.CustomFieldQuery
+    )
+    const model = component.getCustomFieldQueryModel(customFieldCondition)
+    expect(model.isValid()).toBe(true)
   })
 
   it('should expose select metadata helpers', () => {
@@ -538,6 +553,12 @@ describe('WorkflowEditDialogComponent', () => {
     expect(
       component.getConditionSelectItems(TriggerConditionType.TagsAll)
     ).toEqual([])
+
+    expect(
+      component.isCustomFieldQueryCondition(
+        TriggerConditionType.CustomFieldQuery
+      )
+    ).toBe(true)
   })
 
   it('should normalize condition values for single and multi selects', () => {
@@ -562,6 +583,13 @@ describe('WorkflowEditDialogComponent', () => {
         8
       )
     ).toEqual(8)
+    const customFieldJson = JSON.stringify(['AND', [[1, 'exact', 'test']]])
+    expect(
+      component['normalizeConditionValue'](
+        TriggerConditionType.CustomFieldQuery,
+        customFieldJson
+      )
+    ).toEqual(customFieldJson)
   })
 
   it('should add and remove condition form groups', () => {

@@ -1124,6 +1124,13 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("does not have these storage path(s)"),
     )
 
+    filter_custom_field_query = models.TextField(
+        _("filter custom field query"),
+        null=True,
+        blank=True,
+        help_text=_("JSON-encoded custom field query expression."),
+    )
+
     schedule_offset_days = models.IntegerField(
         _("schedule offset days"),
         default=0,

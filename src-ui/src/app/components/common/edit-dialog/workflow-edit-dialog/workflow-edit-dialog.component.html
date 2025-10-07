@@ -210,6 +210,19 @@
                           [title]="null"
                           formControlName="values"
                         ></pngx-input-tags>
+                      } @else if (
+                        isCustomFieldQueryCondition(condition.get('type').value)
+                      ) {
+                        <pngx-custom-fields-query-dropdown
+                          [selectionModel]="getCustomFieldQueryModel(condition)"
+                          (selectionModelChange)="onCustomFieldQuerySelectionChange(condition, $event)"
+                          [useDropdown]="false"
+                        ></pngx-custom-fields-query-dropdown>
+                        @if (!isCustomFieldQueryValid(condition)) {
+                          <div class="text-danger small" i18n>
+                            Complete the custom field query configuration.
+                          </div>
+                        }
                       } @else {
                         <pngx-input-select
                           [items]="getConditionSelectItems(condition.get('type').value)"

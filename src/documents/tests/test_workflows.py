@@ -1,4 +1,5 @@
 import datetime
+import json
 import shutil
 import socket
 from datetime import timedelta
@@ -31,6 +32,7 @@ from documents import tasks
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
 from documents.matching import document_matches_workflow
+from documents.matching import existing_document_matches_workflow
 from documents.matching import prefilter_documents_by_workflowtrigger
 from documents.models import Correspondent
 from documents.models import CustomField
@@ -1266,6 +1268,114 @@ class TestWorkflows(
                 f" {trigger.filter_has_not_storage_paths.all()}"
             )
             self.assertIn(expected_str, cm.output[1])
+
+    def test_document_added_custom_field_query_no_match(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_custom_field_query=json.dumps(
+                [
+                    "AND",
+                    [[self.cf1.id, "exact", "expected"]],
+                ],
+            ),
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        workflow = Workflow.objects.create(name="Workflow 1", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+        workflow.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=self.cf1,
+            value_text="other",
+        )
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {workflow}"
+            self.assertIn(expected_str, cm.output[0])
+            self.assertIn(
+                "Document custom fields do not match the configured custom field query",
+                cm.output[1],
+            )
+
+    def test_document_added_custom_field_query_match(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_custom_field_query=json.dumps(
+                [
+                    "AND",
+                    [[self.cf1.id, "exact", "expected"]],
+                ],
+            ),
+        )
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=self.cf1,
+            value_text="expected",
+        )
+
+        matched, reason = existing_document_matches_workflow(doc, trigger)
+        self.assertTrue(matched)
+        self.assertEqual(reason, "")
+
+    def test_prefilter_documents_custom_field_query(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_custom_field_query=json.dumps(
+                [
+                    "AND",
+                    [[self.cf1.id, "exact", "match"]],
+                ],
+            ),
+        )
+        doc1 = Document.objects.create(
+            title="doc 1",
+            correspondent=self.c,
+            original_filename="doc1.pdf",
+            checksum="checksum1",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc1,
+            field=self.cf1,
+            value_text="match",
+        )
+
+        doc2 = Document.objects.create(
+            title="doc 2",
+            correspondent=self.c,
+            original_filename="doc2.pdf",
+            checksum="checksum2",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc2,
+            field=self.cf1,
+            value_text="different",
+        )
+
+        filtered = prefilter_documents_by_workflowtrigger(
+            Document.objects.all(),
+            trigger,
+        )
+        self.assertIn(doc1, filtered)
+        self.assertNotIn(doc2, filtered)
 
     def test_document_added_no_match_doctype(self):
         trigger = WorkflowTrigger.objects.create(
