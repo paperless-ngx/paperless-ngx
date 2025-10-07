@@ -587,6 +587,10 @@ export class WorkflowEditDialogComponent
     return formValues
   }
 
+  public matchingPatternRequired(formGroup: FormGroup): boolean {
+    return formGroup.get('matching_algorithm').value !== MATCH_NONE
+  }
+
   private createConditionFormGroup(
     type: TriggerConditionType,
     initialValue?: number | number[]

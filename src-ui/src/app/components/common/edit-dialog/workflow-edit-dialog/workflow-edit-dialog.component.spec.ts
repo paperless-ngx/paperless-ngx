@@ -12,7 +12,11 @@ import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of } from 'rxjs'
 import { CustomFieldDataType } from 'src/app/data/custom-field'
-import { MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model'
+import {
+  MATCHING_ALGORITHMS,
+  MATCH_AUTO,
+  MATCH_NONE,
+} from 'src/app/data/matching-model'
 import { Workflow } from 'src/app/data/workflow'
 import {
   WorkflowAction,
@@ -374,6 +378,18 @@ describe('WorkflowEditDialogComponent', () => {
     component.save()
     expect(component.objectForm.get('actions').value[0].email).toBeNull()
     expect(component.objectForm.get('actions').value[0].webhook).toBeNull()
+  })
+
+  it('should require matching pattern when algorithm is not none', () => {
+    const triggerGroup = new FormGroup({
+      matching_algorithm: new FormControl(MATCH_AUTO),
+      match: new FormControl(''),
+    })
+    expect(component.matchingPatternRequired(triggerGroup)).toBe(true)
+    triggerGroup.get('matching_algorithm').setValue(MATCHING_ALGORITHMS[0].id)
+    expect(component.matchingPatternRequired(triggerGroup)).toBe(true)
+    triggerGroup.get('matching_algorithm').setValue(MATCH_NONE)
+    expect(component.matchingPatternRequired(triggerGroup)).toBe(false)
   })
 
   it('should map condition builder values into trigger filters on save', () => {
