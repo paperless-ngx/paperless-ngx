@@ -1159,6 +1159,114 @@ class TestWorkflows(
             )
             self.assertIn(expected_str, cm.output[1])
 
+    def test_document_added_excluded_correspondent(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        trigger.filter_has_not_correspondents.set([self.c])
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = (
+                f"Document correspondent {doc.correspondent} is excluded by"
+                f" {trigger.filter_has_not_correspondents.all()}"
+            )
+            self.assertIn(expected_str, cm.output[1])
+
+    def test_document_added_excluded_document_types(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        trigger.filter_has_not_document_types.set([self.dt])
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            document_type=self.dt,
+            original_filename="sample.pdf",
+        )
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = (
+                f"Document doc type {doc.document_type} is excluded by"
+                f" {trigger.filter_has_not_document_types.all()}"
+            )
+            self.assertIn(expected_str, cm.output[1])
+
+    def test_document_added_excluded_storage_paths(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        trigger.filter_has_not_storage_paths.set([self.sp])
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            storage_path=self.sp,
+            original_filename="sample.pdf",
+        )
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = (
+                f"Document storage path {doc.storage_path} is excluded by"
+                f" {trigger.filter_has_not_storage_paths.all()}"
+            )
+            self.assertIn(expected_str, cm.output[1])
+
     def test_document_added_no_match_doctype(self):
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,

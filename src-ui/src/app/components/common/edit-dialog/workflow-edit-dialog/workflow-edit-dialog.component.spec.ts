@@ -43,6 +43,7 @@ import { EditDialogMode } from '../edit-dialog.component'
 import {
   DOCUMENT_SOURCE_OPTIONS,
   SCHEDULE_DATE_FIELD_OPTIONS,
+  TriggerConditionType,
   WORKFLOW_ACTION_OPTIONS,
   WORKFLOW_TYPE_OPTIONS,
   WorkflowEditDialogComponent,
@@ -375,29 +376,73 @@ describe('WorkflowEditDialogComponent', () => {
     expect(component.objectForm.get('actions').value[0].webhook).toBeNull()
   })
 
-  it('should map tag condition builder values into trigger filters on save', () => {
+  it('should map condition builder values into trigger filters on save', () => {
     component.object = undefined
     component.addTrigger()
     const triggerGroup = component.triggerFields.at(0)
-    component.addTagCondition(0)
-    component.addTagCondition(0)
-    component.addTagCondition(0)
+    component.addCondition(triggerGroup as FormGroup)
+    component.addCondition(triggerGroup as FormGroup)
+    component.addCondition(triggerGroup as FormGroup)
 
-    const tagConditions = component.getTagConditionsFormArray(
+    const conditions = component.getConditionsFormArray(
       triggerGroup as FormGroup
     )
-    expect(tagConditions.length).toBe(3)
+    expect(conditions.length).toBe(3)
 
-    tagConditions.at(0).get('tags').setValue([1])
-    tagConditions.at(1).get('tags').setValue([2, 3])
-    tagConditions.at(2).get('tags').setValue([4])
+    conditions.at(0).get('values').setValue([1])
+    conditions.at(1).get('values').setValue([2, 3])
+    conditions.at(2).get('values').setValue([4])
+
+    const addConditionOfType = (type: TriggerConditionType) => {
+      component.addCondition(triggerGroup as FormGroup)
+      const conditionArray = component.getConditionsFormArray(
+        triggerGroup as FormGroup
+      )
+      const newCondition = conditionArray.at(conditionArray.length - 1)
+      newCondition.get('type').setValue(type)
+      return newCondition
+    }
+
+    const correspondentIs = addConditionOfType(
+      TriggerConditionType.CorrespondentIs
+    )
+    correspondentIs.get('values').setValue(1)
+
+    const correspondentNot = addConditionOfType(
+      TriggerConditionType.CorrespondentNot
+    )
+    correspondentNot.get('values').setValue([1])
+
+    const documentTypeIs = addConditionOfType(
+      TriggerConditionType.DocumentTypeIs
+    )
+    documentTypeIs.get('values').setValue(1)
+
+    const documentTypeNot = addConditionOfType(
+      TriggerConditionType.DocumentTypeNot
+    )
+    documentTypeNot.get('values').setValue([1])
+
+    const storagePathIs = addConditionOfType(TriggerConditionType.StoragePathIs)
+    storagePathIs.get('values').setValue(1)
+
+    const storagePathNot = addConditionOfType(
+      TriggerConditionType.StoragePathNot
+    )
+    storagePathNot.get('values').setValue([1])
 
     const formValues = component['getFormValues']()
 
     expect(formValues.triggers[0].filter_has_tags).toEqual([1])
     expect(formValues.triggers[0].filter_has_all_tags).toEqual([2, 3])
     expect(formValues.triggers[0].filter_has_not_tags).toEqual([4])
-    expect(formValues.triggers[0].tagConditions).toBeUndefined()
+    expect(formValues.triggers[0].filter_has_correspondent).toEqual(1)
+    expect(formValues.triggers[0].filter_has_not_correspondents).toEqual([1])
+    expect(formValues.triggers[0].filter_has_document_type).toEqual(1)
+    expect(formValues.triggers[0].filter_has_not_document_types).toEqual([1])
+    expect(formValues.triggers[0].filter_has_storage_path).toEqual(1)
+    expect(formValues.triggers[0].filter_has_not_storage_paths).toEqual([1])
+    expect(formValues.triggers[0].conditions).toBeUndefined()
   })
 
   it('should remove selected custom field from the form group', () => {

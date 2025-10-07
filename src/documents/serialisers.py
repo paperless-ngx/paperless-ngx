@@ -2196,6 +2196,9 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             "filter_has_tags",
             "filter_has_all_tags",
             "filter_has_not_tags",
+            "filter_has_not_correspondents",
+            "filter_has_not_document_types",
+            "filter_has_not_storage_paths",
             "filter_has_correspondent",
             "filter_has_document_type",
             "filter_has_storage_path",
@@ -2418,6 +2421,18 @@ class WorkflowSerializer(serializers.ModelSerializer):
                 filter_has_tags = trigger.pop("filter_has_tags", None)
                 filter_has_all_tags = trigger.pop("filter_has_all_tags", None)
                 filter_has_not_tags = trigger.pop("filter_has_not_tags", None)
+                filter_has_not_correspondents = trigger.pop(
+                    "filter_has_not_correspondents",
+                    None,
+                )
+                filter_has_not_document_types = trigger.pop(
+                    "filter_has_not_document_types",
+                    None,
+                )
+                filter_has_not_storage_paths = trigger.pop(
+                    "filter_has_not_storage_paths",
+                    None,
+                )
                 # Convert sources to strings to handle django-multiselectfield v1.0 changes
                 WorkflowTriggerSerializer.normalize_workflow_trigger_sources(trigger)
                 trigger_instance, _ = WorkflowTrigger.objects.update_or_create(
@@ -2430,6 +2445,18 @@ class WorkflowSerializer(serializers.ModelSerializer):
                     trigger_instance.filter_has_all_tags.set(filter_has_all_tags)
                 if filter_has_not_tags is not None:
                     trigger_instance.filter_has_not_tags.set(filter_has_not_tags)
+                if filter_has_not_correspondents is not None:
+                    trigger_instance.filter_has_not_correspondents.set(
+                        filter_has_not_correspondents,
+                    )
+                if filter_has_not_document_types is not None:
+                    trigger_instance.filter_has_not_document_types.set(
+                        filter_has_not_document_types,
+                    )
+                if filter_has_not_storage_paths is not None:
+                    trigger_instance.filter_has_not_storage_paths.set(
+                        filter_has_not_storage_paths,
+                    )
                 set_triggers.append(trigger_instance)
 
         if actions is not None and actions is not serializers.empty:

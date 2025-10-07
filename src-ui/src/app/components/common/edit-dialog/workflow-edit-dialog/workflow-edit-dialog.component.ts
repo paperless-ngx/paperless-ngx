@@ -135,27 +135,116 @@ export const WORKFLOW_ACTION_OPTIONS = [
   },
 ]
 
-export enum TagConditionType {
-  Any = 'any',
-  All = 'all',
-  None = 'none',
+export enum TriggerConditionType {
+  TagsAny = 'tags_any',
+  TagsAll = 'tags_all',
+  TagsNone = 'tags_none',
+  CorrespondentIs = 'correspondent_is',
+  CorrespondentNot = 'correspondent_not',
+  DocumentTypeIs = 'document_type_is',
+  DocumentTypeNot = 'document_type_not',
+  StoragePathIs = 'storage_path_is',
+  StoragePathNot = 'storage_path_not',
 }
 
-const TAG_CONDITION_OPTIONS = [
+interface TriggerConditionDefinition {
+  id: TriggerConditionType
+  name: string
+  hint?: string
+  valueLabel: string
+  inputType: 'tags' | 'select'
+  allowMultipleEntries: boolean
+  allowMultipleValues: boolean
+  selectItems?: 'correspondents' | 'documentTypes' | 'storagePaths'
+}
+
+const TRIGGER_CONDITION_DEFINITIONS: TriggerConditionDefinition[] = [
   {
-    id: TagConditionType.Any,
+    id: TriggerConditionType.TagsAny,
     name: $localize`Has any of these tags`,
     hint: $localize`Trigger matches when the document has at least one of the selected tags.`,
+    valueLabel: $localize`Tags`,
+    inputType: 'tags',
+    allowMultipleEntries: false,
+    allowMultipleValues: true,
   },
   {
-    id: TagConditionType.All,
+    id: TriggerConditionType.TagsAll,
     name: $localize`Has all of these tags`,
-    hint: $localize`Trigger matches when the document has every tag in the selection.`,
+    hint: $localize`Trigger matches only when every selected tag is present.`,
+    valueLabel: $localize`Tags`,
+    inputType: 'tags',
+    allowMultipleEntries: false,
+    allowMultipleValues: true,
   },
   {
-    id: TagConditionType.None,
+    id: TriggerConditionType.TagsNone,
     name: $localize`Does not have these tags`,
-    hint: $localize`Trigger matches when the document has none of the selected tags.`,
+    hint: $localize`Trigger matches only when none of the selected tags are present.`,
+    valueLabel: $localize`Tags`,
+    inputType: 'tags',
+    allowMultipleEntries: false,
+    allowMultipleValues: true,
+  },
+  {
+    id: TriggerConditionType.CorrespondentIs,
+    name: $localize`Has correspondent`,
+    hint: $localize`Trigger matches when the document has the selected correspondent.`,
+    valueLabel: $localize`Correspondent`,
+    inputType: 'select',
+    allowMultipleEntries: false,
+    allowMultipleValues: false,
+    selectItems: 'correspondents',
+  },
+  {
+    id: TriggerConditionType.CorrespondentNot,
+    name: $localize`Does not have correspondents`,
+    hint: $localize`Trigger matches when the document does not have any of the selected correspondents.`,
+    valueLabel: $localize`Correspondents`,
+    inputType: 'select',
+    allowMultipleEntries: false,
+    allowMultipleValues: true,
+    selectItems: 'correspondents',
+  },
+  {
+    id: TriggerConditionType.DocumentTypeIs,
+    name: $localize`Has document type`,
+    hint: $localize`Trigger matches when the document has the selected document type.`,
+    valueLabel: $localize`Document type`,
+    inputType: 'select',
+    allowMultipleEntries: false,
+    allowMultipleValues: false,
+    selectItems: 'documentTypes',
+  },
+  {
+    id: TriggerConditionType.DocumentTypeNot,
+    name: $localize`Does not have document types`,
+    hint: $localize`Trigger matches when the document does not have any of the selected document types.`,
+    valueLabel: $localize`Document types`,
+    inputType: 'select',
+    allowMultipleEntries: false,
+    allowMultipleValues: true,
+    selectItems: 'documentTypes',
+  },
+  {
+    id: TriggerConditionType.StoragePathIs,
+    name: $localize`Has storage path`,
+    hint: $localize`Trigger matches when the document has the selected storage path.`,
+    valueLabel: $localize`Storage path`,
+    inputType: 'select',
+    allowMultipleEntries: false,
+    allowMultipleValues: false,
+    selectItems: 'storagePaths',
+  },
+  {
+    id: TriggerConditionType.StoragePathNot,
+    name: $localize`Does not have storage paths`,
+    hint: $localize`Trigger matches when the document does not have any of the selected storage paths.`,
+    valueLabel: $localize`Storage paths`,
+    inputType: 'select',
+    allowMultipleEntries: false,
+    allowMultipleValues: true,
+    selectItems: 'storagePaths',
   },
 ]
 
@@ -194,8 +283,8 @@ export class WorkflowEditDialogComponent
 {
   public WorkflowTriggerType = WorkflowTriggerType
   public WorkflowActionType = WorkflowActionType
-  public TagConditionType = TagConditionType
-  public tagConditionOptions = TAG_CONDITION_OPTIONS
+  public TriggerConditionType = TriggerConditionType
+  public conditionDefinitions = TRIGGER_CONDITION_DEFINITIONS
 
   private correspondentService: CorrespondentService
   private documentTypeService: DocumentTypeService
@@ -423,29 +512,86 @@ export class WorkflowEditDialogComponent
       formValues.triggers = formValues.triggers.map(
         (trigger: any, index: number) => {
           const triggerFormGroup = this.triggerFields.at(index) as FormGroup
-          const conditions = this.getTagConditionsFormArray(triggerFormGroup)
+          const conditions = this.getConditionsFormArray(triggerFormGroup)
 
-          const tagBuckets: Record<TagConditionType, number[]> = {
-            [TagConditionType.Any]: [],
-            [TagConditionType.All]: [],
-            [TagConditionType.None]: [],
+          const aggregate = {
+            filter_has_tags: [] as number[],
+            filter_has_all_tags: [] as number[],
+            filter_has_not_tags: [] as number[],
+            filter_has_not_correspondents: [] as number[],
+            filter_has_not_document_types: [] as number[],
+            filter_has_not_storage_paths: [] as number[],
+            filter_has_correspondent: null as number | null,
+            filter_has_document_type: null as number | null,
+            filter_has_storage_path: null as number | null,
           }
 
           conditions.controls.forEach((control) => {
-            const type = control.get('type').value as TagConditionType
-            const tags = control.get('tags').value as number[]
-            if (tags?.length) {
-              tagBuckets[type] = [...tags]
-            } else {
-              tagBuckets[type] = []
+            const type = control.get('type').value as TriggerConditionType
+            const values = control.get('values').value
+
+            if (values === null || values === undefined) {
+              return
+            }
+
+            if (Array.isArray(values) && values.length === 0) {
+              return
+            }
+
+            switch (type) {
+              case TriggerConditionType.TagsAny:
+                aggregate.filter_has_tags = [...values]
+                break
+              case TriggerConditionType.TagsAll:
+                aggregate.filter_has_all_tags = [...values]
+                break
+              case TriggerConditionType.TagsNone:
+                aggregate.filter_has_not_tags = [...values]
+                break
+              case TriggerConditionType.CorrespondentIs:
+                aggregate.filter_has_correspondent = Array.isArray(values)
+                  ? values[0]
+                  : values
+                break
+              case TriggerConditionType.CorrespondentNot:
+                aggregate.filter_has_not_correspondents = [...values]
+                break
+              case TriggerConditionType.DocumentTypeIs:
+                aggregate.filter_has_document_type = Array.isArray(values)
+                  ? values[0]
+                  : values
+                break
+              case TriggerConditionType.DocumentTypeNot:
+                aggregate.filter_has_not_document_types = [...values]
+                break
+              case TriggerConditionType.StoragePathIs:
+                aggregate.filter_has_storage_path = Array.isArray(values)
+                  ? values[0]
+                  : values
+                break
+              case TriggerConditionType.StoragePathNot:
+                aggregate.filter_has_not_storage_paths = [...values]
+                break
             }
           })
 
-          trigger.filter_has_tags = tagBuckets[TagConditionType.Any]
-          trigger.filter_has_all_tags = tagBuckets[TagConditionType.All]
-          trigger.filter_has_not_tags = tagBuckets[TagConditionType.None]
+          trigger.filter_has_tags = aggregate.filter_has_tags
+          trigger.filter_has_all_tags = aggregate.filter_has_all_tags
+          trigger.filter_has_not_tags = aggregate.filter_has_not_tags
+          trigger.filter_has_not_correspondents =
+            aggregate.filter_has_not_correspondents
+          trigger.filter_has_not_document_types =
+            aggregate.filter_has_not_document_types
+          trigger.filter_has_not_storage_paths =
+            aggregate.filter_has_not_storage_paths
+          trigger.filter_has_correspondent =
+            aggregate.filter_has_correspondent ?? null
+          trigger.filter_has_document_type =
+            aggregate.filter_has_document_type ?? null
+          trigger.filter_has_storage_path =
+            aggregate.filter_has_storage_path ?? null
 
-          delete trigger.tagConditions
+          delete trigger.conditions
 
           return trigger
         }
@@ -455,108 +601,279 @@ export class WorkflowEditDialogComponent
     return formValues
   }
 
-  private createTagConditionFormGroup(
-    type: TagConditionType,
-    tags: number[] = []
+  private createConditionFormGroup(
+    type: TriggerConditionType,
+    initialValue?: number | number[]
   ): FormGroup {
-    return new FormGroup({
+    const group = new FormGroup({
       type: new FormControl(type),
-      tags: new FormControl(tags ?? []),
+      values: new FormControl(this.normalizeConditionValue(type, initialValue)),
     })
+
+    group
+      .get('type')
+      .valueChanges.subscribe((newType: TriggerConditionType) => {
+        group.get('values').setValue(this.getDefaultConditionValue(newType), {
+          emitEvent: false,
+        })
+      })
+
+    return group
   }
 
-  private buildTagConditionsFormArray(trigger: WorkflowTrigger): FormArray {
+  private buildConditionFormArray(trigger: WorkflowTrigger): FormArray {
     const conditions = new FormArray([])
 
     if (trigger.filter_has_tags && trigger.filter_has_tags.length > 0) {
       conditions.push(
-        this.createTagConditionFormGroup(TagConditionType.Any, [
-          ...trigger.filter_has_tags,
-        ])
+        this.createConditionFormGroup(
+          TriggerConditionType.TagsAny,
+          trigger.filter_has_tags
+        )
       )
     }
 
     if (trigger.filter_has_all_tags && trigger.filter_has_all_tags.length > 0) {
       conditions.push(
-        this.createTagConditionFormGroup(TagConditionType.All, [
-          ...trigger.filter_has_all_tags,
-        ])
+        this.createConditionFormGroup(
+          TriggerConditionType.TagsAll,
+          trigger.filter_has_all_tags
+        )
       )
     }
 
     if (trigger.filter_has_not_tags && trigger.filter_has_not_tags.length > 0) {
       conditions.push(
-        this.createTagConditionFormGroup(TagConditionType.None, [
-          ...trigger.filter_has_not_tags,
-        ])
+        this.createConditionFormGroup(
+          TriggerConditionType.TagsNone,
+          trigger.filter_has_not_tags
+        )
+      )
+    }
+
+    if (trigger.filter_has_correspondent) {
+      conditions.push(
+        this.createConditionFormGroup(
+          TriggerConditionType.CorrespondentIs,
+          trigger.filter_has_correspondent
+        )
+      )
+    }
+
+    if (
+      trigger.filter_has_not_correspondents &&
+      trigger.filter_has_not_correspondents.length > 0
+    ) {
+      conditions.push(
+        this.createConditionFormGroup(
+          TriggerConditionType.CorrespondentNot,
+          trigger.filter_has_not_correspondents
+        )
+      )
+    }
+
+    if (trigger.filter_has_document_type) {
+      conditions.push(
+        this.createConditionFormGroup(
+          TriggerConditionType.DocumentTypeIs,
+          trigger.filter_has_document_type
+        )
+      )
+    }
+
+    if (
+      trigger.filter_has_not_document_types &&
+      trigger.filter_has_not_document_types.length > 0
+    ) {
+      conditions.push(
+        this.createConditionFormGroup(
+          TriggerConditionType.DocumentTypeNot,
+          trigger.filter_has_not_document_types
+        )
+      )
+    }
+
+    if (trigger.filter_has_storage_path) {
+      conditions.push(
+        this.createConditionFormGroup(
+          TriggerConditionType.StoragePathIs,
+          trigger.filter_has_storage_path
+        )
+      )
+    }
+
+    if (
+      trigger.filter_has_not_storage_paths &&
+      trigger.filter_has_not_storage_paths.length > 0
+    ) {
+      conditions.push(
+        this.createConditionFormGroup(
+          TriggerConditionType.StoragePathNot,
+          trigger.filter_has_not_storage_paths
+        )
       )
     }
 
     return conditions
   }
 
-  getTagConditionsFormArray(formGroup: FormGroup): FormArray {
-    return formGroup.get('tagConditions') as FormArray
+  getConditionsFormArray(formGroup: FormGroup): FormArray {
+    return formGroup.get('conditions') as FormArray
   }
 
-  getTagConditionLabel(type: TagConditionType): string {
-    return (
-      this.tagConditionOptions.find((option) => option.id === type)?.name ?? ''
-    )
-  }
+  getConditionTypeOptions(formGroup: FormGroup, conditionIndex: number) {
+    const conditions = this.getConditionsFormArray(formGroup)
 
-  getTagConditionHint(formGroup: FormGroup, conditionIndex: number): string {
-    const conditions = this.getTagConditionsFormArray(formGroup)
-    const type = conditions.at(conditionIndex).get('type')
-      .value as TagConditionType
-    return (
-      this.tagConditionOptions.find((option) => option.id === type)?.hint ?? ''
-    )
-  }
-
-  getTagConditionSelectItems(formGroup: FormGroup, conditionIndex: number) {
-    const conditions = this.getTagConditionsFormArray(formGroup)
-    return this.tagConditionOptions.map((option) => ({
-      ...option,
-      disabled: conditions.controls.some((control, idx) => {
-        if (idx === conditionIndex) {
-          return false
-        }
-        return control.get('type').value === option.id
-      }),
+    return this.conditionDefinitions.map((definition) => ({
+      id: definition.id,
+      name: definition.name,
+      disabled:
+        !definition.allowMultipleEntries &&
+        conditions.controls.some((control, idx) => {
+          if (idx === conditionIndex) {
+            return false
+          }
+          return control.get('type').value === definition.id
+        }),
     }))
   }
 
-  canAddTagCondition(formGroup: FormGroup): boolean {
-    const conditions = this.getTagConditionsFormArray(formGroup)
-    return conditions.length < this.tagConditionOptions.length
+  canAddCondition(formGroup: FormGroup): boolean {
+    const conditions = this.getConditionsFormArray(formGroup)
+    const usedTypes = conditions.controls.map(
+      (control) => control.get('type').value as TriggerConditionType
+    )
+
+    return this.conditionDefinitions.some((definition) => {
+      if (definition.allowMultipleEntries) {
+        return true
+      }
+      return !usedTypes.includes(definition.id)
+    })
   }
 
-  addTagCondition(triggerIndex: number) {
-    const triggerFormGroup = this.triggerFields.at(triggerIndex) as FormGroup
-    const conditions = this.getTagConditionsFormArray(triggerFormGroup)
-    const availableTypes = this.tagConditionOptions
-      .map((option) => option.id)
-      .filter(
-        (type) =>
-          !conditions.controls.some(
-            (control) => control.get('type').value === type
-          )
-      )
-    if (availableTypes.length === 0) {
+  addCondition(triggerFormGroup: FormGroup) {
+    const triggerIndex = this.triggerFields.controls.indexOf(triggerFormGroup)
+    if (triggerIndex === -1) {
       return
     }
-    conditions.push(this.createTagConditionFormGroup(availableTypes[0]))
+
+    const conditions = this.getConditionsFormArray(triggerFormGroup)
+
+    const availableDefinition = this.conditionDefinitions.find((definition) => {
+      if (definition.allowMultipleEntries) {
+        return true
+      }
+      return !conditions.controls.some(
+        (control) => control.get('type').value === definition.id
+      )
+    })
+
+    if (!availableDefinition) {
+      return
+    }
+
+    conditions.push(this.createConditionFormGroup(availableDefinition.id))
     triggerFormGroup.markAsDirty()
     triggerFormGroup.markAsTouched()
   }
 
-  removeTagCondition(triggerIndex: number, conditionIndex: number) {
-    const triggerFormGroup = this.triggerFields.at(triggerIndex) as FormGroup
-    const conditions = this.getTagConditionsFormArray(triggerFormGroup)
+  removeCondition(triggerFormGroup: FormGroup, conditionIndex: number) {
+    const triggerIndex = this.triggerFields.controls.indexOf(triggerFormGroup)
+    if (triggerIndex === -1) {
+      return
+    }
+
+    const conditions = this.getConditionsFormArray(triggerFormGroup)
     conditions.removeAt(conditionIndex)
     triggerFormGroup.markAsDirty()
     triggerFormGroup.markAsTouched()
+  }
+
+  getConditionDefinition(
+    type: TriggerConditionType
+  ): TriggerConditionDefinition | undefined {
+    return this.conditionDefinitions.find(
+      (definition) => definition.id === type
+    )
+  }
+
+  getConditionName(type: TriggerConditionType): string {
+    return this.getConditionDefinition(type)?.name ?? ''
+  }
+
+  getConditionHint(formGroup: FormGroup, conditionIndex: number): string {
+    const conditions = this.getConditionsFormArray(formGroup)
+    const type = conditions.at(conditionIndex).get('type')
+      .value as TriggerConditionType
+    return this.getConditionDefinition(type)?.hint ?? ''
+  }
+
+  getConditionValueLabel(type: TriggerConditionType): string {
+    return this.getConditionDefinition(type)?.valueLabel ?? ''
+  }
+
+  isTagsCondition(type: TriggerConditionType): boolean {
+    return this.getConditionDefinition(type)?.inputType === 'tags'
+  }
+
+  isMultiValueCondition(type: TriggerConditionType): boolean {
+    switch (type) {
+      case TriggerConditionType.TagsAny:
+      case TriggerConditionType.TagsAll:
+      case TriggerConditionType.TagsNone:
+      case TriggerConditionType.CorrespondentNot:
+      case TriggerConditionType.DocumentTypeNot:
+      case TriggerConditionType.StoragePathNot:
+        return true
+      default:
+        return false
+    }
+  }
+
+  isSelectMultiple(type: TriggerConditionType): boolean {
+    return !this.isTagsCondition(type) && this.isMultiValueCondition(type)
+  }
+
+  getConditionSelectItems(type: TriggerConditionType) {
+    const definition = this.getConditionDefinition(type)
+    if (!definition || definition.inputType !== 'select') {
+      return []
+    }
+
+    switch (definition.selectItems) {
+      case 'correspondents':
+        return this.correspondents
+      case 'documentTypes':
+        return this.documentTypes
+      case 'storagePaths':
+        return this.storagePaths
+      default:
+        return []
+    }
+  }
+
+  private getDefaultConditionValue(type: TriggerConditionType) {
+    return this.isMultiValueCondition(type) ? [] : null
+  }
+
+  private normalizeConditionValue(
+    type: TriggerConditionType,
+    value?: number | number[]
+  ) {
+    if (value === undefined || value === null) {
+      return this.getDefaultConditionValue(type)
+    }
+
+    if (this.isMultiValueCondition(type)) {
+      return Array.isArray(value) ? [...value] : [value]
+    }
+
+    if (Array.isArray(value)) {
+      return value.length > 0 ? value[0] : null
+    }
+
+    return value
   }
 
   private createTriggerField(
@@ -583,7 +900,7 @@ export class WorkflowEditDialogComponent
         filter_has_storage_path: new FormControl(
           trigger.filter_has_storage_path
         ),
-        tagConditions: this.buildTagConditionsFormArray(trigger),
+        conditions: this.buildConditionFormArray(trigger),
         schedule_offset_days: new FormControl(trigger.schedule_offset_days),
         schedule_is_recurring: new FormControl(trigger.schedule_is_recurring),
         schedule_recurring_interval_days: new FormControl(
@@ -708,6 +1025,9 @@ export class WorkflowEditDialogComponent
       filter_has_tags: [],
       filter_has_all_tags: [],
       filter_has_not_tags: [],
+      filter_has_not_correspondents: [],
+      filter_has_not_document_types: [],
+      filter_has_not_storage_paths: [],
       filter_has_correspondent: null,
       filter_has_document_type: null,
       filter_has_storage_path: null,

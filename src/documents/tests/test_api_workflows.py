@@ -186,6 +186,9 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                             "filter_has_tags": [self.t1.id],
                             "filter_has_all_tags": [self.t2.id],
                             "filter_has_not_tags": [self.t3.id],
+                            "filter_has_not_correspondents": [self.c2.id],
+                            "filter_has_not_document_types": [self.dt2.id],
+                            "filter_has_not_storage_paths": [self.sp2.id],
                             "filter_has_document_type": self.dt.id,
                             "filter_has_correspondent": self.c.id,
                             "filter_has_storage_path": self.sp.id,
@@ -238,6 +241,18 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertSetEqual(
             set(trigger.filter_has_not_tags.values_list("id", flat=True)),
             {self.t3.id},
+        )
+        self.assertSetEqual(
+            set(trigger.filter_has_not_correspondents.values_list("id", flat=True)),
+            {self.c2.id},
+        )
+        self.assertSetEqual(
+            set(trigger.filter_has_not_document_types.values_list("id", flat=True)),
+            {self.dt2.id},
+        )
+        self.assertSetEqual(
+            set(trigger.filter_has_not_storage_paths.values_list("id", flat=True)),
+            {self.sp2.id},
         )
 
     def test_api_create_invalid_workflow_trigger(self):
@@ -394,6 +409,9 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                             "filter_has_tags": [self.t1.id],
                             "filter_has_all_tags": [self.t2.id],
                             "filter_has_not_tags": [self.t3.id],
+                            "filter_has_not_correspondents": [self.c2.id],
+                            "filter_has_not_document_types": [self.dt2.id],
+                            "filter_has_not_storage_paths": [self.sp2.id],
                             "filter_has_correspondent": self.c.id,
                             "filter_has_document_type": self.dt.id,
                         },
@@ -418,6 +436,18 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(
             workflow.triggers.first().filter_has_not_tags.first(),
             self.t3,
+        )
+        self.assertEqual(
+            workflow.triggers.first().filter_has_not_correspondents.first(),
+            self.c2,
+        )
+        self.assertEqual(
+            workflow.triggers.first().filter_has_not_document_types.first(),
+            self.dt2,
+        )
+        self.assertEqual(
+            workflow.triggers.first().filter_has_not_storage_paths.first(),
+            self.sp2,
         )
         self.assertEqual(workflow.actions.first().assign_title, "Action New Title")
 

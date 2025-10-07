@@ -172,32 +172,34 @@
           }
         }
       </div>
+    </div>
+    <div class="row">
       @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated || formGroup.get('type').value === WorkflowTriggerType.Scheduled) {
-        <div class="col-md-6">
-          <div class="trigger-tag-conditions mb-3">
+        <div class="col">
+          <div class="trigger-conditions mb-3">
             <div class="d-flex align-items-center">
-              <label class="form-label mb-0" i18n>Tag conditions</label>
+              <label class="form-label mb-0" i18n>Conditions</label>
               <button
                 type="button"
                 class="btn btn-sm btn-outline-primary ms-auto"
-                (click)="addTagCondition(i)"
-                [disabled]="!canAddTagCondition(formGroup)"
+                (click)="addCondition(formGroup)"
+                [disabled]="!canAddCondition(formGroup)"
               >
                 <i-bs name="plus-circle"></i-bs>&nbsp;<span i18n>Add condition</span>
               </button>
             </div>
-            <div class="mt-2" formArrayName="tagConditions">
-              @if (getTagConditionsFormArray(formGroup).length === 0) {
-                <p class="text-muted small" i18n>No tag conditions added. Add one to refine tag-based matching.</p>
+            <div class="mt-2" formArrayName="conditions">
+              @if (getConditionsFormArray(formGroup).length === 0) {
+                <p class="text-muted small" i18n>No conditions added. Add one to define document filters.</p>
               }
-              @for (condition of getTagConditionsFormArray(formGroup).controls; track condition; let conditionIndex = $index) {
+              @for (condition of getConditionsFormArray(formGroup).controls; track condition; let conditionIndex = $index) {
                 <div [formGroupName]="conditionIndex" class="border rounded p-3 mb-2">
                   <div class="d-flex align-items-start gap-2 mb-2">
                     <div class="flex-grow-1">
                       <pngx-input-select
                         i18n-title
                         title="Condition type"
-                        [items]="getTagConditionSelectItems(formGroup, conditionIndex)"
+                        [items]="getConditionTypeOptions(formGroup, conditionIndex)"
                         formControlName="type"
                         [allowNull]="false"
                       ></pngx-input-select>
@@ -205,25 +207,33 @@
                     <button
                       type="button"
                       class="btn btn-link text-danger p-0 ms-1"
-                      (click)="removeTagCondition(i, conditionIndex)"
+                      (click)="removeCondition(formGroup, conditionIndex)"
                     >
                       <i-bs name="trash"></i-bs>
                       <span class="visually-hidden" i18n>Remove condition</span>
                     </button>
                   </div>
-                  <pngx-input-tags
-                    [allowCreate]="false"
-                    [title]="getTagConditionLabel(condition.get('type').value)"
-                    [hint]="getTagConditionHint(formGroup, conditionIndex)"
-                    formControlName="tags"
-                  ></pngx-input-tags>
+                  @if (isTagsCondition(condition.get('type').value)) {
+                    <pngx-input-tags
+                      [allowCreate]="false"
+                      [title]="getConditionValueLabel(condition.get('type').value)"
+                      [hint]="getConditionHint(formGroup, conditionIndex)"
+                      formControlName="values"
+                    ></pngx-input-tags>
+                  } @else {
+                    <pngx-input-select
+                      [title]="getConditionValueLabel(condition.get('type').value)"
+                      [items]="getConditionSelectItems(condition.get('type').value)"
+                      [hint]="getConditionHint(formGroup, conditionIndex)"
+                      [allowNull]="true"
+                      [multiple]="isSelectMultiple(condition.get('type').value)"
+                      formControlName="values"
+                    ></pngx-input-select>
+                  }
                 </div>
               }
             </div>
           </div>
-          <pngx-input-select i18n-title title="Has correspondent" [items]="correspondents" [allowNull]="true" formControlName="filter_has_correspondent"></pngx-input-select>
-          <pngx-input-select i18n-title title="Has document type" [items]="documentTypes" [allowNull]="true" formControlName="filter_has_document_type"></pngx-input-select>
-          <pngx-input-select i18n-title title="Has storage path" [items]="storagePaths" [allowNull]="true" formControlName="filter_has_storage_path"></pngx-input-select>
         </div>
       }
     </div>

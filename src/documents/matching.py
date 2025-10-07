@@ -404,34 +404,76 @@ def existing_document_matches_workflow(
         trigger_matched = False
 
     # Document correspondent vs trigger has_correspondent
-    if (
-        trigger.filter_has_correspondent is not None
-        and document.correspondent != trigger.filter_has_correspondent
-    ):
-        reason = (
-            f"Document correspondent {document.correspondent} does not match {trigger.filter_has_correspondent}",
-        )
-        trigger_matched = False
+    if trigger_matched:
+        if (
+            trigger.filter_has_correspondent is not None
+            and document.correspondent != trigger.filter_has_correspondent
+        ):
+            reason = (
+                f"Document correspondent {document.correspondent} does not match {trigger.filter_has_correspondent}",
+            )
+            trigger_matched = False
+
+        if (
+            trigger.filter_has_not_correspondents.all().count() > 0
+            and document.correspondent
+            and trigger.filter_has_not_correspondents.filter(
+                id=document.correspondent_id,
+            ).exists()
+        ):
+            reason = (
+                f"Document correspondent {document.correspondent} is excluded by"
+                f" {trigger.filter_has_not_correspondents.all()}",
+            )
+            trigger_matched = False
 
     # Document document_type vs trigger has_document_type
-    if (
-        trigger.filter_has_document_type is not None
-        and document.document_type != trigger.filter_has_document_type
-    ):
-        reason = (
-            f"Document doc type {document.document_type} does not match {trigger.filter_has_document_type}",
-        )
-        trigger_matched = False
+    if trigger_matched:
+        if (
+            trigger.filter_has_document_type is not None
+            and document.document_type != trigger.filter_has_document_type
+        ):
+            reason = (
+                f"Document doc type {document.document_type} does not match {trigger.filter_has_document_type}",
+            )
+            trigger_matched = False
+
+        if (
+            trigger.filter_has_not_document_types.all().count() > 0
+            and document.document_type
+            and trigger.filter_has_not_document_types.filter(
+                id=document.document_type_id,
+            ).exists()
+        ):
+            reason = (
+                f"Document doc type {document.document_type} is excluded by"
+                f" {trigger.filter_has_not_document_types.all()}",
+            )
+            trigger_matched = False
 
     # Document storage_path vs trigger has_storage_path
-    if (
-        trigger.filter_has_storage_path is not None
-        and document.storage_path != trigger.filter_has_storage_path
-    ):
-        reason = (
-            f"Document storage path {document.storage_path} does not match {trigger.filter_has_storage_path}",
-        )
-        trigger_matched = False
+    if trigger_matched:
+        if (
+            trigger.filter_has_storage_path is not None
+            and document.storage_path != trigger.filter_has_storage_path
+        ):
+            reason = (
+                f"Document storage path {document.storage_path} does not match {trigger.filter_has_storage_path}",
+            )
+            trigger_matched = False
+
+        if (
+            trigger.filter_has_not_storage_paths.all().count() > 0
+            and document.storage_path
+            and trigger.filter_has_not_storage_paths.filter(
+                id=document.storage_path_id,
+            ).exists()
+        ):
+            reason = (
+                f"Document storage path {document.storage_path} is excluded by"
+                f" {trigger.filter_has_not_storage_paths.all()}",
+            )
+            trigger_matched = False
 
     # Document original_filename vs trigger filename
     if (
@@ -482,14 +524,29 @@ def prefilter_documents_by_workflowtrigger(
             correspondent=trigger.filter_has_correspondent,
         )
 
+    if trigger.filter_has_not_correspondents.all().count() > 0:
+        documents = documents.exclude(
+            correspondent__in=trigger.filter_has_not_correspondents.all(),
+        )
+
     if trigger.filter_has_document_type is not None:
         documents = documents.filter(
             document_type=trigger.filter_has_document_type,
         )
 
+    if trigger.filter_has_not_document_types.all().count() > 0:
+        documents = documents.exclude(
+            document_type__in=trigger.filter_has_not_document_types.all(),
+        )
+
     if trigger.filter_has_storage_path is not None:
         documents = documents.filter(
             storage_path=trigger.filter_has_storage_path,
+        )
+
+    if trigger.filter_has_not_storage_paths.all().count() > 0:
+        documents = documents.exclude(
+            storage_path__in=trigger.filter_has_not_storage_paths.all(),
         )
 
     if trigger.filter_filename is not None and len(trigger.filter_filename) > 0:
