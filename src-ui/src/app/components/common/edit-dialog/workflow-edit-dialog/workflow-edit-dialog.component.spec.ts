@@ -461,6 +461,130 @@ describe('WorkflowEditDialogComponent', () => {
     expect(formValues.triggers[0].conditions).toBeUndefined()
   })
 
+  it('should reuse cached condition type options and update disabled state', () => {
+    component.object = undefined
+    component.addTrigger()
+    const triggerGroup = component.triggerFields.at(0) as FormGroup
+    component.addCondition(triggerGroup)
+
+    const optionsFirst = component.getConditionTypeOptions(triggerGroup, 0)
+    const optionsSecond = component.getConditionTypeOptions(triggerGroup, 0)
+    expect(optionsFirst).toBe(optionsSecond)
+
+    // to force disabled flag
+    component.addCondition(triggerGroup)
+    const conditionArray = component.getConditionsFormArray(triggerGroup)
+    const firstCondition = conditionArray.at(0)
+    firstCondition.get('type').setValue(TriggerConditionType.CorrespondentIs)
+
+    component.addCondition(triggerGroup)
+    const updatedConditions = component.getConditionsFormArray(triggerGroup)
+    const secondCondition = updatedConditions.at(1)
+    const options = component.getConditionTypeOptions(triggerGroup, 1)
+    const correspondentIsOption = options.find(
+      (option) => option.id === TriggerConditionType.CorrespondentIs
+    )
+    expect(correspondentIsOption.disabled).toBe(true)
+
+    firstCondition.get('type').setValue(TriggerConditionType.DocumentTypeNot)
+    secondCondition.get('type').setValue(TriggerConditionType.TagsAll)
+    const postChangeOptions = component.getConditionTypeOptions(triggerGroup, 1)
+    const correspondentOptionAfter = postChangeOptions.find(
+      (option) => option.id === TriggerConditionType.CorrespondentIs
+    )
+    expect(correspondentOptionAfter.disabled).toBe(false)
+  })
+
+  it('should build condition form array from existing trigger filters', () => {
+    const trigger = workflow.triggers[0]
+    trigger.filter_has_tags = [1]
+    trigger.filter_has_all_tags = [2, 3]
+    trigger.filter_has_not_tags = [4]
+    trigger.filter_has_correspondent = 5 as any
+    trigger.filter_has_not_correspondents = [6] as any
+    trigger.filter_has_document_type = 7 as any
+    trigger.filter_has_not_document_types = [8] as any
+    trigger.filter_has_storage_path = 9 as any
+    trigger.filter_has_not_storage_paths = [10] as any
+
+    component.object = workflow
+    component.ngOnInit()
+    const triggerGroup = component.triggerFields.at(0) as FormGroup
+    const conditions = component.getConditionsFormArray(triggerGroup)
+    expect(conditions.length).toBe(9)
+  })
+
+  it('should expose select metadata helpers', () => {
+    expect(
+      component.isSelectMultiple(TriggerConditionType.CorrespondentNot)
+    ).toBe(true)
+    expect(
+      component.isSelectMultiple(TriggerConditionType.CorrespondentIs)
+    ).toBe(false)
+
+    component.correspondents = [{ id: 1, name: 'C1' } as any]
+    component.documentTypes = [{ id: 2, name: 'DT' } as any]
+    component.storagePaths = [{ id: 3, name: 'SP' } as any]
+
+    expect(
+      component.getConditionSelectItems(TriggerConditionType.CorrespondentIs)
+    ).toEqual(component.correspondents)
+    expect(
+      component.getConditionSelectItems(TriggerConditionType.DocumentTypeIs)
+    ).toEqual(component.documentTypes)
+    expect(
+      component.getConditionSelectItems(TriggerConditionType.StoragePathIs)
+    ).toEqual(component.storagePaths)
+    expect(
+      component.getConditionSelectItems(TriggerConditionType.TagsAll)
+    ).toEqual([])
+  })
+
+  it('should normalize condition values for single and multi selects', () => {
+    expect(
+      component['normalizeConditionValue'](TriggerConditionType.TagsAny)
+    ).toEqual([])
+    expect(
+      component['normalizeConditionValue'](TriggerConditionType.TagsAny, 5)
+    ).toEqual([5])
+    expect(
+      component['normalizeConditionValue'](TriggerConditionType.TagsAny, [5, 6])
+    ).toEqual([5, 6])
+    expect(
+      component['normalizeConditionValue'](
+        TriggerConditionType.CorrespondentIs,
+        [7]
+      )
+    ).toEqual(7)
+    expect(
+      component['normalizeConditionValue'](
+        TriggerConditionType.CorrespondentIs,
+        8
+      )
+    ).toEqual(8)
+  })
+
+  it('should add and remove condition form groups', () => {
+    component['changeDetector'] = { detectChanges: jest.fn() } as any
+    component.object = undefined
+    component.addTrigger()
+    const triggerGroup = component.triggerFields.at(0) as FormGroup
+
+    component.addCondition(triggerGroup)
+
+    component.removeCondition(triggerGroup, 0)
+    expect(component.getConditionsFormArray(triggerGroup).length).toBe(0)
+
+    component.addCondition(triggerGroup)
+    const conditionArrayAfterAdd =
+      component.getConditionsFormArray(triggerGroup)
+    conditionArrayAfterAdd
+      .at(0)
+      .get('type')
+      .setValue(TriggerConditionType.TagsAll)
+    expect(component.getConditionsFormArray(triggerGroup).length).toBe(1)
+  })
+
   it('should remove selected custom field from the form group', () => {
     const formGroup = new FormGroup({
       assign_custom_fields: new FormControl([1, 2, 3]),
