@@ -120,6 +120,12 @@ export class CustomFieldQueriesModel {
     })
   }
 
+  addInitialAtom() {
+    this.addAtom(
+      new CustomFieldQueryAtom([null, CustomFieldQueryOperator.Exists, 'true'])
+    )
+  }
+
   private findElement(
     queryElement: CustomFieldQueryElement,
     elements: any[]
@@ -261,13 +267,7 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
   public onOpenChange(open: boolean) {
     if (open) {
       if (this.selectionModel.queries.length === 0) {
-        this.selectionModel.addAtom(
-          new CustomFieldQueryAtom([
-            null,
-            CustomFieldQueryOperator.Exists,
-            'true',
-          ])
-        )
+        this.selectionModel.addInitialAtom()
       }
       if (
         this.selectionModel.queries.length === 1 &&

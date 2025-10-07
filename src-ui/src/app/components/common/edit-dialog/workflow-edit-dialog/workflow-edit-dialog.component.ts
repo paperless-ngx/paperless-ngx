@@ -963,6 +963,7 @@ export class WorkflowEditDialogComponent
         model.queries = [expression]
       } catch (error) {
         model.clear(false)
+        model.addInitialAtom()
       }
     }
 
