@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core'
 import { Observable, Subject } from 'rxjs'
-import { first, takeUntil } from 'rxjs/operators'
+import { first, takeUntil, tap } from 'rxjs/operators'
 import {
   PaperlessTask,
   PaperlessTaskName,
@@ -68,14 +68,17 @@ export class TasksService {
   }
 
   public dismissTasks(task_ids: Set<number>) {
-    this.http
+    return this.http
       .post(`${this.baseUrl}tasks/acknowledge/`, {
         tasks: [...task_ids],
       })
-      .pipe(first())
-      .subscribe((r) => {
-        this.reload()
-      })
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifer),
+        tap(() => {
+          this.reload()
+        })
+      )
   }
 
   public cancelPending(): void {
