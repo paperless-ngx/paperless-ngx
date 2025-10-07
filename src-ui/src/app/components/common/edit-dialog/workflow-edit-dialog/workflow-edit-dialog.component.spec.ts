@@ -512,7 +512,7 @@ describe('WorkflowEditDialogComponent', () => {
     expect(formValues.triggers[0].filter_has_storage_path).toEqual(7)
   })
 
-  it('should reuse cached condition type options and update disabled state', () => {
+  it('should reuse condition type options and update disabled state', () => {
     component.object = undefined
     component.addTrigger()
     const triggerGroup = component.triggerFields.at(0) as FormGroup
@@ -638,10 +638,14 @@ describe('WorkflowEditDialogComponent', () => {
 
     const model = component.getCustomFieldQueryModel(conditionGroup)
     expect(model).toBeDefined()
-    expect(component['customFieldQueryModels'].has(conditionGroup)).toBe(true)
+    expect(
+      component['getStoredCustomFieldQueryModel'](conditionGroup as any)
+    ).toBe(model)
 
     component.removeCondition(triggerGroup, 0)
-    expect(component['customFieldQueryModels'].has(conditionGroup)).toBe(false)
+    expect(
+      component['getStoredCustomFieldQueryModel'](conditionGroup as any)
+    ).toBeNull()
   })
 
   it('should return readable condition names', () => {
@@ -726,10 +730,8 @@ describe('WorkflowEditDialogComponent', () => {
     component.onCustomFieldQuerySelectionChange(formGroup, model)
     expect(changeSpy).toHaveBeenCalledWith(formGroup, model)
 
-    const map = component['customFieldQueryModels']
-
     expect(component.isCustomFieldQueryValid(formGroup)).toBe(true)
-    map.set(formGroup, model)
+    component['setCustomFieldQueryModel'](formGroup as any, model as any)
 
     const validSpy = jest.spyOn(model, 'isValid').mockReturnValue(false)
     const emptySpy = jest.spyOn(model, 'isEmpty').mockReturnValue(false)
@@ -743,7 +745,7 @@ describe('WorkflowEditDialogComponent', () => {
     emptySpy.mockReturnValue(false)
     expect(component.isCustomFieldQueryValid(formGroup)).toBe(true)
 
-    map.delete(formGroup)
+    component['clearCustomFieldQueryModel'](formGroup as any)
   })
 
   it('should recover from invalid custom field query json and update control on changes', () => {
@@ -753,7 +755,9 @@ describe('WorkflowEditDialogComponent', () => {
 
     component['ensureCustomFieldQueryModel'](conditionGroup, 'not-json')
 
-    const model = component['customFieldQueryModels'].get(conditionGroup)
+    const model = component['getStoredCustomFieldQueryModel'](
+      conditionGroup as any
+    )
     expect(model).toBeDefined()
     expect(model.queries.length).toBeGreaterThan(0)
 
@@ -773,7 +777,7 @@ describe('WorkflowEditDialogComponent', () => {
 
     expect(valuesControl.value).toEqual(JSON.stringify(expression.serialize()))
 
-    component['teardownCustomFieldQueryModel'](conditionGroup)
+    component['clearCustomFieldQueryModel'](conditionGroup as any)
   })
 
   it('should handle custom field query model change edge cases', () => {
