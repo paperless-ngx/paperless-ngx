@@ -615,7 +615,8 @@ export class DocumentDetailComponent
       })
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        if (this.openDocumentService.isDirty(this.document)) this.saveEditNext()
+        if (this.openDocumentService.isDirty(this.document))
+          this.saveEditNextShortcut()
       })
   }
 
@@ -845,6 +846,11 @@ export class DocumentDetailComponent
       }
     })
     return changes
+  }
+
+  saveEditNextShortcut() {
+    if (this.hasNext()) return this.saveEditNext()
+    return this.save(true)
   }
 
   save(close: boolean = false) {
