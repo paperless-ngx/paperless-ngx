@@ -73,7 +73,7 @@ export class TasksComponent
   tasksService = inject(TasksService)
   private modalService = inject(NgbModal)
   private readonly router = inject(Router)
-  private toastService = inject(ToastService)
+  private readonly toastService = inject(ToastService)
 
   public activeTab: TaskTab
   public selectedTasks: Set<number> = new Set()
@@ -157,10 +157,10 @@ export class TasksComponent
         modal.componentInstance.buttonsEnabled = false
         modal.close()
         this.tasksService.dismissTasks(tasks).subscribe({
-          error: (e) => (
-            this.toastService.showError($localize`Error dismissing tasks`, e),
-            (modal.componentInstance.buttonsEnabled = true)
-          ),
+          error: (e) => {
+            this.toastService.showError($localize`Error dismissing tasks`, e)
+            modal.componentInstance.buttonsEnabled = true
+          },
         })
         this.clearSelection()
       })
