@@ -512,6 +512,32 @@ describe('WorkflowEditDialogComponent', () => {
     expect(formValues.triggers[0].filter_has_storage_path).toEqual(7)
   })
 
+  it('should convert multi-value condition values when aggregating filters', () => {
+    component.object = undefined
+    component.addTrigger()
+    const triggerGroup = component.triggerFields.at(0) as FormGroup
+
+    const setCondition = (type: TriggerConditionType, value: number): void => {
+      const condition = component.addCondition(triggerGroup) as FormGroup
+      condition.get('type').setValue(type)
+      condition.get('values').setValue(value)
+    }
+
+    setCondition(TriggerConditionType.TagsAll, 11)
+    setCondition(TriggerConditionType.TagsNone, 12)
+    setCondition(TriggerConditionType.CorrespondentNot, 13)
+    setCondition(TriggerConditionType.DocumentTypeNot, 14)
+    setCondition(TriggerConditionType.StoragePathNot, 15)
+
+    const formValues = component['getFormValues']()
+
+    expect(formValues.triggers[0].filter_has_all_tags).toEqual([11])
+    expect(formValues.triggers[0].filter_has_not_tags).toEqual([12])
+    expect(formValues.triggers[0].filter_has_not_correspondents).toEqual([13])
+    expect(formValues.triggers[0].filter_has_not_document_types).toEqual([14])
+    expect(formValues.triggers[0].filter_has_not_storage_paths).toEqual([15])
+  })
+
   it('should reuse condition type options and update disabled state', () => {
     component.object = undefined
     component.addTrigger()
@@ -616,6 +642,37 @@ describe('WorkflowEditDialogComponent', () => {
     expect(component.addCondition(triggerGroup)).toBeNull()
   })
 
+  it('should skip condition definitions without handlers when building form array', () => {
+    const originalDefinitions = component.conditionDefinitions
+    component.conditionDefinitions = [
+      {
+        id: 999,
+        name: 'Unsupported',
+        inputType: 'text',
+        allowMultipleEntries: false,
+        allowMultipleValues: false,
+      } as any,
+    ]
+
+    const trigger = {
+      filter_has_tags: [],
+      filter_has_all_tags: [],
+      filter_has_not_tags: [],
+      filter_has_not_correspondents: [],
+      filter_has_not_document_types: [],
+      filter_has_not_storage_paths: [],
+      filter_has_correspondent: null,
+      filter_has_document_type: null,
+      filter_has_storage_path: null,
+      filter_custom_field_query: null,
+    } as any
+
+    const conditions = component['buildConditionFormArray'](trigger)
+    expect(conditions.length).toBe(0)
+
+    component.conditionDefinitions = originalDefinitions
+  })
+
   it('should return null when adding condition for unknown trigger form group', () => {
     expect(component.addCondition(new FormGroup({}) as any)).toBeNull()
   })
@@ -714,6 +771,17 @@ describe('WorkflowEditDialogComponent', () => {
         TriggerConditionType.CustomFieldQuery
       )
     ).toBe(true)
+  })
+
+  it('should return empty select items when definition is missing', () => {
+    const originalDefinitions = component.conditionDefinitions
+    component.conditionDefinitions = []
+
+    expect(
+      component.getConditionSelectItems(TriggerConditionType.CorrespondentIs)
+    ).toEqual([])
+
+    component.conditionDefinitions = originalDefinitions
   })
 
   it('should handle custom field query selection change and validation states', () => {
