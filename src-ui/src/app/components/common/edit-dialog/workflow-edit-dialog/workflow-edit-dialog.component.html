@@ -176,58 +176,58 @@
     @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated || formGroup.get('type').value === WorkflowTriggerType.Scheduled) {
       <div class="row mt-3">
         <div class="col">
-          <div class="trigger-conditions mb-3">
+          <div class="trigger-filters mb-3">
             <div class="d-flex align-items-center">
-              <label class="form-label mb-0" i18n>Conditions</label>
+              <label class="form-label mb-0" i18n>Advanced Filters</label>
               <button
                 type="button"
                 class="btn btn-sm btn-outline-primary ms-auto"
-                (click)="addCondition(formGroup)"
-                [disabled]="!canAddCondition(formGroup)"
+                (click)="addFilter(formGroup)"
+                [disabled]="!canAddFilter(formGroup)"
               >
-                <i-bs name="plus-circle"></i-bs>&nbsp;<span i18n>Add condition</span>
+                <i-bs name="plus-circle"></i-bs>&nbsp;<span i18n>Add filter</span>
               </button>
             </div>
-            <ul class="mt-2 list-group conditions" formArrayName="conditions">
-              @if (getConditionsFormArray(formGroup).length === 0) {
-                <p class="text-muted small" i18n>No conditions added. Add one to define document filters.</p>
+            <ul class="mt-2 list-group filters" formArrayName="filters">
+              @if (getFiltersFormArray(formGroup).length === 0) {
+                <p class="text-muted small" i18n>No advanced workflow filters defined.</p>
               }
-              @for (condition of getConditionsFormArray(formGroup).controls; track condition; let conditionIndex = $index) {
-                <li [formGroupName]="conditionIndex" class="list-group-item">
+              @for (filter of getFiltersFormArray(formGroup).controls; track filter; let filterIndex = $index) {
+                <li [formGroupName]="filterIndex" class="list-group-item">
                   <div class="d-flex align-items-center gap-2">
                     <div class="w-25">
                       <pngx-input-select
                         i18n-title
-                        [items]="getConditionTypeOptions(formGroup, conditionIndex)"
+                        [items]="getFilterTypeOptions(formGroup, filterIndex)"
                         formControlName="type"
                         [allowNull]="false"
                       ></pngx-input-select>
                     </div>
                     <div class="flex-grow-1">
-                      @if (isTagsCondition(condition.get('type').value)) {
+                      @if (isTagsFilter(filter.get('type').value)) {
                         <pngx-input-tags
                           [allowCreate]="false"
                           [title]="null"
                           formControlName="values"
                         ></pngx-input-tags>
                       } @else if (
-                        isCustomFieldQueryCondition(condition.get('type').value)
+                        isCustomFieldQueryFilter(filter.get('type').value)
                       ) {
                         <pngx-custom-fields-query-dropdown
-                          [selectionModel]="getCustomFieldQueryModel(condition)"
-                          (selectionModelChange)="onCustomFieldQuerySelectionChange(condition, $event)"
+                          [selectionModel]="getCustomFieldQueryModel(filter)"
+                          (selectionModelChange)="onCustomFieldQuerySelectionChange(filter, $event)"
                           [useDropdown]="false"
                         ></pngx-custom-fields-query-dropdown>
-                        @if (!isCustomFieldQueryValid(condition)) {
+                        @if (!isCustomFieldQueryValid(filter)) {
                           <div class="text-danger small" i18n>
                             Complete the custom field query configuration.
                           </div>
                         }
                       } @else {
                         <pngx-input-select
-                          [items]="getConditionSelectItems(condition.get('type').value)"
+                          [items]="getFilterSelectItems(filter.get('type').value)"
                           [allowNull]="true"
-                          [multiple]="isSelectMultiple(condition.get('type').value)"
+                          [multiple]="isSelectMultiple(filter.get('type').value)"
                           formControlName="values"
                         ></pngx-input-select>
                       }
@@ -235,7 +235,7 @@
                     <button
                       type="button"
                       class="btn btn-link text-danger p-0"
-                      (click)="removeCondition(formGroup, conditionIndex)"
+                      (click)="removeFilter(formGroup, filterIndex)"
                     >
                       <i-bs name="trash"></i-bs><span class="ms-1" i18n>Delete</span>
                     </button>

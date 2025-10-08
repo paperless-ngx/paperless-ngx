@@ -141,7 +141,7 @@ export const WORKFLOW_ACTION_OPTIONS = [
   },
 ]
 
-export enum TriggerConditionType {
+export enum TriggerFilterType {
   TagsAny = 'tags_any',
   TagsAll = 'tags_all',
   TagsNone = 'tags_none',
@@ -154,8 +154,8 @@ export enum TriggerConditionType {
   CustomFieldQuery = 'custom_field_query',
 }
 
-interface TriggerConditionDefinition {
-  id: TriggerConditionType
+interface TriggerFilterDefinition {
+  id: TriggerFilterType
   name: string
   inputType: 'tags' | 'select' | 'customFieldQuery'
   allowMultipleEntries: boolean
@@ -164,7 +164,7 @@ interface TriggerConditionDefinition {
   disabled?: boolean
 }
 
-type TriggerConditionOption = TriggerConditionDefinition & {
+type TriggerFilterOption = TriggerFilterDefinition & {
   disabled?: boolean
 }
 
@@ -181,7 +181,7 @@ type TriggerFilterAggregate = {
   filter_custom_field_query: string | null
 }
 
-interface ConditionFilterHandler {
+interface FilterHandler {
   apply: (aggregate: TriggerFilterAggregate, values: any) => void
   extract: (trigger: WorkflowTrigger) => any
   hasValue: (value: any) => boolean
@@ -192,35 +192,35 @@ const CUSTOM_FIELD_QUERY_SUBSCRIPTION_KEY = Symbol(
   'customFieldQuerySubscription'
 )
 
-type CustomFieldConditionGroup = FormGroup & {
+type CustomFieldFilterGroup = FormGroup & {
   [CUSTOM_FIELD_QUERY_MODEL_KEY]?: CustomFieldQueriesModel
   [CUSTOM_FIELD_QUERY_SUBSCRIPTION_KEY]?: Subscription
 }
 
-const TRIGGER_CONDITION_DEFINITIONS: TriggerConditionDefinition[] = [
+const TRIGGER_FILTER_DEFINITIONS: TriggerFilterDefinition[] = [
   {
-    id: TriggerConditionType.TagsAny,
+    id: TriggerFilterType.TagsAny,
     name: $localize`Has any of these tags`,
     inputType: 'tags',
     allowMultipleEntries: false,
     allowMultipleValues: true,
   },
   {
-    id: TriggerConditionType.TagsAll,
+    id: TriggerFilterType.TagsAll,
     name: $localize`Has all of these tags`,
     inputType: 'tags',
     allowMultipleEntries: false,
     allowMultipleValues: true,
   },
   {
-    id: TriggerConditionType.TagsNone,
+    id: TriggerFilterType.TagsNone,
     name: $localize`Does not have these tags`,
     inputType: 'tags',
     allowMultipleEntries: false,
     allowMultipleValues: true,
   },
   {
-    id: TriggerConditionType.CorrespondentIs,
+    id: TriggerFilterType.CorrespondentIs,
     name: $localize`Has correspondent`,
     inputType: 'select',
     allowMultipleEntries: false,
@@ -228,7 +228,7 @@ const TRIGGER_CONDITION_DEFINITIONS: TriggerConditionDefinition[] = [
     selectItems: 'correspondents',
   },
   {
-    id: TriggerConditionType.CorrespondentNot,
+    id: TriggerFilterType.CorrespondentNot,
     name: $localize`Does not have correspondents`,
     inputType: 'select',
     allowMultipleEntries: false,
@@ -236,7 +236,7 @@ const TRIGGER_CONDITION_DEFINITIONS: TriggerConditionDefinition[] = [
     selectItems: 'correspondents',
   },
   {
-    id: TriggerConditionType.DocumentTypeIs,
+    id: TriggerFilterType.DocumentTypeIs,
     name: $localize`Has document type`,
     inputType: 'select',
     allowMultipleEntries: false,
@@ -244,7 +244,7 @@ const TRIGGER_CONDITION_DEFINITIONS: TriggerConditionDefinition[] = [
     selectItems: 'documentTypes',
   },
   {
-    id: TriggerConditionType.DocumentTypeNot,
+    id: TriggerFilterType.DocumentTypeNot,
     name: $localize`Does not have document types`,
     inputType: 'select',
     allowMultipleEntries: false,
@@ -252,7 +252,7 @@ const TRIGGER_CONDITION_DEFINITIONS: TriggerConditionDefinition[] = [
     selectItems: 'documentTypes',
   },
   {
-    id: TriggerConditionType.StoragePathIs,
+    id: TriggerFilterType.StoragePathIs,
     name: $localize`Has storage path`,
     inputType: 'select',
     allowMultipleEntries: false,
@@ -260,7 +260,7 @@ const TRIGGER_CONDITION_DEFINITIONS: TriggerConditionDefinition[] = [
     selectItems: 'storagePaths',
   },
   {
-    id: TriggerConditionType.StoragePathNot,
+    id: TriggerFilterType.StoragePathNot,
     name: $localize`Does not have storage paths`,
     inputType: 'select',
     allowMultipleEntries: false,
@@ -268,7 +268,7 @@ const TRIGGER_CONDITION_DEFINITIONS: TriggerConditionDefinition[] = [
     selectItems: 'storagePaths',
   },
   {
-    id: TriggerConditionType.CustomFieldQuery,
+    id: TriggerFilterType.CustomFieldQuery,
     name: $localize`Matches custom field query`,
     inputType: 'customFieldQuery',
     allowMultipleEntries: false,
@@ -280,18 +280,15 @@ const TRIGGER_MATCHING_ALGORITHMS = MATCHING_ALGORITHMS.filter(
   (a) => a.id !== MATCH_AUTO
 )
 
-const CONDITION_FILTER_HANDLERS: Record<
-  TriggerConditionType,
-  ConditionFilterHandler
-> = {
-  [TriggerConditionType.TagsAny]: {
+const FILTER_HANDLERS: Record<TriggerFilterType, FilterHandler> = {
+  [TriggerFilterType.TagsAny]: {
     apply: (aggregate, values) => {
       aggregate.filter_has_tags = Array.isArray(values) ? [...values] : [values]
     },
     extract: (trigger) => trigger.filter_has_tags,
     hasValue: (value) => Array.isArray(value) && value.length > 0,
   },
-  [TriggerConditionType.TagsAll]: {
+  [TriggerFilterType.TagsAll]: {
     apply: (aggregate, values) => {
       aggregate.filter_has_all_tags = Array.isArray(values)
         ? [...values]
@@ -300,7 +297,7 @@ const CONDITION_FILTER_HANDLERS: Record<
     extract: (trigger) => trigger.filter_has_all_tags,
     hasValue: (value) => Array.isArray(value) && value.length > 0,
   },
-  [TriggerConditionType.TagsNone]: {
+  [TriggerFilterType.TagsNone]: {
     apply: (aggregate, values) => {
       aggregate.filter_has_not_tags = Array.isArray(values)
         ? [...values]
@@ -309,7 +306,7 @@ const CONDITION_FILTER_HANDLERS: Record<
     extract: (trigger) => trigger.filter_has_not_tags,
     hasValue: (value) => Array.isArray(value) && value.length > 0,
   },
-  [TriggerConditionType.CorrespondentIs]: {
+  [TriggerFilterType.CorrespondentIs]: {
     apply: (aggregate, values) => {
       aggregate.filter_has_correspondent = Array.isArray(values)
         ? (values[0] ?? null)
@@ -318,7 +315,7 @@ const CONDITION_FILTER_HANDLERS: Record<
     extract: (trigger) => trigger.filter_has_correspondent,
     hasValue: (value) => value !== null && value !== undefined,
   },
-  [TriggerConditionType.CorrespondentNot]: {
+  [TriggerFilterType.CorrespondentNot]: {
     apply: (aggregate, values) => {
       aggregate.filter_has_not_correspondents = Array.isArray(values)
         ? [...values]
@@ -327,7 +324,7 @@ const CONDITION_FILTER_HANDLERS: Record<
     extract: (trigger) => trigger.filter_has_not_correspondents,
     hasValue: (value) => Array.isArray(value) && value.length > 0,
   },
-  [TriggerConditionType.DocumentTypeIs]: {
+  [TriggerFilterType.DocumentTypeIs]: {
     apply: (aggregate, values) => {
       aggregate.filter_has_document_type = Array.isArray(values)
         ? (values[0] ?? null)
@@ -336,7 +333,7 @@ const CONDITION_FILTER_HANDLERS: Record<
     extract: (trigger) => trigger.filter_has_document_type,
     hasValue: (value) => value !== null && value !== undefined,
   },
-  [TriggerConditionType.DocumentTypeNot]: {
+  [TriggerFilterType.DocumentTypeNot]: {
     apply: (aggregate, values) => {
       aggregate.filter_has_not_document_types = Array.isArray(values)
         ? [...values]
@@ -345,7 +342,7 @@ const CONDITION_FILTER_HANDLERS: Record<
     extract: (trigger) => trigger.filter_has_not_document_types,
     hasValue: (value) => Array.isArray(value) && value.length > 0,
   },
-  [TriggerConditionType.StoragePathIs]: {
+  [TriggerFilterType.StoragePathIs]: {
     apply: (aggregate, values) => {
       aggregate.filter_has_storage_path = Array.isArray(values)
         ? (values[0] ?? null)
@@ -354,7 +351,7 @@ const CONDITION_FILTER_HANDLERS: Record<
     extract: (trigger) => trigger.filter_has_storage_path,
     hasValue: (value) => value !== null && value !== undefined,
   },
-  [TriggerConditionType.StoragePathNot]: {
+  [TriggerFilterType.StoragePathNot]: {
     apply: (aggregate, values) => {
       aggregate.filter_has_not_storage_paths = Array.isArray(values)
         ? [...values]
@@ -363,7 +360,7 @@ const CONDITION_FILTER_HANDLERS: Record<
     extract: (trigger) => trigger.filter_has_not_storage_paths,
     hasValue: (value) => Array.isArray(value) && value.length > 0,
   },
-  [TriggerConditionType.CustomFieldQuery]: {
+  [TriggerFilterType.CustomFieldQuery]: {
     apply: (aggregate, values) => {
       aggregate.filter_custom_field_query = values as string
     },
@@ -405,8 +402,8 @@ export class WorkflowEditDialogComponent
 {
   public WorkflowTriggerType = WorkflowTriggerType
   public WorkflowActionType = WorkflowActionType
-  public TriggerConditionType = TriggerConditionType
-  public conditionDefinitions = TRIGGER_CONDITION_DEFINITIONS
+  public TriggerFilterType = TriggerFilterType
+  public filterDefinitions = TRIGGER_FILTER_DEFINITIONS
 
   private correspondentService: CorrespondentService
   private documentTypeService: DocumentTypeService
@@ -426,9 +423,9 @@ export class WorkflowEditDialogComponent
 
   private allowedActionTypes = []
 
-  private readonly triggerConditionOptionsMap = new WeakMap<
+  private readonly triggerFilterOptionsMap = new WeakMap<
     FormArray,
-    TriggerConditionOption[]
+    TriggerFilterOption[]
   >()
 
   constructor() {
@@ -639,7 +636,7 @@ export class WorkflowEditDialogComponent
       formValues.triggers = formValues.triggers.map(
         (trigger: any, index: number) => {
           const triggerFormGroup = this.triggerFields.at(index) as FormGroup
-          const conditions = this.getConditionsFormArray(triggerFormGroup)
+          const filters = this.getFiltersFormArray(triggerFormGroup)
 
           const aggregate: TriggerFilterAggregate = {
             filter_has_tags: [],
@@ -654,8 +651,8 @@ export class WorkflowEditDialogComponent
             filter_custom_field_query: null,
           }
 
-          for (const control of conditions.controls) {
-            const type = control.get('type').value as TriggerConditionType
+          for (const control of filters.controls) {
+            const type = control.get('type').value as TriggerFilterType
             const values = control.get('values').value
 
             if (values === null || values === undefined) {
@@ -666,7 +663,7 @@ export class WorkflowEditDialogComponent
               continue
             }
 
-            const handler = CONDITION_FILTER_HANDLERS[type]
+            const handler = FILTER_HANDLERS[type]
             handler?.apply(aggregate, values)
           }
 
@@ -688,7 +685,7 @@ export class WorkflowEditDialogComponent
           trigger.filter_custom_field_query =
             aggregate.filter_custom_field_query ?? null
 
-          delete trigger.conditions
+          delete trigger.filters
 
           return trigger
         }
@@ -702,40 +699,38 @@ export class WorkflowEditDialogComponent
     return formGroup.get('matching_algorithm').value !== MATCH_NONE
   }
 
-  private createConditionFormGroup(
-    type: TriggerConditionType,
+  private createFilterFormGroup(
+    type: TriggerFilterType,
     initialValue?: any
   ): FormGroup {
     const group = new FormGroup({
       type: new FormControl(type),
-      values: new FormControl(this.normalizeConditionValue(type, initialValue)),
+      values: new FormControl(this.normalizeFilterValue(type, initialValue)),
     })
 
-    group
-      .get('type')
-      .valueChanges.subscribe((newType: TriggerConditionType) => {
-        if (newType === TriggerConditionType.CustomFieldQuery) {
-          this.ensureCustomFieldQueryModel(group)
-        } else {
-          this.clearCustomFieldQueryModel(group)
-          group.get('values').setValue(this.getDefaultConditionValue(newType), {
-            emitEvent: false,
-          })
-        }
-      })
+    group.get('type').valueChanges.subscribe((newType: TriggerFilterType) => {
+      if (newType === TriggerFilterType.CustomFieldQuery) {
+        this.ensureCustomFieldQueryModel(group)
+      } else {
+        this.clearCustomFieldQueryModel(group)
+        group.get('values').setValue(this.getDefaultFilterValue(newType), {
+          emitEvent: false,
+        })
+      }
+    })
 
-    if (type === TriggerConditionType.CustomFieldQuery) {
+    if (type === TriggerFilterType.CustomFieldQuery) {
       this.ensureCustomFieldQueryModel(group, initialValue)
     }
 
     return group
   }
 
-  private buildConditionFormArray(trigger: WorkflowTrigger): FormArray {
-    const conditions = new FormArray([])
+  private buildFiltersFormArray(trigger: WorkflowTrigger): FormArray {
+    const filters = new FormArray([])
 
-    for (const definition of this.conditionDefinitions) {
-      const handler = CONDITION_FILTER_HANDLERS[definition.id]
+    for (const definition of this.filterDefinitions) {
+      const handler = FILTER_HANDLERS[definition.id]
       if (!handler) {
         continue
       }
@@ -745,24 +740,24 @@ export class WorkflowEditDialogComponent
         continue
       }
 
-      conditions.push(this.createConditionFormGroup(definition.id, value))
+      filters.push(this.createFilterFormGroup(definition.id, value))
     }
 
-    return conditions
+    return filters
   }
 
-  getConditionsFormArray(formGroup: FormGroup): FormArray {
-    return formGroup.get('conditions') as FormArray
+  getFiltersFormArray(formGroup: FormGroup): FormArray {
+    return formGroup.get('filters') as FormArray
   }
 
-  getConditionTypeOptions(formGroup: FormGroup, conditionIndex: number) {
-    const conditions = this.getConditionsFormArray(formGroup)
-    const options = this.getConditionTypeOptionsForArray(conditions)
-    const currentType = conditions.at(conditionIndex).get('type')
-      .value as TriggerConditionType
+  getFilterTypeOptions(formGroup: FormGroup, filterIndex: number) {
+    const filters = this.getFiltersFormArray(formGroup)
+    const options = this.getFilterTypeOptionsForArray(filters)
+    const currentType = filters.at(filterIndex).get('type')
+      .value as TriggerFilterType
     const usedTypes = new Set(
-      conditions.controls.map(
-        (control) => control.get('type').value as TriggerConditionType
+      filters.controls.map(
+        (control) => control.get('type').value as TriggerFilterType
       )
     )
 
@@ -778,15 +773,15 @@ export class WorkflowEditDialogComponent
     return options
   }
 
-  canAddCondition(formGroup: FormGroup): boolean {
-    const conditions = this.getConditionsFormArray(formGroup)
+  canAddFilter(formGroup: FormGroup): boolean {
+    const filters = this.getFiltersFormArray(formGroup)
     const usedTypes = new Set(
-      conditions.controls.map(
-        (control) => control.get('type').value as TriggerConditionType
+      filters.controls.map(
+        (control) => control.get('type').value as TriggerFilterType
       )
     )
 
-    return this.conditionDefinitions.some((definition) => {
+    return this.filterDefinitions.some((definition) => {
       if (definition.allowMultipleEntries) {
         return true
       }
@@ -794,19 +789,19 @@ export class WorkflowEditDialogComponent
     })
   }
 
-  addCondition(triggerFormGroup: FormGroup): FormGroup | null {
+  addFilter(triggerFormGroup: FormGroup): FormGroup | null {
     const triggerIndex = this.triggerFields.controls.indexOf(triggerFormGroup)
     if (triggerIndex === -1) {
       return null
     }
 
-    const conditions = this.getConditionsFormArray(triggerFormGroup)
+    const filters = this.getFiltersFormArray(triggerFormGroup)
 
-    const availableDefinition = this.conditionDefinitions.find((definition) => {
+    const availableDefinition = this.filterDefinitions.find((definition) => {
       if (definition.allowMultipleEntries) {
         return true
       }
-      return !conditions.controls.some(
+      return !filters.controls.some(
         (control) => control.get('type').value === definition.id
       )
     })
@@ -815,72 +810,67 @@ export class WorkflowEditDialogComponent
       return null
     }
 
-    conditions.push(this.createConditionFormGroup(availableDefinition.id))
+    filters.push(this.createFilterFormGroup(availableDefinition.id))
     triggerFormGroup.markAsDirty()
     triggerFormGroup.markAsTouched()
 
-    return conditions.at(-1) as FormGroup
+    return filters.at(-1) as FormGroup
   }
 
-  removeCondition(triggerFormGroup: FormGroup, conditionIndex: number) {
+  removeFilter(triggerFormGroup: FormGroup, filterIndex: number) {
     const triggerIndex = this.triggerFields.controls.indexOf(triggerFormGroup)
     if (triggerIndex === -1) {
       return
     }
 
-    const conditions = this.getConditionsFormArray(triggerFormGroup)
-    const conditionGroup = conditions.at(conditionIndex) as FormGroup
-    if (
-      conditionGroup?.get('type').value ===
-      TriggerConditionType.CustomFieldQuery
-    ) {
-      this.clearCustomFieldQueryModel(conditionGroup)
+    const filters = this.getFiltersFormArray(triggerFormGroup)
+    const filterGroup = filters.at(filterIndex) as FormGroup
+    if (filterGroup?.get('type').value === TriggerFilterType.CustomFieldQuery) {
+      this.clearCustomFieldQueryModel(filterGroup)
     }
-    conditions.removeAt(conditionIndex)
+    filters.removeAt(filterIndex)
     triggerFormGroup.markAsDirty()
     triggerFormGroup.markAsTouched()
   }
 
-  getConditionDefinition(
-    type: TriggerConditionType
-  ): TriggerConditionDefinition | undefined {
-    return this.conditionDefinitions.find(
-      (definition) => definition.id === type
-    )
+  getFilterDefinition(
+    type: TriggerFilterType
+  ): TriggerFilterDefinition | undefined {
+    return this.filterDefinitions.find((definition) => definition.id === type)
   }
 
-  getConditionName(type: TriggerConditionType): string {
-    return this.getConditionDefinition(type)?.name ?? ''
+  getFilterName(type: TriggerFilterType): string {
+    return this.getFilterDefinition(type)?.name ?? ''
   }
 
-  isTagsCondition(type: TriggerConditionType): boolean {
-    return this.getConditionDefinition(type)?.inputType === 'tags'
+  isTagsFilter(type: TriggerFilterType): boolean {
+    return this.getFilterDefinition(type)?.inputType === 'tags'
   }
 
-  isCustomFieldQueryCondition(type: TriggerConditionType): boolean {
-    return this.getConditionDefinition(type)?.inputType === 'customFieldQuery'
+  isCustomFieldQueryFilter(type: TriggerFilterType): boolean {
+    return this.getFilterDefinition(type)?.inputType === 'customFieldQuery'
   }
 
-  isMultiValueCondition(type: TriggerConditionType): boolean {
+  isMultiValueFilter(type: TriggerFilterType): boolean {
     switch (type) {
-      case TriggerConditionType.TagsAny:
-      case TriggerConditionType.TagsAll:
-      case TriggerConditionType.TagsNone:
-      case TriggerConditionType.CorrespondentNot:
-      case TriggerConditionType.DocumentTypeNot:
-      case TriggerConditionType.StoragePathNot:
+      case TriggerFilterType.TagsAny:
+      case TriggerFilterType.TagsAll:
+      case TriggerFilterType.TagsNone:
+      case TriggerFilterType.CorrespondentNot:
+      case TriggerFilterType.DocumentTypeNot:
+      case TriggerFilterType.StoragePathNot:
         return true
       default:
         return false
     }
   }
 
-  isSelectMultiple(type: TriggerConditionType): boolean {
-    return !this.isTagsCondition(type) && this.isMultiValueCondition(type)
+  isSelectMultiple(type: TriggerFilterType): boolean {
+    return !this.isTagsFilter(type) && this.isMultiValueFilter(type)
   }
 
-  getConditionSelectItems(type: TriggerConditionType) {
-    const definition = this.getConditionDefinition(type)
+  getFilterSelectItems(type: TriggerFilterType) {
+    const definition = this.getFilterDefinition(type)
     if (!definition || definition.inputType !== 'select') {
       return []
     }
@@ -917,36 +907,36 @@ export class WorkflowEditDialogComponent
     return model.isEmpty() || model.isValid()
   }
 
-  private getConditionTypeOptionsForArray(
-    conditions: FormArray
-  ): TriggerConditionOption[] {
-    let cached = this.triggerConditionOptionsMap.get(conditions)
+  private getFilterTypeOptionsForArray(
+    filters: FormArray
+  ): TriggerFilterOption[] {
+    let cached = this.triggerFilterOptionsMap.get(filters)
     if (!cached) {
-      cached = this.conditionDefinitions.map((definition) => ({
+      cached = this.filterDefinitions.map((definition) => ({
         ...definition,
         disabled: false,
       }))
-      this.triggerConditionOptionsMap.set(conditions, cached)
+      this.triggerFilterOptionsMap.set(filters, cached)
     }
     return cached
   }
 
   private ensureCustomFieldQueryModel(
-    conditionGroup: FormGroup,
+    filterGroup: FormGroup,
     initialValue?: any
   ): CustomFieldQueriesModel {
-    const existingModel = this.getStoredCustomFieldQueryModel(conditionGroup)
+    const existingModel = this.getStoredCustomFieldQueryModel(filterGroup)
     if (existingModel) {
       return existingModel
     }
 
     const model = new CustomFieldQueriesModel()
-    this.setCustomFieldQueryModel(conditionGroup, model)
+    this.setCustomFieldQueryModel(filterGroup, model)
 
     const rawValue =
       typeof initialValue === 'string'
         ? initialValue
-        : (conditionGroup.get('values').value as string)
+        : (filterGroup.get('values').value as string)
 
     if (rawValue) {
       try {
@@ -962,46 +952,45 @@ export class WorkflowEditDialogComponent
     const subscription = model.changed
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        this.onCustomFieldQueryModelChanged(conditionGroup, model)
+        this.onCustomFieldQueryModelChanged(filterGroup, model)
       })
-    conditionGroup[CUSTOM_FIELD_QUERY_SUBSCRIPTION_KEY]?.unsubscribe()
-    conditionGroup[CUSTOM_FIELD_QUERY_SUBSCRIPTION_KEY] = subscription
+    filterGroup[CUSTOM_FIELD_QUERY_SUBSCRIPTION_KEY]?.unsubscribe()
+    filterGroup[CUSTOM_FIELD_QUERY_SUBSCRIPTION_KEY] = subscription
 
-    this.onCustomFieldQueryModelChanged(conditionGroup, model)
+    this.onCustomFieldQueryModelChanged(filterGroup, model)
 
     return model
   }
 
-  private clearCustomFieldQueryModel(conditionGroup: FormGroup) {
-    const group = conditionGroup as CustomFieldConditionGroup
+  private clearCustomFieldQueryModel(filterGroup: FormGroup) {
+    const group = filterGroup as CustomFieldFilterGroup
     group[CUSTOM_FIELD_QUERY_SUBSCRIPTION_KEY]?.unsubscribe()
     delete group[CUSTOM_FIELD_QUERY_SUBSCRIPTION_KEY]
     delete group[CUSTOM_FIELD_QUERY_MODEL_KEY]
   }
 
   private getStoredCustomFieldQueryModel(
-    conditionGroup: FormGroup
+    filterGroup: FormGroup
   ): CustomFieldQueriesModel | null {
     return (
-      (conditionGroup as CustomFieldConditionGroup)[
-        CUSTOM_FIELD_QUERY_MODEL_KEY
-      ] ?? null
+      (filterGroup as CustomFieldFilterGroup)[CUSTOM_FIELD_QUERY_MODEL_KEY] ??
+      null
     )
   }
 
   private setCustomFieldQueryModel(
-    conditionGroup: FormGroup,
+    filterGroup: FormGroup,
     model: CustomFieldQueriesModel
   ) {
-    const group = conditionGroup as CustomFieldConditionGroup
+    const group = filterGroup as CustomFieldFilterGroup
     group[CUSTOM_FIELD_QUERY_MODEL_KEY] = model
   }
 
   private onCustomFieldQueryModelChanged(
-    conditionGroup: FormGroup,
+    filterGroup: FormGroup,
     model: CustomFieldQueriesModel
   ) {
-    const control = conditionGroup.get('values')
+    const control = filterGroup.get('values')
     if (!control) {
       return
     }
@@ -1020,26 +1009,26 @@ export class WorkflowEditDialogComponent
     control.setValue(serialized, { emitEvent: false })
   }
 
-  private getDefaultConditionValue(type: TriggerConditionType) {
-    if (type === TriggerConditionType.CustomFieldQuery) {
+  private getDefaultFilterValue(type: TriggerFilterType) {
+    if (type === TriggerFilterType.CustomFieldQuery) {
       return null
     }
-    return this.isMultiValueCondition(type) ? [] : null
+    return this.isMultiValueFilter(type) ? [] : null
   }
 
-  private normalizeConditionValue(type: TriggerConditionType, value?: any) {
+  private normalizeFilterValue(type: TriggerFilterType, value?: any) {
     if (value === undefined || value === null) {
-      return this.getDefaultConditionValue(type)
+      return this.getDefaultFilterValue(type)
     }
 
-    if (type === TriggerConditionType.CustomFieldQuery) {
+    if (type === TriggerFilterType.CustomFieldQuery) {
       if (typeof value === 'string') {
         return value
       }
       return value ? JSON.stringify(value) : null
     }
 
-    if (this.isMultiValueCondition(type)) {
+    if (this.isMultiValueFilter(type)) {
       return Array.isArray(value) ? [...value] : [value]
     }
 
@@ -1065,7 +1054,7 @@ export class WorkflowEditDialogComponent
         matching_algorithm: new FormControl(trigger.matching_algorithm),
         match: new FormControl(trigger.match),
         is_insensitive: new FormControl(trigger.is_insensitive),
-        conditions: this.buildConditionFormArray(trigger),
+        filters: this.buildFiltersFormArray(trigger),
         schedule_offset_days: new FormControl(trigger.schedule_offset_days),
         schedule_is_recurring: new FormControl(trigger.schedule_is_recurring),
         schedule_recurring_interval_days: new FormControl(

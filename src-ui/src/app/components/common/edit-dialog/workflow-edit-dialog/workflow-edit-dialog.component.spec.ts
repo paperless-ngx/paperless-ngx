@@ -50,7 +50,7 @@ import { EditDialogMode } from '../edit-dialog.component'
 import {
   DOCUMENT_SOURCE_OPTIONS,
   SCHEDULE_DATE_FIELD_OPTIONS,
-  TriggerConditionType,
+  TriggerFilterType,
   WORKFLOW_ACTION_OPTIONS,
   WORKFLOW_TYPE_OPTIONS,
   WorkflowEditDialogComponent,
@@ -395,62 +395,50 @@ describe('WorkflowEditDialogComponent', () => {
     expect(component.matchingPatternRequired(triggerGroup)).toBe(false)
   })
 
-  it('should map condition builder values into trigger filters on save', () => {
+  it('should map filter builder values into trigger filters on save', () => {
     component.object = undefined
     component.addTrigger()
     const triggerGroup = component.triggerFields.at(0)
-    component.addCondition(triggerGroup as FormGroup)
-    component.addCondition(triggerGroup as FormGroup)
-    component.addCondition(triggerGroup as FormGroup)
+    component.addFilter(triggerGroup as FormGroup)
+    component.addFilter(triggerGroup as FormGroup)
+    component.addFilter(triggerGroup as FormGroup)
 
-    const conditions = component.getConditionsFormArray(
-      triggerGroup as FormGroup
-    )
-    expect(conditions.length).toBe(3)
+    const filters = component.getFiltersFormArray(triggerGroup as FormGroup)
+    expect(filters.length).toBe(3)
 
-    conditions.at(0).get('values').setValue([1])
-    conditions.at(1).get('values').setValue([2, 3])
-    conditions.at(2).get('values').setValue([4])
+    filters.at(0).get('values').setValue([1])
+    filters.at(1).get('values').setValue([2, 3])
+    filters.at(2).get('values').setValue([4])
 
-    const addConditionOfType = (type: TriggerConditionType) => {
-      const newCondition = component.addCondition(triggerGroup as FormGroup)
-      newCondition.get('type').setValue(type)
-      return newCondition
+    const addFilterOfType = (type: TriggerFilterType) => {
+      const newFilter = component.addFilter(triggerGroup as FormGroup)
+      newFilter.get('type').setValue(type)
+      return newFilter
     }
 
-    const correspondentIs = addConditionOfType(
-      TriggerConditionType.CorrespondentIs
-    )
+    const correspondentIs = addFilterOfType(TriggerFilterType.CorrespondentIs)
     correspondentIs.get('values').setValue(1)
 
-    const correspondentNot = addConditionOfType(
-      TriggerConditionType.CorrespondentNot
-    )
+    const correspondentNot = addFilterOfType(TriggerFilterType.CorrespondentNot)
     correspondentNot.get('values').setValue([1])
 
-    const documentTypeIs = addConditionOfType(
-      TriggerConditionType.DocumentTypeIs
-    )
+    const documentTypeIs = addFilterOfType(TriggerFilterType.DocumentTypeIs)
     documentTypeIs.get('values').setValue(1)
 
-    const documentTypeNot = addConditionOfType(
-      TriggerConditionType.DocumentTypeNot
-    )
+    const documentTypeNot = addFilterOfType(TriggerFilterType.DocumentTypeNot)
     documentTypeNot.get('values').setValue([1])
 
-    const storagePathIs = addConditionOfType(TriggerConditionType.StoragePathIs)
+    const storagePathIs = addFilterOfType(TriggerFilterType.StoragePathIs)
     storagePathIs.get('values').setValue(1)
 
-    const storagePathNot = addConditionOfType(
-      TriggerConditionType.StoragePathNot
-    )
+    const storagePathNot = addFilterOfType(TriggerFilterType.StoragePathNot)
     storagePathNot.get('values').setValue([1])
 
-    const customFieldCondition = addConditionOfType(
-      TriggerConditionType.CustomFieldQuery
+    const customFieldFilter = addFilterOfType(
+      TriggerFilterType.CustomFieldQuery
     )
     const customFieldQuery = JSON.stringify(['AND', [[1, 'exact', 'test']]])
-    customFieldCondition.get('values').setValue(customFieldQuery)
+    customFieldFilter.get('values').setValue(customFieldQuery)
 
     const formValues = component['getFormValues']()
 
@@ -466,23 +454,21 @@ describe('WorkflowEditDialogComponent', () => {
     expect(formValues.triggers[0].filter_custom_field_query).toEqual(
       customFieldQuery
     )
-    expect(formValues.triggers[0].conditions).toBeUndefined()
+    expect(formValues.triggers[0].filters).toBeUndefined()
   })
 
-  it('should ignore empty and null condition values when mapping filters', () => {
+  it('should ignore empty and null filter values when mapping filters', () => {
     component.object = undefined
     component.addTrigger()
     const triggerGroup = component.triggerFields.at(0) as FormGroup
 
-    const tagsCondition = component.addCondition(triggerGroup)
-    tagsCondition.get('type').setValue(TriggerConditionType.TagsAny)
-    tagsCondition.get('values').setValue([])
+    const tagsFilter = component.addFilter(triggerGroup)
+    tagsFilter.get('type').setValue(TriggerFilterType.TagsAny)
+    tagsFilter.get('values').setValue([])
 
-    const correspondentCondition = component.addCondition(triggerGroup)
-    correspondentCondition
-      .get('type')
-      .setValue(TriggerConditionType.CorrespondentIs)
-    correspondentCondition.get('values').setValue(null)
+    const correspondentFilter = component.addFilter(triggerGroup)
+    correspondentFilter.get('type').setValue(TriggerFilterType.CorrespondentIs)
+    correspondentFilter.get('values').setValue(null)
 
     const formValues = component['getFormValues']()
 
@@ -495,15 +481,15 @@ describe('WorkflowEditDialogComponent', () => {
     component.addTrigger()
     const triggerGroup = component.triggerFields.at(0) as FormGroup
 
-    const addConditionOfType = (type: TriggerConditionType, value: any) => {
-      const condition = component.addCondition(triggerGroup)
-      condition.get('type').setValue(type)
-      condition.get('values').setValue(value)
+    const addFilterOfType = (type: TriggerFilterType, value: any) => {
+      const filter = component.addFilter(triggerGroup)
+      filter.get('type').setValue(type)
+      filter.get('values').setValue(value)
     }
 
-    addConditionOfType(TriggerConditionType.CorrespondentIs, [5])
-    addConditionOfType(TriggerConditionType.DocumentTypeIs, [6])
-    addConditionOfType(TriggerConditionType.StoragePathIs, [7])
+    addFilterOfType(TriggerFilterType.CorrespondentIs, [5])
+    addFilterOfType(TriggerFilterType.DocumentTypeIs, [6])
+    addFilterOfType(TriggerFilterType.StoragePathIs, [7])
 
     const formValues = component['getFormValues']()
 
@@ -512,22 +498,22 @@ describe('WorkflowEditDialogComponent', () => {
     expect(formValues.triggers[0].filter_has_storage_path).toEqual(7)
   })
 
-  it('should convert multi-value condition values when aggregating filters', () => {
+  it('should convert multi-value filter values when aggregating filters', () => {
     component.object = undefined
     component.addTrigger()
     const triggerGroup = component.triggerFields.at(0) as FormGroup
 
-    const setCondition = (type: TriggerConditionType, value: number): void => {
-      const condition = component.addCondition(triggerGroup) as FormGroup
-      condition.get('type').setValue(type)
-      condition.get('values').setValue(value)
+    const setFilter = (type: TriggerFilterType, value: number): void => {
+      const filter = component.addFilter(triggerGroup) as FormGroup
+      filter.get('type').setValue(type)
+      filter.get('values').setValue(value)
     }
 
-    setCondition(TriggerConditionType.TagsAll, 11)
-    setCondition(TriggerConditionType.TagsNone, 12)
-    setCondition(TriggerConditionType.CorrespondentNot, 13)
-    setCondition(TriggerConditionType.DocumentTypeNot, 14)
-    setCondition(TriggerConditionType.StoragePathNot, 15)
+    setFilter(TriggerFilterType.TagsAll, 11)
+    setFilter(TriggerFilterType.TagsNone, 12)
+    setFilter(TriggerFilterType.CorrespondentNot, 13)
+    setFilter(TriggerFilterType.DocumentTypeNot, 14)
+    setFilter(TriggerFilterType.StoragePathNot, 15)
 
     const formValues = component['getFormValues']()
 
@@ -538,55 +524,55 @@ describe('WorkflowEditDialogComponent', () => {
     expect(formValues.triggers[0].filter_has_not_storage_paths).toEqual([15])
   })
 
-  it('should reuse condition type options and update disabled state', () => {
+  it('should reuse filter type options and update disabled state', () => {
     component.object = undefined
     component.addTrigger()
     const triggerGroup = component.triggerFields.at(0) as FormGroup
-    component.addCondition(triggerGroup)
+    component.addFilter(triggerGroup)
 
-    const optionsFirst = component.getConditionTypeOptions(triggerGroup, 0)
-    const optionsSecond = component.getConditionTypeOptions(triggerGroup, 0)
+    const optionsFirst = component.getFilterTypeOptions(triggerGroup, 0)
+    const optionsSecond = component.getFilterTypeOptions(triggerGroup, 0)
     expect(optionsFirst).toBe(optionsSecond)
 
     // to force disabled flag
-    component.addCondition(triggerGroup)
-    const conditionArray = component.getConditionsFormArray(triggerGroup)
-    const firstCondition = conditionArray.at(0)
-    firstCondition.get('type').setValue(TriggerConditionType.CorrespondentIs)
+    component.addFilter(triggerGroup)
+    const filterArray = component.getFiltersFormArray(triggerGroup)
+    const firstFilter = filterArray.at(0)
+    firstFilter.get('type').setValue(TriggerFilterType.CorrespondentIs)
 
-    component.addCondition(triggerGroup)
-    const updatedConditions = component.getConditionsFormArray(triggerGroup)
-    const secondCondition = updatedConditions.at(1)
-    const options = component.getConditionTypeOptions(triggerGroup, 1)
+    component.addFilter(triggerGroup)
+    const updatedFilters = component.getFiltersFormArray(triggerGroup)
+    const secondFilter = updatedFilters.at(1)
+    const options = component.getFilterTypeOptions(triggerGroup, 1)
     const correspondentIsOption = options.find(
-      (option) => option.id === TriggerConditionType.CorrespondentIs
+      (option) => option.id === TriggerFilterType.CorrespondentIs
     )
     expect(correspondentIsOption.disabled).toBe(true)
 
-    firstCondition.get('type').setValue(TriggerConditionType.DocumentTypeNot)
-    secondCondition.get('type').setValue(TriggerConditionType.TagsAll)
-    const postChangeOptions = component.getConditionTypeOptions(triggerGroup, 1)
+    firstFilter.get('type').setValue(TriggerFilterType.DocumentTypeNot)
+    secondFilter.get('type').setValue(TriggerFilterType.TagsAll)
+    const postChangeOptions = component.getFilterTypeOptions(triggerGroup, 1)
     const correspondentOptionAfter = postChangeOptions.find(
-      (option) => option.id === TriggerConditionType.CorrespondentIs
+      (option) => option.id === TriggerFilterType.CorrespondentIs
     )
     expect(correspondentOptionAfter.disabled).toBe(false)
   })
 
-  it('should keep multi-entry condition options enabled and allow duplicates', () => {
+  it('should keep multi-entry filter options enabled and allow duplicates', () => {
     component.object = undefined
     component.addTrigger()
     const triggerGroup = component.triggerFields.at(0) as FormGroup
 
-    component.conditionDefinitions = [
+    component.filterDefinitions = [
       {
-        id: TriggerConditionType.TagsAny,
+        id: TriggerFilterType.TagsAny,
         name: 'Any tags',
         inputType: 'tags',
         allowMultipleEntries: true,
         allowMultipleValues: true,
       } as any,
       {
-        id: TriggerConditionType.CorrespondentIs,
+        id: TriggerFilterType.CorrespondentIs,
         name: 'Correspondent is',
         inputType: 'select',
         allowMultipleEntries: false,
@@ -595,36 +581,36 @@ describe('WorkflowEditDialogComponent', () => {
       } as any,
     ]
 
-    const firstCondition = component.addCondition(triggerGroup)
-    firstCondition.get('type').setValue(TriggerConditionType.TagsAny)
+    const firstFilter = component.addFilter(triggerGroup)
+    firstFilter.get('type').setValue(TriggerFilterType.TagsAny)
 
-    const secondCondition = component.addCondition(triggerGroup)
-    expect(secondCondition).not.toBeNull()
+    const secondFilter = component.addFilter(triggerGroup)
+    expect(secondFilter).not.toBeNull()
 
-    const options = component.getConditionTypeOptions(triggerGroup, 1)
+    const options = component.getFilterTypeOptions(triggerGroup, 1)
     const multiEntryOption = options.find(
-      (option) => option.id === TriggerConditionType.TagsAny
+      (option) => option.id === TriggerFilterType.TagsAny
     )
 
     expect(multiEntryOption.disabled).toBe(false)
-    expect(component.canAddCondition(triggerGroup)).toBe(true)
+    expect(component.canAddFilter(triggerGroup)).toBe(true)
   })
 
-  it('should return null when no condition definitions remain available', () => {
+  it('should return null when no filter definitions remain available', () => {
     component.object = undefined
     component.addTrigger()
     const triggerGroup = component.triggerFields.at(0) as FormGroup
 
-    component.conditionDefinitions = [
+    component.filterDefinitions = [
       {
-        id: TriggerConditionType.TagsAny,
+        id: TriggerFilterType.TagsAny,
         name: 'Any tags',
         inputType: 'tags',
         allowMultipleEntries: false,
         allowMultipleValues: true,
       } as any,
       {
-        id: TriggerConditionType.CorrespondentIs,
+        id: TriggerFilterType.CorrespondentIs,
         name: 'Correspondent is',
         inputType: 'select',
         allowMultipleEntries: false,
@@ -633,18 +619,18 @@ describe('WorkflowEditDialogComponent', () => {
       } as any,
     ]
 
-    const firstCondition = component.addCondition(triggerGroup)
-    firstCondition.get('type').setValue(TriggerConditionType.TagsAny)
-    const secondCondition = component.addCondition(triggerGroup)
-    secondCondition.get('type').setValue(TriggerConditionType.CorrespondentIs)
+    const firstFilter = component.addFilter(triggerGroup)
+    firstFilter.get('type').setValue(TriggerFilterType.TagsAny)
+    const secondFilter = component.addFilter(triggerGroup)
+    secondFilter.get('type').setValue(TriggerFilterType.CorrespondentIs)
 
-    expect(component.canAddCondition(triggerGroup)).toBe(false)
-    expect(component.addCondition(triggerGroup)).toBeNull()
+    expect(component.canAddFilter(triggerGroup)).toBe(false)
+    expect(component.addFilter(triggerGroup)).toBeNull()
   })
 
-  it('should skip condition definitions without handlers when building form array', () => {
-    const originalDefinitions = component.conditionDefinitions
-    component.conditionDefinitions = [
+  it('should skip filter definitions without handlers when building form array', () => {
+    const originalDefinitions = component.filterDefinitions
+    component.filterDefinitions = [
       {
         id: 999,
         name: 'Unsupported',
@@ -667,52 +653,52 @@ describe('WorkflowEditDialogComponent', () => {
       filter_custom_field_query: null,
     } as any
 
-    const conditions = component['buildConditionFormArray'](trigger)
-    expect(conditions.length).toBe(0)
+    const filters = component['buildFiltersFormArray'](trigger)
+    expect(filters.length).toBe(0)
 
-    component.conditionDefinitions = originalDefinitions
+    component.filterDefinitions = originalDefinitions
   })
 
-  it('should return null when adding condition for unknown trigger form group', () => {
-    expect(component.addCondition(new FormGroup({}) as any)).toBeNull()
+  it('should return null when adding filter for unknown trigger form group', () => {
+    expect(component.addFilter(new FormGroup({}) as any)).toBeNull()
   })
 
-  it('should ignore remove condition calls for unknown trigger form group', () => {
+  it('should ignore remove filter calls for unknown trigger form group', () => {
     expect(() =>
-      component.removeCondition(new FormGroup({}) as any, 0)
+      component.removeFilter(new FormGroup({}) as any, 0)
     ).not.toThrow()
   })
 
-  it('should teardown custom field query model when removing a custom field condition', () => {
+  it('should teardown custom field query model when removing a custom field filter', () => {
     component.object = undefined
     component.addTrigger()
     const triggerGroup = component.triggerFields.at(0) as FormGroup
 
-    component.addCondition(triggerGroup)
-    const conditions = component.getConditionsFormArray(triggerGroup)
-    const conditionGroup = conditions.at(0) as FormGroup
-    conditionGroup.get('type').setValue(TriggerConditionType.CustomFieldQuery)
+    component.addFilter(triggerGroup)
+    const filters = component.getFiltersFormArray(triggerGroup)
+    const filterGroup = filters.at(0) as FormGroup
+    filterGroup.get('type').setValue(TriggerFilterType.CustomFieldQuery)
 
-    const model = component.getCustomFieldQueryModel(conditionGroup)
+    const model = component.getCustomFieldQueryModel(filterGroup)
     expect(model).toBeDefined()
     expect(
-      component['getStoredCustomFieldQueryModel'](conditionGroup as any)
+      component['getStoredCustomFieldQueryModel'](filterGroup as any)
     ).toBe(model)
 
-    component.removeCondition(triggerGroup, 0)
+    component.removeFilter(triggerGroup, 0)
     expect(
-      component['getStoredCustomFieldQueryModel'](conditionGroup as any)
+      component['getStoredCustomFieldQueryModel'](filterGroup as any)
     ).toBeNull()
   })
 
-  it('should return readable condition names', () => {
-    expect(component.getConditionName(TriggerConditionType.TagsAny)).toBe(
+  it('should return readable filter names', () => {
+    expect(component.getFilterName(TriggerFilterType.TagsAny)).toBe(
       'Has any of these tags'
     )
-    expect(component.getConditionName(999 as any)).toBe('')
+    expect(component.getFilterName(999 as any)).toBe('')
   })
 
-  it('should build condition form array from existing trigger filters', () => {
+  it('should build filter form array from existing trigger filters', () => {
     const trigger = workflow.triggers[0]
     trigger.filter_has_tags = [1]
     trigger.filter_has_all_tags = [2, 3]
@@ -731,64 +717,62 @@ describe('WorkflowEditDialogComponent', () => {
     component.object = workflow
     component.ngOnInit()
     const triggerGroup = component.triggerFields.at(0) as FormGroup
-    const conditions = component.getConditionsFormArray(triggerGroup)
-    expect(conditions.length).toBe(10)
-    const customFieldCondition = conditions.at(9) as FormGroup
-    expect(customFieldCondition.get('type').value).toBe(
-      TriggerConditionType.CustomFieldQuery
+    const filters = component.getFiltersFormArray(triggerGroup)
+    expect(filters.length).toBe(10)
+    const customFieldFilter = filters.at(9) as FormGroup
+    expect(customFieldFilter.get('type').value).toBe(
+      TriggerFilterType.CustomFieldQuery
     )
-    const model = component.getCustomFieldQueryModel(customFieldCondition)
+    const model = component.getCustomFieldQueryModel(customFieldFilter)
     expect(model.isValid()).toBe(true)
   })
 
   it('should expose select metadata helpers', () => {
-    expect(
-      component.isSelectMultiple(TriggerConditionType.CorrespondentNot)
-    ).toBe(true)
-    expect(
-      component.isSelectMultiple(TriggerConditionType.CorrespondentIs)
-    ).toBe(false)
+    expect(component.isSelectMultiple(TriggerFilterType.CorrespondentNot)).toBe(
+      true
+    )
+    expect(component.isSelectMultiple(TriggerFilterType.CorrespondentIs)).toBe(
+      false
+    )
 
     component.correspondents = [{ id: 1, name: 'C1' } as any]
     component.documentTypes = [{ id: 2, name: 'DT' } as any]
     component.storagePaths = [{ id: 3, name: 'SP' } as any]
 
     expect(
-      component.getConditionSelectItems(TriggerConditionType.CorrespondentIs)
+      component.getFilterSelectItems(TriggerFilterType.CorrespondentIs)
     ).toEqual(component.correspondents)
     expect(
-      component.getConditionSelectItems(TriggerConditionType.DocumentTypeIs)
+      component.getFilterSelectItems(TriggerFilterType.DocumentTypeIs)
     ).toEqual(component.documentTypes)
     expect(
-      component.getConditionSelectItems(TriggerConditionType.StoragePathIs)
+      component.getFilterSelectItems(TriggerFilterType.StoragePathIs)
     ).toEqual(component.storagePaths)
-    expect(
-      component.getConditionSelectItems(TriggerConditionType.TagsAll)
-    ).toEqual([])
+    expect(component.getFilterSelectItems(TriggerFilterType.TagsAll)).toEqual(
+      []
+    )
 
     expect(
-      component.isCustomFieldQueryCondition(
-        TriggerConditionType.CustomFieldQuery
-      )
+      component.isCustomFieldQueryFilter(TriggerFilterType.CustomFieldQuery)
     ).toBe(true)
   })
 
   it('should return empty select items when definition is missing', () => {
-    const originalDefinitions = component.conditionDefinitions
-    component.conditionDefinitions = []
+    const originalDefinitions = component.filterDefinitions
+    component.filterDefinitions = []
 
     expect(
-      component.getConditionSelectItems(TriggerConditionType.CorrespondentIs)
+      component.getFilterSelectItems(TriggerFilterType.CorrespondentIs)
     ).toEqual([])
 
-    component.conditionDefinitions = originalDefinitions
+    component.filterDefinitions = originalDefinitions
   })
 
   it('should return empty select items when definition has unknown source', () => {
-    const originalDefinitions = component.conditionDefinitions
-    component.conditionDefinitions = [
+    const originalDefinitions = component.filterDefinitions
+    component.filterDefinitions = [
       {
-        id: TriggerConditionType.CorrespondentIs,
+        id: TriggerFilterType.CorrespondentIs,
         name: 'Correspondent is',
         inputType: 'select',
         allowMultipleEntries: false,
@@ -798,10 +782,10 @@ describe('WorkflowEditDialogComponent', () => {
     ]
 
     expect(
-      component.getConditionSelectItems(TriggerConditionType.CorrespondentIs)
+      component.getFilterSelectItems(TriggerFilterType.CorrespondentIs)
     ).toEqual([])
 
-    component.conditionDefinitions = originalDefinitions
+    component.filterDefinitions = originalDefinitions
   })
 
   it('should handle custom field query selection change and validation states', () => {
@@ -837,19 +821,19 @@ describe('WorkflowEditDialogComponent', () => {
   })
 
   it('should recover from invalid custom field query json and update control on changes', () => {
-    const conditionGroup = new FormGroup({
+    const filterGroup = new FormGroup({
       values: new FormControl('not-json'),
     })
 
-    component['ensureCustomFieldQueryModel'](conditionGroup, 'not-json')
+    component['ensureCustomFieldQueryModel'](filterGroup, 'not-json')
 
     const model = component['getStoredCustomFieldQueryModel'](
-      conditionGroup as any
+      filterGroup as any
     )
     expect(model).toBeDefined()
     expect(model.queries.length).toBeGreaterThan(0)
 
-    const valuesControl = conditionGroup.get('values')
+    const valuesControl = filterGroup.get('values')
     expect(valuesControl.value).toBeNull()
 
     const expression = new CustomFieldQueryExpression([
@@ -865,7 +849,7 @@ describe('WorkflowEditDialogComponent', () => {
 
     expect(valuesControl.value).toEqual(JSON.stringify(expression.serialize()))
 
-    component['clearCustomFieldQueryModel'](conditionGroup as any)
+    component['clearCustomFieldQueryModel'](filterGroup as any)
   })
 
   it('should handle custom field query model change edge cases', () => {
@@ -898,71 +882,61 @@ describe('WorkflowEditDialogComponent', () => {
     expect(groupWithControl.get('values').value).toBeNull()
   })
 
-  it('should normalize condition values for single and multi selects', () => {
+  it('should normalize filter values for single and multi selects', () => {
     expect(
-      component['normalizeConditionValue'](TriggerConditionType.TagsAny)
+      component['normalizeFilterValue'](TriggerFilterType.TagsAny)
     ).toEqual([])
     expect(
-      component['normalizeConditionValue'](TriggerConditionType.TagsAny, 5)
+      component['normalizeFilterValue'](TriggerFilterType.TagsAny, 5)
     ).toEqual([5])
     expect(
-      component['normalizeConditionValue'](TriggerConditionType.TagsAny, [5, 6])
+      component['normalizeFilterValue'](TriggerFilterType.TagsAny, [5, 6])
     ).toEqual([5, 6])
     expect(
-      component['normalizeConditionValue'](
-        TriggerConditionType.CorrespondentIs,
-        [7]
-      )
+      component['normalizeFilterValue'](TriggerFilterType.CorrespondentIs, [7])
     ).toEqual(7)
     expect(
-      component['normalizeConditionValue'](
-        TriggerConditionType.CorrespondentIs,
-        8
-      )
+      component['normalizeFilterValue'](TriggerFilterType.CorrespondentIs, 8)
     ).toEqual(8)
     const customFieldJson = JSON.stringify(['AND', [[1, 'exact', 'test']]])
     expect(
-      component['normalizeConditionValue'](
-        TriggerConditionType.CustomFieldQuery,
+      component['normalizeFilterValue'](
+        TriggerFilterType.CustomFieldQuery,
         customFieldJson
       )
     ).toEqual(customFieldJson)
 
     const customFieldObject = ['AND', [[1, 'exact', 'other']]]
     expect(
-      component['normalizeConditionValue'](
-        TriggerConditionType.CustomFieldQuery,
+      component['normalizeFilterValue'](
+        TriggerFilterType.CustomFieldQuery,
         customFieldObject
       )
     ).toEqual(JSON.stringify(customFieldObject))
 
     expect(
-      component['normalizeConditionValue'](
-        TriggerConditionType.CustomFieldQuery,
+      component['normalizeFilterValue'](
+        TriggerFilterType.CustomFieldQuery,
         false
       )
     ).toBeNull()
   })
 
-  it('should add and remove condition form groups', () => {
+  it('should add and remove filter form groups', () => {
     component['changeDetector'] = { detectChanges: jest.fn() } as any
     component.object = undefined
     component.addTrigger()
     const triggerGroup = component.triggerFields.at(0) as FormGroup
 
-    component.addCondition(triggerGroup)
+    component.addFilter(triggerGroup)
 
-    component.removeCondition(triggerGroup, 0)
-    expect(component.getConditionsFormArray(triggerGroup).length).toBe(0)
+    component.removeFilter(triggerGroup, 0)
+    expect(component.getFiltersFormArray(triggerGroup).length).toBe(0)
 
-    component.addCondition(triggerGroup)
-    const conditionArrayAfterAdd =
-      component.getConditionsFormArray(triggerGroup)
-    conditionArrayAfterAdd
-      .at(0)
-      .get('type')
-      .setValue(TriggerConditionType.TagsAll)
-    expect(component.getConditionsFormArray(triggerGroup).length).toBe(1)
+    component.addFilter(triggerGroup)
+    const filterArrayAfterAdd = component.getFiltersFormArray(triggerGroup)
+    filterArrayAfterAdd.at(0).get('type').setValue(TriggerFilterType.TagsAll)
+    expect(component.getFiltersFormArray(triggerGroup).length).toBe(1)
   })
 
   it('should remove selected custom field from the form group', () => {
