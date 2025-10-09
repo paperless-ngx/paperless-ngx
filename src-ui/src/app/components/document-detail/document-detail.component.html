@@ -1,4 +1,4 @@
-<pngx-page-header [(title)]="title">
+<pngx-page-header [(title)]="title" [id]="documentId">
   @if (archiveContentRenderType === ContentRenderType.PDF && !useNativePdfViewer) {
     @if (previewNumPages) {
       <div class="input-group input-group-sm d-none d-md-flex">

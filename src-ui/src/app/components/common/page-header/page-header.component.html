@@ -1,7 +1,10 @@
 <div class="row pt-3 pb-3 pb-md-2 align-items-center">
   <div class="col-md text-truncate">
-    <h3 class="text-truncate" style="line-height: 1.4">
+    <h3 class="text-truncate d-flex align-items-center" style="line-height: 1.4">
       {{title}}
+      @if (id) {
+        <span class="badge bg-primary text-primary-text-contrast ms-2 small fs-normal">ID: {{id}}</span>
+      }
       @if (subTitle) {
         <span class="h6 mb-0 d-block d-md-inline fw-normal ms-md-3 text-truncate" style="line-height: 1.4">{{subTitle}}</span>
       }

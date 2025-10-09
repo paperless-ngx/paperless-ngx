@@ -27,6 +27,9 @@ export class PageHeaderComponent {
   }
 
   @Input()
+  id: number
+
+  @Input()
   subTitle: string = ''
 
   @Input()
