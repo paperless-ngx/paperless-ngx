@@ -135,6 +135,44 @@ class TestTasks(DirectoriesMixin, APITestCase):
         response = self.client.get(self.ENDPOINT + "?acknowledged=false")
         self.assertEqual(len(response.data), 0)
 
+    def test_acknowledge_tasks_requires_change_permission(self):
+        """
+        GIVEN:
+            - A regular user initially without change permissions
+            - A regular user with change permissions
+        WHEN:
+            - API call is made to acknowledge tasks
+        THEN:
+            - The first user is forbidden from acknowledging tasks
+            - The second user is allowed to acknowledge tasks
+        """
+        regular_user = User.objects.create_user(username="test")
+        self.client.force_authenticate(user=regular_user)
+
+        task = PaperlessTask.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_file_name="task_one.pdf",
+        )
+
+        response = self.client.post(
+            self.ENDPOINT + "acknowledge/",
+            {"tasks": [task.id]},
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        regular_user2 = User.objects.create_user(username="test2")
+        regular_user2.user_permissions.add(
+            Permission.objects.get(codename="change_paperlesstask"),
+        )
+        regular_user2.save()
+        self.client.force_authenticate(user=regular_user2)
+
+        response = self.client.post(
+            self.ENDPOINT + "acknowledge/",
+            {"tasks": [task.id]},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def test_tasks_owner_aware(self):
         """
         GIVEN:

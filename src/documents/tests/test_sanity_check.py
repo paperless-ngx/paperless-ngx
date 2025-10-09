@@ -169,6 +169,13 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
         messages = check_sanity()
         self.assertFalse(messages.has_warning)
 
+    def test_ignore_ignorable_files(self):
+        self.make_test_data()
+        Path(self.dirs.media_dir, ".DS_Store").touch()
+        Path(self.dirs.media_dir, "desktop.ini").touch()
+        messages = check_sanity()
+        self.assertFalse(messages.has_warning)
+
     def test_archive_filename_no_checksum(self):
         doc = self.make_test_data()
         doc.archive_checksum = None

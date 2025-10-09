@@ -170,11 +170,11 @@ Available options are `postgresql` and `mariadb`.
 
     !!! note
 
-    A small pool is typically sufficient — for example, a size of 4.
-    Make sure your PostgreSQL server's max_connections setting is large enough to handle:
-    ```(Paperless workers + Celery workers) × pool size + safety margin```
-    For example, with 4 Paperless workers and 2 Celery workers, and a pool size of 4:
-    (4 + 2) × 4 + 10 = 34 connections required.
+        A small pool is typically sufficient — for example, a size of 4.
+        Make sure your PostgreSQL server's max_connections setting is large enough to handle:
+        ```(Paperless workers + Celery workers) × pool size + safety margin```
+        For example, with 4 Paperless workers and 2 Celery workers, and a pool size of 4:
+        (4 + 2) × 4 + 10 = 34 connections required.
 
 #### [`PAPERLESS_DB_READ_CACHE_ENABLED=<bool>`](#PAPERLESS_DB_READ_CACHE_ENABLED) {#PAPERLESS_DB_READ_CACHE_ENABLED}
 
@@ -184,9 +184,9 @@ Available options are `postgresql` and `mariadb`.
 
     !!! danger
 
-    **Do not modify the database outside the application while it is running.**
-    This includes actions such as restoring a backup, upgrading the database, or performing manual inserts. All external modifications must be done **only when the application is stopped**.
-    After making any such changes, you **must invalidate the DB read cache** using the `invalidate_cachalot` management command.
+        **Do not modify the database outside the application while it is running.**
+        This includes actions such as restoring a backup, upgrading the database, or performing manual inserts. All external modifications must be done **only when the application is stopped**.
+        After making any such changes, you **must invalidate the DB read cache** using the `invalidate_cachalot` management command.
 
 #### [`PAPERLESS_READ_CACHE_TTL=<int>`](#PAPERLESS_READ_CACHE_TTL) {#PAPERLESS_READ_CACHE_TTL}
 
@@ -196,7 +196,7 @@ Available options are `postgresql` and `mariadb`.
 
     !!! warning
 
-    A high TTL increases memory usage over time. Memory may be used until end of TTL, even if the cache is invalidated with the `invalidate_cachalot` command.
+        A high TTL increases memory usage over time. Memory may be used until end of TTL, even if the cache is invalidated with the `invalidate_cachalot` command.
 
 In case of an out-of-memory (OOM) situation, Redis may stop accepting new data — including cache entries, scheduled tasks, and documents to consume.
 If your system has limited RAM, consider configuring a dedicated Redis instance for the read cache, with a memory limit and the eviction policy set to `allkeys-lru`.

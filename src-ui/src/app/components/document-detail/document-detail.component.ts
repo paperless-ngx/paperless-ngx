@@ -628,7 +628,10 @@ export class DocumentDetailComponent
       })
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        if (this.openDocumentService.isDirty(this.document)) this.saveEditNext()
+        if (this.openDocumentService.isDirty(this.document)) {
+          if (this.hasNext()) this.saveEditNext()
+          else this.save(true)
+        }
       })
   }
 

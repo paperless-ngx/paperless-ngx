@@ -1267,7 +1267,7 @@ describe('DocumentDetailComponent', () => {
   it('should support keyboard shortcuts', () => {
     initNormally()
 
-    jest.spyOn(component, 'hasNext').mockReturnValue(true)
+    const hasNextSpy = jest.spyOn(component, 'hasNext').mockReturnValue(true)
     const nextSpy = jest.spyOn(component, 'nextDoc')
     document.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'arrowright', ctrlKey: true })
@@ -1281,20 +1281,31 @@ describe('DocumentDetailComponent', () => {
     )
     expect(prevSpy).toHaveBeenCalled()
 
-    jest.spyOn(openDocumentsService, 'isDirty').mockReturnValue(true)
+    const isDirtySpy = jest
+      .spyOn(openDocumentsService, 'isDirty')
+      .mockReturnValue(true)
     const saveSpy = jest.spyOn(component, 'save')
     document.dispatchEvent(
       new KeyboardEvent('keydown', { key: 's', ctrlKey: true })
     )
     expect(saveSpy).toHaveBeenCalled()
 
-    jest.spyOn(openDocumentsService, 'isDirty').mockReturnValue(true)
-    jest.spyOn(component, 'hasNext').mockReturnValue(true)
+    hasNextSpy.mockReturnValue(true)
     const saveNextSpy = jest.spyOn(component, 'saveEditNext')
     document.dispatchEvent(
       new KeyboardEvent('keydown', { key: 's', ctrlKey: true, shiftKey: true })
     )
     expect(saveNextSpy).toHaveBeenCalled()
+
+    saveSpy.mockClear()
+    saveNextSpy.mockClear()
+    isDirtySpy.mockReturnValue(true)
+    hasNextSpy.mockReturnValue(false)
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 's', ctrlKey: true, shiftKey: true })
+    )
+    expect(saveNextSpy).not.toHaveBeenCalled()
+    expect(saveSpy).toHaveBeenCalledWith(true)
 
     const closeSpy = jest.spyOn(component, 'close')
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'escape' }))
