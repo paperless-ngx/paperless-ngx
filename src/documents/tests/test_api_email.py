@@ -40,10 +40,19 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
             filename="test2.pdf",
         )
 
-        # Copy sample files to document paths
-        shutil.copy(self.SAMPLE_DIR / "simple.pdf", self.doc1.archive_path)
-        shutil.copy(self.SAMPLE_DIR / "simple.pdf", self.doc1.source_path)
-        shutil.copy(self.SAMPLE_DIR / "simple.pdf", self.doc2.source_path)
+        # Copy sample files to document paths (using different files to distinguish versions)
+        shutil.copy(
+            self.SAMPLE_DIR / "documents" / "originals" / "0000001.pdf",
+            self.doc1.archive_path,
+        )
+        shutil.copy(
+            self.SAMPLE_DIR / "documents" / "originals" / "0000002.pdf",
+            self.doc1.source_path,
+        )
+        shutil.copy(
+            self.SAMPLE_DIR / "documents" / "originals" / "0000003.pdf",
+            self.doc2.source_path,
+        )
 
     @override_settings(
         EMAIL_ENABLED=True,
@@ -52,11 +61,13 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
     def test_email_success(self):
         """
         GIVEN:
-            - Multiple existing documents
+            - Multiple existing documents (doc1 with archive, doc2 without)
         WHEN:
             - API request is made to bulk email documents
         THEN:
             - Email is sent with all documents attached
+            - Archive version used by default for doc1
+            - Original version used for doc2 (no archive available)
         """
         response = self.client.post(
             self.ENDPOINT,
@@ -81,10 +92,22 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
         self.assertEqual(email.body, "Here are your documents")
         self.assertEqual(len(email.attachments), 2)
 
-        # Check attachment names (should default to archive version for doc1, original for doc2)
         attachment_names = [att[0] for att in email.attachments]
-        self.assertIn("archive1.pdf", attachment_names)
-        self.assertIn("test2.pdf", attachment_names)
+        self.assertEqual(len(attachment_names), 2)
+        self.assertIn(f"{self.doc1!s}.pdf", attachment_names)
+        self.assertIn(f"{self.doc2!s}.pdf", attachment_names)
+
+        doc1_attachment = next(
+            att for att in email.attachments if att[0] == f"{self.doc1!s}.pdf"
+        )
+        archive_size = self.doc1.archive_path.stat().st_size
+        self.assertEqual(len(doc1_attachment[1]), archive_size)
+
+        doc2_attachment = next(
+            att for att in email.attachments if att[0] == f"{self.doc2!s}.pdf"
+        )
+        original_size = self.doc2.source_path.stat().st_size
+        self.assertEqual(len(doc2_attachment[1]), original_size)
 
     @override_settings(
         EMAIL_ENABLED=True,
@@ -115,7 +138,12 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].attachments[0][0], "test1.pdf")
+
+        attachment = mail.outbox[0].attachments[0]
+        self.assertEqual(attachment[0], f"{self.doc1!s}.pdf")
+
+        original_size = self.doc1.source_path.stat().st_size
+        self.assertEqual(len(attachment[1]), original_size)
 
     def test_email_missing_required_fields(self):
         """
@@ -300,6 +328,49 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    @override_settings(
+        EMAIL_ENABLED=True,
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    )
+    def test_email_duplicate_filenames(self):
+        """
+        GIVEN:
+            - Multiple documents with the same title
+        WHEN:
+            - API request is made to bulk email documents
+        THEN:
+            - Filenames are made unique with counters
+        """
+        doc3 = Document.objects.create(
+            title="test1",
+            mime_type="application/pdf",
+            content="this is document 3",
+            checksum="3",
+            filename="test3.pdf",
+        )
+        shutil.copy(self.SAMPLE_DIR / "simple.pdf", doc3.source_path)
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "documents": [self.doc1.pk, doc3.pk],
+                    "addresses": "test@example.com",
+                    "subject": "Test",
+                    "message": "Test message",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(mail.outbox), 1)
+
+        attachment_names = [att[0] for att in mail.outbox[0].attachments]
+        self.assertEqual(len(attachment_names), 2)
+        self.assertIn(f"{self.doc1!s}.pdf", attachment_names)
+        self.assertIn(f"{doc3!s}_01.pdf", attachment_names)
 
     @mock.patch(
         "django.core.mail.message.EmailMessage.send",

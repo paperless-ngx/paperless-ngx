@@ -1207,21 +1207,13 @@ class DocumentViewSet(
             ):
                 return HttpResponseForbidden("Insufficient permissions")
 
-        attachments = []
-        for doc in documents:
-            attachment_path = (
-                doc.archive_path
-                if use_archive_version and doc.has_archive_version
-                else doc.source_path
-            )
-            attachments.append((attachment_path, doc.mime_type))
-
         try:
             send_email(
                 subject=subject,
                 body=message,
                 to=addresses,
-                attachments=attachments,
+                attachments=documents,
+                use_archive=use_archive_version,
             )
 
             logger.debug(
