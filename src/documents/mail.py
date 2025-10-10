@@ -32,18 +32,19 @@ def send_email(
         to=to,
     )
 
-    for attachment_path, mime_type in attachments:
-        # Something could be renaming the file concurrently so it can't be attached
-        with FileLock(settings.MEDIA_LOCK), attachment_path.open("rb") as f:
-            content = f.read()
-            if mime_type == "message/rfc822":
-                # See https://forum.djangoproject.com/t/using-emailmessage-with-an-attached-email-file-crashes-due-to-non-ascii/37981
-                content = message_from_bytes(content)
+    # Something could be renaming the file concurrently so it can't be attached
+    with FileLock(settings.MEDIA_LOCK):
+        for attachment_path, mime_type in attachments:
+            with attachment_path.open("rb") as f:
+                content = f.read()
+                if mime_type == "message/rfc822":
+                    # See https://forum.djangoproject.com/t/using-emailmessage-with-an-attached-email-file-crashes-due-to-non-ascii/37981
+                    content = message_from_bytes(content)
 
-            email.attach(
-                filename=attachment_path.name,
-                content=content,
-                mimetype=mime_type,
-            )
+                email.attach(
+                    filename=attachment_path.name,
+                    content=content,
+                    mimetype=mime_type,
+                )
 
     return email.send()
