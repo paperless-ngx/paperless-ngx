@@ -474,7 +474,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.client.force_authenticate(user1)
 
         response = self.client.get(
-            "/api/documents/",
+            "/api/documents/?ordering=-id",
             format="json",
         )
 
@@ -1278,3 +1278,34 @@ class TestBulkEditObjectPermissions(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class TestFullPermissionsFlag(APITestCase):
+    def setUp(self):
+        super().setUp()
+
+        self.admin = User.objects.create_superuser(username="admin")
+
+    def test_full_perms_flag(self):
+        """
+        GIVEN:
+            - API request to list documents
+        WHEN:
+            - full_perms flag is set to true, 1, false, or a random value
+        THEN:
+            - Permissions field is included or excluded accordingly
+        """
+        self.client.force_authenticate(self.admin)
+        Document.objects.create(title="Doc", checksum="xyz", owner=self.admin)
+
+        resp = self.client.get("/api/documents/?full_perms=true")
+        self.assertIn("permissions", resp.data["results"][0])
+
+        resp = self.client.get("/api/documents/?full_perms=1")
+        self.assertIn("permissions", resp.data["results"][0])
+
+        resp = self.client.get("/api/documents/?full_perms=false")
+        self.assertNotIn("permissions", resp.data["results"][0])
+
+        resp = self.client.get("/api/documents/?full_perms=garbage")
+        self.assertNotIn("permissions", resp.data["results"][0])

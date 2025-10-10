@@ -154,11 +154,11 @@ describe('TagsComponent', () => {
   it('support remove tags', () => {
     component.tags = tags
     component.value = [1, 2]
-    component.removeTag(new PointerEvent('point'), 2)
+    component.removeTag(2)
     expect(component.value).toEqual([1])
 
     component.disabled = true
-    component.removeTag(new PointerEvent('point'), 1)
+    component.removeTag(1)
     expect(component.value).toEqual([1])
   })
 

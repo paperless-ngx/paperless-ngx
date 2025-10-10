@@ -1,5 +1,4 @@
 name: ci
-
 on:
   push:
     tags:
@@ -12,34 +11,27 @@ on:
   pull_request:
     branches-ignore:
       - 'translations**'
-
 env:
-  DEFAULT_UV_VERSION: "0.6.x"
+  DEFAULT_UV_VERSION: "0.8.x"
   # This is the default version of Python to use in most steps which aren't specific
   DEFAULT_PYTHON_VERSION: "3.11"
-
+  NLTK_DATA: "/usr/share/nltk_data"
 jobs:
   pre-commit:
     # We want to run on external PRs, but not on our own internal PRs as they'll be run
     # by the push to the branch. Without this if check, checks are duplicated since
     # internal PRs match both the push and pull_request events.
-    if:
-      github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
-      github.repository
-
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     name: Linting Checks
     runs-on: ubuntu-24.04
     steps:
-      -
-        name: Checkout repository
-        uses: actions/checkout@v4
-      -
-        name: Install python
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      - name: Install python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
-      -
-        name: Check files
+      - name: Check files
         uses: pre-commit/action@v3.0.1
 
   tests-backend:
@@ -52,50 +44,44 @@ jobs:
         python-version: ['3.10', '3.11', '3.12']
       fail-fast: false
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v4
-      -
-        name: Start containers
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Start containers
         run: |
           docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml pull --quiet
           docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml up --detach
-      -
-        name: Set up Python
+      - name: Set up Python
         id: setup-python
         uses: actions/setup-python@v5
         with:
           python-version: "${{ matrix.python-version }}"
-      -
-        name: Install uv
-        uses: astral-sh/setup-uv@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
           python-version: ${{ steps.setup-python.outputs.python-version }}
-      -
-        name: Install system dependencies
+      - name: Install system dependencies
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends unpaper tesseract-ocr imagemagick ghostscript libzbar0 poppler-utils
-      -
-        name: Configure ImageMagick
+      - name: Configure ImageMagick
         run: |
           sudo cp docker/rootfs/etc/ImageMagick-6/paperless-policy.xml /etc/ImageMagick-6/policy.xml
-      -
-        name: Install Python dependencies
+      - name: Install Python dependencies
         run: |
           uv sync \
             --python ${{ steps.setup-python.outputs.python-version }} \
             --group testing \
             --frozen
-      -
-        name: List installed Python dependencies
+      - name: List installed Python dependencies
         run: |
           uv pip list
-      -
-        name: Tests
+      - name: Install or update NLTK dependencies
+        run: uv run python -m nltk.downloader punkt punkt_tab snowball_data stopwords -d ${{ env.NLTK_DATA }}
+      - name: Tests
         env:
+          NLTK_DATA: ${{ env.NLTK_DATA }}
           PAPERLESS_CI_TEST: 1
           # Enable paperless_mail testing against real server
           PAPERLESS_MAIL_TEST_HOST: ${{ secrets.TEST_MAIL_HOST }}
@@ -107,41 +93,36 @@ jobs:
             --dev \
             --frozen \
             pytest
-      -
-        name: Upload backend test results to Codecov
+      - name: Upload backend test results to Codecov
         if: always()
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: backend-python-${{ matrix.python-version }}
           files: junit.xml
-      -
-        name: Upload backend coverage to Codecov
+      - name: Upload backend coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: backend-python-${{ matrix.python-version }}
           files: coverage.xml
-      -
-        name: Stop containers
+      - name: Stop containers
         if: always()
         run: |
           docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml logs
           docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml down
-
   install-frontend-dependencies:
     name: "Install Frontend Dependencies"
     runs-on: ubuntu-24.04
     needs:
       - pre-commit
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
-      -
-        name: Use Node.js 20
+      - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
@@ -155,17 +136,10 @@ jobs:
             ~/.pnpm-store
             ~/.cache
           key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
-      -
-        name: Install dependencies
-        if: steps.cache-frontend-deps.outputs.cache-hit != 'true'
+      - name: Install dependencies
         run: cd src-ui && pnpm install
-      -
-        name: Install Playwright
-        if: steps.cache-frontend-deps.outputs.cache-hit != 'true'
-        run: cd src-ui && pnpm playwright install --with-deps
-
   tests-frontend:
-    name: "Frontend Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
+    name: "Frontend Unit Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
     runs-on: ubuntu-24.04
     needs:
       - install-frontend-dependencies
@@ -176,13 +150,12 @@ jobs:
         shard-index: [1, 2, 3, 4]
         shard-count: [4]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
-      -
-        name: Use Node.js 20
+      - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
@@ -198,52 +171,90 @@ jobs:
           key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
       - name: Re-link Angular cli
         run: cd src-ui && pnpm link @angular/cli
-      -
-        name: Linting checks
+      - name: Linting checks
         run: cd src-ui && pnpm run lint
-      -
-        name: Run Jest unit tests
+      - name: Run Jest unit tests
         run: cd src-ui && pnpm run test --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
-      -
-        name: Run Playwright e2e tests
-        run: cd src-ui && pnpm exec playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
-      -
-        name: Upload frontend test results to Codecov
+      - name: Upload frontend test results to Codecov
         uses: codecov/test-results-action@v1
         if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: frontend-node-${{ matrix.node-version }}
           directory: src-ui/
-      -
-        name: Upload frontend coverage to Codecov
+      - name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: frontend-node-${{ matrix.node-version }}
           directory: src-ui/coverage/
-
-  frontend-bundle-analysis:
-    name: "Frontend Bundle Analysis"
+  tests-frontend-e2e:
+    name: "Frontend E2E Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
     runs-on: ubuntu-24.04
     needs:
-      - tests-frontend
+      - install-frontend-dependencies
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20.x]
+        shard-index: [1, 2]
+        shard-count: [2]
     steps:
-      - uses: actions/checkout@v4
-      -
-        name: Install pnpm
+      - uses: actions/checkout@v5
+      - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
-      -
-        name: Use Node.js 20
+      - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
           cache: 'pnpm'
           cache-dependency-path: 'src-ui/pnpm-lock.yaml'
-      -
-        name: Cache frontend dependencies
+      - name: Cache frontend dependencies
+        id: cache-frontend-deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pnpm-store
+            ~/.cache
+          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
+      - name: Re-link Angular cli
+        run: cd src-ui && pnpm link @angular/cli
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+      - name: Install Playwright system dependencies
+        run: npx playwright install-deps
+      - name: Install dependencies
+        run: cd src-ui && pnpm install --no-frozen-lockfile
+      - name: Install Playwright
+        run: cd src-ui && pnpm exec playwright install
+      - name: Run Playwright e2e tests
+        run: cd src-ui && pnpm exec playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
+  frontend-bundle-analysis:
+    name: "Frontend Bundle Analysis"
+    runs-on: ubuntu-24.04
+    needs:
+      - tests-frontend
+      - tests-frontend-e2e
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'pnpm'
+          cache-dependency-path: 'src-ui/pnpm-lock.yaml'
+      - name: Cache frontend dependencies
         id: cache-frontend-deps
         uses: actions/cache@v4
         with:
@@ -251,11 +262,9 @@ jobs:
             ~/.pnpm-store
             ~/.cache
           key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
-      -
-        name: Re-link Angular cli
+      - name: Re-link Angular cli
         run: cd src-ui && pnpm link @angular/cli
-      -
-        name: Build frontend and upload analysis
+      - name: Build frontend and upload analysis
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: cd src-ui && pnpm run build --configuration=production

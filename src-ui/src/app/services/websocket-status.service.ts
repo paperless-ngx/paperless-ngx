@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { Subject } from 'rxjs'
 import { environment } from 'src/environments/environment'
+import { User } from '../data/user'
 import { WebsocketDocumentsDeletedMessage } from '../data/websocket-documents-deleted-message'
 import { WebsocketProgressMessage } from '../data/websocket-progress-message'
 import { SettingsService } from './settings.service'
@@ -92,7 +93,7 @@ export class FileStatus {
   providedIn: 'root',
 })
 export class WebsocketStatusService {
-  constructor(private settingsService: SettingsService) {}
+  private settingsService = inject(SettingsService)
 
   private statusWebSocket: WebSocket
 
@@ -102,6 +103,7 @@ export class WebsocketStatusService {
   private documentConsumptionFinishedSubject = new Subject<FileStatus>()
   private documentConsumptionFailedSubject = new Subject<FileStatus>()
   private documentDeletedSubject = new Subject<boolean>()
+  private connectionStatusSubject = new Subject<boolean>()
 
   private get(taskId: string, filename?: string) {
     let status =
@@ -152,6 +154,15 @@ export class WebsocketStatusService {
     this.statusWebSocket = new WebSocket(
       `${environment.webSocketProtocol}//${environment.webSocketHost}${environment.webSocketBaseUrl}status/`
     )
+    this.statusWebSocket.onopen = () => {
+      this.connectionStatusSubject.next(true)
+    }
+    this.statusWebSocket.onclose = () => {
+      this.connectionStatusSubject.next(false)
+    }
+    this.statusWebSocket.onerror = () => {
+      this.connectionStatusSubject.next(false)
+    }
     this.statusWebSocket.onmessage = (ev: MessageEvent) => {
       const {
         type,
@@ -173,13 +184,25 @@ export class WebsocketStatusService {
     }
   }
 
+  private canViewMessage(messageData: WebsocketProgressMessage): boolean {
+    // see paperless.consumers.StatusConsumer._can_view
+    const user: User = this.settingsService.currentUser
+    return (
+      !messageData.owner_id ||
+      user.is_superuser ||
+      (messageData.owner_id && messageData.owner_id === user.id) ||
+      (messageData.users_can_view &&
+        messageData.users_can_view.includes(user.id)) ||
+      (messageData.groups_can_view &&
+        messageData.groups_can_view.some((groupId) =>
+          user.groups?.includes(groupId)
+        ))
+    )
+  }
+
   handleProgressUpdate(messageData: WebsocketProgressMessage) {
     // fallback if backend didn't restrict message
-    if (
-      messageData.owner_id &&
-      messageData.owner_id !== this.settingsService.currentUser?.id &&
-      !this.settingsService.currentUser?.is_superuser
-    ) {
+    if (!this.canViewMessage(messageData)) {
       return
     }
 
@@ -272,5 +295,13 @@ export class WebsocketStatusService {
 
   onDocumentDeleted() {
     return this.documentDeletedSubject
+  }
+
+  onConnectionStatus() {
+    return this.connectionStatusSubject.asObservable()
+  }
+
+  isConnected(): boolean {
+    return this.statusWebSocket?.readyState === WebSocket.OPEN
   }
 }

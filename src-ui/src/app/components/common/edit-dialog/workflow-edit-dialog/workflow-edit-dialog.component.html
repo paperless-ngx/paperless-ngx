@@ -123,7 +123,15 @@
       <p class="small" i18n>Set scheduled trigger offset and which date field to use.</p>
       <div class="row">
         <div class="col-4">
-          <pngx-input-number i18n-title title="Offset days" formControlName="schedule_offset_days" [showAdd]="false" [error]="error?.schedule_offset_days"></pngx-input-number>
+          <pngx-input-number
+            i18n-title
+            title="Offset days"
+            formControlName="schedule_offset_days"
+            [showAdd]="false"
+            [error]="error?.schedule_offset_days"
+            hint="Positive values will trigger after the date, negative values before."
+            i18n-hint
+          ></pngx-input-number>
         </div>
         <div class="col-4">
           <pngx-input-select i18n-title title="Relative to" formControlName="schedule_date_field" [items]="scheduleDateFieldOptions" [error]="error?.schedule_date_field"></pngx-input-select>

@@ -25,14 +25,12 @@
 #
 # For more extensive installation and update instructions, refer to the
 # documentation.
-
 services:
   broker:
-    image: docker.io/library/redis:7
+    image: docker.io/library/redis:8
     restart: unless-stopped
     volumes:
       - redisdata:/data
-
   db:
     image: docker.io/library/postgres:17
     restart: unless-stopped
@@ -42,7 +40,6 @@ services:
       POSTGRES_DB: paperless
       POSTGRES_USER: paperless
       POSTGRES_PASSWORD: paperless
-
   webserver:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
@@ -61,7 +58,6 @@ services:
       PAPERLESS_DBHOST: db
     env_file:
       - stack.env
-
 volumes:
   data:
   media:

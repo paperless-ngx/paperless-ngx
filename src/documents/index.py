@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import logging
 import math
+import re
 from collections import Counter
 from contextlib import contextmanager
 from datetime import datetime
+from datetime import time
+from datetime import timedelta
 from datetime import timezone
 from shutil import rmtree
 from typing import TYPE_CHECKING
@@ -12,6 +15,8 @@ from typing import Literal
 
 from django.conf import settings
 from django.utils import timezone as django_timezone
+from django.utils.timezone import get_current_timezone
+from django.utils.timezone import now
 from guardian.shortcuts import get_users_with_perms
 from whoosh import classify
 from whoosh import highlight
@@ -168,7 +173,7 @@ def update_document(writer: AsyncWriter, doc: Document) -> None:
         type=doc.document_type.name if doc.document_type else None,
         type_id=doc.document_type.id if doc.document_type else None,
         has_type=doc.document_type is not None,
-        created=doc.created,
+        created=datetime.combine(doc.created, time.min),
         added=doc.added,
         asn=asn,
         modified=doc.modified,
@@ -280,6 +285,7 @@ class DelayedQuery:
         self.saved_results = dict()
         self.first_score = None
         self.filter_queryset = filter_queryset
+        self.suggested_correction = None
 
     def __len__(self) -> int:
         page = self[0:1]
@@ -289,7 +295,8 @@ class DelayedQuery:
         if item.start in self.saved_results:
             return self.saved_results[item.start]
 
-        q, mask = self._get_query()
+        q, mask, suggested_correction = self._get_query()
+        self.suggested_correction = suggested_correction
         sortedby, reverse = self._get_query_sortedby()
 
         page: ResultsPage = self.searcher.search_page(
@@ -341,6 +348,7 @@ class LocalDateParser(English):
 class DelayedFullTextQuery(DelayedQuery):
     def _get_query(self) -> tuple:
         q_str = self.query_params["query"]
+        q_str = rewrite_natural_date_keywords(q_str)
         qp = MultifieldParser(
             [
                 "content",
@@ -360,12 +368,19 @@ class DelayedFullTextQuery(DelayedQuery):
             ),
         )
         q = qp.parse(q_str)
+        suggested_correction = None
+        try:
+            corrected = self.searcher.correct_query(q, q_str)
+            if corrected.string != q_str:
+                suggested_correction = corrected.string
+        except Exception as e:
+            logger.info(
+                "Error while correcting query %s: %s",
+                f"{q_str!r}",
+                e,
+            )
 
-        corrected = self.searcher.correct_query(q, q_str)
-        if corrected.query != q:
-            corrected.query = corrected.string
-
-        return q, None
+        return q, None, suggested_correction
 
 
 class DelayedMoreLikeThisQuery(DelayedQuery):
@@ -386,7 +401,7 @@ class DelayedMoreLikeThisQuery(DelayedQuery):
         )
         mask: set = {docnum}
 
-        return q, mask
+        return q, mask, None
 
 
 def autocomplete(
@@ -440,3 +455,37 @@ def get_permissions_criterias(user: User | None = None) -> list:
                 query.Term("viewer_id", str(user.id)),
             )
     return user_criterias
+
+
+def rewrite_natural_date_keywords(query_string: str) -> str:
+    """
+    Rewrites natural date keywords (e.g. added:today or added:"yesterday") to UTC range syntax for Whoosh.
+    """
+
+    tz = get_current_timezone()
+    local_now = now().astimezone(tz)
+
+    today = local_now.date()
+    yesterday = today - timedelta(days=1)
+
+    ranges = {
+        "today": (
+            datetime.combine(today, time.min, tzinfo=tz),
+            datetime.combine(today, time.max, tzinfo=tz),
+        ),
+        "yesterday": (
+            datetime.combine(yesterday, time.min, tzinfo=tz),
+            datetime.combine(yesterday, time.max, tzinfo=tz),
+        ),
+    }
+
+    pattern = r"(\b(?:added|created))\s*:\s*[\"']?(today|yesterday)[\"']?"
+
+    def repl(m):
+        field, keyword = m.group(1), m.group(2)
+        start, end = ranges[keyword]
+        start_str = start.astimezone(timezone.utc).strftime("%Y%m%d%H%M%S")
+        end_str = end.astimezone(timezone.utc).strftime("%Y%m%d%H%M%S")
+        return f"{field}:[{start_str} TO {end_str}]"
+
+    return re.sub(pattern, repl, query_string)

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-11 13:33-0700\n"
-"PO-Revision-Date: 2025-03-18 00:32\n"
+"POT-Creation-Date: 2025-08-31 22:24+0000\n"
+"PO-Revision-Date: 2025-09-07 23:13\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -21,67 +21,67 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumen"
 
-#: documents/filters.py:374
+#: documents/filters.py:384
 msgid "Value must be valid JSON."
-msgstr ""
-
-#: documents/filters.py:393
-msgid "Invalid custom field query expression"
-msgstr ""
+msgstr "Nilai harus berupa JSON yang valid."
 
 #: documents/filters.py:403
+msgid "Invalid custom field query expression"
+msgstr "Ekspresi pencarian bidang khusus tidak valid"
+
+#: documents/filters.py:413
 msgid "Invalid expression list. Must be nonempty."
-msgstr ""
+msgstr "Daftar ekspresi tidak valid. Tidak boleh kosong."
 
-#: documents/filters.py:424
+#: documents/filters.py:434
 msgid "Invalid logical operator {op!r}"
-msgstr ""
+msgstr "Operator logika {op!r} tidak valid"
 
-#: documents/filters.py:438
+#: documents/filters.py:448
 msgid "Maximum number of query conditions exceeded."
-msgstr ""
+msgstr "Jumlah maksimal kondisi pencarian terlampaui."
 
-#: documents/filters.py:503
+#: documents/filters.py:513
 msgid "{name!r} is not a valid custom field."
-msgstr ""
+msgstr "{name!r} bukan bidang khusus yang valid."
 
-#: documents/filters.py:540
+#: documents/filters.py:550
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr ""
+msgstr "{data_type} tidak mendukung ekspresi pencarian expr {expr!r}."
 
-#: documents/filters.py:648
+#: documents/filters.py:658
 msgid "Maximum nesting depth exceeded."
-msgstr ""
+msgstr "Kedalaman susunan maksimal terlampaui."
 
-#: documents/filters.py:827
+#: documents/filters.py:843
 msgid "Custom field not found"
-msgstr ""
+msgstr "Bidang khusus tidak ditemukan"
 
-#: documents/models.py:36 documents/models.py:710
+#: documents/models.py:36 documents/models.py:713
 msgid "owner"
 msgstr "pemilik"
 
-#: documents/models.py:53 documents/models.py:921
+#: documents/models.py:53 documents/models.py:924
 msgid "None"
 msgstr "Tidak ada"
 
-#: documents/models.py:54 documents/models.py:922
+#: documents/models.py:54 documents/models.py:925
 msgid "Any word"
 msgstr "Kata apa pun"
 
-#: documents/models.py:55 documents/models.py:923
+#: documents/models.py:55 documents/models.py:926
 msgid "All words"
 msgstr "Semua kata"
 
-#: documents/models.py:56 documents/models.py:924
+#: documents/models.py:56 documents/models.py:927
 msgid "Exact match"
 msgstr "Sama persis"
 
-#: documents/models.py:57 documents/models.py:925
+#: documents/models.py:57 documents/models.py:928
 msgid "Regular expression"
 msgstr "Ekspresi reguler"
 
-#: documents/models.py:58 documents/models.py:926
+#: documents/models.py:58 documents/models.py:929
 msgid "Fuzzy word"
 msgstr "Kata samar"
 
@@ -89,20 +89,20 @@ msgstr "Kata samar"
 msgid "Automatic"
 msgstr "Otomatis"
 
-#: documents/models.py:62 documents/models.py:398 documents/models.py:1416
+#: documents/models.py:62 documents/models.py:401 documents/models.py:1419
 #: paperless_mail/models.py:23 paperless_mail/models.py:143
 msgid "name"
 msgstr "nama"
 
-#: documents/models.py:64 documents/models.py:990
+#: documents/models.py:64 documents/models.py:993
 msgid "match"
 msgstr "cocok"
 
-#: documents/models.py:67 documents/models.py:993
+#: documents/models.py:67 documents/models.py:996
 msgid "matching algorithm"
 msgstr "mencocokkan algoritma"
 
-#: documents/models.py:72 documents/models.py:998
+#: documents/models.py:72 documents/models.py:1001
 msgid "is insensitive"
 msgstr "tidak sensitif"
 
@@ -166,7 +166,7 @@ msgstr "Terenkripsi dengan GNU Privacy Guard"
 msgid "title"
 msgstr "judul"
 
-#: documents/models.py:170 documents/models.py:624
+#: documents/models.py:170 documents/models.py:627
 msgid "content"
 msgstr "konten"
 
@@ -196,995 +196,995 @@ msgstr "Checksum dari dokumen yang di arsip."
 
 #: documents/models.py:205
 msgid "page count"
-msgstr ""
+msgstr "jumlah halaman"
 
 #: documents/models.py:212
 msgid "The number of pages of the document."
-msgstr ""
+msgstr "Jumlah halaman dokumen."
 
-#: documents/models.py:216 documents/models.py:630 documents/models.py:668
-#: documents/models.py:739 documents/models.py:797
+#: documents/models.py:217 documents/models.py:633 documents/models.py:671
+#: documents/models.py:742 documents/models.py:800
 msgid "created"
 msgstr "dibuat"
 
-#: documents/models.py:219
+#: documents/models.py:223
 msgid "modified"
 msgstr "dimodifikasi"
 
-#: documents/models.py:226
+#: documents/models.py:230
 msgid "storage type"
 msgstr "jenis penyimpanan"
 
-#: documents/models.py:234
+#: documents/models.py:238
 msgid "added"
 msgstr "menambahkan"
 
-#: documents/models.py:241
+#: documents/models.py:245
 msgid "filename"
 msgstr "nama berkas"
 
-#: documents/models.py:247
+#: documents/models.py:251
 msgid "Current filename in storage"
 msgstr "Nama berkas saat ini yang tersimpan"
 
-#: documents/models.py:251
+#: documents/models.py:255
 msgid "archive filename"
 msgstr "nama berkas arsip"
 
-#: documents/models.py:257
+#: documents/models.py:261
 msgid "Current archive filename in storage"
 msgstr "Nama berkas arsip yang tersimpan"
 
-#: documents/models.py:261
+#: documents/models.py:265
 msgid "original filename"
 msgstr "nama berkas asli"
 
-#: documents/models.py:267
+#: documents/models.py:271
 msgid "The original name of the file when it was uploaded"
 msgstr "Nama berkas asli pada saat diunggah"
 
-#: documents/models.py:274
+#: documents/models.py:278
 msgid "archive serial number"
 msgstr "nomor serial arsip"
 
-#: documents/models.py:284
+#: documents/models.py:288
 msgid "The position of this document in your physical document archive."
 msgstr "Posisi dokumen ini pada arsip fisik dokumen yang di binder."
 
-#: documents/models.py:290 documents/models.py:641 documents/models.py:695
-#: documents/models.py:1459
+#: documents/models.py:294 documents/models.py:644 documents/models.py:698
+#: documents/models.py:1462
 msgid "document"
 msgstr "dokumen"
 
-#: documents/models.py:291
+#: documents/models.py:295
 msgid "documents"
 msgstr "dokumen"
 
-#: documents/models.py:379
+#: documents/models.py:382
 msgid "Table"
 msgstr "Tabel"
 
-#: documents/models.py:380
+#: documents/models.py:383
 msgid "Small Cards"
-msgstr ""
+msgstr "kartu kecil"
 
-#: documents/models.py:381
+#: documents/models.py:384
 msgid "Large Cards"
 msgstr "Kartu Besar"
 
-#: documents/models.py:384
+#: documents/models.py:387
 msgid "Title"
 msgstr "Judul"
 
-#: documents/models.py:385 documents/models.py:942
+#: documents/models.py:388 documents/models.py:945
 msgid "Created"
 msgstr "Dibuat"
 
-#: documents/models.py:386 documents/models.py:941
+#: documents/models.py:389 documents/models.py:944
 msgid "Added"
 msgstr "Ditambahkan"
 
-#: documents/models.py:387
+#: documents/models.py:390
 msgid "Tags"
 msgstr "Label"
 
-#: documents/models.py:388
+#: documents/models.py:391
 msgid "Correspondent"
 msgstr "Koresponden"
 
-#: documents/models.py:389
+#: documents/models.py:392
 msgid "Document Type"
 msgstr "Tipe Dokumen"
 
-#: documents/models.py:390
+#: documents/models.py:393
 msgid "Storage Path"
 msgstr "Lokasi Penyimpanan"
 
-#: documents/models.py:391
+#: documents/models.py:394
 msgid "Note"
 msgstr "Catatan"
 
-#: documents/models.py:392
+#: documents/models.py:395
 msgid "Owner"
 msgstr "Pemilik"
 
-#: documents/models.py:393
+#: documents/models.py:396
 msgid "Shared"
 msgstr "Dibagikan"
 
-#: documents/models.py:394
+#: documents/models.py:397
 msgid "ASN"
 msgstr "ASN"
 
-#: documents/models.py:395
+#: documents/models.py:398
 msgid "Pages"
 msgstr "Halaman"
 
-#: documents/models.py:401
+#: documents/models.py:404
 msgid "show on dashboard"
 msgstr "tampilkan di dasbor"
 
-#: documents/models.py:404
+#: documents/models.py:407
 msgid "show in sidebar"
 msgstr "tunjukan di bilah sisi"
 
-#: documents/models.py:408
+#: documents/models.py:411
 msgid "sort field"
 msgstr "urutkan bidang"
 
-#: documents/models.py:413
+#: documents/models.py:416
 msgid "sort reverse"
 msgstr "urutkan terbalik"
 
-#: documents/models.py:416
+#: documents/models.py:419
 msgid "View page size"
 msgstr "lihat ukuran halaman"
 
-#: documents/models.py:424
+#: documents/models.py:427
 msgid "View display mode"
 msgstr "Mode tampilan"
 
-#: documents/models.py:431
+#: documents/models.py:434
 msgid "Document display fields"
 msgstr "Area tampilan dokumen"
 
-#: documents/models.py:438 documents/models.py:501
+#: documents/models.py:441 documents/models.py:504
 msgid "saved view"
 msgstr "tampilan disimpan"
 
-#: documents/models.py:439
+#: documents/models.py:442
 msgid "saved views"
 msgstr "tampilan disimpan"
 
-#: documents/models.py:447
+#: documents/models.py:450
 msgid "title contains"
 msgstr "judul memiliki"
 
-#: documents/models.py:448
+#: documents/models.py:451
 msgid "content contains"
 msgstr "konten memiliki"
 
-#: documents/models.py:449
+#: documents/models.py:452
 msgid "ASN is"
 msgstr "ASN adalah"
 
-#: documents/models.py:450
+#: documents/models.py:453
 msgid "correspondent is"
 msgstr "koresponden adalah"
 
-#: documents/models.py:451
+#: documents/models.py:454
 msgid "document type is"
 msgstr "jenis dokumen adalah"
 
-#: documents/models.py:452
+#: documents/models.py:455
 msgid "is in inbox"
 msgstr "di dalam kotak masuk"
 
-#: documents/models.py:453
+#: documents/models.py:456
 msgid "has tag"
 msgstr "memiliki label"
 
-#: documents/models.py:454
+#: documents/models.py:457
 msgid "has any tag"
 msgstr "memiliki label apapun"
 
-#: documents/models.py:455
+#: documents/models.py:458
 msgid "created before"
 msgstr "dibuat sebelum"
 
-#: documents/models.py:456
+#: documents/models.py:459
 msgid "created after"
 msgstr "dibuat setelah"
 
-#: documents/models.py:457
+#: documents/models.py:460
 msgid "created year is"
 msgstr "dibuat pada tahun"
 
-#: documents/models.py:458
+#: documents/models.py:461
 msgid "created month is"
 msgstr "dibuat pada bulan"
 
-#: documents/models.py:459
+#: documents/models.py:462
 msgid "created day is"
 msgstr "dibuat pada hari"
 
-#: documents/models.py:460
+#: documents/models.py:463
 msgid "added before"
 msgstr "ditambahkan sebelum"
 
-#: documents/models.py:461
+#: documents/models.py:464
 msgid "added after"
 msgstr "ditambahkan setelah"
 
-#: documents/models.py:462
+#: documents/models.py:465
 msgid "modified before"
 msgstr "disunting sebelum"
 
-#: documents/models.py:463
+#: documents/models.py:466
 msgid "modified after"
 msgstr "disunting setelah"
 
-#: documents/models.py:464
+#: documents/models.py:467
 msgid "does not have tag"
 msgstr "tidak memiliki label"
 
-#: documents/models.py:465
+#: documents/models.py:468
 msgid "does not have ASN"
 msgstr "tidak memiliki ASN"
 
-#: documents/models.py:466
+#: documents/models.py:469
 msgid "title or content contains"
 msgstr "judul atau konten mengandung"
 
-#: documents/models.py:467
+#: documents/models.py:470
 msgid "fulltext query"
 msgstr "kueri teks lengkap"
 
-#: documents/models.py:468
+#: documents/models.py:471
 msgid "more like this"
 msgstr "lebih seperti ini"
 
-#: documents/models.py:469
+#: documents/models.py:472
 msgid "has tags in"
 msgstr "memiliki label dalam"
 
-#: documents/models.py:470
+#: documents/models.py:473
 msgid "ASN greater than"
 msgstr "ASN lebih dari"
 
-#: documents/models.py:471
+#: documents/models.py:474
 msgid "ASN less than"
 msgstr "ASN kurang dari"
 
-#: documents/models.py:472
+#: documents/models.py:475
 msgid "storage path is"
 msgstr "lokasi penyimpanan"
 
-#: documents/models.py:473
+#: documents/models.py:476
 msgid "has correspondent in"
 msgstr "memiliki koresponden dalam"
 
-#: documents/models.py:474
+#: documents/models.py:477
 msgid "does not have correspondent in"
 msgstr "tidak memiliki koresponden dalam"
 
-#: documents/models.py:475
+#: documents/models.py:478
 msgid "has document type in"
 msgstr "memiliki jenis dokumen dalam"
 
-#: documents/models.py:476
+#: documents/models.py:479
 msgid "does not have document type in"
 msgstr "tidak memiliki jenis dokumen dalam"
 
-#: documents/models.py:477
+#: documents/models.py:480
 msgid "has storage path in"
 msgstr "memiliki lokasi penyimpanan dalam"
 
-#: documents/models.py:478
+#: documents/models.py:481
 msgid "does not have storage path in"
 msgstr "tidak memiliki lokasi penyimpanan dalam"
 
-#: documents/models.py:479
+#: documents/models.py:482
 msgid "owner is"
 msgstr "pemilik adalah"
 
-#: documents/models.py:480
+#: documents/models.py:483
 msgid "has owner in"
 msgstr "memiliki pemilik dalam"
 
-#: documents/models.py:481
+#: documents/models.py:484
 msgid "does not have owner"
 msgstr "tidak memiliki pemilik"
 
-#: documents/models.py:482
+#: documents/models.py:485
 msgid "does not have owner in"
 msgstr "tidak memiliki pemilik dalam"
 
-#: documents/models.py:483
+#: documents/models.py:486
 msgid "has custom field value"
 msgstr "muat nilai bidang khusus"
 
-#: documents/models.py:484
+#: documents/models.py:487
 msgid "is shared by me"
 msgstr "dibagikan oleh saya"
 
-#: documents/models.py:485
+#: documents/models.py:488
 msgid "has custom fields"
 msgstr "memiliki area khusus"
 
-#: documents/models.py:486
+#: documents/models.py:489
 msgid "has custom field in"
 msgstr "memiliki area khusus di"
 
-#: documents/models.py:487
+#: documents/models.py:490
 msgid "does not have custom field in"
 msgstr "tidak memiliki area khusus di"
 
-#: documents/models.py:488
+#: documents/models.py:491
 msgid "does not have custom field"
 msgstr "tidak memiliki area khusus"
 
-#: documents/models.py:489
+#: documents/models.py:492
 msgid "custom fields query"
 msgstr "kueri bidang khusus"
 
-#: documents/models.py:490
-msgid "created to"
-msgstr ""
-
-#: documents/models.py:491
-msgid "created from"
-msgstr ""
-
-#: documents/models.py:492
-msgid "added to"
-msgstr ""
-
 #: documents/models.py:493
-msgid "added from"
-msgstr ""
+msgid "created to"
+msgstr "dibuat ke"
 
 #: documents/models.py:494
-msgid "mime type is"
-msgstr ""
+msgid "created from"
+msgstr "dibuat dari"
 
-#: documents/models.py:504
+#: documents/models.py:495
+msgid "added to"
+msgstr "ditambahkan ke"
+
+#: documents/models.py:496
+msgid "added from"
+msgstr "ditambahkan dari"
+
+#: documents/models.py:497
+msgid "mime type is"
+msgstr "tipe mime adalah"
+
+#: documents/models.py:507
 msgid "rule type"
 msgstr "jenis peraturan"
 
-#: documents/models.py:506
+#: documents/models.py:509
 msgid "value"
 msgstr "nilai"
 
-#: documents/models.py:509
+#: documents/models.py:512
 msgid "filter rule"
 msgstr "saring aturan"
 
-#: documents/models.py:510
+#: documents/models.py:513
 msgid "filter rules"
 msgstr "saring aturan"
 
-#: documents/models.py:534
+#: documents/models.py:537
 msgid "Auto Task"
 msgstr "Tugas Otomatis"
 
-#: documents/models.py:535
+#: documents/models.py:538
 msgid "Scheduled Task"
 msgstr "Tugas Terjadwal"
 
-#: documents/models.py:536
+#: documents/models.py:539
 msgid "Manual Task"
 msgstr "Tugas Manual"
 
-#: documents/models.py:539
-msgid "Consume File"
-msgstr ""
-
-#: documents/models.py:540
-msgid "Train Classifier"
-msgstr ""
-
-#: documents/models.py:541
-msgid "Check Sanity"
-msgstr ""
-
 #: documents/models.py:542
-msgid "Index Optimize"
-msgstr ""
+msgid "Consume File"
+msgstr "Konsumsi Berkas"
 
-#: documents/models.py:547
+#: documents/models.py:543
+msgid "Train Classifier"
+msgstr "Latih Pengklasifikasi"
+
+#: documents/models.py:544
+msgid "Check Sanity"
+msgstr "Cek Kewajaran"
+
+#: documents/models.py:545
+msgid "Index Optimize"
+msgstr "Optimalkan Indeks"
+
+#: documents/models.py:550
 msgid "Task ID"
 msgstr "ID Tugas"
 
-#: documents/models.py:548
+#: documents/models.py:551
 msgid "Celery ID for the Task that was run"
 msgstr "Celery ID untuk tugas yang sudah dijalankan"
 
-#: documents/models.py:553
+#: documents/models.py:556
 msgid "Acknowledged"
 msgstr "Diakui"
 
-#: documents/models.py:554
+#: documents/models.py:557
 msgid "If the task is acknowledged via the frontend or API"
 msgstr "Jika tugas telah diketahui melalui frontend atau API"
 
-#: documents/models.py:560
+#: documents/models.py:563
 msgid "Task Filename"
 msgstr "Nama Berkas Tugas"
 
-#: documents/models.py:561
+#: documents/models.py:564
 msgid "Name of the file which the Task was run for"
 msgstr "Nama dari berkas yang mana tugas akan dijalankan"
 
-#: documents/models.py:568
+#: documents/models.py:571
 msgid "Task Name"
 msgstr "Nama Tugas"
 
-#: documents/models.py:569
+#: documents/models.py:572
 msgid "Name of the task that was run"
-msgstr ""
+msgstr "Nama tugas yang dijalankan"
 
-#: documents/models.py:576
+#: documents/models.py:579
 msgid "Task State"
 msgstr "Status Tugas"
 
-#: documents/models.py:577
+#: documents/models.py:580
 msgid "Current state of the task being run"
 msgstr "Status tugas sekarang yang sedang dijalankan"
 
-#: documents/models.py:583
+#: documents/models.py:586
 msgid "Created DateTime"
 msgstr "Dibuat TanggalWaktu"
 
-#: documents/models.py:584
+#: documents/models.py:587
 msgid "Datetime field when the task result was created in UTC"
 msgstr "Kolom tanggal dan waktu saat hasil selesai dibuat dalam UTC"
 
-#: documents/models.py:590
+#: documents/models.py:593
 msgid "Started DateTime"
 msgstr "Dimulai TanggalWaktu"
 
-#: documents/models.py:591
+#: documents/models.py:594
 msgid "Datetime field when the task was started in UTC"
 msgstr "Kolom Tanggal dan waktu saat tugas dimulai dalam UTC"
 
-#: documents/models.py:597
+#: documents/models.py:600
 msgid "Completed DateTime"
 msgstr "Selesai TanggalWaktu"
 
-#: documents/models.py:598
+#: documents/models.py:601
 msgid "Datetime field when the task was completed in UTC"
 msgstr "Kolom tanggal dan waktu saat hasil selesai dibuat dalam UTC"
 
-#: documents/models.py:604
+#: documents/models.py:607
 msgid "Result Data"
 msgstr "Data Hasil"
 
-#: documents/models.py:606
+#: documents/models.py:609
 msgid "The data returned by the task"
 msgstr "Data yang dikembalikan dari tugas"
 
-#: documents/models.py:614
+#: documents/models.py:617
 msgid "Task Type"
 msgstr "Tipe Tugas"
 
-#: documents/models.py:615
+#: documents/models.py:618
 msgid "The type of task that was run"
-msgstr ""
+msgstr "Jenis tugas yang dijalankan"
 
-#: documents/models.py:626
+#: documents/models.py:629
 msgid "Note for the document"
 msgstr "Catatan untuk dokumen"
 
-#: documents/models.py:650
+#: documents/models.py:653
 msgid "user"
 msgstr "pengguna"
 
-#: documents/models.py:655
+#: documents/models.py:658
 msgid "note"
 msgstr "catatan"
 
-#: documents/models.py:656
+#: documents/models.py:659
 msgid "notes"
 msgstr "catatan"
 
-#: documents/models.py:664
+#: documents/models.py:667
 msgid "Archive"
 msgstr "Arsip"
 
-#: documents/models.py:665
+#: documents/models.py:668
 msgid "Original"
 msgstr "Orisinil"
 
-#: documents/models.py:676 paperless_mail/models.py:75
+#: documents/models.py:679 paperless_mail/models.py:75
 msgid "expiration"
 msgstr "masa berlaku"
 
-#: documents/models.py:683
+#: documents/models.py:686
 msgid "slug"
 msgstr "topik konten"
 
-#: documents/models.py:715
+#: documents/models.py:718
 msgid "share link"
 msgstr "bagikan tautan"
 
-#: documents/models.py:716
+#: documents/models.py:719
 msgid "share links"
 msgstr "berbagi tautan"
 
-#: documents/models.py:728
+#: documents/models.py:731
 msgid "String"
 msgstr "String"
 
-#: documents/models.py:729
+#: documents/models.py:732
 msgid "URL"
 msgstr "URL"
 
-#: documents/models.py:730
+#: documents/models.py:733
 msgid "Date"
 msgstr "Tanggal"
 
-#: documents/models.py:731
+#: documents/models.py:734
 msgid "Boolean"
 msgstr "Boolean"
 
-#: documents/models.py:732
+#: documents/models.py:735
 msgid "Integer"
 msgstr "Bilangan bulat"
 
-#: documents/models.py:733
+#: documents/models.py:736
 msgid "Float"
 msgstr "Float"
 
-#: documents/models.py:734
+#: documents/models.py:737
 msgid "Monetary"
 msgstr "Keuangan"
 
-#: documents/models.py:735
+#: documents/models.py:738
 msgid "Document Link"
 msgstr "Tautan Dokumen"
 
-#: documents/models.py:736
+#: documents/models.py:739
 msgid "Select"
 msgstr "Pilih"
 
-#: documents/models.py:748
+#: documents/models.py:751
 msgid "data type"
 msgstr "jenis data"
 
-#: documents/models.py:755
+#: documents/models.py:758
 msgid "extra data"
 msgstr "data ekstra"
 
-#: documents/models.py:759
+#: documents/models.py:762
 msgid "Extra data for the custom field, such as select options"
 msgstr "Data tambahan untuk variasi kolom, seperti pilihan"
 
-#: documents/models.py:765
+#: documents/models.py:768
 msgid "custom field"
 msgstr "kolom khusus"
 
-#: documents/models.py:766
+#: documents/models.py:769
 msgid "custom fields"
 msgstr "kolom khusus"
 
-#: documents/models.py:863
+#: documents/models.py:866
 msgid "custom field instance"
 msgstr "kolom Khusus Instansi"
 
-#: documents/models.py:864
+#: documents/models.py:867
 msgid "custom field instances"
 msgstr "kolom Khusus Instansi"
 
-#: documents/models.py:929
+#: documents/models.py:932
 msgid "Consumption Started"
 msgstr "Memulai Penggunaan"
 
-#: documents/models.py:930
+#: documents/models.py:933
 msgid "Document Added"
 msgstr "Dokumen ditambahkan"
 
-#: documents/models.py:931
+#: documents/models.py:934
 msgid "Document Updated"
 msgstr "Dokumen diperbarui"
 
-#: documents/models.py:932
+#: documents/models.py:935
 msgid "Scheduled"
 msgstr "Dijadwalkan"
 
-#: documents/models.py:935
+#: documents/models.py:938
 msgid "Consume Folder"
 msgstr "Pengunaan Folder"
 
-#: documents/models.py:936
+#: documents/models.py:939
 msgid "Api Upload"
 msgstr "Unggah Menggunakan API"
 
-#: documents/models.py:937
+#: documents/models.py:940
 msgid "Mail Fetch"
 msgstr "Pengambilan Surat"
 
-#: documents/models.py:938
+#: documents/models.py:941
 msgid "Web UI"
 msgstr "Antarmuka Web"
 
-#: documents/models.py:943
+#: documents/models.py:946
 msgid "Modified"
 msgstr "Dimodifikasi"
 
-#: documents/models.py:944
+#: documents/models.py:947
 msgid "Custom Field"
 msgstr "Kolom Khusus"
 
-#: documents/models.py:947
+#: documents/models.py:950
 msgid "Workflow Trigger Type"
 msgstr "Tipe Pemicu Alur Kerja"
 
-#: documents/models.py:959
+#: documents/models.py:962
 msgid "filter path"
 msgstr "saring lokasi"
 
-#: documents/models.py:964
+#: documents/models.py:967
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
 msgstr "Hanya gunakan dokumen dengan jalur yang sesuai denganyang sudah ditentukan. Karakter pengganti seperti * diperbolehkan. Huruf besar/kecil tidak berpengaruh."
 
-#: documents/models.py:971
+#: documents/models.py:974
 msgid "filter filename"
 msgstr "saring nama berkas"
 
-#: documents/models.py:976 paperless_mail/models.py:200
+#: documents/models.py:979 paperless_mail/models.py:200
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "Hanya gunakan dokumen yang sepenuhnya cocok dengan nama berkas ini jika ditentukan. Wildcard seperti *.pdf atau *faktur* diperbolehkan. Tidak peka huruf besar kecil."
 
-#: documents/models.py:987
+#: documents/models.py:990
 msgid "filter documents from this mail rule"
 msgstr "saring dokumen dari peraturan surel"
 
-#: documents/models.py:1003
+#: documents/models.py:1006
 msgid "has these tag(s)"
 msgstr "memiliki label(-label) ini"
 
-#: documents/models.py:1011
+#: documents/models.py:1014
 msgid "has this document type"
 msgstr "memiliki jenis dokumen ini"
 
-#: documents/models.py:1019
+#: documents/models.py:1022
 msgid "has this correspondent"
 msgstr "memiliki koresponden ini"
 
-#: documents/models.py:1023
-msgid "schedule offset days"
-msgstr ""
-
 #: documents/models.py:1026
-msgid "The number of days to offset the schedule trigger by."
-msgstr ""
+msgid "schedule offset days"
+msgstr "hari penggeseran jadwal"
 
-#: documents/models.py:1031
-msgid "schedule is recurring"
-msgstr ""
+#: documents/models.py:1029
+msgid "The number of days to offset the schedule trigger by."
+msgstr "Jumlah hari untuk menggeser pemicu jadwal."
 
 #: documents/models.py:1034
+msgid "schedule is recurring"
+msgstr "jadwal berulang"
+
+#: documents/models.py:1037
 msgid "If the schedule should be recurring."
-msgstr ""
+msgstr "Jika jadwal harus berulang."
 
-#: documents/models.py:1039
+#: documents/models.py:1042
 msgid "schedule recurring delay in days"
-msgstr ""
+msgstr "jeda jadwal berulang dalam hari"
 
-#: documents/models.py:1043
+#: documents/models.py:1046
 msgid "The number of days between recurring schedule triggers."
-msgstr ""
+msgstr "Jumlah hari antara pemicu jadwal berulang."
 
-#: documents/models.py:1048
+#: documents/models.py:1051
 msgid "schedule date field"
-msgstr ""
+msgstr "bidang tanggal jadwal"
 
-#: documents/models.py:1053
+#: documents/models.py:1056
 msgid "The field to check for a schedule trigger."
-msgstr ""
+msgstr "Bidang untuk memeriksa pemicu jadwal."
 
-#: documents/models.py:1062
+#: documents/models.py:1065
 msgid "schedule date custom field"
-msgstr ""
+msgstr "bidang khusus tanggal jadwal"
 
-#: documents/models.py:1066
+#: documents/models.py:1069
 msgid "workflow trigger"
 msgstr "pemicu alur kerja"
 
-#: documents/models.py:1067
+#: documents/models.py:1070
 msgid "workflow triggers"
 msgstr "pemicu alur kerja"
 
-#: documents/models.py:1075
+#: documents/models.py:1078
 msgid "email subject"
-msgstr ""
+msgstr "subjek email"
 
-#: documents/models.py:1079
+#: documents/models.py:1082
 msgid "The subject of the email, can include some placeholders, see documentation."
-msgstr ""
-
-#: documents/models.py:1085
-msgid "email body"
-msgstr ""
+msgstr "Subjek email, dapat berisi beberapa placeholder, lihat dokumentasi."
 
 #: documents/models.py:1088
-msgid "The body (message) of the email, can include some placeholders, see documentation."
-msgstr ""
+msgid "email body"
+msgstr "isi surel"
 
-#: documents/models.py:1094
-msgid "emails to"
-msgstr ""
+#: documents/models.py:1091
+msgid "The body (message) of the email, can include some placeholders, see documentation."
+msgstr "Isi (pesan) email, dapat berisi beberapa placeholder, lihat dokumentasi."
 
 #: documents/models.py:1097
+msgid "emails to"
+msgstr "kirim surel ke"
+
+#: documents/models.py:1100
 msgid "The destination email addresses, comma separated."
-msgstr ""
+msgstr "Alamat email tujuan, pisahkan dengan koma."
 
-#: documents/models.py:1103
+#: documents/models.py:1106
 msgid "include document in email"
-msgstr ""
-
-#: documents/models.py:1114
-msgid "webhook url"
-msgstr ""
+msgstr "sertakan dokumen dalam email"
 
 #: documents/models.py:1117
+msgid "webhook url"
+msgstr "url webhook"
+
+#: documents/models.py:1120
 msgid "The destination URL for the notification."
-msgstr ""
+msgstr "URL tujuan untuk notifikasi."
 
-#: documents/models.py:1122
+#: documents/models.py:1125
 msgid "use parameters"
-msgstr ""
+msgstr "gunakan parameter"
 
-#: documents/models.py:1127
+#: documents/models.py:1130
 msgid "send as JSON"
-msgstr ""
-
-#: documents/models.py:1131
-msgid "webhook parameters"
-msgstr ""
+msgstr "kirim sebagai JSON"
 
 #: documents/models.py:1134
-msgid "The parameters to send with the webhook URL if body not used."
-msgstr ""
+msgid "webhook parameters"
+msgstr "parameter webhook"
 
-#: documents/models.py:1138
-msgid "webhook body"
-msgstr ""
+#: documents/models.py:1137
+msgid "The parameters to send with the webhook URL if body not used."
+msgstr "Parameter yang dikirim bersama URL webhook jika body tidak digunakan."
 
 #: documents/models.py:1141
-msgid "The body to send with the webhook URL if parameters not used."
-msgstr ""
+msgid "webhook body"
+msgstr "isi webhook"
 
-#: documents/models.py:1145
-msgid "webhook headers"
-msgstr ""
+#: documents/models.py:1144
+msgid "The body to send with the webhook URL if parameters not used."
+msgstr "Isi yang dikirim bersama URL webhook jika parameter tidak digunakan."
 
 #: documents/models.py:1148
+msgid "webhook headers"
+msgstr "header webhook"
+
+#: documents/models.py:1151
 msgid "The headers to send with the webhook URL."
-msgstr ""
+msgstr "Header yang dikirim bersama URL webhook."
 
-#: documents/models.py:1153
+#: documents/models.py:1156
 msgid "include document in webhook"
-msgstr ""
+msgstr "sertakan dokumen dalam webhook"
 
-#: documents/models.py:1164
+#: documents/models.py:1167
 msgid "Assignment"
 msgstr "Tugas"
 
-#: documents/models.py:1168
+#: documents/models.py:1171
 msgid "Removal"
 msgstr "Penghapusan"
 
-#: documents/models.py:1172 documents/templates/account/password_reset.html:15
+#: documents/models.py:1175 documents/templates/account/password_reset.html:15
 msgid "Email"
 msgstr "Surel"
 
-#: documents/models.py:1176
+#: documents/models.py:1179
 msgid "Webhook"
 msgstr "Webhook"
 
-#: documents/models.py:1180
+#: documents/models.py:1183
 msgid "Workflow Action Type"
 msgstr "Jenis Aksi Alur Kerja"
 
-#: documents/models.py:1186
+#: documents/models.py:1189
 msgid "assign title"
 msgstr "tetapkan judul"
 
-#: documents/models.py:1191
+#: documents/models.py:1194
 msgid "Assign a document title, can include some placeholders, see documentation."
 msgstr "Tetapkan judul dokumen, dapat menyertakan beberapa placeholder, lihat dokumentasi."
 
-#: documents/models.py:1200 paperless_mail/models.py:274
+#: documents/models.py:1203 paperless_mail/models.py:274
 msgid "assign this tag"
 msgstr "tetapkan label ini"
 
-#: documents/models.py:1209 paperless_mail/models.py:282
+#: documents/models.py:1212 paperless_mail/models.py:282
 msgid "assign this document type"
 msgstr "tetapkan jenis dokumen ini"
 
-#: documents/models.py:1218 paperless_mail/models.py:296
+#: documents/models.py:1221 paperless_mail/models.py:296
 msgid "assign this correspondent"
 msgstr "tetapkan koresponden ini"
 
-#: documents/models.py:1227
+#: documents/models.py:1230
 msgid "assign this storage path"
 msgstr "tetapkan lokasi penyimpanan ini"
 
-#: documents/models.py:1236
+#: documents/models.py:1239
 msgid "assign this owner"
 msgstr "tetapkan pemilik ini"
 
-#: documents/models.py:1243
+#: documents/models.py:1246
 msgid "grant view permissions to these users"
 msgstr "memberikan izin melihat kepada pengguna ini"
 
-#: documents/models.py:1250
+#: documents/models.py:1253
 msgid "grant view permissions to these groups"
 msgstr "memberikan izin melihat kepada grup ini"
 
-#: documents/models.py:1257
+#: documents/models.py:1260
 msgid "grant change permissions to these users"
 msgstr "memberikan izin perubahan kepada pengguna ini"
 
-#: documents/models.py:1264
+#: documents/models.py:1267
 msgid "grant change permissions to these groups"
 msgstr "memberikan izin perubahan kepada grup ini"
 
-#: documents/models.py:1271
+#: documents/models.py:1274
 msgid "assign these custom fields"
 msgstr "tetapkan area khusus ini"
 
-#: documents/models.py:1275
+#: documents/models.py:1278
 msgid "custom field values"
-msgstr ""
+msgstr "nilai bidang khusus"
 
-#: documents/models.py:1279
+#: documents/models.py:1282
 msgid "Optional values to assign to the custom fields."
-msgstr ""
+msgstr "Nilai tambahan untuk diisi ke bidang khusus."
 
-#: documents/models.py:1288
+#: documents/models.py:1291
 msgid "remove these tag(s)"
 msgstr "Hapus tag ini"
 
-#: documents/models.py:1293
+#: documents/models.py:1296
 msgid "remove all tags"
 msgstr "hapus semua label"
 
-#: documents/models.py:1300
+#: documents/models.py:1303
 msgid "remove these document type(s)"
 msgstr "Hapus jenis dokumen ini"
 
-#: documents/models.py:1305
+#: documents/models.py:1308
 msgid "remove all document types"
 msgstr "Hapus semua tipe dokumen"
 
-#: documents/models.py:1312
+#: documents/models.py:1315
 msgid "remove these correspondent(s)"
 msgstr "hapus koresponden(-koresponden) ini"
 
-#: documents/models.py:1317
+#: documents/models.py:1320
 msgid "remove all correspondents"
 msgstr "hapus semua koresponden"
 
-#: documents/models.py:1324
+#: documents/models.py:1327
 msgid "remove these storage path(s)"
 msgstr "hapus lokasi(-lokasi) penyimpanan ini"
 
-#: documents/models.py:1329
+#: documents/models.py:1332
 msgid "remove all storage paths"
 msgstr "hapus semua lokasi penyimpanan"
 
-#: documents/models.py:1336
+#: documents/models.py:1339
 msgid "remove these owner(s)"
 msgstr "hapus pemilik(-pemilik) ini"
 
-#: documents/models.py:1341
+#: documents/models.py:1344
 msgid "remove all owners"
 msgstr "hapus semua pemilik"
 
-#: documents/models.py:1348
+#: documents/models.py:1351
 msgid "remove view permissions for these users"
 msgstr "hapus izin melihat kepada pengguna-pengguna ini"
 
-#: documents/models.py:1355
+#: documents/models.py:1358
 msgid "remove view permissions for these groups"
 msgstr "hapus izin melihat kepada grup-grup ini"
 
-#: documents/models.py:1362
+#: documents/models.py:1365
 msgid "remove change permissions for these users"
 msgstr "hapus izin mengubah kepada pengguna-pengguna ini"
 
-#: documents/models.py:1369
+#: documents/models.py:1372
 msgid "remove change permissions for these groups"
 msgstr "hapus izin mengubah kepada grup-grup ini"
 
-#: documents/models.py:1374
+#: documents/models.py:1377
 msgid "remove all permissions"
 msgstr "hapus semua izin"
 
-#: documents/models.py:1381
+#: documents/models.py:1384
 msgid "remove these custom fields"
 msgstr "hapus kolom-kolom khusus ini"
 
-#: documents/models.py:1386
+#: documents/models.py:1389
 msgid "remove all custom fields"
 msgstr "hapus semua kolom khusus"
 
-#: documents/models.py:1395
+#: documents/models.py:1398
 msgid "email"
 msgstr "surel"
 
-#: documents/models.py:1404
+#: documents/models.py:1407
 msgid "webhook"
 msgstr "webhook"
 
-#: documents/models.py:1408
+#: documents/models.py:1411
 msgid "workflow action"
 msgstr "tindakan alur kerja"
 
-#: documents/models.py:1409
+#: documents/models.py:1412
 msgid "workflow actions"
 msgstr "tindakan alur kerja"
 
-#: documents/models.py:1418 paperless_mail/models.py:145
+#: documents/models.py:1421 paperless_mail/models.py:145
 msgid "order"
 msgstr "urut"
 
-#: documents/models.py:1424
+#: documents/models.py:1427
 msgid "triggers"
 msgstr "pemicu-pemicu"
 
-#: documents/models.py:1431
+#: documents/models.py:1434
 msgid "actions"
 msgstr "tindakan"
 
-#: documents/models.py:1434 paperless_mail/models.py:154
+#: documents/models.py:1437 paperless_mail/models.py:154
 msgid "enabled"
 msgstr "diaktifkan"
 
-#: documents/models.py:1445
+#: documents/models.py:1448
 msgid "workflow"
 msgstr "alur kerja"
 
-#: documents/models.py:1449
+#: documents/models.py:1452
 msgid "workflow trigger type"
-msgstr ""
+msgstr "tipe pemicu alur kerja"
 
-#: documents/models.py:1463
+#: documents/models.py:1466
 msgid "date run"
-msgstr ""
+msgstr "tanggal dijalankan"
 
-#: documents/models.py:1469
+#: documents/models.py:1472
 msgid "workflow run"
-msgstr ""
+msgstr "jalankan alur kerja"
 
-#: documents/models.py:1470
+#: documents/models.py:1473
 msgid "workflow runs"
-msgstr ""
+msgstr "daftar jalankan alur kerja"
 
-#: documents/serialisers.py:135
+#: documents/serialisers.py:139
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Ekspresi reguler tidak sesuai: %(error)s"
 
-#: documents/serialisers.py:561
+#: documents/serialisers.py:565
 msgid "Invalid color."
 msgstr "Warna tidak sesuai."
 
-#: documents/serialisers.py:1600
+#: documents/serialisers.py:1700
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Jenis berkas %(type)s tidak didukung"
 
-#: documents/serialisers.py:1689
+#: documents/serialisers.py:1794
 msgid "Invalid variable detected."
 msgstr "Variabel ilegal terdeteksi."
 
 #: documents/templates/account/account_inactive.html:5
 msgid "Paperless-ngx account inactive"
-msgstr ""
+msgstr "Akun Paperless-ngx tidak aktif"
 
 #: documents/templates/account/account_inactive.html:9
 msgid "Account inactive."
@@ -1223,28 +1223,28 @@ msgstr "Mohon masuk."
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
 msgstr "Tidak memiliki akun? <a href=\"%(signup_url)s\">Daftar</a>"
 
-#: documents/templates/account/login.html:19
-#: documents/templates/account/signup.html:15
+#: documents/templates/account/login.html:25
+#: documents/templates/account/signup.html:22
 #: documents/templates/socialaccount/signup.html:13
 msgid "Username"
 msgstr "Nama pengguna"
 
-#: documents/templates/account/login.html:20
-#: documents/templates/account/signup.html:17
+#: documents/templates/account/login.html:26
+#: documents/templates/account/signup.html:24
 msgid "Password"
 msgstr "Kata sandi"
 
-#: documents/templates/account/login.html:30
+#: documents/templates/account/login.html:36
 #: documents/templates/mfa/authenticate.html:23
 msgid "Sign in"
 msgstr "Masuk"
 
-#: documents/templates/account/login.html:34
+#: documents/templates/account/login.html:40
 msgid "Forgot your password?"
 msgstr "Lupa kata sandi Anda?"
 
-#: documents/templates/account/login.html:45
-#: documents/templates/account/signup.html:49
+#: documents/templates/account/login.html:51
+#: documents/templates/account/signup.html:57
 msgid "or sign in via"
 msgstr "atau masuk melalui"
 
@@ -1317,21 +1317,25 @@ msgstr "Kata sandi baru sudah di set. Silakan <a href=\"%(login_url)s\">Masuk</a
 msgid "Paperless-ngx sign up"
 msgstr "Daftar Paperless-ngx"
 
-#: documents/templates/account/signup.html:10
+#: documents/templates/account/signup.html:11
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
 msgstr "Sudah memiliki akun? <a href=\"%(login_url)s\">Masuk</a>"
 
-#: documents/templates/account/signup.html:16
+#: documents/templates/account/signup.html:19
+msgid "Note: This is the first user account for this installation and will be granted superuser privileges."
+msgstr "Catatan: Ini adalah akun pengguna pertama untuk instalasi ini dan akan diberi hak superuser."
+
+#: documents/templates/account/signup.html:23
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
 msgstr "Surat elektronik (tidak wajib)"
 
-#: documents/templates/account/signup.html:18
+#: documents/templates/account/signup.html:25
 msgid "Password (again)"
 msgstr "Kata Sandi (ulang)"
 
-#: documents/templates/account/signup.html:36
+#: documents/templates/account/signup.html:43
 #: documents/templates/socialaccount/signup.html:27
 msgid "Sign up"
 msgstr "Daftar"
@@ -1350,11 +1354,11 @@ msgstr "Berikut tautan ke dokumen."
 
 #: documents/templates/mfa/authenticate.html:7
 msgid "Paperless-ngx Two-Factor Authentication"
-msgstr ""
+msgstr "Autentikasi Dua Faktor Paperless-ngx"
 
 #: documents/templates/mfa/authenticate.html:12
 msgid "Your account is protected by two-factor authentication. Please enter an authenticator code:"
-msgstr ""
+msgstr "Akun dilindungi oleh autentikasi dua faktor. Silakan masukkan kode autentikator:"
 
 #: documents/templates/mfa/authenticate.html:17
 msgid "Code"
@@ -1404,33 +1408,48 @@ msgstr "Anda akan menggunakan akun %(provider_name)s Anda untuk masuk."
 msgid "As a final step, please complete the following form:"
 msgstr "Sebagai langkah terakhir, mohon formulir berikut:"
 
+#: documents/validators.py:24
+#, python-brace-format
+msgid "Unable to parse URI {value}, missing scheme"
+msgstr "Gagal membaca URI {value}, skema tidak ditemukan"
+
+#: documents/validators.py:29
+#, python-brace-format
+msgid "Unable to parse URI {value}, missing net location or path"
+msgstr "Gagal membaca URI {value}, lokasi jaringan atau path tidak ditemukan"
+
 #: documents/validators.py:36
-msgid ", "
-msgstr ""
+msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
+msgstr "Skema URI '{parts.scheme}' tidak diizinkan. Skema yang diizinkan: {', '.join(allowed_schemes)}"
+
+#: documents/validators.py:45
+#, python-brace-format
+msgid "Unable to parse URI {value}"
+msgstr "Gagal membaca URI {value}"
 
 #: paperless/apps.py:11
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/models.py:26
 msgid "pdf"
-msgstr ""
+msgstr "pdf"
 
 #: paperless/models.py:27
 msgid "pdfa"
-msgstr ""
+msgstr "pdfa"
 
 #: paperless/models.py:28
 msgid "pdfa-1"
-msgstr ""
+msgstr "pdfa-1"
 
 #: paperless/models.py:29
 msgid "pdfa-2"
-msgstr ""
+msgstr "pdfa-2"
 
 #: paperless/models.py:30
 msgid "pdfa-3"
-msgstr ""
+msgstr "pdfa-3"
 
 #: paperless/models.py:39
 msgid "skip"
@@ -1446,7 +1465,7 @@ msgstr "paksa"
 
 #: paperless/models.py:42
 msgid "skip_noarchive"
-msgstr ""
+msgstr "lewati_tanpa_arsip"
 
 #: paperless/models.py:50
 msgid "never"
@@ -1454,7 +1473,7 @@ msgstr "tidak pernah"
 
 #: paperless/models.py:51
 msgid "with_text"
-msgstr ""
+msgstr "dengan_teks"
 
 #: paperless/models.py:52
 msgid "always"
@@ -1462,11 +1481,11 @@ msgstr "selalu"
 
 #: paperless/models.py:60
 msgid "clean"
-msgstr ""
+msgstr "bersih"
 
 #: paperless/models.py:61
 msgid "clean-final"
-msgstr ""
+msgstr "clean-final"
 
 #: paperless/models.py:62
 msgid "none"
@@ -1474,15 +1493,15 @@ msgstr "tidak ada"
 
 #: paperless/models.py:70
 msgid "LeaveColorUnchanged"
-msgstr ""
+msgstr "LeaveColorUnchanged"
 
 #: paperless/models.py:71
 msgid "RGB"
-msgstr ""
+msgstr "RGB"
 
 #: paperless/models.py:72
 msgid "UseDeviceIndependentColor"
-msgstr ""
+msgstr "UseDeviceIndependentColor"
 
 #: paperless/models.py:73
 msgid "Gray"
@@ -1490,7 +1509,7 @@ msgstr "Abu-abu"
 
 #: paperless/models.py:74
 msgid "CMYK"
-msgstr ""
+msgstr "CMYK"
 
 #: paperless/models.py:83
 msgid "Sets the output PDF type"
@@ -1518,11 +1537,11 @@ msgstr "Penyetelan nilai fallback DPI gambar"
 
 #: paperless/models.py:131
 msgid "Controls the unpaper cleaning"
-msgstr ""
+msgstr "Mengatur proses pembersihan unpaper"
 
 #: paperless/models.py:138
 msgid "Enables deskew"
-msgstr ""
+msgstr "Mengaktifkan deskew"
 
 #: paperless/models.py:141
 msgid "Enables page rotation"
@@ -1530,169 +1549,221 @@ msgstr "Membolehkan rotasi halaman"
 
 #: paperless/models.py:146
 msgid "Sets the threshold for rotation of pages"
-msgstr ""
+msgstr "Atur ambang batas rotasi halaman"
 
 #: paperless/models.py:152
 msgid "Sets the maximum image size for decompression"
-msgstr ""
+msgstr "Atur ukuran maksimum gambar untuk dekompresi"
 
 #: paperless/models.py:158
 msgid "Sets the Ghostscript color conversion strategy"
-msgstr ""
+msgstr "Atur strategi konversi warna Ghostscript"
 
 #: paperless/models.py:166
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr ""
+msgstr "Menambahkan argumen tambahan pengguna untuk OCRMyPDF"
 
-#: paperless/models.py:171
+#: paperless/models.py:175
 msgid "Application title"
 msgstr "Judul aplikasi"
 
-#: paperless/models.py:178
+#: paperless/models.py:182
 msgid "Application logo"
 msgstr "Judul aplikasi"
 
-#: paperless/models.py:188
+#: paperless/models.py:197
+msgid "Enables barcode scanning"
+msgstr "Aktifkan pemindaian barcode"
+
+#: paperless/models.py:203
+msgid "Enables barcode TIFF support"
+msgstr "Aktifkan dukungan barcode TIFF"
+
+#: paperless/models.py:209
+msgid "Sets the barcode string"
+msgstr "Atur string barcode"
+
+#: paperless/models.py:217
+msgid "Retains split pages"
+msgstr "Mempertahankan halaman yang dipisah"
+
+#: paperless/models.py:223
+msgid "Enables ASN barcode"
+msgstr "Mengaktifkan barcode ASN"
+
+#: paperless/models.py:229
+msgid "Sets the ASN barcode prefix"
+msgstr "Atur awalan barcode ASN"
+
+#: paperless/models.py:237
+msgid "Sets the barcode upscale factor"
+msgstr "Atur faktor pembesaran barcode"
+
+#: paperless/models.py:244
+msgid "Sets the barcode DPI"
+msgstr "Atur DPI barcode"
+
+#: paperless/models.py:251
+msgid "Sets the maximum pages for barcode"
+msgstr "Atur jumlah halaman maksimum untuk barcode"
+
+#: paperless/models.py:258
+msgid "Enables tag barcode"
+msgstr "Mengaktifkan barcode tag"
+
+#: paperless/models.py:264
+msgid "Sets the tag barcode mapping"
+msgstr "Atur pemetaan barcode tag"
+
+#: paperless/models.py:269
 msgid "paperless application settings"
 msgstr "pengaturan aplikasi paperless"
 
-#: paperless/settings.py:723
+#: paperless/settings.py:772
 msgid "English (US)"
 msgstr "Inggris (AS)"
 
-#: paperless/settings.py:724
+#: paperless/settings.py:773
 msgid "Arabic"
 msgstr "Arab"
 
-#: paperless/settings.py:725
+#: paperless/settings.py:774
 msgid "Afrikaans"
 msgstr "Bahasa Afrika"
 
-#: paperless/settings.py:726
+#: paperless/settings.py:775
 msgid "Belarusian"
 msgstr "Belarusia"
 
-#: paperless/settings.py:727
+#: paperless/settings.py:776
 msgid "Bulgarian"
 msgstr "Bahasa Bulgaria"
 
-#: paperless/settings.py:728
+#: paperless/settings.py:777
 msgid "Catalan"
-msgstr ""
+msgstr "Katalan"
 
-#: paperless/settings.py:729
+#: paperless/settings.py:778
 msgid "Czech"
 msgstr "Bahasa Ceko"
 
-#: paperless/settings.py:730
+#: paperless/settings.py:779
 msgid "Danish"
-msgstr ""
+msgstr "Denmark"
 
-#: paperless/settings.py:731
+#: paperless/settings.py:780
 msgid "German"
 msgstr "Jerman"
 
-#: paperless/settings.py:732
+#: paperless/settings.py:781
 msgid "Greek"
 msgstr "Yunani"
 
-#: paperless/settings.py:733
+#: paperless/settings.py:782
 msgid "English (GB)"
 msgstr "Inggris (GB)"
 
-#: paperless/settings.py:734
+#: paperless/settings.py:783
 msgid "Spanish"
 msgstr "Spanyol"
 
-#: paperless/settings.py:735
-msgid "Finnish"
-msgstr ""
+#: paperless/settings.py:784
+msgid "Persian"
+msgstr "Persia"
 
-#: paperless/settings.py:736
+#: paperless/settings.py:785
+msgid "Finnish"
+msgstr "Finlandia"
+
+#: paperless/settings.py:786
 msgid "French"
 msgstr "Prancis"
 
-#: paperless/settings.py:737
+#: paperless/settings.py:787
 msgid "Hungarian"
 msgstr "Hungaria"
 
-#: paperless/settings.py:738
+#: paperless/settings.py:788
 msgid "Italian"
 msgstr "Italia"
 
-#: paperless/settings.py:739
+#: paperless/settings.py:789
 msgid "Japanese"
 msgstr "Bahasa Jepang"
 
-#: paperless/settings.py:740
+#: paperless/settings.py:790
 msgid "Korean"
 msgstr "Bahasa Korea"
 
-#: paperless/settings.py:741
+#: paperless/settings.py:791
 msgid "Luxembourgish"
 msgstr "Luksemburg"
 
-#: paperless/settings.py:742
+#: paperless/settings.py:792
 msgid "Norwegian"
 msgstr "Norwegia"
 
-#: paperless/settings.py:743
+#: paperless/settings.py:793
 msgid "Dutch"
 msgstr "Belanda"
 
-#: paperless/settings.py:744
+#: paperless/settings.py:794
 msgid "Polish"
 msgstr "Polandia"
 
-#: paperless/settings.py:745
+#: paperless/settings.py:795
 msgid "Portuguese (Brazil)"
 msgstr "Portugis (Brasil)"
 
-#: paperless/settings.py:746
+#: paperless/settings.py:796
 msgid "Portuguese"
 msgstr "Portugis"
 
-#: paperless/settings.py:747
+#: paperless/settings.py:797
 msgid "Romanian"
 msgstr "Rumania"
 
-#: paperless/settings.py:748
+#: paperless/settings.py:798
 msgid "Russian"
 msgstr "Rusia"
 
-#: paperless/settings.py:749
+#: paperless/settings.py:799
 msgid "Slovak"
 msgstr "Slovakia"
 
-#: paperless/settings.py:750
+#: paperless/settings.py:800
 msgid "Slovenian"
 msgstr "Slovenia"
 
-#: paperless/settings.py:751
+#: paperless/settings.py:801
 msgid "Serbian"
 msgstr "Serbia"
 
-#: paperless/settings.py:752
+#: paperless/settings.py:802
 msgid "Swedish"
 msgstr "Swedia"
 
-#: paperless/settings.py:753
+#: paperless/settings.py:803
 msgid "Turkish"
 msgstr "Turki"
 
-#: paperless/settings.py:754
+#: paperless/settings.py:804
 msgid "Ukrainian"
 msgstr "Ukraina"
 
-#: paperless/settings.py:755
+#: paperless/settings.py:805
+msgid "Vietnamese"
+msgstr "Vietnam"
+
+#: paperless/settings.py:806
 msgid "Chinese Simplified"
 msgstr "Mandarin Sederhana"
 
-#: paperless/settings.py:756
+#: paperless/settings.py:807
 msgid "Chinese Traditional"
-msgstr ""
+msgstr "Tionghoa Tradisional"
 
-#: paperless/urls.py:374
+#: paperless/urls.py:368
 msgid "Paperless-ngx administration"
 msgstr "Administrasi Paperless-ngx"
 
@@ -1726,7 +1797,7 @@ msgstr "Metadata"
 
 #: paperless_mail/admin.py:92
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr ""
+msgstr "Berikan metadata ke dokumen yang dikenai aturan ini secara otomatis. Jika tidak memberikan tag, tipe, atau pengirim di sini, Paperless tetap akan memproses semua aturan yang cocok yang telah ditentukan."
 
 #: paperless_mail/apps.py:11
 msgid "Paperless mail"
@@ -1754,15 +1825,15 @@ msgstr "Gunakan STARTTLS"
 
 #: paperless_mail/models.py:19
 msgid "IMAP"
-msgstr ""
+msgstr "IMAP"
 
 #: paperless_mail/models.py:20
 msgid "Gmail OAuth"
-msgstr ""
+msgstr "Gmail Oauth"
 
 #: paperless_mail/models.py:21
 msgid "Outlook OAuth"
-msgstr ""
+msgstr "Outlook Oauth"
 
 #: paperless_mail/models.py:25
 msgid "IMAP server"
@@ -1802,19 +1873,19 @@ msgstr "Set karakter yang akan digunakan saat berkomunikasi dengan server email,
 
 #: paperless_mail/models.py:60
 msgid "account type"
-msgstr ""
+msgstr "tipe akun"
 
 #: paperless_mail/models.py:66
 msgid "refresh token"
-msgstr ""
+msgstr "refresh token"
 
 #: paperless_mail/models.py:70
 msgid "The refresh token to use for token authentication e.g. with oauth2."
-msgstr ""
+msgstr "Refresh token yang digunakan untuk autentikasi token, misalnya dengan oauth2."
 
 #: paperless_mail/models.py:79
 msgid "The expiration date of the refresh token. "
-msgstr ""
+msgstr "Tanggal kedaluwarsa refresh token. "
 
 #: paperless_mail/models.py:89
 msgid "mail rule"
@@ -1842,23 +1913,23 @@ msgstr "Memproses semua file, termasuk lampiran."
 
 #: paperless_mail/models.py:119
 msgid "System default"
-msgstr ""
+msgstr "Default sistem"
 
 #: paperless_mail/models.py:120
 msgid "Text, then HTML"
-msgstr ""
+msgstr "Teks, lalu HTML"
 
 #: paperless_mail/models.py:121
 msgid "HTML, then text"
-msgstr ""
+msgstr "HTML, lalu teks"
 
 #: paperless_mail/models.py:122
 msgid "HTML only"
-msgstr ""
+msgstr "Hanya HTML"
 
 #: paperless_mail/models.py:123
 msgid "Text only"
-msgstr ""
+msgstr "Hanya teks"
 
 #: paperless_mail/models.py:126
 msgid "Delete"
@@ -1970,7 +2041,7 @@ msgstr "cakupan konsumsi"
 
 #: paperless_mail/models.py:241
 msgid "pdf layout"
-msgstr ""
+msgstr "tata letak pdf"
 
 #: paperless_mail/models.py:247
 msgid "action"

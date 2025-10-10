@@ -16,5 +16,6 @@ def tesseract_consumer_declaration(sender, **kwargs):
             "image/gif": ".gif",
             "image/bmp": ".bmp",
             "image/webp": ".webp",
+            "image/heic": ".heic",
         },
     }

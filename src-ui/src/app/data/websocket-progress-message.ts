@@ -7,4 +7,6 @@ export interface WebsocketProgressMessage {
   message?: string
   document_id: number
   owner_id?: number
+  users_can_view?: number[]
+  groups_can_view?: number[]
 }

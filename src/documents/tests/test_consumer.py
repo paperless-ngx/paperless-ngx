@@ -1,14 +1,11 @@
 import datetime
-import os
 import shutil
 import stat
 import tempfile
-import zoneinfo
 from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
 
-from dateutil import tz
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
@@ -68,7 +65,7 @@ class CopyParser(_BaseTestParser):
 
     def parse(self, document_path, mime_type, file_name=None):
         self.text = "The text"
-        self.archive_path = os.path.join(self.tempdir, "archive.pdf")
+        self.archive_path = Path(self.tempdir / "archive.pdf")
         shutil.copy(document_path, self.archive_path)
 
 
@@ -98,15 +95,16 @@ class FaultyGenericExceptionParser(_BaseTestParser):
 
 def fake_magic_from_file(file, *, mime=False):
     if mime:
-        if file.name.startswith("invalid_pdf"):
+        filepath = Path(file)
+        if filepath.name.startswith("invalid_pdf"):
             return "application/octet-stream"
-        if os.path.splitext(file)[1] == ".pdf":
+        if filepath.suffix == ".pdf":
             return "application/pdf"
-        elif os.path.splitext(file)[1] == ".png":
+        elif filepath.suffix == ".png":
             return "image/png"
-        elif os.path.splitext(file)[1] == ".webp":
+        elif filepath.suffix == ".webp":
             return "image/webp"
-        elif os.path.splitext(file)[1] == ".eml":
+        elif filepath.suffix == ".eml":
             return "message/rfc822"
         else:
             return "unknown"
@@ -227,7 +225,7 @@ class TestConsumer(
         self.assertEqual(document.content, "The Text")
         self.assertEqual(
             document.title,
-            os.path.splitext(os.path.basename(filename))[0],
+            Path(filename).stem,
         )
         self.assertIsNone(document.correspondent)
         self.assertIsNone(document.document_type)
@@ -247,27 +245,16 @@ class TestConsumer(
 
         self._assert_first_last_send_progress()
 
-        # Convert UTC time from DB to local time
-        document_date_local = timezone.localtime(document.created)
-
-        self.assertEqual(
-            document_date_local.tzinfo,
-            zoneinfo.ZoneInfo("America/Chicago"),
-        )
-        self.assertEqual(document_date_local.tzinfo, rough_create_date_local.tzinfo)
-        self.assertEqual(document_date_local.year, rough_create_date_local.year)
-        self.assertEqual(document_date_local.month, rough_create_date_local.month)
-        self.assertEqual(document_date_local.day, rough_create_date_local.day)
-        self.assertEqual(document_date_local.hour, rough_create_date_local.hour)
-        self.assertEqual(document_date_local.minute, rough_create_date_local.minute)
-        # Skipping seconds and more precise
+        self.assertEqual(document.created.year, rough_create_date_local.year)
+        self.assertEqual(document.created.month, rough_create_date_local.month)
+        self.assertEqual(document.created.day, rough_create_date_local.day)
 
     @override_settings(FILENAME_FORMAT=None)
     def testDeleteMacFiles(self):
         # https://github.com/jonaswinkler/paperless-ng/discussions/1037
 
         filename = self.get_test_file()
-        shadow_file = os.path.join(self.dirs.scratch_dir, "._sample.pdf")
+        shadow_file = Path(self.dirs.scratch_dir) / "._sample.pdf"
 
         shutil.copy(filename, shadow_file)
 
@@ -497,8 +484,8 @@ class TestConsumer(
         self._assert_first_last_send_progress()
 
     def testNotAFile(self):
-        with self.get_consumer(Path("non-existing-file")) as consumer:
-            with self.assertRaisesMessage(ConsumerError, "File not found"):
+        with self.assertRaisesMessage(ConsumerError, "File not found"):
+            with self.get_consumer(Path("non-existing-file")) as consumer:
                 consumer.run()
         self._assert_first_last_send_progress(last_status="FAILED")
 
@@ -506,8 +493,8 @@ class TestConsumer(
         with self.get_consumer(self.get_test_file()) as consumer:
             consumer.run()
 
-        with self.get_consumer(self.get_test_file()) as consumer:
-            with self.assertRaisesMessage(ConsumerError, "It is a duplicate"):
+        with self.assertRaisesMessage(ConsumerError, "It is a duplicate"):
+            with self.get_consumer(self.get_test_file()) as consumer:
                 consumer.run()
 
         self._assert_first_last_send_progress(last_status="FAILED")
@@ -516,8 +503,8 @@ class TestConsumer(
         with self.get_consumer(self.get_test_file()) as consumer:
             consumer.run()
 
-        with self.get_consumer(self.get_test_archive_file()) as consumer:
-            with self.assertRaisesMessage(ConsumerError, "It is a duplicate"):
+        with self.assertRaisesMessage(ConsumerError, "It is a duplicate"):
+            with self.get_consumer(self.get_test_archive_file()) as consumer:
                 consumer.run()
 
         self._assert_first_last_send_progress(last_status="FAILED")
@@ -534,8 +521,8 @@ class TestConsumer(
 
         Document.objects.all().delete()
 
-        with self.get_consumer(self.get_test_file()) as consumer:
-            with self.assertRaisesMessage(ConsumerError, "document is in the trash"):
+        with self.assertRaisesMessage(ConsumerError, "document is in the trash"):
+            with self.get_consumer(self.get_test_file()) as consumer:
                 consumer.run()
 
     def testAsnExists(self):
@@ -545,11 +532,11 @@ class TestConsumer(
         ) as consumer:
             consumer.run()
 
-        with self.get_consumer(
-            self.get_test_file2(),
-            DocumentMetadataOverrides(asn=123),
-        ) as consumer:
-            with self.assertRaisesMessage(ConsumerError, "ASN 123 already exists"):
+        with self.assertRaisesMessage(ConsumerError, "ASN 123 already exists"):
+            with self.get_consumer(
+                self.get_test_file2(),
+                DocumentMetadataOverrides(asn=123),
+            ) as consumer:
                 consumer.run()
 
     def testAsnExistsInTrash(self):
@@ -562,22 +549,22 @@ class TestConsumer(
             document = Document.objects.first()
             document.delete()
 
-        with self.get_consumer(
-            self.get_test_file2(),
-            DocumentMetadataOverrides(asn=123),
-        ) as consumer:
-            with self.assertRaisesMessage(ConsumerError, "document is in the trash"):
+        with self.assertRaisesMessage(ConsumerError, "document is in the trash"):
+            with self.get_consumer(
+                self.get_test_file2(),
+                DocumentMetadataOverrides(asn=123),
+            ) as consumer:
                 consumer.run()
 
     @mock.patch("documents.parsers.document_consumer_declaration.send")
     def testNoParsers(self, m):
         m.return_value = []
 
-        with self.get_consumer(self.get_test_file()) as consumer:
-            with self.assertRaisesMessage(
-                ConsumerError,
-                "sample.pdf: Unsupported mime type application/pdf",
-            ):
+        with self.assertRaisesMessage(
+            ConsumerError,
+            "sample.pdf: Unsupported mime type application/pdf",
+        ):
+            with self.get_consumer(self.get_test_file()) as consumer:
                 consumer.run()
 
         self._assert_first_last_send_progress(last_status="FAILED")
@@ -739,8 +726,8 @@ class TestConsumer(
         dst = self.get_test_file()
         self.assertIsFile(dst)
 
-        with self.get_consumer(dst) as consumer:
-            with self.assertRaises(ConsumerError):
+        with self.assertRaises(ConsumerError):
+            with self.get_consumer(dst) as consumer:
                 consumer.run()
 
         self.assertIsNotFile(dst)
@@ -764,11 +751,11 @@ class TestConsumer(
         dst = self.get_test_file()
         self.assertIsFile(dst)
 
-        with self.get_consumer(dst) as consumer:
-            with self.assertRaisesRegex(
-                ConsumerError,
-                r"sample\.pdf: Not consuming sample\.pdf: It is a duplicate of sample \(#\d+\)",
-            ):
+        with self.assertRaisesRegex(
+            ConsumerError,
+            r"sample\.pdf: Not consuming sample\.pdf: It is a duplicate of sample \(#\d+\)",
+        ):
+            with self.get_consumer(dst) as consumer:
                 consumer.run()
 
         self.assertIsFile(dst)
@@ -931,7 +918,7 @@ class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
 
         self.assertEqual(
             document.created,
-            datetime.datetime(1996, 2, 20, tzinfo=tz.gettz(settings.TIME_ZONE)),
+            datetime.date(1996, 2, 20),
         )
 
     @override_settings(FILENAME_DATE_ORDER="YMD")
@@ -961,7 +948,7 @@ class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
 
         self.assertEqual(
             document.created,
-            datetime.datetime(2022, 2, 1, tzinfo=tz.gettz(settings.TIME_ZONE)),
+            datetime.date(2022, 2, 1),
         )
 
     def test_consume_date_filename_date_use_content(self):
@@ -991,7 +978,7 @@ class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
 
         self.assertEqual(
             document.created,
-            datetime.datetime(1996, 2, 20, tzinfo=tz.gettz(settings.TIME_ZONE)),
+            datetime.date(1996, 2, 20),
         )
 
     @override_settings(
@@ -1023,7 +1010,7 @@ class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
 
         self.assertEqual(
             document.created,
-            datetime.datetime(1997, 2, 20, tzinfo=tz.gettz(settings.TIME_ZONE)),
+            datetime.date(1997, 2, 20),
         )
 
 
@@ -1095,8 +1082,8 @@ class PreConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                 outfile.write("echo This message goes to stderr >&2")
 
             # Make the file executable
-            st = os.stat(script.name)
-            os.chmod(script.name, st.st_mode | stat.S_IEXEC)
+            st = Path(script.name).stat()
+            Path(script.name).chmod(st.st_mode | stat.S_IEXEC)
 
             with override_settings(PRE_CONSUME_SCRIPT=script.name):
                 with self.assertLogs("paperless.consumer", level="INFO") as cm:
@@ -1127,8 +1114,8 @@ class PreConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                 outfile.write("exit 100\n")
 
             # Make the file executable
-            st = os.stat(script.name)
-            os.chmod(script.name, st.st_mode | stat.S_IEXEC)
+            st = Path(script.name).stat()
+            Path(script.name).chmod(st.st_mode | stat.S_IEXEC)
 
             with override_settings(PRE_CONSUME_SCRIPT=script.name):
                 with self.get_consumer(self.test_file) as c:
@@ -1187,12 +1174,16 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                 m.assert_called_once()
 
     @mock.patch("documents.consumer.run_subprocess")
-    def test_post_consume_script_with_correspondent(self, m):
+    def test_post_consume_script_with_correspondent_and_type(self, m):
         with tempfile.NamedTemporaryFile() as script:
             with override_settings(POST_CONSUME_SCRIPT=script.name):
                 c = Correspondent.objects.create(name="my_bank")
+                t = DocumentType.objects.create(
+                    name="Test type",
+                )
                 doc = Document.objects.create(
                     title="Test",
+                    document_type=t,
                     mime_type="application/pdf",
                     correspondent=c,
                 )
@@ -1220,6 +1211,7 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
 
                 subset = {
                     "DOCUMENT_ID": str(doc.pk),
+                    "DOCUMENT_TYPE": "Test type",
                     "DOCUMENT_DOWNLOAD_URL": f"/api/documents/{doc.pk}/download/",
                     "DOCUMENT_THUMBNAIL_URL": f"/api/documents/{doc.pk}/thumb/",
                     "DOCUMENT_CORRESPONDENT": "my_bank",
@@ -1245,8 +1237,8 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                 outfile.write("exit -500\n")
 
             # Make the file executable
-            st = os.stat(script.name)
-            os.chmod(script.name, st.st_mode | stat.S_IEXEC)
+            st = Path(script.name).stat()
+            Path(script.name).chmod(st.st_mode | stat.S_IEXEC)
 
             with override_settings(POST_CONSUME_SCRIPT=script.name):
                 doc = Document.objects.create(title="Test", mime_type="application/pdf")

@@ -9,25 +9,57 @@ declare -r media_root_dir="${PAPERLESS_MEDIA_ROOT:-/usr/src/paperless/media}"
 declare -r consume_dir="${PAPERLESS_CONSUMPTION_DIR:-/usr/src/paperless/consume}"
 declare -r tmp_dir="${PAPERLESS_SCRATCH_DIR:=/tmp/paperless}"
 
-echo "${log_prefix} Checking for folder existence"
+declare -r main_dirs=(
+	"${export_dir}"
+	"${data_dir}"
+	"${media_root_dir}"
+	"${consume_dir}"
+	"${tmp_dir}"
+)
 
-for dir in \
-	"${export_dir}" \
-	"${data_dir}" "${data_dir}/index" \
-	"${media_root_dir}" "${media_root_dir}/documents" "${media_root_dir}/documents/originals" "${media_root_dir}/documents/thumbnails" \
-	"${consume_dir}" \
-	"${tmp_dir}"; do
-	if [[ ! -d "${dir}" ]]; then
-		mkdir --parents --verbose "${dir}"
-	fi
-done
+declare -r extra_dirs=(
+	"${main_dirs[@]}"
+	"${data_dir}/index"
+	"${media_root_dir}/documents"
+	"${media_root_dir}/documents/originals"
+	"${media_root_dir}/documents/thumbnails"
+)
 
-echo "${log_prefix} Adjusting file and folder permissions"
-for dir in \
-	"${export_dir}" \
-	"${data_dir}" \
-	"${media_root_dir}" \
-	"${consume_dir}" \
-	"${tmp_dir}"; do
-	find "${dir}" -not \( -user paperless -and -group paperless \) -exec chown --changes paperless:paperless {} +
-done
+if [[ -n "${USER_IS_NON_ROOT}" ]]; then
+	# Non-root mode: Create directories as current user, warn about permission issues
+	echo "${log_prefix} Running in non-root mode, checking directories"
+	current_uid=$(id --user)
+	current_gid=$(id --group)
+
+	for dir in "${extra_dirs[@]}"; do
+		if [[ ! -d "${dir}" ]]; then
+			mkdir --parents --verbose "${dir}" || echo "${log_prefix} WARNING: Could not create ${dir} - permission denied"
+		fi
+		# Check permissions on existing directories too
+		if [[ -d "${dir}" && ! -w "${dir}" ]]; then
+			echo "${log_prefix} WARNING: No write permission to ${dir}"
+		fi
+	done
+
+	# Warn about ownership issues
+	for dir in "${main_dirs[@]}"; do
+		if [[ -d "${dir}" ]]; then
+			find "${dir}" -not \( -user ${current_uid} -and -group ${current_gid} \) -exec echo "${log_prefix} WARNING: Permission issue on {}: not owned by current user (${current_uid}:${current_gid})" \; 2>/dev/null || echo "${log_prefix} WARNING: Cannot check permissions on ${dir}"
+		fi
+	done
+else
+	# Root mode: Create and fix permissions as needed
+	echo "${log_prefix} Running with root privileges, adjusting directories and permissions"
+
+	# First create directories
+	for dir in "${extra_dirs[@]}"; do
+		if [[ ! -d "${dir}" ]]; then
+			mkdir --parents --verbose "${dir}"
+		fi
+	done
+
+	# Then fix permissions on all directories
+	for dir in "${main_dirs[@]}"; do
+		find "${dir}" -not \( -user paperless -and -group paperless \) -exec chown --changes paperless:paperless {} +
+	done
+fi

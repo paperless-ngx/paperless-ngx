@@ -1,4 +1,5 @@
 import shutil
+from datetime import date
 from pathlib import Path
 from unittest import mock
 
@@ -39,18 +40,24 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         self.dt2 = DocumentType.objects.create(name="dt2")
         self.t1 = Tag.objects.create(name="t1")
         self.t2 = Tag.objects.create(name="t2")
-        self.doc1 = Document.objects.create(checksum="A", title="A")
+        self.doc1 = Document.objects.create(
+            checksum="A",
+            title="A",
+            created=date(2023, 1, 1),
+        )
         self.doc2 = Document.objects.create(
             checksum="B",
             title="B",
             correspondent=self.c1,
             document_type=self.dt1,
+            created=date(2023, 1, 2),
         )
         self.doc3 = Document.objects.create(
             checksum="C",
             title="C",
             correspondent=self.c2,
             document_type=self.dt2,
+            created=date(2023, 1, 3),
         )
         self.doc4 = Document.objects.create(checksum="D", title="D")
         self.doc5 = Document.objects.create(checksum="E", title="E")
@@ -336,6 +343,35 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             self.doc2.custom_fields.filter(field=cf3).first().value,
         )
 
+    def test_modify_custom_fields_doclink_self_link(self):
+        """
+        GIVEN:
+            - 2 existing documents
+            - Existing doc link custom field
+        WHEN:
+            - Doc link field is modified to include self link
+        THEN:
+            - Self link should not be created
+        """
+        cf = CustomField.objects.create(
+            name="cf",
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        )
+        bulk_edit.modify_custom_fields(
+            [self.doc1.id, self.doc2.id],
+            add_custom_fields={cf.id: [self.doc1.id]},
+            remove_custom_fields=[],
+        )
+
+        self.assertEqual(
+            self.doc1.custom_fields.first().value,
+            [self.doc2.id],
+        )
+        self.assertEqual(
+            self.doc2.custom_fields.first().value,
+            [self.doc1.id],
+        )
+
     def test_delete(self):
         self.assertEqual(Document.objects.count(), 5)
         bulk_edit.delete([self.doc1.id, self.doc2.id])
@@ -500,6 +536,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             filename=sample2,
             mime_type="application/pdf",
             page_count=8,
+            created=date(2023, 1, 2),
         )
         self.doc2.archive_filename = sample2_archive
         self.doc2.save()
@@ -528,6 +565,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             title="D",
             filename=img_doc,
             mime_type="image/jpeg",
+            created=date(2023, 1, 3),
         )
         self.img_doc.archive_filename = img_doc_archive
         self.img_doc.save()
@@ -871,3 +909,156 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             expected_str = "Error deleting pages from document"
             self.assertIn(expected_str, error_str)
             mock_update_archive_file.assert_not_called()
+
+    @mock.patch("documents.bulk_edit.group")
+    @mock.patch("documents.tasks.consume_file.s")
+    def test_edit_pdf_basic_operations(self, mock_consume_file, mock_group):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - edit_pdf is called with two operations to split the doc and rotate pages
+        THEN:
+            - A grouped task is generated and delay() is called
+        """
+        mock_group.return_value.delay.return_value = None
+        doc_ids = [self.doc2.id]
+        operations = [{"page": 1, "doc": 0}, {"page": 2, "doc": 1, "rotate": 90}]
+
+        result = bulk_edit.edit_pdf(doc_ids, operations)
+        self.assertEqual(result, "OK")
+        mock_group.return_value.delay.assert_called_once()
+
+    @mock.patch("documents.bulk_edit.group")
+    @mock.patch("documents.tasks.consume_file.s")
+    def test_edit_pdf_with_user_override(self, mock_consume_file, mock_group):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - edit_pdf is called with user override
+        THEN:
+            - Task is created with user context
+        """
+        mock_group.return_value.delay.return_value = None
+        doc_ids = [self.doc2.id]
+        operations = [{"page": 1, "doc": 0}, {"page": 2, "doc": 1}]
+        user = User.objects.create(username="editor")
+
+        result = bulk_edit.edit_pdf(doc_ids, operations, user=user)
+        self.assertEqual(result, "OK")
+        mock_group.return_value.delay.assert_called_once()
+
+    @mock.patch("documents.bulk_edit.chord")
+    @mock.patch("documents.tasks.consume_file.s")
+    def test_edit_pdf_with_delete_original(self, mock_consume_file, mock_chord):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - edit_pdf is called with delete_original=True
+        THEN:
+            - Task group is triggered
+        """
+        mock_chord.return_value.delay.return_value = None
+        doc_ids = [self.doc2.id]
+        operations = [{"page": 1}, {"page": 2}]
+
+        result = bulk_edit.edit_pdf(doc_ids, operations, delete_original=True)
+        self.assertEqual(result, "OK")
+        mock_chord.assert_called_once()
+
+    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.delay")
+    def test_edit_pdf_with_update_document(self, mock_update_document):
+        """
+        GIVEN:
+            - A single existing PDF document
+        WHEN:
+            - edit_pdf is called with update_document=True and a single output
+        THEN:
+            - The original document is updated in-place
+            - The update_document_content_maybe_archive_file task is triggered
+        """
+        doc_ids = [self.doc2.id]
+        operations = [{"page": 1}, {"page": 2}]
+        original_checksum = self.doc2.checksum
+        original_page_count = self.doc2.page_count
+
+        result = bulk_edit.edit_pdf(
+            doc_ids,
+            operations=operations,
+            update_document=True,
+            delete_original=False,
+        )
+
+        self.assertEqual(result, "OK")
+        self.doc2.refresh_from_db()
+        self.assertNotEqual(self.doc2.checksum, original_checksum)
+        self.assertNotEqual(self.doc2.page_count, original_page_count)
+        mock_update_document.assert_called_once_with(document_id=self.doc2.id)
+
+    @mock.patch("documents.bulk_edit.group")
+    @mock.patch("documents.tasks.consume_file.s")
+    def test_edit_pdf_without_metadata(self, mock_consume_file, mock_group):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - edit_pdf is called with include_metadata=False
+        THEN:
+            - Tasks are created with empty metadata
+        """
+        mock_group.return_value.delay.return_value = None
+        doc_ids = [self.doc2.id]
+        operations = [{"page": 1}]
+
+        result = bulk_edit.edit_pdf(doc_ids, operations, include_metadata=False)
+        self.assertEqual(result, "OK")
+        mock_group.return_value.delay.assert_called_once()
+
+    @mock.patch("documents.bulk_edit.group")
+    @mock.patch("documents.tasks.consume_file.s")
+    def test_edit_pdf_open_failure(self, mock_consume_file, mock_group):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - edit_pdf fails to open PDF
+        THEN:
+            - Task group is not called
+        """
+        doc_ids = [self.doc2.id]
+        operations = [
+            {"page": 9999},  # invalid page, forces error during PDF load
+        ]
+        with self.assertLogs("paperless.bulk_edit", level="ERROR"):
+            with self.assertRaises(Exception):
+                bulk_edit.edit_pdf(doc_ids, operations)
+        mock_group.assert_not_called()
+        mock_consume_file.assert_not_called()
+
+    @mock.patch("documents.bulk_edit.group")
+    @mock.patch("documents.tasks.consume_file.s")
+    def test_edit_pdf_multiple_outputs_with_update_flag_errors(
+        self,
+        mock_consume_file,
+        mock_group,
+    ):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - edit_pdf is called with multiple outputs and update_document=True
+        THEN:
+            - An error is logged and task group is not called
+        """
+        doc_ids = [self.doc2.id]
+        operations = [
+            {"page": 1, "doc": 0},
+            {"page": 2, "doc": 1},
+        ]
+        with self.assertLogs("paperless.bulk_edit", level="ERROR"):
+            with self.assertRaises(ValueError):
+                bulk_edit.edit_pdf(doc_ids, operations, update_document=True)
+        mock_group.assert_not_called()
+        mock_consume_file.assert_not_called()

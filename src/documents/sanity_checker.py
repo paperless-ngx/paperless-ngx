@@ -12,6 +12,7 @@ from tqdm import tqdm
 
 from documents.models import Document
 from documents.models import PaperlessTask
+from paperless.config import GeneralConfig
 
 
 class SanityCheckMessages:
@@ -81,6 +82,13 @@ def check_sanity(*, progress=False, scheduled=True) -> SanityCheckMessages:
     lockfile = Path(settings.MEDIA_LOCK).resolve()
     if lockfile in present_files:
         present_files.remove(lockfile)
+
+    general_config = GeneralConfig()
+    app_logo = general_config.app_logo or settings.APP_LOGO
+    if app_logo:
+        logo_file = Path(settings.MEDIA_ROOT / Path(app_logo.lstrip("/"))).resolve()
+        if logo_file in present_files:
+            present_files.remove(logo_file)
 
     for doc in tqdm(Document.global_objects.all(), disable=not progress):
         # Check sanity of the thumbnail

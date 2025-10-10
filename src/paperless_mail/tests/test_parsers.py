@@ -665,7 +665,7 @@ class TestParser:
         assert str(request.url) == "http://localhost:3000/forms/chromium/convert/html"
 
     @pytest.mark.httpx_mock(can_send_already_matched_responses=True)
-    @mock.patch("gotenberg_client._merge.MergeRoute.merge")
+    @mock.patch("gotenberg_client._merge.routes.SyncMergePdfsRoute.merge")
     @mock.patch("paperless_mail.models.MailRule.objects.get")
     def test_generate_pdf_layout_options(
         self,

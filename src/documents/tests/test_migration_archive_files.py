@@ -1,6 +1,5 @@
 import hashlib
 import importlib
-import os
 import shutil
 from pathlib import Path
 from unittest import mock
@@ -20,22 +19,22 @@ migration_1012_obj = importlib.import_module(
 )
 
 
-def archive_name_from_filename(filename):
-    return os.path.splitext(filename)[0] + ".pdf"
+def archive_name_from_filename(filename: Path) -> Path:
+    return Path(filename.stem + ".pdf")
 
 
-def archive_path_old(self):
+def archive_path_old(self) -> Path:
     if self.filename:
-        fname = archive_name_from_filename(self.filename)
+        fname = archive_name_from_filename(Path(self.filename))
     else:
-        fname = f"{self.pk:07}.pdf"
+        fname = Path(f"{self.pk:07}.pdf")
 
-    return os.path.join(settings.ARCHIVE_DIR, fname)
+    return Path(settings.ARCHIVE_DIR) / fname
 
 
 def archive_path_new(doc):
     if doc.archive_filename is not None:
-        return os.path.join(settings.ARCHIVE_DIR, str(doc.archive_filename))
+        return Path(settings.ARCHIVE_DIR) / str(doc.archive_filename)
     else:
         return None
 
@@ -48,7 +47,7 @@ def source_path(doc):
         if doc.storage_type == STORAGE_TYPE_GPG:
             fname += ".gpg"  # pragma: no cover
 
-    return os.path.join(settings.ORIGINALS_DIR, fname)
+    return Path(settings.ORIGINALS_DIR) / fname
 
 
 def thumbnail_path(doc):
@@ -56,7 +55,7 @@ def thumbnail_path(doc):
     if doc.storage_type == STORAGE_TYPE_GPG:
         file_name += ".gpg"
 
-    return os.path.join(settings.THUMBNAIL_DIR, file_name)
+    return Path(settings.THUMBNAIL_DIR) / file_name
 
 
 def make_test_document(
@@ -76,7 +75,7 @@ def make_test_document(
     doc.save()
 
     shutil.copy2(original, source_path(doc))
-    with open(original, "rb") as f:
+    with Path(original).open("rb") as f:
         doc.checksum = hashlib.md5(f.read()).hexdigest()
 
     if archive:
@@ -86,7 +85,7 @@ def make_test_document(
         else:
             shutil.copy2(archive, archive_path_old(doc))
 
-        with open(archive, "rb") as f:
+        with Path(archive).open("rb") as f:
             doc.archive_checksum = hashlib.md5(f.read()).hexdigest()
 
     doc.save()
@@ -96,25 +95,17 @@ def make_test_document(
     return doc
 
 
-simple_jpg = os.path.join(os.path.dirname(__file__), "samples", "simple.jpg")
-simple_pdf = os.path.join(os.path.dirname(__file__), "samples", "simple.pdf")
-simple_pdf2 = os.path.join(
-    os.path.dirname(__file__),
-    "samples",
-    "documents",
-    "originals",
-    "0000002.pdf",
+simple_jpg = Path(__file__).parent / "samples" / "simple.jpg"
+simple_pdf = Path(__file__).parent / "samples" / "simple.pdf"
+simple_pdf2 = (
+    Path(__file__).parent / "samples" / "documents" / "originals" / "0000002.pdf"
 )
-simple_pdf3 = os.path.join(
-    os.path.dirname(__file__),
-    "samples",
-    "documents",
-    "originals",
-    "0000003.pdf",
+simple_pdf3 = (
+    Path(__file__).parent / "samples" / "documents" / "originals" / "0000003.pdf"
 )
-simple_txt = os.path.join(os.path.dirname(__file__), "samples", "simple.txt")
-simple_png = os.path.join(os.path.dirname(__file__), "samples", "simple-noalpha.png")
-simple_png2 = os.path.join(os.path.dirname(__file__), "examples", "no-text.png")
+simple_txt = Path(__file__).parent / "samples" / "simple.txt"
+simple_png = Path(__file__).parent / "samples" / "simple-noalpha.png"
+simple_png2 = Path(__file__).parent / "examples" / "no-text.png"
 
 
 @override_settings(FILENAME_FORMAT="")
@@ -198,13 +189,13 @@ class TestMigrateArchiveFiles(DirectoriesMixin, FileSystemAssertsMixin, TestMigr
             else:
                 self.assertIsNone(doc.archive_filename)
 
-            with open(source_path(doc), "rb") as f:
+            with Path(source_path(doc)).open("rb") as f:
                 original_checksum = hashlib.md5(f.read()).hexdigest()
             self.assertEqual(original_checksum, doc.checksum)
 
             if doc.archive_checksum:
                 self.assertIsFile(archive_path_new(doc))
-                with open(archive_path_new(doc), "rb") as f:
+                with archive_path_new(doc).open("rb") as f:
                     archive_checksum = hashlib.md5(f.read()).hexdigest()
                 self.assertEqual(archive_checksum, doc.archive_checksum)
 
@@ -301,7 +292,7 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
             "clash.pdf",
             simple_pdf,
         )
-        os.unlink(archive_path_old(doc))
+        archive_path_old(doc).unlink()
 
         self.assertRaisesMessage(
             ValueError,
@@ -494,13 +485,13 @@ class TestMigrateArchiveFilesBackwards(
         for doc in Document.objects.all():
             if doc.archive_checksum:
                 self.assertIsFile(archive_path_old(doc))
-            with open(source_path(doc), "rb") as f:
+            with Path(source_path(doc)).open("rb") as f:
                 original_checksum = hashlib.md5(f.read()).hexdigest()
             self.assertEqual(original_checksum, doc.checksum)
 
             if doc.archive_checksum:
                 self.assertIsFile(archive_path_old(doc))
-                with open(archive_path_old(doc), "rb") as f:
+                with archive_path_old(doc).open("rb") as f:
                     archive_checksum = hashlib.md5(f.read()).hexdigest()
                 self.assertEqual(archive_checksum, doc.archive_checksum)
 

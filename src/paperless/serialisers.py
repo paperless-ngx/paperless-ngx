@@ -1,9 +1,11 @@
 import logging
 
+import magic
 from allauth.mfa.adapter import get_adapter as get_mfa_adapter
 from allauth.mfa.models import Authenticator
 from allauth.mfa.totp.internal.auth import TOTP
 from allauth.socialaccount.models import SocialAccount
+from allauth.socialaccount.models import SocialApp
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
@@ -11,6 +13,7 @@ from rest_framework import serializers
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 
 from paperless.models import ApplicationConfiguration
+from paperless.validators import reject_dangerous_svg
 from paperless_mail.serialisers import ObfuscatedPasswordField
 
 logger = logging.getLogger("paperless.settings")
@@ -146,8 +149,11 @@ class SocialAccountSerializer(serializers.ModelSerializer):
             "name",
         )
 
-    def get_name(self, obj) -> str:
-        return obj.get_provider_account().to_str()
+    def get_name(self, obj: SocialAccount) -> str:
+        try:
+            return obj.get_provider_account().to_str()
+        except SocialApp.DoesNotExist:
+            return "Unknown App"
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -185,11 +191,14 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class ApplicationConfigurationSerializer(serializers.ModelSerializer):
     user_args = serializers.JSONField(binary=True, allow_null=True)
+    barcode_tag_mapping = serializers.JSONField(binary=True, allow_null=True)
 
     def run_validation(self, data):
         # Empty strings treated as None to avoid unexpected behavior
         if "user_args" in data and data["user_args"] == "":
             data["user_args"] = None
+        if "barcode_tag_mapping" in data and data["barcode_tag_mapping"] == "":
+            data["barcode_tag_mapping"] = None
         if "language" in data and data["language"] == "":
             data["language"] = None
         return super().run_validation(data)
@@ -198,6 +207,11 @@ class ApplicationConfigurationSerializer(serializers.ModelSerializer):
         if instance.app_logo and "app_logo" in validated_data:
             instance.app_logo.delete()
         return super().update(instance, validated_data)
+
+    def validate_app_logo(self, file):
+        if file and magic.from_buffer(file.read(2048), mime=True) == "image/svg+xml":
+            reject_dangerous_svg(file)
+        return file
 
     class Meta:
         model = ApplicationConfiguration

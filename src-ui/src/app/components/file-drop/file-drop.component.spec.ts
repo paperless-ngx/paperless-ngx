@@ -9,7 +9,6 @@ import {
   tick,
 } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
-import { NgxFileDropEntry, NgxFileDropModule } from 'ngx-file-drop'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -27,7 +26,7 @@ describe('FileDropComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [NgxFileDropModule, FileDropComponent, ToastsComponent],
+      imports: [FileDropComponent, ToastsComponent],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
@@ -66,12 +65,12 @@ describe('FileDropComponent', () => {
     const dropzone = fixture.debugElement.query(
       By.css('.global-dropzone-overlay')
     )
-    expect(dropzone.classes['hide']).toBeTruthy()
+    expect(dropzone.classes['active']).toBeFalsy()
     component.onDragLeave(new Event('dragleave') as DragEvent)
     tick(700)
     fixture.detectChanges()
     // drop
-    const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFiles')
+    const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFile')
     const dragEvent = new Event('drop')
     dragEvent['dataTransfer'] = {
       files: {
@@ -93,52 +92,208 @@ describe('FileDropComponent', () => {
     tick(1)
     fixture.detectChanges()
     expect(component.fileIsOver).toBeTruthy()
-    const dropzone = fixture.debugElement.query(
-      By.css('.global-dropzone-overlay')
-    )
     component.onDragLeave(new Event('dragleave') as DragEvent)
     tick(700)
     fixture.detectChanges()
-    expect(dropzone.classes['hide']).toBeTruthy()
     // drop
     const toastSpy = jest.spyOn(toastService, 'show')
-    const uploadSpy = jest.spyOn(
-      UploadDocumentsService.prototype as any,
-      'uploadFile'
+    const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFile')
+    const file = new File(
+      [new Blob(['testing'], { type: 'application/pdf' })],
+      'file.pdf'
     )
     const dragEvent = new Event('drop')
     dragEvent['dataTransfer'] = {
-      files: {
-        item: () => {
-          return new File(
-            [new Blob(['testing'], { type: 'application/pdf' })],
-            'file.pdf'
-          )
+      items: [
+        {
+          kind: 'file',
+          type: 'application/pdf',
+          getAsFile: () => file,
         },
-        length: 1,
-      } as unknown as FileList,
+      ],
     }
     component.onDrop(dragEvent as DragEvent)
-    component.dropped([
-      {
-        fileEntry: {
-          isFile: true,
-          file: (callback) => {
-            callback(
-              new File(
-                [new Blob(['testing'], { type: 'application/pdf' })],
-                'file.pdf'
-              )
-            )
-          },
-        },
-      } as unknown as NgxFileDropEntry,
-    ])
     tick(3000)
     expect(toastSpy).toHaveBeenCalled()
     expect(uploadSpy).toHaveBeenCalled()
     discardPeriodicTasks()
   }))
+
+  it('should support drag drop, initiate upload with webkitGetAsEntry', fakeAsync(() => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    expect(component.fileIsOver).toBeFalsy()
+    const overEvent = new Event('dragover') as DragEvent
+    ;(overEvent as any).dataTransfer = { types: ['Files'] }
+    component.onDragOver(overEvent)
+    tick(1)
+    fixture.detectChanges()
+    expect(component.fileIsOver).toBeTruthy()
+    component.onDragLeave(new Event('dragleave') as DragEvent)
+    tick(700)
+    fixture.detectChanges()
+    // drop
+    const toastSpy = jest.spyOn(toastService, 'show')
+    const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFile')
+    const file = new File(
+      [new Blob(['testing'], { type: 'application/pdf' })],
+      'file.pdf'
+    )
+    const dragEvent = new Event('drop')
+    dragEvent['dataTransfer'] = {
+      items: [
+        {
+          kind: 'file',
+          type: 'application/pdf',
+          webkitGetAsEntry: () => ({
+            isFile: true,
+            isDirectory: false,
+            file: (cb: (file: File) => void) => cb(file),
+          }),
+        },
+      ],
+      files: [],
+    }
+    component.onDrop(dragEvent as DragEvent)
+    tick(3000)
+    expect(toastSpy).toHaveBeenCalled()
+    expect(uploadSpy).toHaveBeenCalled()
+    discardPeriodicTasks()
+  }))
+
+  it('should show an error on traverseFileTree error', fakeAsync(() => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    const toastSpy = jest.spyOn(toastService, 'showError')
+    const traverseSpy = jest
+      .spyOn(component as any, 'traverseFileTree')
+      .mockReturnValue(Promise.reject(new Error('Error traversing file tree')))
+    fixture.detectChanges()
+
+    // Simulate a drop with a directory entry
+    const mockEntry = {
+      isDirectory: true,
+      isFile: false,
+      createReader: () => ({ readEntries: jest.fn() }),
+    } as unknown as FileSystemDirectoryEntry
+
+    const event = {
+      preventDefault: () => {},
+      stopImmediatePropagation: () => {},
+      dataTransfer: {
+        items: [
+          {
+            kind: 'file',
+            webkitGetAsEntry: () => mockEntry,
+          },
+        ],
+      },
+    } as unknown as DragEvent
+
+    component.onDrop(event)
+
+    tick() // flush microtasks (e.g., Promise.reject)
+
+    expect(traverseSpy).toHaveBeenCalled()
+    expect(toastSpy).toHaveBeenCalledWith(
+      $localize`Failed to read dropped items: Error traversing file tree`
+    )
+
+    discardPeriodicTasks()
+  }))
+
+  it('should support drag drop, initiate upload without DataTransfer API support', fakeAsync(() => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    expect(component.fileIsOver).toBeFalsy()
+    const overEvent = new Event('dragover') as DragEvent
+    ;(overEvent as any).dataTransfer = { types: ['Files'] }
+    component.onDragOver(overEvent)
+    tick(1)
+    fixture.detectChanges()
+    expect(component.fileIsOver).toBeTruthy()
+    component.onDragLeave(new Event('dragleave') as DragEvent)
+    tick(700)
+    fixture.detectChanges()
+    // drop
+    const toastSpy = jest.spyOn(toastService, 'show')
+    const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFile')
+    const file = new File(
+      [new Blob(['testing'], { type: 'application/pdf' })],
+      'file.pdf'
+    )
+    const dragEvent = new Event('drop')
+    dragEvent['dataTransfer'] = {
+      items: [],
+      files: [file],
+    }
+    component.onDrop(dragEvent as DragEvent)
+    tick(3000)
+    expect(toastSpy).toHaveBeenCalled()
+    expect(uploadSpy).toHaveBeenCalled()
+    discardPeriodicTasks()
+  }))
+
+  it('should resolve a single file when entry isFile', () => {
+    const mockFile = new File(['data'], 'test.txt', { type: 'text/plain' })
+    const mockEntry = {
+      isFile: true,
+      isDirectory: false,
+      file: (cb: (f: File) => void) => cb(mockFile),
+    } as unknown as FileSystemFileEntry
+
+    return (component as any)
+      .traverseFileTree(mockEntry)
+      .then((result: File[]) => {
+        expect(result).toEqual([mockFile])
+      })
+  })
+
+  it('should resolve all files in a flat directory', async () => {
+    const file1 = new File(['data'], 'file1.txt')
+    const file2 = new File(['data'], 'file2.txt')
+
+    const mockFileEntry1 = {
+      isFile: true,
+      isDirectory: false,
+      file: (cb: (f: File) => void) => cb(file1),
+    } as unknown as FileSystemFileEntry
+
+    const mockFileEntry2 = {
+      isFile: true,
+      isDirectory: false,
+      file: (cb: (f: File) => void) => cb(file2),
+    } as unknown as FileSystemFileEntry
+
+    let callCount = 0
+
+    const mockDirEntry = {
+      isFile: false,
+      isDirectory: true,
+      createReader: () => ({
+        readEntries: (cb: (batch: FileSystemEntry[]) => void) => {
+          if (callCount++ === 0) {
+            cb([mockFileEntry1, mockFileEntry2])
+          } else {
+            cb([]) // second call: signal EOF
+          }
+        },
+      }),
+    } as unknown as FileSystemDirectoryEntry
+
+    const result = await (component as any).traverseFileTree(mockDirEntry)
+    expect(result).toEqual([file1, file2])
+  })
+
+  it('should resolve a non-file non-directory entry as an empty array', () => {
+    const mockEntry = {
+      isFile: false,
+      isDirectory: false,
+      file: (cb: (f: File) => void) => cb(new File([], '')),
+    } as unknown as FileSystemEntry
+    return (component as any)
+      .traverseFileTree(mockEntry)
+      .then((result: File[]) => {
+        expect(result).toEqual([])
+      })
+  })
 
   it('should ignore events if disabled', fakeAsync(() => {
     settingsService.globalDropzoneEnabled = false

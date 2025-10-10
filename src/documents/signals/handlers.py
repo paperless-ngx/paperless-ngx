@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import ipaddress
 import logging
-import os
 import shutil
+import socket
+from pathlib import Path
 from typing import TYPE_CHECKING
+from urllib.parse import urlparse
 
 import httpx
 from celery import shared_task
@@ -12,10 +15,13 @@ from celery.signals import before_task_publish
 from celery.signals import task_failure
 from celery.signals import task_postrun
 from celery.signals import task_prerun
+from celery.signals import worker_process_init
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.db import DatabaseError
 from django.db import close_old_connections
+from django.db import connections
 from django.db import models
 from django.db.models import Q
 from django.dispatch import receiver
@@ -38,6 +44,7 @@ from documents.models import MatchingModel
 from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import Tag
+from documents.models import UiSettings
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowRun
@@ -47,8 +54,6 @@ from documents.permissions import set_permissions_for_object
 from documents.templating.workflows import parse_w_workflow_placeholders
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     from documents.classifier import DocumentClassifier
     from documents.data_models import ConsumableDocument
     from documents.data_models import DocumentMetadataOverrides
@@ -325,16 +330,16 @@ def cleanup_document_deletion(sender, instance, **kwargs):
             # Find a non-conflicting filename in case a document with the same
             # name was moved to trash earlier
             counter = 0
-            old_filename = os.path.split(instance.source_path)[1]
-            (old_filebase, old_fileext) = os.path.splitext(old_filename)
+            old_filename = Path(instance.source_path).name
+            old_filebase = Path(old_filename).stem
+            old_fileext = Path(old_filename).suffix
 
             while True:
-                new_file_path = os.path.join(
-                    settings.EMPTY_TRASH_DIR,
-                    old_filebase + (f"_{counter:02}" if counter else "") + old_fileext,
+                new_file_path = settings.EMPTY_TRASH_DIR / (
+                    old_filebase + (f"_{counter:02}" if counter else "") + old_fileext
                 )
 
-                if os.path.exists(new_file_path):
+                if new_file_path.exists():
                     counter += 1
                 else:
                     break
@@ -349,32 +354,36 @@ def cleanup_document_deletion(sender, instance, **kwargs):
                 )
                 return
 
-        for filename in (
-            instance.source_path,
+        files = (
             instance.archive_path,
             instance.thumbnail_path,
             *instance.ocr_image_paths,
-        ):
-            if filename and os.path.isfile(filename):
+        )
+        if not settings.EMPTY_TRASH_DIR:
+            # Only delete the original file if we are not moving it to trash dir
+            files += (instance.source_path,)
+
+        for filename in files:
+            if filename and filename.is_file():
                 try:
-                    os.unlink(filename)
+                    filename.unlink()
                     logger.debug(f"Deleted file {filename}.")
                 except OSError as e:
                     logger.warning(
                         f"While deleting document {instance!s}, the file "
                         f"{filename} could not be deleted: {e}",
                     )
-            elif filename and not os.path.isfile(filename):
+            elif filename and not filename.is_file():
                 logger.warning(f"Expected {filename} to exist, but it did not")
 
         delete_empty_directories(
-            os.path.dirname(instance.source_path),
+            Path(instance.source_path).parent,
             root=settings.ORIGINALS_DIR,
         )
 
         if instance.has_archive_version:
             delete_empty_directories(
-                os.path.dirname(instance.archive_path),
+                Path(instance.archive_path).parent,
                 root=settings.ARCHIVE_DIR,
             )
 
@@ -395,14 +404,14 @@ def update_filename_and_move_files(
     if isinstance(instance, CustomFieldInstance):
         instance = instance.document
 
-    def validate_move(instance, old_path, new_path):
-        if not os.path.isfile(old_path):
+    def validate_move(instance, old_path: Path, new_path: Path):
+        if not old_path.is_file():
             # Can't do anything if the old file does not exist anymore.
             msg = f"Document {instance!s}: File {old_path} doesn't exist."
             logger.fatal(msg)
             raise CannotMoveFilesException(msg)
 
-        if os.path.isfile(new_path):
+        if new_path.is_file():
             # Can't do anything if the new file already exists. Skip updating file.
             msg = f"Document {instance!s}: Cannot rename file since target path {new_path} already exists."
             logger.warning(msg)
@@ -430,16 +439,20 @@ def update_filename_and_move_files(
             old_filename = instance.filename
             old_source_path = instance.source_path
 
-            instance.filename = generate_unique_filename(instance)
+            # Need to convert to string to be able to save it to the db
+            instance.filename = str(generate_unique_filename(instance))
             move_original = old_filename != instance.filename
 
             old_archive_filename = instance.archive_filename
             old_archive_path = instance.archive_path
 
             if instance.has_archive_version:
-                instance.archive_filename = generate_unique_filename(
-                    instance,
-                    archive_filename=True,
+                # Need to convert to string to be able to save it to the db
+                instance.archive_filename = str(
+                    generate_unique_filename(
+                        instance,
+                        archive_filename=True,
+                    ),
                 )
 
                 move_archive = old_archive_filename != instance.archive_filename
@@ -481,11 +494,11 @@ def update_filename_and_move_files(
 
             # Try to move files to their original location.
             try:
-                if move_original and os.path.isfile(instance.source_path):
+                if move_original and instance.source_path.is_file():
                     logger.info("Restoring previous original path")
                     shutil.move(instance.source_path, old_source_path)
 
-                if move_archive and os.path.isfile(instance.archive_path):
+                if move_archive and instance.archive_path.is_file():
                     logger.info("Restoring previous archive path")
                     shutil.move(instance.archive_path, old_archive_path)
 
@@ -506,17 +519,15 @@ def update_filename_and_move_files(
 
         # finally, remove any empty sub folders. This will do nothing if
         # something has failed above.
-        if not os.path.isfile(old_source_path):
+        if not old_source_path.is_file():
             delete_empty_directories(
-                os.path.dirname(old_source_path),
+                Path(old_source_path).parent,
                 root=settings.ORIGINALS_DIR,
             )
 
-        if instance.has_archive_version and not os.path.isfile(
-            old_archive_path,
-        ):
+        if instance.has_archive_version and not old_archive_path.is_file():
             delete_empty_directories(
-                os.path.dirname(old_archive_path),
+                Path(old_archive_path).parent,
                 root=settings.ARCHIVE_DIR,
             )
 
@@ -576,6 +587,51 @@ def cleanup_custom_field_deletion(sender, instance: CustomField, **kwargs):
         logger.debug(
             f"Removing custom field {instance} from sort field of {views_with_sort_updated} views",
         )
+
+
+@receiver(models.signals.post_delete, sender=User)
+@receiver(models.signals.post_delete, sender=Group)
+def cleanup_user_deletion(sender, instance: User | Group, **kwargs):
+    """
+    When a user or group is deleted, remove non-cascading references.
+    At the moment, just the default permission settings in UiSettings.
+    """
+    # Remove the user permission settings e.g.
+    #   DEFAULT_PERMS_OWNER: 'general-settings:permissions:default-owner',
+    #   DEFAULT_PERMS_VIEW_USERS: 'general-settings:permissions:default-view-users',
+    #   DEFAULT_PERMS_VIEW_GROUPS: 'general-settings:permissions:default-view-groups',
+    #   DEFAULT_PERMS_EDIT_USERS: 'general-settings:permissions:default-edit-users',
+    #   DEFAULT_PERMS_EDIT_GROUPS: 'general-settings:permissions:default-edit-groups',
+    for ui_settings in UiSettings.objects.all():
+        try:
+            permissions = ui_settings.settings.get("permissions", {})
+            updated = False
+            if isinstance(instance, User):
+                if permissions.get("default_owner") == instance.pk:
+                    permissions["default_owner"] = None
+                    updated = True
+                if instance.pk in permissions.get("default_view_users", []):
+                    permissions["default_view_users"].remove(instance.pk)
+                    updated = True
+                if instance.pk in permissions.get("default_change_users", []):
+                    permissions["default_change_users"].remove(instance.pk)
+                    updated = True
+            elif isinstance(instance, Group):
+                if instance.pk in permissions.get("default_view_groups", []):
+                    permissions["default_view_groups"].remove(instance.pk)
+                    updated = True
+                if instance.pk in permissions.get("default_change_groups", []):
+                    permissions["default_change_groups"].remove(instance.pk)
+                    updated = True
+            if updated:
+                ui_settings.settings["permissions"] = permissions
+                ui_settings.save(update_fields=["settings"])
+        except Exception as e:
+            logger.error(
+                f"Error while cleaning up user {instance.pk} ({instance.username}) from ui_settings: {e}"
+                if isinstance(instance, User)
+                else f"Error while cleaning up group {instance.pk} ({instance.name}) from ui_settings: {e}",
+            )
 
 
 def add_to_index(sender, document, **kwargs):
@@ -662,6 +718,28 @@ def run_workflows_updated(sender, document: Document, logging_group=None, **kwar
     )
 
 
+def _is_public_ip(ip: str) -> bool:
+    try:
+        obj = ipaddress.ip_address(ip)
+        return not (
+            obj.is_private
+            or obj.is_loopback
+            or obj.is_link_local
+            or obj.is_multicast
+            or obj.is_unspecified
+        )
+    except ValueError:  # pragma: no cover
+        return False
+
+
+def _resolve_first_ip(host: str) -> str | None:
+    try:
+        info = socket.getaddrinfo(host, None)
+        return info[0][4][0] if info else None
+    except Exception:  # pragma: no cover
+        return None
+
+
 @shared_task(
     retry_backoff=True,
     autoretry_for=(httpx.HTTPStatusError,),
@@ -676,21 +754,46 @@ def send_webhook(
     *,
     as_json: bool = False,
 ):
+    p = urlparse(url)
+    if p.scheme.lower() not in settings.WEBHOOKS_ALLOWED_SCHEMES or not p.hostname:
+        logger.warning("Webhook blocked: invalid scheme/hostname")
+        raise ValueError("Invalid URL scheme or hostname.")
+
+    port = p.port or (443 if p.scheme == "https" else 80)
+    if (
+        len(settings.WEBHOOKS_ALLOWED_PORTS) > 0
+        and port not in settings.WEBHOOKS_ALLOWED_PORTS
+    ):
+        logger.warning("Webhook blocked: port not permitted")
+        raise ValueError("Destination port not permitted.")
+
+    ip = _resolve_first_ip(p.hostname)
+    if not ip or (
+        not _is_public_ip(ip) and not settings.WEBHOOKS_ALLOW_INTERNAL_REQUESTS
+    ):
+        logger.warning("Webhook blocked: destination not allowed")
+        raise ValueError("Destination host is not allowed.")
+
     try:
+        post_args = {
+            "url": url,
+            "headers": {
+                k: v for k, v in (headers or {}).items() if k.lower() != "host"
+            },
+            "files": files or None,
+            "timeout": 5.0,
+            "follow_redirects": False,
+        }
         if as_json:
-            httpx.post(
-                url,
-                json=data,
-                files=files,
-                headers=headers,
-            ).raise_for_status()
+            post_args["json"] = data
+        elif isinstance(data, dict):
+            post_args["data"] = data
         else:
-            httpx.post(
-                url,
-                content=data,
-                files=files,
-                headers=headers,
-            ).raise_for_status()
+            post_args["content"] = data
+
+        httpx.post(
+            **post_args,
+        ).raise_for_status()
         logger.info(
             f"Webhook sent to {url}",
         )
@@ -704,11 +807,12 @@ def send_webhook(
 def run_workflows(
     trigger_type: WorkflowTrigger.WorkflowTriggerType,
     document: Document | ConsumableDocument,
+    workflow_to_run: Workflow | None = None,
     logging_group=None,
     overrides: DocumentMetadataOverrides | None = None,
     original_file: Path | None = None,
 ) -> tuple[DocumentMetadataOverrides, str] | None:
-    """Run workflows which match a Document (or ConsumableDocument) for a specific trigger type.
+    """Run workflows which match a Document (or ConsumableDocument) for a specific trigger type or a single workflow if given.
 
     Assignment or removal actions are either applied directly to the document or an overrides object. If an overrides
     object is provided, the function returns the object with the applied changes or None if no actions were applied and a string
@@ -762,7 +866,7 @@ def run_workflows(
                         timezone.localtime(document.added),
                         document.original_filename or "",
                         document.filename or "",
-                        timezone.localtime(document.created),
+                        document.created,
                     )
                 except Exception:
                     logger.exception(
@@ -1014,7 +1118,7 @@ def run_workflows(
 
         if action.remove_all_custom_fields:
             if not use_overrides:
-                CustomFieldInstance.objects.filter(document=document).delete()
+                CustomFieldInstance.objects.filter(document=document).hard_delete()
             else:
                 overrides.custom_fields = None
         elif action.remove_custom_fields.exists():
@@ -1022,7 +1126,7 @@ def run_workflows(
                 CustomFieldInstance.objects.filter(
                     field__in=action.remove_custom_fields.all(),
                     document=document,
-                ).delete()
+                ).hard_delete()
             elif overrides.custom_fields:
                 for field in action.remove_custom_fields.filter(
                     pk__in=overrides.custom_fields.keys(),
@@ -1050,7 +1154,7 @@ def run_workflows(
             filename = document.original_filename or ""
             current_filename = document.filename or ""
             added = timezone.localtime(document.added)
-            created = timezone.localtime(document.created)
+            created = document.created
         else:
             title = overrides.title if overrides.title else str(document.original_file)
             doc_url = ""
@@ -1072,7 +1176,7 @@ def run_workflows(
             filename = document.original_file if document.original_file else ""
             current_filename = filename
             added = timezone.localtime(timezone.now())
-            created = timezone.localtime(overrides.created)
+            created = overrides.created
 
         subject = (
             parse_w_workflow_placeholders(
@@ -1138,7 +1242,7 @@ def run_workflows(
             filename = document.original_filename or ""
             current_filename = document.filename or ""
             added = timezone.localtime(document.added)
-            created = timezone.localtime(document.created)
+            created = document.created
         else:
             title = overrides.title if overrides.title else str(document.original_file)
             doc_url = ""
@@ -1160,7 +1264,7 @@ def run_workflows(
             filename = document.original_file if document.original_file else ""
             current_filename = filename
             added = timezone.localtime(timezone.now())
-            created = timezone.localtime(overrides.created)
+            created = overrides.created
 
         try:
             data = {}
@@ -1211,10 +1315,7 @@ def run_workflows(
                     )
             files = None
             if action.webhook.include_document:
-                with open(
-                    original_file,
-                    "rb",
-                ) as f:
+                with original_file.open("rb") as f:
                     files = {
                         "file": (
                             filename,
@@ -1247,24 +1348,28 @@ def run_workflows(
     messages = []
 
     workflows = (
-        Workflow.objects.filter(enabled=True, triggers__type=trigger_type)
-        .prefetch_related(
-            "actions",
-            "actions__assign_view_users",
-            "actions__assign_view_groups",
-            "actions__assign_change_users",
-            "actions__assign_change_groups",
-            "actions__assign_custom_fields",
-            "actions__remove_tags",
-            "actions__remove_correspondents",
-            "actions__remove_document_types",
-            "actions__remove_storage_paths",
-            "actions__remove_custom_fields",
-            "actions__remove_owners",
-            "triggers",
+        (
+            Workflow.objects.filter(enabled=True, triggers__type=trigger_type)
+            .prefetch_related(
+                "actions",
+                "actions__assign_view_users",
+                "actions__assign_view_groups",
+                "actions__assign_change_users",
+                "actions__assign_change_groups",
+                "actions__assign_custom_fields",
+                "actions__remove_tags",
+                "actions__remove_correspondents",
+                "actions__remove_document_types",
+                "actions__remove_storage_paths",
+                "actions__remove_custom_fields",
+                "actions__remove_owners",
+                "triggers",
+            )
+            .order_by("order")
+            .distinct()
         )
-        .order_by("order")
-        .distinct()
+        if workflow_to_run is None
+        else [workflow_to_run]
     )
 
     for workflow in workflows:
@@ -1429,3 +1534,18 @@ def task_failure_handler(
             task_instance.save()
     except Exception:  # pragma: no cover
         logger.exception("Updating PaperlessTask failed")
+
+
+@worker_process_init.connect
+def close_connection_pool_on_worker_init(**kwargs):
+    """
+    Close the DB connection pool for each Celery child process after it starts.
+
+    This is necessary because the parent process parse the Django configuration,
+    initializes connection pools then forks.
+
+    Closing these pools after forking ensures child processes have a valid connection.
+    """
+    for conn in connections.all(initialized_only=True):
+        if conn.alias == "default" and hasattr(conn, "pool") and conn.pool:
+            conn.close_pool()

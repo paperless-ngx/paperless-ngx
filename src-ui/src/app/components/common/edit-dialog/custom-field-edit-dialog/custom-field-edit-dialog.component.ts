@@ -5,6 +5,7 @@ import {
   OnInit,
   QueryList,
   ViewChildren,
+  inject,
 } from '@angular/core'
 import {
   FormArray,
@@ -13,7 +14,7 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { takeUntil } from 'rxjs'
 import {
@@ -28,6 +29,8 @@ import { SelectComponent } from '../../input/select/select.component'
 import { TextComponent } from '../../input/text/text.component'
 import { EditDialogComponent, EditDialogMode } from '../edit-dialog.component'
 
+const SELECT_OPTION_PAGE_SIZE = 8
+
 @Component({
   selector: 'pngx-custom-field-edit-dialog',
   templateUrl: './custom-field-edit-dialog.component.html',
@@ -37,6 +40,7 @@ import { EditDialogComponent, EditDialogMode } from '../edit-dialog.component'
     TextComponent,
     FormsModule,
     ReactiveFormsModule,
+    NgbPaginationModule,
     NgxBootstrapIconsModule,
   ],
 })
@@ -45,6 +49,21 @@ export class CustomFieldEditDialogComponent
   implements OnInit, AfterViewInit
 {
   CustomFieldDataType = CustomFieldDataType
+  SELECT_OPTION_PAGE_SIZE = SELECT_OPTION_PAGE_SIZE
+
+  private _allSelectOptions: any[] = []
+  public get allSelectOptions(): any[] {
+    return this._allSelectOptions
+  }
+
+  private _selectOptionsPage: number
+  public get selectOptionsPage(): number {
+    return this._selectOptionsPage
+  }
+  public set selectOptionsPage(v: number) {
+    this._selectOptionsPage = v
+    this.updateSelectOptions()
+  }
 
   @ViewChildren('selectOption')
   private selectOptionInputs: QueryList<ElementRef>
@@ -54,13 +73,11 @@ export class CustomFieldEditDialogComponent
       .select_options as FormArray
   }
 
-  constructor(
-    service: CustomFieldsService,
-    activeModal: NgbActiveModal,
-    userService: UserService,
-    settingsService: SettingsService
-  ) {
-    super(service, activeModal, userService, settingsService)
+  constructor() {
+    super()
+    this.service = inject(CustomFieldsService)
+    this.userService = inject(UserService)
+    this.settingsService = inject(SettingsService)
   }
 
   ngOnInit(): void {
@@ -69,17 +86,10 @@ export class CustomFieldEditDialogComponent
       this.objectForm.get('data_type').disable()
     }
     if (this.object?.data_type === CustomFieldDataType.Select) {
-      this.selectOptions.clear()
-      this.object.extra_data.select_options
-        .filter((option) => option)
-        .forEach((option) =>
-          this.selectOptions.push(
-            new FormGroup({
-              label: new FormControl(option.label),
-              id: new FormControl(option.id),
-            })
-          )
-        )
+      this._allSelectOptions = [
+        ...(this.object.extra_data.select_options ?? []),
+      ]
+      this.selectOptionsPage = 1
     }
   }
 
@@ -88,6 +98,19 @@ export class CustomFieldEditDialogComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         this.selectOptionInputs.last?.nativeElement.focus()
+      })
+
+    this.objectForm.valueChanges
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((change) => {
+        // Update the relevant select options values if changed in the form, which is only a page of the entire list
+        this.objectForm
+          .get('extra_data.select_options')
+          ?.value.forEach((option, index) => {
+            this._allSelectOptions[
+              index + (this.selectOptionsPage - 1) * SELECT_OPTION_PAGE_SIZE
+            ] = option
+          })
       })
   }
 
@@ -110,6 +133,17 @@ export class CustomFieldEditDialogComponent
     })
   }
 
+  protected getFormValues() {
+    const formValues = super.getFormValues()
+    if (
+      this.objectForm.get('data_type')?.value === CustomFieldDataType.Select
+    ) {
+      // Make sure we send all select options, with updated values
+      formValues.extra_data.select_options = this._allSelectOptions
+    }
+    return formValues
+  }
+
   getDataTypes() {
     return DATA_TYPE_LABELS
   }
@@ -118,13 +152,35 @@ export class CustomFieldEditDialogComponent
     return this.dialogMode === EditDialogMode.EDIT
   }
 
+  private updateSelectOptions() {
+    this.selectOptions.clear()
+    this._allSelectOptions
+      .slice(
+        (this.selectOptionsPage - 1) * SELECT_OPTION_PAGE_SIZE,
+        this.selectOptionsPage * SELECT_OPTION_PAGE_SIZE
+      )
+      .forEach((option) =>
+        this.selectOptions.push(
+          new FormGroup({
+            label: new FormControl(option.label),
+            id: new FormControl(option.id),
+          })
+        )
+      )
+  }
+
   public addSelectOption() {
-    this.selectOptions.push(
-      new FormGroup({ label: new FormControl(null), id: new FormControl(null) })
+    this._allSelectOptions.push({ label: null, id: null })
+    this.selectOptionsPage = Math.ceil(
+      this.allSelectOptions.length / SELECT_OPTION_PAGE_SIZE
     )
   }
 
   public removeSelectOption(index: number) {
     this.selectOptions.removeAt(index)
+    this._allSelectOptions.splice(
+      index + (this.selectOptionsPage - 1) * SELECT_OPTION_PAGE_SIZE,
+      1
+    )
   }
 }

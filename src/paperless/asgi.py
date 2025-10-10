@@ -21,3 +21,10 @@ application = ProtocolTypeRouter(
         "websocket": AuthMiddlewareStack(URLRouter(websocket_urlpatterns)),
     },
 )
+
+import logging  # noqa: E402
+
+from paperless.version import __full_version_str__  # noqa: E402
+
+logger = logging.getLogger("paperless.asgi")
+logger.info(f"[init] Paperless-ngx version: v{__full_version_str__}")

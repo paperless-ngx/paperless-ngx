@@ -1,131 +1,138 @@
 [project]
 name = "paperless-ngx"
-version = "2.15.0"
-description = "A community-supported supercharged version of paperless: scan, index and archive all your physical documents"
+version = "2.18.4"
+description = "A community-supported supercharged document management system: scan, index and archive all your physical documents"
 readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [
-	"Programming Language :: Python :: 3 :: Only",
-	"Programming Language :: Python :: 3.10",
-	"Programming Language :: Python :: 3.11",
-	"Programming Language :: Python :: 3.12",
-	"Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
 ]
 # TODO: Move certain things to groups and then utilize that further
 # This will allow testing to not install a webserver, mysql, etc
 
 dependencies = [
-	"bleach~=6.2.0",
-	"celery[redis]~=5.4.0",
-	"channels~=4.2",
-	"channels-redis~=4.2",
-	"concurrent-log-handler~=0.9.25",
-	"dateparser~=1.2",
-	# WARNING: django does not use semver.
-	#          Only patch versions are guaranteed to not introduce breaking changes.
-	"django~=5.1.7",
-	"django-allauth[socialaccount,mfa]~=65.4.0",
-	"django-auditlog~=3.0.0",
-	"django-celery-results~=2.5.1",
-	"django-compression-middleware~=0.5.0",
-	"django-cors-headers~=4.7.0",
-	"django-extensions~=3.2.3",
-	"django-filter~=25.1",
-	"django-guardian~=2.4.0",
-	"django-multiselectfield~=0.1.13",
-	"django-soft-delete~=1.0.18",
-	"djangorestframework~=3.15",
-	"djangorestframework-guardian~=0.3.0",
-	"drf-spectacular~=0.28",
-	"drf-spectacular-sidecar~=2025.3.1",
-	"drf-writable-nested~=0.7.1",
-	"filelock~=3.17.0",
-	"flower~=2.0.1",
-	"gotenberg-client~=0.9.0",
-	"httpx-oauth~=0.16",
-	"imap-tools~=1.10.0",
-	"inotifyrecursive~=0.3",
-	"jinja2~=3.1.5",
-	"langchain>=0.3.21",
-	"langchain-experimental>=0.3.4",
-	"langchain-mistralai>=0.2.9",
-	"langchain-openai>=0.3.9",
-	"langchain-redis>=0.2",
-	"langdetect~=1.0.9",
-	"langgraph>=0.3.21",
-	"mistralai>=1.6",
-	"nltk~=3.9.1",
-	"ocrmypdf~=16.10.0",
-	"pathvalidate~=3.2.3",
-	"pdf2image~=1.17.0",
-	"python-dateutil~=2.9.0",
-	"python-dotenv~=1.0.1",
-	"python-gnupg~=0.5.4",
-	"python-ipware~=3.0.0",
-	"python-magic~=0.4.27",
-	"pyzbar~=0.1.9",
-	"rapidfuzz~=3.12.1",
-	"redis[hiredis]~=5.2.1",
-	"scikit-learn~=1.6.1",
-	"setproctitle~=1.3.4",
-	"tika-client~=0.9.0",
-	"tqdm~=4.67.1",
-	"watchdog~=6.0",
-	"whitenoise~=6.9",
-	"whoosh-reloaded>=2.7.5",
-	"zxing-cpp~=2.3.0",
+  "babel>=2.17",
+  "bleach~=6.2.0",
+  "celery[redis]~=5.5.1",
+  "channels~=4.2",
+  "channels-redis~=4.2",
+  "concurrent-log-handler~=0.9.25",
+  "dateparser~=1.2",
+  # WARNING: django does not use semver.
+  #          Only patch versions are guaranteed to not introduce breaking changes.
+  "django~=5.2.5",
+  "django-allauth[socialaccount,mfa]~=65.4.0",
+  "django-auditlog~=3.2.1",
+  "django-cachalot~=2.8.0",
+  "django-celery-results~=2.6.0",
+  "django-compression-middleware~=0.5.0",
+  "django-cors-headers~=4.7.0",
+  "django-extensions~=4.1",
+  "django-filter~=25.1",
+  "django-guardian~=3.0.3",
+  "django-multiselectfield~=1.0.1",
+  "django-soft-delete~=1.0.18",
+  "djangorestframework~=3.16",
+  "djangorestframework-guardian~=0.4.0",
+  "drf-spectacular~=0.28",
+  "drf-spectacular-sidecar~=2025.8.1",
+  "drf-writable-nested~=0.7.1",
+  "filelock~=3.19.1",
+  "flower~=2.0.1",
+  "gotenberg-client~=0.11.0",
+  "httpx-oauth~=0.16",
+  "imap-tools~=1.11.0",
+  "inotifyrecursive~=0.3",
+  "jinja2~=3.1.5",
+  "langdetect~=1.0.9",
+  "nltk~=3.9.1",
+  "ocrmypdf~=16.10.0",
+  "pathvalidate~=3.3.1",
+  "pdf2image~=1.17.0",
+  "psycopg-pool",
+  "python-dateutil~=2.9.0",
+  "python-dotenv~=1.1.0",
+  "python-gnupg~=0.5.4",
+  "python-ipware~=3.0.0",
+  "python-magic~=0.4.27",
+  "pyzbar~=0.1.9",
+  "rapidfuzz~=3.14.0",
+  "redis[hiredis]~=5.2.1",
+  "scikit-learn~=1.7.0",
+  "setproctitle~=1.3.4",
+  "tika-client~=0.10.0",
+  "tqdm~=4.67.1",
+  "watchdog~=6.0",
+  "whitenoise~=6.9",
+  "whoosh-reloaded>=2.7.5",
+  "zxing-cpp~=2.3.0",
+  "langchain>=0.3.21",
+  "langchain-experimental>=0.3.4",
+  "langchain-mistralai>=0.2.9",
+  "langchain-openai>=0.3.9",
+  "langchain-redis>=0.2",
+  "langgraph>=0.3.21",
+  "mistralai>=1.6",
 ]
 
 optional-dependencies.mariadb = ["mysqlclient~=2.2.7"]
 optional-dependencies.postgres = [
-	"psycopg[c]==3.2.5",
-	# Direct dependency for proper resolution of the pre-built wheels
-	"psycopg-c==3.2.5",
+  "psycopg[c,pool]==3.2.9",
+  # Direct dependency for proper resolution of the pre-built wheels
+  "psycopg-c==3.2.9",
+  "psycopg-pool==3.2.6",
 ]
 optional-dependencies.webserver = ["granian[uvloop]~=2.2.0"]
 
 [dependency-groups]
 
 dev = [
-	{ "include-group" = "docs" },
-	{ "include-group" = "testing" },
-	{ "include-group" = "lint" },
+  { "include-group" = "docs" },
+  { "include-group" = "testing" },
+  { "include-group" = "lint" },
 ]
 
 docs = ["mkdocs-glightbox~=0.4.0", "mkdocs-material~=9.6.4"]
 
 testing = [
-	"daphne",
-	"factory-boy~=3.3.1",
-	"imagehash",
-	"pytest~=8.3.3",
-	"pytest-cov~=6.0.0",
-	"pytest-django~=4.10.0",
-	"pytest-env",
-	"pytest-httpx",
-	"pytest-mock",
-	"pytest-rerunfailures",
-	"pytest-sugar",
-	"pytest-xdist",
+  "daphne",
+  "factory-boy~=3.3.1",
+  "imagehash",
+  "pytest~=8.4.1",
+  "pytest-cov~=6.2.1",
+  "pytest-django~=4.11.1",
+  "pytest-env",
+  "pytest-httpx",
+  "pytest-mock",
+  "pytest-rerunfailures",
+  "pytest-sugar",
+  "pytest-xdist",
 ]
 
 lint = ["pre-commit~=4.1.0", "pre-commit-uv~=4.1.3", "ruff~=0.9.9"]
+lint = ["pre-commit~=4.3.0", "pre-commit-uv~=4.1.3", "ruff~=0.12.2"]
 
 typing = [
-	"celery-types",
-	"django-filter-stubs",
-	"django-stubs[compatible-mypy]",
-	"djangorestframework-stubs[compatible-mypy]",
-	"mypy",
-	"types-bleach",
-	"types-colorama",
-	"types-dateparser",
-	"types-markdown",
-	"types-pygments",
-	"types-python-dateutil",
-	"types-redis",
-	"types-setuptools",
-	"types-tqdm",
+  "celery-types",
+  "django-filter-stubs",
+  "django-stubs[compatible-mypy]",
+  "djangorestframework-stubs[compatible-mypy]",
+  "lxml-stubs",
+  "mypy",
+  "types-bleach",
+  "types-colorama",
+  "types-dateparser",
+  "types-markdown",
+  "types-pygments",
+  "types-python-dateutil",
+  "types-pytz",
+  "types-redis",
+  "types-setuptools",
+  "types-tqdm",
 ]
 
 [tool.ruff]
@@ -140,32 +147,32 @@ show-fixes = true
 output-format = "grouped"
 # https://docs.astral.sh/ruff/rules/
 lint.extend-select = [
-	"COM",  # https://docs.astral.sh/ruff/rules/#flake8-commas-com
-	"DJ",   # https://docs.astral.sh/ruff/rules/#flake8-django-dj
-	"EXE",  # https://docs.astral.sh/ruff/rules/#flake8-executable-exe
-	"F401",
-	"FBT",  # https://docs.astral.sh/ruff/rules/#flake8-boolean-trap-fbt
-	"FLY",  # https://docs.astral.sh/ruff/rules/#flynt-fly
-	"G201", # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
-	"I",    # https://docs.astral.sh/ruff/rules/#isort-i
-	"ICN",  # https://docs.astral.sh/ruff/rules/#flake8-import-conventions-icn
-	"INP",  # https://docs.astral.sh/ruff/rules/#flake8-no-pep420-inp
-	"ISC",  # https://docs.astral.sh/ruff/rules/#flake8-implicit-str-concat-isc
-	"PIE",  # https://docs.astral.sh/ruff/rules/#flake8-pie-pie
-	"PLC",  # https://docs.astral.sh/ruff/rules/#pylint-pl
-	"PLE",  # https://docs.astral.sh/ruff/rules/#pylint-pl
-	"PTH",  # https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
-	"Q",    # https://docs.astral.sh/ruff/rules/#flake8-quotes-q
-	"RSE",  # https://docs.astral.sh/ruff/rules/#flake8-raise-rse
-	"RUF",  # https://docs.astral.sh/ruff/rules/#ruff-specific-rules-ruf
-	"SIM",  # https://docs.astral.sh/ruff/rules/#flake8-simplify-sim
-	"T20",  # https://docs.astral.sh/ruff/rules/#flake8-print-t20
-	"TC",   # https://docs.astral.sh/ruff/rules/#flake8-type-checking-tc
-	"TID",  # https://docs.astral.sh/ruff/rules/#flake8-tidy-imports-tid
-	"UP",   # https://docs.astral.sh/ruff/rules/#pyupgrade-up
-	"W",    # https://docs.astral.sh/ruff/rules/#pycodestyle-e-w
+  "COM",  # https://docs.astral.sh/ruff/rules/#flake8-commas-com
+  "DJ",   # https://docs.astral.sh/ruff/rules/#flake8-django-dj
+  "EXE",  # https://docs.astral.sh/ruff/rules/#flake8-executable-exe
+  "F401",
+  "FBT",  # https://docs.astral.sh/ruff/rules/#flake8-boolean-trap-fbt
+  "FLY",  # https://docs.astral.sh/ruff/rules/#flynt-fly
+  "G201", # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
+  "I",    # https://docs.astral.sh/ruff/rules/#isort-i
+  "ICN",  # https://docs.astral.sh/ruff/rules/#flake8-import-conventions-icn
+  "INP",  # https://docs.astral.sh/ruff/rules/#flake8-no-pep420-inp
+  "ISC",  # https://docs.astral.sh/ruff/rules/#flake8-implicit-str-concat-isc
+  "PIE",  # https://docs.astral.sh/ruff/rules/#flake8-pie-pie
+  "PLC",  # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PLE",  # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PTH",  # https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
+  "Q",    # https://docs.astral.sh/ruff/rules/#flake8-quotes-q
+  "RSE",  # https://docs.astral.sh/ruff/rules/#flake8-raise-rse
+  "RUF",  # https://docs.astral.sh/ruff/rules/#ruff-specific-rules-ruf
+  "SIM",  # https://docs.astral.sh/ruff/rules/#flake8-simplify-sim
+  "T20",  # https://docs.astral.sh/ruff/rules/#flake8-print-t20
+  "TC",   # https://docs.astral.sh/ruff/rules/#flake8-type-checking-tc
+  "TID",  # https://docs.astral.sh/ruff/rules/#flake8-tidy-imports-tid
+  "UP",   # https://docs.astral.sh/ruff/rules/#pyupgrade-up
+  "W",    # https://docs.astral.sh/ruff/rules/#pycodestyle-e-w
 ]
-lint.ignore = ["COM812", "DJ001", "RUF012", "SIM105"]
+lint.ignore = ["DJ001", "RUF012", "SIM105"]
 # Migrations
 lint.per-file-ignores."*/migrations/*.py" = ["E501", "SIM", "T201"]
 # Testing
@@ -173,92 +180,97 @@ lint.per-file-ignores."*/tests/*.py" = ["E501", "SIM117"]
 lint.per-file-ignores.".github/scripts/*.py" = ["E501", "INP001", "SIM117"]
 # Docker specific
 lint.per-file-ignores."docker/rootfs/usr/local/bin/wait-for-redis.py" = [
-	"INP001",
-	"T201",
+  "INP001",
+  "T201",
 ]
 lint.per-file-ignores."docker/wait-for-redis.py" = ["INP001", "T201"]
 lint.per-file-ignores."src/documents/file_handling.py" = [
-	"PTH",
+  "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/management/commands/document_consumer.py" = [
-	"PTH",
+  "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/management/commands/document_exporter.py" = [
-	"PTH",
+  "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/migrations/1012_fix_archive_files.py" = [
-	"PTH",
+  "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/models.py" = ["SIM115"]
 lint.per-file-ignores."src/documents/parsers.py" = [
-	"PTH",
+  "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/signals/handlers.py" = [
-	"PTH",
+  "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/tests/test_consumer.py" = [
-	"PTH",
+  "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/tests/test_file_handling.py" = [
-	"PTH",
+  "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/tests/test_management.py" = [
-	"PTH",
+  "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/tests/test_management_consumer.py" = [
-	"PTH",
+  "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/tests/test_management_exporter.py" = [
-	"PTH",
+  "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/tests/test_migration_archive_files.py" = [
-	"PTH",
+  "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/tests/test_migration_document_pages_count.py" = [
-	"PTH",
+  "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/tests/test_migration_mime_type.py" = [
-	"PTH",
+  "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/tests/test_sanity_check.py" = [
-	"PTH",
+  "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/views.py" = ["PTH"] # TODO Enable & remove
 lint.per-file-ignores."src/paperless/checks.py" = ["PTH"] # TODO Enable & remove
 lint.per-file-ignores."src/paperless/settings.py" = [
-	"PTH",
+  "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/paperless/views.py" = ["PTH"] # TODO Enable & remove
 lint.per-file-ignores."src/paperless_mail/mail.py" = [
-	"PTH",
+  "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/paperless_tesseract/tests/test_parser.py" = [
-	"PTH",
-	"RUF001",
-] # TODO PTH Enable & remove
+  "RUF001",
+]
 lint.isort.force-single-line = true
+
+[tool.codespell]
+write-changes = true
+ignore-words-list = "criterias,afterall,valeu,ureue,equest,ure,assertIn,Oktober"
+skip = "src-ui/src/locale/*,src-ui/pnpm-lock.yaml,src-ui/e2e/*,src/paperless_mail/tests/samples/*,src/documents/tests/samples/*,*.po,*.json"
 
 [tool.pytest.ini_options]
 minversion = "8.0"
 pythonpath = ["src"]
 testpaths = [
-	"src/documents/tests/",
-	"src/paperless/tests/",
-	"src/paperless_mail/tests/",
-	"src/paperless_tesseract/tests/",
-	"src/paperless_tika/tests",
+  "src/documents/tests/",
+  "src/paperless/tests/",
+  "src/paperless_mail/tests/",
+  "src/paperless_tesseract/tests/",
+  "src/paperless_tika/tests",
+  "src/paperless_text/tests/",
 ]
 addopts = [
-	"--pythonwarnings=all",
-	"--cov",
-	"--cov-report=html",
-	"--cov-report=xml",
-	"--numprocesses=auto",
-	"--maxprocesses=16",
-	"--quiet",
-	"--durations=50",
-	"--junitxml=junit.xml",
-	"-o junit_family=legacy",
+  "--pythonwarnings=all",
+  "--cov",
+  "--cov-report=html",
+  "--cov-report=xml",
+  "--numprocesses=auto",
+  "--maxprocesses=16",
+  "--quiet",
+  "--durations=50",
+  "--junitxml=junit.xml",
+  "-o junit_family=legacy",
 ]
 norecursedirs = ["src/locale/", ".venv/", "src-ui/"]
 
@@ -274,17 +286,14 @@ omit = ["*/tests/*", "manage.py", "paperless/wsgi.py", "paperless/auth.py"]
 
 [tool.coverage.report]
 exclude_also = [
-	"if settings.AUDIT_LOG_ENABLED:",
-	"if AUDIT_LOG_ENABLED:",
-	"if TYPE_CHECKING:",
+  "if settings.AUDIT_LOG_ENABLED:",
+  "if AUDIT_LOG_ENABLED:",
+  "if TYPE_CHECKING:",
 ]
 
 [tool.mypy]
-plugins = [
-	"mypy_django_plugin.main",
-	"mypy_drf_plugin.main",
-	"numpy.typing.mypy_plugin",
-]
+mypy_path = "src"
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
 check_untyped_defs = true
 disallow_any_generics = true
 disallow_incomplete_defs = true
@@ -300,12 +309,12 @@ environments = ["sys_platform == 'darwin'", "sys_platform == 'linux'"]
 [tool.uv.sources]
 # Markers are chosen to select these almost exclusively when building the Docker image
 psycopg-c = [
-	{ url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.5/psycopg_c-3.2.5-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
-	{ url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.5/psycopg_c-3.2.5-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_c-3.2.9-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_c-3.2.9-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
 ]
 zxing-cpp = [
-	{ url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
-	{ url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
 ]
 whoosh-reloaded = { git = "https://github.com/Sygil-Dev/whoosh-reloaded.git" }
 

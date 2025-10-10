@@ -7,6 +7,7 @@ import {
   QueryList,
   ViewChild,
   ViewChildren,
+  inject,
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
@@ -37,6 +38,11 @@ import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit
   ],
 })
 export class CustomFieldsDropdownComponent extends LoadingComponentWithPermissions {
+  private customFieldsService = inject(CustomFieldsService)
+  private modalService = inject(NgbModal)
+  private toastService = inject(ToastService)
+  private permissionsService = inject(PermissionsService)
+
   public popperOptions = pngxPopperOptions
 
   @Input()
@@ -78,12 +84,7 @@ export class CustomFieldsDropdownComponent extends LoadingComponentWithPermissio
     )
   }
 
-  constructor(
-    private customFieldsService: CustomFieldsService,
-    private modalService: NgbModal,
-    private toastService: ToastService,
-    private permissionsService: PermissionsService
-  ) {
+  constructor() {
     super()
     this.getFields()
   }

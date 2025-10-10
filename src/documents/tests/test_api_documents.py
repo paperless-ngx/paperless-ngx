@@ -171,6 +171,113 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results[0]), 0)
 
+    def test_document_legacy_created_format(self):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - Document is requested with api version ≥ 9
+            - Document is requested with api version < 9
+        THEN:
+            - Document created field is returned as date
+            - Document created field is returned as datetime
+        """
+        doc = Document.objects.create(
+            title="none",
+            checksum="123",
+            mime_type="application/pdf",
+            created=date(2023, 1, 1),
+        )
+
+        response = self.client.get(
+            f"/api/documents/{doc.pk}/",
+            headers={"Accept": "application/json; version=8"},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertRegex(response.data["created"], r"^2023-01-01T00:00:00.*$")
+
+        response = self.client.get(
+            f"/api/documents/{doc.pk}/",
+            headers={"Accept": "application/json; version=9"},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["created"], "2023-01-01")
+
+        # legacy datetime format
+        response = self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            {"created": "2023-02-01T23:00:00Z"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        doc.refresh_from_db()
+        self.assertEqual(doc.created, date(2023, 2, 1))
+
+        # naive datetime
+        response = self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            {"created": "2023-06-28T23:00:00"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        doc.refresh_from_db()
+        self.assertEqual(doc.created, date(2023, 6, 28))
+
+    def test_document_update_legacy_created_format(self):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - Document is updated with created in datetime format
+        THEN:
+            - Document created field is updated as date
+        """
+        doc = Document.objects.create(
+            title="none",
+            checksum="123",
+            mime_type="application/pdf",
+            created=date(2023, 1, 1),
+        )
+
+        created_datetime = datetime.datetime(2023, 2, 1, 12, 0, 0)
+        response = self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            {"created": created_datetime},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.created, date(2023, 2, 1))
+
+    def test_document_update_with_created_date(self):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - Document is updated with created_date and not created
+        THEN:
+            - Document created field is updated
+        """
+        doc = Document.objects.create(
+            title="none",
+            checksum="123",
+            mime_type="application/pdf",
+            created=date(2023, 1, 1),
+        )
+
+        created_date = date(2023, 2, 1)
+        self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            {"created_date": created_date},
+            format="json",
+        )
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.created_date, created_date)
+
     def test_document_actions(self):
         _, filename = tempfile.mkstemp(dir=self.dirs.originals_dir)
 
@@ -1313,7 +1420,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         _, overrides = self.get_last_consume_delay_call_args()
 
-        self.assertEqual(overrides.created, created)
+        self.assertEqual(overrides.created, created.date())
 
     def test_upload_with_asn(self):
         self.consume_file_mock.return_value = celery.result.AsyncResult(
@@ -2225,6 +2332,26 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
                     "last_name": note.user.last_name,
                 },
             },
+        )
+
+    def test_docnote_serializer_v7(self):
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document which will have notes!",
+        )
+        Note.objects.create(
+            note="This is a note.",
+            document=doc,
+            user=self.user,
+        )
+        self.assertEqual(
+            self.client.get(
+                f"/api/documents/{doc.pk}/",
+                headers={"Accept": "application/json; version=7"},
+                format="json",
+            ).data["notes"][0]["user"],
+            self.user.id,
         )
 
     def test_create_note(self):

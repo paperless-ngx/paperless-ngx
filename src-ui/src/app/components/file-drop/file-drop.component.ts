@@ -1,9 +1,4 @@
-import { Component, HostListener, ViewChild } from '@angular/core'
-import {
-  NgxFileDropComponent,
-  NgxFileDropEntry,
-  NgxFileDropModule,
-} from 'ngx-file-drop'
+import { Component, HostListener, inject } from '@angular/core'
 import {
   PermissionAction,
   PermissionsService,
@@ -17,19 +12,17 @@ import { UploadDocumentsService } from 'src/app/services/upload-documents.servic
   selector: 'pngx-file-drop',
   templateUrl: './file-drop.component.html',
   styleUrls: ['./file-drop.component.scss'],
-  imports: [NgxFileDropModule],
+  imports: [],
 })
 export class FileDropComponent {
+  private settings = inject(SettingsService)
+  private toastService = inject(ToastService)
+  private uploadDocumentsService = inject(UploadDocumentsService)
+  private permissionsService = inject(PermissionsService)
+
   private fileLeaveTimeoutID: any
   fileIsOver: boolean = false
   hidden: boolean = true
-
-  constructor(
-    private settings: SettingsService,
-    private toastService: ToastService,
-    private uploadDocumentsService: UploadDocumentsService,
-    private permissionsService: PermissionsService
-  ) {}
 
   public get dragDropEnabled(): boolean {
     return (
@@ -40,8 +33,6 @@ export class FileDropComponent {
       )
     )
   }
-
-  @ViewChild('ngxFileDrop') ngxFileDrop: NgxFileDropComponent
 
   @HostListener('document:dragover', ['$event']) onDragOver(event: DragEvent) {
     if (!this.dragDropEnabled || !event.dataTransfer?.types?.includes('Files'))
@@ -78,19 +69,85 @@ export class FileDropComponent {
     }, ms)
   }
 
+  private traverseFileTree(entry: FileSystemEntry): Promise<File[]> {
+    if (entry.isFile) {
+      return new Promise((resolve, reject) => {
+        ;(entry as FileSystemFileEntry).file(resolve, reject)
+      }).then((file: File) => [file])
+    }
+
+    if (entry.isDirectory) {
+      return new Promise<File[]>((resolve, reject) => {
+        const dirReader = (entry as FileSystemDirectoryEntry).createReader()
+        const allEntries: FileSystemEntry[] = []
+
+        const readEntries = () => {
+          dirReader.readEntries((batch) => {
+            if (batch.length === 0) {
+              const promises = allEntries.map((child) =>
+                this.traverseFileTree(child)
+              )
+              Promise.all(promises)
+                .then((results) => resolve([].concat(...results)))
+                .catch(reject)
+            } else {
+              allEntries.push(...batch)
+              readEntries() // keep reading
+            }
+          }, reject)
+        }
+
+        readEntries()
+      })
+    }
+
+    return Promise.resolve([])
+  }
+
   @HostListener('document:drop', ['$event']) public onDrop(event: DragEvent) {
     if (!this.dragDropEnabled) return
     event.preventDefault()
     event.stopImmediatePropagation()
-    // pass event onto ngx-file-drop to handle files
-    this.ngxFileDrop.dropFiles(event)
-    this.onDragLeave(event, true)
-  }
 
-  public dropped(files: NgxFileDropEntry[]) {
-    this.uploadDocumentsService.onNgxFileDrop(files)
-    if (files.length > 0)
+    const files: File[] = []
+    const entries: FileSystemEntry[] = []
+    if (event.dataTransfer?.items && event.dataTransfer.items.length) {
+      for (const item of Array.from(event.dataTransfer.items)) {
+        if (item.webkitGetAsEntry) {
+          // webkitGetAsEntry not standard, but is widely supported
+          const entry = item.webkitGetAsEntry()
+          if (entry) entries.push(entry)
+        } else if (item.kind === 'file') {
+          const file = item.getAsFile()
+          if (file) files.push(file)
+        }
+      }
+    } else if (event.dataTransfer?.files) {
+      // Fallback for browsers without DataTransferItem API
+      for (const file of Array.from(event.dataTransfer.files)) {
+        files.push(file)
+      }
+    }
+
+    if (entries.length) {
+      const promises = entries.map((entry) => this.traverseFileTree(entry))
+      Promise.all(promises)
+        .then((results) => {
+          files.push(...[].concat(...results))
+          this.toastService.showInfo($localize`Initiating upload...`, 3000)
+          files.forEach((file) => this.uploadDocumentsService.uploadFile(file))
+        })
+        .catch((e) => {
+          this.toastService.showError(
+            $localize`Failed to read dropped items: ${e.message}`
+          )
+        })
+    } else if (files.length) {
       this.toastService.showInfo($localize`Initiating upload...`, 3000)
+      files.forEach((file) => this.uploadDocumentsService.uploadFile(file))
+    }
+
+    this.onDragLeave(event, true)
   }
 
   @HostListener('window:blur', ['$event']) public onWindowBlur() {

@@ -1,11 +1,9 @@
 # Please see the documentation for all configuration options:
 # https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
-
 version: 2
 # Required for uv support for now
 enable-beta-ecosystems: true
 updates:
-
   # Enable version updates for pnpm
   - package-ecosystem: "npm"
     target-branch: "dev"
@@ -17,9 +15,6 @@ updates:
     labels:
       - "frontend"
       - "dependencies"
-    # Add reviewers
-    reviewers:
-      - "paperless-ngx/frontend"
     groups:
       frontend-angular-dependencies:
         patterns:
@@ -35,7 +30,6 @@ updates:
         patterns:
           - "@typescript-eslint*"
           - "eslint"
-
   # Enable version updates for Python
   - package-ecosystem: "uv"
     target-branch: "dev"
@@ -46,9 +40,6 @@ updates:
     labels:
       - "backend"
       - "dependencies"
-    # Add reviewers
-    reviewers:
-      - "paperless-ngx/backend"
     groups:
       development:
         patterns:
@@ -59,6 +50,7 @@ updates:
       django:
         patterns:
           - "*django*"
+          - "drf-*"
       major-versions:
         update-types:
           - "major"
@@ -66,11 +58,13 @@ updates:
         update-types:
           - "minor"
           - "patch"
+        exclude-patterns:
+          - "*django*"
+          - "drf-*"
       pre-built:
         patterns:
           - psycopg*
           - zxing-cpp
-
   # Enable updates for GitHub Actions
   - package-ecosystem: "github-actions"
     target-branch: "dev"
@@ -81,41 +75,32 @@ updates:
     labels:
       - "ci-cd"
       - "dependencies"
-    # Add reviewers
-    reviewers:
-      - "paperless-ngx/ci-cd"
     groups:
       actions:
         update-types:
           - "major"
           - "minor"
           - "patch"
-
   # Update Dockerfile in root directory
   - package-ecosystem: "docker"
-    directory: "/"
+    directories:
+      - "/"
+      - "/.devcontainer/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
-    reviewers:
-      - "paperless-ngx/ci-cd"
     labels:
-      - "ci-cd"
       - "dependencies"
     commit-message:
       prefix: "docker"
       include: "scope"
-
   # Update Docker Compose files in docker/compose directory
   - package-ecosystem: "docker-compose"
     directory: "/docker/compose/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
-    reviewers:
-      - "paperless-ngx/ci-cd"
     labels:
-      - "ci-cd"
       - "dependencies"
     commit-message:
       prefix: "docker-compose"

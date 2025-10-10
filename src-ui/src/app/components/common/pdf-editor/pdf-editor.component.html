@@ -1,0 +1,107 @@
+<pdf-viewer [src]="pdfSrc" [render-text]="false" zoom="0.4" (after-load-complete)="pdfLoaded($event)"></pdf-viewer>
+<div class="modal-header">
+  <h4 class="modal-title">{{ title }}</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="cancel()"></button>
+</div>
+<div class="modal-body">
+  <div class="btn-toolbar mb-2">
+    <div class="btn-group me-3">
+      <button class="btn btn-sm btn-secondary" (click)="selectAll()" title="Select all pages" i18n-title>
+        <i-bs name="check-all"></i-bs>
+      </button>
+      <button class="btn btn-sm btn-secondary" (click)="deselectAll()" [disabled]="!hasSelection()" title="Deselect all pages" i18n-title>
+        <i-bs name="x"></i-bs>
+      </button>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-sm btn-secondary" (click)="rotateSelected(-90)" [disabled]="!hasSelection()" title="Rotate selected pages counter-clockwise" i18n-title>
+        <i-bs name="arrow-counterclockwise"></i-bs>
+      </button>
+      <button class="btn btn-sm btn-secondary" (click)="rotateSelected(90)" [disabled]="!hasSelection()" title="Rotate selected pages clockwise" i18n-title>
+        <i-bs name="arrow-clockwise"></i-bs>
+      </button>
+      <button class="btn btn-sm btn-danger" (click)="deleteSelected()" [disabled]="!hasSelection()" title="Delete selected pages" i18n-title>
+        <i-bs name="trash"></i-bs>
+      </button>
+    </div>
+  </div>
+  <div cdkDropList (cdkDropListDropped)="drop($event)" cdkDropListOrientation="mixed" class="d-flex flex-wrap row-cols-2 row-cols-md-5">
+    @for (p of pages; track p.page; let i = $index) {
+      <div class="page-item rounded p-2" cdkDrag (click)="toggleSelection(i)" [class.selected]="p.selected">
+        <div class="btn-toolbar hover-actions z-10">
+          <div class="btn-group me-2">
+            <button class="btn btn-sm btn-dark" (click)="rotate(i); $event.stopPropagation()" title="Rotate page counter-clockwise" i18n-title>
+              <i-bs name="arrow-counterclockwise"></i-bs>
+            </button>
+            <button class="btn btn-sm btn-dark" (click)="rotate(i); $event.stopPropagation()" title="Rotate page clockwise" i18n-title>
+              <i-bs name="arrow-clockwise"></i-bs>
+            </button>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-sm btn-dark text-danger" (click)="remove(i); $event.stopPropagation()" title="Delete page" i18n-title>
+              <i-bs name="trash"></i-bs>
+            </button>
+            <button class="btn btn-sm btn-dark" (click)="toggleSplit(i); $event.stopPropagation()" title="Add / remove document split here" i18n-title>
+              <i-bs name="scissors"></i-bs>
+            </button>
+          </div>
+        </div>
+        <div class="border-end border-bottom bg-light py-1 px-2 document-check z-10">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="page{{i}}" [checked]="p.selected" (click)="toggleSelection(i); $event.stopPropagation()">
+            <label class="form-check-label" for="page{{i}}"></label>
+          </div>
+        </div>
+        <div class="pdf-viewer-container w-100" [class.selected]="p.selected">
+          @defer (on viewport) {
+            @if (!p.loaded) {
+              <div class="placeholder-glow w-100 h-100 z-10">
+                <span class="placeholder w-100 h-100"></span>
+              </div>
+            }
+            <pdf-viewer class="fade" [class.show]="p.loaded" [src]="pdfSrc" [page]="p.page" [rotation]="p.rotate" [original-size]="false" [show-all]="false" [render-text]="false" (page-rendered)="p.loaded = true"></pdf-viewer>
+          } @placeholder {
+            <div class="placeholder-glow w-100 h-100 z-10">
+              <span class="placeholder w-100 h-100"></span>
+            </div>
+          }
+        </div>
+        @if (p.splitAfter) {
+          <div class="split-after rounded position-absolute top-0 end-0 bg-dark text-uppercase text-center h-100 px-1 small fw-bold">&mdash; <span i18n>Split here</span> &mdash;</div>
+        }
+      </div>
+    }
+  </div>
+</div>
+<div class="modal-footer">
+  <div class="d-flex flex-column flex-md-row w-100 gap-3 align-items-center">
+    <div class="btn-group" role="group">
+      <input type="radio" class="btn-check" [(ngModel)]="editMode" [value]="PdfEditorEditMode.Create" id="editModeCreate" name="editmode">
+      <label for="editModeCreate" class="btn btn-outline-primary btn-sm">
+        <i-bs name="plus"></i-bs>
+        <span class="form-check-label ms-1" i18n>Create new document(s)</span>
+      </label>
+      <input type="radio" class="btn-check" [(ngModel)]="editMode" [value]="PdfEditorEditMode.Update" id="editModeUpdate" name="editmode" [disabled]="hasSplit()">
+      <label for="editModeUpdate" class="btn btn-outline-primary btn-sm">
+        <i-bs name="pencil"></i-bs>
+        <span class="form-check-label ms-2" i18n>Update existing document</span>
+      </label>
+    </div>
+    @if (editMode === PdfEditorEditMode.Create) {
+      <div class="form-group d-flex">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="copyMeta" [(ngModel)]="includeMetadata">
+          <label class="form-check-label" for="copyMeta" i18n>Copy metadata</label>
+        </div>
+        <div class="form-check ms-3">
+          <input class="form-check-input" type="checkbox" id="deleteOriginal" [(ngModel)]="deleteOriginal">
+          <label class="form-check-label" for="deleteOriginal" i18n>Delete original</label>
+        </div>
+      </div>
+    }
+    <div class="form-group ms-md-auto">
+      <button type="button" class="btn me-2" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">{{ cancelBtnCaption }}</button>
+      <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="pages.length === 0">{{ btnCaption }}</button>
+    </div>
+  </div>
+</div>

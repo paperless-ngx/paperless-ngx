@@ -136,6 +136,36 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
             ],
         )
 
+    def test_profile_w_social_removed_app(self):
+        """
+        GIVEN:
+            - Configured user and setup social account
+            - Social app has been removed
+        WHEN:
+            - API call is made to get profile
+        THEN:
+            - Profile is returned with "Unknown App" as name
+        """
+        self.setupSocialAccount()
+
+        # Remove the social app
+        SocialApp.objects.get(provider_id="keycloak-test").delete()
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(
+            response.data["social_accounts"],
+            [
+                {
+                    "id": 1,
+                    "provider": "keycloak-test",
+                    "name": "Unknown App",
+                },
+            ],
+        )
+
     def test_update_profile(self):
         """
         GIVEN:

@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { Observable } from 'rxjs'
 import { environment } from 'src/environments/environment'
 
@@ -7,7 +7,7 @@ import { environment } from 'src/environments/environment'
   providedIn: 'root',
 })
 export class LogService {
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient)
 
   list(): Observable<string[]> {
     return this.http.get<string[]>(`${environment.apiBaseUrl}logs/`)

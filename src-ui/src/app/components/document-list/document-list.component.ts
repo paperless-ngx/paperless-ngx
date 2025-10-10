@@ -1,6 +1,7 @@
 import { AsyncPipe, NgClass, NgTemplateOutlet } from '@angular/common'
 import {
   Component,
+  inject,
   OnDestroy,
   OnInit,
   QueryList,
@@ -103,24 +104,20 @@ export class DocumentListComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy
 {
+  list = inject(DocumentListViewService)
+  savedViewService = inject(SavedViewService)
+  route = inject(ActivatedRoute)
+  private router = inject(Router)
+  private toastService = inject(ToastService)
+  private modalService = inject(NgbModal)
+  private websocketStatusService = inject(WebsocketStatusService)
+  openDocumentsService = inject(OpenDocumentsService)
+  settingsService = inject(SettingsService)
+  private hotKeyService = inject(HotKeyService)
+  permissionService = inject(PermissionsService)
+
   DisplayField = DisplayField
   DisplayMode = DisplayMode
-
-  constructor(
-    public list: DocumentListViewService,
-    public savedViewService: SavedViewService,
-    public route: ActivatedRoute,
-    private router: Router,
-    private toastService: ToastService,
-    private modalService: NgbModal,
-    private websocketStatusService: WebsocketStatusService,
-    public openDocumentsService: OpenDocumentsService,
-    public settingsService: SettingsService,
-    private hotKeyService: HotKeyService,
-    public permissionService: PermissionsService
-  ) {
-    super()
-  }
 
   @ViewChild('filterEditor')
   private filterEditor: FilterEditorComponent
@@ -267,7 +264,9 @@ export class DocumentListComponent
           view,
           convertToParamMap(this.route.snapshot.queryParams)
         )
-        this.list.reload()
+        this.list.reload(() => {
+          this.savedViewService.setDocumentCount(view, this.list.collectionSize)
+        })
         this.updateDisplayCustomFields()
         this.unmodifiedFilterRules = view.filter_rules
       })
@@ -402,7 +401,9 @@ export class DocumentListComponent
       .subscribe((view) => {
         this.unmodifiedSavedView = view
         this.list.activateSavedView(view)
-        this.list.reload()
+        this.list.reload(() => {
+          this.savedViewService.setDocumentCount(view, this.list.collectionSize)
+        })
       })
   }
 

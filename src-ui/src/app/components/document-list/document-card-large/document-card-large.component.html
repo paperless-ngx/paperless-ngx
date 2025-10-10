@@ -15,7 +15,7 @@
       }
 
     </div>
-    <div class="col">
+    <div class="col col-md-10">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
           <h5 class="card-title w-100">
@@ -112,14 +112,14 @@
               @if (displayFields.includes(DisplayField.CREATED) || displayFields.includes(DisplayField.ADDED)) {
                 <ng-template #dateTooltip>
                   <div class="d-flex flex-column text-light">
-                    <span i18n>Created: {{ document.created_date | customDate }}</span>
+                    <span i18n>Created: {{ document.created | customDate }}</span>
                     <span i18n>Added: {{ document.added | customDate }}</span>
                     <span i18n>Modified: {{ document.modified | customDate }}</span>
                   </div>
                 </ng-template>
                 @if (displayFields.includes(DisplayField.CREATED)) {
                   <div class="list-group-item bg-light text-dark p-1 border-0 d-flex align-items-center" [ngbTooltip]="dateTooltip">
-                    <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="calendar-event"></i-bs><small>{{document.created_date | customDate:'mediumDate'}}</small>
+                    <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="calendar-event"></i-bs><small>{{document.created | customDate:'mediumDate'}}</small>
                   </div>
                 }
                 @if (displayFields.includes(DisplayField.ADDED)) {

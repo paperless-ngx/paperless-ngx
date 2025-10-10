@@ -1,5 +1,4 @@
 import filecmp
-import os
 import shutil
 from pathlib import Path
 from threading import Thread
@@ -94,13 +93,13 @@ class ConsumerThreadMixin(DocumentConsumeDelayMixin):
             print("Consumed a perfectly valid file.")  # noqa: T201
 
     def slow_write_file(self, target, *, incomplete=False):
-        with open(self.sample_file, "rb") as f:
+        with Path(self.sample_file).open("rb") as f:
             pdf_bytes = f.read()
 
         if incomplete:
             pdf_bytes = pdf_bytes[: len(pdf_bytes) - 100]
 
-        with open(target, "wb") as f:
+        with Path(target).open("wb") as f:
             # this will take 2 seconds, since the file is about 20k.
             print("Start writing file.")  # noqa: T201
             for b in chunked(1000, pdf_bytes):
@@ -116,7 +115,7 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
     def test_consume_file(self):
         self.t_start()
 
-        f = Path(os.path.join(self.dirs.consumption_dir, "my_file.pdf"))
+        f = Path(self.dirs.consumption_dir) / "my_file.pdf"
         shutil.copy(self.sample_file, f)
 
         self.wait_for_task_mock_call()
@@ -130,7 +129,7 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
     def test_consume_file_invalid_ext(self):
         self.t_start()
 
-        f = os.path.join(self.dirs.consumption_dir, "my_file.wow")
+        f = Path(self.dirs.consumption_dir) / "my_file.wow"
         shutil.copy(self.sample_file, f)
 
         self.wait_for_task_mock_call()
@@ -138,7 +137,7 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
         self.consume_file_mock.assert_not_called()
 
     def test_consume_existing_file(self):
-        f = Path(os.path.join(self.dirs.consumption_dir, "my_file.pdf"))
+        f = Path(self.dirs.consumption_dir) / "my_file.pdf"
         shutil.copy(self.sample_file, f)
 
         self.t_start()
@@ -154,7 +153,7 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
 
         self.t_start()
 
-        fname = Path(os.path.join(self.dirs.consumption_dir, "my_file.pdf"))
+        fname = Path(self.dirs.consumption_dir) / "my_file.pdf"
 
         self.slow_write_file(fname)
 
@@ -174,8 +173,8 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
 
         self.t_start()
 
-        fname = Path(os.path.join(self.dirs.consumption_dir, "my_file.~df"))
-        fname2 = Path(os.path.join(self.dirs.consumption_dir, "my_file.pdf"))
+        fname = Path(self.dirs.consumption_dir) / "my_file.~df"
+        fname2 = Path(self.dirs.consumption_dir) / "my_file.pdf"
 
         self.slow_write_file(fname)
         shutil.move(fname, fname2)
@@ -196,7 +195,7 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
 
         self.t_start()
 
-        fname = Path(os.path.join(self.dirs.consumption_dir, "my_file.pdf"))
+        fname = Path(self.dirs.consumption_dir) / "my_file.pdf"
         self.slow_write_file(fname, incomplete=True)
 
         self.wait_for_task_mock_call()
@@ -225,23 +224,23 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
 
         shutil.copy(
             self.sample_file,
-            os.path.join(self.dirs.consumption_dir, ".DS_STORE"),
+            Path(self.dirs.consumption_dir) / ".DS_STORE",
         )
         shutil.copy(
             self.sample_file,
-            os.path.join(self.dirs.consumption_dir, "my_file.pdf"),
+            Path(self.dirs.consumption_dir) / "my_file.pdf",
         )
         shutil.copy(
             self.sample_file,
-            os.path.join(self.dirs.consumption_dir, "._my_file.pdf"),
+            Path(self.dirs.consumption_dir) / "._my_file.pdf",
         )
         shutil.copy(
             self.sample_file,
-            os.path.join(self.dirs.consumption_dir, "my_second_file.pdf"),
+            Path(self.dirs.consumption_dir) / "my_second_file.pdf",
         )
         shutil.copy(
             self.sample_file,
-            os.path.join(self.dirs.consumption_dir, "._my_second_file.pdf"),
+            Path(self.dirs.consumption_dir) / "._my_second_file.pdf",
         )
 
         sleep(5)
@@ -259,59 +258,65 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
     def test_is_ignored(self):
         test_paths = [
             {
-                "path": os.path.join(self.dirs.consumption_dir, "foo.pdf"),
+                "path": str(Path(self.dirs.consumption_dir) / "foo.pdf"),
                 "ignore": False,
             },
             {
-                "path": os.path.join(self.dirs.consumption_dir, "foo", "bar.pdf"),
+                "path": str(
+                    Path(self.dirs.consumption_dir) / "foo" / "bar.pdf",
+                ),
                 "ignore": False,
             },
             {
-                "path": os.path.join(self.dirs.consumption_dir, ".DS_STORE"),
+                "path": str(Path(self.dirs.consumption_dir) / ".DS_STORE"),
                 "ignore": True,
             },
             {
-                "path": os.path.join(self.dirs.consumption_dir, ".DS_Store"),
+                "path": str(Path(self.dirs.consumption_dir) / ".DS_Store"),
                 "ignore": True,
             },
             {
-                "path": os.path.join(self.dirs.consumption_dir, ".stfolder", "foo.pdf"),
-                "ignore": True,
-            },
-            {
-                "path": os.path.join(self.dirs.consumption_dir, ".stfolder.pdf"),
-                "ignore": False,
-            },
-            {
-                "path": os.path.join(
-                    self.dirs.consumption_dir,
-                    ".stversions",
-                    "foo.pdf",
+                "path": str(
+                    Path(self.dirs.consumption_dir) / ".stfolder" / "foo.pdf",
                 ),
                 "ignore": True,
             },
             {
-                "path": os.path.join(self.dirs.consumption_dir, ".stversions.pdf"),
+                "path": str(Path(self.dirs.consumption_dir) / ".stfolder.pdf"),
                 "ignore": False,
             },
             {
-                "path": os.path.join(self.dirs.consumption_dir, "._foo.pdf"),
+                "path": str(
+                    Path(self.dirs.consumption_dir) / ".stversions" / "foo.pdf",
+                ),
                 "ignore": True,
             },
             {
-                "path": os.path.join(self.dirs.consumption_dir, "my_foo.pdf"),
+                "path": str(
+                    Path(self.dirs.consumption_dir) / ".stversions.pdf",
+                ),
                 "ignore": False,
             },
             {
-                "path": os.path.join(self.dirs.consumption_dir, "._foo", "bar.pdf"),
+                "path": str(Path(self.dirs.consumption_dir) / "._foo.pdf"),
                 "ignore": True,
             },
             {
-                "path": os.path.join(
-                    self.dirs.consumption_dir,
-                    "@eaDir",
-                    "SYNO@.fileindexdb",
-                    "_1jk.fnm",
+                "path": str(Path(self.dirs.consumption_dir) / "my_foo.pdf"),
+                "ignore": False,
+            },
+            {
+                "path": str(
+                    Path(self.dirs.consumption_dir) / "._foo" / "bar.pdf",
+                ),
+                "ignore": True,
+            },
+            {
+                "path": str(
+                    Path(self.dirs.consumption_dir)
+                    / "@eaDir"
+                    / "SYNO@.fileindexdb"
+                    / "_1jk.fnm",
                 ),
                 "ignore": True,
             },
@@ -325,14 +330,14 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
                 f'_is_ignored("{filepath}") != {expected_ignored_result}',
             )
 
-    @mock.patch("documents.management.commands.document_consumer.open")
+    @mock.patch("documents.management.commands.document_consumer.Path.open")
     def test_consume_file_busy(self, open_mock):
         # Calling this mock always raises this
         open_mock.side_effect = OSError
 
         self.t_start()
 
-        f = os.path.join(self.dirs.consumption_dir, "my_file.pdf")
+        f = Path(self.dirs.consumption_dir) / "my_file.pdf"
         shutil.copy(self.sample_file, f)
 
         self.wait_for_task_mock_call()
@@ -380,9 +385,9 @@ class TestConsumerTags(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCas
 
         self.t_start()
 
-        path = os.path.join(self.dirs.consumption_dir, *tag_names)
-        os.makedirs(path, exist_ok=True)
-        f = Path(os.path.join(path, "my_file.pdf"))
+        path = Path(self.dirs.consumption_dir) / "/".join(tag_names)
+        path.mkdir(parents=True, exist_ok=True)
+        f = path / "my_file.pdf"
         # Wait at least inotify read_delay for recursive watchers
         # to be created for the new directories
         sleep(1)

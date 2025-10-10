@@ -2,6 +2,7 @@ import {
   Component,
   EventEmitter,
   forwardRef,
+  inject,
   Input,
   OnInit,
   Output,
@@ -45,10 +46,10 @@ import { TagComponent } from '../../tag/tag.component'
   ],
 })
 export class TagsComponent implements OnInit, ControlValueAccessor {
-  constructor(
-    private tagService: TagService,
-    private modalService: NgbModal
-  ) {
+  private tagService = inject(TagService)
+  private modalService = inject(NgbModal)
+
+  constructor() {
     this.createTagRef = this.createTag.bind(this)
   }
 
@@ -118,13 +119,10 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     }
   }
 
-  removeTag(event: PointerEvent, id: number) {
+  removeTag(tagID: number) {
     if (this.disabled) return
 
-    // prevent opening dropdown
-    event.stopImmediatePropagation()
-
-    let index = this.value.indexOf(id)
+    let index = this.value.indexOf(tagID)
     if (index > -1) {
       let oldValue = this.value
       oldValue.splice(index, 1)
@@ -133,7 +131,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     }
   }
 
-  createTag(name: string = null) {
+  createTag(name: string = null, add: boolean = false) {
     var modal = this.modalService.open(TagEditDialogComponent, {
       backdrop: 'static',
     })
@@ -146,9 +144,10 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     return firstValueFrom(
       (modal.componentInstance as TagEditDialogComponent).succeeded.pipe(
         first(),
-        tap(() => {
+        tap((newTag) => {
           this.tagService.listAll().subscribe((tags) => {
             this.tags = tags.results
+            add && this.addTag(newTag.id)
           })
         })
       )

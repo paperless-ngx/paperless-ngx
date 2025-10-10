@@ -19,6 +19,10 @@
     height: 0.8em;
   }
 
+  .view-name {
+    max-width: calc(100% - 50px)
+  }
+
   .nav-group:not(:has(.app-link)) .sidebar-heading {
     display: none !important;
   }
@@ -187,7 +191,7 @@ main {
   list-style-type: none;
 
   &:hover .close {
-    display: block;
+    display: flex;
   }
 
   .close {

@@ -108,6 +108,7 @@ class RasterisedDocumentParser(DocumentParser):
             "image/bmp",
             "image/gif",
             "image/webp",
+            "image/heic",
         ]
 
     def has_alpha(self, image) -> bool:

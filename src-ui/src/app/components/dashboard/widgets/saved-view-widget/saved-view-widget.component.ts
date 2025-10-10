@@ -1,6 +1,7 @@
 import { AsyncPipe, NgClass, NgStyle } from '@angular/common'
 import {
   Component,
+  inject,
   Input,
   OnDestroy,
   OnInit,
@@ -51,6 +52,7 @@ import {
 } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
@@ -84,25 +86,22 @@ export class SavedViewWidgetComponent
   extends LoadingComponentWithPermissions
   implements OnInit, OnDestroy
 {
+  private documentService = inject(DocumentService)
+  private router = inject(Router)
+  private list = inject(DocumentListViewService)
+  private websocketStatusService = inject(WebsocketStatusService)
+  openDocumentsService = inject(OpenDocumentsService)
+  documentListViewService = inject(DocumentListViewService)
+  permissionsService = inject(PermissionsService)
+  private settingsService = inject(SettingsService)
+  private customFieldService = inject(CustomFieldsService)
+  private savedViewService = inject(SavedViewService)
+
   public DisplayMode = DisplayMode
   public DisplayField = DisplayField
   public CustomFieldDataType = CustomFieldDataType
 
   private customFields: CustomField[] = []
-
-  constructor(
-    private documentService: DocumentService,
-    private router: Router,
-    private list: DocumentListViewService,
-    private websocketStatusService: WebsocketStatusService,
-    public openDocumentsService: OpenDocumentsService,
-    public documentListViewService: DocumentListViewService,
-    public permissionsService: PermissionsService,
-    private settingsService: SettingsService,
-    private customFieldService: CustomFieldsService
-  ) {
-    super()
-  }
 
   @Input()
   savedView: SavedView
@@ -120,6 +119,8 @@ export class SavedViewWidgetComponent
   displayMode: DisplayMode
 
   displayFields: DisplayField[] = DEFAULT_DASHBOARD_DISPLAY_FIELDS
+
+  count: number
 
   ngOnInit(): void {
     this.reload()
@@ -181,6 +182,8 @@ export class SavedViewWidgetComponent
         tap((result) => {
           this.show = true
           this.documents = result.results
+          this.count = result.count
+          this.savedViewService.setDocumentCount(this.savedView, result.count)
         }),
         delay(500)
       )

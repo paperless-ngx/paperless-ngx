@@ -1,6 +1,5 @@
 import { HttpEventType } from '@angular/common/http'
-import { Injectable } from '@angular/core'
-import { FileSystemFileEntry, NgxFileDropEntry } from 'ngx-file-drop'
+import { Injectable, inject } from '@angular/core'
 import { Subscription } from 'rxjs'
 import { DocumentService } from './rest/document.service'
 import {
@@ -12,29 +11,12 @@ import {
   providedIn: 'root',
 })
 export class UploadDocumentsService {
+  private documentService = inject(DocumentService)
+  private websocketStatusService = inject(WebsocketStatusService)
+
   private uploadSubscriptions: Array<Subscription> = []
 
-  constructor(
-    private documentService: DocumentService,
-    private websocketStatusService: WebsocketStatusService
-  ) {}
-
-  onNgxFileDrop(files: NgxFileDropEntry[]) {
-    for (const droppedFile of files) {
-      if (droppedFile.fileEntry.isFile) {
-        const fileEntry = droppedFile.fileEntry as FileSystemFileEntry
-        fileEntry.file((file: File) => this.uploadFile(file))
-      }
-    }
-  }
-
-  uploadFiles(files: FileList) {
-    for (let index = 0; index < files.length; index++) {
-      this.uploadFile(files.item(index))
-    }
-  }
-
-  private uploadFile(file: File) {
+  public uploadFile(file: File) {
     let formData = new FormData()
     formData.append('document', file, file.name)
     formData.append('from_webui', 'true')

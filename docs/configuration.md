@@ -50,47 +50,48 @@ matcher.
 
 ### Database
 
+By default, Paperless uses **SQLite** with a database stored at `data/db.sqlite3`.
+To switch to **PostgreSQL** or **MariaDB**, set [`PAPERLESS_DBHOST`](#PAPERLESS_DBHOST) and optionally configure other
+database-related environment variables.
+
+#### [`PAPERLESS_DBHOST=<hostname>`](#PAPERLESS_DBHOST) {#PAPERLESS_DBHOST}
+
+: If unset, Paperless uses **SQLite** by default.
+
+    Set `PAPERLESS_DBHOST` to switch to PostgreSQL or MariaDB instead.
+
 #### [`PAPERLESS_DBENGINE=<engine_name>`](#PAPERLESS_DBENGINE) {#PAPERLESS_DBENGINE}
 
-: Optional, gives the ability to choose Postgres or MariaDB for
-database engine. Available options are `postgresql` and
-`mariadb`.
+: Optional. Specifies the database engine to use when connecting to a remote database.
+Available options are `postgresql` and `mariadb`.
 
-    Default is `postgresql`.
+    Defaults to `postgresql` if `PAPERLESS_DBHOST` is set.
 
     !!! warning
 
         Using MariaDB comes with some caveats. See [MySQL Caveats](advanced_usage.md#mysql-caveats).
 
-#### [`PAPERLESS_DBHOST=<hostname>`](#PAPERLESS_DBHOST) {#PAPERLESS_DBHOST}
-
-: By default, sqlite is used as the database backend. This can be
-changed here.
-
-    Set PAPERLESS_DBHOST and another database will be used instead of
-    sqlite.
-
 #### [`PAPERLESS_DBPORT=<port>`](#PAPERLESS_DBPORT) {#PAPERLESS_DBPORT}
 
-: Adjust port if necessary.
+: Port to use when connecting to PostgreSQL or MariaDB.
 
-    Default is 5432.
+    Default is `5432` for PostgreSQL and `3306` for MariaDB.
 
 #### [`PAPERLESS_DBNAME=<name>`](#PAPERLESS_DBNAME) {#PAPERLESS_DBNAME}
 
-: Database name in PostgreSQL or MariaDB.
+: Name of the database to connect to when using PostgreSQL or MariaDB.
 
     Defaults to "paperless".
 
 #### [`PAPERLESS_DBUSER=<name>`](#PAPERLESS_DBUSER) {#PAPERLESS_DBUSER}
 
-: Database user in PostgreSQL or MariaDB.
+: Username for authenticating with the PostgreSQL or MariaDB database.
 
     Defaults to "paperless".
 
 #### [`PAPERLESS_DBPASS=<password>`](#PAPERLESS_DBPASS) {#PAPERLESS_DBPASS}
 
-: Database password for PostgreSQL or MariaDB.
+: Password for the PostgreSQL or MariaDB database user.
 
     Defaults to "paperless".
 
@@ -110,20 +111,20 @@ changed here.
 
 #### [`PAPERLESS_DBSSLROOTCERT=<ca-path>`](#PAPERLESS_DBSSLROOTCERT) {#PAPERLESS_DBSSLROOTCERT}
 
-: SSL root certificate path
+: Path to the SSL root certificate used to verify the database server.
 
     See [the official documentation about
     sslmode for PostgreSQL](https://www.postgresql.org/docs/current/libpq-ssl.html).
-    Changes path of `root.crt`.
+    Changes the location of `root.crt`.
 
     See [the official documentation about
     sslmode for MySQL and MariaDB](https://dev.mysql.com/doc/refman/8.0/en/connection-options.html#option_general_ssl-ca).
 
-    Defaults to unset, using the documented path in the home directory.
+    Defaults to unset, using the standard location in the home directory.
 
 #### [`PAPERLESS_DBSSLCERT=<client-cert-path>`](#PAPERLESS_DBSSLCERT) {#PAPERLESS_DBSSLCERT}
 
-: SSL client certificate path
+: Path to the client SSL certificate used when connecting securely.
 
     See [the official documentation about
     sslmode for PostgreSQL](https://www.postgresql.org/docs/current/libpq-ssl.html).
@@ -131,13 +132,13 @@ changed here.
     See [the official documentation about
     sslmode for MySQL and MariaDB](https://dev.mysql.com/doc/refman/8.0/en/connection-options.html#option_general_ssl-cert).
 
-    Changes path of `postgresql.crt`.
+    Changes the location of `postgresql.crt`.
 
-    Defaults to unset, using the documented path in the home directory.
+    Defaults to unset, using the standard location in the home directory.
 
 #### [`PAPERLESS_DBSSLKEY=<client-cert-key>`](#PAPERLESS_DBSSLKEY) {#PAPERLESS_DBSSLKEY}
 
-: SSL client key path
+: Path to the client SSL private key used when connecting securely.
 
     See [the official documentation about
     sslmode for PostgreSQL](https://www.postgresql.org/docs/current/libpq-ssl.html).
@@ -145,17 +146,70 @@ changed here.
     See [the official documentation about
     sslmode for MySQL and MariaDB](https://dev.mysql.com/doc/refman/8.0/en/connection-options.html#option_general_ssl-key).
 
-    Changes path of `postgresql.key`.
+    Changes the location of `postgresql.key`.
 
-    Defaults to unset, using the documented path in the home directory.
+    Defaults to unset, using the standard location in the home directory.
 
 #### [`PAPERLESS_DB_TIMEOUT=<int>`](#PAPERLESS_DB_TIMEOUT) {#PAPERLESS_DB_TIMEOUT}
 
-: Amount of time for a database connection to wait for the database to
-unlock. Mostly applicable for sqlite based installation. Consider changing
-to postgresql if you are having concurrency problems with sqlite.
+: Sets how long a database connection should wait before timing out.
 
-    Defaults to unset, keeping the Django defaults.
+    For SQLite, this sets how long to wait if the database is locked.
+    For PostgreSQL or MariaDB, this sets the connection timeout.
+
+    Defaults to unset, which uses Django’s built-in defaults.
+
+#### [`PAPERLESS_DB_POOLSIZE=<int>`](#PAPERLESS_DB_POOLSIZE) {#PAPERLESS_DB_POOLSIZE}
+
+: Defines the maximum number of database connections to keep in the pool.
+
+    Only applies to PostgreSQL. This setting is ignored for other database engines.
+
+    The value must be greater than or equal to 1 to be used.
+    Defaults to unset, which disables connection pooling.
+
+    !!! note
+
+        A small pool is typically sufficient — for example, a size of 4.
+        Make sure your PostgreSQL server's max_connections setting is large enough to handle:
+        ```(Paperless workers + Celery workers) × pool size + safety margin```
+        For example, with 4 Paperless workers and 2 Celery workers, and a pool size of 4:
+        (4 + 2) × 4 + 10 = 34 connections required.
+
+#### [`PAPERLESS_DB_READ_CACHE_ENABLED=<bool>`](#PAPERLESS_DB_READ_CACHE_ENABLED) {#PAPERLESS_DB_READ_CACHE_ENABLED}
+
+: Caches the database read query results into Redis. This can significantly improve application response times by caching database queries, at the cost of slightly increased memory usage.
+
+    Defaults to `false`.
+
+    !!! danger
+
+        **Do not modify the database outside the application while it is running.**
+        This includes actions such as restoring a backup, upgrading the database, or performing manual inserts. All external modifications must be done **only when the application is stopped**.
+        After making any such changes, you **must invalidate the DB read cache** using the `invalidate_cachalot` management command.
+
+#### [`PAPERLESS_READ_CACHE_TTL=<int>`](#PAPERLESS_READ_CACHE_TTL) {#PAPERLESS_READ_CACHE_TTL}
+
+: Specifies how long (in seconds) read data should be cached.
+
+    Allowed values are between `1` (one second) and `31536000` (one year). Defaults to `3600` (one hour).
+
+    !!! warning
+
+        A high TTL increases memory usage over time. Memory may be used until end of TTL, even if the cache is invalidated with the `invalidate_cachalot` command.
+
+In case of an out-of-memory (OOM) situation, Redis may stop accepting new data — including cache entries, scheduled tasks, and documents to consume.
+If your system has limited RAM, consider configuring a dedicated Redis instance for the read cache, with a memory limit and the eviction policy set to `allkeys-lru`.
+For more details, refer to the [Redis eviction policy documentation](https://redis.io/docs/latest/develop/reference/eviction/), and see the `PAPERLESS_READ_CACHE_REDIS_URL` setting to specify a separate Redis broker.
+
+#### [`PAPERLESS_READ_CACHE_REDIS_URL=<url>`](#PAPERLESS_READ_CACHE_REDIS_URL) {#PAPERLESS_READ_CACHE_REDIS_URL}
+
+: Defines the Redis instance used for the read cache.
+
+    Defaults to `None`.
+
+    !!! Note
+    If this value is not set, the same Redis instance used for scheduled tasks will be used for caching as well.
 
 ## Optional Services
 
@@ -200,7 +254,7 @@ and watch out for indentation if editing the YAML file.
 
 ### Email Parsing
 
-#### [`PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT=<int>`(#PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT) {#PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT}
+#### [`PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT=<int>`](#PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT) {#PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT}
 
 : The default layout to use for emails that are consumed as documents. Must be one of the integer choices below. Note that mail
 rules can specify this setting, thus this fallback is used for the default selection and for .eml files consumed by other means.
@@ -629,7 +683,13 @@ If both the [PAPERLESS_ACCOUNT_DEFAULT_GROUPS](#PAPERLESS_ACCOUNT_DEFAULT_GROUPS
 
 !!! note
 
-    If you do not have a working email server set up you should set this to 'none'.
+    If you do not have a working email server set up this will be set to 'none'.
+
+#### [`PAPERLESS_ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS=<bool>`](#PAPERLESS_ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS) {#PAPERLESS_ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS}
+
+: See the relevant [django-allauth documentation](https://docs.allauth.org/en/latest/account/configuration.html)
+
+    Defaults to True (from allauth)
 
 #### [`PAPERLESS_DISABLE_REGULAR_LOGIN=<bool>`](#PAPERLESS_DISABLE_REGULAR_LOGIN) {#PAPERLESS_DISABLE_REGULAR_LOGIN}
 
@@ -960,6 +1020,22 @@ still perform some basic text pre-processing before matching.
 
     Defaults to 1.
 
+#### [`PAPERLESS_DATE_PARSER_LANGUAGES=<lang>`](#PAPERLESS_DATE_PARSER_LANGUAGES) {#PAPERLESS_DATE_PARSER_LANGUAGES}
+
+Specifies which language Paperless should use when parsing dates from documents.
+
+    This should be a language code supported by the dateparser library,
+    for example: "en", or a combination such as "en+de".
+    Locales are also supported (e.g., "en-AU").
+    Multiple languages can be combined using "+", for example: "en+de" or "en-AU+de".
+    For valid values, refer to the list of supported languages and locales in the [dateparser documentation](https://dateparser.readthedocs.io/en/latest/supported_locales.html).
+
+    Set this to match the languages in which most of your documents are written.
+    If not set, Paperless will attempt to infer the language(s) from the OCR configuration (`PAPERLESS_OCR_LANGUAGE`).
+
+!!! note
+This format differs from the `PAPERLESS_OCR_LANGUAGE` setting, which uses ISO 639-2 codes (3 letters, e.g., "eng+deu" for Tesseract OCR).
+
 #### [`PAPERLESS_EMAIL_TASK_CRON=<cron expression>`](#PAPERLESS_EMAIL_TASK_CRON) {#PAPERLESS_EMAIL_TASK_CRON}
 
 : Configures the scheduled email fetching frequency. The value
@@ -1057,9 +1133,9 @@ be used with caution!
 
 ## Document Consumption {#consume_config}
 
-#### [`PAPERLESS_CONSUMER_DISABLE=<bool>`](#PAPERLESS_CONSUMER_DISABLE) {#PAPERLESS_CONSUMER_DISABLE}
+#### [`PAPERLESS_CONSUMER_DISABLE`](#PAPERLESS_CONSUMER_DISABLE) {#PAPERLESS_CONSUMER_DISABLE}
 
-: Completely disable the directory-based consumer in docker. If you don't plan to consume documents
+: If set (to anything), this completely disables the directory-based consumer in docker. If you don't plan to consume documents
 via the consumption directory, you can disable the consumer to save resources.
 
 #### [`PAPERLESS_CONSUMER_DELETE_DUPLICATES=<bool>`](#PAPERLESS_CONSUMER_DELETE_DUPLICATES) {#PAPERLESS_CONSUMER_DELETE_DUPLICATES}
@@ -1205,6 +1281,30 @@ within your documents.
 : Enable or disable the GPG decryptor for encrypted emails. See [GPG Decryptor](advanced_usage.md#gpg-decryptor) for more information.
 
     Defaults to false.
+
+## Workflow webhooks
+
+#### [`PAPERLESS_WEBHOOKS_ALLOWED_SCHEMES=<str>`](#PAPERLESS_WEBHOOKS_ALLOWED_SCHEMES) {#PAPERLESS_WEBHOOKS_ALLOWED_SCHEMES}
+
+: A comma-separated list of allowed schemes for webhooks. This setting
+controls which URL schemes are permitted for webhook URLs.
+
+    Defaults to `http,https`.
+
+#### [`PAPERLESS_WEBHOOKS_ALLOWED_PORTS=<str>`](#PAPERLESS_WEBHOOKS_ALLOWED_PORTS) {#PAPERLESS_WEBHOOKS_ALLOWED_PORTS}
+
+: A comma-separated list of allowed ports for webhooks. This setting
+controls which ports are permitted for webhook URLs. For example, if you
+set this to `80,443`, webhooks will only be sent to URLs that use these
+ports.
+
+    Defaults to empty list, which allows all ports.
+
+#### [`PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS=<bool>`](#PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS) {#PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS}
+
+: If set to false, webhooks cannot be sent to internal URLs (e.g., localhost).
+
+    Defaults to true, which allows internal requests.
 
 ### Polling {#polling}
 
@@ -1659,6 +1759,11 @@ started by the container.
 
 : Path to an image file in the /media/logo directory, must include 'logo', e.g. `/logo/Atari_logo.svg`
 
+!!! note
+
+    The logo file will be viewable by anyone with access to the Paperless instance login page,
+    so consider your choice of logo carefully and removing exif data from images before uploading.
+
 #### [`PAPERLESS_ENABLE_UPDATE_CHECK=<bool>`](#PAPERLESS_ENABLE_UPDATE_CHECK) {#PAPERLESS_ENABLE_UPDATE_CHECK}
 
 !!! note
@@ -1670,7 +1775,7 @@ started by the container.
 
 ## Email sending
 
-Setting an SMTP server for the backend will allow you to reset your
+Setting an SMTP server for the backend will allow you to use the Email workflow action, send documents from the UI as well as reset your
 password. All of these options come from their similarly-named [Django settings](https://docs.djangoproject.com/en/4.2/ref/settings/#email-host)
 
 #### [`PAPERLESS_EMAIL_HOST=<str>`](#PAPERLESS_EMAIL_HOST) {#PAPERLESS_EMAIL_HOST}

@@ -10,9 +10,9 @@
   }
   <div class="input-group input-group-sm me-md-5 d-none d-md-flex">
     <button class="btn btn-outline-secondary" (click)="decreaseZoom()" i18n>-</button>
-    <select class="form-select" (change)="setZoom($event.target.value)">
+    <select class="form-select" (change)="setZoom($event.target.value)" [ngModel]="currentZoom">
       @for (setting of zoomSettings; track setting) {
-      <option [value]="setting" [attr.selected]="isZoomSelected(setting) ? 'selected' : null">
+      <option [value]="setting">
         {{ getZoomSettingTitle(setting) }}
       </option>
       }
@@ -61,19 +61,9 @@
         <i-bs width="1em" height="1em" name="diagram-3"></i-bs>&nbsp;<span i18n>More like this</span>
       </button>
 
-      <button ngbDropdownItem (click)="splitDocument()"
-        [disabled]="!userCanAdd || originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
-        <i-bs width="1em" height="1em" name="scissors"></i-bs>&nbsp;<span i18n>Split</span>
-      </button>
-
-      <button ngbDropdownItem (click)="rotateDocument()"
+      <button ngbDropdownItem (click)="editPdf()"
         [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF">
-        <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
-      </button>
-
-      <button ngbDropdownItem (click)="deletePages()"
-        [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
-        <i-bs name="file-earmark-minus"></i-bs>&nbsp;<ng-container i18n>Delete page(s)</ng-container>
+        <i-bs name="pencil"></i-bs>&nbsp;<ng-container i18n>PDF Editor</ng-container>
       </button>
     </div>
   </div>
@@ -137,9 +127,9 @@
                 (keyup)="titleKeyUp($event)" [error]="error?.title"></pngx-input-text>
               <pngx-input-number i18n-title title="Archive serial number" [error]="error?.archive_serial_number"
                 [horizontal]="true" formControlName='archive_serial_number'></pngx-input-number>
-              <pngx-input-date i18n-title title="Date created" formControlName="created_date"
+              <pngx-input-date i18n-title title="Date created" formControlName="created"
                 [suggestions]="suggestions?.dates" [showFilter]="true" [horizontal]="true"
-                (filterDocuments)="filterDocuments($event)" [error]="error?.created_date"></pngx-input-date>
+                (filterDocuments)="filterDocuments($event)" [error]="error?.created"></pngx-input-date>
               <pngx-input-select [items]="correspondents" i18n-title title="Correspondent"
                 formControlName="correspondent" [allowNull]="true" [showFilter]="true" [horizontal]="true"
                 (filterDocuments)="filterDocuments($event, DataType.Correspondent)"

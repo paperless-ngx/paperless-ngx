@@ -1,6 +1,5 @@
 import filecmp
 import hashlib
-import os
 import shutil
 import tempfile
 from io import StringIO
@@ -19,7 +18,7 @@ from documents.tasks import update_document_content_maybe_archive_file
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 
-sample_file = os.path.join(os.path.dirname(__file__), "samples", "simple.pdf")
+sample_file: Path = Path(__file__).parent / "samples" / "simple.pdf"
 
 
 @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
@@ -34,19 +33,13 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
     def test_archiver(self):
         doc = self.make_models()
-        shutil.copy(
-            sample_file,
-            os.path.join(self.dirs.originals_dir, f"{doc.id:07}.pdf"),
-        )
+        shutil.copy(sample_file, Path(self.dirs.originals_dir) / f"{doc.id:07}.pdf")
 
         call_command("document_archiver", "--processes", "1")
 
     def test_handle_document(self):
         doc = self.make_models()
-        shutil.copy(
-            sample_file,
-            os.path.join(self.dirs.originals_dir, f"{doc.id:07}.pdf"),
-        )
+        shutil.copy(sample_file, Path(self.dirs.originals_dir) / f"{doc.id:07}.pdf")
 
         update_document_content_maybe_archive_file(doc.pk)
 
@@ -90,11 +83,8 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             mime_type="application/pdf",
             filename="document_01.pdf",
         )
-        shutil.copy(sample_file, os.path.join(self.dirs.originals_dir, "document.pdf"))
-        shutil.copy(
-            sample_file,
-            os.path.join(self.dirs.originals_dir, "document_01.pdf"),
-        )
+        shutil.copy(sample_file, Path(self.dirs.originals_dir) / "document.pdf")
+        shutil.copy(sample_file, Path(self.dirs.originals_dir) / "document_01.pdf")
 
         update_document_content_maybe_archive_file(doc2.pk)
         update_document_content_maybe_archive_file(doc1.pk)
@@ -136,22 +126,22 @@ class TestDecryptDocuments(FileSystemAssertsMixin, TestCase):
         )
 
         shutil.copy(
-            os.path.join(
-                os.path.dirname(__file__),
-                "samples",
-                "documents",
-                "originals",
-                "0000004.pdf.gpg",
+            (
+                Path(__file__).parent
+                / "samples"
+                / "documents"
+                / "originals"
+                / "0000004.pdf.gpg"
             ),
             originals_dir / "0000004.pdf.gpg",
         )
         shutil.copy(
-            os.path.join(
-                os.path.dirname(__file__),
-                "samples",
-                "documents",
-                "thumbnails",
-                "0000004.webp.gpg",
+            (
+                Path(__file__).parent
+                / "samples"
+                / "documents"
+                / "thumbnails"
+                / "0000004.webp.gpg"
             ),
             thumb_dir / f"{doc.id:07}.webp.gpg",
         )
@@ -162,13 +152,13 @@ class TestDecryptDocuments(FileSystemAssertsMixin, TestCase):
 
         self.assertEqual(doc.storage_type, Document.STORAGE_TYPE_UNENCRYPTED)
         self.assertEqual(doc.filename, "0000004.pdf")
-        self.assertIsFile(os.path.join(originals_dir, "0000004.pdf"))
+        self.assertIsFile(Path(originals_dir) / "0000004.pdf")
         self.assertIsFile(doc.source_path)
-        self.assertIsFile(os.path.join(thumb_dir, f"{doc.id:07}.webp"))
+        self.assertIsFile(Path(thumb_dir) / f"{doc.id:07}.webp")
         self.assertIsFile(doc.thumbnail_path)
 
         with doc.source_file as f:
-            checksum = hashlib.md5(f.read()).hexdigest()
+            checksum: str = hashlib.md5(f.read()).hexdigest()
             self.assertEqual(checksum, doc.checksum)
 
 

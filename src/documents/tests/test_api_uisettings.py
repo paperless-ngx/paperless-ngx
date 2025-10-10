@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.tests.utils import DirectoriesMixin
+from paperless.version import __full_version_str__
 
 
 class TestApiUiSettings(DirectoriesMixin, APITestCase):
@@ -39,6 +40,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
         self.assertDictEqual(
             response.data["settings"],
             {
+                "version": __full_version_str__,
                 "app_title": None,
                 "app_logo": None,
                 "auditlog_enabled": True,
@@ -116,6 +118,30 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_settings_must_be_dict(self):
+        """
+        GIVEN:
+            - API request to update ui_settings with settings not being a dict
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "settings": "not a dict",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            "Expected a dictionary",
+            str(response.data["settings"]),
+        )
 
     @override_settings(
         OAUTH_CALLBACK_BASE_URL="http://localhost:8000",

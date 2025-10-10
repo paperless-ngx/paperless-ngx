@@ -156,7 +156,7 @@
 			"label": "Maintenance: recreate .venv",
 			"description": "Recreate the python virtual environment and install python dependencies",
 			"type": "shell",
-			"command": "rm -R -v .venv/* || uv install --dev",
+			"command": "rm -rf .venv && uv venv && uv sync --dev",
 			"group": "none",
 			"presentation": {
 				"echo": true,

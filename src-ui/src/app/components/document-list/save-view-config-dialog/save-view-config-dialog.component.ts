@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  inject,
+} from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -16,7 +23,7 @@ import { TextComponent } from '../../common/input/text/text.component'
   imports: [CheckComponent, TextComponent, FormsModule, ReactiveFormsModule],
 })
 export class SaveViewConfigDialogComponent implements OnInit {
-  constructor(private modal: NgbActiveModal) {}
+  private modal = inject(NgbActiveModal)
 
   @Output()
   public saveClicked = new EventEmitter()

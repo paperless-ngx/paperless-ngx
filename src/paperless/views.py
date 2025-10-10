@@ -1,5 +1,5 @@
-import os
 from collections import OrderedDict
+from pathlib import Path
 
 from allauth.mfa import signals
 from allauth.mfa.adapter import get_adapter as get_mfa_adapter
@@ -11,8 +11,9 @@ from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db.models.functions import Lower
-from django.http import HttpResponse
+from django.http import FileResponse
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseNotFound
@@ -87,21 +88,18 @@ class StandardPagination(PageNumberPagination):
         response_schema["properties"]["all"] = {
             "type": "array",
             "example": "[1, 2, 3]",
+            "items": {"type": "integer"},
         }
         return response_schema
 
 
 class FaviconView(View):
-    def get(self, request, *args, **kwargs):  # pragma: no cover
-        favicon = os.path.join(
-            os.path.dirname(__file__),
-            "static",
-            "paperless",
-            "img",
-            "favicon.ico",
-        )
-        with open(favicon, "rb") as f:
-            return HttpResponse(f, content_type="image/x-icon")
+    def get(self, request, *args, **kwargs):
+        try:
+            path = Path(staticfiles_storage.path("paperless/img/favicon.ico"))
+            return FileResponse(path.open("rb"), content_type="image/x-icon")
+        except FileNotFoundError:
+            return HttpResponseNotFound("favicon.ico not found")
 
 
 class UserViewSet(ModelViewSet):
@@ -137,6 +135,13 @@ class UserViewSet(ModelViewSet):
             )
         return super().update(request, *args, **kwargs)
 
+    @extend_schema(
+        request=None,
+        responses={
+            200: OpenApiTypes.BOOL,
+            404: OpenApiTypes.STR,
+        },
+    )
     @action(detail=True, methods=["post"])
     def deactivate_totp(self, request, pk=None):
         request_user = request.user
@@ -344,6 +349,10 @@ class ApplicationConfigurationViewSet(ModelViewSet):
 
     serializer_class = ApplicationConfigurationSerializer
     permission_classes = (IsAuthenticated, DjangoModelPermissions)
+
+    @extend_schema(exclude=True)
+    def create(self, request, *args, **kwargs):
+        return Response(status=405)  # Not Allowed
 
 
 @extend_schema_view(

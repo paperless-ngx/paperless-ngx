@@ -1,6 +1,7 @@
 <pngx-widget-frame
   *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }"
   [title]="savedView.name"
+  [badge]="count"
   [loading]="loading"
   [draggable]="savedView"
   >
@@ -43,7 +44,7 @@
                       <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3" title="Open document" i18n-title>{{doc.added | customDate}}</a>
                     }
                     @case (DisplayField.CREATED) {
-                      <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3" title="Open document" i18n-title>{{doc.created_date | customDate}}</a>
+                      <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3" title="Open document" i18n-title>{{doc.created | customDate}}</a>
                     }
                     @case (DisplayField.TITLE) {
                       <a routerLink="/documents/{{doc.id}}" title="Open document" i18n-title class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.title | documentTitle}}</a>

@@ -21,6 +21,7 @@ from django.db.models import Value
 from django.db.models import When
 from django.db.models.functions import Cast
 from django.utils.translation import gettext_lazy as _
+from django_filters import DateFilter
 from django_filters.rest_framework import BooleanFilter
 from django_filters.rest_framework import Filter
 from django_filters.rest_framework import FilterSet
@@ -48,6 +49,15 @@ CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
 INT_KWARGS = ["exact", "gt", "gte", "lt", "lte", "isnull"]
 DATE_KWARGS = [
+    "year",
+    "month",
+    "day",
+    "gt",
+    "gte",
+    "lt",
+    "lte",
+]
+DATETIME_KWARGS = [
     "year",
     "month",
     "day",
@@ -731,6 +741,12 @@ class DocumentFilterSet(FilterSet):
 
     mime_type = MimeTypeFilter()
 
+    # Backwards compatibility
+    created__date__gt = DateFilter(field_name="created", lookup_expr="gt")
+    created__date__gte = DateFilter(field_name="created", lookup_expr="gte")
+    created__date__lt = DateFilter(field_name="created", lookup_expr="lt")
+    created__date__lte = DateFilter(field_name="created", lookup_expr="lte")
+
     class Meta:
         model = Document
         fields = {
@@ -739,8 +755,8 @@ class DocumentFilterSet(FilterSet):
             "content": CHAR_KWARGS,
             "archive_serial_number": INT_KWARGS,
             "created": DATE_KWARGS,
-            "added": DATE_KWARGS,
-            "modified": DATE_KWARGS,
+            "added": DATETIME_KWARGS,
+            "modified": DATETIME_KWARGS,
             "original_filename": CHAR_KWARGS,
             "checksum": CHAR_KWARGS,
             "correspondent": ["isnull"],
@@ -764,8 +780,8 @@ class ShareLinkFilterSet(FilterSet):
     class Meta:
         model = ShareLink
         fields = {
-            "created": DATE_KWARGS,
-            "expiration": DATE_KWARGS,
+            "created": DATETIME_KWARGS,
+            "expiration": DATETIME_KWARGS,
         }
 
 

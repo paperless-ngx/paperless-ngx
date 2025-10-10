@@ -1,7 +1,6 @@
 import datetime
 import itertools
 import logging
-import os
 import ssl
 import tempfile
 import traceback
@@ -30,7 +29,7 @@ from imap_tools import MailBoxUnencrypted
 from imap_tools import MailMessage
 from imap_tools import MailMessageFlags
 from imap_tools import errors
-from imap_tools.mailbox import MailBoxTls
+from imap_tools.mailbox import MailBoxStartTls
 from imap_tools.query import LogicOperator
 
 from documents.data_models import ConsumableDocument
@@ -323,7 +322,7 @@ def error_callback(
         folder=rule.folder,
         uid=message_uid,
         subject=message_subject,
-        received=message_date,
+        received=make_aware(message_date) if is_naive(message_date) else message_date,
         status="FAILED",
         error=traceback.format_exc(),
     )
@@ -401,7 +400,7 @@ def make_criterias(rule: MailRule, *, supports_gmail_labels: bool):
         supports_gmail_labels=supports_gmail_labels,
     ).get_criteria()
     if isinstance(rule_query, dict):
-        if len(rule_query) or len(criterias):
+        if len(rule_query) or criterias:
             return AND(**rule_query, **criterias)
         else:
             return "ALL"
@@ -420,7 +419,7 @@ def get_mailbox(server, port, security) -> MailBox:
     if security == MailAccount.ImapSecurity.NONE:
         mailbox = MailBoxUnencrypted(server, port)
     elif security == MailAccount.ImapSecurity.STARTTLS:
-        mailbox = MailBoxTls(server, port, ssl_context=ssl_context)
+        mailbox = MailBoxStartTls(server, port, ssl_context=ssl_context)
     elif security == MailAccount.ImapSecurity.SSL:
         mailbox = MailBox(server, port, ssl_context=ssl_context)
     else:
@@ -484,7 +483,7 @@ class MailAccountHandler(LoggingMixin):
             return message.subject
 
         elif rule.assign_title_from == MailRule.TitleSource.FROM_FILENAME:
-            return os.path.splitext(os.path.basename(att.filename))[0]
+            return Path(att.filename).stem
 
         elif rule.assign_title_from == MailRule.TitleSource.NONE:
             return None
@@ -887,7 +886,9 @@ class MailAccountHandler(LoggingMixin):
                     folder=rule.folder,
                     uid=message.uid,
                     subject=message.subject,
-                    received=message.date,
+                    received=make_aware(message.date)
+                    if is_naive(message.date)
+                    else message.date,
                     status="PROCESSED_WO_CONSUMPTION",
                 )
 
@@ -906,7 +907,7 @@ class MailAccountHandler(LoggingMixin):
             dir=settings.SCRATCH_DIR,
             suffix=".eml",
         )
-        with open(temp_filename, "wb") as f:
+        with Path(temp_filename).open("wb") as f:
             # Move "From"-header to beginning of file
             # TODO: This ugly workaround is needed because the parser is
             #   chosen only by the mime_type detected via magic

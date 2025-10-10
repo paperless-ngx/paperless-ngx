@@ -1,9 +1,12 @@
 import json
 import logging
 import os
+import tempfile
 from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
+from zipfile import ZipFile
+from zipfile import is_zipfile
 
 import tqdm
 from django.conf import settings
@@ -244,14 +247,19 @@ class Command(CryptMixin, BaseCommand):
         self.manifest_paths = []
         self.manifest = []
 
+        # Create a temporary directory for extracting a zip file into it, even if supplied source is no zip file to keep code cleaner.
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            if is_zipfile(self.source):
+                with ZipFile(self.source) as zf:
+                    zf.extractall(tmp_dir)
+                self.source = Path(tmp_dir)
+            self._run_import()
+
+    def _run_import(self):
         self.pre_check()
-
         self.load_metadata()
-
         self.load_manifest_files()
-
         self.check_manifest_validity()
-
         self.decrypt_secret_fields()
 
         # see /src/documents/signals/handlers.py

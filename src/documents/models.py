@@ -225,7 +225,11 @@ class Document(SoftDeleteModel, ModelWithOwner):
         ),
     )
 
-    created = models.DateTimeField(_("created"), default=timezone.now, db_index=True)
+    created = models.DateField(
+        _("created"),
+        default=datetime.date.today,
+        db_index=True,
+    )
 
     modified = models.DateTimeField(
         _("modified"),
@@ -303,8 +307,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
         verbose_name_plural = _("documents")
 
     def __str__(self) -> str:
-        # Convert UTC database time to local time
-        created = datetime.date.isoformat(timezone.localdate(self.created))
+        created = self.created.isoformat()
 
         res = f"{created}"
 
@@ -399,7 +402,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
 
     @property
     def created_date(self):
-        return timezone.localdate(self.created)
+        return self.created
 
 
 class SavedView(ModelWithOwner):
@@ -1047,7 +1050,7 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has this correspondent"),
     )
 
-    schedule_offset_days = models.PositiveIntegerField(
+    schedule_offset_days = models.IntegerField(
         _("schedule offset days"),
         default=0,
         help_text=_(

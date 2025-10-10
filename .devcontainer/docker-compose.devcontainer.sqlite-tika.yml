@@ -20,20 +20,17 @@
 #
 # This file is intended only to be used through VSCOde devcontainers. See README.md
 # in the folder .devcontainer.
-
-
 services:
   broker:
     image: docker.io/library/redis:7
     restart: unless-stopped
     volumes:
       - ./redisdata:/data
-
   # No ports need to be exposed; the VSCode DevContainer plugin manages them.
   paperless-development:
     image: paperless-ngx
     build:
-      context: ../    # Dockerfile cannot access files from parent directories if context is not set.
+      context: ../ # Dockerfile cannot access files from parent directories if context is not set.
       dockerfile: ./.devcontainer/Dockerfile
     restart: unless-stopped
     depends_on:
@@ -61,7 +58,6 @@ services:
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
       PAPERLESS_STATICDIR: ./src/documents/static
       PAPERLESS_DEBUG: true
-
     # Overrides default command so things don't shut down after the process ends.
     command: /bin/sh -c "chown -R paperless:paperless /usr/src/paperless/paperless-ngx/src/documents/static/frontend && chown -R paperless:paperless /usr/src/paperless/paperless-ngx/.ruff_cache && while sleep 1000; do :; done"
 
@@ -94,18 +90,15 @@ services:
   gotenberg:
     image: docker.io/gotenberg/gotenberg:8.17
     restart: unless-stopped
-
     # The Gotenberg Chromium route is used to convert .eml files. We do not
     # want to allow external content like tracking pixels or even JavaScript.
     command:
       - "gotenberg"
       - "--chromium-disable-javascript=true"
       - "--chromium-allow-list=file:///tmp/.*"
-
   tika:
     image: docker.io/apache/tika:latest
     restart: unless-stopped
-
 volumes:
   data:
   media:

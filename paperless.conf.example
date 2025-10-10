@@ -1,10 +1,6 @@
 # Have a look at the docs for documentation.
 # https://docs.paperless-ngx.com/configuration/
 
-# Debug. Only enable this for development.
-
-#PAPERLESS_DEBUG=false
-
 # Required services
 
 #PAPERLESS_REDIS=redis://localhost:6379

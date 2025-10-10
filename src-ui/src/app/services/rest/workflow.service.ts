@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { tap } from 'rxjs'
 import { Workflow } from 'src/app/data/workflow'
@@ -10,8 +9,9 @@ import { AbstractPaperlessService } from './abstract-paperless-service'
 export class WorkflowService extends AbstractPaperlessService<Workflow> {
   loading: boolean
 
-  constructor(http: HttpClient) {
-    super(http, 'workflows')
+  constructor() {
+    super()
+    this.resourceName = 'workflows'
   }
 
   public reload() {

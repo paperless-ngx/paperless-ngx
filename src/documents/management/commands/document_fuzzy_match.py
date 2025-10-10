@@ -125,14 +125,14 @@ class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
                 messages.append(
                     self.style.NOTICE(
                         f"Document {result.doc_one_pk} fuzzy match"
-                        f" to {result.doc_two_pk} (confidence {result.ratio:.3f})",
+                        f" to {result.doc_two_pk} (confidence {result.ratio:.3f})\n",
                     ),
                 )
                 maybe_delete_ids.append(result.doc_two_pk)
 
         if len(messages) == 0:
             messages.append(
-                self.style.SUCCESS("No matches found"),
+                self.style.SUCCESS("No matches found\n"),
             )
         self.stdout.writelines(
             messages,

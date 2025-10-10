@@ -30,7 +30,7 @@ physical documents into a searchable online archive so you can keep, well, _less
 -   Utilizes the open-source Tesseract engine to recognize more than 100 languages.
 -   Documents are saved as PDF/A format which is designed for long term storage, alongside the unaltered originals.
 -   Uses machine-learning to automatically add tags, correspondents and document types to your documents.
--   Supports PDF documents, images, plain text files, Office documents (Word, Excel, Powerpoint, and LibreOffice equivalents)[^1] and more.
+-   Supports PDF documents, images, plain text files, Office documents (Word, Excel, PowerPoint, and LibreOffice equivalents)[^1] and more.
 -   Paperless stores your documents plain on disk. Filenames and folders are managed by paperless and their format can be configured freely with different configurations assigned to different documents.
 -   **Beautiful, modern web application** that features:
     -   Customizable dashboard with statistics.
@@ -197,7 +197,7 @@ People interested in continuing the work on paperless-ngx are encouraged to reac
 
 ### Translation
 
-Paperless-ngx is available in many languages that are coordinated on [Crowdin](https://crwd.in/paperless-ngx). If you want to help out by translating paperless-ngx into your language, please head over to the [Paperless-ngx project at Crowdin](https://crwd.in/paperless-ngx), and thank you!
+Paperless-ngx is available in many languages that are coordinated on [Crowdin](https://crowdin.com/project/paperless-ngx). If you want to help out by translating paperless-ngx into your language, please head over to the [Paperless-ngx project at Crowdin](https://crowdin.com/project/paperless-ngx), and thank you!
 
 ## Scanners & Software
 

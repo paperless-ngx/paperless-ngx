@@ -23,11 +23,17 @@ def copy_basic_file_stats(source: Path | str, dest: Path | str) -> None:
 
     The extended attribute copy does weird things with SELinux and files
     copied from temporary directories and copystat doesn't allow disabling
-    these copies
+    these copies.
+
+    If there is a PermissionError, skip copying file stats.
     """
     source, dest = _coerce_to_path(source, dest)
     src_stat = source.stat()
-    utime(dest, ns=(src_stat.st_atime_ns, src_stat.st_mtime_ns))
+
+    try:
+        utime(dest, ns=(src_stat.st_atime_ns, src_stat.st_mtime_ns))
+    except PermissionError:
+        pass
 
 
 def copy_file_with_basic_stats(
@@ -40,10 +46,17 @@ def copy_file_with_basic_stats(
 
     The extended attribute copy does weird things with SELinux and files
     copied from temporary directories.
+
+    If there is a PermissionError (e.g., on ZFS with acltype=nfsv4)
+    fall back to copyfile (data only).
     """
     source, dest = _coerce_to_path(source, dest)
 
-    shutil.copy(source, dest)
+    try:
+        shutil.copy(source, dest)
+    except PermissionError:
+        shutil.copyfile(source, dest)
+
     copy_basic_file_stats(source, dest)
 
 
@@ -108,3 +121,10 @@ def run_subprocess(
         completed_proc.check_returncode()
 
     return completed_proc
+
+
+def get_boolean(boolstr: str) -> bool:
+    """
+    Return a boolean value from a string representation.
+    """
+    return bool(boolstr.lower() in ("yes", "y", "1", "t", "true"))

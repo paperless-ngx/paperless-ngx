@@ -17,7 +17,7 @@
           (change)="onChange(value)">
 
           <ng-template ng-label-tmp let-item="item">
-            <button class="tag-wrap btn p-0 d-flex align-items-center" (click)="removeTag($event, item.id)" title="Remove tag" i18n-title>
+            <button class="tag-wrap btn p-0 d-flex align-items-center" (click)="removeTag(item.id)" (mousedown)="$event.stopImmediatePropagation()" type="button" title="Remove tag" i18n-title>
               <i-bs name="x" style="margin-inline-end: 1px;"></i-bs>
               @if (item.id && tags) {
                 <pngx-tag style="background-color: none;" [tag]="getTag(item.id)"></pngx-tag>
@@ -33,7 +33,7 @@
           </ng-template>
         </ng-select>
         @if (allowCreate && !hideAddButton) {
-          <button class="btn btn-outline-secondary" type="button" (click)="createTag()" [disabled]="disabled">
+          <button class="btn btn-outline-secondary" type="button" (click)="createTag(null, true)" [disabled]="disabled">
             <i-bs width="1.2em" height="1.2em" name="plus"></i-bs>
           </button>
         }
