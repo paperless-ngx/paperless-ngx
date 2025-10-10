@@ -589,13 +589,34 @@ def document_matches_workflow(
     settings from the workflow trigger, False otherwise
     """
 
+    triggers_queryset = (
+        workflow.triggers.filter(
+            type=trigger_type,
+        )
+        .select_related(
+            "filter_mailrule",
+            "filter_has_document_type",
+            "filter_has_correspondent",
+            "filter_has_storage_path",
+            "schedule_date_custom_field",
+        )
+        .prefetch_related(
+            "filter_has_tags",
+            "filter_has_all_tags",
+            "filter_has_not_tags",
+            "filter_has_not_document_types",
+            "filter_has_not_correspondents",
+            "filter_has_not_storage_paths",
+        )
+    )
+
     trigger_matched = True
-    if workflow.triggers.filter(type=trigger_type).count() == 0:
+    if not triggers_queryset.exists():
         trigger_matched = False
         logger.info(f"Document did not match {workflow}")
         logger.debug(f"No matching triggers with type {trigger_type} found")
     else:
-        for trigger in workflow.triggers.filter(type=trigger_type):
+        for trigger in triggers_queryset:
             if trigger_type == WorkflowTrigger.WorkflowTriggerType.CONSUMPTION:
                 trigger_matched, reason = consumable_document_matches_workflow(
                     document,
