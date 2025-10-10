@@ -345,157 +345,147 @@ def consumable_document_matches_workflow(
 def existing_document_matches_workflow(
     document: Document,
     trigger: WorkflowTrigger,
-) -> tuple[bool, str]:
+) -> tuple[bool, str | None]:
     """
     Returns True if the Document matches all filters from the workflow trigger,
     False otherwise. Includes a reason if doesn't match
     """
 
-    trigger_matched = True
-    reason = ""
-
+    # Check content matching algorithm
     if trigger.matching_algorithm > MatchingModel.MATCH_NONE and not matches(
         trigger,
         document,
     ):
-        reason = (
+        return (
+            False,
             f"Document content matching settings for algorithm '{trigger.matching_algorithm}' did not match",
         )
-        trigger_matched = False
+
+    # Check if any tag filters exist to determine if we need to load document tags
+    trigger_has_tags_qs = trigger.filter_has_tags.all()
+    trigger_has_all_tags_qs = trigger.filter_has_all_tags.all()
+    trigger_has_not_tags_qs = trigger.filter_has_not_tags.all()
+
+    has_tags_filter = trigger_has_tags_qs.exists()
+    has_all_tags_filter = trigger_has_all_tags_qs.exists()
+    has_not_tags_filter = trigger_has_not_tags_qs.exists()
+
+    # Load document tags once if any tag filters exist
+    document_tag_ids = None
+    if has_tags_filter or has_all_tags_filter or has_not_tags_filter:
+        document_tag_ids = set(document.tags.values_list("id", flat=True))
 
     # Document tags vs trigger has_tags (any of)
-    if trigger.filter_has_tags.all().count() > 0 and (
-        document.tags.filter(
-            id__in=trigger.filter_has_tags.all().values_list("id"),
-        ).count()
-        == 0
-    ):
-        reason = (
-            f"Document tags {document.tags.all()} do not include"
-            f" {trigger.filter_has_tags.all()}",
-        )
-        trigger_matched = False
+    if has_tags_filter:
+        trigger_has_tag_ids = set(trigger_has_tags_qs.values_list("id", flat=True))
+        if not (document_tag_ids & trigger_has_tag_ids):
+            # For error message, load the actual tag objects
+            return (
+                False,
+                f"Document tags {list(document.tags.all())} do not include {list(trigger_has_tags_qs)}",
+            )
 
     # Document tags vs trigger has_all_tags (all of)
-    if trigger.filter_has_all_tags.all().count() > 0 and trigger_matched:
-        required_tag_ids = set(
-            trigger.filter_has_all_tags.all().values_list("id", flat=True),
-        )
-        document_tag_ids = set(
-            document.tags.all().values_list("id", flat=True),
-        )
-        missing_tags = required_tag_ids - document_tag_ids
-        if missing_tags:
-            reason = (
-                f"Document tags {document.tags.all()} do not contain all of"
-                f" {trigger.filter_has_all_tags.all()}",
+    if has_all_tags_filter:
+        required_tag_ids = set(trigger_has_all_tags_qs.values_list("id", flat=True))
+        if not required_tag_ids.issubset(document_tag_ids):
+            return (
+                False,
+                f"Document tags {list(document.tags.all())} do not contain all of {list(trigger_has_all_tags_qs)}",
             )
-            trigger_matched = False
 
     # Document tags vs trigger has_not_tags (none of)
-    if (
-        trigger.filter_has_not_tags.all().count() > 0
-        and trigger_matched
-        and document.tags.filter(
-            id__in=trigger.filter_has_not_tags.all().values_list("id"),
-        ).exists()
-    ):
-        reason = (
-            f"Document tags {document.tags.all()} include excluded tags"
-            f" {trigger.filter_has_not_tags.all()}",
-        )
-        trigger_matched = False
+    if has_not_tags_filter:
+        excluded_tag_ids = set(trigger_has_not_tags_qs.values_list("id", flat=True))
+        if document_tag_ids & excluded_tag_ids:
+            return (
+                False,
+                f"Document tags {list(document.tags.all())} include excluded tags {list(trigger_has_not_tags_qs)}",
+            )
 
     # Document correspondent vs trigger has_correspondent
-    if trigger_matched:
-        if (
-            trigger.filter_has_correspondent is not None
-            and document.correspondent != trigger.filter_has_correspondent
-        ):
-            reason = (
-                f"Document correspondent {document.correspondent} does not match {trigger.filter_has_correspondent}",
-            )
-            trigger_matched = False
+    if (
+        trigger.filter_has_correspondent_id is not None
+        and document.correspondent_id != trigger.filter_has_correspondent_id
+    ):
+        return (
+            False,
+            f"Document correspondent {document.correspondent} does not match {trigger.filter_has_correspondent}",
+        )
 
-        if (
-            trigger.filter_has_not_correspondents.all().count() > 0
-            and document.correspondent
-            and trigger.filter_has_not_correspondents.filter(
-                id=document.correspondent_id,
-            ).exists()
-        ):
-            reason = (
-                f"Document correspondent {document.correspondent} is excluded by"
-                f" {trigger.filter_has_not_correspondents.all()}",
-            )
-            trigger_matched = False
+    if (
+        document.correspondent_id
+        and trigger.filter_has_not_correspondents.filter(
+            id=document.correspondent_id,
+        ).exists()
+    ):
+        return (
+            False,
+            f"Document correspondent {document.correspondent} is excluded by {list(trigger.filter_has_not_correspondents.all())}",
+        )
 
     # Document document_type vs trigger has_document_type
-    if trigger_matched:
-        if (
-            trigger.filter_has_document_type is not None
-            and document.document_type != trigger.filter_has_document_type
-        ):
-            reason = (
-                f"Document doc type {document.document_type} does not match {trigger.filter_has_document_type}",
-            )
-            trigger_matched = False
+    if (
+        trigger.filter_has_document_type_id is not None
+        and document.document_type_id != trigger.filter_has_document_type_id
+    ):
+        return (
+            False,
+            f"Document doc type {document.document_type} does not match {trigger.filter_has_document_type}",
+        )
 
-        if (
-            trigger.filter_has_not_document_types.all().count() > 0
-            and document.document_type
-            and trigger.filter_has_not_document_types.filter(
-                id=document.document_type_id,
-            ).exists()
-        ):
-            reason = (
-                f"Document doc type {document.document_type} is excluded by"
-                f" {trigger.filter_has_not_document_types.all()}",
-            )
-            trigger_matched = False
+    if (
+        document.document_type_id
+        and trigger.filter_has_not_document_types.filter(
+            id=document.document_type_id,
+        ).exists()
+    ):
+        return (
+            False,
+            f"Document doc type {document.document_type} is excluded by {list(trigger.filter_has_not_document_types.all())}",
+        )
 
     # Document storage_path vs trigger has_storage_path
-    if trigger_matched:
-        if (
-            trigger.filter_has_storage_path is not None
-            and document.storage_path != trigger.filter_has_storage_path
-        ):
-            reason = (
-                f"Document storage path {document.storage_path} does not match {trigger.filter_has_storage_path}",
-            )
-            trigger_matched = False
+    if (
+        trigger.filter_has_storage_path_id is not None
+        and document.storage_path_id != trigger.filter_has_storage_path_id
+    ):
+        return (
+            False,
+            f"Document storage path {document.storage_path} does not match {trigger.filter_has_storage_path}",
+        )
 
-        if (
-            trigger.filter_has_not_storage_paths.all().count() > 0
-            and document.storage_path
-            and trigger.filter_has_not_storage_paths.filter(
-                id=document.storage_path_id,
-            ).exists()
-        ):
-            reason = (
-                f"Document storage path {document.storage_path} is excluded by"
-                f" {trigger.filter_has_not_storage_paths.all()}",
-            )
-            trigger_matched = False
+    if (
+        document.storage_path_id
+        and trigger.filter_has_not_storage_paths.filter(
+            id=document.storage_path_id,
+        ).exists()
+    ):
+        return (
+            False,
+            f"Document storage path {document.storage_path} is excluded by {list(trigger.filter_has_not_storage_paths.all())}",
+        )
 
-    if trigger_matched and trigger.filter_custom_field_query:
+    # Custom field query check
+    if trigger.filter_custom_field_query:
         parser = CustomFieldQueryParser("filter_custom_field_query")
         try:
             custom_field_q, annotations = parser.parse(
                 trigger.filter_custom_field_query,
             )
         except serializers.ValidationError:
-            reason = "Invalid custom field query configuration"
-            trigger_matched = False
-        else:
-            qs = (
-                Document.objects.filter(id=document.id)
-                .annotate(**annotations)
-                .filter(custom_field_q)
+            return (False, "Invalid custom field query configuration")
+
+        qs = (
+            Document.objects.filter(id=document.id)
+            .annotate(**annotations)
+            .filter(custom_field_q)
+        )
+        if not qs.exists():
+            return (
+                False,
+                "Document custom fields do not match the configured custom field query",
             )
-            if not qs.exists():
-                reason = "Document custom fields do not match the configured custom field query"
-                trigger_matched = False
 
     # Document original_filename vs trigger filename
     if (
@@ -507,13 +497,12 @@ def existing_document_matches_workflow(
             trigger.filter_filename.lower(),
         )
     ):
-        reason = (
-            f"Document filename {document.original_filename} does not match"
-            f" {trigger.filter_filename.lower()}",
+        return (
+            False,
+            f"Document filename {document.original_filename} does not match {trigger.filter_filename.lower()}",
         )
-        trigger_matched = False
 
-    return (trigger_matched, reason)
+    return (True, None)
 
 
 def prefilter_documents_by_workflowtrigger(
@@ -526,27 +515,28 @@ def prefilter_documents_by_workflowtrigger(
     document_matches_workflow in run_workflows
     """
 
-    if trigger.filter_has_tags.all().count() > 0:
-        documents = documents.filter(
-            tags__in=trigger.filter_has_tags.all(),
-        ).distinct()
+    # Filter for documents that have AT LEAST ONE of the specified tags.
+    if trigger.filter_has_tags.exists():
+        documents = documents.filter(tags__in=trigger.filter_has_tags.all()).distinct()
 
-    if trigger.filter_has_all_tags.all().count() > 0:
-        for tag_id in trigger.filter_has_all_tags.all().values_list("id", flat=True):
-            documents = documents.filter(tags__id=tag_id)
+    # Filter for documents that have ALL of the specified tags.
+    if trigger.filter_has_all_tags.exists():
+        for tag in trigger.filter_has_all_tags.all():
+            documents = documents.filter(tags=tag)
+        # Multiple JOINs can create duplicate results.
         documents = documents.distinct()
 
-    if trigger.filter_has_not_tags.all().count() > 0:
-        documents = documents.exclude(
-            tags__in=trigger.filter_has_not_tags.all(),
-        ).distinct()
+    # Exclude documents that have ANY of the specified tags.
+    if trigger.filter_has_not_tags.exists():
+        documents = documents.exclude(tags__in=trigger.filter_has_not_tags.all())
+
+    # Correspondent, DocumentType, etc. filtering
 
     if trigger.filter_has_correspondent is not None:
         documents = documents.filter(
             correspondent=trigger.filter_has_correspondent,
         )
-
-    if trigger.filter_has_not_correspondents.all().count() > 0:
+    if trigger.filter_has_not_correspondents.exists():
         documents = documents.exclude(
             correspondent__in=trigger.filter_has_not_correspondents.all(),
         )
@@ -555,8 +545,7 @@ def prefilter_documents_by_workflowtrigger(
         documents = documents.filter(
             document_type=trigger.filter_has_document_type,
         )
-
-    if trigger.filter_has_not_document_types.all().count() > 0:
+    if trigger.filter_has_not_document_types.exists():
         documents = documents.exclude(
             document_type__in=trigger.filter_has_not_document_types.all(),
         )
@@ -565,11 +554,12 @@ def prefilter_documents_by_workflowtrigger(
         documents = documents.filter(
             storage_path=trigger.filter_has_storage_path,
         )
-
-    if trigger.filter_has_not_storage_paths.all().count() > 0:
+    if trigger.filter_has_not_storage_paths.exists():
         documents = documents.exclude(
             storage_path__in=trigger.filter_has_not_storage_paths.all(),
         )
+
+    # Custom Field & Filename Filtering
 
     if trigger.filter_custom_field_query:
         parser = CustomFieldQueryParser("filter_custom_field_query")
@@ -582,11 +572,9 @@ def prefilter_documents_by_workflowtrigger(
 
         documents = documents.annotate(**annotations).filter(custom_field_q)
 
-    if trigger.filter_filename is not None and len(trigger.filter_filename) > 0:
-        # the true fnmatch will actually run later so we just want a loose filter here
+    if trigger.filter_filename:
         regex = fnmatch_translate(trigger.filter_filename).lstrip("^").rstrip("$")
-        regex = f"(?i){regex}"
-        documents = documents.filter(original_filename__regex=regex)
+        documents = documents.filter(original_filename__iregex=regex)
 
     return documents
 

@@ -1083,7 +1083,7 @@ class TestWorkflows(
             )
             expected_str = f"Document did not match {w}"
             self.assertIn(expected_str, cm.output[0])
-            expected_str = f"Document tags {doc.tags.all()} do not include {trigger.filter_has_tags.all()}"
+            expected_str = f"Document tags {list(doc.tags.all())} do not include {list(trigger.filter_has_tags.all())}"
             self.assertIn(expected_str, cm.output[1])
 
     def test_document_added_no_match_all_tags(self):
@@ -1119,8 +1119,8 @@ class TestWorkflows(
             expected_str = f"Document did not match {w}"
             self.assertIn(expected_str, cm.output[0])
             expected_str = (
-                f"Document tags {doc.tags.all()} do not contain all of"
-                f" {trigger.filter_has_all_tags.all()}"
+                f"Document tags {list(doc.tags.all())} do not contain all of"
+                f" {list(trigger.filter_has_all_tags.all())}"
             )
             self.assertIn(expected_str, cm.output[1])
 
@@ -1157,8 +1157,8 @@ class TestWorkflows(
             expected_str = f"Document did not match {w}"
             self.assertIn(expected_str, cm.output[0])
             expected_str = (
-                f"Document tags {doc.tags.all()} include excluded tags"
-                f" {trigger.filter_has_not_tags.all()}"
+                f"Document tags {list(doc.tags.all())} include excluded tags"
+                f" {list(trigger.filter_has_not_tags.all())}"
             )
             self.assertIn(expected_str, cm.output[1])
 
@@ -1194,7 +1194,7 @@ class TestWorkflows(
             self.assertIn(expected_str, cm.output[0])
             expected_str = (
                 f"Document correspondent {doc.correspondent} is excluded by"
-                f" {trigger.filter_has_not_correspondents.all()}"
+                f" {list(trigger.filter_has_not_correspondents.all())}"
             )
             self.assertIn(expected_str, cm.output[1])
 
@@ -1230,7 +1230,7 @@ class TestWorkflows(
             self.assertIn(expected_str, cm.output[0])
             expected_str = (
                 f"Document doc type {doc.document_type} is excluded by"
-                f" {trigger.filter_has_not_document_types.all()}"
+                f" {list(trigger.filter_has_not_document_types.all())}"
             )
             self.assertIn(expected_str, cm.output[1])
 
@@ -1266,7 +1266,7 @@ class TestWorkflows(
             self.assertIn(expected_str, cm.output[0])
             expected_str = (
                 f"Document storage path {doc.storage_path} is excluded by"
-                f" {trigger.filter_has_not_storage_paths.all()}"
+                f" {list(trigger.filter_has_not_storage_paths.all())}"
             )
             self.assertIn(expected_str, cm.output[1])
 
@@ -1335,7 +1335,7 @@ class TestWorkflows(
 
         matched, reason = existing_document_matches_workflow(doc, trigger)
         self.assertTrue(matched)
-        self.assertEqual(reason, "")
+        self.assertIsNone(reason)
 
     def test_prefilter_documents_custom_field_query(self):
         trigger = WorkflowTrigger.objects.create(
