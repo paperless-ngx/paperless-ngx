@@ -1,28 +1,36 @@
-<div class="btn-group w-100" role="group" ngbDropdown #dropdown="ngbDropdown" (openChange)="onOpenChange($event)" [popperOptions]="popperOptions">
-  <button class="btn btn-sm btn-outline-primary" id="dropdown_toggle" ngbDropdownToggle [disabled]="disabled">
-    <i-bs name="{{icon}}"></i-bs>
-    <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
-    @if (isActive) {
-      <pngx-clearable-badge [selected]="isActive" (cleared)="reset()"></pngx-clearable-badge>
-    }
-  </button>
-  <div class="px-3 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown_{{name}}">
-    <div class="list-group list-group-flush">
-      @for (element of selectionModel.queries; track element.id; let i = $index) {
-        <div class="list-group-item px-0 d-flex flex-nowrap">
-          @switch (element.type) {
-            @case (CustomFieldQueryComponentType.Atom) {
-              <ng-container *ngTemplateOutlet="queryAtom; context: { atom: element }"></ng-container>
-            }
-            @case (CustomFieldQueryComponentType.Expression) {
-              <ng-container *ngTemplateOutlet="queryExpression; context: { expression: element }"></ng-container>
-            }
-          }
-        </div>
+@if (useDropdown) {
+  <div class="btn-group w-100" role="group" ngbDropdown #dropdown="ngbDropdown" (openChange)="onOpenChange($event)" [popperOptions]="popperOptions">
+    <button class="btn btn-sm btn-outline-primary" id="dropdown_toggle" ngbDropdownToggle [disabled]="disabled">
+      <i-bs name="{{icon}}"></i-bs>
+      <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
+      @if (isActive) {
+        <pngx-clearable-badge [selected]="isActive" (cleared)="reset()"></pngx-clearable-badge>
       }
+    </button>
+    <div class="px-3 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown_{{name}}">
+      <ng-container *ngTemplateOutlet="list; context: { queries: selectionModel.queries }"></ng-container>
     </div>
   </div>
-</div>
+} @else {
+  <ng-container *ngTemplateOutlet="list; context: { queries: selectionModel.queries }"></ng-container>
+}
+
+<ng-template #list let-queries="queries">
+  <div class="list-group list-group-flush">
+    @for (element of queries; track element.id; let i = $index) {
+      <div class="list-group-item px-0 d-flex flex-nowrap">
+        @switch (element.type) {
+          @case (CustomFieldQueryComponentType.Atom) {
+            <ng-container *ngTemplateOutlet="queryAtom; context: { atom: element }"></ng-container>
+          }
+          @case (CustomFieldQueryComponentType.Expression) {
+            <ng-container *ngTemplateOutlet="queryExpression; context: { expression: element }"></ng-container>
+          }
+        }
+      </div>
+    }
+  </div>
+</ng-template>
 
 <ng-template #comparisonValueTemplate let-atom="atom">
   @if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Date) {
