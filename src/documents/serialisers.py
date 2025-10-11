@@ -15,6 +15,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.validators import DecimalValidator
+from django.core.validators import EmailValidator
 from django.core.validators import MaxLengthValidator
 from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
@@ -1921,9 +1922,11 @@ class EmailSerializer(DocumentListSerializer):
         if not address_list:
             raise serializers.ValidationError("At least one email address is required")
 
-        email_pattern = r"[^@]+@[^@]+\.[^@]+"
+        email_validator = EmailValidator()
         for address in address_list:
-            if not re.match(email_pattern, address):
+            try:
+                email_validator(address)
+            except ValidationError:
                 raise serializers.ValidationError(f"Invalid email address: {address}")
 
         return ",".join(address_list)
