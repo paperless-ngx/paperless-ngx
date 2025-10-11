@@ -1923,11 +1923,11 @@ class EmailSerializer(DocumentListSerializer):
             raise serializers.ValidationError("At least one email address is required")
 
         email_validator = EmailValidator()
-        for address in address_list:
-            try:
+        try:
+            for address in address_list:
                 email_validator(address)
-            except ValidationError:
-                raise serializers.ValidationError(f"Invalid email address: {address}")
+        except ValidationError:
+            raise serializers.ValidationError(f"Invalid email address: {address}")
 
         return ",".join(address_list)
 
