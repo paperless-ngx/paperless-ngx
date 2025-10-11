@@ -414,7 +414,7 @@ fields and permissions, which will be merged.
 
 #### Types {#workflow-trigger-types}
 
-Currently, there are three events that correspond to workflow trigger 'types':
+Currently, there are four events that correspond to workflow trigger 'types':
 
 1. **Consumption Started**: _before_ a document is consumed, so events can include filters by source (mail, consumption
    folder or API), file path, file name, mail rule
@@ -427,7 +427,7 @@ Currently, there are three events that correspond to workflow trigger 'types':
    added, created, updated date or you can specify a (date) custom field. You can also specify a day offset from the date (positive
    offsets will trigger after the date, negative offsets will trigger before).
 
-The following flow diagram illustrates the three document trigger types:
+The following flow diagram illustrates the four document trigger types:
 
 ```mermaid
 flowchart TD
@@ -637,7 +637,7 @@ When you first delete a document it is moved to the 'trash' until either it is e
 You can set how long documents remain in the trash before being automatically deleted with [`PAPERLESS_EMPTY_TRASH_DELAY`](configuration.md#PAPERLESS_EMPTY_TRASH_DELAY), which defaults
 to 30 days. Until the file is actually deleted (e.g. the trash is emptied), all files and database content remains intact and can be restored at any point up until that time.
 
-Additionally you may configure a directory where deleted files are moved to when they the trash is emptied with [`PAPERLESS_EMPTY_TRASH_DIR`](configuration.md#PAPERLESS_EMPTY_TRASH_DIR).
+Additionally you may configure a directory where deleted files are moved to when the trash is emptied with [`PAPERLESS_EMPTY_TRASH_DIR`](configuration.md#PAPERLESS_EMPTY_TRASH_DIR).
 Note that the empty trash directory only stores the original file, the archive file and all database information is permanently removed once a document is fully deleted.
 
 ## Best practices {#basic-searching}

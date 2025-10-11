@@ -42,8 +42,8 @@ describe('ColorComponent', () => {
   })
 
   it('should set swatch color', () => {
-    const swatch: HTMLSpanElement = fixture.nativeElement.querySelector(
-      'span.input-group-text'
+    const swatch: HTMLButtonElement = fixture.nativeElement.querySelector(
+      'button.input-group-text'
     )
     expect(swatch.style.backgroundColor).toEqual('')
     component.value = '#ff0000'
