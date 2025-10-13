@@ -1,4 +1,5 @@
 import datetime
+import json
 import shutil
 import socket
 from datetime import timedelta
@@ -31,6 +32,7 @@ from documents import tasks
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
 from documents.matching import document_matches_workflow
+from documents.matching import existing_document_matches_workflow
 from documents.matching import prefilter_documents_by_workflowtrigger
 from documents.models import Correspondent
 from documents.models import CustomField
@@ -46,6 +48,7 @@ from documents.models import WorkflowActionEmail
 from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
+from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_consumption_finished
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DummyProgressManager
@@ -1080,8 +1083,408 @@ class TestWorkflows(
             )
             expected_str = f"Document did not match {w}"
             self.assertIn(expected_str, cm.output[0])
-            expected_str = f"Document tags {doc.tags.all()} do not include {trigger.filter_has_tags.all()}"
+            expected_str = f"Document tags {list(doc.tags.all())} do not include {list(trigger.filter_has_tags.all())}"
             self.assertIn(expected_str, cm.output[1])
+
+    def test_document_added_no_match_all_tags(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        trigger.filter_has_all_tags.set([self.t1, self.t2])
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        doc.tags.set([self.t1])
+        doc.save()
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = (
+                f"Document tags {list(doc.tags.all())} do not contain all of"
+                f" {list(trigger.filter_has_all_tags.all())}"
+            )
+            self.assertIn(expected_str, cm.output[1])
+
+    def test_document_added_excluded_tags(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        trigger.filter_has_not_tags.set([self.t3])
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        doc.tags.set([self.t3])
+        doc.save()
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = (
+                f"Document tags {list(doc.tags.all())} include excluded tags"
+                f" {list(trigger.filter_has_not_tags.all())}"
+            )
+            self.assertIn(expected_str, cm.output[1])
+
+    def test_document_added_excluded_correspondent(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        trigger.filter_has_not_correspondents.set([self.c])
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = (
+                f"Document correspondent {doc.correspondent} is excluded by"
+                f" {list(trigger.filter_has_not_correspondents.all())}"
+            )
+            self.assertIn(expected_str, cm.output[1])
+
+    def test_document_added_excluded_document_types(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        trigger.filter_has_not_document_types.set([self.dt])
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            document_type=self.dt,
+            original_filename="sample.pdf",
+        )
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = (
+                f"Document doc type {doc.document_type} is excluded by"
+                f" {list(trigger.filter_has_not_document_types.all())}"
+            )
+            self.assertIn(expected_str, cm.output[1])
+
+    def test_document_added_excluded_storage_paths(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        trigger.filter_has_not_storage_paths.set([self.sp])
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            storage_path=self.sp,
+            original_filename="sample.pdf",
+        )
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = (
+                f"Document storage path {doc.storage_path} is excluded by"
+                f" {list(trigger.filter_has_not_storage_paths.all())}"
+            )
+            self.assertIn(expected_str, cm.output[1])
+
+    def test_document_added_custom_field_query_no_match(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_custom_field_query=json.dumps(
+                [
+                    "AND",
+                    [[self.cf1.id, "exact", "expected"]],
+                ],
+            ),
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        workflow = Workflow.objects.create(name="Workflow 1", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+        workflow.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=self.cf1,
+            value_text="other",
+        )
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {workflow}"
+            self.assertIn(expected_str, cm.output[0])
+            self.assertIn(
+                "Document custom fields do not match the configured custom field query",
+                cm.output[1],
+            )
+
+    def test_document_added_custom_field_query_match(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_custom_field_query=json.dumps(
+                [
+                    "AND",
+                    [[self.cf1.id, "exact", "expected"]],
+                ],
+            ),
+        )
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=self.cf1,
+            value_text="expected",
+        )
+
+        matched, reason = existing_document_matches_workflow(doc, trigger)
+        self.assertTrue(matched)
+        self.assertIsNone(reason)
+
+    def test_prefilter_documents_custom_field_query(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_custom_field_query=json.dumps(
+                [
+                    "AND",
+                    [[self.cf1.id, "exact", "match"]],
+                ],
+            ),
+        )
+        doc1 = Document.objects.create(
+            title="doc 1",
+            correspondent=self.c,
+            original_filename="doc1.pdf",
+            checksum="checksum1",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc1,
+            field=self.cf1,
+            value_text="match",
+        )
+
+        doc2 = Document.objects.create(
+            title="doc 2",
+            correspondent=self.c,
+            original_filename="doc2.pdf",
+            checksum="checksum2",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc2,
+            field=self.cf1,
+            value_text="different",
+        )
+
+        filtered = prefilter_documents_by_workflowtrigger(
+            Document.objects.all(),
+            trigger,
+        )
+        self.assertIn(doc1, filtered)
+        self.assertNotIn(doc2, filtered)
+
+    def test_consumption_trigger_requires_filter_configuration(self):
+        serializer = WorkflowTriggerSerializer(
+            data={
+                "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            },
+        )
+
+        self.assertFalse(serializer.is_valid())
+        errors = serializer.errors.get("non_field_errors", [])
+        self.assertIn(
+            "File name, path or mail rule filter are required",
+            [str(error) for error in errors],
+        )
+
+    def test_workflow_trigger_serializer_clears_empty_custom_field_query(self):
+        serializer = WorkflowTriggerSerializer(
+            data={
+                "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+                "filter_custom_field_query": "",
+            },
+        )
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertIsNone(serializer.validated_data.get("filter_custom_field_query"))
+
+    def test_existing_document_invalid_custom_field_query_configuration(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_custom_field_query="{ not json",
+        )
+
+        document = Document.objects.create(
+            title="doc invalid query",
+            original_filename="invalid.pdf",
+            checksum="checksum-invalid-query",
+        )
+
+        matched, reason = existing_document_matches_workflow(document, trigger)
+        self.assertFalse(matched)
+        self.assertEqual(reason, "Invalid custom field query configuration")
+
+    def test_prefilter_documents_returns_none_for_invalid_custom_field_query(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_custom_field_query="{ not json",
+        )
+
+        Document.objects.create(
+            title="doc",
+            original_filename="doc.pdf",
+            checksum="checksum-prefilter-invalid",
+        )
+
+        filtered = prefilter_documents_by_workflowtrigger(
+            Document.objects.all(),
+            trigger,
+        )
+
+        self.assertEqual(list(filtered), [])
+
+    def test_prefilter_documents_applies_all_filters(self):
+        other_document_type = DocumentType.objects.create(name="Other Type")
+        other_storage_path = StoragePath.objects.create(
+            name="Blocked path",
+            path="/blocked/",
+        )
+
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_has_correspondent=self.c,
+            filter_has_document_type=self.dt,
+            filter_has_storage_path=self.sp,
+        )
+        trigger.filter_has_tags.set([self.t1])
+        trigger.filter_has_all_tags.set([self.t1, self.t2])
+        trigger.filter_has_not_tags.set([self.t3])
+        trigger.filter_has_not_correspondents.set([self.c2])
+        trigger.filter_has_not_document_types.set([other_document_type])
+        trigger.filter_has_not_storage_paths.set([other_storage_path])
+
+        allowed_document = Document.objects.create(
+            title="allowed",
+            correspondent=self.c,
+            document_type=self.dt,
+            storage_path=self.sp,
+            original_filename="allow.pdf",
+            checksum="checksum-prefilter-allowed",
+        )
+        allowed_document.tags.set([self.t1, self.t2])
+
+        blocked_document = Document.objects.create(
+            title="blocked",
+            correspondent=self.c2,
+            document_type=other_document_type,
+            storage_path=other_storage_path,
+            original_filename="block.pdf",
+            checksum="checksum-prefilter-blocked",
+        )
+        blocked_document.tags.set([self.t1, self.t3])
+
+        filtered = prefilter_documents_by_workflowtrigger(
+            Document.objects.all(),
+            trigger,
+        )
+
+        self.assertIn(allowed_document, filtered)
+        self.assertNotIn(blocked_document, filtered)
 
     def test_document_added_no_match_doctype(self):
         trigger = WorkflowTrigger.objects.create(
