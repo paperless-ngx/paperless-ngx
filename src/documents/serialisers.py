@@ -16,6 +16,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.validators import DecimalValidator
+from django.core.validators import EmailValidator
 from django.core.validators import MaxLengthValidator
 from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
@@ -1905,6 +1906,51 @@ class BulkDownloadSerializer(DocumentListSerializer):
             "bzip2": zipfile.ZIP_BZIP2,
             "lzma": zipfile.ZIP_LZMA,
         }[compression]
+
+
+class EmailSerializer(DocumentListSerializer):
+    addresses = serializers.CharField(
+        required=True,
+        label="Email addresses",
+        help_text="Comma-separated email addresses",
+    )
+
+    subject = serializers.CharField(
+        required=True,
+        label="Email subject",
+    )
+
+    message = serializers.CharField(
+        required=True,
+        label="Email message",
+    )
+
+    use_archive_version = serializers.BooleanField(
+        default=True,
+        label="Use archive version",
+        help_text="Use archive version of documents if available",
+    )
+
+    def validate_addresses(self, addresses):
+        address_list = [addr.strip() for addr in addresses.split(",")]
+        if not address_list:
+            raise serializers.ValidationError("At least one email address is required")
+
+        email_validator = EmailValidator()
+        try:
+            for address in address_list:
+                email_validator(address)
+        except ValidationError:
+            raise serializers.ValidationError(f"Invalid email address: {address}")
+
+        return ",".join(address_list)
+
+    def validate_documents(self, documents):
+        super().validate_documents(documents)
+        if not documents:
+            raise serializers.ValidationError("At least one document is required")
+
+        return documents
 
 
 class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
