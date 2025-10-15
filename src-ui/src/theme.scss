@@ -34,7 +34,7 @@
 
 // Dark text colors allow for maintain contrast with theme color changes
 $text-color-light-bg: #212529;
-$text-color-dark-bg: #abb2bf;
+$text-color-dark-bg: #dfdfdf;
 $text-color-dark-bg-accent: color.adjust($text-color-dark-bg, $lightness: 10%);
 // Taken from bootstrap
 $form-check-input-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#{$text-color-light-bg}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/></svg>");
