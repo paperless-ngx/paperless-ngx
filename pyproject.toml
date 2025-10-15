@@ -10,6 +10,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
 ]
 # TODO: Move certain things to groups and then utilize that further
 # This will allow testing to not install a webserver, mysql, etc
@@ -25,7 +26,7 @@ dependencies = [
   # WARNING: django does not use semver.
   #          Only patch versions are guaranteed to not introduce breaking changes.
   "django~=5.2.5",
-  "django-allauth[socialaccount,mfa]~=65.4.0",
+  "django-allauth[mfa,socialaccount]~=65.4.0",
   "django-auditlog~=3.2.1",
   "django-cachalot~=2.8.0",
   "django-celery-results~=2.6.0",
@@ -136,6 +137,25 @@ typing = [
   "types-redis",
   "types-setuptools",
   "types-tqdm",
+]
+
+[tool.uv]
+required-version = ">=0.5.14"
+package = false
+environments = [
+  "sys_platform == 'darwin'",
+  "sys_platform == 'linux'",
+]
+
+[tool.uv.sources]
+# Markers are chosen to select these almost exclusively when building the Docker image
+psycopg-c = [
+  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_c-3.2.9-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_c-3.2.9-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
+]
+zxing-cpp = [
+  { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
 ]
 
 [tool.ruff]
@@ -283,25 +303,6 @@ disallow_incomplete_defs = true
 disallow_untyped_defs = true
 warn_redundant_casts = true
 warn_unused_ignores = true
-
-[tool.uv]
-required-version = ">=0.5.14"
-package = false
-environments = [
-  "sys_platform == 'darwin'",
-  "sys_platform == 'linux'",
-]
-
-[tool.uv.sources]
-# Markers are chosen to select these almost exclusively when building the Docker image
-psycopg-c = [
-  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_c-3.2.9-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
-  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_c-3.2.9-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
-]
-zxing-cpp = [
-  { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
-  { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
-]
 
 [tool.django-stubs]
 django_settings_module = "paperless.settings"
