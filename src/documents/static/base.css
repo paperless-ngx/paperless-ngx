@@ -76,7 +76,7 @@ body {
   /* From theme_dark.scss */
   body {
     --bs-body-bg: #161618;
-    --bs-body-color: #abb2bf;
+    --bs-body-color: #dfdfdf;
     --bs-body-color-rgb: 171, 178, 191;
     --bs-border-color: #47494f;
   }
@@ -86,10 +86,10 @@ body {
   }
 
   svg.logo .text {
-    fill: #abb2bf !important;
+    fill: #dfdfdf !important;
   }
 
   .byline {
-    color: #abb2bf;
+    color: #dfdfdf;
   }
 }
