@@ -11,8 +11,14 @@ import {
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of } from 'rxjs'
+import { CustomFieldQueriesModel } from 'src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
 import { CustomFieldDataType } from 'src/app/data/custom-field'
-import { MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model'
+import { CustomFieldQueryLogicalOperator } from 'src/app/data/custom-field-query'
+import {
+  MATCHING_ALGORITHMS,
+  MATCH_AUTO,
+  MATCH_NONE,
+} from 'src/app/data/matching-model'
 import { Workflow } from 'src/app/data/workflow'
 import {
   WorkflowAction,
@@ -31,6 +37,7 @@ import { DocumentTypeService } from 'src/app/services/rest/document-type.service
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { CustomFieldQueryExpression } from 'src/app/utils/custom-field-query-element'
 import { ConfirmButtonComponent } from '../../confirm-button/confirm-button.component'
 import { NumberComponent } from '../../input/number/number.component'
 import { PermissionsGroupComponent } from '../../input/permissions/permissions-group/permissions-group.component'
@@ -43,6 +50,7 @@ import { EditDialogMode } from '../edit-dialog.component'
 import {
   DOCUMENT_SOURCE_OPTIONS,
   SCHEDULE_DATE_FIELD_OPTIONS,
+  TriggerFilterType,
   WORKFLOW_ACTION_OPTIONS,
   WORKFLOW_TYPE_OPTIONS,
   WorkflowEditDialogComponent,
@@ -373,6 +381,562 @@ describe('WorkflowEditDialogComponent', () => {
     component.save()
     expect(component.objectForm.get('actions').value[0].email).toBeNull()
     expect(component.objectForm.get('actions').value[0].webhook).toBeNull()
+  })
+
+  it('should require matching pattern when algorithm is not none', () => {
+    const triggerGroup = new FormGroup({
+      matching_algorithm: new FormControl(MATCH_AUTO),
+      match: new FormControl(''),
+    })
+    expect(component.matchingPatternRequired(triggerGroup)).toBe(true)
+    triggerGroup.get('matching_algorithm').setValue(MATCHING_ALGORITHMS[0].id)
+    expect(component.matchingPatternRequired(triggerGroup)).toBe(true)
+    triggerGroup.get('matching_algorithm').setValue(MATCH_NONE)
+    expect(component.matchingPatternRequired(triggerGroup)).toBe(false)
+  })
+
+  it('should map filter builder values into trigger filters on save', () => {
+    component.object = undefined
+    component.addTrigger()
+    const triggerGroup = component.triggerFields.at(0)
+    component.addFilter(triggerGroup as FormGroup)
+    component.addFilter(triggerGroup as FormGroup)
+    component.addFilter(triggerGroup as FormGroup)
+
+    const filters = component.getFiltersFormArray(triggerGroup as FormGroup)
+    expect(filters.length).toBe(3)
+
+    filters.at(0).get('values').setValue([1])
+    filters.at(1).get('values').setValue([2, 3])
+    filters.at(2).get('values').setValue([4])
+
+    const addFilterOfType = (type: TriggerFilterType) => {
+      const newFilter = component.addFilter(triggerGroup as FormGroup)
+      newFilter.get('type').setValue(type)
+      return newFilter
+    }
+
+    const correspondentIs = addFilterOfType(TriggerFilterType.CorrespondentIs)
+    correspondentIs.get('values').setValue(1)
+
+    const correspondentNot = addFilterOfType(TriggerFilterType.CorrespondentNot)
+    correspondentNot.get('values').setValue([1])
+
+    const documentTypeIs = addFilterOfType(TriggerFilterType.DocumentTypeIs)
+    documentTypeIs.get('values').setValue(1)
+
+    const documentTypeNot = addFilterOfType(TriggerFilterType.DocumentTypeNot)
+    documentTypeNot.get('values').setValue([1])
+
+    const storagePathIs = addFilterOfType(TriggerFilterType.StoragePathIs)
+    storagePathIs.get('values').setValue(1)
+
+    const storagePathNot = addFilterOfType(TriggerFilterType.StoragePathNot)
+    storagePathNot.get('values').setValue([1])
+
+    const customFieldFilter = addFilterOfType(
+      TriggerFilterType.CustomFieldQuery
+    )
+    const customFieldQuery = JSON.stringify(['AND', [[1, 'exact', 'test']]])
+    customFieldFilter.get('values').setValue(customFieldQuery)
+
+    const formValues = component['getFormValues']()
+
+    expect(formValues.triggers[0].filter_has_tags).toEqual([1])
+    expect(formValues.triggers[0].filter_has_all_tags).toEqual([2, 3])
+    expect(formValues.triggers[0].filter_has_not_tags).toEqual([4])
+    expect(formValues.triggers[0].filter_has_correspondent).toEqual(1)
+    expect(formValues.triggers[0].filter_has_not_correspondents).toEqual([1])
+    expect(formValues.triggers[0].filter_has_document_type).toEqual(1)
+    expect(formValues.triggers[0].filter_has_not_document_types).toEqual([1])
+    expect(formValues.triggers[0].filter_has_storage_path).toEqual(1)
+    expect(formValues.triggers[0].filter_has_not_storage_paths).toEqual([1])
+    expect(formValues.triggers[0].filter_custom_field_query).toEqual(
+      customFieldQuery
+    )
+    expect(formValues.triggers[0].filters).toBeUndefined()
+  })
+
+  it('should ignore empty and null filter values when mapping filters', () => {
+    component.object = undefined
+    component.addTrigger()
+    const triggerGroup = component.triggerFields.at(0) as FormGroup
+
+    const tagsFilter = component.addFilter(triggerGroup)
+    tagsFilter.get('type').setValue(TriggerFilterType.TagsAny)
+    tagsFilter.get('values').setValue([])
+
+    const correspondentFilter = component.addFilter(triggerGroup)
+    correspondentFilter.get('type').setValue(TriggerFilterType.CorrespondentIs)
+    correspondentFilter.get('values').setValue(null)
+
+    const formValues = component['getFormValues']()
+
+    expect(formValues.triggers[0].filter_has_tags).toEqual([])
+    expect(formValues.triggers[0].filter_has_correspondent).toBeNull()
+  })
+
+  it('should derive single select filters from array values', () => {
+    component.object = undefined
+    component.addTrigger()
+    const triggerGroup = component.triggerFields.at(0) as FormGroup
+
+    const addFilterOfType = (type: TriggerFilterType, value: any) => {
+      const filter = component.addFilter(triggerGroup)
+      filter.get('type').setValue(type)
+      filter.get('values').setValue(value)
+    }
+
+    addFilterOfType(TriggerFilterType.CorrespondentIs, [5])
+    addFilterOfType(TriggerFilterType.DocumentTypeIs, [6])
+    addFilterOfType(TriggerFilterType.StoragePathIs, [7])
+
+    const formValues = component['getFormValues']()
+
+    expect(formValues.triggers[0].filter_has_correspondent).toEqual(5)
+    expect(formValues.triggers[0].filter_has_document_type).toEqual(6)
+    expect(formValues.triggers[0].filter_has_storage_path).toEqual(7)
+  })
+
+  it('should convert multi-value filter values when aggregating filters', () => {
+    component.object = undefined
+    component.addTrigger()
+    const triggerGroup = component.triggerFields.at(0) as FormGroup
+
+    const setFilter = (type: TriggerFilterType, value: number): void => {
+      const filter = component.addFilter(triggerGroup) as FormGroup
+      filter.get('type').setValue(type)
+      filter.get('values').setValue(value)
+    }
+
+    setFilter(TriggerFilterType.TagsAll, 11)
+    setFilter(TriggerFilterType.TagsNone, 12)
+    setFilter(TriggerFilterType.CorrespondentNot, 13)
+    setFilter(TriggerFilterType.DocumentTypeNot, 14)
+    setFilter(TriggerFilterType.StoragePathNot, 15)
+
+    const formValues = component['getFormValues']()
+
+    expect(formValues.triggers[0].filter_has_all_tags).toEqual([11])
+    expect(formValues.triggers[0].filter_has_not_tags).toEqual([12])
+    expect(formValues.triggers[0].filter_has_not_correspondents).toEqual([13])
+    expect(formValues.triggers[0].filter_has_not_document_types).toEqual([14])
+    expect(formValues.triggers[0].filter_has_not_storage_paths).toEqual([15])
+  })
+
+  it('should reuse filter type options and update disabled state', () => {
+    component.object = undefined
+    component.addTrigger()
+    const triggerGroup = component.triggerFields.at(0) as FormGroup
+    component.addFilter(triggerGroup)
+
+    const optionsFirst = component.getFilterTypeOptions(triggerGroup, 0)
+    const optionsSecond = component.getFilterTypeOptions(triggerGroup, 0)
+    expect(optionsFirst).toBe(optionsSecond)
+
+    // to force disabled flag
+    component.addFilter(triggerGroup)
+    const filterArray = component.getFiltersFormArray(triggerGroup)
+    const firstFilter = filterArray.at(0)
+    firstFilter.get('type').setValue(TriggerFilterType.CorrespondentIs)
+
+    component.addFilter(triggerGroup)
+    const updatedFilters = component.getFiltersFormArray(triggerGroup)
+    const secondFilter = updatedFilters.at(1)
+    const options = component.getFilterTypeOptions(triggerGroup, 1)
+    const correspondentIsOption = options.find(
+      (option) => option.id === TriggerFilterType.CorrespondentIs
+    )
+    expect(correspondentIsOption.disabled).toBe(true)
+
+    firstFilter.get('type').setValue(TriggerFilterType.DocumentTypeNot)
+    secondFilter.get('type').setValue(TriggerFilterType.TagsAll)
+    const postChangeOptions = component.getFilterTypeOptions(triggerGroup, 1)
+    const correspondentOptionAfter = postChangeOptions.find(
+      (option) => option.id === TriggerFilterType.CorrespondentIs
+    )
+    expect(correspondentOptionAfter.disabled).toBe(false)
+  })
+
+  it('should keep multi-entry filter options enabled and allow duplicates', () => {
+    component.object = undefined
+    component.addTrigger()
+    const triggerGroup = component.triggerFields.at(0) as FormGroup
+
+    component.filterDefinitions = [
+      {
+        id: TriggerFilterType.TagsAny,
+        name: 'Any tags',
+        inputType: 'tags',
+        allowMultipleEntries: true,
+        allowMultipleValues: true,
+      } as any,
+      {
+        id: TriggerFilterType.CorrespondentIs,
+        name: 'Correspondent is',
+        inputType: 'select',
+        allowMultipleEntries: false,
+        allowMultipleValues: false,
+        selectItems: 'correspondents',
+      } as any,
+    ]
+
+    const firstFilter = component.addFilter(triggerGroup)
+    firstFilter.get('type').setValue(TriggerFilterType.TagsAny)
+
+    const secondFilter = component.addFilter(triggerGroup)
+    expect(secondFilter).not.toBeNull()
+
+    const options = component.getFilterTypeOptions(triggerGroup, 1)
+    const multiEntryOption = options.find(
+      (option) => option.id === TriggerFilterType.TagsAny
+    )
+
+    expect(multiEntryOption.disabled).toBe(false)
+    expect(component.canAddFilter(triggerGroup)).toBe(true)
+  })
+
+  it('should return null when no filter definitions remain available', () => {
+    component.object = undefined
+    component.addTrigger()
+    const triggerGroup = component.triggerFields.at(0) as FormGroup
+
+    component.filterDefinitions = [
+      {
+        id: TriggerFilterType.TagsAny,
+        name: 'Any tags',
+        inputType: 'tags',
+        allowMultipleEntries: false,
+        allowMultipleValues: true,
+      } as any,
+      {
+        id: TriggerFilterType.CorrespondentIs,
+        name: 'Correspondent is',
+        inputType: 'select',
+        allowMultipleEntries: false,
+        allowMultipleValues: false,
+        selectItems: 'correspondents',
+      } as any,
+    ]
+
+    const firstFilter = component.addFilter(triggerGroup)
+    firstFilter.get('type').setValue(TriggerFilterType.TagsAny)
+    const secondFilter = component.addFilter(triggerGroup)
+    secondFilter.get('type').setValue(TriggerFilterType.CorrespondentIs)
+
+    expect(component.canAddFilter(triggerGroup)).toBe(false)
+    expect(component.addFilter(triggerGroup)).toBeNull()
+  })
+
+  it('should skip filter definitions without handlers when building form array', () => {
+    const originalDefinitions = component.filterDefinitions
+    component.filterDefinitions = [
+      {
+        id: 999,
+        name: 'Unsupported',
+        inputType: 'text',
+        allowMultipleEntries: false,
+        allowMultipleValues: false,
+      } as any,
+    ]
+
+    const trigger = {
+      filter_has_tags: [],
+      filter_has_all_tags: [],
+      filter_has_not_tags: [],
+      filter_has_not_correspondents: [],
+      filter_has_not_document_types: [],
+      filter_has_not_storage_paths: [],
+      filter_has_correspondent: null,
+      filter_has_document_type: null,
+      filter_has_storage_path: null,
+      filter_custom_field_query: null,
+    } as any
+
+    const filters = component['buildFiltersFormArray'](trigger)
+    expect(filters.length).toBe(0)
+
+    component.filterDefinitions = originalDefinitions
+  })
+
+  it('should return null when adding filter for unknown trigger form group', () => {
+    expect(component.addFilter(new FormGroup({}) as any)).toBeNull()
+  })
+
+  it('should ignore remove filter calls for unknown trigger form group', () => {
+    expect(() =>
+      component.removeFilter(new FormGroup({}) as any, 0)
+    ).not.toThrow()
+  })
+
+  it('should teardown custom field query model when removing a custom field filter', () => {
+    component.object = undefined
+    component.addTrigger()
+    const triggerGroup = component.triggerFields.at(0) as FormGroup
+
+    component.addFilter(triggerGroup)
+    const filters = component.getFiltersFormArray(triggerGroup)
+    const filterGroup = filters.at(0) as FormGroup
+    filterGroup.get('type').setValue(TriggerFilterType.CustomFieldQuery)
+
+    const model = component.getCustomFieldQueryModel(filterGroup)
+    expect(model).toBeDefined()
+    expect(
+      component['getStoredCustomFieldQueryModel'](filterGroup as any)
+    ).toBe(model)
+
+    component.removeFilter(triggerGroup, 0)
+    expect(
+      component['getStoredCustomFieldQueryModel'](filterGroup as any)
+    ).toBeNull()
+  })
+
+  it('should return readable filter names', () => {
+    expect(component.getFilterName(TriggerFilterType.TagsAny)).toBe(
+      'Has any of these tags'
+    )
+    expect(component.getFilterName(999 as any)).toBe('')
+  })
+
+  it('should build filter form array from existing trigger filters', () => {
+    const trigger = workflow.triggers[0]
+    trigger.filter_has_tags = [1]
+    trigger.filter_has_all_tags = [2, 3]
+    trigger.filter_has_not_tags = [4]
+    trigger.filter_has_correspondent = 5 as any
+    trigger.filter_has_not_correspondents = [6] as any
+    trigger.filter_has_document_type = 7 as any
+    trigger.filter_has_not_document_types = [8] as any
+    trigger.filter_has_storage_path = 9 as any
+    trigger.filter_has_not_storage_paths = [10] as any
+    trigger.filter_custom_field_query = JSON.stringify([
+      'AND',
+      [[1, 'exact', 'value']],
+    ]) as any
+
+    component.object = workflow
+    component.ngOnInit()
+    const triggerGroup = component.triggerFields.at(0) as FormGroup
+    const filters = component.getFiltersFormArray(triggerGroup)
+    expect(filters.length).toBe(10)
+    const customFieldFilter = filters.at(9) as FormGroup
+    expect(customFieldFilter.get('type').value).toBe(
+      TriggerFilterType.CustomFieldQuery
+    )
+    const model = component.getCustomFieldQueryModel(customFieldFilter)
+    expect(model.isValid()).toBe(true)
+  })
+
+  it('should expose select metadata helpers', () => {
+    expect(component.isSelectMultiple(TriggerFilterType.CorrespondentNot)).toBe(
+      true
+    )
+    expect(component.isSelectMultiple(TriggerFilterType.CorrespondentIs)).toBe(
+      false
+    )
+
+    component.correspondents = [{ id: 1, name: 'C1' } as any]
+    component.documentTypes = [{ id: 2, name: 'DT' } as any]
+    component.storagePaths = [{ id: 3, name: 'SP' } as any]
+
+    expect(
+      component.getFilterSelectItems(TriggerFilterType.CorrespondentIs)
+    ).toEqual(component.correspondents)
+    expect(
+      component.getFilterSelectItems(TriggerFilterType.DocumentTypeIs)
+    ).toEqual(component.documentTypes)
+    expect(
+      component.getFilterSelectItems(TriggerFilterType.StoragePathIs)
+    ).toEqual(component.storagePaths)
+    expect(component.getFilterSelectItems(TriggerFilterType.TagsAll)).toEqual(
+      []
+    )
+
+    expect(
+      component.isCustomFieldQueryFilter(TriggerFilterType.CustomFieldQuery)
+    ).toBe(true)
+  })
+
+  it('should return empty select items when definition is missing', () => {
+    const originalDefinitions = component.filterDefinitions
+    component.filterDefinitions = []
+
+    expect(
+      component.getFilterSelectItems(TriggerFilterType.CorrespondentIs)
+    ).toEqual([])
+
+    component.filterDefinitions = originalDefinitions
+  })
+
+  it('should return empty select items when definition has unknown source', () => {
+    const originalDefinitions = component.filterDefinitions
+    component.filterDefinitions = [
+      {
+        id: TriggerFilterType.CorrespondentIs,
+        name: 'Correspondent is',
+        inputType: 'select',
+        allowMultipleEntries: false,
+        allowMultipleValues: false,
+        selectItems: 'unknown',
+      } as any,
+    ]
+
+    expect(
+      component.getFilterSelectItems(TriggerFilterType.CorrespondentIs)
+    ).toEqual([])
+
+    component.filterDefinitions = originalDefinitions
+  })
+
+  it('should handle custom field query selection change and validation states', () => {
+    const formGroup = new FormGroup({
+      values: new FormControl(null),
+    })
+    const model = new CustomFieldQueriesModel()
+
+    const changeSpy = jest.spyOn(
+      component as any,
+      'onCustomFieldQueryModelChanged'
+    )
+
+    component.onCustomFieldQuerySelectionChange(formGroup, model)
+    expect(changeSpy).toHaveBeenCalledWith(formGroup, model)
+
+    expect(component.isCustomFieldQueryValid(formGroup)).toBe(true)
+    component['setCustomFieldQueryModel'](formGroup as any, model as any)
+
+    const validSpy = jest.spyOn(model, 'isValid').mockReturnValue(false)
+    const emptySpy = jest.spyOn(model, 'isEmpty').mockReturnValue(false)
+    expect(component.isCustomFieldQueryValid(formGroup)).toBe(false)
+    expect(validSpy).toHaveBeenCalled()
+
+    validSpy.mockReturnValue(true)
+    emptySpy.mockReturnValue(true)
+    expect(component.isCustomFieldQueryValid(formGroup)).toBe(true)
+
+    emptySpy.mockReturnValue(false)
+    expect(component.isCustomFieldQueryValid(formGroup)).toBe(true)
+
+    component['clearCustomFieldQueryModel'](formGroup as any)
+  })
+
+  it('should recover from invalid custom field query json and update control on changes', () => {
+    const filterGroup = new FormGroup({
+      values: new FormControl('not-json'),
+    })
+
+    component['ensureCustomFieldQueryModel'](filterGroup, 'not-json')
+
+    const model = component['getStoredCustomFieldQueryModel'](
+      filterGroup as any
+    )
+    expect(model).toBeDefined()
+    expect(model.queries.length).toBeGreaterThan(0)
+
+    const valuesControl = filterGroup.get('values')
+    expect(valuesControl.value).toBeNull()
+
+    const expression = new CustomFieldQueryExpression([
+      CustomFieldQueryLogicalOperator.And,
+      [[1, 'exact', 'value']],
+    ])
+    model.queries = [expression]
+
+    jest.spyOn(model, 'isValid').mockReturnValue(true)
+    jest.spyOn(model, 'isEmpty').mockReturnValue(false)
+
+    model.changed.next(model)
+
+    expect(valuesControl.value).toEqual(JSON.stringify(expression.serialize()))
+
+    component['clearCustomFieldQueryModel'](filterGroup as any)
+  })
+
+  it('should handle custom field query model change edge cases', () => {
+    const groupWithoutControl = new FormGroup({})
+    const dummyModel = {
+      isValid: jest.fn().mockReturnValue(true),
+      isEmpty: jest.fn().mockReturnValue(false),
+    }
+
+    expect(() =>
+      component['onCustomFieldQueryModelChanged'](
+        groupWithoutControl as any,
+        dummyModel as any
+      )
+    ).not.toThrow()
+
+    const groupWithControl = new FormGroup({
+      values: new FormControl('initial'),
+    })
+    const emptyModel = {
+      isValid: jest.fn().mockReturnValue(true),
+      isEmpty: jest.fn().mockReturnValue(true),
+    }
+
+    component['onCustomFieldQueryModelChanged'](
+      groupWithControl as any,
+      emptyModel as any
+    )
+
+    expect(groupWithControl.get('values').value).toBeNull()
+  })
+
+  it('should normalize filter values for single and multi selects', () => {
+    expect(
+      component['normalizeFilterValue'](TriggerFilterType.TagsAny)
+    ).toEqual([])
+    expect(
+      component['normalizeFilterValue'](TriggerFilterType.TagsAny, 5)
+    ).toEqual([5])
+    expect(
+      component['normalizeFilterValue'](TriggerFilterType.TagsAny, [5, 6])
+    ).toEqual([5, 6])
+    expect(
+      component['normalizeFilterValue'](TriggerFilterType.CorrespondentIs, [7])
+    ).toEqual(7)
+    expect(
+      component['normalizeFilterValue'](TriggerFilterType.CorrespondentIs, 8)
+    ).toEqual(8)
+    const customFieldJson = JSON.stringify(['AND', [[1, 'exact', 'test']]])
+    expect(
+      component['normalizeFilterValue'](
+        TriggerFilterType.CustomFieldQuery,
+        customFieldJson
+      )
+    ).toEqual(customFieldJson)
+
+    const customFieldObject = ['AND', [[1, 'exact', 'other']]]
+    expect(
+      component['normalizeFilterValue'](
+        TriggerFilterType.CustomFieldQuery,
+        customFieldObject
+      )
+    ).toEqual(JSON.stringify(customFieldObject))
+
+    expect(
+      component['normalizeFilterValue'](
+        TriggerFilterType.CustomFieldQuery,
+        false
+      )
+    ).toBeNull()
+  })
+
+  it('should add and remove filter form groups', () => {
+    component['changeDetector'] = { detectChanges: jest.fn() } as any
+    component.object = undefined
+    component.addTrigger()
+    const triggerGroup = component.triggerFields.at(0) as FormGroup
+
+    component.addFilter(triggerGroup)
+
+    component.removeFilter(triggerGroup, 0)
+    expect(component.getFiltersFormArray(triggerGroup).length).toBe(0)
+
+    component.addFilter(triggerGroup)
+    const filterArrayAfterAdd = component.getFiltersFormArray(triggerGroup)
+    filterArrayAfterAdd.at(0).get('type').setValue(TriggerFilterType.TagsAll)
+    expect(component.getFiltersFormArray(triggerGroup).length).toBe(1)
   })
 
   it('should remove selected custom field from the form group', () => {

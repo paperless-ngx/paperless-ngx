@@ -1066,12 +1066,33 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has these tag(s)"),
     )
 
+    filter_has_all_tags = models.ManyToManyField(
+        Tag,
+        blank=True,
+        related_name="workflowtriggers_has_all",
+        verbose_name=_("has all of these tag(s)"),
+    )
+
+    filter_has_not_tags = models.ManyToManyField(
+        Tag,
+        blank=True,
+        related_name="workflowtriggers_has_not",
+        verbose_name=_("does not have these tag(s)"),
+    )
+
     filter_has_document_type = models.ForeignKey(
         DocumentType,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
         verbose_name=_("has this document type"),
+    )
+
+    filter_has_not_document_types = models.ManyToManyField(
+        DocumentType,
+        blank=True,
+        related_name="workflowtriggers_has_not_document_type",
+        verbose_name=_("does not have these document type(s)"),
     )
 
     filter_has_correspondent = models.ForeignKey(
@@ -1082,12 +1103,33 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has this correspondent"),
     )
 
+    filter_has_not_correspondents = models.ManyToManyField(
+        Correspondent,
+        blank=True,
+        related_name="workflowtriggers_has_not_correspondent",
+        verbose_name=_("does not have these correspondent(s)"),
+    )
+
     filter_has_storage_path = models.ForeignKey(
         StoragePath,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
         verbose_name=_("has this storage path"),
+    )
+
+    filter_has_not_storage_paths = models.ManyToManyField(
+        StoragePath,
+        blank=True,
+        related_name="workflowtriggers_has_not_storage_path",
+        verbose_name=_("does not have these storage path(s)"),
+    )
+
+    filter_custom_field_query = models.TextField(
+        _("filter custom field query"),
+        null=True,
+        blank=True,
+        help_text=_("JSON-encoded custom field query expression."),
     )
 
     schedule_offset_days = models.IntegerField(

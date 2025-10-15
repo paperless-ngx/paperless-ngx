@@ -484,15 +484,24 @@ flowchart TD
 Workflows allow you to filter by:
 
 -   Source, e.g. documents uploaded via consume folder, API (& the web UI) and mail fetch
--   File name, including wildcards e.g. \*.pdf will apply to all pdfs
+-   File name, including wildcards e.g. \*.pdf will apply to all pdfs.
 -   File path, including wildcards. Note that enabling `PAPERLESS_CONSUMER_RECURSIVE` would allow, for
     example, automatically assigning documents to different owners based on the upload directory.
 -   Mail rule. Choosing this option will force 'mail fetch' to be the workflow source.
 -   Content matching (`Added`, `Updated` and `Scheduled` triggers only). Filter document content using the matching settings.
--   Tags (`Added`, `Updated` and `Scheduled` triggers only). Filter for documents with any of the specified tags
--   Document type (`Added`, `Updated` and `Scheduled` triggers only). Filter documents with this doc type
--   Correspondent (`Added`, `Updated` and `Scheduled` triggers only). Filter documents with this correspondent
--   Storage path (`Added`, `Updated` and `Scheduled` triggers only). Filter documents with this storage path
+
+There are also 'advanced' filters available for `Added`, `Updated` and `Scheduled` triggers:
+
+-   Any Tags: Filter for documents with any of the specified tags.
+-   All Tags: Filter for documents with all of the specified tags.
+-   No Tags: Filter for documents with none of the specified tags.
+-   Document type: Filter documents with this document type.
+-   Not Document types: Filter documents without any of these document types.
+-   Correspondent: Filter documents with this correspondent.
+-   Not Correspondents: Filter documents without any of these correspondents.
+-   Storage path: Filter documents with this storage path.
+-   Not Storage paths: Filter documents without any of these storage paths.
+-   Custom field query: Filter documents with a custom field query (the same as used for the document list filters).
 
 ### Workflow Actions
 
