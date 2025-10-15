@@ -256,14 +256,15 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     return this._searchQuery
   }
 
-  emailDocument(
-    documentId: number,
+  emailDocuments(
+    documentIds: number[],
     addresses: string,
     subject: string,
     message: string,
     useArchiveVersion: boolean
   ): Observable<any> {
-    return this.http.post(this.getResourceUrl(documentId, 'email'), {
+    return this.http.post(this.getResourceUrl(null, 'email'), {
+      documents: documentIds,
       addresses: addresses,
       subject: subject,
       message: message,
