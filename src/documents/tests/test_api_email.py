@@ -351,11 +351,20 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
         )
         shutil.copy(self.SAMPLE_DIR / "simple.pdf", doc3.source_path)
 
+        doc4 = Document.objects.create(
+            title="test1",
+            mime_type="application/pdf",
+            content="this is document 4",
+            checksum="4",
+            filename="test4.pdf",
+        )
+        shutil.copy(self.SAMPLE_DIR / "simple.pdf", doc4.source_path)
+
         response = self.client.post(
             self.ENDPOINT,
             json.dumps(
                 {
-                    "documents": [self.doc1.pk, doc3.pk],
+                    "documents": [self.doc1.pk, doc3.pk, doc4.pk],
                     "addresses": "test@example.com",
                     "subject": "Test",
                     "message": "Test message",
@@ -368,9 +377,10 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
         self.assertEqual(len(mail.outbox), 1)
 
         attachment_names = [att[0] for att in mail.outbox[0].attachments]
-        self.assertEqual(len(attachment_names), 2)
+        self.assertEqual(len(attachment_names), 3)
         self.assertIn(f"{self.doc1!s}.pdf", attachment_names)
         self.assertIn(f"{doc3!s}_01.pdf", attachment_names)
+        self.assertIn(f"{doc3!s}_02.pdf", attachment_names)
 
     @mock.patch(
         "django.core.mail.message.EmailMessage.send",
