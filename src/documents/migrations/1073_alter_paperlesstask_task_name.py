@@ -6,7 +6,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "1071_tag_tn_ancestors_count_tag_tn_ancestors_pks_and_more"),
+        ("documents", "1072_workflowtrigger_filter_custom_field_query_and_more"),
     ]
 
     operations = [
