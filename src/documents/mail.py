@@ -1,16 +1,23 @@
+from __future__ import annotations
+
 from email import message_from_bytes
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.core.mail import EmailMessage
 from filelock import FileLock
+
+if TYPE_CHECKING:
+    from documents.models import Document
 
 
 def send_email(
     subject: str,
     body: str,
     to: list[str],
-    attachments: list[tuple[Path, str]],
+    attachments: list[Document],
+    *,
+    use_archive: bool,
 ) -> int:
     """
     Send an email with attachments.
@@ -19,7 +26,8 @@ def send_email(
         subject: Email subject
         body: Email body text
         to: List of recipient email addresses
-        attachments: List of (path, mime_type) tuples for attachments (the list may be empty)
+        attachments: List of documents to attach (the list may be empty)
+        use_archive: Whether to attach archive versions when available
 
     Returns:
         Number of emails sent
@@ -32,19 +40,48 @@ def send_email(
         to=to,
     )
 
+    used_filenames: set[str] = set()
+
     # Something could be renaming the file concurrently so it can't be attached
     with FileLock(settings.MEDIA_LOCK):
-        for attachment_path, mime_type in attachments:
+        for document in attachments:
+            attachment_path = (
+                document.archive_path
+                if use_archive and document.has_archive_version
+                else document.source_path
+            )
+
+            friendly_filename = _get_unique_filename(
+                document,
+                used_filenames,
+                archive=use_archive and document.has_archive_version,
+            )
+            used_filenames.add(friendly_filename)
+
             with attachment_path.open("rb") as f:
                 content = f.read()
-                if mime_type == "message/rfc822":
+                if document.mime_type == "message/rfc822":
                     # See https://forum.djangoproject.com/t/using-emailmessage-with-an-attached-email-file-crashes-due-to-non-ascii/37981
                     content = message_from_bytes(content)
 
                 email.attach(
-                    filename=attachment_path.name,
+                    filename=friendly_filename,
                     content=content,
-                    mimetype=mime_type,
+                    mimetype=document.mime_type,
                 )
 
     return email.send()
+
+
+def _get_unique_filename(doc: Document, used_names: set[str], *, archive: bool) -> str:
+    """
+    Constructs a unique friendly filename for the given document.
+
+    The filename might not be unique enough, so a counter is appended if needed.
+    """
+    counter = 0
+    while True:
+        filename = doc.get_public_filename(archive=archive, counter=counter)
+        if filename not in used_names:
+            return filename
+        counter += 1

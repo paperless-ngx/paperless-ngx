@@ -1164,12 +1164,13 @@ def run_workflows(
         try:
             attachments = []
             if action.email.include_document and original_file:
-                attachments = [(original_file, document.mime_type)]
+                attachments = [document]
             n_messages = send_email(
                 subject=subject,
                 body=body,
                 to=action.email.to.split(","),
                 attachments=attachments,
+                use_archive=False,
             )
             logger.debug(
                 f"Sent {n_messages} notification email(s) to {action.email.to}",
