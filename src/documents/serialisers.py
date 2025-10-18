@@ -16,6 +16,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.validators import DecimalValidator
+from django.core.validators import EmailValidator
 from django.core.validators import MaxLengthValidator
 from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
@@ -43,6 +44,7 @@ if settings.AUDIT_LOG_ENABLED:
 
 from documents import bulk_edit
 from documents.data_models import DocumentSource
+from documents.filters import CustomFieldQueryParser
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -1906,6 +1908,51 @@ class BulkDownloadSerializer(DocumentListSerializer):
         }[compression]
 
 
+class EmailSerializer(DocumentListSerializer):
+    addresses = serializers.CharField(
+        required=True,
+        label="Email addresses",
+        help_text="Comma-separated email addresses",
+    )
+
+    subject = serializers.CharField(
+        required=True,
+        label="Email subject",
+    )
+
+    message = serializers.CharField(
+        required=True,
+        label="Email message",
+    )
+
+    use_archive_version = serializers.BooleanField(
+        default=True,
+        label="Use archive version",
+        help_text="Use archive version of documents if available",
+    )
+
+    def validate_addresses(self, addresses):
+        address_list = [addr.strip() for addr in addresses.split(",")]
+        if not address_list:
+            raise serializers.ValidationError("At least one email address is required")
+
+        email_validator = EmailValidator()
+        try:
+            for address in address_list:
+                email_validator(address)
+        except ValidationError:
+            raise serializers.ValidationError(f"Invalid email address: {address}")
+
+        return ",".join(address_list)
+
+    def validate_documents(self, documents):
+        super().validate_documents(documents)
+        if not documents:
+            raise serializers.ValidationError("At least one document is required")
+
+        return documents
+
+
 class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     class Meta:
         model = StoragePath
@@ -2194,6 +2241,12 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             "match",
             "is_insensitive",
             "filter_has_tags",
+            "filter_has_all_tags",
+            "filter_has_not_tags",
+            "filter_custom_field_query",
+            "filter_has_not_correspondents",
+            "filter_has_not_document_types",
+            "filter_has_not_storage_paths",
             "filter_has_correspondent",
             "filter_has_document_type",
             "filter_has_storage_path",
@@ -2218,6 +2271,20 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             and len(attrs["filter_path"]) == 0
         ):
             attrs["filter_path"] = None
+
+        if (
+            "filter_custom_field_query" in attrs
+            and attrs["filter_custom_field_query"] is not None
+            and len(attrs["filter_custom_field_query"]) == 0
+        ):
+            attrs["filter_custom_field_query"] = None
+
+        if (
+            "filter_custom_field_query" in attrs
+            and attrs["filter_custom_field_query"] is not None
+        ):
+            parser = CustomFieldQueryParser("filter_custom_field_query")
+            parser.parse(attrs["filter_custom_field_query"])
 
         trigger_type = attrs.get("type", getattr(self.instance, "type", None))
         if (
@@ -2414,6 +2481,20 @@ class WorkflowSerializer(serializers.ModelSerializer):
         if triggers is not None and triggers is not serializers.empty:
             for trigger in triggers:
                 filter_has_tags = trigger.pop("filter_has_tags", None)
+                filter_has_all_tags = trigger.pop("filter_has_all_tags", None)
+                filter_has_not_tags = trigger.pop("filter_has_not_tags", None)
+                filter_has_not_correspondents = trigger.pop(
+                    "filter_has_not_correspondents",
+                    None,
+                )
+                filter_has_not_document_types = trigger.pop(
+                    "filter_has_not_document_types",
+                    None,
+                )
+                filter_has_not_storage_paths = trigger.pop(
+                    "filter_has_not_storage_paths",
+                    None,
+                )
                 # Convert sources to strings to handle django-multiselectfield v1.0 changes
                 WorkflowTriggerSerializer.normalize_workflow_trigger_sources(trigger)
                 trigger_instance, _ = WorkflowTrigger.objects.update_or_create(
@@ -2422,6 +2503,22 @@ class WorkflowSerializer(serializers.ModelSerializer):
                 )
                 if filter_has_tags is not None:
                     trigger_instance.filter_has_tags.set(filter_has_tags)
+                if filter_has_all_tags is not None:
+                    trigger_instance.filter_has_all_tags.set(filter_has_all_tags)
+                if filter_has_not_tags is not None:
+                    trigger_instance.filter_has_not_tags.set(filter_has_not_tags)
+                if filter_has_not_correspondents is not None:
+                    trigger_instance.filter_has_not_correspondents.set(
+                        filter_has_not_correspondents,
+                    )
+                if filter_has_not_document_types is not None:
+                    trigger_instance.filter_has_not_document_types.set(
+                        filter_has_not_document_types,
+                    )
+                if filter_has_not_storage_paths is not None:
+                    trigger_instance.filter_has_not_storage_paths.set(
+                        filter_has_not_storage_paths,
+                    )
                 set_triggers.append(trigger_instance)
 
         if actions is not None and actions is not serializers.empty:
