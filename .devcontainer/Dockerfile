@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM --platform=$BUILDPLATFORM docker.io/node:20-bookworm-slim as main-app
+FROM --platform=$BUILDPLATFORM docker.io/node:25-bookworm-slim as main-app
 
 ARG DEBIAN_FRONTEND=noninteractive
 
