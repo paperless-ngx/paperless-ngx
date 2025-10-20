@@ -2077,7 +2077,7 @@ wheels = [
 
 [[package]]
 name = "ocrmypdf"
-version = "16.11.0"
+version = "16.11.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "deprecation", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -2090,9 +2090,9 @@ dependencies = [
     { name = "pluggy", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "rich", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/44/af/947d6abb0cb41f99971a7a4bd33684d3cee20c9e32c8f9dc90e8c5dcf21c/ocrmypdf-16.11.0.tar.gz", hash = "sha256:d89077e503238dac35c6e565925edc8d98b71e5289853c02cacbc1d0901f1be7", size = 7015068, upload-time = "2025-09-12T08:36:53.507Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/13/11/dad06efcf749d77dfcebac0bdec7980f57a9d58a38f2fdc1e0e9ade84ec0/ocrmypdf-16.11.1.tar.gz", hash = "sha256:838ab69e0ee0f04feea0d5861a17badecab6d3beaed0e29a97058eadda58cbb1", size = 7015278, upload-time = "2025-10-16T10:18:27.743Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d9/b2/eda3bb0939bf81d889812dd82cf37fa6f8769af8e31008bd586ba12fae09/ocrmypdf-16.11.0-py3-none-any.whl", hash = "sha256:13628294a309c85b21947b5c7bc7fcd202464517c14b71a050adc9dde85c48f7", size = 162883, upload-time = "2025-09-12T08:36:51.611Z" },
+    { url = "https://files.pythonhosted.org/packages/3e/df/9aec86efc6463dfde75a43427b84eee61d363a931ffa8f9f9b2582948d0d/ocrmypdf-16.11.1-py3-none-any.whl", hash = "sha256:44100061b3b8eb0d191dd54f0469aed33d3bcd3bd2a5252f8635ead6c9d26e29", size = 162953, upload-time = "2025-10-16T10:18:25.823Z" },
 ]
 
 [[package]]
@@ -2262,7 +2262,7 @@ requires-dist = [
     { name = "concurrent-log-handler", specifier = "~=0.9.25" },
     { name = "dateparser", specifier = "~=1.2" },
     { name = "django", specifier = "~=5.2.5" },
-    { name = "django-allauth", extras = ["socialaccount", "mfa"], specifier = "~=65.4.0" },
+    { name = "django-allauth", extras = ["mfa", "socialaccount"], specifier = "~=65.4.0" },
     { name = "django-auditlog", specifier = "~=3.2.1" },
     { name = "django-cachalot", specifier = "~=2.8.0" },
     { name = "django-celery-results", specifier = "~=2.6.0" },
