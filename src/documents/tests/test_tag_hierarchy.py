@@ -171,7 +171,7 @@ class TestTagHierarchy(APITestCase):
         )
         assert resp_fail.status_code == 400
         assert "parent" in resp_fail.data
-        assert "Invalid" in str(resp_fail.data["parent"])
+        assert "Maximum nesting depth exceeded" in str(resp_fail.data["parent"])
 
     def test_max_depth_on_move_subtree(self):
         a = Tag.objects.create(name="A2")
@@ -191,7 +191,7 @@ class TestTagHierarchy(APITestCase):
         )
         assert resp_fail.status_code == 400
         assert "Maximum nesting depth exceeded" in str(
-            resp_fail.data["non_field_errors"],
+            resp_fail.data["parent"],
         )
 
         # Moving X under C (depth 3) should be allowed (deepest becomes 5)
