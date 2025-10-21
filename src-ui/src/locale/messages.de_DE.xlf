@@ -5216,7 +5216,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">181</context>
         </context-group>
-        <target state="needs-translation">Advanced Filters</target>
+        <target state="translated">Erweiterte Filter</target>
       </trans-unit>
       <trans-unit id="910026778839409110" datatype="html">
         <source>Add filter</source>
@@ -5224,7 +5224,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">188</context>
         </context-group>
-        <target state="needs-translation">Add filter</target>
+        <target state="translated">Filter hinzufügen</target>
       </trans-unit>
       <trans-unit id="5671193617280178107" datatype="html">
         <source>No advanced workflow filters defined.</source>
@@ -5232,7 +5232,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">193</context>
         </context-group>
-        <target state="needs-translation">No advanced workflow filters defined.</target>
+        <target state="translated">Keine erweiterten Arbeitsablauf-Filter definiert.</target>
       </trans-unit>
       <trans-unit id="6892734625735572404" datatype="html">
         <source> Complete the custom field query configuration. </source>
@@ -5240,7 +5240,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">222,224</context>
         </context-group>
-        <target state="needs-translation"> Complete the custom field query configuration. </target>
+        <target state="translated"> Benutzerdefinierte Feldabfragekonfiguration abschließen. </target>
       </trans-unit>
       <trans-unit id="6417103744331194518" datatype="html" approved="yes">
         <source>Action type</source>
@@ -5620,7 +5620,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">203</context>
         </context-group>
-        <target state="needs-translation">Has any of these tags</target>
+        <target state="translated">Hat beliebige dieser Tags</target>
       </trans-unit>
       <trans-unit id="4166903555074156852" datatype="html">
         <source>Has all of these tags</source>
@@ -5628,7 +5628,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">210</context>
         </context-group>
-        <target state="needs-translation">Has all of these tags</target>
+        <target state="translated">Hat alle diese Tags</target>
       </trans-unit>
       <trans-unit id="6624363795312783141" datatype="html">
         <source>Does not have these tags</source>
@@ -5636,7 +5636,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">217</context>
         </context-group>
-        <target state="needs-translation">Does not have these tags</target>
+        <target state="translated">Hat diese Tags nicht</target>
       </trans-unit>
       <trans-unit id="5281365940563983618" datatype="html" approved="yes">
         <source>Has correspondent</source>
@@ -5652,7 +5652,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">232</context>
         </context-group>
-        <target state="needs-translation">Does not have correspondents</target>
+        <target state="translated">Korrespondent ist nicht</target>
       </trans-unit>
       <trans-unit id="4806713133917046341" datatype="html" approved="yes">
         <source>Has document type</source>
@@ -5668,7 +5668,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">248</context>
         </context-group>
-        <target state="needs-translation">Does not have document types</target>
+        <target state="translated">Dokumenttyp ist nicht</target>
       </trans-unit>
       <trans-unit id="4277260190522078330" datatype="html" approved="yes">
         <source>Has storage path</source>
@@ -5684,7 +5684,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">264</context>
         </context-group>
-        <target state="needs-translation">Does not have storage paths</target>
+        <target state="translated">Speicherpfad ist nicht</target>
       </trans-unit>
       <trans-unit id="6250799006816371860" datatype="html">
         <source>Matches custom field query</source>
@@ -5692,7 +5692,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">272</context>
         </context-group>
-        <target state="needs-translation">Matches custom field query</target>
+        <target state="translated">Stimmt mit benutzerdefinierter Feldabfrage überein</target>
       </trans-unit>
       <trans-unit id="3138206142174978019" datatype="html" approved="yes">
         <source>Create new workflow</source>
@@ -5716,7 +5716,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.html</context>
           <context context-type="linenumber">2,6</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {Email Document} other {Email <x id="INTERPOLATION"/> Documents}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {Document mailen} other {<x id="INTERPOLATION"/> Dokumente mailen}}</target>
       </trans-unit>
       <trans-unit id="7376342558017986274" datatype="html" approved="yes">
         <source>Email address(es)</source>
@@ -5768,7 +5768,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.html</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Some email servers may reject messages with large attachments.</target>
+        <target state="translated">Einige E-Mail-Server lehnen Nachrichten mit großen Anhängen ab.</target>
       </trans-unit>
       <trans-unit id="9049148856403142491" datatype="html" approved="yes">
         <source>Email sent</source>
