@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-13 22:25+0000\n"
-"PO-Revision-Date: 2025-10-20 12:14\n"
+"POT-Creation-Date: 2025-10-21 05:44+0000\n"
+"PO-Revision-Date: 2025-10-21 05:45\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -1216,10 +1216,6 @@ msgstr "Ekspresi reguler tidak sesuai: %(error)s"
 #: documents/serialisers.py:609
 msgid "Invalid color."
 msgstr "Warna tidak sesuai."
-
-#: documents/serialisers.py:638
-msgid "Invalid parent tag."
-msgstr "Tag induk tidak valid."
 
 #: documents/serialisers.py:1795
 #, python-format

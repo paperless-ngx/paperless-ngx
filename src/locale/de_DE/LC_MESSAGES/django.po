@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-13 22:25+0000\n"
-"PO-Revision-Date: 2025-10-20 00:37\n"
+"POT-Creation-Date: 2025-10-21 05:44+0000\n"
+"PO-Revision-Date: 2025-10-21 12:15\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -894,7 +894,7 @@ msgstr ""
 
 #: documents/models.py:1131
 msgid "JSON-encoded custom field query expression."
-msgstr ""
+msgstr "JSON-kodierte benutzerdefinierter Feldabfrageausdruck."
 
 #: documents/models.py:1135
 msgid "schedule offset days"
@@ -1216,10 +1216,6 @@ msgstr "Ungültiger regulärer Ausdruck: %(error)s"
 #: documents/serialisers.py:609
 msgid "Invalid color."
 msgstr "Ungültige Farbe."
-
-#: documents/serialisers.py:638
-msgid "Invalid parent tag."
-msgstr "Ungültiges übergeordnetes Tag."
 
 #: documents/serialisers.py:1795
 #, python-format

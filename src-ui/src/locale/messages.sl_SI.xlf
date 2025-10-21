@@ -5216,7 +5216,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">181</context>
         </context-group>
-        <target state="needs-translation">Advanced Filters</target>
+        <target state="translated">Napredni filtri</target>
       </trans-unit>
       <trans-unit id="910026778839409110" datatype="html">
         <source>Add filter</source>
@@ -5224,7 +5224,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">188</context>
         </context-group>
-        <target state="needs-translation">Add filter</target>
+        <target state="translated">Dodaj filter</target>
       </trans-unit>
       <trans-unit id="5671193617280178107" datatype="html">
         <source>No advanced workflow filters defined.</source>
@@ -5232,7 +5232,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">193</context>
         </context-group>
-        <target state="needs-translation">No advanced workflow filters defined.</target>
+        <target state="translated">Ni definiranih naprednih filtrov poteka dela.</target>
       </trans-unit>
       <trans-unit id="6892734625735572404" datatype="html">
         <source> Complete the custom field query configuration. </source>
@@ -5240,7 +5240,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">222,224</context>
         </context-group>
-        <target state="needs-translation"> Complete the custom field query configuration. </target>
+        <target state="translated"> Dokončajte konfiguracijo poizvedbe po polju po meri </target>
       </trans-unit>
       <trans-unit id="6417103744331194518" datatype="html">
         <source>Action type</source>
@@ -5620,7 +5620,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">203</context>
         </context-group>
-        <target state="needs-translation">Has any of these tags</target>
+        <target state="translated">Ima katero koli od teh oznak</target>
       </trans-unit>
       <trans-unit id="4166903555074156852" datatype="html">
         <source>Has all of these tags</source>
@@ -5628,7 +5628,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">210</context>
         </context-group>
-        <target state="needs-translation">Has all of these tags</target>
+        <target state="translated">Ima vse te oznake</target>
       </trans-unit>
       <trans-unit id="6624363795312783141" datatype="html">
         <source>Does not have these tags</source>
@@ -5636,7 +5636,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">217</context>
         </context-group>
-        <target state="needs-translation">Does not have these tags</target>
+        <target state="translated">Nima teh oznak</target>
       </trans-unit>
       <trans-unit id="5281365940563983618" datatype="html">
         <source>Has correspondent</source>
@@ -5652,7 +5652,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">232</context>
         </context-group>
-        <target state="needs-translation">Does not have correspondents</target>
+        <target state="translated">Nima dopisnikov</target>
       </trans-unit>
       <trans-unit id="4806713133917046341" datatype="html">
         <source>Has document type</source>
@@ -5668,7 +5668,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">248</context>
         </context-group>
-        <target state="needs-translation">Does not have document types</target>
+        <target state="translated">Nima vrst dokumentov</target>
       </trans-unit>
       <trans-unit id="4277260190522078330" datatype="html">
         <source>Has storage path</source>
@@ -5684,7 +5684,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">264</context>
         </context-group>
-        <target state="needs-translation">Does not have storage paths</target>
+        <target state="translated">Nima poti za shranjevanje</target>
       </trans-unit>
       <trans-unit id="6250799006816371860" datatype="html">
         <source>Matches custom field query</source>
@@ -5692,7 +5692,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">272</context>
         </context-group>
-        <target state="needs-translation">Matches custom field query</target>
+        <target state="translated">Ujema se poizvedba polja po meri</target>
       </trans-unit>
       <trans-unit id="3138206142174978019" datatype="html">
         <source>Create new workflow</source>
@@ -5716,7 +5716,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.html</context>
           <context context-type="linenumber">2,6</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {Email Document} other {Email <x id="INTERPOLATION"/> Documents}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {Pošlji dokument po e-pošti} other {Pošlji dokumente <x id="INTERPOLATION"/>}}</target>
       </trans-unit>
       <trans-unit id="7376342558017986274" datatype="html">
         <source>Email address(es)</source>
@@ -5768,7 +5768,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.html</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Some email servers may reject messages with large attachments.</target>
+        <target state="translated">Nekateri e-poštni strežniki lahko zavrnejo sporočila z velikimi prilogami.</target>
       </trans-unit>
       <trans-unit id="9049148856403142491" datatype="html">
         <source>Email sent</source>
@@ -5784,7 +5784,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.ts</context>
           <context context-type="linenumber">69</context>
         </context-group>
-        <target state="needs-translation">Error emailing documents</target>
+        <target state="translated">Napaka pri pošiljanju dokumentov po e-pošti</target>
       </trans-unit>
       <trans-unit id="3742745894977668908" datatype="html">
         <source>Error emailing document</source>
