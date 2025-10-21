@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-13 22:25+0000\n"
+"POT-Creation-Date: 2025-10-21 05:44+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1226,10 +1226,6 @@ msgstr ""
 
 #: documents/serialisers.py:609
 msgid "Invalid color."
-msgstr ""
-
-#: documents/serialisers.py:638
-msgid "Invalid parent tag."
 msgstr ""
 
 #: documents/serialisers.py:1795
