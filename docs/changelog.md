@@ -1,5 +1,150 @@
 # Changelog
 
+## paperless-ngx 2.19.0
+
+### Notable Changes
+
+-   Feature: Advanced Workflow Filters [@shamoon](https://github.com/shamoon) ([#11029](https://github.com/paperless-ngx/paperless-ngx/pull/11029))
+-   Feature: Nested Tags [@shamoon](https://github.com/shamoon) ([#10833](https://github.com/paperless-ngx/paperless-ngx/pull/10833))
+
+### Features / Enhancements
+
+-   docker(deps): bump astral-sh/uv from 0.9.2-python3.12-bookworm-slim to 0.9.4-python3.12-bookworm-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#11091](https://github.com/paperless-ngx/paperless-ngx/pull/11091))
+-   Enhancement: use friendly file names when emailing documents [@JanKleine](https://github.com/JanKleine) ([#11055](https://github.com/paperless-ngx/paperless-ngx/pull/11055))
+-   Feature: Advanced Workflow Filters [@shamoon](https://github.com/shamoon) ([#11029](https://github.com/paperless-ngx/paperless-ngx/pull/11029))
+-   docker(deps): Bump astral-sh/uv from 0.8.22-python3.12-bookworm-slim to 0.9.2-python3.12-bookworm-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#11052](https://github.com/paperless-ngx/paperless-ngx/pull/11052))
+-   Feature: add support for emailing multiple documents [@JanKleine](https://github.com/JanKleine) ([#10666](https://github.com/paperless-ngx/paperless-ngx/pull/10666))
+-   Enhancement: ignore same files in sanity checker as consumer [@shamoon](https://github.com/shamoon) ([#10999](https://github.com/paperless-ngx/paperless-ngx/pull/10999))
+-   Enhancement: open color picker on swatch button click [@shamoon](https://github.com/shamoon) ([#10994](https://github.com/paperless-ngx/paperless-ngx/pull/10994))
+-   Performance: Cache django-guardian permissions when counting documents [@Merinorus](https://github.com/Merinorus) ([#10657](https://github.com/paperless-ngx/paperless-ngx/pull/10657))
+-   Tweakhancement: reorganize some list \& bulk editing buttons [@shamoon](https://github.com/shamoon) ([#10944](https://github.com/paperless-ngx/paperless-ngx/pull/10944))
+-   Enhancement: support workflow path matching of barcode-split documents [@DerRockWolf](https://github.com/DerRockWolf) ([#10723](https://github.com/paperless-ngx/paperless-ngx/pull/10723))
+-   Feature: processed mail UI [@shamoon](https://github.com/shamoon) ([#10866](https://github.com/paperless-ngx/paperless-ngx/pull/10866))
+-   Enhancement: support custom field values on post document [@shamoon](https://github.com/shamoon) ([#10859](https://github.com/paperless-ngx/paperless-ngx/pull/10859))
+-   Feature: Nested Tags [@shamoon](https://github.com/shamoon) ([#10833](https://github.com/paperless-ngx/paperless-ngx/pull/10833))
+-   Enhancement: long text custom field [@jojo2357](https://github.com/jojo2357) ([#10846](https://github.com/paperless-ngx/paperless-ngx/pull/10846))
+-   Enhancement: Add print button [@mpaletti](https://github.com/mpaletti) ([#10626](https://github.com/paperless-ngx/paperless-ngx/pull/10626))
+-   Enhancement: add storage path as workflow trigger filter @david-loe ([#10771](https://github.com/paperless-ngx/paperless-ngx/pull/10771))
+-   Enhancement: jinja template support for workflow title assignment [@sidey79](https://github.com/sidey79) ([#10700](https://github.com/paperless-ngx/paperless-ngx/pull/10700))
+-   Enhancement: Limit excessively long content length when computing suggestions [@Merinorus](https://github.com/Merinorus) ([#10656](https://github.com/paperless-ngx/paperless-ngx/pull/10656))
+
+### Bug Fixes
+
+-   Fix: remove obsolete warning for custom field value index [@shamoon](https://github.com/shamoon) ([#11083](https://github.com/paperless-ngx/paperless-ngx/pull/11083))
+-   Fix: set min-height for drag-drop items container [@shamoon](https://github.com/shamoon) ([#11064](https://github.com/paperless-ngx/paperless-ngx/pull/11064))
+-   Fix custom field query dropdown toggle corners [@shamoon](https://github.com/shamoon) ([#11028](https://github.com/paperless-ngx/paperless-ngx/pull/11028))
+-   Fix: correct save hotkey action when no next document exists [@shamoon](https://github.com/shamoon) ([#11027](https://github.com/paperless-ngx/paperless-ngx/pull/11027))
+-   Fix: require only change permissions for task dismissal, add frontend error handling [@shamoon](https://github.com/shamoon) ([#11023](https://github.com/paperless-ngx/paperless-ngx/pull/11023))
+-   Chore(deps): Bulk upgrade backend dependencies [@stumpylog](https://github.com/stumpylog) ([#10971](https://github.com/paperless-ngx/paperless-ngx/pull/10971))
+-   Chore: remove Codecov token from CI workflow [@shamoon](https://github.com/shamoon) ([#10941](https://github.com/paperless-ngx/paperless-ngx/pull/10941))
+-   Fix: fix select option removal and pagination update [@shamoon](https://github.com/shamoon) ([#10933](https://github.com/paperless-ngx/paperless-ngx/pull/10933))
+-   Fix: skip fuzzy matching for empty document content [@shamoon](https://github.com/shamoon) ([#10914](https://github.com/paperless-ngx/paperless-ngx/pull/10914))
+-   Fix: add extra error handling to \_consume for file checks [@shamoon](https://github.com/shamoon) ([#10897](https://github.com/paperless-ngx/paperless-ngx/pull/10897))
+-   Fix: restore str celery beat schedule filename [@shamoon](https://github.com/shamoon) ([#10893](https://github.com/paperless-ngx/paperless-ngx/pull/10893))
+-   Fix: fix pdf editor hover rotate counterclockwise button [@shamoon](https://github.com/shamoon) ([#10848](https://github.com/paperless-ngx/paperless-ngx/pull/10848))
+-   Fix: warp long words in toast content [@shamoon](https://github.com/shamoon) ([#10839](https://github.com/paperless-ngx/paperless-ngx/pull/10839))
+-   Fix: fix error when bulk adding empty doc link custom fields [@shamoon](https://github.com/shamoon) ([#10832](https://github.com/paperless-ngx/paperless-ngx/pull/10832))
+-   Fix: set match value for correspondents created by mail rule [@shamoon](https://github.com/shamoon) ([#10820](https://github.com/paperless-ngx/paperless-ngx/pull/10820))
+
+### Maintenance
+
+-   Chore(deps): Bump the actions group with 5 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10978](https://github.com/paperless-ngx/paperless-ngx/pull/10978))
+-   Chore: remove Codecov token from CI workflow [@shamoon](https://github.com/shamoon) ([#10941](https://github.com/paperless-ngx/paperless-ngx/pull/10941))
+
+### Dependencies
+
+<details>
+<summary>29 changes</summary>
+
+-   docker(deps): bump astral-sh/uv from 0.9.2-python3.12-bookworm-slim to 0.9.4-python3.12-bookworm-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#11091](https://github.com/paperless-ngx/paperless-ngx/pull/11091))
+-   docker-compose(deps): Bump gotenberg/gotenberg from 8.23 to 8.24 in /docker/compose @[dependabot[bot]](https://github.com/apps/dependabot) ([#11050](https://github.com/paperless-ngx/paperless-ngx/pull/11050))
+-   Chore(deps): Bump the small-changes group across 1 directory with 8 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#11065](https://github.com/paperless-ngx/paperless-ngx/pull/11065))
+-   docker(deps): Bump astral-sh/uv from 0.8.22-python3.12-bookworm-slim to 0.9.2-python3.12-bookworm-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#11052](https://github.com/paperless-ngx/paperless-ngx/pull/11052))
+-   Chore(deps): Bump the actions group with 5 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10978](https://github.com/paperless-ngx/paperless-ngx/pull/10978))
+-   Chore(deps): Bump uuid from 11.1.0 to 13.0.0 in /src-ui @[dependabot[bot]](https://github.com/apps/dependabot) ([#10983](https://github.com/paperless-ngx/paperless-ngx/pull/10983))
+-   Chore(deps-dev): Bump @playwright/test from 1.55.0 to 1.55.1 in /src-ui @[dependabot[bot]](https://github.com/apps/dependabot) ([#10982](https://github.com/paperless-ngx/paperless-ngx/pull/10982))
+-   Chore(deps-dev): Bump the frontend-eslint-dependencies group in /src-ui with 4 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10981](https://github.com/paperless-ngx/paperless-ngx/pull/10981))
+-   Chore(deps-dev): Bump webpack from 5.101.3 to 5.102.0 in /src-ui @[dependabot[bot]](https://github.com/apps/dependabot) ([#10986](https://github.com/paperless-ngx/paperless-ngx/pull/10986))
+-   Chore(deps-dev): Bump prettier-plugin-organize-imports from 4.2.0 to 4.3.0 in /src-ui @[dependabot[bot]](https://github.com/apps/dependabot) ([#10985](https://github.com/paperless-ngx/paperless-ngx/pull/10985))
+-   Chore(deps-dev): Bump the frontend-jest-dependencies group in /src-ui with 3 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10980](https://github.com/paperless-ngx/paperless-ngx/pull/10980))
+-   Chore(deps-dev): Bump @types/node from 24.3.0 to 24.6.1 in /src-ui @[dependabot[bot]](https://github.com/apps/dependabot) ([#10984](https://github.com/paperless-ngx/paperless-ngx/pull/10984))
+-   Chore(deps): Bump the frontend-angular-dependencies group in /src-ui with 21 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10979](https://github.com/paperless-ngx/paperless-ngx/pull/10979))
+-   docker-compose(deps): Bump library/postgres from 17 to 18 in /docker/compose @[dependabot[bot]](https://github.com/apps/dependabot) ([#10965](https://github.com/paperless-ngx/paperless-ngx/pull/10965))
+-   Chore(deps): Bump the major-versions group with 2 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10960](https://github.com/paperless-ngx/paperless-ngx/pull/10960))
+-   Chore(deps): Bump types-colorama from 0.4.15.20240311 to 0.4.15.20250801 @[dependabot[bot]](https://github.com/apps/dependabot) ([#10961](https://github.com/paperless-ngx/paperless-ngx/pull/10961))
+-   Chore(deps): Bump django-guardian from 3.1.3 to 3.2.0 @[dependabot[bot]](https://github.com/apps/dependabot) ([#10909](https://github.com/paperless-ngx/paperless-ngx/pull/10909))
+-   Chore(deps): Bump django-soft-delete from 1.0.19 to 1.0.21 @[dependabot[bot]](https://github.com/apps/dependabot) ([#10908](https://github.com/paperless-ngx/paperless-ngx/pull/10908))
+-   Chore(deps): Bump whitenoise from 6.10.0 to 6.11.0 @[dependabot[bot]](https://github.com/apps/dependabot) ([#10910](https://github.com/paperless-ngx/paperless-ngx/pull/10910))
+-   Chore(deps): Bump django-cors-headers from 4.8.0 to 4.9.0 @[dependabot[bot]](https://github.com/apps/dependabot) ([#10907](https://github.com/paperless-ngx/paperless-ngx/pull/10907))
+-   docker(deps): bump astral-sh/uv from 0.8.17-python3.12-bookworm-slim to 0.8.19-python3.12-bookworm-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#10906](https://github.com/paperless-ngx/paperless-ngx/pull/10906))
+-   docker(deps): Bump astral-sh/uv from 0.8.15-python3.12-bookworm-slim to 0.8.17-python3.12-bookworm-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#10864](https://github.com/paperless-ngx/paperless-ngx/pull/10864))
+-   Chore(deps): Bump the small-changes group across 1 directory with 3 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10880](https://github.com/paperless-ngx/paperless-ngx/pull/10880))
+-   Chore(deps): Bump django-guardian from 3.1.2 to 3.1.3 in the django group @[dependabot[bot]](https://github.com/apps/dependabot) ([#10863](https://github.com/paperless-ngx/paperless-ngx/pull/10863))
+-   Chore(deps): Bump pytest-cov from 6.2.1 to 7.0.0 in the development group across 1 directory @[dependabot[bot]](https://github.com/apps/dependabot) ([#10822](https://github.com/paperless-ngx/paperless-ngx/pull/10822))
+-   Chore(deps): Bump the django group with 4 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10811](https://github.com/paperless-ngx/paperless-ngx/pull/10811))
+-   docker-compose(deps): Bump gotenberg/gotenberg from 8.22 to 8.23 in /docker/compose @[dependabot[bot]](https://github.com/apps/dependabot) ([#10812](https://github.com/paperless-ngx/paperless-ngx/pull/10812))
+-   Chore(deps): Bump the small-changes group across 1 directory with 8 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10821](https://github.com/paperless-ngx/paperless-ngx/pull/10821))
+-   docker(deps): Bump astral-sh/uv from 0.8.13-python3.12-bookworm-slim to 0.8.15-python3.12-bookworm-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#10810](https://github.com/paperless-ngx/paperless-ngx/pull/10810))
+</details>
+
+### All App Changes
+
+<details>
+<summary>51 changes</summary>
+
+-   Tweak: improve tag parent validation error handling [@shamoon](https://github.com/shamoon) ([#11096](https://github.com/paperless-ngx/paperless-ngx/pull/11096))
+-   Fix: remove obsolete warning for custom field value index [@shamoon](https://github.com/shamoon) ([#11083](https://github.com/paperless-ngx/paperless-ngx/pull/11083))
+-   Chore(deps): Bump the small-changes group across 1 directory with 8 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#11065](https://github.com/paperless-ngx/paperless-ngx/pull/11065))
+-   Enhancement: use friendly file names when emailing documents [@JanKleine](https://github.com/JanKleine) ([#11055](https://github.com/paperless-ngx/paperless-ngx/pull/11055))
+-   Fix: set min-height for drag-drop items container [@shamoon](https://github.com/shamoon) ([#11064](https://github.com/paperless-ngx/paperless-ngx/pull/11064))
+-   Feature: Advanced Workflow Filters [@shamoon](https://github.com/shamoon) ([#11029](https://github.com/paperless-ngx/paperless-ngx/pull/11029))
+-   Feature: add support for emailing multiple documents [@JanKleine](https://github.com/JanKleine) ([#10666](https://github.com/paperless-ngx/paperless-ngx/pull/10666))
+-   Fix custom field query dropdown toggle corners [@shamoon](https://github.com/shamoon) ([#11028](https://github.com/paperless-ngx/paperless-ngx/pull/11028))
+-   Fix: correct save hotkey action when no next document exists [@shamoon](https://github.com/shamoon) ([#11027](https://github.com/paperless-ngx/paperless-ngx/pull/11027))
+-   Fix: require only change permissions for task dismissal, add frontend error handling [@shamoon](https://github.com/shamoon) ([#11023](https://github.com/paperless-ngx/paperless-ngx/pull/11023))
+-   Enhancement: ignore same files in sanity checker as consumer [@shamoon](https://github.com/shamoon) ([#10999](https://github.com/paperless-ngx/paperless-ngx/pull/10999))
+-   Enhancement: open color picker on swatch button click [@shamoon](https://github.com/shamoon) ([#10994](https://github.com/paperless-ngx/paperless-ngx/pull/10994))
+-   Chore(deps): Bump uuid from 11.1.0 to 13.0.0 in /src-ui @[dependabot[bot]](https://github.com/apps/dependabot) ([#10983](https://github.com/paperless-ngx/paperless-ngx/pull/10983))
+-   Chore(deps-dev): Bump @playwright/test from 1.55.0 to 1.55.1 in /src-ui @[dependabot[bot]](https://github.com/apps/dependabot) ([#10982](https://github.com/paperless-ngx/paperless-ngx/pull/10982))
+-   Chore(deps-dev): Bump the frontend-eslint-dependencies group in /src-ui with 4 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10981](https://github.com/paperless-ngx/paperless-ngx/pull/10981))
+-   Chore(deps-dev): Bump webpack from 5.101.3 to 5.102.0 in /src-ui @[dependabot[bot]](https://github.com/apps/dependabot) ([#10986](https://github.com/paperless-ngx/paperless-ngx/pull/10986))
+-   Chore(deps-dev): Bump prettier-plugin-organize-imports from 4.2.0 to 4.3.0 in /src-ui @[dependabot[bot]](https://github.com/apps/dependabot) ([#10985](https://github.com/paperless-ngx/paperless-ngx/pull/10985))
+-   Chore(deps-dev): Bump the frontend-jest-dependencies group in /src-ui with 3 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10980](https://github.com/paperless-ngx/paperless-ngx/pull/10980))
+-   Chore(deps-dev): Bump @types/node from 24.3.0 to 24.6.1 in /src-ui @[dependabot[bot]](https://github.com/apps/dependabot) ([#10984](https://github.com/paperless-ngx/paperless-ngx/pull/10984))
+-   Chore(deps): Bump the frontend-angular-dependencies group in /src-ui with 21 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10979](https://github.com/paperless-ngx/paperless-ngx/pull/10979))
+-   Performance: Cache django-guardian permissions when counting documents [@Merinorus](https://github.com/Merinorus) ([#10657](https://github.com/paperless-ngx/paperless-ngx/pull/10657))
+-   Chore(deps): Bulk upgrade backend dependencies [@stumpylog](https://github.com/stumpylog) ([#10971](https://github.com/paperless-ngx/paperless-ngx/pull/10971))
+-   Chore(deps): Bump the major-versions group with 2 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10960](https://github.com/paperless-ngx/paperless-ngx/pull/10960))
+-   Chore(deps): Bump types-colorama from 0.4.15.20240311 to 0.4.15.20250801 @[dependabot[bot]](https://github.com/apps/dependabot) ([#10961](https://github.com/paperless-ngx/paperless-ngx/pull/10961))
+-   Chore(deps): Bump django-guardian from 3.1.3 to 3.2.0 @[dependabot[bot]](https://github.com/apps/dependabot) ([#10909](https://github.com/paperless-ngx/paperless-ngx/pull/10909))
+-   Chore(deps): Bump django-soft-delete from 1.0.19 to 1.0.21 @[dependabot[bot]](https://github.com/apps/dependabot) ([#10908](https://github.com/paperless-ngx/paperless-ngx/pull/10908))
+-   Chore(deps): Bump whitenoise from 6.10.0 to 6.11.0 @[dependabot[bot]](https://github.com/apps/dependabot) ([#10910](https://github.com/paperless-ngx/paperless-ngx/pull/10910))
+-   Tweakhancement: reorganize some list \& bulk editing buttons [@shamoon](https://github.com/shamoon) ([#10944](https://github.com/paperless-ngx/paperless-ngx/pull/10944))
+-   Chore(deps): Bump django-cors-headers from 4.8.0 to 4.9.0 @[dependabot[bot]](https://github.com/apps/dependabot) ([#10907](https://github.com/paperless-ngx/paperless-ngx/pull/10907))
+-   Fix: fix select option removal and pagination update [@shamoon](https://github.com/shamoon) ([#10933](https://github.com/paperless-ngx/paperless-ngx/pull/10933))
+-   Enhancement: support workflow path matching of barcode-split documents [@DerRockWolf](https://github.com/DerRockWolf) ([#10723](https://github.com/paperless-ngx/paperless-ngx/pull/10723))
+-   Fix: skip fuzzy matching for empty document content [@shamoon](https://github.com/shamoon) ([#10914](https://github.com/paperless-ngx/paperless-ngx/pull/10914))
+-   Feature: processed mail UI [@shamoon](https://github.com/shamoon) ([#10866](https://github.com/paperless-ngx/paperless-ngx/pull/10866))
+-   Fix: add extra error handling to \_consume for file checks [@shamoon](https://github.com/shamoon) ([#10897](https://github.com/paperless-ngx/paperless-ngx/pull/10897))
+-   Fix: restore str celery beat schedule filename [@shamoon](https://github.com/shamoon) ([#10893](https://github.com/paperless-ngx/paperless-ngx/pull/10893))
+-   Enhancement: support custom field values on post document [@shamoon](https://github.com/shamoon) ([#10859](https://github.com/paperless-ngx/paperless-ngx/pull/10859))
+-   Feature: Nested Tags [@shamoon](https://github.com/shamoon) ([#10833](https://github.com/paperless-ngx/paperless-ngx/pull/10833))
+-   Chore(deps): Bump the small-changes group across 1 directory with 3 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10880](https://github.com/paperless-ngx/paperless-ngx/pull/10880))
+-   Chore(deps): Bump django-guardian from 3.1.2 to 3.1.3 in the django group @[dependabot[bot]](https://github.com/apps/dependabot) ([#10863](https://github.com/paperless-ngx/paperless-ngx/pull/10863))
+-   Enhancement: long text custom field [@jojo2357](https://github.com/jojo2357) ([#10846](https://github.com/paperless-ngx/paperless-ngx/pull/10846))
+-   Fix: fix pdf editor hover rotate counterclockwise button [@shamoon](https://github.com/shamoon) ([#10848](https://github.com/paperless-ngx/paperless-ngx/pull/10848))
+-   Fix: warp long words in toast content [@shamoon](https://github.com/shamoon) ([#10839](https://github.com/paperless-ngx/paperless-ngx/pull/10839))
+-   Fix: fix error when bulk adding empty doc link custom fields [@shamoon](https://github.com/shamoon) ([#10832](https://github.com/paperless-ngx/paperless-ngx/pull/10832))
+-   Enhancement: Add print button [@mpaletti](https://github.com/mpaletti) ([#10626](https://github.com/paperless-ngx/paperless-ngx/pull/10626))
+-   Enhancement: add storage path as workflow trigger filter @david-loe ([#10771](https://github.com/paperless-ngx/paperless-ngx/pull/10771))
+-   Enhancement: jinja template support for workflow title assignment [@sidey79](https://github.com/sidey79) ([#10700](https://github.com/paperless-ngx/paperless-ngx/pull/10700))
+-   Chore(deps): Bump pytest-cov from 6.2.1 to 7.0.0 in the development group across 1 directory @[dependabot[bot]](https://github.com/apps/dependabot) ([#10822](https://github.com/paperless-ngx/paperless-ngx/pull/10822))
+-   Chore(deps): Bump the django group with 4 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10811](https://github.com/paperless-ngx/paperless-ngx/pull/10811))
+-   Enhancement: Limit excessively long content length when computing suggestions [@Merinorus](https://github.com/Merinorus) ([#10656](https://github.com/paperless-ngx/paperless-ngx/pull/10656))
+-   Chore(deps): Bump the small-changes group across 1 directory with 8 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10821](https://github.com/paperless-ngx/paperless-ngx/pull/10821))
+-   Fix: set match value for correspondents created by mail rule [@shamoon](https://github.com/shamoon) ([#10820](https://github.com/paperless-ngx/paperless-ngx/pull/10820))
+</details>
+
 ## paperless-ngx 2.18.4
 
 ### Features / Enhancements
