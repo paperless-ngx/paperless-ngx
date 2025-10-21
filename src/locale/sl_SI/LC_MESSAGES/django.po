@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-13 22:25+0000\n"
-"PO-Revision-Date: 2025-10-13 22:27\n"
+"POT-Creation-Date: 2025-10-21 05:44+0000\n"
+"PO-Revision-Date: 2025-10-21 05:45\n"
 "Last-Translator: \n"
 "Language-Team: Slovenian\n"
 "Language: sl_SI\n"
@@ -858,11 +858,11 @@ msgstr "vsebuje te oznake"
 
 #: documents/models.py:1072
 msgid "has all of these tag(s)"
-msgstr ""
+msgstr "ima vse te oznake"
 
 #: documents/models.py:1079
 msgid "does not have these tag(s)"
-msgstr ""
+msgstr "nima teh oznak"
 
 #: documents/models.py:1087
 msgid "has this document type"
@@ -870,7 +870,7 @@ msgstr "vsebuje tip dokumenta"
 
 #: documents/models.py:1094
 msgid "does not have these document type(s)"
-msgstr ""
+msgstr "nima teh vrst dokumentov"
 
 #: documents/models.py:1102
 msgid "has this correspondent"
@@ -878,7 +878,7 @@ msgstr "vsebuje dopisnika"
 
 #: documents/models.py:1109
 msgid "does not have these correspondent(s)"
-msgstr ""
+msgstr "nima teh dopisnikov"
 
 #: documents/models.py:1117
 msgid "has this storage path"
@@ -886,15 +886,15 @@ msgstr "ima to pot shranjevanja"
 
 #: documents/models.py:1124
 msgid "does not have these storage path(s)"
-msgstr ""
+msgstr "nima teh poti za shranjevanje"
 
 #: documents/models.py:1128
 msgid "filter custom field query"
-msgstr ""
+msgstr "filtriranje polj po meri"
 
 #: documents/models.py:1131
 msgid "JSON-encoded custom field query expression."
-msgstr ""
+msgstr "Izraz poizvedbe za polje po meri, kodiran v JSON."
 
 #: documents/models.py:1135
 msgid "schedule offset days"
@@ -1216,10 +1216,6 @@ msgstr "Neveljaven splošen izraz: %(error)s"
 #: documents/serialisers.py:609
 msgid "Invalid color."
 msgstr "Napačna barva."
-
-#: documents/serialisers.py:638
-msgid "Invalid parent tag."
-msgstr "Neveljavna nadrejena oznaka."
 
 #: documents/serialisers.py:1795
 #, python-format
