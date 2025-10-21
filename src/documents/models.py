@@ -132,7 +132,7 @@ class Tag(MatchingModel, TreeNodeModel):
         height = 0 if self.pk is None else self.get_depth()
         deepest_new_depth = (new_parent_depth + 1) + height
         if deepest_new_depth > self.MAX_NESTING_DEPTH:
-            raise ValidationError(_("Maximum nesting depth exceeded."))
+            raise ValidationError({"parent": _("Maximum nesting depth exceeded.")})
 
         return super().clean()
 
