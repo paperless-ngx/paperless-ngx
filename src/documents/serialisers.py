@@ -635,7 +635,7 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
                 temp.clean()
             except ValidationError as e:
                 logger.debug("Tag parent validation failed: %s", e)
-                raise serializers.ValidationError({"parent": _("Invalid parent tag.")})
+                raise e
 
         return super().validate(attrs)
 
