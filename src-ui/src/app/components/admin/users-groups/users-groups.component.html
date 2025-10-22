@@ -7,7 +7,7 @@
   >
 </pngx-page-header>
 
-@if (users) {
+@if (canViewUsers && users) {
   <h4 class="d-flex">
     <ng-container i18n>Users</ng-container>
     <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editUser()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.User }">
@@ -45,7 +45,7 @@
   </ul>
 }
 
-@if (groups) {
+@if (canViewGroups && groups) {
   <h4 class="mt-4 d-flex">
     <ng-container i18n>Groups</ng-container>
     <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editGroup()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Group }">
@@ -86,7 +86,7 @@
   </ul>
 }
 
-@if (!users || !groups) {
+@if ((canViewUsers && !users) || (canViewGroups && !groups)) {
   <div>
     <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
     <div class="visually-hidden" i18n>Loading...</div>
