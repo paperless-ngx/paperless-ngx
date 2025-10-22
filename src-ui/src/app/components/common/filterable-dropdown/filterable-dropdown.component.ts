@@ -114,13 +114,6 @@ export class FilterableDropdownSelectionModel {
           b.id == NEGATIVE_NULL_FILTER_VALUE)
       ) {
         return 1
-      }
-
-      // Preserve hierarchical order when provided (e.g., Tags)
-      const ao = (a as any)['orderIndex']
-      const bo = (b as any)['orderIndex']
-      if (ao !== undefined && bo !== undefined) {
-        return ao - bo
       } else if (
         this.getNonTemporary(a.id) == ToggleableItemState.NotSelected &&
         this.getNonTemporary(b.id) != ToggleableItemState.NotSelected
@@ -143,6 +136,13 @@ export class FilterableDropdownSelectionModel {
         this.getDocumentCount(a.id) < this.getDocumentCount(b.id)
       ) {
         return 1
+      }
+
+      // Preserve hierarchical order when provided (e.g., Tags)
+      const ao = (a as any)['orderIndex']
+      const bo = (b as any)['orderIndex']
+      if (ao !== undefined && bo !== undefined) {
+        return ao - bo
       } else {
         return a.name.localeCompare(b.name)
       }
