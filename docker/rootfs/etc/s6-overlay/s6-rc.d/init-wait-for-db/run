@@ -2,7 +2,7 @@
 # shellcheck shell=bash
 # vim: set ft=bash ts=4 sw=4 sts=4 et :
 
-declare -r log_prefix="[init-db-wait]"
+declare -r LOG_PREFIX="[init-db-wait]"
 
 declare -ri TIMEOUT=60
 declare -i ATTEMPT=0
@@ -14,7 +14,7 @@ delay_next_attempt() {
     local -ri remaining=$(( TIMEOUT - elapsed ))
 
     if (( remaining <= 0 )); then
-        echo "${log_prefix} Unable to connect after $elapsed seconds."
+        echo "${LOG_PREFIX} Unable to connect after $elapsed seconds."
         exit 1
     fi
 
@@ -26,12 +26,12 @@ delay_next_attempt() {
     fi
 
     ATTEMPT+=1
-    echo "${log_prefix} Attempt $ATTEMPT failed! Trying again in $DELAY seconds..."
+    echo "${LOG_PREFIX} Attempt $ATTEMPT failed! Trying again in $DELAY seconds..."
     sleep "$DELAY"
 }
 
 wait_for_postgres() {
-	echo "${log_prefix} Waiting for PostgreSQL to start..."
+	echo "${LOG_PREFIX} Waiting for PostgreSQL to start..."
 
 	local -r host="${PAPERLESS_DBHOST:-localhost}"
 	local -r port="${PAPERLESS_DBPORT:-5432}"
@@ -46,7 +46,7 @@ wait_for_postgres() {
 }
 
 wait_for_mariadb() {
-	echo "${log_prefix} Waiting for MariaDB to start..."
+	echo "${LOG_PREFIX} Waiting for MariaDB to start..."
 
 	local -r host="${PAPERLESS_DBHOST:=localhost}"
 	local -r port="${PAPERLESS_DBPORT:=3306}"
@@ -60,11 +60,11 @@ wait_for_mariadb() {
 }
 
 if [[ "${PAPERLESS_DBENGINE}" == "mariadb" ]]; then
-	echo "${log_prefix} Waiting for MariaDB to report ready"
+	echo "${LOG_PREFIX} Waiting for MariaDB to report ready"
 	wait_for_mariadb
 elif [[ -n "${PAPERLESS_DBHOST}" ]]; then
-	echo "${log_prefix} Waiting for postgresql to report ready"
+	echo "${LOG_PREFIX} Waiting for postgresql to report ready"
 	wait_for_postgres
 fi
 
-	echo "${log_prefix} Database is ready"
+echo "${LOG_PREFIX} Database is ready"
