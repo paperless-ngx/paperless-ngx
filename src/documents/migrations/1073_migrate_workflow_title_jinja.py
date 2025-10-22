@@ -15,6 +15,8 @@ def convert_from_format_to_template(apps, schema_editor):
 
     with transaction.atomic():
         for WorkflowAction in WorkflowActions.objects.all():
+            if not WorkflowAction.assign_title:
+                continue
             WorkflowAction.assign_title = convert_format_str_to_template_format(
                 WorkflowAction.assign_title,
             )
