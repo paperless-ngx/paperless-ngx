@@ -366,7 +366,9 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
 
     def get_document_count_filter(self):
         user = getattr(self.request, "user", None)
-        if user is None or user.is_superuser:
+        if user is None or not getattr(user, "is_authenticated", False):
+            return Q(documents__deleted_at__isnull=True, documents__owner__isnull=True)
+        elif user.is_superuser:
             return Q(documents__deleted_at__isnull=True)
         return Q(
             documents__deleted_at__isnull=True,
