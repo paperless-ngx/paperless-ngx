@@ -42,7 +42,7 @@ wait_for_postgres() {
 	while ! pg_isready -h "${host}" -p "${port}" --username "${user}"; do
         delay_next_attempt
 	done
-	echo "Connected to PostgreSQL"
+	echo "${LOG_PREFIX} Connected to PostgreSQL"
 }
 
 wait_for_mariadb() {
@@ -54,7 +54,7 @@ wait_for_mariadb() {
 	while ! true > "/dev/tcp/$host/$port"; do
         delay_next_attempt
 	done
-	echo "Connected to MariaDB"
+	echo "${LOG_PREFIX} Connected to MariaDB"
 }
 
 if [[ "${PAPERLESS_DBENGINE:-}" == "mariadb" ]]; then
