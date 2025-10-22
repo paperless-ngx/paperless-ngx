@@ -121,6 +121,24 @@ class TestTagHierarchy(APITestCase):
         tags = set(self.document.tags.values_list("pk", flat=True))
         assert tags == {self.parent.pk, orphan.pk}
 
+    def test_child_document_count_included_when_parent_paginated(self):
+        self.document.tags.add(self.child)
+
+        response = self.client.get(
+            "/api/tags/",
+            {"page_size": 1, "ordering": "-name"},
+        )
+
+        assert response.status_code == 200
+        assert response.data["results"][0]["id"] == self.parent.pk
+
+        children = response.data["results"][0]["children"]
+        assert len(children) == 1
+
+        child_entry = children[0]
+        assert child_entry["id"] == self.child.pk
+        assert child_entry["document_count"] == 1
+
     def test_cannot_set_parent_to_self(self):
         tag = Tag.objects.create(name="Selfie")
         resp = self.client.patch(

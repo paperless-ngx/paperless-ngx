@@ -364,21 +364,21 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
     Mixin to add document count to queryset, permissions-aware if needed
     """
 
-    def get_queryset(self):
-        filter = (
-            Q(documents__deleted_at__isnull=True)
-            if self.request.user is None or self.request.user.is_superuser
-            else (
-                Q(
-                    documents__deleted_at__isnull=True,
-                    documents__id__in=get_objects_for_user_owner_aware(
-                        self.request.user,
-                        "documents.view_document",
-                        Document,
-                    ).values_list("id", flat=True),
-                )
-            )
+    def get_document_count_filter(self):
+        user = getattr(self.request, "user", None)
+        if user is None or user.is_superuser:
+            return Q(documents__deleted_at__isnull=True)
+        return Q(
+            documents__deleted_at__isnull=True,
+            documents__id__in=get_objects_for_user_owner_aware(
+                user,
+                "documents.view_document",
+                Document,
+            ).values_list("id", flat=True),
         )
+
+    def get_queryset(self):
+        filter = self.get_document_count_filter()
         return (
             super()
             .get_queryset()
@@ -446,6 +446,11 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     )
     filterset_class = TagFilterSet
     ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["document_count_filter"] = self.get_document_count_filter()
+        return context
 
     def perform_update(self, serializer):
         old_parent = self.get_object().get_parent()
