@@ -1,5 +1,6 @@
 #!/command/with-contenv /usr/bin/bash
 # shellcheck shell=bash
+# vim: set ft=bash ts=4 sw=4 sts=4 et :
 
 declare -r log_prefix="[init-db-wait]"
 
