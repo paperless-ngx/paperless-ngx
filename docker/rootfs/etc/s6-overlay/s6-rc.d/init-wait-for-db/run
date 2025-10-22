@@ -37,9 +37,7 @@ wait_for_postgres() {
 	local -r port="${PAPERLESS_DBPORT:-5432}"
 	local -r user="${PAPERLESS_DBUSER:-paperless}"
 
-	# Disable warning, host and port can't have spaces
-	# shellcheck disable=SC2086
-	while [ ! "$(pg_isready -h ${host} -p ${port} --username ${user})" ]; do
+	while ! pg_isready -h "${host}" -p "${port}" --username "${user}"; do
         delay_next_attempt
 	done
 	echo "Connected to PostgreSQL"
@@ -51,9 +49,7 @@ wait_for_mariadb() {
 	local -r host="${PAPERLESS_DBHOST:=localhost}"
 	local -r port="${PAPERLESS_DBPORT:=3306}"
 
-	# Disable warning, host and port can't have spaces
-	# shellcheck disable=SC2086
-	while ! true > /dev/tcp/$host/$port; do
+	while ! true > "/dev/tcp/$host/$port"; do
         delay_next_attempt
 	done
 	echo "Connected to MariaDB"
