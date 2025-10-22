@@ -58,10 +58,8 @@ wait_for_mariadb() {
 }
 
 if [[ "${PAPERLESS_DBENGINE:-}" == "mariadb" ]]; then
-	echo "${LOG_PREFIX} Waiting for MariaDB to report ready"
 	wait_for_mariadb
 elif [[ -n "${PAPERLESS_DBHOST:-}" ]]; then
-	echo "${LOG_PREFIX} Waiting for postgresql to report ready"
 	wait_for_postgres
 fi
 
