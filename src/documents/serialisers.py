@@ -21,7 +21,6 @@ from django.core.validators import MaxLengthValidator
 from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
 from django.db.models import Count
-from django.db.models import Q
 from django.utils.crypto import get_random_string
 from django.utils.dateparse import parse_datetime
 from django.utils.text import slugify
@@ -67,8 +66,8 @@ from documents.models import WorkflowActionEmail
 from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowTrigger
 from documents.parsers import is_mime_type_supported
+from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_groups_with_only_permission
-from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import set_permissions_for_object
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.templating.utils import convert_format_str_to_template_format
@@ -579,17 +578,7 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         if filter_q is None:
             request = self.context.get("request")
             user = getattr(request, "user", None) if request else None
-            if user is None or getattr(user, "is_superuser", False):
-                filter_q = Q(documents__deleted_at__isnull=True)
-            else:
-                filter_q = Q(
-                    documents__deleted_at__isnull=True,
-                    documents__id__in=get_objects_for_user_owner_aware(
-                        user,
-                        "documents.view_document",
-                        Document,
-                    ).values_list("id", flat=True),
-                )
+            filter_q = get_document_count_filter_for_user(user)
             self.context["document_count_filter"] = filter_q
         serializer = TagSerializer(
             obj.get_children_queryset()

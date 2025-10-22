@@ -141,6 +141,7 @@ from documents.permissions import AcknowledgeTasksPermissions
 from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessNotePermissions
 from documents.permissions import PaperlessObjectPermissions
+from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
@@ -365,19 +366,9 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
     """
 
     def get_document_count_filter(self):
-        user = getattr(self.request, "user", None)
-        if user is None or not getattr(user, "is_authenticated", False):
-            return Q(documents__deleted_at__isnull=True, documents__owner__isnull=True)
-        elif user.is_superuser:
-            return Q(documents__deleted_at__isnull=True)
-        return Q(
-            documents__deleted_at__isnull=True,
-            documents__id__in=get_objects_for_user_owner_aware(
-                user,
-                "documents.view_document",
-                Document,
-            ).values_list("id", flat=True),
-        )
+        request = getattr(self, "request", None)
+        user = getattr(request, "user", None) if request else None
+        return get_document_count_filter_for_user(user)
 
     def get_queryset(self):
         filter = self.get_document_count_filter()
