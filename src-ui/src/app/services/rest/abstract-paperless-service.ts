@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core'
 import { Observable } from 'rxjs'
-import { map, publishReplay, refCount } from 'rxjs/operators'
+import { map, publishReplay, refCount, tap } from 'rxjs/operators'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { Results } from 'src/app/data/results'
 import { environment } from 'src/environments/environment'
@@ -12,6 +12,11 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
   protected baseUrl: string = environment.apiBaseUrl
   protected http: HttpClient
   protected resourceName: string
+
+  protected _loading: boolean = false
+  public get loading(): boolean {
+    return this._loading
+  }
 
   constructor() {
     this.http = inject(HttpClient)
@@ -43,6 +48,7 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
     sortReverse?: boolean,
     extraParams?
   ): Observable<Results<T>> {
+    this._loading = true
     let httpParams = new HttpParams()
     if (page) {
       httpParams = httpParams.set('page', page.toString())
@@ -59,9 +65,15 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
         httpParams = httpParams.set(extraParamKey, extraParams[extraParamKey])
       }
     }
-    return this.http.get<Results<T>>(this.getResourceUrl(), {
-      params: httpParams,
-    })
+    return this.http
+      .get<Results<T>>(this.getResourceUrl(), {
+        params: httpParams,
+      })
+      .pipe(
+        tap(() => {
+          this._loading = false
+        })
+      )
   }
 
   private _listAll: Observable<Results<T>>
@@ -96,6 +108,7 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
   }
 
   getFew(ids: number[], extraParams?): Observable<Results<T>> {
+    this._loading = true
     let httpParams = new HttpParams()
     httpParams = httpParams.set('id__in', ids.join(','))
     httpParams = httpParams.set('ordering', '-id')
@@ -105,9 +118,15 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
         httpParams = httpParams.set(extraParamKey, extraParams[extraParamKey])
       }
     }
-    return this.http.get<Results<T>>(this.getResourceUrl(), {
-      params: httpParams,
-    })
+    return this.http
+      .get<Results<T>>(this.getResourceUrl(), {
+        params: httpParams,
+      })
+      .pipe(
+        tap(() => {
+          this._loading = false
+        })
+      )
   }
 
   clearCache() {
@@ -115,7 +134,12 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
   }
 
   get(id: number): Observable<T> {
-    return this.http.get<T>(this.getResourceUrl(id))
+    this._loading = true
+    return this.http.get<T>(this.getResourceUrl(id)).pipe(
+      tap(() => {
+        this._loading = false
+      })
+    )
   }
 
   create(o: T): Observable<T> {

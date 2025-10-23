@@ -9,6 +9,7 @@ from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
+from documents.serialisers import TagSerializer
 from documents.signals.handlers import run_workflows
 
 
@@ -120,6 +121,31 @@ class TestTagHierarchy(APITestCase):
         self.document.refresh_from_db()
         tags = set(self.document.tags.values_list("pk", flat=True))
         assert tags == {self.parent.pk, orphan.pk}
+
+    def test_child_document_count_included_when_parent_paginated(self):
+        self.document.tags.add(self.child)
+
+        response = self.client.get(
+            "/api/tags/",
+            {"page_size": 1, "ordering": "-name"},
+        )
+
+        assert response.status_code == 200
+        assert response.data["results"][0]["id"] == self.parent.pk
+
+        children = response.data["results"][0]["children"]
+        assert len(children) == 1
+
+        child_entry = children[0]
+        assert child_entry["id"] == self.child.pk
+        assert child_entry["document_count"] == 1
+
+    def test_tag_serializer_populates_document_filter_context(self):
+        context = {}
+
+        serializer = TagSerializer(self.parent, context=context)
+        assert serializer.data  # triggers serialization
+        assert "document_count_filter" in context
 
     def test_cannot_set_parent_to_self(self):
         tag = Tag.objects.create(name="Selfie")

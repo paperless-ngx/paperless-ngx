@@ -347,4 +347,18 @@ describe('ManagementListComponent', () => {
     expect(component.userCanBulkEdit(PermissionAction.Delete)).toBeFalsy()
     expect(component.userCanBulkEdit(PermissionAction.Change)).toBeFalsy()
   })
+
+  it('should return an original object from filtered child object', () => {
+    const childTag: Tag = {
+      id: 4,
+      name: 'Child Tag',
+      matching_algorithm: MATCH_LITERAL,
+      match: 'child',
+      document_count: 10,
+      parent: 1,
+    }
+    component['unfilteredData'].push(childTag)
+    const original = component.getOriginalObject({ id: 4 } as Tag)
+    expect(original).toEqual(childTag)
+  })
 })

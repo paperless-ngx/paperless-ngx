@@ -141,6 +141,7 @@ from documents.permissions import AcknowledgeTasksPermissions
 from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessNotePermissions
 from documents.permissions import PaperlessObjectPermissions
+from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
@@ -364,21 +365,13 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
     Mixin to add document count to queryset, permissions-aware if needed
     """
 
+    def get_document_count_filter(self):
+        request = getattr(self, "request", None)
+        user = getattr(request, "user", None) if request else None
+        return get_document_count_filter_for_user(user)
+
     def get_queryset(self):
-        filter = (
-            Q(documents__deleted_at__isnull=True)
-            if self.request.user is None or self.request.user.is_superuser
-            else (
-                Q(
-                    documents__deleted_at__isnull=True,
-                    documents__id__in=get_objects_for_user_owner_aware(
-                        self.request.user,
-                        "documents.view_document",
-                        Document,
-                    ).values_list("id", flat=True),
-                )
-            )
-        )
+        filter = self.get_document_count_filter()
         return (
             super()
             .get_queryset()
@@ -446,6 +439,11 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     )
     filterset_class = TagFilterSet
     ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["document_count_filter"] = self.get_document_count_filter()
+        return context
 
     def perform_update(self, serializer):
         old_parent = self.get_object().get_parent()

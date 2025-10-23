@@ -2,6 +2,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
 from django.db.models import QuerySet
 from guardian.core import ObjectPermissionChecker
 from guardian.models import GroupObjectPermission
@@ -11,6 +12,8 @@ from guardian.shortcuts import get_users_with_perms
 from guardian.shortcuts import remove_perm
 from rest_framework.permissions import BasePermission
 from rest_framework.permissions import DjangoObjectPermissions
+
+from documents.models import Document
 
 
 class PaperlessObjectPermissions(DjangoObjectPermissions):
@@ -123,6 +126,25 @@ def set_permissions_for_object(permissions: list[str], object, *, merge: bool = 
                             group,
                             object,
                         )
+
+
+def get_document_count_filter_for_user(user):
+    """
+    Return the Q object used to filter document counts for the given user.
+    """
+
+    if user is None or not getattr(user, "is_authenticated", False):
+        return Q(documents__deleted_at__isnull=True, documents__owner__isnull=True)
+    if getattr(user, "is_superuser", False):
+        return Q(documents__deleted_at__isnull=True)
+    return Q(
+        documents__deleted_at__isnull=True,
+        documents__id__in=get_objects_for_user_owner_aware(
+            user,
+            "documents.view_document",
+            Document,
+        ).values_list("id", flat=True),
+    )
 
 
 def get_objects_for_user_owner_aware(user, perms, Model) -> QuerySet:
