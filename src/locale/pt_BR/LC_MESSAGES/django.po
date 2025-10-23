@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-21 05:44+0000\n"
-"PO-Revision-Date: 2025-10-21 05:45\n"
+"POT-Creation-Date: 2025-10-22 18:15+0000\n"
+"PO-Revision-Date: 2025-10-22 18:18\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -1209,39 +1209,39 @@ msgstr "execução do fluxo de trabalho"
 msgid "workflow runs"
 msgstr "execução de fluxo de trabalho"
 
-#: documents/serialisers.py:143
+#: documents/serialisers.py:145
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Expressão regular inválida: %(error)s"
 
-#: documents/serialisers.py:609
+#: documents/serialisers.py:619
 msgid "Invalid color."
 msgstr "Cor inválida."
 
-#: documents/serialisers.py:1795
+#: documents/serialisers.py:1805
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Tipo de arquivo %(type)s não suportado"
 
-#: documents/serialisers.py:1839
+#: documents/serialisers.py:1849
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "O ID do campo personalizado deve ser um número inteiro: %(id)s"
 
-#: documents/serialisers.py:1846
+#: documents/serialisers.py:1856
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Não existe um campo personalizado com o ID %(id)s"
 
-#: documents/serialisers.py:1863 documents/serialisers.py:1873
+#: documents/serialisers.py:1873 documents/serialisers.py:1883
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Campos personalizados devem estar em uma lista de números inteiros ou em um objeto que relacione IDs a valores."
 
-#: documents/serialisers.py:1868
+#: documents/serialisers.py:1878
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Campos personalizados inválidos ou duplicados."
 
-#: documents/serialisers.py:1983
+#: documents/serialisers.py:1993
 msgid "Invalid variable detected."
 msgstr "Variável inválida detectada."
 

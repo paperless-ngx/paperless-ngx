@@ -20,6 +20,7 @@ from django.core.validators import EmailValidator
 from django.core.validators import MaxLengthValidator
 from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
+from django.db.models import Count
 from django.utils.crypto import get_random_string
 from django.utils.dateparse import parse_datetime
 from django.utils.text import slugify
@@ -65,6 +66,7 @@ from documents.models import WorkflowActionEmail
 from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowTrigger
 from documents.parsers import is_mime_type_supported
+from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import set_permissions_for_object
 from documents.templating.filepath import validate_filepath_template_and_render
@@ -572,8 +574,16 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         ),
     )
     def get_children(self, obj):
+        filter_q = self.context.get("document_count_filter")
+        if filter_q is None:
+            request = self.context.get("request")
+            user = getattr(request, "user", None) if request else None
+            filter_q = get_document_count_filter_for_user(user)
+            self.context["document_count_filter"] = filter_q
         serializer = TagSerializer(
-            obj.get_children(),
+            obj.get_children_queryset()
+            .select_related("owner")
+            .annotate(document_count=Count("documents", filter=filter_q)),
             many=True,
             context=self.context,
         )
