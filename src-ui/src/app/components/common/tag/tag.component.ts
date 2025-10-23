@@ -53,4 +53,8 @@ export class TagComponent {
 
   @Input()
   showParents: boolean = false
+
+  public get loading(): boolean {
+    return this.tagService.loading
+  }
 }
