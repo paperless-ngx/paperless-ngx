@@ -35,15 +35,13 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name="WorkflowAction",
+            model_name="workflowaction",
             name="assign_title",
             field=models.TextField(
-                null=True,
                 blank=True,
-                help_text=(
-                    "Assign a document title, can be a JINJA2 template, "
-                    "see documentation.",
-                ),
+                help_text="Assign a document title, must  be a Jinja2 template, see documentation.",
+                null=True,
+                verbose_name="assign title",
             ),
         ),
         migrations.RunPython(
