@@ -146,7 +146,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   }
 
   public getOriginalObject(object: T): T {
-    return this.unfilteredData.find((d) => d.id == object.id)
+    return this.unfilteredData.find((d) => d?.id == object?.id) || object
   }
 
   reloadData(extraParams: { [key: string]: any } = null) {
