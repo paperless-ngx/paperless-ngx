@@ -904,6 +904,10 @@ export class BulkEditorComponent
     })
   }
 
+  public get emailEnabled(): boolean {
+    return this.settings.get(SETTINGS_KEYS.EMAIL_ENABLED)
+  }
+
   emailSelected() {
     const allHaveArchiveVersion = this.list.documents
       .filter((d) => this.list.selected.has(d.id))
