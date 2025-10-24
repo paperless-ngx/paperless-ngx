@@ -14,6 +14,7 @@ import { GroupService } from 'src/app/services/rest/group.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { ConfirmButtonComponent } from '../../confirm-button/confirm-button.component'
 import { PasswordComponent } from '../../input/password/password.component'
 import { SelectComponent } from '../../input/select/select.component'
 import { TextComponent } from '../../input/text/text.component'
@@ -28,6 +29,7 @@ import { PermissionsSelectComponent } from '../../permissions-select/permissions
     SelectComponent,
     TextComponent,
     PasswordComponent,
+    ConfirmButtonComponent,
     FormsModule,
     ReactiveFormsModule,
   ],
