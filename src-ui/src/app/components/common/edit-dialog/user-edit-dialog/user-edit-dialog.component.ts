@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { first } from 'rxjs'
-import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
+import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { Group } from 'src/app/data/group'
 import { User } from 'src/app/data/user'
@@ -29,7 +29,7 @@ import { PermissionsSelectComponent } from '../../permissions-select/permissions
     SelectComponent,
     TextComponent,
     PasswordComponent,
-    ConfirmDialogComponent,
+    ConfirmButtonComponent,
     FormsModule,
     ReactiveFormsModule,
   ],
