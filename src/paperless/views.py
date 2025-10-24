@@ -125,6 +125,10 @@ class UserViewSet(ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         user_to_update: User = self.get_object()
+        if not request.user.is_superuser and user_to_update.is_superuser:
+            return HttpResponseForbidden(
+                "Superusers can only be modified by other superusers",
+            )
         if (
             not request.user.is_superuser
             and request.data.get("is_superuser") is not None
