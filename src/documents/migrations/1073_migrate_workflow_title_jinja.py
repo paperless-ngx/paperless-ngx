@@ -12,11 +12,11 @@ logger = logging.getLogger("paperless.migrations")
 def convert_from_format_to_template(apps, schema_editor):
     WorkflowActions = apps.get_model("documents", "WorkflowAction")
 
+    batch_size = 500
     actions_to_update = []
+
     queryset = (
-        WorkflowActions.objects.filter(
-            assign_title__isnull=False,
-        )
+        WorkflowActions.objects.filter(assign_title__isnull=False)
         .exclude(assign_title="")
         .only("id", "assign_title")
     )
@@ -33,7 +33,11 @@ def convert_from_format_to_template(apps, schema_editor):
         actions_to_update.append(action)
 
     if actions_to_update:
-        WorkflowActions.objects.bulk_update(actions_to_update, ["assign_title"])
+        WorkflowActions.objects.bulk_update(
+            actions_to_update,
+            ["assign_title"],
+            batch_size=batch_size,
+        )
 
 
 class Migration(migrations.Migration):
