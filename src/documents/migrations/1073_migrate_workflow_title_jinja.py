@@ -3,7 +3,6 @@ import logging
 
 from django.db import migrations
 from django.db import models
-from django.db import transaction
 
 from documents.templating.utils import convert_format_str_to_template_format
 
@@ -13,19 +12,28 @@ logger = logging.getLogger("paperless.migrations")
 def convert_from_format_to_template(apps, schema_editor):
     WorkflowActions = apps.get_model("documents", "WorkflowAction")
 
-    with transaction.atomic():
-        for WorkflowAction in WorkflowActions.objects.all():
-            if not WorkflowAction.assign_title:
-                continue
-            WorkflowAction.assign_title = convert_format_str_to_template_format(
-                WorkflowAction.assign_title,
-            )
-            logger.debug(
-                "Converted WorkflowAction id %d title to template format: %s",
-                WorkflowAction.id,
-                WorkflowAction.assign_title,
-            )
-            WorkflowAction.save()
+    actions_to_update = []
+    queryset = (
+        WorkflowActions.objects.filter(
+            assign_title__isnull=False,
+        )
+        .exclude(assign_title="")
+        .only("id", "assign_title")
+    )
+
+    for action in queryset:
+        action.assign_title = convert_format_str_to_template_format(
+            action.assign_title,
+        )
+        logger.debug(
+            "Converted WorkflowAction id %d title to template format: %s",
+            action.id,
+            action.assign_title,
+        )
+        actions_to_update.append(action)
+
+    if actions_to_update:
+        WorkflowActions.objects.bulk_update(actions_to_update, ["assign_title"])
 
 
 class Migration(migrations.Migration):
