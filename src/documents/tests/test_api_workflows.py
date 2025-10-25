@@ -808,3 +808,434 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.action.refresh_from_db()
         self.assertEqual(self.action.assign_title, "Patched Title")
+
+    def test_deletion_action_validation(self):
+        """
+        GIVEN:
+            - API request to create a workflow with a deletion action
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP response
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow 2",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.DELETION,
+                            "deletion": {
+                                "skip_trash": False,
+                            },
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow 3",
+                    "order": 2,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.DELETION,
+                            "deletion": {
+                                "skip_trash": True,
+                            },
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_deletion_action_as_last_action_valid(self):
+        """
+        GIVEN:
+            - API request to create a workflow with multiple actions
+            - Deletion action is the last action
+        WHEN:
+            - API is called
+        THEN:
+            - Workflow is created successfully
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow with Deletion Last",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
+                            "assign_title": "Assigned Title",
+                        },
+                        {
+                            "type": WorkflowAction.WorkflowActionType.REMOVAL,
+                            "remove_all_tags": True,
+                        },
+                        {
+                            "type": WorkflowAction.WorkflowActionType.DELETION,
+                            "deletion": {
+                                "skip_trash": False,
+                            },
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_deletion_action_in_middle_invalid(self):
+        """
+        GIVEN:
+            - API request to create a workflow with deletion action not at the end
+        WHEN:
+            - API is called
+        THEN:
+            - HTTP 400 error with validation message
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow with Deletion in Middle",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.DELETION,
+                            "deletion": {
+                                "skip_trash": False,
+                            },
+                        },
+                        {
+                            "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
+                            "assign_title": "After Deletion",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Deletion action must be the last action", str(response.data))
+
+    def test_multiple_deletion_actions_invalid(self):
+        """
+        GIVEN:
+            - API request to create a workflow with multiple deletion actions
+        WHEN:
+            - API is called
+        THEN:
+            - HTTP 400 error with validation message
+            - Multiple deletions are caught because the first one is not last
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow with Multiple Deletions",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.DELETION,
+                            "deletion": {
+                                "skip_trash": False,
+                            },
+                        },
+                        {
+                            "type": WorkflowAction.WorkflowActionType.DELETION,
+                            "deletion": {
+                                "skip_trash": True,
+                            },
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Deletion action must be the last action", str(response.data))
+
+    def test_update_workflow_add_action_after_deletion_invalid(self):
+        """
+        GIVEN:
+            - Existing workflow with deletion action at end
+        WHEN:
+            - PATCH to add action after deletion
+        THEN:
+            - HTTP 400 error with validation message
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow to Update",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.DELETION,
+                            "deletion": {
+                                "skip_trash": False,
+                            },
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        workflow_id = response.data["id"]
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{workflow_id}/",
+            json.dumps(
+                {
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.DELETION,
+                            "deletion": {
+                                "skip_trash": False,
+                            },
+                        },
+                        {
+                            "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
+                            "assign_title": "After Deletion",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Deletion action must be the last action", str(response.data))
+
+    def test_update_workflow_reorder_deletion_to_middle_invalid(self):
+        """
+        GIVEN:
+            - Existing workflow with assignment then deletion
+        WHEN:
+            - PATCH to reorder to deletion then assignment
+        THEN:
+            - HTTP 400 error with validation message
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow to Reorder",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
+                            "assign_title": "First",
+                        },
+                        {
+                            "type": WorkflowAction.WorkflowActionType.DELETION,
+                            "deletion": {
+                                "skip_trash": False,
+                            },
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        workflow_id = response.data["id"]
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{workflow_id}/",
+            json.dumps(
+                {
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.DELETION,
+                            "deletion": {
+                                "skip_trash": False,
+                            },
+                        },
+                        {
+                            "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
+                            "assign_title": "Second",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Deletion action must be the last action", str(response.data))
+
+    def test_update_workflow_add_deletion_at_end_valid(self):
+        """
+        GIVEN:
+            - Existing workflow without deletion action
+        WHEN:
+            - PATCH to add deletion action at end
+        THEN:
+            - HTTP 200 success
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow to Add Deletion",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
+                            "assign_title": "First Action",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        workflow_id = response.data["id"]
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{workflow_id}/",
+            json.dumps(
+                {
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
+                            "assign_title": "First Action",
+                        },
+                        {
+                            "type": WorkflowAction.WorkflowActionType.DELETION,
+                            "deletion": {
+                                "skip_trash": False,
+                            },
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_update_workflow_remove_deletion_action_valid(self):
+        """
+        GIVEN:
+            - Existing workflow with deletion action
+        WHEN:
+            - PATCH to remove deletion action
+        THEN:
+            - HTTP 200 success
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow to Remove Deletion",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
+                            "assign_title": "First Action",
+                        },
+                        {
+                            "type": WorkflowAction.WorkflowActionType.DELETION,
+                            "deletion": {
+                                "skip_trash": False,
+                            },
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        workflow_id = response.data["id"]
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{workflow_id}/",
+            json.dumps(
+                {
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
+                            "assign_title": "Only Action",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
