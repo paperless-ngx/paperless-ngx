@@ -139,6 +139,10 @@ export const WORKFLOW_ACTION_OPTIONS = [
     id: WorkflowActionType.Webhook,
     name: $localize`Webhook`,
   },
+  {
+    id: WorkflowActionType.Deletion,
+    name: $localize`Delete`,
+  },
 ]
 
 export enum TriggerFilterType {
@@ -1133,6 +1137,10 @@ export class WorkflowEditDialogComponent
           headers: new FormControl(action.webhook?.headers),
           include_document: new FormControl(!!action.webhook?.include_document),
         }),
+        deletion: new FormGroup({
+          id: new FormControl(action.deletion?.id),
+          skip_trash: new FormControl(!!action.deletion?.skip_trash),
+        }),
       }),
       { emitEvent }
     )
@@ -1259,6 +1267,10 @@ export class WorkflowEditDialogComponent
         headers: null,
         include_document: false,
       },
+      deletion: {
+        id: null,
+        skip_trash: false,
+      },
     }
     this.object.actions.push(action)
     this.createActionField(action)
@@ -1288,6 +1300,10 @@ export class WorkflowEditDialogComponent
     this.actionFields.controls.forEach((c) =>
       c.get('id').setValue(null, { emitEvent: false })
     )
+    // clear action errors since the order has changed
+    if (this.error?.actions) {
+      this.error.actions = null
+    }
   }
 
   save(): void {
@@ -1299,6 +1315,9 @@ export class WorkflowEditDialogComponent
         }
         if (action.type !== WorkflowActionType.Email) {
           action.email = null
+        }
+        if (action.type !== WorkflowActionType.Deletion) {
+          action.deletion = null
         }
       })
     super.save()

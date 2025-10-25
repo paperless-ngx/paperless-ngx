@@ -92,6 +92,9 @@
                           buttonClasses="btn-link text-danger ms-2"
                           iconName="trash">
                         </pngx-confirm-button>
+                        @if(error?.actions?.[i]?.type) {
+                          <span class="text-danger ms-2"><i-bs name="exclamation-triangle"></i-bs> {{error.actions[i].type[0]}}</span>
+                        }
                       </button>
                     </div>
                     <div ngbAccordionCollapse>
@@ -427,6 +430,14 @@
             }
             <pngx-input-entries i18n-title title="Webhook headers" formControlName="headers" [error]="error?.actions?.[i]?.headers"></pngx-input-entries>
             <pngx-input-switch i18n-title title="Include document" formControlName="include_document"></pngx-input-switch>
+          </div>
+        </div>
+      }
+      @case (WorkflowActionType.Deletion) {
+        <div class="row" [formGroup]="formGroup.get('deletion')">
+          <input type="hidden" formControlName="id" />
+          <div class="col">
+            <pngx-input-switch i18n-title title="Skip trash and delete directly" formControlName="skip_trash"></pngx-input-switch>
           </div>
         </div>
       }
