@@ -259,3 +259,25 @@ def execute_webhook_action(
             f"Error occurred sending webhook: {e}",
             extra={"group": logging_group},
         )
+
+
+def execute_deletion_action(
+    action: WorkflowAction,
+    document: Document,
+    logging_group,
+) -> None:
+    """
+    Execute a deletion action for a workflow.
+    """
+    if action.deletion.skip_trash:
+        document.hard_delete()
+        logger.debug(
+            f"Hard deleted document {document}",
+            extra={"group": logging_group},
+        )
+    else:
+        document.delete()
+        logger.debug(
+            f"Moved document {document} to trash",
+            extra={"group": logging_group},
+        )

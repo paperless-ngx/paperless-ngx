@@ -1269,6 +1269,16 @@ class WorkflowActionWebhook(models.Model):
         return f"Workflow Webhook Action {self.pk}"
 
 
+class WorkflowActionDeletion(models.Model):
+    skip_trash = models.BooleanField(
+        default=False,
+        verbose_name=_("Skip trash and delete directly"),
+    )
+
+    def __str__(self):
+        return f"Workflow Delete Action {self.pk}"
+
+
 class WorkflowAction(models.Model):
     class WorkflowActionType(models.IntegerChoices):
         ASSIGNMENT = (
@@ -1286,6 +1296,10 @@ class WorkflowAction(models.Model):
         WEBHOOK = (
             4,
             _("Webhook"),
+        )
+        DELETION = (
+            5,
+            _("Deletion"),
         )
 
     type = models.PositiveIntegerField(
@@ -1512,6 +1526,15 @@ class WorkflowAction(models.Model):
         on_delete=models.SET_NULL,
         related_name="action",
         verbose_name=_("webhook"),
+    )
+
+    deletion = models.ForeignKey(
+        WorkflowActionDeletion,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="action",
+        verbose_name=_("delete"),
     )
 
     class Meta:

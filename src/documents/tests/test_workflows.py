@@ -50,6 +50,7 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowAction
+from documents.models import WorkflowActionDeletion
 from documents.models import WorkflowActionEmail
 from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowRun
@@ -3609,6 +3610,443 @@ class TestWorkflows(
                 )
 
         mock_post.assert_called_once()
+
+    def test_workflow_delete_action_soft_delete(self):
+        """
+        GIVEN:
+            - Document updated workflow with delete action
+            - skip_trash is False
+        WHEN:
+            - Document that matches is updated
+        THEN:
+            - Document is moved to trash (soft deleted)
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        delete_action = WorkflowActionDeletion.objects.create(
+            skip_trash=False,
+        )
+        self.assertEqual(
+            str(delete_action),
+            f"Workflow Delete Action {delete_action.id}",
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.DELETION,
+            deletion=delete_action,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        self.assertEqual(Document.objects.count(), 1)
+        self.assertEqual(Document.deleted_objects.count(), 0)
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        self.assertEqual(Document.objects.count(), 0)
+        self.assertEqual(Document.deleted_objects.count(), 1)
+
+    def test_workflow_delete_action_hard_delete(self):
+        """
+        GIVEN:
+            - Document updated workflow with delete action
+            - skip_trash is True
+        WHEN:
+            - Document that matches is updated
+        THEN:
+            - Document is hard deleted
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        delete_action = WorkflowActionDeletion.objects.create(
+            skip_trash=True,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.DELETION,
+            deletion=delete_action,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        self.assertEqual(Document.objects.count(), 1)
+        self.assertEqual(Document.deleted_objects.count(), 0)
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        self.assertEqual(Document.objects.count(), 0)
+        self.assertEqual(Document.deleted_objects.count(), 0)
+
+    @override_settings(
+        PAPERLESS_EMAIL_HOST="localhost",
+        EMAIL_ENABLED=True,
+        PAPERLESS_URL="http://localhost:8000",
+    )
+    @mock.patch("django.core.mail.message.EmailMessage.send")
+    def test_workflow_deletion_with_email_action(self, mock_email_send):
+        """
+        GIVEN:
+            - Workflow with email action, then deletion action
+            - skip_trash is True
+        WHEN:
+            - Document matches and workflow runs
+        THEN:
+            - Email is sent first
+            - Document is hard deleted
+        """
+        mock_email_send.return_value = 1
+
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        email_action = WorkflowActionEmail.objects.create(
+            subject="Document deleted: {doc_title}",
+            body="Document {doc_title} will be deleted",
+            to="user@example.com",
+            include_document=False,
+        )
+        email_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.EMAIL,
+            email=email_action,
+        )
+        deletion_action = WorkflowActionDeletion.objects.create(
+            skip_trash=True,
+        )
+        deletion_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.DELETION,
+            deletion=deletion_action,
+        )
+        w = Workflow.objects.create(
+            name="Workflow with email then deletion",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(email_workflow_action, deletion_workflow_action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        self.assertEqual(Document.objects.count(), 1)
+        self.assertEqual(Document.deleted_objects.count(), 0)
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        mock_email_send.assert_called_once()
+        self.assertEqual(Document.objects.count(), 0)
+        self.assertEqual(Document.deleted_objects.count(), 0)
+
+    @override_settings(
+        PAPERLESS_URL="http://localhost:8000",
+    )
+    @mock.patch("documents.signals.handlers.send_webhook.delay")
+    def test_workflow_deletion_with_webhook_action(self, mock_webhook_delay):
+        """
+        GIVEN:
+            - Workflow with webhook action (include_document=True), then deletion action
+            - skip_trash is True
+        WHEN:
+            - Document matches and workflow runs
+        THEN:
+            - Webhook .delay() is called with complete data including file bytes
+            - Document is hard deleted
+            - Webhook task has all necessary data and doesn't rely on document existence
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        webhook_action = WorkflowActionWebhook.objects.create(
+            use_params=True,
+            params={
+                "title": "{{doc_title}}",
+                "message": "Document being deleted",
+            },
+            url="http://paperless-ngx.com/webhook",
+            include_document=True,
+        )
+        webhook_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.WEBHOOK,
+            webhook=webhook_action,
+        )
+        deletion_action = WorkflowActionDeletion.objects.create(
+            skip_trash=True,
+        )
+        deletion_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.DELETION,
+            deletion=deletion_action,
+        )
+        w = Workflow.objects.create(
+            name="Workflow with webhook then deletion",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(webhook_workflow_action, deletion_workflow_action)
+        w.save()
+
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="simple.pdf",
+            filename=test_file,
+            mime_type="application/pdf",
+        )
+
+        self.assertEqual(Document.objects.count(), 1)
+        self.assertEqual(Document.deleted_objects.count(), 0)
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        mock_webhook_delay.assert_called_once()
+        call_kwargs = mock_webhook_delay.call_args[1]
+        self.assertEqual(call_kwargs["url"], "http://paperless-ngx.com/webhook")
+        self.assertEqual(
+            call_kwargs["data"],
+            {"title": "sample test", "message": "Document being deleted"},
+        )
+        self.assertIsNotNone(call_kwargs["files"])
+        self.assertIn("file", call_kwargs["files"])
+        self.assertEqual(call_kwargs["files"]["file"][0], "simple.pdf")
+        self.assertEqual(call_kwargs["files"]["file"][2], "application/pdf")
+        self.assertIsInstance(call_kwargs["files"]["file"][1], bytes)
+
+        self.assertEqual(Document.objects.count(), 0)
+        self.assertEqual(Document.deleted_objects.count(), 0)
+
+    @override_settings(
+        PAPERLESS_EMAIL_HOST="localhost",
+        EMAIL_ENABLED=True,
+        PAPERLESS_URL="http://localhost:8000",
+    )
+    @mock.patch("django.core.mail.message.EmailMessage.send")
+    def test_workflow_deletion_after_email_failure(self, mock_email_send):
+        """
+        GIVEN:
+            - Workflow with email action (that fails), then deletion action
+        WHEN:
+            - Document matches and workflow runs
+            - Email action raises exception
+        THEN:
+            - Email failure is logged
+            - Deletion still executes successfully
+        """
+        mock_email_send.side_effect = Exception("Email server error")
+
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        email_action = WorkflowActionEmail.objects.create(
+            subject="Document deleted: {doc_title}",
+            body="Document {doc_title} will be deleted",
+            to="user@example.com",
+            include_document=False,
+        )
+        email_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.EMAIL,
+            email=email_action,
+        )
+        deletion_action = WorkflowActionDeletion.objects.create(
+            skip_trash=True,
+        )
+        deletion_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.DELETION,
+            deletion=deletion_action,
+        )
+        w = Workflow.objects.create(
+            name="Workflow with failing email then deletion",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(email_workflow_action, deletion_workflow_action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        self.assertEqual(Document.objects.count(), 1)
+        self.assertEqual(Document.deleted_objects.count(), 0)
+
+        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
+            run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+            expected_str = "Error occurred sending notification email"
+            self.assertIn(expected_str, cm.output[0])
+
+        self.assertEqual(Document.objects.count(), 0)
+        self.assertEqual(Document.deleted_objects.count(), 0)
+
+    def test_multiple_workflows_deletion_then_assignment(self):
+        """
+        GIVEN:
+            - Workflow 1 (order=0) with deletion action
+            - Workflow 2 (order=1) with assignment action
+            - Both workflows match the same document
+        WHEN:
+            - Workflows run sequentially
+        THEN:
+            - First workflow runs and deletes document (soft delete)
+            - Second workflow does not trigger (document no longer exists)
+            - Logs confirm deletion and skipping of remaining workflows
+        """
+        trigger1 = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        deletion_action = WorkflowActionDeletion.objects.create(
+            skip_trash=False,
+        )
+        deletion_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.DELETION,
+            deletion=deletion_action,
+        )
+        w1 = Workflow.objects.create(
+            name="Workflow 1 - Deletion",
+            order=0,
+        )
+        w1.triggers.add(trigger1)
+        w1.actions.add(deletion_workflow_action)
+        w1.save()
+
+        trigger2 = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        assignment_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.ASSIGNMENT,
+            assign_correspondent=self.c2,
+        )
+        w2 = Workflow.objects.create(
+            name="Workflow 2 - Assignment",
+            order=1,
+        )
+        w2.triggers.add(trigger2)
+        w2.actions.add(assignment_action)
+        w2.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        self.assertEqual(Document.objects.count(), 1)
+        self.assertEqual(Document.deleted_objects.count(), 0)
+
+        with self.assertLogs("paperless.handlers", level="DEBUG") as cm:
+            run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        self.assertEqual(Document.objects.count(), 0)
+        self.assertEqual(Document.deleted_objects.count(), 1)
+
+        # We check logs instead of WorkflowRun.objects.count() because when the document
+        # is soft-deleted, the WorkflowRun is cascade-deleted (hard delete) since it does
+        # not inherit from the SoftDeleteModel. The logs confirm that the first workflow
+        # executed the deletion and remaining workflows were skipped.
+        log_output = "\n".join(cm.output)
+        self.assertIn("Moved document", log_output)
+        self.assertIn("to trash", log_output)
+        self.assertIn(
+            "Document was moved to trash, skipping remaining workflows",
+            log_output,
+        )
+
+    def test_multiple_workflows_hard_deletion_then_assignment(self):
+        """
+        GIVEN:
+            - Workflow 1 (order=0) with deletion action (skip_trash=True)
+            - Workflow 2 (order=1) with assignment action
+            - Both workflows match the same document
+        WHEN:
+            - Workflows run sequentially
+        THEN:
+            - First workflow runs and hard deletes document
+            - Second workflow does not trigger (document no longer exists)
+            - Logs confirm hard deletion and skipping of remaining workflows
+        """
+        trigger1 = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        deletion_action = WorkflowActionDeletion.objects.create(
+            skip_trash=True,  # Hard delete
+        )
+        deletion_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.DELETION,
+            deletion=deletion_action,
+        )
+        w1 = Workflow.objects.create(
+            name="Workflow 1 - Hard Deletion",
+            order=0,
+        )
+        w1.triggers.add(trigger1)
+        w1.actions.add(deletion_workflow_action)
+        w1.save()
+
+        trigger2 = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        assignment_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.ASSIGNMENT,
+            assign_correspondent=self.c2,
+        )
+        w2 = Workflow.objects.create(
+            name="Workflow 2 - Assignment",
+            order=1,
+        )
+        w2.triggers.add(trigger2)
+        w2.actions.add(assignment_action)
+        w2.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        self.assertEqual(Document.objects.count(), 1)
+        self.assertEqual(Document.deleted_objects.count(), 0)
+
+        with self.assertLogs("paperless.handlers", level="DEBUG") as cm:
+            run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        self.assertEqual(Document.objects.count(), 0)
+        self.assertEqual(Document.deleted_objects.count(), 0)
+
+        log_output = "\n".join(cm.output)
+        self.assertIn("Hard deleted document", log_output)
+        self.assertIn(
+            "Document no longer exists, skipping remaining workflows",
+            log_output,
+        )
 
 
 class TestWebhookSend:
