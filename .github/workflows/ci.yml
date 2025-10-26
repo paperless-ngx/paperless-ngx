@@ -179,12 +179,13 @@ jobs:
             --dev \
             --frozen \
             pytest
-        #      - name: Upload backend test results to Codecov
-        #       if: always()
-        #       uses: codecov/test-results-action@v1
-        #       with:
-        #         flags: backend-python-${{ matrix.python-version }}
-        #         files: junit.xml
+      - name: Upload backend test results to Codecov
+        uses: codecov/codecov-action@v5
+        if: always()
+        with:
+          flags: backend-python-${{ matrix.python-version }}
+          files: junit.xml
+          report_type: test_results
       - name: Upload backend coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
@@ -259,12 +260,13 @@ jobs:
         run: cd src-ui && pnpm run lint
       - name: Run Jest unit tests
         run: cd src-ui && pnpm run test --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
-        #      - name: Upload frontend test results to Codecov
-        #       uses: codecov/test-results-action@v1
-        #       if: always()
-        #       with:
-        #         flags: frontend-node-${{ matrix.node-version }}
-        #         directory: src-ui/
+      - name: Upload frontend test results to Codecov
+        uses: codecov/codecov-action@v5
+        if: always()
+        with:
+          flags: frontend-node-${{ matrix.node-version }}
+          directory: src-ui/
+          report_type: test_results
       - name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
