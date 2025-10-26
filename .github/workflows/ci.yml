@@ -188,7 +188,7 @@ jobs:
       - name: Upload backend coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          flags: backend-python-${{ matrix.python-version }}
+          flags: backend-python-${{ matrix.python-version }}-test
           files: coverage.xml
       - name: Stop containers
         if: always()
