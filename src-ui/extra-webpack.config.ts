@@ -13,7 +13,10 @@ export default (
   if (config.plugins) {
     config.plugins.push(
       codecovWebpackPlugin({
+        """
         enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+        """
+        enableBundleAnalysis: false,
         bundleName: 'paperless-ngx',
         uploadToken: process.env.CODECOV_TOKEN,
       })
