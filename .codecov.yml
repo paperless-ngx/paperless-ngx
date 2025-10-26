@@ -27,6 +27,7 @@ coverage:
         # allow as low as 75%
         target: 100%
         threshold: 25%
+
 # https://docs.codecov.com/docs/javascript-bundle-analysis
 bundle_analysis:
   # Fail if the bundle size increases by more than 1MB
