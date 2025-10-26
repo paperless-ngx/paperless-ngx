@@ -180,8 +180,8 @@ jobs:
             --frozen \
             pytest
       - name: Upload backend test results to Codecov
-        uses: codecov/codecov-action@v5
         if: always()
+        uses: codecov/codecov-action@v5
         with:
           flags: backend-python-${{ matrix.python-version }}
           files: junit.xml
@@ -189,7 +189,7 @@ jobs:
       - name: Upload backend coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          flags: backend-python-${{ matrix.python-version }}-test
+          flags: backend-python-${{ matrix.python-version }}
           files: coverage.xml
       - name: Stop containers
         if: always()
@@ -261,8 +261,8 @@ jobs:
       - name: Run Jest unit tests
         run: cd src-ui && pnpm run test --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
       - name: Upload frontend test results to Codecov
-        uses: codecov/codecov-action@v5
         if: always()
+        uses: codecov/codecov-action@v5
         with:
           flags: frontend-node-${{ matrix.node-version }}
           directory: src-ui/
