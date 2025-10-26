@@ -956,7 +956,10 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("Deletion action must be the last action", str(response.data))
+        self.assertIn(
+            "Delete action must be the last action in the workflow",
+            str(response.data),
+        )
 
     def test_multiple_deletion_actions_invalid(self):
         """
@@ -1000,7 +1003,10 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("Deletion action must be the last action", str(response.data))
+        self.assertIn(
+            "Delete action must be the last action in the workflow",
+            str(response.data),
+        )
 
     def test_update_workflow_add_action_after_deletion_invalid(self):
         """
@@ -1060,7 +1066,10 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("Deletion action must be the last action", str(response.data))
+        self.assertIn(
+            "Delete action must be the last action in the workflow",
+            str(response.data),
+        )
 
     def test_update_workflow_reorder_deletion_to_middle_invalid(self):
         """
@@ -1124,7 +1133,10 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("Deletion action must be the last action", str(response.data))
+        self.assertIn(
+            "Delete action must be the last action in the workflow",
+            str(response.data),
+        )
 
     def test_update_workflow_add_deletion_at_end_valid(self):
         """
