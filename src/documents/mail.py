@@ -7,6 +7,8 @@ from django.conf import settings
 from django.core.mail import EmailMessage
 from filelock import FileLock
 
+from documents.data_models import ConsumableDocument
+
 if TYPE_CHECKING:
     from documents.models import Document
 
@@ -15,7 +17,7 @@ def send_email(
     subject: str,
     body: str,
     to: list[str],
-    attachments: list[Document],
+    attachments: list[Document | ConsumableDocument],
     *,
     use_archive: bool,
 ) -> int:
@@ -45,17 +47,20 @@ def send_email(
     # Something could be renaming the file concurrently so it can't be attached
     with FileLock(settings.MEDIA_LOCK):
         for document in attachments:
-            attachment_path = (
-                document.archive_path
-                if use_archive and document.has_archive_version
-                else document.source_path
-            )
-
-            friendly_filename = _get_unique_filename(
-                document,
-                used_filenames,
-                archive=use_archive and document.has_archive_version,
-            )
+            if isinstance(document, ConsumableDocument):
+                attachment_path = document.original_file
+                friendly_filename = document.original_path.name
+            else:
+                attachment_path = (
+                    document.archive_path
+                    if use_archive and document.has_archive_version
+                    else document.source_path
+                )
+                friendly_filename = _get_unique_filename(
+                    document,
+                    used_filenames,
+                    archive=use_archive and document.has_archive_version,
+                )
             used_filenames.add(friendly_filename)
 
             with attachment_path.open("rb") as f:

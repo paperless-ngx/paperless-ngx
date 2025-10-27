@@ -2856,7 +2856,7 @@ class TestWorkflows(
             self.assertEqual(["owner@example.com"], to)
             self.assertEqual(1, len(attachments))
             attachment = attachments[0]
-            with attachment.source_path.open("rb"):
+            with attachment.original_file.open("rb"):
                 return 1
             raise AssertionError("Attachment source file should have been available")
 
