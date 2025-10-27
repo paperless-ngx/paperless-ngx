@@ -2811,7 +2811,7 @@ class TestWorkflows(
             path="workflow/{{ document.pk }}",
         )
         trigger = WorkflowTrigger.objects.create(
-            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
         )
         assignment_action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.ASSIGNMENT,
@@ -2843,7 +2843,6 @@ class TestWorkflows(
         Document.objects.create(
             title="workflow doc",
             correspondent=self.c,
-            original_filename="simple.pdf",
             checksum="wf-assignment-email",
             mime_type="application/pdf",
         )
