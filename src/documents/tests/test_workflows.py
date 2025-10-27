@@ -2793,6 +2793,85 @@ class TestWorkflows(
         EMAIL_ENABLED=True,
         PAPERLESS_URL="http://localhost:8000",
     )
+    @mock.patch("documents.signals.handlers.send_email")
+    def test_workflow_assignment_then_email_includes_attachment(self, mock_send_email):
+        """
+        GIVEN:
+            - Workflow with assignment and email actions
+            - Email action configured to include the document
+        WHEN:
+            - Workflow is run on a newly created document
+        THEN:
+            - Email action sends the document as an attachment
+        """
+
+        storage_path = StoragePath.objects.create(
+            name="sp2",
+            path="workflow/{{ document.pk }}",
+        )
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        assignment_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.ASSIGNMENT,
+            assign_storage_path=storage_path,
+            assign_owner=self.user2,
+        )
+        assignment_action.assign_tags.add(self.t1)
+
+        email_action_config = WorkflowActionEmail.objects.create(
+            subject="Doc ready {doc_title}",
+            body="Document URL: {doc_url}",
+            to="owner@example.com",
+            include_document=True,
+        )
+        email_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.EMAIL,
+            email=email_action_config,
+        )
+
+        workflow = Workflow.objects.create(name="Assignment then email", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.set([assignment_action, email_action])
+
+        temp_working_copy = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "working-copy.pdf",
+        )
+
+        document = Document.objects.create(
+            title="workflow doc",
+            correspondent=self.c,
+            original_filename="simple.pdf",
+            checksum="wf-assignment-email",
+            mime_type="application/pdf",
+        )
+
+        def fake_send_email(subject, body, to, attachments, *, use_archive):
+            self.assertEqual(["owner@example.com"], to)
+            self.assertEqual(1, len(attachments))
+            attachment = attachments[0]
+            self.assertTrue(
+                attachment.source_path.is_file(),
+                msg=f"Attachment path missing: {attachment.source_path}",
+            )
+            return 1
+
+        mock_send_email.side_effect = fake_send_email
+
+        run_workflows(
+            WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            document,
+            original_file=Path(temp_working_copy),
+        )
+
+        mock_send_email.assert_called_once()
+
+    @override_settings(
+        PAPERLESS_EMAIL_HOST="localhost",
+        EMAIL_ENABLED=True,
+        PAPERLESS_URL="http://localhost:8000",
+    )
     @mock.patch("httpx.post")
     @mock.patch("django.core.mail.message.EmailMessage.send")
     def test_workflow_email_action(self, mock_email_send, mock_post):
