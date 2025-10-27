@@ -49,7 +49,7 @@ def send_email(
         for document in attachments:
             if isinstance(document, ConsumableDocument):
                 attachment_path = document.original_file
-                friendly_filename = document.original_path.name
+                friendly_filename = document.original_file.name
             else:
                 attachment_path = (
                     document.archive_path

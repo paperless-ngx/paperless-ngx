@@ -2794,8 +2794,8 @@ class TestWorkflows(
         EMAIL_ENABLED=True,
         PAPERLESS_URL="http://localhost:8000",
     )
-    @mock.patch("documents.signals.handlers.send_email")
-    def test_workflow_assignment_then_email_includes_attachment(self, mock_send_email):
+    @mock.patch("django.core.mail.message.EmailMessage.send")
+    def test_workflow_assignment_then_email_includes_attachment(self, mock_email_send):
         """
         GIVEN:
             - Workflow with assignment and email actions
@@ -2852,15 +2852,7 @@ class TestWorkflows(
             original_file=temp_working_copy,
         )
 
-        def fake_send_email(subject, body, to, attachments, *, use_archive):
-            self.assertEqual(["owner@example.com"], to)
-            self.assertEqual(1, len(attachments))
-            attachment = attachments[0]
-            with attachment.original_file.open("rb"):
-                return 1
-            raise AssertionError("Attachment source file should have been available")
-
-        mock_send_email.side_effect = fake_send_email
+        mock_email_send.return_value = 1
 
         with self.assertNoLogs("paperless.handlers", level="ERROR"):
             run_workflows(
@@ -2869,7 +2861,7 @@ class TestWorkflows(
                 overrides=DocumentMetadataOverrides(),
             )
 
-        mock_send_email.assert_called_once()
+        mock_email_send.assert_called_once()
 
     @override_settings(
         PAPERLESS_EMAIL_HOST="localhost",
