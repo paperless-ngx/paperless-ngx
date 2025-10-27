@@ -2847,14 +2847,15 @@ class TestWorkflows(
             mime_type="application/pdf",
         )
 
+        attachment_opened = False
+
         def fake_send_email(subject, body, to, attachments, *, use_archive):
+            nonlocal attachment_opened
             self.assertEqual(["owner@example.com"], to)
             self.assertEqual(1, len(attachments))
             attachment = attachments[0]
-            self.assertTrue(
-                attachment.source_path.is_file(),
-                msg=f"Attachment path missing: {attachment.source_path}",
-            )
+            with attachment.source_path.open("rb"):
+                attachment_opened = True
             return 1
 
         mock_send_email.side_effect = fake_send_email
@@ -2866,6 +2867,10 @@ class TestWorkflows(
         )
 
         mock_send_email.assert_called_once()
+        self.assertTrue(
+            attachment_opened,
+            "Attachment source file should have been available to the email action",
+        )
 
     @override_settings(
         PAPERLESS_EMAIL_HOST="localhost",
