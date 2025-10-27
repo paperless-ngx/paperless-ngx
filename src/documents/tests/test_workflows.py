@@ -30,6 +30,7 @@ from pytest_django.fixtures import SettingsWrapper
 
 from documents import tasks
 from documents.data_models import ConsumableDocument
+from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.matching import document_matches_workflow
 from documents.matching import existing_document_matches_workflow
@@ -2839,12 +2840,17 @@ class TestWorkflows(
             self.dirs.scratch_dir / "working-copy.pdf",
         )
 
-        document = Document.objects.create(
+        Document.objects.create(
             title="workflow doc",
             correspondent=self.c,
             original_filename="simple.pdf",
             checksum="wf-assignment-email",
             mime_type="application/pdf",
+        )
+
+        consumable_document = ConsumableDocument(
+            source=DocumentSource.ConsumeFolder,
+            original_file=temp_working_copy,
         )
 
         def fake_send_email(subject, body, to, attachments, *, use_archive):
@@ -2859,9 +2865,9 @@ class TestWorkflows(
 
         with self.assertNoLogs("paperless.handlers", level="ERROR"):
             run_workflows(
-                WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
-                document,
-                original_file=Path(temp_working_copy),
+                WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                consumable_document,
+                overrides=DocumentMetadataOverrides(),
             )
 
         mock_send_email.assert_called_once()
