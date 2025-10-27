@@ -2847,30 +2847,24 @@ class TestWorkflows(
             mime_type="application/pdf",
         )
 
-        attachment_opened = False
-
         def fake_send_email(subject, body, to, attachments, *, use_archive):
-            nonlocal attachment_opened
             self.assertEqual(["owner@example.com"], to)
             self.assertEqual(1, len(attachments))
             attachment = attachments[0]
             with attachment.source_path.open("rb"):
-                attachment_opened = True
-            return 1
+                return 1
+            raise AssertionError("Attachment source file should have been available")
 
         mock_send_email.side_effect = fake_send_email
 
-        run_workflows(
-            WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
-            document,
-            original_file=Path(temp_working_copy),
-        )
+        with self.assertNoLogs("paperless.handlers", level="ERROR"):
+            run_workflows(
+                WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+                document,
+                original_file=Path(temp_working_copy),
+            )
 
         mock_send_email.assert_called_once()
-        self.assertTrue(
-            attachment_opened,
-            "Attachment source file should have been available to the email action",
-        )
 
     @override_settings(
         PAPERLESS_EMAIL_HOST="localhost",
