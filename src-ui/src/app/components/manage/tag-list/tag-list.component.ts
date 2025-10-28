@@ -64,7 +64,7 @@ export class TagListComponent extends ManagementListComponent<Tag> {
   override reloadData(extraParams: { [key: string]: any } = null) {
     const params = this.nameFilter?.length
       ? extraParams
-      : { ...(extraParams ?? {}), is_root: true }
+      : { ...extraParams, is_root: true }
     super.reloadData(params)
   }
 
@@ -76,16 +76,14 @@ export class TagListComponent extends ManagementListComponent<Tag> {
 
   protected override getSelectableIDs(tags: Tag[]): number[] {
     const ids: number[] = []
-    tags
-      .filter((t) => t)
-      ?.forEach((tag) => {
-        if (tag.id != null) {
-          ids.push(tag.id)
-        }
-        if (Array.isArray(tag.children) && tag.children.length) {
-          ids.push(...this.getSelectableIDs(tag.children))
-        }
-      })
+    for (const tag of tags.filter(Boolean)) {
+      if (tag.id != null) {
+        ids.push(tag.id)
+      }
+      if (Array.isArray(tag.children) && tag.children.length) {
+        ids.push(...this.getSelectableIDs(tag.children))
+      }
+    }
     return ids
   }
 }
