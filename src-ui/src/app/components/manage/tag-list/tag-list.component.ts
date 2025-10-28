@@ -73,4 +73,19 @@ export class TagListComponent extends ManagementListComponent<Tag> {
       ? [...data]
       : data.filter((tag) => !tag.parent)
   }
+
+  protected override getSelectableIDs(tags: Tag[]): number[] {
+    const ids: number[] = []
+    tags
+      .filter((t) => t)
+      ?.forEach((tag) => {
+        if (tag.id != null) {
+          ids.push(tag.id)
+        }
+        if (Array.isArray(tag.children) && tag.children.length) {
+          ids.push(...this.getSelectableIDs(tag.children))
+        }
+      })
+    return ids
+  }
 }

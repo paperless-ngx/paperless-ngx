@@ -115,4 +115,30 @@ describe('TagListComponent', () => {
       null
     )
   })
+
+  it('should include child tags when selecting all', () => {
+    const parent = {
+      id: 10,
+      name: 'Parent',
+      children: [
+        {
+          id: 11,
+          name: 'Child',
+        },
+      ],
+    }
+
+    component.data = [parent as any]
+    const selectEvent = { target: { checked: true } } as unknown as PointerEvent
+    component.toggleAll(selectEvent)
+
+    expect(component.selectedObjects.has(10)).toBe(true)
+    expect(component.selectedObjects.has(11)).toBe(true)
+
+    const deselectEvent = {
+      target: { checked: false },
+    } as unknown as PointerEvent
+    component.toggleAll(deselectEvent)
+    expect(component.selectedObjects.size).toBe(0)
+  })
 })
