@@ -77,9 +77,11 @@
               </div>
               <div ngbAccordion [closeOthers]="true" cdkDropList (cdkDropListDropped)="onActionDrop($event)">
                 @for (action of object?.actions; track action; let i = $index){
-                  <div ngbAccordionItem cdkDrag [formGroup]="actionFields.controls[i]">
-                    <div ngbAccordionHeader>
-                      <button ngbAccordionButton>{{i + 1}}. {{getActionTypeOptionName(actionFields.controls[i].value.type)}}
+                  <div ngbAccordionItem [formGroup]="actionFields.controls[i]">
+                    <div ngbAccordionHeader cdkDrag>
+                      <button ngbAccordionButton>
+                        <i-bs name="grip-vertical" class="ms-n3 pe-1"></i-bs>
+                        {{i + 1}}. {{getActionTypeOptionName(actionFields.controls[i].value.type)}}
                         @if(action.id) {
                           <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{action.id}}</span>
                         }
