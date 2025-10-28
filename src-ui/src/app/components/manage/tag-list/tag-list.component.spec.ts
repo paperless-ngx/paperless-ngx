@@ -17,6 +17,7 @@ describe('TagListComponent', () => {
   let component: TagListComponent
   let fixture: ComponentFixture<TagListComponent>
   let tagService: TagService
+  let listFilteredSpy: jest.SpyInstance
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -39,7 +40,7 @@ describe('TagListComponent', () => {
     }).compileComponents()
 
     tagService = TestBed.inject(TagService)
-    jest.spyOn(tagService, 'listFiltered').mockReturnValue(
+    listFilteredSpy = jest.spyOn(tagService, 'listFiltered').mockReturnValue(
       of({
         count: 3,
         all: [1, 2, 3],
@@ -86,5 +87,32 @@ describe('TagListComponent', () => {
     component['_nameFilter'] = 'Tag2' // Simulate non-empty name filter
     const filteredWithName = component.filterData(tags as any)
     expect(filteredWithName.length).toBe(3)
+  })
+
+  it('should request only parent tags when no name filter is applied', () => {
+    expect(tagService.listFiltered).toHaveBeenCalledWith(
+      1,
+      null,
+      undefined,
+      undefined,
+      undefined,
+      true,
+      { is_root: true }
+    )
+  })
+
+  it('should include child tags when a name filter is applied', () => {
+    listFilteredSpy.mockClear()
+    component['_nameFilter'] = 'Tag'
+    component.reloadData()
+    expect(tagService.listFiltered).toHaveBeenCalledWith(
+      1,
+      null,
+      undefined,
+      undefined,
+      'Tag',
+      true,
+      null
+    )
   })
 })

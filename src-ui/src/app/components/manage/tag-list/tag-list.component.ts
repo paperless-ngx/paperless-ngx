@@ -61,6 +61,13 @@ export class TagListComponent extends ManagementListComponent<Tag> {
     return $localize`Do you really want to delete the tag "${object.name}"?`
   }
 
+  override reloadData(extraParams: { [key: string]: any } = null) {
+    const params = this.nameFilter?.length
+      ? extraParams
+      : { ...(extraParams ?? {}), is_root: true }
+    super.reloadData(params)
+  }
+
   filterData(data: Tag[]) {
     return this.nameFilter?.length
       ? [...data]
