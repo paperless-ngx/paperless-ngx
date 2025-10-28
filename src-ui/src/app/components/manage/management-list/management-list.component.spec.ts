@@ -361,4 +361,11 @@ describe('ManagementListComponent', () => {
     const original = component.getOriginalObject({ id: 4 } as Tag)
     expect(original).toEqual(childTag)
   })
+
+  it('getSelectableIDs should return flat ids when not overridden', () => {
+    const ids = (
+      ManagementListComponent.prototype as any
+    ).getSelectableIDs.call({}, [{ id: 1 }, { id: 5 }] as any)
+    expect(ids).toEqual([1, 5])
+  })
 })
