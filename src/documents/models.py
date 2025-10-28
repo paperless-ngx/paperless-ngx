@@ -1548,7 +1548,7 @@ class Workflow(models.Model):
         return f"Workflow: {self.name}"
 
 
-class WorkflowRun(models.Model):
+class WorkflowRun(SoftDeleteModel):
     workflow = models.ForeignKey(
         Workflow,
         on_delete=models.CASCADE,
