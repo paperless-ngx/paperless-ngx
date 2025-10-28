@@ -114,6 +114,13 @@ export class FilterableDropdownSelectionModel {
           b.id == NEGATIVE_NULL_FILTER_VALUE)
       ) {
         return 1
+      }
+
+      // Preserve hierarchical order when provided (e.g., Tags)
+      const ao = (a as any)['orderIndex']
+      const bo = (b as any)['orderIndex']
+      if (ao !== undefined && bo !== undefined) {
+        return ao - bo
       } else if (
         this.getNonTemporary(a.id) == ToggleableItemState.NotSelected &&
         this.getNonTemporary(b.id) != ToggleableItemState.NotSelected
@@ -136,17 +143,14 @@ export class FilterableDropdownSelectionModel {
         this.getDocumentCount(a.id) < this.getDocumentCount(b.id)
       ) {
         return 1
-      }
-
-      // Preserve hierarchical order when provided (e.g., Tags)
-      const ao = (a as any)['orderIndex']
-      const bo = (b as any)['orderIndex']
-      if (ao !== undefined && bo !== undefined) {
-        return ao - bo
       } else {
         return a.name.localeCompare(b.name)
       }
     })
+
+    if (this._documentCounts.length) {
+      this.promoteBranchesWithDocumentCounts()
+    }
   }
 
   private selectionStates = new Map<number, ToggleableItemState>()
@@ -378,6 +382,122 @@ export class FilterableDropdownSelectionModel {
 
   getDocumentCount(id: number) {
     return this._documentCounts.find((c) => c.id === id)?.document_count
+  }
+
+  private promoteBranchesWithDocumentCounts() {
+    const parentById = new Map<number, number | null>()
+    const rootMemo = new Map<number, number | null>()
+    const docCountMemo = new Map<number, number>()
+
+    for (const item of this._items) {
+      if (typeof item.id === 'number') {
+        const parentValue = (item as any)['parent']
+        parentById.set(
+          item.id,
+          typeof parentValue === 'number' ? parentValue : null
+        )
+      }
+    }
+
+    const findRootId = (id: number): number | null => {
+      if (rootMemo.has(id)) {
+        return rootMemo.get(id)
+      }
+      const parentId = parentById.get(id)
+      if (parentId === undefined || parentId === null) {
+        rootMemo.set(id, id)
+        return id
+      }
+      const rootId = findRootId(parentId)
+      rootMemo.set(id, rootId)
+      return rootId
+    }
+
+    const getRootDocCount = (rootId: number | null): number => {
+      if (rootId === null) {
+        return 0
+      }
+      if (docCountMemo.has(rootId)) {
+        return docCountMemo.get(rootId)
+      }
+      const explicit = this.getDocumentCount(rootId)
+      if (typeof explicit === 'number') {
+        docCountMemo.set(rootId, explicit)
+        return explicit
+      }
+      const rootItem = this._items.find((i) => i.id === rootId)
+      const fallback =
+        typeof (rootItem as any)?.['document_count'] === 'number'
+          ? (rootItem as any)['document_count']
+          : 0
+      docCountMemo.set(rootId, fallback)
+      return fallback
+    }
+
+    type BranchSummary = {
+      items: MatchingModel[]
+      firstIndex: number
+      special: boolean
+      selected: boolean
+      hasDocs: boolean
+    }
+
+    const summaries = new Map<string, BranchSummary>()
+
+    this._items.forEach((item, index) => {
+      const isNullItem = item?.id === null
+      const isNegativeNull = item?.id === NEGATIVE_NULL_FILTER_VALUE
+      const numericId =
+        typeof item?.id === 'number' ? (item.id as number) : null
+      const rootId = numericId !== null ? findRootId(numericId) : null
+
+      const key = isNullItem
+        ? 'null'
+        : isNegativeNull
+          ? 'neg-null'
+          : rootId !== null
+            ? `root-${rootId}`
+            : `misc-${index}`
+
+      let summary = summaries.get(key)
+      if (!summary) {
+        const special = isNullItem || isNegativeNull
+        summary = {
+          items: [],
+          firstIndex: index,
+          special,
+          selected: false,
+          hasDocs:
+            !special && rootId !== null ? getRootDocCount(rootId) > 0 : false,
+        }
+        summaries.set(key, summary)
+      }
+
+      summary.items.push(item)
+
+      if (
+        !summary.special &&
+        numericId !== null &&
+        this.getNonTemporary(numericId) !== ToggleableItemState.NotSelected
+      ) {
+        summary.selected = true
+      }
+    })
+
+    const orderedBranches = Array.from(summaries.values()).sort((a, b) => {
+      const aRank = a.special ? -1 : a.selected ? 0 : 1
+      const bRank = b.special ? -1 : b.selected ? 0 : 1
+
+      if (aRank !== bRank) {
+        return aRank - bRank
+      }
+      if (a.hasDocs !== b.hasDocs) {
+        return a.hasDocs ? -1 : 1
+      }
+      return a.firstIndex - b.firstIndex
+    })
+
+    this._items = orderedBranches.flatMap((summary) => summary.items)
   }
 
   init(map: Map<number, ToggleableItemState>) {

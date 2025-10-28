@@ -564,6 +564,73 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     ])
   })
 
+  it('keeps children with their parent when parent has document count', () => {
+    const parent: Tag = {
+      id: 10,
+      name: 'Parent Tag',
+      orderIndex: 0,
+      document_count: 2,
+    }
+    const child: Tag = {
+      id: 11,
+      name: 'Child Tag',
+      parent: parent.id,
+      orderIndex: 1,
+      document_count: 0,
+    }
+    const otherRoot: Tag = {
+      id: 20,
+      name: 'Other Tag',
+      orderIndex: 2,
+      document_count: 0,
+    }
+
+    component.selectionModel.items = [parent, child, otherRoot]
+    component.selectionModel = selectionModel
+    component.documentCounts = [
+      { id: parent.id, document_count: 2 },
+      { id: otherRoot.id, document_count: 0 },
+    ]
+    selectionModel.apply()
+
+    expect(component.selectionModel.items).toEqual([
+      nullItem,
+      parent,
+      child,
+      otherRoot,
+    ])
+  })
+
+  it('keeps selected branches ahead of document-based ordering', () => {
+    const selectedRoot: Tag = {
+      id: 30,
+      name: 'Selected Root',
+      orderIndex: 0,
+      document_count: 0,
+    }
+    const otherRoot: Tag = {
+      id: 40,
+      name: 'Other Root',
+      orderIndex: 1,
+      document_count: 2,
+    }
+
+    component.selectionModel.items = [selectedRoot, otherRoot]
+    component.selectionModel = selectionModel
+    selectionModel.set(selectedRoot.id, ToggleableItemState.Selected)
+    component.documentCounts = [
+      { id: selectedRoot.id, document_count: 0 },
+      { id: otherRoot.id, document_count: 2 },
+    ]
+    selectionModel.apply()
+
+    expect(component.selectionModel.items).toEqual([
+      nullItem,
+      selectedRoot,
+      otherRoot,
+    ])
+  })
+
   it('should set support create, keep open model and call createRef method', fakeAsync(() => {
     component.selectionModel.items = items
     component.icon = 'tag-fill'
