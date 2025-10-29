@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-22 18:15+0000\n"
-"PO-Revision-Date: 2025-10-22 18:18\n"
+"POT-Creation-Date: 2025-10-28 18:06+0000\n"
+"PO-Revision-Date: 2025-10-28 18:08\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Документы"
 
-#: documents/filters.py:386
+#: documents/filters.py:392
 msgid "Value must be valid JSON."
 msgstr "Значение должно быть корректным JSON."
 
-#: documents/filters.py:405
+#: documents/filters.py:411
 msgid "Invalid custom field query expression"
 msgstr "Неверное выражение запроса пользовательского поля"
 
-#: documents/filters.py:415
+#: documents/filters.py:421
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Недопустимый список выражений. Не может быть пустым."
 
-#: documents/filters.py:436
+#: documents/filters.py:442
 msgid "Invalid logical operator {op!r}"
 msgstr "Недопустимый логический оператор {op!r}"
 
-#: documents/filters.py:450
+#: documents/filters.py:456
 msgid "Maximum number of query conditions exceeded."
 msgstr "Превышено максимальное количество условий запроса."
 
-#: documents/filters.py:515
+#: documents/filters.py:521
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} не является допустимым пользовательским полем."
 
-#: documents/filters.py:552
+#: documents/filters.py:558
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} не поддерживает запрос {expr!r}."
 
-#: documents/filters.py:660 documents/models.py:135
+#: documents/filters.py:666 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
 msgstr "Превышена максимальная глубина вложения."
 
-#: documents/filters.py:845
+#: documents/filters.py:851
 msgid "Custom field not found"
 msgstr "Пользовательское поле не найдено"
 

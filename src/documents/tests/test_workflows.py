@@ -30,6 +30,7 @@ from pytest_django.fixtures import SettingsWrapper
 
 from documents import tasks
 from documents.data_models import ConsumableDocument
+from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.matching import document_matches_workflow
 from documents.matching import existing_document_matches_workflow
@@ -2787,6 +2788,80 @@ class TestWorkflows(
         self.assertEqual(doc.owner, self.user2)
         self.assertEqual(doc.tags.all().count(), 1)
         self.assertIn(self.t2, doc.tags.all())
+
+    @override_settings(
+        PAPERLESS_EMAIL_HOST="localhost",
+        EMAIL_ENABLED=True,
+        PAPERLESS_URL="http://localhost:8000",
+    )
+    @mock.patch("django.core.mail.message.EmailMessage.send")
+    def test_workflow_assignment_then_email_includes_attachment(self, mock_email_send):
+        """
+        GIVEN:
+            - Workflow with assignment and email actions
+            - Email action configured to include the document
+        WHEN:
+            - Workflow is run on a newly created document
+        THEN:
+            - Email action sends the document as an attachment
+        """
+
+        storage_path = StoragePath.objects.create(
+            name="sp2",
+            path="workflow/{{ document.pk }}",
+        )
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+        )
+        assignment_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.ASSIGNMENT,
+            assign_storage_path=storage_path,
+            assign_owner=self.user2,
+        )
+        assignment_action.assign_tags.add(self.t1)
+
+        email_action_config = WorkflowActionEmail.objects.create(
+            subject="Doc ready {doc_title}",
+            body="Document URL: {doc_url}",
+            to="owner@example.com",
+            include_document=True,
+        )
+        email_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.EMAIL,
+            email=email_action_config,
+        )
+
+        workflow = Workflow.objects.create(name="Assignment then email", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.set([assignment_action, email_action])
+
+        temp_working_copy = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "working-copy.pdf",
+        )
+
+        Document.objects.create(
+            title="workflow doc",
+            correspondent=self.c,
+            checksum="wf-assignment-email",
+            mime_type="application/pdf",
+        )
+
+        consumable_document = ConsumableDocument(
+            source=DocumentSource.ConsumeFolder,
+            original_file=temp_working_copy,
+        )
+
+        mock_email_send.return_value = 1
+
+        with self.assertNoLogs("paperless.handlers", level="ERROR"):
+            run_workflows(
+                WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                consumable_document,
+                overrides=DocumentMetadataOverrides(),
+            )
+
+        mock_email_send.assert_called_once()
 
     @override_settings(
         PAPERLESS_EMAIL_HOST="localhost",
