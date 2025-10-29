@@ -92,6 +92,12 @@ class TagFilterSet(FilterSet):
             "name": CHAR_KWARGS,
         }
 
+    is_root = BooleanFilter(
+        label="Is root tag",
+        field_name="tn_parent",
+        lookup_expr="isnull",
+    )
+
 
 class DocumentTypeFilterSet(FilterSet):
     class Meta:

@@ -140,7 +140,7 @@
 
   @if (object.children && object.children.length > 0) {
     @for (child of object.children; track child) {
-      <ng-container [ngTemplateOutlet]="objectRow" [ngTemplateOutletContext]="{ object: child, depth: depth + 1 }"></ng-container>
+      <ng-container [ngTemplateOutlet]="objectRow" [ngTemplateOutletContext]="{ object: getOriginalObject(child), depth: depth + 1 }"></ng-container>
     }
   }
 </ng-template>

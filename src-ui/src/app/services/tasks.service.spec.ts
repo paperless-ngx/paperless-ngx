@@ -51,7 +51,7 @@ describe('TasksService', () => {
   })
 
   it('calls acknowledge_tasks api endpoint on dismiss and reloads', () => {
-    tasksService.dismissTasks(new Set([1, 2, 3]))
+    tasksService.dismissTasks(new Set([1, 2, 3])).subscribe()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}tasks/acknowledge/`
     )

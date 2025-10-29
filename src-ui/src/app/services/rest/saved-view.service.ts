@@ -17,7 +17,6 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
   private settingsService = inject(SettingsService)
   private documentService = inject(DocumentService)
 
-  public loading: boolean = true
   private savedViews: SavedView[] = []
   private savedViewDocumentCounts: Map<number, number> = new Map()
   private unsubscribeNotifier: Subject<void> = new Subject<void>()
@@ -38,12 +37,12 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
       tap({
         next: (r) => {
           this.savedViews = r.results
-          this.loading = false
+          this._loading = false
           this.settingsService.dashboardIsEmpty =
             this.dashboardViews.length === 0
         },
         error: () => {
-          this.loading = false
+          this._loading = false
           this.settingsService.dashboardIsEmpty = true
         },
       })

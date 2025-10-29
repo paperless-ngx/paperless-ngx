@@ -16,6 +16,7 @@ import {
   NgbNavItem,
 } from '@ng-bootstrap/ng-bootstrap'
 import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import {
   PaperlessTask,
@@ -28,6 +29,7 @@ import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { TasksService } from 'src/app/services/tasks.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
@@ -123,6 +125,7 @@ describe('TasksComponent', () => {
   let router: Router
   let httpTestingController: HttpTestingController
   let reloadSpy
+  let toastService: ToastService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -157,6 +160,7 @@ describe('TasksComponent', () => {
     httpTestingController = TestBed.inject(HttpTestingController)
     modalService = TestBed.inject(NgbModal)
     router = TestBed.inject(Router)
+    toastService = TestBed.inject(ToastService)
     fixture = TestBed.createComponent(TasksComponent)
     component = fixture.componentInstance
     jest.useFakeTimers()
@@ -247,6 +251,42 @@ describe('TasksComponent', () => {
     expect(modal).not.toBeUndefined()
     modal.componentInstance.confirmClicked.emit()
     expect(dismissSpy).toHaveBeenCalledWith(selected)
+  })
+
+  it('should show an error and re-enable modal buttons when dismissing multiple tasks fails', () => {
+    component.selectedTasks = new Set([tasks[0].id, tasks[1].id])
+    const error = new Error('dismiss failed')
+    const toastSpy = jest.spyOn(toastService, 'showError')
+    const dismissSpy = jest
+      .spyOn(tasksService, 'dismissTasks')
+      .mockReturnValue(throwError(() => error))
+
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
+
+    component.dismissTasks()
+    expect(modal).not.toBeUndefined()
+
+    modal.componentInstance.confirmClicked.emit()
+
+    expect(dismissSpy).toHaveBeenCalledWith(new Set([tasks[0].id, tasks[1].id]))
+    expect(toastSpy).toHaveBeenCalledWith('Error dismissing tasks', error)
+    expect(modal.componentInstance.buttonsEnabled).toBe(true)
+    expect(component.selectedTasks.size).toBe(0)
+  })
+
+  it('should show an error when dismissing a single task fails', () => {
+    const error = new Error('dismiss failed')
+    const toastSpy = jest.spyOn(toastService, 'showError')
+    const dismissSpy = jest
+      .spyOn(tasksService, 'dismissTasks')
+      .mockReturnValue(throwError(() => error))
+
+    component.dismissTask(tasks[0])
+
+    expect(dismissSpy).toHaveBeenCalledWith(new Set([tasks[0].id]))
+    expect(toastSpy).toHaveBeenCalledWith('Error dismissing task', error)
+    expect(component.selectedTasks.size).toBe(0)
   })
 
   it('should support dismiss all tasks', () => {

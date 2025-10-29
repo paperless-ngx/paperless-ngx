@@ -615,7 +615,10 @@ export class DocumentDetailComponent
       })
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        if (this.openDocumentService.isDirty(this.document)) this.saveEditNext()
+        if (this.openDocumentService.isDirty(this.document)) {
+          if (this.hasNext()) this.saveEditNext()
+          else this.save(true)
+        }
       })
   }
 
@@ -1478,7 +1481,7 @@ export class DocumentDetailComponent
     const modal = this.modalService.open(EmailDocumentDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.documentId = this.document.id
+    modal.componentInstance.documentIds = [this.document.id]
     modal.componentInstance.hasArchiveVersion =
       !!this.document?.archived_file_name
   }

@@ -57,6 +57,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
 from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema_serializer
 from drf_spectacular.utils import extend_schema_view
 from drf_spectacular.utils import inline_serializer
 from guardian.utils import get_group_obj_perms_model
@@ -136,9 +137,12 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.parsers import get_parser_class_for_mime_type
 from documents.parsers import parse_date_generator
+from documents.permissions import AcknowledgeTasksPermissions
 from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessNotePermissions
 from documents.permissions import PaperlessObjectPermissions
+from documents.permissions import ViewDocumentsPermissions
+from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
@@ -152,6 +156,7 @@ from documents.serialisers import CustomFieldSerializer
 from documents.serialisers import DocumentListSerializer
 from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
+from documents.serialisers import EmailSerializer
 from documents.serialisers import NotesSerializer
 from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import RunTaskViewSerializer
@@ -264,13 +269,6 @@ class BulkPermissionMixin:
     Prefetch Django-Guardian permissions for a list before serialization, to avoid N+1 queries.
     """
 
-    def get_permission_codenames(self):
-        model_name = self.queryset.model.__name__.lower()
-        return {
-            "view": f"view_{model_name}",
-            "change": f"change_{model_name}",
-        }
-
     def _get_object_perms(
         self,
         objects: list,
@@ -332,22 +330,32 @@ class BulkPermissionMixin:
         else:
             queryset = self.filter_queryset(self.get_queryset())
 
-        codenames = self.get_permission_codenames()
-        perm_names = [codenames["view"], codenames["change"]]
-        user_perms = self._get_object_perms(queryset, perm_names, actor="users")
-        group_perms = self._get_object_perms(queryset, perm_names, actor="groups")
+        model_name = self.queryset.model.__name__.lower()
+        permission_name_view = f"view_{model_name}"
+        permission_name_change = f"change_{model_name}"
+
+        user_perms = self._get_object_perms(
+            objects=queryset,
+            perm_codenames=[permission_name_view, permission_name_change],
+            actor="users",
+        )
+        group_perms = self._get_object_perms(
+            objects=queryset,
+            perm_codenames=[permission_name_view, permission_name_change],
+            actor="groups",
+        )
 
         context["users_view_perms"] = {
-            pk: user_perms[pk][codenames["view"]] for pk in user_perms
+            pk: user_perms[pk][permission_name_view] for pk in user_perms
         }
         context["users_change_perms"] = {
-            pk: user_perms[pk][codenames["change"]] for pk in user_perms
+            pk: user_perms[pk][permission_name_change] for pk in user_perms
         }
         context["groups_view_perms"] = {
-            pk: group_perms[pk][codenames["view"]] for pk in group_perms
+            pk: group_perms[pk][permission_name_view] for pk in group_perms
         }
         context["groups_change_perms"] = {
-            pk: group_perms[pk][codenames["change"]] for pk in group_perms
+            pk: group_perms[pk][permission_name_change] for pk in group_perms
         }
 
         return context
@@ -358,21 +366,13 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
     Mixin to add document count to queryset, permissions-aware if needed
     """
 
+    def get_document_count_filter(self):
+        request = getattr(self, "request", None)
+        user = getattr(request, "user", None) if request else None
+        return get_document_count_filter_for_user(user)
+
     def get_queryset(self):
-        filter = (
-            Q(documents__deleted_at__isnull=True)
-            if self.request.user is None or self.request.user.is_superuser
-            else (
-                Q(
-                    documents__deleted_at__isnull=True,
-                    documents__id__in=get_objects_for_user_owner_aware(
-                        self.request.user,
-                        "documents.view_document",
-                        Document,
-                    ).values_list("id", flat=True),
-                )
-            )
-        )
+        filter = self.get_document_count_filter()
         return (
             super()
             .get_queryset()
@@ -441,6 +441,11 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     filterset_class = TagFilterSet
     ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["document_count_filter"] = self.get_document_count_filter()
+        return context
+
     def perform_update(self, serializer):
         old_parent = self.get_object().get_parent()
         tag = serializer.save()
@@ -465,6 +470,14 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     )
     filterset_class = DocumentTypeFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
+
+
+@extend_schema_serializer(
+    component_name="EmailDocumentRequest",
+    exclude_fields=("documents",),
+)
+class EmailDocumentDetailSchema(EmailSerializer):
+    pass
 
 
 @extend_schema_view(
@@ -634,20 +647,28 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             404: None,
         },
     ),
-    email=extend_schema(
+    email_document=extend_schema(
         description="Email the document to one or more recipients as an attachment.",
-        request=inline_serializer(
-            name="EmailRequest",
-            fields={
-                "addresses": serializers.CharField(),
-                "subject": serializers.CharField(),
-                "message": serializers.CharField(),
-                "use_archive_version": serializers.BooleanField(default=True),
-            },
-        ),
+        request=EmailDocumentDetailSchema,
         responses={
             200: inline_serializer(
-                name="EmailResponse",
+                name="EmailDocumentResponse",
+                fields={"message": serializers.CharField()},
+            ),
+            400: None,
+            403: None,
+            404: None,
+            500: None,
+        },
+        deprecated=True,
+    ),
+    email_documents=extend_schema(
+        operation_id="email_documents",
+        description="Email one or more documents as attachments to one or more recipients.",
+        request=EmailSerializer,
+        responses={
+            200: inline_serializer(
+                name="EmailDocumentsResponse",
                 fields={"message": serializers.CharField()},
             ),
             400: None,
@@ -1151,55 +1172,63 @@ class DocumentViewSet(
 
         return Response(sorted(entries, key=lambda x: x["timestamp"], reverse=True))
 
-    @action(methods=["post"], detail=True)
-    def email(self, request, pk=None):
-        try:
-            doc = Document.objects.select_related("owner").get(pk=pk)
+    @action(
+        methods=["post"],
+        detail=True,
+        url_path="email",
+        permission_classes=[IsAuthenticated, ViewDocumentsPermissions],
+    )
+    # TODO: deprecated as of 2.19, remove in future release
+    def email_document(self, request, pk=None):
+        request_data = request.data.copy()
+        request_data.setlist("documents", [pk])
+        return self.email_documents(request, data=request_data)
+
+    @action(
+        methods=["post"],
+        detail=False,
+        url_path="email",
+        serializer_class=EmailSerializer,
+        permission_classes=[IsAuthenticated, ViewDocumentsPermissions],
+    )
+    def email_documents(self, request, data=None):
+        serializer = EmailSerializer(data=data or request.data)
+        serializer.is_valid(raise_exception=True)
+
+        validated_data = serializer.validated_data
+        document_ids = validated_data.get("documents")
+        addresses = validated_data.get("addresses").split(",")
+        addresses = [addr.strip() for addr in addresses]
+        subject = validated_data.get("subject")
+        message = validated_data.get("message")
+        use_archive_version = validated_data.get("use_archive_version", True)
+
+        documents = Document.objects.select_related("owner").filter(pk__in=document_ids)
+        for document in documents:
             if request.user is not None and not has_perms_owner_aware(
                 request.user,
                 "view_document",
-                doc,
+                document,
             ):
                 return HttpResponseForbidden("Insufficient permissions")
-        except Document.DoesNotExist:
-            raise Http404
 
         try:
-            if (
-                "addresses" not in request.data
-                or "subject" not in request.data
-                or "message" not in request.data
-            ):
-                return HttpResponseBadRequest("Missing required fields")
-
-            use_archive_version = request.data.get("use_archive_version", True)
-
-            addresses = request.data.get("addresses").split(",")
-            if not all(
-                re.match(r"[^@]+@[^@]+\.[^@]+", address.strip())
-                for address in addresses
-            ):
-                return HttpResponseBadRequest("Invalid email address found")
-
             send_email(
-                subject=request.data.get("subject"),
-                body=request.data.get("message"),
+                subject=subject,
+                body=message,
                 to=addresses,
-                attachment=(
-                    doc.archive_path
-                    if use_archive_version and doc.has_archive_version
-                    else doc.source_path
-                ),
-                attachment_mime_type=doc.mime_type,
+                attachments=documents,
+                use_archive=use_archive_version,
             )
+
             logger.debug(
-                f"Sent document {doc.id} via email to {addresses}",
+                f"Sent documents {[doc.id for doc in documents]} via email to {addresses}",
             )
             return Response({"message": "Email sent"})
         except Exception as e:
-            logger.warning(f"An error occurred emailing document: {e!s}")
+            logger.warning(f"An error occurred emailing documents: {e!s}")
             return HttpResponseServerError(
-                "Error emailing document, check logs for more detail.",
+                "Error emailing documents, check logs for more detail.",
             )
 
 
@@ -2484,7 +2513,11 @@ class TasksViewSet(ReadOnlyModelViewSet):
             queryset = PaperlessTask.objects.filter(task_id=task_id)
         return queryset
 
-    @action(methods=["post"], detail=False)
+    @action(
+        methods=["post"],
+        detail=False,
+        permission_classes=[IsAuthenticated, AcknowledgeTasksPermissions],
+    )
     def acknowledge(self, request):
         serializer = AcknowledgeTasksViewSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

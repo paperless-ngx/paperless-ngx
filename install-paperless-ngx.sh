@@ -374,7 +374,7 @@ fi
 # of the provided folder
 if [[ -n $DATABASE_FOLDER ]] ; then
 	if [[ "$DATABASE_BACKEND" == "postgres" ]] ; then
-		sed -i "s#- pgdata:/var/lib/postgresql/data#- $DATABASE_FOLDER:/var/lib/postgresql/data#g" docker-compose.yml
+		sed -i "s#- pgdata:/var/lib/postgresql#- $DATABASE_FOLDER:/var/lib/postgresql#g" docker-compose.yml
 		sed -i "/^\s*pgdata:/d" docker-compose.yml
 	elif [[ "$DATABASE_BACKEND" == "mariadb" ]]; then
 		sed -i "s#- dbdata:/var/lib/mysql#- $DATABASE_FOLDER:/var/lib/mysql#g" docker-compose.yml
