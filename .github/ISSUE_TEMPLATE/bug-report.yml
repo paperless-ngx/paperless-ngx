@@ -6,8 +6,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        ### ⚠️ Please remember: issues are for *bugs*
-        That is, something you believe affects every single user of Paperless-ngx, not just you. If you're not sure, start with one of the other options below.
+        ### ⚠️ Please remember: issues are for *bugs* only! ⚠️
+        That is, something you believe affects every single user of Paperless-ngx (and the demo, for example), not just you. If you are not sure, start with one of the other options below.
 
         Also, note that **Paperless-ngx does not perform OCR or archive file creation itself**, those are handled by other tools. Problems with OCR or archive versions of specific files should likely be raised 'upstream', see https://github.com/ocrmypdf/OCRmyPDF/issues or https://github.com/tesseract-ocr/tesseract/issues
   - type: markdown
@@ -58,6 +58,12 @@ body:
     attributes:
       label: Browser logs
       description: Logs from the web browser related to your issue, if needed
+      render: bash
+  - type: textarea
+    id: logs_services
+    attributes:
+      label: Services logs
+      description: Logs from other services (or containers) related to your issue, if needed. For example, the database or redis logs.
       render: bash
   - type: input
     id: version

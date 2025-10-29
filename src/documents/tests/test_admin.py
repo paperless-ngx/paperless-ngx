@@ -2,9 +2,11 @@ import types
 from unittest.mock import patch
 
 from django.contrib.admin.sites import AdminSite
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.utils import timezone
+from rest_framework import status
 
 from documents import index
 from documents.admin import DocumentAdmin
@@ -125,3 +127,36 @@ class TestPaperlessAdmin(DirectoriesMixin, TestCase):
         form.request = types.SimpleNamespace(user=superuser)
         self.assertTrue(form.is_valid())
         self.assertEqual({}, form.errors)
+
+    def test_superuser_can_only_be_modified_by_superuser(self):
+        superuser = User.objects.create_superuser(username="superuser", password="test")
+        user = User.objects.create(
+            username="test",
+            is_superuser=False,
+            is_staff=True,
+        )
+        change_user_perm = Permission.objects.get(codename="change_user")
+        user.user_permissions.add(change_user_perm)
+
+        self.client.force_login(user)
+        response = self.client.patch(
+            f"/api/users/{superuser.pk}/",
+            {"first_name": "Updated"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(
+            response.content.decode(),
+            "Superusers can only be modified by other superusers",
+        )
+
+        self.client.logout()
+        self.client.force_login(superuser)
+        response = self.client.patch(
+            f"/api/users/{superuser.pk}/",
+            {"first_name": "Updated"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        superuser.refresh_from_db()
+        self.assertEqual(superuser.first_name, "Updated")
