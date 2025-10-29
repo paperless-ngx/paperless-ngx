@@ -1,0 +1,20 @@
+name: Deploy to VPS
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to DigitalOcean
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: ${{ secrets.DROPLET_USER }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          script: |
+            cd ~/paperless-ngx
+            git fetch origin main
+            git reset --hard origin/main
+            docker compose -f docker/compose/docker-compose.postgres.yml up
