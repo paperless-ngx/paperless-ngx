@@ -701,6 +701,20 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     expect(getRootDocCount(memoRoot.id)).toEqual(9)
   })
 
+  it('falls back to model stored document counts if selection data missing entry', () => {
+    const rootWithoutSelection: Tag = {
+      id: 90,
+      name: 'Fallback Root',
+      document_count: 4,
+    }
+    selectionModel.items = [rootWithoutSelection]
+    selectionModel.documentCounts = []
+
+    const getRootDocCount = (selectionModel as any).createRootDocCounter()
+
+    expect(getRootDocCount(rootWithoutSelection.id)).toEqual(4)
+  })
+
   it('should set support create, keep open model and call createRef method', fakeAsync(() => {
     component.selectionModel.items = items
     component.icon = 'tag-fill'
