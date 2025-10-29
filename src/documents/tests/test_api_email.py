@@ -329,6 +329,34 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_email_only_requires_view_permission(self):
+        """
+        GIVEN:
+            - User having only view documents permission
+        WHEN:
+            - API request is made to bulk email documents
+        THEN:
+            - Request succeeds
+        """
+        user1 = User.objects.create_user(username="test1")
+        user1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+
+        self.client.force_authenticate(user1)
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "documents": [self.doc1.pk],
+                    "addresses": "test@example.com",
+                    "subject": "Test",
+                    "message": "Test message",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     @override_settings(
         EMAIL_ENABLED=True,
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",

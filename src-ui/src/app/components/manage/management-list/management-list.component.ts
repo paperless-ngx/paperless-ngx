@@ -297,11 +297,17 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   }
 
   toggleAll(event: PointerEvent) {
-    if ((event.target as HTMLInputElement).checked) {
-      this.selectedObjects = new Set(this.data.map((o) => o.id))
+    const checked = (event.target as HTMLInputElement).checked
+    this.togggleAll = checked
+    if (checked) {
+      this.selectedObjects = new Set(this.getSelectableIDs(this.data))
     } else {
       this.clearSelection()
     }
+  }
+
+  protected getSelectableIDs(objects: T[]): number[] {
+    return objects.map((o) => o.id)
   }
 
   clearSelection() {

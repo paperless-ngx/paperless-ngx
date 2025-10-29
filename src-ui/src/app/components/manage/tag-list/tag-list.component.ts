@@ -61,9 +61,29 @@ export class TagListComponent extends ManagementListComponent<Tag> {
     return $localize`Do you really want to delete the tag "${object.name}"?`
   }
 
+  override reloadData(extraParams: { [key: string]: any } = null) {
+    const params = this.nameFilter?.length
+      ? extraParams
+      : { ...extraParams, is_root: true }
+    super.reloadData(params)
+  }
+
   filterData(data: Tag[]) {
     return this.nameFilter?.length
       ? [...data]
       : data.filter((tag) => !tag.parent)
+  }
+
+  protected override getSelectableIDs(tags: Tag[]): number[] {
+    const ids: number[] = []
+    for (const tag of tags.filter(Boolean)) {
+      if (tag.id != null) {
+        ids.push(tag.id)
+      }
+      if (Array.isArray(tag.children) && tag.children.length) {
+        ids.push(...this.getSelectableIDs(tag.children))
+      }
+    }
+    return ids
   }
 }
