@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-22 18:15+0000\n"
-"PO-Revision-Date: 2025-10-22 18:18\n"
+"POT-Creation-Date: 2025-10-28 18:06+0000\n"
+"PO-Revision-Date: 2025-10-28 18:08\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Documentos"
 
-#: documents/filters.py:386
+#: documents/filters.py:392
 msgid "Value must be valid JSON."
 msgstr "El valor debe ser JSON válido."
 
-#: documents/filters.py:405
+#: documents/filters.py:411
 msgid "Invalid custom field query expression"
 msgstr "Expresión de consulta de campo personalizado no válida"
 
-#: documents/filters.py:415
+#: documents/filters.py:421
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Lista de expresiones no válida. No debe estar vacía."
 
-#: documents/filters.py:436
+#: documents/filters.py:442
 msgid "Invalid logical operator {op!r}"
 msgstr "Operador lógico inválido {op!r}"
 
-#: documents/filters.py:450
+#: documents/filters.py:456
 msgid "Maximum number of query conditions exceeded."
 msgstr "Se ha superado el número máximo de condiciones de consulta."
 
-#: documents/filters.py:515
+#: documents/filters.py:521
 msgid "{name!r} is not a valid custom field."
 msgstr "{nombre!r} no es un campo personalizado válido."
 
-#: documents/filters.py:552
+#: documents/filters.py:558
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} no admite la consulta expr {expr!r}."
 
-#: documents/filters.py:660 documents/models.py:135
+#: documents/filters.py:666 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
 msgstr "Profundidad máxima de nidificación superada."
 
-#: documents/filters.py:845
+#: documents/filters.py:851
 msgid "Custom field not found"
 msgstr "Campo personalizado no encontrado"
 
@@ -136,11 +136,11 @@ msgstr "etiquetas"
 
 #: documents/models.py:123
 msgid "Cannot set itself as parent."
-msgstr ""
+msgstr "No se puede establecer a sí mismo como padre."
 
 #: documents/models.py:125
 msgid "Cannot set parent to a descendant."
-msgstr ""
+msgstr "No se puede establecer el padre a un descendiente."
 
 #: documents/models.py:142 documents/models.py:190
 msgid "document type"
@@ -758,7 +758,7 @@ msgstr "Selecciona"
 
 #: documents/models.py:795
 msgid "Long Text"
-msgstr ""
+msgstr "Texto largo"
 
 #: documents/models.py:807
 msgid "data type"
@@ -858,11 +858,11 @@ msgstr "tiene estas etiqueta(s)"
 
 #: documents/models.py:1072
 msgid "has all of these tag(s)"
-msgstr ""
+msgstr "tiene todas estas etiqueta(s)"
 
 #: documents/models.py:1079
 msgid "does not have these tag(s)"
-msgstr ""
+msgstr "no tiene estas etiqueta(s)"
 
 #: documents/models.py:1087
 msgid "has this document type"
@@ -870,7 +870,7 @@ msgstr "tiene este tipo de documento"
 
 #: documents/models.py:1094
 msgid "does not have these document type(s)"
-msgstr ""
+msgstr "no tiene estos tipos de documento (s)"
 
 #: documents/models.py:1102
 msgid "has this correspondent"
@@ -882,19 +882,19 @@ msgstr ""
 
 #: documents/models.py:1117
 msgid "has this storage path"
-msgstr ""
+msgstr "tiene esta ruta de almacenamiento"
 
 #: documents/models.py:1124
 msgid "does not have these storage path(s)"
-msgstr ""
+msgstr "no tiene esta(s) ruta(s) de almacenamiento"
 
 #: documents/models.py:1128
 msgid "filter custom field query"
-msgstr ""
+msgstr "filtrar consulta de campo personalizado"
 
 #: documents/models.py:1131
 msgid "JSON-encoded custom field query expression."
-msgstr ""
+msgstr "Expresión de consulta de campo personalizado codificado en JSON."
 
 #: documents/models.py:1135
 msgid "schedule offset days"
@@ -1038,7 +1038,7 @@ msgstr "asignar título"
 
 #: documents/models.py:1302
 msgid "Assign a document title, must  be a Jinja2 template, see documentation."
-msgstr ""
+msgstr "Asignar un título de documento, debe ser una plantilla de Jinja2, ver documentación."
 
 #: documents/models.py:1310 paperless_mail/models.py:274
 msgid "assign this tag"
@@ -1225,20 +1225,20 @@ msgstr "Tipo de fichero %(type)s no suportado"
 #: documents/serialisers.py:1849
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
-msgstr ""
+msgstr "El id del campo personalizado debe ser un entero: %(id)s"
 
 #: documents/serialisers.py:1856
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
-msgstr ""
+msgstr "El campo personalizado con identificador %(id)s no existe"
 
 #: documents/serialisers.py:1873 documents/serialisers.py:1883
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
-msgstr ""
+msgstr "Los campos personalizados deben ser una lista de enteros o un identificador de mapeo de objetos a valores."
 
 #: documents/serialisers.py:1878
 msgid "Some custom fields don't exist or were specified twice."
-msgstr ""
+msgstr "Algunos campos personalizados no existen o fueron especificados dos veces."
 
 #: documents/serialisers.py:1993
 msgid "Invalid variable detected."
@@ -1473,21 +1473,21 @@ msgstr "Como último paso, por favor complete el siguiente formulario:"
 #: documents/validators.py:24
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "No se puede analizar la URI {value}, falta el esquema"
 
 #: documents/validators.py:29
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "No se puede analizar la URI {value}, falta la ubicación de la red o la ruta"
 
 #: documents/validators.py:36
 msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
-msgstr ""
+msgstr "El esquema URI '{parts.scheme}' no está permitido. Esquemas permitidos: {', '.join(allowed_schemes)}"
 
 #: documents/validators.py:45
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "No se puede analizar la URI {value}"
 
 #: paperless/apps.py:11
 msgid "Paperless"
@@ -1731,7 +1731,7 @@ msgstr "Español"
 
 #: paperless/settings.py:785
 msgid "Persian"
-msgstr ""
+msgstr "Persa"
 
 #: paperless/settings.py:786
 msgid "Finnish"
@@ -1815,7 +1815,7 @@ msgstr "Ucraniano"
 
 #: paperless/settings.py:806
 msgid "Vietnamese"
-msgstr ""
+msgstr "Vietnamita"
 
 #: paperless/settings.py:807
 msgid "Chinese Simplified"
