@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-22 18:15+0000\n"
-"PO-Revision-Date: 2025-10-22 18:18\n"
+"POT-Creation-Date: 2025-10-28 18:06+0000\n"
+"PO-Revision-Date: 2025-10-29 12:14\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Documents"
 
-#: documents/filters.py:386
+#: documents/filters.py:392
 msgid "Value must be valid JSON."
 msgstr "La valeur doit être un JSON valide."
 
-#: documents/filters.py:405
+#: documents/filters.py:411
 msgid "Invalid custom field query expression"
-msgstr "Expression de requête personnalisée invalide"
+msgstr "Requête de champ personnalisé invalide"
 
-#: documents/filters.py:415
+#: documents/filters.py:421
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Liste d’expressions invalide. Doit être non vide."
 
-#: documents/filters.py:436
+#: documents/filters.py:442
 msgid "Invalid logical operator {op!r}"
 msgstr "Opérateur logique {op!r} invalide"
 
-#: documents/filters.py:450
+#: documents/filters.py:456
 msgid "Maximum number of query conditions exceeded."
 msgstr "Nombre maximum de conditions de requête dépassé."
 
-#: documents/filters.py:515
+#: documents/filters.py:521
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} n'est pas un champ personnalisé valide."
 
-#: documents/filters.py:552
+#: documents/filters.py:558
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} ne supporte pas l'expression {expr!r}."
 
-#: documents/filters.py:660 documents/models.py:135
+#: documents/filters.py:666 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
 msgstr "Profondeur de récursion maximale dépassée."
 
-#: documents/filters.py:845
+#: documents/filters.py:851
 msgid "Custom field not found"
 msgstr "Champ personnalisé non trouvé"
 
@@ -136,11 +136,11 @@ msgstr "étiquettes"
 
 #: documents/models.py:123
 msgid "Cannot set itself as parent."
-msgstr ""
+msgstr "Impossible de se définir comme parent."
 
 #: documents/models.py:125
 msgid "Cannot set parent to a descendant."
-msgstr ""
+msgstr "Impossible de défini un parent comme descendant."
 
 #: documents/models.py:142 documents/models.py:190
 msgid "document type"
@@ -862,7 +862,7 @@ msgstr "a toutes ces étiquettes"
 
 #: documents/models.py:1079
 msgid "does not have these tag(s)"
-msgstr ""
+msgstr "n'a pas ce(s) tag(s)"
 
 #: documents/models.py:1087
 msgid "has this document type"
@@ -870,7 +870,7 @@ msgstr "A ce type de document"
 
 #: documents/models.py:1094
 msgid "does not have these document type(s)"
-msgstr ""
+msgstr "n'a pas ce(s) type(s) de document"
 
 #: documents/models.py:1102
 msgid "has this correspondent"
@@ -878,7 +878,7 @@ msgstr "A ce correspondant"
 
 #: documents/models.py:1109
 msgid "does not have these correspondent(s)"
-msgstr ""
+msgstr "n'a pas ce(s) correspondant(s)"
 
 #: documents/models.py:1117
 msgid "has this storage path"
@@ -890,11 +890,11 @@ msgstr ""
 
 #: documents/models.py:1128
 msgid "filter custom field query"
-msgstr ""
+msgstr "filtrer la requête de champ personnalisé"
 
 #: documents/models.py:1131
 msgid "JSON-encoded custom field query expression."
-msgstr ""
+msgstr "Expression de champ personnalisé encodée en JSON."
 
 #: documents/models.py:1135
 msgid "schedule offset days"
@@ -1225,20 +1225,20 @@ msgstr "Type de fichier %(type)s non pris en charge"
 #: documents/serialisers.py:1849
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
-msgstr ""
+msgstr "L'id du champ personnalisé doit être un entier : %(id)s"
 
 #: documents/serialisers.py:1856
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
-msgstr ""
+msgstr "Le champ personnalisé avec l'id %(id)s n'existe pas"
 
 #: documents/serialisers.py:1873 documents/serialisers.py:1883
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
-msgstr ""
+msgstr "Les champs personnalisés doivent être une liste d'entiers ou un mappage d'identifiants à des valeurs."
 
 #: documents/serialisers.py:1878
 msgid "Some custom fields don't exist or were specified twice."
-msgstr ""
+msgstr "Certains champs personnalisés n'existent pas ou ont été spécifiés deux fois."
 
 #: documents/serialisers.py:1993
 msgid "Invalid variable detected."
