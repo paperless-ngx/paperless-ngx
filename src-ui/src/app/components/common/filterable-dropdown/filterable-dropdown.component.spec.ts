@@ -631,6 +631,76 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     ])
   })
 
+  it('uses fallback document counts when selection data is missing', () => {
+    const fallbackRoot: Tag = {
+      id: 50,
+      name: 'Fallback Root',
+      orderIndex: 0,
+      document_count: 3,
+    }
+    const fallbackChild: Tag = {
+      id: 51,
+      name: 'Fallback Child',
+      parent: fallbackRoot.id,
+      orderIndex: 1,
+      document_count: 0,
+    }
+    const otherRoot: Tag = {
+      id: 60,
+      name: 'Other Root',
+      orderIndex: 2,
+      document_count: 0,
+    }
+
+    component.selectionModel = selectionModel
+    selectionModel.items = [fallbackRoot, fallbackChild, otherRoot]
+    component.documentCounts = [{ id: otherRoot.id, document_count: 0 }]
+
+    selectionModel.apply()
+
+    expect(selectionModel.items).toEqual([
+      nullItem,
+      fallbackRoot,
+      fallbackChild,
+      otherRoot,
+    ])
+  })
+
+  it('handles special and non-numeric ids when promoting branches', () => {
+    const rootWithDocs: Tag = {
+      id: 70,
+      name: 'Root With Docs',
+      orderIndex: 0,
+      document_count: 1,
+    }
+    const miscItem: any = { id: 'misc', name: 'Misc Item' }
+
+    component.selectionModel = selectionModel
+    selectionModel.intersection = Intersection.Exclude
+    selectionModel.items = [rootWithDocs, miscItem as any]
+    component.documentCounts = [{ id: rootWithDocs.id, document_count: 1 }]
+
+    selectionModel.apply()
+
+    expect(selectionModel.items.map((item) => item.id)).toEqual([
+      NEGATIVE_NULL_FILTER_VALUE,
+      rootWithDocs.id,
+      'misc',
+    ])
+  })
+
+  it('memoizes root document counts between lookups', () => {
+    const memoRoot: Tag = { id: 80, name: 'Memo Root' }
+    selectionModel.items = [memoRoot]
+    selectionModel.documentCounts = [{ id: memoRoot.id, document_count: 9 }]
+
+    const getRootDocCount = (selectionModel as any).createRootDocCounter()
+
+    expect(getRootDocCount(memoRoot.id)).toEqual(9)
+    selectionModel.documentCounts = []
+    expect(getRootDocCount(memoRoot.id)).toEqual(9)
+  })
+
   it('should set support create, keep open model and call createRef method', fakeAsync(() => {
     component.selectionModel.items = items
     component.icon = 'tag-fill'
