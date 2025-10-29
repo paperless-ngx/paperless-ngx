@@ -476,7 +476,7 @@ export class FilterableDropdownSelectionModel {
   ): Map<string, BranchSummary> {
     const summaries = new Map<string, BranchSummary>()
 
-    this._items.forEach((item, index) => {
+    for (const [index, item] of this._items.entries()) {
       const { key, special, rootId } = this.describeBranchItem(
         item,
         index,
@@ -501,7 +501,7 @@ export class FilterableDropdownSelectionModel {
       if (this.shouldMarkSummarySelected(summary, item)) {
         summary.selected = true
       }
-    })
+    }
 
     return summaries
   }
