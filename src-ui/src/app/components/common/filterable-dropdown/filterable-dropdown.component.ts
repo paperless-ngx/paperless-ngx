@@ -444,20 +444,19 @@ export class FilterableDropdownSelectionModel {
 
     const summaries = new Map<string, BranchSummary>()
 
-    this._items.forEach((item, index) => {
+    for (const [index, item] of this._items.entries()) {
       const isNullItem = item?.id === null
       const isNegativeNull = item?.id === NEGATIVE_NULL_FILTER_VALUE
-      const numericId =
-        typeof item?.id === 'number' ? (item.id as number) : null
-      const rootId = numericId !== null ? findRootId(numericId) : null
+      const rootId = item?.id !== null ? findRootId(item.id) : null
 
-      const key = isNullItem
-        ? 'null'
-        : isNegativeNull
-          ? 'neg-null'
-          : rootId !== null
-            ? `root-${rootId}`
-            : `misc-${index}`
+      let key: string = `misc-${index}`
+      if (isNullItem) {
+        key = 'null'
+      } else if (isNegativeNull) {
+        key = 'neg-null'
+      } else if (rootId !== null) {
+        key = `root-${rootId}`
+      }
 
       let summary = summaries.get(key)
       if (!summary) {
@@ -477,16 +476,22 @@ export class FilterableDropdownSelectionModel {
 
       if (
         !summary.special &&
-        numericId !== null &&
-        this.getNonTemporary(numericId) !== ToggleableItemState.NotSelected
+        item?.id !== null &&
+        this.getNonTemporary(item.id) !== ToggleableItemState.NotSelected
       ) {
         summary.selected = true
       }
-    })
+    }
 
     const orderedBranches = Array.from(summaries.values()).sort((a, b) => {
-      const aRank = a.special ? -1 : a.selected ? 0 : 1
-      const bRank = b.special ? -1 : b.selected ? 0 : 1
+      const getBranchRank = (s: BranchSummary) => {
+        if (s.special) return -1
+        if (s.selected) return 0
+        return 1
+      }
+
+      const aRank = getBranchRank(a)
+      const bRank = getBranchRank(b)
 
       if (aRank !== bRank) {
         return aRank - bRank
