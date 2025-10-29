@@ -420,12 +420,13 @@ export class FilterableDropdownSelectionModel {
 
   private createRootFinder(
     parentById: Map<number, number | null>
-  ): (id: number) => number | null {
-    const rootMemo = new Map<number, number | null>()
+  ): (id: number) => number {
+    const rootMemo = new Map<number, number>()
 
-    const findRootId = (id: number): number | null => {
-      if (rootMemo.has(id)) {
-        return rootMemo.get(id) ?? null
+    const findRootId = (id: number): number => {
+      const cached = rootMemo.get(id)
+      if (cached !== undefined) {
+        return cached
       }
 
       const parentId = parentById.get(id)
@@ -442,15 +443,13 @@ export class FilterableDropdownSelectionModel {
     return findRootId
   }
 
-  private createRootDocCounter(): (rootId: number | null) => number {
+  private createRootDocCounter(): (rootId: number) => number {
     const docCountMemo = new Map<number, number>()
 
-    return (rootId: number | null): number => {
-      if (rootId === null) {
-        return 0
-      }
-      if (docCountMemo.has(rootId)) {
-        return docCountMemo.get(rootId) ?? 0
+    return (rootId: number): number => {
+      const cached = docCountMemo.get(rootId)
+      if (cached !== undefined) {
+        return cached
       }
 
       const explicit = this.getDocumentCount(rootId)
@@ -471,8 +470,8 @@ export class FilterableDropdownSelectionModel {
   }
 
   private buildBranchSummaries(
-    findRootId: (id: number) => number | null,
-    getRootDocCount: (rootId: number | null) => number
+    findRootId: (id: number) => number,
+    getRootDocCount: (rootId: number) => number
   ): Map<string, BranchSummary> {
     const summaries = new Map<string, BranchSummary>()
 
@@ -509,7 +508,7 @@ export class FilterableDropdownSelectionModel {
   private describeBranchItem(
     item: MatchingModel,
     index: number,
-    findRootId: (id: number) => number | null
+    findRootId: (id: number) => number
   ): { key: string; special: boolean; rootId: number | null } {
     if (item?.id === null) {
       return { key: 'null', special: true, rootId: null }
@@ -521,9 +520,6 @@ export class FilterableDropdownSelectionModel {
 
     if (typeof item?.id === 'number') {
       const rootId = findRootId(item.id)
-      if (rootId === null) {
-        return { key: `misc-${index}`, special: false, rootId: null }
-      }
       return { key: `root-${rootId}`, special: false, rootId }
     }
 
