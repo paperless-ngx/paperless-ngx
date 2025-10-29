@@ -229,3 +229,24 @@ class TestTagHierarchy(APITestCase):
         assert resp_ok.status_code in (200, 202)
         x.refresh_from_db()
         assert x.parent_pk == c.id
+
+    def test_is_root_filter_returns_only_root_tags(self):
+        other_root = Tag.objects.create(name="Other parent")
+
+        response = self.client.get(
+            "/api/tags/",
+            {"is_root": "true"},
+        )
+
+        assert response.status_code == 200
+        assert response.data["count"] == 2
+
+        returned_ids = {row["id"] for row in response.data["results"]}
+        assert self.child.pk not in returned_ids
+        assert self.parent.pk in returned_ids
+        assert other_root.pk in returned_ids
+
+        parent_entry = next(
+            row for row in response.data["results"] if row["id"] == self.parent.pk
+        )
+        assert any(child["id"] == self.child.pk for child in parent_entry["children"])

@@ -147,6 +147,7 @@ from documents.permissions import AcknowledgeTasksPermissions
 from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessNotePermissions
 from documents.permissions import PaperlessObjectPermissions
+from documents.permissions import ViewDocumentsPermissions
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
@@ -1252,7 +1253,12 @@ class DocumentViewSet(
 
         return Response(sorted(entries, key=lambda x: x["timestamp"], reverse=True))
 
-    @action(methods=["post"], detail=True, url_path="email")
+    @action(
+        methods=["post"],
+        detail=True,
+        url_path="email",
+        permission_classes=[IsAuthenticated, ViewDocumentsPermissions],
+    )
     # TODO: deprecated as of 2.19, remove in future release
     def email_document(self, request, pk=None):
         request_data = request.data.copy()
@@ -1264,6 +1270,7 @@ class DocumentViewSet(
         detail=False,
         url_path="email",
         serializer_class=EmailSerializer,
+        permission_classes=[IsAuthenticated, ViewDocumentsPermissions],
     )
     def email_documents(self, request, data=None):
         serializer = EmailSerializer(data=data or request.data)

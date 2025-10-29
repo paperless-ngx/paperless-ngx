@@ -164,6 +164,24 @@ def has_perms_owner_aware(user, perms, obj):
     return obj.owner is None or obj.owner == user or checker.has_perm(perms, obj)
 
 
+class ViewDocumentsPermissions(BasePermission):
+    """
+    Permissions class that checks for model permissions for only viewing Documents.
+    """
+
+    perms_map = {
+        "OPTIONS": ["documents.view_document"],
+        "GET": ["documents.view_document"],
+        "POST": ["documents.view_document"],
+    }
+
+    def has_permission(self, request, view):
+        if not request.user or (not request.user.is_authenticated):  # pragma: no cover
+            return False
+
+        return request.user.has_perms(self.perms_map.get(request.method, []))
+
+
 class PaperlessNotePermissions(BasePermission):
     """
     Permissions class that checks for model permissions for Notes.
