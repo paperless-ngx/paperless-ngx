@@ -5,7 +5,6 @@ import {
   Component,
   OnDestroy,
   OnInit,
-  ViewChild,
   inject,
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -35,7 +34,7 @@ export class LogsComponent
   private logService = inject(LogService)
   private changedetectorRef = inject(ChangeDetectorRef)
 
-  public logs: Array<{ message: string; level: number }> = []
+  public logs: string[] = []
 
   public logFiles: string[] = []
 
@@ -76,43 +75,29 @@ export class LogsComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (result) => {
-          this.logs = this.parseLogsWithLevel(result)
+          this.logs = result
           this.loading = false
           this.scrollToBottom()
         },
-        error: (error) => {
-          console.error('Error loading logs:', error)
+        error: () => {
           this.logs = []
           this.loading = false
         },
       })
   }
 
-  getLogLevel(log: string): number {
-    if (log.includes('[DEBUG]')) {
+  getLogLevel(log: string) {
+    if (log.indexOf('[DEBUG]') != -1) {
       return 10
-    } else if (log.includes('[WARNING]')) {
+    } else if (log.indexOf('[WARNING]') != -1) {
       return 30
-    } else if (log.includes('[ERROR]')) {
+    } else if (log.indexOf('[ERROR]') != -1) {
       return 40
-    } else if (log.includes('[CRITICAL]')) {
+    } else if (log.indexOf('[CRITICAL]') != -1) {
       return 50
     } else {
       return 20
     }
-  }
-
-  private parseLogsWithLevel(
-    logs: string[]
-  ): Array<{ message: string; level: number }> {
-    return logs.map((log) => ({
-      message: log,
-      level: this.getLogLevel(log),
-    }))
-  }
-
-  trackByIndex(index: number): number {
-    return index
   }
 
   scrollToBottom(): void {
