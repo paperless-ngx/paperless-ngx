@@ -52,7 +52,7 @@ describe('LogsComponent', () => {
     logService = TestBed.inject(LogService)
     jest.spyOn(logService, 'list').mockReturnValue(of(['paperless', 'mail']))
     logSpy = jest.spyOn(logService, 'get')
-    logSpy.mockImplementation((id) => {
+    logSpy.mockImplementation((id, options) => {
       return of(id === 'paperless' ? paperless_logs : mail_logs)
     })
     fixture = TestBed.createComponent(LogsComponent)
@@ -63,7 +63,7 @@ describe('LogsComponent', () => {
   })
 
   it('should display logs with first log initially', () => {
-    expect(logSpy).toHaveBeenCalledWith('paperless')
+    expect(logSpy).toHaveBeenCalledWith('paperless', { tail: 5000 })
     fixture.detectChanges()
     expect(fixture.debugElement.nativeElement.textContent).toContain(
       paperless_logs[0]
@@ -74,7 +74,7 @@ describe('LogsComponent', () => {
     fixture.debugElement
       .queryAll(By.directive(NgbNavLink))[1]
       .nativeElement.dispatchEvent(new MouseEvent('click'))
-    expect(logSpy).toHaveBeenCalledWith('mail')
+    expect(logSpy).toHaveBeenCalledWith('mail', { tail: 5000 })
   })
 
   it('should handle error with no logs', () => {
@@ -86,11 +86,11 @@ describe('LogsComponent', () => {
   })
 
   it('should auto refresh, allow toggle', () => {
-    jest.advanceTimersByTime(6000)
+    jest.advanceTimersByTime(31000)
     expect(reloadSpy).toHaveBeenCalledTimes(2)
 
     component.autoRefreshEnabled = false
-    jest.advanceTimersByTime(6000)
+    jest.advanceTimersByTime(31000)
     expect(reloadSpy).toHaveBeenCalledTimes(2)
   })
 })

@@ -1362,6 +1362,13 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 type=OpenApiTypes.STR,
                 location=OpenApiParameter.PATH,
             ),
+            OpenApiParameter(
+                name="tail",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="Limit the number of lines returned to the last N lines",
+                required=False,
+            ),
         ],
         responses={
             (200, "application/json"): serializers.ListSerializer(
@@ -1393,8 +1400,18 @@ class LogViewSet(ViewSet):
         if not log_file.is_file():
             raise Http404
 
+        tail = request.query_params.get("tail", None)
+
         with log_file.open() as f:
-            lines = [line.rstrip() for line in f.readlines()]
+            if tail:
+                try:
+                    tail_lines = int(tail)
+                    all_lines = f.readlines()
+                    lines = [line.rstrip() for line in all_lines[-tail_lines:]]
+                except (ValueError, TypeError):
+                    lines = [line.rstrip() for line in f.readlines()]
+            else:
+                lines = [line.rstrip() for line in f.readlines()]
 
         return Response(lines)
 

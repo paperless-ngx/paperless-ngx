@@ -3,9 +3,20 @@
   i18n-title
   info="Review the log files for the application and for email checking."
   i18n-info>
-  <div class="form-check form-switch mb-0">
-    <input class="form-check-input" type="checkbox" role="switch" [(ngModel)]="autoRefreshEnabled">
-    <label class="form-check-label" for="autoRefreshSwitch" i18n>Auto refresh</label>
+  <div class="d-flex align-items-center gap-3">
+    <div class="form-check form-switch mb-0">
+      <input class="form-check-input" type="checkbox" role="switch" [(ngModel)]="autoRefreshEnabled">
+      <label class="form-check-label" for="autoRefreshSwitch" i18n>Auto refresh</label>
+    </div>
+    @if (autoRefreshEnabled) {
+      <select class="form-select form-select-sm" style="width: auto;" [(ngModel)]="autoRefreshInterval">
+        <option [value]="10">Every 10s</option>
+        <option [value]="30">Every 30s</option>
+        <option [value]="60">Every 60s</option>
+        <option [value]="90">Every 90s</option>
+        <option [value]="120">Every 2m</option>
+      </select>
+    }
   </div>
 </pngx-page-header>
 
@@ -31,16 +42,23 @@
 
 <cdk-virtual-scroll-viewport
   itemSize="20"
-  class="bg-dark p-3 text-light font-monospace log-container">
+  class="bg-dark p-3 text-light font-monospace log-container"
+  #logContainer>
+  @if (isLoadingMore) {
+    <output class="text-center py-2">
+      <div class="spinner-border spinner-border-sm me-2"></div>
+      <span i18n>Loading older logs...</span>
+    </output>
+  }
   @if (loading && logFiles.length) {
     <output>
       <div class="spinner-border spinner-border-sm me-2"></div>
       <ng-container i18n>Loading...</ng-container>
     </output>
   }
-  <p *cdkVirtualFor="let log of logs; trackBy: trackByIndex"
+  <p *cdkVirtualFor="let log of logs; trackBy: trackByIndex; let i = index"
      class="m-0 p-0"
      [ngClass]="'log-entry-' + log.level">
-    {{log.message}}
+    <span class="text-muted me-2">[{{i + 1}}]</span>{{log.message}}
   </p>
 </cdk-virtual-scroll-viewport>
