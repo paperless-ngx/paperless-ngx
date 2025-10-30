@@ -1448,16 +1448,23 @@ export class DocumentDetailComponent
               iframe.contentWindow.focus()
               iframe.contentWindow.print()
               iframe.contentWindow.onafterprint = () => {
-                timer(500).subscribe(() => {
-                  // delay to avoid print failure
+                timer(100).subscribe(() => {
+                  // delay to avoid FF print failure
                   document.body.removeChild(iframe)
                   URL.revokeObjectURL(blobUrl)
                 })
               }
             } catch (err) {
-              this.toastService.showError($localize`Print failed.`, err)
-              timer(500).subscribe(() => {
-                // delay to avoid print failure
+              const isCrossOriginAfterPrintError =
+                err instanceof DOMException &&
+                (err.name === 'SecurityError' ||
+                  err.message.includes('onafterprint')) &&
+                err.message.includes('cross-origin')
+              if (!isCrossOriginAfterPrintError) {
+                this.toastService.showError($localize`Print failed.`, err)
+              }
+              timer(100).subscribe(() => {
+                // delay to avoid FF print failure
                 document.body.removeChild(iframe)
                 URL.revokeObjectURL(blobUrl)
               })
