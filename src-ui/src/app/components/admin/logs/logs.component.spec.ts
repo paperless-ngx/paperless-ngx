@@ -1,5 +1,6 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { CommonModule } from '@angular/common'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { BrowserModule, By } from '@angular/platform-browser'
 import { NgbModule, NgbNavLink } from '@ng-bootstrap/ng-bootstrap'
@@ -34,6 +35,7 @@ describe('LogsComponent', () => {
   beforeEach(async () => {
     TestBed.configureTestingModule({
       imports: [
+        CommonModule,
         BrowserModule,
         NgbModule,
         ScrollingModule,
@@ -61,7 +63,7 @@ describe('LogsComponent', () => {
   })
 
   it('should display logs with first log initially', () => {
-    expect(logSpy).toHaveBeenCalledWith('paperless')
+    expect(logSpy).toHaveBeenCalledWith('paperless', { tail: 1000 })
     fixture.detectChanges()
     expect(fixture.debugElement.nativeElement.textContent).toContain(
       paperless_logs[0]
@@ -72,7 +74,7 @@ describe('LogsComponent', () => {
     fixture.debugElement
       .queryAll(By.directive(NgbNavLink))[1]
       .nativeElement.dispatchEvent(new MouseEvent('click'))
-    expect(logSpy).toHaveBeenCalledWith('mail')
+    expect(logSpy).toHaveBeenCalledWith('mail', { tail: 1000 })
   })
 
   it('should handle error with no logs', () => {
