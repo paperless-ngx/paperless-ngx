@@ -58,7 +58,6 @@ describe('LogsComponent', () => {
     fixture = TestBed.createComponent(LogsComponent)
     component = fixture.componentInstance
     reloadSpy = jest.spyOn(component, 'reloadLogs')
-    window.HTMLElement.prototype.scroll = function () {}
     jest.useFakeTimers()
     fixture.detectChanges()
   })

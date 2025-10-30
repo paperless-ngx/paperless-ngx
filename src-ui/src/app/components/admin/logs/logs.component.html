@@ -38,8 +38,9 @@
       <ng-container i18n>Loading...</ng-container>
     </output>
   }
-  <p *cdkVirtualFor="let log of logs"
-     class="m-0 p-0 log-entry-{{getLogLevel(log)}}">
-    {{log}}
+  <p *cdkVirtualFor="let log of logs; trackBy: trackByIndex"
+     class="m-0 p-0"
+     [ngClass]="'log-entry-' + log.level">
+    {{log.message}}
   </p>
 </cdk-virtual-scroll-viewport>

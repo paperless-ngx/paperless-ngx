@@ -16,9 +16,9 @@
 }
 
 .log-container {
-  overflow-y: scroll;
-  height: calc(100vh - 200px);
-  top: 70px;
+  overflow-y: auto;
+  height: calc(100vh - 250px);
+  max-height: calc(100vh - 250px);
 
   p {
     white-space: pre-wrap;
