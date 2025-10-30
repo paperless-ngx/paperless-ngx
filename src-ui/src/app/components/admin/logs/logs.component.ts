@@ -1,7 +1,11 @@
 import {
+  CdkVirtualScrollViewport,
+  ScrollingModule,
+} from '@angular/cdk/scrolling'
+import { CommonModule } from '@angular/common'
+import {
   ChangeDetectorRef,
   Component,
-  ElementRef,
   OnDestroy,
   OnInit,
   ViewChild,
@@ -21,8 +25,11 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
   imports: [
     PageHeaderComponent,
     NgbNavModule,
+    CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    CdkVirtualScrollViewport,
+    ScrollingModule,
   ],
 })
 export class LogsComponent
@@ -32,7 +39,7 @@ export class LogsComponent
   private logService = inject(LogService)
   private changedetectorRef = inject(ChangeDetectorRef)
 
-  public logs: string[] = []
+  public logs: Array<{ message: string; level: number }> = []
 
   public logFiles: string[] = []
 
@@ -40,7 +47,7 @@ export class LogsComponent
 
   public autoRefreshEnabled: boolean = true
 
-  @ViewChild('logContainer') logContainer: ElementRef
+  @ViewChild('logContainer') logContainer: CdkVirtualScrollViewport
 
   ngOnInit(): void {
     this.logService
@@ -75,7 +82,7 @@ export class LogsComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (result) => {
-          this.logs = result
+          this.logs = this.parseLogsWithLevel(result)
           this.loading = false
           this.scrollToBottom()
         },
@@ -100,12 +107,19 @@ export class LogsComponent
     }
   }
 
+  private parseLogsWithLevel(
+    logs: string[]
+  ): Array<{ message: string; level: number }> {
+    return logs.map((log) => ({
+      message: log,
+      level: this.getLogLevel(log),
+    }))
+  }
+
   scrollToBottom(): void {
     this.changedetectorRef.detectChanges()
-    this.logContainer?.nativeElement.scroll({
-      top: this.logContainer.nativeElement.scrollHeight,
-      left: 0,
-      behavior: 'auto',
-    })
+    if (this.logContainer) {
+      this.logContainer.scrollToIndex(this.logs.length - 1)
+    }
   }
 }
