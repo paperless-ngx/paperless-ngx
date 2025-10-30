@@ -113,10 +113,6 @@ export class LogsComponent
     }))
   }
 
-  trackByIndex(index: number): number {
-    return index
-  }
-
   scrollToBottom(): void {
     this.changedetectorRef.detectChanges()
     if (this.logContainer) {

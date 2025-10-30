@@ -39,7 +39,7 @@
       <ng-container i18n>Loading...</ng-container>
     </div>
   }
-  <p *cdkVirtualFor="let log of logs; trackBy: trackByIndex"
+  <p *cdkVirtualFor="let log of logs; track $index"
      class="m-0 p-0"
      [ngClass]="'log-entry-' + log.level">
     {{log.message}}
