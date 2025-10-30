@@ -15,8 +15,6 @@ export class LogService {
 
   get(id: string, options?: { tail?: number }): Observable<string[]> {
     const params = options?.tail ? { tail: options.tail.toString() } : {}
-    return this.http.get<string[]>(`${environment.apiBaseUrl}logs/${id}/`, {
-      params,
-    })
+    return this.http.get<string[]>(`${environment.apiBaseUrl}logs/${id}/`, { params })
   }
 }
