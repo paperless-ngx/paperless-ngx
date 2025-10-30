@@ -90,6 +90,10 @@ describe('LogsComponent', () => {
   })
 
   it('should auto refresh, allow toggle', () => {
+    jest
+      .spyOn(CdkVirtualScrollViewport.prototype, 'scrollToIndex')
+      .mockImplementation(() => undefined)
+
     jest.advanceTimersByTime(6000)
     expect(reloadSpy).toHaveBeenCalledTimes(2)
 
