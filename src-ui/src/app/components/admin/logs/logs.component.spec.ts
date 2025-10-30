@@ -3,6 +3,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { BrowserModule, By } from '@angular/platform-browser'
 import { NgbModule, NgbNavLink } from '@ng-bootstrap/ng-bootstrap'
+import { ScrollingModule } from '@angular/cdk/scrolling'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { LogService } from 'src/app/services/rest/log.service'
@@ -35,6 +36,7 @@ describe('LogsComponent', () => {
       imports: [
         BrowserModule,
         NgbModule,
+        ScrollingModule,
         NgxBootstrapIconsModule.pick(allIcons),
         LogsComponent,
         PageHeaderComponent,
@@ -48,7 +50,7 @@ describe('LogsComponent', () => {
     logService = TestBed.inject(LogService)
     jest.spyOn(logService, 'list').mockReturnValue(of(['paperless', 'mail']))
     logSpy = jest.spyOn(logService, 'get')
-    logSpy.mockImplementation((id) => {
+    logSpy.mockImplementation((id, options) => {
       return of(id === 'paperless' ? paperless_logs : mail_logs)
     })
     fixture = TestBed.createComponent(LogsComponent)

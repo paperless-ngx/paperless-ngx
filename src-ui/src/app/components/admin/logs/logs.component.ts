@@ -9,6 +9,7 @@ import {
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
+import { ScrollingModule } from '@angular/cdk/scrolling'
 import { filter, takeUntil, timer } from 'rxjs'
 import { LogService } from 'src/app/services/rest/log.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
@@ -23,6 +24,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     NgbNavModule,
     FormsModule,
     ReactiveFormsModule,
+    ScrollingModule,
   ],
 })
 export class LogsComponent
@@ -32,7 +34,7 @@ export class LogsComponent
   private logService = inject(LogService)
   private changedetectorRef = inject(ChangeDetectorRef)
 
-  public logs: string[] = []
+  public logs: Array<{ message: string; level: number }> = []
 
   public logFiles: string[] = []
 
@@ -71,11 +73,11 @@ export class LogsComponent
   reloadLogs() {
     this.loading = true
     this.logService
-      .get(this.activeLog)
+      .get(this.activeLog, { tail: 1000 })
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (result) => {
-          this.logs = result
+          this.logs = this.parseLogsWithLevel(result)
           this.loading = false
           this.scrollToBottom()
         },
@@ -100,12 +102,21 @@ export class LogsComponent
     }
   }
 
+  private parseLogsWithLevel(logs: string[]): Array<{ message: string; level: number }> {
+    return logs.map(log => ({
+      message: log,
+      level: this.getLogLevel(log)
+    }))
+  }
+
+  trackByIndex(index: number): number {
+    return index
+  }
+
   scrollToBottom(): void {
     this.changedetectorRef.detectChanges()
-    this.logContainer?.nativeElement.scroll({
-      top: this.logContainer.nativeElement.scrollHeight,
-      left: 0,
-      behavior: 'auto',
-    })
+    if (this.logContainer) {
+      this.logContainer.scrollToIndex(this.logs.length - 1, 'auto')
+    }
   }
 }
