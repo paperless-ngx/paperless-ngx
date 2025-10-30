@@ -1,3 +1,8 @@
+import {
+  CdkVirtualScrollViewport,
+  ScrollingModule,
+} from '@angular/cdk/scrolling'
+import { CommonModule } from '@angular/common'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
@@ -38,6 +43,9 @@ describe('LogsComponent', () => {
         NgxBootstrapIconsModule.pick(allIcons),
         LogsComponent,
         PageHeaderComponent,
+        CommonModule,
+        CdkVirtualScrollViewport,
+        ScrollingModule,
       ],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
@@ -54,7 +62,6 @@ describe('LogsComponent', () => {
     fixture = TestBed.createComponent(LogsComponent)
     component = fixture.componentInstance
     reloadSpy = jest.spyOn(component, 'reloadLogs')
-    window.HTMLElement.prototype.scroll = function () {} // mock scroll
     jest.useFakeTimers()
     fixture.detectChanges()
   })
@@ -83,6 +90,10 @@ describe('LogsComponent', () => {
   })
 
   it('should auto refresh, allow toggle', () => {
+    jest
+      .spyOn(CdkVirtualScrollViewport.prototype, 'scrollToIndex')
+      .mockImplementation(() => undefined)
+
     jest.advanceTimersByTime(6000)
     expect(reloadSpy).toHaveBeenCalledTimes(2)
 
