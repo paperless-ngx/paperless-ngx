@@ -2,6 +2,7 @@ import {
   CdkVirtualScrollViewport,
   ScrollingModule,
 } from '@angular/cdk/scrolling'
+import { CommonModule } from '@angular/common'
 import {
   ChangeDetectorRef,
   Component,
@@ -24,8 +25,10 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
   imports: [
     PageHeaderComponent,
     NgbNavModule,
+    CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    CdkVirtualScrollViewport,
     ScrollingModule,
   ],
 })

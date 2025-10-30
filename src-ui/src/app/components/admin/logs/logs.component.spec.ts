@@ -1,4 +1,8 @@
-import { ScrollingModule } from '@angular/cdk/scrolling'
+import {
+  CdkVirtualScrollViewport,
+  ScrollingModule,
+} from '@angular/cdk/scrolling'
+import { CommonModule } from '@angular/common'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
@@ -36,10 +40,12 @@ describe('LogsComponent', () => {
       imports: [
         BrowserModule,
         NgbModule,
-        ScrollingModule,
         NgxBootstrapIconsModule.pick(allIcons),
         LogsComponent,
         PageHeaderComponent,
+        CommonModule,
+        CdkVirtualScrollViewport,
+        ScrollingModule,
       ],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
