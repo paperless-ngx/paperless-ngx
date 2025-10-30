@@ -29,12 +29,12 @@
     </li>
   }
   @if (loading || !logFiles.length) {
-    <div class="ps-2 d-flex align-items-center">
-      <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+    <output class="ps-2 d-flex align-items-center">
+      <div class="spinner-border spinner-border-sm me-2"></div>
       @if (!logFiles.length) {
         <ng-container i18n>Loading...</ng-container>
       }
-    </div>
+    </output>
   }
 </ul>
 
@@ -45,16 +45,16 @@
   class="bg-dark p-3 text-light font-monospace log-container"
   #logContainer>
   @if (isLoadingMore) {
-    <div class="text-center py-2">
-      <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+    <output class="text-center py-2">
+      <div class="spinner-border spinner-border-sm me-2"></div>
       <span i18n>Loading older logs...</span>
-    </div>
+    </output>
   }
   @if (loading && logFiles.length) {
-    <div>
-      <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+    <output>
+      <div class="spinner-border spinner-border-sm me-2"></div>
       <ng-container i18n>Loading...</ng-container>
-    </div>
+    </output>
   }
   <p *cdkVirtualFor="let log of logs; trackBy: trackByIndex; let i = index"
      class="m-0 p-0"
