@@ -86,11 +86,11 @@ describe('LogsComponent', () => {
   })
 
   it('should auto refresh, allow toggle', () => {
-    jest.advanceTimersByTime(6000)
+    jest.advanceTimersByTime(31000)
     expect(reloadSpy).toHaveBeenCalledTimes(2)
 
     component.autoRefreshEnabled = false
-    jest.advanceTimersByTime(6000)
+    jest.advanceTimersByTime(31000)
     expect(reloadSpy).toHaveBeenCalledTimes(2)
   })
 })
