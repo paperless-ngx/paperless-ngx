@@ -1448,13 +1448,11 @@ export class DocumentDetailComponent
               iframe.contentWindow.focus()
               iframe.contentWindow.print()
               iframe.contentWindow.onafterprint = () => {
-                timer(100).subscribe(() => {
-                  // delay to avoid FF print failure
-                  document.body.removeChild(iframe)
-                  URL.revokeObjectURL(blobUrl)
-                })
+                document.body.removeChild(iframe)
+                URL.revokeObjectURL(blobUrl)
               }
             } catch (err) {
+              // FF throws cross-origin error on onafterprint
               const isCrossOriginAfterPrintError =
                 err instanceof DOMException &&
                 (err.name === 'SecurityError' ||
