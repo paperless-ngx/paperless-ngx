@@ -50,7 +50,7 @@ describe('LogsComponent', () => {
     logService = TestBed.inject(LogService)
     jest.spyOn(logService, 'list').mockReturnValue(of(['paperless', 'mail']))
     logSpy = jest.spyOn(logService, 'get')
-    logSpy.mockImplementation((id, options) => {
+    logSpy.mockImplementation((id) => {
       return of(id === 'paperless' ? paperless_logs : mail_logs)
     })
     fixture = TestBed.createComponent(LogsComponent)

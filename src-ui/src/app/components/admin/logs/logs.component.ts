@@ -75,7 +75,7 @@ export class LogsComponent
   reloadLogs() {
     this.loading = true
     this.logService
-      .get(this.activeLog, { tail: 1000 })
+      .get(this.activeLog)
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (result) => {
