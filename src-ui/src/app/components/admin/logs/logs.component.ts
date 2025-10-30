@@ -9,7 +9,7 @@ import {
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
-import { ScrollingModule } from '@angular/cdk/scrolling'
+import { ScrollingModule, CdkVirtualScrollViewport } from '@angular/cdk/scrolling'
 import { filter, takeUntil, timer } from 'rxjs'
 import { LogService } from 'src/app/services/rest/log.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
@@ -42,7 +42,7 @@ export class LogsComponent
 
   public autoRefreshEnabled: boolean = true
 
-  @ViewChild('logContainer') logContainer: ElementRef
+  @ViewChild('logContainer') logContainer: CdkVirtualScrollViewport
 
   ngOnInit(): void {
     this.logService
@@ -116,7 +116,7 @@ export class LogsComponent
   scrollToBottom(): void {
     this.changedetectorRef.detectChanges()
     if (this.logContainer) {
-      this.logContainer.scrollToIndex(this.logs.length - 1, 'auto')
+      this.logContainer.scrollToIndex(this.logs.length - 1)
     }
   }
 }
