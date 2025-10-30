@@ -63,7 +63,7 @@ describe('LogsComponent', () => {
   })
 
   it('should display logs with first log initially', () => {
-    expect(logSpy).toHaveBeenCalledWith('paperless', { tail: 1000 })
+    expect(logSpy).toHaveBeenCalledWith('paperless', { tail: 5000 })
     fixture.detectChanges()
     expect(fixture.debugElement.nativeElement.textContent).toContain(
       paperless_logs[0]
@@ -74,7 +74,7 @@ describe('LogsComponent', () => {
     fixture.debugElement
       .queryAll(By.directive(NgbNavLink))[1]
       .nativeElement.dispatchEvent(new MouseEvent('click'))
-    expect(logSpy).toHaveBeenCalledWith('mail', { tail: 1000 })
+    expect(logSpy).toHaveBeenCalledWith('mail', { tail: 5000 })
   })
 
   it('should handle error with no logs', () => {

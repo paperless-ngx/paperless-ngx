@@ -1,7 +1,7 @@
 import {
+  AfterViewInit,
   ChangeDetectorRef,
   Component,
-  ElementRef,
   OnDestroy,
   OnInit,
   ViewChild,
@@ -31,7 +31,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
 })
 export class LogsComponent
   extends LoadingComponentWithPermissions
-  implements OnInit, OnDestroy
+  implements OnInit, AfterViewInit, OnDestroy
 {
   private logService = inject(LogService)
   private changedetectorRef = inject(ChangeDetectorRef)
@@ -43,6 +43,13 @@ export class LogsComponent
   public activeLog: string
 
   public autoRefreshEnabled: boolean = true
+  public autoRefreshInterval: number = 30
+  public isLoadingMore: boolean = false
+
+  private currentOffset: number = 0
+  private readonly pageSize: number = 5000
+  private hasMoreLogs: boolean = true
+  private wasAtBottom: boolean = true
 
   @ViewChild('logContainer') logContainer: CdkVirtualScrollViewport
 
@@ -57,47 +64,117 @@ export class LogsComponent
           this.activeLog = this.logFiles[0]
           this.reloadLogs()
         }
-        timer(5000, 5000)
+        timer(this.autoRefreshInterval * 1000, this.autoRefreshInterval * 1000)
           .pipe(
             filter(() => this.autoRefreshEnabled),
             takeUntil(this.unsubscribeNotifier)
           )
           .subscribe(() => {
-            this.reloadLogs()
+            this.reloadLogs(true)
           })
       })
+  }
+
+  ngAfterViewInit(): void {
+    if (this.logContainer) {
+      this.logContainer.scrolledIndexChange
+        .pipe(takeUntil(this.unsubscribeNotifier))
+        .subscribe((index) => {
+          const maxIndex = this.logs.length - 1
+          this.wasAtBottom = index >= maxIndex - 50
+
+          if (index < 100 && !this.isLoadingMore && this.hasMoreLogs) {
+            this.loadMoreLogs()
+          }
+        })
+    }
   }
 
   ngOnDestroy(): void {
     super.ngOnDestroy()
   }
 
-  reloadLogs() {
-    this.loading = true
+  reloadLogs(isAutoRefresh: boolean = false): void {
+    if (!isAutoRefresh) {
+      this.loading = true
+    }
+    this.currentOffset = 0
+    this.hasMoreLogs = true
+    this.isLoadingMore = false
+
     this.logService
-      .get(this.activeLog, { tail: 1000 })
+      .get(this.activeLog, { tail: this.pageSize })
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (result) => {
           this.logs = this.parseLogsWithLevel(result)
+          this.currentOffset = result.length
+          this.hasMoreLogs = result.length === this.pageSize
           this.loading = false
-          this.scrollToBottom()
+
+          if (!isAutoRefresh || this.wasAtBottom) {
+            this.scrollToBottom()
+          }
         },
-        error: () => {
+        error: (error) => {
+          console.error('Error loading logs:', error)
           this.logs = []
           this.loading = false
+          this.hasMoreLogs = false
         },
       })
   }
 
-  getLogLevel(log: string) {
-    if (log.indexOf('[DEBUG]') != -1) {
+  loadMoreLogs(): void {
+    if (this.isLoadingMore || !this.hasMoreLogs) {
+      return
+    }
+
+    this.isLoadingMore = true
+    const newOffset = this.currentOffset + this.pageSize
+
+    const currentIndex = this.logContainer?.measureScrollOffset('top')
+      ? Math.floor(this.logContainer.measureScrollOffset('top') / 20)
+      : 0
+
+    this.logService
+      .get(this.activeLog, { tail: newOffset })
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (result) => {
+          if (result.length > this.logs.length) {
+            const newLogsCount = result.length - this.logs.length
+            const newLogs = result.slice(0, newLogsCount)
+            this.logs = [...this.parseLogsWithLevel(newLogs), ...this.logs]
+            this.currentOffset = result.length
+            this.hasMoreLogs = result.length >= newOffset
+
+            this.changedetectorRef.detectChanges()
+            if (this.logContainer) {
+              const newIndex = currentIndex + newLogsCount
+              this.logContainer.scrollToIndex(newIndex)
+            }
+          } else {
+            this.hasMoreLogs = false
+          }
+          this.isLoadingMore = false
+        },
+        error: (error) => {
+          console.error('Error loading more logs:', error)
+          this.isLoadingMore = false
+          this.hasMoreLogs = false
+        },
+      })
+  }
+
+  getLogLevel(log: string): number {
+    if (log.includes('[DEBUG]')) {
       return 10
-    } else if (log.indexOf('[WARNING]') != -1) {
+    } else if (log.includes('[WARNING]')) {
       return 30
-    } else if (log.indexOf('[ERROR]') != -1) {
+    } else if (log.includes('[ERROR]')) {
       return 40
-    } else if (log.indexOf('[CRITICAL]') != -1) {
+    } else if (log.includes('[CRITICAL]')) {
       return 50
     } else {
       return 20
@@ -117,11 +194,11 @@ export class LogsComponent
 
   scrollToBottom(): void {
     this.changedetectorRef.detectChanges()
-    if (this.logContainer && this.logContainer.elementRef?.nativeElement) {
+    if (this.logContainer?.elementRef?.nativeElement) {
       try {
         this.logContainer.scrollToIndex(this.logs.length - 1)
       } catch (e) {
-        // Ignore errors in tests or when element is not ready
+        console.warn('Unable to scroll to bottom:', e)
       }
     }
   }
