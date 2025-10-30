@@ -9,7 +9,6 @@ import {
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
-import { CommonModule } from '@angular/common'
 import { ScrollingModule, CdkVirtualScrollViewport } from '@angular/cdk/scrolling'
 import { filter, takeUntil, timer } from 'rxjs'
 import { LogService } from 'src/app/services/rest/log.service'
@@ -21,7 +20,6 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
   templateUrl: './logs.component.html',
   styleUrls: ['./logs.component.scss'],
   imports: [
-    CommonModule,
     PageHeaderComponent,
     NgbNavModule,
     FormsModule,
@@ -117,12 +115,8 @@ export class LogsComponent
 
   scrollToBottom(): void {
     this.changedetectorRef.detectChanges()
-    if (this.logContainer && this.logContainer.elementRef?.nativeElement) {
-      try {
-        this.logContainer.scrollToIndex(this.logs.length - 1)
-      } catch (e) {
-        // Ignore errors in tests or when element is not ready
-      }
+    if (this.logContainer) {
+      this.logContainer.scrollToIndex(this.logs.length - 1)
     }
   }
 }
