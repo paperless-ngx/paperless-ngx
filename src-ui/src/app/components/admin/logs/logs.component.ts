@@ -1,4 +1,9 @@
 import {
+  CdkVirtualScrollViewport,
+  ScrollingModule,
+} from '@angular/cdk/scrolling'
+import { CommonModule } from '@angular/common'
+import {
   AfterViewInit,
   ChangeDetectorRef,
   Component,
@@ -9,8 +14,6 @@ import {
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
-import { CommonModule } from '@angular/common'
-import { ScrollingModule, CdkVirtualScrollViewport } from '@angular/cdk/scrolling'
 import { filter, takeUntil, timer } from 'rxjs'
 import { LogService } from 'src/app/services/rest/log.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
@@ -181,10 +184,12 @@ export class LogsComponent
     }
   }
 
-  private parseLogsWithLevel(logs: string[]): Array<{ message: string; level: number }> {
-    return logs.map(log => ({
+  private parseLogsWithLevel(
+    logs: string[]
+  ): Array<{ message: string; level: number }> {
+    return logs.map((log) => ({
       message: log,
-      level: this.getLogLevel(log)
+      level: this.getLogLevel(log),
     }))
   }
 
