@@ -1577,4 +1577,71 @@ describe('DocumentDetailComponent', () => {
     createObjectURLSpy.mockRestore()
     revokeObjectURLSpy.mockRestore()
   }))
+
+  it('should suppress toast if cross-origin afterprint error occurs', fakeAsync(() => {
+    initNormally()
+
+    const appendChildSpy = jest
+      .spyOn(document.body, 'appendChild')
+      .mockImplementation((node: Node) => node)
+    const removeChildSpy = jest
+      .spyOn(document.body, 'removeChild')
+      .mockImplementation((node: Node) => node)
+    const createObjectURLSpy = jest
+      .spyOn(URL, 'createObjectURL')
+      .mockReturnValue('blob:mock-url')
+    const revokeObjectURLSpy = jest
+      .spyOn(URL, 'revokeObjectURL')
+      .mockImplementation(() => {})
+
+    const toastSpy = jest.spyOn(toastService, 'showError')
+
+    const mockContentWindow = {
+      focus: jest.fn().mockImplementation(() => {
+        throw new DOMException(
+          'Accessing onafterprint triggered a cross-origin violation',
+          'SecurityError'
+        )
+      }),
+      print: jest.fn(),
+      onafterprint: null,
+    }
+
+    const mockIframe: any = {
+      style: {},
+      src: '',
+      onload: null,
+      contentWindow: mockContentWindow,
+    }
+
+    const createElementSpy = jest
+      .spyOn(document, 'createElement')
+      .mockReturnValue(mockIframe as any)
+
+    const blob = new Blob(['test'], { type: 'application/pdf' })
+    component.printDocument()
+
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/${doc.id}/download/`
+    )
+    req.flush(blob)
+
+    tick()
+
+    if (mockIframe.onload) {
+      mockIframe.onload(new Event('load'))
+    }
+
+    tick(200)
+
+    expect(toastSpy).not.toHaveBeenCalled()
+    expect(removeChildSpy).toHaveBeenCalledWith(mockIframe)
+    expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:mock-url')
+
+    createElementSpy.mockRestore()
+    appendChildSpy.mockRestore()
+    removeChildSpy.mockRestore()
+    createObjectURLSpy.mockRestore()
+    revokeObjectURLSpy.mockRestore()
+  }))
 })
