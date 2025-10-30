@@ -1489,6 +1489,8 @@ describe('DocumentDetailComponent', () => {
       mockContentWindow.onafterprint(new Event('afterprint'))
     }
 
+    tick(500)
+
     expect(removeChildSpy).toHaveBeenCalledWith(mockIframe)
     expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:mock-url')
 
@@ -1562,6 +1564,8 @@ describe('DocumentDetailComponent', () => {
     if (mockIframe.onload) {
       mockIframe.onload(new Event('load'))
     }
+
+    tick(500)
 
     expect(toastSpy).toHaveBeenCalled()
     expect(removeChildSpy).toHaveBeenCalledWith(mockIframe)

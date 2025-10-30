@@ -21,7 +21,7 @@ import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
 import { PDFDocumentProxy, PdfViewerModule } from 'ng2-pdf-viewer'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { DeviceDetectorService } from 'ngx-device-detector'
-import { BehaviorSubject, Observable, of, Subject } from 'rxjs'
+import { BehaviorSubject, Observable, of, Subject, timer } from 'rxjs'
 import {
   catchError,
   debounceTime,
@@ -1448,13 +1448,19 @@ export class DocumentDetailComponent
               iframe.contentWindow.focus()
               iframe.contentWindow.print()
               iframe.contentWindow.onafterprint = () => {
-                document.body.removeChild(iframe)
-                URL.revokeObjectURL(blobUrl)
+                timer(500).subscribe(() => {
+                  // delay to avoid print failure
+                  document.body.removeChild(iframe)
+                  URL.revokeObjectURL(blobUrl)
+                })
               }
             } catch (err) {
               this.toastService.showError($localize`Print failed.`, err)
-              document.body.removeChild(iframe)
-              URL.revokeObjectURL(blobUrl)
+              timer(500).subscribe(() => {
+                // delay to avoid print failure
+                document.body.removeChild(iframe)
+                URL.revokeObjectURL(blobUrl)
+              })
             }
           }
         },
