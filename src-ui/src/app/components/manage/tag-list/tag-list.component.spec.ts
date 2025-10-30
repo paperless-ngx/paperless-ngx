@@ -73,9 +73,14 @@ describe('TagListComponent', () => {
     )
   })
 
-  it('should filter out child tags if name filter is empty, otherwise show all', () => {
+  it('should omit matching children from top level when their parent is present', () => {
     const tags = [
-      { id: 1, name: 'Tag1', parent: null },
+      {
+        id: 1,
+        name: 'Tag1',
+        parent: null,
+        children: [{ id: 2, name: 'Tag2', parent: 1 }],
+      },
       { id: 2, name: 'Tag2', parent: 1 },
       { id: 3, name: 'Tag3', parent: null },
     ]
@@ -86,7 +91,13 @@ describe('TagListComponent', () => {
 
     component['_nameFilter'] = 'Tag2' // Simulate non-empty name filter
     const filteredWithName = component.filterData(tags as any)
-    expect(filteredWithName.length).toBe(3)
+    expect(filteredWithName.length).toBe(2)
+    expect(filteredWithName.find((t) => t.id === 2)).toBeUndefined()
+    expect(
+      filteredWithName
+        .find((t) => t.id === 1)
+        ?.children?.some((c) => c.id === 2)
+    ).toBe(true)
   })
 
   it('should request only parent tags when no name filter is applied', () => {
