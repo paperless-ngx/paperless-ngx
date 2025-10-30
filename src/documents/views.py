@@ -50,6 +50,7 @@ from django.utils.timezone import make_aware
 from django.utils.translation import get_language
 from django.views import View
 from django.views.decorators.cache import cache_control
+from django.views.decorators.cache import cache_page
 from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
@@ -2402,6 +2403,7 @@ class UiSettingsView(GenericAPIView):
         )
 
 
+@method_decorator(cache_page(60 * 15), name="dispatch")
 @extend_schema_view(
     get=extend_schema(
         description="Get the current version of the Paperless-NGX server",
