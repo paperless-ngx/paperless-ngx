@@ -47,6 +47,8 @@ export class LogsComponent
 
   public autoRefreshEnabled: boolean = true
 
+  public limit: number = 5000
+
   @ViewChild('logContainer') logContainer: CdkVirtualScrollViewport
 
   ngOnInit(): void {
@@ -78,7 +80,7 @@ export class LogsComponent
   reloadLogs() {
     this.loading = true
     this.logService
-      .get(this.activeLog)
+      .get(this.activeLog, this.limit)
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (result) => {
