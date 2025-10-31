@@ -1514,134 +1514,97 @@ describe('DocumentDetailComponent', () => {
     )
   })
 
-  it('should show error toast if printing throws inside iframe', fakeAsync(() => {
-    initNormally()
+  const iframePrintErrorCases: Array<{
+    description: string
+    thrownError: Error
+    expectToast: boolean
+  }> = [
+    {
+      description: 'should show error toast if printing throws inside iframe',
+      thrownError: new Error('focus failed'),
+      expectToast: true,
+    },
+    {
+      description:
+        'should suppress toast if cross-origin afterprint error occurs',
+      thrownError: new DOMException(
+        'Accessing onafterprint triggered a cross-origin violation',
+        'SecurityError'
+      ),
+      expectToast: false,
+    },
+  ]
 
-    const appendChildSpy = jest
-      .spyOn(document.body, 'appendChild')
-      .mockImplementation((node: Node) => node)
-    const removeChildSpy = jest
-      .spyOn(document.body, 'removeChild')
-      .mockImplementation((node: Node) => node)
-    const createObjectURLSpy = jest
-      .spyOn(URL, 'createObjectURL')
-      .mockReturnValue('blob:mock-url')
-    const revokeObjectURLSpy = jest
-      .spyOn(URL, 'revokeObjectURL')
-      .mockImplementation(() => {})
+  iframePrintErrorCases.forEach(({ description, thrownError, expectToast }) => {
+    it(
+      description,
+      fakeAsync(() => {
+        initNormally()
 
-    const toastSpy = jest.spyOn(toastService, 'showError')
+        const appendChildSpy = jest
+          .spyOn(document.body, 'appendChild')
+          .mockImplementation((node: Node) => node)
+        const removeChildSpy = jest
+          .spyOn(document.body, 'removeChild')
+          .mockImplementation((node: Node) => node)
+        const createObjectURLSpy = jest
+          .spyOn(URL, 'createObjectURL')
+          .mockReturnValue('blob:mock-url')
+        const revokeObjectURLSpy = jest
+          .spyOn(URL, 'revokeObjectURL')
+          .mockImplementation(() => {})
 
-    const mockContentWindow = {
-      focus: jest.fn().mockImplementation(() => {
-        throw new Error('focus failed')
-      }),
-      print: jest.fn(),
-      onafterprint: null,
-    }
+        const toastSpy = jest.spyOn(toastService, 'showError')
 
-    const mockIframe: any = {
-      style: {},
-      src: '',
-      onload: null,
-      contentWindow: mockContentWindow,
-    }
+        const mockContentWindow = {
+          focus: jest.fn().mockImplementation(() => {
+            throw thrownError
+          }),
+          print: jest.fn(),
+          onafterprint: null,
+        }
 
-    const createElementSpy = jest
-      .spyOn(document, 'createElement')
-      .mockReturnValue(mockIframe as any)
+        const mockIframe: any = {
+          style: {},
+          src: '',
+          onload: null,
+          contentWindow: mockContentWindow,
+        }
 
-    const blob = new Blob(['test'], { type: 'application/pdf' })
-    component.printDocument()
+        const createElementSpy = jest
+          .spyOn(document, 'createElement')
+          .mockReturnValue(mockIframe as any)
 
-    const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/${doc.id}/download/`
-    )
-    req.flush(blob)
+        const blob = new Blob(['test'], { type: 'application/pdf' })
+        component.printDocument()
 
-    tick()
-
-    if (mockIframe.onload) {
-      mockIframe.onload(new Event('load'))
-    }
-
-    tick(500)
-
-    expect(toastSpy).toHaveBeenCalled()
-    expect(removeChildSpy).toHaveBeenCalledWith(mockIframe)
-    expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:mock-url')
-
-    createElementSpy.mockRestore()
-    appendChildSpy.mockRestore()
-    removeChildSpy.mockRestore()
-    createObjectURLSpy.mockRestore()
-    revokeObjectURLSpy.mockRestore()
-  }))
-
-  it('should suppress toast if cross-origin afterprint error occurs', fakeAsync(() => {
-    initNormally()
-
-    const appendChildSpy = jest
-      .spyOn(document.body, 'appendChild')
-      .mockImplementation((node: Node) => node)
-    const removeChildSpy = jest
-      .spyOn(document.body, 'removeChild')
-      .mockImplementation((node: Node) => node)
-    const createObjectURLSpy = jest
-      .spyOn(URL, 'createObjectURL')
-      .mockReturnValue('blob:mock-url')
-    const revokeObjectURLSpy = jest
-      .spyOn(URL, 'revokeObjectURL')
-      .mockImplementation(() => {})
-
-    const toastSpy = jest.spyOn(toastService, 'showError')
-
-    const mockContentWindow = {
-      focus: jest.fn().mockImplementation(() => {
-        throw new DOMException(
-          'Accessing onafterprint triggered a cross-origin violation',
-          'SecurityError'
+        const req = httpTestingController.expectOne(
+          `${environment.apiBaseUrl}documents/${doc.id}/download/`
         )
-      }),
-      print: jest.fn(),
-      onafterprint: null,
-    }
+        req.flush(blob)
 
-    const mockIframe: any = {
-      style: {},
-      src: '',
-      onload: null,
-      contentWindow: mockContentWindow,
-    }
+        tick()
 
-    const createElementSpy = jest
-      .spyOn(document, 'createElement')
-      .mockReturnValue(mockIframe as any)
+        if (mockIframe.onload) {
+          mockIframe.onload(new Event('load'))
+        }
 
-    const blob = new Blob(['test'], { type: 'application/pdf' })
-    component.printDocument()
+        tick(200)
 
-    const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/${doc.id}/download/`
+        if (expectToast) {
+          expect(toastSpy).toHaveBeenCalled()
+        } else {
+          expect(toastSpy).not.toHaveBeenCalled()
+        }
+        expect(removeChildSpy).toHaveBeenCalledWith(mockIframe)
+        expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:mock-url')
+
+        createElementSpy.mockRestore()
+        appendChildSpy.mockRestore()
+        removeChildSpy.mockRestore()
+        createObjectURLSpy.mockRestore()
+        revokeObjectURLSpy.mockRestore()
+      })
     )
-    req.flush(blob)
-
-    tick()
-
-    if (mockIframe.onload) {
-      mockIframe.onload(new Event('load'))
-    }
-
-    tick(200)
-
-    expect(toastSpy).not.toHaveBeenCalled()
-    expect(removeChildSpy).toHaveBeenCalledWith(mockIframe)
-    expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:mock-url')
-
-    createElementSpy.mockRestore()
-    appendChildSpy.mockRestore()
-    removeChildSpy.mockRestore()
-    createObjectURLSpy.mockRestore()
-    revokeObjectURLSpy.mockRestore()
-  }))
+  })
 })
