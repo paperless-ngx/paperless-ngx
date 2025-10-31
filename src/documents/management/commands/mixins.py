@@ -27,7 +27,7 @@ class MultiProcessMixin:
     for the use of multiple processes
     """
 
-    def add_argument_processes_mixin(self, parser: ArgumentParser):
+    def add_argument_processes_mixin(self, parser: ArgumentParser) -> None:
         parser.add_argument(
             "--processes",
             default=max(1, os.cpu_count() // 4),
@@ -35,7 +35,7 @@ class MultiProcessMixin:
             help="Number of processes to distribute work amongst",
         )
 
-    def handle_processes_mixin(self, *args, **options):
+    def handle_processes_mixin(self, *args, **options) -> None:
         self.process_count = options["processes"]
         if self.process_count < 1:
             raise CommandError("There must be at least 1 process")
@@ -47,7 +47,7 @@ class ProgressBarMixin:
     via this class
     """
 
-    def add_argument_progress_bar_mixin(self, parser: ArgumentParser):
+    def add_argument_progress_bar_mixin(self, parser: ArgumentParser) -> None:
         parser.add_argument(
             "--no-progress-bar",
             default=False,
@@ -55,7 +55,7 @@ class ProgressBarMixin:
             help="If set, the progress bar will not be shown",
         )
 
-    def handle_progress_bar_mixin(self, *args, **options):
+    def handle_progress_bar_mixin(self, *args, **options) -> None:
         self.no_progress_bar = options["no_progress_bar"]
         self.use_progress_bar = not self.no_progress_bar
 
@@ -120,7 +120,7 @@ class CryptMixin:
             },
         }
 
-    def load_crypt_params(self, metadata: dict):
+    def load_crypt_params(self, metadata: dict) -> None:
         # Load up the values for setting up decryption
         self.kdf_algorithm: str = metadata[EXPORTER_CRYPTO_SETTINGS_NAME][
             EXPORTER_CRYPTO_ALGO_NAME
@@ -135,7 +135,7 @@ class CryptMixin:
             EXPORTER_CRYPTO_SALT_NAME
         ]
 
-    def setup_crypto(self, *, passphrase: str, salt: str | None = None):
+    def setup_crypto(self, *, passphrase: str, salt: str | None = None) -> None:
         """
         Constructs a class for encryption or decryption using the specified passphrase and salt
 

@@ -1267,7 +1267,7 @@ class DocumentViewSet(
     ),
 )
 class UnifiedSearchViewSet(DocumentViewSet):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.searcher = None
 
@@ -1424,7 +1424,7 @@ class SavedViewViewSet(ModelViewSet, PassUserMixin):
             .prefetch_related("filter_rules")
         )
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         serializer.save(owner=self.request.user)
 
 

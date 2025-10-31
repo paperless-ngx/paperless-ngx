@@ -24,7 +24,7 @@ class TestEmailFileParsing:
         self,
         mail_parser: MailDocumentParser,
         sample_dir: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Fresh parser
@@ -45,7 +45,7 @@ class TestEmailFileParsing:
         self,
         mail_parser: MailDocumentParser,
         broken_email_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Fresh parser
@@ -63,7 +63,7 @@ class TestEmailFileParsing:
         self,
         mail_parser: MailDocumentParser,
         simple_txt_email_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Fresh parser
@@ -97,7 +97,7 @@ class TestEmailMetadataExtraction:
         self,
         caplog: pytest.LogCaptureFixture,
         mail_parser: MailDocumentParser,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Fresh start
@@ -120,7 +120,7 @@ class TestEmailMetadataExtraction:
         self,
         mail_parser: MailDocumentParser,
         simple_txt_email_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Fresh start
@@ -234,7 +234,7 @@ class TestEmailThumbnailGenerate:
         mocker: MockerFixture,
         mail_parser: MailDocumentParser,
         simple_txt_email_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - An E-Mail was parsed
@@ -271,7 +271,7 @@ class TestTikaHtmlParse:
         self,
         httpx_mock: HTTPXMock,
         mail_parser: MailDocumentParser,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Fresh start
@@ -287,7 +287,11 @@ class TestTikaHtmlParse:
         parsed = mail_parser.tika_parse("None")
         assert parsed == ""
 
-    def test_tika_parse(self, httpx_mock: HTTPXMock, mail_parser: MailDocumentParser):
+    def test_tika_parse(
+        self,
+        httpx_mock: HTTPXMock,
+        mail_parser: MailDocumentParser,
+    ) -> None:
         """
         GIVEN:
             - Fresh start
@@ -314,7 +318,7 @@ class TestTikaHtmlParse:
         self,
         httpx_mock: HTTPXMock,
         mail_parser: MailDocumentParser,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Fresh start
@@ -334,7 +338,7 @@ class TestTikaHtmlParse:
         self,
         settings: SettingsWrapper,
         mail_parser: MailDocumentParser,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Fresh start
@@ -357,7 +361,7 @@ class TestParser:
         mocker: MockerFixture,
         mail_parser: MailDocumentParser,
         simple_txt_email_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Fresh start
@@ -403,7 +407,7 @@ class TestParser:
         httpx_mock: HTTPXMock,
         mail_parser: MailDocumentParser,
         html_email_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Fresh start
@@ -457,7 +461,7 @@ class TestParser:
         httpx_mock: HTTPXMock,
         mail_parser: MailDocumentParser,
         simple_txt_email_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Fresh start
@@ -477,7 +481,7 @@ class TestParser:
         mail_parser: MailDocumentParser,
         simple_txt_email_file: Path,
         simple_txt_email_pdf_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Simple text email with no HTML content
@@ -505,7 +509,7 @@ class TestParser:
         mail_parser: MailDocumentParser,
         html_email_file: Path,
         html_email_pdf_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - email with HTML content
@@ -545,7 +549,7 @@ class TestParser:
         mail_parser: MailDocumentParser,
         html_email_file: Path,
         html_email_pdf_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - email with HTML content
@@ -584,7 +588,7 @@ class TestParser:
         mail_parser: MailDocumentParser,
         html_email_file: Path,
         html_email_pdf_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - email with HTML content
@@ -621,7 +625,7 @@ class TestParser:
         mail_parser: MailDocumentParser,
         html_email_file: Path,
         html_email_html_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Email message with HTML content
@@ -643,7 +647,7 @@ class TestParser:
         httpx_mock: HTTPXMock,
         mail_parser: MailDocumentParser,
         html_email_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Email message with HTML content
@@ -675,7 +679,7 @@ class TestParser:
         mail_parser: MailDocumentParser,
         html_email_file: Path,
         html_email_pdf_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Email message

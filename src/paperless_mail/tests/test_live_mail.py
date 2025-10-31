@@ -22,7 +22,7 @@ class TestMailLiveServer:
         self,
         mail_account_handler: MailAccountHandler,
         live_mail_account: MailAccount,
-    ):
+    ) -> None:
         try:
             rule1 = MailRule.objects.create(
                 name="testrule",
@@ -43,7 +43,7 @@ class TestMailLiveServer:
         self,
         mail_account_handler: MailAccountHandler,
         live_mail_account: MailAccount,
-    ):
+    ) -> None:
         try:
             rule2 = MailRule.objects.create(
                 name="testrule",

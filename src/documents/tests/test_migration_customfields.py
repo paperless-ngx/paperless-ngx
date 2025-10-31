@@ -7,7 +7,7 @@ class TestMigrateCustomFields(TestMigrations):
     migrate_from = "1039_consumptiontemplate"
     migrate_to = "1040_customfield_customfieldinstance_and_more"
 
-    def setUpBeforeMigration(self, apps):
+    def setUpBeforeMigration(self, apps) -> None:
         User = get_user_model()
         Group = apps.get_model("auth.Group")
         self.Permission = apps.get_model("auth", "Permission")
@@ -17,7 +17,7 @@ class TestMigrateCustomFields(TestMigrations):
         self.user.user_permissions.add(permission.id)
         self.group.permissions.add(permission.id)
 
-    def test_users_with_add_documents_get_add_customfields(self):
+    def test_users_with_add_documents_get_add_customfields(self) -> None:
         permission = self.Permission.objects.get(codename="add_customfield")
         self.assertTrue(self.user.has_perm(f"documents.{permission.codename}"))
         self.assertTrue(permission in self.group.permissions.all())
@@ -27,7 +27,7 @@ class TestReverseMigrateCustomFields(TestMigrations):
     migrate_from = "1040_customfield_customfieldinstance_and_more"
     migrate_to = "1039_consumptiontemplate"
 
-    def setUpBeforeMigration(self, apps):
+    def setUpBeforeMigration(self, apps) -> None:
         User = get_user_model()
         Group = apps.get_model("auth.Group")
         self.Permission = apps.get_model("auth", "Permission")
@@ -37,7 +37,7 @@ class TestReverseMigrateCustomFields(TestMigrations):
         self.user.user_permissions.add(permission.id)
         self.group.permissions.add(permission.id)
 
-    def test_remove_consumptiontemplate_permissions(self):
+    def test_remove_consumptiontemplate_permissions(self) -> None:
         permission = self.Permission.objects.get(codename="add_customfield")
         self.assertFalse(self.user.has_perm(f"documents.{permission.codename}"))
         self.assertFalse(permission in self.group.permissions.all())

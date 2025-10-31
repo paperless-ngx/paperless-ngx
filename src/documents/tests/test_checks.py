@@ -14,14 +14,14 @@ from documents.tests.factories import DocumentFactory
 
 
 class TestDocumentChecks(TestCase):
-    def test_changed_password_check_empty_db(self):
+    def test_changed_password_check_empty_db(self) -> None:
         self.assertListEqual(changed_password_check(None), [])
 
-    def test_changed_password_check_no_encryption(self):
+    def test_changed_password_check_no_encryption(self) -> None:
         DocumentFactory.create(storage_type=Document.STORAGE_TYPE_UNENCRYPTED)
         self.assertListEqual(changed_password_check(None), [])
 
-    def test_encrypted_missing_passphrase(self):
+    def test_encrypted_missing_passphrase(self) -> None:
         DocumentFactory.create(storage_type=Document.STORAGE_TYPE_GPG)
         msgs = changed_password_check(None)
         self.assertEqual(len(msgs), 1)
@@ -36,7 +36,7 @@ class TestDocumentChecks(TestCase):
     )
     @mock.patch("paperless.db.GnuPG.decrypted")
     @mock.patch("documents.models.Document.source_file")
-    def test_encrypted_decrypt_fails(self, mock_decrypted, mock_source_file):
+    def test_encrypted_decrypt_fails(self, mock_decrypted, mock_source_file) -> None:
         mock_decrypted.return_value = None
         mock_source_file.return_value = b""
 
@@ -60,7 +60,7 @@ class TestDocumentChecks(TestCase):
             ),
         )
 
-    def test_parser_check(self):
+    def test_parser_check(self) -> None:
         self.assertEqual(parser_check(None), [])
 
         with mock.patch("documents.checks.document_consumer_declaration.send") as m:
@@ -76,7 +76,7 @@ class TestDocumentChecks(TestCase):
                 ],
             )
 
-    def test_filename_format_check(self):
+    def test_filename_format_check(self) -> None:
         self.assertEqual(filename_format_check(None), [])
 
         with override_settings(FILENAME_FORMAT="{created}/{title}"):
