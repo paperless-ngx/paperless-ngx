@@ -13,7 +13,7 @@ import {
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
-import { filter, takeUntil, timer } from 'rxjs'
+import { Subject, debounceTime, filter, takeUntil, timer } from 'rxjs'
 import { LogService } from 'src/app/services/rest/log.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
@@ -49,9 +49,15 @@ export class LogsComponent
 
   public limit: number = 5000
 
+  private limitChange$ = new Subject<number>()
+
   @ViewChild('logContainer') logContainer: CdkVirtualScrollViewport
 
   ngOnInit(): void {
+    this.limitChange$
+      .pipe(debounceTime(300), takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => this.reloadLogs())
+
     this.logService
       .list()
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -75,6 +81,10 @@ export class LogsComponent
 
   ngOnDestroy(): void {
     super.ngOnDestroy()
+  }
+
+  onLimitChange(limit: number): void {
+    this.limitChange$.next(limit)
   }
 
   reloadLogs() {

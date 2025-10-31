@@ -6,7 +6,14 @@
   <div class="input-group input-group-sm align-items-center">
     <div class="input-group input-group-sm me-3">
       <span class="input-group-text text-muted" i18n>Show</span>
-      <input class="form-control" type="number" min="100" step="100" [(ngModel)]="limit" (ngModelChange)="reloadLogs()" style="width: 100px;">
+      <input
+        class="form-control"
+        type="number"
+        min="100"
+        step="100"
+        [(ngModel)]="limit"
+        (ngModelChange)="onLimitChange($event)"
+        style="width: 100px;">
       <span class="input-group-text text-muted" i18n>lines</span>
     </div>
     <div class="form-check form-switch">

@@ -101,4 +101,13 @@ describe('LogsComponent', () => {
     jest.advanceTimersByTime(6000)
     expect(reloadSpy).toHaveBeenCalledTimes(2)
   })
+
+  it('should debounce limit changes before reloading logs', () => {
+    const initialCalls = reloadSpy.mock.calls.length
+    component.onLimitChange(6000)
+    jest.advanceTimersByTime(299)
+    expect(reloadSpy).toHaveBeenCalledTimes(initialCalls)
+    jest.advanceTimersByTime(1)
+    expect(reloadSpy).toHaveBeenCalledTimes(initialCalls + 1)
+  })
 })
