@@ -96,7 +96,17 @@ export class LogsComponent
         next: (result) => {
           this.loading = false
           const parsed = this.parseLogsWithLevel(result)
-          if (parsed.join('') !== this.logs.join('')) {
+          const hasChanges =
+            parsed.length !== this.logs.length ||
+            parsed.some((log, idx) => {
+              const current = this.logs[idx]
+              return (
+                !current ||
+                current.message !== log.message ||
+                current.level !== log.level
+              )
+            })
+          if (hasChanges) {
             this.logs = parsed
             this.scrollToBottom()
           }
