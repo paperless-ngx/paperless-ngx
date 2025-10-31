@@ -21,7 +21,7 @@ import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
 import { PDFDocumentProxy, PdfViewerModule } from 'ng2-pdf-viewer'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { DeviceDetectorService } from 'ngx-device-detector'
-import { BehaviorSubject, Observable, of, Subject } from 'rxjs'
+import { BehaviorSubject, Observable, of, Subject, timer } from 'rxjs'
 import {
   catchError,
   debounceTime,
@@ -1452,9 +1452,18 @@ export class DocumentDetailComponent
                 URL.revokeObjectURL(blobUrl)
               }
             } catch (err) {
-              this.toastService.showError($localize`Print failed.`, err)
-              document.body.removeChild(iframe)
-              URL.revokeObjectURL(blobUrl)
+              // FF throws cross-origin error on onafterprint
+              const isCrossOriginAfterPrintError =
+                err instanceof DOMException &&
+                err.message.includes('onafterprint')
+              if (!isCrossOriginAfterPrintError) {
+                this.toastService.showError($localize`Print failed.`, err)
+              }
+              timer(100).subscribe(() => {
+                // delay to avoid FF print failure
+                document.body.removeChild(iframe)
+                URL.revokeObjectURL(blobUrl)
+              })
             }
           }
         },
