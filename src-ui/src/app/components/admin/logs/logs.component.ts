@@ -84,9 +84,12 @@ export class LogsComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (result) => {
-          this.logs = this.parseLogsWithLevel(result)
           this.loading = false
-          this.scrollToBottom()
+          const parsed = this.parseLogsWithLevel(result)
+          if (parsed.join('') !== this.logs.join('')) {
+            this.logs = parsed
+            this.scrollToBottom()
+          }
         },
         error: () => {
           this.logs = []
