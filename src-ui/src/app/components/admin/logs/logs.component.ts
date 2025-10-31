@@ -49,7 +49,7 @@ export class LogsComponent
 
   public limit: number = 5000
 
-  private limitChange$ = new Subject<number>()
+  private readonly limitChange$ = new Subject<number>()
 
   @ViewChild('logContainer') logContainer: CdkVirtualScrollViewport
 

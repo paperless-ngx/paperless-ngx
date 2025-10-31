@@ -2264,6 +2264,8 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             f.write(log_data)
         response = self.client.get("/api/logs/paperless/", {"limit": "abc"})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        response = self.client.get("/api/logs/paperless/", {"limit": -5})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_regex_other_algorithm(self):
         for endpoint in ["correspondents", "tags", "document_types"]:
