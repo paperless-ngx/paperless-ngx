@@ -1455,9 +1455,7 @@ export class DocumentDetailComponent
               // FF throws cross-origin error on onafterprint
               const isCrossOriginAfterPrintError =
                 err instanceof DOMException &&
-                (err.name === 'SecurityError' ||
-                  err.message.includes('onafterprint')) &&
-                err.message.includes('cross-origin')
+                err.message.includes('onafterprint')
               if (!isCrossOriginAfterPrintError) {
                 this.toastService.showError($localize`Print failed.`, err)
               }
