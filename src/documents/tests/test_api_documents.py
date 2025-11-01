@@ -2250,6 +2250,23 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertListEqual(response.data, ["test", "test2"])
 
+    def test_get_log_with_limit(self):
+        log_data = "test1\ntest2\ntest3\n"
+        with (Path(settings.LOGGING_DIR) / "paperless.log").open("w") as f:
+            f.write(log_data)
+        response = self.client.get("/api/logs/paperless/", {"limit": 2})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertListEqual(response.data, ["test2", "test3"])
+
+    def test_get_log_with_invalid_limit(self):
+        log_data = "test1\ntest2\n"
+        with (Path(settings.LOGGING_DIR) / "paperless.log").open("w") as f:
+            f.write(log_data)
+        response = self.client.get("/api/logs/paperless/", {"limit": "abc"})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        response = self.client.get("/api/logs/paperless/", {"limit": -5})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_invalid_regex_other_algorithm(self):
         for endpoint in ["correspondents", "tags", "document_types"]:
             response = self.client.post(

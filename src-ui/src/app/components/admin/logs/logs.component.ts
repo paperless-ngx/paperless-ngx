@@ -13,7 +13,7 @@ import {
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
-import { filter, takeUntil, timer } from 'rxjs'
+import { Subject, debounceTime, filter, takeUntil, timer } from 'rxjs'
 import { LogService } from 'src/app/services/rest/log.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
@@ -47,9 +47,17 @@ export class LogsComponent
 
   public autoRefreshEnabled: boolean = true
 
+  public limit: number = 5000
+
+  private readonly limitChange$ = new Subject<number>()
+
   @ViewChild('logContainer') logContainer: CdkVirtualScrollViewport
 
   ngOnInit(): void {
+    this.limitChange$
+      .pipe(debounceTime(300), takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => this.reloadLogs())
+
     this.logService
       .list()
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -75,16 +83,33 @@ export class LogsComponent
     super.ngOnDestroy()
   }
 
+  onLimitChange(limit: number): void {
+    this.limitChange$.next(limit)
+  }
+
   reloadLogs() {
     this.loading = true
     this.logService
-      .get(this.activeLog)
+      .get(this.activeLog, this.limit)
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (result) => {
-          this.logs = this.parseLogsWithLevel(result)
           this.loading = false
-          this.scrollToBottom()
+          const parsed = this.parseLogsWithLevel(result)
+          const hasChanges =
+            parsed.length !== this.logs.length ||
+            parsed.some((log, idx) => {
+              const current = this.logs[idx]
+              return (
+                !current ||
+                current.message !== log.message ||
+                current.level !== log.level
+              )
+            })
+          if (hasChanges) {
+            this.logs = parsed
+            this.scrollToBottom()
+          }
         },
         error: () => {
           this.logs = []
