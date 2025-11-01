@@ -1428,6 +1428,37 @@ export class DocumentDetailComponent
       })
   }
 
+  removePassword() {
+    if (this.requiresPassword || !this.password) {
+      this.toastService.showError(
+        $localize`Please enter the current password before attempting to remove it.`
+      )
+      return
+    }
+    this.networkActive = true
+    this.documentsService
+      .bulkEdit([this.document.id], 'remove_password', {
+        password: this.password,
+      })
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: () => {
+          this.toastService.showInfo(
+            $localize`Password removal operation for "${this.document.title}" will begin in the background.`
+          )
+          this.networkActive = false
+          this.openDocumentService.refreshDocument(this.documentId)
+        },
+        error: (error) => {
+          this.networkActive = false
+          this.toastService.showError(
+            $localize`Error executing password removal operation`,
+            error
+          )
+        },
+      })
+  }
+
   printDocument() {
     const printUrl = this.documentsService.getDownloadUrl(
       this.document.id,
