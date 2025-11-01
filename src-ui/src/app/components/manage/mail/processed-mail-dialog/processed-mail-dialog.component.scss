@@ -1,5 +1,7 @@
 ::ng-deep .popover {
     max-width: 350px;
+    max-height: 600px;
+    overflow: hidden;
 
     pre {
         white-space: pre-wrap;
