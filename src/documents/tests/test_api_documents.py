@@ -172,6 +172,35 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results[0]), 0)
 
+    def test_document_fields_api_version_8_respects_created(self):
+        Document.objects.create(
+            title="legacy",
+            checksum="123",
+            mime_type="application/pdf",
+            created=date(2024, 1, 15),
+        )
+
+        response = self.client.get(
+            "/api/documents/?fields=id",
+            headers={"Accept": "application/json; version=8"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertIn("id", results[0])
+        self.assertNotIn("created", results[0])
+
+        response = self.client.get(
+            "/api/documents/?fields=id,created",
+            headers={"Accept": "application/json; version=8"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertIn("id", results[0])
+        self.assertIn("created", results[0])
+        self.assertRegex(results[0]["created"], r"^2024-01-15T00:00:00.*$")
+
     def test_document_legacy_created_format(self):
         """
         GIVEN:
