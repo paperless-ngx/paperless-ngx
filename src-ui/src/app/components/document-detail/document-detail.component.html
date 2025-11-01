@@ -65,6 +65,12 @@
       <button ngbDropdownItem (click)="editPdf()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF">
         <i-bs name="pencil"></i-bs>&nbsp;<ng-container i18n>PDF Editor</ng-container>
       </button>
+
+      @if (requiresPassword || password) {
+        <button ngbDropdownItem (click)="removePassword()" [disabled]="!userIsOwner || !password">
+          <i-bs name="unlock"></i-bs>&nbsp;<ng-container i18n>Remove Password</ng-container>
+        </button>
+      }
     </div>
   </div>
 

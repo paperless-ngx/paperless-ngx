@@ -294,6 +294,9 @@ The following methods are supported:
         -   `"delete_original": true` to delete the original documents after editing.
         -   `"update_document": true` to update the existing document with the edited PDF.
         -   `"include_metadata": true` to copy metadata from the original document to the edited document.
+-   `remove_password`
+    -   Requires `parameters`:
+        -   `"password": "PASSWORD_STRING"` The password to remove from the PDF documents.
 -   `merge`
     -   No additional `parameters` required.
     -   The ordering of the merged document is determined by the list of IDs.
