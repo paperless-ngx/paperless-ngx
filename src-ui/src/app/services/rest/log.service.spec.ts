@@ -49,4 +49,14 @@ describe('LogService', () => {
     )
     expect(req.request.method).toEqual('GET')
   })
+
+  it('should pass limit param on logs get when provided', () => {
+    const id: string = 'mail'
+    const limit: number = 100
+    subscription = service.get(id, limit).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${id}/?limit=${limit}`
+    )
+    expect(req.request.method).toEqual('GET')
+  })
 })
