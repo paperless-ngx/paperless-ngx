@@ -138,7 +138,7 @@ describe('TagsComponent', () => {
     settingsService.currentUser = { id: 1 }
     let activeInstances: NgbModalRef[]
     modalService.activeInstances.subscribe((v) => (activeInstances = v))
-    component.select.searchTerm = 'foobar'
+    component.select.filter('foobar')
     component.createTag()
     expect(modalService.hasOpenModals()).toBeTruthy()
     expect(activeInstances[0].componentInstance.object.name).toEqual('foobar')
