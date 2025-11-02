@@ -7,6 +7,7 @@ import re
 import tempfile
 import zipfile
 from collections import defaultdict
+from collections import deque
 from datetime import datetime
 from pathlib import Path
 from time import mktime
@@ -53,6 +54,7 @@ from django.utils.timezone import make_aware
 from django.utils.translation import get_language
 from django.views import View
 from django.views.decorators.cache import cache_control
+from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
@@ -73,6 +75,7 @@ from rest_framework import parsers
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import ValidationError
 from rest_framework.filters import OrderingFilter
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import GenericAPIView
@@ -1489,6 +1492,13 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 type=OpenApiTypes.STR,
                 location=OpenApiParameter.PATH,
             ),
+            OpenApiParameter(
+                name="limit",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="Return only the last N entries from the log file",
+                required=False,
+            ),
         ],
         responses={
             (200, "application/json"): serializers.ListSerializer(
@@ -1520,8 +1530,22 @@ class LogViewSet(ViewSet):
         if not log_file.is_file():
             raise Http404
 
+        limit_param = request.query_params.get("limit")
+        if limit_param is not None:
+            try:
+                limit = int(limit_param)
+            except (TypeError, ValueError):
+                raise ValidationError({"limit": "Must be a positive integer"})
+            if limit < 1:
+                raise ValidationError({"limit": "Must be a positive integer"})
+        else:
+            limit = None
+
         with log_file.open() as f:
-            lines = [line.rstrip() for line in f.readlines()]
+            if limit is None:
+                lines = [line.rstrip() for line in f.readlines()]
+            else:
+                lines = [line.rstrip() for line in deque(f, maxlen=limit)]
 
         return Response(lines)
 
@@ -2533,6 +2557,7 @@ class UiSettingsView(GenericAPIView):
         )
 
 
+@method_decorator(cache_page(60 * 15), name="dispatch")
 @extend_schema_view(
     get=extend_schema(
         description="Get the current version of the Paperless-NGX server",

@@ -154,6 +154,19 @@ export class AppFrameComponent
     return this.settingsService.get(SETTINGS_KEYS.APP_TITLE)
   }
 
+  get canSaveSettings(): boolean {
+    return (
+      this.permissionsService.currentUserCan(
+        PermissionAction.Change,
+        PermissionType.UISettings
+      ) &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.Add,
+        PermissionType.UISettings
+      )
+    )
+  }
+
   get slimSidebarEnabled(): boolean {
     return this.settingsService.get(SETTINGS_KEYS.SLIM_SIDEBAR)
   }
