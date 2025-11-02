@@ -1041,7 +1041,7 @@ class DocumentSerializer(
             request.version if request else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
         )
 
-        if api_version < 9:
+        if api_version < 9 and "created" in self.fields:
             # provide created as a datetime for backwards compatibility
             from django.utils import timezone
 

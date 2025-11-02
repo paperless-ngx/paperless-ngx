@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from pytest_httpx import HTTPXMock
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -7,6 +8,9 @@ from paperless import version
 
 class TestApiRemoteVersion:
     ENDPOINT = "/api/remote_version/"
+
+    def setup_method(self):
+        cache.clear()
 
     def test_remote_version_enabled_no_update_prefix(
         self,
