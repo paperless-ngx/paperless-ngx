@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-28 18:06+0000\n"
-"PO-Revision-Date: 2025-10-28 18:08\n"
+"PO-Revision-Date: 2025-10-30 23:37\n"
 "Last-Translator: \n"
 "Language-Team: Thai\n"
 "Language: th_TH\n"
@@ -942,7 +942,7 @@ msgstr ""
 
 #: documents/models.py:1187
 msgid "email subject"
-msgstr ""
+msgstr "หัวเรื่องของอีเมล"
 
 #: documents/models.py:1191
 msgid "The subject of the email, can include some placeholders, see documentation."
@@ -950,7 +950,7 @@ msgstr ""
 
 #: documents/models.py:1197
 msgid "email body"
-msgstr ""
+msgstr "เนื้อหาอีเมล"
 
 #: documents/models.py:1200
 msgid "The body (message) of the email, can include some placeholders, see documentation."
@@ -958,7 +958,7 @@ msgstr ""
 
 #: documents/models.py:1206
 msgid "emails to"
-msgstr ""
+msgstr "อีเมล์ถึง"
 
 #: documents/models.py:1209
 msgid "The destination email addresses, comma separated."

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-28 18:06+0000\n"
-"PO-Revision-Date: 2025-10-28 18:08\n"
+"PO-Revision-Date: 2025-10-30 23:37\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -47,7 +47,7 @@ msgstr "{name!r} não é um campo personalizado válido."
 
 #: documents/filters.py:558
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr "{data_type} não suporta a consulta expr {expr!r}."
+msgstr "{data_type} Não suporta a consulta expr {expr!r}."
 
 #: documents/filters.py:666 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
@@ -450,7 +450,7 @@ msgstr "pesquisa de texto completo"
 
 #: documents/models.py:526
 msgid "more like this"
-msgstr "Mais como este"
+msgstr "mais como este"
 
 #: documents/models.py:527
 msgid "has tags in"
@@ -859,11 +859,11 @@ msgstr "Possui estas etiquetas"
 
 #: documents/models.py:1072
 msgid "has all of these tag(s)"
-msgstr ""
+msgstr "possui toda(s) esta(s) etiqueta(s)"
 
 #: documents/models.py:1079
 msgid "does not have these tag(s)"
-msgstr ""
+msgstr "não possui esta(s) etiqueta(s)"
 
 #: documents/models.py:1087
 msgid "has this document type"
@@ -871,7 +871,7 @@ msgstr "Possui este tipo de documento"
 
 #: documents/models.py:1094
 msgid "does not have these document type(s)"
-msgstr ""
+msgstr "não possui este(s) tipo(s) de documento"
 
 #: documents/models.py:1102
 msgid "has this correspondent"
@@ -879,7 +879,7 @@ msgstr "Possui este correspondente"
 
 #: documents/models.py:1109
 msgid "does not have these correspondent(s)"
-msgstr ""
+msgstr "não possui este(s) correspondente(s)"
 
 #: documents/models.py:1117
 msgid "has this storage path"
@@ -887,15 +887,15 @@ msgstr "possui este caminho de armazenamento"
 
 #: documents/models.py:1124
 msgid "does not have these storage path(s)"
-msgstr ""
+msgstr "não possui este(s) caminho(s) de armazenamento"
 
 #: documents/models.py:1128
 msgid "filter custom field query"
-msgstr ""
+msgstr "Filtrar consulta de campo personalizado"
 
 #: documents/models.py:1131
 msgid "JSON-encoded custom field query expression."
-msgstr ""
+msgstr "Expressão de consulta de campo personalizado codificada em JSON."
 
 #: documents/models.py:1135
 msgid "schedule offset days"
@@ -1270,7 +1270,7 @@ msgstr "Olá de %(site_name)s!"
 #, python-format
 msgid "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
-msgstr "Obrigado por usar  %(site_name)s!\n"
+msgstr "Obrigado por usar %(site_name)s!\n"
 "%(site_domain)s"
 
 #: documents/templates/account/login.html:5
@@ -1313,7 +1313,7 @@ msgstr "ou conecte-se com"
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
-msgstr "Redefinição de senha Paperless-ngx"
+msgstr "Solicitação de redefinição de senha Paperless-ngx"
 
 #: documents/templates/account/password_reset.html:9
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
