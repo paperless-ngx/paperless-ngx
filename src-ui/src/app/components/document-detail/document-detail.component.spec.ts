@@ -1209,6 +1209,24 @@ describe('DocumentDetailComponent', () => {
     expect(closeSpy).toHaveBeenCalled()
   })
 
+  it('should support removing password protection from pdfs', () => {
+    initNormally()
+    component.password = 'secret'
+    component.removePassword()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    expect(req.request.body).toEqual({
+      documents: [doc.id],
+      method: 'remove_password',
+      parameters: {
+        password: 'secret',
+        update_document: true,
+      },
+    })
+    req.flush(true)
+  })
+
   it('should support keyboard shortcuts', () => {
     initNormally()
 
