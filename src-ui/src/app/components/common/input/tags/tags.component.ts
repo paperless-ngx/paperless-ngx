@@ -169,7 +169,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     if (name) modal.componentInstance.object = { name: name }
     else if (this.select.searchTerm)
       modal.componentInstance.object = { name: this.select.searchTerm }
-    this.select.searchTerm = null
+    this.select.filter(null)
     this.select.detectChanges()
     return firstValueFrom(
       (modal.componentInstance as TagEditDialogComponent).succeeded.pipe(
