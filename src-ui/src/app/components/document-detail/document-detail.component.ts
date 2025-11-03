@@ -1439,6 +1439,7 @@ export class DocumentDetailComponent
     this.documentsService
       .bulkEdit([this.document.id], 'remove_password', {
         password: this.password,
+        update_document: true,
       })
       .pipe(first(), takeUntil(this.unsubscribeNotifier))
       .subscribe({
