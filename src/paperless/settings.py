@@ -537,6 +537,13 @@ ACCOUNT_EMAIL_VERIFICATION = (
     )
 )
 
+if ACCOUNT_EMAIL_VERIFICATION == "mandatory":
+    ACCOUNT_EMAIL_REQUIRED = True
+    if not EMAIL_ENABLED:
+        raise ValueError(
+            "Email must be enabled if ACCOUNT_EMAIL_VERIFICATION is mandatory",
+        )
+
 ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS = __get_boolean(
     "PAPERLESS_ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS",
     "True",
