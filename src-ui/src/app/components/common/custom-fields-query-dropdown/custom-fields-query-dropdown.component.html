@@ -63,6 +63,7 @@
       bindValue="id"
       [(ngModel)]="atom.value"
       [disabled]="disabled"
+      [virtualScroll]="getSelectOptionsForField(atom.field)?.length > 100"
       (mousedown)="$event.stopImmediatePropagation()"
     ></ng-select>
   } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.DocumentLink) {

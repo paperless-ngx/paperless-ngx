@@ -29,6 +29,7 @@
           [multiple]="multiple"
           [bindLabel]="bindLabel"
           bindValue="id"
+          [virtualScroll]="items?.length > 100"
           (change)="onChange(value)"
           (search)="onSearch($event)"
           (focus)="clearLastSearchTerm()"
