@@ -912,9 +912,6 @@ export class BulkEditorComponent
   }
 
   shareSelected() {
-    const selectedDocuments = this.list.documents.filter((d) =>
-      this.list.selected.has(d.id)
-    )
     const modal = this.modalService.open(ShareBundleDialogComponent, {
       backdrop: 'static',
       size: 'lg',

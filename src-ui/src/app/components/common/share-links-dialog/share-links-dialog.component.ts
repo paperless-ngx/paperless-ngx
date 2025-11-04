@@ -25,7 +25,7 @@ export class ShareLinksDialogComponent implements OnInit {
   private toastService = inject(ToastService)
   private clipboard = inject(Clipboard)
 
-  EXPIRATION_OPTIONS = SHARE_LINK_EXPIRATION_OPTIONS
+  readonly expirationOptions = SHARE_LINK_EXPIRATION_OPTIONS
 
   @Input()
   title = $localize`Share Links`
