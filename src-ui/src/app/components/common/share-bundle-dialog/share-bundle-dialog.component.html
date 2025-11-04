@@ -61,7 +61,12 @@
     </div>
   </form>
 </div>
-<div class="modal-footer">
-  <button type="button" class="btn btn-outline-secondary btn-sm" (click)="close()" i18n>Close</button>
-  <button type="button" class="btn btn-primary btn-sm" (click)="submit()" i18n>Save options</button>
+<div class="modal-footer flex-column align-items-stretch">
+  <div class="d-flex justify-content-end gap-2 w-100">
+    <button type="button" class="btn btn-outline-secondary btn-sm" (click)="close()" i18n>Close</button>
+    <button type="button" class="btn btn-primary btn-sm" (click)="submit()" i18n>Save options</button>
+  </div>
+  <div class="text-muted fst-italic small mt-2">
+    <ng-container i18n>Large bundles can take significant time to prepare and / or download.</ng-container>
+  </div>
 </div>
