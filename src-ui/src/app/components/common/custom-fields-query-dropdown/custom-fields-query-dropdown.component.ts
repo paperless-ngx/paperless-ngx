@@ -17,7 +17,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { first, Subject, takeUntil } from 'rxjs'
+import { first, Subject, Subscription, takeUntil } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
   CUSTOM_FIELD_QUERY_MAX_ATOMS,
@@ -41,9 +41,26 @@ import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.comp
 import { DocumentLinkComponent } from '../input/document-link/document-link.component'
 
 export class CustomFieldQueriesModel {
-  public queries: CustomFieldQueryElement[] = []
+  private _queries: CustomFieldQueryElement[] = []
+  private rootSubscriptions: Subscription[] = []
 
   public readonly changed = new Subject<CustomFieldQueriesModel>()
+
+  public get queries(): CustomFieldQueryElement[] {
+    return this._queries
+  }
+
+  public set queries(value: CustomFieldQueryElement[]) {
+    this.teardownRootSubscriptions()
+    this._queries = value ?? []
+    for (const element of this._queries) {
+      this.rootSubscriptions.push(
+        element.changed.subscribe(() => {
+          this.changed.next(this)
+        })
+      )
+    }
+  }
 
   public clear(fireEvent = true) {
     this.queries = []
@@ -107,14 +124,14 @@ export class CustomFieldQueriesModel {
   public addExpression(
     expression: CustomFieldQueryExpression = new CustomFieldQueryExpression()
   ) {
-    if (this.queries.length > 0) {
-      ;(
-        (this.queries[0] as CustomFieldQueryExpression)
-          .value as CustomFieldQueryElement[]
-      ).push(expression)
-    } else {
-      this.queries.push(expression)
+    if (this.queries.length === 0) {
+      this.queries = [expression]
+      return
     }
+    ;(
+      (this.queries[0] as CustomFieldQueryExpression)
+        .value as CustomFieldQueryElement[]
+    ).push(expression)
     expression.changed.subscribe(() => {
       this.changed.next(this)
     })
@@ -165,6 +182,11 @@ export class CustomFieldQueriesModel {
       }
       this.changed.next(this)
     }
+  }
+
+  private teardownRootSubscriptions() {
+    this.rootSubscriptions.forEach((subscription) => subscription.unsubscribe())
+    this.rootSubscriptions = []
   }
 }
 
