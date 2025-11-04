@@ -33,6 +33,7 @@ import {
   SelectionDataItem,
 } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
+import { ShareBundleService } from 'src/app/services/rest/share-bundle.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -88,6 +89,7 @@ export class BulkEditorComponent
   private customFieldService = inject(CustomFieldsService)
   private permissionService = inject(PermissionsService)
   private savedViewService = inject(SavedViewService)
+  private shareBundleService = inject(ShareBundleService)
 
   tagSelectionModel = new FilterableDropdownSelectionModel(true)
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
@@ -913,16 +915,46 @@ export class BulkEditorComponent
     const selectedDocuments = this.list.documents.filter((d) =>
       this.list.selected.has(d.id)
     )
-    const documentsWithArchive = selectedDocuments.filter(
-      (doc) => !!doc.archived_file_name
-    ).length
-
     const modal = this.modalService.open(ShareBundleDialogComponent, {
       backdrop: 'static',
       size: 'lg',
     })
-    modal.componentInstance.documentIds = Array.from(this.list.selected)
-    modal.componentInstance.documentsWithArchive = documentsWithArchive
+    const dialog = modal.componentInstance as ShareBundleDialogComponent
+    dialog.documentIds = Array.from(this.list.selected)
+    dialog.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        const payload = dialog.payload
+        if (!payload || !payload.document_ids.length) {
+          this.toastService.showInfo(
+            $localize`No documents selected for sharing.`
+          )
+          return
+        }
+        dialog.loading = true
+        dialog.buttonsEnabled = false
+        this.shareBundleService
+          .createBundle(payload)
+          .pipe(first())
+          .subscribe({
+            next: () => {
+              dialog.loading = false
+              dialog.buttonsEnabled = true
+              modal.close()
+              this.toastService.showInfo(
+                $localize`Bulk share link creation requested.`
+              )
+            },
+            error: (error) => {
+              dialog.loading = false
+              dialog.buttonsEnabled = true
+              this.toastService.showError(
+                $localize`Bulk share link creation is not available yet.`,
+                error
+              )
+            },
+          })
+      })
   }
 
   manageShareLinks() {
