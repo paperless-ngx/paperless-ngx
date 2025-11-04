@@ -908,6 +908,18 @@ export class BulkEditorComponent
     return this.settings.get(SETTINGS_KEYS.EMAIL_ENABLED)
   }
 
+  shareSelected() {
+    this.toastService.showInfo(
+      $localize`Bulk share link creation is coming soon.`
+    )
+  }
+
+  manageShareLinks() {
+    this.toastService.showInfo(
+      $localize`Bulk share link management is coming soon.`
+    )
+  }
+
   emailSelected() {
     const allHaveArchiveVersion = this.list.documents
       .filter((d) => this.list.selected.has(d.id))
