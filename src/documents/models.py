@@ -756,6 +756,83 @@ class ShareLink(SoftDeleteModel):
         return f"Share Link for {self.document.title}"
 
 
+class ShareBundle(SoftDeleteModel):
+    class Status(models.TextChoices):
+        PENDING = ("pending", _("Pending"))
+        PROCESSING = ("processing", _("Processing"))
+        READY = ("ready", _("Ready"))
+        FAILED = ("failed", _("Failed"))
+
+    class Meta:
+        ordering = ("-created",)
+        verbose_name = _("share bundle")
+        verbose_name_plural = _("share bundles")
+
+    created = models.DateTimeField(
+        _("created"),
+        default=timezone.now,
+        db_index=True,
+        blank=True,
+        editable=False,
+    )
+
+    expiration = models.DateTimeField(
+        _("expiration"),
+        blank=True,
+        null=True,
+        db_index=True,
+    )
+
+    slug = models.SlugField(
+        _("slug"),
+        db_index=True,
+        unique=True,
+        blank=True,
+        editable=False,
+    )
+
+    owner = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        related_name="share_bundles",
+        on_delete=models.SET_NULL,
+        verbose_name=_("owner"),
+    )
+
+    file_version = models.CharField(
+        max_length=50,
+        choices=ShareLink.FileVersion.choices,
+        default=ShareLink.FileVersion.ARCHIVE,
+    )
+
+    status = models.CharField(
+        max_length=50,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
+
+    size_bytes = models.BigIntegerField(
+        _("size (bytes)"),
+        blank=True,
+        null=True,
+    )
+
+    last_error = models.TextField(
+        _("last error"),
+        blank=True,
+    )
+
+    documents = models.ManyToManyField(
+        "documents.Document",
+        related_name="share_bundles",
+        verbose_name=_("documents"),
+    )
+
+    def __str__(self):
+        return _("Share bundle %(slug)s") % {"slug": self.slug}
+
+
 class CustomField(models.Model):
     """
     Defines the name and type of a custom field

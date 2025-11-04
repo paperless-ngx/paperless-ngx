@@ -51,6 +51,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.timezone import make_aware
 from django.utils.translation import get_language
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -71,6 +72,7 @@ from packaging import version as packaging_version
 from redis import Redis
 from rest_framework import parsers
 from rest_framework import serializers
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 from rest_framework.exceptions import ValidationError
@@ -121,6 +123,7 @@ from documents.filters import DocumentTypeFilterSet
 from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
 from documents.filters import ObjectOwnedPermissionsFilter
 from documents.filters import PaperlessTaskFilterSet
+from documents.filters import ShareBundleFilterSet
 from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
@@ -137,6 +140,7 @@ from documents.models import DocumentType
 from documents.models import Note
 from documents.models import PaperlessTask
 from documents.models import SavedView
+from documents.models import ShareBundle
 from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
@@ -171,6 +175,7 @@ from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import RunTaskViewSerializer
 from documents.serialisers import SavedViewSerializer
 from documents.serialisers import SearchResultSerializer
+from documents.serialisers import ShareBundleSerializer
 from documents.serialisers import ShareLinkSerializer
 from documents.serialisers import StoragePathSerializer
 from documents.serialisers import StoragePathTestSerializer
@@ -2436,7 +2441,7 @@ class BulkDownloadView(GenericAPIView):
         follow_filename_format = serializer.validated_data.get("follow_formatting")
 
         for document in documents:
-            if not has_perms_owner_aware(request.user, "view_document", document):
+            if not has_perms_owner_aware(request.user, "change_document", document):
                 return HttpResponseForbidden("Insufficient permissions")
 
         settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
@@ -2789,6 +2794,68 @@ class ShareLinkViewSet(ModelViewSet, PassUserMixin):
     )
     filterset_class = ShareLinkFilterSet
     ordering_fields = ("created", "expiration", "document")
+
+
+class ShareBundleViewSet(ModelViewSet, PassUserMixin):
+    model = ShareBundle
+
+    queryset = ShareBundle.objects.all()
+
+    serializer_class = ShareBundleSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
+    filterset_class = ShareBundleFilterSet
+    ordering_fields = ("created", "expiration", "status")
+
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related("documents")
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        document_ids = serializer.validated_data["document_ids"]
+        documents_qs = Document.objects.filter(pk__in=document_ids).select_related(
+            "owner",
+        )
+        found_ids = set(documents_qs.values_list("pk", flat=True))
+        missing = sorted(set(document_ids) - found_ids)
+        if missing:
+            raise ValidationError(
+                {
+                    "document_ids": _(
+                        "Documents not found: %(ids)s",
+                    )
+                    % {"ids": ", ".join(str(item) for item in missing)},
+                },
+            )
+
+        documents = list(documents_qs)
+        for document in documents:
+            if not has_perms_owner_aware(request.user, "view_document", document):
+                raise ValidationError(
+                    {
+                        "document_ids": _(
+                            "Insufficient permissions to share document %(id)s.",
+                        )
+                        % {"id": document.pk},
+                    },
+                )
+
+        serializer.save(
+            owner=request.user,
+            documents=documents,
+        )
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED,
+            headers=headers,
+        )
 
 
 class SharedLinkView(View):
