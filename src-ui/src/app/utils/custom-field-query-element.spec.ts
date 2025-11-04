@@ -1,4 +1,3 @@
-import { fakeAsync, tick } from '@angular/core/testing'
 import {
   CustomFieldQueryElementType,
   CustomFieldQueryLogicalOperator,
@@ -111,13 +110,26 @@ describe('CustomFieldQueryAtom', () => {
     expect(atom.serialize()).toEqual([1, 'operator', 'value'])
   })
 
-  it('should emit changed on value change after debounce', fakeAsync(() => {
+  it('should emit changed on value change immediately', () => {
     const atom = new CustomFieldQueryAtom()
     const changeSpy = jest.spyOn(atom.changed, 'next')
     atom.value = 'new value'
-    tick(1000)
     expect(changeSpy).toHaveBeenCalled()
-  }))
+  })
+
+  it('should ignore duplicate array emissions', () => {
+    const atom = new CustomFieldQueryAtom()
+    atom.operator = CustomFieldQueryOperator.In
+    const changeSpy = jest.fn()
+    atom.changed.subscribe(changeSpy)
+
+    atom.value = [1, 2]
+    expect(changeSpy).toHaveBeenCalledTimes(1)
+
+    changeSpy.mockClear()
+    atom.value = [1, 2]
+    expect(changeSpy).not.toHaveBeenCalled()
+  })
 })
 
 describe('CustomFieldQueryExpression', () => {
