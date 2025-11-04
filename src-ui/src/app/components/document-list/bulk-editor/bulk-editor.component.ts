@@ -54,6 +54,7 @@ import {
 } from '../../common/filterable-dropdown/filterable-dropdown.component'
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
+import { ShareBundleDialogComponent } from '../../common/share-bundle-dialog/share-bundle-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { CustomFieldsBulkEditDialogComponent } from './custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component'
 
@@ -909,9 +910,19 @@ export class BulkEditorComponent
   }
 
   shareSelected() {
-    this.toastService.showInfo(
-      $localize`Bulk share link creation is coming soon.`
+    const selectedDocuments = this.list.documents.filter((d) =>
+      this.list.selected.has(d.id)
     )
+    const documentsWithArchive = selectedDocuments.filter(
+      (doc) => !!doc.archived_file_name
+    ).length
+
+    const modal = this.modalService.open(ShareBundleDialogComponent, {
+      backdrop: 'static',
+      size: 'lg',
+    })
+    modal.componentInstance.documentIds = Array.from(this.list.selected)
+    modal.componentInstance.documentsWithArchive = documentsWithArchive
   }
 
   manageShareLinks() {
