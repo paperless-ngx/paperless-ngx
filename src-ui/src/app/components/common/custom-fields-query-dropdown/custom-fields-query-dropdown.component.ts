@@ -185,7 +185,9 @@ export class CustomFieldQueriesModel {
   }
 
   private teardownRootSubscriptions() {
-    this.rootSubscriptions.forEach((subscription) => subscription.unsubscribe())
+    for (const subscription of this.rootSubscriptions) {
+      subscription.unsubscribe()
+    }
     this.rootSubscriptions = []
   }
 }
