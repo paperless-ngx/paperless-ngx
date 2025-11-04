@@ -1,6 +1,6 @@
 {
   "name": "paperless-ngx-ui",
-  "version": "2.19.3",
+  "version": "2.19.4",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "ng": "ng",
@@ -21,7 +21,7 @@
     "@angular/platform-browser-dynamic": "~20.3.2",
     "@angular/router": "~20.3.2",
     "@ng-bootstrap/ng-bootstrap": "^19.0.1",
-    "@ng-select/ng-select": "^20.2.2",
+    "@ng-select/ng-select": "^20.6.3",
     "@ngneat/dirty-check-forms": "^3.0.3",
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.3.8",
