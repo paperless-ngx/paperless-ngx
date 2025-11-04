@@ -1,0 +1,67 @@
+<div class="modal-header">
+  <h4 class="modal-title" i18n>Share Selected Documents</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
+</div>
+<div class="modal-body">
+  <form [formGroup]="form" class="d-flex flex-column gap-3">
+    <div>
+      <p class="mb-1">
+        <ng-container i18n>This dialog gathers the options for sending a single link to multiple documents.</ng-container>
+      </p>
+      <p class="mb-1">
+        <ng-container i18n>Selected documents:</ng-container>
+        {{ selectionCount }}
+      </p>
+      @if (documentPreview.length > 0) {
+        <ul class="list-unstyled small mb-0">
+          @for (docId of documentPreview; track docId) {
+            <li>
+              <code>{{ docId }}</code>
+            </li>
+          }
+          @if (selectionCount > documentPreview.length) {
+            <li>
+              <ng-container i18n>+ {{ selectionCount - documentPreview.length }} more…</ng-container>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    <div class="d-flex align-items-center justify-content-between">
+      <div class="form-check form-switch">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          role="switch"
+          id="shareArchiveSwitch"
+          formControlName="shareArchiveVersion"
+          [disabled]="archiveOptionDisabled"
+        />
+        <label class="form-check-label" for="shareArchiveSwitch" i18n>Share archive version</label>
+      </div>
+    </div>
+    @if (archiveOptionDisabled && selectionCount > 0) {
+      <p class="small text-muted mb-0">
+        <ng-container i18n>Archive versions are available only when every selected document has one. Missing archive versions: {{ missingArchiveCount }}.</ng-container>
+      </p>
+    }
+
+    <div class="input-group">
+      <label class="input-group-text" for="expirationDays"><ng-container i18n>Expires</ng-container>:</label>
+      <select class="form-select" id="expirationDays" formControlName="expirationDays">
+        @for (option of expirationOptions; track option.value) {
+          <option [ngValue]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="alert alert-info mb-0" role="alert">
+      <ng-container i18n>Bulk share link creation is still being prototyped. Saving will close this dialog and return the selected options only.</ng-container>
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary btn-sm" (click)="close()" i18n>Close</button>
+  <button type="button" class="btn btn-primary btn-sm" (click)="submit()" i18n>Save options</button>
+</div>
