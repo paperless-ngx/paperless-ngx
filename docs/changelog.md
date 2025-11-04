@@ -2,11 +2,6 @@
 
 ## paperless-ngx 2.19.4
 
-### Features / Enhancements
-
--   Performance: re-enable virtual scroll, bump ng-select [@shamoon](https://github.com/shamoon) ([#11279](https://github.com/paperless-ngx/paperless-ngx/pull/11279))
--   Performance: use virtual scroll container and log level parsing for logs view [@MickLesk](https://github.com/MickLesk) ([#11233](https://github.com/paperless-ngx/paperless-ngx/pull/11233))
-
 ### Bug Fixes
 
 -   Fix: use original_file when attaching docs to workflow emails with added trigger [@shamoon](https://github.com/shamoon) ([#11266](https://github.com/paperless-ngx/paperless-ngx/pull/11266))
@@ -17,6 +12,11 @@
 -   Chore: add max-height and overflow to processedmail error popover [@shamoon](https://github.com/shamoon) ([#11252](https://github.com/paperless-ngx/paperless-ngx/pull/11252))
 -   Fix: delay iframe DOM removal, handle onafterprint error for print in FF [@shamoon](https://github.com/shamoon) ([#11237](https://github.com/paperless-ngx/paperless-ngx/pull/11237))
 -   Fix: de-deduplicate children in tag list when filtering [@shamoon](https://github.com/shamoon) ([#11229](https://github.com/paperless-ngx/paperless-ngx/pull/11229))
+
+### Performance
+
+-   Performance: re-enable virtual scroll, bump ng-select [@shamoon](https://github.com/shamoon) ([#11279](https://github.com/paperless-ngx/paperless-ngx/pull/11279))
+-   Performance: use virtual scroll container and log level parsing for logs view [@MickLesk](https://github.com/MickLesk) ([#11233](https://github.com/paperless-ngx/paperless-ngx/pull/11233))
 
 ### All App Changes
 
