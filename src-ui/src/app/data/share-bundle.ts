@@ -12,6 +12,7 @@ export interface ShareBundleSummary {
   slug: string
   created: string // Date
   expiration?: string // Date
+  documents: number[]
   document_count: number
   file_version: FileVersion
   status: ShareBundleStatus
