@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-28 18:06+0000\n"
-"PO-Revision-Date: 2025-10-28 18:08\n"
+"PO-Revision-Date: 2025-11-01 20:24\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -758,7 +758,7 @@ msgstr "Выбрать"
 
 #: documents/models.py:795
 msgid "Long Text"
-msgstr ""
+msgstr "Длинный текст"
 
 #: documents/models.py:807
 msgid "data type"

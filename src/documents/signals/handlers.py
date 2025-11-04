@@ -32,6 +32,8 @@ from guardian.shortcuts import remove_perm
 from documents import matching
 from documents.caching import clear_document_caches
 from documents.caching import invalidate_llm_suggestions_cache
+from documents.data_models import ConsumableDocument
+from documents.data_models import DocumentSource
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_unique_filename
@@ -57,7 +59,6 @@ from paperless.config import AIConfig
 
 if TYPE_CHECKING:
     from documents.classifier import DocumentClassifier
-    from documents.data_models import ConsumableDocument
     from documents.data_models import DocumentMetadataOverrides
 
 logger = logging.getLogger("paperless.handlers")
@@ -1174,8 +1175,21 @@ def run_workflows(
         )
         try:
             attachments = []
-            if action.email.include_document and original_file:
-                attachments = [document]
+            if action.email.include_document:
+                if trigger_type in [
+                    WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+                    WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+                ]:
+                    # Updated and scheduled can pass the document directly
+                    attachments = [document]
+                elif original_file:
+                    # For consumed and added document is not yet saved, so pass the original file
+                    attachments = [
+                        ConsumableDocument(
+                            source=DocumentSource.ApiUpload,
+                            original_file=original_file,
+                        ),
+                    ]
             n_messages = send_email(
                 subject=subject,
                 body=body,
