@@ -130,6 +130,18 @@ describe('CustomFieldQueryAtom', () => {
     atom.value = [1, 2]
     expect(changeSpy).not.toHaveBeenCalled()
   })
+
+  it('should emit when array values differ while length matches', () => {
+    const atom = new CustomFieldQueryAtom()
+    atom.operator = CustomFieldQueryOperator.In
+    const changeSpy = jest.fn()
+    atom.changed.subscribe(changeSpy)
+
+    atom.value = [1, 2]
+    changeSpy.mockClear()
+    atom.value = [1, 3]
+    expect(changeSpy).toHaveBeenCalledTimes(1)
+  })
 })
 
 describe('CustomFieldQueryExpression', () => {
