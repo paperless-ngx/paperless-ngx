@@ -5,6 +5,8 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, catchError, of, switchMap, takeUntil, timer } from 'rxjs'
 import {
+  SHARE_BUNDLE_FILE_VERSION_LABELS,
+  SHARE_BUNDLE_STATUS_LABELS,
   ShareBundleStatus,
   ShareBundleSummary,
 } from 'src/app/data/share-bundle'
@@ -40,18 +42,6 @@ export class ShareBundleManageDialogComponent
   readonly fileVersions = FileVersion
 
   private readonly refresh$ = new Subject<boolean>()
-
-  private readonly statusLabels: Record<ShareBundleStatus, string> = {
-    [ShareBundleStatus.Pending]: $localize`Pending`,
-    [ShareBundleStatus.Processing]: $localize`Processing`,
-    [ShareBundleStatus.Ready]: $localize`Ready`,
-    [ShareBundleStatus.Failed]: $localize`Failed`,
-  }
-
-  private readonly fileVersionLabels: Record<FileVersion, string> = {
-    [FileVersion.Archive]: $localize`Archive`,
-    [FileVersion.Original]: $localize`Original`,
-  }
 
   ngOnInit(): void {
     this.refresh$
@@ -154,11 +144,11 @@ export class ShareBundleManageDialogComponent
   }
 
   statusLabel(status: ShareBundleStatus): string {
-    return this.statusLabels[status] ?? status
+    return SHARE_BUNDLE_STATUS_LABELS[status] ?? status
   }
 
   fileVersionLabel(version: FileVersion): string {
-    return this.fileVersionLabels[version] ?? version
+    return SHARE_BUNDLE_FILE_VERSION_LABELS[version] ?? version
   }
 
   close(): void {
