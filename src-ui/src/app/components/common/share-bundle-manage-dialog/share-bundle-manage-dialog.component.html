@@ -16,6 +16,11 @@
     </div>
   }
   @if (!loading && !error) {
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <p class="mb-0 text-muted small">
+        <ng-container i18n>Status updates every few seconds while bundles are being prepared.</ng-container>
+      </p>
+    </div>
     @if (bundles.length === 0) {
       <p class="mb-0 text-muted fst-italic" i18n>No bulk share links currently exist.</p>
     }
@@ -26,17 +31,42 @@
             <tr>
               <th scope="col" i18n>Created</th>
               <th scope="col" i18n>Status</th>
+              <th scope="col" i18n>Size</th>
               <th scope="col" i18n>Expires</th>
               <th scope="col" i18n>Documents</th>
-              <th scope="col" i18n>Actions</th>
+              <th scope="col" i18n>File version</th>
+              <th scope="col" class="text-end" i18n>Actions</th>
             </tr>
           </thead>
           <tbody>
             @for (bundle of bundles; track bundle.id) {
               <tr>
-                <td>{{ bundle.created | date: 'short' }}</td>
                 <td>
-                  <span class="badge text-bg-secondary text-uppercase">{{ bundle.status }}</span>
+                  <div>{{ bundle.created | date: 'short' }}</div>
+                  @if (bundle.built_at) {
+                    <div class="small text-muted">
+                      <ng-container i18n>Built:</ng-container> {{ bundle.built_at | date: 'short' }}
+                    </div>
+                  }
+                </td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    @if (bundle.status === statuses.Processing || bundle.status === statuses.Pending) {
+                      <span class="spinner-border spinner-border-sm" role="status"></span>
+                    }
+                    <span>{{ statusLabel(bundle.status) }}</span>
+                  </div>
+                  @if (bundle.last_error && bundle.status === statuses.Failed) {
+                    <div class="small text-danger mt-1">{{ bundle.last_error }}</div>
+                  }
+                </td>
+                <td>
+                  @if (bundle.size_bytes !== undefined && bundle.size_bytes !== null) {
+                    {{ bundle.size_bytes | fileSize }}
+                  }
+                  @if (bundle.size_bytes === undefined || bundle.size_bytes === null) {
+                    <span class="text-muted">&mdash;</span>
+                  }
                 </td>
                 <td>
                   @if (bundle.expiration) {
@@ -47,11 +77,13 @@
                   }
                 </td>
                 <td>{{ bundle.document_count }}</td>
-                <td>
+                <td>{{ fileVersionLabel(bundle.file_version) }}</td>
+                <td class="text-end">
                   <div class="btn-group btn-group-sm">
                     <button
                       type="button"
                       class="btn btn-outline-primary"
+                      [disabled]="bundle.status !== statuses.Ready"
                       (click)="copy(bundle)"
                     >
                       @if (copiedSlug === bundle.slug) {
@@ -62,9 +94,21 @@
                       }
                       <span class="visually-hidden" i18n>Copy link</span>
                     </button>
+                    @if (bundle.status === statuses.Failed) {
+                      <button
+                        type="button"
+                        class="btn btn-outline-warning"
+                        [disabled]="loading"
+                        (click)="retry(bundle)"
+                      >
+                        <i-bs name="arrow-clockwise"></i-bs>
+                        <span class="visually-hidden" i18n>Retry</span>
+                      </button>
+                    }
                     <button
                       type="button"
                       class="btn btn-outline-danger"
+                      [disabled]="loading"
                       (click)="delete(bundle)"
                     >
                       <i-bs name="trash"></i-bs>
