@@ -3,57 +3,107 @@
   <button type="button" class="btn-close" aria-label="Close" (click)="cancel()"></button>
 </div>
 <div class="modal-body">
-  <form [formGroup]="form" class="d-flex flex-column gap-3">
-    <div>
-      <p class="mb-1">
-        <ng-container i18n>This dialog gathers the options for sending a single link to multiple documents.</ng-container>
-      </p>
-      <p class="mb-1">
-        <ng-container i18n>Selected documents:</ng-container>
-        {{ selectionCount }}
-      </p>
-      @if (documentPreview.length > 0) {
-        <ul class="list-unstyled small mb-0">
-          @for (docId of documentPreview; track docId) {
-            <li>
-              <code>{{ docId }}</code>
-            </li>
-          }
-          @if (selectionCount > documentPreview.length) {
-            <li>
-              <ng-container i18n>+ {{ selectionCount - documentPreview.length }} more…</ng-container>
-            </li>
-          }
-        </ul>
-      }
-    </div>
-
-    <div class="d-flex align-items-center justify-content-between">
-      <div class="input-group">
-        <label class="input-group-text" for="expirationDays"><ng-container i18n>Expires</ng-container>:</label>
-        <select class="form-select" id="expirationDays" formControlName="expirationDays">
-          @for (option of expirationOptions; track option.value) {
-            <option [ngValue]="option.value">{{ option.label }}</option>
-          }
-        </select>
+  @if (!createdBundle) {
+    <form [formGroup]="form" class="d-flex flex-column gap-3">
+      <div>
+        <p class="mb-1">
+          <ng-container i18n>This dialog gathers the options for sending a single link to multiple documents.</ng-container>
+        </p>
+        <p class="mb-1">
+          <ng-container i18n>Selected documents:</ng-container>
+          {{ selectionCount }}
+        </p>
+        @if (documentPreview.length > 0) {
+          <ul class="list-unstyled small mb-0">
+            @for (docId of documentPreview; track docId) {
+              <li>
+                <code>{{ docId }}</code>
+              </li>
+            }
+            @if (selectionCount > documentPreview.length) {
+              <li>
+                <ng-container i18n>+ {{ selectionCount - documentPreview.length }} more…</ng-container>
+              </li>
+            }
+          </ul>
+        }
       </div>
-      <div class="form-check form-switch w-100 ms-3">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          role="switch"
-          id="shareArchiveSwitch"
-          formControlName="shareArchiveVersion"
-        />
-        <label class="form-check-label" for="shareArchiveSwitch" i18n>Share archive version (if available)</label>
+
+      <div class="d-flex align-items-center justify-content-between">
+        <div class="input-group">
+          <label class="input-group-text" for="expirationDays"><ng-container i18n>Expires</ng-container>:</label>
+          <select class="form-select" id="expirationDays" formControlName="expirationDays">
+            @for (option of expirationOptions; track option.value) {
+              <option [ngValue]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-check form-switch w-100 ms-3">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            role="switch"
+            id="shareArchiveSwitch"
+            formControlName="shareArchiveVersion"
+          />
+          <label class="form-check-label" for="shareArchiveSwitch" i18n>Share archive version (if available)</label>
+        </div>
       </div>
+    </form>
+  } @else {
+    <div class="d-flex flex-column gap-3">
+      <div class="alert alert-success mb-0" role="status">
+        <h6 class="alert-heading mb-1" i18n>Share link requested</h6>
+        <p class="mb-0 small" i18n>
+          You can copy the link below or open the management screen to monitor its progress. The link will start working once it is ready.
+        </p>
+      </div>
+      <dl class="row mb-0 small">
+        <dt class="col-sm-4" i18n>Status</dt>
+        <dd class="col-sm-8">
+          <span class="badge text-bg-secondary text-uppercase">{{ statusLabel(createdBundle.status) }}</span>
+        </dd>
+        <dt class="col-sm-4" i18n>Slug</dt>
+        <dd class="col-sm-8"><code>{{ createdBundle.slug }}</code></dd>
+        <dt class="col-sm-4" i18n>Link</dt>
+        <dd class="col-sm-8">
+          <div class="input-group input-group-sm">
+            <input class="form-control" type="text" [value]="getShareUrl(createdBundle)" readonly>
+            <button
+              class="btn btn-outline-primary"
+              type="button"
+              (click)="copy(createdBundle)"
+            >
+              @if (copied) {
+                <i-bs name="clipboard-check"></i-bs>
+              }
+              @if (!copied) {
+                <i-bs name="clipboard"></i-bs>
+              }
+              <span class="visually-hidden" i18n>Copy link</span>
+            </button>
+          </div>
+        </dd>
+        <dt class="col-sm-4" i18n>Documents</dt>
+        <dd class="col-sm-8">{{ createdBundle.document_count }}</dd>
+        <dt class="col-sm-4" i18n>Expires</dt>
+        <dd class="col-sm-8">
+          @if (createdBundle.expiration) {
+            {{ createdBundle.expiration | date: 'short' }}
+          }
+          @if (!createdBundle.expiration) {
+            <span i18n>Never</span>
+          }
+        </dd>
+        <dt class="col-sm-4" i18n>File version</dt>
+        <dd class="col-sm-8">{{ fileVersionLabel(createdBundle.file_version) }}</dd>
+        @if (createdBundle.size_bytes !== undefined && createdBundle.size_bytes !== null) {
+          <dt class="col-sm-4" i18n>Size</dt>
+          <dd class="col-sm-8">{{ createdBundle.size_bytes | fileSize }}</dd>
+        }
+      </dl>
     </div>
-
-
-    <div class="alert alert-info mb-0" role="alert">
-      <ng-container i18n>Bulk share link creation is experimental. Saving will attempt to start the process and show the result as a notification.</ng-container>
-    </div>
-  </form>
+  }
 </div>
 <div class="modal-footer">
   <div class="d-flex align-items-center gap-2 w-100">
@@ -61,15 +111,21 @@
       <ng-container i18n>Large bundles can take significant time to prepare and / or download.</ng-container>
     </div>
     <button type="button" class="btn btn-outline-secondary btn-sm ms-auto" (click)="cancel()">{{ cancelBtnCaption }}</button>
-    <button
-      type="button"
-      class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2"
-      (click)="submit()"
-      [disabled]="loading || !buttonsEnabled">
-      @if (loading) {
-        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-      }
-      <span>{{ btnCaption }}</span>
-    </button>
+    @if (createdBundle) {
+      <button type="button" class="btn btn-outline-secondary btn-sm" (click)="openManage()" i18n>Open manage links</button>
+    }
+
+    @if (!createdBundle) {
+      <button
+        type="button"
+        class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2"
+        (click)="submit()"
+        [disabled]="loading || !buttonsEnabled">
+        @if (loading) {
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        }
+        <span>{{ btnCaption }}</span>
+      </button>
+    }
   </div>
 </div>
