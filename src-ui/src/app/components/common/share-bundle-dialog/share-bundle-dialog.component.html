@@ -12,9 +12,9 @@
         </p>
         @if (documentPreview.length > 0) {
           <ul class="list-unstyled small mb-0">
-            @for (docId of documentPreview; track docId) {
+            @for (doc of documentPreview; track doc.id) {
               <li>
-                <code>{{ docId }}</code>
+                <strong>{{ doc.title | documentTitle }}</strong>
               </li>
             }
             @if (selectionCount > documentPreview.length) {

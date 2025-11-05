@@ -918,15 +918,15 @@ export class BulkEditorComponent
       size: 'lg',
     })
     const dialog = modal.componentInstance as ShareBundleDialogComponent
-    dialog.documentIds = Array.from(this.list.selected)
+    const selectedDocuments = this.list.documents.filter((d) =>
+      this.list.selected.has(d.id)
+    )
+    dialog.documents = selectedDocuments
     dialog.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         const payload = dialog.payload
-        if (!payload || !payload.document_ids.length) {
-          this.toastService.showInfo(
-            $localize`No documents selected for sharing.`
-          )
+        if (!payload) {
           return
         }
         dialog.loading = true
