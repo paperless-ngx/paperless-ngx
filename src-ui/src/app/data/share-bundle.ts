@@ -26,3 +26,15 @@ export interface ShareBundleCreatePayload {
   file_version: FileVersion
   expiration_days: number | null
 }
+
+export const SHARE_BUNDLE_STATUS_LABELS: Record<ShareBundleStatus, string> = {
+  [ShareBundleStatus.Pending]: $localize`Pending`,
+  [ShareBundleStatus.Processing]: $localize`Processing`,
+  [ShareBundleStatus.Ready]: $localize`Ready`,
+  [ShareBundleStatus.Failed]: $localize`Failed`,
+}
+
+export const SHARE_BUNDLE_FILE_VERSION_LABELS: Record<FileVersion, string> = {
+  [FileVersion.Archive]: $localize`Archive`,
+  [FileVersion.Original]: $localize`Original`,
+}

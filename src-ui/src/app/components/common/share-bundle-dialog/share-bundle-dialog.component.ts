@@ -4,7 +4,10 @@ import { Component, Input, inject } from '@angular/core'
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import {
+  SHARE_BUNDLE_FILE_VERSION_LABELS,
+  SHARE_BUNDLE_STATUS_LABELS,
   ShareBundleCreatePayload,
+  ShareBundleStatus,
   ShareBundleSummary,
 } from 'src/app/data/share-bundle'
 import {
@@ -47,16 +50,7 @@ export class ShareBundleDialogComponent extends ConfirmDialogComponent {
   createdBundle: ShareBundleSummary | null = null
   copied = false
   onOpenManage?: () => void
-  readonly statusLabels: Record<ShareBundleSummary['status'], string> = {
-    pending: $localize`Pending`,
-    processing: $localize`Processing`,
-    ready: $localize`Ready`,
-    failed: $localize`Failed`,
-  }
-  readonly fileVersionLabels: Record<FileVersion, string> = {
-    [FileVersion.Archive]: $localize`Archive`,
-    [FileVersion.Original]: $localize`Original`,
-  }
+  readonly statuses = ShareBundleStatus
 
   constructor() {
     super()
@@ -116,10 +110,10 @@ export class ShareBundleDialogComponent extends ConfirmDialogComponent {
   }
 
   statusLabel(status: ShareBundleSummary['status']): string {
-    return this.statusLabels[status] ?? status
+    return SHARE_BUNDLE_STATUS_LABELS[status] ?? status
   }
 
   fileVersionLabel(version: FileVersion): string {
-    return this.fileVersionLabels[version] ?? version
+    return SHARE_BUNDLE_FILE_VERSION_LABELS[version] ?? version
   }
 }
