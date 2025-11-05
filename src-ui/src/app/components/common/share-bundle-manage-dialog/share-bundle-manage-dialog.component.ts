@@ -20,7 +20,6 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
 @Component({
   selector: 'pngx-share-bundle-manage-dialog',
   templateUrl: './share-bundle-manage-dialog.component.html',
-  standalone: true,
   imports: [CommonModule, NgxBootstrapIconsModule, FileSizePipe],
 })
 export class ShareBundleManageDialogComponent
