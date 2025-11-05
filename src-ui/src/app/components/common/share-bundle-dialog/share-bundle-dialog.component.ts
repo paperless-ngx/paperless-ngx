@@ -22,7 +22,6 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 @Component({
   selector: 'pngx-share-bundle-dialog',
   templateUrl: './share-bundle-dialog.component.html',
-  standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
