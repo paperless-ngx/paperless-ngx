@@ -279,6 +279,7 @@ MEDIA_ROOT = __get_path("PAPERLESS_MEDIA_ROOT", BASE_DIR.parent / "media")
 ORIGINALS_DIR = MEDIA_ROOT / "documents" / "originals"
 ARCHIVE_DIR = MEDIA_ROOT / "documents" / "archive"
 THUMBNAIL_DIR = MEDIA_ROOT / "documents" / "thumbnails"
+SHARE_BUNDLE_DIR = MEDIA_ROOT / "documents" / "share_bundles"
 
 DATA_DIR = __get_path("PAPERLESS_DATA_DIR", BASE_DIR.parent / "data")
 

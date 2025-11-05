@@ -2205,6 +2205,7 @@ class ShareBundleSerializer(OwnedObjectSerializer):
             "status",
             "size_bytes",
             "last_error",
+            "built_at",
             "documents",
             "document_ids",
             "document_count",
@@ -2217,6 +2218,7 @@ class ShareBundleSerializer(OwnedObjectSerializer):
             "status",
             "size_bytes",
             "last_error",
+            "built_at",
             "documents",
             "document_count",
         )
@@ -2268,10 +2270,14 @@ class ShareBundleSerializer(OwnedObjectSerializer):
 
         ordered_documents = [documents_by_id[doc_id] for doc_id in document_ids]
         share_bundle.documents.set(ordered_documents)
+        share_bundle.document_total = len(ordered_documents)
 
         return share_bundle
 
     def get_document_count(self, obj: ShareBundle) -> int:
+        count = getattr(obj, "document_total", None)
+        if count is not None:
+            return count
         return obj.documents.count()
 
 

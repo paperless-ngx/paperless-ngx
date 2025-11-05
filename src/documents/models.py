@@ -823,6 +823,18 @@ class ShareBundle(SoftDeleteModel):
         blank=True,
     )
 
+    file_path = models.CharField(
+        _("file path"),
+        max_length=512,
+        blank=True,
+    )
+
+    built_at = models.DateTimeField(
+        _("built at"),
+        null=True,
+        blank=True,
+    )
+
     documents = models.ManyToManyField(
         "documents.Document",
         related_name="share_bundles",
@@ -831,6 +843,31 @@ class ShareBundle(SoftDeleteModel):
 
     def __str__(self):
         return _("Share bundle %(slug)s") % {"slug": self.slug}
+
+    @property
+    def absolute_file_path(self) -> Path | None:
+        if not self.file_path:
+            return None
+        file_path = Path(self.file_path)
+        if not file_path.is_absolute():
+            file_path = (settings.MEDIA_ROOT / file_path).resolve()
+        return file_path
+
+    def remove_file(self):
+        path = self.absolute_file_path
+        if path and path.exists():
+            try:
+                path.unlink()
+            except OSError:
+                pass
+
+    def delete(self, using=None, *, keep_parents=False):
+        self.remove_file()
+        return super().delete(using=using, keep_parents=keep_parents)
+
+    def hard_delete(self, using=None, *, keep_parents=False):
+        self.remove_file()
+        return super().hard_delete(using=using, keep_parents=keep_parents)
 
 
 class CustomField(models.Model):

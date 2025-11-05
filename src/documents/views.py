@@ -188,6 +188,7 @@ from documents.serialisers import WorkflowActionSerializer
 from documents.serialisers import WorkflowSerializer
 from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_updated
+from documents.tasks import build_share_bundle
 from documents.tasks import consume_file
 from documents.tasks import empty_trash
 from documents.tasks import index_optimize
@@ -2813,7 +2814,12 @@ class ShareBundleViewSet(ModelViewSet, PassUserMixin):
     ordering_fields = ("created", "expiration", "status")
 
     def get_queryset(self):
-        return super().get_queryset().prefetch_related("documents")
+        return (
+            super()
+            .get_queryset()
+            .prefetch_related("documents")
+            .annotate(document_total=Count("documents", distinct=True))
+        )
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -2846,16 +2852,67 @@ class ShareBundleViewSet(ModelViewSet, PassUserMixin):
                     },
                 )
 
-        serializer.save(
+        document_map = {document.pk: document for document in documents}
+        ordered_documents = [document_map[doc_id] for doc_id in document_ids]
+
+        bundle = serializer.save(
             owner=request.user,
-            documents=documents,
+            documents=ordered_documents,
         )
-        headers = self.get_success_headers(serializer.data)
+        bundle.remove_file()
+        bundle.status = ShareBundle.Status.PENDING
+        bundle.last_error = ""
+        bundle.size_bytes = None
+        bundle.built_at = None
+        bundle.file_path = ""
+        bundle.save(
+            update_fields=[
+                "status",
+                "last_error",
+                "size_bytes",
+                "built_at",
+                "file_path",
+            ],
+        )
+        build_share_bundle.delay(bundle.pk)
+        bundle.document_total = len(ordered_documents)
+        response_serializer = self.get_serializer(bundle)
+        headers = self.get_success_headers(response_serializer.data)
         return Response(
-            serializer.data,
+            response_serializer.data,
             status=status.HTTP_201_CREATED,
             headers=headers,
         )
+
+    @action(detail=True, methods=["post"])
+    def rebuild(self, request, pk=None):
+        bundle = self.get_object()
+        if bundle.status == ShareBundle.Status.PROCESSING:
+            return Response(
+                {"detail": _("Bundle is already being processed.")},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        bundle.remove_file()
+        bundle.status = ShareBundle.Status.PENDING
+        bundle.last_error = ""
+        bundle.size_bytes = None
+        bundle.built_at = None
+        bundle.file_path = ""
+        bundle.save(
+            update_fields=[
+                "status",
+                "last_error",
+                "size_bytes",
+                "built_at",
+                "file_path",
+            ],
+        )
+        build_share_bundle.delay(bundle.pk)
+        bundle.document_total = (
+            getattr(bundle, "document_total", None) or bundle.documents.count()
+        )
+        serializer = self.get_serializer(bundle)
+        return Response(serializer.data)
 
 
 class SharedLinkView(View):
@@ -2864,15 +2921,103 @@ class SharedLinkView(View):
 
     def get(self, request, slug):
         share_link = ShareLink.objects.filter(slug=slug).first()
-        if share_link is None:
+        if share_link is not None:
+            if (
+                share_link.expiration is not None
+                and share_link.expiration < timezone.now()
+            ):
+                return HttpResponseRedirect("/accounts/login/?sharelink_expired=1")
+            return serve_file(
+                doc=share_link.document,
+                use_archive=share_link.file_version == "archive",
+                disposition="inline",
+            )
+
+        share_bundle = ShareBundle.objects.filter(slug=slug).first()
+        if share_bundle is None:
             return HttpResponseRedirect("/accounts/login/?sharelink_notfound=1")
-        if share_link.expiration is not None and share_link.expiration < timezone.now():
+
+        if (
+            share_bundle.expiration is not None
+            and share_bundle.expiration < timezone.now()
+        ):
             return HttpResponseRedirect("/accounts/login/?sharelink_expired=1")
-        return serve_file(
-            doc=share_link.document,
-            use_archive=share_link.file_version == "archive",
-            disposition="inline",
+
+        if share_bundle.status in {
+            ShareBundle.Status.PENDING,
+            ShareBundle.Status.PROCESSING,
+        }:
+            return HttpResponse(
+                _(
+                    "The shared bundle is still being prepared. Please try again later.",
+                ),
+                status=status.HTTP_202_ACCEPTED,
+            )
+
+        if share_bundle.status == ShareBundle.Status.FAILED:
+            share_bundle.remove_file()
+            share_bundle.status = ShareBundle.Status.PENDING
+            share_bundle.last_error = ""
+            share_bundle.size_bytes = None
+            share_bundle.built_at = None
+            share_bundle.file_path = ""
+            share_bundle.save(
+                update_fields=[
+                    "status",
+                    "last_error",
+                    "size_bytes",
+                    "built_at",
+                    "file_path",
+                ],
+            )
+            build_share_bundle.delay(share_bundle.pk)
+            return HttpResponse(
+                _(
+                    "The shared bundle is temporarily unavailable. A rebuild has been scheduled. Please try again later.",
+                ),
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+        file_path = share_bundle.absolute_file_path
+        if file_path is None or not file_path.exists():
+            share_bundle.status = ShareBundle.Status.PENDING
+            share_bundle.last_error = ""
+            share_bundle.size_bytes = None
+            share_bundle.built_at = None
+            share_bundle.file_path = ""
+            share_bundle.save(
+                update_fields=[
+                    "status",
+                    "last_error",
+                    "size_bytes",
+                    "built_at",
+                    "file_path",
+                ],
+            )
+            build_share_bundle.delay(share_bundle.pk)
+            return HttpResponse(
+                _(
+                    "The shared bundle is being prepared. Please try again later.",
+                ),
+                status=status.HTTP_202_ACCEPTED,
+            )
+
+        response = FileResponse(file_path.open("rb"), content_type="application/zip")
+        download_name = f"paperless-share-{share_bundle.slug}.zip"
+        filename_normalized = (
+            normalize("NFKD", download_name)
+            .encode(
+                "ascii",
+                "ignore",
+            )
+            .decode("ascii")
         )
+        filename_encoded = quote(download_name)
+        response["Content-Disposition"] = (
+            f"attachment; filename='{filename_normalized}'; "
+            f"filename*=utf-8''{filename_encoded}"
+        )
+        return response
 
 
 def serve_file(*, doc: Document, use_archive: bool, disposition: str):
