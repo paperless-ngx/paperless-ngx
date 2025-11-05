@@ -935,10 +935,16 @@ export class BulkEditorComponent
           .createBundle(payload)
           .pipe(first())
           .subscribe({
-            next: () => {
+            next: (result) => {
               dialog.loading = false
-              dialog.buttonsEnabled = true
-              modal.close()
+              dialog.buttonsEnabled = false
+              dialog.createdBundle = result
+              dialog.copied = false
+              dialog.payload = null
+              dialog.onOpenManage = () => {
+                modal.close()
+                this.manageShareLinks()
+              }
               this.toastService.showInfo(
                 $localize`Bulk share link creation requested.`
               )
