@@ -7,9 +7,6 @@
     <form [formGroup]="form" class="d-flex flex-column gap-3">
       <div>
         <p class="mb-1">
-          <ng-container i18n>This dialog gathers the options for sending a single link to multiple documents.</ng-container>
-        </p>
-        <p class="mb-1">
           <ng-container i18n>Selected documents:</ng-container>
           {{ selectionCount }}
         </p>
@@ -108,7 +105,7 @@
 <div class="modal-footer">
   <div class="d-flex align-items-center gap-2 w-100">
     <div class="text-light fst-italic small">
-      <ng-container i18n>Large bundles can take significant time to prepare and / or download.</ng-container>
+      <ng-container i18n>A zip file containing the selected documents will be created. This process happens in the background and may take some time, especially for large bundles.</ng-container>
     </div>
     <button type="button" class="btn btn-outline-secondary btn-sm ms-auto" (click)="cancel()">{{ cancelBtnCaption }}</button>
     @if (createdBundle) {
