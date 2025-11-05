@@ -84,10 +84,6 @@ export class ShareBundleManageDialogComponent
     super.ngOnDestroy()
   }
 
-  fetchBundles(): void {
-    this.triggerRefresh(false)
-  }
-
   getShareUrl(bundle: ShareBundleSummary): string {
     const apiURL = new URL(environment.apiBaseUrl)
     return `${apiURL.origin}${apiURL.pathname.replace(/\/api\/$/, '/share/')}${

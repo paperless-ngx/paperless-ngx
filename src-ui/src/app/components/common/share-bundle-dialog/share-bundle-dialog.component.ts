@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common'
 import { Component, Input, inject } from '@angular/core'
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { Document } from 'src/app/data/document'
 import {
   SHARE_BUNDLE_FILE_VERSION_LABELS,
   SHARE_BUNDLE_STATUS_LABELS,
@@ -14,6 +15,7 @@ import {
   FileVersion,
   SHARE_LINK_EXPIRATION_OPTIONS,
 } from 'src/app/data/share-link'
+import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { FileSizePipe } from 'src/app/pipes/file-size.pipe'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
@@ -27,17 +29,19 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
     ReactiveFormsModule,
     NgxBootstrapIconsModule,
     FileSizePipe,
+    DocumentTitlePipe,
   ],
+  providers: [],
 })
 export class ShareBundleDialogComponent extends ConfirmDialogComponent {
   private formBuilder = inject(FormBuilder)
   private clipboard = inject(Clipboard)
   private toastService = inject(ToastService)
 
-  private _documentIds: number[] = []
+  private _documents: Document[] = []
 
   selectionCount = 0
-  documentPreview: number[] = []
+  documentPreview: Document[] = []
   form: FormGroup = this.formBuilder.group({
     shareArchiveVersion: [true],
     expirationDays: [7],
@@ -59,20 +63,16 @@ export class ShareBundleDialogComponent extends ConfirmDialogComponent {
   }
 
   @Input()
-  set documentIds(ids: number[]) {
-    this._documentIds = ids ?? []
-    this.selectionCount = this._documentIds.length
-    this.documentPreview = this._documentIds.slice(0, 10)
-  }
-
-  get documentIds(): number[] {
-    return this._documentIds
+  set documents(docs: Document[]) {
+    this._documents = docs.concat()
+    this.selectionCount = this._documents.length
+    this.documentPreview = this._documents.slice(0, 10)
   }
 
   submit() {
     if (this.createdBundle) return
     this.payload = {
-      document_ids: this.documentIds,
+      document_ids: this._documents.map((doc) => doc.id),
       file_version: this.form.value.shareArchiveVersion
         ? FileVersion.Archive
         : FileVersion.Original,
