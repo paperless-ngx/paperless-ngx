@@ -56,6 +56,7 @@ import {
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 import { ShareBundleDialogComponent } from '../../common/share-bundle-dialog/share-bundle-dialog.component'
+import { ShareBundleManageDialogComponent } from '../../common/share-bundle-manage-dialog/share-bundle-manage-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { CustomFieldsBulkEditDialogComponent } from './custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component'
 
@@ -955,9 +956,10 @@ export class BulkEditorComponent
   }
 
   manageShareLinks() {
-    this.toastService.showInfo(
-      $localize`Bulk share link management is coming soon.`
-    )
+    const modal = this.modalService.open(ShareBundleManageDialogComponent, {
+      backdrop: 'static',
+      size: 'lg',
+    })
   }
 
   emailSelected() {

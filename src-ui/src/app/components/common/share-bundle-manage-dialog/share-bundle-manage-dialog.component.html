@@ -1,0 +1,86 @@
+<div class="modal-header">
+  <h4 class="modal-title">{{ title }}</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
+</div>
+
+<div class="modal-body">
+  @if (loading) {
+    <div class="d-flex align-items-center gap-2">
+      <div class="spinner-border spinner-border-sm" role="status"></div>
+      <span i18n>Loading bulk share links…</span>
+    </div>
+  }
+  @if (!loading && error) {
+    <div class="alert alert-danger mb-0" role="alert">
+      {{ error }}
+    </div>
+  }
+  @if (!loading && !error) {
+    @if (bundles.length === 0) {
+      <p class="mb-0 text-muted fst-italic" i18n>No bulk share links currently exist.</p>
+    }
+    @if (bundles.length > 0) {
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead>
+            <tr>
+              <th scope="col" i18n>Created</th>
+              <th scope="col" i18n>Status</th>
+              <th scope="col" i18n>Expires</th>
+              <th scope="col" i18n>Documents</th>
+              <th scope="col" i18n>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (bundle of bundles; track bundle.id) {
+              <tr>
+                <td>{{ bundle.created | date: 'short' }}</td>
+                <td>
+                  <span class="badge text-bg-secondary text-uppercase">{{ bundle.status }}</span>
+                </td>
+                <td>
+                  @if (bundle.expiration) {
+                    {{ bundle.expiration | date: 'short' }}
+                  }
+                  @if (!bundle.expiration) {
+                    <span i18n>Never</span>
+                  }
+                </td>
+                <td>{{ bundle.document_count }}</td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary"
+                      (click)="copy(bundle)"
+                    >
+                      @if (copiedSlug === bundle.slug) {
+                        <i-bs name="clipboard-check"></i-bs>
+                      }
+                      @if (copiedSlug !== bundle.slug) {
+                        <i-bs name="clipboard"></i-bs>
+                      }
+                      <span class="visually-hidden" i18n>Copy link</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger"
+                      (click)="delete(bundle)"
+                    >
+                      <i-bs name="trash"></i-bs>
+                      <span class="visually-hidden" i18n>Delete link</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary btn-sm" (click)="close()" i18n>Close</button>
+</div>
