@@ -54,7 +54,7 @@
                     @if (bundle.status === statuses.Processing || bundle.status === statuses.Pending) {
                       <span class="spinner-border spinner-border-sm" role="status"></span>
                     }
-                    <span>{{ statusLabel(bundle.status) }}</span>
+                    <span class="badge text-bg-secondary text-uppercase">{{ statusLabel(bundle.status) }}</span>
                   </div>
                   @if (bundle.last_error && bundle.status === statuses.Failed) {
                     <div class="small text-danger mt-1">{{ bundle.last_error }}</div>
