@@ -22,6 +22,13 @@ export class ShareBundleService extends AbstractNameFilterService<ShareBundleSum
     this.clearCache()
     return this.http.post<ShareBundleSummary>(this.getResourceUrl(), payload)
   }
+  rebuildBundle(bundleId: number): Observable<ShareBundleSummary> {
+    this.clearCache()
+    return this.http.post<ShareBundleSummary>(
+      this.getResourceUrl(bundleId, 'rebuild'),
+      {}
+    )
+  }
 
   listAllBundles(): Observable<ShareBundleSummary[]> {
     return this.list(1, 1000, 'created', true).pipe(

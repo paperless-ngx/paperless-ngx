@@ -1,10 +1,15 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { CommonModule } from '@angular/common'
-import { Component, OnInit, inject } from '@angular/core'
+import { Component, OnDestroy, OnInit, inject } from '@angular/core'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { first } from 'rxjs'
-import { ShareBundleSummary } from 'src/app/data/share-bundle'
+import { Subject, catchError, of, switchMap, takeUntil, timer } from 'rxjs'
+import {
+  ShareBundleStatus,
+  ShareBundleSummary,
+} from 'src/app/data/share-bundle'
+import { FileVersion } from 'src/app/data/share-link'
+import { FileSizePipe } from 'src/app/pipes/file-size.pipe'
 import { ShareBundleService } from 'src/app/services/rest/share-bundle.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
@@ -14,11 +19,11 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
   selector: 'pngx-share-bundle-manage-dialog',
   templateUrl: './share-bundle-manage-dialog.component.html',
   standalone: true,
-  imports: [CommonModule, NgxBootstrapIconsModule],
+  imports: [CommonModule, NgxBootstrapIconsModule, FileSizePipe],
 })
 export class ShareBundleManageDialogComponent
   extends LoadingComponentWithPermissions
-  implements OnInit
+  implements OnInit, OnDestroy
 {
   private activeModal = inject(NgbActiveModal)
   private shareBundleService = inject(ShareBundleService)
@@ -28,33 +33,70 @@ export class ShareBundleManageDialogComponent
   title = $localize`Bulk Share Links`
 
   bundles: ShareBundleSummary[] = []
-  error: string
-  copiedSlug: string
+  error: string | null = null
+  copiedSlug: string | null = null
+
+  readonly statuses = ShareBundleStatus
+  readonly fileVersions = FileVersion
+
+  private readonly refresh$ = new Subject<boolean>()
+
+  private readonly statusLabels: Record<ShareBundleStatus, string> = {
+    [ShareBundleStatus.Pending]: $localize`Pending`,
+    [ShareBundleStatus.Processing]: $localize`Processing`,
+    [ShareBundleStatus.Ready]: $localize`Ready`,
+    [ShareBundleStatus.Failed]: $localize`Failed`,
+  }
+
+  private readonly fileVersionLabels: Record<FileVersion, string> = {
+    [FileVersion.Archive]: $localize`Archive`,
+    [FileVersion.Original]: $localize`Original`,
+  }
 
   ngOnInit(): void {
-    this.fetchBundles()
+    this.refresh$
+      .pipe(
+        switchMap((silent) => {
+          if (!silent) {
+            this.loading = true
+          }
+          this.error = null
+          return this.shareBundleService.listAllBundles().pipe(
+            catchError((error) => {
+              if (!silent) {
+                this.loading = false
+              }
+              this.error = $localize`Failed to load bulk share links.`
+              this.toastService.showError(
+                $localize`Error retrieving bulk share links.`,
+                error
+              )
+              return of(null)
+            })
+          )
+        }),
+        takeUntil(this.unsubscribeNotifier)
+      )
+      .subscribe((results) => {
+        if (results) {
+          this.bundles = results
+          this.copiedSlug = null
+        }
+        this.loading = false
+      })
+
+    this.triggerRefresh(false)
+    timer(5000, 5000)
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => this.triggerRefresh(true))
+  }
+
+  ngOnDestroy(): void {
+    super.ngOnDestroy()
   }
 
   fetchBundles(): void {
-    this.loading = true
-    this.error = null
-    this.shareBundleService
-      .listAllBundles()
-      .pipe(first())
-      .subscribe({
-        next: (results) => {
-          this.bundles = results
-          this.loading = false
-        },
-        error: (e) => {
-          this.loading = false
-          this.error = $localize`Failed to load bulk share links.`
-          this.toastService.showError(
-            $localize`Error retrieving bulk share links.`,
-            e
-          )
-        },
-      })
+    this.triggerRefresh(false)
   }
 
   getShareUrl(bundle: ShareBundleSummary): string {
@@ -65,22 +107,29 @@ export class ShareBundleManageDialogComponent
   }
 
   copy(bundle: ShareBundleSummary): void {
+    if (bundle.status !== ShareBundleStatus.Ready) {
+      return
+    }
     const success = this.clipboard.copy(this.getShareUrl(bundle))
     if (success) {
       this.copiedSlug = bundle.slug
       setTimeout(() => {
         this.copiedSlug = null
       }, 3000)
+      this.toastService.showInfo($localize`Share link copied to clipboard.`)
     }
   }
 
   delete(bundle: ShareBundleSummary): void {
+    this.error = null
+    this.loading = true
     this.shareBundleService.delete(bundle).subscribe({
       next: () => {
         this.toastService.showInfo($localize`Bulk share link deleted.`)
-        this.fetchBundles()
+        this.triggerRefresh(false)
       },
       error: (e) => {
+        this.loading = false
         this.toastService.showError(
           $localize`Error deleting bulk share link.`,
           e
@@ -89,7 +138,47 @@ export class ShareBundleManageDialogComponent
     })
   }
 
+  retry(bundle: ShareBundleSummary): void {
+    this.error = null
+    this.shareBundleService.rebuildBundle(bundle.id).subscribe({
+      next: (updated) => {
+        this.toastService.showInfo(
+          $localize`Bulk share link rebuild requested.`
+        )
+        this.replaceBundle(updated)
+      },
+      error: (e) => {
+        this.toastService.showError($localize`Error requesting rebuild.`, e)
+      },
+    })
+  }
+
+  statusLabel(status: ShareBundleStatus): string {
+    return this.statusLabels[status] ?? status
+  }
+
+  fileVersionLabel(version: FileVersion): string {
+    return this.fileVersionLabels[version] ?? version
+  }
+
   close(): void {
     this.activeModal.close()
+  }
+
+  private replaceBundle(updated: ShareBundleSummary): void {
+    const index = this.bundles.findIndex((bundle) => bundle.id === updated.id)
+    if (index >= 0) {
+      this.bundles = [
+        ...this.bundles.slice(0, index),
+        updated,
+        ...this.bundles.slice(index + 1),
+      ]
+    } else {
+      this.bundles = [updated, ...this.bundles]
+    }
+  }
+
+  private triggerRefresh(silent: boolean): void {
+    this.refresh$.next(silent)
   }
 }
