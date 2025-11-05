@@ -3003,7 +3003,8 @@ class SharedLinkView(View):
             )
 
         response = FileResponse(file_path.open("rb"), content_type="application/zip")
-        download_name = f"paperless-share-{share_bundle.slug}.zip"
+        short_slug = share_bundle.slug[:12]
+        download_name = f"paperless-share-{short_slug}.zip"
         filename_normalized = (
             normalize("NFKD", download_name)
             .encode(
