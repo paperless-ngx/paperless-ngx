@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 import {
   ShareBundleCreatePayload,
   ShareBundleSummary,
@@ -22,12 +23,9 @@ export class ShareBundleService extends AbstractNameFilterService<ShareBundleSum
     return this.http.post<ShareBundleSummary>(this.getResourceUrl(), payload)
   }
 
-  listBundlesForDocuments(
-    documentIds: number[]
-  ): Observable<ShareBundleSummary[]> {
-    const params = { documents: documentIds.join(',') }
-    return this.http.get<ShareBundleSummary[]>(this.getResourceUrl(), {
-      params,
-    })
+  listAllBundles(): Observable<ShareBundleSummary[]> {
+    return this.list(1, 1000, 'created', true).pipe(
+      map((response) => response.results)
+    )
   }
 }
