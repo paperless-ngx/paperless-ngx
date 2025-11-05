@@ -241,6 +241,17 @@ def _parse_beat_schedule() -> dict:
                 "expires": 23.0 * 60.0 * 60.0,
             },
         },
+        {
+            "name": "Cleanup expired share bundles",
+            "env_key": "PAPERLESS_SHARE_BUNDLE_CLEANUP_CRON",
+            # Default daily at 02:00
+            "env_default": "0 2 * * *",
+            "task": "documents.tasks.cleanup_expired_share_bundles",
+            "options": {
+                # 1 hour before default schedule sends again
+                "expires": 23.0 * 60.0 * 60.0,
+            },
+        },
     ]
     for task in tasks:
         # Either get the environment setting or use the default

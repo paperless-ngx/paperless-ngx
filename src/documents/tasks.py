@@ -718,3 +718,26 @@ def build_share_bundle(bundle_id: int):
                 temp_zip_path.unlink()
             except OSError:
                 pass
+
+
+@shared_task
+def cleanup_expired_share_bundles():
+    now = timezone.now()
+    expired_qs = ShareBundle.objects.filter(
+        deleted_at__isnull=True,
+        expiration__isnull=False,
+        expiration__lt=now,
+    )
+    count = 0
+    for bundle in expired_qs.iterator():
+        count += 1
+        try:
+            bundle.hard_delete()
+        except Exception as exc:
+            logger.warning(
+                "Failed to delete expired share bundle %s: %s",
+                bundle.pk,
+                exc,
+            )
+    if count:
+        logger.info("Deleted %s expired share bundle(s)", count)
