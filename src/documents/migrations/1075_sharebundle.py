@@ -129,6 +129,22 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
+                    "file_path",
+                    models.CharField(
+                        blank=True,
+                        max_length=512,
+                        verbose_name="file path",
+                    ),
+                ),
+                (
+                    "built_at",
+                    models.DateTimeField(
+                        blank=True,
+                        null=True,
+                        verbose_name="built at",
+                    ),
+                ),
+                (
                     "owner",
                     models.ForeignKey(
                         blank=True,

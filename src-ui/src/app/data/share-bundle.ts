@@ -16,6 +16,7 @@ export interface ShareBundleSummary {
   document_count: number
   file_version: FileVersion
   status: ShareBundleStatus
+  built_at?: string
   size_bytes?: number
   last_error?: string
 }
