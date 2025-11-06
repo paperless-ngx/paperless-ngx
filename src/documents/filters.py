@@ -38,8 +38,8 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import PaperlessTask
-from documents.models import ShareBundle
 from documents.models import ShareLink
+from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
 
@@ -797,11 +797,11 @@ class ShareLinkFilterSet(FilterSet):
         }
 
 
-class ShareBundleFilterSet(FilterSet):
+class ShareLinkBundleFilterSet(FilterSet):
     documents = Filter(method="filter_documents")
 
     class Meta:
-        model = ShareBundle
+        model = ShareLinkBundle
         fields = {
             "created": DATETIME_KWARGS,
             "expiration": DATETIME_KWARGS,
