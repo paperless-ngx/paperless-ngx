@@ -109,19 +109,19 @@
     </div>
     <button type="button" class="btn btn-outline-secondary btn-sm ms-auto" (click)="cancel()">{{ cancelBtnCaption }}</button>
     @if (createdBundle) {
-      <button type="button" class="btn btn-outline-secondary btn-sm" (click)="openManage()" i18n>Manage share link bundles</button>
+      <button type="button" class="btn btn-outline-secondary btn-sm text-nowrap" (click)="openManage()" i18n>Manage share link bundles</button>
     }
 
     @if (!createdBundle) {
       <button
         type="button"
-        class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2"
+        class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2 text-nowrap"
         (click)="submit()"
         [disabled]="loading || !buttonsEnabled">
         @if (loading) {
           <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
         }
-        <span>{{ btnCaption }}</span>
+        {{ btnCaption }}
       </button>
     }
   </div>
