@@ -20,6 +20,23 @@ from paperless_mail.serialisers import ObfuscatedPasswordField
 logger = logging.getLogger("paperless.settings")
 
 
+class PasswordValidationMixin:
+    def _has_real_password(self, value: str | None) -> bool:
+        return bool(value) and value.replace("*", "") != ""
+
+    def validate_password(self, value: str) -> str:
+        if not self._has_real_password(value):
+            return value
+
+        request = self.context.get("request") if hasattr(self, "context") else None
+        user = self.instance or (
+            request.user if request and hasattr(request, "user") else None
+        )
+        validate_password(value, user)  # raise ValidationError if invalid
+
+        return value
+
+
 class PaperlessAuthTokenSerializer(AuthTokenSerializer):
     code = serializers.CharField(
         label="MFA Code",
@@ -50,7 +67,7 @@ class PaperlessAuthTokenSerializer(AuthTokenSerializer):
         return attrs
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(PasswordValidationMixin, serializers.ModelSerializer):
     password = ObfuscatedPasswordField(required=False)
     user_permissions = serializers.SlugRelatedField(
         many=True,
@@ -88,11 +105,11 @@ class UserSerializer(serializers.ModelSerializer):
         return obj.get_group_permissions()
 
     def update(self, instance, validated_data):
-        if "password" in validated_data:
-            if len(validated_data.get("password").replace("*", "")) > 0:
-                instance.set_password(validated_data.get("password"))
-                instance.save()
-            validated_data.pop("password")
+        password = validated_data.pop("password", None)
+        if self._has_real_password(password):
+            instance.set_password(password)
+            instance.save()
+
         super().update(instance, validated_data)
         return instance
 
@@ -103,12 +120,7 @@ class UserSerializer(serializers.ModelSerializer):
         user_permissions = None
         if "user_permissions" in validated_data:
             user_permissions = validated_data.pop("user_permissions")
-        password = None
-        if (
-            "password" in validated_data
-            and len(validated_data.get("password").replace("*", "")) > 0
-        ):
-            password = validated_data.pop("password")
+        password = validated_data.pop("password", None)
         user = User.objects.create(**validated_data)
         # set groups
         if groups:
@@ -117,7 +129,7 @@ class UserSerializer(serializers.ModelSerializer):
         if user_permissions:
             user.user_permissions.set(user_permissions)
         # set password
-        if password:
+        if self._has_real_password(password):
             user.set_password(password)
         user.save()
         return user
@@ -157,7 +169,7 @@ class SocialAccountSerializer(serializers.ModelSerializer):
             return "Unknown App"
 
 
-class ProfileSerializer(serializers.ModelSerializer):
+class ProfileSerializer(PasswordValidationMixin, serializers.ModelSerializer):
     email = serializers.EmailField(allow_blank=True, required=False)
     password = ObfuscatedPasswordField(required=False, allow_null=False)
     auth_token = serializers.SlugRelatedField(read_only=True, slug_field="key")
@@ -175,16 +187,6 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def get_has_usable_password(self, user: User) -> bool:
         return user.has_usable_password()
-
-    def validate_password(self, value: str) -> str:
-        if value is None or value.replace("*", "") == "":
-            return value
-
-        request = self.context.get("request")
-        user = self.instance or (request.user if request else None)
-        validate_password(value, user)
-
-        return value
 
     class Meta:
         model = User
