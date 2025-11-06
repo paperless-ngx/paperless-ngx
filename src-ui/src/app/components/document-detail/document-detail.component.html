@@ -66,8 +66,8 @@
         <i-bs name="pencil"></i-bs>&nbsp;<ng-container i18n>PDF Editor</ng-container>
       </button>
 
-      @if (requiresPassword || password) {
-        <button ngbDropdownItem (click)="removePassword()" [disabled]="!userIsOwner || !password">
+      @if (userIsOwner && (requiresPassword || password)) {
+        <button ngbDropdownItem (click)="removePassword()" [disabled]="!password">
           <i-bs name="unlock"></i-bs>&nbsp;<ng-container i18n>Remove Password</ng-container>
         </button>
       }
