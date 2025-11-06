@@ -9,6 +9,7 @@ from allauth.socialaccount.models import SocialApp
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 
@@ -174,6 +175,16 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def get_has_usable_password(self, user: User) -> bool:
         return user.has_usable_password()
+
+    def validate_password(self, value: str) -> str:
+        if value is None or value.replace("*", "") == "":
+            return value
+
+        request = self.context.get("request")
+        user = self.instance or (request.user if request else None)
+        validate_password(value, user)
+
+        return value
 
     class Meta:
         model = User

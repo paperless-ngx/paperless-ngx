@@ -183,6 +183,7 @@ export class ProfileEditDialogComponent
       this.newPassword && this.currentPassword !== this.newPassword
     const profile = Object.assign({}, this.form.value)
     delete profile.totp_code
+    this.error = null
     this.networkActive = true
     this.profileService
       .update(profile)
@@ -204,6 +205,7 @@ export class ProfileEditDialogComponent
         },
         error: (error) => {
           this.toastService.showError($localize`Error saving profile`, error)
+          this.error = error?.error
           this.networkActive = false
         },
       })

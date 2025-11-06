@@ -192,6 +192,34 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
         self.assertEqual(user.first_name, user_data["first_name"])
         self.assertEqual(user.last_name, user_data["last_name"])
 
+    def test_update_profile_invalid_password_returns_field_error(self):
+        """
+        GIVEN:
+            - Configured user
+        WHEN:
+            - API call is made to update profile with weak password
+        THEN:
+            - Profile update fails with password field error
+        """
+
+        user_data = {
+            "email": "new@email.com",
+            "password": "short",  # shorter than default validator threshold
+            "first_name": "new first name",
+            "last_name": "new last name",
+        }
+
+        response = self.client.patch(self.ENDPOINT, user_data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("password", response.data)
+        self.assertIsInstance(response.data["password"], list)
+        self.assertTrue(
+            any(
+                "too short" in message.lower() for message in response.data["password"]
+            ),
+        )
+
     def test_update_auth_token(self):
         """
         GIVEN:
