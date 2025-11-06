@@ -764,7 +764,7 @@
           <context context-type="sourcefile">src/app/components/admin/logs/logs.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">lines</target>
+        <target state="translated">lignes</target>
       </trans-unit>
       <trans-unit id="8838884664569764142" datatype="html" approved="yes">
         <source>Auto refresh</source>
@@ -8699,7 +8699,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Select:</target>
+        <target state="translated">Sélectionner :</target>
       </trans-unit>
       <trans-unit id="6252070156626006029" datatype="html" approved="yes">
         <source>None</source>
