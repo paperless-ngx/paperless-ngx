@@ -8700,7 +8700,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Select:</target>
+        <target state="translated">選取：</target>
       </trans-unit>
       <trans-unit id="6252070156626006029" datatype="html">
         <source>None</source>
