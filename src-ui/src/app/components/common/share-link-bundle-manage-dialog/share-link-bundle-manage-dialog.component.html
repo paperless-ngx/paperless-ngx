@@ -7,7 +7,7 @@
   @if (loading) {
     <div class="d-flex align-items-center gap-2">
       <div class="spinner-border spinner-border-sm" role="status"></div>
-      <span i18n>Loading bulk share links…</span>
+      <span i18n>Loading share link bundles…</span>
     </div>
   }
   @if (!loading && error) {
@@ -22,7 +22,7 @@
       </p>
     </div>
     @if (bundles.length === 0) {
-      <p class="mb-0 text-muted fst-italic" i18n>No bulk share links currently exist.</p>
+      <p class="mb-0 text-muted fst-italic" i18n>No share link bundles currently exist.</p>
     }
     @if (bundles.length > 0) {
       <div class="table-responsive">
@@ -92,7 +92,7 @@
                       @if (copiedSlug !== bundle.slug) {
                         <i-bs name="clipboard"></i-bs>
                       }
-                      <span class="visually-hidden" i18n>Copy link</span>
+                      <span class="visually-hidden" i18n>Copy share link</span>
                     </button>
                     @if (bundle.status === statuses.Failed) {
                       <button
@@ -112,7 +112,7 @@
                       (click)="delete(bundle)"
                     >
                       <i-bs name="trash"></i-bs>
-                      <span class="visually-hidden" i18n>Delete link</span>
+                      <span class="visually-hidden" i18n>Delete share link bundle</span>
                     </button>
                   </div>
                 </td>

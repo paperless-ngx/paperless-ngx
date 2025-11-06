@@ -5,16 +5,16 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Document } from 'src/app/data/document'
 import {
-  SHARE_BUNDLE_FILE_VERSION_LABELS,
-  SHARE_BUNDLE_STATUS_LABELS,
-  ShareBundleCreatePayload,
-  ShareBundleStatus,
-  ShareBundleSummary,
-} from 'src/app/data/share-bundle'
-import {
   FileVersion,
   SHARE_LINK_EXPIRATION_OPTIONS,
 } from 'src/app/data/share-link'
+import {
+  SHARE_LINK_BUNDLE_FILE_VERSION_LABELS,
+  SHARE_LINK_BUNDLE_STATUS_LABELS,
+  ShareLinkBundleCreatePayload,
+  ShareLinkBundleStatus,
+  ShareLinkBundleSummary,
+} from 'src/app/data/share-link-bundle'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { FileSizePipe } from 'src/app/pipes/file-size.pipe'
 import { ToastService } from 'src/app/services/toast.service'
@@ -22,8 +22,8 @@ import { environment } from 'src/environments/environment'
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component'
 
 @Component({
-  selector: 'pngx-share-bundle-dialog',
-  templateUrl: './share-bundle-dialog.component.html',
+  selector: 'pngx-share-link-bundle-dialog',
+  templateUrl: './share-link-bundle-dialog.component.html',
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -33,7 +33,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
   ],
   providers: [],
 })
-export class ShareBundleDialogComponent extends ConfirmDialogComponent {
+export class ShareLinkBundleDialogComponent extends ConfirmDialogComponent {
   private formBuilder = inject(FormBuilder)
   private clipboard = inject(Clipboard)
   private toastService = inject(ToastService)
@@ -46,20 +46,20 @@ export class ShareBundleDialogComponent extends ConfirmDialogComponent {
     shareArchiveVersion: [true],
     expirationDays: [7],
   })
-  payload: ShareBundleCreatePayload | null = null
+  payload: ShareLinkBundleCreatePayload | null = null
 
   readonly expirationOptions = SHARE_LINK_EXPIRATION_OPTIONS
 
-  createdBundle: ShareBundleSummary | null = null
+  createdBundle: ShareLinkBundleSummary | null = null
   copied = false
   onOpenManage?: () => void
-  readonly statuses = ShareBundleStatus
+  readonly statuses = ShareLinkBundleStatus
 
   constructor() {
     super()
     this.loading = false
-    this.title = $localize`Share Selected Documents`
-    this.btnCaption = $localize`Create`
+    this.title = $localize`Create share link bundle`
+    this.btnCaption = $localize`Create link`
   }
 
   @Input()
@@ -82,14 +82,14 @@ export class ShareBundleDialogComponent extends ConfirmDialogComponent {
     super.confirm()
   }
 
-  getShareUrl(bundle: ShareBundleSummary): string {
+  getShareUrl(bundle: ShareLinkBundleSummary): string {
     const apiURL = new URL(environment.apiBaseUrl)
     return `${apiURL.origin}${apiURL.pathname.replace(/\/api\/$/, '/share/')}${
       bundle.slug
     }`
   }
 
-  copy(bundle: ShareBundleSummary): void {
+  copy(bundle: ShareLinkBundleSummary): void {
     const success = this.clipboard.copy(this.getShareUrl(bundle))
     if (success) {
       this.copied = true
@@ -108,11 +108,11 @@ export class ShareBundleDialogComponent extends ConfirmDialogComponent {
     }
   }
 
-  statusLabel(status: ShareBundleSummary['status']): string {
-    return SHARE_BUNDLE_STATUS_LABELS[status] ?? status
+  statusLabel(status: ShareLinkBundleSummary['status']): string {
+    return SHARE_LINK_BUNDLE_STATUS_LABELS[status] ?? status
   }
 
   fileVersionLabel(version: FileVersion): string {
-    return SHARE_BUNDLE_FILE_VERSION_LABELS[version] ?? version
+    return SHARE_LINK_BUNDLE_FILE_VERSION_LABELS[version] ?? version
   }
 }

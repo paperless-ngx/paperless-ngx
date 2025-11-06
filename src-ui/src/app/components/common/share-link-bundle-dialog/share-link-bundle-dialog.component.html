@@ -50,9 +50,9 @@
   } @else {
     <div class="d-flex flex-column gap-3">
       <div class="alert alert-success mb-0" role="status">
-        <h6 class="alert-heading mb-1" i18n>Share link requested</h6>
+        <h6 class="alert-heading mb-1" i18n>Share link bundle requested</h6>
         <p class="mb-0 small" i18n>
-          You can copy the link below or open the management screen to monitor its progress. The link will start working once it is ready.
+          You can copy the share link below or open the manager to monitor progress. The link will start working once the bundle is ready.
         </p>
       </div>
       <dl class="row mb-0 small">
@@ -105,11 +105,11 @@
 <div class="modal-footer">
   <div class="d-flex align-items-center gap-2 w-100">
     <div class="text-light fst-italic small">
-      <ng-container i18n>A zip file containing the selected documents will be created. This process happens in the background and may take some time, especially for large bundles.</ng-container>
+      <ng-container i18n>A zip file containing the selected documents will be created for this share link bundle. This process happens in the background and may take some time, especially for large bundles.</ng-container>
     </div>
     <button type="button" class="btn btn-outline-secondary btn-sm ms-auto" (click)="cancel()">{{ cancelBtnCaption }}</button>
     @if (createdBundle) {
-      <button type="button" class="btn btn-outline-secondary btn-sm" (click)="openManage()" i18n>Open manage links</button>
+      <button type="button" class="btn btn-outline-secondary btn-sm" (click)="openManage()" i18n>Manage share link bundles</button>
     }
 
     @if (!createdBundle) {

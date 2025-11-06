@@ -777,7 +777,7 @@ class ShareLink(SoftDeleteModel):
         return f"Share Link for {self.document.title}"
 
 
-class ShareBundle(SoftDeleteModel):
+class ShareLinkBundle(SoftDeleteModel):
     class Status(models.TextChoices):
         PENDING = ("pending", _("Pending"))
         PROCESSING = ("processing", _("Processing"))
@@ -786,8 +786,8 @@ class ShareBundle(SoftDeleteModel):
 
     class Meta:
         ordering = ("-created",)
-        verbose_name = _("share bundle")
-        verbose_name_plural = _("share bundles")
+        verbose_name = _("share link bundle")
+        verbose_name_plural = _("share link bundles")
 
     created = models.DateTimeField(
         _("created"),
@@ -816,7 +816,7 @@ class ShareBundle(SoftDeleteModel):
         User,
         blank=True,
         null=True,
-        related_name="share_bundles",
+        related_name="share_link_bundles",
         on_delete=models.SET_NULL,
         verbose_name=_("owner"),
     )
@@ -858,12 +858,12 @@ class ShareBundle(SoftDeleteModel):
 
     documents = models.ManyToManyField(
         "documents.Document",
-        related_name="share_bundles",
+        related_name="share_link_bundles",
         verbose_name=_("documents"),
     )
 
     def __str__(self):
-        return _("Share bundle %(slug)s") % {"slug": self.slug}
+        return _("Share link bundle %(slug)s") % {"slug": self.slug}
 
     @property
     def absolute_file_path(self) -> Path | None:

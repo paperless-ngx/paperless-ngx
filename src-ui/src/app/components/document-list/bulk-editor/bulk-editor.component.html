@@ -112,11 +112,11 @@
         </div>
       </button>
       <div ngbDropdownMenu aria-labelledby="dropdownSend" class="shadow">
-        <button ngbDropdownItem (click)="shareSelected()">
-          <i-bs name="link"></i-bs>&nbsp;<ng-container i18n>Create a share link</ng-container>
+        <button ngbDropdownItem (click)="createShareLinkBundle()">
+          <i-bs name="link"></i-bs>&nbsp;<ng-container i18n>Create a share link bundle</ng-container>
         </button>
-        <button ngbDropdownItem (click)="manageShareLinks()">
-          <i-bs name="list-ul"></i-bs>&nbsp;<ng-container i18n>Manage existing links</ng-container>
+        <button ngbDropdownItem (click)="manageShareLinkBundles()">
+          <i-bs name="list-ul"></i-bs>&nbsp;<ng-container i18n>Manage share link bundles</ng-container>
         </button>
         <div class="dropdown-divider"></div>
         @if (emailEnabled) {

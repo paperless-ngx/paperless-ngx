@@ -11,7 +11,7 @@ from django.db import migrations
 from django.db import models
 
 
-def grant_sharebundle_permissions(apps, schema_editor):
+def grant_share_link_bundle_permissions(apps, schema_editor):
     # Ensure newly introduced permissions are created for all apps
     for app_config in apps.get_app_configs():
         app_config.models_module = True
@@ -22,27 +22,27 @@ def grant_sharebundle_permissions(apps, schema_editor):
     if add_document_perm is None:
         return
 
-    sharebundle_permissions = Permission.objects.filter(
-        codename__contains="sharebundle",
+    share_bundle_permissions = Permission.objects.filter(
+        codename__contains="sharelinkbundle",
     )
 
     users = User.objects.filter(user_permissions=add_document_perm).distinct()
     for user in users:
-        user.user_permissions.add(*sharebundle_permissions)
+        user.user_permissions.add(*share_bundle_permissions)
 
     groups = Group.objects.filter(permissions=add_document_perm).distinct()
     for group in groups:
-        group.permissions.add(*sharebundle_permissions)
+        group.permissions.add(*share_bundle_permissions)
 
 
-def revoke_sharebundle_permissions(apps, schema_editor):
-    sharebundle_permissions = Permission.objects.filter(
-        codename__contains="sharebundle",
+def revoke_share_link_bundle_permissions(apps, schema_editor):
+    share_bundle_permissions = Permission.objects.filter(
+        codename__contains="sharelinkbundle",
     )
     for user in User.objects.all():
-        user.user_permissions.remove(*sharebundle_permissions)
+        user.user_permissions.remove(*share_bundle_permissions)
     for group in Group.objects.all():
-        group.permissions.remove(*sharebundle_permissions)
+        group.permissions.remove(*share_bundle_permissions)
 
 
 class Migration(migrations.Migration):
@@ -53,7 +53,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name="ShareBundle",
+            name="ShareLinkBundle",
             fields=[
                 (
                     "id",
@@ -150,7 +150,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
-                        related_name="share_bundles",
+                        related_name="share_link_bundles",
                         to=settings.AUTH_USER_MODEL,
                         verbose_name="owner",
                     ),
@@ -170,21 +170,21 @@ class Migration(migrations.Migration):
             ],
             options={
                 "ordering": ("-created",),
-                "verbose_name": "share bundle",
-                "verbose_name_plural": "share bundles",
+                "verbose_name": "share link bundle",
+                "verbose_name_plural": "share link bundles",
             },
         ),
         migrations.AddField(
-            model_name="sharebundle",
+            model_name="sharelinkbundle",
             name="documents",
             field=models.ManyToManyField(
-                related_name="share_bundles",
+                related_name="share_link_bundles",
                 to="documents.document",
                 verbose_name="documents",
             ),
         ),
         migrations.RunPython(
-            grant_sharebundle_permissions,
-            reverse_code=revoke_sharebundle_permissions,
+            grant_share_link_bundle_permissions,
+            reverse_code=revoke_share_link_bundle_permissions,
         ),
     ]
