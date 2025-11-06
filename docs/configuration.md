@@ -1610,6 +1610,16 @@ processing. This only has an effect if
 
     Defaults to `0 1 * * *`, once per day.
 
+## Share links
+
+#### [`PAPERLESS_SHARE_LINK_BUNDLE_CLEANUP_CRON=<cron expression>`](#PAPERLESS_SHARE_LINK_BUNDLE_CLEANUP_CRON) {#PAPERLESS_SHARE_LINK_BUNDLE_CLEANUP_CRON}
+
+: Controls how often Paperless-ngx removes expired share link bundles (and their generated ZIP archives).
+
+: If set to the string "disable", expired bundles are not cleaned up automatically.
+
+    Defaults to `0 2 * * *`, once per day at 02:00.
+
 ## Binaries
 
 There are a few external software packages that Paperless expects to
