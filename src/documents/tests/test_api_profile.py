@@ -220,6 +220,37 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
             ),
         )
 
+    def test_update_profile_placeholder_password_skips_validation(self):
+        """
+        GIVEN:
+            - Configured user with existing password
+        WHEN:
+            - API call is made with the obfuscated placeholder password value
+        THEN:
+            - Profile is updated without changing the password or running validators
+        """
+
+        original_password = "orig-pass-12345"
+        self.user.set_password(original_password)
+        self.user.save()
+
+        user_data = {
+            "email": "new@email.com",
+            "password": "*" * 12,  # matches obfuscated value from serializer
+            "first_name": "new first name",
+            "last_name": "new last name",
+        }
+
+        response = self.client.patch(self.ENDPOINT, user_data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        user = User.objects.get(username=self.user.username)
+        self.assertTrue(user.check_password(original_password))
+        self.assertEqual(user.email, user_data["email"])
+        self.assertEqual(user.first_name, user_data["first_name"])
+        self.assertEqual(user.last_name, user_data["last_name"])
+
     def test_update_auth_token(self):
         """
         GIVEN:
