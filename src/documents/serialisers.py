@@ -62,8 +62,8 @@ from documents.models import Note
 from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
-from documents.models import ShareBundle
 from documents.models import ShareLink
+from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import UiSettings
@@ -2175,7 +2175,7 @@ class ShareLinkSerializer(OwnedObjectSerializer):
         return super().create(validated_data)
 
 
-class ShareBundleSerializer(OwnedObjectSerializer):
+class ShareLinkBundleSerializer(OwnedObjectSerializer):
     document_ids = serializers.ListField(
         child=serializers.IntegerField(min_value=1),
         allow_empty=False,
@@ -2194,7 +2194,7 @@ class ShareBundleSerializer(OwnedObjectSerializer):
     document_count = SerializerMethodField()
 
     class Meta:
-        model = ShareBundle
+        model = ShareLinkBundle
         fields = (
             "id",
             "created",
@@ -2243,7 +2243,7 @@ class ShareBundleSerializer(OwnedObjectSerializer):
         else:
             validated_data["expiration"] = None
 
-        share_bundle = super().create(validated_data)
+        share_link_bundle = super().create(validated_data)
 
         if documents is None:
             documents = list(
@@ -2269,12 +2269,12 @@ class ShareBundleSerializer(OwnedObjectSerializer):
             )
 
         ordered_documents = [documents_by_id[doc_id] for doc_id in document_ids]
-        share_bundle.documents.set(ordered_documents)
-        share_bundle.document_total = len(ordered_documents)
+        share_link_bundle.documents.set(ordered_documents)
+        share_link_bundle.document_total = len(ordered_documents)
 
-        return share_bundle
+        return share_link_bundle
 
-    def get_document_count(self, obj: ShareBundle) -> int:
+    def get_document_count(self, obj: ShareLinkBundle) -> int:
         count = getattr(obj, "document_total", None)
         if count is not None:
             return count

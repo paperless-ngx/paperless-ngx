@@ -4,40 +4,40 @@ import { Component, OnDestroy, OnInit, inject } from '@angular/core'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, catchError, of, switchMap, takeUntil, timer } from 'rxjs'
-import {
-  SHARE_BUNDLE_FILE_VERSION_LABELS,
-  SHARE_BUNDLE_STATUS_LABELS,
-  ShareBundleStatus,
-  ShareBundleSummary,
-} from 'src/app/data/share-bundle'
 import { FileVersion } from 'src/app/data/share-link'
+import {
+  SHARE_LINK_BUNDLE_FILE_VERSION_LABELS,
+  SHARE_LINK_BUNDLE_STATUS_LABELS,
+  ShareLinkBundleStatus,
+  ShareLinkBundleSummary,
+} from 'src/app/data/share-link-bundle'
 import { FileSizePipe } from 'src/app/pipes/file-size.pipe'
-import { ShareBundleService } from 'src/app/services/rest/share-bundle.service'
+import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
-  selector: 'pngx-share-bundle-manage-dialog',
-  templateUrl: './share-bundle-manage-dialog.component.html',
+  selector: 'pngx-share-link-bundle-manage-dialog',
+  templateUrl: './share-link-bundle-manage-dialog.component.html',
   imports: [CommonModule, NgxBootstrapIconsModule, FileSizePipe],
 })
-export class ShareBundleManageDialogComponent
+export class ShareLinkBundleManageDialogComponent
   extends LoadingComponentWithPermissions
   implements OnInit, OnDestroy
 {
   private activeModal = inject(NgbActiveModal)
-  private shareBundleService = inject(ShareBundleService)
+  private shareLinkBundleService = inject(ShareLinkBundleService)
   private toastService = inject(ToastService)
   private clipboard = inject(Clipboard)
 
-  title = $localize`Bulk Share Links`
+  title = $localize`Share link bundles`
 
-  bundles: ShareBundleSummary[] = []
+  bundles: ShareLinkBundleSummary[] = []
   error: string | null = null
   copiedSlug: string | null = null
 
-  readonly statuses = ShareBundleStatus
+  readonly statuses = ShareLinkBundleStatus
   readonly fileVersions = FileVersion
 
   private readonly refresh$ = new Subject<boolean>()
@@ -50,14 +50,14 @@ export class ShareBundleManageDialogComponent
             this.loading = true
           }
           this.error = null
-          return this.shareBundleService.listAllBundles().pipe(
+          return this.shareLinkBundleService.listAllBundles().pipe(
             catchError((error) => {
               if (!silent) {
                 this.loading = false
               }
-              this.error = $localize`Failed to load bulk share links.`
+              this.error = $localize`Failed to load share link bundles.`
               this.toastService.showError(
-                $localize`Error retrieving bulk share links.`,
+                $localize`Error retrieving share link bundles.`,
                 error
               )
               return of(null)
@@ -84,15 +84,15 @@ export class ShareBundleManageDialogComponent
     super.ngOnDestroy()
   }
 
-  getShareUrl(bundle: ShareBundleSummary): string {
+  getShareUrl(bundle: ShareLinkBundleSummary): string {
     const apiURL = new URL(environment.apiBaseUrl)
     return `${apiURL.origin}${apiURL.pathname.replace(/\/api\/$/, '/share/')}${
       bundle.slug
     }`
   }
 
-  copy(bundle: ShareBundleSummary): void {
-    if (bundle.status !== ShareBundleStatus.Ready) {
+  copy(bundle: ShareLinkBundleSummary): void {
+    if (bundle.status !== ShareLinkBundleStatus.Ready) {
       return
     }
     const success = this.clipboard.copy(this.getShareUrl(bundle))
@@ -105,30 +105,30 @@ export class ShareBundleManageDialogComponent
     }
   }
 
-  delete(bundle: ShareBundleSummary): void {
+  delete(bundle: ShareLinkBundleSummary): void {
     this.error = null
     this.loading = true
-    this.shareBundleService.delete(bundle).subscribe({
+    this.shareLinkBundleService.delete(bundle).subscribe({
       next: () => {
-        this.toastService.showInfo($localize`Bulk share link deleted.`)
+        this.toastService.showInfo($localize`Share link bundle deleted.`)
         this.triggerRefresh(false)
       },
       error: (e) => {
         this.loading = false
         this.toastService.showError(
-          $localize`Error deleting bulk share link.`,
+          $localize`Error deleting share link bundle.`,
           e
         )
       },
     })
   }
 
-  retry(bundle: ShareBundleSummary): void {
+  retry(bundle: ShareLinkBundleSummary): void {
     this.error = null
-    this.shareBundleService.rebuildBundle(bundle.id).subscribe({
+    this.shareLinkBundleService.rebuildBundle(bundle.id).subscribe({
       next: (updated) => {
         this.toastService.showInfo(
-          $localize`Bulk share link rebuild requested.`
+          $localize`Share link bundle rebuild requested.`
         )
         this.replaceBundle(updated)
       },
@@ -138,19 +138,19 @@ export class ShareBundleManageDialogComponent
     })
   }
 
-  statusLabel(status: ShareBundleStatus): string {
-    return SHARE_BUNDLE_STATUS_LABELS[status] ?? status
+  statusLabel(status: ShareLinkBundleStatus): string {
+    return SHARE_LINK_BUNDLE_STATUS_LABELS[status] ?? status
   }
 
   fileVersionLabel(version: FileVersion): string {
-    return SHARE_BUNDLE_FILE_VERSION_LABELS[version] ?? version
+    return SHARE_LINK_BUNDLE_FILE_VERSION_LABELS[version] ?? version
   }
 
   close(): void {
     this.activeModal.close()
   }
 
-  private replaceBundle(updated: ShareBundleSummary): void {
+  private replaceBundle(updated: ShareLinkBundleSummary): void {
     const index = this.bundles.findIndex((bundle) => bundle.id === updated.id)
     if (index >= 0) {
       this.bundles = [

@@ -43,8 +43,8 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import PaperlessTask
-from documents.models import ShareBundle
 from documents.models import ShareLink
+from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import WorkflowRun
@@ -632,17 +632,19 @@ def update_document_in_llm_index(document):
 def remove_document_from_llm_index(document):
     llm_index_remove_document(document)
 
-def build_share_bundle(bundle_id: int):
+def build_share_link_bundle(bundle_id: int):
     try:
         bundle = (
-            ShareBundle.objects.filter(pk=bundle_id).prefetch_related("documents").get()
+            ShareLinkBundle.objects.filter(pk=bundle_id)
+            .prefetch_related("documents")
+            .get()
         )
-    except ShareBundle.DoesNotExist:
-        logger.warning("Share bundle %s no longer exists.", bundle_id)
+    except ShareLinkBundle.DoesNotExist:
+        logger.warning("Share link bundle %s no longer exists.", bundle_id)
         return
 
     bundle.remove_file()
-    bundle.status = ShareBundle.Status.PROCESSING
+    bundle.status = ShareLinkBundle.Status.PROCESSING
     bundle.last_error = ""
     bundle.size_bytes = None
     bundle.built_at = None
@@ -677,7 +679,7 @@ def build_share_bundle(bundle_id: int):
             for document in documents:
                 strategy.add_document(document)
 
-        output_dir = settings.SHARE_BUNDLE_DIR
+        output_dir = settings.SHARE_LINK_BUNDLE_DIR
         output_dir.mkdir(parents=True, exist_ok=True)
         final_path = (output_dir / f"{bundle.slug}.zip").resolve()
         if final_path.exists():
@@ -689,7 +691,7 @@ def build_share_bundle(bundle_id: int):
         except ValueError:
             bundle.file_path = str(final_path)
         bundle.size_bytes = final_path.stat().st_size
-        bundle.status = ShareBundle.Status.READY
+        bundle.status = ShareLinkBundle.Status.READY
         bundle.built_at = timezone.now()
         bundle.last_error = ""
         bundle.save(
@@ -701,10 +703,14 @@ def build_share_bundle(bundle_id: int):
                 "last_error",
             ],
         )
-        logger.info("Built share bundle %s", bundle.pk)
+        logger.info("Built share link bundle %s", bundle.pk)
     except Exception as exc:
-        logger.exception("Failed to build share bundle %s: %s", bundle_id, exc)
-        bundle.status = ShareBundle.Status.FAILED
+        logger.exception(
+            "Failed to build share link bundle %s: %s",
+            bundle_id,
+            exc,
+        )
+        bundle.status = ShareLinkBundle.Status.FAILED
         bundle.last_error = str(exc)
         bundle.save(update_fields=["status", "last_error"])
         try:
@@ -721,9 +727,9 @@ def build_share_bundle(bundle_id: int):
 
 
 @shared_task
-def cleanup_expired_share_bundles():
+def cleanup_expired_share_link_bundles():
     now = timezone.now()
-    expired_qs = ShareBundle.objects.filter(
+    expired_qs = ShareLinkBundle.objects.filter(
         deleted_at__isnull=True,
         expiration__isnull=False,
         expiration__lt=now,
@@ -735,9 +741,9 @@ def cleanup_expired_share_bundles():
             bundle.hard_delete()
         except Exception as exc:
             logger.warning(
-                "Failed to delete expired share bundle %s: %s",
+                "Failed to delete expired share link bundle %s: %s",
                 bundle.pk,
                 exc,
             )
     if count:
-        logger.info("Deleted %s expired share bundle(s)", count)
+        logger.info("Deleted %s expired share link bundle(s)", count)

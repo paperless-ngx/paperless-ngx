@@ -12,8 +12,8 @@ from documents.models import Note
 from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
-from documents.models import ShareBundle
 from documents.models import ShareLink
+from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.tasks import update_document_parent_tags
@@ -185,7 +185,7 @@ class ShareLinksAdmin(GuardedModelAdmin):
         return super().get_queryset(request).select_related("document__correspondent")
 
 
-class ShareBundleAdmin(GuardedModelAdmin):
+class ShareLinkBundleAdmin(GuardedModelAdmin):
     list_display = ("created", "status", "expiration", "owner", "slug")
     list_filter = ("status", "created", "expiration", "owner")
     search_fields = ("slug",)
@@ -232,7 +232,7 @@ admin.site.register(StoragePath, StoragePathAdmin)
 admin.site.register(PaperlessTask, TaskAdmin)
 admin.site.register(Note, NotesAdmin)
 admin.site.register(ShareLink, ShareLinksAdmin)
-admin.site.register(ShareBundle, ShareBundleAdmin)
+admin.site.register(ShareLinkBundle, ShareLinkBundleAdmin)
 admin.site.register(CustomField, CustomFieldsAdmin)
 admin.site.register(CustomFieldInstance, CustomFieldInstancesAdmin)
 

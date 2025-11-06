@@ -123,7 +123,7 @@ from documents.filters import DocumentTypeFilterSet
 from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
 from documents.filters import ObjectOwnedPermissionsFilter
 from documents.filters import PaperlessTaskFilterSet
-from documents.filters import ShareBundleFilterSet
+from documents.filters import ShareLinkBundleFilterSet
 from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
@@ -140,8 +140,8 @@ from documents.models import DocumentType
 from documents.models import Note
 from documents.models import PaperlessTask
 from documents.models import SavedView
-from documents.models import ShareBundle
 from documents.models import ShareLink
+from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import UiSettings
@@ -175,7 +175,7 @@ from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import RunTaskViewSerializer
 from documents.serialisers import SavedViewSerializer
 from documents.serialisers import SearchResultSerializer
-from documents.serialisers import ShareBundleSerializer
+from documents.serialisers import ShareLinkBundleSerializer
 from documents.serialisers import ShareLinkSerializer
 from documents.serialisers import StoragePathSerializer
 from documents.serialisers import StoragePathTestSerializer
@@ -188,7 +188,7 @@ from documents.serialisers import WorkflowActionSerializer
 from documents.serialisers import WorkflowSerializer
 from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_updated
-from documents.tasks import build_share_bundle
+from documents.tasks import build_share_link_bundle
 from documents.tasks import consume_file
 from documents.tasks import empty_trash
 from documents.tasks import index_optimize
@@ -2797,12 +2797,12 @@ class ShareLinkViewSet(ModelViewSet, PassUserMixin):
     ordering_fields = ("created", "expiration", "document")
 
 
-class ShareBundleViewSet(ModelViewSet, PassUserMixin):
-    model = ShareBundle
+class ShareLinkBundleViewSet(ModelViewSet, PassUserMixin):
+    model = ShareLinkBundle
 
-    queryset = ShareBundle.objects.all()
+    queryset = ShareLinkBundle.objects.all()
 
-    serializer_class = ShareBundleSerializer
+    serializer_class = ShareLinkBundleSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     filter_backends = (
@@ -2810,7 +2810,7 @@ class ShareBundleViewSet(ModelViewSet, PassUserMixin):
         OrderingFilter,
         ObjectOwnedOrGrantedPermissionsFilter,
     )
-    filterset_class = ShareBundleFilterSet
+    filterset_class = ShareLinkBundleFilterSet
     ordering_fields = ("created", "expiration", "status")
 
     def get_queryset(self):
@@ -2860,7 +2860,7 @@ class ShareBundleViewSet(ModelViewSet, PassUserMixin):
             documents=ordered_documents,
         )
         bundle.remove_file()
-        bundle.status = ShareBundle.Status.PENDING
+        bundle.status = ShareLinkBundle.Status.PENDING
         bundle.last_error = ""
         bundle.size_bytes = None
         bundle.built_at = None
@@ -2874,7 +2874,7 @@ class ShareBundleViewSet(ModelViewSet, PassUserMixin):
                 "file_path",
             ],
         )
-        build_share_bundle.delay(bundle.pk)
+        build_share_link_bundle.delay(bundle.pk)
         bundle.document_total = len(ordered_documents)
         response_serializer = self.get_serializer(bundle)
         headers = self.get_success_headers(response_serializer.data)
@@ -2887,13 +2887,13 @@ class ShareBundleViewSet(ModelViewSet, PassUserMixin):
     @action(detail=True, methods=["post"])
     def rebuild(self, request, pk=None):
         bundle = self.get_object()
-        if bundle.status == ShareBundle.Status.PROCESSING:
+        if bundle.status == ShareLinkBundle.Status.PROCESSING:
             return Response(
                 {"detail": _("Bundle is already being processed.")},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         bundle.remove_file()
-        bundle.status = ShareBundle.Status.PENDING
+        bundle.status = ShareLinkBundle.Status.PENDING
         bundle.last_error = ""
         bundle.size_bytes = None
         bundle.built_at = None
@@ -2907,7 +2907,7 @@ class ShareBundleViewSet(ModelViewSet, PassUserMixin):
                 "file_path",
             ],
         )
-        build_share_bundle.delay(bundle.pk)
+        build_share_link_bundle.delay(bundle.pk)
         bundle.document_total = (
             getattr(bundle, "document_total", None) or bundle.documents.count()
         )
@@ -2933,35 +2933,32 @@ class SharedLinkView(View):
                 disposition="inline",
             )
 
-        share_bundle = ShareBundle.objects.filter(slug=slug).first()
-        if share_bundle is None:
+        bundle = ShareLinkBundle.objects.filter(slug=slug).first()
+        if bundle is None:
             return HttpResponseRedirect("/accounts/login/?sharelink_notfound=1")
 
-        if (
-            share_bundle.expiration is not None
-            and share_bundle.expiration < timezone.now()
-        ):
+        if bundle.expiration is not None and bundle.expiration < timezone.now():
             return HttpResponseRedirect("/accounts/login/?sharelink_expired=1")
 
-        if share_bundle.status in {
-            ShareBundle.Status.PENDING,
-            ShareBundle.Status.PROCESSING,
+        if bundle.status in {
+            ShareLinkBundle.Status.PENDING,
+            ShareLinkBundle.Status.PROCESSING,
         }:
             return HttpResponse(
                 _(
-                    "The shared bundle is still being prepared. Please try again later.",
+                    "The share link bundle is still being prepared. Please try again later.",
                 ),
                 status=status.HTTP_202_ACCEPTED,
             )
 
-        if share_bundle.status == ShareBundle.Status.FAILED:
-            share_bundle.remove_file()
-            share_bundle.status = ShareBundle.Status.PENDING
-            share_bundle.last_error = ""
-            share_bundle.size_bytes = None
-            share_bundle.built_at = None
-            share_bundle.file_path = ""
-            share_bundle.save(
+        if bundle.status == ShareLinkBundle.Status.FAILED:
+            bundle.remove_file()
+            bundle.status = ShareLinkBundle.Status.PENDING
+            bundle.last_error = ""
+            bundle.size_bytes = None
+            bundle.built_at = None
+            bundle.file_path = ""
+            bundle.save(
                 update_fields=[
                     "status",
                     "last_error",
@@ -2970,22 +2967,22 @@ class SharedLinkView(View):
                     "file_path",
                 ],
             )
-            build_share_bundle.delay(share_bundle.pk)
+            build_share_link_bundle.delay(bundle.pk)
             return HttpResponse(
                 _(
-                    "The shared bundle is temporarily unavailable. A rebuild has been scheduled. Please try again later.",
+                    "The share link bundle is temporarily unavailable. A rebuild has been scheduled. Please try again later.",
                 ),
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
 
-        file_path = share_bundle.absolute_file_path
+        file_path = bundle.absolute_file_path
         if file_path is None or not file_path.exists():
-            share_bundle.status = ShareBundle.Status.PENDING
-            share_bundle.last_error = ""
-            share_bundle.size_bytes = None
-            share_bundle.built_at = None
-            share_bundle.file_path = ""
-            share_bundle.save(
+            bundle.status = ShareLinkBundle.Status.PENDING
+            bundle.last_error = ""
+            bundle.size_bytes = None
+            bundle.built_at = None
+            bundle.file_path = ""
+            bundle.save(
                 update_fields=[
                     "status",
                     "last_error",
@@ -2994,16 +2991,16 @@ class SharedLinkView(View):
                     "file_path",
                 ],
             )
-            build_share_bundle.delay(share_bundle.pk)
+            build_share_link_bundle.delay(bundle.pk)
             return HttpResponse(
                 _(
-                    "The shared bundle is being prepared. Please try again later.",
+                    "The share link bundle is being prepared. Please try again later.",
                 ),
                 status=status.HTTP_202_ACCEPTED,
             )
 
         response = FileResponse(file_path.open("rb"), content_type="application/zip")
-        short_slug = share_bundle.slug[:12]
+        short_slug = bundle.slug[:12]
         download_name = f"paperless-share-{short_slug}.zip"
         filename_normalized = (
             normalize("NFKD", download_name)
