@@ -42,6 +42,10 @@ export enum RelativeDate {
   THIS_MONTH = 6,
   TODAY = 7,
   YESTERDAY = 8,
+  PREVIOUS_WEEK = 9,
+  PREVIOUS_MONTH = 10,
+  PREVIOUS_QUARTER = 11,
+  PREVIOUS_YEAR = 12,
 }
 
 @Component({
@@ -110,6 +114,26 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
       id: RelativeDate.YESTERDAY,
       name: $localize`Yesterday`,
       date: new Date().setDate(new Date().getDate() - 1),
+    },
+    {
+      id: RelativeDate.PREVIOUS_WEEK,
+      name: $localize`Previous week`,
+      date: null,
+    },
+    {
+      id: RelativeDate.PREVIOUS_MONTH,
+      name: $localize`Previous month`,
+      date: null,
+    },
+    {
+      id: RelativeDate.PREVIOUS_QUARTER,
+      name: $localize`Previous quarter`,
+      date: null,
+    },
+    {
+      id: RelativeDate.PREVIOUS_YEAR,
+      name: $localize`Previous year`,
+      date: null,
     },
   ]
 

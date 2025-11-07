@@ -173,6 +173,22 @@ const RELATIVE_DATE_QUERYSTRINGS = [
     relativeDate: RelativeDate.YESTERDAY,
     dateQuery: 'yesterday',
   },
+  {
+    relativeDate: RelativeDate.PREVIOUS_WEEK,
+    dateQuery: 'previous week',
+  },
+  {
+    relativeDate: RelativeDate.PREVIOUS_MONTH,
+    dateQuery: 'previous month',
+  },
+  {
+    relativeDate: RelativeDate.PREVIOUS_QUARTER,
+    dateQuery: 'previous quarter',
+  },
+  {
+    relativeDate: RelativeDate.PREVIOUS_YEAR,
+    dateQuery: 'previous year',
+  },
 ]
 
 const DEFAULT_TEXT_FILTER_TARGET_OPTIONS = [
