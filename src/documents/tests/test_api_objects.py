@@ -335,14 +335,14 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, "path/Something")
 
-    def test_test_storage_path_replaces_none_placeholder(self):
+    def test_test_storage_path_respects_none_placeholder_setting(self):
         """
         GIVEN:
-            - A document missing metadata referenced by the template
+            - A storage path template referencing an empty field
         WHEN:
-            - The storage path test endpoint is called
+            - Testing the template before and after enabling remove-none
         THEN:
-            - Default placeholders are rendered as 'none' (without dashes)
+            - The preview shows "none" by default and drops the placeholder when configured
         """
         document = Document.objects.create(
             mime_type="application/pdf",
@@ -350,45 +350,27 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             title="Something",
             checksum="123",
         )
+        payload = json.dumps(
+            {
+                "document": document.id,
+                "path": "folder/{{ correspondent }}/{{ title }}",
+            },
+        )
+
         response = self.client.post(
             f"{self.ENDPOINT}test/",
-            json.dumps(
-                {
-                    "document": document.id,
-                    "path": "folder/{{ correspondent }}/{{ title }}",
-                },
-            ),
+            payload,
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, "folder/none/Something")
 
-    @override_settings(FILENAME_FORMAT_REMOVE_NONE=True)
-    def test_test_storage_path_removes_none_placeholder_when_configured(self):
-        """
-        GIVEN:
-            - PAPERLESS_FILENAME_FORMAT_REMOVE_NONE enabled
-        WHEN:
-            - A template references an empty field
-        THEN:
-            - The preview removes the empty placeholder
-        """
-        document = Document.objects.create(
-            mime_type="application/pdf",
-            storage_path=self.sp1,
-            title="Something",
-            checksum="123",
-        )
-        response = self.client.post(
-            f"{self.ENDPOINT}test/",
-            json.dumps(
-                {
-                    "document": document.id,
-                    "path": "folder/{{ correspondent }}/{{ title }}",
-                },
-            ),
-            content_type="application/json",
-        )
+        with override_settings(FILENAME_FORMAT_REMOVE_NONE=True):
+            response = self.client.post(
+                f"{self.ENDPOINT}test/",
+                payload,
+                content_type="application/json",
+            )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, "folder/Something")
 
