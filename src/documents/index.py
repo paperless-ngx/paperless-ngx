@@ -447,7 +447,7 @@ class DelayedFullTextQuery(DelayedQuery):
             if corrected.string != q_str:
                 suggested_correction = corrected.string
         except Exception as e:
-            logger.info(
+            logger.error(
                 "Error while correcting query %s: %s",
                 f"{q_str!r}",
                 e,
@@ -534,31 +534,78 @@ def rewrite_natural_date_keywords(query_string: str) -> str:
     """
     Rewrites natural date keywords (e.g. added:today or added:"yesterday") to UTC range syntax for Whoosh.
     """
+    from dateutil.relativedelta import relativedelta
 
     tz = get_current_timezone()
     local_now = now().astimezone(tz)
-
     today = local_now.date()
-    yesterday = today - timedelta(days=1)
 
-    ranges = {
-        "today": (
-            datetime.combine(today, time.min, tzinfo=tz),
-            datetime.combine(today, time.max, tzinfo=tz),
-        ),
-        "yesterday": (
-            datetime.combine(yesterday, time.min, tzinfo=tz),
-            datetime.combine(yesterday, time.max, tzinfo=tz),
-        ),
-    }
-
-    pattern = r"(\b(?:added|created))\s*:\s*[\"']?(today|yesterday)[\"']?"
+    # Pattern for all supported Keywords
+    pattern = r"(\b(?:added|created))\s*:\s*[\"']?(today|yesterday|this month|previous month|previous week|previous quarter|this year|previous year)[\"']?"
 
     def repl(m):
-        field, keyword = m.group(1), m.group(2)
-        start, end = ranges[keyword]
+        field = m.group(1)
+        keyword = m.group(2).lower()
+
+        # Calculate date ranges on-demand based on keyword
+        match keyword:
+            case "today":
+                start = datetime.combine(today, time.min, tzinfo=tz)
+                end = datetime.combine(today, time.max, tzinfo=tz)
+
+            case "yesterday":
+                yesterday = today - timedelta(days=1)
+                start = datetime.combine(yesterday, time.min, tzinfo=tz)
+                end = datetime.combine(yesterday, time.max, tzinfo=tz)
+
+            case "this month":
+                start = datetime(local_now.year, local_now.month, 1, 0, 0, 0, tzinfo=tz)
+                end = start + relativedelta(months=1) - timedelta(seconds=1)
+
+            case "previous month":
+                this_month_start = datetime(local_now.year, local_now.month, 1, 0, 0, 0, tzinfo=tz)
+                start = this_month_start - relativedelta(months=1)
+                end = this_month_start - timedelta(seconds=1)
+
+            case "this year":
+                start = datetime(local_now.year, 1, 1, 0, 0, 0, tzinfo=tz)
+                end = datetime.combine(today, time.max, tzinfo=tz)
+
+            case "previous week":
+                # ISO-Week: Monday = 0, Sunday = 6
+                days_since_monday = local_now.weekday()
+                this_week_start = datetime.combine(
+                    today - timedelta(days=days_since_monday),
+                    time.min,
+                    tzinfo=tz,
+                )
+                start = this_week_start - timedelta(days=7)
+                end = this_week_start - timedelta(seconds=1)
+
+            case "previous quarter":
+                current_quarter = (local_now.month - 1) // 3 + 1
+                this_quarter_start_month = (current_quarter - 1) * 3 + 1
+                this_quarter_start = datetime(
+                    local_now.year,
+                    this_quarter_start_month,
+                    1, 0, 0, 0,
+                    tzinfo=tz,
+                )
+                start = this_quarter_start - relativedelta(months=3)
+                end = this_quarter_start - timedelta(seconds=1)
+
+            case "previous year":
+                start = datetime(local_now.year - 1, 1, 1, 0, 0, 0, tzinfo=tz)
+                end = datetime(local_now.year - 1, 12, 31, 23, 59, 59, tzinfo=tz)
+
+            case _:
+                # Should not happen, since the pattern only matches known keywords
+                # Fallback: Leave the query unchanged
+                return m.group(0)
+
+        # Convert to UTC and format
         start_str = start.astimezone(timezone.utc).strftime("%Y%m%d%H%M%S")
         end_str = end.astimezone(timezone.utc).strftime("%Y%m%d%H%M%S")
         return f"{field}:[{start_str} TO {end_str}]"
 
-    return re.sub(pattern, repl, query_string)
+    return re.sub(pattern, repl, query_string, flags=re.IGNORECASE)
