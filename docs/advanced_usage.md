@@ -303,9 +303,9 @@ will create a directory structure as follows:
 
 Paperless provides the following variables for use within filenames:
 
--   `{{ asn }}`: The archive serial number of the document, or "none".
--   `{{ correspondent }}`: The name of the correspondent, or "none".
--   `{{ document_type }}`: The name of the document type, or "none".
+-   `{{ asn }}`: The archive serial number of the document, or "-none-".
+-   `{{ correspondent }}`: The name of the correspondent, or "-none-".
+-   `{{ document_type }}`: The name of the document type, or "-none-".
 -   `{{ tag_list }}`: A comma separated list of all tags assigned to the
     document.
 -   `{{ title }}`: The title of the document.
@@ -329,8 +329,8 @@ Paperless provides the following variables for use within filenames:
 -   `{{ added_month_name_short }}`: Month added abbreviated name, as per
     locale
 -   `{{ added_day }}`: Day added only (number 01-31).
--   `{{ owner_username }}`: Username of document owner, if any, or "none"
--   `{{ original_name }}`: Document original filename, minus the extension, if any, or "none"
+-   `{{ owner_username }}`: Username of document owner, if any, or "-none-"
+-   `{{ original_name }}`: Document original filename, minus the extension, if any, or "-none-"
 -   `{{ doc_pk }}`: The paperless identifier (primary key) for the document.
 
 !!! warning
@@ -374,7 +374,7 @@ paperless will fall back to using the default naming scheme instead.
 You can affect how empty placeholders are treated by changing the
 [`PAPERLESS_FILENAME_FORMAT_REMOVE_NONE`](configuration.md#PAPERLESS_FILENAME_FORMAT_REMOVE_NONE) setting.
 
-Enabling this results in all empty placeholders resolving to "" instead of "none" as stated above. Spaces
+Enabling this results in all empty placeholders resolving to "" instead of "-none-" as stated above. Spaces
 before empty placeholders are removed as well, empty directories are omitted.
 
 ### Storage paths
