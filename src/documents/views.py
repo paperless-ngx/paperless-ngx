@@ -108,6 +108,7 @@ from documents.conditionals import thumbnail_last_modified
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
+from documents.file_handling import format_filename
 from documents.filters import CorrespondentFilterSet
 from documents.filters import CustomFieldFilterSet
 from documents.filters import DocumentFilterSet
@@ -183,7 +184,6 @@ from documents.tasks import index_optimize
 from documents.tasks import sanity_check
 from documents.tasks import train_classifier
 from documents.tasks import update_document_parent_tags
-from documents.templating.filepath import validate_filepath_template_and_render
 from documents.utils import get_boolean
 from paperless import version
 from paperless.celery import app as celery_app
@@ -2336,7 +2336,7 @@ class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         document = serializer.validated_data.get("document")
         path = serializer.validated_data.get("path")
 
-        result = validate_filepath_template_and_render(path, document)
+        result = format_filename(document, path)
         return Response(result)
 
 

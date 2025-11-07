@@ -4,6 +4,7 @@ from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -333,6 +334,63 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, "path/Something")
+
+    def test_test_storage_path_replaces_none_placeholder(self):
+        """
+        GIVEN:
+            - A document missing metadata referenced by the template
+        WHEN:
+            - The storage path test endpoint is called
+        THEN:
+            - Default placeholders are rendered as 'none' (without dashes)
+        """
+        document = Document.objects.create(
+            mime_type="application/pdf",
+            storage_path=self.sp1,
+            title="Something",
+            checksum="123",
+        )
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "document": document.id,
+                    "path": "folder/{{ correspondent }}/{{ title }}",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, "folder/none/Something")
+
+    @override_settings(FILENAME_FORMAT_REMOVE_NONE=True)
+    def test_test_storage_path_removes_none_placeholder_when_configured(self):
+        """
+        GIVEN:
+            - PAPERLESS_FILENAME_FORMAT_REMOVE_NONE enabled
+        WHEN:
+            - A template references an empty field
+        THEN:
+            - The preview removes the empty placeholder
+        """
+        document = Document.objects.create(
+            mime_type="application/pdf",
+            storage_path=self.sp1,
+            title="Something",
+            checksum="123",
+        )
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "document": document.id,
+                    "path": "folder/{{ correspondent }}/{{ title }}",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, "folder/Something")
 
 
 class TestBulkEditObjects(APITestCase):
