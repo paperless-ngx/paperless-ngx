@@ -563,7 +563,15 @@ def rewrite_natural_date_keywords(query_string: str) -> str:
                 end = start + relativedelta(months=1) - timedelta(seconds=1)
 
             case "previous month":
-                this_month_start = datetime(local_now.year, local_now.month, 1, 0, 0, 0, tzinfo=tz)
+                this_month_start = datetime(
+                    local_now.year,
+                    local_now.month,
+                    1,
+                    0,
+                    0,
+                    0,
+                    tzinfo=tz,
+                )
                 start = this_month_start - relativedelta(months=1)
                 end = this_month_start - timedelta(seconds=1)
 
@@ -588,7 +596,10 @@ def rewrite_natural_date_keywords(query_string: str) -> str:
                 this_quarter_start = datetime(
                     local_now.year,
                     this_quarter_start_month,
-                    1, 0, 0, 0,
+                    1,
+                    0,
+                    0,
+                    0,
                     tzinfo=tz,
                 )
                 start = this_quarter_start - relativedelta(months=3)
