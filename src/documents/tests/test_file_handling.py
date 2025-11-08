@@ -1083,6 +1083,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             "{% if correspondent == 'none' %}none/{% endif %}"
             "{% if correspondent == '-none-' %}dash/{% endif %}"
             "{% if not correspondent %}false/{% endif %}"
+            "{% if correspondent != 'none' %}notnoneyes/{% else %}notnoneno/{% endif %}"
             "{{ correspondent or 'missing' }}/{{ title }}"
         ),
     )
@@ -1109,11 +1110,13 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
 
         self.assertEqual(
             generate_filename(doc_without_correspondent),
-            Path("none/dash/false/missing/does not matter.pdf"),
+            Path(
+                "none/dash/false/notnoneno/missing/does not matter.pdf",
+            ),
         )
         self.assertEqual(
             generate_filename(doc_with_correspondent),
-            Path("Acme/does not matter.pdf"),
+            Path("notnoneyes/Acme/does not matter.pdf"),
         )
 
     @override_settings(

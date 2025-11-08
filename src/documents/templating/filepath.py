@@ -72,6 +72,9 @@ class PlaceholderString(str):
             other = "-none-"
         return super().__eq__(other)
 
+    def __ne__(self, other) -> bool:
+        return not self.__eq__(other)
+
 
 NO_VALUE_PLACEHOLDER = PlaceholderString("-none-")
 
