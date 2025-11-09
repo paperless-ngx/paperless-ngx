@@ -1517,3 +1517,40 @@ def close_connection_pool_on_worker_init(**kwargs):
     for conn in connections.all(initialized_only=True):
         if conn.alias == "default" and hasattr(conn, "pool") and conn.pool:
             conn.close_pool()
+
+
+# Performance optimization: Cache invalidation handlers
+# These handlers ensure cached metadata lists are updated when models change
+
+
+@receiver(models.signals.post_save, sender=Correspondent)
+@receiver(models.signals.post_delete, sender=Correspondent)
+def invalidate_correspondent_cache(sender, instance, **kwargs):
+    """
+    Invalidate correspondent list cache when correspondents are modified
+    """
+    from documents.caching import clear_metadata_list_caches
+
+    clear_metadata_list_caches()
+
+
+@receiver(models.signals.post_save, sender=DocumentType)
+@receiver(models.signals.post_delete, sender=DocumentType)
+def invalidate_document_type_cache(sender, instance, **kwargs):
+    """
+    Invalidate document type list cache when document types are modified
+    """
+    from documents.caching import clear_metadata_list_caches
+
+    clear_metadata_list_caches()
+
+
+@receiver(models.signals.post_save, sender=Tag)
+@receiver(models.signals.post_delete, sender=Tag)
+def invalidate_tag_cache(sender, instance, **kwargs):
+    """
+    Invalidate tag list cache when tags are modified
+    """
+    from documents.caching import clear_metadata_list_caches
+
+    clear_metadata_list_caches()
