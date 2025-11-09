@@ -1,6 +1,6 @@
 {
   "background_color": "white",
-  "description": "A supercharged version of paperless: scan, index and archive all your physical documents",
+  "description": "IntelliDocs: AI-powered document management - scan, index and archive all your physical documents with advanced ML capabilities",
   "display": "standalone",
   "icons": [
     {
@@ -12,7 +12,7 @@
       "sizes": "any"
     }
   ],
-  "name": "Paperless-ngx",
-  "short_name": "Paperless-ngx",
+  "name": "IntelliDocs",
+  "short_name": "IntelliDocs",
   "start_url": "/"
 }

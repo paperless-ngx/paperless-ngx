@@ -294,3 +294,80 @@ def clear_document_caches(document_id: int) -> None:
             get_thumbnail_modified_key(document_id),
         ],
     )
+
+
+def get_correspondent_list_cache_key() -> str:
+    """
+    Returns the cache key for the correspondent list
+    """
+    return "correspondent_list_v1"
+
+
+def get_document_type_list_cache_key() -> str:
+    """
+    Returns the cache key for the document type list
+    """
+    return "document_type_list_v1"
+
+
+def get_tag_list_cache_key() -> str:
+    """
+    Returns the cache key for the tag list
+    """
+    return "tag_list_v1"
+
+
+def get_storage_path_list_cache_key() -> str:
+    """
+    Returns the cache key for the storage path list
+    """
+    return "storage_path_list_v1"
+
+
+def cache_metadata_lists(timeout: int = CACHE_5_MINUTES) -> None:
+    """
+    Caches frequently accessed metadata lists (correspondents, types, tags, storage paths).
+    These change infrequently but are queried often.
+    
+    This should be called after any changes to these models to invalidate the cache.
+    """
+    from documents.models import Correspondent
+    from documents.models import DocumentType
+    from documents.models import StoragePath
+    from documents.models import Tag
+
+    # Cache correspondent list
+    correspondents = list(
+        Correspondent.objects.all().values("id", "name", "slug").order_by("name"),
+    )
+    cache.set(get_correspondent_list_cache_key(), correspondents, timeout)
+
+    # Cache document type list
+    doc_types = list(
+        DocumentType.objects.all().values("id", "name", "slug").order_by("name"),
+    )
+    cache.set(get_document_type_list_cache_key(), doc_types, timeout)
+
+    # Cache tag list
+    tags = list(Tag.objects.all().values("id", "name", "slug", "color").order_by("name"))
+    cache.set(get_tag_list_cache_key(), tags, timeout)
+
+    # Cache storage path list
+    storage_paths = list(
+        StoragePath.objects.all().values("id", "name", "slug", "path").order_by("name"),
+    )
+    cache.set(get_storage_path_list_cache_key(), storage_paths, timeout)
+
+
+def clear_metadata_list_caches() -> None:
+    """
+    Clears all cached metadata lists
+    """
+    cache.delete_many(
+        [
+            get_correspondent_list_cache_key(),
+            get_document_type_list_cache_key(),
+            get_tag_list_cache_key(),
+            get_storage_path_list_cache_key(),
+        ],
+    )

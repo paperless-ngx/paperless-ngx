@@ -1,0 +1,321 @@
+"""
+Security utilities for IntelliDocs-ngx.
+
+Provides enhanced security features including file validation,
+malicious content detection, and security checks.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import logging
+import mimetypes
+import os
+import re
+from pathlib import Path
+from typing import TYPE_CHECKING
+
+import magic
+
+if TYPE_CHECKING:
+    from django.core.files.uploadedfile import UploadedFile
+
+logger = logging.getLogger("paperless.security")
+
+
+# Allowed MIME types for document upload
+ALLOWED_MIME_TYPES = {
+    # Documents
+    "application/pdf",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-powerpoint",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.oasis.opendocument.text",
+    "application/vnd.oasis.opendocument.spreadsheet",
+    "application/vnd.oasis.opendocument.presentation",
+    "text/plain",
+    "text/csv",
+    "text/html",
+    "text/rtf",
+    "application/rtf",
+    # Images
+    "image/png",
+    "image/jpeg",
+    "image/jpg",
+    "image/gif",
+    "image/bmp",
+    "image/tiff",
+    "image/webp",
+}
+
+# Maximum file size (500MB by default)
+MAX_FILE_SIZE = 500 * 1024 * 1024  # 500MB in bytes
+
+# Dangerous file extensions that should never be allowed
+DANGEROUS_EXTENSIONS = {
+    ".exe",
+    ".dll",
+    ".bat",
+    ".cmd",
+    ".com",
+    ".scr",
+    ".vbs",
+    ".js",
+    ".jar",
+    ".msi",
+    ".app",
+    ".deb",
+    ".rpm",
+}
+
+# Patterns that might indicate malicious content
+MALICIOUS_PATTERNS = [
+    # JavaScript in PDFs (potential XSS)
+    rb"/JavaScript",
+    rb"/JS",
+    rb"/OpenAction",
+    # Embedded executables
+    rb"MZ\x90\x00",  # PE executable header
+    rb"\x7fELF",  # ELF executable header
+]
+
+
+class FileValidationError(Exception):
+    """Raised when file validation fails."""
+
+    pass
+
+
+def validate_uploaded_file(uploaded_file: UploadedFile) -> dict:
+    """
+    Validate an uploaded file for security.
+    
+    Performs multiple checks:
+    1. File size validation
+    2. MIME type validation
+    3. File extension validation
+    4. Content validation (checks for malicious patterns)
+    
+    Args:
+        uploaded_file: Django UploadedFile object
+        
+    Returns:
+        dict: Validation result with 'valid' boolean and 'mime_type'
+        
+    Raises:
+        FileValidationError: If validation fails
+    """
+    # Check file size
+    if uploaded_file.size > MAX_FILE_SIZE:
+        raise FileValidationError(
+            f"File size ({uploaded_file.size} bytes) exceeds maximum allowed "
+            f"size ({MAX_FILE_SIZE} bytes)",
+        )
+
+    # Check file extension
+    file_ext = os.path.splitext(uploaded_file.name)[1].lower()
+    if file_ext in DANGEROUS_EXTENSIONS:
+        raise FileValidationError(
+            f"File extension '{file_ext}' is not allowed for security reasons",
+        )
+
+    # Read file content for validation
+    uploaded_file.seek(0)
+    content = uploaded_file.read(8192)  # Read first 8KB for validation
+    uploaded_file.seek(0)  # Reset file pointer
+
+    # Detect MIME type from content (more reliable than extension)
+    mime_type = magic.from_buffer(content, mime=True)
+
+    # Validate MIME type
+    if mime_type not in ALLOWED_MIME_TYPES:
+        # Check if it's a variant of an allowed type
+        base_type = mime_type.split("/")[0]
+        if base_type not in ["application", "text", "image"]:
+            raise FileValidationError(
+                f"MIME type '{mime_type}' is not allowed. "
+                f"Allowed types: {', '.join(sorted(ALLOWED_MIME_TYPES))}",
+            )
+
+    # Check for malicious patterns
+    check_malicious_content(content)
+
+    logger.info(
+        f"File validated successfully: {uploaded_file.name} "
+        f"(size: {uploaded_file.size}, mime: {mime_type})",
+    )
+
+    return {
+        "valid": True,
+        "mime_type": mime_type,
+        "size": uploaded_file.size,
+    }
+
+
+def validate_file_path(file_path: str | Path) -> dict:
+    """
+    Validate a file on disk for security.
+    
+    Args:
+        file_path: Path to the file
+        
+    Returns:
+        dict: Validation result
+        
+    Raises:
+        FileValidationError: If validation fails
+    """
+    file_path = Path(file_path)
+
+    if not file_path.exists():
+        raise FileValidationError(f"File does not exist: {file_path}")
+
+    if not file_path.is_file():
+        raise FileValidationError(f"Path is not a file: {file_path}")
+
+    # Check file size
+    file_size = file_path.stat().st_size
+    if file_size > MAX_FILE_SIZE:
+        raise FileValidationError(
+            f"File size ({file_size} bytes) exceeds maximum allowed "
+            f"size ({MAX_FILE_SIZE} bytes)",
+        )
+
+    # Check extension
+    file_ext = file_path.suffix.lower()
+    if file_ext in DANGEROUS_EXTENSIONS:
+        raise FileValidationError(
+            f"File extension '{file_ext}' is not allowed for security reasons",
+        )
+
+    # Detect MIME type
+    mime_type = magic.from_file(str(file_path), mime=True)
+
+    # Validate MIME type
+    if mime_type not in ALLOWED_MIME_TYPES:
+        base_type = mime_type.split("/")[0]
+        if base_type not in ["application", "text", "image"]:
+            raise FileValidationError(
+                f"MIME type '{mime_type}' is not allowed",
+            )
+
+    # Check for malicious content
+    with open(file_path, "rb") as f:
+        content = f.read(8192)  # Read first 8KB
+        check_malicious_content(content)
+
+    logger.info(
+        f"File validated successfully: {file_path.name} "
+        f"(size: {file_size}, mime: {mime_type})",
+    )
+
+    return {
+        "valid": True,
+        "mime_type": mime_type,
+        "size": file_size,
+    }
+
+
+def check_malicious_content(content: bytes) -> None:
+    """
+    Check file content for potentially malicious patterns.
+    
+    Args:
+        content: File content to check (first few KB)
+        
+    Raises:
+        FileValidationError: If malicious patterns are detected
+    """
+    for pattern in MALICIOUS_PATTERNS:
+        if re.search(pattern, content):
+            raise FileValidationError(
+                "File contains potentially malicious content and has been rejected",
+            )
+
+
+def calculate_file_hash(file_path: str | Path, algorithm: str = "sha256") -> str:
+    """
+    Calculate cryptographic hash of a file.
+    
+    Args:
+        file_path: Path to the file
+        algorithm: Hash algorithm to use (default: sha256)
+        
+    Returns:
+        str: Hexadecimal hash string
+    """
+    hash_obj = hashlib.new(algorithm)
+
+    with open(file_path, "rb") as f:
+        # Read file in chunks to handle large files efficiently
+        for chunk in iter(lambda: f.read(8192), b""):
+            hash_obj.update(chunk)
+
+    return hash_obj.hexdigest()
+
+
+def sanitize_filename(filename: str) -> str:
+    """
+    Sanitize filename to prevent path traversal and other attacks.
+    
+    Args:
+        filename: Original filename
+        
+    Returns:
+        str: Sanitized filename
+    """
+    # Remove any path components
+    filename = os.path.basename(filename)
+
+    # Remove or replace dangerous characters
+    # Keep alphanumeric, dots, dashes, underscores, and spaces
+    sanitized = re.sub(r"[^\w\s.-]", "_", filename)
+
+    # Remove leading/trailing spaces and dots
+    sanitized = sanitized.strip(". ")
+
+    # Ensure filename is not empty
+    if not sanitized:
+        sanitized = "unnamed_file"
+
+    # Limit length
+    max_length = 255
+    if len(sanitized) > max_length:
+        name, ext = os.path.splitext(sanitized)
+        name = name[: max_length - len(ext) - 1]
+        sanitized = name + ext
+
+    return sanitized
+
+
+def is_safe_redirect_url(url: str, allowed_hosts: list[str]) -> bool:
+    """
+    Check if a redirect URL is safe (no open redirect vulnerability).
+    
+    Args:
+        url: URL to check
+        allowed_hosts: List of allowed hostnames
+        
+    Returns:
+        bool: True if URL is safe
+    """
+    # Relative URLs are safe
+    if url.startswith("/") and not url.startswith("//"):
+        return True
+
+    # Check if URL hostname is in allowed hosts
+    from urllib.parse import urlparse
+
+    try:
+        parsed = urlparse(url)
+        if parsed.scheme not in ["http", "https"]:
+            return False
+        if parsed.hostname in allowed_hosts:
+            return True
+    except (ValueError, AttributeError):
+        return False
+
+    return False
