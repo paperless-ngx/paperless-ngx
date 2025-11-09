@@ -56,6 +56,10 @@
                 [items]="field.extra_data.select_options" bindLabel="label" [allowNull]="true" [horizontal]="true">
               </pngx-input-select>
             }
+            @case (CustomFieldDataType.LongText) {
+              <pngx-input-textarea formControlName="{{field.id}}" class="w-100" [title]="field.name" [horizontal]="true">
+              </pngx-input-textarea>
+            }
           }
           <button type="button" class="btn btn-outline-danger mb-3" (click)="removeField(field.id)">
             <i-bs name="x"></i-bs>

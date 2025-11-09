@@ -24,7 +24,7 @@ import {
 } from '@angular/core/testing'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { of, throwError } from 'rxjs'
+import { Subject, of, throwError } from 'rxjs'
 import { PaperlessTaskName } from 'src/app/data/paperless-task'
 import {
   InstallType,
@@ -34,6 +34,7 @@ import {
 import { SystemStatusService } from 'src/app/services/system-status.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import { SystemStatusDialogComponent } from './system-status-dialog.component'
 
 const status: SystemStatus = {
@@ -77,6 +78,8 @@ describe('SystemStatusDialogComponent', () => {
   let tasksService: TasksService
   let systemStatusService: SystemStatusService
   let toastService: ToastService
+  let websocketStatusService: WebsocketStatusService
+  let websocketSubject: Subject<boolean> = new Subject<boolean>()
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -98,6 +101,12 @@ describe('SystemStatusDialogComponent', () => {
     tasksService = TestBed.inject(TasksService)
     systemStatusService = TestBed.inject(SystemStatusService)
     toastService = TestBed.inject(ToastService)
+    websocketStatusService = TestBed.inject(WebsocketStatusService)
+    jest
+      .spyOn(websocketStatusService, 'onConnectionStatus')
+      .mockImplementation(() => {
+        return websocketSubject.asObservable()
+      })
     fixture.detectChanges()
   })
 
@@ -167,5 +176,20 @@ describe('SystemStatusDialogComponent', () => {
     component.status.pngx_version = '2.4.3'
     component.ngOnInit()
     expect(component.versionMismatch).toBeFalsy()
+  })
+
+  it('should update websocket connection status', () => {
+    websocketSubject.next(true)
+    expect(component.status.websocket_connected).toEqual(
+      SystemStatusItemStatus.OK
+    )
+    websocketSubject.next(false)
+    expect(component.status.websocket_connected).toEqual(
+      SystemStatusItemStatus.ERROR
+    )
+    websocketSubject.next(true)
+    expect(component.status.websocket_connected).toEqual(
+      SystemStatusItemStatus.OK
+    )
   })
 })

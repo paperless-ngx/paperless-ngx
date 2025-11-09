@@ -11,13 +11,13 @@ jobs:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PNGX_BOT_PAT }}
           ref: ${{ github.head_ref }}
       - name: Set up Python
         id: setup-python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
       - name: Install system dependencies
         run: |
           sudo apt-get update -qq
@@ -38,7 +38,7 @@ jobs:
         with:
           version: 10
       - name: Use Node.js 20
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 20.x
           cache: 'pnpm'
@@ -61,7 +61,7 @@ jobs:
           cd src-ui
           pnpm run ng extract-i18n
       - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v6
         with:
           file_pattern: 'src-ui/messages.xlf src/locale/en_US/LC_MESSAGES/django.po'
           commit_message: "Auto translate strings"

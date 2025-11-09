@@ -2,9 +2,11 @@
 
 If you feel like contributing to the project, please do! Bug fixes and improvements are always welcome.
 
+⚠️ Please note: Pull requests that implement a new feature or enhancement _should almost always target an existing feature request_ with evidence of community interest and discussion. This is in order to balance the work of implementing and maintaining new features / enhancements. Pull requests that are opened without meeting this requirement may not be merged.
+
 If you want to implement something big:
 
-- Please start a discussion about that in the issues! Maybe something similar is already in development and we can make it happen together.
+- As above, please start with a discussion! Maybe something similar is already in development and we can make it happen together.
 - When making additions to the project, consider if the majority of users will benefit from your change. If not, you're probably better of forking the project.
 - Also consider if your change will get in the way of other users. A good change is a change that enhances the experience of some users who want that change and does not affect users who do not care about the change.
 - Please see the [paperless-ngx merge process](#merging-prs) below.
@@ -36,6 +38,8 @@ Before you can run `pytest`, ensure to [properly set up your local environment](
 # Merging PRs
 
 Once you have submitted a **P**ull **R**equest it will be reviewed, approved, and merged by one or more community members of any team. Automated code tests and formatting checks must be passed.
+
+Important: Pull requests that implement a new feature or enhancement _should almost always target an existing feature request_ with evidence of community interest and discussion. This is in order to balance the work of implementing and maintaining new features / enhancements. Instead of opening a PR which does not meet this requirement, please open a feature request instead, to gather feedback from both users and the project maintainers.
 
 ## Non-Trivial Requests
 
@@ -109,28 +113,12 @@ Paperless-ngx is a community project. We do our best to delegate permission and 
 
 ## Structure
 
-As of writing, there are 21 members in paperless-ngx. 4 of these people have complete administrative privileges to the repo:
+There are currently 2 members in paperless-ngx with complete administrative privileges to the repo:
 
 - [@shamoon](https://github.com/shamoon)
-- [@bauerj](https://github.com/bauerj)
-- [@qcasey](https://github.com/qcasey)
-- [@FrankStrieter](https://github.com/FrankStrieter)
+- [@stumpylog](https://github.com/stumpylog)
 
-There are 5 teams collaborating on specific tasks within paperless-ngx:
-
-- @paperless-ngx/backend (Python / django)
-- @paperless-ngx/frontend (JavaScript / Typescript)
-- @paperless-ngx/ci-cd (GitHub Actions / Deployment)
-- @paperless-ngx/issues (Issue triage)
-- @paperless-ngx/test (General testing for larger PRs)
-
-## Permissions
-
-All team members are notified when mentioned or assigned to a relevant issue or pull request. Additionally, each team has slightly different access to paperless-ngx:
-
-- The **test** team has no special permissions.
-- The **issues** team has `triage` access. This means they can organize issues and pull requests.
-- The **backend**, **frontend**, and **ci-cd** teams have `write` access. This means they can approve PRs and push code, containers, releases, and more.
+There are other members who occasionally contribute but we are actively seeking more dedicated maintainers of the project. Please reach out if you are interested.
 
 ## Joining
 
@@ -141,13 +129,13 @@ The admins occasionally invite contributors directly if we believe having them o
 # Automatic Repository Maintenance
 
 The Paperless-ngx team appreciates all effort and interest from the community in filing bug reports, creating feature requests, sharing ideas and helping other
-community members. That said, in an effort to keep the repository organized and managebale the project uses automatic handling of certain areas:
+community members. That said, in an effort to keep the repository organized and manageable the project uses automatic handling of certain areas:
 
 - Issues that cannot be reproduced will be marked 'stale' after 7 days of inactivity and closed after 14 further days of inactivity.
 - Issues, pull requests and discussions that are closed will be locked after 30 days of inactivity.
 - Discussions with a marked answer will be automatically closed.
 - Discussions in the 'General' or 'Support' categories will be closed after 180 days of inactivity.
-- Feature requests that do not meet the following thresholds will be closed: 180 days of inactivity, < 5 "up-votes" after 180 days, < 20 "up-votes" after 1 year or < 80 "up-votes" at 2 years.
+- Feature requests that do not meet the following thresholds will be closed: 180 days of inactivity with less than 80 "up-votes", < 5 "up-votes" after 180 days, < 20 "up-votes" after 1 year or < 40 "up-votes" at 2 years.
 
 In all cases, threads can be re-opened by project maintainers and, of course, users can always create a new discussion for related concerns.
 Finally, remember that all information remains searchable and 'closed' feature requests can still serve as inspiration for new features.

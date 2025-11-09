@@ -241,4 +241,15 @@ describe('OpenDocumentsService', () => {
     openDocumentsService.openDocument(doc)
     expect(consoleSpy).toHaveBeenCalled()
   })
+
+  it('should set dirty status with changed fields', () => {
+    subscriptions.push(
+      openDocumentsService.openDocument(documents[0]).subscribe()
+    )
+    const changedFields = { title: 'foo', content: 'bar' }
+    openDocumentsService.setDirty(documents[0], true, changedFields)
+    expect(
+      openDocumentsService.getOpenDocument(documents[0].id).__changedFields
+    ).toEqual(['title', 'content'])
+  })
 })

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-import itertools
 import logging
 import tempfile
 from pathlib import Path
@@ -13,6 +12,7 @@ from celery import chord
 from celery import group
 from celery import shared_task
 from django.conf import settings
+from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
@@ -25,6 +25,7 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
+from documents.models import Tag
 from documents.permissions import set_permissions_for_object
 from documents.plugins.helpers import DocumentsStatusManager
 from documents.tasks import bulk_update_documents
@@ -96,31 +97,45 @@ def set_document_type(doc_ids: list[int], document_type: DocumentType) -> Litera
 
 
 def add_tag(doc_ids: list[int], tag: int) -> Literal["OK"]:
-    qs = Document.objects.filter(Q(id__in=doc_ids) & ~Q(tags__id=tag)).only("pk")
-    affected_docs = list(qs.values_list("pk", flat=True))
+    tag_obj = Tag.objects.get(pk=tag)
+    tags_to_add = [tag_obj, *tag_obj.get_ancestors()]
 
     DocumentTagRelationship = Document.tags.through
+    to_create = []
+    affected_docs: set[int] = set()
 
-    DocumentTagRelationship.objects.bulk_create(
-        [DocumentTagRelationship(document_id=doc, tag_id=tag) for doc in affected_docs],
-    )
+    for t in tags_to_add:
+        qs = Document.objects.filter(Q(id__in=doc_ids) & ~Q(tags__id=t.id)).only("pk")
+        doc_ids_missing_tag = list(qs.values_list("pk", flat=True))
+        affected_docs.update(doc_ids_missing_tag)
+        to_create.extend(
+            DocumentTagRelationship(document_id=doc, tag_id=t.id)
+            for doc in doc_ids_missing_tag
+        )
 
-    bulk_update_documents.delay(document_ids=affected_docs)
+    if to_create:
+        DocumentTagRelationship.objects.bulk_create(to_create)
+
+    if affected_docs:
+        bulk_update_documents.delay(document_ids=list(affected_docs))
 
     return "OK"
 
 
 def remove_tag(doc_ids: list[int], tag: int) -> Literal["OK"]:
-    qs = Document.objects.filter(Q(id__in=doc_ids) & Q(tags__id=tag)).only("pk")
-    affected_docs = list(qs.values_list("pk", flat=True))
+    tag_obj = Tag.objects.get(pk=tag)
+    tag_ids = [tag_obj.id, *tag_obj.get_descendants_pks()]
 
     DocumentTagRelationship = Document.tags.through
+    qs = DocumentTagRelationship.objects.filter(
+        document_id__in=doc_ids,
+        tag_id__in=tag_ids,
+    )
+    affected_docs = list(qs.values_list("document_id", flat=True).distinct())
+    qs.delete()
 
-    DocumentTagRelationship.objects.filter(
-        Q(document_id__in=affected_docs) & Q(tag_id=tag),
-    ).delete()
-
-    bulk_update_documents.delay(document_ids=affected_docs)
+    if affected_docs:
+        bulk_update_documents.delay(document_ids=affected_docs)
 
     return "OK"
 
@@ -132,23 +147,57 @@ def modify_tags(
 ) -> Literal["OK"]:
     qs = Document.objects.filter(id__in=doc_ids).only("pk")
     affected_docs = list(qs.values_list("pk", flat=True))
-
     DocumentTagRelationship = Document.tags.through
 
-    DocumentTagRelationship.objects.filter(
-        document_id__in=affected_docs,
-        tag_id__in=remove_tags,
-    ).delete()
+    # add with all ancestors
+    expanded_add_tags: set[int] = set()
+    add_tag_objects = Tag.objects.filter(pk__in=add_tags)
+    for t in add_tag_objects:
+        expanded_add_tags.add(int(t.id))
+        expanded_add_tags.update(int(pk) for pk in t.get_ancestors_pks())
 
-    DocumentTagRelationship.objects.bulk_create(
-        [
-            DocumentTagRelationship(document_id=doc, tag_id=tag)
-            for (doc, tag) in itertools.product(affected_docs, add_tags)
-        ],
-        ignore_conflicts=True,
-    )
+    # remove with all descendants
+    expanded_remove_tags: set[int] = set()
+    remove_tag_objects = Tag.objects.filter(pk__in=remove_tags)
+    for t in remove_tag_objects:
+        expanded_remove_tags.add(int(t.id))
+        expanded_remove_tags.update(int(pk) for pk in t.get_descendants_pks())
 
-    bulk_update_documents.delay(document_ids=affected_docs)
+    try:
+        with transaction.atomic():
+            if expanded_remove_tags:
+                DocumentTagRelationship.objects.filter(
+                    document_id__in=affected_docs,
+                    tag_id__in=expanded_remove_tags,
+                ).delete()
+
+            to_create = []
+            if expanded_add_tags:
+                existing_pairs = set(
+                    DocumentTagRelationship.objects.filter(
+                        document_id__in=affected_docs,
+                        tag_id__in=expanded_add_tags,
+                    ).values_list("document_id", "tag_id"),
+                )
+
+                to_create = [
+                    DocumentTagRelationship(document_id=doc, tag_id=tag)
+                    for doc in affected_docs
+                    for tag in expanded_add_tags
+                    if (doc, tag) not in existing_pairs
+                ]
+
+                if to_create:
+                    DocumentTagRelationship.objects.bulk_create(
+                        to_create,
+                        ignore_conflicts=True,
+                    )
+
+            if affected_docs:
+                bulk_update_documents.delay(document_ids=affected_docs)
+    except Exception as e:
+        logger.error(f"Error modifying tags: {e}")
+        return "ERROR"
 
     return "OK"
 
@@ -181,6 +230,7 @@ def modify_custom_fields(
                 defaults[value_field] = value
                 if (
                     custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK
+                    and value
                     and doc_id in value
                 ):
                     # Prevent self-linking
@@ -493,6 +543,103 @@ def delete_pages(doc_ids: list[int], pages: list[int]) -> Literal["OK"]:
             logger.info(f"Deleted pages {pages} from document {doc.id}")
     except Exception as e:
         logger.exception(f"Error deleting pages from document {doc.id}: {e}")
+
+    return "OK"
+
+
+def edit_pdf(
+    doc_ids: list[int],
+    operations: list[dict],
+    *,
+    delete_original: bool = False,
+    update_document: bool = False,
+    include_metadata: bool = True,
+    user: User | None = None,
+) -> Literal["OK"]:
+    """
+    Operations is a list of dictionaries describing the final PDF pages.
+    Each entry must contain the original page number in `page` and may
+    specify `rotate` in degrees and `doc` indicating the output
+    document index (for splitting). Pages omitted from the list are
+    discarded.
+    """
+
+    logger.info(
+        f"Editing PDF of document {doc_ids[0]} with {len(operations)} operations",
+    )
+    doc = Document.objects.get(id=doc_ids[0])
+    import pikepdf
+
+    pdf_docs: list[pikepdf.Pdf] = []
+
+    try:
+        with pikepdf.open(doc.source_path) as src:
+            # prepare output documents
+            max_idx = max(op.get("doc", 0) for op in operations)
+            pdf_docs = [pikepdf.new() for _ in range(max_idx + 1)]
+
+            if update_document and len(pdf_docs) > 1:
+                logger.error(
+                    "Update requested but multiple output documents specified",
+                )
+                raise ValueError("Multiple output documents specified")
+
+            for op in operations:
+                dst = pdf_docs[op.get("doc", 0)]
+                page = src.pages[op["page"] - 1]
+                dst.pages.append(page)
+                if op.get("rotate"):
+                    dst.pages[-1].rotate(op["rotate"], relative=True)
+
+        if update_document:
+            temp_path = doc.source_path.with_suffix(".tmp.pdf")
+            pdf = pdf_docs[0]
+            pdf.remove_unreferenced_resources()
+            # save the edited PDF to a temporary file in case of errors
+            pdf.save(temp_path)
+            # replace the original document with the edited one
+            temp_path.replace(doc.source_path)
+            doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
+            doc.page_count = len(pdf.pages)
+            doc.save()
+            update_document_content_maybe_archive_file.delay(document_id=doc.id)
+        else:
+            consume_tasks = []
+            overrides = (
+                DocumentMetadataOverrides().from_document(doc)
+                if include_metadata
+                else DocumentMetadataOverrides()
+            )
+            if user is not None:
+                overrides.owner_id = user.id
+
+            for idx, pdf in enumerate(pdf_docs, start=1):
+                filepath: Path = (
+                    Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
+                    / f"{doc.id}_edit_{idx}.pdf"
+                )
+                pdf.remove_unreferenced_resources()
+                pdf.save(filepath)
+                consume_tasks.append(
+                    consume_file.s(
+                        ConsumableDocument(
+                            source=DocumentSource.ConsumeFolder,
+                            original_file=filepath,
+                        ),
+                        overrides,
+                    ),
+                )
+
+            if delete_original:
+                chord(header=consume_tasks, body=delete.si([doc.id])).delay()
+            else:
+                group(consume_tasks).delay()
+
+    except Exception as e:
+        logger.exception(f"Error editing document {doc.id}: {e}")
+        raise ValueError(
+            f"An error occurred while editing the document: {e}",
+        ) from e
 
     return "OK"
 

@@ -2,6 +2,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
 from django.db.models import QuerySet
 from guardian.core import ObjectPermissionChecker
 from guardian.models import GroupObjectPermission
@@ -11,6 +12,8 @@ from guardian.shortcuts import get_users_with_perms
 from guardian.shortcuts import remove_perm
 from rest_framework.permissions import BasePermission
 from rest_framework.permissions import DjangoObjectPermissions
+
+from documents.models import Document
 
 
 class PaperlessObjectPermissions(DjangoObjectPermissions):
@@ -125,6 +128,25 @@ def set_permissions_for_object(permissions: list[str], object, *, merge: bool = 
                         )
 
 
+def get_document_count_filter_for_user(user):
+    """
+    Return the Q object used to filter document counts for the given user.
+    """
+
+    if user is None or not getattr(user, "is_authenticated", False):
+        return Q(documents__deleted_at__isnull=True, documents__owner__isnull=True)
+    if getattr(user, "is_superuser", False):
+        return Q(documents__deleted_at__isnull=True)
+    return Q(
+        documents__deleted_at__isnull=True,
+        documents__id__in=get_objects_for_user_owner_aware(
+            user,
+            "documents.view_document",
+            Document,
+        ).values_list("id", flat=True),
+    )
+
+
 def get_objects_for_user_owner_aware(user, perms, Model) -> QuerySet:
     objects_owned = Model.objects.filter(owner=user)
     objects_unowned = Model.objects.filter(owner__isnull=True)
@@ -140,6 +162,24 @@ def get_objects_for_user_owner_aware(user, perms, Model) -> QuerySet:
 def has_perms_owner_aware(user, perms, obj):
     checker = ObjectPermissionChecker(user)
     return obj.owner is None or obj.owner == user or checker.has_perm(perms, obj)
+
+
+class ViewDocumentsPermissions(BasePermission):
+    """
+    Permissions class that checks for model permissions for only viewing Documents.
+    """
+
+    perms_map = {
+        "OPTIONS": ["documents.view_document"],
+        "GET": ["documents.view_document"],
+        "POST": ["documents.view_document"],
+    }
+
+    def has_permission(self, request, view):
+        if not request.user or (not request.user.is_authenticated):  # pragma: no cover
+            return False
+
+        return request.user.has_perms(self.perms_map.get(request.method, []))
 
 
 class PaperlessNotePermissions(BasePermission):
@@ -159,5 +199,23 @@ class PaperlessNotePermissions(BasePermission):
             return False
 
         perms = self.perms_map[request.method]
+
+        return request.user.has_perms(perms)
+
+
+class AcknowledgeTasksPermissions(BasePermission):
+    """
+    Permissions class that checks for model permissions for acknowledging tasks.
+    """
+
+    perms_map = {
+        "POST": ["documents.change_paperlesstask"],
+    }
+
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:  # pragma: no cover
+            return False
+
+        perms = self.perms_map.get(request.method, [])
 
         return request.user.has_perms(perms)

@@ -54,20 +54,16 @@
         <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs>&nbsp;<span i18n>Reprocess</span>
       </button>
 
+      <button ngbDropdownItem (click)="printDocument()" [hidden]="useNativePdfViewer || isMobile">
+        <i-bs width="1em" height="1em" name="printer"></i-bs>&nbsp;<span i18n>Print</span>
+      </button>
+
       <button ngbDropdownItem (click)="moreLike()">
         <i-bs width="1em" height="1em" name="diagram-3"></i-bs>&nbsp;<span i18n>More like this</span>
       </button>
 
-      <button ngbDropdownItem (click)="splitDocument()" [disabled]="!userCanAdd || originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
-        <i-bs width="1em" height="1em" name="scissors"></i-bs>&nbsp;<span i18n>Split</span>
-      </button>
-
-      <button ngbDropdownItem (click)="rotateDocument()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF">
-        <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
-      </button>
-
-      <button ngbDropdownItem (click)="deletePages()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
-        <i-bs name="file-earmark-minus"></i-bs>&nbsp;<ng-container i18n>Delete page(s)</ng-container>
+      <button ngbDropdownItem (click)="editPdf()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF">
+        <i-bs name="pencil"></i-bs>&nbsp;<ng-container i18n>PDF Editor</ng-container>
       </button>
     </div>
   </div>
@@ -219,6 +215,14 @@
                       [removable]="userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [error]="getCustomFieldError(i)"></pngx-input-select>
+                    }
+                    @case (CustomFieldDataType.LongText) {
+                      <pngx-input-textarea formControlName="value"
+                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                      [removable]="userCanEdit"
+                      (removed)="removeField(fieldInstance)"
+                      [horizontal]="true"
+                      [error]="getCustomFieldError(i)"></pngx-input-textarea>
                     }
                   }
                 </div>

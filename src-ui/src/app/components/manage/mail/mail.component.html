@@ -3,7 +3,7 @@
   i18n-title
   info="Manage e-mail accounts and rules for automatically importing documents."
   i18n-info
-  infoLink="usage/#usage-email"
+  infoLink="usage/#incoming-mail"
   >
 </pngx-page-header>
 
@@ -109,10 +109,11 @@
     <li class="list-group-item">
       <div class="row">
         <div class="col" i18n>Name</div>
-        <div class="col d-none d-sm-block" i18n>Sort Order</div>
-        <div class="col" i18n>Account</div>
-        <div class="col d-none d-sm-block" i18n>Status</div>
-        <div class="col" i18n>Actions</div>
+        <div class="col-1 d-none d-sm-block" i18n>Sort Order</div>
+        <div class="col-2" i18n>Account</div>
+        <div class="col-2 d-none d-sm-block" i18n>Status</div>
+        <div class="col d-none d-sm-block" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.ProcessedMail }">Processed Mail</div>
+        <div class="col-3" i18n>Actions</div>
       </div>
     </li>
 
@@ -127,9 +128,9 @@
       <li class="list-group-item">
         <div class="row fade" [class.show]="showRules">
           <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editMailRule(rule)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailRule) || !userCanEdit(rule)">{{rule.name}}</button></div>
-          <div class="col d-flex align-items-center d-none d-sm-flex">{{rule.order}}</div>
-          <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
-          <div class="col d-flex align-items-center d-none d-sm-flex">
+          <div class="col-1 d-flex align-items-center d-none d-sm-flex">{{rule.order}}</div>
+          <div class="col-2 d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
+          <div class="col-2 d-flex align-items-center d-none d-sm-flex">
             <div class="form-check form-switch mb-0">
               <input #inputField type="checkbox" class="form-check-input cursor-pointer" [id]="rule.id+'_enable'" [(ngModel)]="rule.enabled" (change)="onMailRuleEnableToggled(rule)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }">
               <label class="form-check-label cursor-pointer" [for]="rule.id+'_enable'">
@@ -137,7 +138,12 @@
               </label>
             </div>
           </div>
-          <div class="col">
+          <div class="col d-flex align-items-center d-none d-sm-flex" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.ProcessedMail }">
+            <button class="btn btn-sm btn-outline-secondary" type="button" (click)="viewProcessedMail(rule)">
+              <i-bs width="1em" height="1em" name="clock-history"></i-bs>&nbsp;<ng-container i18n>View Processed Mail</ng-container>
+            </button>
+          </div>
+          <div class="col-3">
             <div class="btn-group d-block d-sm-none">
               <div ngbDropdown container="body" class="d-inline-block">
                 <button type="button" class="btn btn-link" id="actionsMenuMobile" (click)="$event.stopPropagation()" ngbDropdownToggle>

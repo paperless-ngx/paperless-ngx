@@ -32,6 +32,14 @@ export interface ChangedItems {
   itemsToRemove: MatchingModel[]
 }
 
+type BranchSummary = {
+  items: MatchingModel[]
+  firstIndex: number
+  special: boolean
+  selected: boolean
+  hasDocs: boolean
+}
+
 export enum LogicalOperator {
   And = 'and',
   Or = 'or',
@@ -114,6 +122,13 @@ export class FilterableDropdownSelectionModel {
           b.id == NEGATIVE_NULL_FILTER_VALUE)
       ) {
         return 1
+      }
+
+      // Preserve hierarchical order when provided (e.g., Tags)
+      const ao = (a as any)['orderIndex']
+      const bo = (b as any)['orderIndex']
+      if (ao !== undefined && bo !== undefined) {
+        return ao - bo
       } else if (
         this.getNonTemporary(a.id) == ToggleableItemState.NotSelected &&
         this.getNonTemporary(b.id) != ToggleableItemState.NotSelected
@@ -140,6 +155,10 @@ export class FilterableDropdownSelectionModel {
         return a.name.localeCompare(b.name)
       }
     })
+
+    if (this._documentCounts.length) {
+      this.promoteBranchesWithDocumentCounts()
+    }
   }
 
   private selectionStates = new Map<number, ToggleableItemState>()
@@ -371,6 +390,180 @@ export class FilterableDropdownSelectionModel {
 
   getDocumentCount(id: number) {
     return this._documentCounts.find((c) => c.id === id)?.document_count
+  }
+
+  private promoteBranchesWithDocumentCounts() {
+    const parentById = this.buildParentById()
+    const findRootId = this.createRootFinder(parentById)
+    const getRootDocCount = this.createRootDocCounter()
+    const summaries = this.buildBranchSummaries(findRootId, getRootDocCount)
+    const orderedBranches = this.orderBranchesByPriority(summaries)
+
+    this._items = orderedBranches.flatMap((summary) => summary.items)
+  }
+
+  private buildParentById(): Map<number, number | null> {
+    const parentById = new Map<number, number | null>()
+
+    for (const item of this._items) {
+      if (typeof item?.id === 'number') {
+        const parentValue = (item as any)['parent']
+        parentById.set(
+          item.id,
+          typeof parentValue === 'number' ? parentValue : null
+        )
+      }
+    }
+
+    return parentById
+  }
+
+  private createRootFinder(
+    parentById: Map<number, number | null>
+  ): (id: number) => number {
+    const rootMemo = new Map<number, number>()
+
+    const findRootId = (id: number): number => {
+      const cached = rootMemo.get(id)
+      if (cached !== undefined) {
+        return cached
+      }
+
+      const parentId = parentById.get(id)
+      if (parentId === undefined || parentId === null) {
+        rootMemo.set(id, id)
+        return id
+      }
+
+      const rootId = findRootId(parentId)
+      rootMemo.set(id, rootId)
+      return rootId
+    }
+
+    return findRootId
+  }
+
+  private createRootDocCounter(): (rootId: number) => number {
+    const docCountMemo = new Map<number, number>()
+
+    return (rootId: number): number => {
+      const cached = docCountMemo.get(rootId)
+      if (cached !== undefined) {
+        return cached
+      }
+
+      const explicit = this.getDocumentCount(rootId)
+      if (typeof explicit === 'number') {
+        docCountMemo.set(rootId, explicit)
+        return explicit
+      }
+
+      const rootItem = this._items.find((i) => i.id === rootId)
+      const fallback =
+        typeof (rootItem as any)?.['document_count'] === 'number'
+          ? (rootItem as any)['document_count']
+          : 0
+
+      docCountMemo.set(rootId, fallback)
+      return fallback
+    }
+  }
+
+  private buildBranchSummaries(
+    findRootId: (id: number) => number,
+    getRootDocCount: (rootId: number) => number
+  ): Map<string, BranchSummary> {
+    const summaries = new Map<string, BranchSummary>()
+
+    for (const [index, item] of this._items.entries()) {
+      const { key, special, rootId } = this.describeBranchItem(
+        item,
+        index,
+        findRootId
+      )
+
+      let summary = summaries.get(key)
+      if (!summary) {
+        summary = {
+          items: [],
+          firstIndex: index,
+          special,
+          selected: false,
+          hasDocs:
+            special || rootId === null ? false : getRootDocCount(rootId) > 0,
+        }
+        summaries.set(key, summary)
+      }
+
+      summary.items.push(item)
+
+      if (this.shouldMarkSummarySelected(summary, item)) {
+        summary.selected = true
+      }
+    }
+
+    return summaries
+  }
+
+  private describeBranchItem(
+    item: MatchingModel,
+    index: number,
+    findRootId: (id: number) => number
+  ): { key: string; special: boolean; rootId: number | null } {
+    if (item?.id === null) {
+      return { key: 'null', special: true, rootId: null }
+    }
+
+    if (item?.id === NEGATIVE_NULL_FILTER_VALUE) {
+      return { key: 'neg-null', special: true, rootId: null }
+    }
+
+    if (typeof item?.id === 'number') {
+      const rootId = findRootId(item.id)
+      return { key: `root-${rootId}`, special: false, rootId }
+    }
+
+    return { key: `misc-${index}`, special: false, rootId: null }
+  }
+
+  private shouldMarkSummarySelected(
+    summary: BranchSummary,
+    item: MatchingModel
+  ): boolean {
+    if (summary.special) {
+      return false
+    }
+
+    if (typeof item?.id !== 'number') {
+      return false
+    }
+
+    return this.getNonTemporary(item.id) !== ToggleableItemState.NotSelected
+  }
+
+  private orderBranchesByPriority(
+    summaries: Map<string, BranchSummary>
+  ): BranchSummary[] {
+    return Array.from(summaries.values()).sort((a, b) => {
+      const rankDiff = this.branchRank(a) - this.branchRank(b)
+      if (rankDiff !== 0) {
+        return rankDiff
+      }
+      if (a.hasDocs !== b.hasDocs) {
+        return a.hasDocs ? -1 : 1
+      }
+      return a.firstIndex - b.firstIndex
+    })
+  }
+
+  private branchRank(summary: BranchSummary): number {
+    if (summary.special) {
+      return -1
+    }
+    if (summary.selected) {
+      return 0
+    }
+    return 1
   }
 
   init(map: Map<number, ToggleableItemState>) {

@@ -1,4 +1,5 @@
 import datetime
+import json
 import shutil
 import tempfile
 import uuid
@@ -170,6 +171,35 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results[0]), 0)
+
+    def test_document_fields_api_version_8_respects_created(self):
+        Document.objects.create(
+            title="legacy",
+            checksum="123",
+            mime_type="application/pdf",
+            created=date(2024, 1, 15),
+        )
+
+        response = self.client.get(
+            "/api/documents/?fields=id",
+            headers={"Accept": "application/json; version=8"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertIn("id", results[0])
+        self.assertNotIn("created", results[0])
+
+        response = self.client.get(
+            "/api/documents/?fields=id,created",
+            headers={"Accept": "application/json; version=8"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertIn("id", results[0])
+        self.assertIn("created", results[0])
+        self.assertRegex(results[0]["created"], r"^2024-01-15T00:00:00.*$")
 
     def test_document_legacy_created_format(self):
         """
@@ -1552,7 +1582,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         input_doc, overrides = self.get_last_consume_delay_call_args()
 
-        new_overrides, msg = run_workflows(
+        new_overrides, _ = run_workflows(
             trigger_type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
             document=input_doc,
             logging_group=None,
@@ -1560,6 +1590,86 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
         overrides.update(new_overrides)
         self.assertEqual(overrides.custom_fields, {cf.id: None, cf2.id: 123})
+
+    def test_upload_with_custom_field_values(self):
+        """
+        GIVEN: A document with a source file
+        WHEN: Upload the document with custom fields and values
+        THEN: Metadata is set correctly
+        """
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
+
+        cf_string = CustomField.objects.create(
+            name="stringfield",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        cf_int = CustomField.objects.create(
+            name="intfield",
+            data_type=CustomField.FieldDataType.INT,
+        )
+
+        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+            response = self.client.post(
+                "/api/documents/post_document/",
+                {
+                    "document": f,
+                    "custom_fields": json.dumps(
+                        {
+                            str(cf_string.id): "a string",
+                            str(cf_int.id): 123,
+                        },
+                    ),
+                },
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.consume_file_mock.assert_called_once()
+
+        input_doc, overrides = self.get_last_consume_delay_call_args()
+
+        self.assertEqual(input_doc.original_file.name, "simple.pdf")
+        self.assertEqual(overrides.filename, "simple.pdf")
+        self.assertEqual(
+            overrides.custom_fields,
+            {cf_string.id: "a string", cf_int.id: 123},
+        )
+
+    def test_upload_with_custom_fields_errors(self):
+        """
+        GIVEN: A document with a source file
+        WHEN: Upload the document with invalid custom fields payloads
+        THEN: The upload is rejected
+        """
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
+
+        error_payloads = [
+            # Non-integer key in mapping
+            {"custom_fields": json.dumps({"abc": "a string"})},
+            # List with non-integer entry
+            {"custom_fields": json.dumps(["abc"])},
+            # Nonexistent id in mapping
+            {"custom_fields": json.dumps({99999999: "a string"})},
+            # Nonexistent id in list
+            {"custom_fields": json.dumps([99999999])},
+            # Invalid type (JSON string, not list/dict/int)
+            {"custom_fields": json.dumps("not-a-supported-structure")},
+        ]
+
+        for payload in error_payloads:
+            with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+                data = {"document": f, **payload}
+                response = self.client.post(
+                    "/api/documents/post_document/",
+                    data,
+                )
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.consume_file_mock.assert_not_called()
 
     def test_upload_with_webui_source(self):
         """
@@ -1581,7 +1691,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.consume_file_mock.assert_called_once()
 
-        input_doc, overrides = self.get_last_consume_delay_call_args()
+        input_doc, _ = self.get_last_consume_delay_call_args()
 
         self.assertEqual(input_doc.source, WorkflowTrigger.DocumentSourceChoices.WEB_UI)
 
@@ -2192,6 +2302,23 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.get("/api/logs/paperless/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertListEqual(response.data, ["test", "test2"])
+
+    def test_get_log_with_limit(self):
+        log_data = "test1\ntest2\ntest3\n"
+        with (Path(settings.LOGGING_DIR) / "paperless.log").open("w") as f:
+            f.write(log_data)
+        response = self.client.get("/api/logs/paperless/", {"limit": 2})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertListEqual(response.data, ["test2", "test3"])
+
+    def test_get_log_with_invalid_limit(self):
+        log_data = "test1\ntest2\n"
+        with (Path(settings.LOGGING_DIR) / "paperless.log").open("w") as f:
+            f.write(log_data)
+        response = self.client.get("/api/logs/paperless/", {"limit": "abc"})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        response = self.client.get("/api/logs/paperless/", {"limit": -5})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_regex_other_algorithm(self):
         for endpoint in ["correspondents", "tags", "document_types"]:
@@ -2965,7 +3092,8 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
 
         self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].attachments[0][0], "archive.pdf")
+        expected_filename = f"{doc.created} test.pdf"
+        self.assertEqual(mail.outbox[0].attachments[0][0], expected_filename)
 
         self.client.post(
             f"/api/documents/{doc2.pk}/email/",
@@ -2978,7 +3106,8 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
 
         self.assertEqual(len(mail.outbox), 2)
-        self.assertEqual(mail.outbox[1].attachments[0][0], "test2.pdf")
+        expected_filename2 = f"{doc2.created} test2.pdf"
+        self.assertEqual(mail.outbox[1].attachments[0][0], expected_filename2)
 
     @mock.patch("django.core.mail.message.EmailMessage.send", side_effect=Exception)
     def test_email_document_errors(self, mocked_send):
@@ -3036,7 +3165,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
                 "message": "hello",
             },
         )
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
         resp = self.client.post(
             f"/api/documents/{doc.pk}/email/",

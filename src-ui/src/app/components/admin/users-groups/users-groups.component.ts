@@ -5,11 +5,16 @@ import { Subject, first, takeUntil } from 'rxjs'
 import { Group } from 'src/app/data/group'
 import { User } from 'src/app/data/user'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { PermissionsService } from 'src/app/services/permissions.service'
+import {
+  PermissionAction,
+  PermissionType,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { setLocationHref } from 'src/app/utils/navigation'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { GroupEditDialogComponent } from '../../common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
@@ -43,30 +48,48 @@ export class UsersAndGroupsComponent
 
   unsubscribeNotifier: Subject<any> = new Subject()
 
-  ngOnInit(): void {
-    this.usersService
-      .listAll(null, null, { full_perms: true })
-      .pipe(first(), takeUntil(this.unsubscribeNotifier))
-      .subscribe({
-        next: (r) => {
-          this.users = r.results
-        },
-        error: (e) => {
-          this.toastService.showError($localize`Error retrieving users`, e)
-        },
-      })
+  public get canViewUsers(): boolean {
+    return this.permissionsService.currentUserCan(
+      PermissionAction.View,
+      PermissionType.User
+    )
+  }
 
-    this.groupsService
-      .listAll(null, null, { full_perms: true })
-      .pipe(first(), takeUntil(this.unsubscribeNotifier))
-      .subscribe({
-        next: (r) => {
-          this.groups = r.results
-        },
-        error: (e) => {
-          this.toastService.showError($localize`Error retrieving groups`, e)
-        },
-      })
+  public get canViewGroups(): boolean {
+    return this.permissionsService.currentUserCan(
+      PermissionAction.View,
+      PermissionType.Group
+    )
+  }
+
+  ngOnInit(): void {
+    if (this.canViewUsers) {
+      this.usersService
+        .listAll(null, null, { full_perms: true })
+        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .subscribe({
+          next: (r) => {
+            this.users = r.results
+          },
+          error: (e) => {
+            this.toastService.showError($localize`Error retrieving users`, e)
+          },
+        })
+    }
+
+    if (this.canViewGroups) {
+      this.groupsService
+        .listAll(null, null, { full_perms: true })
+        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .subscribe({
+          next: (r) => {
+            this.groups = r.results
+          },
+          error: (e) => {
+            this.toastService.showError($localize`Error retrieving groups`, e)
+          },
+        })
+    }
   }
 
   ngOnDestroy() {
@@ -93,7 +116,9 @@ export class UsersAndGroupsComponent
             $localize`Password has been changed, you will be logged out momentarily.`
           )
           setTimeout(() => {
-            window.location.href = `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
+            setLocationHref(
+              `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
+            )
           }, 2500)
         } else {
           this.toastService.showInfo(

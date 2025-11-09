@@ -164,7 +164,7 @@ describe('ManagementListComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const createButton = fixture.debugElement.queryAll(By.css('button'))[3]
+    const createButton = fixture.debugElement.queryAll(By.css('button'))[4]
     createButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
@@ -188,7 +188,7 @@ describe('ManagementListComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const editButton = fixture.debugElement.queryAll(By.css('button'))[6]
+    const editButton = fixture.debugElement.queryAll(By.css('button'))[7]
     editButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
@@ -213,7 +213,7 @@ describe('ManagementListComponent', () => {
     const deleteSpy = jest.spyOn(tagService, 'delete')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[7]
+    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[8]
     deleteButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
@@ -233,7 +233,7 @@ describe('ManagementListComponent', () => {
 
   it('should support quick filter for objects', () => {
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    const filterButton = fixture.debugElement.queryAll(By.css('button'))[8]
+    const filterButton = fixture.debugElement.queryAll(By.css('button'))[9]
     filterButton.triggerEventHandler('click')
     expect(qfSpy).toHaveBeenCalledWith([
       { rule_type: FILTER_HAS_TAGS_ALL, value: tags[0].id.toString() },
@@ -346,5 +346,26 @@ describe('ManagementListComponent', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(false)
     expect(component.userCanBulkEdit(PermissionAction.Delete)).toBeFalsy()
     expect(component.userCanBulkEdit(PermissionAction.Change)).toBeFalsy()
+  })
+
+  it('should return an original object from filtered child object', () => {
+    const childTag: Tag = {
+      id: 4,
+      name: 'Child Tag',
+      matching_algorithm: MATCH_LITERAL,
+      match: 'child',
+      document_count: 10,
+      parent: 1,
+    }
+    component['unfilteredData'].push(childTag)
+    const original = component.getOriginalObject({ id: 4 } as Tag)
+    expect(original).toEqual(childTag)
+  })
+
+  it('getSelectableIDs should return flat ids when not overridden', () => {
+    const ids = (
+      ManagementListComponent.prototype as any
+    ).getSelectableIDs.call({}, [{ id: 1 }, { id: 5 }] as any)
+    expect(ids).toEqual([1, 5])
   })
 })

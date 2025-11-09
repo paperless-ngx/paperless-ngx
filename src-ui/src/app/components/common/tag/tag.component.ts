@@ -50,4 +50,11 @@ export class TagComponent {
 
   @Input()
   clickable: boolean = false
+
+  @Input()
+  showParents: boolean = false
+
+  public get loading(): boolean {
+    return this.tagService.loading
+  }
 }

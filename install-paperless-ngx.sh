@@ -52,12 +52,12 @@ if ! command -v wget &> /dev/null ; then
 fi
 
 if ! command -v docker &> /dev/null ; then
-	echo "docker executable not found. Is docker installed?"
+	echo "docker executable not found. Is Docker installed?"
 	exit 1
 fi
 
 if ! docker compose &> /dev/null ; then
-	echo "docker compose plugin not found. Is docker compose installed?"
+	echo "docker compose plugin not found. Is Docker Compose installed?"
 	exit 1
 fi
 
@@ -66,7 +66,7 @@ fi
 if ! docker stats --no-stream &> /dev/null ; then
 	echo ""
 	echo "WARN: It look like the current user does not have Docker permissions."
-	echo "WARN: Use 'sudo usermod -aG docker $USER' to assign Docker permissions to the user (may require restarting shell)."
+	echo "WARN: Use 'sudo usermod -aG docker $USER' to assign Docker permissions to the user (may require restarting the shell)."
 	echo ""
 	sleep 3
 fi
@@ -135,7 +135,7 @@ DATABASE_BACKEND=$ask_result
 
 echo ""
 echo "Paperless is able to use Apache Tika to support Office documents such as"
-echo "Word, Excel, Powerpoint, and Libreoffice equivalents. This feature"
+echo "Word, Excel, PowerPoint, and LibreOffice equivalents. This feature"
 echo "requires more resources due to the required services."
 echo ""
 
@@ -157,7 +157,7 @@ echo ""
 echo "Specify the user id and group id you wish to run paperless as."
 echo "Paperless will also change ownership on the data, media and consume"
 echo "folder to the specified values, so it's a good idea to supply the user id"
-echo "and group id of your unix user account."
+echo "and group id of your Unix user account."
 echo "If unsure, leave default."
 echo ""
 
@@ -212,7 +212,7 @@ if [[ "$DATABASE_BACKEND" == "sqlite" ]] ; then
 	echo -n "SQLite database, the "
 fi
 echo "search index and other data."
-echo "As with the media folder, leave empty to have this managed by docker."
+echo "As with the media folder, leave empty to have this managed by Docker."
 echo ""
 echo "CAUTION: If specified, you must specify an absolute path starting with /"
 echo "or a relative path starting with ./ here."
@@ -224,7 +224,7 @@ DATA_FOLDER=$ask_result
 if [[ "$DATABASE_BACKEND" == "postgres" || "$DATABASE_BACKEND" == "mariadb" ]] ; then
 	echo ""
 	echo "The database folder, where your database stores its data."
-	echo "Leave empty to have this managed by docker."
+	echo "Leave empty to have this managed by Docker."
 	echo ""
 	echo "CAUTION: If specified, you must specify an absolute path starting with /"
 	echo "or a relative path starting with ./ here."
@@ -276,18 +276,18 @@ echo ""
 echo "Target folder: $TARGET_FOLDER"
 echo "Consume folder: $CONSUME_FOLDER"
 if [[ -z $MEDIA_FOLDER ]] ; then
-	echo "Media folder: Managed by docker"
+	echo "Media folder: Managed by Docker"
 else
 	echo "Media folder: $MEDIA_FOLDER"
 fi
 if [[ -z $DATA_FOLDER ]] ; then
-	echo "Data folder: Managed by docker"
+	echo "Data folder: Managed by Docker"
 else
 	echo "Data folder: $DATA_FOLDER"
 fi
 if [[ "$DATABASE_BACKEND" == "postgres" || "$DATABASE_BACKEND" == "mariadb" ]] ; then
 	if [[ -z $DATABASE_FOLDER ]] ; then
-		echo "Database folder: Managed by docker"
+		echo "Database folder: Managed by Docker"
 	else
 		echo "Database folder: $DATABASE_FOLDER"
 	fi
@@ -374,7 +374,7 @@ fi
 # of the provided folder
 if [[ -n $DATABASE_FOLDER ]] ; then
 	if [[ "$DATABASE_BACKEND" == "postgres" ]] ; then
-		sed -i "s#- pgdata:/var/lib/postgresql/data#- $DATABASE_FOLDER:/var/lib/postgresql/data#g" docker-compose.yml
+		sed -i "s#- pgdata:/var/lib/postgresql#- $DATABASE_FOLDER:/var/lib/postgresql#g" docker-compose.yml
 		sed -i "/^\s*pgdata:/d" docker-compose.yml
 	elif [[ "$DATABASE_BACKEND" == "mariadb" ]]; then
 		sed -i "s#- dbdata:/var/lib/mysql#- $DATABASE_FOLDER:/var/lib/mysql#g" docker-compose.yml

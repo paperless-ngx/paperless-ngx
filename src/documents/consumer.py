@@ -750,7 +750,7 @@ class ConsumerPlugin(
 
         if self.metadata.tag_ids:
             for tag_id in self.metadata.tag_ids:
-                document.tags.add(Tag.objects.get(pk=tag_id))
+                document.add_nested_tags([Tag.objects.get(pk=tag_id)])
 
         if self.metadata.storage_path_id:
             document.storage_path = StoragePath.objects.get(

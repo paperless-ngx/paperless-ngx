@@ -80,7 +80,7 @@ describe('StoragePathListComponent', () => {
       path: 'a'.repeat(100),
     }
     expect(component.extraColumns[0].valueFn(path)).toEqual(
-      `<code>${'a'.repeat(49)}...</code>`
+      `${'a'.repeat(49)}...`
     )
   })
 })

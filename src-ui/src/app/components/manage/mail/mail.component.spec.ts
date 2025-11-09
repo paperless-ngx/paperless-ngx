@@ -188,7 +188,7 @@ describe('MailComponent', () => {
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     editDialog.failed.emit()
-    expect(toastErrorSpy).toBeCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
     editDialog.succeeded.emit(mailAccounts[0] as any)
     expect(toastInfoSpy).toHaveBeenCalledWith(
       `Saved account "${mailAccounts[0].name}".`
@@ -211,7 +211,7 @@ describe('MailComponent', () => {
       throwError(() => new Error('error deleting mail account'))
     )
     deleteDialog.confirm()
-    expect(toastErrorSpy).toBeCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
     deleteSpy.mockReturnValueOnce(of(true))
     deleteDialog.confirm()
     expect(listAllSpy).toHaveBeenCalled()
@@ -246,7 +246,7 @@ describe('MailComponent', () => {
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     editDialog.failed.emit()
-    expect(toastErrorSpy).toBeCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
     editDialog.succeeded.emit(mailRules[0] as any)
     expect(toastInfoSpy).toHaveBeenCalledWith(
       `Saved rule "${mailRules[0].name}".`
@@ -280,7 +280,7 @@ describe('MailComponent', () => {
       throwError(() => new Error('error deleting mail rule "rule1"'))
     )
     deleteDialog.confirm()
-    expect(toastErrorSpy).toBeCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
     deleteSpy.mockReturnValueOnce(of(true))
     deleteDialog.confirm()
     expect(listAllSpy).toHaveBeenCalled()
@@ -408,5 +408,14 @@ describe('MailComponent', () => {
     component.ngOnInit()
     jest.advanceTimersByTime(200)
     expect(editSpy).toHaveBeenCalled()
+  })
+
+  it('should open processed mails dialog', () => {
+    completeSetup()
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
+    component.viewProcessedMail(mailRules[0] as MailRule)
+    const dialog = modal.componentInstance as any
+    expect(dialog.rule).toEqual(mailRules[0])
   })
 })

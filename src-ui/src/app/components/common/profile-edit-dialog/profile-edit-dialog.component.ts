@@ -21,6 +21,7 @@ import {
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { ProfileService } from 'src/app/services/profile.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { setLocationHref } from 'src/app/utils/navigation'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 import { ConfirmButtonComponent } from '../confirm-button/confirm-button.component'
 import { PasswordComponent } from '../input/password/password.component'
@@ -182,6 +183,7 @@ export class ProfileEditDialogComponent
       this.newPassword && this.currentPassword !== this.newPassword
     const profile = Object.assign({}, this.form.value)
     delete profile.totp_code
+    this.error = null
     this.networkActive = true
     this.profileService
       .update(profile)
@@ -194,13 +196,16 @@ export class ProfileEditDialogComponent
               $localize`Password has been changed, you will be logged out momentarily.`
             )
             setTimeout(() => {
-              window.location.href = `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
+              setLocationHref(
+                `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
+              )
             }, 2500)
           }
           this.activeModal.close()
         },
         error: (error) => {
           this.toastService.showError($localize`Error saving profile`, error)
+          this.error = error?.error
           this.networkActive = false
         },
       })

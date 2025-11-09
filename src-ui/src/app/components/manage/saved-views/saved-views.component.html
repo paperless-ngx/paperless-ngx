@@ -70,6 +70,6 @@
     }
   </ul>
 
-  <button type="submit" class="btn btn-primary mb-2" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
-  <button type="button" (click)="reset()" class="btn btn-secondary ms-2 mb-2" [disabled]="(isDirty$ | async) === false" i18n>Cancel</button>
+  <button type="button" (click)="reset()" class="btn btn-outline-secondary mb-2" [disabled]="(isDirty$ | async) === false" i18n>Cancel</button>
+  <button type="submit" class="btn btn-primary ms-2 mb-2" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
 </form>

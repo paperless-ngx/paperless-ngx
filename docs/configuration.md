@@ -159,6 +159,58 @@ Available options are `postgresql` and `mariadb`.
 
     Defaults to unset, which uses Django’s built-in defaults.
 
+#### [`PAPERLESS_DB_POOLSIZE=<int>`](#PAPERLESS_DB_POOLSIZE) {#PAPERLESS_DB_POOLSIZE}
+
+: Defines the maximum number of database connections to keep in the pool.
+
+    Only applies to PostgreSQL. This setting is ignored for other database engines.
+
+    The value must be greater than or equal to 1 to be used.
+    Defaults to unset, which disables connection pooling.
+
+    !!! note
+
+        A small pool is typically sufficient — for example, a size of 4.
+        Make sure your PostgreSQL server's max_connections setting is large enough to handle:
+        ```(Paperless workers + Celery workers) × pool size + safety margin```
+        For example, with 4 Paperless workers and 2 Celery workers, and a pool size of 4:
+        (4 + 2) × 4 + 10 = 34 connections required.
+
+#### [`PAPERLESS_DB_READ_CACHE_ENABLED=<bool>`](#PAPERLESS_DB_READ_CACHE_ENABLED) {#PAPERLESS_DB_READ_CACHE_ENABLED}
+
+: Caches the database read query results into Redis. This can significantly improve application response times by caching database queries, at the cost of slightly increased memory usage.
+
+    Defaults to `false`.
+
+    !!! danger
+
+        **Do not modify the database outside the application while it is running.**
+        This includes actions such as restoring a backup, upgrading the database, or performing manual inserts. All external modifications must be done **only when the application is stopped**.
+        After making any such changes, you **must invalidate the DB read cache** using the `invalidate_cachalot` management command.
+
+#### [`PAPERLESS_READ_CACHE_TTL=<int>`](#PAPERLESS_READ_CACHE_TTL) {#PAPERLESS_READ_CACHE_TTL}
+
+: Specifies how long (in seconds) read data should be cached.
+
+    Allowed values are between `1` (one second) and `31536000` (one year). Defaults to `3600` (one hour).
+
+    !!! warning
+
+        A high TTL increases memory usage over time. Memory may be used until end of TTL, even if the cache is invalidated with the `invalidate_cachalot` command.
+
+In case of an out-of-memory (OOM) situation, Redis may stop accepting new data — including cache entries, scheduled tasks, and documents to consume.
+If your system has limited RAM, consider configuring a dedicated Redis instance for the read cache, with a memory limit and the eviction policy set to `allkeys-lru`.
+For more details, refer to the [Redis eviction policy documentation](https://redis.io/docs/latest/develop/reference/eviction/), and see the `PAPERLESS_READ_CACHE_REDIS_URL` setting to specify a separate Redis broker.
+
+#### [`PAPERLESS_READ_CACHE_REDIS_URL=<url>`](#PAPERLESS_READ_CACHE_REDIS_URL) {#PAPERLESS_READ_CACHE_REDIS_URL}
+
+: Defines the Redis instance used for the read cache.
+
+    Defaults to `None`.
+
+    !!! Note
+    If this value is not set, the same Redis instance used for scheduled tasks will be used for caching as well.
+
 ## Optional Services
 
 ### Tika {#tika}
@@ -928,21 +980,10 @@ paperless will process in parallel on a single document.
         process very large documents faster, use a higher thread per worker
         count.
 
-    The default is a balance between the two, according to your CPU core
-    count, with a slight favor towards threads per worker:
-
-    | CPU core count | Workers | Threads |
-    | -------------- | ------- | ------- |
-    | > 1            | > 1     | > 1     |
-    | > 2            | > 2     | > 1     |
-    | > 4            | > 2     | > 2     |
-    | > 6            | > 2     | > 3     |
-    | > 8            | > 2     | > 4     |
-    | > 12           | > 3     | > 4     |
-    | > 16           | > 4     | > 4     |
-
-    If you only specify PAPERLESS_TASK_WORKERS, paperless will adjust
-    PAPERLESS_THREADS_PER_WORKER automatically.
+    If unset, paperless uses `max(floor(cpu_count / PAPERLESS_TASK_WORKERS), 1)`
+    threads per worker. The idea behind this is that as long as there are enough cores,
+    the total number of threads should less than or equal to the total number of (logical)
+    CPU cores.
 
 #### [`PAPERLESS_WORKER_TIMEOUT=<num>`](#PAPERLESS_WORKER_TIMEOUT) {#PAPERLESS_WORKER_TIMEOUT}
 
@@ -967,6 +1008,22 @@ still perform some basic text pre-processing before matching.
 : See also `PAPERLESS_NLTK_DIR`.
 
     Defaults to 1.
+
+#### [`PAPERLESS_DATE_PARSER_LANGUAGES=<lang>`](#PAPERLESS_DATE_PARSER_LANGUAGES) {#PAPERLESS_DATE_PARSER_LANGUAGES}
+
+Specifies which language Paperless should use when parsing dates from documents.
+
+    This should be a language code supported by the dateparser library,
+    for example: "en", or a combination such as "en+de".
+    Locales are also supported (e.g., "en-AU").
+    Multiple languages can be combined using "+", for example: "en+de" or "en-AU+de".
+    For valid values, refer to the list of supported languages and locales in the [dateparser documentation](https://dateparser.readthedocs.io/en/latest/supported_locales.html).
+
+    Set this to match the languages in which most of your documents are written.
+    If not set, Paperless will attempt to infer the language(s) from the OCR configuration (`PAPERLESS_OCR_LANGUAGE`).
+
+!!! note
+This format differs from the `PAPERLESS_OCR_LANGUAGE` setting, which uses ISO 639-2 codes (3 letters, e.g., "eng+deu" for Tesseract OCR).
 
 #### [`PAPERLESS_EMAIL_TASK_CRON=<cron expression>`](#PAPERLESS_EMAIL_TASK_CRON) {#PAPERLESS_EMAIL_TASK_CRON}
 
@@ -1213,6 +1270,30 @@ within your documents.
 : Enable or disable the GPG decryptor for encrypted emails. See [GPG Decryptor](advanced_usage.md#gpg-decryptor) for more information.
 
     Defaults to false.
+
+## Workflow webhooks
+
+#### [`PAPERLESS_WEBHOOKS_ALLOWED_SCHEMES=<str>`](#PAPERLESS_WEBHOOKS_ALLOWED_SCHEMES) {#PAPERLESS_WEBHOOKS_ALLOWED_SCHEMES}
+
+: A comma-separated list of allowed schemes for webhooks. This setting
+controls which URL schemes are permitted for webhook URLs.
+
+    Defaults to `http,https`.
+
+#### [`PAPERLESS_WEBHOOKS_ALLOWED_PORTS=<str>`](#PAPERLESS_WEBHOOKS_ALLOWED_PORTS) {#PAPERLESS_WEBHOOKS_ALLOWED_PORTS}
+
+: A comma-separated list of allowed ports for webhooks. This setting
+controls which ports are permitted for webhook URLs. For example, if you
+set this to `80,443`, webhooks will only be sent to URLs that use these
+ports.
+
+    Defaults to empty list, which allows all ports.
+
+#### [`PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS=<bool>`](#PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS) {#PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS}
+
+: If set to false, webhooks cannot be sent to internal URLs (e.g., localhost).
+
+    Defaults to true, which allows internal requests.
 
 ### Polling {#polling}
 
@@ -1666,6 +1747,11 @@ started by the container.
 #### [`PAPERLESS_APP_LOGO=<path>`](#PAPERLESS_APP_LOGO) {#PAPERLESS_APP_LOGO}
 
 : Path to an image file in the /media/logo directory, must include 'logo', e.g. `/logo/Atari_logo.svg`
+
+!!! note
+
+    The logo file will be viewable by anyone with access to the Paperless instance login page,
+    so consider your choice of logo carefully and removing exif data from images before uploading.
 
 #### [`PAPERLESS_ENABLE_UPDATE_CHECK=<bool>`](#PAPERLESS_ENABLE_UPDATE_CHECK) {#PAPERLESS_ENABLE_UPDATE_CHECK}
 

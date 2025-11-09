@@ -4,13 +4,11 @@
 # Requires a PAT with the correct scope set in the secrets.
 #
 # This workflow will not trigger runs on forked repos.
-
 name: Cleanup Image Tags
 on:
-  delete:
-  push:
-    paths:
-      - ".github/workflows/cleanup-tags.yml"
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'
 concurrency:
   group: registry-tags-cleanup
   cancel-in-progress: false
@@ -29,7 +27,7 @@ jobs:
     steps:
       - name: Clean temporary images
         if: "${{ env.TOKEN != '' }}"
-        uses: stumpylog/image-cleaner-action/ephemeral@v0.10.0
+        uses: stumpylog/image-cleaner-action/ephemeral@v0.11.0
         with:
           token: "${{ env.TOKEN }}"
           owner: "${{ github.repository_owner }}"
@@ -55,7 +53,7 @@ jobs:
     steps:
       - name: Clean untagged images
         if: "${{ env.TOKEN != '' }}"
-        uses: stumpylog/image-cleaner-action/untagged@v0.10.0
+        uses: stumpylog/image-cleaner-action/untagged@v0.11.0
         with:
           token: "${{ env.TOKEN }}"
           owner: "${{ github.repository_owner }}"

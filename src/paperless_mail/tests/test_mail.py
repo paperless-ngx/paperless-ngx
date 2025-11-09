@@ -1,6 +1,7 @@
 import dataclasses
 import email.contentmanager
 import random
+import time
 import uuid
 from collections import namedtuple
 from contextlib import AbstractContextManager
@@ -25,6 +26,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.models import Correspondent
+from documents.models import MatchingModel
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from paperless_mail import tasks
@@ -385,6 +387,20 @@ class MailMocker(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             apply_mail_action([], rule.pk, message.uid, message.subject, message.date)
 
 
+def assert_eventually_equals(getter_fn, expected_value, timeout=1.0, interval=0.05):
+    """
+    Repeatedly calls `getter_fn()` until the result equals `expected_value`,
+    or times out after `timeout` seconds.
+    """
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        if getter_fn() == expected_value:
+            return
+        time.sleep(interval)
+    actual = getter_fn()
+    raise AssertionError(f"Expected {expected_value}, but got {actual}")
+
+
 @mock.patch("paperless_mail.mail.magic.from_buffer", fake_magic_from_buffer)
 class TestMail(
     DirectoriesMixin,
@@ -431,6 +447,8 @@ class TestMail(
         c = handler._get_correspondent(message, rule)
         self.assertIsNotNone(c)
         self.assertEqual(c.name, "someone@somewhere.com")
+        self.assertEqual(c.matching_algorithm, MatchingModel.MATCH_ANY)
+        self.assertEqual(c.match, "someone@somewhere.com")
         c = handler._get_correspondent(message2, rule)
         self.assertIsNotNone(c)
         self.assertEqual(c.name, "me@localhost.com")
@@ -818,7 +836,7 @@ class TestMail(
         self.mail_account_handler.handle_mail_account(account)
         self.mailMocker.apply_mail_actions()
 
-        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 1)
+        assert_eventually_equals(lambda: len(self.mailMocker.bogus_mailbox.messages), 1)
 
     def test_handle_mail_account_delete_no_filters(self):
         account = MailAccount.objects.create(

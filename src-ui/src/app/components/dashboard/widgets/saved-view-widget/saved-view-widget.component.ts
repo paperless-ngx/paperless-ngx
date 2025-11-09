@@ -52,6 +52,7 @@ import {
 } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
@@ -94,6 +95,7 @@ export class SavedViewWidgetComponent
   permissionsService = inject(PermissionsService)
   private settingsService = inject(SettingsService)
   private customFieldService = inject(CustomFieldsService)
+  private savedViewService = inject(SavedViewService)
 
   public DisplayMode = DisplayMode
   public DisplayField = DisplayField
@@ -117,6 +119,8 @@ export class SavedViewWidgetComponent
   displayMode: DisplayMode
 
   displayFields: DisplayField[] = DEFAULT_DASHBOARD_DISPLAY_FIELDS
+
+  count: number
 
   ngOnInit(): void {
     this.reload()
@@ -178,6 +182,8 @@ export class SavedViewWidgetComponent
         tap((result) => {
           this.show = true
           this.documents = result.results
+          this.count = result.count
+          this.savedViewService.setDocumentCount(this.savedView, result.count)
         }),
         delay(500)
       )

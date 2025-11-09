@@ -51,14 +51,17 @@ import {
   check,
   check2All,
   checkAll,
+  checkCircle,
   checkCircleFill,
   checkLg,
   chevronDoubleLeft,
   chevronDoubleRight,
+  chevronRight,
   clipboard,
   clipboardCheck,
   clipboardCheckFill,
   clipboardFill,
+  clockHistory,
   dash,
   dashCircle,
   diagram3,
@@ -94,6 +97,7 @@ import {
   infoCircle,
   journals,
   link,
+  listNested,
   listTask,
   listUl,
   microsoft,
@@ -110,6 +114,7 @@ import {
   playFill,
   plus,
   plusCircle,
+  printer,
   questionCircle,
   scissors,
   search,
@@ -182,6 +187,7 @@ import localeSr from '@angular/common/locales/sr'
 import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
+import localeVi from '@angular/common/locales/vi'
 import localeZh from '@angular/common/locales/zh'
 import localeZhHant from '@angular/common/locales/zh-Hant'
 import { CorrespondentNamePipe } from './app/pipes/correspondent-name.pipe'
@@ -219,6 +225,7 @@ registerLocaleData(localeSl)
 registerLocaleData(localeSr)
 registerLocaleData(localeSv)
 registerLocaleData(localeTr)
+registerLocaleData(localeVi)
 registerLocaleData(localeUk)
 registerLocaleData(localeZh)
 registerLocaleData(localeZhHant)
@@ -258,14 +265,17 @@ const icons = {
   check,
   check2All,
   checkAll,
+  checkCircle,
   checkCircleFill,
   checkLg,
   chevronDoubleLeft,
   chevronDoubleRight,
+  chevronRight,
   clipboard,
   clipboardCheck,
   clipboardCheckFill,
   clipboardFill,
+  clockHistory,
   dash,
   dashCircle,
   diagram3,
@@ -301,6 +311,7 @@ const icons = {
   infoCircle,
   journals,
   link,
+  listNested,
   listTask,
   listUl,
   microsoft,
@@ -317,6 +328,7 @@ const icons = {
   playFill,
   plus,
   plusCircle,
+  printer,
   questionCircle,
   scissors,
   search,

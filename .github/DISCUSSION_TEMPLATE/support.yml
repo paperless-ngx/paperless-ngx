@@ -51,5 +51,5 @@ body:
     id: logs
     attributes:
       label: Relevant logs or output
-      description: If you have logs, errors that might help, paste it here.
+      description: If you have logs, errors that might help, paste it here. For example other containers or services (database, redis, etc).
       render: bash

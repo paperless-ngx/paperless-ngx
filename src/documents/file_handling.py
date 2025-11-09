@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from django.conf import settings
 
@@ -7,19 +8,15 @@ from documents.templating.filepath import validate_filepath_template_and_render
 from documents.templating.utils import convert_format_str_to_template_format
 
 
-def create_source_path_directory(source_path):
-    os.makedirs(os.path.dirname(source_path), exist_ok=True)
+def create_source_path_directory(source_path: Path) -> None:
+    source_path.parent.mkdir(parents=True, exist_ok=True)
 
 
-def delete_empty_directories(directory, root):
-    if not os.path.isdir(directory):
+def delete_empty_directories(directory: Path, root: Path) -> None:
+    if not directory.is_dir():
         return
 
-    # Go up in the directory hierarchy and try to delete all directories
-    directory = os.path.normpath(directory)
-    root = os.path.normpath(root)
-
-    if not directory.startswith(root + os.path.sep):
+    if not directory.is_relative_to(root):
         # don't do anything outside our originals folder.
 
         # append os.path.set so that we avoid these cases:
@@ -27,11 +24,12 @@ def delete_empty_directories(directory, root):
         #   root = /home/originals ("/" gets appended and startswith fails)
         return
 
+    # Go up in the directory hierarchy and try to delete all directories
     while directory != root:
-        if not os.listdir(directory):
+        if not list(directory.iterdir()):
             # it's empty
             try:
-                os.rmdir(directory)
+                directory.rmdir()
             except OSError:
                 # whatever. empty directories aren't that bad anyway.
                 return
@@ -40,10 +38,10 @@ def delete_empty_directories(directory, root):
             return
 
         # go one level up
-        directory = os.path.normpath(os.path.dirname(directory))
+        directory = directory.parent
 
 
-def generate_unique_filename(doc, *, archive_filename=False):
+def generate_unique_filename(doc, *, archive_filename=False) -> Path:
     """
     Generates a unique filename for doc in settings.ORIGINALS_DIR.
 
@@ -56,21 +54,32 @@ def generate_unique_filename(doc, *, archive_filename=False):
 
     """
     if archive_filename:
-        old_filename = doc.archive_filename
+        old_filename: Path | None = (
+            Path(doc.archive_filename) if doc.archive_filename else None
+        )
         root = settings.ARCHIVE_DIR
     else:
-        old_filename = doc.filename
+        old_filename = Path(doc.filename) if doc.filename else None
         root = settings.ORIGINALS_DIR
 
     # If generating archive filenames, try to make a name that is similar to
     # the original filename first.
 
     if archive_filename and doc.filename:
-        new_filename = os.path.splitext(doc.filename)[0] + ".pdf"
-        if new_filename == old_filename or not os.path.exists(
-            os.path.join(root, new_filename),
-        ):
-            return new_filename
+        # Generate the full path using the same logic as generate_filename
+        base_generated = generate_filename(doc, archive_filename=archive_filename)
+
+        # Try to create a simple PDF version based on the original filename
+        # but preserve any directory structure from the template
+        if str(base_generated.parent) != ".":
+            # Has directory structure, preserve it
+            simple_pdf_name = base_generated.parent / (Path(doc.filename).stem + ".pdf")
+        else:
+            # No directory structure
+            simple_pdf_name = Path(Path(doc.filename).stem + ".pdf")
+
+        if simple_pdf_name == old_filename or not (root / simple_pdf_name).exists():
+            return simple_pdf_name
 
     counter = 0
 
@@ -84,10 +93,33 @@ def generate_unique_filename(doc, *, archive_filename=False):
             # still the same as before.
             return new_filename
 
-        if os.path.exists(os.path.join(root, new_filename)):
+        if (root / new_filename).exists():
             counter += 1
         else:
             return new_filename
+
+
+def format_filename(document: Document, template_str: str) -> str | None:
+    rendered_filename = validate_filepath_template_and_render(
+        template_str,
+        document,
+    )
+    if rendered_filename is None:
+        return None
+
+    # Apply this setting.  It could become a filter in the future (or users could use |default)
+    if settings.FILENAME_FORMAT_REMOVE_NONE:
+        rendered_filename = rendered_filename.replace("/-none-/", "/")
+        rendered_filename = rendered_filename.replace(" -none-", "")
+        rendered_filename = rendered_filename.replace("-none-", "")
+        rendered_filename = rendered_filename.strip(os.sep)
+
+    rendered_filename = rendered_filename.replace(
+        "-none-",
+        "none",
+    )  # backward compatibility
+
+    return rendered_filename
 
 
 def generate_filename(
@@ -96,30 +128,8 @@ def generate_filename(
     counter=0,
     append_gpg=True,
     archive_filename=False,
-):
-    path = ""
-
-    def format_filename(document: Document, template_str: str) -> str | None:
-        rendered_filename = validate_filepath_template_and_render(
-            template_str,
-            document,
-        )
-        if rendered_filename is None:
-            return None
-
-        # Apply this setting.  It could become a filter in the future (or users could use |default)
-        if settings.FILENAME_FORMAT_REMOVE_NONE:
-            rendered_filename = rendered_filename.replace("/-none-/", "/")
-            rendered_filename = rendered_filename.replace(" -none-", "")
-            rendered_filename = rendered_filename.replace("-none-", "")
-            rendered_filename = rendered_filename.strip(os.sep)
-
-        rendered_filename = rendered_filename.replace(
-            "-none-",
-            "none",
-        )  # backward compatibility
-
-        return rendered_filename
+) -> Path:
+    base_path: Path | None = None
 
     # Determine the source of the format string
     if doc.storage_path is not None:
@@ -134,17 +144,34 @@ def generate_filename(
 
     # If we have one, render it
     if filename_format is not None:
-        path = format_filename(doc, filename_format)
+        rendered_path: str | None = format_filename(doc, filename_format)
+        if rendered_path:
+            base_path = Path(rendered_path)
 
     counter_str = f"_{counter:02}" if counter else ""
     filetype_str = ".pdf" if archive_filename else doc.file_type
 
-    if path:
-        filename = f"{path}{counter_str}{filetype_str}"
+    if base_path:
+        # Split the path into directory and filename parts
+        directory = base_path.parent
+        # Use the full name (not just stem) as the base filename
+        base_filename = base_path.name
+
+        # Build the final filename with counter and filetype
+        final_filename = f"{base_filename}{counter_str}{filetype_str}"
+
+        # If we have a directory component, include it
+        if str(directory) != ".":
+            full_path = directory / final_filename
+        else:
+            full_path = Path(final_filename)
     else:
-        filename = f"{doc.pk:07}{counter_str}{filetype_str}"
+        # No template, use document ID
+        final_filename = f"{doc.pk:07}{counter_str}{filetype_str}"
+        full_path = Path(final_filename)
 
+    # Add GPG extension if needed
     if append_gpg and doc.storage_type == doc.STORAGE_TYPE_GPG:
-        filename += ".gpg"
+        full_path = full_path.with_suffix(full_path.suffix + ".gpg")
 
-    return filename
+    return full_path

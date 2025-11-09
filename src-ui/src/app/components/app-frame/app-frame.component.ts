@@ -102,7 +102,9 @@ export class AppFrameComponent
         PermissionType.SavedView
       )
     ) {
-      this.savedViewService.reload()
+      this.savedViewService.reload(() => {
+        this.savedViewService.maybeRefreshDocumentCounts()
+      })
     }
   }
 
@@ -143,11 +145,24 @@ export class AppFrameComponent
   }
 
   get versionString(): string {
-    return `${environment.appTitle} v${this.settingsService.get(SETTINGS_KEYS.VERSION)}${environment.production ? '' : ` #${environment.tag}`}`
+    return `${environment.appTitle} v${this.settingsService.get(SETTINGS_KEYS.VERSION)}${environment.tag === 'prod' ? '' : ` #${environment.tag}`}`
   }
 
   get customAppTitle(): string {
     return this.settingsService.get(SETTINGS_KEYS.APP_TITLE)
+  }
+
+  get canSaveSettings(): boolean {
+    return (
+      this.permissionsService.currentUserCan(
+        PermissionAction.Change,
+        PermissionType.UISettings
+      ) &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.Add,
+        PermissionType.UISettings
+      )
+    )
   }
 
   get slimSidebarEnabled(): boolean {
@@ -282,5 +297,12 @@ export class AppFrameComponent
 
   onLogout() {
     this.openDocumentsService.closeAll()
+  }
+
+  get showSidebarCounts(): boolean {
+    return (
+      this.settingsService.get(SETTINGS_KEYS.SIDEBAR_VIEWS_SHOW_COUNT) &&
+      !this.settingsService.organizingSidebarSavedViews
+    )
   }
 }

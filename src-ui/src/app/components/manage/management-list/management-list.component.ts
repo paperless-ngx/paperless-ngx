@@ -53,6 +53,8 @@ export interface ManagementListColumn {
   rendersHtml?: boolean
 
   hideOnMobile?: boolean
+
+  monospace?: boolean
 }
 
 @Directive()
@@ -77,6 +79,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
 
   public data: T[] = []
+  private unfilteredData: T[] = []
 
   public page = 1
 
@@ -130,6 +133,22 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     this.reloadData()
   }
 
+  protected filterData(data: T[]): T[] {
+    return data
+  }
+
+  getDocumentCount(object: MatchingModel): number {
+    return (
+      object.document_count ??
+      this.unfilteredData.find((d) => d.id == object.id)?.document_count ??
+      0
+    )
+  }
+
+  public getOriginalObject(object: T): T {
+    return this.unfilteredData.find((d) => d?.id == object?.id) || object
+  }
+
   reloadData(extraParams: { [key: string]: any } = null) {
     this.loading = true
     this.clearSelection()
@@ -146,7 +165,8 @@ export abstract class ManagementListComponent<T extends MatchingModel>
       .pipe(
         takeUntil(this.unsubscribeNotifier),
         tap((c) => {
-          this.data = c.results
+          this.unfilteredData = c.results
+          this.data = this.filterData(c.results)
           this.collectionSize = c.count
         }),
         delay(100)
@@ -277,11 +297,17 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   }
 
   toggleAll(event: PointerEvent) {
-    if ((event.target as HTMLInputElement).checked) {
-      this.selectedObjects = new Set(this.data.map((o) => o.id))
+    const checked = (event.target as HTMLInputElement).checked
+    this.togggleAll = checked
+    if (checked) {
+      this.selectedObjects = new Set(this.getSelectableIDs(this.data))
     } else {
       this.clearSelection()
     }
+  }
+
+  protected getSelectableIDs(objects: T[]): number[] {
+    return objects.map((o) => o.id)
   }
 
   clearSelection() {

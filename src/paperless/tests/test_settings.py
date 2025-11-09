@@ -3,10 +3,12 @@ import os
 from unittest import TestCase
 from unittest import mock
 
+import pytest
 from celery.schedules import crontab
 
 from paperless.settings import _parse_base_paths
 from paperless.settings import _parse_beat_schedule
+from paperless.settings import _parse_dateparser_languages
 from paperless.settings import _parse_db_settings
 from paperless.settings import _parse_ignore_dates
 from paperless.settings import _parse_paperless_url
@@ -471,3 +473,23 @@ class TestPathSettings(TestCase):
         base_paths = _parse_base_paths()
         self.assertEqual("/paperless/", base_paths[1])  # BASE_URL
         self.assertEqual("/foobar/", base_paths[4])  # LOGOUT_REDIRECT_URL
+
+
+@pytest.mark.parametrize(
+    ("languages", "expected"),
+    [
+        ("de", ["de"]),
+        ("zh", ["zh"]),
+        ("fr+en", ["fr", "en"]),
+        # Locales must be supported
+        ("en-001+fr-CA", ["en-001", "fr-CA"]),
+        ("en-001+fr", ["en-001", "fr"]),
+        # Special case for Chinese: variants seem to miss some dates,
+        # so we always add "zh" as a fallback.
+        ("en+zh-Hans-HK", ["en", "zh-Hans-HK", "zh"]),
+        ("en+zh-Hans", ["en", "zh-Hans", "zh"]),
+        ("en+zh-Hans+zh-Hant", ["en", "zh-Hans", "zh-Hant", "zh"]),
+    ],
+)
+def test_parser_date_parser_languages(languages, expected):
+    assert sorted(_parse_dateparser_languages(languages)) == sorted(expected)

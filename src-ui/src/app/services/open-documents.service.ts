@@ -84,10 +84,20 @@ export class OpenDocumentsService {
     this.save()
   }
 
-  setDirty(doc: Document, dirty: boolean) {
-    if (!this.openDocuments.find((d) => d.id == doc.id)) return
-    if (dirty) this.dirtyDocuments.add(doc.id)
-    else this.dirtyDocuments.delete(doc.id)
+  setDirty(doc: Document, dirty: boolean, changedFields: object = {}) {
+    const existingDoc = this.getOpenDocument(doc.id)
+    if (!existingDoc) return
+    if (dirty) {
+      this.dirtyDocuments.add(doc.id)
+      existingDoc.__changedFields = Object.keys(changedFields).filter(
+        (key) => key !== 'id'
+      )
+    } else {
+      this.dirtyDocuments.delete(doc.id)
+      existingDoc.__changedFields = []
+    }
+
+    this.save()
   }
 
   hasDirty(): boolean {

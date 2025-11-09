@@ -16,8 +16,8 @@
 # - Instead of SQLite (default), MariaDB is used as the database server.
 # - Apache Tika and Gotenberg servers are started with paperless and paperless
 #   is configured to use these services. These provide support for consuming
-#   Office documents (Word, Excel, Power Point and their LibreOffice counter-
-#   parts.
+#   Office documents (Word, Excel, PowerPoint and their LibreOffice counter-
+#   parts).
 #
 # To install and update paperless with this file, do the following:
 #
@@ -25,11 +25,9 @@
 #   and '.env' into a folder.
 # - Run 'docker compose pull'.
 # - Run 'docker compose up -d'.
-
 #
 # For more extensive installation and update instructions, refer to the
 # documentation.
-
 services:
   broker:
     image: docker.io/library/redis:8
@@ -37,7 +35,7 @@ services:
     volumes:
       - redisdata:/data
   db:
-    image: docker.io/library/mariadb:11
+    image: docker.io/library/mariadb:12
     restart: unless-stopped
     volumes:
       - dbdata:/var/lib/mysql
@@ -74,7 +72,7 @@ services:
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
   gotenberg:
-    image: docker.io/gotenberg/gotenberg:8.20
+    image: docker.io/gotenberg/gotenberg:8.24
     restart: unless-stopped
     # The gotenberg chromium route is used to convert .eml files. We do not
     # want to allow external content like tracking pixels or even javascript.

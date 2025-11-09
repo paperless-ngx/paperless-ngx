@@ -20,7 +20,6 @@
 #
 # This file is intended only to be used through VSCOde devcontainers. See README.md
 # in the folder .devcontainer.
-
 services:
   broker:
     image: docker.io/library/redis:7
@@ -50,7 +49,6 @@ services:
       - ./data:/usr/src/paperless/paperless-ngx/data
       - ./media:/usr/src/paperless/paperless-ngx/media
       - ./consume:/usr/src/paperless/paperless-ngx/consume
-      - ~/.gitconfig:/usr/src/paperless/.gitconfig:ro
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_TIKA_ENABLED: 1

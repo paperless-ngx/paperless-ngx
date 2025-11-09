@@ -1,12 +1,14 @@
 import datetime
 from zoneinfo import ZoneInfo
 
+import pytest
 from pytest_django.fixtures import SettingsWrapper
 
 from documents.parsers import parse_date
 from documents.parsers import parse_date_generator
 
 
+@pytest.mark.django_db()
 class TestDate:
     def test_date_format_1(self):
         text = "lorem ipsum 130218 lorem ipsum"
@@ -44,12 +46,22 @@ class TestDate:
         )
         assert parse_date("", text) is None
 
-    def test_date_format_7(self, settings_timezone: ZoneInfo):
+    def test_date_format_7(
+        self,
+        settings: SettingsWrapper,
+        settings_timezone: ZoneInfo,
+    ):
+        settings.DATE_PARSER_LANGUAGES = ["de"]
         text = "lorem ipsum\nMärz 2019\nlorem ipsum"
         date = parse_date("", text)
         assert date == datetime.datetime(2019, 3, 1, 0, 0, tzinfo=settings_timezone)
 
-    def test_date_format_8(self, settings_timezone: ZoneInfo):
+    def test_date_format_8(
+        self,
+        settings: SettingsWrapper,
+        settings_timezone: ZoneInfo,
+    ):
+        settings.DATE_PARSER_LANGUAGES = ["de"]
         text = (
             "lorem ipsum\n"
             "Wohnort\n"
@@ -71,7 +83,12 @@ class TestDate:
             tzinfo=settings_timezone,
         )
 
-    def test_date_format_9(self, settings_timezone: ZoneInfo):
+    def test_date_format_9(
+        self,
+        settings: SettingsWrapper,
+        settings_timezone: ZoneInfo,
+    ):
+        settings.DATE_PARSER_LANGUAGES = ["de"]
         text = "lorem ipsum\n27. Nullmonth 2020\nMärz 2020\nlorem ipsum"
         assert parse_date("", text) == datetime.datetime(
             2020,
@@ -250,7 +267,12 @@ class TestDate:
     def test_crazy_date_with_spaces(self):
         assert parse_date("", "20 408000l 2475") is None
 
-    def test_utf_month_names(self, settings_timezone: ZoneInfo):
+    def test_utf_month_names(
+        self,
+        settings: SettingsWrapper,
+        settings_timezone: ZoneInfo,
+    ):
+        settings.DATE_PARSER_LANGUAGES = ["fr", "de", "hr", "cs", "pl", "tr"]
         assert parse_date("", "13 décembre 2023") == datetime.datetime(
             2023,
             12,

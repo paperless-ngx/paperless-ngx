@@ -43,7 +43,7 @@ export class GroupEditDialogComponent extends EditDialogComponent<Group> {
   getForm(): FormGroup {
     return new FormGroup({
       name: new FormControl(''),
-      permissions: new FormControl(null),
+      permissions: new FormControl([]),
     })
   }
 }

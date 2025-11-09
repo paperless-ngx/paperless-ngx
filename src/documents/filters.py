@@ -92,6 +92,12 @@ class TagFilterSet(FilterSet):
             "name": CHAR_KWARGS,
         }
 
+    is_root = BooleanFilter(
+        label="Is root tag",
+        field_name="tn_parent",
+        lookup_expr="isnull",
+    )
+
 
 class DocumentTypeFilterSet(FilterSet):
     class Meta:
@@ -230,6 +236,7 @@ class CustomFieldsFilter(Filter):
                 | qs.filter(custom_fields__value_monetary__icontains=value)
                 | qs.filter(custom_fields__value_document_ids__icontains=value)
                 | qs.filter(custom_fields__value_select__in=option_ids)
+                | qs.filter(custom_fields__value_long_text__icontains=value)
             )
         else:
             return qs
@@ -314,6 +321,7 @@ class CustomFieldQueryParser:
         CustomField.FieldDataType.MONETARY: ("basic", "string", "arithmetic"),
         CustomField.FieldDataType.DOCUMENTLINK: ("basic", "containment"),
         CustomField.FieldDataType.SELECT: ("basic",),
+        CustomField.FieldDataType.LONG_TEXT: ("basic", "string"),
     }
 
     DATE_COMPONENTS = [
@@ -845,7 +853,10 @@ class DocumentsOrderingFilter(OrderingFilter):
 
             annotation = None
             match field.data_type:
-                case CustomField.FieldDataType.STRING:
+                case (
+                    CustomField.FieldDataType.STRING
+                    | CustomField.FieldDataType.LONG_TEXT
+                ):
                     annotation = Subquery(
                         CustomFieldInstance.objects.filter(
                             document_id=OuterRef("id"),

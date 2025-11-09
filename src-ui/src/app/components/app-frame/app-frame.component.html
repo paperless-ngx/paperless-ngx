@@ -68,13 +68,15 @@
     <nav id="sidebarMenu" class="d-md-block bg-light sidebar collapse"
       [ngClass]="slimSidebarEnabled ? 'slim' : 'col-md-3 col-lg-2 col-xxxl-1'" [class.animating]="slimSidebarAnimating"
       [ngbCollapse]="isMenuCollapsed">
-      <button class="btn btn-sm btn-dark sidebar-slim-toggler" (click)="toggleSlimSidebar()">
-        @if (slimSidebarEnabled) {
-          <i-bs width="0.9em" height="0.9em" name="chevron-double-right"></i-bs>
-        } @else {
-          <i-bs width="0.9em" height="0.9em" name="chevron-double-left"></i-bs>
-        }
-      </button>
+      @if (canSaveSettings) {
+        <button class="btn btn-sm btn-dark sidebar-slim-toggler" (click)="toggleSlimSidebar()">
+          @if (slimSidebarEnabled) {
+            <i-bs width="0.9em" height="0.9em" name="chevron-double-right"></i-bs>
+          } @else {
+            <i-bs width="0.9em" height="0.9em" name="chevron-double-left"></i-bs>
+          }
+        </button>
+      }
       <div class="sidebar-sticky pt-3 d-flex flex-column justify-space-around">
         <ul class="nav flex-column">
           <li class="nav-item app-link">
@@ -108,11 +110,19 @@
                 <li class="nav-item w-100 app-link" cdkDrag [cdkDragDisabled]="!settingsService.organizingSidebarSavedViews"
                   cdkDragPreviewContainer="parent" cdkDragPreviewClass="navItemDrag" (cdkDragStarted)="onDragStart($event)"
                   (cdkDragEnded)="onDragEnd($event)">
-                  <a class="nav-link" [class.text-truncate]="!slimSidebarEnabled" routerLink="view/{{view.id}}"
+                  <a class="nav-link" routerLink="view/{{view.id}}"
                     routerLinkActive="active" (click)="closeMenu()" [ngbPopover]="view.name"
                     [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave"
                     popoverClass="popover-slim">
-                    <i-bs class="me-1" name="funnel"></i-bs><span>&nbsp;{{view.name}}</span>
+                    <i-bs class="me-1" name="funnel"></i-bs>
+                      <span>&nbsp;<div class="d-inline-flex view-name"><span class="overflow-hidden" [class.text-wrap]="!slimSidebarEnabled">{{view.name}}</span></div>
+                        @if (showSidebarCounts && !slimSidebarEnabled) {
+                          <span class="badge bg-info text-dark ms-2 d-inline">{{ savedViewService.getDocumentCount(view) }}</span>
+                        }
+                      </span>
+                    @if (showSidebarCounts && slimSidebarEnabled) {
+                      <span class="badge bg-info text-dark position-absolute top-0 end-0 d-none d-md-block">{{ savedViewService.getDocumentCount(view) }}</span>
+                    }
                   </a>
                   @if (settingsService.organizingSidebarSavedViews) {
                     <div class="position-absolute end-0 top-0 px-3 py-2" [class.me-n3]="slimSidebarEnabled" cdkDragHandle>
@@ -139,7 +149,7 @@
                   [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave"
                   popoverClass="popover-slim">
                   <i-bs class="me-1" name="file-text"></i-bs><span>&nbsp;{{d.title | documentTitle}}</span>
-                  <span class="close" (click)="closeDocument(d); $event.preventDefault()">
+                  <span class="close flex-column justify-content-center" (click)="closeDocument(d); $event.preventDefault()">
                     <i-bs name="x"></i-bs>
                   </span>
                 </a>

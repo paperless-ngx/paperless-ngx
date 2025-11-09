@@ -1,4 +1,4 @@
-import { NgClass, TitleCasePipe } from '@angular/common'
+import { NgClass, NgTemplateOutlet, TitleCasePipe } from '@angular/common'
 import { Component, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
@@ -28,6 +28,7 @@ import { ManagementListComponent } from '../management-list/management-list.comp
     FormsModule,
     ReactiveFormsModule,
     NgClass,
+    NgTemplateOutlet,
     NgbDropdownModule,
     NgbPaginationModule,
     NgxBootstrapIconsModule,
