@@ -161,7 +161,14 @@ ARG RUNTIME_PACKAGES="\
   zlib1g \
   # Barcode splitter
   libzbar0 \
-  poppler-utils"
+  poppler-utils \
+  # OpenCV system dependencies for ML/OCR features
+  libglib2.0-0 \
+  libsm6 \
+  libxext6 \
+  libxrender1 \
+  libgomp1 \
+  libgl1"
 
 # Install basic runtime packages.
 # These change very infrequently
