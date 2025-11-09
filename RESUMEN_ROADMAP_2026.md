@@ -20,11 +20,11 @@ Siguiendo las directivas de `agents.md` como ley, hemos completado una investiga
 
 #### Contenido:
 - **12 Epics principales** distribuidos estratégicamente en 4 trimestres
-- **147 tareas específicas** con estimaciones detalladas de tiempo
-- **Calendario de entregas** por trimestre con milestones claros
-- **Estimación de recursos e inversión:** $165,200 - $250,200 USD (año completo)
-- **Métricas de éxito (KPIs):** técnicas, de negocio y de producto
-- **Análisis de riesgos** con planes de mitigación
+- **145 tareas específicas** con estimaciones detalladas de tiempo
+- **Enfoque:** Usuarios individuales y PYMEs (NO empresas grandes)
+- **Costo:** $0 USD/año (100% GRATUITO - proyecto Open Source sin servicios de pago)
+- **Métricas de éxito (KPIs):** enfocadas en usuarios finales
+- **Simplicidad sobre complejidad:** Features útiles, no enterprise
 
 #### Estructura Trimestral:
 
@@ -35,22 +35,22 @@ Siguiendo las directivas de `agents.md` como ley, hemos completado una investiga
 - EPIC 4: Encriptación de Documentos en Reposo (12 tareas)
 - **Total:** 42 tareas, 13 semanas
 
-**Q2 2026 (Abril-Junio): EXPANSIÓN** 🟠 Alta
+**Q2 2026 (Abril-Junio): ACCESIBILIDAD** 🟠 Alta
 - EPIC 5: Aplicación Móvil Nativa iOS/Android (28 tareas)
 - EPIC 6: Cloud Storage Sync (Dropbox, GDrive, OneDrive) (15 tareas)
-- EPIC 7: Analytics y Reporting Avanzado (13 tareas)
-- **Total:** 56 tareas, 13 semanas
+- EPIC 7: Estadísticas Básicas y Reportes Simples (8 tareas)
+- **Total:** 51 tareas, 13 semanas
 
-**Q3 2026 (Julio-Septiembre): COLABORACIÓN** 🟡 Media
-- EPIC 8: Colaboración y Anotaciones en Tiempo Real (16 tareas)
-- EPIC 9: Multi-Tenancy (SaaS-ready) (18 tareas)
-- EPIC 10: Compliance Avanzado (ISO 15489, DOD 5015.2) (14 tareas)
-- **Total:** 48 tareas, 13 semanas
+**Q3 2026 (Julio-Septiembre): COLABORACIÓN SIMPLE** 🟡 Media
+- EPIC 8: Colaboración para Equipos Pequeños (16 tareas)
+- EPIC 9: Mejoras de UX y Experiencia de Usuario (12 tareas)
+- EPIC 10: Compartir y Permisos Simples (12 tareas)
+- **Total:** 40 tareas, 13 semanas
 
-**Q4 2026 (Octubre-Diciembre): INNOVACIÓN** 🟢 Media-Baja
-- EPIC 11: Blockchain Integration (10 tareas)
-- EPIC 12: AR/VR y Búsqueda Visual (11 tareas)
-- **Total:** 21 tareas, 13 semanas
+**Q4 2026 (Octubre-Diciembre): REFINAMIENTO** 🟢 Media
+- EPIC 11: Documentación y Ayuda para Usuarios (7 tareas)
+- EPIC 12: Estabilidad y Bug Fixes (5 tareas)
+- **Total:** 12 tareas, 13 semanas
 
 ---
 
@@ -89,10 +89,11 @@ Siguiendo las directivas de `agents.md` como ley, hemos completado una investiga
 
 #### Contenido:
 - **Workspace setup completo:** Estructura de páginas y databases
-- **Sync bidireccional GitHub↔Notion** con 3 opciones:
-  1. **Opción A (Recomendada):** API custom con GitHub Actions
-  2. **Opción B (Más fácil):** Zapier - no-code, 15 minutos setup
-  3. **Opción C (Alternativa):** Make/Integromat
+- **Sync bidireccional GitHub↔Notion** 100% GRATUITO:
+  - Script Python custom con GitHub Actions (NO servicios de pago)
+  - Actualización automática cada hora sin costo
+  - ❌ SIN Zapier (cuesta $19.99/mes)
+  - ❌ SIN Make/Integromat (cuesta $9/mes)
 - **Database "Roadmap 2026 Tasks":** 12 propiedades configuradas
 - **5 vistas diferentes:** Timeline (Gantt), Kanban, Por Epic, Calendar, Tabla
 - **Dashboard ejecutivo:** Progress bars, KPIs, métricas automáticas
@@ -137,12 +138,12 @@ Actualizada siguiendo las directivas de `agents.md`:
 
 ### Planificación
 - **Duración:** 52 semanas (año completo 2026)
-- **Epics:** 12 principales
-- **Tareas:** 147 específicas
-- **Distribución:** 42 (Q1), 56 (Q2), 48 (Q3), 21 (Q4)
+- **Epics:** 12 principales (enfocados en usuarios y PYMEs)
+- **Tareas:** 145 específicas (simplificado, NO enterprise)
+- **Distribución:** 42 (Q1), 51 (Q2), 40 (Q3), 12 (Q4)
 
 ### Recursos
-- **Costo total:** $0 - $500 USD/año (proyecto Open Source)
+- **Costo total:** $0 USD/año (100% GRATUITO - SIN servicios de pago)
 - **Equipo voluntario:**
   - 1 Maintainer principal (10-15 hrs/semana)
   - Contribuidores backend (5-8 hrs/semana c/u)

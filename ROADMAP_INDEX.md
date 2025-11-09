@@ -20,7 +20,7 @@
 
 3. **[ROADMAP_2026.md](./ROADMAP_2026.md)** (1-2 horas)
    - La hoja de ruta completa
-   - 12 Epics, 147 tareas
+   - 12 Epics, 145 tareas (enfoque usuarios y PYMEs)
    - Todo el detalle
 
 ---
@@ -36,7 +36,7 @@
 **Tiempo de lectura:** 10 minutos  
 **Contenido:**
 - Misión cumplida y entregables
-- Números clave (147 tareas, $165k-$250k, 52 semanas)
+- Números clave (145 tareas, $0/año 100% GRATIS, 52 semanas)
 - Impacto esperado en 2026
 - Próximos pasos inmediatos
 - Recomendaciones clave
@@ -55,10 +55,10 @@
 - 12 Epics distribuidos en 4 trimestres:
   - **Q1 2026:** Testing, API Docs, Performance, Encriptación (42 tareas)
   - **Q2 2026:** Mobile, Cloud Sync, Analytics (56 tareas)
-  - **Q3 2026:** Colaboración, Multi-tenancy, Compliance (48 tareas)
-  - **Q4 2026:** Blockchain, AR/VR (21 tareas)
+  - **Q3 2026:** Colaboración, UX mejorada, Compartir simple (40 tareas)
+  - **Q4 2026:** Documentación, Refinamiento (12 tareas)
 - Calendario de entregas
-- Estimación de recursos ($165k-$250k)
+- Recursos: $0/año (open source, sin servicios de pago)
 - Métricas de éxito (KPIs)
 - Análisis de riesgos
 
@@ -109,14 +109,14 @@
 > **Guía de integración con Notion (recomendado por el Director)**
 
 **Audiencia:** Product manager, team  
-**Tiempo de setup:** 1 hora (Zapier) o 4-5 horas (completo)  
+**Tiempo de setup:** 2-3 horas (100% GRATIS con GitHub Actions)  
 **Contenido:**
 - Por qué Notion vs Jira/Confluence
 - Workspace setup completo
-- Sync bidireccional GitHub↔Notion (3 opciones):
-  - Opción A: API custom con GitHub Actions (incluye script Python)
-  - Opción B: Zapier (no-code, 15 min)
-  - Opción C: Make/Integromat
+- Sync bidireccional GitHub↔Notion 100% GRATIS:
+  - Script Python custom con GitHub Actions (NO Zapier de pago)
+  - ❌ SIN servicios de pago (Zapier $19.99/mes eliminado)
+  - ❌ SIN Make/Integromat ($9/mes eliminado)
 - Database configurada (12 propiedades)
 - 5 vistas (Timeline, Kanban, Calendar, Table, Dashboard)
 - Templates (tasks, weekly/monthly reports)
@@ -139,7 +139,7 @@
 
 **Decisiones a tomar:**
 - [ ] ¿Aprobar el roadmap?
-- [ ] ¿Aprobar presupuesto $165k-$250k?
+- [ ] ¿Aprobar roadmap? (sin costo - open source)
 - [ ] ¿Usar GitHub Projects, Notion o ambos?
 - [ ] ¿Qué Epics priorizar?
 - [ ] ¿Contratar o redistribuir equipo actual?
@@ -196,34 +196,37 @@
 6. **EPIC 6:** Cloud Storage Sync (15 tareas) - 🟡 Media
 7. **EPIC 7:** Analytics y Reporting (13 tareas) - 🟡 Media
 
-#### Q3 2026 - Colaboración (13 semanas)
-8. **EPIC 8:** Colaboración en Tiempo Real (16 tareas) - 🟡 Media
-9. **EPIC 9:** Multi-Tenancy (SaaS) (18 tareas) - 🟡 Media
-10. **EPIC 10:** Compliance Avanzado (14 tareas) - 🟢 Media
+#### Q3 2026 - UX y Colaboración Simple (13 semanas)
+8. **EPIC 8:** Colaboración para Equipos Pequeños (16 tareas) - 🟡 Media
+9. **EPIC 9:** Mejoras de UX y Experiencia de Usuario (12 tareas) - 🟡 Media
+10. **EPIC 10:** Compartir y Permisos Simples (12 tareas) - 🟡 Media
 
-#### Q4 2026 - Innovación (13 semanas)
-11. **EPIC 11:** Blockchain Integration (10 tareas) - 🟢 Media-Baja
-12. **EPIC 12:** AR/VR Búsqueda Visual (11 tareas) - 🟢 Baja
+#### Q4 2026 - Refinamiento (13 semanas)
+11. **EPIC 11:** Documentación y Ayuda para Usuarios (7 tareas) - 🟢 Media
+12. **EPIC 12:** Estabilidad y Refinamiento (5 tareas) - 🟢 Media-Baja
 
-**Total:** 147 tareas, 52 semanas
+**Total:** 145 tareas, 52 semanas (enfoque en usuarios y PYMEs)
 
 ---
 
 ## 💰 Presupuesto y Recursos
 
 ### Costo Total (Proyecto Open Source)
-**$0 - $500 USD/año** (proyecto open source con servicios gratuitos)
+**$0 USD/año** ✅ (100% GRATUITO - SIN servicios de pago)
 
-### Desglose:
-- **Recursos Humanos:** $142,000 - $203,000
-  - Senior Backend Dev: 52 semanas
-  - Senior Frontend Dev: 30 semanas
-  - Mobile Developer: 12 semanas
-  - QA Engineer: 20 semanas
-  - DevOps Engineer: 10 semanas
+### Modelo:
+- **Recursos Humanos:** Contribuciones voluntarias (comunidad open source)
+  - Maintainer principal: 10-15 hrs/semana
+  - Contribuidores voluntarios: 5-8 hrs/semana
+  - **Costo: $0** (voluntarios)
   
-- **Infraestructura:** Servicios gratuitos (GitHub Actions, Vercel, Tesseract, etc.)
-  - Cloud hosting, AI APIs, Monitoring, CI/CD, etc.
+- **Infraestructura:** 100% servicios gratuitos
+  - Hosting: Vercel/Netlify (gratis)
+  - CI/CD: GitHub Actions (gratis)
+  - AI/ML: Hugging Face (gratis)
+  - OCR: Tesseract (gratis)
+  - Mobile: F-Droid (gratis)
+  - **Costo: $0**
 
 ---
 
@@ -243,16 +246,16 @@
 → **Release v2.1.0**
 
 ### Q3 2026 (Septiembre 30)
-✓ Colaboración implementada  
-✓ Multi-tenancy activo  
-✓ Compliance features  
-→ **Release v2.2.0 (SaaS-ready)**
+✓ Colaboración para equipos pequeños  
+✓ UX renovada y accesible  
+✓ Compartir documentos fácilmente  
+→ **Release v2.2.0 (user-friendly)**
 
 ### Q4 2026 (Diciembre 31)
-✓ Blockchain integration  
-✓ AR/VR features  
-✓ Auditoría SOC 2  
-→ **Release v3.0.0 (Enterprise-ready)**
+✓ Documentación completa en español  
+✓ App estable y pulida  
+✓ Ayuda contextual y tutoriales  
+→ **Release v3.0.0 (listo para usuarios finales)**
 
 ---
 
@@ -267,16 +270,16 @@
 - MAU: 1,000 → 3,000 (+200%)
 - Documentos: 100k/mes → 250k/mes (+150%)
 - Mobile adoption: 0% → 30%
-- MRR: $0 → $10k-$50k
+- GitHub Stars: 100 → 1,000+ (adopción comunidad)
 
 ### Capacidades Nuevas
-- 📱 Apps móviles
-- ☁️ Cloud sync
-- 🤝 Colaboración
-- 🏢 Multi-tenancy
-- 📜 Compliance
-- ⛓️ Blockchain
-- 🔍 AR/VR
+- 📱 Apps móviles (Android vía F-Droid - gratis)
+- ☁️ Cloud sync (Dropbox, Google Drive, OneDrive)
+- 🤝 Colaboración para equipos pequeños
+- 🔗 Compartir con familia y amigos
+- 🎨 UX mejorada y personalizable
+- 📚 Documentación completa en español
+- 📊 Estadísticas personales de uso
 
 ---
 
@@ -303,8 +306,8 @@
 
 ## ❓ FAQs
 
-### ¿Por qué 147 tareas?
-Cada tarea está diseñada para ser completable en 0.5-3 días. Tareas más grandes se dividen en subtareas.
+### ¿Por qué 145 tareas?
+Simplificado de 147 originales, eliminando features enterprise (multi-tenancy, compliance avanzado, blockchain, AR/VR). Cada tarea está diseñada para ser completable en 0.5-3 días.
 
 ### ¿El roadmap es flexible?
 Sí. Es una guía, no una biblia. Se revisa y ajusta mensualmente según feedback y realidad.
@@ -312,8 +315,8 @@ Sí. Es una guía, no una biblia. Se revisa y ajusta mensualmente según feedbac
 ### ¿Debo usar GitHub Projects O Notion?
 **Recomendación:** Ambos. GitHub para tracking técnico, Notion para planificación y comunicación.
 
-### ¿Qué pasa si no tenemos presupuesto completo?
-Prioriza: EPIC 1 y 4 son críticos (Q1). Los demás pueden ajustarse o posponerse.
+### ¿El proyecto es realmente $0/año?
+**SÍ.** 100% gratuito. Sin servicios de pago (Zapier, Google Play, App Store eliminados). Solo servicios gratuitos y open source. Contribuciones voluntarias de la comunidad.
 
 ### ¿Puedo cambiar el orden de los Epics?
 Sí, respetando dependencias. Por ejemplo, EPIC 5 (Mobile) necesita EPIC 2 (API docs).

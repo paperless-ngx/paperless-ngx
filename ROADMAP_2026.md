@@ -12,17 +12,19 @@
 
 Esta hoja de ruta define **todas las implementaciones planificadas para IntelliDocs-ngx durante el año 2026**, organizadas en **12 Epics principales** distribuidas en **4 trimestres**. El plan incluye:
 
-- **147 tareas específicas** distribuidas en 12 meses
+- **145 tareas específicas** distribuidas en 12 meses
 - **Modelo:** Proyecto Open Source con contribuciones de la comunidad
-- **Prioridades:** 35% Alta, 45% Media, 20% Baja
-- **Costo real:** $0 - $500 USD/año (usando servicios gratuitos y open source)
+- **Enfoque:** Usuarios individuales y PYMEs (pequeñas/medianas empresas)
+- **Costo real:** $0 USD/año (100% gratuito - proyecto Open Source sin servicios de pago)
 
 ### 🎯 Objetivos Estratégicos 2026
 
-1. **Consolidación Tecnológica** (Q1-Q2): Optimizar base actual, resolver deuda técnica
-2. **Expansión de Capacidades** (Q2-Q3): Nuevas features de IA, Mobile, Colaboración
-3. **Escala y Madurez** (Q3-Q4): Multi-tenancy, Compliance avanzado, Internacionalización
-4. **Innovación** (Q4): Blockchain, AR/VR para búsqueda visual
+**Enfoque:** Usuarios individuales y pequeñas/medianas empresas (PYMEs)
+
+1. **Consolidación y Calidad** (Q1-Q2): Optimizar base actual, resolver deuda técnica, mejorar experiencia de usuario
+2. **Accesibilidad** (Q2-Q3): Mobile app, sincronización simple, mejor UI/UX
+3. **Colaboración Básica** (Q3-Q4): Compartir documentos, permisos simples, trabajo en equipo pequeño
+4. **Refinamiento** (Q4): Pulir features existentes, documentación de usuario, estabilidad
 
 ---
 
@@ -31,10 +33,10 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
 | Trimestre | Epics Principales | Tareas | Esfuerzo | Prioridad |
 |-----------|-------------------|--------|----------|-----------|
 | **Q1 2026** | Consolidación Base + Testing | 42 | 13 semanas | 🔴 Alta |
-| **Q2 2026** | Mobile + Cloud Sync + Analytics | 38 | 13 semanas | 🟡 Media-Alta |
-| **Q3 2026** | Colaboración + Multi-tenancy | 35 | 13 semanas | 🟡 Media |
-| **Q4 2026** | Compliance + Blockchain + AR/VR | 32 | 13 semanas | 🟢 Media-Baja |
-| **Total** | **12 Epics** | **147 tareas** | **52 semanas** | Mixed |
+| **Q2 2026** | Mobile + Cloud Sync | 51 | 13 semanas | 🟡 Media-Alta |
+| **Q3 2026** | Colaboración + UX Simple | 40 | 13 semanas | 🟡 Media |
+| **Q4 2026** | Documentación + Refinamiento | 12 | 13 semanas | 🟢 Media |
+| **Total** | **12 Epics** | **145 tareas** | **52 semanas** | Enfoque en usuarios individuales y PYMEs |
 
 ---
 
@@ -385,19 +387,22 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
   - Estimación: 3 días
   - Prioridad: Media
 
-- [ ] **TSK-2663:** Beta testing (TestFlight + Google Play Beta)
-  - Estimación: 5 días
+- [ ] **TSK-2663:** Beta testing con usuarios (distribución directa APK)
+  - Estimación: 3 días
   - Prioridad: Alta
 
-- [ ] **TSK-2664:** Publicación en App Store
+- [ ] **TSK-2664:** Publicación en F-Droid (Android open source store)
+  - Subtareas: fdroid_metadata, prepare_release, submit
   - Estimación: 2 días
   - Prioridad: Alta
+  - ✅ **GRATIS** - F-Droid no cobra por publicar
 
-- [ ] **TSK-2665:** Publicación en Google Play
-  - Estimación: 2 días
+- [ ] **TSK-2665:** Setup de distribución directa APK (GitHub Releases)
+  - Estimación: 1 día
   - Prioridad: Alta
+  - ✅ **GRATIS** - sin costo de stores
 
-- [ ] **TSK-2666:** Documentación de usuario para mobile
+- [ ] **TSK-2666:** Documentación de instalación manual (sideloading)
   - Estimación: 1 día
   - Prioridad: Media
 
@@ -507,74 +512,53 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
 
 ---
 
-## 🎯 EPIC 7: Analytics y Reporting Avanzado (Q2 2026)
+## 🎯 EPIC 7: Estadísticas Básicas y Reportes (Q2 2026)
 **Prioridad:** 🟡 MEDIA  
-**Duración:** 3 semanas  
+**Duración:** 2 semanas  
 **Dependencias:** EPIC 1, EPIC 3  
-**Objetivo:** Dashboard ejecutivo con métricas y reportes
+**Objetivo:** Dashboard simple con estadísticas de uso personal
 
-### Tareas (13 total)
+### Tareas (8 total)
 
-#### 7.1 Backend Analytics
-- [ ] **TSK-2686:** Módulo de analytics con agregaciones complejas
-  - Estimación: 3 días
-  - Prioridad: Media
-
-- [ ] **TSK-2687:** APIs para dashboard stats
+#### 7.1 Estadísticas Básicas
+- [ ] **TSK-2686:** Vista de estadísticas personales
+  - Subtareas: total_docs, storage_used, recent_activity
   - Estimación: 2 días
   - Prioridad: Media
 
-- [ ] **TSK-2688:** Sistema de generación de reportes (PDF/Excel)
-  - Estimación: 3 días
+- [ ] **TSK-2687:** Gráfico de documentos por mes
+  - Estimación: 1.5 días
   - Prioridad: Media
 
-- [ ] **TSK-2689:** Reportes programados (envío por email)
-  - Estimación: 2 días
+- [ ] **TSK-2688:** Desglose por tags y tipos de documentos
+  - Estimación: 1.5 días
+  - Prioridad: Media
+
+- [ ] **TSK-2689:** Búsquedas más frecuentes
+  - Estimación: 1 día
   - Prioridad: Baja
 
-#### 7.2 Frontend Dashboard
-- [ ] **TSK-2690:** Dashboard ejecutivo con ApexCharts
-  - Subtareas: charts_setup, responsive_design, dark_mode
-  - Estimación: 4 días
-  - Prioridad: Media
-
-- [ ] **TSK-2691:** Gráficos de tendencias (uploads, storage, actividad)
-  - Estimación: 2 días
-  - Prioridad: Media
-
-- [ ] **TSK-2692:** Desglose por tags, correspondientes, tipos
-  - Estimación: 2 días
-  - Prioridad: Media
-
-- [ ] **TSK-2693:** Filtros de fecha personalizables
+#### 7.2 Reportes Simples
+- [ ] **TSK-2690:** Export de lista de documentos (CSV)
   - Estimación: 1 día
   - Prioridad: Media
 
-#### 7.3 Reportes Avanzados
-- [ ] **TSK-2694:** Generador visual de reportes (drag & drop)
-  - Estimación: 5 días
+- [ ] **TSK-2691:** Resumen mensual por email (opcional)
+  - Estimación: 2 días
   - Prioridad: Baja
 
-- [ ] **TSK-2695:** Templates de reportes (financiero, compliance, ejecutivo)
-  - Estimación: 2 días
+- [ ] **TSK-2692:** Reporte de espacio usado
+  - Estimación: 1 día
   - Prioridad: Media
 
-- [ ] **TSK-2696:** Export a múltiples formatos (PDF, Excel, CSV, JSON)
-  - Estimación: 2 días
-  - Prioridad: Media
-
-- [ ] **TSK-2697:** Compartir reportes vía link público (expirable)
-  - Estimación: 1.5 días
-  - Prioridad: Baja
-
-- [ ] **TSK-2698:** Tests para módulo de analytics
-  - Estimación: 1.5 días
+- [ ] **TSK-2693:** Tests para módulo de estadísticas
+  - Estimación: 1 día
   - Prioridad: Media
 
 ### Entregables
-- 📊 Dashboard ejecutivo interactivo
-- 📈 10+ tipos de gráficos y métricas
-- 📄 Sistema de generación de reportes
+- 📊 Dashboard personal con estadísticas básicas
+- 📈 Gráficos simples de uso
+- 📄 Export de listas (CSV)
 
 ---
 
@@ -662,294 +646,226 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
 
 ---
 
-## 🎯 EPIC 9: Multi-Tenancy (Q3 2026)
+## 🎯 EPIC 9: Mejoras de UX y Experiencia de Usuario (Q3 2026)
 **Prioridad:** 🟡 MEDIA  
-**Duración:** 5 semanas  
-**Dependencias:** EPIC 4 (encriptación), EPIC 8 (permisos)  
-**Objetivo:** Soporte para múltiples organizaciones (SaaS-ready)
+**Duración:** 3 semanas  
+**Dependencias:** EPIC 8 (colaboración)  
+**Objetivo:** Hacer la app más intuitiva y fácil de usar para usuarios finales
 
-### Tareas (18 total)
+### Tareas (12 total)
 
-#### 9.1 Arquitectura Multi-Tenant
-- [ ] **TSK-2715:** Diseño de arquitectura (shared DB vs schema separation)
-  - Estimación: 2 días
-  - Prioridad: Alta
-
-- [ ] **TSK-2716:** Modelo de Tenant (Organization)
-  - Subtareas: tenant_isolation, data_partitioning, quotas
-  - Estimación: 2 días
-  - Prioridad: Alta
-
-- [ ] **TSK-2717:** Middleware de tenant detection
-  - Estimación: 2 días
-  - Prioridad: Alta
-
-- [ ] **TSK-2718:** Migraciones de BD para multi-tenancy
-  - Estimación: 2 días
-  - Prioridad: Alta
-
-#### 9.2 Gestión de Tenants
-- [ ] **TSK-2719:** Admin panel para gestión de organizaciones
-  - Estimación: 3 días
-  - Prioridad: Media
-
-- [ ] **TSK-2720:** Onboarding de nuevos tenants (signup flow)
-  - Estimación: 2 días
-  - Prioridad: Media
-
-- [ ] **TSK-2721:** Sistema de cuotas (storage, users, documents)
+#### 9.1 Interfaz de Usuario Mejorada
+- [ ] **TSK-2715:** Rediseño del dashboard principal
+  - Subtareas: wireframes, user_research, implementation
   - Estimación: 3 días
   - Prioridad: Alta
 
-- [ ] **TSK-2722:** Billing y subscripciones (Stripe integration)
-  - Estimación: 5 días
-  - Prioridad: Media
-
-#### 9.3 Aislamiento y Seguridad
-- [ ] **TSK-2723:** Tests de aislamiento de datos entre tenants
-  - Estimación: 2 días
-  - Prioridad: Crítica
-
-- [ ] **TSK-2724:** Audit logs por tenant
-  - Estimación: 1.5 días
-  - Prioridad: Alta
-
-- [ ] **TSK-2725:** Backup y restore por tenant
-  - Estimación: 2 días
-  - Prioridad: Alta
-
-#### 9.4 Gestión de Usuarios
-- [ ] **TSK-2726:** Roles por tenant (admin, member, viewer)
-  - Estimación: 2 días
-  - Prioridad: Alta
-
-- [ ] **TSK-2727:** Invitación de usuarios a tenant
+- [ ] **TSK-2716:** Onboarding interactivo para nuevos usuarios
+  - Subtareas: tutorial_steps, tooltips, help_bubbles
   - Estimación: 2 días
   - Prioridad: Media
 
-- [ ] **TSK-2728:** SSO por tenant (SAML, OAuth)
-  - Estimación: 4 días
-  - Prioridad: Media
-
-#### 9.5 Personalización
-- [ ] **TSK-2729:** Branding por tenant (logo, colores)
+- [ ] **TSK-2717:** Búsqueda mejorada con sugerencias
+  - Subtareas: autocomplete, recent_searches, saved_searches
   - Estimación: 2 días
-  - Prioridad: Baja
+  - Prioridad: Alta
 
-- [ ] **TSK-2730:** Subdominios personalizados (tenant.intellidocs.com)
-  - Estimación: 2 días
-  - Prioridad: Baja
-
-- [ ] **TSK-2731:** Configuración por tenant (features toggles)
+- [ ] **TSK-2718:** Accesos directos de teclado
+  - Subtareas: shortcut_mapping, help_modal, customization
   - Estimación: 1.5 días
   - Prioridad: Media
 
-- [ ] **TSK-2732:** Tests E2E de multi-tenancy
-  - Estimación: 3 días
+#### 9.2 Accesibilidad
+- [ ] **TSK-2719:** Soporte de modo oscuro completo
+  - Estimación: 2 días
+  - Prioridad: Media
+
+- [ ] **TSK-2720:** Soporte ARIA para lectores de pantalla
+  - Estimación: 2 días
+  - Prioridad: Media
+
+- [ ] **TSK-2721:** Tamaño de fuente ajustable
+  - Estimación: 1 día
+  - Prioridad: Baja
+
+#### 9.3 Personalización
+- [ ] **TSK-2722:** Temas personalizables (colores)
+  - Estimación: 2 días
+  - Prioridad: Baja
+
+- [ ] **TSK-2723:** Vista de documentos configurable (lista/grid/cards)
+  - Estimación: 1.5 días
+  - Prioridad: Media
+
+- [ ] **TSK-2724:** Preferencias de usuario guardadas
+  - Estimación: 1 día
+  - Prioridad: Media
+
+#### 9.4 Performance UI
+- [ ] **TSK-2725:** Skeleton screens para mejor perceived performance
+  - Estimación: 1.5 días
+  - Prioridad: Media
+
+- [ ] **TSK-2726:** Tests de usabilidad con usuarios reales
+  - Estimación: 2 días
   - Prioridad: Alta
 
 ### Entregables
-- 🏢 Soporte completo de multi-tenancy
-- 💳 Sistema de billing con Stripe
-- 🔒 Aislamiento total de datos por tenant
+- 🎨 Interfaz renovada y más intuitiva
+- ♿ Accesibilidad mejorada
+- 🎨 Personalización para usuarios
+- 📊 Métricas de usabilidad
 
 ---
 
-## 🎯 EPIC 10: Compliance Avanzado (Q3-Q4 2026)
+## 🎯 EPIC 10: Compartir y Permisos Simples (Q3-Q4 2026)
+**Prioridad:** 🟡 MEDIA  
+**Duración:** 3 semanas  
+**Dependencias:** EPIC 8 (colaboración)  
+**Objetivo:** Permitir compartir documentos fácilmente con familia, amigos, o equipos pequeños
+
+### Tareas (12 total)
+
+#### 10.1 Sistema de Compartir
+- [ ] **TSK-2727:** Links públicos con expiración
+  - Subtareas: generate_link, expiration_dates, password_protection
+  - Estimación: 2 días
+  - Prioridad: Alta
+
+- [ ] **TSK-2728:** Compartir por email
+  - Estimación: 1.5 días
+  - Prioridad: Media
+
+- [ ] **TSK-2729:** Compartir múltiples documentos (carpetas)
+  - Estimación: 2 días
+  - Prioridad: Media
+
+- [ ] **TSK-2730:** Revocar accesos compartidos
+  - Estimación: 1 día
+  - Prioridad: Alta
+
+#### 10.2 Permisos Básicos
+- [ ] **TSK-2731:** Permisos simples (ver/editar/descargar)
+  - Estimación: 2 días
+  - Prioridad: Alta
+
+- [ ] **TSK-2732:** Usuarios invitados (sin cuenta)
+  - Estimación: 2 días
+  - Prioridad: Media
+
+- [ ] **TSK-2733:** Grupos simples para familias/equipos pequeños
+  - Estimación: 2 días
+  - Prioridad: Media
+
+#### 10.3 Notificaciones
+- [ ] **TSK-2734:** Notificaciones de documentos compartidos
+  - Estimación: 1.5 días
+  - Prioridad: Media
+
+- [ ] **TSK-2735:** Historial de accesos (quién vio qué)
+  - Estimación: 2 días
+  - Prioridad: Baja
+
+#### 10.4 Seguridad
+- [ ] **TSK-2736:** Watermarks en documentos compartidos (opcional)
+  - Estimación: 2 días
+  - Prioridad: Baja
+
+- [ ] **TSK-2737:** Logs de actividad de compartidos
+  - Estimación: 1 día
+  - Prioridad: Media
+
+- [ ] **TSK-2738:** Tests de seguridad para compartir
+  - Estimación: 2 días
+  - Prioridad: Alta
+
+### Entregables
+- 🔗 Sistema simple de compartir con links
+- 👥 Permisos básicos para familia/equipos
+- 🔔 Notificaciones de actividad
+- 🔒 Seguridad básica de documentos compartidos
+
+---
+
+## 🎯 EPIC 11: Documentación y Ayuda para Usuarios (Q4 2026)
 **Prioridad:** 🟢 MEDIA  
-**Duración:** 4 semanas  
-**Dependencias:** EPIC 9  
-**Objetivo:** Certificaciones ISO 15489, DOD 5015.2, SOC 2
+**Duración:** 2 semanas  
+**Dependencias:** EPIC 9 (UX)  
+**Objetivo:** Guías completas y ayuda contextual para usuarios
 
-### Tareas (14 total)
+### Tareas (7 total)
 
-#### 10.1 Records Retention
-- [ ] **TSK-2733:** Sistema de políticas de retención
-  - Subtareas: retention_rules, legal_holds, disposition_schedule
-  - Estimación: 4 días
-  - Prioridad: Media
-
-- [ ] **TSK-2734:** Automatización de eliminación según políticas
-  - Estimación: 2 días
-  - Prioridad: Media
-
-- [ ] **TSK-2735:** Legal hold (suspender eliminación automática)
-  - Estimación: 2 días
-  - Prioridad: Media
-
-- [ ] **TSK-2736:** Audit trail inmutable para compliance
+- [ ] **TSK-2739:** Guía de inicio rápido para usuarios
+  - Subtareas: getting_started, video_tutorials, screenshots
   - Estimación: 3 días
   - Prioridad: Alta
 
-#### 10.2 ISO 15489 Compliance
-- [ ] **TSK-2737:** Metadata obligatorio para records management
-  - Estimación: 2 días
-  - Prioridad: Media
-
-- [ ] **TSK-2738:** Clasificación de documentos (vital, important, useful, non-essential)
-  - Estimación: 2 días
-  - Prioridad: Media
-
-- [ ] **TSK-2739:** Workflow de aprobación de documentos
+- [ ] **TSK-2740:** Documentación de features en español
   - Estimación: 3 días
-  - Prioridad: Baja
+  - Prioridad: Alta
 
-#### 10.3 DOD 5015.2 Features
-- [ ] **TSK-2740:** Gestión de series de registros (file plans)
-  - Estimación: 3 días
-  - Prioridad: Baja
-
-- [ ] **TSK-2741:** Niveles de seguridad clasificada
-  - Estimación: 2 días
-  - Prioridad: Baja
-
-#### 10.4 Auditoría y Reporting
-- [ ] **TSK-2742:** Reportes de compliance (ISO, DOD)
-  - Estimación: 3 días
-  - Prioridad: Media
-
-- [ ] **TSK-2743:** Dashboard de compliance status
+- [ ] **TSK-2741:** Sistema de ayuda contextual (tooltips)
   - Estimación: 2 días
   - Prioridad: Media
 
-- [ ] **TSK-2744:** Export de audit logs para auditoría externa
+- [ ] **TSK-2742:** FAQs de usuarios comunes
   - Estimación: 1 día
   - Prioridad: Media
 
-#### 10.5 Certificación
-- [ ] **TSK-2745:** Documentación para certificación ISO 15489
+- [ ] **TSK-2743:** Videos tutoriales cortos
   - Estimación: 3 días
   - Prioridad: Media
 
-- [ ] **TSK-2746:** Penetration testing y security audit (SOC 2)
+- [ ] **TSK-2744:** Troubleshooting guide
+  - Estimación: 2 días
+  - Prioridad: Media
+
+- [ ] **TSK-2745:** Templates de documentos comunes
+  - Estimación: 1 día
+  - Prioridad: Baja
+
+### Entregables
+- 📚 Documentación completa en español
+- 🎥 Videos tutoriales
+- 💡 Ayuda contextual en la app
+- 📋 Templates útiles
+
+---
+
+## 🎯 EPIC 12: Estabilidad y Refinamiento (Q4 2026)
+**Prioridad:** 🟢 MEDIA-BAJA  
+**Duración:** 2 semanas  
+**Dependencias:** Todos los anteriores  
+**Objetivo:** Pulir features existentes, corregir bugs, mejorar estabilidad
+
+### Tareas (5 total)
+
+- [ ] **TSK-2746:** Bug bash - corrección de bugs reportados
   - Estimación: 5 días
   - Prioridad: Alta
 
-### Entregables
-- 📜 Sistema de records retention automatizado
-- 🏛️ Compliance con ISO 15489, DOD 5015.2
-- 🔍 Audit trail inmutable
-
----
-
-## 🎯 EPIC 11: Blockchain Integration (Q4 2026)
-**Prioridad:** 🟢 BAJA (Innovación)  
-**Duración:** 3 semanas  
-**Dependencias:** EPIC 4 (encriptación), EPIC 10 (compliance)  
-**Objetivo:** Timestamping inmutable y cadena de custodia
-
-### Tareas (10 total)
-
-- [ ] **TSK-2747:** Investigación de blockchain (Ethereum, Hyperledger, custom)
+- [ ] **TSK-2747:** Optimización de memoria en mobile
   - Estimación: 2 días
   - Prioridad: Media
 
-- [ ] **TSK-2748:** Diseño de arquitectura blockchain
-  - Subtareas: smart_contracts, hash_anchoring, cost_analysis
-  - Estimación: 3 días
-  - Prioridad: Media
-
-- [ ] **TSK-2749:** Implementar hash anchoring (guardar hashes en blockchain)
-  - Estimación: 4 días
-  - Prioridad: Media
-
-- [ ] **TSK-2750:** Smart contract para chain of custody
-  - Estimación: 5 días
-  - Prioridad: Baja
-
-- [ ] **TSK-2751:** Verificación de integridad vía blockchain
-  - Estimación: 2 días
-  - Prioridad: Media
-
-- [ ] **TSK-2752:** UI para verificar timestamping blockchain
-  - Estimación: 2 días
-  - Prioridad: Baja
-
-- [ ] **TSK-2753:** Certificados de autenticidad descargables
-  - Estimación: 2 días
-  - Prioridad: Baja
-
-- [ ] **TSK-2754:** API pública de verificación
+- [ ] **TSK-2748:** Mejora de mensajes de error (más claros)
   - Estimación: 1.5 días
   - Prioridad: Media
 
-- [ ] **TSK-2755:** Tests de integración blockchain
+- [ ] **TSK-2749:** Tests de regresión completos
   - Estimación: 2 días
-  - Prioridad: Media
+  - Prioridad: Alta
 
-- [ ] **TSK-2756:** Documentación técnica de blockchain features
-  - Estimación: 1.5 días
-  - Prioridad: Media
+- [ ] **TSK-2750:** Preparación para v3.0 release
+  - Subtareas: release_notes, migration_guide, announcements
+  - Estimación: 2 días
+  - Prioridad: Alta
 
 ### Entregables
-- ⛓️ Timestamping inmutable en blockchain
-- 📜 Certificados de autenticidad verificables
-- 🔗 API pública de verificación
-
----
-
-## 🎯 EPIC 12: AR/VR y Búsqueda Visual (Q4 2026)
-**Prioridad:** 🟢 BAJA (Innovación)  
-**Duración:** 3 semanas  
-**Dependencias:** EPIC 5 (mobile), EPIC 3 (ML/IA)  
-**Objetivo:** Features experimentales de búsqueda visual
-
-### Tareas (11 total)
-
-#### 12.1 Búsqueda Visual
-- [ ] **TSK-2757:** Búsqueda por imagen (reverse image search)
-  - Subtareas: image_embeddings, similarity_search, indexing
-  - Estimación: 4 días
-  - Prioridad: Baja
-
-- [ ] **TSK-2758:** Captura de foto y búsqueda de documentos similares
-  - Estimación: 3 días
-  - Prioridad: Baja
-
-- [ ] **TSK-2759:** Reconocimiento de logos y marcas
-  - Estimación: 3 días
-  - Prioridad: Baja
-
-#### 12.2 AR Features (iOS/Android)
-- [ ] **TSK-2760:** AR viewer para documentos (ARKit/ARCore)
-  - Estimación: 5 días
-  - Prioridad: Baja
-
-- [ ] **TSK-2761:** Proyección de documentos en espacio físico
-  - Estimación: 3 días
-  - Prioridad: Baja
-
-- [ ] **TSK-2762:** Anotaciones AR sobre documentos físicos
-  - Estimación: 3 días
-  - Prioridad: Baja
-
-#### 12.3 VR Features (Experimental)
-- [ ] **TSK-2763:** Visor VR de archivos 3D (WebXR)
-  - Estimación: 4 días
-  - Prioridad: Baja
-
-- [ ] **TSK-2764:** Navegación VR de archivo de documentos
-  - Estimación: 3 días
-  - Prioridad: Baja
-
-#### 12.4 Integración
-- [ ] **TSK-2765:** Tests de features AR/VR
-  - Estimación: 2 días
-  - Prioridad: Baja
-
-- [ ] **TSK-2766:** Documentación de uso de AR/VR
-  - Estimación: 1 día
-  - Prioridad: Baja
-
-- [ ] **TSK-2767:** Demo videos de AR/VR features
-  - Estimación: 2 días
-  - Prioridad: Baja
-
-### Entregables
-- 🔍 Búsqueda visual por imagen
-- 📱 AR viewer para mobile
-- 🥽 VR archive navigation (experimental)
-
+- 🐛 Bugs críticos corregidos
+- 📱 Mobile más estable
+- ✅ Suite de tests completa
+- 📦 Release v3.0 lista
 ---
 
 ## 📅 Calendario de Entregas por Trimestre
@@ -982,45 +898,45 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
 | **Junio** | EPIC 7 | 📊 Dashboard analytics, Release v2.1 |
 
 **Entregables Q2:**
-- Apps móviles en App Store + Google Play
+- Apps móviles en F-Droid + APK directo (100% gratis)
 - Sync con Dropbox, Google Drive, OneDrive
-- Dashboard ejecutivo con analytics
+- Estadísticas personales básicas
 - Release v2.1.0
 
 ---
 
-### Q3 2026 (Julio - Septiembre): Colaboración
+### Q3 2026 (Julio - Septiembre): UX y Compartir
 **Semanas 27-39**
 
 | Mes | Epic | Hitos Principales |
 |-----|------|-------------------|
-| **Julio** | EPIC 8 | 💬 Comentarios y anotaciones |
-| **Agosto** | EPIC 9 (parte 1) | 🏢 Multi-tenancy beta |
-| **Septiembre** | EPIC 9 (parte 2) + EPIC 10 | 💳 Billing, 📜 Compliance features, Release v2.2 |
+| **Julio** | EPIC 8 | 💬 Comentarios y anotaciones en tiempo real |
+| **Agosto** | EPIC 9 | 🎨 UX renovada, accesibilidad mejorada |
+| **Septiembre** | EPIC 10 | 🔗 Sistema de compartir y permisos simples, Release v2.2 |
 
 **Entregables Q3:**
-- Sistema de colaboración completo
-- Multi-tenancy con billing
-- Compliance ISO 15489, DOD 5015.2
-- Release v2.2.0 (SaaS-ready)
+- Sistema de colaboración para equipos pequeños
+- Interfaz mejorada y más intuitiva
+- Compartir documentos con familia/amigos
+- Release v2.2.0 (enfoque en usuarios)
 
 ---
 
-### Q4 2026 (Octubre - Diciembre): Innovación
+### Q4 2026 (Octubre - Diciembre): Documentación y Refinamiento
 **Semanas 40-52**
 
 | Mes | Epic | Hitos Principales |
 |-----|------|-------------------|
-| **Octubre** | EPIC 10 (finish) + EPIC 11 | 📜 Certificación compliance, ⛓️ Blockchain beta |
-| **Noviembre** | EPIC 12 | 🔍 AR/VR features experimentales |
-| **Diciembre** | Cierre 2026 | 🎉 Release v3.0.0, 📊 Retrospectiva, 🗓️ Plan 2027 |
+| **Octubre** | EPIC 10 (finish) | 🔗 Completar sistema de compartir |
+| **Noviembre** | EPIC 11 | 📚 Documentación de usuario completa, videos tutoriales |
+| **Diciembre** | EPIC 12 + Cierre | 🐛 Bug fixes, estabilidad, Release v3.0.0 |
 
 **Entregables Q4:**
-- Blockchain integration (timestamping)
-- AR/VR features experimentales
-- Auditoría de seguridad externa (SOC 2)
-- Release v3.0.0 (Enterprise-ready)
-- Roadmap 2027
+- Documentación completa en español
+- Videos tutoriales para usuarios
+- App estable y pulida
+- Release v3.0.0 (listo para usuarios finales)
+- Retrospectiva 2026
 
 ---
 
@@ -1055,18 +971,20 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
 | **OCR** | Tesseract OCR | Open source, self-hosted |
 | **Monitoring** | Sentry (free tier) | 5k eventos/mes gratis |
 | **CI/CD** | GitHub Actions | 2,000 min/mes gratis para repos públicos |
-| **Blockchain** | Testnet/Polygon (low cost) | <$100/año en gas fees |
-| **Mobile Publishing** | Una sola vez: $25 Google + $99/año Apple | $124 primer año |
-| **Storage** | Self-hosted / Cloudflare R2 | R2: 10GB gratis/mes |
+| **Blockchain** | ❌ ELIMINADO (no necesario para usuarios) | $0 |
+| **Mobile Publishing** | Solo F-Droid (Android) o APK directo | **$0** (sin App Store/Google Play) |
+| **Storage** | Self-hosted | $0 |
 | **CDN** | Cloudflare | Plan gratuito ilimitado |
 
 ### Costo Total Real
-💵 **$0 - $500 USD/año** (principalmente Apple Developer fee)
+💵 **$0 USD/año** ✅ (100% GRATUITO - Proyecto Open Source)
 
-**Alternativa 100% gratis:**
-- No publicar en App Store (solo APK para Android)
-- Usar solo servicios gratuitos
-- Self-hosting en hardware propio
+**Estrategia 100% gratis:**
+- ✅ Publicar APK directamente (sin Google Play)
+- ✅ F-Droid para distribución Android (gratis)
+- ✅ NO App Store (evitar $99/año)
+- ✅ Solo servicios gratuitos y open source
+- ✅ Self-hosting cuando sea necesario
 - **Costo total: $0**
 
 ---
@@ -1080,12 +998,12 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
 - ✅ **Security Score:** A+ (actual: A)
 - ✅ **Lighthouse Score (Web):** >90 (actual: ~75)
 
-### Métricas de Negocio
+### Métricas de Comunidad
 - 📈 **Usuarios Activos Mensuales (MAU):** +200% (1,000 → 3,000)
 - 📈 **Documentos Procesados:** +150% (100k → 250k/mes)
 - 📈 **Mobile Adoption:** 30% de usuarios en mobile
-- 📈 **Tenants Activos (SaaS):** 50+ organizaciones
-- 💰 **MRR (Monthly Recurring Revenue):** $10,000 - $50,000
+- 👥 **Contribuidores Activos:** 20+ contributors en GitHub
+- ⭐ **GitHub Stars:** 1,000+ estrellas (indicador de adopción)
 
 ### Métricas de Producto
 - ⭐ **NPS (Net Promoter Score):** >50

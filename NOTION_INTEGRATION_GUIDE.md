@@ -366,50 +366,24 @@ if __name__ == '__main__':
 
 ---
 
-### Opción B: Usando Zapier (No-code, más fácil)
+### ✅ Alternativa Manual (Si no quieres GitHub Actions)
 
-#### Configuración de Zap
+Si prefieres no usar GitHub Actions, puedes sincronizar manualmente:
 
-1. Crear cuenta en https://zapier.com
-2. Crear nuevo Zap: **"GitHub to Notion"**
+1. Ejecutar el script Python localmente:
+```bash
+python .github/scripts/sync_github_to_notion.py
+```
 
-**Trigger:**
-- App: GitHub
-- Event: New Issue
-- Account: Conectar cuenta de GitHub
-- Repository: dawnsystem/IntelliDocs-ngx
+2. Programarlo con cron (Linux/Mac):
+```bash
+# Ejecutar cada hora
+0 * * * * cd /path/to/repo && python .github/scripts/sync_github_to_notion.py
+```
 
-**Action:**
-- App: Notion
-- Event: Create Database Item
-- Account: Conectar cuenta de Notion
-- Database: Roadmap 2026 Tasks
-- Mapear campos:
-  - Task ID → Issue number
-  - Status → "Planned"
-  - Epic → Parse from labels
-  - Prioridad → Parse from labels
-  - GitHub Issue → Issue URL
+3. O usar un scheduled task en Windows
 
-3. Crear Zap inverso: **"Notion to GitHub"** (opcional)
-   - Trigger: Updated Database Item in Notion
-   - Action: Update Issue in GitHub
-
-#### Limitaciones de Zapier
-- ⚠️ Plan gratuito: 100 tasks/mes
-- ⚠️ No sync bidireccional completo
-- ⚠️ Latencia de ~5-15 minutos
-
-**Costo:** $19.99/mes (plan Starter) para sync ilimitado
-
----
-
-### Opción C: Usando Make (Integromat) - Alternativa a Zapier
-
-Similar a Zapier pero con más control:
-- Plan gratuito: 1,000 operations/mes
-- Costo: $9/mes (plan Core)
-- Mejor para workflows complejos
+**Esta opción es 100% gratuita y no requiere servicios de terceros de pago.**
 
 ---
 
@@ -826,10 +800,10 @@ Para compartir con usuarios sin cuenta:
 - **YouTube:** Notion product management
 - **Templates:** https://www.notion.so/templates
 
-### Integraciones
-- **Notion API:** https://developers.notion.com/
-- **Zapier Notion:** https://zapier.com/apps/notion
-- **Make Notion:** https://www.make.com/en/integrations/notion
+### Integraciones (100% Gratuitas)
+- **Notion API:** https://developers.notion.com/ (GRATIS)
+- **GitHub Actions:** https://github.com/features/actions (GRATIS - 2000 min/mes)
+- **Python Notion Client:** https://github.com/ramnes/notion-sdk-py (GRATIS, open source)
 
 ### Comunidad
 - **Reddit:** r/Notion
@@ -849,12 +823,12 @@ Para compartir con usuarios sin cuenta:
 - [ ] Vistas creadas (Timeline, Kanban, Calendar, Table)
 - [ ] Dashboard ejecutivo configurado
 
-### Integración
-- [ ] Notion API integration creada
-- [ ] GitHub Action configurada
+### Integración (100% Gratuita)
+- [ ] Notion API integration creada (GRATIS)
+- [ ] GitHub Action configurada (GRATIS)
 - [ ] Secrets configurados en GitHub
-- [ ] Primer sync exitoso
-- [ ] Zapier/Make configurado (si aplica)
+- [ ] Primer sync exitoso con script Python (GRATIS)
+- [ ] ✅ SIN servicios de pago (Zapier/Make eliminados)
 
 ### Documentación
 - [ ] Markdown docs migrados a Notion
