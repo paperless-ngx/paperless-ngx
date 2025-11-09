@@ -13,9 +13,9 @@
 Esta hoja de ruta define **todas las implementaciones planificadas para IntelliDocs-ngx durante el año 2026**, organizadas en **12 Epics principales** distribuidas en **4 trimestres**. El plan incluye:
 
 - **147 tareas específicas** distribuidas en 12 meses
-- **Estimación total:** ~52 semanas de desarrollo (1 desarrollador full-time)
+- **Modelo:** Proyecto Open Source con contribuciones de la comunidad
 - **Prioridades:** 35% Alta, 45% Media, 20% Baja
-- **Inversión estimada:** $85,000 - $120,000 USD (1-2 desarrolladores)
+- **Costo real:** $0 - $500 USD/año (usando servicios gratuitos y open source)
 
 ### 🎯 Objetivos Estratégicos 2026
 
@@ -1024,33 +1024,50 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
 
 ---
 
-## 💰 Estimación de Recursos e Inversión
+## 💰 Estimación de Recursos (Proyecto Open Source)
 
-### Recursos Humanos
+### Recursos Humanos (Contribución Voluntaria)
 
-| Rol | Tiempo | Costo Estimado (USD) |
-|-----|--------|----------------------|
-| Senior Backend Developer | 52 semanas | $60,000 - $85,000 |
-| Senior Frontend Developer | 30 semanas | $35,000 - $50,000 |
-| Mobile Developer | 12 semanas | $15,000 - $22,000 |
-| QA Engineer | 20 semanas | $20,000 - $28,000 |
-| DevOps Engineer | 10 semanas | $12,000 - $18,000 |
-| **TOTAL** | - | **$142,000 - $203,000** |
+**Modelo Open Source:** Desarrollo basado en comunidad y contribuciones voluntarias
 
-### Infraestructura y Servicios
+| Rol | Tiempo Estimado | Modalidad |
+|-----|-----------------|-----------|
+| Maintainer Principal | 10-15 hrs/semana | Voluntario/Part-time |
+| Contribuidores Backend | 5-8 hrs/semana c/u | Comunidad open source |
+| Contribuidores Frontend | 5-8 hrs/semana c/u | Comunidad open source |
+| Mobile Contributors | 3-5 hrs/semana c/u | Comunidad open source |
+| Code Reviewers | 2-3 hrs/semana c/u | Comunidad open source |
 
-| Servicio | Costo Anual Estimado |
-|----------|----------------------|
-| Cloud hosting (AWS/GCP) | $12,000 - $24,000 |
-| AI/ML APIs (Google Vision, OpenAI) | $5,000 - $10,000 |
-| Monitoring y APM (Sentry, Datadog) | $3,000 - $6,000 |
-| CI/CD (GitHub Actions, CircleCI) | $2,000 - $4,000 |
-| Blockchain (Ethereum gas fees) | $1,000 - $3,000 |
-| Apple Developer + Google Play | $200 |
-| **TOTAL** | **$23,200 - $47,200** |
+**Estrategia de comunidad:**
+- Fomentar contribuciones via GitHub Issues "good first issue"
+- Hackatones trimestrales para features grandes
+- Reconocimiento público de contribuidores en README
+- Documentación clara para nuevos contribuidores
 
-### Inversión Total Estimada
-💵 **$165,200 - $250,200 USD** (año completo)
+### Infraestructura y Servicios (Gratis/Open Source)
+
+| Servicio | Solución Gratuita | Notas |
+|----------|-------------------|-------|
+| **Hosting** | Vercel/Netlify/GitHub Pages | Hosting frontend gratis |
+| **Backend** | Fly.io/Railway (free tier) | O self-hosted en servidor propio |
+| **Base de datos** | PostgreSQL/MariaDB | Self-hosted o Supabase free tier |
+| **AI/ML** | Modelos open source locales | Hugging Face models, TrOCR, Tesseract |
+| **OCR** | Tesseract OCR | Open source, self-hosted |
+| **Monitoring** | Sentry (free tier) | 5k eventos/mes gratis |
+| **CI/CD** | GitHub Actions | 2,000 min/mes gratis para repos públicos |
+| **Blockchain** | Testnet/Polygon (low cost) | <$100/año en gas fees |
+| **Mobile Publishing** | Una sola vez: $25 Google + $99/año Apple | $124 primer año |
+| **Storage** | Self-hosted / Cloudflare R2 | R2: 10GB gratis/mes |
+| **CDN** | Cloudflare | Plan gratuito ilimitado |
+
+### Costo Total Real
+💵 **$0 - $500 USD/año** (principalmente Apple Developer fee)
+
+**Alternativa 100% gratis:**
+- No publicar en App Store (solo APK para Android)
+- Usar solo servicios gratuitos
+- Self-hosting en hardware propio
+- **Costo total: $0**
 
 ---
 

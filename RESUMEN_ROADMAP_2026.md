@@ -142,13 +142,13 @@ Actualizada siguiendo las directivas de `agents.md`:
 - **Distribución:** 42 (Q1), 56 (Q2), 48 (Q3), 21 (Q4)
 
 ### Recursos
-- **Inversión estimada:** $165,200 - $250,200 USD
-- **Equipo sugerido:**
-  - 1 Senior Backend Developer (52 semanas)
-  - 1 Senior Frontend Developer (30 semanas)
-  - 1 Mobile Developer (12 semanas)
-  - 1 QA Engineer (20 semanas)
-  - 1 DevOps Engineer (10 semanas)
+- **Costo total:** $0 - $500 USD/año (proyecto Open Source)
+- **Equipo voluntario:**
+  - 1 Maintainer principal (10-15 hrs/semana)
+  - Contribuidores backend (5-8 hrs/semana c/u)
+  - Contribuidores frontend (5-8 hrs/semana c/u)
+  - Mobile contributors (3-5 hrs/semana c/u)
+  - Code reviewers (2-3 hrs/semana c/u)
 
 ### Prioridades
 - 🔴 **Crítica:** 25 tareas (17%)
@@ -171,7 +171,7 @@ Actualizada siguiendo las directivas de `agents.md`:
 #### Semana 1: Revisión y Decisión
 ```
 □ Leer ROADMAP_2026.md (Resumen Ejecutivo + Q1)
-□ Revisar presupuesto estimado ($165k-$250k)
+□ Revisar modelo Open Source (sin costo, contribuciones voluntarias)
 □ Decidir: ¿Aprobamos el roadmap? SI/NO/AJUSTAR
 □ Priorizar: ¿Qué Epics son más críticos?
 ```
@@ -203,12 +203,12 @@ Actualizada siguiendo las directivas de `agents.md`:
 
 ## 💡 Recomendaciones Clave
 
-### 1. Empezar con lo Crítico (Q1)
+### 1. Empezar con lo Crítico (Q1) - Modelo Open Source
 No intentes hacerlo todo a la vez. **Enfócate en Q1 2026**:
 - ✅ EPIC 1: Testing (garantiza calidad)
-- ✅ EPIC 4: Encriptación (seguridad crítica)
+- ✅ EPIC 4: Encriptación con soluciones open source (cryptography lib)
 - ✅ EPIC 2: API Docs (facilita desarrollo futuro)
-- ✅ EPIC 3: Performance (mejora experiencia)
+- ✅ EPIC 3: Performance con herramientas gratuitas
 
 ### 2. Usar Notion para Gestión
 Hemos analizado Jira, Confluence y Notion:
