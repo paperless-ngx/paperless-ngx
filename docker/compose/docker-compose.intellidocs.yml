@@ -41,11 +41,11 @@ services:
       start_period: 30s
 
   webserver:
-    image: ghcr.io/paperless-ngx/paperless-ngx:latest
-    # To build locally instead:
-    # build:
-    #   context: ../..
-    #   dockerfile: Dockerfile
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    image: intellidocs-ngx:local
+    pull_policy: never
     restart: unless-stopped
     depends_on:
       broker:
