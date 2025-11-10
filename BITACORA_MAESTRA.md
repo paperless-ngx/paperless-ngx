@@ -10,7 +10,7 @@
 *   **Identificador de Tarea:** `TSK-DOCKER-RUN-001`
 *   **Objetivo Principal:** Levantar temporalmente IntelliDocs en Docker para validación funcional
 *   **Estado Detallado:** Imagen `intellidocs-ngx:local` reconstruida con scripts s6 y middleware seguros; contenedores `compose-broker-1` y `compose-webserver-1` en estado **healthy**, endpoints API respondiendo con códigos esperados (401 sin credenciales) y redirección HTTP 302 desde `http://localhost:8000`
-*   **Próximo Micro-Paso Planificado:** Ejecutar `docker/test-intellidocs-features.sh` para validar flujos ML/OCR y compartir credenciales de prueba al Director
+*   **Próximo Micro-Paso Planificado:** Ejecutar `docker/test-intellidocs-features.sh` para validar flujos ML/OCR y coordinar revisión de seguridad posterior al reseteo de credenciales
 
 ### ✅ Historial de Implementaciones Completadas
 *(En orden cronológico inverso. Cada entrada es un hito de negocio finalizado)*
@@ -57,6 +57,7 @@
     *   `11:45:55` - **ACCIÓN:** Análisis de errores API. **DETALLE:** Detección de 500 en `/api/ui_settings/` y `/api/profile/totp/`; revisión de logs revela `request.user` no disponible en middlewares personalizados.
     *   `11:50:10` - **ACCIÓN:** Mitigación de bug. **DETALLE:** Actualización de `src/paperless/middleware.py` para usar `getattr(request, "user", None)` antes de acceder a propiedades y reconstrucción de imagen Docker.
     *   `11:55:40` - **ACCIÓN:** Validación de endpoints. **COMANDO:** `curl -i http://localhost:8000/api/ui_settings/`. **RESULTADO:** Respuesta 401 (Unauthorized) sin errores inesperados.
+    *   `12:05:20` - **ACCIÓN:** Reinicio de credenciales. **DETALLE:** Restablecida contraseña del usuario `dawnsystem` mediante `manage.py shell` con persistencia en BD Docker.
 *   **Resultado de la Sesión:** Contenedores Docker IntelliDocs activos y saludables usando imagen reconstruida.
 *   **Commit Asociado:** Pendiente (cambios locales sin commit).
 *   **Observaciones/Decisiones de Diseño:**
