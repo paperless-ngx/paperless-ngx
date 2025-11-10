@@ -1,4 +1,4 @@
-#!/command/with-contenv /usr/bin/bash
+#!/command/with-contenv /bin/bash
 # shellcheck shell=bash
 declare -r log_prefix="[init-complete]"
 declare -r end_time=$(date +%s)

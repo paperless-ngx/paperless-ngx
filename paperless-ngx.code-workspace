@@ -33,6 +33,7 @@
 			"**/coverage.json": true
 		},
 		"python.defaultInterpreterPath": ".venv/bin/python3",
+		"powershell.cwd": "IntelliDocs-ngx",
 	},
 	"extensions": {
 		"recommendations": ["ms-python.python", "charliermarsh.ruff", "editorconfig.editorconfig"],
