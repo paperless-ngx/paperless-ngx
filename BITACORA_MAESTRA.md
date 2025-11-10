@@ -1,5 +1,5 @@
 # 📝 Bitácora Maestra del Proyecto: IntelliDocs-ngx
-*Última actualización: 2025-11-09 23:45:00 UTC*
+*Última actualización: 2025-11-10 10:40:00 UTC*
 
 ---
 
@@ -9,8 +9,8 @@
 
 *   **Identificador de Tarea:** `TSK-DOCKER-RUN-001`
 *   **Objetivo Principal:** Levantar temporalmente IntelliDocs en Docker para validación funcional
-*   **Estado Detallado:** Contenedores `compose-broker-1` y `compose-webserver-1` activos con health checks en estado **healthy** y puerto web `8000` expuesto
-*   **Próximo Micro-Paso Planificado:** Entregar instrucciones de acceso al Director y programar apagado controlado tras finalizar las pruebas
+*   **Estado Detallado:** Imagen `intellidocs-ngx:local` reconstruida con scripts s6 y middleware seguros; contenedores `compose-broker-1` y `compose-webserver-1` en estado **healthy**, endpoints API respondiendo con códigos esperados (401 sin credenciales) y redirección HTTP 302 desde `http://localhost:8000`
+*   **Próximo Micro-Paso Planificado:** Ejecutar `docker/test-intellidocs-features.sh` para validar flujos ML/OCR y compartir credenciales de prueba al Director
 
 ### ✅ Historial de Implementaciones Completadas
 *(En orden cronológico inverso. Cada entrada es un hito de negocio finalizado)*
@@ -36,6 +36,33 @@
 ---
 
 ## 🔬 Registro Forense de Sesiones (Log Detallado)
+
+### Sesión Iniciada: 2025-11-10 10:05:00 UTC
+
+*   **Directiva del Director:** "quiero actualizar la imagen de docker para que tenga las nuevas implementaciones que he hecho ultimamente, y luego correrlo en docker"
+*   **Plan de Acción Propuesto:**
+    1. Construir una nueva imagen Docker incorporando las últimas dependencias ML/OCR.
+    2. Desplegar el stack con `docker-compose.intellidocs.yml` y validar el estado de los servicios.
+    3. Diagnosticar y corregir cualquier incidencia en el arranque (scripts s6, health checks, permisos).
+    4. Confirmar accesibilidad de `http://localhost:8000` y documentar resultados en la bitácora.
+*   **Log de Acciones (con timestamp):**
+    *   `10:05:20` - **ACCIÓN:** Revisión de bitácora y configuraciones Docker. **DETALLE:** Verificación de `Dockerfile`, `docker-compose.intellidocs.yml` y scripts s6.
+    *   `10:09:45` - **ACCIÓN:** Construcción de imagen. **COMANDO:** `docker build -t intellidocs-ngx:latest .`. **RESULTADO:** Build completada con dependencias ML/OCR instaladas.
+    *   `10:19:10` - **ACCIÓN:** Despliegue inicial. **COMANDO:** `docker compose ... up -d`. **RESULTADO:** Contenedor webserver en reinicio; error `exec /usr/bin/bash` identificado.
+    *   `10:23:05` - **ACCIÓN:** Normalización de scripts s6. **DETALLE:** Conversión a LF y cambio de shebang a `/bin/bash` en `docker/rootfs/etc/s6-overlay/s6-rc.d/*/run`.
+    *   `10:27:30` - **ACCIÓN:** Reconstrucción de imagen. **COMANDO:** `docker build -t intellidocs-ngx:latest .`. **RESULTADO:** Imagen actualizada sin errores de s6.
+    *   `10:32:40` - **ACCIÓN:** Despliegue definitivo. **COMANDO:** `docker compose --project-name compose -f docker/compose/docker-compose.intellidocs.yml up -d`. **RESULTADO:** Servicios broker y webserver levantados con health checks en progreso.
+    *   `10:34:20` - **ACCIÓN:** Verificación de estado. **COMANDO:** `docker compose ... ps`. **RESULTADO:** Ambos contenedores en estado **healthy**.
+    *   `10:35:40` - **ACCIÓN:** Prueba de conectividad HTTP. **COMANDO:** `Invoke-WebRequest http://localhost:8000/`. **RESULTADO:** Respuesta 302 (Found), confirmando accesibilidad.
+    *   `11:45:55` - **ACCIÓN:** Análisis de errores API. **DETALLE:** Detección de 500 en `/api/ui_settings/` y `/api/profile/totp/`; revisión de logs revela `request.user` no disponible en middlewares personalizados.
+    *   `11:50:10` - **ACCIÓN:** Mitigación de bug. **DETALLE:** Actualización de `src/paperless/middleware.py` para usar `getattr(request, "user", None)` antes de acceder a propiedades y reconstrucción de imagen Docker.
+    *   `11:55:40` - **ACCIÓN:** Validación de endpoints. **COMANDO:** `curl -i http://localhost:8000/api/ui_settings/`. **RESULTADO:** Respuesta 401 (Unauthorized) sin errores inesperados.
+*   **Resultado de la Sesión:** Contenedores Docker IntelliDocs activos y saludables usando imagen reconstruida.
+*   **Commit Asociado:** Pendiente (cambios locales sin commit).
+*   **Observaciones/Decisiones de Diseño:**
+    - Se reemplazó `/usr/bin/bash` por `/bin/bash` en todos los scripts `run` de s6-overlay y se eliminaron retornos de carro Windows.
+    - Se mantuvo el volumen `ml_cache` para persistir modelos ML entre reinicios.
+    - Health check del webserver requiere ~60s mientras se cargan modelos; se documentó en próximos pasos ejecutar script de validación adicional.
 
 ### Sesión Iniciada: 2025-11-10 00:10:00 UTC
 

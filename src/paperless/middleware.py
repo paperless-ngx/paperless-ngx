@@ -11,7 +11,8 @@ class ApiVersionMiddleware:
 
     def __call__(self, request):
         response = self.get_response(request)
-        if request.user.is_authenticated:
+        user = getattr(request, "user", None)
+        if user is not None and user.is_authenticated:
             versions = settings.REST_FRAMEWORK["ALLOWED_VERSIONS"]
             response["X-Api-Version"] = versions[len(versions) - 1]
             response["X-Version"] = version.__full_version_str__
@@ -56,8 +57,9 @@ class RateLimitMiddleware:
 
     def _get_identifier(self, request) -> str:
         """Get unique identifier for rate limiting (user or IP)."""
-        if request.user.is_authenticated:
-            return f"user_{request.user.id}"
+        user = getattr(request, "user", None)
+        if user is not None and user.is_authenticated:
+            return f"user_{user.id}"
         return f"ip_{self._get_client_ip(request)}"
 
     def _get_client_ip(self, request) -> str:
