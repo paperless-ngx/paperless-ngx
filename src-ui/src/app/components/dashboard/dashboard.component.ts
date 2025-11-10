@@ -53,6 +53,9 @@ export class DashboardComponent extends ComponentWithPermissions {
 
     this.savedViewService.listAll().subscribe(() => {
       this.dashboardViews = this.savedViewService.dashboardViews
+      // Ensure document counts are available for views that might be hidden
+      // when show_only_if_populated is true, even if count display is disabled.
+      this.savedViewService.maybeRefreshDocumentCounts(this.dashboardViews)
     })
   }
 

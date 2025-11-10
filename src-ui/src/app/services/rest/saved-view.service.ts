@@ -123,7 +123,14 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
   }
 
   public maybeRefreshDocumentCounts(views: SavedView[] = this.sidebarViews) {
-    if (!this.settingsService.get(SETTINGS_KEYS.SIDEBAR_VIEWS_SHOW_COUNT)) {
+    // We normally only refresh counts if the user opted to display them.
+    // However, views with show_only_if_populated rely on counts for visibility,
+    // so we must still fetch counts for those even when the setting is disabled.
+    const showCountSetting = this.settingsService.get(
+      SETTINGS_KEYS.SIDEBAR_VIEWS_SHOW_COUNT
+    )
+    const needsCountsForVisibility = views.some((v) => v.show_only_if_populated)
+    if (!showCountSetting && !needsCountsForVisibility) {
       return
     }
     this.unsubscribeNotifier.next() // clear previous subscriptions
