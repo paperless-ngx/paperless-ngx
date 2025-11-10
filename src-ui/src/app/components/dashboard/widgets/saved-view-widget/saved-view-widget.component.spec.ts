@@ -51,6 +51,7 @@ const savedView: SavedView = {
   sort_reverse: true,
   show_in_sidebar: true,
   show_on_dashboard: true,
+  show_only_if_populated: false,
   filter_rules: [
     {
       rule_type: FILTER_HAS_TAGS_ALL,
@@ -248,6 +249,7 @@ describe('SavedViewWidgetComponent', () => {
     component.showAll()
     expect(routerSpy).toHaveBeenCalledWith(['view', savedView.id])
     savedView.show_in_sidebar = false
+    savedView.show_only_if_populated = false
     component.showAll()
     expect(routerSpy).toHaveBeenCalledWith(['documents'], {
       queryParams: { view: savedView.id },

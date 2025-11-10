@@ -514,6 +514,7 @@ describe('DocumentListComponent', () => {
       name: 'Foo Bar',
       show_on_dashboard: true,
       show_in_sidebar: true,
+      show_only_if_populated: false,
     })
     expect(savedViewServiceCreate).toHaveBeenCalled()
     expect(modalSpy).toHaveBeenCalled()
@@ -563,6 +564,7 @@ describe('DocumentListComponent', () => {
       name: 'Foo Bar',
       show_on_dashboard: true,
       show_in_sidebar: true,
+      show_only_if_populated: false,
     })
     expect(openModal.componentInstance.error).toEqual({ filter_rules: ['11'] })
   })

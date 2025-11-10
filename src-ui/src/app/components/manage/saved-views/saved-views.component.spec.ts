@@ -24,8 +24,20 @@ import { PageHeaderComponent } from '../../common/page-header/page-header.compon
 import { SavedViewsComponent } from './saved-views.component'
 
 const savedViews = [
-  { id: 1, name: 'view1', show_in_sidebar: true, show_on_dashboard: true },
-  { id: 2, name: 'view2', show_in_sidebar: false, show_on_dashboard: false },
+  {
+    id: 1,
+    name: 'view1',
+    show_in_sidebar: true,
+    show_on_dashboard: true,
+    show_only_if_populated: false,
+  },
+  {
+    id: 2,
+    name: 'view2',
+    show_in_sidebar: false,
+    show_on_dashboard: false,
+    show_only_if_populated: false,
+  },
 ]
 
 describe('SavedViewsComponent', () => {
@@ -145,6 +157,7 @@ describe('SavedViewsComponent', () => {
         name: view.name,
         show_in_sidebar: view.show_in_sidebar,
         show_on_dashboard: !view.show_on_dashboard,
+        show_only_if_populated: view.show_only_if_populated,
       },
     ])
   })

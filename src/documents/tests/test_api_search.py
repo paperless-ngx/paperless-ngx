@@ -1252,6 +1252,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             name="bank view",
             show_on_dashboard=True,
             show_in_sidebar=True,
+            show_only_if_populated=False,
             sort_field="",
             owner=user1,
         )

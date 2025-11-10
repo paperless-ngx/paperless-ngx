@@ -47,6 +47,7 @@ describe('SaveViewConfigDialogComponent', () => {
       name,
       showInSideBar: false,
       showOnDashboard: false,
+      showOnlyIfPopulated: false,
     })
   })
 
@@ -78,6 +79,7 @@ describe('SaveViewConfigDialogComponent', () => {
       name,
       showInSideBar: true,
       showOnDashboard: true,
+      showOnlyIfPopulated: false,
     })
   })
 

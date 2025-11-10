@@ -420,6 +420,7 @@ export class DocumentListComponent
         name: formValue.name,
         show_on_dashboard: formValue.showOnDashboard,
         show_in_sidebar: formValue.showInSideBar,
+        show_only_if_populated: formValue.showOnlyIfPopulated,
         filter_rules: this.list.filterRules,
         sort_reverse: this.list.sortReverse,
         sort_field: this.list.sortField,

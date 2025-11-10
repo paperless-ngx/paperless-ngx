@@ -1952,6 +1952,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             sort_field="",
             show_on_dashboard=False,
             show_in_sidebar=False,
+            show_only_if_populated=False,
         )
         SavedView.objects.create(
             owner=u2,
@@ -1959,6 +1960,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             sort_field="",
             show_on_dashboard=False,
             show_in_sidebar=False,
+            show_only_if_populated=False,
         )
         SavedView.objects.create(
             owner=u2,
@@ -1966,6 +1968,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             sort_field="",
             show_on_dashboard=False,
             show_in_sidebar=False,
+            show_only_if_populated=False,
         )
 
         response = self.client.get("/api/saved_views/")
@@ -2006,6 +2009,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             "name": "test",
             "show_on_dashboard": True,
             "show_in_sidebar": True,
+            "show_only_if_populated": False,
             "sort_field": "created2",
             "filter_rules": [{"rule_type": 4, "value": "test"}],
         }
@@ -2062,6 +2066,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             "name": "test",
             "show_on_dashboard": True,
             "show_in_sidebar": True,
+            "show_only_if_populated": False,
             "sort_field": "created2",
             "filter_rules": [{"rule_type": 4, "value": "test"}],
             "page_size": 20,
@@ -2151,6 +2156,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             "name": "test",
             "show_on_dashboard": True,
             "show_in_sidebar": True,
+            "show_only_if_populated": False,
             "sort_field": "created2",
             "filter_rules": [{"rule_type": 4, "value": "test"}],
             "page_size": 20,
@@ -2228,6 +2234,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             sort_field=SavedView.DisplayFields.CUSTOM_FIELD % custom_field.id,
             show_on_dashboard=True,
             show_in_sidebar=True,
+            show_only_if_populated=False,
             display_fields=[
                 SavedView.DisplayFields.TITLE,
                 SavedView.DisplayFields.CREATED,

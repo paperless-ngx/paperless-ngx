@@ -46,14 +46,16 @@
           </div>
         }
         @for (v of dashboardViews; track v.id) {
-          <div class="col">
-            <pngx-saved-view-widget
-              [savedView]="v"
-              (cdkDragStarted)="onDragStart($event)"
-              (cdkDragEnded)="onDragEnd($event)"
-              >
-            </pngx-saved-view-widget>
-          </div>
+          @if (!v.show_only_if_populated || (savedViewService.getDocumentCount(v) ?? 0) > 0) {
+            <div class="col">
+              <pngx-saved-view-widget
+                [savedView]="v"
+                (cdkDragStarted)="onDragStart($event)"
+                (cdkDragEnded)="onDragEnd($event)"
+                >
+              </pngx-saved-view-widget>
+            </div>
+          }
         }
       </ng-container>
     </div>

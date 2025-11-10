@@ -336,6 +336,10 @@ msgstr "Auf Startseite zeigen"
 msgid "show in sidebar"
 msgstr "In Seitenleiste zeigen"
 
+#: documents/models.py:410
+msgid "Show only if populated"
+msgstr "Zeige nur wenn Dokumente vorhanden"
+
 #: documents/models.py:466
 msgid "sort field"
 msgstr "Sortierfeld"

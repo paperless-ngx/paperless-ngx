@@ -9,6 +9,8 @@ export interface SavedView extends ObjectWithPermissions {
 
   show_in_sidebar?: boolean
 
+  show_only_if_populated?: boolean
+
   sort_field: string
 
   sort_reverse: boolean
