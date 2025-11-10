@@ -7,7 +7,10 @@
 
 ### 🚧 Tarea en Progreso (WIP - Work In Progress)
 
-Estado actual: **A la espera de nuevas directivas del Director.**
+*   **Identificador de Tarea:** `TSK-DOCKER-RUN-001`
+*   **Objetivo Principal:** Levantar temporalmente IntelliDocs en Docker para validación funcional
+*   **Estado Detallado:** Contenedores `compose-broker-1` y `compose-webserver-1` activos con health checks en estado **healthy** y puerto web `8000` expuesto
+*   **Próximo Micro-Paso Planificado:** Entregar instrucciones de acceso al Director y programar apagado controlado tras finalizar las pruebas
 
 ### ✅ Historial de Implementaciones Completadas
 *(En orden cronológico inverso. Cada entrada es un hito de negocio finalizado)*
@@ -33,6 +36,28 @@ Estado actual: **A la espera de nuevas directivas del Director.**
 ---
 
 ## 🔬 Registro Forense de Sesiones (Log Detallado)
+
+### Sesión Iniciada: 2025-11-10 00:10:00 UTC
+
+*   **Directiva del Director:** "QUIERO INICIAR ESTE PROYECTO (EJECUTARLO) PERO TEMPORALMENTE PARA PROBARLO EN DOCKER"
+*   **Plan de Acción Propuesto:**
+    1. Verificar disponibilidad del entorno Docker local
+    2. Levantar el stack IntelliDocs con `docker-compose.intellidocs.yml` y el archivo de entorno asociado
+    3. Comprobar estado de los contenedores, health checks y logs clave
+    4. Documentar resultados y próximos pasos en la Bitácora Maestra
+*   **Log de Acciones (con timestamp):**
+    *   `00:10:05` - **ACCIÓN:** Verificación de herramienta. **DETALLE:** `docker --version`. **RESULTADO:** Docker 28.3.2 operativo.
+    *   `00:10:30` - **ACCIÓN:** Ejecución de comando. **DETALLE:** `docker compose --env-file docker/compose/docker-compose.env -f docker/compose/docker-compose.intellidocs.yml up -d`. **RESULTADO:** Imágenes descargadas y contenedores `compose-broker-1` y `compose-webserver-1` iniciados.
+    *   `00:12:10` - **ACCIÓN:** Monitoreo de servicios. **DETALLE:** `docker compose ... ps`. **RESULTADO:** Broker healthy, webserver en `health: starting`.
+    *   `00:12:25` - **ACCIÓN:** Revisión de logs. **DETALLE:** `docker compose ... logs --tail 50 webserver`. **RESULTADO:** Migraciones Django aplicadas correctamente.
+    *   `00:12:50` - **ACCIÓN:** Espera controlada. **DETALLE:** `Start-Sleep -Seconds 20`. **RESULTADO:** Permitir finalización de health checks.
+    *   `00:13:15` - **ACCIÓN:** Verificación final. **DETALLE:** `docker compose ... ps`. **RESULTADO:** Ambos contenedores en estado **healthy**, puerto `8000` expuesto.
+*   **Resultado de la Sesión:** Entorno Docker IntelliDocs activo y listo para pruebas manuales.
+*   **Commit Asociado:** Pendiente (sesión operativa sin cambios de código).
+*   **Observaciones/Decisiones de Diseño:**
+    - Se utilizaron los valores por defecto del archivo `docker/compose/docker-compose.env`.
+    - No se cargaron volúmenes adicionales más allá de los definidos (`data`, `media`, `ml_cache`, `redisdata`).
+    - El próximo paso recomendado es validar acceso vía `http://localhost:8000` y ejecutar el script `docker/test-intellidocs-features.sh` si se requiere verificación integral.
 
 ### Sesión Iniciada: 2025-11-09 23:37:00 UTC
 
