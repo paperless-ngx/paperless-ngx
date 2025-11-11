@@ -1581,3 +1581,143 @@ class WorkflowRun(SoftDeleteModel):
 
     def __str__(self):
         return f"WorkflowRun of {self.workflow} at {self.run_at} on {self.document}"
+
+
+class DeletionRequest(models.Model):
+    """
+    Model to track AI-initiated deletion requests requiring user approval.
+    
+    This ensures no documents are deleted without explicit user consent,
+    implementing the safety requirement from agents.md.
+    """
+    
+    # Request metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    # Requester (AI system)
+    requested_by_ai = models.BooleanField(default=True)
+    ai_reason = models.TextField(
+        help_text=_("Detailed explanation from AI about why deletion is recommended")
+    )
+    
+    # User who must approve
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='deletion_requests',
+        help_text=_("User who must approve this deletion"),
+    )
+    
+    # Status tracking
+    STATUS_PENDING = 'pending'
+    STATUS_APPROVED = 'approved'
+    STATUS_REJECTED = 'rejected'
+    STATUS_CANCELLED = 'cancelled'
+    STATUS_COMPLETED = 'completed'
+    
+    STATUS_CHOICES = [
+        (STATUS_PENDING, _('Pending')),
+        (STATUS_APPROVED, _('Approved')),
+        (STATUS_REJECTED, _('Rejected')),
+        (STATUS_CANCELLED, _('Cancelled')),
+        (STATUS_COMPLETED, _('Completed')),
+    ]
+    
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_PENDING,
+    )
+    
+    # Documents to be deleted
+    documents = models.ManyToManyField(
+        Document,
+        related_name='deletion_requests',
+        help_text=_("Documents that would be deleted if approved"),
+    )
+    
+    # Impact summary (JSON field with details)
+    impact_summary = models.JSONField(
+        default=dict,
+        help_text=_("Summary of what will be affected by this deletion"),
+    )
+    
+    # Approval tracking
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    reviewed_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='reviewed_deletion_requests',
+        help_text=_("User who reviewed and approved/rejected"),
+    )
+    review_comment = models.TextField(
+        blank=True,
+        help_text=_("User's comment when reviewing"),
+    )
+    
+    # Completion tracking
+    completed_at = models.DateTimeField(null=True, blank=True)
+    completion_details = models.JSONField(
+        default=dict,
+        help_text=_("Details about the deletion execution"),
+    )
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = _("deletion request")
+        verbose_name_plural = _("deletion requests")
+        indexes = [
+            models.Index(fields=['status', 'user']),
+            models.Index(fields=['created_at']),
+        ]
+    
+    def __str__(self):
+        doc_count = self.documents.count()
+        return f"Deletion Request {self.id} - {doc_count} documents - {self.status}"
+    
+    def approve(self, user: User, comment: str = "") -> bool:
+        """
+        Approve the deletion request.
+        
+        Args:
+            user: User approving the request
+            comment: Optional comment from user
+            
+        Returns:
+            True if approved successfully
+        """
+        if self.status != self.STATUS_PENDING:
+            return False
+        
+        self.status = self.STATUS_APPROVED
+        self.reviewed_by = user
+        self.reviewed_at = timezone.now()
+        self.review_comment = comment
+        self.save()
+        
+        return True
+    
+    def reject(self, user: User, comment: str = "") -> bool:
+        """
+        Reject the deletion request.
+        
+        Args:
+            user: User rejecting the request
+            comment: Optional comment from user
+            
+        Returns:
+            True if rejected successfully
+        """
+        if self.status != self.STATUS_PENDING:
+            return False
+        
+        self.status = self.STATUS_REJECTED
+        self.reviewed_by = user
+        self.reviewed_at = timezone.now()
+        self.review_comment = comment
+        self.save()
+        
+        return True
