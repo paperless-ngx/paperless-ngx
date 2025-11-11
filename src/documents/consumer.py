@@ -480,6 +480,10 @@ class ConsumerPlugin(
                 # If we get here, it was successful. Proceed with post-consume
                 # hooks. If they fail, nothing will get changed.
 
+                # AI Scanner Integration: Perform comprehensive AI scan
+                # This scans the document and applies/suggests metadata automatically
+                self._run_ai_scanner(document, text)
+
                 document_consumption_finished.send(
                     sender=self.__class__,
                     document=document,
@@ -748,6 +752,101 @@ class ConsumerPlugin(
             copy_basic_file_stats(source, target)
         except Exception:  # pragma: no cover
             pass
+
+    def _run_ai_scanner(self, document, text):
+        """
+        Run AI scanner on the document to automatically detect and apply metadata.
+        
+        This is called during document consumption to leverage AI/ML capabilities
+        for automatic metadata management as specified in agents.md.
+        
+        Args:
+            document: The Document model instance
+            text: The extracted document text
+        """
+        try:
+            from documents.ai_scanner import get_ai_scanner
+            
+            scanner = get_ai_scanner()
+            
+            # Get the original file path if available
+            original_file_path = str(self.working_copy) if self.working_copy else None
+            
+            # Perform comprehensive AI scan
+            self.log.info(f"Running AI scanner on document: {document.title}")
+            scan_result = scanner.scan_document(
+                document=document,
+                document_text=text,
+                original_file_path=original_file_path,
+            )
+            
+            # Apply scan results (auto-apply high confidence, suggest medium confidence)
+            results = scanner.apply_scan_results(
+                document=document,
+                scan_result=scan_result,
+                auto_apply=True,  # Auto-apply high confidence suggestions
+            )
+            
+            # Log what was applied and suggested
+            if results["applied"]["tags"]:
+                self.log.info(
+                    f"AI auto-applied tags: {[t['name'] for t in results['applied']['tags']]}"
+                )
+            
+            if results["applied"]["correspondent"]:
+                self.log.info(
+                    f"AI auto-applied correspondent: {results['applied']['correspondent']['name']}"
+                )
+            
+            if results["applied"]["document_type"]:
+                self.log.info(
+                    f"AI auto-applied document type: {results['applied']['document_type']['name']}"
+                )
+            
+            if results["applied"]["storage_path"]:
+                self.log.info(
+                    f"AI auto-applied storage path: {results['applied']['storage_path']['name']}"
+                )
+            
+            # Log suggestions for user review
+            if results["suggestions"]["tags"]:
+                self.log.info(
+                    f"AI suggested tags (require review): "
+                    f"{[t['name'] for t in results['suggestions']['tags']]}"
+                )
+            
+            if results["suggestions"]["correspondent"]:
+                self.log.info(
+                    f"AI suggested correspondent (requires review): "
+                    f"{results['suggestions']['correspondent']['name']}"
+                )
+            
+            if results["suggestions"]["document_type"]:
+                self.log.info(
+                    f"AI suggested document type (requires review): "
+                    f"{results['suggestions']['document_type']['name']}"
+                )
+            
+            if results["suggestions"]["storage_path"]:
+                self.log.info(
+                    f"AI suggested storage path (requires review): "
+                    f"{results['suggestions']['storage_path']['name']}"
+                )
+            
+            # Store suggestions in document metadata for UI to display
+            # This allows the frontend to show AI suggestions to users
+            if not hasattr(document, '_ai_suggestions'):
+                document._ai_suggestions = results["suggestions"]
+            
+        except ImportError:
+            # AI scanner not available, skip
+            self.log.debug("AI scanner not available, skipping AI analysis")
+        except Exception as e:
+            # Don't fail the entire consumption if AI scanner fails
+            self.log.warning(
+                f"AI scanner failed for document {document.title}: {e}",
+                exc_info=True,
+            )
 
 
 class ConsumerPreflightPlugin(

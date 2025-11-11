@@ -1148,6 +1148,53 @@ OCR_MAX_IMAGE_PIXELS: Final[int | None] = __get_optional_int(
     "PAPERLESS_OCR_MAX_IMAGE_PIXELS",
 )
 
+# AI/ML Features for IntelliDocs
+# Enable comprehensive AI scanning of documents for automatic metadata management
+PAPERLESS_ENABLE_AI_SCANNER: Final[bool] = __get_boolean(
+    "PAPERLESS_ENABLE_AI_SCANNER",
+    "true",  # Enabled by default for IntelliDocs
+)
+
+# Enable ML features (BERT classification, NER, semantic search)
+PAPERLESS_ENABLE_ML_FEATURES: Final[bool] = __get_boolean(
+    "PAPERLESS_ENABLE_ML_FEATURES",
+    "true",  # Enabled by default for IntelliDocs
+)
+
+# Enable advanced OCR features (table extraction, handwriting recognition, form detection)
+PAPERLESS_ENABLE_ADVANCED_OCR: Final[bool] = __get_boolean(
+    "PAPERLESS_ENABLE_ADVANCED_OCR",
+    "true",  # Enabled by default for IntelliDocs
+)
+
+# ML model for document classification
+PAPERLESS_ML_CLASSIFIER_MODEL: Final[str] = os.getenv(
+    "PAPERLESS_ML_CLASSIFIER_MODEL",
+    "distilbert-base-uncased",
+)
+
+# Auto-apply threshold for AI suggestions (0.0-1.0)
+# Suggestions above this confidence will be automatically applied
+PAPERLESS_AI_AUTO_APPLY_THRESHOLD: Final[float] = __get_float(
+    "PAPERLESS_AI_AUTO_APPLY_THRESHOLD",
+    0.80,
+)
+
+# Suggest threshold for AI suggestions (0.0-1.0)
+# Suggestions above this confidence will be shown to user for review
+PAPERLESS_AI_SUGGEST_THRESHOLD: Final[float] = __get_float(
+    "PAPERLESS_AI_SUGGEST_THRESHOLD",
+    0.60,
+)
+
+# Enable GPU acceleration for ML/OCR if available
+PAPERLESS_USE_GPU: Final[bool] = __get_boolean("PAPERLESS_USE_GPU")
+
+# Cache directory for ML models
+PAPERLESS_ML_MODEL_CACHE: Final[Path | None] = __get_optional_path(
+    "PAPERLESS_ML_MODEL_CACHE",
+)
+
 OCR_COLOR_CONVERSION_STRATEGY = os.getenv(
     "PAPERLESS_OCR_COLOR_CONVERSION_STRATEGY",
     "RGB",
