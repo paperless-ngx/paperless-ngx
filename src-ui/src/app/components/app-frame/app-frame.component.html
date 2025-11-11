@@ -107,7 +107,7 @@
             </h6>
             <ul class="nav flex-column mb-2" cdkDropList (cdkDropListDropped)="onDrop($event)">
               @for (view of savedViewService.sidebarViews; track view.id) {
-                @if (!view.show_only_if_populated || savedViewService.getDocumentCount(view) > 0) {
+                @if (settingsService.organizingSidebarSavedViews || !view.show_only_if_populated || savedViewService.getDocumentCount(view) > 0) {
                   <li class="nav-item w-100 app-link" cdkDrag [cdkDragDisabled]="!settingsService.organizingSidebarSavedViews"
                     cdkDragPreviewContainer="parent" cdkDragPreviewClass="navItemDrag" (cdkDragStarted)="onDragStart($event)"
                     (cdkDragEnded)="onDragEnd($event)">
