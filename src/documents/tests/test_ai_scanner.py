@@ -18,11 +18,8 @@ Tests cover:
 - Error handling and edge cases
 """
 
-import logging
 from unittest import mock
 
-import pytest
-from django.conf import settings
 from django.db import transaction
 from django.test import TestCase, override_settings
 
@@ -1275,7 +1272,7 @@ class TestApplyScanResults(TestCase):
                               side_effect=Exception("Save failed")):
             with self.assertRaises(Exception):
                 with transaction.atomic():
-                    result = scanner.apply_scan_results(
+                    scanner.apply_scan_results(
                         self.document,
                         scan_result,
                         auto_apply=True
@@ -1293,7 +1290,7 @@ class TestApplyScanResults(TestCase):
         scan_result = AIScanResult()
         scan_result.tags = [(999, 0.90)]  # Non-existent tag
         
-        result = scanner.apply_scan_results(
+        scanner.apply_scan_results(
             self.document,
             scan_result,
             auto_apply=True

@@ -274,14 +274,12 @@ class TestAIScannerIntegrationTransactions(TransactionTestCase):
             return original_save(self, *args, **kwargs)
         
         with mock.patch.object(Document, 'save', failing_save):
-            try:
+            with self.assertRaises(Exception):
                 scanner.apply_scan_results(
                     self.document,
                     scan_result,
                     auto_apply=True
                 )
-            except Exception:
-                pass
         
         # Verify changes were rolled back
         self.document.refresh_from_db()
