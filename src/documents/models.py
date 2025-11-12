@@ -1670,6 +1670,13 @@ class DeletionRequest(models.Model):
         verbose_name = _("deletion request")
         verbose_name_plural = _("deletion requests")
         indexes = [
+            # Composite index for common listing queries (by user, filtered by status, sorted by date)
+            models.Index(fields=['user', 'status', 'created_at'], name='delreq_user_status_created_idx'),
+            # Index for queries filtering by review date
+            models.Index(fields=['reviewed_at'], name='delreq_reviewed_at_idx'),
+            # Index for queries filtering by completion date
+            models.Index(fields=['completed_at'], name='delreq_completed_at_idx'),
+            # Legacy indexes kept for backward compatibility
             models.Index(fields=['status', 'user']),
             models.Index(fields=['created_at']),
         ]
