@@ -489,9 +489,11 @@ class ConsumerPlugin(
                     document=document,
                     logging_group=self.logging_group,
                     classifier=classifier,
-                    original_file=self.unmodified_original
-                    if self.unmodified_original
-                    else self.working_copy,
+                    original_file=(
+                        self.unmodified_original
+                        if self.unmodified_original
+                        else self.working_copy
+                    ),
                 )
 
                 # After everything is in the database, copy the files into
@@ -502,9 +504,11 @@ class ConsumerPlugin(
 
                     self._write(
                         document.storage_type,
-                        self.unmodified_original
-                        if self.unmodified_original is not None
-                        else self.working_copy,
+                        (
+                            self.unmodified_original
+                            if self.unmodified_original is not None
+                            else self.working_copy
+                        ),
                         document.source_path,
                     )
 
@@ -865,9 +869,9 @@ class ConsumerPreflightPlugin(
         Confirm the input file still exists where it should
         """
         if TYPE_CHECKING:
-            assert isinstance(self.input_doc.original_file, Path), (
-                self.input_doc.original_file
-            )
+            assert isinstance(
+                self.input_doc.original_file, Path,
+            ), self.input_doc.original_file
         if not self.input_doc.original_file.is_file():
             self._fail(
                 ConsumerStatusShortMessage.FILE_NOT_FOUND,

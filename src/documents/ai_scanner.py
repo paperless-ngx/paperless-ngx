@@ -51,7 +51,8 @@ class AIScanResult:
             None  # (storage_path_id, confidence)
         )
         self.custom_fields: dict[
-            int, tuple[Any, float],
+            int,
+            tuple[Any, float],
         ] = {}  # {field_id: (value, confidence), ...}
         self.workflows: list[tuple[int, float]] = []  # [(workflow_id, confidence), ...]
         self.extracted_entities: dict[str, Any] = {}  # NER results
@@ -97,8 +98,9 @@ class AIDocumentScanner:
         self,
         auto_apply_threshold: float = 0.80,
         suggest_threshold: float = 0.60,
-        enable_ml_features: bool = None,
-        enable_advanced_ocr: bool = None,
+        *,
+        enable_ml_features: bool | None = None,
+        enable_advanced_ocr: bool | None = None,
     ):
         """
         Initialize AI scanner.
@@ -188,7 +190,7 @@ class AIDocumentScanner:
         self,
         document: Document,
         document_text: str,
-        original_file_path: str = None,
+        original_file_path: str | None = None,
     ) -> AIScanResult:
         """
         Perform comprehensive AI scan of a document.
@@ -215,7 +217,9 @@ class AIDocumentScanner:
 
         # Analyze and suggest tags
         result.tags = self._suggest_tags(
-            document, document_text, result.extracted_entities,
+            document,
+            document_text,
+            result.extracted_entities,
         )
 
         # Detect correspondent
@@ -296,7 +300,7 @@ class AIDocumentScanner:
             logger.debug("Extracted entities from NER")
             return entities
         except Exception as e:
-            logger.error(f"Entity extraction failed: {e}", exc_info=True)
+            logger.exception(f"Entity extraction failed: {e}")
             return {}
 
     def _suggest_tags(
@@ -357,7 +361,7 @@ class AIDocumentScanner:
             logger.debug(f"Suggested {len(suggestions)} tags")
 
         except Exception as e:
-            logger.error(f"Tag suggestion failed: {e}", exc_info=True)
+            logger.exception(f"Tag suggestion failed: {e}")
 
         return suggestions
 
@@ -384,7 +388,8 @@ class AIDocumentScanner:
         try:
             # Use existing matching logic
             matched_correspondents = match_correspondents(
-                document, self._get_classifier(),
+                document,
+                self._get_classifier(),
             )
 
             if matched_correspondents:
@@ -413,7 +418,7 @@ class AIDocumentScanner:
                     return (correspondent.id, confidence)
 
         except Exception as e:
-            logger.error(f"Correspondent detection failed: {e}", exc_info=True)
+            logger.exception(f"Correspondent detection failed: {e}")
 
         return None
 
@@ -452,7 +457,7 @@ class AIDocumentScanner:
                 pass
 
         except Exception as e:
-            logger.error(f"Document type classification failed: {e}", exc_info=True)
+            logger.exception(f"Document type classification failed: {e}")
 
         return None
 
@@ -484,7 +489,7 @@ class AIDocumentScanner:
                 return (storage_path.id, confidence)
 
         except Exception as e:
-            logger.error(f"Storage path suggestion failed: {e}", exc_info=True)
+            logger.exception(f"Storage path suggestion failed: {e}")
 
         return None
 
@@ -523,7 +528,7 @@ class AIDocumentScanner:
                     )
 
         except Exception as e:
-            logger.error(f"Custom field extraction failed: {e}", exc_info=True)
+            logger.exception(f"Custom field extraction failed: {e}")
 
         return extracted_fields
 
@@ -628,7 +633,7 @@ class AIDocumentScanner:
                     )
 
         except Exception as e:
-            logger.error(f"Workflow suggestion failed: {e}", exc_info=True)
+            logger.exception(f"Workflow suggestion failed: {e}")
 
         return suggestions
 
@@ -699,7 +704,7 @@ class AIDocumentScanner:
                 return suggested_title[:127]  # Respect title length limit
 
         except Exception as e:
-            logger.error(f"Title suggestion failed: {e}", exc_info=True)
+            logger.exception(f"Title suggestion failed: {e}")
 
         return None
 
@@ -719,13 +724,14 @@ class AIDocumentScanner:
             logger.debug(f"Extracted {len(tables)} tables from document")
             return tables
         except Exception as e:
-            logger.error(f"Table extraction failed: {e}", exc_info=True)
+            logger.exception(f"Table extraction failed: {e}")
             return []
 
     def apply_scan_results(
         self,
         document: Document,
         scan_result: AIScanResult,
+        *,
         auto_apply: bool = True,
         user_confirmed: bool = False,
     ) -> dict[str, Any]:
@@ -842,7 +848,7 @@ class AIDocumentScanner:
                 document.save()
 
         except Exception as e:
-            logger.error(f"Failed to apply scan results: {e}", exc_info=True)
+            logger.exception(f"Failed to apply scan results: {e}")
 
         return {
             "applied": applied,
