@@ -1,0 +1,126 @@
+@if (hasSuggestions) {
+  <div class="ai-suggestions-panel card shadow-sm mb-3" [@slideIn]>
+    <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between" role="button" (click)="toggleCollapse()">
+      <div class="d-flex align-items-center">
+        <i-bs name="magic" width="1.2em" height="1.2em" class="me-2"></i-bs>
+        <strong i18n>AI Suggestions</strong>
+        <span class="badge bg-light text-primary ms-2">{{ pendingSuggestions.length }}</span>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        @if (appliedCount > 0) {
+          <span class="badge bg-success" i18n>{{ appliedCount }} applied</span>
+        }
+        @if (rejectedCount > 0) {
+          <span class="badge bg-danger" i18n>{{ rejectedCount }} rejected</span>
+        }
+        <i-bs [name]="isCollapsed ? 'chevron-down' : 'chevron-up'" width="1em" height="1em"></i-bs>
+      </div>
+    </div>
+
+    <div [ngbCollapse]="isCollapsed" class="card-body">
+      <div class="mb-3 pb-2 border-bottom">
+        <p class="text-muted small mb-2" i18n>
+          <i-bs name="info-circle" width="0.9em" height="0.9em" class="me-1"></i-bs>
+          AI has analyzed this document and suggests the following metadata. Review and apply or reject each suggestion.
+        </p>
+        <div class="d-flex gap-2 flex-wrap">
+          <button
+            type="button"
+            class="btn btn-sm btn-success"
+            [disabled]="disabled || pendingSuggestions.length === 0"
+            (click)="applyAll()"
+            i18n>
+            <i-bs name="check-all" width="1em" height="1em" class="me-1"></i-bs>
+            Apply All
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-danger"
+            [disabled]="disabled || pendingSuggestions.length === 0"
+            (click)="rejectAll()"
+            i18n>
+            <i-bs name="x-circle" width="1em" height="1em" class="me-1"></i-bs>
+            Reject All
+          </button>
+        </div>
+      </div>
+
+      <div class="suggestions-container">
+        @for (type of suggestionTypes; track type) {
+          <div class="suggestion-group mb-3">
+            <div class="suggestion-group-header d-flex align-items-center mb-2">
+              <i-bs [name]="getTypeIcon(type)" width="1.1em" height="1.1em" class="me-2 text-primary"></i-bs>
+              <strong class="text-secondary">{{ getTypeLabel(type) }}</strong>
+              <span class="badge bg-secondary ms-2">{{ groupedSuggestions.get(type)?.length }}</span>
+            </div>
+
+            <div class="suggestion-items">
+              @for (suggestion of groupedSuggestions.get(type); track suggestion.id) {
+                <div
+                  class="suggestion-item card mb-2"
+                  [@fadeInOut]
+                  [class.suggestion-applying]="suggestion.status === AISuggestionStatus.Applied"
+                  [class.suggestion-rejecting]="suggestion.status === AISuggestionStatus.Rejected">
+                  <div class="card-body p-2">
+                    <div class="d-flex align-items-start justify-content-between gap-2">
+                      <div class="flex-grow-1">
+                        <div class="suggestion-value fw-medium mb-1">
+                          @if (suggestion.type === AISuggestionType.CustomField && suggestion.field_name) {
+                            <span class="text-muted small me-1">{{ suggestion.field_name }}:</span>
+                          }
+                          {{ getLabel(suggestion) }}
+                        </div>
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                          <span
+                            class="confidence-badge badge"
+                            [ngClass]="getConfidenceClass(suggestion.confidence)">
+                            <i-bs [name]="getConfidenceIcon(suggestion.confidence)" width="0.8em" height="0.8em" class="me-1"></i-bs>
+                            {{ getConfidenceLabel(suggestion.confidence) }}
+                          </span>
+                          @if (suggestion.created_at) {
+                            <span class="text-muted small">
+                              <i-bs name="clock" width="0.8em" height="0.8em" class="me-1"></i-bs>
+                              {{ suggestion.created_at | date:'short' }}
+                            </span>
+                          }
+                        </div>
+                      </div>
+
+                      <div class="suggestion-actions d-flex gap-1 flex-shrink-0">
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-success"
+                          [disabled]="disabled"
+                          (click)="applySuggestion(suggestion)"
+                          i18n-title
+                          title="Apply this suggestion">
+                          <i-bs name="check-lg" width="1em" height="1em"></i-bs>
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-danger"
+                          [disabled]="disabled"
+                          (click)="rejectSuggestion(suggestion)"
+                          i18n-title
+                          title="Reject this suggestion">
+                          <i-bs name="x-lg" width="1em" height="1em"></i-bs>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (pendingSuggestions.length === 0) {
+        <div class="text-center text-muted py-3">
+          <i-bs name="check-circle" width="2em" height="2em" class="mb-2"></i-bs>
+          <p i18n>All suggestions have been processed</p>
+        </div>
+      }
+    </div>
+  </div>
+}
