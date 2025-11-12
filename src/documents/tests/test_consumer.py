@@ -14,6 +14,7 @@ from django.test import override_settings
 from django.utils import timezone
 from guardian.core import ObjectPermissionChecker
 
+from documents.ai_scanner import AIScanResult
 from documents.consumer import ConsumerError
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
@@ -1298,6 +1299,42 @@ class TestConsumerAIScannerIntegration(
         shutil.copy(src, dst)
         return dst
 
+    def get_test_file_with_name(self, filename):
+        """Helper to create a test file with a specific name."""
+        src = (
+            Path(__file__).parent
+            / "samples"
+            / "documents"
+            / "originals"
+            / "0000001.pdf"
+        )
+        dst = self.dirs.scratch_dir / filename
+        shutil.copy(src, dst)
+        return dst
+
+    def create_empty_scan_result_mock(self, mock_scanner):
+        """Helper to configure mock scanner with empty scan results."""
+        scan_result = AIScanResult()
+        mock_scanner.scan_document.return_value = scan_result
+        mock_scanner.apply_scan_results.return_value = {
+            "applied": {
+                "tags": [],
+                "correspondent": None,
+                "document_type": None,
+                "storage_path": None,
+                "custom_fields": [],
+                "workflows": [],
+            },
+            "suggestions": {
+                "tags": [],
+                "correspondent": None,
+                "document_type": None,
+                "storage_path": None,
+                "custom_fields": [],
+                "workflows": [],
+            },
+        }
+
     @mock.patch("documents.ai_scanner.get_ai_scanner")
     @override_settings(PAPERLESS_ENABLE_AI_SCANNER=True)
     def test_ai_scanner_end_to_end_integration(self, mock_get_scanner):
@@ -1319,7 +1356,6 @@ class TestConsumerAIScannerIntegration(
         mock_get_scanner.return_value = mock_scanner
         
         # Mock scan results
-        from documents.ai_scanner import AIScanResult
         scan_result = AIScanResult()
         scan_result.tags = [(tag1.id, 0.85), (tag2.id, 0.75)]
         scan_result.correspondent = (correspondent.id, 0.90)
@@ -1422,27 +1458,7 @@ class TestConsumerAIScannerIntegration(
         mock_scanner = MagicMock()
         mock_get_scanner.return_value = mock_scanner
         
-        from documents.ai_scanner import AIScanResult
-        scan_result = AIScanResult()
-        mock_scanner.scan_document.return_value = scan_result
-        mock_scanner.apply_scan_results.return_value = {
-            "applied": {
-                "tags": [],
-                "correspondent": None,
-                "document_type": None,
-                "storage_path": None,
-                "custom_fields": [],
-                "workflows": [],
-            },
-            "suggestions": {
-                "tags": [],
-                "correspondent": None,
-                "document_type": None,
-                "storage_path": None,
-                "custom_fields": [],
-                "workflows": [],
-            },
-        }
+        self.create_empty_scan_result_mock(mock_scanner)
         
         filename = self.get_test_file()
         
@@ -1488,38 +1504,10 @@ class TestConsumerAIScannerIntegration(
             mock_scanner = MagicMock()
             mock_get_scanner.return_value = mock_scanner
             
-            from documents.ai_scanner import AIScanResult
-            scan_result = AIScanResult()
-            mock_scanner.scan_document.return_value = scan_result
-            mock_scanner.apply_scan_results.return_value = {
-                "applied": {
-                    "tags": [],
-                    "correspondent": None,
-                    "document_type": None,
-                    "storage_path": None,
-                    "custom_fields": [],
-                    "workflows": [],
-                },
-                "suggestions": {
-                    "tags": [],
-                    "correspondent": None,
-                    "document_type": None,
-                    "storage_path": None,
-                    "custom_fields": [],
-                    "workflows": [],
-                },
-            }
+            self.create_empty_scan_result_mock(mock_scanner)
             
             # Create a PNG file
-            src = (
-                Path(__file__).parent
-                / "samples"
-                / "documents"
-                / "originals"
-                / "0000001.pdf"
-            )
-            dst = self.dirs.scratch_dir / "sample.png"
-            shutil.copy(src, dst)
+            dst = self.get_test_file_with_name("sample.png")
             
             with self.get_consumer(dst) as consumer:
                 consumer.run()
@@ -1543,27 +1531,7 @@ class TestConsumerAIScannerIntegration(
         mock_scanner = MagicMock()
         mock_get_scanner.return_value = mock_scanner
         
-        from documents.ai_scanner import AIScanResult
-        scan_result = AIScanResult()
-        mock_scanner.scan_document.return_value = scan_result
-        mock_scanner.apply_scan_results.return_value = {
-            "applied": {
-                "tags": [],
-                "correspondent": None,
-                "document_type": None,
-                "storage_path": None,
-                "custom_fields": [],
-                "workflows": [],
-            },
-            "suggestions": {
-                "tags": [],
-                "correspondent": None,
-                "document_type": None,
-                "storage_path": None,
-                "custom_fields": [],
-                "workflows": [],
-            },
-        }
+        self.create_empty_scan_result_mock(mock_scanner)
         
         filename = self.get_test_file()
         
@@ -1579,12 +1547,10 @@ class TestConsumerAIScannerIntegration(
         # Verify AI scanner was called
         mock_scanner.scan_document.assert_called_once()
         
-        # Note: This is a basic performance test with mocks.
-        # Real performance testing would require actual ML components.
-        # The test ensures the integration doesn't add significant overhead.
+        # With mocks, this should be very fast (<1s).
+        # TODO: Implement proper performance testing with real ML models in integration/performance test suite.
         elapsed_time = end_time - start_time
-        # With mocks, this should be very fast
-        self.assertLess(elapsed_time, 10.0, "Consumer with AI scanner took too long")
+        self.assertLess(elapsed_time, 1.0, "Consumer with AI scanner (mocked) took too long")
 
     @mock.patch("documents.ai_scanner.get_ai_scanner")
     @override_settings(PAPERLESS_ENABLE_AI_SCANNER=True)
@@ -1602,7 +1568,6 @@ class TestConsumerAIScannerIntegration(
         mock_scanner = MagicMock()
         mock_get_scanner.return_value = mock_scanner
         
-        from documents.ai_scanner import AIScanResult
         scan_result = AIScanResult()
         scan_result.tags = [(tag.id, 0.85)]
         mock_scanner.scan_document.return_value = scan_result
@@ -1643,8 +1608,6 @@ class TestConsumerAIScannerIntegration(
         mock_scanner = MagicMock()
         mock_get_scanner.return_value = mock_scanner
         
-        from documents.ai_scanner import AIScanResult
-        
         # Configure scanner to return different results for each call
         scan_results = []
         for tag in [tag1, tag2]:
@@ -1675,16 +1638,7 @@ class TestConsumerAIScannerIntegration(
         # Process multiple documents
         filenames = [self.get_test_file()]
         # Create second file
-        src = (
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000001.pdf"
-        )
-        dst = self.dirs.scratch_dir / "sample2.pdf"
-        shutil.copy(src, dst)
-        filenames.append(dst)
+        filenames.append(self.get_test_file_with_name("sample2.pdf"))
         
         for filename in filenames:
             with self.get_consumer(filename) as consumer:
@@ -1708,27 +1662,7 @@ class TestConsumerAIScannerIntegration(
         mock_scanner = MagicMock()
         mock_get_scanner.return_value = mock_scanner
         
-        from documents.ai_scanner import AIScanResult
-        scan_result = AIScanResult()
-        mock_scanner.scan_document.return_value = scan_result
-        mock_scanner.apply_scan_results.return_value = {
-            "applied": {
-                "tags": [],
-                "correspondent": None,
-                "document_type": None,
-                "storage_path": None,
-                "custom_fields": [],
-                "workflows": [],
-            },
-            "suggestions": {
-                "tags": [],
-                "correspondent": None,
-                "document_type": None,
-                "storage_path": None,
-                "custom_fields": [],
-                "workflows": [],
-            },
-        }
+        self.create_empty_scan_result_mock(mock_scanner)
         
         filename = self.get_test_file()
         
