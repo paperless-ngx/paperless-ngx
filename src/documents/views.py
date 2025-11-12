@@ -1863,7 +1863,7 @@ class SearchAutoCompleteView(GenericAPIView):
         user = self.request.user if hasattr(self.request, "user") else None
 
         if "term" in request.query_params:
-            term = request.query_params["term"]
+            term = request.query_params["term"].strip()
         else:
             return HttpResponseBadRequest("Term required")
 
