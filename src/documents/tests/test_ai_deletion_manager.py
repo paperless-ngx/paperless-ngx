@@ -12,7 +12,6 @@ Tests cover:
 """
 
 from datetime import datetime
-from unittest import mock
 
 from django.contrib.auth.models import User
 from django.test import TestCase
