@@ -62,8 +62,8 @@ elsewhere. Here are a couple notes about that.
 -   With the optional Tika integration enabled (see [Tika configuration](https://docs.paperless-ngx.com/configuration#tika)),
     Paperless also supports various Office documents (.docx, .doc, odt,
     .ppt, .pptx, .odp, .xls, .xlsx, .ods).
--   Zip files are now supported as well. All file types mentioned above
-    found in the zip will be extracted and added to paperless.
+-   Zip files are supported as well. All file types mentioned above
+    found in the zip will be extracted and queued for consumption.
 
 Paperless-ngx determines the type of a file by inspecting its content.
 The file extensions do not matter.
