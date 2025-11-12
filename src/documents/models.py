@@ -317,6 +317,12 @@ class Document(SoftDeleteModel, ModelWithOwner):
         ordering = ("-created",)
         verbose_name = _("document")
         verbose_name_plural = _("documents")
+        permissions = [
+            ("can_view_ai_suggestions", "Can view AI suggestions"),
+            ("can_apply_ai_suggestions", "Can apply AI suggestions"),
+            ("can_approve_deletions", "Can approve AI-recommended deletions"),
+            ("can_configure_ai", "Can configure AI settings"),
+        ]
 
     def __str__(self) -> str:
         created = self.created.isoformat()
