@@ -1721,3 +1721,116 @@ class DeletionRequest(models.Model):
         self.save()
         
         return True
+
+
+class AISuggestionFeedback(models.Model):
+    """
+    Model to track user feedback on AI suggestions (applied/rejected).
+    Used for improving AI accuracy and providing statistics.
+    """
+    
+    # Suggestion types
+    TYPE_TAG = 'tag'
+    TYPE_CORRESPONDENT = 'correspondent'
+    TYPE_DOCUMENT_TYPE = 'document_type'
+    TYPE_STORAGE_PATH = 'storage_path'
+    TYPE_CUSTOM_FIELD = 'custom_field'
+    TYPE_WORKFLOW = 'workflow'
+    TYPE_TITLE = 'title'
+    
+    SUGGESTION_TYPES = (
+        (TYPE_TAG, _('Tag')),
+        (TYPE_CORRESPONDENT, _('Correspondent')),
+        (TYPE_DOCUMENT_TYPE, _('Document Type')),
+        (TYPE_STORAGE_PATH, _('Storage Path')),
+        (TYPE_CUSTOM_FIELD, _('Custom Field')),
+        (TYPE_WORKFLOW, _('Workflow')),
+        (TYPE_TITLE, _('Title')),
+    )
+    
+    # Feedback status
+    STATUS_APPLIED = 'applied'
+    STATUS_REJECTED = 'rejected'
+    
+    FEEDBACK_STATUS = (
+        (STATUS_APPLIED, _('Applied')),
+        (STATUS_REJECTED, _('Rejected')),
+    )
+    
+    document = models.ForeignKey(
+        Document,
+        on_delete=models.CASCADE,
+        related_name='ai_suggestion_feedbacks',
+        verbose_name=_('document'),
+    )
+    
+    suggestion_type = models.CharField(
+        _('suggestion type'),
+        max_length=50,
+        choices=SUGGESTION_TYPES,
+    )
+    
+    suggested_value_id = models.IntegerField(
+        _('suggested value ID'),
+        null=True,
+        blank=True,
+        help_text=_('ID of the suggested object (tag, correspondent, etc.)'),
+    )
+    
+    suggested_value_text = models.TextField(
+        _('suggested value text'),
+        blank=True,
+        help_text=_('Text representation of the suggested value'),
+    )
+    
+    confidence = models.FloatField(
+        _('confidence'),
+        help_text=_('AI confidence score (0.0 to 1.0)'),
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+    )
+    
+    status = models.CharField(
+        _('status'),
+        max_length=20,
+        choices=FEEDBACK_STATUS,
+    )
+    
+    user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='ai_suggestion_feedbacks',
+        verbose_name=_('user'),
+        help_text=_('User who applied or rejected the suggestion'),
+    )
+    
+    created_at = models.DateTimeField(
+        _('created at'),
+        auto_now_add=True,
+    )
+    
+    applied_at = models.DateTimeField(
+        _('applied/rejected at'),
+        auto_now=True,
+    )
+    
+    metadata = models.JSONField(
+        _('metadata'),
+        default=dict,
+        blank=True,
+        help_text=_('Additional metadata about the suggestion'),
+    )
+    
+    class Meta:
+        verbose_name = _('AI suggestion feedback')
+        verbose_name_plural = _('AI suggestion feedbacks')
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['document', 'suggestion_type']),
+            models.Index(fields=['status', 'created_at']),
+            models.Index(fields=['suggestion_type', 'status']),
+        ]
+    
+    def __str__(self):
+        return f"{self.suggestion_type} suggestion for document {self.document_id} - {self.status}"
