@@ -43,6 +43,7 @@ from documents.views import WorkflowActionViewSet
 from documents.views import WorkflowTriggerViewSet
 from documents.views import WorkflowViewSet
 from documents.views import serve_logo
+from documents.views.deletion_request import DeletionRequestViewSet
 from paperless.consumers import StatusConsumer
 from paperless.views import ApplicationConfigurationViewSet
 from paperless.views import DisconnectSocialAccountView
@@ -79,6 +80,7 @@ api_router.register(r"workflows", WorkflowViewSet)
 api_router.register(r"custom_fields", CustomFieldViewSet)
 api_router.register(r"config", ApplicationConfigurationViewSet)
 api_router.register(r"processed_mail", ProcessedMailViewSet)
+api_router.register(r"deletion-requests", DeletionRequestViewSet, basename="deletion-requests")
 
 
 urlpatterns = [
