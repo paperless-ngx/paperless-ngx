@@ -25,6 +25,8 @@ import numpy as np
 import torch
 from sentence_transformers import SentenceTransformer, util
 
+from documents.ml.model_cache import ModelCacheManager
+
 if TYPE_CHECKING:
     pass
 
@@ -48,6 +50,7 @@ class SemanticSearch:
         self,
         model_name: str = "all-MiniLM-L6-v2",
         cache_dir: str | None = None,
+        use_cache: bool = True,
     ):
         """
         Initialize semantic search.
@@ -60,16 +63,38 @@ class SemanticSearch:
                        - all-mpnet-base-v2 (420MB, highest quality)
                        - all-MiniLM-L12-v2 (120MB, balanced)
             cache_dir: Directory to cache model
+            use_cache: Whether to use model cache (default: True)
         """
-        logger.info(f"Initializing SemanticSearch with model: {model_name}")
+        logger.info(
+            f"Initializing SemanticSearch with model: {model_name} "
+            f"(caching: {use_cache})"
+        )
 
         self.model_name = model_name
-        self.model = SentenceTransformer(model_name, cache_folder=cache_dir)
-
-        # Storage for embeddings
-        # In production, this should be in a vector database like Faiss or Milvus
-        self.document_embeddings = {}
-        self.document_metadata = {}
+        self.use_cache = use_cache
+        self.cache_manager = ModelCacheManager.get_instance(
+            disk_cache_dir=cache_dir,
+        ) if use_cache else None
+        
+        # Cache key for this model
+        cache_key = f"semantic_search_{model_name}"
+        
+        if self.use_cache and self.cache_manager:
+            # Load model from cache
+            def loader():
+                return SentenceTransformer(model_name, cache_folder=cache_dir)
+            
+            self.model = self.cache_manager.get_or_load_model(cache_key, loader)
+            
+            # Try to load embeddings from disk
+            embeddings = self.cache_manager.load_embeddings_from_disk("document_embeddings")
+            self.document_embeddings = embeddings if embeddings else {}
+            self.document_metadata = {}
+        else:
+            # Load without caching
+            self.model = SentenceTransformer(model_name, cache_folder=cache_dir)
+            self.document_embeddings = {}
+            self.document_metadata = {}
 
         logger.info("SemanticSearch initialized successfully")
 
@@ -139,6 +164,13 @@ class SemanticSearch:
                 self.document_metadata[doc_id] = metadata
 
         logger.info(f"Indexed {len(documents)} documents successfully")
+        
+        # Save embeddings to disk cache if enabled
+        if self.use_cache and self.cache_manager:
+            self.cache_manager.save_embeddings_to_disk(
+                "document_embeddings",
+                self.document_embeddings,
+            )
 
     def search(
         self,
