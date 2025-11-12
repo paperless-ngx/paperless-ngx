@@ -22,7 +22,6 @@ from documents.models import (
     DeletionRequest,
     Document,
     DocumentType,
-    StoragePath,
     Tag,
 )
 from documents.tests.utils import DirectoriesMixin

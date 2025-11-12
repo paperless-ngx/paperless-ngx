@@ -69,6 +69,7 @@ from packaging import version as packaging_version
 from redis import Redis
 from rest_framework import parsers
 from rest_framework import serializers
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 from rest_framework.exceptions import ValidationError
@@ -127,6 +128,7 @@ from documents.matching import match_storage_paths
 from documents.matching import match_tags
 from documents.models import Correspondent
 from documents.models import CustomField
+from documents.models import DeletionRequest
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
@@ -139,9 +141,15 @@ from documents.models import UiSettings
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
+from documents.ai_scanner import AIDocumentScanner
+from documents.ai_scanner import get_ai_scanner
 from documents.parsers import get_parser_class_for_mime_type
 from documents.parsers import parse_date_generator
 from documents.permissions import AcknowledgeTasksPermissions
+from documents.permissions import CanApplyAISuggestionsPermission
+from documents.permissions import CanApproveDeletionsPermission
+from documents.permissions import CanConfigureAIPermission
+from documents.permissions import CanViewAISuggestionsPermission
 from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessNotePermissions
 from documents.permissions import PaperlessObjectPermissions
@@ -152,11 +160,16 @@ from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
 from documents.schema import generate_object_with_permissions_schema
 from documents.serialisers import AcknowledgeTasksViewSerializer
+from documents.serialisers import AIConfigurationSerializer
+from documents.serialisers import AISuggestionsRequestSerializer
+from documents.serialisers import AISuggestionsResponseSerializer
+from documents.serialisers import ApplyAISuggestionsSerializer
 from documents.serialisers import BulkDownloadSerializer
 from documents.serialisers import BulkEditObjectsSerializer
 from documents.serialisers import BulkEditSerializer
 from documents.serialisers import CorrespondentSerializer
 from documents.serialisers import CustomFieldSerializer
+from documents.serialisers import DeletionApprovalSerializer
 from documents.serialisers import DocumentListSerializer
 from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
@@ -3155,7 +3168,7 @@ def serve_logo(request, filename=None):
 class AISuggestionsView(GenericAPIView):
     """
     API view to get AI suggestions for a document.
-    
+
     Requires: can_view_ai_suggestions permission
     """
     
@@ -3164,10 +3177,6 @@ class AISuggestionsView(GenericAPIView):
     
     def post(self, request):
         """Get AI suggestions for a document."""
-        from documents.ai_scanner import get_ai_scanner
-        from documents.models import Document, Tag, Correspondent, DocumentType, StoragePath
-        from documents.serialisers import AISuggestionsRequestSerializer
-        
         # Validate request
         request_serializer = AISuggestionsRequestSerializer(data=request.data)
         request_serializer.is_valid(raise_exception=True)
@@ -3178,7 +3187,7 @@ class AISuggestionsView(GenericAPIView):
             document = Document.objects.get(pk=document_id)
         except Document.DoesNotExist:
             return Response(
-                {"error": "Document not found"},
+                {"error": "Document not found or you don't have permission to view it"},
                 status=status.HTTP_404_NOT_FOUND
             )
         
@@ -3214,6 +3223,7 @@ class AISuggestionsView(GenericAPIView):
                     "confidence": confidence
                 })
             except Tag.DoesNotExist:
+                # Tag was suggested by AI but no longer exists; skip it
                 pass
         
         # Format correspondent suggestion
@@ -3227,6 +3237,7 @@ class AISuggestionsView(GenericAPIView):
                     "confidence": confidence
                 }
             except Correspondent.DoesNotExist:
+                # Correspondent was suggested but no longer exists; skip it
                 pass
         
         # Format document type suggestion
@@ -3240,6 +3251,7 @@ class AISuggestionsView(GenericAPIView):
                     "confidence": confidence
                 }
             except DocumentType.DoesNotExist:
+                # Document type was suggested but no longer exists; skip it
                 pass
         
         # Format storage path suggestion
@@ -3253,6 +3265,7 @@ class AISuggestionsView(GenericAPIView):
                     "confidence": confidence
                 }
             except StoragePath.DoesNotExist:
+                # Storage path was suggested but no longer exists; skip it
                 pass
         
         # Format custom fields
@@ -3268,7 +3281,7 @@ class AISuggestionsView(GenericAPIView):
 class ApplyAISuggestionsView(GenericAPIView):
     """
     API view to apply AI suggestions to a document.
-    
+
     Requires: can_apply_ai_suggestions permission
     """
     
@@ -3276,10 +3289,6 @@ class ApplyAISuggestionsView(GenericAPIView):
     
     def post(self, request):
         """Apply AI suggestions to a document."""
-        from documents.ai_scanner import get_ai_scanner
-        from documents.models import Document, Tag, Correspondent, DocumentType, StoragePath
-        from documents.serialisers import ApplyAISuggestionsSerializer
-        
         # Validate request
         serializer = ApplyAISuggestionsSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -3323,6 +3332,7 @@ class ApplyAISuggestionsView(GenericAPIView):
                     document.add_nested_tags([tag])
                     applied.append(f"tag: {tag.name}")
                 except Tag.DoesNotExist:
+                    # Tag not found; skip applying this tag
                     pass
         
         if serializer.validated_data.get('apply_correspondent') and scan_result.correspondent:
@@ -3332,6 +3342,7 @@ class ApplyAISuggestionsView(GenericAPIView):
                 document.correspondent = correspondent
                 applied.append(f"correspondent: {correspondent.name}")
             except Correspondent.DoesNotExist:
+                # Correspondent not found; skip applying
                 pass
         
         if serializer.validated_data.get('apply_document_type') and scan_result.document_type:
@@ -3341,6 +3352,7 @@ class ApplyAISuggestionsView(GenericAPIView):
                 document.document_type = doc_type
                 applied.append(f"document_type: {doc_type.name}")
             except DocumentType.DoesNotExist:
+                # Document type not found; skip applying
                 pass
         
         if serializer.validated_data.get('apply_storage_path') and scan_result.storage_path:
@@ -3350,6 +3362,7 @@ class ApplyAISuggestionsView(GenericAPIView):
                 document.storage_path = storage_path
                 applied.append(f"storage_path: {storage_path.name}")
             except StoragePath.DoesNotExist:
+                # Storage path not found; skip applying
                 pass
         
         if serializer.validated_data.get('apply_title') and scan_result.title_suggestion:
@@ -3369,7 +3382,7 @@ class ApplyAISuggestionsView(GenericAPIView):
 class AIConfigurationView(GenericAPIView):
     """
     API view to get/update AI configuration.
-    
+
     Requires: can_configure_ai permission
     """
     
@@ -3377,9 +3390,6 @@ class AIConfigurationView(GenericAPIView):
     
     def get(self, request):
         """Get current AI configuration."""
-        from documents.ai_scanner import get_ai_scanner
-        from documents.serialisers import AIConfigurationSerializer
-        
         scanner = get_ai_scanner()
         
         config_data = {
@@ -3393,10 +3403,13 @@ class AIConfigurationView(GenericAPIView):
         return Response(serializer.data)
     
     def post(self, request):
-        """Update AI configuration."""
-        from documents.ai_scanner import get_ai_scanner, AIDocumentScanner, _scanner_instance
-        from documents.serialisers import AIConfigurationSerializer
+        """
+        Update AI configuration.
         
+        Note: This updates the global scanner instance. Configuration changes
+        will take effect immediately but may require server restart in production
+        environments for consistency across workers.
+        """
         serializer = AIConfigurationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
@@ -3412,19 +3425,21 @@ class AIConfigurationView(GenericAPIView):
             config['enable_advanced_ocr'] = serializer.validated_data['advanced_ocr_enabled']
         
         # Update global scanner instance
-        global _scanner_instance
-        _scanner_instance = AIDocumentScanner(**config)
+        # WARNING: Not thread-safe. Consider storing configuration in database
+        # and reloading on each get_ai_scanner() call for production use
+        from documents import ai_scanner
+        ai_scanner._scanner_instance = AIDocumentScanner(**config)
         
         return Response({
             "status": "success",
-            "message": "AI configuration updated"
+            "message": "AI configuration updated. Changes may require server restart for consistency."
         })
 
 
 class DeletionApprovalView(GenericAPIView):
     """
     API view to approve/reject deletion requests.
-    
+
     Requires: can_approve_deletions permission
     """
     
@@ -3432,9 +3447,6 @@ class DeletionApprovalView(GenericAPIView):
     
     def post(self, request):
         """Approve or reject a deletion request."""
-        from documents.models import DeletionRequest
-        from documents.serialisers import DeletionApprovalSerializer
-        
         serializer = DeletionApprovalSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
@@ -3450,7 +3462,8 @@ class DeletionApprovalView(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-        # Check if user has permission
+        # Permission is handled by the permission class; users with the permission
+        # can approve any deletion request. Additional ownership check for non-superusers.
         if deletion_request.user != request.user and not request.user.is_superuser:
             return Response(
                 {"error": "Permission denied"},
@@ -3459,6 +3472,10 @@ class DeletionApprovalView(GenericAPIView):
         
         if action == "approve":
             deletion_request.status = DeletionRequest.STATUS_APPROVED
+            # TODO: Store approval reason for audit trail
+            # deletion_request.approval_reason = reason
+            # deletion_request.reviewed_at = timezone.now()
+            # deletion_request.reviewed_by = request.user
             deletion_request.save()
             
             # Perform the actual deletion
@@ -3468,9 +3485,12 @@ class DeletionApprovalView(GenericAPIView):
                 "message": "Deletion request approved",
                 "request_id": request_id
             })
-        
-        elif action == "reject":
+        else:  # action == "reject"
             deletion_request.status = DeletionRequest.STATUS_REJECTED
+            # TODO: Store rejection reason for audit trail
+            # deletion_request.rejection_reason = reason
+            # deletion_request.reviewed_at = timezone.now()
+            # deletion_request.reviewed_by = request.user
             deletion_request.save()
             
             return Response({
@@ -3479,11 +3499,3 @@ class DeletionApprovalView(GenericAPIView):
                 "request_id": request_id
             })
 
-
-# Import the new permission classes
-from documents.permissions import (
-    CanViewAISuggestionsPermission,
-    CanApplyAISuggestionsPermission,
-    CanApproveDeletionsPermission,
-    CanConfigureAIPermission,
-)
