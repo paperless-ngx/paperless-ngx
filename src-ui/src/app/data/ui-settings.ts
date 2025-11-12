@@ -76,6 +76,13 @@ export const SETTINGS_KEYS = {
   GMAIL_OAUTH_URL: 'gmail_oauth_url',
   OUTLOOK_OAUTH_URL: 'outlook_oauth_url',
   EMAIL_ENABLED: 'email_enabled',
+  // AI Settings
+  AI_SCANNER_ENABLED: 'ai-settings:scanner:enabled',
+  AI_ML_FEATURES_ENABLED: 'ai-settings:ml-features:enabled',
+  AI_ADVANCED_OCR_ENABLED: 'ai-settings:advanced-ocr:enabled',
+  AI_AUTO_APPLY_THRESHOLD: 'ai-settings:thresholds:auto-apply',
+  AI_SUGGEST_THRESHOLD: 'ai-settings:thresholds:suggest',
+  AI_ML_MODEL: 'ai-settings:ml-model',
 }
 
 export const SETTINGS: UiSetting[] = [
