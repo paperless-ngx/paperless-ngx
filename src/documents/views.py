@@ -3150,3 +3150,340 @@ def serve_logo(request, filename=None):
         filename=app_logo.name,
         as_attachment=True,
     )
+
+
+class AISuggestionsView(GenericAPIView):
+    """
+    API view to get AI suggestions for a document.
+    
+    Requires: can_view_ai_suggestions permission
+    """
+    
+    permission_classes = [IsAuthenticated, CanViewAISuggestionsPermission]
+    serializer_class = AISuggestionsResponseSerializer
+    
+    def post(self, request):
+        """Get AI suggestions for a document."""
+        from documents.ai_scanner import get_ai_scanner
+        from documents.models import Document, Tag, Correspondent, DocumentType, StoragePath
+        from documents.serialisers import AISuggestionsRequestSerializer
+        
+        # Validate request
+        request_serializer = AISuggestionsRequestSerializer(data=request.data)
+        request_serializer.is_valid(raise_exception=True)
+        
+        document_id = request_serializer.validated_data['document_id']
+        
+        try:
+            document = Document.objects.get(pk=document_id)
+        except Document.DoesNotExist:
+            return Response(
+                {"error": "Document not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Check if user has permission to view this document
+        if not has_perms_owner_aware(request.user, 'documents.view_document', document):
+            return Response(
+                {"error": "Permission denied"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Get AI scanner and scan document
+        scanner = get_ai_scanner()
+        scan_result = scanner.scan_document(document, document.content or "")
+        
+        # Build response
+        response_data = {
+            "document_id": document.id,
+            "tags": [],
+            "correspondent": None,
+            "document_type": None,
+            "storage_path": None,
+            "title_suggestion": scan_result.title_suggestion,
+            "custom_fields": {}
+        }
+        
+        # Format tag suggestions
+        for tag_id, confidence in scan_result.tags:
+            try:
+                tag = Tag.objects.get(pk=tag_id)
+                response_data["tags"].append({
+                    "id": tag.id,
+                    "name": tag.name,
+                    "confidence": confidence
+                })
+            except Tag.DoesNotExist:
+                pass
+        
+        # Format correspondent suggestion
+        if scan_result.correspondent:
+            corr_id, confidence = scan_result.correspondent
+            try:
+                correspondent = Correspondent.objects.get(pk=corr_id)
+                response_data["correspondent"] = {
+                    "id": correspondent.id,
+                    "name": correspondent.name,
+                    "confidence": confidence
+                }
+            except Correspondent.DoesNotExist:
+                pass
+        
+        # Format document type suggestion
+        if scan_result.document_type:
+            type_id, confidence = scan_result.document_type
+            try:
+                doc_type = DocumentType.objects.get(pk=type_id)
+                response_data["document_type"] = {
+                    "id": doc_type.id,
+                    "name": doc_type.name,
+                    "confidence": confidence
+                }
+            except DocumentType.DoesNotExist:
+                pass
+        
+        # Format storage path suggestion
+        if scan_result.storage_path:
+            path_id, confidence = scan_result.storage_path
+            try:
+                storage_path = StoragePath.objects.get(pk=path_id)
+                response_data["storage_path"] = {
+                    "id": storage_path.id,
+                    "name": storage_path.name,
+                    "confidence": confidence
+                }
+            except StoragePath.DoesNotExist:
+                pass
+        
+        # Format custom fields
+        for field_id, (value, confidence) in scan_result.custom_fields.items():
+            response_data["custom_fields"][str(field_id)] = {
+                "value": value,
+                "confidence": confidence
+            }
+        
+        return Response(response_data)
+
+
+class ApplyAISuggestionsView(GenericAPIView):
+    """
+    API view to apply AI suggestions to a document.
+    
+    Requires: can_apply_ai_suggestions permission
+    """
+    
+    permission_classes = [IsAuthenticated, CanApplyAISuggestionsPermission]
+    
+    def post(self, request):
+        """Apply AI suggestions to a document."""
+        from documents.ai_scanner import get_ai_scanner
+        from documents.models import Document, Tag, Correspondent, DocumentType, StoragePath
+        from documents.serialisers import ApplyAISuggestionsSerializer
+        
+        # Validate request
+        serializer = ApplyAISuggestionsSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        document_id = serializer.validated_data['document_id']
+        
+        try:
+            document = Document.objects.get(pk=document_id)
+        except Document.DoesNotExist:
+            return Response(
+                {"error": "Document not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Check if user has permission to change this document
+        if not has_perms_owner_aware(request.user, 'documents.change_document', document):
+            return Response(
+                {"error": "Permission denied"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Get AI scanner and scan document
+        scanner = get_ai_scanner()
+        scan_result = scanner.scan_document(document, document.content or "")
+        
+        # Apply suggestions based on user selections
+        applied = []
+        
+        if serializer.validated_data.get('apply_tags'):
+            selected_tags = serializer.validated_data.get('selected_tags', [])
+            if selected_tags:
+                # Apply only selected tags
+                tags_to_apply = [tag_id for tag_id, _ in scan_result.tags if tag_id in selected_tags]
+            else:
+                # Apply all high-confidence tags
+                tags_to_apply = [tag_id for tag_id, conf in scan_result.tags if conf >= scanner.auto_apply_threshold]
+            
+            for tag_id in tags_to_apply:
+                try:
+                    tag = Tag.objects.get(pk=tag_id)
+                    document.add_nested_tags([tag])
+                    applied.append(f"tag: {tag.name}")
+                except Tag.DoesNotExist:
+                    pass
+        
+        if serializer.validated_data.get('apply_correspondent') and scan_result.correspondent:
+            corr_id, confidence = scan_result.correspondent
+            try:
+                correspondent = Correspondent.objects.get(pk=corr_id)
+                document.correspondent = correspondent
+                applied.append(f"correspondent: {correspondent.name}")
+            except Correspondent.DoesNotExist:
+                pass
+        
+        if serializer.validated_data.get('apply_document_type') and scan_result.document_type:
+            type_id, confidence = scan_result.document_type
+            try:
+                doc_type = DocumentType.objects.get(pk=type_id)
+                document.document_type = doc_type
+                applied.append(f"document_type: {doc_type.name}")
+            except DocumentType.DoesNotExist:
+                pass
+        
+        if serializer.validated_data.get('apply_storage_path') and scan_result.storage_path:
+            path_id, confidence = scan_result.storage_path
+            try:
+                storage_path = StoragePath.objects.get(pk=path_id)
+                document.storage_path = storage_path
+                applied.append(f"storage_path: {storage_path.name}")
+            except StoragePath.DoesNotExist:
+                pass
+        
+        if serializer.validated_data.get('apply_title') and scan_result.title_suggestion:
+            document.title = scan_result.title_suggestion
+            applied.append(f"title: {scan_result.title_suggestion}")
+        
+        # Save document
+        document.save()
+        
+        return Response({
+            "status": "success",
+            "document_id": document.id,
+            "applied": applied
+        })
+
+
+class AIConfigurationView(GenericAPIView):
+    """
+    API view to get/update AI configuration.
+    
+    Requires: can_configure_ai permission
+    """
+    
+    permission_classes = [IsAuthenticated, CanConfigureAIPermission]
+    
+    def get(self, request):
+        """Get current AI configuration."""
+        from documents.ai_scanner import get_ai_scanner
+        from documents.serialisers import AIConfigurationSerializer
+        
+        scanner = get_ai_scanner()
+        
+        config_data = {
+            "auto_apply_threshold": scanner.auto_apply_threshold,
+            "suggest_threshold": scanner.suggest_threshold,
+            "ml_enabled": scanner.ml_enabled,
+            "advanced_ocr_enabled": scanner.advanced_ocr_enabled,
+        }
+        
+        serializer = AIConfigurationSerializer(config_data)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        """Update AI configuration."""
+        from documents.ai_scanner import get_ai_scanner, AIDocumentScanner, _scanner_instance
+        from documents.serialisers import AIConfigurationSerializer
+        
+        serializer = AIConfigurationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        # Create new scanner with updated configuration
+        config = {}
+        if 'auto_apply_threshold' in serializer.validated_data:
+            config['auto_apply_threshold'] = serializer.validated_data['auto_apply_threshold']
+        if 'suggest_threshold' in serializer.validated_data:
+            config['suggest_threshold'] = serializer.validated_data['suggest_threshold']
+        if 'ml_enabled' in serializer.validated_data:
+            config['enable_ml_features'] = serializer.validated_data['ml_enabled']
+        if 'advanced_ocr_enabled' in serializer.validated_data:
+            config['enable_advanced_ocr'] = serializer.validated_data['advanced_ocr_enabled']
+        
+        # Update global scanner instance
+        global _scanner_instance
+        _scanner_instance = AIDocumentScanner(**config)
+        
+        return Response({
+            "status": "success",
+            "message": "AI configuration updated"
+        })
+
+
+class DeletionApprovalView(GenericAPIView):
+    """
+    API view to approve/reject deletion requests.
+    
+    Requires: can_approve_deletions permission
+    """
+    
+    permission_classes = [IsAuthenticated, CanApproveDeletionsPermission]
+    
+    def post(self, request):
+        """Approve or reject a deletion request."""
+        from documents.models import DeletionRequest
+        from documents.serialisers import DeletionApprovalSerializer
+        
+        serializer = DeletionApprovalSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        request_id = serializer.validated_data['request_id']
+        action = serializer.validated_data['action']
+        reason = serializer.validated_data.get('reason', '')
+        
+        try:
+            deletion_request = DeletionRequest.objects.get(pk=request_id)
+        except DeletionRequest.DoesNotExist:
+            return Response(
+                {"error": "Deletion request not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Check if user has permission
+        if deletion_request.user != request.user and not request.user.is_superuser:
+            return Response(
+                {"error": "Permission denied"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        if action == "approve":
+            deletion_request.status = DeletionRequest.STATUS_APPROVED
+            deletion_request.save()
+            
+            # Perform the actual deletion
+            # This would integrate with the AI deletion manager
+            return Response({
+                "status": "success",
+                "message": "Deletion request approved",
+                "request_id": request_id
+            })
+        
+        elif action == "reject":
+            deletion_request.status = DeletionRequest.STATUS_REJECTED
+            deletion_request.save()
+            
+            return Response({
+                "status": "success",
+                "message": "Deletion request rejected",
+                "request_id": request_id
+            })
+
+
+# Import the new permission classes
+from documents.permissions import (
+    CanViewAISuggestionsPermission,
+    CanApplyAISuggestionsPermission,
+    CanApproveDeletionsPermission,
+    CanConfigureAIPermission,
+)
