@@ -127,6 +127,7 @@ from documents.matching import match_storage_paths
 from documents.matching import match_tags
 from documents.models import Correspondent
 from documents.models import CustomField
+from documents.models import DeletionRequest
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
@@ -157,6 +158,8 @@ from documents.serialisers import BulkEditObjectsSerializer
 from documents.serialisers import BulkEditSerializer
 from documents.serialisers import CorrespondentSerializer
 from documents.serialisers import CustomFieldSerializer
+from documents.serialisers import DeletionRequestActionSerializer
+from documents.serialisers import DeletionRequestSerializer
 from documents.serialisers import DocumentListSerializer
 from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer

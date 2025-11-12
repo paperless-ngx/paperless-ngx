@@ -49,6 +49,7 @@ from documents.filters import CustomFieldQueryParser
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
+from documents.models import DeletionRequest
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
@@ -2695,4 +2696,101 @@ class StoragePathTestSerializer(SerializerWithPerms):
         required=True,
         label="Document",
         write_only=True,
+    )
+
+
+class DeletionRequestSerializer(serializers.ModelSerializer):
+    """
+    Serializer for DeletionRequest model.
+    Provides full CRUD operations for AI-initiated deletion requests.
+    """
+
+    user_username = serializers.CharField(
+        source="user.username",
+        read_only=True,
+        label="User",
+    )
+
+    reviewed_by_username = serializers.CharField(
+        source="reviewed_by.username",
+        read_only=True,
+        label="Reviewed By",
+        allow_null=True,
+    )
+
+    document_count = serializers.SerializerMethodField(
+        label="Document Count",
+        read_only=True,
+    )
+
+    documents_detail = serializers.SerializerMethodField(
+        label="Documents",
+        read_only=True,
+    )
+
+    class Meta:
+        model = DeletionRequest
+        fields = [
+            "id",
+            "created_at",
+            "updated_at",
+            "requested_by_ai",
+            "ai_reason",
+            "user",
+            "user_username",
+            "status",
+            "documents",
+            "documents_detail",
+            "document_count",
+            "impact_summary",
+            "reviewed_at",
+            "reviewed_by",
+            "reviewed_by_username",
+            "review_comment",
+            "completed_at",
+            "completion_details",
+        ]
+        read_only_fields = [
+            "id",
+            "created_at",
+            "updated_at",
+            "reviewed_at",
+            "reviewed_by",
+            "completed_at",
+        ]
+
+    def get_document_count(self, obj):
+        """Get the count of documents in this deletion request."""
+        return obj.documents.count()
+
+    def get_documents_detail(self, obj):
+        """Get detailed information about documents in this deletion request."""
+        documents = obj.documents.all()[:100]  # Limit to prevent large responses
+        return [
+            {
+                "id": doc.id,
+                "title": doc.title,
+                "created": doc.created,
+                "correspondent": (
+                    doc.correspondent.name if doc.correspondent else None
+                ),
+                "document_type": (
+                    doc.document_type.name if doc.document_type else None
+                ),
+                "tags": [tag.name for tag in doc.tags.all()],
+            }
+            for doc in documents
+        ]
+
+
+class DeletionRequestActionSerializer(serializers.Serializer):
+    """
+    Serializer for approve/reject actions on DeletionRequest.
+    """
+
+    review_comment = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        label="Review Comment",
+        help_text="Optional comment when reviewing the deletion request",
     )
