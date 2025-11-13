@@ -648,7 +648,7 @@ class TestApiUser(DirectoriesMixin, APITestCase):
 
         user1 = {
             "username": "testuser",
-            "password": "test",
+            "password": "areallysupersecretpassword235",
             "first_name": "Test",
             "last_name": "User",
         }
@@ -730,7 +730,7 @@ class TestApiUser(DirectoriesMixin, APITestCase):
             f"{self.ENDPOINT}{user1.pk}/",
             data={
                 "first_name": "Updated Name 2",
-                "password": "123xyz",
+                "password": "newreallystrongpassword456",
             },
         )
 
