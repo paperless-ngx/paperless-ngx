@@ -15,11 +15,15 @@ from drf_spectacular.views import SpectacularAPIView
 from drf_spectacular.views import SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 
+from documents.views import AIConfigurationView
+from documents.views import AISuggestionsView
+from documents.views import ApplyAISuggestionsView
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
 from documents.views import CorrespondentViewSet
 from documents.views import CustomFieldViewSet
+from documents.views import DeletionApprovalView
 from documents.views import DocumentTypeViewSet
 from documents.views import GlobalSearchView
 from documents.views import IndexView
@@ -201,6 +205,33 @@ urlpatterns = [
                     "^trash/",
                     TrashView.as_view(),
                     name="trash",
+                ),
+                re_path(
+                    "^ai/",
+                    include(
+                        [
+                            re_path(
+                                "^suggestions/$",
+                                AISuggestionsView.as_view(),
+                                name="ai_suggestions",
+                            ),
+                            re_path(
+                                "^suggestions/apply/$",
+                                ApplyAISuggestionsView.as_view(),
+                                name="ai_apply_suggestions",
+                            ),
+                            re_path(
+                                "^config/$",
+                                AIConfigurationView.as_view(),
+                                name="ai_config",
+                            ),
+                            re_path(
+                                "^deletions/approve/$",
+                                DeletionApprovalView.as_view(),
+                                name="ai_deletion_approval",
+                            ),
+                        ],
+                    ),
                 ),
                 re_path(
                     r"^oauth/callback/",
