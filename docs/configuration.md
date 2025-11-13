@@ -1842,13 +1842,13 @@ current backend. If not supplied, defaults to "gpt-3.5-turbo" for OpenAI and "ll
 
 #### [`PAPERLESS_AI_LLM_API_KEY=<str>`](#PAPERLESS_AI_LLM_API_KEY) {#PAPERLESS_AI_LLM_API_KEY}
 
-: The API key to use for the AI backend. This is required for the OpenAI backend only.
+: The API key to use for the AI backend. This is required for the OpenAI backend (optional for others).
 
     Defaults to None.
 
 #### [`PAPERLESS_AI_LLM_ENDPOINT=<str>`](#PAPERLESS_AI_LLM_ENDPOINT) {#PAPERLESS_AI_LLM_ENDPOINT}
 
-: The endpoint / url to use for the AI backend. This is required for the Ollama backend only.
+: The endpoint / url to use for the AI backend. This is required for the Ollama backend (optional for others).
 
     Defaults to None.
 

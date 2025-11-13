@@ -47,11 +47,13 @@ def test_get_llm_openai(mock_ai_config, mock_openai_llm):
     mock_ai_config.llm_backend = "openai"
     mock_ai_config.llm_model = "test_model"
     mock_ai_config.llm_api_key = "test_api_key"
+    mock_ai_config.llm_endpoint = "http://test-url"
 
     client = AIClient()
 
     mock_openai_llm.assert_called_once_with(
         model="test_model",
+        api_base="http://test-url",
         api_key="test_api_key",
     )
     assert client.llm == mock_openai_llm.return_value

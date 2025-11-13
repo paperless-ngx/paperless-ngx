@@ -30,6 +30,7 @@ class AIClient:
         elif self.settings.llm_backend == "openai":
             return OpenAI(
                 model=self.settings.llm_model or "gpt-3.5-turbo",
+                api_base=self.settings.llm_endpoint or None,
                 api_key=self.settings.llm_api_key,
             )
         else:
