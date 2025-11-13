@@ -2698,6 +2698,64 @@ class StoragePathTestSerializer(SerializerWithPerms):
     )
 
 
+class DeletionRequestSerializer(serializers.ModelSerializer):
+    """Serializer for DeletionRequest model with document details."""
+    
+    document_details = serializers.SerializerMethodField()
+    user_username = serializers.CharField(source='user.username', read_only=True)
+    reviewed_by_username = serializers.CharField(
+        source='reviewed_by.username', 
+        read_only=True,
+        allow_null=True,
+    )
+    
+    class Meta:
+        from documents.models import DeletionRequest
+        model = DeletionRequest
+        fields = [
+            'id',
+            'created_at',
+            'updated_at',
+            'requested_by_ai',
+            'ai_reason',
+            'user',
+            'user_username',
+            'status',
+            'impact_summary',
+            'reviewed_at',
+            'reviewed_by',
+            'reviewed_by_username',
+            'review_comment',
+            'completed_at',
+            'completion_details',
+            'document_details',
+        ]
+        read_only_fields = [
+            'id',
+            'created_at',
+            'updated_at',
+            'reviewed_at',
+            'reviewed_by',
+            'completed_at',
+            'completion_details',
+        ]
+    
+    def get_document_details(self, obj):
+        """Get details of documents in this deletion request."""
+        documents = obj.documents.all()
+        return [
+            {
+                'id': doc.id,
+                'title': doc.title,
+                'created': doc.created.isoformat() if doc.created else None,
+                'correspondent': doc.correspondent.name if doc.correspondent else None,
+                'document_type': doc.document_type.name if doc.document_type else None,
+                'tags': [tag.name for tag in doc.tags.all()],
+            }
+            for doc in documents
+        ]
+
+
 class AISuggestionsRequestSerializer(serializers.Serializer):
     """Serializer for requesting AI suggestions for a document."""
 
@@ -2795,26 +2853,4 @@ class AIConfigurationSerializer(serializers.Serializer):
         required=False,
         label="Advanced OCR Enabled",
         help_text="Enable/disable advanced OCR features",
-    )
-
-
-class DeletionApprovalSerializer(serializers.Serializer):
-    """Serializer for approving/rejecting deletion requests."""
-
-    request_id = serializers.IntegerField(
-        required=True,
-        label="Request ID",
-        help_text="ID of the deletion request",
-    )
-    action = serializers.ChoiceField(
-        choices=["approve", "reject"],
-        required=True,
-        label="Action",
-        help_text="Action to take on the deletion request",
-    )
-    reason = serializers.CharField(
-        required=False,
-        allow_blank=True,
-        label="Reason",
-        help_text="Reason for approval/rejection (optional)",
     )
