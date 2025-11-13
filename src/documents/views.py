@@ -1391,7 +1391,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
         except Exception as e:
             logger.error(f"Error getting AI suggestions for document {pk}: {e}", exc_info=True)
             return Response(
-                {"detail": f"Error generating AI suggestions: {str(e)}"},
+                {"detail": "Error generating AI suggestions. Please check the logs for details."},
                 status=500,
             )
 
@@ -1477,15 +1477,15 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 )
                 
         except (Tag.DoesNotExist, Correspondent.DoesNotExist, 
-                DocumentType.DoesNotExist, StoragePath.DoesNotExist) as e:
+                DocumentType.DoesNotExist, StoragePath.DoesNotExist):
             return Response(
-                {"detail": f"Referenced object not found: {str(e)}"},
+                {"detail": "Referenced object not found"},
                 status=404,
             )
         except Exception as e:
             logger.error(f"Error applying suggestion for document {pk}: {e}", exc_info=True)
             return Response(
-                {"detail": f"Error applying suggestion: {str(e)}"},
+                {"detail": "Error applying suggestion. Please check the logs for details."},
                 status=500,
             )
 
@@ -1530,7 +1530,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
         except Exception as e:
             logger.error(f"Error rejecting suggestion for document {pk}: {e}", exc_info=True)
             return Response(
-                {"detail": f"Error rejecting suggestion: {str(e)}"},
+                {"detail": "Error rejecting suggestion. Please check the logs for details."},
                 status=500,
             )
 
@@ -1616,7 +1616,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
         except Exception as e:
             logger.error(f"Error getting AI suggestion statistics: {e}", exc_info=True)
             return Response(
-                {"detail": f"Error getting statistics: {str(e)}"},
+                {"detail": "Error getting statistics. Please check the logs for details."},
                 status=500,
             )
 
