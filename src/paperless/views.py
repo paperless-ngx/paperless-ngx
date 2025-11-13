@@ -199,10 +199,10 @@ class ProfileView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = self.request.user if hasattr(self.request, "user") else None
 
-        if len(serializer.validated_data.get("password").replace("*", "")) > 0:
-            user.set_password(serializer.validated_data.get("password"))
+        password = serializer.validated_data.pop("password", None)
+        if password and password.replace("*", ""):
+            user.set_password(password)
             user.save()
-        serializer.validated_data.pop("password")
 
         for key, value in serializer.validated_data.items():
             setattr(user, key, value)

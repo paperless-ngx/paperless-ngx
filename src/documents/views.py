@@ -25,6 +25,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.core.cache import cache
 from django.db import connections
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
@@ -54,7 +55,6 @@ from django.utils.timezone import make_aware
 from django.utils.translation import get_language
 from django.views import View
 from django.views.decorators.cache import cache_control
-from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
@@ -114,6 +114,7 @@ from documents.conditionals import thumbnail_last_modified
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
+from documents.file_handling import format_filename
 from documents.filters import CorrespondentFilterSet
 from documents.filters import CustomFieldFilterSet
 from documents.filters import DocumentFilterSet
@@ -189,7 +190,6 @@ from documents.tasks import index_optimize
 from documents.tasks import sanity_check
 from documents.tasks import train_classifier
 from documents.tasks import update_document_parent_tags
-from documents.templating.filepath import validate_filepath_template_and_render
 from documents.utils import get_boolean
 from paperless import version
 from paperless.celery import app as celery_app
@@ -2463,7 +2463,7 @@ class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         document = serializer.validated_data.get("document")
         path = serializer.validated_data.get("path")
 
-        result = validate_filepath_template_and_render(path, document)
+        result = format_filename(document, path)
         return Response(result)
 
 
@@ -2557,7 +2557,6 @@ class UiSettingsView(GenericAPIView):
         )
 
 
-@method_decorator(cache_page(60 * 15), name="dispatch")
 @extend_schema_view(
     get=extend_schema(
         description="Get the current version of the Paperless-NGX server",
@@ -2567,31 +2566,34 @@ class UiSettingsView(GenericAPIView):
     ),
 )
 class RemoteVersionView(GenericAPIView):
+    cache_key = "remote_version_view_latest_release"
+
     def get(self, request, format=None):
-        remote_version = "0.0.0"
-        is_greater_than_current = False
         current_version = packaging_version.parse(version.__full_version_str__)
-        try:
-            resp = httpx.get(
-                "https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest",
-                headers={"Accept": "application/json"},
-            )
-            resp.raise_for_status()
+        remote_version = cache.get(self.cache_key)
+        if remote_version is None:
             try:
+                resp = httpx.get(
+                    "https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest",
+                    headers={"Accept": "application/json"},
+                )
+                resp.raise_for_status()
                 data = resp.json()
                 remote_version = data["tag_name"]
                 # Some early tags used ngx-x.y.z
                 remote_version = remote_version.removeprefix("ngx-")
             except ValueError as e:
                 logger.debug(f"An error occurred parsing remote version json: {e}")
-        except httpx.HTTPError as e:
-            logger.debug(f"An error occurred checking for available updates: {e}")
+            except httpx.HTTPError as e:
+                logger.debug(f"An error occurred checking for available updates: {e}")
+
+            if remote_version:
+                cache.set(self.cache_key, remote_version, 60 * 15)
+            else:
+                remote_version = "0.0.0"
 
         is_greater_than_current = (
-            packaging_version.parse(
-                remote_version,
-            )
-            > current_version
+            packaging_version.parse(remote_version) > current_version
         )
 
         return Response(

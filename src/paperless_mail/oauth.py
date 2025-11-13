@@ -103,6 +103,9 @@ class PaperlessMailOAuth2Manager:
                         refresh_token=account.refresh_token,
                     ),
                 )
+            if "refresh_token" in result:
+                # Outlook returns a new refresh token on refresh, Gmail does not
+                account.refresh_token = result["refresh_token"]
             account.password = result["access_token"]
             account.expiration = timezone.now() + timedelta(
                 seconds=result["expires_in"],
