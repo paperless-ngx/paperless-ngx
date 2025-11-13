@@ -2696,3 +2696,125 @@ class StoragePathTestSerializer(SerializerWithPerms):
         label="Document",
         write_only=True,
     )
+
+
+class AISuggestionsRequestSerializer(serializers.Serializer):
+    """Serializer for requesting AI suggestions for a document."""
+
+    document_id = serializers.IntegerField(
+        required=True,
+        label="Document ID",
+        help_text="ID of the document to analyze",
+    )
+
+
+class AISuggestionSerializer(serializers.Serializer):
+    """Serializer for a single AI suggestion."""
+
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    confidence = serializers.FloatField()
+
+
+class AISuggestionsResponseSerializer(serializers.Serializer):
+    """Serializer for AI suggestions response."""
+
+    document_id = serializers.IntegerField()
+    tags = AISuggestionSerializer(many=True, required=False)
+    correspondent = AISuggestionSerializer(required=False, allow_null=True)
+    document_type = AISuggestionSerializer(required=False, allow_null=True)
+    storage_path = AISuggestionSerializer(required=False, allow_null=True)
+    title_suggestion = serializers.CharField(required=False, allow_null=True)
+    custom_fields = serializers.DictField(required=False)
+
+
+class ApplyAISuggestionsSerializer(serializers.Serializer):
+    """Serializer for applying AI suggestions to a document."""
+
+    document_id = serializers.IntegerField(
+        required=True,
+        label="Document ID",
+        help_text="ID of the document to apply suggestions to",
+    )
+    apply_tags = serializers.BooleanField(
+        default=False,
+        label="Apply Tags",
+        help_text="Whether to apply tag suggestions",
+    )
+    apply_correspondent = serializers.BooleanField(
+        default=False,
+        label="Apply Correspondent",
+        help_text="Whether to apply correspondent suggestion",
+    )
+    apply_document_type = serializers.BooleanField(
+        default=False,
+        label="Apply Document Type",
+        help_text="Whether to apply document type suggestion",
+    )
+    apply_storage_path = serializers.BooleanField(
+        default=False,
+        label="Apply Storage Path",
+        help_text="Whether to apply storage path suggestion",
+    )
+    apply_title = serializers.BooleanField(
+        default=False,
+        label="Apply Title",
+        help_text="Whether to apply title suggestion",
+    )
+    selected_tags = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=False,
+        label="Selected Tags",
+        help_text="Specific tag IDs to apply (optional)",
+    )
+
+
+class AIConfigurationSerializer(serializers.Serializer):
+    """Serializer for AI configuration settings."""
+
+    auto_apply_threshold = serializers.FloatField(
+        required=False,
+        min_value=0.0,
+        max_value=1.0,
+        label="Auto Apply Threshold",
+        help_text="Confidence threshold for automatic application (0.0-1.0)",
+    )
+    suggest_threshold = serializers.FloatField(
+        required=False,
+        min_value=0.0,
+        max_value=1.0,
+        label="Suggest Threshold",
+        help_text="Confidence threshold for suggestions (0.0-1.0)",
+    )
+    ml_enabled = serializers.BooleanField(
+        required=False,
+        label="ML Features Enabled",
+        help_text="Enable/disable ML features",
+    )
+    advanced_ocr_enabled = serializers.BooleanField(
+        required=False,
+        label="Advanced OCR Enabled",
+        help_text="Enable/disable advanced OCR features",
+    )
+
+
+class DeletionApprovalSerializer(serializers.Serializer):
+    """Serializer for approving/rejecting deletion requests."""
+
+    request_id = serializers.IntegerField(
+        required=True,
+        label="Request ID",
+        help_text="ID of the deletion request",
+    )
+    action = serializers.ChoiceField(
+        choices=["approve", "reject"],
+        required=True,
+        label="Action",
+        help_text="Action to take on the deletion request",
+    )
+    reason = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        label="Reason",
+        help_text="Reason for approval/rejection (optional)",
+    )
