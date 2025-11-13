@@ -1358,6 +1358,279 @@ class UnifiedSearchViewSet(DocumentViewSet):
         )
         return Response(max_asn + 1)
 
+    @action(detail=True, methods=["GET"], name="Get AI Suggestions")
+    def ai_suggestions(self, request, pk=None):
+        """
+        Get AI suggestions for a document.
+        
+        Returns AI-generated suggestions for tags, correspondent, document type,
+        storage path, custom fields, workflows, and title.
+        """
+        from documents.ai_scanner import get_ai_scanner
+        from documents.serializers.ai_suggestions import AISuggestionsSerializer
+        
+        try:
+            document = self.get_object()
+            
+            # Check if document has content to scan
+            if not document.content:
+                return Response(
+                    {"detail": "Document has no content to analyze"},
+                    status=400,
+                )
+            
+            # Get AI scanner instance
+            scanner = get_ai_scanner()
+            
+            # Perform AI scan
+            scan_result = scanner.scan_document(
+                document=document,
+                document_text=document.content,
+                original_file_path=document.source_path if hasattr(document, 'source_path') else None,
+            )
+            
+            # Convert scan result to serializable format
+            data = AISuggestionsSerializer.from_scan_result(scan_result, document.id)
+            
+            # Serialize and return
+            serializer = AISuggestionsSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            
+            return Response(serializer.validated_data)
+            
+        except Exception as e:
+            logger.error(f"Error getting AI suggestions for document {pk}: {e}", exc_info=True)
+            return Response(
+                {"detail": "Error generating AI suggestions. Please check the logs for details."},
+                status=500,
+            )
+
+    @action(detail=True, methods=["POST"], name="Apply AI Suggestion")
+    def apply_suggestion(self, request, pk=None):
+        """
+        Apply an AI suggestion to a document.
+        
+        Records user feedback and applies the suggested change.
+        """
+        from documents.models import AISuggestionFeedback
+        from documents.serializers.ai_suggestions import ApplySuggestionSerializer
+        
+        try:
+            document = self.get_object()
+            
+            # Validate input
+            serializer = ApplySuggestionSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            
+            suggestion_type = serializer.validated_data['suggestion_type']
+            value_id = serializer.validated_data.get('value_id')
+            value_text = serializer.validated_data.get('value_text')
+            confidence = serializer.validated_data['confidence']
+            
+            # Apply the suggestion based on type
+            applied = False
+            result_message = ""
+            
+            if suggestion_type == 'tag' and value_id:
+                tag = Tag.objects.get(pk=value_id)
+                document.tags.add(tag)
+                applied = True
+                result_message = f"Tag '{tag.name}' applied"
+                
+            elif suggestion_type == 'correspondent' and value_id:
+                correspondent = Correspondent.objects.get(pk=value_id)
+                document.correspondent = correspondent
+                document.save()
+                applied = True
+                result_message = f"Correspondent '{correspondent.name}' applied"
+                
+            elif suggestion_type == 'document_type' and value_id:
+                doc_type = DocumentType.objects.get(pk=value_id)
+                document.document_type = doc_type
+                document.save()
+                applied = True
+                result_message = f"Document type '{doc_type.name}' applied"
+                
+            elif suggestion_type == 'storage_path' and value_id:
+                storage_path = StoragePath.objects.get(pk=value_id)
+                document.storage_path = storage_path
+                document.save()
+                applied = True
+                result_message = f"Storage path '{storage_path.name}' applied"
+                
+            elif suggestion_type == 'title' and value_text:
+                document.title = value_text
+                document.save()
+                applied = True
+                result_message = f"Title updated to '{value_text}'"
+            
+            if applied:
+                # Record feedback
+                AISuggestionFeedback.objects.create(
+                    document=document,
+                    suggestion_type=suggestion_type,
+                    suggested_value_id=value_id,
+                    suggested_value_text=value_text or "",
+                    confidence=confidence,
+                    status=AISuggestionFeedback.STATUS_APPLIED,
+                    user=request.user,
+                )
+                
+                return Response({
+                    "status": "success",
+                    "message": result_message,
+                })
+            else:
+                return Response(
+                    {"detail": "Invalid suggestion type or missing value"},
+                    status=400,
+                )
+                
+        except (Tag.DoesNotExist, Correspondent.DoesNotExist, 
+                DocumentType.DoesNotExist, StoragePath.DoesNotExist):
+            return Response(
+                {"detail": "Referenced object not found"},
+                status=404,
+            )
+        except Exception as e:
+            logger.error(f"Error applying suggestion for document {pk}: {e}", exc_info=True)
+            return Response(
+                {"detail": "Error applying suggestion. Please check the logs for details."},
+                status=500,
+            )
+
+    @action(detail=True, methods=["POST"], name="Reject AI Suggestion")
+    def reject_suggestion(self, request, pk=None):
+        """
+        Reject an AI suggestion for a document.
+        
+        Records user feedback for improving AI accuracy.
+        """
+        from documents.models import AISuggestionFeedback
+        from documents.serializers.ai_suggestions import RejectSuggestionSerializer
+        
+        try:
+            document = self.get_object()
+            
+            # Validate input
+            serializer = RejectSuggestionSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            
+            suggestion_type = serializer.validated_data['suggestion_type']
+            value_id = serializer.validated_data.get('value_id')
+            value_text = serializer.validated_data.get('value_text')
+            confidence = serializer.validated_data['confidence']
+            
+            # Record feedback
+            AISuggestionFeedback.objects.create(
+                document=document,
+                suggestion_type=suggestion_type,
+                suggested_value_id=value_id,
+                suggested_value_text=value_text or "",
+                confidence=confidence,
+                status=AISuggestionFeedback.STATUS_REJECTED,
+                user=request.user,
+            )
+            
+            return Response({
+                "status": "success",
+                "message": "Suggestion rejected and feedback recorded",
+            })
+            
+        except Exception as e:
+            logger.error(f"Error rejecting suggestion for document {pk}: {e}", exc_info=True)
+            return Response(
+                {"detail": "Error rejecting suggestion. Please check the logs for details."},
+                status=500,
+            )
+
+    @action(detail=False, methods=["GET"], name="AI Suggestion Statistics")
+    def ai_suggestion_stats(self, request):
+        """
+        Get statistics about AI suggestion accuracy.
+        
+        Returns aggregated data about applied vs rejected suggestions,
+        accuracy rates, and confidence scores.
+        """
+        from django.db.models import Avg, Count, Q
+        from documents.models import AISuggestionFeedback
+        from documents.serializers.ai_suggestions import AISuggestionStatsSerializer
+        
+        try:
+            # Get overall counts
+            total_feedbacks = AISuggestionFeedback.objects.count()
+            total_applied = AISuggestionFeedback.objects.filter(
+                status=AISuggestionFeedback.STATUS_APPLIED
+            ).count()
+            total_rejected = AISuggestionFeedback.objects.filter(
+                status=AISuggestionFeedback.STATUS_REJECTED
+            ).count()
+            
+            # Calculate accuracy rate
+            accuracy_rate = (total_applied / total_feedbacks * 100) if total_feedbacks > 0 else 0
+            
+            # Get statistics by suggestion type using a single aggregated query
+            stats_by_type = AISuggestionFeedback.objects.values('suggestion_type').annotate(
+                total=Count('id'),
+                applied=Count('id', filter=Q(status=AISuggestionFeedback.STATUS_APPLIED)),
+                rejected=Count('id', filter=Q(status=AISuggestionFeedback.STATUS_REJECTED))
+            )
+            
+            # Build the by_type dictionary using the aggregated results
+            by_type = {}
+            for stat in stats_by_type:
+                suggestion_type = stat['suggestion_type']
+                type_total = stat['total']
+                type_applied = stat['applied']
+                type_rejected = stat['rejected']
+                
+                by_type[suggestion_type] = {
+                    'total': type_total,
+                    'applied': type_applied,
+                    'rejected': type_rejected,
+                    'accuracy_rate': (type_applied / type_total * 100) if type_total > 0 else 0,
+                }
+            
+            # Get average confidence scores
+            avg_confidence_applied = AISuggestionFeedback.objects.filter(
+                status=AISuggestionFeedback.STATUS_APPLIED
+            ).aggregate(Avg('confidence'))['confidence__avg'] or 0.0
+            
+            avg_confidence_rejected = AISuggestionFeedback.objects.filter(
+                status=AISuggestionFeedback.STATUS_REJECTED
+            ).aggregate(Avg('confidence'))['confidence__avg'] or 0.0
+            
+            # Get recent suggestions (last 10)
+            recent_suggestions = AISuggestionFeedback.objects.order_by('-created_at')[:10]
+            
+            # Build response data
+            from documents.serializers.ai_suggestions import AISuggestionFeedbackSerializer
+            data = {
+                'total_suggestions': total_feedbacks,
+                'total_applied': total_applied,
+                'total_rejected': total_rejected,
+                'accuracy_rate': accuracy_rate,
+                'by_type': by_type,
+                'average_confidence_applied': avg_confidence_applied,
+                'average_confidence_rejected': avg_confidence_rejected,
+                'recent_suggestions': AISuggestionFeedbackSerializer(
+                    recent_suggestions, many=True
+                ).data,
+            }
+            
+            # Serialize and return
+            serializer = AISuggestionStatsSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            
+            return Response(serializer.validated_data)
+            
+        except Exception as e:
+            logger.error(f"Error getting AI suggestion statistics: {e}", exc_info=True)
+            return Response(
+                {"detail": "Error getting statistics. Please check the logs for details."},
+                status=500,
+            )
+
 
 @extend_schema_view(
     list=extend_schema(
