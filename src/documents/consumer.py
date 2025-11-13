@@ -768,6 +768,11 @@ class ConsumerPlugin(
             document: The Document model instance
             text: The extracted document text
         """
+        # Check if AI scanner is enabled
+        if not settings.PAPERLESS_ENABLE_AI_SCANNER:
+            self.log.debug("AI scanner is disabled, skipping AI analysis")
+            return
+
         try:
             from documents.ai_scanner import get_ai_scanner
 
