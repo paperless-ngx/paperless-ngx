@@ -169,7 +169,6 @@ from documents.serialisers import BulkEditObjectsSerializer
 from documents.serialisers import BulkEditSerializer
 from documents.serialisers import CorrespondentSerializer
 from documents.serialisers import CustomFieldSerializer
-from documents.serialisers import DeletionApprovalSerializer
 from documents.serialisers import DocumentListSerializer
 from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
@@ -3435,67 +3434,4 @@ class AIConfigurationView(GenericAPIView):
             "message": "AI configuration updated. Changes may require server restart for consistency."
         })
 
-
-class DeletionApprovalView(GenericAPIView):
-    """
-    API view to approve/reject deletion requests.
-
-    Requires: can_approve_deletions permission
-    """
-    
-    permission_classes = [IsAuthenticated, CanApproveDeletionsPermission]
-    
-    def post(self, request):
-        """Approve or reject a deletion request."""
-        serializer = DeletionApprovalSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        
-        request_id = serializer.validated_data['request_id']
-        action = serializer.validated_data['action']
-        reason = serializer.validated_data.get('reason', '')
-        
-        try:
-            deletion_request = DeletionRequest.objects.get(pk=request_id)
-        except DeletionRequest.DoesNotExist:
-            return Response(
-                {"error": "Deletion request not found"},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        
-        # Permission is handled by the permission class; users with the permission
-        # can approve any deletion request. Additional ownership check for non-superusers.
-        if deletion_request.user != request.user and not request.user.is_superuser:
-            return Response(
-                {"error": "Permission denied"},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        
-        if action == "approve":
-            deletion_request.status = DeletionRequest.STATUS_APPROVED
-            # TODO: Store approval reason for audit trail
-            # deletion_request.approval_reason = reason
-            # deletion_request.reviewed_at = timezone.now()
-            # deletion_request.reviewed_by = request.user
-            deletion_request.save()
-            
-            # Perform the actual deletion
-            # This would integrate with the AI deletion manager
-            return Response({
-                "status": "success",
-                "message": "Deletion request approved",
-                "request_id": request_id
-            })
-        else:  # action == "reject"
-            deletion_request.status = DeletionRequest.STATUS_REJECTED
-            # TODO: Store rejection reason for audit trail
-            # deletion_request.rejection_reason = reason
-            # deletion_request.reviewed_at = timezone.now()
-            # deletion_request.reviewed_by = request.user
-            deletion_request.save()
-            
-            return Response({
-                "status": "success",
-                "message": "Deletion request rejected",
-                "request_id": request_id
-            })
 

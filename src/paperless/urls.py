@@ -23,7 +23,6 @@ from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
 from documents.views import CorrespondentViewSet
 from documents.views import CustomFieldViewSet
-from documents.views import DeletionApprovalView
 from documents.views import DocumentTypeViewSet
 from documents.views import GlobalSearchView
 from documents.views import IndexView
@@ -224,11 +223,6 @@ urlpatterns = [
                                 "^config/$",
                                 AIConfigurationView.as_view(),
                                 name="ai_config",
-                            ),
-                            re_path(
-                                "^deletions/approve/$",
-                                DeletionApprovalView.as_view(),
-                                name="ai_deletion_approval",
                             ),
                         ],
                     ),

@@ -2754,6 +2754,8 @@ class DeletionRequestSerializer(serializers.ModelSerializer):
             }
             for doc in documents
         ]
+
+
 class AISuggestionsRequestSerializer(serializers.Serializer):
     """Serializer for requesting AI suggestions for a document."""
 
@@ -2851,26 +2853,4 @@ class AIConfigurationSerializer(serializers.Serializer):
         required=False,
         label="Advanced OCR Enabled",
         help_text="Enable/disable advanced OCR features",
-    )
-
-
-class DeletionApprovalSerializer(serializers.Serializer):
-    """Serializer for approving/rejecting deletion requests."""
-
-    request_id = serializers.IntegerField(
-        required=True,
-        label="Request ID",
-        help_text="ID of the deletion request",
-    )
-    action = serializers.ChoiceField(
-        choices=["approve", "reject"],
-        required=True,
-        label="Action",
-        help_text="Action to take on the deletion request",
-    )
-    reason = serializers.CharField(
-        required=False,
-        allow_blank=True,
-        label="Reason",
-        help_text="Reason for approval/rejection (optional)",
     )
