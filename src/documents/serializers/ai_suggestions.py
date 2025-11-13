@@ -15,12 +15,29 @@ from documents.models import (
     AISuggestionFeedback,
     Correspondent,
     CustomField,
-    Document,
     DocumentType,
     StoragePath,
     Tag,
     Workflow,
 )
+
+
+# Suggestion type choices - used across multiple serializers
+SUGGESTION_TYPE_CHOICES = [
+    'tag',
+    'correspondent',
+    'document_type',
+    'storage_path',
+    'custom_field',
+    'workflow',
+    'title',
+]
+
+# Types that require value_id
+ID_REQUIRED_TYPES = ['tag', 'correspondent', 'document_type', 'storage_path', 'workflow']
+# Types that require value_text
+TEXT_REQUIRED_TYPES = ['title']
+# Types that can use either (custom_field can be ID or text)
 
 
 class TagSuggestionSerializer(serializers.Serializer):
@@ -122,6 +139,7 @@ class AISuggestionsSerializer(serializers.Serializer):
                         'confidence': confidence,
                     })
                 except Tag.DoesNotExist:
+                    # Tag no longer exists in database; skip this suggestion
                     pass
             data['tags'] = tag_suggestions
         
@@ -136,6 +154,7 @@ class AISuggestionsSerializer(serializers.Serializer):
                     'confidence': confidence,
                 }
             except Correspondent.DoesNotExist:
+                # Correspondent no longer exists in database; omit from suggestions
                 pass
         
         # Document Type
@@ -149,6 +168,7 @@ class AISuggestionsSerializer(serializers.Serializer):
                     'confidence': confidence,
                 }
             except DocumentType.DoesNotExist:
+                # Document type no longer exists in database; omit from suggestions
                 pass
         
         # Storage Path
@@ -163,6 +183,7 @@ class AISuggestionsSerializer(serializers.Serializer):
                     'confidence': confidence,
                 }
             except StoragePath.DoesNotExist:
+                # Storage path no longer exists in database; omit from suggestions
                 pass
         
         # Custom Fields
@@ -178,6 +199,7 @@ class AISuggestionsSerializer(serializers.Serializer):
                         'confidence': confidence,
                     })
                 except CustomField.DoesNotExist:
+                    # Custom field no longer exists in database; skip this suggestion
                     pass
             data['custom_fields'] = field_suggestions
         
@@ -193,6 +215,7 @@ class AISuggestionsSerializer(serializers.Serializer):
                         'confidence': confidence,
                     })
                 except Workflow.DoesNotExist:
+                    # Workflow no longer exists in database; skip this suggestion
                     pass
             data['workflows'] = workflow_suggestions
         
@@ -205,66 +228,65 @@ class AISuggestionsSerializer(serializers.Serializer):
         return data
 
 
-class ApplySuggestionSerializer(serializers.Serializer):
+class SuggestionSerializerMixin:
+    """
+    Mixin to provide validation logic for suggestion serializers.
+    """
+    def validate(self, attrs):
+        """Validate that the correct value field is provided for the suggestion type."""
+        suggestion_type = attrs.get('suggestion_type')
+        value_id = attrs.get('value_id')
+        value_text = attrs.get('value_text')
+        
+        # Types that require value_id
+        if suggestion_type in ID_REQUIRED_TYPES and not value_id:
+            raise serializers.ValidationError(
+                f"value_id is required for suggestion_type '{suggestion_type}'"
+            )
+        
+        # Types that require value_text
+        if suggestion_type in TEXT_REQUIRED_TYPES and not value_text:
+            raise serializers.ValidationError(
+                f"value_text is required for suggestion_type '{suggestion_type}'"
+            )
+        
+        # For custom_field, either is acceptable
+        if suggestion_type == 'custom_field' and not value_id and not value_text:
+            raise serializers.ValidationError(
+                "Either value_id or value_text must be provided for custom_field"
+            )
+        
+        return attrs
+
+
+class ApplySuggestionSerializer(SuggestionSerializerMixin, serializers.Serializer):
     """
     Serializer for applying AI suggestions.
     """
     
     suggestion_type = serializers.ChoiceField(
-        choices=[
-            'tag',
-            'correspondent',
-            'document_type',
-            'storage_path',
-            'custom_field',
-            'workflow',
-            'title',
-        ],
+        choices=SUGGESTION_TYPE_CHOICES,
         required=True,
     )
     
     value_id = serializers.IntegerField(required=False, allow_null=True)
     value_text = serializers.CharField(required=False, allow_blank=True)
     confidence = serializers.FloatField(required=True)
-    
-    def validate(self, attrs):
-        """Validate that at least one value field is provided."""
-        if not attrs.get('value_id') and not attrs.get('value_text'):
-            raise serializers.ValidationError(
-                "Either value_id or value_text must be provided"
-            )
-        return attrs
 
 
-class RejectSuggestionSerializer(serializers.Serializer):
+class RejectSuggestionSerializer(SuggestionSerializerMixin, serializers.Serializer):
     """
     Serializer for rejecting AI suggestions.
     """
     
     suggestion_type = serializers.ChoiceField(
-        choices=[
-            'tag',
-            'correspondent',
-            'document_type',
-            'storage_path',
-            'custom_field',
-            'workflow',
-            'title',
-        ],
+        choices=SUGGESTION_TYPE_CHOICES,
         required=True,
     )
     
     value_id = serializers.IntegerField(required=False, allow_null=True)
     value_text = serializers.CharField(required=False, allow_blank=True)
     confidence = serializers.FloatField(required=True)
-    
-    def validate(self, attrs):
-        """Validate that at least one value field is provided."""
-        if not attrs.get('value_id') and not attrs.get('value_text'):
-            raise serializers.ValidationError(
-                "Either value_id or value_text must be provided"
-            )
-        return attrs
 
 
 class AISuggestionFeedbackSerializer(serializers.ModelSerializer):

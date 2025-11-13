@@ -5,7 +5,6 @@ Tests for AI Suggestions API endpoints.
 from unittest import mock
 
 from django.contrib.auth.models import User
-from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 

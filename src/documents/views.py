@@ -1386,8 +1386,6 @@ class UnifiedSearchViewSet(DocumentViewSet):
             
             return Response(serializer.validated_data)
             
-        except Document.DoesNotExist:
-            return Response({"detail": "Document not found"}, status=404)
         except Exception as e:
             logger.error(f"Error getting AI suggestions for document {pk}: {e}", exc_info=True)
             return Response(
@@ -1559,19 +1557,20 @@ class UnifiedSearchViewSet(DocumentViewSet):
             # Calculate accuracy rate
             accuracy_rate = (total_applied / total_feedbacks * 100) if total_feedbacks > 0 else 0
             
-            # Get statistics by suggestion type
+            # Get statistics by suggestion type using a single aggregated query
+            stats_by_type = AISuggestionFeedback.objects.values('suggestion_type').annotate(
+                total=Count('id'),
+                applied=Count('id', filter=Q(status=AISuggestionFeedback.STATUS_APPLIED)),
+                rejected=Count('id', filter=Q(status=AISuggestionFeedback.STATUS_REJECTED))
+            )
+            
+            # Build the by_type dictionary using the aggregated results
             by_type = {}
-            for suggestion_type, _ in AISuggestionFeedback.SUGGESTION_TYPES:
-                type_feedbacks = AISuggestionFeedback.objects.filter(
-                    suggestion_type=suggestion_type
-                )
-                type_applied = type_feedbacks.filter(
-                    status=AISuggestionFeedback.STATUS_APPLIED
-                ).count()
-                type_rejected = type_feedbacks.filter(
-                    status=AISuggestionFeedback.STATUS_REJECTED
-                ).count()
-                type_total = type_applied + type_rejected
+            for stat in stats_by_type:
+                suggestion_type = stat['suggestion_type']
+                type_total = stat['total']
+                type_applied = stat['applied']
+                type_rejected = stat['rejected']
                 
                 by_type[suggestion_type] = {
                     'total': type_total,

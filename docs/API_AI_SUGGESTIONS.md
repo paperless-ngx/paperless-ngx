@@ -108,16 +108,16 @@ Apply an AI suggestion to a document and record user feedback.
 }
 ```
 
-**Suggestion Types:**
+**Supported Suggestion Types:**
 - `tag` - Tag assignment
 - `correspondent` - Correspondent assignment
 - `document_type` - Document type classification
 - `storage_path` - Storage path assignment
-- `custom_field` - Custom field value
-- `workflow` - Workflow assignment
 - `title` - Document title
 
-**For ID-based suggestions (tag, correspondent, document_type, storage_path, workflow):**
+**Note:** Custom field and workflow suggestions are supported in the API response but not yet implemented in the apply endpoint.
+
+**For ID-based suggestions (tag, correspondent, document_type, storage_path):**
 ```json
 {
   "suggestion_type": "correspondent",
@@ -126,7 +126,7 @@ Apply an AI suggestion to a document and record user feedback.
 }
 ```
 
-**For text-based suggestions (title, custom_field):**
+**For text-based suggestions (title):**
 ```json
 {
   "suggestion_type": "title",
