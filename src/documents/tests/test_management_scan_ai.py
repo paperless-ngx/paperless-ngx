@@ -71,7 +71,9 @@ class TestScanDocumentsAICommand(DirectoriesMixin, TestCase):
     def test_command_all_flag(self):
         """Test command with --all flag."""
         # Mock the AI scanner
-        with mock.patch("documents.management.commands.scan_documents_ai.get_ai_scanner") as mock_scanner:
+        with mock.patch(
+            "documents.management.commands.scan_documents_ai.get_ai_scanner"
+        ) as mock_scanner:
             mock_instance = mock.Mock()
             mock_scanner.return_value = mock_instance
 
@@ -95,7 +97,9 @@ class TestScanDocumentsAICommand(DirectoriesMixin, TestCase):
 
     def test_command_filter_by_type(self):
         """Test command with --filter-by-type option."""
-        with mock.patch("documents.management.commands.scan_documents_ai.get_ai_scanner") as mock_scanner:
+        with mock.patch(
+            "documents.management.commands.scan_documents_ai.get_ai_scanner"
+        ) as mock_scanner:
             mock_instance = mock.Mock()
             mock_scanner.return_value = mock_instance
 
@@ -129,7 +133,9 @@ class TestScanDocumentsAICommand(DirectoriesMixin, TestCase):
 
     def test_command_date_range(self):
         """Test command with --date-range option."""
-        with mock.patch("documents.management.commands.scan_documents_ai.get_ai_scanner") as mock_scanner:
+        with mock.patch(
+            "documents.management.commands.scan_documents_ai.get_ai_scanner"
+        ) as mock_scanner:
             mock_instance = mock.Mock()
             mock_scanner.return_value = mock_instance
 
@@ -182,7 +188,9 @@ class TestScanDocumentsAICommand(DirectoriesMixin, TestCase):
 
     def test_command_id_range(self):
         """Test command with --id-range option."""
-        with mock.patch("documents.management.commands.scan_documents_ai.get_ai_scanner") as mock_scanner:
+        with mock.patch(
+            "documents.management.commands.scan_documents_ai.get_ai_scanner"
+        ) as mock_scanner:
             mock_instance = mock.Mock()
             mock_scanner.return_value = mock_instance
 
@@ -205,7 +213,9 @@ class TestScanDocumentsAICommand(DirectoriesMixin, TestCase):
 
     def test_command_confidence_threshold(self):
         """Test command with custom confidence threshold."""
-        with mock.patch("documents.management.commands.scan_documents_ai.get_ai_scanner") as mock_scanner:
+        with mock.patch(
+            "documents.management.commands.scan_documents_ai.get_ai_scanner"
+        ) as mock_scanner:
             mock_instance = mock.Mock()
             mock_scanner.return_value = mock_instance
 
@@ -244,7 +254,9 @@ class TestScanDocumentsAICommand(DirectoriesMixin, TestCase):
 
     def test_command_auto_apply(self):
         """Test command with --auto-apply-high-confidence."""
-        with mock.patch("documents.management.commands.scan_documents_ai.get_ai_scanner") as mock_scanner:
+        with mock.patch(
+            "documents.management.commands.scan_documents_ai.get_ai_scanner"
+        ) as mock_scanner:
             mock_instance = mock.Mock()
             mock_scanner.return_value = mock_instance
 
@@ -277,7 +289,9 @@ class TestScanDocumentsAICommand(DirectoriesMixin, TestCase):
 
     def test_command_dry_run_does_not_apply(self):
         """Test that dry run mode does not apply changes."""
-        with mock.patch("documents.management.commands.scan_documents_ai.get_ai_scanner") as mock_scanner:
+        with mock.patch(
+            "documents.management.commands.scan_documents_ai.get_ai_scanner"
+        ) as mock_scanner:
             mock_instance = mock.Mock()
             mock_scanner.return_value = mock_instance
 
@@ -311,7 +325,9 @@ class TestScanDocumentsAICommand(DirectoriesMixin, TestCase):
             checksum="EMPTY123",
         )
 
-        with mock.patch("documents.management.commands.scan_documents_ai.get_ai_scanner") as mock_scanner:
+        with mock.patch(
+            "documents.management.commands.scan_documents_ai.get_ai_scanner"
+        ) as mock_scanner:
             mock_instance = mock.Mock()
             mock_scanner.return_value = mock_instance
 
@@ -334,7 +350,9 @@ class TestScanDocumentsAICommand(DirectoriesMixin, TestCase):
 
     def test_command_handles_scanner_error(self):
         """Test that command handles scanner errors gracefully."""
-        with mock.patch("documents.management.commands.scan_documents_ai.get_ai_scanner") as mock_scanner:
+        with mock.patch(
+            "documents.management.commands.scan_documents_ai.get_ai_scanner"
+        ) as mock_scanner:
             mock_instance = mock.Mock()
             mock_scanner.return_value = mock_instance
 
@@ -365,7 +383,9 @@ class TestScanDocumentsAICommand(DirectoriesMixin, TestCase):
                 checksum=f"BATCH{i}",
             )
 
-        with mock.patch("documents.management.commands.scan_documents_ai.get_ai_scanner") as mock_scanner:
+        with mock.patch(
+            "documents.management.commands.scan_documents_ai.get_ai_scanner"
+        ) as mock_scanner:
             mock_instance = mock.Mock()
             mock_scanner.return_value = mock_instance
 
@@ -388,7 +408,9 @@ class TestScanDocumentsAICommand(DirectoriesMixin, TestCase):
 
     def test_command_displays_suggestions(self):
         """Test that command displays suggestions in output."""
-        with mock.patch("documents.management.commands.scan_documents_ai.get_ai_scanner") as mock_scanner:
+        with mock.patch(
+            "documents.management.commands.scan_documents_ai.get_ai_scanner"
+        ) as mock_scanner:
             mock_instance = mock.Mock()
             mock_scanner.return_value = mock_instance
 
@@ -421,7 +443,9 @@ class TestScanDocumentsAICommand(DirectoriesMixin, TestCase):
     @override_settings(PAPERLESS_ENABLE_AI_SCANNER=False)
     def test_command_works_when_ai_disabled(self):
         """Test that command can run even if AI scanner is disabled in settings."""
-        with mock.patch("documents.management.commands.scan_documents_ai.get_ai_scanner") as mock_scanner:
+        with mock.patch(
+            "documents.management.commands.scan_documents_ai.get_ai_scanner"
+        ) as mock_scanner:
             mock_instance = mock.Mock()
             mock_scanner.return_value = mock_instance
 

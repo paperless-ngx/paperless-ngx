@@ -28,7 +28,7 @@ logger = logging.getLogger("paperless.management.scan_documents_ai")
 class Command(ProgressBarMixin, BaseCommand):
     """
     Management command to apply AI scanner to existing documents.
-    
+
     This command processes existing documents through the comprehensive AI scanner
     to generate metadata suggestions (tags, correspondents, document types, etc.).
     """
@@ -127,7 +127,9 @@ class Command(ProgressBarMixin, BaseCommand):
 
         if document_count == 0:
             self.stdout.write(
-                self.style.WARNING("No documents found matching the specified filters."),
+                self.style.WARNING(
+                    "No documents found matching the specified filters."
+                ),
             )
             return
 
@@ -153,12 +155,14 @@ class Command(ProgressBarMixin, BaseCommand):
     def _validate_arguments(self, options):
         """Validate command line arguments."""
         # At least one filter must be specified
-        if not any([
-            options["all"],
-            options["filter_by_type"],
-            options["date_range"],
-            options["id_range"],
-        ]):
+        if not any(
+            [
+                options["all"],
+                options["filter_by_type"],
+                options["date_range"],
+                options["id_range"],
+            ]
+        ):
             raise CommandError(
                 "You must specify at least one filter: "
                 "--all, --filter-by-type, --date-range, or --id-range",
@@ -242,7 +246,9 @@ class Command(ProgressBarMixin, BaseCommand):
         # Display processing mode
         self.stdout.write("\nProcessing mode:")
         if options["dry_run"]:
-            self.stdout.write(self.style.WARNING("  • DRY RUN - No changes will be applied"))
+            self.stdout.write(
+                self.style.WARNING("  • DRY RUN - No changes will be applied")
+            )
         elif options["auto_apply_high_confidence"]:
             self.stdout.write("  • Auto-apply high confidence suggestions (≥80%)")
         else:
@@ -266,7 +272,7 @@ class Command(ProgressBarMixin, BaseCommand):
     ) -> dict[str, Any]:
         """
         Process documents through the AI scanner.
-        
+
         Returns:
             Dictionary with processing results and statistics
         """
@@ -291,7 +297,7 @@ class Command(ProgressBarMixin, BaseCommand):
             disable=self.no_progress_bar,
             desc="Processing batches",
         ):
-            batch = queryset[i:i + batch_size]
+            batch = queryset[i : i + batch_size]
 
             for document in batch:
                 try:
@@ -334,26 +340,29 @@ class Command(ProgressBarMixin, BaseCommand):
                             )
 
                         # Store for summary
-                        results["documents_with_suggestions"].append({
-                            "id": document.id,
-                            "title": document.title,
-                            "suggestions": filtered_result.to_dict(),
-                            "applied": applied if auto_apply else None,
-                        })
+                        results["documents_with_suggestions"].append(
+                            {
+                                "id": document.id,
+                                "title": document.title,
+                                "suggestions": filtered_result.to_dict(),
+                                "applied": applied if auto_apply else None,
+                            }
+                        )
 
                     results["processed"] += 1
 
                 except Exception as e:
-                    logger.error(
+                    logger.exception(
                         f"Error processing document {document.id}: {e}",
-                        exc_info=True,
                     )
                     results["errors"] += 1
-                    results["error_documents"].append({
-                        "id": document.id,
-                        "title": document.title,
-                        "error": str(e),
-                    })
+                    results["error_documents"].append(
+                        {
+                            "id": document.id,
+                            "title": document.title,
+                            "error": str(e),
+                        }
+                    )
 
         return results
 
@@ -367,25 +376,24 @@ class Command(ProgressBarMixin, BaseCommand):
 
         # Filter tags
         filtered.tags = [
-            (tag_id, conf) for tag_id, conf in scan_result.tags
-            if conf >= threshold
+            (tag_id, conf) for tag_id, conf in scan_result.tags if conf >= threshold
         ]
 
         # Filter correspondent
         if scan_result.correspondent:
-            corr_id, conf = scan_result.correspondent
+            _corr_id, conf = scan_result.correspondent
             if conf >= threshold:
                 filtered.correspondent = scan_result.correspondent
 
         # Filter document type
         if scan_result.document_type:
-            type_id, conf = scan_result.document_type
+            _type_id, conf = scan_result.document_type
             if conf >= threshold:
                 filtered.document_type = scan_result.document_type
 
         # Filter storage path
         if scan_result.storage_path:
-            path_id, conf = scan_result.storage_path
+            _path_id, conf = scan_result.storage_path
             if conf >= threshold:
                 filtered.storage_path = scan_result.storage_path
 
@@ -396,8 +404,7 @@ class Command(ProgressBarMixin, BaseCommand):
 
         # Filter workflows
         filtered.workflows = [
-            (wf_id, conf) for wf_id, conf in scan_result.workflows
-            if conf >= threshold
+            (wf_id, conf) for wf_id, conf in scan_result.workflows if conf >= threshold
         ]
 
         # Copy other fields as-is
@@ -428,12 +435,18 @@ class Command(ProgressBarMixin, BaseCommand):
         # Display statistics
         self.stdout.write("Statistics:")
         self.stdout.write(f"  • Documents processed: {results['processed']}")
-        self.stdout.write(f"  • Documents with suggestions: {len(results['documents_with_suggestions'])}")
-        self.stdout.write(f"  • Total suggestions generated: {results['suggestions_generated']}")
+        self.stdout.write(
+            f"  • Documents with suggestions: {len(results['documents_with_suggestions'])}"
+        )
+        self.stdout.write(
+            f"  • Total suggestions generated: {results['suggestions_generated']}"
+        )
 
         if options["auto_apply_high_confidence"] and not options["dry_run"]:
             self.stdout.write(
-                self.style.SUCCESS(f"  • Suggestions auto-applied: {results['auto_applied']}"),
+                self.style.SUCCESS(
+                    f"  • Suggestions auto-applied: {results['auto_applied']}"
+                ),
             )
 
         if results["errors"] > 0:
