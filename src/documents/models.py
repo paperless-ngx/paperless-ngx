@@ -1847,7 +1847,3 @@ class AISuggestionFeedback(models.Model):
     
     def __str__(self):
         return f"{self.suggestion_type} suggestion for document {self.document_id} - {self.status}"
-
-
-# Import webhook models so Django recognizes them
-from documents.webhooks import AIWebhookEvent, AIWebhookConfig  # noqa: E402, F401

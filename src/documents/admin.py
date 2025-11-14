@@ -16,7 +16,6 @@ from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.tasks import update_document_parent_tags
-from documents.webhooks import AIWebhookEvent, AIWebhookConfig
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.admin import LogEntryAdmin
@@ -219,57 +218,6 @@ admin.site.register(Note, NotesAdmin)
 admin.site.register(ShareLink, ShareLinksAdmin)
 admin.site.register(CustomField, CustomFieldsAdmin)
 admin.site.register(CustomFieldInstance, CustomFieldInstancesAdmin)
-
-
-class AIWebhookEventAdmin(admin.ModelAdmin):
-    list_display = ("event_type", "webhook_url", "status", "attempts", "created_at", "completed_at")
-    list_filter = ("event_type", "status", "created_at")
-    search_fields = ("webhook_url", "error_message")
-    readonly_fields = ("event_type", "webhook_url", "payload", "created_at", "last_attempt_at",
-                       "response_status_code", "response_body", "error_message", "completed_at", "attempts")
-    ordering = ("-created_at",)
-    
-    def has_add_permission(self, request):
-        # Webhook events are created automatically, not manually
-        return False
-    
-    def has_change_permission(self, request, obj=None):
-        # Events are read-only
-        return False
-
-
-class AIWebhookConfigAdmin(admin.ModelAdmin):
-    list_display = ("name", "enabled", "url", "max_retries", "created_at")
-    list_filter = ("enabled", "created_at")
-    search_fields = ("name", "url")
-    readonly_fields = ("created_at", "updated_at")
-    fieldsets = (
-        ("Basic Information", {
-            "fields": ("name", "enabled", "url")
-        }),
-        ("Event Configuration", {
-            "fields": ("events",)
-        }),
-        ("Request Configuration", {
-            "fields": ("headers", "secret", "timeout")
-        }),
-        ("Retry Configuration", {
-            "fields": ("max_retries", "retry_delay")
-        }),
-        ("Metadata", {
-            "fields": ("created_by", "created_at", "updated_at"),
-            "classes": ("collapse",)
-        }),
-    )
-    
-    def save_model(self, request, obj, form, change):
-        if not change:  # Only set created_by when creating
-            obj.created_by = request.user
-        super().save_model(request, obj, form, change)
-
-
-admin.site.register(AIWebhookEvent, AIWebhookEventAdmin)
-admin.site.register(AIWebhookConfig, AIWebhookConfigAdmin)
 
 if settings.AUDIT_LOG_ENABLED:
 
