@@ -286,16 +286,18 @@ class ConsumerPlugin(
         Return the document object if it was successfully created.
         """
 
-        # Preflight has already run including progress update to 0%
-        self.log.info(f"Consuming {self.filename}")
+        tempdir = None
 
-        # For the actual work, copy the file into a tempdir
-        # Use context manager to ensure cleanup happens automatically
-        with tempfile.TemporaryDirectory(
-            prefix="paperless-ngx",
-            dir=settings.SCRATCH_DIR,
-        ) as tempdir_path:
-            self.working_copy = Path(tempdir_path) / Path(self.filename)
+        try:
+            # Preflight has already run including progress update to 0%
+            self.log.info(f"Consuming {self.filename}")
+
+            # For the actual work, copy the file into a tempdir
+            tempdir = tempfile.TemporaryDirectory(
+                prefix="paperless-ngx",
+                dir=settings.SCRATCH_DIR,
+            )
+            self.working_copy = Path(tempdir.name) / Path(self.filename)
             copy_file_with_basic_stats(self.input_doc.original_file, self.working_copy)
             self.unmodified_original = None
 
@@ -408,7 +410,7 @@ class ConsumerPlugin(
                     self.log.debug(f"Detected mime type after qpdf: {mime_type}")
                     # Save the original file for later
                     self.unmodified_original = (
-                        Path(tempdir_path) / Path("uo") / Path(self.filename)
+                        Path(tempdir.name) / Path("uo") / Path(self.filename)
                     )
                     self.unmodified_original.parent.mkdir(exist_ok=True)
                     copy_file_with_basic_stats(
@@ -423,6 +425,7 @@ class ConsumerPlugin(
                 mime_type,
             )
             if not parser_class:
+                tempdir.cleanup()
                 self._fail(
                     ConsumerStatusShortMessage.UNSUPPORTED_TYPE,
                     f"Unsupported mime type {mime_type}",
@@ -437,227 +440,231 @@ class ConsumerPlugin(
             )
 
             self.run_pre_consume_script()
+        except:
+            if tempdir:
+                tempdir.cleanup()
+            raise
 
-            def progress_callback(current_progress, max_progress):  # pragma: no cover
-                # recalculate progress to be within 20 and 80
-                p = int((current_progress / max_progress) * 50 + 20)
-                self._send_progress(p, 100, ProgressStatusOptions.WORKING)
+        def progress_callback(current_progress, max_progress):  # pragma: no cover
+            # recalculate progress to be within 20 and 80
+            p = int((current_progress / max_progress) * 50 + 20)
+            self._send_progress(p, 100, ProgressStatusOptions.WORKING)
 
-            # This doesn't parse the document yet, but gives us a parser.
+        # This doesn't parse the document yet, but gives us a parser.
 
-            document_parser: DocumentParser = parser_class(
-                self.logging_group,
-                progress_callback=progress_callback,
+        document_parser: DocumentParser = parser_class(
+            self.logging_group,
+            progress_callback=progress_callback,
+        )
+
+        self.log.debug(f"Parser: {type(document_parser).__name__}")
+
+        # Parse the document. This may take some time.
+
+        text = None
+        date = None
+        thumbnail = None
+        archive_path = None
+        page_count = None
+
+        try:
+            self._send_progress(
+                20,
+                100,
+                ProgressStatusOptions.WORKING,
+                ConsumerStatusShortMessage.PARSING_DOCUMENT,
             )
-
-            self.log.debug(f"Parser: {type(document_parser).__name__}")
-
-            # Parse the document. This may take some time.
-
-            text = None
-            date = None
-            thumbnail = None
-            archive_path = None
-            page_count = None
-
-            try:
-                self._send_progress(
-                    20,
-                    100,
-                    ProgressStatusOptions.WORKING,
-                    ConsumerStatusShortMessage.PARSING_DOCUMENT,
-                )
-                self.log.debug(f"Parsing {self.filename}...")
-                if (
-                    isinstance(document_parser, MailDocumentParser)
-                    and self.input_doc.mailrule_id
-                ):
-                    document_parser.parse(
-                        self.working_copy,
-                        mime_type,
-                        self.filename,
-                        self.input_doc.mailrule_id,
-                    )
-                else:
-                    document_parser.parse(self.working_copy, mime_type, self.filename)
-
-                self.log.debug(f"Generating thumbnail for {self.filename}...")
-                self._send_progress(
-                    70,
-                    100,
-                    ProgressStatusOptions.WORKING,
-                    ConsumerStatusShortMessage.GENERATING_THUMBNAIL,
-                )
-                thumbnail = document_parser.get_thumbnail(
+            self.log.debug(f"Parsing {self.filename}...")
+            if (
+                isinstance(document_parser, MailDocumentParser)
+                and self.input_doc.mailrule_id
+            ):
+                document_parser.parse(
                     self.working_copy,
                     mime_type,
                     self.filename,
+                    self.input_doc.mailrule_id,
                 )
+            else:
+                document_parser.parse(self.working_copy, mime_type, self.filename)
 
-                text = document_parser.get_text()
-                date = document_parser.get_date()
-                if date is None:
-                    self._send_progress(
-                        90,
-                        100,
-                        ProgressStatusOptions.WORKING,
-                        ConsumerStatusShortMessage.PARSE_DATE,
-                    )
-                    date = parse_date(self.filename, text)
-                archive_path = document_parser.get_archive_path()
-                page_count = document_parser.get_page_count(
-                    self.working_copy,
-                    mime_type,
-                )
-
-            except ParseError as e:
-                document_parser.cleanup()
-                self._fail(
-                    str(e),
-                    f"Error occurred while consuming document {self.filename}: {e}",
-                    exc_info=True,
-                    exception=e,
-                )
-            except Exception as e:
-                document_parser.cleanup()
-                self._fail(
-                    str(e),
-                    f"Unexpected error while consuming document {self.filename}: {e}",
-                    exc_info=True,
-                    exception=e,
-                )
-
-            # Prepare the document classifier.
-
-            # TODO: I don't really like to do this here, but this way we avoid
-            #   reloading the classifier multiple times, since there are multiple
-            #   post-consume hooks that all require the classifier.
-
-            classifier = load_classifier()
-
+            self.log.debug(f"Generating thumbnail for {self.filename}...")
             self._send_progress(
-                95,
+                70,
                 100,
                 ProgressStatusOptions.WORKING,
-                ConsumerStatusShortMessage.SAVE_DOCUMENT,
+                ConsumerStatusShortMessage.GENERATING_THUMBNAIL,
             )
-            # now that everything is done, we can start to store the document
-            # in the system. This will be a transaction and reasonably fast.
-            try:
-                with transaction.atomic():
-                    # store the document.
-                    document = self._store(
-                        text=text,
-                        date=date,
-                        page_count=page_count,
-                        mime_type=mime_type,
-                    )
+            thumbnail = document_parser.get_thumbnail(
+                self.working_copy,
+                mime_type,
+                self.filename,
+            )
 
-                    # If we get here, it was successful. Proceed with post-consume
-                    # hooks. If they fail, nothing will get changed.
-
-                    document_consumption_finished.send(
-                        sender=self.__class__,
-                        document=document,
-                        logging_group=self.logging_group,
-                        classifier=classifier,
-                        original_file=self.unmodified_original
-                        if self.unmodified_original
-                        else self.working_copy,
-                    )
-
-                    # After everything is in the database, copy the files into
-                    # place. If this fails, we'll also rollback the transaction.
-                    with FileLock(settings.MEDIA_LOCK):
-                        document.filename = generate_unique_filename(document)
-                        create_source_path_directory(document.source_path)
-
-                        self._write(
-                            document.storage_type,
-                            self.unmodified_original
-                            if self.unmodified_original is not None
-                            else self.working_copy,
-                            document.source_path,
-                        )
-
-                        self._write(
-                            document.storage_type,
-                            thumbnail,
-                            document.thumbnail_path,
-                        )
-
-                        if archive_path and Path(archive_path).is_file():
-                            document.archive_filename = generate_unique_filename(
-                                document,
-                                archive_filename=True,
-                            )
-                            create_source_path_directory(document.archive_path)
-                            self._write(
-                                document.storage_type,
-                                archive_path,
-                                document.archive_path,
-                            )
-
-                            with Path(archive_path).open("rb") as f:
-                                document.archive_checksum = hashlib.md5(
-                                    f.read(),
-                                ).hexdigest()
-
-                    # Don't save with the lock active. Saving will cause the file
-                    # renaming logic to acquire the lock as well.
-                    # This triggers things like file renaming
-                    document.save()
-
-                    # Delete the file only if it was successfully consumed
-                    self.log.debug(
-                        f"Deleting original file {self.input_doc.original_file}",
-                    )
-                    self.input_doc.original_file.unlink()
-                    self.log.debug(f"Deleting working copy {self.working_copy}")
-                    self.working_copy.unlink()
-                    if self.unmodified_original is not None:  # pragma: no cover
-                        self.log.debug(
-                            f"Deleting unmodified original file {self.unmodified_original}",
-                        )
-                        self.unmodified_original.unlink()
-
-                    # https://github.com/jonaswinkler/paperless-ng/discussions/1037
-                    shadow_file = (
-                        Path(self.input_doc.original_file).parent
-                        / f"._{Path(self.input_doc.original_file).name}"
-                    )
-
-                    if Path(shadow_file).is_file():
-                        self.log.debug(f"Deleting shadow file {shadow_file}")
-                        Path(shadow_file).unlink()
-
-            except Exception as e:
-                self._fail(
-                    str(e),
-                    f"The following error occurred while storing document "
-                    f"{self.filename} after parsing: {e}",
-                    exc_info=True,
-                    exception=e,
+            text = document_parser.get_text()
+            date = document_parser.get_date()
+            if date is None:
+                self._send_progress(
+                    90,
+                    100,
+                    ProgressStatusOptions.WORKING,
+                    ConsumerStatusShortMessage.PARSE_DATE,
                 )
-            finally:
-                document_parser.cleanup()
+                date = parse_date(self.filename, text)
+            archive_path = document_parser.get_archive_path()
+            page_count = document_parser.get_page_count(self.working_copy, mime_type)
 
-            self.run_post_consume_script(document)
-
-            self.log.info(f"Document {document} consumption finished")
-
-            self._send_progress(
-                100,
-                100,
-                ProgressStatusOptions.SUCCESS,
-                ConsumerStatusShortMessage.FINISHED,
-                document.id,
+        except ParseError as e:
+            document_parser.cleanup()
+            if tempdir:
+                tempdir.cleanup()
+            self._fail(
+                str(e),
+                f"Error occurred while consuming document {self.filename}: {e}",
+                exc_info=True,
+                exception=e,
+            )
+        except Exception as e:
+            document_parser.cleanup()
+            if tempdir:
+                tempdir.cleanup()
+            self._fail(
+                str(e),
+                f"Unexpected error while consuming document {self.filename}: {e}",
+                exc_info=True,
+                exception=e,
             )
 
-            # Return the most up to date fields
-            document.refresh_from_db()
+        # Prepare the document classifier.
 
-            return f"Success. New document id {document.pk} created"
+        # TODO: I don't really like to do this here, but this way we avoid
+        #   reloading the classifier multiple times, since there are multiple
+        #   post-consume hooks that all require the classifier.
+
+        classifier = load_classifier()
+
+        self._send_progress(
+            95,
+            100,
+            ProgressStatusOptions.WORKING,
+            ConsumerStatusShortMessage.SAVE_DOCUMENT,
+        )
+        # now that everything is done, we can start to store the document
+        # in the system. This will be a transaction and reasonably fast.
+        try:
+            with transaction.atomic():
+                # store the document.
+                document = self._store(
+                    text=text,
+                    date=date,
+                    page_count=page_count,
+                    mime_type=mime_type,
+                )
+
+                # If we get here, it was successful. Proceed with post-consume
+                # hooks. If they fail, nothing will get changed.
+
+                document_consumption_finished.send(
+                    sender=self.__class__,
+                    document=document,
+                    logging_group=self.logging_group,
+                    classifier=classifier,
+                    original_file=self.unmodified_original
+                    if self.unmodified_original
+                    else self.working_copy,
+                )
+
+                # After everything is in the database, copy the files into
+                # place. If this fails, we'll also rollback the transaction.
+                with FileLock(settings.MEDIA_LOCK):
+                    document.filename = generate_unique_filename(document)
+                    create_source_path_directory(document.source_path)
+
+                    self._write(
+                        document.storage_type,
+                        self.unmodified_original
+                        if self.unmodified_original is not None
+                        else self.working_copy,
+                        document.source_path,
+                    )
+
+                    self._write(
+                        document.storage_type,
+                        thumbnail,
+                        document.thumbnail_path,
+                    )
+
+                    if archive_path and Path(archive_path).is_file():
+                        document.archive_filename = generate_unique_filename(
+                            document,
+                            archive_filename=True,
+                        )
+                        create_source_path_directory(document.archive_path)
+                        self._write(
+                            document.storage_type,
+                            archive_path,
+                            document.archive_path,
+                        )
+
+                        with Path(archive_path).open("rb") as f:
+                            document.archive_checksum = hashlib.md5(
+                                f.read(),
+                            ).hexdigest()
+
+                # Don't save with the lock active. Saving will cause the file
+                # renaming logic to acquire the lock as well.
+                # This triggers things like file renaming
+                document.save()
+
+                # Delete the file only if it was successfully consumed
+                self.log.debug(f"Deleting original file {self.input_doc.original_file}")
+                self.input_doc.original_file.unlink()
+                self.log.debug(f"Deleting working copy {self.working_copy}")
+                self.working_copy.unlink()
+                if self.unmodified_original is not None:  # pragma: no cover
+                    self.log.debug(
+                        f"Deleting unmodified original file {self.unmodified_original}",
+                    )
+                    self.unmodified_original.unlink()
+
+                # https://github.com/jonaswinkler/paperless-ng/discussions/1037
+                shadow_file = (
+                    Path(self.input_doc.original_file).parent
+                    / f"._{Path(self.input_doc.original_file).name}"
+                )
+
+                if Path(shadow_file).is_file():
+                    self.log.debug(f"Deleting shadow file {shadow_file}")
+                    Path(shadow_file).unlink()
+
+        except Exception as e:
+            self._fail(
+                str(e),
+                f"The following error occurred while storing document "
+                f"{self.filename} after parsing: {e}",
+                exc_info=True,
+                exception=e,
+            )
+        finally:
+            document_parser.cleanup()
+            tempdir.cleanup()
+
+        self.run_post_consume_script(document)
+
+        self.log.info(f"Document {document} consumption finished")
+
+        self._send_progress(
+            100,
+            100,
+            ProgressStatusOptions.SUCCESS,
+            ConsumerStatusShortMessage.FINISHED,
+            document.id,
+        )
+
+        # Return the most up to date fields
+        document.refresh_from_db()
+
+        return f"Success. New document id {document.pk} created"
 
     def _parse_title_placeholders(self, title: str) -> str:
         local_added = timezone.localtime(timezone.now())
