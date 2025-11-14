@@ -26,6 +26,7 @@ from documents.tasks import empty_trash
 from documents.tests.factories import DocumentFactory
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
+from documents.tests.utils import skip_if_root
 
 
 class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
@@ -89,6 +90,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             settings.ORIGINALS_DIR / "test" / "test.pdf.gpg",
         )
 
+    @skip_if_root
     @override_settings(FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_file_renaming_missing_permissions(self):
         document = Document()

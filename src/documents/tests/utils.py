@@ -1,3 +1,4 @@
+import os
 import shutil
 import tempfile
 import time
@@ -27,6 +28,8 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.parsers import ParseError
 from documents.plugins.helpers import ProgressStatusOptions
+
+skip_if_root = pytest.mark.skipif(os.getuid() == 0, reason="running as root")
 
 
 def setup_directories():
