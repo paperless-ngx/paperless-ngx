@@ -1195,6 +1195,31 @@ PAPERLESS_ML_MODEL_CACHE: Final[Path | None] = __get_optional_path(
     "PAPERLESS_ML_MODEL_CACHE",
 )
 
+# AI Webhooks Configuration
+# Enable webhooks for AI events (deletion requests, auto-applied suggestions, scan completion)
+PAPERLESS_AI_WEBHOOKS_ENABLED: Final[bool] = __get_boolean(
+    "PAPERLESS_AI_WEBHOOKS_ENABLED",
+    "false",  # Disabled by default, users must explicitly enable
+)
+
+# Maximum number of retry attempts for failed webhooks
+PAPERLESS_AI_WEBHOOKS_MAX_RETRIES: Final[int] = __get_int(
+    "PAPERLESS_AI_WEBHOOKS_MAX_RETRIES",
+    3,
+)
+
+# Initial retry delay in seconds (will increase exponentially)
+PAPERLESS_AI_WEBHOOKS_RETRY_DELAY: Final[int] = __get_int(
+    "PAPERLESS_AI_WEBHOOKS_RETRY_DELAY",
+    60,
+)
+
+# Webhook request timeout in seconds
+PAPERLESS_AI_WEBHOOKS_TIMEOUT: Final[int] = __get_int(
+    "PAPERLESS_AI_WEBHOOKS_TIMEOUT",
+    10,
+)
+
 OCR_COLOR_CONVERSION_STRATEGY = os.getenv(
     "PAPERLESS_OCR_COLOR_CONVERSION_STRATEGY",
     "RGB",
