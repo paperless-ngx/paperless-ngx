@@ -544,22 +544,43 @@ def check_paths_and_prune_custom_fields(sender, instance: CustomField, **kwargs)
     """
     if (
         instance.data_type == CustomField.FieldDataType.SELECT
-        and instance.fields.count() > 0
         and instance.extra_data
+        and instance.fields.exists()
     ):  # Only select fields, for now
-        select_options = {
-            option["id"]: option["label"]
-            for option in instance.extra_data.get("select_options", [])
-        }
+        sync_custom_field_instances_and_document_names.delay(instance.pk)
 
-        for cf_instance in instance.fields.all():
-            # Check if the current value is still a valid option
-            if cf_instance.value not in select_options:
-                cf_instance.value_select = None
-                cf_instance.save(update_fields=["value_select"])
 
-            # Update the filename and move files if necessary
-            update_filename_and_move_files(sender, cf_instance)
+@shared_task
+def sync_custom_field_instances_and_document_names(custom_field_id: int):
+    """
+    Removes custom field instances where value is no longer a valid select option
+    and updates file names of all documents that have this custom field.
+    """
+    try:
+        custom_field = CustomField.objects.get(pk=custom_field_id)
+    except CustomField.DoesNotExist:
+        return
+
+    if (
+        custom_field.data_type != CustomField.FieldDataType.SELECT
+        or not custom_field.extra_data
+        or not custom_field.fields.exists()
+    ):
+        return
+
+    select_options = {
+        option["id"]: option["label"]
+        for option in custom_field.extra_data.get("select_options", [])
+    }
+
+    for cf_instance in custom_field.fields.all():
+        # Check if the current value is still a valid option
+        if cf_instance.value not in select_options:
+            cf_instance.value_select = None
+            cf_instance.save(update_fields=["value_select"])
+
+        # Update the filename and move files if necessary
+        update_filename_and_move_files(CustomField, cf_instance)
 
 
 @receiver(models.signals.post_delete, sender=CustomField)
