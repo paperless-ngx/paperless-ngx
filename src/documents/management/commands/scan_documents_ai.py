@@ -128,7 +128,7 @@ class Command(ProgressBarMixin, BaseCommand):
         if document_count == 0:
             self.stdout.write(
                 self.style.WARNING(
-                    "No documents found matching the specified filters."
+                    "No documents found matching the specified filters.",
                 ),
             )
             return
@@ -161,7 +161,7 @@ class Command(ProgressBarMixin, BaseCommand):
                 options["filter_by_type"],
                 options["date_range"],
                 options["id_range"],
-            ]
+            ],
         ):
             raise CommandError(
                 "You must specify at least one filter: "
@@ -247,7 +247,7 @@ class Command(ProgressBarMixin, BaseCommand):
         self.stdout.write("\nProcessing mode:")
         if options["dry_run"]:
             self.stdout.write(
-                self.style.WARNING("  • DRY RUN - No changes will be applied")
+                self.style.WARNING("  • DRY RUN - No changes will be applied"),
             )
         elif options["auto_apply_high_confidence"]:
             self.stdout.write("  • Auto-apply high confidence suggestions (≥80%)")
@@ -346,7 +346,7 @@ class Command(ProgressBarMixin, BaseCommand):
                                 "title": document.title,
                                 "suggestions": filtered_result.to_dict(),
                                 "applied": applied if auto_apply else None,
-                            }
+                            },
                         )
 
                     results["processed"] += 1
@@ -361,7 +361,7 @@ class Command(ProgressBarMixin, BaseCommand):
                             "id": document.id,
                             "title": document.title,
                             "error": str(e),
-                        }
+                        },
                     )
 
         return results
@@ -436,16 +436,16 @@ class Command(ProgressBarMixin, BaseCommand):
         self.stdout.write("Statistics:")
         self.stdout.write(f"  • Documents processed: {results['processed']}")
         self.stdout.write(
-            f"  • Documents with suggestions: {len(results['documents_with_suggestions'])}"
+            f"  • Documents with suggestions: {len(results['documents_with_suggestions'])}",
         )
         self.stdout.write(
-            f"  • Total suggestions generated: {results['suggestions_generated']}"
+            f"  • Total suggestions generated: {results['suggestions_generated']}",
         )
 
         if options["auto_apply_high_confidence"] and not options["dry_run"]:
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"  • Suggestions auto-applied: {results['auto_applied']}"
+                    f"  • Suggestions auto-applied: {results['auto_applied']}",
                 ),
             )
 
