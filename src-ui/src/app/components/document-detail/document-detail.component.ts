@@ -1,3 +1,8 @@
+import {
+  CdkDragDrop,
+  DragDropModule,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop'
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
 import { HttpClient, HttpResponse } from '@angular/common/http'
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core'
@@ -175,6 +180,7 @@ export enum ZoomSetting {
     NgxBootstrapIconsModule,
     PdfViewerModule,
     TextAreaComponent,
+    DragDropModule,
   ],
 })
 export class DocumentDetailComponent
@@ -230,6 +236,8 @@ export class DocumentDetailComponent
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
   storagePaths: StoragePath[]
+
+  customFieldOrderChanged: boolean = false
 
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
@@ -842,6 +850,35 @@ export class DocumentDetailComponent
             this.documentForm.get('permissions_form').value['owner']
           changes['set_permissions'] =
             this.documentForm.get('permissions_form').value['set_permissions']
+        } else if (key === 'custom_fields') {
+          const formValue = this.documentForm.get(key).value
+
+          // Validate and clean custom field values, including created field from original instances
+          const cleanedCustomFields = formValue.map((fieldData, index) => {
+            let cleanValue = fieldData.value
+            if (typeof cleanValue === 'number' && isNaN(cleanValue)) {
+              cleanValue = null
+            } else if (
+              typeof cleanValue === 'string' &&
+              (cleanValue.trim() === 'NaN' || cleanValue.trim() === '')
+            ) {
+              cleanValue = null
+            }
+
+            // Use the updated created timestamp from the document model, not the form
+            // The document model has the correct timestamps after reordering
+            const documentField = this.document.custom_fields[index]
+            const createdValue =
+              documentField?.created || fieldData.created || new Date()
+
+            return {
+              field: fieldData.field,
+              value: cleanValue,
+              created: createdValue,
+            }
+          })
+
+          changes[key] = cleanedCustomFields
         } else {
           changes[key] = this.documentForm.get(key).value
         }
@@ -859,25 +896,29 @@ export class DocumentDetailComponent
       .subscribe({
         next: (docValues) => {
           // in case data changed while saving eg removing inbox_tags
-          this.documentForm.patchValue(docValues)
+          // Exclude custom_fields from patchValue to preserve reordered state
+          const { custom_fields, ...otherDocValues } = docValues
+          this.documentForm.patchValue(otherDocValues)
           const newValues = Object.assign({}, this.documentForm.value)
           newValues.tags = [...docValues.tags]
-          newValues.custom_fields = [...docValues.custom_fields]
+          // Preserve the current custom field order instead of using server order
+          newValues.custom_fields = [...this.document.custom_fields]
           this.store.next(newValues)
           this.openDocumentService.setDirty(this.document, false)
           this.openDocumentService.save()
+          // Mark form as pristine to reset dirty state
+          this.documentForm.markAsPristine()
           this.toastService.showInfo(
             $localize`Document "${newValues.title}" saved successfully.`
           )
           this.networkActive = false
           this.error = null
           if (close) {
-            this.close(() =>
-              this.openDocumentService.refreshDocument(this.documentId)
-            )
-          } else {
-            this.openDocumentService.refreshDocument(this.documentId)
+            this.close(() => {
+              // Don't refresh document to preserve custom field order
+            })
           }
+          // Don't refresh document to preserve custom field order
           this.savedViewService.maybeRefreshDocumentCounts()
         },
         error: (error) => {
@@ -1350,15 +1391,31 @@ export class DocumentDetailComponent
 
   private updateFormForCustomFields(emitEvent: boolean = false) {
     this.customFieldFormFields.clear({ emitEvent: false })
-    this.document.custom_fields?.forEach((fieldInstance) => {
-      this.customFieldFormFields.push(
-        new FormGroup({
-          field: new FormControl(fieldInstance.field),
-          value: new FormControl(fieldInstance.value),
-        }),
-        { emitEvent }
-      )
-    })
+    if (this.document?.custom_fields) {
+      this.document.custom_fields.forEach((fieldInstance, index) => {
+        // Validate and clean the value to prevent NaN errors
+        let cleanValue = fieldInstance.value
+        if (typeof cleanValue === 'number' && isNaN(cleanValue)) {
+          cleanValue = null
+          fieldInstance.value = null
+        } else if (
+          typeof cleanValue === 'string' &&
+          cleanValue.trim() === 'NaN'
+        ) {
+          cleanValue = null
+          fieldInstance.value = null
+        }
+
+        this.customFieldFormFields.push(
+          new FormGroup({
+            field: new FormControl(fieldInstance.field),
+            value: new FormControl(cleanValue),
+            created: new FormControl(fieldInstance.created),
+          }),
+          { emitEvent }
+        )
+      })
+    }
   }
 
   public addField(field: CustomField) {
@@ -1381,6 +1438,28 @@ export class DocumentDetailComponent
     this.updateFormForCustomFields(true)
     this.documentForm.get('custom_fields').markAsDirty()
     this.documentForm.updateValueAndValidity()
+  }
+
+  public onCustomFieldDrop(event: CdkDragDrop<CustomFieldInstance[]>) {
+    if (event.previousIndex !== event.currentIndex) {
+      // Reorder the custom fields array
+      moveItemInArray(
+        this.document.custom_fields,
+        event.previousIndex,
+        event.currentIndex
+      )
+
+      // Update the created timestamps to reflect the new order for persistence
+      const baseTime = Date.now()
+      this.document.custom_fields.forEach((field, index) => {
+        field.created = new Date(baseTime + index)
+      })
+
+      // Update the form to reflect the new order
+      this.updateFormForCustomFields(true)
+      this.documentForm.get('custom_fields').markAsDirty()
+      this.documentForm.markAsDirty()
+    }
   }
 
   editPdf() {

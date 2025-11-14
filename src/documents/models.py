@@ -857,7 +857,6 @@ class CustomFieldInstance(SoftDeleteModel):
         _("created"),
         default=timezone.now,
         db_index=True,
-        editable=False,
     )
 
     document = models.ForeignKey(
@@ -921,7 +920,7 @@ class CustomFieldInstance(SoftDeleteModel):
     value_long_text = models.TextField(null=True)
 
     class Meta:
-        ordering = ("created",)
+        ordering = ["created"]
         verbose_name = _("custom field instance")
         verbose_name_plural = _("custom field instances")
         constraints = [

@@ -90,3 +90,97 @@ textarea.rtl {
     object-position: top;
   }
 }
+
+// Custom field drag and drop styling
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+              0 8px 10px 1px rgba(0, 0, 0, 0.14),
+              0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.3;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+// Drag handle styling
+[cdkDragHandle] {
+  cursor: grab;
+  padding: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 3px;
+  }
+
+  &:active {
+    cursor: grabbing;
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  i-bs {
+    pointer-events: none;
+  }
+}
+
+// Custom field container alignment fixes
+.d-flex.align-items-start {
+  // Ensure the drag handle aligns properly with the input row
+  align-items: flex-start !important;
+
+  .flex-grow-1 {
+    // Ensure pngx components align properly
+    ::ng-deep .mb-3 {
+      margin-bottom: 0 !important;
+    }
+
+    ::ng-deep .form-label {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 400;
+      color: var(--bs-body-color);
+    }
+
+    ::ng-deep .btn-sm {
+      line-height: 1.25;
+      padding: 0.25rem 0.5rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+
+      i, fa-icon, svg {
+        margin: 0;
+        vertical-align: baseline;
+      }
+    }
+  }
+}
+
+// Prevent text selection during drag
+.cdk-drag {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+
+  &.cdk-drag-dragging {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+  }
+}

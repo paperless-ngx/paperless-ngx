@@ -134,99 +134,111 @@
               <pngx-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.StoragePath)"
               (createNew)="createStoragePath($event)" [hideAddButton]="createDisabled(DataType.StoragePath)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></pngx-input-select>
               <pngx-input-tags formControlName="tags" [suggestions]="suggestions?.tags" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.Tag)" [hideAddButton]="createDisabled(DataType.Tag)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></pngx-input-tags>
-              @for (fieldInstance of document?.custom_fields; track fieldInstance.field; let i = $index) {
-                <div [formGroup]="customFieldFormFields.controls[i]">
-                  @switch (getCustomFieldFromInstance(fieldInstance)?.data_type) {
-                    @case (CustomFieldDataType.String) {
-                      <pngx-input-text formControlName="value"
-                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userCanEdit"
-                      (removed)="removeField(fieldInstance)"
-                      [horizontal]="true"
-                      [error]="getCustomFieldError(i)"></pngx-input-text>
-                    }
-                    @case (CustomFieldDataType.Date) {
-                      <pngx-input-date formControlName="value"
-                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userCanEdit"
-                      (removed)="removeField(fieldInstance)"
-                      [horizontal]="true"
-                      [error]="getCustomFieldError(i)"></pngx-input-date>
-                    }
-                    @case (CustomFieldDataType.Integer) {
-                      <pngx-input-number formControlName="value"
-                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userCanEdit"
-                      (removed)="removeField(fieldInstance)"
-                      [horizontal]="true"
-                      [showAdd]="false"
-                      [error]="getCustomFieldError(i)"></pngx-input-number>
-                    }
-                    @case (CustomFieldDataType.Float) {
-                      <pngx-input-number formControlName="value"
-                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userCanEdit"
-                      (removed)="removeField(fieldInstance)"
-                      [horizontal]="true"
-                      [showAdd]="false"
-                      [step]=".1"
-                      [error]="getCustomFieldError(i)"></pngx-input-number>
-                    }
-                    @case (CustomFieldDataType.Monetary) {
-                      <pngx-input-monetary formControlName="value"
-                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [defaultCurrency]="getCustomFieldFromInstance(fieldInstance)?.extra_data?.default_currency"
-                      [removable]="userCanEdit"
-                      (removed)="removeField(fieldInstance)"
-                      [horizontal]="true"
-                      [error]="getCustomFieldError(i)"></pngx-input-monetary>
-                    }
-                    @case (CustomFieldDataType.Boolean) {
-                      <pngx-input-check formControlName="value"
-                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userCanEdit"
-                      (removed)="removeField(fieldInstance)"
-                      [horizontal]="true"></pngx-input-check>
-                    }
-                    @case (CustomFieldDataType.Url) {
-                      <pngx-input-url formControlName="value"
-                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userCanEdit"
-                      (removed)="removeField(fieldInstance)"
-                      [horizontal]="true"
-                      [error]="getCustomFieldError(i)"></pngx-input-url>
-                    }
-                    @case (CustomFieldDataType.DocumentLink) {
-                      <pngx-input-document-link formControlName="value"
-                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [parentDocumentID]="documentId"
-                      [removable]="userCanEdit"
-                      (removed)="removeField(fieldInstance)"
-                      [horizontal]="true"
-                      [error]="getCustomFieldError(i)"></pngx-input-document-link>
-                    }
-                    @case (CustomFieldDataType.Select) {
-                      <pngx-input-select formControlName="value"
-                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [items]="getCustomFieldFromInstance(fieldInstance)?.extra_data.select_options"
-                      bindLabel="label"
-                      [allowNull]="true"
-                      [horizontal]="true"
-                      [removable]="userCanEdit"
-                      (removed)="removeField(fieldInstance)"
-                      [error]="getCustomFieldError(i)"></pngx-input-select>
-                    }
-                    @case (CustomFieldDataType.LongText) {
-                      <pngx-input-textarea formControlName="value"
-                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userCanEdit"
-                      (removed)="removeField(fieldInstance)"
-                      [horizontal]="true"
-                      [error]="getCustomFieldError(i)"></pngx-input-textarea>
-                    }
-                  }
-                </div>
-              }
+
+              <!-- Custom Fields Container -->
+              <div cdkDropList (cdkDropListDropped)="onCustomFieldDrop($event)">
+                @for (fieldInstance of document?.custom_fields; track fieldInstance.field; let i = $index) {
+                  <div cdkDrag class="position-relative" cdkDragPreviewContainer="parent">
+                    <div class="d-flex align-items-start">
+                      <div class="flex-grow-1" [formGroup]="customFieldFormFields.controls[i]">
+	                      @switch (getCustomFieldFromInstance(fieldInstance)?.data_type) {
+	                        @case (CustomFieldDataType.String) {
+	                          <pngx-input-text formControlName="value"
+	                          [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+	                          [removable]="userCanEdit"
+	                          (removed)="removeField(fieldInstance)"
+	                          [horizontal]="true"
+	                          [error]="getCustomFieldError(i)"></pngx-input-text>
+	                        }
+	                        @case (CustomFieldDataType.Date) {
+	                          <pngx-input-date formControlName="value"
+	                          [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+	                          [removable]="userCanEdit"
+	                          (removed)="removeField(fieldInstance)"
+	                          [horizontal]="true"
+	                          [error]="getCustomFieldError(i)"></pngx-input-date>
+	                        }
+	                        @case (CustomFieldDataType.Integer) {
+	                          <pngx-input-number formControlName="value"
+	                          [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+	                          [removable]="userCanEdit"
+	                          (removed)="removeField(fieldInstance)"
+	                          [horizontal]="true"
+	                          [showAdd]="false"
+	                          [error]="getCustomFieldError(i)"></pngx-input-number>
+	                        }
+	                        @case (CustomFieldDataType.Float) {
+	                          <pngx-input-number formControlName="value"
+	                          [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+	                          [removable]="userCanEdit"
+	                          (removed)="removeField(fieldInstance)"
+	                          [horizontal]="true"
+	                          [showAdd]="false"
+	                          [step]=".1"
+	                          [error]="getCustomFieldError(i)"></pngx-input-number>
+	                        }
+	                        @case (CustomFieldDataType.Monetary) {
+	                          <pngx-input-monetary formControlName="value"
+	                          [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+	                          [defaultCurrency]="getCustomFieldFromInstance(fieldInstance)?.extra_data?.default_currency"
+	                          [removable]="userCanEdit"
+	                          (removed)="removeField(fieldInstance)"
+	                          [horizontal]="true"
+	                          [error]="getCustomFieldError(i)"></pngx-input-monetary>
+	                        }
+	                        @case (CustomFieldDataType.Boolean) {
+	                          <pngx-input-check formControlName="value"
+	                          [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+	                          [removable]="userCanEdit"
+	                          (removed)="removeField(fieldInstance)"
+	                          [horizontal]="true"
+	                          [error]="getCustomFieldError(i)"></pngx-input-check>
+	                        }
+	                        @case (CustomFieldDataType.Url) {
+	                          <pngx-input-url formControlName="value"
+	                          [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+	                          [removable]="userCanEdit"
+	                          (removed)="removeField(fieldInstance)"
+	                          [horizontal]="true"
+	                          [error]="getCustomFieldError(i)"></pngx-input-url>
+	                        }
+	                        @case (CustomFieldDataType.DocumentLink) {
+	                          <pngx-input-document-link formControlName="value"
+	                          [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+	                          [parentDocumentID]="documentId"
+	                          [removable]="userCanEdit"
+	                          (removed)="removeField(fieldInstance)"
+	                          [horizontal]="true"
+	                          [error]="getCustomFieldError(i)"></pngx-input-document-link>
+	                        }
+	                        @case (CustomFieldDataType.Select) {
+	                          <pngx-input-select formControlName="value"
+	                          [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+	                          [items]="getCustomFieldFromInstance(fieldInstance)?.extra_data.select_options"
+	                          bindLabel="label"
+	                          [allowNull]="true"
+	                          [horizontal]="true"
+	                          [removable]="userCanEdit"
+	                          (removed)="removeField(fieldInstance)"
+	                          [error]="getCustomFieldError(i)"></pngx-input-select>
+	                        }
+	                        @case (CustomFieldDataType.LongText) {
+	                          <pngx-input-textarea formControlName="value"
+	                          [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+	                          [removable]="userCanEdit"
+	                          (removed)="removeField(fieldInstance)"
+	                          [horizontal]="true"
+	                          [error]="getCustomFieldError(i)"></pngx-input-textarea>
+	                        }
+                        }
+                      </div>
+                      <div class="ms-2 d-flex align-items-center" cdkDragHandle style="height: 38px;">
+                        <i-bs name="grip-vertical" class="text-muted"></i-bs>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
             </div>
 
             <div class="d-flex border-top pt-3">
