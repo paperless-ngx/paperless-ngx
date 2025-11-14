@@ -120,6 +120,7 @@ from documents.filters import PaperlessTaskFilterSet
 from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
+from documents.mail import EmailAttachment
 from documents.mail import send_email
 from documents.matching import match_correspondents
 from documents.matching import match_document_types
@@ -1216,12 +1217,28 @@ class DocumentViewSet(
                 return HttpResponseForbidden("Insufficient permissions")
 
         try:
+            attachments: list[EmailAttachment] = []
+            for doc in documents:
+                attachment_path = (
+                    doc.archive_path
+                    if use_archive_version and doc.has_archive_version
+                    else doc.source_path
+                )
+                attachments.append(
+                    EmailAttachment(
+                        path=attachment_path,
+                        mime_type=doc.mime_type,
+                        friendly_name=doc.get_public_filename(
+                            archive=use_archive_version and doc.has_archive_version,
+                        ),
+                    ),
+                )
+
             send_email(
                 subject=subject,
                 body=message,
                 to=addresses,
-                attachments=documents,
-                use_archive=use_archive_version,
+                attachments=attachments,
             )
 
             logger.debug(
