@@ -1195,6 +1195,18 @@ PAPERLESS_ML_MODEL_CACHE: Final[Path | None] = __get_optional_path(
     "PAPERLESS_ML_MODEL_CACHE",
 )
 
+# ML Model Cache Settings
+# Maximum number of models to keep in memory cache (LRU eviction)
+PAPERLESS_ML_CACHE_MAX_MODELS: Final[int] = int(
+    os.getenv("PAPERLESS_ML_CACHE_MAX_MODELS", "3"),
+)
+
+# Enable model warm-up on startup (preload models for faster first use)
+PAPERLESS_ML_CACHE_WARMUP: Final[bool] = __get_boolean(
+    "PAPERLESS_ML_CACHE_WARMUP",
+    default=False,
+)
+
 OCR_COLOR_CONVERSION_STRATEGY = os.getenv(
     "PAPERLESS_OCR_COLOR_CONVERSION_STRATEGY",
     "RGB",
