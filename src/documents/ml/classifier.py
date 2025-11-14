@@ -20,6 +20,8 @@ from transformers import (
     TrainingArguments,
 )
 
+from documents.ml.model_cache import ModelCacheManager
+
 if TYPE_CHECKING:
     from documents.models import Document
 
@@ -93,7 +95,11 @@ class TransformerDocumentClassifier:
     - Works well even with limited training data
     """
 
-    def __init__(self, model_name: str = "distilbert-base-uncased"):
+    def __init__(
+        self, 
+        model_name: str = "distilbert-base-uncased",
+        use_cache: bool = True,
+    ):
         """
         Initialize classifier.
         
@@ -103,14 +109,25 @@ class TransformerDocumentClassifier:
                        Alternatives:
                        - bert-base-uncased (440MB, more accurate)
                        - albert-base-v2 (47MB, smallest)
+            use_cache: Whether to use model cache (default: True)
         """
         self.model_name = model_name
+        self.use_cache = use_cache
+        self.cache_manager = ModelCacheManager.get_instance() if use_cache else None
+        
+        # Cache key for this model configuration
+        self.cache_key = f"classifier_{model_name}"
+        
+        # Load tokenizer (lightweight, not cached)
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = None
         self.label_map = {}
         self.reverse_label_map = {}
 
-        logger.info(f"Initialized TransformerDocumentClassifier with {model_name}")
+        logger.info(
+            f"Initialized TransformerDocumentClassifier with {model_name} "
+            f"(caching: {use_cache})"
+        )
 
     def train(
         self,
@@ -215,10 +232,26 @@ class TransformerDocumentClassifier:
         Args:
             model_dir: Directory containing saved model
         """
-        logger.info(f"Loading model from {model_dir}")
-        self.model = AutoModelForSequenceClassification.from_pretrained(model_dir)
-        self.tokenizer = AutoTokenizer.from_pretrained(model_dir)
-        self.model.eval()  # Set to evaluation mode
+        if self.use_cache and self.cache_manager:
+            # Try to get from cache first
+            cache_key = f"{self.cache_key}_{model_dir}"
+            
+            def loader():
+                logger.info(f"Loading model from {model_dir}")
+                model = AutoModelForSequenceClassification.from_pretrained(model_dir)
+                tokenizer = AutoTokenizer.from_pretrained(model_dir)
+                model.eval()  # Set to evaluation mode
+                return {"model": model, "tokenizer": tokenizer}
+            
+            cached = self.cache_manager.get_or_load_model(cache_key, loader)
+            self.model = cached["model"]
+            self.tokenizer = cached["tokenizer"]
+        else:
+            # Load without caching
+            logger.info(f"Loading model from {model_dir}")
+            self.model = AutoModelForSequenceClassification.from_pretrained(model_dir)
+            self.tokenizer = AutoTokenizer.from_pretrained(model_dir)
+            self.model.eval()  # Set to evaluation mode
 
     def predict(
         self,
