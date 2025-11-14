@@ -83,6 +83,8 @@ class AIDeletionManager:
             )
 
         # TODO: Send in-app notification to user about pending deletion request
+        # TODO: Send notification to user about pending deletion request
+        # This could be via email, in-app notification, or both
 
         return request
 
