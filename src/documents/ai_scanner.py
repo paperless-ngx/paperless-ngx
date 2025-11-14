@@ -768,8 +768,6 @@ class AIDocumentScanner:
             "custom_fields": {},
         }
 
-        applied_fields = []  # Track which fields were auto-applied for webhook
-
         try:
             with transaction.atomic():
                 # Apply tags
@@ -778,7 +776,6 @@ class AIDocumentScanner:
                         tag = Tag.objects.get(pk=tag_id)
                         document.add_nested_tags([tag])
                         applied["tags"].append({"id": tag_id, "name": tag.name})
-                        applied_fields.append("tags")
                         logger.info(f"Auto-applied tag: {tag.name}")
                     elif confidence >= self.suggest_threshold:
                         tag = Tag.objects.get(pk=tag_id)
@@ -800,7 +797,6 @@ class AIDocumentScanner:
                             "id": corr_id,
                             "name": correspondent.name,
                         }
-                        applied_fields.append("correspondent")
                         logger.info(f"Auto-applied correspondent: {correspondent.name}")
                     elif confidence >= self.suggest_threshold:
                         correspondent = Correspondent.objects.get(pk=corr_id)
@@ -820,7 +816,6 @@ class AIDocumentScanner:
                             "id": type_id,
                             "name": doc_type.name,
                         }
-                        applied_fields.append("document_type")
                         logger.info(f"Auto-applied document type: {doc_type.name}")
                     elif confidence >= self.suggest_threshold:
                         doc_type = DocumentType.objects.get(pk=type_id)
@@ -840,7 +835,6 @@ class AIDocumentScanner:
                             "id": path_id,
                             "name": storage_path.name,
                         }
-                        applied_fields.append("storage_path")
                         logger.info(f"Auto-applied storage path: {storage_path.name}")
                     elif confidence >= self.suggest_threshold:
                         storage_path = StoragePath.objects.get(pk=path_id)
@@ -852,43 +846,6 @@ class AIDocumentScanner:
 
                 # Save document with changes
                 document.save()
-
-                # Send webhooks for auto-applied suggestions
-                if applied_fields:
-                    try:
-                        from documents.webhooks import send_suggestion_applied_webhook
-                        send_suggestion_applied_webhook(
-                            document,
-                            scan_result.to_dict(),
-                            applied_fields,
-                        )
-                    except Exception as webhook_error:
-                        logger.warning(
-                            f"Failed to send suggestion applied webhook: {webhook_error}",
-                            exc_info=True,
-                        )
-
-                # Send webhook for scan completion
-                try:
-                    from documents.webhooks import send_scan_completed_webhook
-                    auto_applied_count = len(applied_fields)
-                    suggestions_count = sum([
-                        len(suggestions.get("tags", [])),
-                        1 if suggestions.get("correspondent") else 0,
-                        1 if suggestions.get("document_type") else 0,
-                        1 if suggestions.get("storage_path") else 0,
-                    ])
-                    send_scan_completed_webhook(
-                        document,
-                        scan_result.to_dict(),
-                        auto_applied_count,
-                        suggestions_count,
-                    )
-                except Exception as webhook_error:
-                    logger.warning(
-                        f"Failed to send scan completed webhook: {webhook_error}",
-                        exc_info=True,
-                    )
 
         except Exception as e:
             logger.exception(f"Failed to apply scan results: {e}")

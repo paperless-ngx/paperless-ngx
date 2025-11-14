@@ -72,17 +72,6 @@ class AIDeletionManager:
             f"requiring approval from user {user.username}",
         )
 
-        # Send webhook notification about deletion request
-        try:
-            from documents.webhooks import send_deletion_request_webhook
-            send_deletion_request_webhook(request)
-        except Exception as webhook_error:
-            logger.warning(
-                f"Failed to send deletion request webhook: {webhook_error}",
-                exc_info=True,
-            )
-
-        # TODO: Send in-app notification to user about pending deletion request
         # TODO: Send notification to user about pending deletion request
         # This could be via email, in-app notification, or both
 
