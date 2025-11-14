@@ -3148,7 +3148,7 @@ class TestWorkflows(
         BASE_URL="/paperless/",
     )
     @mock.patch("documents.signals.handlers.send_webhook.delay")
-    def test_workflow_webhook_action_body_with_subpath(self, mock_post):
+    def test_workflow_webhook_action_body(self, mock_post):
         """
         GIVEN:
             - Document updated workflow with webhook action which uses body
