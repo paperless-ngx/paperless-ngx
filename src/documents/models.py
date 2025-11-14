@@ -1721,3 +1721,7 @@ class DeletionRequest(models.Model):
         self.save()
         
         return True
+
+
+# Import webhook models so Django recognizes them
+from documents.webhooks import AIWebhookEvent, AIWebhookConfig  # noqa: E402, F401
