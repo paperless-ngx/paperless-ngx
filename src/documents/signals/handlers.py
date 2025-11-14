@@ -1095,7 +1095,9 @@ def run_workflows(
 
         if not use_overrides:
             title = document.title
-            doc_url = f"{settings.PAPERLESS_URL}/documents/{document.pk}/"
+            doc_url = (
+                f"{settings.PAPERLESS_URL}{settings.BASE_URL}documents/{document.pk}/"
+            )
             correspondent = (
                 document.correspondent.name if document.correspondent else ""
             )
@@ -1199,7 +1201,9 @@ def run_workflows(
     def webhook_action():
         if not use_overrides:
             title = document.title
-            doc_url = f"{settings.PAPERLESS_URL}/documents/{document.pk}/"
+            doc_url = (
+                f"{settings.PAPERLESS_URL}{settings.BASE_URL}documents/{document.pk}/"
+            )
             correspondent = (
                 document.correspondent.name if document.correspondent else ""
             )
