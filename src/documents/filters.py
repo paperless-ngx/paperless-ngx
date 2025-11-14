@@ -160,6 +160,7 @@ class InboxFilter(Filter):
 @extend_schema_field(serializers.CharField)
 class TitleContentFilter(Filter):
     def filter(self, qs, value):
+        value = value.strip() if isinstance(value, str) else value
         if value:
             return qs.filter(Q(title__icontains=value) | Q(content__icontains=value))
         else:
@@ -214,6 +215,7 @@ class CustomFieldFilterSet(FilterSet):
 @extend_schema_field(serializers.CharField)
 class CustomFieldsFilter(Filter):
     def filter(self, qs, value):
+        value = value.strip() if isinstance(value, str) else value
         if value:
             fields_with_matching_selects = CustomField.objects.filter(
                 extra_data__icontains=value,
@@ -244,6 +246,7 @@ class CustomFieldsFilter(Filter):
 
 class MimeTypeFilter(Filter):
     def filter(self, qs, value):
+        value = value.strip() if isinstance(value, str) else value
         if value:
             return qs.filter(mime_type__icontains=value)
         else:
