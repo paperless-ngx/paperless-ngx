@@ -416,6 +416,80 @@ assigned. `-f` works differently for tags: By default, only additional
 tags get added to documents, no tags will be removed. With `-f`, tags
 that don't match a document anymore get removed as well.
 
+### AI Document Scanner {#ai-scanner}
+
+The AI Document Scanner uses machine learning and natural language processing to automatically
+analyze documents and suggest metadata (tags, correspondents, document types, storage paths,
+custom fields, and workflows). This is useful for applying AI analysis to existing documents
+that were imported before the AI scanner was enabled, or to re-scan documents with updated
+AI models.
+
+```
+scan_documents_ai [-h] [--all] [--filter-by-type TYPE_ID [TYPE_ID ...]]
+                  [--date-range START_DATE END_DATE] [--id-range START_ID END_ID]
+                  [--dry-run] [--auto-apply-high-confidence]
+                  [--confidence-threshold THRESHOLD] [--no-progress-bar]
+                  [--batch-size SIZE]
+
+optional arguments:
+--all                           Scan all documents in the system
+--filter-by-type TYPE_ID        Filter by document type ID(s)
+--date-range START_DATE END_DATE
+                                Filter by creation date range (YYYY-MM-DD format)
+--id-range START_ID END_ID      Filter by document ID range
+--dry-run                       Preview suggestions without applying changes
+--auto-apply-high-confidence    Automatically apply high confidence suggestions (≥80%)
+--confidence-threshold THRESHOLD
+                                Minimum confidence threshold (0.0-1.0, default: 0.60)
+--no-progress-bar               Disable progress bar display
+--batch-size SIZE               Number of documents to process at once (default: 100)
+```
+
+The command processes documents through the comprehensive AI scanner and generates
+suggestions for metadata. You must specify at least one filter option (`--all`,
+`--filter-by-type`, `--date-range`, or `--id-range`).
+
+**Examples:**
+
+Scan all documents in dry-run mode (preview only):
+```bash
+python manage.py scan_documents_ai --all --dry-run
+```
+
+Scan documents of a specific type and auto-apply high confidence suggestions:
+```bash
+python manage.py scan_documents_ai --filter-by-type 1 3 --auto-apply-high-confidence
+```
+
+Scan documents from a date range:
+```bash
+python manage.py scan_documents_ai --date-range 2024-01-01 2024-12-31 --dry-run
+```
+
+Scan a specific range of document IDs:
+```bash
+python manage.py scan_documents_ai --id-range 100 200 --auto-apply-high-confidence
+```
+
+**Understanding Confidence Levels:**
+
+The AI scanner assigns confidence scores to each suggestion:
+- **High confidence (≥80%)**: Very reliable suggestions that can be auto-applied with `--auto-apply-high-confidence`
+- **Medium confidence (60-79%)**: Suggestions that should be reviewed before applying
+- **Low confidence (<60%)**: Not shown by default, increase with `--confidence-threshold` if needed
+
+The command displays a detailed summary at the end, including:
+- Number of documents processed
+- Total suggestions generated
+- Sample suggestions for the first 5 documents with suggestions
+- Any errors encountered during processing
+
+**Performance Considerations:**
+
+For large document sets, the scanner processes documents in batches (default: 100 documents).
+You can adjust this with `--batch-size` to balance between memory usage and processing speed.
+The scanner is designed to handle thousands of documents without affecting system performance.
+
 ### Managing the Automatic matching algorithm
 
 The _Auto_ matching algorithm requires a trained neural network to work.
