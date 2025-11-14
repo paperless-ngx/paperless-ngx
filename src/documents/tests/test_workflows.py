@@ -3212,6 +3212,8 @@ class TestWorkflows(
 
     @override_settings(
         PAPERLESS_URL="http://localhost:8000",
+        PAPERLESS_FORCE_SCRIPT_NAME="/paperless",
+        BASE_URL="/paperless/",
     )
     @mock.patch("documents.signals.handlers.send_webhook.delay")
     def test_workflow_webhook_action_body(self, mock_post):
@@ -3263,7 +3265,7 @@ class TestWorkflows(
 
         mock_post.assert_called_once_with(
             url="http://paperless-ngx.com",
-            data=f"Test message: http://localhost:8000/documents/{doc.id}/",
+            data=f"Test message: http://localhost:8000/paperless/documents/{doc.id}/",
             headers={},
             files=None,
             as_json=False,
