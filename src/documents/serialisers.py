@@ -2696,3 +2696,161 @@ class StoragePathTestSerializer(SerializerWithPerms):
         label="Document",
         write_only=True,
     )
+
+
+class DeletionRequestSerializer(serializers.ModelSerializer):
+    """Serializer for DeletionRequest model with document details."""
+    
+    document_details = serializers.SerializerMethodField()
+    user_username = serializers.CharField(source='user.username', read_only=True)
+    reviewed_by_username = serializers.CharField(
+        source='reviewed_by.username', 
+        read_only=True,
+        allow_null=True,
+    )
+    
+    class Meta:
+        from documents.models import DeletionRequest
+        model = DeletionRequest
+        fields = [
+            'id',
+            'created_at',
+            'updated_at',
+            'requested_by_ai',
+            'ai_reason',
+            'user',
+            'user_username',
+            'status',
+            'impact_summary',
+            'reviewed_at',
+            'reviewed_by',
+            'reviewed_by_username',
+            'review_comment',
+            'completed_at',
+            'completion_details',
+            'document_details',
+        ]
+        read_only_fields = [
+            'id',
+            'created_at',
+            'updated_at',
+            'reviewed_at',
+            'reviewed_by',
+            'completed_at',
+            'completion_details',
+        ]
+    
+    def get_document_details(self, obj):
+        """Get details of documents in this deletion request."""
+        documents = obj.documents.all()
+        return [
+            {
+                'id': doc.id,
+                'title': doc.title,
+                'created': doc.created.isoformat() if doc.created else None,
+                'correspondent': doc.correspondent.name if doc.correspondent else None,
+                'document_type': doc.document_type.name if doc.document_type else None,
+                'tags': [tag.name for tag in doc.tags.all()],
+            }
+            for doc in documents
+        ]
+
+
+class AISuggestionsRequestSerializer(serializers.Serializer):
+    """Serializer for requesting AI suggestions for a document."""
+
+    document_id = serializers.IntegerField(
+        required=True,
+        label="Document ID",
+        help_text="ID of the document to analyze",
+    )
+
+
+class AISuggestionSerializer(serializers.Serializer):
+    """Serializer for a single AI suggestion."""
+
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    confidence = serializers.FloatField()
+
+
+class AISuggestionsResponseSerializer(serializers.Serializer):
+    """Serializer for AI suggestions response."""
+
+    document_id = serializers.IntegerField()
+    tags = AISuggestionSerializer(many=True, required=False)
+    correspondent = AISuggestionSerializer(required=False, allow_null=True)
+    document_type = AISuggestionSerializer(required=False, allow_null=True)
+    storage_path = AISuggestionSerializer(required=False, allow_null=True)
+    title_suggestion = serializers.CharField(required=False, allow_null=True)
+    custom_fields = serializers.DictField(required=False)
+
+
+class ApplyAISuggestionsSerializer(serializers.Serializer):
+    """Serializer for applying AI suggestions to a document."""
+
+    document_id = serializers.IntegerField(
+        required=True,
+        label="Document ID",
+        help_text="ID of the document to apply suggestions to",
+    )
+    apply_tags = serializers.BooleanField(
+        default=False,
+        label="Apply Tags",
+        help_text="Whether to apply tag suggestions",
+    )
+    apply_correspondent = serializers.BooleanField(
+        default=False,
+        label="Apply Correspondent",
+        help_text="Whether to apply correspondent suggestion",
+    )
+    apply_document_type = serializers.BooleanField(
+        default=False,
+        label="Apply Document Type",
+        help_text="Whether to apply document type suggestion",
+    )
+    apply_storage_path = serializers.BooleanField(
+        default=False,
+        label="Apply Storage Path",
+        help_text="Whether to apply storage path suggestion",
+    )
+    apply_title = serializers.BooleanField(
+        default=False,
+        label="Apply Title",
+        help_text="Whether to apply title suggestion",
+    )
+    selected_tags = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=False,
+        label="Selected Tags",
+        help_text="Specific tag IDs to apply (optional)",
+    )
+
+
+class AIConfigurationSerializer(serializers.Serializer):
+    """Serializer for AI configuration settings."""
+
+    auto_apply_threshold = serializers.FloatField(
+        required=False,
+        min_value=0.0,
+        max_value=1.0,
+        label="Auto Apply Threshold",
+        help_text="Confidence threshold for automatic application (0.0-1.0)",
+    )
+    suggest_threshold = serializers.FloatField(
+        required=False,
+        min_value=0.0,
+        max_value=1.0,
+        label="Suggest Threshold",
+        help_text="Confidence threshold for suggestions (0.0-1.0)",
+    )
+    ml_enabled = serializers.BooleanField(
+        required=False,
+        label="ML Features Enabled",
+        help_text="Enable/disable ML features",
+    )
+    advanced_ocr_enabled = serializers.BooleanField(
+        required=False,
+        label="Advanced OCR Enabled",
+        help_text="Enable/disable advanced OCR features",
+    )

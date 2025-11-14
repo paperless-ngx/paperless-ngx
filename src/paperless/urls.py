@@ -15,6 +15,9 @@ from drf_spectacular.views import SpectacularAPIView
 from drf_spectacular.views import SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 
+from documents.views import AIConfigurationView
+from documents.views import AISuggestionsView
+from documents.views import ApplyAISuggestionsView
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
@@ -43,6 +46,7 @@ from documents.views import WorkflowActionViewSet
 from documents.views import WorkflowTriggerViewSet
 from documents.views import WorkflowViewSet
 from documents.views import serve_logo
+from documents.views.deletion_request import DeletionRequestViewSet
 from paperless.consumers import StatusConsumer
 from paperless.views import ApplicationConfigurationViewSet
 from paperless.views import DisconnectSocialAccountView
@@ -79,6 +83,7 @@ api_router.register(r"workflows", WorkflowViewSet)
 api_router.register(r"custom_fields", CustomFieldViewSet)
 api_router.register(r"config", ApplicationConfigurationViewSet)
 api_router.register(r"processed_mail", ProcessedMailViewSet)
+api_router.register(r"deletion-requests", DeletionRequestViewSet, basename="deletion-requests")
 
 
 urlpatterns = [
@@ -199,6 +204,28 @@ urlpatterns = [
                     "^trash/",
                     TrashView.as_view(),
                     name="trash",
+                ),
+                re_path(
+                    "^ai/",
+                    include(
+                        [
+                            re_path(
+                                "^suggestions/$",
+                                AISuggestionsView.as_view(),
+                                name="ai_suggestions",
+                            ),
+                            re_path(
+                                "^suggestions/apply/$",
+                                ApplyAISuggestionsView.as_view(),
+                                name="ai_apply_suggestions",
+                            ),
+                            re_path(
+                                "^config/$",
+                                AIConfigurationView.as_view(),
+                                name="ai_config",
+                            ),
+                        ],
+                    ),
                 ),
                 re_path(
                     r"^oauth/callback/",
