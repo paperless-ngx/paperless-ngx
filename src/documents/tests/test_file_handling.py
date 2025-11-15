@@ -22,6 +22,7 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
+from documents.signals.handlers import sync_custom_field_instances_and_document_names
 from documents.tasks import empty_trash
 from documents.tests.factories import DocumentFactory
 from documents.tests.utils import DirectoriesMixin
@@ -531,15 +532,17 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @override_settings(
         FILENAME_FORMAT="{{title}}_{{custom_fields|get_cf_value('test')}}",
     )
-    @mock.patch("documents.signals.handlers.update_filename_and_move_files")
-    def test_select_cf_updated(self, m):
+    @mock.patch(
+        "documents.signals.handlers.sync_custom_field_instances_and_document_names.delay",
+    )
+    def test_select_cf_updated_enqueues_task(self, mock_delay):
         """
         GIVEN:
             - A document with a select type custom field
         WHEN:
             - The custom field select options are updated
         THEN:
-            - The update_filename_and_move_files handler is called and the document filename is updated
+            - The async task is scheduled so filenames can be refreshed
         """
         cf = CustomField.objects.create(
             name="test",
@@ -569,7 +572,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertEqual(generate_filename(doc), Path("document_apple.pdf"))
 
         # handler should not have been called
-        self.assertEqual(m.call_count, 0)
+        self.assertEqual(mock_delay.call_count, 0)
         cf.extra_data = {
             "select_options": [
                 {"label": "aubergine", "id": "abc123"},
@@ -578,9 +581,79 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             ],
         }
         cf.save()
+        mock_delay.assert_called_once_with(cf.pk)
         self.assertEqual(generate_filename(doc), Path("document_aubergine.pdf"))
-        # handler should have been called
-        self.assertEqual(m.call_count, 1)
+
+    @override_settings(
+        FILENAME_FORMAT="{{title}}_{{custom_fields|get_cf_value('test')}}",
+    )
+    @mock.patch("documents.signals.handlers.update_filename_and_move_files")
+    def test_sync_custom_field_instances_task_updates_documents(self, mock_update):
+        """
+        GIVEN:
+            - Documents with select custom field values (including one later removed option)
+        WHEN:
+            - The worker task processes the custom field
+        THEN:
+            - Invalid instances are pruned and filename updates are triggered
+        """
+        cf = CustomField.objects.create(
+            name="test",
+            data_type=CustomField.FieldDataType.SELECT,
+            extra_data={
+                "select_options": [
+                    {"label": "apple", "id": "abc123"},
+                    {"label": "banana", "id": "def456"},
+                    {"label": "remove", "id": "removed"},
+                ],
+            },
+        )
+        doc_valid = Document.objects.create(
+            title="valid",
+            filename="valid.pdf",
+            archive_filename="valid.pdf",
+            checksum="A",
+            archive_checksum="B",
+            mime_type="application/pdf",
+        )
+        valid_instance = CustomFieldInstance.objects.create(
+            field=cf,
+            document=doc_valid,
+            value_select="abc123",
+        )
+        doc_invalid = Document.objects.create(
+            title="invalid",
+            filename="invalid.pdf",
+            archive_filename="invalid.pdf",
+            checksum="C",
+            archive_checksum="D",
+            mime_type="application/pdf",
+        )
+        removed_value_instance = CustomFieldInstance.objects.create(
+            field=cf,
+            document=doc_invalid,
+            value_select="removed",
+        )
+
+        cf.extra_data = {
+            "select_options": [
+                {"label": "aubergine", "id": "abc123"},
+                {"label": "banana", "id": "def456"},
+            ],
+        }
+        with mock.patch(
+            "documents.signals.handlers.sync_custom_field_instances_and_document_names.delay",
+        ):
+            cf.save(update_fields=["extra_data"])
+
+        sync_custom_field_instances_and_document_names(cf.pk)
+
+        removed_value_instance.refresh_from_db()
+        self.assertIsNone(removed_value_instance.value_select)
+        valid_instance.refresh_from_db()
+        self.assertEqual(valid_instance.value_select, "abc123")
+        # worker should have triggered filename update for both instances
+        self.assertEqual(mock_update.call_count, 2)
 
 
 class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
