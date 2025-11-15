@@ -54,8 +54,8 @@ class TestCustomAccountAdapter(TestCase):
             # False because request host is not in allowed hosts
             self.assertFalse(adapter.is_safe_url(url))
 
-    @mock.patch("allauth.core.ratelimit._consume_rate", return_value=True)
-    def test_pre_authenticate(self, mock_consume_rate):
+    @mock.patch("allauth.core.internal.ratelimit.consume", return_value=True)
+    def test_pre_authenticate(self, mock_consume):
         adapter = get_adapter()
         request = HttpRequest()
         request.get_host = mock.Mock(return_value="example.com")
