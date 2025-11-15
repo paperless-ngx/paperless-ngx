@@ -20,21 +20,16 @@ According to agents.md requirements:
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Dict, List, Optional, Any, Tuple
+from typing import TYPE_CHECKING
+from typing import Any
 
 from django.conf import settings
 from django.db import transaction
 
 if TYPE_CHECKING:
-    from documents.models import (
-        Document,
-        Tag,
-        Correspondent,
-        DocumentType,
-        StoragePath,
-        CustomField,
-        Workflow,
-    )
+    from documents.models import CustomField
+    from documents.models import Document
+    from documents.models import Workflow
 
 logger = logging.getLogger("paperless.ai_scanner")
 
@@ -45,17 +40,26 @@ class AIScanResult:
     """
 
     def __init__(self):
-        self.tags: List[Tuple[int, float]] = []  # [(tag_id, confidence), ...]
-        self.correspondent: Optional[Tuple[int, float]] = None  # (correspondent_id, confidence)
-        self.document_type: Optional[Tuple[int, float]] = None  # (document_type_id, confidence)
-        self.storage_path: Optional[Tuple[int, float]] = None  # (storage_path_id, confidence)
-        self.custom_fields: Dict[int, Tuple[Any, float]] = {}  # {field_id: (value, confidence), ...}
-        self.workflows: List[Tuple[int, float]] = []  # [(workflow_id, confidence), ...]
-        self.extracted_entities: Dict[str, Any] = {}  # NER results
-        self.title_suggestion: Optional[str] = None
-        self.metadata: Dict[str, Any] = {}  # Additional metadata
+        self.tags: list[tuple[int, float]] = []  # [(tag_id, confidence), ...]
+        self.correspondent: tuple[int, float] | None = (
+            None  # (correspondent_id, confidence)
+        )
+        self.document_type: tuple[int, float] | None = (
+            None  # (document_type_id, confidence)
+        )
+        self.storage_path: tuple[int, float] | None = (
+            None  # (storage_path_id, confidence)
+        )
+        self.custom_fields: dict[
+            int,
+            tuple[Any, float],
+        ] = {}  # {field_id: (value, confidence), ...}
+        self.workflows: list[tuple[int, float]] = []  # [(workflow_id, confidence), ...]
+        self.extracted_entities: dict[str, Any] = {}  # NER results
+        self.title_suggestion: str | None = None
+        self.metadata: dict[str, Any] = {}  # Additional metadata
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert scan results to dictionary for logging/serialization."""
         return {
             "tags": self.tags,
@@ -73,7 +77,7 @@ class AIScanResult:
 class AIDocumentScanner:
     """
     Comprehensive AI scanner for automatic document metadata management.
-    
+
     This scanner integrates all ML/AI capabilities to provide automatic:
     - Tag assignment based on content analysis
     - Correspondent detection from document text
@@ -81,7 +85,7 @@ class AIDocumentScanner:
     - Storage path suggestion based on content/type
     - Custom field extraction using NER
     - Workflow assignment based on document characteristics
-    
+
     Features:
     - High confidence threshold (>80%) for automatic application
     - Medium confidence (60-80%) for suggestions requiring user review
@@ -94,12 +98,13 @@ class AIDocumentScanner:
         self,
         auto_apply_threshold: float = 0.80,
         suggest_threshold: float = 0.60,
-        enable_ml_features: bool = None,
-        enable_advanced_ocr: bool = None,
+        *,
+        enable_ml_features: bool | None = None,
+        enable_advanced_ocr: bool | None = None,
     ):
         """
         Initialize AI scanner.
-        
+
         Args:
             auto_apply_threshold: Confidence threshold for automatic application (default: 0.80)
             suggest_threshold: Confidence threshold for suggestions (default: 0.60)
@@ -108,7 +113,7 @@ class AIDocumentScanner:
         """
         self.auto_apply_threshold = auto_apply_threshold
         self.suggest_threshold = suggest_threshold
-        
+
         # Check settings for ML/OCR enablement
         self.ml_enabled = (
             enable_ml_features
@@ -120,23 +125,37 @@ class AIDocumentScanner:
             if enable_advanced_ocr is not None
             else getattr(settings, "PAPERLESS_ENABLE_ADVANCED_OCR", True)
         )
-        
+
         # Lazy loading of ML components
         self._classifier = None
         self._ner_extractor = None
         self._semantic_search = None
         self._table_extractor = None
-        
+
         logger.info(
             f"AIDocumentScanner initialized - ML: {self.ml_enabled}, "
-            f"Advanced OCR: {self.advanced_ocr_enabled}"
+            f"Advanced OCR: {self.advanced_ocr_enabled}",
         )
 
     def _get_classifier(self):
-        """Lazy load the ML classifier."""
+        """Lazy load the ML classifier with caching."""
         if self._classifier is None and self.ml_enabled:
             try:
                 from documents.ml.classifier import TransformerDocumentClassifier
+                
+                # Get model name from settings
+                model_name = getattr(
+                    settings, 
+                    "PAPERLESS_ML_CLASSIFIER_MODEL",
+                    "distilbert-base-uncased",
+                )
+                
+                self._classifier = TransformerDocumentClassifier(
+                    model_name=model_name,
+                    use_cache=True,
+                )
+                logger.info("ML classifier loaded successfully with caching")
+
                 self._classifier = TransformerDocumentClassifier()
                 logger.info("ML classifier loaded successfully")
             except Exception as e:
@@ -145,10 +164,13 @@ class AIDocumentScanner:
         return self._classifier
 
     def _get_ner_extractor(self):
-        """Lazy load the NER extractor."""
+        """Lazy load the NER extractor with caching."""
         if self._ner_extractor is None and self.ml_enabled:
             try:
                 from documents.ml.ner import DocumentNER
+                self._ner_extractor = DocumentNER(use_cache=True)
+                logger.info("NER extractor loaded successfully with caching")
+
                 self._ner_extractor = DocumentNER()
                 logger.info("NER extractor loaded successfully")
             except Exception as e:
@@ -156,10 +178,24 @@ class AIDocumentScanner:
         return self._ner_extractor
 
     def _get_semantic_search(self):
-        """Lazy load semantic search."""
+        """Lazy load semantic search with caching."""
         if self._semantic_search is None and self.ml_enabled:
             try:
                 from documents.ml.semantic_search import SemanticSearch
+                
+                # Get cache directory from settings
+                cache_dir = getattr(
+                    settings,
+                    "PAPERLESS_ML_MODEL_CACHE",
+                    None,
+                )
+                
+                self._semantic_search = SemanticSearch(
+                    cache_dir=cache_dir,
+                    use_cache=True,
+                )
+                logger.info("Semantic search loaded successfully with caching")
+
                 self._semantic_search = SemanticSearch()
                 logger.info("Semantic search loaded successfully")
             except Exception as e:
@@ -171,6 +207,7 @@ class AIDocumentScanner:
         if self._table_extractor is None and self.advanced_ocr_enabled:
             try:
                 from documents.ocr.table_extractor import TableExtractor
+
                 self._table_extractor = TableExtractor()
                 logger.info("Table extractor loaded successfully")
             except Exception as e:
@@ -181,253 +218,275 @@ class AIDocumentScanner:
         self,
         document: Document,
         document_text: str,
-        original_file_path: str = None,
+        original_file_path: str | None = None,
     ) -> AIScanResult:
         """
         Perform comprehensive AI scan of a document.
-        
+
         This is the main entry point for document scanning. It orchestrates
         all AI/ML components to analyze the document and generate suggestions.
-        
+
         Args:
             document: The Document model instance
             document_text: The extracted text content
             original_file_path: Path to original file (for OCR/image analysis)
-            
+
         Returns:
             AIScanResult containing all suggestions and extracted data
         """
-        logger.info(f"Starting AI scan for document: {document.title} (ID: {document.pk})")
-        
+        logger.info(
+            f"Starting AI scan for document: {document.title} (ID: {document.pk})",
+        )
+
         result = AIScanResult()
-        
+
         # Extract entities using NER
         result.extracted_entities = self._extract_entities(document_text)
-        
+
         # Analyze and suggest tags
-        result.tags = self._suggest_tags(document, document_text, result.extracted_entities)
-        
+        result.tags = self._suggest_tags(
+            document,
+            document_text,
+            result.extracted_entities,
+        )
+
         # Detect correspondent
         result.correspondent = self._detect_correspondent(
-            document, document_text, result.extracted_entities
+            document,
+            document_text,
+            result.extracted_entities,
         )
-        
+
         # Classify document type
         result.document_type = self._classify_document_type(
-            document, document_text, result.extracted_entities
+            document,
+            document_text,
+            result.extracted_entities,
         )
-        
+
         # Suggest storage path
         result.storage_path = self._suggest_storage_path(
-            document, document_text, result
+            document,
+            document_text,
+            result,
         )
-        
+
         # Extract custom fields
         result.custom_fields = self._extract_custom_fields(
-            document, document_text, result.extracted_entities
+            document,
+            document_text,
+            result.extracted_entities,
         )
-        
+
         # Suggest workflows
         result.workflows = self._suggest_workflows(document, document_text, result)
-        
+
         # Generate improved title suggestion
         result.title_suggestion = self._suggest_title(
-            document, document_text, result.extracted_entities
+            document,
+            document_text,
+            result.extracted_entities,
         )
-        
+
         # Extract tables if advanced OCR enabled
         if self.advanced_ocr_enabled and original_file_path:
             result.metadata["tables"] = self._extract_tables(original_file_path)
-        
+
         logger.info(f"AI scan completed for document {document.pk}")
         logger.debug(f"Scan results: {result.to_dict()}")
-        
+
         return result
 
-    def _extract_entities(self, text: str) -> Dict[str, Any]:
+    def _extract_entities(self, text: str) -> dict[str, Any]:
         """
         Extract named entities from document text using NER.
-        
+
         Returns:
             Dictionary with extracted entities (persons, orgs, dates, amounts, etc.)
         """
         ner = self._get_ner_extractor()
         if not ner:
             return {}
-        
+
         try:
             # Use extract_all to get comprehensive entity extraction
             entities = ner.extract_all(text)
-            
+
             # Convert string lists to dict format for consistency
             for key in ["persons", "organizations", "locations", "misc"]:
                 if key in entities and isinstance(entities[key], list):
-                    entities[key] = [{"text": e} if isinstance(e, str) else e for e in entities[key]]
-            
+                    entities[key] = [
+                        {"text": e} if isinstance(e, str) else e for e in entities[key]
+                    ]
+
             for key in ["dates", "amounts"]:
                 if key in entities and isinstance(entities[key], list):
-                    entities[key] = [{"text": e} if isinstance(e, str) else e for e in entities[key]]
-            
-            logger.debug(f"Extracted entities from NER")
+                    entities[key] = [
+                        {"text": e} if isinstance(e, str) else e for e in entities[key]
+                    ]
+
+            logger.debug("Extracted entities from NER")
             return entities
         except Exception as e:
-            logger.error(f"Entity extraction failed: {e}", exc_info=True)
+            logger.exception(f"Entity extraction failed: {e}")
             return {}
 
     def _suggest_tags(
         self,
         document: Document,
         text: str,
-        entities: Dict[str, Any],
-    ) -> List[Tuple[int, float]]:
+        entities: dict[str, Any],
+    ) -> list[tuple[int, float]]:
         """
         Suggest relevant tags based on document content and entities.
-        
+
         Uses a combination of:
         - Keyword matching with existing tag patterns
         - ML classification if available
         - Entity-based suggestions (e.g., organization -> company tag)
-        
+
         Returns:
             List of (tag_id, confidence) tuples
         """
-        from documents.models import Tag
         from documents.matching import match_tags
-        
+        from documents.models import Tag
+
         suggestions = []
-        
+
         try:
             # Use existing matching logic
             matched_tags = match_tags(document, self._get_classifier())
-            
+
             # Add confidence scores based on matching strength
             for tag in matched_tags:
                 confidence = 0.85  # High confidence for matched tags
                 suggestions.append((tag.id, confidence))
-            
+
             # Additional entity-based suggestions
             if entities:
                 # Suggest tags based on detected entities
                 all_tags = Tag.objects.all()
-                
+
                 # Check for organization entities -> company/business tags
                 if entities.get("organizations"):
                     for tag in all_tags.filter(name__icontains="company"):
                         suggestions.append((tag.id, 0.70))
-                
+
                 # Check for date entities -> tax/financial tags if year-end
                 if entities.get("dates"):
                     for tag in all_tags.filter(name__icontains="tax"):
                         suggestions.append((tag.id, 0.65))
-            
+
             # Remove duplicates, keep highest confidence
             seen = {}
             for tag_id, conf in suggestions:
                 if tag_id not in seen or conf > seen[tag_id]:
                     seen[tag_id] = conf
-            
+
             suggestions = [(tid, conf) for tid, conf in seen.items()]
             suggestions.sort(key=lambda x: x[1], reverse=True)
-            
+
             logger.debug(f"Suggested {len(suggestions)} tags")
-            
+
         except Exception as e:
-            logger.error(f"Tag suggestion failed: {e}", exc_info=True)
-        
+            logger.exception(f"Tag suggestion failed: {e}")
+
         return suggestions
 
     def _detect_correspondent(
         self,
         document: Document,
         text: str,
-        entities: Dict[str, Any],
-    ) -> Optional[Tuple[int, float]]:
+        entities: dict[str, Any],
+    ) -> tuple[int, float] | None:
         """
         Detect correspondent based on document content and entities.
-        
+
         Uses:
         - Organization entities from NER
         - Email domains
         - Existing correspondent matching patterns
-        
+
         Returns:
             (correspondent_id, confidence) or None
         """
-        from documents.models import Correspondent
         from documents.matching import match_correspondents
-        
+        from documents.models import Correspondent
+
         try:
             # Use existing matching logic
-            matched_correspondents = match_correspondents(document, self._get_classifier())
-            
+            matched_correspondents = match_correspondents(
+                document,
+                self._get_classifier(),
+            )
+
             if matched_correspondents:
                 correspondent = matched_correspondents[0]
                 confidence = 0.85
                 logger.debug(
                     f"Detected correspondent: {correspondent.name} "
-                    f"(confidence: {confidence})"
+                    f"(confidence: {confidence})",
                 )
                 return (correspondent.id, confidence)
-            
+
             # Try to match based on NER organizations
             if entities.get("organizations"):
                 org_name = entities["organizations"][0]["text"]
                 # Try to find existing correspondent with similar name
                 correspondents = Correspondent.objects.filter(
-                    name__icontains=org_name[:20]  # First 20 chars
+                    name__icontains=org_name[:20],  # First 20 chars
                 )
                 if correspondents.exists():
                     correspondent = correspondents.first()
                     confidence = 0.70
                     logger.debug(
                         f"Detected correspondent from NER: {correspondent.name} "
-                        f"(confidence: {confidence})"
+                        f"(confidence: {confidence})",
                     )
                     return (correspondent.id, confidence)
-        
+
         except Exception as e:
-            logger.error(f"Correspondent detection failed: {e}", exc_info=True)
-        
+            logger.exception(f"Correspondent detection failed: {e}")
+
         return None
 
     def _classify_document_type(
         self,
         document: Document,
         text: str,
-        entities: Dict[str, Any],
-    ) -> Optional[Tuple[int, float]]:
+        entities: dict[str, Any],
+    ) -> tuple[int, float] | None:
         """
         Classify document type using ML and content analysis.
-        
+
         Returns:
             (document_type_id, confidence) or None
         """
-        from documents.models import DocumentType
         from documents.matching import match_document_types
-        
+
         try:
             # Use existing matching logic
             matched_types = match_document_types(document, self._get_classifier())
-            
+
             if matched_types:
                 doc_type = matched_types[0]
                 confidence = 0.85
                 logger.debug(
                     f"Classified document type: {doc_type.name} "
-                    f"(confidence: {confidence})"
+                    f"(confidence: {confidence})",
                 )
                 return (doc_type.id, confidence)
-            
+
             # ML-based classification if available
             classifier = self._get_classifier()
             if classifier and hasattr(classifier, "predict"):
                 # This would need a trained model with document type labels
                 # For now, fall back to pattern matching
                 pass
-        
+
         except Exception as e:
-            logger.error(f"Document type classification failed: {e}", exc_info=True)
-        
+            logger.exception(f"Document type classification failed: {e}")
+
         return None
 
     def _suggest_storage_path(
@@ -435,127 +494,131 @@ class AIDocumentScanner:
         document: Document,
         text: str,
         scan_result: AIScanResult,
-    ) -> Optional[Tuple[int, float]]:
+    ) -> tuple[int, float] | None:
         """
         Suggest appropriate storage path based on document characteristics.
-        
+
         Returns:
             (storage_path_id, confidence) or None
         """
-        from documents.models import StoragePath
         from documents.matching import match_storage_paths
-        
+
         try:
             # Use existing matching logic
             matched_paths = match_storage_paths(document, self._get_classifier())
-            
+
             if matched_paths:
                 storage_path = matched_paths[0]
                 confidence = 0.80
                 logger.debug(
                     f"Suggested storage path: {storage_path.name} "
-                    f"(confidence: {confidence})"
+                    f"(confidence: {confidence})",
                 )
                 return (storage_path.id, confidence)
-        
+
         except Exception as e:
-            logger.error(f"Storage path suggestion failed: {e}", exc_info=True)
-        
+            logger.exception(f"Storage path suggestion failed: {e}")
+
         return None
 
     def _extract_custom_fields(
         self,
         document: Document,
         text: str,
-        entities: Dict[str, Any],
-    ) -> Dict[int, Tuple[Any, float]]:
+        entities: dict[str, Any],
+    ) -> dict[int, tuple[Any, float]]:
         """
         Extract values for custom fields using NER and pattern matching.
-        
+
         Returns:
             Dictionary mapping field_id to (value, confidence)
         """
         from documents.models import CustomField
-        
+
         extracted_fields = {}
-        
+
         try:
             custom_fields = CustomField.objects.all()
-            
+
             for field in custom_fields:
                 # Try to extract field value based on field name and type
                 value, confidence = self._extract_field_value(
-                    field, text, entities
+                    field,
+                    text,
+                    entities,
                 )
-                
+
                 if value is not None and confidence >= self.suggest_threshold:
                     extracted_fields[field.id] = (value, confidence)
                     logger.debug(
                         f"Extracted custom field '{field.name}': {value} "
-                        f"(confidence: {confidence})"
+                        f"(confidence: {confidence})",
                     )
-        
+
         except Exception as e:
-            logger.error(f"Custom field extraction failed: {e}", exc_info=True)
-        
+            logger.exception(f"Custom field extraction failed: {e}")
+
         return extracted_fields
 
     def _extract_field_value(
         self,
         field: CustomField,
         text: str,
-        entities: Dict[str, Any],
-    ) -> Tuple[Any, float]:
+        entities: dict[str, Any],
+    ) -> tuple[Any, float]:
         """
         Extract a single custom field value.
-        
+
         Returns:
             (value, confidence) tuple
         """
         field_name_lower = field.name.lower()
-        
+
         # Date fields
         if "date" in field_name_lower:
             dates = entities.get("dates", [])
             if dates:
                 return (dates[0]["text"], 0.75)
-        
+
         # Amount/price fields
-        if any(keyword in field_name_lower for keyword in ["amount", "price", "cost", "total"]):
+        if any(
+            keyword in field_name_lower
+            for keyword in ["amount", "price", "cost", "total"]
+        ):
             amounts = entities.get("amounts", [])
             if amounts:
                 return (amounts[0]["text"], 0.75)
-        
+
         # Invoice number fields
         if "invoice" in field_name_lower:
             invoice_numbers = entities.get("invoice_numbers", [])
             if invoice_numbers:
                 return (invoice_numbers[0], 0.80)
-        
+
         # Email fields
         if "email" in field_name_lower:
             emails = entities.get("emails", [])
             if emails:
                 return (emails[0], 0.85)
-        
+
         # Phone fields
         if "phone" in field_name_lower:
             phones = entities.get("phones", [])
             if phones:
                 return (phones[0], 0.85)
-        
+
         # Person name fields
         if "name" in field_name_lower or "person" in field_name_lower:
             persons = entities.get("persons", [])
             if persons:
                 return (persons[0]["text"], 0.70)
-        
+
         # Organization fields
         if "company" in field_name_lower or "organization" in field_name_lower:
             orgs = entities.get("organizations", [])
             if orgs:
                 return (orgs[0]["text"], 0.70)
-        
+
         return (None, 0.0)
 
     def _suggest_workflows(
@@ -563,40 +626,43 @@ class AIDocumentScanner:
         document: Document,
         text: str,
         scan_result: AIScanResult,
-    ) -> List[Tuple[int, float]]:
+    ) -> list[tuple[int, float]]:
         """
         Suggest relevant workflows based on document characteristics.
-        
+
         Returns:
             List of (workflow_id, confidence) tuples
         """
-        from documents.models import Workflow, WorkflowTrigger
-        
+        from documents.models import Workflow
+        from documents.models import WorkflowTrigger
+
         suggestions = []
-        
+
         try:
             # Get all workflows with consumption triggers
             workflows = Workflow.objects.filter(
                 enabled=True,
                 triggers__type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
             ).distinct()
-            
+
             for workflow in workflows:
                 # Evaluate workflow conditions against scan results
                 confidence = self._evaluate_workflow_match(
-                    workflow, document, scan_result
+                    workflow,
+                    document,
+                    scan_result,
                 )
-                
+
                 if confidence >= self.suggest_threshold:
                     suggestions.append((workflow.id, confidence))
                     logger.debug(
                         f"Suggested workflow: {workflow.name} "
-                        f"(confidence: {confidence})"
+                        f"(confidence: {confidence})",
                     )
-        
+
         except Exception as e:
-            logger.error(f"Workflow suggestion failed: {e}", exc_info=True)
-        
+            logger.exception(f"Workflow suggestion failed: {e}")
+
         return suggestions
 
     def _evaluate_workflow_match(
@@ -607,109 +673,113 @@ class AIDocumentScanner:
     ) -> float:
         """
         Evaluate how well a workflow matches the document.
-        
+
         Returns:
             Confidence score (0.0 to 1.0)
         """
         # This is a simplified evaluation
         # In practice, you'd check workflow triggers and conditions
-        
+
         confidence = 0.5  # Base confidence
-        
+
         # Increase confidence if document type matches workflow expectations
         if scan_result.document_type and workflow.actions.exists():
             confidence += 0.2
-        
+
         # Increase confidence if correspondent matches
         if scan_result.correspondent:
             confidence += 0.15
-        
+
         # Increase confidence if tags match
         if scan_result.tags:
             confidence += 0.15
-        
+
         return min(confidence, 1.0)
 
     def _suggest_title(
         self,
         document: Document,
         text: str,
-        entities: Dict[str, Any],
-    ) -> Optional[str]:
+        entities: dict[str, Any],
+    ) -> str | None:
         """
         Generate an improved title suggestion based on document content.
-        
+
         Returns:
             Suggested title or None
         """
         try:
             # Extract key information for title
             title_parts = []
-            
+
             # Add document type if detected
             if entities.get("document_type"):
                 title_parts.append(entities["document_type"])
-            
+
             # Add primary organization
             orgs = entities.get("organizations", [])
             if orgs:
                 title_parts.append(orgs[0]["text"][:30])  # Limit length
-            
+
             # Add date if available
             dates = entities.get("dates", [])
             if dates:
                 title_parts.append(dates[0]["text"])
-            
+
             if title_parts:
                 suggested_title = " - ".join(title_parts)
                 logger.debug(f"Generated title suggestion: {suggested_title}")
                 return suggested_title[:127]  # Respect title length limit
-        
+
         except Exception as e:
-            logger.error(f"Title suggestion failed: {e}", exc_info=True)
-        
+            logger.exception(f"Title suggestion failed: {e}")
+
         return None
 
-    def _extract_tables(self, file_path: str) -> List[Dict[str, Any]]:
+    def _extract_tables(self, file_path: str) -> list[dict[str, Any]]:
         """
         Extract tables from document using advanced OCR.
-        
+
         Returns:
             List of extracted tables with data and metadata
         """
         extractor = self._get_table_extractor()
         if not extractor:
             return []
-        
+
         try:
             tables = extractor.extract_tables_from_image(file_path)
             logger.debug(f"Extracted {len(tables)} tables from document")
             return tables
         except Exception as e:
-            logger.error(f"Table extraction failed: {e}", exc_info=True)
+            logger.exception(f"Table extraction failed: {e}")
             return []
 
     def apply_scan_results(
         self,
         document: Document,
         scan_result: AIScanResult,
+        *,
         auto_apply: bool = True,
         user_confirmed: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Apply AI scan results to document.
-        
+
         Args:
             document: Document to update
             scan_result: AI scan results
             auto_apply: Whether to auto-apply high confidence suggestions
             user_confirmed: Whether user has confirmed low-confidence changes
-            
+
         Returns:
             Dictionary with applied changes and pending suggestions
         """
-        from documents.models import Tag, Correspondent, DocumentType, StoragePath
-        
+        from documents.models import Correspondent
+        from documents.models import DocumentType
+        from documents.models import StoragePath
+        from documents.models import Tag
+
         applied = {
             "tags": [],
             "correspondent": None,
@@ -717,7 +787,7 @@ class AIDocumentScanner:
             "storage_path": None,
             "custom_fields": {},
         }
-        
+
         suggestions = {
             "tags": [],
             "correspondent": None,
@@ -725,7 +795,7 @@ class AIDocumentScanner:
             "storage_path": None,
             "custom_fields": {},
         }
-        
+
         try:
             with transaction.atomic():
                 # Apply tags
@@ -737,12 +807,14 @@ class AIDocumentScanner:
                         logger.info(f"Auto-applied tag: {tag.name}")
                     elif confidence >= self.suggest_threshold:
                         tag = Tag.objects.get(pk=tag_id)
-                        suggestions["tags"].append({
-                            "id": tag_id,
-                            "name": tag.name,
-                            "confidence": confidence,
-                        })
-                
+                        suggestions["tags"].append(
+                            {
+                                "id": tag_id,
+                                "name": tag.name,
+                                "confidence": confidence,
+                            },
+                        )
+
                 # Apply correspondent
                 if scan_result.correspondent:
                     corr_id, confidence = scan_result.correspondent
@@ -761,7 +833,7 @@ class AIDocumentScanner:
                             "name": correspondent.name,
                             "confidence": confidence,
                         }
-                
+
                 # Apply document type
                 if scan_result.document_type:
                     type_id, confidence = scan_result.document_type
@@ -780,7 +852,7 @@ class AIDocumentScanner:
                             "name": doc_type.name,
                             "confidence": confidence,
                         }
-                
+
                 # Apply storage path
                 if scan_result.storage_path:
                     path_id, confidence = scan_result.storage_path
@@ -799,17 +871,110 @@ class AIDocumentScanner:
                             "name": storage_path.name,
                             "confidence": confidence,
                         }
-                
+
                 # Save document with changes
                 document.save()
-        
+
         except Exception as e:
-            logger.error(f"Failed to apply scan results: {e}", exc_info=True)
-        
+            logger.exception(f"Failed to apply scan results: {e}")
+
         return {
             "applied": applied,
             "suggestions": suggestions,
         }
+
+    def warm_up_models(self) -> None:
+        """
+        Pre-load all ML models on startup (warm-up).
+        
+        This ensures models are cached and ready for use,
+        making the first document scan fast.
+        """
+        if not self.ml_enabled:
+            logger.info("ML features disabled, skipping warm-up")
+            return
+
+        import time
+        logger.info("Starting ML model warm-up...")
+        start_time = time.time()
+        
+        from documents.ml.model_cache import ModelCacheManager
+        cache_manager = ModelCacheManager.get_instance()
+        
+        # Define model loaders
+        model_loaders = {}
+        
+        # Classifier
+        if self.ml_enabled:
+            def load_classifier():
+                from documents.ml.classifier import TransformerDocumentClassifier
+                model_name = getattr(
+                    settings,
+                    "PAPERLESS_ML_CLASSIFIER_MODEL",
+                    "distilbert-base-uncased",
+                )
+                return TransformerDocumentClassifier(
+                    model_name=model_name,
+                    use_cache=True,
+                )
+            model_loaders["classifier"] = load_classifier
+        
+        # NER
+        if self.ml_enabled:
+            def load_ner():
+                from documents.ml.ner import DocumentNER
+                return DocumentNER(use_cache=True)
+            model_loaders["ner"] = load_ner
+        
+        # Semantic Search
+        if self.ml_enabled:
+            def load_semantic():
+                from documents.ml.semantic_search import SemanticSearch
+                cache_dir = getattr(settings, "PAPERLESS_ML_MODEL_CACHE", None)
+                return SemanticSearch(cache_dir=cache_dir, use_cache=True)
+            model_loaders["semantic_search"] = load_semantic
+        
+        # Table Extractor
+        if self.advanced_ocr_enabled:
+            def load_table():
+                from documents.ocr.table_extractor import TableExtractor
+                return TableExtractor()
+            model_loaders["table_extractor"] = load_table
+        
+        # Warm up all models
+        cache_manager.warm_up(model_loaders)
+        
+        warm_up_time = time.time() - start_time
+        logger.info(f"ML model warm-up completed in {warm_up_time:.2f}s")
+
+    def get_cache_metrics(self) -> Dict[str, Any]:
+        """
+        Get cache performance metrics.
+        
+        Returns:
+            Dictionary with cache statistics
+        """
+        from documents.ml.model_cache import ModelCacheManager
+        
+        try:
+            cache_manager = ModelCacheManager.get_instance()
+            return cache_manager.get_metrics()
+        except Exception as e:
+            logger.error(f"Failed to get cache metrics: {e}")
+            return {
+                "error": str(e),
+            }
+
+    def clear_cache(self) -> None:
+        """Clear all model caches."""
+        from documents.ml.model_cache import ModelCacheManager
+        
+        try:
+            cache_manager = ModelCacheManager.get_instance()
+            cache_manager.clear_all()
+            logger.info("All model caches cleared")
+        except Exception as e:
+            logger.error(f"Failed to clear cache: {e}")
 
 
 # Global scanner instance (lazy initialized)
@@ -819,7 +984,7 @@ _scanner_instance = None
 def get_ai_scanner() -> AIDocumentScanner:
     """
     Get or create the global AI scanner instance.
-    
+
     Returns:
         AIDocumentScanner instance
     """

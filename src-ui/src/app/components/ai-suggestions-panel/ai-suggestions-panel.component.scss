@@ -1,0 +1,241 @@
+.ai-suggestions-panel {
+  border: 2px solid var(--bs-primary);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .card-header {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+    padding: 0.75rem 1rem;
+
+    &:hover {
+      background-color: var(--bs-primary) !important;
+      filter: brightness(1.1);
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+    }
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+}
+
+.suggestions-container {
+  max-height: 600px;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  // Custom scrollbar styles
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+
+    &:hover {
+      background: #555;
+    }
+  }
+}
+
+.suggestion-group {
+  .suggestion-group-header {
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #dee2e6;
+
+    strong {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+    }
+  }
+
+  .suggestion-items {
+    padding-left: 1.5rem;
+  }
+}
+
+.suggestion-item {
+  border-left: 3px solid var(--bs-primary);
+  transition: all 0.3s ease;
+  position: relative;
+
+  &:hover {
+    border-left-color: var(--bs-success);
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+    transform: translateX(2px);
+  }
+
+  &.suggestion-applying {
+    animation: applyAnimation 0.5s ease;
+    border-left-color: var(--bs-success);
+    background-color: rgba(25, 135, 84, 0.1);
+  }
+
+  &.suggestion-rejecting {
+    animation: rejectAnimation 0.5s ease;
+    border-left-color: var(--bs-danger);
+    background-color: rgba(220, 53, 69, 0.1);
+  }
+
+  .suggestion-value {
+    color: #333;
+    font-size: 0.95rem;
+    word-break: break-word;
+  }
+
+  .confidence-badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    display: inline-flex;
+    align-items: center;
+
+    &.confidence-high {
+      background-color: #28a745;
+      color: white;
+    }
+
+    &.confidence-medium {
+      background-color: #ffc107;
+      color: #333;
+    }
+
+    &.confidence-low {
+      background-color: #dc3545;
+      color: white;
+    }
+  }
+
+  .suggestion-actions {
+    .btn {
+      min-width: 36px;
+      padding: 0.25rem 0.5rem;
+      transition: all 0.2s ease;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes applyAnimation {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+}
+
+@keyframes rejectAnimation {
+  0% {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateX(-20px) rotate(-5deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-40px) rotate(-10deg);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .ai-suggestions-panel {
+    .card-header {
+      padding: 0.5rem 0.75rem;
+      flex-wrap: wrap;
+
+      .badge {
+        font-size: 0.65rem;
+        padding: 0.2rem 0.4rem;
+      }
+    }
+
+    .card-body {
+      padding: 0.75rem;
+    }
+  }
+
+  .suggestions-container {
+    max-height: 400px;
+  }
+
+  .suggestion-group {
+    .suggestion-items {
+      padding-left: 0.5rem;
+    }
+  }
+
+  .suggestion-item {
+    .d-flex {
+      flex-direction: column;
+      gap: 0.5rem !important;
+    }
+
+    .suggestion-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .ai-suggestions-panel {
+    .card-header {
+      .d-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.5rem;
+      }
+    }
+  }
+
+  .suggestion-item {
+    .suggestion-value {
+      font-size: 0.875rem;
+    }
+
+    .confidence-badge {
+      font-size: 0.7rem;
+    }
+  }
+}

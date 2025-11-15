@@ -32,6 +32,11 @@ import {
   switchMap,
   takeUntil,
 } from 'rxjs/operators'
+import {
+  AISuggestion,
+  AISuggestionStatus,
+  AISuggestionType,
+} from 'src/app/data/ai-suggestion'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
@@ -109,6 +114,7 @@ import { ShareLinksDialogComponent } from '../common/share-links-dialog/share-li
 import { DocumentHistoryComponent } from '../document-history/document-history.component'
 import { DocumentNotesComponent } from '../document-notes/document-notes.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
+import { AiSuggestionsPanelComponent } from '../ai-suggestions-panel/ai-suggestions-panel.component'
 import { MetadataCollapseComponent } from './metadata-collapse/metadata-collapse.component'
 
 enum DocumentDetailNavIDs {
@@ -151,6 +157,7 @@ export enum ZoomSetting {
     CustomFieldsDropdownComponent,
     DocumentNotesComponent,
     DocumentHistoryComponent,
+    AiSuggestionsPanelComponent,
     CheckComponent,
     DateComponent,
     DocumentLinkComponent,
@@ -216,6 +223,7 @@ export class DocumentDetailComponent
   document: Document
   metadata: DocumentMetadata
   suggestions: DocumentSuggestions
+  aiSuggestions: AISuggestion[] = []
   users: User[]
 
   title: string
@@ -437,6 +445,7 @@ export class DocumentDetailComponent
           }
           this.documentId = doc.id
           this.suggestions = null
+          this.aiSuggestions = []
           const openDocument = this.openDocumentService.getOpenDocument(
             this.documentId
           )
@@ -691,9 +700,11 @@ export class DocumentDetailComponent
         .subscribe({
           next: (result) => {
             this.suggestions = result
+            this.aiSuggestions = this.convertSuggestionsToAI(result)
           },
           error: (error) => {
             this.suggestions = null
+            this.aiSuggestions = []
             this.toastService.showError(
               $localize`Error retrieving suggestions.`,
               error
@@ -1541,5 +1552,125 @@ export class DocumentDetailComponent
           this.tiffError = $localize`An error occurred loading tiff: ${err.toString()}`
         },
       })
+  }
+
+  private convertSuggestionsToAI(suggestions: DocumentSuggestions): AISuggestion[] {
+    if (!suggestions) {
+      return []
+    }
+
+    const aiSuggestions: AISuggestion[] = []
+    let id = 1
+
+    // Convert tag suggestions
+    if (suggestions.tags && suggestions.tags.length > 0) {
+      suggestions.tags.forEach((tagId) => {
+        aiSuggestions.push({
+          id: `tag-${id++}`,
+          type: AISuggestionType.Tag,
+          value: tagId,
+          confidence: 0.75, // Default confidence for legacy suggestions
+          status: AISuggestionStatus.Pending,
+        })
+      })
+    }
+
+    // Convert correspondent suggestions
+    if (suggestions.correspondents && suggestions.correspondents.length > 0) {
+      suggestions.correspondents.forEach((corrId) => {
+        aiSuggestions.push({
+          id: `correspondent-${id++}`,
+          type: AISuggestionType.Correspondent,
+          value: corrId,
+          confidence: 0.75,
+          status: AISuggestionStatus.Pending,
+        })
+      })
+    }
+
+    // Convert document type suggestions
+    if (suggestions.document_types && suggestions.document_types.length > 0) {
+      suggestions.document_types.forEach((docTypeId) => {
+        aiSuggestions.push({
+          id: `doctype-${id++}`,
+          type: AISuggestionType.DocumentType,
+          value: docTypeId,
+          confidence: 0.75,
+          status: AISuggestionStatus.Pending,
+        })
+      })
+    }
+
+    // Convert storage path suggestions
+    if (suggestions.storage_paths && suggestions.storage_paths.length > 0) {
+      suggestions.storage_paths.forEach((storagePathId) => {
+        aiSuggestions.push({
+          id: `storage-${id++}`,
+          type: AISuggestionType.StoragePath,
+          value: storagePathId,
+          confidence: 0.75,
+          status: AISuggestionStatus.Pending,
+        })
+      })
+    }
+
+    // Convert date suggestions
+    if (suggestions.dates && suggestions.dates.length > 0) {
+      suggestions.dates.forEach((date) => {
+        aiSuggestions.push({
+          id: `date-${id++}`,
+          type: AISuggestionType.Date,
+          value: date,
+          confidence: 0.75,
+          status: AISuggestionStatus.Pending,
+        })
+      })
+    }
+
+    return aiSuggestions
+  }
+
+  onApplySuggestion(suggestion: AISuggestion): void {
+    switch (suggestion.type) {
+      case AISuggestionType.Tag:
+        const currentTags = this.documentForm.get('tags').value || []
+        if (!currentTags.includes(suggestion.value)) {
+          this.documentForm.get('tags').setValue([...currentTags, suggestion.value])
+          this.documentForm.get('tags').markAsDirty()
+        }
+        break
+
+      case AISuggestionType.Correspondent:
+        this.documentForm.get('correspondent').setValue(suggestion.value)
+        this.documentForm.get('correspondent').markAsDirty()
+        break
+
+      case AISuggestionType.DocumentType:
+        this.documentForm.get('document_type').setValue(suggestion.value)
+        this.documentForm.get('document_type').markAsDirty()
+        break
+
+      case AISuggestionType.StoragePath:
+        this.documentForm.get('storage_path').setValue(suggestion.value)
+        this.documentForm.get('storage_path').markAsDirty()
+        break
+
+      case AISuggestionType.Date:
+        const dateAdapter = new ISODateAdapter()
+        const dateValue = dateAdapter.fromModel(suggestion.value)
+        this.documentForm.get('created').setValue(dateValue)
+        this.documentForm.get('created').markAsDirty()
+        break
+
+      case AISuggestionType.Title:
+        this.documentForm.get('title').setValue(suggestion.value)
+        this.documentForm.get('title').markAsDirty()
+        break
+    }
+  }
+
+  onRejectSuggestion(suggestion: AISuggestion): void {
+    // Just remove it from the list (handled by the panel component)
+    // No additional action needed here
   }
 }

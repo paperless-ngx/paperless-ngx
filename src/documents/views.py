@@ -69,6 +69,7 @@ from packaging import version as packaging_version
 from redis import Redis
 from rest_framework import parsers
 from rest_framework import serializers
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 from rest_framework.exceptions import ValidationError
@@ -140,9 +141,15 @@ from documents.models import UiSettings
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
+from documents.ai_scanner import AIDocumentScanner
+from documents.ai_scanner import get_ai_scanner
 from documents.parsers import get_parser_class_for_mime_type
 from documents.parsers import parse_date_generator
 from documents.permissions import AcknowledgeTasksPermissions
+from documents.permissions import CanApplyAISuggestionsPermission
+from documents.permissions import CanApproveDeletionsPermission
+from documents.permissions import CanConfigureAIPermission
+from documents.permissions import CanViewAISuggestionsPermission
 from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessNotePermissions
 from documents.permissions import PaperlessObjectPermissions
@@ -153,6 +160,10 @@ from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
 from documents.schema import generate_object_with_permissions_schema
 from documents.serialisers import AcknowledgeTasksViewSerializer
+from documents.serialisers import AIConfigurationSerializer
+from documents.serialisers import AISuggestionsRequestSerializer
+from documents.serialisers import AISuggestionsResponseSerializer
+from documents.serialisers import ApplyAISuggestionsSerializer
 from documents.serialisers import BulkDownloadSerializer
 from documents.serialisers import BulkEditObjectsSerializer
 from documents.serialisers import BulkEditSerializer
@@ -1348,6 +1359,279 @@ class UnifiedSearchViewSet(DocumentViewSet):
             "archive_serial_number__max",
         )
         return Response(max_asn + 1)
+
+    @action(detail=True, methods=["GET"], name="Get AI Suggestions")
+    def ai_suggestions(self, request, pk=None):
+        """
+        Get AI suggestions for a document.
+        
+        Returns AI-generated suggestions for tags, correspondent, document type,
+        storage path, custom fields, workflows, and title.
+        """
+        from documents.ai_scanner import get_ai_scanner
+        from documents.serializers.ai_suggestions import AISuggestionsSerializer
+        
+        try:
+            document = self.get_object()
+            
+            # Check if document has content to scan
+            if not document.content:
+                return Response(
+                    {"detail": "Document has no content to analyze"},
+                    status=400,
+                )
+            
+            # Get AI scanner instance
+            scanner = get_ai_scanner()
+            
+            # Perform AI scan
+            scan_result = scanner.scan_document(
+                document=document,
+                document_text=document.content,
+                original_file_path=document.source_path if hasattr(document, 'source_path') else None,
+            )
+            
+            # Convert scan result to serializable format
+            data = AISuggestionsSerializer.from_scan_result(scan_result, document.id)
+            
+            # Serialize and return
+            serializer = AISuggestionsSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            
+            return Response(serializer.validated_data)
+            
+        except Exception as e:
+            logger.error(f"Error getting AI suggestions for document {pk}: {e}", exc_info=True)
+            return Response(
+                {"detail": "Error generating AI suggestions. Please check the logs for details."},
+                status=500,
+            )
+
+    @action(detail=True, methods=["POST"], name="Apply AI Suggestion")
+    def apply_suggestion(self, request, pk=None):
+        """
+        Apply an AI suggestion to a document.
+        
+        Records user feedback and applies the suggested change.
+        """
+        from documents.models import AISuggestionFeedback
+        from documents.serializers.ai_suggestions import ApplySuggestionSerializer
+        
+        try:
+            document = self.get_object()
+            
+            # Validate input
+            serializer = ApplySuggestionSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            
+            suggestion_type = serializer.validated_data['suggestion_type']
+            value_id = serializer.validated_data.get('value_id')
+            value_text = serializer.validated_data.get('value_text')
+            confidence = serializer.validated_data['confidence']
+            
+            # Apply the suggestion based on type
+            applied = False
+            result_message = ""
+            
+            if suggestion_type == 'tag' and value_id:
+                tag = Tag.objects.get(pk=value_id)
+                document.tags.add(tag)
+                applied = True
+                result_message = f"Tag '{tag.name}' applied"
+                
+            elif suggestion_type == 'correspondent' and value_id:
+                correspondent = Correspondent.objects.get(pk=value_id)
+                document.correspondent = correspondent
+                document.save()
+                applied = True
+                result_message = f"Correspondent '{correspondent.name}' applied"
+                
+            elif suggestion_type == 'document_type' and value_id:
+                doc_type = DocumentType.objects.get(pk=value_id)
+                document.document_type = doc_type
+                document.save()
+                applied = True
+                result_message = f"Document type '{doc_type.name}' applied"
+                
+            elif suggestion_type == 'storage_path' and value_id:
+                storage_path = StoragePath.objects.get(pk=value_id)
+                document.storage_path = storage_path
+                document.save()
+                applied = True
+                result_message = f"Storage path '{storage_path.name}' applied"
+                
+            elif suggestion_type == 'title' and value_text:
+                document.title = value_text
+                document.save()
+                applied = True
+                result_message = f"Title updated to '{value_text}'"
+            
+            if applied:
+                # Record feedback
+                AISuggestionFeedback.objects.create(
+                    document=document,
+                    suggestion_type=suggestion_type,
+                    suggested_value_id=value_id,
+                    suggested_value_text=value_text or "",
+                    confidence=confidence,
+                    status=AISuggestionFeedback.STATUS_APPLIED,
+                    user=request.user,
+                )
+                
+                return Response({
+                    "status": "success",
+                    "message": result_message,
+                })
+            else:
+                return Response(
+                    {"detail": "Invalid suggestion type or missing value"},
+                    status=400,
+                )
+                
+        except (Tag.DoesNotExist, Correspondent.DoesNotExist, 
+                DocumentType.DoesNotExist, StoragePath.DoesNotExist):
+            return Response(
+                {"detail": "Referenced object not found"},
+                status=404,
+            )
+        except Exception as e:
+            logger.error(f"Error applying suggestion for document {pk}: {e}", exc_info=True)
+            return Response(
+                {"detail": "Error applying suggestion. Please check the logs for details."},
+                status=500,
+            )
+
+    @action(detail=True, methods=["POST"], name="Reject AI Suggestion")
+    def reject_suggestion(self, request, pk=None):
+        """
+        Reject an AI suggestion for a document.
+        
+        Records user feedback for improving AI accuracy.
+        """
+        from documents.models import AISuggestionFeedback
+        from documents.serializers.ai_suggestions import RejectSuggestionSerializer
+        
+        try:
+            document = self.get_object()
+            
+            # Validate input
+            serializer = RejectSuggestionSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            
+            suggestion_type = serializer.validated_data['suggestion_type']
+            value_id = serializer.validated_data.get('value_id')
+            value_text = serializer.validated_data.get('value_text')
+            confidence = serializer.validated_data['confidence']
+            
+            # Record feedback
+            AISuggestionFeedback.objects.create(
+                document=document,
+                suggestion_type=suggestion_type,
+                suggested_value_id=value_id,
+                suggested_value_text=value_text or "",
+                confidence=confidence,
+                status=AISuggestionFeedback.STATUS_REJECTED,
+                user=request.user,
+            )
+            
+            return Response({
+                "status": "success",
+                "message": "Suggestion rejected and feedback recorded",
+            })
+            
+        except Exception as e:
+            logger.error(f"Error rejecting suggestion for document {pk}: {e}", exc_info=True)
+            return Response(
+                {"detail": "Error rejecting suggestion. Please check the logs for details."},
+                status=500,
+            )
+
+    @action(detail=False, methods=["GET"], name="AI Suggestion Statistics")
+    def ai_suggestion_stats(self, request):
+        """
+        Get statistics about AI suggestion accuracy.
+        
+        Returns aggregated data about applied vs rejected suggestions,
+        accuracy rates, and confidence scores.
+        """
+        from django.db.models import Avg, Count, Q
+        from documents.models import AISuggestionFeedback
+        from documents.serializers.ai_suggestions import AISuggestionStatsSerializer
+        
+        try:
+            # Get overall counts
+            total_feedbacks = AISuggestionFeedback.objects.count()
+            total_applied = AISuggestionFeedback.objects.filter(
+                status=AISuggestionFeedback.STATUS_APPLIED
+            ).count()
+            total_rejected = AISuggestionFeedback.objects.filter(
+                status=AISuggestionFeedback.STATUS_REJECTED
+            ).count()
+            
+            # Calculate accuracy rate
+            accuracy_rate = (total_applied / total_feedbacks * 100) if total_feedbacks > 0 else 0
+            
+            # Get statistics by suggestion type using a single aggregated query
+            stats_by_type = AISuggestionFeedback.objects.values('suggestion_type').annotate(
+                total=Count('id'),
+                applied=Count('id', filter=Q(status=AISuggestionFeedback.STATUS_APPLIED)),
+                rejected=Count('id', filter=Q(status=AISuggestionFeedback.STATUS_REJECTED))
+            )
+            
+            # Build the by_type dictionary using the aggregated results
+            by_type = {}
+            for stat in stats_by_type:
+                suggestion_type = stat['suggestion_type']
+                type_total = stat['total']
+                type_applied = stat['applied']
+                type_rejected = stat['rejected']
+                
+                by_type[suggestion_type] = {
+                    'total': type_total,
+                    'applied': type_applied,
+                    'rejected': type_rejected,
+                    'accuracy_rate': (type_applied / type_total * 100) if type_total > 0 else 0,
+                }
+            
+            # Get average confidence scores
+            avg_confidence_applied = AISuggestionFeedback.objects.filter(
+                status=AISuggestionFeedback.STATUS_APPLIED
+            ).aggregate(Avg('confidence'))['confidence__avg'] or 0.0
+            
+            avg_confidence_rejected = AISuggestionFeedback.objects.filter(
+                status=AISuggestionFeedback.STATUS_REJECTED
+            ).aggregate(Avg('confidence'))['confidence__avg'] or 0.0
+            
+            # Get recent suggestions (last 10)
+            recent_suggestions = AISuggestionFeedback.objects.order_by('-created_at')[:10]
+            
+            # Build response data
+            from documents.serializers.ai_suggestions import AISuggestionFeedbackSerializer
+            data = {
+                'total_suggestions': total_feedbacks,
+                'total_applied': total_applied,
+                'total_rejected': total_rejected,
+                'accuracy_rate': accuracy_rate,
+                'by_type': by_type,
+                'average_confidence_applied': avg_confidence_applied,
+                'average_confidence_rejected': avg_confidence_rejected,
+                'recent_suggestions': AISuggestionFeedbackSerializer(
+                    recent_suggestions, many=True
+                ).data,
+            }
+            
+            # Serialize and return
+            serializer = AISuggestionStatsSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            
+            return Response(serializer.validated_data)
+            
+        except Exception as e:
+            logger.error(f"Error getting AI suggestion statistics: {e}", exc_info=True)
+            return Response(
+                {"detail": "Error getting statistics. Please check the logs for details."},
+                status=500,
+            )
 
 
 @extend_schema_view(
@@ -3269,3 +3553,276 @@ def serve_logo(request, filename=None):
         filename=app_logo.name,
         as_attachment=True,
     )
+
+
+class AISuggestionsView(GenericAPIView):
+    """
+    API view to get AI suggestions for a document.
+
+    Requires: can_view_ai_suggestions permission
+    """
+    
+    permission_classes = [IsAuthenticated, CanViewAISuggestionsPermission]
+    serializer_class = AISuggestionsResponseSerializer
+    
+    def post(self, request):
+        """Get AI suggestions for a document."""
+        # Validate request
+        request_serializer = AISuggestionsRequestSerializer(data=request.data)
+        request_serializer.is_valid(raise_exception=True)
+        
+        document_id = request_serializer.validated_data['document_id']
+        
+        try:
+            document = Document.objects.get(pk=document_id)
+        except Document.DoesNotExist:
+            return Response(
+                {"error": "Document not found or you don't have permission to view it"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Check if user has permission to view this document
+        if not has_perms_owner_aware(request.user, 'documents.view_document', document):
+            return Response(
+                {"error": "Permission denied"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Get AI scanner and scan document
+        scanner = get_ai_scanner()
+        scan_result = scanner.scan_document(document, document.content or "")
+        
+        # Build response
+        response_data = {
+            "document_id": document.id,
+            "tags": [],
+            "correspondent": None,
+            "document_type": None,
+            "storage_path": None,
+            "title_suggestion": scan_result.title_suggestion,
+            "custom_fields": {}
+        }
+        
+        # Format tag suggestions
+        for tag_id, confidence in scan_result.tags:
+            try:
+                tag = Tag.objects.get(pk=tag_id)
+                response_data["tags"].append({
+                    "id": tag.id,
+                    "name": tag.name,
+                    "confidence": confidence
+                })
+            except Tag.DoesNotExist:
+                # Tag was suggested by AI but no longer exists; skip it
+                pass
+        
+        # Format correspondent suggestion
+        if scan_result.correspondent:
+            corr_id, confidence = scan_result.correspondent
+            try:
+                correspondent = Correspondent.objects.get(pk=corr_id)
+                response_data["correspondent"] = {
+                    "id": correspondent.id,
+                    "name": correspondent.name,
+                    "confidence": confidence
+                }
+            except Correspondent.DoesNotExist:
+                # Correspondent was suggested but no longer exists; skip it
+                pass
+        
+        # Format document type suggestion
+        if scan_result.document_type:
+            type_id, confidence = scan_result.document_type
+            try:
+                doc_type = DocumentType.objects.get(pk=type_id)
+                response_data["document_type"] = {
+                    "id": doc_type.id,
+                    "name": doc_type.name,
+                    "confidence": confidence
+                }
+            except DocumentType.DoesNotExist:
+                # Document type was suggested but no longer exists; skip it
+                pass
+        
+        # Format storage path suggestion
+        if scan_result.storage_path:
+            path_id, confidence = scan_result.storage_path
+            try:
+                storage_path = StoragePath.objects.get(pk=path_id)
+                response_data["storage_path"] = {
+                    "id": storage_path.id,
+                    "name": storage_path.name,
+                    "confidence": confidence
+                }
+            except StoragePath.DoesNotExist:
+                # Storage path was suggested but no longer exists; skip it
+                pass
+        
+        # Format custom fields
+        for field_id, (value, confidence) in scan_result.custom_fields.items():
+            response_data["custom_fields"][str(field_id)] = {
+                "value": value,
+                "confidence": confidence
+            }
+        
+        return Response(response_data)
+
+
+class ApplyAISuggestionsView(GenericAPIView):
+    """
+    API view to apply AI suggestions to a document.
+
+    Requires: can_apply_ai_suggestions permission
+    """
+    
+    permission_classes = [IsAuthenticated, CanApplyAISuggestionsPermission]
+    
+    def post(self, request):
+        """Apply AI suggestions to a document."""
+        # Validate request
+        serializer = ApplyAISuggestionsSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        document_id = serializer.validated_data['document_id']
+        
+        try:
+            document = Document.objects.get(pk=document_id)
+        except Document.DoesNotExist:
+            return Response(
+                {"error": "Document not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Check if user has permission to change this document
+        if not has_perms_owner_aware(request.user, 'documents.change_document', document):
+            return Response(
+                {"error": "Permission denied"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Get AI scanner and scan document
+        scanner = get_ai_scanner()
+        scan_result = scanner.scan_document(document, document.content or "")
+        
+        # Apply suggestions based on user selections
+        applied = []
+        
+        if serializer.validated_data.get('apply_tags'):
+            selected_tags = serializer.validated_data.get('selected_tags', [])
+            if selected_tags:
+                # Apply only selected tags
+                tags_to_apply = [tag_id for tag_id, _ in scan_result.tags if tag_id in selected_tags]
+            else:
+                # Apply all high-confidence tags
+                tags_to_apply = [tag_id for tag_id, conf in scan_result.tags if conf >= scanner.auto_apply_threshold]
+            
+            for tag_id in tags_to_apply:
+                try:
+                    tag = Tag.objects.get(pk=tag_id)
+                    document.add_nested_tags([tag])
+                    applied.append(f"tag: {tag.name}")
+                except Tag.DoesNotExist:
+                    # Tag not found; skip applying this tag
+                    pass
+        
+        if serializer.validated_data.get('apply_correspondent') and scan_result.correspondent:
+            corr_id, confidence = scan_result.correspondent
+            try:
+                correspondent = Correspondent.objects.get(pk=corr_id)
+                document.correspondent = correspondent
+                applied.append(f"correspondent: {correspondent.name}")
+            except Correspondent.DoesNotExist:
+                # Correspondent not found; skip applying
+                pass
+        
+        if serializer.validated_data.get('apply_document_type') and scan_result.document_type:
+            type_id, confidence = scan_result.document_type
+            try:
+                doc_type = DocumentType.objects.get(pk=type_id)
+                document.document_type = doc_type
+                applied.append(f"document_type: {doc_type.name}")
+            except DocumentType.DoesNotExist:
+                # Document type not found; skip applying
+                pass
+        
+        if serializer.validated_data.get('apply_storage_path') and scan_result.storage_path:
+            path_id, confidence = scan_result.storage_path
+            try:
+                storage_path = StoragePath.objects.get(pk=path_id)
+                document.storage_path = storage_path
+                applied.append(f"storage_path: {storage_path.name}")
+            except StoragePath.DoesNotExist:
+                # Storage path not found; skip applying
+                pass
+        
+        if serializer.validated_data.get('apply_title') and scan_result.title_suggestion:
+            document.title = scan_result.title_suggestion
+            applied.append(f"title: {scan_result.title_suggestion}")
+        
+        # Save document
+        document.save()
+        
+        return Response({
+            "status": "success",
+            "document_id": document.id,
+            "applied": applied
+        })
+
+
+class AIConfigurationView(GenericAPIView):
+    """
+    API view to get/update AI configuration.
+
+    Requires: can_configure_ai permission
+    """
+    
+    permission_classes = [IsAuthenticated, CanConfigureAIPermission]
+    
+    def get(self, request):
+        """Get current AI configuration."""
+        scanner = get_ai_scanner()
+        
+        config_data = {
+            "auto_apply_threshold": scanner.auto_apply_threshold,
+            "suggest_threshold": scanner.suggest_threshold,
+            "ml_enabled": scanner.ml_enabled,
+            "advanced_ocr_enabled": scanner.advanced_ocr_enabled,
+        }
+        
+        serializer = AIConfigurationSerializer(config_data)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        """
+        Update AI configuration.
+        
+        Note: This updates the global scanner instance. Configuration changes
+        will take effect immediately but may require server restart in production
+        environments for consistency across workers.
+        """
+        serializer = AIConfigurationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        # Create new scanner with updated configuration
+        config = {}
+        if 'auto_apply_threshold' in serializer.validated_data:
+            config['auto_apply_threshold'] = serializer.validated_data['auto_apply_threshold']
+        if 'suggest_threshold' in serializer.validated_data:
+            config['suggest_threshold'] = serializer.validated_data['suggest_threshold']
+        if 'ml_enabled' in serializer.validated_data:
+            config['enable_ml_features'] = serializer.validated_data['ml_enabled']
+        if 'advanced_ocr_enabled' in serializer.validated_data:
+            config['enable_advanced_ocr'] = serializer.validated_data['advanced_ocr_enabled']
+        
+        # Update global scanner instance
+        # WARNING: Not thread-safe. Consider storing configuration in database
+        # and reloading on each get_ai_scanner() call for production use
+        from documents import ai_scanner
+        ai_scanner._scanner_instance = AIDocumentScanner(**config)
+        
+        return Response({
+            "status": "success",
+            "message": "AI configuration updated. Changes may require server restart for consistency."
+        })
+
+
