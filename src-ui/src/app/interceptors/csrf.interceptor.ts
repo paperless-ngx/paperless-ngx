@@ -4,15 +4,15 @@ import {
   HttpInterceptor,
   HttpRequest,
 } from '@angular/common/http'
-import { Injectable, inject } from '@angular/core'
+import { inject, Injectable } from '@angular/core'
 import { Meta } from '@angular/platform-browser'
 import { CookieService } from 'ngx-cookie-service'
 import { Observable } from 'rxjs'
 
 @Injectable()
 export class CsrfInterceptor implements HttpInterceptor {
-  private cookieService = inject(CookieService)
-  private meta = inject(Meta)
+  private cookieService: CookieService = inject(CookieService)
+  private meta: Meta = inject(Meta)
 
   intercept(
     request: HttpRequest<unknown>,
