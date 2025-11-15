@@ -27,7 +27,7 @@ jobs:
     steps:
       - name: Clean temporary images
         if: "${{ env.TOKEN != '' }}"
-        uses: stumpylog/image-cleaner-action/ephemeral@v0.11.0
+        uses: stumpylog/image-cleaner-action/ephemeral@v0.12.0
         with:
           token: "${{ env.TOKEN }}"
           owner: "${{ github.repository_owner }}"
@@ -53,7 +53,7 @@ jobs:
     steps:
       - name: Clean untagged images
         if: "${{ env.TOKEN != '' }}"
-        uses: stumpylog/image-cleaner-action/untagged@v0.11.0
+        uses: stumpylog/image-cleaner-action/untagged@v0.12.0
         with:
           token: "${{ env.TOKEN }}"
           owner: "${{ github.repository_owner }}"
