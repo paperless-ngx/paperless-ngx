@@ -33,7 +33,6 @@ from documents import matching
 from documents.caching import clear_document_caches
 from documents.caching import invalidate_llm_suggestions_cache
 from documents.data_models import ConsumableDocument
-from documents.data_models import DocumentSource
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_unique_filename
