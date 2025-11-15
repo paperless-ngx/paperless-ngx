@@ -62,6 +62,10 @@ def is_mime_type_supported(mime_type: str) -> bool:
     """
     Returns True if the mime type is supported, False otherwise
     """
+
+    if mime_type == "application/zip":
+        return True
+
     return get_parser_class_for_mime_type(mime_type) is not None
 
 
@@ -109,6 +113,8 @@ def get_supported_file_extensions() -> set[str]:
             # says is the default extension
             # This makes image/webp supported on Python < 3.11
             extensions.add(supported_mime_types[mime_type])
+
+    extensions.add(".zip")
 
     return extensions
 
