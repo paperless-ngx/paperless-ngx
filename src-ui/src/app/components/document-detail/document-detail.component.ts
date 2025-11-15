@@ -901,32 +901,38 @@ export class DocumentDetailComponent
       .pipe(first())
       .subscribe({
         next: (docValues) => {
-          // in case data changed while saving eg removing inbox_tags
-          // Exclude custom_fields from patchValue to preserve reordered state
+          // Update form with server response, excluding custom_fields to preserve reordered state
           const { custom_fields, ...otherDocValues } = docValues
           this.documentForm.patchValue(otherDocValues)
-          const newValues = Object.assign({}, this.documentForm.value)
-          newValues.tags = [...docValues.tags]
-          // Preserve the current custom field order instead of using server order
-          newValues.custom_fields = [...this.document.custom_fields]
-          this.store.next(newValues)
+
+          // Update store with current form state, but use server tags and preserve custom field order
+          const updatedValues = {
+            ...this.documentForm.value,
+            tags: [...docValues.tags],
+            custom_fields: this.document.custom_fields.map((fieldInstance) => ({
+              field: fieldInstance.field,
+              value: fieldInstance.value,
+              created: fieldInstance.created || null,
+            })),
+          }
+
+          this.store.next(updatedValues)
           this.openDocumentService.setDirty(this.document, false)
           this.openDocumentService.save()
-          // Mark form as pristine to reset dirty state
           this.documentForm.markAsPristine()
-          // Reset custom field order changed flag
           this.customFieldOrderChanged = false
+
           this.toastService.showInfo(
-            $localize`Document "${newValues.title}" saved successfully.`
+            $localize`Document "${updatedValues.title}" saved successfully.`
           )
           this.networkActive = false
           this.error = null
+
           if (close) {
             this.close(() => {
-              // Don't refresh document to preserve custom field order
+              // Document order preserved, no refresh needed
             })
           }
-          // Don't refresh document to preserve custom field order
           this.savedViewService.maybeRefreshDocumentCounts()
         },
         error: (error) => {
