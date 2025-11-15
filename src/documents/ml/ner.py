@@ -18,6 +18,8 @@ from typing import TYPE_CHECKING
 
 from transformers import pipeline
 
+from documents.ml.model_cache import ModelCacheManager
+
 if TYPE_CHECKING:
     pass
 
@@ -42,7 +44,11 @@ class DocumentNER:
     - Phone numbers
     """
 
-    def __init__(self, model_name: str = "dslim/bert-base-NER"):
+    def __init__(
+        self,
+        model_name: str = "dslim/bert-base-NER",
+        use_cache: bool = True,
+    ):
         """
         Initialize NER extractor.
         
@@ -52,14 +58,37 @@ class DocumentNER:
                        Alternatives:
                        - dslim/bert-base-NER-uncased
                        - dbmdz/bert-large-cased-finetuned-conll03-english
+            use_cache: Whether to use model cache (default: True)
         """
-        logger.info(f"Initializing NER with model: {model_name}")
+        logger.info(f"Initializing NER with model: {model_name} (caching: {use_cache})")
 
-        self.ner_pipeline = pipeline(
-            "ner",
-            model=model_name,
-            aggregation_strategy="simple",
-        )
+        self.model_name = model_name
+        self.use_cache = use_cache
+        self.cache_manager = ModelCacheManager.get_instance() if use_cache else None
+        
+        # Cache key for this model
+        cache_key = f"ner_{model_name}"
+        
+        if self.use_cache and self.cache_manager:
+            # Load from cache or create new
+            def loader():
+                return pipeline(
+                    "ner",
+                    model=model_name,
+                    aggregation_strategy="simple",
+                )
+            
+            self.ner_pipeline = self.cache_manager.get_or_load_model(
+                cache_key,
+                loader,
+            )
+        else:
+            # Load without caching
+            self.ner_pipeline = pipeline(
+                "ner",
+                model=model_name,
+                aggregation_strategy="simple",
+            )
 
         # Compile regex patterns for efficiency
         self._compile_patterns()

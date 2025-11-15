@@ -118,6 +118,13 @@
         <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
       </div>
 
+      <pngx-ai-suggestions-panel
+        [suggestions]="aiSuggestions"
+        [disabled]="!userCanEdit"
+        (apply)="onApplySuggestion($event)"
+        (reject)="onRejectSuggestion($event)">
+      </pngx-ai-suggestions-panel>
+
       <ul ngbNav #nav="ngbNav" class="nav-underline flex-nowrap flex-md-wrap overflow-auto" (navChange)="onNavChange($event)" [(activeId)]="activeNavID">
         <li [ngbNavItem]="DocumentDetailNavIDs.Details">
           <a ngbNavLink i18n>Details</a>
