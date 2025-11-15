@@ -853,7 +853,7 @@ export class DocumentDetailComponent
         } else if (key === 'custom_fields') {
           const formValue = this.documentForm.get(key).value
 
-          // Validate and clean custom field values, including created field from original instances
+          // Validate and clean custom field values
           const cleanedCustomFields = formValue.map((fieldData, index) => {
             let cleanValue = fieldData.value
             if (typeof cleanValue === 'number' && isNaN(cleanValue)) {
@@ -865,17 +865,26 @@ export class DocumentDetailComponent
               cleanValue = null
             }
 
-            // Use the updated created timestamp from the document model, not the form
-            // The document model has the correct timestamps after reordering
-            const documentField = this.document.custom_fields[index]
-            const createdValue =
-              documentField?.created || fieldData.created || new Date()
-
-            return {
+            const result: any = {
               field: fieldData.field,
               value: cleanValue,
-              created: createdValue,
             }
+
+            // Only include 'created' field if:
+            // 1. Custom field order has been changed (reordering occurred), OR
+            // 2. The field had an existing 'created' value (it's an existing field being modified)
+            const documentField = this.document.custom_fields[index]
+            const hasExistingCreated = documentField?.created !== undefined
+
+            if (
+              this.customFieldOrderChanged ||
+              (hasExistingCreated && fieldData.created)
+            ) {
+              result.created =
+                documentField?.created || fieldData.created || new Date()
+            }
+
+            return result
           })
 
           changes[key] = cleanedCustomFields
@@ -908,6 +917,8 @@ export class DocumentDetailComponent
           this.openDocumentService.save()
           // Mark form as pristine to reset dirty state
           this.documentForm.markAsPristine()
+          // Reset custom field order changed flag
+          this.customFieldOrderChanged = false
           this.toastService.showInfo(
             $localize`Document "${newValues.title}" saved successfully.`
           )
@@ -1441,6 +1452,9 @@ export class DocumentDetailComponent
       this.document.custom_fields.forEach((field, index) => {
         field.created = new Date(baseTime + index)
       })
+
+      // Mark that custom field order has changed
+      this.customFieldOrderChanged = true
 
       // Update the form to reflect the new order
       this.updateFormForCustomFields(true)
