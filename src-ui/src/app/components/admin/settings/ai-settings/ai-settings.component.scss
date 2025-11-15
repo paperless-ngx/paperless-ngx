@@ -1,0 +1,38 @@
+// AI Settings Component Styles
+
+.form-range {
+  cursor: pointer;
+  
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.badge {
+  min-width: 50px;
+  font-size: 0.9rem;
+  padding: 0.4rem 0.6rem;
+}
+
+.card {
+  .card-body {
+    .row {
+      font-size: 0.95rem;
+    }
+  }
+}
+
+.alert {
+  font-size: 0.9rem;
+  
+  i-bs {
+    vertical-align: middle;
+  }
+}
+
+.btn {
+  i-bs {
+    vertical-align: middle;
+  }
+}

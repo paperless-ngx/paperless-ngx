@@ -76,6 +76,13 @@ export const SETTINGS_KEYS = {
   GMAIL_OAUTH_URL: 'gmail_oauth_url',
   OUTLOOK_OAUTH_URL: 'outlook_oauth_url',
   EMAIL_ENABLED: 'email_enabled',
+  // AI Settings
+  AI_SCANNER_ENABLED: 'ai-settings:scanner:enabled',
+  AI_ML_FEATURES_ENABLED: 'ai-settings:ml-features:enabled',
+  AI_ADVANCED_OCR_ENABLED: 'ai-settings:advanced-ocr:enabled',
+  AI_AUTO_APPLY_THRESHOLD: 'ai-settings:thresholds:auto-apply',
+  AI_SUGGEST_THRESHOLD: 'ai-settings:thresholds:suggest',
+  AI_ML_MODEL: 'ai-settings:ml-model',
 }
 
 export const SETTINGS: UiSetting[] = [
@@ -288,5 +295,36 @@ export const SETTINGS: UiSetting[] = [
     key: SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING,
     type: 'string',
     default: 'page-width', // ZoomSetting from 'document-detail.component'
+  },
+  // AI Settings
+  {
+    key: SETTINGS_KEYS.AI_SCANNER_ENABLED,
+    type: 'boolean',
+    default: false,
+  },
+  {
+    key: SETTINGS_KEYS.AI_ML_FEATURES_ENABLED,
+    type: 'boolean',
+    default: false,
+  },
+  {
+    key: SETTINGS_KEYS.AI_ADVANCED_OCR_ENABLED,
+    type: 'boolean',
+    default: false,
+  },
+  {
+    key: SETTINGS_KEYS.AI_AUTO_APPLY_THRESHOLD,
+    type: 'number',
+    default: 80,
+  },
+  {
+    key: SETTINGS_KEYS.AI_SUGGEST_THRESHOLD,
+    type: 'number',
+    default: 60,
+  },
+  {
+    key: SETTINGS_KEYS.AI_ML_MODEL,
+    type: 'string',
+    default: 'bert-base',
   },
 ]

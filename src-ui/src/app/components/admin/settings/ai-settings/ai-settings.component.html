@@ -1,0 +1,207 @@
+<div class="row">
+  <div class="col-xl-6 pe-xl-5">
+    <h5 i18n>AI Scanner Configuration</h5>
+    
+    <div class="row mb-3">
+      <div class="col">
+        <pngx-input-check 
+          i18n-title 
+          title="Enable AI Scanner" 
+          formControlName="aiScannerEnabled"
+          i18n-hint
+          hint="Automatically scan and analyze documents using AI"
+          (change)="onAiSettingChange()">
+        </pngx-input-check>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col">
+        <pngx-input-check 
+          i18n-title 
+          title="Enable ML Features" 
+          formControlName="aiMlFeaturesEnabled"
+          i18n-hint
+          hint="Use machine learning for document classification and entity extraction"
+          [disabled]="!aiScannerEnabled"
+          (change)="onAiSettingChange()">
+        </pngx-input-check>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col">
+        <pngx-input-check 
+          i18n-title 
+          title="Enable Advanced OCR" 
+          formControlName="aiAdvancedOcrEnabled"
+          i18n-hint
+          hint="Advanced OCR with table extraction and handwriting recognition"
+          [disabled]="!aiScannerEnabled"
+          (change)="onAiSettingChange()">
+        </pngx-input-check>
+      </div>
+    </div>
+
+    <h5 class="mt-4" i18n>Confidence Thresholds</h5>
+    <p class="text-muted small" i18n>
+      Configure how AI suggestions are applied based on confidence levels
+    </p>
+
+    <div class="row mb-3">
+      <div class="col-md-4 col-form-label pt-0">
+        <span i18n>Auto-apply threshold</span>
+      </div>
+      <div class="col-md-8">
+        <div class="d-flex align-items-center">
+          <input 
+            type="range" 
+            class="form-range flex-grow-1 me-3" 
+            min="50" 
+            max="100" 
+            step="5"
+            [value]="autoApplyThreshold"
+            (input)="onAutoApplyThresholdChange($event)"
+            [disabled]="!aiScannerEnabled">
+          <span class="badge bg-primary">{{ autoApplyThreshold }}%</span>
+        </div>
+        <small class="form-text text-muted" i18n>
+          Suggestions with confidence above this threshold will be applied automatically
+        </small>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-4 col-form-label pt-0">
+        <span i18n>Suggest threshold</span>
+      </div>
+      <div class="col-md-8">
+        <div class="d-flex align-items-center">
+          <input 
+            type="range" 
+            class="form-range flex-grow-1 me-3" 
+            min="30" 
+            max="90" 
+            step="5"
+            [value]="suggestThreshold"
+            (input)="onSuggestThresholdChange($event)"
+            [disabled]="!aiScannerEnabled">
+          <span class="badge bg-secondary">{{ suggestThreshold }}%</span>
+        </div>
+        <small class="form-text text-muted" i18n>
+          Suggestions with confidence above this threshold will be shown for review
+        </small>
+      </div>
+    </div>
+
+    <h5 class="mt-4" i18n>ML Model Selection</h5>
+    
+    <div class="row mb-3">
+      <div class="col-md-4 col-form-label pt-0">
+        <span i18n>Model</span>
+      </div>
+      <div class="col-md-8">
+        <select 
+          class="form-select" 
+          formControlName="aiMlModel"
+          [disabled]="!aiScannerEnabled || !settingsForm.get('aiMlFeaturesEnabled')?.value"
+          (change)="onAiSettingChange()">
+          @for (model of mlModels; track model.value) {
+            <option [value]="model.value">{{ model.label }}</option>
+          }
+        </select>
+        <small class="form-text text-muted" i18n>
+          Select the machine learning model for document classification
+        </small>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="col-xl-6 ps-xl-5">
+    <h5 class="mt-3 mt-xl-0" i18n>Testing & Validation</h5>
+    
+    <div class="row mb-3">
+      <div class="col">
+        <button 
+          type="button"
+          class="btn btn-outline-primary" 
+          (click)="testAIWithSample()"
+          [disabled]="!aiScannerEnabled || testingInProgress">
+          @if (testingInProgress) {
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          } @else {
+            <i-bs name="play-circle" class="me-2"></i-bs>
+          }
+          <ng-container i18n>Test AI with Sample Document</ng-container>
+        </button>
+        <p class="text-muted small mt-2" i18n>
+          Test the AI scanner with a sample document to verify configuration
+        </p>
+      </div>
+    </div>
+
+    <h5 class="mt-4" i18n>Performance Statistics</h5>
+    
+    <div class="card">
+      <div class="card-body">
+        @if (aiStats.totalDocumentsProcessed === 0) {
+          <p class="text-muted mb-0" i18n>No documents processed yet</p>
+        } @else {
+          <div class="row mb-2">
+            <div class="col-7">
+              <strong i18n>Total documents processed:</strong>
+            </div>
+            <div class="col-5 text-end">
+              {{ aiStats.totalDocumentsProcessed }}
+            </div>
+          </div>
+          
+          <div class="row mb-2">
+            <div class="col-7">
+              <strong i18n>Auto-applied:</strong>
+            </div>
+            <div class="col-5 text-end">
+              {{ aiStats.autoAppliedCount }}
+            </div>
+          </div>
+          
+          <div class="row mb-2">
+            <div class="col-7">
+              <strong i18n>Suggestions created:</strong>
+            </div>
+            <div class="col-5 text-end">
+              {{ aiStats.suggestionsCount }}
+            </div>
+          </div>
+          
+          <div class="row mb-2">
+            <div class="col-7">
+              <strong i18n>Average confidence:</strong>
+            </div>
+            <div class="col-5 text-end">
+              {{ aiStats.averageConfidence }}%
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-7">
+              <strong i18n>Avg. processing time:</strong>
+            </div>
+            <div class="col-5 text-end">
+              {{ aiStats.processingTime }}s
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="alert alert-info mt-3" role="alert">
+      <i-bs name="info-circle" class="me-2"></i-bs>
+      <strong i18n>Note:</strong>
+      <span i18n>
+        AI features require backend configuration. Make sure the AI scanner is enabled in the backend settings.
+      </span>
+    </div>
+  </div>
+</div>

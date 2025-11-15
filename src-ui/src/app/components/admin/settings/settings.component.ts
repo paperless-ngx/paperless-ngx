@@ -67,12 +67,14 @@ import { PageHeaderComponent } from '../../common/page-header/page-header.compon
 import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
 import { ZoomSetting } from '../../document-detail/document-detail.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { AiSettingsComponent } from './ai-settings/ai-settings.component'
 
 enum SettingsNavIDs {
   General = 1,
   Permissions = 2,
   Notifications = 3,
   SavedViews = 4,
+  AI = 5,
 }
 
 const systemLanguage = { code: '', name: $localize`Use system language` }
@@ -100,6 +102,7 @@ const systemDateFormat = {
     NgbNavModule,
     NgbPopoverModule,
     NgxBootstrapIconsModule,
+    AiSettingsComponent,
   ],
 })
 export class SettingsComponent
@@ -156,6 +159,13 @@ export class SettingsComponent
 
     savedViewsWarnOnUnsavedChange: new FormControl(null),
     sidebarViewsShowCount: new FormControl(null),
+
+    aiScannerEnabled: new FormControl(null),
+    aiMlFeaturesEnabled: new FormControl(null),
+    aiAdvancedOcrEnabled: new FormControl(null),
+    aiAutoApplyThreshold: new FormControl(null),
+    aiSuggestThreshold: new FormControl(null),
+    aiMlModel: new FormControl(null),
   })
 
   SettingsNavIDs = SettingsNavIDs
@@ -338,6 +348,18 @@ export class SettingsComponent
       ),
       searchDbOnly: this.settings.get(SETTINGS_KEYS.SEARCH_DB_ONLY),
       searchLink: this.settings.get(SETTINGS_KEYS.SEARCH_FULL_TYPE),
+      aiScannerEnabled: this.settings.get(SETTINGS_KEYS.AI_SCANNER_ENABLED),
+      aiMlFeaturesEnabled: this.settings.get(
+        SETTINGS_KEYS.AI_ML_FEATURES_ENABLED
+      ),
+      aiAdvancedOcrEnabled: this.settings.get(
+        SETTINGS_KEYS.AI_ADVANCED_OCR_ENABLED
+      ),
+      aiAutoApplyThreshold: this.settings.get(
+        SETTINGS_KEYS.AI_AUTO_APPLY_THRESHOLD
+      ),
+      aiSuggestThreshold: this.settings.get(SETTINGS_KEYS.AI_SUGGEST_THRESHOLD),
+      aiMlModel: this.settings.get(SETTINGS_KEYS.AI_ML_MODEL),
     }
   }
 
@@ -533,6 +555,30 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.SEARCH_FULL_TYPE,
       this.settingsForm.value.searchLink
+    )
+    this.settings.set(
+      SETTINGS_KEYS.AI_SCANNER_ENABLED,
+      this.settingsForm.value.aiScannerEnabled
+    )
+    this.settings.set(
+      SETTINGS_KEYS.AI_ML_FEATURES_ENABLED,
+      this.settingsForm.value.aiMlFeaturesEnabled
+    )
+    this.settings.set(
+      SETTINGS_KEYS.AI_ADVANCED_OCR_ENABLED,
+      this.settingsForm.value.aiAdvancedOcrEnabled
+    )
+    this.settings.set(
+      SETTINGS_KEYS.AI_AUTO_APPLY_THRESHOLD,
+      this.settingsForm.value.aiAutoApplyThreshold
+    )
+    this.settings.set(
+      SETTINGS_KEYS.AI_SUGGEST_THRESHOLD,
+      this.settingsForm.value.aiSuggestThreshold
+    )
+    this.settings.set(
+      SETTINGS_KEYS.AI_ML_MODEL,
+      this.settingsForm.value.aiMlModel
     )
     this.settings.setLanguage(this.settingsForm.value.displayLanguage)
     this.settings
