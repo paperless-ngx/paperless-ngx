@@ -8,6 +8,7 @@ import { TrashComponent } from './components/admin/trash/trash.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 import { AppFrameComponent } from './components/app-frame/app-frame.component'
 import { DashboardComponent } from './components/dashboard/dashboard.component'
+import { DeletionRequestsComponent } from './components/deletion-requests/deletion-requests.component'
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
 import { DocumentDetailComponent } from './components/document-detail/document-detail.component'
 import { DocumentListComponent } from './components/document-list/document-list.component'
@@ -172,6 +173,18 @@ export const routes: Routes = [
             type: PermissionType.Document,
           },
           componentName: 'TrashComponent',
+        },
+      },
+      {
+        path: 'deletion-requests',
+        component: DeletionRequestsComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Document,
+          },
+          componentName: 'DeletionRequestsComponent',
         },
       },
       // redirect old paths

@@ -169,6 +169,8 @@ from documents.serialisers import BulkEditObjectsSerializer
 from documents.serialisers import BulkEditSerializer
 from documents.serialisers import CorrespondentSerializer
 from documents.serialisers import CustomFieldSerializer
+from documents.serialisers import DeletionRequestActionSerializer
+from documents.serialisers import DeletionRequestSerializer
 from documents.serialisers import DocumentListSerializer
 from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
@@ -3375,6 +3377,122 @@ class SystemStatusView(PassUserMixin):
                 },
             },
         )
+
+
+class DeletionRequestViewSet(ModelViewSet):
+    """
+    ViewSet for managing DeletionRequest objects.
+    Provides list, retrieve, approve, and reject operations.
+    """
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = DeletionRequestSerializer
+    pagination_class = StandardPagination
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    ordering_fields = ("created_at", "updated_at", "status")
+    ordering = ("-created_at",)
+
+    def get_queryset(self):
+        """
+        Filter deletion requests by user.
+        Only show requests for the current user or requests they can manage.
+        """
+        user = self.request.user
+        if user.is_superuser:
+            return DeletionRequest.objects.all()
+        return DeletionRequest.objects.filter(user=user)
+
+    def get_serializer_class(self):
+        """Use different serializers for different actions."""
+        if self.action in ["approve", "reject"]:
+            return DeletionRequestActionSerializer
+        return DeletionRequestSerializer
+
+    @extend_schema(
+        request=DeletionRequestActionSerializer,
+        responses={200: DeletionRequestSerializer},
+    )
+    @action(detail=True, methods=["post"])
+    def approve(self, request, pk=None):
+        """
+        Approve a deletion request.
+        """
+        deletion_request = self.get_object()
+
+        if deletion_request.status != DeletionRequest.STATUS_PENDING:
+            return Response(
+                {"error": "Only pending requests can be approved"},
+                status=400,
+            )
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        comment = serializer.validated_data.get("review_comment", "")
+        success = deletion_request.approve(request.user, comment)
+
+        if success:
+            return Response(
+                DeletionRequestSerializer(deletion_request).data,
+                status=200,
+            )
+        else:
+            return Response(
+                {"error": "Failed to approve deletion request"},
+                status=400,
+            )
+
+    @extend_schema(
+        request=DeletionRequestActionSerializer,
+        responses={200: DeletionRequestSerializer},
+    )
+    @action(detail=True, methods=["post"])
+    def reject(self, request, pk=None):
+        """
+        Reject a deletion request.
+        """
+        deletion_request = self.get_object()
+
+        if deletion_request.status != DeletionRequest.STATUS_PENDING:
+            return Response(
+                {"error": "Only pending requests can be rejected"},
+                status=400,
+            )
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        comment = serializer.validated_data.get("review_comment", "")
+        success = deletion_request.reject(request.user, comment)
+
+        if success:
+            return Response(
+                DeletionRequestSerializer(deletion_request).data,
+                status=200,
+            )
+        else:
+            return Response(
+                {"error": "Failed to reject deletion request"},
+                status=400,
+            )
+
+    @extend_schema(
+        responses={200: inline_serializer(
+            name="PendingCountResponse",
+            fields={"count": serializers.IntegerField()},
+        )},
+    )
+    @action(detail=False, methods=["get"])
+    def pending_count(self, request):
+        """
+        Get the count of pending deletion requests for the current user.
+        """
+        user = request.user
+        count = DeletionRequest.objects.filter(
+            user=user,
+            status=DeletionRequest.STATUS_PENDING,
+        ).count()
+        return Response({"count": count})
 
 
 class TrashView(ListModelMixin, PassUserMixin):

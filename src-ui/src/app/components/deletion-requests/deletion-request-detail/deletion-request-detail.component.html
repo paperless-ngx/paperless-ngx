@@ -1,0 +1,244 @@
+<div class="modal-header">
+  <h4 class="modal-title" i18n>Deletion Request Details</h4>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="activeModal.dismiss()"
+  ></button>
+</div>
+
+<div class="modal-body">
+  <!-- Request Information -->
+  <div class="card mb-3">
+    <div class="card-header">
+      <h5 class="mb-0" i18n>Request Information</h5>
+    </div>
+    <div class="card-body">
+      <div class="row mb-2">
+        <div class="col-md-3"><strong i18n>ID:</strong></div>
+        <div class="col-md-9">{{ deletionRequest.id }}</div>
+      </div>
+      <div class="row mb-2">
+        <div class="col-md-3"><strong i18n>Status:</strong></div>
+        <div class="col-md-9">
+          <span
+            class="badge"
+            [ngClass]="{
+              'bg-warning text-dark': deletionRequest.status === DeletionRequestStatus.Pending,
+              'bg-success': deletionRequest.status === DeletionRequestStatus.Approved,
+              'bg-danger': deletionRequest.status === DeletionRequestStatus.Rejected,
+              'bg-info': deletionRequest.status === DeletionRequestStatus.Completed,
+              'bg-secondary': deletionRequest.status === DeletionRequestStatus.Cancelled
+            }"
+          >
+            {{ deletionRequest.status }}
+          </span>
+        </div>
+      </div>
+      <div class="row mb-2">
+        <div class="col-md-3"><strong i18n>Created:</strong></div>
+        <div class="col-md-9">
+          {{ deletionRequest.created_at | customDate:'medium' }}
+        </div>
+      </div>
+      <div class="row mb-2">
+        <div class="col-md-3"><strong i18n>User:</strong></div>
+        <div class="col-md-9">{{ deletionRequest.user_username }}</div>
+      </div>
+      @if (deletionRequest.reviewed_by_username) {
+        <div class="row mb-2">
+          <div class="col-md-3"><strong i18n>Reviewed By:</strong></div>
+          <div class="col-md-9">{{ deletionRequest.reviewed_by_username }}</div>
+        </div>
+      }
+      @if (deletionRequest.reviewed_at) {
+        <div class="row mb-2">
+          <div class="col-md-3"><strong i18n>Reviewed At:</strong></div>
+          <div class="col-md-9">
+            {{ deletionRequest.reviewed_at | customDate:'medium' }}
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- AI Reason -->
+  <div class="card mb-3">
+    <div class="card-header">
+      <h5 class="mb-0" i18n>AI Reason</h5>
+    </div>
+    <div class="card-body">
+      <p>{{ deletionRequest.ai_reason }}</p>
+    </div>
+  </div>
+
+  <!-- Impact Analysis -->
+  @if (deletionRequest.impact_summary) {
+    <div class="card mb-3">
+      <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0" i18n>
+          <i-bs name="exclamation-triangle"></i-bs> Impact Analysis
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <div class="text-center p-3 bg-light rounded">
+              <h3 class="mb-0">{{ deletionRequest.impact_summary.document_count }}</h3>
+              <small class="text-muted" i18n>Documents</small>
+            </div>
+          </div>
+          @if (deletionRequest.impact_summary.affected_tags?.length > 0) {
+            <div class="col-md-4">
+              <div class="text-center p-3 bg-light rounded">
+                <h3 class="mb-0">{{ deletionRequest.impact_summary.affected_tags.length }}</h3>
+                <small class="text-muted" i18n>Affected Tags</small>
+              </div>
+            </div>
+          }
+          @if (deletionRequest.impact_summary.affected_correspondents?.length > 0) {
+            <div class="col-md-4">
+              <div class="text-center p-3 bg-light rounded">
+                <h3 class="mb-0">{{ deletionRequest.impact_summary.affected_correspondents.length }}</h3>
+                <small class="text-muted" i18n>Affected Correspondents</small>
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (deletionRequest.impact_summary.affected_tags?.length > 0) {
+          <div class="mb-3">
+            <strong i18n>Affected Tags:</strong>
+            <div class="mt-1">
+              @for (tag of deletionRequest.impact_summary.affected_tags; track tag) {
+                <span class="badge bg-secondary me-1">{{ tag }}</span>
+              }
+            </div>
+          </div>
+        }
+
+        @if (deletionRequest.impact_summary.affected_correspondents?.length > 0) {
+          <div class="mb-3">
+            <strong i18n>Affected Correspondents:</strong>
+            <div class="mt-1">
+              @for (correspondent of deletionRequest.impact_summary.affected_correspondents; track correspondent) {
+                <span class="badge bg-info me-1">{{ correspondent }}</span>
+              }
+            </div>
+          </div>
+        }
+
+        @if (deletionRequest.impact_summary.affected_types?.length > 0) {
+          <div class="mb-3">
+            <strong i18n>Affected Document Types:</strong>
+            <div class="mt-1">
+              @for (type of deletionRequest.impact_summary.affected_types; track type) {
+                <span class="badge bg-primary me-1">{{ type }}</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Documents List -->
+  @if (deletionRequest.documents_detail && deletionRequest.documents_detail.length > 0) {
+    <div class="card mb-3">
+      <div class="card-header">
+        <h5 class="mb-0" i18n>Documents to be Deleted</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-sm table-hover">
+            <thead>
+              <tr>
+                <th scope="col" i18n>ID</th>
+                <th scope="col" i18n>Title</th>
+                <th scope="col" i18n>Correspondent</th>
+                <th scope="col" i18n>Type</th>
+                <th scope="col" i18n>Tags</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (doc of deletionRequest.documents_detail; track doc.id) {
+                <tr>
+                  <td>{{ doc.id }}</td>
+                  <td>{{ doc.title }}</td>
+                  <td>{{ doc.correspondent || '-' }}</td>
+                  <td>{{ doc.document_type || '-' }}</td>
+                  <td>
+                    @for (tag of doc.tags; track tag) {
+                      <span class="badge bg-secondary me-1">{{ tag }}</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Review Comment (if exists or editable) -->
+  @if (deletionRequest.review_comment || canModify()) {
+    <div class="card mb-3">
+      <div class="card-header">
+        <h5 class="mb-0" i18n>Review Comment</h5>
+      </div>
+      <div class="card-body">
+        @if (deletionRequest.review_comment && !canModify()) {
+          <p>{{ deletionRequest.review_comment }}</p>
+        } @else if (canModify()) {
+          <textarea
+            class="form-control"
+            rows="3"
+            [(ngModel)]="reviewComment"
+            placeholder="Add a comment (optional)"
+            i18n-placeholder
+          ></textarea>
+        }
+      </div>
+    </div>
+  }
+</div>
+
+<div class="modal-footer">
+  @if (canModify()) {
+    <button
+      type="button"
+      class="btn btn-danger"
+      (click)="reject()"
+      [disabled]="isProcessing"
+    >
+      @if (isProcessing) {
+        <span class="spinner-border spinner-border-sm me-1"></span>
+      }
+      <i-bs name="x-circle"></i-bs>
+      <ng-container i18n>Reject</ng-container>
+    </button>
+    <button
+      type="button"
+      class="btn btn-success"
+      (click)="approve()"
+      [disabled]="isProcessing"
+    >
+      @if (isProcessing) {
+        <span class="spinner-border spinner-border-sm me-1"></span>
+      }
+      <i-bs name="check-circle"></i-bs>
+      <ng-container i18n>Approve</ng-container>
+    </button>
+  }
+  <button
+    type="button"
+    class="btn btn-secondary"
+    (click)="activeModal.dismiss()"
+    [disabled]="isProcessing"
+    i18n
+  >
+    Close
+  </button>
+</div>

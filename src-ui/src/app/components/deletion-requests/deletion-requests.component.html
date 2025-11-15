@@ -1,0 +1,114 @@
+<pngx-page-header
+  title="Deletion Requests"
+  i18n-title
+  info="Manage AI-initiated deletion requests. Review and approve or reject document deletions recommended by the AI system."
+  i18n-info
+>
+  @if (getPendingCount() > 0) {
+    <div class="badge bg-warning text-dark ms-2">
+      {{ getPendingCount() }} <ng-container i18n>pending</ng-container>
+    </div>
+  }
+</pngx-page-header>
+
+<ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs mb-3">
+  <li [ngbNavItem]="DeletionRequestStatus.Pending">
+    <button ngbNavLink (click)="onTabChange(DeletionRequestStatus.Pending)">
+      <ng-container i18n>Pending</ng-container>
+      @if (getStatusCount(DeletionRequestStatus.Pending) > 0) {
+        <span class="badge bg-warning text-dark ms-1">
+          {{ getStatusCount(DeletionRequestStatus.Pending) }}
+        </span>
+      }
+    </button>
+  </li>
+  <li [ngbNavItem]="DeletionRequestStatus.Approved">
+    <button ngbNavLink (click)="onTabChange(DeletionRequestStatus.Approved)">
+      <ng-container i18n>Approved</ng-container>
+    </button>
+  </li>
+  <li [ngbNavItem]="DeletionRequestStatus.Rejected">
+    <button ngbNavLink (click)="onTabChange(DeletionRequestStatus.Rejected)">
+      <ng-container i18n>Rejected</ng-container>
+    </button>
+  </li>
+  <li [ngbNavItem]="DeletionRequestStatus.Completed">
+    <button ngbNavLink (click)="onTabChange(DeletionRequestStatus.Completed)">
+      <ng-container i18n>Completed</ng-container>
+    </button>
+  </li>
+</ul>
+
+<div [ngbNavOutlet]="nav"></div>
+
+@if (deletionRequestService.loading) {
+  <div class="text-center my-5">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden" i18n>Loading...</span>
+    </div>
+  </div>
+} @else if (filteredRequests.length === 0) {
+  <div class="alert alert-info" i18n>
+    No deletion requests found with status: {{ activeTab }}
+  </div>
+} @else {
+  <div class="table-responsive">
+    <table class="table table-hover table-striped align-middle">
+      <thead>
+        <tr>
+          <th scope="col" i18n>ID</th>
+          <th scope="col" i18n>Created</th>
+          <th scope="col" i18n>Documents</th>
+          <th scope="col" i18n>AI Reason</th>
+          <th scope="col" i18n>Status</th>
+          <th scope="col" i18n>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (request of filteredRequests | slice: (page-1) * pageSize : page * pageSize; track request.id) {
+          <tr (click)="viewDetails(request)" style="cursor: pointer;">
+            <td>{{ request.id }}</td>
+            <td>{{ request.created_at | customDate:'short' }}</td>
+            <td>
+              <span class="badge bg-primary">
+                {{ request.document_count }} <ng-container i18n>docs</ng-container>
+              </span>
+            </td>
+            <td>
+              <div class="text-truncate" style="max-width: 300px;" [ngbTooltip]="request.ai_reason">
+                {{ request.ai_reason }}
+              </div>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="getStatusBadgeClass(request.status)">
+                {{ request.status }}
+              </span>
+            </td>
+            <td>
+              <button
+                class="btn btn-sm btn-outline-primary"
+                (click)="viewDetails(request); $event.stopPropagation()"
+                i18n
+              >
+                <i-bs name="eye"></i-bs> View Details
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (collectionSize > pageSize) {
+    <div class="d-flex justify-content-center mt-3">
+      <ngb-pagination
+        [(page)]="page"
+        [pageSize]="pageSize"
+        [collectionSize]="collectionSize"
+        [maxSize]="5"
+        [rotate]="true"
+        [boundaryLinks]="true"
+      ></ngb-pagination>
+    </div>
+  }
+}

@@ -23,6 +23,7 @@ from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
 from documents.views import CorrespondentViewSet
 from documents.views import CustomFieldViewSet
+from documents.views import DeletionRequestViewSet
 from documents.views import DocumentTypeViewSet
 from documents.views import GlobalSearchView
 from documents.views import IndexView
@@ -83,6 +84,7 @@ api_router.register(r"workflows", WorkflowViewSet)
 api_router.register(r"custom_fields", CustomFieldViewSet)
 api_router.register(r"config", ApplicationConfigurationViewSet)
 api_router.register(r"processed_mail", ProcessedMailViewSet)
+api_router.register(r"deletion_requests", DeletionRequestViewSet)
 api_router.register(r"deletion-requests", DeletionRequestViewSet, basename="deletion-requests")
 
 
