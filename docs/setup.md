@@ -326,7 +326,7 @@ are released, dependency support is confirmed, etc.
 
     !!! warning
 
-        Ensure your Redis instance [is secured](https://redis.io/docs/getting-started/#securing-redis).
+        Ensure your Redis instance [is secured](https://redis.io/docs/latest/operate/oss_and_stack/management/security/).
 
 7.  Create the following directories if they are missing:
 
