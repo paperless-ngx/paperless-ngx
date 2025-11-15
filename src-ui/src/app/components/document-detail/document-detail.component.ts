@@ -859,11 +859,9 @@ export class DocumentDetailComponent
               value: fieldData.value,
             }
 
-            // Only include 'created' field if custom field order has been changed (reordering occurred)
-            if (this.customFieldOrderChanged) {
-              const documentField = this.document.custom_fields[index]
-              result.created =
-                documentField?.created || fieldData.created || new Date()
+            // Include created field for order persistence if available
+            if (fieldData.created) {
+              result.created = fieldData.created
             }
 
             return result

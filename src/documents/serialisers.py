@@ -809,6 +809,7 @@ class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
 class CustomFieldInstanceSerializer(serializers.ModelSerializer):
     field = serializers.PrimaryKeyRelatedField(queryset=CustomField.objects.all())
     value = ReadWriteSerializerMethodField(allow_null=True)
+    created = serializers.DateTimeField(write_only=True, required=False)
 
     def create(self, validated_data):
         # An instance is attached to a document
