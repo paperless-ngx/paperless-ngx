@@ -5,6 +5,7 @@ export enum WorkflowActionType {
   Removal = 2,
   Email = 3,
   Webhook = 4,
+  Deletion = 5,
 }
 
 export interface WorkflowActionEmail extends ObjectWithId {
@@ -31,6 +32,10 @@ export interface WorkflowActionWebhook extends ObjectWithId {
   headers?: object
 
   include_document?: boolean
+}
+
+export interface WorkflowActionDeletion extends ObjectWithId {
+  skip_trash?: boolean
 }
 
 export interface WorkflowAction extends ObjectWithId {
@@ -97,4 +102,6 @@ export interface WorkflowAction extends ObjectWithId {
   email?: WorkflowActionEmail
 
   webhook?: WorkflowActionWebhook
+
+  deletion?: WorkflowActionDeletion
 }
