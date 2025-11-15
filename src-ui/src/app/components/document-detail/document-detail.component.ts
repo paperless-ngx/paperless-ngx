@@ -343,19 +343,23 @@ export class DocumentDetailComponent
   }
 
   private mapDocToForm(doc: Document): any {
-    // Transform custom_fields to match FormControl structure
-    const transformedCustomFields =
-      doc.custom_fields?.map((fieldInstance) => ({
+    return {
+      ...doc,
+      permissions_form: { owner: doc.owner, set_permissions: doc.permissions },
+      custom_fields: this.transformCustomFieldsForForm(doc.custom_fields),
+    }
+  }
+
+  private transformCustomFieldsForForm(
+    customFields: CustomFieldInstance[]
+  ): any[] {
+    return (
+      customFields?.map((fieldInstance) => ({
         field: fieldInstance.field,
         value: fieldInstance.value,
         created: fieldInstance.created || null,
       })) || []
-
-    return {
-      ...doc,
-      permissions_form: { owner: doc.owner, set_permissions: doc.permissions },
-      custom_fields: transformedCustomFields,
-    }
+    )
   }
 
   private mapFormToDoc(value: any): any {
@@ -388,14 +392,6 @@ export class DocumentDetailComponent
     currentDocument: Document,
     originalDocument: Document
   ): void {
-    // Transform custom_fields to match the form control structure
-    const transformedCustomFields =
-      originalDocument.custom_fields?.map((fieldInstance) => ({
-        field: fieldInstance.field,
-        value: fieldInstance.value,
-        created: fieldInstance.created || null,
-      })) || []
-
     this.store = new BehaviorSubject({
       title: originalDocument.title,
       content: originalDocument.content,
@@ -409,7 +405,9 @@ export class DocumentDetailComponent
         owner: originalDocument.owner,
         set_permissions: originalDocument.permissions,
       },
-      custom_fields: transformedCustomFields,
+      custom_fields: this.transformCustomFieldsForForm(
+        originalDocument.custom_fields
+      ),
     })
     this.isDirty$ = dirtyCheck(this.documentForm, this.store.asObservable())
     this.isDirty$
@@ -909,11 +907,9 @@ export class DocumentDetailComponent
           const updatedValues = {
             ...this.documentForm.value,
             tags: [...docValues.tags],
-            custom_fields: this.document.custom_fields.map((fieldInstance) => ({
-              field: fieldInstance.field,
-              value: fieldInstance.value,
-              created: fieldInstance.created || null,
-            })),
+            custom_fields: this.transformCustomFieldsForForm(
+              this.document.custom_fields
+            ),
           }
 
           this.store.next(updatedValues)
