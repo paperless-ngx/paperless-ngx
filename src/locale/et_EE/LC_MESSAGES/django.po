@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-28 18:06+0000\n"
-"PO-Revision-Date: 2025-10-28 18:07\n"
+"POT-Creation-Date: 2025-11-14 16:09+0000\n"
+"PO-Revision-Date: 2025-11-14 16:11\n"
 "Last-Translator: \n"
 "Language-Team: Estonian\n"
 "Language: et_EE\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumendid"
 
-#: documents/filters.py:392
+#: documents/filters.py:395
 msgid "Value must be valid JSON."
 msgstr "Väärtus peab olema lubatav JSON."
 
-#: documents/filters.py:411
+#: documents/filters.py:414
 msgid "Invalid custom field query expression"
 msgstr "Vigane kohandatud välja päringu avaldis"
 
-#: documents/filters.py:421
+#: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Vigane avaldiste loend. Peab olema mittetühi."
 
-#: documents/filters.py:442
+#: documents/filters.py:445
 msgid "Invalid logical operator {op!r}"
 msgstr "Vigane loogikaoperaator {op!r}"
 
-#: documents/filters.py:456
+#: documents/filters.py:459
 msgid "Maximum number of query conditions exceeded."
 msgstr "Päringutingimuste suurim hulk on ületatud."
 
-#: documents/filters.py:521
+#: documents/filters.py:524
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} ei ole lubatud kohandatud väli."
 
-#: documents/filters.py:558
+#: documents/filters.py:561
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} ei toeta päringu avaldist {expr!r}."
 
-#: documents/filters.py:666 documents/models.py:135
+#: documents/filters.py:669 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
 msgstr "Suurim pesastamis sügavus ületatud."
 
-#: documents/filters.py:851
+#: documents/filters.py:854
 msgid "Custom field not found"
 msgstr "Kohandatud välja ei leitud"
 
