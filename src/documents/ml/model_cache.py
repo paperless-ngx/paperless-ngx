@@ -202,7 +202,8 @@ class ModelCacheManager:
         self._initialized = True
         self.model_cache = LRUCache(max_size=max_models)
         self.disk_cache_dir = Path(disk_cache_dir) if disk_cache_dir else None
-        
+        self._model_load_lock = threading.Lock()  # Lock for model loading
+
         if self.disk_cache_dir:
             self.disk_cache_dir.mkdir(parents=True, exist_ok=True)
             logger.info(f"Disk cache initialized at: {self.disk_cache_dir}")
@@ -236,40 +237,53 @@ class ModelCacheManager:
     ) -> Any:
         """
         Get model from cache or load it.
-        
+
+        Uses double-checked locking to ensure thread safety while minimizing
+        lock contention. This prevents multiple threads from loading the same
+        model simultaneously.
+
         Args:
             model_key: Unique identifier for the model
             loader_func: Function to load the model if not cached
-            
+
         Returns:
             The loaded model
         """
-        # Try to get from cache
+        # First check without lock (optimization)
         model = self.model_cache.get(model_key)
-        
+
         if model is not None:
             logger.debug(f"Model cache HIT: {model_key}")
             return model
 
-        # Cache miss - load model
-        logger.info(f"Model cache MISS: {model_key} - loading...")
-        start_time = time.time()
-        
-        try:
-            model = loader_func()
-            self.model_cache.put(model_key, model)
-            self.model_cache.metrics.record_load()
-            
-            load_time = time.time() - start_time
-            logger.info(
-                f"Model loaded successfully: {model_key} "
-                f"(took {load_time:.2f}s)"
-            )
-            
-            return model
-        except Exception as e:
-            logger.error(f"Failed to load model {model_key}: {e}", exc_info=True)
-            raise
+        # Lock for model loading
+        with self._model_load_lock:
+            # Second check inside lock (double-check)
+            model = self.model_cache.get(model_key)
+
+            if model is not None:
+                logger.debug(f"Model cache HIT (after lock): {model_key}")
+                return model
+
+            # Cache miss - load model (only one thread reaches here)
+            logger.info(f"Model cache MISS: {model_key} - loading...")
+            start_time = time.time()
+
+            try:
+                model = loader_func()
+                self.model_cache.put(model_key, model)
+                self.model_cache.metrics.record_load()
+
+                load_time = time.time() - start_time
+                logger.info(
+                    f"Model loaded successfully: {model_key} "
+                    f"(took {load_time:.2f}s)"
+                )
+
+                return model
+            except Exception as e:
+                logger.error(f"Failed to load model {model_key}: {e}", exc_info=True)
+                raise
 
     def save_embeddings_to_disk(
         self,

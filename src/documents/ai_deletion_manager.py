@@ -17,8 +17,10 @@ import logging
 from typing import TYPE_CHECKING
 from typing import Any
 
+from django.contrib.auth.models import User
+
 if TYPE_CHECKING:
-    from django.contrib.auth.models import User
+    pass
 
 logger = logging.getLogger("paperless.ai_deletion")
 

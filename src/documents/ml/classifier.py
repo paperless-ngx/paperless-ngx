@@ -96,13 +96,13 @@ class TransformerDocumentClassifier:
     """
 
     def __init__(
-        self, 
+        self,
         model_name: str = "distilbert-base-uncased",
         use_cache: bool = True,
     ):
         """
         Initialize classifier.
-        
+
         Args:
             model_name: HuggingFace model name
                        Default: distilbert-base-uncased (132MB, fast)
@@ -111,6 +111,14 @@ class TransformerDocumentClassifier:
                        - albert-base-v2 (47MB, smallest)
             use_cache: Whether to use model cache (default: True)
         """
+        # Añadir validación al inicio
+        if not isinstance(model_name, str) or not model_name.strip():
+            raise ValueError("model_name must be a non-empty string")
+
+        if not isinstance(use_cache, bool):
+            raise TypeError("use_cache must be a boolean")
+
+        # Resto del código existente...
         self.model_name = model_name
         self.use_cache = use_cache
         self.cache_manager = ModelCacheManager.get_instance() if use_cache else None

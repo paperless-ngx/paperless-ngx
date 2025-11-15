@@ -1,8 +1,10 @@
 import { CommonModule } from '@angular/common'
-import { Component, inject, Input } from '@angular/core'
+import { Component, inject, Input, OnDestroy } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { Subject } from 'rxjs'
+import { takeUntil } from 'rxjs/operators'
 import {
   DeletionRequest,
   DeletionRequestStatus,
@@ -21,9 +23,8 @@ import { ToastService } from 'src/app/services/toast.service'
     CustomDatePipe,
   ],
   templateUrl: './deletion-request-detail.component.html',
-  styleUrls: ['./deletion-request-detail.component.scss'],
 })
-export class DeletionRequestDetailComponent {
+export class DeletionRequestDetailComponent implements OnDestroy {
   @Input() deletionRequest: DeletionRequest
 
   public DeletionRequestStatus = DeletionRequestStatus
@@ -33,6 +34,7 @@ export class DeletionRequestDetailComponent {
 
   public reviewComment: string = ''
   public isProcessing: boolean = false
+  private destroy$ = new Subject<void>()
 
   approve(): void {
     if (this.isProcessing) return
@@ -40,6 +42,7 @@ export class DeletionRequestDetailComponent {
     this.isProcessing = true
     this.deletionRequestService
       .approve(this.deletionRequest.id, this.reviewComment)
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (result) => {
           this.toastService.showInfo(
@@ -64,6 +67,7 @@ export class DeletionRequestDetailComponent {
     this.isProcessing = true
     this.deletionRequestService
       .reject(this.deletionRequest.id, this.reviewComment)
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (result) => {
           this.toastService.showInfo(
@@ -84,5 +88,10 @@ export class DeletionRequestDetailComponent {
 
   canModify(): boolean {
     return this.deletionRequest.status === DeletionRequestStatus.Pending
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next()
+    this.destroy$.complete()
   }
 }

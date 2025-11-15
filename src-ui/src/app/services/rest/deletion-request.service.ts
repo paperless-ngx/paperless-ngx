@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Observable } from 'rxjs'
-import { tap } from 'rxjs/operators'
+import { tap, catchError } from 'rxjs/operators'
 import { DeletionRequest } from 'src/app/data/deletion-request'
 import { AbstractPaperlessService } from './abstract-paperless-service'
 
@@ -28,6 +28,10 @@ export class DeletionRequestService extends AbstractPaperlessService<DeletionReq
       .pipe(
         tap(() => {
           this._loading = false
+        }),
+        catchError((error) => {
+          this._loading = false
+          throw error
         })
       )
   }
@@ -46,6 +50,10 @@ export class DeletionRequestService extends AbstractPaperlessService<DeletionReq
       .pipe(
         tap(() => {
           this._loading = false
+        }),
+        catchError((error) => {
+          this._loading = false
+          throw error
         })
       )
   }

@@ -72,14 +72,34 @@ DANGEROUS_EXTENSIONS = {
 }
 
 # Patterns that might indicate malicious content
+# SECURITY: Refined patterns to reduce false positives while maintaining protection
 MALICIOUS_PATTERNS = [
-    # JavaScript in PDFs (potential XSS)
-    rb"/JavaScript",
-    rb"/JS",
-    rb"/OpenAction",
-    # Embedded executables
-    rb"MZ\x90\x00",  # PE executable header
-    rb"\x7fELF",  # ELF executable header
+    # JavaScript malicioso en PDFs (excluye formularios legítimos)
+    # Nota: No usar rb"/JavaScript" directamente - demasiado amplio
+    rb"/Launch",  # Launch actions son peligrosas
+    rb"/OpenAction(?!.*?/AcroForm)",  # OpenAction sin formularios
+
+    # Código ejecutable embebido (archivo)
+    rb"/EmbeddedFile.*?\.exe",
+    rb"/EmbeddedFile.*?\.bat",
+    rb"/EmbeddedFile.*?\.cmd",
+    rb"/EmbeddedFile.*?\.sh",
+    rb"/EmbeddedFile.*?\.vbs",
+    rb"/EmbeddedFile.*?\.ps1",
+
+    # Ejecutables (headers de binarios)
+    rb"MZ\x90\x00",  # PE executable header (Windows)
+    rb"\x7fELF",  # ELF executable header (Linux)
+
+    # SubmitForm a dominios externos no confiables
+    rb"/SubmitForm.*?https?://(?!localhost|127\.0\.0\.1|trusted-domain\.com)",
+]
+
+# Whitelist para JavaScript legítimo en PDFs (formularios Adobe)
+ALLOWED_JS_PATTERNS = [
+    rb"/AcroForm",  # Formularios Adobe
+    rb"/Annot.*?/Widget",  # Widgets de formulario
+    rb"/Fields\[",  # Campos de formulario
 ]
 
 
@@ -87,6 +107,19 @@ class FileValidationError(Exception):
     """Raised when file validation fails."""
 
     pass
+
+
+def has_whitelisted_javascript(content: bytes) -> bool:
+    """
+    Check if PDF has whitelisted JavaScript (legitimate forms).
+
+    Args:
+        content: File content to check
+
+    Returns:
+        bool: True if PDF contains legitimate JavaScript (forms), False otherwise
+    """
+    return any(re.search(pattern, content) for pattern in ALLOWED_JS_PATTERNS)
 
 
 def validate_uploaded_file(uploaded_file: UploadedFile) -> dict:
@@ -222,13 +255,32 @@ def validate_file_path(file_path: str | Path) -> dict:
 def check_malicious_content(content: bytes) -> None:
     """
     Check file content for potentially malicious patterns.
-    
+
+    SECURITY: Enhanced validation with whitelist support
+    - Verifica patrones maliciosos específicos
+    - Permite JavaScript legítimo (formularios PDF)
+    - Reduce falsos positivos manteniendo seguridad
+
     Args:
         content: File content to check (first few KB)
-        
+
     Raises:
         FileValidationError: If malicious patterns are detected
     """
+    # Primero verificar si tiene JavaScript (antes de rechazar por patrones)
+    has_javascript = rb"/JavaScript" in content or rb"/JS" in content
+
+    if has_javascript:
+        # Si tiene JavaScript, verificar si es legítimo (formularios)
+        if not has_whitelisted_javascript(content):
+            # JavaScript no permitido - verificar si es malicioso
+            # Solo rechazar si no es un formulario legítimo
+            raise FileValidationError(
+                "File contains potentially malicious JavaScript and has been rejected. "
+                "PDF forms with AcroForm are allowed.",
+            )
+
+    # Verificar otros patrones maliciosos
     for pattern in MALICIOUS_PATTERNS:
         if re.search(pattern, content):
             raise FileValidationError(

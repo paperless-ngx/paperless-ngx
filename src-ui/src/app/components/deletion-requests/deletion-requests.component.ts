@@ -34,7 +34,6 @@ import { DeletionRequestDetailComponent } from './deletion-request-detail/deleti
     CustomDatePipe,
   ],
   templateUrl: './deletion-requests.component.html',
-  styleUrls: ['./deletion-requests.component.scss'],
 })
 export class DeletionRequestsComponent
   extends LoadingComponentWithPermissions

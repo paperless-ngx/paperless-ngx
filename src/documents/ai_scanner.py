@@ -22,6 +22,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 from typing import Any
+from typing import Dict
 
 from django.conf import settings
 from django.db import transaction
@@ -94,6 +95,21 @@ class AIDocumentScanner:
     - No destructive operations without user confirmation
     """
 
+    # Confidence thresholds para decisiones automáticas
+    HIGH_CONFIDENCE_MATCH = 0.85  # Auto-aplicar etiquetas/tipos
+    MEDIUM_CONFIDENCE_ENTITY = 0.70  # Confianza media para entidades
+    TAG_CONFIDENCE_HIGH = 0.85
+    TAG_CONFIDENCE_MEDIUM = 0.65
+    CORRESPONDENT_CONFIDENCE_HIGH = 0.85
+    CORRESPONDENT_CONFIDENCE_MEDIUM = 0.70
+    DOCUMENT_TYPE_CONFIDENCE = 0.85
+    STORAGE_PATH_CONFIDENCE = 0.80
+    CUSTOM_FIELD_CONFIDENCE_HIGH = 0.85
+    CUSTOM_FIELD_CONFIDENCE_MEDIUM = 0.70
+    WORKFLOW_BASE_CONFIDENCE = 0.50
+    WORKFLOW_MATCH_BONUS = 0.20
+    WORKFLOW_FEATURE_BONUS = 0.15
+
     def __init__(
         self,
         auto_apply_threshold: float = 0.80,
@@ -155,9 +171,6 @@ class AIDocumentScanner:
                     use_cache=True,
                 )
                 logger.info("ML classifier loaded successfully with caching")
-
-                self._classifier = TransformerDocumentClassifier()
-                logger.info("ML classifier loaded successfully")
             except Exception as e:
                 logger.warning(f"Failed to load ML classifier: {e}")
                 self.ml_enabled = False
@@ -170,9 +183,6 @@ class AIDocumentScanner:
                 from documents.ml.ner import DocumentNER
                 self._ner_extractor = DocumentNER(use_cache=True)
                 logger.info("NER extractor loaded successfully with caching")
-
-                self._ner_extractor = DocumentNER()
-                logger.info("NER extractor loaded successfully")
             except Exception as e:
                 logger.warning(f"Failed to load NER extractor: {e}")
         return self._ner_extractor
@@ -195,9 +205,6 @@ class AIDocumentScanner:
                     use_cache=True,
                 )
                 logger.info("Semantic search loaded successfully with caching")
-
-                self._semantic_search = SemanticSearch()
-                logger.info("Semantic search loaded successfully")
             except Exception as e:
                 logger.warning(f"Failed to load semantic search: {e}")
         return self._semantic_search
@@ -359,7 +366,7 @@ class AIDocumentScanner:
 
             # Add confidence scores based on matching strength
             for tag in matched_tags:
-                confidence = 0.85  # High confidence for matched tags
+                confidence = self.TAG_CONFIDENCE_HIGH  # High confidence for matched tags
                 suggestions.append((tag.id, confidence))
 
             # Additional entity-based suggestions
@@ -370,12 +377,12 @@ class AIDocumentScanner:
                 # Check for organization entities -> company/business tags
                 if entities.get("organizations"):
                     for tag in all_tags.filter(name__icontains="company"):
-                        suggestions.append((tag.id, 0.70))
+                        suggestions.append((tag.id, self.MEDIUM_CONFIDENCE_ENTITY))
 
                 # Check for date entities -> tax/financial tags if year-end
                 if entities.get("dates"):
                     for tag in all_tags.filter(name__icontains="tax"):
-                        suggestions.append((tag.id, 0.65))
+                        suggestions.append((tag.id, self.TAG_CONFIDENCE_MEDIUM))
 
             # Remove duplicates, keep highest confidence
             seen = {}
@@ -422,7 +429,7 @@ class AIDocumentScanner:
 
             if matched_correspondents:
                 correspondent = matched_correspondents[0]
-                confidence = 0.85
+                confidence = self.CORRESPONDENT_CONFIDENCE_HIGH
                 logger.debug(
                     f"Detected correspondent: {correspondent.name} "
                     f"(confidence: {confidence})",
@@ -438,7 +445,7 @@ class AIDocumentScanner:
                 )
                 if correspondents.exists():
                     correspondent = correspondents.first()
-                    confidence = 0.70
+                    confidence = self.CORRESPONDENT_CONFIDENCE_MEDIUM
                     logger.debug(
                         f"Detected correspondent from NER: {correspondent.name} "
                         f"(confidence: {confidence})",
@@ -470,7 +477,7 @@ class AIDocumentScanner:
 
             if matched_types:
                 doc_type = matched_types[0]
-                confidence = 0.85
+                confidence = self.DOCUMENT_TYPE_CONFIDENCE
                 logger.debug(
                     f"Classified document type: {doc_type.name} "
                     f"(confidence: {confidence})",
@@ -509,7 +516,7 @@ class AIDocumentScanner:
 
             if matched_paths:
                 storage_path = matched_paths[0]
-                confidence = 0.80
+                confidence = self.STORAGE_PATH_CONFIDENCE
                 logger.debug(
                     f"Suggested storage path: {storage_path.name} "
                     f"(confidence: {confidence})",
@@ -578,7 +585,7 @@ class AIDocumentScanner:
         if "date" in field_name_lower:
             dates = entities.get("dates", [])
             if dates:
-                return (dates[0]["text"], 0.75)
+                return (dates[0]["text"], self.CUSTOM_FIELD_CONFIDENCE_MEDIUM)
 
         # Amount/price fields
         if any(
@@ -587,37 +594,37 @@ class AIDocumentScanner:
         ):
             amounts = entities.get("amounts", [])
             if amounts:
-                return (amounts[0]["text"], 0.75)
+                return (amounts[0]["text"], self.CUSTOM_FIELD_CONFIDENCE_MEDIUM)
 
         # Invoice number fields
         if "invoice" in field_name_lower:
             invoice_numbers = entities.get("invoice_numbers", [])
             if invoice_numbers:
-                return (invoice_numbers[0], 0.80)
+                return (invoice_numbers[0], self.STORAGE_PATH_CONFIDENCE)
 
         # Email fields
         if "email" in field_name_lower:
             emails = entities.get("emails", [])
             if emails:
-                return (emails[0], 0.85)
+                return (emails[0], self.CUSTOM_FIELD_CONFIDENCE_HIGH)
 
         # Phone fields
         if "phone" in field_name_lower:
             phones = entities.get("phones", [])
             if phones:
-                return (phones[0], 0.85)
+                return (phones[0], self.CUSTOM_FIELD_CONFIDENCE_HIGH)
 
         # Person name fields
         if "name" in field_name_lower or "person" in field_name_lower:
             persons = entities.get("persons", [])
             if persons:
-                return (persons[0]["text"], 0.70)
+                return (persons[0]["text"], self.CUSTOM_FIELD_CONFIDENCE_MEDIUM)
 
         # Organization fields
         if "company" in field_name_lower or "organization" in field_name_lower:
             orgs = entities.get("organizations", [])
             if orgs:
-                return (orgs[0]["text"], 0.70)
+                return (orgs[0]["text"], self.CUSTOM_FIELD_CONFIDENCE_MEDIUM)
 
         return (None, 0.0)
 
@@ -680,19 +687,19 @@ class AIDocumentScanner:
         # This is a simplified evaluation
         # In practice, you'd check workflow triggers and conditions
 
-        confidence = 0.5  # Base confidence
+        confidence = self.WORKFLOW_BASE_CONFIDENCE  # Base confidence
 
         # Increase confidence if document type matches workflow expectations
         if scan_result.document_type and workflow.actions.exists():
-            confidence += 0.2
+            confidence += self.WORKFLOW_MATCH_BONUS
 
         # Increase confidence if correspondent matches
         if scan_result.correspondent:
-            confidence += 0.15
+            confidence += self.WORKFLOW_FEATURE_BONUS
 
         # Increase confidence if tags match
         if scan_result.tags:
-            confidence += 0.15
+            confidence += self.WORKFLOW_FEATURE_BONUS
 
         return min(confidence, 1.0)
 

@@ -1,3 +1,5 @@
+import { DeletionRequest, DeletionRequestStatus } from './deletion-request'
+
 /**
  * Represents the AI scanner status and statistics
  */
@@ -36,28 +38,4 @@ export interface AIStatus {
    * AI scanner version or configuration info
    */
   version?: string
-}
-
-/**
- * Represents a pending deletion request initiated by AI
- */
-export interface DeletionRequest {
-  id: number
-  document_id: number
-  document_title: string
-  reason: string
-  confidence: number
-  created_at: string
-  status: DeletionRequestStatus
-}
-
-/**
- * Status of a deletion request
- */
-export enum DeletionRequestStatus {
-  Pending = 'pending',
-  Approved = 'approved',
-  Rejected = 'rejected',
-  Cancelled = 'cancelled',
-  Completed = 'completed',
 }

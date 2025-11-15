@@ -29,13 +29,13 @@ logger = logging.getLogger("paperless.ml.ner")
 class DocumentNER:
     """
     Extract named entities from documents using BERT-based NER.
-    
+
     Uses pre-trained NER models to automatically extract:
     - Person names (PER)
     - Organization names (ORG)
     - Locations (LOC)
     - Miscellaneous entities (MISC)
-    
+
     Plus custom regex extraction for:
     - Dates
     - Amounts/Prices
@@ -43,6 +43,10 @@ class DocumentNER:
     - Email addresses
     - Phone numbers
     """
+
+    # Límites de procesamiento
+    MAX_TEXT_LENGTH_FOR_NER = 5000  # Máximo de caracteres para NER
+    MAX_ENTITY_LENGTH = 100  # Máximo de caracteres por entidad
 
     def __init__(
         self,
@@ -96,7 +100,7 @@ class DocumentNER:
         logger.info("DocumentNER initialized successfully")
 
     def _compile_patterns(self) -> None:
-        """Compile regex patterns for common entities."""
+        """Compile regex patterns for common entities and document classification."""
         # Date patterns
         self.date_patterns = [
             re.compile(r"\d{1,2}[/-]\d{1,2}[/-]\d{2,4}"),  # MM/DD/YYYY, DD-MM-YYYY
@@ -131,6 +135,12 @@ class DocumentNER:
             r"(?:\+\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}",
         )
 
+        # Document type classification patterns (compiled for performance)
+        self.invoice_keyword_pattern = re.compile(r"\binvoice\b", re.IGNORECASE)
+        self.receipt_keyword_pattern = re.compile(r"\breceipt\b", re.IGNORECASE)
+        self.contract_keyword_pattern = re.compile(r"\bcontract\b|\bagreement\b", re.IGNORECASE)
+        self.letter_keyword_pattern = re.compile(r"\bdear\b|\bsincerely\b", re.IGNORECASE)
+
     def extract_entities(self, text: str) -> dict[str, list[str]]:
         """
         Extract named entities from text.
@@ -148,7 +158,7 @@ class DocumentNER:
                   }
         """
         # Run NER model
-        entities = self.ner_pipeline(text[:5000])  # Limit to first 5000 chars
+        entities = self.ner_pipeline(text[:self.MAX_TEXT_LENGTH_FOR_NER])  # Limit to first chars
 
         # Organize by type
         organized = {
@@ -387,29 +397,31 @@ class DocumentNER:
     def suggest_tags(self, text: str) -> list[str]:
         """
         Suggest tags based on extracted entities.
-        
+
+        Uses compiled regex patterns for improved performance.
+
         Args:
             text: Document text
-            
+
         Returns:
             list: Suggested tag names
         """
         tags = []
 
-        # Check for invoice indicators
-        if re.search(r"\binvoice\b", text, re.IGNORECASE):
+        # Check for invoice indicators (using compiled pattern)
+        if self.invoice_keyword_pattern.search(text):
             tags.append("invoice")
 
-        # Check for receipt indicators
-        if re.search(r"\breceipt\b", text, re.IGNORECASE):
+        # Check for receipt indicators (using compiled pattern)
+        if self.receipt_keyword_pattern.search(text):
             tags.append("receipt")
 
-        # Check for contract indicators
-        if re.search(r"\bcontract\b|\bagreement\b", text, re.IGNORECASE):
+        # Check for contract indicators (using compiled pattern)
+        if self.contract_keyword_pattern.search(text):
             tags.append("contract")
 
-        # Check for letter indicators
-        if re.search(r"\bdear\b|\bsincerely\b", text, re.IGNORECASE):
+        # Check for letter indicators (using compiled pattern)
+        if self.letter_keyword_pattern.search(text):
             tags.append("letter")
 
         return tags

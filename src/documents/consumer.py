@@ -716,7 +716,7 @@ class ConsumerPlugin(
             self.metadata.view_users is not None
             or self.metadata.view_groups is not None
             or self.metadata.change_users is not None
-            or self.metadata.change_users is not None
+            or self.metadata.change_groups is not None
         ):
             permissions = {
                 "view": {
@@ -769,7 +769,7 @@ class ConsumerPlugin(
             text: The extracted document text
         """
         # Check if AI scanner is enabled
-        if not settings.PAPERLESS_ENABLE_AI_SCANNER:
+        if not getattr(settings, 'PAPERLESS_ENABLE_AI_SCANNER', True):
             self.log.debug("AI scanner is disabled, skipping AI analysis")
             return
 

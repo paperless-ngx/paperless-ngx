@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core'
-import { BehaviorSubject, Observable, interval } from 'rxjs'
+import { BehaviorSubject, Observable, interval, Subscription } from 'rxjs'
 import { catchError, map, startWith, switchMap } from 'rxjs/operators'
 import { AIStatus } from 'src/app/data/ai-status'
 import { environment } from 'src/environments/environment'
@@ -21,12 +21,13 @@ export class AIStatusService {
   })
 
   public loading: boolean = false
+  private pollingSubscription?: Subscription
 
   // Poll every 30 seconds for AI status updates
   private readonly POLL_INTERVAL = 30000
 
   constructor() {
-    this.startPolling()
+    // Polling is now controlled manually via startPolling()
   }
 
   /**
@@ -46,8 +47,11 @@ export class AIStatusService {
   /**
    * Start polling for AI status updates
    */
-  private startPolling(): void {
-    interval(this.POLL_INTERVAL)
+  public startPolling(): void {
+    if (this.pollingSubscription) {
+      return // Already running
+    }
+    this.pollingSubscription = interval(this.POLL_INTERVAL)
       .pipe(
         startWith(0), // Emit immediately on subscription
         switchMap(() => this.fetchAIStatus())
@@ -55,6 +59,16 @@ export class AIStatusService {
       .subscribe((status) => {
         this.aiStatusSubject.next(status)
       })
+  }
+
+  /**
+   * Stop polling for AI status updates
+   */
+  public stopPolling(): void {
+    if (this.pollingSubscription) {
+      this.pollingSubscription.unsubscribe()
+      this.pollingSubscription = undefined
+    }
   }
 
   /**

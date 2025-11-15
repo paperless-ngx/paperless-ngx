@@ -7,6 +7,7 @@ import { ToastService } from 'src/app/services/toast.service'
 import { CheckComponent } from '../../../common/input/check/check.component'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { CommonModule } from '@angular/common'
+import { environment } from 'src/environments/environment'
 
 interface MLModel {
   value: string
@@ -107,14 +108,16 @@ export class AiSettingsComponent implements OnInit {
       })
       
       // Log mock test results
-      console.log('AI Scanner Test Results:', {
-        scannerEnabled: this.settingsForm.get('aiScannerEnabled')?.value,
-        mlEnabled: this.settingsForm.get('aiMlFeaturesEnabled')?.value,
-        ocrEnabled: this.settingsForm.get('aiAdvancedOcrEnabled')?.value,
-        autoApplyThreshold: this.autoApplyThreshold,
-        suggestThreshold: this.suggestThreshold,
-        model: this.settingsForm.get('aiMlModel')?.value,
-      })
+      if (!environment.production) {
+        console.log('AI Scanner Test Results:', {
+          scannerEnabled: this.settingsForm.get('aiScannerEnabled')?.value,
+          mlEnabled: this.settingsForm.get('aiMlFeaturesEnabled')?.value,
+          ocrEnabled: this.settingsForm.get('aiAdvancedOcrEnabled')?.value,
+          autoApplyThreshold: this.autoApplyThreshold,
+          suggestThreshold: this.suggestThreshold,
+          model: this.settingsForm.get('aiMlModel')?.value,
+        })
+      }
     }, 2000)
   }
 

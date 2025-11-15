@@ -11,12 +11,15 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnDestroy,
   Output,
   SimpleChanges,
   inject,
 } from '@angular/core'
 import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { Subject } from 'rxjs'
+import { takeUntil } from 'rxjs/operators'
 import {
   AISuggestion,
   AISuggestionStatus,
@@ -61,7 +64,7 @@ import { ToastService } from 'src/app/services/toast.service'
     ]),
   ],
 })
-export class AiSuggestionsPanelComponent implements OnChanges {
+export class AiSuggestionsPanelComponent implements OnChanges, OnDestroy {
   private tagService = inject(TagService)
   private correspondentService = inject(CorrespondentService)
   private documentTypeService = inject(DocumentTypeService)
@@ -92,6 +95,7 @@ export class AiSuggestionsPanelComponent implements OnChanges {
   private documentTypes: DocumentType[] = []
   private storagePaths: StoragePath[] = []
   private customFields: CustomField[] = []
+  private destroy$ = new Subject<void>()
 
   public AISuggestionType = AISuggestionType
   public AISuggestionStatus = AISuggestionStatus
@@ -129,7 +133,7 @@ export class AiSuggestionsPanelComponent implements OnChanges {
       (s) => s.type === AISuggestionType.Tag
     )
     if (tagSuggestions.length > 0) {
-      this.tagService.listAll().subscribe((tags) => {
+      this.tagService.listAll().pipe(takeUntil(this.destroy$)).subscribe((tags) => {
         this.tags = tags.results
         this.updateSuggestionLabels()
       })
@@ -140,7 +144,7 @@ export class AiSuggestionsPanelComponent implements OnChanges {
       (s) => s.type === AISuggestionType.Correspondent
     )
     if (correspondentSuggestions.length > 0) {
-      this.correspondentService.listAll().subscribe((correspondents) => {
+      this.correspondentService.listAll().pipe(takeUntil(this.destroy$)).subscribe((correspondents) => {
         this.correspondents = correspondents.results
         this.updateSuggestionLabels()
       })
@@ -151,7 +155,7 @@ export class AiSuggestionsPanelComponent implements OnChanges {
       (s) => s.type === AISuggestionType.DocumentType
     )
     if (documentTypeSuggestions.length > 0) {
-      this.documentTypeService.listAll().subscribe((documentTypes) => {
+      this.documentTypeService.listAll().pipe(takeUntil(this.destroy$)).subscribe((documentTypes) => {
         this.documentTypes = documentTypes.results
         this.updateSuggestionLabels()
       })
@@ -162,7 +166,7 @@ export class AiSuggestionsPanelComponent implements OnChanges {
       (s) => s.type === AISuggestionType.StoragePath
     )
     if (storagePathSuggestions.length > 0) {
-      this.storagePathService.listAll().subscribe((storagePaths) => {
+      this.storagePathService.listAll().pipe(takeUntil(this.destroy$)).subscribe((storagePaths) => {
         this.storagePaths = storagePaths.results
         this.updateSuggestionLabels()
       })
@@ -173,7 +177,7 @@ export class AiSuggestionsPanelComponent implements OnChanges {
       (s) => s.type === AISuggestionType.CustomField
     )
     if (customFieldSuggestions.length > 0) {
-      this.customFieldsService.listAll().subscribe((customFields) => {
+      this.customFieldsService.listAll().pipe(takeUntil(this.destroy$)).subscribe((customFields) => {
         this.customFields = customFields.results
         this.updateSuggestionLabels()
       })
@@ -377,5 +381,10 @@ export class AiSuggestionsPanelComponent implements OnChanges {
 
   public get suggestionTypes(): AISuggestionType[] {
     return Array.from(this.groupedSuggestions.keys())
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next()
+    this.destroy$.complete()
   }
 }
