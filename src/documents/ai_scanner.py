@@ -15,6 +15,13 @@ According to agents.md requirements:
 - AI suggests metadata for all manageable aspects
 - AI cannot delete files without explicit user authorization
 - AI must inform users comprehensively before any destructive action
+
+Logging levels used in this module:
+- DEBUG: Detailed execution info (cache hits, intermediate values, threshold checks)
+- INFO: Normal system events (document scanned, metadata applied, model loaded)
+- WARNING: Unexpected but recoverable situations (low confidence, model fallback)
+- ERROR: Errors requiring attention (scan failure, missing dependencies)
+- CRITICAL: System non-functional (should never occur in normal operation)
 """
 
 from __future__ import annotations
@@ -23,6 +30,7 @@ import logging
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Dict
+from typing import TypedDict
 
 from django.conf import settings
 from django.db import transaction
@@ -33,6 +41,71 @@ if TYPE_CHECKING:
     from documents.models import Workflow
 
 logger = logging.getLogger("paperless.ai_scanner")
+
+
+class TagSuggestion(TypedDict):
+    """Tag suggestion with confidence score."""
+    tag_id: int
+    confidence: float
+
+
+class CorrespondentSuggestion(TypedDict):
+    """Correspondent suggestion with confidence score."""
+    correspondent_id: int
+    confidence: float
+
+
+class DocumentTypeSuggestion(TypedDict):
+    """Document type suggestion with confidence score."""
+    type_id: int
+    confidence: float
+
+
+class StoragePathSuggestion(TypedDict):
+    """Storage path suggestion with confidence score."""
+    path_id: int
+    confidence: float
+
+
+class CustomFieldSuggestion(TypedDict):
+    """Custom field value with confidence score."""
+    value: Any
+    confidence: float
+
+
+class WorkflowSuggestion(TypedDict):
+    """Workflow assignment suggestion with confidence score."""
+    workflow_id: int
+    confidence: float
+
+
+class AIScanResultDict(TypedDict, total=False):
+    """
+    Structured result from AI document scanning.
+
+    All fields are optional (total=False) as not all documents
+    will have suggestions for all metadata types.
+
+    Attributes:
+        tags: List of tag suggestions with confidence scores
+        correspondent: Correspondent suggestion (optional)
+        document_type: Document type suggestion (optional)
+        storage_path: Storage path suggestion (optional)
+        custom_fields: Dictionary of custom field suggestions by field ID
+        workflows: List of workflow assignment suggestions
+        extracted_entities: Named entities extracted from document
+        title_suggestion: Suggested document title (optional)
+        metadata: Additional metadata extracted from document
+    """
+    tags: list[TagSuggestion]
+    correspondent: CorrespondentSuggestion
+    document_type: DocumentTypeSuggestion
+    storage_path: StoragePathSuggestion
+    custom_fields: dict[int, CustomFieldSuggestion]
+    workflows: list[WorkflowSuggestion]
+    extracted_entities: dict[str, Any]
+    title_suggestion: str
+    metadata: dict[str, Any]
 
 
 class AIScanResult:
@@ -60,19 +133,45 @@ class AIScanResult:
         self.title_suggestion: str | None = None
         self.metadata: dict[str, Any] = {}  # Additional metadata
 
-    def to_dict(self) -> dict[str, Any]:
-        """Convert scan results to dictionary for logging/serialization."""
-        return {
-            "tags": self.tags,
-            "correspondent": self.correspondent,
-            "document_type": self.document_type,
-            "storage_path": self.storage_path,
-            "custom_fields": self.custom_fields,
-            "workflows": self.workflows,
-            "extracted_entities": self.extracted_entities,
-            "title_suggestion": self.title_suggestion,
-            "metadata": self.metadata,
+    def to_dict(self) -> AIScanResultDict:
+        """
+        Convert scan results to dictionary with proper typing.
+
+        Returns:
+            AIScanResultDict: Typed dictionary containing all scan results
+        """
+        # Convert internal tuple format to TypedDict format
+        result: AIScanResultDict = {
+            'tags': [{'tag_id': tag_id, 'confidence': conf} for tag_id, conf in self.tags],
+            'custom_fields': {
+                field_id: {'value': value, 'confidence': conf}
+                for field_id, (value, conf) in self.custom_fields.items()
+            },
+            'workflows': [{'workflow_id': wf_id, 'confidence': conf} for wf_id, conf in self.workflows],
+            'extracted_entities': self.extracted_entities,
+            'metadata': self.metadata,
         }
+
+        # Add optional fields only if present
+        if self.correspondent:
+            result['correspondent'] = {
+                'correspondent_id': self.correspondent[0],
+                'confidence': self.correspondent[1],
+            }
+        if self.document_type:
+            result['document_type'] = {
+                'type_id': self.document_type[0],
+                'confidence': self.document_type[1],
+            }
+        if self.storage_path:
+            result['storage_path'] = {
+                'path_id': self.storage_path[0],
+                'confidence': self.storage_path[1],
+            }
+        if self.title_suggestion:
+            result['title_suggestion'] = self.title_suggestion
+
+        return result
 
 
 class AIDocumentScanner:

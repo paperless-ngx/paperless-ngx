@@ -9,12 +9,27 @@ export interface DeletionRequestDocument {
   tags: string[]
 }
 
+export interface FailedDeletion {
+  document_id: number
+  document_title: string
+  error: string
+}
+
+export interface CompletionDetails {
+  deleted_count: number
+  deleted_document_ids: number[]
+  failed_deletions?: FailedDeletion[]
+  errors?: string[]
+  total_documents: number
+  completed_at: string
+}
+
 export interface DeletionRequestImpactSummary {
   document_count: number
   documents: DeletionRequestDocument[]
-  affected_tags: string[]
-  affected_correspondents: string[]
-  affected_types: string[]
+  affected_tags: Array<{ id: number; name: string; count: number }> | string[]
+  affected_correspondents: Array<{ id: number; name: string; count: number }> | string[]
+  affected_types: Array<{ id: number; name: string; count: number }> | string[]
   date_range?: {
     earliest: string
     latest: string
@@ -46,5 +61,5 @@ export interface DeletionRequest extends ObjectWithId {
   reviewed_by_username?: string
   review_comment?: string
   completed_at?: string
-  completion_details?: any
+  completion_details?: CompletionDetails
 }

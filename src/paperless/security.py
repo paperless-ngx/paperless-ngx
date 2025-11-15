@@ -23,36 +23,44 @@ if TYPE_CHECKING:
 logger = logging.getLogger("paperless.security")
 
 
-# Allowed MIME types for document upload
+# Lista explícita de tipos MIME permitidos
 ALLOWED_MIME_TYPES = {
-    # Documents
-    "application/pdf",
-    "application/vnd.ms-excel",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    "application/vnd.ms-powerpoint",
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-    "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    "application/vnd.oasis.opendocument.text",
-    "application/vnd.oasis.opendocument.spreadsheet",
-    "application/vnd.oasis.opendocument.presentation",
-    "text/plain",
-    "text/csv",
-    "text/html",
-    "text/rtf",
-    "application/rtf",
-    # Images
-    "image/png",
-    "image/jpeg",
-    "image/jpg",
-    "image/gif",
-    "image/bmp",
-    "image/tiff",
-    "image/webp",
+    # Documentos
+    'application/pdf',
+    'application/vnd.oasis.opendocument.text',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-powerpoint',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'application/vnd.oasis.opendocument.spreadsheet',
+    'application/vnd.oasis.opendocument.presentation',
+    'application/rtf',
+    'text/rtf',
+
+    # Imágenes
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/tiff',
+    'image/bmp',
+    'image/webp',
+
+    # Texto
+    'text/plain',
+    'text/html',
+    'text/csv',
+    'text/markdown',
 }
 
-# Maximum file size (500MB by default)
-MAX_FILE_SIZE = 500 * 1024 * 1024  # 500MB in bytes
+# Maximum file size (100MB by default)
+# Can be overridden by settings.MAX_UPLOAD_SIZE
+try:
+    from django.conf import settings
+    MAX_FILE_SIZE = getattr(settings, 'MAX_UPLOAD_SIZE', 100 * 1024 * 1024)  # 100MB por defecto
+except ImportError:
+    MAX_FILE_SIZE = 100 * 1024 * 1024  # 100MB in bytes
 
 # Dangerous file extensions that should never be allowed
 DANGEROUS_EXTENSIONS = {
@@ -122,6 +130,23 @@ def has_whitelisted_javascript(content: bytes) -> bool:
     return any(re.search(pattern, content) for pattern in ALLOWED_JS_PATTERNS)
 
 
+def validate_mime_type(mime_type: str) -> None:
+    """
+    Validate MIME type against whitelist.
+
+    Args:
+        mime_type: MIME type to validate
+
+    Raises:
+        FileValidationError: If MIME type is not allowed
+    """
+    if mime_type not in ALLOWED_MIME_TYPES:
+        raise FileValidationError(
+            f"MIME type '{mime_type}' is not allowed. "
+            f"Allowed types: {', '.join(sorted(ALLOWED_MIME_TYPES))}"
+        )
+
+
 def validate_uploaded_file(uploaded_file: UploadedFile) -> dict:
     """
     Validate an uploaded file for security.
@@ -163,15 +188,8 @@ def validate_uploaded_file(uploaded_file: UploadedFile) -> dict:
     # Detect MIME type from content (more reliable than extension)
     mime_type = magic.from_buffer(content, mime=True)
 
-    # Validate MIME type
-    if mime_type not in ALLOWED_MIME_TYPES:
-        # Check if it's a variant of an allowed type
-        base_type = mime_type.split("/")[0]
-        if base_type not in ["application", "text", "image"]:
-            raise FileValidationError(
-                f"MIME type '{mime_type}' is not allowed. "
-                f"Allowed types: {', '.join(sorted(ALLOWED_MIME_TYPES))}",
-            )
+    # Validate MIME type using strict whitelist
+    validate_mime_type(mime_type)
 
     # Check for malicious patterns
     check_malicious_content(content)
@@ -227,13 +245,8 @@ def validate_file_path(file_path: str | Path) -> dict:
     # Detect MIME type
     mime_type = magic.from_file(str(file_path), mime=True)
 
-    # Validate MIME type
-    if mime_type not in ALLOWED_MIME_TYPES:
-        base_type = mime_type.split("/")[0]
-        if base_type not in ["application", "text", "image"]:
-            raise FileValidationError(
-                f"MIME type '{mime_type}' is not allowed",
-            )
+    # Validate MIME type using strict whitelist
+    validate_mime_type(mime_type)
 
     # Check for malicious content
     with open(file_path, "rb") as f:

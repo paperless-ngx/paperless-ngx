@@ -17,7 +17,7 @@ export enum AISuggestionStatus {
 export interface AISuggestion {
   id: string
   type: AISuggestionType
-  value: any
+  value: number | string | Date
   confidence: number
   status: AISuggestionStatus
   label?: string

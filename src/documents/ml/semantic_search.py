@@ -83,12 +83,17 @@ class SemanticSearch:
             # Load model from cache
             def loader():
                 return SentenceTransformer(model_name, cache_folder=cache_dir)
-            
+
             self.model = self.cache_manager.get_or_load_model(cache_key, loader)
-            
+
             # Try to load embeddings from disk
             embeddings = self.cache_manager.load_embeddings_from_disk("document_embeddings")
-            self.document_embeddings = embeddings if embeddings else {}
+            if embeddings and self._validate_embeddings(embeddings):
+                self.document_embeddings = embeddings
+                logger.info(f"Loaded {len(embeddings)} valid embeddings from disk cache")
+            else:
+                self.document_embeddings = {}
+                logger.warning("Embeddings failed validation, starting with empty cache")
             self.document_metadata = {}
         else:
             # Load without caching
@@ -97,6 +102,43 @@ class SemanticSearch:
             self.document_metadata = {}
 
         logger.info("SemanticSearch initialized successfully")
+
+    def _validate_embeddings(self, embeddings: dict) -> bool:
+        """
+        Validate loaded embeddings for integrity.
+
+        Args:
+            embeddings: Dictionary of embeddings to validate
+
+        Returns:
+            True if embeddings are valid, False otherwise
+        """
+        if not isinstance(embeddings, dict):
+            logger.warning("Embeddings is not a dictionary")
+            return False
+
+        if len(embeddings) == 0:
+            logger.warning("Embeddings dictionary is empty")
+            return False
+
+        # Validate structure: each value should be a numpy array
+        try:
+            for doc_id, embedding in embeddings.items():
+                if not isinstance(embedding, np.ndarray) and not isinstance(embedding, torch.Tensor):
+                    logger.warning(f"Embedding for doc {doc_id} is not a numpy array or tensor")
+                    return False
+                if hasattr(embedding, 'size'):
+                    if embedding.size == 0:
+                        logger.warning(f"Embedding for doc {doc_id} is empty")
+                        return False
+                elif hasattr(embedding, 'numel'):
+                    if embedding.numel() == 0:
+                        logger.warning(f"Embedding for doc {doc_id} is empty")
+                        return False
+            return True
+        except Exception as e:
+            logger.error(f"Error validating embeddings: {e}")
+            return False
 
     def index_document(
         self,
@@ -164,13 +206,26 @@ class SemanticSearch:
                 self.document_metadata[doc_id] = metadata
 
         logger.info(f"Indexed {len(documents)} documents successfully")
-        
+
         # Save embeddings to disk cache if enabled
         if self.use_cache and self.cache_manager:
-            self.cache_manager.save_embeddings_to_disk(
+            self.save_embeddings_to_disk()
+
+    def save_embeddings_to_disk(self):
+        """Save embeddings to disk cache with error handling."""
+        try:
+            result = self.cache_manager.save_embeddings_to_disk(
                 "document_embeddings",
-                self.document_embeddings,
+                self.document_embeddings
             )
+            if result:
+                logger.info(
+                    f"Successfully saved {len(self.document_embeddings)} embeddings to disk"
+                )
+            else:
+                logger.error("Failed to save embeddings to disk (returned False)")
+        except Exception as e:
+            logger.exception(f"Exception while saving embeddings to disk: {e}")
 
     def search(
         self,

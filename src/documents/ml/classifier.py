@@ -3,6 +3,13 @@ BERT-based document classifier for IntelliDocs-ngx.
 
 Provides improved classification accuracy (40-60% better) compared to
 traditional ML approaches by using transformer models.
+
+Logging levels used in this module:
+- DEBUG: Detailed execution info (cache hits, tokenization details, prediction scores)
+- INFO: Normal operations (model loaded, training started, predictions made)
+- WARNING: Unexpected but recoverable situations (model not found, using fallback)
+- ERROR: Errors requiring attention (model load failure, training failure)
+- CRITICAL: System non-functional (should never occur in normal operation)
 """
 
 from __future__ import annotations
@@ -148,7 +155,7 @@ class TransformerDocumentClassifier:
     ) -> dict:
         """
         Train the classifier on document data.
-        
+
         Args:
             documents: List of document texts
             labels: List of class labels (integers)
@@ -156,9 +163,15 @@ class TransformerDocumentClassifier:
             output_dir: Directory to save trained model
             num_epochs: Number of training epochs
             batch_size: Training batch size
-            
+
         Returns:
-            dict: Training metrics
+            dict: Training metrics including train_loss, epochs, and num_labels
+
+        Raises:
+            ValueError: If documents list is empty or labels don't match documents length
+            RuntimeError: If insufficient training data or training fails
+            OSError: If output directory cannot be created or written to
+            MemoryError: If insufficient memory for model training
         """
         logger.info(f"Training classifier with {len(documents)} documents")
 
@@ -235,10 +248,18 @@ class TransformerDocumentClassifier:
 
     def load_model(self, model_dir: str) -> None:
         """
-        Load a pre-trained model.
-        
+        Load a pre-trained model from disk or cache.
+
+        Downloads the model from Hugging Face Hub if not cached locally.
+
         Args:
             model_dir: Directory containing saved model
+
+        Raises:
+            OSError: If model directory doesn't exist or is inaccessible
+            RuntimeError: If model loading fails due to memory or compatibility issues
+            ValueError: If model_name is invalid or model files are corrupted
+            ConnectionError: If unable to download model from Hugging Face Hub
         """
         if self.use_cache and self.cache_manager:
             # Try to get from cache first
@@ -267,15 +288,19 @@ class TransformerDocumentClassifier:
         return_confidence: bool = True,
     ) -> tuple[int, float] | int:
         """
-        Classify a document.
-        
+        Classify a document using the loaded model.
+
         Args:
             document_text: Text content of document
             return_confidence: Whether to return confidence score
-            
+
         Returns:
             If return_confidence=True: (predicted_class, confidence)
             If return_confidence=False: predicted_class
+
+        Raises:
+            ValueError: If document_text is empty or None
+            RuntimeError: If model is not loaded or prediction fails
         """
         if self.model is None:
             msg = "Model not loaded. Call load_model() or train() first"

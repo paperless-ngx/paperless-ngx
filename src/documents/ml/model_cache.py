@@ -18,6 +18,7 @@ causing slow performance. With this cache:
 
 from __future__ import annotations
 
+import errno
 import logging
 import pickle
 import threading
@@ -289,25 +290,42 @@ class ModelCacheManager:
         self,
         key: str,
         embeddings: Dict[int, Any],
-    ) -> None:
+    ) -> bool:
         """
         Save embeddings to disk cache.
-        
+
         Args:
             key: Cache key
             embeddings: Dictionary of embeddings to save
+
+        Returns:
+            True if successful, False otherwise
+
+        Raises:
+            OSError: If disk is full or other OS error occurs
         """
         if not self.disk_cache_dir:
-            return
+            logger.warning("Disk cache directory not configured")
+            return False
 
         cache_file = self.disk_cache_dir / f"{key}.pkl"
-        
+
         try:
-            with open(cache_file, "wb") as f:
+            with open(cache_file, 'wb') as f:
                 pickle.dump(embeddings, f, protocol=pickle.HIGHEST_PROTOCOL)
-            logger.info(f"Saved {len(embeddings)} embeddings to disk: {cache_file}")
+            logger.info(f"Saved {len(embeddings)} embeddings to {cache_file}")
+            return True
+        except OSError as e:
+            if e.errno == errno.ENOSPC:
+                logger.error(f"Disk full - cannot save embeddings to {cache_file}")
+                # Intentar eliminar archivos antiguos para hacer espacio
+                self._cleanup_old_cache_files()
+            else:
+                logger.error(f"OS error saving embeddings to {cache_file}: {e}")
+            return False
         except Exception as e:
-            logger.error(f"Failed to save embeddings to disk: {e}", exc_info=True)
+            logger.exception(f"Failed to save embeddings to {cache_file}: {e}")
+            return False
 
     def load_embeddings_from_disk(
         self,
@@ -338,6 +356,30 @@ class ModelCacheManager:
         except Exception as e:
             logger.error(f"Failed to load embeddings from disk: {e}", exc_info=True)
             return None
+
+    def _cleanup_old_cache_files(self):
+        """Remove old cache files to free disk space."""
+        if not self.disk_cache_dir or not self.disk_cache_dir.exists():
+            return
+
+        try:
+            cache_files = list(self.disk_cache_dir.glob("*.pkl"))
+
+            # Sort by modification time (oldest first)
+            cache_files.sort(key=lambda f: f.stat().st_mtime)
+
+            # Remove oldest 50% of files
+            files_to_remove = cache_files[:len(cache_files) // 2]
+
+            for cache_file in files_to_remove:
+                try:
+                    cache_file.unlink()
+                    logger.info(f"Removed old cache file: {cache_file}")
+                except Exception as e:
+                    logger.warning(f"Failed to remove {cache_file}: {e}")
+
+        except Exception as e:
+            logger.exception(f"Error during cache cleanup: {e}")
 
     def clear_all(self) -> None:
         """Clear all caches (memory and disk)."""

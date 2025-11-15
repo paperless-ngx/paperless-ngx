@@ -25,7 +25,7 @@ import { ToastService } from 'src/app/services/toast.service'
   templateUrl: './deletion-request-detail.component.html',
 })
 export class DeletionRequestDetailComponent implements OnDestroy {
-  @Input() deletionRequest: DeletionRequest
+  @Input({ required: true }) deletionRequest!: DeletionRequest
 
   public DeletionRequestStatus = DeletionRequestStatus
   public activeModal = inject(NgbActiveModal)

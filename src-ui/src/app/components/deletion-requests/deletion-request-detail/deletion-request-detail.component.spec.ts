@@ -4,6 +4,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { DeletionRequestDetailComponent } from './deletion-request-detail.component'
 import { DeletionRequestService } from 'src/app/services/rest/deletion-request.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { DeletionRequestStatus } from 'src/app/data/deletion-request'
 
 describe('DeletionRequestDetailComponent', () => {
   let component: DeletionRequestDetailComponent
@@ -25,7 +26,7 @@ describe('DeletionRequestDetailComponent', () => {
       ai_reason: 'Test reason',
       user: 1,
       user_username: 'testuser',
-      status: 'pending' as any,
+      status: DeletionRequestStatus.Pending,
       documents: [1, 2],
       documents_detail: [],
       document_count: 2,

@@ -280,110 +280,242 @@ class ConsumerPlugin(
 
     def run(self) -> str:
         """
-        Return the document object if it was successfully created.
-        """
+        Main entry point for document consumption.
 
+        Orchestrates the entire document processing pipeline from setup
+        through parsing, storage, and post-processing.
+
+        Returns:
+            str: Success message with document ID
+        """
         tempdir = None
+        document_parser = None
 
         try:
-            # Preflight has already run including progress update to 0%
-            self.log.info(f"Consuming {self.filename}")
+            # Setup phase
+            tempdir = self._setup_working_copy()
+            mime_type = self._determine_mime_type(tempdir)
+            parser_class = self._get_parser_class(mime_type, tempdir)
 
-            # For the actual work, copy the file into a tempdir
-            tempdir = tempfile.TemporaryDirectory(
-                prefix="paperless-ngx",
-                dir=settings.SCRATCH_DIR,
-            )
-            self.working_copy = Path(tempdir.name) / Path(self.filename)
-            copy_file_with_basic_stats(self.input_doc.original_file, self.working_copy)
-            self.unmodified_original = None
-
-            # Determine the parser class.
-
-            mime_type = magic.from_file(self.working_copy, mime=True)
-
-            self.log.debug(f"Detected mime type: {mime_type}")
-
-            if (
-                Path(self.filename).suffix.lower() == ".pdf"
-                and mime_type in settings.CONSUMER_PDF_RECOVERABLE_MIME_TYPES
-            ):
-                try:
-                    # The file might be a pdf, but the mime type is wrong.
-                    # Try to clean with qpdf
-                    self.log.debug(
-                        "Detected possible PDF with wrong mime type, trying to clean with qpdf",
-                    )
-                    run_subprocess(
-                        [
-                            "qpdf",
-                            "--replace-input",
-                            self.working_copy,
-                        ],
-                        logger=self.log,
-                    )
-                    mime_type = magic.from_file(self.working_copy, mime=True)
-                    self.log.debug(f"Detected mime type after qpdf: {mime_type}")
-                    # Save the original file for later
-                    self.unmodified_original = (
-                        Path(tempdir.name) / Path("uo") / Path(self.filename)
-                    )
-                    self.unmodified_original.parent.mkdir(exist_ok=True)
-                    copy_file_with_basic_stats(
-                        self.input_doc.original_file,
-                        self.unmodified_original,
-                    )
-                except Exception as e:
-                    self.log.error(f"Error attempting to clean PDF: {e}")
-
-            # Based on the mime type, get the parser for that type
-            parser_class: type[DocumentParser] | None = get_parser_class_for_mime_type(
-                mime_type,
-            )
-            if not parser_class:
-                tempdir.cleanup()
-                self._fail(
-                    ConsumerStatusShortMessage.UNSUPPORTED_TYPE,
-                    f"Unsupported mime type {mime_type}",
-                )
-
-            # Notify all listeners that we're going to do some work.
-
+            # Signal document consumption start
             document_consumption_started.send(
                 sender=self.__class__,
                 filename=self.working_copy,
                 logging_group=self.logging_group,
             )
 
+            # Pre-processing
             self.run_pre_consume_script()
+
+            # Parsing phase
+            document_parser = self._create_parser_instance(parser_class)
+            text, date, thumbnail, archive_path, page_count = self._parse_document(
+                document_parser, mime_type
+            )
+
+            # Storage phase
+            classifier = load_classifier()
+            document = self._store_document_in_transaction(
+                text=text,
+                date=date,
+                page_count=page_count,
+                mime_type=mime_type,
+                thumbnail=thumbnail,
+                archive_path=archive_path,
+                classifier=classifier,
+            )
+
+            # Cleanup files
+            self._cleanup_consumed_files()
+
+            # Post-processing
+            self.run_post_consume_script(document)
+
+            # Finalize
+            return self._finalize_consumption(document)
+
         except:
             if tempdir:
                 tempdir.cleanup()
             raise
+        finally:
+            if document_parser:
+                document_parser.cleanup()
+            if tempdir:
+                tempdir.cleanup()
 
+    def _setup_working_copy(self) -> tempfile.TemporaryDirectory:
+        """
+        Setup temporary working directory and copy source file.
+
+        Creates a temporary directory and copies the original file into it
+        for processing. Initializes working_copy and unmodified_original attributes.
+
+        Returns:
+            tempfile.TemporaryDirectory: The temporary directory instance
+        """
+        self.log.info(f"Consuming {self.filename}")
+
+        tempdir = tempfile.TemporaryDirectory(
+            prefix="paperless-ngx",
+            dir=settings.SCRATCH_DIR,
+        )
+        self.working_copy = Path(tempdir.name) / Path(self.filename)
+        copy_file_with_basic_stats(self.input_doc.original_file, self.working_copy)
+        self.unmodified_original = None
+
+        return tempdir
+
+    def _determine_mime_type(self, tempdir: tempfile.TemporaryDirectory) -> str:
+        """
+        Determine MIME type of the document and attempt PDF recovery if needed.
+
+        Detects the MIME type using python-magic. For PDF files with incorrect
+        MIME types, attempts recovery using qpdf and preserves the original file.
+
+        Args:
+            tempdir: Temporary directory for storing recovered files
+
+        Returns:
+            str: The detected MIME type
+        """
+        mime_type = magic.from_file(self.working_copy, mime=True)
+        self.log.debug(f"Detected mime type: {mime_type}")
+
+        # Attempt PDF recovery if needed
+        if (
+            Path(self.filename).suffix.lower() == ".pdf"
+            and mime_type in settings.CONSUMER_PDF_RECOVERABLE_MIME_TYPES
+        ):
+            mime_type = self._attempt_pdf_recovery(tempdir, mime_type)
+
+        return mime_type
+
+    def _attempt_pdf_recovery(
+        self,
+        tempdir: tempfile.TemporaryDirectory,
+        original_mime_type: str
+    ) -> str:
+        """
+        Attempt to recover a PDF file with incorrect MIME type using qpdf.
+
+        Args:
+            tempdir: Temporary directory for storing recovered files
+            original_mime_type: The original detected MIME type
+
+        Returns:
+            str: The MIME type after recovery attempt
+        """
+        try:
+            self.log.debug(
+                "Detected possible PDF with wrong mime type, trying to clean with qpdf",
+            )
+            run_subprocess(
+                ["qpdf", "--replace-input", self.working_copy],
+                logger=self.log,
+            )
+
+            # Re-detect MIME type after qpdf
+            mime_type = magic.from_file(self.working_copy, mime=True)
+            self.log.debug(f"Detected mime type after qpdf: {mime_type}")
+
+            # Save the original file for later
+            self.unmodified_original = (
+                Path(tempdir.name) / Path("uo") / Path(self.filename)
+            )
+            self.unmodified_original.parent.mkdir(exist_ok=True)
+            copy_file_with_basic_stats(
+                self.input_doc.original_file,
+                self.unmodified_original,
+            )
+
+            return mime_type
+
+        except Exception as e:
+            self.log.error(f"Error attempting to clean PDF: {e}")
+            return original_mime_type
+
+    def _get_parser_class(
+        self,
+        mime_type: str,
+        tempdir: tempfile.TemporaryDirectory
+    ) -> type[DocumentParser]:
+        """
+        Determine which parser to use based on MIME type.
+
+        Args:
+            mime_type: The detected MIME type
+            tempdir: Temporary directory to cleanup on failure
+
+        Returns:
+            type[DocumentParser]: The parser class to use
+
+        Raises:
+            ConsumerError: If MIME type is not supported
+        """
+        parser_class: type[DocumentParser] | None = get_parser_class_for_mime_type(
+            mime_type,
+        )
+
+        if not parser_class:
+            tempdir.cleanup()
+            self._fail(
+                ConsumerStatusShortMessage.UNSUPPORTED_TYPE,
+                f"Unsupported mime type {mime_type}",
+            )
+
+        return parser_class
+
+    def _create_parser_instance(
+        self,
+        parser_class: type[DocumentParser]
+    ) -> DocumentParser:
+        """
+        Create a parser instance with progress callback.
+
+        Args:
+            parser_class: The parser class to instantiate
+
+        Returns:
+            DocumentParser: Configured parser instance
+        """
         def progress_callback(current_progress, max_progress):  # pragma: no cover
-            # recalculate progress to be within 20 and 80
+            # Recalculate progress to be within 20 and 80
             p = int((current_progress / max_progress) * 50 + 20)
             self._send_progress(p, 100, ProgressStatusOptions.WORKING)
 
-        # This doesn't parse the document yet, but gives us a parser.
-
-        document_parser: DocumentParser = parser_class(
+        document_parser = parser_class(
             self.logging_group,
             progress_callback=progress_callback,
         )
 
         self.log.debug(f"Parser: {type(document_parser).__name__}")
 
-        # Parse the document. This may take some time.
+        return document_parser
 
-        text = None
-        date = None
-        thumbnail = None
-        archive_path = None
-        page_count = None
+    def _parse_document(
+        self,
+        document_parser: DocumentParser,
+        mime_type: str
+    ) -> tuple[str, datetime.datetime | None, Path, Path | None, int | None]:
+        """
+        Parse the document and extract metadata.
 
+        Performs document parsing, thumbnail generation, date detection,
+        and page counting. Handles both regular documents and mail documents.
+
+        Args:
+            document_parser: The parser instance to use
+            mime_type: The document MIME type
+
+        Returns:
+            tuple: (text, date, thumbnail, archive_path, page_count)
+
+        Raises:
+            ConsumerError: If parsing fails
+        """
         try:
+            # Parse document content
             self._send_progress(
                 20,
                 100,
@@ -391,6 +523,7 @@ class ConsumerPlugin(
                 ConsumerStatusShortMessage.PARSING_DOCUMENT,
             )
             self.log.debug(f"Parsing {self.filename}...")
+
             if (
                 isinstance(document_parser, MailDocumentParser)
                 and self.input_doc.mailrule_id
@@ -404,6 +537,7 @@ class ConsumerPlugin(
             else:
                 document_parser.parse(self.working_copy, mime_type, self.filename)
 
+            # Generate thumbnail
             self.log.debug(f"Generating thumbnail for {self.filename}...")
             self._send_progress(
                 70,
@@ -417,8 +551,11 @@ class ConsumerPlugin(
                 self.filename,
             )
 
+            # Extract metadata
             text = document_parser.get_text()
             date = document_parser.get_date()
+
+            # Parse date if not found by parser
             if date is None:
                 self._send_progress(
                     90,
@@ -427,13 +564,13 @@ class ConsumerPlugin(
                     ConsumerStatusShortMessage.PARSE_DATE,
                 )
                 date = parse_date(self.filename, text)
+
             archive_path = document_parser.get_archive_path()
             page_count = document_parser.get_page_count(self.working_copy, mime_type)
 
+            return text, date, thumbnail, archive_path, page_count
+
         except ParseError as e:
-            document_parser.cleanup()
-            if tempdir:
-                tempdir.cleanup()
             self._fail(
                 str(e),
                 f"Error occurred while consuming document {self.filename}: {e}",
@@ -441,9 +578,6 @@ class ConsumerPlugin(
                 exception=e,
             )
         except Exception as e:
-            document_parser.cleanup()
-            if tempdir:
-                tempdir.cleanup()
             self._fail(
                 str(e),
                 f"Unexpected error while consuming document {self.filename}: {e}",
@@ -451,25 +585,47 @@ class ConsumerPlugin(
                 exception=e,
             )
 
-        # Prepare the document classifier.
+    def _store_document_in_transaction(
+        self,
+        text: str,
+        date: datetime.datetime | None,
+        page_count: int | None,
+        mime_type: str,
+        thumbnail: Path,
+        archive_path: Path | None,
+        classifier,
+    ) -> Document:
+        """
+        Store document and files in database within a transaction.
 
-        # TODO: I don't really like to do this here, but this way we avoid
-        #   reloading the classifier multiple times, since there are multiple
-        #   post-consume hooks that all require the classifier.
+        Creates the document record, runs AI scanner, triggers signals,
+        and stores all associated files (source, thumbnail, archive).
 
-        classifier = load_classifier()
+        Args:
+            text: Extracted document text
+            date: Document date
+            page_count: Number of pages
+            mime_type: Document MIME type
+            thumbnail: Path to thumbnail file
+            archive_path: Path to archive file (if any)
+            classifier: Document classifier instance
 
+        Returns:
+            Document: The created document instance
+
+        Raises:
+            ConsumerError: If storage fails
+        """
         self._send_progress(
             95,
             100,
             ProgressStatusOptions.WORKING,
             ConsumerStatusShortMessage.SAVE_DOCUMENT,
         )
-        # now that everything is done, we can start to store the document
-        # in the system. This will be a transaction and reasonably fast.
+
         try:
             with transaction.atomic():
-                # store the document.
+                # Create document record
                 document = self._store(
                     text=text,
                     date=date,
@@ -477,13 +633,10 @@ class ConsumerPlugin(
                     mime_type=mime_type,
                 )
 
-                # If we get here, it was successful. Proceed with post-consume
-                # hooks. If they fail, nothing will get changed.
-
-                # AI Scanner Integration: Perform comprehensive AI scan
-                # This scans the document and applies/suggests metadata automatically
+                # Run AI scanner for automatic metadata detection
                 self._run_ai_scanner(document, text)
 
+                # Notify listeners
                 document_consumption_finished.send(
                     sender=self.__class__,
                     document=document,
@@ -496,70 +649,13 @@ class ConsumerPlugin(
                     ),
                 )
 
-                # After everything is in the database, copy the files into
-                # place. If this fails, we'll also rollback the transaction.
-                with FileLock(settings.MEDIA_LOCK):
-                    document.filename = generate_unique_filename(document)
-                    create_source_path_directory(document.source_path)
+                # Store files
+                self._store_document_files(document, thumbnail, archive_path)
 
-                    self._write(
-                        document.storage_type,
-                        (
-                            self.unmodified_original
-                            if self.unmodified_original is not None
-                            else self.working_copy
-                        ),
-                        document.source_path,
-                    )
-
-                    self._write(
-                        document.storage_type,
-                        thumbnail,
-                        document.thumbnail_path,
-                    )
-
-                    if archive_path and Path(archive_path).is_file():
-                        document.archive_filename = generate_unique_filename(
-                            document,
-                            archive_filename=True,
-                        )
-                        create_source_path_directory(document.archive_path)
-                        self._write(
-                            document.storage_type,
-                            archive_path,
-                            document.archive_path,
-                        )
-
-                        with Path(archive_path).open("rb") as f:
-                            document.archive_checksum = hashlib.md5(
-                                f.read(),
-                            ).hexdigest()
-
-                # Don't save with the lock active. Saving will cause the file
-                # renaming logic to acquire the lock as well.
-                # This triggers things like file renaming
+                # Save document (triggers file renaming)
                 document.save()
 
-                # Delete the file only if it was successfully consumed
-                self.log.debug(f"Deleting original file {self.input_doc.original_file}")
-                self.input_doc.original_file.unlink()
-                self.log.debug(f"Deleting working copy {self.working_copy}")
-                self.working_copy.unlink()
-                if self.unmodified_original is not None:  # pragma: no cover
-                    self.log.debug(
-                        f"Deleting unmodified original file {self.unmodified_original}",
-                    )
-                    self.unmodified_original.unlink()
-
-                # https://github.com/jonaswinkler/paperless-ng/discussions/1037
-                shadow_file = (
-                    Path(self.input_doc.original_file).parent
-                    / f"._{Path(self.input_doc.original_file).name}"
-                )
-
-                if Path(shadow_file).is_file():
-                    self.log.debug(f"Deleting shadow file {shadow_file}")
-                    Path(shadow_file).unlink()
+                return document
 
         except Exception as e:
             self._fail(
@@ -569,12 +665,96 @@ class ConsumerPlugin(
                 exc_info=True,
                 exception=e,
             )
-        finally:
-            document_parser.cleanup()
-            tempdir.cleanup()
 
-        self.run_post_consume_script(document)
+    def _store_document_files(
+        self,
+        document: Document,
+        thumbnail: Path,
+        archive_path: Path | None
+    ) -> None:
+        """
+        Store document files (source, thumbnail, archive) to disk.
 
+        Acquires a file lock and stores all document files in their
+        final locations. Generates unique filenames and creates directories.
+
+        Args:
+            document: The document instance
+            thumbnail: Path to thumbnail file
+            archive_path: Path to archive file (if any)
+        """
+        with FileLock(settings.MEDIA_LOCK):
+            # Generate filename and create directory
+            document.filename = generate_unique_filename(document)
+            create_source_path_directory(document.source_path)
+
+            # Store source file
+            source_file = (
+                self.unmodified_original
+                if self.unmodified_original is not None
+                else self.working_copy
+            )
+            self._write(document.storage_type, source_file, document.source_path)
+
+            # Store thumbnail
+            self._write(document.storage_type, thumbnail, document.thumbnail_path)
+
+            # Store archive file if exists
+            if archive_path and Path(archive_path).is_file():
+                document.archive_filename = generate_unique_filename(
+                    document,
+                    archive_filename=True,
+                )
+                create_source_path_directory(document.archive_path)
+                self._write(document.storage_type, archive_path, document.archive_path)
+
+                # Calculate archive checksum
+                with Path(archive_path).open("rb") as f:
+                    document.archive_checksum = hashlib.md5(f.read()).hexdigest()
+
+    def _cleanup_consumed_files(self) -> None:
+        """
+        Delete consumed files after successful processing.
+
+        Removes the original file, working copy, unmodified original (if any),
+        and shadow files created by macOS.
+        """
+        self.log.debug(f"Deleting original file {self.input_doc.original_file}")
+        self.input_doc.original_file.unlink()
+
+        self.log.debug(f"Deleting working copy {self.working_copy}")
+        self.working_copy.unlink()
+
+        if self.unmodified_original is not None:  # pragma: no cover
+            self.log.debug(
+                f"Deleting unmodified original file {self.unmodified_original}",
+            )
+            self.unmodified_original.unlink()
+
+        # Delete macOS shadow file if it exists
+        # https://github.com/jonaswinkler/paperless-ng/discussions/1037
+        shadow_file = (
+            Path(self.input_doc.original_file).parent
+            / f"._{Path(self.input_doc.original_file).name}"
+        )
+
+        if Path(shadow_file).is_file():
+            self.log.debug(f"Deleting shadow file {shadow_file}")
+            Path(shadow_file).unlink()
+
+    def _finalize_consumption(self, document: Document) -> str:
+        """
+        Finalize document consumption and send completion notification.
+
+        Logs completion, sends success progress update, refreshes document
+        from database, and returns success message.
+
+        Args:
+            document: The consumed document
+
+        Returns:
+            str: Success message with document ID
+        """
         self.log.info(f"Document {document} consumption finished")
 
         self._send_progress(

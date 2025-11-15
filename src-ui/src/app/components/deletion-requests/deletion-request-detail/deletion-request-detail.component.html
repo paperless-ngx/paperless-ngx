@@ -92,7 +92,7 @@
           @if (deletionRequest.impact_summary.affected_tags?.length > 0) {
             <div class="col-md-4">
               <div class="text-center p-3 bg-light rounded">
-                <h3 class="mb-0">{{ deletionRequest.impact_summary.affected_tags.length }}</h3>
+                <h3 class="mb-0">{{ deletionRequest.impact_summary.affected_tags?.length }}</h3>
                 <small class="text-muted" i18n>Affected Tags</small>
               </div>
             </div>
@@ -100,7 +100,7 @@
           @if (deletionRequest.impact_summary.affected_correspondents?.length > 0) {
             <div class="col-md-4">
               <div class="text-center p-3 bg-light rounded">
-                <h3 class="mb-0">{{ deletionRequest.impact_summary.affected_correspondents.length }}</h3>
+                <h3 class="mb-0">{{ deletionRequest.impact_summary.affected_correspondents?.length }}</h3>
                 <small class="text-muted" i18n>Affected Correspondents</small>
               </div>
             </div>

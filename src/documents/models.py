@@ -1677,14 +1677,16 @@ class DeletionRequest(models.Model):
         verbose_name_plural = _("deletion requests")
         indexes = [
             # Composite index for common listing queries (by user, filtered by status, sorted by date)
+            # PostgreSQL can use this index for queries on: user, user+status, user+status+created_at
             models.Index(fields=['user', 'status', 'created_at'], name='delreq_user_status_created_idx'),
+            # Index for queries filtering by status and date without user filter
+            models.Index(fields=['status', 'created_at'], name='delreq_status_created_idx'),
+            # Index for queries filtering by user and date (common for user-specific views)
+            models.Index(fields=['user', 'created_at'], name='delreq_user_created_idx'),
             # Index for queries filtering by review date
             models.Index(fields=['reviewed_at'], name='delreq_reviewed_at_idx'),
             # Index for queries filtering by completion date
             models.Index(fields=['completed_at'], name='delreq_completed_at_idx'),
-            # Legacy indexes kept for backward compatibility
-            models.Index(fields=['status', 'user']),
-            models.Index(fields=['created_at']),
         ]
     
     def __str__(self):
