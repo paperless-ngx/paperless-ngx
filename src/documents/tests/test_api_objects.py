@@ -4,6 +4,7 @@ from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -333,6 +334,45 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, "path/Something")
+
+    def test_test_storage_path_respects_none_placeholder_setting(self):
+        """
+        GIVEN:
+            - A storage path template referencing an empty field
+        WHEN:
+            - Testing the template before and after enabling remove-none
+        THEN:
+            - The preview shows "none" by default and drops the placeholder when configured
+        """
+        document = Document.objects.create(
+            mime_type="application/pdf",
+            storage_path=self.sp1,
+            title="Something",
+            checksum="123",
+        )
+        payload = json.dumps(
+            {
+                "document": document.id,
+                "path": "folder/{{ correspondent }}/{{ title }}",
+            },
+        )
+
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            payload,
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, "folder/none/Something")
+
+        with override_settings(FILENAME_FORMAT_REMOVE_NONE=True):
+            response = self.client.post(
+                f"{self.ENDPOINT}test/",
+                payload,
+                content_type="application/json",
+            )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, "folder/Something")
 
 
 class TestBulkEditObjects(APITestCase):
