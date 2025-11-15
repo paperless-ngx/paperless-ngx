@@ -1,5 +1,5 @@
 # 📝 Bitácora Maestra del Proyecto: IntelliDocs-ngx
-*Última actualización: 2025-11-11 14:30:00 UTC*
+*Última actualización: 2025-11-15 15:31:00 UTC*
 
 ---
 
@@ -7,13 +7,12 @@
 
 ### 🚧 Tarea en Progreso (WIP - Work In Progress)
 
-*   **Identificador de Tarea:** `TSK-AI-SCANNER-001`
-*   **Objetivo Principal:** Implementar sistema de escaneo AI comprehensivo para gestión automática de metadatos de documentos
-*   **Estado Detallado:** Sistema AI Scanner completamente implementado con: módulo principal (ai_scanner.py - 750 líneas), integración en consumer.py, configuración en settings.py, modelo DeletionRequest para protección de eliminaciones. Sistema usa ML classifier, NER, semantic search y table extraction. Confianza configurable (auto-apply ≥80%, suggest ≥60%). NO se requiere aprobación de usuario para deletions (implementado).
-*   **Próximo Micro-Paso Planificado:** Crear tests comprehensivos para AI Scanner, crear endpoints API para gestión de deletion requests, actualizar frontend para mostrar sugerencias AI
+Estado actual: **A la espera de nuevas directivas del Director.**
 
 ### ✅ Historial de Implementaciones Completadas
 *(En orden cronológico inverso. Cada entrada es un hito de negocio finalizado)*
+
+*   **[2025-11-15] - `TSK-DELETION-UI-001` - UI para Gestión de Deletion Requests:** Implementación completa del dashboard para gestionar deletion requests iniciados por IA. Backend: DeletionRequestSerializer y DeletionRequestActionSerializer (serializers.py), DeletionRequestViewSet con acciones approve/reject/pending_count (views.py), ruta /api/deletion_requests/ (urls.py). Frontend Angular: deletion-request.ts (modelo de datos TypeScript), deletion-request.service.ts (servicio REST con CRUD completo), DeletionRequestsComponent (componente principal con filtrado por pestañas: pending/approved/rejected/completed, badge de notificación, tabla con paginación), DeletionRequestDetailComponent (modal con información completa, análisis de impacto visual, lista de documentos afectados, botones approve/reject), ruta /deletion-requests con guard de permisos. Diseño consistente con resto de app (ng-bootstrap, badges de colores, layout responsive). Validaciones: lint ✓, build ✓, tests spec creados. Cumple 100% criterios de aceptación del issue #17.
 
 *   **[2025-11-11] - `TSK-AI-SCANNER-001` - Sistema AI Scanner Comprehensivo para Gestión Automática de Metadatos:** Implementación completa del sistema de escaneo AI automático según especificaciones agents.md. 4 archivos modificados/creados: ai_scanner.py (750 líneas - módulo principal con AIDocumentScanner, AIScanResult, lazy loading de ML/NER/semantic search/table extractor), consumer.py (_run_ai_scanner integrado en pipeline), settings.py (9 configuraciones nuevas: ENABLE_AI_SCANNER, ENABLE_ML_FEATURES, ENABLE_ADVANCED_OCR, ML_CLASSIFIER_MODEL, AI_AUTO_APPLY_THRESHOLD=0.80, AI_SUGGEST_THRESHOLD=0.60, USE_GPU, ML_MODEL_CACHE), models.py (modelo DeletionRequest 145 líneas), ai_deletion_manager.py (350 líneas - AIDeletionManager con análisis de impacto). Funciones: escaneo automático en consumo, gestión de etiquetas (confianza 0.65-0.85), detección de interlocutores vía NER (0.70-0.85), clasificación de tipos (0.85), asignación de rutas (0.80), extracción de campos personalizados (0.70-0.85), sugerencia de workflows (0.50-1.0), generación de títulos mejorados. Protección de eliminaciones: modelo DeletionRequest con workflow de aprobación, análisis de impacto comprehensivo, AI NUNCA puede eliminar sin autorización explícita del usuario. Sistema cumple 100% con requisitos agents.md. Auto-aplicación automática para confianza ≥80%, sugerencias para revisión 60-80%, logging completo para auditoría.
 
@@ -38,6 +37,51 @@
 ---
 
 ## 🔬 Registro Forense de Sesiones (Log Detallado)
+
+### Sesión Iniciada: 2025-11-15 15:19:00 UTC
+
+*   **Directiva del Director:** "hubo un problema, revisa lo que este hecho y repara, implemeta y haz lo que falte, si se trata de UI que cuadre con el resto de la app"
+*   **Plan de Acción Propuesto:**
+    1. Revisar commits anteriores y estado del código
+    2. Completar implementación del backend API (serializers, ViewSet, routes)
+    3. Crear servicio frontend para consumir API
+    4. Implementar componente de listado con filtros por estado
+    5. Implementar componente de detalle con análisis de impacto
+    6. Añadir routing y validar build
+*   **Log de Acciones (con timestamp):**
+    *   `15:19:00` - **ACCIÓN:** Análisis de código. **DETALLE:** Revisión de commits previos (780decf, 1b4bc75), verificación de cambios en serialisers.py y views.py. **RESULTADO:** Serializers creados pero ViewSet incompleto, frontend sin implementar.
+    *   `15:20:00` - **ACCIÓN:** Modificación de fichero. **DETALLE:** `src/documents/views.py`. **CAMBIOS:** Añadido DeletionRequestViewSet completo (120 líneas) con métodos list, retrieve, approve, reject, pending_count. Extends ModelViewSet, usa IsAuthenticated permissions, DjangoFilterBackend para filtrado.
+    *   `15:21:00` - **ACCIÓN:** Modificación de fichero. **DETALLE:** `src/paperless/urls.py`. **CAMBIOS:** Importado DeletionRequestViewSet, registrado en api_router: `api_router.register(r"deletion_requests", DeletionRequestViewSet)`.
+    *   `15:22:00` - **ACCIÓN:** Validación de sintaxis. **COMANDO:** `python3 -m py_compile` en views.py y urls.py. **RESULTADO:** OK (✓).
+    *   `15:23:00` - **ACCIÓN:** Creación de fichero. **DETALLE:** `src-ui/src/app/data/deletion-request.ts` (1153 bytes). **MOTIVO:** Interfaces TypeScript para DeletionRequest, DeletionRequestDocument, DeletionRequestImpactSummary, enum DeletionRequestStatus.
+    *   `15:24:00` - **ACCIÓN:** Creación de fichero. **DETALLE:** `src-ui/src/app/services/rest/deletion-request.service.ts` (1925 bytes). **MOTIVO:** Servicio Angular extendiendo AbstractPaperlessService con métodos approve(), reject(), getPendingCount().
+    *   `15:24:30` - **ACCIÓN:** Creación de fichero. **DETALLE:** `src-ui/src/app/services/rest/deletion-request.service.spec.ts` (2119 bytes). **MOTIVO:** Tests unitarios para servicio.
+    *   `15:25:00` - **ACCIÓN:** Creación de componente. **DETALLE:** `src-ui/src/app/components/deletion-requests/deletion-requests.component.*` (4 archivos). **MOTIVO:** Componente principal con filtrado por tabs (pending/approved/rejected/completed), tabla con paginación, badges de estado, contador de pendientes.
+    *   `15:26:00` - **ACCIÓN:** Creación de componente. **DETALLE:** `src-ui/src/app/components/deletion-requests/deletion-request-detail/*` (4 archivos). **MOTIVO:** Modal de detalle con información completa, análisis de impacto visual (cards con métricas), lista de documentos, botones approve/reject.
+    *   `15:27:00` - **ACCIÓN:** Modificación de fichero. **DETALLE:** `src-ui/src/app/app-routing.module.ts`. **CAMBIOS:** Importado DeletionRequestsComponent, añadida ruta `/deletion-requests` con PermissionsGuard.
+    *   `15:28:00` - **ACCIÓN:** Instalación de dependencias. **COMANDO:** `pnpm install`. **RESULTADO:** Dependencias instaladas correctamente.
+    *   `15:28:30` - **ACCIÓN:** Lint frontend. **COMANDO:** `pnpm run lint`. **RESULTADO:** 2 errores iniciales (constructor injection, template filter). Corregidos: eliminado parámetro http del constructor, añadido método getStatusCount().
+    *   `15:29:00` - **ACCIÓN:** Lint frontend (2da vez). **COMANDO:** `pnpm run lint`. **RESULTADO:** ✓ All files pass linting.
+    *   `15:29:30` - **ACCIÓN:** Build frontend. **COMANDO:** `pnpm run build`. **RESULTADO:** 2 errores de compilación (private property, incorrect extends). Corregidos: deletionRequestService cambiado a public, unsubscribeNotifier cambiado a protected.
+    *   `15:30:00` - **ACCIÓN:** Build frontend (2da vez). **COMANDO:** `pnpm run build`. **RESULTADO:** ✓ Build successful (dist/paperless-ui generado).
+    *   `15:31:00` - **ACCIÓN:** Commit. **HASH:** `5edfbfc`. **MENSAJE:** `feat: Complete deletion requests management UI implementation`.
+*   **Resultado de la Sesión:** Hito TSK-DELETION-UI-001 completado. UI funcional y consistente con diseño de la app.
+*   **Commit Asociado:** `5edfbfc`
+*   **Observaciones/Decisiones de Diseño:**
+    - Backend: DeletionRequestViewSet filtra por usuario (get_queryset), solo superuser ve todos los requests
+    - Backend: Acciones approve/reject validan status=pending antes de proceder
+    - Backend: pending_count endpoint retorna {count: N} para badge de notificación
+    - Frontend: Servicio usa inject() en lugar de constructor injection (preferencia Angular)
+    - Frontend: DeletionRequestsComponent extiende LoadingComponentWithPermissions (patrón estándar app)
+    - Frontend: Tabs con NgbNav para filtrado por estado, badge warning en tab Pending
+    - Frontend: DeletionRequestDetailComponent usa modal XL responsive
+    - Frontend: Análisis de impacto mostrado con cards visuales (document_count, tags, correspondents)
+    - Frontend: Tabla de documentos afectados muestra: id, title, correspondent, type, tags
+    - Frontend: Solo requests pending permiten approve/reject (canModify() guard)
+    - Frontend: Botones con spinner durante procesamiento (isProcessing flag)
+    - Frontend: Toast notifications para feedback de acciones
+    - Frontend: Diseño consistente: ng-bootstrap components, badges con colores semánticos (warning/success/danger/info), CustomDatePipe para fechas
+    - Frontend: Routing con PermissionsGuard (action: View, type: Document)
 
 ### Sesión Iniciada: 2025-11-11 13:50:00 UTC
 
