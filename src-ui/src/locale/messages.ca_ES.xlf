@@ -764,7 +764,7 @@
           <context context-type="sourcefile">src/app/components/admin/logs/logs.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">lines</target>
+        <target state="translated">línies</target>
       </trans-unit>
       <trans-unit id="8838884664569764142" datatype="html">
         <source>Auto refresh</source>
@@ -2766,7 +2766,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">195</context>
+          <context context-type="linenumber">196</context>
         </context-group>
         <target state="translated">Contrasenya desada, es tancarà la sessió momentàniament.</target>
       </trans-unit>
@@ -6644,7 +6644,7 @@
         <source>Profile updated successfully</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">192</context>
+          <context context-type="linenumber">193</context>
         </context-group>
         <target state="translated">Perfil actualitzat corrcetament</target>
       </trans-unit>
@@ -6652,7 +6652,7 @@
         <source>Error saving profile</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">206</context>
+          <context context-type="linenumber">207</context>
         </context-group>
         <target state="translated">Error desant perfil</target>
       </trans-unit>
@@ -6660,7 +6660,7 @@
         <source>Error generating auth token</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">223</context>
+          <context context-type="linenumber">225</context>
         </context-group>
         <target state="translated">Error generant auth token</target>
       </trans-unit>
@@ -6668,7 +6668,7 @@
         <source>Error disconnecting social account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">248</context>
+          <context context-type="linenumber">250</context>
         </context-group>
         <target state="translated">Error desconnectant compte social</target>
       </trans-unit>
@@ -6676,7 +6676,7 @@
         <source>Error fetching TOTP settings</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">267</context>
+          <context context-type="linenumber">269</context>
         </context-group>
         <target state="translated">Error obtenint les opcions TOTP</target>
       </trans-unit>
@@ -6684,7 +6684,7 @@
         <source>TOTP activated successfully</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">288</context>
+          <context context-type="linenumber">290</context>
         </context-group>
         <target state="translated">TOTP activat correctament</target>
       </trans-unit>
@@ -6692,11 +6692,11 @@
         <source>Error activating TOTP</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">290</context>
+          <context context-type="linenumber">292</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">296</context>
+          <context context-type="linenumber">298</context>
         </context-group>
         <target state="translated">Error activant TOTP</target>
       </trans-unit>
@@ -6704,7 +6704,7 @@
         <source>TOTP deactivated successfully</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">312</context>
+          <context context-type="linenumber">314</context>
         </context-group>
         <target state="translated">TOTP desactivat correctament</target>
       </trans-unit>
@@ -6712,11 +6712,11 @@
         <source>Error deactivating TOTP</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">314</context>
+          <context context-type="linenumber">316</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">319</context>
+          <context context-type="linenumber">321</context>
         </context-group>
         <target state="translated">Error desactivant TOTP</target>
       </trans-unit>
@@ -8700,7 +8700,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Select:</target>
+        <target state="translated">Selecciona:</target>
       </trans-unit>
       <trans-unit id="6252070156626006029" datatype="html">
         <source>None</source>

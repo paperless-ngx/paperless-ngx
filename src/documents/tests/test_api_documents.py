@@ -941,6 +941,23 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results), 0)
 
+    def test_documents_title_content_filter_strips_boundary_whitespace(self):
+        doc = Document.objects.create(
+            title="Testwort",
+            content="",
+            checksum="A",
+            mime_type="application/pdf",
+        )
+
+        response = self.client.get(
+            "/api/documents/",
+            {"title_content": " Testwort "},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], doc.id)
+
     def test_document_permissions_filters(self):
         """
         GIVEN:

@@ -8,8 +8,10 @@ from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.core import mail
 from django.test import override_settings
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
@@ -21,6 +23,8 @@ from pytest_httpx import HTTPXMock
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 
+from documents.file_handling import create_source_path_directory
+from documents.file_handling import generate_unique_filename
 from documents.signals.handlers import run_workflows
 from documents.signals.handlers import send_webhook
 
@@ -2990,6 +2994,70 @@ class TestWorkflows(
         mock_email_send.assert_called_once()
 
     @override_settings(
+        PAPERLESS_EMAIL_HOST="localhost",
+        EMAIL_ENABLED=True,
+        PAPERLESS_URL="http://localhost:8000",
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    )
+    def test_workflow_email_attachment_uses_storage_filename(self):
+        """
+        GIVEN:
+            - Document updated workflow with include document action
+            - Document stored with formatted storage-path filename
+        WHEN:
+            - Workflow sends an email
+        THEN:
+            - Attachment filename matches the stored filename
+        """
+
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        email_action = WorkflowActionEmail.objects.create(
+            subject="Test Notification: {doc_title}",
+            body="Test message: {doc_url}",
+            to="me@example.com",
+            include_document=True,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.EMAIL,
+            email=email_action,
+        )
+        workflow = Workflow.objects.create(
+            name="Workflow attachment filename",
+            order=0,
+        )
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+        workflow.save()
+
+        storage_path = StoragePath.objects.create(
+            name="Fancy Path",
+            path="formatted/{{ document.pk }}/{{ title }}",
+        )
+        doc = Document.objects.create(
+            title="workflow doc",
+            correspondent=self.c,
+            checksum="workflow-email-attachment",
+            mime_type="application/pdf",
+            storage_path=storage_path,
+            original_filename="workflow-orig.pdf",
+        )
+
+        # eg what happens in update_filename_and_move_files
+        generated = generate_unique_filename(doc)
+        destination = (settings.ORIGINALS_DIR / generated).resolve()
+        create_source_path_directory(destination)
+        shutil.copy(self.SAMPLE_DIR / "simple.pdf", destination)
+        Document.objects.filter(pk=doc.pk).update(filename=generated.as_posix())
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        self.assertEqual(len(mail.outbox), 1)
+        attachment_names = [att[0] for att in mail.outbox[0].attachments]
+        self.assertEqual(attachment_names, [Path(generated).name])
+
+    @override_settings(
         EMAIL_ENABLED=False,
     )
     def test_workflow_email_action_no_email_setup(self):
@@ -3144,6 +3212,8 @@ class TestWorkflows(
 
     @override_settings(
         PAPERLESS_URL="http://localhost:8000",
+        PAPERLESS_FORCE_SCRIPT_NAME="/paperless",
+        BASE_URL="/paperless/",
     )
     @mock.patch("documents.signals.handlers.send_webhook.delay")
     def test_workflow_webhook_action_body(self, mock_post):
@@ -3195,7 +3265,7 @@ class TestWorkflows(
 
         mock_post.assert_called_once_with(
             url="http://paperless-ngx.com",
-            data=f"Test message: http://localhost:8000/documents/{doc.id}/",
+            data=f"Test message: http://localhost:8000/paperless/documents/{doc.id}/",
             headers={},
             files=None,
             as_json=False,

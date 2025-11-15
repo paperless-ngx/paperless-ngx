@@ -1,25 +1,26 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from email import message_from_bytes
-from typing import TYPE_CHECKING
+from pathlib import Path
 
 from django.conf import settings
 from django.core.mail import EmailMessage
 from filelock import FileLock
 
-from documents.data_models import ConsumableDocument
 
-if TYPE_CHECKING:
-    from documents.models import Document
+@dataclass(frozen=True)
+class EmailAttachment:
+    path: Path
+    mime_type: str
+    friendly_name: str
 
 
 def send_email(
     subject: str,
     body: str,
     to: list[str],
-    attachments: list[Document | ConsumableDocument],
-    *,
-    use_archive: bool,
+    attachments: list[EmailAttachment],
 ) -> int:
     """
     Send an email with attachments.
@@ -28,8 +29,7 @@ def send_email(
         subject: Email subject
         body: Email body text
         to: List of recipient email addresses
-        attachments: List of documents to attach (the list may be empty)
-        use_archive: Whether to attach archive versions when available
+        attachments: List of attachments
 
     Returns:
         Number of emails sent
@@ -46,47 +46,41 @@ def send_email(
 
     # Something could be renaming the file concurrently so it can't be attached
     with FileLock(settings.MEDIA_LOCK):
-        for document in attachments:
-            if isinstance(document, ConsumableDocument):
-                attachment_path = document.original_file
-                friendly_filename = document.original_file.name
-            else:
-                attachment_path = (
-                    document.archive_path
-                    if use_archive and document.has_archive_version
-                    else document.source_path
-                )
-                friendly_filename = _get_unique_filename(
-                    document,
-                    used_filenames,
-                    archive=use_archive and document.has_archive_version,
-                )
-            used_filenames.add(friendly_filename)
+        for attachment in attachments:
+            filename = _get_unique_filename(
+                attachment.friendly_name,
+                used_filenames,
+            )
+            used_filenames.add(filename)
 
-            with attachment_path.open("rb") as f:
+            with attachment.path.open("rb") as f:
                 content = f.read()
-                if document.mime_type == "message/rfc822":
+                if attachment.mime_type == "message/rfc822":
                     # See https://forum.djangoproject.com/t/using-emailmessage-with-an-attached-email-file-crashes-due-to-non-ascii/37981
                     content = message_from_bytes(content)
 
                 email.attach(
-                    filename=friendly_filename,
+                    filename=filename,
                     content=content,
-                    mimetype=document.mime_type,
+                    mimetype=attachment.mime_type,
                 )
 
     return email.send()
 
 
-def _get_unique_filename(doc: Document, used_names: set[str], *, archive: bool) -> str:
+def _get_unique_filename(friendly_name: str, used_names: set[str]) -> str:
     """
-    Constructs a unique friendly filename for the given document.
+    Constructs a unique friendly filename for the given document, append a counter if needed.
+    """
+    if friendly_name not in used_names:
+        return friendly_name
 
-    The filename might not be unique enough, so a counter is appended if needed.
-    """
-    counter = 0
+    stem = Path(friendly_name).stem
+    suffix = "".join(Path(friendly_name).suffixes)
+
+    counter = 1
     while True:
-        filename = doc.get_public_filename(archive=archive, counter=counter)
+        filename = f"{stem}_{counter:02}{suffix}"
         if filename not in used_names:
             return filename
         counter += 1

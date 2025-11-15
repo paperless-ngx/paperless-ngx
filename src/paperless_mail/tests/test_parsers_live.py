@@ -2,6 +2,7 @@ import os
 import shutil
 import subprocess
 import tempfile
+import time
 from pathlib import Path
 
 import httpx
@@ -53,14 +54,33 @@ class TestUrlCanary:
     Verify certain URLs are still available so testing is valid still
     """
 
-    # Wikimedia rejects requests without a browser-like User-Agent header and returns 403.
-    _WIKIMEDIA_HEADERS = {
-        "User-Agent": (
-            "Mozilla/5.0 (X11; Linux x86_64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/123.0.0.0 Safari/537.36"
-        ),
-    }
+    @classmethod
+    def _fetch_wikimedia(cls, url: str) -> httpx.Response:
+        """
+        Wikimedia occasionally throttles automated requests (HTTP 429). Retry a few
+        times with a short backoff so the tests stay stable, and skip if throttling
+        persists.
+        """
+        last_resp: httpx.Response | None = None
+        # Wikimedia rejects requests without a browser-like User-Agent header and returns 403.
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (X11; Linux x86_64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/123.0.0.0 Safari/537.36"
+            ),
+        }
+        for delay in (0, 1, 2):
+            resp = httpx.get(url, headers=headers, timeout=30.0)
+            if resp.status_code != httpx.codes.TOO_MANY_REQUESTS:
+                return resp
+            last_resp = resp
+            time.sleep(delay)
+
+        pytest.skip(
+            "Wikimedia throttled the canary request with HTTP 429; try rerunning later.",
+        )
+        return last_resp  # pragma: no cover
 
     def test_online_image_exception_on_not_available(self):
         """
@@ -76,11 +96,10 @@ class TestUrlCanary:
         whether this image stays online forever, so here we check if we can detect if is not
         available anymore.
         """
+        resp = self._fetch_wikimedia(
+            "https://upload.wikimedia.org/wikipedia/en/f/f7/nonexistent.png",
+        )
         with pytest.raises(httpx.HTTPStatusError) as exec_info:
-            resp = httpx.get(
-                "https://upload.wikimedia.org/wikipedia/en/f/f7/nonexistent.png",
-                headers=self._WIKIMEDIA_HEADERS,
-            )
             resp.raise_for_status()
 
         assert exec_info.value.response.status_code == httpx.codes.NOT_FOUND
@@ -100,9 +119,8 @@ class TestUrlCanary:
         """
 
         # Now check the URL used in samples/sample.html
-        resp = httpx.get(
+        resp = self._fetch_wikimedia(
             "https://upload.wikimedia.org/wikipedia/en/f/f7/RickRoll.png",
-            headers=self._WIKIMEDIA_HEADERS,
         )
         resp.raise_for_status()
 
