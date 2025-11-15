@@ -1393,23 +1393,10 @@ export class DocumentDetailComponent
     this.customFieldFormFields.clear({ emitEvent: false })
     if (this.document?.custom_fields) {
       this.document.custom_fields.forEach((fieldInstance, index) => {
-        // Validate and clean the value to prevent NaN errors
-        let cleanValue = fieldInstance.value
-        if (typeof cleanValue === 'number' && isNaN(cleanValue)) {
-          cleanValue = null
-          fieldInstance.value = null
-        } else if (
-          typeof cleanValue === 'string' &&
-          cleanValue.trim() === 'NaN'
-        ) {
-          cleanValue = null
-          fieldInstance.value = null
-        }
-
         this.customFieldFormFields.push(
           new FormGroup({
             field: new FormControl(fieldInstance.field),
-            value: new FormControl(cleanValue),
+            value: new FormControl(fieldInstance.value),
             created: new FormControl(fieldInstance.created),
           }),
           { emitEvent }

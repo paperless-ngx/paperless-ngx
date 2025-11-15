@@ -5,5 +5,4 @@ export interface CustomFieldInstance extends ObjectWithId {
   field: number // CustomField
   created: Date
   value?: any
-  position?: number
 }
