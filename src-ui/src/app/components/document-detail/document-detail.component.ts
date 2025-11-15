@@ -853,21 +853,10 @@ export class DocumentDetailComponent
         } else if (key === 'custom_fields') {
           const formValue = this.documentForm.get(key).value
 
-          // Validate and clean custom field values
           const cleanedCustomFields = formValue.map((fieldData, index) => {
-            let cleanValue = fieldData.value
-            if (typeof cleanValue === 'number' && isNaN(cleanValue)) {
-              cleanValue = null
-            } else if (
-              typeof cleanValue === 'string' &&
-              (cleanValue.trim() === 'NaN' || cleanValue.trim() === '')
-            ) {
-              cleanValue = null
-            }
-
             const result: any = {
               field: fieldData.field,
-              value: cleanValue,
+              value: fieldData.value,
             }
 
             // Only include 'created' field if:
