@@ -296,4 +296,35 @@ export const SETTINGS: UiSetting[] = [
     type: 'string',
     default: 'page-width', // ZoomSetting from 'document-detail.component'
   },
+  // AI Settings
+  {
+    key: SETTINGS_KEYS.AI_SCANNER_ENABLED,
+    type: 'boolean',
+    default: false,
+  },
+  {
+    key: SETTINGS_KEYS.AI_ML_FEATURES_ENABLED,
+    type: 'boolean',
+    default: false,
+  },
+  {
+    key: SETTINGS_KEYS.AI_ADVANCED_OCR_ENABLED,
+    type: 'boolean',
+    default: false,
+  },
+  {
+    key: SETTINGS_KEYS.AI_AUTO_APPLY_THRESHOLD,
+    type: 'number',
+    default: 80,
+  },
+  {
+    key: SETTINGS_KEYS.AI_SUGGEST_THRESHOLD,
+    type: 'number',
+    default: 60,
+  },
+  {
+    key: SETTINGS_KEYS.AI_ML_MODEL,
+    type: 'string',
+    default: 'bert-base',
+  },
 ]
