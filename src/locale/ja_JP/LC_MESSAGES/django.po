@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-28 18:06+0000\n"
-"PO-Revision-Date: 2025-10-28 18:07\n"
+"POT-Creation-Date: 2025-11-14 16:09+0000\n"
+"PO-Revision-Date: 2025-11-14 16:11\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "ドキュメント"
 
-#: documents/filters.py:392
+#: documents/filters.py:395
 msgid "Value must be valid JSON."
 msgstr "値は有効なJSONである必要があります。"
 
-#: documents/filters.py:411
+#: documents/filters.py:414
 msgid "Invalid custom field query expression"
 msgstr "無効なカスタムフィールドクエリ式"
 
-#: documents/filters.py:421
+#: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
 msgstr "無効な式リストです。空であってはなりません。"
 
-#: documents/filters.py:442
+#: documents/filters.py:445
 msgid "Invalid logical operator {op!r}"
 msgstr "無効な論理演算子 {op!r}"
 
-#: documents/filters.py:456
+#: documents/filters.py:459
 msgid "Maximum number of query conditions exceeded."
 msgstr "クエリ条件の最大数を超えました。"
 
-#: documents/filters.py:521
+#: documents/filters.py:524
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} は有効なカスタムフィールドではありません。"
 
-#: documents/filters.py:558
+#: documents/filters.py:561
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} はクエリ expr {expr!r} をサポートしていません。"
 
-#: documents/filters.py:666 documents/models.py:135
+#: documents/filters.py:669 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
 msgstr "最大ネストの深さを超えました。"
 
-#: documents/filters.py:851
+#: documents/filters.py:854
 msgid "Custom field not found"
 msgstr "カスタムフィールドが見つかりません"
 
