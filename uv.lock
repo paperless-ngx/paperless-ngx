@@ -959,14 +959,14 @@ wheels = [
 
 [[package]]
 name = "drf-spectacular-sidecar"
-version = "2025.9.1"
+version = "2025.10.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/51/e2/85a0b8dbed8631165a6b49b2aee57636da8e4e710c444566636ffd972a7b/drf_spectacular_sidecar-2025.9.1.tar.gz", hash = "sha256:da2aa45da48fff76de7a1e357b84d1eb0b9df40ca89ec19d5fe94ad1037bb3c8", size = 2420902, upload-time = "2025-09-01T11:23:24.156Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c3/e4/99cd1b1c8c69788bd6cb6a2459674f8c75728e79df23ac7beddd094bf805/drf_spectacular_sidecar-2025.10.1.tar.gz", hash = "sha256:506a5a21ce1ad7211c28acb4e2112e213f6dc095a2052ee6ed6db1ffe8eb5a7b", size = 2420998, upload-time = "2025-10-01T11:23:27.092Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/96/24/db59146ba89491fe1d44ca8aef239c94bf3c7fd41523976090f099430312/drf_spectacular_sidecar-2025.9.1-py3-none-any.whl", hash = "sha256:8e80625209b8a23ff27616db305b9ab71c2e2d1069dacd99720a9c11e429af50", size = 2440255, upload-time = "2025-09-01T11:23:22.822Z" },
+    { url = "https://files.pythonhosted.org/packages/ab/87/70c67391e4ce68715d4dfae8dd33caeda2552af22f436ba55b8867a040fe/drf_spectacular_sidecar-2025.10.1-py3-none-any.whl", hash = "sha256:f1de343184d1a938179ce363d318258fe1e5f02f2f774625272364835f1c42bd", size = 2440241, upload-time = "2025-10-01T11:23:25.743Z" },
 ]
 
 [[package]]
@@ -2277,7 +2277,7 @@ requires-dist = [
     { name = "djangorestframework", specifier = "~=3.16" },
     { name = "djangorestframework-guardian", specifier = "~=0.4.0" },
     { name = "drf-spectacular", specifier = "~=0.28" },
-    { name = "drf-spectacular-sidecar", specifier = "~=2025.9.1" },
+    { name = "drf-spectacular-sidecar", specifier = "~=2025.10.1" },
     { name = "drf-writable-nested", specifier = "~=0.7.1" },
     { name = "filelock", specifier = "~=3.20.0" },
     { name = "flower", specifier = "~=2.0.1" },
