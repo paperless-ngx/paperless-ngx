@@ -747,7 +747,7 @@ export class FilterEditorComponent
     ) {
       filterRules.push({
         rule_type: FILTER_TITLE_CONTENT,
-        value: this._textFilter,
+        value: this._textFilter.trim(),
       })
     }
     if (this._textFilter && this.textFilterTarget == TEXT_FILTER_TARGET_TITLE) {
@@ -805,7 +805,7 @@ export class FilterEditorComponent
     ) {
       filterRules.push({
         rule_type: FILTER_FULLTEXT_QUERY,
-        value: this._textFilter,
+        value: this._textFilter.trim(),
       })
     }
     if (
