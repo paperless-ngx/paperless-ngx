@@ -1,0 +1,55 @@
+.ai-status-container {
+  display: flex;
+  align-items: center;
+}
+
+.ai-status-icon {
+  transition: all 0.3s ease;
+  
+  &.inactive {
+    opacity: 0.4;
+    color: var(--bs-secondary);
+  }
+  
+  &.active {
+    color: var(--bs-success);
+  }
+  
+  &.processing {
+    color: var(--bs-primary);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+.ai-status-tooltip {
+  min-width: 250px;
+  
+  .status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .status-label {
+      font-weight: 500;
+      margin-right: 0.5rem;
+    }
+  }
+}
+
+// Badge positioning
+.badge.rounded-pill {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.35rem;
+  min-width: 1.2rem;
+}

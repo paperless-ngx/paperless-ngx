@@ -47,6 +47,7 @@ import { environment } from 'src/environments/environment'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
+import { AIStatusIndicatorComponent } from './ai-status-indicator/ai-status-indicator.component'
 import { GlobalSearchComponent } from './global-search/global-search.component'
 import { ToastsDropdownComponent } from './toasts-dropdown/toasts-dropdown.component'
 
@@ -59,6 +60,7 @@ import { ToastsDropdownComponent } from './toasts-dropdown/toasts-dropdown.compo
     DocumentTitlePipe,
     IfPermissionsDirective,
     ToastsDropdownComponent,
+    AIStatusIndicatorComponent,
     RouterModule,
     NgClass,
     NgbDropdownModule,
