@@ -7,6 +7,7 @@ from django.test import override_settings
 
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
+from documents.tests.utils import skip_if_root
 from paperless.checks import audit_log_check
 from paperless.checks import binaries_check
 from paperless.checks import debug_mode_check
@@ -37,6 +38,7 @@ class TestChecks(DirectoriesMixin, TestCase):
         for msg in msgs:
             self.assertTrue(msg.msg.endswith("is set but doesn't exist."))
 
+    @skip_if_root
     def test_paths_check_no_access(self):
         Path(self.dirs.data_dir).chmod(0o000)
         Path(self.dirs.media_dir).chmod(0o000)

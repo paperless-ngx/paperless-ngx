@@ -10,6 +10,7 @@ from django.test import override_settings
 from documents.models import Document
 from documents.sanity_checker import check_sanity
 from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import skip_if_root
 
 
 class TestSanityCheck(DirectoriesMixin, TestCase):
@@ -95,6 +96,7 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
         Path(doc.thumbnail_path).unlink()
         self.assertSanityError(doc, "Thumbnail of document does not exist")
 
+    @skip_if_root
     def test_thumbnail_no_access(self):
         doc = self.make_test_data()
         Path(doc.thumbnail_path).chmod(0o000)
@@ -106,6 +108,7 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
         Path(doc.source_path).unlink()
         self.assertSanityError(doc, "Original of document does not exist.")
 
+    @skip_if_root
     def test_original_no_access(self):
         doc = self.make_test_data()
         Path(doc.source_path).chmod(0o000)
@@ -123,6 +126,7 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
         Path(doc.archive_path).unlink()
         self.assertSanityError(doc, "Archived version of document does not exist.")
 
+    @skip_if_root
     def test_archive_no_access(self):
         doc = self.make_test_data()
         Path(doc.archive_path).chmod(0o000)

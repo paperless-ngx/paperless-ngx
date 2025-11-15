@@ -34,7 +34,7 @@ class TestFuzzyMatchCommand(TestCase):
         """
         with self.assertRaises(CommandError) as e:
             self.call_command("--ratio", "-1")
-            self.assertIn("The ratio must be between 0 and 100", str(e))
+        self.assertIn("The ratio must be between 0 and 100", str(e.exception))
 
     def test_invalid_ratio_upper_limit(self):
         """
@@ -47,7 +47,7 @@ class TestFuzzyMatchCommand(TestCase):
         """
         with self.assertRaises(CommandError) as e:
             self.call_command("--ratio", "101")
-            self.assertIn("The ratio must be between 0 and 100", str(e))
+        self.assertIn("The ratio must be between 0 and 100", str(e.exception))
 
     def test_invalid_process_count(self):
         """
@@ -60,7 +60,7 @@ class TestFuzzyMatchCommand(TestCase):
         """
         with self.assertRaises(CommandError) as e:
             self.call_command("--processes", "0")
-            self.assertIn("There must be at least 1 process", str(e))
+        self.assertIn("There must be at least 1 process", str(e.exception))
 
     def test_no_matches(self):
         """
