@@ -1388,7 +1388,7 @@ export class DocumentDetailComponent
           new FormGroup({
             field: new FormControl(fieldInstance.field),
             value: new FormControl(fieldInstance.value),
-            created: new FormControl(fieldInstance.created),
+            created: new FormControl(fieldInstance.created || null),
           }),
           { emitEvent }
         )
@@ -1401,7 +1401,7 @@ export class DocumentDetailComponent
       field: field.id,
       value: null,
       document: this.documentId,
-      created: new Date(),
+      // Don't add created timestamp for new fields - only for reordering
     })
     this.updateFormForCustomFields(true)
     this.documentForm.get('custom_fields').markAsDirty()
