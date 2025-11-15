@@ -343,9 +343,18 @@ export class DocumentDetailComponent
   }
 
   private mapDocToForm(doc: Document): any {
+    // Transform custom_fields to match FormControl structure
+    const transformedCustomFields =
+      doc.custom_fields?.map((fieldInstance) => ({
+        field: fieldInstance.field,
+        value: fieldInstance.value,
+        created: fieldInstance.created || null,
+      })) || []
+
     return {
       ...doc,
       permissions_form: { owner: doc.owner, set_permissions: doc.permissions },
+      custom_fields: transformedCustomFields,
     }
   }
 
@@ -835,11 +844,7 @@ export class DocumentDetailComponent
           }
           this.title = doc.title
           this.updateFormForCustomFields()
-          // Exclude custom_fields from patchValue since we handle them separately
-          const { custom_fields, ...docWithoutCustomFields } = doc
-          this.documentForm.patchValue(docWithoutCustomFields)
-          // Ensure custom fields form control is marked as pristine after structure update
-          this.documentForm.get('custom_fields').markAsPristine()
+          this.documentForm.patchValue(this.mapDocToForm(doc))
           this.documentForm.markAsPristine()
           this.openDocumentService.setDirty(doc, false)
         },
