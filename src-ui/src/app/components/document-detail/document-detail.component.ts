@@ -379,6 +379,14 @@ export class DocumentDetailComponent
     currentDocument: Document,
     originalDocument: Document
   ): void {
+    // Transform custom_fields to match the form control structure
+    const transformedCustomFields =
+      originalDocument.custom_fields?.map((fieldInstance) => ({
+        field: fieldInstance.field,
+        value: fieldInstance.value,
+        created: fieldInstance.created || null,
+      })) || []
+
     this.store = new BehaviorSubject({
       title: originalDocument.title,
       content: originalDocument.content,
@@ -392,7 +400,7 @@ export class DocumentDetailComponent
         owner: originalDocument.owner,
         set_permissions: originalDocument.permissions,
       },
-      custom_fields: [...originalDocument.custom_fields],
+      custom_fields: transformedCustomFields,
     })
     this.isDirty$ = dirtyCheck(this.documentForm, this.store.asObservable())
     this.isDirty$
@@ -827,7 +835,11 @@ export class DocumentDetailComponent
           }
           this.title = doc.title
           this.updateFormForCustomFields()
-          this.documentForm.patchValue(doc)
+          // Exclude custom_fields from patchValue since we handle them separately
+          const { custom_fields, ...docWithoutCustomFields } = doc
+          this.documentForm.patchValue(docWithoutCustomFields)
+          // Ensure custom fields form control is marked as pristine after structure update
+          this.documentForm.get('custom_fields').markAsPristine()
           this.documentForm.markAsPristine()
           this.openDocumentService.setDirty(doc, false)
         },
@@ -1382,18 +1394,16 @@ export class DocumentDetailComponent
 
   private updateFormForCustomFields(emitEvent: boolean = false) {
     this.customFieldFormFields.clear({ emitEvent: false })
-    if (this.document?.custom_fields) {
-      this.document.custom_fields.forEach((fieldInstance, index) => {
-        this.customFieldFormFields.push(
-          new FormGroup({
-            field: new FormControl(fieldInstance.field),
-            value: new FormControl(fieldInstance.value),
-            created: new FormControl(fieldInstance.created || null),
-          }),
-          { emitEvent }
-        )
-      })
-    }
+    this.document.custom_fields?.forEach((fieldInstance) => {
+      this.customFieldFormFields.push(
+        new FormGroup({
+          field: new FormControl(fieldInstance.field),
+          value: new FormControl(fieldInstance.value),
+          created: new FormControl(fieldInstance.created || null),
+        }),
+        { emitEvent }
+      )
+    })
   }
 
   public addField(field: CustomField) {
