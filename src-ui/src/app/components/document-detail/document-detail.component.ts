@@ -859,8 +859,18 @@ export class DocumentDetailComponent
               value: fieldData.value,
             }
 
-            // Include created field for order persistence if available
-            if (fieldData.created) {
+            // Only include created field if:
+            // 1. Custom field order has been changed (reordering occurred), OR
+            // 2. This is an existing field that already had a created timestamp
+            const documentField = this.document.custom_fields[index]
+            const isExistingField =
+              documentField &&
+              documentField.created &&
+              fieldData.created &&
+              documentField.created.getTime() ===
+                new Date(fieldData.created).getTime()
+
+            if (this.customFieldOrderChanged || isExistingField) {
               result.created = fieldData.created
             }
 
