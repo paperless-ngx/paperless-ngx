@@ -319,15 +319,13 @@ class DelayedQuery:
                 self.first_score = results[0].score
 
             if self.first_score:
-                results.top_n = list(
-                    map(
-                        lambda hit: (
-                            (hit[0] / self.first_score) if self.first_score else None,
-                            hit[1],
-                        ),
-                        results.top_n,
-                    ),
-                )
+                results.top_n = [
+                    (
+                        (hit[0] / self.first_score) if self.first_score else None,
+                        hit[1],
+                    )
+                    for hit in results.top_n
+                ]
 
             hits_by_id = {hit["id"]: hit for hit in results}
             matching_ids = list(hits_by_id.keys())
@@ -377,15 +375,13 @@ class DelayedQuery:
         if not self.first_score and len(page.results) > 0 and sortedby is None:
             self.first_score = page.results[0].score
 
-        page.results.top_n = list(
-            map(
-                lambda hit: (
-                    (hit[0] / self.first_score) if self.first_score else None,
-                    hit[1],
-                ),
-                page.results.top_n,
-            ),
-        )
+        page.results.top_n = [
+            (
+                (hit[0] / self.first_score) if self.first_score else None,
+                hit[1],
+            )
+            for hit in page.results.top_n
+        ]
 
         self.saved_results[item.start] = page
 
