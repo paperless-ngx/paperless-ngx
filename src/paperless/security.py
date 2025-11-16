@@ -304,11 +304,11 @@ def check_malicious_content(content: bytes) -> None:
 def calculate_file_hash(file_path: str | Path, algorithm: str = "sha256") -> str:
     """
     Calculate cryptographic hash of a file.
-    
+
     Args:
         file_path: Path to the file
         algorithm: Hash algorithm to use (default: sha256)
-        
+
     Returns:
         str: Hexadecimal hash string
     """
@@ -325,10 +325,10 @@ def calculate_file_hash(file_path: str | Path, algorithm: str = "sha256") -> str
 def sanitize_filename(filename: str) -> str:
     """
     Sanitize filename to prevent path traversal and other attacks.
-    
+
     Args:
         filename: Original filename
-        
+
     Returns:
         str: Sanitized filename
     """
@@ -359,11 +359,11 @@ def sanitize_filename(filename: str) -> str:
 def is_safe_redirect_url(url: str, allowed_hosts: list[str]) -> bool:
     """
     Check if a redirect URL is safe (no open redirect vulnerability).
-    
+
     Args:
         url: URL to check
         allowed_hosts: List of allowed hostnames
-        
+
     Returns:
         bool: True if URL is safe
     """
