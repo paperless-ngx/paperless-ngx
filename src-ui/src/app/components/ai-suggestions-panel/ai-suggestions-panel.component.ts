@@ -39,6 +39,7 @@ import { ToastService } from 'src/app/services/toast.service'
 
 @Component({
   selector: 'pngx-ai-suggestions-panel',
+  standalone: true,
   templateUrl: './ai-suggestions-panel.component.html',
   styleUrls: ['./ai-suggestions-panel.component.scss'],
   imports: [

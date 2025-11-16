@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
     """
 
     dependencies = [
-        ("documents", "1075_add_performance_indexes"),
+        ("documents", "1077_add_deletionrequest_performance_indexes"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

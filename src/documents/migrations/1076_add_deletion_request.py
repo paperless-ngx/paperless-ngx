@@ -129,20 +129,4 @@ class Migration(migrations.Migration):
                 "ordering": ["-created_at"],
             },
         ),
-        # Add composite index for status + user (common query pattern)
-        migrations.AddIndex(
-            model_name="deletionrequest",
-            index=models.Index(
-                fields=["status", "user"],
-                name="del_req_status_user_idx",
-            ),
-        ),
-        # Add index for created_at (for chronological queries)
-        migrations.AddIndex(
-            model_name="deletionrequest",
-            index=models.Index(
-                fields=["created_at"],
-                name="del_req_created_idx",
-            ),
-        ),
     ]

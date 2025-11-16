@@ -318,6 +318,7 @@ class AIDocumentScanner:
                 logger.info("Table extractor loaded successfully")
             except Exception as e:
                 logger.warning(f"Failed to load table extractor: {e}")
+                self.advanced_ocr_enabled = False
         return self._table_extractor
 
     def scan_document(

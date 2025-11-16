@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
     """
 
     dependencies = [
-        ("documents", "1075_add_performance_indexes"),
+        ("documents", "1076_add_deletion_request"),
     ]
 
     operations = [

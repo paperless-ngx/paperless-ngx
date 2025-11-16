@@ -24,6 +24,7 @@ interface AIPerformanceStats {
 
 @Component({
   selector: 'pngx-ai-settings',
+  standalone: true,
   templateUrl: './ai-settings.component.html',
   styleUrls: ['./ai-settings.component.scss'],
   imports: [
