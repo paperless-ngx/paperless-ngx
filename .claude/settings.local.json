@@ -5,7 +5,9 @@
       "Bash(dir:*)",
       "Bash(npm run lint)",
       "Bash(pnpm run lint:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(docker-compose:*)",
+      "Bash(docker build:*)"
     ],
     "deny": [],
     "ask": []
