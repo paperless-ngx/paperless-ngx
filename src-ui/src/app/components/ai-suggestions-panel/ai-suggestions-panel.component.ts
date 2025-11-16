@@ -230,7 +230,7 @@ export class AiSuggestionsPanelComponent implements OnChanges, OnDestroy {
         return new Date(suggestion.value).toLocaleDateString()
 
       case AISuggestionType.Title:
-        return suggestion.value
+        return String(suggestion.value)
 
       default:
         return String(suggestion.value)

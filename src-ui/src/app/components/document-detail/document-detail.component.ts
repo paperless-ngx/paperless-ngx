@@ -1657,7 +1657,7 @@ export class DocumentDetailComponent
 
       case AISuggestionType.Date:
         const dateAdapter = new ISODateAdapter()
-        const dateValue = dateAdapter.fromModel(suggestion.value)
+        const dateValue = dateAdapter.fromModel(String(suggestion.value))
         this.documentForm.get('created').setValue(dateValue)
         this.documentForm.get('created').markAsDirty()
         break
