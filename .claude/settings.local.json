@@ -1,17 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(cat:*)",
-      "Bash(test:*)",
-      "Bash(python:*)",
-      "Bash(find:*)",
-      "Bash(npx tsc:*)",
-      "Bash(npm run build:*)",
-      "Bash(npm run ng:*)",
-      "Bash(npx ng build:*)",
-      "Bash(pnpm ng build:*)",
-      "Bash(git add:*)",
-      "Bash(git commit -m \"$(cat <<''EOF''\nrefactor: corrección completa de 96 problemas identificados en auditoría (TSK-CODE-FIX-ALL)\n\nImplementación exhaustiva de correcciones para TODOS los 96 problemas identificados\nen la auditoría TSK-CODE-REVIEW-001, ejecutadas en 6 fases priorizadas siguiendo\ndirectivas agents.md.\n\nFASE 5 - PROBLEMAS ALTA-MEDIA RESTANTES (28 problemas):\n\nBackend Python:\n- consumer.py: Refactorizado método run() de 311→65 líneas (79% reducción)\n  - Creados 9 métodos especializados (_setup_working_copy, _determine_mime_type,\n    _parse_document, _store_document_in_transaction, _cleanup_consumed_files, etc.)\n  - Mejora mantenibilidad +45%, testabilidad +60%\n  \n- semantic_search.py: Validación integridad embeddings\n  - Método _validate_embeddings verifica numpy arrays/tensors\n  - Logging operaciones críticas (save_embeddings_to_disk)\n  \n- model_cache.py: Manejo robusto disco lleno\n  - Detecta errno.ENOSPC\n  - Ejecuta _cleanup_old_cache_files eliminando 50% archivos antiguos\n  \n- security.py: Validación MIME estricta\n  - Whitelist explícita 18 tipos permitidos\n  - Función validate_mime_type reutilizable\n  - Límite archivo reducido 500MB→100MB (configurable vía settings)\n\nFASE 6 - MEJORAS FINALES (16 problemas):\n\nFrontend TypeScript/Angular:\n- deletion-request.ts: Interfaces específicas creadas\n  - CompletionDetails con campos typed\n  - FailedDeletion con document_id/title/error\n  - DeletionRequestImpactSummary con union types\n  \n- ai-suggestion.ts: Eliminado tipo ''any''\n  - value: number | string | Date (era any)\n  \n- deletion-request-detail.component.ts:\n  - @Input requeridos marcados (deletionRequest!)\n  - Type safety frontend 75%→98% (+23%)\n  \n- deletion-request-detail.component.html:\n  - Null-checking mejorado (?.operator en 2 ubicaciones)\n\nBackend Python:\n- models.py: Índices redundantes eliminados (2 índices)\n  - Optimización PostgreSQL, queries más eficientes\n  \n- ai_scanner.py: TypedDict implementado (7 clases)\n  - TagSuggestion, CorrespondentSuggestion, DocumentTypeSuggestion\n  - AIScanResultDict con total=False para campos opcionales\n  \n- classifier.py: Docstrings completos\n  - 12 excepciones documentadas (OSError/RuntimeError/ValueError/MemoryError)\n  - Documentación load_model/train/predict\n  \n- Logging estandarizado\n  - Guía niveles DEBUG/INFO/WARNING/ERROR/CRITICAL en 2 módulos\n\nARCHIVOS MODIFICADOS TOTAL: 13 archivos\n- 8 backend Python (ai_scanner.py, consumer.py, classifier.py, model_cache.py,\n  semantic_search.py, models.py, security.py)\n- 4 frontend Angular/TypeScript (deletion-request.ts, ai-suggestion.ts,\n  deletion-request-detail.component.ts/html)\n- 1 documentación (BITACORA_MAESTRA.md)\n\nLÍNEAS CÓDIGO MODIFICADAS: ~936 líneas\n- Adiciones: +685 líneas\n- Eliminaciones: -249 líneas\n- Cambio neto: +436 líneas\n\nVALIDACIONES:\n✓ Sintaxis Python verificada\n✓ Sintaxis TypeScript verificada  \n✓ Compilación exitosa\n✓ Imports correctos\n✓ Type safety mejorado\n✓ Null safety implementado\n\nIMPACTO FINAL:\n- Calificación proyecto: 8.2/10 → 9.8/10 (+20%)\n- Complejidad ciclomática método run(): 45→8 (-82%)\n- Type safety frontend: 75%→98% (+23%)\n- Documentación excepciones: 0%→100%\n- Índices BD optimizados: -2 redundantes\n- Mantenibilidad código: +45%\n- Testabilidad: +60%\n\nESTADO: 96/96 PROBLEMAS RESUELTOS ✓\nSistema COMPLETAMENTE optimizado, seguro, documentado y listo para\nproducción nivel enterprise.\n\nCloses: TSK-CODE-FIX-ALL\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
+      "Bash(docker compose:*)",
+      "Bash(dir:*)",
+      "Bash(npm run lint)",
+      "Bash(pnpm run lint:*)"
     ],
     "deny": [],
     "ask": []
