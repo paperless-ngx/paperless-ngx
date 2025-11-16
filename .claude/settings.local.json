@@ -7,7 +7,9 @@
       "Bash(pnpm run lint:*)",
       "Bash(git commit:*)",
       "Bash(docker-compose:*)",
-      "Bash(docker build:*)"
+      "Bash(docker build:*)",
+      "Bash(git -C /c/Users/david/Downloads/IntelliDocs-ngx log --oneline --all --no-merges -20)",
+      "Bash(git -C /c/Users/david/Downloads/IntelliDocs-ngx diff HEAD~5..HEAD --name-only)"
     ],
     "deny": [],
     "ask": []

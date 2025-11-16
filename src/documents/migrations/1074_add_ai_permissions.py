@@ -5,7 +5,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "1072_workflowtrigger_filter_custom_field_query_and_more"),
+        ("documents", "1073_migrate_workflow_title_jinja"),
     ]
 
     operations = [

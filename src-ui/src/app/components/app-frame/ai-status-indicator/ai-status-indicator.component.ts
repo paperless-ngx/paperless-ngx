@@ -12,6 +12,7 @@ import { AIStatusService } from 'src/app/services/ai-status.service'
 
 @Component({
   selector: 'pngx-ai-status-indicator',
+  standalone: true,
   templateUrl: './ai-status-indicator.component.html',
   styleUrls: ['./ai-status-indicator.component.scss'],
   imports: [

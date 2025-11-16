@@ -48,9 +48,13 @@ def __get_boolean(key: str, default: str | bool = "NO") -> bool:
     Return a boolean value based on whatever the user has supplied in the
     environment based on whether the value "looks like" it's True or not.
     """
-    value = os.getenv(key, default)
-    if isinstance(value, bool):
-        return value
+    value = os.getenv(key, None)
+    if value is None:
+        # If environment variable not set, use default
+        if isinstance(default, bool):
+            return default
+        return bool(default.lower() in ("yes", "y", "1", "t", "true"))
+    # Environment variable is always a string
     return bool(value.lower() in ("yes", "y", "1", "t", "true"))
 
 

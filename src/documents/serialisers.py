@@ -46,6 +46,7 @@ if settings.AUDIT_LOG_ENABLED:
 from documents import bulk_edit
 from documents.data_models import DocumentSource
 from documents.filters import CustomFieldQueryParser
+from documents.models import AISuggestionFeedback
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -2778,6 +2779,12 @@ class DeletionRequestSerializer(serializers.ModelSerializer):
                     doc.document_type.name if doc.document_type else None
                 ),
                 "tags": [tag.name for tag in doc.tags.all()],
+            }
+            for doc in documents
+        ]
+
+
+class DeletionRequestDetailSerializer(serializers.ModelSerializer):
     """Serializer for DeletionRequest model with document details."""
     
     document_details = serializers.SerializerMethodField()
