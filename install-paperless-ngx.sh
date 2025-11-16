@@ -97,8 +97,11 @@ echo "1. Application configuration"
 echo "============================"
 
 echo ""
-echo "The URL paperless will be available at. This is required if the"
-echo "installation will be accessible via the web, otherwise can be left blank."
+echo "Enter the full URL where Paperless-ngx will be accessible."
+echo "This is only required if you want to access Paperless-ngx from the internet"
+echo "or through a reverse proxy. Otherwise, you may leave this field blank."
+echo ""
+echo "The URL MUST begin with http:// or https://"
 echo "Example: https://paperless.example.com"
 echo ""
 
