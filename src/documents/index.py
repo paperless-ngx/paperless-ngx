@@ -290,8 +290,8 @@ class DelayedQuery:
         self._manual_hits_cache: list | None = None
 
     def __len__(self) -> int:
-        manual_hits = self._manual_hits()
-        if manual_hits is not None:
+        if self._manual_sort_requested():
+            manual_hits = self._manual_hits()
             return len(manual_hits)
 
         page = self[0:1]
@@ -302,8 +302,6 @@ class DelayedQuery:
         return ordering.lstrip("-").startswith("custom_field_")
 
     def _manual_hits(self):
-        if not self._manual_sort_requested():
-            return None
         if self._manual_hits_cache is None:
             q, mask, suggested_correction = self._get_query()
             self.suggested_correction = suggested_correction
@@ -351,8 +349,8 @@ class DelayedQuery:
         if item.start in self.saved_results:
             return self.saved_results[item.start]
 
-        manual_hits = self._manual_hits()
-        if manual_hits is not None:
+        if self._manual_sort_requested():
+            manual_hits = self._manual_hits()
             start = 0 if item.start is None else item.start
             stop = item.stop
             hits = manual_hits[start:stop] if stop is not None else manual_hits[start:]
