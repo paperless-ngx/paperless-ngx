@@ -43,12 +43,15 @@ for path in [
 os.environ["OMP_THREAD_LIMIT"] = "1"
 
 
-def __get_boolean(key: str, default: str = "NO") -> bool:
+def __get_boolean(key: str, default: str | bool = "NO") -> bool:
     """
     Return a boolean value based on whatever the user has supplied in the
     environment based on whether the value "looks like" it's True or not.
     """
-    return bool(os.getenv(key, default).lower() in ("yes", "y", "1", "t", "true"))
+    value = os.getenv(key, default)
+    if isinstance(value, bool):
+        return value
+    return bool(value.lower() in ("yes", "y", "1", "t", "true"))
 
 
 def __get_int(key: str, default: int) -> int:
