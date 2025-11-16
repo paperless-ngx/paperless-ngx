@@ -358,6 +358,7 @@ class DelayedQuery:
             start = 0 if item.start is None else item.start
             stop = item.stop
             page = manual_hits[start:stop] if stop is not None else manual_hits[start:]
+            self.saved_results[start] = page
             return page
 
         q, mask, suggested_correction = self._get_query()
