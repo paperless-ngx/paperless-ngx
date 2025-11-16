@@ -287,14 +287,78 @@ class DelayedQuery:
         self.first_score = None
         self.filter_queryset = filter_queryset
         self.suggested_correction = None
+        self.manual_hits: list | None = None
+        ordering = self.query_params.get("ordering")
+        ordering_check = ordering.lstrip("-") if ordering else None
+        self._manual_sort_requested = (
+            ordering_check.startswith("custom_field_") if ordering_check else False
+        )
 
     def __len__(self) -> int:
+        manual_hits = self._get_manual_hits()
+        if manual_hits is not None:
+            return len(manual_hits)
+
         page = self[0:1]
         return len(page)
+
+    def _get_manual_hits(self):
+        if not self._manual_sort_requested:
+            return None
+        if self.manual_hits is None:
+            self.manual_hits = self._build_manual_hits()
+        return self.manual_hits
+
+    def _build_manual_hits(self):
+        q, mask, suggested_correction = self._get_query()
+        self.suggested_correction = suggested_correction
+
+        results = self.searcher.search(
+            q,
+            mask=mask,
+            filter=MappedDocIdSet(self.filter_queryset, self.searcher.ixreader),
+            limit=None,
+        )
+        results.fragmenter = highlight.ContextFragmenter(surround=50)
+        results.formatter = HtmlFormatter(tagname="span", between=" ... ")
+
+        if not self.first_score and len(results) > 0:
+            self.first_score = results[0].score
+
+        if self.first_score:
+            results.top_n = list(
+                map(
+                    lambda hit: (
+                        (hit[0] / self.first_score) if self.first_score else None,
+                        hit[1],
+                    ),
+                    results.top_n,
+                ),
+            )
+
+        hits_by_id = {hit["id"]: hit for hit in results}
+        matching_ids = list(hits_by_id.keys())
+
+        ordered_ids = list(
+            self.filter_queryset.filter(id__in=matching_ids).values_list(
+                "id",
+                flat=True,
+            ),
+        )
+        ordered_ids = list(dict.fromkeys(ordered_ids))
+
+        return [hits_by_id[_id] for _id in ordered_ids if _id in hits_by_id]
 
     def __getitem__(self, item):
         if item.start in self.saved_results:
             return self.saved_results[item.start]
+
+        manual_hits = self._get_manual_hits()
+        if manual_hits is not None:
+            start = 0 if item.start is None else item.start
+            stop = item.stop
+            page = manual_hits[start:stop] if stop is not None else manual_hits[start:]
+            return page
 
         q, mask, suggested_correction = self._get_query()
         self.suggested_correction = suggested_correction
