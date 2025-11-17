@@ -69,9 +69,13 @@ export class TagListComponent extends ManagementListComponent<Tag> {
   }
 
   filterData(data: Tag[]) {
-    return this.nameFilter?.length
-      ? [...data]
-      : data.filter((tag) => !tag.parent)
+    if (!this.nameFilter?.length) {
+      return data.filter((tag) => !tag.parent)
+    }
+
+    // When filtering by name, exclude children if their parent is also present
+    const availableIds = new Set(data.map((tag) => tag.id))
+    return data.filter((tag) => !tag.parent || !availableIds.has(tag.parent))
   }
 
   protected override getSelectableIDs(tags: Tag[]): number[] {

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-28 18:06+0000\n"
-"PO-Revision-Date: 2025-10-28 18:08\n"
+"POT-Creation-Date: 2025-11-14 16:09+0000\n"
+"PO-Revision-Date: 2025-11-14 16:11\n"
 "Last-Translator: \n"
 "Language-Team: Thai\n"
 "Language: th_TH\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "เอกสาร"
 
-#: documents/filters.py:392
+#: documents/filters.py:395
 msgid "Value must be valid JSON."
 msgstr "ค่า ต้องอยู่ในรูปแบบ JSON ที่ถูกต้อง"
 
-#: documents/filters.py:411
+#: documents/filters.py:414
 msgid "Invalid custom field query expression"
 msgstr "รูปแบบการค้นหาฟิลด์ที่กำหนดเองไม่ถูกต้อง"
 
-#: documents/filters.py:421
+#: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
 msgstr "รายการคำสั่งไม่ถูกต้อง ต้องไม่เว้นว่าง"
 
-#: documents/filters.py:442
+#: documents/filters.py:445
 msgid "Invalid logical operator {op!r}"
 msgstr "ตัวดำเนินการเชิงตรรกะ {op!r} ไม่ถูกต้อง"
 
-#: documents/filters.py:456
+#: documents/filters.py:459
 msgid "Maximum number of query conditions exceeded."
 msgstr "จำนวนเงื่อนไขในการค้นหาเกินกำหนด"
 
-#: documents/filters.py:521
+#: documents/filters.py:524
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} ไม่ใช่ฟิลด์ที่กำหนดเองที่ถูกต้อง"
 
-#: documents/filters.py:558
+#: documents/filters.py:561
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} ไม่รองรับรูปแบบการค้นหา {expr!r}"
 
-#: documents/filters.py:666 documents/models.py:135
+#: documents/filters.py:669 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
 msgstr "จำนวนการซ้อนเงื่อนไขสูงสุดเกินขีดจำกัด"
 
-#: documents/filters.py:851
+#: documents/filters.py:854
 msgid "Custom field not found"
 msgstr "ไม่พบฟิลด์ที่กำหนด"
 
@@ -942,7 +942,7 @@ msgstr ""
 
 #: documents/models.py:1187
 msgid "email subject"
-msgstr ""
+msgstr "หัวเรื่องของอีเมล"
 
 #: documents/models.py:1191
 msgid "The subject of the email, can include some placeholders, see documentation."
@@ -950,7 +950,7 @@ msgstr ""
 
 #: documents/models.py:1197
 msgid "email body"
-msgstr ""
+msgstr "เนื้อหาอีเมล"
 
 #: documents/models.py:1200
 msgid "The body (message) of the email, can include some placeholders, see documentation."
@@ -958,7 +958,7 @@ msgstr ""
 
 #: documents/models.py:1206
 msgid "emails to"
-msgstr ""
+msgstr "อีเมล์ถึง"
 
 #: documents/models.py:1209
 msgid "The destination email addresses, comma separated."

@@ -1,5 +1,85 @@
 # Changelog
 
+## paperless-ngx 2.19.6
+
+### Bug Fixes
+
+-   Chore: include password validation on user edit [@shamoon](https://github.com/shamoon) ([#11308](https://github.com/paperless-ngx/paperless-ngx/pull/11308))
+-   Fix: include BASE_URL when constructing for workflows [@ebardsley](https://github.com/ebardsley) ([#11360](https://github.com/paperless-ngx/paperless-ngx/pull/11360))
+-   Fixhancement: refactor email attachment logic [@shamoon](https://github.com/shamoon) ([#11336](https://github.com/paperless-ngx/paperless-ngx/pull/11336))
+-   Fixhancement: trim whitespace for some text searches [@shamoon](https://github.com/shamoon) ([#11357](https://github.com/paperless-ngx/paperless-ngx/pull/11357))
+-   Fix: update Outlook refresh token when refreshed [@shamoon](https://github.com/shamoon) ([#11341](https://github.com/paperless-ngx/paperless-ngx/pull/11341))
+-   Fix: only cache remote version data for version checking [@shamoon](https://github.com/shamoon) ([#11320](https://github.com/paperless-ngx/paperless-ngx/pull/11320))
+-   Fix: include replace none logic in storage path preview, improve jinja conditionals for empty metadata [@shamoon](https://github.com/shamoon) ([#11315](https://github.com/paperless-ngx/paperless-ngx/pull/11315))
+
+### Dependencies
+
+-   docker(deps): bump astral-sh/uv from 0.9.7-python3.12-bookworm-slim to 0.9.9-python3.12-bookworm-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#11338](https://github.com/paperless-ngx/paperless-ngx/pull/11338))
+
+### All App Changes
+
+<details>
+<summary>7 changes</summary>
+
+-   Fix: include BASE_URL when constructing for workflows [@ebardsley](https://github.com/ebardsley) ([#11360](https://github.com/paperless-ngx/paperless-ngx/pull/11360))
+-   Fixhancement: refactor email attachment logic [@shamoon](https://github.com/shamoon) ([#11336](https://github.com/paperless-ngx/paperless-ngx/pull/11336))
+-   Fixhancement: trim whitespace for some text searches [@shamoon](https://github.com/shamoon) ([#11357](https://github.com/paperless-ngx/paperless-ngx/pull/11357))
+-   Fix: update Outlook refresh token when refreshed [@shamoon](https://github.com/shamoon) ([#11341](https://github.com/paperless-ngx/paperless-ngx/pull/11341))
+-   Fix: only cache remote version data for version checking [@shamoon](https://github.com/shamoon) ([#11320](https://github.com/paperless-ngx/paperless-ngx/pull/11320))
+-   Fix: include replace none logic in storage path preview, improve jinja conditionals for empty metadata [@shamoon](https://github.com/shamoon) ([#11315](https://github.com/paperless-ngx/paperless-ngx/pull/11315))
+-   Chore: include password validation on user edit [@shamoon](https://github.com/shamoon) ([#11308](https://github.com/paperless-ngx/paperless-ngx/pull/11308))
+</details>
+
+## paperless-ngx 2.19.5
+
+### Bug Fixes
+
+-   Fix: ensure custom field query propagation, change detection [@shamoon](https://github.com/shamoon) ([#11291](https://github.com/paperless-ngx/paperless-ngx/pull/11291))
+
+### Dependencies
+
+-   docker(deps): Bump astral-sh/uv from 0.9.4-python3.12-bookworm-slim to 0.9.7-python3.12-bookworm-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#11283](https://github.com/paperless-ngx/paperless-ngx/pull/11283))
+
+### All App Changes
+
+-   Fix: ensure custom field query propagation, change detection [@shamoon](https://github.com/shamoon) ([#11291](https://github.com/paperless-ngx/paperless-ngx/pull/11291))
+
+## paperless-ngx 2.19.4
+
+### Bug Fixes
+
+-   Fix: use original_file when attaching docs to workflow emails with added trigger [@shamoon](https://github.com/shamoon) ([#11266](https://github.com/paperless-ngx/paperless-ngx/pull/11266))
+-   Fix: mark 'Select' button in doc list for translation [@shamoon](https://github.com/shamoon) ([#11278](https://github.com/paperless-ngx/paperless-ngx/pull/11278))
+-   Fix: respect fields parameter for created field [@shamoon](https://github.com/shamoon) ([#11251](https://github.com/paperless-ngx/paperless-ngx/pull/11251))
+-   Fix: improve legibility of processed mail error popover in light mode [@shamoon](https://github.com/shamoon) ([#11258](https://github.com/paperless-ngx/paperless-ngx/pull/11258))
+-   Fixhancement: truncate large logs, improve auto-scroll [@shamoon](https://github.com/shamoon) ([#11239](https://github.com/paperless-ngx/paperless-ngx/pull/11239))
+-   Chore: add max-height and overflow to processedmail error popover [@shamoon](https://github.com/shamoon) ([#11252](https://github.com/paperless-ngx/paperless-ngx/pull/11252))
+-   Fix: delay iframe DOM removal, handle onafterprint error for print in FF [@shamoon](https://github.com/shamoon) ([#11237](https://github.com/paperless-ngx/paperless-ngx/pull/11237))
+-   Fix: de-deduplicate children in tag list when filtering [@shamoon](https://github.com/shamoon) ([#11229](https://github.com/paperless-ngx/paperless-ngx/pull/11229))
+
+### Performance
+
+-   Performance: re-enable virtual scroll, bump ng-select [@shamoon](https://github.com/shamoon) ([#11279](https://github.com/paperless-ngx/paperless-ngx/pull/11279))
+-   Performance: use virtual scroll container and log level parsing for logs view [@MickLesk](https://github.com/MickLesk) ([#11233](https://github.com/paperless-ngx/paperless-ngx/pull/11233))
+
+### All App Changes
+
+<details>
+<summary>11 changes</summary>
+
+-   Performance: re-enable virtual scroll, bump ng-select [@shamoon](https://github.com/shamoon) ([#11279](https://github.com/paperless-ngx/paperless-ngx/pull/11279))
+-   Fix: use original_file when attaching docs to workflow emails with added trigger [@shamoon](https://github.com/shamoon) ([#11266](https://github.com/paperless-ngx/paperless-ngx/pull/11266))
+-   Fix: mark 'Select' button in doc list for translation [@shamoon](https://github.com/shamoon) ([#11278](https://github.com/paperless-ngx/paperless-ngx/pull/11278))
+-   Fix: respect fields parameter for created field [@shamoon](https://github.com/shamoon) ([#11251](https://github.com/paperless-ngx/paperless-ngx/pull/11251))
+-   Fix: improve legibility of processed mail error popover in light mode [@shamoon](https://github.com/shamoon) ([#11258](https://github.com/paperless-ngx/paperless-ngx/pull/11258))
+-   Fixhancement: truncate large logs, improve auto-scroll [@shamoon](https://github.com/shamoon) ([#11239](https://github.com/paperless-ngx/paperless-ngx/pull/11239))
+-   Chore: add max-height and overflow to processedmail error popover [@shamoon](https://github.com/shamoon) ([#11252](https://github.com/paperless-ngx/paperless-ngx/pull/11252))
+-   Fix: delay iframe DOM removal, handle onafterprint error for print in FF [@shamoon](https://github.com/shamoon) ([#11237](https://github.com/paperless-ngx/paperless-ngx/pull/11237))
+-   Performance: use virtual scroll container and log level parsing for logs view [@MickLesk](https://github.com/MickLesk) ([#11233](https://github.com/paperless-ngx/paperless-ngx/pull/11233))
+-   Chore: cache Github version check for 15 minutes [@shamoon](https://github.com/shamoon) ([#11235](https://github.com/paperless-ngx/paperless-ngx/pull/11235))
+-   Fix: de-deduplicate children in tag list when filtering [@shamoon](https://github.com/shamoon) ([#11229](https://github.com/paperless-ngx/paperless-ngx/pull/11229))
+</details>
+
 ## paperless-ngx 2.19.3
 
 ### Bug Fixes

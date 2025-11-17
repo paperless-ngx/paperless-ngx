@@ -1079,6 +1079,47 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         )
 
     @override_settings(
+        FILENAME_FORMAT=(
+            "{% if correspondent == 'none' %}none/{% endif %}"
+            "{% if correspondent == '-none-' %}dash/{% endif %}"
+            "{% if not correspondent %}false/{% endif %}"
+            "{% if correspondent != 'none' %}notnoneyes/{% else %}notnoneno/{% endif %}"
+            "{{ correspondent or 'missing' }}/{{ title }}"
+        ),
+    )
+    def test_placeholder_matches_none_variants_and_false(self):
+        """
+        GIVEN:
+            - Templates that compare against 'none', '-none-' and rely on truthiness
+        WHEN:
+            - A document has or lacks a correspondent
+        THEN:
+            - Empty placeholders behave like both strings and evaluate False
+        """
+        doc_without_correspondent = Document.objects.create(
+            title="does not matter",
+            mime_type="application/pdf",
+            checksum="abc",
+        )
+        doc_with_correspondent = Document.objects.create(
+            title="does not matter",
+            mime_type="application/pdf",
+            checksum="def",
+            correspondent=Correspondent.objects.create(name="Acme"),
+        )
+
+        self.assertEqual(
+            generate_filename(doc_without_correspondent),
+            Path(
+                "none/dash/false/notnoneno/missing/does not matter.pdf",
+            ),
+        )
+        self.assertEqual(
+            generate_filename(doc_with_correspondent),
+            Path("notnoneyes/Acme/does not matter.pdf"),
+        )
+
+    @override_settings(
         FILENAME_FORMAT="{created_year_short}/{created_month_name_short}/{created_month_name}/{title}",
     )
     def test_short_names_created(self):

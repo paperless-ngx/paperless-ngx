@@ -1,3 +1,8 @@
+import {
+  CdkVirtualScrollViewport,
+  ScrollingModule,
+} from '@angular/cdk/scrolling'
+import { CommonModule } from '@angular/common'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
@@ -38,6 +43,9 @@ describe('LogsComponent', () => {
         NgxBootstrapIconsModule.pick(allIcons),
         LogsComponent,
         PageHeaderComponent,
+        CommonModule,
+        CdkVirtualScrollViewport,
+        ScrollingModule,
       ],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
@@ -54,13 +62,12 @@ describe('LogsComponent', () => {
     fixture = TestBed.createComponent(LogsComponent)
     component = fixture.componentInstance
     reloadSpy = jest.spyOn(component, 'reloadLogs')
-    window.HTMLElement.prototype.scroll = function () {} // mock scroll
     jest.useFakeTimers()
     fixture.detectChanges()
   })
 
   it('should display logs with first log initially', () => {
-    expect(logSpy).toHaveBeenCalledWith('paperless')
+    expect(logSpy).toHaveBeenCalledWith('paperless', 5000)
     fixture.detectChanges()
     expect(fixture.debugElement.nativeElement.textContent).toContain(
       paperless_logs[0]
@@ -71,7 +78,7 @@ describe('LogsComponent', () => {
     fixture.debugElement
       .queryAll(By.directive(NgbNavLink))[1]
       .nativeElement.dispatchEvent(new MouseEvent('click'))
-    expect(logSpy).toHaveBeenCalledWith('mail')
+    expect(logSpy).toHaveBeenCalledWith('mail', 5000)
   })
 
   it('should handle error with no logs', () => {
@@ -83,11 +90,24 @@ describe('LogsComponent', () => {
   })
 
   it('should auto refresh, allow toggle', () => {
+    jest
+      .spyOn(CdkVirtualScrollViewport.prototype, 'scrollToIndex')
+      .mockImplementation(() => undefined)
+
     jest.advanceTimersByTime(6000)
     expect(reloadSpy).toHaveBeenCalledTimes(2)
 
     component.autoRefreshEnabled = false
     jest.advanceTimersByTime(6000)
     expect(reloadSpy).toHaveBeenCalledTimes(2)
+  })
+
+  it('should debounce limit changes before reloading logs', () => {
+    const initialCalls = reloadSpy.mock.calls.length
+    component.onLimitChange(6000)
+    jest.advanceTimersByTime(299)
+    expect(reloadSpy).toHaveBeenCalledTimes(initialCalls)
+    jest.advanceTimersByTime(1)
+    expect(reloadSpy).toHaveBeenCalledTimes(initialCalls + 1)
   })
 })
