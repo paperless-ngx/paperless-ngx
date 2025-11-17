@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-21 05:44+0000\n"
-"PO-Revision-Date: 2025-10-21 05:45\n"
+"POT-Creation-Date: 2025-11-14 16:09+0000\n"
+"PO-Revision-Date: 2025-11-14 16:11\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Belgeler"
 
-#: documents/filters.py:386
+#: documents/filters.py:395
 msgid "Value must be valid JSON."
 msgstr "Değer geçerli bir JSON olmalıdır."
 
-#: documents/filters.py:405
+#: documents/filters.py:414
 msgid "Invalid custom field query expression"
 msgstr "Geçersiz özel alan sorgu ifadesi"
 
-#: documents/filters.py:415
+#: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Geçersiz ifade listesi. Boş olmamalıdır."
 
-#: documents/filters.py:436
+#: documents/filters.py:445
 msgid "Invalid logical operator {op!r}"
 msgstr "Geçersiz mantıksal işleç {op!r}"
 
-#: documents/filters.py:450
+#: documents/filters.py:459
 msgid "Maximum number of query conditions exceeded."
 msgstr "En çok sorgu koşulu sayısı aşıldı."
 
-#: documents/filters.py:515
+#: documents/filters.py:524
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} geçerli bir özel alan değil."
 
-#: documents/filters.py:552
+#: documents/filters.py:561
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type}, {expr!r} sorgu ifadesini desteklemiyor."
 
-#: documents/filters.py:660 documents/models.py:135
+#: documents/filters.py:669 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
 msgstr "En çok iç içe geçme izni aşıldı."
 
-#: documents/filters.py:845
+#: documents/filters.py:854
 msgid "Custom field not found"
 msgstr "Özel alan bulunamadı"
 
@@ -1208,39 +1208,39 @@ msgstr "iş akışı çalıştırma"
 msgid "workflow runs"
 msgstr "iş akışı çalıştırma"
 
-#: documents/serialisers.py:143
+#: documents/serialisers.py:145
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Hatalı düzenli ifade: %(error)s"
 
-#: documents/serialisers.py:609
+#: documents/serialisers.py:619
 msgid "Invalid color."
 msgstr "Geçersiz renk."
 
-#: documents/serialisers.py:1795
+#: documents/serialisers.py:1805
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Dosya türü %(type)s desteklenmiyor"
 
-#: documents/serialisers.py:1839
+#: documents/serialisers.py:1849
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr ""
 
-#: documents/serialisers.py:1846
+#: documents/serialisers.py:1856
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr ""
 
-#: documents/serialisers.py:1863 documents/serialisers.py:1873
+#: documents/serialisers.py:1873 documents/serialisers.py:1883
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr ""
 
-#: documents/serialisers.py:1868
+#: documents/serialisers.py:1878
 msgid "Some custom fields don't exist or were specified twice."
 msgstr ""
 
-#: documents/serialisers.py:1983
+#: documents/serialisers.py:1993
 msgid "Invalid variable detected."
 msgstr "Geçersiz değişken algılandı."
 

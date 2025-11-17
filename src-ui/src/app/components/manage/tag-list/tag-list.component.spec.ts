@@ -17,6 +17,7 @@ describe('TagListComponent', () => {
   let component: TagListComponent
   let fixture: ComponentFixture<TagListComponent>
   let tagService: TagService
+  let listFilteredSpy: jest.SpyInstance
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -39,7 +40,7 @@ describe('TagListComponent', () => {
     }).compileComponents()
 
     tagService = TestBed.inject(TagService)
-    jest.spyOn(tagService, 'listFiltered').mockReturnValue(
+    listFilteredSpy = jest.spyOn(tagService, 'listFiltered').mockReturnValue(
       of({
         count: 3,
         all: [1, 2, 3],
@@ -72,9 +73,14 @@ describe('TagListComponent', () => {
     )
   })
 
-  it('should filter out child tags if name filter is empty, otherwise show all', () => {
+  it('should omit matching children from top level when their parent is present', () => {
     const tags = [
-      { id: 1, name: 'Tag1', parent: null },
+      {
+        id: 1,
+        name: 'Tag1',
+        parent: null,
+        children: [{ id: 2, name: 'Tag2', parent: 1 }],
+      },
       { id: 2, name: 'Tag2', parent: 1 },
       { id: 3, name: 'Tag3', parent: null },
     ]
@@ -85,6 +91,65 @@ describe('TagListComponent', () => {
 
     component['_nameFilter'] = 'Tag2' // Simulate non-empty name filter
     const filteredWithName = component.filterData(tags as any)
-    expect(filteredWithName.length).toBe(3)
+    expect(filteredWithName.length).toBe(2)
+    expect(filteredWithName.find((t) => t.id === 2)).toBeUndefined()
+    expect(
+      filteredWithName
+        .find((t) => t.id === 1)
+        ?.children?.some((c) => c.id === 2)
+    ).toBe(true)
+  })
+
+  it('should request only parent tags when no name filter is applied', () => {
+    expect(tagService.listFiltered).toHaveBeenCalledWith(
+      1,
+      null,
+      undefined,
+      undefined,
+      undefined,
+      true,
+      { is_root: true }
+    )
+  })
+
+  it('should include child tags when a name filter is applied', () => {
+    listFilteredSpy.mockClear()
+    component['_nameFilter'] = 'Tag'
+    component.reloadData()
+    expect(tagService.listFiltered).toHaveBeenCalledWith(
+      1,
+      null,
+      undefined,
+      undefined,
+      'Tag',
+      true,
+      null
+    )
+  })
+
+  it('should include child tags when selecting all', () => {
+    const parent = {
+      id: 10,
+      name: 'Parent',
+      children: [
+        {
+          id: 11,
+          name: 'Child',
+        },
+      ],
+    }
+
+    component.data = [parent as any]
+    const selectEvent = { target: { checked: true } } as unknown as PointerEvent
+    component.toggleAll(selectEvent)
+
+    expect(component.selectedObjects.has(10)).toBe(true)
+    expect(component.selectedObjects.has(11)).toBe(true)
+
+    const deselectEvent = {
+      target: { checked: false },
+    } as unknown as PointerEvent
+    component.toggleAll(deselectEvent)
+    expect(component.selectedObjects.size).toBe(0)
   })
 })

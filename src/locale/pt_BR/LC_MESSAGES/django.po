@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-21 05:44+0000\n"
-"PO-Revision-Date: 2025-10-21 05:45\n"
+"POT-Creation-Date: 2025-11-14 16:09+0000\n"
+"PO-Revision-Date: 2025-11-14 16:11\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Documentos"
 
-#: documents/filters.py:386
+#: documents/filters.py:395
 msgid "Value must be valid JSON."
 msgstr "O valor deve ser um JSON válido."
 
-#: documents/filters.py:405
+#: documents/filters.py:414
 msgid "Invalid custom field query expression"
 msgstr "Expressão de consulta de campo personalizado inválida"
 
-#: documents/filters.py:415
+#: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Lista de expressões inválida. Deve estar não vazia."
 
-#: documents/filters.py:436
+#: documents/filters.py:445
 msgid "Invalid logical operator {op!r}"
 msgstr "Operador lógico inválido {op!r}"
 
-#: documents/filters.py:450
+#: documents/filters.py:459
 msgid "Maximum number of query conditions exceeded."
 msgstr "Número máximo de condições de consulta excedido."
 
-#: documents/filters.py:515
+#: documents/filters.py:524
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} não é um campo personalizado válido."
 
-#: documents/filters.py:552
+#: documents/filters.py:561
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr "{data_type} não suporta a consulta expr {expr!r}."
+msgstr "{data_type} Não suporta a consulta expr {expr!r}."
 
-#: documents/filters.py:660 documents/models.py:135
+#: documents/filters.py:669 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
 msgstr "Profundidade máxima do aninhamento excedida."
 
-#: documents/filters.py:845
+#: documents/filters.py:854
 msgid "Custom field not found"
 msgstr "Campo personalizado não encontrado"
 
@@ -450,7 +450,7 @@ msgstr "pesquisa de texto completo"
 
 #: documents/models.py:526
 msgid "more like this"
-msgstr "Mais como este"
+msgstr "mais como este"
 
 #: documents/models.py:527
 msgid "has tags in"
@@ -859,11 +859,11 @@ msgstr "Possui estas etiquetas"
 
 #: documents/models.py:1072
 msgid "has all of these tag(s)"
-msgstr ""
+msgstr "possui toda(s) esta(s) etiqueta(s)"
 
 #: documents/models.py:1079
 msgid "does not have these tag(s)"
-msgstr ""
+msgstr "não possui esta(s) etiqueta(s)"
 
 #: documents/models.py:1087
 msgid "has this document type"
@@ -871,7 +871,7 @@ msgstr "Possui este tipo de documento"
 
 #: documents/models.py:1094
 msgid "does not have these document type(s)"
-msgstr ""
+msgstr "não possui este(s) tipo(s) de documento"
 
 #: documents/models.py:1102
 msgid "has this correspondent"
@@ -879,7 +879,7 @@ msgstr "Possui este correspondente"
 
 #: documents/models.py:1109
 msgid "does not have these correspondent(s)"
-msgstr ""
+msgstr "não possui este(s) correspondente(s)"
 
 #: documents/models.py:1117
 msgid "has this storage path"
@@ -887,15 +887,15 @@ msgstr "possui este caminho de armazenamento"
 
 #: documents/models.py:1124
 msgid "does not have these storage path(s)"
-msgstr ""
+msgstr "não possui este(s) caminho(s) de armazenamento"
 
 #: documents/models.py:1128
 msgid "filter custom field query"
-msgstr ""
+msgstr "Filtrar consulta de campo personalizado"
 
 #: documents/models.py:1131
 msgid "JSON-encoded custom field query expression."
-msgstr ""
+msgstr "Expressão de consulta de campo personalizado codificada em JSON."
 
 #: documents/models.py:1135
 msgid "schedule offset days"
@@ -1209,39 +1209,39 @@ msgstr "execução do fluxo de trabalho"
 msgid "workflow runs"
 msgstr "execução de fluxo de trabalho"
 
-#: documents/serialisers.py:143
+#: documents/serialisers.py:145
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Expressão regular inválida: %(error)s"
 
-#: documents/serialisers.py:609
+#: documents/serialisers.py:619
 msgid "Invalid color."
 msgstr "Cor inválida."
 
-#: documents/serialisers.py:1795
+#: documents/serialisers.py:1805
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Tipo de arquivo %(type)s não suportado"
 
-#: documents/serialisers.py:1839
+#: documents/serialisers.py:1849
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "O ID do campo personalizado deve ser um número inteiro: %(id)s"
 
-#: documents/serialisers.py:1846
+#: documents/serialisers.py:1856
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Não existe um campo personalizado com o ID %(id)s"
 
-#: documents/serialisers.py:1863 documents/serialisers.py:1873
+#: documents/serialisers.py:1873 documents/serialisers.py:1883
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Campos personalizados devem estar em uma lista de números inteiros ou em um objeto que relacione IDs a valores."
 
-#: documents/serialisers.py:1868
+#: documents/serialisers.py:1878
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Campos personalizados inválidos ou duplicados."
 
-#: documents/serialisers.py:1983
+#: documents/serialisers.py:1993
 msgid "Invalid variable detected."
 msgstr "Variável inválida detectada."
 
@@ -1270,7 +1270,7 @@ msgstr "Olá de %(site_name)s!"
 #, python-format
 msgid "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
-msgstr "Obrigado por usar  %(site_name)s!\n"
+msgstr "Obrigado por usar %(site_name)s!\n"
 "%(site_domain)s"
 
 #: documents/templates/account/login.html:5
@@ -1313,7 +1313,7 @@ msgstr "ou conecte-se com"
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
-msgstr "Redefinição de senha Paperless-ngx"
+msgstr "Solicitação de redefinição de senha Paperless-ngx"
 
 #: documents/templates/account/password_reset.html:9
 msgid "Enter your email address below, and we'll email instructions for setting a new one."

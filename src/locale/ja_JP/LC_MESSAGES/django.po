@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-21 05:44+0000\n"
-"PO-Revision-Date: 2025-10-21 05:45\n"
+"POT-Creation-Date: 2025-11-14 16:09+0000\n"
+"PO-Revision-Date: 2025-11-14 16:11\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "ドキュメント"
 
-#: documents/filters.py:386
+#: documents/filters.py:395
 msgid "Value must be valid JSON."
 msgstr "値は有効なJSONである必要があります。"
 
-#: documents/filters.py:405
+#: documents/filters.py:414
 msgid "Invalid custom field query expression"
 msgstr "無効なカスタムフィールドクエリ式"
 
-#: documents/filters.py:415
+#: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
 msgstr "無効な式リストです。空であってはなりません。"
 
-#: documents/filters.py:436
+#: documents/filters.py:445
 msgid "Invalid logical operator {op!r}"
 msgstr "無効な論理演算子 {op!r}"
 
-#: documents/filters.py:450
+#: documents/filters.py:459
 msgid "Maximum number of query conditions exceeded."
 msgstr "クエリ条件の最大数を超えました。"
 
-#: documents/filters.py:515
+#: documents/filters.py:524
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} は有効なカスタムフィールドではありません。"
 
-#: documents/filters.py:552
+#: documents/filters.py:561
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} はクエリ expr {expr!r} をサポートしていません。"
 
-#: documents/filters.py:660 documents/models.py:135
+#: documents/filters.py:669 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
 msgstr "最大ネストの深さを超えました。"
 
-#: documents/filters.py:845
+#: documents/filters.py:854
 msgid "Custom field not found"
 msgstr "カスタムフィールドが見つかりません"
 
@@ -1208,39 +1208,39 @@ msgstr "ワークフローの実行"
 msgid "workflow runs"
 msgstr "ワークフローの実行"
 
-#: documents/serialisers.py:143
+#: documents/serialisers.py:145
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "不正な正規表現: %(error)s"
 
-#: documents/serialisers.py:609
+#: documents/serialisers.py:619
 msgid "Invalid color."
 msgstr "無効な色"
 
-#: documents/serialisers.py:1795
+#: documents/serialisers.py:1805
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "ファイルタイプ %(type)s はサポートされていません"
 
-#: documents/serialisers.py:1839
+#: documents/serialisers.py:1849
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr ""
 
-#: documents/serialisers.py:1846
+#: documents/serialisers.py:1856
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr ""
 
-#: documents/serialisers.py:1863 documents/serialisers.py:1873
+#: documents/serialisers.py:1873 documents/serialisers.py:1883
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr ""
 
-#: documents/serialisers.py:1868
+#: documents/serialisers.py:1878
 msgid "Some custom fields don't exist or were specified twice."
 msgstr ""
 
-#: documents/serialisers.py:1983
+#: documents/serialisers.py:1993
 msgid "Invalid variable detected."
 msgstr "無効な変数を検出しました"
 

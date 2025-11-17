@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-21 05:44+0000\n"
-"PO-Revision-Date: 2025-10-21 05:45\n"
+"POT-Creation-Date: 2025-11-14 16:09+0000\n"
+"PO-Revision-Date: 2025-11-14 16:11\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumentumok"
 
-#: documents/filters.py:386
+#: documents/filters.py:395
 msgid "Value must be valid JSON."
-msgstr "Érvényes JSON érték szükséges"
+msgstr "Érvényes JSON érték szükséges."
 
-#: documents/filters.py:405
+#: documents/filters.py:414
 msgid "Invalid custom field query expression"
 msgstr "Érvénytelen egyéni mező lekérdezési kifejezés"
 
-#: documents/filters.py:415
+#: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Érvénytelen kifejezéslista. Nem lehet üres."
 
-#: documents/filters.py:436
+#: documents/filters.py:445
 msgid "Invalid logical operator {op!r}"
 msgstr "Érvénytelen logikai operátor {op!r}"
 
-#: documents/filters.py:450
+#: documents/filters.py:459
 msgid "Maximum number of query conditions exceeded."
 msgstr "Maximum lekérdezési feltételszám átlépve."
 
-#: documents/filters.py:515
+#: documents/filters.py:524
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} nem érvényes egyéni mező."
 
-#: documents/filters.py:552
+#: documents/filters.py:561
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr "{data_type} nem támogatja a(z) {expr!r} lekérdezési kifejezést."
+msgstr "A(z) {data_type} nem támogatja a {expr!r} kifejezés lekérdezést."
 
-#: documents/filters.py:660 documents/models.py:135
+#: documents/filters.py:669 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
 msgstr "Maximum beágyazási mélység túllépve."
 
-#: documents/filters.py:845
+#: documents/filters.py:854
 msgid "Custom field not found"
 msgstr "Az egyéni mező nem található"
 
@@ -136,11 +136,11 @@ msgstr "címkék"
 
 #: documents/models.py:123
 msgid "Cannot set itself as parent."
-msgstr ""
+msgstr "Nem állíthatja be magát szülőként."
 
 #: documents/models.py:125
 msgid "Cannot set parent to a descendant."
-msgstr ""
+msgstr "Nem lehet szülőt beállítani egy leszármazotthoz."
 
 #: documents/models.py:142 documents/models.py:190
 msgid "document type"
@@ -758,7 +758,7 @@ msgstr "Válassz"
 
 #: documents/models.py:795
 msgid "Long Text"
-msgstr ""
+msgstr "Hosszú szöveg"
 
 #: documents/models.py:807
 msgid "data type"
@@ -858,11 +858,11 @@ msgstr "ezekkel a címkékkel rendelkezik"
 
 #: documents/models.py:1072
 msgid "has all of these tag(s)"
-msgstr ""
+msgstr "ezen címke(ék) mindegyikét tartalmazza"
 
 #: documents/models.py:1079
 msgid "does not have these tag(s)"
-msgstr ""
+msgstr "nem tartalmazza ezt a címkét vagy címéket"
 
 #: documents/models.py:1087
 msgid "has this document type"
@@ -870,7 +870,7 @@ msgstr "ez a dokumentumtípusa"
 
 #: documents/models.py:1094
 msgid "does not have these document type(s)"
-msgstr ""
+msgstr "nem rendelkezik dokumentumtípussal a"
 
 #: documents/models.py:1102
 msgid "has this correspondent"
@@ -878,23 +878,23 @@ msgstr "ez a levelezőpartner"
 
 #: documents/models.py:1109
 msgid "does not have these correspondent(s)"
-msgstr ""
+msgstr "nincs ilyen levelezőpartner(ek).\""
 
 #: documents/models.py:1117
 msgid "has this storage path"
-msgstr ""
+msgstr "rendelkezik ezzel a tárolási útvonallal"
 
 #: documents/models.py:1124
 msgid "does not have these storage path(s)"
-msgstr ""
+msgstr "nem rendelkezik ezzel a tárolási útvonallal"
 
 #: documents/models.py:1128
 msgid "filter custom field query"
-msgstr ""
+msgstr "egyéni mező a lekérdezés szűrésére"
 
 #: documents/models.py:1131
 msgid "JSON-encoded custom field query expression."
-msgstr ""
+msgstr "JSON-kódolású egyéni mező lekérdezési kifejezés."
 
 #: documents/models.py:1135
 msgid "schedule offset days"
@@ -1038,7 +1038,7 @@ msgstr "cím hozzárendelése"
 
 #: documents/models.py:1302
 msgid "Assign a document title, must  be a Jinja2 template, see documentation."
-msgstr ""
+msgstr "Dokumentumcím hozzárendelése, amelynek Jinja2 sablonnak kell lennie, lásd a dokumentációt."
 
 #: documents/models.py:1310 paperless_mail/models.py:274
 msgid "assign this tag"
@@ -1208,39 +1208,39 @@ msgstr "munkafolyamat futtatás"
 msgid "workflow runs"
 msgstr "munkafolyamat futtatások"
 
-#: documents/serialisers.py:143
+#: documents/serialisers.py:145
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Érvénytelen reguláris kifejezés: %(error)s"
 
-#: documents/serialisers.py:609
+#: documents/serialisers.py:619
 msgid "Invalid color."
 msgstr "Érvénytelen szín."
 
-#: documents/serialisers.py:1795
+#: documents/serialisers.py:1805
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Fájltípus %(type)s nem támogatott"
 
-#: documents/serialisers.py:1839
+#: documents/serialisers.py:1849
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
-msgstr ""
+msgstr "Az egyéni mező azonosítójának egész számnak kell lennie: %(id)s"
 
-#: documents/serialisers.py:1846
+#: documents/serialisers.py:1856
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
-msgstr ""
+msgstr "A(z) %(id)s azonosítójú egyéni mező nem létezik"
 
-#: documents/serialisers.py:1863 documents/serialisers.py:1873
+#: documents/serialisers.py:1873 documents/serialisers.py:1883
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
-msgstr ""
+msgstr "Az egyéni mezőknek egész számok listájának vagy azonosítókat értékekhez rendelő objektumnak kell lenniük."
 
-#: documents/serialisers.py:1868
+#: documents/serialisers.py:1878
 msgid "Some custom fields don't exist or were specified twice."
-msgstr ""
+msgstr "Néhány egyéni mező nem létezik, vagy kétszer lett megadva."
 
-#: documents/serialisers.py:1983
+#: documents/serialisers.py:1993
 msgid "Invalid variable detected."
 msgstr "Érvénytelen változót észleltek."
 

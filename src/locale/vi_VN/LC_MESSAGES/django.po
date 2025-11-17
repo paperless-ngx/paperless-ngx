@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-21 05:44+0000\n"
-"PO-Revision-Date: 2025-10-21 05:45\n"
+"POT-Creation-Date: 2025-11-14 16:09+0000\n"
+"PO-Revision-Date: 2025-11-14 16:11\n"
 "Last-Translator: \n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Tài liệu"
 
-#: documents/filters.py:386
+#: documents/filters.py:395
 msgid "Value must be valid JSON."
 msgstr "Giá trị phải là JSON hợp lệ."
 
-#: documents/filters.py:405
+#: documents/filters.py:414
 msgid "Invalid custom field query expression"
 msgstr "Biểu thức truy vấn trường tùy chỉnh không hợp lệ"
 
-#: documents/filters.py:415
+#: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Danh sách biểu thức không hợp lệ. Phải không rỗng."
 
-#: documents/filters.py:436
+#: documents/filters.py:445
 msgid "Invalid logical operator {op!r}"
 msgstr "Toán tử lô-gic không hợp lệ  {op!r}"
 
-#: documents/filters.py:450
+#: documents/filters.py:459
 msgid "Maximum number of query conditions exceeded."
 msgstr "Đã vượt quá số điều kiện truy vấn tối đa."
 
-#: documents/filters.py:515
+#: documents/filters.py:524
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} không phải là trường tùy chỉnh hợp lệ."
 
-#: documents/filters.py:552
+#: documents/filters.py:561
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} không hỗ trợ expr truy vấn{expr!r}."
 
-#: documents/filters.py:660 documents/models.py:135
+#: documents/filters.py:669 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
 msgstr "Đã vượt quá độ sâu lồng nhau tối đa."
 
-#: documents/filters.py:845
+#: documents/filters.py:854
 msgid "Custom field not found"
 msgstr "Không tìm thấy trường tùy chỉnh"
 
@@ -136,7 +136,7 @@ msgstr "thẻ"
 
 #: documents/models.py:123
 msgid "Cannot set itself as parent."
-msgstr ""
+msgstr "Không thể tự đặt thành thư mục gốc"
 
 #: documents/models.py:125
 msgid "Cannot set parent to a descendant."
@@ -758,7 +758,7 @@ msgstr "Chọn"
 
 #: documents/models.py:795
 msgid "Long Text"
-msgstr ""
+msgstr "Văn bản dài"
 
 #: documents/models.py:807
 msgid "data type"
@@ -858,11 +858,11 @@ msgstr "có những thẻ này"
 
 #: documents/models.py:1072
 msgid "has all of these tag(s)"
-msgstr ""
+msgstr "có tất cả thẻ này"
 
 #: documents/models.py:1079
 msgid "does not have these tag(s)"
-msgstr ""
+msgstr "không có các thẻ này"
 
 #: documents/models.py:1087
 msgid "has this document type"
@@ -870,7 +870,7 @@ msgstr "có loại tài liệu này"
 
 #: documents/models.py:1094
 msgid "does not have these document type(s)"
-msgstr ""
+msgstr "không có các loại tài liệu này"
 
 #: documents/models.py:1102
 msgid "has this correspondent"
@@ -878,15 +878,15 @@ msgstr "có phóng viên này"
 
 #: documents/models.py:1109
 msgid "does not have these correspondent(s)"
-msgstr ""
+msgstr "không có các biên tập viên này"
 
 #: documents/models.py:1117
 msgid "has this storage path"
-msgstr ""
+msgstr "có đường dẫn lưu trữ này"
 
 #: documents/models.py:1124
 msgid "does not have these storage path(s)"
-msgstr ""
+msgstr "không có các đường dẫn lưu trữ này"
 
 #: documents/models.py:1128
 msgid "filter custom field query"
@@ -1208,39 +1208,39 @@ msgstr "dòng công việc chạy"
 msgid "workflow runs"
 msgstr "dòng công việc chạy"
 
-#: documents/serialisers.py:143
+#: documents/serialisers.py:145
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Biểu thức chính quy không hợp lệ: %(error)s"
 
-#: documents/serialisers.py:609
+#: documents/serialisers.py:619
 msgid "Invalid color."
 msgstr "Màu không hợp lệ."
 
-#: documents/serialisers.py:1795
+#: documents/serialisers.py:1805
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Loại tập tin %(type)s không được hỗ trợ"
 
-#: documents/serialisers.py:1839
+#: documents/serialisers.py:1849
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr ""
 
-#: documents/serialisers.py:1846
+#: documents/serialisers.py:1856
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr ""
 
-#: documents/serialisers.py:1863 documents/serialisers.py:1873
+#: documents/serialisers.py:1873 documents/serialisers.py:1883
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr ""
 
-#: documents/serialisers.py:1868
+#: documents/serialisers.py:1878
 msgid "Some custom fields don't exist or were specified twice."
 msgstr ""
 
-#: documents/serialisers.py:1983
+#: documents/serialisers.py:1993
 msgid "Invalid variable detected."
 msgstr "Đã phát hiện biến số không hợp lệ."
 

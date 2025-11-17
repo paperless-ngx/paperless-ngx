@@ -89,6 +89,65 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(len(results), 0)
         self.assertCountEqual(response.data["all"], [])
 
+    def test_search_custom_field_ordering(self):
+        custom_field = CustomField.objects.create(
+            name="Sortable field",
+            data_type=CustomField.FieldDataType.INT,
+        )
+        d1 = Document.objects.create(
+            title="first",
+            content="match",
+            checksum="A1",
+        )
+        d2 = Document.objects.create(
+            title="second",
+            content="match",
+            checksum="B2",
+        )
+        d3 = Document.objects.create(
+            title="third",
+            content="match",
+            checksum="C3",
+        )
+        CustomFieldInstance.objects.create(
+            document=d1,
+            field=custom_field,
+            value_int=30,
+        )
+        CustomFieldInstance.objects.create(
+            document=d2,
+            field=custom_field,
+            value_int=10,
+        )
+        CustomFieldInstance.objects.create(
+            document=d3,
+            field=custom_field,
+            value_int=20,
+        )
+
+        with AsyncWriter(index.open_index()) as writer:
+            index.update_document(writer, d1)
+            index.update_document(writer, d2)
+            index.update_document(writer, d3)
+
+        response = self.client.get(
+            f"/api/documents/?query=match&ordering=custom_field_{custom_field.pk}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            [doc["id"] for doc in response.data["results"]],
+            [d2.id, d3.id, d1.id],
+        )
+
+        response = self.client.get(
+            f"/api/documents/?query=match&ordering=-custom_field_{custom_field.pk}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            [doc["id"] for doc in response.data["results"]],
+            [d1.id, d3.id, d2.id],
+        )
+
     def test_search_multi_page(self):
         with AsyncWriter(index.open_index()) as writer:
             for i in range(55):
