@@ -63,6 +63,7 @@ jobs:
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v6
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           file_pattern: 'src-ui/messages.xlf src/locale/en_US/LC_MESSAGES/django.po'
           commit_message: "Auto translate strings"
           commit_user_name: "GitHub Actions"

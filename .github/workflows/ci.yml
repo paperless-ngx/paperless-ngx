@@ -74,6 +74,100 @@ jobs:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       - name: Check files
         uses: pre-commit/action@v3.0.1
+  verify-environment:
+    name: "Verify Environment & Services"
+    runs-on: ubuntu-24.04
+    needs:
+      - pre-commit
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Verify Docker installation
+        run: |
+          if ! command -v docker &> /dev/null; then
+            echo "✗ Docker is not installed"
+            exit 1
+          fi
+          echo "✓ Docker is installed: $(docker --version)"
+      - name: Verify docker-compose installation
+        run: |
+          if ! command -v docker &> /dev/null || ! docker compose version &> /dev/null; then
+            echo "✗ docker-compose is not installed"
+            exit 1
+          fi
+          echo "✓ docker compose is installed: $(docker compose version)"
+      - name: Verify compose file exists
+        env:
+          COMPOSE_FILE: docker/compose/docker-compose.intellidocs.yml
+        run: |
+          if [ ! -f "$COMPOSE_FILE" ]; then
+            echo "✗ Compose file not found: $COMPOSE_FILE"
+            exit 1
+          fi
+          echo "✓ Compose file found: $COMPOSE_FILE"
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
+          enable-cache: true
+          python-version: ${{ steps.setup-python.outputs.python-version }}
+      - name: Generate and verify requirements.txt
+        run: |
+          uv export --quiet --no-dev --all-extras --format requirements-txt --output-file requirements.txt
+          if [ ! -f "requirements.txt" ]; then
+            echo "✗ requirements.txt was not generated"
+            exit 1
+          fi
+          echo "✓ requirements.txt generated successfully"
+      - name: Verify Python dependencies installation
+        run: |
+          # Verify that requirements.txt can be parsed
+          if ! python -c "
+import sys
+try:
+    with open('requirements.txt', 'r') as f:
+        lines = f.readlines()
+    print(f'✓ requirements.txt has {len(lines)} entries')
+    sys.exit(0)
+except Exception as e:
+    print(f'✗ Error reading requirements.txt: {e}')
+    sys.exit(1)
+          "; then
+            exit 1
+          fi
+      - name: Start Redis service
+        run: |
+          docker compose --file docker/compose/docker-compose.intellidocs.yml up -d broker
+          echo "Waiting for Redis to be ready..."
+          sleep 10
+      - name: Verify Redis is responding
+        run: |
+          MAX_RETRIES=30
+          RETRY_COUNT=0
+
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            if docker compose --file docker/compose/docker-compose.intellidocs.yml exec -T broker redis-cli ping &> /dev/null; then
+              echo "✓ Redis is responding"
+              exit 0
+            fi
+
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            echo "Waiting for Redis... (attempt $RETRY_COUNT/$MAX_RETRIES)"
+            sleep 2
+          done
+
+          echo "✗ Redis is not responding after $MAX_RETRIES attempts"
+          docker compose --file docker/compose/docker-compose.intellidocs.yml logs broker
+          exit 1
+      - name: Stop services
+        if: always()
+        run: |
+          docker compose --file docker/compose/docker-compose.intellidocs.yml down -v
   documentation:
     name: "Build & Deploy Documentation"
     runs-on: ubuntu-24.04

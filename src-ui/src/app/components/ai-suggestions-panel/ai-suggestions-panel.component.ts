@@ -18,8 +18,8 @@ import {
 } from '@angular/core'
 import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { Subject } from 'rxjs'
-import { takeUntil } from 'rxjs/operators'
+import { Subject, of } from 'rxjs'
+import { takeUntil, catchError } from 'rxjs/operators'
 import {
   AISuggestion,
   AISuggestionStatus,
@@ -134,10 +134,19 @@ export class AiSuggestionsPanelComponent implements OnChanges, OnDestroy {
       (s) => s.type === AISuggestionType.Tag
     )
     if (tagSuggestions.length > 0) {
-      this.tagService.listAll().pipe(takeUntil(this.destroy$)).subscribe((tags) => {
-        this.tags = tags.results
-        this.updateSuggestionLabels()
-      })
+      this.tagService
+        .listAll()
+        .pipe(
+          takeUntil(this.destroy$),
+          catchError((error) => {
+            console.error('Failed to load tags:', error)
+            return of({ results: [] })
+          })
+        )
+        .subscribe((tags) => {
+          this.tags = tags.results
+          this.updateSuggestionLabels()
+        })
     }
 
     // Load correspondents if needed
@@ -145,10 +154,19 @@ export class AiSuggestionsPanelComponent implements OnChanges, OnDestroy {
       (s) => s.type === AISuggestionType.Correspondent
     )
     if (correspondentSuggestions.length > 0) {
-      this.correspondentService.listAll().pipe(takeUntil(this.destroy$)).subscribe((correspondents) => {
-        this.correspondents = correspondents.results
-        this.updateSuggestionLabels()
-      })
+      this.correspondentService
+        .listAll()
+        .pipe(
+          takeUntil(this.destroy$),
+          catchError((error) => {
+            console.error('Failed to load correspondents:', error)
+            return of({ results: [] })
+          })
+        )
+        .subscribe((correspondents) => {
+          this.correspondents = correspondents.results
+          this.updateSuggestionLabels()
+        })
     }
 
     // Load document types if needed
@@ -156,10 +174,19 @@ export class AiSuggestionsPanelComponent implements OnChanges, OnDestroy {
       (s) => s.type === AISuggestionType.DocumentType
     )
     if (documentTypeSuggestions.length > 0) {
-      this.documentTypeService.listAll().pipe(takeUntil(this.destroy$)).subscribe((documentTypes) => {
-        this.documentTypes = documentTypes.results
-        this.updateSuggestionLabels()
-      })
+      this.documentTypeService
+        .listAll()
+        .pipe(
+          takeUntil(this.destroy$),
+          catchError((error) => {
+            console.error('Failed to load document types:', error)
+            return of({ results: [] })
+          })
+        )
+        .subscribe((documentTypes) => {
+          this.documentTypes = documentTypes.results
+          this.updateSuggestionLabels()
+        })
     }
 
     // Load storage paths if needed
@@ -167,10 +194,19 @@ export class AiSuggestionsPanelComponent implements OnChanges, OnDestroy {
       (s) => s.type === AISuggestionType.StoragePath
     )
     if (storagePathSuggestions.length > 0) {
-      this.storagePathService.listAll().pipe(takeUntil(this.destroy$)).subscribe((storagePaths) => {
-        this.storagePaths = storagePaths.results
-        this.updateSuggestionLabels()
-      })
+      this.storagePathService
+        .listAll()
+        .pipe(
+          takeUntil(this.destroy$),
+          catchError((error) => {
+            console.error('Failed to load storage paths:', error)
+            return of({ results: [] })
+          })
+        )
+        .subscribe((storagePaths) => {
+          this.storagePaths = storagePaths.results
+          this.updateSuggestionLabels()
+        })
     }
 
     // Load custom fields if needed
@@ -178,10 +214,19 @@ export class AiSuggestionsPanelComponent implements OnChanges, OnDestroy {
       (s) => s.type === AISuggestionType.CustomField
     )
     if (customFieldSuggestions.length > 0) {
-      this.customFieldsService.listAll().pipe(takeUntil(this.destroy$)).subscribe((customFields) => {
-        this.customFields = customFields.results
-        this.updateSuggestionLabels()
-      })
+      this.customFieldsService
+        .listAll()
+        .pipe(
+          takeUntil(this.destroy$),
+          catchError((error) => {
+            console.error('Failed to load custom fields:', error)
+            return of({ results: [] })
+          })
+        )
+        .subscribe((customFields) => {
+          this.customFields = customFields.results
+          this.updateSuggestionLabels()
+        })
     }
   }
 
