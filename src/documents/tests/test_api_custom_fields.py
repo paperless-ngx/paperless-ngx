@@ -1,6 +1,7 @@
 import json
 from datetime import date
 from unittest.mock import ANY
+from unittest.mock import patch
 
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
@@ -10,6 +11,7 @@ from rest_framework.test import APITestCase
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
+from documents.signals.handlers import sync_custom_field_instances_and_document_names
 from documents.tests.utils import DirectoriesMixin
 
 
@@ -211,7 +213,10 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
             ],
         )
 
-    def test_custom_field_select_options_pruned(self):
+    @patch(
+        "documents.signals.handlers.sync_custom_field_instances_and_document_names.delay",
+    )
+    def test_custom_field_select_options_pruned(self, mock_sync_delay):
         """
         GIVEN:
             - Select custom field exists and document instance with one of the options
@@ -242,7 +247,13 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         CustomFieldInstance.objects.create(
             document=doc,
             field=custom_field_select,
-            value_text="abc-123",
+            value_select="def-456",
+        )
+
+        mock_sync_delay.side_effect = (
+            lambda custom_field_id: sync_custom_field_instances_and_document_names(
+                custom_field_id,
+            )
         )
 
         resp = self.client.patch(
@@ -273,6 +284,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
 
         doc.refresh_from_db()
         self.assertEqual(doc.custom_fields.first().value, None)
+        mock_sync_delay.assert_called_once_with(custom_field_select.pk)
 
     def test_custom_field_select_old_version(self):
         """
