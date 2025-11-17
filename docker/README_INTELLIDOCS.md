@@ -94,13 +94,13 @@ En `docker-compose.env`:
 # Habilitar funciones ML
 PAPERLESS_ENABLE_ML_FEATURES=1
 
-# Habilitar OCR avanzado  
+# Habilitar OCR avanzado
 PAPERLESS_ENABLE_ADVANCED_OCR=1
 
 # Modelo ML a usar
 PAPERLESS_ML_CLASSIFIER_MODEL=distilbert-base-uncased
 
-# Usar GPU (requiere NVIDIA Docker)
+# Usar GPU (require NVIDIA Docker)
 PAPERLESS_USE_GPU=0
 
 # Umbral para detección de tablas
@@ -135,7 +135,7 @@ docker build -t intellidocs-ngx:dev .
 # image: intellidocs-ngx:dev
 ```
 
-## 🔍 Comandos Útiles
+## 🔍 Commandos Útiles
 
 ### Gestión de contenedores
 
@@ -164,7 +164,7 @@ docker compose -f docker-compose.intellidocs.yml down -v
 # Shell en webserver
 docker compose -f docker-compose.intellidocs.yml exec webserver bash
 
-# Ejecutar comando de Django
+# Ejecutar commando de Django
 docker compose -f docker-compose.intellidocs.yml exec webserver python manage.py <command>
 
 # Crear superusuario
@@ -310,6 +310,6 @@ USERMAP_GID=$(id -g)
 
 ---
 
-**IntelliDocs** - Sistema de Gestión Documental con IA  
-Versión: 1.0.0  
+**IntelliDocs** - Sistema de Gestión Documental con IA
+Versión: 1.0.0
 Última actualización: 2025-11-09

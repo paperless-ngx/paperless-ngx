@@ -1,21 +1,22 @@
 # Generated manually for DeletionRequest performance optimization
 
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
     """
     Add performance indexes for DeletionRequest model.
-    
+
     These indexes optimize common query patterns:
     - Filtering by user + status + created_at (most common listing query)
     - Filtering by reviewed_at (for finding reviewed requests)
     - Filtering by completed_at (for finding completed requests)
-    
+
     Expected performance improvement:
     - List queries: <100ms
     - Filter queries: <50ms
-    
+
     Addresses Issue: [AI Scanner] Índices de Performance para DeletionRequest
     Epic: Migraciones de Base de Datos
     """

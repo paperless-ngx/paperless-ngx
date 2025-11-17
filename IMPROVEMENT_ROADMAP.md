@@ -85,7 +85,7 @@ class Migration(migrations.Migration):
         ),
         # Full-text search optimization
         migrations.RunSQL(
-            "CREATE INDEX doc_content_idx ON documents_document " 
+            "CREATE INDEX doc_content_idx ON documents_document "
             "USING gin(to_tsvector('english', content));"
         ),
     ]
@@ -231,7 +231,7 @@ getOptimizedThumbnailUrl(documentId: number): string {
 loadThumbnail(documentId: number): void {
   // Load low-quality placeholder first
   this.thumbnailUrl = `/api/documents/${documentId}/thumb/?quality=10`;
-  
+
   // Then load high-quality version
   const img = new Image();
   img.onload = () => {
@@ -266,38 +266,38 @@ import base64
 
 class DocumentEncryption:
     """Handle document encryption/decryption"""
-    
+
     def __init__(self):
         # Key should be stored in secure key management system
         self.cipher = Fernet(settings.DOCUMENT_ENCRYPTION_KEY)
-    
+
     def encrypt_file(self, file_path: str) -> str:
         """Encrypt a document file"""
         with open(file_path, 'rb') as f:
             plaintext = f.read()
-        
+
         ciphertext = self.cipher.encrypt(plaintext)
-        
+
         encrypted_path = f"{file_path}.encrypted"
         with open(encrypted_path, 'wb') as f:
             f.write(ciphertext)
-        
+
         return encrypted_path
-    
+
     def decrypt_file(self, encrypted_path: str, output_path: str = None):
         """Decrypt a document file"""
         with open(encrypted_path, 'rb') as f:
             ciphertext = f.read()
-        
+
         plaintext = self.cipher.decrypt(ciphertext)
-        
+
         if output_path:
             with open(output_path, 'wb') as f:
                 f.write(plaintext)
             return output_path
-        
+
         return plaintext
-    
+
     def decrypt_stream(self, encrypted_path: str):
         """Decrypt file as a stream for serving"""
         import io
@@ -308,13 +308,13 @@ class DocumentEncryption:
 class Consumer:
     def _write(self, document, path, ...):
         # ... existing code ...
-        
+
         if settings.ENABLE_DOCUMENT_ENCRYPTION:
             encryption = DocumentEncryption()
             # Encrypt original file
             encrypted_path = encryption.encrypt_file(source_path)
             os.rename(encrypted_path, source_path)
-            
+
             # Encrypt archive file
             if archive_path:
                 encrypted_archive = encryption.encrypt_file(archive_path)
@@ -363,10 +363,10 @@ import time
 
 class RateLimitMiddleware:
     """Rate limit API requests per user/IP"""
-    
+
     def __init__(self, get_response):
         self.get_response = get_response
-    
+
     def __call__(self, request):
         if request.path.startswith('/api/'):
             # Get identifier (user ID or IP)
@@ -374,16 +374,16 @@ class RateLimitMiddleware:
                 identifier = f'user_{request.user.id}'
             else:
                 identifier = f'ip_{self.get_client_ip(request)}'
-            
+
             # Check rate limit
             if not self.check_rate_limit(identifier, request.path):
                 return HttpResponse(
                     'Rate limit exceeded. Please try again later.',
                     status=429
                 )
-        
+
         return self.get_response(request)
-    
+
     def check_rate_limit(self, identifier: str, path: str) -> bool:
         """
         Rate limits:
@@ -397,25 +397,25 @@ class RateLimitMiddleware:
             '/api/upload/': (10, 60),
             'default': (200, 60)
         }
-        
+
         # Find matching rate limit
         limit, window = rate_limits.get('default')
         for pattern, (l, w) in rate_limits.items():
             if path.startswith(pattern):
                 limit, window = l, w
                 break
-        
+
         # Check cache
         cache_key = f'rate_limit_{identifier}_{path}'
         current = cache.get(cache_key, 0)
-        
+
         if current >= limit:
             return False
-        
+
         # Increment counter
         cache.set(cache_key, current + 1, window)
         return True
-    
+
     def get_client_ip(self, request):
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         if x_forwarded_for:
@@ -440,16 +440,16 @@ class RateLimitMiddleware:
 # paperless/middleware.py
 class SecurityHeadersMiddleware:
     """Add security headers to responses"""
-    
+
     def __init__(self, get_response):
         self.get_response = get_response
-    
+
     def __call__(self, request):
         response = self.get_response(request)
-        
+
         # Strict Transport Security
         response['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
-        
+
         # Content Security Policy
         response['Content-Security-Policy'] = (
             "default-src 'self'; "
@@ -460,24 +460,24 @@ class SecurityHeadersMiddleware:
             "connect-src 'self' ws: wss:; "
             "frame-ancestors 'none';"
         )
-        
+
         # X-Frame-Options (prevent clickjacking)
         response['X-Frame-Options'] = 'DENY'
-        
+
         # X-Content-Type-Options
         response['X-Content-Type-Options'] = 'nosniff'
-        
+
         # X-XSS-Protection
         response['X-XSS-Protection'] = '1; mode=block'
-        
+
         # Referrer Policy
         response['Referrer-Policy'] = 'strict-origin-when-cross-origin'
-        
+
         # Permissions Policy
         response['Permissions-Policy'] = (
             'geolocation=(), microphone=(), camera=()'
         )
-        
+
         return response
 ```
 
@@ -503,20 +503,20 @@ from torch.utils.data import Dataset
 
 class DocumentDataset(Dataset):
     """Dataset for document classification"""
-    
+
     def __init__(self, documents, labels, tokenizer, max_length=512):
         self.documents = documents
         self.labels = labels
         self.tokenizer = tokenizer
         self.max_length = max_length
-    
+
     def __len__(self):
         return len(self.documents)
-    
+
     def __getitem__(self, idx):
         doc = self.documents[idx]
         label = self.labels[idx]
-        
+
         encoding = self.tokenizer(
             doc.content,
             truncation=True,
@@ -524,7 +524,7 @@ class DocumentDataset(Dataset):
             max_length=self.max_length,
             return_tensors='pt'
         )
-        
+
         return {
             'input_ids': encoding['input_ids'].flatten(),
             'attention_mask': encoding['attention_mask'].flatten(),
@@ -533,31 +533,31 @@ class DocumentDataset(Dataset):
 
 class TransformerDocumentClassifier:
     """BERT-based document classifier"""
-    
+
     def __init__(self, model_name='distilbert-base-uncased'):
         self.model_name = model_name
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = None
-    
+
     def train(self, documents, labels):
         """Train the classifier"""
         # Prepare dataset
         dataset = DocumentDataset(documents, labels, self.tokenizer)
-        
+
         # Split train/validation
         train_size = int(0.9 * len(dataset))
         val_size = len(dataset) - train_size
         train_dataset, val_dataset = torch.utils.data.random_split(
             dataset, [train_size, val_size]
         )
-        
+
         # Load model
         num_labels = len(set(labels))
         self.model = AutoModelForSequenceClassification.from_pretrained(
             self.model_name,
             num_labels=num_labels
         )
-        
+
         # Training arguments
         training_args = TrainingArguments(
             output_dir='./models/document_classifier',
@@ -572,7 +572,7 @@ class TransformerDocumentClassifier:
             save_strategy='epoch',
             load_best_model_at_end=True,
         )
-        
+
         # Train
         trainer = Trainer(
             model=self.model,
@@ -580,20 +580,20 @@ class TransformerDocumentClassifier:
             train_dataset=train_dataset,
             eval_dataset=val_dataset,
         )
-        
+
         trainer.train()
-        
+
         # Save model
         self.model.save_pretrained('./models/document_classifier_final')
         self.tokenizer.save_pretrained('./models/document_classifier_final')
-    
+
     def predict(self, document_text):
         """Classify a document"""
         if self.model is None:
             self.model = AutoModelForSequenceClassification.from_pretrained(
                 './models/document_classifier_final'
             )
-        
+
         # Tokenize
         inputs = self.tokenizer(
             document_text,
@@ -602,14 +602,14 @@ class TransformerDocumentClassifier:
             max_length=512,
             return_tensors='pt'
         )
-        
+
         # Predict
         with torch.no_grad():
             outputs = self.model(**inputs)
             predictions = torch.nn.functional.softmax(outputs.logits, dim=-1)
             predicted_class = torch.argmax(predictions, dim=-1).item()
             confidence = predictions[0][predicted_class].item()
-        
+
         return predicted_class, confidence
 ```
 
@@ -621,18 +621,18 @@ from transformers import pipeline
 
 class DocumentNER:
     """Extract entities from documents"""
-    
+
     def __init__(self):
         self.ner_pipeline = pipeline(
             "ner",
             model="dslim/bert-base-NER",
             aggregation_strategy="simple"
         )
-    
+
     def extract_entities(self, text):
         """Extract named entities"""
         entities = self.ner_pipeline(text)
-        
+
         # Organize by type
         organized = {
             'persons': [],
@@ -641,7 +641,7 @@ class DocumentNER:
             'dates': [],
             'amounts': []
         }
-        
+
         for entity in entities:
             entity_type = entity['entity_group']
             if entity_type == 'PER':
@@ -651,35 +651,35 @@ class DocumentNER:
             elif entity_type == 'LOC':
                 organized['locations'].append(entity['word'])
             # Add more entity types...
-        
+
         return organized
-    
+
     def extract_invoice_data(self, text):
         """Extract invoice-specific data"""
         # Use regex + NER for better results
         import re
-        
+
         data = {}
-        
+
         # Extract amounts
         amount_pattern = r'\$?\d+[,\d]*\.?\d{0,2}'
         amounts = re.findall(amount_pattern, text)
         data['amounts'] = amounts
-        
+
         # Extract dates
         date_pattern = r'\d{1,2}[/-]\d{1,2}[/-]\d{2,4}'
         dates = re.findall(date_pattern, text)
         data['dates'] = dates
-        
+
         # Extract invoice numbers
         invoice_pattern = r'(?:Invoice|Inv\.?)\s*#?\s*(\d+)'
         invoice_nums = re.findall(invoice_pattern, text, re.IGNORECASE)
         data['invoice_numbers'] = invoice_nums
-        
+
         # Use NER for organization names
         entities = self.extract_entities(text)
         data['organizations'] = entities['organizations']
-        
+
         return data
 ```
 
@@ -692,29 +692,29 @@ import numpy as np
 
 class SemanticSearch:
     """Semantic search using embeddings"""
-    
+
     def __init__(self):
         self.model = SentenceTransformer('all-MiniLM-L6-v2')
         self.document_embeddings = {}
-    
+
     def index_document(self, document_id, text):
         """Create embedding for document"""
         embedding = self.model.encode(text, convert_to_tensor=True)
         self.document_embeddings[document_id] = embedding
-    
+
     def search(self, query, top_k=10):
         """Search documents by semantic similarity"""
         query_embedding = self.model.encode(query, convert_to_tensor=True)
-        
+
         # Calculate similarities
         similarities = []
         for doc_id, doc_embedding in self.document_embeddings.items():
             similarity = util.cos_sim(query_embedding, doc_embedding).item()
             similarities.append((doc_id, similarity))
-        
+
         # Sort by similarity
         similarities.sort(key=lambda x: x[1], reverse=True)
-        
+
         return similarities[:top_k]
 ```
 
@@ -748,57 +748,57 @@ from pdf2image import convert_from_path
 
 class TableExtractor:
     """Extract tables from documents"""
-    
+
     def detect_tables(self, image_path):
         """Detect table regions in image"""
         img = cv2.imread(image_path, 0)
-        
+
         # Thresholding
         thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
-        
+
         # Detect horizontal lines
         horizontal_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (40, 1))
         detect_horizontal = cv2.morphologyEx(
             thresh, cv2.MORPH_OPEN, horizontal_kernel, iterations=2
         )
-        
+
         # Detect vertical lines
         vertical_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 40))
         detect_vertical = cv2.morphologyEx(
             thresh, cv2.MORPH_OPEN, vertical_kernel, iterations=2
         )
-        
+
         # Combine
         table_mask = cv2.add(detect_horizontal, detect_vertical)
-        
+
         # Find contours (table regions)
         contours, _ = cv2.findContours(
             table_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
         )
-        
+
         tables = []
         for contour in contours:
             x, y, w, h = cv2.boundingRect(contour)
             if w > 100 and h > 100:  # Minimum table size
                 tables.append((x, y, w, h))
-        
+
         return tables
-    
+
     def extract_table_data(self, image_path, table_bbox):
         """Extract data from table region"""
         x, y, w, h = table_bbox
-        
+
         # Crop table region
         img = cv2.imread(image_path)
         table_img = img[y:y+h, x:x+w]
-        
+
         # OCR with table structure
         data = pytesseract.image_to_data(
             table_img,
             output_type=pytesseract.Output.DICT,
             config='--psm 6'  # Assume uniform block of text
         )
-        
+
         # Organize into rows and columns
         rows = {}
         for i, text in enumerate(data['text']):
@@ -811,30 +811,30 @@ class TableExtractor:
                     'left': data['left'][i],
                     'confidence': data['conf'][i]
                 })
-        
+
         # Sort columns by X coordinate
         table_data = []
         for row_num in sorted(rows.keys()):
             row = rows[row_num]
             row.sort(key=lambda x: x['left'])
             table_data.append([cell['text'] for cell in row])
-        
+
         return pd.DataFrame(table_data)
-    
+
     def extract_all_tables(self, pdf_path):
         """Extract all tables from PDF"""
         # Convert PDF to images
         images = convert_from_path(pdf_path)
-        
+
         all_tables = []
         for page_num, image in enumerate(images):
             # Save temp image
             temp_path = f'/tmp/page_{page_num}.png'
             image.save(temp_path)
-            
+
             # Detect tables
             tables = self.detect_tables(temp_path)
-            
+
             # Extract each table
             for table_bbox in tables:
                 df = self.extract_table_data(temp_path, table_bbox)
@@ -842,7 +842,7 @@ class TableExtractor:
                     'page': page_num + 1,
                     'data': df
                 })
-        
+
         return all_tables
 ```
 
@@ -865,27 +865,27 @@ import os
 
 class HandwritingRecognizer:
     """OCR for handwritten documents"""
-    
+
     def __init__(self):
         # Use Google Cloud Vision API (best for handwriting)
         self.client = vision.ImageAnnotatorClient()
-    
+
     def recognize_handwriting(self, image_path):
         """Extract handwritten text"""
         with open(image_path, 'rb') as image_file:
             content = image_file.read()
-        
+
         image = vision.Image(content=content)
-        
+
         # Use DOCUMENT_TEXT_DETECTION for handwriting
         response = self.client.document_text_detection(image=image)
-        
+
         if response.error.message:
             raise Exception(f'Error: {response.error.message}')
-        
+
         # Extract text
         full_text = response.full_text_annotation.text
-        
+
         # Extract with confidence scores
         pages = []
         for page in response.full_text_annotation.pages:
@@ -904,7 +904,7 @@ class HandwritingRecognizer:
                         })
                     page_text.append(paragraph_text)
             pages.append(page_text)
-        
+
         return {
             'text': full_text,
             'structured': pages
@@ -947,13 +947,13 @@ export const DocumentScannerScreen = () => {
       letUserAdjustCrop: true,
       croppedImageQuality: 100,
     });
-    
+
     if (scannedImages && scannedImages.length > 0) {
       // Upload to IntelliDocs
       await uploadDocument(scannedImages[0]);
     }
   };
-  
+
   return (
     <View>
       <Button onPress={scanDocument} title="Scan Document" />
@@ -970,7 +970,7 @@ export const DocumentService = {
     const isConnected = await NetInfo.fetch().then(
       state => state.isConnected
     );
-    
+
     if (!isConnected) {
       // Queue for later
       const queue = await AsyncStorage.getItem('upload_queue') || '[]';
@@ -979,7 +979,7 @@ export const DocumentService = {
       await AsyncStorage.setItem('upload_queue', JSON.stringify(queueData));
       return { queued: true };
     }
-    
+
     // Upload immediately
     return await api.uploadDocument(file);
   }
@@ -1005,7 +1005,7 @@ class DocumentComment(models.Model):
     modified = models.DateTimeField(auto_now=True)
     parent = models.ForeignKey('self', null=True, blank=True)  # For replies
     resolved = models.BooleanField(default=False)
-    
+
     # For annotations (comments on specific locations)
     page_number = models.IntegerField(null=True)
     position_x = models.FloatField(null=True)
@@ -1032,10 +1032,10 @@ class DocumentCommentViewSet(viewsets.ModelViewSet):
             position_x=request.data.get('position_x'),
             position_y=request.data.get('position_y'),
         )
-        
+
         # Notify other users
         notify_document_comment(comment)
-        
+
         return Response(CommentSerializer(comment).data)
 ```
 
@@ -1044,11 +1044,11 @@ class DocumentCommentViewSet(viewsets.ModelViewSet):
 // annotation.component.ts
 export class AnnotationComponent {
   annotations: Annotation[] = [];
-  
+
   addHighlight(selection: Selection) {
     const range = selection.getRangeAt(0);
     const rect = range.getBoundingClientRect();
-    
+
     const annotation: Annotation = {
       type: 'highlight',
       pageNumber: this.currentPage,
@@ -1059,13 +1059,13 @@ export class AnnotationComponent {
       color: '#FFFF00',
       text: selection.toString()
     };
-    
+
     this.documentService.addAnnotation(
       this.documentId,
       annotation
     ).subscribe();
   }
-  
+
   renderAnnotations() {
     // Overlay annotations on PDF viewer
     this.annotations.forEach(annotation => {
@@ -1092,14 +1092,14 @@ from googleapiclient.discovery import build
 
 class CloudStorageSync:
     """Sync documents with cloud storage"""
-    
+
     def sync_with_dropbox(self, access_token):
         """Two-way sync with Dropbox"""
         dbx = Dropbox(access_token)
-        
+
         # Get files from Dropbox
         result = dbx.files_list_folder('/IntelliDocs')
-        
+
         for entry in result.entries:
             if entry.name.endswith('.pdf'):
                 # Check if already imported
@@ -1109,7 +1109,7 @@ class CloudStorageSync:
                     # Download and import
                     _, response = dbx.files_download(entry.path_display)
                     self.import_file(response.content, entry.name)
-        
+
         # Upload new documents to Dropbox
         new_docs = Document.objects.filter(
             synced_to_dropbox=False
@@ -1122,20 +1122,20 @@ class CloudStorageSync:
                 )
             doc.synced_to_dropbox = True
             doc.save()
-    
+
     def sync_with_google_drive(self, credentials_path):
         """Sync with Google Drive"""
         credentials = service_account.Credentials.from_service_account_file(
             credentials_path
         )
         service = build('drive', 'v3', credentials=credentials)
-        
+
         # List files in Drive folder
         results = service.files().list(
             q="'folder_id' in parents",
             fields="files(id, name, mimeType)"
         ).execute()
-        
+
         for item in results.get('files', []):
             # Download and import
             request = service.files().get_media(fileId=item['id'])
@@ -1156,13 +1156,13 @@ from datetime import timedelta
 
 class DocumentAnalytics:
     """Generate analytics and reports"""
-    
+
     def get_dashboard_stats(self, user=None):
         """Get overview statistics"""
         queryset = Document.objects.all()
         if user:
             queryset = queryset.filter(owner=user)
-        
+
         stats = {
             'total_documents': queryset.count(),
             'documents_this_month': queryset.filter(
@@ -1175,21 +1175,21 @@ class DocumentAnalytics:
                 Sum('original_size')
             )['original_size__sum'] or 0,
         }
-        
+
         # Documents by type
         stats['by_type'] = queryset.values(
             'document_type__name'
         ).annotate(
             count=Count('id')
         ).order_by('-count')
-        
+
         # Documents by correspondent
         stats['by_correspondent'] = queryset.values(
             'correspondent__name'
         ).annotate(
             count=Count('id')
         ).order_by('-count')[:10]
-        
+
         # Upload trend (last 12 months)
         upload_trend = []
         for i in range(12):
@@ -1203,29 +1203,29 @@ class DocumentAnalytics:
                 'count': count
             })
         stats['upload_trend'] = list(reversed(upload_trend))
-        
+
         return stats
-    
+
     def generate_report(self, report_type, start_date, end_date, filters=None):
         """Generate custom reports"""
         queryset = Document.objects.filter(
             created__gte=start_date,
             created__lte=end_date
         )
-        
+
         if filters:
             if 'correspondent' in filters:
                 queryset = queryset.filter(correspondent_id=filters['correspondent'])
             if 'document_type' in filters:
                 queryset = queryset.filter(document_type_id=filters['document_type'])
-        
+
         if report_type == 'summary':
             return self._generate_summary_report(queryset)
         elif report_type == 'detailed':
             return self._generate_detailed_report(queryset)
         elif report_type == 'compliance':
             return self._generate_compliance_report(queryset)
-    
+
     def export_report(self, report_data, format='pdf'):
         """Export report to PDF/Excel"""
         if format == 'pdf':
@@ -1242,14 +1242,14 @@ class DocumentAnalytics:
 export class AnalyticsDashboardComponent implements OnInit {
   stats: DashboardStats;
   chartOptions: any;
-  
+
   ngOnInit() {
     this.analyticsService.getDashboardStats().subscribe(stats => {
       this.stats = stats;
       this.setupCharts();
     });
   }
-  
+
   setupCharts() {
     // Upload trend chart
     this.chartOptions = {
@@ -1266,7 +1266,7 @@ export class AnalyticsDashboardComponent implements OnInit {
       }
     };
   }
-  
+
   generateReport(type: string) {
     this.analyticsService.generateReport(type, {
       start_date: this.startDate,

@@ -1,6 +1,6 @@
 # GitHub Issues Templates para AI Scanner
 
-Este documento contiene todos los issues que deben crearse para las mejoras del AI Scanner. Cada issue está formateado para ser copiado directamente a GitHub.
+Este documento contiene todos los issues que deben crearse para las mejoras del AI Scanner. Cada issue está formateado para set copiado directamente a GitHub.
 
 ---
 
@@ -37,8 +37,8 @@ Crear suite completa de tests unitarios para `ai_scanner.py`
 - [ ] Todos los tests pasan en CI/CD
 - [ ] Tests incluyen casos edge y errores
 
-**Estimación**: 3-5 días  
-**Prioridad**: 🔴 ALTA  
+**Estimación**: 3-5 días
+**Prioridad**: 🔴 ALTA
 **Épica**: Testing y Calidad de Código
 
 ---
@@ -54,7 +54,7 @@ Crear tests para `ai_deletion_manager.py` y modelo `DeletionRequest`
 **Tareas**:
 - [ ] Tests para `create_deletion_request()` con análisis de impacto
 - [ ] Tests para `_analyze_impact()` con diferentes documentos
-- [ ] Tests para `format_deletion_request_for_user()` con varios escenarios
+- [ ] Tests para `format_deletion_request_for_user()` con various escenarios
 - [ ] Tests para `get_pending_requests()` con filtros
 - [ ] Tests para modelo `DeletionRequest` (approve, reject)
 - [ ] Tests para workflow completo de aprobación/rechazo
@@ -66,12 +66,12 @@ Crear tests para `ai_deletion_manager.py` y modelo `DeletionRequest`
 - `src/documents/tests/test_deletion_request_model.py`
 
 **Criterios de Aceptación**:
-- [ ] Cobertura >95% para componentes críticos de seguridad
+- [ ] Cobertura >95% para components críticos de seguridad
 - [ ] Tests verifican constraints de seguridad
 - [ ] Tests pasan en CI/CD
 
-**Estimación**: 2-3 días  
-**Prioridad**: 🔴 ALTA  
+**Estimación**: 2-3 días
+**Prioridad**: 🔴 ALTA
 **Épica**: Testing y Calidad de Código
 
 ---
@@ -99,11 +99,11 @@ Tests de integración para `_run_ai_scanner()` en pipeline de consumo
 **Criterios de Aceptación**:
 - [ ] Pipeline completo testeado end-to-end
 - [ ] Graceful degradation verificado
-- [ ] Performance aceptable (<2s adicionales por documento)
+- [ ] Performance acceptable (<2s adicionales por documento)
 
-**Estimación**: 2-3 días  
-**Prioridad**: 🔴 ALTA  
-**Dependencias**: Issue 1.1  
+**Estimación**: 2-3 días
+**Prioridad**: 🔴 ALTA
+**Dependencias**: Issue 1.1
 **Épica**: Testing y Calidad de Código
 
 ---
@@ -134,8 +134,8 @@ Ejecutar y corregir linters en código nuevo del AI Scanner
 - [ ] Código pasa pre-commit hooks
 - [ ] Type hints completos
 
-**Estimación**: 1 día  
-**Prioridad**: 🟡 MEDIA  
+**Estimación**: 1 día
+**Prioridad**: 🟡 MEDIA
 **Épica**: Testing y Calidad de Código
 
 ---
@@ -164,11 +164,11 @@ Crear migración Django para modelo `DeletionRequest`
 **Criterios de Aceptación**:
 - [ ] Migración se ejecuta sin errores
 - [ ] Índices creados correctamente
-- [ ] Backward compatible si posible
+- [ ] Backward compatible si possible
 
-**Estimación**: 1 día  
-**Prioridad**: 🔴 ALTA  
-**Dependencias**: Issue 1.2  
+**Estimación**: 1 día
+**Prioridad**: 🔴 ALTA
+**Dependencias**: Issue 1.2
 **Épica**: Migraciones de Base de Datos
 
 ---
@@ -195,9 +195,9 @@ Optimizar índices de base de datos para queries frecuentes
 - [ ] Queries de listado <100ms
 - [ ] Queries de filtrado <50ms
 
-**Estimación**: 0.5 días  
-**Prioridad**: 🟡 MEDIA  
-**Dependencias**: Issue 2.1  
+**Estimación**: 0.5 días
+**Prioridad**: 🟡 MEDIA
+**Dependencias**: Issue 2.1
 **Épica**: Migraciones de Base de Datos
 
 ---
@@ -231,9 +231,9 @@ Crear endpoints REST para gestión de deletion requests (listado y detalle)
 - [ ] Tests de API incluidos
 - [ ] Permisos verificados (solo requests propios o admin)
 
-**Estimación**: 2-3 días  
-**Prioridad**: 🔴 ALTA  
-**Dependencias**: Issue 2.1  
+**Estimación**: 2-3 días
+**Prioridad**: 🔴 ALTA
+**Dependencias**: Issue 2.1
 **Épica**: API REST Endpoints
 
 ---
@@ -251,7 +251,7 @@ Endpoints para aprobar/rechazar deletion requests
 - [ ] Endpoint POST `/api/deletion-requests/{id}/reject/`
 - [ ] Endpoint POST `/api/deletion-requests/{id}/cancel/`
 - [ ] Validación de permisos (solo owner o admin)
-- [ ] Validación de estado (solo pending puede ser aprobado/rechazado)
+- [ ] Validación de estado (solo pending puede set aprobado/rechazado)
 - [ ] Respuesta con resultado de ejecución si aprobado
 - [ ] Notificaciones async si configurado
 
@@ -260,13 +260,13 @@ Endpoints para aprobar/rechazar deletion requests
 - Actualizar `src/documents/urls.py`
 
 **Criterios de Aceptación**:
-- [ ] Workflow completo funcional via API
+- [ ] Workflow completo functional via API
 - [ ] Validaciones de estado y permisos
 - [ ] Tests de API incluidos
 
-**Estimación**: 2 días  
-**Prioridad**: 🔴 ALTA  
-**Dependencias**: Issue 3.1  
+**Estimación**: 2 días
+**Prioridad**: 🔴 ALTA
+**Dependencias**: Issue 3.1
 **Épica**: API REST Endpoints
 
 ---
@@ -296,8 +296,8 @@ Exponer sugerencias de AI via API para frontend
 - [ ] Tracking de user feedback
 - [ ] API documentada
 
-**Estimación**: 2-3 días  
-**Prioridad**: 🟡 MEDIA  
+**Estimación**: 2-3 días
+**Prioridad**: 🟡 MEDIA
 **Épica**: API REST Endpoints
 
 ---
@@ -327,9 +327,9 @@ Sistema de webhooks para notificar eventos de AI
 - [ ] Retry logic robusto
 - [ ] Eventos documentados
 
-**Estimación**: 2 días  
-**Prioridad**: 🟢 BAJA  
-**Dependencias**: Issues 3.1, 3.3  
+**Estimación**: 2 días
+**Prioridad**: 🟢 BAJA
+**Dependencias**: Issues 3.1, 3.3
 **Épica**: API REST Endpoints
 
 ---
@@ -362,9 +362,9 @@ Mostrar sugerencias de AI en página de detalle de documento
 - [ ] Mobile responsive
 - [ ] Tests de componente incluidos
 
-**Estimación**: 3-4 días  
-**Prioridad**: 🔴 ALTA  
-**Dependencias**: Issue 3.3  
+**Estimación**: 3-4 días
+**Prioridad**: 🔴 ALTA
+**Dependencias**: Issue 3.3
 **Épica**: Integración Frontend
 
 ---
@@ -384,7 +384,7 @@ Dashboard para gestionar deletion requests
 - [ ] Modal de confirmación para aprobar/rechazar
 - [ ] Mostrar análisis de impacto de forma clara
 - [ ] Badge de notificación para pending requests
-- [ ] Historial de requests completados
+- [ ] Historical de requests completados
 
 **Archivos a Crear**:
 - `src-ui/src/app/components/deletion-requests/`
@@ -393,11 +393,11 @@ Dashboard para gestionar deletion requests
 **Criterios de Aceptación**:
 - [ ] Usuario puede revisar y aprobar/rechazar requests
 - [ ] Análisis de impacto claro y comprensible
-- [ ] Notificaciones visuales
+- [ ] Notificaciones visuals
 
-**Estimación**: 3-4 días  
-**Prioridad**: 🔴 ALTA  
-**Dependencias**: Issues 3.1, 3.2  
+**Estimación**: 3-4 días
+**Prioridad**: 🔴 ALTA
+**Dependencias**: Issues 3.1, 3.2
 **Épica**: Integración Frontend
 
 ---
@@ -425,8 +425,8 @@ Indicador global de estado de AI en UI
 - [ ] Estado de AI siempre visible
 - [ ] Notificaciones no intrusivas
 
-**Estimación**: 1-2 días  
-**Prioridad**: 🟡 MEDIA  
+**Estimación**: 1-2 días
+**Prioridad**: 🟡 MEDIA
 **Épica**: Integración Frontend
 
 ---
@@ -456,8 +456,8 @@ Página de configuración para features de AI
 - [ ] Cambios se reflejan inmediatamente
 - [ ] Validación de valores
 
-**Estimación**: 2-3 días  
-**Prioridad**: 🟡 MEDIA  
+**Estimación**: 2-3 días
+**Prioridad**: 🟡 MEDIA
 **Épica**: Integración Frontend
 
 ---

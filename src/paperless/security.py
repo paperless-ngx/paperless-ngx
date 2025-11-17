@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import hashlib
 import logging
-import mimetypes
 import os
 import re
 from pathlib import Path
@@ -26,39 +25,42 @@ logger = logging.getLogger("paperless.security")
 # Lista explícita de tipos MIME permitidos
 ALLOWED_MIME_TYPES = {
     # Documentos
-    'application/pdf',
-    'application/vnd.oasis.opendocument.text',
-    'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'application/vnd.ms-excel',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'application/vnd.ms-powerpoint',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-    'application/vnd.oasis.opendocument.spreadsheet',
-    'application/vnd.oasis.opendocument.presentation',
-    'application/rtf',
-    'text/rtf',
-
+    "application/pdf",
+    "application/vnd.oasis.opendocument.text",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-powerpoint",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    "application/vnd.oasis.opendocument.spreadsheet",
+    "application/vnd.oasis.opendocument.presentation",
+    "application/rtf",
+    "text/rtf",
     # Imágenes
-    'image/jpeg',
-    'image/png',
-    'image/gif',
-    'image/tiff',
-    'image/bmp',
-    'image/webp',
-
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "image/tiff",
+    "image/bmp",
+    "image/webp",
     # Texto
-    'text/plain',
-    'text/html',
-    'text/csv',
-    'text/markdown',
+    "text/plain",
+    "text/html",
+    "text/csv",
+    "text/markdown",
 }
 
 # Maximum file size (100MB by default)
 # Can be overridden by settings.MAX_UPLOAD_SIZE
 try:
     from django.conf import settings
-    MAX_FILE_SIZE = getattr(settings, 'MAX_UPLOAD_SIZE', 100 * 1024 * 1024)  # 100MB por defecto
+
+    MAX_FILE_SIZE = getattr(
+        settings,
+        "MAX_UPLOAD_SIZE",
+        100 * 1024 * 1024,
+    )  # 100MB por defecto
 except ImportError:
     MAX_FILE_SIZE = 100 * 1024 * 1024  # 100MB in bytes
 
@@ -86,7 +88,6 @@ MALICIOUS_PATTERNS = [
     # Nota: No usar rb"/JavaScript" directamente - demasiado amplio
     rb"/Launch",  # Launch actions son peligrosas
     rb"/OpenAction(?!.*?/AcroForm)",  # OpenAction sin formularios
-
     # Código ejecutable embebido (archivo)
     rb"/EmbeddedFile.*?\.exe",
     rb"/EmbeddedFile.*?\.bat",
@@ -94,11 +95,9 @@ MALICIOUS_PATTERNS = [
     rb"/EmbeddedFile.*?\.sh",
     rb"/EmbeddedFile.*?\.vbs",
     rb"/EmbeddedFile.*?\.ps1",
-
     # Ejecutables (headers de binarios)
     rb"MZ\x90\x00",  # PE executable header (Windows)
     rb"\x7fELF",  # ELF executable header (Linux)
-
     # SubmitForm a dominios externos no confiables
     rb"/SubmitForm.*?https?://(?!localhost|127\.0\.0\.1|trusted-domain\.com)",
 ]
@@ -113,8 +112,6 @@ ALLOWED_JS_PATTERNS = [
 
 class FileValidationError(Exception):
     """Raised when file validation fails."""
-
-    pass
 
 
 def has_whitelisted_javascript(content: bytes) -> bool:
@@ -143,26 +140,26 @@ def validate_mime_type(mime_type: str) -> None:
     if mime_type not in ALLOWED_MIME_TYPES:
         raise FileValidationError(
             f"MIME type '{mime_type}' is not allowed. "
-            f"Allowed types: {', '.join(sorted(ALLOWED_MIME_TYPES))}"
+            f"Allowed types: {', '.join(sorted(ALLOWED_MIME_TYPES))}",
         )
 
 
 def validate_uploaded_file(uploaded_file: UploadedFile) -> dict:
     """
     Validate an uploaded file for security.
-    
+
     Performs multiple checks:
     1. File size validation
     2. MIME type validation
     3. File extension validation
     4. Content validation (checks for malicious patterns)
-    
+
     Args:
         uploaded_file: Django UploadedFile object
-        
+
     Returns:
         dict: Validation result with 'valid' boolean and 'mime_type'
-        
+
     Raises:
         FileValidationError: If validation fails
     """
@@ -209,13 +206,13 @@ def validate_uploaded_file(uploaded_file: UploadedFile) -> dict:
 def validate_file_path(file_path: str | Path) -> dict:
     """
     Validate a file on disk for security.
-    
+
     Args:
         file_path: Path to the file
-        
+
     Returns:
         dict: Validation result
-        
+
     Raises:
         FileValidationError: If validation fails
     """

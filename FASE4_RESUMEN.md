@@ -235,12 +235,12 @@ from documents.ocr import TableExtractor
 extractor = TableExtractor()
 tablas = extractor.extract_tables_from_image("factura.pdf")
 
-# Primera tabla suele ser líneas de items
+# Primera tabla suele set líneas de items
 if tablas:
     items = tablas[0]['data']
     print("Artículos:")
     print(items)
-    
+
     # Calcular total
     if 'Monto' in items.columns:
         total = items['Monto'].sum()
@@ -286,19 +286,19 @@ from documents.ocr import TableExtractor, HandwritingRecognizer, FormFieldDetect
 
 def digitalizar_documento(ruta_imagen):
     """Pipeline completo de digitalización."""
-    
+
     # Extraer tablas
     extractor_tablas = TableExtractor()
     tablas = extractor_tablas.extract_tables_from_image(ruta_imagen)
-    
+
     # Extraer notas manuscritas
     reconocedor = HandwritingRecognizer()
     notas = reconocedor.recognize_from_file(ruta_imagen, mode='lines')
-    
+
     # Extraer campos de formulario
     detector = FormFieldDetector()
     datos_formulario = detector.extract_form_data(ruta_imagen)
-    
+
     return {
         'tablas': tablas,
         'notas_manuscritas': notas,

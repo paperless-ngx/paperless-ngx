@@ -20,23 +20,23 @@ This document details the first phase of performance optimizations implemented f
 1. **Correspondent + Created Date** (`doc_corr_created_idx`)
    - Optimizes: "Show me all documents from this correspondent sorted by date"
    - Use case: Viewing documents by sender/receiver
-   
+
 2. **Document Type + Created Date** (`doc_type_created_idx`)
    - Optimizes: "Show me all invoices/receipts sorted by date"
    - Use case: Viewing documents by category
-   
+
 3. **Owner + Created Date** (`doc_owner_created_idx`)
    - Optimizes: "Show me all my documents sorted by date"
    - Use case: Multi-user environments, personal document views
-   
+
 4. **Storage Path + Created Date** (`doc_storage_created_idx`)
    - Optimizes: "Show me all documents in this storage location sorted by date"
    - Use case: Organized filing by location
-   
+
 5. **Modified Date Descending** (`doc_modified_desc_idx`)
    - Optimizes: "Show me recently modified documents"
    - Use case: "What changed recently?" queries
-   
+
 6. **Document-Tags Junction Table** (`doc_tags_document_idx`)
    - Optimizes: Tag filtering performance
    - Use case: "Show me all documents with these tags"
@@ -224,8 +224,8 @@ else:
 **Before** (no index):
 ```sql
 -- Slow: Sequential scan through all documents
-SELECT * FROM documents_document 
-WHERE correspondent_id = 5 
+SELECT * FROM documents_document
+WHERE correspondent_id = 5
 ORDER BY created DESC;
 -- Time: ~200ms for 10k docs
 ```
@@ -233,8 +233,8 @@ ORDER BY created DESC;
 **After** (with index):
 ```sql
 -- Fast: Index scan using doc_corr_created_idx
-SELECT * FROM documents_document 
-WHERE correspondent_id = 5 
+SELECT * FROM documents_document
+WHERE correspondent_id = 5
 ORDER BY created DESC;
 -- Time: ~20ms for 10k docs (10x faster!)
 ```
@@ -292,7 +292,7 @@ Check if indexes are being used:
 
 ```sql
 -- PostgreSQL: Check index usage
-SELECT 
+SELECT
     schemaname,
     tablename,
     indexname,

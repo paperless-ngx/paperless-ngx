@@ -358,8 +358,8 @@
     <li [ngbNavItem]="SettingsNavIDs.AI">
       <a ngbNavLink i18n>AI Configuration</a>
       <ng-template ngbNavContent>
-        <pngx-ai-settings 
-          [settingsForm]="settingsForm" 
+        <pngx-ai-settings
+          [settingsForm]="settingsForm"
           [isDirty$]="isDirty$"
           (settingsChanged)="settingsForm.markAsDirty()">
         </pngx-ai-settings>

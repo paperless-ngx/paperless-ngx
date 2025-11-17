@@ -1,8 +1,8 @@
 # 🚀 Quick Start: Implementando el Roadmap 2026
 
-**Documento:** Guía rápida para comenzar la implementación del ROADMAP_2026  
-**Fecha:** 2025-11-09  
-**Autoridad:** Siguiendo directivas de `agents.md`  
+**Documento:** Guía rápida para comenzar la implementación del ROADMAP_2026
+**Fecha:** 2025-11-09
+**Autoridad:** Siguiendo directivas de `agents.md`
 **Audiencia:** Director (@dawnsystem) y equipo de desarrollo
 
 ---
@@ -26,7 +26,7 @@ Tienes 3 documentos principales creados:
    - Resumen Ejecutivo
    - Vista General por Trimestre
    - EPIC 1-4 (Q1 2026 - Prioridad CRÍTICA)
-   
+
 2. Decisión: ¿Aprobar el roadmap? → SI/NO/AJUSTAR
 ```
 
@@ -113,7 +113,7 @@ Usa un archivo `PROGRESS.md` en el repo:
 **Ventajas:**
 - ✅ Súper simple
 - ✅ Versionado en Git
-- ✅ No requiere herramientas externas
+- ✅ No require herramientas externas
 
 **Desventajas:**
 - ⚠️ No tan visual
@@ -263,7 +263,7 @@ Cada tarea completada es un logro:
 4. Si no: añadir al backlog con prioridad
 
 ### ...un Epic parece inviable
-1. Analizar qué lo hace inviable
+1. Analizar qué lo have inviable
 2. Proponer alternativas
 3. Discutir con director
 4. Ajustar roadmap (es un documento vivo)
@@ -415,8 +415,8 @@ git push origin feature/tsk-2601-tests-classifier
 
 ## 📞 Soporte
 
-**Director del Proyecto:** @dawnsystem  
-**Documentación:** Ver carpeta `/docs` en el repo  
+**Director del Proyecto:** @dawnsystem
+**Documentación:** Ver carpeta `/docs` en el repo
 **Issues:** https://github.com/dawnsystem/IntelliDocs-ngx/issues
 
 ---
@@ -427,6 +427,6 @@ git push origin feature/tsk-2601-tests-classifier
 
 ---
 
-**Última actualización:** 2025-11-09  
-**Versión:** 1.0  
+**Última actualización:** 2025-11-09
+**Versión:** 1.0
 **Siguiente revisión:** 2026-01-01

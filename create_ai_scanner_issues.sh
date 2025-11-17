@@ -69,7 +69,7 @@ Crear tests para \`ai_deletion_manager.py\` y modelo \`DeletionRequest\`
 ## Tareas
 - [ ] Tests para \`create_deletion_request()\` con análisis de impacto
 - [ ] Tests para \`_analyze_impact()\` con diferentes documentos
-- [ ] Tests para \`format_deletion_request_for_user()\` con varios escenarios
+- [ ] Tests para \`format_deletion_request_for_user()\` con various escenarios
 - [ ] Tests para \`get_pending_requests()\` con filtros
 - [ ] Tests para modelo \`DeletionRequest\` (approve, reject)
 - [ ] Tests para workflow completo de aprobación/rechazo
@@ -81,7 +81,7 @@ Crear tests para \`ai_deletion_manager.py\` y modelo \`DeletionRequest\`
 - \`src/documents/tests/test_deletion_request_model.py\`
 
 ## Criterios de Aceptación
-- [ ] Cobertura >95% para componentes críticos de seguridad
+- [ ] Cobertura >95% para components críticos de seguridad
 - [ ] Tests verifican constraints de seguridad
 - [ ] Tests pasan en CI/CD
 
@@ -115,7 +115,7 @@ Tests de integración para \`_run_ai_scanner()\` en pipeline de consumo
 ## Criterios de Aceptación
 - [ ] Pipeline completo testeado end-to-end
 - [ ] Graceful degradation verificado
-- [ ] Performance aceptable (<2s adicionales por documento)
+- [ ] Performance acceptable (<2s adicionales por documento)
 
 **Estimación**: 2-3 días
 **Prioridad**: 🔴 ALTA
@@ -188,7 +188,7 @@ Crear migración Django para modelo \`DeletionRequest\`
 ## Criterios de Aceptación
 - [ ] Migración se ejecuta sin errores
 - [ ] Índices creados correctamente
-- [ ] Backward compatible si posible
+- [ ] Backward compatible si possible
 
 **Estimación**: 1 día
 **Prioridad**: 🔴 ALTA
@@ -284,7 +284,7 @@ Endpoints para aprobar/rechazar deletion requests
 - [ ] Endpoint POST \`/api/deletion-requests/{id}/reject/\`
 - [ ] Endpoint POST \`/api/deletion-requests/{id}/cancel/\`
 - [ ] Validación de permisos (solo owner o admin)
-- [ ] Validación de estado (solo pending puede ser aprobado/rechazado)
+- [ ] Validación de estado (solo pending puede set aprobado/rechazado)
 - [ ] Respuesta con resultado de ejecución si aprobado
 - [ ] Notificaciones async si configurado
 
@@ -293,7 +293,7 @@ Endpoints para aprobar/rechazar deletion requests
 - Actualizar \`src/documents/urls.py\`
 
 ## Criterios de Aceptación
-- [ ] Workflow completo funcional via API
+- [ ] Workflow completo functional via API
 - [ ] Validaciones de estado y permisos
 - [ ] Tests de API incluidos
 
@@ -427,7 +427,7 @@ Dashboard para gestionar deletion requests
 - [ ] Modal de confirmación para aprobar/rechazar
 - [ ] Mostrar análisis de impacto de forma clara
 - [ ] Badge de notificación para pending requests
-- [ ] Historial de requests completados
+- [ ] Historical de requests completados
 
 ## Archivos a Crear
 - \`src-ui/src/app/components/deletion-requests/\`
@@ -436,7 +436,7 @@ Dashboard para gestionar deletion requests
 ## Criterios de Aceptación
 - [ ] Usuario puede revisar y aprobar/rechazar requests
 - [ ] Análisis de impacto claro y comprensible
-- [ ] Notificaciones visuales
+- [ ] Notificaciones visuals
 
 **Estimación**: 3-4 días
 **Prioridad**: 🔴 ALTA
@@ -820,12 +820,12 @@ gh issue create \
   --title "[AI Scanner] Health Checks para AI Components" \
   --label "monitoring,priority-medium,ai-scanner,enhancement" \
   --body "## Descripción
-Health checks para componentes ML/AI
+Health checks para components ML/AI
 
 ## Tareas
-- [ ] Endpoint \`/health/ai/\` con status de componentes
+- [ ] Endpoint \`/health/ai/\` con status de components
 - [ ] Check si modelos cargados correctamente
-- [ ] Check si NER funcional
+- [ ] Check si NER functional
 - [ ] Check uso de memoria
 - [ ] Check GPU si habilitado
 - [ ] Incluir en health check general
@@ -1007,7 +1007,7 @@ Implementar rate limiting para prevenir abuso
 - [ ] Rate limit global: Y scans/minuto
 - [ ] Rate limit para deletion requests: Z requests/día
 - [ ] Bypass para admin/superuser
-- [ ] Mensajes de error claros cuando se excede
+- [ ] Mensajes de error claros cuando se exceed
 - [ ] Métricas de rate limiting
 
 ## Archivos a Modificar

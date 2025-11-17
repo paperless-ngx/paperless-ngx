@@ -1,15 +1,16 @@
 # Generated manually for DeletionRequest model
 # Based on model definition in documents/models.py
 
-from django.conf import settings
-from django.db import migrations, models
 import django.db.models.deletion
+from django.conf import settings
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
     """
     Add DeletionRequest model for AI-initiated deletion requests.
-    
+
     This model tracks deletion requests that require user approval,
     implementing the safety requirement from agents.md to ensure
     no documents are deleted without explicit user consent.
@@ -48,7 +49,7 @@ class Migration(migrations.Migration):
                 (
                     "ai_reason",
                     models.TextField(
-                        help_text="Detailed explanation from AI about why deletion is recommended"
+                        help_text="Detailed explanation from AI about why deletion is recommended",
                     ),
                 ),
                 (

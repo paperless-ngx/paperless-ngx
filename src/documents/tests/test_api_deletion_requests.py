@@ -11,17 +11,14 @@ Tests cover:
 """
 
 from django.contrib.auth.models import User
-from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from documents.models import (
-    Correspondent,
-    DeletionRequest,
-    Document,
-    DocumentType,
-    Tag,
-)
+from documents.models import Correspondent
+from documents.models import DeletionRequest
+from documents.models import Document
+from documents.models import DocumentType
+from documents.models import Tag
 
 
 class TestDeletionRequestAPI(APITestCase):
@@ -32,8 +29,11 @@ class TestDeletionRequestAPI(APITestCase):
         # Create users
         self.user1 = User.objects.create_user(username="user1", password="pass123")
         self.user2 = User.objects.create_user(username="user2", password="pass123")
-        self.admin = User.objects.create_superuser(username="admin", password="admin123")
-        
+        self.admin = User.objects.create_superuser(
+            username="admin",
+            password="admin123",
+        )
+
         # Create test documents
         self.doc1 = Document.objects.create(
             title="Test Document 1",
@@ -53,7 +53,7 @@ class TestDeletionRequestAPI(APITestCase):
             checksum="checksum3",
             mime_type="application/pdf",
         )
-        
+
         # Create deletion requests
         self.request1 = DeletionRequest.objects.create(
             requested_by_ai=True,
@@ -63,7 +63,7 @@ class TestDeletionRequestAPI(APITestCase):
             impact_summary={"document_count": 1},
         )
         self.request1.documents.add(self.doc1)
-        
+
         self.request2 = DeletionRequest.objects.create(
             requested_by_ai=True,
             ai_reason="Low quality document",
@@ -77,7 +77,7 @@ class TestDeletionRequestAPI(APITestCase):
         """Test that users can list their own deletion requests."""
         self.client.force_authenticate(user=self.user1)
         response = self.client.get("/api/deletion-requests/")
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["id"], self.request1.id)
@@ -86,7 +86,7 @@ class TestDeletionRequestAPI(APITestCase):
         """Test that admin can list all deletion requests."""
         self.client.force_authenticate(user=self.admin)
         response = self.client.get("/api/deletion-requests/")
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 2)
 
@@ -94,7 +94,7 @@ class TestDeletionRequestAPI(APITestCase):
         """Test retrieving a single deletion request."""
         self.client.force_authenticate(user=self.user1)
         response = self.client.get(f"/api/deletion-requests/{self.request1.id}/")
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["id"], self.request1.id)
         self.assertEqual(response.data["ai_reason"], "Duplicate document detected")
@@ -104,23 +104,23 @@ class TestDeletionRequestAPI(APITestCase):
     def test_approve_deletion_request_as_owner(self):
         """Test approving a deletion request as the owner."""
         self.client.force_authenticate(user=self.user1)
-        
+
         # Verify document exists
         self.assertTrue(Document.objects.filter(id=self.doc1.id).exists())
-        
+
         response = self.client.post(
             f"/api/deletion-requests/{self.request1.id}/approve/",
             {"comment": "Approved by owner"},
         )
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("message", response.data)
         self.assertIn("execution_result", response.data)
         self.assertEqual(response.data["execution_result"]["deleted_count"], 1)
-        
+
         # Verify document was deleted
         self.assertFalse(Document.objects.filter(id=self.doc1.id).exists())
-        
+
         # Verify deletion request was updated
         self.request1.refresh_from_db()
         self.assertEqual(self.request1.status, DeletionRequest.STATUS_COMPLETED)
@@ -131,18 +131,18 @@ class TestDeletionRequestAPI(APITestCase):
     def test_approve_deletion_request_as_admin(self):
         """Test approving a deletion request as admin."""
         self.client.force_authenticate(user=self.admin)
-        
+
         response = self.client.post(
             f"/api/deletion-requests/{self.request2.id}/approve/",
             {"comment": "Approved by admin"},
         )
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("execution_result", response.data)
-        
+
         # Verify document was deleted
         self.assertFalse(Document.objects.filter(id=self.doc2.id).exists())
-        
+
         # Verify deletion request was updated
         self.request2.refresh_from_db()
         self.assertEqual(self.request2.status, DeletionRequest.STATUS_COMPLETED)
@@ -151,16 +151,16 @@ class TestDeletionRequestAPI(APITestCase):
     def test_approve_deletion_request_without_permission(self):
         """Test that non-owners cannot approve deletion requests."""
         self.client.force_authenticate(user=self.user2)
-        
+
         response = self.client.post(
             f"/api/deletion-requests/{self.request1.id}/approve/",
         )
-        
+
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        
+
         # Verify document was NOT deleted
         self.assertTrue(Document.objects.filter(id=self.doc1.id).exists())
-        
+
         # Verify deletion request was NOT updated
         self.request1.refresh_from_db()
         self.assertEqual(self.request1.status, DeletionRequest.STATUS_PENDING)
@@ -169,13 +169,13 @@ class TestDeletionRequestAPI(APITestCase):
         """Test that already approved requests cannot be approved again."""
         self.request1.status = DeletionRequest.STATUS_APPROVED
         self.request1.save()
-        
+
         self.client.force_authenticate(user=self.user1)
-        
+
         response = self.client.post(
             f"/api/deletion-requests/{self.request1.id}/approve/",
         )
-        
+
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("error", response.data)
         self.assertIn("pending", response.data["error"].lower())
@@ -183,18 +183,18 @@ class TestDeletionRequestAPI(APITestCase):
     def test_reject_deletion_request_as_owner(self):
         """Test rejecting a deletion request as the owner."""
         self.client.force_authenticate(user=self.user1)
-        
+
         response = self.client.post(
             f"/api/deletion-requests/{self.request1.id}/reject/",
             {"comment": "Not needed"},
         )
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("message", response.data)
-        
+
         # Verify document was NOT deleted
         self.assertTrue(Document.objects.filter(id=self.doc1.id).exists())
-        
+
         # Verify deletion request was updated
         self.request1.refresh_from_db()
         self.assertEqual(self.request1.status, DeletionRequest.STATUS_REJECTED)
@@ -205,16 +205,16 @@ class TestDeletionRequestAPI(APITestCase):
     def test_reject_deletion_request_as_admin(self):
         """Test rejecting a deletion request as admin."""
         self.client.force_authenticate(user=self.admin)
-        
+
         response = self.client.post(
             f"/api/deletion-requests/{self.request2.id}/reject/",
         )
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         # Verify document was NOT deleted
         self.assertTrue(Document.objects.filter(id=self.doc2.id).exists())
-        
+
         # Verify deletion request was updated
         self.request2.refresh_from_db()
         self.assertEqual(self.request2.status, DeletionRequest.STATUS_REJECTED)
@@ -223,13 +223,13 @@ class TestDeletionRequestAPI(APITestCase):
     def test_reject_deletion_request_without_permission(self):
         """Test that non-owners cannot reject deletion requests."""
         self.client.force_authenticate(user=self.user2)
-        
+
         response = self.client.post(
             f"/api/deletion-requests/{self.request1.id}/reject/",
         )
-        
+
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        
+
         # Verify deletion request was NOT updated
         self.request1.refresh_from_db()
         self.assertEqual(self.request1.status, DeletionRequest.STATUS_PENDING)
@@ -238,31 +238,31 @@ class TestDeletionRequestAPI(APITestCase):
         """Test that already rejected requests cannot be rejected again."""
         self.request1.status = DeletionRequest.STATUS_REJECTED
         self.request1.save()
-        
+
         self.client.force_authenticate(user=self.user1)
-        
+
         response = self.client.post(
             f"/api/deletion-requests/{self.request1.id}/reject/",
         )
-        
+
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("error", response.data)
 
     def test_cancel_deletion_request_as_owner(self):
         """Test canceling a deletion request as the owner."""
         self.client.force_authenticate(user=self.user1)
-        
+
         response = self.client.post(
             f"/api/deletion-requests/{self.request1.id}/cancel/",
             {"comment": "Changed my mind"},
         )
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("message", response.data)
-        
+
         # Verify document was NOT deleted
         self.assertTrue(Document.objects.filter(id=self.doc1.id).exists())
-        
+
         # Verify deletion request was updated
         self.request1.refresh_from_db()
         self.assertEqual(self.request1.status, DeletionRequest.STATUS_CANCELLED)
@@ -273,13 +273,13 @@ class TestDeletionRequestAPI(APITestCase):
     def test_cancel_deletion_request_without_permission(self):
         """Test that non-owners cannot cancel deletion requests."""
         self.client.force_authenticate(user=self.user2)
-        
+
         response = self.client.post(
             f"/api/deletion-requests/{self.request1.id}/cancel/",
         )
-        
+
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        
+
         # Verify deletion request was NOT updated
         self.request1.refresh_from_db()
         self.assertEqual(self.request1.status, DeletionRequest.STATUS_PENDING)
@@ -288,13 +288,13 @@ class TestDeletionRequestAPI(APITestCase):
         """Test that approved requests cannot be cancelled."""
         self.request1.status = DeletionRequest.STATUS_APPROVED
         self.request1.save()
-        
+
         self.client.force_authenticate(user=self.user1)
-        
+
         response = self.client.post(
             f"/api/deletion-requests/{self.request1.id}/cancel/",
         )
-        
+
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("error", response.data)
 
@@ -309,17 +309,17 @@ class TestDeletionRequestAPI(APITestCase):
             impact_summary={"document_count": 2},
         )
         multi_request.documents.add(self.doc1, self.doc3)
-        
+
         self.client.force_authenticate(user=self.user1)
-        
+
         response = self.client.post(
             f"/api/deletion-requests/{multi_request.id}/approve/",
         )
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["execution_result"]["deleted_count"], 2)
         self.assertEqual(response.data["execution_result"]["total_documents"], 2)
-        
+
         # Verify both documents were deleted
         self.assertFalse(Document.objects.filter(id=self.doc1.id).exists())
         self.assertFalse(Document.objects.filter(id=self.doc3.id).exists())
@@ -330,15 +330,15 @@ class TestDeletionRequestAPI(APITestCase):
         tag = Tag.objects.create(name="test-tag")
         correspondent = Correspondent.objects.create(name="Test Corp")
         doc_type = DocumentType.objects.create(name="Invoice")
-        
+
         self.doc1.tags.add(tag)
         self.doc1.correspondent = correspondent
         self.doc1.document_type = doc_type
         self.doc1.save()
-        
+
         self.client.force_authenticate(user=self.user1)
         response = self.client.get(f"/api/deletion-requests/{self.request1.id}/")
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         doc_details = response.data["document_details"]
         self.assertEqual(len(doc_details), 1)
@@ -352,7 +352,7 @@ class TestDeletionRequestAPI(APITestCase):
         """Test that unauthenticated users cannot access the API."""
         response = self.client.get("/api/deletion-requests/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        
+
         response = self.client.post(
             f"/api/deletion-requests/{self.request1.id}/approve/",
         )

@@ -23,8 +23,7 @@ class TestMLDependenciesAvailable:
         import torch
 
         assert version.parse(torch.__version__) >= version.parse("2.0.0"), (
-            f"PyTorch version {torch.__version__} is too old. "
-            f"Minimum required: 2.0.0"
+            f"PyTorch version {torch.__version__} is too old. Minimum required: 2.0.0"
         )
 
     def test_transformers_available(self):
@@ -41,8 +40,7 @@ class TestMLDependenciesAvailable:
         import cv2
 
         assert version.parse(cv2.__version__) >= version.parse("4.8.0"), (
-            f"OpenCV version {cv2.__version__} is too old. "
-            f"Minimum required: 4.8.0"
+            f"OpenCV version {cv2.__version__} is too old. Minimum required: 4.8.0"
         )
 
     def test_sentence_transformers_available(self):
@@ -65,8 +63,7 @@ class TestMLDependenciesAvailable:
         import numpy as np
 
         assert version.parse(np.__version__) >= version.parse("1.26.0"), (
-            f"NumPy version {np.__version__} is too old. "
-            f"Minimum required: 1.26.0"
+            f"NumPy version {np.__version__} is too old. Minimum required: 1.26.0"
         )
 
     def test_pandas_available(self):
@@ -74,8 +71,7 @@ class TestMLDependenciesAvailable:
         import pandas as pd
 
         assert version.parse(pd.__version__) >= version.parse("2.0.0"), (
-            f"Pandas version {pd.__version__} is too old. "
-            f"Minimum required: 2.0.0"
+            f"Pandas version {pd.__version__} is too old. Minimum required: 2.0.0"
         )
 
 
@@ -150,7 +146,6 @@ class TestMLCacheDirectory:
 
     def test_model_cache_writable(self, tmp_path):
         """Test that we can write to model cache directory."""
-        import pathlib
 
         # Use tmp_path fixture for testing
         cache_dir = tmp_path / ".cache" / "huggingface"
@@ -169,7 +164,6 @@ class TestMLCacheDirectory:
 
     def test_torch_cache_directory(self, tmp_path, monkeypatch):
         """Test that PyTorch can use a custom cache directory."""
-        import torch
 
         # Set custom cache directory
         cache_dir = tmp_path / ".cache" / "torch"
@@ -204,8 +198,9 @@ class TestMLPerformanceBasic:
 
     def test_numpy_performance_basic(self):
         """Test basic NumPy performance with larger arrays."""
-        import numpy as np
         import time
+
+        import numpy as np
 
         # Create large array (10 million elements)
         arr = np.random.rand(10_000_000)

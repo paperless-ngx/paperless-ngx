@@ -4,7 +4,7 @@ Este documento proporciona instrucciones completas para ejecutar IntelliDocs con
 
 ## 📋 Tabla de Contenidos
 
-- [Requisitos Previos](#requisitos-previos)
+- [Requisitos Previous](#requisitos-previos)
 - [Inicio Rápido](#inicio-rápido)
 - [Configuración Detallada](#configuración-detallada)
 - [Nuevas Funciones Disponibles](#nuevas-funciones-disponibles)
@@ -14,7 +14,7 @@ Este documento proporciona instrucciones completas para ejecutar IntelliDocs con
 
 ---
 
-## 🔧 Requisitos Previos
+## 🔧 Requisitos Previous
 
 ### Hardware Recomendado
 
@@ -74,7 +74,7 @@ bash -c "$(curl -L https://raw.githubusercontent.com/dawnsystem/IntelliDocs-ngx/
    ```bash
    # Con SQLite (más simple)
    docker compose -f docker-compose.sqlite.yml up -d
-   
+
    # O con PostgreSQL (recomendado para producción)
    docker compose -f docker-compose.postgres.yml up -d
    ```
@@ -120,7 +120,7 @@ PAPERLESS_ENABLE_ADVANCED_OCR=1
 # Opciones: distilbert-base-uncased (rápido), bert-base-uncased (más preciso)
 PAPERLESS_ML_CLASSIFIER_MODEL=distilbert-base-uncased
 
-# Aceleración GPU (requiere NVIDIA Docker)
+# Aceleración GPU (require NVIDIA Docker)
 PAPERLESS_USE_GPU=0
 
 # Umbral de confianza para detección de tablas (0.0-1.0)
@@ -164,7 +164,7 @@ chmod 777 ./ml_cache
 
 **Resultado**: 147x mejora de rendimiento (54.3s → 0.37s)
 
-**Uso**: Automático, no requiere configuración adicional.
+**Uso**: Automático, no require configuración adicional.
 
 ---
 
@@ -209,11 +209,11 @@ PAPERLESS_COOKIE_PREFIX=intellidocs
 # Habilitar todas las funciones ML
 PAPERLESS_ENABLE_ML_FEATURES=1
 
-# Usar modelo más preciso (requiere más RAM)
+# Usar modelo más preciso (require más RAM)
 PAPERLESS_ML_CLASSIFIER_MODEL=bert-base-uncased
 ```
 
-**Primer Uso**: Los modelos ML se descargan automáticamente en el primer inicio (~500MB-1GB). Esto puede tomar varios minutos.
+**Primer Uso**: Los modelos ML se descargan automáticamente en el primer inicio (~500MB-1GB). Esto puede tomar various minutos.
 
 ---
 
@@ -531,7 +531,7 @@ docker compose exec webserver ls -lh /usr/src/paperless/.cache/huggingface/hub/
    ```bash
    # Backup de base de datos
    docker compose exec db pg_dump -U paperless paperless > backup.sql
-   
+
    # Backup de media
    tar -czf media_backup.tar.gz ./media
    ```
@@ -564,7 +564,7 @@ docker compose exec webserver ls -lh /usr/src/paperless/.cache/huggingface/hub/
 
 - **Documentación IntelliDocs**: Ver archivos en `/docs`
 - **Bitácora Maestra**: `BITACORA_MAESTRA.md`
-- **Guías de Implementación**: 
+- **Guías de Implementación**:
   - `FASE1_RESUMEN.md` - Performance
   - `FASE2_RESUMEN.md` - Security
   - `FASE3_RESUMEN.md` - AI/ML
@@ -583,6 +583,6 @@ Si encuentras problemas:
 
 ---
 
-**IntelliDocs** - Sistema de Gestión Documental con IA  
-Versión: 1.0.0 (basado en Paperless-ngx 2.19.5)  
+**IntelliDocs** - Sistema de Gestión Documental con IA
+Versión: 1.0.0 (basado en Paperless-ngx 2.19.5)
 Última actualización: 2025-11-09

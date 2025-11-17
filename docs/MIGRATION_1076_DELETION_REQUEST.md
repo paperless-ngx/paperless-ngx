@@ -108,8 +108,8 @@ No data migration is required as this is a new model with no pre-existing data.
 ### Verify Table Creation
 ```sql
 -- Check table exists
-SELECT table_name 
-FROM information_schema.tables 
+SELECT table_name
+FROM information_schema.tables
 WHERE table_name = 'documents_deletionrequest';
 
 -- Check columns
@@ -119,8 +119,8 @@ WHERE table_name = 'documents_deletionrequest';
 ### Verify Indexes
 ```sql
 -- Check indexes exist
-SELECT indexname, indexdef 
-FROM pg_indexes 
+SELECT indexname, indexdef
+FROM pg_indexes
 WHERE tablename = 'documents_deletionrequest';
 ```
 

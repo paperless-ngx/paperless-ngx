@@ -67,7 +67,7 @@ export class AIStatusIndicatorComponent implements OnInit, OnDestroy {
    */
   get iconClass(): string {
     const classes = ['ai-status-icon']
-    
+
     if (!this.aiStatus.active) {
       classes.push('inactive')
     } else if (this.aiStatus.processing) {

@@ -25,7 +25,7 @@ class ApiVersionMiddleware:
 class RateLimitMiddleware:
     """
     Rate limit API requests per user/IP to prevent DoS attacks.
-    
+
     Implements sliding window rate limiting using Redis cache.
     Different endpoints have different limits based on their resource usage.
     """
@@ -115,7 +115,7 @@ class RateLimitMiddleware:
 class SecurityHeadersMiddleware:
     """
     Add security headers to all responses for enhanced security.
-    
+
     Implements best practices for web security including:
     - HSTS (HTTP Strict Transport Security)
     - CSP (Content Security Policy)
@@ -160,7 +160,7 @@ class SecurityHeadersMiddleware:
 
         # Store nonce in request for use in templates
         # Templates can access this via {{ request.csp_nonce }}
-        if hasattr(request, '_csp_nonce'):
+        if hasattr(request, "_csp_nonce"):
             request._csp_nonce = nonce
 
         # Prevent clickjacking attacks

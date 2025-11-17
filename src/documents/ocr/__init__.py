@@ -11,21 +11,24 @@ Lazy imports are used to avoid loading heavy dependencies unless needed.
 """
 
 __all__ = [
-    'TableExtractor',
-    'HandwritingRecognizer',
-    'FormFieldDetector',
+    "FormFieldDetector",
+    "HandwritingRecognizer",
+    "TableExtractor",
 ]
 
 
 def __getattr__(name):
     """Lazy import to avoid loading heavy ML models on startup."""
-    if name == 'TableExtractor':
+    if name == "TableExtractor":
         from .table_extractor import TableExtractor
+
         return TableExtractor
-    elif name == 'HandwritingRecognizer':
+    elif name == "HandwritingRecognizer":
         from .handwriting import HandwritingRecognizer
+
         return HandwritingRecognizer
-    elif name == 'FormFieldDetector':
+    elif name == "FormFieldDetector":
         from .form_detector import FormFieldDetector
+
         return FormFieldDetector
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

@@ -224,7 +224,7 @@ class AcknowledgeTasksPermissions(BasePermission):
 class CanViewAISuggestionsPermission(BasePermission):
     """
     Permission class to check if user can view AI suggestions.
-    
+
     This permission allows users to view AI scan results and suggestions
     for documents, including tags, correspondents, document types, and
     other metadata suggestions.
@@ -233,11 +233,11 @@ class CanViewAISuggestionsPermission(BasePermission):
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
             return False
-        
+
         # Superusers always have permission
         if request.user.is_superuser:
             return True
-        
+
         # Check for specific permission
         return request.user.has_perm("documents.can_view_ai_suggestions")
 
@@ -245,7 +245,7 @@ class CanViewAISuggestionsPermission(BasePermission):
 class CanApplyAISuggestionsPermission(BasePermission):
     """
     Permission class to check if user can apply AI suggestions to documents.
-    
+
     This permission allows users to apply AI-generated suggestions to documents,
     such as auto-applying tags, correspondents, document types, etc.
     """
@@ -253,11 +253,11 @@ class CanApplyAISuggestionsPermission(BasePermission):
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
             return False
-        
+
         # Superusers always have permission
         if request.user.is_superuser:
             return True
-        
+
         # Check for specific permission
         return request.user.has_perm("documents.can_apply_ai_suggestions")
 
@@ -265,7 +265,7 @@ class CanApplyAISuggestionsPermission(BasePermission):
 class CanApproveDeletionsPermission(BasePermission):
     """
     Permission class to check if user can approve AI-recommended deletions.
-    
+
     This permission is required to approve deletion requests initiated by AI,
     ensuring that no documents are deleted without explicit user authorization.
     """
@@ -273,11 +273,11 @@ class CanApproveDeletionsPermission(BasePermission):
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
             return False
-        
+
         # Superusers always have permission
         if request.user.is_superuser:
             return True
-        
+
         # Check for specific permission
         return request.user.has_perm("documents.can_approve_deletions")
 
@@ -285,7 +285,7 @@ class CanApproveDeletionsPermission(BasePermission):
 class CanConfigureAIPermission(BasePermission):
     """
     Permission class to check if user can configure AI settings.
-    
+
     This permission allows users to configure AI scanner settings, including
     confidence thresholds, auto-apply behavior, and ML feature toggles.
     Typically restricted to administrators.
@@ -294,10 +294,10 @@ class CanConfigureAIPermission(BasePermission):
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
             return False
-        
+
         # Superusers always have permission
         if request.user.is_superuser:
             return True
-        
+
         # Check for specific permission
         return request.user.has_perm("documents.can_configure_ai")

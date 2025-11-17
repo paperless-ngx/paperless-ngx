@@ -7,10 +7,10 @@ Uses sentence embeddings to understand the semantic content of documents.
 Examples:
 - Query: "tax documents from 2023"
   Finds: Documents about taxes, returns, deductions from 2023
-  
+
 - Query: "medical bills"
   Finds: Invoices from hospitals, clinics, prescriptions, insurance claims
-  
+
 - Query: "employment contract"
   Finds: Job offers, agreements, NDAs, work contracts
 """
@@ -18,17 +18,13 @@ Examples:
 from __future__ import annotations
 
 import logging
-from pathlib import Path
-from typing import TYPE_CHECKING
 
 import numpy as np
 import torch
-from sentence_transformers import SentenceTransformer, util
+from sentence_transformers import SentenceTransformer
+from sentence_transformers import util
 
 from documents.ml.model_cache import ModelCacheManager
-
-if TYPE_CHECKING:
-    pass
 
 logger = logging.getLogger("paperless.ml.semantic_search")
 
@@ -36,10 +32,10 @@ logger = logging.getLogger("paperless.ml.semantic_search")
 class SemanticSearch:
     """
     Semantic search using sentence embeddings.
-    
+
     Creates vector representations of documents and queries,
     then finds similar documents using cosine similarity.
-    
+
     This provides much better search results than keyword matching:
     - Understands synonyms (invoice = bill)
     - Understands context (medical + bill = healthcare invoice)
@@ -54,7 +50,7 @@ class SemanticSearch:
     ):
         """
         Initialize semantic search.
-        
+
         Args:
             model_name: Sentence transformer model
                        Default: all-MiniLM-L6-v2 (80MB, fast, good quality)
@@ -67,18 +63,22 @@ class SemanticSearch:
         """
         logger.info(
             f"Initializing SemanticSearch with model: {model_name} "
-            f"(caching: {use_cache})"
+            f"(caching: {use_cache})",
         )
 
         self.model_name = model_name
         self.use_cache = use_cache
-        self.cache_manager = ModelCacheManager.get_instance(
-            disk_cache_dir=cache_dir,
-        ) if use_cache else None
-        
+        self.cache_manager = (
+            ModelCacheManager.get_instance(
+                disk_cache_dir=cache_dir,
+            )
+            if use_cache
+            else None
+        )
+
         # Cache key for this model
         cache_key = f"semantic_search_{model_name}"
-        
+
         if self.use_cache and self.cache_manager:
             # Load model from cache
             def loader():
@@ -87,13 +87,19 @@ class SemanticSearch:
             self.model = self.cache_manager.get_or_load_model(cache_key, loader)
 
             # Try to load embeddings from disk
-            embeddings = self.cache_manager.load_embeddings_from_disk("document_embeddings")
+            embeddings = self.cache_manager.load_embeddings_from_disk(
+                "document_embeddings",
+            )
             if embeddings and self._validate_embeddings(embeddings):
                 self.document_embeddings = embeddings
-                logger.info(f"Loaded {len(embeddings)} valid embeddings from disk cache")
+                logger.info(
+                    f"Loaded {len(embeddings)} valid embeddings from disk cache",
+                )
             else:
                 self.document_embeddings = {}
-                logger.warning("Embeddings failed validation, starting with empty cache")
+                logger.warning(
+                    "Embeddings failed validation, starting with empty cache",
+                )
             self.document_metadata = {}
         else:
             # Load without caching
@@ -124,14 +130,19 @@ class SemanticSearch:
         # Validate structure: each value should be a numpy array
         try:
             for doc_id, embedding in embeddings.items():
-                if not isinstance(embedding, np.ndarray) and not isinstance(embedding, torch.Tensor):
-                    logger.warning(f"Embedding for doc {doc_id} is not a numpy array or tensor")
+                if not isinstance(embedding, np.ndarray) and not isinstance(
+                    embedding,
+                    torch.Tensor,
+                ):
+                    logger.warning(
+                        f"Embedding for doc {doc_id} is not a numpy array or tensor",
+                    )
                     return False
-                if hasattr(embedding, 'size'):
+                if hasattr(embedding, "size"):
                     if embedding.size == 0:
                         logger.warning(f"Embedding for doc {doc_id} is empty")
                         return False
-                elif hasattr(embedding, 'numel'):
+                elif hasattr(embedding, "numel"):
                     if embedding.numel() == 0:
                         logger.warning(f"Embedding for doc {doc_id} is empty")
                         return False
@@ -148,9 +159,9 @@ class SemanticSearch:
     ) -> None:
         """
         Index a document for semantic search.
-        
+
         Creates an embedding vector for the document and stores it.
-        
+
         Args:
             document_id: Document ID
             text: Document text content
@@ -176,7 +187,7 @@ class SemanticSearch:
     ) -> None:
         """
         Index multiple documents efficiently.
-        
+
         Args:
             documents: List of (document_id, text, metadata) tuples
             batch_size: Batch size for encoding
@@ -216,11 +227,11 @@ class SemanticSearch:
         try:
             result = self.cache_manager.save_embeddings_to_disk(
                 "document_embeddings",
-                self.document_embeddings
+                self.document_embeddings,
             )
             if result:
                 logger.info(
-                    f"Successfully saved {len(self.document_embeddings)} embeddings to disk"
+                    f"Successfully saved {len(self.document_embeddings)} embeddings to disk",
                 )
             else:
                 logger.error("Failed to save embeddings to disk (returned False)")
@@ -235,12 +246,12 @@ class SemanticSearch:
     ) -> list[tuple[int, float]]:
         """
         Search documents by semantic similarity.
-        
+
         Args:
             query: Search query
             top_k: Number of results to return
             min_score: Minimum similarity score (0-1)
-            
+
         Returns:
             list: List of (document_id, similarity_score) tuples
                   Sorted by similarity (highest first)
@@ -284,12 +295,12 @@ class SemanticSearch:
     ) -> list[dict]:
         """
         Search and return results with metadata.
-        
+
         Args:
             query: Search query
             top_k: Number of results to return
             min_score: Minimum similarity score (0-1)
-            
+
         Returns:
             list: List of result dictionaries
                   [
@@ -325,14 +336,14 @@ class SemanticSearch:
     ) -> list[tuple[int, float]]:
         """
         Find documents similar to a given document.
-        
+
         Useful for "Find similar" functionality.
-        
+
         Args:
             document_id: Document ID to find similar documents for
             top_k: Number of results to return
             min_score: Minimum similarity score (0-1)
-            
+
         Returns:
             list: List of (document_id, similarity_score) tuples
                   Excludes the source document
@@ -371,10 +382,10 @@ class SemanticSearch:
     def remove_document(self, document_id: int) -> bool:
         """
         Remove a document from the index.
-        
+
         Args:
             document_id: Document ID to remove
-            
+
         Returns:
             bool: True if document was removed, False if not found
         """
@@ -395,7 +406,7 @@ class SemanticSearch:
     def get_index_size(self) -> int:
         """
         Get number of indexed documents.
-        
+
         Returns:
             int: Number of documents in index
         """
@@ -404,7 +415,7 @@ class SemanticSearch:
     def save_index(self, filepath: str) -> None:
         """
         Save index to disk.
-        
+
         Args:
             filepath: Path to save index
         """
@@ -424,7 +435,7 @@ class SemanticSearch:
     def load_index(self, filepath: str) -> None:
         """
         Load index from disk.
-        
+
         Args:
             filepath: Path to load index from
         """
@@ -452,14 +463,12 @@ class SemanticSearch:
     def get_model_info(self) -> dict:
         """
         Get information about the model and index.
-        
+
         Returns:
             dict: Model and index information
         """
         return {
             "model_name": self.model_name,
             "indexed_documents": len(self.document_embeddings),
-            "embedding_dimension": (
-                self.model.get_sentence_embedding_dimension()
-            ),
+            "embedding_dimension": (self.model.get_sentence_embedding_dimension()),
         }

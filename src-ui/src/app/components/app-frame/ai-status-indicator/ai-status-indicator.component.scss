@@ -5,16 +5,16 @@
 
 .ai-status-icon {
   transition: all 0.3s ease;
-  
+
   &.inactive {
     opacity: 0.4;
     color: var(--bs-secondary);
   }
-  
+
   &.active {
     color: var(--bs-success);
   }
-  
+
   &.processing {
     color: var(--bs-primary);
     animation: pulse 1.5s ease-in-out infinite;
@@ -34,12 +34,12 @@
 
 .ai-status-tooltip {
   min-width: 250px;
-  
+
   .status-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    
+
     .status-label {
       font-weight: 500;
       margin-right: 0.5rem;

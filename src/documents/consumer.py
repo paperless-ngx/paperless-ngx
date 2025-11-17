@@ -310,7 +310,8 @@ class ConsumerPlugin(
             # Parsing phase
             document_parser = self._create_parser_instance(parser_class)
             text, date, thumbnail, archive_path, page_count = self._parse_document(
-                document_parser, mime_type
+                document_parser,
+                mime_type,
             )
 
             # Storage phase
@@ -394,7 +395,7 @@ class ConsumerPlugin(
     def _attempt_pdf_recovery(
         self,
         tempdir: tempfile.TemporaryDirectory,
-        original_mime_type: str
+        original_mime_type: str,
     ) -> str:
         """
         Attempt to recover a PDF file with incorrect MIME type using qpdf.
@@ -438,7 +439,7 @@ class ConsumerPlugin(
     def _get_parser_class(
         self,
         mime_type: str,
-        tempdir: tempfile.TemporaryDirectory
+        tempdir: tempfile.TemporaryDirectory,
     ) -> type[DocumentParser]:
         """
         Determine which parser to use based on MIME type.
@@ -468,7 +469,7 @@ class ConsumerPlugin(
 
     def _create_parser_instance(
         self,
-        parser_class: type[DocumentParser]
+        parser_class: type[DocumentParser],
     ) -> DocumentParser:
         """
         Create a parser instance with progress callback.
@@ -479,6 +480,7 @@ class ConsumerPlugin(
         Returns:
             DocumentParser: Configured parser instance
         """
+
         def progress_callback(current_progress, max_progress):  # pragma: no cover
             # Recalculate progress to be within 20 and 80
             p = int((current_progress / max_progress) * 50 + 20)
@@ -496,7 +498,7 @@ class ConsumerPlugin(
     def _parse_document(
         self,
         document_parser: DocumentParser,
-        mime_type: str
+        mime_type: str,
     ) -> tuple[str, datetime.datetime | None, Path, Path | None, int | None]:
         """
         Parse the document and extract metadata.
@@ -670,7 +672,7 @@ class ConsumerPlugin(
         self,
         document: Document,
         thumbnail: Path,
-        archive_path: Path | None
+        archive_path: Path | None,
     ) -> None:
         """
         Store document files (source, thumbnail, archive) to disk.
@@ -949,7 +951,7 @@ class ConsumerPlugin(
             text: The extracted document text
         """
         # Check if AI scanner is enabled
-        if not getattr(settings, 'PAPERLESS_ENABLE_AI_SCANNER', True):
+        if not getattr(settings, "PAPERLESS_ENABLE_AI_SCANNER", True):
             self.log.debug("AI scanner is disabled, skipping AI analysis")
             return
 
@@ -1055,7 +1057,8 @@ class ConsumerPreflightPlugin(
         """
         if TYPE_CHECKING:
             assert isinstance(
-                self.input_doc.original_file, Path,
+                self.input_doc.original_file,
+                Path,
             ), self.input_doc.original_file
         if not self.input_doc.original_file.is_file():
             self._fail(

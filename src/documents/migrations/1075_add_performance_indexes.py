@@ -1,18 +1,19 @@
 # Generated manually for performance optimization
 
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
     """
     Add composite indexes for better query performance.
-    
+
     These indexes optimize common query patterns:
     - Filtering by correspondent + created date
     - Filtering by document_type + created date
     - Filtering by owner + created date
     - Filtering by storage_path + created date
-    
+
     Expected performance improvement: 5-10x faster queries for filtered document lists
     """
 
@@ -65,7 +66,7 @@ class Migration(migrations.Migration):
         # Note: This is already handled by Django's ManyToMany, but we ensure it's optimal
         migrations.RunSQL(
             sql="""
-                CREATE INDEX IF NOT EXISTS doc_tags_document_idx 
+                CREATE INDEX IF NOT EXISTS doc_tags_document_idx
                 ON documents_document_tags(document_id, tag_id);
             """,
             reverse_sql="DROP INDEX IF EXISTS doc_tags_document_idx;",

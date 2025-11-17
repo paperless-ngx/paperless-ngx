@@ -15,13 +15,11 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.utils import timezone
 
-from documents.models import (
-    Correspondent,
-    DeletionRequest,
-    Document,
-    DocumentType,
-    Tag,
-)
+from documents.models import Correspondent
+from documents.models import DeletionRequest
+from documents.models import Document
+from documents.models import DocumentType
+from documents.models import Tag
 
 
 class TestDeletionRequestModelCreation(TestCase):
@@ -45,7 +43,7 @@ class TestDeletionRequestModelCreation(TestCase):
             user=self.user,
             status=DeletionRequest.STATUS_PENDING,
         )
-        
+
         self.assertIsNotNone(request)
         self.assertTrue(request.requested_by_ai)
         self.assertEqual(request.ai_reason, "Test reason")
@@ -59,7 +57,7 @@ class TestDeletionRequestModelCreation(TestCase):
             ai_reason="Test",
             user=self.user,
         )
-        
+
         self.assertIsNotNone(request.created_at)
         self.assertIsNotNone(request.updated_at)
 
@@ -70,7 +68,7 @@ class TestDeletionRequestModelCreation(TestCase):
             ai_reason="Test",
             user=self.user,
         )
-        
+
         self.assertEqual(request.status, DeletionRequest.STATUS_PENDING)
 
     def test_deletion_request_with_documents(self):
@@ -80,16 +78,16 @@ class TestDeletionRequestModelCreation(TestCase):
             ai_reason="Test",
             user=self.user,
         )
-        
+
         doc2 = Document.objects.create(
             title="Document 2",
             content="Content 2",
             checksum="checksum2",
             mime_type="application/pdf",
         )
-        
+
         request.documents.add(self.doc, doc2)
-        
+
         self.assertEqual(request.documents.count(), 2)
         self.assertIn(self.doc, request.documents.all())
         self.assertIn(doc2, request.documents.all())
@@ -101,7 +99,7 @@ class TestDeletionRequestModelCreation(TestCase):
             ai_reason="Test",
             user=self.user,
         )
-        
+
         self.assertIsInstance(request.impact_summary, dict)
         self.assertEqual(request.impact_summary, {})
 
@@ -112,14 +110,14 @@ class TestDeletionRequestModelCreation(TestCase):
             "affected_tags": ["tag1", "tag2"],
             "metadata": {"key": "value"},
         }
-        
+
         request = DeletionRequest.objects.create(
             requested_by_ai=True,
             ai_reason="Test",
             user=self.user,
             impact_summary=impact,
         )
-        
+
         self.assertEqual(request.impact_summary["document_count"], 5)
         self.assertEqual(request.impact_summary["affected_tags"], ["tag1", "tag2"])
 
@@ -131,9 +129,9 @@ class TestDeletionRequestModelCreation(TestCase):
             user=self.user,
         )
         request.documents.add(self.doc)
-        
+
         str_repr = str(request)
-        
+
         self.assertIn("Deletion Request", str_repr)
         self.assertIn(str(request.id), str_repr)
         self.assertIn("1 documents", str_repr)
@@ -162,9 +160,9 @@ class TestDeletionRequestApprove(TestCase):
             user=self.user,
             status=DeletionRequest.STATUS_PENDING,
         )
-        
+
         result = request.approve(self.approver, "Approved")
-        
+
         self.assertTrue(result)
         self.assertEqual(request.status, DeletionRequest.STATUS_APPROVED)
         self.assertEqual(request.reviewed_by, self.approver)
@@ -179,9 +177,9 @@ class TestDeletionRequestApprove(TestCase):
             user=self.user,
             status=DeletionRequest.STATUS_PENDING,
         )
-        
+
         result = request.approve(self.approver)
-        
+
         self.assertTrue(result)
         self.assertEqual(request.review_comment, "")
 
@@ -195,9 +193,9 @@ class TestDeletionRequestApprove(TestCase):
             reviewed_by=self.user,
             reviewed_at=timezone.now(),
         )
-        
+
         result = request.approve(self.approver, "Trying to approve again")
-        
+
         self.assertFalse(result)
         self.assertEqual(request.reviewed_by, self.user)  # Should not change
 
@@ -211,9 +209,9 @@ class TestDeletionRequestApprove(TestCase):
             reviewed_by=self.user,
             reviewed_at=timezone.now(),
         )
-        
+
         result = request.approve(self.approver, "Trying to approve rejected")
-        
+
         self.assertFalse(result)
         self.assertEqual(request.status, DeletionRequest.STATUS_REJECTED)
 
@@ -225,9 +223,9 @@ class TestDeletionRequestApprove(TestCase):
             user=self.user,
             status=DeletionRequest.STATUS_CANCELLED,
         )
-        
+
         result = request.approve(self.approver, "Trying to approve cancelled")
-        
+
         self.assertFalse(result)
         self.assertEqual(request.status, DeletionRequest.STATUS_CANCELLED)
 
@@ -239,9 +237,9 @@ class TestDeletionRequestApprove(TestCase):
             user=self.user,
             status=DeletionRequest.STATUS_COMPLETED,
         )
-        
+
         result = request.approve(self.approver, "Trying to approve completed")
-        
+
         self.assertFalse(result)
         self.assertEqual(request.status, DeletionRequest.STATUS_COMPLETED)
 
@@ -253,11 +251,11 @@ class TestDeletionRequestApprove(TestCase):
             user=self.user,
             status=DeletionRequest.STATUS_PENDING,
         )
-        
+
         before_approval = timezone.now()
         result = request.approve(self.approver, "Approved")
         after_approval = timezone.now()
-        
+
         self.assertTrue(result)
         self.assertIsNotNone(request.reviewed_at)
         self.assertGreaterEqual(request.reviewed_at, before_approval)
@@ -280,9 +278,9 @@ class TestDeletionRequestReject(TestCase):
             user=self.user,
             status=DeletionRequest.STATUS_PENDING,
         )
-        
+
         result = request.reject(self.reviewer, "Not necessary")
-        
+
         self.assertTrue(result)
         self.assertEqual(request.status, DeletionRequest.STATUS_REJECTED)
         self.assertEqual(request.reviewed_by, self.reviewer)
@@ -297,9 +295,9 @@ class TestDeletionRequestReject(TestCase):
             user=self.user,
             status=DeletionRequest.STATUS_PENDING,
         )
-        
+
         result = request.reject(self.reviewer)
-        
+
         self.assertTrue(result)
         self.assertEqual(request.review_comment, "")
 
@@ -313,9 +311,9 @@ class TestDeletionRequestReject(TestCase):
             reviewed_by=self.user,
             reviewed_at=timezone.now(),
         )
-        
+
         result = request.reject(self.reviewer, "Trying to reject again")
-        
+
         self.assertFalse(result)
         self.assertEqual(request.reviewed_by, self.user)  # Should not change
 
@@ -329,9 +327,9 @@ class TestDeletionRequestReject(TestCase):
             reviewed_by=self.user,
             reviewed_at=timezone.now(),
         )
-        
+
         result = request.reject(self.reviewer, "Trying to reject approved")
-        
+
         self.assertFalse(result)
         self.assertEqual(request.status, DeletionRequest.STATUS_APPROVED)
 
@@ -343,9 +341,9 @@ class TestDeletionRequestReject(TestCase):
             user=self.user,
             status=DeletionRequest.STATUS_CANCELLED,
         )
-        
+
         result = request.reject(self.reviewer, "Trying to reject cancelled")
-        
+
         self.assertFalse(result)
         self.assertEqual(request.status, DeletionRequest.STATUS_CANCELLED)
 
@@ -357,9 +355,9 @@ class TestDeletionRequestReject(TestCase):
             user=self.user,
             status=DeletionRequest.STATUS_COMPLETED,
         )
-        
+
         result = request.reject(self.reviewer, "Trying to reject completed")
-        
+
         self.assertFalse(result)
         self.assertEqual(request.status, DeletionRequest.STATUS_COMPLETED)
 
@@ -371,11 +369,11 @@ class TestDeletionRequestReject(TestCase):
             user=self.user,
             status=DeletionRequest.STATUS_PENDING,
         )
-        
+
         before_rejection = timezone.now()
         result = request.reject(self.reviewer, "Rejected")
         after_rejection = timezone.now()
-        
+
         self.assertTrue(result)
         self.assertIsNotNone(request.reviewed_at)
         self.assertGreaterEqual(request.reviewed_at, before_rejection)
@@ -389,11 +387,11 @@ class TestDeletionRequestWorkflowScenarios(TestCase):
         """Set up test data."""
         self.user = User.objects.create_user(username="user1", password="pass")
         self.approver = User.objects.create_user(username="approver", password="pass")
-        
+
         self.correspondent = Correspondent.objects.create(name="Test Corp")
         self.doc_type = DocumentType.objects.create(name="Invoice")
         self.tag = Tag.objects.create(name="Important")
-        
+
         self.doc1 = Document.objects.create(
             title="Document 1",
             content="Content 1",
@@ -403,7 +401,7 @@ class TestDeletionRequestWorkflowScenarios(TestCase):
             document_type=self.doc_type,
         )
         self.doc1.tags.add(self.tag)
-        
+
         self.doc2 = Document.objects.create(
             title="Document 2",
             content="Content 2",
@@ -421,15 +419,15 @@ class TestDeletionRequestWorkflowScenarios(TestCase):
             impact_summary={"document_count": 2},
         )
         request.documents.add(self.doc1, self.doc2)
-        
+
         # Verify initial state
         self.assertEqual(request.status, DeletionRequest.STATUS_PENDING)
         self.assertIsNone(request.reviewed_by)
         self.assertIsNone(request.reviewed_at)
-        
+
         # Approve
         success = request.approve(self.approver, "Confirmed duplicates")
-        
+
         # Verify final state
         self.assertTrue(success)
         self.assertEqual(request.status, DeletionRequest.STATUS_APPROVED)
@@ -446,13 +444,13 @@ class TestDeletionRequestWorkflowScenarios(TestCase):
             status=DeletionRequest.STATUS_PENDING,
         )
         request.documents.add(self.doc1)
-        
+
         # Verify initial state
         self.assertEqual(request.status, DeletionRequest.STATUS_PENDING)
-        
+
         # Reject
         success = request.reject(self.approver, "Not duplicates")
-        
+
         # Verify final state
         self.assertTrue(success)
         self.assertEqual(request.status, DeletionRequest.STATUS_REJECTED)
@@ -468,14 +466,14 @@ class TestDeletionRequestWorkflowScenarios(TestCase):
             user=self.user,
             status=DeletionRequest.STATUS_PENDING,
         )
-        
+
         # Reject first
         request.reject(self.user, "Rejected")
         self.assertEqual(request.status, DeletionRequest.STATUS_REJECTED)
-        
+
         # Try to approve
         success = request.approve(self.approver, "Changed my mind")
-        
+
         # Should fail
         self.assertFalse(success)
         self.assertEqual(request.status, DeletionRequest.STATUS_REJECTED)
@@ -488,14 +486,14 @@ class TestDeletionRequestWorkflowScenarios(TestCase):
             user=self.user,
             status=DeletionRequest.STATUS_PENDING,
         )
-        
+
         # Approve first
         request.approve(self.approver, "Approved")
         self.assertEqual(request.status, DeletionRequest.STATUS_APPROVED)
-        
+
         # Try to reject
         success = request.reject(self.user, "Changed my mind")
-        
+
         # Should fail
         self.assertFalse(success)
         self.assertEqual(request.status, DeletionRequest.STATUS_APPROVED)
@@ -516,7 +514,7 @@ class TestDeletionRequestAuditTrail(TestCase):
             ai_reason="Test",
             user=self.user,
         )
-        
+
         self.assertEqual(request.user, self.user)
 
     def test_audit_trail_records_reviewer(self):
@@ -527,9 +525,9 @@ class TestDeletionRequestAuditTrail(TestCase):
             user=self.user,
             status=DeletionRequest.STATUS_PENDING,
         )
-        
+
         request.approve(self.approver, "Approved")
-        
+
         self.assertEqual(request.reviewed_by, self.approver)
         self.assertNotEqual(request.reviewed_by, request.user)
 
@@ -540,12 +538,12 @@ class TestDeletionRequestAuditTrail(TestCase):
             ai_reason="Test",
             user=self.user,
         )
-        
+
         created_at = request.created_at
-        
+
         # Approve the request
         request.approve(self.approver, "Approved")
-        
+
         # Verify timestamps
         self.assertIsNotNone(request.created_at)
         self.assertIsNotNone(request.updated_at)
@@ -555,16 +553,16 @@ class TestDeletionRequestAuditTrail(TestCase):
     def test_audit_trail_preserves_ai_reason(self):
         """Test that AI's original reason is preserved."""
         original_reason = "AI detected duplicates based on content similarity"
-        
+
         request = DeletionRequest.objects.create(
             requested_by_ai=True,
             ai_reason=original_reason,
             user=self.user,
         )
-        
+
         # Approve with different comment
         request.approve(self.approver, "User confirmed")
-        
+
         # Original AI reason should be preserved
         self.assertEqual(request.ai_reason, original_reason)
         self.assertEqual(request.review_comment, "User confirmed")
@@ -582,7 +580,7 @@ class TestDeletionRequestAuditTrail(TestCase):
                 "completed_by": "system",
             },
         )
-        
+
         self.assertEqual(request.completion_details["deleted_count"], 5)
         self.assertEqual(request.completion_details["failed_count"], 0)
 
@@ -593,17 +591,17 @@ class TestDeletionRequestAuditTrail(TestCase):
             ai_reason="Reason 1",
             user=self.user,
         )
-        
+
         request2 = DeletionRequest.objects.create(
             requested_by_ai=True,
             ai_reason="Reason 2",
             user=self.user,
         )
-        
+
         # Approve one, reject another
         request1.approve(self.approver, "Approved")
         request2.reject(self.approver, "Rejected")
-        
+
         # Verify each has its own audit trail
         self.assertEqual(request1.status, DeletionRequest.STATUS_APPROVED)
         self.assertEqual(request2.status, DeletionRequest.STATUS_REJECTED)
@@ -625,13 +623,13 @@ class TestDeletionRequestModelRelationships(TestCase):
             ai_reason="Test",
             user=self.user,
         )
-        
+
         request_id = request.id
         self.assertEqual(DeletionRequest.objects.filter(id=request_id).count(), 1)
-        
+
         # Delete user
         self.user.delete()
-        
+
         # Request should be deleted
         self.assertEqual(DeletionRequest.objects.filter(id=request_id).count(), 0)
 
@@ -649,15 +647,15 @@ class TestDeletionRequestModelRelationships(TestCase):
             checksum="checksum2",
             mime_type="application/pdf",
         )
-        
+
         request = DeletionRequest.objects.create(
             requested_by_ai=True,
             ai_reason="Test",
             user=self.user,
         )
-        
+
         request.documents.add(doc1, doc2)
-        
+
         self.assertEqual(request.documents.count(), 2)
         self.assertEqual(doc1.deletion_requests.count(), 1)
         self.assertEqual(doc2.deletion_requests.count(), 1)
@@ -670,29 +668,29 @@ class TestDeletionRequestModelRelationships(TestCase):
             user=self.user,
             status=DeletionRequest.STATUS_PENDING,
         )
-        
+
         self.assertIsNone(request.reviewed_by)
 
     def test_reviewed_by_set_null_on_delete(self):
         """Test that reviewed_by is set to null when reviewer is deleted."""
         approver = User.objects.create_user(username="approver", password="pass")
-        
+
         request = DeletionRequest.objects.create(
             requested_by_ai=True,
             ai_reason="Test",
             user=self.user,
             status=DeletionRequest.STATUS_PENDING,
         )
-        
+
         request.approve(approver, "Approved")
         self.assertEqual(request.reviewed_by, approver)
-        
+
         # Delete approver
         approver.delete()
-        
+
         # Refresh request
         request.refresh_from_db()
-        
+
         # reviewed_by should be null
         self.assertIsNone(request.reviewed_by)
         # But the request should still exist

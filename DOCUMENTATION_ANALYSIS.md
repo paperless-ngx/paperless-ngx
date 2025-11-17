@@ -15,7 +15,7 @@ IntelliDocs-ngx is a sophisticated document management system forked from Paperl
 ### Architecture Overview
 - **Total Python Files**: 357
 - **Total TypeScript Files**: 386
-- **Main Modules**: 
+- **Main Modules**:
   - `documents` - Core document processing and management
   - `paperless` - Framework configuration and utilities
   - `paperless_mail` - Email integration and processing
@@ -41,7 +41,7 @@ The documents module is the heart of IntelliDocs-ngx, handling all document-rela
   - `try_consume_file()` - Entry point for document processing
   - `_consume()` - Core consumption logic
   - `_write()` - Saves document to database
-  
+
 **Key Functions**:
 - Document ingestion from various sources
 - OCR text extraction
@@ -70,7 +70,7 @@ The documents module is the heart of IntelliDocs-ngx, handling all document-rela
 - `Document` - Central document entity
   - Fields: title, content, correspondent, document_type, tags, created, modified
   - Methods: archiving, searching, versioning
-  
+
 - `Correspondent` - Represents document senders/receivers
 - `DocumentType` - Categories for documents
 - `Tag` - Flexible labeling system
@@ -91,7 +91,7 @@ The documents module is the heart of IntelliDocs-ngx, handling all document-rela
   - `metadata()` - Extract/update metadata
   - `suggestions()` - ML-based classification suggestions
   - `bulk_edit()` - Mass document updates
-  
+
 - `CorrespondentViewSet` - Manage correspondents
 - `DocumentTypeViewSet` - Manage document types
 - `TagViewSet` - Manage tags
@@ -725,13 +725,13 @@ Apache Tika integration for complex formats.
 ### High Priority Technical Debt
 1. **Large monolithic files** - views.py (113KB), serialisers.py (96KB)
    - Solution: Split into feature-based modules
-   
+
 2. **Database query optimization** - N+1 queries in several endpoints
    - Solution: Add select_related/prefetch_related
-   
+
 3. **Frontend bundle size** - Large initial load
    - Solution: Implement lazy loading, code splitting
-   
+
 4. **Missing indexes** - Slow queries on large datasets
    - Solution: Add composite indexes
 

@@ -492,7 +492,7 @@ except FileValidationError:
 
 ### Compliance Impact
 
-**Before**: 
+**Before**:
 - ❌ OWASP Top 10: Fails 5/10 categories
 - ❌ SOC 2: Not compliant
 - ❌ ISO 27001: Not compliant
@@ -652,7 +652,7 @@ safety check
 ✅ Secure file handling utilities
 
 **Security improvements**:
-✅ Security score: C → A+ 
+✅ Security score: C → A+
 ✅ Vulnerability count: -80%
 ✅ Enterprise-ready security
 ✅ Compliance-ready (OWASP, partial SOC 2)

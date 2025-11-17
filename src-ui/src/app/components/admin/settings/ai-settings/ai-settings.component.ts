@@ -99,7 +99,7 @@ export class AiSettingsComponent implements OnInit {
 
   testAIWithSample() {
     this.testingInProgress = true
-    
+
     // Mock test - in real implementation, this would call the backend API
     setTimeout(() => {
       this.testingInProgress = false
@@ -107,7 +107,7 @@ export class AiSettingsComponent implements OnInit {
         content: $localize`AI test completed successfully. Check the console for results.`,
         delay: 5000,
       })
-      
+
       // Log mock test results
       if (!environment.production) {
         console.log('AI Scanner Test Results:', {

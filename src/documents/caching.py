@@ -328,7 +328,7 @@ def cache_metadata_lists(timeout: int = CACHE_5_MINUTES) -> None:
     """
     Caches frequently accessed metadata lists (correspondents, types, tags, storage paths).
     These change infrequently but are queried often.
-    
+
     This should be called after any changes to these models to invalidate the cache.
     """
     from documents.models import Correspondent
@@ -349,7 +349,9 @@ def cache_metadata_lists(timeout: int = CACHE_5_MINUTES) -> None:
     cache.set(get_document_type_list_cache_key(), doc_types, timeout)
 
     # Cache tag list
-    tags = list(Tag.objects.all().values("id", "name", "slug", "color").order_by("name"))
+    tags = list(
+        Tag.objects.all().values("id", "name", "slug", "color").order_by("name"),
+    )
     cache.set(get_tag_list_cache_key(), tags, timeout)
 
     # Cache storage path list

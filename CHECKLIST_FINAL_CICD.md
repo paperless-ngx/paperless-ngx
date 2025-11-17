@@ -96,8 +96,8 @@ Todas las correcciones críticas identificadas en el **INFORME_AUDITORIA_CICD.md
 - [x] TableExtractor error handling mejorado
 - [x] Tests ML smoke creados
 - [x] Dependencias OpenCV agregadas a CI
-- [⚠️] `python manage.py check` pasa (requiere entorno Django completo)
-- [⚠️] `pytest tests/test_ml_smoke.py` pasa (requiere dependencias ML instaladas)
+- [⚠️] `python manage.py check` pasa (require entorno Django completo)
+- [⚠️] `pytest tests/test_ml_smoke.py` pasa (require dependencias ML instaladas)
 
 **Nota:** Las validaciones con ⚠️ requieren entorno completo y se ejecutarán automáticamente en CI/CD.
 
@@ -107,7 +107,7 @@ Todas las correcciones críticas identificadas en el **INFORME_AUDITORIA_CICD.md
 - [x] `standalone: true` agregado a ai-settings
 - [x] Icono `playCircle` agregado a main.ts
 - [x] `ng build --configuration production` exitoso ✅
-- [⚠️] `ng test --no-watch` pasa (no ejecutado - requiere entorno de tests)
+- [⚠️] `ng test --no-watch` pasa (no ejecutado - require entorno de tests)
 
 **Nota:** Los tests frontend se ejecutarán automáticamente en CI/CD.
 
@@ -116,7 +116,7 @@ Todas las correcciones críticas identificadas en el **INFORME_AUDITORIA_CICD.md
 - [⚠️] Build local exitoso (Docker no disponible en entorno local - se ejecutará en CI/CD)
 - [⚠️] Migraciones ejecutan sin errores (se validará en CI/CD)
 - [⚠️] ML dependencies funcionan en container (se validará en CI/CD)
-- [⚠️] Volúmenes persisten datos (se validará en deployment)
+- [⚠️] Volúmenes persistent datos (se validará en deployment)
 - [⚠️] Health check responde OK (se validará en deployment)
 
 **Nota:** Todas las validaciones Docker se ejecutarán automáticamente en GitHub Actions.
@@ -235,5 +235,5 @@ Para dudas sobre esta implementación:
 - **Director:** @dawnsystem
 
 **Última actualización:** 2025-11-17
-**Responsable:** Claude (Sonnet 4.5)
+**Responsible:** Claude (Sonnet 4.5)
 **Sesión:** TSK-CICD-VALIDATION-FINAL

@@ -1,15 +1,16 @@
 # Generated manually for AI Suggestions API
 
-from django.conf import settings
-from django.db import migrations, models
-import django.db.models.deletion
 import django.core.validators
+import django.db.models.deletion
+from django.conf import settings
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
     """
     Add AISuggestionFeedback model for tracking user feedback on AI suggestions.
-    
+
     This model enables:
     - Tracking of applied vs rejected AI suggestions
     - Accuracy statistics and improvement of AI models

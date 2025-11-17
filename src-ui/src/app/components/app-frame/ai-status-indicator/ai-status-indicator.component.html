@@ -1,15 +1,15 @@
 <li class="nav-item ai-status-container">
-  <button 
-    class="btn border-0 position-relative" 
-    [ngbPopover]="aiStatusPopover" 
+  <button
+    class="btn border-0 position-relative"
+    [ngbPopover]="aiStatusPopover"
     popoverClass="ai-status-popover"
     placement="bottom"
     container="body"
     triggers="mouseenter:mouseleave">
-    <i-bs 
-      width="1.3em" 
-      height="1.3em" 
-      [name]="iconName" 
+    <i-bs
+      width="1.3em"
+      height="1.3em"
+      [name]="iconName"
       [class]="iconClass">
     </i-bs>
     @if (hasAlerts) {
@@ -26,7 +26,7 @@
       <i-bs name="robot" width="1em" height="1em" class="me-1"></i-bs>
       <span i18n>AI Scanner Status</span>
     </h6>
-    
+
     <div class="status-info">
       <div class="status-row mb-2">
         <span class="status-label" i18n>Status:</span>
@@ -66,8 +66,8 @@
     </div>
 
     <div class="mt-3 pt-2 border-top">
-      <button 
-        class="btn btn-sm btn-outline-primary w-100" 
+      <button
+        class="btn btn-sm btn-outline-primary w-100"
         (click)="navigateToSettings()"
         i18n>
         Configure AI Scanner

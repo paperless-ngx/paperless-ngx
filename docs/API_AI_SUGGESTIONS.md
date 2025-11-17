@@ -278,9 +278,9 @@ async function getAISuggestions(documentId: number): Promise<AISuggestions> {
 
 // Apply a suggestion
 async function applySuggestion(
-  documentId: number, 
-  type: string, 
-  valueId: number, 
+  documentId: number,
+  type: string,
+  valueId: number,
   confidence: number
 ): Promise<void> {
   await axios.post(`${API_BASE}/${documentId}/apply-suggestion/`, {
@@ -292,9 +292,9 @@ async function applySuggestion(
 
 // Reject a suggestion
 async function rejectSuggestion(
-  documentId: number, 
-  type: string, 
-  valueId: number, 
+  documentId: number,
+  type: string,
+  valueId: number,
   confidence: number
 ): Promise<void> {
   await axios.post(`${API_BASE}/${documentId}/reject-suggestion/`, {
@@ -315,21 +315,21 @@ async function handleDocument(documentId: number) {
   try {
     // Get suggestions
     const suggestions = await getAISuggestions(documentId);
-    
+
     // Show suggestions to user
     if (suggestions.tags) {
       suggestions.tags.forEach(tag => {
         console.log(`Suggested tag: ${tag.name} (${tag.confidence * 100}%)`);
       });
     }
-    
+
     // User accepts a tag suggestion
     if (suggestions.tags && suggestions.tags.length > 0) {
       const tag = suggestions.tags[0];
       await applySuggestion(documentId, 'tag', tag.id, tag.confidence);
       console.log('Tag applied successfully');
     }
-    
+
   } catch (error) {
     console.error('Error handling AI suggestions:', error);
   }
