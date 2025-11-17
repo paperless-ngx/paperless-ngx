@@ -95,6 +95,14 @@ LABEL org.opencontainers.image.source="https://github.com/paperless-ngx/paperles
 LABEL org.opencontainers.image.url="https://github.com/paperless-ngx/paperless-ngx"
 LABEL org.opencontainers.image.licenses="GPL-3.0-only"
 
+# Build metadata labels
+ARG BUILD_DATE
+ARG VERSION
+ARG REVISION
+LABEL org.opencontainers.image.created="${BUILD_DATE}"
+LABEL org.opencontainers.image.version="${VERSION}"
+LABEL org.opencontainers.image.revision="${REVISION}"
+
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Buildx provided, must be defined to use though
@@ -104,6 +112,11 @@ ARG TARGETARCH
 ARG JBIG2ENC_VERSION=0.30
 ARG QPDF_VERSION=11.9.0
 ARG GS_VERSION=10.03.1
+
+# Image metadata variables with defaults
+ARG BUILD_DATE=unknown
+ARG VERSION=dev
+ARG REVISION=unknown
 
 # Set Python environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
