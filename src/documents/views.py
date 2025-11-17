@@ -1363,7 +1363,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
     def ai_suggestions(self, request, pk=None):
         """
         Get AI suggestions for a document.
-        
+
         Returns AI-generated suggestions for tags, correspondent, document type,
         storage path, custom fields, workflows, and title.
         """
@@ -1387,7 +1387,9 @@ class UnifiedSearchViewSet(DocumentViewSet):
             scan_result = scanner.scan_document(
                 document=document,
                 document_text=document.content,
-                original_file_path=document.source_path if hasattr(document, "source_path") else None,
+                original_file_path=document.source_path
+                if hasattr(document, "source_path")
+                else None,
             )
 
             # Convert scan result to serializable format
@@ -1400,9 +1402,14 @@ class UnifiedSearchViewSet(DocumentViewSet):
             return Response(serializer.validated_data)
 
         except Exception as e:
-            logger.error(f"Error getting AI suggestions for document {pk}: {e}", exc_info=True)
+            logger.error(
+                f"Error getting AI suggestions for document {pk}: {e}",
+                exc_info=True,
+            )
             return Response(
-                {"detail": "Error generating AI suggestions. Please check the logs for details."},
+                {
+                    "detail": "Error generating AI suggestions. Please check the logs for details.",
+                },
                 status=500,
             )
 
@@ -1410,7 +1417,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
     def apply_suggestion(self, request, pk=None):
         """
         Apply an AI suggestion to a document.
-        
+
         Records user feedback and applies the suggested change.
         """
         from documents.models import AISuggestionFeedback
@@ -1477,26 +1484,37 @@ class UnifiedSearchViewSet(DocumentViewSet):
                     user=request.user,
                 )
 
-                return Response({
-                    "status": "success",
-                    "message": result_message,
-                })
+                return Response(
+                    {
+                        "status": "success",
+                        "message": result_message,
+                    },
+                )
             else:
                 return Response(
                     {"detail": "Invalid suggestion type or missing value"},
                     status=400,
                 )
 
-        except (Tag.DoesNotExist, Correspondent.DoesNotExist,
-                DocumentType.DoesNotExist, StoragePath.DoesNotExist):
+        except (
+            Tag.DoesNotExist,
+            Correspondent.DoesNotExist,
+            DocumentType.DoesNotExist,
+            StoragePath.DoesNotExist,
+        ):
             return Response(
                 {"detail": "Referenced object not found"},
                 status=404,
             )
         except Exception as e:
-            logger.error(f"Error applying suggestion for document {pk}: {e}", exc_info=True)
+            logger.error(
+                f"Error applying suggestion for document {pk}: {e}",
+                exc_info=True,
+            )
             return Response(
-                {"detail": "Error applying suggestion. Please check the logs for details."},
+                {
+                    "detail": "Error applying suggestion. Please check the logs for details.",
+                },
                 status=500,
             )
 
@@ -1504,7 +1522,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
     def reject_suggestion(self, request, pk=None):
         """
         Reject an AI suggestion for a document.
-        
+
         Records user feedback for improving AI accuracy.
         """
         from documents.models import AISuggestionFeedback
@@ -1533,15 +1551,22 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 user=request.user,
             )
 
-            return Response({
-                "status": "success",
-                "message": "Suggestion rejected and feedback recorded",
-            })
+            return Response(
+                {
+                    "status": "success",
+                    "message": "Suggestion rejected and feedback recorded",
+                },
+            )
 
         except Exception as e:
-            logger.error(f"Error rejecting suggestion for document {pk}: {e}", exc_info=True)
+            logger.error(
+                f"Error rejecting suggestion for document {pk}: {e}",
+                exc_info=True,
+            )
             return Response(
-                {"detail": "Error rejecting suggestion. Please check the logs for details."},
+                {
+                    "detail": "Error rejecting suggestion. Please check the logs for details.",
+                },
                 status=500,
             )
 
@@ -1549,7 +1574,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
     def ai_suggestion_stats(self, request):
         """
         Get statistics about AI suggestion accuracy.
-        
+
         Returns aggregated data about applied vs rejected suggestions,
         accuracy rates, and confidence scores.
         """
@@ -1571,13 +1596,23 @@ class UnifiedSearchViewSet(DocumentViewSet):
             ).count()
 
             # Calculate accuracy rate
-            accuracy_rate = (total_applied / total_feedbacks * 100) if total_feedbacks > 0 else 0
+            accuracy_rate = (
+                (total_applied / total_feedbacks * 100) if total_feedbacks > 0 else 0
+            )
 
             # Get statistics by suggestion type using a single aggregated query
-            stats_by_type = AISuggestionFeedback.objects.values("suggestion_type").annotate(
+            stats_by_type = AISuggestionFeedback.objects.values(
+                "suggestion_type",
+            ).annotate(
                 total=Count("id"),
-                applied=Count("id", filter=Q(status=AISuggestionFeedback.STATUS_APPLIED)),
-                rejected=Count("id", filter=Q(status=AISuggestionFeedback.STATUS_REJECTED)),
+                applied=Count(
+                    "id",
+                    filter=Q(status=AISuggestionFeedback.STATUS_APPLIED),
+                ),
+                rejected=Count(
+                    "id",
+                    filter=Q(status=AISuggestionFeedback.STATUS_REJECTED),
+                ),
             )
 
             # Build the by_type dictionary using the aggregated results
@@ -1592,25 +1627,36 @@ class UnifiedSearchViewSet(DocumentViewSet):
                     "total": type_total,
                     "applied": type_applied,
                     "rejected": type_rejected,
-                    "accuracy_rate": (type_applied / type_total * 100) if type_total > 0 else 0,
+                    "accuracy_rate": (type_applied / type_total * 100)
+                    if type_total > 0
+                    else 0,
                 }
 
             # Get average confidence scores
-            avg_confidence_applied = AISuggestionFeedback.objects.filter(
-                status=AISuggestionFeedback.STATUS_APPLIED,
-            ).aggregate(Avg("confidence"))["confidence__avg"] or 0.0
+            avg_confidence_applied = (
+                AISuggestionFeedback.objects.filter(
+                    status=AISuggestionFeedback.STATUS_APPLIED,
+                ).aggregate(Avg("confidence"))["confidence__avg"]
+                or 0.0
+            )
 
-            avg_confidence_rejected = AISuggestionFeedback.objects.filter(
-                status=AISuggestionFeedback.STATUS_REJECTED,
-            ).aggregate(Avg("confidence"))["confidence__avg"] or 0.0
+            avg_confidence_rejected = (
+                AISuggestionFeedback.objects.filter(
+                    status=AISuggestionFeedback.STATUS_REJECTED,
+                ).aggregate(Avg("confidence"))["confidence__avg"]
+                or 0.0
+            )
 
             # Get recent suggestions (last 10)
-            recent_suggestions = AISuggestionFeedback.objects.order_by("-created_at")[:10]
+            recent_suggestions = AISuggestionFeedback.objects.order_by("-created_at")[
+                :10
+            ]
 
             # Build response data
             from documents.serializers.ai_suggestions import (
                 AISuggestionFeedbackSerializer,
             )
+
             data = {
                 "total_suggestions": total_feedbacks,
                 "total_applied": total_applied,
@@ -1620,7 +1666,8 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 "average_confidence_applied": avg_confidence_applied,
                 "average_confidence_rejected": avg_confidence_rejected,
                 "recent_suggestions": AISuggestionFeedbackSerializer(
-                    recent_suggestions, many=True,
+                    recent_suggestions,
+                    many=True,
                 ).data,
             }
 
@@ -1633,7 +1680,9 @@ class UnifiedSearchViewSet(DocumentViewSet):
         except Exception as e:
             logger.error(f"Error getting AI suggestion statistics: {e}", exc_info=True)
             return Response(
-                {"detail": "Error getting statistics. Please check the logs for details."},
+                {
+                    "detail": "Error getting statistics. Please check the logs for details.",
+                },
                 status=500,
             )
 
@@ -3481,10 +3530,12 @@ class DeletionRequestViewSet(ModelViewSet):
             )
 
     @extend_schema(
-        responses={200: inline_serializer(
-            name="PendingCountResponse",
-            fields={"count": serializers.IntegerField()},
-        )},
+        responses={
+            200: inline_serializer(
+                name="PendingCountResponse",
+                fields={"count": serializers.IntegerField()},
+            ),
+        },
     )
     @action(detail=False, methods=["get"])
     def pending_count(self, request):
@@ -3611,11 +3662,13 @@ class AISuggestionsView(GenericAPIView):
         for tag_id, confidence in scan_result.tags:
             try:
                 tag = Tag.objects.get(pk=tag_id)
-                response_data["tags"].append({
-                    "id": tag.id,
-                    "name": tag.name,
-                    "confidence": confidence,
-                })
+                response_data["tags"].append(
+                    {
+                        "id": tag.id,
+                        "name": tag.name,
+                        "confidence": confidence,
+                    },
+                )
             except Tag.DoesNotExist:
                 # Tag was suggested by AI but no longer exists; skip it
                 pass
@@ -3698,7 +3751,11 @@ class ApplyAISuggestionsView(GenericAPIView):
             )
 
         # Check if user has permission to change this document
-        if not has_perms_owner_aware(request.user, "documents.change_document", document):
+        if not has_perms_owner_aware(
+            request.user,
+            "documents.change_document",
+            document,
+        ):
             return Response(
                 {"error": "Permission denied"},
                 status=status.HTTP_403_FORBIDDEN,
@@ -3715,10 +3772,16 @@ class ApplyAISuggestionsView(GenericAPIView):
             selected_tags = serializer.validated_data.get("selected_tags", [])
             if selected_tags:
                 # Apply only selected tags
-                tags_to_apply = [tag_id for tag_id, _ in scan_result.tags if tag_id in selected_tags]
+                tags_to_apply = [
+                    tag_id for tag_id, _ in scan_result.tags if tag_id in selected_tags
+                ]
             else:
                 # Apply all high-confidence tags
-                tags_to_apply = [tag_id for tag_id, conf in scan_result.tags if conf >= scanner.auto_apply_threshold]
+                tags_to_apply = [
+                    tag_id
+                    for tag_id, conf in scan_result.tags
+                    if conf >= scanner.auto_apply_threshold
+                ]
 
             for tag_id in tags_to_apply:
                 try:
@@ -3729,7 +3792,10 @@ class ApplyAISuggestionsView(GenericAPIView):
                     # Tag not found; skip applying this tag
                     pass
 
-        if serializer.validated_data.get("apply_correspondent") and scan_result.correspondent:
+        if (
+            serializer.validated_data.get("apply_correspondent")
+            and scan_result.correspondent
+        ):
             corr_id, confidence = scan_result.correspondent
             try:
                 correspondent = Correspondent.objects.get(pk=corr_id)
@@ -3739,7 +3805,10 @@ class ApplyAISuggestionsView(GenericAPIView):
                 # Correspondent not found; skip applying
                 pass
 
-        if serializer.validated_data.get("apply_document_type") and scan_result.document_type:
+        if (
+            serializer.validated_data.get("apply_document_type")
+            and scan_result.document_type
+        ):
             type_id, confidence = scan_result.document_type
             try:
                 doc_type = DocumentType.objects.get(pk=type_id)
@@ -3749,7 +3818,10 @@ class ApplyAISuggestionsView(GenericAPIView):
                 # Document type not found; skip applying
                 pass
 
-        if serializer.validated_data.get("apply_storage_path") and scan_result.storage_path:
+        if (
+            serializer.validated_data.get("apply_storage_path")
+            and scan_result.storage_path
+        ):
             path_id, confidence = scan_result.storage_path
             try:
                 storage_path = StoragePath.objects.get(pk=path_id)
@@ -3759,18 +3831,23 @@ class ApplyAISuggestionsView(GenericAPIView):
                 # Storage path not found; skip applying
                 pass
 
-        if serializer.validated_data.get("apply_title") and scan_result.title_suggestion:
+        if (
+            serializer.validated_data.get("apply_title")
+            and scan_result.title_suggestion
+        ):
             document.title = scan_result.title_suggestion
             applied.append(f"title: {scan_result.title_suggestion}")
 
         # Save document
         document.save()
 
-        return Response({
-            "status": "success",
-            "document_id": document.id,
-            "applied": applied,
-        })
+        return Response(
+            {
+                "status": "success",
+                "document_id": document.id,
+                "applied": applied,
+            },
+        )
 
 
 class AIConfigurationView(GenericAPIView):
@@ -3799,7 +3876,7 @@ class AIConfigurationView(GenericAPIView):
     def post(self, request):
         """
         Update AI configuration.
-        
+
         Note: This updates the global scanner instance. Configuration changes
         will take effect immediately but may require server restart in production
         environments for consistency across workers.
@@ -3810,23 +3887,28 @@ class AIConfigurationView(GenericAPIView):
         # Create new scanner with updated configuration
         config = {}
         if "auto_apply_threshold" in serializer.validated_data:
-            config["auto_apply_threshold"] = serializer.validated_data["auto_apply_threshold"]
+            config["auto_apply_threshold"] = serializer.validated_data[
+                "auto_apply_threshold"
+            ]
         if "suggest_threshold" in serializer.validated_data:
             config["suggest_threshold"] = serializer.validated_data["suggest_threshold"]
         if "ml_enabled" in serializer.validated_data:
             config["enable_ml_features"] = serializer.validated_data["ml_enabled"]
         if "advanced_ocr_enabled" in serializer.validated_data:
-            config["enable_advanced_ocr"] = serializer.validated_data["advanced_ocr_enabled"]
+            config["enable_advanced_ocr"] = serializer.validated_data[
+                "advanced_ocr_enabled"
+            ]
 
         # Update global scanner instance
         # WARNING: Not thread-safe. Consider storing configuration in database
         # and reloading on each get_ai_scanner() call for production use
         from documents import ai_scanner
+
         ai_scanner._scanner_instance = AIDocumentScanner(**config)
 
-        return Response({
-            "status": "success",
-            "message": "AI configuration updated. Changes may require server restart for consistency.",
-        })
-
-
+        return Response(
+            {
+                "status": "success",
+                "message": "AI configuration updated. Changes may require server restart for consistency.",
+            },
+        )

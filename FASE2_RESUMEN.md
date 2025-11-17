@@ -41,7 +41,7 @@ Validaciones implementadas:
 ```python
 ✅ Tamaño máximo de archivo (500MB)
 ✅ Tipos MIME permitidos
-✅ Extensiones peligrosas bloqueadas
+✅ Extensions peligrosas bloqueadas
 ✅ Detección de contenido malicioso
 ✅ Prevención de path traversal
 ✅ Cálculo de checksums
@@ -85,7 +85,7 @@ Los cambios se activan automáticamente al reiniciar la aplicación.
 
 ```bash
 # Simplemente reinicia el servidor Django
-# No se requiere configuración adicional
+# No se require configuración adicional
 ```
 
 ### Paso 2: Verificar Cabeceras de Seguridad
@@ -116,20 +116,20 @@ done
 
 **Cómo funciona**:
 ```
-Usuario hace petición
+Usuario have petición
     ↓
 Verificar contador en Redis
     ↓
 ¿Dentro del límite? → Permitir
     ↓
-¿Excede límite? → Bloquear con HTTP 429
+¿Exceed límite? → Bloquear con HTTP 429
 ```
 
 **Ejemplo**:
 ```
-Minuto 0:00 - Usuario hace 90 peticiones ✅
-Minuto 0:30 - Usuario hace 10 más (total: 100) ✅
-Minuto 0:31 - Usuario hace 1 más → ❌ BLOQUEADO
+Minuto 0:00 - Usuario have 90 peticiones ✅
+Minuto 0:30 - Usuario have 10 más (total: 100) ✅
+Minuto 0:31 - Usuario have 1 más → ❌ BLOQUEADO
 Minuto 1:01 - Contador se reinicia
 ```
 
@@ -149,7 +149,7 @@ Minuto 1:01 - Contador se reinicia
 
 **Cabecera**: `X-Frame-Options: DENY`
 
-**Efecto**: La página no puede ser embebida en iframe
+**Efecto**: La página no puede set embebida en iframe
 
 ---
 
@@ -159,7 +159,7 @@ Minuto 1:01 - Contador se reinicia
 **Validaciones**:
 - ✅ Verifica tamaño de archivo
 - ✅ Valida tipo MIME (usando magic numbers, no extensión)
-- ✅ Bloquea extensiones peligrosas (.exe, .bat, etc.)
+- ✅ Bloquea extensions peligrosas (.exe, .bat, etc.)
 - ✅ Escanea contenido en busca de patrones maliciosos
 
 **Archivos Bloqueados**:
@@ -341,7 +341,7 @@ ALLOWED_MIME_TYPES = {
 - Web Application Firewall (WAF)
 
 ### Largo Plazo (3-6 Meses)
-- Auditoría de seguridad profesional
+- Auditoría de seguridad professional
 - Certificaciones (SOC 2, ISO 27001)
 - Penetration testing
 

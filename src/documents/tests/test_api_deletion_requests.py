@@ -29,7 +29,10 @@ class TestDeletionRequestAPI(APITestCase):
         # Create users
         self.user1 = User.objects.create_user(username="user1", password="pass123")
         self.user2 = User.objects.create_user(username="user2", password="pass123")
-        self.admin = User.objects.create_superuser(username="admin", password="admin123")
+        self.admin = User.objects.create_superuser(
+            username="admin",
+            password="admin123",
+        )
 
         # Create test documents
         self.doc1 = Document.objects.create(

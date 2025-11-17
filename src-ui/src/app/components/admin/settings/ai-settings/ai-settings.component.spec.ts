@@ -25,7 +25,7 @@ describe('AiSettingsComponent', () => {
 
     fixture = TestBed.createComponent(AiSettingsComponent)
     component = fixture.componentInstance
-    
+
     // Create a mock form group
     component.settingsForm = new FormGroup({
       aiScannerEnabled: new FormControl(false),
@@ -35,9 +35,9 @@ describe('AiSettingsComponent', () => {
       aiSuggestThreshold: new FormControl(60),
       aiMlModel: new FormControl('bert-base'),
     })
-    
+
     component.isDirty$ = of(false)
-    
+
     fixture.detectChanges()
   })
 
@@ -61,9 +61,9 @@ describe('AiSettingsComponent', () => {
     const event = {
       target: { value: '85' },
     } as any
-    
+
     component.onAutoApplyThresholdChange(event)
-    
+
     expect(component.settingsForm.get('aiAutoApplyThreshold')?.value).toBe(85)
   })
 
@@ -71,29 +71,29 @@ describe('AiSettingsComponent', () => {
     const event = {
       target: { value: '70' },
     } as any
-    
+
     component.onSuggestThresholdChange(event)
-    
+
     expect(component.settingsForm.get('aiSuggestThreshold')?.value).toBe(70)
   })
 
   it('should emit settings changed event', () => {
     spyOn(component.settingsChanged, 'emit')
-    
+
     component.onAiSettingChange()
-    
+
     expect(component.settingsChanged.emit).toHaveBeenCalled()
   })
 
   it('should test AI with sample document', (done) => {
     component.settingsForm.get('aiScannerEnabled')?.setValue(true)
-    
+
     expect(component.testingInProgress).toBe(false)
-    
+
     component.testAIWithSample()
-    
+
     expect(component.testingInProgress).toBe(true)
-    
+
     setTimeout(() => {
       expect(component.testingInProgress).toBe(false)
       expect(mockToastService.show).toHaveBeenCalled()
@@ -104,7 +104,7 @@ describe('AiSettingsComponent', () => {
   it('should return correct aiScannerEnabled status', () => {
     component.settingsForm.get('aiScannerEnabled')?.setValue(true)
     expect(component.aiScannerEnabled).toBe(true)
-    
+
     component.settingsForm.get('aiScannerEnabled')?.setValue(false)
     expect(component.aiScannerEnabled).toBe(false)
   })
@@ -112,7 +112,7 @@ describe('AiSettingsComponent', () => {
   it('should get correct threshold values', () => {
     component.settingsForm.get('aiAutoApplyThreshold')?.setValue(75)
     component.settingsForm.get('aiSuggestThreshold')?.setValue(55)
-    
+
     expect(component.autoApplyThreshold).toBe(75)
     expect(component.suggestThreshold).toBe(55)
   })

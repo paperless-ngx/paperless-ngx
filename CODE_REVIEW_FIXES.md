@@ -244,7 +244,7 @@ Add missing dependencies to pyproject.toml
 1. **Add ML Dependencies to pyproject.toml**
    ```toml
    "transformers>=4.30.0",
-   "torch>=2.0.0", 
+   "torch>=2.0.0",
    "sentence-transformers>=2.2.0",
    ```
 

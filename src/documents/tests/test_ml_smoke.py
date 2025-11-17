@@ -23,8 +23,7 @@ class TestMLDependenciesAvailable:
         import torch
 
         assert version.parse(torch.__version__) >= version.parse("2.0.0"), (
-            f"PyTorch version {torch.__version__} is too old. "
-            f"Minimum required: 2.0.0"
+            f"PyTorch version {torch.__version__} is too old. Minimum required: 2.0.0"
         )
 
     def test_transformers_available(self):
@@ -41,8 +40,7 @@ class TestMLDependenciesAvailable:
         import cv2
 
         assert version.parse(cv2.__version__) >= version.parse("4.8.0"), (
-            f"OpenCV version {cv2.__version__} is too old. "
-            f"Minimum required: 4.8.0"
+            f"OpenCV version {cv2.__version__} is too old. Minimum required: 4.8.0"
         )
 
     def test_sentence_transformers_available(self):
@@ -65,8 +63,7 @@ class TestMLDependenciesAvailable:
         import numpy as np
 
         assert version.parse(np.__version__) >= version.parse("1.26.0"), (
-            f"NumPy version {np.__version__} is too old. "
-            f"Minimum required: 1.26.0"
+            f"NumPy version {np.__version__} is too old. Minimum required: 1.26.0"
         )
 
     def test_pandas_available(self):
@@ -74,8 +71,7 @@ class TestMLDependenciesAvailable:
         import pandas as pd
 
         assert version.parse(pd.__version__) >= version.parse("2.0.0"), (
-            f"Pandas version {pd.__version__} is too old. "
-            f"Minimum required: 2.0.0"
+            f"Pandas version {pd.__version__} is too old. Minimum required: 2.0.0"
         )
 
 

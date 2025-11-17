@@ -18,12 +18,12 @@ logger = logging.getLogger(__name__)
 class TableExtractor:
     """
     Extract tables from document images and PDFs.
-    
+
     Supports multiple extraction methods:
     - Deep learning-based table detection (table-transformer model)
     - PDF structure parsing
     - OCR-based table extraction
-    
+
     Example:
         >>> extractor = TableExtractor()
         >>> tables = extractor.extract_tables_from_image("invoice.png")
@@ -40,7 +40,7 @@ class TableExtractor:
     ):
         """
         Initialize the table extractor.
-        
+
         Args:
             model_name: Hugging Face model name for table detection
             confidence_threshold: Minimum confidence score for detection (0-1)
@@ -76,16 +76,18 @@ class TableExtractor:
 
         except ImportError as e:
             logger.error(f"Failed to load table detection model: {e}")
-            logger.error("Please install required packages: pip install transformers torch pillow")
+            logger.error(
+                "Please install required packages: pip install transformers torch pillow",
+            )
             raise
 
     def detect_tables(self, image: Image.Image) -> list[dict[str, Any]]:
         """
         Detect tables in an image.
-        
+
         Args:
             image: PIL Image object
-            
+
         Returns:
             List of detected tables with bounding boxes and confidence scores
             [
@@ -122,12 +124,18 @@ class TableExtractor:
 
             # Convert to list of dicts
             tables = []
-            for score, label, box in zip(results["scores"], results["labels"], results["boxes"]):
-                tables.append({
-                    "bbox": box.cpu().tolist(),
-                    "score": score.item(),
-                    "label": self._model.config.id2label[label.item()],
-                })
+            for score, label, box in zip(
+                results["scores"],
+                results["labels"],
+                results["boxes"],
+            ):
+                tables.append(
+                    {
+                        "bbox": box.cpu().tolist(),
+                        "score": score.item(),
+                        "label": self._model.config.id2label[label.item()],
+                    },
+                )
 
             logger.info(f"Detected {len(tables)} tables in image")
             return tables
@@ -144,14 +152,14 @@ class TableExtractor:
     ) -> dict[str, Any] | None:
         """
         Extract table data from a specific region of an image.
-        
+
         Args:
             image: PIL Image object
             bbox: Bounding box [x1, y1, x2, y2]
             use_ocr: Whether to use OCR for text extraction
-            
+
         Returns:
-            Extracted table data as dictionary with 'data' (pandas DataFrame) 
+            Extracted table data as dictionary with 'data' (pandas DataFrame)
             and 'raw_text' keys, or None if extraction failed
         """
         try:
@@ -184,6 +192,7 @@ class TableExtractor:
             else:
                 # Fallback to basic OCR without structure
                 import pytesseract
+
                 raw_text = pytesseract.image_to_string(table_image)
                 return {
                     "data": None,
@@ -193,7 +202,9 @@ class TableExtractor:
                 }
 
         except ImportError:
-            logger.error("pytesseract not installed. Install with: pip install pytesseract")
+            logger.error(
+                "pytesseract not installed. Install with: pip install pytesseract",
+            )
             return None
         except Exception as e:
             logger.error(f"Error extracting table from region: {e}")
@@ -202,10 +213,10 @@ class TableExtractor:
     def _reconstruct_table_from_ocr(self, ocr_data: dict) -> Any | None:
         """
         Reconstruct table structure from OCR output.
-        
+
         Args:
             ocr_data: OCR data from pytesseract
-            
+
         Returns:
             pandas DataFrame or None if reconstruction failed
         """
@@ -265,11 +276,11 @@ class TableExtractor:
     ) -> list[dict[str, Any]]:
         """
         Extract all tables from an image file.
-        
+
         Args:
             image_path: Path to image file
             output_format: 'dataframe' or 'csv' or 'json'
-            
+
         Returns:
             List of extracted tables with data and metadata
         """
@@ -283,7 +294,7 @@ class TableExtractor:
             # Extract data from each table
             tables = []
             for i, detection in enumerate(detections):
-                logger.info(f"Extracting table {i+1}/{len(detections)}")
+                logger.info(f"Extracting table {i + 1}/{len(detections)}")
 
                 table_data = self.extract_table_from_region(
                     image,
@@ -298,11 +309,15 @@ class TableExtractor:
                     if output_format == "csv" and table_data["data"] is not None:
                         table_data["csv"] = table_data["data"].to_csv(index=False)
                     elif output_format == "json" and table_data["data"] is not None:
-                        table_data["json"] = table_data["data"].to_json(orient="records")
+                        table_data["json"] = table_data["data"].to_json(
+                            orient="records",
+                        )
 
                     tables.append(table_data)
 
-            logger.info(f"Successfully extracted {len(tables)} tables from {image_path}")
+            logger.info(
+                f"Successfully extracted {len(tables)} tables from {image_path}",
+            )
             return tables
 
         except Exception as e:
@@ -316,11 +331,11 @@ class TableExtractor:
     ) -> dict[int, list[dict[str, Any]]]:
         """
         Extract tables from a PDF document.
-        
+
         Args:
             pdf_path: Path to PDF file
             page_numbers: List of page numbers to process (1-indexed), or None for all pages
-            
+
         Returns:
             Dictionary mapping page numbers to lists of extracted tables
         """
@@ -379,11 +394,11 @@ class TableExtractor:
     ) -> bool:
         """
         Save extracted tables to an Excel file.
-        
+
         Args:
             tables: List of table dictionaries with 'data' key containing DataFrame
             output_path: Path to output Excel file
-            
+
         Returns:
             True if successful, False otherwise
         """
@@ -393,9 +408,9 @@ class TableExtractor:
             with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
                 for i, table in enumerate(tables):
                     if table.get("data") is not None:
-                        sheet_name = f"Table_{i+1}"
+                        sheet_name = f"Table_{i + 1}"
                         if "page" in table:
-                            sheet_name = f"Page_{table['page']}_Table_{i+1}"
+                            sheet_name = f"Page_{table['page']}_Table_{i + 1}"
 
                         table["data"].to_excel(
                             writer,

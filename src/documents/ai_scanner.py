@@ -44,36 +44,42 @@ logger = logging.getLogger("paperless.ai_scanner")
 
 class TagSuggestion(TypedDict):
     """Tag suggestion with confidence score."""
+
     tag_id: int
     confidence: float
 
 
 class CorrespondentSuggestion(TypedDict):
     """Correspondent suggestion with confidence score."""
+
     correspondent_id: int
     confidence: float
 
 
 class DocumentTypeSuggestion(TypedDict):
     """Document type suggestion with confidence score."""
+
     type_id: int
     confidence: float
 
 
 class StoragePathSuggestion(TypedDict):
     """Storage path suggestion with confidence score."""
+
     path_id: int
     confidence: float
 
 
 class CustomFieldSuggestion(TypedDict):
     """Custom field value with confidence score."""
+
     value: Any
     confidence: float
 
 
 class WorkflowSuggestion(TypedDict):
     """Workflow assignment suggestion with confidence score."""
+
     workflow_id: int
     confidence: float
 
@@ -96,6 +102,7 @@ class AIScanResultDict(TypedDict, total=False):
         title_suggestion: Suggested document title (optional)
         metadata: Additional metadata extracted from document
     """
+
     tags: list[TagSuggestion]
     correspondent: CorrespondentSuggestion
     document_type: DocumentTypeSuggestion
@@ -141,12 +148,17 @@ class AIScanResult:
         """
         # Convert internal tuple format to TypedDict format
         result: AIScanResultDict = {
-            "tags": [{"tag_id": tag_id, "confidence": conf} for tag_id, conf in self.tags],
+            "tags": [
+                {"tag_id": tag_id, "confidence": conf} for tag_id, conf in self.tags
+            ],
             "custom_fields": {
                 field_id: {"value": value, "confidence": conf}
                 for field_id, (value, conf) in self.custom_fields.items()
             },
-            "workflows": [{"workflow_id": wf_id, "confidence": conf} for wf_id, conf in self.workflows],
+            "workflows": [
+                {"workflow_id": wf_id, "confidence": conf}
+                for wf_id, conf in self.workflows
+            ],
             "extracted_entities": self.extracted_entities,
             "metadata": self.metadata,
         }
@@ -279,6 +291,7 @@ class AIDocumentScanner:
         if self._ner_extractor is None and self.ml_enabled:
             try:
                 from documents.ml.ner import DocumentNER
+
                 self._ner_extractor = DocumentNER(use_cache=True)
                 logger.info("NER extractor loaded successfully with caching")
             except Exception as e:
@@ -465,7 +478,9 @@ class AIDocumentScanner:
 
             # Add confidence scores based on matching strength
             for tag in matched_tags:
-                confidence = self.TAG_CONFIDENCE_HIGH  # High confidence for matched tags
+                confidence = (
+                    self.TAG_CONFIDENCE_HIGH
+                )  # High confidence for matched tags
                 suggestions.append((tag.id, confidence))
 
             # Additional entity-based suggestions
@@ -992,7 +1007,7 @@ class AIDocumentScanner:
     def warm_up_models(self) -> None:
         """
         Pre-load all ML models on startup (warm-up).
-        
+
         This ensures models are cached and ready for use,
         making the first document scan fast.
         """
@@ -1001,10 +1016,12 @@ class AIDocumentScanner:
             return
 
         import time
+
         logger.info("Starting ML model warm-up...")
         start_time = time.time()
 
         from documents.ml.model_cache import ModelCacheManager
+
         cache_manager = ModelCacheManager.get_instance()
 
         # Define model loaders
@@ -1012,8 +1029,10 @@ class AIDocumentScanner:
 
         # Classifier
         if self.ml_enabled:
+
             def load_classifier():
                 from documents.ml.classifier import TransformerDocumentClassifier
+
                 model_name = getattr(
                     settings,
                     "PAPERLESS_ML_CLASSIFIER_MODEL",
@@ -1023,28 +1042,38 @@ class AIDocumentScanner:
                     model_name=model_name,
                     use_cache=True,
                 )
+
             model_loaders["classifier"] = load_classifier
 
         # NER
         if self.ml_enabled:
+
             def load_ner():
                 from documents.ml.ner import DocumentNER
+
                 return DocumentNER(use_cache=True)
+
             model_loaders["ner"] = load_ner
 
         # Semantic Search
         if self.ml_enabled:
+
             def load_semantic():
                 from documents.ml.semantic_search import SemanticSearch
+
                 cache_dir = getattr(settings, "PAPERLESS_ML_MODEL_CACHE", None)
                 return SemanticSearch(cache_dir=cache_dir, use_cache=True)
+
             model_loaders["semantic_search"] = load_semantic
 
         # Table Extractor
         if self.advanced_ocr_enabled:
+
             def load_table():
                 from documents.ocr.table_extractor import TableExtractor
+
                 return TableExtractor()
+
             model_loaders["table_extractor"] = load_table
 
         # Warm up all models
@@ -1056,7 +1085,7 @@ class AIDocumentScanner:
     def get_cache_metrics(self) -> dict[str, Any]:
         """
         Get cache performance metrics.
-        
+
         Returns:
             Dictionary with cache statistics
         """

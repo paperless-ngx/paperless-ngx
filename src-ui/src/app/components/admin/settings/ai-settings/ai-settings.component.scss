@@ -2,7 +2,7 @@
 
 .form-range {
   cursor: pointer;
-  
+
   &:disabled {
     cursor: not-allowed;
     opacity: 0.5;
@@ -25,7 +25,7 @@
 
 .alert {
   font-size: 0.9rem;
-  
+
   i-bs {
     vertical-align: middle;
   }

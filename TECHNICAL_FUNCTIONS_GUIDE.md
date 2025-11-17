@@ -175,7 +175,7 @@ def train(self) -> bool
 
 **Parameters**: None
 
-**Returns**: 
+**Returns**:
 - `True` if training successful
 - `False` if insufficient data
 
@@ -468,7 +468,7 @@ def get_barcodes(path, pages=None) -> list
 **Supported Formats**:
 - CODE128, CODE39, QR Code, Data Matrix, EAN, UPC
 
-**Uses**: 
+**Uses**:
 - pyzbar library for barcode detection
 - OpenCV for image processing
 
@@ -496,7 +496,7 @@ def separate_pages(path, barcodes) -> list
 
 **Returns**: List of paths to separated documents
 
-**Use Case**: 
+**Use Case**:
 - Batch scanning with separator sheets
 - Automatic document splitting
 
@@ -638,18 +638,18 @@ def execute_workflow(self, workflow, document, trigger_type) -> dict
 ```
 
 **Workflow Components**:
-1. **Triggers**: 
+1. **Triggers**:
    - consumption
    - manual
    - scheduled
    - webhook
-   
+
 2. **Conditions**:
    - Document properties
    - Content matching
    - Date ranges
    - Custom field values
-   
+
 3. **Actions**:
    - Set correspondent
    - Set document type
@@ -749,7 +749,7 @@ def setup_periodic_tasks(sender, **kwargs):
         sanity_check.s(),
         name='daily-sanity-check'
     )
-    
+
     # Train classifier weekly
     sender.add_periodic_task(
         crontab(day_of_week=0, hour=2, minute=0),

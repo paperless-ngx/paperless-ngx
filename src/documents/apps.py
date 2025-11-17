@@ -59,9 +59,11 @@ class DocumentsConfig(AppConfig):
         if warmup_enabled:
             try:
                 from documents.ai_scanner import get_ai_scanner
+
                 scanner = get_ai_scanner()
                 scanner.warm_up_models()
             except Exception as e:
                 import logging
+
                 logger = logging.getLogger("paperless.documents")
                 logger.warning(f"Failed to warm up ML models: {e}")

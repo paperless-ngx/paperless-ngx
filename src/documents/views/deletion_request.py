@@ -27,7 +27,7 @@ logger = logging.getLogger("paperless.api")
 class DeletionRequestViewSet(ModelViewSet):
     """
     ViewSet for managing deletion requests.
-    
+
     Provides CRUD operations plus custom actions for approval workflow.
     """
 
@@ -37,7 +37,7 @@ class DeletionRequestViewSet(ModelViewSet):
     def get_queryset(self):
         """
         Return deletion requests for the current user.
-        
+
         Superusers can see all requests.
         Regular users only see their own requests.
         """
@@ -49,10 +49,10 @@ class DeletionRequestViewSet(ModelViewSet):
     def _can_manage_request(self, deletion_request):
         """
         Check if current user can manage (approve/reject/cancel) the request.
-        
+
         Args:
             deletion_request: The DeletionRequest instance
-            
+
         Returns:
             bool: True if user is the owner or a superuser
         """
@@ -63,11 +63,11 @@ class DeletionRequestViewSet(ModelViewSet):
     def approve(self, request, pk=None):
         """
         Approve a pending deletion request and execute the deletion.
-        
+
         Validates:
         - User has permission (owner or admin)
         - Status is pending
-        
+
         Returns:
             Response with execution results
         """
@@ -120,11 +120,13 @@ class DeletionRequestViewSet(ModelViewSet):
                         logger.error(
                             f"Failed to delete document {doc.id}: {e!s}",
                         )
-                        failed_deletions.append({
-                            "id": doc.id,
-                            "title": doc.title,
-                            "error": str(e),
-                        })
+                        failed_deletions.append(
+                            {
+                                "id": doc.id,
+                                "title": doc.title,
+                                "error": str(e),
+                            },
+                        )
 
                 # Update completion status
                 deletion_request.status = DeletionRequest.STATUS_COMPLETED
@@ -163,11 +165,11 @@ class DeletionRequestViewSet(ModelViewSet):
     def reject(self, request, pk=None):
         """
         Reject a pending deletion request.
-        
+
         Validates:
         - User has permission (owner or admin)
         - Status is pending
-        
+
         Returns:
             Response with updated deletion request
         """
@@ -215,11 +217,11 @@ class DeletionRequestViewSet(ModelViewSet):
     def cancel(self, request, pk=None):
         """
         Cancel a pending deletion request.
-        
+
         Validates:
         - User has permission (owner or admin)
         - Status is pending
-        
+
         Returns:
             Response with updated deletion request
         """
@@ -245,7 +247,10 @@ class DeletionRequestViewSet(ModelViewSet):
         deletion_request.status = DeletionRequest.STATUS_CANCELLED
         deletion_request.reviewed_by = request.user
         deletion_request.reviewed_at = timezone.now()
-        deletion_request.review_comment = request.data.get("comment", "Cancelled by user")
+        deletion_request.review_comment = request.data.get(
+            "comment",
+            "Cancelled by user",
+        )
         deletion_request.save()
 
         logger.info(

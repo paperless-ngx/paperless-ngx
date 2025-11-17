@@ -1,8 +1,8 @@
 # 📘 Guía de Integración con Notion
 
-**Documento:** Guía completa para integrar IntelliDocs-ngx Roadmap 2026 con Notion  
-**Fecha:** 2025-11-09  
-**Autoridad:** Siguiendo directivas de `agents.md`  
+**Documento:** Guía completa para integrar IntelliDocs-ngx Roadmap 2026 con Notion
+**Fecha:** 2025-11-09
+**Autoridad:** Siguiendo directivas de `agents.md`
 **Preferencia del Director:** Notion sobre Jira/Confluence
 
 ---
@@ -89,7 +89,7 @@ Crear una **Full-page database** llamada "Roadmap 2026 Tasks" con las siguientes
 | **Progreso** | Number | Porcentaje (0-100) |
 | **Fecha Inicio** | Date | - |
 | **Fecha Fin** | Date | - |
-| **Responsable** | Person | - |
+| **Responsible** | Person | - |
 | **GitHub Issue** | URL | Link al issue en GitHub |
 | **GitHub PR** | URL | Link al PR cuando aplique |
 | **Tags** | Multi-select | backend, frontend, mobile, ml-ai, ocr, security, devops |
@@ -114,8 +114,8 @@ Crear un template para nuevas tasks:
 - **Fin estimado:** {{Fecha Fin}}
 - **Trimestre:** {{Trimestre}}
 
-## 👤 Responsable
-{{Responsable}}
+## 👤 Responsible
+{{Responsible}}
 
 ## ✅ Subtareas
 - [ ] Subtarea 1
@@ -130,7 +130,7 @@ Crear un template para nuevas tasks:
 ## 🔗 Links
 - GitHub Issue: {{GitHub Issue}}
 - GitHub PR: {{GitHub PR}}
-- Documentación relacionada: 
+- Documentación relacionada:
 
 ## 💬 Notas
 [Notas adicionales, decisiones de diseño, etc.]
@@ -277,7 +277,7 @@ def get_status_from_issue(issue):
 
 def sync_issue_to_notion(issue):
     """Sincroniza un issue de GitHub a Notion"""
-    
+
     # Buscar si ya existe en Notion
     results = notion.databases.query(
         database_id=NOTION_DATABASE_ID,
@@ -286,7 +286,7 @@ def sync_issue_to_notion(issue):
             "url": {"equals": issue.html_url}
         }
     )
-    
+
     # Preparar propiedades
     properties = {
         "Task ID": {"title": [{"text": {"content": f"TSK-{issue.number}"}}]},
@@ -296,17 +296,17 @@ def sync_issue_to_notion(issue):
         "Trimestre": {"select": {"name": get_quarter_from_labels(issue.labels)}},
         "GitHub Issue": {"url": issue.html_url},
     }
-    
-    # Agregar responsable si existe
+
+    # Agregar responsible si existe
     if issue.assignee:
-        properties["Responsable"] = {
+        properties["Responsible"] = {
             "people": [{"object": "user", "name": issue.assignee.login}]
         }
-    
+
     # Agregar PR si existe
     if issue.pull_request:
         properties["GitHub PR"] = {"url": issue.pull_request.html_url}
-    
+
     # Crear o actualizar en Notion
     if results['results']:
         # Actualizar existente
@@ -340,17 +340,17 @@ def sync_issue_to_notion(issue):
 def main():
     """Función principal"""
     print("🔄 Sincronizando GitHub Issues a Notion...")
-    
+
     # Obtener todos los issues abiertos
     issues = repo.get_issues(state='all')
-    
+
     count = 0
     for issue in issues:
         # Solo sincronizar issues con label de Epic
         if any(label.name.startswith('epic:') for label in issue.labels):
             sync_issue_to_notion(issue)
             count += 1
-    
+
     print(f"\n✅ Sincronización completa: {count} issues procesados")
 
 if __name__ == '__main__':
@@ -383,7 +383,7 @@ python .github/scripts/sync_github_to_notion.py
 
 3. O usar un scheduled task en Windows
 
-**Esta opción es 100% gratuita y no requiere servicios de terceros de pago.**
+**Esta opción es 100% gratuita y no require servicios de terceros de pago.**
 
 ---
 
@@ -407,7 +407,7 @@ python .github/scripts/sync_github_to_notion.py
 3. Configurar:
    - **Group by:** Status
    - **Sort by:** Prioridad
-   - **Card preview:** Task ID, Responsable, Fecha Fin
+   - **Card preview:** Task ID, Responsible, Fecha Fin
 
 ### Vista 3: Por Epic
 
@@ -852,9 +852,9 @@ Para compartir con usuarios sin cuenta:
 
 ---
 
-**Soporte:**  
-Director: @dawnsystem  
-Fecha: 2025-11-09  
+**Soporte:**
+Director: @dawnsystem
+Fecha: 2025-11-09
 Versión: 1.0
 
 **Nota:** Este documento es parte de la iniciativa del ROADMAP_2026.md y sigue las directivas de agents.md

@@ -178,7 +178,7 @@ if tables:
     line_items = tables[0]['data']
     print("Line Items:")
     print(line_items)
-    
+
     # Calculate total
     if 'Amount' in line_items.columns:
         total = line_items['Amount'].sum()
@@ -230,19 +230,19 @@ from documents.ocr import TableExtractor, HandwritingRecognizer, FormFieldDetect
 
 def digitize_document(image_path):
     """Complete document digitization."""
-    
+
     # Extract tables
     table_extractor = TableExtractor()
     tables = table_extractor.extract_tables_from_image(image_path)
-    
+
     # Extract handwritten notes
     handwriting = HandwritingRecognizer()
     notes = handwriting.recognize_from_file(image_path, mode='lines')
-    
+
     # Extract form fields
     form_detector = FormFieldDetector()
     form_data = form_detector.extract_form_data(image_path)
-    
+
     return {
         'tables': tables,
         'handwritten_notes': notes,
@@ -392,22 +392,22 @@ from documents.ocr import TableExtractor, HandwritingRecognizer
 
 def process_document(document):
     """Enhanced document processing with advanced OCR."""
-    
+
     # Existing OCR (Tesseract)
     basic_text = run_tesseract(document.path)
-    
+
     # Advanced table extraction
     if document.has_tables:
         table_extractor = TableExtractor()
         tables = table_extractor.extract_tables_from_image(document.path)
         document.extracted_tables = tables
-    
+
     # Handwriting recognition for specific document types
     if document.document_type == 'handwritten_form':
         recognizer = HandwritingRecognizer()
         handwritten_text = recognizer.recognize_from_file(document.path)
         document.content = basic_text + "\n\n" + handwritten_text['text']
-    
+
     return document
 ```
 
@@ -420,23 +420,23 @@ Add rules for specific document types:
 
 class EnhancedRasterisedDocumentParser(RasterisedDocumentParser):
     """Extended parser with advanced OCR."""
-    
+
     def parse(self, document_path, mime_type, file_name=None):
         # Call parent parser
         content = super().parse(document_path, mime_type, file_name)
-        
+
         # Add table extraction for invoices
         if self._is_invoice(file_name):
             from documents.ocr import TableExtractor
             extractor = TableExtractor()
             tables = extractor.extract_tables_from_image(document_path)
-            
+
             # Append table data to content
             for i, table in enumerate(tables):
                 content += f"\n\n[Table {i+1}]\n"
                 if table['data'] is not None:
                     content += table['data'].to_string()
-        
+
         return content
 ```
 
@@ -452,7 +452,7 @@ from documents.ocr import TableExtractor
 def test_table_detection():
     extractor = TableExtractor()
     tables = extractor.extract_tables_from_image("tests/fixtures/invoice.png")
-    
+
     assert len(tables) > 0
     assert tables[0]['detection_score'] > 0.7
     assert tables[0]['data'] is not None
@@ -460,7 +460,7 @@ def test_table_detection():
 def test_table_to_dataframe():
     extractor = TableExtractor()
     tables = extractor.extract_tables_from_image("tests/fixtures/table.png")
-    
+
     df = tables[0]['data']
     assert df.shape[0] > 0  # Has rows
     assert df.shape[1] > 0  # Has columns
@@ -472,12 +472,12 @@ def test_table_to_dataframe():
 def test_full_document_pipeline():
     """Test complete OCR pipeline."""
     from documents.ocr import TableExtractor, HandwritingRecognizer, FormFieldDetector
-    
+
     # Process test document
     tables = TableExtractor().extract_tables_from_image("tests/fixtures/form.jpg")
     handwriting = HandwritingRecognizer().recognize_from_file("tests/fixtures/form.jpg")
     form_data = FormFieldDetector().extract_form_data("tests/fixtures/form.jpg")
-    
+
     # Verify results
     assert len(tables) > 0
     assert len(handwriting['text']) > 0

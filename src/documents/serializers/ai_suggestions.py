@@ -31,7 +31,13 @@ SUGGESTION_TYPE_CHOICES = [
 ]
 
 # Types that require value_id
-ID_REQUIRED_TYPES = ["tag", "correspondent", "document_type", "storage_path", "workflow"]
+ID_REQUIRED_TYPES = [
+    "tag",
+    "correspondent",
+    "document_type",
+    "storage_path",
+    "workflow",
+]
 # Types that require value_text
 TEXT_REQUIRED_TYPES = ["title"]
 # Types that can use either (custom_field can be ID or text)
@@ -97,7 +103,7 @@ class TitleSuggestionSerializer(serializers.Serializer):
 class AISuggestionsSerializer(serializers.Serializer):
     """
     Main serializer for AI scan results.
-    
+
     Converts AIScanResult objects to JSON format for API responses.
     """
 
@@ -113,11 +119,11 @@ class AISuggestionsSerializer(serializers.Serializer):
     def from_scan_result(scan_result, document_id: int) -> dict[str, Any]:
         """
         Convert an AIScanResult object to serializer data.
-        
+
         Args:
             scan_result: AIScanResult instance from ai_scanner
             document_id: Document ID for reference
-            
+
         Returns:
             Dictionary ready for serialization
         """
@@ -129,12 +135,14 @@ class AISuggestionsSerializer(serializers.Serializer):
             for tag_id, confidence in scan_result.tags:
                 try:
                     tag = Tag.objects.get(pk=tag_id)
-                    tag_suggestions.append({
-                        "id": tag.id,
-                        "name": tag.name,
-                        "color": getattr(tag, "color", "#000000"),
-                        "confidence": confidence,
-                    })
+                    tag_suggestions.append(
+                        {
+                            "id": tag.id,
+                            "name": tag.name,
+                            "color": getattr(tag, "color", "#000000"),
+                            "confidence": confidence,
+                        },
+                    )
                 except Tag.DoesNotExist:
                     # Tag no longer exists in database; skip this suggestion
                     pass
@@ -189,12 +197,14 @@ class AISuggestionsSerializer(serializers.Serializer):
             for field_id, (value, confidence) in scan_result.custom_fields.items():
                 try:
                     field = CustomField.objects.get(pk=field_id)
-                    field_suggestions.append({
-                        "field_id": field.id,
-                        "field_name": field.name,
-                        "value": str(value),
-                        "confidence": confidence,
-                    })
+                    field_suggestions.append(
+                        {
+                            "field_id": field.id,
+                            "field_name": field.name,
+                            "value": str(value),
+                            "confidence": confidence,
+                        },
+                    )
                 except CustomField.DoesNotExist:
                     # Custom field no longer exists in database; skip this suggestion
                     pass
@@ -206,11 +216,13 @@ class AISuggestionsSerializer(serializers.Serializer):
             for workflow_id, confidence in scan_result.workflows:
                 try:
                     workflow = Workflow.objects.get(pk=workflow_id)
-                    workflow_suggestions.append({
-                        "id": workflow.id,
-                        "name": workflow.name,
-                        "confidence": confidence,
-                    })
+                    workflow_suggestions.append(
+                        {
+                            "id": workflow.id,
+                            "name": workflow.name,
+                            "confidence": confidence,
+                        },
+                    )
                 except Workflow.DoesNotExist:
                     # Workflow no longer exists in database; skip this suggestion
                     pass
@@ -229,6 +241,7 @@ class SuggestionSerializerMixin:
     """
     Mixin to provide validation logic for suggestion serializers.
     """
+
     def validate(self, attrs):
         """Validate that the correct value field is provided for the suggestion type."""
         suggestion_type = attrs.get("suggestion_type")

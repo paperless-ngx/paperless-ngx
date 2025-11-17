@@ -31,7 +31,7 @@ logger = logging.getLogger("paperless.ml.classifier")
 class DocumentDataset(Dataset):
     """
     PyTorch Dataset for document classification.
-    
+
     Handles tokenization and preparation of documents for BERT training.
     """
 
@@ -44,7 +44,7 @@ class DocumentDataset(Dataset):
     ):
         """
         Initialize dataset.
-        
+
         Args:
             documents: List of document texts
             labels: List of class labels
@@ -83,11 +83,11 @@ class DocumentDataset(Dataset):
 class TransformerDocumentClassifier:
     """
     BERT-based document classifier.
-    
+
     Uses DistilBERT (a smaller, faster version of BERT) for document
     classification. Provides significantly better accuracy than traditional
     ML approaches while being fast enough for real-time use.
-    
+
     Expected Improvements:
     - 40-60% better classification accuracy
     - Better handling of context and semantics
@@ -330,11 +330,11 @@ class TransformerDocumentClassifier:
     ) -> list[tuple[int, float]]:
         """
         Classify multiple documents efficiently.
-        
+
         Args:
             documents: List of document texts
             batch_size: Batch size for inference
-            
+
         Returns:
             List of (predicted_class, confidence) tuples
         """

@@ -14,11 +14,11 @@
 
 | Componente | Calificación | Estado | Listo para CI/CD |
 |------------|--------------|--------|------------------|
-| **Backend Python** | 6.5/10 | ⚠️ Requiere correcciones | ❌ NO |
-| **Frontend Angular** | 6.5/10 | ⚠️ Requiere correcciones | ❌ NO |
+| **Backend Python** | 6.5/10 | ⚠️ Require correcciones | ❌ NO |
+| **Frontend Angular** | 6.5/10 | ⚠️ Require correcciones | ❌ NO |
 | **Docker** | 8.5/10 | ✅ Mayormente correcto | ⚠️ PARCIAL |
 | **CI/CD** | 6.0/10 | ⚠️ Incompleto para ML/OCR | ❌ NO |
-| **GLOBAL** | **6.9/10** | **REQUIERE CORRECCIONES** | **❌ NO** |
+| **GLOBAL** | **6.9/10** | **REQUIRE CORRECCIONES** | **❌ NO** |
 
 ### Veredicto Final
 
@@ -26,7 +26,7 @@
 
 **Razones críticas:**
 1. 🔴 Migraciones de base de datos duplicadas (bloquean deployment)
-2. 🔴 Componentes Angular sin declaración `standalone: true` (bloquean build)
+2. 🔴 Components Angular sin declaración `standalone: true` (bloquean build)
 3. 🔴 No hay validación de dependencias ML/OCR en CI
 4. 🔴 Modelo `AISuggestionFeedback` falta en models.py
 
@@ -155,10 +155,10 @@ class AISuggestionFeedback(models.Model):
 
 ---
 
-### CRÍTICO #3: Componentes Angular sin `standalone: true`
+### CRÍTICO #3: Components Angular sin `standalone: true`
 
 **Severidad:** 🔴 BLOQUEANTE - Impide compilación
-**Archivos afectados:** 2 componentes
+**Archivos afectados:** 2 components
 
 #### Archivo 1: `src-ui/src/app/components/ai-suggestions-panel/ai-suggestions-panel.component.ts`
 
@@ -440,7 +440,7 @@ def _get_table_extractor(self):
 
 ### MENOR #2: JSDoc faltante
 
-**Archivos:** Varios métodos públicos sin documentación JSDoc
+**Archivos:** Various métodos públicos sin documentación JSDoc
 
 **Recomendación:** Agregar documentación a métodos públicos.
 
@@ -454,7 +454,7 @@ def _get_table_extractor(self):
 
 **Estado:** ✅ YA CORREGIDO - Protegido con `!environment.production`
 
-**No requiere acción.**
+**No require acción.**
 
 ---
 
@@ -514,7 +514,7 @@ def _get_table_extractor(self):
      CMD curl -fs http://localhost:8000/api/health/ || exit 1
    ```
 
-   Crear endpoint `/api/health/` que valide:
+   Crear endpoint `/api/health/` que valid:
    - ✅ Redis conectado
    - ✅ BD disponible
    - ✅ Frontend cargado
@@ -570,7 +570,7 @@ def _get_table_extractor(self):
 3. **NO hay caché de modelos ML**
    - Cada build descargará ~1GB de modelos desde Hugging Face
    - Tiempo de build: +5-10 minutos extra
-   - Posible rate limiting de Hugging Face
+   - Possible rate limiting de Hugging Face
 
 4. **NO hay smoke tests post-build**
    - No valida que la imagen construida funciona
@@ -691,7 +691,7 @@ mv 1076_aisuggestionfeedback.py \
 # Los índices ya están definidos en models.py
 ```
 
-#### Paso 1.4: Agregar `standalone: true` a componentes (5 min)
+#### Paso 1.4: Agregar `standalone: true` a components (5 min)
 ```typescript
 // Editar src-ui/src/app/components/ai-suggestions-panel/ai-suggestions-panel.component.ts
 // Línea 41: Agregar standalone: true
@@ -942,7 +942,7 @@ jobs:
 - [ ] Build local exitoso: `docker build -t intellidocs-ngx:test .`
 - [ ] Migraciones ejecutan sin errores
 - [ ] ML dependencies funcionan en container
-- [ ] Volúmenes persisten datos correctamente
+- [ ] Volúmenes persistent datos correctamente
 - [ ] Health check responde OK
 
 ### CI/CD
@@ -1068,7 +1068,7 @@ jobs:
 4. ✅ **DOCUMENTAR PROCESO** en BITACORA_MAESTRA.md
 
 **Después de correcciones:**
-- ✅ Build de imagen Docker funcional
+- ✅ Build de imagen Docker functional
 - ✅ Tests de backend/frontend/ML pasando
 - ✅ CI/CD automatizado en cada commit a `dev`
 - ✅ Pull de imagen actualizada funcionará correctamente

@@ -279,7 +279,7 @@ Models are downloaded automatically on first use:
 from documents.ml import TransformerDocumentClassifier, DocumentNER, SemanticSearch
 
 classifier = TransformerDocumentClassifier()  # Downloads distilbert
-ner = DocumentNER()                           # Downloads NER model  
+ner = DocumentNER()                           # Downloads NER model
 search = SemanticSearch()                     # Downloads sentence transformer
 ```
 
@@ -293,30 +293,30 @@ from documents.ml import DocumentNER
 
 def consume_document(self, document):
     # ... existing processing ...
-    
+
     # Extract entities automatically
     ner = DocumentNER()
     entities = ner.extract_all(document.content)
-    
+
     # Auto-suggest correspondent
     if not document.correspondent and entities['organizations']:
         suggested = entities['organizations'][0]
         # Create or find correspondent
         document.correspondent = get_or_create_correspondent(suggested)
-    
+
     # Auto-suggest tags
     suggested_tags = ner.suggest_tags(document.content)
     for tag_name in suggested_tags:
         tag = get_or_create_tag(tag_name)
         document.tags.add(tag)
-    
+
     # Store extracted data as custom fields
     document.custom_fields = {
         'extracted_dates': entities['dates'],
         'extracted_amounts': entities['amounts'],
         'extracted_emails': entities['emails'],
     }
-    
+
     document.save()
 ```
 
@@ -519,7 +519,7 @@ entities = ner.extract_entities(text)
 ### Memory (RAM)
 
 - **Model Loading**: 1-2GB per model
-- **Inference**: 
+- **Inference**:
   - CPU: 2-4GB
   - GPU: 4-8GB (recommended)
 
@@ -693,13 +693,13 @@ Process large batches in background tasks:
 def index_documents_task(document_ids):
     search = SemanticSearch()
     search.load_index('./semantic_index.pt')
-    
+
     documents = Document.objects.filter(id__in=document_ids)
     batch = [
         (doc.id, doc.content, {'title': doc.title})
         for doc in documents
     ]
-    
+
     search.index_documents_batch(batch)
     search.save_index('./semantic_index.pt')
 ```

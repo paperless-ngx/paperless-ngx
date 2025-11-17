@@ -60,7 +60,7 @@ def _get_classifier(self):
 ```
 
 **Impacto**:
-- La configuración del modelo (`model_name`) se ignora
+- La configuración del modelo (`model_name`) se ignore
 - El parámetro `use_cache=True` se pierde
 - Se carga el modelo dos veces innecesariamente
 - Pérdida de rendimiento y memoria
@@ -116,7 +116,7 @@ if (
 
 **Impacto**:
 - Los permisos de `change_groups` nunca se verifican
-- Bug potencial en sistema de permisos
+- Bug potential en sistema de permisos
 
 **Solución**:
 ```python
@@ -262,7 +262,7 @@ response["Content-Security-Policy"] = (
 
 **Impacto**:
 - Vulnerable a XSS (Cross-Site Scripting)
-- Inyección de scripts maliciosos posible
+- Inyección de scripts maliciosos possible
 - No cumple con mejores prácticas de seguridad
 
 **Solución**:
@@ -284,7 +284,7 @@ def add_security_headers(request, response):
 
 ---
 
-### 7. MEMORY LEAKS EN FRONTEND (MÚLTIPLES COMPONENTES)
+### 7. MEMORY LEAKS EN FRONTEND (MÚLTIPLES COMPONENTS)
 
 **Archivos**:
 - `src-ui/src/app/components/deletion-requests/deletion-request-detail/deletion-request-detail.component.ts`
@@ -293,7 +293,7 @@ def add_security_headers(request, response):
 
 **Severidad**: 🔴 CRÍTICO
 
-**Descripción**: Componentes crean suscripciones HTTP sin implementar `OnDestroy` ni usar `takeUntil` para cancelarlas.
+**Descripción**: Components crean suscripciones HTTP sin implementar `OnDestroy` ni usar `takeUntil` para cancelarlas.
 
 **Código Problemático**:
 ```typescript
@@ -362,7 +362,7 @@ export class DeletionRequestDetailComponent implements OnDestroy {
 
 **Impacto**:
 - Viola directivas de agents.md (Artículo I, Sección 3)
-- Imposible determinar cuál es la fecha real de última actualización
+- Impossible determinar cuál es la fecha real de última actualización
 - Confusión para el equipo
 
 **Solución**:
@@ -460,7 +460,7 @@ _(Ver secciones detalladas más adelante)_
 ## 🔧 PROBLEMAS BAJOS (Backlog)
 
 ### 45. Archivos SCSS Vacíos
-**Archivos**: Múltiples componentes Angular
+**Archivos**: Múltiples components Angular
 **Solución**: Eliminar o añadir estilos necesarios
 
 ### 46. Duplicación de Clases CSS
@@ -508,7 +508,7 @@ _(Ver secciones detalladas más adelante)_
 1. **numpy Versión Desactualizada** (🟡 MEDIO)
    - Actual: `>= 1.24.0`
    - Recomendado: `>= 1.26.0`
-   - Razón: scikit-learn 1.7.0 requiere numpy más reciente
+   - Razón: scikit-learn 1.7.0 require numpy más reciente
 
 2. **openpyxl Posiblemente Innecesaria** (🟡 MEDIO)
    - No se encontraron imports directos
@@ -565,7 +565,7 @@ _(Ver secciones detalladas más adelante)_
 **Calificación**: 8.5/10
 
 **Fortalezas**:
-- ✅ Arquitectura modular (componentes standalone)
+- ✅ Arquitectura modular (components standalone)
 - ✅ Uso de inject() (nuevo patrón Angular)
 - ✅ Tipado fuerte TypeScript
 - ✅ Guards para permisos
@@ -599,7 +599,7 @@ _(Ver secciones detalladas más adelante)_
 
 2. **Rate Limiting Débil** (🟡 MEDIO)
    - Cache puede limpiarse
-   - Bypass posible
+   - Bypass possible
 
 3. **Detección de Malware con Falsos Positivos** (🟡 MEDIO)
    - Patrones muy amplios
@@ -627,7 +627,7 @@ _(Ver secciones detalladas más adelante)_
 
 ### Código Frontend
 - **Líneas totales**: ~658 (módulo deletion-requests)
-- **Complejidad**: Media (componentes bien estructurados)
+- **Complejidad**: Media (components bien estructurados)
 - **Cobertura de tests**: Básica (solo tests de creación)
 - **Documentación**: 40% (comentarios limitados)
 
@@ -679,7 +679,7 @@ _(Ver secciones detalladas más adelante)_
    - Archivos: 2
    - Prioridad: MÁXIMA
 
-6. **Implementar OnDestroy en componentes Angular**
+6. **Implementar OnDestroy en components Angular**
    - Tiempo estimado: 3 horas
    - Archivos: 3
    - Prioridad: MÁXIMA
@@ -694,7 +694,7 @@ _(Ver secciones detalladas más adelante)_
    - Archivos: 1
    - Prioridad: MÁXIMA
 
-**Total Fase 1**: 12 horas aprox.
+**Total Fase 1**: 12 horas approx.
 
 ### Fase 2: Correcciones Altas (3-5 días)
 
@@ -706,7 +706,7 @@ _(Ver secciones detalladas más adelante)_
 6. Añadir manejo de errores en servicios Angular
 7. Implementar start/stop en polling service
 
-**Total Fase 2**: 16 horas aprox.
+**Total Fase 2**: 16 horas approx.
 
 ### Fase 3: Mejoras Medias (1-2 semanas)
 
@@ -718,7 +718,7 @@ _(Ver secciones detalladas más adelante)_
 6. Validar @Input requeridos
 7. Expandir tests unitarios
 
-**Total Fase 3**: 32 horas aprox.
+**Total Fase 3**: 32 horas approx.
 
 ### Fase 4: Backlog (Planificar)
 
@@ -728,7 +728,7 @@ _(Ver secciones detalladas más adelante)_
 4. Remover console.log
 5. Actualizar documentación
 
-**Total Fase 4**: 8 horas aprox.
+**Total Fase 4**: 8 horas approx.
 
 ---
 
@@ -801,7 +801,7 @@ _(Ver secciones detalladas más adelante)_
 7. ✅ Transacciones atómicas en operaciones críticas
 
 ### Frontend
-1. ✅ Componentes standalone (nuevo patrón Angular)
+1. ✅ Components standalone (nuevo patrón Angular)
 2. ✅ Uso de inject() en lugar de constructor injection
 3. ✅ Tipado fuerte en TypeScript
 4. ✅ Uso de $localize para i18n
@@ -824,7 +824,7 @@ _(Ver secciones detalladas más adelante)_
 **Métodos Más Complejos**:
 1. `consumer.py:run()` - 311 líneas (🔴 refactorizar)
 2. `ai_scanner.py:scan_document()` - 180 líneas (🟡 revisar)
-3. `ai_deletion_manager.py:_analyze_impact()` - 62 líneas (✅ aceptable)
+3. `ai_deletion_manager.py:_analyze_impact()` - 62 líneas (✅ acceptable)
 
 **Complejidad Ciclomática Estimada**:
 - `run()`: ~45 (🔴 muy alta, límite recomendado: 10)
@@ -878,7 +878,7 @@ _(Ver secciones detalladas más adelante)_
 1. **Completar documentación técnica**
    - Añadir docstrings completos
    - Documentar excepciones
-   - Crear diagramas de arquitectura
+   - Crear diagrams de arquitectura
 
 2. **Implementar CI/CD**
    - Tests automáticos en PRs
@@ -927,7 +927,7 @@ El proyecto IntelliDocs-ngx está en **buen estado general** con una arquitectur
 1. ❌ Código duplicado que afecta funcionalidad
 2. ❌ Memory leaks en frontend
 3. ❌ Seguridad CSP demasiado permisiva
-4. ❌ Thread safety parcial en componentes críticos
+4. ❌ Thread safety parcial en components críticos
 5. ❌ Falta de tests comprehensivos
 
 ### Riesgo General
@@ -959,7 +959,7 @@ Se recomienda:
 8. `src-ui/src/app/services/ai-status.service.ts`
 9. `BITACORA_MAESTRA.md`
 
-### B. Comandos Útiles para Verificación
+### B. Commandos Útiles para Verificación
 
 ```bash
 # Backend - Linting

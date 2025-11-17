@@ -21,11 +21,14 @@ def __getattr__(name):
     """Lazy import to avoid loading heavy ML models on startup."""
     if name == "TableExtractor":
         from .table_extractor import TableExtractor
+
         return TableExtractor
     elif name == "HandwritingRecognizer":
         from .handwriting import HandwritingRecognizer
+
         return HandwritingRecognizer
     elif name == "FormFieldDetector":
         from .form_detector import FormFieldDetector
+
         return FormFieldDetector
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

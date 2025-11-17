@@ -299,15 +299,16 @@ class TestAIScannerIntegrationPerformance(TestCase):
             documents.append(doc)
 
         # Mock to avoid actual ML loading
-        with mock.patch.object(scanner, "_extract_entities", return_value={}), \
-             mock.patch.object(scanner, "_suggest_tags", return_value=[]), \
-             mock.patch.object(scanner, "_detect_correspondent", return_value=None), \
-             mock.patch.object(scanner, "_classify_document_type", return_value=None), \
-             mock.patch.object(scanner, "_suggest_storage_path", return_value=None), \
-             mock.patch.object(scanner, "_extract_custom_fields", return_value={}), \
-             mock.patch.object(scanner, "_suggest_workflows", return_value=[]), \
-             mock.patch.object(scanner, "_suggest_title", return_value=None):
-
+        with (
+            mock.patch.object(scanner, "_extract_entities", return_value={}),
+            mock.patch.object(scanner, "_suggest_tags", return_value=[]),
+            mock.patch.object(scanner, "_detect_correspondent", return_value=None),
+            mock.patch.object(scanner, "_classify_document_type", return_value=None),
+            mock.patch.object(scanner, "_suggest_storage_path", return_value=None),
+            mock.patch.object(scanner, "_extract_custom_fields", return_value={}),
+            mock.patch.object(scanner, "_suggest_workflows", return_value=[]),
+            mock.patch.object(scanner, "_suggest_title", return_value=None),
+        ):
             results = []
             for doc in documents:
                 result = scanner.scan_document(doc, doc.content)
@@ -411,9 +412,9 @@ class TestAIScannerIntegrationConfidenceLevels(TestCase):
 
         scan_result = AIScanResult()
         scan_result.tags = [
-            (self.tag_high.id, 0.90),    # Should be applied
+            (self.tag_high.id, 0.90),  # Should be applied
             (self.tag_medium.id, 0.70),  # Should be suggested
-            (self.tag_low.id, 0.50),     # Should be ignored
+            (self.tag_low.id, 0.50),  # Should be ignored
         ]
 
         result = scanner.apply_scan_results(
@@ -448,15 +449,16 @@ class TestAIScannerIntegrationGlobalInstance(TestCase):
             content="Test content",
         )
 
-        with mock.patch.object(scanner1, "_extract_entities", return_value={}), \
-             mock.patch.object(scanner1, "_suggest_tags", return_value=[]), \
-             mock.patch.object(scanner1, "_detect_correspondent", return_value=None), \
-             mock.patch.object(scanner1, "_classify_document_type", return_value=None), \
-             mock.patch.object(scanner1, "_suggest_storage_path", return_value=None), \
-             mock.patch.object(scanner1, "_extract_custom_fields", return_value={}), \
-             mock.patch.object(scanner1, "_suggest_workflows", return_value=[]), \
-             mock.patch.object(scanner1, "_suggest_title", return_value=None):
-
+        with (
+            mock.patch.object(scanner1, "_extract_entities", return_value={}),
+            mock.patch.object(scanner1, "_suggest_tags", return_value=[]),
+            mock.patch.object(scanner1, "_detect_correspondent", return_value=None),
+            mock.patch.object(scanner1, "_classify_document_type", return_value=None),
+            mock.patch.object(scanner1, "_suggest_storage_path", return_value=None),
+            mock.patch.object(scanner1, "_extract_custom_fields", return_value={}),
+            mock.patch.object(scanner1, "_suggest_workflows", return_value=[]),
+            mock.patch.object(scanner1, "_suggest_title", return_value=None),
+        ):
             result1 = scanner1.scan_document(document, document.content)
             result2 = scanner2.scan_document(document, document.content)
 
@@ -476,15 +478,16 @@ class TestAIScannerIntegrationEdgeCases(TestCase):
             content="",
         )
 
-        with mock.patch.object(scanner, "_extract_entities", return_value={}), \
-             mock.patch.object(scanner, "_suggest_tags", return_value=[]), \
-             mock.patch.object(scanner, "_detect_correspondent", return_value=None), \
-             mock.patch.object(scanner, "_classify_document_type", return_value=None), \
-             mock.patch.object(scanner, "_suggest_storage_path", return_value=None), \
-             mock.patch.object(scanner, "_extract_custom_fields", return_value={}), \
-             mock.patch.object(scanner, "_suggest_workflows", return_value=[]), \
-             mock.patch.object(scanner, "_suggest_title", return_value=None):
-
+        with (
+            mock.patch.object(scanner, "_extract_entities", return_value={}),
+            mock.patch.object(scanner, "_suggest_tags", return_value=[]),
+            mock.patch.object(scanner, "_detect_correspondent", return_value=None),
+            mock.patch.object(scanner, "_classify_document_type", return_value=None),
+            mock.patch.object(scanner, "_suggest_storage_path", return_value=None),
+            mock.patch.object(scanner, "_extract_custom_fields", return_value={}),
+            mock.patch.object(scanner, "_suggest_workflows", return_value=[]),
+            mock.patch.object(scanner, "_suggest_title", return_value=None),
+        ):
             result = scanner.scan_document(document, document.content)
 
             self.assertIsInstance(result, AIScanResult)
@@ -521,15 +524,16 @@ class TestAIScannerIntegrationEdgeCases(TestCase):
             content="Société française • 日本語 • Ελληνικά • مرحبا",
         )
 
-        with mock.patch.object(scanner, "_extract_entities", return_value={}), \
-             mock.patch.object(scanner, "_suggest_tags", return_value=[]), \
-             mock.patch.object(scanner, "_detect_correspondent", return_value=None), \
-             mock.patch.object(scanner, "_classify_document_type", return_value=None), \
-             mock.patch.object(scanner, "_suggest_storage_path", return_value=None), \
-             mock.patch.object(scanner, "_extract_custom_fields", return_value={}), \
-             mock.patch.object(scanner, "_suggest_workflows", return_value=[]), \
-             mock.patch.object(scanner, "_suggest_title", return_value=None):
-
+        with (
+            mock.patch.object(scanner, "_extract_entities", return_value={}),
+            mock.patch.object(scanner, "_suggest_tags", return_value=[]),
+            mock.patch.object(scanner, "_detect_correspondent", return_value=None),
+            mock.patch.object(scanner, "_classify_document_type", return_value=None),
+            mock.patch.object(scanner, "_suggest_storage_path", return_value=None),
+            mock.patch.object(scanner, "_extract_custom_fields", return_value={}),
+            mock.patch.object(scanner, "_suggest_workflows", return_value=[]),
+            mock.patch.object(scanner, "_suggest_title", return_value=None),
+        ):
             result = scanner.scan_document(document, document.content)
 
             self.assertIsInstance(result, AIScanResult)

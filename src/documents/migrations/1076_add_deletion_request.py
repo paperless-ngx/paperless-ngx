@@ -10,7 +10,7 @@ from django.db import models
 class Migration(migrations.Migration):
     """
     Add DeletionRequest model for AI-initiated deletion requests.
-    
+
     This model tracks deletion requests that require user approval,
     implementing the safety requirement from agents.md to ensure
     no documents are deleted without explicit user consent.

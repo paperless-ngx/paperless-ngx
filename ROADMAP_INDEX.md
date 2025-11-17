@@ -1,6 +1,6 @@
 # 📑 Índice de Documentación del Roadmap 2026
 
-**Hub central para la hoja de ruta anual de IntelliDocs-ngx**
+**Hub central para la hoja de ruta annual de IntelliDocs-ngx**
 
 ---
 
@@ -32,8 +32,8 @@
 #### 1. RESUMEN_ROADMAP_2026.md (12KB)
 > **Resumen ejecutivo en español para el Director**
 
-**Audiencia:** Director, stakeholders, ejecutivos  
-**Tiempo de lectura:** 10 minutos  
+**Audiencia:** Director, stakeholders, ejecutivos
+**Tiempo de lectura:** 10 minutos
 **Contenido:**
 - Misión cumplida y entregables
 - Números clave (145 tareas, $0/año 100% GRATIS, 52 semanas)
@@ -48,8 +48,8 @@
 #### 2. ROADMAP_2026.md (34KB)
 > **La hoja de ruta maestra completa**
 
-**Audiencia:** Todo el equipo  
-**Tiempo de lectura:** 1-2 horas  
+**Audiencia:** Todo el equipo
+**Tiempo de lectura:** 1-2 horas
 **Contenido:**
 - Resumen ejecutivo
 - 12 Epics distribuidos en 4 trimestres:
@@ -69,8 +69,8 @@
 #### 3. ROADMAP_QUICK_START.md (10KB)
 > **Guía práctica para empezar HOY**
 
-**Audiencia:** Desarrolladores, team leads  
-**Tiempo de lectura:** 15 minutos  
+**Audiencia:** Desarrolladores, team leads
+**Tiempo de lectura:** 15 minutos
 **Contenido:**
 - Acción inmediata (esta semana)
 - Primera sprint (2 semanas)
@@ -89,12 +89,12 @@
 #### 4. GITHUB_PROJECT_SETUP.md (16KB)
 > **Guía completa para crear GitHub Project**
 
-**Audiencia:** Product manager, tech lead  
-**Tiempo de setup:** 2-3 horas (completo) o 30 min (básico)  
+**Audiencia:** Product manager, tech lead
+**Tiempo de setup:** 2-3 horas (completo) o 30 min (básico)
 **Contenido:**
 - Setup paso a paso del GitHub Project
 - Estructura Kanban (7 columnas)
-- 30+ Labels organizados (comandos bash incluidos)
+- 30+ Labels organizados (commandos bash incluidos)
 - 8 Custom Fields
 - Múltiples vistas (Roadmap, Board, Calendar, Table)
 - Automation workflows
@@ -108,8 +108,8 @@
 #### 5. NOTION_INTEGRATION_GUIDE.md (21KB)
 > **Guía de integración con Notion (recomendado por el Director)**
 
-**Audiencia:** Product manager, team  
-**Tiempo de setup:** 2-3 horas (100% GRATIS con GitHub Actions)  
+**Audiencia:** Product manager, team
+**Tiempo de setup:** 2-3 horas (100% GRATIS con GitHub Actions)
 **Contenido:**
 - Por qué Notion vs Jira/Confluence
 - Workspace setup completo
@@ -134,7 +134,7 @@
 1. [RESUMEN_ROADMAP_2026.md](./RESUMEN_ROADMAP_2026.md) - 10 min
 2. [ROADMAP_2026.md](./ROADMAP_2026.md) - Solo secciones:
    - Resumen Ejecutivo
-   - Vista General por Trimestre  
+   - Vista General por Trimestre
    - EPIC 1-4 (Q1 2026 - Prioridad crítica)
 
 **Decisiones a tomar:**
@@ -219,7 +219,7 @@
   - Maintainer principal: 10-15 hrs/semana
   - Contribuidores voluntarios: 5-8 hrs/semana
   - **Costo: $0** (voluntarios)
-  
+
 - **Infraestructura:** 100% servicios gratuitos
   - Hosting: Vercel/Netlify (gratis)
   - CI/CD: GitHub Actions (gratis)
@@ -233,28 +233,28 @@
 ## 🎯 Milestones Críticos
 
 ### Q1 2026 (Marzo 31)
-✓ Testing >90% cobertura  
-✓ API documentada  
-✓ Performance +50%  
-✓ Encriptación activa  
+✓ Testing >90% cobertura
+✓ API documentada
+✓ Performance +50%
+✓ Encriptación activa
 → **Release v2.0.0**
 
 ### Q2 2026 (Junio 30)
-✓ Apps móviles publicadas  
-✓ Cloud sync activo  
-✓ Analytics dashboard  
+✓ Apps móviles publicadas
+✓ Cloud sync activo
+✓ Analytics dashboard
 → **Release v2.1.0**
 
 ### Q3 2026 (Septiembre 30)
-✓ Colaboración para equipos pequeños  
-✓ UX renovada y accesible  
-✓ Compartir documentos fácilmente  
+✓ Colaboración para equipos pequeños
+✓ UX renovada y accessible
+✓ Compartir documentos fácilmente
 → **Release v2.2.0 (user-friendly)**
 
 ### Q4 2026 (Diciembre 31)
-✓ Documentación completa en español  
-✓ App estable y pulida  
-✓ Ayuda contextual y tutoriales  
+✓ Documentación completa en español
+✓ App estable y pulida
+✓ Ayuda contextual y tutoriales
 → **Release v3.0.0 (listo para usuarios finales)**
 
 ---
@@ -307,7 +307,7 @@
 ## ❓ FAQs
 
 ### ¿Por qué 145 tareas?
-Simplificado de 147 originales, eliminando features enterprise (multi-tenancy, compliance avanzado, blockchain, AR/VR). Cada tarea está diseñada para ser completable en 0.5-3 días.
+Simplificado de 147 originales, eliminando features enterprise (multi-tenancy, compliance avanzado, blockchain, AR/VR). Cada tarea está diseñada para set completable en 0.5-3 días.
 
 ### ¿El roadmap es flexible?
 Sí. Es una guía, no una biblia. Se revisa y ajusta mensualmente según feedback y realidad.
@@ -345,9 +345,9 @@ Después de cada sesión significativa (mínimo 1x por semana).
 
 ## 📞 Soporte
 
-**Director del Proyecto:** @dawnsystem  
-**Repository:** https://github.com/dawnsystem/IntelliDocs-ngx  
-**Issues:** https://github.com/dawnsystem/IntelliDocs-ngx/issues  
+**Director del Proyecto:** @dawnsystem
+**Repository:** https://github.com/dawnsystem/IntelliDocs-ngx
+**Issues:** https://github.com/dawnsystem/IntelliDocs-ngx/issues
 **Documentación:** Carpeta `/docs` en el repo
 
 ---
@@ -361,8 +361,8 @@ Después de cada sesión significativa (mínimo 1x por semana).
 
 ---
 
-**Última actualización:** 2025-11-09  
-**Versión:** 1.0  
+**Última actualización:** 2025-11-09
+**Versión:** 1.0
 **Próxima revisión:** 2026-01-01
 
 **¡Mucho éxito con la implementación del roadmap 2026! 🚀**

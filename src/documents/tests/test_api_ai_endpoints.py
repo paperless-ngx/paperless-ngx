@@ -35,13 +35,19 @@ class TestAISuggestionsEndpoint(DirectoriesMixin, APITestCase):
 
         # Create users
         self.superuser = User.objects.create_superuser(
-            username="admin", email="admin@test.com", password="admin123",
+            username="admin",
+            email="admin@test.com",
+            password="admin123",
         )
         self.user_with_permission = User.objects.create_user(
-            username="permitted", email="permitted@test.com", password="permitted123",
+            username="permitted",
+            email="permitted@test.com",
+            password="permitted123",
         )
         self.user_without_permission = User.objects.create_user(
-            username="regular", email="regular@test.com", password="regular123",
+            username="regular",
+            email="regular@test.com",
+            password="regular123",
         )
 
         # Assign view permission
@@ -174,10 +180,14 @@ class TestApplyAISuggestionsEndpoint(DirectoriesMixin, APITestCase):
 
         # Create users
         self.superuser = User.objects.create_superuser(
-            username="admin", email="admin@test.com", password="admin123",
+            username="admin",
+            email="admin@test.com",
+            password="admin123",
         )
         self.user_with_permission = User.objects.create_user(
-            username="permitted", email="permitted@test.com", password="permitted123",
+            username="permitted",
+            email="permitted@test.com",
+            password="permitted123",
         )
 
         # Assign apply permission
@@ -284,10 +294,14 @@ class TestAIConfigurationEndpoint(DirectoriesMixin, APITestCase):
 
         # Create users
         self.superuser = User.objects.create_superuser(
-            username="admin", email="admin@test.com", password="admin123",
+            username="admin",
+            email="admin@test.com",
+            password="admin123",
         )
         self.user_without_permission = User.objects.create_user(
-            username="regular", email="regular@test.com", password="regular123",
+            username="regular",
+            email="regular@test.com",
+            password="regular123",
         )
 
     def test_unauthorized_access_denied(self):
@@ -362,13 +376,19 @@ class TestDeletionApprovalEndpoint(DirectoriesMixin, APITestCase):
 
         # Create users
         self.superuser = User.objects.create_superuser(
-            username="admin", email="admin@test.com", password="admin123",
+            username="admin",
+            email="admin@test.com",
+            password="admin123",
         )
         self.user_with_permission = User.objects.create_user(
-            username="permitted", email="permitted@test.com", password="permitted123",
+            username="permitted",
+            email="permitted@test.com",
+            password="permitted123",
         )
         self.user_without_permission = User.objects.create_user(
-            username="regular", email="regular@test.com", password="regular123",
+            username="regular",
+            email="regular@test.com",
+            password="regular123",
         )
 
         # Assign approval permission
@@ -501,7 +521,9 @@ class TestEndpointPermissionIntegration(DirectoriesMixin, APITestCase):
 
         # Create user with all AI permissions
         self.power_user = User.objects.create_user(
-            username="power_user", email="power@test.com", password="power123",
+            username="power_user",
+            email="power@test.com",
+            password="power123",
         )
 
         content_type = ContentType.objects.get_for_model(Document)

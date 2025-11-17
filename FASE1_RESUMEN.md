@@ -14,7 +14,7 @@
 6 nuevos índices para acelerar consultas:
 ```
 ✅ doc_corr_created_idx        → Filtrar por remitente + fecha
-✅ doc_type_created_idx         → Filtrar por tipo + fecha  
+✅ doc_type_created_idx         → Filtrar por tipo + fecha
 ✅ doc_owner_created_idx        → Filtrar por usuario + fecha
 ✅ doc_storage_created_idx      → Filtrar por ubicación + fecha
 ✅ doc_modified_desc_idx        → Documentos modificados recientemente
@@ -109,7 +109,7 @@ Las consultas ahora serán 5-150x más rápidas dependiendo de la operación.
 Antes: 8-12 segundos
 Después: <1 segundo
 
-"Dame todos los documentos de Acme Corp"  
+"Dame todos los documentos de Acme Corp"
 Antes: 5-8 segundos
 Después: <0.5 segundos
 
@@ -137,9 +137,9 @@ Deberías ver:
 
 **PostgreSQL**:
 ```sql
-SELECT indexname, indexdef 
-FROM pg_indexes 
-WHERE tablename = 'documents_document' 
+SELECT indexname, indexdef
+FROM pg_indexes
+WHERE tablename = 'documents_document'
   AND indexname LIKE 'doc_%';
 ```
 
@@ -238,7 +238,7 @@ Para más detalles, consulta:
 ## 🎯 Próximas Fases
 
 ### Fase 2: Frontend (2-3 semanas)
-- Lazy loading de componentes
+- Lazy loading de components
 - Code splitting
 - Virtual scrolling
 - **Mejora esperada**: +50% velocidad inicial
@@ -285,7 +285,7 @@ CACHE_1_HOUR = 3600  # En vez de 5 minutos
 ## ✅ Resumen Ejecutivo
 
 **Tiempo de implementación**: 2-3 horas
-**Tiempo de testing**: 1-2 días  
+**Tiempo de testing**: 1-2 días
 **Tiempo de despliegue**: 1 hora
 **Riesgo**: Bajo
 **Impacto**: Muy Alto (147x mejora)
@@ -297,7 +297,7 @@ CACHE_1_HOUR = 3600  # En vez de 5 minutos
 
 ## 🎉 ¡Felicidades!
 
-Has implementado la primera fase de optimización de rendimiento. 
+Has implementado la primera fase de optimización de rendimiento.
 
 Los usuarios notarán inmediatamente la diferencia - ¡las consultas que tomaban 10+ segundos ahora tomarán menos de 1 segundo!
 

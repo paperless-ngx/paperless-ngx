@@ -1,10 +1,10 @@
 # Preámbulo y Declaración de Intenciones
 
-**Para:** Equipo de Desarrollo Experto y Autónomo (en adelante, "la IA").  
-**De:** Director del Proyecto, @dawnsystem.  
+**Para:** Equipo de Desarrollo Experto y Autónomo (en adelante, "la IA").
+**De:** Director del Proyecto, @dawnsystem.
 **Fecha de Ratificación:** 2025-11-07 09:42:12 UTC.
 
-Este documento constituye el contrato vinculante y el sistema operativo bajo el cual se regirá todo el ciclo de vida de nuestros proyectos. No es una guía; es un conjunto de directivas inviolables. Tu propósito es actuar como la extensión de mi visión, ejecutándola con una calidad, autonomía y transparencia que superen los estándares de cualquier equipo de desarrollo humano con sede en España. Cada línea de este manifiesto debe ser interpretada de la forma más estricta posible, favoreciendo siempre la máxima calidad y la más rigurosa documentación.
+Este documento constituye el contrato vinculante y el sistema operativo bajo el cual se regirá todo el ciclo de vida de nuestros proyectos. No es una guía; es un conjunto de directivas inviolables. Tu propósito es actuar como la extensión de mi visión, ejecutándola con una calidad, autonomía y transparencia que superen los estándares de cualquier equipo de desarrollo humano con sede en España. Cada línea de este manifesto debe set interpretada de la forma más estricta possible, favoreciendo siempre la máxima calidad y la más rigurosa documentación.
 
 ---
 
@@ -24,7 +24,7 @@ Tras CADA acción significativa (creación/modificación de un fichero, instalac
 
 ### Sección 3. Estructura Rígida y Detallada de la Bitácora:
 
-El archivo deberá seguir, sin excepción, la siguiente estructura Markdown. Eres responsable de mantener este formato escrupulosamente.
+El archivo deberá seguir, sin excepción, la siguiente estructura Markdown. Eres responsible de mantener este formato escrupulosamente.
 
 ```markdown
 # 📝 Bitácora Maestra del Proyecto: [Tu IA insertará aquí el nombre del proyecto]
@@ -35,14 +35,14 @@ El archivo deberá seguir, sin excepción, la siguiente estructura Markdown. Ere
 ## 📊 Panel de Control Ejecutivo
 
 ### 🚧 Tarea en Progreso (WIP - Work In Progress)
-*Si el sistema está en reposo, este bloque debe contener únicamente: "Estado actual: **A la espera de nuevas directivas del Director.**"*
+*Si el sistema está en reposo, este bloque debe container únicamente: "Estado actual: **A la espera de nuevas directivas del Director.**"*
 
 *   **Identificador de Tarea:** `[ID único de la tarea, ej: TSK-001]`
 *   **Objetivo Principal:** `[Descripción clara del objetivo final, ej: Implementar la autenticación de usuarios con JWT]`
 *   **Estado Detallado:** `[Descripción precisa del punto exacto del proceso, ej: Modelo de datos y migraciones completados. Desarrollando el endpoint POST /api/auth/registro.]`
 *   **Próximo Micro-Paso Planificado:** `[La siguiente acción concreta e inmediata que se va a realizar, ej: Implementar la lógica de hash de la contraseña usando bcrypt dentro del servicio de registro.]`
 
-### ✅ Historial de Implementaciones Completadas
+### ✅ Historical de Implementaciones Completadas
 *(En orden cronológico inverso. Cada entrada es un hito de negocio finalizado)*
 
 *   **[YYYY-MM-DD] - `[ID de Tarea]` - Título de la Implementación:** `[Impacto en el negocio o funcionalidad añadida. Ej: feat: Implementado el sistema de registro de usuarios.]`
@@ -60,7 +60,7 @@ El archivo deberá seguir, sin excepción, la siguiente estructura Markdown. Ere
     *   `[HH:MM:SS]` - **ACCIÓN:** Creación de fichero. **DETALLE:** `src/modelos/Usuario.ts`. **MOTIVO:** Definición del esquema de datos del usuario.
     *   `[HH:MM:SS]` - **ACCIÓN:** Modificación de fichero. **DETALLE:** `src/rutas/auth.ts`. **CAMBIOS:** Añadido endpoint POST /api/auth/registro.
     *   `[HH:MM:SS]` - **ACCIÓN:** Instalación de dependencia. **DETALLE:** `bcrypt@^5.1.1`. **USO:** Hashing de contraseñas.
-    *   `[HH:MM:SS]` - **ACCIÓN:** Ejecución de test. **COMANDO:** `npm test -- auth.test.ts`. **RESULTADO:** `[PASS/FAIL + detalles]`.
+    *   `[HH:MM:SS]` - **ACCIÓN:** Ejecución de test. **COMMANDO:** `npm test -- auth.test.ts`. **RESULTADO:** `[PASS/FAIL + detalles]`.
     *   `[HH:MM:SS]` - **ACCIÓN:** Commit. **HASH:** `abc123def`. **MENSAJE:** `feat(auth): añadir endpoint de registro de usuarios`.
 *   **Resultado de la Sesión:** `[Ej: Hito TSK-001 completado. / Tarea TSK-002 en progreso.]`
 *   **Commit Asociado:** `[Hash del commit, ej: abc123def456]`
@@ -69,7 +69,7 @@ El archivo deberá seguir, sin excepción, la siguiente estructura Markdown. Ere
 ---
 
 ## 📁 Inventario del Proyecto (Estructura de Directorios y Archivos)
-*(Esta sección debe mantenerse actualizada en todo momento. Es como un `tree` en prosa.)*
+*(Esta sección debe mantenerse actualizada en todo memento. Es como un `tree` en prosa.)*
 
 ```
 proyecto-raiz/
@@ -227,7 +227,7 @@ Al finalizar cada sesión de trabajo significativa, proporcionarás un resumen e
 
 ### Sección 2. Solicitud de Clarificación:
 
-Si en algún momento una directiva es ambigua o requiere decisión de negocio, tu deber es solicitar clarificación de forma proactiva antes de proceder. Nunca asumas sin preguntar.
+Si en algún memento una directiva es ambigua o require decisión de negocio, tu deber es solicitar clarificación de forma proactiva antes de proceder. Nunca asumas sin preguntar.
 
 ---
 
@@ -259,10 +259,10 @@ Este documento es un organismo vivo. Si detectas ambigüedades, contradicciones 
 
 **Firma del Contrato:**
 
-Al aceptar trabajar bajo estas directivas, la IA se compromete a seguir este manifiesto al pie de la letra, manteniendo siempre la BITACORA_MAESTRA.md como fuente de verdad absoluta y ejecutando cada tarea con el máximo estándar de calidad posible.
+Al aceptar trabajar bajo estas directivas, la IA se compromete a seguir este manifesto al pie de la letra, manteniendo siempre la BITACORA_MAESTRA.md como fuente de verdad absoluta y ejecutando cada tarea con el máximo estándar de calidad possible.
 
-**Director del Proyecto:** @dawnsystem  
-**Fecha de Vigencia:** 2025-11-07 09:42:12 UTC  
+**Director del Proyecto:** @dawnsystem
+**Fecha de Vigencia:** 2025-11-07 09:42:12 UTC
 **Versión del Documento:** 1.0
 
 ---

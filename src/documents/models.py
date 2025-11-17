@@ -1592,7 +1592,7 @@ class WorkflowRun(SoftDeleteModel):
 class DeletionRequest(models.Model):
     """
     Model to track AI-initiated deletion requests requiring user approval.
-    
+
     This ensures no documents are deleted without explicit user consent,
     implementing the safety requirement from agents.md.
     """
@@ -1678,9 +1678,15 @@ class DeletionRequest(models.Model):
         indexes = [
             # Composite index for common listing queries (by user, filtered by status, sorted by date)
             # PostgreSQL can use this index for queries on: user, user+status, user+status+created_at
-            models.Index(fields=["user", "status", "created_at"], name="delreq_user_status_created_idx"),
+            models.Index(
+                fields=["user", "status", "created_at"],
+                name="delreq_user_status_created_idx",
+            ),
             # Index for queries filtering by status and date without user filter
-            models.Index(fields=["status", "created_at"], name="delreq_status_created_idx"),
+            models.Index(
+                fields=["status", "created_at"],
+                name="delreq_status_created_idx",
+            ),
             # Index for queries filtering by user and date (common for user-specific views)
             models.Index(fields=["user", "created_at"], name="delreq_user_created_idx"),
             # Index for queries filtering by review date
@@ -1696,11 +1702,11 @@ class DeletionRequest(models.Model):
     def approve(self, user: User, comment: str = "") -> bool:
         """
         Approve the deletion request.
-        
+
         Args:
             user: User approving the request
             comment: Optional comment from user
-            
+
         Returns:
             True if approved successfully
         """
@@ -1718,11 +1724,11 @@ class DeletionRequest(models.Model):
     def reject(self, user: User, comment: str = "") -> bool:
         """
         Reject the deletion request.
-        
+
         Args:
             user: User rejecting the request
             comment: Optional comment from user
-            
+
         Returns:
             True if rejected successfully
         """

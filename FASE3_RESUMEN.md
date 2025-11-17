@@ -209,7 +209,7 @@ nuevo_doc_id = 12345
 similares = search.find_similar_documents(nuevo_doc_id, min_score=0.9)
 
 if similares and similares[0][1] > 0.95:  # 95% similar
-    print("¡Advertencia: Posible duplicado!")
+    print("¡Advertencia: Possible duplicado!")
 ```
 
 ### Caso 4: Auto-etiquetado Inteligente
@@ -218,7 +218,7 @@ texto = """
 Estimado Juan,
 
 Esta carta confirma su empleo en Acme Corporation
-iniciando el 15 de enero de 2024. Su salario anual será $85,000...
+iniciando el 15 de enero de 2024. Su salario annual será $85,000...
 """
 
 tags = ner.suggest_tags(texto)
@@ -305,7 +305,7 @@ Antes de desplegar a producción:
 - [ ] Clasificación funciona con datos de prueba
 - [ ] NER extrae entidades correctamente
 - [ ] Búsqueda semántica retorna resultados relevantes
-- [ ] Rendimiento aceptable (CPU o GPU)
+- [ ] Rendimiento acceptable (CPU o GPU)
 - [ ] Modelos guardados y cargados correctamente
 - [ ] Integración con pipeline de documentos
 

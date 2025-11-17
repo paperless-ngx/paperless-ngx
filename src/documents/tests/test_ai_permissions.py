@@ -28,7 +28,6 @@ class MockView:
     """Mock view for testing permissions."""
 
 
-
 class TestCanViewAISuggestionsPermission(TestCase):
     """Test the CanViewAISuggestionsPermission class."""
 
@@ -40,13 +39,19 @@ class TestCanViewAISuggestionsPermission(TestCase):
 
         # Create users
         self.superuser = User.objects.create_superuser(
-            username="admin", email="admin@test.com", password="admin123",
+            username="admin",
+            email="admin@test.com",
+            password="admin123",
         )
         self.regular_user = User.objects.create_user(
-            username="regular", email="regular@test.com", password="regular123",
+            username="regular",
+            email="regular@test.com",
+            password="regular123",
         )
         self.permitted_user = User.objects.create_user(
-            username="permitted", email="permitted@test.com", password="permitted123",
+            username="permitted",
+            email="permitted@test.com",
+            password="permitted123",
         )
 
         # Assign permission to permitted_user
@@ -106,13 +111,19 @@ class TestCanApplyAISuggestionsPermission(TestCase):
 
         # Create users
         self.superuser = User.objects.create_superuser(
-            username="admin", email="admin@test.com", password="admin123",
+            username="admin",
+            email="admin@test.com",
+            password="admin123",
         )
         self.regular_user = User.objects.create_user(
-            username="regular", email="regular@test.com", password="regular123",
+            username="regular",
+            email="regular@test.com",
+            password="regular123",
         )
         self.permitted_user = User.objects.create_user(
-            username="permitted", email="permitted@test.com", password="permitted123",
+            username="permitted",
+            email="permitted@test.com",
+            password="permitted123",
         )
 
         # Assign permission to permitted_user
@@ -172,13 +183,19 @@ class TestCanApproveDeletionsPermission(TestCase):
 
         # Create users
         self.superuser = User.objects.create_superuser(
-            username="admin", email="admin@test.com", password="admin123",
+            username="admin",
+            email="admin@test.com",
+            password="admin123",
         )
         self.regular_user = User.objects.create_user(
-            username="regular", email="regular@test.com", password="regular123",
+            username="regular",
+            email="regular@test.com",
+            password="regular123",
         )
         self.permitted_user = User.objects.create_user(
-            username="permitted", email="permitted@test.com", password="permitted123",
+            username="permitted",
+            email="permitted@test.com",
+            password="permitted123",
         )
 
         # Assign permission to permitted_user
@@ -238,13 +255,19 @@ class TestCanConfigureAIPermission(TestCase):
 
         # Create users
         self.superuser = User.objects.create_superuser(
-            username="admin", email="admin@test.com", password="admin123",
+            username="admin",
+            email="admin@test.com",
+            password="admin123",
         )
         self.regular_user = User.objects.create_user(
-            username="regular", email="regular@test.com", password="regular123",
+            username="regular",
+            email="regular@test.com",
+            password="regular123",
         )
         self.permitted_user = User.objects.create_user(
-            username="permitted", email="permitted@test.com", password="permitted123",
+            username="permitted",
+            email="permitted@test.com",
+            password="permitted123",
         )
 
         # Assign permission to permitted_user
@@ -344,7 +367,9 @@ class TestRoleBasedAccessControl(TestCase):
     def test_viewer_role_permissions(self):
         """Test that viewer role has appropriate permissions."""
         user = User.objects.create_user(
-            username="viewer", email="viewer@test.com", password="viewer123",
+            username="viewer",
+            email="viewer@test.com",
+            password="viewer123",
         )
         user.groups.add(self.viewer_group)
 
@@ -359,7 +384,9 @@ class TestRoleBasedAccessControl(TestCase):
     def test_editor_role_permissions(self):
         """Test that editor role has appropriate permissions."""
         user = User.objects.create_user(
-            username="editor", email="editor@test.com", password="editor123",
+            username="editor",
+            email="editor@test.com",
+            password="editor123",
         )
         user.groups.add(self.editor_group)
 
@@ -374,7 +401,9 @@ class TestRoleBasedAccessControl(TestCase):
     def test_admin_role_permissions(self):
         """Test that admin role has all permissions."""
         user = User.objects.create_user(
-            username="ai_admin", email="ai_admin@test.com", password="admin123",
+            username="ai_admin",
+            email="ai_admin@test.com",
+            password="admin123",
         )
         user.groups.add(self.admin_group)
 
@@ -389,7 +418,9 @@ class TestRoleBasedAccessControl(TestCase):
     def test_user_with_multiple_groups(self):
         """Test that user permissions accumulate from multiple groups."""
         user = User.objects.create_user(
-            username="multi_role", email="multi@test.com", password="multi123",
+            username="multi_role",
+            email="multi@test.com",
+            password="multi123",
         )
         user.groups.add(self.viewer_group, self.editor_group)
 
@@ -404,7 +435,9 @@ class TestRoleBasedAccessControl(TestCase):
     def test_direct_permission_assignment_overrides_group(self):
         """Test that direct permission assignment works alongside group permissions."""
         user = User.objects.create_user(
-            username="special", email="special@test.com", password="special123",
+            username="special",
+            email="special@test.com",
+            password="special123",
         )
         user.groups.add(self.viewer_group)
 
@@ -427,7 +460,9 @@ class TestPermissionAssignment(TestCase):
     def setUp(self):
         """Set up test user."""
         self.user = User.objects.create_user(
-            username="testuser", email="test@test.com", password="test123",
+            username="testuser",
+            email="test@test.com",
+            password="test123",
         )
         content_type = ContentType.objects.get_for_model(Document)
         self.view_permission, _ = Permission.objects.get_or_create(
@@ -499,7 +534,9 @@ class TestPermissionEdgeCases(TestCase):
     def test_inactive_user_with_permission(self):
         """Test that inactive users are denied even with permission."""
         user = User.objects.create_user(
-            username="inactive", email="inactive@test.com", password="inactive123",
+            username="inactive",
+            email="inactive@test.com",
+            password="inactive123",
         )
         user.is_active = False
         user.save()

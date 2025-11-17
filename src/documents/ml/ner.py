@@ -41,8 +41,8 @@ class DocumentNER:
     """
 
     # Límites de procesamiento
-    MAX_TEXT_LENGTH_FOR_NER = 5000  # Máximo de caracteres para NER
-    MAX_ENTITY_LENGTH = 100  # Máximo de caracteres por entidad
+    MAX_TEXT_LENGTH_FOR_NER = 5000  # Máximo de characters para NER
+    MAX_ENTITY_LENGTH = 100  # Máximo de characters por entidad
 
     def __init__(
         self,
@@ -51,7 +51,7 @@ class DocumentNER:
     ):
         """
         Initialize NER extractor.
-        
+
         Args:
             model_name: HuggingFace NER model
                        Default: dslim/bert-base-NER (good general purpose)
@@ -118,7 +118,10 @@ class DocumentNER:
         # Invoice number patterns
         self.invoice_patterns = [
             re.compile(r"(?:Invoice|Inv\.?)\s*#?\s*(\w+)", re.IGNORECASE),
-            re.compile(r"(?:Invoice|Inv\.?)\s*(?:Number|No\.?)\s*:?\s*(\w+)", re.IGNORECASE),
+            re.compile(
+                r"(?:Invoice|Inv\.?)\s*(?:Number|No\.?)\s*:?\s*(\w+)",
+                re.IGNORECASE,
+            ),
         ]
 
         # Email pattern
@@ -134,16 +137,22 @@ class DocumentNER:
         # Document type classification patterns (compiled for performance)
         self.invoice_keyword_pattern = re.compile(r"\binvoice\b", re.IGNORECASE)
         self.receipt_keyword_pattern = re.compile(r"\breceipt\b", re.IGNORECASE)
-        self.contract_keyword_pattern = re.compile(r"\bcontract\b|\bagreement\b", re.IGNORECASE)
-        self.letter_keyword_pattern = re.compile(r"\bdear\b|\bsincerely\b", re.IGNORECASE)
+        self.contract_keyword_pattern = re.compile(
+            r"\bcontract\b|\bagreement\b",
+            re.IGNORECASE,
+        )
+        self.letter_keyword_pattern = re.compile(
+            r"\bdear\b|\bsincerely\b",
+            re.IGNORECASE,
+        )
 
     def extract_entities(self, text: str) -> dict[str, list[str]]:
         """
         Extract named entities from text.
-        
+
         Args:
             text: Document text
-            
+
         Returns:
             dict: Dictionary of entity types and their values
                   {
@@ -154,7 +163,9 @@ class DocumentNER:
                   }
         """
         # Run NER model
-        entities = self.ner_pipeline(text[:self.MAX_TEXT_LENGTH_FOR_NER])  # Limit to first chars
+        entities = self.ner_pipeline(
+            text[: self.MAX_TEXT_LENGTH_FOR_NER],
+        )  # Limit to first chars
 
         # Organize by type
         organized = {
@@ -190,10 +201,10 @@ class DocumentNER:
     def extract_dates(self, text: str) -> list[str]:
         """
         Extract dates from text.
-        
+
         Args:
             text: Document text
-            
+
         Returns:
             list: List of date strings found
         """
@@ -208,10 +219,10 @@ class DocumentNER:
     def extract_amounts(self, text: str) -> list[str]:
         """
         Extract monetary amounts from text.
-        
+
         Args:
             text: Document text
-            
+
         Returns:
             list: List of amount strings found
         """
@@ -226,10 +237,10 @@ class DocumentNER:
     def extract_invoice_numbers(self, text: str) -> list[str]:
         """
         Extract invoice numbers from text.
-        
+
         Args:
             text: Document text
-            
+
         Returns:
             list: List of invoice numbers found
         """
@@ -244,10 +255,10 @@ class DocumentNER:
     def extract_emails(self, text: str) -> list[str]:
         """
         Extract email addresses from text.
-        
+
         Args:
             text: Document text
-            
+
         Returns:
             list: List of email addresses found
         """
@@ -260,10 +271,10 @@ class DocumentNER:
     def extract_phones(self, text: str) -> list[str]:
         """
         Extract phone numbers from text.
-        
+
         Args:
             text: Document text
-            
+
         Returns:
             list: List of phone numbers found
         """
@@ -276,12 +287,12 @@ class DocumentNER:
     def extract_all(self, text: str) -> dict[str, list[str]]:
         """
         Extract all types of entities from text.
-        
+
         This is the main method that combines NER and regex extraction.
-        
+
         Args:
             text: Document text
-            
+
         Returns:
             dict: Complete extraction results
                   {
@@ -317,12 +328,12 @@ class DocumentNER:
     def extract_invoice_data(self, text: str) -> dict[str, any]:
         """
         Extract invoice-specific data from text.
-        
+
         Specialized method for invoices that extracts common fields.
-        
+
         Args:
             text: Invoice text
-            
+
         Returns:
             dict: Invoice data
                   {
@@ -372,10 +383,10 @@ class DocumentNER:
     def suggest_correspondent(self, text: str) -> str | None:
         """
         Suggest a correspondent based on extracted entities.
-        
+
         Args:
             text: Document text
-            
+
         Returns:
             str or None: Suggested correspondent name
         """

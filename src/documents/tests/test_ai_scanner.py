@@ -64,7 +64,10 @@ class TestAIScanResult(TestCase):
         result.storage_path = (3, 0.85)
         result.custom_fields = {1: ("value1", 0.70), 2: ("value2", 0.65)}
         result.workflows = [(1, 0.75)]
-        result.extracted_entities = {"persons": ["John Doe"], "organizations": ["ACME Corp"]}
+        result.extracted_entities = {
+            "persons": ["John Doe"],
+            "organizations": ["ACME Corp"],
+        }
         result.title_suggestion = "Invoice - ACME Corp - 2024-01-01"
         result.metadata = {"tables": [{"data": "test"}]}
 
@@ -74,10 +77,19 @@ class TestAIScanResult(TestCase):
         self.assertEqual(result_dict["correspondent"], (1, 0.90))
         self.assertEqual(result_dict["document_type"], (2, 0.80))
         self.assertEqual(result_dict["storage_path"], (3, 0.85))
-        self.assertEqual(result_dict["custom_fields"], {1: ("value1", 0.70), 2: ("value2", 0.65)})
+        self.assertEqual(
+            result_dict["custom_fields"],
+            {1: ("value1", 0.70), 2: ("value2", 0.65)},
+        )
         self.assertEqual(result_dict["workflows"], [(1, 0.75)])
-        self.assertEqual(result_dict["extracted_entities"], {"persons": ["John Doe"], "organizations": ["ACME Corp"]})
-        self.assertEqual(result_dict["title_suggestion"], "Invoice - ACME Corp - 2024-01-01")
+        self.assertEqual(
+            result_dict["extracted_entities"],
+            {"persons": ["John Doe"], "organizations": ["ACME Corp"]},
+        )
+        self.assertEqual(
+            result_dict["title_suggestion"],
+            "Invoice - ACME Corp - 2024-01-01",
+        )
         self.assertEqual(result_dict["metadata"], {"tables": [{"data": "test"}]})
 
 
@@ -149,8 +161,10 @@ class TestAIDocumentScannerLazyLoading(TestCase):
 
         # Mock the import and class
         mock_classifier_instance = mock.MagicMock()
-        with mock.patch("documents.ai_scanner.TransformerDocumentClassifier",
-                       return_value=mock_classifier_instance) as mock_classifier_class:
+        with mock.patch(
+            "documents.ai_scanner.TransformerDocumentClassifier",
+            return_value=mock_classifier_instance,
+        ) as mock_classifier_class:
             classifier = scanner._get_classifier()
 
             self.assertIsNotNone(classifier)
@@ -164,8 +178,10 @@ class TestAIDocumentScannerLazyLoading(TestCase):
         scanner = AIDocumentScanner()
 
         mock_classifier_instance = mock.MagicMock()
-        with mock.patch("documents.ai_scanner.TransformerDocumentClassifier",
-                       return_value=mock_classifier_instance):
+        with mock.patch(
+            "documents.ai_scanner.TransformerDocumentClassifier",
+            return_value=mock_classifier_instance,
+        ):
             classifier1 = scanner._get_classifier()
             classifier2 = scanner._get_classifier()
 
@@ -177,8 +193,10 @@ class TestAIDocumentScannerLazyLoading(TestCase):
         """Test that classifier loading handles import errors gracefully."""
         scanner = AIDocumentScanner()
 
-        with mock.patch("documents.ai_scanner.TransformerDocumentClassifier",
-                       side_effect=ImportError("Module not found")):
+        with mock.patch(
+            "documents.ai_scanner.TransformerDocumentClassifier",
+            side_effect=ImportError("Module not found"),
+        ):
             classifier = scanner._get_classifier()
 
             self.assertIsNone(classifier)
@@ -199,8 +217,10 @@ class TestAIDocumentScannerLazyLoading(TestCase):
         scanner = AIDocumentScanner()
 
         mock_ner_instance = mock.MagicMock()
-        with mock.patch("documents.ai_scanner.DocumentNER",
-                       return_value=mock_ner_instance) as mock_ner_class:
+        with mock.patch(
+            "documents.ai_scanner.DocumentNER",
+            return_value=mock_ner_instance,
+        ) as mock_ner_class:
             ner = scanner._get_ner_extractor()
 
             self.assertIsNotNone(ner)
@@ -213,8 +233,10 @@ class TestAIDocumentScannerLazyLoading(TestCase):
         """Test NER extractor handles loading errors."""
         scanner = AIDocumentScanner()
 
-        with mock.patch("documents.ai_scanner.DocumentNER",
-                       side_effect=Exception("Failed to load")):
+        with mock.patch(
+            "documents.ai_scanner.DocumentNER",
+            side_effect=Exception("Failed to load"),
+        ):
             ner = scanner._get_ner_extractor()
 
             self.assertIsNone(ner)
@@ -226,8 +248,10 @@ class TestAIDocumentScannerLazyLoading(TestCase):
         scanner = AIDocumentScanner()
 
         mock_search_instance = mock.MagicMock()
-        with mock.patch("documents.ai_scanner.SemanticSearch",
-                       return_value=mock_search_instance) as mock_search_class:
+        with mock.patch(
+            "documents.ai_scanner.SemanticSearch",
+            return_value=mock_search_instance,
+        ) as mock_search_class:
             search = scanner._get_semantic_search()
 
             self.assertIsNotNone(search)
@@ -241,8 +265,10 @@ class TestAIDocumentScannerLazyLoading(TestCase):
         scanner = AIDocumentScanner()
 
         mock_extractor_instance = mock.MagicMock()
-        with mock.patch("documents.ai_scanner.TableExtractor",
-                       return_value=mock_extractor_instance) as mock_extractor_class:
+        with mock.patch(
+            "documents.ai_scanner.TableExtractor",
+            return_value=mock_extractor_instance,
+        ) as mock_extractor_class:
             extractor = scanner._get_table_extractor()
 
             self.assertIsNotNone(extractor)
@@ -337,8 +363,14 @@ class TestSuggestTags(TestCase):
 
     def setUp(self):
         """Set up test tags."""
-        self.tag1 = Tag.objects.create(name="Invoice", matching_algorithm=Tag.MATCH_AUTO)
-        self.tag2 = Tag.objects.create(name="Company", matching_algorithm=Tag.MATCH_AUTO)
+        self.tag1 = Tag.objects.create(
+            name="Invoice",
+            matching_algorithm=Tag.MATCH_AUTO,
+        )
+        self.tag2 = Tag.objects.create(
+            name="Company",
+            matching_algorithm=Tag.MATCH_AUTO,
+        )
         self.tag3 = Tag.objects.create(name="Tax", matching_algorithm=Tag.MATCH_AUTO)
         self.document = Document.objects.create(
             title="Test Document",
@@ -640,8 +672,11 @@ class TestExtractCustomFields(TestCase):
         """Test custom field extraction handles exceptions."""
         scanner = AIDocumentScanner()
 
-        with mock.patch.object(CustomField.objects, "all",
-                              side_effect=Exception("DB error")):
+        with mock.patch.object(
+            CustomField.objects,
+            "all",
+            side_effect=Exception("DB error"),
+        ):
             fields = scanner._extract_custom_fields(self.document, "text", {})
 
             self.assertEqual(fields, {})
@@ -688,7 +723,9 @@ class TestExtractFieldValue(TestCase):
         entities = {"dates": [{"text": "2024-01-01"}]}
 
         value, confidence = scanner._extract_field_value(
-            self.field_date, "text", entities,
+            self.field_date,
+            "text",
+            entities,
         )
 
         self.assertEqual(value, "2024-01-01")
@@ -700,7 +737,9 @@ class TestExtractFieldValue(TestCase):
         entities = {"amounts": [{"text": "$1,000"}]}
 
         value, confidence = scanner._extract_field_value(
-            self.field_amount, "text", entities,
+            self.field_amount,
+            "text",
+            entities,
         )
 
         self.assertEqual(value, "$1,000")
@@ -712,7 +751,9 @@ class TestExtractFieldValue(TestCase):
         entities = {"invoice_numbers": ["INV-12345"]}
 
         value, confidence = scanner._extract_field_value(
-            self.field_invoice, "text", entities,
+            self.field_invoice,
+            "text",
+            entities,
         )
 
         self.assertEqual(value, "INV-12345")
@@ -724,7 +765,9 @@ class TestExtractFieldValue(TestCase):
         entities = {"emails": ["test@example.com"]}
 
         value, confidence = scanner._extract_field_value(
-            self.field_email, "text", entities,
+            self.field_email,
+            "text",
+            entities,
         )
 
         self.assertEqual(value, "test@example.com")
@@ -736,7 +779,9 @@ class TestExtractFieldValue(TestCase):
         entities = {"phones": ["+1-555-1234"]}
 
         value, confidence = scanner._extract_field_value(
-            self.field_phone, "text", entities,
+            self.field_phone,
+            "text",
+            entities,
         )
 
         self.assertEqual(value, "+1-555-1234")
@@ -748,7 +793,9 @@ class TestExtractFieldValue(TestCase):
         entities = {"persons": [{"text": "John Doe"}]}
 
         value, confidence = scanner._extract_field_value(
-            self.field_person, "text", entities,
+            self.field_person,
+            "text",
+            entities,
         )
 
         self.assertEqual(value, "John Doe")
@@ -760,7 +807,9 @@ class TestExtractFieldValue(TestCase):
         entities = {"organizations": [{"text": "ACME Corp"}]}
 
         value, confidence = scanner._extract_field_value(
-            self.field_company, "text", entities,
+            self.field_company,
+            "text",
+            entities,
         )
 
         self.assertEqual(value, "ACME Corp")
@@ -772,7 +821,9 @@ class TestExtractFieldValue(TestCase):
         entities = {}
 
         value, confidence = scanner._extract_field_value(
-            self.field_date, "text", entities,
+            self.field_date,
+            "text",
+            entities,
         )
 
         self.assertIsNone(value)
@@ -845,10 +896,15 @@ class TestSuggestWorkflows(TestCase):
 
         scan_result = AIScanResult()
 
-        with mock.patch.object(Workflow.objects, "filter",
-                              side_effect=Exception("DB error")):
+        with mock.patch.object(
+            Workflow.objects,
+            "filter",
+            side_effect=Exception("DB error"),
+        ):
             suggestions = scanner._suggest_workflows(
-                self.document, "text", scan_result,
+                self.document,
+                "text",
+                scan_result,
             )
 
             self.assertEqual(suggestions, [])
@@ -875,7 +931,9 @@ class TestEvaluateWorkflowMatch(TestCase):
         scan_result = AIScanResult()
 
         confidence = scanner._evaluate_workflow_match(
-            self.workflow, self.document, scan_result,
+            self.workflow,
+            self.document,
+            scan_result,
         )
 
         self.assertEqual(confidence, 0.5)
@@ -893,7 +951,9 @@ class TestEvaluateWorkflowMatch(TestCase):
         )
 
         confidence = scanner._evaluate_workflow_match(
-            self.workflow, self.document, scan_result,
+            self.workflow,
+            self.document,
+            scan_result,
         )
 
         self.assertGreater(confidence, 0.5)
@@ -905,7 +965,9 @@ class TestEvaluateWorkflowMatch(TestCase):
         scan_result.correspondent = (1, 0.90)
 
         confidence = scanner._evaluate_workflow_match(
-            self.workflow, self.document, scan_result,
+            self.workflow,
+            self.document,
+            scan_result,
         )
 
         self.assertGreater(confidence, 0.5)
@@ -917,7 +979,9 @@ class TestEvaluateWorkflowMatch(TestCase):
         scan_result.tags = [(1, 0.80), (2, 0.75)]
 
         confidence = scanner._evaluate_workflow_match(
-            self.workflow, self.document, scan_result,
+            self.workflow,
+            self.document,
+            scan_result,
         )
 
         self.assertGreater(confidence, 0.5)
@@ -937,7 +1001,9 @@ class TestEvaluateWorkflowMatch(TestCase):
         )
 
         confidence = scanner._evaluate_workflow_match(
-            self.workflow, self.document, scan_result,
+            self.workflow,
+            self.document,
+            scan_result,
         )
 
         self.assertLessEqual(confidence, 1.0)
@@ -1056,7 +1122,9 @@ class TestExtractTables(TestCase):
         scanner = AIDocumentScanner()
 
         mock_extractor = mock.MagicMock()
-        mock_extractor.extract_tables_from_image.side_effect = Exception("Extraction failed")
+        mock_extractor.extract_tables_from_image.side_effect = Exception(
+            "Extraction failed",
+        )
         scanner._table_extractor = mock_extractor
 
         tables = scanner._extract_tables("/path/to/file.pdf")
@@ -1131,15 +1199,16 @@ class TestScanDocument(TestCase):
         mock_extract_tables.return_value = [{"data": "test"}]
 
         # Mock other methods to avoid complexity
-        with mock.patch.object(scanner, "_extract_entities", return_value={}), \
-             mock.patch.object(scanner, "_suggest_tags", return_value=[]), \
-             mock.patch.object(scanner, "_detect_correspondent", return_value=None), \
-             mock.patch.object(scanner, "_classify_document_type", return_value=None), \
-             mock.patch.object(scanner, "_suggest_storage_path", return_value=None), \
-             mock.patch.object(scanner, "_extract_custom_fields", return_value={}), \
-             mock.patch.object(scanner, "_suggest_workflows", return_value=[]), \
-             mock.patch.object(scanner, "_suggest_title", return_value=None):
-
+        with (
+            mock.patch.object(scanner, "_extract_entities", return_value={}),
+            mock.patch.object(scanner, "_suggest_tags", return_value=[]),
+            mock.patch.object(scanner, "_detect_correspondent", return_value=None),
+            mock.patch.object(scanner, "_classify_document_type", return_value=None),
+            mock.patch.object(scanner, "_suggest_storage_path", return_value=None),
+            mock.patch.object(scanner, "_extract_custom_fields", return_value={}),
+            mock.patch.object(scanner, "_suggest_workflows", return_value=[]),
+            mock.patch.object(scanner, "_suggest_title", return_value=None),
+        ):
             result = scanner.scan_document(
                 self.document,
                 "Document text",
@@ -1153,16 +1222,17 @@ class TestScanDocument(TestCase):
         """Test that tables are not extracted when file path is not provided."""
         scanner = AIDocumentScanner(enable_advanced_ocr=True)
 
-        with mock.patch.object(scanner, "_extract_tables") as mock_extract_tables, \
-             mock.patch.object(scanner, "_extract_entities", return_value={}), \
-             mock.patch.object(scanner, "_suggest_tags", return_value=[]), \
-             mock.patch.object(scanner, "_detect_correspondent", return_value=None), \
-             mock.patch.object(scanner, "_classify_document_type", return_value=None), \
-             mock.patch.object(scanner, "_suggest_storage_path", return_value=None), \
-             mock.patch.object(scanner, "_extract_custom_fields", return_value={}), \
-             mock.patch.object(scanner, "_suggest_workflows", return_value=[]), \
-             mock.patch.object(scanner, "_suggest_title", return_value=None):
-
+        with (
+            mock.patch.object(scanner, "_extract_tables") as mock_extract_tables,
+            mock.patch.object(scanner, "_extract_entities", return_value={}),
+            mock.patch.object(scanner, "_suggest_tags", return_value=[]),
+            mock.patch.object(scanner, "_detect_correspondent", return_value=None),
+            mock.patch.object(scanner, "_classify_document_type", return_value=None),
+            mock.patch.object(scanner, "_suggest_storage_path", return_value=None),
+            mock.patch.object(scanner, "_extract_custom_fields", return_value={}),
+            mock.patch.object(scanner, "_suggest_workflows", return_value=[]),
+            mock.patch.object(scanner, "_suggest_title", return_value=None),
+        ):
             result = scanner.scan_document(self.document, "Document text")
 
             mock_extract_tables.assert_not_called()
@@ -1265,8 +1335,11 @@ class TestApplyScanResults(TestCase):
         scan_result = AIScanResult()
         scan_result.correspondent = (self.correspondent.id, 0.90)
 
-        with mock.patch.object(self.document, "save",
-                              side_effect=Exception("Save failed")):
+        with mock.patch.object(
+            self.document,
+            "save",
+            side_effect=Exception("Save failed"),
+        ):
             with self.assertRaises(Exception):
                 with transaction.atomic():
                     scanner.apply_scan_results(
@@ -1327,15 +1400,16 @@ class TestEdgeCasesAndErrorHandling(TestCase):
         """Test scanning document with empty text."""
         scanner = AIDocumentScanner()
 
-        with mock.patch.object(scanner, "_extract_entities", return_value={}), \
-             mock.patch.object(scanner, "_suggest_tags", return_value=[]), \
-             mock.patch.object(scanner, "_detect_correspondent", return_value=None), \
-             mock.patch.object(scanner, "_classify_document_type", return_value=None), \
-             mock.patch.object(scanner, "_suggest_storage_path", return_value=None), \
-             mock.patch.object(scanner, "_extract_custom_fields", return_value={}), \
-             mock.patch.object(scanner, "_suggest_workflows", return_value=[]), \
-             mock.patch.object(scanner, "_suggest_title", return_value=None):
-
+        with (
+            mock.patch.object(scanner, "_extract_entities", return_value={}),
+            mock.patch.object(scanner, "_suggest_tags", return_value=[]),
+            mock.patch.object(scanner, "_detect_correspondent", return_value=None),
+            mock.patch.object(scanner, "_classify_document_type", return_value=None),
+            mock.patch.object(scanner, "_suggest_storage_path", return_value=None),
+            mock.patch.object(scanner, "_extract_custom_fields", return_value={}),
+            mock.patch.object(scanner, "_suggest_workflows", return_value=[]),
+            mock.patch.object(scanner, "_suggest_title", return_value=None),
+        ):
             result = scanner.scan_document(self.document, "")
 
             self.assertIsNotNone(result)
@@ -1346,15 +1420,16 @@ class TestEdgeCasesAndErrorHandling(TestCase):
         scanner = AIDocumentScanner()
         long_text = "A" * 100000
 
-        with mock.patch.object(scanner, "_extract_entities", return_value={}), \
-             mock.patch.object(scanner, "_suggest_tags", return_value=[]), \
-             mock.patch.object(scanner, "_detect_correspondent", return_value=None), \
-             mock.patch.object(scanner, "_classify_document_type", return_value=None), \
-             mock.patch.object(scanner, "_suggest_storage_path", return_value=None), \
-             mock.patch.object(scanner, "_extract_custom_fields", return_value={}), \
-             mock.patch.object(scanner, "_suggest_workflows", return_value=[]), \
-             mock.patch.object(scanner, "_suggest_title", return_value=None):
-
+        with (
+            mock.patch.object(scanner, "_extract_entities", return_value={}),
+            mock.patch.object(scanner, "_suggest_tags", return_value=[]),
+            mock.patch.object(scanner, "_detect_correspondent", return_value=None),
+            mock.patch.object(scanner, "_classify_document_type", return_value=None),
+            mock.patch.object(scanner, "_suggest_storage_path", return_value=None),
+            mock.patch.object(scanner, "_extract_custom_fields", return_value={}),
+            mock.patch.object(scanner, "_suggest_workflows", return_value=[]),
+            mock.patch.object(scanner, "_suggest_title", return_value=None),
+        ):
             result = scanner.scan_document(self.document, long_text)
 
             self.assertIsNotNone(result)
@@ -1364,15 +1439,16 @@ class TestEdgeCasesAndErrorHandling(TestCase):
         scanner = AIDocumentScanner()
         special_text = "Test with émojis 😀 and special chars: <>{}[]|\\`~"
 
-        with mock.patch.object(scanner, "_extract_entities", return_value={}), \
-             mock.patch.object(scanner, "_suggest_tags", return_value=[]), \
-             mock.patch.object(scanner, "_detect_correspondent", return_value=None), \
-             mock.patch.object(scanner, "_classify_document_type", return_value=None), \
-             mock.patch.object(scanner, "_suggest_storage_path", return_value=None), \
-             mock.patch.object(scanner, "_extract_custom_fields", return_value={}), \
-             mock.patch.object(scanner, "_suggest_workflows", return_value=[]), \
-             mock.patch.object(scanner, "_suggest_title", return_value=None):
-
+        with (
+            mock.patch.object(scanner, "_extract_entities", return_value={}),
+            mock.patch.object(scanner, "_suggest_tags", return_value=[]),
+            mock.patch.object(scanner, "_detect_correspondent", return_value=None),
+            mock.patch.object(scanner, "_classify_document_type", return_value=None),
+            mock.patch.object(scanner, "_suggest_storage_path", return_value=None),
+            mock.patch.object(scanner, "_extract_custom_fields", return_value={}),
+            mock.patch.object(scanner, "_suggest_workflows", return_value=[]),
+            mock.patch.object(scanner, "_suggest_title", return_value=None),
+        ):
             result = scanner.scan_document(self.document, special_text)
 
             self.assertIsNotNone(result)

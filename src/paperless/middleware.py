@@ -25,7 +25,7 @@ class ApiVersionMiddleware:
 class RateLimitMiddleware:
     """
     Rate limit API requests per user/IP to prevent DoS attacks.
-    
+
     Implements sliding window rate limiting using Redis cache.
     Different endpoints have different limits based on their resource usage.
     """
@@ -115,7 +115,7 @@ class RateLimitMiddleware:
 class SecurityHeadersMiddleware:
     """
     Add security headers to all responses for enhanced security.
-    
+
     Implements best practices for web security including:
     - HSTS (HTTP Strict Transport Security)
     - CSP (Content Security Policy)

@@ -1,7 +1,7 @@
 # 📋 GitHub Projects - Configuración y Estructura
 
-**Documento:** Guía completa para configurar GitHub Projects para IntelliDocs-ngx  
-**Fecha:** 2025-11-09  
+**Documento:** Guía completa para configurar GitHub Projects para IntelliDocs-ngx
+**Fecha:** 2025-11-09
 **Autoridad:** Siguiendo directivas de `agents.md`
 
 ---
@@ -16,7 +16,7 @@ Este documento proporciona las instrucciones paso a paso para crear y configurar
 
 ### Información General del Project
 - **Nombre:** IntelliDocs-ngx Roadmap 2026
-- **Descripción:** Plan anual de desarrollo e implementación para IntelliDocs-ngx
+- **Descripción:** Plan annual de desarrollo e implementación para IntelliDocs-ngx
 - **Template:** Board (Kanban) + Roadmap views
 - **Visibilidad:** Privado (solo equipo)
 
@@ -68,27 +68,27 @@ Crear las siguientes columnas en el Board:
 1. **📥 Backlog**
    - Status: Backlog
    - Descripción: Tareas no iniciadas, priorizadas para futuro
-   
+
 2. **📅 Planned (Q1-Q4)**
    - Status: Planned
    - Descripción: Tareas planificadas con trimestre asignado
-   
+
 3. **🔨 In Progress**
    - Status: In Progress
    - Descripción: Tareas en desarrollo activo
-   
+
 4. **👀 In Review**
    - Status: In Review
    - Descripción: Tareas completadas, esperando code review
-   
+
 5. **🧪 Testing**
    - Status: Testing
    - Descripción: Features en QA y testing
-   
+
 6. **✅ Done**
    - Status: Done
    - Descripción: Tareas completadas y mergeadas
-   
+
 7. **🚫 Blocked**
    - Status: Blocked
    - Descripción: Tareas bloqueadas por dependencias
@@ -150,7 +150,7 @@ area: ocr
 area: security
 ```
 
-### Comandos para crear labels (GitHub CLI)
+### Commandos para crear labels (GitHub CLI)
 
 ```bash
 # Prioridades
@@ -258,8 +258,8 @@ Agregar campos personalizados al project para tracking avanzado:
 - **Tipo:** Date
 - **Descripción:** Fecha objetivo de finalización
 
-### 8. Responsable (Person)
-- **Nombre:** Responsable
+### 8. Responsible (Person)
+- **Nombre:** Responsible
 - **Tipo:** Person
 - **Descripción:** Persona asignada a la tarea
 
@@ -294,19 +294,19 @@ Para cada tarea en ROADMAP_2026.md:
 1. Crear un Issue en GitHub:
    ```
    Título: TSK-2601: Tests para classifier.py (clasificación BERT)
-   
+
    Descripción:
    **Epic:** EPIC 1: Testing y QA
    **Prioridad:** Alta
    **Estimación:** 2 días
    **Trimestre:** Q1 2026
-   
+
    ## Subtareas
    - [ ] test_train_model
    - [ ] test_predict
    - [ ] test_save_load
    - [ ] test_edge_cases
-   
+
    ## Aceptación
    - Tests passing
    - Cobertura >90%
@@ -331,7 +331,7 @@ Para cada tarea en ROADMAP_2026.md:
 #!/usr/bin/env python3
 """
 Script para importar tareas del ROADMAP_2026.md a GitHub Issues
-Requiere: pip install PyGithub
+Require: pip install PyGithub
 """
 
 from github import Github
@@ -424,10 +424,10 @@ gh issue create \
 3. Group by: Trimestre
 4. Sort by: Epic
 
-### Vista 3: Por Responsable
-1. Crear nueva vista: **"Por Responsable"**
+### Vista 3: Por Responsible
+1. Crear nueva vista: **"Por Responsible"**
 2. Tipo: Board
-3. Group by: Responsable
+3. Group by: Responsible
 4. Sort by: Prioridad
 
 ### Vista 4: Lista Completa
@@ -674,6 +674,6 @@ IntelliDocs-ngx Roadmap 2026
 
 ---
 
-**Contacto:**  
-Director: @dawnsystem  
+**Contacto:**
+Director: @dawnsystem
 Fecha: 2025-11-09

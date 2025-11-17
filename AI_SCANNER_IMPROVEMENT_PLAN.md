@@ -1,15 +1,15 @@
 # AI Scanner - Plan de Mejoras y Siguientes Pasos
 
 ## Documento de Planificación
-**Fecha**: 2025-11-11  
-**Proyecto**: IntelliDocs-ngx AI Scanner  
+**Fecha**: 2025-11-11
+**Proyecto**: IntelliDocs-ngx AI Scanner
 **Estado**: PRODUCTION READY - Mejoras Planificadas
 
 ---
 
 ## 📋 Resumen Ejecutivo
 
-El sistema AI Scanner está completamente implementado y funcional. Este documento detalla todas las mejoras, optimizaciones y tareas pendientes organizadas por prioridad y área.
+El sistema AI Scanner está completamente implementado y functional. Este documento detalla todas las mejoras, optimizaciones y tareas pendientes organizadas por prioridad y área.
 
 ---
 
@@ -31,8 +31,8 @@ El sistema AI Scanner está completamente implementado y funcional. Este documen
 ## 📊 ÉPICA 1: Testing y Calidad de Código
 
 ### Issue 1.1: Tests Unitarios para AI Scanner
-**Prioridad**: 🔴 ALTA  
-**Estimación**: 3-5 días  
+**Prioridad**: 🔴 ALTA
+**Estimación**: 3-5 días
 **Dependencias**: Ninguna
 
 **Descripción**:
@@ -64,8 +64,8 @@ Crear suite completa de tests unitarios para `ai_scanner.py`
 ---
 
 ### Issue 1.2: Tests Unitarios para AI Deletion Manager
-**Prioridad**: 🔴 ALTA  
-**Estimación**: 2-3 días  
+**Prioridad**: 🔴 ALTA
+**Estimación**: 2-3 días
 **Dependencias**: Ninguna
 
 **Descripción**:
@@ -74,7 +74,7 @@ Crear tests para `ai_deletion_manager.py` y modelo `DeletionRequest`
 **Tareas**:
 - [ ] Tests para `create_deletion_request()` con análisis de impacto
 - [ ] Tests para `_analyze_impact()` con diferentes documentos
-- [ ] Tests para `format_deletion_request_for_user()` con varios escenarios
+- [ ] Tests para `format_deletion_request_for_user()` con various escenarios
 - [ ] Tests para `get_pending_requests()` con filtros
 - [ ] Tests para modelo `DeletionRequest` (approve, reject)
 - [ ] Tests para workflow completo de aprobación/rechazo
@@ -86,15 +86,15 @@ Crear tests para `ai_deletion_manager.py` y modelo `DeletionRequest`
 - `src/documents/tests/test_deletion_request_model.py`
 
 **Criterios de Aceptación**:
-- Cobertura >95% para componentes críticos de seguridad
+- Cobertura >95% para components críticos de seguridad
 - Tests verifican constraints de seguridad
 - Tests pasan en CI/CD
 
 ---
 
 ### Issue 1.3: Tests de Integración para Consumer
-**Prioridad**: 🔴 ALTA  
-**Estimación**: 2-3 días  
+**Prioridad**: 🔴 ALTA
+**Estimación**: 2-3 días
 **Dependencias**: Issue 1.1
 
 **Descripción**:
@@ -115,13 +115,13 @@ Tests de integración para `_run_ai_scanner()` en pipeline de consumo
 **Criterios de Aceptación**:
 - Pipeline completo testeado end-to-end
 - Graceful degradation verificado
-- Performance aceptable (<2s adicionales por documento)
+- Performance acceptable (<2s adicionales por documento)
 
 ---
 
 ### Issue 1.4: Pre-commit Hooks y Linting
-**Prioridad**: 🟡 MEDIA  
-**Estimación**: 1 día  
+**Prioridad**: 🟡 MEDIA
+**Estimación**: 1 día
 **Dependencias**: Ninguna
 
 **Descripción**:
@@ -150,8 +150,8 @@ Ejecutar y corregir linters en código nuevo
 ## 📊 ÉPICA 2: Migraciones de Base de Datos
 
 ### Issue 2.1: Migración Django para DeletionRequest
-**Prioridad**: 🔴 ALTA  
-**Estimación**: 1 día  
+**Prioridad**: 🔴 ALTA
+**Estimación**: 1 día
 **Dependencias**: Issue 1.2 (tests)
 
 **Descripción**:
@@ -171,13 +171,13 @@ Crear migración Django para modelo `DeletionRequest`
 **Criterios de Aceptación**:
 - Migración se ejecuta sin errores
 - Índices creados correctamente
-- Backward compatible si posible
+- Backward compatible si possible
 
 ---
 
 ### Issue 2.2: Índices de Performance para DeletionRequest
-**Prioridad**: 🟡 MEDIA  
-**Estimación**: 0.5 días  
+**Prioridad**: 🟡 MEDIA
+**Estimación**: 0.5 días
 **Dependencias**: Issue 2.1
 
 **Descripción**:
@@ -202,8 +202,8 @@ Optimizar índices de base de datos para queries frecuentes
 ## 📊 ÉPICA 3: API REST Endpoints
 
 ### Issue 3.1: API Endpoints para Deletion Requests - Listado y Detalle
-**Prioridad**: 🔴 ALTA  
-**Estimación**: 2-3 días  
+**Prioridad**: 🔴 ALTA
+**Estimación**: 2-3 días
 **Dependencias**: Issue 2.1
 
 **Descripción**:
@@ -231,8 +231,8 @@ Crear endpoints REST para gestión de deletion requests
 ---
 
 ### Issue 3.2: API Endpoints para Deletion Requests - Acciones
-**Prioridad**: 🔴 ALTA  
-**Estimación**: 2 días  
+**Prioridad**: 🔴 ALTA
+**Estimación**: 2 días
 **Dependencias**: Issue 3.1
 
 **Descripción**:
@@ -243,7 +243,7 @@ Endpoints para aprobar/rechazar deletion requests
 - [ ] Endpoint POST `/api/deletion-requests/{id}/reject/`
 - [ ] Endpoint POST `/api/deletion-requests/{id}/cancel/`
 - [ ] Validación de permisos (solo owner o admin)
-- [ ] Validación de estado (solo pending puede ser aprobado/rechazado)
+- [ ] Validación de estado (solo pending puede set aprobado/rechazado)
 - [ ] Respuesta con resultado de ejecución si aprobado
 - [ ] Notificaciones async si configurado
 
@@ -252,15 +252,15 @@ Endpoints para aprobar/rechazar deletion requests
 - Actualizar `src/documents/urls.py`
 
 **Criterios de Aceptación**:
-- Workflow completo funcional via API
+- Workflow completo functional via API
 - Validaciones de estado y permisos
 - Tests de API incluidos
 
 ---
 
 ### Issue 3.3: API Endpoints para AI Suggestions
-**Prioridad**: 🟡 MEDIA  
-**Estimación**: 2-3 días  
+**Prioridad**: 🟡 MEDIA
+**Estimación**: 2-3 días
 **Dependencias**: Ninguna
 
 **Descripción**:
@@ -286,8 +286,8 @@ Exponer sugerencias de AI via API para frontend
 ---
 
 ### Issue 3.4: Webhooks para Eventos de AI
-**Prioridad**: 🟢 BAJA  
-**Estimación**: 2 días  
+**Prioridad**: 🟢 BAJA
+**Estimación**: 2 días
 **Dependencias**: Issue 3.1, 3.3
 
 **Descripción**:
@@ -315,8 +315,8 @@ Sistema de webhooks para notificar eventos de AI
 ## 📊 ÉPICA 4: Integración Frontend
 
 ### Issue 4.1: UI para AI Suggestions en Document Detail
-**Prioridad**: 🔴 ALTA  
-**Estimación**: 3-4 días  
+**Prioridad**: 🔴 ALTA
+**Estimación**: 3-4 días
 **Dependencias**: Issue 3.3
 
 **Descripción**:
@@ -343,8 +343,8 @@ Mostrar sugerencias de AI en página de detalle de documento
 ---
 
 ### Issue 4.2: UI para Deletion Requests Management
-**Prioridad**: 🔴 ALTA  
-**Estimación**: 3-4 días  
+**Prioridad**: 🔴 ALTA
+**Estimación**: 3-4 días
 **Dependencias**: Issue 3.1, 3.2
 
 **Descripción**:
@@ -357,7 +357,7 @@ Dashboard para gestionar deletion requests
 - [ ] Modal de confirmación para aprobar/rechazar
 - [ ] Mostrar análisis de impacto de forma clara
 - [ ] Badge de notificación para pending requests
-- [ ] Historial de requests completados
+- [ ] Historical de requests completados
 
 **Archivos a Crear**:
 - `src-ui/src/app/components/deletion-requests/`
@@ -366,13 +366,13 @@ Dashboard para gestionar deletion requests
 **Criterios de Aceptación**:
 - Usuario puede revisar y aprobar/rechazar requests
 - Análisis de impacto claro y comprensible
-- Notificaciones visuales
+- Notificaciones visuals
 
 ---
 
 ### Issue 4.3: AI Status Indicator
-**Prioridad**: 🟡 MEDIA  
-**Estimación**: 1-2 días  
+**Prioridad**: 🟡 MEDIA
+**Estimación**: 1-2 días
 **Dependencias**: Ninguna
 
 **Descripción**:
@@ -396,8 +396,8 @@ Indicador global de estado de AI en UI
 ---
 
 ### Issue 4.4: Settings Page para AI Configuration
-**Prioridad**: 🟡 MEDIA  
-**Estimación**: 2-3 días  
+**Prioridad**: 🟡 MEDIA
+**Estimación**: 2-3 días
 **Dependencias**: Ninguna
 
 **Descripción**:
@@ -425,8 +425,8 @@ Página de configuración para features de AI
 ## 📊 ÉPICA 5: Optimización de Performance
 
 ### Issue 5.1: Caching de Modelos ML
-**Prioridad**: 🔴 ALTA  
-**Estimación**: 2 días  
+**Prioridad**: 🔴 ALTA
+**Estimación**: 2 días
 **Dependencias**: Ninguna
 
 **Descripción**:
@@ -452,8 +452,8 @@ Implementar caché eficiente para modelos ML
 ---
 
 ### Issue 5.2: Procesamiento Asíncrono con Celery
-**Prioridad**: 🟡 MEDIA  
-**Estimación**: 2-3 días  
+**Prioridad**: 🟡 MEDIA
+**Estimación**: 2-3 días
 **Dependencias**: Issue 5.1
 
 **Descripción**:
@@ -479,8 +479,8 @@ Mover AI scanning a tareas Celery asíncronas
 ---
 
 ### Issue 5.3: Batch Processing para Documentos Existentes
-**Prioridad**: 🟡 MEDIA  
-**Estimación**: 2 días  
+**Prioridad**: 🟡 MEDIA
+**Estimación**: 2 días
 **Dependencias**: Issue 5.2
 
 **Descripción**:
@@ -505,8 +505,8 @@ Command para aplicar AI scanner a documentos existentes
 ---
 
 ### Issue 5.4: Query Optimization
-**Prioridad**: 🟡 MEDIA  
-**Estimación**: 1-2 días  
+**Prioridad**: 🟡 MEDIA
+**Estimación**: 1-2 días
 **Dependencias**: Ninguna
 
 **Descripción**:
@@ -532,8 +532,8 @@ Optimizar queries de base de datos en AI scanner
 ## 📊 ÉPICA 6: Mejoras de ML/AI
 
 ### Issue 6.1: Training Pipeline para Custom Models
-**Prioridad**: 🟡 MEDIA  
-**Estimación**: 3-4 días  
+**Prioridad**: 🟡 MEDIA
+**Estimación**: 3-4 días
 **Dependencias**: Issue 1.1
 
 **Descripción**:
@@ -559,8 +559,8 @@ Pipeline para entrenar modelos custom con datos del usuario
 ---
 
 ### Issue 6.2: Active Learning Loop
-**Prioridad**: 🟢 BAJA  
-**Estimación**: 3-5 días  
+**Prioridad**: 🟢 BAJA
+**Estimación**: 3-5 días
 **Dependencias**: Issue 6.1, Issue 3.3
 
 **Descripción**:
@@ -583,8 +583,8 @@ Sistema de aprendizaje continuo basado en feedback de usuario
 ---
 
 ### Issue 6.3: Multi-language Support para NER
-**Prioridad**: 🟡 MEDIA  
-**Estimación**: 2-3 días  
+**Prioridad**: 🟡 MEDIA
+**Estimación**: 2-3 días
 **Dependencias**: Ninguna
 
 **Descripción**:
@@ -608,8 +608,8 @@ Soporte para múltiples idiomas en extracción de entidades
 ---
 
 ### Issue 6.4: Confidence Calibration
-**Prioridad**: 🟡 MEDIA  
-**Estimación**: 2 días  
+**Prioridad**: 🟡 MEDIA
+**Estimación**: 2 días
 **Dependencias**: Issue 3.3
 
 **Descripción**:
@@ -634,8 +634,8 @@ Calibrar confianza basada en feedback histórico
 ## 📊 ÉPICA 7: Monitoreo y Observabilidad
 
 ### Issue 7.1: Metrics y Logging Estructurado
-**Prioridad**: 🟡 MEDIA  
-**Estimación**: 2 días  
+**Prioridad**: 🟡 MEDIA
+**Estimación**: 2 días
 **Dependencias**: Ninguna
 
 **Descripción**:
@@ -661,17 +661,17 @@ Implementar logging estructurado y métricas
 ---
 
 ### Issue 7.2: Health Checks para AI Components
-**Prioridad**: 🟡 MEDIA  
-**Estimación**: 1 día  
+**Prioridad**: 🟡 MEDIA
+**Estimación**: 1 día
 **Dependencias**: Issue 7.1
 
 **Descripción**:
-Health checks para componentes ML/AI
+Health checks para components ML/AI
 
 **Tareas**:
-- [ ] Endpoint `/health/ai/` con status de componentes
+- [ ] Endpoint `/health/ai/` con status de components
 - [ ] Check si modelos cargados correctamente
-- [ ] Check si NER funcional
+- [ ] Check si NER functional
 - [ ] Check uso de memoria
 - [ ] Check GPU si habilitado
 - [ ] Incluir en health check general
@@ -686,8 +686,8 @@ Health checks para componentes ML/AI
 ---
 
 ### Issue 7.3: Audit Log Detallado
-**Prioridad**: 🟡 MEDIA  
-**Estimación**: 1-2 días  
+**Prioridad**: 🟡 MEDIA
+**Estimación**: 1-2 días
 **Dependencias**: Ninguna
 
 **Descripción**:
@@ -714,8 +714,8 @@ Audit log completo de acciones de AI
 ## 📊 ÉPICA 8: Documentación de Usuario
 
 ### Issue 8.1: Guía de Usuario para AI Features
-**Prioridad**: 🔴 ALTA  
-**Estimación**: 2-3 días  
+**Prioridad**: 🔴 ALTA
+**Estimación**: 2-3 días
 **Dependencias**: Issue 4.1, 4.2
 
 **Descripción**:
@@ -744,8 +744,8 @@ Documentación completa para usuarios finales
 ---
 
 ### Issue 8.2: API Documentation
-**Prioridad**: 🟡 MEDIA  
-**Estimación**: 1-2 días  
+**Prioridad**: 🟡 MEDIA
+**Estimación**: 1-2 días
 **Dependencias**: Issue 3.1, 3.2, 3.3
 
 **Descripción**:
@@ -771,8 +771,8 @@ Documentación de API REST completa
 ---
 
 ### Issue 8.3: Guía de Administrador
-**Prioridad**: 🟡 MEDIA  
-**Estimación**: 2 días  
+**Prioridad**: 🟡 MEDIA
+**Estimación**: 2 días
 **Dependencias**: Issue 8.1
 
 **Descripción**:
@@ -800,8 +800,8 @@ Documentación para administradores del sistema
 ## 📊 ÉPICA 9: Seguridad Avanzada
 
 ### Issue 9.1: Rate Limiting para AI Operations
-**Prioridad**: 🟡 MEDIA  
-**Estimación**: 1-2 días  
+**Prioridad**: 🟡 MEDIA
+**Estimación**: 1-2 días
 **Dependencias**: Ninguna
 
 **Descripción**:
@@ -812,7 +812,7 @@ Implementar rate limiting para prevenir abuso
 - [ ] Rate limit global: Y scans/minuto
 - [ ] Rate limit para deletion requests: Z requests/día
 - [ ] Bypass para admin/superuser
-- [ ] Mensajes de error claros cuando se excede
+- [ ] Mensajes de error claros cuando se exceed
 - [ ] Métricas de rate limiting
 
 **Archivos a Modificar**:
@@ -827,8 +827,8 @@ Implementar rate limiting para prevenir abuso
 ---
 
 ### Issue 9.2: Validation de Inputs
-**Prioridad**: 🔴 ALTA  
-**Estimación**: 1 día  
+**Prioridad**: 🔴 ALTA
+**Estimación**: 1 día
 **Dependencias**: Ninguna
 
 **Descripción**:
@@ -853,8 +853,8 @@ Validación exhaustiva de inputs para prevenir inyección
 ---
 
 ### Issue 9.3: Permissions Granulares
-**Prioridad**: 🟡 MEDIA  
-**Estimación**: 2 días  
+**Prioridad**: 🟡 MEDIA
+**Estimación**: 2 días
 **Dependencias**: Issue 3.1
 
 **Descripción**:
@@ -882,8 +882,8 @@ Sistema de permisos granular para AI features
 ## 📊 ÉPICA 10: Internacionalización
 
 ### Issue 10.1: Traducción de Mensajes de AI
-**Prioridad**: 🟢 BAJA  
-**Estimación**: 1-2 días  
+**Prioridad**: 🟢 BAJA
+**Estimación**: 1-2 días
 **Dependencias**: Ninguna
 
 **Descripción**:
@@ -995,12 +995,12 @@ Internacionalizar todos los mensajes de AI
 
 ## 🎯 Conclusión
 
-Este plan de mejoras cubre todos los aspectos necesarios para llevar el AI Scanner de PRODUCTION READY a PRODUCTION EXCELLENCE. La implementación de estos issues transformará el sistema en una solución robusta, escalable y amigable para el usuario.
+Este plan de mejoras cubre todos los aspects necesarios para llevar el AI Scanner de PRODUCTION READY a PRODUCTION EXCELLENCE. La implementación de estos issues transformará el sistema en una solución robusta, escalable y amigable para el usuario.
 
 **Total Estimado**: ~60-80 días de desarrollo (3-4 meses con 1 desarrollador)
 
-**Épicas**: 10  
-**Issues**: 35+  
-**Prioridad Alta**: 8 issues  
-**Prioridad Media**: 18 issues  
+**Épicas**: 10
+**Issues**: 35+
+**Prioridad Alta**: 8 issues
+**Prioridad Media**: 18 issues
 **Prioridad Baja**: 9 issues

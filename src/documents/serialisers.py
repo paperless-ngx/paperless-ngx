@@ -2796,6 +2796,7 @@ class DeletionRequestDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         from documents.models import DeletionRequest
+
         model = DeletionRequest
         fields = [
             "id",

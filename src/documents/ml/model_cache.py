@@ -83,14 +83,14 @@ class CacheMetrics:
 class LRUCache:
     """
     Thread-safe LRU (Least Recently Used) cache implementation.
-    
+
     When the cache is full, the least recently used item is evicted.
     """
 
     def __init__(self, max_size: int = 3):
         """
         Initialize LRU cache.
-        
+
         Args:
             max_size: Maximum number of items to cache
         """
@@ -102,10 +102,10 @@ class LRUCache:
     def get(self, key: str) -> Any | None:
         """
         Get item from cache.
-        
+
         Args:
             key: Cache key
-            
+
         Returns:
             Cached value or None if not found
         """
@@ -122,7 +122,7 @@ class LRUCache:
     def put(self, key: str, value: Any) -> None:
         """
         Add item to cache.
-        
+
         Args:
             key: Cache key
             value: Value to cache
@@ -162,13 +162,13 @@ class LRUCache:
 class ModelCacheManager:
     """
     Singleton cache manager for ML models.
-    
+
     Provides centralized caching for all ML models with:
     - Lazy loading with caching
     - LRU eviction policy
     - Thread-safe operations
     - Performance metrics
-    
+
     Usage:
         cache = ModelCacheManager.get_instance()
         model = cache.get_or_load_model("classifier", loader_func)
@@ -192,7 +192,7 @@ class ModelCacheManager:
     ):
         """
         Initialize model cache manager.
-        
+
         Args:
             max_models: Maximum number of models to keep in memory
             disk_cache_dir: Directory for disk cache (embeddings)
@@ -220,11 +220,11 @@ class ModelCacheManager:
     ) -> ModelCacheManager:
         """
         Get singleton instance of ModelCacheManager.
-        
+
         Args:
             max_models: Maximum number of models to keep in memory
             disk_cache_dir: Directory for disk cache
-            
+
         Returns:
             ModelCacheManager instance
         """
@@ -278,8 +278,7 @@ class ModelCacheManager:
 
                 load_time = time.time() - start_time
                 logger.info(
-                    f"Model loaded successfully: {model_key} "
-                    f"(took {load_time:.2f}s)",
+                    f"Model loaded successfully: {model_key} (took {load_time:.2f}s)",
                 )
 
                 return model
@@ -334,10 +333,10 @@ class ModelCacheManager:
     ) -> dict[int, Any] | None:
         """
         Load embeddings from disk cache.
-        
+
         Args:
             key: Cache key
-            
+
         Returns:
             Dictionary of embeddings or None if not found
         """
@@ -370,7 +369,7 @@ class ModelCacheManager:
             cache_files.sort(key=lambda f: f.stat().st_mtime)
 
             # Remove oldest 50% of files
-            files_to_remove = cache_files[:len(cache_files) // 2]
+            files_to_remove = cache_files[: len(cache_files) // 2]
 
             for cache_file in files_to_remove:
                 try:
@@ -397,7 +396,7 @@ class ModelCacheManager:
     def get_metrics(self) -> dict[str, Any]:
         """
         Get cache performance metrics.
-        
+
         Returns:
             Dictionary with cache statistics
         """
@@ -421,7 +420,7 @@ class ModelCacheManager:
     ) -> None:
         """
         Pre-load models on startup (warm-up).
-        
+
         Args:
             model_loaders: Dictionary of {model_key: loader_function}
         """

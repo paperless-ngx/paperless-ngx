@@ -19,16 +19,16 @@ logger = logging.getLogger(__name__)
 class HandwritingRecognizer:
     """
     Recognize handwritten text from document images.
-    
+
     Uses transformer-based models (TrOCR) for accurate handwriting recognition.
     Supports both printed and handwritten text detection.
-    
+
     Example:
         >>> recognizer = HandwritingRecognizer()
         >>> text = recognizer.recognize_from_image("handwritten_note.jpg")
         >>> print(text)
         "This is handwritten text..."
-        
+
         >>> # With line detection
         >>> lines = recognizer.recognize_lines("form.jpg")
         >>> for line in lines:
@@ -43,7 +43,7 @@ class HandwritingRecognizer:
     ):
         """
         Initialize the handwriting recognizer.
-        
+
         Args:
             model_name: Hugging Face model name
                 Options:
@@ -95,11 +95,11 @@ class HandwritingRecognizer:
     ) -> str:
         """
         Recognize text from a single image.
-        
+
         Args:
             image: PIL Image object containing handwritten text
             preprocess: Whether to preprocess image (contrast, binarization)
-            
+
         Returns:
             Recognized text string
         """
@@ -113,7 +113,10 @@ class HandwritingRecognizer:
                 image = self._preprocess_image(image)
 
             # Prepare image for model
-            pixel_values = self._processor(images=image, return_tensors="pt").pixel_values
+            pixel_values = self._processor(
+                images=image,
+                return_tensors="pt",
+            ).pixel_values
 
             if self.use_gpu and torch.cuda.is_available():
                 pixel_values = pixel_values.cuda()
@@ -123,7 +126,10 @@ class HandwritingRecognizer:
                 generated_ids = self._model.generate(pixel_values)
 
             # Decode to text
-            text = self._processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
+            text = self._processor.batch_decode(
+                generated_ids,
+                skip_special_tokens=True,
+            )[0]
 
             logger.debug(f"Recognized text: {text[:100]}...")
             return text
@@ -135,10 +141,10 @@ class HandwritingRecognizer:
     def _preprocess_image(self, image: Image.Image) -> Image.Image:
         """
         Preprocess image for better recognition.
-        
+
         Args:
             image: Input PIL Image
-            
+
         Returns:
             Preprocessed PIL Image
         """
@@ -169,10 +175,10 @@ class HandwritingRecognizer:
     def detect_text_lines(self, image: Image.Image) -> list[dict[str, Any]]:
         """
         Detect individual text lines in an image.
-        
+
         Args:
             image: PIL Image object
-            
+
         Returns:
             List of detected lines with bounding boxes
             [
@@ -195,10 +201,19 @@ class HandwritingRecognizer:
                 gray = img_array
 
             # Binarize
-            _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+            _, binary = cv2.threshold(
+                gray,
+                0,
+                255,
+                cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU,
+            )
 
             # Find contours
-            contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            contours, _ = cv2.findContours(
+                binary,
+                cv2.RETR_EXTERNAL,
+                cv2.CHAIN_APPROX_SIMPLE,
+            )
 
             # Get bounding boxes for each contour
             lines = []
@@ -208,11 +223,13 @@ class HandwritingRecognizer:
                 # Filter out very small regions
                 if w > 20 and h > 10:
                     # Crop line from original image
-                    line_img = image.crop((x, y, x+w, y+h))
-                    lines.append({
-                        "bbox": [x, y, x+w, y+h],
-                        "image": line_img,
-                    })
+                    line_img = image.crop((x, y, x + w, y + h))
+                    lines.append(
+                        {
+                            "bbox": [x, y, x + w, y + h],
+                            "image": line_img,
+                        },
+                    )
 
             # Sort lines top to bottom
             lines.sort(key=lambda l: l["bbox"][1])
@@ -221,7 +238,9 @@ class HandwritingRecognizer:
             return lines
 
         except ImportError:
-            logger.error("opencv-python not installed. Install with: pip install opencv-python")
+            logger.error(
+                "opencv-python not installed. Install with: pip install opencv-python",
+            )
             return []
         except Exception as e:
             logger.error(f"Error detecting text lines: {e}")
@@ -234,11 +253,11 @@ class HandwritingRecognizer:
     ) -> list[dict[str, Any]]:
         """
         Recognize text from each line in an image.
-        
+
         Args:
             image_path: Path to image file
             return_confidence: Whether to include confidence scores
-            
+
         Returns:
             List of recognized lines with text and metadata
             [
@@ -260,7 +279,7 @@ class HandwritingRecognizer:
             # Recognize each line
             results = []
             for i, line in enumerate(lines):
-                logger.debug(f"Recognizing line {i+1}/{len(lines)}")
+                logger.debug(f"Recognizing line {i + 1}/{len(lines)}")
 
                 text = self.recognize_from_image(line["image"], preprocess=True)
 
@@ -287,10 +306,10 @@ class HandwritingRecognizer:
     def _estimate_confidence(self, text: str) -> float:
         """
         Estimate confidence of recognition result.
-        
+
         Args:
             text: Recognized text
-            
+
         Returns:
             Confidence score (0-1)
         """
@@ -328,13 +347,13 @@ class HandwritingRecognizer:
     ) -> dict[str, Any]:
         """
         Recognize handwriting from an image file.
-        
+
         Args:
             image_path: Path to image file
             mode: Recognition mode
                 - 'full': Recognize entire image as one block
                 - 'lines': Detect and recognize individual lines
-                
+
         Returns:
             Dictionary with recognized text and metadata
         """
@@ -356,7 +375,9 @@ class HandwritingRecognizer:
 
                 # Combine all lines
                 full_text = "\n".join(line["text"] for line in lines)
-                avg_confidence = np.mean([line["confidence"] for line in lines]) if lines else 0.0
+                avg_confidence = (
+                    np.mean([line["confidence"] for line in lines]) if lines else 0.0
+                )
 
                 return {
                     "text": full_text,
@@ -384,7 +405,7 @@ class HandwritingRecognizer:
     ) -> dict[str, str]:
         """
         Recognize text from specific form fields.
-        
+
         Args:
             image_path: Path to form image
             field_regions: List of field definitions
@@ -395,7 +416,7 @@ class HandwritingRecognizer:
                     },
                     ...
                 ]
-                
+
         Returns:
             Dictionary mapping field names to recognized text
         """
@@ -432,17 +453,17 @@ class HandwritingRecognizer:
     ) -> list[dict[str, Any]]:
         """
         Recognize handwriting from multiple images in batch.
-        
+
         Args:
             image_paths: List of image file paths
             mode: Recognition mode ('full' or 'lines')
-            
+
         Returns:
             List of recognition results
         """
         results = []
         for i, path in enumerate(image_paths):
-            logger.info(f"Processing image {i+1}/{len(image_paths)}: {path}")
+            logger.info(f"Processing image {i + 1}/{len(image_paths)}: {path}")
             result = self.recognize_from_file(path, mode=mode)
             result["image_path"] = path
             results.append(result)

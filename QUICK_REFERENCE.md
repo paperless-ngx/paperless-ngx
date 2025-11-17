@@ -480,10 +480,10 @@ def health_check(request):
 # ✅ Good
 def process_document(document_id: int) -> Document:
     """Process a document and return the result.
-    
+
     Args:
         document_id: ID of document to process
-        
+
     Returns:
         Processed document instance
     """
@@ -567,6 +567,6 @@ class DocumentConsumerTest(TestCase):
 
 ---
 
-*Last Updated: November 9, 2025*  
-*Version: 1.0*  
+*Last Updated: November 9, 2025*
+*Version: 1.0*
 *IntelliDocs-ngx v2.19.5*

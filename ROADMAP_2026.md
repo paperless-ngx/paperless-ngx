@@ -1,9 +1,9 @@
-# 🗺️ IntelliDocs-ngx - Hoja de Ruta 2026 (Roadmap Anual)
+# 🗺️ IntelliDocs-ngx - Hoja de Ruta 2026 (Roadmap Annual)
 
-**Versión:** 1.0  
-**Fecha de Creación:** 2025-11-09  
-**Última Actualización:** 2025-11-09 22:39:23 UTC  
-**Autoridad:** Este documento sigue las directivas de `agents.md`  
+**Versión:** 1.0
+**Fecha de Creación:** 2025-11-09
+**Última Actualización:** 2025-11-09 22:39:23 UTC
+**Autoridad:** Este documento sigue las directivas de `agents.md`
 **Estado:** 🟢 ACTIVO
 
 ---
@@ -41,9 +41,9 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
 ---
 
 ## 🎯 EPIC 1: Testing y QA Completo (Q1 2026)
-**Prioridad:** 🔴 CRÍTICA  
-**Duración:** 4 semanas  
-**Dependencias:** Ninguna (Fase 0)  
+**Prioridad:** 🔴 CRÍTICA
+**Duración:** 4 semanas
+**Dependencias:** Ninguna (Fase 0)
 **Objetivo:** Cobertura >90% de código para validar las 4 fases implementadas
 
 ### Tareas (12 total)
@@ -53,12 +53,12 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
   - Subtareas: test_train_model, test_predict, test_save_load, test_edge_cases
   - Estimación: 2 días
   - Prioridad: Alta
-  
+
 - [ ] **TSK-2602:** Tests para `ner.py` (Named Entity Recognition)
   - Subtareas: test_extract_entities, test_invoice_data, test_confidence_scores
   - Estimación: 2 días
   - Prioridad: Alta
-  
+
 - [ ] **TSK-2603:** Tests para `semantic_search.py`
   - Subtareas: test_index_document, test_search, test_similarity_scoring
   - Estimación: 1.5 días
@@ -69,12 +69,12 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
   - Subtareas: test_detect_tables, test_extract_data, test_accuracy_benchmark
   - Estimación: 2 días
   - Prioridad: Alta
-  
+
 - [ ] **TSK-2605:** Tests para `handwriting.py`
   - Subtareas: test_recognize_handwriting, test_trocr_model, test_fallback_tesseract
   - Estimación: 2 días
   - Prioridad: Alta
-  
+
 - [ ] **TSK-2606:** Tests para `form_detector.py`
   - Subtareas: test_detect_forms, test_extract_fields, test_checkbox_detection
   - Estimación: 2 días
@@ -85,7 +85,7 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
   - Subtareas: test_rate_limits, test_ip_detection, test_user_limits
   - Estimación: 1.5 días
   - Prioridad: Alta
-  
+
 - [ ] **TSK-2608:** Tests para `security.py` (validación de archivos)
   - Subtareas: test_mime_validation, test_malware_detection, test_content_scan
   - Estimación: 2 días
@@ -96,7 +96,7 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
   - Subtareas: measure_query_times, compare_before_after, stress_test
   - Estimación: 1 día
   - Prioridad: Media
-  
+
 - [ ] **TSK-2610:** Benchmark de sistema de caché
   - Subtareas: test_cache_hit_rate, test_invalidation, load_test
   - Estimación: 1 día
@@ -107,7 +107,7 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
   - Subtareas: setup_test_env, test_pdf_upload, test_ocr_execution, test_auto_classify
   - Estimación: 3 días
   - Prioridad: Alta
-  
+
 - [ ] **TSK-2612:** Tests E2E - Búsqueda semántica + filtros
   - Subtareas: test_semantic_search, test_combined_filters, test_performance
   - Estimación: 2 días
@@ -121,9 +121,9 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
 ---
 
 ## 🎯 EPIC 2: Documentación API y Swagger (Q1 2026)
-**Prioridad:** 🔴 ALTA  
-**Duración:** 2 semanas  
-**Dependencias:** EPIC 1  
+**Prioridad:** 🔴 ALTA
+**Duración:** 2 semanas
+**Dependencias:** EPIC 1
 **Objetivo:** API totalmente documentada con OpenAPI 3.0
 
 ### Tareas (8 total)
@@ -169,9 +169,9 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
 ---
 
 ## 🎯 EPIC 3: Optimización Avanzada de Performance (Q1 2026)
-**Prioridad:** 🟡 MEDIA-ALTA  
-**Duración:** 3 semanas  
-**Dependencias:** EPIC 1 (para validar mejoras)  
+**Prioridad:** 🟡 MEDIA-ALTA
+**Duración:** 3 semanas
+**Dependencias:** EPIC 1 (para validar mejoras)
 **Objetivo:** Reducir tiempos de respuesta en 50% adicional
 
 ### Tareas (10 total)
@@ -229,9 +229,9 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
 ---
 
 ## 🎯 EPIC 4: Encriptación de Documentos en Reposo (Q1 2026)
-**Prioridad:** 🔴 CRÍTICA (Security)  
-**Duración:** 3 semanas  
-**Dependencias:** EPIC 1 (tests de seguridad)  
+**Prioridad:** 🔴 CRÍTICA (Security)
+**Duración:** 3 semanas
+**Dependencias:** EPIC 1 (tests de seguridad)
 **Objetivo:** Proteger documentos con encriptación AES-256
 
 ### Tareas (12 total)
@@ -258,7 +258,7 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
   - Estimación: 4 días
   - Prioridad: Crítica
 
-- [ ] **TSK-2636:** Comando de migración: encriptar documentos existentes
+- [ ] **TSK-2636:** Commando de migración: encriptar documentos existentes
   - Estimación: 2 días
   - Prioridad: Alta
 
@@ -294,9 +294,9 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
 ---
 
 ## 🎯 EPIC 5: Aplicación Móvil Nativa (Q2 2026)
-**Prioridad:** 🟡 MEDIA-ALTA  
-**Duración:** 8 semanas  
-**Dependencias:** EPIC 2 (API documentada)  
+**Prioridad:** 🟡 MEDIA-ALTA
+**Duración:** 8 semanas
+**Dependencias:** EPIC 2 (API documentada)
 **Objetivo:** Apps iOS y Android con React Native
 
 ### Tareas (28 total)
@@ -379,7 +379,7 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
   - Prioridad: Baja
 
 #### 5.6 Testing y Deployment
-- [ ] **TSK-2661:** Tests unitarios para componentes críticos
+- [ ] **TSK-2661:** Tests unitarios para components críticos
   - Estimación: 3 días
   - Prioridad: Alta
 
@@ -431,9 +431,9 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
 ---
 
 ## 🎯 EPIC 6: Cloud Storage Sync (Q2 2026)
-**Prioridad:** 🟡 MEDIA  
-**Duración:** 4 semanas  
-**Dependencias:** EPIC 2  
+**Prioridad:** 🟡 MEDIA
+**Duración:** 4 semanas
+**Dependencias:** EPIC 2
 **Objetivo:** Sincronización bidireccional con Dropbox, Google Drive, OneDrive
 
 ### Tareas (15 total)
@@ -513,9 +513,9 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
 ---
 
 ## 🎯 EPIC 7: Estadísticas Básicas y Reportes (Q2 2026)
-**Prioridad:** 🟡 MEDIA  
-**Duración:** 2 semanas  
-**Dependencias:** EPIC 1, EPIC 3  
+**Prioridad:** 🟡 MEDIA
+**Duración:** 2 semanas
+**Dependencias:** EPIC 1, EPIC 3
 **Objetivo:** Dashboard simple con estadísticas de uso personal
 
 ### Tareas (8 total)
@@ -563,9 +563,9 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
 ---
 
 ## 🎯 EPIC 8: Colaboración y Anotaciones (Q3 2026)
-**Prioridad:** 🟡 MEDIA  
-**Duración:** 4 semanas  
-**Dependencias:** EPIC 2  
+**Prioridad:** 🟡 MEDIA
+**Duración:** 4 semanas
+**Dependencias:** EPIC 2
 **Objetivo:** Features de colaboración en tiempo real
 
 ### Tareas (16 total)
@@ -591,7 +591,7 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
   - Estimación: 1 día
   - Prioridad: Media
 
-#### 8.2 Anotaciones Visuales
+#### 8.2 Anotaciones Visuals
 - [ ] **TSK-2704:** Modelo para anotaciones (highlights, rectangles, arrows)
   - Estimación: 1 día
   - Prioridad: Media
@@ -647,9 +647,9 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
 ---
 
 ## 🎯 EPIC 9: Mejoras de UX y Experiencia de Usuario (Q3 2026)
-**Prioridad:** 🟡 MEDIA  
-**Duración:** 3 semanas  
-**Dependencias:** EPIC 8 (colaboración)  
+**Prioridad:** 🟡 MEDIA
+**Duración:** 3 semanas
+**Dependencias:** EPIC 8 (colaboración)
 **Objetivo:** Hacer la app más intuitiva y fácil de usar para usuarios finales
 
 ### Tareas (12 total)
@@ -719,9 +719,9 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
 ---
 
 ## 🎯 EPIC 10: Compartir y Permisos Simples (Q3-Q4 2026)
-**Prioridad:** 🟡 MEDIA  
-**Duración:** 3 semanas  
-**Dependencias:** EPIC 8 (colaboración)  
+**Prioridad:** 🟡 MEDIA
+**Duración:** 3 semanas
+**Dependencias:** EPIC 8 (colaboración)
 **Objetivo:** Permitir compartir documentos fácilmente con familia, amigos, o equipos pequeños
 
 ### Tareas (12 total)
@@ -762,7 +762,7 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
   - Estimación: 1.5 días
   - Prioridad: Media
 
-- [ ] **TSK-2735:** Historial de accesos (quién vio qué)
+- [ ] **TSK-2735:** Historical de accesos (quién vio qué)
   - Estimación: 2 días
   - Prioridad: Baja
 
@@ -788,9 +788,9 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
 ---
 
 ## 🎯 EPIC 11: Documentación y Ayuda para Usuarios (Q4 2026)
-**Prioridad:** 🟢 MEDIA  
-**Duración:** 2 semanas  
-**Dependencias:** EPIC 9 (UX)  
+**Prioridad:** 🟢 MEDIA
+**Duración:** 2 semanas
+**Dependencias:** EPIC 9 (UX)
 **Objetivo:** Guías completas y ayuda contextual para usuarios
 
 ### Tareas (7 total)
@@ -833,9 +833,9 @@ Esta hoja de ruta define **todas las implementaciones planificadas para IntelliD
 ---
 
 ## 🎯 EPIC 12: Estabilidad y Refinamiento (Q4 2026)
-**Prioridad:** 🟢 MEDIA-BAJA  
-**Duración:** 2 semanas  
-**Dependencias:** Todos los anteriores  
+**Prioridad:** 🟢 MEDIA-BAJA
+**Duración:** 2 semanas
+**Dependencias:** Todos los anteriores
 **Objetivo:** Pulir features existentes, corregir bugs, mejorar estabilidad
 
 ### Tareas (5 total)
@@ -1103,7 +1103,7 @@ Durante cada EPIC:
 - [ ] Tests passing en CI/CD
 
 Al completar cada EPIC:
-- [ ] Demo funcional
+- [ ] Demo functional
 - [ ] Documentación actualizada
 - [ ] Tests con cobertura >90%
 - [ ] Security scan passed
@@ -1118,7 +1118,7 @@ Al completar cada EPIC:
 
 ---
 
-**Aprobado por:**  
-Director del Proyecto: @dawnsystem  
-Fecha de Aprobación: Pendiente  
+**Aprobado por:**
+Director del Proyecto: @dawnsystem
+Fecha de Aprobación: Pendiente
 Versión: 1.0

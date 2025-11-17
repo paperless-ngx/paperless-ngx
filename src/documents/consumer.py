@@ -310,7 +310,8 @@ class ConsumerPlugin(
             # Parsing phase
             document_parser = self._create_parser_instance(parser_class)
             text, date, thumbnail, archive_path, page_count = self._parse_document(
-                document_parser, mime_type,
+                document_parser,
+                mime_type,
             )
 
             # Storage phase
@@ -479,6 +480,7 @@ class ConsumerPlugin(
         Returns:
             DocumentParser: Configured parser instance
         """
+
         def progress_callback(current_progress, max_progress):  # pragma: no cover
             # Recalculate progress to be within 20 and 80
             p = int((current_progress / max_progress) * 50 + 20)
@@ -1055,7 +1057,8 @@ class ConsumerPreflightPlugin(
         """
         if TYPE_CHECKING:
             assert isinstance(
-                self.input_doc.original_file, Path,
+                self.input_doc.original_file,
+                Path,
             ), self.input_doc.original_file
         if not self.input_doc.original_file.is_file():
             self._fail(
