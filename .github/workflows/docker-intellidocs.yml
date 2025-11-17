@@ -45,7 +45,6 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          cd /home/user/IntelliDocs-ngx
           uv sync --all-extras
 
       - name: Test ML/OCR imports
