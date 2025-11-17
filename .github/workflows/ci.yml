@@ -353,9 +353,9 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: cd src-ui && pnpm run build --configuration=production
   build-docker-image:
-    name: Build Docker image for ${{ github.ref_name }}
+    name: Build Docker image for ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
     runs-on: ubuntu-24.04
-    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || startsWith(github.ref, 'refs/heads/fix-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || contains(github.ref, 'beta.rc') || startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/heads/l10n_'))
+    if: (github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || startsWith(github.ref, 'refs/heads/fix-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || contains(github.ref, 'beta.rc') || startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/heads/l10n_'))) || (github.event_name == 'pull_request' && (startsWith(github.head_ref, 'feature-') || startsWith(github.head_ref, 'fix-') || github.head_ref == 'dev' || github.head_ref == 'beta' || contains(github.head_ref, 'beta.rc') || startsWith(github.head_ref, 'l10n_')))
     concurrency:
       group: ${{ github.workflow }}-build-docker-image-${{ github.ref_name }}
       cancel-in-progress: true
