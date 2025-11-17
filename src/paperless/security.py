@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import hashlib
 import logging
-import mimetypes
 import os
 import re
 from pathlib import Path
@@ -26,39 +25,39 @@ logger = logging.getLogger("paperless.security")
 # Lista explícita de tipos MIME permitidos
 ALLOWED_MIME_TYPES = {
     # Documentos
-    'application/pdf',
-    'application/vnd.oasis.opendocument.text',
-    'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'application/vnd.ms-excel',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'application/vnd.ms-powerpoint',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-    'application/vnd.oasis.opendocument.spreadsheet',
-    'application/vnd.oasis.opendocument.presentation',
-    'application/rtf',
-    'text/rtf',
+    "application/pdf",
+    "application/vnd.oasis.opendocument.text",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-powerpoint",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    "application/vnd.oasis.opendocument.spreadsheet",
+    "application/vnd.oasis.opendocument.presentation",
+    "application/rtf",
+    "text/rtf",
 
     # Imágenes
-    'image/jpeg',
-    'image/png',
-    'image/gif',
-    'image/tiff',
-    'image/bmp',
-    'image/webp',
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "image/tiff",
+    "image/bmp",
+    "image/webp",
 
     # Texto
-    'text/plain',
-    'text/html',
-    'text/csv',
-    'text/markdown',
+    "text/plain",
+    "text/html",
+    "text/csv",
+    "text/markdown",
 }
 
 # Maximum file size (100MB by default)
 # Can be overridden by settings.MAX_UPLOAD_SIZE
 try:
     from django.conf import settings
-    MAX_FILE_SIZE = getattr(settings, 'MAX_UPLOAD_SIZE', 100 * 1024 * 1024)  # 100MB por defecto
+    MAX_FILE_SIZE = getattr(settings, "MAX_UPLOAD_SIZE", 100 * 1024 * 1024)  # 100MB por defecto
 except ImportError:
     MAX_FILE_SIZE = 100 * 1024 * 1024  # 100MB in bytes
 
@@ -114,7 +113,6 @@ ALLOWED_JS_PATTERNS = [
 class FileValidationError(Exception):
     """Raised when file validation fails."""
 
-    pass
 
 
 def has_whitelisted_javascript(content: bytes) -> bool:
@@ -143,7 +141,7 @@ def validate_mime_type(mime_type: str) -> None:
     if mime_type not in ALLOWED_MIME_TYPES:
         raise FileValidationError(
             f"MIME type '{mime_type}' is not allowed. "
-            f"Allowed types: {', '.join(sorted(ALLOWED_MIME_TYPES))}"
+            f"Allowed types: {', '.join(sorted(ALLOWED_MIME_TYPES))}",
         )
 
 

@@ -18,17 +18,13 @@ Examples:
 from __future__ import annotations
 
 import logging
-from pathlib import Path
-from typing import TYPE_CHECKING
 
 import numpy as np
 import torch
-from sentence_transformers import SentenceTransformer, util
+from sentence_transformers import SentenceTransformer
+from sentence_transformers import util
 
 from documents.ml.model_cache import ModelCacheManager
-
-if TYPE_CHECKING:
-    pass
 
 logger = logging.getLogger("paperless.ml.semantic_search")
 
@@ -67,7 +63,7 @@ class SemanticSearch:
         """
         logger.info(
             f"Initializing SemanticSearch with model: {model_name} "
-            f"(caching: {use_cache})"
+            f"(caching: {use_cache})",
         )
 
         self.model_name = model_name
@@ -75,10 +71,10 @@ class SemanticSearch:
         self.cache_manager = ModelCacheManager.get_instance(
             disk_cache_dir=cache_dir,
         ) if use_cache else None
-        
+
         # Cache key for this model
         cache_key = f"semantic_search_{model_name}"
-        
+
         if self.use_cache and self.cache_manager:
             # Load model from cache
             def loader():
@@ -127,11 +123,11 @@ class SemanticSearch:
                 if not isinstance(embedding, np.ndarray) and not isinstance(embedding, torch.Tensor):
                     logger.warning(f"Embedding for doc {doc_id} is not a numpy array or tensor")
                     return False
-                if hasattr(embedding, 'size'):
+                if hasattr(embedding, "size"):
                     if embedding.size == 0:
                         logger.warning(f"Embedding for doc {doc_id} is empty")
                         return False
-                elif hasattr(embedding, 'numel'):
+                elif hasattr(embedding, "numel"):
                     if embedding.numel() == 0:
                         logger.warning(f"Embedding for doc {doc_id} is empty")
                         return False
@@ -216,11 +212,11 @@ class SemanticSearch:
         try:
             result = self.cache_manager.save_embeddings_to_disk(
                 "document_embeddings",
-                self.document_embeddings
+                self.document_embeddings,
             )
             if result:
                 logger.info(
-                    f"Successfully saved {len(self.document_embeddings)} embeddings to disk"
+                    f"Successfully saved {len(self.document_embeddings)} embeddings to disk",
                 )
             else:
                 logger.error("Failed to save embeddings to disk (returned False)")

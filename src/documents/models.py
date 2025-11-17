@@ -1596,59 +1596,59 @@ class DeletionRequest(models.Model):
     This ensures no documents are deleted without explicit user consent,
     implementing the safety requirement from agents.md.
     """
-    
+
     # Request metadata
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     # Requester (AI system)
     requested_by_ai = models.BooleanField(default=True)
     ai_reason = models.TextField(
-        help_text=_("Detailed explanation from AI about why deletion is recommended")
+        help_text=_("Detailed explanation from AI about why deletion is recommended"),
     )
-    
+
     # User who must approve
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='deletion_requests',
+        related_name="deletion_requests",
         help_text=_("User who must approve this deletion"),
     )
-    
+
     # Status tracking
-    STATUS_PENDING = 'pending'
-    STATUS_APPROVED = 'approved'
-    STATUS_REJECTED = 'rejected'
-    STATUS_CANCELLED = 'cancelled'
-    STATUS_COMPLETED = 'completed'
-    
+    STATUS_PENDING = "pending"
+    STATUS_APPROVED = "approved"
+    STATUS_REJECTED = "rejected"
+    STATUS_CANCELLED = "cancelled"
+    STATUS_COMPLETED = "completed"
+
     STATUS_CHOICES = [
-        (STATUS_PENDING, _('Pending')),
-        (STATUS_APPROVED, _('Approved')),
-        (STATUS_REJECTED, _('Rejected')),
-        (STATUS_CANCELLED, _('Cancelled')),
-        (STATUS_COMPLETED, _('Completed')),
+        (STATUS_PENDING, _("Pending")),
+        (STATUS_APPROVED, _("Approved")),
+        (STATUS_REJECTED, _("Rejected")),
+        (STATUS_CANCELLED, _("Cancelled")),
+        (STATUS_COMPLETED, _("Completed")),
     ]
-    
+
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default=STATUS_PENDING,
     )
-    
+
     # Documents to be deleted
     documents = models.ManyToManyField(
         Document,
-        related_name='deletion_requests',
+        related_name="deletion_requests",
         help_text=_("Documents that would be deleted if approved"),
     )
-    
+
     # Impact summary (JSON field with details)
     impact_summary = models.JSONField(
         default=dict,
         help_text=_("Summary of what will be affected by this deletion"),
     )
-    
+
     # Approval tracking
     reviewed_at = models.DateTimeField(null=True, blank=True)
     reviewed_by = models.ForeignKey(
@@ -1656,43 +1656,43 @@ class DeletionRequest(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='reviewed_deletion_requests',
+        related_name="reviewed_deletion_requests",
         help_text=_("User who reviewed and approved/rejected"),
     )
     review_comment = models.TextField(
         blank=True,
         help_text=_("User's comment when reviewing"),
     )
-    
+
     # Completion tracking
     completed_at = models.DateTimeField(null=True, blank=True)
     completion_details = models.JSONField(
         default=dict,
         help_text=_("Details about the deletion execution"),
     )
-    
+
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
         verbose_name = _("deletion request")
         verbose_name_plural = _("deletion requests")
         indexes = [
             # Composite index for common listing queries (by user, filtered by status, sorted by date)
             # PostgreSQL can use this index for queries on: user, user+status, user+status+created_at
-            models.Index(fields=['user', 'status', 'created_at'], name='delreq_user_status_created_idx'),
+            models.Index(fields=["user", "status", "created_at"], name="delreq_user_status_created_idx"),
             # Index for queries filtering by status and date without user filter
-            models.Index(fields=['status', 'created_at'], name='delreq_status_created_idx'),
+            models.Index(fields=["status", "created_at"], name="delreq_status_created_idx"),
             # Index for queries filtering by user and date (common for user-specific views)
-            models.Index(fields=['user', 'created_at'], name='delreq_user_created_idx'),
+            models.Index(fields=["user", "created_at"], name="delreq_user_created_idx"),
             # Index for queries filtering by review date
-            models.Index(fields=['reviewed_at'], name='delreq_reviewed_at_idx'),
+            models.Index(fields=["reviewed_at"], name="delreq_reviewed_at_idx"),
             # Index for queries filtering by completion date
-            models.Index(fields=['completed_at'], name='delreq_completed_at_idx'),
+            models.Index(fields=["completed_at"], name="delreq_completed_at_idx"),
         ]
-    
+
     def __str__(self):
         doc_count = self.documents.count()
         return f"Deletion Request {self.id} - {doc_count} documents - {self.status}"
-    
+
     def approve(self, user: User, comment: str = "") -> bool:
         """
         Approve the deletion request.
@@ -1706,15 +1706,15 @@ class DeletionRequest(models.Model):
         """
         if self.status != self.STATUS_PENDING:
             return False
-        
+
         self.status = self.STATUS_APPROVED
         self.reviewed_by = user
         self.reviewed_at = timezone.now()
         self.review_comment = comment
         self.save()
-        
+
         return True
-    
+
     def reject(self, user: User, comment: str = "") -> bool:
         """
         Reject the deletion request.
@@ -1728,13 +1728,13 @@ class DeletionRequest(models.Model):
         """
         if self.status != self.STATUS_PENDING:
             return False
-        
+
         self.status = self.STATUS_REJECTED
         self.reviewed_by = user
         self.reviewed_at = timezone.now()
         self.review_comment = comment
         self.save()
-        
+
         return True
 
 
@@ -1743,109 +1743,109 @@ class AISuggestionFeedback(models.Model):
     Model to track user feedback on AI suggestions (applied/rejected).
     Used for improving AI accuracy and providing statistics.
     """
-    
+
     # Suggestion types
-    TYPE_TAG = 'tag'
-    TYPE_CORRESPONDENT = 'correspondent'
-    TYPE_DOCUMENT_TYPE = 'document_type'
-    TYPE_STORAGE_PATH = 'storage_path'
-    TYPE_CUSTOM_FIELD = 'custom_field'
-    TYPE_WORKFLOW = 'workflow'
-    TYPE_TITLE = 'title'
-    
+    TYPE_TAG = "tag"
+    TYPE_CORRESPONDENT = "correspondent"
+    TYPE_DOCUMENT_TYPE = "document_type"
+    TYPE_STORAGE_PATH = "storage_path"
+    TYPE_CUSTOM_FIELD = "custom_field"
+    TYPE_WORKFLOW = "workflow"
+    TYPE_TITLE = "title"
+
     SUGGESTION_TYPES = (
-        (TYPE_TAG, _('Tag')),
-        (TYPE_CORRESPONDENT, _('Correspondent')),
-        (TYPE_DOCUMENT_TYPE, _('Document Type')),
-        (TYPE_STORAGE_PATH, _('Storage Path')),
-        (TYPE_CUSTOM_FIELD, _('Custom Field')),
-        (TYPE_WORKFLOW, _('Workflow')),
-        (TYPE_TITLE, _('Title')),
+        (TYPE_TAG, _("Tag")),
+        (TYPE_CORRESPONDENT, _("Correspondent")),
+        (TYPE_DOCUMENT_TYPE, _("Document Type")),
+        (TYPE_STORAGE_PATH, _("Storage Path")),
+        (TYPE_CUSTOM_FIELD, _("Custom Field")),
+        (TYPE_WORKFLOW, _("Workflow")),
+        (TYPE_TITLE, _("Title")),
     )
-    
+
     # Feedback status
-    STATUS_APPLIED = 'applied'
-    STATUS_REJECTED = 'rejected'
-    
+    STATUS_APPLIED = "applied"
+    STATUS_REJECTED = "rejected"
+
     FEEDBACK_STATUS = (
-        (STATUS_APPLIED, _('Applied')),
-        (STATUS_REJECTED, _('Rejected')),
+        (STATUS_APPLIED, _("Applied")),
+        (STATUS_REJECTED, _("Rejected")),
     )
-    
+
     document = models.ForeignKey(
         Document,
         on_delete=models.CASCADE,
-        related_name='ai_suggestion_feedbacks',
-        verbose_name=_('document'),
+        related_name="ai_suggestion_feedbacks",
+        verbose_name=_("document"),
     )
-    
+
     suggestion_type = models.CharField(
-        _('suggestion type'),
+        _("suggestion type"),
         max_length=50,
         choices=SUGGESTION_TYPES,
     )
-    
+
     suggested_value_id = models.IntegerField(
-        _('suggested value ID'),
+        _("suggested value ID"),
         null=True,
         blank=True,
-        help_text=_('ID of the suggested object (tag, correspondent, etc.)'),
+        help_text=_("ID of the suggested object (tag, correspondent, etc.)"),
     )
-    
+
     suggested_value_text = models.TextField(
-        _('suggested value text'),
+        _("suggested value text"),
         blank=True,
-        help_text=_('Text representation of the suggested value'),
+        help_text=_("Text representation of the suggested value"),
     )
-    
+
     confidence = models.FloatField(
-        _('confidence'),
-        help_text=_('AI confidence score (0.0 to 1.0)'),
+        _("confidence"),
+        help_text=_("AI confidence score (0.0 to 1.0)"),
         validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
     )
-    
+
     status = models.CharField(
-        _('status'),
+        _("status"),
         max_length=20,
         choices=FEEDBACK_STATUS,
     )
-    
+
     user = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='ai_suggestion_feedbacks',
-        verbose_name=_('user'),
-        help_text=_('User who applied or rejected the suggestion'),
+        related_name="ai_suggestion_feedbacks",
+        verbose_name=_("user"),
+        help_text=_("User who applied or rejected the suggestion"),
     )
-    
+
     created_at = models.DateTimeField(
-        _('created at'),
+        _("created at"),
         auto_now_add=True,
     )
-    
+
     applied_at = models.DateTimeField(
-        _('applied/rejected at'),
+        _("applied/rejected at"),
         auto_now=True,
     )
-    
+
     metadata = models.JSONField(
-        _('metadata'),
+        _("metadata"),
         default=dict,
         blank=True,
-        help_text=_('Additional metadata about the suggestion'),
+        help_text=_("Additional metadata about the suggestion"),
     )
-    
+
     class Meta:
-        verbose_name = _('AI suggestion feedback')
-        verbose_name_plural = _('AI suggestion feedbacks')
-        ordering = ['-created_at']
+        verbose_name = _("AI suggestion feedback")
+        verbose_name_plural = _("AI suggestion feedbacks")
+        ordering = ["-created_at"]
         indexes = [
-            models.Index(fields=['document', 'suggestion_type']),
-            models.Index(fields=['status', 'created_at']),
-            models.Index(fields=['suggestion_type', 'status']),
+            models.Index(fields=["document", "suggestion_type"]),
+            models.Index(fields=["status", "created_at"]),
+            models.Index(fields=["suggestion_type", "status"]),
         ]
-    
+
     def __str__(self):
         return f"{self.suggestion_type} suggestion for document {self.document_id} - {self.status}"

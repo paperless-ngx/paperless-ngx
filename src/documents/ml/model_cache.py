@@ -24,8 +24,9 @@ import pickle
 import threading
 import time
 from collections import OrderedDict
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional, Tuple
+from typing import Any
 
 logger = logging.getLogger("paperless.ml.model_cache")
 
@@ -58,7 +59,7 @@ class CacheMetrics:
         with self.lock:
             self.loads += 1
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         with self.lock:
             total = self.hits + self.misses
             hit_rate = (self.hits / total * 100) if total > 0 else 0.0
@@ -98,7 +99,7 @@ class LRUCache:
         self.lock = threading.Lock()
         self.metrics = CacheMetrics()
 
-    def get(self, key: str) -> Optional[Any]:
+    def get(self, key: str) -> Any | None:
         """
         Get item from cache.
         
@@ -153,7 +154,7 @@ class LRUCache:
         with self.lock:
             return len(self.cache)
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Get cache metrics."""
         return self.metrics.get_stats()
 
@@ -173,7 +174,7 @@ class ModelCacheManager:
         model = cache.get_or_load_model("classifier", loader_func)
     """
 
-    _instance: Optional[ModelCacheManager] = None
+    _instance: ModelCacheManager | None = None
     _lock = threading.Lock()
 
     def __new__(cls, *args, **kwargs):
@@ -187,7 +188,7 @@ class ModelCacheManager:
     def __init__(
         self,
         max_models: int = 3,
-        disk_cache_dir: Optional[str] = None,
+        disk_cache_dir: str | None = None,
     ):
         """
         Initialize model cache manager.
@@ -215,7 +216,7 @@ class ModelCacheManager:
     def get_instance(
         cls,
         max_models: int = 3,
-        disk_cache_dir: Optional[str] = None,
+        disk_cache_dir: str | None = None,
     ) -> ModelCacheManager:
         """
         Get singleton instance of ModelCacheManager.
@@ -278,7 +279,7 @@ class ModelCacheManager:
                 load_time = time.time() - start_time
                 logger.info(
                     f"Model loaded successfully: {model_key} "
-                    f"(took {load_time:.2f}s)"
+                    f"(took {load_time:.2f}s)",
                 )
 
                 return model
@@ -289,7 +290,7 @@ class ModelCacheManager:
     def save_embeddings_to_disk(
         self,
         key: str,
-        embeddings: Dict[int, Any],
+        embeddings: dict[int, Any],
     ) -> bool:
         """
         Save embeddings to disk cache.
@@ -311,7 +312,7 @@ class ModelCacheManager:
         cache_file = self.disk_cache_dir / f"{key}.pkl"
 
         try:
-            with open(cache_file, 'wb') as f:
+            with open(cache_file, "wb") as f:
                 pickle.dump(embeddings, f, protocol=pickle.HIGHEST_PROTOCOL)
             logger.info(f"Saved {len(embeddings)} embeddings to {cache_file}")
             return True
@@ -330,7 +331,7 @@ class ModelCacheManager:
     def load_embeddings_from_disk(
         self,
         key: str,
-    ) -> Optional[Dict[int, Any]]:
+    ) -> dict[int, Any] | None:
         """
         Load embeddings from disk cache.
         
@@ -344,7 +345,7 @@ class ModelCacheManager:
             return None
 
         cache_file = self.disk_cache_dir / f"{key}.pkl"
-        
+
         if not cache_file.exists():
             return None
 
@@ -384,7 +385,7 @@ class ModelCacheManager:
     def clear_all(self) -> None:
         """Clear all caches (memory and disk)."""
         self.model_cache.clear()
-        
+
         if self.disk_cache_dir and self.disk_cache_dir.exists():
             for cache_file in self.disk_cache_dir.glob("*.pkl"):
                 try:
@@ -393,7 +394,7 @@ class ModelCacheManager:
                 except Exception as e:
                     logger.error(f"Failed to delete {cache_file}: {e}")
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """
         Get cache performance metrics.
         
@@ -403,20 +404,20 @@ class ModelCacheManager:
         metrics = self.model_cache.get_metrics()
         metrics["cache_size"] = self.model_cache.size()
         metrics["max_size"] = self.model_cache.max_size
-        
+
         if self.disk_cache_dir and self.disk_cache_dir.exists():
             disk_files = list(self.disk_cache_dir.glob("*.pkl"))
             metrics["disk_cache_files"] = len(disk_files)
-            
+
             # Calculate total disk cache size
             total_size = sum(f.stat().st_size for f in disk_files)
             metrics["disk_cache_size_mb"] = f"{total_size / 1024 / 1024:.2f}"
-        
+
         return metrics
 
     def warm_up(
         self,
-        model_loaders: Dict[str, Callable[[], Any]],
+        model_loaders: dict[str, Callable[[], Any]],
     ) -> None:
         """
         Pre-load models on startup (warm-up).
@@ -426,12 +427,12 @@ class ModelCacheManager:
         """
         logger.info(f"Starting model warm-up ({len(model_loaders)} models)...")
         start_time = time.time()
-        
+
         for model_key, loader_func in model_loaders.items():
             try:
                 self.get_or_load_model(model_key, loader_func)
             except Exception as e:
                 logger.warning(f"Failed to warm-up model {model_key}: {e}")
-        
+
         warm_up_time = time.time() - start_time
         logger.info(f"Model warm-up completed in {warm_up_time:.2f}s")

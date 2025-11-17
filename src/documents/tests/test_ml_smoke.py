@@ -150,7 +150,6 @@ class TestMLCacheDirectory:
 
     def test_model_cache_writable(self, tmp_path):
         """Test that we can write to model cache directory."""
-        import pathlib
 
         # Use tmp_path fixture for testing
         cache_dir = tmp_path / ".cache" / "huggingface"
@@ -169,7 +168,6 @@ class TestMLCacheDirectory:
 
     def test_torch_cache_directory(self, tmp_path, monkeypatch):
         """Test that PyTorch can use a custom cache directory."""
-        import torch
 
         # Set custom cache directory
         cache_dir = tmp_path / ".cache" / "torch"
@@ -204,8 +202,9 @@ class TestMLPerformanceBasic:
 
     def test_numpy_performance_basic(self):
         """Test basic NumPy performance with larger arrays."""
-        import numpy as np
         import time
+
+        import numpy as np
 
         # Create large array (10 million elements)
         arr = np.random.rand(10_000_000)

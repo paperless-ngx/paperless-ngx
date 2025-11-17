@@ -29,7 +29,6 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 from typing import Any
-from typing import Dict
 from typing import TypedDict
 
 from django.conf import settings
@@ -142,34 +141,34 @@ class AIScanResult:
         """
         # Convert internal tuple format to TypedDict format
         result: AIScanResultDict = {
-            'tags': [{'tag_id': tag_id, 'confidence': conf} for tag_id, conf in self.tags],
-            'custom_fields': {
-                field_id: {'value': value, 'confidence': conf}
+            "tags": [{"tag_id": tag_id, "confidence": conf} for tag_id, conf in self.tags],
+            "custom_fields": {
+                field_id: {"value": value, "confidence": conf}
                 for field_id, (value, conf) in self.custom_fields.items()
             },
-            'workflows': [{'workflow_id': wf_id, 'confidence': conf} for wf_id, conf in self.workflows],
-            'extracted_entities': self.extracted_entities,
-            'metadata': self.metadata,
+            "workflows": [{"workflow_id": wf_id, "confidence": conf} for wf_id, conf in self.workflows],
+            "extracted_entities": self.extracted_entities,
+            "metadata": self.metadata,
         }
 
         # Add optional fields only if present
         if self.correspondent:
-            result['correspondent'] = {
-                'correspondent_id': self.correspondent[0],
-                'confidence': self.correspondent[1],
+            result["correspondent"] = {
+                "correspondent_id": self.correspondent[0],
+                "confidence": self.correspondent[1],
             }
         if self.document_type:
-            result['document_type'] = {
-                'type_id': self.document_type[0],
-                'confidence': self.document_type[1],
+            result["document_type"] = {
+                "type_id": self.document_type[0],
+                "confidence": self.document_type[1],
             }
         if self.storage_path:
-            result['storage_path'] = {
-                'path_id': self.storage_path[0],
-                'confidence': self.storage_path[1],
+            result["storage_path"] = {
+                "path_id": self.storage_path[0],
+                "confidence": self.storage_path[1],
             }
         if self.title_suggestion:
-            result['title_suggestion'] = self.title_suggestion
+            result["title_suggestion"] = self.title_suggestion
 
         return result
 
@@ -257,14 +256,14 @@ class AIDocumentScanner:
         if self._classifier is None and self.ml_enabled:
             try:
                 from documents.ml.classifier import TransformerDocumentClassifier
-                
+
                 # Get model name from settings
                 model_name = getattr(
-                    settings, 
+                    settings,
                     "PAPERLESS_ML_CLASSIFIER_MODEL",
                     "distilbert-base-uncased",
                 )
-                
+
                 self._classifier = TransformerDocumentClassifier(
                     model_name=model_name,
                     use_cache=True,
@@ -291,14 +290,14 @@ class AIDocumentScanner:
         if self._semantic_search is None and self.ml_enabled:
             try:
                 from documents.ml.semantic_search import SemanticSearch
-                
+
                 # Get cache directory from settings
                 cache_dir = getattr(
                     settings,
                     "PAPERLESS_ML_MODEL_CACHE",
                     None,
                 )
-                
+
                 self._semantic_search = SemanticSearch(
                     cache_dir=cache_dir,
                     use_cache=True,
@@ -1004,13 +1003,13 @@ class AIDocumentScanner:
         import time
         logger.info("Starting ML model warm-up...")
         start_time = time.time()
-        
+
         from documents.ml.model_cache import ModelCacheManager
         cache_manager = ModelCacheManager.get_instance()
-        
+
         # Define model loaders
         model_loaders = {}
-        
+
         # Classifier
         if self.ml_enabled:
             def load_classifier():
@@ -1025,14 +1024,14 @@ class AIDocumentScanner:
                     use_cache=True,
                 )
             model_loaders["classifier"] = load_classifier
-        
+
         # NER
         if self.ml_enabled:
             def load_ner():
                 from documents.ml.ner import DocumentNER
                 return DocumentNER(use_cache=True)
             model_loaders["ner"] = load_ner
-        
+
         # Semantic Search
         if self.ml_enabled:
             def load_semantic():
@@ -1040,21 +1039,21 @@ class AIDocumentScanner:
                 cache_dir = getattr(settings, "PAPERLESS_ML_MODEL_CACHE", None)
                 return SemanticSearch(cache_dir=cache_dir, use_cache=True)
             model_loaders["semantic_search"] = load_semantic
-        
+
         # Table Extractor
         if self.advanced_ocr_enabled:
             def load_table():
                 from documents.ocr.table_extractor import TableExtractor
                 return TableExtractor()
             model_loaders["table_extractor"] = load_table
-        
+
         # Warm up all models
         cache_manager.warm_up(model_loaders)
-        
+
         warm_up_time = time.time() - start_time
         logger.info(f"ML model warm-up completed in {warm_up_time:.2f}s")
 
-    def get_cache_metrics(self) -> Dict[str, Any]:
+    def get_cache_metrics(self) -> dict[str, Any]:
         """
         Get cache performance metrics.
         
@@ -1062,7 +1061,7 @@ class AIDocumentScanner:
             Dictionary with cache statistics
         """
         from documents.ml.model_cache import ModelCacheManager
-        
+
         try:
             cache_manager = ModelCacheManager.get_instance()
             return cache_manager.get_metrics()
@@ -1075,7 +1074,7 @@ class AIDocumentScanner:
     def clear_cache(self) -> None:
         """Clear all model caches."""
         from documents.ml.model_cache import ModelCacheManager
-        
+
         try:
             cache_manager = ModelCacheManager.get_instance()
             cache_manager.clear_all()

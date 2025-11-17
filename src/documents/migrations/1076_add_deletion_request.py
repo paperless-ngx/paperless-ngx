@@ -1,9 +1,10 @@
 # Generated manually for DeletionRequest model
 # Based on model definition in documents/models.py
 
-from django.conf import settings
-from django.db import migrations, models
 import django.db.models.deletion
+from django.conf import settings
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
@@ -48,7 +49,7 @@ class Migration(migrations.Migration):
                 (
                     "ai_reason",
                     models.TextField(
-                        help_text="Detailed explanation from AI about why deletion is recommended"
+                        help_text="Detailed explanation from AI about why deletion is recommended",
                     ),
                 ),
                 (

@@ -14,14 +14,10 @@ from __future__ import annotations
 
 import logging
 import re
-from typing import TYPE_CHECKING
 
 from transformers import pipeline
 
 from documents.ml.model_cache import ModelCacheManager
-
-if TYPE_CHECKING:
-    pass
 
 logger = logging.getLogger("paperless.ml.ner")
 
@@ -69,10 +65,10 @@ class DocumentNER:
         self.model_name = model_name
         self.use_cache = use_cache
         self.cache_manager = ModelCacheManager.get_instance() if use_cache else None
-        
+
         # Cache key for this model
         cache_key = f"ner_{model_name}"
-        
+
         if self.use_cache and self.cache_manager:
             # Load from cache or create new
             def loader():
@@ -81,7 +77,7 @@ class DocumentNER:
                     model=model_name,
                     aggregation_strategy="simple",
                 )
-            
+
             self.ner_pipeline = self.cache_manager.get_or_load_model(
                 cache_key,
                 loader,

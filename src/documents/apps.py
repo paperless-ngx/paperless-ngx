@@ -38,22 +38,22 @@ class DocumentsConfig(AppConfig):
     def _initialize_ml_cache(self):
         """Initialize ML model cache and optionally warm up models."""
         from django.conf import settings
-        
+
         # Only initialize if ML features are enabled
         if not getattr(settings, "PAPERLESS_ENABLE_ML_FEATURES", False):
             return
-        
+
         # Initialize cache manager with settings
         from documents.ml.model_cache import ModelCacheManager
-        
+
         max_models = getattr(settings, "PAPERLESS_ML_CACHE_MAX_MODELS", 3)
         cache_dir = getattr(settings, "PAPERLESS_ML_MODEL_CACHE", None)
-        
+
         cache_manager = ModelCacheManager.get_instance(
             max_models=max_models,
             disk_cache_dir=str(cache_dir) if cache_dir else None,
         )
-        
+
         # Warm up models if configured
         warmup_enabled = getattr(settings, "PAPERLESS_ML_CACHE_WARMUP", False)
         if warmup_enabled:

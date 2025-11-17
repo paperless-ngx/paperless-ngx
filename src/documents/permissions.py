@@ -233,11 +233,11 @@ class CanViewAISuggestionsPermission(BasePermission):
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
             return False
-        
+
         # Superusers always have permission
         if request.user.is_superuser:
             return True
-        
+
         # Check for specific permission
         return request.user.has_perm("documents.can_view_ai_suggestions")
 
@@ -253,11 +253,11 @@ class CanApplyAISuggestionsPermission(BasePermission):
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
             return False
-        
+
         # Superusers always have permission
         if request.user.is_superuser:
             return True
-        
+
         # Check for specific permission
         return request.user.has_perm("documents.can_apply_ai_suggestions")
 
@@ -273,11 +273,11 @@ class CanApproveDeletionsPermission(BasePermission):
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
             return False
-        
+
         # Superusers always have permission
         if request.user.is_superuser:
             return True
-        
+
         # Check for specific permission
         return request.user.has_perm("documents.can_approve_deletions")
 
@@ -294,10 +294,10 @@ class CanConfigureAIPermission(BasePermission):
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
             return False
-        
+
         # Superusers always have permission
         if request.user.is_superuser:
             return True
-        
+
         # Check for specific permission
         return request.user.has_perm("documents.can_configure_ai")

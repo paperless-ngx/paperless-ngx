@@ -14,13 +14,9 @@ According to agents.md requirements:
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING
 from typing import Any
 
 from django.contrib.auth.models import User
-
-if TYPE_CHECKING:
-    pass
 
 logger = logging.getLogger("paperless.ai_deletion")
 

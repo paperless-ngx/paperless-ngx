@@ -10,9 +10,9 @@ Provides AI/ML capabilities including:
 from __future__ import annotations
 
 __all__ = [
-    "TransformerDocumentClassifier",
     "DocumentNER",
     "SemanticSearch",
+    "TransformerDocumentClassifier",
 ]
 
 # Lazy imports to avoid loading heavy ML libraries unless needed

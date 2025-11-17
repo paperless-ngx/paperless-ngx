@@ -15,22 +15,15 @@ Logging levels used in this module:
 from __future__ import annotations
 
 import logging
-from pathlib import Path
-from typing import TYPE_CHECKING
 
 import torch
 from torch.utils.data import Dataset
-from transformers import (
-    AutoModelForSequenceClassification,
-    AutoTokenizer,
-    Trainer,
-    TrainingArguments,
-)
+from transformers import AutoModelForSequenceClassification
+from transformers import AutoTokenizer
+from transformers import Trainer
+from transformers import TrainingArguments
 
 from documents.ml.model_cache import ModelCacheManager
-
-if TYPE_CHECKING:
-    from documents.models import Document
 
 logger = logging.getLogger("paperless.ml.classifier")
 
@@ -129,10 +122,10 @@ class TransformerDocumentClassifier:
         self.model_name = model_name
         self.use_cache = use_cache
         self.cache_manager = ModelCacheManager.get_instance() if use_cache else None
-        
+
         # Cache key for this model configuration
         self.cache_key = f"classifier_{model_name}"
-        
+
         # Load tokenizer (lightweight, not cached)
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = None
@@ -141,7 +134,7 @@ class TransformerDocumentClassifier:
 
         logger.info(
             f"Initialized TransformerDocumentClassifier with {model_name} "
-            f"(caching: {use_cache})"
+            f"(caching: {use_cache})",
         )
 
     def train(
@@ -264,14 +257,14 @@ class TransformerDocumentClassifier:
         if self.use_cache and self.cache_manager:
             # Try to get from cache first
             cache_key = f"{self.cache_key}_{model_dir}"
-            
+
             def loader():
                 logger.info(f"Loading model from {model_dir}")
                 model = AutoModelForSequenceClassification.from_pretrained(model_dir)
                 tokenizer = AutoTokenizer.from_pretrained(model_dir)
                 model.eval()  # Set to evaluation mode
                 return {"model": model, "tokenizer": tokenizer}
-            
+
             cached = self.cache_manager.get_or_load_model(cache_key, loader)
             self.model = cached["model"]
             self.tokenizer = cached["tokenizer"]

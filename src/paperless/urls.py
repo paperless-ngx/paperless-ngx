@@ -86,7 +86,7 @@ api_router.register(r"config", ApplicationConfigurationViewSet)
 api_router.register(r"processed_mail", ProcessedMailViewSet)
 api_router.register(r"deletion_requests", DeletionRequestViewSet)
 api_router.register(
-    r"deletion-requests", DeletionRequestViewSet, basename="deletion-requests"
+    r"deletion-requests", DeletionRequestViewSet, basename="deletion-requests",
 )
 
 

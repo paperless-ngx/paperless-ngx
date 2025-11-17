@@ -160,7 +160,7 @@ class SecurityHeadersMiddleware:
 
         # Store nonce in request for use in templates
         # Templates can access this via {{ request.csp_nonce }}
-        if hasattr(request, '_csp_nonce'):
+        if hasattr(request, "_csp_nonce"):
             request._csp_nonce = nonce
 
         # Prevent clickjacking attacks
