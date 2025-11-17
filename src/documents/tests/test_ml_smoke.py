@@ -12,6 +12,7 @@ Task: TSK-CICD-AUDIT-001
 """
 
 import pytest
+from packaging import version
 
 
 class TestMLDependenciesAvailable:
@@ -21,7 +22,7 @@ class TestMLDependenciesAvailable:
         """Verify PyTorch is installed and importable."""
         import torch
 
-        assert torch.__version__ >= "2.0.0", (
+        assert version.parse(torch.__version__) >= version.parse("2.0.0"), (
             f"PyTorch version {torch.__version__} is too old. "
             f"Minimum required: 2.0.0"
         )
@@ -30,7 +31,7 @@ class TestMLDependenciesAvailable:
         """Verify Transformers library is installed and importable."""
         import transformers
 
-        assert transformers.__version__ >= "4.30.0", (
+        assert version.parse(transformers.__version__) >= version.parse("4.30.0"), (
             f"Transformers version {transformers.__version__} is too old. "
             f"Minimum required: 4.30.0"
         )
@@ -39,7 +40,7 @@ class TestMLDependenciesAvailable:
         """Verify OpenCV is installed and importable."""
         import cv2
 
-        assert cv2.__version__ >= "4.8.0", (
+        assert version.parse(cv2.__version__) >= version.parse("4.8.0"), (
             f"OpenCV version {cv2.__version__} is too old. "
             f"Minimum required: 4.8.0"
         )
@@ -54,7 +55,7 @@ class TestMLDependenciesAvailable:
         """Verify scikit-learn is installed and importable."""
         import sklearn
 
-        assert sklearn.__version__ >= "1.7.0", (
+        assert version.parse(sklearn.__version__) >= version.parse("1.7.0"), (
             f"scikit-learn version {sklearn.__version__} is too old. "
             f"Minimum required: 1.7.0"
         )
@@ -63,7 +64,7 @@ class TestMLDependenciesAvailable:
         """Verify NumPy is installed and importable."""
         import numpy as np
 
-        assert np.__version__ >= "1.26.0", (
+        assert version.parse(np.__version__) >= version.parse("1.26.0"), (
             f"NumPy version {np.__version__} is too old. "
             f"Minimum required: 1.26.0"
         )
@@ -72,7 +73,7 @@ class TestMLDependenciesAvailable:
         """Verify Pandas is installed and importable."""
         import pandas as pd
 
-        assert pd.__version__ >= "2.0.0", (
+        assert version.parse(pd.__version__) >= version.parse("2.0.0"), (
             f"Pandas version {pd.__version__} is too old. "
             f"Minimum required: 2.0.0"
         )
