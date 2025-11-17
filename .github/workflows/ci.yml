@@ -151,7 +151,7 @@ jobs:
           RETRY_COUNT=0
 
           while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-            if docker exec $(docker ps -qf "name=broker") redis-cli ping &> /dev/null; then
+            if docker compose --file docker/compose/docker-compose.intellidocs.yml exec -T broker redis-cli ping &> /dev/null; then
               echo "✓ Redis is responding"
               exit 0
             fi

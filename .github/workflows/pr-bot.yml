@@ -83,11 +83,18 @@ jobs:
             const pr = context.payload.pull_request;
             const user = pr.user.login;
 
-            const { data: members } = await github.rest.orgs.listMembers({
-              org: 'paperless-ngx',
-            });
+            // Try to get org members, but handle if this is not an org
+            let memberLogins = [];
+            try {
+              const { data: members } = await github.rest.orgs.listMembers({
+                org: context.repo.owner,
+              });
+              memberLogins = members.map(m => m.login.toLowerCase());
+            } catch (error) {
+              // If not an organization, only skip for repo collaborators
+              core.info('Not an organization or unable to fetch members');
+            }
 
-            const memberLogins = members.map(m => m.login.toLowerCase());
             if (memberLogins.includes(user.toLowerCase())) {
               core.info('Skipping comment: user is org member');
               return;
@@ -98,7 +105,7 @@ jobs:
                 "Thank you very much for submitting this PR to us!\n\n" +
                 "This is what will happen next:\n\n" +
                 "1. CI tests will run against your PR to ensure quality and consistency.\n" +
-                "2. Next, human contributors from paperless-ngx review your changes.\n" +
+                "2. Next, human contributors will review your changes.\n" +
                 "3. Please address any issues that come up during the review as soon as you are able to.\n" +
                 "4. If accepted, your pull request will be merged into the `dev` branch and changes there will be tested further.\n" +
                 "5. Eventually, changes from you and other contributors will be merged into `main` and a new release will be made.\n\n" +
