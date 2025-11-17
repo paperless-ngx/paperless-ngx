@@ -27,7 +27,7 @@ dependencies = [
   #          Only patch versions are guaranteed to not introduce breaking changes.
   "django~=5.2.5",
   "django-allauth[mfa,socialaccount]~=65.12.1",
-  "django-auditlog~=3.2.1",
+  "django-auditlog~=3.3.0",
   "django-cachalot~=2.8.0",
   "django-celery-results~=2.6.0",
   "django-compression-middleware~=0.5.0",

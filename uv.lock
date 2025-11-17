@@ -710,15 +710,15 @@ socialaccount = [
 
 [[package]]
 name = "django-auditlog"
-version = "3.2.1"
+version = "3.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "python-dateutil", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e1/46/9da1d94493832fa18d2f6324a76d387fa232001593866987a96047709f4e/django_auditlog-3.2.1.tar.gz", hash = "sha256:63a4c9f7793e94eed804bc31a04d9b0b58244b1d280e2ed273c8b406bff1f779", size = 72926, upload-time = "2025-07-03T20:08:17.734Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/37/d8/ddd1c653ffb7ed1984596420982e32a0b163a0be316721a801a54dcbf016/django_auditlog-3.3.0.tar.gz", hash = "sha256:01331a0e7bb1a8ff7573311b486c88f3d0c431c388f5a1e4a9b6b26911dd79b8", size = 85941, upload-time = "2025-10-02T17:16:27.591Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a7/06/67296d050a72dcd76f57f220df621cb27e5b9282ba7ad0f5f74870dce241/django_auditlog-3.2.1-py3-none-any.whl", hash = "sha256:99603ca9d015f7e9b062b1c34f3e0826a3ce6ae6e5950c81bb7e663f7802a899", size = 38330, upload-time = "2025-07-03T20:07:51.735Z" },
+    { url = "https://files.pythonhosted.org/packages/f3/bc/6e1b503d1755ab09cff6480cb088def073f1303165ab59b1a09247a2e756/django_auditlog-3.3.0-py3-none-any.whl", hash = "sha256:ab0f0f556a7107ac01c8fa87137bdfbb2b6f0debf70f7753169d9a40673d2636", size = 39676, upload-time = "2025-10-02T17:15:42.922Z" },
 ]
 
 [[package]]
@@ -2263,7 +2263,7 @@ requires-dist = [
     { name = "dateparser", specifier = "~=1.2" },
     { name = "django", specifier = "~=5.2.5" },
     { name = "django-allauth", extras = ["mfa", "socialaccount"], specifier = "~=65.12.1" },
-    { name = "django-auditlog", specifier = "~=3.2.1" },
+    { name = "django-auditlog", specifier = "~=3.3.0" },
     { name = "django-cachalot", specifier = "~=2.8.0" },
     { name = "django-celery-results", specifier = "~=2.6.0" },
     { name = "django-compression-middleware", specifier = "~=0.5.0" },
