@@ -31,11 +31,10 @@ from guardian.shortcuts import remove_perm
 
 from documents import matching
 from documents.caching import clear_document_caches
-from documents.data_models import ConsumableDocument
-from documents.data_models import DocumentSource
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_unique_filename
+from documents.mail import EmailAttachment
 from documents.mail import send_email
 from documents.models import Correspondent
 from documents.models import CustomField
@@ -57,6 +56,7 @@ from documents.templating.workflows import parse_w_workflow_placeholders
 
 if TYPE_CHECKING:
     from documents.classifier import DocumentClassifier
+    from documents.data_models import ConsumableDocument
     from documents.data_models import DocumentMetadataOverrides
 
 logger = logging.getLogger("paperless.handlers")
@@ -1116,7 +1116,9 @@ def run_workflows(
 
         if not use_overrides:
             title = document.title
-            doc_url = f"{settings.PAPERLESS_URL}/documents/{document.pk}/"
+            doc_url = (
+                f"{settings.PAPERLESS_URL}{settings.BASE_URL}documents/{document.pk}/"
+            )
             correspondent = (
                 document.correspondent.name if document.correspondent else ""
             )
@@ -1184,28 +1186,41 @@ def run_workflows(
             else ""
         )
         try:
-            attachments = []
+            attachments: list[EmailAttachment] = []
             if action.email.include_document:
+                attachment: EmailAttachment | None = None
                 if trigger_type in [
                     WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
                     WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
-                ]:
-                    # Updated and scheduled can pass the document directly
-                    attachments = [document]
+                ] and isinstance(document, Document):
+                    friendly_name = (
+                        Path(current_filename).name
+                        if current_filename
+                        else document.source_path.name
+                    )
+                    attachment = EmailAttachment(
+                        path=document.source_path,
+                        mime_type=document.mime_type,
+                        friendly_name=friendly_name,
+                    )
                 elif original_file:
-                    # For consumed and added document is not yet saved, so pass the original file
-                    attachments = [
-                        ConsumableDocument(
-                            source=DocumentSource.ApiUpload,
-                            original_file=original_file,
-                        ),
-                    ]
+                    friendly_name = (
+                        Path(current_filename).name
+                        if current_filename
+                        else original_file.name
+                    )
+                    attachment = EmailAttachment(
+                        path=original_file,
+                        mime_type=document.mime_type,
+                        friendly_name=friendly_name,
+                    )
+                if attachment:
+                    attachments = [attachment]
             n_messages = send_email(
                 subject=subject,
                 body=body,
                 to=action.email.to.split(","),
                 attachments=attachments,
-                use_archive=False,
             )
             logger.debug(
                 f"Sent {n_messages} notification email(s) to {action.email.to}",
@@ -1220,7 +1235,9 @@ def run_workflows(
     def webhook_action():
         if not use_overrides:
             title = document.title
-            doc_url = f"{settings.PAPERLESS_URL}/documents/{document.pk}/"
+            doc_url = (
+                f"{settings.PAPERLESS_URL}{settings.BASE_URL}documents/{document.pk}/"
+            )
             correspondent = (
                 document.correspondent.name if document.correspondent else ""
             )

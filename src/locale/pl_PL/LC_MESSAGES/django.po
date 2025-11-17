@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-28 18:06+0000\n"
-"PO-Revision-Date: 2025-10-29 12:14\n"
+"POT-Creation-Date: 2025-11-14 16:09+0000\n"
+"PO-Revision-Date: 2025-11-14 16:11\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumenty"
 
-#: documents/filters.py:392
+#: documents/filters.py:395
 msgid "Value must be valid JSON."
 msgstr "Wartość musi być prawidłowym JSON."
 
-#: documents/filters.py:411
+#: documents/filters.py:414
 msgid "Invalid custom field query expression"
 msgstr "Nieprawidłowe wyrażenie zapytania pola niestandardowego"
 
-#: documents/filters.py:421
+#: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Nieprawidłowa lista wyrażeń. Nie może być pusta."
 
-#: documents/filters.py:442
+#: documents/filters.py:445
 msgid "Invalid logical operator {op!r}"
 msgstr "Nieprawidłowy operator logiczny {op!r}"
 
-#: documents/filters.py:456
+#: documents/filters.py:459
 msgid "Maximum number of query conditions exceeded."
 msgstr "Maksymalna liczba warunków zapytania została przekroczona."
 
-#: documents/filters.py:521
+#: documents/filters.py:524
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} nie jest prawidłowym polem niestandardowym."
 
-#: documents/filters.py:558
+#: documents/filters.py:561
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} nie obsługuje wyrażenia zapytania {expr!r}."
 
-#: documents/filters.py:666 documents/models.py:135
+#: documents/filters.py:669 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
 msgstr "Przekroczono maksymalną głębokość zagnieżdżenia."
 
-#: documents/filters.py:851
+#: documents/filters.py:854
 msgid "Custom field not found"
 msgstr "Nie znaleziono pola niestandardowego"
 
@@ -878,23 +878,23 @@ msgstr "posiada wskazanego nadawcę"
 
 #: documents/models.py:1109
 msgid "does not have these correspondent(s)"
-msgstr ""
+msgstr "nie posiada korespondenta(-ów)"
 
 #: documents/models.py:1117
 msgid "has this storage path"
-msgstr ""
+msgstr "ma tę ścieżkę zapisu"
 
 #: documents/models.py:1124
 msgid "does not have these storage path(s)"
-msgstr ""
+msgstr "nie ma tej ścieżki/ścieżek zapisu"
 
 #: documents/models.py:1128
 msgid "filter custom field query"
-msgstr ""
+msgstr "filtruj zapytanie pola niestandardowego"
 
 #: documents/models.py:1131
 msgid "JSON-encoded custom field query expression."
-msgstr ""
+msgstr "Niestandardowe wyrażenie zapytania pola zakodowane w formacie JSON."
 
 #: documents/models.py:1135
 msgid "schedule offset days"
@@ -1038,7 +1038,7 @@ msgstr "przypisz tytuł"
 
 #: documents/models.py:1302
 msgid "Assign a document title, must  be a Jinja2 template, see documentation."
-msgstr ""
+msgstr "Przypisz tytuł dokumentu, musi być szablonem Jinja2, zobacz dokumentację."
 
 #: documents/models.py:1310 paperless_mail/models.py:274
 msgid "assign this tag"
@@ -1225,20 +1225,20 @@ msgstr "Typ pliku %(type)s nie jest obsługiwany"
 #: documents/serialisers.py:1849
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
-msgstr ""
+msgstr "Identyfikator pola niestandardowego musi być liczbą całkowitą: %(id)s"
 
 #: documents/serialisers.py:1856
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
-msgstr ""
+msgstr "Pole niestandardowe z id %(id)s nie istnieje"
 
 #: documents/serialisers.py:1873 documents/serialisers.py:1883
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
-msgstr ""
+msgstr "Pola niestandardowe muszą być listą liczb całkowitych lub obiektem mapującym identyfikatory na wartości."
 
 #: documents/serialisers.py:1878
 msgid "Some custom fields don't exist or were specified twice."
-msgstr ""
+msgstr "Niektóre niestandardowe pola nie istnieją lub zostały określone dwukrotnie."
 
 #: documents/serialisers.py:1993
 msgid "Invalid variable detected."
@@ -1473,21 +1473,21 @@ msgstr "Na koniec należy wypełnić poniższy formularz:"
 #: documents/validators.py:24
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "Nie można przeanalizować URI {value}, brak schematu"
 
 #: documents/validators.py:29
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "Nie można przeanalizować URI {value}, brak lokalizacji sieciowej lub ścieżki"
 
 #: documents/validators.py:36
 msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
-msgstr ""
+msgstr "Schemat URI '{parts.scheme}' jest niedozwolony. Dozwolone schematy: {', '.join(allowed_schemes)}"
 
 #: documents/validators.py:45
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "Nie można przetworzyć URI {value}"
 
 #: paperless/apps.py:11
 msgid "Paperless"
@@ -1815,7 +1815,7 @@ msgstr "Ukraiński"
 
 #: paperless/settings.py:806
 msgid "Vietnamese"
-msgstr ""
+msgstr "Wietnamski"
 
 #: paperless/settings.py:807
 msgid "Chinese Simplified"
