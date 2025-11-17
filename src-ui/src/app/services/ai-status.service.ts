@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core'
-import { BehaviorSubject, Observable, interval, Subscription } from 'rxjs'
+import { BehaviorSubject, Observable, interval, Subscription, of } from 'rxjs'
 import { catchError, map, startWith, switchMap } from 'rxjs/operators'
 import { AIStatus } from 'src/app/data/ai-status'
 import { environment } from 'src/environments/environment'
@@ -86,19 +86,15 @@ export class AIStatusService {
         }),
         catchError((error) => {
           this.loading = false
-          console.warn('Failed to fetch AI status, using mock data:', error)
-          // Return mock data if endpoint doesn't exist yet
-          return [
-            {
-              active: true,
-              processing: false,
-              documents_scanned_today: 42,
-              suggestions_applied: 15,
-              pending_deletion_requests: 2,
-              last_scan: new Date().toISOString(),
-              version: '1.0.0',
-            },
-          ]
+          console.warn('Failed to fetch AI status:', error)
+          // Return default status if endpoint fails
+          return of({
+            active: false,
+            processing: false,
+            documents_scanned_today: 0,
+            suggestions_applied: 0,
+            pending_deletion_requests: 0,
+          })
         })
       )
   }
