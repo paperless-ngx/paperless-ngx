@@ -130,6 +130,15 @@ jobs:
         python-version: ['3.10', '3.11', '3.12']
       fail-fast: false
     steps:
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          swap-storage: true
       - name: Checkout
         uses: actions/checkout@v5
       - name: Start containers
@@ -196,6 +205,10 @@ jobs:
         run: |
           docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml logs
           docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml down
+      - name: Clean up Docker
+        if: always()
+        run: |
+          docker system prune -af --volumes
   install-frontend-dependencies:
     name: "Install Frontend Dependencies"
     runs-on: ubuntu-24.04
@@ -284,6 +297,15 @@ jobs:
         shard-index: [1, 2]
         shard-count: [2]
     steps:
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          swap-storage: true
       - uses: actions/checkout@v5
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -364,6 +386,15 @@ jobs:
       - tests-frontend
       - tests-frontend-e2e
     steps:
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          swap-storage: true
       - name: Check pushing to Docker Hub
         id: push-other-places
         # Only push to Dockerhub from the main repo AND the ref is either:
