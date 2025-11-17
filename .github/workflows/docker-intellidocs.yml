@@ -22,6 +22,7 @@ jobs:
   test-ml-dependencies:
     name: Validate ML/OCR Dependencies
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
 
     steps:
       - name: Checkout code
@@ -83,6 +84,9 @@ jobs:
           "
 
       - name: Run ML smoke tests
+        env:
+          # Skip slow tests that download models to avoid timeouts/disk space issues
+          SKIP_SLOW_TESTS: "1"
         run: |
           uv run pytest src/documents/tests/test_ml_smoke.py -v --tb=short
 
@@ -92,6 +96,7 @@ jobs:
   build-and-push:
     name: Build IntelliDocs Docker Image
     runs-on: ubuntu-24.04
+    timeout-minutes: 120
     needs: test-ml-dependencies
     permissions:
       contents: read
@@ -167,6 +172,7 @@ jobs:
   test-docker-image:
     name: Test Docker Image
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     needs: build-and-push
     if: github.event_name != 'pull_request'
 
@@ -183,8 +189,15 @@ jobs:
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "tag=latest" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            # For tags, use the tag name directly
+            TAG_NAME="${{ github.ref_name }}"
+            echo "tag=${TAG_NAME}" >> $GITHUB_OUTPUT
           else
-            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            # For branches, sanitize name to be Docker-compatible
+            # Replace / with - and remove special characters
+            SANITIZED_TAG=$(echo "${{ github.ref_name }}" | sed 's/\//-/g' | sed 's/[^a-zA-Z0-9._-]/-/g')
+            echo "tag=${SANITIZED_TAG}" >> $GITHUB_OUTPUT
           fi
 
       - name: Pull Docker image

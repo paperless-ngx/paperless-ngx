@@ -77,6 +77,7 @@ jobs:
   verify-environment:
     name: "Verify Environment & Services"
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     needs:
       - pre-commit
     steps:
@@ -126,16 +127,43 @@ jobs:
           echo "✓ requirements.txt generated successfully"
       - name: Verify Python dependencies installation
         run: |
-          # Verify that requirements.txt can be parsed
+          # Verify that requirements.txt is valid and dependencies can be resolved
           if ! python -c "
 import sys
+import re
 try:
     with open('requirements.txt', 'r') as f:
-        lines = f.readlines()
-    print(f'✓ requirements.txt has {len(lines)} entries')
+        lines = [l.strip() for l in f.readlines() if l.strip() and not l.startswith('#')]
+
+    # Validate format of each dependency line
+    invalid_lines = []
+    for line in lines:
+        # Skip empty lines and comments
+        if not line or line.startswith('#'):
+            continue
+        # Basic validation: should contain package name
+        if not re.match(r'^[a-zA-Z0-9_-]+', line):
+            invalid_lines.append(line)
+
+    if invalid_lines:
+        print(f'✗ Invalid dependency lines found: {invalid_lines}')
+        sys.exit(1)
+
+    print(f'✓ requirements.txt has {len(lines)} valid entries')
+
+    # Verify critical ML/OCR dependencies are present
+    content = ' '.join(lines)
+    required_packages = ['torch', 'transformers', 'opencv-python', 'sentence-transformers', 'scikit-learn']
+    missing = [pkg for pkg in required_packages if pkg not in content]
+
+    if missing:
+        print(f'✗ Missing critical ML/OCR dependencies: {missing}')
+        sys.exit(1)
+
+    print(f'✓ All critical ML/OCR dependencies present')
     sys.exit(0)
 except Exception as e:
-    print(f'✗ Error reading requirements.txt: {e}')
+    print(f'✗ Error validating requirements.txt: {e}')
     sys.exit(1)
           "; then
             exit 1
@@ -461,7 +489,7 @@ except Exception as e:
           path: |
             ~/.pnpm-store
             ~/.cache
-          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
+          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
       - name: Re-link Angular cli
         run: cd src-ui && pnpm link @angular/cli
       - name: Build frontend and upload analysis

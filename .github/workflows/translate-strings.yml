@@ -6,7 +6,8 @@ on:
 jobs:
   generate-translate-strings:
     name: Generate Translation Strings
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
     permissions:
       contents: write
     steps:
@@ -18,6 +19,8 @@ jobs:
       - name: Set up Python
         id: setup-python
         uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
       - name: Install system dependencies
         run: |
           sudo apt-get update -qq
@@ -25,10 +28,13 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
         with:
+          version: '0.9.x'
           enable-cache: true
+          python-version: ${{ steps.setup-python.outputs.python-version }}
       - name: Install backend python dependencies
         run: |
           uv sync \
+            --python ${{ steps.setup-python.outputs.python-version }} \
             --group dev \
             --frozen
       - name: Generate backend translation strings
