@@ -105,7 +105,7 @@ export class BulkEditorComponent
   downloadForm = new FormGroup({
     downloadFileTypeArchive: new FormControl(true),
     downloadFileTypeOriginals: new FormControl(false),
-    downloadUseFormatting: new FormControl(false),
+    downloadUseFormatting: new FormControl(true),
   })
 
   @Input()
