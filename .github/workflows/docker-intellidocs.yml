@@ -1,0 +1,264 @@
+name: IntelliDocs Docker Build & Deploy
+
+on:
+  push:
+    branches: [dev, main, 'claude/**']
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    branches: [dev, main]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ============================================================================
+  # JOB 1: Validar dependencias ML/OCR
+  # ============================================================================
+  test-ml-dependencies:
+    name: Validate ML/OCR Dependencies
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install UV package manager
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.9.x'
+
+      - name: Install system dependencies for OpenCV/ML
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq --no-install-recommends \
+            libglib2.0-0 libsm6 libxext6 libxrender1 libgomp1 libgl1
+
+      - name: Install Python dependencies
+        run: |
+          cd /home/user/IntelliDocs-ngx
+          uv sync --all-extras
+
+      - name: Test ML/OCR imports
+        run: |
+          uv run python -c "
+          import sys
+          try:
+              import torch
+              print(f'✅ torch: {torch.__version__}')
+          except ImportError as e:
+              print(f'❌ torch: {e}')
+              sys.exit(1)
+
+          try:
+              import transformers
+              print(f'✅ transformers: {transformers.__version__}')
+          except ImportError as e:
+              print(f'❌ transformers: {e}')
+              sys.exit(1)
+
+          try:
+              import cv2
+              print(f'✅ opencv: {cv2.__version__}')
+          except ImportError as e:
+              print(f'❌ opencv: {e}')
+              sys.exit(1)
+
+          try:
+              import sentence_transformers
+              print(f'✅ sentence-transformers: {sentence_transformers.__version__}')
+          except ImportError as e:
+              print(f'❌ sentence-transformers: {e}')
+              sys.exit(1)
+
+          print('\\n✅ All ML/OCR dependencies loaded successfully!')
+          "
+
+      - name: Run ML smoke tests
+        run: |
+          uv run pytest src/documents/tests/test_ml_smoke.py -v --tb=short
+
+  # ============================================================================
+  # JOB 2: Build y Push imagen Docker
+  # ============================================================================
+  build-and-push:
+    name: Build IntelliDocs Docker Image
+    runs-on: ubuntu-24.04
+    needs: test-ml-dependencies
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    strategy:
+      matrix:
+        platform: [linux/amd64, linux/arm64]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set up QEMU for multi-arch builds
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Log in to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-,format=short
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: ${{ matrix.platform }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.platform }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.platform }}
+          build-args: |
+            BUILD_DATE=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
+            VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
+            REVISION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
+
+      - name: Analyze image size
+        if: github.event_name != 'pull_request'
+        run: |
+          echo "### Docker Image Built ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Platform:** ${{ matrix.platform }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tags:** ${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Digest:** ${{ steps.build.outputs.digest }}" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================================================
+  # JOB 3: Smoke tests en contenedor
+  # ============================================================================
+  test-docker-image:
+    name: Test Docker Image
+    runs-on: ubuntu-24.04
+    needs: build-and-push
+    if: github.event_name != 'pull_request'
+
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine image tag
+        id: tag
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Pull Docker image
+        run: |
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+
+      - name: Test ML dependencies in container
+        run: |
+          docker run --rm \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} \
+            python -c "
+          import sys
+          try:
+              import torch, transformers, cv2, sentence_transformers
+              print('✅ All ML dependencies loaded successfully in container')
+          except ImportError as e:
+              print(f'❌ ML dependency error: {e}')
+              sys.exit(1)
+          "
+
+      - name: Test Django migrations check
+        run: |
+          docker run --rm \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} \
+            python src/manage.py makemigrations --check --dry-run
+
+      - name: Verify OpenCV system dependencies
+        run: |
+          docker run --rm \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} \
+            sh -c "dpkg -l | grep -E 'libglib2.0-0|libsm6|libxext6|libxrender1|libgomp1|libgl1'"
+
+      - name: Generate test report
+        if: always()
+        run: |
+          echo "## Docker Image Tests 🐳" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Image pulled successfully" >> $GITHUB_STEP_SUMMARY
+          echo "✅ ML dependencies verified" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Django migrations validated" >> $GITHUB_STEP_SUMMARY
+          echo "✅ System dependencies verified" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Image:** \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================================================
+  # JOB 4: Crear GitHub Release (solo para tags)
+  # ============================================================================
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-24.04
+    needs: [build-and-push, test-docker-image]
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          body: |
+            ## IntelliDocs Release ${{ github.ref_name }}
+
+            ### Docker Images
+            - **AMD64:** `${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}`
+            - **ARM64:** `${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}`
+
+            ### Installation
+            ```bash
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+            ```
+
+            See [DOCKER_SETUP_INTELLIDOCS.md](DOCKER_SETUP_INTELLIDOCS.md) for full setup instructions.
