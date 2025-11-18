@@ -117,16 +117,12 @@ jobs:
   build-and-push:
     name: Build IntelliDocs Docker Image
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 60
     needs: test-ml-dependencies
     permissions:
       contents: read
       packages: write
       id-token: write
-
-    strategy:
-      matrix:
-        platform: [linux/amd64, linux/arm64]
 
     steps:
       - name: Free Disk Space (CRITICAL - Prevent "no space left on device")
@@ -156,7 +152,7 @@ jobs:
       - name: Set up QEMU for multi-arch builds
         uses: docker/setup-qemu-action@v3
         with:
-          platforms: arm64
+          platforms: linux/amd64,linux/arm64
 
       - name: Log in to GitHub Container Registry
         if: github.event_name != 'pull_request'
@@ -179,31 +175,36 @@ jobs:
             type=sha,format=short
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image (multi-arch)
         id: build
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
-          platforms: ${{ matrix.platform }}
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=${{ matrix.platform }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.platform }}
+          # Use branch-based cache scopes for better cache reuse
+          cache-from: |
+            type=gha,scope=buildx-multi-arch
+            type=gha,scope=buildx-${{ github.ref_name }}
+          cache-to: type=gha,mode=max,scope=buildx-${{ github.ref_name }}
           build-args: |
             BUILD_DATE=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
             VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
             REVISION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
 
-      - name: Analyze image size
+      - name: Analyze multi-arch image
         if: github.event_name != 'pull_request'
         run: |
-          echo "### Docker Image Built ✅" >> $GITHUB_STEP_SUMMARY
+          echo "### Docker Multi-Arch Image Built ✅" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Platform:** ${{ matrix.platform }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Platforms:** linux/amd64, linux/arm64" >> $GITHUB_STEP_SUMMARY
           echo "**Tags:** ${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
           echo "**Digest:** ${{ steps.build.outputs.digest }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Multi-arch manifest created successfully!**" >> $GITHUB_STEP_SUMMARY
 
   # ============================================================================
   # JOB 3: Smoke tests en contenedor
