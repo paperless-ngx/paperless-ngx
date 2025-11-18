@@ -186,6 +186,7 @@ class TestRewriteNaturalDateKeywords(SimpleTestCase):
                 datetime(2025, 7, 15, 12, 0, 0, tzinfo=timezone.utc),
                 ("added:[20240101", "TO 20241231"),
             ),
+            # Previous quarter from July 15, 2025 is April-June.
             (
                 "added:previous quarter",
                 datetime(2025, 7, 15, 12, 0, 0, tzinfo=timezone.utc),
@@ -210,31 +211,24 @@ class TestRewriteNaturalDateKeywords(SimpleTestCase):
         # modified
         self._assert_rewrite_contains("modified:today", fixed_now, "modified:[20250720")
 
-    def test_quoted_keywords(self):
+    def test_basic_syntax_variants(self):
         """
-        Test that quoted keywords work.
+        Test that quoting, casing, and multi-clause queries are parsed.
         """
         fixed_now = datetime(2025, 7, 20, 15, 30, 45, tzinfo=timezone.utc)
+
+        # quoted keywords
         result1 = self._rewrite_with_now('added:"today"', fixed_now)
         result2 = self._rewrite_with_now("added:'today'", fixed_now)
         self.assertIn("added:[20250720", result1)
         self.assertIn("added:[20250720", result2)
 
-    def test_case_insensitive(self):
-        """
-        Test that keywords are case-insensitive.
-        """
-        fixed_now = datetime(2025, 7, 20, 15, 30, 45, tzinfo=timezone.utc)
-        queries = ("added:TODAY", "added:Today", "added:ToDaY")
-        for query in queries:
-            with self.subTest(query=query):
+        # case insensitivity
+        for query in ("added:TODAY", "added:Today", "added:ToDaY"):
+            with self.subTest(case_variant=query):
                 self._assert_rewrite_contains(query, fixed_now, "added:[20250720")
 
-    def test_multiple_keywords(self):
-        """
-        Test that multiple keywords in one query work.
-        """
-        fixed_now = datetime(2025, 7, 20, 15, 30, 45, tzinfo=timezone.utc)
+        # multiple clauses
         result = self._rewrite_with_now("added:today created:yesterday", fixed_now)
         self.assertIn("added:[20250720", result)
         self.assertIn("created:[20250719", result)
