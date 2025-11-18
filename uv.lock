@@ -710,15 +710,15 @@ socialaccount = [
 
 [[package]]
 name = "django-auditlog"
-version = "3.2.1"
+version = "3.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "python-dateutil", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e1/46/9da1d94493832fa18d2f6324a76d387fa232001593866987a96047709f4e/django_auditlog-3.2.1.tar.gz", hash = "sha256:63a4c9f7793e94eed804bc31a04d9b0b58244b1d280e2ed273c8b406bff1f779", size = 72926, upload-time = "2025-07-03T20:08:17.734Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/37/d8/ddd1c653ffb7ed1984596420982e32a0b163a0be316721a801a54dcbf016/django_auditlog-3.3.0.tar.gz", hash = "sha256:01331a0e7bb1a8ff7573311b486c88f3d0c431c388f5a1e4a9b6b26911dd79b8", size = 85941, upload-time = "2025-10-02T17:16:27.591Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a7/06/67296d050a72dcd76f57f220df621cb27e5b9282ba7ad0f5f74870dce241/django_auditlog-3.2.1-py3-none-any.whl", hash = "sha256:99603ca9d015f7e9b062b1c34f3e0826a3ce6ae6e5950c81bb7e663f7802a899", size = 38330, upload-time = "2025-07-03T20:07:51.735Z" },
+    { url = "https://files.pythonhosted.org/packages/f3/bc/6e1b503d1755ab09cff6480cb088def073f1303165ab59b1a09247a2e756/django_auditlog-3.3.0-py3-none-any.whl", hash = "sha256:ab0f0f556a7107ac01c8fa87137bdfbb2b6f0debf70f7753169d9a40673d2636", size = 39676, upload-time = "2025-10-02T17:15:42.922Z" },
 ]
 
 [[package]]
@@ -959,14 +959,14 @@ wheels = [
 
 [[package]]
 name = "drf-spectacular-sidecar"
-version = "2025.9.1"
+version = "2025.10.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/51/e2/85a0b8dbed8631165a6b49b2aee57636da8e4e710c444566636ffd972a7b/drf_spectacular_sidecar-2025.9.1.tar.gz", hash = "sha256:da2aa45da48fff76de7a1e357b84d1eb0b9df40ca89ec19d5fe94ad1037bb3c8", size = 2420902, upload-time = "2025-09-01T11:23:24.156Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c3/e4/99cd1b1c8c69788bd6cb6a2459674f8c75728e79df23ac7beddd094bf805/drf_spectacular_sidecar-2025.10.1.tar.gz", hash = "sha256:506a5a21ce1ad7211c28acb4e2112e213f6dc095a2052ee6ed6db1ffe8eb5a7b", size = 2420998, upload-time = "2025-10-01T11:23:27.092Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/96/24/db59146ba89491fe1d44ca8aef239c94bf3c7fd41523976090f099430312/drf_spectacular_sidecar-2025.9.1-py3-none-any.whl", hash = "sha256:8e80625209b8a23ff27616db305b9ab71c2e2d1069dacd99720a9c11e429af50", size = 2440255, upload-time = "2025-09-01T11:23:22.822Z" },
+    { url = "https://files.pythonhosted.org/packages/ab/87/70c67391e4ce68715d4dfae8dd33caeda2552af22f436ba55b8867a040fe/drf_spectacular_sidecar-2025.10.1-py3-none-any.whl", hash = "sha256:f1de343184d1a938179ce363d318258fe1e5f02f2f774625272364835f1c42bd", size = 2440241, upload-time = "2025-10-01T11:23:25.743Z" },
 ]
 
 [[package]]
@@ -2263,7 +2263,7 @@ requires-dist = [
     { name = "dateparser", specifier = "~=1.2" },
     { name = "django", specifier = "~=5.2.5" },
     { name = "django-allauth", extras = ["mfa", "socialaccount"], specifier = "~=65.12.1" },
-    { name = "django-auditlog", specifier = "~=3.2.1" },
+    { name = "django-auditlog", specifier = "~=3.3.0" },
     { name = "django-cachalot", specifier = "~=2.8.0" },
     { name = "django-celery-results", specifier = "~=2.6.0" },
     { name = "django-compression-middleware", specifier = "~=0.5.0" },
@@ -2277,7 +2277,7 @@ requires-dist = [
     { name = "djangorestframework", specifier = "~=3.16" },
     { name = "djangorestframework-guardian", specifier = "~=0.4.0" },
     { name = "drf-spectacular", specifier = "~=0.28" },
-    { name = "drf-spectacular-sidecar", specifier = "~=2025.9.1" },
+    { name = "drf-spectacular-sidecar", specifier = "~=2025.10.1" },
     { name = "drf-writable-nested", specifier = "~=0.7.1" },
     { name = "filelock", specifier = "~=3.20.0" },
     { name = "flower", specifier = "~=2.0.1" },
