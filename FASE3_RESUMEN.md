@@ -9,9 +9,11 @@
 ## 📦 Qué se Implementó
 
 ### 1️⃣ Clasificación con BERT
+
 **Archivo**: `src/documents/ml/classifier.py`
 
 Clasificador de documentos basado en transformers:
+
 ```
 ✅ TransformerDocumentClassifier - Clase principal
 ✅ Entrenamiento en datos propios
@@ -21,14 +23,17 @@ Clasificador de documentos basado en transformers:
 ```
 
 **Modelos soportados**:
+
 - `distilbert-base-uncased` (132MB, rápido) - por defecto
 - `bert-base-uncased` (440MB, más preciso)
 - `albert-base-v2` (47MB, más pequeño)
 
 ### 2️⃣ Reconocimiento de Entidades (NER)
+
 **Archivo**: `src/documents/ml/ner.py`
 
 Extracción automática de información estructurada:
+
 ```python
 ✅ DocumentNER - Clase principal
 ✅ Extracción de personas, organizaciones, ubicaciones
@@ -38,13 +43,16 @@ Extracción automática de información estructurada:
 ```
 
 **Entidades extraídas**:
+
 - **Vía BERT**: Personas, Organizaciones, Ubicaciones
 - **Vía Regex**: Fechas, Montos, Facturas, Emails, Teléfonos
 
 ### 3️⃣ Búsqueda Semántica
+
 **Archivo**: `src/documents/ml/semantic_search.py`
 
 Búsqueda por significado, no solo palabras clave:
+
 ```python
 ✅ SemanticSearch - Clase principal
 ✅ Indexación de documentos
@@ -54,6 +62,7 @@ Búsqueda por significado, no solo palabras clave:
 ```
 
 **Modelos soportados**:
+
 - `all-MiniLM-L6-v2` (80MB, rápido, buena calidad) - por defecto
 - `all-mpnet-base-v2` (420MB, máxima calidad)
 - `paraphrase-multilingual-...` (multilingüe)
@@ -64,13 +73,13 @@ Búsqueda por significado, no solo palabras clave:
 
 ### Antes vs Después
 
-| Métrica | Antes | Después | Mejora |
-|---------|-------|---------|--------|
-| **Precisión clasificación** | 70-75% | 90-95% | **+20-25%** |
-| **Extracción metadatos** | Manual | Automática | **100%** |
-| **Tiempo entrada datos** | 2-5 min/doc | 0 seg/doc | **100%** |
-| **Relevancia búsqueda** | 40% | 85% | **+45%** |
-| **Falsos positivos** | 15% | 3% | **-80%** |
+| Métrica                     | Antes       | Después    | Mejora      |
+| --------------------------- | ----------- | ---------- | ----------- |
+| **Precisión clasificación** | 70-75%      | 90-95%     | **+20-25%** |
+| **Extracción metadatos**    | Manual      | Automática | **100%**    |
+| **Tiempo entrada datos**    | 2-5 min/doc | 0 seg/doc  | **100%**    |
+| **Relevancia búsqueda**     | 40%         | 85%        | **+45%**    |
+| **Falsos positivos**        | 15%         | 3%         | **-80%**    |
 
 ### Impacto Visual
 
@@ -89,6 +98,7 @@ Después: █████████░ 85% (+45%)
 ## 🎯 Cómo Usar
 
 ### Paso 1: Instalar Dependencias
+
 ```bash
 pip install transformers>=4.30.0
 pip install torch>=2.0.0
@@ -98,6 +108,7 @@ pip install sentence-transformers>=2.2.0
 **Tamaño total**: ~500MB (modelos se descargan en primer uso)
 
 ### Paso 2: Usar Clasificación
+
 ```python
 from documents.ml import TransformerDocumentClassifier
 
@@ -115,6 +126,7 @@ print(f"Predicción: {predicted} con {confidence:.2%} confianza")
 ```
 
 ### Paso 3: Usar NER
+
 ```python
 from documents.ml import DocumentNER
 
@@ -137,6 +149,7 @@ invoice_data = ner.extract_invoice_data(texto_factura)
 ```
 
 ### Paso 4: Usar Búsqueda Semántica
+
 ```python
 from documents.ml import SemanticSearch
 
@@ -163,6 +176,7 @@ similar = search.find_similar_documents(document_id=123, top_k=5)
 ## 💡 Casos de Uso
 
 ### Caso 1: Procesamiento Automático de Facturas
+
 ```python
 from documents.ml import DocumentNER
 
@@ -190,6 +204,7 @@ documento.monto = 1234.56
 ```
 
 ### Caso 2: Búsqueda Inteligente
+
 ```python
 # Usuario busca: "gastos de viaje de negocios"
 results = search.search("gastos de viaje de negocios")
@@ -203,6 +218,7 @@ results = search.search("gastos de viaje de negocios")
 ```
 
 ### Caso 3: Detección de Duplicados
+
 ```python
 # Buscar documentos similares al nuevo
 nuevo_doc_id = 12345
@@ -213,6 +229,7 @@ if similares and similares[0][1] > 0.95:  # 95% similar
 ```
 
 ### Caso 4: Auto-etiquetado Inteligente
+
 ```python
 texto = """
 Estimado Juan,
@@ -233,6 +250,7 @@ entities = ner.extract_entities(texto)
 ## 🔍 Verificar que Funciona
 
 ### 1. Probar Clasificación
+
 ```python
 from documents.ml import TransformerDocumentClassifier
 
@@ -255,6 +273,7 @@ print(f"Predicción: {pred} ({conf:.2%} confianza)")
 ```
 
 ### 2. Probar NER
+
 ```python
 from documents.ml import DocumentNER
 
@@ -275,6 +294,7 @@ for tipo, valores in entities.items():
 ```
 
 ### 3. Probar Búsqueda Semántica
+
 ```python
 from documents.ml import SemanticSearch
 
@@ -314,11 +334,13 @@ Antes de desplegar a producción:
 ## 💾 Requisitos de Recursos
 
 ### Espacio en Disco
+
 - **Modelos**: ~500MB
 - **Índice** (10,000 docs): ~200MB
 - **Total**: ~700MB
 
 ### Memoria (RAM)
+
 - **CPU**: 2-4GB
 - **GPU**: 4-8GB (recomendado)
 - **Mínimo**: 8GB RAM total
@@ -327,11 +349,13 @@ Antes de desplegar a producción:
 ### Velocidad de Procesamiento
 
 **CPU (Intel i7)**:
+
 - Clasificación: 100-200 docs/min
 - NER: 50-100 docs/min
 - Indexación: 20-50 docs/min
 
 **GPU (NVIDIA RTX 3060)**:
+
 - Clasificación: 500-1000 docs/min
 - NER: 300-500 docs/min
 - Indexación: 200-400 docs/min
@@ -360,16 +384,19 @@ rm -rf src/documents/ml/
 ## 🎓 Mejores Prácticas
 
 ### 1. Selección de Modelo
+
 - **Empezar con DistilBERT**: Buen balance velocidad/precisión
 - **BERT**: Si necesitas máxima precisión
 - **ALBERT**: Si tienes limitaciones de memoria
 
 ### 2. Datos de Entrenamiento
+
 - **Mínimo**: 50-100 ejemplos por clase
 - **Bueno**: 500+ ejemplos por clase
 - **Ideal**: 1000+ ejemplos por clase
 
 ### 3. Procesamiento por Lotes
+
 ```python
 # Bueno: Por lotes
 results = classifier.predict_batch(docs, batch_size=32)
@@ -379,6 +406,7 @@ results = [classifier.predict(doc) for doc in docs]
 ```
 
 ### 4. Cachear Modelos
+
 ```python
 # Bueno: Reutilizar instancia
 _classifier = None
@@ -411,16 +439,19 @@ classifier = TransformerDocumentClassifier()  # ¡Lento!
 ## 🎯 Próximos Pasos
 
 ### Esta Semana
+
 1. ✅ Instalar dependencias
 2. 🔄 Probar con datos de ejemplo
 3. 🔄 Entrenar modelo de clasificación
 
 ### Próximas Semanas
+
 1. 📋 Integrar NER en procesamiento
 2. 📋 Implementar búsqueda semántica
 3. 📋 Entrenar con datos reales
 
 ### Próximas Fases (Opcional)
+
 - **Fase 4**: OCR Avanzado (extracción de tablas, escritura a mano)
 - **Fase 5**: Apps móviles y colaboración
 
@@ -441,7 +472,7 @@ Has implementado la tercera fase de mejoras IA/ML. El sistema ahora tiene:
 
 ---
 
-*Implementado: 9 de noviembre de 2025*
-*Fase: 3 de 5*
-*Estado: ✅ Listo para Testing*
-*Mejora: 40-60% mejor precisión en clasificación*
+_Implementado: 9 de noviembre de 2025_
+_Fase: 3 de 5_
+_Estado: ✅ Listo para Testing_
+_Mejora: 40-60% mejor precisión en clasificación_

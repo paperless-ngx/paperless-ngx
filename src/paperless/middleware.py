@@ -86,9 +86,9 @@ class RateLimitMiddleware:
         """
         # Find matching rate limit for this path
         limit, window = self.rate_limits["default"]
-        for pattern, (l, w) in self.rate_limits.items():
+        for pattern, (lim, win) in self.rate_limits.items():
             if pattern != "default" and path.startswith(pattern):
-                limit, window = l, w
+                limit, window = lim, win
                 break
 
         # Build cache key

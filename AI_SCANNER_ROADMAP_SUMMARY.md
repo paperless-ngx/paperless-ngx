@@ -15,7 +15,9 @@ Llevar el AI Scanner de **PRODUCTION READY** a **PRODUCTION EXCELLENCE** mediant
 ## 📚 Documentación de Planificación
 
 ### 1. AI_SCANNER_IMPROVEMENT_PLAN.md (27KB)
+
 **Plan maestro completo con:**
+
 - 10 épicas organizadas por área
 - 35+ issues detallados
 - Tareas específicas para cada issue
@@ -26,14 +28,18 @@ Llevar el AI Scanner de **PRODUCTION READY** a **PRODUCTION EXCELLENCE** mediant
 - Métricas de éxito
 
 ### 2. GITHUB_ISSUES_TEMPLATE.md (15KB)
+
 **Templates listos para crear issues:**
+
 - 14 issues principales formateados
 - Labels sugeridos
 - Formato consistente
 - Instrucciones de creación
 
 ### 3. AI_SCANNER_IMPLEMENTATION.md (11KB)
+
 **Documentación técnica de implementación:**
+
 - Arquitectura del sistema
 - Features implementadas
 - Compliance con agents.md
@@ -44,6 +50,7 @@ Llevar el AI Scanner de **PRODUCTION READY** a **PRODUCTION EXCELLENCE** mediant
 ## 📊 Las 10 Épicas del Roadmap
 
 ### ÉPICA 1: Testing y Calidad de Código
+
 **Issues**: 4 | **Prioridad**: 🔴 ALTA | **Estimación**: 6-9 días
 
 - Tests unitarios AI Scanner (90% cobertura)
@@ -56,6 +63,7 @@ Llevar el AI Scanner de **PRODUCTION READY** a **PRODUCTION EXCELLENCE** mediant
 ---
 
 ### ÉPICA 2: Migraciones de Base de Datos
+
 **Issues**: 2 | **Prioridad**: 🔴 ALTA | **Estimación**: 1.5 días
 
 - Migración Django para DeletionRequest
@@ -66,6 +74,7 @@ Llevar el AI Scanner de **PRODUCTION READY** a **PRODUCTION EXCELLENCE** mediant
 ---
 
 ### ÉPICA 3: API REST Endpoints
+
 **Issues**: 4 | **Prioridad**: 🔴 ALTA (2) + 🟡 MEDIA (1) + 🟢 BAJA (1) | **Estimación**: 8-10 días
 
 - Endpoints Deletion Requests (listado, detalle, acciones)
@@ -77,6 +86,7 @@ Llevar el AI Scanner de **PRODUCTION READY** a **PRODUCTION EXCELLENCE** mediant
 ---
 
 ### ÉPICA 4: Integración Frontend
+
 **Issues**: 4 | **Prioridad**: 🔴 ALTA (2) + 🟡 MEDIA (2) | **Estimación**: 9-13 días
 
 - UI AI Suggestions en Document Detail
@@ -89,6 +99,7 @@ Llevar el AI Scanner de **PRODUCTION READY** a **PRODUCTION EXCELLENCE** mediant
 ---
 
 ### ÉPICA 5: Optimización de Performance
+
 **Issues**: 4 | **Prioridad**: 🟡 MEDIA | **Estimación**: 7-9 días
 
 - Caching de modelos ML
@@ -101,6 +112,7 @@ Llevar el AI Scanner de **PRODUCTION READY** a **PRODUCTION EXCELLENCE** mediant
 ---
 
 ### ÉPICA 6: Mejoras de ML/AI
+
 **Issues**: 4 | **Prioridad**: 🟡 MEDIA (3) + 🟢 BAJA (1) | **Estimación**: 10-14 días
 
 - Training pipeline para modelos custom
@@ -113,6 +125,7 @@ Llevar el AI Scanner de **PRODUCTION READY** a **PRODUCTION EXCELLENCE** mediant
 ---
 
 ### ÉPICA 7: Monitoreo y Observabilidad
+
 **Issues**: 3 | **Prioridad**: 🟡 MEDIA | **Estimación**: 4-5 días
 
 - Metrics y logging estructurado
@@ -124,6 +137,7 @@ Llevar el AI Scanner de **PRODUCTION READY** a **PRODUCTION EXCELLENCE** mediant
 ---
 
 ### ÉPICA 8: Documentación de Usuario
+
 **Issues**: 3 | **Prioridad**: 🔴 ALTA (1) + 🟡 MEDIA (2) | **Estimación**: 5-7 días
 
 - Guía de usuario para AI features
@@ -135,6 +149,7 @@ Llevar el AI Scanner de **PRODUCTION READY** a **PRODUCTION EXCELLENCE** mediant
 ---
 
 ### ÉPICA 9: Seguridad Avanzada
+
 **Issues**: 3 | **Prioridad**: 🔴 ALTA (1) + 🟡 MEDIA (2) | **Estimación**: 4-5 días
 
 - Rate limiting para AI operations
@@ -146,6 +161,7 @@ Llevar el AI Scanner de **PRODUCTION READY** a **PRODUCTION EXCELLENCE** mediant
 ---
 
 ### ÉPICA 10: Internacionalización
+
 **Issues**: 1 | **Prioridad**: 🟢 BAJA | **Estimación**: 1-2 días
 
 - Traducción de mensajes de AI
@@ -157,6 +173,7 @@ Llevar el AI Scanner de **PRODUCTION READY** a **PRODUCTION EXCELLENCE** mediant
 ## 📅 Roadmap Detallado (6 Sprints)
 
 ### 🏃 Sprint 1 (2 semanas) - Fundamentos
+
 **Focus**: Testing y Database
 
 - ✅ Issue 1.1: Tests Unitarios AI Scanner
@@ -169,6 +186,7 @@ Llevar el AI Scanner de **PRODUCTION READY** a **PRODUCTION EXCELLENCE** mediant
 ---
 
 ### 🏃 Sprint 2 (2 semanas) - API
+
 **Focus**: REST Endpoints
 
 - ✅ Issue 3.1: API Deletion Requests - Listado
@@ -180,6 +198,7 @@ Llevar el AI Scanner de **PRODUCTION READY** a **PRODUCTION EXCELLENCE** mediant
 ---
 
 ### 🏃 Sprint 3 (2 semanas) - Frontend
+
 **Focus**: UI/UX
 
 - ✅ Issue 4.1: UI AI Suggestions
@@ -191,6 +210,7 @@ Llevar el AI Scanner de **PRODUCTION READY** a **PRODUCTION EXCELLENCE** mediant
 ---
 
 ### 🏃 Sprint 4 (2 semanas) - Performance
+
 **Focus**: Optimización
 
 - ✅ Issue 5.1: Caching Modelos ML
@@ -202,6 +222,7 @@ Llevar el AI Scanner de **PRODUCTION READY** a **PRODUCTION EXCELLENCE** mediant
 ---
 
 ### 🏃 Sprint 5 (2 semanas) - Documentación y Refinamiento
+
 **Focus**: Docs y Calidad
 
 - ✅ Issue 8.1: Guía de Usuario
@@ -214,6 +235,7 @@ Llevar el AI Scanner de **PRODUCTION READY** a **PRODUCTION EXCELLENCE** mediant
 ---
 
 ### 🏃 Sprint 6 (2 semanas) - ML Improvements
+
 **Focus**: Mejoras ML
 
 - ✅ Issue 6.1: Training Pipeline
@@ -227,20 +249,24 @@ Llevar el AI Scanner de **PRODUCTION READY** a **PRODUCTION EXCELLENCE** mediant
 ## 📈 Métricas de Éxito
 
 ### Cobertura de Tests
+
 - ✅ Target: >90% código crítico
 - ✅ Target: >80% código general
 
 ### Performance
+
 - ✅ AI Scan time: <2s por documento
 - ✅ API response time: <200ms
 - ✅ UI load time: <1s
 
 ### Calidad
+
 - ✅ Zero linting errors
 - ✅ Zero security vulnerabilities
 - ✅ API uptime: >99.9%
 
 ### User Satisfaction
+
 - ✅ User feedback: >4.5/5
 - ✅ AI suggestion acceptance rate: >70%
 - ✅ Deletion request false positive rate: <5%
@@ -250,10 +276,12 @@ Llevar el AI Scanner de **PRODUCTION READY** a **PRODUCTION EXCELLENCE** mediant
 ## 🎯 Distribución por Prioridad
 
 ### 🔴 Prioridad ALTA (8 issues)
+
 **Tiempo estimado**: ~20-27 días
 **% del total**: 23%
 
 Incluye fundamentos críticos:
+
 - Tests completos
 - Migración DB
 - API básica
@@ -266,10 +294,12 @@ Incluye fundamentos críticos:
 ---
 
 ### 🟡 Prioridad MEDIA (18 issues)
+
 **Tiempo estimado**: ~30-40 días
 **% del total**: 51%
 
 Incluye optimizaciones y mejoras:
+
 - Performance
 - ML improvements
 - Monitoreo
@@ -281,10 +311,12 @@ Incluye optimizaciones y mejoras:
 ---
 
 ### 🟢 Prioridad BAJA (9 issues)
+
 **Tiempo estimado**: ~10-13 días
 **% del total**: 26%
 
 Nice to have:
+
 - Webhooks
 - Active learning
 - i18n
@@ -297,21 +329,25 @@ Nice to have:
 ## 💰 Estimación de Recursos
 
 ### Tiempo Total
+
 - **Mínimo**: 60 días desarrollo
 - **Máximo**: 80 días desarrollo
 - **Promedio**: 70 días (3.5 meses)
 
 ### Con 1 Desarrollador
+
 - **6 sprints** de 2 semanas
 - **3-4 meses** calendario
 - **Disponibilidad**: 100%
 
 ### Con 2 Desarrolladores
+
 - **3-4 sprints** paralelos
 - **1.5-2 meses** calendario
 - **Coordinación**: esencial
 
 ### Con Equipo (3+)
+
 - **2-3 sprints** paralelos
 - **1-1.5 meses** calendario
 - **Gestión**: crítica
@@ -321,6 +357,7 @@ Nice to have:
 ## 🚀 Cómo Empezar
 
 ### Paso 1: Crear Issues en GitHub
+
 1. Abrir `GITHUB_ISSUES_TEMPLATE.md`
 2. Copiar template del primer issue
 3. Crear issue en GitHub con labels
@@ -329,12 +366,14 @@ Nice to have:
 **Alternativa**: Crear todos los issues de una vez
 
 ### Paso 2: Configurar Proyecto GitHub
+
 1. Crear GitHub Project
 2. Añadir columnas: Backlog, Sprint, In Progress, Review, Done
 3. Añadir todos los issues al proyecto
 4. Organizarlos por épica y sprint
 
 ### Paso 3: Iniciar Sprint 1
+
 1. Mover issues de Sprint 1 a "Sprint"
 2. Asignar desarrolladores
 3. Comenzar con Issue 1.1 (Tests AI Scanner)
@@ -342,6 +381,7 @@ Nice to have:
 5. Sprint review al finalizar
 
 ### Paso 4: Iteración
+
 1. Completar Sprint 1
 2. Review y retrospectiva
 3. Planificar Sprint 2
@@ -354,18 +394,21 @@ Nice to have:
 ### KPIs por Sprint
 
 **Sprint 1-2** (Fundamentos + API):
+
 - Tests coverage: actual vs target
 - Migration status: pending/done
 - API endpoints: implemented/total
 - Documentation: pages completed
 
 **Sprint 3-4** (Frontend + Performance):
+
 - UI components: completed/total
 - Performance metrics: before/after
 - User acceptance: feedback score
 - Bug count: open/resolved
 
 **Sprint 5-6** (Docs + ML):
+
 - Docs pages: completed/total
 - ML accuracy: improvement %
 - Code quality: linting score
@@ -376,6 +419,7 @@ Nice to have:
 ## 🎓 Lessons Learned (Para Actualizar)
 
 Esta sección se actualizará después de cada sprint con:
+
 - Qué funcionó bien
 - Qué se puede mejorar
 - Blockers encontrados
@@ -387,6 +431,7 @@ Esta sección se actualizará después de cada sprint con:
 ## 📞 Contacto y Soporte
 
 **Documentación**:
+
 - Plan completo: `AI_SCANNER_IMPROVEMENT_PLAN.md`
 - Templates issues: `GITHUB_ISSUES_TEMPLATE.md`
 - Implementación actual: `AI_SCANNER_IMPLEMENTATION.md`
@@ -421,6 +466,6 @@ Este roadmap transforma el AI Scanner de un sistema functional a una solución d
 
 ---
 
-*Documento creado: 2025-11-11*
-*Última actualización: 2025-11-11*
-*Versión: 1.0*
+_Documento creado: 2025-11-11_
+_Última actualización: 2025-11-11_
+_Versión: 1.0_

@@ -70,6 +70,7 @@ cd ..
 ```
 
 **What's New in IntelliDocs:**
+
 - ⚡ **147x faster** performance with optimized caching
 - 🔒 **A+ security score** with rate limiting and security headers
 - 🤖 **BERT classification** with 90-95% accuracy
@@ -78,6 +79,7 @@ cd ..
 - 🔍 **Semantic search** for better document discovery
 
 For detailed Docker setup instructions, see:
+
 - **[DOCKER_SETUP_INTELLIDOCS.md](DOCKER_SETUP_INTELLIDOCS.md)** - Complete guide with all features
 - **[docker/README_INTELLIDOCS.md](docker/README_INTELLIDOCS.md)** - Docker-specific documentation
 

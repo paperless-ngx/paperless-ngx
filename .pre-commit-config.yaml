@@ -58,10 +58,12 @@ repos:
     hooks:
       - id: pyproject-fmt
   # Dockerfile hooks
-  - repo: https://github.com/AleksaC/hadolint-py
-    rev: v2.14.0
-    hooks:
-      - id: hadolint
+  # TEMPORARILY DISABLED: hadolint-py has HTTP 403 errors when downloading binaries
+  # TODO: Re-enable with official hadolint hook or working version
+  # - repo: https://github.com/AleksaC/hadolint-py
+  #   rev: v2.14.0
+  #   hooks:
+  #     - id: hadolint
   # Shell script hooks
   - repo: https://github.com/lovesegfault/beautysh
     rev: v6.2.1
@@ -71,10 +73,12 @@ repos:
           - setuptools
         args:
           - "--tab"
-  - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: "v0.11.0.1"
-    hooks:
-      - id: shellcheck
+  # TEMPORARILY DISABLED: shellcheck-py has HTTP 403 errors when downloading binaries
+  # TODO: Re-enable with working version or alternative
+  # - repo: https://github.com/shellcheck-py/shellcheck-py
+  #   rev: "v0.11.0.1"
+  #   hooks:
+  #     - id: shellcheck
   - repo: https://github.com/google/yamlfmt
     rev: v0.18.0
     hooks:

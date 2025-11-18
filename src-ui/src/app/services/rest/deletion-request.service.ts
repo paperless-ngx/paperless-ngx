@@ -1,7 +1,6 @@
-import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Observable } from 'rxjs'
-import { tap, catchError } from 'rxjs/operators'
+import { catchError, tap } from 'rxjs/operators'
 import { DeletionRequest } from 'src/app/data/deletion-request'
 import { AbstractPaperlessService } from './abstract-paperless-service'
 

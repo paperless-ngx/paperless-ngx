@@ -19,6 +19,7 @@ Este documento proporciona instrucciones completas para ejecutar IntelliDocs con
 ### Hardware Recomendado
 
 Para las nuevas funciones de IA/ML:
+
 - **CPU**: 4+ cores (8+ recomendado)
 - **RAM**: 8 GB mínimo (16 GB recomendado para ML/OCR avanzado)
 - **Disco**: 20 GB mínimo (para modelos ML y datos)
@@ -50,12 +51,14 @@ bash -c "$(curl -L https://raw.githubusercontent.com/dawnsystem/IntelliDocs-ngx/
 ### Opción 2: Setup Manual
 
 1. **Clonar el repositorio:**
+
    ```bash
    git clone https://github.com/dawnsystem/IntelliDocs-ngx.git
    cd IntelliDocs-ngx
    ```
 
 2. **Configurar variables de entorno:**
+
    ```bash
    cd docker/compose
    cp docker-compose.env docker-compose.env.local
@@ -63,6 +66,7 @@ bash -c "$(curl -L https://raw.githubusercontent.com/dawnsystem/IntelliDocs-ngx/
    ```
 
 3. **Configurar valores mínimos requeridos:**
+
    ```bash
    # Editar docker-compose.env.local
    PAPERLESS_SECRET_KEY=$(openssl rand -base64 32)
@@ -71,6 +75,7 @@ bash -c "$(curl -L https://raw.githubusercontent.com/dawnsystem/IntelliDocs-ngx/
    ```
 
 4. **Iniciar los contenedores:**
+
    ```bash
    # Con SQLite (más simple)
    docker compose -f docker-compose.sqlite.yml up -d
@@ -80,6 +85,7 @@ bash -c "$(curl -L https://raw.githubusercontent.com/dawnsystem/IntelliDocs-ngx/
    ```
 
 5. **Acceder a la aplicación:**
+
    ```
    http://localhost:8000
    ```
@@ -137,11 +143,11 @@ PAPERLESS_ML_MODEL_CACHE=/usr/src/paperless/.cache/huggingface
 
 ```yaml
 volumes:
-  - ./data:/usr/src/paperless/data        # Base de datos SQLite y datos de app
-  - ./media:/usr/src/paperless/media      # Documentos procesados
-  - ./consume:/usr/src/paperless/consume  # Documentos a procesar
-  - ./export:/usr/src/paperless/export    # Exportaciones
-  - ./ml_cache:/usr/src/paperless/.cache  # Caché de modelos ML (NUEVO)
+  - ./data:/usr/src/paperless/data # Base de datos SQLite y datos de app
+  - ./media:/usr/src/paperless/media # Documentos procesados
+  - ./consume:/usr/src/paperless/consume # Documentos a procesar
+  - ./export:/usr/src/paperless/export # Exportaciones
+  - ./ml_cache:/usr/src/paperless/.cache # Caché de modelos ML (NUEVO)
 ```
 
 **IMPORTANTE**: Crear el directorio `ml_cache` para persistir los modelos ML descargados:
@@ -158,6 +164,7 @@ chmod 777 ./ml_cache
 ### Fase 1: Optimización de Rendimiento ⚡
 
 **Mejoras Implementadas:**
+
 - 6 índices compuestos en base de datos
 - Sistema de caché mejorado con Redis
 - Invalidación automática de caché
@@ -171,6 +178,7 @@ chmod 777 ./ml_cache
 ### Fase 2: Refuerzo de Seguridad 🔒
 
 **Mejoras Implementadas:**
+
 - Rate limiting por IP
 - 7 security headers (CSP, HSTS, X-Frame-Options, etc.)
 - Validación multi-capa de archivos
@@ -192,10 +200,12 @@ PAPERLESS_COOKIE_PREFIX=intellidocs
 **Funciones Disponibles:**
 
 1. **Clasificación Automática con BERT**
+
    - Precisión: 90-95% (vs 70-80% tradicional)
    - Clasifica documentos automáticamente por tipo
 
 2. **Named Entity Recognition (NER)**
+
    - Extrae nombres, fechas, montos, emails automáticamente
    - 100% automatización de entrada de datos
 
@@ -222,11 +232,13 @@ PAPERLESS_ML_CLASSIFIER_MODEL=bert-base-uncased
 **Funciones Disponibles:**
 
 1. **Extracción de Tablas**
+
    - Precisión: 90-95%
    - Detecta y extrae tablas automáticamente
    - Exporta a CSV/Excel
 
 2. **Reconocimiento de Escritura a Mano**
+
    - Precisión: 85-92%
    - Soporta múltiples idiomas
    - Usa modelo TrOCR de Microsoft
@@ -267,6 +279,7 @@ docker build -t intellidocs-ngx:latest .
 Para usar aceleración GPU con NVIDIA:
 
 1. **Instalar NVIDIA Container Toolkit:**
+
    ```bash
    # Ubuntu/Debian
    distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
@@ -310,6 +323,7 @@ docker compose ps
 ```
 
 Deberías ver:
+
 - `webserver` (IntelliDocs)
 - `broker` (Redis)
 - `db` (PostgreSQL/MariaDB, si aplica)
@@ -375,15 +389,18 @@ docker compose exec webserver python /tmp/test_ml.py
 Una vez que la aplicación esté corriendo:
 
 1. **Subir un documento de prueba:**
+
    - Navega a http://localhost:8000
    - Sube un documento PDF o imagen
    - Observa el proceso de OCR en los logs
 
 2. **Verificar clasificación automática:**
+
    - Después de procesar, verifica si el documento fue clasificado
    - Ve a "Documents" → "Tags" para ver tags aplicados
 
 3. **Probar búsqueda semántica:**
+
    - Busca por conceptos en lugar de palabras exactas
    - Ejemplo: busca "factura de electricidad" aunque el documento diga "recibo de luz"
 
@@ -400,6 +417,7 @@ Una vez que la aplicación esté corriendo:
 **Síntoma**: El contenedor se reinicia constantemente o muestra errores de import.
 
 **Solución**:
+
 ```bash
 # Reconstruir la imagen sin caché
 docker compose build --no-cache
@@ -417,6 +435,7 @@ docker compose logs -f webserver
 **Síntoma**: El contenedor se detiene o está muy lento con documentos grandes.
 
 **Solución**:
+
 ```bash
 # Aumentar memoria asignada a Docker
 # En Docker Desktop: Settings → Resources → Memory → 8GB+
@@ -431,6 +450,7 @@ PAPERLESS_THREADS_PER_WORKER=1
 **Síntoma**: Errores sobre modelos no encontrados.
 
 **Solución**:
+
 ```bash
 # Verificar conectividad a Hugging Face
 docker compose exec webserver ping -c 3 huggingface.co
@@ -454,6 +474,7 @@ docker compose exec webserver ls -lah /usr/src/paperless/.cache/huggingface/
 **Síntoma**: PAPERLESS_USE_GPU=1 pero usa CPU.
 
 **Solución**:
+
 ```bash
 # Verificar NVIDIA Docker
 docker run --rm --gpus all nvidia/cuda:11.8.0-base-ubuntu22.04 nvidia-smi
@@ -467,6 +488,7 @@ docker compose exec webserver python -c "import torch; print(f'CUDA available: {
 **Síntoma**: Los documentos no son procesados o el texto no es extraído.
 
 **Solución**:
+
 ```bash
 # Verificar Tesseract
 docker compose exec webserver tesseract --version
@@ -483,6 +505,7 @@ docker compose exec webserver apt-get update && apt-get install -y tesseract-ocr
 **Síntoma**: Error al escribir en volúmenes.
 
 **Solución**:
+
 ```bash
 # Ajustar permisos de directorios locales
 sudo chown -R 1000:1000 ./data ./media ./consume ./export ./ml_cache
@@ -523,11 +546,13 @@ docker compose exec webserver ls -lh /usr/src/paperless/.cache/huggingface/hub/
 ### Producción
 
 1. **Usar PostgreSQL en lugar de SQLite**
+
    ```bash
    docker compose -f docker-compose.postgres.yml up -d
    ```
 
 2. **Configurar backups automáticos**
+
    ```bash
    # Backup de base de datos
    docker compose exec db pg_dump -U paperless paperless > backup.sql
@@ -537,6 +562,7 @@ docker compose exec webserver ls -lh /usr/src/paperless/.cache/huggingface/hub/
    ```
 
 3. **Usar HTTPS con reverse proxy**
+
    - Nginx o Traefik frente a IntelliDocs
    - Certificado SSL (Let's Encrypt)
 
@@ -547,6 +573,7 @@ docker compose exec webserver ls -lh /usr/src/paperless/.cache/huggingface/hub/
 ### Desarrollo
 
 1. **Usar volumen para código fuente**
+
    ```yaml
    volumes:
      - ./src:/usr/src/paperless/src

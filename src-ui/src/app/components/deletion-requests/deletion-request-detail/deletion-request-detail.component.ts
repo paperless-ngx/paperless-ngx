@@ -16,12 +16,7 @@ import { ToastService } from 'src/app/services/toast.service'
 @Component({
   selector: 'pngx-deletion-request-detail',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    NgxBootstrapIconsModule,
-    CustomDatePipe,
-  ],
+  imports: [CommonModule, FormsModule, NgxBootstrapIconsModule, CustomDatePipe],
   templateUrl: './deletion-request-detail.component.html',
 })
 export class DeletionRequestDetailComponent implements OnDestroy {

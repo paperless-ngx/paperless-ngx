@@ -8,16 +8,16 @@ This document provides a prioritized roadmap for improving IntelliDocs-ngx with 
 
 ## Quick Reference: Priority Matrix
 
-| Category | Priority | Effort | Impact | Timeline |
-|----------|----------|--------|--------|----------|
-| Performance Optimization | **High** | Low-Medium | High | 2-3 weeks |
-| Security Hardening | **High** | Medium | High | 3-4 weeks |
-| AI/ML Enhancement | **High** | High | Very High | 4-6 weeks |
-| Advanced OCR | **High** | Medium | High | 3-4 weeks |
-| Mobile Experience | Medium | Very High | Medium | 6-8 weeks |
-| Collaboration Features | Medium | Medium-High | Medium | 4-5 weeks |
-| Integration Expansion | Medium | Medium | Medium | 3-4 weeks |
-| Analytics & Reporting | Medium | Medium | Medium | 3-4 weeks |
+| Category                 | Priority | Effort      | Impact    | Timeline  |
+| ------------------------ | -------- | ----------- | --------- | --------- |
+| Performance Optimization | **High** | Low-Medium  | High      | 2-3 weeks |
+| Security Hardening       | **High** | Medium      | High      | 3-4 weeks |
+| AI/ML Enhancement        | **High** | High        | Very High | 4-6 weeks |
+| Advanced OCR             | **High** | Medium      | High      | 3-4 weeks |
+| Mobile Experience        | Medium   | Very High   | Medium    | 6-8 weeks |
+| Collaboration Features   | Medium   | Medium-High | Medium    | 4-5 weeks |
+| Integration Expansion    | Medium   | Medium      | Medium    | 3-4 weeks |
+| Analytics & Reporting    | Medium   | Medium      | Medium    | 3-4 weeks |
 
 ---
 
@@ -28,6 +28,7 @@ This document provides a prioritized roadmap for improving IntelliDocs-ngx with 
 #### 1.1.1 Database Query Optimization
 
 **Current Issues**:
+
 - N+1 queries in document list endpoint
 - Missing indexes on commonly filtered fields
 - Inefficient JOIN operations
@@ -92,6 +93,7 @@ class Migration(migrations.Migration):
 ```
 
 **Expected Results**:
+
 - 5-10x faster document list queries
 - 3-5x faster search queries
 - Reduced database CPU usage by 40-60%
@@ -166,6 +168,7 @@ CACHES = {
 ```
 
 **Expected Results**:
+
 - 10x faster metadata queries
 - 50% reduction in database load
 - Better scalability for concurrent users
@@ -183,23 +186,23 @@ CACHES = {
 const routes: Routes = [
   {
     path: 'documents',
-    loadChildren: () => import('./documents/documents.module')
-      .then(m => m.DocumentsModule)
+    loadChildren: () =>
+      import('./documents/documents.module').then((m) => m.DocumentsModule),
   },
   {
     path: 'settings',
-    loadChildren: () => import('./settings/settings.module')
-      .then(m => m.SettingsModule)
+    loadChildren: () =>
+      import('./settings/settings.module').then((m) => m.SettingsModule),
   },
   // ... other routes
-];
+]
 ```
 
 **Virtual Scrolling for Large Lists**:
 
 ```typescript
 // document-list.component.ts
-import { ScrollingModule } from '@angular/cdk/scrolling';
+import { ScrollingModule } from '@angular/cdk/scrolling'
 
 @Component({
   template: `
@@ -208,7 +211,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
         <app-document-card [document]="document"></app-document-card>
       </div>
     </cdk-virtual-scroll-viewport>
-  `
+  `,
 })
 export class DocumentListComponent {
   // Only renders visible items + buffer
@@ -242,6 +245,7 @@ loadThumbnail(documentId: number): void {
 ```
 
 **Expected Results**:
+
 - 50% faster initial page load (2-4s → 1-2s)
 - 60% smaller bundle size
 - Smooth scrolling with 10,000+ documents
@@ -343,6 +347,7 @@ python manage.py rotate_encryption_key --old-key-version 1 --new-key-version 2
 ```
 
 **Expected Results**:
+
 - Documents protected at rest
 - Compliance with GDPR, HIPAA requirements
 - Minimal performance impact (<5% overhead)
@@ -426,6 +431,7 @@ class RateLimitMiddleware:
 ```
 
 **Expected Results**:
+
 - Protection against DoS attacks
 - Fair resource allocation
 - Better system stability
@@ -719,12 +725,14 @@ class SemanticSearch:
 ```
 
 **Expected Results**:
+
 - 40-60% improvement in classification accuracy
 - Automatic metadata extraction (dates, amounts, parties)
 - Better search results (semantic understanding)
 - Support for more complex documents
 
 **Resource Requirements**:
+
 - GPU recommended (can use CPU with slower inference)
 - 4-8GB additional RAM for models
 - ~2GB disk space for models
@@ -847,6 +855,7 @@ class TableExtractor:
 ```
 
 **Expected Results**:
+
 - Extract structured data from invoices, reports
 - 80-90% accuracy on well-formatted tables
 - Export to CSV/Excel
@@ -914,6 +923,7 @@ class HandwritingRecognizer:
 **Alternative**: Use Azure Computer Vision or AWS Textract for handwriting
 
 **Expected Results**:
+
 - Support for handwritten notes, forms
 - 70-85% accuracy (depending on handwriting quality)
 - Mixed printed/handwritten text support
@@ -929,12 +939,14 @@ class HandwritingRecognizer:
 #### 2.1.1 Native Mobile Apps (React Native)
 
 **Why React Native**:
+
 - Code sharing between iOS and Android
 - Near-native performance
 - Large ecosystem
 - TypeScript support
 
 **Core Features**:
+
 ```typescript
 // MobileApp/src/screens/DocumentScanner.tsx
 import { Camera } from 'react-native-vision-camera';
@@ -1040,14 +1052,15 @@ class DocumentCommentViewSet(viewsets.ModelViewSet):
 ```
 
 **Frontend**:
+
 ```typescript
 // annotation.component.ts
 export class AnnotationComponent {
-  annotations: Annotation[] = [];
+  annotations: Annotation[] = []
 
   addHighlight(selection: Selection) {
-    const range = selection.getRangeAt(0);
-    const rect = range.getBoundingClientRect();
+    const range = selection.getRangeAt(0)
+    const rect = range.getBoundingClientRect()
 
     const annotation: Annotation = {
       type: 'highlight',
@@ -1057,21 +1070,18 @@ export class AnnotationComponent {
       width: rect.width,
       height: rect.height,
       color: '#FFFF00',
-      text: selection.toString()
-    };
+      text: selection.toString(),
+    }
 
-    this.documentService.addAnnotation(
-      this.documentId,
-      annotation
-    ).subscribe();
+    this.documentService.addAnnotation(this.documentId, annotation).subscribe()
   }
 
   renderAnnotations() {
     // Overlay annotations on PDF viewer
-    this.annotations.forEach(annotation => {
-      const element = this.createAnnotationElement(annotation);
-      this.pdfContainer.appendChild(element);
-    });
+    this.annotations.forEach((annotation) => {
+      const element = this.createAnnotationElement(annotation)
+      this.pdfContainer.appendChild(element)
+    })
   }
 }
 ```
@@ -1237,44 +1247,49 @@ class DocumentAnalytics:
 ```
 
 **Frontend Dashboard**:
+
 ```typescript
 // analytics-dashboard.component.ts
 export class AnalyticsDashboardComponent implements OnInit {
-  stats: DashboardStats;
-  chartOptions: any;
+  stats: DashboardStats
+  chartOptions: any
 
   ngOnInit() {
-    this.analyticsService.getDashboardStats().subscribe(stats => {
-      this.stats = stats;
-      this.setupCharts();
-    });
+    this.analyticsService.getDashboardStats().subscribe((stats) => {
+      this.stats = stats
+      this.setupCharts()
+    })
   }
 
   setupCharts() {
     // Upload trend chart
     this.chartOptions = {
-      series: [{
-        name: 'Documents',
-        data: this.stats.upload_trend.map(d => d.count)
-      }],
+      series: [
+        {
+          name: 'Documents',
+          data: this.stats.upload_trend.map((d) => d.count),
+        },
+      ],
       chart: {
         type: 'area',
-        height: 350
+        height: 350,
       },
       xaxis: {
-        categories: this.stats.upload_trend.map(d => d.month)
-      }
-    };
+        categories: this.stats.upload_trend.map((d) => d.month),
+      },
+    }
   }
 
   generateReport(type: string) {
-    this.analyticsService.generateReport(type, {
-      start_date: this.startDate,
-      end_date: this.endDate,
-      filters: this.filters
-    }).subscribe(blob => {
-      saveAs(blob, `report_${type}.pdf`);
-    });
+    this.analyticsService
+      .generateReport(type, {
+        start_date: this.startDate,
+        end_date: this.endDate,
+        filters: this.filters,
+      })
+      .subscribe((blob) => {
+        saveAs(blob, `report_${type}.pdf`)
+      })
   }
 }
 ```
@@ -1312,5 +1327,5 @@ Each improvement has been detailed with implementation code, expected results, a
 
 ---
 
-*Generated: 2025-11-09*
-*For: IntelliDocs-ngx v2.19.5*
+_Generated: 2025-11-09_
+_For: IntelliDocs-ngx v2.19.5_

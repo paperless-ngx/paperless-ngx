@@ -1,10 +1,10 @@
-import { TestBed } from '@angular/core/testing'
 import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing'
-import { DeletionRequestService } from './deletion-request.service'
+import { TestBed } from '@angular/core/testing'
 import { environment } from 'src/environments/environment'
+import { DeletionRequestService } from './deletion-request.service'
 
 describe('DeletionRequestService', () => {
   let service: DeletionRequestService

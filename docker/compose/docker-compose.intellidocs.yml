@@ -20,7 +20,6 @@
 # 3. Run: docker compose -f docker-compose.intellidocs.yml up -d
 #
 # For more details, see: DOCKER_SETUP_INTELLIDOCS.md
-
 services:
   broker:
     image: docker.io/library/redis:8
@@ -29,17 +28,14 @@ services:
       - redisdata:/data
     # Redis configuration for better performance with caching
     command: >
-      redis-server
-      --maxmemory 512mb
-      --maxmemory-policy allkeys-lru
-      --save 60 1000
+      redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru --save 60 1000
+
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 30s
-
   webserver:
     build:
       context: ../..
@@ -82,23 +78,22 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 120s  # ML models may take time to load on first start
+      start_period: 120s # ML models may take time to load on first start
     # Resource limits (adjust based on your system)
     deploy:
       resources:
         limits:
-          memory: 8G  # Increase for larger ML models
+          memory: 8G # Increase for larger ML models
         reservations:
-          memory: 4G  # Minimum for ML features
-    # Uncomment below for GPU support (requires nvidia-container-toolkit)
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
-
+          memory: 4G # Minimum for ML features
+          # Uncomment below for GPU support (requires nvidia-container-toolkit)
+          # deploy:
+          #   resources:
+          #     reservations:
+          #       devices:
+          #         - driver: nvidia
+          #           count: 1
+          #           capabilities: [gpu]
 volumes:
   data:
     driver: local

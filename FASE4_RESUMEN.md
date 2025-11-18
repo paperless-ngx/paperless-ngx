@@ -3,6 +3,7 @@
 ## 📋 Resumen
 
 Se ha implementado un sistema completo de OCR avanzado que incluye:
+
 - **Extracción de tablas** de documentos
 - **Reconocimiento de escritura a mano**
 - **Detección de campos de formularios**
@@ -14,6 +15,7 @@ Se ha implementado un sistema completo de OCR avanzado que incluye:
 Extrae automáticamente tablas de documentos y las convierte en datos estructurados.
 
 **Capacidades:**
+
 - ✅ Detección de tablas con deep learning
 - ✅ Extracción a pandas DataFrame
 - ✅ Exportación a CSV, JSON, Excel
@@ -21,6 +23,7 @@ Extrae automáticamente tablas de documentos y las convierte en datos estructura
 - ✅ Procesamiento por lotes
 
 **Ejemplo de Uso:**
+
 ```python
 from documents.ocr import TableExtractor
 
@@ -39,6 +42,7 @@ extractor.save_tables_to_excel(tablas, "tablas_extraidas.xlsx")
 ```
 
 **Casos de Uso:**
+
 - 📊 Facturas con líneas de items
 - 📈 Reportes financieros con datos tabulares
 - 📋 Listas de precios
@@ -49,6 +53,7 @@ extractor.save_tables_to_excel(tablas, "tablas_extraidas.xlsx")
 Reconoce texto manuscrito usando modelos de transformers de última generación (TrOCR).
 
 **Capacidades:**
+
 - ✅ Reconocimiento de escritura a mano
 - ✅ Detección automática de líneas
 - ✅ Puntuación de confianza
@@ -56,6 +61,7 @@ Reconoce texto manuscrito usando modelos de transformers de última generación 
 - ✅ Preprocesamiento automático
 
 **Ejemplo de Uso:**
+
 ```python
 from documents.ocr import HandwritingRecognizer
 
@@ -78,6 +84,7 @@ print(datos)  # {'Nombre': 'Juan Pérez', 'Fecha': '15/01/2024'}
 ```
 
 **Casos de Uso:**
+
 - ✍️ Formularios llenados a mano
 - 📝 Notas manuscritas
 - 📋 Solicitudes firmadas
@@ -88,6 +95,7 @@ print(datos)  # {'Nombre': 'Juan Pérez', 'Fecha': '15/01/2024'}
 Detecta y extrae automáticamente campos de formularios.
 
 **Capacidades:**
+
 - ✅ Detección de checkboxes (marcados/no marcados)
 - ✅ Detección de campos de texto
 - ✅ Asociación automática de etiquetas
@@ -95,6 +103,7 @@ Detecta y extrae automáticamente campos de formularios.
 - ✅ Salida estructurada
 
 **Ejemplo de Uso:**
+
 ```python
 from documents.ocr import FormFieldDetector
 
@@ -117,6 +126,7 @@ print(datos)
 ```
 
 **Casos de Uso:**
+
 - 📄 Formularios de solicitud
 - ✔️ Encuestas con checkboxes
 - 📋 Formularios de registro
@@ -126,43 +136,45 @@ print(datos)
 
 ### Extracción de Tablas
 
-| Métrica | Valor |
-|---------|-------|
-| **Precisión de detección** | 90-95% |
-| **Precisión de extracción** | 85-90% |
-| **Velocidad (CPU)** | 2-5 seg/página |
-| **Velocidad (GPU)** | 0.5-1 seg/página |
-| **Uso de memoria** | ~2GB |
+| Métrica                     | Valor            |
+| --------------------------- | ---------------- |
+| **Precisión de detección**  | 90-95%           |
+| **Precisión de extracción** | 85-90%           |
+| **Velocidad (CPU)**         | 2-5 seg/página   |
+| **Velocidad (GPU)**         | 0.5-1 seg/página |
+| **Uso de memoria**          | ~2GB             |
 
 **Resultados Típicos:**
+
 - Tablas simples (con líneas): 95% precisión
 - Tablas complejas (anidadas): 80-85% precisión
 - Tablas sin bordes: 70-75% precisión
 
 ### Reconocimiento de Escritura
 
-| Métrica | Valor |
-|---------|-------|
-| **Precisión** | 85-92% (inglés) |
-| **Tasa de error** | 8-15% |
-| **Velocidad (CPU)** | 1-2 seg/línea |
+| Métrica             | Valor             |
+| ------------------- | ----------------- |
+| **Precisión**       | 85-92% (inglés)   |
+| **Tasa de error**   | 8-15%             |
+| **Velocidad (CPU)** | 1-2 seg/línea     |
 | **Velocidad (GPU)** | 0.1-0.3 seg/línea |
-| **Uso de memoria** | ~1.5GB |
+| **Uso de memoria**  | ~1.5GB            |
 
 **Precisión por Calidad:**
+
 - Escritura clara y limpia: 90-95%
 - Escritura promedio: 85-90%
 - Escritura cursiva/difícil: 70-80%
 
 ### Detección de Formularios
 
-| Métrica | Valor |
-|---------|-------|
-| **Detección de checkboxes** | 95-98% |
-| **Precisión de estado** | 92-96% |
-| **Detección de campos** | 88-93% |
-| **Asociación de etiquetas** | 85-90% |
-| **Velocidad** | 2-4 seg/formulario |
+| Métrica                     | Valor              |
+| --------------------------- | ------------------ |
+| **Detección de checkboxes** | 95-98%             |
+| **Precisión de estado**     | 92-96%             |
+| **Detección de campos**     | 88-93%             |
+| **Asociación de etiquetas** | 85-90%             |
+| **Velocidad**               | 2-4 seg/formulario |
 
 ## 🚀 Instalación
 
@@ -192,6 +204,7 @@ pip install openpyxl>=3.1.0
 ### Dependencias del Sistema
 
 **Tesseract OCR:**
+
 ```bash
 # Ubuntu/Debian
 sudo apt-get install tesseract-ocr
@@ -201,6 +214,7 @@ brew install tesseract
 ```
 
 **Poppler (para PDF):**
+
 ```bash
 # Ubuntu/Debian
 sudo apt-get install poppler-utils
@@ -212,12 +226,14 @@ brew install poppler
 ## 💻 Requisitos de Hardware
 
 ### Mínimo
+
 - **CPU**: Intel i5 o equivalente
 - **RAM**: 8GB
 - **Disco**: 2GB para modelos
 - **GPU**: No requerida (fallback a CPU)
 
 ### Recomendado para Producción
+
 - **CPU**: Intel i7/Xeon o equivalente
 - **RAM**: 16GB
 - **Disco**: 5GB (modelos + caché)
@@ -314,26 +330,34 @@ resultado = digitalizar_documento("formulario_complejo.jpg")
 ### Errores Comunes
 
 **1. No se Encuentra Tesseract**
+
 ```
 TesseractNotFoundError
 ```
+
 **Solución**: Instalar Tesseract OCR (ver sección de Instalación)
 
 **2. Memoria GPU Insuficiente**
+
 ```
 CUDA out of memory
 ```
+
 **Solución**: Usar modo CPU:
+
 ```python
 extractor = TableExtractor(use_gpu=False)
 recognizer = HandwritingRecognizer(use_gpu=False)
 ```
 
 **3. Baja Precisión**
+
 ```
 Precisión < 70%
 ```
+
 **Soluciones:**
+
 - Mejorar calidad de imagen (mayor resolución, mejor contraste)
 - Usar modelos más grandes (trocr-large-handwritten)
 - Preprocesar imágenes (eliminar ruido, enderezar)
@@ -341,12 +365,14 @@ Precisión < 70%
 ## 📈 Mejoras Esperadas
 
 ### Antes (OCR Básico)
+
 - ❌ Sin extracción de tablas
 - ❌ Sin reconocimiento de escritura a mano
 - ❌ Extracción manual de datos
 - ❌ Procesamiento lento
 
 ### Después (OCR Avanzado)
+
 - ✅ Extracción automática de tablas (90-95% precisión)
 - ✅ Reconocimiento de escritura (85-92% precisión)
 - ✅ Detección automática de campos (88-93% precisión)
@@ -354,34 +380,38 @@ Precisión < 70%
 
 ### Impacto en Tiempo
 
-| Tarea | Manual | Con OCR Avanzado | Ahorro |
-|-------|--------|------------------|--------|
-| Extraer tabla de factura | 5-10 min | 5 seg | **99%** |
-| Transcribir formulario manuscrito | 10-15 min | 30 seg | **97%** |
-| Extraer datos de formulario | 3-5 min | 3 seg | **99%** |
-| Procesar 100 documentos | 10-15 horas | 15-30 min | **98%** |
+| Tarea                             | Manual      | Con OCR Avanzado | Ahorro  |
+| --------------------------------- | ----------- | ---------------- | ------- |
+| Extraer tabla de factura          | 5-10 min    | 5 seg            | **99%** |
+| Transcribir formulario manuscrito | 10-15 min   | 30 seg           | **97%** |
+| Extraer datos de formulario       | 3-5 min     | 3 seg            | **99%** |
+| Procesar 100 documentos           | 10-15 horas | 15-30 min        | **98%** |
 
 ## ✅ Checklist de Implementación
 
 ### Instalación
+
 - [ ] Instalar paquetes Python (transformers, torch, etc.)
 - [ ] Instalar Tesseract OCR
 - [ ] Instalar Poppler (para PDF)
 - [ ] Verificar GPU disponible (opcional)
 
 ### Testing
+
 - [ ] Probar extracción de tablas con factura de ejemplo
 - [ ] Probar reconocimiento de escritura con nota manuscrita
 - [ ] Probar detección de formularios con formulario lleno
 - [ ] Verificar precisión con documentos reales
 
 ### Integración
+
 - [ ] Integrar en pipeline de procesamiento de documentos
 - [ ] Configurar reglas para tipos de documentos específicos
 - [ ] Añadir manejo de errores y fallbacks
 - [ ] Implementar monitoreo de calidad
 
 ### Optimización
+
 - [ ] Configurar uso de GPU si está disponible
 - [ ] Implementar procesamiento por lotes
 - [ ] Añadir caché de modelos
@@ -390,21 +420,25 @@ Precisión < 70%
 ## 🎉 Beneficios Clave
 
 ### Ahorro de Tiempo
+
 - **99% reducción** en tiempo de extracción de datos
 - Procesamiento de 100 docs: 15 horas → 30 minutos
 
 ### Mejora de Precisión
+
 - **90-95%** precisión en extracción de tablas
 - **85-92%** precisión en reconocimiento de escritura
 - **88-93%** precisión en detección de campos
 
 ### Nuevas Capacidades
+
 - ✅ Procesar documentos manuscritos
 - ✅ Extraer datos estructurados de tablas
 - ✅ Detectar y validar formularios automáticamente
 - ✅ Exportar a formatos estructurados (Excel, JSON)
 
 ### Casos de Uso Habilitados
+
 - 📊 Análisis automático de facturas
 - ✍️ Digitalización de formularios manuscritos
 - 📋 Validación automática de formularios
@@ -413,12 +447,14 @@ Precisión < 70%
 ## 📞 Próximos Pasos
 
 ### Esta Semana
+
 1. ✅ Instalar dependencias
 2. 🔄 Probar con documentos de ejemplo
 3. 🔄 Verificar precisión y rendimiento
 4. 🔄 Ajustar configuración según necesidades
 
 ### Próximo Mes
+
 1. 📋 Integrar en pipeline de producción
 2. 📋 Entrenar modelos personalizados si es necesario
 3. 📋 Implementar monitoreo de calidad
@@ -427,13 +463,16 @@ Precisión < 70%
 ## 📚 Recursos
 
 ### Documentación
+
 - **Técnica (inglés)**: `ADVANCED_OCR_PHASE4.md`
 - **Resumen (español)**: `FASE4_RESUMEN.md` (este archivo)
 
 ### Ejemplos de Código
+
 Ver sección "Casos de Uso Prácticos" arriba
 
 ### Soporte
+
 - Issues en GitHub
 - Documentación de modelos: https://huggingface.co/microsoft
 
@@ -444,6 +483,7 @@ Ver sección "Casos de Uso Prácticos" arriba
 **Fase 4 completada con éxito:**
 
 ✅ **3 módulos implementados**:
+
 - TableExtractor (extracción de tablas)
 - HandwritingRecognizer (escritura a mano)
 - FormFieldDetector (campos de formulario)
@@ -460,6 +500,6 @@ Ver sección "Casos de Uso Prácticos" arriba
 
 ---
 
-*Generado: 9 de noviembre de 2025*
-*Para: IntelliDocs-ngx v2.19.5*
-*Fase: 4 de 5 - OCR Avanzado*
+_Generado: 9 de noviembre de 2025_
+_Para: IntelliDocs-ngx v2.19.5_
+_Fase: 4 de 5 - OCR Avanzado_

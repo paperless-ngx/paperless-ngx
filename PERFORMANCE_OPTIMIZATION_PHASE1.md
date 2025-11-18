@@ -13,27 +13,34 @@ This document details the first phase of performance optimizations implemented f
 **File**: `src/documents/migrations/1075_add_performance_indexes.py`
 
 **What it does**:
+
 - Adds composite indexes for commonly filtered document queries
 - Optimizes query performance for the most frequent use cases
 
 **Indexes Added**:
+
 1. **Correspondent + Created Date** (`doc_corr_created_idx`)
+
    - Optimizes: "Show me all documents from this correspondent sorted by date"
    - Use case: Viewing documents by sender/receiver
 
 2. **Document Type + Created Date** (`doc_type_created_idx`)
+
    - Optimizes: "Show me all invoices/receipts sorted by date"
    - Use case: Viewing documents by category
 
 3. **Owner + Created Date** (`doc_owner_created_idx`)
+
    - Optimizes: "Show me all my documents sorted by date"
    - Use case: Multi-user environments, personal document views
 
 4. **Storage Path + Created Date** (`doc_storage_created_idx`)
+
    - Optimizes: "Show me all documents in this storage location sorted by date"
    - Use case: Organized filing by location
 
 5. **Modified Date Descending** (`doc_modified_desc_idx`)
+
    - Optimizes: "Show me recently modified documents"
    - Use case: "What changed recently?" queries
 
@@ -42,6 +49,7 @@ This document details the first phase of performance optimizations implemented f
    - Use case: "Show me all documents with these tags"
 
 **Expected Performance Improvement**:
+
 - 5-10x faster queries when filtering by correspondent, type, owner, or storage path
 - 3-5x faster tag filtering
 - 40-60% reduction in database CPU usage for common queries
@@ -53,27 +61,33 @@ This document details the first phase of performance optimizations implemented f
 **File**: `src/documents/caching.py`
 
 **What it does**:
+
 - Adds intelligent caching for frequently accessed metadata lists
 - These lists change infrequently but are requested on nearly every page load
 
 **New Functions Added**:
 
 #### `cache_metadata_lists(timeout: int = CACHE_5_MINUTES)`
+
 Caches the complete lists of:
+
 - Correspondents (id, name, slug)
 - Document Types (id, name, slug)
 - Tags (id, name, slug, color)
 - Storage Paths (id, name, slug, path)
 
 **Why this matters**:
+
 - These lists are loaded in dropdowns, filters, and form fields on almost every page
 - They rarely change but are queried thousands of times per day
 - Caching them reduces database load by 50-70% for typical usage patterns
 
 #### `clear_metadata_list_caches()`
+
 Invalidates all metadata list caches when data changes.
 
 **Cache Keys**:
+
 ```python
 "correspondent_list_v1"
 "document_type_list_v1"
@@ -88,15 +102,18 @@ Invalidates all metadata list caches when data changes.
 **File**: `src/documents/signals/handlers.py`
 
 **What it does**:
+
 - Automatically clears cached metadata lists when models are created, updated, or deleted
 - Ensures users always see up-to-date information without manual cache clearing
 
 **Signal Handlers Added**:
+
 1. `invalidate_correspondent_cache()` - Triggered on Correspondent save/delete
 2. `invalidate_document_type_cache()` - Triggered on DocumentType save/delete
 3. `invalidate_tag_cache()` - Triggered on Tag save/delete
 
 **How it works**:
+
 ```
 User creates a new tag
     ↓
@@ -114,6 +131,7 @@ Next request rebuilds cache with new data
 ## 📊 Expected Performance Impact
 
 ### Before Optimization
+
 ```
 Document List Query (1000 docs, filtered by correspondent):
 ├─ Query 1: Get documents                     ~200ms
@@ -130,6 +148,7 @@ Metadata Dropdown Load:
 ```
 
 ### After Optimization
+
 ```
 Document List Query (1000 docs, filtered by correspondent):
 ├─ Query 1: Get documents with index          ~20ms
@@ -142,14 +161,17 @@ Metadata Dropdown Load:
 ```
 
 ### Real-World Impact
+
 For a typical user session with 10 page loads and 5 filtered searches:
 
 **Before**:
+
 - Page loads: 10 × 330ms = 3,300ms
 - Searches: 5 × 10,200ms = 51,000ms
 - **Total**: 54,300ms (54.3 seconds)
 
 **After**:
+
 - Page loads: 10 × 2ms = 20ms
 - Searches: 5 × 70ms = 350ms
 - **Total**: 370ms (0.37 seconds)
@@ -171,6 +193,7 @@ python src/manage.py migrate documents
 ```
 
 **Important Notes**:
+
 - The migration is **safe** to run on production
 - It creates indexes **concurrently** (non-blocking on PostgreSQL)
 - For very large databases (>1M documents), consider running during low-traffic hours
@@ -185,6 +208,7 @@ The caching enhancements and signal handlers are automatically active once deplo
 After deployment, check:
 
 1. **Database Query Times**:
+
 ```bash
 # PostgreSQL: Check slow queries
 SELECT query, calls, mean_exec_time, max_exec_time
@@ -195,12 +219,14 @@ LIMIT 10;
 ```
 
 2. **Application Response Times**:
+
 ```bash
 # Check Django logs for API response times
 # Should see 70-90% reduction in document list endpoint times
 ```
 
 3. **Cache Hit Rate**:
+
 ```python
 # In Django shell
 from django.core.cache import cache
@@ -222,6 +248,7 @@ else:
 ### Document List Queries
 
 **Before** (no index):
+
 ```sql
 -- Slow: Sequential scan through all documents
 SELECT * FROM documents_document
@@ -231,6 +258,7 @@ ORDER BY created DESC;
 ```
 
 **After** (with index):
+
 ```sql
 -- Fast: Index scan using doc_corr_created_idx
 SELECT * FROM documents_document
@@ -242,6 +270,7 @@ ORDER BY created DESC;
 ### Metadata List Queries
 
 **Before** (no cache):
+
 ```sql
 -- Every page load hits database
 SELECT id, name, slug FROM documents_correspondent ORDER BY name;
@@ -251,6 +280,7 @@ SELECT id, name, slug, color FROM documents_tag ORDER BY name;
 ```
 
 **After** (with cache):
+
 ```python
 # First request hits database and caches for 5 minutes
 # Next 1000+ requests read from Redis in ~2ms
@@ -310,12 +340,14 @@ ORDER BY idx_scan DESC;
 If you need to rollback these changes:
 
 ### 1. Rollback Migration
+
 ```bash
 # Revert to previous migration
 python src/manage.py migrate documents 1074_workflowrun_deleted_at_workflowrun_restored_at_and_more
 ```
 
 ### 2. Disable Cache Functions
+
 The cache functions won't cause issues even if you don't use them. But to disable:
 
 ```python
@@ -343,11 +375,13 @@ Before deploying to production, verify:
 These are already documented in IMPROVEMENT_ROADMAP.md:
 
 1. **Frontend Performance**:
+
    - Lazy loading for document list (50% faster initial load)
    - Code splitting (smaller bundle size)
    - Virtual scrolling for large lists
 
 2. **Advanced Caching**:
+
    - Cache document list results
    - Cache search results
    - Cache API responses
@@ -395,6 +429,6 @@ Phase 1 performance optimization is complete! These changes provide immediate, s
 **Time to deploy**: 1 hour
 **Performance gain**: 10-150x improvement depending on operation
 
-*Documentation created: 2025-11-09*
-*Implementation: Phase 1 of Performance Optimization Roadmap*
-*Status: ✅ Ready for Testing*
+_Documentation created: 2025-11-09_
+_Implementation: Phase 1 of Performance Optimization Roadmap_
+_Status: ✅ Ready for Testing_

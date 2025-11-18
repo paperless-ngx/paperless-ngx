@@ -13,11 +13,13 @@ This document details the second phase of improvements implemented for IntelliDo
 **File**: `src/paperless/middleware.py`
 
 **What it does**:
+
 - Protects against Denial of Service (DoS) attacks
 - Limits the number of API requests per user/IP
 - Uses Redis cache for distributed rate limiting across workers
 
 **Rate Limits Configured**:
+
 ```python
 /api/documents/     → 100 requests per minute
 /api/search/        → 30 requests per minute (expensive operation)
@@ -27,6 +29,7 @@ Other API endpoints → 200 requests per minute (default)
 ```
 
 **How it works**:
+
 1. Intercepts all `/api/*` requests
 2. Identifies user (authenticated user ID or IP address)
 3. Checks Redis cache for request count
@@ -34,6 +37,7 @@ Other API endpoints → 200 requests per minute (default)
 5. Increments counter with time window expiration
 
 **Benefits**:
+
 - ✅ Prevents DoS attacks
 - ✅ Fair resource allocation among users
 - ✅ System remains stable under high load
@@ -46,6 +50,7 @@ Other API endpoints → 200 requests per minute (default)
 **File**: `src/paperless/middleware.py`
 
 **What it does**:
+
 - Adds comprehensive security headers to all HTTP responses
 - Implements industry best practices for web security
 - Protects against common web vulnerabilities
@@ -53,58 +58,73 @@ Other API endpoints → 200 requests per minute (default)
 **Headers Added**:
 
 #### Strict-Transport-Security (HSTS)
+
 ```http
 Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
 ```
+
 - Forces browsers to use HTTPS
 - Valid for 1 year
 - Includes all subdomains
 - Eligible for browser preload list
 
 #### Content-Security-Policy (CSP)
+
 ```http
 Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; ...
 ```
+
 - Restricts resource loading to same origin
 - Allows inline scripts (needed for Angular)
 - Blocks loading of external resources
 - Prevents XSS attacks
 
 #### X-Frame-Options
+
 ```http
 X-Frame-Options: DENY
 ```
+
 - Prevents clickjacking attacks
 - Site cannot be embedded in iframe/frame
 
 #### X-Content-Type-Options
+
 ```http
 X-Content-Type-Options: nosniff
 ```
+
 - Prevents MIME type sniffing
 - Forces browser to respect declared content types
 
 #### X-XSS-Protection
+
 ```http
 X-XSS-Protection: 1; mode=block
 ```
+
 - Enables browser XSS filter (legacy but helpful)
 
 #### Referrer-Policy
+
 ```http
 Referrer-Policy: strict-origin-when-cross-origin
 ```
+
 - Controls referrer information sent
 - Protects user privacy
 
 #### Permissions-Policy
+
 ```http
 Permissions-Policy: geolocation=(), microphone=(), camera=()
 ```
+
 - Restricts browser features
 - Blocks access to geolocation, microphone, camera
 
 **Benefits**:
+
 - ✅ Protects against XSS (Cross-Site Scripting)
 - ✅ Prevents clickjacking
 - ✅ Blocks MIME type confusion attacks
@@ -119,6 +139,7 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
 **File**: `src/paperless/security.py` (new module)
 
 **What it does**:
+
 - Comprehensive file validation before processing
 - Detects and blocks malicious files
 - Prevents common file upload vulnerabilities
@@ -126,13 +147,16 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
 **Validation Checks**:
 
 #### 1. File Size Validation
+
 ```python
 MAX_FILE_SIZE = 500 * 1024 * 1024  # 500MB
 ```
+
 - Prevents resource exhaustion
 - Blocks excessively large files
 
 #### 2. MIME Type Validation
+
 ```python
 ALLOWED_MIME_TYPES = {
     "application/pdf",
@@ -141,11 +165,13 @@ ALLOWED_MIME_TYPES = {
     # ... and more
 }
 ```
+
 - Only allows document/image types
 - Uses magic numbers (not file extension)
 - More reliable than extension checking
 
 #### 3. File Extension Blocking
+
 ```python
 DANGEROUS_EXTENSIONS = {
     ".exe", ".dll", ".bat", ".cmd",
@@ -153,10 +179,12 @@ DANGEROUS_EXTENSIONS = {
     # ... and more
 }
 ```
+
 - Blocks executable files
 - Prevents script execution
 
 #### 4. Malicious Content Detection
+
 ```python
 MALICIOUS_PATTERNS = [
     rb"/JavaScript",     # JavaScript in PDFs
@@ -165,6 +193,7 @@ MALICIOUS_PATTERNS = [
     rb"\x7fELF",        # ELF executable header
 ]
 ```
+
 - Scans first 8KB of file
 - Detects embedded executables
 - Blocks malicious PDF features
@@ -172,7 +201,9 @@ MALICIOUS_PATTERNS = [
 **Key Functions**:
 
 ##### `validate_uploaded_file(uploaded_file)`
+
 Validates Django uploaded files:
+
 ```python
 from paperless.security import validate_uploaded_file
 
@@ -186,7 +217,9 @@ except FileValidationError as e:
 ```
 
 ##### `validate_file_path(file_path)`
+
 Validates files on disk:
+
 ```python
 from paperless.security import validate_file_path
 
@@ -198,7 +231,9 @@ except FileValidationError:
 ```
 
 ##### `sanitize_filename(filename)`
+
 Prevents path traversal attacks:
+
 ```python
 from paperless.security import sanitize_filename
 
@@ -207,7 +242,9 @@ safe_name = sanitize_filename('../../etc/passwd')
 ```
 
 ##### `calculate_file_hash(file_path)`
+
 Calculates file checksums:
+
 ```python
 from paperless.security import calculate_file_hash
 
@@ -216,6 +253,7 @@ sha256_hash = calculate_file_hash('/path/to/file.pdf')
 ```
 
 **Benefits**:
+
 - ✅ Blocks malicious files before processing
 - ✅ Prevents code execution vulnerabilities
 - ✅ Protects against path traversal
@@ -244,6 +282,7 @@ MIDDLEWARE = [
 ```
 
 **Order matters**:
+
 - `SecurityHeadersMiddleware` is early (sets headers)
 - `RateLimitMiddleware` is before authentication (protects auth endpoints)
 
@@ -254,6 +293,7 @@ MIDDLEWARE = [
 ### Before Security Hardening
 
 **Vulnerabilities**:
+
 - ❌ No rate limiting (vulnerable to DoS)
 - ❌ Missing security headers (vulnerable to XSS, clickjacking)
 - ❌ Basic file validation (vulnerable to malicious uploads)
@@ -263,6 +303,7 @@ MIDDLEWARE = [
 ### After Security Hardening
 
 **Protections**:
+
 - ✅ Rate limiting protects against DoS
 - ✅ Comprehensive security headers (HSTS, CSP, X-Frame-Options, etc.)
 - ✅ Multi-layer file validation
@@ -306,6 +347,7 @@ ALLOWED_MIME_TYPES = {
 ### 4. Monitor Rate Limiting
 
 Check Redis for rate limit hits:
+
 ```bash
 redis-cli
 
@@ -326,6 +368,7 @@ DEL rate_limit_user_123_/api/documents/
 ### Rate Limiting Strategy
 
 **Sliding Window Implementation**:
+
 ```
 User makes request
     ↓
@@ -339,6 +382,7 @@ Counter expires after time window
 ```
 
 **Example Scenario**:
+
 ```
 Time 0:00 - User makes 90 requests to /api/documents/
 Time 0:30 - User makes 10 more requests (total: 100)
@@ -353,21 +397,25 @@ Time 1:01 - Counter resets, user can make requests again
 #### Why These Headers Matter
 
 **HSTS (Strict-Transport-Security)**:
+
 - **Attack prevented**: SSL stripping, man-in-the-middle
 - **How**: Forces all connections to use HTTPS
 - **Impact**: Browsers automatically upgrade HTTP to HTTPS
 
 **CSP (Content-Security-Policy)**:
+
 - **Attack prevented**: XSS (Cross-Site Scripting)
 - **How**: Restricts where resources can be loaded from
 - **Impact**: Malicious scripts cannot be injected
 
 **X-Frame-Options**:
+
 - **Attack prevented**: Clickjacking
 - **How**: Prevents page from being embedded in iframe
 - **Impact**: Cannot trick users to click hidden buttons
 
 **X-Content-Type-Options**:
+
 - **Attack prevented**: MIME confusion attacks
 - **How**: Prevents browser from guessing content type
 - **Impact**: Scripts cannot be disguised as images
@@ -393,6 +441,7 @@ File Upload
 **Real-World Examples**:
 
 **Example 1: Malicious PDF**
+
 ```
 File: invoice.pdf
 Size: 245 KB
@@ -403,6 +452,7 @@ Result: REJECTED - Malicious content detected
 ```
 
 **Example 2: Disguised Executable**
+
 ```
 File: document.pdf
 Size: 512 KB
@@ -412,6 +462,7 @@ Result: REJECTED - MIME type mismatch
 ```
 
 **Example 3: Path Traversal**
+
 ```
 File: ../../etc/passwd
 Sanitized: etc_passwd
@@ -482,23 +533,25 @@ except FileValidationError:
 
 ### Before vs After
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| **Security Headers** | 2/10 | 10/10 | +400% |
-| **DoS Protection** | None | Rate Limited | ✅ |
-| **File Validation** | Basic | Multi-layer | ✅ |
-| **Security Score** | C | A+ | +3 grades |
-| **Vulnerability Count** | 15+ | 2-3 | -80% |
+| Metric                  | Before | After        | Improvement |
+| ----------------------- | ------ | ------------ | ----------- |
+| **Security Headers**    | 2/10   | 10/10        | +400%       |
+| **DoS Protection**      | None   | Rate Limited | ✅          |
+| **File Validation**     | Basic  | Multi-layer  | ✅          |
+| **Security Score**      | C      | A+           | +3 grades   |
+| **Vulnerability Count** | 15+    | 2-3          | -80%        |
 
 ### Compliance Impact
 
 **Before**:
+
 - ❌ OWASP Top 10: Fails 5/10 categories
 - ❌ SOC 2: Not compliant
 - ❌ ISO 27001: Not compliant
 - ❌ GDPR: Partial compliance
 
 **After**:
+
 - ✅ OWASP Top 10: Passes 8/10 categories
 - ✅ SOC 2: Improved compliance (needs encryption for full)
 - ✅ ISO 27001: Improved compliance
@@ -552,6 +605,7 @@ Before deploying to production:
 ### 1. Monitor Rate Limit Hits
 
 Set up alerts for excessive rate limiting:
+
 ```python
 # Add to monitoring dashboard
 rate_limit_hits = cache.get('rate_limit_hits_count', 0)
@@ -562,6 +616,7 @@ if rate_limit_hits > 1000:
 ### 2. Whitelist Internal Services
 
 For internal services that need higher limits:
+
 ```python
 # In RateLimitMiddleware._check_rate_limit()
 if identifier in WHITELISTED_IPS:
@@ -602,10 +657,12 @@ safety check
 ### Short-term (Next 1-2 Weeks)
 
 1. **Enable 2FA for all admin users**
+
    - Already supported via django-allauth
    - Enforce for privileged accounts
 
 2. **Set up security monitoring**
+
    - Monitor rate limit violations
    - Alert on suspicious file uploads
    - Track failed authentication attempts
@@ -617,10 +674,12 @@ safety check
 ### Medium-term (Next 1-2 Months)
 
 1. **Implement document encryption** (Phase 3)
+
    - Encrypt documents at rest
    - Use proper key management
 
 2. **Add malware scanning**
+
    - Integrate ClamAV or similar
    - Scan all uploaded files
 
@@ -631,6 +690,7 @@ safety check
 ### Long-term (Next 3-6 Months)
 
 1. **Security audit by professionals**
+
    - Penetration testing
    - Code review
    - Infrastructure audit
@@ -679,6 +739,6 @@ Phase 2 security hardening is complete! These changes significantly improve the 
 **Time to deploy**: 1 hour
 **Security improvement**: 400% (C → A+)
 
-*Documentation created: 2025-11-09*
-*Implementation: Phase 2 of Security Hardening*
-*Status: ✅ Ready for Testing*
+_Documentation created: 2025-11-09_
+_Implementation: Phase 2 of Security Hardening_
+_Status: ✅ Ready for Testing_

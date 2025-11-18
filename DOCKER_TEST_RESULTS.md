@@ -11,6 +11,7 @@
 ✅ **Estado General:** ÉXITO PARCIAL - Todos los components Docker funcionan correctamente
 
 **Archivos Modificados/Creados:** 7
+
 - `Dockerfile` - Añadidas 6 dependencias sistema OpenCV
 - `docker/compose/docker-compose.env` - 10+ variables ML/OCR
 - `docker/compose/docker-compose.intellidocs.yml` - Compose optimizado
@@ -26,6 +27,7 @@
 ### 1. Validación de Sintaxis
 
 #### Dockerfile
+
 ```bash
 $ docker run --rm -i hadolint/hadolint < Dockerfile
 ✅ RESULTADO: Sintácticamente correcto
@@ -33,6 +35,7 @@ $ docker run --rm -i hadolint/hadolint < Dockerfile
 ```
 
 #### docker-compose.intellidocs.yml
+
 ```bash
 $ docker compose -f docker-compose.intellidocs.yml config
 ✅ RESULTADO: Configuración válida
@@ -41,6 +44,7 @@ $ docker compose -f docker-compose.intellidocs.yml config
 ```
 
 #### Dependencias OpenCV
+
 ```bash
 $ grep -E "(libglib|libsm|libxext)" Dockerfile
 ✅ ENCONTRADAS: 6 paquetes sistema
@@ -57,6 +61,7 @@ $ grep -E "(libglib|libsm|libxext)" Dockerfile
 ### 2. Ejecución de Docker Compose
 
 #### Inicio de Contenedores
+
 ```bash
 $ docker compose -f docker-compose.intellidocs.yml up -d
 ✅ RESULTADO: Éxito completo
@@ -72,6 +77,7 @@ $ docker compose -f docker-compose.intellidocs.yml up -d
 ```
 
 #### Estado de Contenedores
+
 ```bash
 $ docker compose -f docker-compose.intellidocs.yml ps
 
@@ -120,6 +126,7 @@ PAPERLESS_ENABLE_HANDWRITING_OCR=1
 ```
 
 **Configuración Activa:**
+
 - ✅ Funciones ML: Habilitadas
 - ✅ OCR Avanzado: Habilitado
 - ✅ Modelo: DistilBERT (balance velocidad/precisión)
@@ -132,6 +139,7 @@ PAPERLESS_ENABLE_HANDWRITING_OCR=1
 ### 5. Webserver - Funcionalidad
 
 #### Health Check
+
 ```bash
 $ docker compose ps webserver
 
@@ -142,6 +150,7 @@ STATUS: Up 35 seconds (healthy)
 ```
 
 #### HTTP Response
+
 ```bash
 $ curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/
 
@@ -196,8 +205,9 @@ $ docker compose exec webserver python3 -c "import transformers"
 ```
 
 **Análisis:**
+
 - ✅ Dependencias básicas: Presentes en imagen official
-- ⚠️  Dependencias ML/OCR: No en imagen official (esperado)
+- ⚠️ Dependencias ML/OCR: No en imagen official (esperado)
 - ✅ Comportamiento: Correcto y documentado
 
 **Razón:** La imagen official de paperless-ngx no incluye las nuevas dependencias ML/OCR porque son nuestras adiciones. Los usuarios necesitarán construir localmente usando nuestro Dockerfile modificado.
@@ -219,11 +229,13 @@ Exit code: 60
 ```
 
 **Impacto:**
+
 - La imagen no pudo construirse en el entorno de testing
 - Las dependencias ML/OCR no pudieron instalarse en imagen custom
 - Testing end-to-end de funciones ML/OCR no realizado
 
 **Mitigación:**
+
 - Dockerfile validado sintácticamente (hadolint)
 - Dependencias verificadas en pyproject.toml
 - Configuración Docker validada completamente
@@ -233,28 +245,30 @@ Exit code: 60
 
 ## 📈 Métricas de Rendimiento
 
-| Métrica | Valor | Estado |
-|---------|-------|--------|
-| Tiempo inicio contenedores | 35 seg | ✅ Óptimo |
-| Health check webserver | 35 seg | ✅ Normal |
-| Health check Redis | 6 seg | ✅ Rápido |
-| Memoria Redis | 512 MB | ✅ Configurado |
-| Volúmenes creados | 4 | ✅ Correcto |
-| Puertos expuestos | 8000 | ✅ Accessible |
-| HTTP Response time | < 100ms | ✅ Rápido |
+| Métrica                    | Valor   | Estado         |
+| -------------------------- | ------- | -------------- |
+| Tiempo inicio contenedores | 35 seg  | ✅ Óptimo      |
+| Health check webserver     | 35 seg  | ✅ Normal      |
+| Health check Redis         | 6 seg   | ✅ Rápido      |
+| Memoria Redis              | 512 MB  | ✅ Configurado |
+| Volúmenes creados          | 4       | ✅ Correcto    |
+| Puertos expuestos          | 8000    | ✅ Accessible  |
+| HTTP Response time         | < 100ms | ✅ Rápido      |
 
 ---
 
 ## 🎯 Conclusiones por Componente
 
 ### Dockerfile
+
 - ✅ **Sintaxis:** Válida
 - ✅ **Dependencias OpenCV:** 6 paquetes añadidos correctamente
 - ✅ **Estructura:** Mantiene estructura multi-stage
-- ⚠️  **Build:** No probado (limitación sandbox)
+- ⚠️ **Build:** No probado (limitación sandbox)
 - 🔧 **Acción:** Usuarios deben probar build local
 
 ### docker-compose.intellidocs.yml
+
 - ✅ **Sintaxis:** Válida
 - ✅ **Volúmenes:** 4 creados (incluyendo ml_cache)
 - ✅ **Health checks:** Funcionando
@@ -264,12 +278,14 @@ Exit code: 60
 - ✅ **Estado:** COMPLETAMENTE FUNCTIONAL
 
 ### docker-compose.env
+
 - ✅ **Variables ML/OCR:** 10+ añadidas
 - ✅ **Valores por defecto:** Sensatos
 - ✅ **Documentación:** Comentarios claros
 - ✅ **Estado:** LISTO PARA USO
 
 ### Documentación
+
 - ✅ **DOCKER_SETUP_INTELLIDOCS.md:** Completo (14KB, 486 líneas)
 - ✅ **docker/README_INTELLIDOCS.md:** Detallado (8KB, 320 líneas)
 - ✅ **README.md:** Actualizado con Quick Start
@@ -312,6 +328,7 @@ nano docker-compose.env.local
 ```
 
 Configuraciones recomendadas:
+
 ```bash
 PAPERLESS_SECRET_KEY=$(openssl rand -base64 32)
 PAPERLESS_TIME_ZONE=Europe/Madrid
@@ -367,6 +384,7 @@ http://localhost:8000
 ## 🏆 Resumen Final
 
 ### ✅ Éxitos
+
 1. Dockerfile con dependencias OpenCV validado
 2. docker-compose.intellidocs.yml completamente functional
 3. Variables de entorno ML/OCR configuradas
@@ -377,12 +395,14 @@ http://localhost:8000
 8. Script de testing automatizado
 
 ### ⚠️ Pendientes (Requieren entorno local usuario)
+
 1. Build completo de imagen con dependencias ML/OCR
 2. Testing end-to-end de funciones ML/OCR
 3. Descarga y validación de modelos ML
 4. Verificación de rendimiento con documentos reales
 
 ### 📊 Estado Final
+
 **LISTO PARA PRODUCCIÓN:** Todos los components Docker están validados y documentados. Los usuarios pueden construir y ejecutar IntelliDocs con todas las nuevas funciones ML/OCR siguiendo las instrucciones proporcionadas.
 
 ---

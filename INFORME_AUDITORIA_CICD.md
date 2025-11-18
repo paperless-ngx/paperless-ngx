@@ -12,19 +12,20 @@
 
 ### Estado General del Proyecto
 
-| Componente | Calificación | Estado | Listo para CI/CD |
-|------------|--------------|--------|------------------|
-| **Backend Python** | 6.5/10 | ⚠️ Require correcciones | ❌ NO |
-| **Frontend Angular** | 6.5/10 | ⚠️ Require correcciones | ❌ NO |
-| **Docker** | 8.5/10 | ✅ Mayormente correcto | ⚠️ PARCIAL |
-| **CI/CD** | 6.0/10 | ⚠️ Incompleto para ML/OCR | ❌ NO |
-| **GLOBAL** | **6.9/10** | **REQUIRE CORRECCIONES** | **❌ NO** |
+| Componente           | Calificación | Estado                    | Listo para CI/CD |
+| -------------------- | ------------ | ------------------------- | ---------------- |
+| **Backend Python**   | 6.5/10       | ⚠️ Require correcciones   | ❌ NO            |
+| **Frontend Angular** | 6.5/10       | ⚠️ Require correcciones   | ❌ NO            |
+| **Docker**           | 8.5/10       | ✅ Mayormente correcto    | ⚠️ PARCIAL       |
+| **CI/CD**            | 6.0/10       | ⚠️ Incompleto para ML/OCR | ❌ NO            |
+| **GLOBAL**           | **6.9/10**   | **REQUIRE CORRECCIONES**  | **❌ NO**        |
 
 ### Veredicto Final
 
 **❌ EL PROYECTO NO ESTÁ LISTO PARA CI/CD AUTOMATIZADO**
 
 **Razones críticas:**
+
 1. 🔴 Migraciones de base de datos duplicadas (bloquean deployment)
 2. 🔴 Components Angular sin declaración `standalone: true` (bloquean build)
 3. 🔴 No hay validación de dependencias ML/OCR en CI
@@ -43,6 +44,7 @@
 **Archivos afectados:** 3 migraciones
 
 **Problema:**
+
 ```
 src/documents/migrations/
 ├── 1076_add_deletion_request.py
@@ -51,6 +53,7 @@ src/documents/migrations/
 ```
 
 **Impacto:**
+
 - Django migrará solo la primera
 - Las otras dos se saltarán silenciosamente
 - Tablas `DeletionRequest` sin índices de performance
@@ -58,6 +61,7 @@ src/documents/migrations/
 - **Build de Docker fallará en fase `migrate`**
 
 **Solución:**
+
 ```bash
 # Renombrar migraciones
 mv src/documents/migrations/1076_add_deletionrequest_performance_indexes.py \
@@ -68,6 +72,7 @@ mv src/documents/migrations/1076_aisuggestionfeedback.py \
 ```
 
 **Actualizar dependencias en archivos:**
+
 ```python
 # En 1077_add_deletionrequest_performance_indexes.py:
 dependencies = [
@@ -90,6 +95,7 @@ dependencies = [
 **Archivo:** `src/documents/models.py`
 
 **Problema:**
+
 - Existe migración `1078_aisuggestionfeedback.py` que crea la tabla
 - NO existe el modelo Django correspondiente en `models.py`
 - ORM no podrá acceder a la tabla
@@ -163,6 +169,7 @@ class AISuggestionFeedback(models.Model):
 #### Archivo 1: `src-ui/src/app/components/ai-suggestions-panel/ai-suggestions-panel.component.ts`
 
 **Problema (línea 40):**
+
 ```typescript
 @Component({
   selector: 'pngx-ai-suggestions-panel',
@@ -179,11 +186,13 @@ class AISuggestionFeedback(models.Model):
 ```
 
 **Error esperado en `ng build`:**
+
 ```
 Component 'AiSuggestionsPanelComponent' is not standalone and cannot be imported directly
 ```
 
 **Solución:**
+
 ```typescript
 @Component({
   selector: 'pngx-ai-suggestions-panel',
@@ -202,6 +211,7 @@ Component 'AiSuggestionsPanelComponent' is not standalone and cannot be imported
 #### Archivo 2: `src-ui/src/app/components/admin/settings/ai-settings/ai-settings.component.ts`
 
 **Problema (línea 25):**
+
 ```typescript
 @Component({
   selector: 'pngx-ai-settings',
@@ -219,6 +229,7 @@ Component 'AiSuggestionsPanelComponent' is not standalone and cannot be imported
 ```
 
 **Solución:**
+
 ```typescript
 @Component({
   selector: 'pngx-ai-settings',
@@ -248,28 +259,31 @@ Component 'AiSuggestionsPanelComponent' is not standalone and cannot be imported
 El icono `playCircle` es usado en `ai-settings.component.html:134` pero NO está importado en `main.ts`.
 
 **Ubicación de uso:**
+
 ```html
 <i-bs name="play-circle" class="me-2"></i-bs>
 ```
 
 **Error en navegador:**
+
 ```
 [ngx-bootstrap-icons] Icon 'play-circle' not found
 ```
 
 **Solución:**
 Agregar a `main.ts` (~línea 150):
+
 ```typescript
 import {
   // ... otros iconos
-  playCircle,  // ← AGREGAR
+  playCircle, // ← AGREGAR
   // ... resto
 } from 'ngx-bootstrap-icons'
 
 // En el objeto icons (~línea 371):
 const icons = {
   // ... otros iconos
-  playCircle,  // ← AGREGAR
+  playCircle, // ← AGREGAR
   // ... resto
 }
 ```
@@ -284,11 +298,13 @@ const icons = {
 **Archivo faltante:** Tests de dependencias ML/OCR
 
 **Problema:**
+
 - CI ejecuta tests de backend/frontend
 - Tests NO validan que torch, transformers, opencv funcionen
 - Build puede pasar pero fallar en runtime al procesar documentos con ML/OCR
 
 **Dependencias del sistema faltantes en CI:**
+
 ```bash
 # Están en Dockerfile pero NO en .github/workflows/ci.yml línea 150
 libglib2.0-0 libsm6 libxext6 libxrender1 libgomp1 libgl1
@@ -337,6 +353,7 @@ def test_basic_opencv_operations():
 ```
 
 **Actualizar `.github/workflows/ci.yml` línea 150:**
+
 ```yaml
 - name: Install system dependencies
   run: |
@@ -360,10 +377,12 @@ def test_basic_opencv_operations():
 
 **Problema:**
 Los índices están definidos dos veces:
+
 1. En la migración: `migrations.AddIndex()` (líneas 132-147)
 2. En models.py: `Meta.indexes = [...]` (líneas 1678-1689)
 
 **Impacto:**
+
 - Error al ejecutar migraciones: "relation already exists"
 - Build de Docker fallará
 
@@ -380,6 +399,7 @@ Eliminar las operaciones `AddIndex` de la migración 1076 (líneas 132-147), dej
 **Archivo:** `src/documents/ai_scanner.py` línea 318
 
 **Problema:**
+
 ```python
 def _get_table_extractor(self):
     if self._table_extractor is None and self.advanced_ocr_enabled:
@@ -394,10 +414,12 @@ def _get_table_extractor(self):
 ```
 
 **Impacto:**
+
 - Si TableExtractor falla, seguirá intentando cargarlo en cada llamada
 - Logs llenos de warnings innecesarios
 
 **Solución:**
+
 ```python
         except Exception as e:
             logger.warning(f"Failed to load table extractor: {e}")
@@ -430,6 +452,7 @@ def _get_table_extractor(self):
 **Problema:** Solo tiene test de creación básico.
 
 **Recomendación:** Agregar tests funcionales:
+
 - Test de `loadDeletionRequests()`
 - Test de `filterByStatus()`
 - Test de `viewDetails()`
@@ -465,23 +488,27 @@ def _get_table_extractor(self):
 #### ✅ Fortalezas
 
 1. **Multi-stage build bien estructurado**
+
    - Stage 1: `compile-frontend` (Node 20 + PNPM)
    - Stage 2: `s6-overlay-base` (init system)
    - Stage 3: `main-app` (imagen final)
 
 2. **Dependencias del sistema completas**
+
    ```dockerfile
    # OpenCV dependencies (líneas 166-171)
    libglib2.0-0 libsm6 libxext6 libxrender1 libgomp1 libgl1
    ```
 
 3. **Volúmenes persistentes correctos**
+
    - `data` - Base de datos
    - `media` - Documentos
    - `ml_cache` ⭐ **NUEVO** - Modelos ML (~500MB-1GB)
    - `redisdata` - Caché Redis
 
 4. **Variables de entorno documentadas**
+
    - 10+ variables nuevas ML/OCR en `docker-compose.env`
    - Todas con valores por defecto seguros
 
@@ -494,12 +521,14 @@ def _get_table_extractor(self):
 #### ⚠️ Debilidades
 
 1. **Healthcheck básico**
+
    - Solo verifica HTTP responde
    - NO verifica Redis conectado
    - NO verifica BD disponible
    - NO verifica modelos ML cargados
 
 2. **Tamaño de imagen grande**
+
    - Estimado: ~3-4GB comprimido (vs 1.5GB de paperless-ngx vanilla)
    - Razón: Dependencias ML/OCR (torch ~800MB-2GB, transformers ~400MB)
 
@@ -509,12 +538,14 @@ def _get_table_extractor(self):
 #### 📝 Recomendaciones Docker
 
 1. **Mejorar healthcheck** (prioridad media)
+
    ```dockerfile
    HEALTHCHECK --interval=30s --timeout=10s --retries=5 \
      CMD curl -fs http://localhost:8000/api/health/ || exit 1
    ```
 
    Crear endpoint `/api/health/` que valid:
+
    - ✅ Redis conectado
    - ✅ BD disponible
    - ✅ Frontend cargado
@@ -533,6 +564,7 @@ def _get_table_extractor(self):
 #### ✅ Fortalezas
 
 1. **Workflow completo y robusto** (`.github/workflows/ci.yml` - 675 líneas)
+
    - Tests backend (Python 3.10, 3.11, 3.12)
    - Tests frontend (Jest con sharding)
    - Tests E2E (Playwright con sharding)
@@ -540,10 +572,12 @@ def _get_table_extractor(self):
    - Release automation
 
 2. **Build condicional**
+
    - Solo construye en branches específicas: `dev`, `beta`, `feature-*`, `fix-*`
    - Solo si tests pasan: `needs: [tests-backend, tests-frontend, tests-frontend-e2e]`
 
 3. **Cache estratégico**
+
    ```yaml
    cache-from:
      - ghcr.io/.../builder/cache/app:dev
@@ -559,20 +593,24 @@ def _get_table_extractor(self):
 #### ❌ Debilidades CRÍTICAS
 
 1. **NO valida dependencias ML/OCR**
+
    - Tests de backend NO instalan librerías OpenCV
    - Tests de backend NO importan torch/transformers
    - Build puede pasar pero fallar en runtime
 
 2. **NO hay tests específicos IntelliDocs**
+
    - Workflow heredado de paperless-ngx upstream
    - No hay validación de features ML/OCR
 
 3. **NO hay caché de modelos ML**
+
    - Cada build descargará ~1GB de modelos desde Hugging Face
    - Tiempo de build: +5-10 minutos extra
    - Possible rate limiting de Hugging Face
 
 4. **NO hay smoke tests post-build**
+
    - No valida que la imagen construida funciona
    - No valida que modelos ML se cargan correctamente
 
@@ -587,6 +625,7 @@ def _get_table_extractor(self):
 **Archivo nuevo:** `.github/workflows/docker-intellidocs.yml`
 
 **Trigger:**
+
 ```yaml
 on:
   push:
@@ -600,6 +639,7 @@ on:
 ```
 
 **Jobs:**
+
 1. `test-ml-dependencies` - Valida torch, transformers, opencv
 2. `build-and-push` - Construye y sube imagen a GHCR
 3. `test-smoke` - Tests básicos en imagen construida
@@ -640,6 +680,7 @@ ghcr.io/dawnsystem/intellidocs-ngx:dev-abc123   # Dev + commit SHA
 ```
 
 **Implementación en workflow:**
+
 ```yaml
 - name: Extract metadata
   id: meta
@@ -662,6 +703,7 @@ ghcr.io/dawnsystem/intellidocs-ngx:dev-abc123   # Dev + commit SHA
 **Tiempo total estimado: 1.5 horas**
 
 #### Paso 1.1: Corregir migraciones duplicadas (15 min)
+
 ```bash
 cd src/documents/migrations
 
@@ -678,6 +720,7 @@ mv 1076_aisuggestionfeedback.py \
 ```
 
 #### Paso 1.2: Agregar modelo AISuggestionFeedback (20 min)
+
 ```bash
 # Editar src/documents/models.py
 # Agregar el modelo completo al final (~línea 1690)
@@ -685,6 +728,7 @@ mv 1076_aisuggestionfeedback.py \
 ```
 
 #### Paso 1.3: Eliminar índices duplicados (10 min)
+
 ```bash
 # Editar src/documents/migrations/1076_add_deletion_request.py
 # Eliminar líneas 132-147 (operaciones AddIndex)
@@ -692,6 +736,7 @@ mv 1076_aisuggestionfeedback.py \
 ```
 
 #### Paso 1.4: Agregar `standalone: true` a components (5 min)
+
 ```typescript
 // Editar src-ui/src/app/components/ai-suggestions-panel/ai-suggestions-panel.component.ts
 // Línea 41: Agregar standalone: true
@@ -701,6 +746,7 @@ mv 1076_aisuggestionfeedback.py \
 ```
 
 #### Paso 1.5: Agregar icono playCircle (3 min)
+
 ```typescript
 // Editar src-ui/src/main.ts
 // Línea ~150: import { ..., playCircle, ... } from 'ngx-bootstrap-icons'
@@ -708,18 +754,21 @@ mv 1076_aisuggestionfeedback.py \
 ```
 
 #### Paso 1.6: Agregar dependencias OpenCV en CI (5 min)
+
 ```yaml
 # Editar .github/workflows/ci.yml línea 150
 # Agregar: libglib2.0-0 libsm6 libxext6 libxrender1 libgomp1 libgl1
 ```
 
 #### Paso 1.7: Crear tests ML smoke (30 min)
+
 ```bash
 # Crear tests/test_ml_smoke.py
 # Ver código completo en sección "CRÍTICO #5"
 ```
 
 #### Paso 1.8: Fix TableExtractor error handling (2 min)
+
 ```python
 # Editar src/documents/ai_scanner.py línea 318
 # Agregar: self.advanced_ocr_enabled = False
@@ -730,6 +779,7 @@ mv 1076_aisuggestionfeedback.py \
 ### FASE 2: VALIDACIÓN (30 min)
 
 #### Paso 2.1: Validar migraciones
+
 ```bash
 cd src
 python manage.py makemigrations --check --dry-run
@@ -737,11 +787,13 @@ python manage.py migrate --plan
 ```
 
 #### Paso 2.2: Validar sintaxis Python
+
 ```bash
 find src -name "*.py" -exec python -m py_compile {} \;
 ```
 
 #### Paso 2.3: Validar compilación Angular
+
 ```bash
 cd src-ui
 npm install
@@ -749,6 +801,7 @@ ng build --configuration production
 ```
 
 #### Paso 2.4: Ejecutar tests ML
+
 ```bash
 cd src
 pytest tests/test_ml_smoke.py -v
@@ -759,11 +812,13 @@ pytest tests/test_ml_smoke.py -v
 ### FASE 3: BUILD LOCAL DOCKER (1 hora)
 
 #### Paso 3.1: Build imagen
+
 ```bash
 docker build -t intellidocs-ngx:test .
 ```
 
 #### Paso 3.2: Test smoke
+
 ```bash
 docker run --rm intellidocs-ngx:test python -c "
 import torch, transformers, cv2, sentence_transformers
@@ -772,6 +827,7 @@ print('✅ ML dependencies OK')
 ```
 
 #### Paso 3.3: Test migraciones
+
 ```bash
 docker-compose -f docker-compose.intellidocs.yml up -d broker db
 docker-compose -f docker-compose.intellidocs.yml run --rm webserver migrate
@@ -967,43 +1023,43 @@ jobs:
 
 ### Estado Antes de Correcciones
 
-| Métrica | Valor | Objetivo |
-|---------|-------|----------|
-| Calificación backend | 6.5/10 | 9.0/10 |
-| Calificación frontend | 6.5/10 | 9.0/10 |
-| Calificación Docker | 8.5/10 | 9.5/10 |
-| Calificación CI/CD | 6.0/10 | 9.0/10 |
-| **GLOBAL** | **6.9/10** | **9.0/10** |
-| Problemas críticos | 5 | 0 |
-| Problemas importantes | 3 | 0 |
-| Tests ML/OCR | 0% | 80% |
-| Build exitoso | ❌ NO | ✅ SÍ |
+| Métrica               | Valor      | Objetivo   |
+| --------------------- | ---------- | ---------- |
+| Calificación backend  | 6.5/10     | 9.0/10     |
+| Calificación frontend | 6.5/10     | 9.0/10     |
+| Calificación Docker   | 8.5/10     | 9.5/10     |
+| Calificación CI/CD    | 6.0/10     | 9.0/10     |
+| **GLOBAL**            | **6.9/10** | **9.0/10** |
+| Problemas críticos    | 5          | 0          |
+| Problemas importantes | 3          | 0          |
+| Tests ML/OCR          | 0%         | 80%        |
+| Build exitoso         | ❌ NO      | ✅ SÍ      |
 
 ### Estado Después de Correcciones (Estimado)
 
-| Métrica | Valor | Objetivo |
-|---------|-------|----------|
-| Calificación backend | 9.2/10 | 9.0/10 |
-| Calificación frontend | 9.5/10 | 9.0/10 |
-| Calificación Docker | 9.0/10 | 9.5/10 |
-| Calificación CI/CD | 8.8/10 | 9.0/10 |
-| **GLOBAL** | **9.1/10** | **9.0/10** |
-| Problemas críticos | 0 | 0 |
-| Problemas importantes | 0 | 0 |
-| Tests ML/OCR | 85% | 80% |
-| Build exitoso | ✅ SÍ | ✅ SÍ |
+| Métrica               | Valor      | Objetivo   |
+| --------------------- | ---------- | ---------- |
+| Calificación backend  | 9.2/10     | 9.0/10     |
+| Calificación frontend | 9.5/10     | 9.0/10     |
+| Calificación Docker   | 9.0/10     | 9.5/10     |
+| Calificación CI/CD    | 8.8/10     | 9.0/10     |
+| **GLOBAL**            | **9.1/10** | **9.0/10** |
+| Problemas críticos    | 0          | 0          |
+| Problemas importantes | 0          | 0          |
+| Tests ML/OCR          | 85%        | 80%        |
+| Build exitoso         | ✅ SÍ      | ✅ SÍ      |
 
 ---
 
 ## 🎯 TIEMPO TOTAL ESTIMADO
 
-| Fase | Tiempo | Complejidad |
-|------|--------|-------------|
-| Fase 1: Correcciones críticas | 1.5 horas | Media |
-| Fase 2: Validación | 0.5 horas | Baja |
-| Fase 3: Build local Docker | 1 hora | Baja |
-| Fase 4: Workflow CI/CD | 2 horas | Media |
-| **TOTAL** | **5 horas** | **Media** |
+| Fase                          | Tiempo      | Complejidad |
+| ----------------------------- | ----------- | ----------- |
+| Fase 1: Correcciones críticas | 1.5 horas   | Media       |
+| Fase 2: Validación            | 0.5 horas   | Baja        |
+| Fase 3: Build local Docker    | 1 hora      | Baja        |
+| Fase 4: Workflow CI/CD        | 2 horas     | Media       |
+| **TOTAL**                     | **5 horas** | **Media**   |
 
 **Con experiencia:** 4 horas
 **Con interrupciones:** 6-7 horas
@@ -1016,24 +1072,29 @@ jobs:
 ### Mejoras Futuras (Prioridad Media-Baja)
 
 1. **Optimizar tamaño de imagen** (1-2 días)
+
    - Investigar Alpine base image
    - Multi-stage build más agresivo
    - Eliminar dependencias de build
 
 2. **Variants de imagen** (2-3 días)
+
    - `intellidocs-ngx:cpu` (sin GPU support)
    - `intellidocs-ngx:gpu` (con CUDA)
    - `intellidocs-ngx:minimal` (sin ML/OCR)
 
 3. **Caché de modelos ML en CI** (1 día)
+
    - Usar GitHub Actions cache
    - Pre-cargar modelos en imagen base
 
 4. **Healthcheck avanzado** (1 día)
+
    - Endpoint `/api/health/` completo
    - Validar Redis, BD, modelos ML
 
 5. **Monitoreo y métricas** (3-5 días)
+
    - Integrar Prometheus exporter
    - Dashboards Grafana
    - Alertas automáticas
@@ -1048,14 +1109,17 @@ jobs:
 ## 📝 CONCLUSIÓN
 
 ### Estado Actual
+
 **❌ El proyecto NO está listo para CI/CD automatizado.**
 
 ### Problemas Críticos Identificados
+
 1. 🔴 5 problemas críticos que bloquean build/deployment
 2. 🟡 3 problemas importantes que afectan estabilidad
 3. ⚠️ 3 problemas menores de calidad
 
 ### Tiempo de Corrección
+
 **5 horas de trabajo enfocado** para resolver todos los problemas críticos e importantes.
 
 ### Recomendación Final
@@ -1068,6 +1132,7 @@ jobs:
 4. ✅ **DOCUMENTAR PROCESO** en BITACORA_MAESTRA.md
 
 **Después de correcciones:**
+
 - ✅ Build de imagen Docker functional
 - ✅ Tests de backend/frontend/ML pasando
 - ✅ CI/CD automatizado en cada commit a `dev`
@@ -1089,6 +1154,7 @@ jobs:
 ## 📧 CONTACTO Y SOPORTE
 
 Para dudas sobre esta auditoría o el proceso de corrección:
+
 - **Issue Tracker:** https://github.com/dawnsystem/IntelliDocs-ngx/issues
 - **Director:** @dawnsystem
 

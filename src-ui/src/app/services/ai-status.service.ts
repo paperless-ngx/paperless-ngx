@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core'
-import { BehaviorSubject, Observable, interval, Subscription, of } from 'rxjs'
+import { BehaviorSubject, Observable, Subscription, interval, of } from 'rxjs'
 import { catchError, map, startWith, switchMap } from 'rxjs/operators'
 import { AIStatus } from 'src/app/data/ai-status'
 import { environment } from 'src/environments/environment'
@@ -77,26 +77,24 @@ export class AIStatusService {
   private fetchAIStatus(): Observable<AIStatus> {
     this.loading = true
 
-    return this.http
-      .get<AIStatus>(`${this.baseUrl}ai/status/`)
-      .pipe(
-        map((status) => {
-          this.loading = false
-          return status
-        }),
-        catchError((error) => {
-          this.loading = false
-          console.warn('Failed to fetch AI status:', error)
-          // Return default status if endpoint fails
-          return of({
-            active: false,
-            processing: false,
-            documents_scanned_today: 0,
-            suggestions_applied: 0,
-            pending_deletion_requests: 0,
-          })
+    return this.http.get<AIStatus>(`${this.baseUrl}ai/status/`).pipe(
+      map((status) => {
+        this.loading = false
+        return status
+      }),
+      catchError((error) => {
+        this.loading = false
+        console.warn('Failed to fetch AI status:', error)
+        // Return default status if endpoint fails
+        return of({
+          active: false,
+          processing: false,
+          documents_scanned_today: 0,
+          suggestions_applied: 0,
+          pending_deletion_requests: 0,
         })
-      )
+      })
+    )
   }
 
   /**

@@ -1,8 +1,8 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
-import { DeletionRequestsComponent } from './deletion-requests.component'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { DeletionRequestService } from 'src/app/services/rest/deletion-request.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { DeletionRequestsComponent } from './deletion-requests.component'
 
 describe('DeletionRequestsComponent', () => {
   let component: DeletionRequestsComponent

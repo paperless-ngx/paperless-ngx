@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { of } from 'rxjs'
-import { AiSettingsComponent } from './ai-settings.component'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { AiSettingsComponent } from './ai-settings.component'
 
 describe('AiSettingsComponent', () => {
   let component: AiSettingsComponent
@@ -12,8 +12,14 @@ describe('AiSettingsComponent', () => {
   let mockToastService: jasmine.SpyObj<ToastService>
 
   beforeEach(async () => {
-    mockSettingsService = jasmine.createSpyObj('SettingsService', ['get', 'set'])
-    mockToastService = jasmine.createSpyObj('ToastService', ['show', 'showError'])
+    mockSettingsService = jasmine.createSpyObj('SettingsService', [
+      'get',
+      'set',
+    ])
+    mockToastService = jasmine.createSpyObj('ToastService', [
+      'show',
+      'showError',
+    ])
 
     await TestBed.configureTestingModule({
       imports: [AiSettingsComponent, ReactiveFormsModule],
