@@ -40,10 +40,10 @@ class TestCommandImport(
                 "--no-progress-bar",
                 str(self.dirs.scratch_dir),
             )
-            self.assertIn(
-                "That directory doesn't appear to contain a manifest.json file.",
-                str(e),
-            )
+        self.assertIn(
+            "That directory doesn't appear to contain a manifest.json file.",
+            str(e.exception),
+        )
 
     def test_check_manifest_malformed(self):
         """
@@ -66,10 +66,10 @@ class TestCommandImport(
                 "--no-progress-bar",
                 str(self.dirs.scratch_dir),
             )
-            self.assertIn(
-                "The manifest file contains a record which does not refer to an actual document file.",
-                str(e),
-            )
+        self.assertIn(
+            "The manifest file contains a record which does not refer to an actual document file.",
+            str(e.exception),
+        )
 
     def test_check_manifest_file_not_found(self):
         """
@@ -95,7 +95,7 @@ class TestCommandImport(
                 "--no-progress-bar",
                 str(self.dirs.scratch_dir),
             )
-            self.assertIn('The manifest file refers to "noexist.pdf"', str(e))
+        self.assertIn('The manifest file refers to "noexist.pdf"', str(e.exception))
 
     def test_import_permission_error(self):
         """
@@ -129,14 +129,14 @@ class TestCommandImport(
             cmd.data_only = False
             with self.assertRaises(CommandError) as cm:
                 cmd.check_manifest_validity()
-                self.assertInt("Failed to read from original file", str(cm.exception))
+            self.assertIn("Failed to read from original file", str(cm.exception))
 
             original_path.chmod(0o444)
             archive_path.chmod(0o222)
 
             with self.assertRaises(CommandError) as cm:
                 cmd.check_manifest_validity()
-                self.assertInt("Failed to read from archive file", str(cm.exception))
+            self.assertIn("Failed to read from archive file", str(cm.exception))
 
     def test_import_source_not_existing(self):
         """
@@ -149,7 +149,7 @@ class TestCommandImport(
         """
         with self.assertRaises(CommandError) as cm:
             call_command("document_importer", Path("/tmp/notapath"))
-            self.assertInt("That path doesn't exist", str(cm.exception))
+        self.assertIn("That path doesn't exist", str(cm.exception))
 
     def test_import_source_not_readable(self):
         """
@@ -165,10 +165,10 @@ class TestCommandImport(
             path.chmod(0o222)
             with self.assertRaises(CommandError) as cm:
                 call_command("document_importer", path)
-                self.assertInt(
-                    "That path doesn't appear to be readable",
-                    str(cm.exception),
-                )
+            self.assertIn(
+                "That path doesn't appear to be readable",
+                str(cm.exception),
+            )
 
     def test_import_source_does_not_exist(self):
         """
@@ -185,8 +185,7 @@ class TestCommandImport(
 
         with self.assertRaises(CommandError) as e:
             call_command("document_importer", "--no-progress-bar", str(path))
-
-            self.assertIn("That path doesn't exist", str(e))
+        self.assertIn("That path doesn't exist", str(e.exception))
 
     def test_import_files_exist(self):
         """
