@@ -34,7 +34,7 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["pngx_version"], version.__full_version_str__)
         self.assertIsNotNone(response.data["server_os"])
-        self.assertIn(response.data["install_type"], ["bare-metal", "docker"])
+        self.assertEqual(response.data["install_type"], "bare-metal")
         self.assertIsNotNone(response.data["storage"]["total"])
         self.assertIsNotNone(response.data["storage"]["available"])
         self.assertEqual(response.data["database"]["type"], "sqlite")

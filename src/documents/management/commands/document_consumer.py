@@ -250,22 +250,10 @@ class Command(BaseCommand):
         if options["oneshot"]:
             return
 
-        inotify = None
         if settings.CONSUMER_POLLING == 0 and INotify:
-            try:
-                inotify = INotify()
-            except OSError:
-                logger.exception("inotify failed to instantiate")
-
-        if inotify:
-            self.handle_inotify(
-                inotify,
-                directory,
-                recursive,
-                is_testing=options["testing"],
-            )
+            self.handle_inotify(directory, recursive, is_testing=options["testing"])
         else:
-            if inotify is None and settings.CONSUMER_POLLING == 0:  # pragma: no cover
+            if INotify is None and settings.CONSUMER_POLLING == 0:  # pragma: no cover
                 logger.warning("Using polling as INotify import failed")
             self.handle_polling(directory, recursive, is_testing=options["testing"])
 
@@ -298,7 +286,7 @@ class Command(BaseCommand):
                 observer.stop()
             observer.join()
 
-    def handle_inotify(self, inotify, directory, recursive, *, is_testing: bool):
+    def handle_inotify(self, directory, recursive, *, is_testing: bool):
         logger.info(f"Using inotify to watch directory for changes: {directory}")
 
         timeout_ms = None
@@ -306,6 +294,7 @@ class Command(BaseCommand):
             timeout_ms = self.testing_timeout_ms
             logger.debug(f"Configuring timeout to {timeout_ms}ms")
 
+        inotify = INotify()
         inotify_flags = flags.CLOSE_WRITE | flags.MOVED_TO | flags.MODIFY
         if recursive:
             inotify.add_watch_recursive(directory, inotify_flags)

@@ -152,19 +152,6 @@ $ ng build --configuration production
     configuration. This is not ideal. But for now, make sure no settings
     except for DEBUG are overridden when testing.
 
--   Testing under docker is possible (but generally unsupported) if a
-    bare-metal environment cannot be setup. To run tests under docker, use
-    this command:
-
-    ```bash
-    # paperless-ngx/
-
-    $ docker run --rm -i -t \
-      -v $PWD:/usr/src/paperless \
-      --entrypoint=uv paperlessngx/paperless-ngx:latest \
-      run pytest
-    ```
-
 !!! note
 
       The line length rule E501 is generally useful for getting multiple

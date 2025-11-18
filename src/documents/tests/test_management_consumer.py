@@ -5,7 +5,6 @@ from threading import Thread
 from time import sleep
 from unittest import mock
 
-import pytest
 from django.conf import settings
 from django.core.management import CommandError
 from django.core.management import call_command
@@ -18,14 +17,6 @@ from documents.management.commands import document_consumer
 from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DocumentConsumeDelayMixin
-
-try:
-    from inotifyrecursive import INotify
-
-    INotify()
-    SKIP_INOTIFY_TESTS = False
-except (ImportError, OSError):
-    SKIP_INOTIFY_TESTS = True
 
 
 class ConsumerThread(Thread):
@@ -117,10 +108,10 @@ class ConsumerThreadMixin(DocumentConsumeDelayMixin):
             print("file completed.")  # noqa: T201
 
 
-class _TestConsumerBase(DirectoriesMixin, ConsumerThreadMixin):
-    # Note: adding TransactionTestCase as a base makes pytest discover this
-    # class. Only add it to the actual test classes.
-
+@override_settings(
+    CONSUMER_INOTIFY_DELAY=0.01,
+)
+class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
     def test_consume_file(self):
         self.t_start()
 
@@ -375,28 +366,19 @@ class _TestConsumerBase(DirectoriesMixin, ConsumerThreadMixin):
 
 
 @override_settings(
-    CONSUMER_INOTIFY_DELAY=0.01,
-)
-@pytest.mark.skipif(SKIP_INOTIFY_TESTS, reason="no inotify")
-class TestConsumer(_TestConsumerBase, TransactionTestCase):
-    pass
-
-
-@override_settings(
     CONSUMER_POLLING=1,
     # please leave the delay here and down below
     # see https://github.com/paperless-ngx/paperless-ngx/pull/66
     CONSUMER_POLLING_DELAY=3,
     CONSUMER_POLLING_RETRY_COUNT=20,
 )
-class TestConsumerPolling(_TestConsumerBase, TransactionTestCase):
+class TestConsumerPolling(TestConsumer):
     # just do all the tests with polling
     pass
 
 
 @override_settings(CONSUMER_INOTIFY_DELAY=0.01, CONSUMER_RECURSIVE=True)
-@pytest.mark.skipif(SKIP_INOTIFY_TESTS, reason="no inotify")
-class TestConsumerRecursive(_TestConsumerBase, TransactionTestCase):
+class TestConsumerRecursive(TestConsumer):
     # just do all the tests with recursive
     pass
 
@@ -407,14 +389,14 @@ class TestConsumerRecursive(_TestConsumerBase, TransactionTestCase):
     CONSUMER_POLLING_DELAY=3,
     CONSUMER_POLLING_RETRY_COUNT=20,
 )
-class TestConsumerRecursivePolling(_TestConsumerBase, TransactionTestCase):
+class TestConsumerRecursivePolling(TestConsumer):
     # just do all the tests with polling and recursive
     pass
 
 
-@override_settings(CONSUMER_RECURSIVE=True, CONSUMER_SUBDIRS_AS_TAGS=True)
 class TestConsumerTags(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
-    def _test_consume_file_with_path_tags(self):
+    @override_settings(CONSUMER_RECURSIVE=True, CONSUMER_SUBDIRS_AS_TAGS=True)
+    def test_consume_file_with_path_tags(self):
         tag_names = ("existingTag", "Space Tag")
         # Create a Tag prior to consuming a file using it in path
         tag_ids = [
@@ -447,14 +429,10 @@ class TestConsumerTags(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCas
         # their order.
         self.assertCountEqual(overrides.tag_ids, tag_ids)
 
-    @pytest.mark.skipif(SKIP_INOTIFY_TESTS, reason="no inotify")
-    def test_consume_file_with_path_tags(self):
-        self._test_consume_file_with_path_tags()
-
     @override_settings(
         CONSUMER_POLLING=1,
         CONSUMER_POLLING_DELAY=3,
         CONSUMER_POLLING_RETRY_COUNT=20,
     )
     def test_consume_file_with_path_tags_polling(self):
-        self._test_consume_file_with_path_tags()
+        self.test_consume_file_with_path_tags()
