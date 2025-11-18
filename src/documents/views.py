@@ -1413,17 +1413,24 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 status=500,
             )
 
-    @action(detail=True, methods=["POST"], name="Apply AI Suggestion")
+    @action(
+        detail=True,
+        methods=["POST"],
+        name="Apply AI Suggestion",
+        permission_classes=[IsAuthenticated, CanApplyAISuggestionsPermission],
+    )
     def apply_suggestion(self, request, pk=None):
         """
         Apply an AI suggestion to a document.
 
         Records user feedback and applies the suggested change.
+        Requires 'can_apply_ai_suggestions' permission.
         """
         from documents.models import AISuggestionFeedback
         from documents.serializers.ai_suggestions import ApplySuggestionSerializer
 
         try:
+            # Check permissions - get_object() validates object-level permissions
             document = self.get_object()
 
             # Validate input
@@ -1496,14 +1503,40 @@ class UnifiedSearchViewSet(DocumentViewSet):
                     status=400,
                 )
 
-        except (
-            Tag.DoesNotExist,
-            Correspondent.DoesNotExist,
-            DocumentType.DoesNotExist,
-            StoragePath.DoesNotExist,
-        ):
+        except Tag.DoesNotExist:
+            logger.error(
+                f"Tag {value_id} not found when applying suggestion to document {pk} "
+                f"by user {request.user.username}",
+            )
             return Response(
-                {"detail": "Referenced object not found"},
+                {"detail": f"Tag with ID {value_id} not found"},
+                status=404,
+            )
+        except Correspondent.DoesNotExist:
+            logger.error(
+                f"Correspondent {value_id} not found when applying suggestion to document {pk} "
+                f"by user {request.user.username}",
+            )
+            return Response(
+                {"detail": f"Correspondent with ID {value_id} not found"},
+                status=404,
+            )
+        except DocumentType.DoesNotExist:
+            logger.error(
+                f"DocumentType {value_id} not found when applying suggestion to document {pk} "
+                f"by user {request.user.username}",
+            )
+            return Response(
+                {"detail": f"Document type with ID {value_id} not found"},
+                status=404,
+            )
+        except StoragePath.DoesNotExist:
+            logger.error(
+                f"StoragePath {value_id} not found when applying suggestion to document {pk} "
+                f"by user {request.user.username}",
+            )
+            return Response(
+                {"detail": f"Storage path with ID {value_id} not found"},
                 status=404,
             )
         except Exception as e:

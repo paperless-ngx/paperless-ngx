@@ -6,7 +6,8 @@ on:
 jobs:
   generate-translate-strings:
     name: Generate Translation Strings
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
     permissions:
       contents: write
     steps:
@@ -18,6 +19,8 @@ jobs:
       - name: Set up Python
         id: setup-python
         uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
       - name: Install system dependencies
         run: |
           sudo apt-get update -qq
@@ -25,14 +28,44 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
         with:
+          version: '0.9.x'
           enable-cache: true
+          python-version: ${{ steps.setup-python.outputs.python-version }}
+      - name: Verify pyproject.toml exists
+        run: |
+          if [ ! -f "pyproject.toml" ]; then
+            echo "✗ pyproject.toml not found"
+            exit 1
+          fi
+          echo "✓ pyproject.toml found"
       - name: Install backend python dependencies
         run: |
           uv sync \
+            --python ${{ steps.setup-python.outputs.python-version }} \
             --group dev \
             --frozen
+          # Verify installation succeeded
+          if ! uv pip list > /dev/null 2>&1; then
+            echo "✗ Python dependencies installation failed"
+            exit 1
+          fi
+          echo "✓ Python dependencies installed successfully"
+      - name: Verify manage.py exists
+        run: |
+          if [ ! -f "src/manage.py" ]; then
+            echo "✗ src/manage.py not found"
+            exit 1
+          fi
+          echo "✓ src/manage.py found"
       - name: Generate backend translation strings
-        run: cd src/ && uv run manage.py makemessages -l en_US -i "samples*"
+        run: |
+          cd src/ && uv run manage.py makemessages -l en_US -i "samples*"
+          # Verify translation file was generated/updated
+          if [ ! -f "locale/en_US/LC_MESSAGES/django.po" ]; then
+            echo "✗ Backend translation file not generated"
+            exit 1
+          fi
+          echo "✓ Backend translation strings generated successfully"
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -51,15 +84,45 @@ jobs:
             ~/.pnpm-store
             ~/.cache
           key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
+      - name: Verify package.json exists
+        run: |
+          if [ ! -f "src-ui/package.json" ]; then
+            echo "✗ src-ui/package.json not found"
+            exit 1
+          fi
+          if [ ! -f "src-ui/pnpm-lock.yaml" ]; then
+            echo "✗ src-ui/pnpm-lock.yaml not found"
+            exit 1
+          fi
+          echo "✓ Frontend configuration files found"
       - name: Install frontend dependencies
         if: steps.cache-frontend-deps.outputs.cache-hit != 'true'
-        run: cd src-ui && pnpm install
+        run: |
+          cd src-ui && pnpm install
+          # Verify installation succeeded
+          if [ ! -d "node_modules" ]; then
+            echo "✗ pnpm install failed - node_modules not created"
+            exit 1
+          fi
+          echo "✓ Frontend dependencies installed successfully"
       - name: Re-link Angular cli
-        run: cd src-ui && pnpm link @angular/cli
+        run: |
+          cd src-ui
+          if ! pnpm link @angular/cli; then
+            echo "✗ Failed to link Angular CLI"
+            exit 1
+          fi
+          echo "✓ Angular CLI linked successfully"
       - name: Generate frontend translation strings
         run: |
           cd src-ui
           pnpm run ng extract-i18n
+          # Verify translation file was generated/updated
+          if [ ! -f "messages.xlf" ]; then
+            echo "✗ Frontend translation file not generated"
+            exit 1
+          fi
+          echo "✓ Frontend translation strings generated successfully"
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v6
         with:

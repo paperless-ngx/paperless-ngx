@@ -20,6 +20,7 @@ jobs:
   detect-duplicate:
     name: Detect Duplicate Run
     runs-on: ubuntu-24.04
+    timeout-minutes: 5
     outputs:
       should_run: ${{ steps.check.outputs.should_run }}
     steps:
@@ -65,6 +66,7 @@ jobs:
     if: needs.detect-duplicate.outputs.should_run == 'true'
     name: Linting Checks
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -77,6 +79,7 @@ jobs:
   verify-environment:
     name: "Verify Environment & Services"
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     needs:
       - pre-commit
     steps:
@@ -126,20 +129,45 @@ jobs:
           echo "✓ requirements.txt generated successfully"
       - name: Verify Python dependencies installation
         run: |
-          # Verify that requirements.txt can be parsed
-          if ! python -c "
-import sys
-try:
-    with open('requirements.txt', 'r') as f:
-        lines = f.readlines()
-    print(f'✓ requirements.txt has {len(lines)} entries')
-    sys.exit(0)
-except Exception as e:
-    print(f'✗ Error reading requirements.txt: {e}')
-    sys.exit(1)
-          "; then
-            exit 1
-          fi
+          # Verify that requirements.txt is valid and dependencies can be resolved
+          python << 'EOF'
+          import sys
+          import re
+          try:
+              with open('requirements.txt', 'r') as f:
+                  lines = [l.strip() for l in f.readlines() if l.strip() and not l.startswith('#')]
+
+              # Validate format of each dependency line
+              invalid_lines = []
+              for line in lines:
+                  # Skip empty lines and comments
+                  if not line or line.startswith('#'):
+                      continue
+                  # Basic validation: should contain package name
+                  if not re.match(r'^[a-zA-Z0-9_-]+', line):
+                      invalid_lines.append(line)
+
+              if invalid_lines:
+                  print(f'✗ Invalid dependency lines found: {invalid_lines}')
+                  sys.exit(1)
+
+              print(f'✓ requirements.txt has {len(lines)} valid entries')
+
+              # Verify critical ML/OCR dependencies are present
+              content = ' '.join(lines)
+              required_packages = ['torch', 'transformers', 'opencv-python', 'sentence-transformers', 'scikit-learn']
+              missing = [pkg for pkg in required_packages if pkg not in content]
+
+              if missing:
+                  print(f'✗ Missing critical ML/OCR dependencies: {missing}')
+                  sys.exit(1)
+
+              print(f'✓ All critical ML/OCR dependencies present')
+              sys.exit(0)
+          except Exception as e:
+              print(f'✗ Error validating requirements.txt: {e}')
+              sys.exit(1)
+          EOF
       - name: Start Redis service
         run: |
           docker compose --file docker/compose/docker-compose.intellidocs.yml up -d broker
@@ -171,6 +199,7 @@ except Exception as e:
   documentation:
     name: "Build & Deploy Documentation"
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     needs:
       - pre-commit
     steps:
@@ -190,6 +219,13 @@ except Exception as e:
       - name: Install Python dependencies
         run: |
           uv sync --python ${{ steps.setup-python.outputs.python-version }} --dev --frozen
+      - name: Verify mkdocs config exists
+        run: |
+          if [ ! -f "mkdocs.yml" ]; then
+            echo "✗ mkdocs.yml not found"
+            exit 1
+          fi
+          echo "✓ mkdocs.yml found"
       - name: Make documentation
         run: |
           uv run \
@@ -197,6 +233,12 @@ except Exception as e:
             --dev \
             --frozen \
             mkdocs build --config-file ./mkdocs.yml
+          # Verify site directory was created
+          if [ ! -d "site" ]; then
+            echo "✗ Documentation build failed - site directory not created"
+            exit 1
+          fi
+          echo "✓ Documentation built successfully"
       - name: Deploy documentation
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
@@ -217,6 +259,7 @@ except Exception as e:
   tests-backend:
     name: "Backend Tests (Python ${{ matrix.python-version }})"
     runs-on: ubuntu-24.04
+    timeout-minutes: 60
     needs:
       - pre-commit
     strategy:
@@ -235,10 +278,28 @@ except Exception as e:
           swap-storage: true
       - name: Checkout
         uses: actions/checkout@v5
+      - name: Verify docker-compose file exists
+        run: |
+          COMPOSE_FILE="${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml"
+          if [ ! -f "$COMPOSE_FILE" ]; then
+            echo "✗ Compose file not found: $COMPOSE_FILE"
+            exit 1
+          fi
+          echo "✓ Compose file found: $COMPOSE_FILE"
       - name: Start containers
         run: |
           docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml pull --quiet
           docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml up --detach
+          # Wait for containers to be healthy
+          echo "Waiting for containers to be ready..."
+          sleep 5
+          # Verify containers are running
+          if ! docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml ps | grep -q "Up"; then
+            echo "✗ Containers failed to start"
+            docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml logs
+            exit 1
+          fi
+          echo "✓ Containers started successfully"
       - name: Set up Python
         id: setup-python
         uses: actions/setup-python@v6
@@ -256,7 +317,18 @@ except Exception as e:
           sudo apt-get install -qq --no-install-recommends unpaper tesseract-ocr imagemagick ghostscript libzbar0 poppler-utils libglib2.0-0 libsm6 libxext6 libxrender1 libgomp1 libgl1
       - name: Configure ImageMagick
         run: |
+          # Verify source file exists
+          if [ ! -f "docker/rootfs/etc/ImageMagick-6/paperless-policy.xml" ]; then
+            echo "✗ ImageMagick policy file not found"
+            exit 1
+          fi
+          # Verify destination directory exists
+          if [ ! -d "/etc/ImageMagick-6" ]; then
+            echo "✗ ImageMagick-6 directory not found - may not be installed correctly"
+            exit 1
+          fi
           sudo cp docker/rootfs/etc/ImageMagick-6/paperless-policy.xml /etc/ImageMagick-6/policy.xml
+          echo "✓ ImageMagick configured successfully"
       - name: Install Python dependencies
         run: |
           uv sync \
@@ -306,6 +378,7 @@ except Exception as e:
   install-frontend-dependencies:
     name: "Install Frontend Dependencies"
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
     needs:
       - pre-commit
     steps:
@@ -328,11 +401,26 @@ except Exception as e:
             ~/.pnpm-store
             ~/.cache
           key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
+      - name: Verify pnpm-lock.yaml exists
+        run: |
+          if [ ! -f "src-ui/pnpm-lock.yaml" ]; then
+            echo "✗ pnpm-lock.yaml not found in src-ui/"
+            exit 1
+          fi
+          echo "✓ pnpm-lock.yaml found"
       - name: Install dependencies
-        run: cd src-ui && pnpm install
+        run: |
+          cd src-ui && pnpm install
+          # Verify node_modules was created
+          if [ ! -d "node_modules" ]; then
+            echo "✗ pnpm install failed - node_modules not created"
+            exit 1
+          fi
+          echo "✓ Frontend dependencies installed successfully"
   tests-frontend:
     name: "Frontend Unit Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     needs:
       - install-frontend-dependencies
     strategy:
@@ -362,11 +450,26 @@ except Exception as e:
             ~/.cache
           key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
       - name: Re-link Angular cli
-        run: cd src-ui && pnpm link @angular/cli
+        run: |
+          cd src-ui
+          if ! pnpm link @angular/cli; then
+            echo "✗ Failed to link Angular CLI"
+            exit 1
+          fi
+          echo "✓ Angular CLI linked successfully"
       - name: Linting checks
-        run: cd src-ui && pnpm run lint
+        run: |
+          cd src-ui
+          if ! pnpm run lint; then
+            echo "✗ Linting checks failed"
+            exit 1
+          fi
+          echo "✓ Linting checks passed"
       - name: Run Jest unit tests
-        run: cd src-ui && pnpm run test --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
+        run: |
+          cd src-ui
+          pnpm run test --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
+          echo "✓ Unit tests completed for shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}"
       - name: Upload frontend test results to Codecov
         if: always()
         uses: codecov/codecov-action@v5
@@ -382,6 +485,7 @@ except Exception as e:
   tests-frontend-e2e:
     name: "Frontend E2E Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
     runs-on: ubuntu-24.04
+    timeout-minutes: 45
     needs:
       - install-frontend-dependencies
     strategy:
@@ -429,16 +533,38 @@ except Exception as e:
           restore-keys: |
             ${{ runner.os }}-playwright-
       - name: Install Playwright system dependencies
-        run: npx playwright install-deps
+        run: |
+          if ! npx playwright install-deps; then
+            echo "✗ Failed to install Playwright system dependencies"
+            exit 1
+          fi
+          echo "✓ Playwright system dependencies installed"
       - name: Install dependencies
-        run: cd src-ui && pnpm install --no-frozen-lockfile
+        run: |
+          cd src-ui && pnpm install --no-frozen-lockfile
+          # Verify installation succeeded
+          if [ ! -d "node_modules" ]; then
+            echo "✗ pnpm install failed - node_modules not created"
+            exit 1
+          fi
+          echo "✓ Dependencies installed successfully"
       - name: Install Playwright
-        run: cd src-ui && pnpm exec playwright install
+        run: |
+          cd src-ui
+          if ! pnpm exec playwright install; then
+            echo "✗ Failed to install Playwright browsers"
+            exit 1
+          fi
+          echo "✓ Playwright browsers installed successfully"
       - name: Run Playwright e2e tests
-        run: cd src-ui && pnpm exec playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
+        run: |
+          cd src-ui
+          pnpm exec playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
+          echo "✓ E2E tests completed for shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}"
   frontend-bundle-analysis:
     name: "Frontend Bundle Analysis"
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     needs:
       - tests-frontend
       - tests-frontend-e2e
@@ -461,16 +587,25 @@ except Exception as e:
           path: |
             ~/.pnpm-store
             ~/.cache
-          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
+          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
       - name: Re-link Angular cli
         run: cd src-ui && pnpm link @angular/cli
       - name: Build frontend and upload analysis
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        run: cd src-ui && pnpm run build --configuration=production
+        run: |
+          cd src-ui
+          pnpm run build --configuration=production
+          # Verify build output exists
+          if [ ! -d "dist" ]; then
+            echo "✗ Frontend build failed - dist directory not created"
+            exit 1
+          fi
+          echo "✓ Frontend built successfully"
   build-docker-image:
     name: Build Docker image for ${{ github.ref_name }}
     runs-on: ubuntu-24.04
+    timeout-minutes: 60
     if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || startsWith(github.ref, 'refs/heads/fix-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || contains(github.ref, 'beta.rc') || startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/heads/l10n_'))
     concurrency:
       group: ${{ github.workflow }}-build-docker-image-${{ github.ref_name }}
@@ -578,11 +713,31 @@ except Exception as e:
             type=registry,mode=max,ref=ghcr.io/${{ steps.set-ghcr-repository.outputs.ghcr-repository }}/builder/cache/app:${{ github.ref_name }}
       - name: Inspect image
         run: |
-          docker buildx imagetools inspect ${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}
+          IMAGE_TAG="${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}"
+          if ! docker buildx imagetools inspect "$IMAGE_TAG"; then
+            echo "✗ Failed to inspect Docker image: $IMAGE_TAG"
+            exit 1
+          fi
+          echo "✓ Docker image inspected successfully: $IMAGE_TAG"
       - name: Export frontend artifact from docker
         run: |
-          docker create --name frontend-extract ${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}
-          docker cp frontend-extract:/usr/src/paperless/src/documents/static/frontend src/documents/static/frontend/
+          IMAGE_TAG="${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}"
+          if ! docker create --name frontend-extract "$IMAGE_TAG"; then
+            echo "✗ Failed to create container from image: $IMAGE_TAG"
+            exit 1
+          fi
+          if ! docker cp frontend-extract:/usr/src/paperless/src/documents/static/frontend src/documents/static/frontend/; then
+            echo "✗ Failed to extract frontend from container"
+            docker rm frontend-extract
+            exit 1
+          fi
+          docker rm frontend-extract
+          # Verify frontend was extracted
+          if [ ! -d "src/documents/static/frontend" ]; then
+            echo "✗ Frontend extraction failed - directory not created"
+            exit 1
+          fi
+          echo "✓ Frontend extracted successfully from Docker image"
       - name: Upload frontend artifact
         uses: actions/upload-artifact@v4
         with:
@@ -595,6 +750,7 @@ except Exception as e:
       - build-docker-image
       - documentation
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -682,8 +838,25 @@ except Exception as e:
         run: |
           echo "Creating release archive"
           cd dist
+          # Verify directory exists
+          if [ ! -d "paperless-ngx" ]; then
+            echo "✗ paperless-ngx directory not found"
+            exit 1
+          fi
           sudo chown -R 1000:1000 paperless-ngx/
           tar -cJf paperless-ngx.tar.xz paperless-ngx/
+          # Verify archive was created
+          if [ ! -f "paperless-ngx.tar.xz" ]; then
+            echo "✗ Failed to create release archive"
+            exit 1
+          fi
+          # Verify archive is not empty
+          ARCHIVE_SIZE=$(stat -f%z "paperless-ngx.tar.xz" 2>/dev/null || stat -c%s "paperless-ngx.tar.xz")
+          if [ "$ARCHIVE_SIZE" -lt 1000000 ]; then
+            echo "✗ Archive seems too small (${ARCHIVE_SIZE} bytes) - build may have failed"
+            exit 1
+          fi
+          echo "✓ Release archive created successfully (${ARCHIVE_SIZE} bytes)"
       - name: Upload release artifact
         uses: actions/upload-artifact@v4
         with:
@@ -693,6 +866,7 @@ except Exception as e:
   publish-release:
     name: "Publish Release"
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
     outputs:
       prerelease: ${{ steps.get_version.outputs.prerelease }}
       changelog: ${{ steps.create-release.outputs.body }}
@@ -738,6 +912,7 @@ except Exception as e:
   append-changelog:
     name: "Append Changelog"
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     needs:
       - publish-release
     if: needs.publish-release.outputs.prerelease == 'false'

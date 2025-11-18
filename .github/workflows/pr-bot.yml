@@ -8,7 +8,8 @@ permissions:
 jobs:
   pr-bot:
     name: Automated PR Bot
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - name: Label PR by file path or branch name
         # see .github/labeler.yml for the labeler config
