@@ -118,22 +118,42 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
     {
       id: RelativeDate.PREVIOUS_WEEK,
       name: $localize`Previous week`,
-      date: null,
+      date: new Date(
+        new Date().getFullYear(),
+        new Date().getMonth(),
+        new Date().getDate() - new Date().getDay() - 6
+      ),
+      dateEnd: new Date(
+        new Date().getFullYear(),
+        new Date().getMonth(),
+        new Date().getDate() - new Date().getDay()
+      ),
     },
     {
       id: RelativeDate.PREVIOUS_MONTH,
       name: $localize`Previous month`,
-      date: null,
+      date: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1),
+      dateEnd: new Date(new Date().getFullYear(), new Date().getMonth(), 0),
     },
     {
       id: RelativeDate.PREVIOUS_QUARTER,
       name: $localize`Previous quarter`,
-      date: null,
+      date: new Date(
+        new Date().getFullYear(),
+        Math.floor(new Date().getMonth() / 3) * 3 - 3,
+        1
+      ),
+      dateEnd: new Date(
+        new Date().getFullYear(),
+        Math.floor(new Date().getMonth() / 3) * 3,
+        0
+      ),
     },
     {
       id: RelativeDate.PREVIOUS_YEAR,
       name: $localize`Previous year`,
-      date: null,
+      date: new Date('1/1/' + (new Date().getFullYear() - 1)),
+      dateEnd: new Date('12/31/' + (new Date().getFullYear() - 1)),
     },
   ]
 
