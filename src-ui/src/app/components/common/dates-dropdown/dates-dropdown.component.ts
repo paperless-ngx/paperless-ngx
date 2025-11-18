@@ -1,4 +1,4 @@
-import { NgClass } from '@angular/common'
+import { NgClass, NgTemplateOutlet } from '@angular/common'
 import {
   Component,
   EventEmitter,
@@ -63,6 +63,7 @@ export enum RelativeDate {
     FormsModule,
     ReactiveFormsModule,
     NgClass,
+    NgTemplateOutlet,
   ],
 })
 export class DatesDropdownComponent implements OnInit, OnDestroy {
