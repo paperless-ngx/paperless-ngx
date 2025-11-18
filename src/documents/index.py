@@ -13,6 +13,7 @@ from shutil import rmtree
 from typing import TYPE_CHECKING
 from typing import Literal
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.utils import timezone as django_timezone
 from django.utils.timezone import get_current_timezone
@@ -534,7 +535,6 @@ def rewrite_natural_date_keywords(query_string: str) -> str:
     """
     Rewrites natural date keywords (e.g. added:today or added:"yesterday") to UTC range syntax for Whoosh.
     """
-    from dateutil.relativedelta import relativedelta
 
     tz = get_current_timezone()
     local_now = now().astimezone(tz)
