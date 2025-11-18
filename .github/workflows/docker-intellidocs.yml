@@ -13,7 +13,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  # Docker requires lowercase repository names
+  IMAGE_NAME: dawnsystem/intellidocs-ngx
 
 jobs:
   # ============================================================================
