@@ -44,10 +44,22 @@ jobs:
           sudo apt-get install -qq --no-install-recommends \
             libglib2.0-0 libsm6 libxext6 libxrender1 libgomp1 libgl1
 
+      - name: Verify pyproject.toml exists
+        run: |
+          if [ ! -f "pyproject.toml" ]; then
+            echo "✗ pyproject.toml not found"
+            exit 1
+          fi
+          echo "✓ pyproject.toml found"
       - name: Install Python dependencies
         run: |
           uv sync --all-extras
-
+          # Verify installation succeeded
+          if ! uv pip list > /dev/null 2>&1; then
+            echo "✗ Python dependencies installation failed"
+            exit 1
+          fi
+          echo "✓ Python dependencies installed successfully"
       - name: Test ML/OCR imports
         run: |
           uv run python -c "
@@ -83,12 +95,20 @@ jobs:
           print('\\n✅ All ML/OCR dependencies loaded successfully!')
           "
 
+      - name: Verify test file exists
+        run: |
+          if [ ! -f "src/documents/tests/test_ml_smoke.py" ]; then
+            echo "✗ ML smoke test file not found"
+            exit 1
+          fi
+          echo "✓ ML smoke test file found"
       - name: Run ML smoke tests
         env:
           # Skip slow tests that download models to avoid timeouts/disk space issues
           SKIP_SLOW_TESTS: "1"
         run: |
           uv run pytest src/documents/tests/test_ml_smoke.py -v --tb=short
+          echo "✓ ML smoke tests passed"
 
   # ============================================================================
   # JOB 2: Build y Push imagen Docker
@@ -111,6 +131,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
+      - name: Verify Dockerfile exists
+        run: |
+          if [ ! -f "Dockerfile" ]; then
+            echo "✗ Dockerfile not found"
+            exit 1
+          fi
+          echo "✓ Dockerfile found"
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -202,8 +229,18 @@ jobs:
 
       - name: Pull Docker image
         run: |
-          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
-
+          IMAGE_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}"
+          echo "Pulling image: $IMAGE_TAG"
+          if ! docker pull "$IMAGE_TAG"; then
+            echo "✗ Failed to pull Docker image: $IMAGE_TAG"
+            exit 1
+          fi
+          # Verify image was pulled
+          if ! docker images "$IMAGE_TAG" | grep -q "${{ steps.tag.outputs.tag }}"; then
+            echo "✗ Image not found after pull"
+            exit 1
+          fi
+          echo "✓ Docker image pulled successfully: $IMAGE_TAG"
       - name: Test ML dependencies in container
         run: |
           docker run --rm \
@@ -220,15 +257,20 @@ jobs:
 
       - name: Test Django migrations check
         run: |
-          docker run --rm \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} \
-            python src/manage.py makemigrations --check --dry-run
-
+          IMAGE_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}"
+          if ! docker run --rm "$IMAGE_TAG" python src/manage.py makemigrations --check --dry-run; then
+            echo "✗ Django migrations check failed"
+            exit 1
+          fi
+          echo "✓ Django migrations check passed"
       - name: Verify OpenCV system dependencies
         run: |
-          docker run --rm \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} \
-            sh -c "dpkg -l | grep -E 'libglib2.0-0|libsm6|libxext6|libxrender1|libgomp1|libgl1'"
+          IMAGE_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}"
+          if ! docker run --rm "$IMAGE_TAG" sh -c "dpkg -l | grep -E 'libglib2.0-0|libsm6|libxext6|libxrender1|libgomp1|libgl1'"; then
+            echo "✗ OpenCV system dependencies check failed"
+            exit 1
+          fi
+          echo "✓ OpenCV system dependencies verified"
 
       - name: Generate test report
         if: always()
@@ -248,6 +290,7 @@ jobs:
   create-release:
     name: Create GitHub Release
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     needs: [build-and-push, test-docker-image]
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
