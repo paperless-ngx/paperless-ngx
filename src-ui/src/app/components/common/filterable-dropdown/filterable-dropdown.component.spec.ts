@@ -631,6 +631,47 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     ])
   })
 
+  it('resorts items immediately when document count sorting enabled', () => {
+    const apple: Tag = { id: 55, name: 'Apple' }
+    const zebra: Tag = { id: 56, name: 'Zebra' }
+
+    selectionModel.documentCountSortingEnabled = true
+    selectionModel.items = [apple, zebra]
+    expect(selectionModel.items.map((item) => item?.id ?? null)).toEqual([
+      null,
+      apple.id,
+      zebra.id,
+    ])
+
+    selectionModel.documentCounts = [
+      { id: zebra.id, document_count: 5 },
+      { id: apple.id, document_count: 0 },
+    ]
+
+    expect(selectionModel.items.map((item) => item?.id ?? null)).toEqual([
+      null,
+      zebra.id,
+      apple.id,
+    ])
+  })
+
+  it('does not resort items by default when document counts are set', () => {
+    const first: Tag = { id: 57, name: 'First' }
+    const second: Tag = { id: 58, name: 'Second' }
+
+    selectionModel.items = [first, second]
+    selectionModel.documentCounts = [
+      { id: second.id, document_count: 10 },
+      { id: first.id, document_count: 0 },
+    ]
+
+    expect(selectionModel.items.map((item) => item?.id ?? null)).toEqual([
+      null,
+      first.id,
+      second.id,
+    ])
+  })
+
   it('uses fallback document counts when selection data is missing', () => {
     const fallbackRoot: Tag = {
       id: 50,
