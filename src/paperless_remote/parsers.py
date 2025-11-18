@@ -77,31 +77,36 @@ class RemoteDocumentParser(RasterisedDocumentParser):
             credential=AzureKeyCredential(self.settings.api_key),
         )
 
-        with file.open("rb") as f:
-            analyze_request = AnalyzeDocumentRequest(bytes_source=f.read())
-            poller = client.begin_analyze_document(
-                model_id="prebuilt-read",
-                body=analyze_request,
-                output_content_format=DocumentContentFormat.TEXT,
-                output=[AnalyzeOutputOption.PDF],  # request searchable PDF output
-                content_type="application/json",
-            )
+        try:
+            with file.open("rb") as f:
+                analyze_request = AnalyzeDocumentRequest(bytes_source=f.read())
+                poller = client.begin_analyze_document(
+                    model_id="prebuilt-read",
+                    body=analyze_request,
+                    output_content_format=DocumentContentFormat.TEXT,
+                    output=[AnalyzeOutputOption.PDF],  # request searchable PDF output
+                    content_type="application/json",
+                )
 
-        poller.wait()
-        result_id = poller.details["operation_id"]
-        result = poller.result()
+            poller.wait()
+            result_id = poller.details["operation_id"]
+            result = poller.result()
 
-        # Download the PDF with embedded text
-        self.archive_path = self.tempdir / "archive.pdf"
-        with self.archive_path.open("wb") as f:
-            for chunk in client.get_analyze_result_pdf(
-                model_id="prebuilt-read",
-                result_id=result_id,
-            ):
-                f.write(chunk)
+            # Download the PDF with embedded text
+            self.archive_path = self.tempdir / "archive.pdf"
+            with self.archive_path.open("wb") as f:
+                for chunk in client.get_analyze_result_pdf(
+                    model_id="prebuilt-read",
+                    result_id=result_id,
+                ):
+                    f.write(chunk)
+            return result.content
+        except Exception as e:
+            self.log.error(f"Azure AI Vision parsing failed: {e}")
+        finally:
+            client.close()
 
-        client.close()
-        return result.content
+        return None
 
     def parse(self, document_path: Path, mime_type, file_name=None):
         if not self.settings.engine_is_valid():

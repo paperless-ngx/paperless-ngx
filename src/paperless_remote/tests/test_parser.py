@@ -68,6 +68,33 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 ["This is a test document."],
             )
 
+    @mock.patch("azure.ai.documentintelligence.DocumentIntelligenceClient")
+    def test_get_text_with_azure_error_logged_and_returns_none(self, mock_client_cls):
+        mock_client = mock.Mock()
+        mock_client.begin_analyze_document.side_effect = RuntimeError("fail")
+        mock_client_cls.return_value = mock_client
+
+        with override_settings(
+            REMOTE_OCR_ENGINE="azureai",
+            REMOTE_OCR_API_KEY="somekey",
+            REMOTE_OCR_ENDPOINT="https://endpoint.cognitiveservices.azure.com",
+        ):
+            parser = get_parser(uuid.uuid4())
+            with mock.patch.object(parser.log, "error") as mock_log_error:
+                parser.parse(
+                    self.SAMPLE_FILES / "simple-digital.pdf",
+                    "application/pdf",
+                )
+
+        self.assertIsNone(parser.text)
+        mock_client.begin_analyze_document.assert_called_once()
+        mock_client.close.assert_called_once()
+        mock_log_error.assert_called_once()
+        self.assertIn(
+            "Azure AI Vision parsing failed",
+            mock_log_error.call_args[0][0],
+        )
+
     @override_settings(
         REMOTE_OCR_ENGINE="azureai",
         REMOTE_OCR_API_KEY="key",
