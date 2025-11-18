@@ -534,20 +534,21 @@ def get_permissions_criterias(user: User | None = None) -> list:
 def rewrite_natural_date_keywords(query_string: str) -> str:
     """
     Rewrites natural date keywords (e.g. added:today or added:"yesterday") to UTC range syntax for Whoosh.
+    This resolves timezone issues with date parsing in Whoosh as well as adding support for more
+    natural date keywords.
     """
 
     tz = get_current_timezone()
     local_now = now().astimezone(tz)
     today = local_now.date()
 
-    # Pattern for all supported Keywords
+    # all supported Keywords
     pattern = r"(\b(?:added|created|modified))\s*:\s*[\"']?(today|yesterday|this month|previous month|previous week|previous quarter|this year|previous year)[\"']?"
 
     def repl(m):
         field = m.group(1)
         keyword = m.group(2).lower()
 
-        # Calculate date ranges on-demand based on keyword
         match keyword:
             case "today":
                 start = datetime.combine(today, time.min, tzinfo=tz)
@@ -580,7 +581,6 @@ def rewrite_natural_date_keywords(query_string: str) -> str:
                 end = datetime.combine(today, time.max, tzinfo=tz)
 
             case "previous week":
-                # ISO-Week: Monday = 0, Sunday = 6
                 days_since_monday = local_now.weekday()
                 this_week_start = datetime.combine(
                     today - timedelta(days=days_since_monday),
@@ -608,11 +608,6 @@ def rewrite_natural_date_keywords(query_string: str) -> str:
             case "previous year":
                 start = datetime(local_now.year - 1, 1, 1, 0, 0, 0, tzinfo=tz)
                 end = datetime(local_now.year - 1, 12, 31, 23, 59, 59, tzinfo=tz)
-
-            case _:
-                # Should not happen, since the pattern only matches known keywords
-                # Fallback: Leave the query unchanged
-                return m.group(0)
 
         # Convert to UTC and format
         start_str = start.astimezone(timezone.utc).strftime("%Y%m%d%H%M%S")
