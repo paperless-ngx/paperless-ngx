@@ -1,4 +1,4 @@
-#!/command/with-contenv /bin/bash
+#!/command/with-contenv /usr/bin/bash
 # shellcheck shell=bash
 
 declare -r log_prefix="[custom-init]"
@@ -30,7 +30,7 @@ if [ -d "${custom_script_dir}" ]; then
 			NAME="$(basename "${SCRIPT}")"
 			if [ -f "${SCRIPT}" ]; then
 				echo "${log_prefix} ${NAME}: executing..."
-				/command/with-contenv /bin/bash "${SCRIPT}"
+				/command/with-contenv /usr/bin/bash "${SCRIPT}"
 				echo "${log_prefix} ${NAME}: exited $?"
 			elif [ ! -f "${SCRIPT}" ]; then
 				echo "${log_prefix} ${NAME}: is not a file"

@@ -1,4 +1,4 @@
-#!/command/with-contenv /bin/bash
+#!/command/with-contenv /usr/bin/bash
 # shellcheck shell=bash
 
 cd ${PAPERLESS_SRC_DIR}
