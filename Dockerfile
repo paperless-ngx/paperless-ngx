@@ -190,27 +190,12 @@ RUN set -eux \
   echo "Installing system packages" \
     && apt-get update \
     && apt-get install --yes --quiet --no-install-recommends ${RUNTIME_PACKAGES} \
-    && echo "Installing pre-built updates" \
-      && curl --fail --silent --no-progress-meter --show-error --location --remote-name-all --parallel --parallel-max 4 \
-        https://github.com/paperless-ngx/builder/releases/download/qpdf-${QPDF_VERSION}/libqpdf29_${QPDF_VERSION}-1_${TARGETARCH}.deb \
-        https://github.com/paperless-ngx/builder/releases/download/qpdf-${QPDF_VERSION}/qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb \
-        https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
-        https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
-        https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
-        https://github.com/paperless-ngx/builder/releases/download/jbig2enc-${JBIG2ENC_VERSION}/jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
-      && echo "Installing qpdf ${QPDF_VERSION}" \
-        && dpkg --install ./libqpdf29_${QPDF_VERSION}-1_${TARGETARCH}.deb \
-        && dpkg --install ./qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb \
-      && echo "Installing Ghostscript ${GS_VERSION}" \
-        && dpkg --install ./libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
-        && dpkg --install ./libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
-        && dpkg --install ./ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
-      && echo "Installing jbig2enc" \
-        && dpkg --install ./jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
-      && echo "Configuring imagemagick" \
-        && cp /etc/ImageMagick-6/paperless-policy.xml /etc/ImageMagick-6/policy.xml \
-      && echo "Cleaning up image layer" \
-        && rm --force --verbose *.deb \
+    && echo "WORKAROUND: Using Debian repository versions instead of custom builds" \
+    && echo "Reason: GitHub releases from paperless-ngx/builder returning 403 errors" \
+    && echo "Note: qpdf and ghostscript from Debian repos; jbig2enc removed (no code refs)" \
+    && echo "Configuring imagemagick" \
+      && cp /etc/ImageMagick-6/paperless-policy.xml /etc/ImageMagick-6/policy.xml \
+    && echo "Cleaning up image layer" \
     && rm --recursive --force --verbose /var/lib/apt/lists/*
 
 WORKDIR /usr/src/paperless/src/
