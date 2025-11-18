@@ -133,8 +133,6 @@ class TestAutoComplete(DirectoriesMixin, TestCase):
 class TestRewriteNaturalDateKeywords(SimpleTestCase):
     """
     Unit tests for rewrite_natural_date_keywords function.
-    Uses SimpleTestCase (no database required) since the function only uses
-    Django timezone utilities and standard library modules.
     """
 
     @override_settings(TIME_ZONE="UTC")
@@ -143,7 +141,6 @@ class TestRewriteNaturalDateKeywords(SimpleTestCase):
         fixed_now = datetime(2025, 7, 20, 15, 30, 45, tzinfo=timezone.utc)
         with mock.patch("documents.index.now", return_value=fixed_now):
             result = index.rewrite_natural_date_keywords("added:today")
-            # Should match: added:[20250720000000 TO 20250720235959]
             self.assertIn("added:[20250720", result)
             self.assertIn("TO 20250720", result)
 
@@ -153,7 +150,6 @@ class TestRewriteNaturalDateKeywords(SimpleTestCase):
         fixed_now = datetime(2025, 7, 20, 15, 30, 45, tzinfo=timezone.utc)
         with mock.patch("documents.index.now", return_value=fixed_now):
             result = index.rewrite_natural_date_keywords("added:yesterday")
-            # Should match: added:[20250719000000 TO 20250719235959]
             self.assertIn("added:[20250719", result)
             self.assertIn("TO 20250719", result)
 
@@ -163,7 +159,6 @@ class TestRewriteNaturalDateKeywords(SimpleTestCase):
         fixed_now = datetime(2025, 7, 15, 12, 0, 0, tzinfo=timezone.utc)
         with mock.patch("documents.index.now", return_value=fixed_now):
             result = index.rewrite_natural_date_keywords("added:this month")
-            # Should match: added:[20250701000000 TO 20250731235959]
             self.assertIn("added:[20250701", result)
             self.assertIn("TO 20250731", result)
 
@@ -173,7 +168,6 @@ class TestRewriteNaturalDateKeywords(SimpleTestCase):
         fixed_now = datetime(2025, 7, 15, 12, 0, 0, tzinfo=timezone.utc)
         with mock.patch("documents.index.now", return_value=fixed_now):
             result = index.rewrite_natural_date_keywords("added:previous month")
-            # Should match: added:[20250601000000 TO 20250630235959]
             self.assertIn("added:[20250601", result)
             self.assertIn("TO 20250630", result)
 
@@ -183,7 +177,6 @@ class TestRewriteNaturalDateKeywords(SimpleTestCase):
         fixed_now = datetime(2025, 7, 15, 12, 0, 0, tzinfo=timezone.utc)
         with mock.patch("documents.index.now", return_value=fixed_now):
             result = index.rewrite_natural_date_keywords("added:this year")
-            # Should match: added:[20250101000000 TO 20250715235959]
             self.assertIn("added:[20250101", result)
             self.assertIn("TO 20250715", result)
 
@@ -193,7 +186,6 @@ class TestRewriteNaturalDateKeywords(SimpleTestCase):
         fixed_now = datetime(2025, 7, 15, 12, 0, 0, tzinfo=timezone.utc)
         with mock.patch("documents.index.now", return_value=fixed_now):
             result = index.rewrite_natural_date_keywords("added:previous year")
-            # Should match: added:[20240101000000 TO 20241231235959]
             self.assertIn("added:[20240101", result)
             self.assertIn("TO 20241231", result)
 
@@ -215,7 +207,6 @@ class TestRewriteNaturalDateKeywords(SimpleTestCase):
         fixed_now = datetime(2025, 7, 15, 12, 0, 0, tzinfo=timezone.utc)
         with mock.patch("documents.index.now", return_value=fixed_now):
             result = index.rewrite_natural_date_keywords("added:previous quarter")
-            # Should match: added:[20250401000000 TO 20250630235959]
             self.assertIn("added:[20250401", result)
             self.assertIn("TO 20250630", result)
 
@@ -226,6 +217,14 @@ class TestRewriteNaturalDateKeywords(SimpleTestCase):
         with mock.patch("documents.index.now", return_value=fixed_now):
             result = index.rewrite_natural_date_keywords("created:today")
             self.assertIn("created:[20250720", result)
+
+    @override_settings(TIME_ZONE="UTC")
+    def test_modified_field(self):
+        """Test that 'modified' field works in addition to 'added'."""
+        fixed_now = datetime(2025, 7, 20, 15, 30, 45, tzinfo=timezone.utc)
+        with mock.patch("documents.index.now", return_value=fixed_now):
+            result = index.rewrite_natural_date_keywords("modified:today")
+            self.assertIn("modified:[20250720", result)
 
     @override_settings(TIME_ZONE="UTC")
     def test_quoted_keywords(self):
