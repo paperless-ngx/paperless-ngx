@@ -244,7 +244,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         CustomFieldInstance.objects.create(
             document=doc,
             field=custom_field_select,
-            value_text="abc-123",
+            value_select="def-456",
         )
 
         resp = self.client.patch(

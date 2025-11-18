@@ -571,7 +571,7 @@ class TestExportImport(
         with self.assertRaises(CommandError) as e:
             call_command(*args)
 
-            self.assertEqual("That path isn't a directory", str(e))
+        self.assertEqual("That path doesn't exist", str(e.exception))
 
     def test_export_target_exists_but_is_file(self):
         """
@@ -589,7 +589,7 @@ class TestExportImport(
             with self.assertRaises(CommandError) as e:
                 call_command(*args)
 
-                self.assertEqual("That path isn't a directory", str(e))
+            self.assertEqual("That path isn't a directory", str(e.exception))
 
     def test_export_target_not_writable(self):
         """
@@ -608,7 +608,10 @@ class TestExportImport(
             with self.assertRaises(CommandError) as e:
                 call_command(*args)
 
-                self.assertEqual("That path doesn't appear to be writable", str(e))
+            self.assertEqual(
+                "That path doesn't appear to be writable",
+                str(e.exception),
+            )
 
     def test_no_archive(self):
         """

@@ -400,6 +400,9 @@ export class FilterEditorComponent
 
   @Input()
   set filterRules(value: FilterRule[]) {
+    if (value === this._filterRules) {
+      return
+    }
     this._filterRules = value
 
     this.documentTypeSelectionModel.clear(false)
@@ -1098,7 +1101,13 @@ export class FilterEditorComponent
   rulesModified: boolean = false
 
   updateRules() {
-    this.filterRulesChange.next(this.filterRules)
+    const updatedRules = this.filterRules
+    this._filterRules = updatedRules
+    this.rulesModified = filterRulesDiffer(
+      this._unmodifiedFilterRules,
+      updatedRules
+    )
+    this.filterRulesChange.next(updatedRules)
   }
 
   get textFilter() {
