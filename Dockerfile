@@ -136,6 +136,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # Packages need for running
 ARG RUNTIME_PACKAGES="\
   # General utils
+  bash \
   curl \
   # Docker specific
   gosu \
