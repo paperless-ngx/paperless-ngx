@@ -53,15 +53,6 @@ class TestUrlCanary:
     Verify certain URLs are still available so testing is valid still
     """
 
-    # Wikimedia rejects requests without a browser-like User-Agent header and returns 403.
-    _WIKIMEDIA_HEADERS = {
-        "User-Agent": (
-            "Mozilla/5.0 (X11; Linux x86_64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/123.0.0.0 Safari/537.36"
-        ),
-    }
-
     def test_online_image_exception_on_not_available(self):
         """
         GIVEN:
@@ -76,11 +67,10 @@ class TestUrlCanary:
         whether this image stays online forever, so here we check if we can detect if is not
         available anymore.
         """
+        resp = httpx.get(
+            "https://docs.paperless-ngx.com/assets/non-existent.png",
+        )
         with pytest.raises(httpx.HTTPStatusError) as exec_info:
-            resp = httpx.get(
-                "https://upload.wikimedia.org/wikipedia/en/f/f7/nonexistent.png",
-                headers=self._WIKIMEDIA_HEADERS,
-            )
             resp.raise_for_status()
 
         assert exec_info.value.response.status_code == httpx.codes.NOT_FOUND
@@ -101,8 +91,7 @@ class TestUrlCanary:
 
         # Now check the URL used in samples/sample.html
         resp = httpx.get(
-            "https://upload.wikimedia.org/wikipedia/en/f/f7/RickRoll.png",
-            headers=self._WIKIMEDIA_HEADERS,
+            "https://docs.paperless-ngx.com/assets/logo_full_white.svg",
         )
         resp.raise_for_status()
 

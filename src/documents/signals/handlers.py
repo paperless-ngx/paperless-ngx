@@ -393,9 +393,9 @@ class CannotMoveFilesException(Exception):
 
 
 # should be disabled in /src/documents/management/commands/document_importer.py handle
-@receiver(models.signals.post_save, sender=CustomFieldInstance)
-@receiver(models.signals.m2m_changed, sender=Document.tags.through)
-@receiver(models.signals.post_save, sender=Document)
+@receiver(models.signals.post_save, sender=CustomFieldInstance, weak=False)
+@receiver(models.signals.m2m_changed, sender=Document.tags.through, weak=False)
+@receiver(models.signals.post_save, sender=Document, weak=False)
 def update_filename_and_move_files(
     sender,
     instance: Document | CustomFieldInstance,
