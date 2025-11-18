@@ -130,46 +130,44 @@ jobs:
       - name: Verify Python dependencies installation
         run: |
           # Verify that requirements.txt is valid and dependencies can be resolved
-          if ! python -c "
-import sys
-import re
-try:
-    with open('requirements.txt', 'r') as f:
-        lines = [l.strip() for l in f.readlines() if l.strip() and not l.startswith('#')]
+          python << 'EOF'
+          import sys
+          import re
+          try:
+              with open('requirements.txt', 'r') as f:
+                  lines = [l.strip() for l in f.readlines() if l.strip() and not l.startswith('#')]
 
-    # Validate format of each dependency line
-    invalid_lines = []
-    for line in lines:
-        # Skip empty lines and comments
-        if not line or line.startswith('#'):
-            continue
-        # Basic validation: should contain package name
-        if not re.match(r'^[a-zA-Z0-9_-]+', line):
-            invalid_lines.append(line)
+              # Validate format of each dependency line
+              invalid_lines = []
+              for line in lines:
+                  # Skip empty lines and comments
+                  if not line or line.startswith('#'):
+                      continue
+                  # Basic validation: should contain package name
+                  if not re.match(r'^[a-zA-Z0-9_-]+', line):
+                      invalid_lines.append(line)
 
-    if invalid_lines:
-        print(f'✗ Invalid dependency lines found: {invalid_lines}')
-        sys.exit(1)
+              if invalid_lines:
+                  print(f'✗ Invalid dependency lines found: {invalid_lines}')
+                  sys.exit(1)
 
-    print(f'✓ requirements.txt has {len(lines)} valid entries')
+              print(f'✓ requirements.txt has {len(lines)} valid entries')
 
-    # Verify critical ML/OCR dependencies are present
-    content = ' '.join(lines)
-    required_packages = ['torch', 'transformers', 'opencv-python', 'sentence-transformers', 'scikit-learn']
-    missing = [pkg for pkg in required_packages if pkg not in content]
+              # Verify critical ML/OCR dependencies are present
+              content = ' '.join(lines)
+              required_packages = ['torch', 'transformers', 'opencv-python', 'sentence-transformers', 'scikit-learn']
+              missing = [pkg for pkg in required_packages if pkg not in content]
 
-    if missing:
-        print(f'✗ Missing critical ML/OCR dependencies: {missing}')
-        sys.exit(1)
+              if missing:
+                  print(f'✗ Missing critical ML/OCR dependencies: {missing}')
+                  sys.exit(1)
 
-    print(f'✓ All critical ML/OCR dependencies present')
-    sys.exit(0)
-except Exception as e:
-    print(f'✗ Error validating requirements.txt: {e}')
-    sys.exit(1)
-          "; then
-            exit 1
-          fi
+              print(f'✓ All critical ML/OCR dependencies present')
+              sys.exit(0)
+          except Exception as e:
+              print(f'✗ Error validating requirements.txt: {e}')
+              sys.exit(1)
+          EOF
       - name: Start Redis service
         run: |
           docker compose --file docker/compose/docker-compose.intellidocs.yml up -d broker
