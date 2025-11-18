@@ -447,7 +447,7 @@ class DelayedFullTextQuery(DelayedQuery):
             if corrected.string != q_str:
                 suggested_correction = corrected.string
         except Exception as e:
-            logger.error(
+            logger.info(
                 "Error while correcting query %s: %s",
                 f"{q_str!r}",
                 e,
