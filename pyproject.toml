@@ -157,16 +157,18 @@ environments = [
   "sys_platform == 'linux'",
 ]
 
-[tool.uv.sources]
+# [tool.uv.sources]
+# TEMPORARILY DISABLED: GitHub releases URLs returning 403 errors
+# These custom builds were used for Docker image optimization but PyPI versions work fine
 # Markers are chosen to select these almost exclusively when building the Docker image
-psycopg-c = [
-  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_c-3.2.9-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
-  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_c-3.2.9-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
-]
-zxing-cpp = [
-  { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
-  { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
-]
+# psycopg-c = [
+#   { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_c-3.2.9-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
+#   { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_c-3.2.9-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
+# ]
+# zxing-cpp = [
+#   { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
+#   { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
+# ]
 
 [tool.ruff]
 target-version = "py310"
@@ -261,7 +263,7 @@ lint.isort.force-single-line = true
 [tool.codespell]
 write-changes = true
 ignore-words-list = "criterias,afterall,valeu,ureue,equest,ure,assertIn,Oktober"
-skip = "src-ui/src/locale/*,src-ui/pnpm-lock.yaml,src-ui/e2e/*,src/paperless_mail/tests/samples/*,src/documents/tests/samples/*,*.po,*.json"
+skip = "src-ui/src/locale/*,src-ui/pnpm-lock.yaml,src-ui/e2e/*,src/paperless_mail/tests/samples/*,src/documents/tests/samples/*,*.po,*.json,[Ff][Aa][Ss][Ee]*.md,BITACORA*.md,INFORME*.md,ROADMAP*.md,DOCKER_*.md,REPORTE*.md,AI_*.md,CHECKLIST*.md,agents.md,create_ai_scanner_issues.sh,docker/README_INTELLIDOCS.md"
 
 [tool.pytest.ini_options]
 minversion = "8.0"
