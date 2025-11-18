@@ -140,6 +140,9 @@ export class AiSuggestionsPanelComponent implements OnChanges, OnDestroy {
           takeUntil(this.destroy$),
           catchError((error) => {
             console.error('Failed to load tags:', error)
+            this.toastService.showError(
+              $localize`Failed to load tags for AI suggestions. Please refresh the page.`
+            )
             return of({ results: [] })
           })
         )
@@ -160,6 +163,9 @@ export class AiSuggestionsPanelComponent implements OnChanges, OnDestroy {
           takeUntil(this.destroy$),
           catchError((error) => {
             console.error('Failed to load correspondents:', error)
+            this.toastService.showError(
+              $localize`Failed to load correspondents for AI suggestions. Please refresh the page.`
+            )
             return of({ results: [] })
           })
         )
@@ -180,6 +186,9 @@ export class AiSuggestionsPanelComponent implements OnChanges, OnDestroy {
           takeUntil(this.destroy$),
           catchError((error) => {
             console.error('Failed to load document types:', error)
+            this.toastService.showError(
+              $localize`Failed to load document types for AI suggestions. Please refresh the page.`
+            )
             return of({ results: [] })
           })
         )
@@ -200,6 +209,9 @@ export class AiSuggestionsPanelComponent implements OnChanges, OnDestroy {
           takeUntil(this.destroy$),
           catchError((error) => {
             console.error('Failed to load storage paths:', error)
+            this.toastService.showError(
+              $localize`Failed to load storage paths for AI suggestions. Please refresh the page.`
+            )
             return of({ results: [] })
           })
         )
@@ -220,6 +232,9 @@ export class AiSuggestionsPanelComponent implements OnChanges, OnDestroy {
           takeUntil(this.destroy$),
           catchError((error) => {
             console.error('Failed to load custom fields:', error)
+            this.toastService.showError(
+              $localize`Failed to load custom fields for AI suggestions. Please refresh the page.`
+            )
             return of({ results: [] })
           })
         )
