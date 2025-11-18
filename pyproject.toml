@@ -17,7 +17,7 @@ classifiers = [
 
 dependencies = [
   "babel>=2.17",
-  "bleach~=6.2.0",
+  "bleach~=6.3.0",
   "celery[redis]~=5.5.1",
   "channels~=4.2",
   "channels-redis~=4.2",
@@ -52,11 +52,11 @@ dependencies = [
   "jinja2~=3.1.5",
   "langdetect~=1.0.9",
   "nltk~=3.9.1",
-  "ocrmypdf~=16.11.0",
+  "ocrmypdf~=16.12.0",
   "pathvalidate~=3.3.1",
   "pdf2image~=1.17.0",
   "python-dateutil~=2.9.0",
-  "python-dotenv~=1.1.0",
+  "python-dotenv~=1.2.1",
   "python-gnupg~=0.5.4",
   "python-ipware~=3.0.0",
   "python-magic~=0.4.27",
@@ -80,7 +80,7 @@ optional-dependencies.postgres = [
   "psycopg[c,pool]==3.2.9",
   # Direct dependency for proper resolution of the pre-built wheels
   "psycopg-c==3.2.9",
-  "psycopg-pool==3.2.6",
+  "psycopg-pool==3.2.7",
 ]
 optional-dependencies.webserver = [
   "granian[uvloop]~=2.5.1",
@@ -96,7 +96,7 @@ dev = [
 
 docs = [
   "mkdocs-glightbox~=0.5.1",
-  "mkdocs-material~=9.6.4",
+  "mkdocs-material~=9.7.0",
 ]
 
 testing = [
@@ -115,7 +115,7 @@ testing = [
 ]
 
 lint = [
-  "pre-commit~=4.3.0",
+  "pre-commit~=4.4.0",
   "pre-commit-uv~=4.2.0",
   "ruff~=0.14.0",
 ]
