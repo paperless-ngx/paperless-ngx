@@ -541,7 +541,7 @@ def rewrite_natural_date_keywords(query_string: str) -> str:
     today = local_now.date()
 
     # Pattern for all supported Keywords
-    pattern = r"(\b(?:added|created))\s*:\s*[\"']?(today|yesterday|this month|previous month|previous week|previous quarter|this year|previous year)[\"']?"
+    pattern = r"(\b(?:added|created|modified))\s*:\s*[\"']?(today|yesterday|this month|previous month|previous week|previous quarter|this year|previous year)[\"']?"
 
     def repl(m):
         field = m.group(1)
