@@ -366,6 +366,8 @@ jobs:
     env:
       BUILD_REF: ${{ github.event_name == 'pull_request' && format('refs/heads/{0}', github.head_ref) || github.ref }}
       BUILD_REF_NAME: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+      BUILD_CACHE_KEY: ${{ github.event_name == 'pull_request' && replace(github.head_ref, '/', '-') || github.ref_name }}
+      CAN_PUSH_IMAGES: ${{ format('{0}', github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) }}
     steps:
       - name: Check pushing to Docker Hub
         id: push-other-places
@@ -400,6 +402,8 @@ jobs:
           tags: |
             # Tag branches with branch name
             type=ref,event=branch
+            # Pull requests need a sanitized branch tag for pushing images
+            type=raw,value=${{ env.BUILD_CACHE_KEY }},enable=${{ github.event_name == 'pull_request' }}
             # Process semver tags
             # For a tag x.y.z or vX.Y.Z, output an x.y.z and x.y image tag
             type=semver,pattern={{version}}
@@ -442,7 +446,7 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
-          push: ${{ github.event_name != 'pull_request' }}
+          push: ${{ env.CAN_PUSH_IMAGES == 'true' }}
           tags: ${{ steps.docker-meta.outputs.tags }}
           labels: ${{ steps.docker-meta.outputs.labels }}
           build-args: |
@@ -450,18 +454,20 @@ jobs:
           # Get cache layers from this branch, then dev
           # This allows new branches to get at least some cache benefits, generally from dev
           cache-from: |
-            type=registry,ref=ghcr.io/${{ steps.set-ghcr-repository.outputs.ghcr-repository }}/builder/cache/app:${{ env.BUILD_REF_NAME }}
+            type=registry,ref=ghcr.io/${{ steps.set-ghcr-repository.outputs.ghcr-repository }}/builder/cache/app:${{ env.BUILD_CACHE_KEY }}
             type=registry,ref=ghcr.io/${{ steps.set-ghcr-repository.outputs.ghcr-repository }}/builder/cache/app:dev
-          cache-to: |
-            type=registry,mode=max,ref=ghcr.io/${{ steps.set-ghcr-repository.outputs.ghcr-repository }}/builder/cache/app:${{ env.BUILD_REF_NAME }}
+          cache-to: ${{ env.CAN_PUSH_IMAGES == 'true' && format('type=registry,mode=max,ref=ghcr.io/{0}/builder/cache/app:{1}', steps.set-ghcr-repository.outputs.ghcr-repository, env.BUILD_CACHE_KEY) || '' }}
       - name: Inspect image
+        if: env.CAN_PUSH_IMAGES == 'true'
         run: |
           docker buildx imagetools inspect ${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}
       - name: Export frontend artifact from docker
+        if: env.CAN_PUSH_IMAGES == 'true'
         run: |
           docker create --name frontend-extract ${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}
           docker cp frontend-extract:/usr/src/paperless/src/documents/static/frontend src/documents/static/frontend/
       - name: Upload frontend artifact
+        if: env.CAN_PUSH_IMAGES == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: frontend-compiled
@@ -472,6 +478,7 @@ jobs:
     needs:
       - build-docker-image
       - documentation
+    if: github.event_name == 'push'
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
