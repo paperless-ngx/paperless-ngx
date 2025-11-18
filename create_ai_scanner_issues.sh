@@ -22,10 +22,10 @@ echo ""
 # Issue 1.1
 echo "Creando Issue 1.1..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Tests Unitarios para AI Scanner" \
-  --label "testing,priority-high,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Tests Unitarios para AI Scanner" \
+	--label "testing,priority-high,ai-scanner,enhancement" \
+	--body "## Descripción
 Crear suite completa de tests unitarios para \`ai_scanner.py\`
 
 ## Tareas
@@ -60,10 +60,10 @@ echo "✅ Issue 1.1 creado"
 # Issue 1.2
 echo "Creando Issue 1.2..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Tests Unitarios para AI Deletion Manager" \
-  --label "testing,priority-high,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Tests Unitarios para AI Deletion Manager" \
+	--label "testing,priority-high,ai-scanner,enhancement" \
+	--body "## Descripción
 Crear tests para \`ai_deletion_manager.py\` y modelo \`DeletionRequest\`
 
 ## Tareas
@@ -94,10 +94,10 @@ echo "✅ Issue 1.2 creado"
 # Issue 1.3
 echo "Creando Issue 1.3..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Tests de Integración para Consumer" \
-  --label "testing,priority-high,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Tests de Integración para Consumer" \
+	--label "testing,priority-high,ai-scanner,enhancement" \
+	--body "## Descripción
 Tests de integración para \`_run_ai_scanner()\` en pipeline de consumo
 
 ## Tareas
@@ -127,10 +127,10 @@ echo "✅ Issue 1.3 creado"
 # Issue 1.4
 echo "Creando Issue 1.4..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Pre-commit Hooks y Linting" \
-  --label "code-quality,priority-medium,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Pre-commit Hooks y Linting" \
+	--label "code-quality,priority-medium,ai-scanner,enhancement" \
+	--body "## Descripción
 Ejecutar y corregir linters en código nuevo del AI Scanner
 
 ## Tareas
@@ -168,10 +168,10 @@ echo ""
 # Issue 2.1
 echo "Creando Issue 2.1..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Migración Django para DeletionRequest" \
-  --label "database,priority-high,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Migración Django para DeletionRequest" \
+	--label "database,priority-high,ai-scanner,enhancement" \
+	--body "## Descripción
 Crear migración Django para modelo \`DeletionRequest\`
 
 ## Tareas
@@ -200,10 +200,10 @@ echo "✅ Issue 2.1 creado"
 # Issue 2.2
 echo "Creando Issue 2.2..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Índices de Performance para DeletionRequest" \
-  --label "database,performance,priority-medium,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Índices de Performance para DeletionRequest" \
+	--label "database,performance,priority-medium,ai-scanner,enhancement" \
+	--body "## Descripción
 Optimizar índices de base de datos para queries frecuentes
 
 ## Tareas
@@ -238,10 +238,10 @@ echo ""
 # Issue 3.1
 echo "Creando Issue 3.1..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] API Endpoints para Deletion Requests - Listado y Detalle" \
-  --label "api,priority-high,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] API Endpoints para Deletion Requests - Listado y Detalle" \
+	--label "api,priority-high,ai-scanner,enhancement" \
+	--body "## Descripción
 Crear endpoints REST para gestión de deletion requests (listado y detalle)
 
 ## Tareas
@@ -273,10 +273,10 @@ echo "✅ Issue 3.1 creado"
 # Issue 3.2
 echo "Creando Issue 3.2..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] API Endpoints para Deletion Requests - Acciones" \
-  --label "api,priority-high,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] API Endpoints para Deletion Requests - Acciones" \
+	--label "api,priority-high,ai-scanner,enhancement" \
+	--body "## Descripción
 Endpoints para aprobar/rechazar deletion requests
 
 ## Tareas
@@ -307,10 +307,10 @@ echo "✅ Issue 3.2 creado"
 # Issue 3.3
 echo "Creando Issue 3.3..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] API Endpoints para AI Suggestions" \
-  --label "api,priority-medium,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] API Endpoints para AI Suggestions" \
+	--label "api,priority-medium,ai-scanner,enhancement" \
+	--body "## Descripción
 Exponer sugerencias de AI via API para frontend
 
 ## Tareas
@@ -339,10 +339,10 @@ echo "✅ Issue 3.3 creado"
 # Issue 3.4
 echo "Creando Issue 3.4..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Webhooks para Eventos de AI" \
-  --label "api,webhooks,priority-low,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Webhooks para Eventos de AI" \
+	--label "api,webhooks,priority-low,ai-scanner,enhancement" \
+	--body "## Descripción
 Sistema de webhooks para notificar eventos de AI
 
 ## Tareas
@@ -380,10 +380,10 @@ echo ""
 # Issue 4.1
 echo "Creando Issue 4.1..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] UI para AI Suggestions en Document Detail" \
-  --label "frontend,priority-high,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] UI para AI Suggestions en Document Detail" \
+	--label "frontend,priority-high,ai-scanner,enhancement" \
+	--body "## Descripción
 Mostrar sugerencias de AI en página de detalle de documento
 
 ## Tareas
@@ -414,10 +414,10 @@ echo "✅ Issue 4.1 creado"
 # Issue 4.2
 echo "Creando Issue 4.2..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] UI para Deletion Requests Management" \
-  --label "frontend,priority-high,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] UI para Deletion Requests Management" \
+	--label "frontend,priority-high,ai-scanner,enhancement" \
+	--body "## Descripción
 Dashboard para gestionar deletion requests
 
 ## Tareas
@@ -448,10 +448,10 @@ echo "✅ Issue 4.2 creado"
 # Issue 4.3
 echo "Creando Issue 4.3..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] AI Status Indicator" \
-  --label "frontend,priority-medium,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] AI Status Indicator" \
+	--label "frontend,priority-medium,ai-scanner,enhancement" \
+	--body "## Descripción
 Indicador global de estado de AI en UI
 
 ## Tareas
@@ -478,10 +478,10 @@ echo "✅ Issue 4.3 creado"
 # Issue 4.4
 echo "Creando Issue 4.4..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Settings Page para AI Configuration" \
-  --label "frontend,priority-medium,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Settings Page para AI Configuration" \
+	--label "frontend,priority-medium,ai-scanner,enhancement" \
+	--body "## Descripción
 Página de configuración para features de AI
 
 ## Tareas
@@ -518,10 +518,10 @@ echo ""
 # Issue 5.1
 echo "Creando Issue 5.1..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Caching de Modelos ML" \
-  --label "performance,priority-high,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Caching de Modelos ML" \
+	--label "performance,priority-high,ai-scanner,enhancement" \
+	--body "## Descripción
 Implementar caché eficiente para modelos ML
 
 ## Tareas
@@ -550,10 +550,10 @@ echo "✅ Issue 5.1 creado"
 # Issue 5.2
 echo "Creando Issue 5.2..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Procesamiento Asíncrono con Celery" \
-  --label "performance,priority-medium,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Procesamiento Asíncrono con Celery" \
+	--label "performance,priority-medium,ai-scanner,enhancement" \
+	--body "## Descripción
 Mover AI scanning a tareas Celery asíncronas
 
 ## Tareas
@@ -583,10 +583,10 @@ echo "✅ Issue 5.2 creado"
 # Issue 5.3
 echo "Creando Issue 5.3..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Batch Processing para Documentos Existentes" \
-  --label "performance,priority-medium,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Batch Processing para Documentos Existentes" \
+	--label "performance,priority-medium,ai-scanner,enhancement" \
+	--body "## Descripción
 Command para aplicar AI scanner a documentos existentes
 
 ## Tareas
@@ -615,10 +615,10 @@ echo "✅ Issue 5.3 creado"
 # Issue 5.4
 echo "Creando Issue 5.4..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Query Optimization" \
-  --label "performance,database,priority-medium,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Query Optimization" \
+	--label "performance,database,priority-medium,ai-scanner,enhancement" \
+	--body "## Descripción
 Optimizar queries de base de datos en AI scanner
 
 ## Tareas
@@ -653,10 +653,10 @@ echo ""
 # Issue 6.1
 echo "Creando Issue 6.1..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Training Pipeline para Custom Models" \
-  --label "ml-ai,priority-medium,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Training Pipeline para Custom Models" \
+	--label "ml-ai,priority-medium,ai-scanner,enhancement" \
+	--body "## Descripción
 Pipeline para entrenar modelos custom con datos del usuario
 
 ## Tareas
@@ -686,10 +686,10 @@ echo "✅ Issue 6.1 creado"
 # Issue 6.2
 echo "Creando Issue 6.2..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Active Learning Loop" \
-  --label "ml-ai,priority-low,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Active Learning Loop" \
+	--label "ml-ai,priority-low,ai-scanner,enhancement" \
+	--body "## Descripción
 Sistema de aprendizaje continuo basado en feedback de usuario
 
 ## Tareas
@@ -716,10 +716,10 @@ echo "✅ Issue 6.2 creado"
 # Issue 6.3
 echo "Creando Issue 6.3..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Multi-language Support para NER" \
-  --label "ml-ai,priority-medium,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Multi-language Support para NER" \
+	--label "ml-ai,priority-medium,ai-scanner,enhancement" \
+	--body "## Descripción
 Soporte para múltiples idiomas en extracción de entidades
 
 ## Tareas
@@ -746,10 +746,10 @@ echo "✅ Issue 6.3 creado"
 # Issue 6.4
 echo "Creando Issue 6.4..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Confidence Calibration" \
-  --label "ml-ai,priority-medium,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Confidence Calibration" \
+	--label "ml-ai,priority-medium,ai-scanner,enhancement" \
+	--body "## Descripción
 Calibrar confianza basada en feedback histórico
 
 ## Tareas
@@ -784,10 +784,10 @@ echo ""
 # Issue 7.1
 echo "Creando Issue 7.1..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Metrics y Logging Estructurado" \
-  --label "monitoring,priority-medium,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Metrics y Logging Estructurado" \
+	--label "monitoring,priority-medium,ai-scanner,enhancement" \
+	--body "## Descripción
 Implementar logging estructurado y métricas
 
 ## Tareas
@@ -816,10 +816,10 @@ echo "✅ Issue 7.1 creado"
 # Issue 7.2
 echo "Creando Issue 7.2..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Health Checks para AI Components" \
-  --label "monitoring,priority-medium,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Health Checks para AI Components" \
+	--label "monitoring,priority-medium,ai-scanner,enhancement" \
+	--body "## Descripción
 Health checks para components ML/AI
 
 ## Tareas
@@ -847,10 +847,10 @@ echo "✅ Issue 7.2 creado"
 # Issue 7.3
 echo "Creando Issue 7.3..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Audit Log Detallado" \
-  --label "monitoring,security,priority-medium,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Audit Log Detallado" \
+	--label "monitoring,security,priority-medium,ai-scanner,enhancement" \
+	--body "## Descripción
 Audit log completo de acciones de AI
 
 ## Tareas
@@ -886,10 +886,10 @@ echo ""
 # Issue 8.1
 echo "Creando Issue 8.1..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Guía de Usuario para AI Features" \
-  --label "documentation,priority-high,ai-scanner" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Guía de Usuario para AI Features" \
+	--label "documentation,priority-high,ai-scanner" \
+	--body "## Descripción
 Documentación completa para usuarios finales
 
 ## Tareas
@@ -922,10 +922,10 @@ echo "✅ Issue 8.1 creado"
 # Issue 8.2
 echo "Creando Issue 8.2..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] API Documentation" \
-  --label "documentation,api,priority-medium,ai-scanner" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] API Documentation" \
+	--label "documentation,api,priority-medium,ai-scanner" \
+	--body "## Descripción
 Documentación de API REST completa
 
 ## Tareas
@@ -955,10 +955,10 @@ echo "✅ Issue 8.2 creado"
 # Issue 8.3
 echo "Creando Issue 8.3..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Guía de Administrador" \
-  --label "documentation,priority-medium,ai-scanner" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Guía de Administrador" \
+	--label "documentation,priority-medium,ai-scanner" \
+	--body "## Descripción
 Documentación para administradores del sistema
 
 ## Tareas
@@ -996,10 +996,10 @@ echo ""
 # Issue 9.1
 echo "Creando Issue 9.1..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Rate Limiting para AI Operations" \
-  --label "security,priority-medium,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Rate Limiting para AI Operations" \
+	--label "security,priority-medium,ai-scanner,enhancement" \
+	--body "## Descripción
 Implementar rate limiting para prevenir abuso
 
 ## Tareas
@@ -1028,10 +1028,10 @@ echo "✅ Issue 9.1 creado"
 # Issue 9.2
 echo "Creando Issue 9.2..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Validation de Inputs" \
-  --label "security,priority-high,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Validation de Inputs" \
+	--label "security,priority-high,ai-scanner,enhancement" \
+	--body "## Descripción
 Validación exhaustiva de inputs para prevenir inyección
 
 ## Tareas
@@ -1059,10 +1059,10 @@ echo "✅ Issue 9.2 creado"
 # Issue 9.3
 echo "Creando Issue 9.3..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Permissions Granulares" \
-  --label "security,priority-medium,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Permissions Granulares" \
+	--label "security,priority-medium,ai-scanner,enhancement" \
+	--body "## Descripción
 Sistema de permisos granular para AI features
 
 ## Tareas
@@ -1100,10 +1100,10 @@ echo ""
 # Issue 10.1
 echo "Creando Issue 10.1..."
 gh issue create \
-  --repo "$REPO" \
-  --title "[AI Scanner] Traducción de Mensajes de AI" \
-  --label "i18n,priority-low,ai-scanner,enhancement" \
-  --body "## Descripción
+	--repo "$REPO" \
+	--title "[AI Scanner] Traducción de Mensajes de AI" \
+	--label "i18n,priority-low,ai-scanner,enhancement" \
+	--body "## Descripción
 Internacionalizar todos los mensajes de AI
 
 ## Tareas

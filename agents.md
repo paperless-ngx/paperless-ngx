@@ -28,61 +28,67 @@ El archivo deberá seguir, sin excepción, la siguiente estructura Markdown. Ere
 
 ```markdown
 # 📝 Bitácora Maestra del Proyecto: [Tu IA insertará aquí el nombre del proyecto]
-*Última actualización: [Tu IA insertará aquí la fecha y hora UTC en formato YYYY-MM-DD HH:MM:SS]*
+
+_Última actualización: [Tu IA insertará aquí la fecha y hora UTC en formato YYYY-MM-DD HH:MM:SS]_
 
 ---
 
 ## 📊 Panel de Control Ejecutivo
 
 ### 🚧 Tarea en Progreso (WIP - Work In Progress)
-*Si el sistema está en reposo, este bloque debe container únicamente: "Estado actual: **A la espera de nuevas directivas del Director.**"*
 
-*   **Identificador de Tarea:** `[ID único de la tarea, ej: TSK-001]`
-*   **Objetivo Principal:** `[Descripción clara del objetivo final, ej: Implementar la autenticación de usuarios con JWT]`
-*   **Estado Detallado:** `[Descripción precisa del punto exacto del proceso, ej: Modelo de datos y migraciones completados. Desarrollando el endpoint POST /api/auth/registro.]`
-*   **Próximo Micro-Paso Planificado:** `[La siguiente acción concreta e inmediata que se va a realizar, ej: Implementar la lógica de hash de la contraseña usando bcrypt dentro del servicio de registro.]`
+_Si el sistema está en reposo, este bloque debe container únicamente: "Estado actual: **A la espera de nuevas directivas del Director.**"_
+
+- **Identificador de Tarea:** `[ID único de la tarea, ej: TSK-001]`
+- **Objetivo Principal:** `[Descripción clara del objetivo final, ej: Implementar la autenticación de usuarios con JWT]`
+- **Estado Detallado:** `[Descripción precisa del punto exacto del proceso, ej: Modelo de datos y migraciones completados. Desarrollando el endpoint POST /api/auth/registro.]`
+- **Próximo Micro-Paso Planificado:** `[La siguiente acción concreta e inmediata que se va a realizar, ej: Implementar la lógica de hash de la contraseña usando bcrypt dentro del servicio de registro.]`
 
 ### ✅ Historical de Implementaciones Completadas
-*(En orden cronológico inverso. Cada entrada es un hito de negocio finalizado)*
 
-*   **[YYYY-MM-DD] - `[ID de Tarea]` - Título de la Implementación:** `[Impacto en el negocio o funcionalidad añadida. Ej: feat: Implementado el sistema de registro de usuarios.]`
+_(En orden cronológico inverso. Cada entrada es un hito de negocio finalizado)_
+
+- **[YYYY-MM-DD] - `[ID de Tarea]` - Título de la Implementación:** `[Impacto en el negocio o funcionalidad añadida. Ej: feat: Implementado el sistema de registro de usuarios.]`
 
 ---
 
 ## 🔬 Registro Forense de Sesiones (Log Detallado)
-*(Este es un registro append-only que nunca se modifica, solo se añade. Proporciona un rastro de auditoría completo)*
+
+_(Este es un registro append-only que nunca se modifica, solo se añade. Proporciona un rastro de auditoría completo)_
 
 ### Sesión Iniciada: [YYYY-MM-DD HH:MM:SS UTC]
 
-*   **Directiva del Director:** `[Copia literal de mi instrucción]`
-*   **Plan de Acción Propuesto:** `[Resumen del plan que propusiste y yo aprobé]`
-*   **Log de Acciones (con timestamp):**
-    *   `[HH:MM:SS]` - **ACCIÓN:** Creación de fichero. **DETALLE:** `src/modelos/Usuario.ts`. **MOTIVO:** Definición del esquema de datos del usuario.
-    *   `[HH:MM:SS]` - **ACCIÓN:** Modificación de fichero. **DETALLE:** `src/rutas/auth.ts`. **CAMBIOS:** Añadido endpoint POST /api/auth/registro.
-    *   `[HH:MM:SS]` - **ACCIÓN:** Instalación de dependencia. **DETALLE:** `bcrypt@^5.1.1`. **USO:** Hashing de contraseñas.
-    *   `[HH:MM:SS]` - **ACCIÓN:** Ejecución de test. **COMMANDO:** `npm test -- auth.test.ts`. **RESULTADO:** `[PASS/FAIL + detalles]`.
-    *   `[HH:MM:SS]` - **ACCIÓN:** Commit. **HASH:** `abc123def`. **MENSAJE:** `feat(auth): añadir endpoint de registro de usuarios`.
-*   **Resultado de la Sesión:** `[Ej: Hito TSK-001 completado. / Tarea TSK-002 en progreso.]`
-*   **Commit Asociado:** `[Hash del commit, ej: abc123def456]`
-*   **Observaciones/Decisiones de Diseño:** `[Cualquier decisión importante tomada, ej: Decidimos usar bcrypt con salt rounds=12 por balance seguridad/performance.]`
+- **Directiva del Director:** `[Copia literal de mi instrucción]`
+- **Plan de Acción Propuesto:** `[Resumen del plan que propusiste y yo aprobé]`
+- **Log de Acciones (con timestamp):**
+  - `[HH:MM:SS]` - **ACCIÓN:** Creación de fichero. **DETALLE:** `src/modelos/Usuario.ts`. **MOTIVO:** Definición del esquema de datos del usuario.
+  - `[HH:MM:SS]` - **ACCIÓN:** Modificación de fichero. **DETALLE:** `src/rutas/auth.ts`. **CAMBIOS:** Añadido endpoint POST /api/auth/registro.
+  - `[HH:MM:SS]` - **ACCIÓN:** Instalación de dependencia. **DETALLE:** `bcrypt@^5.1.1`. **USO:** Hashing de contraseñas.
+  - `[HH:MM:SS]` - **ACCIÓN:** Ejecución de test. **COMMANDO:** `npm test -- auth.test.ts`. **RESULTADO:** `[PASS/FAIL + detalles]`.
+  - `[HH:MM:SS]` - **ACCIÓN:** Commit. **HASH:** `abc123def`. **MENSAJE:** `feat(auth): añadir endpoint de registro de usuarios`.
+- **Resultado de la Sesión:** `[Ej: Hito TSK-001 completado. / Tarea TSK-002 en progreso.]`
+- **Commit Asociado:** `[Hash del commit, ej: abc123def456]`
+- **Observaciones/Decisiones de Diseño:** `[Cualquier decisión importante tomada, ej: Decidimos usar bcrypt con salt rounds=12 por balance seguridad/performance.]`
 
 ---
 
 ## 📁 Inventario del Proyecto (Estructura de Directorios y Archivos)
-*(Esta sección debe mantenerse actualizada en todo memento. Es como un `tree` en prosa.)*
 
+_(Esta sección debe mantenerse actualizada en todo memento. Es como un `tree` en prosa.)_
 ```
+
 proyecto-raiz/
 ├── src/
-│   ├── modelos/
-│   │   └── Usuario.ts (PROPÓSITO: Modelo de datos para usuarios)
-│   ├── rutas/
-│   │   └── auth.ts (PROPÓSITO: Endpoints de autenticación)
-│   └── index.ts (PROPÓSITO: Punto de entrada principal)
+│ ├── modelos/
+│ │ └── Usuario.ts (PROPÓSITO: Modelo de datos para usuarios)
+│ ├── rutas/
+│ │ └── auth.ts (PROPÓSITO: Endpoints de autenticación)
+│ └── index.ts (PROPÓSITO: Punto de entrada principal)
 ├── tests/
-│   └── auth.test.ts (PROPÓSITO: Tests del módulo de autenticación)
+│ └── auth.test.ts (PROPÓSITO: Tests del módulo de autenticación)
 ├── package.json (ESTADO: Actualizado con bcrypt@^5.1.1)
 └── BITACORA_MAESTRA.md (ESTE ARCHIVO - La fuente de verdad)
+
 ```
 
 ---
@@ -150,25 +156,26 @@ proyecto-raiz/
 
 ### Sección 1. Convenciones de Nomenclatura:
 
-*   **Variables y funciones:** camelCase (ej: `getUserById`)
-*   **Clases e interfaces:** PascalCase (ej: `UserRepository`)
-*   **Constantes:** UPPER_SNAKE_CASE (ej: `MAX_RETRY_ATTEMPTS`)
-*   **Archivos:** kebab-case (ej: `user-service.ts`)
+- **Variables y funciones:** camelCase (ej: `getUserById`)
+- **Clases e interfaces:** PascalCase (ej: `UserRepository`)
+- **Constantes:** UPPER_SNAKE_CASE (ej: `MAX_RETRY_ATTEMPTS`)
+- **Archivos:** kebab-case (ej: `user-service.ts`)
 
 ### Sección 2. Documentación del Código:
 
 Todo código debe estar documentado con JSDoc/TSDoc/Docstrings según el lenguaje. Cada función pública debe tener:
-*   Descripción breve del propósito
-*   Parámetros (@param)
-*   Valor de retorno (@returns)
-*   Excepciones (@throws)
-*   Ejemplos de uso (@example)
+
+- Descripción breve del propósito
+- Parámetros (@param)
+- Valor de retorno (@returns)
+- Excepciones (@throws)
+- Ejemplos de uso (@example)
 
 ### Sección 3. Testing:
 
-*   Cada funcionalidad nueva debe incluir tests unitarios.
-*   Los tests de integración son obligatorios para endpoints y flujos críticos.
-*   La cobertura de código no puede disminuir con ningún cambio.
+- Cada funcionalidad nueva debe incluir tests unitarios.
+- Los tests de integración son obligatorios para endpoints y flujos críticos.
+- La cobertura de código no puede disminuir con ningún cambio.
 
 ---
 
@@ -187,15 +194,17 @@ Todos los commits seguirán el formato Conventional Commits:
 ```
 
 **Tipos válidos:**
-*   `feat`: Nueva funcionalidad
-*   `fix`: Corrección de bug
-*   `docs`: Cambios en documentación
-*   `style`: Cambios de formato (no afectan código)
-*   `refactor`: Refactorización de código
-*   `test`: Añadir o modificar tests
-*   `chore`: Tareas de mantenimiento
+
+- `feat`: Nueva funcionalidad
+- `fix`: Corrección de bug
+- `docs`: Cambios en documentación
+- `style`: Cambios de formato (no afectan código)
+- `refactor`: Refactorización de código
+- `test`: Añadir o modificar tests
+- `chore`: Tareas de mantenimiento
 
 **Ejemplo:**
+
 ```
 feat(auth): añadir endpoint de registro de usuarios
 
@@ -207,10 +216,10 @@ Closes: TSK-001
 
 ### Sección 2. Branching Strategy:
 
-*   `main`: Rama de producción, siempre estable
-*   `develop`: Rama de desarrollo, integración continua
-*   `feature/*`: Ramas de funcionalidades (ej: `feature/user-auth`)
-*   `hotfix/*`: Correcciones urgentes de producción
+- `main`: Rama de producción, siempre estable
+- `develop`: Rama de desarrollo, integración continua
+- `feature/*`: Ramas de funcionalidades (ej: `feature/user-auth`)
+- `hotfix/*`: Correcciones urgentes de producción
 
 ---
 
@@ -219,11 +228,12 @@ Closes: TSK-001
 ### Sección 1. Actualizaciones de Progreso:
 
 Al finalizar cada sesión de trabajo significativa, proporcionarás un resumen ejecutivo que incluya:
-*   Objetivos planteados
-*   Objetivos alcanzados
-*   Problemas encontrados y soluciones aplicadas
-*   Próximos pasos
-*   Tiempo estimado para completar la tarea actual
+
+- Objetivos planteados
+- Objetivos alcanzados
+- Problemas encontrados y soluciones aplicadas
+- Próximos pasos
+- Tiempo estimado para completar la tarea actual
 
 ### Sección 2. Solicitud de Clarificación:
 
@@ -236,18 +246,20 @@ Si en algún memento una directiva es ambigua o require decisión de negocio, tu
 ### Sección 1. Decisiones Técnicas Autónomas:
 
 Tienes autonomía completa para tomar decisiones sobre:
-*   Elección de algoritmos y estructuras de datos
-*   Patrones de diseño a aplicar
-*   Refactorizaciones internas que mejoren calidad sin cambiar funcionalidad
-*   Optimizaciones de rendimiento
+
+- Elección de algoritmos y estructuras de datos
+- Patrones de diseño a aplicar
+- Refactorizaciones internas que mejoren calidad sin cambiar funcionalidad
+- Optimizaciones de rendimiento
 
 ### Sección 2. Decisiones que Requieren Aprobación:
 
 Debes consultar antes de:
-*   Cambiar el stack tecnológico (añadir/quitar frameworks mayores)
-*   Modificar la arquitectura general del sistema
-*   Cambiar especificaciones funcionales o de negocio
-*   Cualquier decisión que afecte costos o tiempos de entrega
+
+- Cambiar el stack tecnológico (añadir/quitar frameworks mayores)
+- Modificar la arquitectura general del sistema
+- Cambiar especificaciones funcionales o de negocio
+- Cualquier decisión que afecte costos o tiempos de entrega
 
 ---
 
@@ -267,4 +279,4 @@ Al aceptar trabajar bajo estas directivas, la IA se compromete a seguir este man
 
 ---
 
-*"La excelencia no es un acto, sino un hábito. La documentación precisa no es un lujo, sino una necesidad."*
+_"La excelencia no es un acto, sino un hábito. La documentación precisa no es un lujo, sino una necesidad."_

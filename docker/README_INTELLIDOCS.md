@@ -66,6 +66,7 @@ cd docker
 ```
 
 Este script verifica:
+
 - ✓ Contenedores en ejecución
 - ✓ Dependencias Python (torch, transformers, opencv, etc.)
 - ✓ Módulos ML/OCR instalados
@@ -79,6 +80,7 @@ Este script verifica:
 ### Compose File Optimizado (`docker-compose.intellidocs.yml`)
 
 Características especiales:
+
 - ✨ **Redis optimizado** para caché con política LRU
 - ✨ **Volumen ML cache** persistente para modelos
 - ✨ **Health checks** mejorados
@@ -112,15 +114,15 @@ PAPERLESS_ENABLE_HANDWRITING_OCR=1
 
 ## 📊 Comparación de Compose Files
 
-| Característica | sqlite.yml | postgres.yml | intellidocs.yml |
-|---------------|-----------|--------------|-----------------|
-| Base de datos | SQLite | PostgreSQL | SQLite/Config |
-| Redis básico | ✓ | ✓ | ✓ Optimizado |
-| ML cache | ✗ | ✗ | ✓ Persistente |
-| Health checks | Básico | Básico | ✓ Completo |
-| Resource limits | ✗ | ✗ | ✓ Configurado |
-| GPU ready | ✗ | ✗ | ✓ Preparado |
-| Variables ML | ✗ | ✗ | ✓ Pre-config |
+| Característica  | sqlite.yml | postgres.yml | intellidocs.yml |
+| --------------- | ---------- | ------------ | --------------- |
+| Base de datos   | SQLite     | PostgreSQL   | SQLite/Config   |
+| Redis básico    | ✓          | ✓            | ✓ Optimizado    |
+| ML cache        | ✗          | ✗            | ✓ Persistente   |
+| Health checks   | Básico     | Básico       | ✓ Completo      |
+| Resource limits | ✗          | ✗            | ✓ Configurado   |
+| GPU ready       | ✗          | ✗            | ✓ Preparado     |
+| Variables ML    | ✗          | ✗            | ✓ Pre-config    |
 
 ## 🏗️ Construir Imagen Local
 
@@ -226,12 +228,13 @@ Para sistemas con menos RAM:
 deploy:
   resources:
     limits:
-      memory: 4G  # Reducir de 8G
+      memory: 4G # Reducir de 8G
     reservations:
-      memory: 2G  # Reducir de 4G
+      memory: 2G # Reducir de 4G
 ```
 
 Y configurar workers:
+
 ```bash
 PAPERLESS_TASK_WORKERS=1
 PAPERLESS_THREADS_PER_WORKER=1

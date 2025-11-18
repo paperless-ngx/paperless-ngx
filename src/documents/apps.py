@@ -49,7 +49,7 @@ class DocumentsConfig(AppConfig):
         max_models = getattr(settings, "PAPERLESS_ML_CACHE_MAX_MODELS", 3)
         cache_dir = getattr(settings, "PAPERLESS_ML_MODEL_CACHE", None)
 
-        cache_manager = ModelCacheManager.get_instance(
+        _cache_manager = ModelCacheManager.get_instance(
             max_models=max_models,
             disk_cache_dir=str(cache_dir) if cache_dir else None,
         )

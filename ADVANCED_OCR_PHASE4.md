@@ -11,6 +11,7 @@ This document describes the implementation of advanced OCR capabilities for Inte
 Advanced table detection and extraction using deep learning models.
 
 **Key Features:**
+
 - **Deep Learning Detection**: Uses Microsoft's table-transformer model for accurate table detection
 - **Multiple Extraction Methods**: PDF structure parsing, image-based detection, OCR-based extraction
 - **Structured Output**: Extracts tables as pandas DataFrames with proper row/column structure
@@ -46,6 +47,7 @@ extractor.save_tables_to_excel(tables, "extracted_tables.xlsx")
 ```
 
 **Methods:**
+
 - `detect_tables(image)` - Detect table regions in image
 - `extract_table_from_region(image, bbox)` - Extract data from specific table region
 - `extract_tables_from_image(path)` - Extract all tables from image file
@@ -57,6 +59,7 @@ extractor.save_tables_to_excel(tables, "extracted_tables.xlsx")
 Transformer-based handwriting OCR using Microsoft's TrOCR model.
 
 **Key Features:**
+
 - **State-of-the-Art Model**: Uses TrOCR (Transformer-based OCR) for high accuracy
 - **Line Detection**: Automatically detects and recognizes individual text lines
 - **Confidence Scoring**: Provides confidence scores for recognition quality
@@ -98,6 +101,7 @@ print(fields)  # {'Name': 'John Doe', 'Date': '01/15/2024', ...}
 ```
 
 **Methods:**
+
 - `recognize_from_image(image)` - Recognize text from PIL Image
 - `recognize_lines(image_path)` - Detect and recognize individual lines
 - `recognize_from_file(path, mode)` - Recognize from file ('full' or 'lines' mode)
@@ -105,6 +109,7 @@ print(fields)  # {'Name': 'John Doe', 'Date': '01/15/2024', ...}
 - `batch_recognize(image_paths)` - Process multiple images
 
 **Model Options:**
+
 - `microsoft/trocr-base-handwritten` - Default, good for English handwriting (132MB)
 - `microsoft/trocr-large-handwritten` - More accurate, slower (1.4GB)
 - `microsoft/trocr-base-printed` - For printed text (132MB)
@@ -114,6 +119,7 @@ print(fields)  # {'Name': 'John Doe', 'Date': '01/15/2024', ...}
 Automatic detection and extraction of form fields.
 
 **Key Features:**
+
 - **Checkbox Detection**: Detects checkboxes and determines if checked
 - **Text Field Detection**: Finds underlined or boxed text input fields
 - **Label Association**: Matches labels to their fields automatically
@@ -155,6 +161,7 @@ print(df)
 ```
 
 **Methods:**
+
 - `detect_checkboxes(image)` - Find and check state of checkboxes
 - `detect_text_fields(image)` - Find text input fields
 - `detect_labels(image, field_bboxes)` - Find labels near fields
@@ -285,6 +292,7 @@ pip install sentence-transformers>=2.2.0
 ### System Dependencies
 
 **For pytesseract:**
+
 ```bash
 # Ubuntu/Debian
 sudo apt-get install tesseract-ocr
@@ -297,6 +305,7 @@ brew install tesseract
 ```
 
 **For pdf2image:**
+
 ```bash
 # Ubuntu/Debian
 sudo apt-get install poppler-utils
@@ -312,53 +321,57 @@ brew install poppler
 
 ### Table Extraction
 
-| Metric | Value |
-|--------|-------|
-| **Detection Accuracy** | 90-95% |
-| **Extraction Accuracy** | 85-90% for structured tables |
-| **Processing Speed (CPU)** | 2-5 seconds per page |
-| **Processing Speed (GPU)** | 0.5-1 second per page |
-| **Memory Usage** | ~2GB (model + image) |
+| Metric                     | Value                        |
+| -------------------------- | ---------------------------- |
+| **Detection Accuracy**     | 90-95%                       |
+| **Extraction Accuracy**    | 85-90% for structured tables |
+| **Processing Speed (CPU)** | 2-5 seconds per page         |
+| **Processing Speed (GPU)** | 0.5-1 second per page        |
+| **Memory Usage**           | ~2GB (model + image)         |
 
 **Typical Results:**
+
 - Simple tables (grid lines): 95% accuracy
 - Complex tables (nested): 80-85% accuracy
 - Tables without borders: 70-75% accuracy
 
 ### Handwriting Recognition
 
-| Metric | Value |
-|--------|-------|
-| **Recognition Accuracy** | 85-92% (English) |
-| **Character Error Rate** | 8-15% |
-| **Processing Speed (CPU)** | 1-2 seconds per line |
+| Metric                     | Value                    |
+| -------------------------- | ------------------------ |
+| **Recognition Accuracy**   | 85-92% (English)         |
+| **Character Error Rate**   | 8-15%                    |
+| **Processing Speed (CPU)** | 1-2 seconds per line     |
 | **Processing Speed (GPU)** | 0.1-0.3 seconds per line |
-| **Memory Usage** | ~1.5GB |
+| **Memory Usage**           | ~1.5GB                   |
 
 **Accuracy by Quality:**
+
 - Clear, neat handwriting: 90-95%
 - Average handwriting: 85-90%
 - Poor/cursive handwriting: 70-80%
 
 ### Form Field Detection
 
-| Metric | Value |
-|--------|-------|
-| **Checkbox Detection** | 95-98% |
-| **Checkbox State Accuracy** | 92-96% |
-| **Text Field Detection** | 88-93% |
-| **Label Association** | 85-90% |
-| **Processing Speed** | 2-4 seconds per form |
+| Metric                      | Value                |
+| --------------------------- | -------------------- |
+| **Checkbox Detection**      | 95-98%               |
+| **Checkbox State Accuracy** | 92-96%               |
+| **Text Field Detection**    | 88-93%               |
+| **Label Association**       | 85-90%               |
+| **Processing Speed**        | 2-4 seconds per form |
 
 ## Hardware Requirements
 
 ### Minimum Requirements
+
 - **CPU**: Intel i5 or equivalent
 - **RAM**: 8GB
 - **Disk**: 2GB for models
 - **GPU**: Not required (CPU fallback available)
 
 ### Recommended for Production
+
 - **CPU**: Intel i7/Xeon or equivalent
 - **RAM**: 16GB
 - **Disk**: 5GB (models + cache)
@@ -369,6 +382,7 @@ brew install poppler
 ### GPU Acceleration
 
 Models support CUDA automatically:
+
 ```python
 # Automatic GPU detection
 extractor = TableExtractor(use_gpu=True)  # Uses GPU if available
@@ -376,6 +390,7 @@ recognizer = HandwritingRecognizer(use_gpu=True)
 ```
 
 **GPU Speedup:**
+
 - Table extraction: 5-8x faster
 - Handwriting recognition: 8-12x faster
 - Batch processing: 10-15x faster
@@ -487,6 +502,7 @@ def test_full_document_pipeline():
 ### Manual Validation
 
 Test with real documents:
+
 ```bash
 # Test table extraction
 python -m documents.ocr.table_extractor test_docs/invoice.pdf
@@ -503,31 +519,41 @@ python -m documents.ocr.form_detector test_docs/application.pdf
 ### Common Issues
 
 **1. Model Download Fails**
+
 ```
 Error: Connection timeout downloading model
 ```
+
 Solution: Models are large (100MB-1GB). Ensure stable internet. Models are cached after first download.
 
 **2. CUDA Out of Memory**
+
 ```
 RuntimeError: CUDA out of memory
 ```
+
 Solution: Reduce batch size or use CPU mode:
+
 ```python
 extractor = TableExtractor(use_gpu=False)
 ```
 
 **3. Tesseract Not Found**
+
 ```
 TesseractNotFoundError
 ```
+
 Solution: Install Tesseract OCR system package (see Installation section).
 
 **4. Low Accuracy Results**
+
 ```
 Recognition accuracy < 70%
 ```
+
 Solutions:
+
 - Improve image quality (higher resolution, better contrast)
 - Use larger models (trocr-large-handwritten)
 - Preprocess images (denoise, deskew)
@@ -538,6 +564,7 @@ Solutions:
 ### 1. Image Quality
 
 **Recommendations:**
+
 - Minimum 300 DPI for scanning
 - Good contrast and lighting
 - Flat, unwrinkled documents
@@ -546,10 +573,12 @@ Solutions:
 ### 2. Model Selection
 
 **Table Extraction:**
+
 - Use `table-transformer-detection` for most cases
 - Adjust confidence_threshold based on precision/recall needs
 
 **Handwriting:**
+
 - `trocr-base-handwritten` - Fast, good for most cases
 - `trocr-large-handwritten` - Better accuracy, slower
 - `trocr-base-printed` - Use for printed forms
@@ -557,6 +586,7 @@ Solutions:
 ### 3. Performance Optimization
 
 **Batch Processing:**
+
 ```python
 # Process multiple documents efficiently
 image_paths = ["doc1.jpg", "doc2.jpg", "doc3.jpg"]
@@ -566,6 +596,7 @@ results = recognizer.batch_recognize(image_paths)
 
 **Lazy Loading:**
 Models are loaded on first use to save memory:
+
 ```python
 # No memory used until first call
 extractor = TableExtractor()  # Model not loaded yet
@@ -575,6 +606,7 @@ tables = extractor.extract_tables_from_image("doc.jpg")
 ```
 
 **Reuse Objects:**
+
 ```python
 # Good: Reuse detector object
 detector = FormFieldDetector()
@@ -614,18 +646,21 @@ def process_with_fallback(image_path):
 ## Roadmap & Future Enhancements
 
 ### Short-term (Next 2-4 weeks)
+
 - [ ] Add unit tests for all OCR modules
 - [ ] Integrate with document consumer pipeline
 - [ ] Add configuration options to settings
 - [ ] Create CLI tools for testing
 
 ### Medium-term (1-2 months)
+
 - [ ] Support for more languages (multilingual models)
 - [ ] Signature detection and verification
 - [ ] Barcode/QR code reading
 - [ ] Document layout analysis
 
 ### Long-term (3-6 months)
+
 - [ ] Custom model fine-tuning interface
 - [ ] Real-time OCR via webcam/scanner
 - [ ] Batch processing dashboard
@@ -643,6 +678,7 @@ Phase 4 adds powerful advanced OCR capabilities to IntelliDocs-ngx:
 ✅ Integration examples
 
 **Impact:**
+
 - **Data Extraction**: Automatic extraction of structured data from tables
 - **Handwriting Support**: Process handwritten forms and notes
 - **Form Automation**: Automatically extract and validate form data
@@ -650,6 +686,7 @@ Phase 4 adds powerful advanced OCR capabilities to IntelliDocs-ngx:
 - **Accuracy**: 85-95% depending on document type
 
 **Next Steps:**
+
 1. Install dependencies
 2. Test with sample documents
 3. Integrate into document processing pipeline
@@ -657,6 +694,6 @@ Phase 4 adds powerful advanced OCR capabilities to IntelliDocs-ngx:
 
 ---
 
-*Generated: November 9, 2025*
-*For: IntelliDocs-ngx v2.19.5*
-*Phase: 4 of 5 - Advanced OCR*
+_Generated: November 9, 2025_
+_For: IntelliDocs-ngx v2.19.5_
+_Phase: 4 of 5 - Advanced OCR_

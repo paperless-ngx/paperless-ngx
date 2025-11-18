@@ -61,7 +61,7 @@ const mockSuggestions: AISuggestion[] = [
     id: '3',
     type: AISuggestionType.DocumentType,
     value: 1,
-    confidence: 0.90,
+    confidence: 0.9,
     status: AISuggestionStatus.Pending,
   },
 ]

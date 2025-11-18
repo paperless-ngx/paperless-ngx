@@ -1,5 +1,3 @@
-import { DeletionRequest, DeletionRequestStatus } from './deletion-request'
-
 /**
  * Represents the AI scanner status and statistics
  */

@@ -78,23 +78,23 @@ Crear la siguiente jerarquía de páginas:
 
 Crear una **Full-page database** llamada "Roadmap 2026 Tasks" con las siguientes propiedades:
 
-| Property Name | Type | Options/Config |
-|---------------|------|----------------|
-| **Task ID** | Title | Formato: TSK-XXXX |
-| **Status** | Select | Backlog, Planned, In Progress, In Review, Testing, Done, Blocked |
-| **Epic** | Select | EPIC 1-12 (ver ROADMAP_2026.md) |
-| **Prioridad** | Select | 🔴 Crítica, 🟠 Alta, 🟡 Media, 🟢 Baja |
-| **Trimestre** | Select | Q1, Q2, Q3, Q4 2026 |
-| **Estimación** | Number | Días de trabajo |
-| **Progreso** | Number | Porcentaje (0-100) |
-| **Fecha Inicio** | Date | - |
-| **Fecha Fin** | Date | - |
-| **Responsible** | Person | - |
-| **GitHub Issue** | URL | Link al issue en GitHub |
-| **GitHub PR** | URL | Link al PR cuando aplique |
-| **Tags** | Multi-select | backend, frontend, mobile, ml-ai, ocr, security, devops |
-| **Notas** | Text | Notas adicionales |
-| **Subtareas** | Relation | Link a otra database de subtareas |
+| Property Name    | Type         | Options/Config                                                   |
+| ---------------- | ------------ | ---------------------------------------------------------------- |
+| **Task ID**      | Title        | Formato: TSK-XXXX                                                |
+| **Status**       | Select       | Backlog, Planned, In Progress, In Review, Testing, Done, Blocked |
+| **Epic**         | Select       | EPIC 1-12 (ver ROADMAP_2026.md)                                  |
+| **Prioridad**    | Select       | 🔴 Crítica, 🟠 Alta, 🟡 Media, 🟢 Baja                           |
+| **Trimestre**    | Select       | Q1, Q2, Q3, Q4 2026                                              |
+| **Estimación**   | Number       | Días de trabajo                                                  |
+| **Progreso**     | Number       | Porcentaje (0-100)                                               |
+| **Fecha Inicio** | Date         | -                                                                |
+| **Fecha Fin**    | Date         | -                                                                |
+| **Responsible**  | Person       | -                                                                |
+| **GitHub Issue** | URL          | Link al issue en GitHub                                          |
+| **GitHub PR**    | URL          | Link al PR cuando aplique                                        |
+| **Tags**         | Multi-select | backend, frontend, mobile, ml-ai, ocr, security, devops          |
+| **Notas**        | Text         | Notas adicionales                                                |
+| **Subtareas**    | Relation     | Link a otra database de subtareas                                |
 
 ### 2.2 Template de Task
 
@@ -104,35 +104,43 @@ Crear un template para nuevas tasks:
 # {{Task ID}}: {{Título}}
 
 ## 📋 Descripción
+
 [Descripción detallada de la tarea]
 
 ## 🎯 Epic
+
 {{Epic}}
 
 ## 📅 Timeline
+
 - **Inicio:** {{Fecha Inicio}}
 - **Fin estimado:** {{Fecha Fin}}
 - **Trimestre:** {{Trimestre}}
 
 ## 👤 Responsible
+
 {{Responsible}}
 
 ## ✅ Subtareas
+
 - [ ] Subtarea 1
 - [ ] Subtarea 2
 - [ ] Subtarea 3
 
 ## 📝 Criterios de Aceptación
+
 - [ ] Criterio 1
 - [ ] Criterio 2
 - [ ] Criterio 3
 
 ## 🔗 Links
+
 - GitHub Issue: {{GitHub Issue}}
 - GitHub PR: {{GitHub PR}}
 - Documentación relacionada:
 
 ## 💬 Notas
+
 [Notas adicionales, decisiones de diseño, etc.]
 ```
 
@@ -147,6 +155,7 @@ Crear un template para nuevas tasks:
 1. Ir a https://www.notion.so/my-integrations
 2. Click en **"+ New integration"**
 3. Configurar:
+
    - **Name:** IntelliDocs GitHub Sync
    - **Associated workspace:** IntelliDocs-ngx
    - **Type:** Internal integration
@@ -371,11 +380,13 @@ if __name__ == '__main__':
 Si prefieres no usar GitHub Actions, puedes sincronizar manualmente:
 
 1. Ejecutar el script Python localmente:
+
 ```bash
 python .github/scripts/sync_github_to_notion.py
 ```
 
 2. Programarlo con cron (Linux/Mac):
+
 ```bash
 # Ejecutar cada hora
 0 * * * * cd /path/to/repo && python .github/scripts/sync_github_to_notion.py
@@ -457,12 +468,15 @@ Insertar vistas filtradas de la database principal:
 
 ```markdown
 ## 🔥 Tareas Críticas
+
 [Linked database: Filter by Prioridad = Crítica]
 
 ## 🚀 En Progreso Esta Semana
+
 [Linked database: Filter by Status = In Progress]
 
 ## ⏰ Vencimientos Próximos (7 días)
+
 [Linked database: Filter by Fecha Fin within next 7 days]
 ```
 
@@ -486,11 +500,13 @@ Usar fórmulas de Notion para calcular métricas:
 ### 6.1 Migrar Documentos Markdown a Notion
 
 **Opción A: Import manual**
+
 1. Copiar contenido de archivos .md
 2. Pegar en páginas de Notion
 3. Notion convierte Markdown automáticamente
 
 **Opción B: Usando markdown-to-notion**
+
 ```bash
 npm install -g markdown-to-notion
 
@@ -528,7 +544,9 @@ markdown-to-notion \
 ### 7.1 Configurar Notificaciones
 
 En Notion Settings:
+
 1. **My notifications:**
+
    - ✅ Updates to pages I'm subscribed to
    - ✅ @mentions
    - ✅ Comments and replies
@@ -544,6 +562,7 @@ Si el equipo usa Slack:
 1. Instalar Notion app en Slack
 2. Conectar workspace de Notion
 3. Configurar notificaciones:
+
    ```
    /notion subscribe #intellidocs-dev to "Roadmap 2026 Tasks"
    ```
@@ -565,26 +584,32 @@ Crear una database "Weekly Updates" con template:
 # Week {{week_number}} - {{date_range}}
 
 ## 🎯 Objetivos de la Semana
+
 - [ ] Objetivo 1
 - [ ] Objetivo 2
 - [ ] Objetivo 3
 
 ## ✅ Completado
+
 {{linked_view: tasks done this week}}
 
 ## 🔨 En Progreso
+
 {{linked_view: tasks in progress}}
 
 ## 🚫 Bloqueadores
+
 - Bloqueador 1: [descripción]
 - Bloqueador 2: [descripción]
 
 ## 📈 Métricas
+
 - **Velocity:** X tasks/semana
 - **Burn rate:** Y% del sprint
 - **Progreso general:** Z%
 
 ## 🎯 Próxima Semana
+
 - Plan para semana siguiente
 ```
 
@@ -596,29 +621,36 @@ Template para reportes mensuales:
 # Monthly Report: {{month}} {{year}}
 
 ## 📊 Executive Summary
+
 [Resumen de alto nivel para stakeholders]
 
 ## ✅ Epics Completados
+
 {{linked_view: epics completed this month}}
 
 ## 🎯 Progress vs Plan
+
 - **Planned:** X tasks
 - **Completed:** Y tasks
 - **Variance:** Z%
 
 ## 🌟 Highlights
+
 - Logro importante 1
 - Logro importante 2
 - Logro importante 3
 
 ## ⚠️ Challenges
+
 - Desafío 1 y cómo se resolvió
 - Desafío 2 (en progreso)
 
 ## 🔮 Next Month Forecast
+
 [Proyecciones para próximo mes]
 
 ## 📎 Attachments
+
 - Screenshots
 - Charts
 - Links
@@ -631,6 +663,7 @@ Template para reportes mensuales:
 ### 9.1 Cover Images
 
 Agregar covers personalizados:
+
 - Logo de IntelliDocs-ngx en página principal
 - Imágenes temáticas por Epic
 - Usar Unsplash integration de Notion
@@ -638,6 +671,7 @@ Agregar covers personalizados:
 ### 9.2 Icons
 
 Asignar íconos a páginas:
+
 - 🏠 Home
 - 📊 Roadmap
 - 📚 Docs
@@ -648,6 +682,7 @@ Asignar íconos a páginas:
 ### 9.3 Colores y Themes
 
 Usar colores consistentes:
+
 - 🔴 Crítico / Urgente
 - 🟠 Alta prioridad
 - 🟡 Media prioridad
@@ -663,6 +698,7 @@ Usar colores consistentes:
 
 1. **Workspace Settings** → **Members & Groups**
 2. Crear grupos:
+
    - **Admins:** Full access
    - **Developers:** Can edit
    - **Stakeholders:** Can comment
@@ -680,6 +716,7 @@ Para compartir con usuarios sin cuenta:
 1. Click en "Share" en la página
 2. Seleccionar "Share to web"
 3. Configurar:
+
    - ⬜ Allow search engines to index
    - ✅ Allow comments
    - ⬜ Allow editing
@@ -693,6 +730,7 @@ Para compartir con usuarios sin cuenta:
 ### Notion Mobile Apps
 
 1. Descargar Notion app:
+
    - iOS: App Store
    - Android: Google Play
 
@@ -712,6 +750,7 @@ Para compartir con usuarios sin cuenta:
 ### Flujo de Trabajo Típico
 
 1. **Nueva Feature Request:**
+
    ```
    User → GitHub Issue → Auto-sync → Notion Task
                                           ↓
@@ -721,6 +760,7 @@ Para compartir con usuarios sin cuenta:
    ```
 
 2. **Durante Desarrollo:**
+
    ```
    Developer → Move to "In Progress" en Notion
                      ↓
@@ -745,26 +785,31 @@ Para compartir con usuarios sin cuenta:
 ## 💡 Tips y Best Practices
 
 ### 1. Mantener Notion como "Source of Truth" para Planning
+
 - ✅ Planificación estratégica en Notion
 - ✅ Tracking técnico en GitHub
 - ✅ Sync automático entre ambos
 
 ### 2. Usar Templates
+
 - ✅ Template para tasks
 - ✅ Template para meeting notes
 - ✅ Template para weekly updates
 
 ### 3. Embeds útiles
+
 - Embed Figma designs
 - Embed Google Sheets (para budgets)
 - Embed Loom videos (demos)
 
 ### 4. Databases Relacionadas
+
 - Link tasks a epics
 - Link epics a OKRs
 - Link docs a tasks
 
 ### 5. Mantener Limpio
+
 - Archivar tasks viejas
 - Review mensual de docs
 - Actualizar templates según feedback
@@ -773,19 +818,21 @@ Para compartir con usuarios sin cuenta:
 
 ## 🆚 Comparación: Notion vs Jira/Confluence
 
-| Feature | Notion | Jira + Confluence | Ganador |
-|---------|--------|-------------------|---------|
-| **Facilidad de uso** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | Notion |
-| **Flexibilidad** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | Notion |
-| **Features de PM** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | Jira |
-| **Documentación** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | Notion |
-| **Integraciones** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | Jira |
-| **Costo** | $8/user/mes | $7.75/user/mes | Empate |
-| **Curva de aprendizaje** | Suave | Pronunciada | Notion |
-| **Reporting** | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | Jira |
+| Feature                  | Notion      | Jira + Confluence | Ganador |
+| ------------------------ | ----------- | ----------------- | ------- |
+| **Facilidad de uso**     | ⭐⭐⭐⭐⭐  | ⭐⭐⭐            | Notion  |
+| **Flexibilidad**         | ⭐⭐⭐⭐⭐  | ⭐⭐⭐            | Notion  |
+| **Features de PM**       | ⭐⭐⭐⭐    | ⭐⭐⭐⭐⭐        | Jira    |
+| **Documentación**        | ⭐⭐⭐⭐⭐  | ⭐⭐⭐⭐          | Notion  |
+| **Integraciones**        | ⭐⭐⭐⭐    | ⭐⭐⭐⭐⭐        | Jira    |
+| **Costo**                | $8/user/mes | $7.75/user/mes    | Empate  |
+| **Curva de aprendizaje** | Suave       | Pronunciada       | Notion  |
+| **Reporting**            | ⭐⭐⭐      | ⭐⭐⭐⭐⭐        | Jira    |
 
 ### Recomendación
+
 ✅ **Notion** es la mejor opción para IntelliDocs-ngx porque:
+
 1. Equipo pequeño (1-5 personas)
 2. Necesidad de flexibilidad
 3. Documentación como prioridad
@@ -796,16 +843,19 @@ Para compartir con usuarios sin cuenta:
 ## 📚 Recursos Adicionales
 
 ### Tutoriales Notion
+
 - **Notion Academy:** https://www.notion.so/help/guides
 - **YouTube:** Notion product management
 - **Templates:** https://www.notion.so/templates
 
 ### Integraciones (100% Gratuitas)
+
 - **Notion API:** https://developers.notion.com/ (GRATIS)
 - **GitHub Actions:** https://github.com/features/actions (GRATIS - 2000 min/mes)
 - **Python Notion Client:** https://github.com/ramnes/notion-sdk-py (GRATIS, open source)
 
 ### Comunidad
+
 - **Reddit:** r/Notion
 - **Discord:** Notion Community
 - **Twitter:** @NotionHQ
@@ -815,6 +865,7 @@ Para compartir con usuarios sin cuenta:
 ## ✅ Checklist de Setup Completo
 
 ### Notion Setup
+
 - [ ] Workspace creado
 - [ ] Estructura de páginas configurada
 - [ ] Database "Roadmap 2026 Tasks" creada
@@ -824,6 +875,7 @@ Para compartir con usuarios sin cuenta:
 - [ ] Dashboard ejecutivo configurado
 
 ### Integración (100% Gratuita)
+
 - [ ] Notion API integration creada (GRATIS)
 - [ ] GitHub Action configurada (GRATIS)
 - [ ] Secrets configurados en GitHub
@@ -831,11 +883,13 @@ Para compartir con usuarios sin cuenta:
 - [ ] ✅ SIN servicios de pago (Zapier/Make eliminados)
 
 ### Documentación
+
 - [ ] Markdown docs migrados a Notion
 - [ ] Wiki de documentación organizada
 - [ ] API reference embedded
 
 ### Equipo
+
 - [ ] Miembros invitados
 - [ ] Permisos configurados
 - [ ] Onboarding docs creados

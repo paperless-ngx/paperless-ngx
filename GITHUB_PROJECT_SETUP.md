@@ -15,6 +15,7 @@ Este documento proporciona las instrucciones paso a paso para crear y configurar
 ## 📊 Estructura del Project
 
 ### Información General del Project
+
 - **Nombre:** IntelliDocs-ngx Roadmap 2026
 - **Descripción:** Plan annual de desarrollo e implementación para IntelliDocs-ngx
 - **Template:** Board (Kanban) + Roadmap views
@@ -34,6 +35,7 @@ Este documento proporciona las instrucciones paso a paso para crear y configurar
 3. Seleccionar template: **"Board"**
 
 4. Configurar:
+
    - **Project name:** IntelliDocs-ngx Roadmap 2026
    - **Description:** Hoja de ruta completa para el año 2026. 12 Epics, 147 tareas, distribuidas en 4 trimestres.
    - **Visibility:** Private
@@ -66,26 +68,32 @@ Crear las siguientes columnas en el Board:
 ### Columnas del Kanban
 
 1. **📥 Backlog**
+
    - Status: Backlog
    - Descripción: Tareas no iniciadas, priorizadas para futuro
 
 2. **📅 Planned (Q1-Q4)**
+
    - Status: Planned
    - Descripción: Tareas planificadas con trimestre asignado
 
 3. **🔨 In Progress**
+
    - Status: In Progress
    - Descripción: Tareas en desarrollo activo
 
 4. **👀 In Review**
+
    - Status: In Review
    - Descripción: Tareas completadas, esperando code review
 
 5. **🧪 Testing**
+
    - Status: Testing
    - Descripción: Features en QA y testing
 
 6. **✅ Done**
+
    - Status: Done
    - Descripción: Tareas completadas y mergeadas
 
@@ -98,6 +106,7 @@ Crear las siguientes columnas en el Board:
 ## 🏷️ Paso 3: Configurar Labels (Etiquetas)
 
 ### Labels por Prioridad
+
 ```
 🔴 priority: critical
 🟠 priority: high
@@ -106,6 +115,7 @@ Crear las siguientes columnas en el Board:
 ```
 
 ### Labels por Epic
+
 ```
 epic: 01-testing-qa
 epic: 02-api-docs
@@ -122,6 +132,7 @@ epic: 12-ar-vr
 ```
 
 ### Labels por Trimestre
+
 ```
 Q1-2026 (Enero-Marzo)
 Q2-2026 (Abril-Junio)
@@ -130,6 +141,7 @@ Q4-2026 (Octubre-Diciembre)
 ```
 
 ### Labels por Tipo
+
 ```
 type: feature
 type: enhancement
@@ -140,6 +152,7 @@ type: infrastructure
 ```
 
 ### Labels por Área
+
 ```
 area: backend
 area: frontend
@@ -204,6 +217,7 @@ gh label create "area: security" --color "c5def5" --description "Seguridad"
 Agregar campos personalizados al project para tracking avanzado:
 
 ### 1. Epic (Single Select)
+
 - **Nombre:** Epic
 - **Tipo:** Single select
 - **Opciones:**
@@ -221,6 +235,7 @@ Agregar campos personalizados al project para tracking avanzado:
   - EPIC 12: AR/VR
 
 ### 2. Trimestre (Single Select)
+
 - **Nombre:** Trimestre
 - **Tipo:** Single select
 - **Opciones:**
@@ -230,11 +245,13 @@ Agregar campos personalizados al project para tracking avanzado:
   - Q4 2026 (Octubre-Diciembre)
 
 ### 3. Estimación (Number)
+
 - **Nombre:** Estimación (días)
 - **Tipo:** Number
 - **Descripción:** Tiempo estimado en días de trabajo
 
 ### 4. Prioridad (Single Select)
+
 - **Nombre:** Prioridad
 - **Tipo:** Single select
 - **Opciones:**
@@ -244,21 +261,25 @@ Agregar campos personalizados al project para tracking avanzado:
   - 🟢 Baja
 
 ### 5. Progreso (Number)
+
 - **Nombre:** Progreso (%)
 - **Tipo:** Number
 - **Descripción:** Porcentaje de completitud (0-100)
 
 ### 6. Fecha Inicio (Date)
+
 - **Nombre:** Fecha Inicio
 - **Tipo:** Date
 - **Descripción:** Fecha de inicio de la tarea
 
 ### 7. Fecha Fin (Date)
+
 - **Nombre:** Fecha Fin
 - **Tipo:** Date
 - **Descripción:** Fecha objetivo de finalización
 
 ### 8. Responsible (Person)
+
 - **Nombre:** Responsible
 - **Tipo:** Person
 - **Descripción:** Persona asignada a la tarea
@@ -270,6 +291,7 @@ Agregar campos personalizados al project para tracking avanzado:
 1. En el project, click en **"+ New view"**
 2. Seleccionar **"Roadmap"**
 3. Configurar:
+
    - **Name:** Roadmap 2026
    - **Date field (start):** Fecha Inicio
    - **Date field (end):** Fecha Fin
@@ -279,6 +301,7 @@ Agregar campos personalizados al project para tracking avanzado:
 4. Guardar vista
 
 ### Vista de Roadmap recomendada
+
 - Mostrar markers por trimestre
 - Color-code por prioridad
 - Agrupar por Epic
@@ -292,6 +315,7 @@ Agregar campos personalizados al project para tracking avanzado:
 Para cada tarea en ROADMAP_2026.md:
 
 1. Crear un Issue en GitHub:
+
    ```
    Título: TSK-2601: Tests para classifier.py (clasificación BERT)
 
@@ -314,6 +338,7 @@ Para cada tarea en ROADMAP_2026.md:
    ```
 
 2. Asignar labels:
+
    - `epic: 01-testing-qa`
    - `priority: high`
    - `Q1-2026`
@@ -413,24 +438,28 @@ gh issue create \
 ## 📊 Paso 7: Configurar Vistas Adicionales
 
 ### Vista 1: Por Prioridad
+
 1. Crear nueva vista: **"Por Prioridad"**
 2. Tipo: Board
 3. Group by: Prioridad
 4. Sort by: Fecha Inicio
 
 ### Vista 2: Por Trimestre
+
 1. Crear nueva vista: **"Por Trimestre"**
 2. Tipo: Board
 3. Group by: Trimestre
 4. Sort by: Epic
 
 ### Vista 3: Por Responsible
+
 1. Crear nueva vista: **"Por Responsible"**
 2. Tipo: Board
 3. Group by: Responsible
 4. Sort by: Prioridad
 
 ### Vista 4: Lista Completa
+
 1. Crear nueva vista: **"Lista Completa"**
 2. Tipo: Table
 3. Mostrar todas las columnas
@@ -443,14 +472,17 @@ gh issue create \
 ### Reglas de Automatización Recomendadas
 
 1. **Auto-mover a "In Progress" cuando se asigna**
+
    - Trigger: Item assigned
    - Action: Set status to "In Progress"
 
 2. **Auto-mover a "In Review" cuando se abre PR**
+
    - Trigger: Pull request opened
    - Action: Set status to "In Review"
 
 3. **Auto-mover a "Done" cuando se cierra issue**
+
    - Trigger: Issue closed
    - Action: Set status to "Done"
 
@@ -489,10 +521,12 @@ jobs:
 En el Project, habilitar Insights para ver:
 
 1. **Burndown Chart**
+
    - Visualizar progreso vs tiempo
    - Ajustar por trimestre
 
 2. **Velocity**
+
    - Tareas completadas por sprint/semana
    - Identificar bottlenecks
 
@@ -517,12 +551,15 @@ En cada Pull Request, referenciar el issue:
 
 ```markdown
 ## Descripción
+
 Implementa tests para el clasificador BERT.
 
 ## Issue Relacionado
+
 Closes #123 (TSK-2601)
 
 ## Checklist
+
 - [x] Tests añadidos
 - [x] Tests passing
 - [x] Documentación actualizada
@@ -534,22 +571,27 @@ Crear `.github/PULL_REQUEST_TEMPLATE.md`:
 
 ```markdown
 ## 📋 Descripción
+
 <!-- Describe los cambios -->
 
 ## 🎯 Issue Relacionado
+
 Closes #<!-- número del issue -->
 
 ## 🧪 Testing
+
 - [ ] Tests unitarios añadidos
 - [ ] Tests de integración añadidos
 - [ ] Tests passing en CI/CD
 
 ## 📚 Documentación
+
 - [ ] README actualizado
 - [ ] BITACORA_MAESTRA.md actualizada
 - [ ] Comentarios en código
 
 ## ✅ Checklist
+
 - [ ] Code review solicitado
 - [ ] Linter passing
 - [ ] No breaking changes
@@ -563,10 +605,12 @@ Closes #<!-- número del issue -->
 ### Asignar Roles
 
 1. **Admin:** @dawnsystem (Director)
+
    - Puede editar project settings
    - Aprobar cambios al roadmap
 
 2. **Write:** Developers
+
    - Pueden mover cards
    - Actualizar custom fields
    - Crear issues
@@ -615,26 +659,31 @@ IntelliDocs-ngx Roadmap 2026
 ## 🎓 Best Practices
 
 ### 1. Actualización Regular
+
 - ✅ Actualizar status de tasks **diariamente**
 - ✅ Review del project board en **daily standup**
 - ✅ Update de custom fields al cambiar estado
 
 ### 2. Granularidad de Tasks
+
 - ✅ Tasks no más de 3-5 días
 - ✅ Si una task es >5 días, dividirla en subtasks
 - ✅ Usar subtasks en el issue description
 
 ### 3. Documentación
+
 - ✅ Cada task debe tener acceptance criteria
 - ✅ Link a documentación técnica cuando aplique
 - ✅ Screenshots/videos de cambios UI
 
 ### 4. Code Reviews
+
 - ✅ PR reviews obligatorios antes de merge
 - ✅ Mínimo 1 aprobación requerida
 - ✅ CI/CD debe pasar antes de merge
 
 ### 5. Comunicación
+
 - ✅ Comentar en issues, no en Slack/email
 - ✅ Tag (@mention) a personas relevantes
 - ✅ Usar reactions para quick feedback
@@ -666,6 +715,7 @@ IntelliDocs-ngx Roadmap 2026
 ---
 
 **Próximos Pasos:**
+
 1. Crear el GitHub Project siguiendo esta guía
 2. Importar las primeras 20-30 tareas del EPIC 1
 3. Asignar responsables

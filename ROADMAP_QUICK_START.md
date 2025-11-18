@@ -20,6 +20,7 @@ Tienes 3 documentos principales creados:
 ## ⚡ Acción Inmediata (Esta Semana)
 
 ### Día 1: Revisar y Aprobar
+
 ```bash
 # Leer documentos en este orden:
 1. ROADMAP_2026.md → Secciones:
@@ -31,6 +32,7 @@ Tienes 3 documentos principales creados:
 ```
 
 ### Día 2-3: Setup GitHub Project
+
 ```bash
 # Opción Rápida (30 minutos):
 1. Ir a: https://github.com/dawnsystem/IntelliDocs-ngx/projects
@@ -47,6 +49,7 @@ Tienes 3 documentos principales creados:
 ```
 
 ### Día 4-5: Setup Notion (Opcional pero Recomendado)
+
 ```bash
 # Opción Rápida con Zapier (1 hora):
 1. Crear cuenta Notion: https://notion.so
@@ -80,6 +83,7 @@ Semana 2:
 ```
 
 **Resultado esperado:**
+
 - ✅ 6 tareas completadas
 - ✅ Cobertura de tests: 60-70% → 85-90%
 - ✅ Equipo familiarizado con el roadmap
@@ -98,24 +102,29 @@ Usa un archivo `PROGRESS.md` en el repo:
 ## Semana del 2026-01-06 al 2026-01-10
 
 ### Lunes 06/01
+
 - [x] TSK-2601: Tests classifier.py (50% - en progreso)
 - [x] Setup entorno de testing
 
 ### Martes 07/01
+
 - [x] TSK-2601: Completado ✅
 - [ ] TSK-2602: Tests ner.py (iniciando)
 
 ### Miércoles 08/01
+
 - [x] TSK-2602: Tests ner.py (80% - casi listo)
-...
+      ...
 ```
 
 **Ventajas:**
+
 - ✅ Súper simple
 - ✅ Versionado en Git
 - ✅ No require herramientas externas
 
 **Desventajas:**
+
 - ⚠️ No tan visual
 - ⚠️ Difícil de compartir con stakeholders
 
@@ -209,6 +218,7 @@ AL COMPLETAR TASK:
 ## 💡 Tips de Productividad
 
 ### 1. Dividir Tareas Grandes
+
 Si una tarea toma >3 días, divídela:
 
 ```
@@ -220,6 +230,7 @@ Si una tarea toma >3 días, divídela:
 ```
 
 ### 2. Timeboxing
+
 No te quedes atorado:
 
 ```
@@ -230,6 +241,7 @@ Si una tarea está tomando 2x el tiempo estimado:
 ```
 
 ### 3. Celebrar Wins
+
 Cada tarea completada es un logro:
 
 ```
@@ -245,24 +257,28 @@ Cada tarea completada es un logro:
 ## 🚨 Qué Hacer Si...
 
 ### ...estás bloqueado en una tarea
+
 1. Documentar el blocker claramente
 2. Intentar workaround (timeboxed: 1 hora)
 3. Escalar a director/equipo
 4. Mientras, trabajar en otra tarea
 
 ### ...una tarea toma más tiempo de lo estimado
+
 1. Re-estimar honestamente
 2. Comunicar el cambio
 3. Ajustar el plan si necesario
 4. Aprender para próximas estimaciones
 
 ### ...descubres deuda técnica crítica
+
 1. Documentar en `BITACORA_MAESTRA.md` sección "Bugs Conocidos"
 2. Evaluar impacto
 3. Si crítico: añadir al sprint actual
 4. Si no: añadir al backlog con prioridad
 
 ### ...un Epic parece inviable
+
 1. Analizar qué lo have inviable
 2. Proponer alternativas
 3. Discutir con director
@@ -273,6 +289,7 @@ Cada tarea completada es un logro:
 ## 📈 Métricas Clave a Trackear
 
 ### Métricas Semanales
+
 ```
 □ Tasks completadas: X/Y
 □ Velocity: X tasks/semana
@@ -282,6 +299,7 @@ Cada tarea completada es un logro:
 ```
 
 ### Métricas Mensuales
+
 ```
 □ Epics completados: X/12
 □ Progreso general: X%
@@ -328,6 +346,7 @@ Q4 2026 (Diciembre 31):
 ## 🔗 Links Rápidos
 
 ### Documentación Principal
+
 - [ROADMAP_2026.md](./ROADMAP_2026.md) - Hoja de ruta completa
 - [GITHUB_PROJECT_SETUP.md](./GITHUB_PROJECT_SETUP.md) - Setup GitHub
 - [NOTION_INTEGRATION_GUIDE.md](./NOTION_INTEGRATION_GUIDE.md) - Setup Notion
@@ -335,11 +354,13 @@ Q4 2026 (Diciembre 31):
 - [agents.md](./agents.md) - Directivas del proyecto
 
 ### Documentación Técnica
+
 - [IMPROVEMENT_ROADMAP.md](./IMPROVEMENT_ROADMAP.md) - Roadmap técnico detallado
 - [TECHNICAL_FUNCTIONS_GUIDE.md](./TECHNICAL_FUNCTIONS_GUIDE.md) - Guía de funciones
 - [IMPLEMENTATION_README.md](./IMPLEMENTATION_README.md) - Guía de instalación
 
 ### Herramientas
+
 - GitHub Project: [Crear aquí](https://github.com/dawnsystem/IntelliDocs-ngx/projects)
 - Notion: [Crear workspace](https://notion.so)
 - GitHub CLI: [Instalar](https://cli.github.com/)
@@ -349,12 +370,14 @@ Q4 2026 (Diciembre 31):
 ## ✅ Checklist: ¿Estoy Listo para Empezar?
 
 ### Checklist Mínima (para empezar HOY)
+
 - [ ] Leí el Resumen Ejecutivo de ROADMAP_2026.md
 - [ ] Entiendo los 12 Epics principales
 - [ ] Revisé las tareas de EPIC 1 (Testing)
 - [ ] Sé qué haré los próximos 2-3 días
 
 ### Checklist Completa (ideal)
+
 - [ ] Leí ROADMAP_2026.md completo
 - [ ] GitHub Project creado
 - [ ] Notion workspace configurado
@@ -367,6 +390,7 @@ Q4 2026 (Diciembre 31):
 ## 🎉 ¡Empecemos!
 
 ### Acción #1 (AHORA MISMO)
+
 ```bash
 # 1. Abrir ROADMAP_2026.md
 # 2. Ir a EPIC 1
@@ -377,6 +401,7 @@ Q4 2026 (Diciembre 31):
 ```
 
 ### Primer Commit
+
 ```bash
 git checkout -b feature/tsk-2601-tests-classifier
 # ... hacer cambios ...
@@ -397,18 +422,23 @@ git push origin feature/tsk-2601-tests-classifier
 ## 💬 Preguntas Frecuentes
 
 ### P: ¿Debo seguir el roadmap al pie de la letra?
+
 **R:** No. Es una guía, no una biblia. Ajusta según feedback y realidad.
 
 ### P: ¿Qué hago si no tengo tiempo/recursos para todo?
+
 **R:** Prioriza. Enfócate en Epics críticos (EPIC 1, 4). Los demás son flexibles.
 
 ### P: ¿Puedo cambiar el orden de los Epics?
+
 **R:** Sí, respetando dependencias. Por ejemplo, EPIC 5 (Mobile) necesita EPIC 2 (API docs).
 
 ### P: ¿Cuándo actualizar BITACORA_MAESTRA.md?
+
 **R:** Después de cada sesión significativa (al menos 1x por semana).
 
 ### P: ¿Es obligatorio usar Notion?
+
 **R:** No, pero es la preferencia del Director. GitHub Projects + Markdown también funciona.
 
 ---
@@ -423,7 +453,7 @@ git push origin feature/tsk-2601-tests-classifier
 
 **¡Mucho éxito en la implementación del roadmap 2026! 🚀**
 
-*Recuerda: Lo perfecto es enemigo de lo bueno. Mejor iterar rápido que planificar eternamente.*
+_Recuerda: Lo perfecto es enemigo de lo bueno. Mejor iterar rápido que planificar eternamente._
 
 ---
 

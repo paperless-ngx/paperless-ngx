@@ -9,21 +9,25 @@ This document describes the enhancements implemented in IntelliDocs-ngx (Phases 
 ## 📦 What's Implemented
 
 ### Phase 1: Performance Optimization (147x faster)
+
 - ✅ Database indexing (6 composite indexes)
 - ✅ Enhanced caching system
 - ✅ Automatic cache invalidation
 
 ### Phase 2: Security Hardening (Grade A+ security)
+
 - ✅ API rate limiting (DoS protection)
 - ✅ Security headers (7 headers)
 - ✅ Enhanced file validation
 
 ### Phase 3: AI/ML Enhancement (+40-60% accuracy)
+
 - ✅ BERT document classification
 - ✅ Named Entity Recognition (NER)
 - ✅ Semantic search
 
 ### Phase 4: Advanced OCR (99% time savings)
+
 - ✅ Table extraction (90-95% accuracy)
 - ✅ Handwriting recognition (85-92% accuracy)
 - ✅ Form field detection (95-98% accuracy)
@@ -35,17 +39,20 @@ This document describes the enhancements implemented in IntelliDocs-ngx (Phases 
 ### 1. Install System Dependencies
 
 **Ubuntu/Debian:**
+
 ```bash
 sudo apt-get update
 sudo apt-get install -y tesseract-ocr poppler-utils
 ```
 
 **macOS:**
+
 ```bash
 brew install tesseract poppler
 ```
 
 **Windows:**
+
 - Download Tesseract from: https://github.com/UB-Mannheim/tesseract/wiki
 - Add to PATH
 
@@ -85,6 +92,7 @@ tesseract --version
 No configuration needed. Caching and indexes work automatically.
 
 **To disable caching** (not recommended):
+
 ```python
 # In settings.py
 CACHES = {
@@ -97,6 +105,7 @@ CACHES = {
 ### Phase 2: Security
 
 **Rate Limiting** (configured in `src/paperless/middleware.py`):
+
 ```python
 rate_limits = {
     "/api/documents/": (100, 60),  # 100 requests per minute
@@ -108,6 +117,7 @@ rate_limits = {
 ```
 
 **To disable rate limiting** (for testing):
+
 ```python
 # In settings.py
 # Comment out the middleware
@@ -119,9 +129,11 @@ MIDDLEWARE = [
 ```
 
 **Security Headers** (automatic):
+
 - HSTS, CSP, X-Frame-Options, X-Content-Type-Options, etc.
 
 **File Validation** (automatic):
+
 - Max file size: 500MB
 - Allowed types: PDF, Office docs, images
 - Blocks: .exe, .dll, .bat, etc.
@@ -129,17 +141,20 @@ MIDDLEWARE = [
 ### Phase 3: AI/ML
 
 **Default Models** (download automatically on first use):
+
 - Classifier: `distilbert-base-uncased` (~132MB)
 - NER: `dbmdz/bert-large-cased-finetuned-conll03-english` (~1.3GB)
 - Semantic Search: `all-MiniLM-L6-v2` (~80MB)
 
 **GPU Support** (automatic if available):
+
 ```bash
 # Check GPU availability
 python -c "import torch; print(f'CUDA: {torch.cuda.is_available()}')"
 ```
 
 **Pre-download models** (optional but recommended):
+
 ```python
 from documents.ml import TransformerDocumentClassifier, DocumentNER, SemanticSearch
 
@@ -194,6 +209,7 @@ safe_name = sanitize_filename("../../etc/passwd")  # Returns "etc_passwd"
 ### Phase 3: AI/ML
 
 #### Document Classification
+
 ```python
 from documents.ml import TransformerDocumentClassifier
 
@@ -220,6 +236,7 @@ classifier = TransformerDocumentClassifier.load_model("/path/to/model")
 ```
 
 #### Named Entity Recognition
+
 ```python
 from documents.ml import DocumentNER
 
@@ -245,6 +262,7 @@ tags = ner.suggest_tags(text)  # ['invoice', 'payment']
 ```
 
 #### Semantic Search
+
 ```python
 from documents.ml import SemanticSearch
 
@@ -276,6 +294,7 @@ search = SemanticSearch.load_index("/path/to/index")
 ### Phase 4: Advanced OCR
 
 #### Table Extraction
+
 ```python
 from documents.ocr import TableExtractor
 
@@ -304,6 +323,7 @@ all_tables = extractor.batch_process(image_files)
 ```
 
 #### Handwriting Recognition
+
 ```python
 from documents.ocr import HandwritingRecognizer
 
@@ -330,6 +350,7 @@ all_lines = recognizer.batch_process(images)
 ```
 
 #### Form Detection
+
 ```python
 from documents.ocr import FormFieldDetector
 
@@ -455,6 +476,7 @@ print("Form detector loaded")
 ### Phase 1: Performance
 
 **Issue:** Queries still slow
+
 - **Solution:** Ensure migration ran: `python src/manage.py showmigrations documents`
 - Check indexes exist in database
 - Verify Redis is running for cache
@@ -462,11 +484,13 @@ print("Form detector loaded")
 ### Phase 2: Security
 
 **Issue:** Rate limiting not working
+
 - **Solution:** Ensure Redis is configured and running
 - Check middleware is in MIDDLEWARE list in settings.py
 - Verify cache backend is Redis, not dummy
 
 **Issue:** Files being rejected
+
 - **Solution:** Check file type is in ALLOWED_MIME_TYPES
 - Review logs for specific validation error
 - Adjust MAX_FILE_SIZE if needed (src/paperless/security.py)
@@ -474,15 +498,18 @@ print("Form detector loaded")
 ### Phase 3: AI/ML
 
 **Issue:** Import errors
+
 - **Solution:** Install dependencies: `pip install transformers torch sentence-transformers`
 - Verify installation: `pip list | grep -E "transformers|torch|sentence"`
 
 **Issue:** Model download fails
+
 - **Solution:** Check internet connection
 - Try pre-downloading: `huggingface-cli download model_name`
 - Set HF_HOME environment variable for custom cache location
 
 **Issue:** Out of memory
+
 - **Solution:** Use smaller models (distilbert instead of bert-large)
 - Reduce batch size
 - Use CPU instead of GPU for small tasks
@@ -490,15 +517,18 @@ print("Form detector loaded")
 ### Phase 4: Advanced OCR
 
 **Issue:** Tesseract not found
+
 - **Solution:** Install system package: `sudo apt-get install tesseract-ocr`
 - Verify: `tesseract --version`
 - Add to PATH on Windows
 
 **Issue:** Import errors
+
 - **Solution:** Install dependencies: `pip install opencv-python pytesseract pillow`
 - Verify: `pip list | grep -E "opencv|pytesseract|pillow"`
 
 **Issue:** Poor OCR quality
+
 - **Solution:** Improve image quality (300+ DPI)
 - Use grayscale conversion
 - Apply preprocessing (threshold, noise removal)
@@ -510,40 +540,40 @@ print("Form detector loaded")
 
 ### Phase 1: Performance Optimization
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| Document list query | 10.2s | 0.07s | **145x faster** |
-| Metadata loading | 330ms | 2ms | **165x faster** |
-| User session | 54.3s | 0.37s | **147x faster** |
-| DB CPU usage | 100% | 40-60% | **-50%** |
+| Metric              | Before | After  | Improvement     |
+| ------------------- | ------ | ------ | --------------- |
+| Document list query | 10.2s  | 0.07s  | **145x faster** |
+| Metadata loading    | 330ms  | 2ms    | **165x faster** |
+| User session        | 54.3s  | 0.37s  | **147x faster** |
+| DB CPU usage        | 100%   | 40-60% | **-50%**        |
 
 ### Phase 2: Security Hardening
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| Security headers | 2/10 | 10/10 | **+400%** |
-| Security grade | C | A+ | **+3 grades** |
-| Vulnerabilities | 15+ | 2-3 | **-80%** |
-| OWASP compliance | 30% | 80% | **+50%** |
+| Metric           | Before | After | Improvement   |
+| ---------------- | ------ | ----- | ------------- |
+| Security headers | 2/10   | 10/10 | **+400%**     |
+| Security grade   | C      | A+    | **+3 grades** |
+| Vulnerabilities  | 15+    | 2-3   | **-80%**      |
+| OWASP compliance | 30%    | 80%   | **+50%**      |
 
 ### Phase 3: AI/ML Enhancement
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| Classification accuracy | 70-75% | 90-95% | **+20-25%** |
-| Data entry time | 2-5 min | 0 sec | **100% automated** |
-| Search relevance | 40% | 85% | **+45%** |
-| False positives | 15% | 3% | **-80%** |
+| Metric                  | Before  | After  | Improvement        |
+| ----------------------- | ------- | ------ | ------------------ |
+| Classification accuracy | 70-75%  | 90-95% | **+20-25%**        |
+| Data entry time         | 2-5 min | 0 sec  | **100% automated** |
+| Search relevance        | 40%     | 85%    | **+45%**           |
+| False positives         | 15%     | 3%     | **-80%**           |
 
 ### Phase 4: Advanced OCR
 
-| Metric | Value |
-|--------|-------|
-| Table detection | 90-95% accuracy |
-| Table extraction | 85-90% accuracy |
-| Handwriting recognition | 85-92% accuracy |
-| Form field detection | 95-98% accuracy |
-| Time savings | 99% (5-10 min → 5-30 sec) |
+| Metric                  | Value                     |
+| ----------------------- | ------------------------- |
+| Table detection         | 90-95% accuracy           |
+| Table extraction        | 85-90% accuracy           |
+| Handwriting recognition | 85-92% accuracy           |
+| Form field detection    | 95-98% accuracy           |
+| Time savings            | 99% (5-10 min → 5-30 sec) |
 
 ---
 
@@ -552,12 +582,14 @@ print("Form detector loaded")
 ### Phase 2 Security Features
 
 **Rate Limiting:**
+
 - Protects against DoS attacks
 - Distributed across workers (using Redis)
 - Different limits per endpoint
 - Returns HTTP 429 when exceeded
 
 **Security Headers:**
+
 - HSTS: Forces HTTPS
 - CSP: Prevents XSS attacks
 - X-Frame-Options: Prevents clickjacking
@@ -567,6 +599,7 @@ print("Form detector loaded")
 - Permissions-Policy: Restricts browser features
 
 **File Validation:**
+
 - Size limit: 500MB (configurable)
 - MIME type validation
 - Extension blacklist
@@ -598,6 +631,7 @@ print("Form detector loaded")
 ## 🤝 Support
 
 For issues or questions:
+
 1. Check troubleshooting section above
 2. Review relevant phase documentation
 3. Check logs: `logs/paperless.log`
@@ -611,5 +645,5 @@ Same as IntelliDocs-ngx/paperless-ngx
 
 ---
 
-*Last updated: November 9, 2025*
-*Version: 2.19.5*
+_Last updated: November 9, 2025_
+_Version: 2.19.5_

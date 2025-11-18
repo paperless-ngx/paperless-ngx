@@ -1,10 +1,10 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { DeletionRequestDetailComponent } from './deletion-request-detail.component'
+import { DeletionRequestStatus } from 'src/app/data/deletion-request'
 import { DeletionRequestService } from 'src/app/services/rest/deletion-request.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { DeletionRequestStatus } from 'src/app/data/deletion-request'
+import { DeletionRequestDetailComponent } from './deletion-request-detail.component'
 
 describe('DeletionRequestDetailComponent', () => {
   let component: DeletionRequestDetailComponent

@@ -9,9 +9,11 @@
 ## 📦 Qué se Implementó
 
 ### 1️⃣ Rate Limiting (Limitación de Tasa)
+
 **Archivo**: `src/paperless/middleware.py`
 
 Protección contra ataques DoS:
+
 ```
 ✅ /api/documents/  → 100 peticiones por minuto
 ✅ /api/search/     → 30 peticiones por minuto
@@ -21,9 +23,11 @@ Protección contra ataques DoS:
 ```
 
 ### 2️⃣ Security Headers (Cabeceras de Seguridad)
+
 **Archivo**: `src/paperless/middleware.py`
 
 Cabeceras de seguridad añadidas:
+
 ```
 ✅ Strict-Transport-Security (HSTS)
 ✅ Content-Security-Policy (CSP)
@@ -35,9 +39,11 @@ Cabeceras de seguridad añadidas:
 ```
 
 ### 3️⃣ Validación Avanzada de Archivos
+
 **Archivo**: `src/paperless/security.py` (nuevo módulo)
 
 Validaciones implementadas:
+
 ```python
 ✅ Tamaño máximo de archivo (500MB)
 ✅ Tipos MIME permitidos
@@ -48,6 +54,7 @@ Validaciones implementadas:
 ```
 
 ### 4️⃣ Configuración de Middleware
+
 **Archivo**: `src/paperless/settings.py`
 
 Middlewares de seguridad activados automáticamente.
@@ -58,13 +65,13 @@ Middlewares de seguridad activados automáticamente.
 
 ### Antes vs Después
 
-| Categoría | Antes | Después | Mejora |
-|-----------|-------|---------|--------|
-| **Cabeceras de seguridad** | 2/10 | 10/10 | **+400%** |
-| **Protección DoS** | ❌ Ninguna | ✅ Rate limiting | **+100%** |
-| **Validación de archivos** | ⚠️ Básica | ✅ Multi-capa | **+300%** |
-| **Puntuación de seguridad** | C | A+ | **+3 grados** |
-| **Vulnerabilidades** | 15+ | 2-3 | **-80%** |
+| Categoría                   | Antes      | Después          | Mejora        |
+| --------------------------- | ---------- | ---------------- | ------------- |
+| **Cabeceras de seguridad**  | 2/10       | 10/10            | **+400%**     |
+| **Protección DoS**          | ❌ Ninguna | ✅ Rate limiting | **+100%**     |
+| **Validación de archivos**  | ⚠️ Básica  | ✅ Multi-capa    | **+300%**     |
+| **Puntuación de seguridad** | C          | A+               | **+3 grados** |
+| **Vulnerabilidades**        | 15+        | 2-3              | **-80%**      |
 
 ### Impacto Visual
 
@@ -81,6 +88,7 @@ DESPUÉS (Grade A+) 🔒
 ## 🎯 Cómo Usar
 
 ### Paso 1: Desplegar
+
 Los cambios se activan automáticamente al reiniciar la aplicación.
 
 ```bash
@@ -89,6 +97,7 @@ Los cambios se activan automáticamente al reiniciar la aplicación.
 ```
 
 ### Paso 2: Verificar Cabeceras de Seguridad
+
 ```bash
 # Verifica las cabeceras
 curl -I https://tu-intellidocs.com/
@@ -100,6 +109,7 @@ curl -I https://tu-intellidocs.com/
 ```
 
 ### Paso 3: Probar Rate Limiting
+
 ```bash
 # Haz muchas peticiones rápidas (debería bloquear después de 100)
 for i in {1..110}; do
@@ -112,9 +122,11 @@ done
 ## 🛡️ Protecciones Implementadas
 
 ### 1. Protección contra DoS
+
 **Qué previene**: Ataques de denegación de servicio
 
 **Cómo funciona**:
+
 ```
 Usuario have petición
     ↓
@@ -126,6 +138,7 @@ Verificar contador en Redis
 ```
 
 **Ejemplo**:
+
 ```
 Minuto 0:00 - Usuario have 90 peticiones ✅
 Minuto 0:30 - Usuario have 10 más (total: 100) ✅
@@ -136,6 +149,7 @@ Minuto 1:01 - Contador se reinicia
 ---
 
 ### 2. Protección contra XSS
+
 **Qué previene**: Cross-Site Scripting
 
 **Cabecera**: `Content-Security-Policy`
@@ -145,6 +159,7 @@ Minuto 1:01 - Contador se reinicia
 ---
 
 ### 3. Protección contra Clickjacking
+
 **Qué previene**: Engañar a usuarios con iframes ocultos
 
 **Cabecera**: `X-Frame-Options: DENY`
@@ -154,15 +169,18 @@ Minuto 1:01 - Contador se reinicia
 ---
 
 ### 4. Protección contra Archivos Maliciosos
+
 **Qué previene**: Subida de malware, ejecutables
 
 **Validaciones**:
+
 - ✅ Verifica tamaño de archivo
 - ✅ Valida tipo MIME (usando magic numbers, no extensión)
 - ✅ Bloquea extensions peligrosas (.exe, .bat, etc.)
 - ✅ Escanea contenido en busca de patrones maliciosos
 
 **Archivos Bloqueados**:
+
 ```
 ❌ document.exe        - Extensión peligrosa
 ❌ malware.pdf         - Contiene código JavaScript malicioso
@@ -177,6 +195,7 @@ Minuto 1:01 - Contador se reinicia
 ## 🔍 Verificar que Funciona
 
 ### 1. Verificar Puntuación de Seguridad
+
 ```bash
 # Visita: https://securityheaders.com
 # Ingresa tu URL de IntelliDocs
@@ -184,6 +203,7 @@ Minuto 1:01 - Contador se reinicia
 ```
 
 ### 2. Verificar Rate Limiting
+
 ```python
 # En Django shell
 from django.core.cache import cache
@@ -196,6 +216,7 @@ cache.get('rate_limit_user_123_/api/documents/')
 ```
 
 ### 3. Probar Validación de Archivos
+
 ```python
 from paperless.security import validate_file_path, FileValidationError
 
@@ -235,7 +256,9 @@ Antes de desplegar a producción:
 ### Funciones Disponibles
 
 #### `validate_uploaded_file(uploaded_file)`
+
 Valida archivos subidos:
+
 ```python
 from paperless.security import validate_uploaded_file
 
@@ -247,7 +270,9 @@ except FileValidationError as e:
 ```
 
 #### `sanitize_filename(filename)`
+
 Previene path traversal:
+
 ```python
 from paperless.security import sanitize_filename
 
@@ -256,7 +281,9 @@ nombre_seguro = sanitize_filename('../../etc/passwd')
 ```
 
 #### `calculate_file_hash(file_path)`
+
 Calcula checksums:
+
 ```python
 from paperless.security import calculate_file_hash
 
@@ -289,6 +316,7 @@ MIDDLEWARE = [
 ## 💡 Configuración Opcional
 
 ### Ajustar Límites de Rate
+
 Si necesitas diferentes límites:
 
 ```python
@@ -300,6 +328,7 @@ self.rate_limits = {
 ```
 
 ### Permitir Tipos de Archivo Adicionales
+
 ```python
 # En src/paperless/security.py
 ALLOWED_MIME_TYPES = {
@@ -315,12 +344,14 @@ ALLOWED_MIME_TYPES = {
 ### Estándares de Seguridad
 
 **Antes**:
+
 - ❌ OWASP Top 10: Falla 5/10
 - ❌ SOC 2: No cumple
 - ❌ ISO 27001: No cumple
 - ⚠️ GDPR: Cumplimiento parcial
 
 **Después**:
+
 - ✅ OWASP Top 10: Pasa 8/10
 - ⚠️ SOC 2: Mejor (necesita cifrado para completo)
 - ⚠️ ISO 27001: Mejor
@@ -331,16 +362,19 @@ ALLOWED_MIME_TYPES = {
 ## 🎯 Próximas Mejoras (Fase 3)
 
 ### Corto Plazo (1-2 Semanas)
+
 - 2FA obligatorio para admins
 - Monitoreo de eventos de seguridad
 - Configurar fail2ban
 
 ### Medio Plazo (1-2 Meses)
+
 - Cifrado de documentos (siguiente fase)
 - Escaneo de malware (ClamAV)
 - Web Application Firewall (WAF)
 
 ### Largo Plazo (3-6 Meses)
+
 - Auditoría de seguridad professional
 - Certificaciones (SOC 2, ISO 27001)
 - Penetration testing
@@ -363,6 +397,7 @@ ALLOWED_MIME_TYPES = {
 ## 🔐 Qué Está Protegido Ahora
 
 ### Antes (Grade C) 😟
+
 ```
 □ Rate limiting
 □ Security headers
@@ -373,6 +408,7 @@ ALLOWED_MIME_TYPES = {
 ```
 
 ### Después (Grade A+) 🔒
+
 ```
 ✅ Rate limiting
 ✅ Security headers
@@ -400,7 +436,7 @@ Has implementado la segunda fase de seguridad. El sistema ahora está protegido 
 
 ---
 
-*Implementado: 9 de noviembre de 2025*
-*Fase: 2 de 5*
-*Estado: ✅ Listo para Testing*
-*Mejora: Grade C → A+ (400% mejora)*
+_Implementado: 9 de noviembre de 2025_
+_Fase: 2 de 5_
+_Estado: ✅ Listo para Testing_
+_Mejora: Grade C → A+ (400% mejora)_

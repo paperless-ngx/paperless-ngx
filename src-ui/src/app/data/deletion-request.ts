@@ -28,7 +28,9 @@ export interface DeletionRequestImpactSummary {
   document_count: number
   documents: DeletionRequestDocument[]
   affected_tags: Array<{ id: number; name: string; count: number }> | string[]
-  affected_correspondents: Array<{ id: number; name: string; count: number }> | string[]
+  affected_correspondents:
+    | Array<{ id: number; name: string; count: number }>
+    | string[]
   affected_types: Array<{ id: number; name: string; count: number }> | string[]
   date_range?: {
     earliest: string

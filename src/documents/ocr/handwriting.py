@@ -232,7 +232,7 @@ class HandwritingRecognizer:
                     )
 
             # Sort lines top to bottom
-            lines.sort(key=lambda l: l["bbox"][1])
+            lines.sort(key=lambda line: line["bbox"][1])
 
             logger.info(f"Detected {len(lines)} text lines")
             return lines

@@ -452,21 +452,25 @@ suggestions for metadata. You must specify at least one filter option (`--all`,
 **Examples:**
 
 Scan all documents in dry-run mode (preview only):
+
 ```bash
 python manage.py scan_documents_ai --all --dry-run
 ```
 
 Scan documents of a specific type and auto-apply high confidence suggestions:
+
 ```bash
 python manage.py scan_documents_ai --filter-by-type 1 3 --auto-apply-high-confidence
 ```
 
 Scan documents from a date range:
+
 ```bash
 python manage.py scan_documents_ai --date-range 2024-01-01 2024-12-31 --dry-run
 ```
 
 Scan a specific range of document IDs:
+
 ```bash
 python manage.py scan_documents_ai --id-range 100 200 --auto-apply-high-confidence
 ```
@@ -474,15 +478,17 @@ python manage.py scan_documents_ai --id-range 100 200 --auto-apply-high-confiden
 **Understanding Confidence Levels:**
 
 The AI scanner assigns confidence scores to each suggestion:
-- **High confidence (≥80%)**: Very reliable suggestions that can be auto-applied with `--auto-apply-high-confidence`
-- **Medium confidence (60-79%)**: Suggestions that should be reviewed before applying
-- **Low confidence (<60%)**: Not shown by default, increase with `--confidence-threshold` if needed
+
+-   **High confidence (≥80%)**: Very reliable suggestions that can be auto-applied with `--auto-apply-high-confidence`
+-   **Medium confidence (60-79%)**: Suggestions that should be reviewed before applying
+-   **Low confidence (<60%)**: Not shown by default, increase with `--confidence-threshold` if needed
 
 The command displays a detailed summary at the end, including:
-- Number of documents processed
-- Total suggestions generated
-- Sample suggestions for the first 5 documents with suggestions
-- Any errors encountered during processing
+
+-   Number of documents processed
+-   Total suggestions generated
+-   Sample suggestions for the first 5 documents with suggestions
+-   Any errors encountered during processing
 
 **Performance Considerations:**
 

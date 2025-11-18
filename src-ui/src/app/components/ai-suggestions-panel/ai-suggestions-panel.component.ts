@@ -1,11 +1,5 @@
+import { animate, style, transition, trigger } from '@angular/animations'
 import { CommonModule } from '@angular/common'
-import {
-  trigger,
-  state,
-  style,
-  transition,
-  animate,
-} from '@angular/animations'
 import {
   Component,
   EventEmitter,
@@ -19,7 +13,7 @@ import {
 import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, of } from 'rxjs'
-import { takeUntil, catchError } from 'rxjs/operators'
+import { catchError, takeUntil } from 'rxjs/operators'
 import {
   AISuggestion,
   AISuggestionStatus,
@@ -42,16 +36,15 @@ import { ToastService } from 'src/app/services/toast.service'
   standalone: true,
   templateUrl: './ai-suggestions-panel.component.html',
   styleUrls: ['./ai-suggestions-panel.component.scss'],
-  imports: [
-    CommonModule,
-    NgbCollapseModule,
-    NgxBootstrapIconsModule,
-  ],
+  imports: [CommonModule, NgbCollapseModule, NgxBootstrapIconsModule],
   animations: [
     trigger('slideIn', [
       transition(':enter', [
         style({ transform: 'translateY(-20px)', opacity: 0 }),
-        animate('300ms ease-out', style({ transform: 'translateY(0)', opacity: 1 })),
+        animate(
+          '300ms ease-out',
+          style({ transform: 'translateY(0)', opacity: 1 })
+        ),
       ]),
     ]),
     trigger('fadeInOut', [
@@ -60,7 +53,10 @@ import { ToastService } from 'src/app/services/toast.service'
         animate('200ms ease-out', style({ opacity: 1, transform: 'scale(1)' })),
       ]),
       transition(':leave', [
-        animate('200ms ease-in', style({ opacity: 0, transform: 'scale(0.95)' })),
+        animate(
+          '200ms ease-in',
+          style({ opacity: 0, transform: 'scale(0.95)' })
+        ),
       ]),
     ]),
   ],
@@ -281,7 +277,9 @@ export class AiSuggestionsPanelComponent implements OnChanges, OnDestroy {
         const storagePath = this.storagePaths.find(
           (sp) => sp.id === suggestion.value
         )
-        return storagePath ? storagePath.name : `Storage Path #${suggestion.value}`
+        return storagePath
+          ? storagePath.name
+          : `Storage Path #${suggestion.value}`
 
       case AISuggestionType.CustomField:
         return suggestion.field_name || 'Custom Field'
@@ -410,9 +408,7 @@ export class AiSuggestionsPanelComponent implements OnChanges, OnDestroy {
     })
     this.processSuggestions()
 
-    this.toastService.showInfo(
-      $localize`Applied ${count} AI suggestions`
-    )
+    this.toastService.showInfo($localize`Applied ${count} AI suggestions`)
   }
 
   public rejectAll(): void {
@@ -427,9 +423,7 @@ export class AiSuggestionsPanelComponent implements OnChanges, OnDestroy {
     })
     this.processSuggestions()
 
-    this.toastService.showInfo(
-      $localize`Rejected ${count} AI suggestions`
-    )
+    this.toastService.showInfo($localize`Rejected ${count} AI suggestions`)
   }
 
   public toggleCollapse(): void {

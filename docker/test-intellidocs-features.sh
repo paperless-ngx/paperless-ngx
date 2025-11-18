@@ -17,8 +17,8 @@ NC='\033[0m' # No Color
 
 # Check if docker compose is available
 if ! command -v docker &> /dev/null; then
-    echo -e "${RED}✗ Docker is not installed${NC}"
-    exit 1
+	echo -e "${RED}✗ Docker is not installed${NC}"
+	exit 1
 fi
 
 echo -e "${GREEN}✓ Docker is installed${NC}"
@@ -26,8 +26,8 @@ echo -e "${GREEN}✓ Docker is installed${NC}"
 # Check if compose file exists
 COMPOSE_FILE="compose/docker-compose.intellidocs.yml"
 if [ ! -f "$COMPOSE_FILE" ]; then
-    echo -e "${RED}✗ Compose file not found: $COMPOSE_FILE${NC}"
-    exit 1
+	echo -e "${RED}✗ Compose file not found: $COMPOSE_FILE${NC}"
+	exit 1
 fi
 
 echo -e "${GREEN}✓ Docker compose file found${NC}"
@@ -36,12 +36,12 @@ echo ""
 # Test 1: Check if containers are running
 echo "Test 1: Checking if containers are running..."
 if docker compose -f "$COMPOSE_FILE" ps | grep -q "Up"; then
-    echo -e "${GREEN}✓ Containers are running${NC}"
+	echo -e "${GREEN}✓ Containers are running${NC}"
 else
-    echo -e "${YELLOW}! Containers are not running. Starting them...${NC}"
-    docker compose -f "$COMPOSE_FILE" up -d
-    echo "Waiting 60 seconds for containers to initialize..."
-    sleep 60
+	echo -e "${YELLOW}! Containers are not running. Starting them...${NC}"
+	docker compose -f "$COMPOSE_FILE" up -d
+	echo "Waiting 60 seconds for containers to initialize..."
+	sleep 60
 fi
 echo ""
 
@@ -123,41 +123,41 @@ else:
 PYTHON_EOF
 
 if [ $? -eq 0 ]; then
-    echo -e "${GREEN}✓ All Python dependencies are available${NC}"
+	echo -e "${GREEN}✓ All Python dependencies are available${NC}"
 else
-    echo -e "${RED}✗ Some Python dependencies are missing${NC}"
-    exit 1
+	echo -e "${RED}✗ Some Python dependencies are missing${NC}"
+	exit 1
 fi
 echo ""
 
 # Test 3: Check if ML modules exist
 echo "Test 3: Checking ML/OCR module files..."
 for module in "documents/ml/classifier.py" "documents/ml/ner.py" "documents/ml/semantic_search.py" "documents/ocr/table_extractor.py" "documents/ocr/handwriting.py" "documents/ocr/form_detector.py"; do
-    if docker compose -f "$COMPOSE_FILE" exec -T webserver test -f "/usr/src/paperless/src/$module"; then
-        echo -e "${GREEN}✓ $module exists${NC}"
-    else
-        echo -e "${RED}✗ $module not found${NC}"
-        exit 1
-    fi
+	if docker compose -f "$COMPOSE_FILE" exec -T webserver test -f "/usr/src/paperless/src/$module"; then
+		echo -e "${GREEN}✓ $module exists${NC}"
+	else
+		echo -e "${RED}✗ $module not found${NC}"
+		exit 1
+	fi
 done
 echo ""
 
 # Test 4: Check Redis connection
 echo "Test 4: Checking Redis connection..."
 if docker compose -f "$COMPOSE_FILE" exec -T broker redis-cli ping | grep -q "PONG"; then
-    echo -e "${GREEN}✓ Redis is responding${NC}"
+	echo -e "${GREEN}✓ Redis is responding${NC}"
 else
-    echo -e "${RED}✗ Redis is not responding${NC}"
-    exit 1
+	echo -e "${RED}✗ Redis is not responding${NC}"
+	exit 1
 fi
 echo ""
 
 # Test 5: Check if webserver is responding
 echo "Test 5: Checking if webserver is responding..."
 if docker compose -f "$COMPOSE_FILE" exec -T webserver curl -f -s http://localhost:8000 > /dev/null; then
-    echo -e "${GREEN}✓ Webserver is responding${NC}"
+	echo -e "${GREEN}✓ Webserver is responding${NC}"
 else
-    echo -e "${YELLOW}! Webserver is not responding yet (may still be initializing)${NC}"
+	echo -e "${YELLOW}! Webserver is not responding yet (may still be initializing)${NC}"
 fi
 echo ""
 

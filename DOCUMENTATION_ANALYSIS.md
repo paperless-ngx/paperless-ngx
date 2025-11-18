@@ -5,6 +5,7 @@
 IntelliDocs-ngx is a sophisticated document management system forked from Paperless-ngx. It's designed to digitize, organize, and manage physical documents through OCR, machine learning classification, and automated workflows.
 
 ### Technology Stack
+
 - **Backend**: Django 5.2.5 + Python 3.10+
 - **Frontend**: Angular 20.3 + TypeScript
 - **Database**: PostgreSQL, MariaDB, MySQL, SQLite support
@@ -13,6 +14,7 @@ IntelliDocs-ngx is a sophisticated document management system forked from Paperl
 - **Storage**: Local filesystem, object storage support
 
 ### Architecture Overview
+
 - **Total Python Files**: 357
 - **Total TypeScript Files**: 386
 - **Main Modules**:
@@ -34,15 +36,18 @@ The documents module is the heart of IntelliDocs-ngx, handling all document-rela
 #### Key Files and Functions:
 
 ##### `consumer.py` - Document Consumption Pipeline
+
 **Purpose**: Processes incoming documents through OCR, classification, and storage.
 
 **Main Classes**:
+
 - `Consumer` - Orchestrates the entire document consumption process
   - `try_consume_file()` - Entry point for document processing
   - `_consume()` - Core consumption logic
   - `_write()` - Saves document to database
 
 **Key Functions**:
+
 - Document ingestion from various sources
 - OCR text extraction
 - Metadata extraction
@@ -51,9 +56,11 @@ The documents module is the heart of IntelliDocs-ngx, handling all document-rela
 - Archive creation
 
 ##### `classifier.py` - Machine Learning Classification
+
 **Purpose**: Automatically classifies documents using machine learning algorithms.
 
 **Main Classes**:
+
 - `DocumentClassifier` - Implements classification logic
   - `train()` - Trains classification model on existing documents
   - `classify_document()` - Predicts document classification
@@ -64,10 +71,13 @@ The documents module is the heart of IntelliDocs-ngx, handling all document-rela
 **Algorithm**: Uses scikit-learn's LinearSVC for text classification based on document content.
 
 ##### `models.py` - Database Models
+
 **Purpose**: Defines all database schemas and relationships.
 
 **Main Models**:
+
 - `Document` - Central document entity
+
   - Fields: title, content, correspondent, document_type, tags, created, modified
   - Methods: archiving, searching, versioning
 
@@ -82,10 +92,13 @@ The documents module is the heart of IntelliDocs-ngx, handling all document-rela
 - `ConsumptionTemplate` - Pre-configured consumption rules
 
 ##### `views.py` - REST API Endpoints
+
 **Purpose**: Provides RESTful API for all document operations.
 
 **Main ViewSets**:
+
 - `DocumentViewSet` - CRUD operations for documents
+
   - `download()` - Download original/archived document
   - `preview()` - Generate document preview
   - `metadata()` - Extract/update metadata
@@ -100,18 +113,22 @@ The documents module is the heart of IntelliDocs-ngx, handling all document-rela
 - `CustomFieldViewSet` - Manage custom metadata fields
 
 ##### `serialisers.py` - Data Serialization
+
 **Purpose**: Converts between database models and JSON/API representations.
 
 **Main Serializers**:
+
 - `DocumentSerializer` - Complete document serialization with permissions
 - `BulkEditSerializer` - Handles bulk operations
 - `PostDocumentSerializer` - Document upload handling
 - `WorkflowSerializer` - Workflow configuration
 
 ##### `tasks.py` - Asynchronous Tasks
+
 **Purpose**: Celery tasks for background processing.
 
 **Main Tasks**:
+
 - `consume_file()` - Async document consumption
 - `train_classifier()` - Retrain ML models
 - `update_document_archive_file()` - Regenerate archives
@@ -119,58 +136,71 @@ The documents module is the heart of IntelliDocs-ngx, handling all document-rela
 - `sanity_check()` - System health checks
 
 ##### `index.py` - Search Indexing
+
 **Purpose**: Full-text search functionality.
 
 **Main Classes**:
+
 - `DocumentIndex` - Manages search index
   - `add_or_update_document()` - Index document content
   - `remove_document()` - Remove from index
   - `search()` - Full-text search with ranking
 
 ##### `matching.py` - Pattern Matching
+
 **Purpose**: Automatic document classification based on rules.
 
 **Main Classes**:
+
 - `DocumentMatcher` - Pattern matching engine
   - `match()` - Apply matching rules
   - `auto_match()` - Automatic rule application
 
 **Match Types**:
+
 - Exact text match
 - Regular expressions
 - Fuzzy matching
 - Date/metadata matching
 
 ##### `barcodes.py` - Barcode Processing
+
 **Purpose**: Extract and process barcodes for document routing.
 
 **Main Functions**:
+
 - `get_barcodes()` - Detect barcodes in documents
 - `barcode_reader()` - Read barcode data
 - `separate_pages()` - Split documents based on barcodes
 
 ##### `bulk_edit.py` - Mass Operations
+
 **Purpose**: Efficient bulk document modifications.
 
 **Main Classes**:
+
 - `BulkEditService` - Coordinates bulk operations
   - `update_documents()` - Batch updates
   - `merge_documents()` - Combine documents
   - `split_documents()` - Divide documents
 
 ##### `file_handling.py` - File Operations
+
 **Purpose**: Manages document file lifecycle.
 
 **Main Functions**:
+
 - `create_source_path_directory()` - Organize source files
 - `generate_unique_filename()` - Avoid filename collisions
 - `delete_empty_directories()` - Cleanup
 - `move_file_to_final_location()` - Archive management
 
 ##### `parsers.py` - Document Parsing
+
 **Purpose**: Extract content from various document formats.
 
 **Main Classes**:
+
 - `DocumentParser` - Base parser interface
 - `RasterizedPdfParser` - PDF with images
 - `TextParser` - Plain text documents
@@ -178,9 +208,11 @@ The documents module is the heart of IntelliDocs-ngx, handling all document-rela
 - `ImageParser` - Image files
 
 ##### `filters.py` - Query Filtering
+
 **Purpose**: Advanced document filtering and search.
 
 **Main Classes**:
+
 - `DocumentFilter` - Complex query builder
   - Filter by: date ranges, tags, correspondents, content, custom fields
   - Boolean operations (AND, OR, NOT)
@@ -188,18 +220,22 @@ The documents module is the heart of IntelliDocs-ngx, handling all document-rela
   - Full-text search integration
 
 ##### `permissions.py` - Access Control
+
 **Purpose**: Document-level security and permissions.
 
 **Main Classes**:
+
 - `PaperlessObjectPermissions` - Per-object permissions
   - User ownership
   - Group sharing
   - Public access controls
 
 ##### `workflows.py` - Automation Engine
+
 **Purpose**: Automated document processing workflows.
 
 **Main Classes**:
+
 - `WorkflowEngine` - Executes workflows
   - Triggers: document consumption, manual, scheduled
   - Actions: assign correspondent, set tags, execute webhooks
@@ -212,9 +248,11 @@ The documents module is the heart of IntelliDocs-ngx, handling all document-rela
 Core framework configuration and utilities.
 
 ##### `settings.py` - Application Configuration
+
 **Purpose**: Django settings and environment configuration.
 
 **Key Settings**:
+
 - Database configuration
 - Security settings (CORS, CSP, authentication)
 - File storage configuration
@@ -224,51 +262,63 @@ Core framework configuration and utilities.
 - API configuration
 
 ##### `celery.py` - Task Queue Configuration
+
 **Purpose**: Celery worker configuration.
 
 **Main Functions**:
+
 - Task scheduling
 - Queue management
 - Worker monitoring
 - Periodic tasks (cleanup, training)
 
 ##### `auth.py` - Authentication
+
 **Purpose**: User authentication and authorization.
 
 **Main Classes**:
+
 - Custom authentication backends
 - OAuth integration
 - Token authentication
 - Permission checking
 
 ##### `consumers.py` - WebSocket Support
+
 **Purpose**: Real-time updates via WebSockets.
 
 **Main Consumers**:
+
 - `StatusConsumer` - Document processing status
 - `NotificationConsumer` - System notifications
 
 ##### `middleware.py` - Request Processing
+
 **Purpose**: HTTP request/response middleware.
 
 **Main Middleware**:
+
 - Authentication handling
 - CORS management
 - Compression
 - Logging
 
 ##### `urls.py` - URL Routing
+
 **Purpose**: API endpoint routing.
 
 **Routes**:
+
 - `/api/` - REST API endpoints
 - `/ws/` - WebSocket endpoints
 - `/admin/` - Django admin interface
 
 ##### `views.py` - Core Views
+
 **Purpose**: System-level API endpoints.
 
 **Main Views**:
+
 - System status
 - Configuration
 - Statistics
@@ -281,26 +331,32 @@ Core framework configuration and utilities.
 Email integration for document ingestion.
 
 ##### `mail.py` - Email Processing
+
 **Purpose**: Fetch and process emails as documents.
 
 **Main Classes**:
+
 - `MailAccountHandler` - Email account management
   - `get_messages()` - Fetch emails via IMAP
   - `process_message()` - Convert email to document
   - `handle_attachments()` - Extract attachments
 
 ##### `oauth.py` - OAuth Email Authentication
+
 **Purpose**: OAuth2 for Gmail, Outlook integration.
 
 **Main Functions**:
+
 - OAuth token management
 - Token refresh
 - Provider-specific authentication
 
 ##### `tasks.py` - Email Tasks
+
 **Purpose**: Background email processing.
 
 **Main Tasks**:
+
 - `process_mail_accounts()` - Check all configured accounts
 - `train_from_emails()` - Learn from email patterns
 
@@ -311,9 +367,11 @@ Email integration for document ingestion.
 OCR via Tesseract engine.
 
 ##### `parsers.py` - Tesseract OCR
+
 **Purpose**: Extract text from images/PDFs using Tesseract.
 
 **Main Classes**:
+
 - `RasterisedDocumentParser` - OCR for scanned documents
   - `parse()` - Execute OCR
   - `construct_ocrmypdf_parameters()` - Configure OCR
@@ -327,9 +385,11 @@ OCR via Tesseract engine.
 Plain text document processing.
 
 ##### `parsers.py` - Text Extraction
+
 **Purpose**: Extract text from text-based documents.
 
 **Main Classes**:
+
 - `TextDocumentParser` - Parse text files
 - `PdfDocumentParser` - Extract text from PDF
 
@@ -340,9 +400,11 @@ Plain text document processing.
 Apache Tika integration for complex formats.
 
 ##### `parsers.py` - Tika Processing
+
 **Purpose**: Parse Office documents, archives, etc.
 
 **Main Classes**:
+
 - `TikaDocumentParser` - Universal document parser
   - Supports: Office, LibreOffice, images, archives
   - Metadata extraction
@@ -355,6 +417,7 @@ Apache Tika integration for complex formats.
 ### 2.1 Angular Application Structure
 
 ##### Core Components:
+
 - **Dashboard** - Main document view
 - **Document List** - Searchable document grid
 - **Document Detail** - Individual document viewer
@@ -362,6 +425,7 @@ Apache Tika integration for complex formats.
 - **Admin Panel** - User/group management
 
 ##### Key Services:
+
 - `DocumentService` - API interactions
 - `SearchService` - Advanced search
 - `PermissionsService` - Access control
@@ -369,6 +433,7 @@ Apache Tika integration for complex formats.
 - `WebSocketService` - Real-time updates
 
 ##### Features:
+
 - Drag-and-drop document upload
 - Advanced filtering and search
 - Bulk operations
@@ -384,6 +449,7 @@ Apache Tika integration for complex formats.
 ### 3.1 Current Features
 
 #### Document Management
+
 - ✅ Multi-format support (PDF, images, Office documents)
 - ✅ OCR with multiple engines (Tesseract, Tika)
 - ✅ Full-text search with ranking
@@ -394,6 +460,7 @@ Apache Tika integration for complex formats.
 - ✅ Double-sided scanning support
 
 #### Classification & Organization
+
 - ✅ Machine learning auto-classification
 - ✅ Pattern-based matching rules
 - ✅ Custom metadata fields
@@ -403,6 +470,7 @@ Apache Tika integration for complex formats.
 - ✅ Storage path templates
 
 #### Automation
+
 - ✅ Workflow engine with triggers and actions
 - ✅ Scheduled tasks
 - ✅ Email integration
@@ -410,6 +478,7 @@ Apache Tika integration for complex formats.
 - ✅ Consumption templates
 
 #### Security & Access
+
 - ✅ User authentication (local, OAuth, SSO)
 - ✅ Multi-factor authentication (MFA)
 - ✅ Per-document permissions
@@ -418,6 +487,7 @@ Apache Tika integration for complex formats.
 - ✅ Audit logging
 
 #### Integration
+
 - ✅ REST API
 - ✅ WebSocket real-time updates
 - ✅ Email (IMAP, OAuth)
@@ -425,6 +495,7 @@ Apache Tika integration for complex formats.
 - ✅ Browser extensions
 
 #### User Experience
+
 - ✅ Modern Angular UI
 - ✅ Dark mode
 - ✅ Mobile responsive
@@ -440,8 +511,10 @@ Apache Tika integration for complex formats.
 ### Priority 1: Critical/High Impact
 
 #### 4.1 AI & Machine Learning Enhancements
+
 **Current State**: Basic LinearSVC classifier
 **Proposed Improvements**:
+
 - [ ] Implement deep learning models (BERT, transformers) for better classification
 - [ ] Add named entity recognition (NER) for automatic metadata extraction
 - [ ] Implement image content analysis (detect invoices, receipts, contracts)
@@ -451,6 +524,7 @@ Apache Tika integration for complex formats.
 - [ ] Support for custom AI model plugins
 
 **Benefits**:
+
 - 40-60% improvement in classification accuracy
 - Automatic extraction of dates, amounts, parties
 - Better search relevance
@@ -459,8 +533,10 @@ Apache Tika integration for complex formats.
 **Implementation Effort**: Medium-High (4-6 weeks)
 
 #### 4.2 Advanced OCR Improvements
+
 **Current State**: Tesseract with basic preprocessing
 **Proposed Improvements**:
+
 - [ ] Integrate modern OCR engines (PaddleOCR, EasyOCR)
 - [ ] Add table detection and extraction
 - [ ] Implement form field recognition
@@ -470,6 +546,7 @@ Apache Tika integration for complex formats.
 - [ ] Receipt-specific OCR optimization
 
 **Benefits**:
+
 - Better accuracy on poor-quality scans
 - Structured data extraction from forms/tables
 - Support for handwritten documents
@@ -478,8 +555,10 @@ Apache Tika integration for complex formats.
 **Implementation Effort**: Medium (3-4 weeks)
 
 #### 4.3 Performance & Scalability
+
 **Current State**: Good for small-medium deployments
 **Proposed Improvements**:
+
 - [ ] Implement document thumbnail caching strategy
 - [ ] Add Redis caching for frequently accessed data
 - [ ] Optimize database queries (add missing indexes)
@@ -490,6 +569,7 @@ Apache Tika integration for complex formats.
 - [ ] Implement database connection pooling
 
 **Benefits**:
+
 - 3-5x faster page loads
 - Support for 100K+ document libraries
 - Reduced server resource usage
@@ -498,8 +578,10 @@ Apache Tika integration for complex formats.
 **Implementation Effort**: Medium (2-3 weeks)
 
 #### 4.4 Security Hardening
+
 **Current State**: Basic security measures
 **Proposed Improvements**:
+
 - [ ] Implement document encryption at rest
 - [ ] Add end-to-end encryption for sharing
 - [ ] Implement rate limiting on API endpoints
@@ -512,6 +594,7 @@ Apache Tika integration for complex formats.
 - [ ] Add malware scanning integration
 
 **Benefits**:
+
 - Protection against data breaches
 - Compliance with GDPR, HIPAA
 - Prevention of common attacks
@@ -524,8 +607,10 @@ Apache Tika integration for complex formats.
 ### Priority 2: Medium Impact
 
 #### 4.5 Mobile Experience
+
 **Current State**: Responsive web UI
 **Proposed Improvements**:
+
 - [ ] Develop native mobile apps (iOS/Android)
 - [ ] Add mobile document scanning with camera
 - [ ] Implement offline mode
@@ -535,6 +620,7 @@ Apache Tika integration for complex formats.
 - [ ] Implement biometric authentication
 
 **Benefits**:
+
 - Better mobile user experience
 - Faster document capture on-the-go
 - Increased user engagement
@@ -542,8 +628,10 @@ Apache Tika integration for complex formats.
 **Implementation Effort**: High (6-8 weeks)
 
 #### 4.6 Collaboration Features
+
 **Current State**: Basic sharing
 **Proposed Improvements**:
+
 - [ ] Add document comments/annotations
 - [ ] Implement version comparison (diff view)
 - [ ] Add collaborative editing
@@ -554,6 +642,7 @@ Apache Tika integration for complex formats.
 - [ ] Support document check-in/check-out
 
 **Benefits**:
+
 - Better team collaboration
 - Reduced email back-and-forth
 - Clear audit trails
@@ -562,8 +651,10 @@ Apache Tika integration for complex formats.
 **Implementation Effort**: Medium-High (4-5 weeks)
 
 #### 4.7 Integration Expansion
+
 **Current State**: Basic email integration
 **Proposed Improvements**:
+
 - [ ] Add Dropbox/Google Drive/OneDrive sync
 - [ ] Implement Slack/Teams notifications
 - [ ] Add Zapier/Make integration
@@ -574,6 +665,7 @@ Apache Tika integration for complex formats.
 - [ ] Support external authentication providers (Keycloak, Okta)
 
 **Benefits**:
+
 - Seamless workflow integration
 - Reduced manual import
 - Better enterprise compatibility
@@ -581,8 +673,10 @@ Apache Tika integration for complex formats.
 **Implementation Effort**: Medium (3-4 weeks per integration)
 
 #### 4.8 Advanced Search & Analytics
+
 **Current State**: Basic full-text search
 **Proposed Improvements**:
+
 - [ ] Add Elasticsearch integration
 - [ ] Implement faceted search
 - [ ] Add search suggestions/autocomplete
@@ -593,6 +687,7 @@ Apache Tika integration for complex formats.
 - [ ] Support natural language queries
 
 **Benefits**:
+
 - Faster, more relevant search
 - Better data insights
 - Proactive document discovery
@@ -604,8 +699,10 @@ Apache Tika integration for complex formats.
 ### Priority 3: Nice to Have
 
 #### 4.9 Document Processing
+
 **Current State**: Basic workflow automation
 **Proposed Improvements**:
+
 - [ ] Add automatic document splitting based on content
 - [ ] Implement duplicate detection
 - [ ] Add automatic document rotation
@@ -616,6 +713,7 @@ Apache Tika integration for complex formats.
 - [ ] Support for large format documents (blueprints, maps)
 
 **Benefits**:
+
 - Reduced manual processing
 - Better document quality
 - Compliance features
@@ -623,8 +721,10 @@ Apache Tika integration for complex formats.
 **Implementation Effort**: Low-Medium (2-3 weeks)
 
 #### 4.10 User Experience Enhancements
+
 **Current State**: Good modern UI
 **Proposed Improvements**:
+
 - [ ] Add drag-and-drop organization (Trello-style)
 - [ ] Implement document timeline view
 - [ ] Add calendar view for date-based documents
@@ -635,6 +735,7 @@ Apache Tika integration for complex formats.
 - [ ] Implement keyboard navigation improvements
 
 **Benefits**:
+
 - More intuitive navigation
 - Better accessibility
 - Personalized experience
@@ -642,8 +743,10 @@ Apache Tika integration for complex formats.
 **Implementation Effort**: Low-Medium (2-3 weeks)
 
 #### 4.11 Backup & Recovery
+
 **Current State**: Manual backups
 **Proposed Improvements**:
+
 - [ ] Implement automated backup scheduling
 - [ ] Add incremental backups
 - [ ] Support for cloud backup (S3, Azure Blob)
@@ -653,6 +756,7 @@ Apache Tika integration for complex formats.
 - [ ] Add export to standard formats (EAD, METS)
 
 **Benefits**:
+
 - Data protection
 - Business continuity
 - Peace of mind
@@ -660,8 +764,10 @@ Apache Tika integration for complex formats.
 **Implementation Effort**: Low-Medium (2-3 weeks)
 
 #### 4.12 Compliance & Archival
+
 **Current State**: Basic retention
 **Proposed Improvements**:
+
 - [ ] Add retention policy engine
 - [ ] Implement legal hold
 - [ ] Add compliance reporting
@@ -671,6 +777,7 @@ Apache Tika integration for complex formats.
 - [ ] Support for long-term format preservation
 
 **Benefits**:
+
 - Legal compliance
 - Records management
 - Archival standards
@@ -682,6 +789,7 @@ Apache Tika integration for complex formats.
 ## 5. Code Quality Analysis
 
 ### 5.1 Strengths
+
 - ✅ Well-structured Django application
 - ✅ Good separation of concerns
 - ✅ Comprehensive test coverage
@@ -693,12 +801,14 @@ Apache Tika integration for complex formats.
 ### 5.2 Areas for Improvement
 
 #### Code Organization
+
 - [ ] Refactor large files (views.py is 113KB, models.py is 44KB)
 - [ ] Extract reusable utilities
 - [ ] Improve module coupling
 - [ ] Add more type hints (Python 3.10+ types)
 
 #### Testing
+
 - [ ] Add integration tests for workflows
 - [ ] Improve E2E test coverage
 - [ ] Add performance tests
@@ -706,6 +816,7 @@ Apache Tika integration for complex formats.
 - [ ] Implement mutation testing
 
 #### Documentation
+
 - [ ] Add inline function documentation (docstrings)
 - [ ] Create architecture diagrams
 - [ ] Add API examples
@@ -713,6 +824,7 @@ Apache Tika integration for complex formats.
 - [ ] Improve error messages
 
 #### Dependency Management
+
 - [ ] Audit dependencies for security
 - [ ] Update outdated packages
 - [ ] Remove unused dependencies
@@ -723,19 +835,24 @@ Apache Tika integration for complex formats.
 ## 6. Technical Debt Analysis
 
 ### High Priority Technical Debt
+
 1. **Large monolithic files** - views.py (113KB), serialisers.py (96KB)
+
    - Solution: Split into feature-based modules
 
 2. **Database query optimization** - N+1 queries in several endpoints
+
    - Solution: Add select_related/prefetch_related
 
 3. **Frontend bundle size** - Large initial load
+
    - Solution: Implement lazy loading, code splitting
 
 4. **Missing indexes** - Slow queries on large datasets
    - Solution: Add composite indexes
 
 ### Medium Priority Technical Debt
+
 1. **Inconsistent error handling** - Mix of exceptions and error codes
 2. **Test flakiness** - Some tests fail intermittently
 3. **Hard-coded values** - Magic numbers and strings
@@ -746,12 +863,14 @@ Apache Tika integration for complex formats.
 ## 7. Performance Benchmarks
 
 ### Current Performance (estimated)
+
 - Document consumption: 5-10 docs/minute (with OCR)
 - Search query: 100-500ms (10K documents)
 - API response: 50-200ms
 - Frontend load: 2-4 seconds
 
 ### Target Performance (with improvements)
+
 - Document consumption: 20-30 docs/minute
 - Search query: 50-100ms
 - API response: 20-50ms
@@ -762,30 +881,35 @@ Apache Tika integration for complex formats.
 ## 8. Recommended Implementation Roadmap
 
 ### Phase 1: Foundation (Months 1-2)
+
 1. Performance optimization (caching, queries)
 2. Security hardening
 3. Code refactoring (split large files)
 4. Technical debt reduction
 
 ### Phase 2: Core Features (Months 3-4)
+
 1. Advanced OCR improvements
 2. AI/ML enhancements (NER, better classification)
 3. Enhanced search (Elasticsearch)
 4. Mobile experience improvements
 
 ### Phase 3: Collaboration (Months 5-6)
+
 1. Comments and annotations
 2. Workflow improvements
 3. Notification system
 4. Activity feeds
 
 ### Phase 4: Integration (Months 7-8)
+
 1. Cloud storage sync
 2. Third-party integrations
 3. Advanced automation
 4. API enhancements
 
 ### Phase 5: Advanced Features (Months 9-12)
+
 1. Native mobile apps
 2. Advanced analytics
 3. Compliance features
@@ -796,12 +920,14 @@ Apache Tika integration for complex formats.
 ## 9. Cost-Benefit Analysis
 
 ### Quick Wins (High Impact, Low Effort)
+
 1. **Database indexing** (1 week) - 3-5x query speedup
 2. **API response caching** (1 week) - 2-3x faster responses
 3. **Frontend lazy loading** (1 week) - 50% faster initial load
 4. **Security headers** (2 days) - Better security score
 
 ### High ROI Projects
+
 1. **AI classification** (4-6 weeks) - 40-60% better accuracy
 2. **Mobile apps** (6-8 weeks) - New user segment
 3. **Elasticsearch** (3-4 weeks) - Much better search
@@ -812,6 +938,7 @@ Apache Tika integration for complex formats.
 ## 10. Competitive Analysis
 
 ### Comparison with Similar Systems
+
 - **Paperless-ngx** (parent): Same foundation
 - **Papermerge**: More focus on UI/UX
 - **Mayan EDMS**: More enterprise features
@@ -819,6 +946,7 @@ Apache Tika integration for complex formats.
 - **Alfresco**: More mature, heavier
 
 ### IntelliDocs-ngx Differentiators
+
 - Modern tech stack (latest Django/Angular)
 - Active development
 - Strong ML capabilities (can be enhanced)
@@ -826,6 +954,7 @@ Apache Tika integration for complex formats.
 - Open source
 
 ### Areas to Lead
+
 1. **AI/ML** - Best-in-class classification
 2. **Mobile** - Native apps with scanning
 3. **Integration** - Widest ecosystem support
@@ -836,6 +965,7 @@ Apache Tika integration for complex formats.
 ## 11. Resource Requirements
 
 ### Development Team (for full roadmap)
+
 - 2-3 Backend developers (Python/Django)
 - 2-3 Frontend developers (Angular/TypeScript)
 - 1 ML/AI specialist
@@ -844,6 +974,7 @@ Apache Tika integration for complex formats.
 - 1 QA engineer
 
 ### Infrastructure (for enterprise deployment)
+
 - Application server: 4 CPU, 8GB RAM
 - Database server: 4 CPU, 16GB RAM
 - Redis: 2 CPU, 4GB RAM
@@ -864,6 +995,7 @@ IntelliDocs-ngx is a solid document management system with excellent foundations
 5. **Advanced OCR** - Better data extraction
 
 The recommended approach is to:
+
 1. Start with quick wins (performance, security)
 2. Focus on high-ROI features (AI, search)
 3. Build differentiating capabilities (mobile, integrations)
@@ -878,6 +1010,7 @@ With these improvements, IntelliDocs-ngx can become the leading open-source docu
 [Note: Due to size, detailed function documentation for all 357 Python and 386 TypeScript files would be generated separately as API documentation]
 
 ### Quick Stats
+
 - **Total Python Functions**: ~2,500
 - **Total TypeScript Functions**: ~3,000
 - **API Endpoints**: 150+
@@ -909,22 +1042,26 @@ With these improvements, IntelliDocs-ngx can become the leading open-source docu
 ## Appendix C: Testing Strategy
 
 ### Unit Tests
+
 - Coverage target: 80%+
 - Focus on business logic
 - Mock external dependencies
 
 ### Integration Tests
+
 - Test API endpoints
 - Test database interactions
 - Test external service integration
 
 ### E2E Tests
+
 - Critical user flows
 - Document upload/download
 - Search functionality
 - Workflow execution
 
 ### Performance Tests
+
 - Load testing (concurrent users)
 - Stress testing (maximum capacity)
 - Spike testing (sudden traffic)
@@ -935,6 +1072,7 @@ With these improvements, IntelliDocs-ngx can become the leading open-source docu
 ## Appendix D: Monitoring & Observability
 
 ### Metrics to Track
+
 - Document processing rate
 - API response times
 - Error rates
@@ -945,6 +1083,7 @@ With these improvements, IntelliDocs-ngx can become the leading open-source docu
 - OCR accuracy
 
 ### Logging
+
 - Application logs (structured JSON)
 - Access logs
 - Error logs
@@ -952,6 +1091,7 @@ With these improvements, IntelliDocs-ngx can become the leading open-source docu
 - Performance logs
 
 ### Alerting
+
 - Failed document processing
 - High error rates
 - Slow API responses
@@ -960,6 +1100,6 @@ With these improvements, IntelliDocs-ngx can become the leading open-source docu
 
 ---
 
-*Document generated: 2025-11-09*
-*IntelliDocs-ngx Version: 2.19.5*
-*Author: Copilot Analysis Engine*
+_Document generated: 2025-11-09_
+_IntelliDocs-ngx Version: 2.19.5_
+_Author: Copilot Analysis Engine_

@@ -1,5 +1,4 @@
 name: IntelliDocs Docker Build & Deploy
-
 on:
   push:
     branches: [dev, main, 'claude/**']
@@ -10,12 +9,10 @@ on:
   pull_request:
     branches: [dev, main]
   workflow_dispatch:
-
 env:
   REGISTRY: ghcr.io
   # Docker requires lowercase repository names
   IMAGE_NAME: dawnsystem/intellidocs-ngx
-
 jobs:
   # ============================================================================
   # JOB 1: Validar dependencias ML/OCR
@@ -24,27 +21,22 @@ jobs:
     name: Validate ML/OCR Dependencies
     runs-on: ubuntu-24.04
     timeout-minutes: 30
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
-
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-
       - name: Install UV package manager
         uses: astral-sh/setup-uv@v6
         with:
           version: '0.9.x'
-
       - name: Install system dependencies for OpenCV/ML
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends \
             libglib2.0-0 libsm6 libxext6 libxrender1 libgomp1 libgl1
-
       - name: Verify pyproject.toml exists
         run: |
           if [ ! -f "pyproject.toml" ]; then
@@ -95,7 +87,6 @@ jobs:
 
           print('\\n✅ All ML/OCR dependencies loaded successfully!')
           "
-
       - name: Verify test file exists
         run: |
           if [ ! -f "src/documents/tests/test_ml_smoke.py" ]; then
@@ -110,7 +101,6 @@ jobs:
         run: |
           uv run pytest src/documents/tests/test_ml_smoke.py -v --tb=short
           echo "✓ ML smoke tests passed"
-
   # ============================================================================
   # JOB 2: Build y Push imagen Docker
   # ============================================================================
@@ -123,7 +113,6 @@ jobs:
       contents: read
       packages: write
       id-token: write
-
     steps:
       - name: Free Disk Space (CRITICAL - Prevent "no space left on device")
         uses: jlumbroso/free-disk-space@main
@@ -135,10 +124,8 @@ jobs:
           large-packages: true
           docker-images: true
           swap-storage: true
-
       - name: Checkout code
         uses: actions/checkout@v5
-
       - name: Verify Dockerfile exists
         run: |
           if [ ! -f "Dockerfile" ]; then
@@ -148,12 +135,10 @@ jobs:
           echo "✓ Dockerfile found"
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
       - name: Set up QEMU for multi-arch builds
         uses: docker/setup-qemu-action@v3
         with:
           platforms: linux/amd64,linux/arm64
-
       - name: Log in to GitHub Container Registry
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
@@ -161,7 +146,6 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Extract metadata (tags, labels)
         id: meta
         uses: docker/metadata-action@v5
@@ -174,7 +158,6 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=sha,format=short
             type=raw,value=latest,enable={{is_default_branch}}
-
       - name: Build and push Docker image (multi-arch)
         id: build
         uses: docker/build-push-action@v6
@@ -194,7 +177,6 @@ jobs:
             BUILD_DATE=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
             VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
             REVISION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
-
       - name: Analyze multi-arch image
         if: github.event_name != 'pull_request'
         run: |
@@ -205,7 +187,6 @@ jobs:
           echo "**Digest:** ${{ steps.build.outputs.digest }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Multi-arch manifest created successfully!**" >> $GITHUB_STEP_SUMMARY
-
   # ============================================================================
   # JOB 3: Smoke tests en contenedor
   # ============================================================================
@@ -215,7 +196,6 @@ jobs:
     timeout-minutes: 20
     needs: build-and-push
     if: github.event_name != 'pull_request'
-
     steps:
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -223,7 +203,6 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Determine image tag
         id: tag
         run: |
@@ -239,7 +218,6 @@ jobs:
             SANITIZED_TAG=$(echo "${{ github.ref_name }}" | sed 's/\//-/g' | sed 's/[^a-zA-Z0-9._-]/-/g')
             echo "tag=${SANITIZED_TAG}" >> $GITHUB_OUTPUT
           fi
-
       - name: Pull Docker image
         run: |
           IMAGE_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}"
@@ -267,7 +245,6 @@ jobs:
               print(f'❌ ML dependency error: {e}')
               sys.exit(1)
           "
-
       - name: Test Django migrations check
         run: |
           IMAGE_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}"
@@ -284,7 +261,6 @@ jobs:
             exit 1
           fi
           echo "✓ OpenCV system dependencies verified"
-
       - name: Start container for health check (CRITICAL - Detect crash loops)
         id: start-container
         run: |
@@ -324,7 +300,6 @@ jobs:
           fi
 
           echo "✓ Container is running after 15 seconds"
-
       - name: Check for crash loops (CRITICAL)
         run: |
           CONTAINER_NAME="${{ steps.start-container.outputs.container_name }}"
@@ -362,7 +337,6 @@ jobs:
           fi
 
           echo "✓ No crash loops detected - container is stable"
-
       - name: Check frontend is responding (HTTP health check)
         run: |
           CONTAINER_NAME="${{ steps.start-container.outputs.container_name }}"
@@ -427,7 +401,6 @@ jobs:
           fi
 
           echo "✓ Frontend health check PASSED - application is responding correctly"
-
       - name: Stop and remove test container
         if: always()
         run: |
@@ -438,7 +411,6 @@ jobs:
             docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
             echo "✓ Cleanup complete"
           fi
-
       - name: Generate test report
         if: always()
         run: |
@@ -452,7 +424,6 @@ jobs:
           echo "✅ **CRITICAL: Frontend responds correctly**" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Image:** \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
-
   # ============================================================================
   # JOB 4: Crear GitHub Release (solo para tags)
   # ============================================================================
@@ -464,11 +435,9 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
-
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:

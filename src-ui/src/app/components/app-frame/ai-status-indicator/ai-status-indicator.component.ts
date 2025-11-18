@@ -1,10 +1,7 @@
 import { DatePipe } from '@angular/common'
 import { Component, OnDestroy, OnInit, inject } from '@angular/core'
 import { Router, RouterModule } from '@angular/router'
-import {
-  NgbPopoverModule,
-  NgbTooltipModule,
-} from '@ng-bootstrap/ng-bootstrap'
+import { NgbPopoverModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subscription } from 'rxjs'
 import { AIStatus } from 'src/app/data/ai-status'
@@ -38,11 +35,9 @@ export class AIStatusIndicatorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.subscription = this.aiStatusService
-      .getStatus()
-      .subscribe((status) => {
-        this.aiStatus = status
-      })
+    this.subscription = this.aiStatusService.getStatus().subscribe((status) => {
+      this.aiStatus = status
+    })
   }
 
   ngOnDestroy(): void {

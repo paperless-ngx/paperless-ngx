@@ -87,6 +87,7 @@ import { ToastService } from 'src/app/services/toast.service'
 import { getFilenameFromContentDisposition } from 'src/app/utils/http'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
+import { AiSuggestionsPanelComponent } from '../ai-suggestions-panel/ai-suggestions-panel.component'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
@@ -114,7 +115,6 @@ import { ShareLinksDialogComponent } from '../common/share-links-dialog/share-li
 import { DocumentHistoryComponent } from '../document-history/document-history.component'
 import { DocumentNotesComponent } from '../document-notes/document-notes.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
-import { AiSuggestionsPanelComponent } from '../ai-suggestions-panel/ai-suggestions-panel.component'
 import { MetadataCollapseComponent } from './metadata-collapse/metadata-collapse.component'
 
 enum DocumentDetailNavIDs {
@@ -1554,7 +1554,9 @@ export class DocumentDetailComponent
       })
   }
 
-  private convertSuggestionsToAI(suggestions: DocumentSuggestions): AISuggestion[] {
+  private convertSuggestionsToAI(
+    suggestions: DocumentSuggestions
+  ): AISuggestion[] {
     if (!suggestions) {
       return []
     }
@@ -1635,7 +1637,9 @@ export class DocumentDetailComponent
       case AISuggestionType.Tag:
         const currentTags = this.documentForm.get('tags').value || []
         if (!currentTags.includes(suggestion.value)) {
-          this.documentForm.get('tags').setValue([...currentTags, suggestion.value])
+          this.documentForm
+            .get('tags')
+            .setValue([...currentTags, suggestion.value])
           this.documentForm.get('tags').markAsDirty()
         }
         break

@@ -1,13 +1,19 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core'
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { CommonModule } from '@angular/common'
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  inject,
+} from '@angular/core'
+import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Observable } from 'rxjs'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { CheckComponent } from '../../../common/input/check/check.component'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { CommonModule } from '@angular/common'
 import { environment } from 'src/environments/environment'
+import { CheckComponent } from '../../../common/input/check/check.component'
 
 interface MLModel {
   value: string

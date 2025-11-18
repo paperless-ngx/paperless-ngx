@@ -13,11 +13,13 @@ This document details the third phase of improvements implemented for IntelliDoc
 **File**: `src/documents/ml/classifier.py`
 
 **What it does**:
+
 - Uses transformer models (BERT/DistilBERT) for document classification
 - Provides 40-60% better accuracy than traditional ML approaches
 - Understands context and semantics, not just keywords
 
 **Key Features**:
+
 - **TransformerDocumentClassifier** class
 - Training on custom datasets
 - Batch prediction for efficiency
@@ -25,6 +27,7 @@ This document details the third phase of improvements implemented for IntelliDoc
 - Confidence scores for predictions
 
 **Models Supported**:
+
 ```python
 "distilbert-base-uncased"  # 132MB, fast (default)
 "bert-base-uncased"        # 440MB, more accurate
@@ -32,6 +35,7 @@ This document details the third phase of improvements implemented for IntelliDoc
 ```
 
 **How to use**:
+
 ```python
 from documents.ml import TransformerDocumentClassifier
 
@@ -49,6 +53,7 @@ print(f"Predicted: {predicted_class} with {confidence:.2%} confidence")
 ```
 
 **Benefits**:
+
 - ✅ 40-60% improvement in classification accuracy
 - ✅ Better handling of complex documents
 - ✅ Reduced false positives
@@ -62,11 +67,13 @@ print(f"Predicted: {predicted_class} with {confidence:.2%} confidence")
 **File**: `src/documents/ml/ner.py`
 
 **What it does**:
+
 - Automatically extracts structured information from documents
 - Identifies people, organizations, locations
 - Extracts dates, amounts, invoice numbers, emails, phones
 
 **Key Features**:
+
 - **DocumentNER** class
 - BERT-based entity recognition
 - Regex patterns for specific data types
@@ -74,7 +81,9 @@ print(f"Predicted: {predicted_class} with {confidence:.2%} confidence")
 - Automatic correspondent/tag suggestions
 
 **Entities Extracted**:
+
 - **Named Entities** (via BERT):
+
   - Persons (PER): "John Doe", "Jane Smith"
   - Organizations (ORG): "Acme Corporation", "Google Inc."
   - Locations (LOC): "New York", "San Francisco"
@@ -88,6 +97,7 @@ print(f"Predicted: {predicted_class} with {confidence:.2%} confidence")
   - Phones: "+1-555-123-4567"
 
 **How to use**:
+
 ```python
 from documents.ml import DocumentNER
 
@@ -118,6 +128,7 @@ tags = ner.suggest_tags(text)  # ["invoice", "receipt"]
 ```
 
 **Benefits**:
+
 - ✅ Automatic metadata extraction
 - ✅ No manual data entry needed
 - ✅ Better document organization
@@ -131,11 +142,13 @@ tags = ner.suggest_tags(text)  # ["invoice", "receipt"]
 **File**: `src/documents/ml/semantic_search.py`
 
 **What it does**:
+
 - Search by meaning, not just keywords
 - Understands context and synonyms
 - Finds semantically similar documents
 
 **Key Features**:
+
 - **SemanticSearch** class
 - Vector embeddings using Sentence Transformers
 - Cosine similarity for matching
@@ -144,6 +157,7 @@ tags = ner.suggest_tags(text)  # ["invoice", "receipt"]
 - Index save/load
 
 **Models Supported**:
+
 ```python
 "all-MiniLM-L6-v2"              # 80MB, fast, good quality (default)
 "paraphrase-multilingual-..."   # Multilingual support
@@ -151,6 +165,7 @@ tags = ner.suggest_tags(text)  # ["invoice", "receipt"]
 ```
 
 **How to use**:
+
 ```python
 from documents.ml import SemanticSearch
 
@@ -181,6 +196,7 @@ similar = search.find_similar_documents(document_id=123, top_k=5)
 ```
 
 **Search Examples**:
+
 ```python
 # Query: "medical bills"
 # Finds: hospital invoices, prescription receipts, insurance claims
@@ -193,6 +209,7 @@ similar = search.find_similar_documents(document_id=123, top_k=5)
 ```
 
 **Benefits**:
+
 - ✅ 10x better search relevance
 - ✅ Understands synonyms and context
 - ✅ Finds related concepts
@@ -206,18 +223,21 @@ similar = search.find_similar_documents(document_id=123, top_k=5)
 ### Before AI/ML Enhancement
 
 **Classification**:
+
 - ❌ Accuracy: 70-75% (basic classifier)
 - ❌ Requires manual rules
 - ❌ Poor with complex documents
 - ❌ Many false positives
 
 **Metadata Extraction**:
+
 - ❌ Manual data entry
 - ❌ No automatic extraction
 - ❌ Time-consuming
 - ❌ Error-prone
 
 **Search**:
+
 - ❌ Keyword matching only
 - ❌ Must know exact terms
 - ❌ No synonym understanding
@@ -226,18 +246,21 @@ similar = search.find_similar_documents(document_id=123, top_k=5)
 ### After AI/ML Enhancement
 
 **Classification**:
+
 - ✅ Accuracy: 90-95% (BERT classifier)
 - ✅ Automatic learning from examples
 - ✅ Handles complex documents
 - ✅ Minimal false positives
 
 **Metadata Extraction**:
+
 - ✅ Automatic entity extraction
 - ✅ Structured data from text
 - ✅ Instant processing
 - ✅ High accuracy
 
 **Search**:
+
 - ✅ Semantic understanding
 - ✅ Finds meaning, not just words
 - ✅ Understands synonyms
@@ -477,29 +500,29 @@ entities = ner.extract_entities(text)
 
 ### Classification Accuracy
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| **Overall Accuracy** | 70-75% | 90-95% | **+20-25%** |
-| **Invoice Classification** | 65% | 94% | **+29%** |
-| **Receipt Classification** | 72% | 93% | **+21%** |
-| **Contract Classification** | 68% | 91% | **+23%** |
-| **False Positives** | 15% | 3% | **-80%** |
+| Metric                      | Before | After  | Improvement |
+| --------------------------- | ------ | ------ | ----------- |
+| **Overall Accuracy**        | 70-75% | 90-95% | **+20-25%** |
+| **Invoice Classification**  | 65%    | 94%    | **+29%**    |
+| **Receipt Classification**  | 72%    | 93%    | **+21%**    |
+| **Contract Classification** | 68%    | 91%    | **+23%**    |
+| **False Positives**         | 15%    | 3%     | **-80%**    |
 
 ### Metadata Extraction
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| **Manual Entry Time** | 2-5 min/doc | 0 sec/doc | **100%** |
-| **Extraction Accuracy** | N/A | 85-90% | **NEW** |
-| **Data Completeness** | 40% | 85% | **+45%** |
+| Metric                  | Before      | After     | Improvement |
+| ----------------------- | ----------- | --------- | ----------- |
+| **Manual Entry Time**   | 2-5 min/doc | 0 sec/doc | **100%**    |
+| **Extraction Accuracy** | N/A         | 85-90%    | **NEW**     |
+| **Data Completeness**   | 40%         | 85%       | **+45%**    |
 
 ### Search Quality
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| **Relevant Results (Top 10)** | 40% | 85% | **+45%** |
-| **Query Understanding** | Keywords only | Semantic | **NEW** |
-| **Synonym Matching** | 0% | 95% | **+95%** |
+| Metric                        | Before        | After    | Improvement |
+| ----------------------------- | ------------- | -------- | ----------- |
+| **Relevant Results (Top 10)** | 40%           | 85%      | **+45%**    |
+| **Query Understanding**       | Keywords only | Semantic | **NEW**     |
+| **Synonym Matching**          | 0%            | 95%      | **+95%**    |
 
 ---
 
@@ -508,6 +531,7 @@ entities = ner.extract_entities(text)
 ### Disk Space
 
 - **Models**: ~500MB
+
   - DistilBERT: 132MB
   - NER model: 250MB
   - Sentence Transformer: 80MB
@@ -528,11 +552,13 @@ entities = ner.extract_entities(text)
 ### Processing Speed
 
 **CPU (Intel i7)**:
+
 - Classification: 100-200 documents/min
 - NER Extraction: 50-100 documents/min
 - Semantic Indexing: 20-50 documents/min
 
 **GPU (NVIDIA RTX 3060)**:
+
 - Classification: 500-1000 documents/min
 - NER Extraction: 300-500 documents/min
 - Semantic Indexing: 200-400 documents/min
@@ -711,12 +737,14 @@ def index_documents_task(document_ids):
 ### Short-term (1-2 Weeks)
 
 1. **Install dependencies and test**
+
    ```bash
    pip install transformers torch sentence-transformers
    python -m documents.ml.classifier  # Test import
    ```
 
 2. **Train classification model**
+
    - Collect training data (existing classified documents)
    - Train model
    - Evaluate accuracy
@@ -728,11 +756,13 @@ def index_documents_task(document_ids):
 ### Medium-term (1-2 Months)
 
 1. **Build semantic search**
+
    - Index all documents
    - Add semantic search endpoint to API
    - Update frontend to use semantic search
 
 2. **Optimize performance**
+
    - Set up GPU if available
    - Implement caching
    - Batch processing for large datasets
@@ -745,6 +775,7 @@ def index_documents_task(document_ids):
 ### Long-term (3-6 Months)
 
 1. **Advanced features**
+
    - Multi-label classification
    - Custom NER for domain-specific entities
    - Question-answering system
@@ -795,6 +826,6 @@ Phase 3 AI/ML enhancement is complete! These changes bring state-of-the-art AI c
 **Time to integrate**: 1-2 weeks
 **AI/ML improvement**: 40-60% better accuracy
 
-*Documentation created: 2025-11-09*
-*Implementation: Phase 3 of AI/ML Enhancement*
-*Status: ✅ Ready for Testing*
+_Documentation created: 2025-11-09_
+_Implementation: Phase 3 of AI/ML Enhancement_
+_Status: ✅ Ready for Testing_
