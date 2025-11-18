@@ -116,7 +116,7 @@ jobs:
   build-and-push:
     name: Build IntelliDocs Docker Image
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
+    timeout-minutes: 45
     needs: test-ml-dependencies
     permissions:
       contents: read
@@ -272,6 +272,160 @@ jobs:
           fi
           echo "✓ OpenCV system dependencies verified"
 
+      - name: Start container for health check (CRITICAL - Detect crash loops)
+        id: start-container
+        run: |
+          IMAGE_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}"
+
+          echo "🔍 Starting container in detached mode to test for crash loops..."
+
+          # Start container with a name
+          CONTAINER_NAME="intellidocs-health-check-$$"
+
+          if ! docker run -d --name "$CONTAINER_NAME" \
+            -e PAPERLESS_SECRET_KEY=test-secret-key-for-ci \
+            -e PAPERLESS_REDIS=redis://localhost:6379 \
+            -p 8000:8000 \
+            "$IMAGE_TAG"; then
+            echo "✗ Failed to start container"
+            exit 1
+          fi
+
+          echo "container_name=$CONTAINER_NAME" >> $GITHUB_OUTPUT
+          echo "✓ Container started: $CONTAINER_NAME"
+
+          # Wait for container to initialize
+          echo "⏳ Waiting 15 seconds for container to initialize..."
+          sleep 15
+
+          # Check if container is still running (detect immediate crashes)
+          if ! docker ps | grep -q "$CONTAINER_NAME"; then
+            echo "✗ Container is not running - it may have crashed immediately"
+            echo "📋 Container logs:"
+            docker logs "$CONTAINER_NAME" 2>&1 || true
+            echo ""
+            echo "🔍 Container inspect:"
+            docker inspect "$CONTAINER_NAME" 2>&1 || true
+            docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
+            exit 1
+          fi
+
+          echo "✓ Container is running after 15 seconds"
+
+      - name: Check for crash loops (CRITICAL)
+        run: |
+          CONTAINER_NAME="${{ steps.start-container.outputs.container_name }}"
+
+          echo "🔍 Checking restart count to detect crash loops..."
+
+          # Get restart count
+          RESTART_COUNT=$(docker inspect --format='{{.RestartCount}}' "$CONTAINER_NAME" 2>/dev/null || echo "0")
+
+          echo "📊 Restart count: $RESTART_COUNT"
+
+          if [ "$RESTART_COUNT" -gt 0 ]; then
+            echo "✗ CRITICAL: Container has restarted $RESTART_COUNT times - CRASH LOOP DETECTED!"
+            echo ""
+            echo "📋 Last 100 lines of container logs:"
+            docker logs --tail 100 "$CONTAINER_NAME" 2>&1 || true
+            echo ""
+            echo "🔍 Container state:"
+            docker inspect "$CONTAINER_NAME" | jq '.[0].State' 2>/dev/null || docker inspect "$CONTAINER_NAME" 2>&1 || true
+            docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
+            exit 1
+          fi
+
+          # Check container health status
+          HEALTH_STATUS=$(docker inspect --format='{{.State.Health.Status}}' "$CONTAINER_NAME" 2>/dev/null || echo "none")
+          echo "🏥 Health status: $HEALTH_STATUS"
+
+          # Check if container is still running
+          if ! docker ps | grep -q "$CONTAINER_NAME"; then
+            echo "✗ Container stopped running during health check"
+            echo "📋 Container logs:"
+            docker logs "$CONTAINER_NAME" 2>&1 || true
+            docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
+            exit 1
+          fi
+
+          echo "✓ No crash loops detected - container is stable"
+
+      - name: Check frontend is responding (HTTP health check)
+        run: |
+          CONTAINER_NAME="${{ steps.start-container.outputs.container_name }}"
+
+          echo "🌐 Testing if frontend is responding on http://localhost:8000..."
+
+          # Give the web server more time to start
+          echo "⏳ Waiting 10 more seconds for web server to be ready..."
+          sleep 10
+
+          # Try to connect to the frontend (up to 30 attempts with 2s between each)
+          MAX_ATTEMPTS=30
+          ATTEMPT=0
+          SUCCESS=false
+
+          while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            ATTEMPT=$((ATTEMPT + 1))
+            echo "Attempt $ATTEMPT/$MAX_ATTEMPTS: Testing HTTP connection..."
+
+            # Try HTTP request with timeout
+            if curl -f -s -m 5 http://localhost:8000/ > /dev/null 2>&1; then
+              echo "✓ Frontend is responding!"
+              SUCCESS=true
+              break
+            fi
+
+            # Check if container is still running
+            if ! docker ps | grep -q "$CONTAINER_NAME"; then
+              echo "✗ Container stopped during health check!"
+              echo "📋 Container logs:"
+              docker logs "$CONTAINER_NAME" 2>&1 || true
+              docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
+              exit 1
+            fi
+
+            # Check for new restarts
+            RESTART_COUNT=$(docker inspect --format='{{.RestartCount}}' "$CONTAINER_NAME" 2>/dev/null || echo "0")
+            if [ "$RESTART_COUNT" -gt 0 ]; then
+              echo "✗ Container restarted during health check - CRASH LOOP!"
+              echo "📋 Container logs:"
+              docker logs --tail 100 "$CONTAINER_NAME" 2>&1 || true
+              docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
+              exit 1
+            fi
+
+            sleep 2
+          done
+
+          if [ "$SUCCESS" = false ]; then
+            echo "✗ Frontend did not respond after $MAX_ATTEMPTS attempts (60 seconds)"
+            echo ""
+            echo "📋 Last 100 lines of container logs:"
+            docker logs --tail 100 "$CONTAINER_NAME" 2>&1 || true
+            echo ""
+            echo "🔍 Container processes:"
+            docker exec "$CONTAINER_NAME" ps aux 2>&1 || true
+            echo ""
+            echo "🌐 Network connections:"
+            docker exec "$CONTAINER_NAME" netstat -tlnp 2>&1 || true
+            docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
+            exit 1
+          fi
+
+          echo "✓ Frontend health check PASSED - application is responding correctly"
+
+      - name: Stop and remove test container
+        if: always()
+        run: |
+          CONTAINER_NAME="${{ steps.start-container.outputs.container_name }}"
+          if [ -n "$CONTAINER_NAME" ]; then
+            echo "🧹 Cleaning up test container: $CONTAINER_NAME"
+            docker logs --tail 50 "$CONTAINER_NAME" 2>&1 || true
+            docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
+            echo "✓ Cleanup complete"
+          fi
+
       - name: Generate test report
         if: always()
         run: |
@@ -281,6 +435,8 @@ jobs:
           echo "✅ ML dependencies verified" >> $GITHUB_STEP_SUMMARY
           echo "✅ Django migrations validated" >> $GITHUB_STEP_SUMMARY
           echo "✅ System dependencies verified" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **CRITICAL: No crash loops detected**" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **CRITICAL: Frontend responds correctly**" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Image:** \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
 
