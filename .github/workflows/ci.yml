@@ -366,23 +366,21 @@ jobs:
     steps:
       - name: Prepare build variables
         id: build-vars
-        shell: bash
-        run: |
-          BUILD_REF="${{ github.event_name == 'pull_request' && format('refs/heads/{0}', github.head_ref) || github.ref }}"
-          BUILD_REF_NAME="${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}"
-          BUILD_CACHE_KEY="${BUILD_REF_NAME//\//-}"
+        uses: actions/github-script@v8
+        with:
+          result-encoding: string
+          script: |
+            const isPR = context.eventName === 'pull_request';
+            const defaultRefName = context.ref.replace('refs/heads/', '');
+            const headRef = isPR ? context.payload.pull_request.head.ref : defaultRefName;
+            const buildRef = isPR ? `refs/heads/${headRef}` : context.ref;
+            const buildCacheKey = headRef.split('/').join('-');
+            const canPush = context.eventName === 'push' || (isPR && context.payload.pull_request.head.repo.full_name === `${context.repo.owner}/${context.repo.repo}`);
 
-          CAN_PUSH="false"
-          if [[ "${{ github.event_name }}" == "push" ]]; then
-            CAN_PUSH="true"
-          elif [[ "${{ github.event_name }}" == "pull_request" && "${{ github.event.pull_request.head.repo.full_name }}" == "${{ github.repository }}" ]]; then
-            CAN_PUSH="true"
-          fi
-
-          echo "build-ref=${BUILD_REF}" >> "$GITHUB_OUTPUT"
-          echo "build-ref-name=${BUILD_REF_NAME}" >> "$GITHUB_OUTPUT"
-          echo "build-cache-key=${BUILD_CACHE_KEY}" >> "$GITHUB_OUTPUT"
-          echo "can-push=${CAN_PUSH}" >> "$GITHUB_OUTPUT"
+            core.setOutput('build-ref', buildRef);
+            core.setOutput('build-ref-name', headRef);
+            core.setOutput('build-cache-key', buildCacheKey);
+            core.setOutput('can-push', canPush ? 'true' : 'false');
       - name: Check pushing to Docker Hub
         id: push-other-places
         # Only push to Dockerhub from the main repo AND the ref is either:
