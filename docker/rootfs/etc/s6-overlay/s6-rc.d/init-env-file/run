@@ -29,5 +29,5 @@ if find /run/s6/container_environment/*"_FILE" -maxdepth 1 > /dev/null 2>&1; the
 		fi
 	done
 else
-		echo "${log_prefix} No *_FILE environment found"
+	echo "${log_prefix} No *_FILE environment found"
 fi
