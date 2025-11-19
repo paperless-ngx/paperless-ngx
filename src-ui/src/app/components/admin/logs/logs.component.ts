@@ -146,9 +146,7 @@ export class LogsComponent
   scrollToBottom(): void {
     this.changedetectorRef.detectChanges()
     if (this.logContainer) {
-      // AutoSizeVirtualScrollStrategy does not support scrollToIndex
-      const element = this.logContainer.elementRef.nativeElement
-      element.scrollTo({ top: element.scrollHeight })
+      this.logContainer.scrollTo({ bottom: 0 })
     }
   }
 }
