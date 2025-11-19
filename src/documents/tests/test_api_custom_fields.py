@@ -4,6 +4,7 @@ from unittest.mock import ANY
 
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -211,6 +212,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
             ],
         )
 
+    @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
     def test_custom_field_select_options_pruned(self):
         """
         GIVEN:
@@ -242,7 +244,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         CustomFieldInstance.objects.create(
             document=doc,
             field=custom_field_select,
-            value_text="abc-123",
+            value_select="def-456",
         )
 
         resp = self.client.patch(
