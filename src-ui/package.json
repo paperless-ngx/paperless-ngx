@@ -12,6 +12,7 @@
   "private": true,
   "dependencies": {
     "@angular/cdk": "^20.2.13",
+    "@angular/cdk-experimental": "^20.2.14",
     "@angular/common": "~20.3.12",
     "@angular/compiler": "~20.3.12",
     "@angular/core": "~20.3.12",

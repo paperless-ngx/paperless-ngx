@@ -44,7 +44,9 @@
 <div [ngbNavOutlet]="nav" class="mt-2"></div>
 
 <cdk-virtual-scroll-viewport
-  itemSize="20"
+  autosize
+  [minBufferPx]="200"
+  [maxBufferPx]="600"
   class="bg-dark p-3 text-light font-monospace log-container"
   #logContainer>
   @if (loading && !logFiles.length) {

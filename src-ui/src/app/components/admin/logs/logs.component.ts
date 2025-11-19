@@ -1,6 +1,7 @@
+import { ScrollingModule } from '@angular/cdk-experimental/scrolling'
 import {
+  CdkVirtualForOf,
   CdkVirtualScrollViewport,
-  ScrollingModule,
 } from '@angular/cdk/scrolling'
 import { CommonModule } from '@angular/common'
 import {
@@ -28,6 +29,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    CdkVirtualForOf,
     CdkVirtualScrollViewport,
     ScrollingModule,
   ],
@@ -144,7 +146,7 @@ export class LogsComponent
   scrollToBottom(): void {
     this.changedetectorRef.detectChanges()
     if (this.logContainer) {
-      this.logContainer.scrollToIndex(this.logs.length - 1)
+      // this.logContainer.scrollToIndex(this.logs.length - 1)
     }
   }
 }
