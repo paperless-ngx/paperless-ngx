@@ -110,6 +110,7 @@ export class LogsComponent
             })
           if (hasChanges) {
             this.logs = parsed
+            this.logContainer?.checkViewportSize()
             this.scrollToBottom()
           }
         },
@@ -145,8 +146,6 @@ export class LogsComponent
 
   scrollToBottom(): void {
     this.changedetectorRef.detectChanges()
-    if (this.logContainer) {
-      this.logContainer.scrollTo({ bottom: 0 })
-    }
+    this.logContainer?.scrollTo({ bottom: 0 })
   }
 }
