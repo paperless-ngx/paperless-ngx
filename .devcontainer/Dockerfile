@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM --platform=$BUILDPLATFORM docker.io/node:20-bookworm-slim as main-app
+FROM --platform=$BUILDPLATFORM docker.io/node:20-trixie-slim as main-app
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -9,8 +9,6 @@ ARG TARGETARCH
 
 # Can be workflow provided, defaults set for manual building
 ARG JBIG2ENC_VERSION=0.29
-ARG QPDF_VERSION=11.9.0
-ARG GS_VERSION=10.03.1
 
 # Set Python environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -88,32 +86,10 @@ COPY --from=ghcr.io/astral-sh/uv:0.7.8 /uv /bin/uv
 
 RUN set -eux \
   && echo "Installing pre-built updates" \
-    && echo "Installing qpdf ${QPDF_VERSION}" \
-      && curl --fail --silent --show-error --location \
-        --output libqpdf29_${QPDF_VERSION}-1_${TARGETARCH}.deb \
-        https://github.com/paperless-ngx/builder/releases/download/qpdf-${QPDF_VERSION}/libqpdf29_${QPDF_VERSION}-1_${TARGETARCH}.deb \
-      && curl --fail --silent --show-error --location \
-        --output qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb \
-        https://github.com/paperless-ngx/builder/releases/download/qpdf-${QPDF_VERSION}/qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb \
-      && dpkg --install ./libqpdf29_${QPDF_VERSION}-1_${TARGETARCH}.deb \
-      && dpkg --install ./qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb \
-    && echo "Installing Ghostscript ${GS_VERSION}" \
-      && curl --fail --silent --show-error --location \
-          --output libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
-      && curl --fail --silent --show-error --location \
-          --output ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
-      && curl --fail --silent --show-error --location \
-          --output libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
-        && dpkg --install ./libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
-        && dpkg --install ./libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
-        && dpkg --install ./ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
     && echo "Installing jbig2enc" \
       && curl --fail --silent --show-error --location \
         --output jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
-        https://github.com/paperless-ngx/builder/releases/download/jbig2enc-${JBIG2ENC_VERSION}/jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
+        https://github.com/paperless-ngx/builder/releases/download/jbig2enc-trixie-v${JBIG2ENC_VERSION}/jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
       && dpkg --install ./jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb
 
 # setup docker-specific things
