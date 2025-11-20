@@ -41,21 +41,15 @@
   }
 </ul>
 
-<cdk-virtual-scroll-viewport
-  autosize
-  [minBufferPx]="200"
-  [maxBufferPx]="600"
-  class="bg-dark p-3 text-light font-monospace log-container"
-  #logContainer>
+<cdk-virtual-scroll-viewport autosize class="bg-dark text-light font-monospace log-container" #logContainer>
   @if (loading && !logFiles.length) {
     <div>
       <div class="spinner-border spinner-border-sm me-2" role="status"></div>
       <ng-container i18n>Loading...</ng-container>
     </div>
+  } @else {
+    <div class="p-3">
+      <p *cdkVirtualFor="let log of logs" class="m-0 p-0" [ngClass]="'log-entry-' + log.level">{{log.message}}</p>
+    </div>
   }
-  <p *cdkVirtualFor="let log of logs"
-     class="m-0 p-0"
-     [ngClass]="'log-entry-' + log.level">
-    {{log.message}}
-  </p>
 </cdk-virtual-scroll-viewport>
