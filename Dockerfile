@@ -32,7 +32,7 @@ RUN set -eux \
 # Purpose: Installs s6-overlay and rootfs
 # Comments:
 #  - Don't leave anything extra in here either
-FROM ghcr.io/astral-sh/uv:0.9.10-python3.12-bookworm-slim AS s6-overlay-base
+FROM ghcr.io/astral-sh/uv:0.9.10-python3.12-trixie-slim AS s6-overlay-base
 
 WORKDIR /usr/src/s6
 
@@ -171,7 +171,7 @@ RUN set -eux \
     && apt-get install --yes --quiet --no-install-recommends ${RUNTIME_PACKAGES} \
     && echo "Installing pre-built updates" \
       && curl --fail --silent --no-progress-meter --show-error --location --remote-name-all \
-        https://github.com/paperless-ngx/builder/releases/download/jbig2enc-v${JBIG2ENC_VERSION}/jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
+        https://github.com/paperless-ngx/builder/releases/download/jbig2enc-trixie-v${JBIG2ENC_VERSION}/jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
       && echo "Installing jbig2enc" \
         && dpkg --install ./jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
       && echo "Configuring imagemagick" \
