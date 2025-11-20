@@ -396,6 +396,7 @@ class CannotMoveFilesException(Exception):
 @receiver(models.signals.post_save, sender=CustomFieldInstance, weak=False)
 @receiver(models.signals.m2m_changed, sender=Document.tags.through, weak=False)
 @receiver(models.signals.post_save, sender=Document, weak=False)
+@shared_task
 def update_filename_and_move_files(
     sender,
     instance: Document | CustomFieldInstance,
@@ -559,7 +560,7 @@ def check_paths_and_prune_custom_fields(sender, instance: CustomField, **kwargs)
                 cf_instance.save(update_fields=["value_select"])
 
             # Update the filename and move files if necessary
-            update_filename_and_move_files(sender, cf_instance)
+            update_filename_and_move_files.delay(sender, cf_instance)
 
 
 @receiver(models.signals.post_delete, sender=CustomField)

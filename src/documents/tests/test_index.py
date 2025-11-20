@@ -2,6 +2,7 @@ from datetime import datetime
 from unittest import mock
 
 from django.contrib.auth.models import User
+from django.test import SimpleTestCase
 from django.test import TestCase
 from django.test import override_settings
 from django.utils.timezone import get_current_timezone
@@ -127,3 +128,126 @@ class TestAutoComplete(DirectoriesMixin, TestCase):
             response = self.client.get("/api/documents/?query=added:yesterday")
             results = response.json()["results"]
             self.assertEqual(len(results), 0)
+
+
+@override_settings(TIME_ZONE="UTC")
+class TestRewriteNaturalDateKeywords(SimpleTestCase):
+    """
+    Unit tests for rewrite_natural_date_keywords function.
+    """
+
+    def _rewrite_with_now(self, query: str, now_dt: datetime) -> str:
+        with mock.patch("documents.index.now", return_value=now_dt):
+            return index.rewrite_natural_date_keywords(query)
+
+    def _assert_rewrite_contains(
+        self,
+        query: str,
+        now_dt: datetime,
+        *expected_fragments: str,
+    ) -> str:
+        result = self._rewrite_with_now(query, now_dt)
+        for fragment in expected_fragments:
+            self.assertIn(fragment, result)
+        return result
+
+    def test_range_keywords(self):
+        """
+        Test various different range keywords
+        """
+        cases = [
+            (
+                "added:today",
+                datetime(2025, 7, 20, 15, 30, 45, tzinfo=timezone.utc),
+                ("added:[20250720", "TO 20250720"),
+            ),
+            (
+                "added:yesterday",
+                datetime(2025, 7, 20, 15, 30, 45, tzinfo=timezone.utc),
+                ("added:[20250719", "TO 20250719"),
+            ),
+            (
+                "added:this month",
+                datetime(2025, 7, 15, 12, 0, 0, tzinfo=timezone.utc),
+                ("added:[20250701", "TO 20250731"),
+            ),
+            (
+                "added:previous month",
+                datetime(2025, 7, 15, 12, 0, 0, tzinfo=timezone.utc),
+                ("added:[20250601", "TO 20250630"),
+            ),
+            (
+                "added:this year",
+                datetime(2025, 7, 15, 12, 0, 0, tzinfo=timezone.utc),
+                ("added:[20250101", "TO 20250715"),
+            ),
+            (
+                "added:previous year",
+                datetime(2025, 7, 15, 12, 0, 0, tzinfo=timezone.utc),
+                ("added:[20240101", "TO 20241231"),
+            ),
+            # Previous quarter from July 15, 2025 is April-June.
+            (
+                "added:previous quarter",
+                datetime(2025, 7, 15, 12, 0, 0, tzinfo=timezone.utc),
+                ("added:[20250401", "TO 20250630"),
+            ),
+            # July 20, 2025 is a Sunday (weekday 6) so previous week is July 7-13.
+            (
+                "added:previous week",
+                datetime(2025, 7, 20, 12, 0, 0, tzinfo=timezone.utc),
+                ("added:[20250707", "TO 20250713"),
+            ),
+        ]
+
+        for query, now_dt, fragments in cases:
+            with self.subTest(query=query):
+                self._assert_rewrite_contains(query, now_dt, *fragments)
+
+    def test_additional_fields(self):
+        fixed_now = datetime(2025, 7, 20, 15, 30, 45, tzinfo=timezone.utc)
+        # created
+        self._assert_rewrite_contains("created:today", fixed_now, "created:[20250720")
+        # modified
+        self._assert_rewrite_contains("modified:today", fixed_now, "modified:[20250720")
+
+    def test_basic_syntax_variants(self):
+        """
+        Test that quoting, casing, and multi-clause queries are parsed.
+        """
+        fixed_now = datetime(2025, 7, 20, 15, 30, 45, tzinfo=timezone.utc)
+
+        # quoted keywords
+        result1 = self._rewrite_with_now('added:"today"', fixed_now)
+        result2 = self._rewrite_with_now("added:'today'", fixed_now)
+        self.assertIn("added:[20250720", result1)
+        self.assertIn("added:[20250720", result2)
+
+        # case insensitivity
+        for query in ("added:TODAY", "added:Today", "added:ToDaY"):
+            with self.subTest(case_variant=query):
+                self._assert_rewrite_contains(query, fixed_now, "added:[20250720")
+
+        # multiple clauses
+        result = self._rewrite_with_now("added:today created:yesterday", fixed_now)
+        self.assertIn("added:[20250720", result)
+        self.assertIn("created:[20250719", result)
+
+    def test_no_match(self):
+        """
+        Test that queries without keywords are unchanged.
+        """
+        query = "title:test content:example"
+        result = index.rewrite_natural_date_keywords(query)
+        self.assertEqual(query, result)
+
+    @override_settings(TIME_ZONE="Pacific/Auckland")
+    def test_timezone_awareness(self):
+        """
+        Test timezone conversion.
+        """
+        # July 20, 2025 1:00 AM NZST = July 19, 2025 13:00 UTC
+        fixed_now = datetime(2025, 7, 20, 1, 0, 0, tzinfo=get_current_timezone())
+        result = self._rewrite_with_now("added:today", fixed_now)
+        # Should convert to UTC properly
+        self.assertIn("added:[20250719", result)

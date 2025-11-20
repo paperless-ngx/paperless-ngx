@@ -12,24 +12,24 @@ declare -i DELAY=0
 declare -i STARTED_AT=${EPOCHSECONDS:?EPOCHSECONDS var unset}
 
 delay_next_attempt() {
-    local -i elapsed=$(( EPOCHSECONDS - STARTED_AT ))
-    local -ri remaining=$(( TIMEOUT - elapsed ))
+	local -i elapsed=$(( EPOCHSECONDS - STARTED_AT ))
+	local -ri remaining=$(( TIMEOUT - elapsed ))
 
-    if (( remaining <= 0 )); then
-        echo "${LOG_PREFIX} Unable to connect after $elapsed seconds."
-        exit 1
-    fi
+	if (( remaining <= 0 )); then
+		echo "${LOG_PREFIX} Unable to connect after $elapsed seconds."
+		exit 1
+	fi
 
-    DELAY+=1
+	DELAY+=1
 
-    # clamp to remaining time
-    if (( DELAY > remaining )); then
-        DELAY=$remaining
-    fi
+	# clamp to remaining time
+	if (( DELAY > remaining )); then
+		DELAY=$remaining
+	fi
 
-    ATTEMPT+=1
-    echo "${LOG_PREFIX} Attempt $ATTEMPT failed! Trying again in $DELAY seconds..."
-    sleep "$DELAY"
+	ATTEMPT+=1
+	echo "${LOG_PREFIX} Attempt $ATTEMPT failed! Trying again in $DELAY seconds..."
+	sleep "$DELAY"
 }
 
 wait_for_postgres() {
@@ -40,7 +40,7 @@ wait_for_postgres() {
 	local -r user="${PAPERLESS_DBUSER:-paperless}"
 
 	while ! pg_isready -h "${host}" -p "${port}" --username "${user}"; do
-        delay_next_attempt
+		delay_next_attempt
 	done
 	echo "${LOG_PREFIX} Connected to PostgreSQL"
 }
@@ -51,8 +51,8 @@ wait_for_mariadb() {
 	local -r host="${PAPERLESS_DBHOST:-localhost}"
 	local -r port="${PAPERLESS_DBPORT:-3306}"
 
-	while ! true > "/dev/tcp/$host/$port"; do
-        delay_next_attempt
+	while ! mariadb-admin --host="$host" --port="$port" ping --silent >/dev/null 2>&1; do
+		delay_next_attempt
 	done
 	echo "${LOG_PREFIX} Connected to MariaDB"
 }

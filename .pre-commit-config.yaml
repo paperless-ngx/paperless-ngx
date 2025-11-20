@@ -49,12 +49,12 @@ repos:
           - 'prettier-plugin-organize-imports@4.1.0'
   # Python hooks
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.0
+    rev: v0.14.5
     hooks:
       - id: ruff-check
       - id: ruff-format
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: "v2.11.0"
+    rev: "v2.11.1"
     hooks:
       - id: pyproject-fmt
   # Dockerfile hooks
@@ -64,11 +64,11 @@ repos:
       - id: hadolint
   # Shell script hooks
   - repo: https://github.com/lovesegfault/beautysh
-    rev: v6.2.1
+    rev: v6.4.2
     hooks:
       - id: beautysh
-        additional_dependencies:
-          - setuptools
+        types: [file]
+        files: (\.sh$|/run$|/finish$)
         args:
           - "--tab"
   - repo: https://github.com/shellcheck-py/shellcheck-py
@@ -76,7 +76,7 @@ repos:
     hooks:
       - id: shellcheck
   - repo: https://github.com/google/yamlfmt
-    rev: v0.18.0
+    rev: v0.20.0
     hooks:
       - id: yamlfmt
         exclude: "^src-ui/pnpm-lock.yaml"
