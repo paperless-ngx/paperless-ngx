@@ -21,7 +21,7 @@ def calculate_sha256(filepath: Path) -> str | None:
                 sha256_hash.update(chunk)
         return sha256_hash.hexdigest()
     except OSError as e:
-        click.echo(f"Error reading {filepath}: {e}\n", err=True)
+        click.echo(f"Error reading {filepath}: {e}", err=True)
         return None
 
 
@@ -66,7 +66,7 @@ def replace_with_symlinks(
         original_file = file_list[0]
         duplicates = file_list[1:]
 
-        click.echo(f"Found {len(duplicates)} duplicate(s) of: {original_file}\n")
+        click.echo(f"Found {len(duplicates)} duplicate(s) of: {original_file}")
 
         for duplicate in duplicates:
             try:
@@ -74,7 +74,7 @@ def replace_with_symlinks(
                 file_size = duplicate.stat().st_size
 
                 if dry_run:
-                    click.echo(f"  [DRY RUN] Would replace: {duplicate}\n")
+                    click.echo(f"  [DRY RUN] Would replace: {duplicate}")
                 else:
                     # Remove the duplicate file
                     duplicate.unlink()
@@ -84,18 +84,18 @@ def replace_with_symlinks(
                         # Try to create a relative symlink
                         rel_path = original_file.relative_to(duplicate.parent)
                         duplicate.symlink_to(rel_path)
-                        click.echo(f"  Replaced: {duplicate} -> {rel_path}\n")
+                        click.echo(f"  Replaced: {duplicate} -> {rel_path}")
                     except ValueError:
                         # Fall back to absolute path
                         duplicate.symlink_to(original_file.resolve())
-                        click.echo(f"  Replaced: {duplicate} -> {original_file}\n")
+                        click.echo(f"  Replaced: {duplicate} -> {original_file}")
 
                     space_saved += file_size
 
                 total_duplicates += 1
 
             except OSError as e:
-                click.echo(f"  Error replacing {duplicate}: {e}\n", err=True)
+                click.echo(f"  Error replacing {duplicate}: {e}", err=True)
 
     return total_duplicates, space_saved
 
@@ -128,36 +128,36 @@ def deduplicate(directory: Path, *, dry_run: bool, verbose: bool) -> None:
 
     click.echo(f"Scanning directory: {directory}")
     if dry_run:
-        click.echo("Running in DRY RUN mode - no changes will be made\n")
+        click.echo("Running in DRY RUN mode - no changes will be made")
 
     # Find all duplicate files
-    click.echo("Calculating file hashes...\n")
+    click.echo("Calculating file hashes...")
     duplicate_groups = find_duplicate_files(directory)
 
     if not duplicate_groups:
-        click.echo("No duplicate files found!\n")
+        click.echo("No duplicate files found!")
         return
 
     total_files = sum(len(files) - 1 for files in duplicate_groups.values())
     click.echo(
         f"Found {len(duplicate_groups)} group(s) of duplicates "
-        f"({total_files} files to deduplicate)\n",
+        f"({total_files} files to deduplicate)",
     )
 
     if verbose:
         for file_hash, files in duplicate_groups.items():
-            click.echo(f"Hash: {file_hash}\n")
+            click.echo(f"Hash: {file_hash}")
             for f in files:
-                click.echo(f"  - {f}\n")
+                click.echo(f"  - {f}")
 
     # Replace duplicates with symlinks
-    click.echo("Processing duplicates...\n")
+    click.echo("Processing duplicates...")
     num_replaced, space_saved = replace_with_symlinks(duplicate_groups, dry_run=dry_run)
 
     # Summary
     click.echo(
         f"{'Would replace' if dry_run else 'Replaced'} "
-        f"{num_replaced} duplicate file(s)\n",
+        f"{num_replaced} duplicate file(s)",
     )
     if not dry_run:
         click.echo(f"Space saved: {humanize.naturalsize(space_saved, binary=True)}")
