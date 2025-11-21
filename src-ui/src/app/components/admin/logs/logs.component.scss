@@ -18,8 +18,20 @@
 .log-container {
   height: calc(100vh - 190px);
   overflow-y: auto;
+  position: relative;
 
   p {
     white-space: pre-wrap;
   }
+}
+
+.jump-to-bottom {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease-in-out;
+}
+
+.jump-to-bottom.visible {
+  opacity: 1;
+  pointer-events: auto;
 }

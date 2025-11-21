@@ -3,7 +3,6 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
-  NgZone,
   OnDestroy,
   OnInit,
   ViewChild,
@@ -11,7 +10,7 @@ import {
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
-import { Subject, debounceTime, filter, take, takeUntil, timer } from 'rxjs'
+import { Subject, debounceTime, filter, takeUntil, timer } from 'rxjs'
 import { LogService } from 'src/app/services/rest/log.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
@@ -34,7 +33,6 @@ export class LogsComponent
 {
   private logService = inject(LogService)
   private changedetectorRef = inject(ChangeDetectorRef)
-  private ngZone = inject(NgZone)
 
   public logs: Array<{ message: string; level: number }> = []
 
@@ -45,6 +43,8 @@ export class LogsComponent
   public autoRefreshEnabled: boolean = true
 
   public limit: number = 5000
+
+  public showJumpToBottom = false
 
   private readonly limitChange$ = new Subject<number>()
 
@@ -111,6 +111,7 @@ export class LogsComponent
             if (shouldStickToBottom) {
               this.scrollToBottom()
             }
+            this.showJumpToBottom = !shouldStickToBottom
           }
         },
         error: () => {
@@ -144,16 +145,13 @@ export class LogsComponent
   }
 
   scrollToBottom(): void {
+    const viewport = this.logContainer?.nativeElement
+    if (!viewport) {
+      return
+    }
     this.changedetectorRef.detectChanges()
-    this.ngZone.onStable.pipe(take(1)).subscribe(() => {
-      requestAnimationFrame(() => {
-        const viewport = this.logContainer?.nativeElement
-        if (!viewport) {
-          return
-        }
-        viewport.scrollTop = viewport.scrollHeight
-      })
-    })
+    viewport.scrollTop = viewport.scrollHeight
+    this.showJumpToBottom = false
   }
 
   private isNearBottom(element?: HTMLElement): boolean {
@@ -161,5 +159,9 @@ export class LogsComponent
     const distanceFromBottom =
       element.scrollHeight - element.scrollTop - element.clientHeight
     return distanceFromBottom <= 40
+  }
+
+  onScroll(): void {
+    this.showJumpToBottom = !this.isNearBottom(this.logContainer?.nativeElement)
   }
 }
