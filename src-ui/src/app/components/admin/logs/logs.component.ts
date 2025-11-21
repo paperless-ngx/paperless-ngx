@@ -86,9 +86,7 @@ export class LogsComponent
 
   reloadLogs() {
     this.loading = true
-    const shouldStickToBottom = this.isNearBottom(
-      this.logContainer?.nativeElement
-    )
+    const shouldStickToBottom = this.isNearBottom()
     this.logService
       .get(this.activeLog, this.limit)
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -154,14 +152,16 @@ export class LogsComponent
     this.showJumpToBottom = false
   }
 
-  private isNearBottom(element?: HTMLElement): boolean {
-    if (!element) return true
+  private isNearBottom(): boolean {
+    if (!this.logContainer?.nativeElement) return true
     const distanceFromBottom =
-      element.scrollHeight - element.scrollTop - element.clientHeight
+      this.logContainer.nativeElement.scrollHeight -
+      this.logContainer.nativeElement.scrollTop -
+      this.logContainer.nativeElement.clientHeight
     return distanceFromBottom <= 40
   }
 
   onScroll(): void {
-    this.showJumpToBottom = !this.isNearBottom(this.logContainer?.nativeElement)
+    this.showJumpToBottom = !this.isNearBottom()
   }
 }
