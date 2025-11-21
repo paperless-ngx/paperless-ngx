@@ -1,11 +1,8 @@
-import {
-  CdkVirtualScrollViewport,
-  ScrollingModule,
-} from '@angular/cdk/scrolling'
 import { CommonModule } from '@angular/common'
 import {
   ChangeDetectorRef,
   Component,
+  ElementRef,
   OnDestroy,
   OnInit,
   ViewChild,
@@ -28,8 +25,6 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    CdkVirtualScrollViewport,
-    ScrollingModule,
   ],
 })
 export class LogsComponent
@@ -49,9 +44,11 @@ export class LogsComponent
 
   public limit: number = 5000
 
+  public showJumpToBottom = false
+
   private readonly limitChange$ = new Subject<number>()
 
-  @ViewChild('logContainer') logContainer: CdkVirtualScrollViewport
+  @ViewChild('logContainer') logContainer: ElementRef<HTMLElement>
 
   ngOnInit(): void {
     this.limitChange$
@@ -89,6 +86,7 @@ export class LogsComponent
 
   reloadLogs() {
     this.loading = true
+    const shouldStickToBottom = this.isNearBottom()
     this.logService
       .get(this.activeLog, this.limit)
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -108,7 +106,10 @@ export class LogsComponent
             })
           if (hasChanges) {
             this.logs = parsed
-            this.scrollToBottom()
+            if (shouldStickToBottom) {
+              this.scrollToBottom()
+            }
+            this.showJumpToBottom = !shouldStickToBottom
           }
         },
         error: () => {
@@ -142,9 +143,25 @@ export class LogsComponent
   }
 
   scrollToBottom(): void {
-    this.changedetectorRef.detectChanges()
-    if (this.logContainer) {
-      this.logContainer.scrollToIndex(this.logs.length - 1)
+    const viewport = this.logContainer?.nativeElement
+    if (!viewport) {
+      return
     }
+    this.changedetectorRef.detectChanges()
+    viewport.scrollTop = viewport.scrollHeight
+    this.showJumpToBottom = false
+  }
+
+  private isNearBottom(): boolean {
+    if (!this.logContainer?.nativeElement) return true
+    const distanceFromBottom =
+      this.logContainer.nativeElement.scrollHeight -
+      this.logContainer.nativeElement.scrollTop -
+      this.logContainer.nativeElement.clientHeight
+    return distanceFromBottom <= 40
+  }
+
+  onScroll(): void {
+    this.showJumpToBottom = !this.isNearBottom()
   }
 }

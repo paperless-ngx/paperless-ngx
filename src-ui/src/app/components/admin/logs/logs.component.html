@@ -41,21 +41,21 @@
   }
 </ul>
 
-<div [ngbNavOutlet]="nav" class="mt-2"></div>
-
-<cdk-virtual-scroll-viewport
-  itemSize="20"
-  class="bg-dark p-3 text-light font-monospace log-container"
-  #logContainer>
+<div #logContainer class="bg-dark text-light font-monospace log-container p-3" (scroll)="onScroll()">
   @if (loading && !logFiles.length) {
     <div>
       <div class="spinner-border spinner-border-sm me-2" role="status"></div>
       <ng-container i18n>Loading...</ng-container>
     </div>
+  } @else {
+    <p *ngFor="let log of logs" class="m-0 p-0" [ngClass]="'log-entry-' + log.level">{{log.message}}</p>
   }
-  <p *cdkVirtualFor="let log of logs"
-     class="m-0 p-0"
-     [ngClass]="'log-entry-' + log.level">
-    {{log.message}}
-  </p>
-</cdk-virtual-scroll-viewport>
+</div>
+<button
+  type="button"
+  class="btn btn-sm btn-secondary jump-to-bottom position-fixed bottom-0 end-0 m-5"
+  [class.visible]="showJumpToBottom"
+  (click)="scrollToBottom()"
+>
+  ↓ <span i18n>Jump to bottom</span>
+</button>
