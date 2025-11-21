@@ -1,12 +1,9 @@
-import { ScrollingModule } from '@angular/cdk-experimental/scrolling'
-import {
-  CdkVirtualForOf,
-  CdkVirtualScrollViewport,
-} from '@angular/cdk/scrolling'
 import { CommonModule } from '@angular/common'
 import {
   ChangeDetectorRef,
   Component,
+  ElementRef,
+  NgZone,
   OnDestroy,
   OnInit,
   ViewChild,
@@ -14,7 +11,7 @@ import {
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
-import { Subject, debounceTime, filter, takeUntil, timer } from 'rxjs'
+import { Subject, debounceTime, filter, take, takeUntil, timer } from 'rxjs'
 import { LogService } from 'src/app/services/rest/log.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
@@ -29,9 +26,6 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    CdkVirtualForOf,
-    CdkVirtualScrollViewport,
-    ScrollingModule,
   ],
 })
 export class LogsComponent
@@ -40,6 +34,7 @@ export class LogsComponent
 {
   private logService = inject(LogService)
   private changedetectorRef = inject(ChangeDetectorRef)
+  private ngZone = inject(NgZone)
 
   public logs: Array<{ message: string; level: number }> = []
 
@@ -53,7 +48,7 @@ export class LogsComponent
 
   private readonly limitChange$ = new Subject<number>()
 
-  @ViewChild('logContainer') logContainer: CdkVirtualScrollViewport
+  @ViewChild('logContainer') logContainer: ElementRef<HTMLElement>
 
   ngOnInit(): void {
     this.limitChange$
@@ -91,6 +86,9 @@ export class LogsComponent
 
   reloadLogs() {
     this.loading = true
+    const shouldStickToBottom = this.isNearBottom(
+      this.logContainer?.nativeElement
+    )
     this.logService
       .get(this.activeLog, this.limit)
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -110,7 +108,9 @@ export class LogsComponent
             })
           if (hasChanges) {
             this.logs = parsed
-            this.scrollToBottom()
+            if (shouldStickToBottom) {
+              this.scrollToBottom()
+            }
           }
         },
         error: () => {
@@ -145,9 +145,21 @@ export class LogsComponent
 
   scrollToBottom(): void {
     this.changedetectorRef.detectChanges()
-    setTimeout(() => {
-      this.logContainer?.checkViewportSize()
-      this.logContainer?.scrollTo({ bottom: 0 })
-    }, 50)
+    this.ngZone.onStable.pipe(take(1)).subscribe(() => {
+      requestAnimationFrame(() => {
+        const viewport = this.logContainer?.nativeElement
+        if (!viewport) {
+          return
+        }
+        viewport.scrollTop = viewport.scrollHeight
+      })
+    })
+  }
+
+  private isNearBottom(element?: HTMLElement): boolean {
+    if (!element) return true
+    const distanceFromBottom =
+      element.scrollHeight - element.scrollTop - element.clientHeight
+    return distanceFromBottom <= 40
   }
 }

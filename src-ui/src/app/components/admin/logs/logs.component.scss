@@ -17,6 +17,7 @@
 
 .log-container {
   height: calc(100vh - 190px);
+  overflow-y: auto;
 
   p {
     white-space: pre-wrap;
