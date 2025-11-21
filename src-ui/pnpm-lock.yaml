@@ -11,9 +11,6 @@ importers:
       '@angular/cdk':
         specifier: ^20.2.13
         version: 20.2.13(@angular/common@20.3.12(@angular/core@20.3.12(@angular/compiler@20.3.12)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.12(@angular/compiler@20.3.12)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
-      '@angular/cdk-experimental':
-        specifier: ^20.2.14
-        version: 20.2.14(@angular/cdk@20.2.13(@angular/common@20.3.12(@angular/core@20.3.12(@angular/compiler@20.3.12)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.12(@angular/compiler@20.3.12)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.12(@angular/compiler@20.3.12)(rxjs@7.8.2)(zone.js@0.15.1))
       '@angular/common':
         specifier: ~20.3.12
         version: 20.3.12(@angular/core@20.3.12(@angular/compiler@20.3.12)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
@@ -497,12 +494,6 @@ packages:
         optional: true
       vitest:
         optional: true
-
-  '@angular/cdk-experimental@20.2.14':
-    resolution: {integrity: sha512-oTqd8fV9m8HfzIpd1GXJ9OOKhTV/2D3hPfhZjG4puTQ5JeWcljVR2T/fZHpWGnNRoHJL5MkIkQP6338uJbX22Q==}
-    peerDependencies:
-      '@angular/cdk': 20.2.14
-      '@angular/core': ^20.0.0 || ^21.0.0
 
   '@angular/cdk@20.2.13':
     resolution: {integrity: sha512-h1jTkCmJ/rEQQMkxgKFMCBOrMfjZEnppgdekNmSTerwdVp4vdosTDTzFH/kwiOGFeRClffmvqQ2XLG8mQOKOtA==}
@@ -7451,12 +7442,6 @@ snapshots:
       - terser
       - tsx
       - yaml
-
-  '@angular/cdk-experimental@20.2.14(@angular/cdk@20.2.13(@angular/common@20.3.12(@angular/core@20.3.12(@angular/compiler@20.3.12)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.12(@angular/compiler@20.3.12)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.12(@angular/compiler@20.3.12)(rxjs@7.8.2)(zone.js@0.15.1))':
-    dependencies:
-      '@angular/cdk': 20.2.13(@angular/common@20.3.12(@angular/core@20.3.12(@angular/compiler@20.3.12)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.12(@angular/compiler@20.3.12)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
-      '@angular/core': 20.3.12(@angular/compiler@20.3.12)(rxjs@7.8.2)(zone.js@0.15.1)
-      tslib: 2.8.1
 
   '@angular/cdk@20.2.13(@angular/common@20.3.12(@angular/core@20.3.12(@angular/compiler@20.3.12)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.12(@angular/compiler@20.3.12)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)':
     dependencies:
