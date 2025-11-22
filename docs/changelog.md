@@ -14,7 +14,6 @@
 -   Enhancement: add more relative dates, support modified [@shamoon](https://github.com/shamoon) ([#11411](https://github.com/paperless-ngx/paperless-ngx/pull/11411))
 -   Performance: make move files after select custom field change async [@shamoon](https://github.com/shamoon) ([#11391](https://github.com/paperless-ngx/paperless-ngx/pull/11391))
 -   Enhancement: Use a better check for the MariaDB server to be ready [@stumpylog](https://github.com/stumpylog) ([#11396](https://github.com/paperless-ngx/paperless-ngx/pull/11396))
--   docker(deps): bump astral-sh/uv from 0.9.9-python3.12-bookworm-slim to 0.9.10-python3.12-bookworm-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#11394](https://github.com/paperless-ngx/paperless-ngx/pull/11394))
 -   Enhancement: speed-up docker container startup [@flrgh](https://github.com/flrgh) ([#11134](https://github.com/paperless-ngx/paperless-ngx/pull/11134))
 
 ### Bug Fixes
