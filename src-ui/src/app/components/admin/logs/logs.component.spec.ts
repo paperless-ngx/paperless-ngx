@@ -110,4 +110,11 @@ describe('LogsComponent', () => {
     jest.advanceTimersByTime(1)
     expect(reloadSpy).toHaveBeenCalledTimes(initialCalls + 1)
   })
+
+  it('should update jump to bottom visibility on scroll', () => {
+    component.showJumpToBottom = false
+    jest.spyOn(component as any, 'isNearBottom').mockReturnValue(false)
+    component.onScroll()
+    expect(component.showJumpToBottom).toBe(true)
+  })
 })

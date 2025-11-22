@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-11-14 16:09+0000\n"
-"PO-Revision-Date: 2025-11-14 16:11\n"
+"PO-Revision-Date: 2025-11-21 23:54\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -31,7 +31,7 @@ msgstr ""
 
 #: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
-msgstr ""
+msgstr "قائمة عبارة خاطئة."
 
 #: documents/filters.py:445
 msgid "Invalid logical operator {op!r}"
@@ -1062,7 +1062,7 @@ msgstr "تعيين هذا المالك"
 
 #: documents/models.py:1353
 msgid "grant view permissions to these users"
-msgstr "منح أذونات العرض إلى هؤلاء المستخدمين"
+msgstr "منح صلاحيات العرض إلى هؤلاء المستخدمين"
 
 #: documents/models.py:1360
 msgid "grant view permissions to these groups"
@@ -1130,11 +1130,11 @@ msgstr "إزالة جميع المالكين"
 
 #: documents/models.py:1458
 msgid "remove view permissions for these users"
-msgstr "سحب أذونات العرض من هؤلاء المستخدمين"
+msgstr "سحب صلاحيات العرض من هؤلاء المستخدمين"
 
 #: documents/models.py:1465
 msgid "remove view permissions for these groups"
-msgstr "سحب أذونات العرض من هذه المجموعات"
+msgstr "سحب صلاحيات العرض من هذه المجموعات"
 
 #: documents/models.py:1472
 msgid "remove change permissions for these users"
