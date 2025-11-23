@@ -8,7 +8,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG TARGETARCH
 
 # Can be workflow provided, defaults set for manual building
-ARG JBIG2ENC_VERSION=0.29
+ARG JBIG2ENC_VERSION=0.30
 
 # Set Python environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -97,13 +97,13 @@ RUN set -eux \
 WORKDIR /usr/src/paperless/src/docker/
 
 COPY [ \
-  "docker/rootfs/etc/ImageMagick-6/paperless-policy.xml", \
+  "docker/rootfs/etc/ImageMagick-7/paperless-policy.xml", \
   "./" \
 ]
 
 RUN set -eux \
   && echo "Configuring ImageMagick" \
-    && mv paperless-policy.xml /etc/ImageMagick-6/policy.xml
+    && mv paperless-policy.xml /etc/ImageMagick-7/policy.xml
 
 
 # Packages needed only for building a few quick Python
