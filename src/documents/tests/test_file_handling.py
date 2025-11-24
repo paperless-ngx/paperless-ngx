@@ -569,7 +569,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertEqual(generate_filename(doc), Path("document_apple.pdf"))
 
         # handler should not have been called
-        self.assertEqual(m.call_count, 0)
+        self.assertEqual(m.delay.call_count, 0)
         cf.extra_data = {
             "select_options": [
                 {"label": "aubergine", "id": "abc123"},
@@ -579,8 +579,8 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         }
         cf.save()
         self.assertEqual(generate_filename(doc), Path("document_aubergine.pdf"))
-        # handler should have been called
-        self.assertEqual(m.call_count, 1)
+        # handler should have been called via delay
+        self.assertEqual(m.delay.call_count, 1)
 
 
 class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
