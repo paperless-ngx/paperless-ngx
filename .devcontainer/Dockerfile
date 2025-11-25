@@ -8,14 +8,17 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG TARGETARCH
 
 # Can be workflow provided, defaults set for manual building
-ARG JBIG2ENC_VERSION=0.29
+ARG JBIG2ENC_VERSION=0.30
 
 # Set Python environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     # Ignore warning from Whitenoise
     PYTHONWARNINGS="ignore:::django.http.response:517" \
-    PNGX_CONTAINERIZED=1
+    PNGX_CONTAINERIZED=1 \
+    # https://docs.astral.sh/uv/reference/settings/#link-mode
+    UV_LINK_MODE=copy \
+    UV_CACHE_DIR=/cache/uv/
 
 #
 # Begin installation and configuration
@@ -81,7 +84,7 @@ RUN set -eux \
     && apt-get update \
     && apt-get install --yes --quiet ${PYTHON_PACKAGES}
 
-COPY --from=ghcr.io/astral-sh/uv:0.7.8 /uv /bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.9.10 /uv /bin/uv
 
 
 RUN set -eux \
@@ -103,6 +106,7 @@ COPY [ \
 
 RUN set -eux \
   && echo "Configuring ImageMagick" \
+    && mkdir -p /etc/ImageMagick-6 \
     && mv paperless-policy.xml /etc/ImageMagick-6/policy.xml
 
 
@@ -118,7 +122,7 @@ ARG BUILD_PACKAGES="\
   pkg-config"
 
 # hadolint ignore=DL3042
-RUN --mount=type=cache,target=/root/.cache/uv,id=pip-cache \
+RUN --mount=type=cache,target=/cache/uv/,id=uv-cache \
   set -eux \
   && echo "Installing build system packages" \
     && apt-get update \
