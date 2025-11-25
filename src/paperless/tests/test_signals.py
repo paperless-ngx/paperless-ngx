@@ -192,6 +192,68 @@ class TestSyncSocialLoginGroups(TestCase):
         )
         self.assertEqual(list(user.groups.all()), [])
 
+    @override_settings(SOCIAL_ACCOUNT_SYNC_GROUPS=True)
+    def test_userinfo_groups(self):
+        """
+        GIVEN:
+            - Enabled group syncing, and `groups` nested under `userinfo`
+        WHEN:
+            - The social login is updated via signal after login
+        THEN:
+            - The user's groups are updated using `userinfo.groups`
+        """
+        group = Group.objects.create(name="group1")
+        user = User.objects.create_user(username="testuser")
+        sociallogin = Mock(
+            user=user,
+            account=Mock(
+                extra_data={
+                    "userinfo": {
+                        "groups": ["group1"],
+                    },
+                },
+            ),
+        )
+
+        handle_social_account_updated(
+            sender=None,
+            request=HttpRequest(),
+            sociallogin=sociallogin,
+        )
+
+        self.assertEqual(list(user.groups.all()), [group])
+
+    @override_settings(SOCIAL_ACCOUNT_SYNC_GROUPS=True)
+    def test_id_token_groups_fallback(self):
+        """
+        GIVEN:
+            - Enabled group syncing, and `groups` only under `id_token`
+        WHEN:
+            - The social login is updated via signal after login
+        THEN:
+            - The user's groups are updated using `id_token.groups`
+        """
+        group = Group.objects.create(name="group1")
+        user = User.objects.create_user(username="testuser")
+        sociallogin = Mock(
+            user=user,
+            account=Mock(
+                extra_data={
+                    "id_token": {
+                        "groups": ["group1"],
+                    },
+                },
+            ),
+        )
+
+        handle_social_account_updated(
+            sender=None,
+            request=HttpRequest(),
+            sociallogin=sociallogin,
+        )
+
+        self.assertEqual(list(user.groups.all()), [group])
+
 
 class TestUserGroupDeletionCleanup(TestCase):
     """
