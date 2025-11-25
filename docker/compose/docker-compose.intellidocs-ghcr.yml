@@ -1,0 +1,88 @@
+# Docker Compose file for IntelliDocs using pre-built image from GitHub Container Registry
+# This variant uses the CI-built image instead of building locally
+#
+# To deploy:
+#
+# 1. Copy docker-compose.env to docker-compose.env.local and configure
+# 2. Create required directories:
+#    mkdir -p ./data ./media ./export ./consume ./ml_cache
+# 3. Run: docker compose -f docker-compose.intellidocs-ghcr.yml up -d
+#
+services:
+  broker:
+    image: docker.io/library/redis:8
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+    # Redis configuration for better performance with caching
+    command: >
+      redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru --save 60 1000
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  webserver:
+    # Use pre-built image from GitHub Container Registry
+    image: ghcr.io/dawnsystem/intellidocs-ngx:latest
+    # Pull policy: always pull latest version
+    pull_policy: always
+    restart: unless-stopped
+    depends_on:
+      broker:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      # Core data volumes
+      - data:/usr/src/paperless/data
+      - media:/usr/src/paperless/media
+      - ./export:/usr/src/paperless/export
+      - ./consume:/usr/src/paperless/consume
+      # ML models cache (IMPORTANT: persists downloaded models)
+      - ml_cache:/usr/src/paperless/.cache
+    env_file: docker-compose.env
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+      # Enable new features by default
+      PAPERLESS_ENABLE_ML_FEATURES: ${PAPERLESS_ENABLE_ML_FEATURES:-1}
+      PAPERLESS_ENABLE_ADVANCED_OCR: ${PAPERLESS_ENABLE_ADVANCED_OCR:-1}
+      # ML configuration
+      PAPERLESS_ML_CLASSIFIER_MODEL: ${PAPERLESS_ML_CLASSIFIER_MODEL:-distilbert-base-uncased}
+      PAPERLESS_USE_GPU: ${PAPERLESS_USE_GPU:-0}
+      # OCR configuration
+      PAPERLESS_TABLE_DETECTION_THRESHOLD: ${PAPERLESS_TABLE_DETECTION_THRESHOLD:-0.7}
+      PAPERLESS_ENABLE_HANDWRITING_OCR: ${PAPERLESS_ENABLE_HANDWRITING_OCR:-1}
+      # Model cache location
+      PAPERLESS_ML_MODEL_CACHE: /usr/src/paperless/.cache/huggingface
+      # Performance settings (adjust based on available RAM)
+      PAPERLESS_TASK_WORKERS: ${PAPERLESS_TASK_WORKERS:-2}
+      PAPERLESS_THREADS_PER_WORKER: ${PAPERLESS_THREADS_PER_WORKER:-2}
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "-S", "-L", "--max-time", "2", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s # ML models may take time to load on first start
+    # Resource limits (adjust based on your system)
+    deploy:
+      resources:
+        limits:
+          memory: 8G # Increase for larger ML models
+        reservations:
+          memory: 4G # Minimum for ML features
+
+volumes:
+  data:
+    driver: local
+  media:
+    driver: local
+  redisdata:
+    driver: local
+  ml_cache:
+    driver: local
+    # Important: This volume persists ML models between container restarts
+    # First run will download ~500MB-1GB of models
