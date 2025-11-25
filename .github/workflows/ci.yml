@@ -153,7 +153,7 @@ jobs:
           sudo apt-get install -qq --no-install-recommends unpaper tesseract-ocr imagemagick ghostscript libzbar0 poppler-utils
       - name: Configure ImageMagick
         run: |
-          sudo cp docker/rootfs/etc/ImageMagick-6/paperless-policy.xml /etc/ImageMagick-6/policy.xml
+          sudo cp docker/rootfs/etc/ImageMagick-7/paperless-policy.xml /etc/ImageMagick-7/policy.xml
       - name: Install Python dependencies
         run: |
           uv sync \
