@@ -13,7 +13,6 @@ from time import mktime
 from typing import Literal
 from unicodedata import normalize
 from urllib.parse import quote
-from urllib.parse import urlparse
 
 import httpx
 import magic
@@ -66,6 +65,7 @@ from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
 from langdetect import detect
 from packaging import version as packaging_version
+
 # Redis connection via settings helper function
 from rest_framework import parsers
 from rest_framework import serializers
@@ -2981,10 +2981,15 @@ class SystemStatusView(PassUserMixin):
                 client.ping()
                 redis_status = "OK"
                 # Try to get connection info for display
-                if hasattr(client, 'connection_pool') and hasattr(client.connection_pool, 'connection_kwargs'):
+                if hasattr(client, "connection_pool") and hasattr(
+                    client.connection_pool,
+                    "connection_kwargs",
+                ):
                     conn_kwargs = client.connection_pool.connection_kwargs
-                    if 'host' in conn_kwargs and 'port' in conn_kwargs:
-                        redis_constructed_url = f"redis://{conn_kwargs['host']}:{conn_kwargs['port']}"
+                    if "host" in conn_kwargs and "port" in conn_kwargs:
+                        redis_constructed_url = (
+                            f"redis://{conn_kwargs['host']}:{conn_kwargs['port']}"
+                        )
             except Exception as e:
                 redis_status = "ERROR"
                 logger.exception(
@@ -2992,7 +2997,7 @@ class SystemStatusView(PassUserMixin):
                 )
                 redis_error = "Error connecting to redis, check logs for more detail."
             finally:
-                if hasattr(client, 'close'):
+                if hasattr(client, "close"):
                     client.close()
         except Exception as e:
             redis_status = "ERROR"

@@ -3,7 +3,6 @@
 #
 # Usage:
 #   docker-compose -f docker-compose.postgres-sentinel.yml up
-
 services:
   # Redis Master
   redis-master:
@@ -11,50 +10,34 @@ services:
     command: redis-server --protected-mode no --port 6379
     networks:
       - paperless
-
   # Redis Sentinel instances
   sentinel-1:
     image: docker.io/library/redis:7-alpine
     command: >
-      sh -c "echo 'sentinel announce-ip sentinel-1
-      sentinel monitor mymaster redis-master 6379 2
-      sentinel down-after-milliseconds mymaster 5000
-      sentinel failover-timeout mymaster 60000
-      sentinel parallel-syncs mymaster 1' > /tmp/sentinel.conf &&
-      redis-sentinel /tmp/sentinel.conf"
+      sh -c "echo 'sentinel announce-ip sentinel-1 sentinel monitor mymaster redis-master 6379 2 sentinel down-after-milliseconds mymaster 5000 sentinel failover-timeout mymaster 60000 sentinel parallel-syncs mymaster 1' > /tmp/sentinel.conf && redis-sentinel /tmp/sentinel.conf"
+
     depends_on:
       - redis-master
     networks:
       - paperless
-
   sentinel-2:
     image: docker.io/library/redis:7-alpine
     command: >
-      sh -c "echo 'sentinel announce-ip sentinel-2
-      sentinel monitor mymaster redis-master 6379 2
-      sentinel down-after-milliseconds mymaster 5000
-      sentinel failover-timeout mymaster 60000
-      sentinel parallel-syncs mymaster 1' > /tmp/sentinel.conf &&
-      redis-sentinel /tmp/sentinel.conf"
+      sh -c "echo 'sentinel announce-ip sentinel-2 sentinel monitor mymaster redis-master 6379 2 sentinel down-after-milliseconds mymaster 5000 sentinel failover-timeout mymaster 60000 sentinel parallel-syncs mymaster 1' > /tmp/sentinel.conf && redis-sentinel /tmp/sentinel.conf"
+
     depends_on:
       - redis-master
     networks:
       - paperless
-
   sentinel-3:
     image: docker.io/library/redis:7-alpine
     command: >
-      sh -c "echo 'sentinel announce-ip sentinel-3
-      sentinel monitor mymaster redis-master 6379 2
-      sentinel down-after-milliseconds mymaster 5000
-      sentinel failover-timeout mymaster 60000
-      sentinel parallel-syncs mymaster 1' > /tmp/sentinel.conf &&
-      redis-sentinel /tmp/sentinel.conf"
+      sh -c "echo 'sentinel announce-ip sentinel-3 sentinel monitor mymaster redis-master 6379 2 sentinel down-after-milliseconds mymaster 5000 sentinel failover-timeout mymaster 60000 sentinel parallel-syncs mymaster 1' > /tmp/sentinel.conf && redis-sentinel /tmp/sentinel.conf"
+
     depends_on:
       - redis-master
     networks:
       - paperless
-
   # Database
   db:
     image: docker.io/library/postgres:16
@@ -67,7 +50,6 @@ services:
       POSTGRES_PASSWORD: paperless
     networks:
       - paperless
-
   # Paperless-ngx services
   webserver:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
@@ -94,7 +76,6 @@ services:
       PAPERLESS_DBNAME: paperless
     networks:
       - paperless
-
   task-queue:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
@@ -120,7 +101,6 @@ services:
     command: ["python3", "manage.py", "qcluster"]
     networks:
       - paperless
-
   scheduler:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
@@ -143,12 +123,10 @@ services:
     command: ["python3", "manage.py", "celeryd_beat"]
     networks:
       - paperless
-
 volumes:
   data:
   media:
   pgdata:
-
 networks:
   paperless:
     driver: bridge

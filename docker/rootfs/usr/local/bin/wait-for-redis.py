@@ -19,10 +19,10 @@ def parse_sentinel_config():
     """Parse Redis Sentinel configuration from environment variables."""
     sentinel_hosts = os.getenv("PAPERLESS_REDIS_SENTINEL_HOSTS")
     sentinel_service = os.getenv("PAPERLESS_REDIS_SENTINEL_SERVICE_NAME", "mymaster")
-    
+
     if not sentinel_hosts:
         return None
-    
+
     # Parse hosts in format "host1:port1,host2:port2"
     hosts = []
     for host_port in sentinel_hosts.split(","):
@@ -34,7 +34,7 @@ def parse_sentinel_config():
             hosts.append((host.strip(), int(port.strip())))
         else:
             hosts.append((host_port.strip(), 26379))  # Default Sentinel port
-    
+
     return {
         "hosts": hosts,
         "service_name": sentinel_service,
@@ -44,14 +44,16 @@ def parse_sentinel_config():
     }
 
 
-def get_redis_client(redis_url: str = None):
+def get_redis_client(redis_url: str | None = None):
     """Get a Redis client, either direct or via Sentinel."""
     sentinel_config = parse_sentinel_config()
-    
+
     if sentinel_config:
-        click.echo(f"Using Redis Sentinel with service: {sentinel_config['service_name']}")
+        click.echo(
+            f"Using Redis Sentinel with service: {sentinel_config['service_name']}",
+        )
         click.echo(f"Sentinel hosts: {sentinel_config['hosts']}")
-        
+
         sentinel = Sentinel(
             sentinel_config["hosts"],
             password=sentinel_config["password"],
@@ -92,10 +94,10 @@ def wait(redis_url: str, retry_count: int, retry_sleep: int) -> None:
 
     attempt = 0
     client = None
-    
+
     try:
         client = get_redis_client(redis_url)
-        
+
         while attempt < retry_count:
             try:
                 client.ping()
@@ -117,12 +119,12 @@ def wait(redis_url: str, retry_count: int, retry_sleep: int) -> None:
         else:
             click.echo("Connected to Redis broker.")
             sys.exit(os.EX_OK)
-            
+
     except Exception as e:
         click.echo(f"Failed to create Redis connection: {e}")
         sys.exit(os.EX_UNAVAILABLE)
     finally:
-        if client and hasattr(client, 'close'):
+        if client and hasattr(client, "close"):
             client.close()
 
 
