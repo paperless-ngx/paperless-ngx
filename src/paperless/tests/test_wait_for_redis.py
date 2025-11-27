@@ -229,14 +229,24 @@ class TestWaitCommand:
         # This is a simpler integration test that just checks the script exists and can be imported
         import subprocess
         import sys
+        from pathlib import Path
 
-        script_path = "/Users/michaelfaherty/github/paperless-ngx/docker/rootfs/usr/local/bin/wait-for-redis.py"
+        # Get path to the script relative to the repository root
+        script_path = (
+            Path(__file__).parent.parent.parent.parent
+            / "docker"
+            / "rootfs"
+            / "usr"
+            / "local"
+            / "bin"
+            / "wait-for-redis.py"
+        )
 
         # Test that the script can show help without errors
         result = subprocess.run(
             [
                 sys.executable,
-                script_path,
+                str(script_path),
                 "--help",
             ],
             capture_output=True,

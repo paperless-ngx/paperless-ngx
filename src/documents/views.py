@@ -2973,23 +2973,27 @@ class SystemStatusView(PassUserMixin):
         media_stats = os.statvfs(settings.MEDIA_ROOT)
 
         redis_error = None
-        redis_constructed_url = "Redis/Sentinel"
+        redis_constructed_url = settings._CHANNELS_REDIS_URL
+        # Remove credentials from URL for display
+        if redis_constructed_url and "://" in redis_constructed_url:
+            from urllib.parse import urlparse
+
+            parsed = urlparse(redis_constructed_url)
+            if parsed.username or parsed.password:
+                # Reconstruct URL without credentials
+                netloc = parsed.hostname
+                if parsed.port:
+                    netloc = f"{netloc}:{parsed.port}"
+                redis_constructed_url = f"{parsed.scheme}://{netloc}{parsed.path}"
+
         try:
-            # Use the helper function from settings to get the appropriate Redis client
-            client = settings._get_redis_connection()
+            # Import the helper function from settings module
+            from paperless.settings import _get_redis_connection
+
+            client = _get_redis_connection()
             try:
                 client.ping()
                 redis_status = "OK"
-                # Try to get connection info for display
-                if hasattr(client, "connection_pool") and hasattr(
-                    client.connection_pool,
-                    "connection_kwargs",
-                ):
-                    conn_kwargs = client.connection_pool.connection_kwargs
-                    if "host" in conn_kwargs and "port" in conn_kwargs:
-                        redis_constructed_url = (
-                            f"redis://{conn_kwargs['host']}:{conn_kwargs['port']}"
-                        )
             except Exception as e:
                 redis_status = "ERROR"
                 logger.exception(

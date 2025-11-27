@@ -12,43 +12,22 @@ from django.test import TestCase
 class RedisSentinelIntegrationTest(TestCase):
     """Integration tests for Redis Sentinel functionality."""
 
-    def tearDown(self):
-        """Clean up environment variables after each test."""
-        sentinel_vars = [
-            "PAPERLESS_REDIS_SENTINEL_HOSTS",
-            "PAPERLESS_REDIS_SENTINEL_SERVICE_NAME",
-            "PAPERLESS_REDIS_SENTINEL_PASSWORD",
-            "PAPERLESS_REDIS_SENTINEL_USERNAME",
-            "PAPERLESS_REDIS_SENTINEL_DB",
-            "PAPERLESS_REDIS_PASSWORD",
-        ]
-        for var in sentinel_vars:
-            if var in os.environ:
-                del os.environ[var]
-
     def test_settings_import_with_sentinel_config(self):
         """Test that settings can be imported with Sentinel configuration."""
-        os.environ.update(
+        with patch.dict(
+            os.environ,
             {
                 "PAPERLESS_REDIS_SENTINEL_HOSTS": "s1:26379,s2:26379",
                 "PAPERLESS_REDIS_SENTINEL_SERVICE_NAME": "mymaster",
             },
-        )
+        ):
+            # Verify Sentinel config is parsed correctly
+            from paperless.settings import _parse_redis_sentinel_config
 
-        # Re-import settings to pick up the new environment
-        import importlib
+            config = _parse_redis_sentinel_config()
 
-        import paperless.settings
-
-        importlib.reload(paperless.settings)
-
-        # Verify Sentinel config is parsed correctly
-        from paperless.settings import _parse_redis_sentinel_config
-
-        config = _parse_redis_sentinel_config()
-
-        self.assertIsNotNone(config)
-        self.assertEqual(config["service_name"], "mymaster")
+            self.assertIsNotNone(config)
+            self.assertEqual(config["service_name"], "mymaster")
         self.assertEqual(len(config["hosts"]), 2)
 
     def test_settings_import_without_sentinel_config(self):
@@ -77,64 +56,69 @@ class RedisSentinelIntegrationTest(TestCase):
 
     def test_configuration_precedence(self):
         """Test that Sentinel configuration takes precedence over regular Redis URL."""
-        os.environ.update(
+        with patch.dict(
+            os.environ,
             {
                 "PAPERLESS_REDIS": "redis://localhost:6379/1",
                 "PAPERLESS_REDIS_SENTINEL_HOSTS": "s1:26379",
                 "PAPERLESS_REDIS_SENTINEL_SERVICE_NAME": "mymaster",
             },
-        )
+        ):
+            from paperless.settings import _parse_redis_url
 
-        from paperless.settings import _parse_redis_url
+            celery_url, _channels_url = _parse_redis_url("redis://localhost:6379/1")
 
-        celery_url, _channels_url = _parse_redis_url("redis://localhost:6379/1")
-
-        # Should use Sentinel configuration, not the regular Redis URL
-        self.assertTrue(celery_url.startswith("sentinel://"))
-        self.assertIn("s1:26379", celery_url)
-        self.assertIn("mymaster", celery_url)
+            # Should use Sentinel configuration, not the regular Redis URL
+            self.assertTrue(celery_url.startswith("sentinel://"))
+            self.assertIn("s1:26379", celery_url)
+            self.assertIn("mymaster", celery_url)
 
     def test_environment_variable_validation(self):
         """Test validation of environment variable formats."""
-        # Test invalid port number
-        os.environ["PAPERLESS_REDIS_SENTINEL_HOSTS"] = "sentinel1:invalid_port"
+        with patch.dict(
+            os.environ,
+            {"PAPERLESS_REDIS_SENTINEL_HOSTS": "sentinel1:invalid_port"},
+        ):
+            from paperless.settings import _parse_redis_sentinel_config
 
-        from paperless.settings import _parse_redis_sentinel_config
-
-        # Should raise an error for invalid port
-        with self.assertRaises(ValueError):
-            _parse_redis_sentinel_config()
+            # Should raise an error for invalid port
+            with self.assertRaises(ValueError):
+                _parse_redis_sentinel_config()
 
     def test_db_number_parsing(self):
         """Test that database numbers are parsed correctly."""
-        os.environ.update(
+        with patch.dict(
+            os.environ,
             {
                 "PAPERLESS_REDIS_SENTINEL_HOSTS": "s1:26379",
                 "PAPERLESS_REDIS_SENTINEL_DB": "5",
             },
-        )
+        ):
+            from paperless.settings import _parse_redis_sentinel_config
 
-        from paperless.settings import _parse_redis_sentinel_config
+            config = _parse_redis_sentinel_config()
 
-        config = _parse_redis_sentinel_config()
-
-        self.assertEqual(config["db"], 5)
+            self.assertEqual(config["db"], 5)
 
     def test_empty_sentinel_hosts(self):
         """Test behavior with empty Sentinel hosts."""
-        os.environ["PAPERLESS_REDIS_SENTINEL_HOSTS"] = ""
+        with patch.dict(
+            os.environ,
+            {"PAPERLESS_REDIS_SENTINEL_HOSTS": ""},
+        ):
+            from paperless.settings import _parse_redis_sentinel_config
 
-        from paperless.settings import _parse_redis_sentinel_config
+            config = _parse_redis_sentinel_config()
 
-        config = _parse_redis_sentinel_config()
-
-        self.assertIsNone(config)
+            self.assertIsNone(config)
 
     def test_malformed_sentinel_hosts(self):
         """Test behavior with malformed Sentinel hosts."""
-        os.environ["PAPERLESS_REDIS_SENTINEL_HOSTS"] = "s1:26379,,s2:26379"
-
-        from paperless.settings import _parse_redis_sentinel_config
+        with patch.dict(
+            os.environ,
+            {"PAPERLESS_REDIS_SENTINEL_HOSTS": "s1:26379,,s2:26379"},
+        ):
+            from paperless.settings import _parse_redis_sentinel_config
 
         config = _parse_redis_sentinel_config()
 
