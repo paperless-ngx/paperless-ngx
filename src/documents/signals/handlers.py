@@ -547,12 +547,12 @@ def process_cf_select_update(custom_field: CustomField):
         for option in custom_field.extra_data.get("select_options", [])
     }
 
-    for cf_instance in custom_field.fields.select_related("document").iterator():
-        # Check if the current value is still a valid option
-        if cf_instance.value not in select_options:
-            cf_instance.value_select = None
-            cf_instance.save(update_fields=["value_select"])
+    # Clear select values that no longer exist
+    custom_field.fields.exclude(
+        value_select__in=select_options.keys(),
+    ).update(value_select=None)
 
+    for cf_instance in custom_field.fields.select_related("document").iterator():
         # Update the filename and move files if necessary
         update_filename_and_move_files(CustomFieldInstance, cf_instance)
 
