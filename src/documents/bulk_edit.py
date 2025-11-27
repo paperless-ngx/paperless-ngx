@@ -219,30 +219,76 @@ def modify_custom_fields(
     custom_fields = CustomField.objects.filter(
         id__in=[int(field) for field, _ in add_custom_fields],
     ).distinct()
+
+    to_create = []
+
+    changed_columns = set()
+    # for each custom field to add, update or create instances for all affected docs
     for field_id, value in add_custom_fields:
+        custom_field = custom_fields.get(id=field_id)
         for doc_id in affected_docs:
             defaults = {}
-            custom_field = custom_fields.get(id=field_id)
-            if custom_field:
-                value_field = CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
-                    custom_field.data_type
-                ]
-                defaults[value_field] = value
-                if (
-                    custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK
-                    and value
-                    and doc_id in value
-                ):
-                    # Prevent self-linking
-                    continue
-            CustomFieldInstance.objects.update_or_create(
-                document_id=doc_id,
-                field_id=field_id,
-                defaults=defaults,
-            )
+            value_field = CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                custom_field.data_type
+            ]
+            changed_columns.add(value_field)
+            defaults[value_field] = value
+
+            if (
+                custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK
+                and value
+                and doc_id in value
+            ):
+                # Prevent self-linking
+                continue
+
+            x = CustomFieldInstance(document_id=doc_id, field_id=field_id, **defaults)
+
+            to_create.append(x)
+
             if custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
                 doc = Document.objects.get(id=doc_id)
                 reflect_doclinks(doc, custom_field, value)
+
+    # We could do the following, but only postgres and sqlite support the
+    # update_conflicts upsert statement. In order to support mariadb/mysql,
+    # we need to separate out the creates and updates
+    #
+    # CustomFieldInstance.objects.bulk_create(to_create,
+    #                                         update_conflicts=True,
+    #                                         unique_fields=["document_id", "field_id"],
+    #                                         update_fields=changed_columns)
+
+    # Query for existing instances to separate creates from updates
+    existing_instances = {
+        (x.document_id, x.field_id): x
+        for x in CustomFieldInstance.objects.filter(
+            document_id__in=affected_docs,
+            field_id__in=[field for field, _ in add_custom_fields],
+        )
+    }
+
+    # Separate into creates and updates
+    instances_to_create = []
+    instances_to_update = []
+    for x in to_create:
+        existing = existing_instances.get((x.document_id, x.field_id))
+        if existing is None:
+            instances_to_create.append(x)
+        else:
+            # Copy values from new instance to existing
+            for field_name in changed_columns:
+                setattr(existing, field_name, getattr(x, field_name))
+            instances_to_update.append(existing)
+
+    # actually do the create and updates
+    if instances_to_create:
+        CustomFieldInstance.objects.bulk_create(instances_to_create)
+    if instances_to_update:
+        CustomFieldInstance.objects.bulk_update(
+            instances_to_update,
+            list(changed_columns),
+        )
 
     # For doc link fields that are being removed, remove symmetrical links
     for doclink_being_removed_instance in CustomFieldInstance.objects.filter(
@@ -252,6 +298,9 @@ def modify_custom_fields(
         value_document_ids__isnull=False,
     ):
         for target_doc_id in doclink_being_removed_instance.value:
+            # updating doclinks is still done in a for loop due to complexity,
+            # and bulk editing 100+ documents to have the same doclink seems
+            # a bit contrived
             remove_doclink(
                 document=Document.objects.get(
                     id=doclink_being_removed_instance.document.id,
