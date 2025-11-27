@@ -48,6 +48,47 @@ matcher.
 
     Defaults to no prefix.
 
+#### Redis Sentinel Configuration
+
+Instead of using `PAPERLESS_REDIS`, you can configure Redis Sentinel for high availability:
+
+##### [`PAPERLESS_REDIS_SENTINEL_HOSTS=<hosts>`](#PAPERLESS_REDIS_SENTINEL_HOSTS) {#PAPERLESS_REDIS_SENTINEL_HOSTS}
+
+: Comma-separated list of Redis Sentinel hosts and ports.
+    
+    Example: `sentinel1:26379,sentinel2:26379,sentinel3:26379`
+
+##### [`PAPERLESS_REDIS_SENTINEL_SERVICE_NAME=<name>`](#PAPERLESS_REDIS_SENTINEL_SERVICE_NAME) {#PAPERLESS_REDIS_SENTINEL_SERVICE_NAME}
+
+: The Redis service name monitored by Sentinel.
+    
+    Defaults to `mymaster`.
+
+##### [`PAPERLESS_REDIS_SENTINEL_PASSWORD=<password>`](#PAPERLESS_REDIS_SENTINEL_PASSWORD) {#PAPERLESS_REDIS_SENTINEL_PASSWORD}
+
+: Password for Sentinel authentication (optional).
+
+##### [`PAPERLESS_REDIS_SENTINEL_USERNAME=<username>`](#PAPERLESS_REDIS_SENTINEL_USERNAME) {#PAPERLESS_REDIS_SENTINEL_USERNAME}
+
+: Username for Redis authentication (optional).
+
+##### [`PAPERLESS_REDIS_SENTINEL_DB=<db>`](#PAPERLESS_REDIS_SENTINEL_DB) {#PAPERLESS_REDIS_SENTINEL_DB}
+
+: Redis database number.
+    
+    Defaults to `0`.
+
+##### [`PAPERLESS_REDIS_PASSWORD=<password>`](#PAPERLESS_REDIS_PASSWORD) {#PAPERLESS_REDIS_PASSWORD}
+
+: Password for Redis instance authentication when using Sentinel.
+
+!!! note
+
+    When Redis Sentinel configuration is provided, it takes precedence over `PAPERLESS_REDIS`. 
+    The Sentinel configuration enables automatic failover and high availability for your Redis setup.
+    
+    See the example Docker Compose file at `docker/compose/docker-compose.postgres-sentinel.yml` for a complete Redis Sentinel setup.
+
 ### Database
 
 By default, Paperless uses **SQLite** with a database stored at `data/db.sqlite3`.

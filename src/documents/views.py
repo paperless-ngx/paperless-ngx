@@ -66,7 +66,7 @@ from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
 from langdetect import detect
 from packaging import version as packaging_version
-from redis import Redis
+# Redis connection via settings helper function
 from rest_framework import parsers
 from rest_framework import serializers
 from rest_framework.decorators import action
@@ -2972,22 +2972,34 @@ class SystemStatusView(PassUserMixin):
 
         media_stats = os.statvfs(settings.MEDIA_ROOT)
 
-        redis_url = settings._CHANNELS_REDIS_URL
-        redis_url_parsed = urlparse(redis_url)
-        redis_constructed_url = f"{redis_url_parsed.scheme}://{redis_url_parsed.path or redis_url_parsed.hostname}"
-        if redis_url_parsed.hostname is not None:
-            redis_constructed_url += f":{redis_url_parsed.port}"
         redis_error = None
-        with Redis.from_url(url=redis_url) as client:
+        redis_constructed_url = "Redis/Sentinel"
+        try:
+            # Use the helper function from settings to get the appropriate Redis client
+            client = settings._get_redis_connection()
             try:
                 client.ping()
                 redis_status = "OK"
+                # Try to get connection info for display
+                if hasattr(client, 'connection_pool') and hasattr(client.connection_pool, 'connection_kwargs'):
+                    conn_kwargs = client.connection_pool.connection_kwargs
+                    if 'host' in conn_kwargs and 'port' in conn_kwargs:
+                        redis_constructed_url = f"redis://{conn_kwargs['host']}:{conn_kwargs['port']}"
             except Exception as e:
                 redis_status = "ERROR"
                 logger.exception(
                     f"System status detected a possible problem while connecting to redis: {e}",
                 )
                 redis_error = "Error connecting to redis, check logs for more detail."
+            finally:
+                if hasattr(client, 'close'):
+                    client.close()
+        except Exception as e:
+            redis_status = "ERROR"
+            logger.exception(
+                f"System status detected a possible problem while creating redis connection: {e}",
+            )
+            redis_error = "Error creating redis connection, check logs for more detail."
 
         celery_error = None
         celery_url = None

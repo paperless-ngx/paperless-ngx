@@ -1,0 +1,154 @@
+# Docker Compose file for Paperless-ngx with PostgreSQL and Redis Sentinel
+# This example shows how to configure Redis Sentinel for high availability
+#
+# Usage:
+#   docker-compose -f docker-compose.postgres-sentinel.yml up
+
+services:
+  # Redis Master
+  redis-master:
+    image: docker.io/library/redis:7-alpine
+    command: redis-server --protected-mode no --port 6379
+    networks:
+      - paperless
+
+  # Redis Sentinel instances
+  sentinel-1:
+    image: docker.io/library/redis:7-alpine
+    command: >
+      sh -c "echo 'sentinel announce-ip sentinel-1
+      sentinel monitor mymaster redis-master 6379 2
+      sentinel down-after-milliseconds mymaster 5000
+      sentinel failover-timeout mymaster 60000
+      sentinel parallel-syncs mymaster 1' > /tmp/sentinel.conf &&
+      redis-sentinel /tmp/sentinel.conf"
+    depends_on:
+      - redis-master
+    networks:
+      - paperless
+
+  sentinel-2:
+    image: docker.io/library/redis:7-alpine
+    command: >
+      sh -c "echo 'sentinel announce-ip sentinel-2
+      sentinel monitor mymaster redis-master 6379 2
+      sentinel down-after-milliseconds mymaster 5000
+      sentinel failover-timeout mymaster 60000
+      sentinel parallel-syncs mymaster 1' > /tmp/sentinel.conf &&
+      redis-sentinel /tmp/sentinel.conf"
+    depends_on:
+      - redis-master
+    networks:
+      - paperless
+
+  sentinel-3:
+    image: docker.io/library/redis:7-alpine
+    command: >
+      sh -c "echo 'sentinel announce-ip sentinel-3
+      sentinel monitor mymaster redis-master 6379 2
+      sentinel down-after-milliseconds mymaster 5000
+      sentinel failover-timeout mymaster 60000
+      sentinel parallel-syncs mymaster 1' > /tmp/sentinel.conf &&
+      redis-sentinel /tmp/sentinel.conf"
+    depends_on:
+      - redis-master
+    networks:
+      - paperless
+
+  # Database
+  db:
+    image: docker.io/library/postgres:16
+    restart: unless-stopped
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: paperless
+      POSTGRES_USER: paperless
+      POSTGRES_PASSWORD: paperless
+    networks:
+      - paperless
+
+  # Paperless-ngx services
+  webserver:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    restart: unless-stopped
+    depends_on:
+      - db
+      - sentinel-1
+      - sentinel-2
+      - sentinel-3
+    ports:
+      - "8000:8000"
+    volumes:
+      - data:/usr/src/paperless/data
+      - media:/usr/src/paperless/media
+      - ./export:/usr/src/paperless/export
+      - ./consume:/usr/src/paperless/consume
+    environment:
+      PAPERLESS_REDIS_SENTINEL_HOSTS: sentinel-1:26379,sentinel-2:26379,sentinel-3:26379
+      PAPERLESS_REDIS_SENTINEL_SERVICE_NAME: mymaster
+      PAPERLESS_DBENGINE: postgresql
+      PAPERLESS_DBHOST: db
+      PAPERLESS_DBUSER: paperless
+      PAPERLESS_DBPASS: paperless
+      PAPERLESS_DBNAME: paperless
+    networks:
+      - paperless
+
+  task-queue:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    restart: unless-stopped
+    depends_on:
+      - db
+      - sentinel-1
+      - sentinel-2
+      - sentinel-3
+    volumes:
+      - data:/usr/src/paperless/data
+      - media:/usr/src/paperless/media
+      - ./export:/usr/src/paperless/export
+      - ./consume:/usr/src/paperless/consume
+    environment:
+      PAPERLESS_REDIS_SENTINEL_HOSTS: sentinel-1:26379,sentinel-2:26379,sentinel-3:26379
+      PAPERLESS_REDIS_SENTINEL_SERVICE_NAME: mymaster
+      PAPERLESS_DBENGINE: postgresql
+      PAPERLESS_DBHOST: db
+      PAPERLESS_DBUSER: paperless
+      PAPERLESS_DBPASS: paperless
+      PAPERLESS_DBNAME: paperless
+      PAPERLESS_TASK_WORKERS: 2
+    command: ["python3", "manage.py", "qcluster"]
+    networks:
+      - paperless
+
+  scheduler:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    restart: unless-stopped
+    depends_on:
+      - db
+      - sentinel-1
+      - sentinel-2
+      - sentinel-3
+    volumes:
+      - data:/usr/src/paperless/data
+      - media:/usr/src/paperless/media
+    environment:
+      PAPERLESS_REDIS_SENTINEL_HOSTS: sentinel-1:26379,sentinel-2:26379,sentinel-3:26379
+      PAPERLESS_REDIS_SENTINEL_SERVICE_NAME: mymaster
+      PAPERLESS_DBENGINE: postgresql
+      PAPERLESS_DBHOST: db
+      PAPERLESS_DBUSER: paperless
+      PAPERLESS_DBPASS: paperless
+      PAPERLESS_DBNAME: paperless
+    command: ["python3", "manage.py", "celeryd_beat"]
+    networks:
+      - paperless
+
+volumes:
+  data:
+  media:
+  pgdata:
+
+networks:
+  paperless:
+    driver: bridge
