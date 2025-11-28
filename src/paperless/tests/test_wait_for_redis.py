@@ -76,7 +76,7 @@ class TestSentinelConfigParsing:
             {
                 "PAPERLESS_REDIS_SENTINEL_HOSTS": "s1:26379,s2:26380,s3:26381",
                 "PAPERLESS_REDIS_SENTINEL_SERVICE_NAME": "myredis",
-                "PAPERLESS_REDIS_SENTINEL_PASSWORD": "sentinel_pass",  # nosec
+                "PAPERLESS_REDIS_SENTINEL_PASSWORD": "sentinel_pass",
                 "PAPERLESS_REDIS_SENTINEL_USERNAME": "redis_user",
                 "PAPERLESS_REDIS_SENTINEL_DB": "2",
             },
@@ -133,8 +133,8 @@ class TestRedisClientCreation:
             {
                 "PAPERLESS_REDIS_SENTINEL_HOSTS": "s1:26379,s2:26379",
                 "PAPERLESS_REDIS_SENTINEL_SERVICE_NAME": "mymaster",
-                "PAPERLESS_REDIS_SENTINEL_PASSWORD": "sentinel_pass",  # nosec
-                "PAPERLESS_REDIS_PASSWORD": "redis_pass",  # nosec
+                "PAPERLESS_REDIS_SENTINEL_PASSWORD": "sentinel_pass",
+                "PAPERLESS_REDIS_PASSWORD": "redis_pass",
                 "PAPERLESS_REDIS_SENTINEL_USERNAME": "redis_user",
                 "PAPERLESS_REDIS_SENTINEL_DB": "1",
             },
@@ -157,7 +157,7 @@ class TestRedisClientCreation:
         mock_sentinel.master_for.assert_called_once_with(
             "mymaster",
             username="redis_user",
-            password="redis_pass",  # nosec
+            password="redis_pass",
             db=1,
         )
 
