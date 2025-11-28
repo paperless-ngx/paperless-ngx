@@ -120,9 +120,10 @@ class RedisSentinelIntegrationTest(TestCase):
         ):
             from paperless.settings import _parse_redis_sentinel_config
 
-        config = _parse_redis_sentinel_config()
+            config = _parse_redis_sentinel_config()
 
-        # Should handle empty entries gracefully
-        self.assertEqual(len(config["hosts"]), 2)
-        self.assertEqual(config["hosts"][0], ("s1", 26379))
-        self.assertEqual(config["hosts"][1], ("s2", 26379))
+            # Should handle empty entries gracefully
+            self.assertIsNotNone(config)
+            self.assertEqual(len(config["hosts"]), 2)
+            self.assertEqual(config["hosts"][0], ("s1", 26379))
+            self.assertEqual(config["hosts"][1], ("s2", 26379))
