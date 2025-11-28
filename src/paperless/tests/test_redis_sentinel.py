@@ -34,7 +34,7 @@ class RedisSentinelTestMixin:
             if var in os.environ:
                 del os.environ[var]
 
-    def tearDown(self):
+    def tearDown(self):  # noqa: N802
         """Clean up environment variables after each test."""
         self._cleanup_sentinel_env_vars()
         super().tearDown()
