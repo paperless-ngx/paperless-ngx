@@ -17,10 +17,10 @@ from paperless.settings import _parse_redis_url
 
 
 class RedisSentinelTestMixin:
-    """Mixin providing common tearDown for Redis Sentinel tests."""
+    """Mixin providing common cleanup for Redis Sentinel tests."""
 
-    def tearDown(self):
-        """Clean up environment variables after each test."""
+    def _cleanup_sentinel_env_vars(self):
+        """Clean up Redis Sentinel environment variables."""
         sentinel_vars = [
             "PAPERLESS_REDIS_SENTINEL_HOSTS",
             "PAPERLESS_REDIS_SENTINEL_SERVICE_NAME",
@@ -33,6 +33,11 @@ class RedisSentinelTestMixin:
         for var in sentinel_vars:
             if var in os.environ:
                 del os.environ[var]
+
+    def tearDown(self):
+        """Clean up environment variables after each test."""
+        self._cleanup_sentinel_env_vars()
+        super().tearDown()
 
 
 class RedisSentinelConfigTest(RedisSentinelTestMixin, TestCase):

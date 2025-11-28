@@ -11,17 +11,17 @@ import sys
 import time
 from pathlib import Path
 
-import click
-from redis import Redis
-from redis.sentinel import Sentinel
-
 # Add the src directory to the path to import shared utilities
 # Resolve path relative to this script's location
 script_dir = Path(__file__).resolve().parent
 src_dir = script_dir / ".." / ".." / ".." / ".." / "src"
 sys.path.insert(0, str(src_dir.resolve()))
 
-from paperless.redis_sentinel_utils import parse_redis_sentinel_config
+import click  # noqa: E402
+from redis import Redis  # noqa: E402
+from redis.sentinel import Sentinel  # noqa: E402
+
+from paperless.redis_sentinel_utils import parse_redis_sentinel_config  # noqa: E402
 
 
 def get_redis_client(redis_url: str | None = None):
