@@ -76,7 +76,7 @@ class TestSentinelConfigParsing:
             {
                 "PAPERLESS_REDIS_SENTINEL_HOSTS": "s1:26379,s2:26380,s3:26381",
                 "PAPERLESS_REDIS_SENTINEL_SERVICE_NAME": "myredis",
-                "PAPERLESS_REDIS_SENTINEL_PASSWORD": "sentinel_pass",
+                "PAPERLESS_REDIS_SENTINEL_PASSWORD": "sentinel_pass",  # NOSONAR
                 "PAPERLESS_REDIS_SENTINEL_USERNAME": "redis_user",
                 "PAPERLESS_REDIS_SENTINEL_DB": "2",
             },
@@ -87,7 +87,7 @@ class TestSentinelConfigParsing:
         expected = {
             "hosts": [("s1", 26379), ("s2", 26380), ("s3", 26381)],
             "service_name": "myredis",
-            "password": "sentinel_pass",
+            "password": "sentinel_pass",  # NOSONAR
             "db": 2,
             "username": "redis_user",
         }
@@ -133,8 +133,8 @@ class TestRedisClientCreation:
             {
                 "PAPERLESS_REDIS_SENTINEL_HOSTS": "s1:26379,s2:26379",
                 "PAPERLESS_REDIS_SENTINEL_SERVICE_NAME": "mymaster",
-                "PAPERLESS_REDIS_SENTINEL_PASSWORD": "sentinel_pass",
-                "PAPERLESS_REDIS_PASSWORD": "redis_pass",
+                "PAPERLESS_REDIS_SENTINEL_PASSWORD": "sentinel_pass",  # NOSONAR
+                "PAPERLESS_REDIS_PASSWORD": "redis_pass",  # NOSONAR
                 "PAPERLESS_REDIS_SENTINEL_USERNAME": "redis_user",
                 "PAPERLESS_REDIS_SENTINEL_DB": "1",
             },
@@ -150,14 +150,14 @@ class TestRedisClientCreation:
         # Verify Sentinel was created with correct parameters
         mock_sentinel_class.assert_called_once_with(
             [("s1", 26379), ("s2", 26379)],
-            password="sentinel_pass",
+            password="sentinel_pass",  # NOSONAR
         )
 
         # Verify master_for was called with correct parameters
         mock_sentinel.master_for.assert_called_once_with(
             "mymaster",
             username="redis_user",
-            password="redis_pass",
+            password="redis_pass",  # NOSONAR
             db=1,
         )
 
