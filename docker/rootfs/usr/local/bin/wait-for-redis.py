@@ -9,44 +9,24 @@ Supports both regular Redis connections and Redis Sentinel configurations.
 import os
 import sys
 import time
+from pathlib import Path
 
 import click
 from redis import Redis
 from redis.sentinel import Sentinel
 
+# Add the src directory to the path to import shared utilities
+# Resolve path relative to this script's location
+script_dir = Path(__file__).resolve().parent
+src_dir = script_dir / ".." / ".." / ".." / ".." / "src"
+sys.path.insert(0, str(src_dir.resolve()))
 
-def parse_sentinel_config():
-    """Parse Redis Sentinel configuration from environment variables."""
-    sentinel_hosts = os.getenv("PAPERLESS_REDIS_SENTINEL_HOSTS")
-    sentinel_service = os.getenv("PAPERLESS_REDIS_SENTINEL_SERVICE_NAME", "mymaster")
-
-    if not sentinel_hosts:
-        return None
-
-    # Parse hosts in format "host1:port1,host2:port2"
-    hosts = []
-    for host_port in sentinel_hosts.split(","):
-        host_port = host_port.strip()
-        if not host_port:  # Skip empty entries
-            continue
-        if ":" in host_port:
-            host, port = host_port.split(":")
-            hosts.append((host.strip(), int(port.strip())))
-        else:
-            hosts.append((host_port.strip(), 26379))  # Default Sentinel port
-
-    return {
-        "hosts": hosts,
-        "service_name": sentinel_service,
-        "password": os.getenv("PAPERLESS_REDIS_SENTINEL_PASSWORD"),
-        "db": int(os.getenv("PAPERLESS_REDIS_SENTINEL_DB", "0")),
-        "username": os.getenv("PAPERLESS_REDIS_SENTINEL_USERNAME"),
-    }
+from paperless.redis_sentinel_utils import parse_redis_sentinel_config
 
 
 def get_redis_client(redis_url: str | None = None):
     """Get a Redis client, either direct or via Sentinel."""
-    sentinel_config = parse_sentinel_config()
+    sentinel_config = parse_redis_sentinel_config()
 
     if sentinel_config:
         click.echo(

@@ -6,39 +6,7 @@ import os
 from unittest.mock import Mock
 from unittest.mock import patch
 
-# We'll mock the wait-for-redis script functions for testing
-# Since it's a standalone script, we'll create equivalent functions for testing
-
-
-def parse_sentinel_config():
-    """Mock parse_sentinel_config function for testing."""
-    import os
-
-    sentinel_hosts = os.getenv("PAPERLESS_REDIS_SENTINEL_HOSTS")
-    sentinel_service = os.getenv("PAPERLESS_REDIS_SENTINEL_SERVICE_NAME", "mymaster")
-
-    if not sentinel_hosts:
-        return None
-
-    # Parse hosts in format "host1:port1,host2:port2"
-    hosts = []
-    for host_port in sentinel_hosts.split(","):
-        host_port = host_port.strip()
-        if not host_port:  # Skip empty entries
-            continue
-        if ":" in host_port:
-            host, port = host_port.split(":")
-            hosts.append((host.strip(), int(port.strip())))
-        else:
-            hosts.append((host_port.strip(), 26379))  # Default Sentinel port
-
-    return {
-        "hosts": hosts,
-        "service_name": sentinel_service,
-        "password": os.getenv("PAPERLESS_REDIS_SENTINEL_PASSWORD"),
-        "db": int(os.getenv("PAPERLESS_REDIS_SENTINEL_DB", "0")),
-        "username": os.getenv("PAPERLESS_REDIS_SENTINEL_USERNAME"),
-    }
+from paperless.redis_sentinel_utils import parse_redis_sentinel_config
 
 
 def get_redis_client(redis_url=None):
@@ -46,7 +14,7 @@ def get_redis_client(redis_url=None):
     from redis import Redis
     from redis.sentinel import Sentinel
 
-    sentinel_config = parse_sentinel_config()
+    sentinel_config = parse_redis_sentinel_config()
 
     if sentinel_config:
         sentinel = Sentinel(
@@ -84,14 +52,14 @@ class TestSentinelConfigParsing:
 
     def test_no_sentinel_config(self):
         """Test that None is returned when no Sentinel config is present."""
-        config = parse_sentinel_config()
+        config = parse_redis_sentinel_config()
         assert config is None
 
     def test_basic_sentinel_config(self):
         """Test basic Sentinel configuration parsing."""
         os.environ["PAPERLESS_REDIS_SENTINEL_HOSTS"] = "sentinel1:26379,sentinel2:26379"
 
-        config = parse_sentinel_config()
+        config = parse_redis_sentinel_config()
 
         expected = {
             "hosts": [("sentinel1", 26379), ("sentinel2", 26379)],
@@ -114,7 +82,7 @@ class TestSentinelConfigParsing:
             },
         )
 
-        config = parse_sentinel_config()
+        config = parse_redis_sentinel_config()
 
         expected = {
             "hosts": [("s1", 26379), ("s2", 26380), ("s3", 26381)],
@@ -131,7 +99,7 @@ class TestSentinelConfigParsing:
             "sentinel1,sentinel2:26380,sentinel3"
         )
 
-        config = parse_sentinel_config()
+        config = parse_redis_sentinel_config()
 
         expected_hosts = [
             ("sentinel1", 26379),
@@ -242,6 +210,11 @@ class TestWaitCommand:
             / "wait-for-redis.py"
         )
 
+        # Set PYTHONPATH to include the src directory
+        env = os.environ.copy()
+        src_path = Path(__file__).parent.parent.parent
+        env["PYTHONPATH"] = str(src_path)
+
         # Test that the script can show help without errors
         result = subprocess.run(
             [
@@ -251,6 +224,7 @@ class TestWaitCommand:
             ],
             capture_output=True,
             text=True,
+            env=env,
         )
 
         assert result.returncode == 0
