@@ -16,8 +16,8 @@ from paperless.settings import _parse_redis_sentinel_config
 from paperless.settings import _parse_redis_url
 
 
-class RedisSentinelConfigTest(TestCase):
-    """Test Redis Sentinel configuration parsing."""
+class RedisSentinelTestMixin:
+    """Mixin providing common tearDown for Redis Sentinel tests."""
 
     def tearDown(self):
         """Clean up environment variables after each test."""
@@ -28,10 +28,15 @@ class RedisSentinelConfigTest(TestCase):
             "PAPERLESS_REDIS_SENTINEL_USERNAME",
             "PAPERLESS_REDIS_SENTINEL_DB",
             "PAPERLESS_REDIS_PASSWORD",
+            "PAPERLESS_REDIS",
         ]
         for var in sentinel_vars:
             if var in os.environ:
                 del os.environ[var]
+
+
+class RedisSentinelConfigTest(RedisSentinelTestMixin, TestCase):
+    """Test Redis Sentinel configuration parsing."""
 
     def test_no_sentinel_config(self):
         """Test that None is returned when no Sentinel config is present."""
@@ -103,21 +108,8 @@ class RedisSentinelConfigTest(TestCase):
         self.assertEqual(config["hosts"], expected_hosts)
 
 
-class RedisUrlParsingTest(TestCase):
+class RedisUrlParsingTest(RedisSentinelTestMixin, TestCase):
     """Test Redis URL parsing with Sentinel support."""
-
-    def tearDown(self):
-        """Clean up environment variables after each test."""
-        sentinel_vars = [
-            "PAPERLESS_REDIS_SENTINEL_HOSTS",
-            "PAPERLESS_REDIS_SENTINEL_SERVICE_NAME",
-            "PAPERLESS_REDIS_SENTINEL_PASSWORD",
-            "PAPERLESS_REDIS_SENTINEL_USERNAME",
-            "PAPERLESS_REDIS_SENTINEL_DB",
-        ]
-        for var in sentinel_vars:
-            if var in os.environ:
-                del os.environ[var]
 
     def test_parse_redis_url_with_sentinel(self):
         """Test Redis URL parsing when Sentinel is configured."""
@@ -156,22 +148,8 @@ class RedisUrlParsingTest(TestCase):
         self.assertEqual(channels_url, "unix:///tmp/redis.sock")
 
 
-class CeleryBrokerConfigTest(TestCase):
+class CeleryBrokerConfigTest(RedisSentinelTestMixin, TestCase):
     """Test Celery broker configuration with Sentinel."""
-
-    def tearDown(self):
-        """Clean up environment variables after each test."""
-        sentinel_vars = [
-            "PAPERLESS_REDIS_SENTINEL_HOSTS",
-            "PAPERLESS_REDIS_SENTINEL_SERVICE_NAME",
-            "PAPERLESS_REDIS_SENTINEL_PASSWORD",
-            "PAPERLESS_REDIS_PASSWORD",
-            "PAPERLESS_REDIS_SENTINEL_USERNAME",
-            "PAPERLESS_REDIS_SENTINEL_DB",
-        ]
-        for var in sentinel_vars:
-            if var in os.environ:
-                del os.environ[var]
 
     def test_celery_config_with_sentinel(self):
         """Test Celery broker configuration with Sentinel."""
@@ -224,22 +202,8 @@ class CeleryBrokerConfigTest(TestCase):
         self.assertEqual(transport_options, {"global_keyprefix": ""})
 
 
-class ChannelLayersConfigTest(TestCase):
+class ChannelLayersConfigTest(RedisSentinelTestMixin, TestCase):
     """Test Django Channels configuration with Sentinel."""
-
-    def tearDown(self):
-        """Clean up environment variables after each test."""
-        sentinel_vars = [
-            "PAPERLESS_REDIS_SENTINEL_HOSTS",
-            "PAPERLESS_REDIS_SENTINEL_SERVICE_NAME",
-            "PAPERLESS_REDIS_SENTINEL_PASSWORD",
-            "PAPERLESS_REDIS_PASSWORD",
-            "PAPERLESS_REDIS_SENTINEL_USERNAME",
-            "PAPERLESS_REDIS_SENTINEL_DB",
-        ]
-        for var in sentinel_vars:
-            if var in os.environ:
-                del os.environ[var]
 
     def test_channel_layers_with_sentinel(self):
         """Test channel layers configuration with Sentinel."""
@@ -294,23 +258,8 @@ class ChannelLayersConfigTest(TestCase):
         self.assertNotIn("sentinel", config["default"]["CONFIG"])
 
 
-class RedisConnectionTest(TestCase):
+class RedisConnectionTest(RedisSentinelTestMixin, TestCase):
     """Test Redis connection helper function."""
-
-    def tearDown(self):
-        """Clean up environment variables after each test."""
-        sentinel_vars = [
-            "PAPERLESS_REDIS_SENTINEL_HOSTS",
-            "PAPERLESS_REDIS_SENTINEL_SERVICE_NAME",
-            "PAPERLESS_REDIS_SENTINEL_PASSWORD",
-            "PAPERLESS_REDIS_PASSWORD",
-            "PAPERLESS_REDIS_SENTINEL_USERNAME",
-            "PAPERLESS_REDIS_SENTINEL_DB",
-            "PAPERLESS_REDIS",
-        ]
-        for var in sentinel_vars:
-            if var in os.environ:
-                del os.environ[var]
 
     @patch("redis.sentinel.Sentinel")
     def test_get_redis_connection_with_sentinel(self, mock_sentinel_class):

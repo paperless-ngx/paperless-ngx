@@ -19,6 +19,9 @@ from dotenv import load_dotenv
 
 logger = logging.getLogger("paperless.settings")
 
+# Default Redis URL constant
+_DEFAULT_REDIS_URL = "redis://localhost:6379"
+
 # Tap paperless.conf if it's available
 for path in [
     os.getenv("PAPERLESS_CONFIGURATION_PATH"),
@@ -168,7 +171,7 @@ def _get_redis_connection():
         )
     else:
         # Fallback to regular Redis URL
-        redis_url = os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")
+        redis_url = os.getenv("PAPERLESS_REDIS", _DEFAULT_REDIS_URL)
         return Redis.from_url(redis_url)
 
 
@@ -201,7 +204,7 @@ def _parse_redis_url(env_redis: str | None) -> tuple[str, str]:
 
     # Not set, return a compatible default
     if env_redis is None:
-        return ("redis://localhost:6379", "redis://localhost:6379")
+        return (_DEFAULT_REDIS_URL, _DEFAULT_REDIS_URL)
 
     if "unix" in env_redis.lower():
         # channels_redis socket format, looks like:
