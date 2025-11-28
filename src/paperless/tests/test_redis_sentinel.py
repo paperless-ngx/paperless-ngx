@@ -34,7 +34,7 @@ class RedisSentinelTestMixin:
             if var in os.environ:
                 del os.environ[var]
 
-    def tearDown(self):
+    def tearDown(self):  # NOSONAR
         """Clean up environment variables after each test."""
         self._cleanup_sentinel_env_vars()
         super().tearDown()
@@ -69,7 +69,7 @@ class RedisSentinelConfigTest(RedisSentinelTestMixin, TestCase):
             {
                 "PAPERLESS_REDIS_SENTINEL_HOSTS": "s1:26379,s2:26380,s3:26381",
                 "PAPERLESS_REDIS_SENTINEL_SERVICE_NAME": "myredis",
-                "PAPERLESS_REDIS_SENTINEL_PASSWORD": "sentinel_pass",
+                "PAPERLESS_REDIS_SENTINEL_PASSWORD": "sentinel_pass",  # NOSONAR
                 "PAPERLESS_REDIS_SENTINEL_USERNAME": "redis_user",
                 "PAPERLESS_REDIS_SENTINEL_DB": "2",
             },
@@ -80,7 +80,7 @@ class RedisSentinelConfigTest(RedisSentinelTestMixin, TestCase):
         expected = {
             "hosts": [("s1", 26379), ("s2", 26380), ("s3", 26381)],
             "service_name": "myredis",
-            "password": "sentinel_pass",
+            "password": "sentinel_pass",  # NOSONAR
             "db": 2,
             "username": "redis_user",
         }
@@ -162,8 +162,8 @@ class CeleryBrokerConfigTest(RedisSentinelTestMixin, TestCase):
             {
                 "PAPERLESS_REDIS_SENTINEL_HOSTS": "s1:26379,s2:26379",
                 "PAPERLESS_REDIS_SENTINEL_SERVICE_NAME": "mymaster",
-                "PAPERLESS_REDIS_SENTINEL_PASSWORD": "sentinel_pass",
-                "PAPERLESS_REDIS_PASSWORD": "redis_pass",
+                "PAPERLESS_REDIS_SENTINEL_PASSWORD": "sentinel_pass",  # NOSONAR
+                "PAPERLESS_REDIS_PASSWORD": "redis_pass",  # NOSONAR
                 "PAPERLESS_REDIS_SENTINEL_USERNAME": "redis_user",
                 "PAPERLESS_REDIS_SENTINEL_DB": "1",
             },
@@ -176,8 +176,8 @@ class CeleryBrokerConfigTest(RedisSentinelTestMixin, TestCase):
             "master_name": "mymaster",
             "sentinels": [("s1", 26379), ("s2", 26379)],
             "global_keyprefix": "",  # Default empty prefix
-            "sentinel_kwargs": {"password": "sentinel_pass"},
-            "password": "redis_pass",
+            "sentinel_kwargs": {"password": "sentinel_pass"},  # NOSONAR
+            "password": "redis_pass",  # NOSONAR
             "username": "redis_user",
             "db": 1,
         }
@@ -216,8 +216,8 @@ class ChannelLayersConfigTest(RedisSentinelTestMixin, TestCase):
             {
                 "PAPERLESS_REDIS_SENTINEL_HOSTS": "s1:26379,s2:26379",
                 "PAPERLESS_REDIS_SENTINEL_SERVICE_NAME": "mymaster",
-                "PAPERLESS_REDIS_SENTINEL_PASSWORD": "sentinel_pass",
-                "PAPERLESS_REDIS_PASSWORD": "redis_pass",
+                "PAPERLESS_REDIS_SENTINEL_PASSWORD": "sentinel_pass",  # NOSONAR
+                "PAPERLESS_REDIS_PASSWORD": "redis_pass",  # NOSONAR
                 "PAPERLESS_REDIS_SENTINEL_USERNAME": "redis_user",
                 "PAPERLESS_REDIS_SENTINEL_DB": "2",
             },
@@ -233,13 +233,13 @@ class ChannelLayersConfigTest(RedisSentinelTestMixin, TestCase):
         expected_sentinel = {
             "sentinels": [("s1", 26379), ("s2", 26379)],
             "service_name": "mymaster",
-            "sentinel_kwargs": {"password": "sentinel_pass"},
+            "sentinel_kwargs": {"password": "sentinel_pass"},  # NOSONAR
         }
         self.assertEqual(config["default"]["CONFIG"]["sentinel"], expected_sentinel)
 
         expected_connection = {
             "db": 2,
-            "password": "redis_pass",
+            "password": "redis_pass",  # NOSONAR
             "username": "redis_user",
         }
         self.assertEqual(
@@ -273,8 +273,8 @@ class RedisConnectionTest(RedisSentinelTestMixin, TestCase):
             {
                 "PAPERLESS_REDIS_SENTINEL_HOSTS": "s1:26379,s2:26379",
                 "PAPERLESS_REDIS_SENTINEL_SERVICE_NAME": "mymaster",
-                "PAPERLESS_REDIS_SENTINEL_PASSWORD": "sentinel_pass",
-                "PAPERLESS_REDIS_PASSWORD": "redis_pass",
+                "PAPERLESS_REDIS_SENTINEL_PASSWORD": "sentinel_pass",  # NOSONAR
+                "PAPERLESS_REDIS_PASSWORD": "redis_pass",  # NOSONAR
                 "PAPERLESS_REDIS_SENTINEL_USERNAME": "redis_user",
                 "PAPERLESS_REDIS_SENTINEL_DB": "1",
             },
@@ -290,14 +290,14 @@ class RedisConnectionTest(RedisSentinelTestMixin, TestCase):
         # Verify Sentinel was created with correct parameters
         mock_sentinel_class.assert_called_once_with(
             [("s1", 26379), ("s2", 26379)],
-            password="sentinel_pass",
+            password="sentinel_pass",  # NOSONAR
         )
 
         # Verify master_for was called with correct parameters
         mock_sentinel.master_for.assert_called_once_with(
             "mymaster",
             username="redis_user",
-            password="redis_pass",
+            password="redis_pass",  # NOSONAR
             db=1,
         )
 
