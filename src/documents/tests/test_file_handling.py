@@ -530,6 +530,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
     @override_settings(
         FILENAME_FORMAT="{{title}}_{{custom_fields|get_cf_value('test')}}",
+        CELERY_TASK_ALWAYS_EAGER=True,
     )
     @mock.patch("documents.signals.handlers.update_filename_and_move_files")
     def test_select_cf_updated(self, m):
@@ -569,7 +570,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertEqual(generate_filename(doc), Path("document_apple.pdf"))
 
         # handler should not have been called
-        self.assertEqual(m.delay.call_count, 0)
+        self.assertEqual(m.call_count, 0)
         cf.extra_data = {
             "select_options": [
                 {"label": "aubergine", "id": "abc123"},
@@ -579,8 +580,8 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         }
         cf.save()
         self.assertEqual(generate_filename(doc), Path("document_aubergine.pdf"))
-        # handler should have been called via delay
-        self.assertEqual(m.delay.call_count, 1)
+        # handler should have been called once via the async task
+        self.assertEqual(m.call_count, 1)
 
 
 class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
