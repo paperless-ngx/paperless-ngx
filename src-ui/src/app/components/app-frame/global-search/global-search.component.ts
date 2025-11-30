@@ -411,6 +411,9 @@ export class GlobalSearchComponent implements OnInit {
     const ruleType = this.useAdvancedForFullSearch
       ? FILTER_FULLTEXT_QUERY
       : FILTER_TITLE_CONTENT
+    this.documentService.searchQuery = this.useAdvancedForFullSearch
+      ? this.query
+      : ''
     this.documentListViewService.quickFilter([
       { rule_type: ruleType, value: this.query },
     ])
