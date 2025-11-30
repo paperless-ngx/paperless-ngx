@@ -396,7 +396,6 @@ class CannotMoveFilesException(Exception):
 @receiver(models.signals.post_save, sender=CustomFieldInstance, weak=False)
 @receiver(models.signals.m2m_changed, sender=Document.tags.through, weak=False)
 @receiver(models.signals.post_save, sender=Document, weak=False)
-@shared_task
 def update_filename_and_move_files(
     sender,
     instance: Document | CustomFieldInstance,
@@ -533,34 +532,43 @@ def update_filename_and_move_files(
             )
 
 
-# should be disabled in /src/documents/management/commands/document_importer.py handle
-@receiver(models.signals.post_save, sender=CustomField)
-def check_paths_and_prune_custom_fields(sender, instance: CustomField, **kwargs):
+@shared_task
+def process_cf_select_update(custom_field: CustomField):
     """
-    When a custom field is updated:
+    Update documents tied to a select custom field:
+
     1. 'Select' custom field instances get their end-user value (e.g. in file names) from the select_options in extra_data,
     which is contained in the custom field itself. So when the field is changed, we (may) need to update the file names
     of all documents that have this custom field.
     2. If a 'Select' field option was removed, we need to nullify the custom field instances that have the option.
+    """
+    select_options = {
+        option["id"]: option["label"]
+        for option in custom_field.extra_data.get("select_options", [])
+    }
+
+    # Clear select values that no longer exist
+    custom_field.fields.exclude(
+        value_select__in=select_options.keys(),
+    ).update(value_select=None)
+
+    for cf_instance in custom_field.fields.select_related("document").iterator():
+        # Update the filename and move files if necessary
+        update_filename_and_move_files(CustomFieldInstance, cf_instance)
+
+
+# should be disabled in /src/documents/management/commands/document_importer.py handle
+@receiver(models.signals.post_save, sender=CustomField)
+def check_paths_and_prune_custom_fields(sender, instance: CustomField, **kwargs):
+    """
+    When a custom field is updated, check if we need to update any documents. Done async to avoid slowing down the save operation.
     """
     if (
         instance.data_type == CustomField.FieldDataType.SELECT
         and instance.fields.count() > 0
         and instance.extra_data
     ):  # Only select fields, for now
-        select_options = {
-            option["id"]: option["label"]
-            for option in instance.extra_data.get("select_options", [])
-        }
-
-        for cf_instance in instance.fields.all():
-            # Check if the current value is still a valid option
-            if cf_instance.value not in select_options:
-                cf_instance.value_select = None
-                cf_instance.save(update_fields=["value_select"])
-
-            # Update the filename and move files if necessary
-            update_filename_and_move_files.delay(sender, cf_instance)
+        process_cf_select_update.delay(instance)
 
 
 @receiver(models.signals.post_delete, sender=CustomField)
