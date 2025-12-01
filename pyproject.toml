@@ -45,7 +45,7 @@ dependencies = [
   "drf-writable-nested~=0.7.1",
   "filelock~=3.20.0",
   "flower~=2.0.1",
-  "gotenberg-client~=0.12.0",
+  "gotenberg-client~=0.13.0",
   "httpx-oauth~=0.16",
   "imap-tools~=1.11.0",
   "inotifyrecursive~=0.3",
@@ -80,7 +80,7 @@ optional-dependencies.postgres = [
   "psycopg[c,pool]==3.2.12",
   # Direct dependency for proper resolution of the pre-built wheels
   "psycopg-c==3.2.12",
-  "psycopg-pool==3.2.7",
+  "psycopg-pool==3.3.0",
 ]
 optional-dependencies.webserver = [
   "granian[uvloop]~=2.5.1",
@@ -115,7 +115,7 @@ testing = [
 ]
 
 lint = [
-  "pre-commit~=4.4.0",
+  "pre-commit~=4.5.0",
   "pre-commit-uv~=4.2.0",
   "ruff~=0.14.0",
 ]
