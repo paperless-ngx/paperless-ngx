@@ -2,15 +2,11 @@
 
 ## paperless-ngx 2.20.1
 
-### Features / Enhancements
-
--   Fix: change async handling of select custom field updates [@shamoon](https://github.com/shamoon) ([#11490](https://github.com/paperless-ngx/paperless-ngx/pull/11490))
--   Fix: skip SSL for MariaDB ping in init script [@danielrheinbay](https://github.com/danielrheinbay) ([#11491](https://github.com/paperless-ngx/paperless-ngx/pull/11491))
-
 ### Bug Fixes
 
 -   Fix: set search term when using advanced search from global search [@shamoon](https://github.com/shamoon) ([#11503](https://github.com/paperless-ngx/paperless-ngx/pull/11503))
 -   Fix: change async handling of select custom field updates [@shamoon](https://github.com/shamoon) ([#11490](https://github.com/paperless-ngx/paperless-ngx/pull/11490))
+-   Fix: skip SSL for MariaDB ping in init script [@danielrheinbay](https://github.com/danielrheinbay) ([#11491](https://github.com/paperless-ngx/paperless-ngx/pull/11491))
 -   Fix: handle allauth groups location breaking change [@shamoon](https://github.com/shamoon) ([#11471](https://github.com/paperless-ngx/paperless-ngx/pull/11471))
 
 ### Dependencies
