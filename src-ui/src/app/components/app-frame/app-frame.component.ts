@@ -44,6 +44,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
+import { ChatComponent } from '../chat/chat/chat.component'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
@@ -59,6 +60,7 @@ import { ToastsDropdownComponent } from './toasts-dropdown/toasts-dropdown.compo
     DocumentTitlePipe,
     IfPermissionsDirective,
     ToastsDropdownComponent,
+    ChatComponent,
     RouterModule,
     NgClass,
     NgbDropdownModule,
@@ -182,6 +184,10 @@ export class AppFrameComponent
           console.warn(error)
         },
       })
+  }
+
+  get aiEnabled(): boolean {
+    return this.settingsService.get(SETTINGS_KEYS.AI_ENABLED)
   }
 
   closeMenu() {

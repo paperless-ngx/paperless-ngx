@@ -31,6 +31,8 @@ from guardian.shortcuts import remove_perm
 
 from documents import matching
 from documents.caching import clear_document_caches
+from documents.caching import invalidate_llm_suggestions_cache
+from documents.data_models import ConsumableDocument
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_unique_filename
@@ -53,6 +55,7 @@ from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import set_permissions_for_object
 from documents.templating.workflows import parse_w_workflow_placeholders
+from paperless.config import AIConfig
 
 if TYPE_CHECKING:
     from documents.classifier import DocumentClassifier
@@ -596,6 +599,15 @@ def cleanup_custom_field_deletion(sender, instance: CustomField, **kwargs):
         logger.debug(
             f"Removing custom field {instance} from sort field of {views_with_sort_updated} views",
         )
+
+
+@receiver(models.signals.post_save, sender=Document)
+def update_llm_suggestions_cache(sender, instance, **kwargs):
+    """
+    Invalidate the LLM suggestions cache when a document is saved.
+    """
+    # Invalidate the cache for the document
+    invalidate_llm_suggestions_cache(instance.pk)
 
 
 @receiver(models.signals.post_delete, sender=User)
@@ -1543,3 +1555,26 @@ def close_connection_pool_on_worker_init(**kwargs):
     for conn in connections.all(initialized_only=True):
         if conn.alias == "default" and hasattr(conn, "pool") and conn.pool:
             conn.close_pool()
+
+
+def add_or_update_document_in_llm_index(sender, document, **kwargs):
+    """
+    Add or update a document in the LLM index when it is created or updated.
+    """
+    ai_config = AIConfig()
+    if ai_config.llm_index_enabled():
+        from documents.tasks import update_document_in_llm_index
+
+        update_document_in_llm_index.delay(document)
+
+
+@receiver(models.signals.post_delete, sender=Document)
+def delete_document_from_llm_index(sender, instance: Document, **kwargs):
+    """
+    Delete a document from the LLM index when it is deleted.
+    """
+    ai_config = AIConfig()
+    if ai_config.llm_index_enabled():
+        from documents.tasks import remove_document_from_llm_index
+
+        remove_document_from_llm_index.delay(instance)
