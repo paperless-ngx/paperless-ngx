@@ -43,7 +43,7 @@ class TestMigrateMimeType(DirectoriesMixin, TestMigrations):
     migrate_from = "1002_auto_20201111_1105"
     migrate_to = "1003_mime_types"
 
-    def setUpBeforeMigration(self, apps):
+    def setUpBeforeMigration(self, apps) -> None:
         Document = apps.get_model("documents", "Document")
         doc = Document.objects.create(
             title="test",
@@ -73,7 +73,7 @@ class TestMigrateMimeType(DirectoriesMixin, TestMigrations):
             source_path_before(doc2),
         )
 
-    def testMimeTypesMigrated(self):
+    def testMimeTypesMigrated(self) -> None:
         Document = self.apps.get_model("documents", "Document")
 
         doc = Document.objects.get(id=self.doc_id)
@@ -88,7 +88,7 @@ class TestMigrateMimeTypeBackwards(DirectoriesMixin, TestMigrations):
     migrate_from = "1003_mime_types"
     migrate_to = "1002_auto_20201111_1105"
 
-    def setUpBeforeMigration(self, apps):
+    def setUpBeforeMigration(self, apps) -> None:
         Document = apps.get_model("documents", "Document")
         doc = Document.objects.create(
             title="test",
@@ -101,7 +101,7 @@ class TestMigrateMimeTypeBackwards(DirectoriesMixin, TestMigrations):
             source_path_after(doc),
         )
 
-    def testMimeTypesReverted(self):
+    def testMimeTypesReverted(self) -> None:
         Document = self.apps.get_model("documents", "Document")
 
         doc = Document.objects.get(id=self.doc_id)

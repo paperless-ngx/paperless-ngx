@@ -40,7 +40,7 @@ class Document:
     we need to make use of a lot of these shortcuts here.
     """
 
-    def __init__(self, doc):
+    def __init__(self, doc) -> None:
         self.pk = doc.pk
         self.correspondent = doc.correspondent
         self.title = doc.title
@@ -74,7 +74,7 @@ class Document:
         return slugify(str(self)) + "." + self.file_type
 
 
-def set_checksums(apps, schema_editor):
+def set_checksums(apps, schema_editor) -> None:
     document_model = apps.get_model("documents", "Document")
 
     if not document_model.objects.all().exists():
@@ -141,7 +141,7 @@ def set_checksums(apps, schema_editor):
         document_model.objects.filter(pk=document.pk).update(checksum=checksum)
 
 
-def do_nothing(apps, schema_editor):
+def do_nothing(apps, schema_editor) -> None:
     pass
 
 
