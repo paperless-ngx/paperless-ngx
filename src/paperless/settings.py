@@ -19,6 +19,9 @@ from dotenv import load_dotenv
 
 logger = logging.getLogger("paperless.settings")
 
+# Default Redis URL constant
+_DEFAULT_REDIS_URL = "redis://localhost:6379"
+
 # Tap paperless.conf if it's available
 for path in [
     os.getenv("PAPERLESS_CONFIGURATION_PATH"),
@@ -113,6 +116,43 @@ def __get_list(
         return []
 
 
+def _parse_redis_sentinel_config() -> dict | None:
+    """
+    Parse Redis Sentinel configuration from environment variables.
+
+    Returns a dict with sentinel configuration or None if not configured.
+    """
+    from paperless.redis_sentinel_utils import parse_redis_sentinel_config
+
+    return parse_redis_sentinel_config()
+
+
+def _get_redis_connection():
+    """
+    Get a Redis connection, either direct or via Sentinel.
+    """
+    from redis import Redis
+    from redis.sentinel import Sentinel
+
+    sentinel_config = _parse_redis_sentinel_config()
+
+    if sentinel_config:
+        sentinel = Sentinel(
+            sentinel_config["hosts"],
+            password=sentinel_config["password"],
+        )
+        return sentinel.master_for(
+            sentinel_config["service_name"],
+            username=sentinel_config["username"],
+            password=os.getenv("PAPERLESS_REDIS_PASSWORD"),
+            db=sentinel_config["db"],
+        )
+    else:
+        # Fallback to regular Redis URL
+        redis_url = os.getenv("PAPERLESS_REDIS", _DEFAULT_REDIS_URL)
+        return Redis.from_url(redis_url)
+
+
 def _parse_redis_url(env_redis: str | None) -> tuple[str, str]:
     """
     Gets the Redis information from the environment or a default and handles
@@ -121,9 +161,28 @@ def _parse_redis_url(env_redis: str | None) -> tuple[str, str]:
     Returns a tuple of (celery_url, channels_url)
     """
 
+    # Check for Sentinel configuration first
+    sentinel_config = _parse_redis_sentinel_config()
+    if sentinel_config:
+        # For Sentinel, we need to construct appropriate URLs
+        # Celery supports sentinel:// URLs
+        sentinel_hosts_str = ",".join(
+            f"{host}:{port}" for host, port in sentinel_config["hosts"]
+        )
+        celery_url = (
+            f"sentinel://{sentinel_hosts_str}/{sentinel_config['service_name']}"
+        )
+
+        # For channels-redis, we'll use the first sentinel host as fallback
+        # but configure sentinel in the CHANNEL_LAYERS config
+        first_host, first_port = sentinel_config["hosts"][0]
+        channels_url = f"redis://{first_host}:{first_port}/{sentinel_config['db']}"
+
+        return (celery_url, channels_url)
+
     # Not set, return a compatible default
     if env_redis is None:
-        return ("redis://localhost:6379", "redis://localhost:6379")
+        return (_DEFAULT_REDIS_URL, _DEFAULT_REDIS_URL)
 
     if "unix" in env_redis.lower():
         # channels_redis socket format, looks like:
@@ -457,17 +516,53 @@ TEMPLATES = [
     },
 ]
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.pubsub.RedisPubSubChannelLayer",
-        "CONFIG": {
-            "hosts": [_CHANNELS_REDIS_URL],
-            "capacity": 2000,  # default 100
-            "expiry": 15,  # default 60
-            "prefix": _REDIS_KEY_PREFIX,
-        },
-    },
-}
+
+def _get_channel_layers_config():
+    """
+    Configure channel layers with Redis Sentinel support if available.
+    """
+    sentinel_config = _parse_redis_sentinel_config()
+
+    if sentinel_config:
+        return {
+            "default": {
+                "BACKEND": "channels_redis.pubsub.RedisPubSubChannelLayer",
+                "CONFIG": {
+                    "sentinel": {
+                        "sentinels": sentinel_config["hosts"],
+                        "service_name": sentinel_config["service_name"],
+                        "sentinel_kwargs": {
+                            "password": sentinel_config["password"],
+                        }
+                        if sentinel_config["password"]
+                        else {},
+                    },
+                    "capacity": 2000,  # default 100
+                    "expiry": 15,  # default 60
+                    "prefix": _REDIS_KEY_PREFIX,
+                    "connection_kwargs": {
+                        "db": sentinel_config["db"],
+                        "password": os.getenv("PAPERLESS_REDIS_PASSWORD"),
+                        "username": sentinel_config["username"],
+                    },
+                },
+            },
+        }
+    else:
+        return {
+            "default": {
+                "BACKEND": "channels_redis.pubsub.RedisPubSubChannelLayer",
+                "CONFIG": {
+                    "hosts": [_CHANNELS_REDIS_URL],
+                    "capacity": 2000,  # default 100
+                    "expiry": 15,  # default 60
+                    "prefix": _REDIS_KEY_PREFIX,
+                },
+            },
+        }
+
+
+CHANNEL_LAYERS = _get_channel_layers_config()
 
 ###############################################################################
 # Email (SMTP) Backend                                                        #
@@ -890,7 +985,43 @@ logging.config.dictConfig(LOGGING)
 
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html
 
-CELERY_BROKER_URL = _CELERY_REDIS_URL
+
+def _get_celery_broker_config():
+    """
+    Configure Celery broker with Redis Sentinel support if available.
+    """
+    sentinel_config = _parse_redis_sentinel_config()
+
+    if sentinel_config:
+        # Celery supports Redis Sentinel via redis:// URL with Sentinel transport options
+        broker_url = "redis://sentinel"
+        transport_options = {
+            "master_name": sentinel_config["service_name"],
+            "sentinels": sentinel_config["hosts"],
+            "global_keyprefix": _REDIS_KEY_PREFIX,
+        }
+
+        # Add authentication if configured
+        if sentinel_config["password"]:
+            transport_options["sentinel_kwargs"] = {
+                "password": sentinel_config["password"],
+            }
+
+        if os.getenv("PAPERLESS_REDIS_PASSWORD"):
+            transport_options["password"] = os.getenv("PAPERLESS_REDIS_PASSWORD")
+
+        if sentinel_config["username"]:
+            transport_options["username"] = sentinel_config["username"]
+
+        if sentinel_config["db"] != 0:
+            transport_options["db"] = sentinel_config["db"]
+
+        return broker_url, transport_options
+    else:
+        return _CELERY_REDIS_URL, {"global_keyprefix": _REDIS_KEY_PREFIX}
+
+
+CELERY_BROKER_URL, _broker_transport_options = _get_celery_broker_config()
 CELERY_TIMEZONE = TIME_ZONE
 
 CELERY_WORKER_HIJACK_ROOT_LOGGER = False
@@ -902,9 +1033,7 @@ CELERY_TASK_SEND_SENT_EVENT = True
 CELERY_SEND_TASK_SENT_EVENT = True
 CELERY_BROKER_CONNECTION_RETRY = True
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
-CELERY_BROKER_TRANSPORT_OPTIONS = {
-    "global_keyprefix": _REDIS_KEY_PREFIX,
-}
+CELERY_BROKER_TRANSPORT_OPTIONS = _broker_transport_options
 
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT: Final[int] = __get_int("PAPERLESS_WORKER_TIMEOUT", 1800)
