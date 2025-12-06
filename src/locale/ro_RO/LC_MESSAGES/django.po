@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-11-14 16:09+0000\n"
-"PO-Revision-Date: 2025-11-14 16:11\n"
+"PO-Revision-Date: 2025-12-04 00:37\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -136,7 +136,7 @@ msgstr "etichete"
 
 #: documents/models.py:123
 msgid "Cannot set itself as parent."
-msgstr ""
+msgstr "Nu se poate seta ca părinte."
 
 #: documents/models.py:125
 msgid "Cannot set parent to a descendant."
@@ -450,7 +450,7 @@ msgstr "query fulltext"
 
 #: documents/models.py:526
 msgid "more like this"
-msgstr ""
+msgstr "mai multe ca aceasta"
 
 #: documents/models.py:527
 msgid "has tags in"

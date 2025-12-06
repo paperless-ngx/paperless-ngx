@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-11-14 16:09+0000\n"
-"PO-Revision-Date: 2025-11-14 16:11\n"
+"PO-Revision-Date: 2025-12-03 12:15\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -136,11 +136,11 @@ msgstr "label"
 
 #: documents/models.py:123
 msgid "Cannot set itself as parent."
-msgstr ""
+msgstr "Tidak dapat menetapkan dirinya sebagai induk."
 
 #: documents/models.py:125
 msgid "Cannot set parent to a descendant."
-msgstr ""
+msgstr "Tidak dapat menetapkan induk ke keturunan."
 
 #: documents/models.py:142 documents/models.py:190
 msgid "document type"
@@ -858,11 +858,11 @@ msgstr "memiliki label(-label) ini"
 
 #: documents/models.py:1072
 msgid "has all of these tag(s)"
-msgstr ""
+msgstr "memiliki semua label ini"
 
 #: documents/models.py:1079
 msgid "does not have these tag(s)"
-msgstr ""
+msgstr "tidak memiliki semua label ini"
 
 #: documents/models.py:1087
 msgid "has this document type"
@@ -870,7 +870,7 @@ msgstr "memiliki jenis dokumen ini"
 
 #: documents/models.py:1094
 msgid "does not have these document type(s)"
-msgstr ""
+msgstr "tidak memiliki semua tipe dokumen ini"
 
 #: documents/models.py:1102
 msgid "has this correspondent"
@@ -878,15 +878,15 @@ msgstr "memiliki koresponden ini"
 
 #: documents/models.py:1109
 msgid "does not have these correspondent(s)"
-msgstr ""
+msgstr "tidak memiliki koresponden ini"
 
 #: documents/models.py:1117
 msgid "has this storage path"
-msgstr ""
+msgstr "memiliki jalur penyimpanan ini"
 
 #: documents/models.py:1124
 msgid "does not have these storage path(s)"
-msgstr ""
+msgstr "tidak memiliki jalur penyimpanan ini"
 
 #: documents/models.py:1128
 msgid "filter custom field query"
