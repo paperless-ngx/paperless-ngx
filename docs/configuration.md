@@ -1054,11 +1054,21 @@ should be a valid crontab(5) expression describing when to run.
 
 #### [`PAPERLESS_SANITY_TASK_CRON=<cron expression>`](#PAPERLESS_SANITY_TASK_CRON) {#PAPERLESS_SANITY_TASK_CRON}
 
-: Configures the scheduled sanity checker frequency.
+: Configures the scheduled sanity checker frequency. The value should be a
+valid crontab(5) expression describing when to run.
 
 : If set to the string "disable", the sanity checker will not run automatically.
 
     Defaults to `30 0 * * sun` or Sunday at 30 minutes past midnight.
+
+#### [`PAPERLESS_WORKFLOW_SCHEDULED_TASK_CRON=<cron expression>`](#PAPERLESS_WORKFLOW_SCHEDULED_TASK_CRON) {#PAPERLESS_WORKFLOW_SCHEDULED_TASK_CRON}
+
+: Configures the scheduled workflow check frequency. The value should be a
+valid crontab(5) expression describing when to run.
+
+: If set to the string "disable", scheduled workflows will not run.
+
+    Defaults to `5 */1 * * *` or every hour at 5 minutes past the hour.
 
 #### [`PAPERLESS_ENABLE_COMPRESSION=<bool>`](#PAPERLESS_ENABLE_COMPRESSION) {#PAPERLESS_ENABLE_COMPRESSION}
 

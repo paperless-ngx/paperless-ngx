@@ -656,6 +656,9 @@ def run_workflows_added(
     original_file=None,
     **kwargs,
 ):
+    """
+    Connected to document_consumption_finished signal.
+    """
     run_workflows(
         trigger_type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
         document=document,
@@ -666,6 +669,9 @@ def run_workflows_added(
 
 
 def run_workflows_updated(sender, document: Document, logging_group=None, **kwargs):
+    """
+    Connected to document_updated signal.
+    """
     run_workflows(
         trigger_type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
         document=document,
@@ -773,6 +779,40 @@ def run_workflows(
     object is provided, the function returns the object with the applied changes or None if no actions were applied and a string
     of messages for each action. If no overrides object is provided, the changes are applied directly to the document and the
     function returns None.
+
+    Trigger-specific usage:
+        CONSUMPTION (consumer.py:65):
+            - document: ConsumableDocument (pre-database)
+            - overrides: Fresh DocumentMetadataOverrides()
+            - Returns modified overrides for document creation
+
+        DOCUMENT_ADDED (handlers.py:651):
+            - document: Document (saved in DB, inside transaction)
+            - original_file: Consumer's unmodified_original or working_copy
+            - Modifies document directly
+
+        DOCUMENT_UPDATED (handlers.py:661):
+            - document: Document (updated via API)
+            - Modifies document directly
+            - Uses document.source_path for attachments
+
+        SCHEDULED (tasks.py:513):
+            - workflow_to_run: Specific workflow for execution control
+            - document: Document matched by date criteria
+            - Uses document.source_path for attachments
+
+    Args:
+        trigger_type: Which trigger type to execute (CONSUMPTION/DOCUMENT_ADDED/DOCUMENT_UPDATED/SCHEDULED)
+        document: Document to process. ConsumableDocument for CONSUMPTION (not yet in DB), Document for others
+        workflow_to_run: Run one specific workflow instead of querying all. Only supplied by SCHEDULED trigger
+        logging_group: Groups related log messages (for consumer task tracking). Supplied by DOCUMENT_ADDED/UPDATED
+        overrides: DocumentMetadataOverrides to modify instead of document directly. Only used by CONSUMPTION
+        original_file: Path to document file for email/webhook attachments. Supplied by DOCUMENT_ADDED. Falls back
+            to document.source_path (saved docs) or document.original_file (ConsumableDocument)
+
+    Returns:
+        usually None, changes are applied directly to document. In case of
+         CONSUMPTION, (overrides, messages) tuple with accumulated changes
     """
 
     def assignment_action():
