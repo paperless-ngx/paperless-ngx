@@ -42,13 +42,13 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
-from documents.workflows.utils import apply_assignment_to_document
-from documents.workflows.utils import apply_assignment_to_overrides
-from documents.workflows.utils import apply_removal_to_document
-from documents.workflows.utils import apply_removal_to_overrides
-from documents.workflows.utils import build_workflow_action_context
-from documents.workflows.utils import execute_email_action
-from documents.workflows.utils import execute_webhook_action
+from documents.workflows.actions import build_workflow_action_context
+from documents.workflows.actions import execute_email_action
+from documents.workflows.actions import execute_webhook_action
+from documents.workflows.mutations import apply_assignment_to_document
+from documents.workflows.mutations import apply_assignment_to_overrides
+from documents.workflows.mutations import apply_removal_to_document
+from documents.workflows.mutations import apply_removal_to_overrides
 from documents.workflows.utils import get_workflows_for_trigger
 
 if TYPE_CHECKING:
