@@ -679,12 +679,14 @@ def run_workflows(
     original_file: Path | None = None,
 ) -> tuple[DocumentMetadataOverrides, str] | None:
     """
-    Run workflows which match a Document (or ConsumableDocument) for a specific trigger type or a single workflow if given.
+    Execute workflows matching a document for the given trigger. When `overrides` is provided
+    (consumption flow), actions mutate that object and the function returns `(overrides, messages)`.
+    Otherwise actions mutate the actual document and return nothing.
 
-    Assignment or removal actions are either applied directly to the document or an overrides object. If an overrides
-    object is provided, the function returns the object with the applied changes or None if no actions were applied and a string
-    of messages for each action. If no overrides object is provided, the changes are applied directly to the document and the
-    function returns None.
+    Attachments for email/webhook actions use `original_file` when given, otherwise fall back to
+    `document.source_path` (Document) or `document.original_file` (ConsumableDocument).
+
+    Passing `workflow_to_run` skips the workflow query (currently only used by scheduled runs).
     """
 
     use_overrides = overrides is not None
