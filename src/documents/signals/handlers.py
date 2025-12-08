@@ -28,6 +28,7 @@ from documents import matching
 from documents.caching import clear_document_caches
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
+from documents.file_handling import generate_filename
 from documents.file_handling import generate_unique_filename
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -452,21 +453,47 @@ def update_filename_and_move_files(
             old_filename = instance.filename
             old_source_path = instance.source_path
 
+            candidate_filename = generate_filename(instance)
+            candidate_source_path = (
+                settings.ORIGINALS_DIR / candidate_filename
+            ).resolve()
+            if candidate_filename == Path(old_filename):
+                new_filename = Path(old_filename)
+            elif (
+                candidate_source_path.exists()
+                and candidate_source_path != old_source_path
+            ):
+                # Only fall back to unique search when there is an actual conflict
+                new_filename = generate_unique_filename(instance)
+            else:
+                new_filename = candidate_filename
+
             # Need to convert to string to be able to save it to the db
-            instance.filename = str(generate_unique_filename(instance))
+            instance.filename = str(new_filename)
             move_original = old_filename != instance.filename
 
             old_archive_filename = instance.archive_filename
             old_archive_path = instance.archive_path
 
             if instance.has_archive_version:
-                # Need to convert to string to be able to save it to the db
-                instance.archive_filename = str(
-                    generate_unique_filename(
+                archive_candidate = generate_filename(instance, archive_filename=True)
+                archive_candidate_path = (
+                    settings.ARCHIVE_DIR / archive_candidate
+                ).resolve()
+                if archive_candidate == Path(old_archive_filename):
+                    new_archive_filename = Path(old_archive_filename)
+                elif (
+                    archive_candidate_path.exists()
+                    and archive_candidate_path != old_archive_path
+                ):
+                    new_archive_filename = generate_unique_filename(
                         instance,
                         archive_filename=True,
-                    ),
-                )
+                    )
+                else:
+                    new_archive_filename = archive_candidate
+
+                instance.archive_filename = str(new_archive_filename)
 
                 move_archive = old_archive_filename != instance.archive_filename
             else:

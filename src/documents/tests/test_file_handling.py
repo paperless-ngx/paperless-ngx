@@ -1697,7 +1697,7 @@ class TestCustomFieldFilenameUpdates(
         expected_filename = Path("updated/document.pdf")
         self.assertEqual(Path(self.doc.filename), expected_filename)
         self.assertTrue(Path(self.doc.source_path).is_file())
-        self.assertGreater(m.call_count, 0)
+        self.assertLessEqual(m.call_count, 1)
 
 
 class TestPathDateLocalization:
