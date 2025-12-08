@@ -51,7 +51,7 @@ wait_for_mariadb() {
 	local -r host="${PAPERLESS_DBHOST:-localhost}"
 	local -r port="${PAPERLESS_DBPORT:-3306}"
 
-	while ! mariadb-admin --host="$host" --port="$port" ping --silent >/dev/null 2>&1; do
+	while ! mariadb-admin --host="${host}" --port="${port}" --skip-ssl ping --silent >/dev/null 2>&1; do
 		delay_next_attempt
 	done
 	echo "${LOG_PREFIX} Connected to MariaDB"
