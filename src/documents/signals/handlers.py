@@ -42,6 +42,7 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
+from documents.templating.utils import convert_format_str_to_template_format
 from documents.workflows.actions import build_workflow_action_context
 from documents.workflows.actions import execute_email_action
 from documents.workflows.actions import execute_webhook_action
@@ -389,6 +390,19 @@ class CannotMoveFilesException(Exception):
     pass
 
 
+def _filename_template_uses_custom_fields(doc: Document) -> bool:
+    template = None
+    if doc.storage_path is not None:
+        template = doc.storage_path.path
+    elif settings.FILENAME_FORMAT is not None:
+        template = convert_format_str_to_template_format(settings.FILENAME_FORMAT)
+
+    if not template:
+        return False
+
+    return "custom_fields" in template
+
+
 # should be disabled in /src/documents/management/commands/document_importer.py handle
 @receiver(models.signals.post_save, sender=CustomFieldInstance, weak=False)
 @receiver(models.signals.m2m_changed, sender=Document.tags.through, weak=False)
@@ -399,6 +413,8 @@ def update_filename_and_move_files(
     **kwargs,
 ):
     if isinstance(instance, CustomFieldInstance):
+        if not _filename_template_uses_custom_fields(instance.document):
+            return
         instance = instance.document
 
     def validate_move(instance, old_path: Path, new_path: Path):
