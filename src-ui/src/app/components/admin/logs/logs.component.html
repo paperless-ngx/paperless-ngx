@@ -48,7 +48,9 @@
       <ng-container i18n>Loading...</ng-container>
     </div>
   } @else {
-    <p *ngFor="let log of logs" class="m-0 p-0" [ngClass]="'log-entry-' + log.level">{{log.message}}</p>
+    @for (log of logs; track log) {
+      <p class="m-0 p-0" [ngClass]="'log-entry-' + log.level">{{log.message}}</p>
+    }
   }
 </div>
 <button
