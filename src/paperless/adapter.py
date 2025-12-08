@@ -137,3 +137,25 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             user.save()
         handle_social_account_updated(None, request, sociallogin)
         return user
+
+    def on_authentication_error(
+        self,
+        request,
+        provider,
+        error=None,
+        exception=None,
+        extra_context=None,
+    ):
+        """
+        Just log errors and pass them along.
+        """
+        logger.warning(
+            f"Social authentication error for provider `{provider!s}`: {error!s} ({exception!s})",
+        )
+        return super().on_authentication_error(
+            request,
+            provider,
+            error,
+            exception,
+            extra_context,
+        )
