@@ -15,7 +15,7 @@ from documents.models import DocumentType
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.templating.workflows import parse_w_workflow_placeholders
-from documents.workflows.utils import send_webhook
+from documents.workflows.webhooks import send_webhook
 
 logger = logging.getLogger("paperless.workflows.actions")
 
