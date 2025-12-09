@@ -23,12 +23,12 @@ logger = logging.getLogger("paperless.workflows.actions")
 def build_workflow_action_context(
     document: Document | ConsumableDocument,
     overrides: DocumentMetadataOverrides | None,
-    *,
-    use_overrides: bool = False,
 ) -> dict:
     """
     Build context dictionary for workflow action placeholder parsing.
     """
+    use_overrides = overrides is not None
+
     if not use_overrides:
         return {
             "title": document.title,

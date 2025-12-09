@@ -738,11 +738,7 @@ def run_workflows(
                         )
                         continue
 
-                    context = build_workflow_action_context(
-                        document,
-                        overrides,
-                        use_overrides=use_overrides,
-                    )
+                    context = build_workflow_action_context(document, overrides)
                     execute_email_action(
                         action,
                         document,
@@ -752,11 +748,7 @@ def run_workflows(
                         trigger_type,
                     )
                 elif action.type == WorkflowAction.WorkflowActionType.WEBHOOK:
-                    context = build_workflow_action_context(
-                        document,
-                        overrides,
-                        use_overrides=use_overrides,
-                    )
+                    context = build_workflow_action_context(document, overrides)
                     execute_webhook_action(
                         action,
                         document,
