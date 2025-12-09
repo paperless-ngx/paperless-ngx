@@ -90,6 +90,13 @@ def execute_email_action(
     Execute an email action for a workflow.
     """
 
+    if not settings.EMAIL_ENABLED:
+        logger.error(
+            "Email backend has not been configured, cannot send email notifications",
+            extra={"group": logging_group},
+        )
+        return
+
     subject = (
         parse_w_workflow_placeholders(
             action.email.subject,

@@ -731,13 +731,6 @@ def run_workflows(
                     else:
                         apply_removal_to_document(action, document, doc_tag_ids)
                 elif action.type == WorkflowAction.WorkflowActionType.EMAIL:
-                    if not settings.EMAIL_ENABLED:
-                        logger.error(
-                            "Email backend has not been configured, cannot send email notifications",
-                            extra={"group": logging_group},
-                        )
-                        continue
-
                     context = build_workflow_action_context(document, overrides)
                     execute_email_action(
                         action,

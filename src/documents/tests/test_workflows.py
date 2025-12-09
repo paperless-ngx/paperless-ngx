@@ -3096,7 +3096,7 @@ class TestWorkflows(
             original_filename="sample.pdf",
         )
 
-        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
+        with self.assertLogs("paperless.workflows.actions", level="ERROR") as cm:
             run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
             expected_str = "Email backend has not been configured"
