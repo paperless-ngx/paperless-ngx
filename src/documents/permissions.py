@@ -61,7 +61,12 @@ def get_groups_with_only_permission(obj, codename):
     return Group.objects.filter(id__in=group_object_perm_group_ids).distinct()
 
 
-def set_permissions_for_object(permissions: list[str], object, *, merge: bool = False):
+def set_permissions_for_object(
+    permissions: list[str],
+    object,
+    *,
+    merge: bool = False,
+) -> None:
     """
     Set permissions for an object. The permissions are given as a list of strings
     in the format "action_modelname", e.g. "view_document".

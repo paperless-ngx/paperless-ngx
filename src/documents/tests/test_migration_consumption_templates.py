@@ -7,7 +7,7 @@ class TestMigrateConsumptionTemplate(TestMigrations):
     migrate_from = "1038_sharelink"
     migrate_to = "1039_consumptiontemplate"
 
-    def setUpBeforeMigration(self, apps):
+    def setUpBeforeMigration(self, apps) -> None:
         User = get_user_model()
         Group = apps.get_model("auth.Group")
         self.Permission = apps.get_model("auth", "Permission")
@@ -17,7 +17,7 @@ class TestMigrateConsumptionTemplate(TestMigrations):
         self.user.user_permissions.add(permission.id)
         self.group.permissions.add(permission.id)
 
-    def test_users_with_add_documents_get_add_consumptiontemplate(self):
+    def test_users_with_add_documents_get_add_consumptiontemplate(self) -> None:
         permission = self.Permission.objects.get(codename="add_consumptiontemplate")
         self.assertTrue(self.user.has_perm(f"documents.{permission.codename}"))
         self.assertTrue(permission in self.group.permissions.all())
@@ -27,7 +27,7 @@ class TestReverseMigrateConsumptionTemplate(TestMigrations):
     migrate_from = "1039_consumptiontemplate"
     migrate_to = "1038_sharelink"
 
-    def setUpBeforeMigration(self, apps):
+    def setUpBeforeMigration(self, apps) -> None:
         User = get_user_model()
         Group = apps.get_model("auth.Group")
         self.Permission = apps.get_model("auth", "Permission")
@@ -40,7 +40,7 @@ class TestReverseMigrateConsumptionTemplate(TestMigrations):
             self.user.user_permissions.add(permission.id)
             self.group.permissions.add(permission.id)
 
-    def test_remove_consumptiontemplate_permissions(self):
+    def test_remove_consumptiontemplate_permissions(self) -> None:
         permission = self.Permission.objects.filter(
             codename="add_consumptiontemplate",
         ).first()

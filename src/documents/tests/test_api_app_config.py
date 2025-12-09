@@ -20,7 +20,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         user = User.objects.create_superuser(username="temp_admin")
         self.client.force_authenticate(user=user)
 
-    def test_api_get_config(self):
+    def test_api_get_config(self) -> None:
         """
         GIVEN:
             - API request to get app config
@@ -68,7 +68,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
             },
         )
 
-    def test_api_get_ui_settings_with_config(self):
+    def test_api_get_ui_settings_with_config(self) -> None:
         """
         GIVEN:
             - Existing config with app_title, app_logo specified
@@ -91,7 +91,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
             | response.data["settings"],
         )
 
-    def test_api_update_config(self):
+    def test_api_update_config(self) -> None:
         """
         GIVEN:
             - API request to update app config
@@ -114,7 +114,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         config = ApplicationConfiguration.objects.first()
         self.assertEqual(config.color_conversion_strategy, ColorConvertChoices.RGB)
 
-    def test_api_update_config_empty_fields(self):
+    def test_api_update_config_empty_fields(self) -> None:
         """
         GIVEN:
             - API request to update app config with empty string for user_args JSONField and language field
@@ -141,7 +141,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         self.assertEqual(config.language, None)
         self.assertEqual(config.barcode_tag_mapping, None)
 
-    def test_api_replace_app_logo(self):
+    def test_api_replace_app_logo(self) -> None:
         """
         GIVEN:
             - Existing config with app_logo specified
@@ -190,7 +190,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         )
         self.assertFalse(Path(old_logo.path).exists())
 
-    def test_api_rejects_malicious_svg_logo(self):
+    def test_api_rejects_malicious_svg_logo(self) -> None:
         """
         GIVEN:
             - An SVG logo containing a <script> tag
@@ -210,7 +210,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("disallowed", str(response.data).lower())
 
-    def test_create_not_allowed(self):
+    def test_create_not_allowed(self) -> None:
         """
         GIVEN:
             - API request to create a new app config

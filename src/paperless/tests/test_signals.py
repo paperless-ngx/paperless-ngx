@@ -12,14 +12,14 @@ from paperless.signals import handle_social_account_updated
 
 
 class TestFailedLoginLogging(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.creds = {
             "username": "john lennon",
         }
 
-    def test_unauthenticated(self):
+    def test_unauthenticated(self) -> None:
         """
         GIVEN:
             - Request with no authentication provided
@@ -39,7 +39,7 @@ class TestFailedLoginLogging(TestCase):
                 ],
             )
 
-    def test_none(self):
+    def test_none(self) -> None:
         """
         GIVEN:
             - Request with no IP possible
@@ -60,7 +60,7 @@ class TestFailedLoginLogging(TestCase):
                 ],
             )
 
-    def test_public(self):
+    def test_public(self) -> None:
         """
         GIVEN:
             - Request with publicly routeable IP
@@ -83,7 +83,7 @@ class TestFailedLoginLogging(TestCase):
                 ],
             )
 
-    def test_private(self):
+    def test_private(self) -> None:
         """
         GIVEN:
             - Request with private range IP
@@ -110,7 +110,7 @@ class TestFailedLoginLogging(TestCase):
 
 class TestSyncSocialLoginGroups(TestCase):
     @override_settings(SOCIAL_ACCOUNT_SYNC_GROUPS=True)
-    def test_sync_enabled(self):
+    def test_sync_enabled(self) -> None:
         """
         GIVEN:
             - Enabled group syncing, a user, and a social login
@@ -137,7 +137,7 @@ class TestSyncSocialLoginGroups(TestCase):
         self.assertEqual(list(user.groups.all()), [group])
 
     @override_settings(SOCIAL_ACCOUNT_SYNC_GROUPS=False)
-    def test_sync_disabled(self):
+    def test_sync_disabled(self) -> None:
         """
         GIVEN:
             - Disabled group syncing, a user, and a social login
@@ -164,7 +164,7 @@ class TestSyncSocialLoginGroups(TestCase):
         self.assertEqual(list(user.groups.all()), [])
 
     @override_settings(SOCIAL_ACCOUNT_SYNC_GROUPS=True)
-    def test_no_groups(self):
+    def test_no_groups(self) -> None:
         """
         GIVEN:
             - Enabled group syncing, a user, and a social login with no groups
@@ -193,7 +193,7 @@ class TestSyncSocialLoginGroups(TestCase):
         self.assertEqual(list(user.groups.all()), [])
 
     @override_settings(SOCIAL_ACCOUNT_SYNC_GROUPS=True)
-    def test_userinfo_groups(self):
+    def test_userinfo_groups(self) -> None:
         """
         GIVEN:
             - Enabled group syncing, and `groups` nested under `userinfo`
@@ -224,7 +224,7 @@ class TestSyncSocialLoginGroups(TestCase):
         self.assertEqual(list(user.groups.all()), [group])
 
     @override_settings(SOCIAL_ACCOUNT_SYNC_GROUPS=True)
-    def test_id_token_groups_fallback(self):
+    def test_id_token_groups_fallback(self) -> None:
         """
         GIVEN:
             - Enabled group syncing, and `groups` only under `id_token`
@@ -261,7 +261,7 @@ class TestUserGroupDeletionCleanup(TestCase):
     from ui_settings
     """
 
-    def test_user_group_deletion_cleanup(self):
+    def test_user_group_deletion_cleanup(self) -> None:
         """
         GIVEN:
             - Existing user
@@ -302,7 +302,7 @@ class TestUserGroupDeletionCleanup(TestCase):
         self.assertEqual(permissions.get("default_view_groups"), [])
         self.assertEqual(permissions.get("default_change_groups"), [])
 
-    def test_user_group_deletion_error_handling(self):
+    def test_user_group_deletion_error_handling(self) -> None:
         """
         GIVEN:
             - Existing user and group

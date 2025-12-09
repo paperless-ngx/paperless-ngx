@@ -27,7 +27,7 @@ class TestDocumentAdmin(DirectoriesMixin, TestCase):
         super().setUp()
         self.doc_admin = DocumentAdmin(model=Document, admin_site=AdminSite())
 
-    def test_save_model(self):
+    def test_save_model(self) -> None:
         doc = Document.objects.create(title="test")
 
         doc.title = "new title"
@@ -35,7 +35,7 @@ class TestDocumentAdmin(DirectoriesMixin, TestCase):
         self.assertEqual(Document.objects.get(id=doc.id).title, "new title")
         self.assertEqual(self.get_document_from_index(doc)["id"], doc.id)
 
-    def test_delete_model(self):
+    def test_delete_model(self) -> None:
         doc = Document.objects.create(title="test")
         index.add_or_update_document(doc)
         self.assertIsNotNone(self.get_document_from_index(doc))
@@ -45,7 +45,7 @@ class TestDocumentAdmin(DirectoriesMixin, TestCase):
         self.assertRaises(Document.DoesNotExist, Document.objects.get, id=doc.id)
         self.assertIsNone(self.get_document_from_index(doc))
 
-    def test_delete_queryset(self):
+    def test_delete_queryset(self) -> None:
         docs = []
         for i in range(42):
             doc = Document.objects.create(
@@ -67,7 +67,7 @@ class TestDocumentAdmin(DirectoriesMixin, TestCase):
         for doc in docs:
             self.assertIsNone(self.get_document_from_index(doc))
 
-    def test_created(self):
+    def test_created(self) -> None:
         doc = Document.objects.create(
             title="test",
             created=timezone.make_aware(timezone.datetime(2020, 4, 12)),
@@ -98,7 +98,7 @@ class TestPaperlessAdmin(DirectoriesMixin, TestCase):
         super().setUp()
         self.user_admin = PaperlessUserAdmin(model=User, admin_site=AdminSite())
 
-    def test_request_is_passed_to_form(self):
+    def test_request_is_passed_to_form(self) -> None:
         user = User.objects.create(username="test", is_superuser=False)
         non_superuser = User.objects.create(username="requestuser")
         request = types.SimpleNamespace(user=non_superuser)
@@ -106,7 +106,7 @@ class TestPaperlessAdmin(DirectoriesMixin, TestCase):
         form = formType(data={}, instance=user)
         self.assertEqual(form.request, request)
 
-    def test_only_superuser_can_change_superuser(self):
+    def test_only_superuser_can_change_superuser(self) -> None:
         superuser = User.objects.create_superuser(username="superuser", password="test")
         non_superuser = User.objects.create(username="requestuser")
         user = User.objects.create(username="test", is_superuser=False)
@@ -128,7 +128,7 @@ class TestPaperlessAdmin(DirectoriesMixin, TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual({}, form.errors)
 
-    def test_superuser_can_only_be_modified_by_superuser(self):
+    def test_superuser_can_only_be_modified_by_superuser(self) -> None:
         superuser = User.objects.create_superuser(username="superuser", password="test")
         user = User.objects.create(
             username="test",
