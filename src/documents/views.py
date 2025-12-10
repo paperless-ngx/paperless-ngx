@@ -35,7 +35,6 @@ from django.db.models import Model
 from django.db.models import Q
 from django.db.models import Sum
 from django.db.models import When
-from django.db.models.functions import Length
 from django.db.models.functions import Lower
 from django.db.models.manager import Manager
 from django.http import FileResponse
@@ -2371,8 +2370,6 @@ class StatisticsView(GenericAPIView):
             ).count()
         )
 
-        documents_total = documents.count()
-
         inbox_tag_list = list(tags.filter(is_inbox_tag=True))
 
         documents_inbox = (
@@ -2383,20 +2380,20 @@ class StatisticsView(GenericAPIView):
             else None
         )
 
+        # Count with only one SQL request
+        doc_stats = documents.aggregate(
+            total=Count("id"),
+            character_count=Sum("content_length"),
+        )
+        documents_total = doc_stats["total"]
+        character_count = doc_stats["character_count"]
+
         document_file_type_counts = (
             documents.values("mime_type")
             .annotate(mime_type_count=Count("mime_type"))
             .order_by("-mime_type_count")
             if documents_total > 0
             else []
-        )
-
-        character_count = (
-            documents.annotate(
-                characters=Length("content"),
-            )
-            .aggregate(Sum("characters"))
-            .get("characters__sum")
         )
 
         current_asn = Document.objects.aggregate(

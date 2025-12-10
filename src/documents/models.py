@@ -192,6 +192,15 @@ class Document(SoftDeleteModel, ModelWithOwner):
         ),
     )
 
+    content_length = models.PositiveIntegerField(
+        _("content length"),
+        default=0,
+        editable=False,
+        help_text=_(
+            "The length of the content field in characters. Automatically set when the document is saved. Used to compute statistics faster.",
+        ),
+    )
+
     mime_type = models.CharField(_("mime type"), max_length=256, editable=False)
 
     tags = models.ManyToManyField(
@@ -312,6 +321,10 @@ class Document(SoftDeleteModel, ModelWithOwner):
         if self.title:
             res += f" {self.title}"
         return res
+
+    def save(self, *args, **kwargs):
+        self.content_length = len(self.content) if self.content else 0
+        super().save(*args, **kwargs)
 
     @property
     def suggestion_content(self):
