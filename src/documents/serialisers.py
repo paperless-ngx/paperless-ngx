@@ -62,6 +62,7 @@ from documents.models import Tag
 from documents.models import UiSettings
 from documents.models import Workflow
 from documents.models import WorkflowAction
+from documents.models import WorkflowActionDeletion
 from documents.models import WorkflowActionEmail
 from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowTrigger
@@ -2366,6 +2367,17 @@ class WorkflowActionWebhookSerializer(serializers.ModelSerializer):
         ]
 
 
+class WorkflowActionDeletionSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(allow_null=True, required=False)
+
+    class Meta:
+        model = WorkflowActionDeletion
+        fields = [
+            "id",
+            "skip_trash",
+        ]
+
+
 class WorkflowActionSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False, allow_null=True)
     assign_correspondent = CorrespondentField(allow_null=True, required=False)
@@ -2374,6 +2386,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
     assign_storage_path = StoragePathField(allow_null=True, required=False)
     email = WorkflowActionEmailSerializer(allow_null=True, required=False)
     webhook = WorkflowActionWebhookSerializer(allow_null=True, required=False)
+    deletion = WorkflowActionDeletionSerializer(allow_null=True, required=False)
 
     class Meta:
         model = WorkflowAction
@@ -2411,6 +2424,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
             "remove_change_groups",
             "email",
             "webhook",
+            "deletion",
         ]
 
     def validate(self, attrs):
@@ -2555,6 +2569,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
                 email_data = action.pop("email", None)
                 webhook_data = action.pop("webhook", None)
+                deletion_data = action.pop("deletion", None)
 
                 action_instance, _ = WorkflowAction.objects.update_or_create(
                     id=action.get("id"),
@@ -2579,6 +2594,16 @@ class WorkflowSerializer(serializers.ModelSerializer):
                         defaults=serializer.validated_data,
                     )
                     action_instance.webhook = webhook
+                    action_instance.save()
+
+                if deletion_data is not None:
+                    serializer = WorkflowActionDeletionSerializer(data=deletion_data)
+                    serializer.is_valid(raise_exception=True)
+                    deletion, _ = WorkflowActionDeletion.objects.update_or_create(
+                        id=deletion_data.get("id"),
+                        defaults=serializer.validated_data,
+                    )
+                    action_instance.deletion = deletion
                     action_instance.save()
 
                 if assign_tags is not None:
@@ -2616,6 +2641,24 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
                 set_actions.append(action_instance)
 
+        if set_actions:
+            for i, action in enumerate(set_actions):
+                if (
+                    action.type == WorkflowAction.WorkflowActionType.DELETION
+                    and i != len(set_actions) - 1
+                ):
+                    actions_errors = [None] * len(set_actions)
+                    actions_errors[i] = {
+                        "type": [
+                            "Delete action must be the last action in the workflow",
+                        ],
+                    }
+                    raise serializers.ValidationError(
+                        {
+                            "actions": actions_errors,
+                        },
+                    )
+
         if triggers is not serializers.empty:
             instance.triggers.set(set_triggers)
         if actions is not serializers.empty:
@@ -2637,6 +2680,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
         WorkflowActionEmail.objects.filter(action=None).delete()
         WorkflowActionWebhook.objects.filter(action=None).delete()
+        WorkflowActionDeletion.objects.filter(action=None).delete()
 
     def create(self, validated_data) -> Workflow:
         if "triggers" in validated_data:
