@@ -1,5 +1,6 @@
 import logging
 
+from django.db.models.manager import BaseManager
 from django.utils import timezone
 from guardian.shortcuts import remove_perm
 
@@ -13,6 +14,18 @@ from documents.templating.workflows import parse_w_workflow_placeholders
 logger = logging.getLogger("paperless.workflows.mutations")
 
 
+def _get_annotated_exists_flag(
+    action: WorkflowAction,
+    attr_name: str,
+    manager: BaseManager,
+):
+    """
+    Return a boolean from an annotated flag on the action, falling back to
+    evaluating manager.exists().
+    """
+    return getattr(action, attr_name, manager.exists())
+
+
 def apply_assignment_to_document(
     action: WorkflowAction,
     document: Document,
@@ -22,7 +35,11 @@ def apply_assignment_to_document(
     """
     Apply assignment actions to a Document instance.
     """
-    has_assign_tags = getattr(action, "has_assign_tags", action.assign_tags.exists())
+    has_assign_tags = _get_annotated_exists_flag(
+        action,
+        "has_assign_tags",
+        action.assign_tags,
+    )
     if has_assign_tags:
         tag_ids_to_add: set[int] = set()
         for tag in action.assign_tags.all():
@@ -61,25 +78,25 @@ def apply_assignment_to_document(
                 extra={"group": logging_group},
             )
 
-    has_assign_view_users = getattr(
+    has_assign_view_users = _get_annotated_exists_flag(
         action,
         "has_assign_view_users",
-        action.assign_view_users.exists(),
+        action.assign_view_users,
     )
-    has_assign_view_groups = getattr(
+    has_assign_view_groups = _get_annotated_exists_flag(
         action,
         "has_assign_view_groups",
-        action.assign_view_groups.exists(),
+        action.assign_view_groups,
     )
-    has_assign_change_users = getattr(
+    has_assign_change_users = _get_annotated_exists_flag(
         action,
         "has_assign_change_users",
-        action.assign_change_users.exists(),
+        action.assign_change_users,
     )
-    has_assign_change_groups = getattr(
+    has_assign_change_groups = _get_annotated_exists_flag(
         action,
         "has_assign_change_groups",
-        action.assign_change_groups.exists(),
+        action.assign_change_groups,
     )
 
     if any(
@@ -106,10 +123,10 @@ def apply_assignment_to_document(
             merge=True,
         )
 
-    has_assign_custom_fields = getattr(
+    has_assign_custom_fields = _get_annotated_exists_flag(
         action,
         "has_assign_custom_fields",
-        action.assign_custom_fields.exists(),
+        action.assign_custom_fields,
     )
 
     if has_assign_custom_fields:
@@ -146,7 +163,11 @@ def apply_assignment_to_overrides(
     """
     Apply assignment actions to DocumentMetadataOverrides.
     """
-    has_assign_tags = getattr(action, "has_assign_tags", action.assign_tags.exists())
+    has_assign_tags = _get_annotated_exists_flag(
+        action,
+        "has_assign_tags",
+        action.assign_tags,
+    )
     if has_assign_tags:
         if overrides.tag_ids is None:
             overrides.tag_ids = []
@@ -172,25 +193,25 @@ def apply_assignment_to_overrides(
     if action.assign_title:
         overrides.title = action.assign_title
 
-    has_assign_view_users = getattr(
+    has_assign_view_users = _get_annotated_exists_flag(
         action,
         "has_assign_view_users",
-        action.assign_view_users.exists(),
+        action.assign_view_users,
     )
-    has_assign_view_groups = getattr(
+    has_assign_view_groups = _get_annotated_exists_flag(
         action,
         "has_assign_view_groups",
-        action.assign_view_groups.exists(),
+        action.assign_view_groups,
     )
-    has_assign_change_users = getattr(
+    has_assign_change_users = _get_annotated_exists_flag(
         action,
         "has_assign_change_users",
-        action.assign_change_users.exists(),
+        action.assign_change_users,
     )
-    has_assign_change_groups = getattr(
+    has_assign_change_groups = _get_annotated_exists_flag(
         action,
         "has_assign_change_groups",
-        action.assign_change_groups.exists(),
+        action.assign_change_groups,
     )
 
     if any(
@@ -226,10 +247,10 @@ def apply_assignment_to_overrides(
             ),
         )
 
-    has_assign_custom_fields = getattr(
+    has_assign_custom_fields = _get_annotated_exists_flag(
         action,
         "has_assign_custom_fields",
-        action.assign_custom_fields.exists(),
+        action.assign_custom_fields,
     )
 
     if has_assign_custom_fields:
@@ -298,25 +319,25 @@ def apply_removal_to_document(
             object=document,
             merge=False,
         )
-    has_remove_view_users = getattr(
+    has_remove_view_users = _get_annotated_exists_flag(
         action,
         "has_remove_view_users",
-        action.remove_view_users.exists(),
+        action.remove_view_users,
     )
-    has_remove_view_groups = getattr(
+    has_remove_view_groups = _get_annotated_exists_flag(
         action,
         "has_remove_view_groups",
-        action.remove_view_groups.exists(),
+        action.remove_view_groups,
     )
-    has_remove_change_users = getattr(
+    has_remove_change_users = _get_annotated_exists_flag(
         action,
         "has_remove_change_users",
-        action.remove_change_users.exists(),
+        action.remove_change_users,
     )
-    has_remove_change_groups = getattr(
+    has_remove_change_groups = _get_annotated_exists_flag(
         action,
         "has_remove_change_groups",
-        action.remove_change_groups.exists(),
+        action.remove_change_groups,
     )
 
     if any(
@@ -336,10 +357,10 @@ def apply_removal_to_document(
         for group in action.remove_change_groups.all():
             remove_perm("change_document", group, document)
 
-    has_remove_custom_fields = getattr(
+    has_remove_custom_fields = _get_annotated_exists_flag(
         action,
         "has_remove_custom_fields",
-        action.remove_custom_fields.exists(),
+        action.remove_custom_fields,
     )
     if action.remove_all_custom_fields:
         CustomFieldInstance.objects.filter(document=document).hard_delete()
@@ -391,25 +412,25 @@ def apply_removal_to_overrides(
     ):
         overrides.owner_id = None
 
-    has_remove_view_users = getattr(
+    has_remove_view_users = _get_annotated_exists_flag(
         action,
         "has_remove_view_users",
-        action.remove_view_users.exists(),
+        action.remove_view_users,
     )
-    has_remove_view_groups = getattr(
+    has_remove_view_groups = _get_annotated_exists_flag(
         action,
         "has_remove_view_groups",
-        action.remove_view_groups.exists(),
+        action.remove_view_groups,
     )
-    has_remove_change_users = getattr(
+    has_remove_change_users = _get_annotated_exists_flag(
         action,
         "has_remove_change_users",
-        action.remove_change_users.exists(),
+        action.remove_change_users,
     )
-    has_remove_change_groups = getattr(
+    has_remove_change_groups = _get_annotated_exists_flag(
         action,
         "has_remove_change_groups",
-        action.remove_change_groups.exists(),
+        action.remove_change_groups,
     )
 
     if action.remove_all_permissions:
@@ -442,10 +463,10 @@ def apply_removal_to_overrides(
             ):
                 overrides.change_groups.remove(group.pk)
 
-    has_remove_custom_fields = getattr(
+    has_remove_custom_fields = _get_annotated_exists_flag(
         action,
         "has_remove_custom_fields",
-        action.remove_custom_fields.exists(),
+        action.remove_custom_fields,
     )
 
     if action.remove_all_custom_fields:
