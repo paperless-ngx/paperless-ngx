@@ -198,6 +198,10 @@ export class SettingsComponent
     )
   }
 
+  get zoomSettings() {
+    return Object.values(ZoomSetting)
+  }
+
   constructor() {
     super()
     this.settings.settingsSaved.subscribe(() => {
@@ -338,6 +342,17 @@ export class SettingsComponent
       ),
       searchDbOnly: this.settings.get(SETTINGS_KEYS.SEARCH_DB_ONLY),
       searchLink: this.settings.get(SETTINGS_KEYS.SEARCH_FULL_TYPE),
+    }
+  }
+
+  protected getZoomSettingTitle(setting: ZoomSetting): string {
+    switch (setting) {
+      case ZoomSetting.PageFit:
+        return $localize`Fit page`
+      case ZoomSetting.PageWidth:
+        return $localize`Fit width`
+      default:
+        return `${parseFloat(setting) * 100}%`
     }
   }
 
