@@ -41,7 +41,6 @@ from documents.models import DocumentType
 from documents.models import PaperlessTask
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.models import Workflow
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.parsers import DocumentParser
@@ -54,6 +53,7 @@ from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
 from documents.signals.handlers import run_workflows
+from documents.workflows.utils import get_workflows_for_trigger
 from paperless.config import AIConfig
 from paperless_ai.indexing import llm_index_add_or_update_document
 from paperless_ai.indexing import llm_index_remove_document
@@ -415,13 +415,8 @@ def check_scheduled_workflows():
 
     Once a document satisfies this condition, and recurring/non-recurring constraints are met, the workflow is run.
     """
-    scheduled_workflows: list[Workflow] = (
-        Workflow.objects.filter(
-            triggers__type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
-            enabled=True,
-        )
-        .distinct()
-        .prefetch_related("triggers")
+    scheduled_workflows = get_workflows_for_trigger(
+        WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
     )
     if scheduled_workflows.count() > 0:
         logger.debug(f"Checking {len(scheduled_workflows)} scheduled workflows")

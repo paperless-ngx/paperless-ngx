@@ -585,6 +585,9 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             .select_related("owner")
             .annotate(document_count=Count("documents", filter=filter_q)),
             many=True,
+            user=self.user,
+            full_perms=self.full_perms,
+            all_fields=self.all_fields,
             context=self.context,
         )
         return serializer.data
