@@ -26,7 +26,7 @@ from rest_framework.test import APITestCase
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.signals.handlers import run_workflows
-from documents.signals.handlers import send_webhook
+from documents.workflows.webhooks import send_webhook
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -2858,7 +2858,7 @@ class TestWorkflows(
 
         mock_email_send.return_value = 1
 
-        with self.assertNoLogs("paperless.handlers", level="ERROR"):
+        with self.assertNoLogs("paperless.workflows", level="ERROR"):
             run_workflows(
                 WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
                 consumable_document,
@@ -3096,7 +3096,7 @@ class TestWorkflows(
             original_filename="sample.pdf",
         )
 
-        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
+        with self.assertLogs("paperless.workflows.actions", level="ERROR") as cm:
             run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
             expected_str = "Email backend has not been configured"
@@ -3144,7 +3144,7 @@ class TestWorkflows(
             original_filename="sample.pdf",
         )
 
-        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
+        with self.assertLogs("paperless.workflows", level="ERROR") as cm:
             run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
             expected_str = "Error occurred sending email"
@@ -3215,7 +3215,7 @@ class TestWorkflows(
         PAPERLESS_FORCE_SCRIPT_NAME="/paperless",
         BASE_URL="/paperless/",
     )
-    @mock.patch("documents.signals.handlers.send_webhook.delay")
+    @mock.patch("documents.workflows.webhooks.send_webhook.delay")
     def test_workflow_webhook_action_body(self, mock_post):
         """
         GIVEN:
@@ -3274,7 +3274,7 @@ class TestWorkflows(
     @override_settings(
         PAPERLESS_URL="http://localhost:8000",
     )
-    @mock.patch("documents.signals.handlers.send_webhook.delay")
+    @mock.patch("documents.workflows.webhooks.send_webhook.delay")
     def test_workflow_webhook_action_w_files(self, mock_post):
         """
         GIVEN:
@@ -3377,7 +3377,7 @@ class TestWorkflows(
         )
 
         # fails because no file
-        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
+        with self.assertLogs("paperless.workflows", level="ERROR") as cm:
             run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
             expected_str = "Error occurred sending webhook"
@@ -3420,7 +3420,7 @@ class TestWorkflows(
             original_filename="sample.pdf",
         )
 
-        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
+        with self.assertLogs("paperless.workflows", level="ERROR") as cm:
             run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
             expected_str = "Error occurred parsing webhook params"
@@ -3436,7 +3436,7 @@ class TestWorkflows(
             raise_for_status=mock.Mock(),
         )
 
-        with self.assertLogs("paperless.handlers") as cm:
+        with self.assertLogs("paperless.workflows") as cm:
             send_webhook(
                 url="http://paperless-ngx.com",
                 data="Test message",
@@ -3482,7 +3482,7 @@ class TestWorkflows(
             ),
         )
 
-        with self.assertLogs("paperless.handlers") as cm:
+        with self.assertLogs("paperless.workflows") as cm:
             with self.assertRaises(HTTPStatusError):
                 send_webhook(
                     url="http://paperless-ngx.com",
@@ -3498,7 +3498,7 @@ class TestWorkflows(
                 )
                 self.assertIn(expected_str, cm.output[0])
 
-    @mock.patch("documents.signals.handlers.send_webhook.delay")
+    @mock.patch("documents.workflows.webhooks.send_webhook.delay")
     def test_workflow_webhook_action_consumption(self, mock_post):
         """
         GIVEN:
