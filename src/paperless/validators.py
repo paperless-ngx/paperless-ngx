@@ -1,86 +1,159 @@
 from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import UploadedFile
 from lxml import etree
 
 ALLOWED_SVG_TAGS: set[str] = {
-    "svg",
-    "g",
-    "path",
-    "rect",
-    "circle",
-    "ellipse",
-    "line",
-    "polyline",
-    "polygon",
-    "text",
-    "tspan",
-    "defs",
-    "lineargradient",
-    "radialgradient",
-    "stop",
-    "clippath",
-    "use",
-    "title",
-    "desc",
-    "style",
+    # Basic shapes
+    "svg",  # Root SVG element
+    "g",  # Group elements together
+    "path",  # Draw complex shapes with commands
+    "rect",  # Rectangle
+    "circle",  # Circle
+    "ellipse",  # Ellipse/oval
+    "line",  # Straight line
+    "polyline",  # Connected lines (open path)
+    "polygon",  # Connected lines (closed path)
+    # Text
+    "text",  # Text container
+    "tspan",  # Text span within text
+    "textpath",  # Text along a path
+    # Definitions and reusable content
+    "defs",  # Container for reusable elements
+    "symbol",  # Reusable graphic template
+    "use",  # Reference/instantiate reusable elements
+    "marker",  # Arrowheads and path markers
+    "pattern",  # Repeating pattern fills
+    "mask",  # Masking effects
+    # Gradients
+    "lineargradient",  # Linear gradient fill
+    "radialgradient",  # Radial gradient fill
+    "stop",  # Gradient color stop
+    # Clipping
+    "clippath",  # Clipping path definition
+    # Metadata
+    "title",  # Accessible title
+    "desc",  # Accessible description
+    "metadata",  # Document metadata
 }
 
 ALLOWED_SVG_ATTRIBUTES: set[str] = {
-    "id",
-    "class",
-    "style",
-    "d",
-    "fill",
-    "fill-opacity",
-    "fill-rule",
-    "stroke",
-    "stroke-width",
-    "stroke-linecap",
-    "stroke-linejoin",
-    "stroke-miterlimit",
-    "stroke-dasharray",
-    "stroke-dashoffset",
-    "stroke-opacity",
-    "transform",
-    "x",
-    "y",
-    "cx",
-    "cy",
-    "r",
-    "rx",
-    "ry",
-    "width",
-    "height",
-    "x1",
-    "y1",
-    "x2",
-    "y2",
-    "gradienttransform",
-    "gradientunits",
-    "offset",
-    "stop-color",
-    "stop-opacity",
-    "clip-path",
-    "viewbox",
-    "preserveaspectratio",
-    "href",
-    "xlink:href",
-    "font-family",
-    "font-size",
-    "font-weight",
-    "text-anchor",
-    "xmlns",
-    "xmlns:xlink",
-    "version",
+    # Core attributes
+    "id",  # Unique identifier
+    "class",  # CSS class names
+    "style",  # Inline CSS styles (validate content separately!)
+    # Positioning and sizing
+    "x",  # X coordinate
+    "y",  # Y coordinate
+    "cx",  # Center X coordinate (circle/ellipse)
+    "cy",  # Center Y coordinate (circle/ellipse)
+    "r",  # Radius (circle)
+    "rx",  # X radius (ellipse, rounded corners)
+    "ry",  # Y radius (ellipse, rounded corners)
+    "width",  # Width
+    "height",  # Height
+    "x1",  # Start X (line, gradient)
+    "y1",  # Start Y (line, gradient)
+    "x2",  # End X (line, gradient)
+    "y2",  # End Y (line, gradient)
+    "dx",  # X offset (text)
+    "dy",  # Y offset (text)
+    "points",  # Point list for polyline/polygon
+    # Path data
+    "d",  # Path commands and coordinates
+    # Fill properties
+    "fill",  # Fill color or none
+    "fill-opacity",  # Fill transparency
+    "fill-rule",  # Fill algorithm (nonzero/evenodd)
+    # Stroke properties
+    "stroke",  # Stroke color or none
+    "stroke-width",  # Stroke thickness
+    "stroke-opacity",  # Stroke transparency
+    "stroke-linecap",  # Line ending style (butt/round/square)
+    "stroke-linejoin",  # Corner style (miter/round/bevel)
+    "stroke-miterlimit",  # Miter join limit
+    "stroke-dasharray",  # Dash pattern
+    "stroke-dashoffset",  # Dash pattern offset
+    # Transforms and positioning
+    "transform",  # Transformations (translate/rotate/scale)
+    "viewbox",  # Coordinate system and viewport
+    "preserveaspectratio",  # Scaling behavior
+    # Opacity
+    "opacity",  # Overall element opacity
+    # Gradient attributes
+    "gradienttransform",  # Transform applied to gradient
+    "gradientunits",  # Gradient coordinate system
+    "offset",  # Position of gradient stop
+    "stop-color",  # Color at gradient stop
+    "stop-opacity",  # Opacity at gradient stop
+    # Clipping and masking
+    "clip-path",  # Reference to clipping path
+    "mask",  # Reference to mask
+    # Markers
+    "marker-start",  # Marker at path start
+    "marker-mid",  # Marker at path vertices
+    "marker-end",  # Marker at path end
+    # Text attributes
+    "font-family",  # Font name
+    "font-size",  # Font size
+    "font-weight",  # Font weight (normal/bold)
+    "font-style",  # Font style (normal/italic)
+    "text-anchor",  # Text alignment (start/middle/end)
+    "text-decoration",  # Text decoration (underline/etc)
+    "letter-spacing",  # Space between letters
+    # Links and references
+    "href",  # Link or reference (validate for javascript:!)
+    "xlink:href",  # Legacy link reference (validate for javascript:!)
+    "xlink:title",  # Accessible title for links
+    # Pattern attributes
+    "patternunits",  # Pattern coordinate system
+    "patterntransform",  # Transform applied to pattern
+    "patterncontentunits",  # Pattern content coordinate system
+    # Mask attributes
+    "maskunits",  # Mask coordinate system
+    "maskcontentunits",  # Mask content coordinate system
+    # SVG namespace declarations
+    "xmlns",  # XML namespace (usually http://www.w3.org/2000/svg)
+    "xmlns:xlink",  # XLink namespace
+    "version",  # SVG version
     "type",
 }
 
+# Dangerous patterns in style attributes that can execute code
+DANGEROUS_STYLE_PATTERNS: set[str] = {
+    "javascript:",  # javascript: URLs in url() functions
+    "data:text/html",  # HTML data URIs can contain scripts
+    "expression(",  # IE's CSS expressions (legacy but dangerous)
+    "import",  # CSS @import can load external resources
+    "@import",  # CSS @import directive
+    "-moz-binding:",  # Firefox XBL bindings (can execute code)
+    "behaviour:",  # IE behavior property
+    "vbscript:",  # VBScript URLs
+}
 
-def reject_dangerous_svg(file):
+XLINK_NS: set[str] = {
+    "http://www.w3.org/1999/xlink",
+    "https://www.w3.org/1999/xlink",
+}
+
+# Dangerous URI schemes
+DANGEROUS_SCHEMES: set[str] = {
+    "javascript:",
+    "data:text/html",
+    "vbscript:",
+    "file:",
+    "data:application/",  # Can contain scripts
+}
+
+SAFE_PREFIXES: set[str] = {"#", "/", "./", "../", "data:image/"}
+
+
+def reject_dangerous_svg(file: UploadedFile) -> None:
     """
     Rejects SVG files that contain dangerous tags or attributes.
     Raises ValidationError if unsafe content is found.
     See GHSA-6p53-hqqw-8j62
     """
+
     try:
         parser = etree.XMLParser(resolve_entities=False)
         file.seek(0)
@@ -90,17 +163,56 @@ def reject_dangerous_svg(file):
         raise ValidationError("Invalid SVG file.")
 
     for element in root.iter():
-        tag = etree.QName(element.tag).localname.lower()
+        tag: str = etree.QName(element.tag).localname.lower()
         if tag not in ALLOWED_SVG_TAGS:
             raise ValidationError(f"Disallowed SVG tag: <{tag}>")
 
+        attr_name: str
+        attr_value: str
         for attr_name, attr_value in element.attrib.items():
-            attr_name_lower = attr_name.lower()
+            # lxml expands namespaces to {url}name. We must convert the standard
+            # XLink namespace back to 'xlink:' so it matches our allowlist.
+            if attr_name.startswith("{"):
+                qname = etree.QName(attr_name)
+                if qname.namespace in XLINK_NS:
+                    attr_name_check = f"xlink:{qname.localname}"
+                else:
+                    # Unknown namespace: keep raw name (will fail allowlist)
+                    attr_name_check = attr_name
+            else:
+                attr_name_check = attr_name
+
+            attr_name_lower = attr_name_check.lower().strip()
+
             if attr_name_lower not in ALLOWED_SVG_ATTRIBUTES:
                 raise ValidationError(f"Disallowed SVG attribute: {attr_name}")
 
-            if attr_name_lower in {
-                "href",
-                "xlink:href",
-            } and attr_value.strip().lower().startswith("javascript:"):
-                raise ValidationError(f"Disallowed javascript: URI in {attr_name}")
+            if attr_name_lower == "style":
+                style_lower: str = attr_value.lower()
+                # Check if any dangerous pattern is a substring of the style
+                for pattern in DANGEROUS_STYLE_PATTERNS:
+                    if pattern in style_lower:
+                        raise ValidationError(
+                            f"Disallowed pattern in style attribute: {pattern}",
+                        )
+
+            # Validate URI attributes (href, xlink:href)
+            if attr_name_lower in {"href", "xlink:href"}:
+                value_stripped: str = attr_value.strip().lower()
+
+                # Check if value starts with any dangerous scheme
+                for scheme in DANGEROUS_SCHEMES:
+                    if value_stripped.startswith(scheme):
+                        raise ValidationError(
+                            f"Disallowed URI scheme in {attr_name}: {scheme}",
+                        )
+
+                # Allow safe schemes for logos: #anchor, relative paths, data:image/*
+                # No external resources (http/https) needed for logos
+
+                if value_stripped and not any(
+                    value_stripped.startswith(prefix) for prefix in SAFE_PREFIXES
+                ):
+                    raise ValidationError(
+                        f"URI scheme not allowed in {attr_name}: must be #anchor, relative path, or data:image/*",
+                    )
