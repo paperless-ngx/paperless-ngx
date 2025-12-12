@@ -274,6 +274,35 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("disallowed", str(response.data).lower())
 
+    def test_api_rejects_svg_with_style_cdata_javascript(self):
+        """
+        GIVEN:
+            - An SVG logo with javascript: hidden in a CDATA style block
+        WHEN:
+            - Uploaded via PATCH to app config
+        THEN:
+            - SVG is rejected with 400
+        """
+
+        malicious_svg = b"""<?xml version="1.0" encoding="UTF-8"?>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+        <style><![CDATA[
+            rect { background: url("javascript:alert('XSS')"); }
+        ]]></style>
+        <rect width="100" height="100" fill="purple"/>
+    </svg>"""
+
+        svg_file = BytesIO(malicious_svg)
+        svg_file.name = "cdata_style.svg"
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            {"app_logo": svg_file},
+            format="multipart",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("disallowed", str(response.data).lower())
+
     def test_api_rejects_svg_with_style_import(self):
         """
         GIVEN:

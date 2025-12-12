@@ -197,7 +197,8 @@ def reject_dangerous_svg(file: UploadedFile) -> None:
             raise ValidationError(f"Disallowed SVG tag: <{tag}>")
 
         if tag == "style":
-            style_text: str = (element.text or "").lower()
+            # Combine all text (including CDATA) to scan for dangerous patterns
+            style_text: str = "".join(element.itertext()).lower()
             for pattern in DANGEROUS_STYLE_PATTERNS:
                 if pattern in style_text:
                     raise ValidationError(
