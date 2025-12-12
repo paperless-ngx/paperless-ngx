@@ -61,21 +61,22 @@ def get_groups_with_only_permission(obj, codename):
     return Group.objects.filter(id__in=group_object_perm_group_ids).distinct()
 
 
-def set_permissions_for_object(permissions: list[str], object, *, merge: bool = False):
+def set_permissions_for_object(permissions: dict, object, *, merge: bool = False):
     """
-    Set permissions for an object. The permissions are given as a list of strings
-    in the format "action_modelname", e.g. "view_document".
+    Set permissions for an object. The permissions are given as a mapping of actions
+    to a dict of user / group id lists, e.g.
+    {"view": {"users": [1], "groups": [2]}, "change": {"users": [], "groups": []}}.
 
     If merge is True, the permissions are merged with the existing permissions and
     no users or groups are removed. If False, the permissions are set to exactly
     the given list of users and groups.
     """
 
-    for action in permissions:
+    for action, entry in permissions.items():
         permission = f"{action}_{object.__class__.__name__.lower()}"
-        if "users" in permissions[action]:
+        if "users" in entry:
             # users
-            users_to_add = User.objects.filter(id__in=permissions[action]["users"])
+            users_to_add = User.objects.filter(id__in=entry["users"])
             users_to_remove = (
                 get_users_with_perms(
                     object,
@@ -85,12 +86,12 @@ def set_permissions_for_object(permissions: list[str], object, *, merge: bool = 
                 if not merge
                 else User.objects.none()
             )
-            if len(users_to_add) > 0 and len(users_to_remove) > 0:
+            if users_to_add.exists() and users_to_remove.exists():
                 users_to_remove = users_to_remove.exclude(id__in=users_to_add)
-            if len(users_to_remove) > 0:
+            if users_to_remove.exists():
                 for user in users_to_remove:
                     remove_perm(permission, user, object)
-            if len(users_to_add) > 0:
+            if users_to_add.exists():
                 for user in users_to_add:
                     assign_perm(permission, user, object)
                     if action == "change":
@@ -100,9 +101,9 @@ def set_permissions_for_object(permissions: list[str], object, *, merge: bool = 
                             user,
                             object,
                         )
-        if "groups" in permissions[action]:
+        if "groups" in entry:
             # groups
-            groups_to_add = Group.objects.filter(id__in=permissions[action]["groups"])
+            groups_to_add = Group.objects.filter(id__in=entry["groups"])
             groups_to_remove = (
                 get_groups_with_only_permission(
                     object,
@@ -111,12 +112,12 @@ def set_permissions_for_object(permissions: list[str], object, *, merge: bool = 
                 if not merge
                 else Group.objects.none()
             )
-            if len(groups_to_add) > 0 and len(groups_to_remove) > 0:
+            if groups_to_add.exists() and groups_to_remove.exists():
                 groups_to_remove = groups_to_remove.exclude(id__in=groups_to_add)
-            if len(groups_to_remove) > 0:
+            if groups_to_remove.exists():
                 for group in groups_to_remove:
                     remove_perm(permission, group, object)
-            if len(groups_to_add) > 0:
+            if groups_to_add.exists():
                 for group in groups_to_add:
                     assign_perm(permission, group, object)
                     if action == "change":
