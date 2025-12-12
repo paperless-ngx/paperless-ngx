@@ -17,6 +17,7 @@ ALLOWED_SVG_TAGS: set[str] = {
     "text",  # Text container
     "tspan",  # Text span within text
     "textpath",  # Text along a path
+    "style",  # Embedded CSS
     # Definitions and reusable content
     "defs",  # Container for reusable elements
     "symbol",  # Reusable graphic template
@@ -192,6 +193,14 @@ def reject_dangerous_svg(file: UploadedFile) -> None:
         tag: str = etree.QName(element.tag).localname.lower()
         if tag not in ALLOWED_SVG_TAGS:
             raise ValidationError(f"Disallowed SVG tag: <{tag}>")
+
+        if tag == "style":
+            style_text: str = (element.text or "").lower()
+            for pattern in DANGEROUS_STYLE_PATTERNS:
+                if pattern in style_text:
+                    raise ValidationError(
+                        f"Disallowed pattern in <style> content: {pattern}",
+                    )
 
         attr_name: str
         attr_value: str
