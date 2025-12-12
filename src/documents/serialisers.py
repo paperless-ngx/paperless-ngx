@@ -144,8 +144,9 @@ class MatchingModelSerializer(serializers.ModelSerializer):
             try:
                 validate_regex_pattern(match)
             except ValueError as e:
+                logger.debug(f"Invalid regular expression: {e!s}")
                 raise serializers.ValidationError(
-                    _("Invalid regular expression: %(error)s") % {"error": str(e)},
+                    "Invalid regular expression, see log for details.",
                 )
         return match
 
