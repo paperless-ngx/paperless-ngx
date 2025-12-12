@@ -17,6 +17,7 @@ from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
+from httpx import ConnectError
 from httpx import HTTPError
 from httpx import HTTPStatusError
 from pytest_httpx import HTTPXMock
@@ -3428,7 +3429,7 @@ class TestWorkflows(
             expected_str = "Error occurred parsing webhook headers"
             self.assertIn(expected_str, cm.output[1])
 
-    @mock.patch("httpx.post")
+    @mock.patch("httpx.Client.post")
     def test_workflow_webhook_send_webhook_task(self, mock_post):
         mock_post.return_value = mock.Mock(
             status_code=200,
@@ -3449,8 +3450,6 @@ class TestWorkflows(
                 content="Test message",
                 headers={},
                 files=None,
-                follow_redirects=False,
-                timeout=5,
             )
 
             expected_str = "Webhook sent to http://paperless-ngx.com"
@@ -3468,11 +3467,9 @@ class TestWorkflows(
                 data={"message": "Test message"},
                 headers={},
                 files=None,
-                follow_redirects=False,
-                timeout=5,
             )
 
-    @mock.patch("httpx.post")
+    @mock.patch("httpx.Client.post")
     def test_workflow_webhook_send_webhook_retry(self, mock_http):
         mock_http.return_value.raise_for_status = mock.Mock(
             side_effect=HTTPStatusError(
@@ -3668,7 +3665,7 @@ class TestWebhookSecurity:
             - ValueError is raised
         """
         resolve_to("127.0.0.1")
-        with pytest.raises(ValueError):
+        with pytest.raises(ConnectError):
             send_webhook(
                 "http://paperless-ngx.com",
                 data="",
@@ -3698,7 +3695,8 @@ class TestWebhookSecurity:
         )
 
         req = httpx_mock.get_request()
-        assert req.url.host == "paperless-ngx.com"
+        assert req.url.host == "52.207.186.75"
+        assert req.headers["host"] == "paperless-ngx.com"
 
     def test_follow_redirects_disabled(self, httpx_mock: HTTPXMock, resolve_to):
         """
