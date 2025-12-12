@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-14 16:09+0000\n"
-"PO-Revision-Date: 2025-11-22 12:12\n"
+"POT-Creation-Date: 2025-12-12 17:41+0000\n"
+"PO-Revision-Date: 2025-12-12 17:44\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -862,7 +862,7 @@ msgstr "hat alle diese Tags"
 
 #: documents/models.py:1079
 msgid "does not have these tag(s)"
-msgstr "hat diese Tags nicht)"
+msgstr "hat diese Tags nicht"
 
 #: documents/models.py:1087
 msgid "has this document type"
@@ -890,7 +890,7 @@ msgstr "hat diese Speicherpfade nicht"
 
 #: documents/models.py:1128
 msgid "filter custom field query"
-msgstr "Filtere nach benutzerdefiniertem Feld"
+msgstr "Filtern Benutzerdefinierte Feldabfrage"
 
 #: documents/models.py:1131
 msgid "JSON-encoded custom field query expression."
@@ -1208,39 +1208,34 @@ msgstr "Arbeitsablauf-Ausführung"
 msgid "workflow runs"
 msgstr "Arbeitsablauf wird ausgeführt"
 
-#: documents/serialisers.py:145
-#, python-format
-msgid "Invalid regular expression: %(error)s"
-msgstr "Ungültiger regulärer Ausdruck: %(error)s"
-
-#: documents/serialisers.py:619
+#: documents/serialisers.py:640
 msgid "Invalid color."
 msgstr "Ungültige Farbe."
 
-#: documents/serialisers.py:1805
+#: documents/serialisers.py:1826
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Dateityp %(type)s nicht unterstützt"
 
-#: documents/serialisers.py:1849
+#: documents/serialisers.py:1870
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
-msgstr "Feld-ID eines benutzerdefinierten Felds muss eine Ganzzahl sein: %(id)s"
+msgstr "id eines benutzerdefinierten Felds muss eine Ganzzahl sein: %(id)s"
 
-#: documents/serialisers.py:1856
+#: documents/serialisers.py:1877
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Benutzerdefiniertes Feld mit ID %(id)s existiert nicht"
 
-#: documents/serialisers.py:1873 documents/serialisers.py:1883
+#: documents/serialisers.py:1894 documents/serialisers.py:1904
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Benutzerdefinierte Felder müssen eine Liste von Ganzzahlen oder ein Objekt mit Zuordnung von IDs zu Werten sein."
 
-#: documents/serialisers.py:1878
+#: documents/serialisers.py:1899
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Einige benutzerdefinierte Felder existieren nicht oder wurden zweimal angegeben."
 
-#: documents/serialisers.py:1993
+#: documents/serialisers.py:2014
 msgid "Invalid variable detected."
 msgstr "Ungültige Variable erkannt."
 

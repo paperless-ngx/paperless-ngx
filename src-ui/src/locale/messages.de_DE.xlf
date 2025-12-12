@@ -5,7 +5,7 @@
       <trans-unit id="ngb.alert.close" datatype="html" approved="yes">
         <source>Close</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/alert/alert.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/alert/alert.ts</context>
           <context context-type="linenumber">50</context>
         </context-group>
         <target state="final">Schließen</target>
@@ -13,7 +13,7 @@
       <trans-unit id="ngb.carousel.slide-number" datatype="html" approved="yes">
         <source> Slide <x id="INTERPOLATION" equiv-text="ueryList&lt;NgbSli"/> of <x id="INTERPOLATION_1" equiv-text="EventSource = N"/> </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/carousel/carousel.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/carousel/carousel.ts</context>
           <context context-type="linenumber">131,135</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
@@ -22,7 +22,7 @@
       <trans-unit id="ngb.carousel.previous" datatype="html" approved="yes">
         <source>Previous</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/carousel/carousel.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/carousel/carousel.ts</context>
           <context context-type="linenumber">157,159</context>
         </context-group>
         <target state="final">Vorherige</target>
@@ -30,7 +30,7 @@
       <trans-unit id="ngb.carousel.next" datatype="html" approved="yes">
         <source>Next</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/carousel/carousel.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/carousel/carousel.ts</context>
           <context context-type="linenumber">198</context>
         </context-group>
         <target state="final">Nächste</target>
@@ -38,11 +38,11 @@
       <trans-unit id="ngb.datepicker.previous-month" datatype="html" approved="yes">
         <source>Previous month</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/datepicker/datepicker-navigation.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">83,85</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/datepicker/datepicker-navigation.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">112</context>
         </context-group>
         <target state="final">Vorheriger Monat</target>
@@ -50,11 +50,11 @@
       <trans-unit id="ngb.datepicker.next-month" datatype="html" approved="yes">
         <source>Next month</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/datepicker/datepicker-navigation.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">112</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/datepicker/datepicker-navigation.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">112</context>
         </context-group>
         <target state="final">Nächster Monat</target>
@@ -62,7 +62,7 @@
       <trans-unit id="ngb.timepicker.HH" datatype="html" approved="yes">
         <source>HH</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">HH</target>
@@ -70,7 +70,7 @@
       <trans-unit id="ngb.toast.close-aria" datatype="html" approved="yes">
         <source>Close</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">Schließen</target>
@@ -78,11 +78,11 @@
       <trans-unit id="ngb.datepicker.select-month" datatype="html" approved="yes">
         <source>Select month</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">Monat auswählen</target>
@@ -90,7 +90,7 @@
       <trans-unit id="ngb.pagination.first" datatype="html" approved="yes">
         <source>««</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">««</target>
@@ -98,7 +98,7 @@
       <trans-unit id="ngb.timepicker.hours" datatype="html" approved="yes">
         <source>Hours</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">Stunden</target>
@@ -106,7 +106,7 @@
       <trans-unit id="ngb.pagination.previous" datatype="html" approved="yes">
         <source>«</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">«</target>
@@ -114,7 +114,7 @@
       <trans-unit id="ngb.timepicker.MM" datatype="html" approved="yes">
         <source>MM</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">MM</target>
@@ -122,7 +122,7 @@
       <trans-unit id="ngb.pagination.next" datatype="html" approved="yes">
         <source>»</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">»</target>
@@ -130,11 +130,11 @@
       <trans-unit id="ngb.datepicker.select-year" datatype="html" approved="yes">
         <source>Select year</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">Jahr auswählen</target>
@@ -142,7 +142,7 @@
       <trans-unit id="ngb.timepicker.minutes" datatype="html" approved="yes">
         <source>Minutes</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">Minuten</target>
@@ -150,7 +150,7 @@
       <trans-unit id="ngb.pagination.last" datatype="html" approved="yes">
         <source>»»</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">»»</target>
@@ -158,7 +158,7 @@
       <trans-unit id="ngb.pagination.first-aria" datatype="html" approved="yes">
         <source>First</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">Erste</target>
@@ -166,7 +166,7 @@
       <trans-unit id="ngb.timepicker.increment-hours" datatype="html" approved="yes">
         <source>Increment hours</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">Stunden erhöhen</target>
@@ -174,7 +174,7 @@
       <trans-unit id="ngb.pagination.previous-aria" datatype="html" approved="yes">
         <source>Previous</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">Vorherige</target>
@@ -182,7 +182,7 @@
       <trans-unit id="ngb.timepicker.decrement-hours" datatype="html" approved="yes">
         <source>Decrement hours</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">Stunden verringern</target>
@@ -190,7 +190,7 @@
       <trans-unit id="ngb.pagination.next-aria" datatype="html" approved="yes">
         <source>Next</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">Nächste</target>
@@ -198,7 +198,7 @@
       <trans-unit id="ngb.timepicker.increment-minutes" datatype="html" approved="yes">
         <source>Increment minutes</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">Minuten erhöhen</target>
@@ -206,7 +206,7 @@
       <trans-unit id="ngb.pagination.last-aria" datatype="html" approved="yes">
         <source>Last</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">Letzte</target>
@@ -214,7 +214,7 @@
       <trans-unit id="ngb.timepicker.decrement-minutes" datatype="html" approved="yes">
         <source>Decrement minutes</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">Minuten verringern</target>
@@ -222,7 +222,7 @@
       <trans-unit id="ngb.timepicker.SS" datatype="html" approved="yes">
         <source>SS</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">SS</target>
@@ -230,7 +230,7 @@
       <trans-unit id="ngb.timepicker.seconds" datatype="html" approved="yes">
         <source>Seconds</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">Sekunden</target>
@@ -238,7 +238,7 @@
       <trans-unit id="ngb.timepicker.increment-seconds" datatype="html" approved="yes">
         <source>Increment seconds</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">Sekunden erhöhen</target>
@@ -246,7 +246,7 @@
       <trans-unit id="ngb.timepicker.decrement-seconds" datatype="html" approved="yes">
         <source>Decrement seconds</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="final">Sekunden verringern</target>
@@ -256,7 +256,7 @@
           <x id="INTERPOLATION"/>
         </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
       </trans-unit>
@@ -265,7 +265,7 @@
           <x id="INTERPOLATION" equiv-text="barConfig);  pu"/>
         </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.14_@angular+core@20.3.12_@angula_f6978d5a33be250eb7b5e8e65faf7a7d/node_modules/src/progressbar/progressbar.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.3.15_@angular+core@20.3.15_@angula_40533c760dbaadbd90323f0d78d15fb8/node_modules/src/progressbar/progressbar.ts</context>
           <context context-type="linenumber">41,42</context>
         </context-group>
         <target state="final"><x id="INTERPOLATION" equiv-text="barConfig);  pu"/></target>
@@ -886,13 +886,13 @@
         </context-group>
         <target state="final">Wird geladen...</target>
       </trans-unit>
-      <trans-unit id="7831218302373733360" datatype="html">
+      <trans-unit id="7831218302373733360" datatype="html" approved="yes">
         <source>Jump to bottom</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/logs/logs.component.html</context>
-          <context context-type="linenumber">60</context>
+          <context context-type="linenumber">62</context>
         </context-group>
-        <target state="translated">Nach unten</target>
+        <target state="final">Nach unten</target>
       </trans-unit>
       <trans-unit id="1255048712725285892" datatype="html" approved="yes">
         <source>Options to customize appearance, notifications and more. Settings apply to the &lt;strong&gt;current user only&lt;/strong&gt;.</source>
@@ -2150,21 +2150,21 @@
         </context-group>
         <target state="final">Alle <x id="PH" equiv-text="tasks.size"/> Aufgaben verwerfen?</target>
       </trans-unit>
-      <trans-unit id="3597309129998924778" datatype="html">
+      <trans-unit id="3597309129998924778" datatype="html" approved="yes">
         <source>Error dismissing tasks</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">161</context>
         </context-group>
-        <target state="translated">Fehler beim Verwerfen der Aufgaben</target>
+        <target state="final">Fehler beim Verwerfen der Aufgaben</target>
       </trans-unit>
-      <trans-unit id="2132179171926568807" datatype="html">
+      <trans-unit id="2132179171926568807" datatype="html" approved="yes">
         <source>Error dismissing task</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">170</context>
         </context-group>
-        <target state="translated">Fehler beim Verwerfen der Aufgabe</target>
+        <target state="final">Fehler beim Verwerfen der Aufgabe</target>
       </trans-unit>
       <trans-unit id="9011556615675272238" datatype="html" approved="yes">
         <source>queued</source>
@@ -5270,21 +5270,21 @@
         </context-group>
         <target state="final">Inhaltsabgleichsmuster</target>
       </trans-unit>
-      <trans-unit id="7123490720096247063" datatype="html">
+      <trans-unit id="7123490720096247063" datatype="html" approved="yes">
         <source>Advanced Filters</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">183</context>
         </context-group>
-        <target state="translated">Erweiterte Filter</target>
+        <target state="final">Erweiterte Filter</target>
       </trans-unit>
-      <trans-unit id="910026778839409110" datatype="html">
+      <trans-unit id="910026778839409110" datatype="html" approved="yes">
         <source>Add filter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">190</context>
         </context-group>
-        <target state="translated">Filter hinzufügen</target>
+        <target state="final">Filter hinzufügen</target>
       </trans-unit>
       <trans-unit id="5671193617280178107" datatype="html">
         <source>No advanced workflow filters defined.</source>
@@ -5674,29 +5674,29 @@
         </context-group>
         <target state="final">Webhook</target>
       </trans-unit>
-      <trans-unit id="4522609911791833187" datatype="html">
+      <trans-unit id="4522609911791833187" datatype="html" approved="yes">
         <source>Has any of these tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">203</context>
         </context-group>
-        <target state="translated">Hat beliebige dieser Tags</target>
+        <target state="final">Hat beliebige dieser Tags</target>
       </trans-unit>
-      <trans-unit id="4166903555074156852" datatype="html">
+      <trans-unit id="4166903555074156852" datatype="html" approved="yes">
         <source>Has all of these tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">210</context>
         </context-group>
-        <target state="translated">Hat alle diese Tags</target>
+        <target state="final">Hat alle diese Tags</target>
       </trans-unit>
-      <trans-unit id="6624363795312783141" datatype="html">
+      <trans-unit id="6624363795312783141" datatype="html" approved="yes">
         <source>Does not have these tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">217</context>
         </context-group>
-        <target state="translated">Hat diese Tags nicht</target>
+        <target state="final">Hat diese Tags nicht</target>
       </trans-unit>
       <trans-unit id="5281365940563983618" datatype="html" approved="yes">
         <source>Has correspondent</source>
@@ -5706,13 +5706,13 @@
         </context-group>
         <target state="final">Hat Korrespondent</target>
       </trans-unit>
-      <trans-unit id="6884498632428600393" datatype="html">
+      <trans-unit id="6884498632428600393" datatype="html" approved="yes">
         <source>Does not have correspondents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">232</context>
         </context-group>
-        <target state="translated">Korrespondent ist nicht</target>
+        <target state="final">Korrespondent ist nicht</target>
       </trans-unit>
       <trans-unit id="4806713133917046341" datatype="html" approved="yes">
         <source>Has document type</source>
@@ -5722,13 +5722,13 @@
         </context-group>
         <target state="final">Hat Dokumenttyp</target>
       </trans-unit>
-      <trans-unit id="1507843981661822403" datatype="html">
+      <trans-unit id="1507843981661822403" datatype="html" approved="yes">
         <source>Does not have document types</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">248</context>
         </context-group>
-        <target state="translated">Dokumenttyp ist nicht</target>
+        <target state="final">Dokumenttyp ist nicht</target>
       </trans-unit>
       <trans-unit id="4277260190522078330" datatype="html" approved="yes">
         <source>Has storage path</source>
@@ -5738,13 +5738,13 @@
         </context-group>
         <target state="final">hat Speicherpfad</target>
       </trans-unit>
-      <trans-unit id="6070943364927280151" datatype="html">
+      <trans-unit id="6070943364927280151" datatype="html" approved="yes">
         <source>Does not have storage paths</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">264</context>
         </context-group>
-        <target state="translated">Speicherpfad ist nicht</target>
+        <target state="final">Speicherpfad ist nicht</target>
       </trans-unit>
       <trans-unit id="6250799006816371860" datatype="html">
         <source>Matches custom field query</source>
@@ -5822,13 +5822,13 @@
         </context-group>
         <target state="final">E-Mail senden</target>
       </trans-unit>
-      <trans-unit id="804449326554380528" datatype="html">
+      <trans-unit id="804449326554380528" datatype="html" approved="yes">
         <source>Some email servers may reject messages with large attachments.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.html</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="translated">Einige E-Mail-Server lehnen Nachrichten mit großen Anhängen ab.</target>
+        <target state="final">Einige E-Mail-Server lehnen Nachrichten mit großen Anhängen ab.</target>
       </trans-unit>
       <trans-unit id="9049148856403142491" datatype="html" approved="yes">
         <source>Email sent</source>
@@ -5838,13 +5838,13 @@
         </context-group>
         <target state="final">E-Mail gesendet</target>
       </trans-unit>
-      <trans-unit id="4632604705213766411" datatype="html">
+      <trans-unit id="4632604705213766411" datatype="html" approved="yes">
         <source>Error emailing documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.ts</context>
           <context context-type="linenumber">69</context>
         </context-group>
-        <target state="translated">Fehler beim Senden der Dokumente</target>
+        <target state="final">Fehler beim Senden der Dokumente</target>
       </trans-unit>
       <trans-unit id="3742745894977668908" datatype="html" approved="yes">
         <source>Error emailing document</source>
@@ -8070,13 +8070,13 @@
         </context-group>
         <target state="final">Drucken fehlgeschlagen.</target>
       </trans-unit>
-      <trans-unit id="6457245677384603573" datatype="html">
+      <trans-unit id="6457245677384603573" datatype="html" approved="yes">
         <source>Error loading document for printing.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1472</context>
         </context-group>
-        <target state="translated">Fehler beim Laden des Dokuments für den Druck.</target>
+        <target state="final">Fehler beim Laden des Dokuments für den Druck.</target>
       </trans-unit>
       <trans-unit id="6085793215710522488" datatype="html" approved="yes">
         <source>An error occurred loading tiff: <x id="PH" equiv-text="err.toString()"/></source>
@@ -8729,13 +8729,13 @@
         </context-group>
         <target state="final">Alles auswählen</target>
       </trans-unit>
-      <trans-unit id="6857598786757174736" datatype="html">
+      <trans-unit id="6857598786757174736" datatype="html" approved="yes">
         <source>Select:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="translated">Auswählen:</target>
+        <target state="final">Auswählen:</target>
       </trans-unit>
       <trans-unit id="6252070156626006029" datatype="html" approved="yes">
         <source>None</source>
@@ -10429,13 +10429,13 @@
         </context-group>
         <target state="final">Dokumentenverknüpfung</target>
       </trans-unit>
-      <trans-unit id="2541053474781098515" datatype="html">
+      <trans-unit id="2541053474781098515" datatype="html" approved="yes">
         <source>Long Text</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/custom-field.ts</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="translated">Langer Text</target>
+        <target state="final">Langer Text</target>
       </trans-unit>
       <trans-unit id="4460262093225954455" datatype="html" approved="yes">
         <source>Search score</source>
