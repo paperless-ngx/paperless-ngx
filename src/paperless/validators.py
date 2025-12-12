@@ -154,7 +154,9 @@ DANGEROUS_STYLE_PATTERNS: set[str] = {
     "@import",  # CSS @import directive
     "-moz-binding:",  # Firefox XBL bindings (can execute code)
     "behaviour:",  # IE behavior property
+    "behavior:",  # IE behavior property (US spelling)
     "vbscript:",  # VBScript URLs
+    "data:application/",  # Data URIs for arbitrary application payloads
 }
 
 XLINK_NS: set[str] = {
