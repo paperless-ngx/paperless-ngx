@@ -274,6 +274,35 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("disallowed", str(response.data).lower())
 
+    def test_api_rejects_svg_with_style_cdata_javascript(self):
+        """
+        GIVEN:
+            - An SVG logo with javascript: hidden in a CDATA style block
+        WHEN:
+            - Uploaded via PATCH to app config
+        THEN:
+            - SVG is rejected with 400
+        """
+
+        malicious_svg = b"""<?xml version="1.0" encoding="UTF-8"?>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+        <style><![CDATA[
+            rect { background: url("javascript:alert('XSS')"); }
+        ]]></style>
+        <rect width="100" height="100" fill="purple"/>
+    </svg>"""
+
+        svg_file = BytesIO(malicious_svg)
+        svg_file.name = "cdata_style.svg"
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            {"app_logo": svg_file},
+            format="multipart",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("disallowed", str(response.data).lower())
+
     def test_api_rejects_svg_with_style_import(self):
         """
         GIVEN:
@@ -318,6 +347,36 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
 
         svg_file = BytesIO(safe_svg)
         svg_file.name = "safe_logo.svg"
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            {"app_logo": svg_file},
+            format="multipart",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_api_accepts_valid_svg_with_safe_style_tag(self):
+        """
+        GIVEN:
+            - A valid SVG logo with an embedded <style> tag
+        WHEN:
+            - Uploaded to app config
+        THEN:
+            - SVG is accepted with 200
+        """
+
+        safe_svg = b"""<?xml version="1.0" encoding="UTF-8"?>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+        <style>
+            rect { fill: #ff6b6b; stroke: #333; stroke-width: 2; }
+            circle { fill: white; opacity: 0.8; }
+        </style>
+        <rect width="100" height="100"/>
+        <circle cx="50" cy="50" r="30"/>
+    </svg>"""
+
+        svg_file = BytesIO(safe_svg)
+        svg_file.name = "safe_logo_with_style.svg"
 
         response = self.client.patch(
             f"{self.ENDPOINT}1/",

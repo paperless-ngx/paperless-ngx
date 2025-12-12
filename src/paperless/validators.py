@@ -17,6 +17,7 @@ ALLOWED_SVG_TAGS: set[str] = {
     "text",  # Text container
     "tspan",  # Text span within text
     "textpath",  # Text along a path
+    "style",  # Embedded CSS
     # Definitions and reusable content
     "defs",  # Container for reusable elements
     "symbol",  # Reusable graphic template
@@ -153,7 +154,9 @@ DANGEROUS_STYLE_PATTERNS: set[str] = {
     "@import",  # CSS @import directive
     "-moz-binding:",  # Firefox XBL bindings (can execute code)
     "behaviour:",  # IE behavior property
+    "behavior:",  # IE behavior property (US spelling)
     "vbscript:",  # VBScript URLs
+    "data:application/",  # Data URIs for arbitrary application payloads
 }
 
 XLINK_NS: set[str] = {
@@ -192,6 +195,15 @@ def reject_dangerous_svg(file: UploadedFile) -> None:
         tag: str = etree.QName(element.tag).localname.lower()
         if tag not in ALLOWED_SVG_TAGS:
             raise ValidationError(f"Disallowed SVG tag: <{tag}>")
+
+        if tag == "style":
+            # Combine all text (including CDATA) to scan for dangerous patterns
+            style_text: str = "".join(element.itertext()).lower()
+            for pattern in DANGEROUS_STYLE_PATTERNS:
+                if pattern in style_text:
+                    raise ValidationError(
+                        f"Disallowed pattern in <style> content: {pattern}",
+                    )
 
         attr_name: str
         attr_value: str
