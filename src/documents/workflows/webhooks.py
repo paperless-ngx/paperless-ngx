@@ -10,26 +10,98 @@ from django.conf import settings
 logger = logging.getLogger("paperless.workflows.webhooks")
 
 
-def _is_public_ip(ip: str) -> bool:
-    try:
-        obj = ipaddress.ip_address(ip)
-        return not (
-            obj.is_private
-            or obj.is_loopback
-            or obj.is_link_local
-            or obj.is_multicast
-            or obj.is_unspecified
+class WebhookTransport(httpx.HTTPTransport):
+    """
+    Transport that resolves/validates hostnames and rewrites to a vetted IP
+    while keeping Host/SNI as the original hostname.
+    """
+
+    def __init__(
+        self,
+        hostname: str,
+        *args,
+        allow_internal: bool = False,
+        **kwargs,
+    ) -> None:
+        super().__init__(*args, **kwargs)
+        self.hostname = hostname
+        self.allow_internal = allow_internal
+
+    def handle_request(self, request: httpx.Request) -> httpx.Response:
+        hostname = request.url.host
+
+        if not hostname:
+            raise httpx.ConnectError("No hostname in request URL")
+
+        try:
+            addr_info = socket.getaddrinfo(hostname, None)
+        except socket.gaierror as e:
+            raise httpx.ConnectError(f"Could not resolve hostname: {hostname}") from e
+
+        ips = [info[4][0] for info in addr_info if info and info[4]]
+        if not ips:
+            raise httpx.ConnectError(f"Could not resolve hostname: {hostname}")
+
+        if not self.allow_internal:
+            for ip_str in ips:
+                if not WebhookTransport.is_public_ip(ip_str):
+                    raise httpx.ConnectError(
+                        f"Connection blocked: {hostname} resolves to a non-public address",
+                    )
+
+        ip_str = ips[0]
+        formatted_ip = self._format_ip_for_url(ip_str)
+
+        new_headers = httpx.Headers(request.headers)
+        if "host" in new_headers:
+            del new_headers["host"]
+        new_headers["Host"] = hostname
+        new_url = request.url.copy_with(host=formatted_ip)
+
+        request = httpx.Request(
+            method=request.method,
+            url=new_url,
+            headers=new_headers,
+            content=request.content,
+            extensions=request.extensions,
         )
-    except ValueError:  # pragma: no cover
-        return False
+        request.extensions["sni_hostname"] = hostname
 
+        return super().handle_request(request)
 
-def _resolve_first_ip(host: str) -> str | None:
-    try:
-        info = socket.getaddrinfo(host, None)
-        return info[0][4][0] if info else None
-    except Exception:  # pragma: no cover
-        return None
+    def _format_ip_for_url(self, ip: str) -> str:
+        """
+        Format IP address for use in URL (wrap IPv6 in brackets)
+        """
+        try:
+            ip_obj = ipaddress.ip_address(ip)
+            if ip_obj.version == 6:
+                return f"[{ip}]"
+            return ip
+        except ValueError:
+            return ip
+
+    @staticmethod
+    def is_public_ip(ip: str | int) -> bool:
+        try:
+            obj = ipaddress.ip_address(ip)
+            return not (
+                obj.is_private
+                or obj.is_loopback
+                or obj.is_link_local
+                or obj.is_multicast
+                or obj.is_unspecified
+            )
+        except ValueError:  # pragma: no cover
+            return False
+
+    @staticmethod
+    def resolve_first_ip(host: str) -> str | None:
+        try:
+            info = socket.getaddrinfo(host, None)
+            return info[0][4][0] if info else None
+        except Exception:  # pragma: no cover
+            return None
 
 
 @shared_task(
@@ -59,12 +131,10 @@ def send_webhook(
         logger.warning("Webhook blocked: port not permitted")
         raise ValueError("Destination port not permitted.")
 
-    ip = _resolve_first_ip(p.hostname)
-    if not ip or (
-        not _is_public_ip(ip) and not settings.WEBHOOKS_ALLOW_INTERNAL_REQUESTS
-    ):
-        logger.warning("Webhook blocked: destination not allowed")
-        raise ValueError("Destination host is not allowed.")
+    transport = WebhookTransport(
+        hostname=p.hostname,
+        allow_internal=settings.WEBHOOKS_ALLOW_INTERNAL_REQUESTS,
+    )
 
     try:
         post_args = {
@@ -73,8 +143,6 @@ def send_webhook(
                 k: v for k, v in (headers or {}).items() if k.lower() != "host"
             },
             "files": files or None,
-            "timeout": 5.0,
-            "follow_redirects": False,
         }
         if as_json:
             post_args["json"] = data
@@ -83,14 +151,21 @@ def send_webhook(
         else:
             post_args["content"] = data
 
-        httpx.post(
-            **post_args,
-        ).raise_for_status()
-        logger.info(
-            f"Webhook sent to {url}",
-        )
+        with httpx.Client(
+            transport=transport,
+            timeout=5.0,
+            follow_redirects=False,
+        ) as client:
+            client.post(
+                **post_args,
+            ).raise_for_status()
+            logger.info(
+                f"Webhook sent to {url}",
+            )
     except Exception as e:
         logger.error(
             f"Failed attempt sending webhook to {url}: {e}",
         )
         raise e
+    finally:
+        transport.close()
