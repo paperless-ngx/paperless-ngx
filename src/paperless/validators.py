@@ -153,7 +153,20 @@ def reject_dangerous_svg(file: UploadedFile) -> None:
         attr_name: str
         attr_value: str
         for attr_name, attr_value in element.attrib.items():
-            attr_name_lower = attr_name.lower().strip()
+            # lxml expands namespaces to {url}name. We must convert the standard
+            # XLink namespace back to 'xlink:' so it matches our allowlist.
+            if attr_name.startswith("{"):
+                qname = etree.QName(attr_name)
+                if qname.namespace == "http://www.w3.org/1999/xlink":
+                    attr_name_check = f"xlink:{qname.localname}"
+                else:
+                    # Unknown namespace: keep raw name (will fail allowlist)
+                    attr_name_check = attr_name
+            else:
+                attr_name_check = attr_name
+
+            attr_name_lower = attr_name_check.lower().strip()
+
             if attr_name_lower not in ALLOWED_SVG_ATTRIBUTES:
                 raise ValidationError(f"Disallowed SVG attribute: {attr_name}")
 
