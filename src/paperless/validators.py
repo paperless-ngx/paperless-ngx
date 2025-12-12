@@ -64,6 +64,7 @@ ALLOWED_SVG_ATTRIBUTES: set[str] = {
     "fill",  # Fill color or none
     "fill-opacity",  # Fill transparency
     "fill-rule",  # Fill algorithm (nonzero/evenodd)
+    "color",  # Current color
     # Stroke properties
     "stroke",  # Stroke color or none
     "stroke-width",  # Stroke thickness
@@ -73,7 +74,10 @@ ALLOWED_SVG_ATTRIBUTES: set[str] = {
     "stroke-miterlimit",  # Miter join limit
     "stroke-dasharray",  # Dash pattern
     "stroke-dashoffset",  # Dash pattern offset
+    "vector-effect",  # Non-scaling stroke, etc.
+    "clip-rule",  # Rule for clipping paths
     # Transforms and positioning
+    "overflow",  # Overflow behavior
     "transform",  # Transformations (translate/rotate/scale)
     "viewbox",  # Coordinate system and viewport
     "preserveaspectratio",  # Scaling behavior
@@ -82,6 +86,10 @@ ALLOWED_SVG_ATTRIBUTES: set[str] = {
     # Gradient attributes
     "gradienttransform",  # Transform applied to gradient
     "gradientunits",  # Gradient coordinate system
+    "spreadmethod",  # Gradient spread method
+    "fx",  # Radial gradient focal point X
+    "fy",  # Radial gradient focal point Y
+    "fr",  # Radial gradient focal radius
     "offset",  # Position of gradient stop
     "stop-color",  # Color at gradient stop
     "stop-opacity",  # Opacity at gradient stop
@@ -92,6 +100,12 @@ ALLOWED_SVG_ATTRIBUTES: set[str] = {
     "marker-start",  # Marker at path start
     "marker-mid",  # Marker at path vertices
     "marker-end",  # Marker at path end
+    "markerunits",  # Marker coordinate system
+    "markerwidth",  # Marker viewport width
+    "markerheight",  # Marker viewport height
+    "refx",  # Marker reference point X
+    "refy",  # Marker reference point Y
+    "orient",  # Marker orientation
     # Text attributes
     "font-family",  # Font name
     "font-size",  # Font size
@@ -100,6 +114,13 @@ ALLOWED_SVG_ATTRIBUTES: set[str] = {
     "text-anchor",  # Text alignment (start/middle/end)
     "text-decoration",  # Text decoration (underline/etc)
     "letter-spacing",  # Space between letters
+    "word-spacing",  # Space between words
+    "text-rendering",  # Text rendering hint
+    "shape-rendering",  # Shape rendering hint
+    "image-rendering",  # Image rendering hint
+    "startoffset",  # TextPath start offset
+    "method",  # TextPath method
+    "spacing",  # TextPath spacing
     # Links and references
     "href",  # Link or reference (validate for javascript:!)
     "xlink:href",  # Legacy link reference (validate for javascript:!)
@@ -116,6 +137,11 @@ ALLOWED_SVG_ATTRIBUTES: set[str] = {
     "xmlns:xlink",  # XLink namespace
     "version",  # SVG version
     "type",
+    # Accessibility
+    "aria-label",
+    "aria-hidden",
+    "role",
+    "focusable",
 }
 
 # Dangerous patterns in style attributes that can execute code
