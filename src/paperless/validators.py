@@ -21,6 +21,7 @@ ALLOWED_SVG_TAGS: set[str] = {
     "use",
     "title",
     "desc",
+    "style",
 }
 
 ALLOWED_SVG_ATTRIBUTES: set[str] = {
@@ -29,6 +30,7 @@ ALLOWED_SVG_ATTRIBUTES: set[str] = {
     "style",
     "d",
     "fill",
+    "fill-opacity",
     "fill-rule",
     "stroke",
     "stroke-width",
@@ -69,6 +71,7 @@ ALLOWED_SVG_ATTRIBUTES: set[str] = {
     "xmlns",
     "xmlns:xlink",
     "version",
+    "type",
 }
 
 
