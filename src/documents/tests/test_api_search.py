@@ -1289,7 +1289,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
                 content_type__app_label="admin",
             ),
         )
-        set_permissions([4, 5], set_permissions=[], owner=user2, merge=False)
+        set_permissions([4, 5], set_permissions={}, owner=user2, merge=False)
 
         with index.open_index_writer() as writer:
             index.update_document(writer, d1)
