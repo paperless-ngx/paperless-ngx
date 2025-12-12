@@ -501,6 +501,36 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         self.assertIn("disallowed svg attribute", error_msg)
         self.assertIn("{http://example.com/hack}fill", error_msg)
 
+    def test_api_rejects_svg_with_external_http_href(self) -> None:
+        """
+        GIVEN:
+            - An SVG with an external URI (http://) in a safe tag's href attribute.
+        WHEN:
+            - Uploaded via PATCH to app config
+        THEN:
+            - SVG is rejected with 400 because http:// is not a safe_prefix.
+        """
+        from io import BytesIO
+
+        # http:// is not in dangerous_schemes, but it is not in safe_prefixes.
+        malicious_svg = b"""<?xml version="1.0" encoding="UTF-8"?>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+        <use href="http://evil.com/logo.svg" />
+    </svg>"""
+
+        svg_file = BytesIO(malicious_svg)
+        svg_file.name = "external_http_href.svg"
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            {"app_logo": svg_file},
+            format="multipart",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Check for the error message raised by the safe_prefixes check
+        self.assertIn("uri scheme not allowed", str(response.data).lower())
+
     def test_create_not_allowed(self):
         """
         GIVEN:

@@ -115,6 +115,7 @@ ALLOWED_SVG_ATTRIBUTES: set[str] = {
     "xmlns",  # XML namespace (usually http://www.w3.org/2000/svg)
     "xmlns:xlink",  # XLink namespace
     "version",  # SVG version
+    "type",
 }
 
 # Dangerous patterns in style attributes that can execute code
