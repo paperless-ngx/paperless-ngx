@@ -130,6 +130,22 @@ DANGEROUS_STYLE_PATTERNS: set[str] = {
     "vbscript:",  # VBScript URLs
 }
 
+XLINK_NS: set[str] = {
+    "http://www.w3.org/1999/xlink",
+    "https://www.w3.org/1999/xlink",
+}
+
+# Dangerous URI schemes
+DANGEROUS_SCHEMES: set[str] = {
+    "javascript:",
+    "data:text/html",
+    "vbscript:",
+    "file:",
+    "data:application/",  # Can contain scripts
+}
+
+SAFE_PREFIXES: set[str] = {"#", "/", "./", "../", "data:image/"}
+
 
 def reject_dangerous_svg(file: UploadedFile) -> None:
     """
@@ -158,7 +174,7 @@ def reject_dangerous_svg(file: UploadedFile) -> None:
             # XLink namespace back to 'xlink:' so it matches our allowlist.
             if attr_name.startswith("{"):
                 qname = etree.QName(attr_name)
-                if qname.namespace == "http://www.w3.org/1999/xlink":
+                if qname.namespace in XLINK_NS:
                     attr_name_check = f"xlink:{qname.localname}"
                 else:
                     # Unknown namespace: keep raw name (will fail allowlist)
@@ -184,17 +200,8 @@ def reject_dangerous_svg(file: UploadedFile) -> None:
             if attr_name_lower in {"href", "xlink:href"}:
                 value_stripped: str = attr_value.strip().lower()
 
-                # Dangerous URI schemes
-                dangerous_schemes: set[str] = {
-                    "javascript:",
-                    "data:text/html",
-                    "vbscript:",
-                    "file:",
-                    "data:application/",  # Can contain scripts
-                }
-
                 # Check if value starts with any dangerous scheme
-                for scheme in dangerous_schemes:
+                for scheme in DANGEROUS_SCHEMES:
                     if value_stripped.startswith(scheme):
                         raise ValidationError(
                             f"Disallowed URI scheme in {attr_name}: {scheme}",
@@ -202,9 +209,9 @@ def reject_dangerous_svg(file: UploadedFile) -> None:
 
                 # Allow safe schemes for logos: #anchor, relative paths, data:image/*
                 # No external resources (http/https) needed for logos
-                safe_prefixes: tuple[str, ...] = ("#", "/", "./", "../", "data:image/")
+
                 if value_stripped and not any(
-                    value_stripped.startswith(prefix) for prefix in safe_prefixes
+                    value_stripped.startswith(prefix) for prefix in SAFE_PREFIXES
                 ):
                     raise ValidationError(
                         f"URI scheme not allowed in {attr_name}: must be #anchor, relative path, or data:image/*",
