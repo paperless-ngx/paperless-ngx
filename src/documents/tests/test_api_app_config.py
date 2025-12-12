@@ -1,6 +1,7 @@
 import json
 from io import BytesIO
 from pathlib import Path
+from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -66,6 +67,13 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 "barcode_max_pages": None,
                 "barcode_enable_tag": None,
                 "barcode_tag_mapping": None,
+                "ai_enabled": False,
+                "llm_embedding_backend": None,
+                "llm_embedding_model": None,
+                "llm_backend": None,
+                "llm_model": None,
+                "llm_api_key": None,
+                "llm_endpoint": None,
             },
         )
 
@@ -611,3 +619,76 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
         self.assertEqual(ApplicationConfiguration.objects.count(), 1)
+
+    def test_update_llm_api_key(self):
+        """
+        GIVEN:
+            - Existing config with llm_api_key specified
+        WHEN:
+            - API to update llm_api_key is called with all *s
+            - API to update llm_api_key is called with empty string
+        THEN:
+            - llm_api_key is unchanged
+            - llm_api_key is set to None
+        """
+        config = ApplicationConfiguration.objects.first()
+        config.llm_api_key = "1234567890"
+        config.save()
+
+        # Test with all *
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            json.dumps(
+                {
+                    "llm_api_key": "*" * 32,
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        config.refresh_from_db()
+        self.assertEqual(config.llm_api_key, "1234567890")
+        # Test with empty string
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            json.dumps(
+                {
+                    "llm_api_key": "",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        config.refresh_from_db()
+        self.assertEqual(config.llm_api_key, None)
+
+    def test_enable_ai_index_triggers_update(self):
+        """
+        GIVEN:
+            - Existing config with AI disabled
+        WHEN:
+            - Config is updated to enable AI with llm_embedding_backend
+        THEN:
+            - LLM index is triggered to update
+        """
+        config = ApplicationConfiguration.objects.first()
+        config.ai_enabled = False
+        config.llm_embedding_backend = None
+        config.save()
+
+        with (
+            patch("documents.tasks.llmindex_index.delay") as mock_update,
+            patch("paperless_ai.indexing.vector_store_file_exists") as mock_exists,
+        ):
+            mock_exists.return_value = False
+            self.client.patch(
+                f"{self.ENDPOINT}1/",
+                json.dumps(
+                    {
+                        "ai_enabled": True,
+                        "llm_embedding_backend": "openai",
+                    },
+                ),
+                content_type="application/json",
+            )
+            mock_update.assert_called_once()
