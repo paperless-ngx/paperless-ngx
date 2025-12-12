@@ -62,7 +62,7 @@ class WebhookTransport(httpx.HTTPTransport):
             method=request.method,
             url=new_url,
             headers=new_headers,
-            content=request.content,
+            content=request.stream,
             extensions=request.extensions,
         )
         request.extensions["sni_hostname"] = hostname
