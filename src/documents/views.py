@@ -13,7 +13,6 @@ from time import mktime
 from typing import Literal
 from unicodedata import normalize
 from urllib.parse import quote
-from urllib.parse import urlparse
 
 import httpx
 import magic
@@ -66,7 +65,8 @@ from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
 from langdetect import detect
 from packaging import version as packaging_version
-from redis import Redis
+
+# Redis connection via settings helper function
 from rest_framework import parsers
 from rest_framework import serializers
 from rest_framework.decorators import action
@@ -2972,13 +2972,25 @@ class SystemStatusView(PassUserMixin):
 
         media_stats = os.statvfs(settings.MEDIA_ROOT)
 
-        redis_url = settings._CHANNELS_REDIS_URL
-        redis_url_parsed = urlparse(redis_url)
-        redis_constructed_url = f"{redis_url_parsed.scheme}://{redis_url_parsed.path or redis_url_parsed.hostname}"
-        if redis_url_parsed.hostname is not None:
-            redis_constructed_url += f":{redis_url_parsed.port}"
         redis_error = None
-        with Redis.from_url(url=redis_url) as client:
+        redis_constructed_url = settings._CHANNELS_REDIS_URL
+        # Remove credentials from URL for display
+        if redis_constructed_url and "://" in redis_constructed_url:
+            from urllib.parse import urlparse
+
+            parsed = urlparse(redis_constructed_url)
+            if parsed.username or parsed.password:
+                # Reconstruct URL without credentials
+                netloc = parsed.hostname
+                if parsed.port:
+                    netloc = f"{netloc}:{parsed.port}"
+                redis_constructed_url = f"{parsed.scheme}://{netloc}{parsed.path}"
+
+        try:
+            # Import the helper function from settings module
+            from paperless.settings import _get_redis_connection
+
+            client = _get_redis_connection()
             try:
                 client.ping()
                 redis_status = "OK"
@@ -2988,6 +3000,15 @@ class SystemStatusView(PassUserMixin):
                     f"System status detected a possible problem while connecting to redis: {e}",
                 )
                 redis_error = "Error connecting to redis, check logs for more detail."
+            finally:
+                if hasattr(client, "close"):
+                    client.close()
+        except Exception as e:
+            redis_status = "ERROR"
+            logger.exception(
+                f"System status detected a possible problem while creating redis connection: {e}",
+            )
+            redis_error = "Error creating redis connection, check logs for more detail."
 
         celery_error = None
         celery_url = None
