@@ -170,11 +170,18 @@ Available options are `postgresql` and `mariadb`.
 
     !!! note
 
-        A small pool is typically sufficient — for example, a size of 4.
-        Make sure your PostgreSQL server's max_connections setting is large enough to handle:
-        ```(Paperless workers + Celery workers) × pool size + safety margin```
-        For example, with 4 Paperless workers and 2 Celery workers, and a pool size of 4:
-        (4 + 2) × 4 + 10 = 34 connections required.
+        A pool of 8-10 connections per worker is typically sufficient.
+        If you encounter error messages such as `couldn't get a connection`
+        or database connection timeouts, you probably need to increase the pool size.
+
+    !!! warning
+        Make sure your PostgreSQL `max_connections` setting is large enough to handle the connection pools:
+        `(NB_PAPERLESS_WORKERS + NB_CELERY_WORKERS) × POOL_SIZE + SAFETY_MARGIN`. For example, with
+        4 Paperless workers and 2 Celery workers, and a pool size of 8:``(4 + 2) × 8 + 10 = 58`,
+        so `max_connections = 60` (or even more) is appropriate.
+
+        This assumes only Paperless-ngx connects to your PostgreSQL instance. If you have other applications,
+        you should increase `max_connections` accordingly.
 
 #### [`PAPERLESS_DB_READ_CACHE_ENABLED=<bool>`](#PAPERLESS_DB_READ_CACHE_ENABLED) {#PAPERLESS_DB_READ_CACHE_ENABLED}
 
