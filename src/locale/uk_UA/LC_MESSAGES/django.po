@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-22 18:15+0000\n"
-"PO-Revision-Date: 2025-10-23 12:14\n"
+"POT-Creation-Date: 2025-12-12 17:41+0000\n"
+"PO-Revision-Date: 2025-12-12 17:44\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Документи"
 
-#: documents/filters.py:386
+#: documents/filters.py:395
 msgid "Value must be valid JSON."
 msgstr "Значення має бути коректним JSON."
 
-#: documents/filters.py:405
+#: documents/filters.py:414
 msgid "Invalid custom field query expression"
 msgstr ""
 
-#: documents/filters.py:415
+#: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
 msgstr ""
 
-#: documents/filters.py:436
+#: documents/filters.py:445
 msgid "Invalid logical operator {op!r}"
 msgstr ""
 
-#: documents/filters.py:450
+#: documents/filters.py:459
 msgid "Maximum number of query conditions exceeded."
 msgstr ""
 
-#: documents/filters.py:515
+#: documents/filters.py:524
 msgid "{name!r} is not a valid custom field."
 msgstr ""
 
-#: documents/filters.py:552
+#: documents/filters.py:561
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr ""
 
-#: documents/filters.py:660 documents/models.py:135
+#: documents/filters.py:669 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
 msgstr ""
 
-#: documents/filters.py:845
+#: documents/filters.py:854
 msgid "Custom field not found"
 msgstr ""
 
@@ -1208,39 +1208,34 @@ msgstr ""
 msgid "workflow runs"
 msgstr ""
 
-#: documents/serialisers.py:145
-#, python-format
-msgid "Invalid regular expression: %(error)s"
-msgstr "Неправильний регулярний вираз: %(error)s"
-
-#: documents/serialisers.py:619
+#: documents/serialisers.py:640
 msgid "Invalid color."
 msgstr "Неправильний колір."
 
-#: documents/serialisers.py:1805
+#: documents/serialisers.py:1826
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Тип файлу %(type)s не підтримується"
 
-#: documents/serialisers.py:1849
+#: documents/serialisers.py:1870
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr ""
 
-#: documents/serialisers.py:1856
+#: documents/serialisers.py:1877
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr ""
 
-#: documents/serialisers.py:1873 documents/serialisers.py:1883
+#: documents/serialisers.py:1894 documents/serialisers.py:1904
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr ""
 
-#: documents/serialisers.py:1878
+#: documents/serialisers.py:1899
 msgid "Some custom fields don't exist or were specified twice."
 msgstr ""
 
-#: documents/serialisers.py:1993
+#: documents/serialisers.py:2014
 msgid "Invalid variable detected."
 msgstr "Виявлено неправильну змінну."
 

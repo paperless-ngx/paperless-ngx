@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-22 18:15+0000\n"
-"PO-Revision-Date: 2025-10-22 18:18\n"
+"POT-Creation-Date: 2025-12-12 17:41+0000\n"
+"PO-Revision-Date: 2025-12-12 17:44\n"
 "Last-Translator: \n"
 "Language-Team: Slovenian\n"
 "Language: sl_SI\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumenti"
 
-#: documents/filters.py:386
+#: documents/filters.py:395
 msgid "Value must be valid JSON."
 msgstr "Vrednost mora biti veljaven JSON."
 
-#: documents/filters.py:405
+#: documents/filters.py:414
 msgid "Invalid custom field query expression"
 msgstr "Neveljaven izraz poizvedbe po polju po meri"
 
-#: documents/filters.py:415
+#: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Neveljaven seznam izrazov. Ne sme biti prazen."
 
-#: documents/filters.py:436
+#: documents/filters.py:445
 msgid "Invalid logical operator {op!r}"
 msgstr "Neveljaven logični operator {op!r}"
 
-#: documents/filters.py:450
+#: documents/filters.py:459
 msgid "Maximum number of query conditions exceeded."
 msgstr "Preseženo je bilo največje dovoljeno število pogojev poizvedbe."
 
-#: documents/filters.py:515
+#: documents/filters.py:524
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} ni veljavno polje po meri."
 
-#: documents/filters.py:552
+#: documents/filters.py:561
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} ne podpira izraza poizvedbe {expr!r}."
 
-#: documents/filters.py:660 documents/models.py:135
+#: documents/filters.py:669 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
 msgstr "Presežena je bila največja globina gnezdenja."
 
-#: documents/filters.py:845
+#: documents/filters.py:854
 msgid "Custom field not found"
 msgstr "Polja po meri ni bilo mogoče najti"
 
@@ -1208,39 +1208,34 @@ msgstr "izvajanje poteka dela"
 msgid "workflow runs"
 msgstr "poteka dela"
 
-#: documents/serialisers.py:145
-#, python-format
-msgid "Invalid regular expression: %(error)s"
-msgstr "Neveljaven splošen izraz: %(error)s"
-
-#: documents/serialisers.py:619
+#: documents/serialisers.py:640
 msgid "Invalid color."
 msgstr "Napačna barva."
 
-#: documents/serialisers.py:1805
+#: documents/serialisers.py:1826
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Vrsta datoteke %(type)s ni podprta"
 
-#: documents/serialisers.py:1849
+#: documents/serialisers.py:1870
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "ID polja po meri mora biti celo število: %(id)s"
 
-#: documents/serialisers.py:1856
+#: documents/serialisers.py:1877
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Polje po meri z ID-jem %(id)s ne obstaja"
 
-#: documents/serialisers.py:1873 documents/serialisers.py:1883
+#: documents/serialisers.py:1894 documents/serialisers.py:1904
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Polja po meri morajo biti seznam celih števil ali objekt, ki preslika ID-je v vrednosti."
 
-#: documents/serialisers.py:1878
+#: documents/serialisers.py:1899
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Nekatera polja po meri ne obstajajo ali pa so bila navedena dvakrat."
 
-#: documents/serialisers.py:1993
+#: documents/serialisers.py:2014
 msgid "Invalid variable detected."
 msgstr "Zaznani neveljavni znaki."
 

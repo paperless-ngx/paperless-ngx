@@ -38,10 +38,19 @@ def handle_social_account_updated(sender, request, sociallogin, **kwargs):
     """
     from django.contrib.auth.models import Group
 
-    social_account_groups = sociallogin.account.extra_data.get(
+    extra_data = sociallogin.account.extra_data or {}
+    social_account_groups = extra_data.get(
         "groups",
         [],
-    )  # None if not found
+    )  # pre-allauth 65.11.0 structure
+
+    if not social_account_groups:
+        # allauth 65.11.0+ nests claims under `userinfo`/`id_token`
+        social_account_groups = (
+            extra_data.get("userinfo", {}).get("groups")
+            or extra_data.get("id_token", {}).get("groups")
+            or []
+        )
     if settings.SOCIAL_ACCOUNT_SYNC_GROUPS and social_account_groups is not None:
         groups = Group.objects.filter(name__in=social_account_groups)
         logger.debug(

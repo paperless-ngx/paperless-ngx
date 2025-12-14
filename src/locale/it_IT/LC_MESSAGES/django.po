@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-22 18:15+0000\n"
-"PO-Revision-Date: 2025-10-22 18:18\n"
+"POT-Creation-Date: 2025-12-12 17:41+0000\n"
+"PO-Revision-Date: 2025-12-12 17:44\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Documenti"
 
-#: documents/filters.py:386
+#: documents/filters.py:395
 msgid "Value must be valid JSON."
 msgstr "Il valore deve essere un JSON valido."
 
-#: documents/filters.py:405
+#: documents/filters.py:414
 msgid "Invalid custom field query expression"
 msgstr "Campo personalizzato della query non valido"
 
-#: documents/filters.py:415
+#: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Elenco delle espressioni non valido. Deve essere non vuoto."
 
-#: documents/filters.py:436
+#: documents/filters.py:445
 msgid "Invalid logical operator {op!r}"
 msgstr "Operatore logico non valido {op!r}"
 
-#: documents/filters.py:450
+#: documents/filters.py:459
 msgid "Maximum number of query conditions exceeded."
 msgstr "Numero massimo delle condizioni della jQuery superato."
 
-#: documents/filters.py:515
+#: documents/filters.py:524
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} non è un campo personalizzato valido."
 
-#: documents/filters.py:552
+#: documents/filters.py:561
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} Non supporta la jQuery Expo {Expo!r}."
 
-#: documents/filters.py:660 documents/models.py:135
+#: documents/filters.py:669 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
 msgstr "Superata la profondità massima di nidificazione."
 
-#: documents/filters.py:845
+#: documents/filters.py:854
 msgid "Custom field not found"
 msgstr "Campo personalizzato non trovato"
 
@@ -858,11 +858,11 @@ msgstr "ha questi tag(s)"
 
 #: documents/models.py:1072
 msgid "has all of these tag(s)"
-msgstr ""
+msgstr "ha tutte queste etichette"
 
 #: documents/models.py:1079
 msgid "does not have these tag(s)"
-msgstr ""
+msgstr "non ha queste etichette"
 
 #: documents/models.py:1087
 msgid "has this document type"
@@ -870,7 +870,7 @@ msgstr "ha questo tipo di documento"
 
 #: documents/models.py:1094
 msgid "does not have these document type(s)"
-msgstr ""
+msgstr "non ha questi tipi di documento"
 
 #: documents/models.py:1102
 msgid "has this correspondent"
@@ -878,7 +878,7 @@ msgstr "ha questo corrispondente"
 
 #: documents/models.py:1109
 msgid "does not have these correspondent(s)"
-msgstr ""
+msgstr "non ha questi corrispondenti"
 
 #: documents/models.py:1117
 msgid "has this storage path"
@@ -886,7 +886,7 @@ msgstr "ha questo percorso di archiviazione"
 
 #: documents/models.py:1124
 msgid "does not have these storage path(s)"
-msgstr ""
+msgstr "non ha questo percorso di archiviazione"
 
 #: documents/models.py:1128
 msgid "filter custom field query"
@@ -898,7 +898,7 @@ msgstr ""
 
 #: documents/models.py:1135
 msgid "schedule offset days"
-msgstr ""
+msgstr "giorni di offset della schedulazione"
 
 #: documents/models.py:1138
 msgid "The number of days to offset the schedule trigger by."
@@ -998,19 +998,19 @@ msgstr "corpo webhook"
 
 #: documents/models.py:1253
 msgid "The body to send with the webhook URL if parameters not used."
-msgstr ""
+msgstr "Il corpo da inviare con l'URL del webhook se i parametri non vengono utilizzati."
 
 #: documents/models.py:1257
 msgid "webhook headers"
-msgstr ""
+msgstr "header Webhook"
 
 #: documents/models.py:1260
 msgid "The headers to send with the webhook URL."
-msgstr ""
+msgstr "Le intestazioni da inviare con l'URL del webhook."
 
 #: documents/models.py:1265
 msgid "include document in webhook"
-msgstr ""
+msgstr "includi documento nel webhook"
 
 #: documents/models.py:1276
 msgid "Assignment"
@@ -1038,7 +1038,7 @@ msgstr "assegna titolo"
 
 #: documents/models.py:1302
 msgid "Assign a document title, must  be a Jinja2 template, see documentation."
-msgstr ""
+msgstr "Assegnare un titolo del documento, deve essere un modello Jinja2, vedere la documentazione."
 
 #: documents/models.py:1310 paperless_mail/models.py:274
 msgid "assign this tag"
@@ -1178,7 +1178,7 @@ msgstr "priorità"
 
 #: documents/models.py:1534
 msgid "triggers"
-msgstr ""
+msgstr "trigger"
 
 #: documents/models.py:1541
 msgid "actions"
@@ -1202,45 +1202,40 @@ msgstr "data esecuzione"
 
 #: documents/models.py:1579
 msgid "workflow run"
-msgstr ""
+msgstr "esecuzione del workflow"
 
 #: documents/models.py:1580
 msgid "workflow runs"
-msgstr ""
+msgstr "esecuzione del workflow"
 
-#: documents/serialisers.py:145
-#, python-format
-msgid "Invalid regular expression: %(error)s"
-msgstr "Espressione regolare non valida: %(error)s"
-
-#: documents/serialisers.py:619
+#: documents/serialisers.py:640
 msgid "Invalid color."
 msgstr "Colore non valido."
 
-#: documents/serialisers.py:1805
+#: documents/serialisers.py:1826
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Il tipo di file %(type)s non è supportato"
 
-#: documents/serialisers.py:1849
+#: documents/serialisers.py:1870
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
-msgstr ""
+msgstr "L'id del campo personalizzato deve essere un intero: %(id)s"
 
-#: documents/serialisers.py:1856
+#: documents/serialisers.py:1877
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
-msgstr ""
+msgstr "Il campo personalizzato con id %(id)s non esiste"
 
-#: documents/serialisers.py:1873 documents/serialisers.py:1883
+#: documents/serialisers.py:1894 documents/serialisers.py:1904
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
-msgstr ""
+msgstr "I campi personalizzati devono essere un elenco di interi o un id di mappatura."
 
-#: documents/serialisers.py:1878
+#: documents/serialisers.py:1899
 msgid "Some custom fields don't exist or were specified twice."
-msgstr ""
+msgstr "Alcuni campi personalizzati non esistono o sono stati specificati due volte."
 
-#: documents/serialisers.py:1993
+#: documents/serialisers.py:2014
 msgid "Invalid variable detected."
 msgstr "Variabile non valida rilevata."
 
@@ -1482,7 +1477,7 @@ msgstr "Impossibile analizzare l'URI {value}, la posizione di rete o il percorso
 
 #: documents/validators.py:36
 msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
-msgstr ""
+msgstr "Schema URI '{parts.scheme}' non è consentito. Schemi consentiti: {', '.join(allowed_schemes)}"
 
 #: documents/validators.py:45
 #, python-brace-format
@@ -1599,7 +1594,7 @@ msgstr "Imposta il valore di ripiego DPI dell'immagine"
 
 #: paperless/models.py:131
 msgid "Controls the unpaper cleaning"
-msgstr ""
+msgstr "Controlla la pulizia della carta"
 
 #: paperless/models.py:138
 msgid "Enables deskew"
@@ -1635,15 +1630,15 @@ msgstr "Logo applicazione"
 
 #: paperless/models.py:197
 msgid "Enables barcode scanning"
-msgstr ""
+msgstr "Abilita scansione codici a barre"
 
 #: paperless/models.py:203
 msgid "Enables barcode TIFF support"
-msgstr ""
+msgstr "Abilita il supporto TIFF del codice a barre"
 
 #: paperless/models.py:209
 msgid "Sets the barcode string"
-msgstr ""
+msgstr "Imposta la stringa del barcode"
 
 #: paperless/models.py:217
 msgid "Retains split pages"
@@ -1659,11 +1654,11 @@ msgstr "Imposta il prefisso del codice a barre ASN"
 
 #: paperless/models.py:237
 msgid "Sets the barcode upscale factor"
-msgstr ""
+msgstr "Imposta il fattore di ingrandimento del codice a barre"
 
 #: paperless/models.py:244
 msgid "Sets the barcode DPI"
-msgstr ""
+msgstr "Imposta il DPI codice a barre"
 
 #: paperless/models.py:251
 msgid "Sets the maximum pages for barcode"
@@ -1675,7 +1670,7 @@ msgstr "Abilita tag del codice a barre"
 
 #: paperless/models.py:264
 msgid "Sets the tag barcode mapping"
-msgstr ""
+msgstr "Imposta la mappatura dei codici a barre dei tag"
 
 #: paperless/models.py:269
 msgid "paperless application settings"

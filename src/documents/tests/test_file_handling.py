@@ -16,6 +16,7 @@ from django.utils import timezone
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_filename
+from documents.file_handling import generate_unique_filename
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -530,6 +531,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
     @override_settings(
         FILENAME_FORMAT="{{title}}_{{custom_fields|get_cf_value('test')}}",
+        CELERY_TASK_ALWAYS_EAGER=True,
     )
     @mock.patch("documents.signals.handlers.update_filename_and_move_files")
     def test_select_cf_updated(self, m):
@@ -579,7 +581,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         }
         cf.save()
         self.assertEqual(generate_filename(doc), Path("document_aubergine.pdf"))
-        # handler should have been called
+        # handler should have been called once via the async task
         self.assertEqual(m.call_count, 1)
 
 
@@ -1076,6 +1078,47 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         self.assertEqual(
             generate_filename(doc_b),
             Path("SomeImportantNone/2020-07-25.pdf"),
+        )
+
+    @override_settings(
+        FILENAME_FORMAT=(
+            "{% if correspondent == 'none' %}none/{% endif %}"
+            "{% if correspondent == '-none-' %}dash/{% endif %}"
+            "{% if not correspondent %}false/{% endif %}"
+            "{% if correspondent != 'none' %}notnoneyes/{% else %}notnoneno/{% endif %}"
+            "{{ correspondent or 'missing' }}/{{ title }}"
+        ),
+    )
+    def test_placeholder_matches_none_variants_and_false(self):
+        """
+        GIVEN:
+            - Templates that compare against 'none', '-none-' and rely on truthiness
+        WHEN:
+            - A document has or lacks a correspondent
+        THEN:
+            - Empty placeholders behave like both strings and evaluate False
+        """
+        doc_without_correspondent = Document.objects.create(
+            title="does not matter",
+            mime_type="application/pdf",
+            checksum="abc",
+        )
+        doc_with_correspondent = Document.objects.create(
+            title="does not matter",
+            mime_type="application/pdf",
+            checksum="def",
+            correspondent=Correspondent.objects.create(name="Acme"),
+        )
+
+        self.assertEqual(
+            generate_filename(doc_without_correspondent),
+            Path(
+                "none/dash/false/notnoneno/missing/does not matter.pdf",
+            ),
+        )
+        self.assertEqual(
+            generate_filename(doc_with_correspondent),
+            Path("notnoneyes/Acme/does not matter.pdf"),
         )
 
     @override_settings(
@@ -1588,6 +1631,73 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
                 generate_filename(doc),
                 Path("brussels-belgium/some-title-with-special-characters.pdf"),
             )
+
+
+class TestCustomFieldFilenameUpdates(
+    DirectoriesMixin,
+    FileSystemAssertsMixin,
+    TestCase,
+):
+    def setUp(self):
+        self.cf = CustomField.objects.create(
+            name="flavor",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        self.doc = Document.objects.create(
+            title="document",
+            mime_type="application/pdf",
+            checksum="abc123",
+        )
+        self.cfi = CustomFieldInstance.objects.create(
+            field=self.cf,
+            document=self.doc,
+            value_text="initial",
+        )
+        return super().setUp()
+
+    @override_settings(FILENAME_FORMAT=None)
+    def test_custom_field_not_in_template_skips_filename_work(self):
+        storage_path = StoragePath.objects.create(path="{{created}}/{{ title }}")
+        self.doc.storage_path = storage_path
+        self.doc.save()
+        initial_filename = generate_filename(self.doc)
+        Document.objects.filter(pk=self.doc.pk).update(filename=str(initial_filename))
+        self.doc.refresh_from_db()
+        Path(self.doc.source_path).parent.mkdir(parents=True, exist_ok=True)
+        Path(self.doc.source_path).touch()
+
+        with mock.patch("documents.signals.handlers.generate_unique_filename") as m:
+            m.side_effect = generate_unique_filename
+            self.cfi.value_text = "updated"
+            self.cfi.save()
+
+        self.doc.refresh_from_db()
+        self.assertEqual(Path(self.doc.filename), initial_filename)
+        self.assertEqual(m.call_count, 0)
+
+    @override_settings(FILENAME_FORMAT=None)
+    def test_custom_field_in_template_triggers_filename_update(self):
+        storage_path = StoragePath.objects.create(
+            path="{{ custom_fields|get_cf_value('flavor') }}/{{ title }}",
+        )
+        self.doc.storage_path = storage_path
+        self.doc.save()
+        initial_filename = generate_filename(self.doc)
+        Document.objects.filter(pk=self.doc.pk).update(filename=str(initial_filename))
+        self.doc.refresh_from_db()
+        Path(self.doc.source_path).parent.mkdir(parents=True, exist_ok=True)
+        Path(self.doc.source_path).touch()
+
+        with mock.patch("documents.signals.handlers.generate_unique_filename") as m:
+            m.side_effect = generate_unique_filename
+            self.cfi.value_text = "updated"
+            self.cfi.save()
+
+        self.doc.refresh_from_db()
+        expected_filename = Path("updated/document.pdf")
+        self.assertEqual(Path(self.doc.filename), expected_filename)
+        self.assertTrue(Path(self.doc.source_path).is_file())
+        self.assertLessEqual(m.call_count, 1)
 
 
 class TestPathDateLocalization:

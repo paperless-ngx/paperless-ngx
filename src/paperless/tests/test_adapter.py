@@ -54,8 +54,8 @@ class TestCustomAccountAdapter(TestCase):
             # False because request host is not in allowed hosts
             self.assertFalse(adapter.is_safe_url(url))
 
-    @mock.patch("allauth.core.ratelimit._consume_rate", return_value=True)
-    def test_pre_authenticate(self, mock_consume_rate):
+    @mock.patch("allauth.core.internal.ratelimit.consume", return_value=True)
+    def test_pre_authenticate(self, mock_consume):
         adapter = get_adapter()
         request = HttpRequest()
         request.get_host = mock.Mock(return_value="example.com")
@@ -167,3 +167,17 @@ class TestCustomSocialAccountAdapter(TestCase):
         self.assertEqual(user.groups.count(), 1)
         self.assertTrue(user.groups.filter(name="group1").exists())
         self.assertFalse(user.groups.filter(name="group2").exists())
+
+    def test_error_logged_on_authentication_error(self):
+        adapter = get_social_adapter()
+        request = HttpRequest()
+        with self.assertLogs("paperless.auth", level="INFO") as log_cm:
+            adapter.on_authentication_error(
+                request,
+                provider="test-provider",
+                error="Error",
+                exception="Test authentication error",
+            )
+        self.assertTrue(
+            any("Test authentication error" in message for message in log_cm.output),
+        )

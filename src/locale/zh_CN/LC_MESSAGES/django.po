@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-22 18:15+0000\n"
-"PO-Revision-Date: 2025-10-22 18:18\n"
+"POT-Creation-Date: 2025-12-12 17:41+0000\n"
+"PO-Revision-Date: 2025-12-12 17:44\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "文档"
 
-#: documents/filters.py:386
+#: documents/filters.py:395
 msgid "Value must be valid JSON."
 msgstr "值必须是有效的 JSON 格式。"
 
-#: documents/filters.py:405
+#: documents/filters.py:414
 msgid "Invalid custom field query expression"
 msgstr "无效的自定义字段查询表达式"
 
-#: documents/filters.py:415
+#: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
 msgstr "无效的表达式列表。必须不为空。"
 
-#: documents/filters.py:436
+#: documents/filters.py:445
 msgid "Invalid logical operator {op!r}"
 msgstr "无效的逻辑运算符 {op!r}"
 
-#: documents/filters.py:450
+#: documents/filters.py:459
 msgid "Maximum number of query conditions exceeded."
 msgstr "超出查询条件的最大数量。"
 
-#: documents/filters.py:515
+#: documents/filters.py:524
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} 不是一个有效的自定义字段。"
 
-#: documents/filters.py:552
+#: documents/filters.py:561
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} 不支持查询表达式 {expr!r}。"
 
-#: documents/filters.py:660 documents/models.py:135
+#: documents/filters.py:669 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
 msgstr "超出最大嵌套深度。"
 
-#: documents/filters.py:845
+#: documents/filters.py:854
 msgid "Custom field not found"
 msgstr "Custom field not found"
 
@@ -1208,39 +1208,34 @@ msgstr "工作流运行"
 msgid "workflow runs"
 msgstr "工作流运行"
 
-#: documents/serialisers.py:145
-#, python-format
-msgid "Invalid regular expression: %(error)s"
-msgstr "无效的正则表达式：%(error)s"
-
-#: documents/serialisers.py:619
+#: documents/serialisers.py:640
 msgid "Invalid color."
 msgstr "无效的颜色"
 
-#: documents/serialisers.py:1805
+#: documents/serialisers.py:1826
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "不支持文件类型 %(type)s"
 
-#: documents/serialisers.py:1849
+#: documents/serialisers.py:1870
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "自定义字段 id 必须是数字：%(id)s"
 
-#: documents/serialisers.py:1856
+#: documents/serialisers.py:1877
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "自定义字段 id %(id)s 不存在"
 
-#: documents/serialisers.py:1873 documents/serialisers.py:1883
+#: documents/serialisers.py:1894 documents/serialisers.py:1904
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "自定义字段必须为整数列表，或是一个将ID映射到值的对象。"
 
-#: documents/serialisers.py:1878
+#: documents/serialisers.py:1899
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "部分自定义字段不存在或重复指定。"
 
-#: documents/serialisers.py:1993
+#: documents/serialisers.py:2014
 msgid "Invalid variable detected."
 msgstr "检测到无效变量。"
 

@@ -8,21 +8,26 @@ from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.core import mail
 from django.test import override_settings
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
+from httpx import ConnectError
 from httpx import HTTPError
 from httpx import HTTPStatusError
 from pytest_httpx import HTTPXMock
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 
+from documents.file_handling import create_source_path_directory
+from documents.file_handling import generate_unique_filename
 from documents.signals.handlers import run_workflows
-from documents.signals.handlers import send_webhook
+from documents.workflows.webhooks import send_webhook
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -2854,7 +2859,7 @@ class TestWorkflows(
 
         mock_email_send.return_value = 1
 
-        with self.assertNoLogs("paperless.handlers", level="ERROR"):
+        with self.assertNoLogs("paperless.workflows", level="ERROR"):
             run_workflows(
                 WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
                 consumable_document,
@@ -2990,6 +2995,70 @@ class TestWorkflows(
         mock_email_send.assert_called_once()
 
     @override_settings(
+        PAPERLESS_EMAIL_HOST="localhost",
+        EMAIL_ENABLED=True,
+        PAPERLESS_URL="http://localhost:8000",
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    )
+    def test_workflow_email_attachment_uses_storage_filename(self):
+        """
+        GIVEN:
+            - Document updated workflow with include document action
+            - Document stored with formatted storage-path filename
+        WHEN:
+            - Workflow sends an email
+        THEN:
+            - Attachment filename matches the stored filename
+        """
+
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        email_action = WorkflowActionEmail.objects.create(
+            subject="Test Notification: {doc_title}",
+            body="Test message: {doc_url}",
+            to="me@example.com",
+            include_document=True,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.EMAIL,
+            email=email_action,
+        )
+        workflow = Workflow.objects.create(
+            name="Workflow attachment filename",
+            order=0,
+        )
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+        workflow.save()
+
+        storage_path = StoragePath.objects.create(
+            name="Fancy Path",
+            path="formatted/{{ document.pk }}/{{ title }}",
+        )
+        doc = Document.objects.create(
+            title="workflow doc",
+            correspondent=self.c,
+            checksum="workflow-email-attachment",
+            mime_type="application/pdf",
+            storage_path=storage_path,
+            original_filename="workflow-orig.pdf",
+        )
+
+        # eg what happens in update_filename_and_move_files
+        generated = generate_unique_filename(doc)
+        destination = (settings.ORIGINALS_DIR / generated).resolve()
+        create_source_path_directory(destination)
+        shutil.copy(self.SAMPLE_DIR / "simple.pdf", destination)
+        Document.objects.filter(pk=doc.pk).update(filename=generated.as_posix())
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        self.assertEqual(len(mail.outbox), 1)
+        attachment_names = [att[0] for att in mail.outbox[0].attachments]
+        self.assertEqual(attachment_names, [Path(generated).name])
+
+    @override_settings(
         EMAIL_ENABLED=False,
     )
     def test_workflow_email_action_no_email_setup(self):
@@ -3028,7 +3097,7 @@ class TestWorkflows(
             original_filename="sample.pdf",
         )
 
-        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
+        with self.assertLogs("paperless.workflows.actions", level="ERROR") as cm:
             run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
             expected_str = "Email backend has not been configured"
@@ -3076,7 +3145,7 @@ class TestWorkflows(
             original_filename="sample.pdf",
         )
 
-        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
+        with self.assertLogs("paperless.workflows", level="ERROR") as cm:
             run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
             expected_str = "Error occurred sending email"
@@ -3144,8 +3213,10 @@ class TestWorkflows(
 
     @override_settings(
         PAPERLESS_URL="http://localhost:8000",
+        PAPERLESS_FORCE_SCRIPT_NAME="/paperless",
+        BASE_URL="/paperless/",
     )
-    @mock.patch("documents.signals.handlers.send_webhook.delay")
+    @mock.patch("documents.workflows.webhooks.send_webhook.delay")
     def test_workflow_webhook_action_body(self, mock_post):
         """
         GIVEN:
@@ -3195,7 +3266,7 @@ class TestWorkflows(
 
         mock_post.assert_called_once_with(
             url="http://paperless-ngx.com",
-            data=f"Test message: http://localhost:8000/documents/{doc.id}/",
+            data=f"Test message: http://localhost:8000/paperless/documents/{doc.id}/",
             headers={},
             files=None,
             as_json=False,
@@ -3204,7 +3275,7 @@ class TestWorkflows(
     @override_settings(
         PAPERLESS_URL="http://localhost:8000",
     )
-    @mock.patch("documents.signals.handlers.send_webhook.delay")
+    @mock.patch("documents.workflows.webhooks.send_webhook.delay")
     def test_workflow_webhook_action_w_files(self, mock_post):
         """
         GIVEN:
@@ -3307,7 +3378,7 @@ class TestWorkflows(
         )
 
         # fails because no file
-        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
+        with self.assertLogs("paperless.workflows", level="ERROR") as cm:
             run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
             expected_str = "Error occurred sending webhook"
@@ -3350,7 +3421,7 @@ class TestWorkflows(
             original_filename="sample.pdf",
         )
 
-        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
+        with self.assertLogs("paperless.workflows", level="ERROR") as cm:
             run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
             expected_str = "Error occurred parsing webhook params"
@@ -3358,7 +3429,7 @@ class TestWorkflows(
             expected_str = "Error occurred parsing webhook headers"
             self.assertIn(expected_str, cm.output[1])
 
-    @mock.patch("httpx.post")
+    @mock.patch("httpx.Client.post")
     def test_workflow_webhook_send_webhook_task(self, mock_post):
         mock_post.return_value = mock.Mock(
             status_code=200,
@@ -3366,7 +3437,7 @@ class TestWorkflows(
             raise_for_status=mock.Mock(),
         )
 
-        with self.assertLogs("paperless.handlers") as cm:
+        with self.assertLogs("paperless.workflows") as cm:
             send_webhook(
                 url="http://paperless-ngx.com",
                 data="Test message",
@@ -3379,8 +3450,6 @@ class TestWorkflows(
                 content="Test message",
                 headers={},
                 files=None,
-                follow_redirects=False,
-                timeout=5,
             )
 
             expected_str = "Webhook sent to http://paperless-ngx.com"
@@ -3398,11 +3467,9 @@ class TestWorkflows(
                 data={"message": "Test message"},
                 headers={},
                 files=None,
-                follow_redirects=False,
-                timeout=5,
             )
 
-    @mock.patch("httpx.post")
+    @mock.patch("httpx.Client.post")
     def test_workflow_webhook_send_webhook_retry(self, mock_http):
         mock_http.return_value.raise_for_status = mock.Mock(
             side_effect=HTTPStatusError(
@@ -3412,7 +3479,7 @@ class TestWorkflows(
             ),
         )
 
-        with self.assertLogs("paperless.handlers") as cm:
+        with self.assertLogs("paperless.workflows") as cm:
             with self.assertRaises(HTTPStatusError):
                 send_webhook(
                     url="http://paperless-ngx.com",
@@ -3428,7 +3495,7 @@ class TestWorkflows(
                 )
                 self.assertIn(expected_str, cm.output[0])
 
-    @mock.patch("documents.signals.handlers.send_webhook.delay")
+    @mock.patch("documents.workflows.webhooks.send_webhook.delay")
     def test_workflow_webhook_action_consumption(self, mock_post):
         """
         GIVEN:
@@ -3598,7 +3665,7 @@ class TestWebhookSecurity:
             - ValueError is raised
         """
         resolve_to("127.0.0.1")
-        with pytest.raises(ValueError):
+        with pytest.raises(ConnectError):
             send_webhook(
                 "http://paperless-ngx.com",
                 data="",
@@ -3628,7 +3695,8 @@ class TestWebhookSecurity:
         )
 
         req = httpx_mock.get_request()
-        assert req.url.host == "paperless-ngx.com"
+        assert req.url.host == "52.207.186.75"
+        assert req.headers["host"] == "paperless-ngx.com"
 
     def test_follow_redirects_disabled(self, httpx_mock: HTTPXMock, resolve_to):
         """

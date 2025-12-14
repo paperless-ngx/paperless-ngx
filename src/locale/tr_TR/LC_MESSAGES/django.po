@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-22 18:15+0000\n"
-"PO-Revision-Date: 2025-10-22 18:18\n"
+"POT-Creation-Date: 2025-12-12 17:41+0000\n"
+"PO-Revision-Date: 2025-12-12 17:44\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Belgeler"
 
-#: documents/filters.py:386
+#: documents/filters.py:395
 msgid "Value must be valid JSON."
 msgstr "Değer geçerli bir JSON olmalıdır."
 
-#: documents/filters.py:405
+#: documents/filters.py:414
 msgid "Invalid custom field query expression"
 msgstr "Geçersiz özel alan sorgu ifadesi"
 
-#: documents/filters.py:415
+#: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Geçersiz ifade listesi. Boş olmamalıdır."
 
-#: documents/filters.py:436
+#: documents/filters.py:445
 msgid "Invalid logical operator {op!r}"
 msgstr "Geçersiz mantıksal işleç {op!r}"
 
-#: documents/filters.py:450
+#: documents/filters.py:459
 msgid "Maximum number of query conditions exceeded."
 msgstr "En çok sorgu koşulu sayısı aşıldı."
 
-#: documents/filters.py:515
+#: documents/filters.py:524
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} geçerli bir özel alan değil."
 
-#: documents/filters.py:552
+#: documents/filters.py:561
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type}, {expr!r} sorgu ifadesini desteklemiyor."
 
-#: documents/filters.py:660 documents/models.py:135
+#: documents/filters.py:669 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
 msgstr "En çok iç içe geçme izni aşıldı."
 
-#: documents/filters.py:845
+#: documents/filters.py:854
 msgid "Custom field not found"
 msgstr "Özel alan bulunamadı"
 
@@ -136,11 +136,11 @@ msgstr "etiketler"
 
 #: documents/models.py:123
 msgid "Cannot set itself as parent."
-msgstr ""
+msgstr "Kendinizi bir üst düğüm olarak seçemezsiniz."
 
 #: documents/models.py:125
 msgid "Cannot set parent to a descendant."
-msgstr ""
+msgstr "Bir üst düğüm alt düğüm olarak seçilemez."
 
 #: documents/models.py:142 documents/models.py:190
 msgid "document type"
@@ -758,7 +758,7 @@ msgstr "Seç"
 
 #: documents/models.py:795
 msgid "Long Text"
-msgstr ""
+msgstr "Uzun Metin"
 
 #: documents/models.py:807
 msgid "data type"
@@ -858,11 +858,11 @@ msgstr "bu etiket(ler) e sahiptir"
 
 #: documents/models.py:1072
 msgid "has all of these tag(s)"
-msgstr ""
+msgstr "bu etiket veya etiketlerine sahip"
 
 #: documents/models.py:1079
 msgid "does not have these tag(s)"
-msgstr ""
+msgstr "bu etiket veya etiketlerine sahip değil"
 
 #: documents/models.py:1087
 msgid "has this document type"
@@ -870,7 +870,7 @@ msgstr "bu doküman tipindedir"
 
 #: documents/models.py:1094
 msgid "does not have these document type(s)"
-msgstr ""
+msgstr "bu belge tür veya türlerine sahip değil"
 
 #: documents/models.py:1102
 msgid "has this correspondent"
@@ -878,23 +878,23 @@ msgstr "bu muhatap var"
 
 #: documents/models.py:1109
 msgid "does not have these correspondent(s)"
-msgstr ""
+msgstr "bu muhatablara sahip değil"
 
 #: documents/models.py:1117
 msgid "has this storage path"
-msgstr ""
+msgstr "bu depolama yoluna sahip"
 
 #: documents/models.py:1124
 msgid "does not have these storage path(s)"
-msgstr ""
+msgstr "bu depolama dizin veya dizinleri mevcut değil"
 
 #: documents/models.py:1128
 msgid "filter custom field query"
-msgstr ""
+msgstr "özel alanlara göre filtrele"
 
 #: documents/models.py:1131
 msgid "JSON-encoded custom field query expression."
-msgstr ""
+msgstr "JSON olarak verilmiş özel alan sorgu ifadesi."
 
 #: documents/models.py:1135
 msgid "schedule offset days"
@@ -1038,7 +1038,7 @@ msgstr "başlık ata"
 
 #: documents/models.py:1302
 msgid "Assign a document title, must  be a Jinja2 template, see documentation."
-msgstr ""
+msgstr "Dökuman bașlıkları, Jinja2 taslağı olmalıdır, bakınız."
 
 #: documents/models.py:1310 paperless_mail/models.py:274
 msgid "assign this tag"
@@ -1208,39 +1208,34 @@ msgstr "iş akışı çalıştırma"
 msgid "workflow runs"
 msgstr "iş akışı çalıştırma"
 
-#: documents/serialisers.py:145
-#, python-format
-msgid "Invalid regular expression: %(error)s"
-msgstr "Hatalı düzenli ifade: %(error)s"
-
-#: documents/serialisers.py:619
+#: documents/serialisers.py:640
 msgid "Invalid color."
 msgstr "Geçersiz renk."
 
-#: documents/serialisers.py:1805
+#: documents/serialisers.py:1826
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Dosya türü %(type)s desteklenmiyor"
 
-#: documents/serialisers.py:1849
+#: documents/serialisers.py:1870
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
-msgstr ""
+msgstr "%(id)s özel alan numarası tam sayı olmalıdır"
 
-#: documents/serialisers.py:1856
+#: documents/serialisers.py:1877
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
-msgstr ""
+msgstr "%(id)s numaralı özel alan mevcut değil"
 
-#: documents/serialisers.py:1873 documents/serialisers.py:1883
+#: documents/serialisers.py:1894 documents/serialisers.py:1904
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
-msgstr ""
+msgstr "Özel alanlar bir tam sayı olarak veya bir nesne haritası numaraları olmalıdır."
 
-#: documents/serialisers.py:1878
+#: documents/serialisers.py:1899
 msgid "Some custom fields don't exist or were specified twice."
-msgstr ""
+msgstr "Bazı õzel alan numaraları mevcut değil yada iki kez tanımlanmıș."
 
-#: documents/serialisers.py:1993
+#: documents/serialisers.py:2014
 msgid "Invalid variable detected."
 msgstr "Geçersiz değişken algılandı."
 

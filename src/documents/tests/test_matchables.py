@@ -206,6 +206,22 @@ class TestMatching(_TestMatchingBase):
     def test_tach_invalid_regex(self):
         self._test_matching("[", "MATCH_REGEX", [], ["Don't match this"])
 
+    def test_match_regex_timeout_returns_false(self):
+        tag = Tag.objects.create(
+            name="slow",
+            match=r"(a+)+$",
+            matching_algorithm=Tag.MATCH_REGEX,
+        )
+        document = Document(content=("a" * 5000) + "X")
+
+        with self.assertLogs("paperless.regex", level="WARNING") as cm:
+            self.assertFalse(matching.matches(tag, document))
+
+        self.assertTrue(
+            any("timed out" in message for message in cm.output),
+            f"Expected timeout log, got {cm.output}",
+        )
+
     def test_match_fuzzy(self):
         self._test_matching(
             "Springfield, Miss.",

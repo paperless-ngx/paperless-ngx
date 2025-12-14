@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common'
 import {
   ChangeDetectorRef,
   Component,
@@ -9,7 +10,7 @@ import {
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
-import { filter, takeUntil, timer } from 'rxjs'
+import { Subject, debounceTime, filter, takeUntil, timer } from 'rxjs'
 import { LogService } from 'src/app/services/rest/log.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
@@ -21,6 +22,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
   imports: [
     PageHeaderComponent,
     NgbNavModule,
+    CommonModule,
     FormsModule,
     ReactiveFormsModule,
   ],
@@ -32,7 +34,7 @@ export class LogsComponent
   private logService = inject(LogService)
   private changedetectorRef = inject(ChangeDetectorRef)
 
-  public logs: string[] = []
+  public logs: Array<{ message: string; level: number }> = []
 
   public logFiles: string[] = []
 
@@ -40,9 +42,19 @@ export class LogsComponent
 
   public autoRefreshEnabled: boolean = true
 
-  @ViewChild('logContainer') logContainer: ElementRef
+  public limit: number = 5000
+
+  public showJumpToBottom = false
+
+  private readonly limitChange$ = new Subject<number>()
+
+  @ViewChild('logContainer') logContainer: ElementRef<HTMLElement>
 
   ngOnInit(): void {
+    this.limitChange$
+      .pipe(debounceTime(300), takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => this.reloadLogs())
+
     this.logService
       .list()
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -68,16 +80,37 @@ export class LogsComponent
     super.ngOnDestroy()
   }
 
+  onLimitChange(limit: number): void {
+    this.limitChange$.next(limit)
+  }
+
   reloadLogs() {
     this.loading = true
+    const shouldStickToBottom = this.isNearBottom()
     this.logService
-      .get(this.activeLog)
+      .get(this.activeLog, this.limit)
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (result) => {
-          this.logs = result
           this.loading = false
-          this.scrollToBottom()
+          const parsed = this.parseLogsWithLevel(result)
+          const hasChanges =
+            parsed.length !== this.logs.length ||
+            parsed.some((log, idx) => {
+              const current = this.logs[idx]
+              return (
+                !current ||
+                current.message !== log.message ||
+                current.level !== log.level
+              )
+            })
+          if (hasChanges) {
+            this.logs = parsed
+            if (shouldStickToBottom) {
+              this.scrollToBottom()
+            }
+            this.showJumpToBottom = !shouldStickToBottom
+          }
         },
         error: () => {
           this.logs = []
@@ -100,12 +133,35 @@ export class LogsComponent
     }
   }
 
+  private parseLogsWithLevel(
+    logs: string[]
+  ): Array<{ message: string; level: number }> {
+    return logs.map((log) => ({
+      message: log,
+      level: this.getLogLevel(log),
+    }))
+  }
+
   scrollToBottom(): void {
+    const viewport = this.logContainer?.nativeElement
+    if (!viewport) {
+      return
+    }
     this.changedetectorRef.detectChanges()
-    this.logContainer?.nativeElement.scroll({
-      top: this.logContainer.nativeElement.scrollHeight,
-      left: 0,
-      behavior: 'auto',
-    })
+    viewport.scrollTop = viewport.scrollHeight
+    this.showJumpToBottom = false
+  }
+
+  private isNearBottom(): boolean {
+    if (!this.logContainer?.nativeElement) return true
+    const distanceFromBottom =
+      this.logContainer.nativeElement.scrollHeight -
+      this.logContainer.nativeElement.scrollTop -
+      this.logContainer.nativeElement.clientHeight
+    return distanceFromBottom <= 40
+  }
+
+  onScroll(): void {
+    this.showJumpToBottom = !this.isNearBottom()
   }
 }

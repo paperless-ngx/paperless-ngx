@@ -443,6 +443,10 @@ flowchart TD
     'Updated'
     trigger(s)"}
 
+    scheduled{"Documents
+    matching
+    trigger(s)"}
+
     A[New Document] --> consumption
     consumption --> |Yes| C[Workflow Actions Run]
     consumption --> |No| D
@@ -455,6 +459,11 @@ flowchart TD
     updated --> |Yes| J[Workflow Actions Run]
     updated --> |No| K
     J --> K[Document Saved]
+    L[Scheduled Task Check<br/>hourly at :05] --> M[Get All Scheduled Triggers]
+    M --> scheduled
+    scheduled --> |Yes| N[Workflow Actions Run]
+    scheduled --> |No| O[Document Saved]
+    N --> O
 ```
 
 #### Filters {#workflow-trigger-filters}
@@ -553,6 +562,7 @@ applied. You can use the following placeholders in the template with any trigger
 -   `{{added_time}}`: added time in HH:MM format
 -   `{{original_filename}}`: original file name without extension
 -   `{{filename}}`: current file name without extension
+-   `{{doc_title}}`: current document title
 
 The following placeholders are only available for "added" or "updated" triggers
 

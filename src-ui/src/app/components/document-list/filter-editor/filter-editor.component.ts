@@ -173,6 +173,22 @@ const RELATIVE_DATE_QUERYSTRINGS = [
     relativeDate: RelativeDate.YESTERDAY,
     dateQuery: 'yesterday',
   },
+  {
+    relativeDate: RelativeDate.PREVIOUS_WEEK,
+    dateQuery: 'previous week',
+  },
+  {
+    relativeDate: RelativeDate.PREVIOUS_MONTH,
+    dateQuery: 'previous month',
+  },
+  {
+    relativeDate: RelativeDate.PREVIOUS_QUARTER,
+    dateQuery: 'previous quarter',
+  },
+  {
+    relativeDate: RelativeDate.PREVIOUS_YEAR,
+    dateQuery: 'previous year',
+  },
 ]
 
 const DEFAULT_TEXT_FILTER_TARGET_OPTIONS = [
@@ -400,6 +416,9 @@ export class FilterEditorComponent
 
   @Input()
   set filterRules(value: FilterRule[]) {
+    if (value === this._filterRules) {
+      return
+    }
     this._filterRules = value
 
     this.documentTypeSelectionModel.clear(false)
@@ -747,7 +766,7 @@ export class FilterEditorComponent
     ) {
       filterRules.push({
         rule_type: FILTER_TITLE_CONTENT,
-        value: this._textFilter,
+        value: this._textFilter.trim(),
       })
     }
     if (this._textFilter && this.textFilterTarget == TEXT_FILTER_TARGET_TITLE) {
@@ -805,7 +824,7 @@ export class FilterEditorComponent
     ) {
       filterRules.push({
         rule_type: FILTER_FULLTEXT_QUERY,
-        value: this._textFilter,
+        value: this._textFilter.trim(),
       })
     }
     if (
@@ -1098,7 +1117,13 @@ export class FilterEditorComponent
   rulesModified: boolean = false
 
   updateRules() {
-    this.filterRulesChange.next(this.filterRules)
+    const updatedRules = this.filterRules
+    this._filterRules = updatedRules
+    this.rulesModified = filterRulesDiffer(
+      this._unmodifiedFilterRules,
+      updatedRules
+    )
+    this.filterRulesChange.next(updatedRules)
   }
 
   get textFilter() {

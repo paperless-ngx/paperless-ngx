@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-22 18:15+0000\n"
-"PO-Revision-Date: 2025-10-22 18:18\n"
+"POT-Creation-Date: 2025-12-12 17:41+0000\n"
+"PO-Revision-Date: 2025-12-12 17:44\n"
 "Last-Translator: \n"
 "Language-Team: Thai\n"
 "Language: th_TH\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "เอกสาร"
 
-#: documents/filters.py:386
+#: documents/filters.py:395
 msgid "Value must be valid JSON."
 msgstr "ค่า ต้องอยู่ในรูปแบบ JSON ที่ถูกต้อง"
 
-#: documents/filters.py:405
+#: documents/filters.py:414
 msgid "Invalid custom field query expression"
 msgstr "รูปแบบการค้นหาฟิลด์ที่กำหนดเองไม่ถูกต้อง"
 
-#: documents/filters.py:415
+#: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
 msgstr "รายการคำสั่งไม่ถูกต้อง ต้องไม่เว้นว่าง"
 
-#: documents/filters.py:436
+#: documents/filters.py:445
 msgid "Invalid logical operator {op!r}"
 msgstr "ตัวดำเนินการเชิงตรรกะ {op!r} ไม่ถูกต้อง"
 
-#: documents/filters.py:450
+#: documents/filters.py:459
 msgid "Maximum number of query conditions exceeded."
 msgstr "จำนวนเงื่อนไขในการค้นหาเกินกำหนด"
 
-#: documents/filters.py:515
+#: documents/filters.py:524
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} ไม่ใช่ฟิลด์ที่กำหนดเองที่ถูกต้อง"
 
-#: documents/filters.py:552
+#: documents/filters.py:561
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} ไม่รองรับรูปแบบการค้นหา {expr!r}"
 
-#: documents/filters.py:660 documents/models.py:135
+#: documents/filters.py:669 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
 msgstr "จำนวนการซ้อนเงื่อนไขสูงสุดเกินขีดจำกัด"
 
-#: documents/filters.py:845
+#: documents/filters.py:854
 msgid "Custom field not found"
 msgstr "ไม่พบฟิลด์ที่กำหนด"
 
@@ -942,7 +942,7 @@ msgstr ""
 
 #: documents/models.py:1187
 msgid "email subject"
-msgstr ""
+msgstr "หัวเรื่องของอีเมล"
 
 #: documents/models.py:1191
 msgid "The subject of the email, can include some placeholders, see documentation."
@@ -950,7 +950,7 @@ msgstr ""
 
 #: documents/models.py:1197
 msgid "email body"
-msgstr ""
+msgstr "เนื้อหาอีเมล"
 
 #: documents/models.py:1200
 msgid "The body (message) of the email, can include some placeholders, see documentation."
@@ -958,7 +958,7 @@ msgstr ""
 
 #: documents/models.py:1206
 msgid "emails to"
-msgstr ""
+msgstr "อีเมล์ถึง"
 
 #: documents/models.py:1209
 msgid "The destination email addresses, comma separated."
@@ -1208,39 +1208,34 @@ msgstr ""
 msgid "workflow runs"
 msgstr ""
 
-#: documents/serialisers.py:145
-#, python-format
-msgid "Invalid regular expression: %(error)s"
-msgstr "Regular expression ไม่ถูกต้อง : %(error)s"
-
-#: documents/serialisers.py:619
+#: documents/serialisers.py:640
 msgid "Invalid color."
 msgstr "สีไม่ถูกต้อง"
 
-#: documents/serialisers.py:1805
+#: documents/serialisers.py:1826
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "ไม่รองรับไฟล์ประเภท %(type)s"
 
-#: documents/serialisers.py:1849
+#: documents/serialisers.py:1870
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr ""
 
-#: documents/serialisers.py:1856
+#: documents/serialisers.py:1877
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr ""
 
-#: documents/serialisers.py:1873 documents/serialisers.py:1883
+#: documents/serialisers.py:1894 documents/serialisers.py:1904
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr ""
 
-#: documents/serialisers.py:1878
+#: documents/serialisers.py:1899
 msgid "Some custom fields don't exist or were specified twice."
 msgstr ""
 
-#: documents/serialisers.py:1993
+#: documents/serialisers.py:2014
 msgid "Invalid variable detected."
 msgstr "ตรวจพบตัวแปรไม่ถูกต้อง"
 

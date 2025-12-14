@@ -354,5 +354,13 @@ describe('CustomFieldsQueryDropdownComponent', () => {
       model.removeElement(atom)
       expect(completeSpy).toHaveBeenCalled()
     })
+
+    it('should subscribe to existing elements when queries are assigned', () => {
+      const expression = new CustomFieldQueryExpression()
+      const nextSpy = jest.spyOn(model.changed, 'next')
+      model.queries = [expression]
+      expression.changed.next(expression)
+      expect(nextSpy).toHaveBeenCalledWith(model)
+    })
   })
 })

@@ -1,6 +1,6 @@
 [project]
 name = "paperless-ngx"
-version = "2.19.2"
+version = "2.20.2"
 description = "A community-supported supercharged document management system: scan, index and archive all your physical documents"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -17,7 +17,7 @@ classifiers = [
 
 dependencies = [
   "babel>=2.17",
-  "bleach~=6.2.0",
+  "bleach~=6.3.0",
   "celery[redis]~=5.5.1",
   "channels~=4.2",
   "channels-redis~=4.2",
@@ -26,8 +26,8 @@ dependencies = [
   # WARNING: django does not use semver.
   #          Only patch versions are guaranteed to not introduce breaking changes.
   "django~=5.2.5",
-  "django-allauth[mfa,socialaccount]~=65.4.0",
-  "django-auditlog~=3.2.1",
+  "django-allauth[mfa,socialaccount]~=65.12.1",
+  "django-auditlog~=3.3.0",
   "django-cachalot~=2.8.0",
   "django-celery-results~=2.6.0",
   "django-compression-middleware~=0.5.0",
@@ -41,7 +41,7 @@ dependencies = [
   "djangorestframework~=3.16",
   "djangorestframework-guardian~=0.4.0",
   "drf-spectacular~=0.28",
-  "drf-spectacular-sidecar~=2025.9.1",
+  "drf-spectacular-sidecar~=2025.10.1",
   "drf-writable-nested~=0.7.1",
   "filelock~=3.20.0",
   "flower~=2.0.1",
@@ -52,17 +52,18 @@ dependencies = [
   "jinja2~=3.1.5",
   "langdetect~=1.0.9",
   "nltk~=3.9.1",
-  "ocrmypdf~=16.11.0",
+  "ocrmypdf~=16.12.0",
   "pathvalidate~=3.3.1",
   "pdf2image~=1.17.0",
   "python-dateutil~=2.9.0",
-  "python-dotenv~=1.1.0",
+  "python-dotenv~=1.2.1",
   "python-gnupg~=0.5.4",
   "python-ipware~=3.0.0",
   "python-magic~=0.4.27",
   "pyzbar~=0.1.9",
   "rapidfuzz~=3.14.0",
   "redis[hiredis]~=5.2.1",
+  "regex>=2025.9.18",
   "scikit-learn~=1.7.0",
   "setproctitle~=1.3.4",
   "tika-client~=0.10.0",
@@ -77,10 +78,10 @@ optional-dependencies.mariadb = [
   "mysqlclient~=2.2.7",
 ]
 optional-dependencies.postgres = [
-  "psycopg[c,pool]==3.2.9",
+  "psycopg[c,pool]==3.2.12",
   # Direct dependency for proper resolution of the pre-built wheels
-  "psycopg-c==3.2.9",
-  "psycopg-pool==3.2.6",
+  "psycopg-c==3.2.12",
+  "psycopg-pool==3.2.7",
 ]
 optional-dependencies.webserver = [
   "granian[uvloop]~=2.5.1",
@@ -96,7 +97,7 @@ dev = [
 
 docs = [
   "mkdocs-glightbox~=0.5.1",
-  "mkdocs-material~=9.6.4",
+  "mkdocs-material~=9.7.0",
 ]
 
 testing = [
@@ -115,7 +116,7 @@ testing = [
 ]
 
 lint = [
-  "pre-commit~=4.3.0",
+  "pre-commit~=4.4.0",
   "pre-commit-uv~=4.2.0",
   "ruff~=0.14.0",
 ]
@@ -150,8 +151,8 @@ environments = [
 [tool.uv.sources]
 # Markers are chosen to select these almost exclusively when building the Docker image
 psycopg-c = [
-  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_c-3.2.9-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
-  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_c-3.2.9-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-bookworm-3.2.12/psycopg_c-3.2.12-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-bookworm-3.2.12/psycopg_c-3.2.12-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
 ]
 zxing-cpp = [
   { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },

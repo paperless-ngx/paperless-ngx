@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-22 18:15+0000\n"
-"PO-Revision-Date: 2025-10-22 18:18\n"
+"POT-Creation-Date: 2025-12-12 17:41+0000\n"
+"PO-Revision-Date: 2025-12-12 17:44\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "اسناد و مدارک"
 
-#: documents/filters.py:386
+#: documents/filters.py:395
 msgid "Value must be valid JSON."
 msgstr "مقدار باید JSON معتبر باشد."
 
-#: documents/filters.py:405
+#: documents/filters.py:414
 msgid "Invalid custom field query expression"
 msgstr "Invalid custom field query expression"
 
-#: documents/filters.py:415
+#: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
-msgstr ""
+msgstr "لیست عبارت‌ها نامعتبر است. نباید خالی باشد."
 
-#: documents/filters.py:436
+#: documents/filters.py:445
 msgid "Invalid logical operator {op!r}"
 msgstr ""
 
-#: documents/filters.py:450
+#: documents/filters.py:459
 msgid "Maximum number of query conditions exceeded."
 msgstr "حداکثر تعداد شرایط پرس و جو از آن فراتر رفته است."
 
-#: documents/filters.py:515
+#: documents/filters.py:524
 msgid "{name!r} is not a valid custom field."
 msgstr "{نام! R} یک زمینه سفارشی معتبر نیست."
 
-#: documents/filters.py:552
+#: documents/filters.py:561
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr ""
 
-#: documents/filters.py:660 documents/models.py:135
+#: documents/filters.py:669 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
-msgstr ""
+msgstr "حداکثر عمق تودرتویی بیش از حد مجاز است."
 
-#: documents/filters.py:845
+#: documents/filters.py:854
 msgid "Custom field not found"
 msgstr "زمینه سفارشی یافت نشد"
 
@@ -79,7 +79,7 @@ msgstr "مطابقت دقیق"
 
 #: documents/models.py:59 documents/models.py:987
 msgid "Regular expression"
-msgstr ""
+msgstr "عبارت باقاعده"
 
 #: documents/models.py:60 documents/models.py:988
 msgid "Fuzzy word"
@@ -136,11 +136,11 @@ msgstr "برچسب ها"
 
 #: documents/models.py:123
 msgid "Cannot set itself as parent."
-msgstr ""
+msgstr "نمی‌تواند خودش را به عنوان والد تنظیم کند."
 
 #: documents/models.py:125
 msgid "Cannot set parent to a descendant."
-msgstr ""
+msgstr "نمی‌توان والد را به یک فرزند یا عضو پایین‌تر در سلسله‌مراتب تنظیم کرد."
 
 #: documents/models.py:142 documents/models.py:190
 msgid "document type"
@@ -758,7 +758,7 @@ msgstr "انتخاب کردن"
 
 #: documents/models.py:795
 msgid "Long Text"
-msgstr ""
+msgstr "متن طولانی"
 
 #: documents/models.py:807
 msgid "data type"
@@ -1208,39 +1208,34 @@ msgstr "گردش کار"
 msgid "workflow runs"
 msgstr "گردش کار اجرا می شود"
 
-#: documents/serialisers.py:145
-#, python-format
-msgid "Invalid regular expression: %(error)s"
-msgstr ""
-
-#: documents/serialisers.py:619
+#: documents/serialisers.py:640
 msgid "Invalid color."
 msgstr "رنگ نامعتبر"
 
-#: documents/serialisers.py:1805
+#: documents/serialisers.py:1826
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
 
-#: documents/serialisers.py:1849
+#: documents/serialisers.py:1870
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr ""
 
-#: documents/serialisers.py:1856
+#: documents/serialisers.py:1877
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr ""
 
-#: documents/serialisers.py:1873 documents/serialisers.py:1883
+#: documents/serialisers.py:1894 documents/serialisers.py:1904
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr ""
 
-#: documents/serialisers.py:1878
+#: documents/serialisers.py:1899
 msgid "Some custom fields don't exist or were specified twice."
 msgstr ""
 
-#: documents/serialisers.py:1993
+#: documents/serialisers.py:2014
 msgid "Invalid variable detected."
 msgstr "متغیر نامعتبر شناسایی شده است."
 

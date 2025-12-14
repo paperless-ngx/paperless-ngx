@@ -67,7 +67,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Install python
         uses: actions/setup-python@v6
         with:
@@ -81,14 +81,14 @@ jobs:
       - pre-commit
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Set up Python
         id: setup-python
         uses: actions/setup-python@v6
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
@@ -115,7 +115,7 @@ jobs:
             --frozen \
             mkdocs gh-deploy --force --no-history
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: documentation
           path: site/
@@ -131,7 +131,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Start containers
         run: |
           docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml pull --quiet
@@ -142,7 +142,7 @@ jobs:
         with:
           python-version: "${{ matrix.python-version }}"
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
@@ -202,13 +202,13 @@ jobs:
     needs:
       - pre-commit
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
       - name: Use Node.js 20
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: 20.x
           cache: 'pnpm'
@@ -235,13 +235,13 @@ jobs:
         shard-index: [1, 2, 3, 4]
         shard-count: [4]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
       - name: Use Node.js 20
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: 20.x
           cache: 'pnpm'
@@ -284,13 +284,13 @@ jobs:
         shard-index: [1, 2]
         shard-count: [2]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
       - name: Use Node.js 20
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: 20.x
           cache: 'pnpm'
@@ -327,13 +327,13 @@ jobs:
       - tests-frontend
       - tests-frontend-e2e
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
       - name: Use Node.js 20
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: 20.x
           cache: 'pnpm'
@@ -353,9 +353,9 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: cd src-ui && pnpm run build --configuration=production
   build-docker-image:
-    name: Build Docker image for ${{ github.ref_name }}
+    name: Build Docker image for ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
     runs-on: ubuntu-24.04
-    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || startsWith(github.ref, 'refs/heads/fix-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || contains(github.ref, 'beta.rc') || startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/heads/l10n_'))
+    if: (github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || startsWith(github.ref, 'refs/heads/fix-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || contains(github.ref, 'beta.rc') || startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/heads/l10n_'))) || (github.event_name == 'pull_request' && (startsWith(github.head_ref, 'feature-') || startsWith(github.head_ref, 'fix-') || github.head_ref == 'dev' || github.head_ref == 'beta' || contains(github.head_ref, 'beta.rc') || startsWith(github.head_ref, 'l10n_')))
     concurrency:
       group: ${{ github.workflow }}-build-docker-image-${{ github.ref_name }}
       cancel-in-progress: true
@@ -364,6 +364,23 @@ jobs:
       - tests-frontend
       - tests-frontend-e2e
     steps:
+      - name: Prepare build variables
+        id: build-vars
+        uses: actions/github-script@v8
+        with:
+          result-encoding: string
+          script: |
+            const isPR = context.eventName === 'pull_request';
+            const defaultRefName = context.ref.replace('refs/heads/', '');
+            const headRef = isPR ? context.payload.pull_request.head.ref : defaultRefName;
+            const buildRef = isPR ? `refs/heads/${headRef}` : context.ref;
+            const buildCacheKey = headRef.split('/').join('-');
+            const canPush = context.eventName === 'push' || (isPR && context.payload.pull_request.head.repo.full_name === `${context.repo.owner}/${context.repo.repo}`);
+
+            core.setOutput('build-ref', buildRef);
+            core.setOutput('build-ref-name', headRef);
+            core.setOutput('build-cache-key', buildCacheKey);
+            core.setOutput('can-push', canPush ? 'true' : 'false');
       - name: Check pushing to Docker Hub
         id: push-other-places
         # Only push to Dockerhub from the main repo AND the ref is either:
@@ -372,8 +389,11 @@ jobs:
         #  beta
         #  a tag
         # Otherwise forks would require a Docker Hub account and secrets setup
+        env:
+          BUILD_REF: ${{ steps.build-vars.outputs.build-ref }}
+          BUILD_REF_NAME: ${{ steps.build-vars.outputs.build-ref-name }}
         run: |
-          if [[ ${{ github.repository_owner }} == "paperless-ngx" && ( ${{ github.ref_name }} == "dev" || ${{ github.ref_name }} == "beta" || ${{ startsWith(github.ref, 'refs/tags/v') }} == "true" ) ]] ; then
+          if [[ ${{ github.repository_owner }} == "paperless-ngx" && ( "$BUILD_REF_NAME" == "dev" || "$BUILD_REF_NAME" == "beta" || $BUILD_REF == refs/tags/v* || $BUILD_REF == *beta.rc* ) ]] ; then
             echo "Enabling DockerHub image push"
             echo "enable=true" >> $GITHUB_OUTPUT
           else
@@ -397,12 +417,14 @@ jobs:
           tags: |
             # Tag branches with branch name
             type=ref,event=branch
+            # Pull requests need a sanitized branch tag for pushing images
+            type=raw,value=${{ steps.build-vars.outputs.build-cache-key }},enable=${{ github.event_name == 'pull_request' }}
             # Process semver tags
             # For a tag x.y.z or vX.Y.Z, output an x.y.z and x.y image tag
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       # If https://github.com/docker/buildx/issues/1044 is resolved,
       # the append input with a native arm64 arch could be used to
       # significantly speed up building
@@ -439,7 +461,7 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
-          push: ${{ github.event_name != 'pull_request' }}
+          push: ${{ steps.build-vars.outputs.can-push == 'true' }}
           tags: ${{ steps.docker-meta.outputs.tags }}
           labels: ${{ steps.docker-meta.outputs.labels }}
           build-args: |
@@ -447,19 +469,21 @@ jobs:
           # Get cache layers from this branch, then dev
           # This allows new branches to get at least some cache benefits, generally from dev
           cache-from: |
-            type=registry,ref=ghcr.io/${{ steps.set-ghcr-repository.outputs.ghcr-repository }}/builder/cache/app:${{ github.ref_name }}
+            type=registry,ref=ghcr.io/${{ steps.set-ghcr-repository.outputs.ghcr-repository }}/builder/cache/app:${{ steps.build-vars.outputs.build-cache-key }}
             type=registry,ref=ghcr.io/${{ steps.set-ghcr-repository.outputs.ghcr-repository }}/builder/cache/app:dev
-          cache-to: |
-            type=registry,mode=max,ref=ghcr.io/${{ steps.set-ghcr-repository.outputs.ghcr-repository }}/builder/cache/app:${{ github.ref_name }}
+          cache-to: ${{ steps.build-vars.outputs.can-push == 'true' && format('type=registry,mode=max,ref=ghcr.io/{0}/builder/cache/app:{1}', steps.set-ghcr-repository.outputs.ghcr-repository, steps.build-vars.outputs.build-cache-key) || '' }}
       - name: Inspect image
+        if: steps.build-vars.outputs.can-push == 'true'
         run: |
           docker buildx imagetools inspect ${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}
       - name: Export frontend artifact from docker
+        if: steps.build-vars.outputs.can-push == 'true'
         run: |
           docker create --name frontend-extract ${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}
           docker cp frontend-extract:/usr/src/paperless/src/documents/static/frontend src/documents/static/frontend/
       - name: Upload frontend artifact
-        uses: actions/upload-artifact@v4
+        if: steps.build-vars.outputs.can-push == 'true'
+        uses: actions/upload-artifact@v5
         with:
           name: frontend-compiled
           path: src/documents/static/frontend/
@@ -469,17 +493,18 @@ jobs:
     needs:
       - build-docker-image
       - documentation
+    if: github.event_name == 'push'
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Set up Python
         id: setup-python
         uses: actions/setup-python@v6
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
@@ -492,12 +517,12 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends gettext liblept5
       - name: Download frontend artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: frontend-compiled
           path: src/documents/static/frontend/
       - name: Download documentation artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: documentation
           path: docs/_build/html/
@@ -560,7 +585,7 @@ jobs:
           sudo chown -R 1000:1000 paperless-ngx/
           tar -cJf paperless-ngx.tar.xz paperless-ngx/
       - name: Upload release artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: release
           path: dist/paperless-ngx.tar.xz
@@ -577,7 +602,7 @@ jobs:
     if: github.ref_type == 'tag' && (startsWith(github.ref_name, 'v') || contains(github.ref_name, '-beta.rc'))
     steps:
       - name: Download release artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: release
           path: ./
@@ -618,7 +643,7 @@ jobs:
     if: needs.publish-release.outputs.prerelease == 'false'
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: main
       - name: Set up Python
@@ -627,7 +652,7 @@ jobs:
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true

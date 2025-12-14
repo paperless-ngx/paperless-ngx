@@ -26,7 +26,7 @@
           i18n-placeholder
           (change)="onSetCreatedRelativeDate($event)">
           <ng-template ng-option-tmp let-item="item">
-            <div class="d-flex">{{ item.name }}<span class="ms-auto text-muted small">{{ item.date | customDate:'mediumDate' }} &ndash; <ng-container i18n>now</ng-container></span></div>
+            <ng-container [ngTemplateOutlet]="relativeDateOptionTemplate" [ngTemplateOutletContext]="{ $implicit: item }"></ng-container>
           </ng-template>
           </ng-select>
         </div>
@@ -102,7 +102,7 @@
             i18n-placeholder
             (change)="onSetAddedRelativeDate($event)">
             <ng-template ng-option-tmp let-item="item">
-              <div class="d-flex">{{ item.name }}<span class="ms-auto text-muted small">{{ item.date | customDate:'mediumDate' }} &ndash; <ng-container i18n>now</ng-container></span></div>
+              <ng-container [ngTemplateOutlet]="relativeDateOptionTemplate" [ngTemplateOutletContext]="{ $implicit: item }"></ng-container>
             </ng-template>
           </ng-select>
         </div>
@@ -158,3 +158,16 @@
     </div>
   </div>
 </div>
+
+<ng-template #relativeDateOptionTemplate let-item>
+  <div class="d-flex">
+    {{ item.name }}
+    <span class="ms-auto text-muted small">
+      @if (item.dateEnd) {
+        {{ item.date | customDate:'MMM d' }} &ndash; {{ item.dateEnd | customDate:'mediumDate' }}
+      } @else {
+        {{ item.date | customDate:'mediumDate' }} &ndash; <ng-container i18n>now</ng-container>
+      }
+    </span>
+  </div>
+</ng-template>
