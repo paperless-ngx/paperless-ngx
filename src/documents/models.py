@@ -11,6 +11,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from multiselectfield import MultiSelectField
@@ -21,6 +22,7 @@ if settings.AUDIT_LOG_ENABLED:
 
 from django.db.models import Case
 from django.db.models.functions import Cast
+from django.db.models.functions import Length
 from django.db.models.functions import Substr
 from django_softdelete.models import SoftDeleteModel
 
@@ -154,6 +156,8 @@ class StoragePath(MatchingModel):
 
 
 class Document(SoftDeleteModel, ModelWithOwner):
+
+    _backfill_content_length_done = False
     correspondent = models.ForeignKey(
         Correspondent,
         blank=True,
@@ -324,8 +328,31 @@ class Document(SoftDeleteModel, ModelWithOwner):
         return res
 
     def save(self, *args, **kwargs):
+        # Update content_length to accelerate statistics
         self.content_length = len(self.content) if self.content else 0
         super().save(*args, **kwargs)
+
+        # Also backfill content_length for other documents not updated yet
+        # This avoid running a scheduled task and distributes the DB load.
+        if not self._backfill_content_length_done:
+            self._backfill_content_length()
+
+    def _backfill_content_length(self, count=10):
+        """Fill the content_length for other Document instances."""
+        with transaction.atomic():
+            pks = list(
+                Document.objects.filter(content_length__isnull=True)
+                .order_by()
+                .exclude(pk=self.pk)
+                .select_for_update(skip_locked=True)[:count]
+                .values_list("pk", flat=True),
+            )
+            if pks:
+                Document.objects.filter(pk__in=pks).update(
+                    content_length=Length("content"),
+                )
+            else:
+                self._backfill_content_length_done = True
 
     @property
     def suggestion_content(self):
