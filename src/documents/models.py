@@ -194,10 +194,11 @@ class Document(SoftDeleteModel, ModelWithOwner):
 
     content_length = models.PositiveIntegerField(
         _("content length"),
-        default=0,
+        null=True,
+        default=None,
         editable=False,
         help_text=_(
-            "The length of the content field in characters. Automatically set when the document is saved. Used to compute statistics faster.",
+            "The length of the content field in characters. May be null, but automatically set when the document is saved. Used to compute statistics faster.",
         ),
     )
 
@@ -958,7 +959,7 @@ if settings.AUDIT_LOG_ENABLED:
     auditlog.register(
         Document,
         m2m_fields={"tags"},
-        exclude_fields=["modified"],
+        exclude_fields=["content_length", "modified"],
     )
     auditlog.register(Correspondent)
     auditlog.register(Tag)
