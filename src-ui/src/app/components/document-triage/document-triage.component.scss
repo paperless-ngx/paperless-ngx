@@ -1,0 +1,148 @@
+.triage-container {
+  height: calc(100vh - 120px);
+  overflow: hidden;
+}
+
+.triage-content {
+  display: flex;
+  height: 100%;
+  gap: 1rem;
+}
+
+.preview-panel {
+  flex: 1;
+  min-width: 0;
+  background: #f8f9fa;
+  border-radius: 0.25rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.preview-wrapper {
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.preview-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
+}
+
+.pdf-viewer {
+  width: 100%;
+  height: 100%;
+}
+
+.native-pdf-viewer {
+  width: 100%;
+  height: 100%;
+}
+
+.metadata-panel {
+  flex: 0 0 400px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: visible;
+  background: white;
+  border-radius: 0.25rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1;
+}
+
+.metadata-content {
+  h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    word-break: break-word;
+  }
+}
+
+.action-buttons {
+  button {
+    position: relative;
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.4rem;
+    }
+  }
+}
+
+.keyboard-hints {
+  border: 1px solid #dee2e6;
+
+  h6 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  ul {
+    li {
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+
+  kbd {
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 0.2rem;
+    padding: 0.1rem 0.4rem;
+    font-size: 0.75rem;
+    font-family: monospace;
+    display: inline-block;
+    min-width: 1.5rem;
+    text-align: center;
+  }
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+// Ensure ng-select dropdowns appear above other content
+::ng-deep .ng-dropdown-panel {
+  z-index: 9999 !important;
+}
+
+// Ensure the metadata panel doesn't clip dropdowns
+.metadata-panel {
+  ::ng-deep .ng-select {
+    .ng-dropdown-panel {
+      z-index: 10000;
+    }
+  }
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 768px) {
+  .triage-content {
+    flex-direction: column;
+  }
+
+  .preview-panel {
+    flex: 1;
+    min-height: 300px;
+  }
+
+  .metadata-panel {
+    flex: 0 0 auto;
+    max-height: 50vh;
+  }
+}
+

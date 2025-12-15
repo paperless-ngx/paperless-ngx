@@ -164,7 +164,9 @@ export class DocumentService extends AbstractPaperlessService<Document> {
   }
 
   getPreviewUrl(id: number, original: boolean = false): string {
-    let url = new URL(this.getResourceUrl(id, 'preview'))
+    const resourceUrl = this.getResourceUrl(id, 'preview')
+    // Use window.location.origin as base for relative URLs
+    let url = new URL(resourceUrl, window.location.origin)
     if (this._searchQuery) url.hash = `#search="${this.searchQuery}"`
     if (original) {
       url.searchParams.append('original', 'true')
