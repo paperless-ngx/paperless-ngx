@@ -1,0 +1,186 @@
+<pngx-page-header [title]="'Inbox Triage'" i18n-title>
+  <div class="d-flex gap-2 align-items-center">
+    <span class="badge bg-primary" i18n>
+      Document {{getCurrentIndex()}} of {{getRemainingCount()}}
+    </span>
+    <button
+      class="btn btn-sm btn-outline-secondary"
+      (click)="exitTriage()"
+      title="Exit triage (Esc)"
+      i18n-title
+    >
+      <i-bs name="x-lg"></i-bs>&nbsp;<ng-container i18n>Exit</ng-container>
+    </button>
+  </div>
+</pngx-page-header>
+
+<div class="triage-container">
+  @if (currentDocument) {
+    <div class="triage-content">
+      <!-- Left Panel: Document Preview -->
+      <div class="preview-panel">
+        <div class="preview-wrapper">
+          @if (!previewLoaded) {
+            <div class="preview-loading">
+              <div class="spinner-border" role="status"></div>
+              <p i18n>Loading preview...</p>
+            </div>
+          }
+          @if (previewUrl) {
+            @if (!useNativePdfViewer) {
+              <pdf-viewer
+                [src]="previewUrl"
+                [original-size]="false"
+                [show-borders]="true"
+                [show-all]="true"
+                [(page)]="previewCurrentPage"
+                [zoom-scale]="previewZoomScale"
+                (after-load-complete)="onPdfPreviewLoaded()"
+                (error)="onPdfPreviewError($event)"
+                class="pdf-viewer"
+              ></pdf-viewer>
+            } @else {
+              <object
+                [data]="previewUrl | safeUrl"
+                class="native-pdf-viewer"
+                width="100%"
+                height="100%"
+              ></object>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- Right Panel: Metadata Editor -->
+      <div class="metadata-panel">
+        <div class="metadata-content">
+          <h4 class="mb-3">{{ currentDocument.title }}</h4>
+
+          <form [formGroup]="documentForm">
+            <pngx-input-tags
+              i18n-title
+              title="Tags"
+              formControlName="tags"
+              [allowCreate]="true"
+            ></pngx-input-tags>
+
+            <pngx-input-select
+              i18n-title
+              title="Correspondent"
+              formControlName="correspondent"
+              [items]="correspondents"
+              [allowNull]="true"
+            ></pngx-input-select>
+
+            <pngx-input-select
+              i18n-title
+              title="Document Type"
+              formControlName="document_type"
+              [items]="documentTypes"
+              [allowNull]="true"
+            ></pngx-input-select>
+
+            <pngx-input-date
+              i18n-title
+              title="Created Date"
+              formControlName="created"
+            ></pngx-input-date>
+          </form>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons mt-4">
+            <div class="d-grid gap-2">
+              <button
+                class="btn btn-success"
+                (click)="archiveAndNext()"
+                [disabled]="isSaving"
+                title="Archive and move to next (A)"
+                i18n-title
+              >
+                <i-bs name="archive"></i-bs>&nbsp;
+                <ng-container i18n>Archive & Next</ng-container>
+                <span class="badge bg-light text-dark ms-2">A</span>
+              </button>
+
+              <button
+                class="btn btn-primary"
+                (click)="saveAndNext()"
+                [disabled]="isSaving"
+                title="Save and move to next (N)"
+                i18n-title
+              >
+                <i-bs name="check-lg"></i-bs>&nbsp;
+                <ng-container i18n>Save & Next</ng-container>
+                <span class="badge bg-light text-dark ms-2">N</span>
+              </button>
+
+              <div class="btn-group" role="group">
+                <button
+                  class="btn btn-outline-secondary"
+                  (click)="previousDocument()"
+                  [disabled]="isSaving || getCurrentIndex() <= 1"
+                  title="Previous document (P)"
+                  i18n-title
+                >
+                  <i-bs name="arrow-left"></i-bs>&nbsp;
+                  <ng-container i18n>Previous</ng-container>
+                  <span class="badge bg-secondary ms-2">P</span>
+                </button>
+                <button
+                  class="btn btn-outline-secondary"
+                  (click)="nextDocument()"
+                  [disabled]="isSaving || getCurrentIndex() >= getRemainingCount()"
+                  title="Next document (N)"
+                  i18n-title
+                >
+                  <ng-container i18n>Next</ng-container>&nbsp;
+                  <i-bs name="arrow-right"></i-bs>
+                  <span class="badge bg-secondary ms-2">N</span>
+                </button>
+              </div>
+
+              <button
+                class="btn btn-outline-warning"
+                (click)="undo()"
+                [disabled]="!canUndo() || isSaving"
+                title="Undo last action (U)"
+                i18n-title
+              >
+                <i-bs name="arrow-counterclockwise"></i-bs>&nbsp;
+                <ng-container i18n>Undo</ng-container>
+                <span class="badge bg-warning text-dark ms-2">U</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Keyboard Shortcuts Help -->
+          <div class="keyboard-hints mt-4 p-3 bg-light rounded">
+            <h6 class="mb-2" i18n>Keyboard Shortcuts:</h6>
+            <ul class="list-unstyled mb-0 small">
+              <li><kbd>A</kbd> - <ng-container i18n>Archive & Next</ng-container></li>
+              <li><kbd>N</kbd> - <ng-container i18n>Next Document</ng-container></li>
+              <li><kbd>P</kbd> - <ng-container i18n>Previous Document</ng-container></li>
+              <li><kbd>T</kbd> - <ng-container i18n>Focus Tags</ng-container></li>
+              <li><kbd>C</kbd> - <ng-container i18n>Focus Correspondent</ng-container></li>
+              <li><kbd>U</kbd> - <ng-container i18n>Undo Last Action</ng-container></li>
+              <li><kbd>Esc</kbd> - <ng-container i18n>Exit Triage</ng-container></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="text-center py-5">
+        <i-bs name="archive" width="4rem" height="4rem" class="text-muted mb-3"></i-bs>
+        <h3 i18n>All done!</h3>
+        <p class="text-muted" i18n>You've processed all documents in the inbox.</p>
+        <button class="btn btn-primary mt-3" (click)="exitTriage()" i18n>
+          Back to Documents
+        </button>
+      </div>
+    </div>
+  }
+</div>
+

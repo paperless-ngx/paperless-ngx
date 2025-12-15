@@ -1,0 +1,34 @@
+version: "3.4"
+services:
+  broker:
+    image: docker.io/library/redis:8
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+
+  webserver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - broker
+    ports:
+      - "8000:8000"
+    volumes:
+      - data:/usr/src/paperless/data
+      - media:/usr/src/paperless/media
+      - ./docker/compose/export:/usr/src/paperless/export
+      - ./docker/compose/consume:/usr/src/paperless/consume
+      - ./src:/usr/src/paperless/src
+      - ./src-ui/dist:/usr/src/paperless/static/frontend
+    env_file: docker/compose/docker-compose.env
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBHOST: 
+
+volumes:
+  data:
+  media:
+  redisdata:
+

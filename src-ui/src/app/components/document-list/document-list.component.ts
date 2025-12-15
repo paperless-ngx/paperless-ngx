@@ -48,9 +48,11 @@ import { DocumentListViewService } from 'src/app/services/document-list-view.ser
 import { HotKeyService } from 'src/app/services/hot-key.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
+import { DocumentService } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { TriageService } from 'src/app/services/triage.service'
 import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import {
   filterRulesDiffer,
@@ -117,6 +119,8 @@ export class DocumentListComponent
   settingsService = inject(SettingsService)
   private hotKeyService = inject(HotKeyService)
   permissionService = inject(PermissionsService)
+  private triageService = inject(TriageService)
+  private documentService = inject(DocumentService)
 
   DisplayField = DisplayField
   DisplayMode = DisplayMode
@@ -493,5 +497,52 @@ export class DocumentListComponent
 
   resetFilters() {
     this.filterEditor.resetSelected()
+  }
+
+  startTriage() {
+    // Get current state for returning later
+    const currentFilterRules = this.list.filterRules
+    const currentUrl = this.router.url
+
+    // Always load documents via API to ensure we have the latest data
+    // and handle cases where list.documents might be empty
+    this.documentService
+      .listFiltered(
+        1,
+        100, // Load first 100 documents for triage
+        this.list.sortField,
+        this.list.sortReverse,
+        currentFilterRules,
+        { truncate_content: true }
+      )
+      .pipe(first())
+      .subscribe({
+        next: (result) => {
+          if (result.results.length === 0) {
+            this.toastService.showInfo($localize`No documents to triage`)
+            return
+          }
+
+          // Initialize triage with loaded documents
+          this.triageService.initializeTriage(
+            result.results,
+            currentFilterRules,
+            currentUrl
+          )
+          this.router.navigate(['/triage'])
+        },
+        error: (error) => {
+          console.error('Error loading documents for triage:', error)
+          this.toastService.showError(
+            $localize`Error loading documents for triage: ${error?.message || 'Unknown error'}`
+          )
+        },
+      })
+  }
+
+  isInboxView(): boolean {
+    // Check if the current view has inbox filter rules
+    const filterRules = this.list.filterRules
+    return filterRules.some((rule) => rule.rule_type === 5) // FILTER_IS_IN_INBOX
   }
 }

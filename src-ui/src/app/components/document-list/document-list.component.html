@@ -118,6 +118,16 @@
     </div>
   </div>
 
+  <button 
+    class="btn btn-sm btn-success flex-fill" 
+    (click)="startTriage()"
+    [disabled]="list.collectionSize === 0"
+    title="Start processing documents in triage mode"
+    i18n-title
+    *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
+    <i-bs name="archive"></i-bs>&nbsp;<ng-container i18n>Start Triage</ng-container>
+  </button>
+
 </pngx-page-header>
 
 <div class="row sticky-top py-3 mt-n2 mt-md-n3 bg-body">

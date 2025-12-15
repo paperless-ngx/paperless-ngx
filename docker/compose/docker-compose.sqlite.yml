@@ -42,6 +42,7 @@ services:
     env_file: docker-compose.env
     environment:
       PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_CSRF_TRUSTED_ORIGINS: http://localhost:4200
 volumes:
   data:
   media:

@@ -11,6 +11,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component'
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
 import { DocumentDetailComponent } from './components/document-detail/document-detail.component'
 import { DocumentListComponent } from './components/document-list/document-list.component'
+import { DocumentTriageComponent } from './components/document-triage/document-triage.component'
 import { CorrespondentListComponent } from './components/manage/correspondent-list/correspondent-list.component'
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
 import { DocumentTypeListComponent } from './components/manage/document-type-list/document-type-list.component'
@@ -54,6 +55,18 @@ export const routes: Routes = [
             type: PermissionType.Document,
           },
           componentName: 'DocumentListComponent',
+        },
+      },
+      {
+        path: 'triage',
+        component: DocumentTriageComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Document,
+          },
+          componentName: 'DocumentTriageComponent',
         },
       },
       {

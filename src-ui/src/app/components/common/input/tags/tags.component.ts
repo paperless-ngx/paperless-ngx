@@ -58,7 +58,8 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   onTouched = () => {}
 
   writeValue(newValue: number[]): void {
-    this.value = newValue
+    // Ensure we always have an array, even if newValue is null or undefined
+    this.value = newValue || []
   }
   registerOnChange(fn: any): void {
     this.onChange = fn
@@ -110,7 +111,29 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
   value: number[] = []
 
-  tags: Tag[] = []
+  private _tags: Tag[] = []
+  private _tagsLoaded = false
+  
+  get tags(): Tag[] {
+    return this._tags
+  }
+  
+  set tags(value: Tag[]) {
+    const wasLoaded = this._tagsLoaded
+    this._tags = value
+    this._tagsLoaded = value.length > 0
+    
+    // Only trigger update if tags just finished loading and we have a value
+    // This prevents unnecessary updates on every tags array change
+    if (!wasLoaded && this._tagsLoaded && this.value && this.value.length > 0 && this.select) {
+      // Use setTimeout to avoid change detection issues
+      setTimeout(() => {
+        if (this.select) {
+          this.select.detectChanges()
+        }
+      }, 0)
+    }
+  }
 
   public createTagRef: (name) => void
 
