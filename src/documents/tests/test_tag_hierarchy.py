@@ -1,6 +1,7 @@
 from unittest import mock
 
 from django.contrib.auth.models import User
+from django.db import transaction
 from rest_framework.test import APITestCase
 
 from documents import bulk_edit
@@ -10,6 +11,7 @@ from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.serialisers import TagSerializer
+from documents.signals import handlers
 from documents.signals.handlers import run_workflows
 
 
@@ -250,3 +252,31 @@ class TestTagHierarchy(APITestCase):
             row for row in response.data["results"] if row["id"] == self.parent.pk
         )
         assert any(child["id"] == self.child.pk for child in parent_entry["children"])
+
+    def test_tag_tree_deferred_update_runs_on_commit(self):
+        from django.db import transaction
+
+        # Create tags inside an explicit transaction and commit.
+        with transaction.atomic():
+            parent = Tag.objects.create(name="Parent 2")
+            child = Tag.objects.create(name="Child 2", tn_parent=parent)
+        # After commit, tn_* fields should be populated.
+        parent.refresh_from_db()
+        child.refresh_from_db()
+        assert parent.tn_children_count == 1
+        assert child.tn_ancestors_count == 1
+
+    def test_tag_tree_update_runs_once_per_transaction(self):
+        handlers._tag_tree_update_scheduled = False
+
+        with mock.patch("documents.signals.handlers.Tag.update_tree") as update_tree:
+            with self.captureOnCommitCallbacks(execute=True) as callbacks:
+                with transaction.atomic():
+                    handlers.schedule_tag_tree_update()
+                    handlers.schedule_tag_tree_update()
+                    update_tree.assert_not_called()
+                    assert handlers._tag_tree_update_scheduled is True
+
+            assert len(callbacks) == 1
+            update_tree.assert_called_once()
+            assert handlers._tag_tree_update_scheduled is False
