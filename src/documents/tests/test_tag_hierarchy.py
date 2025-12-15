@@ -250,3 +250,16 @@ class TestTagHierarchy(APITestCase):
             row for row in response.data["results"] if row["id"] == self.parent.pk
         )
         assert any(child["id"] == self.child.pk for child in parent_entry["children"])
+
+    def test_tag_tree_deferred_update_runs_on_commit(self):
+        from django.db import transaction
+
+        # Create tags inside an explicit transaction and commit.
+        with transaction.atomic():
+            parent = Tag.objects.create(name="Parent 2")
+            child = Tag.objects.create(name="Child 2", tn_parent=parent)
+        # After commit, tn_* fields should be populated.
+        parent.refresh_from_db()
+        child.refresh_from_db()
+        assert parent.tn_children_count == 1
+        assert child.tn_ancestors_count == 1
