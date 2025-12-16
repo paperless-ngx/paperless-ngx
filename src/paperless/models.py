@@ -265,6 +265,12 @@ class ApplicationConfiguration(AbstractSingletonModel):
         null=True,
     )
 
+    # PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT
+    barcode_tag_split = models.BooleanField(
+        verbose_name=_("Enables splitting on tag barcodes"),
+        null=True,
+    )
+
     class Meta:
         verbose_name = _("paperless application settings")
 
