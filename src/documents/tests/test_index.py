@@ -1,6 +1,7 @@
 from datetime import datetime
 from unittest import mock
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import SimpleTestCase
 from django.test import TestCase
@@ -251,3 +252,31 @@ class TestRewriteNaturalDateKeywords(SimpleTestCase):
         result = self._rewrite_with_now("added:today", fixed_now)
         # Should convert to UTC properly
         self.assertIn("added:[20250719", result)
+
+
+class TestIndexResilience(DirectoriesMixin, SimpleTestCase):
+    def test_transient_missing_segment_does_not_force_recreate(self):
+        file_marker = settings.INDEX_DIR / "file_marker.txt"
+        file_marker.write_text("keep")
+        expected_index = object()
+
+        with (
+            mock.patch("documents.index.exists_in", return_value=True),
+            mock.patch(
+                "documents.index.open_dir",
+                side_effect=[FileNotFoundError("missing"), expected_index],
+            ) as mock_open_dir,
+            mock.patch(
+                "documents.index.create_in",
+            ) as mock_create_in,
+            mock.patch(
+                "documents.index.rmtree",
+            ) as mock_rmtree,
+        ):
+            ix = index.open_index()
+
+        self.assertIs(ix, expected_index)
+        self.assertGreaterEqual(mock_open_dir.call_count, 2)
+        mock_rmtree.assert_not_called()
+        mock_create_in.assert_not_called()
+        self.assertEqual(file_marker.read_text(), "keep")
