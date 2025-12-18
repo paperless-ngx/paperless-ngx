@@ -4782,8 +4782,8 @@
           <context context-type="linenumber">164</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="5491897741674893121" datatype="html">
-        <source>Apply to documents that match this path. Wildcards specified as * are allowed. Case-normalized.&lt;/a&gt;</source>
+      <trans-unit id="4941865803454225171" datatype="html">
+        <source>Apply to documents that match this path. Wildcards specified as * are allowed. Case-normalized.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">164</context>
