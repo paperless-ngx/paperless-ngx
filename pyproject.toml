@@ -84,7 +84,7 @@ optional-dependencies.postgres = [
   "psycopg-pool==3.2.7",
 ]
 optional-dependencies.webserver = [
-  "granian[uvloop]~=2.5.1",
+  "granian[uvloop]~=2.6.0",
 ]
 
 [dependency-groups]
