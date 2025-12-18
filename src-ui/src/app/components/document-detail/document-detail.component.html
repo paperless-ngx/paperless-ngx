@@ -379,7 +379,7 @@
 <ng-template #previewContent>
   <div class="thumb-preview position-absolute pe-none text-center" [class.fade]="previewLoaded">
     @if (showThumbnailOverlay) {
-      <img [src]="thumbUrl | safeUrl" class="mx-auto" [attr.width]="previewZoomScale === 'page-fit' ? 'auto' : '100%'" [attr.height]="previewZoomScale === 'page-fit' ? '100%' : 'auto'" alt="Document loading..." i18n-alt />
+      <img [src]="thumbUrl" class="mx-auto" [attr.width]="previewZoomScale === 'page-fit' ? 'auto' : '100%'" [attr.height]="previewZoomScale === 'page-fit' ? '100%' : 'auto'" alt="Document loading..." i18n-alt />
     }
     <div class="position-absolute top-0 start-0 m-2 p-2 d-flex align-items-center justify-content-center">
       <div>
@@ -414,7 +414,7 @@
       }
       @case (ContentRenderType.Image) {
         <div class="preview-sticky">
-          <img [src]="previewUrl | safeUrl" width="100%" height="100%" alt="{{title}}" />
+          <img [src]="previewUrl" width="100%" height="100%" alt="{{title}}" />
         </div>
       }
       @case (ContentRenderType.TIFF) {
