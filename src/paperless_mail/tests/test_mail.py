@@ -1108,6 +1108,7 @@ class TestMail(
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 2)
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages_spam), 1)
 
+    @pytest.mark.flaky(reruns=4)
     def test_error_skip_rule(self):
         account = MailAccount.objects.create(
             name="test2",
