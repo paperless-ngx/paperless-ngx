@@ -11,7 +11,6 @@ import {
 } from 'src/app/data/mail-rule'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
@@ -46,7 +45,6 @@ describe('MailRuleEditDialogComponent', () => {
         PermissionsFormComponent,
         NumberComponent,
         TagsComponent,
-        SafeHtmlPipe,
         CheckComponent,
         SwitchComponent,
       ],

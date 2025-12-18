@@ -48,9 +48,13 @@ export interface ManagementListColumn {
 
   name: string
 
-  valueFn: any
+  valueFn?: any
 
-  rendersHtml?: boolean
+  badgeFn?: (object: any) => {
+    text: string
+    textColor?: string
+    backgroundColor?: string
+  }
 
   hideOnMobile?: boolean
 

@@ -30,7 +30,6 @@ import {
 } from 'src/app/data/workflow-trigger'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
@@ -105,7 +104,6 @@ describe('WorkflowEditDialogComponent', () => {
         TagsComponent,
         PermissionsUserComponent,
         PermissionsGroupComponent,
-        SafeHtmlPipe,
         ConfirmButtonComponent,
       ],
       providers: [
