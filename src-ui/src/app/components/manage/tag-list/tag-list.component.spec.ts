@@ -8,7 +8,6 @@ import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of } from 'rxjs'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { TagListComponent } from './tag-list.component'
@@ -30,7 +29,6 @@ describe('TagListComponent', () => {
         SortableDirective,
         PageHeaderComponent,
         IfPermissionsDirective,
-        SafeHtmlPipe,
       ],
       providers: [
         DatePipe,

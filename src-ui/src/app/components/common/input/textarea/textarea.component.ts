@@ -5,7 +5,6 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { AbstractInputComponent } from '../abstract-input'
 
 @Component({
@@ -19,12 +18,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-textarea',
   templateUrl: './textarea.component.html',
   styleUrls: ['./textarea.component.scss'],
-  imports: [
-    FormsModule,
-    ReactiveFormsModule,
-    SafeHtmlPipe,
-    NgxBootstrapIconsModule,
-  ],
+  imports: [FormsModule, ReactiveFormsModule, NgxBootstrapIconsModule],
 })
 export class TextAreaComponent extends AbstractInputComponent<string> {
   @Input()

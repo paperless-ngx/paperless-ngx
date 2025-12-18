@@ -10,7 +10,6 @@ import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
 import { Tag } from 'src/app/data/tag'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { PermissionType } from 'src/app/services/permissions.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
@@ -26,7 +25,6 @@ import { ManagementListComponent } from '../management-list/management-list.comp
     PageHeaderComponent,
     TitleCasePipe,
     IfPermissionsDirective,
-    SafeHtmlPipe,
     FormsModule,
     ReactiveFormsModule,
     NgClass,
@@ -49,10 +47,11 @@ export class TagListComponent extends ManagementListComponent<Tag> {
       {
         key: 'color',
         name: $localize`Color`,
-        rendersHtml: true,
-        valueFn: (t: Tag) => {
-          return `<span class="badge" style="color: ${t.text_color}; background-color: ${t.color}">${t.color}</span>`
-        },
+        badgeFn: (t: Tag) => ({
+          text: t.color,
+          textColor: t.text_color,
+          backgroundColor: t.color,
+        }),
       },
     ]
   }
