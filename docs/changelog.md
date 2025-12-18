@@ -1,5 +1,7 @@
 # Changelog
 
+## paperless-ngx 2.20.3
+
 ## paperless-ngx 2.20.2
 
 ### Features / Enhancements
