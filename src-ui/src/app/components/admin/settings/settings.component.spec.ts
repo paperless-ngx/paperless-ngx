@@ -28,7 +28,6 @@ import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
@@ -129,7 +128,6 @@ describe('SettingsComponent', () => {
         ConfirmDialogComponent,
         CheckComponent,
         ColorComponent,
-        SafeHtmlPipe,
         SelectComponent,
         TextComponent,
         NumberComponent,
