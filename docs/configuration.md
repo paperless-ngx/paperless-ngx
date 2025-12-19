@@ -1095,11 +1095,21 @@ should be a valid crontab(5) expression describing when to run.
 
 #### [`PAPERLESS_SANITY_TASK_CRON=<cron expression>`](#PAPERLESS_SANITY_TASK_CRON) {#PAPERLESS_SANITY_TASK_CRON}
 
-: Configures the scheduled sanity checker frequency.
+: Configures the scheduled sanity checker frequency. The value should be a
+valid crontab(5) expression describing when to run.
 
 : If set to the string "disable", the sanity checker will not run automatically.
 
     Defaults to `30 0 * * sun` or Sunday at 30 minutes past midnight.
+
+#### [`PAPERLESS_WORKFLOW_SCHEDULED_TASK_CRON=<cron expression>`](#PAPERLESS_WORKFLOW_SCHEDULED_TASK_CRON) {#PAPERLESS_WORKFLOW_SCHEDULED_TASK_CRON}
+
+: Configures the scheduled workflow check frequency. The value should be a
+valid crontab(5) expression describing when to run.
+
+: If set to the string "disable", scheduled workflows will not run.
+
+    Defaults to `5 */1 * * *` or every hour at 5 minutes past the hour.
 
 #### [`PAPERLESS_ENABLE_COMPRESSION=<bool>`](#PAPERLESS_ENABLE_COMPRESSION) {#PAPERLESS_ENABLE_COMPRESSION}
 
@@ -1312,30 +1322,6 @@ within your documents.
 
     Defaults to false.
 
-## Workflow webhooks
-
-#### [`PAPERLESS_WEBHOOKS_ALLOWED_SCHEMES=<str>`](#PAPERLESS_WEBHOOKS_ALLOWED_SCHEMES) {#PAPERLESS_WEBHOOKS_ALLOWED_SCHEMES}
-
-: A comma-separated list of allowed schemes for webhooks. This setting
-controls which URL schemes are permitted for webhook URLs.
-
-    Defaults to `http,https`.
-
-#### [`PAPERLESS_WEBHOOKS_ALLOWED_PORTS=<str>`](#PAPERLESS_WEBHOOKS_ALLOWED_PORTS) {#PAPERLESS_WEBHOOKS_ALLOWED_PORTS}
-
-: A comma-separated list of allowed ports for webhooks. This setting
-controls which ports are permitted for webhook URLs. For example, if you
-set this to `80,443`, webhooks will only be sent to URLs that use these
-ports.
-
-    Defaults to empty list, which allows all ports.
-
-#### [`PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS=<bool>`](#PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS) {#PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS}
-
-: If set to false, webhooks cannot be sent to internal URLs (e.g., localhost).
-
-    Defaults to true, which allows internal requests.
-
 ### Polling {#polling}
 
 #### [`PAPERLESS_CONSUMER_POLLING=<num>`](#PAPERLESS_CONSUMER_POLLING) {#PAPERLESS_CONSUMER_POLLING}
@@ -1378,6 +1364,30 @@ generate multiple events for a single file, leading to multiple
 consumers working on the same file. Configure this to prevent that.
 
     Defaults to 0.5 seconds.
+
+## Workflow webhooks
+
+#### [`PAPERLESS_WEBHOOKS_ALLOWED_SCHEMES=<str>`](#PAPERLESS_WEBHOOKS_ALLOWED_SCHEMES) {#PAPERLESS_WEBHOOKS_ALLOWED_SCHEMES}
+
+: A comma-separated list of allowed schemes for webhooks. This setting
+controls which URL schemes are permitted for webhook URLs.
+
+    Defaults to `http,https`.
+
+#### [`PAPERLESS_WEBHOOKS_ALLOWED_PORTS=<str>`](#PAPERLESS_WEBHOOKS_ALLOWED_PORTS) {#PAPERLESS_WEBHOOKS_ALLOWED_PORTS}
+
+: A comma-separated list of allowed ports for webhooks. This setting
+controls which ports are permitted for webhook URLs. For example, if you
+set this to `80,443`, webhooks will only be sent to URLs that use these
+ports.
+
+    Defaults to empty list, which allows all ports.
+
+#### [`PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS=<bool>`](#PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS) {#PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS}
+
+: If set to false, webhooks cannot be sent to internal URLs (e.g., localhost).
+
+    Defaults to true, which allows internal requests.
 
 ## Incoming Mail {#incoming_mail}
 

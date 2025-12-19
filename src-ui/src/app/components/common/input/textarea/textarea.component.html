@@ -23,7 +23,7 @@
           rows="4">
         </textarea>
         @if (hint) {
-          <small class="form-text text-muted" [innerHTML]="hint | safeHtml"></small>
+          <small class="form-text text-muted" [innerHTML]="hint"></small>
         }
         <div class="invalid-feedback position-absolute top-100">
           {{error}}

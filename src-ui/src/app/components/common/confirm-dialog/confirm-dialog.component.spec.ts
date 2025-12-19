@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject } from 'rxjs'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { ConfirmDialogComponent } from './confirm-dialog.component'
 
 describe('ConfirmDialogComponent', () => {
@@ -11,8 +10,8 @@ describe('ConfirmDialogComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      providers: [NgbActiveModal, SafeHtmlPipe],
-      imports: [ConfirmDialogComponent, SafeHtmlPipe],
+      providers: [NgbActiveModal],
+      imports: [ConfirmDialogComponent],
     }).compileComponents()
 
     modal = TestBed.inject(NgbActiveModal)

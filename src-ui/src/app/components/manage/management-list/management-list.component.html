@@ -94,8 +94,14 @@
     <td scope="row">{{ getDocumentCount(object) }}</td>
     @for (column of extraColumns; track column) {
       <td scope="row" [ngClass]="{ 'd-none d-sm-table-cell' : column.hideOnMobile }">
-        @if (column.rendersHtml) {
-          <div [innerHtml]="column.valueFn.call(null, object) | safeHtml"></div>
+        @if (column.badgeFn) {
+          <span
+            class="badge"
+            [style.color]="column.badgeFn.call(null, object)?.textColor"
+            [style.backgroundColor]="column.badgeFn.call(null, object)?.backgroundColor"
+          >
+            {{ column.badgeFn.call(null, object)?.text }}
+          </span>
         } @else if (column.monospace) {
           <span class="font-monospace">{{ column.valueFn.call(null, object) }}</span>
         } @else {

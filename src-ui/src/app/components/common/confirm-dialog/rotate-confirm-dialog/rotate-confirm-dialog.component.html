@@ -28,10 +28,10 @@
 <div class="modal-footer flex-nowrap">
     <div class="col">
         @if (message) {
-            <p [innerHTML]="message | safeHtml"></p>
+            <p>{{message}}</p>
         }
         @if (messageBold) {
-          <p class="mb-0 small"><b [innerHTML]="messageBold | safeHtml"></b></p>
+          <p class="mb-0 small"><b>{{messageBold}}</b></p>
         }
     </div>
     <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">
