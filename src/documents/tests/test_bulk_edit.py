@@ -602,11 +602,13 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             expected_filename,
         )
         self.assertEqual(consume_file_args[1].title, None)
+        self.assertTrue(consume_file_args[1].skip_asn)
 
         # With metadata_document_id overrides
         result = bulk_edit.merge(doc_ids, metadata_document_id=metadata_document_id)
         consume_file_args, _ = mock_consume_file.call_args
         self.assertEqual(consume_file_args[1].title, "A (merged)")
+        self.assertTrue(consume_file_args[1].skip_asn)
 
         self.assertEqual(result, "OK")
 
@@ -647,6 +649,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             expected_filename,
         )
         self.assertEqual(consume_file_args[1].title, None)
+        self.assertTrue(consume_file_args[1].skip_asn)
 
         delete_documents_args, _ = mock_delete_documents.call_args
         self.assertEqual(
