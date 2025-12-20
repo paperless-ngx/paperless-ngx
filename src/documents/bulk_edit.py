@@ -433,6 +433,8 @@ def merge(
 
     if user is not None:
         overrides.owner_id = user.id
+    # Avoid copying or detecting ASN from merged PDFs to prevent collision
+    overrides.skip_asn = True
 
     logger.info("Adding merged document to the task queue.")
 
