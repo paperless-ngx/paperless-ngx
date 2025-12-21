@@ -806,6 +806,7 @@ LANGUAGES = [
     ("vi-vn", _("Vietnamese")),
     ("zh-cn", _("Chinese Simplified")),
     ("zh-tw", _("Chinese Traditional")),
+    ("id-id", _("Indonesian")),
 ]
 
 LOCALE_PATHS = [BASE_DIR / "locale"]
