@@ -262,6 +262,12 @@ const LANGUAGE_OPTIONS = [
     englishName: 'Chinese Traditional',
     dateInputFormat: 'yyyy/mm/dd',
   },
+  {
+    code: 'id-id',
+    name: $localize`Indonesian`,
+    englishName: 'Indonesian',
+    dateInputFormat: 'dd-mm-yyyy',
+  },
 ]
 
 const ISO_LANGUAGE_OPTION: LanguageOption = {
