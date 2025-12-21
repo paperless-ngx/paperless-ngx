@@ -50,7 +50,8 @@
           "uk-UA": "src/locale/messages.uk_UA.xlf",
           "vi-VN": "src/locale/messages.vi_VN.xlf",
           "zh-CN": "src/locale/messages.zh_CN.xlf",
-          "zh-TW": "src/locale/messages.zh_TW.xlf"
+          "zh-TW": "src/locale/messages.zh_TW.xlf",
+          "id-ID": "src/locale/messages.id_ID.xlf"
         }
       },
       "architect": {
