@@ -28,6 +28,7 @@ import localeFa from '@angular/common/locales/fa'
 import localeFi from '@angular/common/locales/fi'
 import localeFr from '@angular/common/locales/fr'
 import localeHu from '@angular/common/locales/hu'
+import localeId from '@angular/common/locales/id'
 import localeIt from '@angular/common/locales/it'
 import localeJa from '@angular/common/locales/ja'
 import localeKo from '@angular/common/locales/ko'
@@ -63,6 +64,7 @@ registerLocaleData(localeFa)
 registerLocaleData(localeFi)
 registerLocaleData(localeFr)
 registerLocaleData(localeHu)
+registerLocaleData(localeId)
 registerLocaleData(localeIt)
 registerLocaleData(localeJa)
 registerLocaleData(localeKo)
