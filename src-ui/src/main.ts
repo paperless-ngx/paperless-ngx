@@ -171,6 +171,7 @@ import localeFa from '@angular/common/locales/fa'
 import localeFi from '@angular/common/locales/fi'
 import localeFr from '@angular/common/locales/fr'
 import localeHu from '@angular/common/locales/hu'
+import localeId from '@angular/common/locales/id'
 import localeIt from '@angular/common/locales/it'
 import localeJa from '@angular/common/locales/ja'
 import localeKo from '@angular/common/locales/ko'
@@ -190,7 +191,6 @@ import localeUk from '@angular/common/locales/uk'
 import localeVi from '@angular/common/locales/vi'
 import localeZh from '@angular/common/locales/zh'
 import localeZhHant from '@angular/common/locales/zh-Hant'
-import localeId from '@angular/common/locales/id'
 import { CorrespondentNamePipe } from './app/pipes/correspondent-name.pipe'
 import { DocumentTypeNamePipe } from './app/pipes/document-type-name.pipe'
 import { StoragePathNamePipe } from './app/pipes/storage-path-name.pipe'
@@ -210,6 +210,7 @@ registerLocaleData(localeFa)
 registerLocaleData(localeFi)
 registerLocaleData(localeFr)
 registerLocaleData(localeHu)
+registerLocaleData(localeId, 'id-ID')
 registerLocaleData(localeIt)
 registerLocaleData(localeJa)
 registerLocaleData(localeKo)
@@ -230,7 +231,6 @@ registerLocaleData(localeVi)
 registerLocaleData(localeUk)
 registerLocaleData(localeZh)
 registerLocaleData(localeZhHant)
-registerLocaleData(localeId, 'id-ID')
 
 function initializeApp(settings: SettingsService) {
   return () => {
