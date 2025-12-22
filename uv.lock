@@ -1073,15 +1073,15 @@ wheels = [
 
 [[package]]
 name = "gotenberg-client"
-version = "0.12.0"
+version = "0.13.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx", extra = ["http2"], marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "typing-extensions", marker = "(python_full_version < '3.11' and sys_platform == 'darwin') or (python_full_version < '3.11' and sys_platform == 'linux')" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/61/6d/07ea213c146bbe91dffebff2d8f4dc61e7076d3dd34d4fd1467f9163e752/gotenberg_client-0.12.0.tar.gz", hash = "sha256:1ab50878024469fc003c414ee9810ceeb00d4d7d7c36bd2fb75318fbff139e9b", size = 1210884, upload-time = "2025-10-15T15:32:37.669Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e4/6c/aaadd6657ca42fbd148b1c00604b98c1ead5a22552f4e5365ce5f0632430/gotenberg_client-0.13.1.tar.gz", hash = "sha256:cdd6bbb535cd739b87446cd1b4f6347ed7f9af6a0d4b19baf7c064b75528ee54", size = 1211143, upload-time = "2025-12-04T20:45:24.151Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/12/39/fcb24ff053b1be7e5124f56c3d358706a23a328f685c6db33bc9dbc5472d/gotenberg_client-0.12.0-py3-none-any.whl", hash = "sha256:a540b35ac518e902c2860a88fbe448c15fe5a56fe8ec8604e6a2c8c2228fd0cb", size = 51051, upload-time = "2025-10-15T15:32:36.32Z" },
+    { url = "https://files.pythonhosted.org/packages/79/f6/7a6e6785295332d2538f729ae19516cef712273a5ab8b90d015f08e37a45/gotenberg_client-0.13.1-py3-none-any.whl", hash = "sha256:613f7083a5e8a81699dd8d715c97e5806a424ac48920aad25d7c11b600cdfaf3", size = 51058, upload-time = "2025-12-04T20:45:22.603Z" },
 ]
 
 [[package]]
@@ -2282,7 +2282,7 @@ requires-dist = [
     { name = "drf-writable-nested", specifier = "~=0.7.1" },
     { name = "filelock", specifier = "~=3.20.0" },
     { name = "flower", specifier = "~=2.0.1" },
-    { name = "gotenberg-client", specifier = "~=0.12.0" },
+    { name = "gotenberg-client", specifier = "~=0.13.1" },
     { name = "granian", extras = ["uvloop"], marker = "extra == 'webserver'", specifier = "~=2.5.1" },
     { name = "httpx-oauth", specifier = "~=0.16" },
     { name = "imap-tools", specifier = "~=1.11.0" },
