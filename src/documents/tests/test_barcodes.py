@@ -822,6 +822,35 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         yield reader
         reader.cleanup()
 
+    @override_settings(
+        CONSUMER_ENABLE_TAG_BARCODE=True,
+        CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
+    )
+    def test_barcode_without_tag_match(self):
+        """
+        GIVEN:
+            - Barcode that does not match any TAG mapping pattern
+            - TAG mapping configured for "TAG:" prefix only
+        WHEN:
+            - is_tag property is checked on an ASN barcode
+        THEN:
+            - Returns False
+        """
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-123.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.detect()
+
+            self.assertGreater(
+                len(reader.barcodes),
+                0,
+                "Should have detected at least one barcode",
+            )
+            asn_barcode = reader.barcodes[0]
+            self.assertFalse(
+                asn_barcode.is_tag,
+                f"ASN barcode '{asn_barcode.value}' should not match TAG: pattern",
+            )
+
     @override_settings(CONSUMER_ENABLE_TAG_BARCODE=True)
     def test_scan_file_without_matching_barcodes(self):
         """
