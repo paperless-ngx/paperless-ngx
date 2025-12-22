@@ -748,59 +748,6 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
 
             self.assertEqual(document.archive_serial_number, 123)
 
-    @override_settings(
-        CONSUMER_ENABLE_BARCODES=True,
-        CONSUMER_ENABLE_TAG_BARCODE=True,
-        CONSUMER_TAG_BARCODE_SPLIT=True,
-        CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
-        CELERY_TASK_ALWAYS_EAGER=True,
-        OCR_MODE="skip",
-    )
-    def test_consume_barcode_file_tag_split_and_assignment(self):
-        """
-        GIVEN:
-            - PDF containing TAG barcodes on pages 2 and 4 (TAG:invoice, TAG:receipt)
-            - Tag barcode splitting is enabled
-        WHEN:
-            - File is scanned for barcodes
-            - Barcodes are detected and extraction logic is run
-        THEN:
-            - PDF is split into 3 documents at barcode pages
-            - TAG barcodes are extracted even though splitting is enabled
-                (this verifies the fix for not blocking tag extraction during splits)
-        """
-        test_file = self.BARCODE_SAMPLE_DIR / "split-by-tag-basic.pdf"
-
-        with self.get_reader(test_file) as reader:
-            reader.detect()
-            separator_pages = reader.get_separation_pages()
-
-            # Verify split happens at the right pages (0-indexed: pages 1 and 3)
-            self.assertDictEqual(separator_pages, {1: True, 3: True})
-
-            # Verify barcode data was extracted
-            self.assertGreater(
-                len(reader.barcodes),
-                0,
-                "Barcodes should be detected",
-            )
-
-            # Verify we got TAG barcodes
-            tag_barcodes = [b for b in reader.barcodes if b.is_tag]
-            self.assertEqual(
-                len(tag_barcodes),
-                2,
-                "Should have 2 TAG barcodes (invoice and receipt)",
-            )
-
-            # Verify the specific TAG values (raw barcode data includes TAG: prefix)
-            tag_values = sorted([b.value for b in tag_barcodes])
-            self.assertEqual(
-                tag_values,
-                ["TAG:invoice", "TAG:receipt"],
-                "Should have 'TAG:invoice' and 'TAG:receipt' raw barcode values",
-            )
-
     @override_settings(CONSUMER_BARCODE_SCANNER="PYZBAR")
     def test_scan_file_for_qrcode_without_upscale(self):
         """
@@ -1035,77 +982,52 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
             self.assertEqual(len(tags), 2)
 
     @override_settings(
+        CONSUMER_ENABLE_BARCODES=True,
         CONSUMER_ENABLE_TAG_BARCODE=True,
         CONSUMER_TAG_BARCODE_SPLIT=True,
         CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
+        CELERY_TASK_ALWAYS_EAGER=True,
+        OCR_MODE="skip",
     )
-    def test_asn_barcodes_dont_split_with_tag_mapping(self):
+    def test_consume_barcode_file_tag_split_and_assignment(self):
         """
         GIVEN:
-            - PDF containing ASN barcodes (not TAG: prefixed)
-            - Tag barcode splitting is enabled with TAG: mapping
+            - PDF containing TAG barcodes on pages 2 and 4 (TAG:invoice, TAG:receipt)
+            - Tag barcode splitting is enabled
         WHEN:
-            - File is processed
+            - File is scanned for barcodes
+            - Barcodes are detected and extraction logic is run
         THEN:
-            - ASN barcodes don't match TAG: pattern, so no splits occur
+            - PDF is split into 3 documents at barcode pages
+            - TAG barcodes are extracted even though splitting is enabled
         """
-        test_file = self.BARCODE_SAMPLE_DIR / "split-by-asn-1.pdf"
+        test_file = self.BARCODE_SAMPLE_DIR / "split-by-tag-basic.pdf"
+
         with self.get_reader(test_file) as reader:
             reader.detect()
-            separator_page_numbers = reader.get_separation_pages()
+            separator_pages = reader.get_separation_pages()
 
-            self.assertDictEqual(separator_page_numbers, {})
+            self.assertDictEqual(separator_pages, {1: True, 3: True})
 
-    @override_settings(
-        CONSUMER_ENABLE_ASN_BARCODE=True,
-        CONSUMER_ENABLE_TAG_BARCODE=True,
-        CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
-    )
-    def test_asn_barcodes_not_treated_as_tags(self):
-        """
-        GIVEN:
-            - PDF containing ASN barcodes
-            - TAG barcode feature is enabled with TAG: prefix
-        WHEN:
-            - File is processed
-        THEN:
-            - ASN barcodes should not be treated as tags
-            - No tags should be created
-        """
-        test_file = self.BARCODE_SAMPLE_DIR / "split-by-asn-1.pdf"
-        with self.get_reader(test_file) as reader:
-            reader.run()
-            tags = reader.metadata.tag_ids
+            self.assertGreater(
+                len(reader.barcodes),
+                0,
+                "Barcodes should be detected",
+            )
 
-            self.assertIsNone(tags)
+            tag_barcodes = [b for b in reader.barcodes if b.is_tag]
+            self.assertEqual(
+                len(tag_barcodes),
+                2,
+                "Should have 2 TAG barcodes (invoice and receipt)",
+            )
 
-    @override_settings(
-        CONSUMER_ENABLE_TAG_BARCODE=True,
-        CONSUMER_TAG_BARCODE_MAPPING={"ASN001(.*)": "FOUND_\\g<1>"},
-    )
-    def test_asn_barcodes_can_be_used_as_tags(self):
-        """
-        GIVEN:
-            - PDF containing ASN barcodes
-            - TAG barcode mapping that matches ASN patterns
-        WHEN:
-            - File is processed
-        THEN:
-            - ASN barcodes matching the pattern should create tags
-        """
-        test_file = self.BARCODE_SAMPLE_DIR / "split-by-asn-1.pdf"
-        with self.get_reader(test_file) as reader:
-            reader.run()
-            tags = reader.metadata.tag_ids
-
-            self.assertIsNotNone(tags)
-            self.assertEqual(len(tags), 5)
-
-            self.assertEqual(Tag.objects.get(name__iexact="FOUND_23").pk, tags[0])
-            self.assertEqual(Tag.objects.get(name__iexact="FOUND_24").pk, tags[1])
-            self.assertEqual(Tag.objects.get(name__iexact="FOUND_25").pk, tags[2])
-            self.assertEqual(Tag.objects.get(name__iexact="FOUND_26").pk, tags[3])
-            self.assertEqual(Tag.objects.get(name__iexact="FOUND_27").pk, tags[4])
+            tag_values = sorted([b.value for b in tag_barcodes])
+            self.assertEqual(
+                tag_values,
+                ["TAG:invoice", "TAG:receipt"],
+                "Should have 'TAG:invoice' and 'TAG:receipt' raw barcode values",
+            )
 
     @override_settings(
         CONSUMER_ENABLE_TAG_BARCODE=True,
@@ -1158,10 +1080,8 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
             reader.detect()
             separator_pages = reader.get_separation_pages()
 
-            # Pages 3, 5, 7 should be split points (not page 1)
             self.assertDictEqual(separator_pages, {2: True, 4: True, 6: True})
 
-            # Verify 4 documents created
             document_list = reader.separate_pages(separator_pages)
             self.assertEqual(len(document_list), 4)
 
@@ -1195,34 +1115,6 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
 
     @override_settings(
         CONSUMER_ENABLE_TAG_BARCODE=True,
-        CONSUMER_TAG_BARCODE_SPLIT=False,
-        CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
-    )
-    def test_tag_no_split_but_tags_extracted(self):
-        """
-        GIVEN:
-            - PDF with TAG barcodes
-            - Tag splitting is DISABLED
-        WHEN:
-            - File is processed
-        THEN:
-            - No splits occur
-            - Tags are still extracted from all barcodes
-        """
-        test_file = self.BARCODE_SAMPLE_DIR / "split-by-tag-basic.pdf"
-
-        with self.get_reader(test_file) as reader:
-            reader.run()
-            separator_pages = reader.get_separation_pages()
-
-            self.assertDictEqual(separator_pages, {})
-
-            tags = reader.metadata.tag_ids
-            self.assertIsNotNone(tags)
-            self.assertEqual(len(tags), 2)
-
-    @override_settings(
-        CONSUMER_ENABLE_TAG_BARCODE=True,
         CONSUMER_TAG_BARCODE_SPLIT=True,
         CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
     )
@@ -1251,135 +1143,3 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
 
             tags = reader.metadata.tag_ids
             self.assertIsNone(tags)
-
-    @override_settings(
-        CONSUMER_ENABLE_TAG_BARCODE=True,
-        CONSUMER_TAG_BARCODE_SPLIT=False,
-        CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
-    )
-    def test_comma_separated_tags_no_split(self):
-        """
-        GIVEN:
-            - PDF with comma-separated tags in single barcode
-            - Tag splitting DISABLED
-        WHEN:
-            - File is processed
-        THEN:
-            - No splits occur
-            - Both tags are extracted and assigned to the document
-        """
-        test_file = self.BARCODE_SAMPLE_DIR / "split-by-tag-comma-separated.pdf"
-
-        with self.get_reader(test_file) as reader:
-            reader.run()
-            separator_pages = reader.get_separation_pages()
-
-            self.assertDictEqual(separator_pages, {})
-
-            tags = reader.metadata.tag_ids
-            self.assertIsNotNone(tags)
-            self.assertEqual(len(tags), 2)
-
-    @override_settings(
-        CONSUMER_ENABLE_TAG_BARCODE=True,
-        CONSUMER_TAG_BARCODE_SPLIT=True,
-        CONSUMER_TAG_BARCODE_MAPPING={"ASN(.*)": "ASN_\\g<1>", "TAG:(.*)": "\\g<1>"},
-    )
-    def test_multiple_different_barcodes_same_page_with_split(self):
-        """
-        GIVEN:
-            - PDF with 3 different barcodes on page 1: ASN00111, TAG:invoice, TAG:receipt
-            - Page 3 has ASN00222
-            - Tag splitting enabled
-            - Mapping treats both ASN and TAG as tags
-        WHEN:
-            - File is processed
-        THEN:
-            - Page 1 is NOT a split point (first page never splits)
-            - Page 3 IS a split point (ASN00222)
-            - 2 documents created
-        """
-        test_file = self.BARCODE_SAMPLE_DIR / "split-by-tag-asn-multiple-same-page.pdf"
-
-        with self.get_reader(test_file) as reader:
-            reader.detect()
-
-            # Verify all barcodes detected
-            self.assertEqual(len(reader.barcodes), 4)
-
-            separator_pages = reader.get_separation_pages()
-
-            # Only page 3 should be a split point (page 1 never splits)
-            self.assertDictEqual(separator_pages, {2: True})
-
-            # Verify 2 documents created (pages 1-2 and pages 3-4)
-            document_list = reader.separate_pages(separator_pages)
-            self.assertEqual(len(document_list), 2)
-
-    @override_settings(
-        CONSUMER_ENABLE_TAG_BARCODE=True,
-        CONSUMER_TAG_BARCODE_SPLIT=False,
-        CONSUMER_TAG_BARCODE_MAPPING={"ASN(.*)": "ASN_\\g<1>", "TAG:(.*)": "\\g<1>"},
-    )
-    def test_multiple_different_barcodes_same_page_no_split(self):
-        """
-        GIVEN:
-            - PDF with 3 different barcodes on page 1: ASN00111, TAG:invoice, TAG:receipt
-            - Page 3 has ASN00222
-            - Tag splitting DISABLED
-        WHEN:
-            - File is processed
-        THEN:
-            - No splits occur
-            - All 4 barcodes create tags with their respective values
-            - Tags: ASN_00111, invoice, receipt, ASN_00222
-        """
-        test_file = self.BARCODE_SAMPLE_DIR / "split-by-tag-asn-multiple-same-page.pdf"
-
-        with self.get_reader(test_file) as reader:
-            reader.run()
-            separator_pages = reader.get_separation_pages()
-
-            # No splits
-            self.assertDictEqual(separator_pages, {})
-
-            # All tags from all 4 barcodes should be extracted
-            tags = reader.metadata.tag_ids
-            self.assertIsNotNone(tags)
-            # Should have 4 tag assignments with distinct names
-            # ASN00111->ASN_00111, TAG:invoice->invoice, TAG:receipt->receipt, ASN00222->ASN_00222
-            self.assertEqual(len(tags), 4)
-
-    @override_settings(
-        CONSUMER_ENABLE_ASN_BARCODE=True,
-        CONSUMER_ENABLE_TAG_BARCODE=True,
-        CONSUMER_TAG_BARCODE_SPLIT=True,
-        CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
-    )
-    def test_multiple_barcodes_asn_split_and_tag_split(self):
-        """
-        GIVEN:
-            - PDF with ASN00111 + TAG:invoice + TAG:receipt on page 1
-            - ASN00222 on page 3
-            - BOTH ASN splitting and TAG splitting enabled
-            - TAG mapping does NOT match ASN patterns
-        WHEN:
-            - File is processed
-        THEN:
-            - ASN barcodes DON'T match TAG: pattern, so only ASN splitting applies
-            - TAG barcodes DO match TAG: pattern, so only first page would split for tags
-            - But page 1 never splits, so only page 3 splits (ASN splitting)
-        """
-        test_file = self.BARCODE_SAMPLE_DIR / "split-by-tag-asn-multiple-same-page.pdf"
-
-        with self.get_reader(test_file) as reader:
-            reader.detect()
-            separator_pages = reader.get_separation_pages()
-
-            # Page 3 splits due to ASN00222 (ASN splitting)
-            # Page 1 barcodes: ASN00111 would split via ASN, but page 1 never splits
-            # TAG:invoice and TAG:receipt would split via TAG splitting, but page 1 never splits
-            self.assertDictEqual(separator_pages, {2: True})
-
-            document_list = reader.separate_pages(separator_pages)
-            self.assertEqual(len(document_list), 2)
