@@ -995,39 +995,42 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
             - PDF containing TAG barcodes on pages 2 and 4 (TAG:invoice, TAG:receipt)
             - Tag barcode splitting is enabled
         WHEN:
-            - File is scanned for barcodes
-            - Barcodes are detected and extraction logic is run
+            - File is consumed
         THEN:
             - PDF is split into 3 documents at barcode pages
-            - TAG barcodes are extracted even though splitting is enabled
+            - Each split document has the appropriate TAG barcodes extracted and assigned
+            - Document 1: page 1 (no tags)
+            - Document 2: pages 2-3 with TAG:invoice
+            - Document 3: pages 4-5 with TAG:receipt
         """
         test_file = self.BARCODE_SAMPLE_DIR / "split-by-tag-basic.pdf"
+        dst = settings.SCRATCH_DIR / "split-by-tag-basic.pdf"
+        shutil.copy(test_file, dst)
 
-        with self.get_reader(test_file) as reader:
-            reader.detect()
-            separator_pages = reader.get_separation_pages()
-
-            self.assertDictEqual(separator_pages, {1: True, 3: True})
-
-            self.assertGreater(
-                len(reader.barcodes),
-                0,
-                "Barcodes should be detected",
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
+            result = tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=dst,
+                ),
+                None,
             )
 
-            tag_barcodes = [b for b in reader.barcodes if b.is_tag]
-            self.assertEqual(
-                len(tag_barcodes),
-                2,
-                "Should have 2 TAG barcodes (invoice and receipt)",
-            )
+            self.assertEqual(result, "Barcode splitting complete!")
 
-            tag_values = sorted([b.value for b in tag_barcodes])
-            self.assertEqual(
-                tag_values,
-                ["TAG:invoice", "TAG:receipt"],
-                "Should have 'TAG:invoice' and 'TAG:receipt' raw barcode values",
-            )
+            documents = Document.objects.all().order_by("id")
+            self.assertEqual(documents.count(), 3)
+
+            doc1 = documents[0]
+            self.assertEqual(doc1.tags.count(), 0)
+
+            doc2 = documents[1]
+            self.assertEqual(doc2.tags.count(), 1)
+            self.assertEqual(doc2.tags.first().name, "invoice")
+
+            doc3 = documents[2]
+            self.assertEqual(doc3.tags.count(), 1)
+            self.assertEqual(doc3.tags.first().name, "receipt")
 
     @override_settings(
         CONSUMER_ENABLE_TAG_BARCODE=True,
