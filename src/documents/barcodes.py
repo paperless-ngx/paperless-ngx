@@ -140,10 +140,14 @@ class BarcodePlugin(ConsumeTaskPlugin):
         self.detect()
 
         # try reading tags from barcodes
-        # If tag splitting is enabled, skip this - let each split document extract its own tags
+        # If tag splitting is enabled, skip this on the original document - let each split document extract its own tags
+        # However, if we're processing a split document (original_path is set), extract tags
         if (
             self.settings.barcode_enable_tag
-            and not self.settings.barcode_tag_split
+            and (
+                not self.settings.barcode_tag_split
+                or self.input_doc.original_path is not None
+            )
             and (tags := self.tags) is not None
             and len(tags) > 0
         ):
