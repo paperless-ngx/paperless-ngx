@@ -748,6 +748,82 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
 
             self.assertEqual(document.archive_serial_number, 123)
 
+    @override_settings(
+        CONSUMER_ENABLE_BARCODES=True,
+        CONSUMER_ENABLE_TAG_BARCODE=True,
+        CONSUMER_TAG_BARCODE_SPLIT=True,
+        CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
+    )
+    def test_consume_barcode_file_tag_split_and_assignment(self):
+        """
+        GIVEN:
+            - PDF containing TAG barcodes on pages 2 and 4 (TAG:invoice, TAG:receipt)
+            - Tag barcode splitting is enabled
+        WHEN:
+            - File is consumed and split into multiple documents
+            - Split documents are re-consumed
+        THEN:
+            - 3 documents are created (one for each split)
+            - Each document has the correct tag assigned from its barcode
+            - Tags are created: "invoice" and "receipt"
+        """
+        test_file = self.BARCODE_SAMPLE_DIR / "split-by-tag-basic.pdf"
+
+        dst = settings.SCRATCH_DIR / "split-by-tag-basic.pdf"
+        shutil.copy(test_file, dst)
+
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
+            result = tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=dst,
+                ),
+                None,
+            )
+
+            self.assertEqual(result, "Barcode splitting complete!")
+            self.assertIsNotFile(dst)
+
+            split_files = list(
+                settings.SCRATCH_DIR.glob("paperless-barcode-split-*/[!.]*.pdf"),
+            )
+            self.assertGreater(len(split_files), 0, "Split files should exist")
+
+            for split_file in split_files:
+                if split_file.exists():
+                    tasks.consume_file(
+                        ConsumableDocument(
+                            source=DocumentSource.ConsumeFolder,
+                            original_file=split_file,
+                            original_path=dst,
+                        ),
+                        None,
+                    )
+
+            documents = Document.objects.all().order_by("created")
+
+            self.assertEqual(documents.count(), 3)
+
+            invoice_tag = Tag.objects.filter(name__iexact="invoice").first()
+            receipt_tag = Tag.objects.filter(name__iexact="receipt").first()
+
+            self.assertIsNotNone(invoice_tag, "Invoice tag should be created")
+            self.assertIsNotNone(receipt_tag, "Receipt tag should be created")
+
+            docs_with_invoice = documents.filter(tags=invoice_tag).count()
+            docs_with_receipt = documents.filter(tags=receipt_tag).count()
+
+            self.assertEqual(
+                docs_with_invoice,
+                1,
+                "Exactly one document should have 'invoice' tag",
+            )
+            self.assertEqual(
+                docs_with_receipt,
+                1,
+                "Exactly one document should have 'receipt' tag",
+            )
+
     @override_settings(CONSUMER_BARCODE_SCANNER="PYZBAR")
     def test_scan_file_for_qrcode_without_upscale(self):
         """
