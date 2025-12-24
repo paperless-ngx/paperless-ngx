@@ -34,7 +34,7 @@ class GnuPG:
         ).data
 
 
-def move_documents_and_create_thumbnails(apps, schema_editor):
+def move_documents_and_create_thumbnails(apps, schema_editor) -> None:
     (Path(settings.MEDIA_ROOT) / "documents" / "originals").mkdir(
         parents=True,
         exist_ok=True,

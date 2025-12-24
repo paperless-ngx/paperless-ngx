@@ -7,7 +7,7 @@ class TestMigrateCustomFieldSelects(TestMigrations):
     migrate_from = "1059_workflowactionemail_workflowactionwebhook_and_more"
     migrate_to = "1060_alter_customfieldinstance_value_select"
 
-    def setUpBeforeMigration(self, apps):
+    def setUpBeforeMigration(self, apps) -> None:
         CustomField = apps.get_model("documents.CustomField")
         self.old_format = CustomField.objects.create(
             name="cf1",
@@ -23,7 +23,7 @@ class TestMigrateCustomFieldSelects(TestMigrations):
             document=doc,
         )
 
-    def test_migrate_old_to_new_select_fields(self):
+    def test_migrate_old_to_new_select_fields(self) -> None:
         self.old_format.refresh_from_db()
         self.old_instance.refresh_from_db()
 
@@ -46,7 +46,7 @@ class TestMigrationCustomFieldSelectsReverse(TestMigrations):
     migrate_from = "1060_alter_customfieldinstance_value_select"
     migrate_to = "1059_workflowactionemail_workflowactionwebhook_and_more"
 
-    def setUpBeforeMigration(self, apps):
+    def setUpBeforeMigration(self, apps) -> None:
         CustomField = apps.get_model("documents.CustomField")
         self.new_format = CustomField.objects.create(
             name="cf1",
@@ -68,7 +68,7 @@ class TestMigrationCustomFieldSelectsReverse(TestMigrations):
             document=doc,
         )
 
-    def test_migrate_new_to_old_select_fields(self):
+    def test_migrate_new_to_old_select_fields(self) -> None:
         self.new_format.refresh_from_db()
         self.new_instance.refresh_from_db()
 
