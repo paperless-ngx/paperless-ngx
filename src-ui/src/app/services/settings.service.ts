@@ -137,6 +137,12 @@ const LANGUAGE_OPTIONS = [
     dateInputFormat: 'yyyy.mm.dd',
   },
   {
+    code: 'id-id',
+    name: $localize`Indonesian`,
+    englishName: 'Indonesian',
+    dateInputFormat: 'dd-mm-yyyy',
+  },
+  {
     code: 'it-it',
     name: $localize`Italian`,
     englishName: 'Italian',
