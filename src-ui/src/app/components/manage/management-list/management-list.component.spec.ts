@@ -33,7 +33,6 @@ import { Tag } from 'src/app/data/tag'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
   PermissionAction,
@@ -93,7 +92,6 @@ describe('ManagementListComponent', () => {
         SortableDirective,
         PageHeaderComponent,
         IfPermissionsDirective,
-        SafeHtmlPipe,
         ConfirmDialogComponent,
         PermissionsDialogComponent,
       ],

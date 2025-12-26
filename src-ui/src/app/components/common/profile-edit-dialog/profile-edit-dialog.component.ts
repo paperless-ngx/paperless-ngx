@@ -18,7 +18,6 @@ import {
   SocialAccountProvider,
   TotpSettings,
 } from 'src/app/data/user-profile'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { ProfileService } from 'src/app/services/profile.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { setLocationHref } from 'src/app/utils/navigation'
@@ -37,7 +36,6 @@ import { TextComponent } from '../input/text/text.component'
     PasswordComponent,
     FormsModule,
     ReactiveFormsModule,
-    SafeHtmlPipe,
     NgbAccordionModule,
     NgbPopoverModule,
     NgxBootstrapIconsModule,
@@ -88,6 +86,13 @@ export class ProfileEditDialogComponent
 
   public socialAccounts: SocialAccount[] = []
   public socialAccountProviders: SocialAccountProvider[] = []
+
+  get qrSvgDataUrl(): string | null {
+    if (!this.totpSettings?.qr_svg) {
+      return null
+    }
+    return `data:image/svg+xml;utf8,${encodeURIComponent(this.totpSettings.qr_svg)}`
+  }
 
   ngOnInit(): void {
     this.networkActive = true

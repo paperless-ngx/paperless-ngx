@@ -11,7 +11,6 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { ToastService } from 'src/app/services/toast.service'
 import { TrashService } from 'src/app/services/trash.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
@@ -53,7 +52,6 @@ describe('TrashComponent', () => {
         TrashComponent,
         PageHeaderComponent,
         ConfirmDialogComponent,
-        SafeHtmlPipe,
       ],
     }).compileComponents()
 

@@ -10,6 +10,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
+from django.core.files.uploadedfile import UploadedFile
 from rest_framework import serializers
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 
@@ -230,7 +231,7 @@ class ApplicationConfigurationSerializer(serializers.ModelSerializer):
             instance.app_logo.delete()
         return super().update(instance, validated_data)
 
-    def validate_app_logo(self, file):
+    def validate_app_logo(self, file: UploadedFile):
         if file and magic.from_buffer(file.read(2048), mime=True) == "image/svg+xml":
             reject_dangerous_svg(file)
         return file

@@ -3,7 +3,6 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { RotateConfirmDialogComponent } from './rotate-confirm-dialog.component'
 
 describe('RotateConfirmDialogComponent', () => {
@@ -15,11 +14,9 @@ describe('RotateConfirmDialogComponent', () => {
       imports: [
         NgxBootstrapIconsModule.pick(allIcons),
         RotateConfirmDialogComponent,
-        SafeHtmlPipe,
       ],
       providers: [
         NgbActiveModal,
-        SafeHtmlPipe,
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],

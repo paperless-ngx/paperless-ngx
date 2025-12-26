@@ -36,7 +36,6 @@ import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { FilterPipe } from 'src/app/pipes/filter.pipe'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { UsernamePipe } from 'src/app/pipes/username.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
@@ -103,7 +102,6 @@ describe('DocumentListComponent', () => {
         DatePipe,
         DocumentTitlePipe,
         UsernamePipe,
-        SafeHtmlPipe,
         PermissionsGuard,
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),

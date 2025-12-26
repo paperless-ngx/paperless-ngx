@@ -9,7 +9,6 @@ import { of } from 'rxjs'
 import { StoragePath } from 'src/app/data/storage-path'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { StoragePathListComponent } from './storage-path-list.component'
@@ -30,7 +29,6 @@ describe('StoragePathListComponent', () => {
         SortableDirective,
         PageHeaderComponent,
         IfPermissionsDirective,
-        SafeHtmlPipe,
       ],
       providers: [
         DatePipe,

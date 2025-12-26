@@ -465,6 +465,10 @@ flowchart TD
     'Updated'
     trigger(s)"}
 
+    scheduled{"Documents
+    matching
+    trigger(s)"}
+
     A[New Document] --> consumption
     consumption --> |Yes| C[Workflow Actions Run]
     consumption --> |No| D
@@ -477,6 +481,11 @@ flowchart TD
     updated --> |Yes| J[Workflow Actions Run]
     updated --> |No| K
     J --> K[Document Saved]
+    L[Scheduled Task Check<br/>hourly at :05] --> M[Get All Scheduled Triggers]
+    M --> scheduled
+    scheduled --> |Yes| N[Workflow Actions Run]
+    scheduled --> |No| O[Document Saved]
+    N --> O
 ```
 
 #### Filters {#workflow-trigger-filters}

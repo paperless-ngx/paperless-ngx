@@ -6,7 +6,6 @@ import {
 } from '@angular/forms'
 import { RouterLink } from '@angular/router'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { AbstractInputComponent } from '../abstract-input'
 
 @Component({
@@ -23,7 +22,6 @@ import { AbstractInputComponent } from '../abstract-input'
   imports: [
     FormsModule,
     ReactiveFormsModule,
-    SafeHtmlPipe,
     NgxBootstrapIconsModule,
     RouterLink,
   ],
