@@ -258,6 +258,13 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     config_key: 'PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING',
     category: ConfigCategory.Barcode,
   },
+  {
+    key: 'barcode_tag_split',
+    title: $localize`Split on Tag Barcodes`,
+    type: ConfigOptionType.Boolean,
+    config_key: 'PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT',
+    category: ConfigCategory.Barcode,
+  },
 ]
 
 export interface PaperlessConfig extends ObjectWithId {
@@ -287,4 +294,5 @@ export interface PaperlessConfig extends ObjectWithId {
   barcode_max_pages: number
   barcode_enable_tag: boolean
   barcode_tag_mapping: object
+  barcode_tag_split: boolean
 }
