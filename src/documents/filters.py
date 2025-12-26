@@ -6,6 +6,7 @@ import json
 import operator
 from contextlib import contextmanager
 from typing import TYPE_CHECKING
+from unicodedata import normalize
 
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Case
@@ -162,7 +163,17 @@ class TitleContentFilter(Filter):
     def filter(self, qs, value):
         value = value.strip() if isinstance(value, str) else value
         if value:
-            return qs.filter(Q(title__icontains=value) | Q(content__icontains=value))
+            # Normalize and get both cases for Cyrillic support
+            value_normalized = normalize("NFC", value)
+            value_lower = value_normalized.lower()
+            value_upper = value_normalized.upper()
+            # Search for all case variants
+            return qs.filter(
+                Q(title__icontains=value_lower)
+                | Q(content__icontains=value_lower)
+                | Q(title__icontains=value_upper)
+                | Q(content__icontains=value_upper),
+            )
         else:
             return qs
 

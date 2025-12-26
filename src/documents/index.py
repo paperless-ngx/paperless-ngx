@@ -12,6 +12,7 @@ from datetime import timezone
 from shutil import rmtree
 from typing import TYPE_CHECKING
 from typing import Literal
+from unicodedata import normalize
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -56,6 +57,11 @@ if TYPE_CHECKING:
     from whoosh.searching import Searcher
 
 logger = logging.getLogger("paperless.index")
+
+
+def normalize_text_for_search(text: str) -> str:
+    """Normalize text for case-insensitive search, including Cyrillic."""
+    return normalize("NFC", text).lower()
 
 
 def get_schema() -> Schema:
@@ -423,6 +429,7 @@ class DelayedFullTextQuery(DelayedQuery):
     def _get_query(self) -> tuple:
         q_str = self.query_params["query"]
         q_str = rewrite_natural_date_keywords(q_str)
+        q_str = normalize_text_for_search(q_str)
         qp = MultifieldParser(
             [
                 "content",
@@ -495,7 +502,7 @@ def autocomplete(
         # Don't let searches with a query that happen to match a field override the
         # content field query instead and return bogus, not text data
         qp.remove_plugin_class(FieldsPlugin)
-        q = qp.parse(f"{term.lower()}*")
+        q = qp.parse(f"{normalize_text_for_search(term)}*")
         user_criterias: list = get_permissions_criterias(user)
 
         results = s.search(
