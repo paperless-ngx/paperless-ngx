@@ -11111,11 +11111,19 @@
         </context-group>
         <target state="needs-translation">Hungarian</target>
       </trans-unit>
+      <trans-unit id="8312065814232621608" datatype="html">
+        <source>Indonesian</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">141</context>
+        </context-group>
+        <target state="needs-translation">Indonesian</target>
+      </trans-unit>
       <trans-unit id="2935232983274991580" datatype="html" approved="yes">
         <source>Italian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">141</context>
+          <context context-type="linenumber">147</context>
         </context-group>
         <target state="final">Italienska</target>
       </trans-unit>
@@ -11123,7 +11131,7 @@
         <source>Japanese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">147</context>
+          <context context-type="linenumber">153</context>
         </context-group>
         <target state="needs-translation">Japanese</target>
       </trans-unit>
@@ -11131,7 +11139,7 @@
         <source>Korean</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">153</context>
+          <context context-type="linenumber">159</context>
         </context-group>
         <target state="needs-translation">Korean</target>
       </trans-unit>
@@ -11139,7 +11147,7 @@
         <source>Luxembourgish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">159</context>
+          <context context-type="linenumber">165</context>
         </context-group>
         <target state="translated">Luxemburgiska</target>
       </trans-unit>
@@ -11147,7 +11155,7 @@
         <source>Dutch</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">165</context>
+          <context context-type="linenumber">171</context>
         </context-group>
         <target state="final">Holländska</target>
       </trans-unit>
@@ -11155,7 +11163,7 @@
         <source>Norwegian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">171</context>
+          <context context-type="linenumber">177</context>
         </context-group>
         <target state="translated">Norska</target>
       </trans-unit>
@@ -11163,7 +11171,7 @@
         <source>Persian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">177</context>
+          <context context-type="linenumber">183</context>
         </context-group>
         <target state="needs-translation">Persian</target>
       </trans-unit>
@@ -11171,7 +11179,7 @@
         <source>Polish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">183</context>
+          <context context-type="linenumber">189</context>
         </context-group>
         <target state="final">Polska</target>
       </trans-unit>
@@ -11179,7 +11187,7 @@
         <source>Portuguese (Brazil)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">189</context>
+          <context context-type="linenumber">195</context>
         </context-group>
         <target state="final">Portugisiska (Brasilien)</target>
       </trans-unit>
@@ -11187,7 +11195,7 @@
         <source>Portuguese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">195</context>
+          <context context-type="linenumber">201</context>
         </context-group>
         <target state="final">Portugisiska</target>
       </trans-unit>
@@ -11195,7 +11203,7 @@
         <source>Romanian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">201</context>
+          <context context-type="linenumber">207</context>
         </context-group>
         <target state="final">Rumänska</target>
       </trans-unit>
@@ -11203,7 +11211,7 @@
         <source>Russian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">207</context>
+          <context context-type="linenumber">213</context>
         </context-group>
         <target state="final">Ryska</target>
       </trans-unit>
@@ -11211,7 +11219,7 @@
         <source>Slovak</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">213</context>
+          <context context-type="linenumber">219</context>
         </context-group>
         <target state="translated">Slovakiska</target>
       </trans-unit>
@@ -11219,7 +11227,7 @@
         <source>Slovenian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">219</context>
+          <context context-type="linenumber">225</context>
         </context-group>
         <target state="translated">Slovenska</target>
       </trans-unit>
@@ -11227,7 +11235,7 @@
         <source>Serbian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">225</context>
+          <context context-type="linenumber">231</context>
         </context-group>
         <target state="translated">Serbiska</target>
       </trans-unit>
@@ -11235,7 +11243,7 @@
         <source>Swedish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">231</context>
+          <context context-type="linenumber">237</context>
         </context-group>
         <target state="final">Svenska</target>
       </trans-unit>
@@ -11243,7 +11251,7 @@
         <source>Turkish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">237</context>
+          <context context-type="linenumber">243</context>
         </context-group>
         <target state="translated">Turkiska</target>
       </trans-unit>
@@ -11251,7 +11259,7 @@
         <source>Ukrainian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">243</context>
+          <context context-type="linenumber">249</context>
         </context-group>
         <target state="translated">Ukrainiska</target>
       </trans-unit>
@@ -11259,7 +11267,7 @@
         <source>Vietnamese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">249</context>
+          <context context-type="linenumber">255</context>
         </context-group>
         <target state="needs-translation">Vietnamese</target>
       </trans-unit>
@@ -11267,7 +11275,7 @@
         <source>Chinese Simplified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">255</context>
+          <context context-type="linenumber">261</context>
         </context-group>
         <target state="translated">Kinesiska (förenklad)</target>
       </trans-unit>
@@ -11275,7 +11283,7 @@
         <source>Chinese Traditional</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">261</context>
+          <context context-type="linenumber">267</context>
         </context-group>
         <target state="needs-translation">Chinese Traditional</target>
       </trans-unit>
@@ -11283,7 +11291,7 @@
         <source>ISO 8601</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">269</context>
+          <context context-type="linenumber">275</context>
         </context-group>
         <target state="translated">ISO 8601</target>
       </trans-unit>
@@ -11291,7 +11299,7 @@
         <source>Successfully completed one-time migratration of settings to the database!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">603</context>
+          <context context-type="linenumber">609</context>
         </context-group>
         <target state="translated">Slutförde engångsmigreringen av inställningarna till databasen!</target>
       </trans-unit>
@@ -11299,7 +11307,7 @@
         <source>Unable to migrate settings to the database, please try saving manually.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">604</context>
+          <context context-type="linenumber">610</context>
         </context-group>
         <target state="translated">Kunde inte migrera inställningarna till databasen, försök spara manuellt.</target>
       </trans-unit>
@@ -11307,7 +11315,7 @@
         <source>You can restart the tour from the settings page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">677</context>
+          <context context-type="linenumber">683</context>
         </context-group>
         <target state="translated">Du kan starta om rundturen från inställningssidan.</target>
       </trans-unit>

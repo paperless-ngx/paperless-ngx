@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-12 17:41+0000\n"
-"PO-Revision-Date: 2025-12-12 17:44\n"
+"POT-Creation-Date: 2025-12-24 05:27+0000\n"
+"PO-Revision-Date: 2025-12-24 05:29\n"
 "Last-Translator: \n"
 "Language-Team: Hindi\n"
 "Language: hi_IN\n"
@@ -23,23 +23,23 @@ msgstr "दस्तावेज़"
 
 #: documents/filters.py:395
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "मान वैध JSON होना चाहिए."
 
 #: documents/filters.py:414
 msgid "Invalid custom field query expression"
-msgstr ""
+msgstr "अमान्य कस्टम फ़ील्ड क्वेरी एक्सप्रेशन"
 
 #: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
-msgstr ""
+msgstr "अमान्य एक्सप्रेशन सूची। खाली नहीं होनी चाहिए।"
 
 #: documents/filters.py:445
 msgid "Invalid logical operator {op!r}"
-msgstr ""
+msgstr "अमान्य लॉजिकल ऑपरेटर {op!r}"
 
 #: documents/filters.py:459
 msgid "Maximum number of query conditions exceeded."
-msgstr ""
+msgstr "क्वेरी शर्तों की अधिकतम संख्या पार हो गई है।"
 
 #: documents/filters.py:524
 msgid "{name!r} is not a valid custom field."
@@ -47,11 +47,11 @@ msgstr "{name!r} यह एक वैध कस्टम फ़ील्ड न�
 
 #: documents/filters.py:561
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr ""
+msgstr "{data_type} क्वेरी एक्सप्रेशन {expr!r} का समर्थन नहीं करता है।"
 
 #: documents/filters.py:669 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
-msgstr ""
+msgstr "अधिकतम नेस्टिंग डेप्थ पार हो गई है।"
 
 #: documents/filters.py:854
 msgid "Custom field not found"
@@ -83,7 +83,7 @@ msgstr "नियमित् एक्सप्रेशन"
 
 #: documents/models.py:60 documents/models.py:988
 msgid "Fuzzy word"
-msgstr ""
+msgstr "अस्पष्ट शब्द"
 
 #: documents/models.py:61
 msgid "Automatic"
@@ -152,7 +152,7 @@ msgstr "दस्तावेज़ प्रकार"
 
 #: documents/models.py:148
 msgid "path"
-msgstr ""
+msgstr "पाथ"
 
 #: documents/models.py:152 documents/models.py:179
 msgid "storage path"
@@ -168,7 +168,7 @@ msgstr "अनएन्क्रिप्टेड"
 
 #: documents/models.py:161
 msgid "Encrypted with GNU Privacy Guard"
-msgstr ""
+msgstr "GNU Privacy Guard के साथ एन्क्रिप्टेड"
 
 #: documents/models.py:182
 msgid "title"
@@ -176,31 +176,31 @@ msgstr "शीर्षक"
 
 #: documents/models.py:194 documents/models.py:682
 msgid "content"
-msgstr ""
+msgstr "कंटेंट"
 
 #: documents/models.py:197
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr ""
+msgstr "दस्तावेज़ का रॉ, केवल-टेक्स्ट डेटा। यह फ़ील्ड मुख्य रूप से खोजने के लिए उपयोग की जाती है।"
 
 #: documents/models.py:202
 msgid "mime type"
-msgstr ""
+msgstr "MIME type"
 
 #: documents/models.py:212
 msgid "checksum"
-msgstr ""
+msgstr "चेकसम"
 
 #: documents/models.py:216
 msgid "The checksum of the original document."
-msgstr ""
+msgstr "मूल दस्तावेज़ का चेकसम।"
 
 #: documents/models.py:220
 msgid "archive checksum"
-msgstr ""
+msgstr "आर्काइव चेकसम"
 
 #: documents/models.py:225
 msgid "The checksum of the archived document."
-msgstr ""
+msgstr "आर्काइव किए गए दस्तावेज़ का चेकसम।"
 
 #: documents/models.py:229
 msgid "page count"
@@ -233,31 +233,31 @@ msgstr "फ़ाइल का नाम"
 
 #: documents/models.py:275
 msgid "Current filename in storage"
-msgstr ""
+msgstr "स्टोरेज में वर्तमान फ़ाइल नाम"
 
 #: documents/models.py:279
 msgid "archive filename"
-msgstr ""
+msgstr "आर्काइव फ़ाइल नाम"
 
 #: documents/models.py:285
 msgid "Current archive filename in storage"
-msgstr ""
+msgstr "स्टोरेज में वर्तमान archive फ़ाइल नाम"
 
 #: documents/models.py:289
 msgid "original filename"
-msgstr ""
+msgstr "मूल फ़ाइल नाम"
 
 #: documents/models.py:295
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "अपलोड किए जाने पर फ़ाइल का मूल नाम"
 
 #: documents/models.py:302
 msgid "archive serial number"
-msgstr ""
+msgstr "archive सीरियल नंबर"
 
 #: documents/models.py:312
 msgid "The position of this document in your physical document archive."
-msgstr ""
+msgstr "आपके भौतिक दस्तावेज़ archive में इस दस्तावेज़ की स्थिति।"
 
 #: documents/models.py:318 documents/models.py:699 documents/models.py:753
 #: documents/models.py:1569
@@ -274,11 +274,11 @@ msgstr "तालिका"
 
 #: documents/models.py:438
 msgid "Small Cards"
-msgstr ""
+msgstr "छोटे कार्ड"
 
 #: documents/models.py:439
 msgid "Large Cards"
-msgstr ""
+msgstr "बड़े कार्ड"
 
 #: documents/models.py:442
 msgid "Title"
@@ -322,7 +322,7 @@ msgstr "साझा"
 
 #: documents/models.py:452
 msgid "ASN"
-msgstr ""
+msgstr "ASN"
 
 #: documents/models.py:453
 msgid "Pages"
@@ -1740,82 +1740,86 @@ msgid "Hungarian"
 msgstr ""
 
 #: paperless/settings.py:789
-msgid "Italian"
+msgid "Indonesian"
 msgstr ""
 
 #: paperless/settings.py:790
-msgid "Japanese"
+msgid "Italian"
 msgstr ""
 
 #: paperless/settings.py:791
-msgid "Korean"
+msgid "Japanese"
 msgstr ""
 
 #: paperless/settings.py:792
-msgid "Luxembourgish"
+msgid "Korean"
 msgstr ""
 
 #: paperless/settings.py:793
-msgid "Norwegian"
+msgid "Luxembourgish"
 msgstr ""
 
 #: paperless/settings.py:794
-msgid "Dutch"
+msgid "Norwegian"
 msgstr ""
 
 #: paperless/settings.py:795
-msgid "Polish"
+msgid "Dutch"
 msgstr ""
 
 #: paperless/settings.py:796
-msgid "Portuguese (Brazil)"
+msgid "Polish"
 msgstr ""
 
 #: paperless/settings.py:797
-msgid "Portuguese"
+msgid "Portuguese (Brazil)"
 msgstr ""
 
 #: paperless/settings.py:798
-msgid "Romanian"
+msgid "Portuguese"
 msgstr ""
 
 #: paperless/settings.py:799
-msgid "Russian"
+msgid "Romanian"
 msgstr ""
 
 #: paperless/settings.py:800
-msgid "Slovak"
+msgid "Russian"
 msgstr ""
 
 #: paperless/settings.py:801
-msgid "Slovenian"
+msgid "Slovak"
 msgstr ""
 
 #: paperless/settings.py:802
-msgid "Serbian"
+msgid "Slovenian"
 msgstr ""
 
 #: paperless/settings.py:803
-msgid "Swedish"
+msgid "Serbian"
 msgstr ""
 
 #: paperless/settings.py:804
-msgid "Turkish"
+msgid "Swedish"
 msgstr ""
 
 #: paperless/settings.py:805
-msgid "Ukrainian"
+msgid "Turkish"
 msgstr ""
 
 #: paperless/settings.py:806
-msgid "Vietnamese"
+msgid "Ukrainian"
 msgstr ""
 
 #: paperless/settings.py:807
-msgid "Chinese Simplified"
+msgid "Vietnamese"
 msgstr ""
 
 #: paperless/settings.py:808
+msgid "Chinese Simplified"
+msgstr ""
+
+#: paperless/settings.py:809
 msgid "Chinese Traditional"
 msgstr ""
 

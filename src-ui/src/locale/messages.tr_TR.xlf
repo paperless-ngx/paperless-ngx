@@ -11112,11 +11112,19 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         </context-group>
         <target state="translated">Macarca</target>
       </trans-unit>
+      <trans-unit id="8312065814232621608" datatype="html">
+        <source>Indonesian</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">141</context>
+        </context-group>
+        <target state="needs-translation">Indonesian</target>
+      </trans-unit>
       <trans-unit id="2935232983274991580" datatype="html">
         <source>Italian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">141</context>
+          <context context-type="linenumber">147</context>
         </context-group>
         <target state="translated">İtalyanca</target>
       </trans-unit>
@@ -11124,7 +11132,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Japanese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">147</context>
+          <context context-type="linenumber">153</context>
         </context-group>
         <target state="translated">Japonca</target>
       </trans-unit>
@@ -11132,7 +11140,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Korean</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">153</context>
+          <context context-type="linenumber">159</context>
         </context-group>
         <target state="translated">Korece</target>
       </trans-unit>
@@ -11140,7 +11148,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Luxembourgish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">159</context>
+          <context context-type="linenumber">165</context>
         </context-group>
         <target state="translated">Lüksemburgca</target>
       </trans-unit>
@@ -11148,7 +11156,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Dutch</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">165</context>
+          <context context-type="linenumber">171</context>
         </context-group>
         <target state="translated">Hollandaca</target>
       </trans-unit>
@@ -11156,7 +11164,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Norwegian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">171</context>
+          <context context-type="linenumber">177</context>
         </context-group>
         <target state="needs-review-translation" state-qualifier="leveraged-tm">Norveçce</target>
       </trans-unit>
@@ -11164,7 +11172,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Persian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">177</context>
+          <context context-type="linenumber">183</context>
         </context-group>
         <target state="translated">Farsça</target>
       </trans-unit>
@@ -11172,7 +11180,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Polish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">183</context>
+          <context context-type="linenumber">189</context>
         </context-group>
         <target state="translated">Lehçe</target>
       </trans-unit>
@@ -11180,7 +11188,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Portuguese (Brazil)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">189</context>
+          <context context-type="linenumber">195</context>
         </context-group>
         <target state="translated">Portekizce (Brezilya)</target>
       </trans-unit>
@@ -11188,7 +11196,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Portuguese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">195</context>
+          <context context-type="linenumber">201</context>
         </context-group>
         <target state="translated">Portekizce</target>
       </trans-unit>
@@ -11196,7 +11204,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Romanian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">201</context>
+          <context context-type="linenumber">207</context>
         </context-group>
         <target state="translated">Romence</target>
       </trans-unit>
@@ -11204,7 +11212,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Russian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">207</context>
+          <context context-type="linenumber">213</context>
         </context-group>
         <target state="translated">Rusça</target>
       </trans-unit>
@@ -11212,7 +11220,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Slovak</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">213</context>
+          <context context-type="linenumber">219</context>
         </context-group>
         <target state="needs-review-translation" state-qualifier="leveraged-tm">Slovakça</target>
       </trans-unit>
@@ -11220,7 +11228,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Slovenian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">219</context>
+          <context context-type="linenumber">225</context>
         </context-group>
         <target state="translated">Slovakça</target>
       </trans-unit>
@@ -11228,7 +11236,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Serbian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">225</context>
+          <context context-type="linenumber">231</context>
         </context-group>
         <target state="translated">Sırpça</target>
       </trans-unit>
@@ -11236,7 +11244,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Swedish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">231</context>
+          <context context-type="linenumber">237</context>
         </context-group>
         <target state="translated">İsveççe</target>
       </trans-unit>
@@ -11244,7 +11252,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Turkish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">237</context>
+          <context context-type="linenumber">243</context>
         </context-group>
         <target state="translated">Türkçe</target>
       </trans-unit>
@@ -11252,7 +11260,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Ukrainian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">243</context>
+          <context context-type="linenumber">249</context>
         </context-group>
         <target state="needs-review-translation" state-qualifier="leveraged-tm">Ukraynaca</target>
       </trans-unit>
@@ -11260,7 +11268,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Vietnamese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">249</context>
+          <context context-type="linenumber">255</context>
         </context-group>
         <target state="translated">Vietnamca</target>
       </trans-unit>
@@ -11268,7 +11276,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Chinese Simplified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">255</context>
+          <context context-type="linenumber">261</context>
         </context-group>
         <target state="translated">Basitleştirilmiş Çince</target>
       </trans-unit>
@@ -11276,7 +11284,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Chinese Traditional</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">261</context>
+          <context context-type="linenumber">267</context>
         </context-group>
         <target state="translated">Geleneksel Çince</target>
       </trans-unit>
@@ -11284,7 +11292,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>ISO 8601</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">269</context>
+          <context context-type="linenumber">275</context>
         </context-group>
         <target state="translated">ISO 8601</target>
       </trans-unit>
@@ -11292,7 +11300,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Successfully completed one-time migratration of settings to the database!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">603</context>
+          <context context-type="linenumber">609</context>
         </context-group>
         <target state="translated">Ayarların veritabanına tek seferlik taşıma işlemi başarıyla tamamlandı!</target>
       </trans-unit>
@@ -11300,7 +11308,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>Unable to migrate settings to the database, please try saving manually.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">604</context>
+          <context context-type="linenumber">610</context>
         </context-group>
         <target state="translated">Ayarları veritabanına taşıyamıyoruz, lütfen manuel olarak kaydetmeyi deneyin.</target>
       </trans-unit>
@@ -11308,7 +11316,7 @@ tüm <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> krite
         <source>You can restart the tour from the settings page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">677</context>
+          <context context-type="linenumber">683</context>
         </context-group>
         <target state="translated">Ayarlar sayfasından turu yeniden başlatabilirsiniz.</target>
       </trans-unit>

@@ -11112,11 +11112,19 @@ Erro ao enviar documentos por e-mail</target>
         </context-group>
         <target state="translated">Húngaro</target>
       </trans-unit>
+      <trans-unit id="8312065814232621608" datatype="html">
+        <source>Indonesian</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">141</context>
+        </context-group>
+        <target state="needs-translation">Indonesian</target>
+      </trans-unit>
       <trans-unit id="2935232983274991580" datatype="html" approved="yes">
         <source>Italian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">141</context>
+          <context context-type="linenumber">147</context>
         </context-group>
         <target state="final">Italiano</target>
       </trans-unit>
@@ -11124,7 +11132,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Japanese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">147</context>
+          <context context-type="linenumber">153</context>
         </context-group>
         <target state="translated">Japonês</target>
       </trans-unit>
@@ -11132,7 +11140,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Korean</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">153</context>
+          <context context-type="linenumber">159</context>
         </context-group>
         <target state="translated">Coreano</target>
       </trans-unit>
@@ -11140,7 +11148,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Luxembourgish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">159</context>
+          <context context-type="linenumber">165</context>
         </context-group>
         <target state="translated">Luxemburguês</target>
       </trans-unit>
@@ -11148,7 +11156,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Dutch</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">165</context>
+          <context context-type="linenumber">171</context>
         </context-group>
         <target state="final">Holandês</target>
       </trans-unit>
@@ -11156,7 +11164,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Norwegian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">171</context>
+          <context context-type="linenumber">177</context>
         </context-group>
         <target state="translated">Norueguês</target>
       </trans-unit>
@@ -11164,7 +11172,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Persian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">177</context>
+          <context context-type="linenumber">183</context>
         </context-group>
         <target state="translated">Persa</target>
       </trans-unit>
@@ -11172,7 +11180,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Polish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">183</context>
+          <context context-type="linenumber">189</context>
         </context-group>
         <target state="final">Polonês</target>
       </trans-unit>
@@ -11180,7 +11188,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Portuguese (Brazil)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">189</context>
+          <context context-type="linenumber">195</context>
         </context-group>
         <target state="final">Português (Brasil)</target>
       </trans-unit>
@@ -11188,7 +11196,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Portuguese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">195</context>
+          <context context-type="linenumber">201</context>
         </context-group>
         <target state="final">Português</target>
       </trans-unit>
@@ -11196,7 +11204,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Romanian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">201</context>
+          <context context-type="linenumber">207</context>
         </context-group>
         <target state="final">Romeno</target>
       </trans-unit>
@@ -11204,7 +11212,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Russian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">207</context>
+          <context context-type="linenumber">213</context>
         </context-group>
         <target state="final">Russo</target>
       </trans-unit>
@@ -11212,7 +11220,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Slovak</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">213</context>
+          <context context-type="linenumber">219</context>
         </context-group>
         <target state="translated">Eslovaco</target>
       </trans-unit>
@@ -11220,7 +11228,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Slovenian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">219</context>
+          <context context-type="linenumber">225</context>
         </context-group>
         <target state="translated">Esloveno</target>
       </trans-unit>
@@ -11228,7 +11236,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Serbian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">225</context>
+          <context context-type="linenumber">231</context>
         </context-group>
         <target state="translated">Sérvio</target>
       </trans-unit>
@@ -11236,7 +11244,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Swedish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">231</context>
+          <context context-type="linenumber">237</context>
         </context-group>
         <target state="final">Sueco</target>
       </trans-unit>
@@ -11244,7 +11252,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Turkish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">237</context>
+          <context context-type="linenumber">243</context>
         </context-group>
         <target state="translated">Turco</target>
       </trans-unit>
@@ -11252,7 +11260,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Ukrainian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">243</context>
+          <context context-type="linenumber">249</context>
         </context-group>
         <target state="translated">Ucraniano</target>
       </trans-unit>
@@ -11260,7 +11268,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Vietnamese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">249</context>
+          <context context-type="linenumber">255</context>
         </context-group>
         <target state="translated">Vietnamita</target>
       </trans-unit>
@@ -11268,7 +11276,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Chinese Simplified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">255</context>
+          <context context-type="linenumber">261</context>
         </context-group>
         <target state="translated">Chinês Simplificado</target>
       </trans-unit>
@@ -11276,7 +11284,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Chinese Traditional</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">261</context>
+          <context context-type="linenumber">267</context>
         </context-group>
         <target state="translated">Chinês (Tradicional)</target>
       </trans-unit>
@@ -11284,7 +11292,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>ISO 8601</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">269</context>
+          <context context-type="linenumber">275</context>
         </context-group>
         <target state="translated">ISO 8601</target>
       </trans-unit>
@@ -11292,7 +11300,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Successfully completed one-time migratration of settings to the database!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">603</context>
+          <context context-type="linenumber">609</context>
         </context-group>
         <target state="translated">A migração de configurações para o banco de dados foi concluída com sucesso!</target>
       </trans-unit>
@@ -11300,7 +11308,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Unable to migrate settings to the database, please try saving manually.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">604</context>
+          <context context-type="linenumber">610</context>
         </context-group>
         <target state="translated">Não foi possível migrar as configurações para o banco de dados, por favor tente salvar manualmente.</target>
       </trans-unit>
@@ -11308,7 +11316,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>You can restart the tour from the settings page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">677</context>
+          <context context-type="linenumber">683</context>
         </context-group>
         <target state="translated">Você pode reiniciar o tour na página de configurações..</target>
       </trans-unit>
