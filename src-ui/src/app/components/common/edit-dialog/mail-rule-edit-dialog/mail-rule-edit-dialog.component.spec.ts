@@ -113,4 +113,25 @@ describe('MailRuleEditDialogComponent', () => {
     expect(component.showCorrespondentField).toBeFalsy()
     expect(component.showActionParamField).toBeFalsy()
   })
+
+  it('should reset file_password when remove_file_password is enabled', (done) => {
+    // Set initial password value
+    component.objectForm.get('file_password').setValue('test-password')
+    expect(component.objectForm.get('file_password').value).toBe(
+      'test-password'
+    )
+
+    // Subscribe to verify the subscription was triggered
+    component.objectForm
+      .get('file_password')
+      .valueChanges.pipe()
+      .subscribe(() => {
+        // Verify file_password is reset to null after the change
+        expect(component.objectForm.get('file_password').value).toBeNull()
+        done()
+      })
+
+    // Enable password removal - this triggers the valueChanges subscription
+    component.objectForm.get('remove_file_password').setValue(true)
+  })
 })

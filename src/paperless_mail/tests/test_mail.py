@@ -1492,6 +1492,150 @@ class TestMail(
             2,
         )  # still 2
 
+    @mock.patch("paperless_mail.mail.unlock_pdf_in_place")
+    def test_remove_file_password_unlock_pdf_success(self, mock_unlock_pdf):
+        """
+        GIVEN:
+            - Mail rule with remove_file_password enabled and file_password set
+            - PDF attachment that is password-protected
+        WHEN:
+            - Mail message with encrypted PDF attachment is processed
+        THEN:
+            - unlock_pdf_in_place should be called with the temp filename and password
+            - File should be consumed
+        """
+        mock_unlock_pdf.return_value = True
+
+        message = self.mailMocker.messageBuilder.create_message(
+            attachments=[
+                _AttachmentDef(filename="encrypted.pdf"),
+            ],
+        )
+
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        rule = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            remove_file_password=True,
+            file_password="test_password",
+        )
+
+        self.mail_account_handler._handle_message(message, rule)
+
+        # Verify unlock_pdf_in_place was called
+        mock_unlock_pdf.assert_called_once()
+        call_args = mock_unlock_pdf.call_args
+        self.assertEqual(call_args[0][1], "test_password")
+
+        # Verify the attachment was consumed
+        self.mailMocker.assert_queue_consumption_tasks_call_args(
+            [
+                [
+                    {"override_filename": "encrypted.pdf"},
+                ],
+            ],
+        )
+
+    @mock.patch("paperless_mail.mail.unlock_pdf_in_place")
+    def test_remove_file_password_unlock_pdf_failure(self, mock_unlock_pdf):
+        """
+        GIVEN:
+            - Mail rule with remove_file_password enabled and file_password set
+            - PDF attachment that fails to unlock
+        WHEN:
+            - Mail message with encrypted PDF attachment is processed
+        THEN:
+            - unlock_pdf_in_place should be called
+            - A warning should be logged
+            - File should still be consumed
+        """
+        mock_unlock_pdf.return_value = False
+
+        message = self.mailMocker.messageBuilder.create_message(
+            attachments=[
+                _AttachmentDef(filename="encrypted.pdf"),
+            ],
+        )
+
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        rule = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            remove_file_password=True,
+            file_password="test_password",
+        )
+
+        with self.assertLogs("paperless.mail", level="WARNING") as cm:
+            self.mail_account_handler._handle_message(message, rule)
+            self.assertIn("could not unlock attachment", cm.output[0])
+
+        # Verify unlock_pdf_in_place was called
+        mock_unlock_pdf.assert_called_once()
+
+        # Verify the attachment was still consumed
+        self.mailMocker.assert_queue_consumption_tasks_call_args(
+            [
+                [
+                    {"override_filename": "encrypted.pdf"},
+                ],
+            ],
+        )
+
+    @mock.patch("paperless_mail.mail.unlock_pdf_in_place")
+    def test_remove_file_password_no_password_provided(self, mock_unlock_pdf):
+        """
+        GIVEN:
+            - Mail rule with remove_file_password enabled but no file_password set
+            - PDF attachment
+        WHEN:
+            - Mail message with PDF attachment is processed
+        THEN:
+            - unlock_pdf_in_place should NOT be called
+            - File should be consumed normally
+        """
+        message = self.mailMocker.messageBuilder.create_message(
+            attachments=[
+                _AttachmentDef(filename="document.pdf"),
+            ],
+        )
+
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        rule = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            remove_file_password=True,
+            file_password=None,  # No password set
+        )
+
+        self.mail_account_handler._handle_message(message, rule)
+
+        # Verify unlock_pdf_in_place was NOT called
+        mock_unlock_pdf.assert_not_called()
+
+        # Verify the attachment was consumed normally
+        self.mailMocker.assert_queue_consumption_tasks_call_args(
+            [
+                [
+                    {"override_filename": "document.pdf"},
+                ],
+            ],
+        )
+
 
 class TestPostConsumeAction(TestCase):
     def setUp(self):
