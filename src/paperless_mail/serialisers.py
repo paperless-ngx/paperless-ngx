@@ -15,8 +15,6 @@ class ObfuscatedPasswordField(serializers.CharField):
     """
 
     def to_representation(self, value) -> str:
-        if value is None:
-            return None
         return "*" * max(10, len(value))
 
     def to_internal_value(self, data):
