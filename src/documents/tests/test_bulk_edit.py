@@ -1155,6 +1155,52 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_group.return_value.delay.assert_called_once()
         mock_chord.assert_not_called()
 
+    @mock.patch("documents.bulk_edit.delete")
+    @mock.patch("documents.bulk_edit.chord")
+    @mock.patch("documents.bulk_edit.group")
+    @mock.patch("documents.tasks.consume_file.s")
+    @mock.patch("documents.bulk_edit.tempfile.mkdtemp")
+    @mock.patch("pikepdf.open")
+    def test_remove_password_deletes_original(
+        self,
+        mock_open,
+        mock_mkdtemp,
+        mock_consume_file,
+        mock_group,
+        mock_chord,
+        mock_delete,
+    ):
+        doc = self.doc2
+        temp_dir = self.dirs.scratch_dir / "remove-password-delete"
+        temp_dir.mkdir(parents=True, exist_ok=True)
+        mock_mkdtemp.return_value = str(temp_dir)
+
+        fake_pdf = mock.MagicMock()
+        fake_pdf.pages = [mock.Mock(), mock.Mock()]
+
+        def save_side_effect(target_path):
+            Path(target_path).write_bytes(b"password removed")
+
+        fake_pdf.save.side_effect = save_side_effect
+        mock_open.return_value.__enter__.return_value = fake_pdf
+        mock_chord.return_value.delay.return_value = None
+
+        result = bulk_edit.remove_password(
+            [doc.id],
+            password="secret",
+            include_metadata=False,
+            update_document=False,
+            delete_original=True,
+        )
+
+        self.assertEqual(result, "OK")
+        mock_open.assert_called_once_with(doc.source_path, password="secret")
+        mock_consume_file.assert_called_once()
+        mock_group.assert_not_called()
+        mock_chord.assert_called_once()
+        mock_chord.return_value.delay.assert_called_once()
+        mock_delete.si.assert_called_once_with([doc.id])
+    
     @mock.patch("pikepdf.open")
     def test_remove_password_open_failure(self, mock_open):
         mock_open.side_effect = RuntimeError("wrong password")
