@@ -219,6 +219,19 @@ different means. These are as follows:
 
     -   **Apple Mail support:** Apple Mail clients allow differently colored tags. For this to work use `apple:<color>` (e.g. _apple:green_) as a custom tag. Available colors are _red_, _orange_, _yellow_, _blue_, _green_, _violet_ and _grey_.
 
+#### Password-Protected Attachments
+
+Mail rules include an option to "Remove password protection" for attachments. When enabled, Paperless-ngx will attempt to unlock password-protected PDFs before consumption using the password you provide in the rule.
+
+-   Only PDF attachments are supported for unlocking.
+-   If unlocking succeeds, the unlocked copy is processed; the original mail attachment remains unchanged.
+-   If unlocking fails (e.g. incorrect password), the attachment is process and a warning is logged.
+-   The password is stored with the mail rule and is shown obfuscated in the UI and API responses.
+
+!!! warning
+
+    Store mail rule passwords with care. Anyone with permission to edit a mail rule can change the configured password.
+
 !!! warning
 
     The mail consumer will perform these actions on all mails it has

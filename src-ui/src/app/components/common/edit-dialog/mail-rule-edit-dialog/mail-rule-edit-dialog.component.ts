@@ -27,6 +27,7 @@ import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { CheckComponent } from '../../input/check/check.component'
 import { NumberComponent } from '../../input/number/number.component'
+import { PasswordComponent } from '../../input/password/password.component'
 import { SelectComponent } from '../../input/select/select.component'
 import { SwitchComponent } from '../../input/switch/switch.component'
 import { TagsComponent } from '../../input/tags/tags.component'
@@ -146,6 +147,7 @@ const METADATA_CORRESPONDENT_OPTIONS = [
     SelectComponent,
     TagsComponent,
     CheckComponent,
+    PasswordComponent,
     TextComponent,
     NumberComponent,
     SwitchComponent,
@@ -187,6 +189,19 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
       .subscribe((result) => (this.documentTypes = result.results))
   }
 
+  ngOnInit(): void {
+    super.ngOnInit()
+
+    // When enabling password removal, start with an empty password field
+    this.objectForm
+      .get('remove_file_password')
+      ?.valueChanges.subscribe((val: boolean) => {
+        if (val === true) {
+          this.objectForm.get('file_password')?.reset(null)
+        }
+      })
+  }
+
   getCreateTitle() {
     return $localize`Create new mail rule`
   }
@@ -222,6 +237,8 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
       ),
       assign_correspondent: new FormControl(null),
       assign_owner_from_rule: new FormControl(true),
+      remove_file_password: new FormControl(false),
+      file_password: new FormControl(null),
     })
   }
 
@@ -237,6 +254,10 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
       this.objectForm?.get('action')?.value == MailAction.Move ||
       this.objectForm?.get('action')?.value == MailAction.Tag
     )
+  }
+
+  get showPasswordField(): boolean {
+    return this.objectForm?.get('remove_file_password')?.value === true
   }
 
   get attachmentTypeOptions() {

@@ -35,6 +35,7 @@ from imap_tools.query import LogicOperator
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
+from documents.pdf_password import unlock_pdf_in_place
 from documents.loggers import LoggingMixin
 from documents.models import Correspondent
 from documents.parsers import is_mime_type_supported
@@ -838,6 +839,15 @@ class MailAccountHandler(LoggingMixin):
                     temp_filename = temp_dir / "no-name-attachment"
 
                 temp_filename.write_bytes(att.payload)
+
+                if rule.remove_file_password and rule.file_password:
+                    status = unlock_pdf_in_place(
+                        temp_filename,
+                        rule.file_password,
+                    )
+                    if not status:
+                        self.log.warning(
+                            f"could not unlock attachment: {att.filename}")
 
                 input_doc = ConsumableDocument(
                     source=DocumentSource.MailFetch,

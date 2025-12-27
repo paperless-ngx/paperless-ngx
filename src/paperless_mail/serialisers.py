@@ -15,6 +15,8 @@ class ObfuscatedPasswordField(serializers.CharField):
     """
 
     def to_representation(self, value) -> str:
+        if value is None:
+            return None
         return "*" * max(10, len(value))
 
     def to_internal_value(self, data):
@@ -70,6 +72,7 @@ class MailRuleSerializer(OwnedObjectSerializer):
     assign_tags = TagsField(many=True, allow_null=True, required=False)
     assign_document_type = DocumentTypeField(allow_null=True, required=False)
     order = serializers.IntegerField(required=False)
+    file_password = ObfuscatedPasswordField(allow_null=True, required=False)
 
     class Meta:
         model = MailRule
@@ -98,6 +101,8 @@ class MailRuleSerializer(OwnedObjectSerializer):
             "attachment_type",
             "consumption_scope",
             "pdf_layout",
+            "remove_file_password",
+            "file_password",
             "owner",
             "user_can_change",
             "permissions",
