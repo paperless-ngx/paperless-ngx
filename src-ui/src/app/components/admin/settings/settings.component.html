@@ -196,8 +196,11 @@
               </div>
               <div class="col">
                 <select class="form-select" formControlName="pdfViewerDefaultZoom">
-                  <option [ngValue]="ZoomSetting.PageWidth" i18n>Fit width</option>
-                  <option [ngValue]="ZoomSetting.PageFit" i18n>Fit page</option>
+                  @for (setting of zoomSettings; track setting) {
+                    <option [value]="setting">
+                      {{ getZoomSettingTitle(setting) }}
+                    </option>
+                  }
                 </select>
                 <p class="small text-muted mt-1" i18n>Only applies to the Paperless-ngx PDF viewer.</p>
               </div>
