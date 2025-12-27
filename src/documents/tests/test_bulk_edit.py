@@ -1200,7 +1200,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_chord.assert_called_once()
         mock_chord.return_value.delay.assert_called_once()
         mock_delete.si.assert_called_once_with([doc.id])
-    
+
     @mock.patch("pikepdf.open")
     def test_remove_password_open_failure(self, mock_open):
         mock_open.side_effect = RuntimeError("wrong password")
