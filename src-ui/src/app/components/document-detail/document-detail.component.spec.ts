@@ -1227,6 +1227,35 @@ describe('DocumentDetailComponent', () => {
     req.flush(true)
   })
 
+  it('should require the current password before removing it', () => {
+    initNormally()
+    const errorSpy = jest.spyOn(toastService, 'showError')
+    component.requiresPassword = true
+    component.password = ''
+
+    component.removePassword()
+
+    expect(errorSpy).toHaveBeenCalled()
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+      )
+  })
+
+  it('should handle failures when removing password protection', () => {
+    initNormally()
+    const errorSpy = jest.spyOn(toastService, 'showError')
+    component.password = 'secret'
+
+    component.removePassword()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    req.error(new ErrorEvent('failed'))
+
+    expect(errorSpy).toHaveBeenCalled()
+    expect(component.networkActive).toBe(false)
+  })
+
   it('should support keyboard shortcuts', () => {
     initNormally()
 
