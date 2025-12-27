@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-12 17:41+0000\n"
-"PO-Revision-Date: 2025-12-12 17:44\n"
+"POT-Creation-Date: 2025-12-24 05:27+0000\n"
+"PO-Revision-Date: 2025-12-24 05:29\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -1741,82 +1741,86 @@ msgid "Hungarian"
 msgstr "Ουγγρικά"
 
 #: paperless/settings.py:789
+msgid "Indonesian"
+msgstr ""
+
+#: paperless/settings.py:790
 msgid "Italian"
 msgstr "Ιταλικά"
 
-#: paperless/settings.py:790
+#: paperless/settings.py:791
 msgid "Japanese"
 msgstr "Ιαπωνικά"
 
-#: paperless/settings.py:791
+#: paperless/settings.py:792
 msgid "Korean"
 msgstr "Κορεάτικα"
 
-#: paperless/settings.py:792
+#: paperless/settings.py:793
 msgid "Luxembourgish"
 msgstr "Λουξεμβουργικά"
 
-#: paperless/settings.py:793
+#: paperless/settings.py:794
 msgid "Norwegian"
 msgstr "Νορβηγικά"
 
-#: paperless/settings.py:794
+#: paperless/settings.py:795
 msgid "Dutch"
 msgstr "Ολλανδικά"
 
-#: paperless/settings.py:795
+#: paperless/settings.py:796
 msgid "Polish"
 msgstr "Πολωνικά"
 
-#: paperless/settings.py:796
+#: paperless/settings.py:797
 msgid "Portuguese (Brazil)"
 msgstr "Πορτογαλικά (Βραζιλίας)"
 
-#: paperless/settings.py:797
+#: paperless/settings.py:798
 msgid "Portuguese"
 msgstr "Πορτογαλικά"
 
-#: paperless/settings.py:798
+#: paperless/settings.py:799
 msgid "Romanian"
 msgstr "Ρουμάνικα"
 
-#: paperless/settings.py:799
+#: paperless/settings.py:800
 msgid "Russian"
 msgstr "Ρωσικά"
 
-#: paperless/settings.py:800
+#: paperless/settings.py:801
 msgid "Slovak"
 msgstr "Σλοβακικά"
 
-#: paperless/settings.py:801
+#: paperless/settings.py:802
 msgid "Slovenian"
 msgstr "Σλοβενικά"
 
-#: paperless/settings.py:802
+#: paperless/settings.py:803
 msgid "Serbian"
 msgstr "Σερβικά"
 
-#: paperless/settings.py:803
+#: paperless/settings.py:804
 msgid "Swedish"
 msgstr "Σουηδικά"
 
-#: paperless/settings.py:804
+#: paperless/settings.py:805
 msgid "Turkish"
 msgstr "Τούρκικα"
 
-#: paperless/settings.py:805
+#: paperless/settings.py:806
 msgid "Ukrainian"
 msgstr "Ουκρανικά"
 
-#: paperless/settings.py:806
+#: paperless/settings.py:807
 msgid "Vietnamese"
 msgstr ""
 
-#: paperless/settings.py:807
+#: paperless/settings.py:808
 msgid "Chinese Simplified"
 msgstr "Κινέζικα Απλοποιημένα"
 
-#: paperless/settings.py:808
+#: paperless/settings.py:809
 msgid "Chinese Traditional"
 msgstr "Κινεζικά Παραδοσιακά"
 
