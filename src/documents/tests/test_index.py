@@ -251,3 +251,28 @@ class TestRewriteNaturalDateKeywords(SimpleTestCase):
         result = self._rewrite_with_now("added:today", fixed_now)
         # Should convert to UTC properly
         self.assertIn("added:[20250719", result)
+
+
+class TestNormalizeTextForSearch(SimpleTestCase):
+    """Test normalize_text_for_search handles Cyrillic case-insensitivity."""
+
+    def test_cyrillic_lowercase(self):
+        """Cyrillic uppercase should normalize to lowercase."""
+        self.assertEqual(index.normalize_text_for_search("ИЗВОД"), "извод")
+        self.assertEqual(index.normalize_text_for_search("ДОКУМЕНТ"), "документ")
+        self.assertEqual(index.normalize_text_for_search("МАКЕДОНИЈА"), "македонија")
+
+    def test_cyrillic_mixed_case(self):
+        """Mixed case Cyrillic should normalize to lowercase."""
+        self.assertEqual(index.normalize_text_for_search("ИзВоД"), "извод")
+        self.assertEqual(index.normalize_text_for_search("Документ"), "документ")
+
+    def test_latin_unchanged(self):
+        """Latin text should still work correctly."""
+        self.assertEqual(index.normalize_text_for_search("INVOICE"), "invoice")
+        self.assertEqual(index.normalize_text_for_search("Invoice"), "invoice")
+
+    def test_already_lowercase(self):
+        """Already lowercase text should remain unchanged."""
+        self.assertEqual(index.normalize_text_for_search("извод"), "извод")
+        self.assertEqual(index.normalize_text_for_search("invoice"), "invoice")
