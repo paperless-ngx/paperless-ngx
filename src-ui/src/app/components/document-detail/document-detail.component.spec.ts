@@ -1238,7 +1238,7 @@ describe('DocumentDetailComponent', () => {
     expect(errorSpy).toHaveBeenCalled()
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/bulk_edit/`
-      )
+    )
   })
 
   it('should handle failures when removing password protection', () => {
