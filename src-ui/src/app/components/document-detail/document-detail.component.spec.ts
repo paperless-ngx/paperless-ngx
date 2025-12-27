@@ -1209,6 +1209,53 @@ describe('DocumentDetailComponent', () => {
     expect(closeSpy).toHaveBeenCalled()
   })
 
+  it('should support removing password protection from pdfs', () => {
+    initNormally()
+    component.password = 'secret'
+    component.removePassword()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    expect(req.request.body).toEqual({
+      documents: [doc.id],
+      method: 'remove_password',
+      parameters: {
+        password: 'secret',
+        update_document: true,
+      },
+    })
+    req.flush(true)
+  })
+
+  it('should require the current password before removing it', () => {
+    initNormally()
+    const errorSpy = jest.spyOn(toastService, 'showError')
+    component.requiresPassword = true
+    component.password = ''
+
+    component.removePassword()
+
+    expect(errorSpy).toHaveBeenCalled()
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+  })
+
+  it('should handle failures when removing password protection', () => {
+    initNormally()
+    const errorSpy = jest.spyOn(toastService, 'showError')
+    component.password = 'secret'
+
+    component.removePassword()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    req.error(new ErrorEvent('failed'))
+
+    expect(errorSpy).toHaveBeenCalled()
+    expect(component.networkActive).toBe(false)
+  })
+
   it('should support keyboard shortcuts', () => {
     initNormally()
 
