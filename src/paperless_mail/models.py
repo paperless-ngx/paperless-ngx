@@ -304,7 +304,9 @@ class MailRule(document_models.ModelWithOwner):
     remove_file_password = models.BooleanField(
         _("remove file password protection"),
         default=False,
-        help_text=_("Try to remove password protection from attachments before consumption."),
+        help_text=_(
+            "Try to remove password protection from attachments before consumption.",
+        ),
     )
 
     file_password = models.CharField(
@@ -312,7 +314,9 @@ class MailRule(document_models.ModelWithOwner):
         max_length=256,
         null=True,
         blank=True,
-        help_text=_("Password to use when removing protection from password-protected files."),
+        help_text=_(
+            "Password to use when removing protection from password-protected files.",
+        ),
     )
 
     def __str__(self):

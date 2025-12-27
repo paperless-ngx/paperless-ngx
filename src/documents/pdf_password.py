@@ -5,8 +5,8 @@ This module provides helpers to unlock (remove encryption from) PDFs either
 in-place or by writing an unlocked temporary copy. It relies on `pikepdf` and
 only applies to PDF files.
 """
+
 import logging
-import shutil
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
@@ -35,13 +35,12 @@ def remove_pdf_password(file_path: Path, password: str) -> Path | None:
         # Open the password-protected PDF
         with pikepdf.open(file_path, password=password) as pdf:
             # Create a temporary file to save the unlocked PDF
-            temp_file = NamedTemporaryFile(
+            with NamedTemporaryFile(
                 delete=False,
                 suffix=".pdf",
                 prefix="unlocked_",
-            )
-            temp_path = Path(temp_file.name)
-            temp_file.close()
+            ) as temp_file:
+                temp_path = Path(temp_file.name)
 
             # Save without encryption
             pdf.save(temp_path, encryption=False)
@@ -83,7 +82,11 @@ def unlock_pdf_in_place(file_path: Path, password: str) -> bool:
 
     try:
         # Open with password
-        with pikepdf.open(file_path, password=password, allow_overwriting_input=True) as pdf:
+        with pikepdf.open(
+            file_path,
+            password=password,
+            allow_overwriting_input=True,
+        ) as pdf:
             # Save without encryption, overwriting the original
             pdf.save(file_path, encryption=False)
             logger.info(f"Successfully unlocked PDF in place: {file_path.name}")
@@ -93,7 +96,7 @@ def unlock_pdf_in_place(file_path: Path, password: str) -> bool:
         logger.warning(f"Incorrect password for PDF: {file_path.name}")
         return False
     except Exception as e:
-        logger.error(f"Failed to unlock PDF {file_path.name}: {e}", exc_info=True)
+        logger.exception(f"Failed to unlock PDF {file_path.name}: {e}")
         return False
 
 
@@ -120,20 +123,28 @@ def lock_pdf_in_place(file_path: Path, password: str) -> bool:
 
     try:
         # Open with password
-        with pikepdf.open(file_path, password=password, allow_overwriting_input=True) as pdf:
-
+        with pikepdf.open(
+            file_path,
+            password=password,
+            allow_overwriting_input=True,
+        ) as pdf:
             # Save with encryption, overwriting the original
             logger.debug(f"Saving encrypted PDF: {file_path}")
 
             no_extracting = pikepdf.Permissions(extract=False)
-            pdf.save(file_path, encryption=pikepdf.Encryption(
-                user=password, owner=password, allow=no_extracting
-            ))
+            pdf.save(
+                file_path,
+                encryption=pikepdf.Encryption(
+                    user=password,
+                    owner=password,
+                    allow=no_extracting,
+                ),
+            )
             return True
 
     except pikepdf.PasswordError:
         logger.warning(f"Incorrect password provided for PDF: {file_path.name}")
         return False
     except Exception as e:
-        logger.error(f"Failed to lock PDF {file_path.name}: {e}", exc_info=True)
+        logger.exception(f"Failed to lock PDF {file_path.name}: {e}")
         return False

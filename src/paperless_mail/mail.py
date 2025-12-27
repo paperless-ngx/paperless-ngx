@@ -35,10 +35,10 @@ from imap_tools.query import LogicOperator
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
-from documents.pdf_password import unlock_pdf_in_place
 from documents.loggers import LoggingMixin
 from documents.models import Correspondent
 from documents.parsers import is_mime_type_supported
+from documents.pdf_password import unlock_pdf_in_place
 from documents.tasks import consume_file
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
@@ -846,8 +846,7 @@ class MailAccountHandler(LoggingMixin):
                         rule.file_password,
                     )
                     if not status:
-                        self.log.warning(
-                            f"could not unlock attachment: {att.filename}")
+                        self.log.warning(f"could not unlock attachment: {att.filename}")
 
                 input_doc = ConsumableDocument(
                     source=DocumentSource.MailFetch,
