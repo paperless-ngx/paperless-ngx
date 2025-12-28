@@ -1273,6 +1273,25 @@ describe('DocumentDetailComponent', () => {
     expect(dialog.buttonsEnabled).toBe(true)
   })
 
+  it('should refresh the document when removing password in update mode', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    const refreshSpy = jest.spyOn(openDocumentsService, 'refreshDocument')
+    initNormally()
+    component.password = 'secret'
+
+    component.removePassword()
+    const dialog =
+      modal.componentInstance as PasswordRemovalConfirmDialogComponent
+    dialog.confirm()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    req.flush(true)
+
+    expect(refreshSpy).toHaveBeenCalledWith(doc.id)
+  })
+
   it('should support keyboard shortcuts', () => {
     initNormally()
 
