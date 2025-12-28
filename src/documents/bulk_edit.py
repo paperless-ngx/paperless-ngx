@@ -650,8 +650,8 @@ def remove_password(
     doc_ids: list[int],
     password: str,
     *,
-    delete_original: bool = False,
     update_document: bool = False,
+    delete_original: bool = False,
     include_metadata: bool = True,
     user: User | None = None,
 ) -> Literal["OK"]:
