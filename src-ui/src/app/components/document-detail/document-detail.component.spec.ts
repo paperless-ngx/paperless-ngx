@@ -66,6 +66,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
+import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
 import {
   DocumentDetailComponent,
@@ -1210,9 +1211,17 @@ describe('DocumentDetailComponent', () => {
   })
 
   it('should support removing password protection from pdfs', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
     initNormally()
     component.password = 'secret'
     component.removePassword()
+    const dialog =
+      modal.componentInstance as PasswordRemovalConfirmDialogComponent
+    dialog.updateDocument = false
+    dialog.includeMetadata = false
+    dialog.deleteOriginal = true
+    dialog.confirm()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/bulk_edit/`
     )
@@ -1221,7 +1230,9 @@ describe('DocumentDetailComponent', () => {
       method: 'remove_password',
       parameters: {
         password: 'secret',
-        update_document: true,
+        update_document: false,
+        include_metadata: false,
+        delete_original: true,
       },
     })
     req.flush(true)
@@ -1242,11 +1253,16 @@ describe('DocumentDetailComponent', () => {
   })
 
   it('should handle failures when removing password protection', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
     initNormally()
     const errorSpy = jest.spyOn(toastService, 'showError')
     component.password = 'secret'
 
     component.removePassword()
+    const dialog =
+      modal.componentInstance as PasswordRemovalConfirmDialogComponent
+    dialog.confirm()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/bulk_edit/`
     )
@@ -1254,6 +1270,7 @@ describe('DocumentDetailComponent', () => {
 
     expect(errorSpy).toHaveBeenCalled()
     expect(component.networkActive).toBe(false)
+    expect(dialog.buttonsEnabled).toBe(true)
   })
 
   it('should support keyboard shortcuts', () => {
