@@ -116,6 +116,7 @@ class BarcodeConfig(BaseConfig):
     barcode_max_pages: int = dataclasses.field(init=False)
     barcode_enable_tag: bool = dataclasses.field(init=False)
     barcode_tag_mapping: dict[str, str] = dataclasses.field(init=False)
+    barcode_tag_split: bool = dataclasses.field(init=False)
 
     def __post_init__(self) -> None:
         app_config = self._get_config_instance()
@@ -152,6 +153,9 @@ class BarcodeConfig(BaseConfig):
         )
         self.barcode_tag_mapping = (
             app_config.barcode_tag_mapping or settings.CONSUMER_TAG_BARCODE_MAPPING
+        )
+        self.barcode_tag_split = (
+            app_config.barcode_tag_split or settings.CONSUMER_TAG_BARCODE_SPLIT
         )
 
 
