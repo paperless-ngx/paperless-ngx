@@ -793,13 +793,11 @@ def run_workflows(
                         logging_group,
                         original_file,
                     )
-                elif action.type == WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL:
-                    if use_overrides:
-                        logger.info(
-                            "Skipping password removal action during consumption workflow",
-                            extra={"group": logging_group},
-                        )
-                        continue
+                elif (
+                    action.type == WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL
+                    and not use_overrides
+                ):
+                    # Password removal only makes sense on actual documents
                     execute_password_removal_action(action, document, logging_group)
 
             if not use_overrides:
