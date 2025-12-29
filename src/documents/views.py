@@ -708,6 +708,7 @@ class DocumentViewSet(
         "title",
         "correspondent__name",
         "document_type__name",
+        "storage_path__name",
         "created",
         "modified",
         "added",
