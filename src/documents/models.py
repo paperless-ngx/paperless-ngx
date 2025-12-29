@@ -1287,6 +1287,10 @@ class WorkflowAction(models.Model):
             4,
             _("Webhook"),
         )
+        PASSWORD_REMOVAL = (
+            5,
+            _("Password removal"),
+        )
 
     type = models.PositiveIntegerField(
         _("Workflow Action Type"),
@@ -1512,6 +1516,15 @@ class WorkflowAction(models.Model):
         on_delete=models.SET_NULL,
         related_name="action",
         verbose_name=_("webhook"),
+    )
+
+    passwords = models.TextField(
+        _("passwords"),
+        null=True,
+        blank=True,
+        help_text=_(
+            "Passwords to try when removing PDF protection. Separate with commas or new lines.",
+        ),
     )
 
     class Meta:

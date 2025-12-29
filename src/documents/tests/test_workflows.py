@@ -3548,6 +3548,75 @@ class TestWorkflows(
 
         mock_post.assert_called_once()
 
+    @mock.patch("documents.bulk_edit.remove_password")
+    def test_password_removal_action_attempts_multiple_passwords(
+        self,
+        mock_remove_password,
+    ):
+        doc = Document.objects.create(
+            title="Protected",
+            checksum="pw-checksum",
+        )
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+            passwords="wrong, right\n extra ",
+        )
+        workflow = Workflow.objects.create(name="Password workflow")
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        mock_remove_password.side_effect = [
+            ValueError("wrong password"),
+            "OK",
+        ]
+
+        run_workflows(trigger.type, doc)
+
+        assert mock_remove_password.call_count == 2
+        mock_remove_password.assert_has_calls(
+            [
+                mock.call(
+                    [doc.id],
+                    password="wrong",
+                    update_document=True,
+                    user=doc.owner,
+                ),
+                mock.call(
+                    [doc.id],
+                    password="right",
+                    update_document=True,
+                    user=doc.owner,
+                ),
+            ],
+        )
+
+    @mock.patch("documents.bulk_edit.remove_password")
+    def test_password_removal_action_skips_without_passwords(
+        self,
+        mock_remove_password,
+    ):
+        doc = Document.objects.create(
+            title="Protected",
+            checksum="pw-checksum-2",
+        )
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+            passwords=" \n , ",
+        )
+        workflow = Workflow.objects.create(name="Password workflow missing passwords")
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        run_workflows(trigger.type, doc)
+
+        mock_remove_password.assert_not_called()
+
 
 class TestWebhookSend:
     def test_send_webhook_data_or_json(

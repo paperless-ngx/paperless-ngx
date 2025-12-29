@@ -1,4 +1,5 @@
 import logging
+import re
 from pathlib import Path
 
 from django.conf import settings
@@ -259,3 +260,67 @@ def execute_webhook_action(
             f"Error occurred sending webhook: {e}",
             extra={"group": logging_group},
         )
+
+
+def parse_passwords(raw_passwords: str | None) -> list[str]:
+    """
+    Convert a comma/newline separated string of passwords into a clean list.
+    """
+    if not raw_passwords:
+        return []
+
+    return [
+        password.strip()
+        for password in re.split(r"[,\n]", raw_passwords)
+        if password.strip()
+    ]
+
+
+def execute_password_removal_action(
+    action: WorkflowAction,
+    document: Document,
+    logging_group,
+) -> None:
+    """
+    Try to remove a password from a document using the configured list.
+    """
+    passwords = parse_passwords(action.passwords)
+    if not passwords:
+        logger.warning(
+            "Password removal action %s has no passwords configured",
+            action.pk,
+            extra={"group": logging_group},
+        )
+        return
+
+    # import here to avoid circular dependency
+    from documents.bulk_edit import remove_password
+
+    for password in passwords:
+        try:
+            remove_password(
+                [document.id],
+                password=password,
+                update_document=True,
+                user=document.owner,
+            )
+            logger.info(
+                "Removed password from document %s using workflow action %s",
+                document.pk,
+                action.pk,
+                extra={"group": logging_group},
+            )
+            return
+        except ValueError as e:
+            logger.warning(
+                "Password removal failed for document %s with supplied password: %s",
+                document.pk,
+                e,
+                extra={"group": logging_group},
+            )
+
+    logger.error(
+        "Password removal failed for document %s after trying all provided passwords",
+        document.pk,
+        extra={"group": logging_group},
+    )

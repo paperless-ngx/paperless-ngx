@@ -430,6 +430,22 @@
           </div>
         </div>
       }
+      @case (WorkflowActionType.PasswordRemoval) {
+        <div class="row">
+          <div class="col">
+            <p class="small" i18n>
+              One or more passwords separated by commas or new lines. The workflow will try them in order until one succeeds.
+            </p>
+            <pngx-input-textarea
+              i18n-title
+              title="Passwords"
+              formControlName="passwords"
+              rows="4"
+              [error]="error?.actions?.[i]?.passwords"
+            ></pngx-input-textarea>
+          </div>
+        </div>
+      }
     }
   </div>
 </ng-template>
