@@ -646,6 +646,77 @@ def edit_pdf(
     return "OK"
 
 
+def remove_password(
+    doc_ids: list[int],
+    password: str,
+    *,
+    update_document: bool = False,
+    delete_original: bool = False,
+    include_metadata: bool = True,
+    user: User | None = None,
+) -> Literal["OK"]:
+    """
+    Remove password protection from PDF documents.
+    """
+    import pikepdf
+
+    for doc_id in doc_ids:
+        doc = Document.objects.get(id=doc_id)
+        try:
+            logger.info(
+                f"Attempting password removal from document {doc_ids[0]}",
+            )
+            with pikepdf.open(doc.source_path, password=password) as pdf:
+                temp_path = doc.source_path.with_suffix(".tmp.pdf")
+                pdf.remove_unreferenced_resources()
+                pdf.save(temp_path)
+
+                if update_document:
+                    # replace the original document with the unprotected one
+                    temp_path.replace(doc.source_path)
+                    doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
+                    doc.page_count = len(pdf.pages)
+                    doc.save()
+                    update_document_content_maybe_archive_file.delay(document_id=doc.id)
+                else:
+                    consume_tasks = []
+                    overrides = (
+                        DocumentMetadataOverrides().from_document(doc)
+                        if include_metadata
+                        else DocumentMetadataOverrides()
+                    )
+                    if user is not None:
+                        overrides.owner_id = user.id
+
+                    filepath: Path = (
+                        Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
+                        / f"{doc.id}_unprotected.pdf"
+                    )
+                    temp_path.replace(filepath)
+                    consume_tasks.append(
+                        consume_file.s(
+                            ConsumableDocument(
+                                source=DocumentSource.ConsumeFolder,
+                                original_file=filepath,
+                            ),
+                            overrides,
+                        ),
+                    )
+
+                    if delete_original:
+                        chord(header=consume_tasks, body=delete.si([doc.id])).delay()
+                    else:
+                        group(consume_tasks).delay()
+
+        except Exception as e:
+            logger.exception(f"Error removing password from document {doc.id}: {e}")
+            raise ValueError(
+                f"An error occurred while removing the password: {e}",
+            ) from e
+
+    return "OK"
+
+
 def reflect_doclinks(
     document: Document,
     field: CustomField,

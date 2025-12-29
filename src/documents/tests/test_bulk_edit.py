@@ -1,3 +1,4 @@
+import hashlib
 import shutil
 from datetime import date
 from pathlib import Path
@@ -1066,3 +1067,147 @@ class TestPDFActions(DirectoriesMixin, TestCase):
                 bulk_edit.edit_pdf(doc_ids, operations, update_document=True)
         mock_group.assert_not_called()
         mock_consume_file.assert_not_called()
+
+    @mock.patch("documents.bulk_edit.update_document_content_maybe_archive_file.delay")
+    @mock.patch("pikepdf.open")
+    def test_remove_password_update_document(self, mock_open, mock_update_document):
+        doc = self.doc1
+        original_checksum = doc.checksum
+
+        fake_pdf = mock.MagicMock()
+        fake_pdf.pages = [mock.Mock(), mock.Mock(), mock.Mock()]
+
+        def save_side_effect(target_path):
+            Path(target_path).write_bytes(b"new pdf content")
+
+        fake_pdf.save.side_effect = save_side_effect
+        mock_open.return_value.__enter__.return_value = fake_pdf
+
+        result = bulk_edit.remove_password(
+            [doc.id],
+            password="secret",
+            update_document=True,
+        )
+
+        self.assertEqual(result, "OK")
+        mock_open.assert_called_once_with(doc.source_path, password="secret")
+        fake_pdf.remove_unreferenced_resources.assert_called_once()
+        doc.refresh_from_db()
+        self.assertNotEqual(doc.checksum, original_checksum)
+        expected_checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
+        self.assertEqual(doc.checksum, expected_checksum)
+        self.assertEqual(doc.page_count, len(fake_pdf.pages))
+        mock_update_document.assert_called_once_with(document_id=doc.id)
+
+    @mock.patch("documents.bulk_edit.chord")
+    @mock.patch("documents.bulk_edit.group")
+    @mock.patch("documents.tasks.consume_file.s")
+    @mock.patch("documents.bulk_edit.tempfile.mkdtemp")
+    @mock.patch("pikepdf.open")
+    def test_remove_password_creates_consumable_document(
+        self,
+        mock_open,
+        mock_mkdtemp,
+        mock_consume_file,
+        mock_group,
+        mock_chord,
+    ):
+        doc = self.doc2
+        temp_dir = self.dirs.scratch_dir / "remove-password"
+        temp_dir.mkdir(parents=True, exist_ok=True)
+        mock_mkdtemp.return_value = str(temp_dir)
+
+        fake_pdf = mock.MagicMock()
+        fake_pdf.pages = [mock.Mock(), mock.Mock()]
+
+        def save_side_effect(target_path):
+            Path(target_path).write_bytes(b"password removed")
+
+        fake_pdf.save.side_effect = save_side_effect
+        mock_open.return_value.__enter__.return_value = fake_pdf
+        mock_group.return_value.delay.return_value = None
+
+        user = User.objects.create(username="owner")
+
+        result = bulk_edit.remove_password(
+            [doc.id],
+            password="secret",
+            include_metadata=False,
+            update_document=False,
+            delete_original=False,
+            user=user,
+        )
+
+        self.assertEqual(result, "OK")
+        mock_open.assert_called_once_with(doc.source_path, password="secret")
+        mock_consume_file.assert_called_once()
+        consume_args, _ = mock_consume_file.call_args
+        consumable_document = consume_args[0]
+        overrides = consume_args[1]
+        expected_path = temp_dir / f"{doc.id}_unprotected.pdf"
+        self.assertTrue(expected_path.exists())
+        self.assertEqual(
+            Path(consumable_document.original_file).resolve(),
+            expected_path.resolve(),
+        )
+        self.assertEqual(overrides.owner_id, user.id)
+        mock_group.assert_called_once_with([mock_consume_file.return_value])
+        mock_group.return_value.delay.assert_called_once()
+        mock_chord.assert_not_called()
+
+    @mock.patch("documents.bulk_edit.delete")
+    @mock.patch("documents.bulk_edit.chord")
+    @mock.patch("documents.bulk_edit.group")
+    @mock.patch("documents.tasks.consume_file.s")
+    @mock.patch("documents.bulk_edit.tempfile.mkdtemp")
+    @mock.patch("pikepdf.open")
+    def test_remove_password_deletes_original(
+        self,
+        mock_open,
+        mock_mkdtemp,
+        mock_consume_file,
+        mock_group,
+        mock_chord,
+        mock_delete,
+    ):
+        doc = self.doc2
+        temp_dir = self.dirs.scratch_dir / "remove-password-delete"
+        temp_dir.mkdir(parents=True, exist_ok=True)
+        mock_mkdtemp.return_value = str(temp_dir)
+
+        fake_pdf = mock.MagicMock()
+        fake_pdf.pages = [mock.Mock(), mock.Mock()]
+
+        def save_side_effect(target_path):
+            Path(target_path).write_bytes(b"password removed")
+
+        fake_pdf.save.side_effect = save_side_effect
+        mock_open.return_value.__enter__.return_value = fake_pdf
+        mock_chord.return_value.delay.return_value = None
+
+        result = bulk_edit.remove_password(
+            [doc.id],
+            password="secret",
+            include_metadata=False,
+            update_document=False,
+            delete_original=True,
+        )
+
+        self.assertEqual(result, "OK")
+        mock_open.assert_called_once_with(doc.source_path, password="secret")
+        mock_consume_file.assert_called_once()
+        mock_group.assert_not_called()
+        mock_chord.assert_called_once()
+        mock_chord.return_value.delay.assert_called_once()
+        mock_delete.si.assert_called_once_with([doc.id])
+
+    @mock.patch("pikepdf.open")
+    def test_remove_password_open_failure(self, mock_open):
+        mock_open.side_effect = RuntimeError("wrong password")
+
+        with self.assertLogs("paperless.bulk_edit", level="ERROR") as cm:
+            with self.assertRaises(ValueError) as exc:
+                bulk_edit.remove_password([self.doc1.id], password="secret")
+
+        self.assertIn("wrong password", str(exc.exception))
+        self.assertIn("Error removing password from document", cm.output[0])
