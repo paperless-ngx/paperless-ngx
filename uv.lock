@@ -1073,15 +1073,15 @@ wheels = [
 
 [[package]]
 name = "gotenberg-client"
-version = "0.12.0"
+version = "0.13.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx", extra = ["http2"], marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "typing-extensions", marker = "(python_full_version < '3.11' and sys_platform == 'darwin') or (python_full_version < '3.11' and sys_platform == 'linux')" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/61/6d/07ea213c146bbe91dffebff2d8f4dc61e7076d3dd34d4fd1467f9163e752/gotenberg_client-0.12.0.tar.gz", hash = "sha256:1ab50878024469fc003c414ee9810ceeb00d4d7d7c36bd2fb75318fbff139e9b", size = 1210884, upload-time = "2025-10-15T15:32:37.669Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e4/6c/aaadd6657ca42fbd148b1c00604b98c1ead5a22552f4e5365ce5f0632430/gotenberg_client-0.13.1.tar.gz", hash = "sha256:cdd6bbb535cd739b87446cd1b4f6347ed7f9af6a0d4b19baf7c064b75528ee54", size = 1211143, upload-time = "2025-12-04T20:45:24.151Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/12/39/fcb24ff053b1be7e5124f56c3d358706a23a328f685c6db33bc9dbc5472d/gotenberg_client-0.12.0-py3-none-any.whl", hash = "sha256:a540b35ac518e902c2860a88fbe448c15fe5a56fe8ec8604e6a2c8c2228fd0cb", size = 51051, upload-time = "2025-10-15T15:32:36.32Z" },
+    { url = "https://files.pythonhosted.org/packages/79/f6/7a6e6785295332d2538f729ae19516cef712273a5ab8b90d015f08e37a45/gotenberg_client-0.13.1-py3-none-any.whl", hash = "sha256:613f7083a5e8a81699dd8d715c97e5806a424ac48920aad25d7c11b600cdfaf3", size = 51058, upload-time = "2025-12-04T20:45:22.603Z" },
 ]
 
 [[package]]
@@ -2077,7 +2077,7 @@ wheels = [
 
 [[package]]
 name = "ocrmypdf"
-version = "16.12.0"
+version = "16.13.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "deprecation", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -2090,9 +2090,9 @@ dependencies = [
     { name = "pluggy", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "rich", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2b/ed/dacc0f189e4fcefc52d709e9961929e3f622a85efa5ae47c9d9663d75cab/ocrmypdf-16.12.0.tar.gz", hash = "sha256:a0f6509e7780b286391f8847fae1811d2b157b14283ad74a2431d6755c5c0ed0", size = 7037326, upload-time = "2025-11-11T22:30:14.223Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8c/52/be1aaece0703a736757d8957c0d4f19c37561054169b501eb0e7132f15e5/ocrmypdf-16.13.0.tar.gz", hash = "sha256:29d37e915234ce717374863a9cc5dd32d29e063dfe60c51380dda71254c88248", size = 7042247, upload-time = "2025-12-24T07:58:35.86Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ce/34/d9d04420e6f7a71e2135b41599dae273e4ef36e2ce79b065b65fb2471636/ocrmypdf-16.12.0-py3-none-any.whl", hash = "sha256:0ea5c42027db9cf3bd12b0d0b4190689027ef813fdad3377106ea66bba0012c3", size = 163415, upload-time = "2025-11-11T22:30:11.56Z" },
+    { url = "https://files.pythonhosted.org/packages/41/b1/e2e7ad98de0d3ee05b44dbc3f78ccb158a620f3add82d00c85490120e7f2/ocrmypdf-16.13.0-py3-none-any.whl", hash = "sha256:fad8a6f7cc52cdc6225095c401a1766c778c47efe9f1e854ae4dc64a550a3d37", size = 165377, upload-time = "2025-12-24T07:58:33.925Z" },
 ]
 
 [[package]]
@@ -2282,7 +2282,7 @@ requires-dist = [
     { name = "drf-writable-nested", specifier = "~=0.7.1" },
     { name = "filelock", specifier = "~=3.20.0" },
     { name = "flower", specifier = "~=2.0.1" },
-    { name = "gotenberg-client", specifier = "~=0.12.0" },
+    { name = "gotenberg-client", specifier = "~=0.13.1" },
     { name = "granian", extras = ["uvloop"], marker = "extra == 'webserver'", specifier = "~=2.5.1" },
     { name = "httpx-oauth", specifier = "~=0.16" },
     { name = "imap-tools", specifier = "~=1.11.0" },
@@ -2291,7 +2291,7 @@ requires-dist = [
     { name = "langdetect", specifier = "~=1.0.9" },
     { name = "mysqlclient", marker = "extra == 'mariadb'", specifier = "~=2.2.7" },
     { name = "nltk", specifier = "~=3.9.1" },
-    { name = "ocrmypdf", specifier = "~=16.12.0" },
+    { name = "ocrmypdf", specifier = "~=16.13.0" },
     { name = "pathvalidate", specifier = "~=3.3.1" },
     { name = "pdf2image", specifier = "~=1.17.0" },
     { name = "psycopg", extras = ["c", "pool"], marker = "extra == 'postgres'", specifier = "==3.2.12" },
