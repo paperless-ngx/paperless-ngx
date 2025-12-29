@@ -12,9 +12,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        env:
+          GH_REF: ${{ github.ref }} # sonar rule:githubactions:S7630 - avoid injection
         with:
           token: ${{ secrets.PNGX_BOT_PAT }}
-          ref: ${{ github.head_ref }}
+          ref: $GH_REF
       - name: Set up Python
         id: setup-python
         uses: actions/setup-python@v6
