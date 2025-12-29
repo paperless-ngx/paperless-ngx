@@ -12,7 +12,7 @@ from documents.models import Document
 from documents.parsers import get_parser_class_for_mime_type
 
 
-def _process_document(doc_id):
+def _process_document(doc_id) -> None:
     document: Document = Document.objects.get(id=doc_id)
     parser_class = get_parser_class_for_mime_type(document.mime_type)
 
@@ -37,7 +37,7 @@ def _process_document(doc_id):
 class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
     help = "This will regenerate the thumbnails for all documents."
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument(
             "-d",
             "--document",

@@ -61,13 +61,13 @@ logger = logging.getLogger("paperless.tasks")
 
 
 @shared_task
-def index_optimize():
+def index_optimize() -> None:
     ix = index.open_index()
     writer = AsyncWriter(ix)
     writer.commit(optimize=True)
 
 
-def index_reindex(*, progress_bar_disable=False):
+def index_reindex(*, progress_bar_disable=False) -> None:
     documents = Document.objects.all()
 
     ix = index.open_index(recreate=True)
@@ -78,7 +78,7 @@ def index_reindex(*, progress_bar_disable=False):
 
 
 @shared_task
-def train_classifier(*, scheduled=True):
+def train_classifier(*, scheduled=True) -> None:
     task = PaperlessTask.objects.create(
         type=PaperlessTask.TaskType.SCHEDULED_TASK
         if scheduled
@@ -224,7 +224,7 @@ def sanity_check(*, scheduled=True, raise_on_error=True):
 
 
 @shared_task
-def bulk_update_documents(document_ids):
+def bulk_update_documents(document_ids) -> None:
     documents = Document.objects.filter(id__in=document_ids)
 
     ix = index.open_index()
@@ -244,7 +244,7 @@ def bulk_update_documents(document_ids):
 
 
 @shared_task
-def update_document_content_maybe_archive_file(document_id):
+def update_document_content_maybe_archive_file(document_id) -> None:
     """
     Re-creates OCR content and thumbnail for a document, and archive file if
     it exists.
@@ -352,7 +352,7 @@ def update_document_content_maybe_archive_file(document_id):
 
 
 @shared_task
-def empty_trash(doc_ids=None):
+def empty_trash(doc_ids=None) -> None:
     if doc_ids is None:
         logger.info("Emptying trash of all expired documents")
     documents = (
@@ -389,7 +389,7 @@ def empty_trash(doc_ids=None):
 
 
 @shared_task
-def check_scheduled_workflows():
+def check_scheduled_workflows() -> None:
     """
     Check and run all enabled scheduled workflows.
 

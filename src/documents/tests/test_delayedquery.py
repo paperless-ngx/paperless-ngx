@@ -6,7 +6,7 @@ from documents.models import User
 
 
 class TestDelayedQuery(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         # all tests run without permission criteria, so has_no_owner query will always
         # be appended.
@@ -40,7 +40,7 @@ class TestDelayedQuery(TestCase):
             ),
         )
 
-    def test_get_permission_criteria(self):
+    def test_get_permission_criteria(self) -> None:
         # tests contains tuples of user instances and the expected filter
         tests = (
             (None, [query.Term("has_owner", text=False)]),

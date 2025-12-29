@@ -650,7 +650,7 @@ def reflect_doclinks(
     document: Document,
     field: CustomField,
     target_doc_ids: list[int],
-):
+) -> None:
     """
     Add or remove 'symmetrical' links to `document` on all `target_doc_ids`
     """
@@ -713,7 +713,7 @@ def remove_doclink(
     document: Document,
     field: CustomField,
     target_doc_id: int,
-):
+) -> None:
     """
     Removes a 'symmetrical' link to `document` from the target document's existing custom field instance
     """

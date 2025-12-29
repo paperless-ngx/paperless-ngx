@@ -184,12 +184,12 @@ def generate_filename(doc, *, counter=0, append_gpg=True, archive_filename=False
 ###############################################################################
 
 
-def parse_wrapper(parser, path, mime_type, file_name):
+def parse_wrapper(parser, path, mime_type, file_name) -> None:
     # this is here so that I can mock this out for testing.
     parser.parse(path, mime_type, file_name)
 
 
-def create_archive_version(doc, retry_count=3):
+def create_archive_version(doc, retry_count=3) -> None:
     from documents.parsers import DocumentParser
     from documents.parsers import ParseError
     from documents.parsers import get_parser_class_for_mime_type
@@ -245,7 +245,7 @@ def create_archive_version(doc, retry_count=3):
             parser.cleanup()
 
 
-def move_old_to_new_locations(apps, schema_editor):
+def move_old_to_new_locations(apps, schema_editor) -> None:
     Document = apps.get_model("documents", "Document")
 
     affected_document_ids = set()
@@ -302,7 +302,7 @@ def move_old_to_new_locations(apps, schema_editor):
         create_archive_version(doc)
 
 
-def move_new_to_old_locations(apps, schema_editor):
+def move_new_to_old_locations(apps, schema_editor) -> None:
     Document = apps.get_model("documents", "Document")
 
     old_archive_paths = set()

@@ -20,7 +20,7 @@ from documents.tests.utils import FileSystemAssertsMixin
 
 
 class TestIndexReindex(DirectoriesMixin, TestCase):
-    def test_index_reindex(self):
+    def test_index_reindex(self) -> None:
         Document.objects.create(
             title="test",
             content="my document",
@@ -32,7 +32,7 @@ class TestIndexReindex(DirectoriesMixin, TestCase):
 
         tasks.index_reindex()
 
-    def test_index_optimize(self):
+    def test_index_optimize(self) -> None:
         Document.objects.create(
             title="test",
             content="my document",
@@ -47,12 +47,12 @@ class TestIndexReindex(DirectoriesMixin, TestCase):
 
 class TestClassifier(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @mock.patch("documents.tasks.load_classifier")
-    def test_train_classifier_no_auto_matching(self, load_classifier):
+    def test_train_classifier_no_auto_matching(self, load_classifier) -> None:
         tasks.train_classifier()
         load_classifier.assert_not_called()
 
     @mock.patch("documents.tasks.load_classifier")
-    def test_train_classifier_with_auto_tag(self, load_classifier):
+    def test_train_classifier_with_auto_tag(self, load_classifier) -> None:
         load_classifier.return_value = None
         Tag.objects.create(matching_algorithm=Tag.MATCH_AUTO, name="test")
         tasks.train_classifier()
@@ -60,7 +60,7 @@ class TestClassifier(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsNotFile(settings.MODEL_FILE)
 
     @mock.patch("documents.tasks.load_classifier")
-    def test_train_classifier_with_auto_type(self, load_classifier):
+    def test_train_classifier_with_auto_type(self, load_classifier) -> None:
         load_classifier.return_value = None
         DocumentType.objects.create(matching_algorithm=Tag.MATCH_AUTO, name="test")
         tasks.train_classifier()
@@ -68,14 +68,14 @@ class TestClassifier(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsNotFile(settings.MODEL_FILE)
 
     @mock.patch("documents.tasks.load_classifier")
-    def test_train_classifier_with_auto_correspondent(self, load_classifier):
+    def test_train_classifier_with_auto_correspondent(self, load_classifier) -> None:
         load_classifier.return_value = None
         Correspondent.objects.create(matching_algorithm=Tag.MATCH_AUTO, name="test")
         tasks.train_classifier()
         load_classifier.assert_called_once()
         self.assertIsNotFile(settings.MODEL_FILE)
 
-    def test_train_classifier(self):
+    def test_train_classifier(self) -> None:
         c = Correspondent.objects.create(matching_algorithm=Tag.MATCH_AUTO, name="test")
         doc = Document.objects.create(correspondent=c, content="test", title="test")
         self.assertIsNotFile(settings.MODEL_FILE)
@@ -104,13 +104,13 @@ class TestClassifier(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
 class TestSanityCheck(DirectoriesMixin, TestCase):
     @mock.patch("documents.tasks.sanity_checker.check_sanity")
-    def test_sanity_check_success(self, m):
+    def test_sanity_check_success(self, m) -> None:
         m.return_value = SanityCheckMessages()
         self.assertEqual(tasks.sanity_check(), "No issues detected.")
         m.assert_called_once()
 
     @mock.patch("documents.tasks.sanity_checker.check_sanity")
-    def test_sanity_check_error(self, m):
+    def test_sanity_check_error(self, m) -> None:
         messages = SanityCheckMessages()
         messages.error(None, "Some error")
         m.return_value = messages
@@ -118,7 +118,7 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
         m.assert_called_once()
 
     @mock.patch("documents.tasks.sanity_checker.check_sanity")
-    def test_sanity_check_error_no_raise(self, m):
+    def test_sanity_check_error_no_raise(self, m) -> None:
         messages = SanityCheckMessages()
         messages.error(None, "Some error")
         m.return_value = messages
@@ -131,7 +131,7 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
         m.assert_called_once()
 
     @mock.patch("documents.tasks.sanity_checker.check_sanity")
-    def test_sanity_check_warning(self, m):
+    def test_sanity_check_warning(self, m) -> None:
         messages = SanityCheckMessages()
         messages.warning(None, "Some warning")
         m.return_value = messages
@@ -142,7 +142,7 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
         m.assert_called_once()
 
     @mock.patch("documents.tasks.sanity_checker.check_sanity")
-    def test_sanity_check_info(self, m):
+    def test_sanity_check_info(self, m) -> None:
         messages = SanityCheckMessages()
         messages.info(None, "Some info")
         m.return_value = messages
@@ -154,7 +154,7 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
 
 
 class TestBulkUpdate(DirectoriesMixin, TestCase):
-    def test_bulk_update_documents(self):
+    def test_bulk_update_documents(self) -> None:
         doc1 = Document.objects.create(
             title="test",
             content="my document",
@@ -177,7 +177,7 @@ class TestEmptyTrashTask(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         - Document is only deleted if it has been in trash for more than delay (default 30 days)
     """
 
-    def test_empty_trash(self):
+    def test_empty_trash(self) -> None:
         doc = Document.objects.create(
             title="test",
             content="my document",
@@ -201,7 +201,7 @@ class TestEmptyTrashTask(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
 
 class TestUpdateContent(DirectoriesMixin, TestCase):
-    def test_update_content_maybe_archive_file(self):
+    def test_update_content_maybe_archive_file(self) -> None:
         """
         GIVEN:
             - Existing document with archive file
@@ -242,7 +242,7 @@ class TestUpdateContent(DirectoriesMixin, TestCase):
         self.assertNotEqual(Document.objects.get(pk=doc.pk).content, "test")
         self.assertNotEqual(Document.objects.get(pk=doc.pk).archive_checksum, "wow")
 
-    def test_update_content_maybe_archive_file_no_archive(self):
+    def test_update_content_maybe_archive_file_no_archive(self) -> None:
         """
         GIVEN:
             - Existing document without archive file

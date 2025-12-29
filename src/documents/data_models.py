@@ -164,7 +164,7 @@ class ConsumableDocument:
     mailrule_id: int | None = None
     mime_type: str = dataclasses.field(init=False, default=None)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """
         After a dataclass is initialized, this is called to finalize some data
         1. Make sure the original path is an absolute, fully qualified path
