@@ -262,20 +262,6 @@ def execute_webhook_action(
         )
 
 
-def parse_passwords(raw_passwords: str | None) -> list[str]:
-    """
-    Convert a comma/newline separated string of passwords into a clean list.
-    """
-    if not raw_passwords:
-        return []
-
-    return [
-        password.strip()
-        for password in re.split(r"[,\n]", raw_passwords)
-        if password.strip()
-    ]
-
-
 def execute_password_removal_action(
     action: WorkflowAction,
     document: Document,
@@ -284,7 +270,7 @@ def execute_password_removal_action(
     """
     Try to remove a password from a document using the configured list.
     """
-    passwords = parse_passwords(action.passwords)
+    passwords = action.passwords
     if not passwords:
         logger.warning(
             "Password removal action %s has no passwords configured",
@@ -292,6 +278,12 @@ def execute_password_removal_action(
             extra={"group": logging_group},
         )
         return
+
+    passwords = [
+        password.strip()
+        for password in re.split(r"[,\n]", passwords)
+        if password.strip()
+    ]
 
     # import here to avoid circular dependency
     from documents.bulk_edit import remove_password
