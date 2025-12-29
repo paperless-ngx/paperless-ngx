@@ -11,6 +11,7 @@ def text_consumer_declaration(sender, **kwargs):
         "mime_types": {
             "text/plain": ".txt",
             "text/csv": ".csv",
+            "text/xml": ".xml",
             "application/csv": ".csv",
         },
     }
