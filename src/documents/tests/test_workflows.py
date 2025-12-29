@@ -3594,6 +3594,30 @@ class TestWorkflows(
         )
 
     @mock.patch("documents.bulk_edit.remove_password")
+    def test_password_removal_action_fails_without_correct_password(
+        self,
+        mock_remove_password,
+    ):
+        doc = Document.objects.create(
+            title="Protected",
+            checksum="pw-checksum-2",
+        )
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+            passwords=" \n , ",
+        )
+        workflow = Workflow.objects.create(name="Password workflow missing passwords")
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        run_workflows(trigger.type, doc)
+
+        mock_remove_password.assert_not_called()
+
+    @mock.patch("documents.bulk_edit.remove_password")
     def test_password_removal_action_skips_without_passwords(
         self,
         mock_remove_password,
