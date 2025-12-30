@@ -19,9 +19,6 @@ def grant_share_link_bundle_permissions(apps, schema_editor):
         app_config.models_module = None
 
     add_document_perm = Permission.objects.filter(codename="add_document").first()
-    if add_document_perm is None:
-        return
-
     share_bundle_permissions = Permission.objects.filter(
         codename__contains="sharelinkbundle",
     )
