@@ -85,6 +85,8 @@
                       class="btn btn-outline-primary"
                       [disabled]="bundle.status !== statuses.Ready"
                       (click)="copy(bundle)"
+                      title="Copy share link"
+                      i18n-title
                     >
                       @if (copiedSlug === bundle.slug) {
                         <i-bs name="clipboard-check"></i-bs>
@@ -105,15 +107,14 @@
                         <span class="visually-hidden" i18n>Retry</span>
                       </button>
                     }
-                    <button
-                      type="button"
-                      class="btn btn-outline-danger"
+                    <pngx-confirm-button
+                      buttonClasses="btn btn-sm btn-outline-danger"
                       [disabled]="loading"
-                      (click)="delete(bundle)"
+                      (confirm)="delete(bundle)"
+                      iconName="trash"
                     >
-                      <i-bs name="trash"></i-bs>
                       <span class="visually-hidden" i18n>Delete share link bundle</span>
-                    </button>
+                    </pngx-confirm-button>
                   </div>
                 </td>
               </tr>
