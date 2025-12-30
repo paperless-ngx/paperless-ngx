@@ -90,7 +90,7 @@ export class BulkEditorComponent
   private customFieldService = inject(CustomFieldsService)
   private permissionService = inject(PermissionsService)
   private savedViewService = inject(SavedViewService)
-  private shareLinkBundleService = inject(ShareLinkBundleService)
+  private readonly shareLinkBundleService = inject(ShareLinkBundleService)
 
   tagSelectionModel = new FilterableDropdownSelectionModel(true)
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
@@ -962,7 +962,7 @@ export class BulkEditorComponent
   }
 
   manageShareLinkBundles() {
-    const modal = this.modalService.open(ShareLinkBundleManageDialogComponent, {
+    this.modalService.open(ShareLinkBundleManageDialogComponent, {
       backdrop: 'static',
       size: 'lg',
     })

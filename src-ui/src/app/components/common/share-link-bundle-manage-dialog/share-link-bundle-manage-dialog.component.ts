@@ -32,10 +32,10 @@ export class ShareLinkBundleManageDialogComponent
   extends LoadingComponentWithPermissions
   implements OnInit, OnDestroy
 {
-  private activeModal = inject(NgbActiveModal)
-  private shareLinkBundleService = inject(ShareLinkBundleService)
-  private toastService = inject(ToastService)
-  private clipboard = inject(Clipboard)
+  private readonly activeModal = inject(NgbActiveModal)
+  private readonly shareLinkBundleService = inject(ShareLinkBundleService)
+  private readonly toastService = inject(ToastService)
+  private readonly clipboard = inject(Clipboard)
 
   title = $localize`Share link bundles`
 
