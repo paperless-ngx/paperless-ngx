@@ -13,6 +13,7 @@ from pikepdf import Page
 from pikepdf import PasswordError
 from pikepdf import Pdf
 
+from documents.consumer import ConsumerPreflightPlugin
 from documents.converters import convert_from_tiff_to_pdf
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
@@ -193,6 +194,15 @@ class BarcodePlugin(ConsumeTaskPlugin):
         ):
             logger.info(f"Found ASN in barcode: {located_asn}")
             self.metadata.asn = located_asn
+            # (Re-)run the preflight ASN check
+            preflight_plugin = ConsumerPreflightPlugin(
+                input_doc=self.input_doc,
+                metadata=self.metadata,
+                status_mgr=self.status_mgr,
+                base_tmp_dir=self.base_tmp_dir,
+                task_id=self.task_id,
+            )
+            preflight_plugin.pre_check_asn_value()
 
     def cleanup(self) -> None:
         self.temp_dir.cleanup()
