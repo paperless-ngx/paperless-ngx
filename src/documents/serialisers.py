@@ -2275,10 +2275,7 @@ class ShareLinkBundleSerializer(OwnedObjectSerializer):
         return share_link_bundle
 
     def get_document_count(self, obj: ShareLinkBundle) -> int:
-        count = getattr(obj, "document_total", None)
-        if count is not None:
-            return count
-        return obj.documents.count()
+        return getattr(obj, "document_total") or obj.documents.count()
 
 
 class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
