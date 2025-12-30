@@ -59,6 +59,20 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("document_ids", response.data)
 
+    @mock.patch("documents.views.has_perms_owner_aware", return_value=False)
+    def test_create_bundle_rejects_insufficient_permissions(self, perms_mock):
+        payload = {
+            "document_ids": [self.document.pk],
+            "file_version": ShareLink.FileVersion.ARCHIVE,
+            "expiration_days": 7,
+        }
+
+        response = self.client.post(self.ENDPOINT, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("document_ids", response.data)
+        perms_mock.assert_called()
+
     @mock.patch("documents.views.build_share_link_bundle.delay")
     def test_rebuild_bundle_resets_state(self, delay_mock):
         bundle = ShareLinkBundle.objects.create(
@@ -253,6 +267,30 @@ class ShareLinkBundleTaskTests(DirectoriesMixin, APITestCase):
         self.assertFalse(expired_path.exists())
         self.assertTrue(active_path.exists())
 
+    def test_cleanup_expired_share_link_bundles_logs_on_failure(self):
+        expired_bundle = ShareLinkBundle.objects.create(
+            slug="expired-bundle",
+            file_version=ShareLink.FileVersion.ARCHIVE,
+            status=ShareLinkBundle.Status.READY,
+            expiration=timezone.now() - timedelta(days=1),
+        )
+        expired_bundle.documents.set([self.document])
+
+        with mock.patch.object(
+            ShareLinkBundle,
+            "hard_delete",
+            side_effect=RuntimeError("fail"),
+        ):
+            with self.assertLogs("paperless.tasks", level="WARNING") as logs:
+                cleanup_expired_share_link_bundles()
+
+        self.assertTrue(
+            any(
+                "Failed to delete expired share link bundle" in msg
+                for msg in logs.output
+            ),
+        )
+
 
 class ShareLinkBundleBuildTaskTests(DirectoriesMixin, APITestCase):
     def setUp(self):
@@ -308,6 +346,26 @@ class ShareLinkBundleBuildTaskTests(DirectoriesMixin, APITestCase):
             self.assertEqual(len(names), 1)
             self.assertEqual(zipf.read(names[0]), archive_path.read_bytes())
 
+    def test_build_share_link_bundle_overwrites_existing_file(self):
+        self._write_document_file(archive=False, content=b"source")
+        bundle = ShareLinkBundle.objects.create(
+            slug="overwrite",
+            file_version=ShareLink.FileVersion.ORIGINAL,
+        )
+        bundle.documents.set([self.document])
+
+        existing = settings.SHARE_LINK_BUNDLE_DIR / "overwrite.zip"
+        existing.parent.mkdir(parents=True, exist_ok=True)
+        existing.write_bytes(b"old")
+
+        build_share_link_bundle(bundle.pk)
+
+        bundle.refresh_from_db()
+        final_path = bundle.absolute_file_path
+        self.assertIsNotNone(final_path)
+        self.assertTrue(final_path.exists())
+        self.assertNotEqual(final_path.read_bytes(), b"old")
+
     def test_build_share_link_bundle_stores_absolute_path_outside_media_root(self):
         settings.SHARE_LINK_BUNDLE_DIR = Path(settings.DATA_DIR) / "share_link_bundles"
         self._write_document_file(archive=False, content=b"source")
@@ -331,10 +389,16 @@ class ShareLinkBundleBuildTaskTests(DirectoriesMixin, APITestCase):
         )
         bundle.documents.set([self.document])
 
-        with mock.patch(
-            "documents.tasks.OriginalsOnlyStrategy.add_document",
-            side_effect=RuntimeError("zip failure"),
+        with (
+            mock.patch(
+                "documents.tasks.OriginalsOnlyStrategy.add_document",
+                side_effect=RuntimeError("zip failure"),
+            ),
+            mock.patch("pathlib.Path.unlink") as unlink_mock,
         ):
+            unlink_mock.side_effect = [OSError("unlink"), OSError("unlink-finally")] + [
+                None,
+            ] * 5
             with self.assertRaises(RuntimeError):
                 build_share_link_bundle(bundle.pk)
 
@@ -342,7 +406,13 @@ class ShareLinkBundleBuildTaskTests(DirectoriesMixin, APITestCase):
         self.assertEqual(bundle.status, ShareLinkBundle.Status.FAILED)
         self.assertEqual(bundle.last_error, "zip failure")
         scratch_zips = list(Path(settings.SCRATCH_DIR).glob("*.zip"))
-        self.assertFalse(scratch_zips)
+        self.assertTrue(scratch_zips)
+        for path in scratch_zips:
+            path.unlink(missing_ok=True)
+
+    def test_build_share_link_bundle_missing_bundle_noop(self):
+        # Should not raise when bundle does not exist
+        build_share_link_bundle(99999)
 
 
 class ShareLinkBundleFilterSetTests(DirectoriesMixin, APITestCase):
@@ -389,6 +459,14 @@ class ShareLinkBundleFilterSetTests(DirectoriesMixin, APITestCase):
 
         self.assertCountEqual(filterset.qs, [self.bundle_one, self.bundle_two])
 
+    def test_filter_documents_returns_queryset_for_empty_ids(self):
+        filterset = ShareLinkBundleFilterSet(
+            data={"documents": ","},
+            queryset=ShareLinkBundle.objects.all(),
+        )
+
+        self.assertCountEqual(filterset.qs, [self.bundle_one, self.bundle_two])
+
 
 class ShareLinkBundleModelTests(DirectoriesMixin, APITestCase):
     def test_absolute_file_path_handles_relative_and_absolute(self):
@@ -407,7 +485,15 @@ class ShareLinkBundleModelTests(DirectoriesMixin, APITestCase):
         absolute_path = Path(self.dirs.media_dir) / "absolute.zip"
         bundle.file_path = str(absolute_path)
 
-        self.assertEqual(bundle.absolute_file_path, absolute_path.resolve())
+        self.assertEqual(bundle.absolute_file_path.resolve(), absolute_path.resolve())
+
+    def test_str_returns_translated_slug(self):
+        bundle = ShareLinkBundle.objects.create(
+            slug="string-slug",
+            file_version=ShareLink.FileVersion.ORIGINAL,
+        )
+
+        self.assertIn("string-slug", str(bundle))
 
     def test_remove_file_deletes_existing_file(self):
         bundle_path = (
@@ -427,6 +513,61 @@ class ShareLinkBundleModelTests(DirectoriesMixin, APITestCase):
         bundle.remove_file()
 
         self.assertFalse(bundle_path.exists())
+
+    def test_remove_file_handles_oserror(self):
+        bundle_path = (
+            Path(settings.MEDIA_ROOT)
+            / "documents"
+            / "share_link_bundles"
+            / "remove-error.zip"
+        )
+        bundle_path.parent.mkdir(parents=True, exist_ok=True)
+        bundle_path.write_bytes(b"remove-me")
+        bundle = ShareLinkBundle.objects.create(
+            slug="remove-error",
+            file_version=ShareLink.FileVersion.ORIGINAL,
+            file_path=str(bundle_path.relative_to(settings.MEDIA_ROOT)),
+        )
+
+        with mock.patch("pathlib.Path.unlink", side_effect=OSError("fail")):
+            bundle.remove_file()
+
+        self.assertTrue(bundle_path.exists())
+
+    def test_delete_and_hard_delete_call_remove_file(self):
+        bundle_path = (
+            Path(settings.MEDIA_ROOT)
+            / "documents"
+            / "share_link_bundles"
+            / "delete.zip"
+        )
+        bundle_path.parent.mkdir(parents=True, exist_ok=True)
+        bundle_path.write_bytes(b"remove-me")
+        bundle = ShareLinkBundle.objects.create(
+            slug="delete-bundle",
+            file_version=ShareLink.FileVersion.ORIGINAL,
+            file_path=str(bundle_path.relative_to(settings.MEDIA_ROOT)),
+        )
+
+        bundle.delete()
+        self.assertFalse(bundle_path.exists())
+
+        bundle2_path = (
+            Path(settings.MEDIA_ROOT)
+            / "documents"
+            / "share_link_bundles"
+            / "harddelete.zip"
+        )
+        bundle2_path.parent.mkdir(parents=True, exist_ok=True)
+        bundle2_path.write_bytes(b"remove-me")
+        bundle2 = ShareLinkBundle.objects.create(
+            slug="harddelete-bundle",
+            file_version=ShareLink.FileVersion.ORIGINAL,
+            file_path=str(bundle2_path.relative_to(settings.MEDIA_ROOT)),
+        )
+
+        bundle2.hard_delete()
+        self.assertFalse(bundle2_path.exists())
 
 
 class ShareLinkBundleSerializerTests(DirectoriesMixin, APITestCase):
