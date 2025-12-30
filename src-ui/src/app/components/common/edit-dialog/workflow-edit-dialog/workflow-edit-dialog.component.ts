@@ -139,6 +139,10 @@ export const WORKFLOW_ACTION_OPTIONS = [
     id: WorkflowActionType.Webhook,
     name: $localize`Webhook`,
   },
+  {
+    id: WorkflowActionType.PasswordRemoval,
+    name: $localize`Password removal`,
+  },
 ]
 
 export enum TriggerFilterType {
@@ -1133,6 +1137,7 @@ export class WorkflowEditDialogComponent
           headers: new FormControl(action.webhook?.headers),
           include_document: new FormControl(!!action.webhook?.include_document),
         }),
+        passwords: new FormControl(action.passwords),
       }),
       { emitEvent }
     )
