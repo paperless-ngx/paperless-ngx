@@ -11,6 +11,7 @@ from django.test import override_settings
 
 from documents import tasks
 from documents.barcodes import BarcodePlugin
+from documents.consumer import ConsumerError
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
@@ -92,6 +93,41 @@ class TestBarcode(
             separator_page_numbers = reader.get_separation_pages()
 
             self.assertDictEqual(separator_page_numbers, {1: False})
+
+    @override_settings(CONSUMER_ENABLE_ASN_BARCODE=True)
+    def test_asn_barcode_duplicate_in_trash_fails(self):
+        """
+        GIVEN:
+            - A document with ASN barcode 123 is in the trash
+        WHEN:
+            - A file with the same barcode ASN is consumed
+        THEN:
+            - The ASN check is re-run and consumption fails
+        """
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-123.pdf"
+
+        first_doc = Document.objects.create(
+            title="First ASN 123",
+            content="",
+            checksum="asn123first",
+            mime_type="application/pdf",
+            archive_serial_number=123,
+        )
+
+        first_doc.delete()
+
+        dupe_asn = settings.SCRATCH_DIR / "barcode-39-asn-123-second.pdf"
+        shutil.copy(test_file, dupe_asn)
+
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
+            with self.assertRaisesRegex(ConsumerError, r"ASN 123.*trash"):
+                tasks.consume_file(
+                    ConsumableDocument(
+                        source=DocumentSource.ConsumeFolder,
+                        original_file=dupe_asn,
+                    ),
+                    None,
+                )
 
     @override_settings(
         CONSUMER_BARCODE_TIFF_SUPPORT=True,
