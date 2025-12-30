@@ -16,11 +16,17 @@ import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
+import { ConfirmButtonComponent } from '../confirm-button/confirm-button.component'
 
 @Component({
   selector: 'pngx-share-link-bundle-manage-dialog',
   templateUrl: './share-link-bundle-manage-dialog.component.html',
-  imports: [CommonModule, NgxBootstrapIconsModule, FileSizePipe],
+  imports: [
+    ConfirmButtonComponent,
+    CommonModule,
+    NgxBootstrapIconsModule,
+    FileSizePipe,
+  ],
 })
 export class ShareLinkBundleManageDialogComponent
   extends LoadingComponentWithPermissions
