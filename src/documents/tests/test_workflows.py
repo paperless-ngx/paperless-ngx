@@ -3555,6 +3555,15 @@ class TestWorkflows(
         self,
         mock_remove_password,
     ):
+        """
+        GIVEN:
+            - Workflow password removal action
+            - Multiple passwords provided
+        WHEN:
+            - Document updated triggering the workflow
+        THEN:
+            - Password removal is attempted until one succeeds
+        """
         doc = Document.objects.create(
             title="Protected",
             checksum="pw-checksum",
@@ -3600,6 +3609,15 @@ class TestWorkflows(
         self,
         mock_remove_password,
     ):
+        """
+        GIVEN:
+            - Workflow password removal action
+            - No correct password provided
+        WHEN:
+            - Document updated triggering the workflow
+        THEN:
+            - Password removal is attempted for all passwords and fails
+        """
         doc = Document.objects.create(
             title="Protected",
             checksum="pw-checksum-2",
@@ -3624,6 +3642,14 @@ class TestWorkflows(
         self,
         mock_remove_password,
     ):
+        """
+        GIVEN:
+            - Workflow password removal action with no passwords
+        WHEN:
+            - Workflow is run
+        THEN:
+            - Password removal is not attempted
+        """
         doc = Document.objects.create(
             title="Protected",
             checksum="pw-checksum-2",
@@ -3648,6 +3674,15 @@ class TestWorkflows(
         self,
         mock_remove_password,
     ):
+        """
+        GIVEN:
+            - Workflow password removal action
+            - Simulated consumption trigger (a ConsumableDocument is used)
+        WHEN:
+            - Document consumption is finished
+        THEN:
+            - Password removal is attempted
+        """
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
             passwords="first, second",
