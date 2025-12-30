@@ -18,9 +18,12 @@ from django.core.exceptions import ValidationError
 from django.core.validators import DecimalValidator
 from django.core.validators import EmailValidator
 from django.core.validators import MaxLengthValidator
+from django.core.validators import MaxValueValidator
+from django.core.validators import MinValueValidator
 from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
 from django.db.models import Count
+from django.db.models.functions import Lower
 from django.utils.crypto import get_random_string
 from django.utils.dateparse import parse_datetime
 from django.utils.text import slugify
@@ -38,6 +41,7 @@ from guardian.utils import get_user_obj_perms_model
 from rest_framework import fields
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
+from rest_framework.filters import OrderingFilter
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.context import set_actor
@@ -69,6 +73,7 @@ from documents.parsers import is_mime_type_supported
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import set_permissions_for_object
+from documents.regex import validate_regex_pattern
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.templating.utils import convert_format_str_to_template_format
 from documents.validators import uri_validator
@@ -139,10 +144,11 @@ class MatchingModelSerializer(serializers.ModelSerializer):
             and self.initial_data["matching_algorithm"] == MatchingModel.MATCH_REGEX
         ):
             try:
-                re.compile(match)
-            except re.error as e:
+                validate_regex_pattern(match)
+            except ValueError as e:
+                logger.debug(f"Invalid regular expression: {e!s}")
                 raise serializers.ValidationError(
-                    _("Invalid regular expression: %(error)s") % {"error": str(e.msg)},
+                    "Invalid regular expression, see log for details.",
                 )
         return match
 
@@ -575,15 +581,29 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     )
     def get_children(self, obj):
         filter_q = self.context.get("document_count_filter")
+        request = self.context.get("request")
         if filter_q is None:
-            request = self.context.get("request")
             user = getattr(request, "user", None) if request else None
             filter_q = get_document_count_filter_for_user(user)
             self.context["document_count_filter"] = filter_q
-        serializer = TagSerializer(
+
+        children_queryset = (
             obj.get_children_queryset()
             .select_related("owner")
-            .annotate(document_count=Count("documents", filter=filter_q)),
+            .annotate(document_count=Count("documents", filter=filter_q))
+        )
+
+        view = self.context.get("view")
+        ordering = (
+            OrderingFilter().get_ordering(request, children_queryset, view)
+            if request and view
+            else None
+        )
+        ordering = ordering or (Lower("name"),)
+        children_queryset = children_queryset.order_by(*ordering)
+
+        serializer = TagSerializer(
+            children_queryset,
             many=True,
             user=self.user,
             full_perms=self.full_perms,
@@ -857,6 +877,13 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
                 uri_validator(data["value"])
             elif field.data_type == CustomField.FieldDataType.INT:
                 integer_validator(data["value"])
+                try:
+                    value_int = int(data["value"])
+                except (TypeError, ValueError):
+                    raise serializers.ValidationError("Enter a valid integer.")
+                # Keep values within the PostgreSQL integer range
+                MinValueValidator(-2147483648)(value_int)
+                MaxValueValidator(2147483647)(value_int)
             elif (
                 field.data_type == CustomField.FieldDataType.MONETARY
                 and data["value"] != ""

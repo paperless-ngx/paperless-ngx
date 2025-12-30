@@ -23,7 +23,6 @@ import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
@@ -84,7 +83,6 @@ describe('MailComponent', () => {
         CustomDatePipe,
         ConfirmDialogComponent,
         CheckComponent,
-        SafeHtmlPipe,
         SelectComponent,
         TextComponent,
         PasswordComponent,

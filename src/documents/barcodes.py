@@ -186,7 +186,11 @@ class BarcodePlugin(ConsumeTaskPlugin):
 
         # Update/overwrite an ASN if possible
         # After splitting, as otherwise each split document gets the same ASN
-        if self.settings.barcode_enable_asn and (located_asn := self.asn) is not None:
+        if (
+            self.settings.barcode_enable_asn
+            and not self.metadata.skip_asn
+            and (located_asn := self.asn) is not None
+        ):
             logger.info(f"Found ASN in barcode: {located_asn}")
             self.metadata.asn = located_asn
 

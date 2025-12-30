@@ -581,7 +581,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             - Consume file should be called
         """
         doc_ids = [self.doc1.id, self.doc2.id, self.doc3.id]
-        metadata_document_id = self.doc1.id
+        metadata_document_id = self.doc2.id
         user = User.objects.create(username="test_user")
 
         result = bulk_edit.merge(
@@ -602,11 +602,14 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             expected_filename,
         )
         self.assertEqual(consume_file_args[1].title, None)
+        self.assertTrue(consume_file_args[1].skip_asn)
 
         # With metadata_document_id overrides
         result = bulk_edit.merge(doc_ids, metadata_document_id=metadata_document_id)
         consume_file_args, _ = mock_consume_file.call_args
-        self.assertEqual(consume_file_args[1].title, "A (merged)")
+        self.assertEqual(consume_file_args[1].title, "B (merged)")
+        self.assertEqual(consume_file_args[1].created, self.doc2.created)
+        self.assertTrue(consume_file_args[1].skip_asn)
 
         self.assertEqual(result, "OK")
 
@@ -647,6 +650,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             expected_filename,
         )
         self.assertEqual(consume_file_args[1].title, None)
+        self.assertTrue(consume_file_args[1].skip_asn)
 
         delete_documents_args, _ = mock_delete_documents.call_args
         self.assertEqual(

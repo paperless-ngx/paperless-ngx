@@ -71,7 +71,7 @@ export class PreviewPopupComponent implements OnDestroy {
     return (this.isPdf && this.useNativePdfViewer) || !this.isPdf
   }
 
-  get previewURL() {
+  get previewUrl() {
     return this.documentService.getPreviewUrl(this.document.id)
   }
 
@@ -93,7 +93,7 @@ export class PreviewPopupComponent implements OnDestroy {
   init() {
     if (this.document.mime_type?.includes('text')) {
       this.http
-        .get(this.previewURL, { responseType: 'text' })
+        .get(this.previewUrl, { responseType: 'text' })
         .pipe(first(), takeUntil(this.unsubscribeNotifier))
         .subscribe({
           next: (res) => {
@@ -124,10 +124,6 @@ export class PreviewPopupComponent implements OnDestroy {
         phraseSearch: true,
       })
     }
-  }
-
-  get previewUrl() {
-    return this.documentService.getPreviewUrl(this.document.id)
   }
 
   mouseEnterPreview() {

@@ -14,7 +14,7 @@
         @if (previewText) {
           <div class="bg-light p-3 overflow-auto whitespace-preserve" width="100%">{{previewText}}</div>
         } @else {
-          <object [data]="previewURL | safeUrl" width="100%" class="bg-light" [class.p-2]="!isPdf"></object>
+          <object [data]="previewUrl | safeUrl" width="100%" class="bg-light" [class.p-2]="!isPdf"></object>
         }
       } @else {
         @if (requiresPassword) {
@@ -24,7 +24,7 @@
         }
         @if (!requiresPassword) {
           <pdf-viewer
-            [src]="previewURL"
+            [src]="previewUrl"
             [original-size]="false"
             [show-borders]="false"
             [show-all]="true"

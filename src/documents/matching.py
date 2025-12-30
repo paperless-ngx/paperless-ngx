@@ -20,6 +20,7 @@ from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
+from documents.regex import safe_regex_search
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -152,7 +153,7 @@ def match_storage_paths(document: Document, classifier: DocumentClassifier, user
 
 
 def matches(matching_model: MatchingModel, document: Document):
-    search_kwargs = {}
+    search_flags = 0
 
     document_content = document.content
 
@@ -161,14 +162,18 @@ def matches(matching_model: MatchingModel, document: Document):
         return False
 
     if matching_model.is_insensitive:
-        search_kwargs = {"flags": re.IGNORECASE}
+        search_flags = re.IGNORECASE
 
     if matching_model.matching_algorithm == MatchingModel.MATCH_NONE:
         return False
 
     elif matching_model.matching_algorithm == MatchingModel.MATCH_ALL:
         for word in _split_match(matching_model):
-            search_result = re.search(rf"\b{word}\b", document_content, **search_kwargs)
+            search_result = re.search(
+                rf"\b{word}\b",
+                document_content,
+                flags=search_flags,
+            )
             if not search_result:
                 return False
         log_reason(
@@ -180,7 +185,7 @@ def matches(matching_model: MatchingModel, document: Document):
 
     elif matching_model.matching_algorithm == MatchingModel.MATCH_ANY:
         for word in _split_match(matching_model):
-            if re.search(rf"\b{word}\b", document_content, **search_kwargs):
+            if re.search(rf"\b{word}\b", document_content, flags=search_flags):
                 log_reason(matching_model, document, f"it contains this word: {word}")
                 return True
         return False
@@ -190,7 +195,7 @@ def matches(matching_model: MatchingModel, document: Document):
             re.search(
                 rf"\b{re.escape(matching_model.match)}\b",
                 document_content,
-                **search_kwargs,
+                flags=search_flags,
             ),
         )
         if result:
@@ -202,16 +207,11 @@ def matches(matching_model: MatchingModel, document: Document):
         return result
 
     elif matching_model.matching_algorithm == MatchingModel.MATCH_REGEX:
-        try:
-            match = re.search(
-                re.compile(matching_model.match, **search_kwargs),
-                document_content,
-            )
-        except re.error:
-            logger.error(
-                f"Error while processing regular expression {matching_model.match}",
-            )
-            return False
+        match = safe_regex_search(
+            matching_model.match,
+            document_content,
+            flags=search_flags,
+        )
         if match:
             log_reason(
                 matching_model,

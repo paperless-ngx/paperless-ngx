@@ -787,6 +787,7 @@ LANGUAGES = [
     ("fi-fi", _("Finnish")),
     ("fr-fr", _("French")),
     ("hu-hu", _("Hungarian")),
+    ("id-id", _("Indonesian")),
     ("it-it", _("Italian")),
     ("ja-jp", _("Japanese")),
     ("ko-kr", _("Korean")),
