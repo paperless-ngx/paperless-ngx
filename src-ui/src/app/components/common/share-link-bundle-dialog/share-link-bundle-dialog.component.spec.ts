@@ -76,6 +76,18 @@ describe('ShareLinkBundleDialogComponent', () => {
     })
     expect(component.buttonsEnabled).toBe(false)
     expect(confirmSpy).toHaveBeenCalled()
+
+    component.form.setValue({
+      shareArchiveVersion: true,
+      expirationDays: 7,
+    })
+    component.submit()
+
+    expect(component.payload).toEqual({
+      document_ids: [1, 2],
+      file_version: FileVersion.Archive,
+      expiration_days: 7,
+    })
   })
 
   it('ignores submit when bundle already created', () => {
