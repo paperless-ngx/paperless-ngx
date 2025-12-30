@@ -925,14 +925,10 @@ export class BulkEditorComponent
     dialog.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        const payload = dialog.payload
-        if (!payload) {
-          return
-        }
         dialog.loading = true
         dialog.buttonsEnabled = false
         this.shareLinkBundleService
-          .createBundle(payload)
+          .createBundle(dialog.payload)
           .pipe(first())
           .subscribe({
             next: (result) => {
