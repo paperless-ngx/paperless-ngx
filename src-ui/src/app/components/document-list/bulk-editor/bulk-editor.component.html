@@ -96,12 +96,34 @@
           <button ngbDropdownItem (click)="mergeSelected()" [disabled]="!userCanAdd || list.selected.size < 2">
             <i-bs name="journals"></i-bs>&nbsp;<ng-container i18n>Merge</ng-container>
           </button>
-          @if (emailEnabled) {
-            <button ngbDropdownItem (click)="emailSelected()">
-              <i-bs name="envelope"></i-bs>&nbsp;<ng-container i18n>Email</ng-container>
-            </button>
-          }
         </div>
+      </div>
+    </div>
+    <div class="btn-toolbar" ngbDropdown>
+      <button
+        class="btn btn-sm btn-outline-primary"
+        id="dropdownSend"
+        ngbDropdownToggle
+        [disabled]="disabled || list.selected.size === 0"
+      >
+        <i-bs name="send"></i-bs>
+        <div class="d-none d-sm-inline">
+          &nbsp;<ng-container i18n>Send</ng-container>
+        </div>
+      </button>
+      <div ngbDropdownMenu aria-labelledby="dropdownSend" class="shadow">
+        <button ngbDropdownItem (click)="createShareLinkBundle()">
+          <i-bs name="link"></i-bs>&nbsp;<ng-container i18n>Create a share link bundle</ng-container>
+        </button>
+        <button ngbDropdownItem (click)="manageShareLinkBundles()">
+          <i-bs name="list-ul"></i-bs>&nbsp;<ng-container i18n>Manage share link bundles</ng-container>
+        </button>
+        <div class="dropdown-divider"></div>
+        @if (emailEnabled) {
+          <button ngbDropdownItem (click)="emailSelected()">
+            <i-bs name="envelope"></i-bs>&nbsp;<ng-container i18n>Email</ng-container>
+          </button>
+        }
       </div>
     </div>
     <div class="btn-group btn-group-sm">
