@@ -2,6 +2,7 @@ import datetime
 import json
 import shutil
 import socket
+import tempfile
 from datetime import timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -60,6 +61,7 @@ from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
+from documents.workflows.actions import execute_password_removal_action
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
@@ -3640,6 +3642,68 @@ class TestWorkflows(
         run_workflows(trigger.type, doc)
 
         mock_remove_password.assert_not_called()
+
+    @mock.patch("documents.bulk_edit.remove_password")
+    def test_password_removal_consumable_document_deferred(
+        self,
+        mock_remove_password,
+    ):
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+            passwords="first, second",
+        )
+
+        temp_dir = Path(tempfile.mkdtemp())
+        original_file = temp_dir / "file.pdf"
+        original_file.write_bytes(b"pdf content")
+        consumable = ConsumableDocument(
+            source=DocumentSource.ApiUpload,
+            original_file=original_file,
+        )
+
+        execute_password_removal_action(action, consumable, logging_group=None)
+
+        mock_remove_password.assert_not_called()
+
+        mock_remove_password.side_effect = [
+            ValueError("bad password"),
+            "OK",
+        ]
+
+        doc = Document.objects.create(
+            checksum="pw-checksum-consumed",
+            title="Protected",
+        )
+
+        document_consumption_finished.send(
+            sender=self.__class__,
+            document=doc,
+        )
+
+        assert mock_remove_password.call_count == 2
+        mock_remove_password.assert_has_calls(
+            [
+                mock.call(
+                    [doc.id],
+                    password="first",
+                    update_document=True,
+                    user=doc.owner,
+                ),
+                mock.call(
+                    [doc.id],
+                    password="second",
+                    update_document=True,
+                    user=doc.owner,
+                ),
+            ],
+        )
+
+        # ensure handler disconnected after first run
+        document_consumption_finished.send(
+            sender=self.__class__,
+            document=doc,
+        )
+        assert mock_remove_password.call_count == 2
 
 
 class TestWebhookSend:

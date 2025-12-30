@@ -15,6 +15,7 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
+from documents.signals import document_consumption_finished
 from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.workflows.webhooks import send_webhook
 
@@ -264,7 +265,7 @@ def execute_webhook_action(
 
 def execute_password_removal_action(
     action: WorkflowAction,
-    document: Document,
+    document: Document | ConsumableDocument,
     logging_group,
 ) -> None:
     """
@@ -284,6 +285,21 @@ def execute_password_removal_action(
         for password in re.split(r"[,\n]", passwords)
         if password.strip()
     ]
+
+    if isinstance(document, ConsumableDocument):
+        # hook the consumption-finished signal to attempt password removal later
+        def handler(sender, **kwargs):
+            consumed_document: Document = kwargs.get("document")
+            if consumed_document is not None:
+                execute_password_removal_action(
+                    action,
+                    consumed_document,
+                    logging_group,
+                )
+            document_consumption_finished.disconnect(handler)
+
+        document_consumption_finished.connect(handler, weak=False)
+        return
 
     # import here to avoid circular dependency
     from documents.bulk_edit import remove_password
