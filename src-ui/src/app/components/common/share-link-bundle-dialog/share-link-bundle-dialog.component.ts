@@ -34,16 +34,16 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
   providers: [],
 })
 export class ShareLinkBundleDialogComponent extends ConfirmDialogComponent {
-  private formBuilder = inject(FormBuilder)
-  private clipboard = inject(Clipboard)
-  private toastService = inject(ToastService)
+  private readonly formBuilder = inject(FormBuilder)
+  private readonly clipboard = inject(Clipboard)
+  private readonly toastService = inject(ToastService)
 
   private _documents: Document[] = []
 
   selectionCount = 0
   documentPreview: Document[] = []
   form: FormGroup = this.formBuilder.group({
-    shareArchiveVersion: [true],
+    shareArchiveVersion: true,
     expirationDays: [7],
   })
   payload: ShareLinkBundleCreatePayload | null = null
