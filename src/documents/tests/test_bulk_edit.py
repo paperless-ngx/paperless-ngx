@@ -604,6 +604,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         )
         self.assertEqual(consume_file_args[1].title, None)
         self.assertFalse(consume_file_args[1].skip_asn)
+        # No metadata_document_id, delete_originals False, so ASN should be None
+        self.assertIsNone(consume_file_args[1].asn)
 
         # With metadata_document_id overrides
         result = bulk_edit.merge(doc_ids, metadata_document_id=metadata_document_id)
@@ -657,6 +659,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         )
         self.assertEqual(consume_file_args[1].title, None)
         self.assertFalse(consume_file_args[1].skip_asn)
+        self.assertEqual(consume_file_args[1].asn, 101)
 
         delete_documents_args, _ = mock_delete_documents.call_args
         self.assertEqual(
@@ -740,6 +743,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         consume_file_args, _ = mock_consume_file.call_args
         self.assertEqual(consume_file_args[1].title, "B (split 2)")
         self.assertFalse(consume_file_args[1].skip_asn)
+        self.assertIsNone(consume_file_args[1].asn)
 
         self.assertEqual(result, "OK")
 
@@ -995,6 +999,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_chord.assert_called_once()
         consume_file_args, _ = mock_consume_file.call_args
         self.assertFalse(consume_file_args[1].skip_asn)
+        self.assertEqual(consume_file_args[1].asn, 250)
         self.doc2.refresh_from_db()
         self.assertIsNone(self.doc2.archive_serial_number)
 
