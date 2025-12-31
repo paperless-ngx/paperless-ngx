@@ -473,6 +473,8 @@ def merge(
 
     if user is not None:
         overrides.owner_id = user.id
+    if not delete_originals:
+        overrides.skip_asn_if_exists = True
 
     if delete_originals and handoff_asn is not None:
         overrides.asn = handoff_asn
@@ -543,6 +545,8 @@ def split(
                 overrides.title = f"{doc.title} (split {idx + 1})"
                 if user is not None:
                     overrides.owner_id = user.id
+                if not delete_originals:
+                    overrides.skip_asn_if_exists = True
                 logger.info(
                     f"Adding split document with pages {split_doc} to the task queue.",
                 )
@@ -673,6 +677,8 @@ def edit_pdf(
             )
             if user is not None:
                 overrides.owner_id = user.id
+            if not delete_original:
+                overrides.skip_asn_if_exists = True
             if delete_original and len(pdf_docs) == 1:
                 overrides.asn = doc.archive_serial_number
             for idx, pdf in enumerate(pdf_docs, start=1):
