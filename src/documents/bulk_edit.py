@@ -421,6 +421,7 @@ def merge(
 
     merged_pdf = pikepdf.new()
     version: str = merged_pdf.pdf_version
+    handoff_asn: int | None = None
     # use doc_ids to preserve order
     for doc_id in doc_ids:
         doc = qs.get(id=doc_id)
@@ -436,6 +437,8 @@ def merge(
                 version = max(version, pdf.pdf_version)
                 merged_pdf.pages.extend(pdf.pages)
             affected_docs.append(doc.id)
+            if handoff_asn is None and doc.archive_serial_number is not None:
+                handoff_asn = doc.archive_serial_number
         except Exception as e:
             logger.exception(
                 f"Error merging document {doc.id}, it will not be included in the merge: {e}",
@@ -461,6 +464,8 @@ def merge(
                 DocumentMetadataOverrides.from_document(metadata_document)
             )
             overrides.title = metadata_document.title + " (merged)"
+            if metadata_document.archive_serial_number is not None:
+                handoff_asn = metadata_document.archive_serial_number
         else:
             overrides = DocumentMetadataOverrides()
     else:
@@ -468,6 +473,9 @@ def merge(
 
     if user is not None:
         overrides.owner_id = user.id
+
+    if delete_originals and handoff_asn is not None:
+        overrides.asn = handoff_asn
 
     logger.info("Adding merged document to the task queue.")
 
@@ -492,8 +500,8 @@ def merge(
         except Exception:
             restore_archive_serial_numbers(backup)
             raise
-    else:
-        consume_task.delay()
+        else:
+            consume_task.delay()
 
     return "OK"
 
@@ -665,6 +673,8 @@ def edit_pdf(
             )
             if user is not None:
                 overrides.owner_id = user.id
+            if delete_original and len(pdf_docs) == 1:
+                overrides.asn = doc.archive_serial_number
             for idx, pdf in enumerate(pdf_docs, start=1):
                 filepath: Path = (
                     Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
