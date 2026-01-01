@@ -1048,7 +1048,7 @@ still perform some basic text pre-processing before matching.
 
 : See also `PAPERLESS_NLTK_DIR`.
 
-    Defaults to 1.
+    Defaults to true, enabling the feature.
 
 #### [`PAPERLESS_DATE_PARSER_LANGUAGES=<lang>`](#PAPERLESS_DATE_PARSER_LANGUAGES) {#PAPERLESS_DATE_PARSER_LANGUAGES}
 
@@ -1115,7 +1115,7 @@ valid crontab(5) expression describing when to run.
 
 : Enables compression of the responses from the webserver.
 
-: Defaults to 1, enabling compression.
+: Defaults to true, enabling compression.
 
     !!! note
 
