@@ -671,6 +671,85 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertIsNone(self.doc2.archive_serial_number)
         self.assertIsNone(self.doc3.archive_serial_number)
 
+    @mock.patch("documents.bulk_edit.delete.si")
+    @mock.patch("documents.tasks.consume_file.s")
+    def test_merge_and_delete_originals_restore_on_failure(
+        self,
+        mock_consume_file,
+        mock_delete_documents,
+    ):
+        """
+        GIVEN:
+            - Existing documents
+        WHEN:
+            - Merge action with deleting documents is called with 1 document
+            - Error occurs when queuing consume file task
+        THEN:
+            - Archive serial numbers are restored
+        """
+        doc_ids = [self.doc1.id]
+        self.doc1.archive_serial_number = 111
+        self.doc1.save()
+        sig = mock.Mock()
+        sig.apply_async.side_effect = Exception("boom")
+        mock_consume_file.return_value = sig
+
+        with self.assertRaises(Exception):
+            bulk_edit.merge(doc_ids, delete_originals=True)
+
+        self.doc1.refresh_from_db()
+        self.assertEqual(self.doc1.archive_serial_number, 111)
+
+    @mock.patch("documents.bulk_edit.delete.si")
+    @mock.patch("documents.tasks.consume_file.s")
+    def test_merge_and_delete_originals_metadata_handoff(
+        self,
+        mock_consume_file,
+        mock_delete_documents,
+    ):
+        """
+        GIVEN:
+            - Existing documents with ASNs
+        WHEN:
+            - Merge with delete_originals=True and metadata_document_id set
+        THEN:
+            - Handoff ASN uses metadata document ASN
+        """
+        doc_ids = [self.doc1.id, self.doc2.id]
+        self.doc1.archive_serial_number = 101
+        self.doc2.archive_serial_number = 202
+        self.doc1.save()
+        self.doc2.save()
+
+        result = bulk_edit.merge(
+            doc_ids,
+            metadata_document_id=self.doc2.id,
+            delete_originals=True,
+        )
+        self.assertEqual(result, "OK")
+
+        consume_file_args, _ = mock_consume_file.call_args
+        self.assertEqual(consume_file_args[1].asn, 202)
+
+    def test_restore_archive_serial_numbers_task(self):
+        """
+        GIVEN:
+            - Existing document with no archive serial number
+        WHEN:
+            - Restore archive serial number task is called with backup data
+        THEN:
+            - Document archive serial number is restored
+        """
+        self.doc1.archive_serial_number = 444
+        self.doc1.save()
+        Document.objects.filter(pk=self.doc1.id).update(archive_serial_number=None)
+
+        backup = {self.doc1.id: 444}
+        bulk_edit.restore_archive_serial_numbers_task(backup)
+
+        self.doc1.refresh_from_db()
+        self.assertEqual(self.doc1.archive_serial_number, 444)
+
     @mock.patch("documents.tasks.consume_file.s")
     def test_merge_with_archive_fallback(self, mock_consume_file):
         """
@@ -785,6 +864,39 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
         self.doc2.refresh_from_db()
         self.assertIsNone(self.doc2.archive_serial_number)
+
+    @mock.patch("documents.bulk_edit.delete.si")
+    @mock.patch("documents.tasks.consume_file.s")
+    @mock.patch("documents.bulk_edit.chord")
+    def test_split_restore_on_failure(
+        self,
+        mock_chord,
+        mock_consume_file,
+        mock_delete_documents,
+    ):
+        """
+        GIVEN:
+            - Existing documents
+        WHEN:
+            - Split action with deleting documents is called with 1 document and 2 page groups
+            - Error occurs when queuing chord task
+        THEN:
+            - Archive serial numbers are restored
+        """
+        doc_ids = [self.doc2.id]
+        pages = [[1, 2]]
+        self.doc2.archive_serial_number = 222
+        self.doc2.save()
+
+        sig = mock.Mock()
+        sig.apply_async.side_effect = Exception("boom")
+        mock_chord.return_value = sig
+
+        result = bulk_edit.split(doc_ids, pages, delete_originals=True)
+        self.assertEqual(result, "OK")
+
+        self.doc2.refresh_from_db()
+        self.assertEqual(self.doc2.archive_serial_number, 222)
 
     @mock.patch("documents.tasks.consume_file.delay")
     @mock.patch("pikepdf.Pdf.save")
@@ -996,6 +1108,39 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertEqual(consume_file_args[1].asn, 250)
         self.doc2.refresh_from_db()
         self.assertIsNone(self.doc2.archive_serial_number)
+
+    @mock.patch("documents.bulk_edit.delete.si")
+    @mock.patch("documents.tasks.consume_file.s")
+    @mock.patch("documents.bulk_edit.chord")
+    def test_edit_pdf_restore_on_failure(
+        self,
+        mock_chord,
+        mock_consume_file,
+        mock_delete_documents,
+    ):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - edit_pdf is called with delete_original=True
+            - Error occurs when queuing chord task
+        THEN:
+            - Archive serial numbers are restored
+        """
+        doc_ids = [self.doc2.id]
+        operations = [{"page": 1}]
+        self.doc2.archive_serial_number = 333
+        self.doc2.save()
+
+        sig = mock.Mock()
+        sig.apply_async.side_effect = Exception("boom")
+        mock_chord.return_value = sig
+
+        with self.assertRaises(Exception):
+            bulk_edit.edit_pdf(doc_ids, operations, delete_original=True)
+
+        self.doc2.refresh_from_db()
+        self.assertEqual(self.doc2.archive_serial_number, 333)
 
     @mock.patch("documents.tasks.update_document_content_maybe_archive_file.delay")
     def test_edit_pdf_with_update_document(self, mock_update_document):
