@@ -4,6 +4,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
+import { RouterTestingModule } from '@angular/router/testing'
 import {
   NgbModal,
   NgbModalModule,
@@ -61,6 +62,7 @@ describe('CustomFieldsComponent', () => {
         NgbModalModule,
         NgbPopoverModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        RouterTestingModule,
         CustomFieldsComponent,
         IfPermissionsDirective,
         PageHeaderComponent,
@@ -108,7 +110,9 @@ describe('CustomFieldsComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reload')
 
-    const createButton = fixture.debugElement.queryAll(By.css('button'))[1]
+    const createButton = fixture.debugElement
+      .queryAll(By.css('button'))
+      .find((btn) => btn.nativeElement.textContent.trim().includes('Add Field'))
     createButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
@@ -133,7 +137,11 @@ describe('CustomFieldsComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reload')
 
-    const editButton = fixture.debugElement.queryAll(By.css('button'))[2]
+    const editButton = fixture.debugElement
+      .queryAll(By.css('button'))
+      .find((btn) =>
+        btn.nativeElement.textContent.trim().includes(fields[0].name)
+      )
     editButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
@@ -158,7 +166,9 @@ describe('CustomFieldsComponent', () => {
     const deleteSpy = jest.spyOn(customFieldsService, 'delete')
     const reloadSpy = jest.spyOn(component, 'reload')
 
-    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[5]
+    const deleteButton = fixture.debugElement
+      .queryAll(By.css('button'))
+      .find((btn) => btn.nativeElement.textContent.trim().includes('Delete'))
     deleteButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
@@ -176,10 +186,10 @@ describe('CustomFieldsComponent', () => {
     expect(reloadSpy).toHaveBeenCalled()
   })
 
-  it('should support filter documents', () => {
-    const filterSpy = jest.spyOn(listViewService, 'quickFilter')
-    component.filterDocuments(fields[0])
-    expect(filterSpy).toHaveBeenCalledWith([
+  it('should provide document filter url', () => {
+    const urlSpy = jest.spyOn(listViewService, 'getQuickFilterUrl')
+    component.getDocumentFilterUrl(fields[0])
+    expect(urlSpy).toHaveBeenCalledWith([
       {
         rule_type: FILTER_CUSTOM_FIELDS_QUERY,
         value: JSON.stringify([
