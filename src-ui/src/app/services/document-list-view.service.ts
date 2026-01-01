@@ -486,7 +486,7 @@ export class DocumentListViewService {
   getQuickFilterUrl(filterRules: FilterRule[]): UrlTree {
     const defaultState = {
       ...this.defaultListViewState(),
-      ...(this.listViewStates.get(null) ?? {}),
+      ...this.listViewStates.get(null),
       filterRules,
     }
     const params = paramsFromViewState(defaultState)
