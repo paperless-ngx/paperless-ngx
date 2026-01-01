@@ -115,7 +115,7 @@ jobs:
             --frozen \
             mkdocs gh-deploy --force --no-history
       - name: Upload artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: documentation
           path: site/
@@ -215,7 +215,7 @@ jobs:
           cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       - name: Cache frontend dependencies
         id: cache-frontend-deps
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.pnpm-store
@@ -248,7 +248,7 @@ jobs:
           cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       - name: Cache frontend dependencies
         id: cache-frontend-deps
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.pnpm-store
@@ -301,7 +301,7 @@ jobs:
           cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       - name: Cache frontend dependencies
         id: cache-frontend-deps
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.pnpm-store
@@ -333,7 +333,7 @@ jobs:
           cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       - name: Cache frontend dependencies
         id: cache-frontend-deps
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.pnpm-store
@@ -476,7 +476,7 @@ jobs:
           docker cp frontend-extract:/usr/src/paperless/src/documents/static/frontend src/documents/static/frontend/
       - name: Upload frontend artifact
         if: steps.build-vars.outputs.can-push == 'true'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: frontend-compiled
           path: src/documents/static/frontend/
@@ -510,12 +510,12 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends gettext liblept5
       - name: Download frontend artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: frontend-compiled
           path: src/documents/static/frontend/
       - name: Download documentation artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: documentation
           path: docs/_build/html/
@@ -578,7 +578,7 @@ jobs:
           sudo chown -R 1000:1000 paperless-ngx/
           tar -cJf paperless-ngx.tar.xz paperless-ngx/
       - name: Upload release artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: release
           path: dist/paperless-ngx.tar.xz
@@ -595,7 +595,7 @@ jobs:
     if: github.ref_type == 'tag' && (startsWith(github.ref_name, 'v') || contains(github.ref_name, '-beta.rc'))
     steps:
       - name: Download release artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: release
           path: ./
