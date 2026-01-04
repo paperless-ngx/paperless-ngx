@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-12 17:41+0000\n"
-"PO-Revision-Date: 2025-12-12 17:44\n"
+"POT-Creation-Date: 2025-12-29 14:49+0000\n"
+"PO-Revision-Date: 2025-12-29 14:50\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -1208,34 +1208,34 @@ msgstr "iş akışı çalıştırma"
 msgid "workflow runs"
 msgstr "iş akışı çalıştırma"
 
-#: documents/serialisers.py:640
+#: documents/serialisers.py:642
 msgid "Invalid color."
 msgstr "Geçersiz renk."
 
-#: documents/serialisers.py:1826
+#: documents/serialisers.py:1835
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Dosya türü %(type)s desteklenmiyor"
 
-#: documents/serialisers.py:1870
+#: documents/serialisers.py:1879
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "%(id)s özel alan numarası tam sayı olmalıdır"
 
-#: documents/serialisers.py:1877
+#: documents/serialisers.py:1886
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "%(id)s numaralı özel alan mevcut değil"
 
-#: documents/serialisers.py:1894 documents/serialisers.py:1904
+#: documents/serialisers.py:1903 documents/serialisers.py:1913
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Özel alanlar bir tam sayı olarak veya bir nesne haritası numaraları olmalıdır."
 
-#: documents/serialisers.py:1899
+#: documents/serialisers.py:1908
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Bazı õzel alan numaraları mevcut değil yada iki kez tanımlanmıș."
 
-#: documents/serialisers.py:2014
+#: documents/serialisers.py:2023
 msgid "Invalid variable detected."
 msgstr "Geçersiz değişken algılandı."
 
@@ -1741,82 +1741,86 @@ msgid "Hungarian"
 msgstr "Macarca"
 
 #: paperless/settings.py:789
+msgid "Indonesian"
+msgstr ""
+
+#: paperless/settings.py:790
 msgid "Italian"
 msgstr "İtalyanca"
 
-#: paperless/settings.py:790
+#: paperless/settings.py:791
 msgid "Japanese"
 msgstr "Japonca"
 
-#: paperless/settings.py:791
+#: paperless/settings.py:792
 msgid "Korean"
 msgstr "Korece"
 
-#: paperless/settings.py:792
+#: paperless/settings.py:793
 msgid "Luxembourgish"
 msgstr "Lüksemburgca"
 
-#: paperless/settings.py:793
+#: paperless/settings.py:794
 msgid "Norwegian"
 msgstr "Norveçce"
 
-#: paperless/settings.py:794
+#: paperless/settings.py:795
 msgid "Dutch"
 msgstr "Hollandaca"
 
-#: paperless/settings.py:795
+#: paperless/settings.py:796
 msgid "Polish"
 msgstr "Polonyaca"
 
-#: paperless/settings.py:796
+#: paperless/settings.py:797
 msgid "Portuguese (Brazil)"
 msgstr "Portekizce (Brezilya)"
 
-#: paperless/settings.py:797
+#: paperless/settings.py:798
 msgid "Portuguese"
 msgstr "Portekizce"
 
-#: paperless/settings.py:798
+#: paperless/settings.py:799
 msgid "Romanian"
 msgstr "Romence"
 
-#: paperless/settings.py:799
+#: paperless/settings.py:800
 msgid "Russian"
 msgstr "Rusça"
 
-#: paperless/settings.py:800
+#: paperless/settings.py:801
 msgid "Slovak"
 msgstr "Slovakça"
 
-#: paperless/settings.py:801
+#: paperless/settings.py:802
 msgid "Slovenian"
 msgstr "Slovakça"
 
-#: paperless/settings.py:802
+#: paperless/settings.py:803
 msgid "Serbian"
 msgstr "Sırpça"
 
-#: paperless/settings.py:803
+#: paperless/settings.py:804
 msgid "Swedish"
 msgstr "İsveççe"
 
-#: paperless/settings.py:804
+#: paperless/settings.py:805
 msgid "Turkish"
 msgstr "Türkçe"
 
-#: paperless/settings.py:805
+#: paperless/settings.py:806
 msgid "Ukrainian"
 msgstr "Ukraynaca"
 
-#: paperless/settings.py:806
+#: paperless/settings.py:807
 msgid "Vietnamese"
 msgstr "Vietnamca"
 
-#: paperless/settings.py:807
+#: paperless/settings.py:808
 msgid "Chinese Simplified"
 msgstr "Basitleştirilmiş Çince"
 
-#: paperless/settings.py:808
+#: paperless/settings.py:809
 msgid "Chinese Traditional"
 msgstr "Geleneksel Çince"
 

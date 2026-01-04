@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-12 17:41+0000\n"
-"PO-Revision-Date: 2025-12-12 17:44\n"
+"POT-Creation-Date: 2025-12-29 14:49+0000\n"
+"PO-Revision-Date: 2026-01-01 00:43\n"
 "Last-Translator: \n"
 "Language-Team: Slovenian\n"
 "Language: sl_SI\n"
@@ -1208,34 +1208,34 @@ msgstr "izvajanje poteka dela"
 msgid "workflow runs"
 msgstr "poteka dela"
 
-#: documents/serialisers.py:640
+#: documents/serialisers.py:642
 msgid "Invalid color."
 msgstr "Napačna barva."
 
-#: documents/serialisers.py:1826
+#: documents/serialisers.py:1835
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Vrsta datoteke %(type)s ni podprta"
 
-#: documents/serialisers.py:1870
+#: documents/serialisers.py:1879
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "ID polja po meri mora biti celo število: %(id)s"
 
-#: documents/serialisers.py:1877
+#: documents/serialisers.py:1886
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Polje po meri z ID-jem %(id)s ne obstaja"
 
-#: documents/serialisers.py:1894 documents/serialisers.py:1904
+#: documents/serialisers.py:1903 documents/serialisers.py:1913
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Polja po meri morajo biti seznam celih števil ali objekt, ki preslika ID-je v vrednosti."
 
-#: documents/serialisers.py:1899
+#: documents/serialisers.py:1908
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Nekatera polja po meri ne obstajajo ali pa so bila navedena dvakrat."
 
-#: documents/serialisers.py:2014
+#: documents/serialisers.py:2023
 msgid "Invalid variable detected."
 msgstr "Zaznani neveljavni znaki."
 
@@ -1741,82 +1741,86 @@ msgid "Hungarian"
 msgstr "Madžarščina"
 
 #: paperless/settings.py:789
+msgid "Indonesian"
+msgstr "Indonezijščina"
+
+#: paperless/settings.py:790
 msgid "Italian"
 msgstr "Italijanščina"
 
-#: paperless/settings.py:790
+#: paperless/settings.py:791
 msgid "Japanese"
 msgstr "japonščina"
 
-#: paperless/settings.py:791
+#: paperless/settings.py:792
 msgid "Korean"
 msgstr "Korejščina"
 
-#: paperless/settings.py:792
+#: paperless/settings.py:793
 msgid "Luxembourgish"
 msgstr "Luksemburški"
 
-#: paperless/settings.py:793
+#: paperless/settings.py:794
 msgid "Norwegian"
 msgstr "Norveščina"
 
-#: paperless/settings.py:794
+#: paperless/settings.py:795
 msgid "Dutch"
 msgstr "Nizozemščina"
 
-#: paperless/settings.py:795
+#: paperless/settings.py:796
 msgid "Polish"
 msgstr "Poljščina"
 
-#: paperless/settings.py:796
+#: paperless/settings.py:797
 msgid "Portuguese (Brazil)"
 msgstr "Portugalščina (Brazilija)"
 
-#: paperless/settings.py:797
+#: paperless/settings.py:798
 msgid "Portuguese"
 msgstr "Portugalščina"
 
-#: paperless/settings.py:798
+#: paperless/settings.py:799
 msgid "Romanian"
 msgstr "Romunščina"
 
-#: paperless/settings.py:799
+#: paperless/settings.py:800
 msgid "Russian"
 msgstr "Ruščina"
 
-#: paperless/settings.py:800
+#: paperless/settings.py:801
 msgid "Slovak"
 msgstr "Slovaščina"
 
-#: paperless/settings.py:801
+#: paperless/settings.py:802
 msgid "Slovenian"
 msgstr "Slovenščina"
 
-#: paperless/settings.py:802
+#: paperless/settings.py:803
 msgid "Serbian"
 msgstr "Srbščina"
 
-#: paperless/settings.py:803
+#: paperless/settings.py:804
 msgid "Swedish"
 msgstr "Švedščina"
 
-#: paperless/settings.py:804
+#: paperless/settings.py:805
 msgid "Turkish"
 msgstr "Turščina"
 
-#: paperless/settings.py:805
+#: paperless/settings.py:806
 msgid "Ukrainian"
 msgstr "Ukrajinščina"
 
-#: paperless/settings.py:806
+#: paperless/settings.py:807
 msgid "Vietnamese"
 msgstr "Vietnamščina"
 
-#: paperless/settings.py:807
+#: paperless/settings.py:808
 msgid "Chinese Simplified"
 msgstr "Poenostavljena kitajščina"
 
-#: paperless/settings.py:808
+#: paperless/settings.py:809
 msgid "Chinese Traditional"
 msgstr "Tradicionalna kitajščina"
 
