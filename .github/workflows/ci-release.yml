@@ -1,0 +1,244 @@
+name: Release
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-beta.rc[0-9]+'
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  DEFAULT_UV_VERSION: "0.9.x"
+  DEFAULT_PYTHON_VERSION: "3.11"
+jobs:
+  # ---------------------------------------------------------------------------
+  # Wait for Docker build to complete (ensures tests passed)
+  # ---------------------------------------------------------------------------
+  wait-for-docker:
+    name: Wait for Docker Build
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Wait for Docker build
+        uses: lewagon/wait-on-check-action@v1.3.4
+        with:
+          ref: ${{ github.sha }}
+          check-name: 'Build Docker Image'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 60
+  # ---------------------------------------------------------------------------
+  # Build release package
+  # ---------------------------------------------------------------------------
+  build-release:
+    name: Build Release
+    needs: wait-for-docker
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      # ---- Frontend Build ----
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: Use Node.js 20
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20.x
+          cache: 'pnpm'
+          cache-dependency-path: 'src-ui/pnpm-lock.yaml'
+      - name: Install frontend dependencies
+        run: cd src-ui && pnpm install
+      - name: Build frontend
+        run: cd src-ui && pnpm run build --configuration production
+      # ---- Backend Setup ----
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
+          enable-cache: true
+          python-version: ${{ steps.setup-python.outputs.python-version }}
+      - name: Install Python dependencies
+        run: |
+          uv sync --python ${{ steps.setup-python.outputs.python-version }} --dev --frozen
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq --no-install-recommends gettext liblept5
+      # ---- Build Documentation ----
+      - name: Build documentation
+        run: |
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --dev \
+            --frozen \
+            mkdocs build --config-file ./mkdocs.yml
+      # ---- Prepare Release ----
+      - name: Generate requirements file
+        run: |
+          uv export --quiet --no-dev --all-extras --format requirements-txt --output-file requirements.txt
+      - name: Compile messages
+        run: |
+          cd src/
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            manage.py compilemessages
+      - name: Collect static files
+        run: |
+          cd src/
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            manage.py collectstatic --no-input --clear
+      - name: Assemble release package
+        run: |
+          mkdir -p dist/paperless-ngx/scripts
+
+          for file_name in .dockerignore \
+                          .env \
+                          Dockerfile \
+                          pyproject.toml \
+                          uv.lock \
+                          requirements.txt \
+                          LICENSE \
+                          README.md \
+                          paperless.conf.example
+          do
+            cp --verbose ${file_name} dist/paperless-ngx/
+          done
+          mv dist/paperless-ngx/paperless.conf.example dist/paperless-ngx/paperless.conf
+
+          cp --recursive docker/ dist/paperless-ngx/docker
+          cp scripts/*.service scripts/*.sh scripts/*.socket dist/paperless-ngx/scripts/
+          cp --recursive src/ dist/paperless-ngx/src
+          cp --recursive site/ dist/paperless-ngx/docs
+          mv static dist/paperless-ngx/
+      - name: Create release archive
+        run: |
+          cd dist
+          sudo chown -R 1000:1000 paperless-ngx/
+          tar -cJf paperless-ngx.tar.xz paperless-ngx/
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: release
+          path: dist/paperless-ngx.tar.xz
+          retention-days: 7
+  # ---------------------------------------------------------------------------
+  # Publish release to GitHub
+  # ---------------------------------------------------------------------------
+  publish-release:
+    name: Publish Release
+    needs: build-release
+    runs-on: ubuntu-24.04
+    outputs:
+      prerelease: ${{ steps.get-version.outputs.prerelease }}
+      changelog: ${{ steps.create-release.outputs.body }}
+      version: ${{ steps.get-version.outputs.version }}
+    steps:
+      - name: Download release artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: release
+          path: ./
+      - name: Get version info
+        id: get-version
+        run: |
+          echo "version=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          if [[ "${{ github.ref_name }}" == *"-beta.rc"* ]]; then
+            echo "prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "prerelease=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Create release and changelog
+        id: create-release
+        uses: release-drafter/release-drafter@v6
+        with:
+          name: Paperless-ngx ${{ steps.get-version.outputs.version }}
+          tag: ${{ steps.get-version.outputs.version }}
+          version: ${{ steps.get-version.outputs.version }}
+          prerelease: ${{ steps.get-version.outputs.prerelease }}
+          publish: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload release archive
+        uses: shogo82148/actions-upload-release-asset@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: ./paperless-ngx.tar.xz
+          asset_name: paperless-ngx-${{ steps.get-version.outputs.version }}.tar.xz
+          asset_content_type: application/x-xz
+  # ---------------------------------------------------------------------------
+  # Append changelog to docs (only on non-prerelease)
+  # ---------------------------------------------------------------------------
+  append-changelog:
+    name: Append Changelog
+    needs: publish-release
+    if: needs.publish-release.outputs.prerelease == 'false'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: main
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
+          enable-cache: true
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+      - name: Update changelog
+        working-directory: docs
+        run: |
+          git branch ${{ needs.publish-release.outputs.version }}-changelog
+          git checkout ${{ needs.publish-release.outputs.version }}-changelog
+
+          echo -e "# Changelog\n\n${{ needs.publish-release.outputs.changelog }}\n" > changelog-new.md
+
+          echo "Manually linking usernames"
+          sed -i -r 's|@([a-zA-Z0-9_]+) \(\[#|[@\1](https://github.com/\1) ([#|g' changelog-new.md
+
+          echo "Removing unneeded comment tags"
+          sed -i -r 's|@<!---->|@|g' changelog-new.md
+
+          CURRENT_CHANGELOG=$(tail --lines +2 changelog.md)
+          echo -e "$CURRENT_CHANGELOG" >> changelog-new.md
+          mv changelog-new.md changelog.md
+
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --dev \
+            pre-commit run --files changelog.md || true
+
+          git config --global user.name "github-actions"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Changelog ${{ needs.publish-release.outputs.version }} - GHA"
+          git push origin ${{ needs.publish-release.outputs.version }}-changelog
+      - name: Create pull request
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { repo, owner } = context.repo;
+            const result = await github.rest.pulls.create({
+              title: 'Documentation: Add ${{ needs.publish-release.outputs.version }} changelog',
+              owner,
+              repo,
+              head: '${{ needs.publish-release.outputs.version }}-changelog',
+              base: 'main',
+              body: 'This PR is auto-generated by CI.'
+            });
+            github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number: result.data.number,
+              labels: ['documentation', 'skip-changelog']
+            });
