@@ -1,0 +1,114 @@
+name: Docker Build
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-beta.rc[0-9]+'
+    branches:
+      - dev
+      - beta
+  pull_request:
+    branches:
+      - dev
+      - main
+  workflow_dispatch:
+concurrency:
+  group: docker-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  build-docker-image:
+    name: Build Docker Image
+    runs-on: ubuntu-24.04
+    env:
+      CAN_PUSH: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Determine ref name
+        id: ref
+        run: |
+          echo "name=${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+      - name: Check external registry push
+        id: push-external
+        env:
+          REF_NAME: ${{ steps.ref.outputs.name }}
+        run: |
+          # If we cannot push (e.g. fork PR), explicitly disable external push and exit
+          if [[ "$CAN_PUSH" != "true" ]]; then
+            echo "enable=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Only push to Docker Hub / Quay from main repo on specific branches/tags
+          if [[ "${{ github.repository_owner }}" == "paperless-ngx" ]]; then
+            case "$REF_NAME" in
+              dev|beta)
+                echo "enable=true" >> $GITHUB_OUTPUT
+                exit 0
+                ;;
+            esac
+            case "$GITHUB_REF" in
+              refs/tags/v*|*beta.rc*)
+                echo "enable=true" >> $GITHUB_OUTPUT
+                exit 0
+                ;;
+            esac
+          fi
+          echo "enable=false" >> $GITHUB_OUTPUT
+      - name: Docker metadata
+        id: docker-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}
+            name=paperlessngx/paperless-ngx,enable=${{ steps.push-external.outputs.enable }}
+            name=quay.io/paperlessngx/paperless-ngx,enable=${{ steps.push-external.outputs.enable }}
+          tags: |
+            type=ref,event=branch
+            type=raw,value=${{ steps.ref.outputs.name }},enable=${{ github.event_name == 'pull_request' }}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to Docker Hub
+        if: steps.push-external.outputs.enable == 'true'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to Quay.io
+        if: steps.push-external.outputs.enable == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_ROBOT_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: ${{ env.CAN_PUSH == 'true' }}
+          tags: ${{ steps.docker-meta.outputs.tags }}
+          labels: ${{ steps.docker-meta.outputs.labels }}
+          build-args: |
+            PNGX_TAG_VERSION=${{ steps.docker-meta.outputs.version }}
+          cache-from: |
+            type=registry,ref=ghcr.io/${{ github.repository }}/cache/app:${{ steps.ref.outputs.name }}
+            type=registry,ref=ghcr.io/${{ github.repository }}/cache/app:dev
+          cache-to: ${{ env.CAN_PUSH == 'true' && format('type=registry,mode=max,ref=ghcr.io/{0}/cache/app:{1}', github.repository, steps.ref.outputs.name) || '' }}
+      - name: Inspect image
+        if: env.CAN_PUSH == 'true'
+        run: |
+          docker buildx imagetools inspect ${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}
