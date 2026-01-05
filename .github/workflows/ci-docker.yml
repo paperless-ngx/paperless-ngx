@@ -26,21 +26,21 @@ jobs:
       - name: Wait for backend tests
         uses: lewagon/wait-on-check-action@v1.3.4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ github.ref }}
           check-name: 'Python 3.11'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 60
       - name: Wait for frontend unit tests
         uses: lewagon/wait-on-check-action@v1.3.4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ github.ref }}
           check-name: 'Unit Tests (1/4)'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 60
       - name: Wait for frontend E2E tests
         uses: lewagon/wait-on-check-action@v1.3.4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ github.ref }}
           check-name: 'E2E Tests (1/2)'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 60
