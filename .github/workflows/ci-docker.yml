@@ -102,9 +102,9 @@ jobs:
           build-args: |
             PNGX_TAG_VERSION=${{ steps.docker-meta.outputs.version }}
           cache-from: |
-            type=registry,ref=ghcr.io/${{ github.repository }}/builder/cache/app:${{ steps.ref.outputs.name }}
-            type=registry,ref=ghcr.io/${{ github.repository }}/builder/cache/app:dev
-          cache-to: ${{ env.CAN_PUSH == 'true' && format('type=registry,mode=max,ref=ghcr.io/{0}/builder/cache/app:{1}', github.repository, steps.ref.outputs.name) || '' }}
+            type=registry,ref=ghcr.io/${{ github.repository }}/cache/app:${{ steps.ref.outputs.name }}
+            type=registry,ref=ghcr.io/${{ github.repository }}/cache/app:dev
+          cache-to: ${{ env.CAN_PUSH == 'true' && format('type=registry,mode=max,ref=ghcr.io/{0}/cache/app:{1}', github.repository, steps.ref.outputs.name) || '' }}
       - name: Inspect image
         if: env.CAN_PUSH == 'true'
         run: |

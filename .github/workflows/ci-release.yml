@@ -116,6 +116,8 @@ jobs:
           cp --recursive src/ dist/paperless-ngx/src
           cp --recursive site/ dist/paperless-ngx/docs
           mv static dist/paperless-ngx/
+
+          find dist/paperless-ngx -name "__pycache__" -type d -exec rm -rf {} +
       - name: Create release archive
         run: |
           cd dist
