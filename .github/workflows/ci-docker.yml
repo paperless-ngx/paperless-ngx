@@ -16,9 +16,6 @@ concurrency:
   group: docker-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
-  # ---------------------------------------------------------------------------
-  # Build and push Docker image
-  # ---------------------------------------------------------------------------
   build-docker-image:
     name: Build Docker Image
     runs-on: ubuntu-24.04
