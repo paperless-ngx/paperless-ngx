@@ -6,6 +6,7 @@ from django.conf import settings
 from documents.models import Document
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.templating.utils import convert_format_str_to_template_format
+from documents.utils import normalize_nfc
 
 
 def create_source_path_directory(source_path: Path) -> None:
@@ -55,11 +56,11 @@ def generate_unique_filename(doc, *, archive_filename=False) -> Path:
     """
     if archive_filename:
         old_filename: Path | None = (
-            Path(doc.archive_filename) if doc.archive_filename else None
+            Path(normalize_nfc(doc.archive_filename)) if doc.archive_filename else None
         )
         root = settings.ARCHIVE_DIR
     else:
-        old_filename = Path(doc.filename) if doc.filename else None
+        old_filename = Path(normalize_nfc(doc.filename)) if doc.filename else None
         root = settings.ORIGINALS_DIR
 
     # If generating archive filenames, try to make a name that is similar to
@@ -91,7 +92,7 @@ def generate_unique_filename(doc, *, archive_filename=False) -> Path:
         )
         if new_filename == old_filename:
             # still the same as before.
-            return new_filename
+            return Path(normalize_nfc(str(new_filename)))
 
         if (root / new_filename).exists():
             counter += 1
@@ -119,7 +120,7 @@ def format_filename(document: Document, template_str: str) -> str | None:
         "none",
     )  # backward compatibility
 
-    return rendered_filename
+    return normalize_nfc(rendered_filename)
 
 
 def generate_filename(
@@ -174,4 +175,4 @@ def generate_filename(
     if append_gpg and doc.storage_type == doc.STORAGE_TYPE_GPG:
         full_path = full_path.with_suffix(full_path.suffix + ".gpg")
 
-    return full_path
+    return Path(normalize_nfc(str(full_path)))

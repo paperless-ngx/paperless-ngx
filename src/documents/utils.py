@@ -1,5 +1,7 @@
 import logging
 import shutil
+import unicodedata
+from os import PathLike
 from os import utime
 from pathlib import Path
 from subprocess import CompletedProcess
@@ -14,6 +16,14 @@ def _coerce_to_path(
     dest: Path | str,
 ) -> tuple[Path, Path]:
     return Path(source).resolve(), Path(dest).resolve()
+
+
+def normalize_nfc(value: str | PathLike[str] | None) -> str | None:
+    """Return NFC-normalized string for filesystem-safe comparisons."""
+
+    if value is None:
+        return None
+    return unicodedata.normalize("NFC", str(value))
 
 
 def copy_basic_file_stats(source: Path | str, dest: Path | str) -> None:

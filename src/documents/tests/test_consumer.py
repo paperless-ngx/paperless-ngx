@@ -290,6 +290,23 @@ class TestConsumer(
 
         self._assert_first_last_send_progress()
 
+    def test_override_filename_normalized(self):
+        filename = self.get_test_file()
+        override_filename = "Inhaltsu\u0308bersicht.pdf"
+
+        with self.get_consumer(
+            filename,
+            DocumentMetadataOverrides(filename=override_filename),
+        ) as consumer:
+            consumer.run()
+
+            document = Document.objects.first()
+
+        self.assertIsNotNone(document)
+        self.assertEqual(document.original_filename, "Inhaltsübersicht.pdf")
+        self.assertEqual(document.title, "Inhaltsübersicht")
+        self._assert_first_last_send_progress()
+
     def testOverrideTitle(self):
         with self.get_consumer(
             self.get_test_file(),
@@ -302,6 +319,25 @@ class TestConsumer(
         self.assertIsNotNone(document)
 
         self.assertEqual(document.title, "Override Title")
+        self._assert_first_last_send_progress()
+
+    @override_settings(FILENAME_FORMAT="{{ title }}")
+    def test_filename_format_normalized(self):
+        filename = self.get_test_file()
+        title = "Inhaltsu\u0308bersicht Faszination"
+
+        with self.get_consumer(
+            filename,
+            DocumentMetadataOverrides(title=title),
+        ) as consumer:
+            consumer.run()
+
+            document = Document.objects.first()
+
+        self.assertIsNotNone(document)
+        self.assertEqual(document.title, "Inhaltsübersicht Faszination")
+        self.assertEqual(document.filename, "Inhaltsübersicht Faszination.pdf")
+        self.assertIsFile(document.source_path)
         self._assert_first_last_send_progress()
 
     def testOverrideCorrespondent(self):

@@ -46,6 +46,7 @@ from documents.signals.handlers import run_workflows
 from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
+from documents.utils import normalize_nfc
 from documents.utils import run_subprocess
 from paperless_mail.parsers import MailDocumentParser
 
@@ -111,7 +112,12 @@ class ConsumerPluginMixin:
 
         self.renew_logging_group()
 
-        self.filename = self.metadata.filename or self.input_doc.original_file.name
+        self.metadata.filename = normalize_nfc(self.metadata.filename)
+        self.metadata.title = normalize_nfc(self.metadata.title)
+
+        self.filename = normalize_nfc(
+            self.metadata.filename or self.input_doc.original_file.name,
+        )
 
     def _send_progress(
         self,
@@ -651,6 +657,8 @@ class ConsumerPlugin(
                 self.log.error(
                     f"Error occurred parsing title override '{self.metadata.title}', falling back to original. Exception: {e}",
                 )
+
+        title = normalize_nfc(title)
 
         file_for_checksum = (
             self.unmodified_original
