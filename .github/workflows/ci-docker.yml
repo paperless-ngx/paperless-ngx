@@ -33,6 +33,12 @@ jobs:
         env:
           REF_NAME: ${{ steps.ref.outputs.name }}
         run: |
+          # If we cannot push (e.g. fork PR), explicitly disable external push and exit
+          if [[ "$CAN_PUSH" != "true" ]]; then
+            echo "enable=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
           # Only push to Docker Hub / Quay from main repo on specific branches/tags
           if [[ "${{ github.repository_owner }}" == "paperless-ngx" ]]; then
             case "$REF_NAME" in
