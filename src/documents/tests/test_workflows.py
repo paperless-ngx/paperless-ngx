@@ -557,6 +557,50 @@ class TestWorkflows(
         expected_str = f"Document filename {test_file.name} does not match"
         self.assertIn(expected_str, cm.output[1])
 
+    def test_workflow_match_filename_diacritics_normalized(self):
+        """
+        GIVEN:
+            - Consumption workflow filtering on filename with diacritics
+        WHEN:
+            - File with decomposed Unicode filename is consumed
+        THEN:
+            - Workflow still matches and applies overrides
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
+            filter_filename="*račun*",
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Diacritics matched",
+        )
+        action.save()
+
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        decomposed_name = "rac\u030cun.pdf"
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / decomposed_name,
+        )
+
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=test_file,
+                ),
+                None,
+            )
+            document = Document.objects.first()
+            self.assertEqual(document.title, "Diacritics matched")
+
     def test_workflow_no_match_path(self):
         """
         GIVEN:
@@ -945,6 +989,35 @@ class TestWorkflows(
 
         self.assertEqual(doc.correspondent, self.c2)
         self.assertEqual(doc.title, f"Doc created in {created.year}")
+
+    def test_document_added_filename_diacritics_normalized(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_filename="*račun*",
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Matched diacritics",
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="rac\u030cun.pdf",
+        )
+
+        document_consumption_finished.send(
+            sender=self.__class__,
+            document=doc,
+        )
+
+        self.assertEqual(doc.title, "Matched diacritics")
 
     def test_document_added_no_match_filename(self):
         trigger = WorkflowTrigger.objects.create(

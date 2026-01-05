@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import logging
 import re
+import unicodedata
 from fnmatch import fnmatch
 from fnmatch import translate as fnmatch_translate
 from typing import TYPE_CHECKING
 
+from django.db.models import Q
 from rest_framework import serializers
 
 from documents.data_models import ConsumableDocument
@@ -28,6 +30,34 @@ if TYPE_CHECKING:
     from documents.classifier import DocumentClassifier
 
 logger = logging.getLogger("paperless.matching")
+
+
+def _normalize_glob_value(value: str) -> str:
+    """Normalize strings for glob-style matching (case-insensitive)."""
+
+    return unicodedata.normalize("NFC", str(value)).casefold()
+
+
+def _normalized_fnmatch(name: str, pattern: str) -> bool:
+    """Canonicalize Unicode and compare using fnmatch semantics."""
+
+    return fnmatch(_normalize_glob_value(name), _normalize_glob_value(pattern))
+
+
+def _glob_regex_variants(pattern: str) -> list[str]:
+    """
+    Build regex patterns that match both NFC and NFD forms of a glob pattern.
+    Using both forms lets DB prefilters remain Unicode-normalization agnostic.
+    """
+
+    regexes = set()
+    for normalized in {
+        unicodedata.normalize("NFC", pattern),
+        unicodedata.normalize("NFD", pattern),
+    }:
+        regex = fnmatch_translate(normalized).lstrip("^").rstrip("$")
+        regexes.add(regex)
+    return list(regexes)
 
 
 def log_reason(
@@ -305,9 +335,9 @@ def consumable_document_matches_workflow(
     if (
         trigger.filter_filename is not None
         and len(trigger.filter_filename) > 0
-        and not fnmatch(
-            document.original_file.name.lower(),
-            trigger.filter_filename.lower(),
+        and not _normalized_fnmatch(
+            document.original_file.name,
+            trigger.filter_filename,
         )
     ):
         reason = (
@@ -328,7 +358,7 @@ def consumable_document_matches_workflow(
     if (
         trigger.filter_path is not None
         and len(trigger.filter_path) > 0
-        and not fnmatch(
+        and not _normalized_fnmatch(
             match_against,
             trigger.filter_path,
         )
@@ -492,9 +522,9 @@ def existing_document_matches_workflow(
         trigger.filter_filename is not None
         and len(trigger.filter_filename) > 0
         and document.original_filename is not None
-        and not fnmatch(
-            document.original_filename.lower(),
-            trigger.filter_filename.lower(),
+        and not _normalized_fnmatch(
+            document.original_filename,
+            trigger.filter_filename,
         )
     ):
         return (
@@ -573,8 +603,11 @@ def prefilter_documents_by_workflowtrigger(
         documents = documents.annotate(**annotations).filter(custom_field_q)
 
     if trigger.filter_filename:
-        regex = fnmatch_translate(trigger.filter_filename).lstrip("^").rstrip("$")
-        documents = documents.filter(original_filename__iregex=regex)
+        regexes = _glob_regex_variants(trigger.filter_filename)
+        filename_q = Q()
+        for regex in regexes:
+            filename_q |= Q(original_filename__iregex=regex)
+        documents = documents.filter(filename_q)
 
     return documents
 
