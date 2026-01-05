@@ -17,39 +17,10 @@ concurrency:
   cancel-in-progress: true
 jobs:
   # ---------------------------------------------------------------------------
-  # Wait for required test workflows to complete
-  # ---------------------------------------------------------------------------
-  wait-for-tests:
-    name: Wait for Tests
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Wait for backend tests
-        uses: lewagon/wait-on-check-action@v1.3.4
-        with:
-          ref: ${{ github.ref }}
-          check-name: 'Python 3.11'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 60
-      - name: Wait for frontend unit tests
-        uses: lewagon/wait-on-check-action@v1.3.4
-        with:
-          ref: ${{ github.ref }}
-          check-name: 'Unit Tests (1/4)'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 60
-      - name: Wait for frontend E2E tests
-        uses: lewagon/wait-on-check-action@v1.3.4
-        with:
-          ref: ${{ github.ref }}
-          check-name: 'E2E Tests (1/2)'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 60
-  # ---------------------------------------------------------------------------
   # Build and push Docker image
   # ---------------------------------------------------------------------------
   build-docker-image:
     name: Build Docker Image
-    needs: wait-for-tests
     runs-on: ubuntu-24.04
     env:
       CAN_PUSH: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
