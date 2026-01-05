@@ -17,60 +17,33 @@ concurrency:
   cancel-in-progress: true
 jobs:
   # ---------------------------------------------------------------------------
-  # Determine which tests need to pass before building
-  # ---------------------------------------------------------------------------
-  check-changes:
-    name: Check Changed Files
-    runs-on: ubuntu-24.04
-    outputs:
-      backend: ${{ steps.filter.outputs.backend }}
-      frontend: ${{ steps.filter.outputs.frontend }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-      - name: Check paths
-        uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            backend:
-              - 'src/**'
-              - 'pyproject.toml'
-              - 'uv.lock'
-            frontend:
-              - 'src-ui/**'
-  # ---------------------------------------------------------------------------
   # Wait for required test workflows to complete
   # ---------------------------------------------------------------------------
   wait-for-tests:
     name: Wait for Tests
-    needs: check-changes
     runs-on: ubuntu-24.04
     steps:
       - name: Wait for backend tests
-        if: needs.check-changes.outputs.backend == 'true'
         uses: lewagon/wait-on-check-action@v1.3.4
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           check-name: 'Python 3.11'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 30
+          wait-interval: 60
       - name: Wait for frontend unit tests
-        if: needs.check-changes.outputs.frontend == 'true'
         uses: lewagon/wait-on-check-action@v1.3.4
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           check-name: 'Unit Tests (1/4)'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 30
+          wait-interval: 60
       - name: Wait for frontend E2E tests
-        if: needs.check-changes.outputs.frontend == 'true'
         uses: lewagon/wait-on-check-action@v1.3.4
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           check-name: 'E2E Tests (1/2)'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 30
+          wait-interval: 60
   # ---------------------------------------------------------------------------
   # Build and push Docker image
   # ---------------------------------------------------------------------------
