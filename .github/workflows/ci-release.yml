@@ -11,23 +11,17 @@ env:
   DEFAULT_UV_VERSION: "0.9.x"
   DEFAULT_PYTHON_VERSION: "3.11"
 jobs:
-  # ---------------------------------------------------------------------------
-  # Wait for Docker build to complete (ensures tests passed)
-  # ---------------------------------------------------------------------------
   wait-for-docker:
     name: Wait for Docker Build
     runs-on: ubuntu-24.04
     steps:
       - name: Wait for Docker build
-        uses: lewagon/wait-on-check-action@v1.3.4
+        uses: lewagon/wait-on-check-action@v1.4.1
         with:
           ref: ${{ github.sha }}
           check-name: 'Build Docker Image'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 60
-  # ---------------------------------------------------------------------------
-  # Build release package
-  # ---------------------------------------------------------------------------
   build-release:
     name: Build Release
     needs: wait-for-docker
@@ -129,9 +123,6 @@ jobs:
           name: release
           path: dist/paperless-ngx.tar.xz
           retention-days: 7
-  # ---------------------------------------------------------------------------
-  # Publish release to GitHub
-  # ---------------------------------------------------------------------------
   publish-release:
     name: Publish Release
     needs: build-release
