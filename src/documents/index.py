@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import math
 import re
+import unicodedata
 from collections import Counter
 from contextlib import contextmanager
 from datetime import datetime
@@ -56,6 +57,14 @@ if TYPE_CHECKING:
     from whoosh.searching import Searcher
 
 logger = logging.getLogger("paperless.index")
+
+
+def _normalize_for_index(value: str | None) -> str | None:
+    """Normalize text to NFC for consistent search/index matching."""
+
+    if value is None:
+        return None
+    return unicodedata.normalize("NFC", value)
 
 
 def get_schema() -> Schema:
@@ -163,37 +172,41 @@ def update_document(writer: AsyncWriter, doc: Document) -> None:
     viewer_ids: str = ",".join([str(u.id) for u in users_with_perms])
     writer.update_document(
         id=doc.pk,
-        title=doc.title,
-        content=doc.content,
-        correspondent=doc.correspondent.name if doc.correspondent else None,
+        title=_normalize_for_index(doc.title),
+        content=_normalize_for_index(doc.content),
+        correspondent=_normalize_for_index(
+            doc.correspondent.name if doc.correspondent else None,
+        ),
         correspondent_id=doc.correspondent.id if doc.correspondent else None,
         has_correspondent=doc.correspondent is not None,
-        tag=tags if tags else None,
+        tag=_normalize_for_index(tags) if tags else None,
         tag_id=tags_ids if tags_ids else None,
         has_tag=len(tags) > 0,
-        type=doc.document_type.name if doc.document_type else None,
+        type=_normalize_for_index(
+            doc.document_type.name if doc.document_type else None,
+        ),
         type_id=doc.document_type.id if doc.document_type else None,
         has_type=doc.document_type is not None,
         created=datetime.combine(doc.created, time.min),
         added=doc.added,
         asn=asn,
         modified=doc.modified,
-        path=doc.storage_path.name if doc.storage_path else None,
+        path=_normalize_for_index(doc.storage_path.name if doc.storage_path else None),
         path_id=doc.storage_path.id if doc.storage_path else None,
         has_path=doc.storage_path is not None,
-        notes=notes,
+        notes=_normalize_for_index(notes),
         num_notes=len(notes),
-        custom_fields=custom_fields,
+        custom_fields=_normalize_for_index(custom_fields),
         custom_field_count=len(doc.custom_fields.all()),
         has_custom_fields=len(custom_fields) > 0,
         custom_fields_id=custom_fields_ids if custom_fields_ids else None,
-        owner=doc.owner.username if doc.owner else None,
+        owner=_normalize_for_index(doc.owner.username if doc.owner else None),
         owner_id=doc.owner.id if doc.owner else None,
         has_owner=doc.owner is not None,
         viewer_id=viewer_ids if viewer_ids else None,
         checksum=doc.checksum,
         page_count=doc.page_count,
-        original_filename=doc.original_filename,
+        original_filename=_normalize_for_index(doc.original_filename),
         is_shared=len(viewer_ids) > 0,
     )
     logger.debug(f"Index updated for document {doc.pk}.")
@@ -421,7 +434,7 @@ class LocalDateParser(English):
 
 class DelayedFullTextQuery(DelayedQuery):
     def _get_query(self) -> tuple:
-        q_str = self.query_params["query"]
+        q_str = _normalize_for_index(self.query_params["query"]) or ""
         q_str = rewrite_natural_date_keywords(q_str)
         qp = MultifieldParser(
             [
@@ -460,7 +473,12 @@ class DelayedFullTextQuery(DelayedQuery):
 class DelayedMoreLikeThisQuery(DelayedQuery):
     def _get_query(self) -> tuple:
         more_like_doc_id = int(self.query_params["more_like_id"])
-        content = Document.objects.get(id=more_like_doc_id).content
+        content = (
+            _normalize_for_index(
+                Document.objects.get(id=more_like_doc_id).content,
+            )
+            or ""
+        )
 
         docnum = self.searcher.document_number(id=more_like_doc_id)
         kts = self.searcher.key_terms_from_text(
@@ -488,6 +506,7 @@ def autocomplete(
     Mimics whoosh.reading.IndexReader.most_distinctive_terms with permissions
     and without scoring
     """
+    term = _normalize_for_index(term) or ""
     terms = []
 
     with ix.searcher(weighting=TF_IDF()) as s:

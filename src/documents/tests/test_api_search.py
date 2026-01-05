@@ -89,6 +89,23 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(len(results), 0)
         self.assertCountEqual(response.data["all"], [])
 
+    def test_search_handles_diacritics_normalization(self):
+        doc = Document.objects.create(
+            title="certida\u0303o de nascimento",
+            content="birth record without keyword",
+            checksum="D",
+            pk=10,
+        )
+        with AsyncWriter(index.open_index()) as writer:
+            index.update_document(writer, doc)
+
+        response = self.client.get("/api/documents/?query=certidão")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], doc.id)
+
     def test_search_custom_field_ordering(self):
         custom_field = CustomField.objects.create(
             name="Sortable field",
