@@ -23,6 +23,7 @@ from documents.models import Workflow
 from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.regex import safe_regex_search
+from documents.utils import normalize_nfc
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -35,7 +36,7 @@ logger = logging.getLogger("paperless.matching")
 def _normalize_glob_value(value: str) -> str:
     """Normalize strings for glob-style matching (case-insensitive)."""
 
-    return unicodedata.normalize("NFC", str(value)).casefold()
+    return (normalize_nfc(value) or "").casefold()
 
 
 def _normalized_fnmatch(name: str, pattern: str) -> bool:
@@ -52,7 +53,7 @@ def _glob_regex_variants(pattern: str) -> list[str]:
 
     regexes = set()
     for normalized in {
-        unicodedata.normalize("NFC", pattern),
+        normalize_nfc(pattern) or "",
         unicodedata.normalize("NFD", pattern),
     }:
         regex = fnmatch_translate(normalized).lstrip("^").rstrip("$")
