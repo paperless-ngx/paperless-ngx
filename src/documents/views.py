@@ -188,6 +188,7 @@ from documents.signals import document_updated
 from documents.tasks import consume_file
 from documents.tasks import empty_trash
 from documents.tasks import index_optimize
+from documents.tasks import llmindex_index
 from documents.tasks import sanity_check
 from documents.tasks import train_classifier
 from documents.tasks import update_document_parent_tags
@@ -203,7 +204,6 @@ from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
 from paperless_ai.ai_classifier import get_ai_document_classification
 from paperless_ai.chat import stream_chat_with_documents
-from paperless_ai.indexing import update_llm_index
 from paperless_ai.matching import extract_unmatched_names
 from paperless_ai.matching import match_correspondents_by_name
 from paperless_ai.matching import match_document_types_by_name
@@ -2681,7 +2681,7 @@ class TasksViewSet(ReadOnlyModelViewSet):
             {"scheduled": False, "raise_on_error": False},
         ),
         PaperlessTask.TaskName.LLMINDEX_UPDATE: (
-            update_llm_index,
+            llmindex_index,
             {"scheduled": False, "rebuild": False},
         ),
     }
