@@ -7,7 +7,7 @@ on:
       - 'src/**'
       - 'pyproject.toml'
       - 'uv.lock'
-      - 'docker/compose/**'
+      - 'docker/compose/docker-compose.ci-test.yml'
       - '.github/workflows/ci-backend.yml'
   pull_request:
     branches-ignore:
@@ -16,7 +16,7 @@ on:
       - 'src/**'
       - 'pyproject.toml'
       - 'uv.lock'
-      - 'docker/compose/**'
+      - 'docker/compose/docker-compose.ci-test.yml'
       - '.github/workflows/ci-backend.yml'
   workflow_dispatch:
 concurrency:
