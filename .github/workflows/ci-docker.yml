@@ -216,9 +216,9 @@ jobs:
           GHCR_REPO: ${{ env.REGISTRY }}/${{ needs.build-arch.outputs.repository }}
         run: |
           for tag in ${TAGS}; do
-            dockerhub_tag="${tag/${GHCR_REPO}/paperlessngx/paperless-ngx}"
+            dockerhub_tag="${tag/${GHCR_REPO}/docker.io/paperlessngx/paperless-ngx}"
             echo "Copying ${tag} to ${dockerhub_tag}"
-            docker buildx imagetools create --tag "${dockerhub_tag}" "${tag}"
+            skopeo copy --all "docker://${tag}" "docker://${dockerhub_tag}"
           done
       - name: Copy to Quay.io
         if: needs.build-arch.outputs.push-external == 'true'
@@ -229,5 +229,5 @@ jobs:
           for tag in ${TAGS}; do
             quay_tag="${tag/${GHCR_REPO}/quay.io/paperlessngx/paperless-ngx}"
             echo "Copying ${tag} to ${quay_tag}"
-            docker buildx imagetools create --tag "${quay_tag}" "${tag}"
+            skopeo copy --all "docker://${tag}" "docker://${quay_tag}"
           done
