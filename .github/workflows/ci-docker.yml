@@ -98,6 +98,10 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Inspect cache
+        run: |
+          # See what's actually in the cache
+          skopeo inspect docker://ghcr.io/paperless-ngx/paperless-ngx/cache/app:feature-cleanup-docker-caching-${{ matrix.arch }}
       - name: Docker metadata
         id: docker-meta
         uses: docker/metadata-action@v5.10.0
