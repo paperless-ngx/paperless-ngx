@@ -31,6 +31,7 @@
           "fi-FI": "src/locale/messages.fi_FI.xlf",
           "fr-FR": "src/locale/messages.fr_FR.xlf",
           "hu-HU": "src/locale/messages.hu_HU.xlf",
+          "id-ID": "src/locale/messages.id_ID.xlf",
           "it-IT": "src/locale/messages.it_IT.xlf",
           "ja-JP": "src/locale/messages.ja_JP.xlf",
           "lb-LU": "src/locale/messages.lb_LU.xlf",
