@@ -41,6 +41,7 @@ from documents.models import PaperlessTask
 from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.utils import normalize_nfc
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -162,7 +163,11 @@ class TitleContentFilter(Filter):
     def filter(self, qs, value):
         value = value.strip() if isinstance(value, str) else value
         if value:
-            return qs.filter(Q(title__icontains=value) | Q(content__icontains=value))
+            normalized = normalize_nfc(value) or ""
+            folded = normalized.casefold()
+            return qs.filter(
+                Q(title__icontains=folded) | Q(content__icontains=folded),
+            )
         else:
             return qs
 
