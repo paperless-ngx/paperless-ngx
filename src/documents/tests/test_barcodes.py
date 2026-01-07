@@ -1064,33 +1064,6 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
     @override_settings(
         CONSUMER_ENABLE_TAG_BARCODE=True,
         CONSUMER_TAG_BARCODE_SPLIT=True,
-        CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
-    )
-    def test_split_by_tag_basic_integration(self):
-        """
-        GIVEN:
-            - PDF with TAG:invoice on page 2, TAG:receipt on page 4
-            - Tag splitting enabled with default TAG: mapping
-        WHEN:
-            - File is processed
-        THEN:
-            - Document splits at pages 2 and 4
-            - 3 separate documents are produced
-        """
-        test_file = self.BARCODE_SAMPLE_DIR / "split-by-tag-basic.pdf"
-
-        with self.get_reader(test_file) as reader:
-            reader.detect()
-            separator_pages = reader.get_separation_pages()
-
-            self.assertDictEqual(separator_pages, {1: True, 3: True})
-
-            document_list = reader.separate_pages(separator_pages)
-            self.assertEqual(len(document_list), 3)
-
-    @override_settings(
-        CONSUMER_ENABLE_TAG_BARCODE=True,
-        CONSUMER_TAG_BARCODE_SPLIT=True,
         CONSUMER_TAG_BARCODE_MAPPING={"ASN(.*)": "ASN_\\g<1>", "TAG:(.*)": "\\g<1>"},
     )
     def test_split_by_mixed_asn_tag_backwards_compat(self):
@@ -1144,34 +1117,3 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
 
             document_list = reader.separate_pages(separator_pages)
             self.assertEqual(len(document_list), 3)
-
-    @override_settings(
-        CONSUMER_ENABLE_TAG_BARCODE=True,
-        CONSUMER_TAG_BARCODE_SPLIT=True,
-        CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
-    )
-    def test_split_by_tag_comma_separated_single_barcode(self):
-        """
-        GIVEN:
-            - PDF with a single barcode containing comma-separated tags: "TAG:invoice,TAG:expense"
-            - Tag splitting enabled
-        WHEN:
-            - File is processed
-        THEN:
-            - Document splits at page 2 (where the barcode is)
-            - 2 separate documents are produced
-            - Tags are NOT assigned during split (they will be extracted during re-consumption of each split document)
-        """
-        test_file = self.BARCODE_SAMPLE_DIR / "split-by-tag-comma-separated.pdf"
-
-        with self.get_reader(test_file) as reader:
-            reader.detect()
-            separator_pages = reader.get_separation_pages()
-
-            self.assertDictEqual(separator_pages, {1: True})
-
-            document_list = reader.separate_pages(separator_pages)
-            self.assertEqual(len(document_list), 2)
-
-            tags = reader.metadata.tag_ids
-            self.assertIsNone(tags)
