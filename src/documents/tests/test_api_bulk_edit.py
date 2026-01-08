@@ -1582,6 +1582,58 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(b"out of bounds", response.content)
 
+    @mock.patch("documents.serialisers.bulk_edit.remove_password")
+    def test_remove_password(self, m):
+        self.setup_mock(m, "remove_password")
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "remove_password",
+                    "parameters": {"password": "secret", "update_document": True},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertCountEqual(args[0], [self.doc2.id])
+        self.assertEqual(kwargs["password"], "secret")
+        self.assertTrue(kwargs["update_document"])
+        self.assertEqual(kwargs["user"], self.user)
+
+    def test_remove_password_invalid_params(self):
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "remove_password",
+                    "parameters": {},
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"password not specified", response.content)
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "remove_password",
+                    "parameters": {"password": 123},
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"password must be a string", response.content)
+
     @override_settings(AUDIT_LOG_ENABLED=True)
     def test_bulk_edit_audit_log_enabled_simple_field(self):
         """

@@ -1,4 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core'
+import { RouterModule } from '@angular/router'
 import {
   NgbDropdownModule,
   NgbModal,
@@ -36,6 +37,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     NgbDropdownModule,
     NgbPaginationModule,
     NgxBootstrapIconsModule,
+    RouterModule,
   ],
 })
 export class CustomFieldsComponent
@@ -130,8 +132,8 @@ export class CustomFieldsComponent
     return DATA_TYPE_LABELS.find((l) => l.id === field.data_type).name
   }
 
-  filterDocuments(field: CustomField) {
-    this.documentListViewService.quickFilter([
+  getDocumentFilterUrl(field: CustomField) {
+    return this.documentListViewService.getQuickFilterUrl([
       {
         rule_type: FILTER_CUSTOM_FIELDS_QUERY,
         value: JSON.stringify([

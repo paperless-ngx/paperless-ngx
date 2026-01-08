@@ -2094,6 +2094,68 @@ class TestWorkflows(
             doc.refresh_from_db()
             self.assertIsNone(doc.owner)
 
+    def test_workflow_scheduled_recurring_respects_latest_run(self):
+        """
+        GIVEN:
+            - Scheduled workflow marked as recurring with a 1-day interval
+            - Document that matches the trigger
+            - Two prior runs exist: one 2 days ago and one 1 hour ago
+        WHEN:
+            - Scheduled workflows are checked again
+        THEN:
+            - Workflow does not run because the most recent run is inside the interval
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.CREATED,
+            schedule_is_recurring=True,
+            schedule_recurring_interval_days=1,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+            created=timezone.now().date() - timedelta(days=3),
+        )
+
+        WorkflowRun.objects.create(
+            workflow=w,
+            document=doc,
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            run_at=timezone.now() - timedelta(days=2),
+        )
+        WorkflowRun.objects.create(
+            workflow=w,
+            document=doc,
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            run_at=timezone.now() - timedelta(hours=1),
+        )
+
+        tasks.check_scheduled_workflows()
+
+        doc.refresh_from_db()
+        self.assertIsNone(doc.owner)
+        self.assertEqual(
+            WorkflowRun.objects.filter(
+                workflow=w,
+                document=doc,
+                type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            ).count(),
+            2,
+        )
+
     def test_workflow_scheduled_trigger_negative_offset_customfield(self):
         """
         GIVEN:
