@@ -16,6 +16,7 @@ classifiers = [
 # This will allow testing to not install a webserver, mysql, etc
 
 dependencies = [
+  "azure-ai-documentintelligence>=1.0.2",
   "babel>=2.17",
   "bleach~=6.3.0",
   "celery[redis]~=5.5.1",
@@ -253,6 +254,7 @@ testpaths = [
   "src/paperless_tesseract/tests/",
   "src/paperless_tika/tests",
   "src/paperless_text/tests/",
+  "src/paperless_remote/tests/",
 ]
 addopts = [
   "--pythonwarnings=all",
