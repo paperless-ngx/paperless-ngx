@@ -19,7 +19,6 @@ from django.db import DatabaseError
 from django.db import close_old_connections
 from django.db import connections
 from django.db import models
-from django.db import transaction
 from django.db.models import Q
 from django.dispatch import receiver
 from django.utils import timezone
@@ -60,8 +59,6 @@ if TYPE_CHECKING:
     from documents.data_models import DocumentMetadataOverrides
 
 logger = logging.getLogger("paperless.handlers")
-
-_tag_tree_update_scheduled = False
 
 
 def add_inbox_tags(sender, document: Document, logging_group=None, **kwargs):
@@ -947,26 +944,3 @@ def close_connection_pool_on_worker_init(**kwargs):
     for conn in connections.all(initialized_only=True):
         if conn.alias == "default" and hasattr(conn, "pool") and conn.pool:
             conn.close_pool()
-
-
-def schedule_tag_tree_update(**_kwargs):
-    """
-    Schedule a single Tag.update_tree() at transaction commit.
-
-    Treenode's default post_save hooks rebuild the entire tree on every save,
-    which is very slow for large tag sets so collapse to one update per
-    transaction.
-    """
-    global _tag_tree_update_scheduled
-    if _tag_tree_update_scheduled:
-        return
-    _tag_tree_update_scheduled = True
-
-    def _run():
-        global _tag_tree_update_scheduled
-        try:
-            Tag.update_tree()
-        finally:
-            _tag_tree_update_scheduled = False
-
-    transaction.on_commit(_run)
