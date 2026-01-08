@@ -83,6 +83,7 @@ import { getFilenameFromContentDisposition } from 'src/app/utils/http'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
+import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
@@ -175,6 +176,7 @@ export enum ZoomSetting {
     NgxBootstrapIconsModule,
     PdfViewerModule,
     TextAreaComponent,
+    PasswordRemovalConfirmDialogComponent,
   ],
 })
 export class DocumentDetailComponent
@@ -1421,6 +1423,63 @@ export class DocumentDetailComponent
               }
               this.toastService.showError(
                 $localize`Error executing PDF edit operation`,
+                error
+              )
+            },
+          })
+      })
+  }
+
+  removePassword() {
+    if (this.requiresPassword || !this.password) {
+      this.toastService.showError(
+        $localize`Please enter the current password before attempting to remove it.`
+      )
+      return
+    }
+    const modal = this.modalService.open(
+      PasswordRemovalConfirmDialogComponent,
+      {
+        backdrop: 'static',
+      }
+    )
+    modal.componentInstance.title = $localize`Remove password protection`
+    modal.componentInstance.message = $localize`Create an unprotected copy or replace the existing file.`
+    modal.componentInstance.btnCaption = $localize`Start`
+
+    modal.componentInstance.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        const dialog =
+          modal.componentInstance as PasswordRemovalConfirmDialogComponent
+        dialog.buttonsEnabled = false
+        this.networkActive = true
+        this.documentsService
+          .bulkEdit([this.document.id], 'remove_password', {
+            password: this.password,
+            update_document: dialog.updateDocument,
+            include_metadata: dialog.includeMetadata,
+            delete_original: dialog.deleteOriginal,
+          })
+          .pipe(first(), takeUntil(this.unsubscribeNotifier))
+          .subscribe({
+            next: () => {
+              this.toastService.showInfo(
+                $localize`Password removal operation for "${this.document.title}" will begin in the background.`
+              )
+              this.networkActive = false
+              modal.close()
+              if (!dialog.updateDocument && dialog.deleteOriginal) {
+                this.openDocumentService.closeDocument(this.document)
+              } else if (dialog.updateDocument) {
+                this.openDocumentService.refreshDocument(this.documentId)
+              }
+            },
+            error: (error) => {
+              dialog.buttonsEnabled = true
+              this.networkActive = false
+              this.toastService.showError(
+                $localize`Error executing password removal operation`,
                 error
               )
             },
