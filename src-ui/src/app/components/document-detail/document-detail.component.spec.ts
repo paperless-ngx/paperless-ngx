@@ -66,6 +66,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
+import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
 import {
   DocumentDetailComponent,
@@ -1262,6 +1263,88 @@ describe('DocumentDetailComponent', () => {
     )
     req.flush(true)
     expect(closeSpy).toHaveBeenCalled()
+  })
+
+  it('should support removing password protection from pdfs', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    initNormally()
+    component.password = 'secret'
+    component.removePassword()
+    const dialog =
+      modal.componentInstance as PasswordRemovalConfirmDialogComponent
+    dialog.updateDocument = false
+    dialog.includeMetadata = false
+    dialog.deleteOriginal = true
+    dialog.confirm()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    expect(req.request.body).toEqual({
+      documents: [doc.id],
+      method: 'remove_password',
+      parameters: {
+        password: 'secret',
+        update_document: false,
+        include_metadata: false,
+        delete_original: true,
+      },
+    })
+    req.flush(true)
+  })
+
+  it('should require the current password before removing it', () => {
+    initNormally()
+    const errorSpy = jest.spyOn(toastService, 'showError')
+    component.requiresPassword = true
+    component.password = ''
+
+    component.removePassword()
+
+    expect(errorSpy).toHaveBeenCalled()
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+  })
+
+  it('should handle failures when removing password protection', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    initNormally()
+    const errorSpy = jest.spyOn(toastService, 'showError')
+    component.password = 'secret'
+
+    component.removePassword()
+    const dialog =
+      modal.componentInstance as PasswordRemovalConfirmDialogComponent
+    dialog.confirm()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    req.error(new ErrorEvent('failed'))
+
+    expect(errorSpy).toHaveBeenCalled()
+    expect(component.networkActive).toBe(false)
+    expect(dialog.buttonsEnabled).toBe(true)
+  })
+
+  it('should refresh the document when removing password in update mode', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    const refreshSpy = jest.spyOn(openDocumentsService, 'refreshDocument')
+    initNormally()
+    component.password = 'secret'
+
+    component.removePassword()
+    const dialog =
+      modal.componentInstance as PasswordRemovalConfirmDialogComponent
+    dialog.confirm()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    req.flush(true)
+
+    expect(refreshSpy).toHaveBeenCalledWith(doc.id)
   })
 
   it('should support keyboard shortcuts', () => {

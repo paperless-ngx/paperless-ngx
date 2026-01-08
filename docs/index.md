@@ -27,7 +27,8 @@ physical documents into a searchable online archive so you can keep, well, _less
 -   **Organize and index** your scanned documents with tags, correspondents, types, and more.
 -   _Your_ data is stored locally on _your_ server and is never transmitted or shared in any way, unless you explicitly choose to do so.
 -   Performs **OCR** on your documents, adding searchable and selectable text, even to documents scanned with only images.
--   Utilizes the open-source Tesseract engine to recognize more than 100 languages.
+    -   Utilizes the open-source Tesseract engine to recognize more than 100 languages.
+    -   _New!_ Supports remote OCR with Azure AI (opt-in).
 -   Documents are saved as PDF/A format which is designed for long term storage, alongside the unaltered originals.
 -   Uses machine-learning to automatically add tags, correspondents and document types to your documents.
 -   **New**: Paperless-ngx can now leverage AI (Large Language Models or LLMs) for document suggestions. This is an optional feature that can be enabled (and is disabled by default).

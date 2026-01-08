@@ -923,6 +923,21 @@ how regularly you intend to scan documents and use paperless.
     performed the task associated with the document, move it to the
     inbox.
 
+## Remote OCR
+
+!!! important
+
+    This feature is disabled by default and will always remain strictly "opt-in".
+
+Paperless-ngx supports performing OCR on documents using remote services. At the moment, this is limited to
+[Microsoft's Azure "Document Intelligence" service](https://azure.microsoft.com/en-us/products/ai-services/ai-document-intelligence).
+This is of course a paid service (with a free tier) which requires an Azure account and subscription. Azure AI is not affiliated with
+Paperless-ngx in any way. When enabled, Paperless-ngx will automatically send appropriate documents to Azure for OCR processing, bypassing
+the local OCR engine. See the [configuration](configuration.md#PAPERLESS_REMOTE_OCR_ENGINE) options for more details.
+
+Additionally, when using a commercial service with this feature, consider both potential costs as well as any associated file size
+or page limitations (e.g. with a free tier).
+
 ## Architecture
 
 Paperless-ngx consists of the following components:
