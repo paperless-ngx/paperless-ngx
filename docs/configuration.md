@@ -1804,3 +1804,23 @@ password. All of these options come from their similarly-named [Django settings]
 #### [`PAPERLESS_EMAIL_USE_SSL=<bool>`](#PAPERLESS_EMAIL_USE_SSL) {#PAPERLESS_EMAIL_USE_SSL}
 
 : Defaults to false.
+
+## Remote OCR
+
+#### [`PAPERLESS_REMOTE_OCR_ENGINE=<str>`](#PAPERLESS_REMOTE_OCR_ENGINE) {#PAPERLESS_REMOTE_OCR_ENGINE}
+
+: The remote OCR engine to use. Currently only Azure AI is supported as "azureai".
+
+    Defaults to None, which disables remote OCR.
+
+#### [`PAPERLESS_REMOTE_OCR_API_KEY=<str>`](#PAPERLESS_REMOTE_OCR_API_KEY) {#PAPERLESS_REMOTE_OCR_API_KEY}
+
+: The API key to use for the remote OCR engine.
+
+    Defaults to None.
+
+#### [`PAPERLESS_REMOTE_OCR_ENDPOINT=<str>`](#PAPERLESS_REMOTE_OCR_ENDPOINT) {#PAPERLESS_REMOTE_OCR_ENDPOINT}
+
+: The endpoint to use for the remote OCR engine. This is required for Azure AI.
+
+    Defaults to None.
