@@ -11,6 +11,9 @@ from paperless_ai.indexing import load_or_build_index
 
 logger = logging.getLogger("paperless_ai.chat")
 
+MAX_SINGLE_DOC_CONTEXT_CHARS = 15000
+SINGLE_DOC_SNIPPET_CHARS = 800
+
 CHAT_PROMPT_TMPL = PromptTemplate(
     template="""Context information is below.
     ---------------------
@@ -49,11 +52,36 @@ def stream_chat_with_documents(query_str: str, documents: list[Document]):
         # Just one doc — provide full content
         doc = documents[0]
         # TODO: include document metadata in the context
-        context = f"TITLE: {doc.title or doc.filename}\n{doc.content or ''}"
+        content = doc.content or ""
+        context_body = content
+
+        if len(content) > MAX_SINGLE_DOC_CONTEXT_CHARS:
+            logger.info(
+                "Truncating single-document context from %s to %s characters",
+                len(content),
+                MAX_SINGLE_DOC_CONTEXT_CHARS,
+            )
+            context_body = content[:MAX_SINGLE_DOC_CONTEXT_CHARS]
+
+            top_nodes = retriever.retrieve(query_str)
+            if len(top_nodes) > 0:
+                snippets = "\n\n".join(
+                    f"TITLE: {node.metadata.get('title')}\n{node.text[:SINGLE_DOC_SNIPPET_CHARS]}"
+                    for node in top_nodes
+                )
+                context_body = f"{context_body}\n\nTOP MATCHES:\n{snippets}"
+
+        context = f"TITLE: {doc.title or doc.filename}\n{context_body}"
     else:
         top_nodes = retriever.retrieve(query_str)
+
+        if len(top_nodes) == 0:
+            logger.warning("Retriever returned no nodes for the given documents.")
+            yield "Sorry, I couldn't find any content to answer your question."
+            return
+
         context = "\n\n".join(
-            f"TITLE: {node.metadata.get('title')}\n{node.text[:500]}"
+            f"TITLE: {node.metadata.get('title')}\n{node.text[:SINGLE_DOC_SNIPPET_CHARS]}"
             for node in top_nodes
         )
 
