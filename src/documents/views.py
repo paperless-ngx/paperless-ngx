@@ -1,5 +1,4 @@
 import itertools
-import json
 import logging
 import os
 import platform
@@ -21,7 +20,6 @@ import magic
 import pathvalidate
 from celery import states
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -1337,24 +1335,25 @@ class DocumentViewSet(
 @method_decorator(
     [
         ensure_csrf_cookie,
-        login_required,
         cache_control(no_cache=True),
     ],
     name="dispatch",
 )
-class ChatStreamingView(View):
-    def post(self, request):
+class ChatStreamingView(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
         request.compress_exempt = True
         ai_config = AIConfig()
         if not ai_config.ai_enabled:
             return HttpResponseBadRequest("AI is required for this feature")
 
         try:
-            data = json.loads(request.body)
-            question = data["q"]
-            doc_id = data.get("document_id", None)
-        except (KeyError, json.JSONDecodeError):
+            question = request.data["q"]
+        except KeyError:
             return HttpResponseBadRequest("Invalid request")
+
+        doc_id = request.data.get("document_id")
 
         if doc_id:
             try:
