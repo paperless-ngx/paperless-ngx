@@ -1332,6 +1332,11 @@ class DocumentViewSet(
             )
 
 
+class ChatStreamingSerializer(serializers.Serializer):
+    q = serializers.CharField(required=True)
+    document_id = serializers.IntegerField(required=False, allow_null=True)
+
+
 @method_decorator(
     [
         ensure_csrf_cookie,
@@ -1341,6 +1346,7 @@ class DocumentViewSet(
 )
 class ChatStreamingView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
+    serializer_class = ChatStreamingSerializer
 
     def post(self, request, *args, **kwargs):
         request.compress_exempt = True
