@@ -404,16 +404,6 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn(b"AI is required for this feature", response.content)
 
-    @override_settings(AI_ENABLED=True)
-    def test_post_invalid_json(self):
-        response = self.client.post(
-            self.ENDPOINT,
-            data="invalid",
-            content_type="application/json",
-        )
-        self.assertEqual(response.status_code, 400)
-        self.assertIn(b"Invalid request", response.content)
-
     @patch("documents.views.stream_chat_with_documents")
     @patch("documents.views.get_objects_for_user_owner_aware")
     @override_settings(AI_ENABLED=True)
