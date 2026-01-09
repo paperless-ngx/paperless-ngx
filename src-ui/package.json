@@ -14,7 +14,7 @@
     "@angular/cdk": "^20.2.13",
     "@angular/common": "~20.3.15",
     "@angular/compiler": "~20.3.15",
-    "@angular/core": "~20.3.15",
+    "@angular/core": "~20.3.16",
     "@angular/forms": "~20.3.15",
     "@angular/localize": "~20.3.15",
     "@angular/platform-browser": "~20.3.15",
