@@ -5,14 +5,12 @@
 # Purpose: Compiles the frontend
 # Notes:
 #  - Does PNPM stuff with Typescript and such
-FROM --platform=$BUILDPLATFORM docker.io/node:20-trixie-slim AS compile-frontend
+FROM --platform=$BUILDPLATFORM docker.io/node:24-trixie-slim AS compile-frontend
 
 COPY ./src-ui /src/src-ui
 
 WORKDIR /src/src-ui
 RUN set -eux \
-  && npm update -g pnpm \
-  && npm install -g corepack@latest \
   && corepack enable \
   && pnpm install
 
@@ -110,8 +108,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONWARNINGS="ignore:::django.http.response:517" \
     PNGX_CONTAINERIZED=1 \
     # https://docs.astral.sh/uv/reference/settings/#link-mode
-    UV_LINK_MODE=copy \
-    UV_CACHE_DIR=/cache/uv/
+    UV_LINK_MODE=copy
 
 #
 # Begin installation and configuration
@@ -193,14 +190,13 @@ ARG BUILD_PACKAGES="\
   pkg-config"
 
 # hadolint ignore=DL3042
-RUN --mount=type=cache,target=${UV_CACHE_DIR},id=python-cache \
-  set -eux \
+RUN set -eux \
   && echo "Installing build system packages" \
     && apt-get update \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
   && echo "Installing Python requirements" \
     && uv export --quiet --no-dev --all-extras --format requirements-txt --output-file requirements.txt \
-    && uv pip install --system --no-python-downloads --python-preference system --requirements requirements.txt \
+    && uv pip install --no-cache --system --no-python-downloads --python-preference system --requirements requirements.txt \
   && echo "Installing NLTK data" \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" snowball_data \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" stopwords \

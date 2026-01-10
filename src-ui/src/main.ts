@@ -2,6 +2,7 @@ import {
   APP_INITIALIZER,
   enableProdMode,
   importProvidersFrom,
+  provideZoneChangeDetection,
 } from '@angular/core'
 
 import { DragDropModule } from '@angular/cdk/drag-drop'
@@ -368,6 +369,7 @@ if (environment.production) {
 
 bootstrapApplication(AppComponent, {
   providers: [
+    provideZoneChangeDetection(),
     importProvidersFrom(
       BrowserModule,
       AppRoutingModule,
