@@ -448,7 +448,42 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["document_count_filter"] = self.get_document_count_filter()
+        if hasattr(self, "_children_map"):
+            context["children_map"] = self._children_map
         return context
+
+    def list(self, request, *args, **kwargs):
+        """
+        Build a children map once to avoid per-parent queries in the serializer.
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+        ordering = OrderingFilter().get_ordering(request, queryset, self) or (
+            Lower("name"),
+        )
+        queryset = queryset.order_by(*ordering)
+
+        all_tags = list(queryset)
+        descendant_pks = {pk for tag in all_tags for pk in tag.get_descendants_pks()}
+
+        if descendant_pks:
+            filter_q = self.get_document_count_filter()
+            children_source = (
+                Tag.objects.filter(pk__in=descendant_pks | {t.pk for t in all_tags})
+                .select_related("owner")
+                .annotate(document_count=Count("documents", filter=filter_q))
+                .order_by(*ordering)
+            )
+        else:
+            children_source = all_tags
+
+        children_map = {}
+        for tag in children_source:
+            children_map.setdefault(tag.tn_parent_id, []).append(tag)
+        self._children_map = children_map
+
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     def perform_update(self, serializer):
         old_parent = self.get_object().get_parent()
