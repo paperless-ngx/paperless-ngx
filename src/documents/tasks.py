@@ -3,7 +3,9 @@ import hashlib
 import logging
 import shutil
 import uuid
+import zipfile
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 from tempfile import TemporaryDirectory
 
 import tqdm
@@ -22,6 +24,8 @@ from whoosh.writing import AsyncWriter
 from documents import index
 from documents import sanity_checker
 from documents.barcodes import BarcodePlugin
+from documents.bulk_download import ArchiveOnlyStrategy
+from documents.bulk_download import OriginalsOnlyStrategy
 from documents.caching import clear_document_caches
 from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
@@ -39,6 +43,8 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import PaperlessTask
+from documents.models import ShareLink
+from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import WorkflowRun
@@ -558,3 +564,121 @@ def update_document_parent_tags(tag: Tag, new_parent: Tag) -> None:
 
     if affected:
         bulk_update_documents.delay(document_ids=list(affected))
+
+
+@shared_task
+def build_share_link_bundle(bundle_id: int):
+    try:
+        bundle = (
+            ShareLinkBundle.objects.filter(pk=bundle_id)
+            .prefetch_related("documents")
+            .get()
+        )
+    except ShareLinkBundle.DoesNotExist:
+        logger.warning("Share link bundle %s no longer exists.", bundle_id)
+        return
+
+    bundle.remove_file()
+    bundle.status = ShareLinkBundle.Status.PROCESSING
+    bundle.last_error = ""
+    bundle.size_bytes = None
+    bundle.built_at = None
+    bundle.file_path = ""
+    bundle.save(
+        update_fields=[
+            "status",
+            "last_error",
+            "size_bytes",
+            "built_at",
+            "file_path",
+        ],
+    )
+
+    documents = list(bundle.documents.all().order_by("pk"))
+
+    with NamedTemporaryFile(
+        dir=settings.SCRATCH_DIR,
+        suffix=".zip",
+        delete=False,
+    ) as temp_zip:
+        temp_zip_path = Path(temp_zip.name)
+
+    try:
+        strategy_class = (
+            ArchiveOnlyStrategy
+            if bundle.file_version == ShareLink.FileVersion.ARCHIVE
+            else OriginalsOnlyStrategy
+        )
+        with zipfile.ZipFile(temp_zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+            strategy = strategy_class(zipf)
+            for document in documents:
+                strategy.add_document(document)
+
+        output_dir = settings.SHARE_LINK_BUNDLE_DIR
+        output_dir.mkdir(parents=True, exist_ok=True)
+        final_path = (output_dir / f"{bundle.slug}.zip").resolve()
+        if final_path.exists():
+            final_path.unlink()
+        shutil.move(str(temp_zip_path), final_path)
+
+        try:
+            bundle.file_path = str(final_path.relative_to(settings.MEDIA_ROOT))
+        except ValueError:
+            bundle.file_path = str(final_path)
+        bundle.size_bytes = final_path.stat().st_size
+        bundle.status = ShareLinkBundle.Status.READY
+        bundle.built_at = timezone.now()
+        bundle.last_error = ""
+        bundle.save(
+            update_fields=[
+                "file_path",
+                "size_bytes",
+                "status",
+                "built_at",
+                "last_error",
+            ],
+        )
+        logger.info("Built share link bundle %s", bundle.pk)
+    except Exception as exc:
+        logger.exception(
+            "Failed to build share link bundle %s: %s",
+            bundle_id,
+            exc,
+        )
+        bundle.status = ShareLinkBundle.Status.FAILED
+        bundle.last_error = str(exc)
+        bundle.save(update_fields=["status", "last_error"])
+        try:
+            temp_zip_path.unlink()
+        except OSError:
+            pass
+        raise
+    finally:
+        if temp_zip_path.exists():
+            try:
+                temp_zip_path.unlink()
+            except OSError:
+                pass
+
+
+@shared_task
+def cleanup_expired_share_link_bundles():
+    now = timezone.now()
+    expired_qs = ShareLinkBundle.objects.filter(
+        deleted_at__isnull=True,
+        expiration__isnull=False,
+        expiration__lt=now,
+    )
+    count = 0
+    for bundle in expired_qs.iterator():
+        count += 1
+        try:
+            bundle.hard_delete()
+        except Exception as exc:
+            logger.warning(
+                "Failed to delete expired share link bundle %s: %s",
+                bundle.pk,
+                exc,
+            )
+    if count:
+        logger.info("Deleted %s expired share link bundle(s)", count)

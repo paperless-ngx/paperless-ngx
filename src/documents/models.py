@@ -777,6 +777,120 @@ class ShareLink(SoftDeleteModel):
         return f"Share Link for {self.document.title}"
 
 
+class ShareLinkBundle(SoftDeleteModel):
+    class Status(models.TextChoices):
+        PENDING = ("pending", _("Pending"))
+        PROCESSING = ("processing", _("Processing"))
+        READY = ("ready", _("Ready"))
+        FAILED = ("failed", _("Failed"))
+
+    class Meta:
+        ordering = ("-created",)
+        verbose_name = _("share link bundle")
+        verbose_name_plural = _("share link bundles")
+
+    created = models.DateTimeField(
+        _("created"),
+        default=timezone.now,
+        db_index=True,
+        blank=True,
+        editable=False,
+    )
+
+    expiration = models.DateTimeField(
+        _("expiration"),
+        blank=True,
+        null=True,
+        db_index=True,
+    )
+
+    slug = models.SlugField(
+        _("slug"),
+        db_index=True,
+        unique=True,
+        blank=True,
+        editable=False,
+    )
+
+    owner = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        related_name="share_link_bundles",
+        on_delete=models.SET_NULL,
+        verbose_name=_("owner"),
+    )
+
+    file_version = models.CharField(
+        max_length=50,
+        choices=ShareLink.FileVersion.choices,
+        default=ShareLink.FileVersion.ARCHIVE,
+    )
+
+    status = models.CharField(
+        max_length=50,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
+
+    size_bytes = models.BigIntegerField(
+        _("size (bytes)"),
+        blank=True,
+        null=True,
+    )
+
+    last_error = models.TextField(
+        _("last error"),
+        blank=True,
+    )
+
+    file_path = models.CharField(
+        _("file path"),
+        max_length=512,
+        blank=True,
+    )
+
+    built_at = models.DateTimeField(
+        _("built at"),
+        null=True,
+        blank=True,
+    )
+
+    documents = models.ManyToManyField(
+        "documents.Document",
+        related_name="share_link_bundles",
+        verbose_name=_("documents"),
+    )
+
+    def __str__(self):
+        return _("Share link bundle %(slug)s") % {"slug": self.slug}
+
+    @property
+    def absolute_file_path(self) -> Path | None:
+        if not self.file_path:
+            return None
+        file_path = Path(self.file_path)
+        if not file_path.is_absolute():
+            file_path = (settings.MEDIA_ROOT / file_path).resolve()
+        return file_path
+
+    def remove_file(self):
+        path = self.absolute_file_path
+        if path and path.exists():
+            try:
+                path.unlink()
+            except OSError:
+                pass
+
+    def delete(self, using=None, *, keep_parents=False):
+        self.remove_file()
+        return super().delete(using=using, keep_parents=keep_parents)
+
+    def hard_delete(self, using=None, *, keep_parents=False):
+        self.remove_file()
+        return super().hard_delete(using=using, keep_parents=keep_parents)
+
+
 class CustomField(models.Model):
     """
     Defines the name and type of a custom field

@@ -51,7 +51,7 @@
   <div class="input-group w-100 mt-2">
     <label class="input-group-text" for="addLink"><ng-container i18n>Expires</ng-container>:</label>
     <select class="form-select fs-6" [(ngModel)]="expirationDays">
-      @for (option of EXPIRATION_OPTIONS; track option) {
+      @for (option of expirationOptions; track option) {
         <option [ngValue]="option.value">{{ option.label }}</option>
       }
     </select>

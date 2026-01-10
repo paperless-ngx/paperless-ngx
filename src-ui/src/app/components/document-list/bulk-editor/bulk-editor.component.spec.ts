@@ -3,6 +3,7 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
+import { EventEmitter } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
@@ -25,6 +26,7 @@ import {
   SelectionData,
 } from 'src/app/services/rest/document.service'
 import { GroupService } from 'src/app/services/rest/group.service'
+import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
@@ -38,6 +40,8 @@ import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { FilterableDropdownComponent } from '../../common/filterable-dropdown/filterable-dropdown.component'
+import { ShareLinkBundleDialogComponent } from '../../common/share-link-bundle-dialog/share-link-bundle-dialog.component'
+import { ShareLinkBundleManageDialogComponent } from '../../common/share-link-bundle-manage-dialog/share-link-bundle-manage-dialog.component'
 import { BulkEditorComponent } from './bulk-editor.component'
 
 const selectionData: SelectionData = {
@@ -72,6 +76,7 @@ describe('BulkEditorComponent', () => {
   let storagePathService: StoragePathService
   let customFieldsService: CustomFieldsService
   let httpTestingController: HttpTestingController
+  let shareLinkBundleService: ShareLinkBundleService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -152,6 +157,15 @@ describe('BulkEditorComponent', () => {
               }),
           },
         },
+        {
+          provide: ShareLinkBundleService,
+          useValue: {
+            createBundle: jest.fn(),
+            listAllBundles: jest.fn(),
+            rebuildBundle: jest.fn(),
+            delete: jest.fn(),
+          },
+        },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],
@@ -168,6 +182,7 @@ describe('BulkEditorComponent', () => {
     storagePathService = TestBed.inject(StoragePathService)
     customFieldsService = TestBed.inject(CustomFieldsService)
     httpTestingController = TestBed.inject(HttpTestingController)
+    shareLinkBundleService = TestBed.inject(ShareLinkBundleService)
 
     fixture = TestBed.createComponent(BulkEditorComponent)
     component = fixture.componentInstance
@@ -1453,5 +1468,131 @@ describe('BulkEditorComponent', () => {
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     ) // listAllFilteredIds
+  })
+
+  it('should create share link bundle and enable manage callback', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue([{ id: 5 }, { id: 7 }] as any)
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([5, 7]))
+
+    const confirmClicked = new EventEmitter<void>()
+    const modalRef: Partial<NgbModalRef> = {
+      close: jest.fn(),
+      componentInstance: {
+        documents: [],
+        confirmClicked,
+        payload: {
+          document_ids: [5, 7],
+          file_version: 'archive',
+          expiration_days: 7,
+        },
+        loading: false,
+        buttonsEnabled: true,
+        copied: false,
+      },
+    }
+
+    const openSpy = jest.spyOn(modalService, 'open')
+    openSpy.mockReturnValueOnce(modalRef as NgbModalRef)
+    openSpy.mockReturnValueOnce({} as NgbModalRef)
+    ;(shareLinkBundleService.createBundle as jest.Mock).mockReturnValueOnce(
+      of({ id: 42 })
+    )
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+
+    component.createShareLinkBundle()
+
+    expect(openSpy).toHaveBeenNthCalledWith(
+      1,
+      ShareLinkBundleDialogComponent,
+      expect.objectContaining({ backdrop: 'static', size: 'lg' })
+    )
+
+    const dialogInstance = modalRef.componentInstance as any
+    expect(dialogInstance.documents).toEqual([{ id: 5 }, { id: 7 }])
+
+    confirmClicked.emit()
+
+    expect(shareLinkBundleService.createBundle).toHaveBeenCalledWith({
+      document_ids: [5, 7],
+      file_version: 'archive',
+      expiration_days: 7,
+    })
+    expect(dialogInstance.loading).toBe(false)
+    expect(dialogInstance.buttonsEnabled).toBe(false)
+    expect(dialogInstance.createdBundle).toEqual({ id: 42 })
+    expect(typeof dialogInstance.onOpenManage).toBe('function')
+    expect(toastInfoSpy).toHaveBeenCalledWith(
+      $localize`Share link bundle creation requested.`
+    )
+
+    dialogInstance.onOpenManage()
+    expect(modalRef.close).toHaveBeenCalled()
+    expect(openSpy).toHaveBeenNthCalledWith(
+      2,
+      ShareLinkBundleManageDialogComponent,
+      expect.objectContaining({ backdrop: 'static', size: 'lg' })
+    )
+    openSpy.mockRestore()
+  })
+
+  it('should handle share link bundle creation errors', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue([{ id: 9 }] as any)
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([9]))
+
+    const confirmClicked = new EventEmitter<void>()
+    const modalRef: Partial<NgbModalRef> = {
+      componentInstance: {
+        documents: [],
+        confirmClicked,
+        payload: {
+          document_ids: [9],
+          file_version: 'original',
+          expiration_days: null,
+        },
+        loading: false,
+        buttonsEnabled: true,
+      },
+    }
+
+    const openSpy = jest
+      .spyOn(modalService, 'open')
+      .mockReturnValue(modalRef as NgbModalRef)
+    ;(shareLinkBundleService.createBundle as jest.Mock).mockReturnValueOnce(
+      throwError(() => new Error('bundle failure'))
+    )
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+
+    component.createShareLinkBundle()
+
+    const dialogInstance = modalRef.componentInstance as any
+    confirmClicked.emit()
+
+    expect(toastErrorSpy).toHaveBeenCalledWith(
+      $localize`Share link bundle creation is not available yet.`,
+      expect.any(Error)
+    )
+    expect(dialogInstance.loading).toBe(false)
+    expect(dialogInstance.buttonsEnabled).toBe(true)
+    openSpy.mockRestore()
+  })
+
+  it('should open share link bundle management dialog', () => {
+    const openSpy = jest.spyOn(modalService, 'open')
+    component.manageShareLinkBundles()
+    expect(openSpy).toHaveBeenCalledWith(
+      ShareLinkBundleManageDialogComponent,
+      expect.objectContaining({ backdrop: 'static', size: 'lg' })
+    )
+    openSpy.mockRestore()
   })
 })
