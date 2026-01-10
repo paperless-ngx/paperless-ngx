@@ -3,7 +3,18 @@
 
 # Required services
 
+# Redis Configuration
+# Standard Redis connection (use this OR Sentinel configuration below)
 #PAPERLESS_REDIS=redis://localhost:6379
+
+# Redis Sentinel Configuration (alternative to PAPERLESS_REDIS)
+# Uncomment and configure the following for Redis Sentinel support:
+#PAPERLESS_REDIS_SENTINEL_HOSTS=sentinel1:26379,sentinel2:26379,sentinel3:26379
+#PAPERLESS_REDIS_SENTINEL_SERVICE_NAME=mymaster
+#PAPERLESS_REDIS_SENTINEL_PASSWORD=your_sentinel_password
+#PAPERLESS_REDIS_SENTINEL_USERNAME=your_redis_username
+#PAPERLESS_REDIS_SENTINEL_DB=0
+#PAPERLESS_REDIS_PASSWORD=your_redis_password
 #PAPERLESS_DBHOST=localhost
 #PAPERLESS_DBPORT=5432
 #PAPERLESS_DBNAME=paperless
