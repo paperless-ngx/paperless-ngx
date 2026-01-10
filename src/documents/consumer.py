@@ -1,7 +1,10 @@
 import datetime
 import hashlib
+import mimetypes
 import os
+import shutil
 import tempfile
+import zipfile
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -303,6 +306,87 @@ class ConsumerPlugin(
             mime_type = magic.from_file(self.working_copy, mime=True)
 
             self.log.debug(f"Detected mime type: {mime_type}")
+
+            if mime_type == "application/zip":
+                # Use context manager for ZIP processing to ensure cleanup
+                with tempfile.TemporaryDirectory(
+                    prefix="paperless-ngx-zip",
+                    dir=settings.SCRATCH_DIR,
+                ) as zip_tempdir:
+                    filesToProcess = extract_zip_to_tempdir(
+                        self.working_copy,
+                        Path(zip_tempdir),
+                        self.log,
+                    )
+                    zip_name = self.working_copy.name
+                    persistent_dir = Path(settings.SCRATCH_DIR)
+                    persistent_dir.mkdir(parents=True, exist_ok=True)
+
+                    # Import here to avoid circular import
+                    from celery import group
+
+                    from documents.tasks import consume_file
+
+                    consume_tasks = []
+                    for file in filesToProcess:
+                        mime = mimetypes.guess_type(str(file))[0]
+                        self.log.debug(
+                            f"Extracted file: {file.name}, detected mime: {mime}",
+                        )
+                        parser_class = (
+                            get_parser_class_for_mime_type(mime) if mime else None
+                        )
+                        if parser_class is not None:
+                            # Import pathvalidate for filename sanitization
+                            import pathvalidate
+
+                            # Sanitize the filename to prevent filesystem issues
+                            sanitized_name = pathvalidate.sanitize_filename(
+                                file.name,
+                                replacement_text="-",
+                            )
+
+                            # Rename file to zipname#originalname before moving
+                            new_name = f"{zip_name}#{sanitized_name}"
+                            dest = persistent_dir / new_name
+                            shutil.move(str(file), str(dest))
+                            source = getattr(self, "source", None)
+                            pdf_title = Path(sanitized_name).stem
+                            overrides = DocumentMetadataOverrides(
+                                filename=new_name,
+                                title=pdf_title,
+                            )
+                            input_doc = ConsumableDocument(
+                                source=source,
+                                original_file=dest,
+                            )
+                            consume_tasks.append(
+                                consume_file.s(input_doc, overrides),
+                            )
+                        else:
+                            self.log.debug(
+                                f"Skipping file with unsupported mime type: {file.name} (mime: {mime})",
+                            )
+
+                    # Execute all consume tasks as a group
+                    if consume_tasks:
+                        group(consume_tasks).delay()
+
+                try:
+                    if self.input_doc.original_file.exists():
+                        self.input_doc.original_file.unlink()
+                    if self.working_copy.exists():
+                        self.working_copy.unlink()
+                except Exception as e:
+                    self.log.warning(f"Error deleting file: {e}")
+
+                self._send_progress(
+                    100,
+                    100,
+                    ProgressStatusOptions.SUCCESS,
+                    ConsumerStatusShortMessage.FINISHED,
+                )
+                return f"Success. Archive {self.filename} was processed."
 
             if (
                 Path(self.filename).suffix.lower() == ".pdf"
@@ -858,3 +942,52 @@ class ConsumerPreflightPlugin(
         self.pre_check_duplicate()
         self.pre_check_directories()
         self.pre_check_asn_value()
+
+
+def extract_zip_to_tempdir(zip_path, temp_extract_dir, log):
+    extracted_files = []
+    try:
+        with zipfile.ZipFile(zip_path, "r") as zip_ref:
+            for member in zip_ref.infolist():
+                # Skip directories
+                if member.is_dir():
+                    continue
+
+                # Skip macOS metadata files
+                if member.filename.startswith("__MACOSX/") or Path(
+                    member.filename,
+                ).name.startswith("._"):
+                    log.debug(f"Skipping macOS metadata file: {member.filename}")
+                    continue
+
+                # Skip hidden files
+                if member.filename.startswith("."):
+                    continue
+
+                # Simple approach: replace non-ASCII characters with underscores
+                raw_filename = member.filename
+                # Replace any character outside ASCII printable range (32-127) with underscore
+                normalized_filename = "".join(
+                    char if 32 <= ord(char) <= 127 else "_" for char in raw_filename
+                )
+
+                target_path = temp_extract_dir / normalized_filename
+                # Ensure parent directories exist
+                target_path.parent.mkdir(parents=True, exist_ok=True)
+                try:
+                    with (
+                        zip_ref.open(member) as source,
+                        Path(target_path).open("wb") as target,
+                    ):
+                        shutil.copyfileobj(source, target)
+                    extracted_files.append(target_path)
+                except Exception as e:
+                    log.warning(f"Skipping invalid path in ZIP: {target_path} ({e})")
+                    continue
+    except zipfile.BadZipFile as e:
+        log.error(f"Error extracting ZIP file {zip_path}: {e}")
+        raise ConsumerError(f"Error extracting ZIP file {zip_path}: {e}")
+    except Exception as e:
+        log.error(f"Unexpected error extracting ZIP file {zip_path}: {e}")
+        raise ConsumerError(f"Unexpected error extracting ZIP file {zip_path}: {e}")
+    return extracted_files
