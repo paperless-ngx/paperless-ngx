@@ -8,7 +8,6 @@ import os
 import tempfile
 from os import PathLike
 from pathlib import Path
-from platform import machine
 from typing import Final
 from urllib.parse import urlparse
 
@@ -322,6 +321,7 @@ INSTALLED_APPS = [
     "paperless_tesseract.apps.PaperlessTesseractConfig",
     "paperless_text.apps.PaperlessTextConfig",
     "paperless_mail.apps.PaperlessMailConfig",
+    "paperless_remote.apps.PaperlessRemoteParserConfig",
     "django.contrib.admin",
     "rest_framework",
     "rest_framework.authtoken",
@@ -423,14 +423,9 @@ ASGI_APPLICATION = "paperless.asgi.application"
 STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", BASE_URL + "static/")
 WHITENOISE_STATIC_PREFIX = "/static/"
 
-if machine().lower() == "aarch64":  # pragma: no cover
-    _static_backend = "django.contrib.staticfiles.storage.StaticFilesStorage"
-else:
-    _static_backend = "whitenoise.storage.CompressedStaticFilesStorage"
-
 STORAGES = {
     "staticfiles": {
-        "BACKEND": _static_backend,
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
 }
@@ -1402,3 +1397,10 @@ WEBHOOKS_ALLOW_INTERNAL_REQUESTS = __get_boolean(
     "PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS",
     "true",
 )
+
+###############################################################################
+# Remote Parser                                                               #
+###############################################################################
+REMOTE_OCR_ENGINE = os.getenv("PAPERLESS_REMOTE_OCR_ENGINE")
+REMOTE_OCR_API_KEY = os.getenv("PAPERLESS_REMOTE_OCR_API_KEY")
+REMOTE_OCR_ENDPOINT = os.getenv("PAPERLESS_REMOTE_OCR_ENDPOINT")

@@ -493,7 +493,7 @@ def check_scheduled_workflows():
                             trigger.schedule_is_recurring
                             and workflow_runs.exists()
                             and (
-                                workflow_runs.last().run_at
+                                workflow_runs.first().run_at
                                 > now
                                 - datetime.timedelta(
                                     days=trigger.schedule_recurring_interval_days,

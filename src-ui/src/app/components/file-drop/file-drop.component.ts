@@ -150,12 +150,11 @@ export class FileDropComponent {
     this.onDragLeave(event, true)
   }
 
-  @HostListener('window:blur', ['$event']) public onWindowBlur() {
+  @HostListener('window:blur') public onWindowBlur() {
     if (this.fileIsOver) this.onDragLeave(null)
   }
 
-  @HostListener('document:visibilitychange', ['$event'])
-  public onVisibilityChange() {
+  @HostListener('document:visibilitychange') public onVisibilityChange() {
     if (document.hidden && this.fileIsOver) this.onDragLeave(null)
   }
 }

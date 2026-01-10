@@ -175,7 +175,7 @@ To add a new development package `uv add --dev <package>`
 
 ## Front end development
 
-The front end is built using AngularJS. In order to get started, you need Node.js (version 14.15+) and
+The front end is built using AngularJS. In order to get started, you need Node.js (version 24+) and
 `pnpm`.
 
 !!! note

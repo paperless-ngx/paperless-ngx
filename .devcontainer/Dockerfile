@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM --platform=$BUILDPLATFORM docker.io/node:20-trixie-slim as main-app
+FROM --platform=$BUILDPLATFORM docker.io/node:24-trixie-slim as main-app
 
 ARG DEBIAN_FRONTEND=noninteractive
 

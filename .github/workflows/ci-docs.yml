@@ -1,0 +1,88 @@
+name: Documentation
+on:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - '.github/workflows/ci-docs.yml'
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - '.github/workflows/ci-docs.yml'
+  workflow_dispatch:
+concurrency:
+  group: docs-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+env:
+  DEFAULT_UV_VERSION: "0.9.x"
+  DEFAULT_PYTHON_VERSION: "3.11"
+jobs:
+  build:
+    name: Build Documentation
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
+          enable-cache: true
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+      - name: Install Python dependencies
+        run: |
+          uv sync --python ${{ steps.setup-python.outputs.python-version }} --dev --frozen
+      - name: Build documentation
+        run: |
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --dev \
+            --frozen \
+            mkdocs build --config-file ./mkdocs.yml
+      - name: Upload artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: documentation
+          path: site/
+          retention-days: 7
+  deploy:
+    name: Deploy Documentation
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
+          enable-cache: true
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+      - name: Install Python dependencies
+        run: |
+          uv sync --python ${{ steps.setup-python.outputs.python-version }} --dev --frozen
+      - name: Deploy documentation
+        run: |
+          echo "docs.paperless-ngx.com" > "${{ github.workspace }}/docs/CNAME"
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --dev \
+            --frozen \
+            mkdocs gh-deploy --force --no-history

@@ -2,6 +2,7 @@ import {
   APP_INITIALIZER,
   enableProdMode,
   importProvidersFrom,
+  provideZoneChangeDetection,
 } from '@angular/core'
 
 import { DragDropModule } from '@angular/cdk/drag-drop'
@@ -132,6 +133,7 @@ import {
   threeDotsVertical,
   trash,
   uiRadios,
+  unlock,
   upcScan,
   windowStack,
   x,
@@ -348,6 +350,7 @@ const icons = {
   threeDotsVertical,
   trash,
   uiRadios,
+  unlock,
   upcScan,
   windowStack,
   x,
@@ -361,6 +364,7 @@ if (environment.production) {
 
 bootstrapApplication(AppComponent, {
   providers: [
+    provideZoneChangeDetection(),
     importProvidersFrom(
       BrowserModule,
       AppRoutingModule,

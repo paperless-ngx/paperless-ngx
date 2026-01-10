@@ -651,4 +651,25 @@ describe('DocumentListViewService', () => {
     documentListViewService.displayFields = customFields as any
     expect(documentListViewService.displayFields).toEqual(['custom_field_1'])
   })
+
+  it('should generate quick filter URL with filter rules', () => {
+    const routerSpy = jest.spyOn(router, 'createUrlTree')
+    const urlTree = documentListViewService.getQuickFilterUrl(filterRules)
+    expect(routerSpy).toHaveBeenCalledWith(['/documents'], {
+      queryParams: expect.objectContaining({
+        tags__id__all: tags__id__all,
+      }),
+    })
+    expect(urlTree).toBeDefined()
+  })
+
+  it('should generate quick filter URL preserving default state', () => {
+    documentListViewService.reload()
+    httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
+    )
+    const urlTree = documentListViewService.getQuickFilterUrl(filterRules)
+    expect(urlTree).toBeDefined()
+    expect(router.createUrlTree).toBeDefined()
+  })
 })

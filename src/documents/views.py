@@ -1504,6 +1504,7 @@ class BulkEditView(PassUserMixin):
         "merge": None,
         "edit_pdf": "checksum",
         "reprocess": "checksum",
+        "remove_password": "checksum",
     }
 
     permission_classes = (IsAuthenticated,)
@@ -1522,6 +1523,7 @@ class BulkEditView(PassUserMixin):
             bulk_edit.split,
             bulk_edit.merge,
             bulk_edit.edit_pdf,
+            bulk_edit.remove_password,
         ]:
             parameters["user"] = user
 
@@ -1550,6 +1552,7 @@ class BulkEditView(PassUserMixin):
                         bulk_edit.rotate,
                         bulk_edit.delete_pages,
                         bulk_edit.edit_pdf,
+                        bulk_edit.remove_password,
                     ]
                 )
                 or (
@@ -1566,7 +1569,7 @@ class BulkEditView(PassUserMixin):
                 and (
                     method in [bulk_edit.split, bulk_edit.merge]
                     or (
-                        method == bulk_edit.edit_pdf
+                        method in [bulk_edit.edit_pdf, bulk_edit.remove_password]
                         and not parameters["update_document"]
                     )
                 )
