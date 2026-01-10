@@ -1032,18 +1032,6 @@ THREADS_PER_WORKER = os.getenv(
 # Paperless Specific Settings                                                 #
 ###############################################################################
 
-IGNORABLE_FILES: Final[list[str]] = [
-    ".DS_Store",
-    ".DS_STORE",
-    "._*",
-    ".stfolder/*",
-    ".stversions/*",
-    ".localized/*",
-    "desktop.ini",
-    "@eaDir/*",
-    "Thumbs.db",
-]
-
 CONSUMER_POLLING = int(os.getenv("PAPERLESS_CONSUMER_POLLING", 0))
 
 CONSUMER_POLLING_DELAY = int(os.getenv("PAPERLESS_CONSUMER_POLLING_DELAY", 5))
@@ -1066,7 +1054,7 @@ CONSUMER_IGNORE_PATTERNS = list(
     json.loads(
         os.getenv(
             "PAPERLESS_CONSUMER_IGNORE_PATTERNS",
-            json.dumps(IGNORABLE_FILES),
+            json.dumps([]),
         ),
     ),
 )
