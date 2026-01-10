@@ -808,3 +808,57 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.action.refresh_from_db()
         self.assertEqual(self.action.assign_title, "Patched Title")
+
+    def test_password_action_passwords_field(self):
+        """
+        GIVEN:
+            - Nothing
+        WHEN:
+            - A workflow password removal action is created with passwords set
+        THEN:
+            - The passwords field is correctly stored and retrieved
+        """
+        passwords = "password1,password2\npassword3"
+        response = self.client.post(
+            "/api/workflow_actions/",
+            {
+                "type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+                "passwords": passwords,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["passwords"], passwords)
+
+    def test_password_action_no_passwords_field(self):
+        """
+        GIVEN:
+            - Nothing
+        WHEN:
+            - A workflow password removal action is created with no passwords set
+            - A workflow password removal action is created with passwords set to empty string
+        THEN:
+            - The required validation error is raised
+        """
+        response = self.client.post(
+            "/api/workflow_actions/",
+            {
+                "type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            "Passwords are required",
+            str(response.data["non_field_errors"][0]),
+        )
+        response = self.client.post(
+            "/api/workflow_actions/",
+            {
+                "type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+                "passwords": "",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            "Passwords are required",
+            str(response.data["non_field_errors"][0]),
+        )
