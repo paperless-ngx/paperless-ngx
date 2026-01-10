@@ -230,8 +230,8 @@ export abstract class ManagementListComponent<T extends MatchingModel>
 
   abstract getDeleteMessage(object: T)
 
-  filterDocuments(object: MatchingModel) {
-    this.documentListViewService.quickFilter([
+  getDocumentFilterUrl(object: MatchingModel) {
+    return this.documentListViewService.getQuickFilterUrl([
       { rule_type: this.filterRuleType, value: object.id.toString() },
     ])
   }

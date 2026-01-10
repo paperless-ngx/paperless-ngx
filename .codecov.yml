@@ -9,6 +9,15 @@ component_management:
     - component_id: frontend
       paths:
         - src-ui/**
+flags:
+  backend:
+    paths:
+      - src/**
+    carryforward: true
+  frontend:
+    paths:
+      - src-ui/**
+    carryforward: true
 # https://docs.codecov.com/docs/pull-request-comments
 comment:
   layout: "header, diff, components, flags, files"
