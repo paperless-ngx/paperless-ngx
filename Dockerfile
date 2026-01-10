@@ -5,7 +5,7 @@
 # Purpose: Compiles the frontend
 # Notes:
 #  - Does PNPM stuff with Typescript and such
-FROM --platform=$BUILDPLATFORM docker.io/node:20-trixie-slim AS compile-frontend
+FROM --platform=$BUILDPLATFORM docker.io/node:24-trixie-slim AS compile-frontend
 
 COPY ./src-ui /src/src-ui
 
