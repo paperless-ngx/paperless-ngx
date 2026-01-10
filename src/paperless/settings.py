@@ -1033,7 +1033,7 @@ CONSUMER_IGNORE_PATTERNS = list(
     json.loads(
         os.getenv(
             "PAPERLESS_CONSUMER_IGNORE_PATTERNS",
-            json.dumps(IGNORABLE_FILES),
+            json.dumps([]),
         ),
     ),
 )
