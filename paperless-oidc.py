@@ -69,8 +69,6 @@ print("Headless config: ", response.json())
 provider = response.json()["data"]["socialaccount"]["providers"][0]
 print("Provider config: ", provider)
 
-# Simulate the provider containing the server_url (requested feature)
-provider["server_url"] = "https://auth.example.com"
 
 """
 Obtain redirect uri from _allauth/browser/v1/auth/provider/redirect
@@ -98,17 +96,15 @@ parsed_url = urlparse(redirect.headers.get("Location"))
 query_params = parse_qs(parsed_url.query)
 
 # Extract scope parameter to match provider
-scope_param = query_params['scope'][0]
+scope_param = query_params["scope"][0]
 print("Parsed scopes: ", scope_param)
 
 # Redirect URI from the app
 redirect_uri = "http://localhost:9000/callback/"
 
-# Depending on final implementation in allauth, add well known
-discovery_url = provider["server_url"]
-well_known_uri = "/.well-known/openid-configuration"
-if "/.well-known/" not in discovery_url:
-    discovery_url += well_known_uri
+# Get well-known discovery URL from allauth
+discovery_url = provider["openid_configuration_url"]
+print(discovery_url)
 
 # Use oidc discovery to get endpoints
 oidc_config = requests.get(discovery_url).json()
@@ -118,13 +114,14 @@ client = OAuth2Session(
     provider["client_id"],
     redirect_uri=redirect_uri,
     scope=scope_param,
-    code_challenge_method="S256"
+    code_challenge_method="S256",
 )
 
 # Create a new authorization URL
 code_verifier = generate_token(48)
 authorization_url, state = client.create_authorization_url(
-    oidc_config["authorization_endpoint"], code_verifier=code_verifier)
+    oidc_config["authorization_endpoint"], code_verifier=code_verifier
+)
 
 # 1. Redirect the user to the updated URL
 webbrowser.open(authorization_url)
@@ -170,12 +167,9 @@ response = session.post(
     json={
         "provider": provider["id"],
         "process": "login",
-        "token": {
-            "client_id": provider["client_id"],
-            "id_token": id_token
-        },
-        "csrfmiddlewaretoken": cookies["csrftoken"]
-    }
+        "token": {"client_id": provider["client_id"], "id_token": id_token},
+        "csrfmiddlewaretoken": cookies["csrftoken"],
+    },
 )
 
 print("Exchange status code: ", response.status_code)
