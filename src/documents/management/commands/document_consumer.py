@@ -294,7 +294,7 @@ class ConsumerFilter(DefaultFilter):
     def _matches_ignore_pattern(self, filename: str) -> bool:
         """Check if the filename matches any ignore pattern."""
         for regex in self._ignore_regexes:
-            if regex.search(filename):
+            if regex.match(filename):
                 logger.debug(
                     f"Filename {filename} matched ignore pattern {regex.pattern}",
                 )
