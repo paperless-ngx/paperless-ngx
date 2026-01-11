@@ -408,7 +408,7 @@ class Command(BaseCommand):
         # Resolve consumption directory
         directory = options.get("directory")
         if not directory:
-            directory = getattr(settings, "CONSUMPTION_DIR", None)
+            directory = settings.CONSUMPTION_DIR
         if not directory:
             raise CommandError("CONSUMPTION_DIR is not configured")
 
