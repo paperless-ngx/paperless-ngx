@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-12 17:41+0000\n"
-"PO-Revision-Date: 2025-12-12 17:44\n"
+"POT-Creation-Date: 2026-01-08 21:50+0000\n"
+"PO-Revision-Date: 2026-01-08 21:52\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -27,27 +27,27 @@ msgstr "Значення має бути коректним JSON."
 
 #: documents/filters.py:414
 msgid "Invalid custom field query expression"
-msgstr ""
+msgstr "Хибний вираз запиту користувацького поля"
 
 #: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
-msgstr ""
+msgstr "Недопустимий список виразів. Має бути непустим."
 
 #: documents/filters.py:445
 msgid "Invalid logical operator {op!r}"
-msgstr ""
+msgstr "Неприпустимий логічний оператор {op!r}"
 
 #: documents/filters.py:459
 msgid "Maximum number of query conditions exceeded."
-msgstr ""
+msgstr "Перевищено максимальну кількість умов запиту."
 
 #: documents/filters.py:524
 msgid "{name!r} is not a valid custom field."
-msgstr ""
+msgstr "{name!r} не є дійсним користувацьким полем."
 
 #: documents/filters.py:561
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr ""
+msgstr "{data_type} не підтримує вираз {expr!r}."
 
 #: documents/filters.py:669 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
@@ -55,7 +55,7 @@ msgstr ""
 
 #: documents/filters.py:854
 msgid "Custom field not found"
-msgstr ""
+msgstr "Не знайдено користувацьке поле"
 
 #: documents/models.py:38 documents/models.py:768
 msgid "owner"
@@ -204,11 +204,11 @@ msgstr "Контрольна сума архівованого документ�
 
 #: documents/models.py:229
 msgid "page count"
-msgstr ""
+msgstr "кількість сторінок"
 
 #: documents/models.py:236
 msgid "The number of pages of the document."
-msgstr ""
+msgstr "Кількість сторінок документа."
 
 #: documents/models.py:241 documents/models.py:688 documents/models.py:726
 #: documents/models.py:798 documents/models.py:857
@@ -326,7 +326,7 @@ msgstr "ASN"
 
 #: documents/models.py:453
 msgid "Pages"
-msgstr ""
+msgstr "Сторінки"
 
 #: documents/models.py:459
 msgid "show on dashboard"
@@ -542,7 +542,7 @@ msgstr ""
 
 #: documents/models.py:549
 msgid "created from"
-msgstr ""
+msgstr "створено з"
 
 #: documents/models.py:550
 msgid "added to"
@@ -554,7 +554,7 @@ msgstr ""
 
 #: documents/models.py:552
 msgid "mime type is"
-msgstr ""
+msgstr "тип mime є"
 
 #: documents/models.py:562
 msgid "rule type"
@@ -590,7 +590,7 @@ msgstr ""
 
 #: documents/models.py:598
 msgid "Train Classifier"
-msgstr ""
+msgstr "Навчити класифікатор"
 
 #: documents/models.py:599
 msgid "Check Sanity"
@@ -758,7 +758,7 @@ msgstr "Вибрати"
 
 #: documents/models.py:795
 msgid "Long Text"
-msgstr ""
+msgstr "Довгий текст"
 
 #: documents/models.py:807
 msgid "data type"
@@ -802,7 +802,7 @@ msgstr "Документ оновлено"
 
 #: documents/models.py:994
 msgid "Scheduled"
-msgstr ""
+msgstr "Заплановано"
 
 #: documents/models.py:997
 msgid "Consume Folder"
@@ -818,11 +818,11 @@ msgstr "Завантаження пошти"
 
 #: documents/models.py:1000
 msgid "Web UI"
-msgstr ""
+msgstr "Веб-інтерфейс"
 
 #: documents/models.py:1005
 msgid "Modified"
-msgstr ""
+msgstr "Змінено"
 
 #: documents/models.py:1006
 msgid "Custom Field"
@@ -914,7 +914,7 @@ msgstr ""
 
 #: documents/models.py:1151
 msgid "schedule recurring delay in days"
-msgstr ""
+msgstr "запланувати періодичну затримку в днях"
 
 #: documents/models.py:1155
 msgid "The number of days between recurring schedule triggers."
@@ -922,7 +922,7 @@ msgstr ""
 
 #: documents/models.py:1160
 msgid "schedule date field"
-msgstr ""
+msgstr "поле дати розкладу"
 
 #: documents/models.py:1165
 msgid "The field to check for a schedule trigger."
@@ -1208,34 +1208,34 @@ msgstr ""
 msgid "workflow runs"
 msgstr ""
 
-#: documents/serialisers.py:640
+#: documents/serialisers.py:642
 msgid "Invalid color."
 msgstr "Неправильний колір."
 
-#: documents/serialisers.py:1826
+#: documents/serialisers.py:1846
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Тип файлу %(type)s не підтримується"
 
-#: documents/serialisers.py:1870
+#: documents/serialisers.py:1890
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr ""
 
-#: documents/serialisers.py:1877
+#: documents/serialisers.py:1897
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr ""
 
-#: documents/serialisers.py:1894 documents/serialisers.py:1904
+#: documents/serialisers.py:1914 documents/serialisers.py:1924
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr ""
 
-#: documents/serialisers.py:1899
+#: documents/serialisers.py:1919
 msgid "Some custom fields don't exist or were specified twice."
 msgstr ""
 
-#: documents/serialisers.py:2014
+#: documents/serialisers.py:2034
 msgid "Invalid variable detected."
 msgstr "Виявлено неправильну змінну."
 
@@ -1676,147 +1676,151 @@ msgstr ""
 msgid "paperless application settings"
 msgstr "налаштування програми документообігу"
 
-#: paperless/settings.py:773
+#: paperless/settings.py:768
 msgid "English (US)"
 msgstr "Англійська (США)"
 
-#: paperless/settings.py:774
+#: paperless/settings.py:769
 msgid "Arabic"
 msgstr "Арабська"
 
-#: paperless/settings.py:775
+#: paperless/settings.py:770
 msgid "Afrikaans"
 msgstr "Африкаанс"
 
-#: paperless/settings.py:776
+#: paperless/settings.py:771
 msgid "Belarusian"
 msgstr "Білоруська"
 
-#: paperless/settings.py:777
+#: paperless/settings.py:772
 msgid "Bulgarian"
 msgstr "Болгарська"
 
-#: paperless/settings.py:778
+#: paperless/settings.py:773
 msgid "Catalan"
 msgstr "Каталонська"
 
-#: paperless/settings.py:779
+#: paperless/settings.py:774
 msgid "Czech"
 msgstr "Чеська"
 
-#: paperless/settings.py:780
+#: paperless/settings.py:775
 msgid "Danish"
 msgstr "Данська"
 
-#: paperless/settings.py:781
+#: paperless/settings.py:776
 msgid "German"
 msgstr "Німецька"
 
-#: paperless/settings.py:782
+#: paperless/settings.py:777
 msgid "Greek"
 msgstr "Грецька"
 
-#: paperless/settings.py:783
+#: paperless/settings.py:778
 msgid "English (GB)"
 msgstr "Англійська (Велика Британія)"
 
-#: paperless/settings.py:784
+#: paperless/settings.py:779
 msgid "Spanish"
 msgstr "Іспанська"
 
-#: paperless/settings.py:785
+#: paperless/settings.py:780
 msgid "Persian"
 msgstr ""
 
-#: paperless/settings.py:786
+#: paperless/settings.py:781
 msgid "Finnish"
 msgstr "Фінська"
 
-#: paperless/settings.py:787
+#: paperless/settings.py:782
 msgid "French"
 msgstr "Французька"
 
-#: paperless/settings.py:788
+#: paperless/settings.py:783
 msgid "Hungarian"
 msgstr "Угорська"
 
-#: paperless/settings.py:789
+#: paperless/settings.py:784
+msgid "Indonesian"
+msgstr ""
+
+#: paperless/settings.py:785
 msgid "Italian"
 msgstr "Італійська"
 
-#: paperless/settings.py:790
+#: paperless/settings.py:786
 msgid "Japanese"
 msgstr "Японська"
 
-#: paperless/settings.py:791
+#: paperless/settings.py:787
 msgid "Korean"
 msgstr "Корейська"
 
-#: paperless/settings.py:792
+#: paperless/settings.py:788
 msgid "Luxembourgish"
 msgstr "Люксембурзька"
 
-#: paperless/settings.py:793
+#: paperless/settings.py:789
 msgid "Norwegian"
 msgstr "Норвезька"
 
-#: paperless/settings.py:794
+#: paperless/settings.py:790
 msgid "Dutch"
 msgstr "Нідерландська"
 
-#: paperless/settings.py:795
+#: paperless/settings.py:791
 msgid "Polish"
 msgstr "Польська"
 
-#: paperless/settings.py:796
+#: paperless/settings.py:792
 msgid "Portuguese (Brazil)"
 msgstr "Португальська (Бразилія)"
 
-#: paperless/settings.py:797
+#: paperless/settings.py:793
 msgid "Portuguese"
 msgstr "Португальська"
 
-#: paperless/settings.py:798
+#: paperless/settings.py:794
 msgid "Romanian"
 msgstr "Румунська"
 
-#: paperless/settings.py:799
+#: paperless/settings.py:795
 msgid "Russian"
 msgstr "Російська"
 
-#: paperless/settings.py:800
+#: paperless/settings.py:796
 msgid "Slovak"
 msgstr "Словацька"
 
-#: paperless/settings.py:801
+#: paperless/settings.py:797
 msgid "Slovenian"
 msgstr "Словенська"
 
-#: paperless/settings.py:802
+#: paperless/settings.py:798
 msgid "Serbian"
 msgstr "Сербська"
 
-#: paperless/settings.py:803
+#: paperless/settings.py:799
 msgid "Swedish"
 msgstr "Шведська"
 
-#: paperless/settings.py:804
+#: paperless/settings.py:800
 msgid "Turkish"
 msgstr "Турецька"
 
-#: paperless/settings.py:805
+#: paperless/settings.py:801
 msgid "Ukrainian"
 msgstr "Українська"
 
-#: paperless/settings.py:806
+#: paperless/settings.py:802
 msgid "Vietnamese"
 msgstr ""
 
-#: paperless/settings.py:807
+#: paperless/settings.py:803
 msgid "Chinese Simplified"
 msgstr "Китайська спрощена"
 
-#: paperless/settings.py:808
+#: paperless/settings.py:804
 msgid "Chinese Traditional"
 msgstr ""
 
