@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-12 17:41+0000\n"
-"PO-Revision-Date: 2025-12-12 17:44\n"
+"POT-Creation-Date: 2026-01-08 21:50+0000\n"
+"PO-Revision-Date: 2026-01-08 21:52\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -27,7 +27,7 @@ msgstr "يجب أن تكون القيمة JSON."
 
 #: documents/filters.py:414
 msgid "Invalid custom field query expression"
-msgstr ""
+msgstr "تعبير استعلام غير صالح للحقول المخصصة"
 
 #: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
@@ -47,7 +47,7 @@ msgstr "{name!r} حقل مخصص غير صالح."
 
 #: documents/filters.py:561
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr ""
+msgstr "{data_type} لا يدعم تعبير الاستعلام {expr!r}."
 
 #: documents/filters.py:669 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
@@ -962,7 +962,7 @@ msgstr ""
 
 #: documents/models.py:1209
 msgid "The destination email addresses, comma separated."
-msgstr ""
+msgstr "عناوين البريد الإلكتروني المستهدفة، مفصولة بفواصل."
 
 #: documents/models.py:1215
 msgid "include document in email"
@@ -970,7 +970,7 @@ msgstr "تضمين المستند في البريد الإلكتروني"
 
 #: documents/models.py:1226
 msgid "webhook url"
-msgstr ""
+msgstr "عنوان Url الخاص بـ webhook"
 
 #: documents/models.py:1229
 msgid "The destination URL for the notification."
@@ -978,19 +978,19 @@ msgstr "عنوان URL وجهة الإشعار."
 
 #: documents/models.py:1234
 msgid "use parameters"
-msgstr ""
+msgstr "استخدام المعلمات"
 
 #: documents/models.py:1239
 msgid "send as JSON"
-msgstr ""
+msgstr "إرسال بصيغة JSON"
 
 #: documents/models.py:1243
 msgid "webhook parameters"
-msgstr ""
+msgstr "معلمات webhook"
 
 #: documents/models.py:1246
 msgid "The parameters to send with the webhook URL if body not used."
-msgstr ""
+msgstr "المعلمات التي يتم إرسالها مع عنوان URL الخاص بـ webhook في حالة عدم استخدام نص الطلب."
 
 #: documents/models.py:1250
 msgid "webhook body"
@@ -998,7 +998,7 @@ msgstr ""
 
 #: documents/models.py:1253
 msgid "The body to send with the webhook URL if parameters not used."
-msgstr ""
+msgstr "نص الطلب الذي سيتم إرساله مع عنوان URL الخاص بـ webhook في حالة عدم استخدام المعلمات."
 
 #: documents/models.py:1257
 msgid "webhook headers"
@@ -1208,34 +1208,34 @@ msgstr ""
 msgid "workflow runs"
 msgstr ""
 
-#: documents/serialisers.py:640
+#: documents/serialisers.py:642
 msgid "Invalid color."
 msgstr "لون خاطئ."
 
-#: documents/serialisers.py:1826
+#: documents/serialisers.py:1846
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "نوع الملف %(type)s غير مدعوم"
 
-#: documents/serialisers.py:1870
+#: documents/serialisers.py:1890
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr ""
 
-#: documents/serialisers.py:1877
+#: documents/serialisers.py:1897
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr ""
 
-#: documents/serialisers.py:1894 documents/serialisers.py:1904
+#: documents/serialisers.py:1914 documents/serialisers.py:1924
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr ""
 
-#: documents/serialisers.py:1899
+#: documents/serialisers.py:1919
 msgid "Some custom fields don't exist or were specified twice."
 msgstr ""
 
-#: documents/serialisers.py:2014
+#: documents/serialisers.py:2034
 msgid "Invalid variable detected."
 msgstr "اكتشاف متغير خاطئ."
 
@@ -1676,147 +1676,151 @@ msgstr ""
 msgid "paperless application settings"
 msgstr "إعدادات التطبيق paperless"
 
-#: paperless/settings.py:773
+#: paperless/settings.py:768
 msgid "English (US)"
 msgstr "الإنجليزية (الولايات المتحدة)"
 
-#: paperless/settings.py:774
+#: paperless/settings.py:769
 msgid "Arabic"
 msgstr "العربية"
 
-#: paperless/settings.py:775
+#: paperless/settings.py:770
 msgid "Afrikaans"
 msgstr "اللغة الأفريقانية"
 
-#: paperless/settings.py:776
+#: paperless/settings.py:771
 msgid "Belarusian"
 msgstr "البيلاروسية"
 
-#: paperless/settings.py:777
+#: paperless/settings.py:772
 msgid "Bulgarian"
 msgstr "البلغارية"
 
-#: paperless/settings.py:778
+#: paperless/settings.py:773
 msgid "Catalan"
 msgstr "اللغة الكتالونية"
 
-#: paperless/settings.py:779
+#: paperless/settings.py:774
 msgid "Czech"
 msgstr "التشيكية"
 
-#: paperless/settings.py:780
+#: paperless/settings.py:775
 msgid "Danish"
 msgstr "الدانماركية"
 
-#: paperless/settings.py:781
+#: paperless/settings.py:776
 msgid "German"
 msgstr "الألمانية"
 
-#: paperless/settings.py:782
+#: paperless/settings.py:777
 msgid "Greek"
 msgstr "اليونانية"
 
-#: paperless/settings.py:783
+#: paperless/settings.py:778
 msgid "English (GB)"
 msgstr "الإنجليزية (المملكة المتحدة)"
 
-#: paperless/settings.py:784
+#: paperless/settings.py:779
 msgid "Spanish"
 msgstr "الإسبانية"
 
-#: paperless/settings.py:785
+#: paperless/settings.py:780
 msgid "Persian"
 msgstr ""
 
-#: paperless/settings.py:786
+#: paperless/settings.py:781
 msgid "Finnish"
 msgstr "الفنلندية"
 
-#: paperless/settings.py:787
+#: paperless/settings.py:782
 msgid "French"
 msgstr "الفرنسية"
 
-#: paperless/settings.py:788
+#: paperless/settings.py:783
 msgid "Hungarian"
 msgstr "المجرية"
 
-#: paperless/settings.py:789
+#: paperless/settings.py:784
+msgid "Indonesian"
+msgstr ""
+
+#: paperless/settings.py:785
 msgid "Italian"
 msgstr "الإيطالية"
 
-#: paperless/settings.py:790
+#: paperless/settings.py:786
 msgid "Japanese"
 msgstr "اليابانية"
 
-#: paperless/settings.py:791
+#: paperless/settings.py:787
 msgid "Korean"
 msgstr ""
 
-#: paperless/settings.py:792
+#: paperless/settings.py:788
 msgid "Luxembourgish"
 msgstr "اللوكسمبرجية"
 
-#: paperless/settings.py:793
+#: paperless/settings.py:789
 msgid "Norwegian"
 msgstr "النرويجية"
 
-#: paperless/settings.py:794
+#: paperless/settings.py:790
 msgid "Dutch"
 msgstr "الهولندية"
 
-#: paperless/settings.py:795
+#: paperless/settings.py:791
 msgid "Polish"
 msgstr "البولندية"
 
-#: paperless/settings.py:796
+#: paperless/settings.py:792
 msgid "Portuguese (Brazil)"
 msgstr "البرتغالية (البرازيل)"
 
-#: paperless/settings.py:797
+#: paperless/settings.py:793
 msgid "Portuguese"
 msgstr "البرتغالية"
 
-#: paperless/settings.py:798
+#: paperless/settings.py:794
 msgid "Romanian"
 msgstr "الرومانية"
 
-#: paperless/settings.py:799
+#: paperless/settings.py:795
 msgid "Russian"
 msgstr "الروسية"
 
-#: paperless/settings.py:800
+#: paperless/settings.py:796
 msgid "Slovak"
 msgstr "السلوفاكية"
 
-#: paperless/settings.py:801
+#: paperless/settings.py:797
 msgid "Slovenian"
 msgstr "السلوفانية"
 
-#: paperless/settings.py:802
+#: paperless/settings.py:798
 msgid "Serbian"
 msgstr "الصربية"
 
-#: paperless/settings.py:803
+#: paperless/settings.py:799
 msgid "Swedish"
 msgstr "السويدية"
 
-#: paperless/settings.py:804
+#: paperless/settings.py:800
 msgid "Turkish"
 msgstr "التركية"
 
-#: paperless/settings.py:805
+#: paperless/settings.py:801
 msgid "Ukrainian"
 msgstr "الأوكرانية"
 
-#: paperless/settings.py:806
+#: paperless/settings.py:802
 msgid "Vietnamese"
 msgstr ""
 
-#: paperless/settings.py:807
+#: paperless/settings.py:803
 msgid "Chinese Simplified"
 msgstr "الصينية المبسطة"
 
-#: paperless/settings.py:808
+#: paperless/settings.py:804
 msgid "Chinese Traditional"
 msgstr ""
 

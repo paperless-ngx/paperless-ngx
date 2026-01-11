@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-12 17:41+0000\n"
-"PO-Revision-Date: 2025-12-12 17:44\n"
+"POT-Creation-Date: 2026-01-08 21:50+0000\n"
+"PO-Revision-Date: 2026-01-08 21:52\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -23,7 +23,7 @@ msgstr "Dokumenter"
 
 #: documents/filters.py:395
 msgid "Value must be valid JSON."
-msgstr "Verdien må være en gyldig JSON."
+msgstr "Verdien må være gyldig JSON."
 
 #: documents/filters.py:414
 msgid "Invalid custom field query expression"
@@ -75,11 +75,11 @@ msgstr "Alle ord"
 
 #: documents/models.py:58 documents/models.py:986
 msgid "Exact match"
-msgstr "Eksakt match"
+msgstr "Eksakt treff"
 
 #: documents/models.py:59 documents/models.py:987
 msgid "Regular expression"
-msgstr "Regulære uttrykk"
+msgstr "Vanlige uttrykk"
 
 #: documents/models.py:60 documents/models.py:988
 msgid "Fuzzy word"
@@ -104,7 +104,7 @@ msgstr "samsvarende algoritme"
 
 #: documents/models.py:74 documents/models.py:1060
 msgid "is insensitive"
-msgstr "er insensitiv"
+msgstr "er ikke sensitiv"
 
 #: documents/models.py:97 documents/models.py:170
 msgid "correspondent"
@@ -124,7 +124,7 @@ msgstr "er innboks tag"
 
 #: documents/models.py:110
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr "Markerer dette merket som en innboks-tag: Alle nybrukte dokumenter vil bli merket med innboks-tagger."
+msgstr "Markerer dette merket som en innboks-tag: Alle nye dokumenter blir merket med innboks-tagger."
 
 #: documents/models.py:116
 msgid "tag"
@@ -144,7 +144,7 @@ msgstr ""
 
 #: documents/models.py:142 documents/models.py:190
 msgid "document type"
-msgstr "dokument type"
+msgstr "dokumenttype"
 
 #: documents/models.py:143
 msgid "document types"
@@ -160,7 +160,7 @@ msgstr "lagringssti"
 
 #: documents/models.py:153
 msgid "storage paths"
-msgstr "lagringsveier"
+msgstr "lagringsstier"
 
 #: documents/models.py:160
 msgid "Unencrypted"
@@ -180,11 +180,11 @@ msgstr "innhold"
 
 #: documents/models.py:197
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr "Raw, tekstbare data fra dokumentet. Dette feltet brukes primært for søking."
+msgstr "Uformatert tekst fra dokumentet. Dette feltet brukes primært for søking."
 
 #: documents/models.py:202
 msgid "mime type"
-msgstr "mime type"
+msgstr "mimetype"
 
 #: documents/models.py:212
 msgid "checksum"
@@ -196,7 +196,7 @@ msgstr "Sjekksummen av det opprinnelige dokumentet."
 
 #: documents/models.py:220
 msgid "archive checksum"
-msgstr "arkiv sjekksum"
+msgstr "arkivsjekksum"
 
 #: documents/models.py:225
 msgid "The checksum of the archived document."
@@ -257,7 +257,7 @@ msgstr "arkiver serienummer"
 
 #: documents/models.py:312
 msgid "The position of this document in your physical document archive."
-msgstr "Dokumentets posisjon i ditt fysiske dokumentarkiv."
+msgstr "Fysisk lagringsplass for dokument."
 
 #: documents/models.py:318 documents/models.py:699 documents/models.py:753
 #: documents/models.py:1569
@@ -310,7 +310,7 @@ msgstr "Lagringssti"
 
 #: documents/models.py:449
 msgid "Note"
-msgstr "Notat"
+msgstr "Merknad"
 
 #: documents/models.py:450
 msgid "Owner"
@@ -342,7 +342,7 @@ msgstr "sorter felt"
 
 #: documents/models.py:471
 msgid "sort reverse"
-msgstr "sorter på baksiden"
+msgstr "motsatt sortering"
 
 #: documents/models.py:474
 msgid "View page size"
@@ -354,7 +354,7 @@ msgstr "Vis visningsmodus"
 
 #: documents/models.py:489
 msgid "Document display fields"
-msgstr "Dokument visning felt"
+msgstr "Utsnitt for dokumentvisning"
 
 #: documents/models.py:496 documents/models.py:559
 msgid "saved view"
@@ -378,7 +378,7 @@ msgstr "ASN er"
 
 #: documents/models.py:508
 msgid "correspondent is"
-msgstr "tilsvarendet er"
+msgstr "korrespondenten er"
 
 #: documents/models.py:509
 msgid "document type is"
@@ -390,11 +390,11 @@ msgstr "er i innboksen"
 
 #: documents/models.py:511
 msgid "has tag"
-msgstr "har tagg"
+msgstr "har etikett"
 
 #: documents/models.py:512
 msgid "has any tag"
-msgstr "har en tag"
+msgstr "har en etikett"
 
 #: documents/models.py:513
 msgid "created before"
@@ -434,7 +434,7 @@ msgstr "endret etter"
 
 #: documents/models.py:522
 msgid "does not have tag"
-msgstr "har ikke tagg"
+msgstr "har ikke etikett"
 
 #: documents/models.py:523
 msgid "does not have ASN"
@@ -446,7 +446,7 @@ msgstr "tittel eller innhold inneholder"
 
 #: documents/models.py:525
 msgid "fulltext query"
-msgstr "full tekst spørring"
+msgstr "fulltekstsøk"
 
 #: documents/models.py:526
 msgid "more like this"
@@ -454,7 +454,7 @@ msgstr "mer som dette"
 
 #: documents/models.py:527
 msgid "has tags in"
-msgstr "har tags i"
+msgstr "har etiketter i"
 
 #: documents/models.py:528
 msgid "ASN greater than"
@@ -558,7 +558,7 @@ msgstr ""
 
 #: documents/models.py:562
 msgid "rule type"
-msgstr "Type regel"
+msgstr "regeltype"
 
 #: documents/models.py:564
 msgid "value"
@@ -566,11 +566,11 @@ msgstr "verdi"
 
 #: documents/models.py:567
 msgid "filter rule"
-msgstr "filtrer regel"
+msgstr "filterregel"
 
 #: documents/models.py:568
 msgid "filter rules"
-msgstr "filtrer regler"
+msgstr "filterregler"
 
 #: documents/models.py:592
 msgid "Auto Task"
@@ -598,7 +598,7 @@ msgstr ""
 
 #: documents/models.py:600
 msgid "Index Optimize"
-msgstr "index optimalisering"
+msgstr "Indeksoptimalisering"
 
 #: documents/models.py:605
 msgid "Task ID"
@@ -614,11 +614,11 @@ msgstr "Bekreftet"
 
 #: documents/models.py:612
 msgid "If the task is acknowledged via the frontend or API"
-msgstr "Hvis oppgaven bekreftes via frontend eller API"
+msgstr "Om oppgaven er bekreftet via grensesnittet eller APIet"
 
 #: documents/models.py:618
 msgid "Task Filename"
-msgstr "Filnavn for oppgave"
+msgstr "Oppgavefilnavn"
 
 #: documents/models.py:619
 msgid "Name of the file which the Task was run for"
@@ -634,7 +634,7 @@ msgstr "Navn på oppgaven som ble kjørt"
 
 #: documents/models.py:634
 msgid "Task State"
-msgstr "Oppgave tilstand"
+msgstr "Oppgavestatus"
 
 #: documents/models.py:635
 msgid "Current state of the task being run"
@@ -674,11 +674,11 @@ msgstr "Dataene returnert av oppgaven"
 
 #: documents/models.py:672
 msgid "Task Type"
-msgstr "Oppgave type"
+msgstr "Oppgavetype"
 
 #: documents/models.py:673
 msgid "The type of task that was run"
-msgstr "Type oppgave som ble utført"
+msgstr "Oppgavetype som ble utført"
 
 #: documents/models.py:684
 msgid "Note for the document"
@@ -714,11 +714,11 @@ msgstr "slug"
 
 #: documents/models.py:773
 msgid "share link"
-msgstr "del kobling"
+msgstr "del lenke"
 
 #: documents/models.py:774
 msgid "share links"
-msgstr "del linker"
+msgstr "del lenker"
 
 #: documents/models.py:786
 msgid "String"
@@ -750,7 +750,7 @@ msgstr ""
 
 #: documents/models.py:793
 msgid "Document Link"
-msgstr "Dokument lenke"
+msgstr "Dokumentlenke"
 
 #: documents/models.py:794
 msgid "Select"
@@ -762,7 +762,7 @@ msgstr ""
 
 #: documents/models.py:807
 msgid "data type"
-msgstr "data type"
+msgstr "datatype"
 
 #: documents/models.py:814
 msgid "extra data"
@@ -1208,34 +1208,34 @@ msgstr ""
 msgid "workflow runs"
 msgstr ""
 
-#: documents/serialisers.py:640
+#: documents/serialisers.py:642
 msgid "Invalid color."
 msgstr "Ugyldig farge."
 
-#: documents/serialisers.py:1826
+#: documents/serialisers.py:1846
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Filtype %(type)s støttes ikke"
 
-#: documents/serialisers.py:1870
+#: documents/serialisers.py:1890
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr ""
 
-#: documents/serialisers.py:1877
+#: documents/serialisers.py:1897
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr ""
 
-#: documents/serialisers.py:1894 documents/serialisers.py:1904
+#: documents/serialisers.py:1914 documents/serialisers.py:1924
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr ""
 
-#: documents/serialisers.py:1899
+#: documents/serialisers.py:1919
 msgid "Some custom fields don't exist or were specified twice."
 msgstr ""
 
-#: documents/serialisers.py:2014
+#: documents/serialisers.py:2034
 msgid "Invalid variable detected."
 msgstr "Ugyldig variabel oppdaget."
 
@@ -1675,147 +1675,151 @@ msgstr ""
 msgid "paperless application settings"
 msgstr ""
 
-#: paperless/settings.py:773
+#: paperless/settings.py:768
 msgid "English (US)"
 msgstr "Engelsk (US)"
 
-#: paperless/settings.py:774
+#: paperless/settings.py:769
 msgid "Arabic"
 msgstr "Arabisk"
 
-#: paperless/settings.py:775
+#: paperless/settings.py:770
 msgid "Afrikaans"
 msgstr "Afrikansk"
 
-#: paperless/settings.py:776
+#: paperless/settings.py:771
 msgid "Belarusian"
 msgstr "Hviterussisk"
 
-#: paperless/settings.py:777
+#: paperless/settings.py:772
 msgid "Bulgarian"
 msgstr ""
 
-#: paperless/settings.py:778
+#: paperless/settings.py:773
 msgid "Catalan"
 msgstr "Katalansk"
 
-#: paperless/settings.py:779
+#: paperless/settings.py:774
 msgid "Czech"
 msgstr "Tsjekkisk"
 
-#: paperless/settings.py:780
+#: paperless/settings.py:775
 msgid "Danish"
 msgstr "Dansk"
 
-#: paperless/settings.py:781
+#: paperless/settings.py:776
 msgid "German"
 msgstr "Tysk"
 
-#: paperless/settings.py:782
+#: paperless/settings.py:777
 msgid "Greek"
 msgstr "Gresk"
 
-#: paperless/settings.py:783
+#: paperless/settings.py:778
 msgid "English (GB)"
 msgstr "Engelsk (GB)"
 
-#: paperless/settings.py:784
+#: paperless/settings.py:779
 msgid "Spanish"
 msgstr "Spansk"
 
-#: paperless/settings.py:785
+#: paperless/settings.py:780
 msgid "Persian"
 msgstr ""
 
-#: paperless/settings.py:786
+#: paperless/settings.py:781
 msgid "Finnish"
 msgstr "Finsk"
 
-#: paperless/settings.py:787
+#: paperless/settings.py:782
 msgid "French"
 msgstr "Fransk"
 
-#: paperless/settings.py:788
+#: paperless/settings.py:783
 msgid "Hungarian"
 msgstr ""
 
-#: paperless/settings.py:789
+#: paperless/settings.py:784
+msgid "Indonesian"
+msgstr ""
+
+#: paperless/settings.py:785
 msgid "Italian"
 msgstr "Italiensk"
 
-#: paperless/settings.py:790
+#: paperless/settings.py:786
 msgid "Japanese"
 msgstr ""
 
-#: paperless/settings.py:791
+#: paperless/settings.py:787
 msgid "Korean"
 msgstr ""
 
-#: paperless/settings.py:792
+#: paperless/settings.py:788
 msgid "Luxembourgish"
 msgstr "Luxembourgsk"
 
-#: paperless/settings.py:793
+#: paperless/settings.py:789
 msgid "Norwegian"
 msgstr "Norsk"
 
-#: paperless/settings.py:794
+#: paperless/settings.py:790
 msgid "Dutch"
 msgstr "Nederlandsk"
 
-#: paperless/settings.py:795
+#: paperless/settings.py:791
 msgid "Polish"
 msgstr "Polsk"
 
-#: paperless/settings.py:796
+#: paperless/settings.py:792
 msgid "Portuguese (Brazil)"
 msgstr "Portugisisk (Brasil)"
 
-#: paperless/settings.py:797
+#: paperless/settings.py:793
 msgid "Portuguese"
 msgstr "Portugisisk"
 
-#: paperless/settings.py:798
+#: paperless/settings.py:794
 msgid "Romanian"
 msgstr "Rumensk"
 
-#: paperless/settings.py:799
+#: paperless/settings.py:795
 msgid "Russian"
 msgstr "Russisk"
 
-#: paperless/settings.py:800
+#: paperless/settings.py:796
 msgid "Slovak"
 msgstr "Slovakisk"
 
-#: paperless/settings.py:801
+#: paperless/settings.py:797
 msgid "Slovenian"
 msgstr "Slovenian"
 
-#: paperless/settings.py:802
+#: paperless/settings.py:798
 msgid "Serbian"
 msgstr "Serbisk"
 
-#: paperless/settings.py:803
+#: paperless/settings.py:799
 msgid "Swedish"
 msgstr "Svensk"
 
-#: paperless/settings.py:804
+#: paperless/settings.py:800
 msgid "Turkish"
 msgstr "Tyrkisk"
 
-#: paperless/settings.py:805
+#: paperless/settings.py:801
 msgid "Ukrainian"
 msgstr "Ukrainsk"
 
-#: paperless/settings.py:806
+#: paperless/settings.py:802
 msgid "Vietnamese"
 msgstr ""
 
-#: paperless/settings.py:807
+#: paperless/settings.py:803
 msgid "Chinese Simplified"
 msgstr "Kinesisk forenklet"
 
-#: paperless/settings.py:808
+#: paperless/settings.py:804
 msgid "Chinese Traditional"
 msgstr ""
 

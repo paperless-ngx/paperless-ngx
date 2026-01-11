@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-12 17:41+0000\n"
-"PO-Revision-Date: 2025-12-12 17:44\n"
+"POT-Creation-Date: 2026-01-08 21:50+0000\n"
+"PO-Revision-Date: 2026-01-08 21:52\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -1208,34 +1208,34 @@ msgstr "uruchomienie przepływu pracy"
 msgid "workflow runs"
 msgstr "uruchomienia przepływu pracy"
 
-#: documents/serialisers.py:640
+#: documents/serialisers.py:642
 msgid "Invalid color."
 msgstr "Nieprawidłowy kolor."
 
-#: documents/serialisers.py:1826
+#: documents/serialisers.py:1846
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Typ pliku %(type)s nie jest obsługiwany"
 
-#: documents/serialisers.py:1870
+#: documents/serialisers.py:1890
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "Identyfikator pola niestandardowego musi być liczbą całkowitą: %(id)s"
 
-#: documents/serialisers.py:1877
+#: documents/serialisers.py:1897
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Pole niestandardowe z id %(id)s nie istnieje"
 
-#: documents/serialisers.py:1894 documents/serialisers.py:1904
+#: documents/serialisers.py:1914 documents/serialisers.py:1924
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Pola niestandardowe muszą być listą liczb całkowitych lub obiektem mapującym identyfikatory na wartości."
 
-#: documents/serialisers.py:1899
+#: documents/serialisers.py:1919
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Niektóre niestandardowe pola nie istnieją lub zostały określone dwukrotnie."
 
-#: documents/serialisers.py:2014
+#: documents/serialisers.py:2034
 msgid "Invalid variable detected."
 msgstr "Wykryto nieprawidłową zmienną."
 
@@ -1676,147 +1676,151 @@ msgstr "Ustawia mapowanie kodu kreskowego tagu"
 msgid "paperless application settings"
 msgstr "paperless ustawienia aplikacji"
 
-#: paperless/settings.py:773
+#: paperless/settings.py:768
 msgid "English (US)"
 msgstr "Angielski (USA)"
 
-#: paperless/settings.py:774
+#: paperless/settings.py:769
 msgid "Arabic"
 msgstr "arabski"
 
-#: paperless/settings.py:775
+#: paperless/settings.py:770
 msgid "Afrikaans"
 msgstr "Afrykanerski"
 
-#: paperless/settings.py:776
+#: paperless/settings.py:771
 msgid "Belarusian"
 msgstr "Białoruski"
 
-#: paperless/settings.py:777
+#: paperless/settings.py:772
 msgid "Bulgarian"
 msgstr "Bułgarski"
 
-#: paperless/settings.py:778
+#: paperless/settings.py:773
 msgid "Catalan"
 msgstr "Kataloński"
 
-#: paperless/settings.py:779
+#: paperless/settings.py:774
 msgid "Czech"
 msgstr "Czeski"
 
-#: paperless/settings.py:780
+#: paperless/settings.py:775
 msgid "Danish"
 msgstr "Duński"
 
-#: paperless/settings.py:781
+#: paperless/settings.py:776
 msgid "German"
 msgstr "Niemiecki"
 
-#: paperless/settings.py:782
+#: paperless/settings.py:777
 msgid "Greek"
 msgstr "Grecki"
 
-#: paperless/settings.py:783
+#: paperless/settings.py:778
 msgid "English (GB)"
 msgstr "Angielski (Wielka Brytania)"
 
-#: paperless/settings.py:784
+#: paperless/settings.py:779
 msgid "Spanish"
 msgstr "Hiszpański"
 
-#: paperless/settings.py:785
+#: paperless/settings.py:780
 msgid "Persian"
 msgstr "perski"
 
-#: paperless/settings.py:786
+#: paperless/settings.py:781
 msgid "Finnish"
 msgstr "Fiński"
 
-#: paperless/settings.py:787
+#: paperless/settings.py:782
 msgid "French"
 msgstr "Francuski"
 
-#: paperless/settings.py:788
+#: paperless/settings.py:783
 msgid "Hungarian"
 msgstr "Węgierski"
 
-#: paperless/settings.py:789
+#: paperless/settings.py:784
+msgid "Indonesian"
+msgstr ""
+
+#: paperless/settings.py:785
 msgid "Italian"
 msgstr "Włoski"
 
-#: paperless/settings.py:790
+#: paperless/settings.py:786
 msgid "Japanese"
 msgstr "Japoński"
 
-#: paperless/settings.py:791
+#: paperless/settings.py:787
 msgid "Korean"
 msgstr "Koreański"
 
-#: paperless/settings.py:792
+#: paperless/settings.py:788
 msgid "Luxembourgish"
 msgstr "Luksemburski"
 
-#: paperless/settings.py:793
+#: paperless/settings.py:789
 msgid "Norwegian"
 msgstr "Norweski"
 
-#: paperless/settings.py:794
+#: paperless/settings.py:790
 msgid "Dutch"
 msgstr "Holenderski"
 
-#: paperless/settings.py:795
+#: paperless/settings.py:791
 msgid "Polish"
 msgstr "Polski"
 
-#: paperless/settings.py:796
+#: paperless/settings.py:792
 msgid "Portuguese (Brazil)"
 msgstr "Portugalski (Brazylia)"
 
-#: paperless/settings.py:797
+#: paperless/settings.py:793
 msgid "Portuguese"
 msgstr "Portugalski"
 
-#: paperless/settings.py:798
+#: paperless/settings.py:794
 msgid "Romanian"
 msgstr "Rumuński"
 
-#: paperless/settings.py:799
+#: paperless/settings.py:795
 msgid "Russian"
 msgstr "Rosyjski"
 
-#: paperless/settings.py:800
+#: paperless/settings.py:796
 msgid "Slovak"
 msgstr "Słowacki"
 
-#: paperless/settings.py:801
+#: paperless/settings.py:797
 msgid "Slovenian"
 msgstr "Słoweński"
 
-#: paperless/settings.py:802
+#: paperless/settings.py:798
 msgid "Serbian"
 msgstr "Serbski"
 
-#: paperless/settings.py:803
+#: paperless/settings.py:799
 msgid "Swedish"
 msgstr "Szwedzki"
 
-#: paperless/settings.py:804
+#: paperless/settings.py:800
 msgid "Turkish"
 msgstr "Turecki"
 
-#: paperless/settings.py:805
+#: paperless/settings.py:801
 msgid "Ukrainian"
 msgstr "Ukraiński"
 
-#: paperless/settings.py:806
+#: paperless/settings.py:802
 msgid "Vietnamese"
 msgstr "Wietnamski"
 
-#: paperless/settings.py:807
+#: paperless/settings.py:803
 msgid "Chinese Simplified"
 msgstr "Chiński uproszczony"
 
-#: paperless/settings.py:808
+#: paperless/settings.py:804
 msgid "Chinese Traditional"
 msgstr "chiński tradycyjny"
 
