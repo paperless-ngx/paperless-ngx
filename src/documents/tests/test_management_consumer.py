@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING
 import pytest
 from django import db
 from django.core.management import CommandError
+from django.test import override_settings
 from watchfiles import Change
 
 from documents.data_models import ConsumableDocument
@@ -115,9 +116,6 @@ def mock_supported_extensions(mocker: MockerFixture) -> MagicMock:
     )
 
 
-# -- TrackedFile Tests --
-
-
 class TestTrackedFile:
     """Tests for the TrackedFile dataclass."""
 
@@ -158,9 +156,6 @@ class TestTrackedFile:
         tracked.update_stats()
         temp_file.unlink()
         assert tracked.is_unchanged() is False
-
-
-# -- FileStabilityTracker Tests --
 
 
 class TestFileStabilityTracker:
@@ -306,9 +301,6 @@ class TestFileStabilityTracker:
         assert stability_tracker.pending_count == 1
 
 
-# -- ConsumerFilter Tests --
-
-
 class TestConsumerFilter:
     """Tests for the ConsumerFilter class."""
 
@@ -395,9 +387,6 @@ class TestConsumerFilterDefaults:
         assert filter_obj(Change.added, str(test_file)) is True
 
 
-# -- _consume_file Tests --
-
-
 @pytest.mark.django_db
 class TestConsumeFile:
     """Tests for the _consume_file function."""
@@ -474,9 +463,6 @@ class TestConsumeFile:
         mock_consume_file_delay.delay.assert_not_called()
 
 
-# -- _tags_from_path Tests --
-
-
 @pytest.mark.django_db
 class TestTagsFromPath:
     """Tests for the _tags_from_path function."""
@@ -519,9 +505,6 @@ class TestTagsFromPath:
         assert len(tag_ids) == 0
 
 
-# -- Command Validation Tests --
-
-
 class TestCommandValidation:
     """Tests for command argument validation."""
 
@@ -548,9 +531,6 @@ class TestCommandValidation:
         with pytest.raises(CommandError, match="not a directory"):
             cmd = Command()
             cmd.handle(directory=str(sample_pdf), oneshot=True, testing=False)
-
-
-# -- Command Oneshot Tests --
 
 
 @pytest.mark.django_db
@@ -621,9 +601,6 @@ class TestCommandOneshot:
         mock_consume_file_delay.delay.assert_not_called()
 
 
-# -- Command Watch Tests --
-
-
 class ConsumerThread(Thread):
     """Thread wrapper for running the consumer command with proper cleanup."""
 
@@ -652,24 +629,23 @@ class ConsumerThread(Thread):
 
     def run(self) -> None:
         try:
-            from django.conf import settings
-
-            # Apply settings directly (thread-safe for reading)
-            settings.SCRATCH_DIR = self.scratch_dir
-            settings.CONSUMER_RECURSIVE = self.recursive
-            settings.CONSUMER_SUBDIRS_AS_TAGS = self.subdirs_as_tags
-            settings.CONSUMER_POLLING_INTERVAL = self.polling_interval
-            settings.CONSUMER_STABILITY_DELAY = self.stability_delay
-            settings.CONSUMER_IGNORE_PATTERNS = []
-
-            self.cmd.handle(
-                directory=str(self.consumption_dir),
-                oneshot=False,
-                testing=True,
-            )
+            with override_settings(
+                SCRATCH_DIR=self.scratch_dir,
+                CONSUMER_RECURSIVE=self.recursive,
+                CONSUMER_SUBDIRS_AS_TAGS=self.subdirs_as_tags,
+                CONSUMER_POLLING_INTERVAL=self.polling_interval,
+                CONSUMER_STABILITY_DELAY=self.stability_delay,
+                CONSUMER_IGNORE_PATTERNS=[],
+            ):
+                self.cmd.handle(
+                    directory=str(self.consumption_dir),
+                    oneshot=False,
+                    testing=True,
+                )
         except Exception as e:
             self.exception = e
         finally:
+            Tag.objects.all().delete()
             # Close database connections created in this thread
             db.connections.close_all()
 
