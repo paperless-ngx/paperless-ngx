@@ -3764,7 +3764,7 @@ class TestWorkflows(
     @override_settings(
         PAPERLESS_URL="http://localhost:8000",
     )
-    @mock.patch("documents.signals.handlers.send_webhook.delay")
+    @mock.patch("documents.workflows.webhooks.send_webhook.delay")
     def test_workflow_deletion_with_webhook_action(self, mock_webhook_delay):
         """
         GIVEN:
@@ -3898,7 +3898,7 @@ class TestWorkflows(
         self.assertEqual(Document.objects.count(), 1)
         self.assertEqual(Document.deleted_objects.count(), 0)
 
-        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
+        with self.assertLogs("paperless.workflows.actions", level="ERROR") as cm:
             run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
             expected_str = "Error occurred sending notification email"
@@ -3962,7 +3962,7 @@ class TestWorkflows(
         self.assertEqual(Document.objects.count(), 1)
         self.assertEqual(Document.deleted_objects.count(), 0)
 
-        with self.assertLogs("paperless.handlers", level="DEBUG") as cm:
+        with self.assertLogs("paperless", level="DEBUG") as cm:
             run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
         self.assertEqual(Document.objects.count(), 0)
@@ -4035,7 +4035,7 @@ class TestWorkflows(
         self.assertEqual(Document.objects.count(), 1)
         self.assertEqual(Document.deleted_objects.count(), 0)
 
-        with self.assertLogs("paperless.handlers", level="DEBUG") as cm:
+        with self.assertLogs("paperless", level="DEBUG") as cm:
             run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
         self.assertEqual(Document.objects.count(), 0)
