@@ -14,6 +14,7 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
+from documents.plugins.base import StopConsumeTaskError
 from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.workflows.webhooks import send_webhook
 
@@ -267,10 +268,32 @@ def execute_deletion_action(
     logging_group,
 ) -> None:
     """
-    Execute a deletion action for a workflow.
+    Execute a deletion action for a workflow on an existing document.
+    Soft-deletes the document (moves to trash).
     """
     document.delete()
     logger.debug(
         f"Moved document {document} to trash",
         extra={"group": logging_group},
+    )
+
+
+def execute_deletion_action_consumption(
+    action: WorkflowAction,
+    document: ConsumableDocument,
+    logging_group,
+) -> None:
+    """
+    Execute a deletion action for a workflow during consumption.
+    Stops consumption and deletes the original file.
+    """
+    if document.original_file.exists():
+        document.original_file.unlink()
+    logger.info(
+        f"Workflow delete action triggered during consumption, "
+        f"deleting file {document.original_file}",
+        extra={"group": logging_group},
+    )
+    raise StopConsumeTaskError(
+        "Document deleted by workflow action during consumption",
     )

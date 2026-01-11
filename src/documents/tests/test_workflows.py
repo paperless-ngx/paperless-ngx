@@ -55,6 +55,7 @@ from documents.models import WorkflowActionEmail
 from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
+from documents.plugins.base import StopConsumeTaskError
 from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_consumption_finished
 from documents.tests.utils import DirectoriesMixin
@@ -3924,6 +3925,131 @@ class TestWorkflows(
             "Document was moved to trash, skipping remaining workflows",
             log_output,
         )
+
+    def test_workflow_delete_action_during_consumption(self):
+        """
+        GIVEN:
+            - Workflow with consumption trigger and delete action
+        WHEN:
+            - Document is being consumed and workflow runs
+        THEN:
+            - StopConsumeTaskError is raised to halt consumption
+            - Original file is deleted
+            - No document is created
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            sources=f"{DocumentSource.ConsumeFolder}",
+            filter_filename="*",
+        )
+        delete_action = WorkflowActionDeletion.objects.create()
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.DELETION,
+            deletion=delete_action,
+        )
+        w = Workflow.objects.create(
+            name="Workflow Delete During Consumption",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        # Create a test file to be consumed
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
+        test_file_path = Path(test_file)
+        self.assertTrue(test_file_path.exists())
+
+        # Create a ConsumableDocument
+        consumable_doc = ConsumableDocument(
+            source=DocumentSource.ConsumeFolder,
+            original_file=test_file_path,
+        )
+
+        self.assertEqual(Document.objects.count(), 0)
+
+        # Run workflows with overrides (consumption flow)
+        with self.assertRaises(StopConsumeTaskError) as context:
+            run_workflows(
+                WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                consumable_doc,
+                overrides=DocumentMetadataOverrides(),
+            )
+
+        self.assertIn("deleted by workflow action", str(context.exception))
+
+        # File should be deleted
+        self.assertFalse(test_file_path.exists())
+
+        # No document should be created
+        self.assertEqual(Document.objects.count(), 0)
+
+    def test_workflow_delete_action_during_consumption_with_assignment(self):
+        """
+        GIVEN:
+            - Workflow with consumption trigger, assignment action, then delete action
+        WHEN:
+            - Document is being consumed and workflow runs
+        THEN:
+            - StopConsumeTaskError is raised to halt consumption
+            - Original file is deleted
+            - No document is created (even though assignment would have worked)
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            sources=f"{DocumentSource.ConsumeFolder}",
+            filter_filename="*",
+        )
+        assignment_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.ASSIGNMENT,
+            assign_title="This should not be applied",
+            assign_correspondent=self.c,
+        )
+        delete_action = WorkflowActionDeletion.objects.create()
+        deletion_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.DELETION,
+            deletion=delete_action,
+        )
+        w = Workflow.objects.create(
+            name="Workflow Assignment then Delete During Consumption",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(assignment_action, deletion_workflow_action)
+        w.save()
+
+        # Create a test file to be consumed
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple2.pdf",
+        )
+        test_file_path = Path(test_file)
+        self.assertTrue(test_file_path.exists())
+
+        # Create a ConsumableDocument
+        consumable_doc = ConsumableDocument(
+            source=DocumentSource.ConsumeFolder,
+            original_file=test_file_path,
+        )
+
+        self.assertEqual(Document.objects.count(), 0)
+
+        # Run workflows with overrides (consumption flow)
+        with self.assertRaises(StopConsumeTaskError):
+            run_workflows(
+                WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                consumable_doc,
+                overrides=DocumentMetadataOverrides(),
+            )
+
+        # File should be deleted
+        self.assertFalse(test_file_path.exists())
+
+        # No document should be created
+        self.assertEqual(Document.objects.count(), 0)
 
 
 class TestWebhookSend:
