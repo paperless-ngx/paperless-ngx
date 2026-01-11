@@ -200,5 +200,6 @@ class AIConfig(BaseConfig):
         self.llm_api_key = app_config.llm_api_key or settings.LLM_API_KEY
         self.llm_endpoint = app_config.llm_endpoint or settings.LLM_ENDPOINT
 
+    @property
     def llm_index_enabled(self) -> bool:
-        return self.ai_enabled and self.llm_embedding_backend
+        return bool(self.ai_enabled and self.llm_embedding_backend)

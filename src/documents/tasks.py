@@ -247,7 +247,7 @@ def bulk_update_documents(document_ids):
             index.update_document(writer, doc)
 
     ai_config = AIConfig()
-    if ai_config.llm_index_enabled():
+    if ai_config.llm_index_enabled:
         update_llm_index(
             progress_bar_disable=True,
             rebuild=False,
@@ -584,7 +584,7 @@ def llmindex_index(
     auto=False,
 ):
     ai_config = AIConfig()
-    if ai_config.llm_index_enabled():
+    if ai_config.llm_index_enabled:
         task = PaperlessTask.objects.create(
             type=PaperlessTask.TaskType.SCHEDULED_TASK
             if scheduled

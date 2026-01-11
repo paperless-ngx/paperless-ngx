@@ -963,7 +963,7 @@ def add_or_update_document_in_llm_index(sender, document, **kwargs):
     Add or update a document in the LLM index when it is created or updated.
     """
     ai_config = AIConfig()
-    if ai_config.llm_index_enabled():
+    if ai_config.llm_index_enabled:
         from documents.tasks import update_document_in_llm_index
 
         update_document_in_llm_index.delay(document)
@@ -975,7 +975,7 @@ def delete_document_from_llm_index(sender, instance: Document, **kwargs):
     Delete a document from the LLM index when it is deleted.
     """
     ai_config = AIConfig()
-    if ai_config.llm_index_enabled():
+    if ai_config.llm_index_enabled:
         from documents.tasks import remove_document_from_llm_index
 
         remove_document_from_llm_index.delay(instance)

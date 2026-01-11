@@ -3212,7 +3212,7 @@ class SystemStatusView(PassUserMixin):
         )
 
         ai_config = AIConfig()
-        if not ai_config.llm_index_enabled():
+        if not ai_config.llm_index_enabled:
             llmindex_status = "DISABLED"
             llmindex_error = None
             llmindex_last_modified = None
