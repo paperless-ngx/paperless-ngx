@@ -219,8 +219,6 @@ def set_llm_suggestions_cache(
     """
     Cache LLM-generated suggestions using a backend-specific identifier (e.g. 'openai:gpt-4').
     """
-    from documents.caching import SuggestionCacheData
-
     doc_key = get_suggestion_cache_key(document_id)
     cache.set(
         doc_key,
