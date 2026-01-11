@@ -703,16 +703,26 @@ def start_consumer(
         sleep(0.5)  # Give thread time to start
         return thread
 
-    yield _start
+    try:
+        yield _start
+    finally:
+        # Cleanup all threads that were started
+        for thread in threads:
+            thread.stop()
 
-    # Cleanup all threads that were started
-    for thread in threads:
-        thread.stop()
+        failed_threads = []
+        for thread in threads:
+            thread.join(timeout=5.0)
+            if thread.is_alive():
+                failed_threads.append(thread)
 
-    for thread in threads:
-        thread.join(timeout=5.0)
-        if thread.is_alive():
-            pytest.fail("Consumer thread did not stop within timeout")
+        # Clean up any Tags created by threads (they bypass test transaction isolation)
+        Tag.objects.all().delete()
+
+        if failed_threads:
+            pytest.fail(
+                f"{len(failed_threads)} consumer thread(s) did not stop within timeout",
+            )
 
 
 @pytest.mark.django_db
