@@ -71,9 +71,9 @@ def _match_names_to_queryset(names: list[str], queryset, attr: str):
         # First try exact match
         if target in object_names:
             index = object_names.index(target)
-            results.append(objects[index])
-            # Remove the matched name from the list to avoid fuzzy matching later
-            object_names.remove(target)
+            matched = objects.pop(index)
+            object_names.pop(index)  # keep object list aligned after removal
+            results.append(matched)
             continue
 
         # Fuzzy match fallback
@@ -85,7 +85,9 @@ def _match_names_to_queryset(names: list[str], queryset, attr: str):
         )
         if matches:
             index = object_names.index(matches[0])
-            results.append(objects[index])
+            matched = objects.pop(index)
+            object_names.pop(index)
+            results.append(matched)
         else:
             pass
     return results
