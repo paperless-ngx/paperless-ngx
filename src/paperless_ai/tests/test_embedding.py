@@ -3,8 +3,8 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
+from django.conf import settings
 
-import paperless_ai.embedding as embedding
 from documents.models import Document
 from paperless.models import LLMEmbeddingBackend
 from paperless_ai.embedding import build_llm_index_text
@@ -20,10 +20,10 @@ def mock_ai_config():
 
 @pytest.fixture
 def temp_llm_index_dir(tmp_path):
-    original_dir = embedding.settings.LLM_INDEX_DIR
-    embedding.settings.LLM_INDEX_DIR = tmp_path
+    original_dir = settings.LLM_INDEX_DIR
+    settings.LLM_INDEX_DIR = tmp_path
     yield tmp_path
-    embedding.settings.LLM_INDEX_DIR = original_dir
+    settings.LLM_INDEX_DIR = original_dir
 
 
 @pytest.fixture
