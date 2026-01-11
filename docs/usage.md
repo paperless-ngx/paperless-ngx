@@ -538,9 +538,8 @@ you may want to adjust these settings to prevent abuse.
 
 ##### Delete {#workflow-action-delete}
 
-"Delete" actions move the document to the trash. You can specify:
-
--   Skip the trash and permanently delete the document directly
+"Delete" actions move the document to the trash. The document can be restored
+from the trash until the trash is emptied (after the configured delay or manually).
 
 If a workflow has a Delete action, it must be the last action in the workflow.
 After a delete action is executed no other workflow will be executed on the

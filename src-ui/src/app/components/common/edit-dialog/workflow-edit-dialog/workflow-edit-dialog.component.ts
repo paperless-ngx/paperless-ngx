@@ -1139,7 +1139,6 @@ export class WorkflowEditDialogComponent
         }),
         deletion: new FormGroup({
           id: new FormControl(action.deletion?.id),
-          skip_trash: new FormControl(!!action.deletion?.skip_trash),
         }),
       }),
       { emitEvent }
@@ -1269,7 +1268,6 @@ export class WorkflowEditDialogComponent
       },
       deletion: {
         id: null,
-        skip_trash: false,
       },
     }
     this.object.actions.push(action)

@@ -834,9 +834,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     "actions": [
                         {
                             "type": WorkflowAction.WorkflowActionType.DELETION,
-                            "deletion": {
-                                "skip_trash": False,
-                            },
+                            "deletion": {},
                         },
                     ],
                 },
@@ -861,9 +859,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     "actions": [
                         {
                             "type": WorkflowAction.WorkflowActionType.DELETION,
-                            "deletion": {
-                                "skip_trash": True,
-                            },
+                            "deletion": {},
                         },
                     ],
                 },
@@ -906,9 +902,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                         },
                         {
                             "type": WorkflowAction.WorkflowActionType.DELETION,
-                            "deletion": {
-                                "skip_trash": False,
-                            },
+                            "deletion": {},
                         },
                     ],
                 },
@@ -942,9 +936,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     "actions": [
                         {
                             "type": WorkflowAction.WorkflowActionType.DELETION,
-                            "deletion": {
-                                "skip_trash": False,
-                            },
+                            "deletion": {},
                         },
                         {
                             "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
@@ -987,15 +979,11 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     "actions": [
                         {
                             "type": WorkflowAction.WorkflowActionType.DELETION,
-                            "deletion": {
-                                "skip_trash": False,
-                            },
+                            "deletion": {},
                         },
                         {
                             "type": WorkflowAction.WorkflowActionType.DELETION,
-                            "deletion": {
-                                "skip_trash": True,
-                            },
+                            "deletion": {},
                         },
                     ],
                 },
@@ -1033,9 +1021,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     "actions": [
                         {
                             "type": WorkflowAction.WorkflowActionType.DELETION,
-                            "deletion": {
-                                "skip_trash": False,
-                            },
+                            "deletion": {},
                         },
                     ],
                 },
@@ -1052,9 +1038,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     "actions": [
                         {
                             "type": WorkflowAction.WorkflowActionType.DELETION,
-                            "deletion": {
-                                "skip_trash": False,
-                            },
+                            "deletion": {},
                         },
                         {
                             "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
@@ -1100,9 +1084,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                         },
                         {
                             "type": WorkflowAction.WorkflowActionType.DELETION,
-                            "deletion": {
-                                "skip_trash": False,
-                            },
+                            "deletion": {},
                         },
                     ],
                 },
@@ -1119,9 +1101,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     "actions": [
                         {
                             "type": WorkflowAction.WorkflowActionType.DELETION,
-                            "deletion": {
-                                "skip_trash": False,
-                            },
+                            "deletion": {},
                         },
                         {
                             "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
@@ -1184,9 +1164,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                         },
                         {
                             "type": WorkflowAction.WorkflowActionType.DELETION,
-                            "deletion": {
-                                "skip_trash": False,
-                            },
+                            "deletion": {},
                         },
                     ],
                 },
@@ -1224,9 +1202,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                         },
                         {
                             "type": WorkflowAction.WorkflowActionType.DELETION,
-                            "deletion": {
-                                "skip_trash": False,
-                            },
+                            "deletion": {},
                         },
                     ],
                 },

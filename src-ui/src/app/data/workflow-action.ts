@@ -34,9 +34,7 @@ export interface WorkflowActionWebhook extends ObjectWithId {
   include_document?: boolean
 }
 
-export interface WorkflowActionDeletion extends ObjectWithId {
-  skip_trash?: boolean
-}
+export interface WorkflowActionDeletion extends ObjectWithId {}
 
 export interface WorkflowAction extends ObjectWithId {
   type: WorkflowActionType

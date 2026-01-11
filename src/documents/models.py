@@ -1270,11 +1270,6 @@ class WorkflowActionWebhook(models.Model):
 
 
 class WorkflowActionDeletion(models.Model):
-    skip_trash = models.BooleanField(
-        default=False,
-        verbose_name=_("Skip trash and delete directly"),
-    )
-
     def __str__(self):
         return f"Workflow Delete Action {self.pk}"
 

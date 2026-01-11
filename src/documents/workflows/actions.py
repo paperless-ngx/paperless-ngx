@@ -269,15 +269,8 @@ def execute_deletion_action(
     """
     Execute a deletion action for a workflow.
     """
-    if action.deletion.skip_trash:
-        document.hard_delete()
-        logger.debug(
-            f"Hard deleted document {document}",
-            extra={"group": logging_group},
-        )
-    else:
-        document.delete()
-        logger.debug(
-            f"Moved document {document} to trash",
-            extra={"group": logging_group},
-        )
+    document.delete()
+    logger.debug(
+        f"Moved document {document} to trash",
+        extra={"group": logging_group},
+    )

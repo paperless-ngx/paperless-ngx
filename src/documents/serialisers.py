@@ -2412,7 +2412,6 @@ class WorkflowActionDeletionSerializer(serializers.ModelSerializer):
         model = WorkflowActionDeletion
         fields = [
             "id",
-            "skip_trash",
         ]
 
 
