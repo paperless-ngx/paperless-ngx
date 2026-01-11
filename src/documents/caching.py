@@ -41,6 +41,7 @@ class SuggestionCacheData:
 CLASSIFIER_VERSION_KEY: Final[str] = "classifier_version"
 CLASSIFIER_HASH_KEY: Final[str] = "classifier_hash"
 CLASSIFIER_MODIFIED_KEY: Final[str] = "classifier_modified"
+LLM_CACHE_CLASSIFIER_VERSION: Final[int] = 1000  # Marker distinguishing LLM suggestions
 
 CACHE_1_MINUTE: Final[int] = 60
 CACHE_5_MINUTES: Final[int] = 5 * CACHE_1_MINUTE
@@ -223,7 +224,7 @@ def set_llm_suggestions_cache(
     cache.set(
         doc_key,
         SuggestionCacheData(
-            classifier_version=1000,  # Unique marker for LLM-based suggestion
+            classifier_version=LLM_CACHE_CLASSIFIER_VERSION,
             classifier_hash=backend,
             suggestions=suggestions,
         ),
