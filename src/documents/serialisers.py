@@ -2678,24 +2678,6 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
                 set_actions.append(action_instance)
 
-        if set_actions:
-            for i, action in enumerate(set_actions):
-                if (
-                    action.type == WorkflowAction.WorkflowActionType.DELETION
-                    and i != len(set_actions) - 1
-                ):
-                    actions_errors = [None] * len(set_actions)
-                    actions_errors[i] = {
-                        "type": [
-                            "Delete action must be the last action in the workflow",
-                        ],
-                    }
-                    raise serializers.ValidationError(
-                        {
-                            "actions": actions_errors,
-                        },
-                    )
-
         if triggers is not serializers.empty:
             instance.triggers.set(set_triggers)
         if actions is not serializers.empty:

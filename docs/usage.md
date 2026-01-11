@@ -541,9 +541,9 @@ you may want to adjust these settings to prevent abuse.
 "Delete" actions move the document to the trash. The document can be restored
 from the trash until the trash is emptied (after the configured delay or manually).
 
-If a workflow has a Delete action, it must be the last action in the workflow.
-After a delete action is executed no other workflow will be executed on the
-document.
+The delete action will always be executed at the end of the workflow run,
+regardless of its position in the action list. After a delete action is executed
+no other workflow will be executed on the document.
 
 #### Workflow placeholders
 
