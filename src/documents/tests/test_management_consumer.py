@@ -716,7 +716,7 @@ def start_consumer(
             if thread.is_alive():
                 failed_threads.append(thread)
 
-        # Clean up any Tags created by threads (they bypass test transaction isolation)
+        # Clean up any Tags created by threads
         Tag.objects.all().delete()
 
         if failed_threads:

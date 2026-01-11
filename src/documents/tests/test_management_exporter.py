@@ -275,6 +275,8 @@ class TestExportImport(
 
             call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
+            for tag in Tag.objects.all():
+                print(f"id: {tag.pk}: {tag.name}")
             self.assertEqual(Tag.objects.count(), 1)
             self.assertEqual(Correspondent.objects.count(), 1)
             self.assertEqual(DocumentType.objects.count(), 1)

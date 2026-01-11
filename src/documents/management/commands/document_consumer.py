@@ -424,11 +424,11 @@ class Command(BaseCommand):
         settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
 
         # Get settings
-        recursive: bool = getattr(settings, "CONSUMER_RECURSIVE", False)
-        subdirs_as_tags: bool = getattr(settings, "CONSUMER_SUBDIRS_AS_TAGS", False)
-        polling_interval: float = getattr(settings, "CONSUMER_POLLING_INTERVAL", 0)
-        stability_delay: float = getattr(settings, "CONSUMER_STABILITY_DELAY", 1.0)
-        ignore_patterns: list[str] = getattr(settings, "CONSUMER_IGNORE_PATTERNS", [])
+        recursive: bool = settings.CONSUMER_RECURSIVE
+        subdirs_as_tags: bool = settings.CONSUMER_SUBDIRS_AS_TAGS
+        polling_interval: float = settings.CONSUMER_POLLING_INTERVAL
+        stability_delay: float = settings.CONSUMER_STABILITY_DELAY
+        ignore_patterns: list[str] = settings.CONSUMER_IGNORE_PATTERNS
         is_testing: bool = options.get("testing", False)
         is_oneshot: bool = options.get("oneshot", False)
 
