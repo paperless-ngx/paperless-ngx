@@ -97,10 +97,6 @@ def get_ai_document_classification(
         else build_prompt_without_rag(document)
     )
 
-    try:
-        client = AIClient()
-        result = client.run_llm_query(prompt)
-        return parse_ai_response(result)
-    except Exception as e:
-        logger.exception("Failed AI classification")
-        raise e
+    client = AIClient()
+    result = client.run_llm_query(prompt)
+    return parse_ai_response(result)
