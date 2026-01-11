@@ -45,6 +45,7 @@ from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.templating.utils import convert_format_str_to_template_format
 from documents.workflows.actions import build_workflow_action_context
+from documents.workflows.actions import execute_deletion_action
 from documents.workflows.actions import execute_email_action
 from documents.workflows.actions import execute_webhook_action
 from documents.workflows.mutations import apply_assignment_to_document
@@ -743,14 +744,31 @@ def run_workflows(
 
     for workflow in workflows:
         if not use_overrides:
-            # This can be called from bulk_update_documents, which may be running multiple times
-            # Refresh this so the matching data is fresh and instance fields are re-freshed
-            # Otherwise, this instance might be behind and overwrite the work another process did
-            document.refresh_from_db()
-            doc_tag_ids = list(document.tags.values_list("pk", flat=True))
+            try:
+                # This can be called from bulk_update_documents, which may be running multiple times
+                # Refresh this so the matching data is fresh and instance fields are re-freshed
+                # Otherwise, this instance might be behind and overwrite the work another process did
+                document.refresh_from_db()
+                doc_tag_ids = list(document.tags.values_list("pk", flat=True))
+            except Document.DoesNotExist:
+                # Document was hard deleted by a previous workflow or another process
+                logger.info(
+                    "Document no longer exists, skipping remaining workflows",
+                    extra={"group": logging_group},
+                )
+                break
+
+            # Check if document was soft deleted (moved to trash)
+            if document.is_deleted:
+                logger.info(
+                    "Document was moved to trash, skipping remaining workflows",
+                    extra={"group": logging_group},
+                )
+                break
 
         if matching.document_matches_workflow(document, workflow, trigger_type):
             action: WorkflowAction
+            has_deletion_action = False
             for action in workflow.actions.all():
                 message = f"Applying {action} from {workflow}"
                 if not use_overrides:
@@ -792,6 +810,8 @@ def run_workflows(
                         logging_group,
                         original_file,
                     )
+                elif action.type == WorkflowAction.WorkflowActionType.DELETION:
+                    has_deletion_action = True
 
             if not use_overrides:
                 # limit title to 128 characters
@@ -805,6 +825,9 @@ def run_workflows(
                 type=trigger_type,
                 document=document if not use_overrides else None,
             )
+
+            if has_deletion_action:
+                execute_deletion_action(action, document, logging_group)
 
     if use_overrides:
         return overrides, "\n".join(messages)

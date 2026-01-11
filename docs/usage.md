@@ -536,6 +536,16 @@ For security reasons, webhooks can be limited to specific ports and disallowed f
 [configuration settings](configuration.md#workflow-webhooks) to change this behavior. If you are allowing non-admins to create workflows,
 you may want to adjust these settings to prevent abuse.
 
+##### Delete {#workflow-action-delete}
+
+"Delete" actions move the document to the trash. You can specify:
+
+-   Skip the trash and permanently delete the document directly
+
+If a workflow has a Delete action, it must be the last action in the workflow.
+After a delete action is executed no other workflow will be executed on the
+document.
+
 #### Workflow placeholders
 
 Titles can be assigned by workflows using [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/templates/).

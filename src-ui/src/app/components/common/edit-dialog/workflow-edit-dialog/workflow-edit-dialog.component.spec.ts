@@ -376,9 +376,11 @@ describe('WorkflowEditDialogComponent', () => {
     component.addAction()
     expect(component.objectForm.get('actions').value[0].email).not.toBeNull()
     expect(component.objectForm.get('actions').value[0].webhook).not.toBeNull()
+    expect(component.objectForm.get('actions').value[0].deletion).not.toBeNull()
     component.save()
     expect(component.objectForm.get('actions').value[0].email).toBeNull()
     expect(component.objectForm.get('actions').value[0].webhook).toBeNull()
+    expect(component.objectForm.get('actions').value[0].deletion).toBeNull()
   })
 
   it('should require matching pattern when algorithm is not none', () => {
@@ -950,5 +952,20 @@ describe('WorkflowEditDialogComponent', () => {
 
     component.removeSelectedCustomField(3, formGroup)
     expect(formGroup.get('assign_custom_fields').value).toEqual([])
+  })
+
+  it('should clear action errors when reordering actions', () => {
+    component.object = workflow
+    component.ngOnInit()
+
+    component.error = {
+      actions: [null, { type: ['Some error'] }],
+    }
+
+    component.onActionDrop({ previousIndex: 0, currentIndex: 1 } as CdkDragDrop<
+      WorkflowAction[]
+    >)
+
+    expect(component.error.actions).toBeNull()
   })
 })
