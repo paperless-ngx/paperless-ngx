@@ -1846,7 +1846,7 @@ suggestions. This setting is required to be set to true in order to use the AI f
 
     Defaults to None.
 
-#### [`PAPERLESS_AI_BACKEND=<str>`](#PAPERLESS_AI_BACKEND) {#PAPERLESS_AI_BACKEND}
+#### [`PAPERLESS_AI_LLM_BACKEND=<str>`](#PAPERLESS_AI_LLM_BACKEND) {#PAPERLESS_AI_LLM_BACKEND}
 
 : The AI backend to use. This can be either "openai" or "ollama". If set to "ollama", the AI
 features will be run locally on your machine. If set to "openai", the AI features will be run
