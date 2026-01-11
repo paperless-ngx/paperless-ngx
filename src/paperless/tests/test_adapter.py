@@ -11,6 +11,9 @@ from django.http import HttpRequest
 from django.test import TestCase
 from django.test import override_settings
 from django.urls import reverse
+from rest_framework.authtoken.models import Token
+
+from paperless.adapter import DrfTokenStrategy
 
 
 class TestCustomAccountAdapter(TestCase):
@@ -181,3 +184,55 @@ class TestCustomSocialAccountAdapter(TestCase):
         self.assertTrue(
             any("Test authentication error" in message for message in log_cm.output),
         )
+
+
+class TestDrfTokenStrategy(TestCase):
+    def test_create_access_token_creates_new_token(self):
+        """
+        GIVEN:
+            - A user with no existing DRF token
+        WHEN:
+            - create_access_token is called
+        THEN:
+            - A new token is created and its key is returned
+        """
+
+        user = User.objects.create_user("testuser")
+        request = HttpRequest()
+        request.user = user
+
+        strategy = DrfTokenStrategy()
+        token_key = strategy.create_access_token(request)
+
+        # Verify a token was created
+        self.assertIsNotNone(token_key)
+        self.assertTrue(Token.objects.filter(user=user).exists())
+
+        # Verify the returned key matches the created token
+        token = Token.objects.get(user=user)
+        self.assertEqual(token_key, token.key)
+
+    def test_create_access_token_returns_existing_token(self):
+        """
+        GIVEN:
+            - A user with an existing DRF token
+        WHEN:
+            - create_access_token is called again
+        THEN:
+            - The same token key is returned (no new token created)
+        """
+
+        user = User.objects.create_user("testuser")
+        existing_token = Token.objects.create(user=user)
+
+        request = HttpRequest()
+        request.user = user
+
+        strategy = DrfTokenStrategy()
+        token_key = strategy.create_access_token(request)
+
+        # Verify the existing token key is returned
+        self.assertEqual(token_key, existing_token.key)
+
+        # Verify only one token exists (no duplicate created)
+        self.assertEqual(Token.objects.filter(user=user).count(), 1)
