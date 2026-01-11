@@ -3738,7 +3738,7 @@ class TestWorkflows(
                 "title": "{{doc_title}}",
                 "message": "Document being deleted",
             },
-            url="http://paperless-ngx.com/webhook",
+            url="https://paperless-ngx.com/webhook",
             include_document=True,
         )
         webhook_workflow_action = WorkflowAction.objects.create(
@@ -3778,7 +3778,7 @@ class TestWorkflows(
 
         mock_webhook_delay.assert_called_once()
         call_kwargs = mock_webhook_delay.call_args[1]
-        self.assertEqual(call_kwargs["url"], "http://paperless-ngx.com/webhook")
+        self.assertEqual(call_kwargs["url"], "https://paperless-ngx.com/webhook")
         self.assertEqual(
             call_kwargs["data"],
             {"title": "sample test", "message": "Document being deleted"},
