@@ -851,8 +851,8 @@ followed by the even pages.
 
 It's important that the scan files get consumed in the correct order, and one at a time.
 You therefore need to make sure that Paperless is running while you upload the files into
-the directory; and if you're using [polling](configuration.md#polling), make sure that
-`CONSUMER_POLLING` is set to a value lower than it takes for the second scan to appear,
+the directory; and if you're using polling, make sure that
+`CONSUMER_POLLING_INTERVAL` is set to a value lower than it takes for the second scan to appear,
 like 5-10 or even lower.
 
 Another thing that might happen is that you start a double sided scan, but then forget

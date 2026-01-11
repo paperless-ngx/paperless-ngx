@@ -1288,9 +1288,7 @@ within your documents.
 
     Defaults to false.
 
-### Polling {#polling}
-
-#### [`PAPERLESS_CONSUMER_POLLING=<num>`](#PAPERLESS_CONSUMER_POLLING) {#PAPERLESS_CONSUMER_POLLING}
+#### [`PAPERLESS_CONSUMER_POLLING_INTERVAL=<num>`](#PAPERLESS_CONSUMER_POLLING_INTERVAL) {#PAPERLESS_CONSUMER_POLLING_INTERVAL}
 
 : If paperless won't find documents added to your consume folder, it
 might not be able to automatically detect filesystem changes. In
@@ -1302,34 +1300,13 @@ system changes with `inotify`.
     Defaults to 0, which disables polling and uses filesystem
     notifications.
 
-#### [`PAPERLESS_CONSUMER_POLLING_RETRY_COUNT=<num>`](#PAPERLESS_CONSUMER_POLLING_RETRY_COUNT) {#PAPERLESS_CONSUMER_POLLING_RETRY_COUNT}
+#### [`PAPERLESS_CONSUMER_STABILITY_DELAY=<num>`](#PAPERLESS_CONSUMER_STABILITY_DELAY) {#PAPERLESS_CONSUMER_STABILITY_DELAY}
 
-: If consumer polling is enabled, sets the maximum number of times
-paperless will check for a file to remain unmodified. If a file's
-modification time and size are identical for two consecutive checks, it
-will be consumed.
-
-    Defaults to 5.
-
-#### [`PAPERLESS_CONSUMER_POLLING_DELAY=<num>`](#PAPERLESS_CONSUMER_POLLING_DELAY) {#PAPERLESS_CONSUMER_POLLING_DELAY}
-
-: If consumer polling is enabled, sets the delay in seconds between
-each check (above) paperless will do while waiting for a file to
-remain unmodified.
+: Once a file has been detected in the consume folder, it must remain unchanged for this
+many seconds before consumption will start on it. If the file is modified, its size changes
+or the watching detects any other change on it, the timer will restart.
 
     Defaults to 5.
-
-### iNotify {#inotify}
-
-#### [`PAPERLESS_CONSUMER_INOTIFY_DELAY=<num>`](#PAPERLESS_CONSUMER_INOTIFY_DELAY) {#PAPERLESS_CONSUMER_INOTIFY_DELAY}
-
-: Sets the time in seconds the consumer will wait for additional
-events from inotify before the consumer will consider a file ready
-and begin consumption. Certain scanners or network setups may
-generate multiple events for a single file, leading to multiple
-consumers working on the same file. Configure this to prevent that.
-
-    Defaults to 0.5 seconds.
 
 ## Workflow webhooks
 
