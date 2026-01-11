@@ -278,18 +278,6 @@ class TestFileStabilityTracker:
         assert len(stable) == 1
         assert stable[0] == file2
 
-    def test_clear(
-        self,
-        stability_tracker: FileStabilityTracker,
-        temp_file: Path,
-    ) -> None:
-        """Test clear removes all tracked files."""
-        stability_tracker.track(temp_file, Change.added)
-        assert stability_tracker.pending_count == 1
-        stability_tracker.clear()
-        assert stability_tracker.pending_count == 0
-        assert stability_tracker.has_pending_files() is False
-
     def test_track_resolves_path(
         self,
         stability_tracker: FileStabilityTracker,

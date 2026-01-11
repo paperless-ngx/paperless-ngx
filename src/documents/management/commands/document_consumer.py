@@ -182,10 +182,6 @@ class FileStabilityTracker:
         """Check if there are files waiting for stability check."""
         return len(self._tracked) > 0
 
-    def clear(self) -> None:
-        """Clear all tracked files."""
-        self._tracked.clear()
-
     @property
     def pending_count(self) -> int:
         """Number of files being tracked."""
@@ -540,6 +536,8 @@ class Command(BaseCommand):
                     # Process each change
                     for change_type, path in changes:
                         path = Path(path).resolve()
+                        if not path.is_file():
+                            continue
                         logger.debug(f"Event: {change_type.name} for {path}")
                         tracker.track(path, change_type)
 
