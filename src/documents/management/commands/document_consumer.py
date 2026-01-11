@@ -351,7 +351,7 @@ def _consume_file(
     if subdirs_as_tags:
         try:
             tag_ids = _tags_from_path(filepath, consumption_dir)
-        except Exception:
+        except Exception:  # pragma: nocover
             logger.exception(f"Error creating tags from path for {filepath}")
 
     # Queue for consumption
@@ -561,10 +561,10 @@ class Command(BaseCommand):
                 elif is_testing:
                     # In testing, use short timeout to check stop flag
                     timeout_ms = testing_timeout_ms
-                else:
+                else:  # pragma: nocover
                     # No pending files, wait indefinitely
                     timeout_ms = 0
 
-            except KeyboardInterrupt:
+            except KeyboardInterrupt:  # pragma: nocover
                 logger.info("Received interrupt, stopping consumer")
                 self.stop_flag.set()
