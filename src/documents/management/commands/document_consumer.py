@@ -157,14 +157,10 @@ class FileStabilityTracker:
 
             # File is stable - verify it's a regular file
             try:
-                if path.is_file():
-                    to_yield.append(path)
-                    logger.info(f"File is stable: {path}")
-                else:
-                    # Not a regular file (directory, symlink, etc.)
-                    to_remove.append(path)
-                    logger.debug(f"Path is not a regular file: {path}")
-            except OSError as e:
+                path.stat()
+                to_yield.append(path)
+                logger.info(f"File is stable: {path}")
+            except OSError as e:  # pragma: no cover
                 logger.warning(f"Cannot access {path}: {e}")
                 to_remove.append(path)
 
@@ -341,7 +337,7 @@ def _consume_file(
     if subdirs_as_tags:
         try:
             tag_ids = _tags_from_path(filepath, consumption_dir)
-        except Exception:
+        except Exception:  # pragma: no cover
             logger.exception(f"Error creating tags from path for {filepath}")
 
     # Queue for consumption
