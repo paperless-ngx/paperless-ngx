@@ -56,7 +56,7 @@ class TrackedFile:
             self.last_mtime = stat.st_mtime
             self.last_size = stat.st_size
             return True
-        except (FileNotFoundError, PermissionError, OSError):
+        except OSError:
             return False
 
     def is_unchanged(self) -> bool:
@@ -67,7 +67,7 @@ class TrackedFile:
         try:
             stat = self.path.stat()
             return stat.st_mtime == self.last_mtime and stat.st_size == self.last_size
-        except (FileNotFoundError, PermissionError, OSError):
+        except OSError:
             return False
 
 
@@ -164,7 +164,7 @@ class FileStabilityTracker:
                     # Not a regular file (directory, symlink, etc.)
                     to_remove.append(path)
                     logger.debug(f"Path is not a regular file: {path}")
-            except (PermissionError, OSError) as e:
+            except OSError as e:
                 logger.warning(f"Cannot access {path}: {e}")
                 to_remove.append(path)
 
@@ -332,7 +332,7 @@ def _consume_file(
         if not filepath.is_file():
             logger.debug(f"Not consuming {filepath}: not a file or doesn't exist")
             return
-    except (PermissionError, OSError) as e:
+    except OSError as e:
         logger.warning(f"Not consuming {filepath}: {e}")
         return
 
