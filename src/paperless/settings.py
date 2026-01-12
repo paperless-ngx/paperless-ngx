@@ -1052,11 +1052,21 @@ CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES
 
 CONSUMER_RECURSIVE = __get_boolean("PAPERLESS_CONSUMER_RECURSIVE")
 
-# Ignore regex patterns, relative to PAPERLESS_CONSUMPTION_DIR
+# Ignore regex patterns, matched against filename only
 CONSUMER_IGNORE_PATTERNS = list(
     json.loads(
         os.getenv(
             "PAPERLESS_CONSUMER_IGNORE_PATTERNS",
+            json.dumps([]),
+        ),
+    ),
+)
+
+# Directories to always ignore.  These are matched by directory name, not full path
+CONSUMER_IGNORE_DIRS = list(
+    json.loads(
+        os.getenv(
+            "PAPERLESS_CONSUMER_IGNORE_DIRS",
             json.dumps([]),
         ),
     ),

@@ -9,7 +9,6 @@ native OS notifications and polling fallback.
 from __future__ import annotations
 
 import logging
-import re
 from dataclasses import dataclass
 from pathlib import Path
 from threading import Event
@@ -57,7 +56,7 @@ class TrackedFile:
             self.last_mtime = stat.st_mtime
             self.last_size = stat.st_size
             return True
-        except (FileNotFoundError, PermissionError):
+        except (FileNotFoundError, PermissionError, OSError):
             return False
 
     def is_unchanged(self) -> bool:
@@ -68,7 +67,7 @@ class TrackedFile:
         try:
             stat = self.path.stat()
             return stat.st_mtime == self.last_mtime and stat.st_size == self.last_size
-        except (FileNotFoundError, PermissionError):
+        except (FileNotFoundError, PermissionError, OSError):
             return False
 
 
@@ -138,7 +137,7 @@ class FileStabilityTracker:
         to_remove: list[Path] = []
         to_yield: list[Path] = []
 
-        for path, tracked in self._tracked.items():
+        for path, tracked in list(self._tracked.items()):
             time_since_event = current_time - tracked.last_event_time
 
             if time_since_event < self.stability_delay:
@@ -165,7 +164,7 @@ class FileStabilityTracker:
                     # Not a regular file (directory, symlink, etc.)
                     to_remove.append(path)
                     logger.debug(f"Path is not a regular file: {path}")
-            except (PermissionError, FileNotFoundError) as e:
+            except (PermissionError, OSError) as e:
                 logger.warning(f"Cannot access {path}: {e}")
                 to_remove.append(path)
 
@@ -190,34 +189,37 @@ class FileStabilityTracker:
 
 class ConsumerFilter(DefaultFilter):
     """
-    Custom filter for the document consumer.
+    Filter for watchfiles that accepts only supported document types
+    and ignores system files/directories.
 
-    Filters files based on:
-    - Supported file extensions
-    - User-configured ignore patterns (regex)
-    - Default ignore patterns for common system files
+    Extends DefaultFilter leveraging its built-in filtering:
+    - `ignore_dirs`: Directory names to ignore (and all their contents)
+    - `ignore_entity_patterns`: Regex patterns matched against filename/dirname only
+
+    We add custom logic for file extension filtering (only accept supported
+    document types), which the library doesn't provide.
     """
 
-    # Default regex patterns to ignore (matched against filename only)
-    DEFAULT_IGNORE_PATTERNS: Final[frozenset[str]] = frozenset(
-        {
-            r"^\.DS_Store$",
-            r"^\.DS_STORE$",
-            r"^\._.*",
-            r"^desktop\.ini$",
-            r"^Thumbs\.db$",
-        },
+    # Regex patterns for files to always ignore (matched against filename only)
+    # These are passed to DefaultFilter.ignore_entity_patterns
+    DEFAULT_IGNORE_PATTERNS: Final[tuple[str, ...]] = (
+        r"^\.DS_Store$",
+        r"^\.DS_STORE$",
+        r"^\._.*",
+        r"^desktop\.ini$",
+        r"^Thumbs\.db$",
     )
 
-    # Directories to always ignore (matched by name via DefaultFilter)
+    # Directories to always ignore (passed to DefaultFilter.ignore_dirs)
+    # These are matched by directory name, not full path
     DEFAULT_IGNORE_DIRS: Final[tuple[str, ...]] = (
-        ".stfolder",
-        ".stversions",
-        ".localized",
-        "@eaDir",
-        ".Spotlight-V100",
-        ".Trashes",
-        "__MACOSX",
+        ".stfolder",  # Syncthing
+        ".stversions",  # Syncthing
+        ".localized",  # macOS
+        "@eaDir",  # Synology NAS
+        ".Spotlight-V100",  # macOS
+        ".Trashes",  # macOS
+        "__MACOSX",  # macOS archive artifacts
     )
 
     def __init__(
@@ -225,38 +227,37 @@ class ConsumerFilter(DefaultFilter):
         *,
         supported_extensions: frozenset[str] | None = None,
         ignore_patterns: list[str] | None = None,
-        consumption_dir: Path | None = None,
+        ignore_dirs: list[str] | None = None,
     ) -> None:
         """
         Initialize the consumer filter.
 
         Args:
-            supported_extensions: Set of supported file extensions (e.g., {".pdf", ".png"}).
-                                If None, uses get_supported_file_extensions().
+            supported_extensions: Set of file extensions to accept (e.g., {".pdf", ".png"}).
+                If None, uses get_supported_file_extensions().
             ignore_patterns: Additional regex patterns to ignore (matched against filename).
-            consumption_dir: Base consumption directory (unused, kept for API compatibility).
+            ignore_dirs: Additional directory names to ignore (merged with defaults).
         """
-        # Combine default and user patterns
-        all_patterns = set(self.DEFAULT_IGNORE_PATTERNS)
-        if ignore_patterns:
-            all_patterns.update(ignore_patterns)
-
-        # Compile all patterns
-        self._ignore_regexes: list[re.Pattern[str]] = [
-            re.compile(pattern) for pattern in all_patterns
-        ]
-
         # Get supported extensions
         if supported_extensions is None:
             supported_extensions = frozenset(get_supported_file_extensions())
         self._supported_extensions = supported_extensions
 
-        # Call parent with directory ignore list
-        # DefaultFilter.ignore_dirs matches directory names, not full paths
+        # Combine default and user patterns
+        all_patterns: list[str] = list(self.DEFAULT_IGNORE_PATTERNS)
+        if ignore_patterns:
+            all_patterns.extend(ignore_patterns)
+
+        # Combine default and user ignore_dirs
+        all_ignore_dirs: list[str] = list(self.DEFAULT_IGNORE_DIRS)
+        if ignore_dirs:
+            all_ignore_dirs.extend(ignore_dirs)
+
+        # Let DefaultFilter handle all the pattern and directory filtering
         super().__init__(
-            ignore_dirs=self.DEFAULT_IGNORE_DIRS,
-            ignore_entity_patterns=None,
-            ignore_paths=None,
+            ignore_dirs=tuple(all_ignore_dirs),
+            ignore_entity_patterns=tuple(all_patterns),
+            ignore_paths=(),
         )
 
     def __call__(self, change: Change, path: str) -> bool:
@@ -264,38 +265,31 @@ class ConsumerFilter(DefaultFilter):
         Filter function for watchfiles.
 
         Returns True if the path should be watched, False to ignore.
+
+        The parent DefaultFilter handles:
+        - Hidden files/directories (starting with .)
+        - Directories in ignore_dirs
+        - Files/directories matching ignore_entity_patterns
+
+        We additionally filter files by extension.
         """
-        # Let parent filter handle directory ignoring and basic checks
+        # Let parent filter handle directory ignoring and pattern matching
         if not super().__call__(change, path):
             return False
 
         path_obj = Path(path)
 
-        # For directories, parent filter already handled ignore_dirs
+        # For directories, parent filter already handled everything
         if path_obj.is_dir():
             return True
 
         # For files, check extension
-        if not self._has_supported_extension(path_obj):
-            return False
-
-        # Check filename against ignore patterns
-        return not self._matches_ignore_pattern(path_obj.name)
+        return self._has_supported_extension(path_obj)
 
     def _has_supported_extension(self, path: Path) -> bool:
         """Check if the file has a supported extension."""
         suffix = path.suffix.lower()
         return suffix in self._supported_extensions
-
-    def _matches_ignore_pattern(self, filename: str) -> bool:
-        """Check if the filename matches any ignore pattern."""
-        for regex in self._ignore_regexes:
-            if regex.match(filename):
-                logger.debug(
-                    f"Filename {filename} matched ignore pattern {regex.pattern}",
-                )
-                return True
-        return False
 
 
 def _tags_from_path(filepath: Path, consumption_dir: Path) -> list[int]:
@@ -338,7 +332,7 @@ def _consume_file(
         if not filepath.is_file():
             logger.debug(f"Not consuming {filepath}: not a file or doesn't exist")
             return
-    except (PermissionError, FileNotFoundError) as e:
+    except (PermissionError, OSError) as e:
         logger.warning(f"Not consuming {filepath}: {e}")
         return
 
@@ -347,7 +341,7 @@ def _consume_file(
     if subdirs_as_tags:
         try:
             tag_ids = _tags_from_path(filepath, consumption_dir)
-        except Exception:  # pragma: nocover
+        except Exception:
             logger.exception(f"Error creating tags from path for {filepath}")
 
     # Queue for consumption
@@ -404,7 +398,7 @@ class Command(BaseCommand):
         # Resolve consumption directory
         directory = options.get("directory")
         if not directory:
-            directory = settings.CONSUMPTION_DIR
+            directory = getattr(settings, "CONSUMPTION_DIR", None)
         if not directory:
             raise CommandError("CONSUMPTION_DIR is not configured")
 
@@ -425,13 +419,14 @@ class Command(BaseCommand):
         polling_interval: float = settings.CONSUMER_POLLING_INTERVAL
         stability_delay: float = settings.CONSUMER_STABILITY_DELAY
         ignore_patterns: list[str] = settings.CONSUMER_IGNORE_PATTERNS
+        ignore_dirs: list[str] = settings.CONSUMER_IGNORE_DIRS
         is_testing: bool = options.get("testing", False)
         is_oneshot: bool = options.get("oneshot", False)
 
         # Create filter
         consumer_filter = ConsumerFilter(
             ignore_patterns=ignore_patterns,
-            consumption_dir=directory,
+            ignore_dirs=ignore_dirs,
         )
 
         # Process existing files
@@ -559,10 +554,10 @@ class Command(BaseCommand):
                 elif is_testing:
                     # In testing, use short timeout to check stop flag
                     timeout_ms = testing_timeout_ms
-                else:  # pragma: nocover
+                else:
                     # No pending files, wait indefinitely
                     timeout_ms = 0
 
-            except KeyboardInterrupt:  # pragma: nocover
+            except KeyboardInterrupt:
                 logger.info("Received interrupt, stopping consumer")
                 self.stop_flag.set()

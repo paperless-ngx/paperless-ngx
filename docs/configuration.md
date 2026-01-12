@@ -1175,21 +1175,44 @@ don't exist yet.
 
 #### [`PAPERLESS_CONSUMER_IGNORE_PATTERNS=<json>`](#PAPERLESS_CONSUMER_IGNORE_PATTERNS) {#PAPERLESS_CONSUMER_IGNORE_PATTERNS}
 
-: By default, paperless ignores certain files and folders in the
-consumption directory, such as system files created by the Mac OS
-or hidden folders some tools use to store data.
+: Additional regex patterns for files to ignore in the consumption directory. Patterns are matched against filenames only (not full paths)
+using Python's `re.match()`, which anchors at the start of the filename.
 
-    This can be adjusted by configuring a custom json array with
-    patterns to exclude.
+    See the [watchfiles documentation](https://watchfiles.helpmanual.io/api/filters/#watchfiles.BaseFilter.ignore_entity_patterns)
 
-    For example, `.DS_STORE/*` will ignore any files found in a folder
-    named `.DS_STORE`, including `.DS_STORE/bar.pdf` and `foo/.DS_STORE/bar.pdf`
+    This setting is for additional patterns beyond the built-in defaults. Common system files and directories are already ignored automatically.
 
-    A pattern like `._*` will ignore anything starting with `._`, including:
-    `._foo.pdf` and `._bar/foo.pdf`
+    Example custom patterns:
 
-    Defaults to
-    `[".DS_Store", ".DS_STORE", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini", "@eaDir/*", "Thumbs.db"]`.
+    ```json
+    ["^temp_", "\\.bak$", "^~"]
+    ```
+
+    This would ignore:
+
+    - Files starting with `temp_` (e.g., `temp_scan.pdf`)
+    - Files ending with `.bak` (e.g., `document.pdf.bak`)
+    - Files starting with `~` (e.g., `~$document.docx`)
+
+    Defaults to `[]` (empty list, uses only built-in defaults).
+
+    The default ignores are `[.DS_Store, .DS_STORE, ._*, desktop.ini, Thumbs.db]` and cannot be overridden.
+
+#### [`PAPERLESS_CONSUMER_IGNORE_DIRS=<json>`](#PAPERLESS_CONSUMER_IGNORE_DIRS) {#PAPERLESS_CONSUMER_IGNORE_DIRS}
+
+: Additional directory names to ignore in the consumption directory. Directories matching these names (and all their contents) will be skipped.
+
+    This setting is for additional directories beyond the built-in defaults. Matching is done by directory name only, not full path.
+
+    Example:
+
+    ```json
+    ["temp", "incoming", ".hidden"]
+    ```
+
+    Defaults to `[]` (empty list, uses only built-in defaults).
+
+    The default ignores are `[.DS_Store, .DS_STORE, ._*, desktop.ini, Thumbs.db]` and cannot be overridden.
 
 #### [`PAPERLESS_CONSUMER_BARCODE_SCANNER=<string>`](#PAPERLESS_CONSUMER_BARCODE_SCANNER) {#PAPERLESS_CONSUMER_BARCODE_SCANNER}
 
@@ -1290,23 +1313,22 @@ within your documents.
 
 #### [`PAPERLESS_CONSUMER_POLLING_INTERVAL=<num>`](#PAPERLESS_CONSUMER_POLLING_INTERVAL) {#PAPERLESS_CONSUMER_POLLING_INTERVAL}
 
-: If paperless won't find documents added to your consume folder, it
-might not be able to automatically detect filesystem changes. In
-that case, specify a polling interval in seconds here, which will
-then cause paperless to periodically check your consumption
-directory for changes. This will also disable listening for file
-system changes with `inotify`.
+: Configures how the consumer detects new files in the consumption directory.
 
-    Defaults to 0, which disables polling and uses filesystem
-    notifications.
+    When set to `0` (default), paperless uses native filesystem notifications for efficient, immediate detection of new files.
+
+    When set to a positive number, paperless polls the consumption directory at that interval in seconds. Use polling for network filesystems (NFS, SMB/CIFS) where native notifications may not work reliably.
+
+    Defaults to 0.
 
 #### [`PAPERLESS_CONSUMER_STABILITY_DELAY=<num>`](#PAPERLESS_CONSUMER_STABILITY_DELAY) {#PAPERLESS_CONSUMER_STABILITY_DELAY}
 
-: Once a file has been detected in the consume folder, it must remain unchanged for this
-many seconds before consumption will start on it. If the file is modified, its size changes
-or the watching detects any other change on it, the timer will restart.
+: Sets the time in seconds that a file must remain unchanged (same size and modification time) before paperless will begin consuming it.
 
-    Defaults to 5.
+    Increase this value if you experience issues with files being consumed before they are fully written, particularly on slower network storage or
+    with certain scanner quirks
+
+    Defaults to 5.0 seconds.
 
 ## Workflow webhooks
 

@@ -46,9 +46,6 @@ if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
 
-# -- Fixtures --
-
-
 @pytest.fixture
 def stability_tracker() -> FileStabilityTracker:
     """Create a FileStabilityTracker with a short delay for testing."""
@@ -355,6 +352,28 @@ class TestConsumerFilter:
         for pattern in ConsumerFilter.DEFAULT_IGNORE_PATTERNS:
             re.compile(pattern)
 
+    def test_custom_ignore_dirs(self, tmp_path: Path) -> None:
+        """Test filter respects custom ignore_dirs."""
+        filter_obj = ConsumerFilter(
+            supported_extensions=frozenset({".pdf"}),
+            ignore_dirs=["custom_ignored_dir"],
+        )
+
+        # Custom ignored directory should be rejected
+        custom_dir = tmp_path / "custom_ignored_dir"
+        custom_dir.mkdir()
+        assert filter_obj(Change.added, str(custom_dir)) is False
+
+        # Normal directory should be accepted
+        normal_dir = tmp_path / "normal_dir"
+        normal_dir.mkdir()
+        assert filter_obj(Change.added, str(normal_dir)) is True
+
+        # Default ignored directories should still be ignored
+        stfolder = tmp_path / ".stfolder"
+        stfolder.mkdir()
+        assert filter_obj(Change.added, str(stfolder)) is False
+
 
 class TestConsumerFilterDefaults:
     """Tests for ConsumerFilter with default settings."""
@@ -617,6 +636,8 @@ class ConsumerThread(Thread):
 
     def run(self) -> None:
         try:
+            # Use override_settings to avoid polluting global settings
+            # which would affect other tests running on the same worker
             with override_settings(
                 SCRATCH_DIR=self.scratch_dir,
                 CONSUMER_RECURSIVE=self.recursive,
@@ -633,8 +654,9 @@ class ConsumerThread(Thread):
         except Exception as e:
             self.exception = e
         finally:
-            Tag.objects.all().delete()
             # Close database connections created in this thread
+            # Important: Do not perform any database operations here (like Tag cleanup)
+            # as they create new connections that won't be properly closed
             db.connections.close_all()
 
     def stop(self) -> None:
@@ -672,7 +694,7 @@ def start_consumer(
     finally:
         # Cleanup all threads that were started
         for thread in threads:
-            thread.stop()
+            thread.stop_and_wait()
 
         failed_threads = []
         for thread in threads:
@@ -680,8 +702,10 @@ def start_consumer(
             if thread.is_alive():
                 failed_threads.append(thread)
 
-        # Clean up any Tags created by threads
+        # Clean up any Tags created by threads (they bypass test transaction isolation)
         Tag.objects.all().delete()
+
+        db.connections.close_all()
 
         if failed_threads:
             pytest.fail(
@@ -799,6 +823,8 @@ class TestCommandWatch:
             assert thread.is_alive()
         finally:
             thread.stop_and_wait(timeout=5.0)
+            # Clean up any Tags created by the thread
+            Tag.objects.all().delete()
 
         assert not thread.is_alive()
 
@@ -860,8 +886,15 @@ class TestCommandWatchRecursive:
         sample_pdf: Path,
         mock_consume_file_delay: MagicMock,
         start_consumer: Callable[..., ConsumerThread],
+        mocker: MockerFixture,
     ) -> None:
         """Test subdirs_as_tags creates tags from directory names."""
+        # Mock _tags_from_path to avoid database operations in the consumer thread
+        mock_tags = mocker.patch(
+            "documents.management.commands.document_consumer._tags_from_path",
+            return_value=[1, 2],
+        )
+
         subdir = consumption_dir / "Invoices" / "2024"
         subdir.mkdir(parents=True)
 
@@ -875,6 +908,7 @@ class TestCommandWatchRecursive:
             raise thread.exception
 
         mock_consume_file_delay.delay.assert_called()
+        mock_tags.assert_called()
         call_args = mock_consume_file_delay.delay.call_args
         overrides = call_args[0][1]
         assert overrides.tag_ids is not None
@@ -934,3 +968,5 @@ class TestCommandWatchEdgeCases:
             assert thread.is_alive()
         finally:
             thread.stop_and_wait(timeout=5.0)
+            # Clean up any Tags created by the thread
+            Tag.objects.all().delete()
