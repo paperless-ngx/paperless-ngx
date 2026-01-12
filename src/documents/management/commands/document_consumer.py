@@ -137,7 +137,7 @@ class FileStabilityTracker:
         to_remove: list[Path] = []
         to_yield: list[Path] = []
 
-        for path, tracked in list(self._tracked.items()):
+        for path, tracked in self._tracked.items():
             time_since_event = current_time - tracked.last_event_time
 
             if time_since_event < self.stability_delay:
