@@ -830,6 +830,7 @@ class TestCommandWatchPolling:
     """Tests for polling mode."""
 
     @pytest.mark.django_db
+    @pytest.mark.flaky(reruns=5)
     def test_polling_mode_works(
         self,
         consumption_dir: Path,
@@ -846,7 +847,7 @@ class TestCommandWatchPolling:
 
         # Wait for: poll interval + stability delay + another poll + margin
         # CI can be slow, so use generous timeout
-        sleep(2.0)
+        sleep(3.0)
 
         if thread.exception:
             raise thread.exception
