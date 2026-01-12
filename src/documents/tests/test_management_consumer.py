@@ -655,8 +655,6 @@ class ConsumerThread(Thread):
             self.exception = e
         finally:
             # Close database connections created in this thread
-            # Important: Do not perform any database operations here (like Tag cleanup)
-            # as they create new connections that won't be properly closed
             db.connections.close_all()
 
     def stop(self) -> None:
@@ -841,12 +839,15 @@ class TestCommandWatchPolling:
         start_consumer: Callable[..., ConsumerThread],
     ) -> None:
         """Test polling mode detects files."""
-        thread = start_consumer(polling_interval=0.5)
+        # Use shorter polling interval for faster test
+        thread = start_consumer(polling_interval=0.5, stability_delay=0.1)
 
         target = consumption_dir / "document.pdf"
         shutil.copy(sample_pdf, target)
 
-        sleep(1.5)
+        # Wait for: poll interval + stability delay + another poll + margin
+        # CI can be slow, so use generous timeout
+        sleep(2.0)
 
         if thread.exception:
             raise thread.exception
