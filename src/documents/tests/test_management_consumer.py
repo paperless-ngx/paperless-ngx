@@ -394,7 +394,6 @@ class TestConsumerFilterDefaults:
         assert filter_obj(Change.added, str(test_file)) is True
 
 
-@pytest.mark.django_db
 class TestConsumeFile:
     """Tests for the _consume_file function."""
 
@@ -540,7 +539,6 @@ class TestCommandValidation:
             cmd.handle(directory=str(sample_pdf), oneshot=True, testing=False)
 
 
-@pytest.mark.django_db
 @pytest.mark.usefixtures("mock_supported_extensions")
 class TestCommandOneshot:
     """Tests for oneshot mode."""
@@ -806,6 +804,7 @@ class TestCommandWatch:
         call_args = mock_consume_file_delay.delay.call_args[0][0]
         assert call_args.original_file.name == "valid.pdf"
 
+    @pytest.mark.django_db
     @pytest.mark.usefixtures("mock_supported_extensions")
     def test_stop_flag_stops_consumer(
         self,
@@ -827,10 +826,10 @@ class TestCommandWatch:
         assert not thread.is_alive()
 
 
-@pytest.mark.django_db
 class TestCommandWatchPolling:
     """Tests for polling mode."""
 
+    @pytest.mark.django_db
     def test_polling_mode_works(
         self,
         consumption_dir: Path,
