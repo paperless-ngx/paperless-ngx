@@ -88,13 +88,13 @@ jobs:
         if: always()
         uses: codecov/codecov-action@v5
         with:
-          flags: backend,backend-python-${{ matrix.python-version }}
+          flags: backend-python-${{ matrix.python-version }}
           files: junit.xml
           report_type: test_results
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          flags: backend,backend-python-${{ matrix.python-version }}
+          flags: backend-python-${{ matrix.python-version }}
           files: coverage.xml
           report_type: coverage
       - name: Stop containers
