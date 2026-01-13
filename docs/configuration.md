@@ -1181,6 +1181,7 @@ using Python's `re.match()`, which anchors at the start of the filename.
     See the [watchfiles documentation](https://watchfiles.helpmanual.io/api/filters/#watchfiles.BaseFilter.ignore_entity_patterns)
 
     This setting is for additional patterns beyond the built-in defaults. Common system files and directories are already ignored automatically.
+    The patterns will be compiled via Python's standard `re` module.
 
     Example custom patterns:
 
@@ -1212,7 +1213,7 @@ using Python's `re.match()`, which anchors at the start of the filename.
 
     Defaults to `[]` (empty list, uses only built-in defaults).
 
-    The default ignores are `[.DS_Store, .DS_STORE, ._*, desktop.ini, Thumbs.db]` and cannot be overridden.
+    The default ignores are `[.stfolder, .stversions, .localized, @eaDir, .Spotlight-V100, .Trashes, __MACOSX]` and cannot be overridden.
 
 #### [`PAPERLESS_CONSUMER_BARCODE_SCANNER=<string>`](#PAPERLESS_CONSUMER_BARCODE_SCANNER) {#PAPERLESS_CONSUMER_BARCODE_SCANNER}
 

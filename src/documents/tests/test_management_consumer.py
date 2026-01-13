@@ -830,7 +830,7 @@ class TestCommandWatchPolling:
     """Tests for polling mode."""
 
     @pytest.mark.django_db
-    @pytest.mark.flaky(reruns=5)
+    @pytest.mark.flaky(reruns=2)
     def test_polling_mode_works(
         self,
         consumption_dir: Path,
@@ -838,7 +838,10 @@ class TestCommandWatchPolling:
         mock_consume_file_delay: MagicMock,
         start_consumer: Callable[..., ConsumerThread],
     ) -> None:
-        """Test polling mode detects files."""
+        """
+        Test polling mode detects files.
+        Note: At times, there appears to be a timing issue, where delay has not yet been called, hence this is marked as flaky.
+        """
         # Use shorter polling interval for faster test
         thread = start_consumer(polling_interval=0.5, stability_delay=0.1)
 
