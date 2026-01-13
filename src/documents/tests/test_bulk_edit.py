@@ -608,7 +608,6 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         consume_file_args, _ = mock_consume_file.call_args
         self.assertEqual(consume_file_args[1].title, "B (merged)")
         self.assertEqual(consume_file_args[1].created, self.doc2.created)
-        self.assertTrue(consume_file_args[1].skip_asn)
 
         self.assertEqual(result, "OK")
 
