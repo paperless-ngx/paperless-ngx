@@ -28,7 +28,7 @@ dependencies = [
   #          Only patch versions are guaranteed to not introduce breaking changes.
   "django~=5.2.5",
   "django-allauth[mfa,socialaccount]~=65.12.1",
-  "django-auditlog~=3.3.0",
+  "django-auditlog~=3.4.1",
   "django-cachalot~=2.8.0",
   "django-celery-results~=2.6.0",
   "django-compression-middleware~=0.5.0",
@@ -47,7 +47,7 @@ dependencies = [
   "faiss-cpu>=1.10",
   "filelock~=3.20.0",
   "flower~=2.0.1",
-  "gotenberg-client~=0.12.0",
+  "gotenberg-client~=0.13.1",
   "httpx-oauth~=0.16",
   "imap-tools~=1.11.0",
   "inotifyrecursive~=0.3",
@@ -60,7 +60,7 @@ dependencies = [
   "llama-index-llms-openai>=0.3.38",
   "llama-index-vector-stores-faiss>=0.3",
   "nltk~=3.9.1",
-  "ocrmypdf~=16.12.0",
+  "ocrmypdf~=16.13.0",
   "openai>=1.76",
   "pathvalidate~=3.3.1",
   "pdf2image~=1.17.0",
@@ -91,7 +91,7 @@ optional-dependencies.postgres = [
   "psycopg[c,pool]==3.2.12",
   # Direct dependency for proper resolution of the pre-built wheels
   "psycopg-c==3.2.12",
-  "psycopg-pool==3.2.7",
+  "psycopg-pool==3.3.0",
 ]
 optional-dependencies.webserver = [
   "granian[uvloop]~=2.5.1",
@@ -126,7 +126,7 @@ testing = [
 ]
 
 lint = [
-  "pre-commit~=4.4.0",
+  "pre-commit~=4.5.1",
   "pre-commit-uv~=4.2.0",
   "ruff~=0.14.0",
 ]
