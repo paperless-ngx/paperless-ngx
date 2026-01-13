@@ -104,9 +104,9 @@ dependencies = [
     { name = "isodate", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "typing-extensions", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/44/7b/8115cd713e2caa5e44def85f2b7ebd02a74ae74d7113ba20bdd41fd6dd80/azure_ai_documentintelligence-1.0.2.tar.gz", hash = "sha256:4d75a2513f2839365ebabc0e0e1772f5601b3a8c9a71e75da12440da13b63484", size = 170940 }
+sdist = { url = "https://files.pythonhosted.org/packages/44/7b/8115cd713e2caa5e44def85f2b7ebd02a74ae74d7113ba20bdd41fd6dd80/azure_ai_documentintelligence-1.0.2.tar.gz", hash = "sha256:4d75a2513f2839365ebabc0e0e1772f5601b3a8c9a71e75da12440da13b63484", size = 170940, upload-time = "2025-03-27T02:46:20.606Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d9/75/c9ec040f23082f54ffb1977ff8f364c2d21c79a640a13d1c1809e7fd6b1a/azure_ai_documentintelligence-1.0.2-py3-none-any.whl", hash = "sha256:e1fb446abbdeccc9759d897898a0fe13141ed29f9ad11fc705f951925822ed59", size = 106005 },
+    { url = "https://files.pythonhosted.org/packages/d9/75/c9ec040f23082f54ffb1977ff8f364c2d21c79a640a13d1c1809e7fd6b1a/azure_ai_documentintelligence-1.0.2-py3-none-any.whl", hash = "sha256:e1fb446abbdeccc9759d897898a0fe13141ed29f9ad11fc705f951925822ed59", size = 106005, upload-time = "2025-03-27T02:46:22.356Z" },
 ]
 
 [[package]]
@@ -118,9 +118,9 @@ dependencies = [
     { name = "six", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "typing-extensions", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/75/aa/7c9db8edd626f1a7d99d09ef7926f6f4fb34d5f9fa00dc394afdfe8e2a80/azure_core-1.33.0.tar.gz", hash = "sha256:f367aa07b5e3005fec2c1e184b882b0b039910733907d001c20fb08ebb8c0eb9", size = 295633 }
+sdist = { url = "https://files.pythonhosted.org/packages/75/aa/7c9db8edd626f1a7d99d09ef7926f6f4fb34d5f9fa00dc394afdfe8e2a80/azure_core-1.33.0.tar.gz", hash = "sha256:f367aa07b5e3005fec2c1e184b882b0b039910733907d001c20fb08ebb8c0eb9", size = 295633, upload-time = "2025-04-03T23:51:02.058Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/07/b7/76b7e144aa53bd206bf1ce34fa75350472c3f69bf30e5c8c18bc9881035d/azure_core-1.33.0-py3-none-any.whl", hash = "sha256:9b5b6d0223a1d38c37500e6971118c1e0f13f54951e6893968b38910bc9cda8f", size = 207071 },
+    { url = "https://files.pythonhosted.org/packages/07/b7/76b7e144aa53bd206bf1ce34fa75350472c3f69bf30e5c8c18bc9881035d/azure_core-1.33.0-py3-none-any.whl", hash = "sha256:9b5b6d0223a1d38c37500e6971118c1e0f13f54951e6893968b38910bc9cda8f", size = 207071, upload-time = "2025-04-03T23:51:03.806Z" },
 ]
 
 [[package]]
@@ -359,15 +359,15 @@ wheels = [
 
 [[package]]
 name = "channels"
-version = "4.3.1"
+version = "4.3.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asgiref", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/12/a0/46450fcf9e56af18a6b0440ba49db6635419bb7bc84142c35f4143b1a66c/channels-4.3.1.tar.gz", hash = "sha256:97413ffd674542db08e16a9ef09cd86ec0113e5f8125fbd33cf0854adcf27cdb", size = 26896, upload-time = "2025-08-01T13:25:19.952Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/74/92/b18d4bb54d14986a8b35215a1c9e6a7f9f4d57ca63ac9aee8290ebb4957d/channels-4.3.2.tar.gz", hash = "sha256:f2bb6bfb73ad7fb4705041d07613c7b4e69528f01ef8cb9fb6c21d9295f15667", size = 27023, upload-time = "2025-11-20T15:13:05.102Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/89/1c/eae1c2a8c195760376e7f65d0bdcc3e966695d29cfbe5c54841ce5c71408/channels-4.3.1-py3-none-any.whl", hash = "sha256:b091d4b26f91d807de3e84aead7ba785314f27eaf5bac31dd51b1c956b883859", size = 31286, upload-time = "2025-08-01T13:25:18.845Z" },
+    { url = "https://files.pythonhosted.org/packages/16/34/c32915288b7ef482377b6adc401192f98c6a99b3a145423d3b8aed807898/channels-4.3.2-py3-none-any.whl", hash = "sha256:fef47e9055a603900cf16cef85f050d522d9ac4b3daccf24835bd9580705c176", size = 31313, upload-time = "2025-11-20T15:13:02.357Z" },
 ]
 
 [[package]]
@@ -867,14 +867,14 @@ wheels = [
 
 [[package]]
 name = "django-soft-delete"
-version = "1.0.21"
+version = "1.0.22"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/da/bf/13996c18bffee3bbcf294830c1737bfb5564164b8319c51e6714b6bdf783/django_soft_delete-1.0.21.tar.gz", hash = "sha256:542bd4650d2769105a4363ea7bb7fbdb3c28429dbaa66417160f8f4b5dc689d5", size = 21153, upload-time = "2025-09-17T08:46:30.476Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/98/d1/c990b731676f93bd4594dee4b5133df52f5d0eee1eb8a969b4030014ac54/django_soft_delete-1.0.22.tar.gz", hash = "sha256:32d0bb95f180c28a40163e78a558acc18901fd56011f91f8ee735c171a6d4244", size = 21982, upload-time = "2025-10-25T13:11:46.199Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fa/e6/8f4fed14499c63e35ca33cf9f424ad2e14e963ec5545594d7c7dc2f710f4/django_soft_delete-1.0.21-py3-none-any.whl", hash = "sha256:dd91e671d9d431ff96f4db727ce03e7fbb4008ae4541b1d162d5d06cc9becd2a", size = 18681, upload-time = "2025-09-17T08:46:29.272Z" },
+    { url = "https://files.pythonhosted.org/packages/f5/c2/fca2bf69b7ca7e18aed9ac059e89f1043663e207a514e8fb652450e49631/django_soft_delete-1.0.22-py3-none-any.whl", hash = "sha256:81973c541d21452d249151085d617ebbfb5ec463899f47cd6b1306677481e94c", size = 19221, upload-time = "2025-10-25T13:11:44.755Z" },
 ]
 
 [[package]]
@@ -913,11 +913,11 @@ wheels = [
 
 [[package]]
 name = "django-treenode"
-version = "0.23.2"
+version = "0.23.3"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/75/f3/274b84607fd64c0844e98659985f964190a46c2460f2523a446c4a946216/django_treenode-0.23.2.tar.gz", hash = "sha256:3c5a6ff5e0c83e34da88749f602b3013dd1ab0527f51952c616e3c21bf265d52", size = 26700, upload-time = "2025-09-04T21:16:53.497Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/25/58/86edbbd1075bb8bc0962c6feb13bc06822405a10fea8352ad73ab2babdd9/django_treenode-0.23.3.tar.gz", hash = "sha256:714c825d5b925a3d2848d0709f29973941ea41a606b8e2b64cbec46010a8cce3", size = 27812, upload-time = "2025-12-01T23:01:24.847Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/00/61/e17d3dee5c6bb24b8faf0c101e17f9a8cafeba6384166176e066c80e8cbb/django_treenode-0.23.2-py3-none-any.whl", hash = "sha256:9363cb50f753654a9acfad6ec4df2a664a5f89dfdf8b55ffd964f27461bef85e", size = 21879, upload-time = "2025-09-04T21:16:51.811Z" },
+    { url = "https://files.pythonhosted.org/packages/bc/52/696db237167483324ef38d8d090fb0fcc33dbb70ebe66c75868005fb7c75/django_treenode-0.23.3-py3-none-any.whl", hash = "sha256:8072e1ac688c1ed3ab95a98a797c5e965380de5228a389d60a4ef8b9a6449387", size = 22014, upload-time = "2025-12-01T23:01:23.266Z" },
 ]
 
 [[package]]
@@ -1064,11 +1064,11 @@ wheels = [
 
 [[package]]
 name = "filelock"
-version = "3.20.0"
+version = "3.20.3"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/58/46/0028a82567109b5ef6e4d2a1f04a583fb513e6cf9527fcdd09afd817deeb/filelock-3.20.0.tar.gz", hash = "sha256:711e943b4ec6be42e1d4e6690b48dc175c822967466bb31c0c293f34334c13f4", size = 18922, upload-time = "2025-10-08T18:03:50.056Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1d/65/ce7f1b70157833bf3cb851b556a37d4547ceafc158aa9b34b36782f23696/filelock-3.20.3.tar.gz", hash = "sha256:18c57ee915c7ec61cff0ecf7f0f869936c7c30191bb0cf406f1341778d0834e1", size = 19485, upload-time = "2026-01-09T17:55:05.421Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/76/91/7216b27286936c16f5b4d0c530087e4a54eead683e6b0b73dd0c64844af6/filelock-3.20.0-py3-none-any.whl", hash = "sha256:339b4732ffda5cd79b13f4e2711a31b0365ce445d95d243bb996273d072546a2", size = 16054, upload-time = "2025-10-08T18:03:48.35Z" },
+    { url = "https://files.pythonhosted.org/packages/b5/36/7fb70f04bf00bc646cd5bb45aa9eddb15e19437a28b8fb2b4a5249fac770/filelock-3.20.3-py3-none-any.whl", hash = "sha256:4b0dda527ee31078689fc205ec4f1c1bf7d56cf88b6dc9426c4f230e46c2dce1", size = 16701, upload-time = "2026-01-09T17:55:04.334Z" },
 ]
 
 [[package]]
@@ -1483,9 +1483,9 @@ wheels = [
 name = "isodate"
 version = "0.7.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/54/4d/e940025e2ce31a8ce1202635910747e5a87cc3a6a6bb2d00973375014749/isodate-0.7.2.tar.gz", hash = "sha256:4cd1aa0f43ca76f4a6c6c0292a85f40b35ec2e43e315b59f06e6d32171a953e6", size = 29705 }
+sdist = { url = "https://files.pythonhosted.org/packages/54/4d/e940025e2ce31a8ce1202635910747e5a87cc3a6a6bb2d00973375014749/isodate-0.7.2.tar.gz", hash = "sha256:4cd1aa0f43ca76f4a6c6c0292a85f40b35ec2e43e315b59f06e6d32171a953e6", size = 29705, upload-time = "2024-10-08T23:04:11.5Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/15/aa/0aca39a37d3c7eb941ba736ede56d689e7be91cab5d9ca846bde3999eba6/isodate-0.7.2-py3-none-any.whl", hash = "sha256:28009937d8031054830160fce6d409ed342816b543597cece116d966c6d99e15", size = 22320 },
+    { url = "https://files.pythonhosted.org/packages/15/aa/0aca39a37d3c7eb941ba736ede56d689e7be91cab5d9ca846bde3999eba6/isodate-0.7.2-py3-none-any.whl", hash = "sha256:28009937d8031054830160fce6d409ed342816b543597cece116d966c6d99e15", size = 22320, upload-time = "2024-10-08T23:04:09.501Z" },
 ]
 
 [[package]]
