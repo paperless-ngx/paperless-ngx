@@ -54,6 +54,10 @@ from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
 from documents.signals.handlers import run_workflows
 from documents.workflows.utils import get_workflows_for_trigger
+from paperless.config import AIConfig
+from paperless_ai.indexing import llm_index_add_or_update_document
+from paperless_ai.indexing import llm_index_remove_document
+from paperless_ai.indexing import update_llm_index
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
@@ -242,6 +246,13 @@ def bulk_update_documents(document_ids):
         for doc in documents:
             index.update_document(writer, doc)
 
+    ai_config = AIConfig()
+    if ai_config.llm_index_enabled:
+        update_llm_index(
+            progress_bar_disable=True,
+            rebuild=False,
+        )
+
 
 @shared_task
 def update_document_content_maybe_archive_file(document_id):
@@ -340,6 +351,10 @@ def update_document_content_maybe_archive_file(document_id):
         )
         with index.open_index_writer() as writer:
             index.update_document(writer, document)
+
+        ai_config = AIConfig()
+        if ai_config.llm_index_enabled:
+            llm_index_add_or_update_document(document)
 
         clear_document_caches(document.pk)
 
@@ -558,3 +573,55 @@ def update_document_parent_tags(tag: Tag, new_parent: Tag) -> None:
 
     if affected:
         bulk_update_documents.delay(document_ids=list(affected))
+
+
+@shared_task
+def llmindex_index(
+    *,
+    progress_bar_disable=True,
+    rebuild=False,
+    scheduled=True,
+    auto=False,
+):
+    ai_config = AIConfig()
+    if ai_config.llm_index_enabled:
+        task = PaperlessTask.objects.create(
+            type=PaperlessTask.TaskType.SCHEDULED_TASK
+            if scheduled
+            else PaperlessTask.TaskType.AUTO
+            if auto
+            else PaperlessTask.TaskType.MANUAL_TASK,
+            task_id=uuid.uuid4(),
+            task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
+            status=states.STARTED,
+            date_created=timezone.now(),
+            date_started=timezone.now(),
+        )
+        from paperless_ai.indexing import update_llm_index
+
+        try:
+            result = update_llm_index(
+                progress_bar_disable=progress_bar_disable,
+                rebuild=rebuild,
+            )
+            task.status = states.SUCCESS
+            task.result = result
+        except Exception as e:
+            logger.error("LLM index error: " + str(e))
+            task.status = states.FAILURE
+            task.result = str(e)
+
+        task.date_done = timezone.now()
+        task.save(update_fields=["status", "result", "date_done"])
+    else:
+        logger.info("LLM index is disabled, skipping update.")
+
+
+@shared_task
+def update_document_in_llm_index(document):
+    llm_index_add_or_update_document(document)
+
+
+@shared_task
+def remove_document_from_llm_index(document):
+    llm_index_remove_document(document)

@@ -15,6 +15,12 @@
         @if (hint) {
           <small class="form-text text-muted" [innerHTML]="hint"></small>
         }
+        @if (getSuggestion()?.length > 0) {
+          <small>
+            <span i18n>Suggestion:</span>&nbsp;
+            <a (click)="applySuggestion(s)" [routerLink]="[]">{{getSuggestion()}}</a>&nbsp;
+          </small>
+        }
         <div class="invalid-feedback position-absolute top-100">
           {{error}}
         </div>

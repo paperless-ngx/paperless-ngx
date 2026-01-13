@@ -598,6 +598,7 @@ class PaperlessTask(ModelWithOwner):
         TRAIN_CLASSIFIER = ("train_classifier", _("Train Classifier"))
         CHECK_SANITY = ("check_sanity", _("Check Sanity"))
         INDEX_OPTIMIZE = ("index_optimize", _("Index Optimize"))
+        LLMINDEX_UPDATE = ("llmindex_update", _("LLM Index Update"))
 
     task_id = models.CharField(
         max_length=255,
