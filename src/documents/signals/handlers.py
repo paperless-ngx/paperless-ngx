@@ -418,7 +418,15 @@ def update_filename_and_move_files(
             return
         instance = instance.document
 
-    def validate_move(instance, old_path: Path, new_path: Path):
+    def validate_move(instance, old_path: Path, new_path: Path, root: Path):
+        if not new_path.is_relative_to(root):
+            msg = (
+                f"Document {instance!s}: Refusing to move file outside root {root}: "
+                f"{new_path}."
+            )
+            logger.warning(msg)
+            raise CannotMoveFilesException(msg)
+
         if not old_path.is_file():
             # Can't do anything if the old file does not exist anymore.
             msg = f"Document {instance!s}: File {old_path} doesn't exist."
@@ -507,12 +515,22 @@ def update_filename_and_move_files(
                 return
 
             if move_original:
-                validate_move(instance, old_source_path, instance.source_path)
+                validate_move(
+                    instance,
+                    old_source_path,
+                    instance.source_path,
+                    settings.ORIGINALS_DIR,
+                )
                 create_source_path_directory(instance.source_path)
                 shutil.move(old_source_path, instance.source_path)
 
             if move_archive:
-                validate_move(instance, old_archive_path, instance.archive_path)
+                validate_move(
+                    instance,
+                    old_archive_path,
+                    instance.archive_path,
+                    settings.ARCHIVE_DIR,
+                )
                 create_source_path_directory(instance.archive_path)
                 shutil.move(old_archive_path, instance.archive_path)
 
