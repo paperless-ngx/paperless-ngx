@@ -501,7 +501,7 @@ The `datetime` filter formats a datetime string or datetime object using Python'
 See the [strftime format code documentation](https://docs.python.org/3.13/library/datetime.html#strftime-and-strptime-format-codes)
 for the possible codes and their meanings.
 
-##### Date Localization
+##### Date Localization {#date-localization}
 
 The `localize_date` filter formats a date or datetime object into a localized string using Babel internationalization.
 This takes into account the provided locale for translation. Since this must be used on a date or datetime object,

@@ -234,47 +234,9 @@ FileNotFoundError: [Errno 2] No such file or directory: '/tmp/ocrmypdf.io.yhk3zb
 
 This probably indicates paperless tried to consume the same file twice.
 This can happen for a number of reasons, depending on how documents are
-placed into the consume folder. If paperless is using inotify (the
-default) to check for documents, try adjusting the
-[inotify configuration](configuration.md#inotify). If polling is enabled, try adjusting the
-[polling configuration](configuration.md#polling).
-
-## Consumer fails waiting for file to remain unmodified.
-
-You might find messages like these in your log files:
-
-```
-[ERROR] [paperless.management.consumer] Timeout while waiting on file /usr/src/paperless/src/../consume/SCN_0001.pdf to remain unmodified.
-```
-
-This indicates paperless timed out while waiting for the file to be
-completely written to the consume folder. Adjusting
-[polling configuration](configuration.md#polling) values should resolve the issue.
-
-!!! note
-
-    The user will need to manually move the file out of the consume folder
-    and back in, for the initial failing file to be consumed.
-
-## Consumer fails reporting "OS reports file as busy still".
-
-You might find messages like these in your log files:
-
-```
-[WARNING] [paperless.management.consumer] Not consuming file /usr/src/paperless/src/../consume/SCN_0001.pdf: OS reports file as busy still
-```
-
-This indicates paperless was unable to open the file, as the OS reported
-the file as still being in use. To prevent a crash, paperless did not
-try to consume the file. If paperless is using inotify (the default) to
-check for documents, try adjusting the
-[inotify configuration](configuration.md#inotify). If polling is enabled, try adjusting the
-[polling configuration](configuration.md#polling).
-
-!!! note
-
-    The user will need to manually move the file out of the consume folder
-    and back in, for the initial failing file to be consumed.
+placed into the consume folder, such as how a scanner may modify a file multiple times as it scans.
+Try adjusting the
+[file stability delay](configuration.md#PAPERLESS_CONSUMER_STABILITY_DELAY) to a larger value.
 
 ## Log reports "Creating PaperlessTask failed".
 
