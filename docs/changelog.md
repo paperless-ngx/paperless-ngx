@@ -2,7 +2,9 @@
 
 ## paperless-ngx 2.20.4
 
-Addresses [GHSA-28cf-xvcf-hw6m](https://github.com/paperless-ngx/paperless-ngx/security/advisories/GHSA-28cf-xvcf-hw6m).
+### Security
+
+-   Resolve [GHSA-28cf-xvcf-hw6m](https://github.com/paperless-ngx/paperless-ngx/security/advisories/GHSA-28cf-xvcf-hw6m)
 
 ### Bug Fixes
 
@@ -26,11 +28,16 @@ Addresses [GHSA-28cf-xvcf-hw6m](https://github.com/paperless-ngx/paperless-ngx/s
 
 ## paperless-ngx 2.20.3
 
-Addresses [GHSA-7cq3-mhxq-w946](https://github.com/paperless-ngx/paperless-ngx/security/advisories/GHSA-7cq3-mhxq-w946).
+### Security
+
+-   Resolve [GHSA-7cq3-mhxq-w946](https://github.com/paperless-ngx/paperless-ngx/security/advisories/GHSA-7cq3-mhxq-w946)
 
 ## paperless-ngx 2.20.2
 
-Addresses [GHSA-6653-vcx4-69mc](https://github.com/paperless-ngx/paperless-ngx/security/advisories/GHSA-6653-vcx4-69mc) and [GHSA-24x5-wp64-9fcc](https://github.com/paperless-ngx/paperless-ngx/security/advisories/GHSA-24x5-wp64-9fcc)
+### Security
+
+-   Resolve [GHSA-6653-vcx4-69mc](https://github.com/paperless-ngx/paperless-ngx/security/advisories/GHSA-6653-vcx4-69mc)
+-   Resolve [GHSA-24x5-wp64-9fcc](https://github.com/paperless-ngx/paperless-ngx/security/advisories/GHSA-24x5-wp64-9fcc)
 
 ### Features / Enhancements
 
