@@ -76,6 +76,7 @@ export const SETTINGS_KEYS = {
   GMAIL_OAUTH_URL: 'gmail_oauth_url',
   OUTLOOK_OAUTH_URL: 'outlook_oauth_url',
   EMAIL_ENABLED: 'email_enabled',
+  AI_ENABLED: 'ai_enabled',
 }
 
 export const SETTINGS: UiSetting[] = [
@@ -288,5 +289,10 @@ export const SETTINGS: UiSetting[] = [
     key: SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING,
     type: 'string',
     default: 'page-width', // ZoomSetting from 'document-detail.component'
+  },
+  {
+    key: SETTINGS_KEYS.AI_ENABLED,
+    type: 'boolean',
+    default: false,
   },
 ]
