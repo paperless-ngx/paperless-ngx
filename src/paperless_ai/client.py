@@ -52,7 +52,7 @@ class AIClient:
         )
         tool_calls = self.llm.get_tool_calls_from_response(
             result,
-            error_on_no_tool_calls=True,
+            error_on_no_tool_call=True,
         )
         logger.debug("LLM query result: %s", tool_calls)
         parsed = DocumentClassifierSchema(**tool_calls[0].tool_kwargs)
