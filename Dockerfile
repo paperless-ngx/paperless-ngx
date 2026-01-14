@@ -195,30 +195,12 @@ RUN set -eux \
     && apt-get update \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
   && echo "Installing Python requirements" \
-    # Ensure linux/amd64 uses CPU-only PyTorch wheels (avoid pulling CUDA/nvidia-* deps) \
-    && printf '%s\n' \
-         '--extra-index-url https://download.pytorch.org/whl/cpu' \
-         'torch==2.7.0' \
-         > /tmp/torch-cpu-constraints.txt \
-    && if [ "${TARGETARCH}" = "amd64" ]; then \
-         uv export --quiet --no-dev --all-extras --no-hashes --format requirements-txt --output-file requirements.txt ; \
-       else \
-         uv export --quiet --no-dev --all-extras --format requirements-txt --output-file requirements.txt ; \
-       fi \
-    && if [ "${TARGETARCH}" = "amd64" ]; then \
-         # Drop CUDA/NVIDIA-only packages that are pulled in by the CUDA PyTorch wheels on amd64.
-         # We'll force a CPU-only torch wheel via constraints during install, so these are unnecessary.
-         sed -i -E '/^(nvidia-|triton==|cusparselt==)/d' requirements.txt ; \
-       fi \
-    && if [ "${TARGETARCH}" = "amd64" ]; then \
-         uv pip install --no-cache --system --no-python-downloads --python-preference system \
-           --index-strategy unsafe-best-match \
-           -c /tmp/torch-cpu-constraints.txt \
-           --requirements requirements.txt ; \
-       else \
-         uv pip install --no-cache --system --no-python-downloads --python-preference system \
-           --requirements requirements.txt ; \
-       fi \
+    && uv export --quiet --no-dev --all-extras --format requirements-txt --output-file requirements.txt \
+    && uv pip install --no-cache --system --no-python-downloads --python-preference system \
+      --index https://pypi.org/simple \
+      --index https://download.pytorch.org/whl/cpu \
+      --index-strategy unsafe-best-match \
+      --requirements requirements.txt \
   && echo "Installing NLTK data" \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" snowball_data \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" stopwords \
