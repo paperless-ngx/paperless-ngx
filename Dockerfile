@@ -203,6 +203,7 @@ RUN set -eux \
     && uv export --quiet --no-dev --all-extras --format requirements-txt --output-file requirements.txt \
     && if [ "${TARGETARCH}" = "amd64" ]; then \
          uv pip install --no-cache --system --no-python-downloads --python-preference system \
+           --index-strategy unsafe-best-match \
            -c /tmp/torch-cpu-constraints.txt \
            --requirements requirements.txt ; \
        else \
