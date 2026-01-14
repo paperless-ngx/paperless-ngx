@@ -195,8 +195,20 @@ RUN set -eux \
     && apt-get update \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
   && echo "Installing Python requirements" \
+    # Ensure linux/amd64 uses CPU-only PyTorch wheels (avoid pulling CUDA/nvidia-* deps) \
+    && printf '%s\n' \
+         '--extra-index-url https://download.pytorch.org/whl/cpu' \
+         'torch==2.7.0' \
+         > /tmp/torch-cpu-constraints.txt \
     && uv export --quiet --no-dev --all-extras --format requirements-txt --output-file requirements.txt \
-    && uv pip install --no-cache --system --no-python-downloads --python-preference system --requirements requirements.txt \
+    && if [ "${TARGETARCH}" = "amd64" ]; then \
+         uv pip install --no-cache --system --no-python-downloads --python-preference system \
+           -c /tmp/torch-cpu-constraints.txt \
+           --requirements requirements.txt ; \
+       else \
+         uv pip install --no-cache --system --no-python-downloads --python-preference system \
+           --requirements requirements.txt ; \
+       fi \
   && echo "Installing NLTK data" \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" snowball_data \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" stopwords \
