@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING
 import pytest
 from django import db
 from django.core.management import CommandError
+from django.db import DatabaseError
 from django.test import override_settings
 from watchfiles import Change
 
@@ -248,6 +249,21 @@ class TestFileStabilityTracker:
         assert len(stable) == 0
         assert tracker.pending_count == 0
 
+    def test_get_stable_files_error_during_check(
+        self,
+        temp_file: Path,
+        mocker: MockerFixture,
+    ) -> None:
+        """Test a file which has become inaccessible is removed from tracking"""
+
+        mocker.patch.object(Path, "stat", side_effect=PermissionError("denied"))
+
+        tracker = FileStabilityTracker(stability_delay=0.1)
+        tracker.track(temp_file, Change.added)
+        stable = list(tracker.get_stable_files())
+        assert len(stable) == 0
+        assert tracker.pending_count == 0
+
     def test_multiple_files_tracking(
         self,
         stability_tracker: FileStabilityTracker,
@@ -467,6 +483,32 @@ class TestConsumeFile:
             subdirs_as_tags=False,
         )
         mock_consume_file_delay.delay.assert_not_called()
+
+    def test_consume_with_tags_error(
+        self,
+        consumption_dir: Path,
+        sample_pdf: Path,
+        mock_consume_file_delay: MagicMock,
+        mocker: MockerFixture,
+    ) -> None:
+        """Test _consume_file handles errors during tag creation"""
+        target = consumption_dir / "document.pdf"
+        shutil.copy(sample_pdf, target)
+
+        mocker.patch(
+            "documents.management.commands.document_consumer._tags_from_path",
+            side_effect=DatabaseError("Something happened"),
+        )
+
+        _consume_file(
+            filepath=target,
+            consumption_dir=consumption_dir,
+            subdirs_as_tags=True,
+        )
+        mock_consume_file_delay.delay.assert_called_once()
+        call_args = mock_consume_file_delay.delay.call_args
+        overrides = call_args[0][1]
+        assert overrides.tag_ids is None
 
 
 @pytest.mark.django_db

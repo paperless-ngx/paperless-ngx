@@ -155,14 +155,9 @@ class FileStabilityTracker:
                     logger.debug(f"File disappeared during stability check: {path}")
                 continue
 
-            # File is stable - verify it's a regular file
-            try:
-                path.stat()
-                to_yield.append(path)
-                logger.info(f"File is stable: {path}")
-            except OSError as e:  # pragma: no cover
-                logger.warning(f"Cannot access {path}: {e}")
-                to_remove.append(path)
+            # File is stable, we can return it
+            to_yield.append(path)
+            logger.info(f"File is stable: {path}")
 
         # Remove files that are no longer valid
         for path in to_remove:
@@ -337,7 +332,7 @@ def _consume_file(
     if subdirs_as_tags:
         try:
             tag_ids = _tags_from_path(filepath, consumption_dir)
-        except Exception:  # pragma: no cover
+        except Exception:
             logger.exception(f"Error creating tags from path for {filepath}")
 
     # Queue for consumption
