@@ -60,8 +60,20 @@ jobs:
           REF_NAME: ${{ steps.ref.outputs.name }}
         run: |
           # should-push: Should we push to GHCR?
-          # True for: pushes (tags/dev/beta). False for PRs.
-          should_push=${{ github.event_name == 'push' }}
+          # True for:
+          #   1. Pushes (tags/dev/beta) - filtered via the workflow triggers
+          #   2. Internal PRs where the branch name starts with 'feature-' - filtered here when a PR is synced
+
+          should_push="false"
+
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            should_push="true"
+          elif [[ "${{ github.event_name }}" == "pull_request" && "${{ github.event.pull_request.head.repo.full_name }}" == "${{ github.repository }}" ]]; then
+            if [[ "${REF_NAME}" == feature-* ]]; then
+              should_push="true"
+            fi
+          fi
+
           echo "should-push=${should_push}"
           echo "should-push=${should_push}" >> $GITHUB_OUTPUT
 
