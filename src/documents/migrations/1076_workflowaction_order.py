@@ -2,13 +2,12 @@
 
 from django.db import migrations
 from django.db import models
+from django.db.models import F
 
 
 def populate_action_order(apps, schema_editor):
     WorkflowAction = apps.get_model("documents", "WorkflowAction")
-    for index, action in enumerate(WorkflowAction.objects.all()):
-        action.order = index
-        action.save()
+    WorkflowAction.objects.all().update(order=F("id"))
 
 
 class Migration(migrations.Migration):
