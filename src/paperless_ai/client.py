@@ -23,7 +23,7 @@ class AIClient:
     def get_llm(self) -> Ollama | OpenAI:
         if self.settings.llm_backend == "ollama":
             return Ollama(
-                model=self.settings.llm_model or "llama3",
+                model=self.settings.llm_model or "llama3.1",
                 base_url=self.settings.llm_endpoint or "http://localhost:11434",
                 request_timeout=120,
             )
