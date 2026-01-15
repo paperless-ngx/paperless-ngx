@@ -228,6 +228,7 @@ urlpatterns = [
                         ],
                     ),
                 ),
+                re_path("^auth/headless/", include("allauth.headless.urls")),
                 re_path(
                     "^$",  # Redirect to the API swagger view
                     RedirectView.as_view(url="schema/view/"),
@@ -355,7 +356,6 @@ urlpatterns = [
             ],
         ),
     ),
-    path("api/auth/", include("allauth.headless.urls")),
     # Root of the Frontend
     re_path(
         r".*",
