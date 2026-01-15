@@ -1873,7 +1873,7 @@ using the OpenAI API. This setting is required to be set to use the AI features.
 #### [`PAPERLESS_AI_LLM_MODEL=<str>`](#PAPERLESS_AI_LLM_MODEL) {#PAPERLESS_AI_LLM_MODEL}
 
 : The model to use for the AI backend, i.e. "gpt-3.5-turbo", "gpt-4" or any of the models supported by the
-current backend. If not supplied, defaults to "gpt-3.5-turbo" for OpenAI and "llama3" for Ollama.
+current backend. If not supplied, defaults to "gpt-3.5-turbo" for OpenAI and "llama3.1" for Ollama.
 
     Defaults to None.
 
