@@ -1294,6 +1294,8 @@ class WorkflowAction(models.Model):
         default=WorkflowActionType.ASSIGNMENT,
     )
 
+    order = models.PositiveIntegerField(_("order"), default=0)
+
     assign_title = models.TextField(
         _("assign title"),
         null=True,

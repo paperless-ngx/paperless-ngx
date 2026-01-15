@@ -20,9 +20,6 @@ def get_workflows_for_trigger(
     wrap it in a list; otherwise fetch enabled workflows for the trigger with
     the prefetches used by the runner.
     """
-    if workflow_to_run is not None:
-        return [workflow_to_run]
-
     annotated_actions = (
         WorkflowAction.objects.select_related(
             "assign_correspondent",
@@ -105,10 +102,25 @@ def get_workflows_for_trigger(
         )
     )
 
+    action_prefetch = Prefetch(
+        "actions",
+        queryset=annotated_actions.order_by("order", "pk"),
+    )
+
+    if workflow_to_run is not None:
+        return (
+            Workflow.objects.filter(pk=workflow_to_run.pk)
+            .prefetch_related(
+                action_prefetch,
+                "triggers",
+            )
+            .distinct()
+        )
+
     return (
         Workflow.objects.filter(enabled=True, triggers__type=trigger_type)
         .prefetch_related(
-            Prefetch("actions", queryset=annotated_actions),
+            action_prefetch,
             "triggers",
         )
         .order_by("order")

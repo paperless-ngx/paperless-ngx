@@ -769,7 +769,7 @@ def run_workflows(
 
         if matching.document_matches_workflow(document, workflow, trigger_type):
             action: WorkflowAction
-            for action in workflow.actions.all():
+            for action in workflow.actions.order_by("order", "pk"):
                 message = f"Applying {action} from {workflow}"
                 if not use_overrides:
                     logger.info(message, extra={"group": logging_group})
