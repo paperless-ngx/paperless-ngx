@@ -617,6 +617,7 @@ jobs:
           version: ${{ steps.get_version.outputs.version }}
           prerelease: ${{ steps.get_version.outputs.prerelease }}
           publish: true # ensures release is not marked as draft
+          committish: ${{ github.sha }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload release archive
