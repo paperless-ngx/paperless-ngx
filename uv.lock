@@ -5163,7 +5163,7 @@ wheels = [
 
 [[package]]
 name = "transformers"
-version = "4.51.3"
+version = "4.53.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "filelock", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -5178,9 +5178,9 @@ dependencies = [
     { name = "tokenizers", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "tqdm", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f1/11/7414d5bc07690002ce4d7553602107bf969af85144bbd02830f9fb471236/transformers-4.51.3.tar.gz", hash = "sha256:e292fcab3990c6defe6328f0f7d2004283ca81a7a07b2de9a46d67fd81ea1409", size = 8941266, upload-time = "2025-04-14T08:15:00.485Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e8/40/f2d2c3bcf5c6135027cab0fd7db52f6149a1c23acc4e45f914c43d362386/transformers-4.53.0.tar.gz", hash = "sha256:f89520011b4a73066fdc7aabfa158317c3934a22e3cd652d7ffbc512c4063841", size = 9177265, upload-time = "2025-06-26T16:10:54.729Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a9/b6/5257d04ae327b44db31f15cce39e6020cc986333c715660b1315a9724d82/transformers-4.51.3-py3-none-any.whl", hash = "sha256:fd3279633ceb2b777013234bbf0b4f5c2d23c4626b05497691f00cfda55e8a83", size = 10383940, upload-time = "2025-04-14T08:13:43.023Z" },
+    { url = "https://files.pythonhosted.org/packages/5e/0c/68d03a38f6ab2ba2b2829eb11b334610dd236e7926787f7656001b68e1f2/transformers-4.53.0-py3-none-any.whl", hash = "sha256:7d8039ff032c01a2d7f8a8fe0066620367003275f023815a966e62203f9f5dd7", size = 10821970, upload-time = "2025-06-26T16:10:51.505Z" },
 ]
 
 [[package]]
