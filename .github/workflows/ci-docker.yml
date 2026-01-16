@@ -69,7 +69,7 @@ jobs:
           if [[ "${{ github.event_name }}" == "push" ]]; then
             should_push="true"
           elif [[ "${{ github.event_name }}" == "pull_request" && "${{ github.event.pull_request.head.repo.full_name }}" == "${{ github.repository }}" ]]; then
-            if [[ "${REF_NAME}" == feature-* ]]; then
+            if [[ "${REF_NAME}" == feature-* || "${REF_NAME}" == fix-* ]]; then
               should_push="true"
             fi
           fi
