@@ -3138,7 +3138,7 @@ requires-dist = [
     { name = "psycopg-c", marker = "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'postgres'", url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-bookworm-3.2.12/psycopg_c-3.2.12-cp312-cp312-linux_aarch64.whl" },
     { name = "psycopg-c", marker = "python_full_version == '3.12.*' and platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'postgres'", url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-bookworm-3.2.12/psycopg_c-3.2.12-cp312-cp312-linux_x86_64.whl" },
     { name = "psycopg-c", marker = "(python_full_version != '3.12.*' and platform_machine == 'aarch64' and extra == 'postgres') or (python_full_version != '3.12.*' and platform_machine == 'x86_64' and extra == 'postgres') or (platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'postgres') or (sys_platform != 'linux' and extra == 'postgres')", specifier = "==3.2.12" },
-    { name = "psycopg-pool", marker = "extra == 'postgres'", specifier = "==3.3.0" },
+    { name = "psycopg-pool", marker = "extra == 'postgres'", specifier = "==3.3" },
     { name = "python-dateutil", specifier = "~=2.9.0" },
     { name = "python-dotenv", specifier = "~=1.2.1" },
     { name = "python-gnupg", specifier = "~=0.5.4" },
@@ -4002,11 +4002,11 @@ wheels = [
 
 [[package]]
 name = "python-gnupg"
-version = "0.5.5"
+version = "0.5.6"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/42/d0/72a14a79f26c6119b281f6ccc475a787432ef155560278e60df97ce68a86/python-gnupg-0.5.5.tar.gz", hash = "sha256:3fdcaf76f60a1b948ff8e37dc398d03cf9ce7427065d583082b92da7a4ff5a63", size = 66467, upload-time = "2025-08-04T19:26:55.778Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/98/2c/6cd2c7cff4bdbb434be5429ef6b8e96ee6b50155551361f30a1bb2ea3c1d/python_gnupg-0.5.6.tar.gz", hash = "sha256:5743e96212d38923fc19083812dc127907e44dbd3bcf0db4d657e291d3c21eac", size = 66825, upload-time = "2025-12-31T17:19:33.19Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/aa/19/c147f78cc18c8788f54d4a16a22f6c05deba85ead5672d3ddf6dcba5a5fe/python_gnupg-0.5.5-py2.py3-none-any.whl", hash = "sha256:51fa7b8831ff0914bc73d74c59b99c613de7247b91294323c39733bb85ac3fc1", size = 21916, upload-time = "2025-08-04T19:26:54.307Z" },
+    { url = "https://files.pythonhosted.org/packages/d2/ab/0ea9de971caf3cd2e268d2b05dfe9883b21cfe686a59249bd2dccb4bae33/python_gnupg-0.5.6-py2.py3-none-any.whl", hash = "sha256:b5050a55663d8ab9fcc8d97556d229af337a87a3ebebd7054cbd8b7e2043394a", size = 22082, upload-time = "2025-12-31T17:16:22.743Z" },
 ]
 
 [[package]]
