@@ -11,14 +11,12 @@ from paperless_ai.chat import stream_chat_with_documents
 @pytest.fixture(autouse=True)
 def patch_embed_model():
     from llama_index.core import settings as llama_settings
+    from llama_index.core.embeddings.mock_embed_model import MockEmbedding
 
-    mock_embed_model = MagicMock()
-    mock_embed_model._get_text_embedding_batch.return_value = [
-        [0.1] * 1536,
-    ]  # 1 vector per input
-    llama_settings.Settings._embed_model = mock_embed_model
+    # Use a real BaseEmbedding subclass to satisfy llama-index 0.14 validation
+    llama_settings.Settings.embed_model = MockEmbedding(embed_dim=1536)
     yield
-    llama_settings.Settings._embed_model = None
+    llama_settings.Settings.embed_model = None
 
 
 @pytest.fixture(autouse=True)
