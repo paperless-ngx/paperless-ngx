@@ -8,7 +8,7 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { ActivatedRoute, Router } from '@angular/router'
+import { ActivatedRoute, Router, RouterModule } from '@angular/router'
 import {
   NgbDateStruct,
   NgbDropdownModule,
@@ -182,6 +182,7 @@ export enum ZoomSetting {
     NgxBootstrapIconsModule,
     PdfViewerModule,
     TextAreaComponent,
+    RouterModule,
   ],
 })
 export class DocumentDetailComponent

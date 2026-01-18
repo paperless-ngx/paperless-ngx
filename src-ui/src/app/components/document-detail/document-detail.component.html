@@ -382,14 +382,15 @@
                 <div class="fst-italic" i18n>Duplicate documents detected:</div>
                 <div class="list-group">
                   @for (duplicate of document.duplicate_documents; track duplicate.id) {
-                    <button
-                      type="button"
+                    <a
                       class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                      (click)="openDuplicateDocument(duplicate.id)"
+                      [routerLink]="['/documents', duplicate.id, 'details']"
                     >
-                      <span>{{ duplicate.title || ('#' + duplicate.id) }}</span>
+                      <span class="d-flex align-items-center gap-2">
+                        <span>{{ duplicate.title || ('#' + duplicate.id) }}</span>
+                      </span>
                       <span class="text-secondary">#{{ duplicate.id }}</span>
-                    </button>
+                    </a>
                   }
                 </div>
               </div>
