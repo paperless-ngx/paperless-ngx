@@ -1195,7 +1195,7 @@ or hidden folders some tools use to store data.
 
 : Sets the barcode scanner used for barcode functionality.
 
-    Currently, "PYZBAR" (the default) or "ZXING" might be selected.
+    Currently, "ZXING" (the default) or "PYZBAR" might be selected.
     If you have problems that your Barcodes/QR-Codes are not detected
     (especially with bad scan quality and/or small codes), try the other one.
 

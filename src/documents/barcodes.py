@@ -264,7 +264,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
         if settings.CONSUMER_BARCODE_SCANNER == "PYZBAR":
             reader: Callable[[Image.Image], list[str]] = self.read_barcodes_pyzbar
             logger.debug("Scanning for barcodes using PYZBAR")
-        else:
+        elif settings.CONSUMER_BARCODE_SCANNER == "ZXING":
             reader = self.read_barcodes_zxing
             logger.debug("Scanning for barcodes using ZXING")
 
