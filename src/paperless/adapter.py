@@ -166,5 +166,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
 
 class DrfTokenStrategy(SessionTokenStrategy):
     def create_access_token(self, request: HttpRequest) -> str | None:
+        if not request.user.is_authenticated:
+            return None
         token, _ = Token.objects.get_or_create(user=request.user)
         return token.key
