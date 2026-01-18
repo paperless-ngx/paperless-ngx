@@ -1020,23 +1020,17 @@ def _get_viewable_duplicates(document: Document, user: User | None):
     checksums = {document.checksum}
     if document.archive_checksum:
         checksums.add(document.archive_checksum)
-    duplicates = (
-        Document.global_objects.filter(
-            Q(checksum__in=checksums) | Q(archive_checksum__in=checksums),
-            deleted_at__isnull=True,
-        )
-        .exclude(pk=document.pk)
-        .order_by("-created")
+    duplicates = Document.global_objects.filter(
+        Q(checksum__in=checksums) | Q(archive_checksum__in=checksums),
+    ).exclude(pk=document.pk)
+    duplicates = duplicates.order_by("-created")
+    allowed = get_objects_for_user_owner_aware(
+        user,
+        "documents.view_document",
+        Document,
+        include_deleted=True,
     )
-    if user.is_superuser:
-        return duplicates
-    return duplicates.filter(
-        id__in=get_objects_for_user_owner_aware(
-            user,
-            "documents.view_document",
-            Document,
-        ).values_list("id", flat=True),
-    )
+    return duplicates.filter(id__in=allowed.values_list("id", flat=True))
 
 
 @extend_schema_serializer(
@@ -1089,7 +1083,7 @@ class DocumentSerializer(
         request = self.context.get("request")
         user = request.user if request else None
         duplicates = _get_viewable_duplicates(obj, user)
-        return list(duplicates.values("id", "title"))
+        return list(duplicates.values("id", "title", "deleted_at"))
 
     def get_original_file_name(self, obj) -> str | None:
         return obj.original_filename
@@ -2178,7 +2172,7 @@ class TasksViewSerializer(OwnedObjectSerializer):
         request = self.context.get("request")
         user = request.user if request else None
         duplicates = _get_viewable_duplicates(document, user)
-        cache[obj.pk] = list(duplicates.values("id", "title"))
+        cache[obj.pk] = list(duplicates.values("id", "title", "deleted_at"))
         return cache[obj.pk]
 
     def get_duplicate_documents(self, obj):

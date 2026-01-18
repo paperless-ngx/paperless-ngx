@@ -456,6 +456,11 @@ export class DocumentDetailComponent
           const openDocument = this.openDocumentService.getOpenDocument(
             this.documentId
           )
+          // update duplicate documents if present
+          if (openDocument && doc?.duplicate_documents) {
+            openDocument.duplicate_documents = doc.duplicate_documents
+            this.openDocumentService.save()
+          }
           const useDoc = openDocument || doc
           if (openDocument) {
             if (

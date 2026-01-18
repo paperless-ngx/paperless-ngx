@@ -385,9 +385,13 @@
                     <a
                       class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
                       [routerLink]="['/documents', duplicate.id, 'details']"
+                      [class.disabled]="duplicate.deleted_at"
                     >
                       <span class="d-flex align-items-center gap-2">
                         <span>{{ duplicate.title || ('#' + duplicate.id) }}</span>
+                        @if (duplicate.deleted_at) {
+                          <span class="badge text-bg-secondary" i18n>In trash</span>
+                        }
                       </span>
                       <span class="text-secondary">#{{ duplicate.id }}</span>
                     </a>
