@@ -2161,7 +2161,8 @@ class TasksViewSerializer(OwnedObjectSerializer):
 
         return result
 
-    def _get_duplicate_documents(self, obj):
+    @extend_schema_field(DuplicateDocumentSummarySerializer(many=True))
+    def get_duplicate_documents(self, obj):
         if not hasattr(self, "_duplicate_documents_cache"):
             self._duplicate_documents_cache = {}
         cache = self._duplicate_documents_cache
@@ -2181,10 +2182,6 @@ class TasksViewSerializer(OwnedObjectSerializer):
         duplicates = _get_viewable_duplicates(document, user)
         cache[obj.pk] = list(duplicates.values("id", "title", "deleted_at"))
         return cache[obj.pk]
-
-    @extend_schema_field(DuplicateDocumentSummarySerializer(many=True))
-    def get_duplicate_documents(self, obj):
-        return self._get_duplicate_documents(obj)
 
 
 class RunTaskViewSerializer(serializers.Serializer):

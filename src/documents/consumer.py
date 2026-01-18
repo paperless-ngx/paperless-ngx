@@ -800,14 +800,7 @@ class ConsumerPreflightPlugin(
                     or str(duplicate.pk)
                 )
 
-                try:
-                    Path(self.input_doc.original_file).unlink()
-                except FileNotFoundError:
-                    pass
-                except Exception as exc:  # pragma: no cover
-                    self.log.warning(
-                        f"Could not delete duplicate file {self.input_doc.original_file}: {exc}",
-                    )
+                Path(self.input_doc.original_file).unlink()
 
                 failure_msg = (
                     f"Not consuming {self.filename}: "
