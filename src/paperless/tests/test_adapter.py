@@ -4,6 +4,7 @@ from allauth.account.adapter import get_adapter
 from allauth.core import context
 from allauth.socialaccount.adapter import get_adapter as get_social_adapter
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.forms import ValidationError
@@ -236,3 +237,22 @@ class TestDrfTokenStrategy(TestCase):
 
         # Verify only one token exists (no duplicate created)
         self.assertEqual(Token.objects.filter(user=user).count(), 1)
+
+    def test_create_access_token_returns_none_for_unauthenticated_user(self):
+        """
+        GIVEN:
+            - An unauthenticated request
+        WHEN:
+            - create_access_token is called
+        THEN:
+            - None is returned and no token is created
+        """
+
+        request = HttpRequest()
+        request.user = AnonymousUser()
+
+        strategy = DrfTokenStrategy()
+        token_key = strategy.create_access_token(request)
+
+        self.assertIsNone(token_key)
+        self.assertEqual(Token.objects.count(), 0)
