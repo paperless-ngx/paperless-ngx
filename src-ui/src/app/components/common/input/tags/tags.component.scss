@@ -23,7 +23,7 @@
 
 // Dropdown hierarchy reveal for ng-select options
 ::ng-deep .ng-dropdown-panel .ng-option {
-  overflow-x: scroll;
+  overflow-x: scroll !important;
 
   .tag-option-row {
     font-size: 1rem;

@@ -28,7 +28,7 @@
             </button>
           </ng-template>
           <ng-template ng-option-tmp let-item="item" let-index="index" let-search="searchTerm">
-            <div class="tag-option-row d-flex align-items-center">
+            <div class="tag-option-row d-flex align-items-center" [class.w-auto]="!getTag(item.id)?.parent">
               @if (item.id && tags) {
                 @if (getTag(item.id)?.parent) {
                   <i-bs name="list-nested" class="me-1"></i-bs>
