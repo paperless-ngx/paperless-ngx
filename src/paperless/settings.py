@@ -172,8 +172,7 @@ def _parse_beat_schedule() -> dict:
             "task": "paperless_mail.tasks.process_mail_accounts",
             "options": {
                 # 1 minute before default schedule sends again
-                "expires": 9.0
-                * 60.0,
+                "expires": 9.0 * 60.0,
             },
         },
         {
@@ -184,8 +183,7 @@ def _parse_beat_schedule() -> dict:
             "task": "documents.tasks.train_classifier",
             "options": {
                 # 1 minute before default schedule sends again
-                "expires": 59.0
-                * 60.0,
+                "expires": 59.0 * 60.0,
             },
         },
         {
@@ -196,9 +194,7 @@ def _parse_beat_schedule() -> dict:
             "task": "documents.tasks.index_optimize",
             "options": {
                 # 1 hour before default schedule sends again
-                "expires": 23.0
-                * 60.0
-                * 60.0,
+                "expires": 23.0 * 60.0 * 60.0,
             },
         },
         {
@@ -209,9 +205,7 @@ def _parse_beat_schedule() -> dict:
             "task": "documents.tasks.sanity_check",
             "options": {
                 # 1 hour before default schedule sends again
-                "expires": ((7.0 * 24.0) - 1.0)
-                * 60.0
-                * 60.0,
+                "expires": ((7.0 * 24.0) - 1.0) * 60.0 * 60.0,
             },
         },
         {
@@ -222,9 +216,7 @@ def _parse_beat_schedule() -> dict:
             "task": "documents.tasks.empty_trash",
             "options": {
                 # 1 hour before default schedule sends again
-                "expires": 23.0
-                * 60.0
-                * 60.0,
+                "expires": 23.0 * 60.0 * 60.0,
             },
         },
         {
@@ -235,8 +227,7 @@ def _parse_beat_schedule() -> dict:
             "task": "documents.tasks.check_scheduled_workflows",
             "options": {
                 # 1 minute before default schedule sends again
-                "expires": 59.0
-                * 60.0,
+                "expires": 59.0 * 60.0,
             },
         },
         {
@@ -247,9 +238,7 @@ def _parse_beat_schedule() -> dict:
             "task": "documents.tasks.llmindex_index",
             "options": {
                 # 1 hour before default schedule sends again
-                "expires": 23.0
-                * 60.0
-                * 60.0,
+                "expires": 23.0 * 60.0 * 60.0,
             },
         },
     ]
