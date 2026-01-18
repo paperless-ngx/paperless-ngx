@@ -779,15 +779,52 @@ class ConsumerPreflightPlugin(
             Q(checksum=checksum) | Q(archive_checksum=checksum),
         )
         if existing_doc.exists():
+            existing_doc = existing_doc.order_by("-created")
+            duplicates_in_trash = existing_doc.filter(deleted_at__isnull=False)
             log_msg = (
                 f"Consuming duplicate {self.filename}: "
                 f"{existing_doc.count()} existing document(s) share the same content."
             )
 
-            if existing_doc.filter(deleted_at__isnull=False).exists():
+            if duplicates_in_trash.exists():
                 log_msg += " Note: at least one existing document is in the trash."
 
             self.log.warning(log_msg)
+
+            if settings.CONSUMER_DELETE_DUPLICATES:
+                duplicate = existing_doc.first()
+                duplicate_label = (
+                    duplicate.title
+                    or duplicate.original_filename
+                    or (Path(duplicate.filename).name if duplicate.filename else None)
+                    or str(duplicate.pk)
+                )
+
+                try:
+                    Path(self.input_doc.original_file).unlink()
+                except FileNotFoundError:
+                    pass
+                except Exception as exc:  # pragma: no cover
+                    self.log.warning(
+                        f"Could not delete duplicate file {self.input_doc.original_file}: {exc}",
+                    )
+
+                failure_msg = (
+                    f"Not consuming {self.filename}: "
+                    f"It is a duplicate of {duplicate_label} (#{duplicate.pk})"
+                )
+                status_msg = ConsumerStatusShortMessage.DOCUMENT_ALREADY_EXISTS
+
+                if duplicates_in_trash.exists():
+                    status_msg = (
+                        ConsumerStatusShortMessage.DOCUMENT_ALREADY_EXISTS_IN_TRASH
+                    )
+                    failure_msg += " Note: existing document is in the trash."
+
+                self._fail(
+                    status_msg,
+                    failure_msg,
+                )
 
     def pre_check_directories(self):
         """

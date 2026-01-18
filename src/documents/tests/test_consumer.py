@@ -719,12 +719,18 @@ class TestConsumer(
         dst = self.get_test_file()
         self.assertIsFile(dst)
 
-        with self.get_consumer(dst) as consumer:
-            consumer.run()
+        expected_message = (
+            f"{dst.name}: Not consuming {dst.name}: "
+            f"It is a duplicate of {document.title} (#{document.pk})"
+        )
+
+        with self.assertRaisesMessage(ConsumerError, expected_message):
+            with self.get_consumer(dst) as consumer:
+                consumer.run()
 
         self.assertIsNotFile(dst)
-        self.assertEqual(Document.objects.count(), 2)
-        self._assert_first_last_send_progress()
+        self.assertEqual(Document.objects.count(), 1)
+        self._assert_first_last_send_progress(last_status=ProgressStatusOptions.FAILED)
 
     @override_settings(CONSUMER_DELETE_DUPLICATES=False)
     def test_no_delete_duplicate(self):
