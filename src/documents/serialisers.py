@@ -1033,6 +1033,12 @@ def _get_viewable_duplicates(document: Document, user: User | None):
     return duplicates.filter(id__in=allowed.values_list("id", flat=True))
 
 
+class DuplicateDocumentSummarySerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    title = serializers.CharField()
+    deleted_at = serializers.DateTimeField(allow_null=True)
+
+
 @extend_schema_serializer(
     deprecate_fields=["created_date"],
 )
@@ -1076,6 +1082,7 @@ class DocumentSerializer(
     def get_page_count(self, obj) -> int | None:
         return obj.page_count
 
+    @extend_schema_field(DuplicateDocumentSummarySerializer(many=True))
     def get_duplicate_documents(self, obj):
         view = self.context.get("view")
         if view and getattr(view, "action", None) != "retrieve":
@@ -2175,6 +2182,7 @@ class TasksViewSerializer(OwnedObjectSerializer):
         cache[obj.pk] = list(duplicates.values("id", "title", "deleted_at"))
         return cache[obj.pk]
 
+    @extend_schema_field(DuplicateDocumentSummarySerializer(many=True))
     def get_duplicate_documents(self, obj):
         return self._get_duplicate_documents(obj)
 
