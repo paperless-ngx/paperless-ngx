@@ -23,6 +23,7 @@ from django.core.validators import MinValueValidator
 from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
 from django.db.models import Count
+from django.db.models import Q
 from django.db.models.functions import Lower
 from django.utils.crypto import get_random_string
 from django.utils.dateparse import parse_datetime
@@ -72,6 +73,7 @@ from documents.models import WorkflowTrigger
 from documents.parsers import is_mime_type_supported
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_groups_with_only_permission
+from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import set_permissions_for_object
 from documents.regex import validate_regex_pattern
 from documents.templating.filepath import validate_filepath_template_and_render
@@ -1014,6 +1016,29 @@ class NotesSerializer(serializers.ModelSerializer):
         return ret
 
 
+def _get_viewable_duplicates(document: Document, user: User | None):
+    checksums = {document.checksum}
+    if document.archive_checksum:
+        checksums.add(document.archive_checksum)
+    duplicates = (
+        Document.global_objects.filter(
+            Q(checksum__in=checksums) | Q(archive_checksum__in=checksums),
+            deleted_at__isnull=True,
+        )
+        .exclude(pk=document.pk)
+        .order_by("-created")
+    )
+    if user.is_superuser:
+        return duplicates
+    return duplicates.filter(
+        id__in=get_objects_for_user_owner_aware(
+            user,
+            "documents.view_document",
+            Document,
+        ).values_list("id", flat=True),
+    )
+
+
 @extend_schema_serializer(
     deprecate_fields=["created_date"],
 )
@@ -1031,6 +1056,7 @@ class DocumentSerializer(
     archived_file_name = SerializerMethodField()
     created_date = serializers.DateField(required=False)
     page_count = SerializerMethodField()
+    duplicate_documents = SerializerMethodField()
 
     notes = NotesSerializer(many=True, required=False, read_only=True)
 
@@ -1055,6 +1081,15 @@ class DocumentSerializer(
 
     def get_page_count(self, obj) -> int | None:
         return obj.page_count
+
+    def get_duplicate_documents(self, obj):
+        view = self.context.get("view")
+        if view and getattr(view, "action", None) != "retrieve":
+            return []
+        request = self.context.get("request")
+        user = request.user if request else None
+        duplicates = _get_viewable_duplicates(obj, user)
+        return list(duplicates.values("id", "title"))
 
     def get_original_file_name(self, obj) -> str | None:
         return obj.original_filename
@@ -1233,6 +1268,7 @@ class DocumentSerializer(
             "archive_serial_number",
             "original_file_name",
             "archived_file_name",
+            "duplicate_documents",
             "owner",
             "permissions",
             "user_can_change",
@@ -2094,10 +2130,12 @@ class TasksViewSerializer(OwnedObjectSerializer):
             "result",
             "acknowledged",
             "related_document",
+            "duplicate_documents",
             "owner",
         )
 
     related_document = serializers.SerializerMethodField()
+    duplicate_documents = serializers.SerializerMethodField()
     created_doc_re = re.compile(r"New document id (\d+) created")
     duplicate_doc_re = re.compile(r"It is a duplicate of .* \(#(\d+)\)")
 
@@ -2121,6 +2159,30 @@ class TasksViewSerializer(OwnedObjectSerializer):
                     pass
 
         return result
+
+    def _get_duplicate_documents(self, obj):
+        if not hasattr(self, "_duplicate_documents_cache"):
+            self._duplicate_documents_cache = {}
+        cache = self._duplicate_documents_cache
+        if obj.pk in cache:
+            return cache[obj.pk]
+        related_document = self.get_related_document(obj)
+        if not related_document:
+            cache[obj.pk] = []
+            return cache[obj.pk]
+        try:
+            document = Document.objects.get(pk=related_document)
+        except Document.DoesNotExist:
+            cache[obj.pk] = []
+            return cache[obj.pk]
+        request = self.context.get("request")
+        user = request.user if request else None
+        duplicates = _get_viewable_duplicates(document, user)
+        cache[obj.pk] = list(duplicates.values("id", "title"))
+        return cache[obj.pk]
+
+    def get_duplicate_documents(self, obj):
+        return self._get_duplicate_documents(obj)
 
 
 class RunTaskViewSerializer(serializers.Serializer):

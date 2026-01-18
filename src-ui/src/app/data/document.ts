@@ -112,6 +112,11 @@ export interface SearchHit {
   note_highlights?: string
 }
 
+export interface DuplicateDocument {
+  id: number
+  title: string
+}
+
 export interface Document extends ObjectWithPermissions {
   correspondent?: number
 
@@ -158,6 +163,8 @@ export interface Document extends ObjectWithPermissions {
   remove_inbox_tags?: boolean
 
   page_count?: number
+
+  duplicate_documents?: DuplicateDocument[]
 
   // Frontend only
   __changedFields?: string[]

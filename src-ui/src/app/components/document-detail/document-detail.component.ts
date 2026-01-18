@@ -706,6 +706,10 @@ export class DocumentDetailComponent
     this.prepareForm(doc)
   }
 
+  openDuplicateDocument(documentId: number) {
+    this.router.navigate(['documents', documentId, 'details'])
+  }
+
   get customFieldFormFields(): FormArray {
     return this.documentForm.get('custom_fields') as FormArray
   }

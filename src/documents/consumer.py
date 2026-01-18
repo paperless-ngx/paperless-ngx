@@ -779,19 +779,15 @@ class ConsumerPreflightPlugin(
             Q(checksum=checksum) | Q(archive_checksum=checksum),
         )
         if existing_doc.exists():
-            msg = ConsumerStatusShortMessage.DOCUMENT_ALREADY_EXISTS
-            log_msg = f"Not consuming {self.filename}: It is a duplicate of {existing_doc.get().title} (#{existing_doc.get().pk})."
-
-            if existing_doc.first().deleted_at is not None:
-                msg = ConsumerStatusShortMessage.DOCUMENT_ALREADY_EXISTS_IN_TRASH
-                log_msg += " Note: existing document is in the trash."
-
-            if settings.CONSUMER_DELETE_DUPLICATES:
-                Path(self.input_doc.original_file).unlink()
-            self._fail(
-                msg,
-                log_msg,
+            log_msg = (
+                f"Consuming duplicate {self.filename}: "
+                f"{existing_doc.count()} existing document(s) share the same content."
             )
+
+            if existing_doc.filter(deleted_at__isnull=False).exists():
+                log_msg += " Note: at least one existing document is in the trash."
+
+            self.log.warning(log_msg)
 
     def pre_check_directories(self):
         """
