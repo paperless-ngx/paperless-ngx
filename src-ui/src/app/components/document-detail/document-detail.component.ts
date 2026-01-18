@@ -124,6 +124,7 @@ enum DocumentDetailNavIDs {
   Notes = 5,
   Permissions = 6,
   History = 7,
+  Duplicates = 8,
 }
 
 enum ContentRenderType {
@@ -704,6 +705,13 @@ export class DocumentDetailComponent
     }
     this.title = this.documentTitlePipe.transform(doc.title)
     this.prepareForm(doc)
+
+    if (
+      this.activeNavID === DocumentDetailNavIDs.Duplicates &&
+      !doc?.duplicate_documents?.length
+    ) {
+      this.activeNavID = DocumentDetailNavIDs.Details
+    }
   }
 
   openDuplicateDocument(documentId: number) {

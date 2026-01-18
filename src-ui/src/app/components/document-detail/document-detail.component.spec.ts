@@ -301,16 +301,16 @@ describe('DocumentDetailComponent', () => {
       .spyOn(openDocumentsService, 'openDocument')
       .mockReturnValueOnce(of(true))
     fixture.detectChanges()
-    expect(component.activeNavID).toEqual(5) // DocumentDetailNavIDs.Notes
+    expect(component.activeNavID).toEqual(component.DocumentDetailNavIDs.Notes)
   })
 
   it('should change url on tab switch', () => {
     initNormally()
     const navigateSpy = jest.spyOn(router, 'navigate')
-    component.nav.select(5)
+    component.nav.select(component.DocumentDetailNavIDs.Notes)
     component.nav.navChange.next({
       activeId: 1,
-      nextId: 5,
+      nextId: component.DocumentDetailNavIDs.Notes,
       preventDefault: () => {},
     })
     fixture.detectChanges()
