@@ -12,7 +12,7 @@ def populate_action_order(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "1075_alter_paperlesstask_task_name"),
+        ("documents", "1074_workflowrun_deleted_at_workflowrun_restored_at_and_more"),
     ]
 
     operations = [
