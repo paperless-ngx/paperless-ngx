@@ -112,11 +112,6 @@ export interface SearchHit {
   note_highlights?: string
 }
 
-export interface DuplicateDocument {
-  id: number
-  title: string
-}
-
 export interface Document extends ObjectWithPermissions {
   correspondent?: number
 
@@ -164,7 +159,7 @@ export interface Document extends ObjectWithPermissions {
 
   page_count?: number
 
-  duplicate_documents?: DuplicateDocument[]
+  duplicate_documents?: Document[]
 
   // Frontend only
   __changedFields?: string[]

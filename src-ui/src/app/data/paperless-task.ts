@@ -1,4 +1,4 @@
-import { DuplicateDocument } from './document'
+import { Document } from './document'
 import { ObjectWithId } from './object-with-id'
 
 export enum PaperlessTaskType {
@@ -43,7 +43,7 @@ export interface PaperlessTask extends ObjectWithId {
 
   related_document?: number
 
-  duplicate_documents?: DuplicateDocument[]
+  duplicate_documents?: Document[]
 
   owner?: number
 }
