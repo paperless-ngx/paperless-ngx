@@ -6,7 +6,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "1074_workflowrun_deleted_at_workflowrun_restored_at_and_more"),
+        ("documents", "1075_workflowaction_order"),
     ]
 
     operations = [
