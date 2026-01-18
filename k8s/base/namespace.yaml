@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: paless
+  labels:
+    app.kubernetes.io/managed-by: context-management
+    app.kubernetes.io/part-of: paless

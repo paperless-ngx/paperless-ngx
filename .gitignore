@@ -1,112 +1,51 @@
-# Byte-compiled / optimized / DLL files
+# Claude Code
+.claude/
+
+# Context Management
+.context-management/
+
+# MCP Configuration (contains credentials)
+.mcp.json
+.mcp.container.json
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.*.template
+
+# Python
 __pycache__/
 *.py[cod]
-
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-#lib/
-lib64/
-parts/
-sdist/
-var/
-*.egg-info/
-.installed.cfg
-*.egg
-/src/paperless_mail/templates/node_modules
-
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*,cover
-.pytest_cache
-junit.xml
-
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-
-# MkDocs documentation
-site/
-
-# PyBuilder
-target/
-
-
-# PyCharm
-.idea
-
-# VS Code
-.vscode
-/src-ui/.vscode
-/docs/.vscode
-.vscode-server
-*CommandMarker
-
-# Other stuff that doesn't belong
-.virtualenv
-virtualenv
-/venv
+*$py.class
 .venv/
-/docker-compose.env
-/docker-compose.yml
-.ruff_cache/
+venv/
 
-# Used for development
-scripts/import-for-development
-scripts/nuke
+# Python Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
 
-# Static files collected by the collectstatic command
-/static/
+# Frontend Build
+.vite/
+dist/
+build/
+node_modules/
 
-# Stored PDFs
-/media/
-/data/
-/paperless.conf
-/consume/
-/export/
+# Kubernetes Secrets
+k8s/base/*-secret.yaml
+k8s/overlays/*/secrets/
 
-# this is where the compiled frontend is moved to.
-/src/documents/static/frontend/
+# Task-specific artifacts
+.claude_task_prompt.md
 
-# mac os
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
 .DS_Store
-
-# celery schedule file
-celerybeat-schedule*
-
-# ignore .devcontainer sub folders
-/.devcontainer/consume/
-/.devcontainer/data/
-/.devcontainer/media/
-/.devcontainer/redisdata/
-
-# ignore pnpm package store folder created when setting up the devcontainer
-.pnpm-store/
+Thumbs.db
