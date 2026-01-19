@@ -35,10 +35,19 @@ node_modules/
 
 # Kubernetes Secrets
 k8s/base/*-secret.yaml
+k8s/base/secret.yaml
 k8s/overlays/*/secrets/
 
 # Task-specific artifacts
 .claude_task_prompt.md
+
+# Logs
+*.log
+logs/
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # IDE
 .idea/

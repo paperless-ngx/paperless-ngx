@@ -8,6 +8,8 @@ resources:
   - namespace.yaml
   - postgres-statefulset.yaml
   - postgres-service.yaml
+  - redis-deployment.yaml
+  - redis-service.yaml
   - configmap.yaml
   - secret.yaml
   - deployment.yaml

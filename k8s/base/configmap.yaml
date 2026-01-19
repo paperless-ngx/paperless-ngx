@@ -5,8 +5,8 @@ metadata:
   labels:
     app: paperless
 data:
-  PAPERLESS_REDIS: "redis://localhost:6379"
-  PAPERLESS_DBHOST: "postgres-service"
+  PAPERLESS_REDIS: "redis://redis:6379"
+  PAPERLESS_DBHOST: "postgres"
   PAPERLESS_DBPORT: "5432"
   PAPERLESS_DBNAME: "paperless"
   PAPERLESS_DBUSER: "paperless"
