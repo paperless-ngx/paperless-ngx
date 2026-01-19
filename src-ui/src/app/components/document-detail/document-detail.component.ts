@@ -285,10 +285,10 @@ export class DocumentDetailComponent
     if (
       element &&
       element.nativeElement.offsetParent !== null &&
-      this.nav?.activeId == 4
+      this.nav?.activeId == DocumentDetailNavIDs.Preview
     ) {
       // its visible
-      setTimeout(() => this.nav?.select(1))
+      setTimeout(() => this.nav?.select(DocumentDetailNavIDs.Details))
     }
   }
 
