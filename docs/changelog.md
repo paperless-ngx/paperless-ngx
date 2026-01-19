@@ -1,5 +1,9 @@
 # Changelog
 
+## paperless-ngx 2.20.5
+
+-   No changes
+
 ## paperless-ngx 2.20.4
 
 ### Security
