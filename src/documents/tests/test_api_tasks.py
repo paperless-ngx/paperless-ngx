@@ -347,6 +347,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
             content="",
             mime_type="application/pdf",
             checksum=checksum,
+            archive_checksum="another-checksum",
         )
         PaperlessTask.objects.create(
             task_id=str(uuid.uuid4()),

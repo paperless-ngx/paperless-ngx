@@ -2166,9 +2166,9 @@ class TasksViewSerializer(OwnedObjectSerializer):
         related_document = self.get_related_document(obj)
         request = self.context.get("request")
         user = request.user if request else None
-        if not related_document or not user:
+        document = Document.global_objects.filter(pk=related_document).first()
+        if not related_document or not user or not document:
             return []
-        document = Document.objects.get(pk=related_document)
         duplicates = _get_viewable_duplicates(document, user)
         return list(duplicates.values("id", "title", "deleted_at"))
 
