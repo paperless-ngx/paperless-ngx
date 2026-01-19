@@ -4,12 +4,16 @@ metadata:
   name: redis
   labels:
     app: redis
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/component: cache
+    app.kubernetes.io/part-of: paless
 spec:
+  type: ClusterIP
+  ports:
+  - port: 6379
+    targetPort: 6379
+    protocol: TCP
+    name: redis
   selector:
     app: redis
-  ports:
-    - name: redis
-      port: 6379
-      targetPort: 6379
-      protocol: TCP
-  type: ClusterIP
+  clusterIP: None  # Headless service for StatefulSet
