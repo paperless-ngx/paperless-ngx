@@ -2163,25 +2163,14 @@ class TasksViewSerializer(OwnedObjectSerializer):
 
     @extend_schema_field(DuplicateDocumentSummarySerializer(many=True))
     def get_duplicate_documents(self, obj):
-        if not hasattr(self, "_duplicate_documents_cache"):
-            self._duplicate_documents_cache = {}
-        cache = self._duplicate_documents_cache
-        if obj.pk in cache:
-            return cache[obj.pk]
         related_document = self.get_related_document(obj)
-        if not related_document:
-            cache[obj.pk] = []
-            return cache[obj.pk]
-        try:
-            document = Document.objects.get(pk=related_document)
-        except Document.DoesNotExist:
-            cache[obj.pk] = []
-            return cache[obj.pk]
         request = self.context.get("request")
         user = request.user if request else None
+        if not related_document or not user:
+            return []
+        document = Document.objects.get(pk=related_document)
         duplicates = _get_viewable_duplicates(document, user)
-        cache[obj.pk] = list(duplicates.values("id", "title", "deleted_at"))
-        return cache[obj.pk]
+        return list(duplicates.values("id", "title", "deleted_at"))
 
 
 class RunTaskViewSerializer(serializers.Serializer):
