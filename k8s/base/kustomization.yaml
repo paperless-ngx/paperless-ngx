@@ -6,6 +6,8 @@ namespace: paless
 
 resources:
   - namespace.yaml
+  - postgres-statefulset.yaml
+  - postgres-service.yaml
   # Add your application resources here:
   # - deployment.yaml
   # - service.yaml
