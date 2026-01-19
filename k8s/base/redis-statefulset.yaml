@@ -17,23 +17,22 @@ spec:
     metadata:
       labels:
         app: redis
+        app.kubernetes.io/name: redis
+        app.kubernetes.io/component: cache
     spec:
-      tolerations:
-        - key: "node.kubernetes.io/disk-pressure"
-          operator: "Exists"
-          effect: "NoSchedule"
       containers:
       - name: redis
         image: redis:7-alpine
-        command:
-          - redis-server
-          - --appendonly
-          - "yes"
-          - --appendfsync
-          - "everysec"
         ports:
         - containerPort: 6379
           name: redis
+          protocol: TCP
+        command:
+        - redis-server
+        - --appendonly
+        - "yes"
+        - --appendfsync
+        - everysec
         env:
         - name: REDIS_DATA_DIR
           value: /data
@@ -45,7 +44,7 @@ spec:
             memory: "128Mi"
             cpu: "100m"
           limits:
-            memory: "512Mi"
+            memory: "256Mi"
             cpu: "500m"
         livenessProbe:
           exec:
@@ -68,9 +67,11 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: redis-data
+      labels:
+        app: redis
     spec:
       accessModes:
-        - ReadWriteOnce
+      - ReadWriteOnce
       storageClassName: local-path
       resources:
         requests:
