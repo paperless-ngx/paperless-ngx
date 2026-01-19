@@ -352,6 +352,18 @@ describe('DocumentDetailComponent', () => {
     expect(component.document).toEqual(doc)
   })
 
+  it('should fall back to details tab when duplicates tab is active but no duplicates', () => {
+    initNormally()
+    component.activeNavID = component.DocumentDetailNavIDs.Duplicates
+    const noDupDoc = { ...doc, duplicate_documents: [] }
+
+    component.updateComponent(noDupDoc)
+
+    expect(component.activeNavID).toEqual(
+      component.DocumentDetailNavIDs.Details
+    )
+  })
+
   it('should load already-opened document via param', () => {
     initNormally()
     jest.spyOn(documentService, 'get').mockReturnValueOnce(of(doc))
@@ -365,6 +377,38 @@ describe('DocumentDetailComponent', () => {
     )
     fixture.detectChanges() // calls ngOnInit
     expect(component.document).toEqual(doc)
+  })
+
+  it('should update cached open document duplicates when reloading an open doc', () => {
+    const openDoc = { ...doc, duplicate_documents: [{ id: 1, title: 'Old' }] }
+    const updatedDuplicates = [
+      { id: 2, title: 'Newer duplicate', deleted_at: null },
+    ]
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
+    jest.spyOn(documentService, 'get').mockReturnValue(
+      of({
+        ...doc,
+        modified: new Date('2024-01-02T00:00:00Z'),
+        duplicate_documents: updatedDuplicates,
+      })
+    )
+    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(openDoc)
+    const saveSpy = jest.spyOn(openDocumentsService, 'save')
+    jest.spyOn(openDocumentsService, 'openDocument').mockReturnValue(of(true))
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({
+        count: customFields.length,
+        all: customFields.map((f) => f.id),
+        results: customFields,
+      })
+    )
+
+    fixture.detectChanges()
+
+    expect(openDoc.duplicate_documents).toEqual(updatedDuplicates)
+    expect(saveSpy).toHaveBeenCalled()
   })
 
   it('should disable form if user cannot edit', () => {
