@@ -61,6 +61,8 @@ spec:
             failureThreshold: 3
       volumes:
         - name: data
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: paperless-data-pvc
         - name: media
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: paperless-media-pvc

@@ -12,6 +12,7 @@ resources:
   - redis-service.yaml
   - configmap.yaml
   - paless-secret.yaml
+  - pv-manual.yaml
   - pvc.yaml
   - deployment.yaml
   - service.yaml

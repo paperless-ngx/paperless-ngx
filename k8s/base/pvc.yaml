@@ -5,6 +5,7 @@ metadata:
   labels:
     app: paperless
 spec:
+  storageClassName: manual
   accessModes:
     - ReadWriteOnce
   resources:
@@ -18,6 +19,7 @@ metadata:
   labels:
     app: paperless
 spec:
+  storageClassName: manual
   accessModes:
     - ReadWriteOnce
   resources:
