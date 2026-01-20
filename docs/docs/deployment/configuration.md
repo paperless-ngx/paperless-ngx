@@ -1,7 +1,6 @@
 ---
 sidebar_position: 2
 title: Configuration Management
----
 description: Central configuration file for all Paless deployment settings
 ---
 
