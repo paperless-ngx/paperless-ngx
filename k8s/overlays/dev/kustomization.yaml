@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - ../../base
+  - minio-console-nodeport.yaml
 
 # Dev environment: single replica, debug logging
 patches:
