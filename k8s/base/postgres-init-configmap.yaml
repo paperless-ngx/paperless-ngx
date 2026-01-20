@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init
+  labels:
+    app: postgres
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: paless
+data:
+  init-multi-tenant.sql: |
+    -- PostgreSQL Multi-Tenancy Initialization Script
+    -- This script sets up the paperless_app user and required extensions
+
+    -- Create paperless_app user if it doesn't exist
+    DO $$
+    BEGIN
+      IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'paperless_app') THEN
+        EXECUTE format('CREATE ROLE paperless_app WITH LOGIN PASSWORD %L', current_setting('custom.paperless_app_password'));
+        RAISE NOTICE 'Created user paperless_app';
+      ELSE
+        RAISE NOTICE 'User paperless_app already exists';
+        -- Update password in case it changed
+        EXECUTE format('ALTER ROLE paperless_app WITH PASSWORD %L', current_setting('custom.paperless_app_password'));
+      END IF;
+    END
+    $$;
+
+    -- Enable required extensions
+    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+    CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+    -- Grant connect privilege
+    GRANT CONNECT ON DATABASE paperless TO paperless_app;
+
+    -- Grant schema usage
+    GRANT USAGE ON SCHEMA public TO paperless_app;
+
+    -- Grant table permissions on all existing tables
+    GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO paperless_app;
+
+    -- Grant sequence permissions for auto-increment columns
+    GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO paperless_app;
+
+    -- Set default privileges for future tables created by paperless user
+    ALTER DEFAULT PRIVILEGES FOR ROLE paperless IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO paperless_app;
+    ALTER DEFAULT PRIVILEGES FOR ROLE paperless IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO paperless_app;
+
+    -- Verify extensions are enabled
+    \echo 'Installed extensions:'
+    SELECT extname, extversion FROM pg_extension WHERE extname IN ('uuid-ossp', 'pgcrypto');

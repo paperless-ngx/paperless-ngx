@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-multi-tenant-init
+  labels:
+    app: postgres
+    app.kubernetes.io/name: postgres-init
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: paless
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: postgres-init
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: init-db
+        image: postgres:18
+        command:
+        - /bin/bash
+        - -c
+        - |
+          echo "Waiting for PostgreSQL to be ready..."
+          until pg_isready -h postgres -U paperless -d paperless; do
+            echo "PostgreSQL not ready, waiting..."
+            sleep 2
+          done
+
+          echo "PostgreSQL is ready. Running multi-tenant initialization..."
+
+          # Set custom variable for use in SQL script
+          export PGOPTIONS="-c custom.paperless_app_password=$PAPERLESS_APP_PASSWORD"
+
+          psql -h postgres -U paperless -d paperless -f /scripts/init-multi-tenant.sql
+
+          echo "Multi-tenant initialization complete!"
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: paless-secret
+              key: db-password
+        - name: PAPERLESS_APP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: paless-secret
+              key: paperless-app-password
+        volumeMounts:
+        - name: init-script
+          mountPath: /scripts
+          readOnly: true
+      volumes:
+      - name: init-script
+        configMap:
+          name: postgres-init
