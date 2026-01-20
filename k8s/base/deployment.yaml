@@ -31,6 +31,12 @@ spec:
                 name: paperless-config
             - secretRef:
                 name: paless-secret
+          env:
+            - name: PAPERLESS_DBPASS
+              valueFrom:
+                secretKeyRef:
+                  name: paless-secret
+                  key: db-password
           volumeMounts:
             - name: data
               mountPath: /usr/src/paperless/data

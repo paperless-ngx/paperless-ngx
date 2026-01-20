@@ -20,3 +20,17 @@ resources:
   - pvc.yaml
   - deployment.yaml
   - service.yaml
+
+# Optional: Use secretGenerator to create secrets from paless.env
+# Uncomment the following lines to use paless.env instead of paless-secret.yaml
+# Make sure to remove or comment out paless-secret.yaml from resources above
+#
+# secretGenerator:
+#   - name: paless-secret
+#     envs:
+#       - ../../paless.env
+#     options:
+#       disableNameSuffixHash: true
+#
+# This will create a Kubernetes secret from the key-value pairs in paless.env
+# Note: The path is relative to this kustomization.yaml file
