@@ -296,24 +296,55 @@ Never commit credentials to version control. Use a secrets management tool (e.g.
 
 ### Development Console Access
 
-In development environments, access MinIO console via NodePort:
+In development environments, access MinIO console via NodePort. The NodePort service is defined in the dev overlay and exposes the MinIO console on port 30090:
+
+**File**: `k8s/overlays/dev/minio-console-nodeport.yaml`
 
 ```yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: minio-console
+  name: minio-console-nodeport
+  labels:
+    app: minio
+    app.kubernetes.io/name: minio
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/part-of: paless
 spec:
   type: NodePort
+  ports:
+  - port: 9001
+    targetPort: 9001
+    nodePort: 30090
+    protocol: TCP
+    name: console
   selector:
     app: minio
-  ports:
-    - port: 9001
-      targetPort: 9001
-      nodePort: 30090
 ```
 
-Access at: `http://localhost:30090` with credentials from secret.
+#### Accessing the Console
+
+**URL**: `http://localhost:30090`
+
+**Credentials**: Use the MinIO root credentials from the secret:
+- **Username**: `MINIO_ROOT_USER` from `paless-secret`
+- **Password**: `MINIO_ROOT_PASSWORD` from `paless-secret`
+
+**For K3s/Local Development**:
+```bash
+# Get the node IP (for remote access)
+kubectl get nodes -o wide
+
+# Then access: http://<node-ip>:30090
+```
+
+:::info NodePort vs ClusterIP
+The MinIO service includes two ports:
+- **ClusterIP (9000, 9001)**: Internal cluster access for Paperless and initialization jobs
+- **NodePort (30090)**: External access for development console UI
+
+Both ports are available simultaneously, allowing pod-to-pod communication and developer console access.
+:::
 
 ### Bucket Initialization Job Configuration
 
@@ -871,8 +902,11 @@ kubectl apply -f rclone-configmap.yaml
 # Deploy StatefulSet
 kubectl apply -f minio-statefulset.yaml
 
-# Deploy Service
+# Deploy Service (ClusterIP for internal access)
 kubectl apply -f minio-service.yaml
+
+# Deploy NodePort service for console access (development only)
+kubectl apply -f overlays/dev/minio-console-nodeport.yaml
 
 # Wait for MinIO pod to be Ready
 kubectl wait --for=condition=ready pod -l app=minio --timeout=5m
