@@ -1,0 +1,66 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-init
+  labels:
+    app: minio-init
+    app.kubernetes.io/name: minio-init
+    app.kubernetes.io/component: init
+    app.kubernetes.io/part-of: paless
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: minio-init
+        app.kubernetes.io/name: minio-init
+    spec:
+      restartPolicy: OnFailure
+      tolerations:
+      - key: node.kubernetes.io/disk-pressure
+        operator: Exists
+        effect: NoSchedule
+      initContainers:
+      # Wait for MinIO to be ready before attempting to create bucket
+      - name: wait-for-minio
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - |
+          echo "Waiting for MinIO to be ready..."
+          until wget --spider -q http://minio:9000/minio/health/ready 2>/dev/null; do
+            echo "MinIO is not ready yet. Retrying in 5 seconds..."
+            sleep 5
+          done
+          echo "MinIO is ready!"
+      containers:
+      - name: minio-client
+        image: minio/mc:latest
+        env:
+        - name: MINIO_ROOT_USER
+          valueFrom:
+            secretKeyRef:
+              name: paless-secret
+              key: minio-root-user
+        - name: MINIO_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: paless-secret
+              key: minio-root-password
+        command:
+        - sh
+        - -c
+        - |
+          set -e
+          echo "Configuring MinIO client alias..."
+          mc alias set minio http://minio:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD"
+
+          echo "Creating bucket 'paperless-media' if it doesn't exist..."
+          mc mb --ignore-existing minio/paperless-media
+
+          echo "Bucket initialization complete!"
+
+          # Verify bucket was created
+          mc ls minio/ | grep paperless-media
+          echo "Verified: paperless-media bucket exists"
