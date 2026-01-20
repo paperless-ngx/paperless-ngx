@@ -8,6 +8,8 @@ resources:
   - namespace.yaml
   - postgres-statefulset.yaml
   - postgres-service.yaml
+  - postgres-init-configmap.yaml
+  - postgres-init-job.yaml
   - redis-statefulset.yaml
   - redis-service.yaml
   - minio-statefulset.yaml
