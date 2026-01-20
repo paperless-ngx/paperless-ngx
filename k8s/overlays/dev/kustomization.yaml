@@ -5,6 +5,10 @@ resources:
   - ../../base
 
 # Dev environment: single replica, debug logging
-# patches:
+patches:
+  - path: paless-secret-patch.yaml
+    target:
+      kind: Secret
+      name: paless-secret
 #   - path: patches/replica-count.yaml
 #   - path: patches/env-dev.yaml
