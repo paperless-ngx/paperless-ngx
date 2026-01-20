@@ -22,7 +22,7 @@
 }
 
 // Dropdown hierarchy reveal for ng-select options
-::ng-deep .ng-dropdown-panel .ng-option {
+:host ::ng-deep .ng-dropdown-panel .ng-option {
   overflow-x: auto !important;
 
   .tag-option-row {
@@ -41,12 +41,12 @@
   }
 }
 
-::ng-deep .ng-dropdown-panel .ng-option:hover .hierarchy-reveal,
-::ng-deep .ng-dropdown-panel .ng-option.ng-option-marked .hierarchy-reveal {
+:host ::ng-deep .ng-dropdown-panel .ng-option:hover .hierarchy-reveal,
+:host ::ng-deep .ng-dropdown-panel .ng-option.ng-option-marked .hierarchy-reveal {
   max-width: 1000px;
 }
 
 ::ng-deep .ng-dropdown-panel .ng-option:hover .hierarchy-indicator,
-::ng-deep .ng-dropdown-panel .ng-option.ng-option-marked .hierarchy-indicator {
+:host ::ng-deep .ng-dropdown-panel .ng-option.ng-option-marked .hierarchy-indicator {
   background: transparent;
 }
