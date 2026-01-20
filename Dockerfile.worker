@@ -1,0 +1,23 @@
+# syntax=docker/dockerfile:1
+# Dockerfile.worker - Worker component only (Celery worker)
+# Based on ghcr.io/paperless-ngx/paperless-ngx:latest with only worker service enabled
+
+FROM ghcr.io/paperless-ngx/paperless-ngx:latest
+
+LABEL org.opencontainers.image.description="Paperless-ngx worker component (Celery worker only)"
+LABEL org.opencontainers.image.title="paless-worker"
+
+# Remove webserver, scheduler, consumer, and flower services from s6-overlay
+RUN set -eux \
+  && echo "Disabling webserver, scheduler, consumer, and flower services" \
+  && rm -rf /etc/s6-overlay/s6-rc.d/svc-webserver \
+  && rm -rf /etc/s6-overlay/s6-rc.d/svc-scheduler \
+  && rm -rf /etc/s6-overlay/s6-rc.d/svc-consumer \
+  && rm -rf /etc/s6-overlay/s6-rc.d/svc-flower \
+  && echo "Removing services from user bundle" \
+  && rm -f /etc/s6-overlay/s6-rc.d/user/contents.d/svc-webserver \
+  && rm -f /etc/s6-overlay/s6-rc.d/user/contents.d/svc-scheduler \
+  && rm -f /etc/s6-overlay/s6-rc.d/user/contents.d/svc-consumer \
+  && rm -f /etc/s6-overlay/s6-rc.d/user/contents.d/svc-flower
+
+# No HEALTHCHECK as this is a background worker
