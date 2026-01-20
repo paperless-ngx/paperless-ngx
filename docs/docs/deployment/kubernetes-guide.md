@@ -260,10 +260,12 @@ Paperless NGX integrates with MinIO to provide S3-compatible object storage for 
 - Resource limits: 512Mi-1Gi memory, 500m-1 CPU
 
 **rclone Sidecar:**
-- Mounts MinIO bucket as a filesystem
-- Uses FUSE to present S3 storage as directory
-- Handles authentication via environment variables
+- Mounts MinIO bucket as a filesystem using rclone
+- Uses FUSE to present S3 storage as a local directory
+- Handles authentication via AWS credentials from secrets
 - Enables seamless file access from Paperless container
+- Configured with VFS cache for performance
+- Uses bidirectional mount propagation for secure volume sharing
 
 **Bucket Initialization Job:**
 - Automated Kubernetes Job creates `paperless-media` bucket
@@ -426,6 +428,175 @@ kubectl get pods --selector=job-name=minio-init
 The minio-init Job should be deployed after the MinIO StatefulSet. Use proper ordering in your Kustomization or Helm chart to ensure correct deployment sequence.
 :::
 
+### rclone Sidecar Configuration
+
+The rclone sidecar container handles mounting the MinIO S3 bucket as a filesystem that Paperless can access directly. This eliminates the need for Paperless to implement S3 API calls for file operations.
+
+#### rclone Configuration
+
+Create a ConfigMap with rclone's S3 remote configuration:
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rclone-config
+  labels:
+    app: paperless
+    app.kubernetes.io/name: paperless
+    app.kubernetes.io/component: storage
+data:
+  rclone.conf: |
+    [minio]
+    type = s3
+    provider = Minio
+    endpoint = http://minio:9000
+    env_auth = true
+    acl = private
+```
+
+**Configuration Options:**
+- `type = s3`: Specifies S3-compatible storage backend
+- `provider = Minio`: Sets provider to MinIO for optimized behavior
+- `endpoint = http://minio:9000`: Internal cluster endpoint to MinIO S3 API
+- `env_auth = true`: Uses `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables for authentication
+- `acl = private`: Sets default ACL for uploaded objects
+
+#### Sidecar Container Definition
+
+The rclone sidecar is deployed as a second container in the Paperless pod:
+
+```yaml
+containers:
+  - name: rclone
+    image: rclone/rclone:latest
+    securityContext:
+      privileged: true
+    command:
+      - /bin/sh
+      - -c
+      - |
+        rclone mount minio:paperless-media /mnt/media --vfs-cache-mode full --allow-other --daemon
+        sleep infinity
+    env:
+      - name: AWS_ACCESS_KEY_ID
+        valueFrom:
+          secretKeyRef:
+            name: paless-secret
+            key: minio-root-user
+      - name: AWS_SECRET_ACCESS_KEY
+        valueFrom:
+          secretKeyRef:
+            name: paless-secret
+            key: minio-root-password
+    volumeMounts:
+      - name: rclone-config
+        mountPath: /config/rclone
+      - name: media
+        mountPath: /mnt/media
+        mountPropagation: Bidirectional
+    resources:
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+```
+
+**Sidecar Configuration Details:**
+
+| Setting | Value | Purpose |
+|---------|-------|---------|
+| Image | `rclone/rclone:latest` | Official rclone container image |
+| `securityContext.privileged` | `true` | Required for FUSE mount operations |
+| Mount command | `rclone mount minio:paperless-media /mnt/media` | Mounts `paperless-media` bucket at `/mnt/media` |
+| `--vfs-cache-mode full` | Full caching | Improves performance, especially for reads |
+| `--allow-other` | Enabled | Allows other containers to access the mount |
+| `--daemon` | Enabled | Runs rclone in background daemon mode |
+
+#### Mount Propagation
+
+The rclone sidecar uses **bidirectional mount propagation** to safely share the mounted filesystem:
+
+```yaml
+volumeMounts:
+  - name: media
+    mountPath: /mnt/media
+    mountPropagation: Bidirectional
+```
+
+**Why Bidirectional Propagation?**
+- Rclone mounts the S3 bucket at `/mnt/media` inside the sidecar container
+- `Bidirectional` propagation allows the Paperless container to see this mount
+- This enables transparent file access as if the bucket were a local filesystem
+
+**Mount Propagation Modes:**
+- `None`: No propagation between containers (default)
+- `HostToContainer`: Host mounts visible in container
+- `Bidirectional`: Mounts propagate both directions (required for sidecars)
+
+#### Volume Configuration
+
+The media volume is configured as an `emptyDir` shared between containers:
+
+```yaml
+volumes:
+  - name: media
+    emptyDir: {}
+  - name: rclone-config
+    configMap:
+      name: rclone-config
+```
+
+**Why emptyDir for media?**
+- Acts as a mount point for the rclone FUSE mount
+- Persistent media is stored in MinIO (backend), not local storage
+- Each pod restart remounts the bucket without data loss
+- Simplifies cleanup when pods terminate
+
+#### Authentication Flow
+
+The rclone sidecar authenticates with MinIO using AWS credentials:
+
+```
+1. Pod starts with rclone and paperless containers
+2. rclone reads AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY from secrets
+3. rclone.conf configures MinIO endpoint (http://minio:9000)
+4. rclone authenticates to MinIO using provided credentials
+5. rclone mounts paperless-media bucket at /mnt/media with FUSE
+6. Paperless container accesses files through mounted filesystem
+```
+
+#### VFS Cache Configuration
+
+The `--vfs-cache-mode full` option enables comprehensive caching:
+
+```
+Read Flow:
+  Paperless reads /mnt/media/document.pdf
+  → rclone checks local cache
+  → If miss: downloads from MinIO S3
+  → Caches locally for future access
+  → Returns to Paperless
+
+Write Flow:
+  Paperless writes to /mnt/media/output.pdf
+  → Written to cache first
+  → Cached file uploaded to MinIO asynchronously
+  → Returns success to Paperless
+```
+
+This caching strategy improves performance while maintaining data consistency.
+
+:::info Resource Allocation
+The rclone sidecar has modest resource requirements:
+- **Requests**: 100m CPU, 128Mi memory (minimum guaranteed)
+- **Limits**: 500m CPU, 512Mi memory (maximum allowed)
+
+Adjust limits based on document volume and concurrent access patterns.
+:::
+
 ### Storage Class
 
 MinIO uses the `local-path` storage class for its data:
@@ -510,6 +681,112 @@ kubectl patch pvc paperless-data-pvc -p '{"spec":{"resources":{"requests":{"stor
 
 ## Troubleshooting
 
+### rclone Sidecar Issues
+
+#### rclone Fails to Mount
+
+**Symptoms:** Pod stuck in `NotReady` state, rclone container crashes repeatedly
+
+**Check rclone logs:**
+```bash
+kubectl logs pod/paperless -c rclone
+
+# Typical errors:
+# "FUSE mount failed: permission denied" → pod needs privileged: true
+# "Unable to connect to minio:9000" → MinIO not ready, check MinIO pod
+# "Invalid credentials" → Check AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
+```
+
+**Diagnosis steps:**
+1. Verify rclone container has `privileged: true` in securityContext
+2. Check MinIO pod is running: `kubectl get pods -l app=minio`
+3. Verify MinIO service endpoint: `kubectl get svc minio`
+4. Confirm bucket exists: `kubectl logs job/minio-init`
+5. Test connectivity from Paperless pod: `kubectl exec pod/paperless -c rclone -- ping minio`
+
+**Resolution:**
+```bash
+# Recreate pod to force rclone remount
+kubectl delete pod/paperless
+
+# Monitor startup logs
+kubectl logs -f pod/paperless -c rclone
+```
+
+#### rclone Mount Point Empty or Inaccessible
+
+**Symptoms:** Files appear to be missing, permission denied when accessing /mnt/media
+
+**Diagnosis:**
+```bash
+# Check mount status inside paperless container
+kubectl exec pod/paperless -c paperless -- mount | grep /mnt/media
+
+# Should output something like:
+# minio:paperless-media on /mnt/media type fuse.rclone (rw,nosuid,nodev,relatime,...)
+
+# If not present, rclone mount failed
+# If present, check file visibility
+kubectl exec pod/paperless -c paperless -- ls -la /mnt/media/
+```
+
+**Common Issues:**
+- Mount propagation not set to `Bidirectional` → update deployment
+- FUSE permissions issue → ensure `--allow-other` flag is present
+- rclone cache corrupted → delete pod to clear cache
+
+#### Slow File Operations
+
+**Symptoms:** File reads/writes are unusually slow, timeouts
+
+**Optimization:**
+```yaml
+# In rclone mount command, adjust VFS cache settings:
+rclone mount minio:paperless-media /mnt/media \
+  --vfs-cache-mode full \
+  --vfs-cache-max-size 2G \      # Increase cache size
+  --vfs-cache-poll-interval 5s \  # Adjust poll frequency
+  --allow-other \
+  --daemon
+```
+
+**Tuning parameters:**
+- `--vfs-cache-max-size`: Increase if documents are large (adjust container memory limit)
+- `--vfs-cache-poll-interval`: Lower for more responsive updates, higher for less overhead
+- `--transfers N`: Increase parallel transfers (default 4)
+
+#### rclone Configuration Not Loading
+
+**Symptoms:** "Config file not found" errors, authentication failures
+
+**Check ConfigMap:**
+```bash
+# Verify ConfigMap exists
+kubectl get cm rclone-config
+
+# View its contents
+kubectl describe cm rclone-config
+
+# Expected output should show rclone.conf with [minio] section
+```
+
+**Verify mount in pod:**
+```bash
+# Check if /config/rclone/rclone.conf is readable
+kubectl exec pod/paperless -c rclone -- cat /config/rclone/rclone.conf
+
+# Should output the rclone configuration with MinIO settings
+```
+
+**Redeploy ConfigMap:**
+```bash
+# Update ConfigMap
+kubectl apply -f rclone-configmap.yaml
+
+# Recreate pod to pick up new config
+kubectl delete pod/paperless
+```
+
 ### PVC Stuck in Pending State
 
 ```bash
@@ -545,8 +822,123 @@ If data is lost after pod restart, verify:
 3. PV is not accidentally deleted
 4. Storage backend is functioning
 
+## Complete Deployment Checklist
+
+Use this checklist when deploying Paperless NGX with MinIO and rclone on Kubernetes:
+
+### Pre-Deployment
+
+- [ ] Kubernetes cluster is running and accessible via `kubectl`
+- [ ] Sufficient storage capacity available (minimum 23Gi)
+- [ ] MinIO root user credentials prepared
+- [ ] Docker registry configured (if using custom image)
+- [ ] Network policies allow pod-to-pod communication
+
+### Deployment Order
+
+**Step 1: Create Namespace**
+```bash
+kubectl apply -f namespace.yaml
+```
+
+**Step 2: Create Secrets**
+```bash
+kubectl apply -f paless-secret.yaml
+# Verify: kubectl get secret paless-secret
+```
+
+**Step 3: Create Persistent Volumes (Development Only)**
+```bash
+kubectl apply -f pv-manual.yaml
+# Verify: kubectl get pv
+```
+
+**Step 4: Create Persistent Volume Claims**
+```bash
+kubectl apply -f pvc.yaml
+# Verify: kubectl get pvc
+# Wait for all PVCs to be Bound
+```
+
+**Step 5: Create rclone Configuration**
+```bash
+kubectl apply -f rclone-configmap.yaml
+# Verify: kubectl describe cm rclone-config
+```
+
+**Step 6: Deploy MinIO**
+```bash
+# Deploy StatefulSet
+kubectl apply -f minio-statefulset.yaml
+
+# Deploy Service
+kubectl apply -f minio-service.yaml
+
+# Wait for MinIO pod to be Ready
+kubectl wait --for=condition=ready pod -l app=minio --timeout=5m
+```
+
+**Step 7: Initialize MinIO Bucket**
+```bash
+kubectl apply -f minio-init-job.yaml
+
+# Wait for job completion
+kubectl wait --for=condition=complete job/minio-init --timeout=5m
+
+# Verify bucket creation
+kubectl logs job/minio-init
+```
+
+**Step 8: Deploy Paperless with rclone**
+```bash
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+
+# Wait for pod to be Ready
+kubectl wait --for=condition=ready pod -l app=paperless --timeout=5m
+
+# Verify both containers are running
+kubectl get pods -l app=paperless
+```
+
+### Post-Deployment Verification
+
+- [ ] Paperless pod shows 2 containers: `paperless` and `rclone`
+- [ ] Both containers are in `Running` state
+- [ ] rclone logs show successful mount: `"Mounting with command: ..."`
+- [ ] Paperless container can access /mnt/media: `kubectl exec pod/paperless -c paperless -- ls /mnt/media/`
+- [ ] MinIO console accessible at configured NodePort
+- [ ] Paperless web UI accessible at configured port
+- [ ] Can upload documents and verify they appear in MinIO
+
+### Verification Commands
+
+```bash
+# Check pod status
+kubectl get pod/paperless -o wide
+
+# View rclone mount status
+kubectl exec pod/paperless -c paperless -- mount | grep media
+
+# Test file access from Paperless container
+kubectl exec pod/paperless -c paperless -- touch /mnt/media/test.txt
+kubectl exec pod/paperless -c paperless -- ls -la /mnt/media/
+
+# Monitor rclone in real-time
+kubectl logs -f pod/paperless -c rclone
+
+# Check resource usage
+kubectl top pod/paperless --containers
+
+# Verify MinIO bucket
+kubectl exec deploy/minio -- mc ls minio/paperless-media
+```
+
 ## References
 
 - [Kubernetes Persistent Volumes Documentation](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
 - [Persistent Volume Claims Guide](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims)
 - [Storage Classes](https://kubernetes.io/docs/concepts/storage/storage-classes/)
+- [rclone Documentation](https://rclone.org/docs/)
+- [rclone S3 Configuration](https://rclone.org/s3/)
+- [MinIO Kubernetes Deployment](https://min.io/docs/minio/kubernetes/upstream/)
