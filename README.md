@@ -101,3 +101,10 @@ Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Relate
 
 > Document scanners are typically used to scan sensitive documents like your social insurance number, tax records, invoices, etc. **Paperless-ngx should never be run on an untrusted host** because information is stored in clear text without encryption. No guarantees are made regarding security (but we do try!) and you use the app at your own risk.
 > **The safest way to run Paperless-ngx is on a local server in your own home with backups in place**.
+>
+> # FEATURE CHANGE
+> My system contains over 10k old documents with bad image quality. They contain a text layer with many diactrics being detected by paperless during upload processing. Each file is classified in detail with several custom fields, and filled with detailed text in notes. I am interested in being able to tell paperless to ignore completely the OCR phase. It will just upload it. I am sure this will be helpful for other users.
+> 
+Tried using this configuration, but it did not work
+PAPERLESS_OCR_SKIP_ARCHIVE_FILE: always
+PAPERLESS_OCR_OUTPUT_TYPE: pdf
