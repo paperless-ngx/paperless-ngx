@@ -2,7 +2,7 @@
 # Dockerfile.worker - Worker component only (Celery worker)
 # Based on ghcr.io/paperless-ngx/paperless-ngx:latest with only worker service enabled
 
-FROM ghcr.io/paperless-ngx/paperless-ngx:latest
+FROM localhost:5001/paless:latest
 
 LABEL org.opencontainers.image.description="Paperless-ngx worker component (Celery worker only)"
 LABEL org.opencontainers.image.title="paless-worker"

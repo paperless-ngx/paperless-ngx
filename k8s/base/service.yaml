@@ -3,7 +3,8 @@ kind: Service
 metadata:
   name: paperless-service
   labels:
-    app: paperless
+    app: paless
+    component: web
 spec:
   type: NodePort
   ports:
@@ -13,4 +14,5 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: paperless
+    app: paless
+    component: web
