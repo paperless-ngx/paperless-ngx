@@ -14,6 +14,9 @@ NC='\033[0m'
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
+# Source paless.env if it exists (for custom configuration)
+[ -f "$PROJECT_ROOT/paless.env" ] && source "$PROJECT_ROOT/paless.env"
+
 # Source .env from .context-management if it exists
 if [ -f "$PROJECT_ROOT/.context-management/.env" ]; then
     source "$PROJECT_ROOT/.context-management/.env"
@@ -21,8 +24,22 @@ fi
 
 REGISTRY="${REGISTRY:-localhost:5000}"
 PROJECT_NAME="${PROJECT_NAME:-app}"
-K8S_NAMESPACE=$(echo "$PROJECT_NAME" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
+# Use PALESS_NAMESPACE if set, otherwise derive from PROJECT_NAME
+K8S_NAMESPACE="${PALESS_NAMESPACE:-$(echo "$PROJECT_NAME" | tr '[:upper:]' '[:lower:]' | tr '_' '-')}"
 OVERLAY="${OVERLAY:-dev}"
+
+# Export variables for kustomize envsubst if needed
+export PALESS_NAMESPACE
+export REGISTRY
+export POSTGRES_DB
+export POSTGRES_USER
+export POSTGRES_PASSWORD
+export MINIO_ROOT_USER
+export MINIO_ROOT_PASSWORD
+export MINIO_BUCKET
+export PAPERLESS_SECRET_KEY
+export PAPERLESS_TIME_ZONE
+export PAPERLESS_OCR_LANGUAGE
 
 # Parse arguments
 TARGET="${1:-all}"
@@ -36,7 +53,7 @@ find_apps() {
         if [ "$dir" != "$PROJECT_ROOT" ]; then
             apps+=("$app_name")
         fi
-    done < <(find "$PROJECT_ROOT" -maxdepth 2 -name "Dockerfile" -type f 2>/dev/null | grep -v node_modules | grep -v .context-management)
+    done < <(find "$PROJECT_ROOT" -maxdepth 2 -name "Dockerfile" -type f 2>/dev/null | grep -v node_modules | grep -v .context-management | grep -v .devcontainer)
     echo "${apps[@]}"
 }
 
