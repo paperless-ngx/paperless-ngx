@@ -1,0 +1,29 @@
+# syntax=docker/dockerfile:1
+# Dockerfile.web - Web component only (Granian webserver)
+# Based on ghcr.io/paperless-ngx/paperless-ngx:latest with only webserver service enabled
+
+FROM ghcr.io/paperless-ngx/paperless-ngx:latest
+
+LABEL org.opencontainers.image.description="Paperless-ngx web component (Granian webserver only)"
+LABEL org.opencontainers.image.title="paless-web"
+
+# Remove worker, scheduler, consumer, and flower services from s6-overlay
+RUN set -eux \
+  && echo "Disabling worker, scheduler, consumer, and flower services" \
+  && rm -rf /etc/s6-overlay/s6-rc.d/svc-worker \
+  && rm -rf /etc/s6-overlay/s6-rc.d/svc-scheduler \
+  && rm -rf /etc/s6-overlay/s6-rc.d/svc-consumer \
+  && rm -rf /etc/s6-overlay/s6-rc.d/svc-flower \
+  && echo "Removing service dependencies from webserver" \
+  && rm -f /etc/s6-overlay/s6-rc.d/svc-webserver/dependencies.d/svc-worker \
+  && rm -f /etc/s6-overlay/s6-rc.d/svc-webserver/dependencies.d/svc-scheduler \
+  && rm -f /etc/s6-overlay/s6-rc.d/svc-webserver/dependencies.d/svc-consumer \
+  && echo "Removing services from user bundle" \
+  && rm -f /etc/s6-overlay/s6-rc.d/user/contents.d/svc-worker \
+  && rm -f /etc/s6-overlay/s6-rc.d/user/contents.d/svc-scheduler \
+  && rm -f /etc/s6-overlay/s6-rc.d/user/contents.d/svc-consumer \
+  && rm -f /etc/s6-overlay/s6-rc.d/user/contents.d/svc-flower
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=10s --retries=5 CMD [ "curl", "-fs", "-S", "-L", "--max-time", "2", "http://localhost:8000" ]
