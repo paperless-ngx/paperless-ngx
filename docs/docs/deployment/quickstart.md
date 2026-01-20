@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 title: Quick Start
 description: Get Paperless NGX running on Kubernetes with persistent storage
 ---

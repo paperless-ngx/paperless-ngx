@@ -1,5 +1,5 @@
 ---
-sidebar_position: 4
+sidebar_position: 1
 title: Deployment Documentation
 description: Complete guides for deploying Paperless NGX
 ---
@@ -9,6 +9,15 @@ description: Complete guides for deploying Paperless NGX
 Welcome to the Paperless NGX deployment guides. This section covers all aspects of deploying and managing Paperless NGX in Kubernetes environments.
 
 ## Available Guides
+
+### [Configuration Management](./configuration.md)
+Central configuration file documentation for all deployment settings.
+
+- `paless.env` file structure and sections
+- Environment variables and their purposes
+- Development vs. production configuration
+- Security checklist and best practices
+- Secrets management and environment-specific overrides
 
 ### [Quick Start](./quickstart.md)
 Get Paperless NGX running on Kubernetes in minutes with persistent storage. Perfect for developers and operators new to the system.
@@ -73,6 +82,9 @@ volumes:
 
 ### I want to...
 
+**Configure environment settings**
+→ Read [Configuration Management](./configuration.md)
+
 **Deploy Paperless NGX quickly**
 → Start with [Quick Start](./quickstart.md)
 
@@ -82,11 +94,14 @@ volumes:
 **Configure volumes for specific scenarios**
 → Refer to [Volume Configuration](./volume-configuration.md)
 
+**Set up secrets and configuration**
+→ See [Configuration Management](./configuration.md#secret-management) and [Quick Start](./quickstart.md#step-1-create-secrets-and-configmaps)
+
 **Migrate from emptyDir to PVC**
 → See the "Data Persistence Strategy" section in [Kubernetes Deployment Guide](./kubernetes-guide.md#data-persistence-strategy)
 
 **Plan storage capacity**
-→ Check "Capacity Planning" in [Kubernetes Deployment Guide](./kubernetes-guide.md#capacity-planning)
+→ Check "Capacity Planning" in [Kubernetes Deployment Guide](./kubernetes-guide.md#capacity-planning) and [Configuration Management](./configuration.md#capacity-planning)
 
 **Troubleshoot volume issues**
 → Use troubleshooting guides in [Volume Configuration](./volume-configuration.md#troubleshooting)
@@ -112,8 +127,11 @@ Kubernetes Cluster
 
 Before deploying to production:
 
+- [ ] Review [Configuration Management](./configuration.md) and complete security checklist
 - [ ] Review [Kubernetes Deployment Guide](./kubernetes-guide.md) for architecture understanding
 - [ ] Follow [Quick Start](./quickstart.md) guide for initial setup
+- [ ] Configure all values in `paless.env` for your environment
+- [ ] Set up secrets management (Sealed Secrets, External Secrets, etc.)
 - [ ] Configure appropriate storage class for your environment
 - [ ] Set reclaim policy to `Retain` for production
 - [ ] Plan and allocate sufficient storage capacity

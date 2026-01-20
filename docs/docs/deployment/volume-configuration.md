@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 5
 title: Volume Configuration
 description: Detailed guide for configuring persistent volumes in Paperless NGX deployments
 ---
