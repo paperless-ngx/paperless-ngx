@@ -19,27 +19,31 @@ for the current development stage but **must be resolved before production**.
 | Severity | Count |
 |----------|-------|
 | Critical | 0 |
-| High     | 1 |
-| Medium   | 2 |
-| Low      | 1 |
+| High     | 2 |
+| Medium   | 3 |
+| Low      | 3 |
 | Info     | 2 |
 
 ---
 
 ## Deferred Findings by Task
 
-### Task: 98326f02...
+### Task: 0a156b7f...
 
 **Date**: 2026-01-20
 **Stage**: dev
-**Description**: Prepare PostgreSQL database for multi-tenancy by verifying schema compatibility and adding necessary
+**Description**: Deploy separated web, worker, and scheduler components to K3s and verify they work together correctl
 
 | Severity | Category | Description | Location |
 |----------|----------|-------------|----------|
-| MEDIUM | A01:2021 - Broken Access Control | SQL schema file contains GRANT statements to 'paperless_app' user with broad per | `docs/database-schema/paperless_schema_baseline.sql:5321-5500+` |
-| HIGH | A01:2021 - Broken Access Control | The schema contains sensitive authentication tables (auth_user, authtoken_token, | `docs/database-schema/paperless_schema_baseline.sql:199,287,2220` |
-| MEDIUM | A09:2021 - Security Logging and Monitoring Failures | The verification script checks for errors in PostgreSQL logs but uses a simple g | `scripts/verify-db-preparation.sh:130` |
-| LOW | A04:2021 - Insecure Design | The verification script uses hardcoded namespace ('paless'), pod name ('postgres | `scripts/verify-db-preparation.sh:9-12` |
-| INFO | A02:2021 - Cryptographic Failures | Documentation mentions pgcrypto extension for 'encryption and hashing' but doesn | `docs/multi-tenant-db-preparation.md:30-34` |
-| INFO | A05:2021 - Security Misconfiguration | Documentation shows max_connections=100 which may be insufficient for a multi-te | `docs/multi-tenant-db-preparation.md:116,156-165` |
+| HIGH | A05:2021 - Security Misconfiguration | Ingress allows access without host header validation (fallback rule at lines 24- | `k8s/base/web-ingress.yaml:24-32` |
+| HIGH | A05:2021 - Security Misconfiguration | Ingress lacks TLS configuration, exposing all traffic including authentication c | `k8s/base/web-ingress.yaml:1-33` |
+| MEDIUM | A05:2021 - Security Misconfiguration | Ingress missing security-related annotations: rate limiting to prevent brute for | `k8s/base/web-ingress.yaml:8-10` |
+| MEDIUM | A09:2021 - Security Logging and Monitoring Failures | No Ingress access logging configuration or monitoring alerts. Unable to detect o | `k8s/base/web-ingress.yaml:1-33` |
+| MEDIUM | A05:2021 - Security Misconfiguration | All three deployments (web, worker, scheduler) use privileged: true for rclone s | `k8s/base/paless-web-deployment.yaml:74, k8s/base/paless-worker-deployment.yaml:54, k8s/base/paless-scheduler-deployment.yaml:54` |
+| LOW | A05:2021 - Security Misconfiguration | Ingress proxy-body-size set to 100m allows large upload sizes which could be use | `k8s/base/web-ingress.yaml:10` |
+| LOW | A05:2021 - Security Misconfiguration | Deployments lack pod-level security contexts (runAsNonRoot, runAsUser, fsGroup). | `k8s/base/paless-web-deployment.yaml:19-24, k8s/base/paless-worker-deployment.yaml:19-24, k8s/base/paless-scheduler-deployment.yaml:19-24` |
+| LOW | A05:2021 - Security Misconfiguration | HPA configurations lack resource limits validation. If CPU/memory metrics fail o | `k8s/base/web-hpa.yaml:14, k8s/base/worker-hpa.yaml:14` |
+| INFO | A04:2021 - Insecure Design | Ingress uses local domain (paless.local) suitable for DEV but will need proper D | `k8s/base/web-ingress.yaml:14` |
+| INFO | A05:2021 - Security Misconfiguration | All three deployments use imagePullPolicy: Always with localhost:5000 registry.  | `k8s/base/paless-web-deployment.yaml:27, k8s/base/paless-worker-deployment.yaml:27, k8s/base/paless-scheduler-deployment.yaml:27` |
 
