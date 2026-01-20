@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: paperless-config
+  labels:
+    app: paperless
+data:
+  PAPERLESS_REDIS: "redis://redis:6379"
+  PAPERLESS_DBHOST: "postgres"
+  PAPERLESS_DBPORT: "5432"
+  PAPERLESS_DBNAME: "paperless"
+  PAPERLESS_DBUSER: "paperless"
+  PAPERLESS_DBSSLMODE: "prefer"
+  PAPERLESS_TIME_ZONE: "UTC"
+  PAPERLESS_OCR_LANGUAGE: "eng"
+  PAPERLESS_TASK_WORKERS: "1"
+  PAPERLESS_THREADS_PER_WORKER: "1"
+  PAPERLESS_CONSUMER_POLLING: "10"
+  PAPERLESS_URL: "http://localhost:30080"
+  PAPERLESS_ALLOWED_HOSTS: "*"
