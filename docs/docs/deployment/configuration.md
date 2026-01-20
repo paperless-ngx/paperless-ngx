@@ -409,10 +409,82 @@ For production changes:
 3. Restart affected deployments
 4. Verify in application logs
 
+## Deployment Script Integration
+
+The `scripts/deploy-to-k3s.sh` helper script automatically sources the `paless.env` file and exports all configuration variables for use with Kustomize overlays.
+
+### How the Script Uses paless.env
+
+1. **Script sources paless.env** during initialization
+2. **Variables are exported** for Kustomize `envsubst` replacements
+3. **Defaults are applied** for unspecified variables
+4. **Configuration is passed to Kustomize** during deployment
+
+### Exported Variables
+
+The following variables from `paless.env` are exported for Kustomize use:
+
+```bash
+export PALESS_NAMESPACE
+export REGISTRY
+export POSTGRES_DB
+export POSTGRES_USER
+export POSTGRES_PASSWORD
+export MINIO_ROOT_USER
+export MINIO_ROOT_PASSWORD
+export MINIO_BUCKET
+export PAPERLESS_SECRET_KEY
+export PAPERLESS_TIME_ZONE
+export PAPERLESS_OCR_LANGUAGE
+```
+
+### Script Workflow
+
+```
+1. Load paless.env (if exists)
+2. Load .context-management/.env (if exists)
+3. Apply defaults for missing variables
+4. Export all variables
+5. Auto-detect Dockerfiles
+6. Build and push images
+7. Apply Kustomize overlays
+8. Wait for pods to be ready
+9. Display status and helpful commands
+```
+
+### Example: Using paless.env with the Script
+
+```bash
+# Create paless.env
+cat > paless.env << 'EOF'
+PALESS_NAMESPACE=production
+REGISTRY=registry.example.com:5000
+POSTGRES_PASSWORD=$(openssl rand -base64 32)
+MINIO_ROOT_PASSWORD=$(openssl rand -base64 32)
+PAPERLESS_TIME_ZONE=America/New_York
+OVERLAY=prod
+EOF
+
+# Run deployment script
+./scripts/deploy-to-k3s.sh all
+
+# The script automatically uses paless.env configuration
+# for all build and deployment operations
+```
+
+### Backwards Compatibility
+
+If `paless.env` doesn't exist, the script:
+- Uses hardcoded defaults from the script itself
+- Allows deployment to proceed without external configuration
+- Enables scripting and CI/CD pipelines without file creation
+
+**Recommended:** Always create `paless.env` for consistency across deployments.
+
 ## Related Documentation
 
 - [Kubernetes Deployment Guide](./kubernetes-guide.md) - Architecture and volume configuration
-- [Quick Start](./quickstart.md) - Getting started with deployment
+- [Quick Start](./quickstart.md) - Getting started with deployment, including deploy-to-k3s.sh usage
 - [Volume Configuration](./volume-configuration.md) - Persistent storage setup
 
 ## References

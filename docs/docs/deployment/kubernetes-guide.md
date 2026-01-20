@@ -934,6 +934,154 @@ kubectl top pod/paperless --containers
 kubectl exec deploy/minio -- mc ls minio/paperless-media
 ```
 
+## Automated Deployment with deploy-to-k3s.sh
+
+For a streamlined deployment experience, the `scripts/deploy-to-k3s.sh` script automates many of the manual steps described above. This script is particularly useful for development and rapid iteration.
+
+### What the Script Automates
+
+1. **Configuration Loading**: Reads `paless.env` for environment settings
+2. **Application Detection**: Auto-discovers Dockerfiles in subdirectories
+3. **Image Building**: Builds Docker images with consistent naming
+4. **Registry Push**: Pushes images to configured registry
+5. **Kustomize Deployment**: Applies environment-specific overlays
+6. **Health Verification**: Waits for pods to reach Ready state
+7. **Status Display**: Shows helpful debugging information and next steps
+
+### Script Features
+
+- **paless.env Integration**: Sources configuration for Kubernetes deployment
+- **Multi-overlay Support**: Deploy to different environments (dev, staging, prod)
+- **Auto-detection**: Finds all applications without manual configuration
+- **Error Handling**: Provides clear error messages and troubleshooting commands
+- **Namespace Management**: Configurable Kubernetes namespace per deployment
+
+### Quick Reference
+
+```bash
+# Show usage and available applications
+./scripts/deploy-to-k3s.sh help
+
+# Deploy all detected applications
+./scripts/deploy-to-k3s.sh all
+
+# Deploy specific application
+./scripts/deploy-to-k3s.sh paperless
+
+# Show deployment status
+./scripts/deploy-to-k3s.sh status
+```
+
+### Configuration with paless.env
+
+Create `paless.env` in the repository root to customize deployment:
+
+```env
+PALESS_NAMESPACE=production
+REGISTRY=registry.example.com:5000
+POSTGRES_PASSWORD=your-secure-password
+MINIO_ROOT_PASSWORD=your-secure-password
+PAPERLESS_TIME_ZONE=America/New_York
+OVERLAY=prod
+```
+
+See [Configuration Management](./configuration.md#deployment-script-integration) for complete details.
+
+### Kustomize Integration
+
+The script applies Kustomize overlays from:
+
+```
+k8s/overlays/{OVERLAY}/
+```
+
+Where `{OVERLAY}` is specified by the `OVERLAY` variable in `paless.env` (default: `dev`).
+
+Each overlay can customize:
+- Resource names and labels
+- Image tags and registries
+- Replica counts
+- Resource limits
+- Storage configurations
+- Environment-specific patches
+
+### Environment Variables for Kustomize
+
+The script exports these variables for use in Kustomize templates:
+
+```bash
+PALESS_NAMESPACE     # Kubernetes namespace
+REGISTRY             # Container image registry
+POSTGRES_DB          # Database name
+POSTGRES_USER        # Database user
+POSTGRES_PASSWORD    # Database password
+MINIO_ROOT_USER      # MinIO admin user
+MINIO_ROOT_PASSWORD  # MinIO admin password
+MINIO_BUCKET         # S3 bucket name
+PAPERLESS_SECRET_KEY # Django secret key
+PAPERLESS_TIME_ZONE  # Application timezone
+PAPERLESS_OCR_LANGUAGE  # OCR languages
+```
+
+Use these in your Kustomize base files with `envsubst`:
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: paless-config
+data:
+  PALESS_NAMESPACE: ${PALESS_NAMESPACE}
+  REGISTRY: ${REGISTRY}
+  POSTGRES_DB: ${POSTGRES_DB}
+```
+
+### Workflow Example
+
+```bash
+# 1. Create configuration
+cat > paless.env << 'EOF'
+PALESS_NAMESPACE=paperless-prod
+REGISTRY=ghcr.io/myorg
+POSTGRES_PASSWORD=$(openssl rand -base64 32)
+MINIO_ROOT_PASSWORD=$(openssl rand -base64 32)
+OVERLAY=prod
+EOF
+
+# 2. Deploy applications
+./scripts/deploy-to-k3s.sh all
+
+# 3. Verify deployment
+./scripts/deploy-to-k3s.sh status
+
+# 4. Check application logs
+kubectl logs -n paperless-prod deployment/paperless -f
+```
+
+### Troubleshooting
+
+If deployment fails, the script provides:
+1. **Detailed error messages** with the specific problem
+2. **Suggested commands** to investigate further
+3. **Event logs** from recent Kubernetes activity
+4. **Pod status** to understand what went wrong
+
+See [Quick Start](./quickstart.md#troubleshooting-deploy-script-issues) for common issues and solutions.
+
+### Manual vs. Automated Deployment
+
+| Aspect | Manual | Script |
+|--------|--------|--------|
+| Configuration | Environment variables | paless.env file |
+| Image Build | Manual docker build | Automatic detection |
+| Registry Push | Manual docker push | Automatic push |
+| Deployment | Manual kubectl apply | Kustomize overlay |
+| Verification | Manual kubectl checks | Automatic health checks |
+| Learning Curve | Higher (understand all steps) | Lower (script handles details) |
+| Customization | Full control | Through paless.env |
+
+**Recommendation**: Use the script for development and CI/CD pipelines. Use manual steps for understanding and debugging complex deployments.
+
 ## References
 
 - [Kubernetes Persistent Volumes Documentation](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)

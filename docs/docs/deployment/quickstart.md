@@ -170,7 +170,181 @@ kubectl get pods
 kubectl get pvc
 ```
 
-## Option 2: Kustomize Deployment with MinIO
+## Option 2: Using the Deploy Script (Recommended for Development)
+
+The `scripts/deploy-to-k3s.sh` is an automated deployment helper that simplifies building and deploying applications to a K3s cluster. It automatically detects Dockerfiles and manages the full build, push, and deployment lifecycle.
+
+### Prerequisites
+
+- K3s cluster running and accessible via `kubectl`
+- Docker installed and running
+- `deploy-to-k3s.sh` executable: `chmod +x scripts/deploy-to-k3s.sh`
+- `paless.env` configuration file (optional but recommended)
+
+### Quick Usage
+
+```bash
+# Deploy all detected apps
+./scripts/deploy-to-k3s.sh all
+
+# Deploy specific app
+./scripts/deploy-to-k3s.sh paperless
+
+# Check deployment status
+./scripts/deploy-to-k3s.sh status
+
+# Show help
+./scripts/deploy-to-k3s.sh help
+```
+
+### Configuration with paless.env
+
+The script reads configuration from `paless.env` in the project root. Create this file to customize your deployment:
+
+```env
+# Kubernetes namespace
+PALESS_NAMESPACE=paless
+
+# Container registry (local K3s registry)
+REGISTRY=localhost:5000
+
+# Database configuration
+POSTGRES_DB=paperless
+POSTGRES_USER=paperless
+POSTGRES_PASSWORD=dev-postgres-password-changeme
+
+# MinIO configuration
+MINIO_ROOT_USER=admin
+MINIO_ROOT_PASSWORD=dev-minio-password-changeme
+MINIO_BUCKET=paperless-documents
+
+# Application settings
+PAPERLESS_SECRET_KEY=dev-secret-key-change-in-production-x7k9m2p5q8w1r4t6
+PAPERLESS_TIME_ZONE=UTC
+PAPERLESS_OCR_LANGUAGE=eng
+
+# Deployment overlay
+OVERLAY=dev
+```
+
+:::info paless.env is Optional
+If `paless.env` doesn't exist, the script uses sensible defaults. However, for production deployments or custom configurations, creating a proper configuration file is strongly recommended.
+:::
+
+### Script Behavior
+
+The `deploy-to-k3s.sh` script performs the following operations:
+
+1. **Sources Configuration**
+   - Loads `paless.env` if it exists
+   - Loads `.context-management/.env` for CI/CD environments
+   - Sets default values for unspecified variables
+
+2. **Auto-detects Applications**
+   - Scans for all `Dockerfile` files in subdirectories
+   - Ignores `node_modules`, `.context-management`, and `.devcontainer`
+
+3. **Builds and Pushes Images**
+   - Builds Docker image with naming: `{REGISTRY}/{PROJECT_NAME}-{app}:latest`
+   - Pushes to specified registry
+
+4. **Deploys to K3s**
+   - Applies Kustomize overlays from `k8s/overlays/{OVERLAY}/`
+   - Exports environment variables for `kustomize envsubst`
+
+5. **Verifies Deployment**
+   - Waits for pods to be ready (120 second timeout)
+   - Shows pod status and helpful commands
+
+### Environment Variables
+
+The script supports these environment variables for fine-grained control:
+
+| Variable | Purpose | Default | Example |
+|----------|---------|---------|---------|
+| `REGISTRY` | Container registry | `localhost:5000` | `ghcr.io/myorg` |
+| `PROJECT_NAME` | Project identifier | `app` | `myproject` |
+| `PALESS_NAMESPACE` | Kubernetes namespace | Derived from `PROJECT_NAME` | `paless` |
+| `OVERLAY` | Kustomize overlay to apply | `dev` | `prod` |
+| `POSTGRES_PASSWORD` | Database password | (from paless.env) | Strong password |
+| `MINIO_ROOT_PASSWORD` | MinIO password | (from paless.env) | Strong password |
+| `PAPERLESS_SECRET_KEY` | Django secret key | (from paless.env) | Generated key |
+
+### Example Deployment Workflow
+
+```bash
+# 1. Create paless.env with your configuration
+cat > paless.env << 'EOF'
+PALESS_NAMESPACE=paperless-dev
+REGISTRY=localhost:5000
+POSTGRES_PASSWORD=$(openssl rand -base64 32)
+MINIO_ROOT_PASSWORD=$(openssl rand -base64 32)
+PAPERLESS_TIME_ZONE=America/New_York
+OVERLAY=dev
+EOF
+
+# 2. Deploy all applications
+./scripts/deploy-to-k3s.sh all
+
+# 3. Check status
+./scripts/deploy-to-k3s.sh status
+
+# 4. View logs
+kubectl logs -n paperless-dev deployment/paperless -f
+```
+
+### Kustomize Integration
+
+The script applies overlays from `k8s/overlays/{OVERLAY}/`, allowing environment-specific customization:
+
+```
+k8s/
+├── base/
+│   ├── kustomization.yaml
+│   ├── deployment.yaml
+│   ├── configmap.yaml
+│   └── ...
+└── overlays/
+    ├── dev/
+    │   ├── kustomization.yaml
+    │   └── patches/
+    └── prod/
+        ├── kustomization.yaml
+        └── patches/
+```
+
+Each overlay can patch resources to customize for that environment. The script exports environment variables for use in `envsubst` replacements within kustomization files.
+
+### Troubleshooting Deploy Script Issues
+
+**Images not pushing to registry:**
+```bash
+# Ensure registry is accessible
+docker push localhost:5000/test:latest
+
+# Check registry logs
+kubectl logs -n kube-system deployment/registry
+```
+
+**Pods not starting:**
+```bash
+# Check deployment status
+kubectl describe deployment -n $PALESS_NAMESPACE
+
+# View pod logs
+kubectl logs -n $PALESS_NAMESPACE deployment/paperless
+```
+
+**Configuration not being applied:**
+```bash
+# Verify paless.env is readable
+cat paless.env | grep -v "^#"
+
+# Check exported variables in script
+./scripts/deploy-to-k3s.sh help
+```
+
+## Option 3: Kustomize Deployment with MinIO
 
 ### Directory Structure
 
