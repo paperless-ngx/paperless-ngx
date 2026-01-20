@@ -177,6 +177,125 @@ volumes:
 - Production-ready storage management
 - Works with any storage backend (local, cloud, network)
 
+## MinIO S3 Object Storage Integration
+
+Paperless NGX integrates with MinIO to provide S3-compatible object storage for media files. This architecture separates application data (SQLite database) from document storage (media files).
+
+### Architecture Overview
+
+```
+┌─────────────────────────────────────────────┐
+│         Paperless NGX Deployment            │
+├─────────────────────────────────────────────┤
+│  ┌──────────────────┐   ┌───────────────┐  │
+│  │   Paperless      │   │    rclone     │  │
+│  │   Container      │◄──►  Sidecar      │  │
+│  │                  │   │   Container   │  │
+│  └──────────────────┘   └───────────────┘  │
+│           ▲                      │          │
+│           │                      ▼          │
+│      /data (1Gi)          /mnt/media       │
+│        emptyDir            emptyDir        │
+│                                 │          │
+│                         [mount propagation]
+│                                 │          │
+│                            /media         │
+│                              PVC          │
+└─────────────────────────────────────────────┘
+           │
+           │ S3 API (HTTP)
+           ▼
+┌─────────────────────────────────────────────┐
+│        MinIO StatefulSet (1 Replica)        │
+├─────────────────────────────────────────────┤
+│  • S3 API Endpoint: minio:9000              │
+│  • Console UI: minio:9001                   │
+│  • Storage: 20Gi PersistentVolume           │
+│  • Bucket: paperless-media                  │
+└─────────────────────────────────────────────┘
+```
+
+### Component Details
+
+**MinIO StatefulSet:**
+- Single-replica MinIO server providing S3 API
+- Stores document media in persistent storage
+- Exposes S3 API on port 9000
+- Includes web console on port 9001
+- Health checks (liveness/readiness probes)
+- Resource limits: 512Mi-1Gi memory, 500m-1 CPU
+
+**rclone Sidecar:**
+- Mounts MinIO bucket as a filesystem
+- Uses FUSE to present S3 storage as directory
+- Handles authentication via environment variables
+- Enables seamless file access from Paperless container
+
+**Bucket Initialization:**
+- Automated job creates `paperless-media` bucket
+- Runs after MinIO is healthy
+- Idempotent operation (safe to re-run)
+- Uses MinIO client (mc) container image
+
+### Credentials Configuration
+
+MinIO requires root credentials stored in secrets:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: paless-secret
+type: Opaque
+stringData:
+  minio-root-user: minioadmin      # Change in production
+  minio-root-password: minioadmin  # Change in production
+```
+
+:::warning Credentials
+Never commit credentials to version control. Use a secrets management tool (e.g., Sealed Secrets, External Secrets Operator) in production.
+:::
+
+### Development Console Access
+
+In development environments, access MinIO console via NodePort:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-console
+spec:
+  type: NodePort
+  selector:
+    app: minio
+  ports:
+    - port: 9001
+      targetPort: 9001
+      nodePort: 30090
+```
+
+Access at: `http://localhost:30090` with credentials from secret.
+
+### Storage Class
+
+MinIO uses the `local-path` storage class for its data:
+
+```yaml
+volumeClaimTemplates:
+  - metadata:
+      name: minio-data
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 20Gi
+```
+
+For production, replace with your cloud provider's storage class (e.g., `ebs-sc`, `standard`).
+
 ## Production Considerations
 
 ### Storage Classes

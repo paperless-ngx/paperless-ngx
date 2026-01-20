@@ -234,6 +234,155 @@ spec:
       storage: 5Gi
 ```
 
+## MinIO S3 Object Storage for Media
+
+Paperless NGX integrates with MinIO for scalable, S3-compatible media storage. This architecture separates application data (database) from media storage (documents).
+
+### Volume Structure with MinIO
+
+```
+Paperless Pod
+├── /usr/src/paperless/data/ (1Gi PVC) ← Database & app state
+├── /usr/src/paperless/media/ (emptyDir) ← Mount point
+│   └── [via rclone mount to MinIO bucket]
+└── rclone Sidecar
+    └── S3 mount: minio:9000/paperless-media
+
+MinIO StatefulSet
+└── /data/ (20Gi PVC) ← Persistent S3 storage
+    └── paperless-media bucket
+```
+
+### MinIO StatefulSet Configuration
+
+**Storage Class:** `local-path` (dev) or cloud provider class (production)
+
+**Volumes:**
+```yaml
+volumeClaimTemplates:
+  - metadata:
+      name: minio-data
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-path  # Change for production
+      resources:
+        requests:
+          storage: 20Gi
+```
+
+**Resource Limits:**
+- Memory: 512Mi (requests) → 1Gi (limits)
+- CPU: 500m (requests) → 1000m (limits)
+
+### rclone Sidecar Configuration
+
+The rclone container mounts the MinIO bucket as a FUSE filesystem:
+
+**Mount Configuration:**
+```bash
+rclone mount minio:paperless-media /mnt/media \
+  --vfs-cache-mode full \
+  --allow-other \
+  --daemon
+```
+
+**Settings Explained:**
+- `vfs-cache-mode full`: Full caching of remote files locally
+- `--allow-other`: Permits other containers to access mount
+- `--daemon`: Runs in background
+- `mountPropagation: Bidirectional`: Allows mount events to propagate
+
+**Environment Variables:**
+```yaml
+- name: AWS_ACCESS_KEY_ID
+  valueFrom:
+    secretKeyRef:
+      name: paless-secret
+      key: minio-root-user
+- name: AWS_SECRET_ACCESS_KEY
+  valueFrom:
+    secretKeyRef:
+      name: paless-secret
+      key: minio-root-password
+```
+
+### Bucket Initialization
+
+MinIO uses an automated Job to initialize the `paperless-media` bucket:
+
+**Key Features:**
+- Runs after MinIO is healthy
+- Uses `minio/mc` (MinIO client) container
+- Idempotent: Safe to run multiple times
+- Includes health check before bucket creation
+
+**Initialization Steps:**
+```bash
+# Wait for MinIO health endpoint
+mc alias set minio http://minio:9000 $USER $PASS
+
+# Create bucket (idempotent)
+mc mb minio/paperless-media || true
+```
+
+### Credentials Management
+
+MinIO credentials stored in Kubernetes Secret:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: paless-secret
+type: Opaque
+stringData:
+  minio-root-user: minioadmin
+  minio-root-password: minioadmin
+```
+
+:::warning Security
+Default credentials `minioadmin/minioadmin` are for development only. In production:
+1. Use strong, randomly-generated credentials
+2. Rotate credentials regularly
+3. Store in secure vault (e.g., Sealed Secrets, External Secrets)
+4. Never commit to version control
+:::
+
+### Console Access
+
+**Internal Access:**
+- Service: `minio:9001`
+- Port: 9001
+- Use pod's service DNS name
+
+**Development NodePort:**
+- Service Type: `NodePort`
+- Port Mapping: 9001 → 30090
+- Access URL: `http://localhost:30090`
+
+**Production:**
+- Use Ingress controller to expose console
+- Implement authentication (OAuth, OIDC)
+- Use HTTPS/TLS
+
+### Storage Growth Planning
+
+**MinIO Bucket Sizing:**
+
+| Document Volume | Bucket Size | Growth Rate |
+|-----------------|------------|------------|
+| < 10,000 docs | 20Gi | ~2-5MB per document |
+| 10,000-50,000 | 50Gi | ~2-5MB per document |
+| > 50,000 docs | 100Gi+ | ~2-5MB per document |
+
+**Expansion Example:**
+```bash
+# Expand MinIO storage
+kubectl patch pvc minio-data-0 -p \
+  '{"spec":{"resources":{"requests":{"storage":"50Gi"}}}}'
+```
+
 ## Access Modes
 
 Paperless NGX requires `ReadWriteOnce` (RWO) access:
@@ -245,7 +394,7 @@ Paperless NGX requires `ReadWriteOnce` (RWO) access:
 | ReadWriteMany | RWX | Multiple pods read/write | Distributed systems |
 
 :::note Access Modes
-Paperless NGX pods cannot share storage simultaneously. Use external backup solutions (e.g., rclone) to share media across systems.
+Paperless NGX pods cannot share storage simultaneously. Use external backup solutions (e.g., rclone, MinIO replication) to share media across systems.
 :::
 
 ## Capacity Management
@@ -393,6 +542,128 @@ df -h /tmp/paperless-*
 
 # Clean up old data if using hostPath
 # For production, increase volume size instead
+```
+
+### MinIO Not Ready
+
+```bash
+# Check MinIO pod status
+kubectl get pods -l app=minio
+kubectl describe pod -l app=minio
+
+# Check MinIO logs
+kubectl logs -l app=minio
+kubectl logs -l app=minio --previous
+
+# Test health endpoint
+kubectl exec deployment/paperless -c rclone -- \
+  curl http://minio:9000/minio/health/live
+
+# Verify service DNS resolution
+kubectl exec deployment/paperless -c rclone -- nslookup minio
+```
+
+### Bucket Initialization Job Failed
+
+```bash
+# Check job status
+kubectl get jobs minio-init
+kubectl describe job minio-init
+
+# Check job logs
+kubectl logs job/minio-init
+
+# Check for pod creation errors
+kubectl get pods -l job-name=minio-init
+kubectl describe pod -l job-name=minio-init
+
+# Re-run job if needed
+kubectl delete job minio-init
+kubectl apply -f minio-init-job.yaml
+```
+
+### rclone Mount Not Working
+
+```bash
+# Check rclone sidecar logs
+kubectl logs deployment/paperless -c rclone
+
+# Verify rclone configuration
+kubectl exec deployment/paperless -c rclone -- cat /config/rclone/rclone.conf
+
+# Check if mount is active
+kubectl exec deployment/paperless -c rclone -- mount | grep minio
+
+# Verify mount in main container
+kubectl exec deployment/paperless -c paperless -- ls -la /usr/src/paperless/media
+
+# Test S3 connectivity
+kubectl exec deployment/paperless -c rclone -- \
+  rclone lsd minio:
+
+# Check rclone VFS cache
+kubectl exec deployment/paperless -c rclone -- ls -la /mnt/media
+```
+
+### Media Files Not Accessible from Paperless
+
+```bash
+# Verify mount propagation
+kubectl get pod deployment/paperless -o jsonpath='{.spec.containers[1].volumeMounts[?(@.name=="media")].mountPropagation}'
+
+# Should return: Bidirectional
+
+# Check file permissions
+kubectl exec deployment/paperless -c paperless -- stat /usr/src/paperless/media
+
+# Verify emptyDir volume is shared
+kubectl get pod deployment/paperless -o yaml | grep -A 10 "emptyDir"
+
+# Test write access
+kubectl exec deployment/paperless -c paperless -- \
+  touch /usr/src/paperless/media/test.txt
+
+# Verify file appears in MinIO
+kubectl exec deployment/paperless -c rclone -- \
+  rclone ls minio:paperless-media
+```
+
+### S3 API Connection Failed
+
+```bash
+# Check network connectivity
+kubectl exec deployment/paperless -c paperless -- ping minio
+
+# Verify service endpoints
+kubectl get endpoints minio
+
+# Test S3 API endpoint
+kubectl exec deployment/paperless -c rclone -- \
+  curl -v http://minio:9000
+
+# Check credentials
+kubectl get secret paless-secret -o jsonpath='{.data.minio-root-user}' | base64 -d
+kubectl get secret paless-secret -o jsonpath='{.data.minio-root-password}' | base64 -d
+```
+
+### Storage Class Not Found
+
+```bash
+# List available storage classes
+kubectl get storageclass
+
+# For development, create manual storage class
+kubectl apply -f - <<EOF
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-path
+provisioner: rancher.io/local-path
+volumeBindingMode: WaitForFirstConsumer
+EOF
+
+# Check if MinIO is using correct storage class
+kubectl get pvc minio-data-0 -o jsonpath='{.spec.storageClassName}'
 ```
 
 ## Best Practices
