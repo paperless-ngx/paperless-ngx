@@ -1116,7 +1116,13 @@ See [Quick Start](./quickstart.md#troubleshooting-deploy-script-issues) for comm
 
 **Recommendation**: Use the script for development and CI/CD pipelines. Use manual steps for understanding and debugging complex deployments.
 
-## References
+## Related Documentation
+
+- [PostgreSQL StatefulSet Guide](./postgres-statefulset.md) - Complete PostgreSQL deployment and multi-tenancy configuration
+- [MinIO Multi-Tenant Storage](./minio-multi-tenant.md) - Per-tenant bucket isolation strategy
+- [Volume Configuration](./volume-configuration.md) - PersistentVolume and PersistentVolumeClaim reference
+
+## External References
 
 - [Kubernetes Persistent Volumes Documentation](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
 - [Persistent Volume Claims Guide](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims)

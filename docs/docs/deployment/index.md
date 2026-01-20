@@ -47,6 +47,17 @@ Comprehensive guide to Kubernetes deployment architecture and best practices.
 - Backup and recovery procedures
 - Production considerations
 
+### [PostgreSQL StatefulSet](./postgres-statefulset.md)
+Deploy and manage PostgreSQL as a Kubernetes StatefulSet for multi-tenant support.
+
+- StatefulSet architecture and networking
+- Deployment and configuration procedures
+- Resource allocation and performance tuning
+- Multi-tenancy support with uuid-ossp and pgcrypto extensions
+- Administration, backup, and monitoring
+- Production HA setup and scaling considerations
+- Troubleshooting guide
+
 ### [Volume Configuration](./volume-configuration.md)
 Detailed reference for persistent volume and persistent volume claim configuration.
 
@@ -113,6 +124,9 @@ volumes:
 
 **Understand the deployment architecture**
 → Read [Kubernetes Deployment Guide](./kubernetes-guide.md)
+
+**Configure PostgreSQL StatefulSet for multi-tenancy**
+→ Follow [PostgreSQL StatefulSet Guide](./postgres-statefulset.md)
 
 **Configure volumes for specific scenarios**
 → Refer to [Volume Configuration](./volume-configuration.md)
