@@ -1,5 +1,5 @@
 ---
-sidebar_position: 4
+sidebar_position: 6
 title: PostgreSQL StatefulSet
 description: Deploy and configure PostgreSQL as a StatefulSet for Paperless NGX multi-tenancy
 ---

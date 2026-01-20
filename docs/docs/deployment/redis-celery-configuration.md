@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 5
 title: Redis and Celery Configuration
 description: Configure Redis as Celery broker and task queue for multi-tenant deployments
 ---

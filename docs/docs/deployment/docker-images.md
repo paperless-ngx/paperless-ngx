@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 title: Docker Image Architecture
 description: Separated Docker images for web, worker, and scheduler components
 ---

@@ -1,3 +1,9 @@
+---
+sidebar_position: 7
+title: MinIO Multi-Tenant Storage
+description: Configure MinIO for per-tenant bucket isolation and multi-tenant document storage
+---
+
 # MinIO Multi-Tenant Storage Configuration
 
 This document describes the MinIO configuration for per-tenant bucket isolation in Paless.
@@ -55,8 +61,12 @@ Use the provided script to create tenant buckets:
 ```
 
 ### Performance
+
+:::info Bucket Creation Speed
 - Bucket creation time: **< 5 seconds**
 - Script includes automatic verification
+- No dependencies on external services
+:::
 
 ### Manual Provisioning (kubectl)
 If needed, you can manually create buckets:
@@ -80,6 +90,10 @@ MinIO supports bucket-level IAM policies for strict tenant isolation:
 
 1. **Default Configuration**: Root user has access to all buckets
 2. **Production Setup**: Create per-tenant IAM users with restricted policies
+
+:::warning Production Security
+For production deployments, always configure per-tenant IAM users with restricted bucket access policies. Never use root credentials in production applications.
+:::
 
 ### Example Tenant Policy
 ```json
@@ -124,10 +138,15 @@ command: rclone mount minio:paperless-${TENANT_ID} /mnt/media ...
 ```
 
 ### Dynamic Tenant Routing
+
+:::tip Multi-Tenant Bucket Routing
 In a true multi-tenant deployment:
 1. Each pod instance is assigned to a specific tenant
 2. The `TENANT_ID` environment variable determines which bucket to mount
 3. rclone mounts the appropriate `paperless-${TENANT_ID}` bucket
+
+This approach ensures complete data isolation and independent scaling per tenant.
+:::
 
 ## Storage Management
 
@@ -237,3 +256,9 @@ kubectl patch pvc minio-data-minio-0 -n paless -p '{"spec":{"resources":{"reques
 - [MinIO Documentation](https://min.io/docs/)
 - [MinIO Client (mc) Guide](https://min.io/docs/minio/linux/reference/minio-mc.html)
 - [rclone MinIO Configuration](https://rclone.org/s3/#minio)
+
+---
+
+**Last Updated**: 2026-01-20
+
+For questions about MinIO configuration or multi-tenant setup, refer to the [MinIO documentation](https://min.io/docs/) or check the troubleshooting section above.

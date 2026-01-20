@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 title: Kubernetes Deployment Guide
 description: Deploy Paperless NGX on Kubernetes with persistent volume management
 ---

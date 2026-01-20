@@ -68,6 +68,16 @@ Deploy and manage PostgreSQL as a Kubernetes StatefulSet for multi-tenant suppor
 - Production HA setup and scaling considerations
 - Troubleshooting guide
 
+### [MinIO Multi-Tenant Storage](./minio-multi-tenant.md)
+Configure MinIO for per-tenant bucket isolation and secure multi-tenant document storage.
+
+- Bucket naming conventions and tenant ID requirements
+- MinIO StatefulSet configuration and provisioning
+- Per-tenant bucket isolation and access control
+- rclone sidecar compatibility for multi-tenant deployments
+- Storage management and testing procedures
+- Production recommendations and best practices
+
 ### [Volume Configuration](./volume-configuration.md)
 Detailed reference for persistent volume and persistent volume claim configuration.
 
@@ -144,6 +154,12 @@ volumes:
 **Configure PostgreSQL StatefulSet for multi-tenancy**
 → Follow [PostgreSQL StatefulSet Guide](./postgres-statefulset.md)
 
+**Configure MinIO for multi-tenant object storage**
+→ Follow [MinIO Multi-Tenant Storage](./minio-multi-tenant.md)
+
+**Set up per-tenant bucket isolation**
+→ See [Bucket Isolation](./minio-multi-tenant.md#bucket-isolation) section in MinIO guide
+
 **Configure volumes for specific scenarios**
 → Refer to [Volume Configuration](./volume-configuration.md)
 
@@ -181,9 +197,12 @@ Kubernetes Cluster
 │       └── Container: paless-scheduler (Celery beat)
 ├── Services
 │   ├── paperless (LoadBalancer → web tier)
-│   ├── redis
-│   └── postgres
-└── Optional: MinIO storage with rclone sidecars
+│   ├── redis (StatefulSet)
+│   ├── postgres (StatefulSet)
+│   └── minio (StatefulSet, optional)
+├── Storage Classes
+│   └── local-path (for PV backend)
+└── Optional: MinIO StatefulSet with per-tenant buckets and rclone sidecars
 ```
 
 :::info Separated Components
@@ -227,9 +246,10 @@ Before deploying to production:
 Paperless NGX in Kubernetes typically integrates with:
 
 - **Storage Backend**: Local hostPath (dev), NFS (test), Cloud storage (production)
-- **Message Queue**: Redis (included in standard deployment)
+- **Message Queue**: Redis StatefulSet (included in standard deployment)
+- **Database**: PostgreSQL StatefulSet (multi-tenant ready)
+- **Object Storage**: MinIO StatefulSet with per-tenant bucket isolation (optional, multi-tenant ready)
 - **Optional Services**: Apache Tika, Gotenberg (for document processing)
-- **Object Storage**: MinIO (via rclone sidecar)
 
 ## Support and Resources
 
