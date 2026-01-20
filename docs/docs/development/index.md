@@ -10,6 +10,17 @@ Welcome to the Paperless NGX development guides. This section covers tools, proc
 
 ## Available Guides
 
+### [Development Container Setup](./devcontainer-setup.md)
+Set up VSCode DevContainer for consistent, containerized development environment.
+
+- DevContainer configuration overview
+- Getting started with VSCode integration
+- Pre-configured debugging and tasks
+- Services (Redis, Gotenberg, Tika)
+- Database options (SQLite, PostgreSQL)
+- Running tests and managing dependencies
+- Troubleshooting and performance tuning
+
 ### [Codecov Configuration](./codecov-configuration.md)
 Manage code coverage tracking across backend and frontend components.
 
@@ -24,6 +35,18 @@ Manage code coverage tracking across backend and frontend components.
 
 ### I want to...
 
+**Set up my development environment**
+→ Read [Development Container Setup](./devcontainer-setup.md)
+
+**Start backend services for development**
+→ See [Debugging and Running Services](./devcontainer-setup.md#available-vscode-configurations) in DevContainer Setup
+
+**Debug Python or TypeScript code**
+→ Follow [Available VSCode Configurations](./devcontainer-setup.md#available-vscode-configurations) for debugging setup
+
+**Run tests and check coverage**
+→ See [Running Tests](./devcontainer-setup.md#running-tests) in DevContainer Setup
+
 **Understand code coverage requirements**
 → Read [Codecov Configuration](./codecov-configuration.md)
 
@@ -36,12 +59,14 @@ Manage code coverage tracking across backend and frontend components.
 **Adjust coverage thresholds**
 → See [Adjusting Coverage Thresholds](./codecov-configuration.md#adjusting-coverage-thresholds)
 
-## Development Environment
+## Development Stack
 
-For setting up a development environment:
-- Backend: Python with Django and Celery
-- Frontend: TypeScript with React and Angular
-- See DevContainer Setup in the repository root (.devcontainer/README.md)
+Paperless NGX development uses:
+- **Backend**: Python with Django and Celery
+- **Frontend**: TypeScript with React and Angular
+- **Database**: SQLite (development) or PostgreSQL (production-like)
+- **Message Queue**: Redis
+- **Development Tools**: VSCode, DevContainers, Docker Compose
 
 ## Testing
 

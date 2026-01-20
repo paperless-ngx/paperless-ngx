@@ -1,5 +1,5 @@
 ---
-sidebar_position: 4
+sidebar_position: 3
 title: Codecov Configuration
 description: Code coverage management with Codecov components and flags
 ---
