@@ -32,8 +32,9 @@ The deployment uses persistent volume claims to ensure data survives pod restart
 
 - Kubernetes 1.20+ cluster
 - kubectl configured with cluster access
-- At least 3Gi total storage available
+- At least 23Gi total storage available (3Gi for Paperless + 20Gi for MinIO)
 - Kustomize (if using kustomization approach)
+- MinIO credentials configured in secrets (see [Credentials Configuration](#credentials-configuration))
 
 ### Step 1: Create Persistent Volumes (Development)
 
@@ -137,6 +138,39 @@ spec:
             claimName: paperless-media-pvc
 ```
 
+### Step 4: Deploy MinIO and Initialize Buckets
+
+When deploying with MinIO S3 object storage, follow the correct deployment order:
+
+1. **Create Secrets** - MinIO requires credentials
+   ```bash
+   kubectl apply -f secrets.yaml
+   ```
+
+2. **Deploy MinIO StatefulSet** - Object storage backend
+   ```bash
+   kubectl apply -f minio-statefulset.yaml
+   ```
+
+3. **Deploy MinIO Service** - Network access to MinIO
+   ```bash
+   kubectl apply -f minio-service.yaml
+   ```
+
+4. **Deploy Bucket Initialization Job** - Creates paperless-media bucket
+   ```bash
+   kubectl apply -f minio-init-job.yaml
+   ```
+
+5. **Deploy Paperless Application** - After MinIO and bucket are ready
+   ```bash
+   kubectl apply -f paperless-deployment.yaml
+   ```
+
+:::tip Deployment Automation
+Use Kustomization or Helm to automate this deployment order. These tools handle dependencies and resource ordering automatically.
+:::
+
 ## Data Persistence Strategy
 
 ### Before: emptyDir Volumes
@@ -231,11 +265,13 @@ Paperless NGX integrates with MinIO to provide S3-compatible object storage for 
 - Handles authentication via environment variables
 - Enables seamless file access from Paperless container
 
-**Bucket Initialization:**
-- Automated job creates `paperless-media` bucket
-- Runs after MinIO is healthy
+**Bucket Initialization Job:**
+- Automated Kubernetes Job creates `paperless-media` bucket
+- Runs after MinIO is healthy (uses init container for health checks)
 - Idempotent operation (safe to re-run)
 - Uses MinIO client (mc) container image
+- Implements backoff retry logic for failure handling
+- Properly configured tolerations for disk-pressure node conditions
 
 ### Credentials Configuration
 
@@ -276,6 +312,119 @@ spec:
 ```
 
 Access at: `http://localhost:30090` with credentials from secret.
+
+### Bucket Initialization Job Configuration
+
+The bucket initialization is handled by a dedicated Kubernetes Job that automatically creates the required `paperless-media` bucket in MinIO. This job runs once per deployment and is idempotent, making it safe to re-run.
+
+#### Job Workflow
+
+1. **Init Container**: Waits for MinIO to become ready
+   - Uses health check endpoint: `http://minio:9000/minio/health/ready`
+   - Retries every 5 seconds until MinIO is available
+   - Ensures bucket creation only happens when MinIO is stable
+
+2. **Main Container**: Creates the bucket
+   - Configures MinIO client alias with provided credentials
+   - Creates `paperless-media` bucket (idempotent - skips if exists)
+   - Verifies bucket creation with listing
+
+#### Job Configuration Example
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-init
+  labels:
+    app: minio-init
+    app.kubernetes.io/component: init
+    app.kubernetes.io/part-of: paless
+spec:
+  backoffLimit: 3  # Retry up to 3 times on failure
+  template:
+    metadata:
+      labels:
+        app: minio-init
+    spec:
+      restartPolicy: OnFailure
+      tolerations:
+      - key: node.kubernetes.io/disk-pressure
+        operator: Exists
+        effect: NoSchedule
+      initContainers:
+      - name: wait-for-minio
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - |
+          echo "Waiting for MinIO to be ready..."
+          until wget --spider -q http://minio:9000/minio/health/ready; do
+            echo "MinIO is not ready. Retrying in 5 seconds..."
+            sleep 5
+          done
+          echo "MinIO is ready!"
+      containers:
+      - name: minio-client
+        image: minio/mc:latest
+        env:
+        - name: MINIO_ROOT_USER
+          valueFrom:
+            secretKeyRef:
+              name: paless-secret
+              key: minio-root-user
+        - name: MINIO_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: paless-secret
+              key: minio-root-password
+        command:
+        - sh
+        - -c
+        - |
+          set -e
+          echo "Configuring MinIO client alias..."
+          mc alias set minio http://minio:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD"
+
+          echo "Creating bucket 'paperless-media' if it doesn't exist..."
+          mc mb --ignore-existing minio/paperless-media
+
+          echo "Bucket initialization complete!"
+          mc ls minio/ | grep paperless-media
+          echo "Verified: paperless-media bucket exists"
+```
+
+:::info Idempotent Operation
+The `--ignore-existing` flag in the `mc mb` command makes bucket creation idempotent. The job can be re-run without error if the bucket already exists. This is essential for Kubernetes' at-least-once delivery semantics.
+:::
+
+#### Job Failure Handling
+
+- **backoffLimit: 3**: Job will retry up to 3 times before marking as failed
+- **restartPolicy: OnFailure**: Failed pods are restarted within the job
+- **tolerations**: Job can run on nodes with disk pressure conditions
+- **Init container health check**: Ensures MinIO is ready before bucket creation
+
+#### Monitoring Job Status
+
+```bash
+# Check job status
+kubectl get job minio-init
+
+# View job logs
+kubectl logs job/minio-init
+
+# Describe job for detailed information
+kubectl describe job minio-init
+
+# View completed job pods
+kubectl get pods --selector=job-name=minio-init
+```
+
+:::warning Job Dependencies
+The minio-init Job should be deployed after the MinIO StatefulSet. Use proper ordering in your Kustomization or Helm chart to ensure correct deployment sequence.
+:::
 
 ### Storage Class
 
