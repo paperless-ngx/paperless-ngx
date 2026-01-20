@@ -6,6 +6,39 @@ from django.utils.translation import gettext_lazy as _
 DEFAULT_SINGLETON_INSTANCE_ID = 1
 
 
+class Tenant(models.Model):
+    """
+    Multi-tenant model for subdomain-based tenant isolation.
+    """
+    name = models.CharField(
+        max_length=255,
+        verbose_name=_("Tenant Name"),
+        help_text=_("Human-readable name for the tenant"),
+    )
+    subdomain = models.CharField(
+        max_length=63,
+        unique=True,
+        db_index=True,
+        verbose_name=_("Subdomain"),
+        help_text=_("Unique subdomain for this tenant (e.g., 'tenant-a')"),
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name=_("Is Active"),
+        help_text=_("Whether this tenant is active and can be accessed"),
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("Tenant")
+        verbose_name_plural = _("Tenants")
+        ordering = ["subdomain"]
+
+    def __str__(self):
+        return f"{self.name} ({self.subdomain})"
+
+
 class AbstractSingletonModel(models.Model):
     class Meta:
         abstract = True
