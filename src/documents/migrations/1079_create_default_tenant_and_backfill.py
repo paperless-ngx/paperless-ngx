@@ -8,21 +8,14 @@ def create_default_tenant_and_backfill(apps, schema_editor):
     """
     Create a default tenant and assign all existing records to it.
     """
-    # Get the Tenant model
-    Tenant = apps.get_model('documents', 'Tenant')
+    # Get the Tenant model from paperless app
+    Tenant = apps.get_model('paperless', 'Tenant')
 
     # Create default tenant if it doesn't exist
     default_tenant, created = Tenant.objects.get_or_create(
         subdomain='default',
         defaults={
             'name': 'Default Tenant',
-            'region': 'us',
-            'max_storage_gb': 10,
-            'max_documents': 10000,
-            'max_users': 10,
-            'theme_color': '#17541f',
-            'app_title': 'Paperless-ngx',
-            'is_active': True,
         }
     )
 

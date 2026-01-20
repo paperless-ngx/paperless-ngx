@@ -20,30 +20,26 @@ for the current development stage but **must be resolved before production**.
 |----------|-------|
 | Critical | 0 |
 | High     | 2 |
-| Medium   | 3 |
-| Low      | 3 |
-| Info     | 2 |
+| Medium   | 2 |
+| Low      | 1 |
+| Info     | 1 |
 
 ---
 
 ## Deferred Findings by Task
 
-### Task: 0a156b7f...
+### Task: e239d66d...
 
 **Date**: 2026-01-20
 **Stage**: dev
-**Description**: Deploy separated web, worker, and scheduler components to K3s and verify they work together correctl
+**Description**: Add tenant_id column to all models inheriting from ModelWithOwner and create data migration
 
 | Severity | Category | Description | Location |
 |----------|----------|-------------|----------|
-| HIGH | A05:2021 - Security Misconfiguration | Ingress allows access without host header validation (fallback rule at lines 24- | `k8s/base/web-ingress.yaml:24-32` |
-| HIGH | A05:2021 - Security Misconfiguration | Ingress lacks TLS configuration, exposing all traffic including authentication c | `k8s/base/web-ingress.yaml:1-33` |
-| MEDIUM | A05:2021 - Security Misconfiguration | Ingress missing security-related annotations: rate limiting to prevent brute for | `k8s/base/web-ingress.yaml:8-10` |
-| MEDIUM | A09:2021 - Security Logging and Monitoring Failures | No Ingress access logging configuration or monitoring alerts. Unable to detect o | `k8s/base/web-ingress.yaml:1-33` |
-| MEDIUM | A05:2021 - Security Misconfiguration | All three deployments (web, worker, scheduler) use privileged: true for rclone s | `k8s/base/paless-web-deployment.yaml:74, k8s/base/paless-worker-deployment.yaml:54, k8s/base/paless-scheduler-deployment.yaml:54` |
-| LOW | A05:2021 - Security Misconfiguration | Ingress proxy-body-size set to 100m allows large upload sizes which could be use | `k8s/base/web-ingress.yaml:10` |
-| LOW | A05:2021 - Security Misconfiguration | Deployments lack pod-level security contexts (runAsNonRoot, runAsUser, fsGroup). | `k8s/base/paless-web-deployment.yaml:19-24, k8s/base/paless-worker-deployment.yaml:19-24, k8s/base/paless-scheduler-deployment.yaml:19-24` |
-| LOW | A05:2021 - Security Misconfiguration | HPA configurations lack resource limits validation. If CPU/memory metrics fail o | `k8s/base/web-hpa.yaml:14, k8s/base/worker-hpa.yaml:14` |
-| INFO | A04:2021 - Insecure Design | Ingress uses local domain (paless.local) suitable for DEV but will need proper D | `k8s/base/web-ingress.yaml:14` |
-| INFO | A05:2021 - Security Misconfiguration | All three deployments use imagePullPolicy: Always with localhost:5000 registry.  | `k8s/base/paless-web-deployment.yaml:27, k8s/base/paless-worker-deployment.yaml:27, k8s/base/paless-scheduler-deployment.yaml:27` |
+| HIGH | A01:2021 - Broken Access Control (OWASP) | No row-level security enforcement for foreign key relationships. Models like Doc | `src/documents/models.py:206-241` |
+| HIGH | A03:2021 - Injection (OWASP) | Data migration uses filter() + update() pattern which is vulnerable to race cond | `src/documents/migrations/1079_create_default_tenant_and_backfill.py:41-47` |
+| MEDIUM | A01:2021 - Broken Access Control (OWASP) | ManyToManyField relationships lack tenant isolation. Document.tags, WorkflowActi | `src/documents/models.py:254-259` |
+| MEDIUM | A09:2021 - Security Logging and Monitoring Failures (OWASP) | Missing audit logging for tenant context changes. Thread-local tenant_id changes | `src/documents/models.py:43-50` |
+| LOW | A04:2021 - Insecure Design (OWASP) | ModelWithOwner.tenant_id allows null=True in model definition, contradicting the | `src/documents/models.py:63-67` |
+| INFO | Security Best Practice | Verification script uses kubectl exec to run Python code in production pods. Whi | `verify_tenant_id_implementation.sh:86-170` |
 
