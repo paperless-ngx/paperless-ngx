@@ -1,47 +1,71 @@
 ---
-sidebar_position: 1
+sidebar_position: 0
 ---
 
-# Tutorial Intro
+# Paperless NGX Documentation
 
-Let's discover **Docusaurus in less than 5 minutes**.
+Welcome to the comprehensive documentation for Paperless NGX. This site contains guides for deploying, configuring, and developing Paperless NGX.
 
-## Getting Started
+## Documentation Sections
 
-Get started by **creating a new site**.
+### [Deployment Guides](./deployment/index.md)
+Learn how to deploy and manage Paperless NGX on Kubernetes with persistent storage, including:
+- Docker image architecture (web, worker, scheduler components)
+- Kubernetes deployment strategies
+- PostgreSQL and MinIO configuration
+- Volume management and data persistence
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+### [Development Guides](./development/index.md)
+Documentation for development and contribution, including:
+- Code coverage tracking with Codecov
+- Testing requirements and practices
+- CI/CD integration
 
-### What you'll need
+## Quick Start
 
-- [Node.js](https://nodejs.org/en/download/) version 20.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+**New to Paperless NGX?**
+→ Start with [Kubernetes Deployment Guide](./deployment/kubernetes-guide.md) or [Quick Start](./deployment/quickstart.md)
 
-## Generate a new site
+**Contributing code?**
+→ See [Development Documentation](./development/index.md) and the Contributing Guide in the repository root
 
-Generate a new Docusaurus site using the **classic template**.
+**Troubleshooting deployment issues?**
+→ Check the troubleshooting sections in relevant deployment guides
 
-The classic template will automatically be added to your project after you run the command:
+## Architecture Overview
 
-```bash
-npm init docusaurus@latest my-website classic
+```
+Paperless NGX (Kubernetes Deployment)
+├── Web Component (paless-web)
+│   └── Granian HTTP server + API
+├── Worker Component (paless-worker)
+│   └── Celery task processing
+├── Scheduler Component (paless-scheduler)
+│   └── Celery beat periodic jobs
+├── PostgreSQL Database
+├── Redis Message Queue
+└── Optional: MinIO Object Storage
 ```
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
+## Key Features
 
-The command also installs all necessary dependencies you need to run Docusaurus.
+- **Separated Components**: Web, worker, and scheduler run as independent Kubernetes deployments
+- **Persistent Storage**: Reliable data persistence with Kubernetes PVCs
+- **Multi-Tenancy**: Database support for multiple tenants via PostgreSQL extensions
+- **S3-Compatible Storage**: Optional MinIO integration for document storage
+- **Code Coverage Tracking**: Comprehensive coverage monitoring across backend and frontend
 
-## Start your site
+## Technology Stack
 
-Run the development server:
+- **Backend**: Python 3.10+, Django, Celery
+- **Frontend**: TypeScript, React
+- **Container Platform**: Kubernetes (k8s)
+- **Databases**: PostgreSQL
+- **Message Queue**: Redis
+- **Optional Storage**: MinIO (S3-compatible)
 
-```bash
-cd my-website
-npm run start
-```
+---
 
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
+Last Updated: 2026-01-20
 
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
-
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+For the latest information, visit the [Paperless NGX GitHub Repository](https://github.com/paperless-ngx/paperless-ngx).

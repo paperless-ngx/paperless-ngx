@@ -473,4 +473,3 @@ kubectl edit statefulset postgres -n paless
 - [Volume Configuration Guide](./volume-configuration.md) - PersistentVolume and PersistentVolumeClaim setup
 - [Kubernetes Deployment Guide](./kubernetes-guide.md) - Complete multi-service deployment
 - [Configuration Management](./configuration.md) - Environment variables and secrets
-- [Multi-Tenant Preparation Report](../database/multi-tenant-preparation-report.md) - Database readiness assessment
