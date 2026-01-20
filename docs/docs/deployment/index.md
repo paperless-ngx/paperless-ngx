@@ -30,6 +30,16 @@ Central configuration file documentation for all deployment settings.
 - Security checklist and best practices
 - Secrets management and environment-specific overrides
 
+### [Redis and Celery Configuration](./redis-celery-configuration.md)
+Configure Redis as Celery broker and manage task queuing for multi-tenant deployments.
+
+- Redis connectivity and URL formats
+- Celery broker and result backend configuration
+- Multi-tenant task queue isolation
+- Worker and performance tuning
+- Health monitoring and troubleshooting
+- Security best practices
+
 ### [Quick Start](./quickstart.md)
 Get Paperless NGX running on Kubernetes in minutes with persistent storage. Perfect for developers and operators new to the system.
 
@@ -118,6 +128,12 @@ volumes:
 
 **Configure environment settings**
 → Read [Configuration Management](./configuration.md)
+
+**Configure Redis and Celery for task queuing**
+→ Read [Redis and Celery Configuration](./redis-celery-configuration.md)
+
+**Set up multi-tenant task queuing**
+→ See [Multi-Tenant Task Queuing](./redis-celery-configuration.md#multi-tenant-task-queuing) section
 
 **Deploy Paperless NGX quickly**
 → Start with [Quick Start](./quickstart.md)
