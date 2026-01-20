@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rclone-config
+  labels:
+    app: paperless
+    app.kubernetes.io/name: paperless
+    app.kubernetes.io/component: storage
+data:
+  rclone.conf: |
+    [minio]
+    type = s3
+    provider = Minio
+    endpoint = http://minio:9000
+    env_auth = true
+    acl = private
