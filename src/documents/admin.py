@@ -15,6 +15,7 @@ from documents.models import SavedViewFilterRule
 from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Tenant
 from documents.tasks import update_document_parent_tags
 
 if settings.AUDIT_LOG_ENABLED:
@@ -207,6 +208,35 @@ class CustomFieldInstancesAdmin(GuardedModelAdmin):
         )
 
 
+class TenantAdmin(admin.ModelAdmin):
+    list_display = ("name", "subdomain", "region", "is_active", "created_at")
+    list_filter = ("region", "is_active", "created_at")
+    search_fields = ("name", "subdomain")
+    readonly_fields = ("id", "created_at", "updated_at", "storage_container")
+    fieldsets = (
+        ("Basic Information", {
+            "fields": ("id", "name", "subdomain", "region", "is_active")
+        }),
+        ("Limits", {
+            "fields": ("max_storage_gb", "max_documents", "max_users")
+        }),
+        ("Branding", {
+            "fields": ("theme_color", "app_title", "logo_url", "custom_css")
+        }),
+        ("Timestamps", {
+            "fields": ("created_at", "updated_at")
+        }),
+        ("Computed Fields", {
+            "fields": ("storage_container",)
+        }),
+    )
+
+    def storage_container(self, obj):
+        return obj.storage_container
+    storage_container.short_description = "Storage Container"
+
+
+admin.site.register(Tenant, TenantAdmin)
 admin.site.register(Correspondent, CorrespondentAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(DocumentType, DocumentTypeAdmin)
