@@ -20,6 +20,10 @@ spec:
         app.kubernetes.io/name: postgres
         app.kubernetes.io/component: database
     spec:
+      tolerations:
+      - key: node.kubernetes.io/disk-pressure
+        operator: Exists
+        effect: NoSchedule
       containers:
       - name: postgres
         image: postgres:18
