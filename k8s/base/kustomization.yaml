@@ -24,6 +24,9 @@ resources:
   - paless-worker-deployment.yaml
   - paless-scheduler-deployment.yaml
   - service.yaml
+  - web-service.yaml
+  - web-hpa.yaml
+  - worker-hpa.yaml
 
 # Optional: Use secretGenerator to create secrets from paless.env
 # Uncomment the following lines to use paless.env instead of paless-secret.yaml
