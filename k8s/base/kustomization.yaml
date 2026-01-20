@@ -12,6 +12,7 @@ resources:
   - redis-service.yaml
   - minio-statefulset.yaml
   - minio-service.yaml
+  - minio-init-job.yaml
   - configmap.yaml
   - paless-secret.yaml
   - pv-manual.yaml
