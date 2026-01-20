@@ -10,11 +10,16 @@ This guide covers deploying Paperless NGX on Kubernetes with proper persistent v
 
 ## Overview
 
-Paperless NGX requires two key volume types:
+Paperless NGX uses a separated component architecture with three independent deployments:
+- **Web Component** (`paless-web`): Handles HTTP requests and document uploads
+- **Worker Component** (`paless-worker`): Processes documents asynchronously (OCR, PDF generation)
+- **Scheduler Component** (`paless-scheduler`): Manages periodic tasks and maintenance operations
+
+All components share persistent storage through:
 - **Data volume** (`/usr/src/paperless/data`): Stores database and application state
 - **Media volume** (`/usr/src/paperless/media`): Stores scanned document files and processed media
 
-The deployment uses persistent volume claims to ensure data survives pod restarts and enables proper backup and recovery strategies.
+This separation provides better scalability, resource isolation, and independent restart capabilities while the deployment uses persistent volume claims to ensure data survives pod restarts and enables proper backup and recovery strategies.
 
 ## Volume Architecture
 
@@ -25,6 +30,451 @@ The deployment uses persistent volume claims to ensure data survives pod restart
 | data | `/usr/src/paperless/data` | 1Gi | PVC | Database and application state |
 | media | `/usr/src/paperless/media` | 2Gi | PVC | Document storage and media files |
 | rclone-config | `/config/rclone` | - | ConfigMap | rclone configuration |
+
+## Separated Component Architecture
+
+Paperless NGX is deployed as three independent components that work together through shared storage and a common message queue (Redis via Celery):
+
+### Component Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Paperless NGX Architecture                   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────┐  │
+│  │                  External Access                        │  │
+│  │  ┌──────────────────────────────────────────────────┐   │  │
+│  │  │  Ingress (paless-web)                           │   │  │
+│  │  │  - Host: paless.local                           │   │  │
+│  │  │  - Path: /                                      │   │  │
+│  │  │  - Routes to: paless-web Service (port 8000)   │   │  │
+│  │  └──────────────────────────────────────────────────┘   │  │
+│  └─────────────────────────────────────────────────────────┘  │
+│           │                                                    │
+│           ▼                                                    │
+│  ┌─────────────────────────────────────────────────────────┐  │
+│  │               Web Component (paless-web)               │  │
+│  │  ┌────────────────────────────────────────────────┐    │  │
+│  │  │ Deployment: paless-web                        │    │  │
+│  │  │ Replicas: 3 (scalable via HPA)               │    │  │
+│  │  │ CPU: 250m request, 1 limit                   │    │  │
+│  │  │ Memory: 512Mi request, 2Gi limit             │    │  │
+│  │  │                                              │    │  │
+│  │  │ Responsibilities:                            │    │  │
+│  │  │ - HTTP API server (port 8000)               │    │  │
+│  │  │ - Document upload handling                  │    │  │
+│  │  │ - Web UI serving                            │    │  │
+│  │  │ - Real-time status updates                  │    │  │
+│  │  └────────────────────────────────────────────────┘    │  │
+│  │                                                         │  │
+│  │  HPA: Scale 1-10 replicas based on CPU/memory        │  │
+│  └─────────────────────────────────────────────────────────┘  │
+│           │ Celery Events                                     │
+│           ▼ (via Redis)                                       │
+│  ┌─────────────────────────────────────────────────────────┐  │
+│  │           Worker Component (paless-worker)              │  │
+│  │  ┌────────────────────────────────────────────────┐    │  │
+│  │  │ Deployment: paless-worker                      │    │  │
+│  │  │ Replicas: 2 (scalable via HPA)                │    │  │
+│  │  │ CPU: 500m request, 2 limit                    │    │  │
+│  │  │ Memory: 1Gi request, 4Gi limit                │    │  │
+│  │  │                                               │    │  │
+│  │  │ Responsibilities:                             │    │  │
+│  │  │ - Asynchronous document processing           │    │  │
+│  │  │ - OCR and text extraction                    │    │  │
+│  │  │ - PDF generation and manipulation            │    │  │
+│  │  │ - File format conversions                    │    │  │
+│  │  │ - Heavy computational workloads              │    │  │
+│  │  └────────────────────────────────────────────────┘    │  │
+│  │                                                         │  │
+│  │  HPA: Scale 1-4 replicas based on CPU/memory         │  │
+│  └─────────────────────────────────────────────────────────┘  │
+│           │ Celery Beat Schedules                            │
+│           ▼ (via Redis)                                      │
+│  ┌─────────────────────────────────────────────────────────┐  │
+│  │         Scheduler Component (paless-scheduler)           │  │
+│  │  ┌────────────────────────────────────────────────┐    │  │
+│  │  │ Deployment: paless-scheduler                   │    │  │
+│  │  │ Replicas: 1 (single instance, no HPA)          │    │  │
+│  │  │ CPU: 100m request, 500m limit                  │    │  │
+│  │  │ Memory: 256Mi request, 1Gi limit               │    │  │
+│  │  │                                                │    │  │
+│  │  │ Responsibilities:                              │    │  │
+│  │  │ - Celery Beat scheduler                       │    │  │
+│  │  │ - Periodic task execution                     │    │  │
+│  │  │ - Report generation scheduling                │    │  │
+│  │  │ - Maintenance operations                      │    │  │
+│  │  │ - Index cleanup and optimization              │    │  │
+│  │  └────────────────────────────────────────────────┘    │  │
+│  └─────────────────────────────────────────────────────────┘  │
+│                      │                                        │
+│                      ▼                                        │
+│  ┌─────────────────────────────────────────────────────────┐  │
+│  │              Shared Resources                           │  │
+│  │  ┌──────────────────────────────────────────────────┐   │  │
+│  │  │ PVC: paperless-data-pvc (1Gi)                   │   │  │
+│  │  │ Mount: /usr/src/paperless/data                  │   │  │
+│  │  │ Purpose: SQLite database, application state    │   │  │
+│  │  │                                                 │   │  │
+│  │  │ PVC: paperless-media-pvc (2Gi)                 │   │  │
+│  │  │ Mount: /usr/src/paperless/media (via rclone)   │   │  │
+│  │  │ Purpose: Document storage, media files         │   │  │
+│  │  │ Backend: MinIO S3 storage                       │   │  │
+│  │  │                                                 │   │  │
+│  │  │ ConfigMap: paperless-config                     │   │  │
+│  │  │ ConfigMap: rclone-config                        │   │  │
+│  │  │ Secret: paless-secret (credentials)             │   │  │
+│  │  │ Service: redis (broker for Celery)              │   │  │
+│  │  └──────────────────────────────────────────────────┘   │  │
+│  └─────────────────────────────────────────────────────────┘  │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Component Responsibilities
+
+#### Web Component (paless-web)
+
+The web component is the user-facing interface:
+
+- **HTTP Server**: Runs the Django application server on port 8000
+- **API Endpoints**: Handles all REST API calls for document management
+- **File Upload**: Accepts document uploads from users
+- **Web UI**: Serves the web interface for users to browse documents
+- **Authentication**: Manages user sessions and authentication
+
+**Scaling:**
+- Runs with 3 replicas by default (configurable)
+- Automatically scales 1-10 replicas based on CPU and memory usage via HPA
+- Stateless design allows arbitrary scaling without data loss
+- Each replica is independent and can be restarted without affecting others
+
+**Resource Allocation:**
+- Request: 250m CPU, 512Mi memory (guaranteed minimum)
+- Limit: 1 CPU, 2Gi memory (maximum allowed)
+- Adjusted for typical web workloads with moderate concurrency
+
+#### Worker Component (paless-worker)
+
+The worker component processes documents:
+
+- **Document Processing**: Executes Celery worker tasks
+- **OCR Operations**: Runs Tesseract for optical character recognition
+- **PDF Generation**: Creates optimized PDF versions
+- **Format Conversion**: Converts documents between formats
+- **Thumbnail Generation**: Creates document previews
+- **Asynchronous Processing**: Handles long-running operations without blocking the web interface
+
+**Scaling:**
+- Runs with 2 replicas by default (configurable)
+- Automatically scales 1-4 replicas based on CPU and memory usage via HPA
+- Each replica is a full Celery worker processing tasks from the queue
+- Can handle multiple concurrent tasks per replica
+
+**Resource Allocation:**
+- Request: 500m CPU, 1Gi memory (guaranteed minimum)
+- Limit: 2 CPU, 4Gi memory (maximum allowed)
+- Higher allocation due to CPU-intensive OCR and document processing
+
+#### Scheduler Component (paless-scheduler)
+
+The scheduler component manages periodic tasks:
+
+- **Celery Beat Scheduler**: Runs the task scheduler for periodic jobs
+- **Scheduled Tasks**: Executes tasks on a defined schedule
+- **Report Generation**: Creates periodic reports
+- **Maintenance**: Performs database optimization and cleanup
+- **Index Management**: Updates search indexes
+- **Single Instance**: Only one scheduler should run to avoid duplicate tasks
+
+**Scaling:**
+- Fixed at 1 replica (never scaled)
+- Critical to have exactly one instance to avoid task duplication
+- Lightweight component, minimal resource usage
+
+**Resource Allocation:**
+- Request: 100m CPU, 256Mi memory (guaranteed minimum)
+- Limit: 500m CPU, 1Gi memory (maximum allowed)
+- Minimal allocation due to I/O-bound scheduling operations
+
+### Inter-component Communication
+
+Components communicate through:
+
+1. **Shared Database (SQLite)**
+   - All components access the same SQLite database via the data PVC
+   - Database file locked by first accessor, preventing conflicts
+   - Application-level transaction handling ensures consistency
+
+2. **Celery Task Queue (Redis)**
+   - Web component submits tasks to the Redis queue
+   - Worker and scheduler components read from the queue
+   - Redis manages task routing and deduplication
+   - Celery Beat scheduler uses Redis for periodic task scheduling
+
+3. **Shared Media Storage (MinIO + rclone)**
+   - All components access media files through rclone mount
+   - rclone FUSE mount provides local filesystem interface to S3 storage
+   - Bidirectional mount propagation allows all containers to access the mount
+   - MinIO provides durable, multi-replica S3 storage
+
+### Component Startup Sequence
+
+For a clean deployment, components should start in this order:
+
+1. **MinIO** - Must be ready first (storage backend)
+2. **Redis** - Must be ready second (message broker)
+3. **Scheduler** - Should start before workers
+4. **Workers** - Can start in any order
+5. **Web** - Start last (user-facing, depends on all others)
+
+Kubernetes doesn't enforce this order automatically. Use Kustomize `dependsOn` or Pod Scheduling Gates if strict ordering is needed.
+
+## Horizontal Pod Autoscaling (HPA)
+
+The web and worker components automatically scale based on resource utilization:
+
+### Web Component HPA
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: web-hpa
+  labels:
+    app: paless
+    component: web
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: paless-web
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 30
+```
+
+**Scaling Rules:**
+- **Scale Up**: Doubles replicas every 30 seconds when CPU > 70% or memory > 80%
+- **Scale Down**: Reduces by 50% every 60 seconds after 5 minutes of stable resource usage
+- **Min/Max**: Scales between 1 and 10 replicas
+
+**When to Scale:**
+- High user traffic increases CPU and memory usage → more replicas
+- Idle periods reduce resource usage → fewer replicas
+- Each replica handles ~100-200 concurrent requests (depends on document size)
+
+### Worker Component HPA
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: worker-hpa
+  labels:
+    app: paless
+    component: worker
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: paless-worker
+  minReplicas: 1
+  maxReplicas: 4
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 75
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 85
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 30
+```
+
+**Scaling Rules:**
+- **Scale Up**: Doubles replicas every 30 seconds when CPU > 75% or memory > 85%
+- **Scale Down**: Reduces by 50% every 60 seconds after 5 minutes of stable resource usage
+- **Min/Max**: Scales between 1 and 4 replicas
+
+**When to Scale:**
+- Large document batch uploads trigger OCR processing → more workers
+- CPU-intensive operations (OCR, PDF generation) increase resource usage
+- Idle periods reduce resource usage → scale down
+- Each worker handles 1-3 concurrent document processing tasks
+
+### Scheduler Component
+
+The scheduler component is **never scaled** (replicas: 1). Celery Beat requires exactly one scheduler instance to prevent duplicate scheduled tasks.
+
+## Networking and Service Discovery
+
+### Web Service
+
+The web component exposes an internal ClusterIP service:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: paless-web
+  labels:
+    app: paless
+    component: web
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: paless
+    component: web
+```
+
+**Service Details:**
+- **Type**: ClusterIP (internal only, not accessible from outside)
+- **Port**: 8000 (HTTP)
+- **Selector**: Routes to all `paless-web` pods
+- **Use**: Referenced by Ingress for external access
+
+**Service Discovery:**
+- DNS name: `paless-web.default.svc.cluster.local` (full FQDN)
+- DNS name: `paless-web.default` (namespace-qualified)
+- DNS name: `paless-web` (within same namespace)
+
+### Ingress for External Access
+
+The Ingress resource provides external HTTP access to the web component:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: paless-web
+  labels:
+    app: paless
+    component: web
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: paless.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: paless-web
+                port:
+                  number: 8000
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: paless-web
+                port:
+                  number: 8000
+```
+
+**Configuration Details:**
+
+| Setting | Value | Purpose |
+|---------|-------|---------|
+| IngressClass | `nginx` | Uses NGINX ingress controller |
+| Host Rule | `paless.local` | Domain-based routing |
+| Path | `/` | Route all requests to web service |
+| PathType | `Prefix` | Match all paths starting with `/` |
+| rewrite-target | `/` | Rewrite URL path before forwarding |
+| proxy-body-size | `100m` | Allow large file uploads (up to 100MB) |
+
+**Access Methods:**
+
+1. **By Hostname** (requires DNS configuration)
+   ```bash
+   curl http://paless.local
+   ```
+
+2. **By Ingress IP** (direct IP access)
+   ```bash
+   # Get Ingress IP
+   kubectl get ingress paless-web
+
+   # Add to /etc/hosts
+   echo "10.0.0.5 paless.local" >> /etc/hosts
+
+   # Access
+   curl http://paless.local
+   ```
+
+3. **Via Port Forwarding** (development)
+   ```bash
+   kubectl port-forward service/paless-web 8000:8000
+   curl http://localhost:8000
+   ```
+
+**Ingress Rules:**
+
+The ingress includes two rule blocks:
+
+1. **Host-based rule** (`paless.local`)
+   - Matches requests to the specific hostname
+   - Used for DNS-based access
+
+2. **Default rule** (no host specified)
+   - Matches all requests (fallback)
+   - Used for IP-based or unknown hostname access
+
+Both rules route to the same service, allowing flexible access methods.
 
 ## Setup Instructions
 
@@ -818,6 +1268,220 @@ kubectl apply -f rclone-configmap.yaml
 kubectl delete pod/paperless
 ```
 
+### Separated Component Issues
+
+#### Components Not Starting
+
+**Symptoms:** One or more component deployments showing 0/N replicas, pods pending or crashing
+
+**Diagnosis:**
+```bash
+# Check deployment status
+kubectl get deployments -l app=paless
+
+# Check for pod creation issues
+kubectl describe deployment paless-web
+kubectl describe deployment paless-worker
+kubectl describe deployment paless-scheduler
+
+# Check recent pod events
+kubectl get events --sort-by='.lastTimestamp'
+
+# Check component-specific pod logs
+kubectl logs -l app=paless,component=web --all-containers=true --tail=50
+kubectl logs -l app=paless,component=worker --all-containers=true --tail=50
+kubectl logs -l app=paless,component=scheduler --all-containers=true --tail=50
+```
+
+**Common Issues:**
+
+1. **Missing Dependencies (MinIO or Redis not ready)**
+   - Web, worker, and scheduler all depend on MinIO and Redis
+   - Solution: Verify MinIO and Redis are running before components
+   ```bash
+   kubectl get pods -l app=minio,app=redis
+   ```
+
+2. **Insufficient Resources**
+   - Not enough CPU/memory for requested replicas
+   - Solution: Check node resource availability
+   ```bash
+   kubectl describe nodes
+   kubectl top nodes
+   ```
+
+3. **PVC Not Bound**
+   - Components can't mount data PVC
+   - Solution: Verify PVCs are bound
+   ```bash
+   kubectl get pvc
+   ```
+
+4. **Image Pull Failures**
+   - Container image not found in registry
+   - Solution: Check image name and registry
+   ```bash
+   kubectl describe pod -l app=paless,component=web | grep -A 5 "Image:"
+   ```
+
+#### Component-to-Component Communication Issues
+
+**Symptoms:** Web component can't connect to worker queue, scheduler tasks not executing
+
+**Diagnosis:**
+```bash
+# Verify Redis (message broker) is running
+kubectl get pods -l app=redis
+
+# Test connectivity from components
+kubectl exec -it deployment/paless-web -- redis-cli -h redis ping
+
+# Check Celery configuration in all components
+kubectl exec -it deployment/paless-web -- printenv | grep CELERY
+```
+
+**Resolution:**
+- Ensure Redis service is running and accessible
+- Verify all components can reach Redis by DNS name (`redis.default.svc.cluster.local`)
+- Check network policies don't block pod-to-pod communication
+
+#### Worker Not Processing Documents
+
+**Symptoms:** Documents uploaded but no processing occurs, worker pod not doing work
+
+**Diagnosis:**
+```bash
+# Check worker pod is running
+kubectl get pods -l app=paless,component=worker
+
+# Monitor worker logs for activity
+kubectl logs -f -l app=paless,component=worker -c paless-worker
+
+# Check if tasks are queued in Redis
+kubectl exec -it deployment/paless-web -- python manage.py shell
+# In Django shell:
+# from django_celery_beat.models import PeriodicTask
+# PeriodicTask.objects.all()
+```
+
+**Common Causes:**
+1. **Worker not connected to Redis** → Check Redis configuration
+2. **No worker replicas running** → Check worker deployment status
+3. **Tasks failing** → Check worker logs for error messages
+4. **Resource limits** → Worker might be getting OOMKilled or CPU throttled
+
+#### Scheduler Not Executing Periodic Tasks
+
+**Symptoms:** Scheduled reports not generated, maintenance tasks not running
+
+**Diagnosis:**
+```bash
+# Verify scheduler pod is running (must be exactly 1)
+kubectl get pods -l app=paless,component=scheduler
+
+# Check Celery Beat logs
+kubectl logs -f -l app=paless,component=scheduler -c paless-scheduler
+
+# Verify scheduler is working
+kubectl exec -it deployment/paless-scheduler -c paless-scheduler -- \
+  celery -A config inspect active_queues
+```
+
+**Issues:**
+1. **Multiple scheduler replicas** → Causes duplicate tasks
+   - Solution: Ensure scheduler deployment has exactly 1 replica
+   ```bash
+   kubectl scale deployment paless-scheduler --replicas=1
+   ```
+
+2. **Scheduler not connected to Redis** → No tasks execute
+   - Solution: Verify Redis connectivity
+
+3. **Tasks not defined** → Check Django settings and Celery Beat configuration
+
+#### HPA Not Scaling Components
+
+**Symptoms:** HPA created but replicas not increasing under load, stuck at minimum replicas
+
+**Diagnosis:**
+```bash
+# Check HPA status
+kubectl get hpa
+
+# Check HPA detailed info
+kubectl describe hpa web-hpa
+kubectl describe hpa worker-hpa
+
+# Check if metrics are being collected
+kubectl top pods -l app=paless
+
+# Check HPA events
+kubectl get events --field-selector involvedObject.kind=HorizontalPodAutoscaler
+```
+
+**Common Issues:**
+
+1. **Metrics Server Not Running**
+   - HPA requires metrics server to collect CPU/memory data
+   ```bash
+   kubectl get deployment -n kube-system metrics-server
+   ```
+   - Solution: Install metrics server if missing
+
+2. **No Resource Requests Defined**
+   - HPA can't calculate utilization without requests
+   - Solution: Verify deployments have `resources.requests`
+
+3. **Requests Too High**
+   - Utilization calculation: `used / requested`
+   - High requests → low utilization percentage → no scaling
+   - Solution: Adjust resource requests to realistic values
+
+4. **CPU/Memory Target Too High**
+   - Default thresholds (70% CPU, 80% memory) might be too high
+   - Solution: Lower thresholds in HPA spec for more responsive scaling
+
+#### Service and Ingress Not Accessible
+
+**Symptoms:** Web UI not reachable, unable to connect to service
+
+**Diagnosis:**
+```bash
+# Verify service is created
+kubectl get service paless-web
+
+# Verify service endpoints (should match pod IPs)
+kubectl get endpoints paless-web
+
+# Test service connectivity from within cluster
+kubectl run -it --rm debug --image=busybox --restart=Never -- \
+  wget -O- http://paless-web:8000
+
+# Check ingress status
+kubectl get ingress paless-web
+
+# Check ingress controller is running
+kubectl get pods -n ingress-nginx
+```
+
+**Issues:**
+1. **Ingress IP not assigned** → Ingress controller not running
+2. **No endpoints** → Web pods not running or have wrong labels
+3. **Service unreachable** → Network policy blocking traffic
+
+**Solutions:**
+```bash
+# Recreate ingress if stuck
+kubectl delete ingress paless-web
+kubectl apply -f web-ingress.yaml
+
+# Force web pod recreation
+kubectl rollout restart deployment paless-web
+
+# Check network policies
+kubectl get networkpolicies
+```
+
 ### PVC Stuck in Pending State
 
 ```bash
@@ -923,49 +1587,249 @@ kubectl wait --for=condition=complete job/minio-init --timeout=5m
 kubectl logs job/minio-init
 ```
 
-**Step 8: Deploy Paperless with rclone**
+**Step 8: Deploy Separated Components**
+
+The separated component architecture includes three independent deployments (web, worker, scheduler) plus networking resources:
+
 ```bash
-kubectl apply -f deployment.yaml
-kubectl apply -f service.yaml
+# Deploy web component and networking
+kubectl apply -f paless-web-deployment.yaml
+kubectl apply -f web-service.yaml
+kubectl apply -f web-ingress.yaml
+kubectl apply -f web-hpa.yaml
 
-# Wait for pod to be Ready
-kubectl wait --for=condition=ready pod -l app=paperless --timeout=5m
+# Wait for web component to be Ready
+kubectl wait --for=condition=ready pod -l app=paless,component=web --timeout=5m
 
-# Verify both containers are running
-kubectl get pods -l app=paperless
+# Deploy worker component and autoscaler
+kubectl apply -f paless-worker-deployment.yaml
+kubectl apply -f worker-hpa.yaml
+
+# Wait for worker component to be Ready
+kubectl wait --for=condition=ready pod -l app=paless,component=worker --timeout=5m
+
+# Deploy scheduler component
+kubectl apply -f paless-scheduler-deployment.yaml
+
+# Wait for scheduler component to be Ready
+kubectl wait --for=condition=ready pod -l app=paless,component=scheduler --timeout=5m
 ```
+
+**Component Verification:**
+
+```bash
+# Check all Paperless components are running
+kubectl get pods -l app=paless -L component
+
+# Expected output:
+# NAME                                   READY   STATUS    RESTARTS   COMPONENT
+# paless-web-xxxxxxxx-xxxxx             2/2     Running   0          web
+# paless-web-xxxxxxxx-xxxxx             2/2     Running   0          web
+# paless-web-xxxxxxxx-xxxxx             2/2     Running   0          web
+# paless-worker-xxxxxxxx-xxxxx          2/2     Running   0          worker
+# paless-worker-xxxxxxxx-xxxxx          2/2     Running   0          worker
+# paless-scheduler-xxxxxxxx-xxxxx       2/2     Running   0          scheduler
+
+# Check HPA status
+kubectl get hpa
+
+# Expected output:
+# NAME        REFERENCE                    TARGETS          MINPODS  MAXPODS  REPLICAS
+# web-hpa     Deployment/paless-web        23%/70%, 45%/80% 1        10       3
+# worker-hpa  Deployment/paless-worker     45%/75%, 60%/85% 1        4        2
+
+# Check services and ingress
+kubectl get service,ingress
+
+# Expected output:
+# NAME                  TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)
+# service/paless-web    ClusterIP   10.43.100.200   <none>        8000/TCP
+#
+# NAME                     CLASS   HOSTS        ADDRESS       PORTS
+# ingress/paless-web       nginx   paless.local 10.0.0.1      80
+```
+
+**Understanding the Output:**
+- **Web pods**: 3 replicas, each with 2 containers (paless-web + rclone)
+- **Worker pods**: 2 replicas, each with 2 containers (paless-worker + rclone)
+- **Scheduler pod**: 1 replica with 2 containers (paless-scheduler + rclone)
+- **Total containers**: 12 containers running (3 × 2 web + 2 × 2 workers + 1 × 2 scheduler)
 
 ### Post-Deployment Verification
 
-- [ ] Paperless pod shows 2 containers: `paperless` and `rclone`
-- [ ] Both containers are in `Running` state
-- [ ] rclone logs show successful mount: `"Mounting with command: ..."`
-- [ ] Paperless container can access /mnt/media: `kubectl exec pod/paperless -c paperless -- ls /mnt/media/`
-- [ ] MinIO console accessible at configured NodePort
-- [ ] Paperless web UI accessible at configured port
-- [ ] Can upload documents and verify they appear in MinIO
+Verify the separated components are working correctly:
+
+**Component Status:**
+- [ ] Web component: 3 pods in `Running` state, each with 2 containers (web + rclone)
+- [ ] Worker component: 2 pods in `Running` state, each with 2 containers (worker + rclone)
+- [ ] Scheduler component: 1 pod in `Running` state with 2 containers (scheduler + rclone)
+- [ ] HPA controllers created for web and worker components
+- [ ] All pods show `READY` status (2/2 containers running)
+
+**Networking:**
+- [ ] Web service created (ClusterIP: paless-web)
+- [ ] Ingress resource created and assigned IP address
+- [ ] Ingress points to web service on port 8000
+- [ ] Web UI accessible via ingress hostname or IP
+
+**Storage and rclone:**
+- [ ] All components can access `/usr/src/paperless/data` (data PVC)
+- [ ] All components can access `/usr/src/paperless/media` (rclone mount)
+- [ ] rclone containers show successful mounts in logs
+- [ ] MinIO bucket accessible from all components
+
+**Functionality:**
+- [ ] Web UI loads and responds to HTTP requests
+- [ ] Can upload documents through web interface
+- [ ] Worker processes documents (check logs for processing activity)
+- [ ] Scheduler executes periodic tasks (check beat logs)
 
 ### Verification Commands
 
+**Component Status:**
+
 ```bash
-# Check pod status
-kubectl get pod/paperless -o wide
+# List all Paperless components with their component labels
+kubectl get pods -l app=paless -L component,ready
 
-# View rclone mount status
-kubectl exec pod/paperless -c paperless -- mount | grep media
+# Check component-specific pod status
+kubectl get pods -l app=paless,component=web
+kubectl get pods -l app=paless,component=worker
+kubectl get pods -l app=paless,component=scheduler
 
-# Test file access from Paperless container
-kubectl exec pod/paperless -c paperless -- touch /mnt/media/test.txt
-kubectl exec pod/paperless -c paperless -- ls -la /mnt/media/
+# Watch components start (shows real-time status)
+kubectl get pods -l app=paless --watch
 
-# Monitor rclone in real-time
-kubectl logs -f pod/paperless -c rclone
+# Detailed pod information
+kubectl describe pod -l app=paless,component=web
+kubectl describe pod -l app=paless,component=worker
+kubectl describe pod -l app=paless,component=scheduler
+```
 
-# Check resource usage
-kubectl top pod/paperless --containers
+**Networking:**
 
-# Verify MinIO bucket
-kubectl exec deploy/minio -- mc ls minio/paperless-media
+```bash
+# Verify service creation
+kubectl get service paless-web
+
+# Verify ingress creation and IP assignment
+kubectl get ingress paless-web
+kubectl describe ingress paless-web
+
+# Test internal service connectivity (from within cluster)
+kubectl run -it --rm debug --image=busybox --restart=Never -- wget -O- http://paless-web:8000
+
+# Get the Ingress IP for external access
+kubectl get ingress paless-web -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+
+# Test external access (if Ingress IP is assigned)
+curl http://<ingress-ip>
+```
+
+**Component Logs:**
+
+```bash
+# Web component logs (all replicas)
+kubectl logs -l app=paless,component=web --all-containers=true
+
+# Monitor web logs in real-time
+kubectl logs -f -l app=paless,component=web -c paless-web
+
+# Worker component logs (all replicas)
+kubectl logs -l app=paless,component=worker --all-containers=true
+
+# Monitor worker processing activity
+kubectl logs -f -l app=paless,component=worker -c paless-worker
+
+# Scheduler component logs
+kubectl logs -f -l app=paless,component=scheduler -c paless-scheduler
+```
+
+**rclone Mount Verification (All Components):**
+
+```bash
+# Check rclone mount in web component
+kubectl exec -it deployment/paless-web -c paless-web -- mount | grep /mnt/media
+
+# Check rclone mount in worker component
+kubectl exec -it deployment/paless-worker -c paless-worker -- mount | grep /mnt/media
+
+# Check rclone mount in scheduler component
+kubectl exec -it deployment/paless-scheduler -c paless-scheduler -- mount | grep /mnt/media
+
+# Test file access from web component
+kubectl exec -it deployment/paless-web -c paless-web -- ls -la /usr/src/paperless/media/
+
+# Test file access from worker component
+kubectl exec -it deployment/paless-worker -c paless-worker -- ls -la /usr/src/paperless/media/
+
+# Monitor rclone activity in real-time (pick any web pod as an example)
+kubectl logs -f deployment/paless-web -c rclone
+```
+
+**Storage Access:**
+
+```bash
+# Verify data PVC is bound to all components
+kubectl get pvc paperless-data-pvc
+kubectl describe pvc paperless-data-pvc
+
+# Verify media PVC is bound
+kubectl get pvc paperless-media-pvc
+kubectl describe pvc paperless-media-pvc
+
+# Check that all components see the same data directory
+kubectl exec deployment/paless-web -c paless-web -- ls -la /usr/src/paperless/data/
+kubectl exec deployment/paless-worker -c paless-worker -- ls -la /usr/src/paperless/data/
+kubectl exec deployment/paless-scheduler -c paless-scheduler -- ls -la /usr/src/paperless/data/
+```
+
+**HPA Status:**
+
+```bash
+# Check HPA controllers
+kubectl get hpa
+
+# Detailed HPA information
+kubectl describe hpa web-hpa
+kubectl describe hpa worker-hpa
+
+# Monitor HPA behavior (scales replicas based on metrics)
+kubectl get hpa --watch
+
+# Check current resource metrics
+kubectl top pods -l app=paless
+```
+
+**Resource Usage:**
+
+```bash
+# Check CPU and memory usage per component
+kubectl top pods -l app=paless,component=web
+kubectl top pods -l app=paless,component=worker
+kubectl top pods -l app=paless,component=scheduler
+
+# Monitor node resource availability
+kubectl top nodes
+
+# Check resource requests vs usage
+kubectl describe nodes
+```
+
+**End-to-End Functionality Test:**
+
+```bash
+# 1. Upload a test document via web API
+curl -X POST -F "document=@test.pdf" http://<ingress-ip>/api/documents/post_document/
+
+# 2. Check if worker picked up the task
+kubectl logs -f -l app=paless,component=worker -c paless-worker | grep "processing"
+
+# 3. Verify document appears in media storage
+kubectl exec -it deployment/paless-web -c paless-web -- ls -la /usr/src/paperless/media/
+
+# 4. Check MinIO bucket content
+kubectl exec -it deployment/minio -- mc ls minio/paperless-media
 ```
 
 ## Automated Deployment with deploy-to-k3s.sh
