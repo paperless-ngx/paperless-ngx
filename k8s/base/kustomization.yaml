@@ -11,7 +11,7 @@ resources:
   - redis-statefulset.yaml
   - redis-service.yaml
   - configmap.yaml
-  - paless-secret.yaml
+  - secret.yaml
   - pvc.yaml
   - deployment.yaml
   - service.yaml
