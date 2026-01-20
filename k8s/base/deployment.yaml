@@ -59,10 +59,46 @@ spec:
             periodSeconds: 5
             timeoutSeconds: 3
             failureThreshold: 3
+        - name: rclone
+          image: rclone/rclone:latest
+          securityContext:
+            privileged: true
+          command:
+            - /bin/sh
+            - -c
+            - |
+              rclone mount minio:paperless-media /mnt/media --vfs-cache-mode full --allow-other --daemon
+              sleep infinity
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: paless-secret
+                  key: minio-root-user
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: paless-secret
+                  key: minio-root-password
+          volumeMounts:
+            - name: rclone-config
+              mountPath: /config/rclone
+            - name: media
+              mountPath: /mnt/media
+              mountPropagation: Bidirectional
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
       volumes:
         - name: data
           persistentVolumeClaim:
             claimName: paperless-data-pvc
         - name: media
-          persistentVolumeClaim:
-            claimName: paperless-media-pvc
+          emptyDir: {}
+        - name: rclone-config
+          configMap:
+            name: rclone-config

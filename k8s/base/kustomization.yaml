@@ -14,6 +14,7 @@ resources:
   - minio-service.yaml
   - minio-init-job.yaml
   - configmap.yaml
+  - rclone-configmap.yaml
   - paless-secret.yaml
   - pv-manual.yaml
   - pvc.yaml
