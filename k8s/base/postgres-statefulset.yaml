@@ -33,9 +33,9 @@ spec:
           protocol: TCP
         env:
         - name: POSTGRES_DB
-          value: "context_db"
+          value: "paperless"
         - name: POSTGRES_USER
-          value: "context_user"
+          value: "paperless"
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -51,7 +51,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - pg_isready -U context_user -d context_db
+            - pg_isready -U paperless -d paperless
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
@@ -61,7 +61,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - pg_isready -U context_user -d context_db
+            - pg_isready -U paperless -d paperless
           initialDelaySeconds: 10
           periodSeconds: 5
           timeoutSeconds: 3

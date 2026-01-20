@@ -3,18 +3,68 @@ kind: ConfigMap
 metadata:
   name: paperless-config
   labels:
-    app: paperless
+    app: paless
+    app.kubernetes.io/name: paperless
+    app.kubernetes.io/component: config
 data:
-  PAPERLESS_REDIS: "redis://redis:6379"
+  # Database Configuration
   PAPERLESS_DBHOST: "postgres"
-  PAPERLESS_DBPORT: "5432"
   PAPERLESS_DBNAME: "paperless"
   PAPERLESS_DBUSER: "paperless"
+  PAPERLESS_DBPORT: "5432"
+  PAPERLESS_DBENGINE: "postgresql"
   PAPERLESS_DBSSLMODE: "prefer"
-  PAPERLESS_TIME_ZONE: "UTC"
+
+  # Redis Configuration
+  PAPERLESS_REDIS: "redis://redis:6379"
+
+  # OCR Configuration
   PAPERLESS_OCR_LANGUAGE: "eng"
-  PAPERLESS_TASK_WORKERS: "1"
+  PAPERLESS_OCR_MODE: "skip"
+  PAPERLESS_OCR_CLEAN: "clean"
+  PAPERLESS_OCR_DESKEW: "true"
+  PAPERLESS_OCR_ROTATE_PAGES: "true"
+  PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD: "12.0"
+  PAPERLESS_OCR_OUTPUT_TYPE: "pdfa"
+
+  # Timezone Configuration
+  PAPERLESS_TIME_ZONE: "UTC"
+
+  # Worker Configuration
+  PAPERLESS_TASK_WORKERS: "2"
   PAPERLESS_THREADS_PER_WORKER: "1"
-  PAPERLESS_CONSUMER_POLLING: "10"
+  PAPERLESS_WORKER_TIMEOUT: "1800"
+
+  # URL Configuration
   PAPERLESS_URL: "http://localhost:30080"
   PAPERLESS_ALLOWED_HOSTS: "*"
+
+  # Application Settings
+  PAPERLESS_PORT: "8000"
+  PAPERLESS_BIND_ADDR: "0.0.0.0"
+  PAPERLESS_DATA_DIR: "/usr/src/paperless/data"
+  PAPERLESS_MEDIA_ROOT: "/usr/src/paperless/media"
+  PAPERLESS_STATICDIR: "/usr/src/paperless/static"
+  PAPERLESS_CONSUMPTION_DIR: "/usr/src/paperless/consume"
+  PAPERLESS_TRASH_DIR: "/usr/src/paperless/trash"
+
+  # Consumer Settings
+  PAPERLESS_CONSUMER_POLLING: "10"
+  PAPERLESS_CONSUMER_DELETE_DUPLICATES: "false"
+  PAPERLESS_CONSUMER_RECURSIVE: "false"
+  PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "false"
+
+  # Tika Configuration
+  PAPERLESS_TIKA_ENABLED: "false"
+  PAPERLESS_TIKA_ENDPOINT: "http://tika:9998"
+  PAPERLESS_TIKA_GOTENBERG_ENDPOINT: "http://gotenberg:3000"
+
+  # Security Settings (non-sensitive)
+  PAPERLESS_COOKIE_PREFIX: "paperless"
+  PAPERLESS_ENABLE_HTTP_REMOTE_USER: "false"
+
+  # Feature Toggles
+  PAPERLESS_ENABLE_COMPRESSION: "true"
+
+  # Audit Log
+  PAPERLESS_AUDIT_LOG_ENABLED: "false"
