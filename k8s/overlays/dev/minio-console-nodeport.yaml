@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-console-nodeport
+  labels:
+    app: minio
+    app.kubernetes.io/name: minio
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/part-of: paless
+spec:
+  type: NodePort
+  ports:
+  - port: 9001
+    targetPort: 9001
+    nodePort: 30090
+    protocol: TCP
+    name: console
+  selector:
+    app: minio
