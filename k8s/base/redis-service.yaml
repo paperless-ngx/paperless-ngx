@@ -9,7 +9,6 @@ metadata:
     app.kubernetes.io/part-of: paless
 spec:
   type: ClusterIP
-  clusterIP: None
   ports:
   - port: 6379
     targetPort: 6379
