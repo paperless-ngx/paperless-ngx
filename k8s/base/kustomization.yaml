@@ -10,6 +10,8 @@ resources:
   - postgres-service.yaml
   - redis-statefulset.yaml
   - redis-service.yaml
+  - minio-statefulset.yaml
+  - minio-service.yaml
   - configmap.yaml
   - paless-secret.yaml
   - pv-manual.yaml
