@@ -29,6 +29,8 @@ from documents.models_legacy import (
     WorkflowActionWebhook,
     WorkflowRun,
     WorkflowTrigger,
+    get_current_tenant_id,
+    set_current_tenant_id,
 )
 
 # Import the new Tenant model
@@ -74,4 +76,8 @@ __all__ = [
     'WorkflowActionEmail',
     'WorkflowActionWebhook',
     'WorkflowRun',
+
+    # Thread-local tenant helpers
+    'get_current_tenant_id',
+    'set_current_tenant_id',
 ]
