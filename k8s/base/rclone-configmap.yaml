@@ -4,6 +4,8 @@ metadata:
   name: rclone-config
   labels:
     app: paperless
+    app.kubernetes.io/name: paperless
+    app.kubernetes.io/component: storage
 data:
   rclone.conf: |
     [minio]

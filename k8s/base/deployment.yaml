@@ -30,7 +30,7 @@ spec:
             - configMapRef:
                 name: paperless-config
             - secretRef:
-                name: paperless-secret
+                name: paless-secret
           volumeMounts:
             - name: data
               mountPath: /usr/src/paperless/data
