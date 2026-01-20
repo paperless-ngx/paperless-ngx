@@ -384,6 +384,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "paperless.middleware.ApiVersionMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "paperless.middleware.TenantMiddleware",  # Added for multi-tenant support
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
@@ -635,6 +636,11 @@ ALLOWED_HOSTS = __get_list("PAPERLESS_ALLOWED_HOSTS", ["*"])
 if ALLOWED_HOSTS != ["*"]:
     # always allow localhost. Necessary e.g. for healthcheck in docker.
     ALLOWED_HOSTS.append("localhost")
+    # Support subdomains for multi-tenant architecture
+    ALLOWED_HOSTS.append(".localhost")
+else:
+    # If using wildcard, ensure subdomain support is explicit
+    ALLOWED_HOSTS = ["*", ".localhost"]
 
 
 def _parse_paperless_url():
