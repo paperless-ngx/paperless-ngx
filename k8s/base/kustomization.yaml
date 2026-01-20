@@ -20,7 +20,9 @@ resources:
   - paless-secret.yaml
   - pv-manual.yaml
   - pvc.yaml
-  - deployment.yaml
+  - paless-web-deployment.yaml
+  - paless-worker-deployment.yaml
+  - paless-scheduler-deployment.yaml
   - service.yaml
 
 # Optional: Use secretGenerator to create secrets from paless.env

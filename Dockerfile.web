@@ -2,7 +2,7 @@
 # Dockerfile.web - Web component only (Granian webserver)
 # Based on ghcr.io/paperless-ngx/paperless-ngx:latest with only webserver service enabled
 
-FROM ghcr.io/paperless-ngx/paperless-ngx:latest
+FROM localhost:5001/paless:latest
 
 LABEL org.opencontainers.image.description="Paperless-ngx web component (Granian webserver only)"
 LABEL org.opencontainers.image.title="paless-web"

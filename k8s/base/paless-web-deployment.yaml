@@ -1,0 +1,113 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paless-web
+  labels:
+    app: paless
+    component: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paless
+      component: web
+  template:
+    metadata:
+      labels:
+        app: paless
+        component: web
+    spec:
+      tolerations:
+        - key: "node.kubernetes.io/disk-pressure"
+          operator: "Exists"
+          effect: "NoSchedule"
+      containers:
+        - name: paless-web
+          image: localhost:5000/paless-web:v2
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: paperless-config
+            - secretRef:
+                name: paless-secret
+          env:
+            - name: PAPERLESS_DBPASS
+              valueFrom:
+                secretKeyRef:
+                  name: paless-secret
+                  key: db-password
+          volumeMounts:
+            - name: data
+              mountPath: /usr/src/paperless/data
+            - name: media
+              mountPath: /usr/src/paperless/media
+          resources:
+            limits:
+              cpu: "1"
+              memory: "2Gi"
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+        - name: rclone
+          image: rclone/rclone:latest
+          securityContext:
+            privileged: true
+          command:
+            - /bin/sh
+            - -c
+            - |
+              rclone mount minio:paperless-media /mnt/media --vfs-cache-mode full --allow-other --daemon
+              sleep infinity
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: paless-secret
+                  key: minio-root-user
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: paless-secret
+                  key: minio-root-password
+          volumeMounts:
+            - name: rclone-config
+              mountPath: /config/rclone
+            - name: media
+              mountPath: /mnt/media
+              mountPropagation: Bidirectional
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: paperless-data-pvc
+        - name: media
+          emptyDir: {}
+        - name: rclone-config
+          configMap:
+            name: rclone-config
