@@ -25,6 +25,7 @@ def enable_rls_forward(apps, schema_editor):
         'documents_savedview',
         'documents_storagepath',
         'documents_paperlesstask',
+        'documents_note',
     ]
 
     for table in tables:
@@ -77,6 +78,7 @@ def disable_rls_reverse(apps, schema_editor):
         'documents_savedview',
         'documents_storagepath',
         'documents_paperlesstask',
+        'documents_note',
     ]
 
     for table in tables:
