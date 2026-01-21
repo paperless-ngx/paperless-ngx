@@ -48,10 +48,10 @@ def handle_social_account_updated(sender, request, sociallogin, **kwargs):
         # allauth 65.11.0+ nests claims under `userinfo`/`id_token`
         social_account_groups = (
             extra_data.get("userinfo", {}).get(
-                settings.SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM
+                settings.SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM,
             )
             or extra_data.get("id_token", {}).get(
-                settings.SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM
+                settings.SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM,
             )
             or []
         )
