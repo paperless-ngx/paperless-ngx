@@ -497,7 +497,6 @@ class ConsumerPlugin(
                     create_source_path_directory(document.source_path)
 
                     self._write(
-                        document.storage_type,
                         self.unmodified_original
                         if self.unmodified_original is not None
                         else self.working_copy,
@@ -505,7 +504,6 @@ class ConsumerPlugin(
                     )
 
                     self._write(
-                        document.storage_type,
                         thumbnail,
                         document.thumbnail_path,
                     )
@@ -517,7 +515,6 @@ class ConsumerPlugin(
                         )
                         create_source_path_directory(document.archive_path)
                         self._write(
-                            document.storage_type,
                             archive_path,
                             document.archive_path,
                         )
@@ -733,7 +730,7 @@ class ConsumerPlugin(
                 }
                 CustomFieldInstance.objects.create(**args)  # adds to document
 
-    def _write(self, storage_type, source, target):
+    def _write(self, source, target):
         with (
             Path(source).open("rb") as read_file,
             Path(target).open("wb") as write_file,

@@ -418,7 +418,6 @@ class Command(CryptMixin, BaseCommand):
                 base_name = generate_filename(
                     document,
                     counter=filename_counter,
-                    append_gpg=False,
                 )
             else:
                 base_name = document.get_public_filename(counter=filename_counter)
