@@ -430,7 +430,7 @@ class TestExportImport(
         Document.objects.create(
             checksum="AAAAAAAAAAAAAAAAA",
             title="wow",
-            filename="0000004.pdf",
+            filename="0000010.pdf",
             mime_type="application/pdf",
         )
         self.assertRaises(FileNotFoundError, call_command, "document_exporter", target)

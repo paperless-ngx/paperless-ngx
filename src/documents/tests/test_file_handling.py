@@ -74,7 +74,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             settings.ORIGINALS_DIR / "none",
         )
         self.assertIsFile(
-            settings.ORIGINALS_DIR / "test" / "test.pdf.gpg",
+            settings.ORIGINALS_DIR / "test" / "test.pdf",
         )
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{correspondent}")
