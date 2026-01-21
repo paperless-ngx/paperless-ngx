@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import pickle
 import re
 import warnings
@@ -26,6 +27,7 @@ from documents.caching import CLASSIFIER_VERSION_KEY
 from documents.caching import StoredLRUCache
 from documents.models import Document
 from documents.models import MatchingModel
+from paperless.middleware import get_current_tenant_id
 
 logger = logging.getLogger("paperless.classifier")
 
@@ -40,6 +42,54 @@ RE_DIGIT = re.compile(r"\d")
 RE_WORD = re.compile(r"\b[\w]+\b")  # words that may contain digits
 
 
+def get_tenant_model_file(tenant_id: str | None = None) -> Path:
+    """
+    Get the tenant-specific model file path.
+
+    Args:
+        tenant_id: UUID string of the tenant. If None, uses current tenant from context.
+
+    Returns:
+        Path to the tenant-specific classifier model file.
+        Falls back to shared model file if no tenant context is available.
+
+    Raises:
+        ValueError: If tenant_id contains invalid characters (path traversal prevention).
+    """
+    if tenant_id is None:
+        tenant_id = get_current_tenant_id()
+
+    if tenant_id:
+        # Validate tenant_id to prevent path traversal attacks
+        import uuid
+        try:
+            # Ensure tenant_id is a valid UUID string
+            uuid.UUID(str(tenant_id))
+        except (ValueError, AttributeError, TypeError):
+            raise ValueError(f"Invalid tenant_id format: {tenant_id}")
+
+        # Create tenant-specific path: MEDIA_ROOT/tenant_{id}/classifier.pkl
+        tenant_dir = settings.MEDIA_ROOT / f"tenant_{tenant_id}"
+
+        # Use atomic directory creation to prevent race conditions
+        # This is more secure than mkdir with exist_ok=True
+        try:
+            tenant_dir.mkdir(parents=True, exist_ok=False)
+        except FileExistsError:
+            # Directory already exists, which is fine
+            pass
+        except OSError as e:
+            # Log security-relevant errors
+            logger.warning(f"Failed to create tenant directory {tenant_dir}: {e}")
+            # Re-raise to prevent continuing with potentially compromised path
+            raise
+
+        return tenant_dir / "classifier.pkl"
+    else:
+        # Fallback to shared model file for backwards compatibility
+        return settings.MODEL_FILE
+
+
 class IncompatibleClassifierVersionError(Exception):
     def __init__(self, message: str, *args: object) -> None:
         self.message: str = message
@@ -50,21 +100,33 @@ class ClassifierModelCorruptError(Exception):
     pass
 
 
-def load_classifier(*, raise_exception: bool = False) -> DocumentClassifier | None:
-    if not settings.MODEL_FILE.is_file():
+def load_classifier(*, raise_exception: bool = False, tenant_id: str | None = None) -> DocumentClassifier | None:
+    """
+    Load the tenant-specific classifier model.
+
+    Args:
+        raise_exception: Whether to raise exceptions instead of returning None
+        tenant_id: UUID string of the tenant. If None, uses current tenant from context.
+
+    Returns:
+        DocumentClassifier instance or None if loading fails
+    """
+    model_file = get_tenant_model_file(tenant_id)
+
+    if not model_file.is_file():
         logger.debug(
-            "Document classification model does not exist (yet), not "
+            f"Document classification model does not exist at {model_file} (yet), not "
             "performing automatic matching.",
         )
         return None
 
     classifier = DocumentClassifier()
     try:
-        classifier.load()
+        classifier.load(tenant_id=tenant_id)
 
     except IncompatibleClassifierVersionError as e:
         logger.info(f"Classifier version incompatible: {e.message}, will re-train")
-        Path(settings.MODEL_FILE).unlink()
+        model_file.unlink()
         classifier = None
         if raise_exception:
             raise e
@@ -74,7 +136,7 @@ def load_classifier(*, raise_exception: bool = False) -> DocumentClassifier | No
             "Unrecoverable error while loading document "
             "classification model, deleting model file.",
         )
-        Path(settings.MODEL_FILE).unlink
+        model_file.unlink()
         classifier = None
         if raise_exception:
             raise e
@@ -127,12 +189,20 @@ class DocumentClassifier:
             pickle.dumps(self.data_vectorizer),
         ).hexdigest()
 
-    def load(self) -> None:
+    def load(self, tenant_id: str | None = None) -> None:
+        """
+        Load the classifier model from tenant-specific path.
+
+        Args:
+            tenant_id: UUID string of the tenant. If None, uses current tenant from context.
+        """
         from sklearn.exceptions import InconsistentVersionWarning
+
+        model_file = get_tenant_model_file(tenant_id)
 
         # Catch warnings for processing
         with warnings.catch_warnings(record=True) as w:
-            with Path(settings.MODEL_FILE).open("rb") as f:
+            with model_file.open("rb") as f:
                 schema_version = pickle.load(f)
 
                 if schema_version != self.FORMAT_VERSION:
@@ -170,8 +240,14 @@ class DocumentClassifier:
                 ):
                     raise IncompatibleClassifierVersionError("sklearn version update")
 
-    def save(self) -> None:
-        target_file: Path = settings.MODEL_FILE
+    def save(self, tenant_id: str | None = None) -> None:
+        """
+        Save the classifier model to tenant-specific path.
+
+        Args:
+            tenant_id: UUID string of the tenant. If None, uses current tenant from context.
+        """
+        target_file: Path = get_tenant_model_file(tenant_id)
         target_file_temp: Path = target_file.with_suffix(".pickle.part")
 
         with target_file_temp.open("wb") as f:
@@ -190,6 +266,7 @@ class DocumentClassifier:
             pickle.dump(self.storage_path_classifier, f)
 
         target_file_temp.rename(target_file)
+        logger.info(f"Saved classifier model to {target_file}")
 
     def train(self) -> bool:
         # Get non-inbox documents

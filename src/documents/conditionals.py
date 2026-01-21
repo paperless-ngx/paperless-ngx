@@ -11,6 +11,7 @@ from documents.caching import CLASSIFIER_MODIFIED_KEY
 from documents.caching import CLASSIFIER_VERSION_KEY
 from documents.caching import get_thumbnail_modified_key
 from documents.classifier import DocumentClassifier
+from documents.classifier import get_tenant_model_file
 from documents.models import Document
 
 
@@ -22,7 +23,8 @@ def suggestions_etag(request, pk: int) -> str | None:
 
     """
     # If no model file, no etag at all
-    if not settings.MODEL_FILE.exists():
+    tenant_model_file = get_tenant_model_file()
+    if not tenant_model_file.exists():
         return None
     # Check cache information
     cache_hits = cache.get_many(
@@ -48,7 +50,8 @@ def suggestions_last_modified(request, pk: int) -> datetime | None:
     unlikely that changes too often
     """
     # No file, no last modified
-    if not settings.MODEL_FILE.exists():
+    tenant_model_file = get_tenant_model_file()
+    if not tenant_model_file.exists():
         return None
     cache_hits = cache.get_many(
         [CLASSIFIER_VERSION_KEY, CLASSIFIER_MODIFIED_KEY],
