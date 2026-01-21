@@ -3,6 +3,7 @@ import threading
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.db import connection
 from django.http import HttpResponse
 
 from paperless import version
@@ -118,9 +119,15 @@ class TenantMiddleware:
         # Set thread-local storage for ORM filtering
         set_current_tenant(tenant)
 
-        # Log tenant resolution for debugging
+        # Set PostgreSQL session variable for Row-Level Security
         if tenant:
+            with connection.cursor() as cursor:
+                cursor.execute("SET app.current_tenant = %s", [str(tenant.id)])
             logger.debug(f"Request processed for tenant: {tenant.name} (ID: {tenant.id})")
+        else:
+            # Clear the session variable if no tenant
+            with connection.cursor() as cursor:
+                cursor.execute("SET app.current_tenant = ''")
 
         # Continue processing request
         response = self.get_response(request)
