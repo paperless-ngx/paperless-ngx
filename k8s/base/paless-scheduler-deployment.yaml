@@ -23,7 +23,7 @@ spec:
           effect: "NoSchedule"
       containers:
         - name: paless-scheduler
-          image: localhost:5000/paless-scheduler:v2
+          image: localhost:5000/paless-scheduler:latest
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
