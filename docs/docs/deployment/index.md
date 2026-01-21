@@ -57,6 +57,19 @@ Comprehensive guide to Kubernetes deployment architecture and best practices.
 - Backup and recovery procedures
 - Production considerations
 
+### [Multi-Tenant Architecture](./multi-tenant-architecture.md)
+Comprehensive overview of multi-tenant design patterns, isolation mechanisms, and Tenant model integration.
+
+- Architecture overview and isolation layers
+- Tenant model fields and lifecycle management
+- Application-layer isolation (ORM filtering)
+- Database-layer isolation (PostgreSQL RLS)
+- Request context isolation and thread-local storage
+- Model patterns for tenant ownership
+- Integration with ORM, middleware, and background tasks
+- Data isolation verification and performance considerations
+- Security best practices and troubleshooting
+
 ### [PostgreSQL StatefulSet](./postgres-statefulset.md)
 Deploy and manage PostgreSQL as a Kubernetes StatefulSet for multi-tenant support.
 
@@ -67,6 +80,18 @@ Deploy and manage PostgreSQL as a Kubernetes StatefulSet for multi-tenant suppor
 - Administration, backup, and monitoring
 - Production HA setup and scaling considerations
 - Troubleshooting guide
+
+### [TenantMiddleware and Subdomain Routing](./tenant-middleware-configuration.md)
+Configure TenantMiddleware for subdomain-based multi-tenant isolation and request context injection.
+
+- Tenant resolution from subdomains and headers
+- Multi-tenant architecture and request flow
+- Subdomain routing and DNS configuration
+- Ingress-based routing with X-Tenant-ID headers
+- Tenant-aware ORM manager integration
+- Row-Level Security (RLS) integration
+- Debugging and troubleshooting
+- Security considerations and best practices
 
 ### [MinIO Multi-Tenant Storage](./minio-multi-tenant.md)
 Configure MinIO for per-tenant bucket isolation and secure multi-tenant document storage.
@@ -151,8 +176,35 @@ volumes:
 **Understand the deployment architecture**
 → Read [Kubernetes Deployment Guide](./kubernetes-guide.md)
 
+**Understand multi-tenant architecture and isolation**
+→ Read [Multi-Tenant Architecture](./multi-tenant-architecture.md)
+
+**Learn about the Tenant model and lifecycle**
+→ See [Tenant Model](./multi-tenant-architecture.md#tenant-model) section in Multi-Tenant Architecture
+
+**Understand tenant isolation mechanisms**
+→ See [Isolation Mechanisms](./multi-tenant-architecture.md#isolation-mechanisms) section in Multi-Tenant Architecture
+
+**Set up tenant-aware ORM managers**
+→ Follow [Model Patterns](./multi-tenant-architecture.md#model-patterns) in Multi-Tenant Architecture
+
+**Debug tenant isolation issues**
+→ Check [Troubleshooting](./multi-tenant-architecture.md#troubleshooting) in Multi-Tenant Architecture
+
 **Configure PostgreSQL StatefulSet for multi-tenancy**
 → Follow [PostgreSQL StatefulSet Guide](./postgres-statefulset.md)
+
+**Configure TenantMiddleware for subdomain-based tenant routing**
+→ Read [TenantMiddleware and Subdomain Routing](./tenant-middleware-configuration.md)
+
+**Set up subdomain routing for multi-tenant isolation**
+→ Follow [Tenant Resolution](./tenant-middleware-configuration.md#tenant-resolution) section in TenantMiddleware guide
+
+**Configure Kubernetes ingress with tenant headers**
+→ See [Ingress Routing Configuration](./tenant-middleware-configuration.md#ingress-routing-configuration) section
+
+**Debug tenant resolution issues**
+→ Check [Debugging](./tenant-middleware-configuration.md#debugging) section in TenantMiddleware guide
 
 **Configure MinIO for multi-tenant object storage**
 → Follow [MinIO Multi-Tenant Storage](./minio-multi-tenant.md)
