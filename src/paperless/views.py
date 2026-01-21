@@ -118,6 +118,24 @@ class UserViewSet(ModelViewSet):
     filterset_class = UserFilterSet
     ordering_fields = ("username",)
 
+    def get_queryset(self):
+        """
+        Filter users by current tenant.
+
+        Returns only users belonging to the current tenant (based on UserProfile.tenant_id).
+        System users (consumer, AnonymousUser) are excluded by the base queryset.
+        """
+        queryset = super().get_queryset()
+
+        # Get current tenant from request
+        tenant_id = getattr(self.request, 'tenant_id', None)
+
+        if tenant_id:
+            # Filter users by tenant_id in their profile
+            queryset = queryset.filter(profile__tenant_id=tenant_id)
+
+        return queryset
+
     def create(self, request, *args, **kwargs):
         if not request.user.is_superuser and request.data.get("is_superuser") is True:
             return HttpResponseForbidden(

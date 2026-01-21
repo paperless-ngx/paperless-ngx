@@ -1,6 +1,9 @@
+from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
 DEFAULT_SINGLETON_INSTANCE_ID = 1
@@ -371,3 +374,53 @@ class ApplicationConfiguration(AbstractSingletonModel):
 
     def __str__(self) -> str:  # pragma: no cover
         return "ApplicationConfiguration"
+
+
+class UserProfile(models.Model):
+    """
+    User profile extending Django's User model with tenant_id.
+
+    This model provides multi-tenant isolation for users by associating
+    each user with a specific tenant via tenant_id field.
+    """
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='profile',
+        verbose_name=_("user"),
+    )
+
+    tenant_id = models.UUIDField(
+        db_index=True,
+        verbose_name=_("tenant"),
+        help_text=_("Tenant to which this user belongs"),
+    )
+
+    class Meta:
+        verbose_name = _("user profile")
+        verbose_name_plural = _("user profiles")
+        indexes = [
+            models.Index(fields=['tenant_id'], name='userprofile_tenant_idx'),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - Tenant {self.tenant_id}"
+
+
+@receiver(post_save, sender=User)
+def create_or_update_user_profile(sender, instance, created, **kwargs):
+    """
+    Signal handler to automatically create UserProfile when User is created.
+
+    Note: tenant_id must be set explicitly on the UserProfile after creation,
+    typically from the current request context.
+    """
+    if created:
+        # Import here to avoid circular imports
+        from documents.models.base import get_current_tenant_id
+
+        tenant_id = get_current_tenant_id()
+        # Only auto-create profile if tenant context is available
+        # System users (consumer, AnonymousUser) may not have tenant context
+        if tenant_id and instance.username not in ["consumer", "AnonymousUser"]:
+            UserProfile.objects.create(user=instance, tenant_id=tenant_id)
