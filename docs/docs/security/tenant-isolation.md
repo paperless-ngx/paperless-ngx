@@ -201,6 +201,7 @@ WHERE tablename LIKE 'documents_%';
 | Table | Policy Name | Filter Condition |
 |-------|-------------|------------------|
 | `documents_document` | `tenant_isolation_policy` | `tenant_id = current_setting('app.current_tenant')::uuid` |
+| `documents_note` | `tenant_isolation_policy` | `tenant_id = current_setting('app.current_tenant')::uuid` |
 | `documents_tag` | `tenant_isolation_policy` | `tenant_id = current_setting('app.current_tenant')::uuid` |
 | `documents_correspondent` | `tenant_isolation_policy` | `tenant_id = current_setting('app.current_tenant')::uuid` |
 | `documents_documenttype` | `tenant_isolation_policy` | `tenant_id = current_setting('app.current_tenant')::uuid` |
@@ -352,6 +353,7 @@ def enable_rls_forward(apps, schema_editor):
 
     tables = [
         'documents_document',
+        'documents_note',
         'documents_tag',
         'documents_correspondent',
         'documents_documenttype',
@@ -718,6 +720,61 @@ For full documentation, see [User Tenant Isolation](./user-tenant-isolation.md).
 
 ---
 
+### Note Tenant Isolation
+
+:::info Note Model Isolation
+As of January 2026, notes attached to documents are tenant-isolated using the `ModelWithOwner` inheritance pattern. The Note model now includes a `tenant_id` field that is automatically populated from the related document, ensuring that document annotations remain properly isolated within tenant boundaries.
+
+For complete details, see [Note Tenant Isolation](./note-tenant-isolation.md).
+:::
+
+#### Note Model Implementation
+
+Notes are document annotations that inherit tenant isolation from their parent documents:
+
+```python
+# src/documents/models.py
+class Note(ModelWithOwner, SoftDeleteModel):
+    """Note model with automatic tenant isolation."""
+
+    note = models.TextField(_("content"), blank=True)
+    created = models.DateTimeField(_("created"), default=timezone.now)
+    document = models.ForeignKey(Document, on_delete=models.CASCADE)
+
+    # Inherited from ModelWithOwner:
+    # - tenant_id: UUID field (indexed, non-nullable)
+    # - objects: TenantManager (automatic filtering)
+    # - all_objects: Manager (bypass)
+```
+
+**Key Features:**
+
+1. **Inherits from ModelWithOwner**: Provides automatic `tenant_id` field and `TenantManager`
+2. **Three-Phase Migration**: Safely adds tenant_id by inheriting from related documents
+3. **PostgreSQL RLS Protection**: RLS policies enforce isolation at database level
+4. **Automatic Tenant Inheritance**: Notes inherit `tenant_id` from their associated document
+
+**Migration Strategy:**
+
+1. **Phase 1**: Add nullable `tenant_id` field (Migration 1084)
+2. **Phase 2**: Backfill from `Document.tenant_id` (Migration 1085)
+3. **Phase 3**: Make field non-nullable (Migration 1086)
+
+**Data Migration Logic:**
+- Notes with documents: Inherit `tenant_id` from `Document.tenant_id`
+- Orphaned notes: Assigned to default tenant
+
+**Security Model:**
+
+- ✅ Application-layer filtering via `TenantManager`
+- ✅ PostgreSQL RLS for defense-in-depth
+- ✅ Cascading protection (document + note filtering)
+- ✅ Test coverage in document views tenant isolation tests
+
+For full documentation, see [Note Tenant Isolation](./note-tenant-isolation.md).
+
+---
+
 ### Group Tenant Isolation
 
 :::info Group Model Isolation
@@ -800,6 +857,7 @@ For full documentation, see [Group Tenant Isolation](./group-tenant-isolation.md
 ## References
 
 - [Document Tenant Isolation](./document-tenant-isolation.md) - Document model tenant isolation and security fix
+- [Note Tenant Isolation](./note-tenant-isolation.md) - Note model tenant isolation implementation
 - [User Tenant Isolation](./user-tenant-isolation.md) - User model tenant isolation implementation
 - [Group Tenant Isolation](./group-tenant-isolation.md) - TenantGroup model tenant isolation implementation
 - [Thread-Local Tenant Context](./thread-local-tenant-context.md) - **Critical**: Shared storage implementation and bug fix
