@@ -4,8 +4,7 @@
 
 set -eu
 
-for command in decrypt_documents \
-	document_archiver \
+for command in document_archiver \
 	document_exporter \
 	document_importer \
 	mail_fetcher \
