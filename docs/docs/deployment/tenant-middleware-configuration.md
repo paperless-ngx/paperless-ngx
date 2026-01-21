@@ -92,21 +92,20 @@ class TenantMiddleware:
 Helper functions manage request context across the application:
 
 ```python
-def get_current_tenant():
-    """Get the current tenant from thread-local storage."""
-    return getattr(_thread_locals, "tenant", None)
-
 def get_current_tenant_id():
     """Get the current tenant ID from thread-local storage."""
-    return getattr(_thread_locals, "tenant_id", None)
+    return getattr(_thread_local, "tenant_id", None)
 
-def set_current_tenant(tenant):
-    """Set the current tenant in thread-local storage."""
-    _thread_locals.tenant = tenant
-    _thread_locals.tenant_id = tenant.id if tenant else None
+def set_current_tenant_id(tenant_id):
+    """Set the current tenant ID in thread-local storage."""
+    _thread_local.tenant_id = tenant_id
 ```
 
 These are used by tenant-aware ORM managers to automatically filter queries by tenant.
+
+:::warning Critical Implementation Detail
+The middleware **must use** `set_current_tenant_id()` from `documents.models.base` to share thread-local storage with `TenantManager`. Using a separate `threading.local()` instance will break tenant isolation. See [Thread-Local Tenant Context](../security/thread-local-tenant-context.md) for details.
+:::
 
 ## Configuration
 
@@ -549,6 +548,7 @@ class Migration(migrations.Migration):
 
 ## See Also
 
+- [Thread-Local Tenant Context](../security/thread-local-tenant-context.md) - **Critical**: Shared storage implementation
 - [Tenant Model Documentation](./multi-tenant-architecture.md)
 - [MinIO Multi-Tenant Storage](./minio-multi-tenant.md)
 - [PostgreSQL Row-Level Security](./postgres-statefulset.md)

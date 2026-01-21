@@ -288,6 +288,8 @@ WHERE tenant_id = current_setting('app.current_tenant', true)::uuid;
 **File:** `src/paperless/middleware.py`
 
 ```python
+from documents.models.base import set_current_tenant_id as set_tenant_id_in_base
+
 class TenantMiddleware:
     """
     Middleware to resolve and enforce tenant isolation based on subdomain routing.
@@ -299,7 +301,7 @@ class TenantMiddleware:
     Sets:
     - request.tenant: The resolved Tenant object
     - request.tenant_id: The tenant's ID
-    - Thread-local storage for ORM filtering
+    - Thread-local storage for ORM filtering (via base.py)
     - PostgreSQL session variable for RLS
     """
 
@@ -318,6 +320,9 @@ class TenantMiddleware:
         request.tenant = tenant
         request.tenant_id = tenant.id
 
+        # Set thread-local storage using shared function from base.py
+        set_tenant_id_in_base(tenant.id if tenant else None)
+
         # Configure PostgreSQL session for RLS
         with connection.cursor() as cursor:
             cursor.execute("SET app.current_tenant = %s", [str(tenant.id)])
@@ -325,8 +330,15 @@ class TenantMiddleware:
         # Process request
         response = self.get_response(request)
 
+        # Clean up thread-local storage
+        set_tenant_id_in_base(None)
+
         return response
 ```
+
+:::warning Critical Bug Fix (January 2026)
+The middleware **must use** `set_current_tenant_id()` from `documents.models.base` to share thread-local storage with `TenantManager`. Earlier versions incorrectly used a separate `threading.local()` instance, which broke tenant isolation for queries. See [Thread-Local Tenant Context](./thread-local-tenant-context.md) for details.
+:::
 
 ### RLS Migration
 
@@ -655,6 +667,7 @@ logger.info(f"User {request.user.username} accessed tenant {tenant.name} (ID: {t
 
 ## References
 
+- [Thread-Local Tenant Context](./thread-local-tenant-context.md) - **Critical**: Shared storage implementation and bug fix
 - [PostgreSQL Row-Level Security Documentation](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
 - [Django Middleware Documentation](https://docs.djangoproject.com/en/stable/topics/http/middleware/)
 - [OWASP Multi-Tenancy Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Multitenant_Architecture_Cheat_Sheet.html)

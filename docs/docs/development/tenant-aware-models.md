@@ -126,6 +126,10 @@ def set_current_tenant_id(tenant_id):
     _thread_local.tenant_id = tenant_id
 ```
 
+:::danger Critical Implementation Requirement
+This thread-local storage **must be shared** between middleware and ORM managers. Never create a separate `threading.local()` instance for tenant context. See [Thread-Local Tenant Context](../security/thread-local-tenant-context.md) for details on a critical bug that was fixed in January 2026.
+:::
+
 ## Models Inheriting from ModelWithOwner
 
 All of these models use automatic tenant isolation:
@@ -603,6 +607,7 @@ def audit_raw_query(query):
 
 ## See Also
 
+- [Thread-Local Tenant Context](../security/thread-local-tenant-context.md) - **Critical**: Shared thread-local storage bug fix
 - [Multi-Tenant Architecture](../deployment/multi-tenant-architecture.md) - Overall design with RLS details
 - [Database-Level Isolation](../deployment/multi-tenant-architecture.md#database-level-isolation-with-row-level-security) - RLS implementation guide
 - [TenantMiddleware Configuration](../deployment/tenant-middleware-configuration.md) - Request routing
