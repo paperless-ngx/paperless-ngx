@@ -876,6 +876,11 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
             date_done=None,
             owner_id=user_id,
         )
+
+        # Close connection pool to prevent memory leak
+        for conn in connections.all(initialized_only=True):
+            if conn.alias == "default" and hasattr(conn, "pool") and conn.pool:
+                conn.close_pool()
     except Exception:  # pragma: no cover
         # Don't let an exception in the signal handlers prevent
         # a document from being consumed.
@@ -899,6 +904,11 @@ def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs):
             task_instance.status = states.STARTED
             task_instance.date_started = timezone.now()
             task_instance.save()
+
+        # Close connection pool to prevent memory leak
+        for conn in connections.all(initialized_only=True):
+            if conn.alias == "default" and hasattr(conn, "pool") and conn.pool:
+                conn.close_pool()
     except Exception:  # pragma: no cover
         # Don't let an exception in the signal handlers prevent
         # a document from being consumed.
@@ -928,6 +938,11 @@ def task_postrun_handler(
             task_instance.result = retval
             task_instance.date_done = timezone.now()
             task_instance.save()
+
+        # Close connection pool to prevent memory leak
+        for conn in connections.all(initialized_only=True):
+            if conn.alias == "default" and hasattr(conn, "pool") and conn.pool:
+                conn.close_pool()
     except Exception:  # pragma: no cover
         # Don't let an exception in the signal handlers prevent
         # a document from being consumed.
@@ -957,6 +972,11 @@ def task_failure_handler(
             task_instance.result = traceback
             task_instance.date_done = timezone.now()
             task_instance.save()
+
+        # Close connection pool to prevent memory leak
+        for conn in connections.all(initialized_only=True):
+            if conn.alias == "default" and hasattr(conn, "pool") and conn.pool:
+                conn.close_pool()
     except Exception:  # pragma: no cover
         logger.exception("Updating PaperlessTask failed")
 
