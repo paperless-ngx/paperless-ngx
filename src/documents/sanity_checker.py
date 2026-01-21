@@ -62,7 +62,10 @@ class SanityCheckFailedException(Exception):
     pass
 
 
-def check_sanity(*, progress=False, scheduled=True) -> SanityCheckMessages:
+def check_sanity(*, progress=False, scheduled=True, tenant_id=None) -> SanityCheckMessages:
+    if tenant_id:
+        from documents.tasks import restore_tenant_context
+        restore_tenant_context(tenant_id)
     paperless_task = PaperlessTask.objects.create(
         task_id=uuid.uuid4(),
         type=PaperlessTask.TaskType.SCHEDULED_TASK

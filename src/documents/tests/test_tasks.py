@@ -373,3 +373,62 @@ class TestAIIndex(DirectoriesMixin, TestCase):
         ) as llm_index_remove_document:
             tasks.remove_document_from_llm_index(doc)
             llm_index_remove_document.assert_called_once_with(doc)
+
+
+class TestTenantContextInTasks(DirectoriesMixin, TestCase):
+    """Test tenant context restoration in Celery tasks."""
+
+    def setUp(self):
+        from paperless.models import Tenant
+
+        self.tenant_a = Tenant.objects.create(
+            name="Tenant A",
+            subdomain="tenant-a",
+            is_active=True,
+        )
+
+    def test_restore_tenant_context_helper(self):
+        """Test restore_tenant_context helper function."""
+        from documents.models import set_current_tenant_id, get_current_tenant_id
+        from documents.tasks import restore_tenant_context
+
+        set_current_tenant_id(None)
+        self.assertIsNone(get_current_tenant_id())
+
+        restore_tenant_context(str(self.tenant_a.id))
+        self.assertEqual(get_current_tenant_id(), self.tenant_a.id)
+
+    def test_train_classifier_with_tenant_id(self):
+        """Test train_classifier restores tenant context."""
+        from documents.models import set_current_tenant_id
+
+        set_current_tenant_id(None)
+
+        tasks.train_classifier(scheduled=False, tenant_id=str(self.tenant_a.id))
+
+        task = PaperlessTask.objects.filter(
+            task_name=PaperlessTask.TaskName.TRAIN_CLASSIFIER,
+            tenant_id=self.tenant_a.id,
+        ).first()
+        self.assertIsNotNone(task)
+        self.assertEqual(task.tenant_id, self.tenant_a.id)
+
+    def test_scheduled_wrapper_spawns_per_tenant(self):
+        """Test wrapper tasks spawn per-tenant executions."""
+        from paperless.models import Tenant
+
+        tenant_b = Tenant.objects.create(
+            name="Tenant B",
+            subdomain="tenant-b",
+            is_active=True,
+        )
+
+        with mock.patch("documents.tasks.train_classifier.delay") as delay_mock:
+            tasks.scheduled_train_classifier_all_tenants()
+
+            self.assertEqual(delay_mock.call_count, 2)
+
+            call_args = [call.kwargs for call in delay_mock.call_args_list]
+            tenant_ids = {args['tenant_id'] for args in call_args}
+            expected = {str(self.tenant_a.id), str(tenant_b.id)}
+            self.assertEqual(tenant_ids, expected)

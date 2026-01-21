@@ -180,7 +180,7 @@ def _parse_beat_schedule() -> dict:
             "env_key": "PAPERLESS_TRAIN_TASK_CRON",
             # Default hourly at 5 minutes past the hour
             "env_default": "5 */1 * * *",
-            "task": "documents.tasks.train_classifier",
+            "task": "documents.tasks.scheduled_train_classifier_all_tenants",
             "options": {
                 # 1 minute before default schedule sends again
                 "expires": 59.0 * 60.0,
@@ -202,7 +202,7 @@ def _parse_beat_schedule() -> dict:
             "env_key": "PAPERLESS_SANITY_TASK_CRON",
             # Default Sunday at 00:30
             "env_default": "30 0 * * sun",
-            "task": "documents.tasks.sanity_check",
+            "task": "documents.tasks.scheduled_sanity_check_all_tenants",
             "options": {
                 # 1 hour before default schedule sends again
                 "expires": ((7.0 * 24.0) - 1.0) * 60.0 * 60.0,
@@ -235,7 +235,7 @@ def _parse_beat_schedule() -> dict:
             "env_key": "PAPERLESS_LLM_INDEX_TASK_CRON",
             # Default daily at 02:10
             "env_default": "10 2 * * *",
-            "task": "documents.tasks.llmindex_index",
+            "task": "documents.tasks.scheduled_llmindex_index_all_tenants",
             "options": {
                 # 1 hour before default schedule sends again
                 "expires": 23.0 * 60.0 * 60.0,
