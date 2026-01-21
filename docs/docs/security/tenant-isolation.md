@@ -642,6 +642,34 @@ logger.info(f"User {request.user.username} accessed tenant {tenant.name} (ID: {t
 As of January 2026, tenant isolation has been extended to multiple models beyond documents. Each model uses the appropriate isolation strategy based on its security requirements and use case.
 :::
 
+### Document Model Tenant Isolation
+
+:::info Document Model Security Fix
+As of January 2026, a critical security fix was applied to Document view endpoints. Two methods were using `Document.global_objects` instead of `Document.objects`, which bypassed tenant filtering in the document download and bulk delete endpoints.
+
+For complete details, see [Document Tenant Isolation](./document-tenant-isolation.md).
+:::
+
+The `Document` model is the core model for storing uploaded documents and uses comprehensive tenant isolation:
+
+**Key Features:**
+
+1. **TenantManager Integration**: Inherits from `ModelWithOwner`, providing automatic tenant filtering
+2. **PostgreSQL RLS Protection**: RLS policies enforce tenant boundaries at database level
+3. **Fixed Endpoints**: Document download and bulk delete now properly use tenant-aware queries
+4. **Comprehensive Testing**: 11 test cases covering all document endpoints
+
+**Security Model:**
+
+- ✅ Application-layer filtering via `TenantManager`
+- ✅ PostgreSQL RLS for defense-in-depth
+- ✅ All view endpoints verified tenant-safe
+- ✅ Cross-tenant access returns 404
+
+For full documentation, see [Document Tenant Isolation](./document-tenant-isolation.md).
+
+---
+
 ### User Tenant Isolation
 
 :::info User Model Isolation
@@ -771,6 +799,7 @@ For full documentation, see [Group Tenant Isolation](./group-tenant-isolation.md
 
 ## References
 
+- [Document Tenant Isolation](./document-tenant-isolation.md) - Document model tenant isolation and security fix
 - [User Tenant Isolation](./user-tenant-isolation.md) - User model tenant isolation implementation
 - [Group Tenant Isolation](./group-tenant-isolation.md) - TenantGroup model tenant isolation implementation
 - [Thread-Local Tenant Context](./thread-local-tenant-context.md) - **Critical**: Shared storage implementation and bug fix
