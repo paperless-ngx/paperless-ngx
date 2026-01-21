@@ -21,12 +21,35 @@ for the current development stage but **must be resolved before production**.
 | Critical | 0 |
 | High     | 2 |
 | Medium   | 2 |
-| Low      | 1 |
-| Info     | 0 |
+| Low      | 2 |
+| Info     | 1 |
 
 ---
 
 ## Deferred Findings by Task
+
+### Task: 9f2eeca4...
+
+**Date**: 2026-01-21
+**Stage**: dev
+**Description**: Add tenant_id field to Django's User model and filter the UserViewSet to only return users belonging to the current tenant
+
+**Status**: ✅ RESOLVED - All HIGH and MEDIUM severity findings addressed in final revision
+
+| Severity | Category | Description | Location | Status |
+|----------|----------|-------------|----------|--------|
+| INFO | A01:2021 – Broken Access Control (OWASP) | User tenant isolation uses application-layer filtering only (no PostgreSQL RLS). Future enhancement: Add RLS policies to auth_user and paperless_userprofile tables for defense-in-depth. | `src/paperless/views.py:128-169` | Accepted for dev stage |
+| LOW | A09:2021 – Security Logging and Monitoring Failures (OWASP) | Comprehensive audit logging implemented for user access events, but PostgreSQL-level RLS violations cannot be logged without RLS policies. | `src/paperless/views.py:126,142-167,184-189` | Partially addressed |
+
+**Implementation Notes**:
+- All acceptance criteria met with comprehensive test coverage (342 lines, 8 test cases)
+- Superuser policy explicitly defined (superusers bypass tenant filtering)
+- Audit logging implemented for tenant isolation events
+- Defensive programming includes null checks for missing UserProfile
+- Signal handler includes fallback to default tenant
+- See [User Tenant Isolation](./user-tenant-isolation.md) for full documentation
+
+---
 
 ### Task: 50709538...
 

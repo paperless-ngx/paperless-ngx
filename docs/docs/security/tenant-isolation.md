@@ -270,14 +270,13 @@ WHERE tenant_id = current_setting('app.current_tenant', true)::uuid;
 
 #### ❌ NOT Protected (By Design)
 
-1. **Shared User Accounts**
-   - Users are NOT tenant-isolated (by design)
-   - A user with credentials can log into any tenant
-   - **Mitigation:** Use separate user accounts per tenant
-
-2. **Administrative Access**
-   - Django admin (`/admin/`) may show cross-tenant data
+1. **Django Admin Interface**
+   - Django admin (`/admin/`) may show cross-tenant data for some models
    - **Mitigation:** Restrict admin access to trusted personnel
+
+2. **Direct Database Access**
+   - Database users with direct SQL access can bypass RLS for superuser connections
+   - **Mitigation:** Restrict database credentials and use connection pooling
 
 ---
 
@@ -637,23 +636,68 @@ logger.info(f"User {request.user.username} accessed tenant {tenant.name} (ID: {t
 
 ---
 
+## User Tenant Isolation
+
+:::info User Model Isolation
+As of January 2026, users are now tenant-isolated at the **application layer**. Each user is associated with a specific tenant via a `UserProfile` model containing a `tenant_id` field. The `/api/users/` endpoint automatically filters users based on the current tenant context.
+
+For complete details, see [User Tenant Isolation](./user-tenant-isolation.md).
+:::
+
+### User-Tenant Relationship
+
+Users are associated with tenants through a `UserProfile` model:
+
+```python
+# src/paperless/models.py
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    tenant_id = models.UUIDField(db_index=True, null=False)
+```
+
+**Key Features:**
+
+1. **Automatic Profile Creation**: Signal handler creates `UserProfile` when users are created
+2. **Tenant Context Integration**: Uses shared thread-local storage from `documents.models.base`
+3. **Filtered User API**: `UserViewSet.get_queryset()` filters by `profile__tenant_id`
+4. **Superuser Bypass**: Superusers can view users across all tenants
+5. **Audit Logging**: All user access events logged to `paperless.audit.tenant`
+
+**Example Usage:**
+
+```bash
+# User from tenant "acme" sees only acme users
+curl -H "Authorization: Token abc123" http://acme.local:8000/api/users/
+
+# Returns: ["alice@acme.com", "bob@acme.com"]
+# Does NOT return: ["charlie@globex.com"]
+```
+
+**Security Model:**
+
+- ✅ Application-layer filtering via `UserViewSet`
+- ❌ No PostgreSQL RLS (future enhancement)
+- ✅ Superuser bypass for administration
+- ✅ Comprehensive test coverage (342 lines, 8 test cases)
+
+For full documentation, see [User Tenant Isolation](./user-tenant-isolation.md).
+
+---
+
 ## Future Enhancements
 
 ### Potential Improvements
 
-1. **Tenant-Specific User Accounts**
-   - Add `tenant_id` to User model
-   - Prevent cross-tenant login
+1. **PostgreSQL RLS for User Models** ⭐ Priority
+   - Add RLS policies to `auth_user` and `paperless_userprofile` tables
+   - Provide defense-in-depth protection for user data
+   - See: [User Tenant Isolation - Future Enhancement](./user-tenant-isolation.md#security-guarantees)
 
 2. **API Key Tenant Binding**
    - Bind API keys to specific tenants
    - Reject requests with mismatched tenant context
 
-3. **Tenant-Aware Admin Interface**
-   - Filter Django admin by tenant
-   - Prevent superuser cross-tenant access
-
-4. **Tenant Quota Enforcement**
+3. **Tenant Quota Enforcement**
    - Storage limits per tenant
    - Document count limits
    - Rate limiting per tenant
@@ -667,7 +711,9 @@ logger.info(f"User {request.user.username} accessed tenant {tenant.name} (ID: {t
 
 ## References
 
+- [User Tenant Isolation](./user-tenant-isolation.md) - User model tenant isolation implementation
 - [Thread-Local Tenant Context](./thread-local-tenant-context.md) - **Critical**: Shared storage implementation and bug fix
+- [Security Debt Tracker](./deferred-findings.md) - Known security issues and deferred findings
 - [PostgreSQL Row-Level Security Documentation](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
 - [Django Middleware Documentation](https://docs.djangoproject.com/en/stable/topics/http/middleware/)
 - [OWASP Multi-Tenancy Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Multitenant_Architecture_Cheat_Sheet.html)
