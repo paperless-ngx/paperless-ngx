@@ -1044,29 +1044,30 @@ IGNORABLE_FILES: Final[list[str]] = [
     "Thumbs.db",
 ]
 
-CONSUMER_POLLING = int(os.getenv("PAPERLESS_CONSUMER_POLLING", 0))
+CONSUMER_POLLING_INTERVAL = float(os.getenv("PAPERLESS_CONSUMER_POLLING_INTERVAL", 0))
 
-CONSUMER_POLLING_DELAY = int(os.getenv("PAPERLESS_CONSUMER_POLLING_DELAY", 5))
-
-CONSUMER_POLLING_RETRY_COUNT = int(
-    os.getenv("PAPERLESS_CONSUMER_POLLING_RETRY_COUNT", 5),
-)
-
-CONSUMER_INOTIFY_DELAY: Final[float] = __get_float(
-    "PAPERLESS_CONSUMER_INOTIFY_DELAY",
-    0.5,
-)
+CONSUMER_STABILITY_DELAY = float(os.getenv("PAPERLESS_CONSUMER_STABILITY_DELAY", 5))
 
 CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES")
 
 CONSUMER_RECURSIVE = __get_boolean("PAPERLESS_CONSUMER_RECURSIVE")
 
-# Ignore glob patterns, relative to PAPERLESS_CONSUMPTION_DIR
+# Ignore regex patterns, matched against filename only
 CONSUMER_IGNORE_PATTERNS = list(
     json.loads(
         os.getenv(
             "PAPERLESS_CONSUMER_IGNORE_PATTERNS",
-            json.dumps(IGNORABLE_FILES),
+            json.dumps([]),
+        ),
+    ),
+)
+
+# Directories to always ignore.  These are matched by directory name, not full path
+CONSUMER_IGNORE_DIRS = list(
+    json.loads(
+        os.getenv(
+            "PAPERLESS_CONSUMER_IGNORE_DIRS",
+            json.dumps([]),
         ),
     ),
 )
