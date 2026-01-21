@@ -25,7 +25,6 @@ from llama_index.vector_stores.faiss import FaissVectorStore
 
 from documents.models import Document
 from documents.models import PaperlessTask
-from documents.tasks import llmindex_index
 from paperless_ai.embedding import build_llm_index_text
 from paperless_ai.embedding import get_embedding_dim
 from paperless_ai.embedding import get_embedding_model
@@ -34,6 +33,8 @@ logger = logging.getLogger("paperless_ai.indexing")
 
 
 def queue_llm_index_update_if_needed(*, rebuild: bool, reason: str) -> bool:
+    from documents.tasks import llmindex_index
+
     has_running = PaperlessTask.objects.filter(
         task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
         status__in=[states.PENDING, states.STARTED],
