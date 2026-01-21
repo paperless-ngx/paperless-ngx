@@ -521,6 +521,93 @@ PAPERLESS_REDIS=redis://redis-node-1:6379,redis-node-2:6379,redis-node-3:6379
 - More complex to operate and monitor
 :::
 
+## API Endpoint: /api/tasks/run/
+
+The `/api/tasks/run/` endpoint allows superusers to manually trigger tasks through the REST API.
+
+### Endpoint Details
+
+**URL**: `POST /api/tasks/run/`
+
+**Authentication**: Required (superuser only)
+
+**Request Headers**:
+```
+Authorization: Token YOUR_SUPERUSER_TOKEN
+X-Tenant-ID: your-tenant-uuid (optional)
+Content-Type: application/json
+```
+
+**Request Body**:
+```json
+{
+    "task_name": "TRAIN_CLASSIFIER"
+}
+```
+
+**Response**:
+```json
+{
+    "result": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+}
+```
+
+### Supported Tasks
+
+| Task Name | Description |
+|-----------|-------------|
+| `INDEX_OPTIMIZE` | Optimize Whoosh search index |
+| `TRAIN_CLASSIFIER` | Train document auto-matching classifier |
+| `CHECK_SANITY` | Run system sanity checks |
+| `LLMINDEX_UPDATE` | Update LLM vector index (if enabled) |
+
+### Multi-Tenant Execution
+
+When executed in a multi-tenant deployment:
+
+1. **From tenant subdomain**: Task automatically receives the tenant context from the HTTP request
+2. **Tenant isolation**: Task execution is isolated to the requesting tenant
+3. **Superuser requirement**: Only superusers can trigger tasks (security restriction)
+
+**Example - Train classifier for current tenant**:
+```bash
+curl -X POST https://tenant1.example.com/api/tasks/run/ \
+  -H "Authorization: Token abc123..." \
+  -H "Content-Type: application/json" \
+  -d '{"task_name": "TRAIN_CLASSIFIER"}'
+```
+
+The task will execute with `tenant_id` automatically set to tenant1's UUID.
+
+### Tenant Context Restoration
+
+The endpoint implementation handles multi-tenant context:
+
+```python
+@action(methods=["post"], detail=False)
+def run(self, request):
+    # Get tenant_id from request context (set by middleware)
+    tenant_id = getattr(request, 'tenant_id', None)
+    if tenant_id:
+        # Include tenant_id in task execution
+        task_args = {**task_args, 'tenant_id': str(tenant_id)}
+
+    # Queue task with tenant context
+    result = task_func.delay(**task_args)
+    return Response({"result": str(result)})
+```
+
+### Task Status Monitoring
+
+After triggering a task, monitor its status:
+
+```bash
+curl -X GET https://example.com/api/tasks/?task_id=f47ac10b-58cc-4372-a567-0e02b2c3d479 \
+  -H "Authorization: Token abc123..."
+```
+
+Response includes `status` (SUCCESS, FAILURE, STARTED), `result`, and timestamps.
+
 ## Summary
 
 | Topic | Configuration |
@@ -529,6 +616,7 @@ PAPERLESS_REDIS=redis://redis-node-1:6379,redis-node-2:6379,redis-node-3:6379
 | Multi-Tenant Isolation | Use `PAPERLESS_REDIS_PREFIX=tenant-name:` |
 | Task Workers | `PAPERLESS_TASK_WORKERS=4` |
 | Worker Timeout | `PAPERLESS_WORKER_TIMEOUT=1800` |
+| API Endpoint | `POST /api/tasks/run/` (superuser only) |
 | Persistence | Enable RDB + AOF in Redis config |
 | Monitoring | Use `celery inspect` and `redis-cli INFO` |
 | Security | Enable authentication and TLS |

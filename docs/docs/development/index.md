@@ -31,6 +31,17 @@ Manage code coverage tracking across backend and frontend components.
 - Threshold configuration and best practices
 - Troubleshooting coverage integration issues
 
+### [Multi-Tenant Celery Tasks Guide](./celery-multi-tenant-tasks.md)
+Implement and manage Celery background tasks in multi-tenant deployments.
+
+- Tenant context restoration pattern and best practices
+- When to add `tenant_id` parameter to tasks
+- Wrapper task pattern for scheduled execution
+- Creating new tasks step-by-step
+- API endpoint documentation for `/api/tasks/run/`
+- Per-tenant vs global task execution patterns
+- Comprehensive troubleshooting guide
+
 ## Quick Navigation
 
 ### I want to...
@@ -58,6 +69,15 @@ Manage code coverage tracking across backend and frontend components.
 
 **Adjust coverage thresholds**
 → See [Adjusting Coverage Thresholds](./codecov-configuration.md#adjusting-coverage-thresholds)
+
+**Implement background tasks for document processing**
+→ Read [Multi-Tenant Celery Tasks Guide](./celery-multi-tenant-tasks.md)
+
+**Understand how scheduled tasks work per-tenant**
+→ See [Scheduled Tasks: Per-Tenant vs Global Execution](./celery-multi-tenant-tasks.md#scheduled-tasks-per-tenant-vs-global-execution)
+
+**Troubleshoot task execution errors**
+→ Check [Troubleshooting](./celery-multi-tenant-tasks.md#troubleshooting) in Celery Tasks Guide
 
 ## Development Stack
 
