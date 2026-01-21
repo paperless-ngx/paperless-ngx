@@ -1882,9 +1882,13 @@ class PostDocumentView(GenericAPIView):
             custom_fields=custom_fields,
         )
 
+        # Get tenant_id from request (set by TenantMiddleware)
+        tenant_id = getattr(request, 'tenant_id', None)
+
         async_task = consume_file.delay(
             input_doc,
             input_doc_overrides,
+            tenant_id=str(tenant_id) if tenant_id else None,
         )
 
         return Response(async_task.id)

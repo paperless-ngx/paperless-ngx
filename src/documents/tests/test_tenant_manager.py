@@ -11,6 +11,7 @@ from django.test import TestCase, TransactionTestCase
 from django.db import connection
 
 from documents.models import (
+    Tenant,
     Correspondent,
     Document,
     DocumentType,
@@ -21,7 +22,6 @@ from documents.models import (
     get_current_tenant_id,
     set_current_tenant_id,
 )
-from paperless.models import Tenant
 
 
 class TenantManagerTestCase(TransactionTestCase):

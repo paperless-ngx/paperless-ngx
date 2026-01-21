@@ -65,10 +65,12 @@ class TenantMiddleware:
         if "." in host:
             # Remove port if present
             host_without_port = host.split(":")[0]
-            parts = host_without_port.split(".")
 
-            # Check if this is a subdomain (more than 2 parts or not just "localhost")
-            if len(parts) >= 2:
+            # Skip subdomain extraction if this is an IP address
+            parts = host_without_port.split(".")
+            is_ip = all(part.isdigit() and 0 <= int(part) <= 255 for part in parts if part)
+
+            if not is_ip and len(parts) >= 2:
                 # Get the subdomain (first part)
                 subdomain = parts[0]
                 logger.debug(f"Extracted subdomain: {subdomain}")
@@ -79,7 +81,7 @@ class TenantMiddleware:
         # Try to resolve tenant
         if subdomain:
             try:
-                from paperless.models import Tenant
+                from documents.models import Tenant
                 tenant = Tenant.objects.get(subdomain=subdomain)
                 logger.info(f"Resolved tenant from subdomain '{subdomain}': {tenant.name} (ID: {tenant.id})")
             except Tenant.DoesNotExist:
@@ -91,7 +93,7 @@ class TenantMiddleware:
 
         elif tenant_id_header:
             try:
-                from paperless.models import Tenant
+                from documents.models import Tenant
                 tenant = Tenant.objects.get(id=tenant_id_header)
                 logger.info(f"Resolved tenant from X-Tenant-ID header: {tenant.name} (ID: {tenant.id})")
             except Tenant.DoesNotExist:

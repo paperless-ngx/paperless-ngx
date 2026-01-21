@@ -2,7 +2,7 @@
 # Dockerfile.scheduler - Scheduler component only (Celery beat)
 # Based on ghcr.io/paperless-ngx/paperless-ngx:latest with only scheduler service enabled
 
-FROM localhost:5001/paless:latest
+FROM localhost:5000/paless:latest
 
 LABEL org.opencontainers.image.description="Paperless-ngx scheduler component (Celery beat only)"
 LABEL org.opencontainers.image.title="paless-scheduler"

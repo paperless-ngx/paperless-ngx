@@ -31,6 +31,8 @@ spec:
             - secretRef:
                 name: paless-secret
           env:
+            - name: SKIP_MIGRATIONS
+              value: "true"
             - name: PAPERLESS_DBPASS
               valueFrom:
                 secretKeyRef:

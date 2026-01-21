@@ -20,7 +20,7 @@ spec:
           effect: "NoSchedule"
       containers:
         - name: paperless
-          image: localhost:5001/paless:latest
+          image: localhost:5000/paless:latest
           imagePullPolicy: Always
           ports:
             - name: http

@@ -10,6 +10,7 @@ resources:
   - postgres-service.yaml
   - postgres-init-configmap.yaml
   - postgres-init-job.yaml
+  - paless-migrate-job.yaml
   - redis-statefulset.yaml
   - redis-service.yaml
   - minio-statefulset.yaml

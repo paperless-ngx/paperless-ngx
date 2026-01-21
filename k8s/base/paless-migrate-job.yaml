@@ -1,0 +1,57 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: paless-migrate
+  labels:
+    app: paless
+    app.kubernetes.io/name: paless-migrate
+    app.kubernetes.io/component: migration
+    app.kubernetes.io/part-of: paless
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: paless-migrate
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: migrate
+        image: localhost:5000/paless-web:v2
+        command:
+        - /bin/bash
+        - -c
+        - |
+          echo "[migrate-job] Waiting for PostgreSQL..."
+          until PGPASSWORD="$PAPERLESS_DBPASS" psql -h postgres -U paperless_app -d paperless -c "SELECT 1" >/dev/null 2>&1; do
+            echo "PostgreSQL not ready, waiting..."
+            sleep 2
+          done
+
+          echo "[migrate-job] Running database migrations..."
+          cd /usr/src/paperless/src
+          python3 manage.py migrate --skip-checks --no-input
+
+          echo "[migrate-job] Migrations complete!"
+        env:
+        - name: PAPERLESS_DBHOST
+          value: postgres
+        - name: PAPERLESS_DBNAME
+          value: paperless
+        - name: PAPERLESS_DBUSER
+          value: paperless_app
+        - name: PAPERLESS_DBPORT
+          value: "5432"
+        - name: PAPERLESS_DBPASS
+          valueFrom:
+            secretKeyRef:
+              name: paless-secret
+              key: paperless-app-password
+        - name: PAPERLESS_REDIS
+          value: redis://redis:6379
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: paless-secret
+              key: db-password

@@ -35,6 +35,8 @@ spec:
             - secretRef:
                 name: paless-secret
           env:
+            - name: SKIP_MIGRATIONS
+              value: "true"
             - name: PAPERLESS_DBPASS
               valueFrom:
                 secretKeyRef:
@@ -56,6 +58,9 @@ spec:
             httpGet:
               path: /
               port: 8000
+              httpHeaders:
+              - name: X-Tenant-ID
+                value: "4"
             initialDelaySeconds: 60
             periodSeconds: 10
             timeoutSeconds: 5
@@ -64,6 +69,9 @@ spec:
             httpGet:
               path: /
               port: 8000
+              httpHeaders:
+              - name: X-Tenant-ID
+                value: "4"
             initialDelaySeconds: 30
             periodSeconds: 5
             timeoutSeconds: 3

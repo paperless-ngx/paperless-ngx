@@ -144,7 +144,26 @@ def consume_file(
     self: Task,
     input_doc: ConsumableDocument,
     overrides: DocumentMetadataOverrides | None = None,
+    tenant_id: str | None = None,
 ):
+    # Restore tenant context for multi-tenant isolation
+    if tenant_id:
+        from django.db import connection
+        from documents.models import set_current_tenant_id
+        import uuid
+
+        # Parse tenant_id to UUID if it's a string
+        tenant_uuid = uuid.UUID(tenant_id) if isinstance(tenant_id, str) else tenant_id
+
+        # Set thread-local storage for ModelWithOwner.save() (CRITICAL)
+        set_current_tenant_id(tenant_uuid)
+
+        # Set PostgreSQL session variable for Row-Level Security
+        with connection.cursor() as cursor:
+            cursor.execute("SET app.current_tenant = %s", [str(tenant_id)])
+
+        logger.info(f"Consuming file with tenant context: {tenant_id}")
+
     # Default no overrides
     if overrides is None:
         overrides = DocumentMetadataOverrides()

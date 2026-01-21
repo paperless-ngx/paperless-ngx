@@ -1,7 +1,7 @@
 # Migration to enable PostgreSQL Row-Level Security (RLS) for tenant isolation
 
 from django.db import migrations, connection
-from psycopg2 import sql
+from psycopg import sql
 
 
 def is_postgresql(schema_editor):

@@ -45,7 +45,8 @@ data:
   PAPERLESS_DATA_DIR: "/usr/src/paperless/data"
   PAPERLESS_MEDIA_ROOT: "/usr/src/paperless/media"
   PAPERLESS_STATICDIR: "/usr/src/paperless/static"
-  PAPERLESS_CONSUMPTION_DIR: "/usr/src/paperless/consume"
+  PAPERLESS_CONSUMPTION_DIR: "/usr/src/paperless/data/consume"
+  PAPERLESS_SCRATCH_DIR: "/usr/src/paperless/data/tmp"
   # PAPERLESS_TRASH_DIR: "/usr/src/paperless/trash"  # Disabled - directory not persistent
 
   # Consumer Settings

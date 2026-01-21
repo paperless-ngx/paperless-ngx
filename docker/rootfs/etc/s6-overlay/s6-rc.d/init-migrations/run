@@ -2,6 +2,12 @@
 # shellcheck shell=bash
 declare -r log_prefix="[init-migrations]"
 
+# Skip migrations if SKIP_MIGRATIONS is set
+if [[ "${SKIP_MIGRATIONS}" == "true" ]]; then
+	echo "${log_prefix} Skipping migrations (SKIP_MIGRATIONS=true)"
+	exit 0
+fi
+
 declare -r data_dir="${PAPERLESS_DATA_DIR:-/usr/src/paperless/data}"
 
 echo "${log_prefix} Apply database migrations..."

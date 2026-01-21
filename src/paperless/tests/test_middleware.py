@@ -3,7 +3,7 @@ from django.test import RequestFactory, TestCase, override_settings
 from rest_framework import status
 
 from paperless.middleware import TenantMiddleware, get_current_tenant, set_current_tenant
-from paperless.models import Tenant
+from documents.models import Tenant
 
 
 class TestTenantMiddleware(TestCase):

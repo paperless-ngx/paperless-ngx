@@ -8,8 +8,8 @@ import uuid
 from django.contrib.auth.models import User
 from django.db import connection
 from django.test import TestCase, TransactionTestCase
-from paperless.models import Tenant
 from documents.models import (
+    Tenant,
     Correspondent,
     Document,
     DocumentType,

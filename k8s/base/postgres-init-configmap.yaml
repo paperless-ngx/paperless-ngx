@@ -33,8 +33,8 @@ data:
     -- Grant connect privilege
     GRANT CONNECT ON DATABASE paperless TO paperless_app;
 
-    -- Grant schema usage
-    GRANT USAGE ON SCHEMA public TO paperless_app;
+    -- Grant schema usage and create privileges
+    GRANT USAGE, CREATE ON SCHEMA public TO paperless_app;
 
     -- Grant table permissions on all existing tables
     GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO paperless_app;
