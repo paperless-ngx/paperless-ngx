@@ -17,7 +17,22 @@ Celery provides asynchronous task processing for long-running operations like do
 - **Tenant Context**: Per-request context (thread-local storage + PostgreSQL RLS) identifying the current tenant
 - **restore_tenant_context()**: Helper function that restores tenant context in task workers
 - **Scheduled Tasks**: Global scheduler (Celery Beat) that spawns per-tenant tasks
+- **Rate Limiting**: Batched task spawning with configurable delays to prevent worker overload
 - **Tenant Isolation**: Row-Level Security (RLS) queries and thread-local storage prevent cross-tenant data leaks
+
+:::info Rate Limiting in Multi-Tenant Deployments
+
+For deployments with many tenants (100+), **rate limiting is essential** to prevent worker overload. The `spawn_tenant_tasks_with_rate_limiting()` helper automatically batches task spawning based on configuration:
+
+```bash
+# Spawn 10 tasks per batch, wait 60 seconds between batches
+CELERY_TENANT_BATCH_SIZE=10
+CELERY_TENANT_BATCH_DELAY=60
+```
+
+All wrapper tasks in Paperless use this pattern by default. See [Rate Limiting Configuration](#rate-limiting-configuration) for details.
+
+:::
 
 ## Tenant Context Restoration Pattern
 
@@ -151,21 +166,45 @@ def my_task(arg1, arg2, *, scheduled=True, tenant_id=None):
 
 Celery Beat runs tasks on a schedule (e.g., daily, weekly). In multi-tenant setups, a single scheduled task can't execute per-tenant automatically—it needs a wrapper to spawn per-tenant tasks.
 
-### The Solution: Wrapper Tasks
+**Additional Challenge**: Spawning tasks for many tenants simultaneously can overload Celery workers, causing task backlog and delays. The solution is **rate limiting** with staggered task execution.
+
+### The Solution: Wrapper Tasks with Rate Limiting
 
 Create a "wrapper" task that:
 1. Fetches all active tenants
-2. Spawns per-tenant tasks with `.delay(tenant_id=...)`
+2. Spawns per-tenant tasks in **batches** with optional **delays** between batches
+3. Prevents worker overload in multi-tenant deployments with 100+ tenants
 
 ### Implementation Pattern
+
+Modern implementation uses the `spawn_tenant_tasks_with_rate_limiting()` helper:
 
 ```python
 @shared_task
 def scheduled_train_classifier_all_tenants():
     """
     Wrapper for Celery Beat: Trains classifier for all active tenants.
-    Iterates through tenants and spawns per-tenant tasks.
+    Spawns per-tenant tasks with rate limiting to prevent worker overload.
     """
+    from paperless.models import Tenant
+
+    tenants = Tenant.objects.filter(is_active=True)
+    spawn_tenant_tasks_with_rate_limiting(
+        tenants=tenants,
+        task_callable=train_classifier.delay,
+        task_name="train_classifier",
+        scheduled=True,
+    )
+```
+
+### Legacy Implementation (Still Supported)
+
+For backwards compatibility, you can still implement wrapper tasks without rate limiting:
+
+```python
+@shared_task
+def scheduled_train_classifier_all_tenants():
+    """Wrapper for Celery Beat: Trains classifier for all active tenants."""
     from paperless.models import Tenant
 
     tenants = Tenant.objects.filter(is_active=True)
@@ -176,13 +215,94 @@ def scheduled_train_classifier_all_tenants():
         train_classifier.delay(scheduled=True, tenant_id=str(tenant.id))
 ```
 
+However, **rate limiting is strongly recommended** for deployments with many tenants.
+
+### Rate Limiting Configuration
+
+Rate limiting is controlled by Django settings:
+
+```python
+# In settings.py or environment variables:
+
+# CELERY_TENANT_BATCH_SIZE: Number of tasks to spawn per batch (default: 10)
+#   - 0 or 1: Spawn all tasks immediately (legacy behavior, not recommended)
+#   - 10: Spawn in batches of 10 tasks
+#   - 25: Spawn in batches of 25 tasks
+CELERY_TENANT_BATCH_SIZE = 10
+
+# CELERY_TENANT_BATCH_DELAY: Delay in seconds between batches (default: 60)
+#   - 0: No delay between batches
+#   - 60: Wait 60 seconds between batches (default, recommended)
+CELERY_TENANT_BATCH_DELAY = 60
+```
+
+#### Environment Variables
+
+Set rate limiting via environment variables (recommended for Docker/Kubernetes):
+
+```bash
+# Spawn 10 tasks, wait 60 seconds between batches
+CELERY_TENANT_BATCH_SIZE=10
+CELERY_TENANT_BATCH_DELAY=60
+```
+
+#### When to Adjust Settings
+
+| Scenario | Batch Size | Batch Delay | Rationale |
+|----------|-----------|------------|-----------|
+| <10 tenants | 0 | 0 | Spawn all immediately, no overload risk |
+| 10-50 tenants | 10 | 30 | Moderate batching, minimal delay |
+| 50-100 tenants | 15 | 45 | Conservative batching for safety |
+| 100+ tenants | 20-25 | 60 | Aggressive rate limiting to prevent overload |
+| Worker limited | 5 | 120 | Very conservative, 2-minute delays |
+
+### spawn_tenant_tasks_with_rate_limiting() Helper
+
+This helper function automates rate-limited task spawning:
+
+```python
+def spawn_tenant_tasks_with_rate_limiting(tenants, task_callable, task_name, **task_kwargs):
+    """
+    Spawns tenant-specific tasks with rate limiting/staggered execution.
+
+    Args:
+        tenants: QuerySet of Tenant objects
+        task_callable: The Celery task to spawn (e.g., train_classifier.delay)
+        task_name: Human-readable task name for logging
+        **task_kwargs: Additional keyword arguments to pass to the task (excluding tenant_id)
+
+    Rate limiting is controlled by:
+        - CELERY_TENANT_BATCH_SIZE: Number of tasks to spawn per batch (0 = no batching)
+        - CELERY_TENANT_BATCH_DELAY: Delay in seconds between batches (0 = no delay)
+    """
+```
+
+**Example Usage**:
+
+```python
+@shared_task
+def scheduled_my_task_all_tenants():
+    """Spawn per-tenant tasks with rate limiting."""
+    from paperless.models import Tenant
+
+    tenants = Tenant.objects.filter(is_active=True)
+    spawn_tenant_tasks_with_rate_limiting(
+        tenants=tenants,
+        task_callable=my_task.delay,
+        task_name="my_task",
+        param1="value",  # Additional kwargs are passed to the task
+    )
+```
+
 ### Key Points
 
 - **Called by Celery Beat**: Configure in `celery.py` beat schedule
 - **No restore_tenant_context()**: Wrapper runs in scheduler context (no tenant needed)
 - **Spawns per-tenant tasks**: Uses `.delay()` to queue per-tenant work
-- **Converts UUID to string**: Pass `str(tenant.id)` to tasks
-- **Logs tenant info**: Include tenant name/subdomain for debugging
+- **Rate limiting included**: Automatically batches tasks based on settings
+- **Converts UUID to string**: Pass `str(tenant.id)` to tasks automatically
+- **Logs batch progress**: Tracks batch numbers and tenant counts
+- **Respects delays**: Pauses between batches to prevent worker overload
 
 ### Celery Beat Configuration
 
@@ -200,20 +320,31 @@ app.conf.beat_schedule = {
         'task': 'documents.tasks.scheduled_sanity_check_all_tenants',
         'schedule': crontab(hour=3, minute=0),  # Daily at 3:00 AM
     },
+    'llmindex-index-all-tenants': {
+        'task': 'documents.tasks.scheduled_llmindex_index_all_tenants',
+        'schedule': crontab(hour=4, minute=0),  # Daily at 4:00 AM
+    },
 }
+```
+
+**Rate limiting applies to all wrapper tasks automatically.** Configure via environment variables:
+
+```bash
+CELERY_TENANT_BATCH_SIZE=10
+CELERY_TENANT_BATCH_DELAY=60
 ```
 
 ### Existing Wrapper Tasks
 
-Paperless provides these wrapper tasks:
+Paperless provides these wrapper tasks. All use rate limiting via `spawn_tenant_tasks_with_rate_limiting()`:
 
-| Wrapper Task | Spawned Task | Purpose |
-|---|---|---|
-| `scheduled_train_classifier_all_tenants` | `train_classifier` | Train auto-matching classifier |
-| `scheduled_sanity_check_all_tenants` | `sanity_check` | Validate system configuration |
-| `scheduled_llmindex_index_all_tenants` | `llmindex_index` | Update LLM vector index |
-| `scheduled_empty_trash_all_tenants` | `empty_trash` | Purge deleted documents |
-| `scheduled_check_workflows_all_tenants` | `check_scheduled_workflows` | Execute scheduled workflows |
+| Wrapper Task | Spawned Task | Purpose | Rate Limited |
+|---|---|---|---|
+| `scheduled_train_classifier_all_tenants` | `train_classifier` | Train auto-matching classifier | ✅ Yes |
+| `scheduled_sanity_check_all_tenants` | `sanity_check` | Validate system configuration | ✅ Yes |
+| `scheduled_llmindex_index_all_tenants` | `llmindex_index` | Update LLM vector index | ✅ Yes |
+| `scheduled_empty_trash_all_tenants` | `empty_trash` | Purge deleted documents | ✅ Yes |
+| `scheduled_check_workflows_all_tenants` | `check_scheduled_workflows` | Execute scheduled workflows | ✅ Yes |
 
 ## Adding New Tasks: Step-by-Step
 
@@ -238,6 +369,29 @@ def my_new_task(param1, *, tenant_id=None):
 ```
 
 ### Step 2: If Task Runs on Schedule, Create Wrapper
+
+Use rate limiting via `spawn_tenant_tasks_with_rate_limiting()`:
+
+```python
+@shared_task
+def scheduled_my_new_task_all_tenants():
+    """
+    Wrapper for Celery Beat: Runs my_new_task for all active tenants.
+    Spawns per-tenant tasks with rate limiting to prevent worker overload.
+    """
+    from paperless.models import Tenant
+    from documents.tasks import spawn_tenant_tasks_with_rate_limiting
+
+    tenants = Tenant.objects.filter(is_active=True)
+    spawn_tenant_tasks_with_rate_limiting(
+        tenants=tenants,
+        task_callable=my_new_task.delay,
+        task_name="my_new_task",
+        param1="value",  # Additional parameters passed to the task
+    )
+```
+
+**Legacy Implementation** (not recommended for many tenants):
 
 ```python
 @shared_task
@@ -490,6 +644,78 @@ def scheduled_per_tenant_task_all_tenants():
         per_tenant_task.delay(tenant_id=str(tenant.id))
 ```
 
+## Rate Limiting Troubleshooting
+
+### Problem: Worker Queue Growing Too Fast
+
+**Symptom**: Celery worker queue backs up, tasks take too long to complete.
+
+**Cause**: Too many tasks spawned simultaneously for large tenant counts (100+ tenants).
+
+**Solution**: Adjust rate limiting settings:
+
+```bash
+# Reduce batch size for more conservative rate limiting
+CELERY_TENANT_BATCH_SIZE=5
+CELERY_TENANT_BATCH_DELAY=120
+
+# Or increase delay between batches
+CELERY_TENANT_BATCH_SIZE=10
+CELERY_TENANT_BATCH_DELAY=120
+```
+
+**Monitoring**: Check Celery worker queue length:
+
+```bash
+celery -A paperless inspect active_queues
+celery -A paperless inspect reserved
+```
+
+### Problem: Wrapper Task Takes Too Long
+
+**Symptom**: Scheduled tasks finish much later than their scheduled time.
+
+**Cause**: Rate limiting delays accumulate with many tenants. For example:
+- 120 tenants ÷ 10 per batch = 12 batches
+- 12 batches × 60-second delay = 660 seconds (11 minutes)
+
+**Solution**:
+1. Increase batch size if workers can handle it:
+   ```bash
+   CELERY_TENANT_BATCH_SIZE=20
+   ```
+
+2. Reduce delay if tasks are quick:
+   ```bash
+   CELERY_TENANT_BATCH_DELAY=30
+   ```
+
+3. Schedule wrapper tasks further apart:
+   ```python
+   app.conf.beat_schedule = {
+       'train-classifier': {
+           'task': 'documents.tasks.scheduled_train_classifier_all_tenants',
+           'schedule': crontab(hour=1, minute=0),  # 1:00 AM instead of 2:00 AM
+       },
+   }
+   ```
+
+### Problem: Batching Doesn't Work
+
+**Symptom**: Tasks spawn all at once despite batch settings.
+
+**Cause**: `CELERY_TENANT_BATCH_SIZE` set to 0 or 1 (legacy behavior).
+
+**Solution**: Set appropriate batch size:
+
+```bash
+# ❌ Wrong - spawns all immediately
+CELERY_TENANT_BATCH_SIZE=0
+
+# ✅ Correct - batches in groups of 10
+CELERY_TENANT_BATCH_SIZE=10
+```
+
 ## Troubleshooting
 
 ### Error: "tenant_id cannot be None"
@@ -663,9 +889,22 @@ def scheduled_per_tenant_task_all_tenants():
        ...
    ```
 
-6. **Create wrapper tasks for scheduled execution**:
+6. **Create wrapper tasks for scheduled execution with rate limiting**:
    ```python
-   # ✅ Good - scheduler-spawned per-tenant tasks
+   # ✅ Good - rate-limited per-tenant tasks (recommended)
+   @shared_task
+   def scheduled_my_task_all_tenants():
+       from documents.tasks import spawn_tenant_tasks_with_rate_limiting
+       from paperless.models import Tenant
+
+       tenants = Tenant.objects.filter(is_active=True)
+       spawn_tenant_tasks_with_rate_limiting(
+           tenants=tenants,
+           task_callable=my_task.delay,
+           task_name="my_task",
+       )
+
+   # ⚠️ Acceptable - manual loop (not recommended for many tenants)
    @shared_task
    def scheduled_my_task_all_tenants():
        for tenant in Tenant.objects.filter(is_active=True):
@@ -675,7 +914,22 @@ def scheduled_per_tenant_task_all_tenants():
    # Would need manual tenant_id specification
    ```
 
-7. **Write tests for tenant isolation**:
+7. **Configure rate limiting for your deployment**:
+   ```bash
+   # For small deployments (<10 tenants)
+   CELERY_TENANT_BATCH_SIZE=0
+   CELERY_TENANT_BATCH_DELAY=0
+
+   # For medium deployments (10-100 tenants)
+   CELERY_TENANT_BATCH_SIZE=10
+   CELERY_TENANT_BATCH_DELAY=60
+
+   # For large deployments (100+ tenants)
+   CELERY_TENANT_BATCH_SIZE=20
+   CELERY_TENANT_BATCH_DELAY=120
+   ```
+
+8. **Write tests for tenant isolation**:
    ```python
    def test_my_task_isolates_tenant_data(self):
        tenant1 = create_tenant()
