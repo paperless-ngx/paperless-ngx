@@ -36,8 +36,8 @@ for the current development stage but **must be resolved before production**.
 
 | Severity | Category | Description | Location |
 |----------|----------|-------------|----------|
-| HIGH | A04:2021 - Insecure Design (OWASP Top 10) | The backfill migration (1088_backfill_sharelink_tenant_id.py:16-19) iterates ove | `src/documents/migrations/1088_backfill_sharelink_tenant_id.py:16-19` |
-| MEDIUM | A09:2021 - Security Logging and Monitoring Failures (OWASP Top 10) | SharedLinkView does not log access attempts, making it impossible to detect or a | `src/documents/views.py:2813-2823` |
+| HIGH | A04:2021 - Insecure Design (OWASP Top 10) | The backfill migration iterates over ShareLinks one-by-one with individual saves | `src/documents/migrations/1088_backfill_sharelink_tenant_id.py:16-19` |
+| MEDIUM | A09:2021 - Security Logging and Monitoring Failures (OWASP Top 10) | SharedLinkView (public share link access endpoint) does not log access attempts. | `src/documents/views.py:2813-2823` |
 | MEDIUM | A05:2021 - Security Misconfiguration (OWASP Top 10) | The RLS policy migration uses 'true' as the second argument to current_setting() | `src/documents/migrations/1090_add_rls_policy_for_sharelink.py:42` |
-| LOW | A04:2021 - Insecure Design (OWASP Top 10) | ShareLink model doesn't have rate limiting or access counting. A malicious actor | `src/documents/models.py:715-764` |
+| LOW | A04:2021 - Insecure Design (OWASP Top 10) | ShareLink model doesn't track access counts or implement rate limiting. A malici | `src/documents/models.py:715-764` |
 

@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '1086_make_note_tenant_id_non_nullable'),
+        ('documents', '1082_migrate_classifier_to_tenant_specific'),
     ]
 
     operations = [
