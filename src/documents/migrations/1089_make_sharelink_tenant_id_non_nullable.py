@@ -1,4 +1,4 @@
-# Migration to make tenant_id non-nullable after backfilling data
+# Migration to make ShareLink.tenant_id non-nullable
 
 from django.db import migrations, models
 
@@ -10,10 +10,13 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # Make tenant_id non-nullable for ShareLink
+        # Make tenant_id non-nullable after backfill
         migrations.AlterField(
             model_name='sharelink',
             name='tenant_id',
-            field=models.UUIDField(db_index=True, verbose_name='tenant'),
+            field=models.UUIDField(
+                db_index=True,
+                verbose_name='tenant'
+            ),
         ),
     ]

@@ -21,25 +21,13 @@ class Migration(migrations.Migration):
                 verbose_name='tenant'
             ),
         ),
-        # Remove the explicit owner field from ShareLink model definition
-        # since it's now inherited from ModelWithOwner
-        # Note: This doesn't drop the column - it just removes the duplicate definition
-        migrations.RemoveField(
+        # Add indexes for ShareLink
+        migrations.AddIndex(
             model_name='sharelink',
-            name='owner',
+            index=models.Index(fields=['tenant_id'], name='documents_sl_tenant__idx'),
         ),
-        # Re-add owner field (inherited from ModelWithOwner)
-        # This ensures proper migration state
-        migrations.AddField(
+        migrations.AddIndex(
             model_name='sharelink',
-            name='owner',
-            field=models.ForeignKey(
-                blank=True,
-                null=True,
-                default=None,
-                on_delete=models.SET_NULL,
-                to='auth.user',
-                verbose_name='owner',
-            ),
+            index=models.Index(fields=['tenant_id', 'owner'], name='documents_sl_tenant__owner_idx'),
         ),
     ]
