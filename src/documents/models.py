@@ -672,7 +672,7 @@ class PaperlessTask(ModelWithOwner):
         return f"Task {self.task_id}"
 
 
-class Note(SoftDeleteModel):
+class Note(ModelWithOwner, SoftDeleteModel):
     note = models.TextField(
         _("content"),
         blank=True,
