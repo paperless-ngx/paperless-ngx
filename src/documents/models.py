@@ -1,5 +1,4 @@
 import datetime
-import threading
 from pathlib import Path
 from typing import Final
 
@@ -28,135 +27,13 @@ from django_softdelete.models import SoftDeleteModel
 from documents.data_models import DocumentSource
 from documents.parsers import get_default_file_extension
 
-# Thread-local storage for current tenant
-_thread_local = threading.local()
-
-
-def get_current_tenant_id():
-    """
-    Get the current tenant ID from thread-local storage.
-    Returns None if no tenant is set.
-    """
-    return getattr(_thread_local, 'tenant_id', None)
-
-
-def set_current_tenant_id(tenant_id):
-    """
-    Set the current tenant ID in thread-local storage.
-
-    Args:
-        tenant_id: UUID of the tenant to set as current
-    """
-    _thread_local.tenant_id = tenant_id
-
-
-class TenantManager(models.Manager):
-    """
-    Custom manager that automatically filters querysets by the current tenant.
-
-    This manager integrates with TenantMiddleware to provide automatic tenant isolation:
-    - All queries are automatically filtered by tenant_id from thread-local storage
-    - No need to manually add .filter(tenant_id=...) in application code
-    - Returns empty queryset if no tenant context is set (security by default)
-
-    Security Model:
-    - TenantMiddleware sets tenant context via set_current_tenant_id()
-    - All ORM queries through .objects automatically filtered by tenant
-    - Related queries (e.g., document.tags.all()) also respect tenant filter
-    - Use Model.all_objects to bypass filtering (admin/superuser only)
-
-    Example:
-        # With tenant context set to tenant-a
-        Document.objects.all()  # Returns only tenant-a documents
-
-        # Without tenant context
-        Document.objects.all()  # Returns empty queryset (security by default)
-
-        # Bypass filter (admin only)
-        Document.all_objects.all()  # Returns all documents across tenants
-    """
-
-    def get_queryset(self):
-        """
-        Override get_queryset to automatically filter by current tenant.
-
-        Returns:
-            QuerySet filtered by current tenant_id, or empty if no tenant set
-        """
-        tenant_id = get_current_tenant_id()
-        queryset = super().get_queryset()
-
-        if tenant_id:
-            return queryset.filter(tenant_id=tenant_id)
-
-        # Return empty queryset if no tenant context (security by default)
-        # This prevents accidental data leaks when tenant context is missing
-        return queryset.none()
-
-
-class ModelWithOwner(models.Model):
-    """
-    Abstract base model for all tenant-aware models.
-
-    Provides automatic tenant isolation through:
-    - tenant_id field: Links record to specific tenant
-    - TenantManager: Automatically filters queries by current tenant
-    - all_objects manager: Bypass filter for admin/superuser operations
-
-    Tenant Isolation Model:
-    - All queries via .objects are automatically scoped to current tenant
-    - Tenant context set by TenantMiddleware from subdomain/header
-    - Related queries also filtered (e.g., document.tags.all())
-    - PostgreSQL RLS provides additional database-level enforcement
-
-    Usage:
-        # Normal queries (automatically filtered)
-        Document.objects.all()  # Only current tenant's documents
-
-        # Admin queries (bypass filter)
-        Document.all_objects.all()  # All documents across all tenants
-    """
-
-    owner = models.ForeignKey(
-        User,
-        blank=True,
-        null=True,
-        default=None,
-        on_delete=models.SET_NULL,
-        verbose_name=_("owner"),
-    )
-
-    tenant_id = models.UUIDField(
-        db_index=True,
-        verbose_name=_("tenant"),
-    )
-
-    # Default manager: automatically filters by current tenant
-    objects = TenantManager()
-
-    # Bypass manager: returns all records across tenants (admin/superuser only)
-    all_objects = models.Manager()
-
-    class Meta:
-        abstract = True
-
-    def save(self, *args, **kwargs):
-        """
-        Override save to auto-populate tenant_id from thread-local storage.
-        Raises ValueError if tenant_id is None.
-        """
-        # Auto-populate tenant_id if not set
-        if self.tenant_id is None:
-            self.tenant_id = get_current_tenant_id()
-
-        # Raise error if tenant_id is still None
-        if self.tenant_id is None:
-            raise ValueError(
-                f"tenant_id cannot be None for {self.__class__.__name__}. "
-                f"Set tenant_id explicitly or use set_current_tenant_id()."
-            )
-
-        super().save(*args, **kwargs)
+# Import tenant-aware base models and managers from base.py
+from documents.models.base import (
+    ModelWithOwner,
+    TenantManager,
+    get_current_tenant_id,
+    set_current_tenant_id,
+)
 
 
 class MatchingModel(ModelWithOwner):
