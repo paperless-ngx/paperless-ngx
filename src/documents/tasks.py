@@ -2,6 +2,7 @@ import datetime
 import hashlib
 import logging
 import shutil
+import time
 import uuid
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -93,72 +94,138 @@ def restore_tenant_context(tenant_id: str | uuid.UUID | None):
     logger.debug(f"Restored tenant context: {tenant_uuid}")
 
 
+def spawn_tenant_tasks_with_rate_limiting(tenants, task_callable, task_name, **task_kwargs):
+    """
+    Spawns tenant-specific tasks with rate limiting/staggered execution.
+
+    Args:
+        tenants: QuerySet of Tenant objects
+        task_callable: The Celery task to spawn (e.g., train_classifier.delay)
+        task_name: Human-readable task name for logging
+        **task_kwargs: Additional keyword arguments to pass to the task (excluding tenant_id)
+
+    Rate limiting is controlled by:
+        - CELERY_TENANT_BATCH_SIZE: Number of tasks to spawn per batch (0 = no batching)
+        - CELERY_TENANT_BATCH_DELAY: Delay in seconds between batches (0 = no delay)
+    """
+    batch_size = settings.CELERY_TENANT_BATCH_SIZE
+    batch_delay = settings.CELERY_TENANT_BATCH_DELAY
+
+    tenant_list = list(tenants)
+    total_tenants = len(tenant_list)
+
+    logger.info(
+        f"Running scheduled {task_name} for {total_tenants} active tenants "
+        f"(batch_size={batch_size}, batch_delay={batch_delay}s)",
+    )
+
+    # If batch_size is 0 or 1, spawn all tasks immediately (legacy behavior)
+    if batch_size <= 1:
+        for tenant in tenant_list:
+            logger.info(f"Spawning {task_name} for tenant: {tenant.subdomain} ({tenant.id})")
+            task_callable(tenant_id=str(tenant.id), **task_kwargs)
+        return
+
+    # Spawn tasks in batches with delays
+    for batch_num, i in enumerate(range(0, total_tenants, batch_size), start=1):
+        batch = tenant_list[i : i + batch_size]
+        logger.info(
+            f"Spawning {task_name} batch {batch_num}/{(total_tenants + batch_size - 1) // batch_size} "
+            f"({len(batch)} tenants)",
+        )
+
+        for tenant in batch:
+            logger.info(f"Spawning {task_name} for tenant: {tenant.subdomain} ({tenant.id})")
+            task_callable(tenant_id=str(tenant.id), **task_kwargs)
+
+        # Sleep between batches (but not after the last batch)
+        if i + batch_size < total_tenants and batch_delay > 0:
+            logger.info(f"Waiting {batch_delay}s before next batch...")
+            time.sleep(batch_delay)
+
+
 @shared_task
 def scheduled_train_classifier_all_tenants():
     """
     Wrapper for Celery Beat: Trains classifier for all active tenants.
-    Iterates through tenants and spawns per-tenant tasks.
+    Spawns per-tenant tasks with rate limiting to prevent worker overload.
     """
     from paperless.models import Tenant
 
     tenants = Tenant.objects.filter(is_active=True)
-    logger.info(f"Running scheduled train_classifier for {tenants.count()} active tenants")
-
-    for tenant in tenants:
-        logger.info(f"Spawning train_classifier for tenant: {tenant.subdomain} ({tenant.id})")
-        train_classifier.delay(scheduled=True, tenant_id=str(tenant.id))
+    spawn_tenant_tasks_with_rate_limiting(
+        tenants=tenants,
+        task_callable=train_classifier.delay,
+        task_name="train_classifier",
+        scheduled=True,
+    )
 
 
 @shared_task
 def scheduled_sanity_check_all_tenants():
-    """Wrapper for Celery Beat: Runs sanity check for all active tenants."""
+    """
+    Wrapper for Celery Beat: Runs sanity check for all active tenants.
+    Spawns per-tenant tasks with rate limiting to prevent worker overload.
+    """
     from paperless.models import Tenant
 
     tenants = Tenant.objects.filter(is_active=True)
-    logger.info(f"Running scheduled sanity_check for {tenants.count()} active tenants")
-
-    for tenant in tenants:
-        logger.info(f"Spawning sanity_check for tenant: {tenant.subdomain} ({tenant.id})")
-        sanity_check.delay(scheduled=True, raise_on_error=True, tenant_id=str(tenant.id))
+    spawn_tenant_tasks_with_rate_limiting(
+        tenants=tenants,
+        task_callable=sanity_check.delay,
+        task_name="sanity_check",
+        scheduled=True,
+        raise_on_error=True,
+    )
 
 
 @shared_task
 def scheduled_llmindex_index_all_tenants():
-    """Wrapper for Celery Beat: Updates LLM index for all active tenants."""
+    """
+    Wrapper for Celery Beat: Updates LLM index for all active tenants.
+    Spawns per-tenant tasks with rate limiting to prevent worker overload.
+    """
     from paperless.models import Tenant
 
     tenants = Tenant.objects.filter(is_active=True)
-    logger.info(f"Running scheduled llmindex_index for {tenants.count()} active tenants")
-
-    for tenant in tenants:
-        logger.info(f"Spawning llmindex_index for tenant: {tenant.subdomain} ({tenant.id})")
-        llmindex_index.delay(scheduled=True, tenant_id=str(tenant.id))
+    spawn_tenant_tasks_with_rate_limiting(
+        tenants=tenants,
+        task_callable=llmindex_index.delay,
+        task_name="llmindex_index",
+        scheduled=True,
+    )
 
 
 @shared_task
 def scheduled_empty_trash_all_tenants():
-    """Wrapper for Celery Beat: Empties trash for all active tenants."""
+    """
+    Wrapper for Celery Beat: Empties trash for all active tenants.
+    Spawns per-tenant tasks with rate limiting to prevent worker overload.
+    """
     from paperless.models import Tenant
 
     tenants = Tenant.objects.filter(is_active=True)
-    logger.info(f"Running scheduled empty_trash for {tenants.count()} active tenants")
-
-    for tenant in tenants:
-        logger.info(f"Spawning empty_trash for tenant: {tenant.subdomain} ({tenant.id})")
-        empty_trash.delay(tenant_id=str(tenant.id))
+    spawn_tenant_tasks_with_rate_limiting(
+        tenants=tenants,
+        task_callable=empty_trash.delay,
+        task_name="empty_trash",
+    )
 
 
 @shared_task
 def scheduled_check_workflows_all_tenants():
-    """Wrapper for Celery Beat: Checks scheduled workflows for all active tenants."""
+    """
+    Wrapper for Celery Beat: Checks scheduled workflows for all active tenants.
+    Spawns per-tenant tasks with rate limiting to prevent worker overload.
+    """
     from paperless.models import Tenant
 
     tenants = Tenant.objects.filter(is_active=True)
-    logger.info(f"Running scheduled check_workflows for {tenants.count()} active tenants")
-
-    for tenant in tenants:
-        logger.info(f"Spawning check_scheduled_workflows for tenant: {tenant.subdomain} ({tenant.id})")
-        check_scheduled_workflows.delay(tenant_id=str(tenant.id))
+    spawn_tenant_tasks_with_rate_limiting(
+        tenants=tenants,
+        task_callable=check_scheduled_workflows.delay,
+        task_name="check_scheduled_workflows",
+    )
 
 
 @shared_task

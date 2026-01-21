@@ -959,6 +959,12 @@ CELERY_BEAT_SCHEDULE = _parse_beat_schedule()
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#beat-schedule-filename
 CELERY_BEAT_SCHEDULE_FILENAME = str(DATA_DIR / "celerybeat-schedule.db")
 
+# Multi-tenant task rate limiting configuration
+# Batch size for spawning tenant tasks (0 = no batching, spawn all at once)
+CELERY_TENANT_BATCH_SIZE: Final[int] = __get_int("CELERY_TENANT_BATCH_SIZE", 10)
+# Delay in seconds between batches (0 = no delay)
+CELERY_TENANT_BATCH_DELAY: Final[int] = __get_int("CELERY_TENANT_BATCH_DELAY", 60)
+
 
 # Cachalot: Database read cache.
 def _parse_cachalot_settings():
