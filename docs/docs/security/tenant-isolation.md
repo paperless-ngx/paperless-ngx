@@ -636,15 +636,21 @@ logger.info(f"User {request.user.username} accessed tenant {tenant.name} (ID: {t
 
 ---
 
-## User Tenant Isolation
+## Additional Tenant-Isolated Models
+
+:::info Extended Tenant Isolation
+As of January 2026, tenant isolation has been extended to multiple models beyond documents. Each model uses the appropriate isolation strategy based on its security requirements and use case.
+:::
+
+### User Tenant Isolation
 
 :::info User Model Isolation
-As of January 2026, users are now tenant-isolated at the **application layer**. Each user is associated with a specific tenant via a `UserProfile` model containing a `tenant_id` field. The `/api/users/` endpoint automatically filters users based on the current tenant context.
+Users are now tenant-isolated at the **application layer**. Each user is associated with a specific tenant via a `UserProfile` model containing a `tenant_id` field. The `/api/users/` endpoint automatically filters users based on the current tenant context.
 
 For complete details, see [User Tenant Isolation](./user-tenant-isolation.md).
 :::
 
-### User-Tenant Relationship
+#### User-Tenant Relationship
 
 Users are associated with tenants through a `UserProfile` model:
 
@@ -684,14 +690,68 @@ For full documentation, see [User Tenant Isolation](./user-tenant-isolation.md).
 
 ---
 
+### Group Tenant Isolation
+
+:::info Group Model Isolation
+As of January 2026, groups are tenant-isolated using the **TenantGroup** model. Groups are automatically filtered by current tenant context via the `TenantManager`, ensuring that group configurations and permissions remain isolated within tenant boundaries.
+
+For complete details, see [Group Tenant Isolation](./group-tenant-isolation.md).
+:::
+
+#### TenantGroup Model
+
+Groups are managed using a `TenantGroup` model that replaces Django's global `Group` model:
+
+```python
+# src/documents/models/tenant_group.py
+class TenantGroup(ModelWithOwner):
+    """Tenant-aware group model with automatic tenant isolation."""
+    name = models.CharField(max_length=150)
+    permissions = models.ManyToManyField('auth.Permission')
+
+    class Meta:
+        unique_together = [["tenant_id", "name"]]
+```
+
+**Key Features:**
+
+1. **Inherits from ModelWithOwner**: Provides automatic `tenant_id` field and `TenantManager`
+2. **Automatic Tenant Filtering**: `TenantGroup.objects` automatically filters by tenant context
+3. **Unique Names per Tenant**: Group names are unique within each tenant, but different tenants can have groups with the same name
+4. **Permission Compatibility**: Works with Django's standard permission system
+5. **Superuser Bypass**: Superusers can view all groups via `TenantGroup.all_objects`
+6. **Audit Logging**: All group access events logged to `paperless.audit.tenant`
+
+**Example Usage:**
+
+```bash
+# User from tenant "acme" sees only acme groups
+curl -H "Authorization: Token abc123" http://acme.local:8000/api/groups/
+
+# Returns: [{"name": "Editors", ...}, {"name": "Viewers", ...}]
+# Does NOT return groups from other tenants
+```
+
+**Security Model:**
+
+- ✅ Application-layer filtering via `TenantManager`
+- ❌ No PostgreSQL RLS (future enhancement)
+- ✅ Superuser bypass for administration
+- ✅ Comprehensive test coverage (9 test cases)
+
+For full documentation, see [Group Tenant Isolation](./group-tenant-isolation.md).
+
+---
+
 ## Future Enhancements
 
 ### Potential Improvements
 
-1. **PostgreSQL RLS for User Models** ⭐ Priority
-   - Add RLS policies to `auth_user` and `paperless_userprofile` tables
-   - Provide defense-in-depth protection for user data
+1. **PostgreSQL RLS for User and Group Models** ⭐ Priority
+   - Add RLS policies to `auth_user`, `paperless_userprofile`, and `documents_tenantgroup` tables
+   - Provide defense-in-depth protection for user and group data
    - See: [User Tenant Isolation - Future Enhancement](./user-tenant-isolation.md#security-guarantees)
+   - See: [Group Tenant Isolation - Future Enhancement](./group-tenant-isolation.md#security-guarantees)
 
 2. **API Key Tenant Binding**
    - Bind API keys to specific tenants
@@ -712,6 +772,7 @@ For full documentation, see [User Tenant Isolation](./user-tenant-isolation.md).
 ## References
 
 - [User Tenant Isolation](./user-tenant-isolation.md) - User model tenant isolation implementation
+- [Group Tenant Isolation](./group-tenant-isolation.md) - TenantGroup model tenant isolation implementation
 - [Thread-Local Tenant Context](./thread-local-tenant-context.md) - **Critical**: Shared storage implementation and bug fix
 - [Security Debt Tracker](./deferred-findings.md) - Known security issues and deferred findings
 - [PostgreSQL Row-Level Security Documentation](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
