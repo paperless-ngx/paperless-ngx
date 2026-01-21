@@ -3,7 +3,6 @@ import json
 import os
 import shutil
 import tempfile
-import time
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -56,7 +55,6 @@ from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
 from documents.utils import copy_file_with_basic_stats
 from paperless import version
-from paperless.db import GnuPG
 from paperless.models import ApplicationConfiguration
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
@@ -316,20 +314,17 @@ class Command(CryptMixin, BaseCommand):
             total=len(document_manifest),
             disable=self.no_progress_bar,
         ):
-            # 3.1. store files unencrypted
-            document_dict["fields"]["storage_type"] = Document.STORAGE_TYPE_UNENCRYPTED
-
             document = document_map[document_dict["pk"]]
 
-            # 3.2. generate a unique filename
+            # 3.1. generate a unique filename
             base_name = self.generate_base_name(document)
 
-            # 3.3. write filenames into manifest
+            # 3.2. write filenames into manifest
             original_target, thumbnail_target, archive_target = (
                 self.generate_document_targets(document, base_name, document_dict)
             )
 
-            # 3.4. write files to target folder
+            # 3.3. write files to target folder
             if not self.data_only:
                 self.copy_document_files(
                     document,
@@ -482,45 +477,23 @@ class Command(CryptMixin, BaseCommand):
 
         If the document is encrypted, the files are decrypted before copying them to the target location.
         """
-        if document.storage_type == Document.STORAGE_TYPE_GPG:
-            t = int(time.mktime(document.created.timetuple()))
+        self.check_and_copy(
+            document.source_path,
+            document.checksum,
+            original_target,
+        )
 
-            original_target.parent.mkdir(parents=True, exist_ok=True)
-            with document.source_file as out_file:
-                original_target.write_bytes(GnuPG.decrypted(out_file))
-                os.utime(original_target, times=(t, t))
+        if thumbnail_target:
+            self.check_and_copy(document.thumbnail_path, None, thumbnail_target)
 
-            if thumbnail_target:
-                thumbnail_target.parent.mkdir(parents=True, exist_ok=True)
-                with document.thumbnail_file as out_file:
-                    thumbnail_target.write_bytes(GnuPG.decrypted(out_file))
-                    os.utime(thumbnail_target, times=(t, t))
-
-            if archive_target:
-                archive_target.parent.mkdir(parents=True, exist_ok=True)
-                if TYPE_CHECKING:
-                    assert isinstance(document.archive_path, Path)
-                with document.archive_path as out_file:
-                    archive_target.write_bytes(GnuPG.decrypted(out_file))
-                    os.utime(archive_target, times=(t, t))
-        else:
+        if archive_target:
+            if TYPE_CHECKING:
+                assert isinstance(document.archive_path, Path)
             self.check_and_copy(
-                document.source_path,
-                document.checksum,
-                original_target,
+                document.archive_path,
+                document.archive_checksum,
+                archive_target,
             )
-
-            if thumbnail_target:
-                self.check_and_copy(document.thumbnail_path, None, thumbnail_target)
-
-            if archive_target:
-                if TYPE_CHECKING:
-                    assert isinstance(document.archive_path, Path)
-                self.check_and_copy(
-                    document.archive_path,
-                    document.archive_checksum,
-                    archive_target,
-                )
 
     def check_and_write_json(
         self,

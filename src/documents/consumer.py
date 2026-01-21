@@ -637,8 +637,6 @@ class ConsumerPlugin(
             )
             self.log.debug(f"Creation date from st_mtime: {create_date}")
 
-        storage_type = Document.STORAGE_TYPE_UNENCRYPTED
-
         if self.metadata.filename:
             title = Path(self.metadata.filename).stem
         else:
@@ -665,7 +663,6 @@ class ConsumerPlugin(
             checksum=hashlib.md5(file_for_checksum.read_bytes()).hexdigest(),
             created=create_date,
             modified=create_date,
-            storage_type=storage_type,
             page_count=page_count,
             original_filename=self.filename,
         )
