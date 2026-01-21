@@ -64,8 +64,79 @@ if settings.AUDIT_LOG_ENABLED:
 logger = logging.getLogger("paperless.tasks")
 
 
+def restore_tenant_context(tenant_id: str | uuid.UUID | None):
+    """
+    Restore tenant context for Celery tasks.
+
+    Sets:
+    - Thread-local storage via set_current_tenant_id()
+    - PostgreSQL RLS session variable: SET app.current_tenant
+
+    Args:
+        tenant_id: UUID (string or UUID object) of the tenant. Can be None.
+    """
+    if tenant_id is None:
+        logger.warning("restore_tenant_context called with tenant_id=None")
+        return
+
+    from django.db import connection
+    from documents.models import set_current_tenant_id
+
+    tenant_uuid = uuid.UUID(tenant_id) if isinstance(tenant_id, str) else tenant_id
+    set_current_tenant_id(tenant_uuid)
+
+    with connection.cursor() as cursor:
+        cursor.execute("SET app.current_tenant = %s", [str(tenant_uuid)])
+
+    logger.debug(f"Restored tenant context: {tenant_uuid}")
+
+
 @shared_task
-def index_optimize():
+def scheduled_train_classifier_all_tenants():
+    """
+    Wrapper for Celery Beat: Trains classifier for all active tenants.
+    Iterates through tenants and spawns per-tenant tasks.
+    """
+    from paperless.models import Tenant
+
+    tenants = Tenant.objects.filter(is_active=True)
+    logger.info(f"Running scheduled train_classifier for {tenants.count()} active tenants")
+
+    for tenant in tenants:
+        logger.info(f"Spawning train_classifier for tenant: {tenant.subdomain} ({tenant.id})")
+        train_classifier.delay(scheduled=True, tenant_id=str(tenant.id))
+
+
+@shared_task
+def scheduled_sanity_check_all_tenants():
+    """Wrapper for Celery Beat: Runs sanity check for all active tenants."""
+    from paperless.models import Tenant
+
+    tenants = Tenant.objects.filter(is_active=True)
+    logger.info(f"Running scheduled sanity_check for {tenants.count()} active tenants")
+
+    for tenant in tenants:
+        logger.info(f"Spawning sanity_check for tenant: {tenant.subdomain} ({tenant.id})")
+        sanity_check.delay(scheduled=True, raise_on_error=True, tenant_id=str(tenant.id))
+
+
+@shared_task
+def scheduled_llmindex_index_all_tenants():
+    """Wrapper for Celery Beat: Updates LLM index for all active tenants."""
+    from paperless.models import Tenant
+
+    tenants = Tenant.objects.filter(is_active=True)
+    logger.info(f"Running scheduled llmindex_index for {tenants.count()} active tenants")
+
+    for tenant in tenants:
+        logger.info(f"Spawning llmindex_index for tenant: {tenant.subdomain} ({tenant.id})")
+        llmindex_index.delay(scheduled=True, tenant_id=str(tenant.id))
+
+
+@shared_task
+def index_optimize(tenant_id=None):
+    # Note: Index optimization is a global operation that affects all tenants.
+    # The tenant_id parameter is accepted for API consistency but not used.
     ix = index.open_index()
     writer = AsyncWriter(ix)
     writer.commit(optimize=True)
@@ -82,7 +153,8 @@ def index_reindex(*, progress_bar_disable=False):
 
 
 @shared_task
-def train_classifier(*, scheduled=True):
+def train_classifier(*, scheduled=True, tenant_id=None):
+    restore_tenant_context(tenant_id)
     task = PaperlessTask.objects.create(
         type=PaperlessTask.TaskType.SCHEDULED_TASK
         if scheduled
@@ -228,8 +300,9 @@ def consume_file(
 
 
 @shared_task
-def sanity_check(*, scheduled=True, raise_on_error=True):
-    messages = sanity_checker.check_sanity(scheduled=scheduled)
+def sanity_check(*, scheduled=True, raise_on_error=True, tenant_id=None):
+    restore_tenant_context(tenant_id)
+    messages = sanity_checker.check_sanity(scheduled=scheduled, tenant_id=tenant_id)
 
     messages.log_messages()
 
@@ -601,7 +674,9 @@ def llmindex_index(
     rebuild=False,
     scheduled=True,
     auto=False,
+    tenant_id=None,
 ):
+    restore_tenant_context(tenant_id)
     ai_config = AIConfig()
     if ai_config.llm_index_enabled:
         task = PaperlessTask.objects.create(

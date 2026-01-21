@@ -2772,8 +2772,16 @@ class TasksViewSet(ReadOnlyModelViewSet):
 
         try:
             task_func, task_args = self.TASK_AND_ARGS_BY_NAME[task_name]
-            result = task_func(**task_args)
-            return Response({"result": result})
+
+            # Add tenant_id from request context
+            tenant_id = getattr(request, 'tenant_id', None)
+            if tenant_id:
+                task_args = {**task_args, 'tenant_id': str(tenant_id)}
+
+            # Execute asynchronously through Celery
+            result = task_func.delay(**task_args)
+
+            return Response({"result": str(result)})
         except Exception as e:
             logger.warning(f"An error occurred running task: {e!s}")
             return HttpResponseServerError(
