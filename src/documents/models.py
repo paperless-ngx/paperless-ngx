@@ -62,16 +62,11 @@ class ModelWithOwner(models.Model):
 
     tenant_id = models.UUIDField(
         db_index=True,
-        null=True,
         verbose_name=_("tenant"),
     )
 
     class Meta:
         abstract = True
-        indexes = [
-            models.Index(fields=['tenant_id'], name='%(app_label)s_%(class)s_tenant_idx'),
-            models.Index(fields=['tenant_id', 'owner'], name='%(app_label)s_%(class)s_tenant_owner_idx'),
-        ]
 
     def save(self, *args, **kwargs):
         """

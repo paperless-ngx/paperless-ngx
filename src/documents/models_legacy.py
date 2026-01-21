@@ -62,7 +62,6 @@ class ModelWithOwner(models.Model):
 
     tenant_id = models.UUIDField(
         db_index=True,
-        null=True,
         verbose_name=_("tenant"),
     )
 
