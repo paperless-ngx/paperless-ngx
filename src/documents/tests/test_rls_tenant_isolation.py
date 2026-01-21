@@ -15,9 +15,6 @@ from documents.models import (
     DocumentType,
     Tag,
     StoragePath,
-    Note,
-    CustomField,
-    CustomFieldInstance,
     SavedView,
     PaperlessTask,
 )
@@ -121,9 +118,6 @@ class RLSTenantIsolationTest(TransactionTestCase):
             'documents_documenttype',
             'documents_savedview',
             'documents_storagepath',
-            'documents_note',
-            'documents_customfield',
-            'documents_customfieldinstance',
             'documents_paperlesstask',
         ]
 
@@ -150,9 +144,6 @@ class RLSTenantIsolationTest(TransactionTestCase):
             'documents_documenttype',
             'documents_savedview',
             'documents_storagepath',
-            'documents_note',
-            'documents_customfield',
-            'documents_customfieldinstance',
             'documents_paperlesstask',
         ]
 

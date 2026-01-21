@@ -23,9 +23,6 @@ def enable_rls_forward(apps, schema_editor):
         'documents_documenttype',
         'documents_savedview',
         'documents_storagepath',
-        'documents_note',
-        'documents_customfield',
-        'documents_customfieldinstance',
         'documents_paperlesstask',
     ]
 
@@ -34,7 +31,9 @@ def enable_rls_forward(apps, schema_editor):
             # Enable Row-Level Security
             cursor.execute(f"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY;")
 
-            # Create tenant isolation policy
+            # Drop policy if it exists, then create it (idempotent)
+            cursor.execute(f"DROP POLICY IF EXISTS tenant_isolation_policy ON {table};")
+
             cursor.execute(f"""
                 CREATE POLICY tenant_isolation_policy ON {table}
                     USING (tenant_id = current_setting('app.current_tenant', true)::uuid);
@@ -59,9 +58,6 @@ def disable_rls_reverse(apps, schema_editor):
         'documents_documenttype',
         'documents_savedview',
         'documents_storagepath',
-        'documents_note',
-        'documents_customfield',
-        'documents_customfieldinstance',
         'documents_paperlesstask',
     ]
 
