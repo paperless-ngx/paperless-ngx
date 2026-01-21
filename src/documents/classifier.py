@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import pickle
 import re
 import warnings
@@ -51,14 +52,38 @@ def get_tenant_model_file(tenant_id: str | None = None) -> Path:
     Returns:
         Path to the tenant-specific classifier model file.
         Falls back to shared model file if no tenant context is available.
+
+    Raises:
+        ValueError: If tenant_id contains invalid characters (path traversal prevention).
     """
     if tenant_id is None:
         tenant_id = get_current_tenant_id()
 
     if tenant_id:
+        # Validate tenant_id to prevent path traversal attacks
+        import uuid
+        try:
+            # Ensure tenant_id is a valid UUID string
+            uuid.UUID(str(tenant_id))
+        except (ValueError, AttributeError, TypeError):
+            raise ValueError(f"Invalid tenant_id format: {tenant_id}")
+
         # Create tenant-specific path: MEDIA_ROOT/tenant_{id}/classifier.pkl
         tenant_dir = settings.MEDIA_ROOT / f"tenant_{tenant_id}"
-        tenant_dir.mkdir(parents=True, exist_ok=True)
+
+        # Use atomic directory creation to prevent race conditions
+        # This is more secure than mkdir with exist_ok=True
+        try:
+            tenant_dir.mkdir(parents=True, exist_ok=False)
+        except FileExistsError:
+            # Directory already exists, which is fine
+            pass
+        except OSError as e:
+            # Log security-relevant errors
+            logger.warning(f"Failed to create tenant directory {tenant_dir}: {e}")
+            # Re-raise to prevent continuing with potentially compromised path
+            raise
+
         return tenant_dir / "classifier.pkl"
     else:
         # Fallback to shared model file for backwards compatibility

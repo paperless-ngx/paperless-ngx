@@ -16,7 +16,7 @@ def migrate_classifier_models_to_tenant_specific(apps, schema_editor):
     2. Copies it to each tenant's directory
     3. Logs the migration for audit purposes
     """
-    Tenant = apps.get_model('documents', 'Tenant')
+    Tenant = apps.get_model('paperless', 'Tenant')
 
     # Check if shared model file exists
     shared_model_file = settings.MODEL_FILE
