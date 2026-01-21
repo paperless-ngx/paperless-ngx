@@ -6,6 +6,14 @@ All models are imported here for easy access.
 # Import Django models that are used throughout the app
 from django.contrib.auth.models import Group, User
 
+# Import base models and managers
+from documents.models.base import (
+    ModelWithOwner,
+    TenantManager,
+    get_current_tenant_id,
+    set_current_tenant_id,
+)
+
 # Import all models from the main models.py file
 from documents.models_legacy import (
     Correspondent,
@@ -14,7 +22,6 @@ from documents.models_legacy import (
     Document,
     DocumentType,
     MatchingModel,
-    ModelWithOwner,
     Note,
     PaperlessTask,
     SavedView,
@@ -29,8 +36,6 @@ from documents.models_legacy import (
     WorkflowActionWebhook,
     WorkflowRun,
     WorkflowTrigger,
-    get_current_tenant_id,
-    set_current_tenant_id,
 )
 
 # Import the new Tenant model
@@ -51,9 +56,10 @@ __all__ = [
     'Note',
     'ShareLink',
 
-    # Base models
+    # Base models and managers
     'ModelWithOwner',
     'MatchingModel',
+    'TenantManager',
 
     # Custom fields
     'CustomField',

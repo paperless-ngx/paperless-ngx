@@ -20,26 +20,26 @@ for the current development stage but **must be resolved before production**.
 |----------|-------|
 | Critical | 0 |
 | High     | 2 |
-| Medium   | 2 |
-| Low      | 1 |
+| Medium   | 1 |
+| Low      | 2 |
 | Info     | 1 |
 
 ---
 
 ## Deferred Findings by Task
 
-### Task: e239d66d...
+### Task: 41fae4c5...
 
-**Date**: 2026-01-20
+**Date**: 2026-01-21
 **Stage**: dev
-**Description**: Add tenant_id column to all models inheriting from ModelWithOwner and create data migration
+**Description**: Implement tenant-aware ORM managers to automatically filter queries by current tenant context
 
 | Severity | Category | Description | Location |
 |----------|----------|-------------|----------|
-| HIGH | A01:2021 - Broken Access Control (OWASP) | No row-level security enforcement for foreign key relationships. Models like Doc | `src/documents/models.py:206-241` |
-| HIGH | A03:2021 - Injection (OWASP) | Data migration uses filter() + update() pattern which is vulnerable to race cond | `src/documents/migrations/1079_create_default_tenant_and_backfill.py:41-47` |
-| MEDIUM | A01:2021 - Broken Access Control (OWASP) | ManyToManyField relationships lack tenant isolation. Document.tags, WorkflowActi | `src/documents/models.py:254-259` |
-| MEDIUM | A09:2021 - Security Logging and Monitoring Failures (OWASP) | Missing audit logging for tenant context changes. Thread-local tenant_id changes | `src/documents/models.py:43-50` |
-| LOW | A04:2021 - Insecure Design (OWASP) | ModelWithOwner.tenant_id allows null=True in model definition, contradicting the | `src/documents/models.py:63-67` |
-| INFO | Security Best Practice | Verification script uses kubectl exec to run Python code in production pods. Whi | `verify_tenant_id_implementation.sh:86-170` |
+| HIGH | A01:2021 - Broken Access Control | Race condition in TenantMiddleware cleanup at line 136. The middleware clears th | `src/paperless/middleware.py:136` |
+| HIGH | A01:2021 - Broken Access Control | The all_objects manager (line 147 in base.py, line 138 in models.py) provides un | `src/documents/models/base.py:147, src/documents/models.py:138` |
+| MEDIUM | A09:2021 - Security Logging and Monitoring Failures | TenantManager silently returns empty queryset when tenant context is missing (li | `src/documents/models/base.py:92-108, src/documents/models.py:92-94` |
+| LOW | A04:2021 - Insecure Design | ModelWithOwner.save() auto-populates tenant_id from thread-local storage with im | `src/documents/models/base.py:163-187` |
+| LOW | A09:2021 - Security Logging and Monitoring Failures | Test code directly manipulates thread-local storage using set_current_tenant_id( | `src/documents/tests/test_tenant_manager.py:51` |
+| INFO | A04:2021 - Insecure Design | Thread-local storage pattern is inherently fragile in async/multi-threaded envir | `src/documents/models/base.py:36, src/paperless/middleware.py:14` |
 
