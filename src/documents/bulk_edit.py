@@ -141,7 +141,7 @@ def remove_tag(doc_ids: list[int], tag: int) -> Literal["OK"]:
 
     if affected_docs:
         tenant_id = get_current_tenant_id()
-    bulk_update_documents.delay(document_ids=affected_docs, tenant_id=str(tenant_id) if tenant_id else None)
+        bulk_update_documents.delay(document_ids=affected_docs, tenant_id=str(tenant_id) if tenant_id else None)
 
     return "OK"
 
@@ -347,6 +347,7 @@ def rotate(doc_ids: list[int], degrees: int) -> Literal["OK"]:
     affected_docs: list[int] = []
     import pikepdf
 
+    tenant_id = get_current_tenant_id()
     rotate_tasks = []
     for doc in qs:
         if doc.mime_type != "application/pdf":
@@ -375,7 +376,7 @@ def rotate(doc_ids: list[int], degrees: int) -> Literal["OK"]:
             logger.exception(f"Error rotating document {doc.id}: {e}")
 
     if len(affected_docs) > 0:
-        bulk_update_task = bulk_update_documents.si(document_ids=affected_docs)
+        bulk_update_task = bulk_update_documents.si(document_ids=affected_docs, tenant_id=str(tenant_id) if tenant_id else None)
         chord(header=rotate_tasks, body=bulk_update_task).delay()
 
     return "OK"
@@ -692,7 +693,7 @@ def remove_password(
                     doc.page_count = len(pdf.pages)
                     doc.save()
                     tenant_id = get_current_tenant_id()
-            update_document_content_maybe_archive_file.delay(document_id=doc.id, tenant_id=str(tenant_id) if tenant_id else None)
+                    update_document_content_maybe_archive_file.delay(document_id=doc.id, tenant_id=str(tenant_id) if tenant_id else None)
                 else:
                     consume_tasks = []
                     overrides = (
