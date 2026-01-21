@@ -763,7 +763,7 @@ class ShareLink(SoftDeleteModel, ModelWithOwner):
         return f"Share Link for {self.document.title}"
 
 
-class CustomField(models.Model):
+class CustomField(ModelWithOwner):
     """
     Defines the name and type of a custom field
     """
