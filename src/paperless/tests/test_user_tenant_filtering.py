@@ -31,19 +31,18 @@ class UserTenantFilteringTestCase(TestCase):
         )
 
         # Create users for tenant A
+        # Signal handler will auto-create UserProfile when tenant context is set
         set_current_tenant_id(self.tenant_a.id)
         self.user_a1 = User.objects.create_user(
             username='user_a1',
             password='testpass123',
             is_superuser=True,
         )
-        UserProfile.objects.create(user=self.user_a1, tenant_id=self.tenant_a.id)
 
         self.user_a2 = User.objects.create_user(
             username='user_a2',
             password='testpass123',
         )
-        UserProfile.objects.create(user=self.user_a2, tenant_id=self.tenant_a.id)
 
         # Create users for tenant B
         set_current_tenant_id(self.tenant_b.id)
@@ -52,13 +51,11 @@ class UserTenantFilteringTestCase(TestCase):
             password='testpass123',
             is_superuser=True,
         )
-        UserProfile.objects.create(user=self.user_b1, tenant_id=self.tenant_b.id)
 
         self.user_b2 = User.objects.create_user(
             username='user_b2',
             password='testpass123',
         )
-        UserProfile.objects.create(user=self.user_b2, tenant_id=self.tenant_b.id)
 
         # API client
         self.client = APIClient()
@@ -193,3 +190,53 @@ class UserTenantFilteringTestCase(TestCase):
         # Should succeed
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['username'], 'user_a2')
+
+    def test_signal_auto_creates_profile(self):
+        """Test that the post_save signal automatically creates UserProfile."""
+        # Set tenant context
+        set_current_tenant_id(self.tenant_a.id)
+
+        # Create a new user (signal should auto-create profile)
+        new_user = User.objects.create_user(
+            username='signal_test_user',
+            password='testpass123',
+        )
+
+        # Verify profile was auto-created by signal
+        self.assertTrue(hasattr(new_user, 'profile'))
+        self.assertEqual(new_user.profile.tenant_id, self.tenant_a.id)
+
+    def test_signal_skips_system_users(self):
+        """Test that signal doesn't create profiles for system users."""
+        # Set tenant context
+        set_current_tenant_id(self.tenant_a.id)
+
+        # Create system user
+        system_user = User.objects.create_user(username='consumer')
+
+        # Profile should NOT be created for system users
+        with self.assertRaises(UserProfile.DoesNotExist):
+            _ = system_user.profile
+
+    def test_middleware_sets_tenant_id_on_request(self):
+        """Test that middleware properly sets request.tenant_id attribute."""
+        from paperless.middleware import TenantMiddleware
+        from django.http import HttpRequest
+        from unittest.mock import Mock
+
+        # Create mock request
+        request = HttpRequest()
+        request.META = {
+            'HTTP_X_TENANT_ID': str(self.tenant_a.id),
+        }
+
+        # Create mock get_response
+        get_response = Mock(return_value=Mock())
+
+        # Initialize middleware and process request
+        middleware = TenantMiddleware(get_response)
+        middleware(request)
+
+        # Verify tenant_id was set on request
+        self.assertTrue(hasattr(request, 'tenant_id'))
+        self.assertEqual(request.tenant_id, self.tenant_a.id)

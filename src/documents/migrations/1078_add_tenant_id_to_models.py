@@ -6,8 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '1076_workflowaction_order'),
-        ('paperless', '0006_tenant'),
+        ('documents', '1077_create_tenant_model'),
     ]
 
     operations = [

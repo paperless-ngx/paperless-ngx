@@ -36,8 +36,8 @@ def create_profiles_for_existing_users(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('paperless', '0006_tenant'),
-        ('documents', '1031_remove_savedview_user_correspondent_owner_and_more'),
+        ('paperless', '0005_applicationconfiguration_ai_enabled_and_more'),
+        ('documents', '1079_create_default_tenant_and_backfill'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
             name='UserProfile',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('tenant_id', models.UUIDField(db_index=True, help_text='Tenant to which this user belongs', verbose_name='tenant')),
+                ('tenant_id', models.UUIDField(db_index=True, null=False, blank=False, help_text='Tenant to which this user belongs', verbose_name='tenant')),
                 ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='profile', to=settings.AUTH_USER_MODEL, verbose_name='user')),
             ],
             options={
