@@ -73,7 +73,7 @@ class TenantManager(models.Manager):
 
     Behavior:
         - If tenant context is set: Returns only objects belonging to current tenant
-        - If tenant context is None: Returns all objects (admin/no-tenant context)
+        - If tenant context is None: Returns empty queryset (security by default)
 
     Security Model:
         - TenantMiddleware sets tenant context from subdomain or X-Tenant-ID header
@@ -97,12 +97,15 @@ class TenantManager(models.Manager):
 
         Returns:
             QuerySet: Filtered by tenant_id if tenant context is set,
-                     otherwise returns unfiltered queryset.
+                     otherwise returns empty queryset (security by default).
         """
         tenant_id = get_current_tenant_id()
         if tenant_id:
             return super().get_queryset().filter(tenant_id=tenant_id)
-        return super().get_queryset()
+
+        # Return empty queryset if no tenant context (security by default)
+        # This prevents accidental data leaks when tenant context is missing
+        return super().get_queryset().none()
 
 
 class ModelWithOwner(models.Model):

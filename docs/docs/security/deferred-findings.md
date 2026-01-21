@@ -36,9 +36,9 @@ for the current development stage but **must be resolved before production**.
 
 | Severity | Category | Description | Location |
 |----------|----------|-------------|----------|
-| HIGH | A01:2021 - Broken Access Control (OWASP Top 10) | Race condition risk with thread-local storage cleanup. TenantMiddleware clears t | `src/paperless/middleware.py:136` |
-| MEDIUM | A01:2021 - Broken Access Control (OWASP Top 10) | The `all_objects` manager provides unrestricted access to all tenant data withou | `src/documents/models.py:138` |
-| MEDIUM | A09:2021 - Security Logging and Monitoring Failures (OWASP Top 10) | No logging when TenantManager returns empty queryset due to missing tenant conte | `src/documents/models.py:92-94` |
-| LOW | A04:2021 - Insecure Design (OWASP Top 10) | ModelWithOwner.save() auto-populates tenant_id from thread-local storage (line 1 | `src/documents/models.py:143-159` |
-| LOW | A09:2021 - Security Logging and Monitoring Failures (OWASP Top 10) | Tests directly manipulate thread-local storage without going through middleware, | `src/documents/tests/test_tenant_manager.py:51` |
+| HIGH | A01:2021 - Broken Access Control | Race condition risk in TenantMiddleware cleanup. The middleware clears thread-lo | `src/paperless/middleware.py:136` |
+| MEDIUM | A01:2021 - Broken Access Control | The all_objects manager bypasses tenant filtering without access control enforce | `src/documents/models/base.py:144` |
+| MEDIUM | A09:2021 - Security Logging and Monitoring Failures | TenantManager returns empty queryset when tenant context is missing (security by | `src/documents/models/base.py:92-105` |
+| LOW | A04:2021 - Insecure Design | ModelWithOwner.save() auto-populates tenant_id from thread-local storage with im | `src/documents/models/base.py:163-184` |
+| LOW | A09:2021 - Security Logging and Monitoring Failures | Test code directly manipulates thread-local storage using set_current_tenant_id( | `src/documents/tests/test_tenant_manager.py:51` |
 
