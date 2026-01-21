@@ -1,6 +1,7 @@
 # Migration to enable PostgreSQL Row-Level Security (RLS) for tenant isolation
 
 from django.db import migrations, connection
+from psycopg2 import sql
 
 
 def is_postgresql(schema_editor):
@@ -29,18 +30,35 @@ def enable_rls_forward(apps, schema_editor):
     for table in tables:
         with schema_editor.connection.cursor() as cursor:
             # Enable Row-Level Security
-            cursor.execute(f"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY;")
+            cursor.execute(
+                sql.SQL("ALTER TABLE {} ENABLE ROW LEVEL SECURITY").format(
+                    sql.Identifier(table)
+                )
+            )
 
             # Drop policy if it exists, then create it (idempotent)
-            cursor.execute(f"DROP POLICY IF EXISTS tenant_isolation_policy ON {table};")
+            cursor.execute(
+                sql.SQL("DROP POLICY IF EXISTS tenant_isolation_policy ON {}").format(
+                    sql.Identifier(table)
+                )
+            )
 
-            cursor.execute(f"""
-                CREATE POLICY tenant_isolation_policy ON {table}
-                    USING (tenant_id = current_setting('app.current_tenant', true)::uuid);
-            """)
+            # Create policy with both USING (for SELECT) and WITH CHECK (for INSERT/UPDATE/DELETE)
+            cursor.execute(
+                sql.SQL("""
+                    CREATE POLICY tenant_isolation_policy ON {}
+                        FOR ALL
+                        USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+                        WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid)
+                """).format(sql.Identifier(table))
+            )
 
             # Force RLS (prevent superuser bypass)
-            cursor.execute(f"ALTER TABLE {table} FORCE ROW LEVEL SECURITY;")
+            cursor.execute(
+                sql.SQL("ALTER TABLE {} FORCE ROW LEVEL SECURITY").format(
+                    sql.Identifier(table)
+                )
+            )
 
 
 def disable_rls_reverse(apps, schema_editor):
@@ -64,13 +82,25 @@ def disable_rls_reverse(apps, schema_editor):
     for table in tables:
         with schema_editor.connection.cursor() as cursor:
             # Drop tenant isolation policy
-            cursor.execute(f"DROP POLICY IF EXISTS tenant_isolation_policy ON {table};")
+            cursor.execute(
+                sql.SQL("DROP POLICY IF EXISTS tenant_isolation_policy ON {}").format(
+                    sql.Identifier(table)
+                )
+            )
 
             # Disable FORCE RLS
-            cursor.execute(f"ALTER TABLE {table} NO FORCE ROW LEVEL SECURITY;")
+            cursor.execute(
+                sql.SQL("ALTER TABLE {} NO FORCE ROW LEVEL SECURITY").format(
+                    sql.Identifier(table)
+                )
+            )
 
             # Disable Row-Level Security
-            cursor.execute(f"ALTER TABLE {table} DISABLE ROW LEVEL SECURITY;")
+            cursor.execute(
+                sql.SQL("ALTER TABLE {} DISABLE ROW LEVEL SECURITY").format(
+                    sql.Identifier(table)
+                )
+            )
 
 
 class Migration(migrations.Migration):
