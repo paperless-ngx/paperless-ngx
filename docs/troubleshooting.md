@@ -48,7 +48,7 @@ consumption directory at startup, but won't find any other files added
 later, you will need to enable filesystem polling with the configuration
 option [`PAPERLESS_CONSUMER_POLLING_INTERVAL`](configuration.md#PAPERLESS_CONSUMER_POLLING_INTERVAL).
 
-This will disable listening to filesystem changes with inotify and
+This will disable automatic listening for filesystem changes and
 paperless will manually check the consumption directory for changes
 instead.
 
