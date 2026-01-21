@@ -136,17 +136,19 @@ Tenant.objects.create(name="Invalid", subdomain="acme_corp")  # Underscore
 
 ### 1. Application Layer Isolation (ORM Filtering)
 
-TenantAwareManager automatically filters all queries to the current tenant:
+#### TenantManager: Automatic Query Filtering
+
+All models inheriting from `ModelWithOwner` use `TenantManager` for automatic tenant isolation:
 
 ```python
-from documents.managers import TenantAwareManager
+from documents.models.base import ModelWithOwner, TenantManager
 
-class Document(models.Model):
-    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
+class Document(ModelWithOwner):
     title = models.CharField(max_length=255)
+    content = models.TextField()
 
     # Tenant-aware: Automatically filters by current tenant
-    objects = TenantAwareManager()
+    objects = TenantManager()
 
     # Bypass filtering (use with caution!)
     all_objects = models.Manager()
@@ -154,22 +156,80 @@ class Document(models.Model):
 
 **How it works:**
 
-1. TenantMiddleware sets thread-local context: `set_current_tenant(current_tenant)`
-2. TenantAwareManager reads thread-local context: `get_current_tenant_id()`
-3. All queries automatically add WHERE clause: `.filter(tenant_id=current_tenant.id)`
+1. TenantMiddleware sets thread-local context via `set_current_tenant_id(tenant_id)`
+2. TenantManager reads thread-local context in `get_queryset()`
+3. All queries automatically add WHERE clause: `.filter(tenant_id=current_tenant_id)`
+4. If no tenant context is set, returns empty queryset (security by default)
 
 ```python
 # Automatic filtering example
-class RequestHandler(APIView):
+class DocumentListView(APIView):
     def get(self, request):
         # request.tenant = <Tenant: Acme (acme)>
+        # Thread-local storage: tenant_id = <UUID>
 
-        # These queries are automatically filtered
+        # These queries are automatically filtered by TenantManager
         docs = Document.objects.all()  # Only this tenant's docs
-        doc = Document.objects.get(id=123)  # Only searches this tenant
+        doc = Document.objects.get(id=123)  # Only searches this tenant's docs
 
-        # To access all tenants (dangerous!)
+        # To access all tenants (admin/superuser only!)
         all_docs = Document.all_objects.all()  # Unfiltered
+```
+
+#### tenant_id Field and Thread-Local Storage
+
+The `ModelWithOwner` base class includes:
+
+```python
+class ModelWithOwner(models.Model):
+    """Base model for tenant-aware document models."""
+
+    # Tenant reference for data isolation
+    tenant_id = models.UUIDField(
+        db_index=True,
+        help_text="UUID of the tenant that owns this object"
+    )
+
+    # Owner of the object
+    owner = models.ForeignKey(User, on_delete=models.PROTECT)
+
+    class Meta:
+        abstract = True
+        indexes = [
+            models.Index(fields=['tenant_id']),
+            models.Index(fields=['tenant_id', 'owner']),
+        ]
+
+    def save(self, *args, **kwargs):
+        """Auto-populate tenant_id from thread-local context."""
+        if self.tenant_id is None:
+            self.tenant_id = get_current_tenant_id()
+
+        if self.tenant_id is None:
+            raise ValueError("tenant_id must be set before saving")
+
+        super().save(*args, **kwargs)
+```
+
+**Key behaviors:**
+
+- `tenant_id` is automatically populated from thread-local storage on save
+- `tenant_id` is indexed for query performance and composite key filtering
+- Raises `ValueError` if tenant_id is None (prevents orphaned records)
+- All related fields (ForeignKey, ManyToMany) inherit tenant filtering through relationships
+
+```python
+# Thread-local storage helpers (from documents.models.base)
+from documents.models.base import get_current_tenant_id, set_current_tenant_id
+
+# Middleware sets tenant context
+set_current_tenant_id(request.tenant_id)  # Called by TenantMiddleware
+
+# Models retrieve context for auto-population
+tenant_id = get_current_tenant_id()  # Used in ModelWithOwner.save()
+
+# ORM manager retrieves context for filtering
+current_tenant_id = get_current_tenant_id()  # Used in TenantManager.get_queryset()
 ```
 
 ### 2. Database Layer Isolation (Row-Level Security)
@@ -218,24 +278,152 @@ _thread_locals.tenant_id = <UUID>
 - Database queries use request tenant
 - After request completes, context is cleared
 
+## ModelWithOwner Base Class
+
+The `ModelWithOwner` abstract base class provides automatic tenant isolation for all inherited models:
+
+```python
+from documents.models.base import ModelWithOwner, TenantManager
+
+class Document(ModelWithOwner):
+    """Document inherits tenant isolation from ModelWithOwner."""
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+
+    class Meta:
+        verbose_name = "document"
+        verbose_name_plural = "documents"
+```
+
+**What ModelWithOwner provides:**
+
+| Field | Type | Description | Behavior |
+|-------|------|-------------|----------|
+| `tenant_id` | UUID | Tenant identifier | Auto-populated from thread-local storage |
+| `owner` | ForeignKey | User who owns the object | Explicitly set by application |
+| `objects` | TenantManager | Tenant-aware manager | Automatic filtering by current tenant |
+| `all_objects` | Manager | Unfiltered manager | Bypasses tenant filtering (admin only) |
+
+**All models inheriting from ModelWithOwner:**
+
+- `Correspondent` - External correspondents
+- `Tag` - Document tags with hierarchical support
+- `DocumentType` - Document classification types
+- `StoragePath` - Document file storage locations
+- `Document` - Primary document records
+- `SavedView` - User-defined document views
+- `PaperlessTask` - Async task tracking
+
+### Data Migration for tenant_id
+
+When upgrading to tenant-aware models, Django migrations automatically handle the schema changes:
+
+```bash
+python manage.py migrate documents
+```
+
+This runs three migrations in sequence:
+
+1. **Migration 1078**: Add nullable `tenant_id` column
+   - Adds `tenant_id` UUIDField with default=None
+   - Creates indexes on `tenant_id` and composite `[tenant_id, owner]`
+   - Allows existing records to have NULL temporarily
+
+2. **Migration 1079**: Backfill tenant_id with default tenant
+   - Creates default tenant if it doesn't exist
+   - Associates all existing records with default tenant
+   - Ensures backward compatibility with single-tenant data
+
+3. **Migration 1080**: Make tenant_id non-nullable
+   - Sets NOT NULL constraint on `tenant_id` column
+   - Prevents orphaned records without tenant ownership
+   - Enforces tenant isolation at database level
+
+Example migration code:
+
+```python
+# Migration 1078: Add nullable tenant_id field
+from django.db import migrations, models
+import uuid
+
+class Migration(migrations.Migration):
+    operations = [
+        migrations.AddField(
+            model_name='document',
+            name='tenant_id',
+            field=models.UUIDField(
+                db_index=True,
+                default=None,
+                null=True,  # Temporarily nullable
+            ),
+        ),
+        migrations.AddIndex(
+            model_name='document',
+            index=models.Index(fields=['tenant_id'], name='doc_tenant_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='document',
+            index=models.Index(
+                fields=['tenant_id', 'owner'],
+                name='doc_tenant_owner_idx'
+            ),
+        ),
+    ]
+
+# Migration 1079: Backfill with default tenant
+def create_default_tenant(apps, schema_editor):
+    Tenant = apps.get_model('paperless', 'Tenant')
+    default_tenant, _ = Tenant.objects.get_or_create(
+        subdomain='default',
+        defaults={'name': 'Default Tenant', 'is_active': True}
+    )
+    return default_tenant
+
+def backfill_tenant_id(apps, schema_editor):
+    Document = apps.get_model('documents', 'Document')
+    default_tenant = create_default_tenant(apps, schema_editor)
+    Document.objects.filter(tenant_id__isnull=True).update(
+        tenant_id=default_tenant.id
+    )
+
+# Migration 1080: Make tenant_id non-nullable
+class Migration(migrations.Migration):
+    operations = [
+        migrations.AlterField(
+            model_name='document',
+            name='tenant_id',
+            field=models.UUIDField(
+                db_index=True,
+                null=False,  # No longer nullable
+            ),
+        ),
+    ]
+```
+
 ## Model Patterns
 
 ### Pattern 1: Simple Tenant Ownership
 
-Models owned by a tenant with automatic filtering:
+Models owned by a tenant with automatic filtering via ModelWithOwner:
 
 ```python
-class Document(models.Model):
-    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
+from documents.models.base import ModelWithOwner, TenantManager
+
+class Document(ModelWithOwner):
+    """Document with tenant isolation from ModelWithOwner."""
     title = models.CharField(max_length=255)
     content = models.TextField()
 
-    objects = TenantAwareManager()
-    all_objects = models.Manager()
+    class Meta:
+        verbose_name = "document"
+        verbose_name_plural = "documents"
 
 # Usage
-doc = Document.objects.get(id=123)  # Automatically filtered by tenant
-# SELECT * FROM document WHERE id=123 AND tenant_id=<current_tenant>
+doc = Document.objects.get(id=123)  # Automatically filtered by current tenant
+# SELECT * FROM document WHERE id=123 AND tenant_id=<current_tenant_id>
+
+# Access all documents (admin only!)
+all_docs = Document.all_objects.all()  # No tenant filtering
 ```
 
 ### Pattern 2: Tenant Ownership via Parent Model
@@ -507,69 +695,153 @@ SELECT * FROM document;  -- Only tenant B's docs
 
 ## Security Best Practices
 
-### 1. Always Use TenantAwareManager
+### 1. Always Inherit from ModelWithOwner
 
 ```python
-# ✅ Correct
-class Document(models.Model):
-    objects = TenantAwareManager()
+# ✅ Correct - Inherit from ModelWithOwner for automatic tenant isolation
+from documents.models.base import ModelWithOwner
 
-# ❌ Wrong (uses default manager, bypasses filtering)
+class Document(ModelWithOwner):
+    title = models.CharField(max_length=255)
+    # Automatically gets:
+    # - tenant_id field with auto-population from thread-local
+    # - objects = TenantManager() for automatic filtering
+    # - all_objects manager for admin access
+
+# ❌ Wrong - Manual tenant field without proper manager
 class Document(models.Model):
-    pass  # No TenantAwareManager
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    # Missing TenantManager - queries NOT filtered by tenant!
 ```
 
-### 2. Validate Tenant in Views
+### 2. Understanding TenantManager Security
+
+TenantManager implements **security by default**:
 
 ```python
-# ✅ Correct - Verify tenant matches request
+from documents.models.base import TenantManager, get_current_tenant_id
+
+class TenantManager(models.Manager):
+    def get_queryset(self):
+        tenant_id = get_current_tenant_id()
+
+        if tenant_id is None:
+            # ⚠️ No tenant context = return EMPTY queryset
+            # Prevents accidental data leaks when tenant context is missing
+            return super().get_queryset().none()
+
+        # ✅ Tenant context set = filter by tenant
+        return super().get_queryset().filter(tenant_id=tenant_id)
+```
+
+**Key security properties:**
+
+- **Default to deny**: No tenant context → empty queryset (prevents leaks)
+- **Automatic filtering**: Don't need to remember `.filter(tenant_id=...)`
+- **Related query filtering**: ForeignKey/ManyToMany inherit filtering
+- **Performance**: Single indexed WHERE clause on tenant_id
+
+**Verify tenant context is set:**
+
+```python
+from documents.models.base import get_current_tenant_id
+
+# In views/serializers
+tenant_id = get_current_tenant_id()
+if tenant_id is None:
+    raise Exception("No tenant context! TenantMiddleware may not be configured")
+
+# Only safe to query if tenant_id is set
+docs = Document.objects.all()
+```
+
+### 3. Validate Tenant in Views (Defense in Depth)
+
+```python
+# ✅ Correct - TenantManager handles filtering automatically
+def get_document(request, doc_id):
+    # TenantManager ensures this document belongs to current tenant
+    doc = Document.objects.get(id=doc_id)
+    return DocumentSerializer(doc).data
+    # If doc doesn't exist for current tenant, raises Document.DoesNotExist
+```
+
+**Don't need manual tenant validation:**
+
+```python
+# ❌ Not necessary - TenantManager guarantees isolation
 def get_document(request, doc_id):
     doc = Document.objects.get(id=doc_id)
-    assert doc.tenant == request.tenant  # Extra safety
+    if doc.tenant_id != request.tenant_id:  # Redundant!
+        raise PermissionDenied()
     return DocumentSerializer(doc).data
 
-# ✅ Also correct - Trust ORM filtering
+# ✅ Trust the ORM manager - it handles it
 def get_document(request, doc_id):
-    doc = Document.objects.get(id=doc_id)
-    return DocumentSerializer(doc).data  # ORM ensures tenant match
+    doc = Document.objects.get(id=doc_id)  # Already filtered
+    return DocumentSerializer(doc).data
 ```
 
-### 3. Never Bypass TenantAwareManager
+### 4. Never Bypass TenantManager Without Good Reason
 
 ```python
-# ❌ DANGEROUS - Bypasses tenant filtering
-docs = Document.all_objects.all()  # Unfiltered access!
+# ❌ DANGEROUS - Unfiltered access across all tenants
+docs = Document.all_objects.all()
+for doc in docs:  # Iterates through ALL tenants' documents!
+    process(doc)
 
 # ✅ Correct - Use tenant-aware manager
-docs = Document.objects.all()  # Filtered by tenant
+docs = Document.objects.all()  # Automatically filtered
+
+# ✅ If you need admin access, explicitly document it
+# ADMIN ONLY: Access all documents across all tenants
+@require_superuser
+def admin_report(request):
+    docs = Document.all_objects.all()  # Explicitly unfiltered
+    return render(request, 'admin_report.html', {'docs': docs})
 ```
 
-### 4. Protect Inactive Tenants
+### 5. Protect Inactive Tenants
 
 ```python
-# Middleware automatically blocks inactive tenants
-if tenant and not tenant.is_active:
-    return HttpResponse("Tenant is inactive", status=403)
+# Middleware automatically blocks inactive tenants (TenantMiddleware)
+# Additional safety: Verify at ORM level
 
-# But verify in ORM queries too
-class TenantAwareManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(
-            tenant__is_active=True  # Additional safety
-        )
+# ❌ ANTI-PATTERN: Inactive tenants not protected
+Document.objects.all()  # Returns docs from inactive tenant if no tenant context!
+
+# ✅ TenantManager handles this: Empty queryset if no tenant context
+# Middleware must set tenant context first, and validate is_active
 ```
 
-### 5. Audit Tenant Changes
+### 6. Audit Tenant-Aware Operations
 
 ```python
-# Log tenant activation/deactivation
-class Tenant(models.Model):
+import logging
+
+logger = logging.getLogger(__name__)
+
+# Log model saves with tenant context
+from documents.models.base import get_current_tenant_id
+
+class Document(ModelWithOwner):
     def save(self, *args, **kwargs):
-        if not self.pk:
-            logger.info(f"Creating tenant: {self.name} ({self.subdomain})")
-        elif self.is_active != self.__dict__.get('is_active'):
-            logger.warning(f"Tenant {self.name} access changed to: {self.is_active}")
+        # Auto-populate tenant_id from thread-local
         super().save(*args, **kwargs)
+        logger.info(
+            f"Saved document {self.id} for tenant {self.tenant_id}",
+            extra={'tenant_id': str(self.tenant_id)}
+        )
+
+# Log tenant context changes
+class TenantMiddleware:
+    def __call__(self, request):
+        tenant_id = get_current_tenant_id()
+        logger.debug(
+            f"Request processed for tenant {tenant_id}",
+            extra={'tenant_id': str(tenant_id) if tenant_id else 'None'}
+        )
 ```
 
 ## Migration Guide
