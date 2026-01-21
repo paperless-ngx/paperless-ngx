@@ -667,6 +667,29 @@ system. See the corresponding
 
     Defaults to False
 
+#### [`PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM=<str>`](#PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM) {#PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM}
+
+: Allows you to define a custom groups claim. Only applicable when [PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS](#PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS) is enabled.
+
+: In order to pass groups from the authentication system you will need to update your [PAPERLESS_SOCIALACCOUNT_PROVIDERS](#PAPERLESS_SOCIALACCOUNT_PROVIDERS) setting by adding a top-level "SCOPES" setting which includes `"{PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM}"`, e.g.:
+
+    ```docker-compose.yml
+    services:
+        ...
+        paperless:
+            ...
+            environment:
+                ...
+                PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS: true
+                PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM: "paperless_groups"
+    ```
+
+    ```json
+    {"openid_connect":{"SCOPE": ["openid","profile","email","paperless_groups"]...
+    ```
+
+    Defaults to "groups"
+
 #### [`PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS=<comma-separated-list>`](#PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS) {#PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS}
 
 : A list of group names that users who signup via social accounts will be added to upon signup. Groups listed here must already exist.
