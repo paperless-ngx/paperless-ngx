@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('paperless', '0005_applicationconfiguration_ai_enabled_and_more'),
-        ('documents', '1079_create_default_tenant_and_backfill'),
+        ('documents', '1077_create_tenant_model'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
