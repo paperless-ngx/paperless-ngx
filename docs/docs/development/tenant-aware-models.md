@@ -542,10 +542,73 @@ class Command(BaseCommand):
 4. **Avoid querying all_objects** in production (performance impact)
 5. **Monitor slow queries** for missing tenant_id filters
 
+## Database-Level Protection with PostgreSQL RLS
+
+:::info
+While TenantManager provides application-level filtering, PostgreSQL Row-Level Security (RLS) provides an additional security layer at the database level. This is important for defense-in-depth.
+:::
+
+### How RLS Complements ModelWithOwner
+
+```
+Application Layer (TenantManager)
+    ↓ Auto-filters queries by thread-local tenant_id
+PostgreSQL RLS Layer
+    ↓ Double-checks tenant_id column matches session variable
+Database Results
+    ↓ Defense-in-depth: bypassing one layer is prevented by the other
+```
+
+### Enabling RLS on New Models
+
+When creating new tenant-aware models:
+
+1. Inherit from `ModelWithOwner` (provides `tenant_id` field)
+2. Run migrations to create the table
+3. Add the model's table to Migration 1081 (RLS migration)
+4. Or manually enable RLS on the table:
+
+```sql
+-- Enable RLS on new table
+ALTER TABLE new_model ENABLE ROW LEVEL SECURITY;
+
+-- Create isolation policy
+CREATE POLICY tenant_isolation_policy ON new_model
+    FOR ALL
+    USING (tenant_id = current_setting('app.current_tenant')::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant')::uuid);
+
+-- Force RLS
+ALTER TABLE new_model FORCE ROW LEVEL SECURITY;
+```
+
+### Non-PostgreSQL Databases
+
+For SQLite/MySQL deployments:
+- RLS is not available
+- Rely on application-level filtering via TenantManager
+- Be extra careful with raw SQL queries (no database-level protection)
+- Consider adding audit logging to detect policy bypasses
+
+```python
+# Example: Audit raw SQL queries in non-PostgreSQL environments
+import logging
+
+logger = logging.getLogger('security')
+
+def audit_raw_query(query):
+    logger.warning(
+        f"Raw SQL query executed: {query[:100]}...",
+        extra={'query_type': 'RAW_SQL'}
+    )
+```
+
 ## See Also
 
-- [Multi-Tenant Architecture](../deployment/multi-tenant-architecture.md) - Overall design
+- [Multi-Tenant Architecture](../deployment/multi-tenant-architecture.md) - Overall design with RLS details
+- [Database-Level Isolation](../deployment/multi-tenant-architecture.md#database-level-isolation-with-row-level-security) - RLS implementation guide
 - [TenantMiddleware Configuration](../deployment/tenant-middleware-configuration.md) - Request routing
 - [Security Best Practices](../deployment/multi-tenant-architecture.md#security-best-practices) - Security guidelines
+- [RLS Tests](../../src/documents/tests/test_rls_tenant_isolation.py) - Test suite verifying RLS policies
 
 **Last Updated**: 2026-01-21
