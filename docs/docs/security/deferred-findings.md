@@ -112,7 +112,10 @@ def save(self, *args, **kwargs):
     if self.tenant_id is None:
         self.tenant_id = get_current_tenant_id()  # Implicit!
     if self.tenant_id is None:
-        raise ValueError("tenant_id must be set")
+        raise ValueError(
+            f"tenant_id cannot be None for {self.__class__.__name__}. "
+            f"Set tenant_id explicitly or use set_current_tenant_id()."
+        )
     super().save(*args, **kwargs)
 ``` |
 | **Impact** | Developers may not realize tenant_id is auto-populated, leading to confusion when debugging. |

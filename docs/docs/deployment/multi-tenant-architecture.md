@@ -206,7 +206,10 @@ class ModelWithOwner(models.Model):
             self.tenant_id = get_current_tenant_id()
 
         if self.tenant_id is None:
-            raise ValueError("tenant_id must be set before saving")
+            raise ValueError(
+                f"tenant_id cannot be None for {self.__class__.__name__}. "
+                f"Set tenant_id explicitly or use set_current_tenant_id()."
+            )
 
         super().save(*args, **kwargs)
 ```

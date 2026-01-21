@@ -75,9 +75,8 @@ class ModelWithOwner(models.Model):
 
         if self.tenant_id is None:
             raise ValueError(
-                "tenant_id must be set before saving. "
-                "Ensure TenantMiddleware is active and tenant_id "
-                "is in thread-local storage."
+                f"tenant_id cannot be None for {self.__class__.__name__}. "
+                f"Set tenant_id explicitly or use set_current_tenant_id()."
             )
 
         super().save(*args, **kwargs)
@@ -170,7 +169,7 @@ with set_tenant_context(tenant.id):
     )
 
 # ❌ Wrong - No tenant context set
-# This will raise ValueError: tenant_id must be set before saving
+# This will raise ValueError: tenant_id cannot be None for Document
 doc = Document(
     title="Invoice 2024",
     content="...",
@@ -439,27 +438,26 @@ ALTER TABLE document ALTER COLUMN tenant_id SET NOT NULL;
 
 ## Troubleshooting
 
-### ValueError: tenant_id must be set before saving
+### ValueError: tenant_id cannot be None
 
 **Problem**: Getting this error when creating objects
 
 ```python
 >>> doc = Document.objects.create(title="...", owner=user)
-ValueError: tenant_id must be set before saving
+ValueError: tenant_id cannot be None for Document. Set tenant_id explicitly or use set_current_tenant_id().
 ```
 
 **Solution**: Ensure TenantMiddleware is active and setting thread-local context
 
 ```python
-from documents.models.base import get_current_tenant_id
+from documents.models.base import get_current_tenant_id, set_current_tenant_id
 
 # Check if tenant context is set
 tenant_id = get_current_tenant_id()
 if not tenant_id:
     # TenantMiddleware not running or not configured
     # Set context manually for testing/management commands
-    from documents.models.base import set_current_tenant_id
-    set_current_tenant_id('<tenant-id>')
+    set_current_tenant_id('<tenant-uuid>')
 ```
 
 ### Querying returns no objects
