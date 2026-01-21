@@ -25,6 +25,7 @@ from documents.barcodes import BarcodePlugin
 from documents.caching import clear_document_caches
 from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
+from documents.classifier import get_tenant_model_file
 from documents.consumer import ConsumerPlugin
 from documents.consumer import ConsumerPreflightPlugin
 from documents.consumer import WorkflowTriggerPlugin
@@ -175,26 +176,28 @@ def train_classifier(*, scheduled=True, tenant_id=None):
         logger.info(result)
         # Special case, items were once auto and trained, so remove the model
         # and prevent its use again
-        if settings.MODEL_FILE.exists():
-            logger.info(f"Removing {settings.MODEL_FILE} so it won't be used")
-            settings.MODEL_FILE.unlink()
+        tenant_model_file = get_tenant_model_file(tenant_id)
+        if tenant_model_file.exists():
+            logger.info(f"Removing {tenant_model_file} so it won't be used")
+            tenant_model_file.unlink()
         task.status = states.SUCCESS
         task.result = result
         task.date_done = timezone.now()
         task.save()
         return
 
-    classifier = load_classifier()
+    classifier = load_classifier(tenant_id=tenant_id)
 
     if not classifier:
         classifier = DocumentClassifier()
 
     try:
         if classifier.train():
+            tenant_model_file = get_tenant_model_file(tenant_id)
             logger.info(
-                f"Saving updated classifier model to {settings.MODEL_FILE}...",
+                f"Saving updated classifier model to {tenant_model_file}...",
             )
-            classifier.save()
+            classifier.save(tenant_id=tenant_id)
             task.result = "Training completed successfully"
         else:
             logger.debug("Training data unchanged.")
