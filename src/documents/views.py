@@ -3362,7 +3362,9 @@ class TrashView(ListModelMixin, PassUserMixin):
         elif action == "empty":
             if doc_ids is None:
                 doc_ids = [doc.id for doc in docs]
-            empty_trash(doc_ids=doc_ids)
+            # Get tenant_id from request (set by TenantMiddleware)
+            tenant_id = getattr(request, 'tenant_id', None)
+            empty_trash.delay(doc_ids=doc_ids, tenant_id=str(tenant_id) if tenant_id else None)
         return Response({"result": "OK", "doc_ids": doc_ids})
 
 

@@ -44,6 +44,7 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
+from documents.models import get_current_tenant_id
 from documents.parsers import DocumentParser
 from documents.parsers import get_parser_class_for_mime_type
 from documents.plugins.base import ConsumeTaskPlugin
@@ -132,6 +133,32 @@ def scheduled_llmindex_index_all_tenants():
     for tenant in tenants:
         logger.info(f"Spawning llmindex_index for tenant: {tenant.subdomain} ({tenant.id})")
         llmindex_index.delay(scheduled=True, tenant_id=str(tenant.id))
+
+
+@shared_task
+def scheduled_empty_trash_all_tenants():
+    """Wrapper for Celery Beat: Empties trash for all active tenants."""
+    from paperless.models import Tenant
+
+    tenants = Tenant.objects.filter(is_active=True)
+    logger.info(f"Running scheduled empty_trash for {tenants.count()} active tenants")
+
+    for tenant in tenants:
+        logger.info(f"Spawning empty_trash for tenant: {tenant.subdomain} ({tenant.id})")
+        empty_trash.delay(tenant_id=str(tenant.id))
+
+
+@shared_task
+def scheduled_check_workflows_all_tenants():
+    """Wrapper for Celery Beat: Checks scheduled workflows for all active tenants."""
+    from paperless.models import Tenant
+
+    tenants = Tenant.objects.filter(is_active=True)
+    logger.info(f"Running scheduled check_workflows for {tenants.count()} active tenants")
+
+    for tenant in tenants:
+        logger.info(f"Spawning check_scheduled_workflows for tenant: {tenant.subdomain} ({tenant.id})")
+        check_scheduled_workflows.delay(tenant_id=str(tenant.id))
 
 
 @shared_task
@@ -323,7 +350,8 @@ def sanity_check(*, scheduled=True, raise_on_error=True, tenant_id=None):
 
 
 @shared_task
-def bulk_update_documents(document_ids):
+def bulk_update_documents(document_ids, tenant_id=None):
+    restore_tenant_context(tenant_id)
     documents = Document.objects.filter(id__in=document_ids)
 
     ix = index.open_index()
@@ -350,11 +378,12 @@ def bulk_update_documents(document_ids):
 
 
 @shared_task
-def update_document_content_maybe_archive_file(document_id):
+def update_document_content_maybe_archive_file(document_id, tenant_id=None):
     """
     Re-creates OCR content and thumbnail for a document, and archive file if
     it exists.
     """
+    restore_tenant_context(tenant_id)
     document = Document.objects.get(id=document_id)
 
     mime_type = document.mime_type
@@ -462,7 +491,8 @@ def update_document_content_maybe_archive_file(document_id):
 
 
 @shared_task
-def empty_trash(doc_ids=None):
+def empty_trash(doc_ids=None, tenant_id=None):
+    restore_tenant_context(tenant_id)
     if doc_ids is None:
         logger.info("Emptying trash of all expired documents")
     documents = (
@@ -499,7 +529,7 @@ def empty_trash(doc_ids=None):
 
 
 @shared_task
-def check_scheduled_workflows():
+def check_scheduled_workflows(tenant_id=None):
     """
     Check and run all enabled scheduled workflows.
 
@@ -510,6 +540,7 @@ def check_scheduled_workflows():
 
     Once a document satisfies this condition, and recurring/non-recurring constraints are met, the workflow is run.
     """
+    restore_tenant_context(tenant_id)
     scheduled_workflows = get_workflows_for_trigger(
         WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
     )
@@ -667,7 +698,8 @@ def update_document_parent_tags(tag: Tag, new_parent: Tag) -> None:
         )
 
     if affected:
-        bulk_update_documents.delay(document_ids=list(affected))
+        tenant_id = get_current_tenant_id()
+        bulk_update_documents.delay(document_ids=list(affected), tenant_id=str(tenant_id) if tenant_id else None)
 
 
 @shared_task

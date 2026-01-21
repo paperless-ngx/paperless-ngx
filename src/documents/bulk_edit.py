@@ -26,6 +26,7 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import get_current_tenant_id
 from documents.permissions import set_permissions_for_object
 from documents.plugins.helpers import DocumentsStatusManager
 from documents.tasks import bulk_update_documents
@@ -53,7 +54,8 @@ def set_correspondent(
     affected_docs = list(qs.values_list("pk", flat=True))
     qs.update(correspondent=correspondent)
 
-    bulk_update_documents.delay(document_ids=affected_docs)
+    tenant_id = get_current_tenant_id()
+    bulk_update_documents.delay(document_ids=affected_docs, tenant_id=str(tenant_id) if tenant_id else None)
 
     return "OK"
 
@@ -72,8 +74,10 @@ def set_storage_path(doc_ids: list[int], storage_path: StoragePath) -> Literal["
     affected_docs = list(qs.values_list("pk", flat=True))
     qs.update(storage_path=storage_path)
 
+    tenant_id = get_current_tenant_id()
     bulk_update_documents.delay(
         document_ids=affected_docs,
+        tenant_id=str(tenant_id) if tenant_id else None,
     )
 
     return "OK"
@@ -91,7 +95,8 @@ def set_document_type(doc_ids: list[int], document_type: DocumentType) -> Litera
     affected_docs = list(qs.values_list("pk", flat=True))
     qs.update(document_type=document_type)
 
-    bulk_update_documents.delay(document_ids=affected_docs)
+    tenant_id = get_current_tenant_id()
+    bulk_update_documents.delay(document_ids=affected_docs, tenant_id=str(tenant_id) if tenant_id else None)
 
     return "OK"
 
@@ -135,7 +140,8 @@ def remove_tag(doc_ids: list[int], tag: int) -> Literal["OK"]:
     qs.delete()
 
     if affected_docs:
-        bulk_update_documents.delay(document_ids=affected_docs)
+        tenant_id = get_current_tenant_id()
+        bulk_update_documents.delay(document_ids=affected_docs, tenant_id=str(tenant_id) if tenant_id else None)
 
     return "OK"
 
@@ -194,7 +200,8 @@ def modify_tags(
                     )
 
             if affected_docs:
-                bulk_update_documents.delay(document_ids=affected_docs)
+                tenant_id = get_current_tenant_id()
+                bulk_update_documents.delay(document_ids=affected_docs, tenant_id=str(tenant_id) if tenant_id else None)
     except Exception as e:
         logger.error(f"Error modifying tags: {e}")
         return "ERROR"
@@ -266,7 +273,8 @@ def modify_custom_fields(
         field_id__in=remove_custom_fields,
     ).hard_delete()
 
-    bulk_update_documents.delay(document_ids=affected_docs)
+    tenant_id = get_current_tenant_id()
+    bulk_update_documents.delay(document_ids=affected_docs, tenant_id=str(tenant_id) if tenant_id else None)
 
     return "OK"
 
@@ -296,8 +304,10 @@ def delete(doc_ids: list[int]) -> Literal["OK"]:
 
 def reprocess(doc_ids: list[int]) -> Literal["OK"]:
     for document_id in doc_ids:
+        tenant_id = get_current_tenant_id()
         update_document_content_maybe_archive_file.delay(
             document_id=document_id,
+            tenant_id=str(tenant_id) if tenant_id else None,
         )
 
     return "OK"
@@ -323,7 +333,8 @@ def set_permissions(
 
     affected_docs = list(qs.values_list("pk", flat=True))
 
-    bulk_update_documents.delay(document_ids=affected_docs)
+    tenant_id = get_current_tenant_id()
+    bulk_update_documents.delay(document_ids=affected_docs, tenant_id=str(tenant_id) if tenant_id else None)
 
     return "OK"
 
@@ -336,6 +347,7 @@ def rotate(doc_ids: list[int], degrees: int) -> Literal["OK"]:
     affected_docs: list[int] = []
     import pikepdf
 
+    tenant_id = get_current_tenant_id()
     rotate_tasks = []
     for doc in qs:
         if doc.mime_type != "application/pdf":
@@ -353,6 +365,7 @@ def rotate(doc_ids: list[int], degrees: int) -> Literal["OK"]:
                 rotate_tasks.append(
                     update_document_content_maybe_archive_file.s(
                         document_id=doc.id,
+                        tenant_id=str(tenant_id) if tenant_id else None,
                     ),
                 )
                 logger.info(
@@ -363,7 +376,7 @@ def rotate(doc_ids: list[int], degrees: int) -> Literal["OK"]:
             logger.exception(f"Error rotating document {doc.id}: {e}")
 
     if len(affected_docs) > 0:
-        bulk_update_task = bulk_update_documents.si(document_ids=affected_docs)
+        bulk_update_task = bulk_update_documents.si(document_ids=affected_docs, tenant_id=str(tenant_id) if tenant_id else None)
         chord(header=rotate_tasks, body=bulk_update_task).delay()
 
     return "OK"
@@ -541,7 +554,8 @@ def delete_pages(doc_ids: list[int], pages: list[int]) -> Literal["OK"]:
             if doc.page_count is not None:
                 doc.page_count = doc.page_count - len(pages)
             doc.save()
-            update_document_content_maybe_archive_file.delay(document_id=doc.id)
+            tenant_id = get_current_tenant_id()
+            update_document_content_maybe_archive_file.delay(document_id=doc.id, tenant_id=str(tenant_id) if tenant_id else None)
             logger.info(f"Deleted pages {pages} from document {doc.id}")
     except Exception as e:
         logger.exception(f"Error deleting pages from document {doc.id}: {e}")
@@ -604,7 +618,8 @@ def edit_pdf(
             doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
             doc.page_count = len(pdf.pages)
             doc.save()
-            update_document_content_maybe_archive_file.delay(document_id=doc.id)
+            tenant_id = get_current_tenant_id()
+            update_document_content_maybe_archive_file.delay(document_id=doc.id, tenant_id=str(tenant_id) if tenant_id else None)
         else:
             consume_tasks = []
             overrides = (
@@ -677,7 +692,8 @@ def remove_password(
                     doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
                     doc.page_count = len(pdf.pages)
                     doc.save()
-                    update_document_content_maybe_archive_file.delay(document_id=doc.id)
+                    tenant_id = get_current_tenant_id()
+                    update_document_content_maybe_archive_file.delay(document_id=doc.id, tenant_id=str(tenant_id) if tenant_id else None)
                 else:
                     consume_tasks = []
                     overrides = (

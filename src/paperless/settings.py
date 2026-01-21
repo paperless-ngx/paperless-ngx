@@ -213,7 +213,7 @@ def _parse_beat_schedule() -> dict:
             "env_key": "PAPERLESS_EMPTY_TRASH_TASK_CRON",
             # Default daily at 01:00
             "env_default": "0 1 * * *",
-            "task": "documents.tasks.empty_trash",
+            "task": "documents.tasks.scheduled_empty_trash_all_tenants",
             "options": {
                 # 1 hour before default schedule sends again
                 "expires": 23.0 * 60.0 * 60.0,
@@ -224,7 +224,7 @@ def _parse_beat_schedule() -> dict:
             "env_key": "PAPERLESS_WORKFLOW_SCHEDULED_TASK_CRON",
             # Default hourly at 5 minutes past the hour
             "env_default": "5 */1 * * *",
-            "task": "documents.tasks.check_scheduled_workflows",
+            "task": "documents.tasks.scheduled_check_workflows_all_tenants",
             "options": {
                 # 1 minute before default schedule sends again
                 "expires": 59.0 * 60.0,
