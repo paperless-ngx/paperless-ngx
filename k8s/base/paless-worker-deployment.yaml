@@ -23,7 +23,7 @@ spec:
           effect: "NoSchedule"
       containers:
         - name: paless-worker
-          image: localhost:5000/paless-worker:v2
+          image: localhost:5000/paless-worker:latest
           imagePullPolicy: Always
           envFrom:
             - configMapRef:

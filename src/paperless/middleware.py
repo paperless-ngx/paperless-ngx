@@ -1,39 +1,14 @@
 import logging
-import threading
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db import connection
 from django.http import HttpResponse
 
+from documents.models.base import set_current_tenant_id as set_tenant_id_in_base
 from paperless import version
 
 logger = logging.getLogger("paperless.middleware")
-
-# Thread-local storage for tenant context
-_thread_locals = threading.local()
-
-
-def get_current_tenant():
-    """
-    Get the current tenant from thread-local storage.
-    """
-    return getattr(_thread_locals, "tenant", None)
-
-
-def get_current_tenant_id():
-    """
-    Get the current tenant ID from thread-local storage.
-    """
-    return getattr(_thread_locals, "tenant_id", None)
-
-
-def set_current_tenant(tenant):
-    """
-    Set the current tenant in thread-local storage.
-    """
-    _thread_locals.tenant = tenant
-    _thread_locals.tenant_id = tenant.id if tenant else None
 
 
 class TenantMiddleware:
@@ -118,8 +93,8 @@ class TenantMiddleware:
         request.tenant = tenant
         request.tenant_id = tenant.id if tenant else None
 
-        # Set thread-local storage for ORM filtering
-        set_current_tenant(tenant)
+        # Set thread-local storage for ORM filtering (using base.py's function)
+        set_tenant_id_in_base(tenant.id if tenant else None)
 
         # Set PostgreSQL session variable for Row-Level Security
         if tenant:
@@ -135,7 +110,7 @@ class TenantMiddleware:
         response = self.get_response(request)
 
         # Clean up thread-local storage after request
-        set_current_tenant(None)
+        set_tenant_id_in_base(None)
 
         return response
 

@@ -23,7 +23,7 @@ spec:
           effect: "NoSchedule"
       containers:
         - name: paless-web
-          image: localhost:5000/paless-web:v2
+          image: localhost:5000/paless-web:latest
           imagePullPolicy: Always
           ports:
             - name: http
@@ -56,22 +56,16 @@ spec:
               memory: "512Mi"
           livenessProbe:
             httpGet:
-              path: /
+              path: /api/
               port: 8000
-              httpHeaders:
-              - name: X-Tenant-ID
-                value: "4"
             initialDelaySeconds: 60
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
           readinessProbe:
             httpGet:
-              path: /
+              path: /api/
               port: 8000
-              httpHeaders:
-              - name: X-Tenant-ID
-                value: "4"
             initialDelaySeconds: 30
             periodSeconds: 5
             timeoutSeconds: 3

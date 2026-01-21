@@ -2,8 +2,9 @@ from django.contrib.auth.models import User
 from django.test import RequestFactory, TestCase, override_settings
 from rest_framework import status
 
-from paperless.middleware import TenantMiddleware, get_current_tenant, set_current_tenant
-from documents.models import Tenant
+from paperless.middleware import TenantMiddleware
+from documents.models import Tenant, Document
+from documents.models.base import get_current_tenant_id, set_current_tenant_id
 
 
 class TestTenantMiddleware(TestCase):
@@ -40,7 +41,7 @@ class TestTenantMiddleware(TestCase):
 
     def tearDown(self):
         """Clean up thread-local storage."""
-        set_current_tenant(None)
+        set_current_tenant_id(None)
 
     def test_resolve_tenant_from_subdomain(self):
         """
@@ -185,16 +186,16 @@ class TestTenantMiddleware(TestCase):
 
         GIVEN: A request with a valid subdomain
         WHEN: Middleware processes the request
-        THEN: Thread-local storage is set with tenant
+        THEN: Thread-local storage is set with tenant ID from base.py
         """
         request = self.factory.get("/", HTTP_HOST="tenant-a.localhost:8000")
 
         # Create a get_response that checks thread-local storage
         def check_thread_local(req):
             # Inside the request processing, thread-local should be set
-            current_tenant = get_current_tenant()
-            self.assertIsNotNone(current_tenant)
-            self.assertEqual(current_tenant.subdomain, "tenant-a")
+            current_tenant_id = get_current_tenant_id()
+            self.assertIsNotNone(current_tenant_id)
+            self.assertEqual(current_tenant_id, self.tenant_a.id)
             return type('obj', (object,), {'status_code': 200})()
 
         self.middleware.get_response = check_thread_local
@@ -202,7 +203,7 @@ class TestTenantMiddleware(TestCase):
         response = self.middleware(request)
 
         # After request processing, thread-local should be cleaned up
-        self.assertIsNone(get_current_tenant())
+        self.assertIsNone(get_current_tenant_id())
 
     def test_subdomain_priority_over_header(self):
         """
@@ -227,3 +228,66 @@ class TestTenantMiddleware(TestCase):
         self.assertIsNotNone(request.tenant)
         self.assertEqual(request.tenant.subdomain, "tenant-a")
         self.assertEqual(request.tenant_id, self.tenant_a.id)
+
+    def test_tenant_manager_receives_correct_context(self):
+        """
+        Test that TenantManager receives tenant context from middleware.
+
+        GIVEN: A request with a valid subdomain and documents from multiple tenants
+        WHEN: Middleware processes the request and Document.objects.all() is called
+        THEN: Only documents from the current tenant are returned
+
+        This test verifies the fix for the bug where middleware used its own
+        thread-local storage instead of the one used by TenantManager.
+        """
+        # Create documents for both tenants
+        user = User.objects.create_user(username="testuser")
+
+        # Set tenant context for document creation
+        set_current_tenant_id(self.tenant_a.id)
+        doc_a = Document.objects.create(
+            title="Document A",
+            tenant_id=self.tenant_a.id,
+            owner=user,
+        )
+
+        set_current_tenant_id(self.tenant_b.id)
+        doc_b = Document.objects.create(
+            title="Document B",
+            tenant_id=self.tenant_b.id,
+            owner=user,
+        )
+
+        # Clear tenant context
+        set_current_tenant_id(None)
+
+        # Create request for tenant A
+        request = self.factory.get("/", HTTP_HOST="tenant-a.localhost:8000")
+
+        # Create a get_response that queries documents
+        def check_tenant_manager(req):
+            # Inside request processing, TenantManager should filter by tenant A
+            documents = Document.objects.all()
+            self.assertEqual(documents.count(), 1)
+            self.assertEqual(documents.first().id, doc_a.id)
+            self.assertEqual(documents.first().title, "Document A")
+
+            # Verify tenant_id matches
+            current_tenant_id = get_current_tenant_id()
+            self.assertEqual(current_tenant_id, self.tenant_a.id)
+
+            return type('obj', (object,), {'status_code': 200})()
+
+        self.middleware.get_response = check_tenant_manager
+        response = self.middleware(request)
+
+        # Verify response was successful
+        self.assertEqual(response.status_code, 200)
+
+        # After request, thread-local should be cleaned up
+        self.assertIsNone(get_current_tenant_id())
+
+        # Clean up
+        doc_a.delete()
+        doc_b.delete()
+        user.delete()
