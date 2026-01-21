@@ -24,6 +24,9 @@
   --pngx-bg-alt2: var(--bs-gray-200); // #e9ecef
   --pngx-bg-disabled: #f7f7f7;
   --pngx-focus-alpha: 0.3;
+  --pngx-scrollbar-track: var(--bs-gray-100);
+  --pngx-scrollbar-thumb: var(--bs-gray-400);
+  --pngx-scrollbar-thumb-hover: var(--bs-gray-500);
   --pngx-toast-max-width: 340px;
   --bs-info: var(--pngx-bg-alt2);
   --bs-info-rgb: 233, 236, 239;
@@ -95,6 +98,9 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   --bs-tertiary-bg: var(--pngx-bg-darker);
   --bs-dark-border-subtle: var(--pngx-bg-darker);
   --bs-border-color-translucent: rgba(0, 0, 0, .175); // override bs
+  --pngx-scrollbar-track: var(--pngx-bg-darker);
+  --pngx-scrollbar-thumb: #3b3f45;
+  --pngx-scrollbar-thumb-hover: #4a4f57;
 
   .text-dark, .text-light {
     color: var(--bs-body-color) !important;

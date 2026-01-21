@@ -13,6 +13,8 @@
   --pngx-sidebar-width: 100%;
   max-width: var(--pngx-sidebar-width);
   transition: all .2s ease;
+  scrollbar-color: var(--pngx-scrollbar-thumb) var(--pngx-scrollbar-track);
+  scrollbar-width: thin;
 
   .sidebar-heading .spinner-border {
     width: 0.8em;
@@ -146,11 +148,34 @@ main {
   overflow-x: hidden;
   overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
   min-height: min-content;
+  scrollbar-color: var(--pngx-scrollbar-thumb) var(--pngx-scrollbar-track);
+  scrollbar-width: thin;
 }
 @supports ((position: -webkit-sticky) or (position: sticky)) {
   .sidebar-sticky {
     position: -webkit-sticky;
     position: sticky;
+  }
+}
+
+.sidebar,
+.sidebar-sticky {
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: var(--pngx-scrollbar-track);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--pngx-scrollbar-thumb);
+    border-radius: 999px;
+    border: 2px solid var(--pngx-scrollbar-track);
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: var(--pngx-scrollbar-thumb-hover);
   }
 }
 
