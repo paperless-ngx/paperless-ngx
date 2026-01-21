@@ -9,6 +9,8 @@ from allauth.socialaccount.models import SocialApp
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+
+from documents.models import TenantGroup
 from django.contrib.auth.password_validation import validate_password
 from django.core.files.uploadedfile import UploadedFile
 from rest_framework import serializers
@@ -162,12 +164,13 @@ class GroupSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Group
+        model = TenantGroup
         fields = (
             "id",
             "name",
             "permissions",
         )
+        read_only_fields = ("tenant_id",)
 
 
 class SocialAccountSerializer(serializers.ModelSerializer):

@@ -11,6 +11,8 @@ from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+
+from documents.models import TenantGroup
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db.models.functions import Lower
 from django.http import FileResponse
@@ -247,9 +249,16 @@ class UserViewSet(ModelViewSet):
 
 
 class GroupViewSet(ModelViewSet):
-    model = Group
+    """
+    ViewSet for managing tenant-scoped groups.
 
-    queryset = Group.objects.order_by(Lower("name"))
+    Groups are automatically filtered by current tenant context.
+    Only groups belonging to the current tenant are visible and can be modified.
+    Creating a group automatically sets tenant_id from request context.
+    """
+    model = TenantGroup
+
+    queryset = TenantGroup.objects.order_by(Lower("name"))
 
     serializer_class = GroupSerializer
     pagination_class = StandardPagination
@@ -257,6 +266,58 @@ class GroupViewSet(ModelViewSet):
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_class = GroupFilterSet
     ordering_fields = ("name",)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        import logging
+        self.audit_logger = logging.getLogger("paperless.audit.tenant")
+
+    def get_queryset(self):
+        """
+        Filter groups by current tenant.
+
+        Returns only groups belonging to the current tenant via TenantManager.
+        The TenantGroup model's default 'objects' manager automatically filters
+        by tenant_id from thread-local context.
+
+        Superusers bypass tenant filtering and can see all groups.
+        """
+        queryset = super().get_queryset()
+
+        # Superusers can see all groups across all tenants
+        if self.request.user.is_superuser:
+            queryset = TenantGroup.all_objects.order_by(Lower("name"))
+            self.audit_logger.info(
+                f"Superuser {self.request.user.username} accessed group list "
+                f"(bypassed tenant filtering)"
+            )
+        else:
+            tenant_id = getattr(self.request, 'tenant_id', None)
+            self.audit_logger.info(
+                f"User {self.request.user.username} accessed group list "
+                f"filtered to tenant {tenant_id}"
+            )
+
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        """
+        Create a new group within the current tenant.
+
+        The tenant_id is automatically set by the TenantGroup model's save()
+        method from thread-local context.
+        """
+        response = super().create(request, *args, **kwargs)
+
+        if response.status_code == 201:
+            tenant_id = getattr(request, 'tenant_id', None)
+            group_name = request.data.get('name', 'unknown')
+            self.audit_logger.info(
+                f"User {request.user.username} created group '{group_name}' "
+                f"in tenant {tenant_id}"
+            )
+
+        return response
 
 
 class ProfileView(GenericAPIView):
