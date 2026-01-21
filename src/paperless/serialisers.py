@@ -115,6 +115,9 @@ class UserSerializer(PasswordValidationMixin, serializers.ModelSerializer):
         return instance
 
     def create(self, validated_data):
+        from documents.models.base import get_current_tenant_id
+        from paperless.models import UserProfile
+
         groups = None
         if "groups" in validated_data:
             groups = validated_data.pop("groups")
@@ -122,6 +125,10 @@ class UserSerializer(PasswordValidationMixin, serializers.ModelSerializer):
         if "user_permissions" in validated_data:
             user_permissions = validated_data.pop("user_permissions")
         password = validated_data.pop("password", None)
+
+        # Get tenant_id from current context
+        tenant_id = get_current_tenant_id()
+
         user = User.objects.create(**validated_data)
         # set groups
         if groups:
@@ -133,6 +140,17 @@ class UserSerializer(PasswordValidationMixin, serializers.ModelSerializer):
         if self._has_real_password(password):
             user.set_password(password)
         user.save()
+
+        # Create UserProfile with tenant_id
+        # Signal handler will create it, but we need to ensure tenant_id is set
+        if tenant_id:
+            if not hasattr(user, 'profile'):
+                UserProfile.objects.create(user=user, tenant_id=tenant_id)
+            elif user.profile.tenant_id != tenant_id:
+                # Update tenant_id if profile exists but has wrong tenant
+                user.profile.tenant_id = tenant_id
+                user.profile.save()
+
         return user
 
 

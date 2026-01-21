@@ -118,16 +118,83 @@ class UserViewSet(ModelViewSet):
     filterset_class = UserFilterSet
     ordering_fields = ("username",)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        import logging
+        self.audit_logger = logging.getLogger("paperless.audit.tenant")
+
+    def get_queryset(self):
+        """
+        Filter users by current tenant.
+
+        Returns only users belonging to the current tenant (based on UserProfile.tenant_id).
+        System users (consumer, AnonymousUser) are excluded by the base queryset.
+        Users without UserProfile are excluded from results.
+
+        Superusers bypass tenant filtering and can see all users.
+        """
+        queryset = super().get_queryset()
+
+        # Superusers can see all users across all tenants
+        if self.request.user.is_superuser:
+            self.audit_logger.info(
+                f"Superuser {self.request.user.username} accessed user list "
+                f"(bypassed tenant filtering)"
+            )
+            return queryset
+
+        # Get current tenant from request
+        tenant_id = getattr(self.request, 'tenant_id', None)
+
+        if tenant_id:
+            # Only include users that have a UserProfile with matching tenant_id
+            # This prevents RelatedObjectDoesNotExist errors for users without profiles
+            queryset = queryset.filter(
+                profile__isnull=False,
+                profile__tenant_id=tenant_id
+            )
+
+            self.audit_logger.info(
+                f"User {self.request.user.username} accessed user list "
+                f"filtered to tenant {tenant_id}"
+            )
+        else:
+            self.audit_logger.warning(
+                f"User {self.request.user.username} accessed user list "
+                f"without tenant context"
+            )
+
+        return queryset
+
     def create(self, request, *args, **kwargs):
         if not request.user.is_superuser and request.data.get("is_superuser") is True:
+            self.audit_logger.warning(
+                f"User {request.user.username} attempted to create superuser "
+                f"without superuser privileges"
+            )
             return HttpResponseForbidden(
                 "Superuser status can only be granted by a superuser",
             )
-        return super().create(request, *args, **kwargs)
+
+        response = super().create(request, *args, **kwargs)
+
+        if response.status_code == 201:
+            tenant_id = getattr(request, 'tenant_id', None)
+            new_username = request.data.get('username', 'unknown')
+            self.audit_logger.info(
+                f"User {request.user.username} created new user '{new_username}' "
+                f"in tenant {tenant_id}"
+            )
+
+        return response
 
     def update(self, request, *args, **kwargs):
         user_to_update: User = self.get_object()
         if not request.user.is_superuser and user_to_update.is_superuser:
+            self.audit_logger.warning(
+                f"User {request.user.username} attempted to modify superuser "
+                f"{user_to_update.username} without superuser privileges"
+            )
             return HttpResponseForbidden(
                 "Superusers can only be modified by other superusers",
             )
@@ -136,10 +203,22 @@ class UserViewSet(ModelViewSet):
             and request.data.get("is_superuser") is not None
             and request.data.get("is_superuser") != user_to_update.is_superuser
         ):
+            self.audit_logger.warning(
+                f"User {request.user.username} attempted to change superuser status "
+                f"for {user_to_update.username} without superuser privileges"
+            )
             return HttpResponseForbidden(
                 "Superuser status can only be changed by a superuser",
             )
-        return super().update(request, *args, **kwargs)
+
+        response = super().update(request, *args, **kwargs)
+
+        if response.status_code == 200:
+            self.audit_logger.info(
+                f"User {request.user.username} updated user {user_to_update.username}"
+            )
+
+        return response
 
     @extend_schema(
         request=None,

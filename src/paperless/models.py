@@ -1,42 +1,12 @@
+from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
 DEFAULT_SINGLETON_INSTANCE_ID = 1
-
-
-class Tenant(models.Model):
-    """
-    Multi-tenant model for subdomain-based tenant isolation.
-    """
-    name = models.CharField(
-        max_length=255,
-        verbose_name=_("Tenant Name"),
-        help_text=_("Human-readable name for the tenant"),
-    )
-    subdomain = models.CharField(
-        max_length=63,
-        unique=True,
-        db_index=True,
-        verbose_name=_("Subdomain"),
-        help_text=_("Unique subdomain for this tenant (e.g., 'tenant-a')"),
-    )
-    is_active = models.BooleanField(
-        default=True,
-        verbose_name=_("Is Active"),
-        help_text=_("Whether this tenant is active and can be accessed"),
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        verbose_name = _("Tenant")
-        verbose_name_plural = _("Tenants")
-        ordering = ["subdomain"]
-
-    def __str__(self):
-        return f"{self.name} ({self.subdomain})"
 
 
 class AbstractSingletonModel(models.Model):
@@ -371,3 +341,85 @@ class ApplicationConfiguration(AbstractSingletonModel):
 
     def __str__(self) -> str:  # pragma: no cover
         return "ApplicationConfiguration"
+
+
+class UserProfile(models.Model):
+    """
+    User profile extending Django's User model with tenant_id.
+
+    This model provides multi-tenant isolation for users by associating
+    each user with a specific tenant via tenant_id field.
+    """
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='profile',
+        verbose_name=_("user"),
+    )
+
+    tenant_id = models.UUIDField(
+        db_index=True,
+        null=False,
+        blank=False,
+        verbose_name=_("tenant"),
+        help_text=_("Tenant to which this user belongs"),
+    )
+
+    class Meta:
+        verbose_name = _("user profile")
+        verbose_name_plural = _("user profiles")
+        indexes = [
+            models.Index(fields=['tenant_id'], name='userprofile_tenant_idx'),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - Tenant {self.tenant_id}"
+
+
+@receiver(post_save, sender=User)
+def create_or_update_user_profile(sender, instance, created, **kwargs):
+    """
+    Signal handler to automatically create UserProfile when User is created.
+
+    This handler ensures every user (except system users) has a UserProfile
+    with a tenant_id. It attempts to get tenant_id from request context,
+    falling back to default tenant if unavailable.
+    """
+    if created and instance.username not in ["consumer", "AnonymousUser"]:
+        # Import here to avoid circular imports
+        from documents.models.base import get_current_tenant_id
+        from documents.models import Tenant
+        import logging
+
+        logger = logging.getLogger(__name__)
+
+        # Check if profile already exists (unlikely but defensive)
+        if hasattr(instance, 'profile'):
+            return
+
+        tenant_id = get_current_tenant_id()
+
+        # If no tenant context, try to get default tenant
+        if not tenant_id:
+            try:
+                default_tenant = Tenant.objects.filter(subdomain='default').first()
+                if default_tenant:
+                    tenant_id = default_tenant.id
+                    logger.warning(
+                        f"User {instance.username} created without tenant context. "
+                        f"Assigned to default tenant {tenant_id}."
+                    )
+            except Exception as e:
+                logger.error(
+                    f"Failed to get default tenant for user {instance.username}: {e}"
+                )
+
+        # Create profile if we have a tenant_id
+        if tenant_id:
+            try:
+                UserProfile.objects.create(user=instance, tenant_id=tenant_id)
+                logger.info(f"Created UserProfile for {instance.username} with tenant {tenant_id}")
+            except Exception as e:
+                logger.error(
+                    f"Failed to create UserProfile for user {instance.username}: {e}"
+                )

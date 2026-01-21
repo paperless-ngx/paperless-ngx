@@ -27,7 +27,7 @@ from documents.caching import CLASSIFIER_VERSION_KEY
 from documents.caching import StoredLRUCache
 from documents.models import Document
 from documents.models import MatchingModel
-from paperless.middleware import get_current_tenant_id
+from documents.models.base import get_current_tenant_id
 
 logger = logging.getLogger("paperless.classifier")
 
