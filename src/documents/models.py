@@ -963,7 +963,7 @@ if settings.AUDIT_LOG_ENABLED:
     auditlog.register(CustomFieldInstance)
 
 
-class WorkflowTrigger(models.Model):
+class WorkflowTrigger(ModelWithOwner):
     class WorkflowTriggerMatching(models.IntegerChoices):
         # No auto matching
         NONE = MatchingModel.MATCH_NONE, _("None")
@@ -1255,7 +1255,7 @@ class WorkflowActionWebhook(models.Model):
         return f"Workflow Webhook Action {self.pk}"
 
 
-class WorkflowAction(models.Model):
+class WorkflowAction(ModelWithOwner):
     class WorkflowActionType(models.IntegerChoices):
         ASSIGNMENT = (
             1,
@@ -1510,7 +1510,7 @@ class WorkflowAction(models.Model):
         return f"WorkflowAction {self.pk}"
 
 
-class Workflow(models.Model):
+class Workflow(ModelWithOwner):
     name = models.CharField(_("name"), max_length=256, unique=True)
 
     order = models.IntegerField(_("order"), default=0)
