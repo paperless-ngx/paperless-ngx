@@ -832,7 +832,7 @@ class DocumentViewSet(
         )
 
     def file_response(self, pk, request, disposition):
-        doc = Document.global_objects.select_related("owner").get(id=pk)
+        doc = Document.objects.select_related("owner").get(id=pk)
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "view_document",
@@ -3348,7 +3348,7 @@ class TrashView(ListModelMixin, PassUserMixin):
 
         doc_ids = serializer.validated_data.get("documents")
         docs = (
-            Document.global_objects.filter(id__in=doc_ids)
+            Document.objects.filter(id__in=doc_ids)
             if doc_ids is not None
             else self.filter_queryset(self.get_queryset()).all()
         )
