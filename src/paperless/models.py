@@ -6,6 +6,9 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
+# Import and re-export Tenant and TenantGroup for backward compatibility
+from documents.models import Tenant, TenantGroup
+
 DEFAULT_SINGLETON_INSTANCE_ID = 1
 
 

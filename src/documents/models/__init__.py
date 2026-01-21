@@ -41,6 +41,9 @@ from documents.models_legacy import (
 # Import the new Tenant model
 from documents.models.tenant import Tenant
 
+# Import TenantGroup model
+from documents.models.tenant_group import TenantGroup
+
 __all__ = [
     # Django auth models
     'User',
@@ -48,6 +51,7 @@ __all__ = [
 
     # Core models
     'Tenant',
+    'TenantGroup',
     'Document',
     'Correspondent',
     'Tag',
