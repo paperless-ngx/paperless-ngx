@@ -693,7 +693,10 @@ def remove_password(
                     doc.page_count = len(pdf.pages)
                     doc.save()
                     tenant_id = get_current_tenant_id()
-                    update_document_content_maybe_archive_file.delay(document_id=doc.id, tenant_id=str(tenant_id) if tenant_id else None)
+                    update_document_content_maybe_archive_file.delay(
+                        document_id=doc.id,
+                        tenant_id=str(tenant_id) if tenant_id else None,
+                    )
                 else:
                     consume_tasks = []
                     overrides = (
