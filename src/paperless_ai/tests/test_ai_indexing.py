@@ -299,11 +299,15 @@ def test_query_similar_documents(
     with (
         patch("paperless_ai.indexing.get_or_create_storage_context") as mock_storage,
         patch("paperless_ai.indexing.load_or_build_index") as mock_load_or_build_index,
+        patch(
+            "paperless_ai.indexing.vector_store_file_exists",
+        ) as mock_vector_store_exists,
         patch("paperless_ai.indexing.VectorIndexRetriever") as mock_retriever_cls,
         patch("paperless_ai.indexing.Document.objects.filter") as mock_filter,
     ):
         mock_storage.return_value = MagicMock()
         mock_storage.return_value.persist_dir = temp_llm_index_dir
+        mock_vector_store_exists.return_value = True
 
         mock_index = MagicMock()
         mock_load_or_build_index.return_value = mock_index
