@@ -138,6 +138,56 @@ python -c 'from django.core.management.utils import get_random_secret_key; print
 
 See [Tesseract language codes](https://tesseract-ocr.github.io/tessdoc/Data-Files-in-different-versions.html) for complete list.
 
+### 6. Celery Task Rate Limiting Configuration
+
+For multi-tenant deployments with many tenants, rate limiting prevents Celery worker overload when spawning per-tenant tasks:
+
+```env
+CELERY_TENANT_BATCH_SIZE=10
+CELERY_TENANT_BATCH_DELAY=60
+```
+
+**Purpose:** Control task spawning rate for scheduled multi-tenant operations.
+
+| Variable | Default | Purpose | Notes |
+|----------|---------|---------|-------|
+| `CELERY_TENANT_BATCH_SIZE` | `10` | Tasks to spawn per batch | 0 or 1 = no batching |
+| `CELERY_TENANT_BATCH_DELAY` | `60` | Delay in seconds between batches | Prevents worker queue backlog |
+
+**Configuration Guidelines:**
+
+| Deployment Size | Batch Size | Batch Delay | Rationale |
+|-----------|-----------|------------|-----------|
+| Tiny (under 10 tenants) | 0 | 0 | Spawn all immediately, no overload risk |
+| Small (10-50 tenants) | 10 | 30 | Moderate batching, minimal delay |
+| Medium (50-100 tenants) | 15 | 45 | Conservative batching for safety |
+| Large (100+ tenants) | 20-25 | 60 | Aggressive rate limiting to prevent overload |
+| Worker limited | 5 | 120 | Very conservative, 2-minute delays |
+
+:::info When to Use Rate Limiting
+
+Rate limiting is **essential** for:
+- Deployments with 100 or more tenants
+- Limited Celery worker capacity
+- Scheduled tasks (train_classifier, sanity_check, etc.)
+
+For small deployments with fewer than 10 tenants, you can set batch size to 0 to spawn all tasks immediately.
+:::
+
+**Example - Production Configuration (100+ tenants)**:
+```env
+CELERY_TENANT_BATCH_SIZE=20
+CELERY_TENANT_BATCH_DELAY=120
+```
+
+**Example - Small Deployment (under 10 tenants)**:
+```env
+CELERY_TENANT_BATCH_SIZE=0
+CELERY_TENANT_BATCH_DELAY=0
+```
+
+For detailed information on rate limiting implementation and troubleshooting, see [Multi-Tenant Celery Tasks Guide](../development/celery-multi-tenant-tasks.md#rate-limiting-configuration).
+
 ## Using paless.env
 
 ### Loading Configuration
@@ -175,6 +225,8 @@ data:
   PAPERLESS_TIME_ZONE: "UTC"
   PAPERLESS_OCR_LANGUAGE: "eng"
   MINIO_BUCKET: "paperless-documents"
+  CELERY_TENANT_BATCH_SIZE: "10"
+  CELERY_TENANT_BATCH_DELAY: "60"
 ```
 
 ### Environment-Specific Overrides
@@ -283,12 +335,12 @@ PAPERLESS_TIME_ZONE=America/New_York  # Your actual timezone
 
 Configure `POSTGRES_PASSWORD` and `MINIO_ROOT_PASSWORD` based on expected load:
 
-**Small Deployment (< 1000 documents)**
+**Small Deployment (under 1000 documents)**
 - PostgreSQL: 1Gi disk
 - MinIO: 5Gi disk
 - Memory: 512Mi each
 
-**Medium Deployment (1000-10000 documents)**
+**Medium Deployment (1000 to 10000 documents)**
 - PostgreSQL: 2Gi disk
 - MinIO: 10Gi disk
 - Memory: 1Gi each

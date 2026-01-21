@@ -248,12 +248,12 @@ CELERY_TENANT_BATCH_DELAY=60
 
 #### When to Adjust Settings
 
-| Scenario | Batch Size | Batch Delay | Rationale |
+| Deployment Size | Batch Size | Batch Delay | Rationale |
 |----------|-----------|------------|-----------|
-| <10 tenants | 0 | 0 | Spawn all immediately, no overload risk |
-| 10-50 tenants | 10 | 30 | Moderate batching, minimal delay |
-| 50-100 tenants | 15 | 45 | Conservative batching for safety |
-| 100+ tenants | 20-25 | 60 | Aggressive rate limiting to prevent overload |
+| Tiny (under 10 tenants) | 0 | 0 | Spawn all immediately, no overload risk |
+| Small (10-50 tenants) | 10 | 30 | Moderate batching, minimal delay |
+| Medium (50-100 tenants) | 15 | 45 | Conservative batching for safety |
+| Large (100+ tenants) | 20-25 | 60 | Aggressive rate limiting to prevent overload |
 | Worker limited | 5 | 120 | Very conservative, 2-minute delays |
 
 ### spawn_tenant_tasks_with_rate_limiting() Helper
