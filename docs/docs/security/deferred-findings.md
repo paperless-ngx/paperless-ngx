@@ -19,27 +19,26 @@ for the current development stage but **must be resolved before production**.
 | Severity | Count |
 |----------|-------|
 | Critical | 0 |
-| High     | 2 |
+| High     | 1 |
 | Medium   | 2 |
-| Low      | 1 |
-| Info     | 1 |
+| Low      | 2 |
+| Info     | 0 |
 
 ---
 
 ## Deferred Findings by Task
 
-### Task: e239d66d...
+### Task: 41fae4c5...
 
-**Date**: 2026-01-20
+**Date**: 2026-01-21
 **Stage**: dev
-**Description**: Add tenant_id column to all models inheriting from ModelWithOwner and create data migration
+**Description**: Implement tenant-aware ORM managers to automatically filter queries by current tenant context
 
 | Severity | Category | Description | Location |
 |----------|----------|-------------|----------|
-| HIGH | A01:2021 - Broken Access Control (OWASP) | No row-level security enforcement for foreign key relationships. Models like Doc | `src/documents/models.py:206-241` |
-| HIGH | A03:2021 - Injection (OWASP) | Data migration uses filter() + update() pattern which is vulnerable to race cond | `src/documents/migrations/1079_create_default_tenant_and_backfill.py:41-47` |
-| MEDIUM | A01:2021 - Broken Access Control (OWASP) | ManyToManyField relationships lack tenant isolation. Document.tags, WorkflowActi | `src/documents/models.py:254-259` |
-| MEDIUM | A09:2021 - Security Logging and Monitoring Failures (OWASP) | Missing audit logging for tenant context changes. Thread-local tenant_id changes | `src/documents/models.py:43-50` |
-| LOW | A04:2021 - Insecure Design (OWASP) | ModelWithOwner.tenant_id allows null=True in model definition, contradicting the | `src/documents/models.py:63-67` |
-| INFO | Security Best Practice | Verification script uses kubectl exec to run Python code in production pods. Whi | `verify_tenant_id_implementation.sh:86-170` |
+| HIGH | A01:2021 - Broken Access Control (OWASP Top 10) | Race condition risk with thread-local storage cleanup. TenantMiddleware clears t | `src/paperless/middleware.py:136` |
+| MEDIUM | A01:2021 - Broken Access Control (OWASP Top 10) | The `all_objects` manager provides unrestricted access to all tenant data withou | `src/documents/models.py:138` |
+| MEDIUM | A09:2021 - Security Logging and Monitoring Failures (OWASP Top 10) | No logging when TenantManager returns empty queryset due to missing tenant conte | `src/documents/models.py:92-94` |
+| LOW | A04:2021 - Insecure Design (OWASP Top 10) | ModelWithOwner.save() auto-populates tenant_id from thread-local storage (line 1 | `src/documents/models.py:143-159` |
+| LOW | A09:2021 - Security Logging and Monitoring Failures (OWASP Top 10) | Tests directly manipulate thread-local storage without going through middleware, | `src/documents/tests/test_tenant_manager.py:51` |
 

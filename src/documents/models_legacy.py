@@ -1,5 +1,4 @@
 import datetime
-import threading
 from pathlib import Path
 from typing import Final
 
@@ -28,63 +27,13 @@ from django_softdelete.models import SoftDeleteModel
 from documents.data_models import DocumentSource
 from documents.parsers import get_default_file_extension
 
-# Thread-local storage for current tenant
-_thread_local = threading.local()
-
-
-def get_current_tenant_id():
-    """
-    Get the current tenant ID from thread-local storage.
-    Returns None if no tenant is set.
-    """
-    return getattr(_thread_local, 'tenant_id', None)
-
-
-def set_current_tenant_id(tenant_id):
-    """
-    Set the current tenant ID in thread-local storage.
-
-    Args:
-        tenant_id: UUID of the tenant to set as current
-    """
-    _thread_local.tenant_id = tenant_id
-
-
-class ModelWithOwner(models.Model):
-    owner = models.ForeignKey(
-        User,
-        blank=True,
-        null=True,
-        default=None,
-        on_delete=models.SET_NULL,
-        verbose_name=_("owner"),
-    )
-
-    tenant_id = models.UUIDField(
-        db_index=True,
-        verbose_name=_("tenant"),
-    )
-
-    class Meta:
-        abstract = True
-
-    def save(self, *args, **kwargs):
-        """
-        Override save to auto-populate tenant_id from thread-local storage.
-        Raises ValueError if tenant_id is None.
-        """
-        # Auto-populate tenant_id if not set
-        if self.tenant_id is None:
-            self.tenant_id = get_current_tenant_id()
-
-        # Raise error if tenant_id is still None
-        if self.tenant_id is None:
-            raise ValueError(
-                f"tenant_id cannot be None for {self.__class__.__name__}. "
-                f"Set tenant_id explicitly or use set_current_tenant_id()."
-            )
-
-        super().save(*args, **kwargs)
+# Import tenant-aware base models and managers from base.py
+from documents.models.base import (
+    ModelWithOwner,
+    TenantManager,
+    get_current_tenant_id,
+    set_current_tenant_id,
+)
 
 
 class MatchingModel(ModelWithOwner):
