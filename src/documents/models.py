@@ -712,7 +712,7 @@ class Note(ModelWithOwner, SoftDeleteModel):
         return self.note
 
 
-class ShareLink(SoftDeleteModel):
+class ShareLink(SoftDeleteModel, ModelWithOwner):
     class FileVersion(models.TextChoices):
         ARCHIVE = ("archive", _("Archive"))
         ORIGINAL = ("original", _("Original"))
@@ -752,15 +752,6 @@ class ShareLink(SoftDeleteModel):
         max_length=50,
         choices=FileVersion.choices,
         default=FileVersion.ARCHIVE,
-    )
-
-    owner = models.ForeignKey(
-        User,
-        blank=True,
-        null=True,
-        related_name="share_links",
-        on_delete=models.SET_NULL,
-        verbose_name=_("owner"),
     )
 
     class Meta:
