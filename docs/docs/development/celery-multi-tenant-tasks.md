@@ -324,6 +324,14 @@ app.conf.beat_schedule = {
         'task': 'documents.tasks.scheduled_llmindex_index_all_tenants',
         'schedule': crontab(hour=4, minute=0),  # Daily at 4:00 AM
     },
+    'empty-trash-all-tenants': {
+        'task': 'documents.tasks.scheduled_empty_trash_all_tenants',
+        'schedule': crontab(hour=5, minute=0),  # Daily at 5:00 AM
+    },
+    'check-workflows-all-tenants': {
+        'task': 'documents.tasks.scheduled_check_workflows_all_tenants',
+        'schedule': crontab(hour=6, minute=0),  # Daily at 6:00 AM
+    },
 }
 ```
 
