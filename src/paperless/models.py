@@ -381,15 +381,45 @@ def create_or_update_user_profile(sender, instance, created, **kwargs):
     """
     Signal handler to automatically create UserProfile when User is created.
 
-    Note: tenant_id must be set explicitly on the UserProfile after creation,
-    typically from the current request context.
+    This handler ensures every user (except system users) has a UserProfile
+    with a tenant_id. It attempts to get tenant_id from request context,
+    falling back to default tenant if unavailable.
     """
-    if created:
+    if created and instance.username not in ["consumer", "AnonymousUser"]:
         # Import here to avoid circular imports
         from documents.models.base import get_current_tenant_id
+        from documents.models import Tenant
+        import logging
+
+        logger = logging.getLogger(__name__)
+
+        # Check if profile already exists (unlikely but defensive)
+        if hasattr(instance, 'profile'):
+            return
 
         tenant_id = get_current_tenant_id()
-        # Only auto-create profile if tenant context is available
-        # System users (consumer, AnonymousUser) may not have tenant context
-        if tenant_id and instance.username not in ["consumer", "AnonymousUser"]:
-            UserProfile.objects.create(user=instance, tenant_id=tenant_id)
+
+        # If no tenant context, try to get default tenant
+        if not tenant_id:
+            try:
+                default_tenant = Tenant.objects.filter(subdomain='default').first()
+                if default_tenant:
+                    tenant_id = default_tenant.id
+                    logger.warning(
+                        f"User {instance.username} created without tenant context. "
+                        f"Assigned to default tenant {tenant_id}."
+                    )
+            except Exception as e:
+                logger.error(
+                    f"Failed to get default tenant for user {instance.username}: {e}"
+                )
+
+        # Create profile if we have a tenant_id
+        if tenant_id:
+            try:
+                UserProfile.objects.create(user=instance, tenant_id=tenant_id)
+                logger.info(f"Created UserProfile for {instance.username} with tenant {tenant_id}")
+            except Exception as e:
+                logger.error(
+                    f"Failed to create UserProfile for user {instance.username}: {e}"
+                )

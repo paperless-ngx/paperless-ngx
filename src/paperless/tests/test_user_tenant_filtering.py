@@ -240,3 +240,102 @@ class UserTenantFilteringTestCase(TestCase):
         # Verify tenant_id was set on request
         self.assertTrue(hasattr(request, 'tenant_id'))
         self.assertEqual(request.tenant_id, self.tenant_a.id)
+
+    def test_superuser_bypasses_tenant_filtering(self):
+        """Test that superusers can see users from all tenants."""
+        # Login as superuser from tenant A
+        self.client.force_authenticate(user=self.user_a1)
+
+        # Make sure user_a1 is a superuser
+        self.assertTrue(self.user_a1.is_superuser)
+
+        # Simulate tenant A request (superuser should see ALL users)
+        response = self.client.get(
+            '/api/users/',
+            HTTP_HOST='tenant-a.localhost',
+            HTTP_X_TENANT_ID=str(self.tenant_a.id),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        usernames = [user['username'] for user in response.data['results']]
+
+        # Superuser should see users from ALL tenants
+        self.assertIn('user_a1', usernames)
+        self.assertIn('user_a2', usernames)
+        self.assertIn('user_b1', usernames)
+        self.assertIn('user_b2', usernames)
+
+    def test_non_superuser_only_sees_own_tenant(self):
+        """Test that non-superusers are limited to their own tenant."""
+        # Login as non-superuser from tenant A
+        self.client.force_authenticate(user=self.user_a2)
+
+        # Make sure user_a2 is NOT a superuser
+        self.assertFalse(self.user_a2.is_superuser)
+
+        # Simulate tenant A request
+        response = self.client.get(
+            '/api/users/',
+            HTTP_HOST='tenant-a.localhost',
+            HTTP_X_TENANT_ID=str(self.tenant_a.id),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        usernames = [user['username'] for user in response.data['results']]
+
+        # Non-superuser should only see users from their tenant
+        self.assertIn('user_a1', usernames)
+        self.assertIn('user_a2', usernames)
+        self.assertNotIn('user_b1', usernames)
+        self.assertNotIn('user_b2', usernames)
+
+    def test_users_without_profile_excluded(self):
+        """Test that users without UserProfile are excluded from results."""
+        # Create a user without profile (bypass signal)
+        set_current_tenant_id(None)  # Clear tenant context so signal doesn't create profile
+        orphan_user = User.objects.create_user(
+            username='orphan_user',
+            password='testpass123',
+        )
+
+        # Verify no profile exists
+        with self.assertRaises(UserProfile.DoesNotExist):
+            _ = orphan_user.profile
+
+        # Login as non-superuser from tenant A
+        self.client.force_authenticate(user=self.user_a2)
+
+        # Request user list
+        response = self.client.get(
+            '/api/users/',
+            HTTP_HOST='tenant-a.localhost',
+            HTTP_X_TENANT_ID=str(self.tenant_a.id),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        usernames = [user['username'] for user in response.data['results']]
+
+        # Orphan user should NOT appear (no profile)
+        self.assertNotIn('orphan_user', usernames)
+
+    def test_signal_fallback_to_default_tenant(self):
+        """Test that signal handler falls back to default tenant when no context."""
+        # Create default tenant
+        default_tenant = Tenant.objects.create(
+            subdomain='default',
+            name='Default Tenant',
+            region='us',
+        )
+
+        # Clear tenant context
+        set_current_tenant_id(None)
+
+        # Create user (signal should use default tenant)
+        fallback_user = User.objects.create_user(
+            username='fallback_user',
+            password='testpass123',
+        )
+
+        # Profile should be created with default tenant
+        self.assertTrue(hasattr(fallback_user, 'profile'))
+        self.assertEqual(fallback_user.profile.tenant_id, default_tenant.id)
