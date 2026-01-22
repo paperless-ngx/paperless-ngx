@@ -25,7 +25,7 @@ def enable_rls_forward(apps, schema_editor):
         'documents_savedview',
         'documents_storagepath',
         'documents_paperlesstask',
-        'documents_note',
+        # NOTE: documents_note excluded - tenant_id added in migration 1084
     ]
 
     for table in tables:
@@ -78,7 +78,7 @@ def disable_rls_reverse(apps, schema_editor):
         'documents_savedview',
         'documents_storagepath',
         'documents_paperlesstask',
-        'documents_note',
+        # NOTE: documents_note excluded - tenant_id added in migration 1084
     ]
 
     for table in tables:

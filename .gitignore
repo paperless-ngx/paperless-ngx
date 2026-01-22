@@ -11,6 +11,7 @@
 # Environment files
 .env
 .env.*
+.env.dev  # Docker Compose development environment (explicit)
 !.env.example
 !.env.*.template
 

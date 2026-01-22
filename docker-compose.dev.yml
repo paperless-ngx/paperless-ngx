@@ -1,0 +1,296 @@
+# ============================================================================
+# Paless Docker Compose Development Environment
+# ============================================================================
+# This configuration is for LOCAL DEVELOPMENT ONLY
+# Production deployments use Kubernetes manifests in k8s/
+# ============================================================================
+
+networks:
+  paless-app-dev-network:
+    name: paless-app-dev-network
+    driver: bridge
+
+volumes:
+  paless-app-postgres-data:
+    name: paless-app-postgres-data
+  paless-app-redis-data:
+    name: paless-app-redis-data
+  paless-app-minio-data:
+    name: paless-app-minio-data
+  paless-app-paperless-data:
+    name: paless-app-paperless-data
+  paless-app-paperless-media:
+    name: paless-app-paperless-media
+
+services:
+  # ==========================================================================
+  # Infrastructure Services
+  # ==========================================================================
+
+  app-postgres:
+    image: postgres:18
+    container_name: paless-app-postgres
+    environment:
+      POSTGRES_DB: ${APP_POSTGRES_DB:-paperless}
+      POSTGRES_USER: ${APP_POSTGRES_USER:-paperless}
+      POSTGRES_PASSWORD: ${APP_POSTGRES_PASSWORD:-paperless_dev_pass}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "8432:5432"
+    volumes:
+      - paless-app-postgres-data:/var/lib/postgresql/data
+    networks:
+      - paless-app-dev-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${APP_POSTGRES_USER:-paperless}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  app-redis:
+    image: redis:7-alpine
+    container_name: paless-app-redis
+    command: redis-server --appendonly yes --appendfsync everysec
+    ports:
+      - "8379:6379"
+    volumes:
+      - paless-app-redis-data:/data
+    networks:
+      - paless-app-dev-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+
+  app-minio:
+    image: minio/minio:latest
+    container_name: paless-app-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${APP_MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${APP_MINIO_ROOT_PASSWORD:-minioadmin123}
+    ports:
+      - "8000:9000"  # S3 API
+      - "8001:9001"  # Console
+    volumes:
+      - paless-app-minio-data:/data
+    networks:
+      - paless-app-dev-network
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  # MinIO bucket initialization (runs once)
+  app-minio-init:
+    image: minio/mc:latest
+    container_name: paless-app-minio-init
+    depends_on:
+      app-minio:
+        condition: service_healthy
+    networks:
+      - paless-app-dev-network
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set myminio http://app-minio:9000 ${APP_MINIO_ROOT_USER:-minioadmin} ${APP_MINIO_ROOT_PASSWORD:-minioadmin123};
+      mc mb myminio/${APP_MINIO_BUCKET:-paperless-media} --ignore-existing;
+      mc anonymous set download myminio/${APP_MINIO_BUCKET:-paperless-media};
+      exit 0;
+      "
+    restart: "no"
+
+  # ==========================================================================
+  # Application Services
+  # ==========================================================================
+  # Note: Base image (localhost:5000/paless:latest) is built by dev-env.sh script
+  # before starting these services
+
+  paless-web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    image: paless-web:dev
+    container_name: paless-app-web
+    depends_on:
+      app-postgres:
+        condition: service_healthy
+      app-redis:
+        condition: service_healthy
+      app-minio:
+        condition: service_healthy
+      app-minio-init:
+        condition: service_completed_successfully
+    environment:
+      # Database Configuration
+      PAPERLESS_DBHOST: ${PAPERLESS_DBHOST:-app-postgres}
+      PAPERLESS_DBNAME: ${PAPERLESS_DBNAME:-paperless}
+      PAPERLESS_DBUSER: ${PAPERLESS_DBUSER:-paperless}
+      PAPERLESS_DBPASS: ${PAPERLESS_DBPASS:-paperless_dev_pass}
+      PAPERLESS_DBPORT: ${PAPERLESS_DBPORT:-5432}
+      PAPERLESS_DBENGINE: ${PAPERLESS_DBENGINE:-postgresql}
+      PAPERLESS_DBSSLMODE: ${PAPERLESS_DBSSLMODE:-prefer}
+
+      # Redis Configuration
+      PAPERLESS_REDIS: ${PAPERLESS_REDIS:-redis://app-redis:6379}
+
+      # Application Settings
+      PAPERLESS_PORT: ${PAPERLESS_PORT:-8000}
+      PAPERLESS_BIND_ADDR: ${PAPERLESS_BIND_ADDR:-0.0.0.0}
+      PAPERLESS_URL: ${PAPERLESS_URL:-http://localhost:8080}
+      PAPERLESS_ALLOWED_HOSTS: ${PAPERLESS_ALLOWED_HOSTS:-*}
+      PAPERLESS_TIME_ZONE: ${PAPERLESS_TIME_ZONE:-UTC}
+      SKIP_MIGRATIONS: ${SKIP_MIGRATIONS:-false}
+
+      # Directories
+      PAPERLESS_DATA_DIR: ${PAPERLESS_DATA_DIR:-/usr/src/paperless/data}
+      PAPERLESS_MEDIA_ROOT: ${PAPERLESS_MEDIA_ROOT:-/usr/src/paperless/media}
+      PAPERLESS_CONSUMPTION_DIR: ${PAPERLESS_CONSUMPTION_DIR:-/usr/src/paperless/data/consume}
+
+      # OCR Settings
+      PAPERLESS_OCR_LANGUAGE: ${PAPERLESS_OCR_LANGUAGE:-eng}
+      PAPERLESS_OCR_MODE: ${PAPERLESS_OCR_MODE:-skip}
+
+      # Worker Settings
+      PAPERLESS_TASK_WORKERS: ${PAPERLESS_TASK_WORKERS:-1}
+      PAPERLESS_THREADS_PER_WORKER: ${PAPERLESS_THREADS_PER_WORKER:-1}
+
+      # Secret Key
+      PAPERLESS_SECRET_KEY: ${PAPERLESS_SECRET_KEY:-dev-secret-key-change-in-production}
+
+      # Admin User (created on first startup)
+      PAPERLESS_ADMIN_USER: ${PAPERLESS_ADMIN_USER:-admin}
+      PAPERLESS_ADMIN_PASSWORD: ${PAPERLESS_ADMIN_PASSWORD:-admin}
+      PAPERLESS_ADMIN_MAIL: ${PAPERLESS_ADMIN_MAIL:-admin@localhost}
+
+      # Debug
+      PAPERLESS_DEBUG: ${PAPERLESS_DEBUG:-false}
+
+    ports:
+      - "8080:8000"
+    volumes:
+      - paless-app-paperless-data:/usr/src/paperless/data
+      - paless-app-paperless-media:/usr/src/paperless/media
+    networks:
+      - paless-app-dev-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s  # Allow time for migrations
+    restart: unless-stopped
+
+  paless-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    image: paless-worker:dev
+    container_name: paless-app-worker
+    depends_on:
+      app-postgres:
+        condition: service_healthy
+      app-redis:
+        condition: service_healthy
+      paless-web:
+        condition: service_started  # Wait for web to run migrations
+    environment:
+      # Database Configuration
+      PAPERLESS_DBHOST: ${PAPERLESS_DBHOST:-app-postgres}
+      PAPERLESS_DBNAME: ${PAPERLESS_DBNAME:-paperless}
+      PAPERLESS_DBUSER: ${PAPERLESS_DBUSER:-paperless}
+      PAPERLESS_DBPASS: ${PAPERLESS_DBPASS:-paperless_dev_pass}
+      PAPERLESS_DBPORT: ${PAPERLESS_DBPORT:-5432}
+      PAPERLESS_DBENGINE: ${PAPERLESS_DBENGINE:-postgresql}
+
+      # Redis Configuration
+      PAPERLESS_REDIS: ${PAPERLESS_REDIS:-redis://app-redis:6379}
+
+      # Directories
+      PAPERLESS_DATA_DIR: ${PAPERLESS_DATA_DIR:-/usr/src/paperless/data}
+      PAPERLESS_MEDIA_ROOT: ${PAPERLESS_MEDIA_ROOT:-/usr/src/paperless/media}
+
+      # Worker Settings
+      PAPERLESS_TASK_WORKERS: ${PAPERLESS_TASK_WORKERS:-1}
+      PAPERLESS_THREADS_PER_WORKER: ${PAPERLESS_THREADS_PER_WORKER:-1}
+
+      # Time Zone
+      PAPERLESS_TIME_ZONE: ${PAPERLESS_TIME_ZONE:-UTC}
+
+      # Skip migrations (web service already ran them)
+      SKIP_MIGRATIONS: ${SKIP_MIGRATIONS_WORKER:-true}
+
+      # Secret Key
+      PAPERLESS_SECRET_KEY: ${PAPERLESS_SECRET_KEY:-dev-secret-key-change-in-production}
+
+      # OCR Settings
+      PAPERLESS_OCR_LANGUAGE: ${PAPERLESS_OCR_LANGUAGE:-eng}
+
+    volumes:
+      - paless-app-paperless-data:/usr/src/paperless/data
+      - paless-app-paperless-media:/usr/src/paperless/media
+    networks:
+      - paless-app-dev-network
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A paperless inspect ping -d celery@$$HOSTNAME || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+  paless-scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile.scheduler
+    image: paless-scheduler:dev
+    container_name: paless-app-scheduler
+    depends_on:
+      app-postgres:
+        condition: service_healthy
+      app-redis:
+        condition: service_healthy
+      paless-web:
+        condition: service_started
+    environment:
+      # Database Configuration
+      PAPERLESS_DBHOST: ${PAPERLESS_DBHOST:-app-postgres}
+      PAPERLESS_DBNAME: ${PAPERLESS_DBNAME:-paperless}
+      PAPERLESS_DBUSER: ${PAPERLESS_DBUSER:-paperless}
+      PAPERLESS_DBPASS: ${PAPERLESS_DBPASS:-paperless_dev_pass}
+      PAPERLESS_DBPORT: ${PAPERLESS_DBPORT:-5432}
+      PAPERLESS_DBENGINE: ${PAPERLESS_DBENGINE:-postgresql}
+
+      # Redis Configuration
+      PAPERLESS_REDIS: ${PAPERLESS_REDIS:-redis://app-redis:6379}
+
+      # Directories
+      PAPERLESS_DATA_DIR: ${PAPERLESS_DATA_DIR:-/usr/src/paperless/data}
+
+      # Time Zone
+      PAPERLESS_TIME_ZONE: ${PAPERLESS_TIME_ZONE:-UTC}
+
+      # Skip migrations
+      SKIP_MIGRATIONS: ${SKIP_MIGRATIONS_WORKER:-true}
+
+      # Secret Key
+      PAPERLESS_SECRET_KEY: ${PAPERLESS_SECRET_KEY:-dev-secret-key-change-in-production}
+
+    volumes:
+      - paless-app-paperless-data:/usr/src/paperless/data
+    networks:
+      - paless-app-dev-network
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'celery.*beat' || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
