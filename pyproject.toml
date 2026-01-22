@@ -27,7 +27,7 @@ dependencies = [
   # WARNING: django does not use semver.
   #          Only patch versions are guaranteed to not introduce breaking changes.
   "django~=5.2.5",
-  "django-allauth[mfa,socialaccount]~=65.12.1",
+  "django-allauth[mfa,socialaccount]~=65.13.1",
   "django-auditlog~=3.4.1",
   "django-cachalot~=2.8.0",
   "django-celery-results~=2.6.0",
