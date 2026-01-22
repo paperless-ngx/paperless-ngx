@@ -50,6 +50,14 @@ class TenantGroup(ModelWithOwner):
         related_name="tenant_groups",
     )
 
+    users = models.ManyToManyField(
+        'auth.User',
+        verbose_name=_("users"),
+        blank=True,
+        related_name="tenant_groups",
+        help_text=_("Users in this tenant group"),
+    )
+
     class Meta:
         verbose_name = _("tenant group")
         verbose_name_plural = _("tenant groups")
