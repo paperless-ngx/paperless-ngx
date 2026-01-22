@@ -597,6 +597,7 @@ The following placeholders are only available for "added" or "updated" triggers
 -   `{{created_day}}`: created day
 -   `{{created_time}}`: created time in HH:MM format
 -   `{{doc_url}}`: URL to the document in the web UI. Requires the `PAPERLESS_URL` setting to be set.
+-   `{{doc_id}}`: Document ID
 
 ##### Examples
 
