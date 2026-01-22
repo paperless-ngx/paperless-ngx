@@ -6,7 +6,7 @@ metadata:
     app: paless
     component: web
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: paless
@@ -109,7 +109,8 @@ spec:
           persistentVolumeClaim:
             claimName: paperless-data-pvc
         - name: media
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: paperless-monolithic-media-pvc
         - name: rclone-config
           configMap:
             name: rclone-config

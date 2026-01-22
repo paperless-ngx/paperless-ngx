@@ -6,10 +6,19 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
-# Import and re-export Tenant and TenantGroup for backward compatibility
-from documents.models import Tenant, TenantGroup
-
 DEFAULT_SINGLETON_INSTANCE_ID = 1
+
+
+# Lazy import for Tenant and TenantGroup to avoid circular imports
+# These are re-exported for backward compatibility
+def __getattr__(name):
+    if name == "Tenant":
+        from documents.models import Tenant
+        return Tenant
+    if name == "TenantGroup":
+        from documents.models import TenantGroup
+        return TenantGroup
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 class AbstractSingletonModel(models.Model):

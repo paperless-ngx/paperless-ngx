@@ -89,6 +89,22 @@ class TenantMiddleware:
             logger.warning(f"Attempted access to inactive tenant: {tenant.name} (ID: {tenant.id})")
             return HttpResponse("Tenant is inactive", status=403)
 
+        # Option 3: For authenticated users without subdomain, use their UserProfile tenant
+        if not tenant and request.user and request.user.is_authenticated:
+            try:
+                from paperless.models import UserProfile
+                from documents.models import Tenant
+                profile = UserProfile.objects.get(user=request.user)
+                if profile.tenant_id:
+                    tenant = Tenant.objects.get(id=profile.tenant_id)
+                    logger.info(f"Resolved tenant from user profile: {tenant.name} (ID: {tenant.id}) for user {request.user.username}")
+            except UserProfile.DoesNotExist:
+                logger.debug(f"No UserProfile found for user {request.user.username}")
+            except Tenant.DoesNotExist:
+                logger.warning(f"UserProfile references non-existent tenant: {profile.tenant_id}")
+            except Exception as e:
+                logger.error(f"Error resolving tenant from user profile: {e}")
+
         # Set tenant on request
         request.tenant = tenant
         request.tenant_id = tenant.id if tenant else None
