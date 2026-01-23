@@ -6,11 +6,24 @@ import os
 from pathlib import Path
 from typing import Any
 
+from dotenv import load_dotenv
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = os.getenv("PAPERLESS_DEBUG", "false").lower() == "true"
 
 ALLOWED_HOSTS = ["*"]
+
+# Tap paperless.conf if it's available
+for path in [
+    os.getenv("PAPERLESS_CONFIGURATION_PATH"),
+    "../paperless.conf",
+    "/etc/paperless.conf",
+    "/usr/local/etc/paperless.conf",
+]:
+    if path and Path(path).exists():
+        load_dotenv(path)
+        break
 
 
 def __get_path(
