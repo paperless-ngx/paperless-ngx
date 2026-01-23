@@ -9,14 +9,19 @@
     <link rel="stylesheet" href="{% static 'base.css' %}" />
     <style>
       body {
-        background: radial-gradient(circle at 20% 20%, #eef5ef, #f7fbf7);
+        background:
+          radial-gradient(circle at 20% 20%, #eef5ef, #f7fbf7),
+          linear-gradient(120deg, rgba(23, 84, 31, 0.05) 0%, rgba(23, 84, 31, 0) 30%),
+          linear-gradient(300deg, rgba(15, 54, 20, 0.06) 0%, rgba(15, 54, 20, 0) 40%);
         min-height: 100vh;
       }
 
-      .hero-card {
-        background: #fff;
+      .hero-card,
+      .card-step {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(6px);
         border: 1px solid rgba(23, 84, 31, 0.08);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06);
         border-radius: 18px;
       }
 
@@ -28,9 +33,13 @@
       }
 
       .card-step {
-        border: 1px solid rgba(23, 84, 31, 0.08);
-        border-radius: 14px;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+        border-radius: 16px;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      .card-step:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 36px rgba(0, 0, 0, 0.08);
       }
 
       .path-pill {
@@ -40,24 +49,90 @@
         padding: 0.4rem 0.75rem;
         font-size: 0.9rem;
       }
+
+      .step-rail {
+        position: relative;
+        height: 4px;
+        background: rgba(23, 84, 31, 0.12);
+        border-radius: 999px;
+      }
+
+      .step-rail .fill {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: calc({{ export_exists|yesno:'33,0' }}% + {{ transformed_exists|yesno:'33,0' }}%);
+        max-width: 100%;
+        background: linear-gradient(90deg, #17541f, #2c7a3c);
+        border-radius: 999px;
+        transition: width 0.3s ease;
+      }
+
+      .step-chip {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        background: #fff;
+        border: 2px solid rgba(23, 84, 31, 0.25);
+        color: #17541f;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+
+      .step-chip.done {
+        background: #17541f;
+        color: #fff;
+        border-color: #17541f;
+      }
     </style>
   </head>
   <body class="pb-5">
     <div class="container py-5">
       <div class="row justify-content-center mb-4">
-        <div class="col-lg-10">
+        <div class="col-lg-9">
           <div class="hero-card p-4 p-md-5">
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
               <div class="d-flex align-items-center gap-3">
-                <img src="{% static 'paperless/img/logo-light.png' %}" alt="Paperless-ngx" width="160" class="logo" />
-                <div>
+                {% include "paperless-ngx/snippets/svg_logo.html" with extra_attrs="width='280' class='logo'" %}
+                <div class="ps-2">
                   <p class="text-uppercase fw-semibold mb-1 text-secondary" style="letter-spacing: 0.12rem;">Migration Mode</p>
                   <h1 class="h3 mb-2 text-primary">Paperless-ngx v2 → v3</h1>
-                  <p class="text-muted mb-0">Run the export, transform, and import flow once your files are ready.</p>
+                  <p class="text-muted mb-0">Migrate your data from Paperless-ngx version 2 to version 3.</p>
                 </div>
               </div>
               <div class="text-end">
                 <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">Online</span>
+              </div>
+            </div>
+            <div class="mt-4">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="step-chip {% if export_exists %}done{% endif %}">1</span>
+                  <div>
+                    <div class="fw-semibold mb-0">Export</div>
+                    <small class="text-muted">v2 data</small>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="step-chip {% if transformed_exists %}done{% endif %}">2</span>
+                  <div>
+                    <div class="fw-semibold mb-0">Transform</div>
+                    <small class="text-muted">to v3 schema</small>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="step-chip {% if transformed_exists %}done{% endif %}">3</span>
+                  <div>
+                    <div class="fw-semibold mb-0">Import</div>
+                    <small class="text-muted">into v3</small>
+                  </div>
+                </div>
+              </div>
+              <div class="step-rail">
+                <div class="fill"></div>
               </div>
             </div>
             {% if messages %}
