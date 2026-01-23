@@ -13,8 +13,14 @@ if [[ -n "${PAPERLESS_FORCE_SCRIPT_NAME}" ]]; then
 	export GRANIAN_URL_PATH_PREFIX=${PAPERLESS_FORCE_SCRIPT_NAME}
 fi
 
-if [[ -n "${USER_IS_NON_ROOT}" ]]; then
-	exec granian --interface asginl --ws --loop uvloop "paperless.asgi:application"
+if [[ "${PAPERLESS_MIGRATION_MODE:-0}" == "1" ]]; then
+	app_module="paperless.migration_asgi:application"
 else
-	exec s6-setuidgid paperless granian --interface asginl --ws --loop uvloop "paperless.asgi:application"
+	app_module="paperless.asgi:application"
+fi
+
+if [[ -n "${USER_IS_NON_ROOT}" ]]; then
+	exec granian --interface asginl --ws --loop uvloop "${app_module}"
+else
+	exec s6-setuidgid paperless granian --interface asginl --ws --loop uvloop "${app_module}"
 fi

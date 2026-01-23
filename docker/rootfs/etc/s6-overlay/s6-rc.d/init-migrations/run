@@ -8,6 +8,11 @@ echo "${log_prefix} Apply database migrations..."
 
 cd "${PAPERLESS_SRC_DIR}"
 
+if [[ "${PAPERLESS_MIGRATION_MODE:-0}" == "1" ]]; then
+	echo "${log_prefix} Migration mode enabled, skipping migrations."
+	exit 0
+fi
+
 # The whole migrate, with flock, needs to run as the right user
 if [[ -n "${USER_IS_NON_ROOT}" ]]; then
 	exec s6-setlock -n "${data_dir}/migration_lock" python3 manage.py migrate --skip-checks --no-input
