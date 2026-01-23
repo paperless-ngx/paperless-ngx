@@ -198,7 +198,15 @@
               <div class="mt-auto">
                 <form method="post">
                   {% csrf_token %}
-                  <button class="btn btn-outline-primary w-100" type="submit" name="action" value="transform">Transform export</button>
+                  <button
+                    class="btn btn-outline-primary w-100"
+                    type="submit"
+                    name="action"
+                    value="transform"
+                    {% if not export_exists %}disabled aria-disabled="true"{% endif %}
+                  >
+                    Transform export
+                  </button>
                 </form>
               </div>
             </div>
@@ -216,7 +224,15 @@
               <div class="mt-auto">
                 <form method="post">
                   {% csrf_token %}
-                  <button class="btn btn-outline-secondary w-100" type="submit" name="action" value="import">Import transformed data</button>
+                  <button
+                    class="btn btn-outline-secondary w-100"
+                    type="submit"
+                    name="action"
+                    value="import"
+                    {% if not transformed_exists %}disabled aria-disabled="true"{% endif %}
+                  >
+                    Import transformed data
+                  </button>
                 </form>
               </div>
             </div>
