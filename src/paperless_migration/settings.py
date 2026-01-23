@@ -36,6 +36,7 @@ def __get_path(
 
 
 DATA_DIR = __get_path("PAPERLESS_DATA_DIR", BASE_DIR.parent / "data")
+EXPORT_DIR = __get_path("PAPERLESS_EXPORT_DIR", BASE_DIR.parent / "export")
 
 
 def _parse_db_settings() -> dict[str, dict[str, Any]]:
@@ -184,11 +185,11 @@ SOCIALACCOUNT_ENABLED = False
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
-MIGRATION_EXPORT_PATH = os.getenv(
+MIGRATION_EXPORT_PATH = __get_path(
     "PAPERLESS_MIGRATION_EXPORT_PATH",
-    "/data/export.json",
+    EXPORT_DIR / "manifest.json",
 )
-MIGRATION_TRANSFORMED_PATH = os.getenv(
+MIGRATION_TRANSFORMED_PATH = __get_path(
     "PAPERLESS_MIGRATION_TRANSFORMED_PATH",
-    "/data/export.v3.json",
+    EXPORT_DIR / "manifest.v3.json",
 )
