@@ -115,7 +115,7 @@ class DocumentMetadataOverrides:
             ).values_list("id", flat=True),
         )
         overrides.custom_fields = {
-            custom_field.id: custom_field.value
+            custom_field.field.id: custom_field.value
             for custom_field in doc.custom_fields.all()
         }
 
