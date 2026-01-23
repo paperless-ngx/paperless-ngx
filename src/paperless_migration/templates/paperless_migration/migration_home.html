@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Paperless-ngx Migration Mode</title>
+  </head>
+  <body>
+    <main>
+      <h1>Migration Mode</h1>
+      <p>
+        This instance is running in migration mode. Use this interface to run
+        the v2 → v3 migration.
+      </p>
+      {% if messages %}
+        <ul>
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      <section>
+        <h2>Step 1 — Export (v2)</h2>
+        <p>Expected export file:</p>
+        <ul>
+          <li><strong>Path:</strong> {{ export_path }}</li>
+          <li><strong>Status:</strong> {{ export_exists|yesno:"Found,Missing" }}</li>
+        </ul>
+        <form method="post">
+          {% csrf_token %}
+          <button type="submit" name="action" value="check">
+            Re-check export
+          </button>
+        </form>
+      </section>
+      <section>
+        <h2>Step 2 — Transform</h2>
+        <p>Expected transformed file:</p>
+        <ul>
+          <li><strong>Path:</strong> {{ transformed_path }}</li>
+          <li><strong>Status:</strong> {{ transformed_exists|yesno:"Found,Missing" }}</li>
+        </ul>
+        <form method="post">
+          {% csrf_token %}
+          <button type="submit" name="action" value="transform">
+            Transform export
+          </button>
+        </form>
+      </section>
+      <section>
+        <h2>Step 3 — Import (v3)</h2>
+        <form method="post">
+          {% csrf_token %}
+          <button type="submit" name="action" value="import">
+            Import transformed data
+          </button>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>
