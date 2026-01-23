@@ -8,17 +8,28 @@
     <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}" />
     <link rel="stylesheet" href="{% static 'base.css' %}" />
     <style>
+      :root {
+        color-scheme: light;
+        --bs-body-bg: #f5f5f5;
+        --bs-body-color: #212529;
+        --bs-body-color-rgb: 33, 37, 41;
+        --bs-border-color: #dee2e6;
+        --bs-link-color: #17541f;
+        --bs-link-color-rgb: 23, 84, 31;
+      }
+      @media (prefers-color-scheme: dark) { :root { color-scheme: light; } }
+
       body {
         background:
           radial-gradient(circle at 20% 20%, #eef5ef, #f7fbf7),
-          linear-gradient(120deg, rgba(23, 84, 31, 0.05) 0%, rgba(23, 84, 31, 0) 30%),
-          linear-gradient(300deg, rgba(15, 54, 20, 0.06) 0%, rgba(15, 54, 20, 0) 40%);
+          linear-gradient(120deg, rgba(23, 84, 31, 0.05) 0%, rgba(0,0,0,0) 30%),
+          linear-gradient(300deg, rgba(15, 54, 20, 0.06) 0%, rgba(0,0,0,0) 40%);
         min-height: 100vh;
       }
 
       .hero-card,
       .card-step {
-        background: rgba(255, 255, 255, 0.9);
+        background: #fff;
         backdrop-filter: blur(6px);
         border: 1px solid rgba(23, 84, 31, 0.08);
         box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06);
@@ -43,7 +54,7 @@
       }
 
       .path-pill {
-        background: rgba(23, 84, 31, 0.06);
+        background: rgba(23, 84, 31, 0.08);
         color: #0f3614;
         border-radius: 12px;
         padding: 0.4rem 0.75rem;

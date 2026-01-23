@@ -6,22 +6,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="author" content="Paperless-ngx project and contributors">
     <meta name="robots" content="noindex,nofollow">
+    <meta name="color-scheme" content="light">
     <title>{% translate "Paperless-ngx sign in" %}</title>
     <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'base.css' %}" rel="stylesheet">
     <style>
+      :root {
+        color-scheme: light;
+        --bs-body-bg: #f5f5f5;
+        --bs-body-color: #212529;
+        --bs-body-color-rgb: 33, 37, 41;
+        --bs-border-color: #dee2e6;
+        --bs-link-color: #17541f;
+        --bs-link-color-rgb: 23, 84, 31;
+      }
+      @media (prefers-color-scheme: dark) { :root { color-scheme: light; } }
       body {
         min-height: 100vh;
         background:
           radial-gradient(circle at 20% 20%, #eef5ef, #f7fbf7),
-          linear-gradient(120deg, rgba(23, 84, 31, 0.05) 0%, rgba(23, 84, 31, 0) 30%),
-          linear-gradient(300deg, rgba(15, 54, 20, 0.06) 0%, rgba(15, 54, 20, 0) 40%);
+          linear-gradient(120deg, rgba(23, 84, 31, 0.05) 0%, rgba(0,0,0,0) 30%),
+          linear-gradient(300deg, rgba(15, 54, 20, 0.06) 0%, rgba(0,0,0,0) 40%);
       }
     </style>
   </head>
   <body class="d-flex align-items-center justify-content-center text-center p-3">
     <main class="w-100" style="max-width: 360px;">
-      <form class="form-accounts shadow-sm bg-white p-4 rounded-4 border border-light" id="form-account" method="post">
+      <form class="form-accounts p-4 rounded-4" id="form-account" method="post">
         {% csrf_token %}
         {% include "paperless-ngx/snippets/svg_logo.html" with extra_attrs="width='240' class='logo mb-3'" %}
 				<p class="text-uppercase fw-semibold mb-1 text-secondary small" style="letter-spacing: 0.12rem;">{% translate "Migration Mode" %}</p>
@@ -30,7 +41,7 @@
           <div class="alert alert-{{ message.level_tag }} mb-2" role="alert">{{ message }}</div>
         {% endfor %}
 
-        <p class="mb-3 text-muted">{% translate "Login with a superuser account to proceed." %}</p>
+        <p class="mb-3">{% translate "Login with a superuser account to proceed." %}</p>
 
         {% if form.errors %}
           <div class="alert alert-danger" role="alert">
@@ -56,6 +67,7 @@
           <input type="text" name="code" id="inputCode" placeholder="One-time code" class="form-control" required>
           <label for="inputCode">One-time code</label>
         </div>
+				<p class="mt-2 small fst-italic">{% translate "Code can be found in the startup logs." %}</p>
         <div class="d-grid mt-3">
           <button class="btn btn-lg btn-primary" type="submit">{% translate "Sign in" %}</button>
         </div>
