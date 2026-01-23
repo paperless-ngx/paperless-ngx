@@ -284,7 +284,12 @@
             logEl.textContent += `\n${line}`;
             logEl.scrollTop = logEl.scrollHeight;
           };
-          evt.onmessage = (e) => append(e.data);
+          evt.onmessage = (e) => {
+            append(e.data);
+            if (e.data.startsWith('Transform finished')) {
+              setTimeout(() => window.location.reload(), 500);
+            }
+          };
           evt.onerror = () => {
             append('[connection closed]');
             evt.close();
