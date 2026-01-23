@@ -268,11 +268,29 @@
                 <div class="fw-semibold">Migration console</div>
                 <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Live output</span>
               </div>
-              <pre class="mb-0" style="background:#0f1a12;color:#d1e7d6;border-radius:12px;min-height:160px;padding:12px;font-size:0.9rem;overflow:auto;">(waiting for connection…)</pre>
+              <pre id="migration-log" class="mb-0" style="background:#0f1a12;color:#d1e7d6;border-radius:12px;min-height:180px;padding:12px;font-size:0.9rem;overflow:auto;">(waiting for connection…)</pre>
             </div>
           </div>
         </div>
       </div>
     </div>
+    {% if start_stream %}
+      <script>
+        (() => {
+          const logEl = document.getElementById('migration-log');
+          if (!logEl) return;
+          const evt = new EventSource('{% url "transform_stream" %}');
+          const append = (line) => {
+            logEl.textContent += `\n${line}`;
+            logEl.scrollTop = logEl.scrollHeight;
+          };
+          evt.onmessage = (e) => append(e.data);
+          evt.onerror = () => {
+            append('[connection closed]');
+            evt.close();
+          };
+        })();
+      </script>
+    {% endif %}
   </body>
 </html>

@@ -1,3 +1,5 @@
+import subprocess
+import sys
 from pathlib import Path
 
 from django.contrib import messages
@@ -5,6 +7,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
+from django.http import StreamingHttpResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
@@ -28,10 +31,8 @@ def migration_home(request):
         if action == "check":
             messages.success(request, "Checked export paths.")
         elif action == "transform":
-            messages.info(
-                request,
-                "Transform step is not implemented yet.",
-            )
+            messages.info(request, "Starting transform… live output below.")
+            request.session["start_transform_stream"] = True
         elif action == "import":
             messages.info(
                 request,
@@ -46,6 +47,7 @@ def migration_home(request):
         "export_exists": export_path.exists(),
         "transformed_path": transformed_path,
         "transformed_exists": transformed_path.exists(),
+        "start_stream": request.session.pop("start_transform_stream", False),
     }
     return render(request, "paperless_migration/migration_home.html", context)
 
@@ -75,3 +77,53 @@ def migration_login(request):
         return redirect(settings.LOGIN_REDIRECT_URL)
 
     return render(request, "account/login.html")
+
+
+@login_required
+@require_http_methods(["GET"])
+def transform_stream(request):
+    if not request.session.get("migration_code_ok"):
+        return HttpResponseForbidden("Access code required")
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("Superuser access required")
+
+    input_path = Path(settings.MIGRATION_EXPORT_PATH)
+    output_path = Path(settings.MIGRATION_TRANSFORMED_PATH)
+
+    cmd = [
+        sys.executable,
+        "-m",
+        "paperless_migration.scripts.transform",
+        "--input",
+        str(input_path),
+        "--output",
+        str(output_path),
+    ]
+
+    def event_stream():
+        process = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            bufsize=1,
+            text=True,
+        )
+        try:
+            yield "data: Starting transform...\n\n"
+            if process.stdout:
+                for line in process.stdout:
+                    yield f"data: {line.rstrip()}\n\n"
+            process.wait()
+            yield f"data: Transform finished with code {process.returncode}\n\n"
+        finally:
+            if process and process.poll() is None:
+                process.kill()
+
+    return StreamingHttpResponse(
+        event_stream(),
+        content_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
