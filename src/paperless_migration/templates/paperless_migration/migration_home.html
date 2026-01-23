@@ -1,61 +1,153 @@
 <!doctype html>
+{% load static %}
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Paperless-ngx Migration Mode</title>
+    <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'base.css' %}" />
+    <style>
+      body {
+        background: radial-gradient(circle at 20% 20%, #eef5ef, #f7fbf7);
+        min-height: 100vh;
+      }
+
+      .hero-card {
+        background: #fff;
+        border: 1px solid rgba(23, 84, 31, 0.08);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+        border-radius: 18px;
+      }
+
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .card-step {
+        border: 1px solid rgba(23, 84, 31, 0.08);
+        border-radius: 14px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+      }
+
+      .path-pill {
+        background: rgba(23, 84, 31, 0.06);
+        color: #0f3614;
+        border-radius: 12px;
+        padding: 0.4rem 0.75rem;
+        font-size: 0.9rem;
+      }
+    </style>
   </head>
-  <body>
-    <main>
-      <h1>Migration Mode</h1>
-      <p>
-        This instance is running in migration mode. Use this interface to run
-        the v2 → v3 migration.
-      </p>
-      {% if messages %}
-        <ul>
-          {% for message in messages %}
-            <li>{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-      <section>
-        <h2>Step 1 — Export (v2)</h2>
-        <p>Expected export file:</p>
-        <ul>
-          <li><strong>Path:</strong> {{ export_path }}</li>
-          <li><strong>Status:</strong> {{ export_exists|yesno:"Found,Missing" }}</li>
-        </ul>
-        <form method="post">
-          {% csrf_token %}
-          <button type="submit" name="action" value="check">
-            Re-check export
-          </button>
-        </form>
-      </section>
-      <section>
-        <h2>Step 2 — Transform</h2>
-        <p>Expected transformed file:</p>
-        <ul>
-          <li><strong>Path:</strong> {{ transformed_path }}</li>
-          <li><strong>Status:</strong> {{ transformed_exists|yesno:"Found,Missing" }}</li>
-        </ul>
-        <form method="post">
-          {% csrf_token %}
-          <button type="submit" name="action" value="transform">
-            Transform export
-          </button>
-        </form>
-      </section>
-      <section>
-        <h2>Step 3 — Import (v3)</h2>
-        <form method="post">
-          {% csrf_token %}
-          <button type="submit" name="action" value="import">
-            Import transformed data
-          </button>
-        </form>
-      </section>
-    </main>
+  <body class="pb-5">
+    <div class="container py-5">
+      <div class="row justify-content-center mb-4">
+        <div class="col-lg-10">
+          <div class="hero-card p-4 p-md-5">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+              <div class="d-flex align-items-center gap-3">
+                <img src="{% static 'paperless/img/logo-light.png' %}" alt="Paperless-ngx" width="160" class="logo" />
+                <div>
+                  <p class="text-uppercase fw-semibold mb-1 text-secondary" style="letter-spacing: 0.12rem;">Migration Mode</p>
+                  <h1 class="h3 mb-2 text-primary">Paperless-ngx v2 → v3</h1>
+                  <p class="text-muted mb-0">Run the export, transform, and import flow once your files are ready.</p>
+                </div>
+              </div>
+              <div class="text-end">
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">Online</span>
+              </div>
+            </div>
+            {% if messages %}
+              <div class="mt-4">
+                {% for message in messages %}
+                  <div class="alert alert-{{ message.level_tag }} mb-2" role="alert">{{ message }}</div>
+                {% endfor %}
+              </div>
+            {% endif %}
+            <div class="row g-3 mt-4">
+              <div class="col-md-6">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="status-dot bg-{{ export_exists|yesno:'success,danger' }}"></span>
+                  <div>
+                    <div class="fw-semibold">Export file</div>
+                    <div class="small text-muted">{{ export_exists|yesno:"Ready,Missing" }}</div>
+                  </div>
+                </div>
+                <div class="path-pill mt-2 text-truncate" title="{{ export_path }}">{{ export_path }}</div>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="status-dot bg-{{ transformed_exists|yesno:'success,warning' }}"></span>
+                  <div>
+                    <div class="fw-semibold">Transformed file</div>
+                    <div class="small text-muted">{{ transformed_exists|yesno:"Ready,Pending" }}</div>
+                  </div>
+                </div>
+                <div class="path-pill mt-2 text-truncate" title="{{ transformed_path }}">{{ transformed_path }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row gy-4 justify-content-center">
+        <div class="col-lg-3 col-md-4">
+          <div class="card card-step h-100">
+            <div class="card-body d-flex flex-column gap-3">
+              <div>
+                <p class="text-uppercase text-muted mb-1 fw-semibold" style="letter-spacing: 0.08rem;">Step 1</p>
+                <h3 class="h5 mb-1">Export (v2)</h3>
+                <p class="small text-muted mb-0">Confirm the v2 export file is present before continuing.</p>
+              </div>
+              <div class="mt-auto">
+                <form method="post">
+                  {% csrf_token %}
+                  <button class="btn btn-primary w-100" type="submit" name="action" value="check">Re-check export</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-4">
+          <div class="card card-step h-100">
+            <div class="card-body d-flex flex-column gap-3">
+              <div>
+                <p class="text-uppercase text-muted mb-1 fw-semibold" style="letter-spacing: 0.08rem;">Step 2</p>
+                <h3 class="h5 mb-1">Transform</h3>
+                <p class="small text-muted mb-0">Convert the export into the v3-ready structure.</p>
+              </div>
+              <div class="mt-auto">
+                <form method="post">
+                  {% csrf_token %}
+                  <button class="btn btn-outline-primary w-100" type="submit" name="action" value="transform">Transform export</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-4">
+          <div class="card card-step h-100">
+            <div class="card-body d-flex flex-column gap-3">
+              <div>
+                <p class="text-uppercase text-muted mb-1 fw-semibold" style="letter-spacing: 0.08rem;">Step 3</p>
+                <h3 class="h5 mb-1">Import (v3)</h3>
+                <p class="small text-muted mb-0">Load the transformed data into your v3 instance.</p>
+              </div>
+              <div class="mt-auto">
+                <form method="post">
+                  {% csrf_token %}
+                  <button class="btn btn-outline-secondary w-100" type="submit" name="action" value="import">Import transformed data</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
