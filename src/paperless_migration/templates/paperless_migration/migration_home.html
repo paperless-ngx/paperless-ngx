@@ -14,10 +14,15 @@
         --bs-body-color: #212529;
         --bs-body-color-rgb: 33, 37, 41;
         --bs-border-color: #dee2e6;
-        --bs-link-color: #17541f;
+        --bs-link-color: var(--pngx-primary);
         --bs-link-color-rgb: 23, 84, 31;
-      }
+			}
       @media (prefers-color-scheme: dark) { :root { color-scheme: light; } }
+
+			.btn-primary:disabled {
+				--bs-btn-disabled-bg: #4d7352;
+				--bs-btn-disabled-border-color: #4d7352;
+      }
 
       body {
         background:
@@ -50,6 +55,10 @@
       .card-step {
         border-radius: 16px;
         transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      .card-step.done-step {
+        opacity: 0.4;
       }
 
       .path-pill {
@@ -180,7 +189,7 @@
 
       <div class="row gy-4 justify-content-center">
         <div class="col-lg-3 col-md-4">
-          <div class="card card-step h-100">
+          <div class="card card-step h-100 {% if export_exists %}done-step{% endif %}">
             <div class="card-body d-flex flex-column gap-3">
               <div>
                 <p class="text-uppercase text-muted mb-1 fw-semibold" style="letter-spacing: 0.08rem;">Step 1</p>
@@ -190,12 +199,12 @@
               <div class="mt-auto d-grid gap-2">
                 <form method="post" enctype="multipart/form-data" class="d-flex gap-2 align-items-center">
                   {% csrf_token %}
-                  <input class="form-control form-control-sm" type="file" name="export_file" accept=".json" required>
-                  <button class="btn btn-outline-secondary btn-sm" type="submit" name="action" value="upload">Upload</button>
+                  <input class="form-control form-control-sm" type="file" name="export_file" accept=".json" {% if export_exists %}disabled{% endif %} required>
+                  <button class="btn btn-outline-secondary btn-sm" type="submit" name="action" value="upload" {% if export_exists %}disabled aria-disabled="true"{% endif %}>Upload</button>
                 </form>
                 <form method="post">
                   {% csrf_token %}
-                  <button class="btn btn-primary w-100" type="submit" name="action" value="check">Re-check export</button>
+                  <button class="btn btn-primary w-100" type="submit" name="action" value="check" {% if export_exists %}disabled aria-disabled="true"{% endif %}>Re-check export</button>
                 </form>
               </div>
             </div>
@@ -203,7 +212,7 @@
         </div>
 
         <div class="col-lg-3 col-md-4">
-          <div class="card card-step h-100">
+          <div class="card card-step h-100 {% if transformed_exists %}done-step{% endif %}">
             <div class="card-body d-flex flex-column gap-3">
               <div>
                 <p class="text-uppercase text-muted mb-1 fw-semibold" style="letter-spacing: 0.08rem;">Step 2</p>
@@ -218,7 +227,7 @@
                     type="submit"
                     name="action"
                     value="transform"
-                    {% if not export_exists %}disabled aria-disabled="true"{% endif %}
+                    {% if not export_exists or transformed_exists %}disabled aria-disabled="true"{% endif %}
                   >
                     Transform export
                   </button>
@@ -229,7 +238,7 @@
         </div>
 
         <div class="col-lg-3 col-md-4">
-          <div class="card card-step h-100">
+          <div class="card card-step h-100 {% if transformed_exists %}done-step{% endif %}">
             <div class="card-body d-flex flex-column gap-3">
               <div>
                 <p class="text-uppercase text-muted mb-1 fw-semibold" style="letter-spacing: 0.08rem;">Step 3</p>
