@@ -89,11 +89,11 @@
       }
     </style>
   </head>
-  <body class="pb-5">
-    <div class="container py-5">
+  <body class="pb-4">
+    <div class="container py-4">
       <div class="row justify-content-center mb-4">
         <div class="col-lg-9">
-          <div class="hero-card p-4 p-md-5">
+          <div class="hero-card p-4">
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
               <div class="d-flex align-items-center gap-3">
                 {% include "paperless-ngx/snippets/svg_logo.html" with extra_attrs="width='280' class='logo'" %}
@@ -142,7 +142,7 @@
                 {% endfor %}
               </div>
             {% endif %}
-            <div class="row g-3 mt-4">
+            <div class="row g-3 mt-2">
               <div class="col-md-6">
                 <div class="d-flex align-items-center gap-2">
                   <span class="status-dot bg-{{ export_exists|yesno:'success,danger' }}"></span>
