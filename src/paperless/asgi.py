@@ -1,12 +1,18 @@
 import os
 
+try:
+    from paperless_migration.detect import choose_settings_module
+
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", choose_settings_module())
+except Exception:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "paperless.settings")
+
 from django.core.asgi import get_asgi_application
 
 # Fetch Django ASGI application early to ensure AppRegistry is populated
 # before importing consumers and AuthMiddlewareStack that may import ORM
 # models.
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "paperless.settings")
 django_asgi_app = get_asgi_application()
 
 from channels.auth import AuthMiddlewareStack  # noqa: E402

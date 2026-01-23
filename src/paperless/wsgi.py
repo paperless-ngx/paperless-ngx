@@ -9,9 +9,14 @@ https://docs.djangoproject.com/en/1.10/howto/deployment/wsgi/
 
 import os
 
-from django.core.wsgi import get_wsgi_application
+try:
+    from paperless_migration.detect import choose_settings_module
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "paperless.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", choose_settings_module())
+except Exception:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "paperless.settings")
+
+from django.core.wsgi import get_wsgi_application
 
 application = get_wsgi_application()
 
