@@ -99,7 +99,6 @@ DATABASES = _parse_db_settings()
 
 SECRET_KEY = os.getenv(
     "PAPERLESS_SECRET_KEY",
-    "e11fl1oa-*ytql8p)(06fbj4ukrlo+n7k&q5+$1md7i+mge=ee",
 )
 
 AUTH_PASSWORD_VALIDATORS = [
