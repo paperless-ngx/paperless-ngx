@@ -185,7 +185,7 @@
               <div>
                 <p class="text-uppercase text-muted mb-1 fw-semibold" style="letter-spacing: 0.08rem;">Step 1</p>
                 <h3 class="h5 mb-1">Export (v2)</h3>
-                <p class="small text-muted mb-0">Generate and upload the v2 export file. For larger files, place the file in the appropriate directory.</p>
+                <p class="small text-muted mb-0">Generate and upload the v2 export file.</p>
               </div>
               <div class="mt-auto d-grid gap-2">
                 <form method="post" enctype="multipart/form-data" class="d-flex gap-2 align-items-center">
@@ -263,7 +263,7 @@
               <div class="small">
                 Run the v2 export from your Paperless instance, e.g.:
                 <code>docker run --rm ghcr.io/paperless-ngx/paperless-ngx:2.20.5 document_exporter --data-only</code>
-                (see <a href="https://docs.paperless-ngx.com/administration/#exporter" target="_blank" rel="noopener noreferrer">documentation</a>). Once the <code>manifest.json</code> is in-place, click “Re-check export”.
+                (see <a href="https://docs.paperless-ngx.com/administration/#exporter" target="_blank" rel="noopener noreferrer">documentation</a>). Once the <code>manifest.json</code> is in-place, upload it or (especially for larger files) place it directly at the expected location and click “Re-check export”.
 								<p class="mt-2 mb-0 text-danger fst-italic">⚠️ The export must be generated with version Paperless-ngx v2.20.5</p>
               </div>
             </div>
