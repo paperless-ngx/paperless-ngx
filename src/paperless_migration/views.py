@@ -33,6 +33,19 @@ def migration_home(request):
         elif action == "transform":
             messages.info(request, "Starting transform… live output below.")
             request.session["start_transform_stream"] = True
+        elif action == "upload":
+            upload = request.FILES.get("export_file")
+            if not upload:
+                messages.error(request, "No file selected.")
+            else:
+                try:
+                    export_path.parent.mkdir(parents=True, exist_ok=True)
+                    with export_path.open("wb") as dest:
+                        for chunk in upload.chunks():
+                            dest.write(chunk)
+                    messages.success(request, f"Uploaded to {export_path}.")
+                except Exception as exc:
+                    messages.error(request, f"Failed to save file: {exc}")
         elif action == "import":
             messages.info(
                 request,

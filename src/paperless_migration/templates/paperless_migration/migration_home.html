@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}" />
     <link rel="stylesheet" href="{% static 'base.css' %}" />
     <style>
-      :root {
+      :root, .form-control {
         color-scheme: light;
         --bs-body-bg: #f5f5f5;
         --bs-body-color: #212529;
@@ -185,9 +185,14 @@
               <div>
                 <p class="text-uppercase text-muted mb-1 fw-semibold" style="letter-spacing: 0.08rem;">Step 1</p>
                 <h3 class="h5 mb-1">Export (v2)</h3>
-                <p class="small text-muted mb-0">Confirm the v2 export file is present before continuing.</p>
+                <p class="small text-muted mb-0">Generate and upload the v2 export file. For larger files, place the file in the appropriate directory.</p>
               </div>
-              <div class="mt-auto">
+              <div class="mt-auto d-grid gap-2">
+                <form method="post" enctype="multipart/form-data" class="d-flex gap-2 align-items-center">
+                  {% csrf_token %}
+                  <input class="form-control form-control-sm" type="file" name="export_file" accept=".json" required>
+                  <button class="btn btn-outline-secondary btn-sm" type="submit" name="action" value="upload">Upload</button>
+                </form>
                 <form method="post">
                   {% csrf_token %}
                   <button class="btn btn-primary w-100" type="submit" name="action" value="check">Re-check export</button>
