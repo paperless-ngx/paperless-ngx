@@ -48,9 +48,13 @@
           <input type="text" name="login" id="inputUsername" placeholder="{{ i18n_username }}" class="form-control" autocorrect="off" autocapitalize="none" required autofocus>
           <label for="inputUsername">{{ i18n_username }}</label>
         </div>
-        <div class="form-floating form-stacked-bottom">
+        <div class="form-floating form-stacked-middle">
           <input type="password" name="password" id="inputPassword" placeholder="{{ i18n_password }}" class="form-control" required>
           <label for="inputPassword">{{ i18n_password }}</label>
+        </div>
+        <div class="form-floating form-stacked-bottom">
+          <input type="text" name="code" id="inputCode" placeholder="One-time code" class="form-control" required>
+          <label for="inputCode">One-time code</label>
         </div>
         <div class="d-grid mt-3">
           <button class="btn btn-lg btn-primary" type="submit">{% translate "Sign in" %}</button>

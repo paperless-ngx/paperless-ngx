@@ -1,6 +1,8 @@
 from pathlib import Path
 
 from django.contrib import messages
+from django.contrib.auth import authenticate
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
@@ -13,6 +15,8 @@ from paperless_migration import settings
 @login_required
 @require_http_methods(["GET", "POST"])
 def migration_home(request):
+    if not request.session.get("migration_code_ok"):
+        return HttpResponseForbidden("Access code required")
     if not request.user.is_superuser:
         return HttpResponseForbidden("Superuser access required")
 
@@ -44,3 +48,30 @@ def migration_home(request):
         "transformed_exists": transformed_path.exists(),
     }
     return render(request, "paperless_migration/migration_home.html", context)
+
+
+@require_http_methods(["GET", "POST"])
+def migration_login(request):
+    if request.method == "POST":
+        username = request.POST.get("login", "")
+        password = request.POST.get("password", "")
+        code = request.POST.get("code", "")
+
+        if not code or code != settings.MIGRATION_ACCESS_CODE:
+            messages.error(request, "One-time code is required.")
+            return redirect("account_login")
+
+        user = authenticate(request, username=username, password=password)
+        if user is None:
+            messages.error(request, "Invalid username or password.")
+            return redirect("account_login")
+
+        if not user.is_superuser:
+            messages.error(request, "Superuser access required.")
+            return redirect("account_login")
+
+        login(request, user)
+        request.session["migration_code_ok"] = True
+        return redirect(settings.LOGIN_REDIRECT_URL)
+
+    return render(request, "account/login.html")

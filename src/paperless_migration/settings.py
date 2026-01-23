@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import logging
 import os
+import secrets
 from pathlib import Path
 from typing import Any
 
@@ -196,3 +198,16 @@ MIGRATION_TRANSFORMED_PATH = __get_path(
     "PAPERLESS_MIGRATION_TRANSFORMED_PATH",
     EXPORT_DIR / "manifest.v3.json",
 )
+
+# One-time access code required for migration logins; stable across autoreload
+_code = os.getenv("PAPERLESS_MIGRATION_ACCESS_CODE")
+if not _code:
+    _code = secrets.token_urlsafe(12)
+    os.environ["PAPERLESS_MIGRATION_ACCESS_CODE"] = _code
+MIGRATION_ACCESS_CODE = _code
+if os.environ.get("PAPERLESS_MIGRATION_CODE_LOGGED") != "1":
+    logging.getLogger(__name__).warning(
+        "Migration one-time access code: %s",
+        MIGRATION_ACCESS_CODE,
+    )
+    os.environ["PAPERLESS_MIGRATION_CODE_LOGGED"] = "1"
