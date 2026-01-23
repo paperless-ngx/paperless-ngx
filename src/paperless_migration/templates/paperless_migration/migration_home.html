@@ -27,6 +27,10 @@
         min-height: 100vh;
       }
 
+			svg.logo .text {
+				fill: #161616 !important;
+			}
+
       .hero-card,
       .card-step {
         background: #fff;
@@ -48,14 +52,9 @@
         transition: transform 0.15s ease, box-shadow 0.15s ease;
       }
 
-      .card-step:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 20px 36px rgba(0, 0, 0, 0.08);
-      }
-
       .path-pill {
         background: rgba(23, 84, 31, 0.08);
-        color: #0f3614;
+        color: var(--bs-body-color);
         border-radius: 12px;
         padding: 0.4rem 0.75rem;
         font-size: 0.9rem;
