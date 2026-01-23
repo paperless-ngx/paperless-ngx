@@ -150,7 +150,10 @@ ROOT_URLCONF = "paperless_migration.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "paperless_migration" / "templates"],
+        "DIRS": [
+            BASE_DIR / "paperless_migration" / "templates",
+            BASE_DIR / "documents" / "templates",
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
