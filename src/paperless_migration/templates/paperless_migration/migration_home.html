@@ -175,8 +175,8 @@
               </div>
             </div>
           </div>
-        </div>
       </div>
+    </div>
 
       <div class="row gy-4 justify-content-center">
         <div class="col-lg-3 col-md-4">
@@ -247,6 +247,21 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div class="row justify-content-center mt-4">
+        <div class="col-lg-9">
+          {% if not export_exists %}
+            <div class="alert alert-info mb-3">
+              <div class="fw-semibold mb-1">Export file not found</div>
+              <div class="small">
+                Run the v2 export from your Paperless instance, e.g.:
+                <code>docker run --rm ghcr.io/paperless-ngx/paperless-ngx:2.20.5 document_exporter --data-only</code>
+                (see <a href="https://docs.paperless-ngx.com/administration/#exporter" target="_blank" rel="noopener noreferrer">documentation</a>). Once the <code>manifest.json</code> is in-place, click “Re-check export”.
+              </div>
+            </div>
+          {% endif %}
         </div>
       </div>
     </div>
