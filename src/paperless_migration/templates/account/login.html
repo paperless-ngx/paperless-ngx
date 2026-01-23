@@ -1,0 +1,61 @@
+{% load i18n static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="Paperless-ngx project and contributors">
+    <meta name="robots" content="noindex,nofollow">
+    <title>{% translate "Paperless-ngx sign in" %}</title>
+    <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'base.css' %}" rel="stylesheet">
+    <style>
+      body {
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 20% 20%, #eef5ef, #f7fbf7),
+          linear-gradient(120deg, rgba(23, 84, 31, 0.05) 0%, rgba(23, 84, 31, 0) 30%),
+          linear-gradient(300deg, rgba(15, 54, 20, 0.06) 0%, rgba(15, 54, 20, 0) 40%);
+      }
+    </style>
+  </head>
+  <body class="d-flex align-items-center justify-content-center text-center p-3">
+    <main class="w-100" style="max-width: 360px;">
+      <form class="form-accounts shadow-sm bg-white p-4 rounded-4 border border-light" id="form-account" method="post">
+        {% csrf_token %}
+        {% include "paperless-ngx/snippets/svg_logo.html" with extra_attrs="width='240' class='logo mb-3'" %}
+				<p class="text-uppercase fw-semibold mb-1 text-secondary small" style="letter-spacing: 0.12rem;">{% translate "Migration Mode" %}</p>
+
+        {% for message in messages %}
+          <div class="alert alert-{{ message.level_tag }} mb-2" role="alert">{{ message }}</div>
+        {% endfor %}
+
+        <p class="mb-3 text-muted">{% translate "Login with a superuser account to proceed." %}</p>
+
+        {% if form.errors %}
+          <div class="alert alert-danger" role="alert">
+            {% for field, errors in form.errors.items %}
+              {% for error in errors %}
+                {{ error }}
+              {% endfor %}
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        {% translate "Username" as i18n_username %}
+        {% translate "Password" as i18n_password %}
+        <div class="form-floating form-stacked-top">
+          <input type="text" name="login" id="inputUsername" placeholder="{{ i18n_username }}" class="form-control" autocorrect="off" autocapitalize="none" required autofocus>
+          <label for="inputUsername">{{ i18n_username }}</label>
+        </div>
+        <div class="form-floating form-stacked-bottom">
+          <input type="password" name="password" id="inputPassword" placeholder="{{ i18n_password }}" class="form-control" required>
+          <label for="inputPassword">{{ i18n_password }}</label>
+        </div>
+        <div class="d-grid mt-3">
+          <button class="btn btn-lg btn-primary" type="submit">{% translate "Sign in" %}</button>
+        </div>
+      </form>
+    </main>
+  </body>
+</html>
