@@ -20,7 +20,9 @@ if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
 
 from django.db.models import Case
+from django.db.models import PositiveIntegerField
 from django.db.models.functions import Cast
+from django.db.models.functions import Length
 from django.db.models.functions import Substr
 from django_softdelete.models import SoftDeleteModel
 
@@ -193,14 +195,12 @@ class Document(SoftDeleteModel, ModelWithOwner):
         ),
     )
 
-    content_length = models.PositiveIntegerField(
-        _("content length"),
-        null=True,
-        default=None,
-        editable=False,
-        help_text=_(
-            "The length of the content field in characters. May be null, but automatically set when the document is saved. Used to compute statistics faster.",
-        ),
+    content_length = models.GeneratedField(
+        expression=Length("content"),
+        output_field=PositiveIntegerField(default=0),
+        db_persist=True,
+        null=False,
+        help_text="Length of the content field in characters. Automatically maintained by the database for faster statistics computation.",
     )
 
     mime_type = models.CharField(_("mime type"), max_length=256, editable=False)
@@ -323,10 +323,6 @@ class Document(SoftDeleteModel, ModelWithOwner):
         if self.title:
             res += f" {self.title}"
         return res
-
-    def save(self, *args, **kwargs):
-        self.content_length = len(self.content) if self.content else 0
-        super().save(*args, **kwargs)
 
     @property
     def suggestion_content(self):

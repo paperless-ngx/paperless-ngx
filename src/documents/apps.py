@@ -1,9 +1,5 @@
-import logging
-
 from django.apps import AppConfig
 from django.utils.translation import gettext_lazy as _
-
-logger = logging.getLogger("paperless.documents")
 
 
 class DocumentsConfig(AppConfig):
@@ -36,26 +32,4 @@ class DocumentsConfig(AppConfig):
 
         import documents.schema  # noqa: F401
 
-        self._check_content_length_backfill()
-
         AppConfig.ready(self)
-
-    def _check_content_length_backfill(self):
-        """
-        Warn if there are documents missing content_length.
-        This can happen after upgrading from a version without content_length
-        on a database with more than 1000 documents.
-        """
-        try:
-            from documents.models import Document
-
-            missing_count = Document.objects.filter(content_length__isnull=True).count()
-            if missing_count > 0:
-                logger.warning(
-                    f"{missing_count} documents are missing the content_length field. "
-                    "Statistics performance may be degraded. "
-                    "Run 'python manage.py backfill_content_length' to fix this.",
-                )
-        except Exception:
-            # Table might not exist yet during migrations
-            pass

@@ -29,15 +29,12 @@ from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.models import Case
 from django.db.models import Count
-from django.db.models import F
 from django.db.models import IntegerField
 from django.db.models import Max
 from django.db.models import Model
 from django.db.models import Q
 from django.db.models import Sum
 from django.db.models import When
-from django.db.models.functions import Coalesce
-from django.db.models.functions import Length
 from django.db.models.functions import Lower
 from django.db.models.manager import Manager
 from django.http import FileResponse
@@ -2384,10 +2381,7 @@ class StatisticsView(GenericAPIView):
             documents.values("mime_type")
             .annotate(
                 mime_type_count=Count("id"),
-                mime_type_chars=Sum(
-                    # content_length may be null if not precomputed yet.
-                    Coalesce(F("content_length"), Length("content")),
-                ),
+                mime_type_chars=Sum("content_length"),
             )
             .order_by("-mime_type_count"),
         )

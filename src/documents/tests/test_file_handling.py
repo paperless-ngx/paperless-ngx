@@ -1390,7 +1390,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             self.assertEqual(len(capture.output), 1)
             self.assertEqual(
                 capture.output[0],
-                "WARNING:paperless.templating:Template attempted restricted operation: <bound method Document.save of <Document: 2020-06-25 Does Matter>> is not safely callable",
+                "WARNING:paperless.templating:Template attempted restricted operation: <bound method Model.save of <Document: 2020-06-25 Does Matter>> is not safely callable",
             )
 
     def test_template_with_custom_fields(self):
