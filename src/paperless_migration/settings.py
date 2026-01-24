@@ -201,6 +201,7 @@ MIGRATION_TRANSFORMED_PATH = __get_path(
     "PAPERLESS_MIGRATION_TRANSFORMED_PATH",
     EXPORT_DIR / "manifest.v3.json",
 )
+MIGRATION_IMPORTED_PATH = Path(EXPORT_DIR / "import.completed").resolve()
 
 # One-time access code required for migration logins; stable across autoreload
 _code = os.getenv("PAPERLESS_MIGRATION_ACCESS_CODE")

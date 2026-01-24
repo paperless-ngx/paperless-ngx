@@ -81,7 +81,7 @@
         left: 0;
         top: 0;
         bottom: 0;
-        width: calc({{ export_exists|yesno:'33,0' }}% + {{ transformed_exists|yesno:'33,0' }}%);
+        width: calc({{ export_exists|yesno:'33,0' }}% + {{ transformed_exists|yesno:'33,0' }}% + {{ imported_exists|yesno:'34,0' }}%);
         max-width: 100%;
         background: linear-gradient(90deg, #17541f, #2c7a3c);
         border-radius: 999px;
@@ -143,7 +143,7 @@
                   </div>
                 </div>
                 <div class="d-flex align-items-center gap-2">
-                  <span class="step-chip {% if transformed_exists %}done{% endif %}">3</span>
+                  <span class="step-chip {% if imported_exists %}done{% endif %}">3</span>
                   <div>
                     <div class="fw-semibold mb-0">Import</div>
                     <small class="text-muted">into v3</small>
@@ -238,7 +238,7 @@
         </div>
 
         <div class="col-lg-3 col-md-4">
-          <div class="card card-step h-100 {% if transformed_exists %}done-step{% endif %}">
+          <div class="card card-step h-100 {% if imported_exists %}done-step{% endif %}">
             <div class="card-body d-flex flex-column gap-3">
               <div>
                 <p class="text-uppercase text-muted mb-1 fw-semibold" style="letter-spacing: 0.08rem;">Step 3</p>
@@ -253,7 +253,7 @@
                     type="submit"
                     name="action"
                     value="import"
-                    {% if not transformed_exists %}disabled aria-disabled="true"{% endif %}
+                    {% if not transformed_exists or imported_exists %}disabled aria-disabled="true"{% endif %}
                   >
                     Import transformed data
                   </button>
@@ -289,19 +289,21 @@
         </div>
       </div>
     </div>
-    {% if start_stream %}
+    {% if stream_action %}
       <script>
         (() => {
           const logEl = document.getElementById('migration-log');
           if (!logEl) return;
-          const evt = new EventSource('{% url "transform_stream" %}');
+          const streamUrl = "{% if stream_action == 'import' %}{% url 'import_stream' %}{% else %}{% url 'transform_stream' %}{% endif %}";
+          const donePrefix = "{{ stream_action|capfirst }} finished";
+          const evt = new EventSource(streamUrl);
           const append = (line) => {
             logEl.textContent += `\n${line}`;
             logEl.scrollTop = logEl.scrollHeight;
           };
           evt.onmessage = (e) => {
             append(e.data);
-            if (e.data.startsWith('Transform finished')) {
+            if (e.data.startsWith(donePrefix)) {
               setTimeout(() => window.location.reload(), 500);
             }
           };

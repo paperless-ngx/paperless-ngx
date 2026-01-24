@@ -11,6 +11,7 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     path("migration/", views.migration_home, name="migration_home"),
     path("migration/transform/stream", views.transform_stream, name="transform_stream"),
+    path("migration/import/stream", views.import_stream, name="import_stream"),
     # redirect root to migration home
     path("", views.migration_home, name="migration_home"),
 ]
