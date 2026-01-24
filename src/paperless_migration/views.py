@@ -162,14 +162,6 @@ def import_stream(request):
     manage_path = Path(settings.BASE_DIR) / "manage.py"
     source_dir = export_path.parent
 
-    cmd = [
-        sys.executable,
-        str(manage_path),
-        "document_importer",
-        str(source_dir),
-        "--data-only",
-    ]
-
     env = os.environ.copy()
     env["DJANGO_SETTINGS_MODULE"] = "paperless.settings"
     env["PAPERLESS_MIGRATION_MODE"] = "0"
@@ -197,27 +189,70 @@ def import_stream(request):
             yield f"data: Failed to prepare import manifest: {exc}\n\n"
             return
 
-        process = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            bufsize=1,
-            text=True,
-            env=env,
-        )
+        def run_cmd(args, label):
+            yield f"data: {label}\n\n"
+            process = subprocess.Popen(
+                args,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                bufsize=1,
+                text=True,
+                env=env,
+            )
+            try:
+                if process.stdout:
+                    for line in process.stdout:
+                        yield f"data: {line.rstrip()}\n\n"
+                process.wait()
+                return process.returncode
+            finally:
+                if process and process.poll() is None:
+                    process.kill()
+
+        wipe_cmd = [
+            sys.executable,
+            "-m",
+            "paperless_migration.scripts.wipe_db",
+        ]
+        migrate_cmd = [
+            sys.executable,
+            str(manage_path),
+            "migrate",
+            "--noinput",
+        ]
+        import_cmd = [
+            sys.executable,
+            str(manage_path),
+            "document_importer",
+            str(source_dir),
+            "--data-only",
+        ]
         try:
-            yield "data: Starting import...\n\n"
-            if process.stdout:
-                for line in process.stdout:
-                    yield f"data: {line.rstrip()}\n\n"
-            process.wait()
-            if process.returncode == 0:
+            wipe_code = yield from run_cmd(
+                wipe_cmd,
+                "Wiping database...",
+            )
+            if wipe_code != 0:
+                yield f"data: Wipe finished with code {wipe_code}\n\n"
+                return
+
+            migrate_code = yield from run_cmd(
+                migrate_cmd,
+                "Running migrations...",
+            )
+            if migrate_code != 0:
+                yield f"data: Migrate finished with code {migrate_code}\n\n"
+                return
+
+            import_code = yield from run_cmd(
+                import_cmd,
+                "Starting import...",
+            )
+            if import_code == 0:
                 imported_marker.parent.mkdir(parents=True, exist_ok=True)
                 imported_marker.write_text("ok\n", encoding="utf-8")
-            yield f"data: Import finished with code {process.returncode}\n\n"
+            yield f"data: Import finished with code {import_code}\n\n"
         finally:
-            if process and process.poll() is None:
-                process.kill()
             if backup_path and backup_path.exists():
                 try:
                     shutil.move(backup_path, export_path)
