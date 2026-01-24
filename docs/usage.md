@@ -278,6 +278,28 @@ Once setup, navigating to the email settings page in Paperless-ngx will allow yo
 You can also submit a document using the REST API, see [POSTing documents](api.md#file-uploads)
 for details.
 
+## Document Suggestions
+
+Paperless-ngx can suggest tags, correspondents, document types and storage paths for documents based on the content of the document. This is done using a (non-LLM) machine learning model that is trained on the documents in your database. The suggestions are shown in the document detail page and can be accepted or rejected by the user.
+
+## AI Features
+
+Paperless-ngx includes several features that use AI to enhance the document management experience. These features are optional and can be enabled or disabled in the settings. If you are using the AI features, you may want to also enable the "LLM index" feature, which supports Retrieval-Augmented Generation (RAG) designed to improve the quality of AI responses. The LLM index feature is not enabled by default and requires additional configuration.
+
+!!! warning
+
+    Remember that Paperless-ngx will send document content to the AI provider you have configured, so consider the privacy implications of using these features, especially if using a remote model (e.g. OpenAI), instead of the default local model.
+
+The AI features work by creating an embedding of the text content and metadata of documents, which is then used for various tasks such as similarity search and question answering. This uses the FAISS vector store.
+
+### AI-Enhanced Suggestions
+
+If enabled, Paperless-ngx can use an AI LLM model to suggest document titles, dates, tags, correspondents and document types for documents. This feature will always be "opt-in" and does not disable the existing classifier-based suggestion system. Currently, both remote (via the OpenAI API) and local (via Ollama) models are supported, see [configuration](configuration.md#ai) for details.
+
+### Document Chat
+
+Paperless-ngx can use an AI LLM model to answer questions about a document or across multiple documents. Again, this feature works best when RAG is enabled. The chat feature is available in the upper app toolbar and will switch between chatting across multiple documents or a single document based on the current view.
+
 ## Sharing documents from Paperless-ngx
 
 Paperless-ngx supports sharing documents with other users by assigning them [permissions](#object-permissions)
@@ -552,7 +574,7 @@ This allows for complex logic to be used to generate the title, including [logic
 and [filters](https://jinja.palletsprojects.com/en/3.1.x/templates/#id11).
 The template is provided as a string.
 
-Using Jinja2 Templates is also useful for [Date localization](advanced_usage.md#Date-Localization) in the title.
+Using Jinja2 Templates is also useful for [Date localization](advanced_usage.md#date-localization) in the title.
 
 The available inputs differ depending on the type of workflow trigger.
 This is because at the time of consumption (when the text is to be set), no automatic tags etc. have been
@@ -584,6 +606,7 @@ The following placeholders are only available for "added" or "updated" triggers
 -   `{{created_day}}`: created day
 -   `{{created_time}}`: created time in HH:MM format
 -   `{{doc_url}}`: URL to the document in the web UI. Requires the `PAPERLESS_URL` setting to be set.
+-   `{{doc_id}}`: Document ID
 
 ##### Examples
 

@@ -581,30 +581,34 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         ),
     )
     def get_children(self, obj):
-        filter_q = self.context.get("document_count_filter")
-        request = self.context.get("request")
-        if filter_q is None:
-            user = getattr(request, "user", None) if request else None
-            filter_q = get_document_count_filter_for_user(user)
-            self.context["document_count_filter"] = filter_q
+        children_map = self.context.get("children_map")
+        if children_map is not None:
+            children = children_map.get(obj.pk, [])
+        else:
+            filter_q = self.context.get("document_count_filter")
+            request = self.context.get("request")
+            if filter_q is None:
+                user = getattr(request, "user", None) if request else None
+                filter_q = get_document_count_filter_for_user(user)
+                self.context["document_count_filter"] = filter_q
 
-        children_queryset = (
-            obj.get_children_queryset()
-            .select_related("owner")
-            .annotate(document_count=Count("documents", filter=filter_q))
-        )
+            children = (
+                obj.get_children_queryset()
+                .select_related("owner")
+                .annotate(document_count=Count("documents", filter=filter_q))
+            )
 
-        view = self.context.get("view")
-        ordering = (
-            OrderingFilter().get_ordering(request, children_queryset, view)
-            if request and view
-            else None
-        )
-        ordering = ordering or (Lower("name"),)
-        children_queryset = children_queryset.order_by(*ordering)
+            view = self.context.get("view")
+            ordering = (
+                OrderingFilter().get_ordering(request, children, view)
+                if request and view
+                else None
+            )
+            ordering = ordering or (Lower("name"),)
+            children = children.order_by(*ordering)
 
         serializer = TagSerializer(
-            children_queryset,
+            children,
             many=True,
             user=self.user,
             full_perms=self.full_perms,
@@ -2586,7 +2590,8 @@ class WorkflowSerializer(serializers.ModelSerializer):
                 set_triggers.append(trigger_instance)
 
         if actions is not None and actions is not serializers.empty:
-            for action in actions:
+            for index, action in enumerate(actions):
+                action["order"] = index
                 assign_tags = action.pop("assign_tags", None)
                 assign_view_users = action.pop("assign_view_users", None)
                 assign_view_groups = action.pop("assign_view_groups", None)
@@ -2724,6 +2729,16 @@ class WorkflowSerializer(serializers.ModelSerializer):
         self.prune_triggers_and_actions()
 
         return instance
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        actions = instance.actions.order_by("order", "pk")
+        data["actions"] = WorkflowActionSerializer(
+            actions,
+            many=True,
+            context=self.context,
+        ).data
+        return data
 
 
 class TrashSerializer(SerializerWithPerms):

@@ -109,13 +109,13 @@ jobs:
         if: always()
         uses: codecov/codecov-action@v5
         with:
-          flags: frontend,frontend-node-${{ matrix.node-version }}
+          flags: frontend-node-${{ matrix.node-version }}
           directory: src-ui/
           report_type: test_results
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          flags: frontend,frontend-node-${{ matrix.node-version }}
+          flags: frontend-node-${{ matrix.node-version }}
           directory: src-ui/coverage/
   e2e-tests:
     name: "E2E Tests (${{ matrix.shard-index }}/${{ matrix.shard-count }})"

@@ -26,6 +26,8 @@ from filelock import FileLock
 
 from documents import matching
 from documents.caching import clear_document_caches
+from documents.caching import invalidate_llm_suggestions_cache
+from documents.data_models import ConsumableDocument
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_filename
@@ -54,6 +56,7 @@ from documents.workflows.mutations import apply_assignment_to_overrides
 from documents.workflows.mutations import apply_removal_to_document
 from documents.workflows.mutations import apply_removal_to_overrides
 from documents.workflows.utils import get_workflows_for_trigger
+from paperless.config import AIConfig
 
 if TYPE_CHECKING:
     from documents.classifier import DocumentClassifier
@@ -420,7 +423,15 @@ def update_filename_and_move_files(
             return
         instance = instance.document
 
-    def validate_move(instance, old_path: Path, new_path: Path):
+    def validate_move(instance, old_path: Path, new_path: Path, root: Path):
+        if not new_path.is_relative_to(root):
+            msg = (
+                f"Document {instance!s}: Refusing to move file outside root {root}: "
+                f"{new_path}."
+            )
+            logger.warning(msg)
+            raise CannotMoveFilesException(msg)
+
         if not old_path.is_file():
             # Can't do anything if the old file does not exist anymore.
             msg = f"Document {instance!s}: File {old_path} doesn't exist."
@@ -509,12 +520,22 @@ def update_filename_and_move_files(
                 return
 
             if move_original:
-                validate_move(instance, old_source_path, instance.source_path)
+                validate_move(
+                    instance,
+                    old_source_path,
+                    instance.source_path,
+                    settings.ORIGINALS_DIR,
+                )
                 create_source_path_directory(instance.source_path)
                 shutil.move(old_source_path, instance.source_path)
 
             if move_archive:
-                validate_move(instance, old_archive_path, instance.archive_path)
+                validate_move(
+                    instance,
+                    old_archive_path,
+                    instance.archive_path,
+                    settings.ARCHIVE_DIR,
+                )
                 create_source_path_directory(instance.archive_path)
                 shutil.move(old_archive_path, instance.archive_path)
 
@@ -638,6 +659,15 @@ def cleanup_custom_field_deletion(sender, instance: CustomField, **kwargs):
         logger.debug(
             f"Removing custom field {instance} from sort field of {views_with_sort_updated} views",
         )
+
+
+@receiver(models.signals.post_save, sender=Document)
+def update_llm_suggestions_cache(sender, instance, **kwargs):
+    """
+    Invalidate the LLM suggestions cache when a document is saved.
+    """
+    # Invalidate the cache for the document
+    invalidate_llm_suggestions_cache(instance.pk)
 
 
 @receiver(models.signals.post_delete, sender=User)
@@ -770,7 +800,7 @@ def run_workflows(
         if matching.document_matches_workflow(document, workflow, trigger_type):
             action: WorkflowAction
             has_deletion_action = False
-            for action in workflow.actions.all():
+            for action in workflow.actions.order_by("order", "pk"):
                 message = f"Applying {action} from {workflow}"
                 if not use_overrides:
                     logger.info(message, extra={"group": logging_group})
@@ -971,3 +1001,26 @@ def close_connection_pool_on_worker_init(**kwargs):
     for conn in connections.all(initialized_only=True):
         if conn.alias == "default" and hasattr(conn, "pool") and conn.pool:
             conn.close_pool()
+
+
+def add_or_update_document_in_llm_index(sender, document, **kwargs):
+    """
+    Add or update a document in the LLM index when it is created or updated.
+    """
+    ai_config = AIConfig()
+    if ai_config.llm_index_enabled:
+        from documents.tasks import update_document_in_llm_index
+
+        update_document_in_llm_index.delay(document)
+
+
+@receiver(models.signals.post_delete, sender=Document)
+def delete_document_from_llm_index(sender, instance: Document, **kwargs):
+    """
+    Delete a document from the LLM index when it is deleted.
+    """
+    ai_config = AIConfig()
+    if ai_config.llm_index_enabled:
+        from documents.tasks import remove_document_from_llm_index
+
+        remove_document_from_llm_index.delay(instance)

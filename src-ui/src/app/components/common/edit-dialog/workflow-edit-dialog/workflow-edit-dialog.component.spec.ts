@@ -252,7 +252,7 @@ describe('WorkflowEditDialogComponent', () => {
     expect(component.object.actions.length).toEqual(2)
   })
 
-  it('should update order and remove ids from actions on drag n drop', () => {
+  it('should update order on drag n drop', () => {
     const action1 = workflow.actions[0]
     const action2 = workflow.actions[1]
     component.object = workflow
@@ -261,8 +261,6 @@ describe('WorkflowEditDialogComponent', () => {
       WorkflowAction[]
     >)
     expect(component.object.actions).toEqual([action2, action1])
-    expect(action1.id).toBeNull()
-    expect(action2.id).toBeNull()
   })
 
   it('should not include auto matching in algorithms', () => {

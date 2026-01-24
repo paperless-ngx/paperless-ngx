@@ -1,6 +1,6 @@
 [project]
 name = "paperless-ngx"
-version = "2.20.3"
+version = "2.20.5"
 description = "A community-supported supercharged document management system: scan, index and archive all your physical documents"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -27,8 +27,8 @@ dependencies = [
   # WARNING: django does not use semver.
   #          Only patch versions are guaranteed to not introduce breaking changes.
   "django~=5.2.5",
-  "django-allauth[mfa,socialaccount]~=65.12.1",
-  "django-auditlog~=3.3.0",
+  "django-allauth[mfa,socialaccount]~=65.13.1",
+  "django-auditlog~=3.4.1",
   "django-cachalot~=2.8.0",
   "django-celery-results~=2.6.0",
   "django-compression-middleware~=0.5.0",
@@ -44,16 +44,23 @@ dependencies = [
   "drf-spectacular~=0.28",
   "drf-spectacular-sidecar~=2025.10.1",
   "drf-writable-nested~=0.7.1",
+  "faiss-cpu>=1.10",
   "filelock~=3.20.0",
   "flower~=2.0.1",
-  "gotenberg-client~=0.12.0",
+  "gotenberg-client~=0.13.1",
   "httpx-oauth~=0.16",
   "imap-tools~=1.11.0",
-  "inotifyrecursive~=0.3",
   "jinja2~=3.1.5",
   "langdetect~=1.0.9",
+  "llama-index-core>=0.14.12",
+  "llama-index-embeddings-huggingface>=0.6.1",
+  "llama-index-embeddings-openai>=0.5.1",
+  "llama-index-llms-ollama>=0.9.1",
+  "llama-index-llms-openai>=0.6.13",
+  "llama-index-vector-stores-faiss>=0.5.2",
   "nltk~=3.9.1",
-  "ocrmypdf~=16.12.0",
+  "ocrmypdf~=16.13.0",
+  "openai>=1.76",
   "pathvalidate~=3.3.1",
   "pdf2image~=1.17.0",
   "python-dateutil~=2.9.0",
@@ -66,10 +73,12 @@ dependencies = [
   "redis[hiredis]~=5.2.1",
   "regex>=2025.9.18",
   "scikit-learn~=1.7.0",
+  "sentence-transformers>=4.1",
   "setproctitle~=1.3.4",
   "tika-client~=0.10.0",
+  "torch~=2.9.1",
   "tqdm~=4.67.1",
-  "watchdog~=6.0",
+  "watchfiles>=1.1.1",
   "whitenoise~=6.9",
   "whoosh-reloaded>=2.7.5",
   "zxing-cpp~=2.3.0",
@@ -82,7 +91,7 @@ optional-dependencies.postgres = [
   "psycopg[c,pool]==3.2.12",
   # Direct dependency for proper resolution of the pre-built wheels
   "psycopg-c==3.2.12",
-  "psycopg-pool==3.2.7",
+  "psycopg-pool==3.3",
 ]
 optional-dependencies.webserver = [
   "granian[uvloop]~=2.5.1",
@@ -117,7 +126,7 @@ testing = [
 ]
 
 lint = [
-  "pre-commit~=4.4.0",
+  "pre-commit~=4.5.1",
   "pre-commit-uv~=4.2.0",
   "ruff~=0.14.0",
 ]
@@ -159,6 +168,15 @@ zxing-cpp = [
   { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
   { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
 ]
+
+torch = [
+  { index = "pytorch-cpu" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [tool.ruff]
 target-version = "py310"
@@ -255,6 +273,7 @@ testpaths = [
   "src/paperless_tika/tests",
   "src/paperless_text/tests/",
   "src/paperless_remote/tests/",
+  "src/paperless_ai/tests",
 ]
 addopts = [
   "--pythonwarnings=all",

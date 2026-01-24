@@ -1293,15 +1293,6 @@ export class WorkflowEditDialogComponent
     const actionField = this.actionFields.at(event.previousIndex)
     this.actionFields.removeAt(event.previousIndex)
     this.actionFields.insert(event.currentIndex, actionField)
-    // removing id will effectively re-create the actions in this order
-    this.object.actions.forEach((a) => (a.id = null))
-    this.actionFields.controls.forEach((c) =>
-      c.get('id').setValue(null, { emitEvent: false })
-    )
-    // clear action errors since the order has changed
-    if (this.error?.actions) {
-      this.error.actions = null
-    }
   }
 
   save(): void {
