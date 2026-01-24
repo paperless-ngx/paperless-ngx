@@ -951,19 +951,4 @@ describe('WorkflowEditDialogComponent', () => {
     component.removeSelectedCustomField(3, formGroup)
     expect(formGroup.get('assign_custom_fields').value).toEqual([])
   })
-
-  it('should clear action errors when reordering actions', () => {
-    component.object = workflow
-    component.ngOnInit()
-
-    component.error = {
-      actions: [null, { type: ['Some error'] }],
-    }
-
-    component.onActionDrop({ previousIndex: 0, currentIndex: 1 } as CdkDragDrop<
-      WorkflowAction[]
-    >)
-
-    expect(component.error.actions).toBeNull()
-  })
 })

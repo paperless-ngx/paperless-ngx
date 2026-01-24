@@ -92,9 +92,6 @@
                           buttonClasses="btn-link text-danger ms-2"
                           iconName="trash">
                         </pngx-confirm-button>
-                        @if(error?.actions?.[i]?.type) {
-                          <span class="text-danger ms-2"><i-bs name="exclamation-triangle"></i-bs> {{error.actions[i].type[0]}}</span>
-                        }
                       </button>
                     </div>
                     <div ngbAccordionCollapse>
