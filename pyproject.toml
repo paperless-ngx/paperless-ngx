@@ -114,15 +114,16 @@ testing = [
   "daphne",
   "factory-boy~=3.3.1",
   "imagehash",
-  "pytest~=8.4.1",
+  "pytest~=9.0.0",
   "pytest-cov~=7.0.0",
   "pytest-django~=4.11.1",
-  "pytest-env",
+  "pytest-env~=1.2.0",
   "pytest-httpx",
-  "pytest-mock",
-  "pytest-rerunfailures",
+  "pytest-mock~=3.15.1",
+  "pytest-randomly~=4.0.1",
+  "pytest-rerunfailures~=16.1",
   "pytest-sugar",
-  "pytest-xdist",
+  "pytest-xdist~=3.8.0",
 ]
 
 lint = [
