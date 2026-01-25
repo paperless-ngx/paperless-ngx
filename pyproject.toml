@@ -120,7 +120,7 @@ testing = [
   "pytest-env~=1.2.0",
   "pytest-httpx",
   "pytest-mock~=3.15.1",
-  "pytest-randomly~=4.0.1",
+  #"pytest-randomly~=4.0.1",
   "pytest-rerunfailures~=16.1",
   "pytest-sugar",
   "pytest-xdist~=3.8.0",
@@ -261,11 +261,10 @@ write-changes = true
 ignore-words-list = "criterias,afterall,valeu,ureue,equest,ure,assertIn,Oktober,commitish"
 skip = "src-ui/src/locale/*,src-ui/pnpm-lock.yaml,src-ui/e2e/*,src/paperless_mail/tests/samples/*,src/documents/tests/samples/*,*.po,*.json"
 
-[tool.pytest.ini_options]
-minversion = "8.0"
-pythonpath = [
-  "src",
-]
+[tool.pytest]
+minversion = "9.0"
+pythonpath = [ "src" ]
+
 testpaths = [
   "src/documents/tests/",
   "src/paperless/tests/",
@@ -276,6 +275,7 @@ testpaths = [
   "src/paperless_remote/tests/",
   "src/paperless_ai/tests",
 ]
+
 addopts = [
   "--pythonwarnings=all",
   "--cov",
@@ -286,8 +286,10 @@ addopts = [
   "--quiet",
   "--durations=50",
   "--junitxml=junit.xml",
-  "-o junit_family=legacy",
+  "-o",
+  "junit_family=legacy",
 ]
+
 norecursedirs = [ "src/locale/", ".venv/", "src-ui/" ]
 
 DJANGO_SETTINGS_MODULE = "paperless.settings"
