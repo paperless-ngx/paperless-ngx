@@ -200,6 +200,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
         output_field=PositiveIntegerField(default=0),
         db_persist=True,
         null=False,
+        serialize=False,
         help_text="Length of the content field in characters. Automatically maintained by the database for faster statistics computation.",
     )
 
