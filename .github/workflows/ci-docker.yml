@@ -35,7 +35,7 @@ jobs:
       contents: read
       packages: write
     outputs:
-      can-push: ${{ steps.check-push.outputs.can-push }}
+      should-push: ${{ steps.check-push.outputs.should-push }}
       push-external: ${{ steps.check-push.outputs.push-external }}
       repository: ${{ steps.repo.outputs.name }}
       ref-name: ${{ steps.ref.outputs.name }}
@@ -59,16 +59,28 @@ jobs:
         env:
           REF_NAME: ${{ steps.ref.outputs.name }}
         run: |
-          # can-push: Can we push to GHCR?
-          # True for: pushes, or PRs from the same repo (not forks)
-          can_push=${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
-          echo "can-push=${can_push}"
-          echo "can-push=${can_push}" >> $GITHUB_OUTPUT
+          # should-push: Should we push to GHCR?
+          # True for:
+          #   1. Pushes (tags/dev/beta) - filtered via the workflow triggers
+          #   2. Internal PRs where the branch name starts with 'feature-' - filtered here when a PR is synced
+
+          should_push="false"
+
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            should_push="true"
+          elif [[ "${{ github.event_name }}" == "pull_request" && "${{ github.event.pull_request.head.repo.full_name }}" == "${{ github.repository }}" ]]; then
+            if [[ "${REF_NAME}" == feature-* || "${REF_NAME}" == fix-* ]]; then
+              should_push="true"
+            fi
+          fi
+
+          echo "should-push=${should_push}"
+          echo "should-push=${should_push}" >> $GITHUB_OUTPUT
 
           # push-external: Should we also push to Docker Hub and Quay.io?
           # Only for main repo on dev/beta branches or version tags
           push_external="false"
-          if [[ "${can_push}" == "true" && "${{ github.repository_owner }}" == "paperless-ngx" ]]; then
+          if [[ "${should_push}" == "true" && "${{ github.repository_owner }}" == "paperless-ngx" ]]; then
             case "${REF_NAME}" in
               dev|beta)
                 push_external="true"
@@ -98,6 +110,12 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Maximize space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
       - name: Docker metadata
         id: docker-meta
         uses: docker/metadata-action@v5.10.0
@@ -119,20 +137,20 @@ jobs:
           labels: ${{ steps.docker-meta.outputs.labels }}
           build-args: |
             PNGX_TAG_VERSION=${{ steps.docker-meta.outputs.version }}
-          outputs: type=image,name=${{ env.REGISTRY }}/${{ steps.repo.outputs.name }},push-by-digest=true,name-canonical=true,push=${{ steps.check-push.outputs.can-push }}
+          outputs: type=image,name=${{ env.REGISTRY }}/${{ steps.repo.outputs.name }},push-by-digest=true,name-canonical=true,push=${{ steps.check-push.outputs.should-push }}
           cache-from: |
             type=registry,ref=${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}/cache/app:${{ steps.ref.outputs.cache-ref }}-${{ matrix.arch }}
             type=registry,ref=${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}/cache/app:dev-${{ matrix.arch }}
-          cache-to: ${{ steps.check-push.outputs.can-push == 'true' && format('type=registry,mode=max,ref={0}/{1}/cache/app:{2}-{3}', env.REGISTRY, steps.repo.outputs.name, steps.ref.outputs.cache-ref, matrix.arch) || '' }}
+          cache-to: ${{ steps.check-push.outputs.should-push == 'true' && format('type=registry,mode=max,ref={0}/{1}/cache/app:{2}-{3}', env.REGISTRY, steps.repo.outputs.name, steps.ref.outputs.cache-ref, matrix.arch) || '' }}
       - name: Export digest
-        if: steps.check-push.outputs.can-push == 'true'
+        if: steps.check-push.outputs.should-push == 'true'
         run: |
           mkdir -p /tmp/digests
           digest="${{ steps.build.outputs.digest }}"
           echo "digest=${digest}"
           touch "/tmp/digests/${digest#sha256:}"
       - name: Upload digest
-        if: steps.check-push.outputs.can-push == 'true'
+        if: steps.check-push.outputs.should-push == 'true'
         uses: actions/upload-artifact@v6.0.0
         with:
           name: digests-${{ matrix.arch }}
@@ -143,7 +161,7 @@ jobs:
     name: Merge and Push Manifest
     runs-on: ubuntu-24.04
     needs: build-arch
-    if: needs.build-arch.outputs.can-push == 'true'
+    if: needs.build-arch.outputs.should-push == 'true'
     permissions:
       contents: read
       packages: write

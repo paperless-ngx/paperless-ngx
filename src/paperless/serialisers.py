@@ -206,6 +206,10 @@ class ProfileSerializer(PasswordValidationMixin, serializers.ModelSerializer):
 class ApplicationConfigurationSerializer(serializers.ModelSerializer):
     user_args = serializers.JSONField(binary=True, allow_null=True)
     barcode_tag_mapping = serializers.JSONField(binary=True, allow_null=True)
+    llm_api_key = ObfuscatedPasswordField(
+        required=False,
+        allow_null=True,
+    )
 
     def run_validation(self, data):
         # Empty strings treated as None to avoid unexpected behavior
@@ -215,6 +219,11 @@ class ApplicationConfigurationSerializer(serializers.ModelSerializer):
             data["barcode_tag_mapping"] = None
         if "language" in data and data["language"] == "":
             data["language"] = None
+        if "llm_api_key" in data and data["llm_api_key"] is not None:
+            if data["llm_api_key"] == "":
+                data["llm_api_key"] = None
+            elif len(data["llm_api_key"].replace("*", "")) == 0:
+                del data["llm_api_key"]
         return super().run_validation(data)
 
     def update(self, instance, validated_data):

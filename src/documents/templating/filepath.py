@@ -108,7 +108,6 @@ def create_dummy_document():
         page_count=5,
         created=timezone.now(),
         modified=timezone.now(),
-        storage_type=Document.STORAGE_TYPE_UNENCRYPTED,
         added=timezone.now(),
         filename="/dummy/filename.pdf",
         archive_filename="/dummy/archive_filename.pdf",
@@ -262,6 +261,17 @@ def get_custom_fields_context(
     return field_data
 
 
+def _is_safe_relative_path(value: str) -> bool:
+    if value == "":
+        return True
+
+    path = PurePath(value)
+    if path.is_absolute() or path.drive:
+        return False
+
+    return ".." not in path.parts
+
+
 def validate_filepath_template_and_render(
     template_string: str,
     document: Document | None = None,
@@ -308,6 +318,12 @@ def validate_filepath_template_and_render(
             template_class=FilePathTemplate,
         )
         rendered_template = template.render(context)
+
+        if not _is_safe_relative_path(rendered_template):
+            logger.warning(
+                "Template rendered an unsafe path (absolute or containing traversal).",
+            )
+            return None
 
         # We're good!
         return rendered_template

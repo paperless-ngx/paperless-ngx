@@ -41,6 +41,7 @@ class SuggestionCacheData:
 CLASSIFIER_VERSION_KEY: Final[str] = "classifier_version"
 CLASSIFIER_HASH_KEY: Final[str] = "classifier_hash"
 CLASSIFIER_MODIFIED_KEY: Final[str] = "classifier_modified"
+LLM_CACHE_CLASSIFIER_VERSION: Final[int] = 1000  # Marker distinguishing LLM suggestions
 
 CACHE_1_MINUTE: Final[int] = 60
 CACHE_5_MINUTES: Final[int] = 5 * CACHE_1_MINUTE
@@ -194,6 +195,54 @@ def refresh_suggestions_cache(
     """
     doc_key = get_suggestion_cache_key(document_id)
     cache.touch(doc_key, timeout)
+
+
+def get_llm_suggestion_cache(
+    document_id: int,
+    backend: str,
+) -> SuggestionCacheData | None:
+    doc_key = get_suggestion_cache_key(document_id)
+    data: SuggestionCacheData = cache.get(doc_key)
+
+    if data and data.classifier_hash == backend:
+        return data
+
+    return None
+
+
+def set_llm_suggestions_cache(
+    document_id: int,
+    suggestions: dict,
+    *,
+    backend: str,
+    timeout: int = CACHE_50_MINUTES,
+) -> None:
+    """
+    Cache LLM-generated suggestions using a backend-specific identifier (e.g. 'openai:gpt-4').
+    """
+    doc_key = get_suggestion_cache_key(document_id)
+    cache.set(
+        doc_key,
+        SuggestionCacheData(
+            classifier_version=LLM_CACHE_CLASSIFIER_VERSION,
+            classifier_hash=backend,
+            suggestions=suggestions,
+        ),
+        timeout,
+    )
+
+
+def invalidate_llm_suggestions_cache(
+    document_id: int,
+) -> None:
+    """
+    Invalidate the LLM suggestions cache for a specific document and backend.
+    """
+    doc_key = get_suggestion_cache_key(document_id)
+    data: SuggestionCacheData = cache.get(doc_key)
+
+    if data:
+        cache.delete(doc_key)
 
 
 def get_metadata_cache_key(document_id: int) -> str:
