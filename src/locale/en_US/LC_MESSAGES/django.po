@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 03:30+0000\n"
+"POT-Creation-Date: 2026-01-25 21:46+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -89,7 +89,7 @@ msgstr ""
 msgid "Automatic"
 msgstr ""
 
-#: documents/models.py:64 documents/models.py:434 documents/models.py:1507
+#: documents/models.py:64 documents/models.py:434 documents/models.py:1528
 #: paperless_mail/models.py:23 paperless_mail/models.py:143
 msgid "name"
 msgstr ""
@@ -252,7 +252,7 @@ msgid "The position of this document in your physical document archive."
 msgstr ""
 
 #: documents/models.py:303 documents/models.py:678 documents/models.py:732
-#: documents/models.py:1550
+#: documents/models.py:1571
 msgid "document"
 msgstr ""
 
@@ -869,346 +869,358 @@ msgid "has this document type"
 msgstr ""
 
 #: documents/models.py:1073
+msgid "has one of these document types"
+msgstr ""
+
+#: documents/models.py:1080
 msgid "does not have these document type(s)"
 msgstr ""
 
-#: documents/models.py:1081
+#: documents/models.py:1088
 msgid "has this correspondent"
 msgstr ""
 
-#: documents/models.py:1088
+#: documents/models.py:1095
 msgid "does not have these correspondent(s)"
 msgstr ""
 
-#: documents/models.py:1096
-msgid "has this storage path"
-msgstr ""
-
-#: documents/models.py:1103
-msgid "does not have these storage path(s)"
-msgstr ""
-
-#: documents/models.py:1107
-msgid "filter custom field query"
+#: documents/models.py:1102
+msgid "has one of these correspondents"
 msgstr ""
 
 #: documents/models.py:1110
-msgid "JSON-encoded custom field query expression."
-msgstr ""
-
-#: documents/models.py:1114
-msgid "schedule offset days"
+msgid "has this storage path"
 msgstr ""
 
 #: documents/models.py:1117
+msgid "has one of these storage paths"
+msgstr ""
+
+#: documents/models.py:1124
+msgid "does not have these storage path(s)"
+msgstr ""
+
+#: documents/models.py:1128
+msgid "filter custom field query"
+msgstr ""
+
+#: documents/models.py:1131
+msgid "JSON-encoded custom field query expression."
+msgstr ""
+
+#: documents/models.py:1135
+msgid "schedule offset days"
+msgstr ""
+
+#: documents/models.py:1138
 msgid "The number of days to offset the schedule trigger by."
 msgstr ""
 
-#: documents/models.py:1122
+#: documents/models.py:1143
 msgid "schedule is recurring"
 msgstr ""
 
-#: documents/models.py:1125
+#: documents/models.py:1146
 msgid "If the schedule should be recurring."
 msgstr ""
 
-#: documents/models.py:1130
+#: documents/models.py:1151
 msgid "schedule recurring delay in days"
 msgstr ""
 
-#: documents/models.py:1134
+#: documents/models.py:1155
 msgid "The number of days between recurring schedule triggers."
 msgstr ""
 
-#: documents/models.py:1139
+#: documents/models.py:1160
 msgid "schedule date field"
 msgstr ""
 
-#: documents/models.py:1144
+#: documents/models.py:1165
 msgid "The field to check for a schedule trigger."
 msgstr ""
 
-#: documents/models.py:1153
+#: documents/models.py:1174
 msgid "schedule date custom field"
 msgstr ""
 
-#: documents/models.py:1157
+#: documents/models.py:1178
 msgid "workflow trigger"
 msgstr ""
 
-#: documents/models.py:1158
+#: documents/models.py:1179
 msgid "workflow triggers"
 msgstr ""
 
-#: documents/models.py:1166
+#: documents/models.py:1187
 msgid "email subject"
 msgstr ""
 
-#: documents/models.py:1170
+#: documents/models.py:1191
 msgid ""
 "The subject of the email, can include some placeholders, see documentation."
 msgstr ""
 
-#: documents/models.py:1176
+#: documents/models.py:1197
 msgid "email body"
 msgstr ""
 
-#: documents/models.py:1179
+#: documents/models.py:1200
 msgid ""
 "The body (message) of the email, can include some placeholders, see "
 "documentation."
 msgstr ""
 
-#: documents/models.py:1185
+#: documents/models.py:1206
 msgid "emails to"
 msgstr ""
 
-#: documents/models.py:1188
+#: documents/models.py:1209
 msgid "The destination email addresses, comma separated."
 msgstr ""
 
-#: documents/models.py:1194
+#: documents/models.py:1215
 msgid "include document in email"
 msgstr ""
 
-#: documents/models.py:1205
+#: documents/models.py:1226
 msgid "webhook url"
 msgstr ""
 
-#: documents/models.py:1208
+#: documents/models.py:1229
 msgid "The destination URL for the notification."
 msgstr ""
 
-#: documents/models.py:1213
+#: documents/models.py:1234
 msgid "use parameters"
 msgstr ""
 
-#: documents/models.py:1218
+#: documents/models.py:1239
 msgid "send as JSON"
 msgstr ""
 
-#: documents/models.py:1222
+#: documents/models.py:1243
 msgid "webhook parameters"
 msgstr ""
 
-#: documents/models.py:1225
+#: documents/models.py:1246
 msgid "The parameters to send with the webhook URL if body not used."
 msgstr ""
 
-#: documents/models.py:1229
+#: documents/models.py:1250
 msgid "webhook body"
 msgstr ""
 
-#: documents/models.py:1232
+#: documents/models.py:1253
 msgid "The body to send with the webhook URL if parameters not used."
 msgstr ""
 
-#: documents/models.py:1236
+#: documents/models.py:1257
 msgid "webhook headers"
 msgstr ""
 
-#: documents/models.py:1239
+#: documents/models.py:1260
 msgid "The headers to send with the webhook URL."
 msgstr ""
 
-#: documents/models.py:1244
+#: documents/models.py:1265
 msgid "include document in webhook"
 msgstr ""
 
-#: documents/models.py:1255
+#: documents/models.py:1276
 msgid "Assignment"
 msgstr ""
 
-#: documents/models.py:1259
+#: documents/models.py:1280
 msgid "Removal"
 msgstr ""
 
-#: documents/models.py:1263 documents/templates/account/password_reset.html:15
+#: documents/models.py:1284 documents/templates/account/password_reset.html:15
 msgid "Email"
 msgstr ""
 
-#: documents/models.py:1267
+#: documents/models.py:1288
 msgid "Webhook"
 msgstr ""
 
-#: documents/models.py:1271
+#: documents/models.py:1292
 msgid "Workflow Action Type"
 msgstr ""
 
-#: documents/models.py:1276 documents/models.py:1509
+#: documents/models.py:1297 documents/models.py:1530
 #: paperless_mail/models.py:145
 msgid "order"
 msgstr ""
 
-#: documents/models.py:1279
+#: documents/models.py:1300
 msgid "assign title"
 msgstr ""
 
-#: documents/models.py:1283
+#: documents/models.py:1304
 msgid "Assign a document title, must  be a Jinja2 template, see documentation."
 msgstr ""
 
-#: documents/models.py:1291 paperless_mail/models.py:274
+#: documents/models.py:1312 paperless_mail/models.py:274
 msgid "assign this tag"
 msgstr ""
 
-#: documents/models.py:1300 paperless_mail/models.py:282
+#: documents/models.py:1321 paperless_mail/models.py:282
 msgid "assign this document type"
 msgstr ""
 
-#: documents/models.py:1309 paperless_mail/models.py:296
+#: documents/models.py:1330 paperless_mail/models.py:296
 msgid "assign this correspondent"
 msgstr ""
 
-#: documents/models.py:1318
+#: documents/models.py:1339
 msgid "assign this storage path"
 msgstr ""
 
-#: documents/models.py:1327
+#: documents/models.py:1348
 msgid "assign this owner"
 msgstr ""
 
-#: documents/models.py:1334
+#: documents/models.py:1355
 msgid "grant view permissions to these users"
 msgstr ""
 
-#: documents/models.py:1341
+#: documents/models.py:1362
 msgid "grant view permissions to these groups"
 msgstr ""
 
-#: documents/models.py:1348
+#: documents/models.py:1369
 msgid "grant change permissions to these users"
 msgstr ""
 
-#: documents/models.py:1355
+#: documents/models.py:1376
 msgid "grant change permissions to these groups"
 msgstr ""
 
-#: documents/models.py:1362
+#: documents/models.py:1383
 msgid "assign these custom fields"
 msgstr ""
 
-#: documents/models.py:1366
+#: documents/models.py:1387
 msgid "custom field values"
 msgstr ""
 
-#: documents/models.py:1370
+#: documents/models.py:1391
 msgid "Optional values to assign to the custom fields."
 msgstr ""
 
-#: documents/models.py:1379
+#: documents/models.py:1400
 msgid "remove these tag(s)"
 msgstr ""
 
-#: documents/models.py:1384
+#: documents/models.py:1405
 msgid "remove all tags"
 msgstr ""
 
-#: documents/models.py:1391
+#: documents/models.py:1412
 msgid "remove these document type(s)"
 msgstr ""
 
-#: documents/models.py:1396
+#: documents/models.py:1417
 msgid "remove all document types"
 msgstr ""
 
-#: documents/models.py:1403
+#: documents/models.py:1424
 msgid "remove these correspondent(s)"
 msgstr ""
 
-#: documents/models.py:1408
+#: documents/models.py:1429
 msgid "remove all correspondents"
 msgstr ""
 
-#: documents/models.py:1415
+#: documents/models.py:1436
 msgid "remove these storage path(s)"
 msgstr ""
 
-#: documents/models.py:1420
+#: documents/models.py:1441
 msgid "remove all storage paths"
 msgstr ""
 
-#: documents/models.py:1427
+#: documents/models.py:1448
 msgid "remove these owner(s)"
 msgstr ""
 
-#: documents/models.py:1432
+#: documents/models.py:1453
 msgid "remove all owners"
 msgstr ""
 
-#: documents/models.py:1439
+#: documents/models.py:1460
 msgid "remove view permissions for these users"
 msgstr ""
 
-#: documents/models.py:1446
+#: documents/models.py:1467
 msgid "remove view permissions for these groups"
 msgstr ""
 
-#: documents/models.py:1453
+#: documents/models.py:1474
 msgid "remove change permissions for these users"
 msgstr ""
 
-#: documents/models.py:1460
+#: documents/models.py:1481
 msgid "remove change permissions for these groups"
 msgstr ""
 
-#: documents/models.py:1465
+#: documents/models.py:1486
 msgid "remove all permissions"
 msgstr ""
 
-#: documents/models.py:1472
+#: documents/models.py:1493
 msgid "remove these custom fields"
 msgstr ""
 
-#: documents/models.py:1477
+#: documents/models.py:1498
 msgid "remove all custom fields"
 msgstr ""
 
-#: documents/models.py:1486
+#: documents/models.py:1507
 msgid "email"
 msgstr ""
 
-#: documents/models.py:1495
+#: documents/models.py:1516
 msgid "webhook"
 msgstr ""
 
-#: documents/models.py:1499
+#: documents/models.py:1520
 msgid "workflow action"
 msgstr ""
 
-#: documents/models.py:1500
+#: documents/models.py:1521
 msgid "workflow actions"
 msgstr ""
 
-#: documents/models.py:1515
+#: documents/models.py:1536
 msgid "triggers"
 msgstr ""
 
-#: documents/models.py:1522
+#: documents/models.py:1543
 msgid "actions"
 msgstr ""
 
-#: documents/models.py:1525 paperless_mail/models.py:154
+#: documents/models.py:1546 paperless_mail/models.py:154
 msgid "enabled"
 msgstr ""
 
-#: documents/models.py:1536
+#: documents/models.py:1557
 msgid "workflow"
 msgstr ""
 
-#: documents/models.py:1540
+#: documents/models.py:1561
 msgid "workflow trigger type"
 msgstr ""
 
-#: documents/models.py:1554
+#: documents/models.py:1575
 msgid "date run"
 msgstr ""
 
-#: documents/models.py:1560
+#: documents/models.py:1581
 msgid "workflow run"
 msgstr ""
 
-#: documents/models.py:1561
+#: documents/models.py:1582
 msgid "workflow runs"
 msgstr ""
 
