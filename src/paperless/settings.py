@@ -1203,19 +1203,6 @@ EMAIL_PARSE_DEFAULT_LAYOUT = __get_int(
     1,  # MailRule.PdfLayout.TEXT_HTML but that can't be imported here
 )
 
-# Pre-2.x versions of Paperless stored your documents locally with GPG
-# encryption, but that is no longer the default.  This behaviour is still
-# available, but it must be explicitly enabled by setting
-# `PAPERLESS_PASSPHRASE` in your environment or config file.  The default is to
-# store these files unencrypted.
-#
-# Translation:
-# * If you're a new user, you can safely ignore this setting.
-# * If you're upgrading from 1.x, this must be set, OR you can run
-#   `./manage.py change_storage_type gpg unencrypted` to decrypt your files,
-#   after which you can unset this value.
-PASSPHRASE = os.getenv("PAPERLESS_PASSPHRASE")
-
 # Trigger a script after every successful document consumption?
 PRE_CONSUME_SCRIPT = os.getenv("PAPERLESS_PRE_CONSUME_SCRIPT")
 POST_CONSUME_SCRIPT = os.getenv("PAPERLESS_POST_CONSUME_SCRIPT")

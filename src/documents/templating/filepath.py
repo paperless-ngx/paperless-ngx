@@ -108,7 +108,6 @@ def create_dummy_document():
         page_count=5,
         created=timezone.now(),
         modified=timezone.now(),
-        storage_type=Document.STORAGE_TYPE_UNENCRYPTED,
         added=timezone.now(),
         filename="/dummy/filename.pdf",
         archive_filename="/dummy/archive_filename.pdf",
