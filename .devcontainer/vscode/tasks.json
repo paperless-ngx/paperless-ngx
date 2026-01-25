@@ -8,7 +8,10 @@
 			"command": "uv run celery --app paperless worker -l DEBUG",
 			"isBackground": true,
 			"options": {
-				"cwd": "${workspaceFolder}/src"
+				"cwd": "${workspaceFolder}/src",
+				"env": {
+					"UV_CACHE_DIR": "${workspaceFolder}/.uv-cache"
+				}
 			},
 			"problemMatcher": [
 				{
@@ -73,7 +76,10 @@
 				"revealProblems": "onProblem"
 			},
 			"options": {
-				"cwd": "${workspaceFolder}/src"
+				"cwd": "${workspaceFolder}/src",
+				"env": {
+					"UV_CACHE_DIR": "${workspaceFolder}/.uv-cache"
+				}
 			}
 		},
 		{
@@ -92,7 +98,10 @@
 				"revealProblems": "onProblem"
 			},
 			"options": {
-				"cwd": "${workspaceFolder}/src"
+				"cwd": "${workspaceFolder}/src",
+				"env": {
+					"UV_CACHE_DIR": "${workspaceFolder}/.uv-cache"
+				}
 			}
 		},
 		{
@@ -111,7 +120,10 @@
 				"revealProblems": "onProblem"
 			},
 			"options": {
-				"cwd": "${workspaceFolder}/src"
+				"cwd": "${workspaceFolder}/src",
+				"env": {
+					"UV_CACHE_DIR": "${workspaceFolder}/.uv-cache"
+				}
 			}
 		},
 		{
@@ -130,7 +142,10 @@
 				"revealProblems": "onProblem"
 			},
 			"options": {
-				"cwd": "${workspaceFolder}"
+				"cwd": "${workspaceFolder}",
+				"env": {
+					"UV_CACHE_DIR": "${workspaceFolder}/.uv-cache"
+				}
 			}
 		},
 		{
@@ -149,7 +164,10 @@
 				"revealProblems": "onProblem"
 			},
 			"options": {
-				"cwd": "${workspaceFolder}/src"
+				"cwd": "${workspaceFolder}/src",
+				"env": {
+					"UV_CACHE_DIR": "${workspaceFolder}/.uv-cache"
+				}
 			}
 		},
 		{
@@ -168,18 +186,31 @@
 				"revealProblems": "onProblem"
 			},
 			"options": {
-				"cwd": "${workspaceFolder}"
+				"cwd": "${workspaceFolder}",
+				"env": {
+					"UV_CACHE_DIR": "${workspaceFolder}/.uv-cache"
+				}
 			}
 		},
 		{
 			"label": "Maintenance: Install Frontend Dependencies",
 			"description": "Install frontend (pnpm) dependencies",
-			"type": "pnpm",
-			"script": "install",
-			"path": "src-ui",
+			"type": "shell",
+			"command": "pnpm install",
 			"group": "clean",
 			"problemMatcher": [],
-			"detail": "install dependencies from package"
+			"options": {
+				"cwd": "${workspaceFolder}/src-ui"
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": true,
+				"panel": "shared",
+				"showReuseMessage": false,
+				"clear": true,
+				"revealProblems": "onProblem"
+			}
 		},
 		{
 			"description": "Clean install frontend dependencies and build the frontend for production",

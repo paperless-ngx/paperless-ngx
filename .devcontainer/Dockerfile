@@ -119,7 +119,11 @@ ARG BUILD_PACKAGES="\
   libpq-dev \
   # https://github.com/PyMySQL/mysqlclient#linux
   default-libmysqlclient-dev \
-  pkg-config"
+  pkg-config \
+  python3-dev \
+  # Rust compiler for tiktoken and other Rust packages
+  cargo \
+  rustc"
 
 # hadolint ignore=DL3042
 RUN --mount=type=cache,target=/cache/uv/,id=uv-cache \
