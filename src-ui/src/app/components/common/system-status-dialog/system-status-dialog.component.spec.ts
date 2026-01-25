@@ -68,6 +68,9 @@ const status: SystemStatus = {
     sanity_check_status: SystemStatusItemStatus.OK,
     sanity_check_last_run: new Date().toISOString(),
     sanity_check_error: null,
+    llmindex_status: SystemStatusItemStatus.OK,
+    llmindex_last_modified: new Date().toISOString(),
+    llmindex_error: null,
   },
 }
 

@@ -18,6 +18,7 @@ from rest_framework.routers import DefaultRouter
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
+from documents.views import ChatStreamingView
 from documents.views import CorrespondentViewSet
 from documents.views import CustomFieldViewSet
 from documents.views import DocumentTypeViewSet
@@ -138,6 +139,11 @@ urlpatterns = [
                                 "^selection_data/",
                                 SelectionDataView.as_view(),
                                 name="selection_data",
+                            ),
+                            re_path(
+                                "^chat/",
+                                ChatStreamingView.as_view(),
+                                name="chat_streaming_view",
                             ),
                         ],
                     ),

@@ -30,6 +30,9 @@
     </div>
   </div>
   <ul ngbNav class="order-sm-3">
+    @if (aiEnabled) {
+      <pngx-chat></pngx-chat>
+    }
     <pngx-toasts-dropdown></pngx-toasts-dropdown>
     <li ngbDropdown class="nav-item dropdown">
       <button class="btn ps-1 border-0" id="userDropdown" ngbDropdownToggle>

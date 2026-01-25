@@ -219,6 +219,30 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(StoragePath.objects.count(), 1)
 
+    def test_api_create_storage_path_rejects_traversal(self):
+        """
+        GIVEN:
+            - API request to create a storage paths
+            - Storage path attempts directory traversal
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+            - No storage path is created
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Traversal path",
+                    "path": "../../../../../tmp/proof",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(StoragePath.objects.count(), 1)
+
     def test_api_storage_path_placeholders(self):
         """
         GIVEN:

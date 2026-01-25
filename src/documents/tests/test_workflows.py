@@ -3300,7 +3300,7 @@ class TestWorkflows(
         )
         webhook_action = WorkflowActionWebhook.objects.create(
             use_params=False,
-            body="Test message: {{doc_url}}",
+            body="Test message: {{doc_url}} with id {{doc_id}}",
             url="http://paperless-ngx.com",
             include_document=False,
         )
@@ -3330,7 +3330,10 @@ class TestWorkflows(
 
         mock_post.assert_called_once_with(
             url="http://paperless-ngx.com",
-            data=f"Test message: http://localhost:8000/paperless/documents/{doc.id}/",
+            data=(
+                f"Test message: http://localhost:8000/paperless/documents/{doc.id}/"
+                f" with id {doc.id}"
+            ),
             headers={},
             files=None,
             as_json=False,
