@@ -265,6 +265,11 @@ skip = "src-ui/src/locale/*,src-ui/pnpm-lock.yaml,src-ui/e2e/*,src/paperless_mai
 minversion = "9.0"
 pythonpath = [ "src" ]
 
+strict_config = true
+strict_markers = true
+strict_parametrization_ids = true
+strict_xfail = true
+
 testpaths = [
   "src/documents/tests/",
   "src/paperless/tests/",
@@ -283,8 +288,9 @@ addopts = [
   "--cov-report=xml",
   "--numprocesses=auto",
   "--maxprocesses=16",
-  "--quiet",
+  "--dist=loadscope",
   "--durations=50",
+  "--durations-min=0.5",
   "--junitxml=junit.xml",
   "-o",
   "junit_family=legacy",
