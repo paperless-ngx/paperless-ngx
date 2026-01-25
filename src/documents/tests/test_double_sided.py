@@ -224,17 +224,18 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         THEN:
             - The collated file gets put into foo/bar
         """
+        # TODO: parameterize this instead
         for path in [
             Path("foo") / "bar" / "double-sided",
             Path("double-sided") / "foo" / "bar",
         ]:
-            with self.subTest(path=path):
+            with self.subTest(path=str(path)):
                 # Ensure we get fresh directories for each run
                 self.tearDown()
                 self.setUp()
 
                 self.create_staging_file()
-                self.consume_file("double-sided-odd.pdf", path / "foo.pdf")
+                self.consume_file("double-sided-odd.pdf", Path(path) / "foo.pdf")
                 self.assertIsFile(
                     self.dirs.consumption_dir / "foo" / "bar" / "foo-collated.pdf",
                 )
