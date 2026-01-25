@@ -2,8 +2,8 @@ from documents.tests.utils import TestMigrations
 
 
 class TestMigrateShareLinkBundlePermissions(TestMigrations):
-    migrate_from = "1074_workflowrun_deleted_at_workflowrun_restored_at_and_more"
-    migrate_to = "1075_sharelinkbundle"
+    migrate_from = "0004_remove_document_storage_type"
+    migrate_to = "0005_sharelinkbundle"
 
     def setUpBeforeMigration(self, apps):
         User = apps.get_model("auth", "User")
@@ -24,8 +24,8 @@ class TestMigrateShareLinkBundlePermissions(TestMigrations):
 
 
 class TestReverseMigrateShareLinkBundlePermissions(TestMigrations):
-    migrate_from = "1075_sharelinkbundle"
-    migrate_to = "1074_workflowrun_deleted_at_workflowrun_restored_at_and_more"
+    migrate_from = "0005_sharelinkbundle"
+    migrate_to = "0004_remove_document_storage_type"
 
     def setUpBeforeMigration(self, apps):
         User = apps.get_model("auth", "User")

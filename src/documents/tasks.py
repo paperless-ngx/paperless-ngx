@@ -632,6 +632,8 @@ def update_document_in_llm_index(document):
 def remove_document_from_llm_index(document):
     llm_index_remove_document(document)
 
+
+@shared_task
 def build_share_link_bundle(bundle_id: int):
     try:
         bundle = (
