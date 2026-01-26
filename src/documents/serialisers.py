@@ -2290,7 +2290,6 @@ class ShareLinkBundleSerializer(OwnedObjectSerializer):
     def create(self, validated_data):
         document_ids = validated_data.pop("document_ids")
         expiration_days = validated_data.pop("expiration_days", None)
-        documents = validated_data.pop("documents", None)
         validated_data["slug"] = get_random_string(50)
         if expiration_days:
             validated_data["expiration"] = timezone.now() + timedelta(
@@ -2301,15 +2300,11 @@ class ShareLinkBundleSerializer(OwnedObjectSerializer):
 
         share_link_bundle = super().create(validated_data)
 
-        if documents is None:
-            documents = list(
-                Document.objects.filter(pk__in=document_ids).only(
-                    "pk",
-                ),
-            )
-        else:
-            documents = list(documents)
-
+        documents = list(
+            Document.objects.filter(pk__in=document_ids).only(
+                "pk",
+            ),
+        )
         documents_by_id = {doc.pk: doc for doc in documents}
         missing = [
             str(doc_id) for doc_id in document_ids if doc_id not in documents_by_id
