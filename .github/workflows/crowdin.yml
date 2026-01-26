@@ -10,7 +10,7 @@ jobs:
   synchronize-with-crowdin:
     name: Crowdin Sync
     if: github.repository_owner == 'paperless-ngx'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout
         uses: actions/checkout@v6
