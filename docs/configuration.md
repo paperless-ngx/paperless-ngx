@@ -659,13 +659,19 @@ system. See the corresponding
 
 : Sync groups from the third party authentication system (e.g. OIDC) to Paperless-ngx. When enabled, users will be added or removed from groups based on their group membership in the third party authentication system. Groups must already exist in Paperless-ngx and have the same name as in the third party authentication system. Groups are updated upon logging in via the third party authentication system, see the corresponding [django-allauth documentation](https://docs.allauth.org/en/dev/socialaccount/signals.html).
 
-: In order to pass groups from the authentication system you will need to update your [PAPERLESS_SOCIALACCOUNT_PROVIDERS](#PAPERLESS_SOCIALACCOUNT_PROVIDERS) setting by adding a top-level "SCOPES" setting which includes "groups", e.g.:
+: In order to pass groups from the authentication system you will need to update your [PAPERLESS_SOCIALACCOUNT_PROVIDERS](#PAPERLESS_SOCIALACCOUNT_PROVIDERS) setting by adding a top-level "SCOPES" setting which includes "groups", or the custom groups claim configured in [`PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM`](#PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM) e.g.:
 
     ```json
     {"openid_connect":{"SCOPE": ["openid","profile","email","groups"]...
     ```
 
     Defaults to False
+
+#### [`PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM=<str>`](#PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM) {#PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM}
+
+: Allows you to define a custom groups claim. See [PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS](#PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS) which is required for this setting to take effect.
+
+    Defaults to "groups"
 
 #### [`PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS=<comma-separated-list>`](#PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS) {#PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS}
 
