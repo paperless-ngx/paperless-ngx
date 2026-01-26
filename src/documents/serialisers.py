@@ -1036,7 +1036,7 @@ def _get_viewable_duplicates(
         Document,
         include_deleted=True,
     )
-    return duplicates.filter(id__in=allowed.values_list("id", flat=True))
+    return duplicates.filter(id__in=allowed)
 
 
 class DuplicateDocumentSummarySerializer(serializers.Serializer):
