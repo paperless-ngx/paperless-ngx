@@ -156,7 +156,6 @@ class StoragePath(MatchingModel):
 
 
 class Document(SoftDeleteModel, ModelWithOwner):
-
     correspondent = models.ForeignKey(
         Correspondent,
         blank=True,
