@@ -171,7 +171,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
         tap((c) => {
           this.unfilteredData = c.results
           this.data = this.filterData(c.results)
-          this.collectionSize = c.count
+          this.collectionSize = c.all?.length ?? c.count
         }),
         delay(100)
       )
