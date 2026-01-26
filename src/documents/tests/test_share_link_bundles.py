@@ -156,57 +156,6 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
 
-    @mock.patch("documents.views.build_share_link_bundle.delay")
-    def test_download_failed_bundle_triggers_rebuild(self, delay_mock):
-        bundle_path = (
-            Path(settings.MEDIA_ROOT)
-            / "documents"
-            / "share_link_bundles"
-            / "failed.zip"
-        )
-        bundle_path.parent.mkdir(parents=True, exist_ok=True)
-        bundle_path.write_bytes(b"old-content")
-
-        bundle = ShareLinkBundle.objects.create(
-            slug="failedslug",
-            file_version=ShareLink.FileVersion.ARCHIVE,
-            status=ShareLinkBundle.Status.FAILED,
-            file_path=str(bundle_path.relative_to(settings.MEDIA_ROOT)),
-            last_error={"message": "Boom"},
-            size_bytes=10,
-        )
-        bundle.documents.set([self.document])
-
-        self.client.logout()
-        response = self.client.get(f"/share/{bundle.slug}/")
-
-        self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
-        bundle.refresh_from_db()
-        self.assertEqual(bundle.status, ShareLinkBundle.Status.PENDING)
-        self.assertIsNone(bundle.last_error)
-        self.assertIsNone(bundle.size_bytes)
-        self.assertEqual(bundle.file_path, "")
-        delay_mock.assert_called_once_with(bundle.pk)
-        self.assertFalse(bundle_path.exists())
-
-    @mock.patch("documents.views.build_share_link_bundle.delay")
-    def test_download_missing_file_triggers_rebuild(self, delay_mock):
-        bundle = ShareLinkBundle.objects.create(
-            slug="missingfileslug",
-            file_version=ShareLink.FileVersion.ARCHIVE,
-            status=ShareLinkBundle.Status.READY,
-            file_path=str(Path(self.dirs.media_dir) / "does-not-exist.zip"),
-        )
-        bundle.documents.set([self.document])
-
-        self.client.logout()
-        response = self.client.get(f"/share/{bundle.slug}/")
-
-        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
-        bundle.refresh_from_db()
-        self.assertEqual(bundle.status, ShareLinkBundle.Status.PENDING)
-        delay_mock.assert_called_once_with(bundle.pk)
-
     def test_expired_share_link_redirects(self):
         share_link = ShareLink.objects.create(
             slug="expiredlink",

@@ -2944,10 +2944,16 @@ class SharedLinkView(View):
         if bundle.expiration is not None and bundle.expiration < timezone.now():
             return HttpResponseRedirect("/accounts/login/?sharelink_expired=1")
 
-        if bundle.status in {
-            ShareLinkBundle.Status.PENDING,
-            ShareLinkBundle.Status.PROCESSING,
-        }:
+        file_path = bundle.absolute_file_path
+
+        if (
+            bundle.status
+            in {
+                ShareLinkBundle.Status.PENDING,
+                ShareLinkBundle.Status.PROCESSING,
+            }
+            or file_path is None
+        ):
             return HttpResponse(
                 _(
                     "The share link bundle is still being prepared. Please try again later.",
@@ -2956,51 +2962,11 @@ class SharedLinkView(View):
             )
 
         if bundle.status == ShareLinkBundle.Status.FAILED:
-            bundle.remove_file()
-            bundle.status = ShareLinkBundle.Status.PENDING
-            bundle.last_error = None
-            bundle.size_bytes = None
-            bundle.built_at = None
-            bundle.file_path = ""
-            bundle.save(
-                update_fields=[
-                    "status",
-                    "last_error",
-                    "size_bytes",
-                    "built_at",
-                    "file_path",
-                ],
-            )
-            build_share_link_bundle.delay(bundle.pk)
             return HttpResponse(
                 _(
-                    "The share link bundle is temporarily unavailable. A rebuild has been scheduled. Please try again later.",
+                    "The share link bundle is unavailable.",
                 ),
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
-            )
-
-        file_path = bundle.absolute_file_path
-        if file_path is None or not file_path.exists():
-            bundle.status = ShareLinkBundle.Status.PENDING
-            bundle.last_error = None
-            bundle.size_bytes = None
-            bundle.built_at = None
-            bundle.file_path = ""
-            bundle.save(
-                update_fields=[
-                    "status",
-                    "last_error",
-                    "size_bytes",
-                    "built_at",
-                    "file_path",
-                ],
-            )
-            build_share_link_bundle.delay(bundle.pk)
-            return HttpResponse(
-                _(
-                    "The share link bundle is being prepared. Please try again later.",
-                ),
-                status=status.HTTP_202_ACCEPTED,
             )
 
         response = FileResponse(file_path.open("rb"), content_type="application/zip")
