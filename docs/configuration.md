@@ -1152,8 +1152,9 @@ via the consumption directory, you can disable the consumer to save resources.
 
 #### [`PAPERLESS_CONSUMER_DELETE_DUPLICATES=<bool>`](#PAPERLESS_CONSUMER_DELETE_DUPLICATES) {#PAPERLESS_CONSUMER_DELETE_DUPLICATES}
 
-: When the consumer detects a duplicate document, it will not touch
-the original document. This default behavior can be changed here.
+: As of version 3.0 Paperless-ngx allows duplicate documents to be consumed by default, _except_ when
+this setting is enabled. When enabled, Paperless will check if a document with the same hash already
+exists in the system and delete the duplicate file from the consumption directory without consuming it.
 
     Defaults to false.
 

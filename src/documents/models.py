@@ -205,7 +205,6 @@ class Document(SoftDeleteModel, ModelWithOwner):
         _("checksum"),
         max_length=32,
         editable=False,
-        unique=True,
         help_text=_("The checksum of the original document."),
     )
 
