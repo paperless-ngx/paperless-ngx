@@ -647,7 +647,7 @@ def build_share_link_bundle(bundle_id: int):
 
     bundle.remove_file()
     bundle.status = ShareLinkBundle.Status.PROCESSING
-    bundle.last_error = ""
+    bundle.last_error = None
     bundle.size_bytes = None
     bundle.built_at = None
     bundle.file_path = ""
@@ -695,7 +695,7 @@ def build_share_link_bundle(bundle_id: int):
         bundle.size_bytes = final_path.stat().st_size
         bundle.status = ShareLinkBundle.Status.READY
         bundle.built_at = timezone.now()
-        bundle.last_error = ""
+        bundle.last_error = None
         bundle.save(
             update_fields=[
                 "file_path",
@@ -713,7 +713,12 @@ def build_share_link_bundle(bundle_id: int):
             exc,
         )
         bundle.status = ShareLinkBundle.Status.FAILED
-        bundle.last_error = str(exc)
+        bundle.last_error = {
+            "bundle_id": bundle_id,
+            "exception_type": exc.__class__.__name__,
+            "message": str(exc),
+            "timestamp": timezone.now().isoformat(),
+        }
         bundle.save(update_fields=["status", "last_error"])
         try:
             temp_zip_path.unlink()

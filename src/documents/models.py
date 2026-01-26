@@ -817,9 +817,11 @@ class ShareLinkBundle(SoftDeleteModel):
         null=True,
     )
 
-    last_error = models.TextField(
+    last_error = models.JSONField(
         _("last error"),
         blank=True,
+        null=True,
+        default=None,
     )
 
     file_path = models.CharField(

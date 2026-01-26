@@ -81,6 +81,7 @@ describe('ShareLinkBundleManageDialogComponent', () => {
       documents: [1],
       status: ShareLinkBundleStatus.Pending,
       file_version: FileVersion.Archive,
+      last_error: undefined,
       ...overrides,
     }) as ShareLinkBundleSummary
 

@@ -120,8 +120,10 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "last_error",
-                    models.TextField(
+                    models.JSONField(
                         blank=True,
+                        null=True,
+                        default=None,
                         verbose_name="last error",
                     ),
                 ),

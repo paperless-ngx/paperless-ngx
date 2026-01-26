@@ -2865,7 +2865,7 @@ class ShareLinkBundleViewSet(ModelViewSet, PassUserMixin):
         )
         bundle.remove_file()
         bundle.status = ShareLinkBundle.Status.PENDING
-        bundle.last_error = ""
+        bundle.last_error = None
         bundle.size_bytes = None
         bundle.built_at = None
         bundle.file_path = ""
@@ -2898,7 +2898,7 @@ class ShareLinkBundleViewSet(ModelViewSet, PassUserMixin):
             )
         bundle.remove_file()
         bundle.status = ShareLinkBundle.Status.PENDING
-        bundle.last_error = ""
+        bundle.last_error = None
         bundle.size_bytes = None
         bundle.built_at = None
         bundle.file_path = ""
@@ -2958,7 +2958,7 @@ class SharedLinkView(View):
         if bundle.status == ShareLinkBundle.Status.FAILED:
             bundle.remove_file()
             bundle.status = ShareLinkBundle.Status.PENDING
-            bundle.last_error = ""
+            bundle.last_error = None
             bundle.size_bytes = None
             bundle.built_at = None
             bundle.file_path = ""
@@ -2982,7 +2982,7 @@ class SharedLinkView(View):
         file_path = bundle.absolute_file_path
         if file_path is None or not file_path.exists():
             bundle.status = ShareLinkBundle.Status.PENDING
-            bundle.last_error = ""
+            bundle.last_error = None
             bundle.size_bytes = None
             bundle.built_at = None
             bundle.file_path = ""

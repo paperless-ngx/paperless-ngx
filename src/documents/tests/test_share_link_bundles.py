@@ -81,7 +81,7 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
             status=ShareLinkBundle.Status.FAILED,
         )
         bundle.documents.set([self.document])
-        bundle.last_error = "Something went wrong"
+        bundle.last_error = {"message": "Something went wrong"}
         bundle.size_bytes = 100
         bundle.file_path = "path/to/file.zip"
         bundle.save()
@@ -91,7 +91,7 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         bundle.refresh_from_db()
         self.assertEqual(bundle.status, ShareLinkBundle.Status.PENDING)
-        self.assertEqual(bundle.last_error, "")
+        self.assertIsNone(bundle.last_error)
         self.assertIsNone(bundle.size_bytes)
         self.assertEqual(bundle.file_path, "")
         delay_mock.assert_called_once_with(bundle.pk)
@@ -172,7 +172,7 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
             file_version=ShareLink.FileVersion.ARCHIVE,
             status=ShareLinkBundle.Status.FAILED,
             file_path=str(bundle_path.relative_to(settings.MEDIA_ROOT)),
-            last_error="Boom",
+            last_error={"message": "Boom"},
             size_bytes=10,
         )
         bundle.documents.set([self.document])
@@ -183,7 +183,7 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
         bundle.refresh_from_db()
         self.assertEqual(bundle.status, ShareLinkBundle.Status.PENDING)
-        self.assertEqual(bundle.last_error, "")
+        self.assertIsNone(bundle.last_error)
         self.assertIsNone(bundle.size_bytes)
         self.assertEqual(bundle.file_path, "")
         delay_mock.assert_called_once_with(bundle.pk)
@@ -335,7 +335,7 @@ class ShareLinkBundleBuildTaskTests(DirectoriesMixin, APITestCase):
 
         bundle.refresh_from_db()
         self.assertEqual(bundle.status, ShareLinkBundle.Status.READY)
-        self.assertEqual(bundle.last_error, "")
+        self.assertIsNone(bundle.last_error)
         self.assertIsNotNone(bundle.built_at)
         self.assertGreater(bundle.size_bytes or 0, 0)
         final_path = bundle.absolute_file_path
@@ -404,7 +404,9 @@ class ShareLinkBundleBuildTaskTests(DirectoriesMixin, APITestCase):
 
         bundle.refresh_from_db()
         self.assertEqual(bundle.status, ShareLinkBundle.Status.FAILED)
-        self.assertEqual(bundle.last_error, "zip failure")
+        self.assertIsInstance(bundle.last_error, dict)
+        self.assertEqual(bundle.last_error.get("message"), "zip failure")
+        self.assertEqual(bundle.last_error.get("exception_type"), "RuntimeError")
         scratch_zips = list(Path(settings.SCRATCH_DIR).glob("*.zip"))
         self.assertTrue(scratch_zips)
         for path in scratch_zips:

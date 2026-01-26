@@ -1,7 +1,7 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { CommonModule } from '@angular/common'
 import { Component, OnDestroy, OnInit, inject } from '@angular/core'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgbActiveModal, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, catchError, of, switchMap, takeUntil, timer } from 'rxjs'
 import { FileVersion } from 'src/app/data/share-link'
@@ -21,9 +21,11 @@ import { ConfirmButtonComponent } from '../confirm-button/confirm-button.compone
 @Component({
   selector: 'pngx-share-link-bundle-manage-dialog',
   templateUrl: './share-link-bundle-manage-dialog.component.html',
+  styleUrls: ['./share-link-bundle-manage-dialog.component.scss'],
   imports: [
     ConfirmButtonComponent,
     CommonModule,
+    NgbPopoverModule,
     NgxBootstrapIconsModule,
     FileSizePipe,
   ],

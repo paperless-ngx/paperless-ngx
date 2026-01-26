@@ -7,6 +7,13 @@ export enum ShareLinkBundleStatus {
   Failed = 'failed',
 }
 
+export type ShareLinkBundleError = {
+  bundle_id: number
+  message?: string
+  exception_type?: string
+  timestamp?: string
+}
+
 export interface ShareLinkBundleSummary {
   id: number
   slug: string
@@ -18,7 +25,7 @@ export interface ShareLinkBundleSummary {
   status: ShareLinkBundleStatus
   built_at?: string
   size_bytes?: number
-  last_error?: string
+  last_error?: ShareLinkBundleError
 }
 
 export interface ShareLinkBundleCreatePayload {

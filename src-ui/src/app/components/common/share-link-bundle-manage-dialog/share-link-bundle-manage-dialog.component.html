@@ -51,14 +51,39 @@
                 </td>
                 <td>
                   <div class="d-flex align-items-center gap-2">
+                    @if (bundle.status === statuses.Failed && bundle.last_error) {
+                      <button
+                        type="button"
+                        class="btn btn-link p-0 text-danger"
+                        [ngbPopover]="errorDetail"
+                        popoverClass="popover-sm"
+                        triggers="mouseover:mouseleave"
+                        placement="auto"
+                        aria-label="View error details"
+                        i18n-aria-label
+                      >
+                        <span class="badge text-bg-warning text-uppercase me-2">{{ statusLabel(bundle.status) }}</span>
+                        <i-bs name="exclamation-triangle-fill" class="text-warning"></i-bs>
+                      </button>
+                      <ng-template #errorDetail>
+                        @if (bundle.last_error.timestamp) {
+                          <div class="text-muted small mb-1">
+                            {{ bundle.last_error.timestamp | date: 'short' }}
+                          </div>
+                        }
+                        <h6>{{ bundle.last_error.exception_type || ($localize`Unknown error`) }}</h6>
+                        @if (bundle.last_error.message) {
+                          <pre class="text-muted small"><code>{{ bundle.last_error.message }}</code></pre>
+                        }
+                      </ng-template>
+                    }
                     @if (bundle.status === statuses.Processing || bundle.status === statuses.Pending) {
                       <span class="spinner-border spinner-border-sm" role="status"></span>
                     }
-                    <span class="badge text-bg-secondary text-uppercase">{{ statusLabel(bundle.status) }}</span>
+                    @if (bundle.status !== statuses.Failed) {
+                      <span class="badge text-bg-secondary text-uppercase">{{ statusLabel(bundle.status) }}</span>
+                    }
                   </div>
-                  @if (bundle.last_error && bundle.status === statuses.Failed) {
-                    <div class="small text-danger mt-1">{{ bundle.last_error }}</div>
-                  }
                 </td>
                 <td>
                   @if (bundle.size_bytes !== undefined && bundle.size_bytes !== null) {
