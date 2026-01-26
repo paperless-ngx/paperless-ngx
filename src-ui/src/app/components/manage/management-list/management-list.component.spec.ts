@@ -275,16 +275,16 @@ describe('ManagementListComponent', () => {
     expect(component.page).toEqual(1)
   })
 
-  it('should support toggle all items in view', () => {
+  it('should support toggle select page in vew', () => {
     expect(component.selectedObjects.size).toEqual(0)
-    const toggleAllSpy = jest.spyOn(component, 'toggleAll')
+    const selectPageSpy = jest.spyOn(component, 'selectPage')
     const checkButton = fixture.debugElement.queryAll(
       By.css('input.form-check-input')
     )[0]
-    checkButton.nativeElement.dispatchEvent(new Event('click'))
+    checkButton.nativeElement.dispatchEvent(new Event('change'))
     checkButton.nativeElement.checked = true
-    checkButton.nativeElement.dispatchEvent(new Event('click'))
-    expect(toggleAllSpy).toHaveBeenCalled()
+    checkButton.nativeElement.dispatchEvent(new Event('change'))
+    expect(selectPageSpy).toHaveBeenCalled()
     expect(component.selectedObjects.size).toEqual(tags.length)
   })
 
