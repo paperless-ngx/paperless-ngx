@@ -686,7 +686,7 @@ def build_share_link_bundle(bundle_id: int):
         final_path = (output_dir / f"{bundle.slug}.zip").resolve()
         if final_path.exists():
             final_path.unlink()
-        shutil.move(str(temp_zip_path), final_path)
+        shutil.move(temp_zip_path, final_path)
 
         try:
             bundle.file_path = str(final_path.relative_to(settings.MEDIA_ROOT))
