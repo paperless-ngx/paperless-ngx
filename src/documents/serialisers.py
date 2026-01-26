@@ -2299,8 +2299,11 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             "filter_has_all_tags",
             "filter_has_not_tags",
             "filter_custom_field_query",
+            "filter_has_any_correspondents",
             "filter_has_not_correspondents",
+            "filter_has_any_document_types",
             "filter_has_not_document_types",
+            "filter_has_any_storage_paths",
             "filter_has_not_storage_paths",
             "filter_has_correspondent",
             "filter_has_document_type",
@@ -2553,12 +2556,24 @@ class WorkflowSerializer(serializers.ModelSerializer):
                 filter_has_tags = trigger.pop("filter_has_tags", None)
                 filter_has_all_tags = trigger.pop("filter_has_all_tags", None)
                 filter_has_not_tags = trigger.pop("filter_has_not_tags", None)
+                filter_has_any_correspondents = trigger.pop(
+                    "filter_has_any_correspondents",
+                    None,
+                )
                 filter_has_not_correspondents = trigger.pop(
                     "filter_has_not_correspondents",
                     None,
                 )
+                filter_has_any_document_types = trigger.pop(
+                    "filter_has_any_document_types",
+                    None,
+                )
                 filter_has_not_document_types = trigger.pop(
                     "filter_has_not_document_types",
+                    None,
+                )
+                filter_has_any_storage_paths = trigger.pop(
+                    "filter_has_any_storage_paths",
                     None,
                 )
                 filter_has_not_storage_paths = trigger.pop(
@@ -2577,13 +2592,25 @@ class WorkflowSerializer(serializers.ModelSerializer):
                     trigger_instance.filter_has_all_tags.set(filter_has_all_tags)
                 if filter_has_not_tags is not None:
                     trigger_instance.filter_has_not_tags.set(filter_has_not_tags)
+                if filter_has_any_correspondents is not None:
+                    trigger_instance.filter_has_any_correspondents.set(
+                        filter_has_any_correspondents,
+                    )
                 if filter_has_not_correspondents is not None:
                     trigger_instance.filter_has_not_correspondents.set(
                         filter_has_not_correspondents,
                     )
+                if filter_has_any_document_types is not None:
+                    trigger_instance.filter_has_any_document_types.set(
+                        filter_has_any_document_types,
+                    )
                 if filter_has_not_document_types is not None:
                     trigger_instance.filter_has_not_document_types.set(
                         filter_has_not_document_types,
+                    )
+                if filter_has_any_storage_paths is not None:
+                    trigger_instance.filter_has_any_storage_paths.set(
+                        filter_has_any_storage_paths,
                     )
                 if filter_has_not_storage_paths is not None:
                     trigger_instance.filter_has_not_storage_paths.set(

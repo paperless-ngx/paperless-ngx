@@ -1278,6 +1278,76 @@ class TestWorkflows(
             )
             self.assertIn(expected_str, cm.output[1])
 
+    def test_document_added_any_filters(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        trigger.filter_has_any_correspondents.set([self.c])
+        trigger.filter_has_any_document_types.set([self.dt])
+        trigger.filter_has_any_storage_paths.set([self.sp])
+
+        matching_doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            document_type=self.dt,
+            storage_path=self.sp,
+            original_filename="sample.pdf",
+            checksum="checksum-any-match",
+        )
+
+        matched, reason = existing_document_matches_workflow(matching_doc, trigger)
+        self.assertTrue(matched)
+        self.assertIsNone(reason)
+
+        wrong_correspondent = Document.objects.create(
+            title="wrong correspondent",
+            correspondent=self.c2,
+            document_type=self.dt,
+            storage_path=self.sp,
+            original_filename="sample2.pdf",
+        )
+        matched, reason = existing_document_matches_workflow(
+            wrong_correspondent,
+            trigger,
+        )
+        self.assertFalse(matched)
+        self.assertIn("correspondent", reason)
+
+        other_document_type = DocumentType.objects.create(name="Other")
+        wrong_document_type = Document.objects.create(
+            title="wrong doc type",
+            correspondent=self.c,
+            document_type=other_document_type,
+            storage_path=self.sp,
+            original_filename="sample3.pdf",
+            checksum="checksum-wrong-doc-type",
+        )
+        matched, reason = existing_document_matches_workflow(
+            wrong_document_type,
+            trigger,
+        )
+        self.assertFalse(matched)
+        self.assertIn("doc type", reason)
+
+        other_storage_path = StoragePath.objects.create(
+            name="Other path",
+            path="/other/",
+        )
+        wrong_storage_path = Document.objects.create(
+            title="wrong storage",
+            correspondent=self.c,
+            document_type=self.dt,
+            storage_path=other_storage_path,
+            original_filename="sample4.pdf",
+            checksum="checksum-wrong-storage-path",
+        )
+        matched, reason = existing_document_matches_workflow(
+            wrong_storage_path,
+            trigger,
+        )
+        self.assertFalse(matched)
+        self.assertIn("storage path", reason)
+
     def test_document_added_custom_field_query_no_match(self):
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
@@ -1385,6 +1455,39 @@ class TestWorkflows(
         )
         self.assertIn(doc1, filtered)
         self.assertNotIn(doc2, filtered)
+
+    def test_prefilter_documents_any_filters(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        trigger.filter_has_any_correspondents.set([self.c])
+        trigger.filter_has_any_document_types.set([self.dt])
+        trigger.filter_has_any_storage_paths.set([self.sp])
+
+        allowed_document = Document.objects.create(
+            title="allowed",
+            correspondent=self.c,
+            document_type=self.dt,
+            storage_path=self.sp,
+            original_filename="doc-allowed.pdf",
+            checksum="checksum-any-allowed",
+        )
+        blocked_document = Document.objects.create(
+            title="blocked",
+            correspondent=self.c2,
+            document_type=self.dt,
+            storage_path=self.sp,
+            original_filename="doc-blocked.pdf",
+            checksum="checksum-any-blocked",
+        )
+
+        filtered = prefilter_documents_by_workflowtrigger(
+            Document.objects.all(),
+            trigger,
+        )
+
+        self.assertIn(allowed_document, filtered)
+        self.assertNotIn(blocked_document, filtered)
 
     def test_consumption_trigger_requires_filter_configuration(self):
         serializer = WorkflowTriggerSerializer(
