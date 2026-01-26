@@ -162,8 +162,7 @@ describe('ManagementListComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const createButton = fixture.debugElement.queryAll(By.css('button'))[4]
-    createButton.triggerEventHandler('click')
+    component.openCreateDialog()
 
     expect(modal).not.toBeUndefined()
     const editDialog = modal.componentInstance as EditDialogComponent<Tag>
@@ -186,8 +185,7 @@ describe('ManagementListComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const editButton = fixture.debugElement.queryAll(By.css('button'))[7]
-    editButton.triggerEventHandler('click')
+    component.openEditDialog(tags[0])
 
     expect(modal).not.toBeUndefined()
     const editDialog = modal.componentInstance as EditDialogComponent<Tag>
@@ -211,8 +209,7 @@ describe('ManagementListComponent', () => {
     const deleteSpy = jest.spyOn(tagService, 'delete')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[8]
-    deleteButton.triggerEventHandler('click')
+    component.openDeleteDialog(tags[0])
 
     expect(modal).not.toBeUndefined()
     const editDialog = modal.componentInstance as ConfirmDialogComponent
@@ -246,8 +243,7 @@ describe('ManagementListComponent', () => {
 
   it('should support quick filter for objects', () => {
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    const filterButton = fixture.debugElement.queryAll(By.css('button'))[9]
-    filterButton.triggerEventHandler('click')
+    component.filterDocuments(tags[0])
     expect(qfSpy).toHaveBeenCalledWith([
       { rule_type: FILTER_HAS_TAGS_ALL, value: tags[0].id.toString() },
     ]) // subclasses set the filter rule type
