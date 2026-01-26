@@ -6,7 +6,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "0005_workflowtrigger_filter_has_any_correspondents_and_more"),
+        ("documents", "0007_document_content_length"),
     ]
 
     operations = [
