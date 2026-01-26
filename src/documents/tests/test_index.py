@@ -180,7 +180,7 @@ class TestRewriteNaturalDateKeywords(SimpleTestCase):
             (
                 "added:this year",
                 datetime(2025, 7, 15, 12, 0, 0, tzinfo=timezone.utc),
-                ("added:[20250101", "TO 20250715"),
+                ("added:[20250101", "TO 20251231"),
             ),
             (
                 "added:previous year",
