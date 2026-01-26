@@ -3,7 +3,13 @@
     <h3 class="text-truncate d-flex align-items-center" style="line-height: 1.4">
       {{title}}
       @if (id) {
-        <span class="badge bg-primary text-primary-text-contrast ms-2 small fs-normal">ID: {{id}}</span>
+        <span class="badge bg-primary text-primary-text-contrast ms-2 small fs-normal cursor-pointer" (click)="copyID()">
+          @if (copied) {
+            <i-bs width="1em" height="1em" name="clipboard-check"></i-bs>&nbsp;<ng-container i18n>Copied!</ng-container>
+          } @else {
+            ID: {{id}}
+          }
+        </span>
       }
       @if (subTitle) {
         <span class="h6 mb-0 d-block d-md-inline fw-normal ms-md-3 text-truncate" style="line-height: 1.4">{{subTitle}}</span>

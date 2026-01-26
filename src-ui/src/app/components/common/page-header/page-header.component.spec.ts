@@ -1,3 +1,4 @@
+import { Clipboard } from '@angular/cdk/clipboard'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { Title } from '@angular/platform-browser'
 import { environment } from 'src/environments/environment'
@@ -7,6 +8,7 @@ describe('PageHeaderComponent', () => {
   let component: PageHeaderComponent
   let fixture: ComponentFixture<PageHeaderComponent>
   let titleService: Title
+  let clipboard: Clipboard
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -15,6 +17,7 @@ describe('PageHeaderComponent', () => {
     }).compileComponents()
 
     titleService = TestBed.inject(Title)
+    clipboard = TestBed.inject(Clipboard)
     fixture = TestBed.createComponent(PageHeaderComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
@@ -31,5 +34,17 @@ describe('PageHeaderComponent', () => {
     const titleSpy = jest.spyOn(titleService, 'setTitle')
     component.title = 'Foo Bar'
     expect(titleSpy).toHaveBeenCalledWith(`Foo Bar - ${environment.appTitle}`)
+  })
+
+  it('should copy id to clipboard, reset after 3 seconds', () => {
+    jest.useFakeTimers()
+    component.id = 42 as any
+    jest.spyOn(clipboard, 'copy').mockReturnValue(true)
+    component.copyID()
+    expect(clipboard.copy).toHaveBeenCalledWith('42')
+    expect(component.copied).toBe(true)
+
+    jest.advanceTimersByTime(3000)
+    expect(component.copied).toBe(false)
   })
 })
