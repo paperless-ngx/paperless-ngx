@@ -241,6 +241,10 @@ class TestExportImport(
                     checksum = hashlib.md5(f.read()).hexdigest()
                 self.assertEqual(checksum, element["fields"]["checksum"])
 
+                # Generated field "content_length" should not be exported,
+                # it is automatically computed during import.
+                self.assertNotIn("content_length", element["fields"])
+
                 if document_exporter.EXPORTER_ARCHIVE_NAME in element:
                     fname = (
                         self.target / element[document_exporter.EXPORTER_ARCHIVE_NAME]

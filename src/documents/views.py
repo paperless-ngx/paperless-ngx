@@ -35,7 +35,6 @@ from django.db.models import Model
 from django.db.models import Q
 from django.db.models import Sum
 from django.db.models import When
-from django.db.models.functions import Length
 from django.db.models.functions import Lower
 from django.db.models.manager import Manager
 from django.http import FileResponse
@@ -2332,23 +2331,19 @@ class StatisticsView(GenericAPIView):
         user = request.user if request.user is not None else None
 
         documents = (
-            (
-                Document.objects.all()
-                if user is None
-                else get_objects_for_user_owner_aware(
-                    user,
-                    "documents.view_document",
-                    Document,
-                )
+            Document.objects.all()
+            if user is None
+            else get_objects_for_user_owner_aware(
+                user,
+                "documents.view_document",
+                Document,
             )
-            .only("mime_type", "content")
-            .prefetch_related("tags")
         )
         tags = (
             Tag.objects.all()
             if user is None
             else get_objects_for_user_owner_aware(user, "documents.view_tag", Tag)
-        )
+        ).only("id", "is_inbox_tag")
         correspondent_count = (
             Correspondent.objects.count()
             if user is None
@@ -2377,31 +2372,33 @@ class StatisticsView(GenericAPIView):
             ).count()
         )
 
-        documents_total = documents.count()
-
-        inbox_tags = tags.filter(is_inbox_tag=True)
+        inbox_tag_pks = list(
+            tags.filter(is_inbox_tag=True).values_list("pk", flat=True),
+        )
 
         documents_inbox = (
-            documents.filter(tags__id__in=inbox_tags).distinct().count()
-            if inbox_tags.exists()
+            documents.filter(tags__id__in=inbox_tag_pks).values("id").distinct().count()
+            if inbox_tag_pks
             else None
         )
 
-        document_file_type_counts = (
+        # Single SQL request for document stats and mime type counts
+        mime_type_stats = list(
             documents.values("mime_type")
-            .annotate(mime_type_count=Count("mime_type"))
-            .order_by("-mime_type_count")
-            if documents_total > 0
-            else []
+            .annotate(
+                mime_type_count=Count("id"),
+                mime_type_chars=Sum("content_length"),
+            )
+            .order_by("-mime_type_count"),
         )
 
-        character_count = (
-            documents.annotate(
-                characters=Length("content"),
-            )
-            .aggregate(Sum("characters"))
-            .get("characters__sum")
-        )
+        # Calculate totals from grouped results
+        documents_total = sum(row["mime_type_count"] for row in mime_type_stats)
+        character_count = sum(row["mime_type_chars"] or 0 for row in mime_type_stats)
+        document_file_type_counts = [
+            {"mime_type": row["mime_type"], "mime_type_count": row["mime_type_count"]}
+            for row in mime_type_stats
+        ]
 
         current_asn = Document.objects.aggregate(
             Max("archive_serial_number", default=0),
@@ -2414,11 +2411,9 @@ class StatisticsView(GenericAPIView):
                 "documents_total": documents_total,
                 "documents_inbox": documents_inbox,
                 "inbox_tag": (
-                    inbox_tags.first().pk if inbox_tags.exists() else None
+                    inbox_tag_pks[0] if inbox_tag_pks else None
                 ),  # backwards compatibility
-                "inbox_tags": (
-                    [tag.pk for tag in inbox_tags] if inbox_tags.exists() else None
-                ),
+                "inbox_tags": (inbox_tag_pks if inbox_tag_pks else None),
                 "document_file_type_counts": document_file_type_counts,
                 "character_count": character_count,
                 "tag_count": len(tags),
