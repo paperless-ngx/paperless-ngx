@@ -303,6 +303,10 @@ export class DocumentDetailComponent
     return this.settings.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
   }
 
+  get hideAsn(): boolean {
+    return this.settings.get(SETTINGS_KEYS.UI_HIDE_ASN)
+  }
+
   get isMobile(): boolean {
     return this.deviceDetectorService.isMobile()
   }

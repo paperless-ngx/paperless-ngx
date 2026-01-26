@@ -1770,6 +1770,10 @@ started by the container.
     The logo file will be viewable by anyone with access to the Paperless instance login page,
     so consider your choice of logo carefully and removing exif data from images before uploading.
 
+#### [`PAPERLESS_UI_HIDE_ASN=<bool>`](#PAPERLESS_UI_HIDE_ASN) {#PAPERLESS_UI_HIDE_ASN}
+
+: If true, hides the Archive Serial Number (ASN) field in the document details screen.
+
 #### [`PAPERLESS_ENABLE_UPDATE_CHECK=<bool>`](#PAPERLESS_ENABLE_UPDATE_CHECK) {#PAPERLESS_ENABLE_UPDATE_CHECK}
 
 !!! note

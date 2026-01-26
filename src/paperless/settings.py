@@ -1319,6 +1319,7 @@ if ENABLE_UPDATE_CHECK != "default":
 
 APP_TITLE = os.getenv("PAPERLESS_APP_TITLE", None)
 APP_LOGO = os.getenv("PAPERLESS_APP_LOGO", None)
+UI_HIDE_ASN = __get_boolean("PAPERLESS_UI_HIDE_ASN", "NO")
 
 ###############################################################################
 # Machine Learning                                                            #

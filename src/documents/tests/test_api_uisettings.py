@@ -44,6 +44,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
                 "app_title": None,
                 "app_logo": None,
                 "auditlog_enabled": True,
+                "ui_hide_asn": False,
                 "trash_delay": 30,
                 "update_checking": {
                     "backend_setting": "default",

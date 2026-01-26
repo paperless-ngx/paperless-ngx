@@ -2561,6 +2561,7 @@ class UiSettingsView(GenericAPIView):
             ui_settings["app_logo"] = general_config.app_logo
 
         ui_settings["auditlog_enabled"] = settings.AUDIT_LOG_ENABLED
+        ui_settings["ui_hide_asn"] = settings.UI_HIDE_ASN
 
         if settings.GMAIL_OAUTH_ENABLED or settings.OUTLOOK_OAUTH_ENABLED:
             manager = PaperlessMailOAuth2Manager()

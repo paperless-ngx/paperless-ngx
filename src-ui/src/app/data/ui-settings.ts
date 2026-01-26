@@ -34,6 +34,7 @@ export const SETTINGS_KEYS = {
   DARK_MODE_THUMB_INVERTED: 'general-settings:dark-mode:thumb-inverted',
   THEME_COLOR: 'general-settings:theme:color',
   USE_NATIVE_PDF_VIEWER: 'general-settings:document-details:native-pdf-viewer',
+  UI_HIDE_ASN: 'general-settings:document-details:hide_asn',
   PDF_VIEWER_ZOOM_SETTING:
     'general-settings:document-details:pdf-viewer-zoom-setting',
   DATE_LOCALE: 'general-settings:date-display:date-locale',
@@ -132,6 +133,11 @@ export const SETTINGS: UiSetting[] = [
   },
   {
     key: SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER,
+    type: 'boolean',
+    default: false,
+  },
+  {
+    key: SETTINGS_KEYS.UI_HIDE_ASN,
     type: 'boolean',
     default: false,
   },
