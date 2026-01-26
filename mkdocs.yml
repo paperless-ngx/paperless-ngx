@@ -69,8 +69,9 @@ nav:
   - development.md
   - 'FAQs': faq.md
   - troubleshooting.md
+  - 'Migration to v3': migration.md
   - changelog.md
-copyright: Copyright &copy; 2016 - 2023 Daniel Quinn, Jonas Winkler, and the Paperless-ngx team
+copyright: Copyright &copy; 2016 - 2026 Daniel Quinn, Jonas Winkler, and the Paperless-ngx team
 extra:
   social:
     - icon: fontawesome/brands/github

@@ -1,4 +1,6 @@
 import os
+import shutil
+import tempfile
 from pathlib import Path
 from unittest import mock
 
@@ -16,9 +18,19 @@ class TestSystemStatus(APITestCase):
     ENDPOINT = "/api/status/"
 
     def setUp(self):
+        super().setUp()
         self.user = User.objects.create_superuser(
             username="temp_admin",
         )
+        self.tmp_dir = Path(tempfile.mkdtemp())
+        self.override = override_settings(MEDIA_ROOT=self.tmp_dir)
+        self.override.enable()
+
+    def tearDown(self):
+        super().tearDown()
+
+        self.override.disable()
+        shutil.rmtree(self.tmp_dir)
 
     def test_system_status(self):
         """

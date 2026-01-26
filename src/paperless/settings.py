@@ -345,6 +345,7 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.mfa",
+    "allauth.headless",
     "drf_spectacular",
     "drf_spectacular_sidecar",
     "treenode",
@@ -543,6 +544,8 @@ SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM: Final[str] = os.getenv(
     "PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM",
     "groups",
 )
+
+HEADLESS_TOKEN_STRATEGY = "paperless.adapter.DrfTokenStrategy"
 
 MFA_TOTP_ISSUER = "Paperless-ngx"
 
@@ -1048,29 +1051,30 @@ IGNORABLE_FILES: Final[list[str]] = [
     "Thumbs.db",
 ]
 
-CONSUMER_POLLING = int(os.getenv("PAPERLESS_CONSUMER_POLLING", 0))
+CONSUMER_POLLING_INTERVAL = float(os.getenv("PAPERLESS_CONSUMER_POLLING_INTERVAL", 0))
 
-CONSUMER_POLLING_DELAY = int(os.getenv("PAPERLESS_CONSUMER_POLLING_DELAY", 5))
-
-CONSUMER_POLLING_RETRY_COUNT = int(
-    os.getenv("PAPERLESS_CONSUMER_POLLING_RETRY_COUNT", 5),
-)
-
-CONSUMER_INOTIFY_DELAY: Final[float] = __get_float(
-    "PAPERLESS_CONSUMER_INOTIFY_DELAY",
-    0.5,
-)
+CONSUMER_STABILITY_DELAY = float(os.getenv("PAPERLESS_CONSUMER_STABILITY_DELAY", 5))
 
 CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES")
 
 CONSUMER_RECURSIVE = __get_boolean("PAPERLESS_CONSUMER_RECURSIVE")
 
-# Ignore glob patterns, relative to PAPERLESS_CONSUMPTION_DIR
+# Ignore regex patterns, matched against filename only
 CONSUMER_IGNORE_PATTERNS = list(
     json.loads(
         os.getenv(
             "PAPERLESS_CONSUMER_IGNORE_PATTERNS",
-            json.dumps(IGNORABLE_FILES),
+            json.dumps([]),
+        ),
+    ),
+)
+
+# Directories to always ignore.  These are matched by directory name, not full path
+CONSUMER_IGNORE_DIRS = list(
+    json.loads(
+        os.getenv(
+            "PAPERLESS_CONSUMER_IGNORE_DIRS",
+            json.dumps([]),
         ),
     ),
 )
@@ -1205,19 +1209,6 @@ EMAIL_PARSE_DEFAULT_LAYOUT = __get_int(
     "PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT",
     1,  # MailRule.PdfLayout.TEXT_HTML but that can't be imported here
 )
-
-# Pre-2.x versions of Paperless stored your documents locally with GPG
-# encryption, but that is no longer the default.  This behaviour is still
-# available, but it must be explicitly enabled by setting
-# `PAPERLESS_PASSPHRASE` in your environment or config file.  The default is to
-# store these files unencrypted.
-#
-# Translation:
-# * If you're a new user, you can safely ignore this setting.
-# * If you're upgrading from 1.x, this must be set, OR you can run
-#   `./manage.py change_storage_type gpg unencrypted` to decrypt your files,
-#   after which you can unset this value.
-PASSPHRASE = os.getenv("PAPERLESS_PASSPHRASE")
 
 # Trigger a script after every successful document consumption?
 PRE_CONSUME_SCRIPT = os.getenv("PAPERLESS_PRE_CONSUME_SCRIPT")

@@ -3,12 +3,15 @@ from urllib.parse import quote
 
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.core import context
+from allauth.headless.tokens.sessions import SessionTokenStrategy
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.forms import ValidationError
+from django.http import HttpRequest
 from django.urls import reverse
+from rest_framework.authtoken.models import Token
 
 from documents.models import Document
 from paperless.signals import handle_social_account_updated
@@ -159,3 +162,11 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             exception,
             extra_context,
         )
+
+
+class DrfTokenStrategy(SessionTokenStrategy):
+    def create_access_token(self, request: HttpRequest) -> str | None:
+        if not request.user.is_authenticated:
+            return None
+        token, _ = Token.objects.get_or_create(user=request.user)
+        return token.key

@@ -154,13 +154,6 @@ class StoragePath(MatchingModel):
 
 
 class Document(SoftDeleteModel, ModelWithOwner):
-    STORAGE_TYPE_UNENCRYPTED = "unencrypted"
-    STORAGE_TYPE_GPG = "gpg"
-    STORAGE_TYPES = (
-        (STORAGE_TYPE_UNENCRYPTED, _("Unencrypted")),
-        (STORAGE_TYPE_GPG, _("Encrypted with GNU Privacy Guard")),
-    )
-
     correspondent = models.ForeignKey(
         Correspondent,
         blank=True,
@@ -248,14 +241,6 @@ class Document(SoftDeleteModel, ModelWithOwner):
         auto_now=True,
         editable=False,
         db_index=True,
-    )
-
-    storage_type = models.CharField(
-        _("storage type"),
-        max_length=11,
-        choices=STORAGE_TYPES,
-        default=STORAGE_TYPE_UNENCRYPTED,
-        editable=False,
     )
 
     added = models.DateTimeField(
@@ -353,12 +338,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
 
     @property
     def source_path(self) -> Path:
-        if self.filename:
-            fname = str(self.filename)
-        else:
-            fname = f"{self.pk:07}{self.file_type}"
-            if self.storage_type == self.STORAGE_TYPE_GPG:
-                fname += ".gpg"  # pragma: no cover
+        fname = str(self.filename) if self.filename else f"{self.pk:07}{self.file_type}"
 
         return (settings.ORIGINALS_DIR / Path(fname)).resolve()
 
@@ -407,8 +387,6 @@ class Document(SoftDeleteModel, ModelWithOwner):
     @property
     def thumbnail_path(self) -> Path:
         webp_file_name = f"{self.pk:07}.webp"
-        if self.storage_type == self.STORAGE_TYPE_GPG:
-            webp_file_name += ".gpg"
 
         webp_file_path = settings.THUMBNAIL_DIR / Path(webp_file_name)
 
@@ -1088,6 +1066,13 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has this document type"),
     )
 
+    filter_has_any_document_types = models.ManyToManyField(
+        DocumentType,
+        blank=True,
+        related_name="workflowtriggers_has_any_document_type",
+        verbose_name=_("has one of these document types"),
+    )
+
     filter_has_not_document_types = models.ManyToManyField(
         DocumentType,
         blank=True,
@@ -1110,12 +1095,26 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("does not have these correspondent(s)"),
     )
 
+    filter_has_any_correspondents = models.ManyToManyField(
+        Correspondent,
+        blank=True,
+        related_name="workflowtriggers_has_any_correspondent",
+        verbose_name=_("has one of these correspondents"),
+    )
+
     filter_has_storage_path = models.ForeignKey(
         StoragePath,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
         verbose_name=_("has this storage path"),
+    )
+
+    filter_has_any_storage_paths = models.ManyToManyField(
+        StoragePath,
+        blank=True,
+        related_name="workflowtriggers_has_any_storage_path",
+        verbose_name=_("has one of these storage paths"),
     )
 
     filter_has_not_storage_paths = models.ManyToManyField(

@@ -27,7 +27,7 @@ dependencies = [
   # WARNING: django does not use semver.
   #          Only patch versions are guaranteed to not introduce breaking changes.
   "django~=5.2.5",
-  "django-allauth[mfa,socialaccount]~=65.12.1",
+  "django-allauth[mfa,socialaccount]~=65.13.1",
   "django-auditlog~=3.4.1",
   "django-cachalot~=2.8.0",
   "django-celery-results~=2.6.0",
@@ -50,7 +50,6 @@ dependencies = [
   "gotenberg-client~=0.13.1",
   "httpx-oauth~=0.16",
   "imap-tools~=1.11.0",
-  "inotifyrecursive~=0.3",
   "jinja2~=3.1.5",
   "langdetect~=1.0.9",
   "llama-index-core>=0.14.12",
@@ -79,7 +78,7 @@ dependencies = [
   "tika-client~=0.10.0",
   "torch~=2.9.1",
   "tqdm~=4.67.1",
-  "watchdog~=6.0",
+  "watchfiles>=1.1.1",
   "whitenoise~=6.9",
   "whoosh-reloaded>=2.7.5",
   "zxing-cpp~=2.3.0",
@@ -258,7 +257,7 @@ lint.isort.force-single-line = true
 
 [tool.codespell]
 write-changes = true
-ignore-words-list = "criterias,afterall,valeu,ureue,equest,ure,assertIn,Oktober"
+ignore-words-list = "criterias,afterall,valeu,ureue,equest,ure,assertIn,Oktober,commitish"
 skip = "src-ui/src/locale/*,src-ui/pnpm-lock.yaml,src-ui/e2e/*,src/paperless_mail/tests/samples/*,src/documents/tests/samples/*,*.po,*.json"
 
 [tool.pytest.ini_options]
