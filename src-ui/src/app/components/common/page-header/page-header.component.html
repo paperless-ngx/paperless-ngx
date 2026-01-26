@@ -10,7 +10,9 @@
         }
       </span>
       @if (subTitle) {
-        <span class="h6 mb-0 d-block d-md-inline fw-normal ms-md-3 text-truncate" style="line-height: 1.4">{{subTitle}}</span>
+        <span class="h6 mb-0 d-block d-md-inline fw-normal ms-md-3 text-truncate" style="line-height: 1.4">
+          {{subTitle}}
+        </span>
       }
       @if (info) {
         <button class="btn btn-sm btn-link text-muted me-auto p-0 p-md-2" title="What's this?" i18n-title type="button" [ngbPopover]="infoPopover" [autoClose]="true">
