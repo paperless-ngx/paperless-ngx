@@ -30,6 +30,9 @@ export class PageHeaderComponent {
   subTitle: string = ''
 
   @Input()
+  id?: number
+
+  @Input()
   info: string
 
   @Input()
