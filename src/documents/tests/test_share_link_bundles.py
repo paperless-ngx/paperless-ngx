@@ -315,21 +315,6 @@ class ShareLinkBundleBuildTaskTests(DirectoriesMixin, APITestCase):
         self.assertTrue(final_path.exists())
         self.assertNotEqual(final_path.read_bytes(), b"old")
 
-    def test_build_share_link_bundle_stores_absolute_path_outside_media_root(self):
-        settings.SHARE_LINK_BUNDLE_DIR = Path(settings.DATA_DIR) / "share_link_bundles"
-        self._write_document_file(archive=False, content=b"source")
-        bundle = ShareLinkBundle.objects.create(
-            slug="outside-media",
-            file_version=ShareLink.FileVersion.ORIGINAL,
-        )
-        bundle.documents.set([self.document])
-
-        build_share_link_bundle(bundle.pk)
-
-        bundle.refresh_from_db()
-        self.assertTrue(Path(bundle.file_path).is_absolute())
-        self.assertEqual(bundle.status, ShareLinkBundle.Status.READY)
-
     def test_build_share_link_bundle_failure_marks_failed(self):
         self._write_document_file(archive=False, content=b"source")
         bundle = ShareLinkBundle.objects.create(
@@ -421,7 +406,7 @@ class ShareLinkBundleFilterSetTests(DirectoriesMixin, APITestCase):
 
 class ShareLinkBundleModelTests(DirectoriesMixin, APITestCase):
     def test_absolute_file_path_handles_relative_and_absolute(self):
-        relative_path = Path("documents/share_link_bundles/relative.zip")
+        relative_path = Path("relative.zip")
         bundle = ShareLinkBundle.objects.create(
             slug="relative-bundle",
             file_version=ShareLink.FileVersion.ORIGINAL,
@@ -430,7 +415,7 @@ class ShareLinkBundleModelTests(DirectoriesMixin, APITestCase):
 
         self.assertEqual(
             bundle.absolute_file_path,
-            (Path(settings.MEDIA_ROOT) / relative_path).resolve(),
+            (settings.SHARE_LINK_BUNDLE_DIR / relative_path).resolve(),
         )
 
         absolute_path = Path(self.dirs.media_dir) / "absolute.zip"
@@ -447,18 +432,13 @@ class ShareLinkBundleModelTests(DirectoriesMixin, APITestCase):
         self.assertIn("string-slug", str(bundle))
 
     def test_remove_file_deletes_existing_file(self):
-        bundle_path = (
-            Path(settings.MEDIA_ROOT)
-            / "documents"
-            / "share_link_bundles"
-            / "remove.zip"
-        )
+        bundle_path = settings.SHARE_LINK_BUNDLE_DIR / "remove.zip"
         bundle_path.parent.mkdir(parents=True, exist_ok=True)
         bundle_path.write_bytes(b"remove-me")
         bundle = ShareLinkBundle.objects.create(
             slug="remove-bundle",
             file_version=ShareLink.FileVersion.ORIGINAL,
-            file_path=str(bundle_path.relative_to(settings.MEDIA_ROOT)),
+            file_path=str(bundle_path.relative_to(settings.SHARE_LINK_BUNDLE_DIR)),
         )
 
         bundle.remove_file()
@@ -466,18 +446,13 @@ class ShareLinkBundleModelTests(DirectoriesMixin, APITestCase):
         self.assertFalse(bundle_path.exists())
 
     def test_remove_file_handles_oserror(self):
-        bundle_path = (
-            Path(settings.MEDIA_ROOT)
-            / "documents"
-            / "share_link_bundles"
-            / "remove-error.zip"
-        )
+        bundle_path = settings.SHARE_LINK_BUNDLE_DIR / "remove-error.zip"
         bundle_path.parent.mkdir(parents=True, exist_ok=True)
         bundle_path.write_bytes(b"remove-me")
         bundle = ShareLinkBundle.objects.create(
             slug="remove-error",
             file_version=ShareLink.FileVersion.ORIGINAL,
-            file_path=str(bundle_path.relative_to(settings.MEDIA_ROOT)),
+            file_path=str(bundle_path.relative_to(settings.SHARE_LINK_BUNDLE_DIR)),
         )
 
         with mock.patch("pathlib.Path.unlink", side_effect=OSError("fail")):
@@ -486,18 +461,13 @@ class ShareLinkBundleModelTests(DirectoriesMixin, APITestCase):
         self.assertTrue(bundle_path.exists())
 
     def test_delete_calls_remove_file(self):
-        bundle_path = (
-            Path(settings.MEDIA_ROOT)
-            / "documents"
-            / "share_link_bundles"
-            / "delete.zip"
-        )
+        bundle_path = settings.SHARE_LINK_BUNDLE_DIR / "delete.zip"
         bundle_path.parent.mkdir(parents=True, exist_ok=True)
         bundle_path.write_bytes(b"remove-me")
         bundle = ShareLinkBundle.objects.create(
             slug="delete-bundle",
             file_version=ShareLink.FileVersion.ORIGINAL,
-            file_path=str(bundle_path.relative_to(settings.MEDIA_ROOT)),
+            file_path=str(bundle_path.relative_to(settings.SHARE_LINK_BUNDLE_DIR)),
         )
 
         bundle.delete()

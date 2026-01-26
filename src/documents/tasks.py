@@ -688,10 +688,7 @@ def build_share_link_bundle(bundle_id: int):
             final_path.unlink()
         shutil.move(temp_zip_path, final_path)
 
-        try:
-            bundle.file_path = str(final_path.relative_to(settings.MEDIA_ROOT))
-        except ValueError:
-            bundle.file_path = str(final_path)
+        bundle.file_path = f"{bundle.slug}.zip"
         bundle.size_bytes = final_path.stat().st_size
         bundle.status = ShareLinkBundle.Status.READY
         bundle.built_at = timezone.now()

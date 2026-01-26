@@ -850,9 +850,9 @@ class ShareLinkBundle(models.Model):
         if not self.file_path:
             return None
         file_path = Path(self.file_path)
-        if not file_path.is_absolute():
-            file_path = (settings.MEDIA_ROOT / file_path).resolve()
-        return file_path
+        if file_path.is_absolute():
+            return file_path
+        return (settings.SHARE_LINK_BUNDLE_DIR / file_path).resolve()
 
     def remove_file(self):
         path = self.absolute_file_path
