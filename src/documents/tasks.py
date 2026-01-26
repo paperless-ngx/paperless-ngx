@@ -721,7 +721,10 @@ def build_share_link_bundle(bundle_id: int):
             pass
         raise
     finally:
-        temp_zip_path.unlink(missing_ok=True)
+        try:
+            temp_zip_path.unlink(missing_ok=True)
+        except OSError:
+            pass
 
 
 @shared_task
