@@ -278,7 +278,7 @@ class ShareLinkBundleTaskTests(DirectoriesMixin, APITestCase):
 
         with mock.patch.object(
             ShareLinkBundle,
-            "hard_delete",
+            "delete",
             side_effect=RuntimeError("fail"),
         ):
             with self.assertLogs("paperless.tasks", level="WARNING") as logs:
@@ -536,7 +536,7 @@ class ShareLinkBundleModelTests(DirectoriesMixin, APITestCase):
 
         self.assertTrue(bundle_path.exists())
 
-    def test_delete_and_hard_delete_call_remove_file(self):
+    def test_delete_calls_remove_file(self):
         bundle_path = (
             Path(settings.MEDIA_ROOT)
             / "documents"
@@ -553,23 +553,6 @@ class ShareLinkBundleModelTests(DirectoriesMixin, APITestCase):
 
         bundle.delete()
         self.assertFalse(bundle_path.exists())
-
-        bundle2_path = (
-            Path(settings.MEDIA_ROOT)
-            / "documents"
-            / "share_link_bundles"
-            / "harddelete.zip"
-        )
-        bundle2_path.parent.mkdir(parents=True, exist_ok=True)
-        bundle2_path.write_bytes(b"remove-me")
-        bundle2 = ShareLinkBundle.objects.create(
-            slug="harddelete-bundle",
-            file_version=ShareLink.FileVersion.ORIGINAL,
-            file_path=str(bundle2_path.relative_to(settings.MEDIA_ROOT)),
-        )
-
-        bundle2.hard_delete()
-        self.assertFalse(bundle2_path.exists())
 
 
 class ShareLinkBundleSerializerTests(DirectoriesMixin, APITestCase):

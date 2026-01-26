@@ -154,18 +154,6 @@ class Migration(migrations.Migration):
                         verbose_name="owner",
                     ),
                 ),
-                (
-                    "deleted_at",
-                    models.DateTimeField(blank=True, null=True),
-                ),
-                (
-                    "restored_at",
-                    models.DateTimeField(blank=True, null=True),
-                ),
-                (
-                    "transaction_id",
-                    models.UUIDField(blank=True, null=True),
-                ),
             ],
             options={
                 "ordering": ("-created",),

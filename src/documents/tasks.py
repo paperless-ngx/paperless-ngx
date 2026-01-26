@@ -736,7 +736,6 @@ def build_share_link_bundle(bundle_id: int):
 def cleanup_expired_share_link_bundles():
     now = timezone.now()
     expired_qs = ShareLinkBundle.objects.filter(
-        deleted_at__isnull=True,
         expiration__isnull=False,
         expiration__lt=now,
     )
@@ -744,7 +743,7 @@ def cleanup_expired_share_link_bundles():
     for bundle in expired_qs.iterator():
         count += 1
         try:
-            bundle.hard_delete()
+            bundle.delete()
         except Exception as exc:
             logger.warning(
                 "Failed to delete expired share link bundle %s: %s",

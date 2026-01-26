@@ -755,17 +755,12 @@ class ShareLink(SoftDeleteModel):
         return f"Share Link for {self.document.title}"
 
 
-class ShareLinkBundle(SoftDeleteModel):
+class ShareLinkBundle(models.Model):
     class Status(models.TextChoices):
         PENDING = ("pending", _("Pending"))
         PROCESSING = ("processing", _("Processing"))
         READY = ("ready", _("Ready"))
         FAILED = ("failed", _("Failed"))
-
-    class Meta:
-        ordering = ("-created",)
-        verbose_name = _("share link bundle")
-        verbose_name_plural = _("share link bundles")
 
     created = models.DateTimeField(
         _("created"),
@@ -842,6 +837,11 @@ class ShareLinkBundle(SoftDeleteModel):
         verbose_name=_("documents"),
     )
 
+    class Meta:
+        ordering = ("-created",)
+        verbose_name = _("share link bundle")
+        verbose_name_plural = _("share link bundles")
+
     def __str__(self):
         return _("Share link bundle %(slug)s") % {"slug": self.slug}
 
@@ -865,10 +865,6 @@ class ShareLinkBundle(SoftDeleteModel):
     def delete(self, using=None, *, keep_parents=False):
         self.remove_file()
         return super().delete(using=using, keep_parents=keep_parents)
-
-    def hard_delete(self, using=None, *, keep_parents=False):
-        self.remove_file()
-        return super().hard_delete(using=using, keep_parents=keep_parents)
 
 
 class CustomField(models.Model):
