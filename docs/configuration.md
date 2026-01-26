@@ -170,11 +170,18 @@ Available options are `postgresql` and `mariadb`.
 
     !!! note
 
-        A small pool is typically sufficient — for example, a size of 4.
-        Make sure your PostgreSQL server's max_connections setting is large enough to handle:
-        ```(Paperless workers + Celery workers) × pool size + safety margin```
-        For example, with 4 Paperless workers and 2 Celery workers, and a pool size of 4:
-        (4 + 2) × 4 + 10 = 34 connections required.
+        A pool of 8-10 connections per worker is typically sufficient.
+        If you encounter error messages such as `couldn't get a connection`
+        or database connection timeouts, you probably need to increase the pool size.
+
+    !!! warning
+        Make sure your PostgreSQL `max_connections` setting is large enough to handle the connection pools:
+        `(NB_PAPERLESS_WORKERS + NB_CELERY_WORKERS) × POOL_SIZE + SAFETY_MARGIN`. For example, with
+        4 Paperless workers and 2 Celery workers, and a pool size of 8:``(4 + 2) × 8 + 10 = 58`,
+        so `max_connections = 60` (or even more) is appropriate.
+
+        This assumes only Paperless-ngx connects to your PostgreSQL instance. If you have other applications,
+        you should increase `max_connections` accordingly.
 
 #### [`PAPERLESS_DB_READ_CACHE_ENABLED=<bool>`](#PAPERLESS_DB_READ_CACHE_ENABLED) {#PAPERLESS_DB_READ_CACHE_ENABLED}
 
@@ -980,21 +987,10 @@ paperless will process in parallel on a single document.
         process very large documents faster, use a higher thread per worker
         count.
 
-    The default is a balance between the two, according to your CPU core
-    count, with a slight favor towards threads per worker:
-
-    | CPU core count | Workers | Threads |
-    | -------------- | ------- | ------- |
-    | > 1            | > 1     | > 1     |
-    | > 2            | > 2     | > 1     |
-    | > 4            | > 2     | > 2     |
-    | > 6            | > 2     | > 3     |
-    | > 8            | > 2     | > 4     |
-    | > 12           | > 3     | > 4     |
-    | > 16           | > 4     | > 4     |
-
-    If you only specify PAPERLESS_TASK_WORKERS, paperless will adjust
-    PAPERLESS_THREADS_PER_WORKER automatically.
+    If unset, paperless uses `max(floor(cpu_count / PAPERLESS_TASK_WORKERS), 1)`
+    threads per worker. The idea behind this is that as long as there are enough cores,
+    the total number of threads should less than or equal to the total number of (logical)
+    CPU cores.
 
 #### [`PAPERLESS_WORKER_TIMEOUT=<num>`](#PAPERLESS_WORKER_TIMEOUT) {#PAPERLESS_WORKER_TIMEOUT}
 
@@ -1018,7 +1014,7 @@ still perform some basic text pre-processing before matching.
 
 : See also `PAPERLESS_NLTK_DIR`.
 
-    Defaults to 1.
+    Defaults to true, enabling the feature.
 
 #### [`PAPERLESS_DATE_PARSER_LANGUAGES=<lang>`](#PAPERLESS_DATE_PARSER_LANGUAGES) {#PAPERLESS_DATE_PARSER_LANGUAGES}
 
@@ -1065,17 +1061,27 @@ should be a valid crontab(5) expression describing when to run.
 
 #### [`PAPERLESS_SANITY_TASK_CRON=<cron expression>`](#PAPERLESS_SANITY_TASK_CRON) {#PAPERLESS_SANITY_TASK_CRON}
 
-: Configures the scheduled sanity checker frequency.
+: Configures the scheduled sanity checker frequency. The value should be a
+valid crontab(5) expression describing when to run.
 
 : If set to the string "disable", the sanity checker will not run automatically.
 
     Defaults to `30 0 * * sun` or Sunday at 30 minutes past midnight.
 
+#### [`PAPERLESS_WORKFLOW_SCHEDULED_TASK_CRON=<cron expression>`](#PAPERLESS_WORKFLOW_SCHEDULED_TASK_CRON) {#PAPERLESS_WORKFLOW_SCHEDULED_TASK_CRON}
+
+: Configures the scheduled workflow check frequency. The value should be a
+valid crontab(5) expression describing when to run.
+
+: If set to the string "disable", scheduled workflows will not run.
+
+    Defaults to `5 */1 * * *` or every hour at 5 minutes past the hour.
+
 #### [`PAPERLESS_ENABLE_COMPRESSION=<bool>`](#PAPERLESS_ENABLE_COMPRESSION) {#PAPERLESS_ENABLE_COMPRESSION}
 
 : Enables compression of the responses from the webserver.
 
-: Defaults to 1, enabling compression.
+: Defaults to true, enabling compression.
 
     !!! note
 
@@ -1169,21 +1175,45 @@ don't exist yet.
 
 #### [`PAPERLESS_CONSUMER_IGNORE_PATTERNS=<json>`](#PAPERLESS_CONSUMER_IGNORE_PATTERNS) {#PAPERLESS_CONSUMER_IGNORE_PATTERNS}
 
-: By default, paperless ignores certain files and folders in the
-consumption directory, such as system files created by the Mac OS
-or hidden folders some tools use to store data.
+: Additional regex patterns for files to ignore in the consumption directory. Patterns are matched against filenames only (not full paths)
+using Python's `re.match()`, which anchors at the start of the filename.
 
-    This can be adjusted by configuring a custom json array with
-    patterns to exclude.
+    See the [watchfiles documentation](https://watchfiles.helpmanual.io/api/filters/#watchfiles.BaseFilter.ignore_entity_patterns)
 
-    For example, `.DS_STORE/*` will ignore any files found in a folder
-    named `.DS_STORE`, including `.DS_STORE/bar.pdf` and `foo/.DS_STORE/bar.pdf`
+    This setting is for additional patterns beyond the built-in defaults. Common system files and directories are already ignored automatically.
+    The patterns will be compiled via Python's standard `re` module.
 
-    A pattern like `._*` will ignore anything starting with `._`, including:
-    `._foo.pdf` and `._bar/foo.pdf`
+    Example custom patterns:
 
-    Defaults to
-    `[".DS_Store", ".DS_STORE", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini", "@eaDir/*", "Thumbs.db"]`.
+    ```json
+    ["^temp_", "\\.bak$", "^~"]
+    ```
+
+    This would ignore:
+
+    - Files starting with `temp_` (e.g., `temp_scan.pdf`)
+    - Files ending with `.bak` (e.g., `document.pdf.bak`)
+    - Files starting with `~` (e.g., `~$document.docx`)
+
+    Defaults to `[]` (empty list, uses only built-in defaults).
+
+    The default ignores are `[.DS_Store, .DS_STORE, ._*, desktop.ini, Thumbs.db]` and cannot be overridden.
+
+#### [`PAPERLESS_CONSUMER_IGNORE_DIRS=<json>`](#PAPERLESS_CONSUMER_IGNORE_DIRS) {#PAPERLESS_CONSUMER_IGNORE_DIRS}
+
+: Additional directory names to ignore in the consumption directory. Directories matching these names (and all their contents) will be skipped.
+
+    This setting is for additional directories beyond the built-in defaults. Matching is done by directory name only, not full path.
+
+    Example:
+
+    ```json
+    ["temp", "incoming", ".hidden"]
+    ```
+
+    Defaults to `[]` (empty list, uses only built-in defaults).
+
+    The default ignores are `[.stfolder, .stversions, .localized, @eaDir, .Spotlight-V100, .Trashes, __MACOSX]` and cannot be overridden.
 
 #### [`PAPERLESS_CONSUMER_BARCODE_SCANNER=<string>`](#PAPERLESS_CONSUMER_BARCODE_SCANNER) {#PAPERLESS_CONSUMER_BARCODE_SCANNER}
 
@@ -1282,6 +1312,25 @@ within your documents.
 
     Defaults to false.
 
+#### [`PAPERLESS_CONSUMER_POLLING_INTERVAL=<num>`](#PAPERLESS_CONSUMER_POLLING_INTERVAL) {#PAPERLESS_CONSUMER_POLLING_INTERVAL}
+
+: Configures how the consumer detects new files in the consumption directory.
+
+    When set to `0` (default), paperless uses native filesystem notifications for efficient, immediate detection of new files.
+
+    When set to a positive number, paperless polls the consumption directory at that interval in seconds. Use polling for network filesystems (NFS, SMB/CIFS) where native notifications may not work reliably.
+
+    Defaults to 0.
+
+#### [`PAPERLESS_CONSUMER_STABILITY_DELAY=<num>`](#PAPERLESS_CONSUMER_STABILITY_DELAY) {#PAPERLESS_CONSUMER_STABILITY_DELAY}
+
+: Sets the time in seconds that a file must remain unchanged (same size and modification time) before paperless will begin consuming it.
+
+    Increase this value if you experience issues with files being consumed before they are fully written, particularly on slower network storage or
+    with certain scanner quirks
+
+    Defaults to 5.0 seconds.
+
 ## Workflow webhooks
 
 #### [`PAPERLESS_WEBHOOKS_ALLOWED_SCHEMES=<str>`](#PAPERLESS_WEBHOOKS_ALLOWED_SCHEMES) {#PAPERLESS_WEBHOOKS_ALLOWED_SCHEMES}
@@ -1305,49 +1354,6 @@ ports.
 : If set to false, webhooks cannot be sent to internal URLs (e.g., localhost).
 
     Defaults to true, which allows internal requests.
-
-### Polling {#polling}
-
-#### [`PAPERLESS_CONSUMER_POLLING=<num>`](#PAPERLESS_CONSUMER_POLLING) {#PAPERLESS_CONSUMER_POLLING}
-
-: If paperless won't find documents added to your consume folder, it
-might not be able to automatically detect filesystem changes. In
-that case, specify a polling interval in seconds here, which will
-then cause paperless to periodically check your consumption
-directory for changes. This will also disable listening for file
-system changes with `inotify`.
-
-    Defaults to 0, which disables polling and uses filesystem
-    notifications.
-
-#### [`PAPERLESS_CONSUMER_POLLING_RETRY_COUNT=<num>`](#PAPERLESS_CONSUMER_POLLING_RETRY_COUNT) {#PAPERLESS_CONSUMER_POLLING_RETRY_COUNT}
-
-: If consumer polling is enabled, sets the maximum number of times
-paperless will check for a file to remain unmodified. If a file's
-modification time and size are identical for two consecutive checks, it
-will be consumed.
-
-    Defaults to 5.
-
-#### [`PAPERLESS_CONSUMER_POLLING_DELAY=<num>`](#PAPERLESS_CONSUMER_POLLING_DELAY) {#PAPERLESS_CONSUMER_POLLING_DELAY}
-
-: If consumer polling is enabled, sets the delay in seconds between
-each check (above) paperless will do while waiting for a file to
-remain unmodified.
-
-    Defaults to 5.
-
-### iNotify {#inotify}
-
-#### [`PAPERLESS_CONSUMER_INOTIFY_DELAY=<num>`](#PAPERLESS_CONSUMER_INOTIFY_DELAY) {#PAPERLESS_CONSUMER_INOTIFY_DELAY}
-
-: Sets the time in seconds the consumer will wait for additional
-events from inotify before the consumer will consider a file ready
-and begin consumption. Certain scanners or network setups may
-generate multiple events for a single file, leading to multiple
-consumers working on the same file. Configure this to prevent that.
-
-    Defaults to 0.5 seconds.
 
 ## Incoming Mail {#incoming_mail}
 
@@ -1805,3 +1811,87 @@ password. All of these options come from their similarly-named [Django settings]
 #### [`PAPERLESS_EMAIL_USE_SSL=<bool>`](#PAPERLESS_EMAIL_USE_SSL) {#PAPERLESS_EMAIL_USE_SSL}
 
 : Defaults to false.
+
+## Remote OCR
+
+#### [`PAPERLESS_REMOTE_OCR_ENGINE=<str>`](#PAPERLESS_REMOTE_OCR_ENGINE) {#PAPERLESS_REMOTE_OCR_ENGINE}
+
+: The remote OCR engine to use. Currently only Azure AI is supported as "azureai".
+
+    Defaults to None, which disables remote OCR.
+
+#### [`PAPERLESS_REMOTE_OCR_API_KEY=<str>`](#PAPERLESS_REMOTE_OCR_API_KEY) {#PAPERLESS_REMOTE_OCR_API_KEY}
+
+: The API key to use for the remote OCR engine.
+
+    Defaults to None.
+
+#### [`PAPERLESS_REMOTE_OCR_ENDPOINT=<str>`](#PAPERLESS_REMOTE_OCR_ENDPOINT) {#PAPERLESS_REMOTE_OCR_ENDPOINT}
+
+: The endpoint to use for the remote OCR engine. This is required for Azure AI.
+
+    Defaults to None.
+
+## AI {#ai}
+
+#### [`PAPERLESS_AI_ENABLED=<bool>`](#PAPERLESS_AI_ENABLED) {#PAPERLESS_AI_ENABLED}
+
+: Enables the AI features in Paperless. This includes the AI-based
+suggestions. This setting is required to be set to true in order to use the AI features.
+
+    Defaults to false.
+
+#### [`PAPERLESS_AI_LLM_EMBEDDING_BACKEND=<str>`](#PAPERLESS_AI_LLM_EMBEDDING_BACKEND) {#PAPERLESS_AI_LLM_EMBEDDING_BACKEND}
+
+: The embedding backend to use for RAG. This can be either "openai" or "huggingface".
+
+    Defaults to None.
+
+#### [`PAPERLESS_AI_LLM_EMBEDDING_MODEL=<str>`](#PAPERLESS_AI_LLM_EMBEDDING_MODEL) {#PAPERLESS_AI_LLM_EMBEDDING_MODEL}
+
+: The model to use for the embedding backend for RAG. This can be set to any of the embedding models supported by the current embedding backend. If not supplied, defaults to "text-embedding-3-small" for OpenAI and "sentence-transformers/all-MiniLM-L6-v2" for Huggingface.
+
+    Defaults to None.
+
+#### [`PAPERLESS_AI_LLM_BACKEND=<str>`](#PAPERLESS_AI_LLM_BACKEND) {#PAPERLESS_AI_LLM_BACKEND}
+
+: The AI backend to use. This can be either "openai" or "ollama". If set to "ollama", the AI
+features will be run locally on your machine. If set to "openai", the AI features will be run
+using the OpenAI API. This setting is required to be set to use the AI features.
+
+    Defaults to None.
+
+    !!! note
+
+        The OpenAI API is a paid service. You will need to set up an OpenAI account and
+        will be charged for usage incurred by Paperless-ngx features and your document data
+        will (of course) be sent to the OpenAI API. Paperless-ngx does not endorse the use of the
+        OpenAI API in any way.
+
+        Refer to the OpenAI terms of service, and use at your own risk.
+
+#### [`PAPERLESS_AI_LLM_MODEL=<str>`](#PAPERLESS_AI_LLM_MODEL) {#PAPERLESS_AI_LLM_MODEL}
+
+: The model to use for the AI backend, i.e. "gpt-3.5-turbo", "gpt-4" or any of the models supported by the
+current backend. If not supplied, defaults to "gpt-3.5-turbo" for OpenAI and "llama3.1" for Ollama.
+
+    Defaults to None.
+
+#### [`PAPERLESS_AI_LLM_API_KEY=<str>`](#PAPERLESS_AI_LLM_API_KEY) {#PAPERLESS_AI_LLM_API_KEY}
+
+: The API key to use for the AI backend. This is required for the OpenAI backend (optional for others).
+
+    Defaults to None.
+
+#### [`PAPERLESS_AI_LLM_ENDPOINT=<str>`](#PAPERLESS_AI_LLM_ENDPOINT) {#PAPERLESS_AI_LLM_ENDPOINT}
+
+: The endpoint / url to use for the AI backend. This is required for the Ollama backend (optional for others).
+
+    Defaults to None.
+
+#### [`PAPERLESS_AI_LLM_INDEX_TASK_CRON=<cron expression>`](#PAPERLESS_AI_LLM_INDEX_TASK_CRON) {#PAPERLESS_AI_LLM_INDEX_TASK_CRON}
+
+: Configures the schedule to update the AI embeddings of text content and metadata for all documents. Only performed if
+AI is enabled and the LLM embedding backend is set.
+
+    Defaults to `10 2 * * *`, once per day.

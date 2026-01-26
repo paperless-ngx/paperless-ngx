@@ -172,6 +172,35 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results[0]), 0)
 
+    def test_document_fields_api_version_8_respects_created(self):
+        Document.objects.create(
+            title="legacy",
+            checksum="123",
+            mime_type="application/pdf",
+            created=date(2024, 1, 15),
+        )
+
+        response = self.client.get(
+            "/api/documents/?fields=id",
+            headers={"Accept": "application/json; version=8"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertIn("id", results[0])
+        self.assertNotIn("created", results[0])
+
+        response = self.client.get(
+            "/api/documents/?fields=id,created",
+            headers={"Accept": "application/json; version=8"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertIn("id", results[0])
+        self.assertIn("created", results[0])
+        self.assertRegex(results[0]["created"], r"^2024-01-15T00:00:00.*$")
+
     def test_document_legacy_created_format(self):
         """
         GIVEN:
@@ -912,6 +941,23 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results), 0)
 
+    def test_documents_title_content_filter_strips_boundary_whitespace(self):
+        doc = Document.objects.create(
+            title="Testwort",
+            content="",
+            checksum="A",
+            mime_type="application/pdf",
+        )
+
+        response = self.client.get(
+            "/api/documents/",
+            {"title_content": " Testwort "},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], doc.id)
+
     def test_document_permissions_filters(self):
         """
         GIVEN:
@@ -1618,6 +1664,44 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.consume_file_mock.assert_not_called()
 
+    def test_patch_document_integer_custom_field_out_of_range(self):
+        """
+        GIVEN:
+            - An integer custom field
+            - A document
+        WHEN:
+            - Patching the document with an integer value exceeding PostgreSQL's range
+        THEN:
+            - HTTP 400 is returned (validation catches the overflow)
+            - No custom field instance is created
+        """
+        cf_int = CustomField.objects.create(
+            name="intfield",
+            data_type=CustomField.FieldDataType.INT,
+        )
+        doc = Document.objects.create(
+            title="Doc",
+            checksum="123",
+            mime_type="application/pdf",
+        )
+
+        response = self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            {
+                "custom_fields": [
+                    {
+                        "field": cf_int.pk,
+                        "value": 2**31,  # overflow for PostgreSQL integer fields
+                    },
+                ],
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("custom_fields", response.data)
+        self.assertEqual(CustomFieldInstance.objects.count(), 0)
+
     def test_upload_with_webui_source(self):
         """
         GIVEN: A document with a source file
@@ -2249,6 +2333,23 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.get("/api/logs/paperless/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertListEqual(response.data, ["test", "test2"])
+
+    def test_get_log_with_limit(self):
+        log_data = "test1\ntest2\ntest3\n"
+        with (Path(settings.LOGGING_DIR) / "paperless.log").open("w") as f:
+            f.write(log_data)
+        response = self.client.get("/api/logs/paperless/", {"limit": 2})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertListEqual(response.data, ["test2", "test3"])
+
+    def test_get_log_with_invalid_limit(self):
+        log_data = "test1\ntest2\n"
+        with (Path(settings.LOGGING_DIR) / "paperless.log").open("w") as f:
+            f.write(log_data)
+        response = self.client.get("/api/logs/paperless/", {"limit": "abc"})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        response = self.client.get("/api/logs/paperless/", {"limit": -5})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_regex_other_algorithm(self):
         for endpoint in ["correspondents", "tags", "document_types"]:
@@ -3022,7 +3123,8 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
 
         self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].attachments[0][0], "archive.pdf")
+        expected_filename = f"{doc.created} test.pdf"
+        self.assertEqual(mail.outbox[0].attachments[0][0], expected_filename)
 
         self.client.post(
             f"/api/documents/{doc2.pk}/email/",
@@ -3035,7 +3137,8 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
 
         self.assertEqual(len(mail.outbox), 2)
-        self.assertEqual(mail.outbox[1].attachments[0][0], "test2.pdf")
+        expected_filename2 = f"{doc2.created} test2.pdf"
+        self.assertEqual(mail.outbox[1].attachments[0][0], expected_filename2)
 
     @mock.patch("django.core.mail.message.EmailMessage.send", side_effect=Exception)
     def test_email_document_errors(self, mocked_send):
@@ -3093,7 +3196,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
                 "message": "hello",
             },
         )
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
         resp = self.client.post(
             f"/api/documents/{doc.pk}/email/",

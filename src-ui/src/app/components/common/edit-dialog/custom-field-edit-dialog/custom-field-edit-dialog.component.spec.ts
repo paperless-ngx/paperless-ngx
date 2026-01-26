@@ -10,7 +10,6 @@ import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { CustomFieldDataType } from 'src/app/data/custom-field'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { SettingsService } from 'src/app/services/settings.service'
 import { SelectComponent } from '../../input/select/select.component'
 import { TextComponent } from '../../input/text/text.component'
@@ -35,7 +34,6 @@ describe('CustomFieldEditDialogComponent', () => {
         IfOwnerDirective,
         SelectComponent,
         TextComponent,
-        SafeHtmlPipe,
       ],
       providers: [
         NgbActiveModal,

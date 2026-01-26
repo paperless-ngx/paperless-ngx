@@ -132,7 +132,7 @@ class Tag(MatchingModel, TreeNodeModel):
         height = 0 if self.pk is None else self.get_depth()
         deepest_new_depth = (new_parent_depth + 1) + height
         if deepest_new_depth > self.MAX_NESTING_DEPTH:
-            raise ValidationError(_("Maximum nesting depth exceeded."))
+            raise ValidationError({"parent": _("Maximum nesting depth exceeded.")})
 
         return super().clean()
 
@@ -154,13 +154,6 @@ class StoragePath(MatchingModel):
 
 
 class Document(SoftDeleteModel, ModelWithOwner):
-    STORAGE_TYPE_UNENCRYPTED = "unencrypted"
-    STORAGE_TYPE_GPG = "gpg"
-    STORAGE_TYPES = (
-        (STORAGE_TYPE_UNENCRYPTED, _("Unencrypted")),
-        (STORAGE_TYPE_GPG, _("Encrypted with GNU Privacy Guard")),
-    )
-
     correspondent = models.ForeignKey(
         Correspondent,
         blank=True,
@@ -248,14 +241,6 @@ class Document(SoftDeleteModel, ModelWithOwner):
         auto_now=True,
         editable=False,
         db_index=True,
-    )
-
-    storage_type = models.CharField(
-        _("storage type"),
-        max_length=11,
-        choices=STORAGE_TYPES,
-        default=STORAGE_TYPE_UNENCRYPTED,
-        editable=False,
     )
 
     added = models.DateTimeField(
@@ -353,12 +338,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
 
     @property
     def source_path(self) -> Path:
-        if self.filename:
-            fname = str(self.filename)
-        else:
-            fname = f"{self.pk:07}{self.file_type}"
-            if self.storage_type == self.STORAGE_TYPE_GPG:
-                fname += ".gpg"  # pragma: no cover
+        fname = str(self.filename) if self.filename else f"{self.pk:07}{self.file_type}"
 
         return (settings.ORIGINALS_DIR / Path(fname)).resolve()
 
@@ -407,8 +387,6 @@ class Document(SoftDeleteModel, ModelWithOwner):
     @property
     def thumbnail_path(self) -> Path:
         webp_file_name = f"{self.pk:07}.webp"
-        if self.storage_type == self.STORAGE_TYPE_GPG:
-            webp_file_name += ".gpg"
 
         webp_file_path = settings.THUMBNAIL_DIR / Path(webp_file_name)
 
@@ -598,6 +576,7 @@ class PaperlessTask(ModelWithOwner):
         TRAIN_CLASSIFIER = ("train_classifier", _("Train Classifier"))
         CHECK_SANITY = ("check_sanity", _("Check Sanity"))
         INDEX_OPTIMIZE = ("index_optimize", _("Index Optimize"))
+        LLMINDEX_UPDATE = ("llmindex_update", _("LLM Index Update"))
 
     task_id = models.CharField(
         max_length=255,
@@ -1065,12 +1044,40 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has these tag(s)"),
     )
 
+    filter_has_all_tags = models.ManyToManyField(
+        Tag,
+        blank=True,
+        related_name="workflowtriggers_has_all",
+        verbose_name=_("has all of these tag(s)"),
+    )
+
+    filter_has_not_tags = models.ManyToManyField(
+        Tag,
+        blank=True,
+        related_name="workflowtriggers_has_not",
+        verbose_name=_("does not have these tag(s)"),
+    )
+
     filter_has_document_type = models.ForeignKey(
         DocumentType,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
         verbose_name=_("has this document type"),
+    )
+
+    filter_has_any_document_types = models.ManyToManyField(
+        DocumentType,
+        blank=True,
+        related_name="workflowtriggers_has_any_document_type",
+        verbose_name=_("has one of these document types"),
+    )
+
+    filter_has_not_document_types = models.ManyToManyField(
+        DocumentType,
+        blank=True,
+        related_name="workflowtriggers_has_not_document_type",
+        verbose_name=_("does not have these document type(s)"),
     )
 
     filter_has_correspondent = models.ForeignKey(
@@ -1081,12 +1088,47 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has this correspondent"),
     )
 
+    filter_has_not_correspondents = models.ManyToManyField(
+        Correspondent,
+        blank=True,
+        related_name="workflowtriggers_has_not_correspondent",
+        verbose_name=_("does not have these correspondent(s)"),
+    )
+
+    filter_has_any_correspondents = models.ManyToManyField(
+        Correspondent,
+        blank=True,
+        related_name="workflowtriggers_has_any_correspondent",
+        verbose_name=_("has one of these correspondents"),
+    )
+
     filter_has_storage_path = models.ForeignKey(
         StoragePath,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
         verbose_name=_("has this storage path"),
+    )
+
+    filter_has_any_storage_paths = models.ManyToManyField(
+        StoragePath,
+        blank=True,
+        related_name="workflowtriggers_has_any_storage_path",
+        verbose_name=_("has one of these storage paths"),
+    )
+
+    filter_has_not_storage_paths = models.ManyToManyField(
+        StoragePath,
+        blank=True,
+        related_name="workflowtriggers_has_not_storage_path",
+        verbose_name=_("does not have these storage path(s)"),
+    )
+
+    filter_custom_field_query = models.TextField(
+        _("filter custom field query"),
+        null=True,
+        blank=True,
+        help_text=_("JSON-encoded custom field query expression."),
     )
 
     schedule_offset_days = models.IntegerField(
@@ -1251,6 +1293,8 @@ class WorkflowAction(models.Model):
         choices=WorkflowActionType.choices,
         default=WorkflowActionType.ASSIGNMENT,
     )
+
+    order = models.PositiveIntegerField(_("order"), default=0)
 
     assign_title = models.TextField(
         _("assign title"),
@@ -1505,7 +1549,7 @@ class Workflow(models.Model):
         return f"Workflow: {self.name}"
 
 
-class WorkflowRun(models.Model):
+class WorkflowRun(SoftDeleteModel):
     workflow = models.ForeignKey(
         Workflow,
         on_delete=models.CASCADE,

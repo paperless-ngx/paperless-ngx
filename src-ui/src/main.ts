@@ -2,6 +2,7 @@ import {
   APP_INITIALIZER,
   enableProdMode,
   importProvidersFrom,
+  provideZoneChangeDetection,
 } from '@angular/core'
 
 import { DragDropModule } from '@angular/cdk/drag-drop'
@@ -9,6 +10,7 @@ import { DatePipe, registerLocaleData } from '@angular/common'
 import {
   HTTP_INTERCEPTORS,
   provideHttpClient,
+  withFetch,
   withInterceptorsFromDi,
 } from '@angular/common/http'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -48,6 +50,7 @@ import {
   caretDown,
   caretUp,
   chatLeftText,
+  chatSquareDots,
   check,
   check2All,
   checkAll,
@@ -123,6 +126,7 @@ import {
   sliders2Vertical,
   sortAlphaDown,
   sortAlphaUpAlt,
+  stars,
   tag,
   tagFill,
   tags,
@@ -132,6 +136,7 @@ import {
   threeDotsVertical,
   trash,
   uiRadios,
+  unlock,
   upcScan,
   windowStack,
   x,
@@ -171,6 +176,7 @@ import localeFa from '@angular/common/locales/fa'
 import localeFi from '@angular/common/locales/fi'
 import localeFr from '@angular/common/locales/fr'
 import localeHu from '@angular/common/locales/hu'
+import localeId from '@angular/common/locales/id'
 import localeIt from '@angular/common/locales/it'
 import localeJa from '@angular/common/locales/ja'
 import localeKo from '@angular/common/locales/ko'
@@ -209,6 +215,7 @@ registerLocaleData(localeFa)
 registerLocaleData(localeFi)
 registerLocaleData(localeFr)
 registerLocaleData(localeHu)
+registerLocaleData(localeId)
 registerLocaleData(localeIt)
 registerLocaleData(localeJa)
 registerLocaleData(localeKo)
@@ -262,6 +269,7 @@ const icons = {
   caretDown,
   caretUp,
   chatLeftText,
+  chatSquareDots,
   check,
   check2All,
   checkAll,
@@ -337,6 +345,7 @@ const icons = {
   sliders2Vertical,
   sortAlphaDown,
   sortAlphaUpAlt,
+  stars,
   tagFill,
   tag,
   tags,
@@ -346,6 +355,7 @@ const icons = {
   threeDotsVertical,
   trash,
   uiRadios,
+  unlock,
   upcScan,
   windowStack,
   x,
@@ -359,6 +369,7 @@ if (environment.production) {
 
 bootstrapApplication(AppComponent, {
   providers: [
+    provideZoneChangeDetection(),
     importProvidersFrom(
       BrowserModule,
       AppRoutingModule,
@@ -401,6 +412,6 @@ bootstrapApplication(AppComponent, {
     CorrespondentNamePipe,
     DocumentTypeNamePipe,
     StoragePathNamePipe,
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(withInterceptorsFromDi(), withFetch()),
   ],
 }).catch((err) => console.error(err))

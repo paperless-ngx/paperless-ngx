@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core'
-import { ParamMap, Router } from '@angular/router'
+import { ParamMap, Router, UrlTree } from '@angular/router'
 import { Observable, Subject, first, takeUntil } from 'rxjs'
 import {
   DEFAULT_DISPLAY_FIELDS,
@@ -481,6 +481,18 @@ export class DocumentListViewService {
     this._activeSavedViewId = null
     this.filterRules = filterRules
     this.router.navigate(['documents'])
+  }
+
+  getQuickFilterUrl(filterRules: FilterRule[]): UrlTree {
+    const defaultState = {
+      ...this.defaultListViewState(),
+      ...this.listViewStates.get(null),
+      filterRules,
+    }
+    const params = paramsFromViewState(defaultState)
+    return this.router.createUrlTree(['/documents'], {
+      queryParams: params,
+    })
   }
 
   getLastPage(): number {

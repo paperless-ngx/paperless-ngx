@@ -1,9 +1,11 @@
 import json
 from datetime import date
+from unittest import mock
 from unittest.mock import ANY
 
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -211,6 +213,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
             ],
         )
 
+    @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
     def test_custom_field_select_options_pruned(self):
         """
         GIVEN:
@@ -242,7 +245,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         CustomFieldInstance.objects.create(
             document=doc,
             field=custom_field_select,
-            value_text="abc-123",
+            value_select="def-456",
         )
 
         resp = self.client.patch(
@@ -273,6 +276,52 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
 
         doc.refresh_from_db()
         self.assertEqual(doc.custom_fields.first().value, None)
+
+    @mock.patch("documents.signals.handlers.process_cf_select_update.delay")
+    def test_custom_field_update_offloaded_once(self, mock_delay):
+        """
+        GIVEN:
+            - A select custom field attached to multiple documents
+        WHEN:
+            - The select options are updated
+        THEN:
+            - The async update task is enqueued once
+        """
+        cf_select = CustomField.objects.create(
+            name="Select Field",
+            data_type=CustomField.FieldDataType.SELECT,
+            extra_data={
+                "select_options": [
+                    {"label": "Option 1", "id": "abc-123"},
+                    {"label": "Option 2", "id": "def-456"},
+                ],
+            },
+        )
+
+        documents = [
+            Document.objects.create(
+                title="WOW",
+                content="the content",
+                checksum=f"{i}",
+                mime_type="application/pdf",
+            )
+            for i in range(3)
+        ]
+        for document in documents:
+            CustomFieldInstance.objects.create(
+                document=document,
+                field=cf_select,
+                value_select="def-456",
+            )
+
+        cf_select.extra_data = {
+            "select_options": [
+                {"label": "Option 1", "id": "abc-123"},
+            ],
+        }
+        cf_select.save()
+
+        mock_delay.assert_called_once_with(cf_select)
 
     def test_custom_field_select_old_version(self):
         """

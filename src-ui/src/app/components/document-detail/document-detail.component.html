@@ -65,18 +65,14 @@
       <button ngbDropdownItem (click)="editPdf()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF">
         <i-bs name="pencil"></i-bs>&nbsp;<ng-container i18n>PDF Editor</ng-container>
       </button>
+
+      @if (userIsOwner && (requiresPassword || password)) {
+        <button ngbDropdownItem (click)="removePassword()" [disabled]="!password">
+          <i-bs name="unlock"></i-bs>&nbsp;<ng-container i18n>Remove Password</ng-container>
+        </button>
+      }
     </div>
   </div>
-
-  <pngx-custom-fields-dropdown
-    *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }"
-    [documentId]="documentId"
-    [disabled]="!userCanEdit"
-    [existingFields]="document?.custom_fields"
-    (created)="refreshCustomFields()"
-    (added)="addField($event)">
-  </pngx-custom-fields-dropdown>
-
 
   <div class="ms-auto" ngbDropdown>
     <button class="btn btn-sm btn-outline-primary" id="sendDropdown" ngbDropdownToggle>
@@ -98,7 +94,7 @@
 </pngx-page-header>
 
 <div class="row">
-  <div class="col-md-6 col-xl-4 mb-4">
+  <div class="col-md-6 col-xl-5 mb-4">
 
     <form [formGroup]='documentForm' (ngSubmit)="save()">
 
@@ -115,6 +111,32 @@
           </button>
         </div>
 
+        <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
+          <div class="btn-group pb-3 ms-auto">
+            <pngx-suggestions-dropdown *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }"
+              [disabled]="!userCanEdit || suggestionsLoading"
+              [loading]="suggestionsLoading"
+              [suggestions]="suggestions"
+              [aiEnabled]="aiEnabled"
+              (getSuggestions)="getSuggestions()"
+              (addTag)="createTag($event)"
+              (addDocumentType)="createDocumentType($event)"
+              (addCorrespondent)="createCorrespondent($event)">
+            </pngx-suggestions-dropdown>
+          </div>
+
+          <div class="btn-group pb-3 ms-2">
+            <pngx-custom-fields-dropdown
+              *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }"
+              [documentId]="documentId"
+              [disabled]="!userCanEdit"
+              [existingFields]="document?.custom_fields"
+              (created)="refreshCustomFields()"
+              (added)="addField($event)">
+            </pngx-custom-fields-dropdown>
+          </div>
+        </ng-container>
+
         <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
       </div>
 
@@ -123,7 +145,7 @@
           <a ngbNavLink i18n>Details</a>
           <ng-template ngbNavContent>
             <div>
-              <pngx-input-text #inputTitle i18n-title title="Title" formControlName="title" [horizontal]="true" (keyup)="titleKeyUp($event)" [error]="error?.title"></pngx-input-text>
+              <pngx-input-text #inputTitle i18n-title title="Title" formControlName="title" [horizontal]="true" [suggestion]="suggestions?.title" (keyup)="titleKeyUp($event)" [error]="error?.title"></pngx-input-text>
               <pngx-input-number i18n-title title="Archive serial number" [error]="error?.archive_serial_number" [horizontal]="true" formControlName='archive_serial_number'></pngx-input-number>
               <pngx-input-date i18n-title title="Date created" formControlName="created" [suggestions]="suggestions?.dates" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
               [error]="error?.created"></pngx-input-date>
@@ -133,7 +155,7 @@
               (createNew)="createDocumentType($event)" [hideAddButton]="createDisabled(DataType.DocumentType)" [suggestions]="suggestions?.document_types" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }"></pngx-input-select>
               <pngx-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.StoragePath)"
               (createNew)="createStoragePath($event)" [hideAddButton]="createDisabled(DataType.StoragePath)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></pngx-input-select>
-              <pngx-input-tags formControlName="tags" [suggestions]="suggestions?.tags" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.Tag)" [hideAddButton]="createDisabled(DataType.Tag)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></pngx-input-tags>
+              <pngx-input-tags #tagsInput formControlName="tags" [suggestions]="suggestions?.tags" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.Tag)" [hideAddButton]="createDisabled(DataType.Tag)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></pngx-input-tags>
               @for (fieldInstance of document?.custom_fields; track fieldInstance.field; let i = $index) {
                 <div [formGroup]="customFieldFormFields.controls[i]">
                   @switch (getCustomFieldFromInstance(fieldInstance)?.data_type) {
@@ -355,14 +377,14 @@
     </form>
   </div>
 
-  <div class="col-md-6 col-xl-8 mb-3 d-none d-md-block position-relative" #pdfPreview>
+  <div class="col-md-6 col-xl-7 mb-3 d-none d-md-block position-relative" #pdfPreview>
     <ng-container *ngTemplateOutlet="previewContent"></ng-container>
   </div>
 
 </div>
 
 <ng-template #saveButtons>
-  <div class="btn-group pb-3 ms-auto">
+  <div class="btn-group pb-3 ms-4">
     <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
       <button type="submit" class="order-3 btn btn-sm btn-primary" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save</button>
       @if (hasNext()) {
@@ -379,7 +401,7 @@
 <ng-template #previewContent>
   <div class="thumb-preview position-absolute pe-none text-center" [class.fade]="previewLoaded">
     @if (showThumbnailOverlay) {
-      <img [src]="thumbUrl | safeUrl" class="mx-auto" [attr.width]="previewZoomScale === 'page-fit' ? 'auto' : '100%'" [attr.height]="previewZoomScale === 'page-fit' ? '100%' : 'auto'" alt="Document loading..." i18n-alt />
+      <img [src]="thumbUrl" class="mx-auto" [attr.width]="previewZoomScale === 'page-fit' ? 'auto' : '100%'" [attr.height]="previewZoomScale === 'page-fit' ? '100%' : 'auto'" alt="Document loading..." i18n-alt />
     }
     <div class="position-absolute top-0 start-0 m-2 p-2 d-flex align-items-center justify-content-center">
       <div>
@@ -414,7 +436,7 @@
       }
       @case (ContentRenderType.Image) {
         <div class="preview-sticky">
-          <img [src]="previewUrl | safeUrl" width="100%" height="100%" alt="{{title}}" />
+          <img [src]="previewUrl" width="100%" height="100%" alt="{{title}}" />
         </div>
       }
       @case (ContentRenderType.TIFF) {

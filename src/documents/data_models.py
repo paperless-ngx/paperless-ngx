@@ -22,7 +22,7 @@ class DocumentMetadataOverrides:
     document_type_id: int | None = None
     tag_ids: list[int] | None = None
     storage_path_id: int | None = None
-    created: datetime.datetime | None = None
+    created: datetime.date | None = None
     asn: int | None = None
     owner_id: int | None = None
     view_users: list[int] | None = None
@@ -30,6 +30,7 @@ class DocumentMetadataOverrides:
     change_users: list[int] | None = None
     change_groups: list[int] | None = None
     custom_fields: dict | None = None
+    skip_asn: bool = False
 
     def update(self, other: "DocumentMetadataOverrides") -> "DocumentMetadataOverrides":
         """
@@ -49,6 +50,8 @@ class DocumentMetadataOverrides:
             self.storage_path_id = other.storage_path_id
         if other.owner_id is not None:
             self.owner_id = other.owner_id
+        if other.skip_asn:
+            self.skip_asn = True
 
         # merge
         if self.tag_ids is None:
@@ -100,6 +103,7 @@ class DocumentMetadataOverrides:
         overrides.storage_path_id = doc.storage_path.id if doc.storage_path else None
         overrides.owner_id = doc.owner.id if doc.owner else None
         overrides.tag_ids = list(doc.tags.values_list("id", flat=True))
+        overrides.created = doc.created
 
         overrides.view_users = list(
             get_users_with_perms(
@@ -114,7 +118,7 @@ class DocumentMetadataOverrides:
             ).values_list("id", flat=True),
         )
         overrides.custom_fields = {
-            custom_field.id: custom_field.value
+            custom_field.field.id: custom_field.value
             for custom_field in doc.custom_fields.all()
         }
 

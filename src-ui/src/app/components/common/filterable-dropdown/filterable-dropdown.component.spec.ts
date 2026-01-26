@@ -564,6 +564,208 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     ])
   })
 
+  it('keeps children with their parent when parent has document count', () => {
+    const parent: Tag = {
+      id: 10,
+      name: 'Parent Tag',
+      orderIndex: 0,
+      document_count: 2,
+    }
+    const child: Tag = {
+      id: 11,
+      name: 'Child Tag',
+      parent: parent.id,
+      orderIndex: 1,
+      document_count: 0,
+    }
+    const otherRoot: Tag = {
+      id: 20,
+      name: 'Other Tag',
+      orderIndex: 2,
+      document_count: 0,
+    }
+
+    component.selectionModel.items = [parent, child, otherRoot]
+    component.selectionModel = selectionModel
+    component.documentCounts = [
+      { id: parent.id, document_count: 2 },
+      { id: otherRoot.id, document_count: 0 },
+    ]
+    selectionModel.apply()
+
+    expect(component.selectionModel.items).toEqual([
+      nullItem,
+      parent,
+      child,
+      otherRoot,
+    ])
+  })
+
+  it('keeps selected branches ahead of document-based ordering', () => {
+    const selectedRoot: Tag = {
+      id: 30,
+      name: 'Selected Root',
+      orderIndex: 0,
+      document_count: 0,
+    }
+    const otherRoot: Tag = {
+      id: 40,
+      name: 'Other Root',
+      orderIndex: 1,
+      document_count: 2,
+    }
+
+    component.selectionModel.items = [selectedRoot, otherRoot]
+    component.selectionModel = selectionModel
+    selectionModel.set(selectedRoot.id, ToggleableItemState.Selected)
+    component.documentCounts = [
+      { id: selectedRoot.id, document_count: 0 },
+      { id: otherRoot.id, document_count: 2 },
+    ]
+    selectionModel.apply()
+
+    expect(component.selectionModel.items).toEqual([
+      nullItem,
+      selectedRoot,
+      otherRoot,
+    ])
+  })
+
+  it('resorts items immediately when document count sorting enabled', () => {
+    const apple: Tag = { id: 55, name: 'Apple' }
+    const zebra: Tag = { id: 56, name: 'Zebra' }
+
+    selectionModel.documentCountSortingEnabled = true
+    selectionModel.items = [apple, zebra]
+    expect(selectionModel.items.map((item) => item?.id ?? null)).toEqual([
+      null,
+      apple.id,
+      zebra.id,
+    ])
+
+    selectionModel.documentCounts = [
+      { id: zebra.id, document_count: 5 },
+      { id: apple.id, document_count: 0 },
+    ]
+
+    expect(selectionModel.items.map((item) => item?.id ?? null)).toEqual([
+      null,
+      zebra.id,
+      apple.id,
+    ])
+  })
+
+  it('does not resort items by default when document counts are set', () => {
+    const first: Tag = { id: 57, name: 'First' }
+    const second: Tag = { id: 58, name: 'Second' }
+
+    selectionModel.items = [first, second]
+    selectionModel.documentCounts = [
+      { id: second.id, document_count: 10 },
+      { id: first.id, document_count: 0 },
+    ]
+
+    expect(selectionModel.items.map((item) => item?.id ?? null)).toEqual([
+      null,
+      first.id,
+      second.id,
+    ])
+  })
+
+  it('uses fallback document counts when selection data is missing', () => {
+    const fallbackRoot: Tag = {
+      id: 50,
+      name: 'Fallback Root',
+      orderIndex: 0,
+      document_count: 3,
+    }
+    const fallbackChild: Tag = {
+      id: 51,
+      name: 'Fallback Child',
+      parent: fallbackRoot.id,
+      orderIndex: 1,
+      document_count: 0,
+    }
+    const otherRoot: Tag = {
+      id: 60,
+      name: 'Other Root',
+      orderIndex: 2,
+      document_count: 0,
+    }
+
+    component.selectionModel = selectionModel
+    selectionModel.items = [fallbackRoot, fallbackChild, otherRoot]
+    component.documentCounts = [{ id: otherRoot.id, document_count: 0 }]
+
+    selectionModel.apply()
+
+    expect(selectionModel.items).toEqual([
+      nullItem,
+      fallbackRoot,
+      fallbackChild,
+      otherRoot,
+    ])
+  })
+
+  it('handles special and non-numeric ids when promoting branches', () => {
+    const rootWithDocs: Tag = {
+      id: 70,
+      name: 'Root With Docs',
+      orderIndex: 0,
+      document_count: 1,
+    }
+    const miscItem: any = { id: 'misc', name: 'Misc Item' }
+
+    component.selectionModel = selectionModel
+    selectionModel.intersection = Intersection.Exclude
+    selectionModel.items = [rootWithDocs, miscItem as any]
+    component.documentCounts = [{ id: rootWithDocs.id, document_count: 1 }]
+
+    selectionModel.apply()
+
+    expect(selectionModel.items.map((item) => item.id)).toEqual([
+      NEGATIVE_NULL_FILTER_VALUE,
+      rootWithDocs.id,
+      'misc',
+    ])
+  })
+
+  it('memoizes root document counts between lookups', () => {
+    const memoRoot: Tag = { id: 80, name: 'Memo Root' }
+    selectionModel.items = [memoRoot]
+    selectionModel.documentCounts = [{ id: memoRoot.id, document_count: 9 }]
+
+    const getRootDocCount = (selectionModel as any).createRootDocCounter()
+
+    expect(getRootDocCount(memoRoot.id)).toEqual(9)
+    selectionModel.documentCounts = []
+    expect(getRootDocCount(memoRoot.id)).toEqual(9)
+  })
+
+  it('falls back to model stored document counts if selection data missing entry', () => {
+    const rootWithoutSelection: Tag = {
+      id: 90,
+      name: 'Fallback Root',
+      document_count: 4,
+    }
+    selectionModel.items = [rootWithoutSelection]
+    selectionModel.documentCounts = []
+
+    const getRootDocCount = (selectionModel as any).createRootDocCounter()
+
+    expect(getRootDocCount(rootWithoutSelection.id)).toEqual(4)
+  })
+
+  it('defaults to zero document count when neither selection nor model provide it', () => {
+    const rootWithoutCounts: Tag = { id: 91, name: 'Fallback Zero Root' }
+    selectionModel.items = [rootWithoutCounts]
+    selectionModel.documentCounts = []
+
+    const getRootDocCount = (selectionModel as any).createRootDocCounter()
+
+    expect(getRootDocCount(rootWithoutCounts.id)).toEqual(0)
+  })
+
   it('should set support create, keep open model and call createRef method', fakeAsync(() => {
     component.selectionModel.items = items
     component.icon = 'tag-fill'

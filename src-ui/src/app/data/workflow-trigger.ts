@@ -40,6 +40,24 @@ export interface WorkflowTrigger extends ObjectWithId {
 
   filter_has_tags?: number[] // Tag.id[]
 
+  filter_has_all_tags?: number[] // Tag.id[]
+
+  filter_has_not_tags?: number[] // Tag.id[]
+
+  filter_has_any_correspondents?: number[] // Correspondent.id[]
+
+  filter_has_not_correspondents?: number[] // Correspondent.id[]
+
+  filter_has_any_document_types?: number[] // DocumentType.id[]
+
+  filter_has_not_document_types?: number[] // DocumentType.id[]
+
+  filter_has_any_storage_paths?: number[] // StoragePath.id[]
+
+  filter_has_not_storage_paths?: number[] // StoragePath.id[]
+
+  filter_custom_field_query?: string
+
   filter_has_correspondent?: number // Correspondent.id
 
   filter_has_document_type?: number // DocumentType.id

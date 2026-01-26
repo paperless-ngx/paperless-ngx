@@ -16,9 +16,14 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.validators import DecimalValidator
+from django.core.validators import EmailValidator
 from django.core.validators import MaxLengthValidator
+from django.core.validators import MaxValueValidator
+from django.core.validators import MinValueValidator
 from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
+from django.db.models import Count
+from django.db.models.functions import Lower
 from django.utils.crypto import get_random_string
 from django.utils.dateparse import parse_datetime
 from django.utils.text import slugify
@@ -36,6 +41,7 @@ from guardian.utils import get_user_obj_perms_model
 from rest_framework import fields
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
+from rest_framework.filters import OrderingFilter
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.context import set_actor
@@ -43,6 +49,7 @@ if settings.AUDIT_LOG_ENABLED:
 
 from documents import bulk_edit
 from documents.data_models import DocumentSource
+from documents.filters import CustomFieldQueryParser
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -63,8 +70,10 @@ from documents.models import WorkflowActionEmail
 from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowTrigger
 from documents.parsers import is_mime_type_supported
+from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import set_permissions_for_object
+from documents.regex import validate_regex_pattern
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.templating.utils import convert_format_str_to_template_format
 from documents.validators import uri_validator
@@ -135,10 +144,11 @@ class MatchingModelSerializer(serializers.ModelSerializer):
             and self.initial_data["matching_algorithm"] == MatchingModel.MATCH_REGEX
         ):
             try:
-                re.compile(match)
-            except re.error as e:
+                validate_regex_pattern(match)
+            except ValueError as e:
+                logger.debug(f"Invalid regular expression: {e!s}")
                 raise serializers.ValidationError(
-                    _("Invalid regular expression: %(error)s") % {"error": str(e.msg)},
+                    "Invalid regular expression, see log for details.",
                 )
         return match
 
@@ -570,9 +580,38 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         ),
     )
     def get_children(self, obj):
+        children_map = self.context.get("children_map")
+        if children_map is not None:
+            children = children_map.get(obj.pk, [])
+        else:
+            filter_q = self.context.get("document_count_filter")
+            request = self.context.get("request")
+            if filter_q is None:
+                user = getattr(request, "user", None) if request else None
+                filter_q = get_document_count_filter_for_user(user)
+                self.context["document_count_filter"] = filter_q
+
+            children = (
+                obj.get_children_queryset()
+                .select_related("owner")
+                .annotate(document_count=Count("documents", filter=filter_q))
+            )
+
+            view = self.context.get("view")
+            ordering = (
+                OrderingFilter().get_ordering(request, children, view)
+                if request and view
+                else None
+            )
+            ordering = ordering or (Lower("name"),)
+            children = children.order_by(*ordering)
+
         serializer = TagSerializer(
-            obj.get_children(),
+            children,
             many=True,
+            user=self.user,
+            full_perms=self.full_perms,
+            all_fields=self.all_fields,
             context=self.context,
         )
         return serializer.data
@@ -633,7 +672,7 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
                 temp.clean()
             except ValidationError as e:
                 logger.debug("Tag parent validation failed: %s", e)
-                raise serializers.ValidationError({"parent": _("Invalid parent tag.")})
+                raise e
 
         return super().validate(attrs)
 
@@ -842,6 +881,13 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
                 uri_validator(data["value"])
             elif field.data_type == CustomField.FieldDataType.INT:
                 integer_validator(data["value"])
+                try:
+                    value_int = int(data["value"])
+                except (TypeError, ValueError):
+                    raise serializers.ValidationError("Enter a valid integer.")
+                # Keep values within the PostgreSQL integer range
+                MinValueValidator(-2147483648)(value_int)
+                MaxValueValidator(2147483647)(value_int)
             elif (
                 field.data_type == CustomField.FieldDataType.MONETARY
                 and data["value"] != ""
@@ -1029,7 +1075,7 @@ class DocumentSerializer(
             request.version if request else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
         )
 
-        if api_version < 9:
+        if api_version < 9 and "created" in self.fields:
             # provide created as a datetime for backwards compatibility
             from django.utils import timezone
 
@@ -1388,6 +1434,7 @@ class BulkEditSerializer(
             "split",
             "delete_pages",
             "edit_pdf",
+            "remove_password",
         ],
         label="Method",
         write_only=True,
@@ -1463,6 +1510,8 @@ class BulkEditSerializer(
             return bulk_edit.delete_pages
         elif method == "edit_pdf":
             return bulk_edit.edit_pdf
+        elif method == "remove_password":
+            return bulk_edit.remove_password
         else:  # pragma: no cover
             # This will never happen as it is handled by the ChoiceField
             raise serializers.ValidationError("Unsupported method.")
@@ -1659,6 +1708,12 @@ class BulkEditSerializer(
                         f"Page {op['page']} is out of bounds for document with {doc.page_count} pages.",
                     )
 
+    def validate_parameters_remove_password(self, parameters):
+        if "password" not in parameters:
+            raise serializers.ValidationError("password not specified")
+        if not isinstance(parameters["password"], str):
+            raise serializers.ValidationError("password must be a string")
+
     def validate(self, attrs):
         method = attrs["method"]
         parameters = attrs["parameters"]
@@ -1699,6 +1754,8 @@ class BulkEditSerializer(
                     "Edit PDF method only supports one document",
                 )
             self._validate_parameters_edit_pdf(parameters, attrs["documents"][0])
+        elif method == bulk_edit.remove_password:
+            self.validate_parameters_remove_password(parameters)
 
         return attrs
 
@@ -1904,6 +1961,51 @@ class BulkDownloadSerializer(DocumentListSerializer):
             "bzip2": zipfile.ZIP_BZIP2,
             "lzma": zipfile.ZIP_LZMA,
         }[compression]
+
+
+class EmailSerializer(DocumentListSerializer):
+    addresses = serializers.CharField(
+        required=True,
+        label="Email addresses",
+        help_text="Comma-separated email addresses",
+    )
+
+    subject = serializers.CharField(
+        required=True,
+        label="Email subject",
+    )
+
+    message = serializers.CharField(
+        required=True,
+        label="Email message",
+    )
+
+    use_archive_version = serializers.BooleanField(
+        default=True,
+        label="Use archive version",
+        help_text="Use archive version of documents if available",
+    )
+
+    def validate_addresses(self, addresses):
+        address_list = [addr.strip() for addr in addresses.split(",")]
+        if not address_list:
+            raise serializers.ValidationError("At least one email address is required")
+
+        email_validator = EmailValidator()
+        try:
+            for address in address_list:
+                email_validator(address)
+        except ValidationError:
+            raise serializers.ValidationError(f"Invalid email address: {address}")
+
+        return ",".join(address_list)
+
+    def validate_documents(self, documents):
+        super().validate_documents(documents)
+        if not documents:
+            raise serializers.ValidationError("At least one document is required")
+
+        return documents
 
 
 class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
@@ -2194,6 +2296,15 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             "match",
             "is_insensitive",
             "filter_has_tags",
+            "filter_has_all_tags",
+            "filter_has_not_tags",
+            "filter_custom_field_query",
+            "filter_has_any_correspondents",
+            "filter_has_not_correspondents",
+            "filter_has_any_document_types",
+            "filter_has_not_document_types",
+            "filter_has_any_storage_paths",
+            "filter_has_not_storage_paths",
             "filter_has_correspondent",
             "filter_has_document_type",
             "filter_has_storage_path",
@@ -2218,6 +2329,20 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             and len(attrs["filter_path"]) == 0
         ):
             attrs["filter_path"] = None
+
+        if (
+            "filter_custom_field_query" in attrs
+            and attrs["filter_custom_field_query"] is not None
+            and len(attrs["filter_custom_field_query"]) == 0
+        ):
+            attrs["filter_custom_field_query"] = None
+
+        if (
+            "filter_custom_field_query" in attrs
+            and attrs["filter_custom_field_query"] is not None
+        ):
+            parser = CustomFieldQueryParser("filter_custom_field_query")
+            parser.parse(attrs["filter_custom_field_query"])
 
         trigger_type = attrs.get("type", getattr(self.instance, "type", None))
         if (
@@ -2414,6 +2539,32 @@ class WorkflowSerializer(serializers.ModelSerializer):
         if triggers is not None and triggers is not serializers.empty:
             for trigger in triggers:
                 filter_has_tags = trigger.pop("filter_has_tags", None)
+                filter_has_all_tags = trigger.pop("filter_has_all_tags", None)
+                filter_has_not_tags = trigger.pop("filter_has_not_tags", None)
+                filter_has_any_correspondents = trigger.pop(
+                    "filter_has_any_correspondents",
+                    None,
+                )
+                filter_has_not_correspondents = trigger.pop(
+                    "filter_has_not_correspondents",
+                    None,
+                )
+                filter_has_any_document_types = trigger.pop(
+                    "filter_has_any_document_types",
+                    None,
+                )
+                filter_has_not_document_types = trigger.pop(
+                    "filter_has_not_document_types",
+                    None,
+                )
+                filter_has_any_storage_paths = trigger.pop(
+                    "filter_has_any_storage_paths",
+                    None,
+                )
+                filter_has_not_storage_paths = trigger.pop(
+                    "filter_has_not_storage_paths",
+                    None,
+                )
                 # Convert sources to strings to handle django-multiselectfield v1.0 changes
                 WorkflowTriggerSerializer.normalize_workflow_trigger_sources(trigger)
                 trigger_instance, _ = WorkflowTrigger.objects.update_or_create(
@@ -2422,10 +2573,39 @@ class WorkflowSerializer(serializers.ModelSerializer):
                 )
                 if filter_has_tags is not None:
                     trigger_instance.filter_has_tags.set(filter_has_tags)
+                if filter_has_all_tags is not None:
+                    trigger_instance.filter_has_all_tags.set(filter_has_all_tags)
+                if filter_has_not_tags is not None:
+                    trigger_instance.filter_has_not_tags.set(filter_has_not_tags)
+                if filter_has_any_correspondents is not None:
+                    trigger_instance.filter_has_any_correspondents.set(
+                        filter_has_any_correspondents,
+                    )
+                if filter_has_not_correspondents is not None:
+                    trigger_instance.filter_has_not_correspondents.set(
+                        filter_has_not_correspondents,
+                    )
+                if filter_has_any_document_types is not None:
+                    trigger_instance.filter_has_any_document_types.set(
+                        filter_has_any_document_types,
+                    )
+                if filter_has_not_document_types is not None:
+                    trigger_instance.filter_has_not_document_types.set(
+                        filter_has_not_document_types,
+                    )
+                if filter_has_any_storage_paths is not None:
+                    trigger_instance.filter_has_any_storage_paths.set(
+                        filter_has_any_storage_paths,
+                    )
+                if filter_has_not_storage_paths is not None:
+                    trigger_instance.filter_has_not_storage_paths.set(
+                        filter_has_not_storage_paths,
+                    )
                 set_triggers.append(trigger_instance)
 
         if actions is not None and actions is not serializers.empty:
-            for action in actions:
+            for index, action in enumerate(actions):
+                action["order"] = index
                 assign_tags = action.pop("assign_tags", None)
                 assign_view_users = action.pop("assign_view_users", None)
                 assign_view_groups = action.pop("assign_view_groups", None)
@@ -2551,6 +2731,16 @@ class WorkflowSerializer(serializers.ModelSerializer):
         self.prune_triggers_and_actions()
 
         return instance
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        actions = instance.actions.order_by("order", "pk")
+        data["actions"] = WorkflowActionSerializer(
+            actions,
+            many=True,
+            context=self.context,
+        ).data
+        return data
 
 
 class TrashSerializer(SerializerWithPerms):

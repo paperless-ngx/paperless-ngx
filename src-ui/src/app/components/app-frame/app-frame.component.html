@@ -30,6 +30,9 @@
     </div>
   </div>
   <ul ngbNav class="order-sm-3">
+    @if (aiEnabled) {
+      <pngx-chat></pngx-chat>
+    }
     <pngx-toasts-dropdown></pngx-toasts-dropdown>
     <li ngbDropdown class="nav-item dropdown">
       <button class="btn ps-1 border-0" id="userDropdown" ngbDropdownToggle>
@@ -68,13 +71,15 @@
     <nav id="sidebarMenu" class="d-md-block bg-light sidebar collapse"
       [ngClass]="slimSidebarEnabled ? 'slim' : 'col-md-3 col-lg-2 col-xxxl-1'" [class.animating]="slimSidebarAnimating"
       [ngbCollapse]="isMenuCollapsed">
-      <button class="btn btn-sm btn-dark sidebar-slim-toggler" (click)="toggleSlimSidebar()">
-        @if (slimSidebarEnabled) {
-          <i-bs width="0.9em" height="0.9em" name="chevron-double-right"></i-bs>
-        } @else {
-          <i-bs width="0.9em" height="0.9em" name="chevron-double-left"></i-bs>
-        }
-      </button>
+      @if (canSaveSettings) {
+        <button class="btn btn-sm btn-dark sidebar-slim-toggler" (click)="toggleSlimSidebar()">
+          @if (slimSidebarEnabled) {
+            <i-bs width="0.9em" height="0.9em" name="chevron-double-right"></i-bs>
+          } @else {
+            <i-bs width="0.9em" height="0.9em" name="chevron-double-left"></i-bs>
+          }
+        </button>
+      }
       <div class="sidebar-sticky pt-3 d-flex flex-column justify-space-around">
         <ul class="nav flex-column">
           <li class="nav-item app-link">

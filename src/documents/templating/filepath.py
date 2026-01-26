@@ -52,6 +52,33 @@ class FilePathTemplate(Template):
         return clean_filepath(original_render)
 
 
+class PlaceholderString(str):
+    """
+    String subclass used as a sentinel for empty metadata values inside templates.
+
+    - Renders as \"-none-\" to preserve existing filename cleaning logic.
+    - Compares equal to either \"-none-\" or \"none\" so templates can check for either.
+    - Evaluates to False so {% if correspondent %} behaves intuitively.
+    """
+
+    def __new__(cls, value: str = "-none-"):
+        return super().__new__(cls, value)
+
+    def __bool__(self) -> bool:
+        return False
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, str) and other == "none":
+            other = "-none-"
+        return super().__eq__(other)
+
+    def __ne__(self, other) -> bool:
+        return not self.__eq__(other)
+
+
+NO_VALUE_PLACEHOLDER = PlaceholderString("-none-")
+
+
 _template_environment.undefined = _LogStrictUndefined
 
 _template_environment.filters["get_cf_value"] = get_cf_value
@@ -81,7 +108,6 @@ def create_dummy_document():
         page_count=5,
         created=timezone.now(),
         modified=timezone.now(),
-        storage_type=Document.STORAGE_TYPE_UNENCRYPTED,
         added=timezone.now(),
         filename="/dummy/filename.pdf",
         archive_filename="/dummy/archive_filename.pdf",
@@ -128,7 +154,7 @@ def get_added_date_context(document: Document) -> dict[str, str]:
 def get_basic_metadata_context(
     document: Document,
     *,
-    no_value_default: str,
+    no_value_default: str = NO_VALUE_PLACEHOLDER,
 ) -> dict[str, str]:
     """
     Given a Document, constructs some basic information about it.  If certain values are not set,
@@ -235,6 +261,17 @@ def get_custom_fields_context(
     return field_data
 
 
+def _is_safe_relative_path(value: str) -> bool:
+    if value == "":
+        return True
+
+    path = PurePath(value)
+    if path.is_absolute() or path.drive:
+        return False
+
+    return ".." not in path.parts
+
+
 def validate_filepath_template_and_render(
     template_string: str,
     document: Document | None = None,
@@ -266,7 +303,7 @@ def validate_filepath_template_and_render(
     # Build the context dictionary
     context = (
         {"document": document}
-        | get_basic_metadata_context(document, no_value_default="-none-")
+        | get_basic_metadata_context(document, no_value_default=NO_VALUE_PLACEHOLDER)
         | get_creation_date_context(document)
         | get_added_date_context(document)
         | get_tags_context(tags_list)
@@ -281,6 +318,12 @@ def validate_filepath_template_and_render(
             template_class=FilePathTemplate,
         )
         rendered_template = template.render(context)
+
+        if not _is_safe_relative_path(rendered_template):
+            logger.warning(
+                "Template rendered an unsafe path (absolute or containing traversal).",
+            )
+            return None
 
         # We're good!
         return rendered_template

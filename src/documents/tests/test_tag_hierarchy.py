@@ -9,6 +9,7 @@ from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
+from documents.serialisers import TagSerializer
 from documents.signals.handlers import run_workflows
 
 
@@ -121,6 +122,31 @@ class TestTagHierarchy(APITestCase):
         tags = set(self.document.tags.values_list("pk", flat=True))
         assert tags == {self.parent.pk, orphan.pk}
 
+    def test_child_document_count_included_when_parent_paginated(self):
+        self.document.tags.add(self.child)
+
+        response = self.client.get(
+            "/api/tags/",
+            {"page_size": 1, "ordering": "-name"},
+        )
+
+        assert response.status_code == 200
+        assert response.data["results"][0]["id"] == self.parent.pk
+
+        children = response.data["results"][0]["children"]
+        assert len(children) == 1
+
+        child_entry = children[0]
+        assert child_entry["id"] == self.child.pk
+        assert child_entry["document_count"] == 1
+
+    def test_tag_serializer_populates_document_filter_context(self):
+        context = {}
+
+        serializer = TagSerializer(self.parent, context=context)
+        assert serializer.data  # triggers serialization
+        assert "document_count_filter" in context
+
     def test_cannot_set_parent_to_self(self):
         tag = Tag.objects.create(name="Selfie")
         resp = self.client.patch(
@@ -171,7 +197,7 @@ class TestTagHierarchy(APITestCase):
         )
         assert resp_fail.status_code == 400
         assert "parent" in resp_fail.data
-        assert "Invalid" in str(resp_fail.data["parent"])
+        assert "Maximum nesting depth exceeded" in str(resp_fail.data["parent"])
 
     def test_max_depth_on_move_subtree(self):
         a = Tag.objects.create(name="A2")
@@ -191,7 +217,7 @@ class TestTagHierarchy(APITestCase):
         )
         assert resp_fail.status_code == 400
         assert "Maximum nesting depth exceeded" in str(
-            resp_fail.data["non_field_errors"],
+            resp_fail.data["parent"],
         )
 
         # Moving X under C (depth 3) should be allowed (deepest becomes 5)
@@ -203,3 +229,24 @@ class TestTagHierarchy(APITestCase):
         assert resp_ok.status_code in (200, 202)
         x.refresh_from_db()
         assert x.parent_pk == c.id
+
+    def test_is_root_filter_returns_only_root_tags(self):
+        other_root = Tag.objects.create(name="Other parent")
+
+        response = self.client.get(
+            "/api/tags/",
+            {"is_root": "true"},
+        )
+
+        assert response.status_code == 200
+        assert response.data["count"] == 2
+
+        returned_ids = {row["id"] for row in response.data["results"]}
+        assert self.child.pk not in returned_ids
+        assert self.parent.pk in returned_ids
+        assert other_root.pk in returned_ids
+
+        parent_entry = next(
+            row for row in response.data["results"] if row["id"] == self.parent.pk
+        )
+        assert any(child["id"] == self.child.pk for child in parent_entry["children"])

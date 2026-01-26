@@ -40,6 +40,7 @@ def parse_w_workflow_placeholders(
     created: date | None = None,
     doc_title: str | None = None,
     doc_url: str | None = None,
+    doc_id: int | None = None,
 ) -> str:
     """
     Available title placeholders for Workflows depend on what has already been assigned,
@@ -79,8 +80,10 @@ def parse_w_workflow_placeholders(
         formatting.update({"doc_title": doc_title})
     if doc_url is not None:
         formatting.update({"doc_url": doc_url})
+    if doc_id is not None:
+        formatting.update({"doc_id": str(doc_id)})
 
-    logger.debug(f"Jinja Template is : {text}")
+    logger.debug(f"Parsing Workflow Jinja template: {text}")
     try:
         template = _template_environment.from_string(
             text,

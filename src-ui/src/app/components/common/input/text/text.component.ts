@@ -4,8 +4,8 @@ import {
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
 } from '@angular/forms'
+import { RouterLink } from '@angular/router'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { AbstractInputComponent } from '../abstract-input'
 
 @Component({
@@ -22,8 +22,8 @@ import { AbstractInputComponent } from '../abstract-input'
   imports: [
     FormsModule,
     ReactiveFormsModule,
-    SafeHtmlPipe,
     NgxBootstrapIconsModule,
+    RouterLink,
   ],
 })
 export class TextComponent extends AbstractInputComponent<string> {
@@ -33,7 +33,19 @@ export class TextComponent extends AbstractInputComponent<string> {
   @Input()
   placeholder: string = ''
 
+  @Input()
+  suggestion: string = ''
+
   constructor() {
     super()
+  }
+
+  getSuggestion() {
+    return this.value !== this.suggestion ? this.suggestion : ''
+  }
+
+  applySuggestion() {
+    this.value = this.suggestion
+    this.onChange(this.value)
   }
 }

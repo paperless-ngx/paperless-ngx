@@ -13,6 +13,7 @@ import {
 } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
+import { RouterLinkWithHref } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import {
   NgbModal,
@@ -33,7 +34,6 @@ import { Tag } from 'src/app/data/tag'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
   PermissionAction,
@@ -93,7 +93,6 @@ describe('ManagementListComponent', () => {
         SortableDirective,
         PageHeaderComponent,
         IfPermissionsDirective,
-        SafeHtmlPipe,
         ConfirmDialogComponent,
         PermissionsDialogComponent,
       ],
@@ -232,12 +231,15 @@ describe('ManagementListComponent', () => {
   })
 
   it('should support quick filter for objects', () => {
-    const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    const filterButton = fixture.debugElement.queryAll(By.css('button'))[9]
-    filterButton.triggerEventHandler('click')
-    expect(qfSpy).toHaveBeenCalledWith([
+    const expectedUrl = documentListViewService.getQuickFilterUrl([
       { rule_type: FILTER_HAS_TAGS_ALL, value: tags[0].id.toString() },
-    ]) // subclasses set the filter rule type
+    ])
+    const filterLink = fixture.debugElement.query(
+      By.css('a.btn-outline-secondary')
+    )
+    expect(filterLink).toBeTruthy()
+    const routerLink = filterLink.injector.get(RouterLinkWithHref)
+    expect(routerLink.urlTree).toEqual(expectedUrl)
   })
 
   it('should reload on sort', () => {
@@ -346,5 +348,26 @@ describe('ManagementListComponent', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(false)
     expect(component.userCanBulkEdit(PermissionAction.Delete)).toBeFalsy()
     expect(component.userCanBulkEdit(PermissionAction.Change)).toBeFalsy()
+  })
+
+  it('should return an original object from filtered child object', () => {
+    const childTag: Tag = {
+      id: 4,
+      name: 'Child Tag',
+      matching_algorithm: MATCH_LITERAL,
+      match: 'child',
+      document_count: 10,
+      parent: 1,
+    }
+    component['unfilteredData'].push(childTag)
+    const original = component.getOriginalObject({ id: 4 } as Tag)
+    expect(original).toEqual(childTag)
+  })
+
+  it('getSelectableIDs should return flat ids when not overridden', () => {
+    const ids = (
+      ManagementListComponent.prototype as any
+    ).getSelectableIDs.call({}, [{ id: 1 }, { id: 5 }] as any)
+    expect(ids).toEqual([1, 5])
   })
 })

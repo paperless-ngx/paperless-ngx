@@ -48,12 +48,13 @@ if settings.AUDIT_LOG_ENABLED:
 
 
 @contextmanager
-def disable_signal(sig, receiver, sender) -> Generator:
+def disable_signal(sig, receiver, sender, *, weak: bool | None = None) -> Generator:
     try:
         sig.disconnect(receiver=receiver, sender=sender)
         yield
     finally:
-        sig.connect(receiver=receiver, sender=sender)
+        kwargs = {"weak": weak} if weak is not None else {}
+        sig.connect(receiver=receiver, sender=sender, **kwargs)
 
 
 class Command(CryptMixin, BaseCommand):
@@ -258,16 +259,19 @@ class Command(CryptMixin, BaseCommand):
                 post_save,
                 receiver=update_filename_and_move_files,
                 sender=Document,
+                weak=False,
             ),
             disable_signal(
                 m2m_changed,
                 receiver=update_filename_and_move_files,
                 sender=Document.tags.through,
+                weak=False,
             ),
             disable_signal(
                 post_save,
                 receiver=update_filename_and_move_files,
                 sender=CustomFieldInstance,
+                weak=False,
             ),
             disable_signal(
                 post_save,
@@ -378,8 +382,6 @@ class Command(CryptMixin, BaseCommand):
                 archive_path = self.source / archive_file
             else:
                 archive_path = None
-
-            document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
             with FileLock(settings.MEDIA_LOCK):
                 if Path(document.source_path).is_file():

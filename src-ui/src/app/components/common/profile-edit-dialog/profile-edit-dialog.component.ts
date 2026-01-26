@@ -18,7 +18,6 @@ import {
   SocialAccountProvider,
   TotpSettings,
 } from 'src/app/data/user-profile'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { ProfileService } from 'src/app/services/profile.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { setLocationHref } from 'src/app/utils/navigation'
@@ -37,7 +36,6 @@ import { TextComponent } from '../input/text/text.component'
     PasswordComponent,
     FormsModule,
     ReactiveFormsModule,
-    SafeHtmlPipe,
     NgbAccordionModule,
     NgbPopoverModule,
     NgxBootstrapIconsModule,
@@ -88,6 +86,13 @@ export class ProfileEditDialogComponent
 
   public socialAccounts: SocialAccount[] = []
   public socialAccountProviders: SocialAccountProvider[] = []
+
+  get qrSvgDataUrl(): string | null {
+    if (!this.totpSettings?.qr_svg) {
+      return null
+    }
+    return `data:image/svg+xml;utf8,${encodeURIComponent(this.totpSettings.qr_svg)}`
+  }
 
   ngOnInit(): void {
     this.networkActive = true
@@ -183,6 +188,7 @@ export class ProfileEditDialogComponent
       this.newPassword && this.currentPassword !== this.newPassword
     const profile = Object.assign({}, this.form.value)
     delete profile.totp_code
+    this.error = null
     this.networkActive = true
     this.profileService
       .update(profile)
@@ -204,6 +210,7 @@ export class ProfileEditDialogComponent
         },
         error: (error) => {
           this.toastService.showError($localize`Error saving profile`, error)
+          this.error = error?.error
           this.networkActive = false
         },
       })

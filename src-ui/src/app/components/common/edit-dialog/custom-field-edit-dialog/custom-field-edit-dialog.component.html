@@ -38,9 +38,6 @@
               size="sm"
             ></ngb-pagination>
           }
-          @if (object?.id) {
-            <small class="d-block mt-2" i18n>Warning: existing instances of this field will retain their current value index (e.g. option #1, #2, #3) after editing the options here</small>
-          }
         }
         @case (CustomFieldDataType.Monetary) {
           <div class="my-3">
