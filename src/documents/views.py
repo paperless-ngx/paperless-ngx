@@ -485,11 +485,11 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
         if descendant_pks:
             filter_q = self.get_document_count_filter()
-            children_source = (
+            children_source = list(
                 Tag.objects.filter(pk__in=descendant_pks | {t.pk for t in all_tags})
                 .select_related("owner")
                 .annotate(document_count=Count("documents", filter=filter_q))
-                .order_by(*ordering)
+                .order_by(*ordering),
             )
         else:
             children_source = all_tags
@@ -501,7 +501,11 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
+        response = self.get_paginated_response(serializer.data)
+        if descendant_pks:
+            # Include children in the "all" field, if needed
+            response.data["all"] = [tag.pk for tag in children_source]
+        return response
 
     def perform_update(self, serializer):
         old_parent = self.get_object().get_parent()

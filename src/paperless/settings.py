@@ -357,6 +357,7 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.mfa",
+    "allauth.headless",
     "drf_spectacular",
     "drf_spectacular_sidecar",
     "treenode",
@@ -551,6 +552,12 @@ SOCIALACCOUNT_PROVIDERS = json.loads(
 )
 SOCIAL_ACCOUNT_DEFAULT_GROUPS = __get_list("PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS")
 SOCIAL_ACCOUNT_SYNC_GROUPS = __get_boolean("PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS")
+SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM: Final[str] = os.getenv(
+    "PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM",
+    "groups",
+)
+
+HEADLESS_TOKEN_STRATEGY = "paperless.adapter.DrfTokenStrategy"
 
 MFA_TOTP_ISSUER = "Paperless-ngx"
 
