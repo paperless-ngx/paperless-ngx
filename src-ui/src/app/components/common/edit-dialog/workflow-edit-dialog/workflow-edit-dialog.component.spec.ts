@@ -412,6 +412,9 @@ describe('WorkflowEditDialogComponent', () => {
       return newFilter
     }
 
+    const correspondentAny = addFilterOfType(TriggerFilterType.CorrespondentAny)
+    correspondentAny.get('values').setValue([11])
+
     const correspondentIs = addFilterOfType(TriggerFilterType.CorrespondentIs)
     correspondentIs.get('values').setValue(1)
 
@@ -421,11 +424,17 @@ describe('WorkflowEditDialogComponent', () => {
     const documentTypeIs = addFilterOfType(TriggerFilterType.DocumentTypeIs)
     documentTypeIs.get('values').setValue(1)
 
+    const documentTypeAny = addFilterOfType(TriggerFilterType.DocumentTypeAny)
+    documentTypeAny.get('values').setValue([12])
+
     const documentTypeNot = addFilterOfType(TriggerFilterType.DocumentTypeNot)
     documentTypeNot.get('values').setValue([1])
 
     const storagePathIs = addFilterOfType(TriggerFilterType.StoragePathIs)
     storagePathIs.get('values').setValue(1)
+
+    const storagePathAny = addFilterOfType(TriggerFilterType.StoragePathAny)
+    storagePathAny.get('values').setValue([13])
 
     const storagePathNot = addFilterOfType(TriggerFilterType.StoragePathNot)
     storagePathNot.get('values').setValue([1])
@@ -441,10 +450,13 @@ describe('WorkflowEditDialogComponent', () => {
     expect(formValues.triggers[0].filter_has_tags).toEqual([1])
     expect(formValues.triggers[0].filter_has_all_tags).toEqual([2, 3])
     expect(formValues.triggers[0].filter_has_not_tags).toEqual([4])
+    expect(formValues.triggers[0].filter_has_any_correspondents).toEqual([11])
     expect(formValues.triggers[0].filter_has_correspondent).toEqual(1)
     expect(formValues.triggers[0].filter_has_not_correspondents).toEqual([1])
+    expect(formValues.triggers[0].filter_has_any_document_types).toEqual([12])
     expect(formValues.triggers[0].filter_has_document_type).toEqual(1)
     expect(formValues.triggers[0].filter_has_not_document_types).toEqual([1])
+    expect(formValues.triggers[0].filter_has_any_storage_paths).toEqual([13])
     expect(formValues.triggers[0].filter_has_storage_path).toEqual(1)
     expect(formValues.triggers[0].filter_has_not_storage_paths).toEqual([1])
     expect(formValues.triggers[0].filter_custom_field_query).toEqual(
@@ -507,16 +519,22 @@ describe('WorkflowEditDialogComponent', () => {
 
     setFilter(TriggerFilterType.TagsAll, 11)
     setFilter(TriggerFilterType.TagsNone, 12)
+    setFilter(TriggerFilterType.CorrespondentAny, 16)
     setFilter(TriggerFilterType.CorrespondentNot, 13)
+    setFilter(TriggerFilterType.DocumentTypeAny, 17)
     setFilter(TriggerFilterType.DocumentTypeNot, 14)
+    setFilter(TriggerFilterType.StoragePathAny, 18)
     setFilter(TriggerFilterType.StoragePathNot, 15)
 
     const formValues = component['getFormValues']()
 
     expect(formValues.triggers[0].filter_has_all_tags).toEqual([11])
     expect(formValues.triggers[0].filter_has_not_tags).toEqual([12])
+    expect(formValues.triggers[0].filter_has_any_correspondents).toEqual([16])
     expect(formValues.triggers[0].filter_has_not_correspondents).toEqual([13])
+    expect(formValues.triggers[0].filter_has_any_document_types).toEqual([17])
     expect(formValues.triggers[0].filter_has_not_document_types).toEqual([14])
+    expect(formValues.triggers[0].filter_has_any_storage_paths).toEqual([18])
     expect(formValues.triggers[0].filter_has_not_storage_paths).toEqual([15])
   })
 
@@ -640,8 +658,11 @@ describe('WorkflowEditDialogComponent', () => {
       filter_has_tags: [],
       filter_has_all_tags: [],
       filter_has_not_tags: [],
+      filter_has_any_correspondents: [],
       filter_has_not_correspondents: [],
+      filter_has_any_document_types: [],
       filter_has_not_document_types: [],
+      filter_has_any_storage_paths: [],
       filter_has_not_storage_paths: [],
       filter_has_correspondent: null,
       filter_has_document_type: null,
@@ -699,11 +720,14 @@ describe('WorkflowEditDialogComponent', () => {
     trigger.filter_has_tags = [1]
     trigger.filter_has_all_tags = [2, 3]
     trigger.filter_has_not_tags = [4]
+    trigger.filter_has_any_correspondents = [10] as any
     trigger.filter_has_correspondent = 5 as any
     trigger.filter_has_not_correspondents = [6] as any
     trigger.filter_has_document_type = 7 as any
+    trigger.filter_has_any_document_types = [11] as any
     trigger.filter_has_not_document_types = [8] as any
     trigger.filter_has_storage_path = 9 as any
+    trigger.filter_has_any_storage_paths = [12] as any
     trigger.filter_has_not_storage_paths = [10] as any
     trigger.filter_custom_field_query = JSON.stringify([
       'AND',
@@ -714,8 +738,8 @@ describe('WorkflowEditDialogComponent', () => {
     component.ngOnInit()
     const triggerGroup = component.triggerFields.at(0) as FormGroup
     const filters = component.getFiltersFormArray(triggerGroup)
-    expect(filters.length).toBe(10)
-    const customFieldFilter = filters.at(9) as FormGroup
+    expect(filters.length).toBe(13)
+    const customFieldFilter = filters.at(12) as FormGroup
     expect(customFieldFilter.get('type').value).toBe(
       TriggerFilterType.CustomFieldQuery
     )
@@ -724,10 +748,25 @@ describe('WorkflowEditDialogComponent', () => {
   })
 
   it('should expose select metadata helpers', () => {
+    expect(component.isSelectMultiple(TriggerFilterType.CorrespondentAny)).toBe(
+      true
+    )
     expect(component.isSelectMultiple(TriggerFilterType.CorrespondentNot)).toBe(
       true
     )
     expect(component.isSelectMultiple(TriggerFilterType.CorrespondentIs)).toBe(
+      false
+    )
+    expect(component.isSelectMultiple(TriggerFilterType.DocumentTypeAny)).toBe(
+      true
+    )
+    expect(component.isSelectMultiple(TriggerFilterType.DocumentTypeIs)).toBe(
+      false
+    )
+    expect(component.isSelectMultiple(TriggerFilterType.StoragePathAny)).toBe(
+      true
+    )
+    expect(component.isSelectMultiple(TriggerFilterType.StoragePathIs)).toBe(
       false
     )
 
@@ -742,7 +781,13 @@ describe('WorkflowEditDialogComponent', () => {
       component.getFilterSelectItems(TriggerFilterType.DocumentTypeIs)
     ).toEqual(component.documentTypes)
     expect(
+      component.getFilterSelectItems(TriggerFilterType.DocumentTypeAny)
+    ).toEqual(component.documentTypes)
+    expect(
       component.getFilterSelectItems(TriggerFilterType.StoragePathIs)
+    ).toEqual(component.storagePaths)
+    expect(
+      component.getFilterSelectItems(TriggerFilterType.StoragePathAny)
     ).toEqual(component.storagePaths)
     expect(component.getFilterSelectItems(TriggerFilterType.TagsAll)).toEqual(
       []
