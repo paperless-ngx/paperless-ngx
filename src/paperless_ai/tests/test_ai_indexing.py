@@ -3,11 +3,13 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
+from celery import states
 from django.test import override_settings
 from django.utils import timezone
 from llama_index.core.base.embeddings.base import BaseEmbedding
 
 from documents.models import Document
+from documents.models import PaperlessTask
 from paperless_ai import indexing
 
 
@@ -288,6 +290,36 @@ def test_update_llm_index_no_documents(
             )
 
 
+@pytest.mark.django_db
+def test_queue_llm_index_update_if_needed_enqueues_when_idle_or_skips_recent():
+    # No existing tasks
+    with patch("documents.tasks.llmindex_index") as mock_task:
+        result = indexing.queue_llm_index_update_if_needed(
+            rebuild=True,
+            reason="test enqueue",
+        )
+
+    assert result is True
+    mock_task.delay.assert_called_once_with(rebuild=True, scheduled=False, auto=True)
+
+    PaperlessTask.objects.create(
+        task_id="task-1",
+        task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
+        status=states.STARTED,
+        date_created=timezone.now(),
+    )
+
+    # Existing running task
+    with patch("documents.tasks.llmindex_index") as mock_task:
+        result = indexing.queue_llm_index_update_if_needed(
+            rebuild=False,
+            reason="should skip",
+        )
+
+    assert result is False
+    mock_task.delay.assert_not_called()
+
+
 @override_settings(
     LLM_EMBEDDING_BACKEND="huggingface",
     LLM_BACKEND="ollama",
@@ -336,3 +368,31 @@ def test_query_similar_documents(
         mock_filter.assert_called_once_with(pk__in=[1, 2])
 
         assert result == mock_filtered_docs
+
+
+@pytest.mark.django_db
+def test_query_similar_documents_triggers_update_when_index_missing(
+    temp_llm_index_dir,
+    real_document,
+):
+    with (
+        patch(
+            "paperless_ai.indexing.vector_store_file_exists",
+            return_value=False,
+        ),
+        patch(
+            "paperless_ai.indexing.queue_llm_index_update_if_needed",
+        ) as mock_queue,
+        patch("paperless_ai.indexing.load_or_build_index") as mock_load,
+    ):
+        result = indexing.query_similar_documents(
+            real_document,
+            top_k=2,
+        )
+
+    mock_queue.assert_called_once_with(
+        rebuild=False,
+        reason="LLM index not found for similarity query.",
+    )
+    mock_load.assert_not_called()
+    assert result == []
