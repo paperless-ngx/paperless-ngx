@@ -3,7 +3,7 @@
     <h3 class="d-flex align-items-center mb-1" style="line-height: 1.4">
       <span class="text-truncate">{{title}}</span>
       @if (id) {
-        <span class="badge bg-primary text-primary-text-contrast ms-2 small fs-normal cursor-pointer" (click)="copyID()">
+        <span class="badge bg-primary text-primary-text-contrast ms-3 small fs-normal cursor-pointer" (click)="copyID()">
           @if (copied) {
             <i-bs width="1em" height="1em" name="clipboard-check"></i-bs>&nbsp;<ng-container i18n>Copied!</ng-container>
           } @else {
