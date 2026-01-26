@@ -45,7 +45,7 @@ def revoke_share_link_bundle_permissions(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("documents", "0004_remove_document_storage_type"),
+        ("documents", "0005_workflowtrigger_filter_has_any_correspondents_and_more"),
     ]
 
     operations = [
