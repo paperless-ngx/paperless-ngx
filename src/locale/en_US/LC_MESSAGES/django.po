@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 21:46+0000\n"
+"POT-Creation-Date: 2026-01-26 08:30+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1747,155 +1747,155 @@ msgstr ""
 msgid "paperless application settings"
 msgstr ""
 
-#: paperless/settings.py:800
+#: paperless/settings.py:802
 msgid "English (US)"
 msgstr ""
 
-#: paperless/settings.py:801
+#: paperless/settings.py:803
 msgid "Arabic"
 msgstr ""
 
-#: paperless/settings.py:802
+#: paperless/settings.py:804
 msgid "Afrikaans"
 msgstr ""
 
-#: paperless/settings.py:803
+#: paperless/settings.py:805
 msgid "Belarusian"
 msgstr ""
 
-#: paperless/settings.py:804
+#: paperless/settings.py:806
 msgid "Bulgarian"
 msgstr ""
 
-#: paperless/settings.py:805
+#: paperless/settings.py:807
 msgid "Catalan"
 msgstr ""
 
-#: paperless/settings.py:806
+#: paperless/settings.py:808
 msgid "Czech"
 msgstr ""
 
-#: paperless/settings.py:807
+#: paperless/settings.py:809
 msgid "Danish"
 msgstr ""
 
-#: paperless/settings.py:808
+#: paperless/settings.py:810
 msgid "German"
 msgstr ""
 
-#: paperless/settings.py:809
+#: paperless/settings.py:811
 msgid "Greek"
 msgstr ""
 
-#: paperless/settings.py:810
+#: paperless/settings.py:812
 msgid "English (GB)"
 msgstr ""
 
-#: paperless/settings.py:811
+#: paperless/settings.py:813
 msgid "Spanish"
 msgstr ""
 
-#: paperless/settings.py:812
+#: paperless/settings.py:814
 msgid "Persian"
 msgstr ""
 
-#: paperless/settings.py:813
+#: paperless/settings.py:815
 msgid "Finnish"
 msgstr ""
 
-#: paperless/settings.py:814
+#: paperless/settings.py:816
 msgid "French"
 msgstr ""
 
-#: paperless/settings.py:815
+#: paperless/settings.py:817
 msgid "Hungarian"
 msgstr ""
 
-#: paperless/settings.py:816
+#: paperless/settings.py:818
 msgid "Indonesian"
 msgstr ""
 
-#: paperless/settings.py:817
+#: paperless/settings.py:819
 msgid "Italian"
 msgstr ""
 
-#: paperless/settings.py:818
+#: paperless/settings.py:820
 msgid "Japanese"
 msgstr ""
 
-#: paperless/settings.py:819
+#: paperless/settings.py:821
 msgid "Korean"
 msgstr ""
 
-#: paperless/settings.py:820
+#: paperless/settings.py:822
 msgid "Luxembourgish"
 msgstr ""
 
-#: paperless/settings.py:821
+#: paperless/settings.py:823
 msgid "Norwegian"
 msgstr ""
 
-#: paperless/settings.py:822
+#: paperless/settings.py:824
 msgid "Dutch"
 msgstr ""
 
-#: paperless/settings.py:823
+#: paperless/settings.py:825
 msgid "Polish"
 msgstr ""
 
-#: paperless/settings.py:824
+#: paperless/settings.py:826
 msgid "Portuguese (Brazil)"
 msgstr ""
 
-#: paperless/settings.py:825
+#: paperless/settings.py:827
 msgid "Portuguese"
 msgstr ""
 
-#: paperless/settings.py:826
+#: paperless/settings.py:828
 msgid "Romanian"
 msgstr ""
 
-#: paperless/settings.py:827
+#: paperless/settings.py:829
 msgid "Russian"
 msgstr ""
 
-#: paperless/settings.py:828
+#: paperless/settings.py:830
 msgid "Slovak"
 msgstr ""
 
-#: paperless/settings.py:829
+#: paperless/settings.py:831
 msgid "Slovenian"
 msgstr ""
 
-#: paperless/settings.py:830
+#: paperless/settings.py:832
 msgid "Serbian"
 msgstr ""
 
-#: paperless/settings.py:831
+#: paperless/settings.py:833
 msgid "Swedish"
 msgstr ""
 
-#: paperless/settings.py:832
+#: paperless/settings.py:834
 msgid "Turkish"
 msgstr ""
 
-#: paperless/settings.py:833
+#: paperless/settings.py:835
 msgid "Ukrainian"
 msgstr ""
 
-#: paperless/settings.py:834
+#: paperless/settings.py:836
 msgid "Vietnamese"
 msgstr ""
 
-#: paperless/settings.py:835
+#: paperless/settings.py:837
 msgid "Chinese Simplified"
 msgstr ""
 
-#: paperless/settings.py:836
+#: paperless/settings.py:838
 msgid "Chinese Traditional"
 msgstr ""
 
-#: paperless/urls.py:376
+#: paperless/urls.py:377
 msgid "Paperless-ngx administration"
 msgstr ""
 
