@@ -20,7 +20,9 @@ if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
 
 from django.db.models import Case
+from django.db.models import PositiveIntegerField
 from django.db.models.functions import Cast
+from django.db.models.functions import Length
 from django.db.models.functions import Substr
 from django_softdelete.models import SoftDeleteModel
 
@@ -190,6 +192,15 @@ class Document(SoftDeleteModel, ModelWithOwner):
             "The raw, text-only data of the document. This field is "
             "primarily used for searching.",
         ),
+    )
+
+    content_length = models.GeneratedField(
+        expression=Length("content"),
+        output_field=PositiveIntegerField(default=0),
+        db_persist=True,
+        null=False,
+        serialize=False,
+        help_text="Length of the content field in characters. Automatically maintained by the database for faster statistics computation.",
     )
 
     mime_type = models.CharField(_("mime type"), max_length=256, editable=False)
@@ -945,7 +956,7 @@ if settings.AUDIT_LOG_ENABLED:
     auditlog.register(
         Document,
         m2m_fields={"tags"},
-        exclude_fields=["modified"],
+        exclude_fields=["content_length", "modified"],
     )
     auditlog.register(Correspondent)
     auditlog.register(Tag)
