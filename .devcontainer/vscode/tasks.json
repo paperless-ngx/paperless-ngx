@@ -8,10 +8,7 @@
 			"command": "uv run celery --app paperless worker -l DEBUG",
 			"isBackground": true,
 			"options": {
-				"cwd": "${workspaceFolder}/src",
-				"env": {
-					"UV_CACHE_DIR": "${workspaceFolder}/.uv-cache"
-				}
+				"cwd": "${workspaceFolder}/src"
 			},
 			"problemMatcher": [
 				{
@@ -76,10 +73,7 @@
 				"revealProblems": "onProblem"
 			},
 			"options": {
-				"cwd": "${workspaceFolder}/src",
-				"env": {
-					"UV_CACHE_DIR": "${workspaceFolder}/.uv-cache"
-				}
+				"cwd": "${workspaceFolder}/src"
 			}
 		},
 		{
@@ -98,10 +92,7 @@
 				"revealProblems": "onProblem"
 			},
 			"options": {
-				"cwd": "${workspaceFolder}/src",
-				"env": {
-					"UV_CACHE_DIR": "${workspaceFolder}/.uv-cache"
-				}
+				"cwd": "${workspaceFolder}/src"
 			}
 		},
 		{
@@ -120,10 +111,7 @@
 				"revealProblems": "onProblem"
 			},
 			"options": {
-				"cwd": "${workspaceFolder}/src",
-				"env": {
-					"UV_CACHE_DIR": "${workspaceFolder}/.uv-cache"
-				}
+				"cwd": "${workspaceFolder}/src"
 			}
 		},
 		{
@@ -142,10 +130,7 @@
 				"revealProblems": "onProblem"
 			},
 			"options": {
-				"cwd": "${workspaceFolder}",
-				"env": {
-					"UV_CACHE_DIR": "${workspaceFolder}/.uv-cache"
-				}
+				"cwd": "${workspaceFolder}"
 			}
 		},
 		{
@@ -164,10 +149,7 @@
 				"revealProblems": "onProblem"
 			},
 			"options": {
-				"cwd": "${workspaceFolder}/src",
-				"env": {
-					"UV_CACHE_DIR": "${workspaceFolder}/.uv-cache"
-				}
+				"cwd": "${workspaceFolder}/src"
 			}
 		},
 		{
@@ -186,10 +168,7 @@
 				"revealProblems": "onProblem"
 			},
 			"options": {
-				"cwd": "${workspaceFolder}",
-				"env": {
-					"UV_CACHE_DIR": "${workspaceFolder}/.uv-cache"
-				}
+				"cwd": "${workspaceFolder}"
 			}
 		},
 		{
