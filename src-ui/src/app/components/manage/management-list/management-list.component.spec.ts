@@ -229,6 +229,21 @@ describe('ManagementListComponent', () => {
     expect(reloadSpy).toHaveBeenCalled()
   })
 
+  it('should use the all list length for collection size when provided', fakeAsync(() => {
+    jest.spyOn(tagService, 'listFiltered').mockReturnValueOnce(
+      of({
+        count: 1,
+        all: [1, 2, 3],
+        results: tags.slice(0, 1),
+      })
+    )
+
+    component.reloadData()
+    tick(100)
+
+    expect(component.collectionSize).toBe(3)
+  }))
+
   it('should support quick filter for objects', () => {
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
     const filterButton = fixture.debugElement.queryAll(By.css('button'))[9]
