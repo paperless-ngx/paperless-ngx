@@ -6,9 +6,11 @@
       "jest",
       "node",
     ],
-    "module": "commonjs",
-    "emitDecoratorMetadata": true,
-    "allowJs": true
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "emitDecoratorMetadata": false,
+    "allowJs": true,
+    "isolatedModules": true
   },
   "files": [
     "src/polyfills.ts"

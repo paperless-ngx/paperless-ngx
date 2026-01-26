@@ -497,7 +497,6 @@ class ConsumerPlugin(
                     create_source_path_directory(document.source_path)
 
                     self._write(
-                        document.storage_type,
                         self.unmodified_original
                         if self.unmodified_original is not None
                         else self.working_copy,
@@ -505,7 +504,6 @@ class ConsumerPlugin(
                     )
 
                     self._write(
-                        document.storage_type,
                         thumbnail,
                         document.thumbnail_path,
                     )
@@ -517,7 +515,6 @@ class ConsumerPlugin(
                         )
                         create_source_path_directory(document.archive_path)
                         self._write(
-                            document.storage_type,
                             archive_path,
                             document.archive_path,
                         )
@@ -637,8 +634,6 @@ class ConsumerPlugin(
             )
             self.log.debug(f"Creation date from st_mtime: {create_date}")
 
-        storage_type = Document.STORAGE_TYPE_UNENCRYPTED
-
         if self.metadata.filename:
             title = Path(self.metadata.filename).stem
         else:
@@ -665,7 +660,6 @@ class ConsumerPlugin(
             checksum=hashlib.md5(file_for_checksum.read_bytes()).hexdigest(),
             created=create_date,
             modified=create_date,
-            storage_type=storage_type,
             page_count=page_count,
             original_filename=self.filename,
         )
@@ -696,7 +690,7 @@ class ConsumerPlugin(
                 pk=self.metadata.storage_path_id,
             )
 
-        if self.metadata.asn is not None:
+        if self.metadata.asn is not None and not self.metadata.skip_asn:
             document.archive_serial_number = self.metadata.asn
 
         if self.metadata.owner_id:
@@ -736,7 +730,7 @@ class ConsumerPlugin(
                 }
                 CustomFieldInstance.objects.create(**args)  # adds to document
 
-    def _write(self, storage_type, source, target):
+    def _write(self, source, target):
         with (
             Path(source).open("rb") as read_file,
             Path(target).open("wb") as write_file,
@@ -812,8 +806,8 @@ class ConsumerPreflightPlugin(
         """
         Check that if override_asn is given, it is unique and within a valid range
         """
-        if self.metadata.asn is None:
-            # check not necessary in case no ASN gets set
+        if self.metadata.skip_asn or self.metadata.asn is None:
+            # if skip is set or ASN is None
             return
         # Validate the range is above zero and less than uint32_t max
         # otherwise, Whoosh can't handle it in the index

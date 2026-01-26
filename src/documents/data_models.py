@@ -30,6 +30,7 @@ class DocumentMetadataOverrides:
     change_users: list[int] | None = None
     change_groups: list[int] | None = None
     custom_fields: dict | None = None
+    skip_asn: bool = False
 
     def update(self, other: "DocumentMetadataOverrides") -> "DocumentMetadataOverrides":
         """
@@ -49,6 +50,8 @@ class DocumentMetadataOverrides:
             self.storage_path_id = other.storage_path_id
         if other.owner_id is not None:
             self.owner_id = other.owner_id
+        if other.skip_asn:
+            self.skip_asn = True
 
         # merge
         if self.tag_ids is None:

@@ -13,6 +13,7 @@ import {
 } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
+import { RouterLinkWithHref } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import {
   NgbModal,
@@ -242,11 +243,15 @@ describe('ManagementListComponent', () => {
   }))
 
   it('should support quick filter for objects', () => {
-    const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    component.filterDocuments(tags[0])
-    expect(qfSpy).toHaveBeenCalledWith([
+    const expectedUrl = documentListViewService.getQuickFilterUrl([
       { rule_type: FILTER_HAS_TAGS_ALL, value: tags[0].id.toString() },
-    ]) // subclasses set the filter rule type
+    ])
+    const filterLink = fixture.debugElement.query(
+      By.css('a.btn-outline-secondary')
+    )
+    expect(filterLink).toBeTruthy()
+    const routerLink = filterLink.injector.get(RouterLinkWithHref)
+    expect(routerLink.urlTree).toEqual(expectedUrl)
   })
 
   it('should reload on sort', () => {

@@ -1,6 +1,7 @@
 import { NgClass, NgTemplateOutlet, TitleCasePipe } from '@angular/common'
 import { Component, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { RouterModule } from '@angular/router'
 import {
   NgbDropdownModule,
   NgbPaginationModule,
@@ -30,6 +31,7 @@ import { ManagementListComponent } from '../management-list/management-list.comp
     TitleCasePipe,
     FormsModule,
     ReactiveFormsModule,
+    RouterModule,
     NgClass,
     NgTemplateOutlet,
     NgbDropdownModule,

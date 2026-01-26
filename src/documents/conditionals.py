@@ -128,7 +128,7 @@ def thumbnail_last_modified(request, pk: int) -> datetime | None:
     Cache should be (slightly?) faster than filesystem
     """
     try:
-        doc = Document.objects.only("storage_type").get(pk=pk)
+        doc = Document.objects.only("pk").get(pk=pk)
         if not doc.thumbnail_path.exists():
             return None
         doc_key = get_thumbnail_modified_key(pk)

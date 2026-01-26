@@ -18,6 +18,7 @@ from rest_framework.routers import DefaultRouter
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
+from documents.views import ChatStreamingView
 from documents.views import CorrespondentViewSet
 from documents.views import CustomFieldViewSet
 from documents.views import DocumentTypeViewSet
@@ -139,6 +140,11 @@ urlpatterns = [
                                 SelectionDataView.as_view(),
                                 name="selection_data",
                             ),
+                            re_path(
+                                "^chat/",
+                                ChatStreamingView.as_view(),
+                                name="chat_streaming_view",
+                            ),
                         ],
                     ),
                 ),
@@ -222,6 +228,7 @@ urlpatterns = [
                         ],
                     ),
                 ),
+                re_path("^auth/headless/", include("allauth.headless.urls")),
                 re_path(
                     "^$",  # Redirect to the API swagger view
                     RedirectView.as_view(url="schema/view/"),

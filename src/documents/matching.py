@@ -403,6 +403,18 @@ def existing_document_matches_workflow(
                 f"Document tags {list(document.tags.all())} include excluded tags {list(trigger_has_not_tags_qs)}",
             )
 
+    allowed_correspondent_ids = set(
+        trigger.filter_has_any_correspondents.values_list("id", flat=True),
+    )
+    if (
+        allowed_correspondent_ids
+        and document.correspondent_id not in allowed_correspondent_ids
+    ):
+        return (
+            False,
+            f"Document correspondent {document.correspondent} is not one of {list(trigger.filter_has_any_correspondents.all())}",
+        )
+
     # Document correspondent vs trigger has_correspondent
     if (
         trigger.filter_has_correspondent_id is not None
@@ -424,6 +436,17 @@ def existing_document_matches_workflow(
             f"Document correspondent {document.correspondent} is excluded by {list(trigger.filter_has_not_correspondents.all())}",
         )
 
+    allowed_document_type_ids = set(
+        trigger.filter_has_any_document_types.values_list("id", flat=True),
+    )
+    if allowed_document_type_ids and (
+        document.document_type_id not in allowed_document_type_ids
+    ):
+        return (
+            False,
+            f"Document doc type {document.document_type} is not one of {list(trigger.filter_has_any_document_types.all())}",
+        )
+
     # Document document_type vs trigger has_document_type
     if (
         trigger.filter_has_document_type_id is not None
@@ -443,6 +466,17 @@ def existing_document_matches_workflow(
         return (
             False,
             f"Document doc type {document.document_type} is excluded by {list(trigger.filter_has_not_document_types.all())}",
+        )
+
+    allowed_storage_path_ids = set(
+        trigger.filter_has_any_storage_paths.values_list("id", flat=True),
+    )
+    if allowed_storage_path_ids and (
+        document.storage_path_id not in allowed_storage_path_ids
+    ):
+        return (
+            False,
+            f"Document storage path {document.storage_path} is not one of {list(trigger.filter_has_any_storage_paths.all())}",
         )
 
     # Document storage_path vs trigger has_storage_path
@@ -532,6 +566,10 @@ def prefilter_documents_by_workflowtrigger(
 
     # Correspondent, DocumentType, etc. filtering
 
+    if trigger.filter_has_any_correspondents.exists():
+        documents = documents.filter(
+            correspondent__in=trigger.filter_has_any_correspondents.all(),
+        )
     if trigger.filter_has_correspondent is not None:
         documents = documents.filter(
             correspondent=trigger.filter_has_correspondent,
@@ -541,6 +579,10 @@ def prefilter_documents_by_workflowtrigger(
             correspondent__in=trigger.filter_has_not_correspondents.all(),
         )
 
+    if trigger.filter_has_any_document_types.exists():
+        documents = documents.filter(
+            document_type__in=trigger.filter_has_any_document_types.all(),
+        )
     if trigger.filter_has_document_type is not None:
         documents = documents.filter(
             document_type=trigger.filter_has_document_type,
@@ -550,6 +592,10 @@ def prefilter_documents_by_workflowtrigger(
             document_type__in=trigger.filter_has_not_document_types.all(),
         )
 
+    if trigger.filter_has_any_storage_paths.exists():
+        documents = documents.filter(
+            storage_path__in=trigger.filter_has_any_storage_paths.all(),
+        )
     if trigger.filter_has_storage_path is not None:
         documents = documents.filter(
             storage_path=trigger.filter_has_storage_path,
@@ -604,8 +650,11 @@ def document_matches_workflow(
             "filter_has_tags",
             "filter_has_all_tags",
             "filter_has_not_tags",
+            "filter_has_any_document_types",
             "filter_has_not_document_types",
+            "filter_has_any_correspondents",
             "filter_has_not_correspondents",
+            "filter_has_any_storage_paths",
             "filter_has_not_storage_paths",
         )
     )
