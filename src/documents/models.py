@@ -812,7 +812,7 @@ class ShareLinkBundle(SoftDeleteModel):
         default=Status.PENDING,
     )
 
-    size_bytes = models.BigIntegerField(
+    size_bytes = models.PositiveIntegerField(
         _("size (bytes)"),
         blank=True,
         null=True,

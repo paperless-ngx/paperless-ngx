@@ -112,7 +112,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "size_bytes",
-                    models.BigIntegerField(
+                    models.PositiveIntegerField(
                         blank=True,
                         null=True,
                         verbose_name="size (bytes)",
