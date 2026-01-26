@@ -84,6 +84,9 @@ from documents.validators import url_validator
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+    from django.db.models.query import QuerySet
+
+
 logger = logging.getLogger("paperless.serializers")
 
 
@@ -1016,7 +1019,10 @@ class NotesSerializer(serializers.ModelSerializer):
         return ret
 
 
-def _get_viewable_duplicates(document: Document, user: User | None):
+def _get_viewable_duplicates(
+    document: Document,
+    user: User | None,
+) -> QuerySet[Document]:
     checksums = {document.checksum}
     if document.archive_checksum:
         checksums.add(document.archive_checksum)
