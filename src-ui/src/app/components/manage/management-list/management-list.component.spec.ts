@@ -288,6 +288,71 @@ describe('ManagementListComponent', () => {
     expect(component.selectedObjects.size).toEqual(tags.length)
   })
 
+  it('selectNone should clear selection and reset toggle flag', () => {
+    component.selectedObjects = new Set([tags[0].id, tags[1].id])
+    component.togggleAll = true
+
+    component.selectNone()
+
+    expect(component.selectedObjects.size).toBe(0)
+    expect(component.togggleAll).toBe(false)
+  })
+
+  it('selectPage should select current page items or clear selection', () => {
+    component.selectPage(true)
+    expect(component.selectedObjects).toEqual(new Set(tags.map((t) => t.id)))
+    expect(component.togggleAll).toBe(true)
+
+    component.togggleAll = true
+    component.selectPage(false)
+    expect(component.selectedObjects.size).toBe(0)
+    expect(component.togggleAll).toBe(false)
+  })
+
+  it('selectAll should use all IDs when collection size exists', () => {
+    ;(component as any).allIDs = [1, 2, 3, 4]
+    component.collectionSize = 4
+
+    component.selectAll()
+
+    expect(component.selectedObjects).toEqual(new Set([1, 2, 3, 4]))
+    expect(component.togggleAll).toBe(true)
+  })
+
+  it('selectAll should clear selection when collection size is zero', () => {
+    component.selectedObjects = new Set([1])
+    component.collectionSize = 0
+    component.togggleAll = true
+
+    component.selectAll()
+
+    expect(component.selectedObjects.size).toBe(0)
+    expect(component.togggleAll).toBe(false)
+  })
+
+  it('toggleSelected should toggle object selection and update toggle state', () => {
+    component.toggleSelected(tags[0])
+    expect(component.selectedObjects.has(tags[0].id)).toBe(true)
+    expect(component.togggleAll).toBe(false)
+
+    component.toggleSelected(tags[1])
+    component.toggleSelected(tags[2])
+    expect(component.togggleAll).toBe(true)
+
+    component.toggleSelected(tags[1])
+    expect(component.selectedObjects.has(tags[1].id)).toBe(false)
+    expect(component.togggleAll).toBe(false)
+  })
+
+  it('areAllPageItemsSelected should return false when page has no selectable items', () => {
+    component.data = []
+    component.selectedObjects.clear()
+
+    expect((component as any).areAllPageItemsSelected()).toBe(false)
+
+    component.data = tags
+  })
+
   it('should support bulk edit permissions', () => {
     const bulkEditPermsSpy = jest.spyOn(tagService, 'bulk_edit_objects')
     component.toggleSelected(tags[0])
