@@ -164,9 +164,11 @@
     {{ item.name }}
     <span class="ms-auto text-muted small">
       @if (item.dateEnd) {
-        {{ item.date | customDate:'MMM d' }} &ndash; {{ item.dateEnd | customDate:'mediumDate' }}
+        {{ item.date | customDate:'mediumDate' }} &ndash; {{ item.dateEnd | customDate:'mediumDate' }}
+      } @else if (item.dateTilNow) {
+        {{ item.dateTilNow | customDate:'mediumDate' }} &ndash; <ng-container i18n>now</ng-container>
       } @else {
-        {{ item.date | customDate:'mediumDate' }} &ndash; <ng-container i18n>now</ng-container>
+        {{ item.date | customDate:'mediumDate' }}
       }
     </span>
   </div>
