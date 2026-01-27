@@ -45,8 +45,7 @@ class MailAttachmentMock:
 
 
 @pytest.mark.live
-@pytest.mark.http
-@pytest.mark.fixtures_server
+@pytest.mark.nginx
 @pytest.mark.skipif(
     "PAPERLESS_CI_TEST" not in os.environ,
     reason="No Gotenberg/Tika servers to test with",
@@ -132,6 +131,7 @@ class TestNginxService:
 @pytest.mark.live
 @pytest.mark.gotenberg
 @pytest.mark.tika
+@pytest.mark.nginx
 @pytest.mark.skipif(
     "PAPERLESS_CI_TEST" not in os.environ,
     reason="No Gotenberg/Tika servers to test with",

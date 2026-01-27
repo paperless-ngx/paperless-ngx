@@ -300,6 +300,13 @@ norecursedirs = [ "src/locale/", ".venv/", "src-ui/" ]
 
 DJANGO_SETTINGS_MODULE = "paperless.settings"
 
+markers = [
+  "live: Integration tests requiring external services (Gotenberg, Tika, nginx, etc)",
+  "nginx: Tests that make HTTP requests to the local nginx service",
+  "gotenberg: Tests requiring Gotenberg service",
+  "tika: Tests requiring Tika service",
+]
+
 [tool.pytest_env]
 PAPERLESS_DISABLE_DBHANDLER = "true"
 PAPERLESS_CACHE_BACKEND = "django.core.cache.backends.locmem.LocMemCache"
