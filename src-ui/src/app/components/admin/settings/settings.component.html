@@ -139,6 +139,25 @@
             </div>
           </div>
           <div class="col-xl-6 ps-xl-5">
+            <h5 class="mt-3 mt-md-0" i18n>Global search</h5>
+            <div class="row">
+              <div class="col">
+                <pngx-input-check i18n-title title="Do not include advanced search results" formControlName="searchDbOnly"></pngx-input-check>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-3 col-form-label pt-0">
+                <span i18n>Full search links to</span>
+              </div>
+              <div class="col mb-3">
+                <select class="form-select" formControlName="searchLink">
+                  <option [ngValue]="GlobalSearchType.TITLE_CONTENT" i18n>Title and content search</option>
+                  <option [ngValue]="GlobalSearchType.ADVANCED" i18n>Advanced search</option>
+                </select>
+              </div>
+            </div>
+
             <h5 class="mt-3 mt-md-0" id="update-checking" i18n>Update checking</h5>
             <div class="row mb-3">
               <div class="col d-flex flex-row align-items-start">
@@ -216,17 +235,17 @@
               </div>
             </div>
 
-            <div class="row mb-3">
+            <div class="row">
               <div class="col">
                 <pngx-input-check i18n-title title="Show document thumbnail during loading" formControlName="documentEditingOverlayThumbnail"></pngx-input-check>
               </div>
             </div>
 
-            <h5 class="mt-3" i18n>Document details fields</h5>
             <div class="row mb-3">
               <div class="col">
+                <label class="mb-2" i18n>Built-in fields to show:</label>
                 @for (option of documentDetailFieldOptions; track option.id) {
-                  <div class="form-check">
+                  <div class="form-check ms-3">
                     <input class="form-check-input" type="checkbox"
                       [id]="'documentDetailField-' + option.id"
                       [checked]="isDocumentDetailFieldShown(option.id)"
@@ -241,25 +260,6 @@
             </div>
           </div>
           <div class="col-xl-6 ps-xl-5">
-            <h5 class="mt-3 mt-md-0" i18n>Global search</h5>
-            <div class="row">
-              <div class="col">
-                <pngx-input-check i18n-title title="Do not include advanced search results" formControlName="searchDbOnly"></pngx-input-check>
-              </div>
-            </div>
-
-            <div class="row mb-3">
-              <div class="col-md-3 col-form-label pt-0">
-                <span i18n>Full search links to</span>
-              </div>
-              <div class="col mb-3">
-                <select class="form-select" formControlName="searchLink">
-                  <option [ngValue]="GlobalSearchType.TITLE_CONTENT" i18n>Title and content search</option>
-                  <option [ngValue]="GlobalSearchType.ADVANCED" i18n>Advanced search</option>
-                </select>
-              </div>
-            </div>
-
             <h5 class="mt-3" i18n>Bulk editing</h5>
             <div class="row mb-3">
               <div class="col">

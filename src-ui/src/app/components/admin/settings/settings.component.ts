@@ -83,9 +83,9 @@ const systemDateFormat = {
 
 export enum DocumentDetailFieldID {
   ArchiveSerialNumber = 'archive_serial_number',
-  StoragePath = 'storage_path',
   Correspondent = 'correspondent',
   DocumentType = 'document_type',
+  StoragePath = 'storage_path',
   Tags = 'tags',
 }
 
@@ -94,9 +94,9 @@ const documentDetailFieldOptions = [
     id: DocumentDetailFieldID.ArchiveSerialNumber,
     label: $localize`Archive serial number`,
   },
-  { id: DocumentDetailFieldID.StoragePath, label: $localize`Storage path` },
   { id: DocumentDetailFieldID.Correspondent, label: $localize`Correspondent` },
   { id: DocumentDetailFieldID.DocumentType, label: $localize`Document type` },
+  { id: DocumentDetailFieldID.StoragePath, label: $localize`Storage path` },
   { id: DocumentDetailFieldID.Tags, label: $localize`Tags` },
 ]
 
