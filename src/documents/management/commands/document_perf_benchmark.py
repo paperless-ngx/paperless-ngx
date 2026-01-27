@@ -16,6 +16,7 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import Tag
 from documents.permissions import get_objects_for_user_owner_aware
+from documents.permissions import permitted_document_ids
 
 
 class Command(BaseCommand):
@@ -530,23 +531,15 @@ class Command(BaseCommand):
             return
 
         self._time_query(
-            label="tag document_count (values_list)",
+            label="tag document_count (grouped)",
             iterations=iterations,
             fn=lambda: list(
-                self._tag_queryset(
-                    prefix=prefix,
-                    filter_q=self._document_filter(user, use_subquery=False),
-                ).values_list("id", "document_count"),
-            ),
-        )
-        self._time_query(
-            label="tag document_count (Subquery)",
-            iterations=iterations,
-            fn=lambda: list(
-                self._tag_queryset(
-                    prefix=prefix,
-                    filter_q=self._document_filter(user, use_subquery=True),
-                ).values_list("id", "document_count"),
+                Tag.documents.through.objects.filter(
+                    document_id__in=Subquery(permitted_document_ids(user)),
+                )
+                .values("tag_id")
+                .annotate(c=Count("document_id"))
+                .values_list("tag_id", "c"),
             ),
         )
 
@@ -561,48 +554,31 @@ class Command(BaseCommand):
         if not CustomField.objects.filter(name__startswith=prefix).exists():
             return
 
-        def _filter(for_user, *, use_subquery: bool):
-            if for_user.is_superuser:
-                return Q(fields__document__deleted_at__isnull=True)
+        permitted = Subquery(permitted_document_ids(user))
+        super_permitted = CustomFieldInstance.objects.filter(
+            document__deleted_at__isnull=True,
+        ).values_list("document_id")
 
-            qs = get_objects_for_user_owner_aware(
-                for_user,
-                "documents.view_document",
-                Document,
-            )
-            ids = (
-                Subquery(qs.values_list("id"))
-                if use_subquery
-                else qs.values_list("id", flat=True)
-            )
-            return Q(
-                fields__document__deleted_at__isnull=True,
-                fields__document__id__in=ids,
-            )
-
-        def _run(filter_q):
+        def _run(ids_subquery):
             return list(
-                CustomField.objects.filter(name__startswith=prefix)
-                .annotate(
-                    document_count=Count("fields", filter=filter_q),
+                CustomFieldInstance.objects.filter(
+                    document_id__in=ids_subquery,
+                    field__name__startswith=prefix,
                 )
-                .values_list("id", "document_count"),
+                .values("field_id")
+                .annotate(c=Count("document_id"))
+                .values_list("field_id", "c"),
             )
 
         self._time_query(
-            label="custom fields document_count (values_list)",
+            label="custom fields document_count (grouped permitted)",
             iterations=iterations,
-            fn=lambda: _run(_filter(user, use_subquery=False)),
-        )
-        self._time_query(
-            label="custom fields document_count (Subquery)",
-            iterations=iterations,
-            fn=lambda: _run(_filter(user, use_subquery=True)),
+            fn=lambda: _run(permitted),
         )
         self._time_query(
             label="custom fields document_count superuser baseline",
             iterations=iterations,
-            fn=lambda: _run(_filter(superuser, use_subquery=False)),
+            fn=lambda: _run(super_permitted),
         )
 
     def _time_query(self, *, label: str, iterations: int, fn):
