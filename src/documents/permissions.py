@@ -139,18 +139,44 @@ def get_document_count_filter_for_user(user):
     if getattr(user, "is_superuser", False):
         return Q(documents__deleted_at__isnull=True)
     return Q(
-        documents__deleted_at__isnull=True,
-        documents__id__in=get_objects_for_user_owner_aware(
-            user,
-            "documents.view_document",
-            Document,
-        ).values_list("id", flat=True),
+        documents__id__in=permitted_document_ids(user),
     )
 
 
-def get_objects_for_user_owner_aware(user, perms, Model) -> QuerySet:
-    objects_owned = Model.objects.filter(owner=user)
-    objects_unowned = Model.objects.filter(owner__isnull=True)
+def permitted_document_ids(user):
+    """
+    Return a Subquery of permitted, non-deleted document IDs for the user.
+    Used to avoid repeated joins to the Document table in count annotations.
+    """
+    if user is None or not getattr(user, "is_authenticated", False):
+        return Document.objects.none().values_list("id")
+    qs = get_objects_for_user_owner_aware(
+        user,
+        "documents.view_document",
+        Document,
+    ).filter(deleted_at__isnull=True)
+    return qs.values_list("id")
+
+
+def get_objects_for_user_owner_aware(
+    user,
+    perms,
+    Model,
+    *,
+    include_deleted=False,
+) -> QuerySet:
+    """
+    Returns objects the user owns, are unowned, or has explicit perms.
+    When include_deleted is True, soft-deleted items are also included.
+    """
+    manager = (
+        Model.global_objects
+        if include_deleted and hasattr(Model, "global_objects")
+        else Model.objects
+    )
+
+    objects_owned = manager.filter(owner=user)
+    objects_unowned = manager.filter(owner__isnull=True)
     objects_with_perms = get_objects_for_user(
         user=user,
         perms=perms,

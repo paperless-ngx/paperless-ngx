@@ -23,6 +23,8 @@ from django.core.validators import MinValueValidator
 from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
 from django.db.models import Count
+from django.db.models import Q
+from django.db.models import Subquery
 from django.db.models.functions import Lower
 from django.utils.crypto import get_random_string
 from django.utils.dateparse import parse_datetime
@@ -70,8 +72,8 @@ from documents.models import WorkflowActionEmail
 from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowTrigger
 from documents.parsers import is_mime_type_supported
-from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_groups_with_only_permission
+from documents.permissions import permitted_document_ids
 from documents.permissions import set_permissions_for_object
 from documents.regex import validate_regex_pattern
 from documents.templating.filepath import validate_filepath_template_and_render
@@ -584,18 +586,41 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         if children_map is not None:
             children = children_map.get(obj.pk, [])
         else:
-            filter_q = self.context.get("document_count_filter")
             request = self.context.get("request")
-            if filter_q is None:
-                user = getattr(request, "user", None) if request else None
-                filter_q = get_document_count_filter_for_user(user)
-                self.context["document_count_filter"] = filter_q
+            user = getattr(request, "user", None) if request else None
 
-            children = (
-                obj.get_children_queryset()
-                .select_related("owner")
-                .annotate(document_count=Count("documents", filter=filter_q))
-            )
+            filter_kind = self.context.get("document_count_filter")
+            if filter_kind is None:
+                filter_kind = (
+                    "superuser"
+                    if user and getattr(user, "is_superuser", False)
+                    else "restricted"
+                )
+                self.context["document_count_filter"] = filter_kind
+
+            queryset = obj.get_children_queryset().select_related("owner")
+
+            if filter_kind == "superuser":
+                children = queryset.annotate(
+                    document_count=Count(
+                        "documents",
+                        filter=Q(documents__deleted_at__isnull=True),
+                        distinct=True,
+                    ),
+                )
+            else:
+                permitted_ids = Subquery(permitted_document_ids(user))
+                counts = dict(
+                    Tag.documents.through.objects.filter(
+                        document_id__in=permitted_ids,
+                    )
+                    .values("tag_id")
+                    .annotate(c=Count("document_id"))
+                    .values_list("tag_id", "c"),
+                )
+                children = list(queryset)
+                for child in children:
+                    child.document_count = counts.get(child.id, 0)
 
             view = self.context.get("view")
             ordering = (
@@ -604,7 +629,11 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
                 else None
             )
             ordering = ordering or (Lower("name"),)
-            children = children.order_by(*ordering)
+            if hasattr(children, "order_by"):
+                children = children.order_by(*ordering)
+            else:
+                # children is a list (pre-fetched); apply basic ordering on name
+                children = sorted(children, key=lambda c: (c.name or "").lower())
 
         serializer = TagSerializer(
             children,

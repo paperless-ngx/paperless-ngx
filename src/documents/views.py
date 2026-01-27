@@ -33,6 +33,7 @@ from django.db.models import IntegerField
 from django.db.models import Max
 from django.db.models import Model
 from django.db.models import Q
+from django.db.models import Subquery
 from django.db.models import Sum
 from django.db.models import When
 from django.db.models.functions import Length
@@ -150,6 +151,7 @@ from documents.permissions import ViewDocumentsPermissions
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
+from documents.permissions import permitted_document_ids
 from documents.permissions import set_permissions_for_object
 from documents.schema import generate_object_with_permissions_schema
 from documents.serialisers import AcknowledgeTasksViewSerializer
@@ -2875,27 +2877,32 @@ class CustomFieldViewSet(ModelViewSet):
     queryset = CustomField.objects.all().order_by("-created")
 
     def get_queryset(self):
-        filter = (
-            Q(fields__document__deleted_at__isnull=True)
-            if self.request.user is None or self.request.user.is_superuser
-            else (
-                Q(
-                    fields__document__deleted_at__isnull=True,
-                    fields__document__id__in=get_objects_for_user_owner_aware(
-                        self.request.user,
-                        "documents.view_document",
-                        Document,
-                    ).values_list("id", flat=True),
+        user = self.request.user
+        if user is None or user.is_superuser:
+            return (
+                super()
+                .get_queryset()
+                .annotate(
+                    document_count=Count(
+                        "fields",
+                        filter=Q(fields__document__deleted_at__isnull=True),
+                        distinct=True,
+                    ),
                 )
             )
-        )
+
+        permitted_ids = Subquery(permitted_document_ids(user))
         return (
             super()
             .get_queryset()
             .annotate(
                 document_count=Count(
                     "fields",
-                    filter=filter,
+                    filter=Q(
+                        fields__document__deleted_at__isnull=True,
+                        fields__document_id__in=permitted_ids,
+                    ),
+                    distinct=True,
                 ),
             )
         )
