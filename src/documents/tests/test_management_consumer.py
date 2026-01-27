@@ -748,7 +748,7 @@ def start_consumer(
         thread = ConsumerThread(consumption_dir, scratch_dir, **kwargs)
         threads.append(thread)
         thread.start()
-        sleep(0.5)  # Give thread time to start
+        sleep(1.0)  # Give thread time to start
         return thread
 
     try:
