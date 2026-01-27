@@ -2,6 +2,8 @@ import {
   APP_INITIALIZER,
   enableProdMode,
   importProvidersFrom,
+  inject,
+  provideAppInitializer,
   provideZoneChangeDetection,
 } from '@angular/core'
 
@@ -11,6 +13,7 @@ import {
   HTTP_INTERCEPTORS,
   provideHttpClient,
   withFetch,
+  withInterceptors,
   withInterceptorsFromDi,
 } from '@angular/common/http'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -237,11 +240,11 @@ registerLocaleData(localeUk)
 registerLocaleData(localeZh)
 registerLocaleData(localeZhHant)
 
-function initializeApp(settings: SettingsService) {
-  return () => {
-    return settings.initializeSettings()
-  }
+function initializeApp() {
+  const settings = inject(SettingsService);
+  return settings.initializeSettings()
 }
+
 const icons = {
   airplane,
   archive,
@@ -380,12 +383,7 @@ bootstrapApplication(AppComponent, {
       DragDropModule,
       NgxBootstrapIconsModule.pick(icons)
     ),
-    {
-      provide: APP_INITIALIZER,
-      useFactory: initializeApp,
-      deps: [SettingsService],
-      multi: true,
-    },
+    provideAppInitializer(initializeApp),
     DatePipe,
     CookieService,
     {
