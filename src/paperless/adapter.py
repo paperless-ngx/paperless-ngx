@@ -3,7 +3,7 @@ from urllib.parse import quote
 
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.core import context
-from allauth.headless.tokens.sessions import SessionTokenStrategy
+from allauth.headless.tokens.strategies.sessions import SessionTokenStrategy
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.conf import settings
 from django.contrib.auth.models import Group
