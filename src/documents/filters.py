@@ -809,12 +809,12 @@ class ShareLinkBundleFilterSet(FilterSet):
         }
 
     def filter_documents(self, queryset, name, value):
-        if not value:
-            return queryset
-        try:
-            ids = [int(item) for item in value.split(",") if item]
-        except ValueError:
-            return queryset.none()
+        ids = []
+        if value:
+            try:
+                ids = [int(item) for item in value.split(",") if item]
+            except ValueError:
+                return queryset.none()
         if not ids:
             return queryset
         return queryset.filter(documents__in=ids).distinct()
