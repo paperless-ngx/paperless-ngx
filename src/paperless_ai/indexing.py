@@ -1,11 +1,14 @@
 import logging
 import shutil
+from datetime import timedelta
 from pathlib import Path
 
 import faiss
 import llama_index.core.settings as llama_settings
 import tqdm
+from celery import states
 from django.conf import settings
+from django.utils import timezone
 from llama_index.core import Document as LlamaDocument
 from llama_index.core import StorageContext
 from llama_index.core import VectorStoreIndex
@@ -21,11 +24,35 @@ from llama_index.core.text_splitter import TokenTextSplitter
 from llama_index.vector_stores.faiss import FaissVectorStore
 
 from documents.models import Document
+from documents.models import PaperlessTask
 from paperless_ai.embedding import build_llm_index_text
 from paperless_ai.embedding import get_embedding_dim
 from paperless_ai.embedding import get_embedding_model
 
 logger = logging.getLogger("paperless_ai.indexing")
+
+
+def queue_llm_index_update_if_needed(*, rebuild: bool, reason: str) -> bool:
+    from documents.tasks import llmindex_index
+
+    has_running = PaperlessTask.objects.filter(
+        task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
+        status__in=[states.PENDING, states.STARTED],
+    ).exists()
+    has_recent = PaperlessTask.objects.filter(
+        task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
+        date_created__gte=(timezone.now() - timedelta(minutes=5)),
+    ).exists()
+    if has_running or has_recent:
+        return False
+
+    llmindex_index.delay(rebuild=rebuild, scheduled=False, auto=True)
+    logger.warning(
+        "Queued LLM index update%s: %s",
+        " (rebuild)" if rebuild else "",
+        reason,
+    )
+    return True
 
 
 def get_or_create_storage_context(*, rebuild=False):
@@ -93,6 +120,10 @@ def load_or_build_index(nodes=None):
     except ValueError as e:
         logger.warning("Failed to load index from storage: %s", e)
         if not nodes:
+            queue_llm_index_update_if_needed(
+                rebuild=vector_store_file_exists(),
+                reason="LLM index missing or invalid while loading.",
+            )
             logger.info("No nodes provided for index creation.")
             raise
         return VectorStoreIndex(
@@ -250,6 +281,13 @@ def query_similar_documents(
     """
     Runs a similarity query and returns top-k similar Document objects.
     """
+    if not vector_store_file_exists():
+        queue_llm_index_update_if_needed(
+            rebuild=False,
+            reason="LLM index not found for similarity query.",
+        )
+        return []
+
     index = load_or_build_index()
 
     # constrain only the node(s) that match the document IDs, if given
