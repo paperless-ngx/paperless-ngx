@@ -161,6 +161,7 @@ class TestCeleryScheduleParsing(TestCase):
     EMPTY_TRASH_EXPIRE_TIME = 23.0 * 60.0 * 60.0
     RUN_SCHEDULED_WORKFLOWS_EXPIRE_TIME = 59.0 * 60.0
     LLM_INDEX_EXPIRE_TIME = 23.0 * 60.0 * 60.0
+    CLEANUP_EXPIRED_SHARE_BUNDLES_EXPIRE_TIME = 23.0 * 60.0 * 60.0
 
     def test_schedule_configuration_default(self):
         """
@@ -210,6 +211,13 @@ class TestCeleryScheduleParsing(TestCase):
                     "schedule": crontab(minute=10, hour=2),
                     "options": {
                         "expires": self.LLM_INDEX_EXPIRE_TIME,
+                    },
+                },
+                "Cleanup expired share link bundles": {
+                    "task": "documents.tasks.cleanup_expired_share_link_bundles",
+                    "schedule": crontab(minute=0, hour=2),
+                    "options": {
+                        "expires": self.CLEANUP_EXPIRED_SHARE_BUNDLES_EXPIRE_TIME,
                     },
                 },
             },
@@ -271,6 +279,13 @@ class TestCeleryScheduleParsing(TestCase):
                         "expires": self.LLM_INDEX_EXPIRE_TIME,
                     },
                 },
+                "Cleanup expired share link bundles": {
+                    "task": "documents.tasks.cleanup_expired_share_link_bundles",
+                    "schedule": crontab(minute=0, hour=2),
+                    "options": {
+                        "expires": self.CLEANUP_EXPIRED_SHARE_BUNDLES_EXPIRE_TIME,
+                    },
+                },
             },
             schedule,
         )
@@ -322,6 +337,13 @@ class TestCeleryScheduleParsing(TestCase):
                         "expires": self.LLM_INDEX_EXPIRE_TIME,
                     },
                 },
+                "Cleanup expired share link bundles": {
+                    "task": "documents.tasks.cleanup_expired_share_link_bundles",
+                    "schedule": crontab(minute=0, hour=2),
+                    "options": {
+                        "expires": self.CLEANUP_EXPIRED_SHARE_BUNDLES_EXPIRE_TIME,
+                    },
+                },
             },
             schedule,
         )
@@ -345,6 +367,7 @@ class TestCeleryScheduleParsing(TestCase):
                 "PAPERLESS_EMPTY_TRASH_TASK_CRON": "disable",
                 "PAPERLESS_WORKFLOW_SCHEDULED_TASK_CRON": "disable",
                 "PAPERLESS_LLM_INDEX_TASK_CRON": "disable",
+                "PAPERLESS_SHARE_LINK_BUNDLE_CLEANUP_CRON": "disable",
             },
         ):
             schedule = _parse_beat_schedule()

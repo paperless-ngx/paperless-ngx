@@ -4,6 +4,7 @@ import logging
 import math
 import re
 from datetime import datetime
+from datetime import timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING
 from typing import Literal
@@ -25,6 +26,7 @@ from django.core.validators import integer_validator
 from django.db.models import Count
 from django.db.models import Q
 from django.db.models.functions import Lower
+from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.dateparse import parse_datetime
 from django.utils.text import slugify
@@ -62,6 +64,7 @@ from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
 from documents.models import ShareLink
+from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import UiSettings
@@ -2226,6 +2229,104 @@ class ShareLinkSerializer(OwnedObjectSerializer):
     def create(self, validated_data):
         validated_data["slug"] = get_random_string(50)
         return super().create(validated_data)
+
+
+class ShareLinkBundleSerializer(OwnedObjectSerializer):
+    document_ids = serializers.ListField(
+        child=serializers.IntegerField(min_value=1),
+        allow_empty=False,
+        write_only=True,
+    )
+    expiration_days = serializers.IntegerField(
+        required=False,
+        allow_null=True,
+        min_value=1,
+        write_only=True,
+    )
+    documents = serializers.PrimaryKeyRelatedField(
+        many=True,
+        read_only=True,
+    )
+    document_count = SerializerMethodField()
+
+    class Meta:
+        model = ShareLinkBundle
+        fields = (
+            "id",
+            "created",
+            "expiration",
+            "expiration_days",
+            "slug",
+            "file_version",
+            "status",
+            "size_bytes",
+            "last_error",
+            "built_at",
+            "documents",
+            "document_ids",
+            "document_count",
+        )
+        read_only_fields = (
+            "id",
+            "created",
+            "expiration",
+            "slug",
+            "status",
+            "size_bytes",
+            "last_error",
+            "built_at",
+            "documents",
+            "document_count",
+        )
+
+    def validate_document_ids(self, value):
+        unique_ids = set(value)
+        if len(unique_ids) != len(value):
+            raise serializers.ValidationError(
+                _("Duplicate document identifiers are not allowed."),
+            )
+        return value
+
+    def create(self, validated_data):
+        document_ids = validated_data.pop("document_ids")
+        expiration_days = validated_data.pop("expiration_days", None)
+        validated_data["slug"] = get_random_string(50)
+        if expiration_days:
+            validated_data["expiration"] = timezone.now() + timedelta(
+                days=expiration_days,
+            )
+        else:
+            validated_data["expiration"] = None
+
+        share_link_bundle = super().create(validated_data)
+
+        documents = list(
+            Document.objects.filter(pk__in=document_ids).only(
+                "pk",
+            ),
+        )
+        documents_by_id = {doc.pk: doc for doc in documents}
+        missing = [
+            str(doc_id) for doc_id in document_ids if doc_id not in documents_by_id
+        ]
+        if missing:
+            raise serializers.ValidationError(
+                {
+                    "document_ids": _(
+                        "Documents not found: %(ids)s",
+                    )
+                    % {"ids": ", ".join(missing)},
+                },
+            )
+
+        ordered_documents = [documents_by_id[doc_id] for doc_id in document_ids]
+        share_link_bundle.documents.set(ordered_documents)
+        share_link_bundle.document_total = len(ordered_documents)
+
+        return share_link_bundle
+
+    def get_document_count(self, obj: ShareLinkBundle) -> int:
+        return getattr(obj, "document_total") or obj.documents.count()
 
 
 class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):

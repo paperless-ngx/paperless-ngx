@@ -1,0 +1,156 @@
+<div class="modal-header">
+  <h4 class="modal-title">{{ title }}</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
+</div>
+
+<div class="modal-body">
+  @if (loading) {
+    <div class="d-flex align-items-center gap-2">
+      <div class="spinner-border spinner-border-sm" role="status"></div>
+      <span i18n>Loading share link bundles…</span>
+    </div>
+  }
+  @if (!loading && error) {
+    <div class="alert alert-danger mb-0" role="alert">
+      {{ error }}
+    </div>
+  }
+  @if (!loading && !error) {
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <p class="mb-0 text-muted small">
+        <ng-container i18n>Status updates every few seconds while bundles are being prepared.</ng-container>
+      </p>
+    </div>
+    @if (bundles.length === 0) {
+      <p class="mb-0 text-muted fst-italic" i18n>No share link bundles currently exist.</p>
+    }
+    @if (bundles.length > 0) {
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead>
+            <tr>
+              <th scope="col" i18n>Created</th>
+              <th scope="col" i18n>Status</th>
+              <th scope="col" i18n>Size</th>
+              <th scope="col" i18n>Expires</th>
+              <th scope="col" i18n>Documents</th>
+              <th scope="col" i18n>File version</th>
+              <th scope="col" class="text-end" i18n>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (bundle of bundles; track bundle.id) {
+              <tr>
+                <td>
+                  <div>{{ bundle.created | date: 'short' }}</div>
+                  @if (bundle.built_at) {
+                    <div class="small text-muted">
+                      <ng-container i18n>Built:</ng-container> {{ bundle.built_at | date: 'short' }}
+                    </div>
+                  }
+                </td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    @if (bundle.status === statuses.Failed && bundle.last_error) {
+                      <button
+                        type="button"
+                        class="btn btn-link p-0 text-danger"
+                        [ngbPopover]="errorDetail"
+                        popoverClass="popover-sm"
+                        triggers="mouseover:mouseleave"
+                        placement="auto"
+                        aria-label="View error details"
+                        i18n-aria-label
+                      >
+                        <span class="badge text-bg-warning text-uppercase me-2">{{ statusLabel(bundle.status) }}</span>
+                        <i-bs name="exclamation-triangle-fill" class="text-warning"></i-bs>
+                      </button>
+                      <ng-template #errorDetail>
+                        @if (bundle.last_error.timestamp) {
+                          <div class="text-muted small mb-1">
+                            {{ bundle.last_error.timestamp | date: 'short' }}
+                          </div>
+                        }
+                        <h6>{{ bundle.last_error.exception_type || ($localize`Unknown error`) }}</h6>
+                        @if (bundle.last_error.message) {
+                          <pre class="text-muted small"><code>{{ bundle.last_error.message }}</code></pre>
+                        }
+                      </ng-template>
+                    }
+                    @if (bundle.status === statuses.Processing || bundle.status === statuses.Pending) {
+                      <span class="spinner-border spinner-border-sm" role="status"></span>
+                    }
+                    @if (bundle.status !== statuses.Failed) {
+                      <span class="badge text-bg-secondary text-uppercase">{{ statusLabel(bundle.status) }}</span>
+                    }
+                  </div>
+                </td>
+                <td>
+                  @if (bundle.size_bytes !== undefined && bundle.size_bytes !== null) {
+                    {{ bundle.size_bytes | fileSize }}
+                  }
+                  @if (bundle.size_bytes === undefined || bundle.size_bytes === null) {
+                    <span class="text-muted">&mdash;</span>
+                  }
+                </td>
+                <td>
+                  @if (bundle.expiration) {
+                    {{ bundle.expiration | date: 'short' }}
+                  }
+                  @if (!bundle.expiration) {
+                    <span i18n>Never</span>
+                  }
+                </td>
+                <td>{{ bundle.document_count }}</td>
+                <td>{{ fileVersionLabel(bundle.file_version) }}</td>
+                <td class="text-end">
+                  <div class="btn-group btn-group-sm">
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary"
+                      [disabled]="bundle.status !== statuses.Ready"
+                      (click)="copy(bundle)"
+                      title="Copy share link"
+                      i18n-title
+                    >
+                      @if (copiedSlug === bundle.slug) {
+                        <i-bs name="clipboard-check"></i-bs>
+                      }
+                      @if (copiedSlug !== bundle.slug) {
+                        <i-bs name="clipboard"></i-bs>
+                      }
+                      <span class="visually-hidden" i18n>Copy share link</span>
+                    </button>
+                    @if (bundle.status === statuses.Failed) {
+                      <button
+                        type="button"
+                        class="btn btn-outline-warning"
+                        [disabled]="loading"
+                        (click)="retry(bundle)"
+                      >
+                        <i-bs name="arrow-clockwise"></i-bs>
+                        <span class="visually-hidden" i18n>Retry</span>
+                      </button>
+                    }
+                    <pngx-confirm-button
+                      buttonClasses="btn btn-sm btn-outline-danger"
+                      [disabled]="loading"
+                      (confirm)="delete(bundle)"
+                      iconName="trash"
+                    >
+                      <span class="visually-hidden" i18n>Delete share link bundle</span>
+                    </pngx-confirm-button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary btn-sm" (click)="close()" i18n>Close</button>
+</div>
