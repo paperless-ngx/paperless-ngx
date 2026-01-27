@@ -110,6 +110,16 @@ class Command(BaseCommand):
             help="How many custom field instances per document (default: 1)",
         )
         parser.add_argument(
+            "--skip-tags",
+            action="store_true",
+            help="Skip tag document_count benchmarks (useful for large datasets on Postgres)",
+        )
+        parser.add_argument(
+            "--skip-custom-fields",
+            action="store_true",
+            help="Skip custom field document_count benchmarks",
+        )
+        parser.add_argument(
             "--reuse-existing",
             action="store_true",
             help="Keep previously generated documents with the given prefix instead of recreating",
@@ -121,6 +131,9 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        # keep options for downstream checks
+        self.options = options
+
         document_total = options["documents"]
         owner_ratio = options["owner_ratio"]
         unowned_ratio = options["unowned_ratio"]
@@ -457,13 +470,19 @@ class Command(BaseCommand):
             iterations=iterations,
             fn=lambda: Document.objects.count(),
         )
-        self._time_tag_counts(iterations=iterations, prefix=prefix, user=target_user)
-        self._time_custom_field_counts(
-            iterations=iterations,
-            prefix=prefix,
-            user=target_user,
-            superuser=superuser,
-        )
+        if not self.options.get("skip_tags"):
+            self._time_tag_counts(
+                iterations=iterations,
+                prefix=prefix,
+                user=target_user,
+            )
+        if not self.options.get("skip_custom_fields"):
+            self._time_custom_field_counts(
+                iterations=iterations,
+                prefix=prefix,
+                user=target_user,
+                superuser=superuser,
+            )
 
     def _count_with_values_list(self, user) -> int:
         qs = get_objects_for_user_owner_aware(
