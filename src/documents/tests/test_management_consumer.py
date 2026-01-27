@@ -894,10 +894,10 @@ class TestCommandWatch:
         assert not thread.is_alive()
 
 
+@pytest.mark.django_db
 class TestCommandWatchPolling:
     """Tests for polling mode."""
 
-    @pytest.mark.django_db
     def test_polling_mode_works(
         self,
         consumption_dir: Path,
@@ -926,6 +926,7 @@ class TestCommandWatchPolling:
         mock_consume_file_delay.delay.assert_called()
 
 
+@pytest.mark.django_db
 class TestCommandWatchRecursive:
     """Tests for recursive watching."""
 
