@@ -81,12 +81,23 @@ const systemDateFormat = {
   name: $localize`Use date format of display language`,
 }
 
+export enum DocumentDetailFieldID {
+  ArchiveSerialNumber = 'archive_serial_number',
+  StoragePath = 'storage_path',
+  Correspondent = 'correspondent',
+  DocumentType = 'document_type',
+  Tags = 'tags',
+}
+
 const documentDetailFieldOptions = [
-  { id: 'archive_serial_number', label: $localize`Archive serial number` },
-  { id: 'storage_path', label: $localize`Storage path` },
-  { id: 'correspondent', label: $localize`Correspondent` },
-  { id: 'document_type', label: $localize`Document type` },
-  { id: 'tags', label: $localize`Tags` },
+  {
+    id: DocumentDetailFieldID.ArchiveSerialNumber,
+    label: $localize`Archive serial number`,
+  },
+  { id: DocumentDetailFieldID.StoragePath, label: $localize`Storage path` },
+  { id: DocumentDetailFieldID.Correspondent, label: $localize`Correspondent` },
+  { id: DocumentDetailFieldID.DocumentType, label: $localize`Document type` },
+  { id: DocumentDetailFieldID.Tags, label: $localize`Tags` },
 ]
 
 @Component({

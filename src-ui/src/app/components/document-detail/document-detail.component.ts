@@ -84,6 +84,7 @@ import { ToastService } from 'src/app/services/toast.service'
 import { getFilenameFromContentDisposition } from 'src/app/utils/http'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
+import { DocumentDetailFieldID } from '../admin/settings/settings.component'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
 import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
@@ -281,6 +282,8 @@ export class DocumentDetailComponent
 
   public readonly DataType = DataType
 
+  public readonly DocumentDetailFieldID = DocumentDetailFieldID
+
   @ViewChild('nav') nav: NgbNav
   @ViewChild('pdfPreview') set pdfPreview(element) {
     // this gets called when component added or removed from DOM
@@ -325,6 +328,12 @@ export class DocumentDetailComponent
 
   get showThumbnailOverlay(): boolean {
     return this.settings.get(SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL)
+  }
+
+  isFieldHidden(fieldId: DocumentDetailFieldID): boolean {
+    return this.settings
+      .get(SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS)
+      .includes(fieldId)
   }
 
   private getRenderType(mimeType: string): ContentRenderType {
