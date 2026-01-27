@@ -69,7 +69,7 @@ def mail_parser() -> MailDocumentParser:
 
 
 @pytest.fixture()
-def greenmail_mail_account(db) -> Generator[MailAccount, None, None]:
+def greenmail_mail_account(db: None) -> Generator[MailAccount, None, None]:
     """
     Create a mail account configured for local Greenmail server.
     """
