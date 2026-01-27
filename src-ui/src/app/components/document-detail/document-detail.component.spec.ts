@@ -48,6 +48,7 @@ import {
 } from 'src/app/data/filter-rule-type'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
@@ -1015,7 +1016,7 @@ describe('DocumentDetailComponent', () => {
   it('should display built-in pdf viewer if not disabled', () => {
     initNormally()
     component.document.archived_file_name = 'file.pdf'
-    jest.spyOn(settingsService, 'get').mockReturnValue(false)
+    settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, false)
     expect(component.useNativePdfViewer).toBeFalsy()
     fixture.detectChanges()
     expect(fixture.debugElement.query(By.css('pdf-viewer'))).not.toBeNull()
@@ -1024,7 +1025,7 @@ describe('DocumentDetailComponent', () => {
   it('should display native pdf viewer if enabled', () => {
     initNormally()
     component.document.archived_file_name = 'file.pdf'
-    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+    settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, true)
     expect(component.useNativePdfViewer).toBeTruthy()
     fixture.detectChanges()
     expect(fixture.debugElement.query(By.css('object'))).not.toBeNull()
