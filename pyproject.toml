@@ -114,15 +114,16 @@ testing = [
   "daphne",
   "factory-boy~=3.3.1",
   "imagehash",
-  "pytest~=8.4.1",
+  "pytest~=9.0.0",
   "pytest-cov~=7.0.0",
   "pytest-django~=4.11.1",
-  "pytest-env",
+  "pytest-env~=1.2.0",
   "pytest-httpx",
-  "pytest-mock",
-  "pytest-rerunfailures",
+  "pytest-mock~=3.15.1",
+  #"pytest-randomly~=4.0.1",
+  "pytest-rerunfailures~=16.1",
   "pytest-sugar",
-  "pytest-xdist",
+  "pytest-xdist~=3.8.0",
 ]
 
 lint = [
@@ -260,11 +261,15 @@ write-changes = true
 ignore-words-list = "criterias,afterall,valeu,ureue,equest,ure,assertIn,Oktober,commitish"
 skip = "src-ui/src/locale/*,src-ui/pnpm-lock.yaml,src-ui/e2e/*,src/paperless_mail/tests/samples/*,src/documents/tests/samples/*,*.po,*.json"
 
-[tool.pytest.ini_options]
-minversion = "8.0"
-pythonpath = [
-  "src",
-]
+[tool.pytest]
+minversion = "9.0"
+pythonpath = [ "src" ]
+
+strict_config = true
+strict_markers = true
+strict_parametrization_ids = true
+strict_xfail = true
+
 testpaths = [
   "src/documents/tests/",
   "src/paperless/tests/",
@@ -275,6 +280,7 @@ testpaths = [
   "src/paperless_remote/tests/",
   "src/paperless_ai/tests",
 ]
+
 addopts = [
   "--pythonwarnings=all",
   "--cov",
@@ -282,11 +288,14 @@ addopts = [
   "--cov-report=xml",
   "--numprocesses=auto",
   "--maxprocesses=16",
-  "--quiet",
+  "--dist=loadscope",
   "--durations=50",
+  "--durations-min=0.5",
   "--junitxml=junit.xml",
-  "-o junit_family=legacy",
+  "-o",
+  "junit_family=legacy",
 ]
+
 norecursedirs = [ "src/locale/", ".venv/", "src-ui/" ]
 
 DJANGO_SETTINGS_MODULE = "paperless.settings"
