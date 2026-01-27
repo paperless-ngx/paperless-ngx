@@ -1,4 +1,3 @@
-import os
 from collections.abc import Generator
 from pathlib import Path
 
@@ -70,18 +69,21 @@ def mail_parser() -> MailDocumentParser:
 
 
 @pytest.fixture()
-def live_mail_account() -> Generator[MailAccount, None, None]:
-    try:
-        account = MailAccount.objects.create(
-            name="test",
-            imap_server=os.environ["PAPERLESS_MAIL_TEST_HOST"],
-            username=os.environ["PAPERLESS_MAIL_TEST_USER"],
-            password=os.environ["PAPERLESS_MAIL_TEST_PASSWD"],
-            imap_port=993,
-        )
-        yield account
-    finally:
-        account.delete()
+def greenmail_mail_account(db) -> Generator[MailAccount, None, None]:
+    """
+    Create a mail account configured for local Greenmail server.
+    """
+    account = MailAccount.objects.create(
+        name="Greenmail Test",
+        imap_server="localhost",
+        imap_port=3143,
+        imap_security=MailAccount.ImapSecurity.NONE,
+        username="test@localhost",
+        password="test",
+        character_set="UTF-8",
+    )
+    yield account
+    account.delete()
 
 
 @pytest.fixture()

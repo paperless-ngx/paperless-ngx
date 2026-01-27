@@ -23,3 +23,17 @@ services:
     container_name: tika
     network_mode: host
     restart: unless-stopped
+  greenmail:
+    image: greenmail/standalone:2.1.8
+    environment:
+      # Enable IMAP, IMAPS, SMTP, SMTPS
+      GREENMAIL_OPTS: >-
+        -Dgreenmail.setup.test.all -Dgreenmail.users=test@localhost:test -Dgreenmail.users.login=test@localhost -Dgreenmail.verbose
+    ports:
+      - "3025:3025" # SMTP
+      - "3143:3143" # IMAP
+      - "3465:3465" # SMTPS
+      - "3993:3993" # IMAPS
+      - "3110:3110" # POP3
+      - "3995:3995" # POP3S
+    restart: unless-stopped
