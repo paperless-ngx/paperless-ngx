@@ -34,3 +34,13 @@ services:
     ports:
       - "3143:3143" # IMAP
     restart: unless-stopped
+  nginx:
+    image: docker.io/nginx:1.29-alpine
+    hostname: nginx
+    container_name: nginx
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    volumes:
+      - ../../docs/assets:/usr/share/nginx/html/assets:ro
+      - ./test-nginx.conf:/etc/nginx/conf.d/default.conf:ro
