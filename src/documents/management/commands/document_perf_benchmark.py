@@ -455,6 +455,7 @@ class Command(BaseCommand):
             )
 
     def _run_benchmarks(self, *, iterations: int, target_user, superuser, prefix: str):
+        self.stdout.write("-> doc counts")
         self._time_query(
             label="non-superuser: id__in(values_list flat=True)",
             iterations=iterations,
@@ -471,12 +472,14 @@ class Command(BaseCommand):
             fn=lambda: Document.objects.count(),
         )
         if not self.options.get("skip_tags"):
+            self.stdout.write("-> tag counts")
             self._time_tag_counts(
                 iterations=iterations,
                 prefix=prefix,
                 user=target_user,
             )
         if not self.options.get("skip_custom_fields"):
+            self.stdout.write("-> custom field counts")
             self._time_custom_field_counts(
                 iterations=iterations,
                 prefix=prefix,
