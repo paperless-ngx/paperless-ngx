@@ -156,6 +156,19 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
 
+    def test_download_failed_bundle_returns_503(self):
+        bundle = ShareLinkBundle.objects.create(
+            slug="failedslug",
+            file_version=ShareLink.FileVersion.ARCHIVE,
+            status=ShareLinkBundle.Status.FAILED,
+        )
+        bundle.documents.set([self.document])
+
+        self.client.logout()
+        response = self.client.get(f"/share/{bundle.slug}/")
+
+        self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
+
     def test_expired_share_link_redirects(self):
         share_link = ShareLink.objects.create(
             slug="expiredlink",

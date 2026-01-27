@@ -2939,16 +2939,10 @@ class SharedLinkView(View):
         if bundle.expiration is not None and bundle.expiration < timezone.now():
             return HttpResponseRedirect("/accounts/login/?sharelink_expired=1")
 
-        file_path = bundle.absolute_file_path
-
-        if (
-            bundle.status
-            in {
-                ShareLinkBundle.Status.PENDING,
-                ShareLinkBundle.Status.PROCESSING,
-            }
-            or file_path is None
-        ):
+        if bundle.status in {
+            ShareLinkBundle.Status.PENDING,
+            ShareLinkBundle.Status.PROCESSING,
+        }:
             return HttpResponse(
                 _(
                     "The share link bundle is still being prepared. Please try again later.",
@@ -2956,7 +2950,9 @@ class SharedLinkView(View):
                 status=status.HTTP_202_ACCEPTED,
             )
 
-        if bundle.status == ShareLinkBundle.Status.FAILED:
+        file_path = bundle.absolute_file_path
+
+        if bundle.status == ShareLinkBundle.Status.FAILED or file_path is None:
             return HttpResponse(
                 _(
                     "The share link bundle is unavailable.",
