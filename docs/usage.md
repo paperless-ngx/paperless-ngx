@@ -308,12 +308,14 @@ or using [email](#workflow-action-email) or [webhook](#workflow-action-webhook) 
 
 ### Share Links
 
-"Share links" are shareable public links to files and can be created and managed under the 'Send' button on the document detail screen.
+"Share links" are public links to files (or an archive of files) and can be created and managed under the 'Send' button on the document detail screen or from the bulk editor.
 
--   Share links do not require a user to login and thus link directly to a file.
+-   Share links do not require a user to login and thus link directly to a file or bundled download.
 -   Links are unique and are of the form `{paperless-url}/share/{randomly-generated-slug}`.
 -   Links can optionally have an expiration time set.
 -   After a link expires or is deleted users will be redirected to the regular paperless-ngx login.
+-   From the document detail screen you can create a share link for that single document.
+-   From the bulk editor you can create a **share link bundle** for any selection. Paperless-ngx prepares a ZIP archive in the background and exposes a single share link. You can revisit the "Manage share link bundles" dialog to monitor progress, retry failed bundles, or delete links.
 
 !!! tip
 

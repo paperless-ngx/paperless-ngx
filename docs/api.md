@@ -8,7 +8,7 @@ Further documentation is provided here for some endpoints and features.
 
 ## Authorization
 
-The REST api provides four different forms of authentication.
+The REST api provides five different forms of authentication.
 
 1.  Basic authentication
 
@@ -51,6 +51,14 @@ The REST api provides four different forms of authentication.
     If enabled (see
     [configuration](configuration.md#PAPERLESS_ENABLE_HTTP_REMOTE_USER_API)),
     you can authenticate against the API using Remote User auth.
+
+5.  Headless OIDC via [`django-allauth`](https://codeberg.org/allauth/django-allauth)
+
+    `django-allauth` exposes API endpoints under `api/auth/` which enable tools
+    like third-party apps to authenticate with social accounts that are
+    configured. See
+    [here](advanced_usage.md#openid-connect-and-social-authentication) for more
+    information on social accounts.
 
 ## Searching for documents
 

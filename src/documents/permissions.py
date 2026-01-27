@@ -148,13 +148,29 @@ def get_document_count_filter_for_user(user):
     )
 
 
-def get_objects_for_user_owner_aware(user, perms, Model) -> QuerySet:
-    objects_owned = Model.objects.filter(owner=user)
-    objects_unowned = Model.objects.filter(owner__isnull=True)
+def get_objects_for_user_owner_aware(
+    user,
+    perms,
+    Model,
+    *,
+    include_deleted=False,
+) -> QuerySet:
+    """
+    Returns objects the user owns, are unowned, or has explicit perms.
+    When include_deleted is True, soft-deleted items are also included.
+    """
+    manager = (
+        Model.global_objects
+        if include_deleted and hasattr(Model, "global_objects")
+        else Model.objects
+    )
+
+    objects_owned = manager.filter(owner=user)
+    objects_unowned = manager.filter(owner__isnull=True)
     objects_with_perms = get_objects_for_user(
         user=user,
         perms=perms,
-        klass=Model,
+        klass=manager.all(),
         accept_global_perms=False,
     )
     return objects_owned | objects_unowned | objects_with_perms

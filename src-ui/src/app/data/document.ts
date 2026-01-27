@@ -159,6 +159,8 @@ export interface Document extends ObjectWithPermissions {
 
   page_count?: number
 
+  duplicate_documents?: Document[]
+
   // Frontend only
   __changedFields?: string[]
 }

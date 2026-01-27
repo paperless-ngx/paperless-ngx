@@ -40,15 +40,19 @@ def handle_social_account_updated(sender, request, sociallogin, **kwargs):
 
     extra_data = sociallogin.account.extra_data or {}
     social_account_groups = extra_data.get(
-        "groups",
+        settings.SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM,
         [],
     )  # pre-allauth 65.11.0 structure
 
     if not social_account_groups:
         # allauth 65.11.0+ nests claims under `userinfo`/`id_token`
         social_account_groups = (
-            extra_data.get("userinfo", {}).get("groups")
-            or extra_data.get("id_token", {}).get("groups")
+            extra_data.get("userinfo", {}).get(
+                settings.SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM,
+            )
+            or extra_data.get("id_token", {}).get(
+                settings.SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM,
+            )
             or []
         )
     if settings.SOCIAL_ACCOUNT_SYNC_GROUPS and social_account_groups is not None:
