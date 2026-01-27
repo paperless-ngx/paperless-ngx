@@ -60,6 +60,20 @@ The REST api provides five different forms of authentication.
     [here](advanced_usage.md#openid-connect-and-social-authentication) for more
     information on social accounts.
 
+## Model Context Protocol (MCP)
+
+Paperless-ngx exposes an MCP endpoint powered by `django-mcp-server` so MCP
+clients can query data collections, run full-text document search, and invoke
+DRF-backed CRUD tools.
+
+-   Endpoint: `/mcp/`
+-   Authentication: identical to the REST API (Basic, Session, Token, or Remote
+    User depending on your configuration).
+
+The MCP server uses existing DRF viewsets and permissions. It also exposes a
+`query_data_collections` tool for structured querying across published models
+and a `search_documents` tool for full-text search.
+
 ## Searching for documents
 
 Full text searching is available on the `/api/documents/` endpoint. Two

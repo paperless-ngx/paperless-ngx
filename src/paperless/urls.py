@@ -356,6 +356,7 @@ urlpatterns = [
             ],
         ),
     ),
+    path("", include("mcp_server.urls")),
     # Root of the Frontend
     re_path(
         r".*",

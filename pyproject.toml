@@ -36,6 +36,7 @@ dependencies = [
   "django-extensions~=4.1",
   "django-filter~=25.1",
   "django-guardian~=3.2.0",
+  "django-mcp-server~=0.5.7",
   "django-multiselectfield~=1.0.1",
   "django-soft-delete~=1.0.18",
   "django-treenode>=0.23.2",

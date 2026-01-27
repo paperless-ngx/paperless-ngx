@@ -348,6 +348,7 @@ INSTALLED_APPS = [
     "allauth.headless",
     "drf_spectacular",
     "drf_spectacular_sidecar",
+    "mcp_server",
     "treenode",
     *env_apps,
 ]
@@ -611,6 +612,17 @@ def _parse_remote_user_settings() -> str:
 
 
 HTTP_REMOTE_USER_HEADER_NAME = _parse_remote_user_settings()
+
+DJANGO_MCP_AUTHENTICATION_CLASSES = REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"]
+DJANGO_MCP_GLOBAL_SERVER_CONFIG = {
+    "name": "paperless-ngx",
+    "instructions": (
+        "Use the MCP tools to search, query, and manage Paperless-ngx data. "
+        "Use `search_documents` for full-text search, and `query_data_collections` "
+        "for structured queries against available collections. "
+        "Write operations are exposed via DRF-backed tools for create/update/delete."
+    ),
+}
 
 # X-Frame options for embedded PDF display:
 X_FRAME_OPTIONS = "SAMEORIGIN"
