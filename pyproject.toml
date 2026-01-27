@@ -305,6 +305,7 @@ markers = [
   "nginx: Tests that make HTTP requests to the local nginx service",
   "gotenberg: Tests requiring Gotenberg service",
   "tika: Tests requiring Tika service",
+  "greenmail: Tests requiring Greenmail service",
 ]
 
 [tool.pytest_env]
