@@ -25,6 +25,8 @@ services:
     restart: unless-stopped
   greenmail:
     image: greenmail/standalone:2.1.8
+    hostname: greenmail
+    container_name: greenmail
     environment:
       # Enable only IMAP for now (SMTP available via 3025 if needed later)
       GREENMAIL_OPTS: >-
