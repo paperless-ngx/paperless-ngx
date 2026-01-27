@@ -53,7 +53,10 @@ def set_correspondent(
     affected_docs = list(qs.values_list("pk", flat=True))
     qs.update(correspondent=correspondent)
 
-    bulk_update_documents.delay(document_ids=affected_docs)
+    # Queue task after transaction commits to prevent race conditions
+    transaction.on_commit(
+        lambda: bulk_update_documents.delay(document_ids=affected_docs),
+    )
 
     return "OK"
 
@@ -72,8 +75,9 @@ def set_storage_path(doc_ids: list[int], storage_path: StoragePath) -> Literal["
     affected_docs = list(qs.values_list("pk", flat=True))
     qs.update(storage_path=storage_path)
 
-    bulk_update_documents.delay(
-        document_ids=affected_docs,
+    # Queue task after transaction commits to prevent race conditions
+    transaction.on_commit(
+        lambda: bulk_update_documents.delay(document_ids=affected_docs),
     )
 
     return "OK"
@@ -91,7 +95,10 @@ def set_document_type(doc_ids: list[int], document_type: DocumentType) -> Litera
     affected_docs = list(qs.values_list("pk", flat=True))
     qs.update(document_type=document_type)
 
-    bulk_update_documents.delay(document_ids=affected_docs)
+    # Queue task after transaction commits to prevent race conditions
+    transaction.on_commit(
+        lambda: bulk_update_documents.delay(document_ids=affected_docs),
+    )
 
     return "OK"
 
@@ -116,8 +123,11 @@ def add_tag(doc_ids: list[int], tag: int) -> Literal["OK"]:
     if to_create:
         DocumentTagRelationship.objects.bulk_create(to_create)
 
+    # Queue task after transaction commits to prevent race conditions
     if affected_docs:
-        bulk_update_documents.delay(document_ids=list(affected_docs))
+        transaction.on_commit(
+            lambda: bulk_update_documents.delay(document_ids=list(affected_docs)),
+        )
 
     return "OK"
 
@@ -134,8 +144,11 @@ def remove_tag(doc_ids: list[int], tag: int) -> Literal["OK"]:
     affected_docs = list(qs.values_list("document_id", flat=True).distinct())
     qs.delete()
 
+    # Queue task after transaction commits to prevent race conditions
     if affected_docs:
-        bulk_update_documents.delay(document_ids=affected_docs)
+        transaction.on_commit(
+            lambda: bulk_update_documents.delay(document_ids=affected_docs),
+        )
 
     return "OK"
 
@@ -193,8 +206,13 @@ def modify_tags(
                         ignore_conflicts=True,
                     )
 
-            if affected_docs:
-                bulk_update_documents.delay(document_ids=affected_docs)
+        # Queue task after transaction commits to prevent race conditions
+        # Using on_commit() ensures task is queued after outermost transaction commits,
+        # preventing cross-system deadlocks and ensuring data consistency
+        if affected_docs:
+            transaction.on_commit(
+                lambda: bulk_update_documents.delay(document_ids=affected_docs),
+            )
     except Exception as e:
         logger.error(f"Error modifying tags: {e}")
         return "ERROR"
@@ -266,7 +284,12 @@ def modify_custom_fields(
         field_id__in=remove_custom_fields,
     ).hard_delete()
 
-    bulk_update_documents.delay(document_ids=affected_docs)
+    # Queue Celery task AFTER all database operations complete
+    # Using on_commit() ensures task is queued after transaction commits,
+    # preventing race conditions where Worker A starts before Worker B releases DB locks
+    transaction.on_commit(
+        lambda: bulk_update_documents.delay(document_ids=affected_docs),
+    )
 
     return "OK"
 
@@ -323,7 +346,10 @@ def set_permissions(
 
     affected_docs = list(qs.values_list("pk", flat=True))
 
-    bulk_update_documents.delay(document_ids=affected_docs)
+    # Queue task after transaction commits to prevent race conditions
+    transaction.on_commit(
+        lambda: bulk_update_documents.delay(document_ids=affected_docs),
+    )
 
     return "OK"
 
