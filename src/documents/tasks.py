@@ -5,8 +5,8 @@ import shutil
 import uuid
 import zipfile
 from pathlib import Path
-from tempfile import NamedTemporaryFile
 from tempfile import TemporaryDirectory
+from tempfile import mkstemp
 
 import tqdm
 from celery import Task
@@ -663,12 +663,8 @@ def build_share_link_bundle(bundle_id: int):
 
     documents = list(bundle.documents.all().order_by("pk"))
 
-    with NamedTemporaryFile(
-        dir=settings.SCRATCH_DIR,
-        suffix=".zip",
-        delete=False,
-    ) as temp_zip:
-        temp_zip_path = Path(temp_zip.name)
+    _, temp_zip_path_str = mkstemp(suffix=".zip", dir=settings.SCRATCH_DIR)
+    temp_zip_path = Path(temp_zip_path_str)
 
     try:
         strategy_class = (
