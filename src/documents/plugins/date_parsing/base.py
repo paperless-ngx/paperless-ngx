@@ -4,6 +4,12 @@ from abc import ABC
 from abc import abstractmethod
 from collections.abc import Iterator
 from dataclasses import dataclass
+from types import TracebackType
+
+try:
+    from typing import Self
+except ImportError:
+    from typing_extensions import Self
 
 import dateparser
 
@@ -28,6 +34,7 @@ class DateParserConfig:
     reference_time: datetime.datetime
 
     # Settings for the default RegexDateParser
+    # Other plugins should use or consider these, but it is not required
     filename_date_order: str | None
     content_date_order: str
 
@@ -44,6 +51,28 @@ class DateParserPluginBase(ABC):
         Initializes the parser with its configuration.
         """
         self.config = config
+
+    def __enter__(self) -> Self:
+        """
+        Enter the runtime context related to this object.
+
+        Subclasses can override this to acquire resources (connections, handles).
+        """
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
+        """
+        Exit the runtime context related to this object.
+
+        Subclasses can override this to release resources.
+        """
+        # Default implementation does nothing.
+        # Returning None implies exceptions are propagated.
 
     def _parse_string(
         self,

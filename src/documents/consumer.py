@@ -429,8 +429,8 @@ class ConsumerPlugin(
                     ProgressStatusOptions.WORKING,
                     ConsumerStatusShortMessage.PARSE_DATE,
                 )
-                date_parser = get_date_parser()
-                date = next(date_parser.parse(self.filename, text), None)
+                with get_date_parser() as date_parser:
+                    date = next(date_parser.parse(self.filename, text), None)
             archive_path = document_parser.get_archive_path()
             page_count = document_parser.get_page_count(self.working_copy, mime_type)
 

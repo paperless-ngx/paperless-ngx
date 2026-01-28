@@ -1023,17 +1023,17 @@ class DocumentViewSet(
 
             dates = []
             if settings.NUMBER_OF_SUGGESTED_DATES > 0:
-                date_parser = get_date_parser()
-                gen = date_parser.parse(doc.filename, doc.content)
-                dates = sorted(
-                    {
-                        i
-                        for i in itertools.islice(
-                            gen,
-                            settings.NUMBER_OF_SUGGESTED_DATES,
-                        )
-                    },
-                )
+                with get_date_parser() as date_parser:
+                    gen = date_parser.parse(doc.filename, doc.content)
+                    dates = sorted(
+                        {
+                            i
+                            for i in itertools.islice(
+                                gen,
+                                settings.NUMBER_OF_SUGGESTED_DATES,
+                            )
+                        },
+                    )
 
             resp_data = {
                 "correspondents": [
