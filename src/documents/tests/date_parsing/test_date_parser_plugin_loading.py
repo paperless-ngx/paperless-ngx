@@ -2,7 +2,6 @@ import datetime
 import logging
 from collections.abc import Iterator
 from importlib.metadata import EntryPoint
-from pathlib import Path
 
 import pytest
 import pytest_mock
@@ -17,12 +16,12 @@ from documents.plugins.date_parsing.regex_parser import RegexDateParserPlugin
 
 
 class AlphaParser(DateParserPluginBase):
-    def parse(self, filename: Path, content: str) -> Iterator[datetime.datetime]:
+    def parse(self, filename: str, content: str) -> Iterator[datetime.datetime]:
         yield timezone.now()
 
 
 class BetaParser(DateParserPluginBase):
-    def parse(self, filename: Path, content: str) -> Iterator[datetime.datetime]:
+    def parse(self, filename: str, content: str) -> Iterator[datetime.datetime]:
         yield timezone.now()
 
 
@@ -98,17 +97,9 @@ class TestDiscoverParserClass:
     ) -> None:
         """If exactly one valid plugin is discovered, it should be returned without logging a warning."""
 
-        class AlphaPlugin(DateParserPluginBase):
-            def parse(
-                self,
-                filename: Path,
-                content: str,
-            ) -> Iterator[datetime.datetime]:
-                yield timezone.now()
-
         ep = mocker.MagicMock(spec=EntryPoint)
         ep.name = "alpha"
-        ep.load.return_value = AlphaPlugin
+        ep.load.return_value = AlphaParser
 
         mock_entry_points = mocker.patch(
             "documents.plugins.date_parsing.entry_points",
@@ -124,8 +115,8 @@ class TestDiscoverParserClass:
         # It should have called entry_points with the correct group
         mock_entry_points.assert_called_once_with(group=DATE_PARSER_ENTRY_POINT_GROUP)
 
-        # The discovered class should be exactly our AlphaPlugin
-        assert result is AlphaPlugin
+        # The discovered class should be exactly our AlphaParser
+        assert result is AlphaParser
 
         # No warnings should have been logged
         assert not any(

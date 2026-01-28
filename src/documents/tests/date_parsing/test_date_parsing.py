@@ -1,5 +1,6 @@
 import datetime
 import logging
+from typing import Any
 
 import pytest
 import pytest_mock
@@ -261,7 +262,11 @@ class TestRegexDateParser:
         # Patch the dateparser.parse
         target = "documents.plugins.date_parsing.base.dateparser.parse"
 
-        def fake_parse(date_string: str, settings=None, locales=None):
+        def fake_parse(
+            date_string: str,
+            settings: dict[str, Any] | None = None,
+            locales: None = None,
+        ) -> datetime.datetime | None:
             date_order = settings.get("DATE_ORDER") if settings else None
 
             # Filename-style YYYY-MM-DD / YYYY.MM.DD
@@ -332,7 +337,11 @@ class TestRegexDateParser:
 
         target = "documents.plugins.date_parsing.base.dateparser.parse"
 
-        def fake_parse(date_string: str, settings=None, locales=None):
+        def fake_parse(
+            date_string: str,
+            settings: dict[str, Any] | None = None,
+            locales: None = None,
+        ) -> datetime.datetime | None:
             if "10/12/2023" in date_string or "10-12-2023" in date_string:
                 # ignored date
                 return datetime.datetime(2023, 12, 10, tzinfo=datetime.timezone.utc)
@@ -393,7 +402,11 @@ class TestRegexDateParser:
         # Patch the module's dateparser.parse so we can inspect calls
         target = "documents.plugins.date_parsing.base.dateparser.parse"
 
-        def fake_parse(date_string: str, settings=None, locales=None):
+        def fake_parse(
+            date_string: str,
+            settings: dict[str, Any] | None = None,
+            locales: None = None,
+        ) -> datetime.datetime | None:
             # return distinct datetimes so we can tell which source was parsed
             if "25/12/2022" in date_string:
                 return datetime.datetime(2022, 12, 25, tzinfo=datetime.timezone.utc)

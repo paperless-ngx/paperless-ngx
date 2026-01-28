@@ -154,10 +154,6 @@ typing = [
 [tool.uv]
 required-version = ">=0.9.0"
 package = false
-environments = [
-  "sys_platform == 'darwin'",
-  "sys_platform == 'linux'",
-]
 
 [tool.uv.sources]
 # Markers are chosen to select these almost exclusively when building the Docker image
@@ -333,6 +329,10 @@ exclude_also = [
 
 [tool.mypy]
 mypy_path = "src"
+files = [
+  "src/documents/plugins/date_parsing",
+  "src/documents/tests/date_parsing",
+]
 plugins = [
   "mypy_django_plugin.main",
   "mypy_drf_plugin.main",
@@ -343,6 +343,29 @@ disallow_incomplete_defs = true
 disallow_untyped_defs = true
 warn_redundant_casts = true
 warn_unused_ignores = true
+
+# This prevents errors from imports, but allows type-checking logic to work
+follow_imports = "silent"
+
+[[tool.mypy.overrides]]
+module = [
+  "documents.*",
+  "paperless.*",
+  "paperless_ai.*",
+  "paperless_mail.*",
+  "paperless_tesseract.*",
+  "paperless_remote.*",
+  "paperless_text.*",
+  "paperless_tika.*",
+]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = [
+  "documents.plugins.date_parsing.*",
+  "documents.tests.date_parsing.*",
+]
+ignore_errors = false
 
 [tool.django-stubs]
 django_settings_module = "paperless.settings"
