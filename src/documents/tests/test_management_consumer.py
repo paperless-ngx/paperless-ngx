@@ -816,7 +816,7 @@ class TestCommandWatch:
                 f.flush()
                 sleep(0.05)
 
-        sleep(0.5)
+        sleep(0.8)
 
         if thread.exception:
             raise thread.exception
@@ -837,7 +837,7 @@ class TestCommandWatch:
         (consumption_dir / "._document.pdf").write_bytes(b"test")
         shutil.copy(sample_pdf, consumption_dir / "valid.pdf")
 
-        sleep(0.5)
+        sleep(0.8)
 
         if thread.exception:
             raise thread.exception

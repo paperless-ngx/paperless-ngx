@@ -89,3 +89,11 @@ def greenmail_mail_account(db: None) -> Generator[MailAccount, None, None]:
 @pytest.fixture()
 def mail_account_handler() -> MailAccountHandler:
     return MailAccountHandler()
+
+
+@pytest.fixture(scope="session")
+def nginx_base_url() -> Generator[str, None, None]:
+    """
+    The base URL for the nginx HTTP server we expect to be alive
+    """
+    yield "http://localhost:8080"

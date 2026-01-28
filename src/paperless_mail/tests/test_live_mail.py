@@ -6,6 +6,8 @@ from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
 
+@pytest.mark.live
+@pytest.mark.greenmail
 @pytest.mark.django_db
 class TestMailGreenmail:
     """
