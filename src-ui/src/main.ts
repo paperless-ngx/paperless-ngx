@@ -1,7 +1,7 @@
 import {
-  APP_INITIALIZER,
-  enableProdMode,
   importProvidersFrom,
+  inject,
+  provideAppInitializer,
   provideZoneChangeDetection,
 } from '@angular/core'
 
@@ -159,7 +159,6 @@ import { UsernamePipe } from './app/pipes/username.pipe'
 import { SettingsService } from './app/services/settings.service'
 import { LocalizedDateParserFormatter } from './app/utils/ngb-date-parser-formatter'
 import { ISODateAdapter } from './app/utils/ngb-iso-date-adapter'
-import { environment } from './environments/environment'
 
 import localeAf from '@angular/common/locales/af'
 import localeAr from '@angular/common/locales/ar'
@@ -237,11 +236,11 @@ registerLocaleData(localeUk)
 registerLocaleData(localeZh)
 registerLocaleData(localeZhHant)
 
-function initializeApp(settings: SettingsService) {
-  return () => {
-    return settings.initializeSettings()
-  }
+function initializeApp() {
+  const settings = inject(SettingsService)
+  return settings.initializeSettings()
 }
+
 const icons = {
   airplane,
   archive,
@@ -363,10 +362,6 @@ const icons = {
   xLg,
 }
 
-if (environment.production) {
-  enableProdMode()
-}
-
 bootstrapApplication(AppComponent, {
   providers: [
     provideZoneChangeDetection(),
@@ -383,12 +378,7 @@ bootstrapApplication(AppComponent, {
       DragDropModule,
       NgxBootstrapIconsModule.pick(icons)
     ),
-    {
-      provide: APP_INITIALIZER,
-      useFactory: initializeApp,
-      deps: [SettingsService],
-      multi: true,
-    },
+    provideAppInitializer(initializeApp),
     DatePipe,
     CookieService,
     {
