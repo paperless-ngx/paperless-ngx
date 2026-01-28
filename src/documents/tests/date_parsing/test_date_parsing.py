@@ -1,6 +1,5 @@
 import datetime
 import logging
-from pathlib import Path
 
 import pytest
 import pytest_mock
@@ -348,7 +347,7 @@ class TestRegexDateParser:
         mocker.patch(target, side_effect=fake_parse)
 
         content = "Ignored: 10/12/2023, Future: 01/02/2024, Keep: 05/01/2023"
-        results = list(parser.parse(Path("whatever.txt"), content))
+        results = list(parser.parse("whatever.txt", content))
 
         assert results == [datetime.datetime(2023, 1, 5, tzinfo=datetime.timezone.utc)]
 
@@ -361,7 +360,7 @@ class TestRegexDateParser:
         """
         parser = RegexDateParserPlugin(base_config)
         results = list(
-            parser.parse(Path("no-dates.txt"), "this has no dates whatsoever"),
+            parser.parse("no-dates.txt", "this has no dates whatsoever"),
         )
         assert results == []
 
