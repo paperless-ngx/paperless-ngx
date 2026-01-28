@@ -128,6 +128,8 @@ class TestTikaParser:
 
         request = httpx_mock.get_request()
 
+        assert request is not None
+
         expected_field_name = "pdfa"
 
         content_type = request.headers["Content-Type"]
