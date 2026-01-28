@@ -114,6 +114,30 @@ def mock_supported_extensions(mocker: MockerFixture) -> MagicMock:
     )
 
 
+def wait_for_mock_call(
+    mock_obj: MagicMock,
+    timeout_s: float = 5.0,
+    poll_interval_s: float = 0.1,
+) -> bool:
+    """
+    Actively wait for a mock to be called.
+
+    Args:
+        mock_obj: The mock object to check (e.g., mock.delay)
+        timeout_s: Maximum time to wait in seconds
+        poll_interval_s: How often to check in seconds
+
+    Returns:
+        True if mock was called within timeout, False otherwise
+    """
+    start_time = monotonic()
+    while monotonic() - start_time < timeout_s:
+        if mock_obj.called:
+            return True
+        sleep(poll_interval_s)
+    return False
+
+
 class TestTrackedFile:
     """Tests for the TrackedFile dataclass."""
 
@@ -724,7 +748,7 @@ def start_consumer(
         thread = ConsumerThread(consumption_dir, scratch_dir, **kwargs)
         threads.append(thread)
         thread.start()
-        sleep(0.5)  # Give thread time to start
+        sleep(2.0)  # Give thread time to start
         return thread
 
     try:
@@ -767,7 +791,8 @@ class TestCommandWatch:
 
         target = consumption_dir / "document.pdf"
         shutil.copy(sample_pdf, target)
-        sleep(0.5)
+
+        wait_for_mock_call(mock_consume_file_delay.delay, timeout_s=2.0)
 
         if thread.exception:
             raise thread.exception
@@ -788,9 +813,12 @@ class TestCommandWatch:
 
         thread = start_consumer()
 
+        sleep(0.5)
+
         target = consumption_dir / "document.pdf"
         shutil.move(temp_location, target)
-        sleep(0.5)
+
+        wait_for_mock_call(mock_consume_file_delay.delay, timeout_s=2.0)
 
         if thread.exception:
             raise thread.exception
@@ -816,7 +844,7 @@ class TestCommandWatch:
                 f.flush()
                 sleep(0.05)
 
-        sleep(0.8)
+        wait_for_mock_call(mock_consume_file_delay.delay, timeout_s=2.0)
 
         if thread.exception:
             raise thread.exception
@@ -837,7 +865,7 @@ class TestCommandWatch:
         (consumption_dir / "._document.pdf").write_bytes(b"test")
         shutil.copy(sample_pdf, consumption_dir / "valid.pdf")
 
-        sleep(0.8)
+        wait_for_mock_call(mock_consume_file_delay.delay, timeout_s=2.0)
 
         if thread.exception:
             raise thread.exception
@@ -868,11 +896,10 @@ class TestCommandWatch:
         assert not thread.is_alive()
 
 
+@pytest.mark.django_db
 class TestCommandWatchPolling:
     """Tests for polling mode."""
 
-    @pytest.mark.django_db
-    @pytest.mark.flaky(reruns=2)
     def test_polling_mode_works(
         self,
         consumption_dir: Path,
@@ -882,7 +909,8 @@ class TestCommandWatchPolling:
     ) -> None:
         """
         Test polling mode detects files.
-        Note: At times, there appears to be a timing issue, where delay has not yet been called, hence this is marked as flaky.
+
+        Uses active waiting with timeout to handle CI delays and polling timing.
         """
         # Use shorter polling interval for faster test
         thread = start_consumer(polling_interval=0.5, stability_delay=0.1)
@@ -890,9 +918,9 @@ class TestCommandWatchPolling:
         target = consumption_dir / "document.pdf"
         shutil.copy(sample_pdf, target)
 
-        # Wait for: poll interval + stability delay + another poll + margin
-        # CI can be slow, so use generous timeout
-        sleep(3.0)
+        # Actively wait for consumption
+        # Polling needs: interval (0.5s) + stability (0.1s) + next poll (0.5s) + margin
+        wait_for_mock_call(mock_consume_file_delay.delay, timeout_s=5.0)
 
         if thread.exception:
             raise thread.exception
@@ -919,7 +947,8 @@ class TestCommandWatchRecursive:
 
         target = subdir / "document.pdf"
         shutil.copy(sample_pdf, target)
-        sleep(0.5)
+
+        wait_for_mock_call(mock_consume_file_delay.delay, timeout_s=2.0)
 
         if thread.exception:
             raise thread.exception
@@ -948,7 +977,8 @@ class TestCommandWatchRecursive:
 
         target = subdir / "document.pdf"
         shutil.copy(sample_pdf, target)
-        sleep(0.5)
+
+        wait_for_mock_call(mock_consume_file_delay.delay, timeout_s=2.0)
 
         if thread.exception:
             raise thread.exception
