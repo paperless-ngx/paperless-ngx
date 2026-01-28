@@ -1,35 +1,46 @@
-import { HttpEvent, HttpRequest } from '@angular/common/http'
+import { HttpClient, HttpEvent, HttpRequest, provideHttpClient, withInterceptors } from '@angular/common/http'
 import { TestBed } from '@angular/core/testing'
 import { Meta } from '@angular/platform-browser'
 import { CookieService } from 'ngx-cookie-service'
 import { of } from 'rxjs'
-import { CsrfInterceptor } from './csrf.interceptor'
+import { CsrfInterceptor, withCsrfInterceptor } from './csrf.interceptor'
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing'
 
 describe('CsrfInterceptor', () => {
-  let interceptor: CsrfInterceptor
   let meta: Meta
   let cookieService: CookieService
+  let httpClient: HttpClient;
+  let httpMock: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [CsrfInterceptor, Meta, CookieService],
+      providers: [
+        Meta,
+        CookieService,
+        provideHttpClient(withInterceptors([withCsrfInterceptor])),
+        provideHttpClientTesting(),
+        ],
     })
 
     meta = TestBed.inject(Meta)
     cookieService = TestBed.inject(CookieService)
-    interceptor = TestBed.inject(CsrfInterceptor)
+    httpClient = TestBed.inject(HttpClient);
+    httpMock = TestBed.inject(HttpTestingController);
   })
 
   it('should get csrf token', () => {
+    
     meta.addTag({ name: 'cookie_prefix', content: 'ngx-' }, true)
+    
     const cookieServiceSpy = jest.spyOn(cookieService, 'get')
     cookieServiceSpy.mockReturnValue('csrftoken')
-    interceptor.intercept(new HttpRequest('GET', 'https://example.com'), {
-      handle: (request) => {
-        expect(request.headers['lazyUpdate'][0]['name']).toEqual('X-CSRFToken')
-        return of({} as HttpEvent<any>)
-      },
-    })
+    
+    httpClient.get('https://example.com').subscribe();
+    const request = httpMock.expectOne('https://example.com');
+    
+    expect(request.request.headers['lazyUpdate'][0]['name']).toEqual('X-CSRFToken')
     expect(cookieServiceSpy).toHaveBeenCalled()
+    request.flush({});
+
   })
 })
