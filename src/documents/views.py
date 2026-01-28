@@ -148,7 +148,6 @@ from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.parsers import get_parser_class_for_mime_type
-from documents.parsers import parse_date_generator
 from documents.permissions import AcknowledgeTasksPermissions
 from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessNotePermissions
@@ -158,6 +157,7 @@ from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
+from documents.plugins.date_parsing import get_date_parser
 from documents.schema import generate_object_with_permissions_schema
 from documents.serialisers import AcknowledgeTasksViewSerializer
 from documents.serialisers import BulkDownloadSerializer
@@ -1023,7 +1023,8 @@ class DocumentViewSet(
 
             dates = []
             if settings.NUMBER_OF_SUGGESTED_DATES > 0:
-                gen = parse_date_generator(doc.filename, doc.content)
+                date_parser = get_date_parser()
+                gen = date_parser.parse(doc.filename, doc.content)
                 dates = sorted(
                     {
                         i
