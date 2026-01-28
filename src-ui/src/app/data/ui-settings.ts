@@ -79,6 +79,7 @@ export const SETTINGS_KEYS = {
   OUTLOOK_OAUTH_URL: 'outlook_oauth_url',
   EMAIL_ENABLED: 'email_enabled',
   AI_ENABLED: 'ai_enabled',
+  PDF_EDITOR_DEFAULT_EDIT_MODE: 'general-settings:pdf-editor:default-edit-mode',
 }
 
 export const SETTINGS: UiSetting[] = [
@@ -301,5 +302,10 @@ export const SETTINGS: UiSetting[] = [
     key: SETTINGS_KEYS.AI_ENABLED,
     type: 'boolean',
     default: false,
+  },
+  {
+    key: SETTINGS_KEYS.PDF_EDITOR_DEFAULT_EDIT_MODE,
+    type: 'string',
+    default: 'create', // PdfEditorEditMode.Create from 'pdf-editor.component'
   },
 ]

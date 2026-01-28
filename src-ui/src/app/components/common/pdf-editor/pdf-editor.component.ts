@@ -8,7 +8,9 @@ import { FormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { PDFDocumentProxy, PdfViewerModule } from 'ng2-pdf-viewer'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component'
 
 interface PageOperation {
@@ -39,12 +41,17 @@ export class PDFEditorComponent extends ConfirmDialogComponent {
   public PdfEditorEditMode = PdfEditorEditMode
 
   private documentService = inject(DocumentService)
+  private settingsService = inject(SettingsService)
   activeModal: NgbActiveModal = inject(NgbActiveModal)
 
   documentID: number
   pages: PageOperation[] = []
   totalPages = 0
-  editMode: PdfEditorEditMode = PdfEditorEditMode.Create
+  editMode: PdfEditorEditMode =
+    this.settingsService.get(SETTINGS_KEYS.PDF_EDITOR_DEFAULT_EDIT_MODE) ===
+    PdfEditorEditMode.Update
+      ? PdfEditorEditMode.Update
+      : PdfEditorEditMode.Create
   deleteOriginal: boolean = false
   includeMetadata: boolean = true
 
