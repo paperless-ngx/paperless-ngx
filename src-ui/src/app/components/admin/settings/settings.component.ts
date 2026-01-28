@@ -64,6 +64,7 @@ import { PermissionsGroupComponent } from '../../common/input/permissions/permis
 import { PermissionsUserComponent } from '../../common/input/permissions/permissions-user/permissions-user.component'
 import { SelectComponent } from '../../common/input/select/select.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
+import { PdfEditorEditMode } from '../../common/pdf-editor/pdf-editor.component'
 import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
 import { ZoomSetting } from '../../document-detail/document-detail.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
@@ -163,6 +164,7 @@ export class SettingsComponent
     defaultPermsEditGroups: new FormControl(null),
     useNativePdfViewer: new FormControl(null),
     pdfViewerDefaultZoom: new FormControl(null),
+    pdfEditorDefaultEditMode: new FormControl(null),
     documentEditingRemoveInboxTags: new FormControl(null),
     documentEditingOverlayThumbnail: new FormControl(null),
     documentDetailsHiddenFields: new FormControl([]),
@@ -195,6 +197,8 @@ export class SettingsComponent
   public readonly GlobalSearchType = GlobalSearchType
 
   public readonly ZoomSetting = ZoomSetting
+
+  public readonly PdfEditorEditMode = PdfEditorEditMode
 
   public readonly documentDetailFieldOptions = documentDetailFieldOptions
 
@@ -313,6 +317,9 @@ export class SettingsComponent
       ),
       pdfViewerDefaultZoom: this.settings.get(
         SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING
+      ),
+      pdfEditorDefaultEditMode: this.settings.get(
+        SETTINGS_KEYS.PDF_EDITOR_DEFAULT_EDIT_MODE
       ),
       displayLanguage: this.settings.getLanguage(),
       dateLocale: this.settings.get(SETTINGS_KEYS.DATE_LOCALE),
@@ -482,6 +489,10 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING,
       this.settingsForm.value.pdfViewerDefaultZoom
+    )
+    this.settings.set(
+      SETTINGS_KEYS.PDF_EDITOR_DEFAULT_EDIT_MODE,
+      this.settingsForm.value.pdfEditorDefaultEditMode
     )
     this.settings.set(
       SETTINGS_KEYS.DATE_LOCALE,
