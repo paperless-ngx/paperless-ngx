@@ -36,7 +36,7 @@ class TestDiscoverParserClass:
     ) -> None:
         mocker.patch(
             "documents.plugins.date_parsing.entry_points",
-            return_value=tuple(),
+            return_value=(),
         )
         result = _discover_parser_class()
         assert result is RegexDateParserPlugin
@@ -181,7 +181,7 @@ class TestDiscoverParserClass:
     ) -> None:
         mock_entry_points = mocker.patch(
             "documents.plugins.date_parsing.entry_points",
-            return_value=tuple(),
+            return_value=(),
         )
 
         # First call populates cache
