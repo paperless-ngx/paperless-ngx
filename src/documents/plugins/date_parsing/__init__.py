@@ -32,7 +32,7 @@ def _discover_parser_class() -> type[DateParserPluginBase]:
     except Exception as e:
         # Log a warning
         logger.warning(f"Could not query entry points for date parsers: {e}")
-        eps = tuple()
+        eps = ()
 
     valid_plugins: list[EntryPoint] = []
     for ep in eps:
