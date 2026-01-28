@@ -8,7 +8,7 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { ActivatedRoute, Router } from '@angular/router'
+import { ActivatedRoute, Router, RouterModule } from '@angular/router'
 import {
   NgbDateStruct,
   NgbDropdownModule,
@@ -84,6 +84,7 @@ import { ToastService } from 'src/app/services/toast.service'
 import { getFilenameFromContentDisposition } from 'src/app/utils/http'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
+import { DocumentDetailFieldID } from '../admin/settings/settings.component'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
 import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
@@ -124,6 +125,7 @@ enum DocumentDetailNavIDs {
   Notes = 5,
   Permissions = 6,
   History = 7,
+  Duplicates = 8,
 }
 
 enum ContentRenderType {
@@ -181,6 +183,7 @@ export enum ZoomSetting {
     NgxBootstrapIconsModule,
     PdfViewerModule,
     TextAreaComponent,
+    RouterModule,
   ],
 })
 export class DocumentDetailComponent
@@ -279,6 +282,8 @@ export class DocumentDetailComponent
 
   public readonly DataType = DataType
 
+  public readonly DocumentDetailFieldID = DocumentDetailFieldID
+
   @ViewChild('nav') nav: NgbNav
   @ViewChild('pdfPreview') set pdfPreview(element) {
     // this gets called when component added or removed from DOM
@@ -323,6 +328,12 @@ export class DocumentDetailComponent
 
   get showThumbnailOverlay(): boolean {
     return this.settings.get(SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL)
+  }
+
+  isFieldHidden(fieldId: DocumentDetailFieldID): boolean {
+    return this.settings
+      .get(SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS)
+      .includes(fieldId)
   }
 
   private getRenderType(mimeType: string): ContentRenderType {
@@ -454,6 +465,11 @@ export class DocumentDetailComponent
           const openDocument = this.openDocumentService.getOpenDocument(
             this.documentId
           )
+          // update duplicate documents if present
+          if (openDocument && doc?.duplicate_documents) {
+            openDocument.duplicate_documents = doc.duplicate_documents
+            this.openDocumentService.save()
+          }
           const useDoc = openDocument || doc
           if (openDocument) {
             if (
@@ -704,6 +720,13 @@ export class DocumentDetailComponent
     }
     this.title = this.documentTitlePipe.transform(doc.title)
     this.prepareForm(doc)
+
+    if (
+      this.activeNavID === DocumentDetailNavIDs.Duplicates &&
+      !doc?.duplicate_documents?.length
+    ) {
+      this.activeNavID = DocumentDetailNavIDs.Details
+    }
   }
 
   get customFieldFormFields(): FormArray {

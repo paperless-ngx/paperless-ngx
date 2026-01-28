@@ -602,7 +602,7 @@ def rewrite_natural_date_keywords(query_string: str) -> str:
 
             case "this year":
                 start = datetime(local_now.year, 1, 1, 0, 0, 0, tzinfo=tz)
-                end = datetime.combine(today, time.max, tzinfo=tz)
+                end = datetime(local_now.year, 12, 31, 23, 59, 59, tzinfo=tz)
 
             case "previous week":
                 days_since_monday = local_now.weekday()

@@ -48,6 +48,7 @@ import {
 } from 'src/app/data/filter-rule-type'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
@@ -301,16 +302,16 @@ describe('DocumentDetailComponent', () => {
       .spyOn(openDocumentsService, 'openDocument')
       .mockReturnValueOnce(of(true))
     fixture.detectChanges()
-    expect(component.activeNavID).toEqual(5) // DocumentDetailNavIDs.Notes
+    expect(component.activeNavID).toEqual(component.DocumentDetailNavIDs.Notes)
   })
 
   it('should change url on tab switch', () => {
     initNormally()
     const navigateSpy = jest.spyOn(router, 'navigate')
-    component.nav.select(5)
+    component.nav.select(component.DocumentDetailNavIDs.Notes)
     component.nav.navChange.next({
       activeId: 1,
-      nextId: 5,
+      nextId: component.DocumentDetailNavIDs.Notes,
       preventDefault: () => {},
     })
     fixture.detectChanges()
@@ -352,6 +353,18 @@ describe('DocumentDetailComponent', () => {
     expect(component.document).toEqual(doc)
   })
 
+  it('should fall back to details tab when duplicates tab is active but no duplicates', () => {
+    initNormally()
+    component.activeNavID = component.DocumentDetailNavIDs.Duplicates
+    const noDupDoc = { ...doc, duplicate_documents: [] }
+
+    component.updateComponent(noDupDoc)
+
+    expect(component.activeNavID).toEqual(
+      component.DocumentDetailNavIDs.Details
+    )
+  })
+
   it('should load already-opened document via param', () => {
     initNormally()
     jest.spyOn(documentService, 'get').mockReturnValueOnce(of(doc))
@@ -365,6 +378,38 @@ describe('DocumentDetailComponent', () => {
     )
     fixture.detectChanges() // calls ngOnInit
     expect(component.document).toEqual(doc)
+  })
+
+  it('should update cached open document duplicates when reloading an open doc', () => {
+    const openDoc = { ...doc, duplicate_documents: [{ id: 1, title: 'Old' }] }
+    const updatedDuplicates = [
+      { id: 2, title: 'Newer duplicate', deleted_at: null },
+    ]
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
+    jest.spyOn(documentService, 'get').mockReturnValue(
+      of({
+        ...doc,
+        modified: new Date('2024-01-02T00:00:00Z'),
+        duplicate_documents: updatedDuplicates,
+      })
+    )
+    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(openDoc)
+    const saveSpy = jest.spyOn(openDocumentsService, 'save')
+    jest.spyOn(openDocumentsService, 'openDocument').mockReturnValue(of(true))
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({
+        count: customFields.length,
+        all: customFields.map((f) => f.id),
+        results: customFields,
+      })
+    )
+
+    fixture.detectChanges()
+
+    expect(openDoc.duplicate_documents).toEqual(updatedDuplicates)
+    expect(saveSpy).toHaveBeenCalled()
   })
 
   it('should disable form if user cannot edit', () => {
@@ -971,7 +1016,7 @@ describe('DocumentDetailComponent', () => {
   it('should display built-in pdf viewer if not disabled', () => {
     initNormally()
     component.document.archived_file_name = 'file.pdf'
-    jest.spyOn(settingsService, 'get').mockReturnValue(false)
+    settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, false)
     expect(component.useNativePdfViewer).toBeFalsy()
     fixture.detectChanges()
     expect(fixture.debugElement.query(By.css('pdf-viewer'))).not.toBeNull()
@@ -980,7 +1025,7 @@ describe('DocumentDetailComponent', () => {
   it('should display native pdf viewer if enabled', () => {
     initNormally()
     component.document.archived_file_name = 'file.pdf'
-    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+    settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, true)
     expect(component.useNativePdfViewer).toBeTruthy()
     fixture.detectChanges()
     expect(fixture.debugElement.query(By.css('object'))).not.toBeNull()
