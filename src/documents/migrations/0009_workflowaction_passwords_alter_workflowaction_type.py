@@ -6,7 +6,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "0007_document_content_length"),
+        ("documents", "0008_sharelinkbundle"),
     ]
 
     operations = [
