@@ -392,6 +392,10 @@ bootstrapApplication(AppComponent, {
     CorrespondentNamePipe,
     DocumentTypeNamePipe,
     StoragePathNamePipe,
-    provideHttpClient(withInterceptorsFromDi(), withInterceptors([withCsrfInterceptor, withApiVersionInterceptor]),withFetch()),
+    provideHttpClient(
+      withInterceptorsFromDi(),
+      withInterceptors([withCsrfInterceptor, withApiVersionInterceptor]),
+      withFetch()
+    ),
   ],
 }).catch((err) => console.error(err))
