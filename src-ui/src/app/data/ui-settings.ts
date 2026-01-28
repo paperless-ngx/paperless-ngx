@@ -1,3 +1,4 @@
+import { PdfEditorEditMode } from '../components/common/pdf-editor/pdf-editor.component'
 import { User } from './user'
 
 export interface UiSettings {
@@ -74,12 +75,13 @@ export const SETTINGS_KEYS = {
     'general-settings:document-details:hidden-fields',
   SEARCH_DB_ONLY: 'general-settings:search:db-only',
   SEARCH_FULL_TYPE: 'general-settings:search:more-link',
+  PDF_EDITOR_DEFAULT_EDIT_MODE:
+    'general-settings:document-editing:default-edit-mode',
   EMPTY_TRASH_DELAY: 'trash_delay',
   GMAIL_OAUTH_URL: 'gmail_oauth_url',
   OUTLOOK_OAUTH_URL: 'outlook_oauth_url',
   EMAIL_ENABLED: 'email_enabled',
   AI_ENABLED: 'ai_enabled',
-  PDF_EDITOR_DEFAULT_EDIT_MODE: 'general-settings:pdf-editor:default-edit-mode',
 }
 
 export const SETTINGS: UiSetting[] = [
@@ -306,6 +308,6 @@ export const SETTINGS: UiSetting[] = [
   {
     key: SETTINGS_KEYS.PDF_EDITOR_DEFAULT_EDIT_MODE,
     type: 'string',
-    default: 'create', // PdfEditorEditMode.Create from 'pdf-editor.component'
+    default: PdfEditorEditMode.Create,
   },
 ]
