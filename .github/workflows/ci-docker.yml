@@ -46,14 +46,13 @@ jobs:
         id: ref
         run: |
           ref_name="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
-          # Sanitize by replacing / with - for cache keys
-          cache_ref="${ref_name//\//-}"
+          # Sanitize by replacing / with - for use in tags and cache keys
+          sanitized_ref="${ref_name//\//-}"
 
           echo "ref_name=${ref_name}"
-          echo "cache_ref=${cache_ref}"
+          echo "sanitized_ref=${sanitized_ref}"
 
-          echo "name=${ref_name}" >> $GITHUB_OUTPUT
-          echo "cache-ref=${cache_ref}" >> $GITHUB_OUTPUT
+          echo "name=${sanitized_ref}" >> $GITHUB_OUTPUT
       - name: Check push permissions
         id: check-push
         env:
@@ -141,9 +140,9 @@ jobs:
             PNGX_TAG_VERSION=${{ steps.docker-meta.outputs.version }}
           outputs: type=image,name=${{ env.REGISTRY }}/${{ steps.repo.outputs.name }},push-by-digest=true,name-canonical=true,push=${{ steps.check-push.outputs.should-push }}
           cache-from: |
-            type=registry,ref=${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}/cache/app:${{ steps.ref.outputs.cache-ref }}-${{ matrix.arch }}
+            type=registry,ref=${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}/cache/app:${{ steps.ref.outputs.name }}-${{ matrix.arch }}
             type=registry,ref=${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}/cache/app:dev-${{ matrix.arch }}
-          cache-to: ${{ steps.check-push.outputs.should-push == 'true' && format('type=registry,mode=max,ref={0}/{1}/cache/app:{2}-{3}', env.REGISTRY, steps.repo.outputs.name, steps.ref.outputs.cache-ref, matrix.arch) || '' }}
+          cache-to: ${{ steps.check-push.outputs.should-push == 'true' && format('type=registry,mode=max,ref={0}/{1}/cache/app:{2}-{3}', env.REGISTRY, steps.repo.outputs.name, steps.ref.outputs.name, matrix.arch) || '' }}
       - name: Export digest
         if: steps.check-push.outputs.should-push == 'true'
         run: |
