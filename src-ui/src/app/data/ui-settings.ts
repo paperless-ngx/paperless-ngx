@@ -1,4 +1,3 @@
-import { PdfEditorEditMode } from '../components/common/pdf-editor/pdf-editor.component'
 import { User } from './user'
 
 export interface UiSettings {
@@ -308,6 +307,6 @@ export const SETTINGS: UiSetting[] = [
   {
     key: SETTINGS_KEYS.PDF_EDITOR_DEFAULT_EDIT_MODE,
     type: 'string',
-    default: PdfEditorEditMode.Create,
+    default: 'create', // PdfEditorEditMode.Create from 'pdf-editor.component'
   },
 ]
