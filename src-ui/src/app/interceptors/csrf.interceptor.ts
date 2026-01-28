@@ -1,10 +1,13 @@
-import { HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http'
+import {
+  HttpEvent,
+  HttpHandlerFn,
+  HttpInterceptorFn,
+  HttpRequest,
+} from '@angular/common/http'
 import { inject } from '@angular/core'
 import { Meta } from '@angular/platform-browser'
 import { CookieService } from 'ngx-cookie-service'
 import { Observable } from 'rxjs'
-
-import { HttpInterceptorFn } from '@angular/common/http'
 
 export const withCsrfInterceptor: HttpInterceptorFn = (
   request: HttpRequest<unknown>,
