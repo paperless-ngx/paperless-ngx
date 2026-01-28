@@ -298,7 +298,7 @@ class TestRegexDateParser:
 
         mocker.patch(target, side_effect=fake_parse)
 
-        results = list(parser.parse(Path(filename), content))
+        results = list(parser.parse(filename, content))
 
         assert results == expected
         for dt in results:
@@ -407,7 +407,7 @@ class TestRegexDateParser:
         filename = "report-2023-12-25.txt"
         content = "Event recorded on 25/12/2022."
 
-        results = list(parser.parse(Path(filename), content))
+        results = list(parser.parse(filename, content))
 
         # Only the content date should have been parsed -> one call
         assert mock.call_count == 1
