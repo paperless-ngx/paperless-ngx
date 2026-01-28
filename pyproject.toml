@@ -306,6 +306,7 @@ markers = [
   "gotenberg: Tests requiring Gotenberg service",
   "tika: Tests requiring Tika service",
   "greenmail: Tests requiring Greenmail service",
+  "date_parsing: Tests which cover date parsing from content or filename",
 ]
 
 [tool.pytest_env]
