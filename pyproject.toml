@@ -16,6 +16,7 @@ classifiers = [
 # This will allow testing to not install a webserver, mysql, etc
 
 dependencies = [
+  "adrf~=0.1.12",
   "azure-ai-documentintelligence>=1.0.2",
   "babel>=2.17",
   "bleach~=6.3.0",

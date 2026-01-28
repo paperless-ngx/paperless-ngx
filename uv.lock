@@ -17,6 +17,20 @@ supported-markers = [
 ]
 
 [[package]]
+name = "adrf"
+version = "0.1.12"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "async-property", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "djangorestframework", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/10/fe/573d7ec8805aec8e13459451f81398c6ac819882496e82fb6b4ae96c2762/adrf-0.1.12.tar.gz", hash = "sha256:e7aa49e5406b168f040f1a12cafb606e98fdd5467314240a9c42dbe63200d2c1", size = 17181, upload-time = "2025-11-24T03:25:44.337Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e7/47/14006c4045f818cf625d2357e823a15b4bb7fab8dd81a40acd23af41ee53/adrf-0.1.12-py3-none-any.whl", hash = "sha256:e9d1f343b82158f4c528c0809c9635a27ceef4c37d3d8e61b8096c8eeded616d", size = 20199, upload-time = "2025-11-24T03:25:43.291Z" },
+]
+
+[[package]]
 name = "aiohappyeyeballs"
 version = "2.6.1"
 source = { registry = "https://pypi.org/simple" }
@@ -201,6 +215,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/7f/bf/0f3ecda32f1cb3bf1dca480aca08a7a8a3bdc4bed2343a103f30731565c9/asgiref-3.9.2.tar.gz", hash = "sha256:a0249afacb66688ef258ffe503528360443e2b9a8d8c4581b6ebefa58c841ef1", size = 36894, upload-time = "2025-09-23T15:00:55.136Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c7/d1/69d02ce34caddb0a7ae088b84c356a625a93cd4ff57b2f97644c03fad905/asgiref-3.9.2-py3-none-any.whl", hash = "sha256:0b61526596219d70396548fc003635056856dba5d0d086f86476f10b33c75960", size = 23788, upload-time = "2025-09-23T15:00:53.627Z" },
+]
+
+[[package]]
+name = "async-property"
+version = "0.2.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a7/12/900eb34b3af75c11b69d6b78b74ec0fd1ba489376eceb3785f787d1a0a1d/async_property-0.2.2.tar.gz", hash = "sha256:17d9bd6ca67e27915a75d92549df64b5c7174e9dc806b30a3934dc4ff0506380", size = 16523, upload-time = "2023-07-03T17:21:55.688Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c7/80/9f608d13b4b3afcebd1dd13baf9551c95fc424d6390e4b1cfd7b1810cd06/async_property-0.2.2-py2.py3-none-any.whl", hash = "sha256:8924d792b5843994537f8ed411165700b27b2bd966cefc4daeefc1253442a9d7", size = 9546, upload-time = "2023-07-03T17:21:54.293Z" },
 ]
 
 [[package]]
@@ -2919,6 +2942,7 @@ name = "paperless-ngx"
 version = "2.20.5"
 source = { virtual = "." }
 dependencies = [
+    { name = "adrf", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "azure-ai-documentintelligence", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "babel", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "bleach", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -3067,6 +3091,7 @@ typing = [
 
 [package.metadata]
 requires-dist = [
+    { name = "adrf", specifier = "~=0.1.12" },
     { name = "azure-ai-documentintelligence", specifier = ">=1.0.2" },
     { name = "babel", specifier = ">=2.17" },
     { name = "bleach", specifier = "~=6.3.0" },

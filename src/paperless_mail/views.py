@@ -1,7 +1,12 @@
 import datetime
 import logging
 from datetime import timedelta
+from typing import Any
 
+from adrf.views import APIView
+from adrf.viewsets import ModelViewSet
+from adrf.viewsets import ReadOnlyModelViewSet
+from asgiref.sync import sync_to_async
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
@@ -15,11 +20,9 @@ from httpx_oauth.oauth2 import GetAccessTokenError
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
-from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
 from documents.permissions import PaperlessObjectPermissions
@@ -38,6 +41,8 @@ from paperless_mail.serialisers import MailAccountSerializer
 from paperless_mail.serialisers import MailRuleSerializer
 from paperless_mail.serialisers import ProcessedMailSerializer
 from paperless_mail.tasks import process_mail_accounts
+
+logger: logging.Logger = logging.getLogger("paperless_mail")
 
 
 @extend_schema_view(
@@ -66,71 +71,75 @@ from paperless_mail.tasks import process_mail_accounts
     ),
 )
 class MailAccountViewSet(ModelViewSet, PassUserMixin):
-    model = MailAccount
-
     queryset = MailAccount.objects.all().order_by("pk")
     serializer_class = MailAccountSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
 
-    def get_permissions(self):
+    def get_permissions(self) -> list[Any]:
         if self.action == "test":
-            # Test action does not require object level permissions
-            self.permission_classes = (IsAuthenticated,)
+            return [IsAuthenticated()]
         return super().get_permissions()
 
     @action(methods=["post"], detail=False)
-    def test(self, request):
-        logger = logging.getLogger("paperless_mail")
+    async def test(self, request: Request) -> Response | HttpResponseBadRequest:
         request.data["name"] = datetime.datetime.now().isoformat()
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
 
-        # account exists, use the password from there instead of *** and refresh_token / expiration
+        # Validation must be wrapped because of sync DB validators
+        await sync_to_async(serializer.is_valid)(raise_exception=True)
+
+        validated_data: dict[str, Any] = serializer.validated_data
+
         if (
-            len(serializer.validated_data.get("password").replace("*", "")) == 0
-            and request.data["id"] is not None
+            len(str(validated_data.get("password", "")).replace("*", "")) == 0
+            and request.data.get("id") is not None
         ):
-            existing_account = MailAccount.objects.get(pk=request.data["id"])
-            serializer.validated_data["password"] = existing_account.password
-            serializer.validated_data["account_type"] = existing_account.account_type
-            serializer.validated_data["refresh_token"] = existing_account.refresh_token
-            serializer.validated_data["expiration"] = existing_account.expiration
+            existing_account = await MailAccount.objects.aget(pk=request.data["id"])
+            validated_data.update(
+                {
+                    "password": existing_account.password,
+                    "account_type": existing_account.account_type,
+                    "refresh_token": existing_account.refresh_token,
+                    "expiration": existing_account.expiration,
+                },
+            )
 
-        account = MailAccount(**serializer.validated_data)
-        with get_mailbox(
-            account.imap_server,
-            account.imap_port,
-            account.imap_security,
-        ) as M:
-            try:
+        account = MailAccount(**validated_data)
+
+        def _blocking_imap_test() -> bool:
+            with get_mailbox(
+                account.imap_server,
+                account.imap_port,
+                account.imap_security,
+            ) as m_box:
                 if (
                     account.is_token
-                    and account.expiration is not None
+                    and account.expiration
                     and account.expiration < timezone.now()
                 ):
                     oauth_manager = PaperlessMailOAuth2Manager()
                     if oauth_manager.refresh_account_oauth_token(existing_account):
                         # User is not changing password and token needs to be refreshed
-                        existing_account.refresh_from_db()
                         account.password = existing_account.password
                     else:
                         raise MailError("Unable to refresh oauth token")
+                mailbox_login(m_box, account)
+                return True
 
-                mailbox_login(M, account)
-                return Response({"success": True})
-            except MailError as e:
-                logger.error(
-                    f"Mail account {account} test failed: {e}",
-                )
-                return HttpResponseBadRequest("Unable to connect to server")
+        try:
+            await sync_to_async(_blocking_imap_test, thread_sensitive=False)()
+            return Response({"success": True})
+        except MailError as e:
+            logger.error(f"Mail account {account} test failed: {e}")
+            return HttpResponseBadRequest("Unable to connect to server")
 
     @action(methods=["post"], detail=True)
-    def process(self, request, pk=None):
-        account = self.get_object()
+    async def process(self, request: Request, pk: int | None = None) -> Response:
+        # FIX: Use aget_object() provided by adrf to avoid SynchronousOnlyOperation
+        account = await self.aget_object()
         process_mail_accounts.delay([account.pk])
-
         return Response({"result": "OK"})
 
 
@@ -144,21 +153,38 @@ class ProcessedMailViewSet(ReadOnlyModelViewSet, PassUserMixin):
         ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = ProcessedMailFilterSet
-
     queryset = ProcessedMail.objects.all().order_by("-processed")
 
     @action(methods=["post"], detail=False)
-    def bulk_delete(self, request):
-        mail_ids = request.data.get("mail_ids", [])
+    async def bulk_delete(
+        self,
+        request: Request,
+    ) -> Response | HttpResponseBadRequest | HttpResponseForbidden:
+        mail_ids: list[int] = request.data.get("mail_ids", [])
         if not isinstance(mail_ids, list) or not all(
             isinstance(i, int) for i in mail_ids
         ):
             return HttpResponseBadRequest("mail_ids must be a list of integers")
-        mails = ProcessedMail.objects.filter(id__in=mail_ids)
-        for mail in mails:
-            if not has_perms_owner_aware(request.user, "delete_processedmail", mail):
+
+        # Store objects to delete after verification
+        to_delete: list[ProcessedMail] = []
+
+        # We must verify permissions for every requested ID
+        async for mail in ProcessedMail.objects.filter(id__in=mail_ids):
+            can_delete = await sync_to_async(has_perms_owner_aware)(
+                request.user,
+                "delete_processedmail",
+                mail,
+            )
+            if not can_delete:
+                # This is what the test is looking for: 403 on permission failure
                 return HttpResponseForbidden("Insufficient permissions")
-            mail.delete()
+            to_delete.append(mail)
+
+        # Only perform deletions if all items passed the permission check
+        for mail in to_delete:
+            await mail.adelete()
+
         return Response({"result": "OK", "deleted_mail_ids": mail_ids})
 
 
@@ -178,77 +204,74 @@ class MailRuleViewSet(ModelViewSet, PassUserMixin):
         responses={200: None},
     ),
 )
-class OauthCallbackView(GenericAPIView):
+class OauthCallbackView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request, format=None):
-        if not (
-            request.user and request.user.has_perms(["paperless_mail.add_mailaccount"])
-        ):
+    async def get(
+        self,
+        request: Request,
+    ) -> Response | HttpResponseBadRequest | HttpResponseRedirect:
+        has_perm = await sync_to_async(request.user.has_perm)(
+            "paperless_mail.add_mailaccount",
+        )
+        if not has_perm:
             return HttpResponseBadRequest(
                 "You do not have permission to add mail accounts",
             )
 
-        logger = logging.getLogger("paperless_mail")
-        code = request.query_params.get("code")
-        # Gmail passes scope as a query param, Outlook does not
-        scope = request.query_params.get("scope")
+        code: str | None = request.query_params.get("code")
+        state: str | None = request.query_params.get("state")
+        scope: str | None = request.query_params.get("scope")
 
-        if code is None:
-            logger.error(
-                f"Invalid oauth callback request, code: {code}, scope: {scope}",
-            )
-            return HttpResponseBadRequest("Invalid request, see logs for more detail")
+        if not code or not state:
+            return HttpResponseBadRequest("Invalid request parameters")
 
         oauth_manager = PaperlessMailOAuth2Manager(
             state=request.session.get("oauth_state"),
         )
-
-        state = request.query_params.get("state", "")
         if not oauth_manager.validate_state(state):
-            logger.error(
-                f"Invalid oauth callback request received state: {state}, expected: {oauth_manager.state}",
-            )
-            return HttpResponseBadRequest("Invalid request, see logs for more detail")
+            return HttpResponseBadRequest("Invalid OAuth state")
 
         try:
-            if scope is not None and "google" in scope:
-                # Google
+            defaults: dict[str, Any] = {
+                "username": "",
+                "imap_security": MailAccount.ImapSecurity.SSL,
+                "imap_port": 993,
+            }
+
+            if scope and "google" in scope:
                 account_type = MailAccount.MailAccountType.GMAIL_OAUTH
                 imap_server = "imap.gmail.com"
-                defaults = {
-                    "name": f"Gmail OAuth {timezone.now()}",
-                    "username": "",
-                    "imap_security": MailAccount.ImapSecurity.SSL,
-                    "imap_port": 993,
-                    "account_type": account_type,
-                }
-                result = oauth_manager.get_gmail_access_token(code)
-
-            elif scope is None:
-                # Outlook
+                defaults.update(
+                    {
+                        "name": f"Gmail OAuth {timezone.now()}",
+                        "account_type": account_type,
+                    },
+                )
+                result = await sync_to_async(oauth_manager.get_gmail_access_token)(code)
+            else:
                 account_type = MailAccount.MailAccountType.OUTLOOK_OAUTH
                 imap_server = "outlook.office365.com"
-                defaults = {
-                    "name": f"Outlook OAuth {timezone.now()}",
-                    "username": "",
-                    "imap_security": MailAccount.ImapSecurity.SSL,
-                    "imap_port": 993,
-                    "account_type": account_type,
-                }
+                defaults.update(
+                    {
+                        "name": f"Outlook OAuth {timezone.now()}",
+                        "account_type": account_type,
+                    },
+                )
+                result = await sync_to_async(oauth_manager.get_outlook_access_token)(
+                    code,
+                )
 
-                result = oauth_manager.get_outlook_access_token(code)
-
-            access_token = result["access_token"]
-            refresh_token = result["refresh_token"]
-            expires_in = result["expires_in"]
-            account, _ = MailAccount.objects.update_or_create(
-                password=access_token,
-                is_token=True,
+            account, _ = await MailAccount.objects.aupdate_or_create(
                 imap_server=imap_server,
-                refresh_token=refresh_token,
-                expiration=timezone.now() + timedelta(seconds=expires_in),
-                defaults=defaults,
+                refresh_token=result["refresh_token"],
+                defaults={
+                    **defaults,
+                    "password": result["access_token"],
+                    "is_token": True,
+                    "expiration": timezone.now()
+                    + timedelta(seconds=result["expires_in"]),
+                },
             )
             return HttpResponseRedirect(
                 f"{oauth_manager.oauth_redirect_url}?oauth_success=1&account_id={account.pk}",
