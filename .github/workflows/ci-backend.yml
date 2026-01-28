@@ -75,9 +75,6 @@ jobs:
         env:
           NLTK_DATA: ${{ env.NLTK_DATA }}
           PAPERLESS_CI_TEST: 1
-          PAPERLESS_MAIL_TEST_HOST: ${{ secrets.TEST_MAIL_HOST }}
-          PAPERLESS_MAIL_TEST_USER: ${{ secrets.TEST_MAIL_USER }}
-          PAPERLESS_MAIL_TEST_PASSWD: ${{ secrets.TEST_MAIL_PASSWD }}
         run: |
           uv run \
             --python ${{ steps.setup-python.outputs.python-version }} \

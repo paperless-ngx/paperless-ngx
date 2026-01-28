@@ -33,6 +33,7 @@ import {
   SelectionDataItem,
 } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
+import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -54,6 +55,8 @@ import {
 } from '../../common/filterable-dropdown/filterable-dropdown.component'
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
+import { ShareLinkBundleDialogComponent } from '../../common/share-link-bundle-dialog/share-link-bundle-dialog.component'
+import { ShareLinkBundleManageDialogComponent } from '../../common/share-link-bundle-manage-dialog/share-link-bundle-manage-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { CustomFieldsBulkEditDialogComponent } from './custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component'
 
@@ -87,6 +90,7 @@ export class BulkEditorComponent
   private customFieldService = inject(CustomFieldsService)
   private permissionService = inject(PermissionsService)
   private savedViewService = inject(SavedViewService)
+  private readonly shareLinkBundleService = inject(ShareLinkBundleService)
 
   tagSelectionModel = new FilterableDropdownSelectionModel(true)
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
@@ -906,6 +910,58 @@ export class BulkEditorComponent
 
   public get emailEnabled(): boolean {
     return this.settings.get(SETTINGS_KEYS.EMAIL_ENABLED)
+  }
+
+  createShareLinkBundle() {
+    const modal = this.modalService.open(ShareLinkBundleDialogComponent, {
+      backdrop: 'static',
+      size: 'lg',
+    })
+    const dialog = modal.componentInstance as ShareLinkBundleDialogComponent
+    const selectedDocuments = this.list.documents.filter((d) =>
+      this.list.selected.has(d.id)
+    )
+    dialog.documents = selectedDocuments
+    dialog.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        dialog.loading = true
+        dialog.buttonsEnabled = false
+        this.shareLinkBundleService
+          .createBundle(dialog.payload)
+          .pipe(first())
+          .subscribe({
+            next: (result) => {
+              dialog.loading = false
+              dialog.buttonsEnabled = false
+              dialog.createdBundle = result
+              dialog.copied = false
+              dialog.payload = null
+              dialog.onOpenManage = () => {
+                modal.close()
+                this.manageShareLinkBundles()
+              }
+              this.toastService.showInfo(
+                $localize`Share link bundle creation requested.`
+              )
+            },
+            error: (error) => {
+              dialog.loading = false
+              dialog.buttonsEnabled = true
+              this.toastService.showError(
+                $localize`Share link bundle creation is not available yet.`,
+                error
+              )
+            },
+          })
+      })
+  }
+
+  manageShareLinkBundles() {
+    this.modalService.open(ShareLinkBundleManageDialogComponent, {
+      backdrop: 'static',
+      size: 'lg',
+    })
   }
 
   emailSelected() {

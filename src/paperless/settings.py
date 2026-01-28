@@ -241,6 +241,17 @@ def _parse_beat_schedule() -> dict:
                 "expires": 23.0 * 60.0 * 60.0,
             },
         },
+        {
+            "name": "Cleanup expired share link bundles",
+            "env_key": "PAPERLESS_SHARE_LINK_BUNDLE_CLEANUP_CRON",
+            # Default daily at 02:00
+            "env_default": "0 2 * * *",
+            "task": "documents.tasks.cleanup_expired_share_link_bundles",
+            "options": {
+                # 1 hour before default schedule sends again
+                "expires": 23.0 * 60.0 * 60.0,
+            },
+        },
     ]
     for task in tasks:
         # Either get the environment setting or use the default
@@ -279,6 +290,7 @@ MEDIA_ROOT = __get_path("PAPERLESS_MEDIA_ROOT", BASE_DIR.parent / "media")
 ORIGINALS_DIR = MEDIA_ROOT / "documents" / "originals"
 ARCHIVE_DIR = MEDIA_ROOT / "documents" / "archive"
 THUMBNAIL_DIR = MEDIA_ROOT / "documents" / "thumbnails"
+SHARE_LINK_BUNDLE_DIR = MEDIA_ROOT / "documents" / "share_link_bundles"
 
 DATA_DIR = __get_path("PAPERLESS_DATA_DIR", BASE_DIR.parent / "data")
 
