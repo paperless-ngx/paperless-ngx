@@ -1,3 +1,5 @@
+import { PdfEditorEditMode } from '../components/common/pdf-editor/pdf-editor-edit-mode'
+import { ZoomSetting } from '../components/document-detail/zoom-setting'
 import { User } from './user'
 
 export interface UiSettings {
@@ -297,7 +299,7 @@ export const SETTINGS: UiSetting[] = [
   {
     key: SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING,
     type: 'string',
-    default: 'page-width', // ZoomSetting from 'document-detail.component'
+    default: ZoomSetting.PageWidth,
   },
   {
     key: SETTINGS_KEYS.AI_ENABLED,
@@ -307,6 +309,6 @@ export const SETTINGS: UiSetting[] = [
   {
     key: SETTINGS_KEYS.PDF_EDITOR_DEFAULT_EDIT_MODE,
     type: 'string',
-    default: 'create', // PdfEditorEditMode.Create from 'pdf-editor.component'
+    default: PdfEditorEditMode.Create,
   },
 ]

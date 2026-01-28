@@ -64,9 +64,9 @@ import { PermissionsGroupComponent } from '../../common/input/permissions/permis
 import { PermissionsUserComponent } from '../../common/input/permissions/permissions-user/permissions-user.component'
 import { SelectComponent } from '../../common/input/select/select.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
-import { PdfEditorEditMode } from '../../common/pdf-editor/pdf-editor.component'
+import { PdfEditorEditMode } from '../../common/pdf-editor/pdf-editor-edit-mode'
 import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
-import { ZoomSetting } from '../../document-detail/document-detail.component'
+import { ZoomSetting } from '../../document-detail/zoom-setting'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 enum SettingsNavIDs {

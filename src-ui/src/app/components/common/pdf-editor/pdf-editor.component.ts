@@ -12,6 +12,7 @@ import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component'
+import { PdfEditorEditMode } from './pdf-editor-edit-mode'
 
 interface PageOperation {
   page: number
@@ -19,11 +20,6 @@ interface PageOperation {
   splitAfter: boolean
   selected?: boolean
   loaded?: boolean
-}
-
-export enum PdfEditorEditMode {
-  Update = 'update',
-  Create = 'create',
 }
 
 @Component({
