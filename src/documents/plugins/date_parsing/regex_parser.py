@@ -1,7 +1,6 @@
 import datetime
 import re
 from collections.abc import Iterator
-from pathlib import Path
 from re import Match
 
 from documents.plugins.date_parsing.base import DateParserPluginBase
@@ -51,7 +50,7 @@ class RegexDateParserPlugin(DateParserPluginBase):
             if date is not None:
                 yield date
 
-    def parse(self, filename: Path, content: str) -> Iterator[datetime.datetime]:
+    def parse(self, filename: str, content: str) -> Iterator[datetime.datetime]:
         """
         Implementation of the abstract parse method.
 
@@ -59,7 +58,7 @@ class RegexDateParserPlugin(DateParserPluginBase):
         """
         if self.config.filename_date_order:
             yield from self._process_content(
-                filename.name,
+                filename,
                 self.config.filename_date_order,
             )
 

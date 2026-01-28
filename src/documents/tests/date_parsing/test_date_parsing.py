@@ -213,7 +213,6 @@ class TestFilterDate:
 
 
 @pytest.mark.date_parsing
-@pytest.mark.regex_date_parser
 class TestRegexDateParser:
     @pytest.mark.parametrize(
         ("filename", "content", "expected"),

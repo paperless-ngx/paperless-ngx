@@ -4,7 +4,6 @@ from abc import ABC
 from abc import abstractmethod
 from collections.abc import Iterator
 from dataclasses import dataclass
-from pathlib import Path
 
 import dateparser
 
@@ -90,7 +89,7 @@ class DateParserPluginBase(ABC):
         return None
 
     @abstractmethod
-    def parse(self, filename: Path, content: str) -> Iterator[datetime.datetime]:
+    def parse(self, filename: str, content: str) -> Iterator[datetime.datetime]:
         """
         Parses a document's filename and content, yielding valid datetime objects.
         """
