@@ -62,11 +62,13 @@ jobs:
           # should-push: Should we push to GHCR?
           # True for:
           #   1. Pushes (tags/dev/beta) - filtered via the workflow triggers
-          #   2. Internal PRs where the branch name starts with 'feature-' - filtered here when a PR is synced
+          #   2. Manual dispatch - always push to GHCR
+          #   3. Internal PRs where the branch name starts with 'feature-' or 'fix-'
 
           should_push="false"
-
           if [[ "${{ github.event_name }}" == "push" ]]; then
+            should_push="true"
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             should_push="true"
           elif [[ "${{ github.event_name }}" == "pull_request" && "${{ github.event.pull_request.head.repo.full_name }}" == "${{ github.repository }}" ]]; then
             if [[ "${REF_NAME}" == feature-* || "${REF_NAME}" == fix-* ]]; then
