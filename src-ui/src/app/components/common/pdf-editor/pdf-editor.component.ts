@@ -41,7 +41,7 @@ export class PDFEditorComponent extends ConfirmDialogComponent {
   public PdfEditorEditMode = PdfEditorEditMode
 
   private documentService = inject(DocumentService)
-  private settingsService = inject(SettingsService)
+  private readonly settingsService = inject(SettingsService)
   activeModal: NgbActiveModal = inject(NgbActiveModal)
 
   documentID: number
