@@ -154,6 +154,10 @@ typing = [
 [tool.uv]
 required-version = ">=0.9.0"
 package = false
+environments = [
+  "sys_platform == 'darwin'",
+  "sys_platform == 'linux'",
+]
 
 [tool.uv.sources]
 # Markers are chosen to select these almost exclusively when building the Docker image
