@@ -5,6 +5,7 @@ import tempfile
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import Final
 
 import magic
 from django.conf import settings
@@ -48,6 +49,8 @@ from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
 from paperless_mail.parsers import MailDocumentParser
+
+LOGGING_NAME: Final[str] = "paperless.consumer"
 
 
 class WorkflowTriggerPlugin(
@@ -156,7 +159,7 @@ class ConsumerPlugin(
     ConsumerPluginMixin,
     ConsumeTaskPlugin,
 ):
-    logging_name = "paperless.consumer"
+    logging_name = LOGGING_NAME
 
     def run_pre_consume_script(self):
         """
@@ -753,7 +756,7 @@ class ConsumerPreflightPlugin(
     ConsumeTaskPlugin,
 ):
     NAME: str = "ConsumerPreflightPlugin"
-    logging_name = "paperless.consumer"
+    logging_name = LOGGING_NAME
 
     def pre_check_file_exists(self):
         """
@@ -852,7 +855,7 @@ class AsnCheckPlugin(
     ConsumeTaskPlugin,
 ):
     NAME: str = "AsnCheckPlugin"
-    logging_name = "paperless.consumer"
+    logging_name = LOGGING_NAME
 
     def pre_check_asn_value(self):
         """
