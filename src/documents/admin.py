@@ -13,6 +13,7 @@ from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
 from documents.models import ShareLink
+from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.tasks import update_document_parent_tags
@@ -60,7 +61,6 @@ class DocumentAdmin(GuardedModelAdmin):
         "added",
         "modified",
         "mime_type",
-        "storage_type",
         "filename",
         "checksum",
         "archive_filename",
@@ -185,6 +185,22 @@ class ShareLinksAdmin(GuardedModelAdmin):
         return super().get_queryset(request).select_related("document__correspondent")
 
 
+class ShareLinkBundleAdmin(GuardedModelAdmin):
+    list_display = ("created", "status", "expiration", "owner", "slug")
+    list_filter = ("status", "created", "expiration", "owner")
+    search_fields = ("slug",)
+
+    def get_queryset(self, request):  # pragma: no cover
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("owner")
+            .prefetch_related(
+                "documents",
+            )
+        )
+
+
 class CustomFieldsAdmin(GuardedModelAdmin):
     fields = ("name", "created", "data_type")
     readonly_fields = ("created", "data_type")
@@ -216,6 +232,7 @@ admin.site.register(StoragePath, StoragePathAdmin)
 admin.site.register(PaperlessTask, TaskAdmin)
 admin.site.register(Note, NotesAdmin)
 admin.site.register(ShareLink, ShareLinksAdmin)
+admin.site.register(ShareLinkBundle, ShareLinkBundleAdmin)
 admin.site.register(CustomField, CustomFieldsAdmin)
 admin.site.register(CustomFieldInstance, CustomFieldInstancesAdmin)
 

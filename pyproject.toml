@@ -19,15 +19,15 @@ dependencies = [
   "azure-ai-documentintelligence>=1.0.2",
   "babel>=2.17",
   "bleach~=6.3.0",
-  "celery[redis]~=5.5.1",
+  "celery[redis]~=5.6.2",
   "channels~=4.2",
   "channels-redis~=4.2",
   "concurrent-log-handler~=0.9.25",
   "dateparser~=1.2",
   # WARNING: django does not use semver.
   #          Only patch versions are guaranteed to not introduce breaking changes.
-  "django~=5.2.5",
-  "django-allauth[mfa,socialaccount]~=65.12.1",
+  "django~=5.2.10",
+  "django-allauth[mfa,socialaccount]~=65.13.1",
   "django-auditlog~=3.4.1",
   "django-cachalot~=2.8.0",
   "django-celery-results~=2.6.0",
@@ -51,7 +51,6 @@ dependencies = [
   "httpx-oauth~=0.16",
   "ijson~=3.3",
   "imap-tools~=1.11.0",
-  "inotifyrecursive~=0.3",
   "jinja2~=3.1.5",
   "langdetect~=1.0.9",
   "llama-index-core>=0.14.12",
@@ -81,9 +80,8 @@ dependencies = [
   "tika-client~=0.10.0",
   "torch~=2.9.1",
   "tqdm~=4.67.1",
-  "typer~=0.12",
-  "watchdog~=6.0",
-  "whitenoise~=6.9",
+  "watchfiles>=1.1.1",
+  "whitenoise~=6.11",
   "whoosh-reloaded>=2.7.5",
   "zxing-cpp~=2.3.0",
 ]
@@ -92,13 +90,13 @@ optional-dependencies.mariadb = [
   "mysqlclient~=2.2.7",
 ]
 optional-dependencies.postgres = [
-  "psycopg[c,pool]==3.2.12",
+  "psycopg[c,pool]==3.3",
   # Direct dependency for proper resolution of the pre-built wheels
-  "psycopg-c==3.2.12",
+  "psycopg-c==3.3",
   "psycopg-pool==3.3",
 ]
 optional-dependencies.webserver = [
-  "granian[uvloop]~=2.5.1",
+  "granian[uvloop]~=2.6.0",
 ]
 
 [dependency-groups]
@@ -118,15 +116,16 @@ testing = [
   "daphne",
   "factory-boy~=3.3.1",
   "imagehash",
-  "pytest~=8.4.1",
+  "pytest~=9.0.0",
   "pytest-cov~=7.0.0",
   "pytest-django~=4.11.1",
-  "pytest-env",
+  "pytest-env~=1.2.0",
   "pytest-httpx",
-  "pytest-mock",
-  "pytest-rerunfailures",
+  "pytest-mock~=3.15.1",
+  #"pytest-randomly~=4.0.1",
+  "pytest-rerunfailures~=16.1",
   "pytest-sugar",
-  "pytest-xdist",
+  "pytest-xdist~=3.8.0",
 ]
 
 lint = [
@@ -155,7 +154,7 @@ typing = [
 ]
 
 [tool.uv]
-required-version = ">=0.5.14"
+required-version = ">=0.9.0"
 package = false
 environments = [
   "sys_platform == 'darwin'",
@@ -165,8 +164,8 @@ environments = [
 [tool.uv.sources]
 # Markers are chosen to select these almost exclusively when building the Docker image
 psycopg-c = [
-  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-bookworm-3.2.12/psycopg_c-3.2.12-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
-  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-bookworm-3.2.12/psycopg_c-3.2.12-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.0/psycopg_c-3.3.0-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.0/psycopg_c-3.3.0-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
 ]
 zxing-cpp = [
   { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
@@ -261,14 +260,18 @@ lint.isort.force-single-line = true
 
 [tool.codespell]
 write-changes = true
-ignore-words-list = "criterias,afterall,valeu,ureue,equest,ure,assertIn,Oktober"
+ignore-words-list = "criterias,afterall,valeu,ureue,equest,ure,assertIn,Oktober,commitish"
 skip = "src-ui/src/locale/*,src-ui/pnpm-lock.yaml,src-ui/e2e/*,src/paperless_mail/tests/samples/*,src/documents/tests/samples/*,*.po,*.json"
 
-[tool.pytest.ini_options]
-minversion = "8.0"
-pythonpath = [
-  "src",
-]
+[tool.pytest]
+minversion = "9.0"
+pythonpath = [ "src" ]
+
+strict_config = true
+strict_markers = true
+strict_parametrization_ids = true
+strict_xfail = true
+
 testpaths = [
   "src/documents/tests/",
   "src/paperless/tests/",
@@ -279,6 +282,7 @@ testpaths = [
   "src/paperless_remote/tests/",
   "src/paperless_ai/tests",
 ]
+
 addopts = [
   "--pythonwarnings=all",
   "--cov",
@@ -286,14 +290,25 @@ addopts = [
   "--cov-report=xml",
   "--numprocesses=auto",
   "--maxprocesses=16",
-  "--quiet",
+  "--dist=loadscope",
   "--durations=50",
+  "--durations-min=0.5",
   "--junitxml=junit.xml",
-  "-o junit_family=legacy",
+  "-o",
+  "junit_family=legacy",
 ]
+
 norecursedirs = [ "src/locale/", ".venv/", "src-ui/" ]
 
 DJANGO_SETTINGS_MODULE = "paperless.settings"
+
+markers = [
+  "live: Integration tests requiring external services (Gotenberg, Tika, nginx, etc)",
+  "nginx: Tests that make HTTP requests to the local nginx service",
+  "gotenberg: Tests requiring Gotenberg service",
+  "tika: Tests requiring Tika service",
+  "greenmail: Tests requiring Greenmail service",
+]
 
 [tool.pytest_env]
 PAPERLESS_DISABLE_DBHANDLER = "true"

@@ -35,7 +35,6 @@ from django.db.models import Model
 from django.db.models import Q
 from django.db.models import Sum
 from django.db.models import When
-from django.db.models.functions import Length
 from django.db.models.functions import Lower
 from django.db.models.manager import Manager
 from django.http import FileResponse
@@ -51,6 +50,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.timezone import make_aware
 from django.utils.translation import get_language
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -71,6 +71,7 @@ from packaging import version as packaging_version
 from redis import Redis
 from rest_framework import parsers
 from rest_framework import serializers
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 from rest_framework.exceptions import ValidationError
@@ -121,6 +122,7 @@ from documents.filters import DocumentTypeFilterSet
 from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
 from documents.filters import ObjectOwnedPermissionsFilter
 from documents.filters import PaperlessTaskFilterSet
+from documents.filters import ShareLinkBundleFilterSet
 from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
@@ -138,6 +140,7 @@ from documents.models import Note
 from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import ShareLink
+from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import UiSettings
@@ -171,6 +174,7 @@ from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import RunTaskViewSerializer
 from documents.serialisers import SavedViewSerializer
 from documents.serialisers import SearchResultSerializer
+from documents.serialisers import ShareLinkBundleSerializer
 from documents.serialisers import ShareLinkSerializer
 from documents.serialisers import StoragePathSerializer
 from documents.serialisers import StoragePathTestSerializer
@@ -183,6 +187,7 @@ from documents.serialisers import WorkflowActionSerializer
 from documents.serialisers import WorkflowSerializer
 from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_updated
+from documents.tasks import build_share_link_bundle
 from documents.tasks import consume_file
 from documents.tasks import empty_trash
 from documents.tasks import index_optimize
@@ -195,7 +200,6 @@ from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import AIConfig
 from paperless.config import GeneralConfig
-from paperless.db import GnuPG
 from paperless.models import ApplicationConfiguration
 from paperless.serialisers import GroupSerializer
 from paperless.serialisers import UserSerializer
@@ -480,11 +484,11 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
         if descendant_pks:
             filter_q = self.get_document_count_filter()
-            children_source = (
+            children_source = list(
                 Tag.objects.filter(pk__in=descendant_pks | {t.pk for t in all_tags})
                 .select_related("owner")
                 .annotate(document_count=Count("documents", filter=filter_q))
-                .order_by(*ordering)
+                .order_by(*ordering),
             )
         else:
             children_source = all_tags
@@ -496,7 +500,11 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
+        response = self.get_paginated_response(serializer.data)
+        if descendant_pks:
+            # Include children in the "all" field, if needed
+            response.data["all"] = [tag.pk for tag in children_source]
+        return response
 
     def perform_update(self, serializer):
         old_parent = self.get_object().get_parent()
@@ -1071,10 +1079,8 @@ class DocumentViewSet(
                 doc,
             ):
                 return HttpResponseForbidden("Insufficient permissions")
-            if doc.storage_type == Document.STORAGE_TYPE_GPG:
-                handle = GnuPG.decrypted(doc.thumbnail_file)
-            else:
-                handle = doc.thumbnail_file
+
+            handle = doc.thumbnail_file
 
             return HttpResponse(handle, content_type="image/webp")
         except (FileNotFoundError, Document.DoesNotExist):
@@ -2325,23 +2331,19 @@ class StatisticsView(GenericAPIView):
         user = request.user if request.user is not None else None
 
         documents = (
-            (
-                Document.objects.all()
-                if user is None
-                else get_objects_for_user_owner_aware(
-                    user,
-                    "documents.view_document",
-                    Document,
-                )
+            Document.objects.all()
+            if user is None
+            else get_objects_for_user_owner_aware(
+                user,
+                "documents.view_document",
+                Document,
             )
-            .only("mime_type", "content")
-            .prefetch_related("tags")
         )
         tags = (
             Tag.objects.all()
             if user is None
             else get_objects_for_user_owner_aware(user, "documents.view_tag", Tag)
-        )
+        ).only("id", "is_inbox_tag")
         correspondent_count = (
             Correspondent.objects.count()
             if user is None
@@ -2370,31 +2372,33 @@ class StatisticsView(GenericAPIView):
             ).count()
         )
 
-        documents_total = documents.count()
-
-        inbox_tags = tags.filter(is_inbox_tag=True)
+        inbox_tag_pks = list(
+            tags.filter(is_inbox_tag=True).values_list("pk", flat=True),
+        )
 
         documents_inbox = (
-            documents.filter(tags__id__in=inbox_tags).distinct().count()
-            if inbox_tags.exists()
+            documents.filter(tags__id__in=inbox_tag_pks).values("id").distinct().count()
+            if inbox_tag_pks
             else None
         )
 
-        document_file_type_counts = (
+        # Single SQL request for document stats and mime type counts
+        mime_type_stats = list(
             documents.values("mime_type")
-            .annotate(mime_type_count=Count("mime_type"))
-            .order_by("-mime_type_count")
-            if documents_total > 0
-            else []
+            .annotate(
+                mime_type_count=Count("id"),
+                mime_type_chars=Sum("content_length"),
+            )
+            .order_by("-mime_type_count"),
         )
 
-        character_count = (
-            documents.annotate(
-                characters=Length("content"),
-            )
-            .aggregate(Sum("characters"))
-            .get("characters__sum")
-        )
+        # Calculate totals from grouped results
+        documents_total = sum(row["mime_type_count"] for row in mime_type_stats)
+        character_count = sum(row["mime_type_chars"] or 0 for row in mime_type_stats)
+        document_file_type_counts = [
+            {"mime_type": row["mime_type"], "mime_type_count": row["mime_type_count"]}
+            for row in mime_type_stats
+        ]
 
         current_asn = Document.objects.aggregate(
             Max("archive_serial_number", default=0),
@@ -2407,11 +2411,9 @@ class StatisticsView(GenericAPIView):
                 "documents_total": documents_total,
                 "documents_inbox": documents_inbox,
                 "inbox_tag": (
-                    inbox_tags.first().pk if inbox_tags.exists() else None
+                    inbox_tag_pks[0] if inbox_tag_pks else None
                 ),  # backwards compatibility
-                "inbox_tags": (
-                    [tag.pk for tag in inbox_tags] if inbox_tags.exists() else None
-                ),
+                "inbox_tags": (inbox_tag_pks if inbox_tag_pks else None),
                 "document_file_type_counts": document_file_type_counts,
                 "character_count": character_count,
                 "tag_count": len(tags),
@@ -2439,7 +2441,7 @@ class BulkDownloadView(GenericAPIView):
         follow_filename_format = serializer.validated_data.get("follow_formatting")
 
         for document in documents:
-            if not has_perms_owner_aware(request.user, "view_document", document):
+            if not has_perms_owner_aware(request.user, "change_document", document):
                 return HttpResponseForbidden("Insufficient permissions")
 
         settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
@@ -2794,21 +2796,187 @@ class ShareLinkViewSet(ModelViewSet, PassUserMixin):
     ordering_fields = ("created", "expiration", "document")
 
 
+class ShareLinkBundleViewSet(ModelViewSet, PassUserMixin):
+    model = ShareLinkBundle
+
+    queryset = ShareLinkBundle.objects.all()
+
+    serializer_class = ShareLinkBundleSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
+    filterset_class = ShareLinkBundleFilterSet
+    ordering_fields = ("created", "expiration", "status")
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .prefetch_related("documents")
+            .annotate(document_total=Count("documents", distinct=True))
+        )
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        document_ids = serializer.validated_data["document_ids"]
+        documents_qs = Document.objects.filter(pk__in=document_ids).select_related(
+            "owner",
+        )
+        found_ids = set(documents_qs.values_list("pk", flat=True))
+        missing = sorted(set(document_ids) - found_ids)
+        if missing:
+            raise ValidationError(
+                {
+                    "document_ids": _(
+                        "Documents not found: %(ids)s",
+                    )
+                    % {"ids": ", ".join(str(item) for item in missing)},
+                },
+            )
+
+        documents = list(documents_qs)
+        for document in documents:
+            if not has_perms_owner_aware(request.user, "view_document", document):
+                raise ValidationError(
+                    {
+                        "document_ids": _(
+                            "Insufficient permissions to share document %(id)s.",
+                        )
+                        % {"id": document.pk},
+                    },
+                )
+
+        document_map = {document.pk: document for document in documents}
+        ordered_documents = [document_map[doc_id] for doc_id in document_ids]
+
+        bundle = serializer.save(
+            owner=request.user,
+            documents=ordered_documents,
+        )
+        bundle.remove_file()
+        bundle.status = ShareLinkBundle.Status.PENDING
+        bundle.last_error = None
+        bundle.size_bytes = None
+        bundle.built_at = None
+        bundle.file_path = ""
+        bundle.save(
+            update_fields=[
+                "status",
+                "last_error",
+                "size_bytes",
+                "built_at",
+                "file_path",
+            ],
+        )
+        build_share_link_bundle.delay(bundle.pk)
+        bundle.document_total = len(ordered_documents)
+        response_serializer = self.get_serializer(bundle)
+        headers = self.get_success_headers(response_serializer.data)
+        return Response(
+            response_serializer.data,
+            status=status.HTTP_201_CREATED,
+            headers=headers,
+        )
+
+    @action(detail=True, methods=["post"])
+    def rebuild(self, request, pk=None):
+        bundle = self.get_object()
+        if bundle.status == ShareLinkBundle.Status.PROCESSING:
+            return Response(
+                {"detail": _("Bundle is already being processed.")},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        bundle.remove_file()
+        bundle.status = ShareLinkBundle.Status.PENDING
+        bundle.last_error = None
+        bundle.size_bytes = None
+        bundle.built_at = None
+        bundle.file_path = ""
+        bundle.save(
+            update_fields=[
+                "status",
+                "last_error",
+                "size_bytes",
+                "built_at",
+                "file_path",
+            ],
+        )
+        build_share_link_bundle.delay(bundle.pk)
+        bundle.document_total = (
+            getattr(bundle, "document_total", None) or bundle.documents.count()
+        )
+        serializer = self.get_serializer(bundle)
+        return Response(serializer.data)
+
+
 class SharedLinkView(View):
     authentication_classes = []
     permission_classes = []
 
     def get(self, request, slug):
         share_link = ShareLink.objects.filter(slug=slug).first()
-        if share_link is None:
+        if share_link is not None:
+            if (
+                share_link.expiration is not None
+                and share_link.expiration < timezone.now()
+            ):
+                return HttpResponseRedirect("/accounts/login/?sharelink_expired=1")
+            return serve_file(
+                doc=share_link.document,
+                use_archive=share_link.file_version == "archive",
+                disposition="inline",
+            )
+
+        bundle = ShareLinkBundle.objects.filter(slug=slug).first()
+        if bundle is None:
             return HttpResponseRedirect("/accounts/login/?sharelink_notfound=1")
-        if share_link.expiration is not None and share_link.expiration < timezone.now():
+
+        if bundle.expiration is not None and bundle.expiration < timezone.now():
             return HttpResponseRedirect("/accounts/login/?sharelink_expired=1")
-        return serve_file(
-            doc=share_link.document,
-            use_archive=share_link.file_version == "archive",
-            disposition="inline",
+
+        if bundle.status in {
+            ShareLinkBundle.Status.PENDING,
+            ShareLinkBundle.Status.PROCESSING,
+        }:
+            return HttpResponse(
+                _(
+                    "The share link bundle is still being prepared. Please try again later.",
+                ),
+                status=status.HTTP_202_ACCEPTED,
+            )
+
+        file_path = bundle.absolute_file_path
+
+        if bundle.status == ShareLinkBundle.Status.FAILED or file_path is None:
+            return HttpResponse(
+                _(
+                    "The share link bundle is unavailable.",
+                ),
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+        response = FileResponse(file_path.open("rb"), content_type="application/zip")
+        short_slug = bundle.slug[:12]
+        download_name = f"paperless-share-{short_slug}.zip"
+        filename_normalized = (
+            normalize("NFKD", download_name)
+            .encode(
+                "ascii",
+                "ignore",
+            )
+            .decode("ascii")
         )
+        filename_encoded = quote(download_name)
+        response["Content-Disposition"] = (
+            f"attachment; filename='{filename_normalized}'; "
+            f"filename*=utf-8''{filename_encoded}"
+        )
+        return response
 
 
 def serve_file(*, doc: Document, use_archive: bool, disposition: str):
@@ -2823,9 +2991,6 @@ def serve_file(*, doc: Document, use_archive: bool, disposition: str):
         # Support browser previewing csv files by using text mime type
         if mime_type in {"application/csv", "text/csv"} and disposition == "inline":
             mime_type = "text/plain"
-
-    if doc.storage_type == Document.STORAGE_TYPE_GPG:
-        file_handle = GnuPG.decrypted(file_handle)
 
     response = HttpResponse(file_handle, content_type=mime_type)
     # Firefox is not able to handle unicode characters in filename field

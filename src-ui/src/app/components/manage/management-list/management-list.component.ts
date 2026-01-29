@@ -84,6 +84,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
 
   public data: T[] = []
   private unfilteredData: T[] = []
+  private allIDs: number[] = []
 
   public page = 1
 
@@ -171,7 +172,8 @@ export abstract class ManagementListComponent<T extends MatchingModel>
         tap((c) => {
           this.unfilteredData = c.results
           this.data = this.filterData(c.results)
-          this.collectionSize = c.count
+          this.collectionSize = c.all?.length ?? c.count
+          this.allIDs = c.all
         }),
         delay(100)
       )
@@ -300,16 +302,6 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     return ownsAll
   }
 
-  toggleAll(event: PointerEvent) {
-    const checked = (event.target as HTMLInputElement).checked
-    this.togggleAll = checked
-    if (checked) {
-      this.selectedObjects = new Set(this.getSelectableIDs(this.data))
-    } else {
-      this.clearSelection()
-    }
-  }
-
   protected getSelectableIDs(objects: T[]): number[] {
     return objects.map((o) => o.id)
   }
@@ -319,10 +311,38 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     this.selectedObjects.clear()
   }
 
+  selectNone() {
+    this.clearSelection()
+  }
+
+  selectPage(select: boolean) {
+    if (select) {
+      this.selectedObjects = new Set(this.getSelectableIDs(this.data))
+      this.togggleAll = this.areAllPageItemsSelected()
+    } else {
+      this.clearSelection()
+    }
+  }
+
+  selectAll() {
+    if (!this.collectionSize) {
+      this.clearSelection()
+      return
+    }
+    this.selectedObjects = new Set(this.allIDs)
+    this.togggleAll = this.areAllPageItemsSelected()
+  }
+
   toggleSelected(object) {
     this.selectedObjects.has(object.id)
       ? this.selectedObjects.delete(object.id)
       : this.selectedObjects.add(object.id)
+    this.togggleAll = this.areAllPageItemsSelected()
+  }
+
+  protected areAllPageItemsSelected(): boolean {
+    const ids = this.getSelectableIDs(this.data)
+    return ids.length > 0 && ids.every((id) => this.selectedObjects.has(id))
   }
 
   setPermissions() {
