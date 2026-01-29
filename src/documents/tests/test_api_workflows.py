@@ -862,69 +862,37 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["passwords"], passwords)
 
-    def test_password_action_no_passwords_field(self):
+    def test_password_action_invalid_passwords_field(self):
         """
         GIVEN:
             - Nothing
         WHEN:
-            - A workflow password removal action is created with no passwords set
-            - A workflow password removal action is created with passwords set to empty string
+            - A workflow password removal action is created with invalid passwords field
         THEN:
             - The required validation error is raised
         """
-        response = self.client.post(
-            "/api/workflow_actions/",
+        for payload in [
+            {"type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL},
             {
                 "type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+                "passwords": "",
             },
-        )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn(
-            "Passwords are required",
-            str(response.data["non_field_errors"][0]),
-        )
-        response = self.client.post(
-            "/api/workflow_actions/",
-            json.dumps(
-                {
-                    "type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
-                    "passwords": "",
-                },
-            ),
-            content_type="application/json",
-        )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn(
-            "Passwords are required",
-            str(response.data["non_field_errors"][0]),
-        )
-        response = self.client.post(
-            "/api/workflow_actions/",
-            json.dumps(
-                {
-                    "type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
-                    "passwords": [],
-                },
-            ),
-            content_type="application/json",
-        )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn(
-            "Passwords are required",
-            str(response.data["non_field_errors"][0]),
-        )
-        response = self.client.post(
-            "/api/workflow_actions/",
-            json.dumps(
-                {
-                    "type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
-                    "passwords": ["", "password2"],
-                },
-            ),
-            content_type="application/json",
-        )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn(
-            "Passwords are required",
-            str(response.data["non_field_errors"][0]),
-        )
+            {
+                "type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+                "passwords": [],
+            },
+            {
+                "type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+                "passwords": ["", "password2"],
+            },
+        ]:
+            response = self.client.post(
+                "/api/workflow_actions/",
+                json.dumps(payload),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            self.assertIn(
+                "Passwords are required",
+                str(response.data["non_field_errors"][0]),
+            )
