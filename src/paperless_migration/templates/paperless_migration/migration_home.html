@@ -16,12 +16,12 @@
         --bs-border-color: #dee2e6;
         --bs-link-color: var(--pngx-primary);
         --bs-link-color-rgb: 23, 84, 31;
-			}
+      }
       @media (prefers-color-scheme: dark) { :root { color-scheme: light; } }
 
-			.btn-primary:disabled {
-				--bs-btn-disabled-bg: #4d7352;
-				--bs-btn-disabled-border-color: #4d7352;
+      .btn-primary:disabled {
+        --bs-btn-disabled-bg: #4d7352;
+        --bs-btn-disabled-border-color: #4d7352;
       }
 
       body {
@@ -32,9 +32,9 @@
         min-height: 100vh;
       }
 
-			svg.logo .text {
-				fill: #161616 !important;
-			}
+      svg.logo .text {
+        fill: #161616 !important;
+      }
 
       .hero-card,
       .card-step {
@@ -106,6 +106,87 @@
         color: #fff;
         border-color: #17541f;
       }
+
+      .console-log {
+        background: #0f1a12;
+        color: #d1e7d6;
+        border-radius: 12px;
+        min-height: 180px;
+        max-height: 400px;
+        padding: 12px;
+        font-size: 0.85rem;
+        font-family: 'Consolas', 'Monaco', monospace;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .console-log .log-error { color: #ff6b6b; }
+      .console-log .log-warning { color: #ffd93d; }
+      .console-log .log-success { color: #6bcb77; }
+      .console-log .log-info { color: #4d96ff; }
+
+      .progress-bar-container {
+        height: 24px;
+        background: rgba(23, 84, 31, 0.1);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+      }
+
+      .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #17541f, #2c7a3c);
+        border-radius: 12px;
+        transition: width 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 600;
+        min-width: fit-content;
+        padding: 0 8px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+      }
+
+      .stat-item {
+        background: rgba(23, 84, 31, 0.05);
+        border-radius: 8px;
+        padding: 0.5rem;
+        text-align: center;
+      }
+
+      .stat-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #17541f;
+      }
+
+      .stat-label {
+        font-size: 0.75rem;
+        color: #666;
+      }
+
+      .ws-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
+
+      .ws-status.connected { background: #d4edda; color: #155724; }
+      .ws-status.disconnected { background: #f8d7da; color: #721c24; }
+      .ws-status.connecting { background: #fff3cd; color: #856404; }
     </style>
   </head>
   <body class="pb-4">
@@ -118,7 +199,7 @@
                 {% include "paperless-ngx/snippets/svg_logo.html" with extra_attrs="width='280' class='logo'" %}
                 <div class="ps-2">
                   <p class="text-uppercase fw-semibold mb-1 text-secondary" style="letter-spacing: 0.12rem;">Migration Mode</p>
-                  <h1 class="h3 mb-2 text-primary">Paperless-ngx v2 → v3</h1>
+                  <h1 class="h3 mb-2 text-primary">Paperless-ngx v2 to v3</h1>
                   <p class="text-muted mb-0">Migrate your data from Paperless-ngx version 2 to version 3.</p>
                 </div>
               </div>
@@ -184,8 +265,8 @@
               </div>
             </div>
           </div>
+        </div>
       </div>
-    </div>
 
       <div class="row gy-4 justify-content-center">
         <div class="col-lg-3 col-md-4">
@@ -219,7 +300,7 @@
                 <h3 class="h5 mb-1">Transform</h3>
                 <p class="small text-muted mb-0">Convert the export into the v3-ready structure.</p>
               </div>
-              <div class="mt-auto">
+              <div class="mt-auto d-grid gap-2">
                 <form method="post">
                   {% csrf_token %}
                   <button
@@ -227,11 +308,20 @@
                     type="submit"
                     name="action"
                     value="transform"
+                    id="btn-transform"
                     {% if not export_exists or transformed_exists %}disabled aria-disabled="true"{% endif %}
                   >
                     Transform export
                   </button>
                 </form>
+                {% if transformed_exists %}
+                <form method="post">
+                  {% csrf_token %}
+                  <button class="btn btn-outline-danger btn-sm w-100" type="submit" name="action" value="reset_transform">
+                    Reset transform
+                  </button>
+                </form>
+                {% endif %}
               </div>
             </div>
           </div>
@@ -253,6 +343,7 @@
                     type="submit"
                     name="action"
                     value="import"
+                    id="btn-import"
                     {% if not transformed_exists or imported_exists %}disabled aria-disabled="true"{% endif %}
                   >
                     Import transformed data
@@ -272,8 +363,8 @@
               <div class="small">
                 Run the v2 export from your Paperless instance, e.g.:
                 <code>docker run --rm ghcr.io/paperless-ngx/paperless-ngx:2.20.6 document_exporter --data-only</code>
-                (see <a href="https://docs.paperless-ngx.com/administration/#exporter" target="_blank" rel="noopener noreferrer">documentation</a>). Once the <code>manifest.json</code> is in-place, upload it or (especially for larger files) place it directly at the expected location and click “Re-check export”.
-								<p class="mt-2 mb-0 text-danger fst-italic">⚠️ The export must be generated with version Paperless-ngx v2.20.6</p>
+                (see <a href="https://docs.paperless-ngx.com/administration/#exporter" target="_blank" rel="noopener noreferrer">documentation</a>). Once the <code>manifest.json</code> is in-place, upload it or (especially for larger files) place it directly at the expected location and click "Re-check export".
+                <p class="mt-2 mb-0 text-danger fst-italic">Warning: The export must be generated with version Paperless-ngx v2.20.6</p>
               </div>
             </div>
           {% endif %}
@@ -281,38 +372,187 @@
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <div class="fw-semibold">Migration console</div>
-                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Live output</span>
+                <span id="ws-status" class="ws-status disconnected">
+                  <span class="status-dot"></span>
+                  <span class="status-text">Ready</span>
+                </span>
               </div>
-              <pre id="migration-log" class="mb-0" style="background:#0f1a12;color:#d1e7d6;border-radius:12px;min-height:180px;padding:12px;font-size:0.9rem;overflow:auto;">Ready</pre>
+
+              <div id="progress-container" class="mb-3" style="display: none;">
+                <div class="progress-bar-container">
+                  <div id="progress-bar" class="progress-bar-fill" style="width: 0%;">
+                    <span id="progress-text">0 rows</span>
+                  </div>
+                </div>
+                <div id="stats-container" class="stats-grid"></div>
+              </div>
+
+              <div id="migration-log" class="console-log">Ready to begin migration...</div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    {% if stream_action %}
-      <script>
-        (() => {
-          const logEl = document.getElementById('migration-log');
-          if (!logEl) return;
-          const streamUrl = "{% if stream_action == 'import' %}{% url 'import_stream' %}{% else %}{% url 'transform_stream' %}{% endif %}";
-          const donePrefix = "{{ stream_action|capfirst }} finished";
-          const evt = new EventSource(streamUrl);
-          const append = (line) => {
-            logEl.textContent += `\n${line}`;
-            logEl.scrollTop = logEl.scrollHeight;
+
+    <script>
+      (function() {
+        const logEl = document.getElementById('migration-log');
+        const wsStatusEl = document.getElementById('ws-status');
+        const progressContainer = document.getElementById('progress-container');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const statsContainer = document.getElementById('stats-container');
+
+        function setWsStatus(status, text) {
+          wsStatusEl.className = 'ws-status ' + status;
+          wsStatusEl.querySelector('.status-text').textContent = text;
+        }
+
+        function appendLog(message, level) {
+          const line = document.createElement('div');
+          line.className = 'log-' + (level || 'info');
+          line.textContent = message;
+          logEl.appendChild(line);
+          logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function clearLog() {
+          logEl.innerHTML = '';
+        }
+
+        function updateProgress(current, total, label) {
+          progressContainer.style.display = 'block';
+          const pct = total ? Math.min(100, (current / total) * 100) : 0;
+          progressBar.style.width = (total ? pct : 100) + '%';
+          progressText.textContent = label || (current.toLocaleString() + ' rows');
+        }
+
+        function updateStats(stats) {
+          if (!stats || Object.keys(stats).length === 0) {
+            statsContainer.innerHTML = '';
+            return;
+          }
+
+          let html = '';
+          for (const [key, value] of Object.entries(stats)) {
+            const label = key.replace('documents.', '').replace('_', ' ');
+            html += '<div class="stat-item">' +
+                    '<div class="stat-value">' + (typeof value === 'number' ? value.toLocaleString() : value) + '</div>' +
+                    '<div class="stat-label">' + label + '</div>' +
+                    '</div>';
+          }
+          statsContainer.innerHTML = html;
+        }
+
+        function formatDuration(seconds) {
+          if (seconds < 60) return seconds.toFixed(1) + 's';
+          const mins = Math.floor(seconds / 60);
+          const secs = (seconds % 60).toFixed(0);
+          return mins + 'm ' + secs + 's';
+        }
+
+        function startWebSocket(action) {
+          const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+          const wsUrl = protocol + '//' + window.location.host + '/ws/migration/' + action + '/';
+
+          clearLog();
+          appendLog('Connecting to ' + action + ' service...', 'info');
+          setWsStatus('connecting', 'Connecting...');
+          progressContainer.style.display = 'none';
+          statsContainer.innerHTML = '';
+
+          const ws = new WebSocket(wsUrl);
+
+          ws.onopen = function() {
+            setWsStatus('connected', 'Connected');
+            appendLog('Connected. Starting ' + action + '...', 'success');
+            ws.send(JSON.stringify({ action: 'start' }));
           };
-          evt.onmessage = (e) => {
-            append(e.data);
-            if (e.data.startsWith(donePrefix)) {
-              setTimeout(() => window.location.reload(), 500);
+
+          ws.onmessage = function(event) {
+            try {
+              const data = JSON.parse(event.data);
+
+              switch (data.type) {
+                case 'log':
+                  appendLog(data.message, data.level || 'info');
+                  break;
+
+                case 'progress':
+                  updateProgress(data.current, data.total, data.label);
+                  break;
+
+                case 'stats':
+                  if (data.transformed) {
+                    updateStats(data.transformed);
+                  } else {
+                    updateStats(data);
+                  }
+                  break;
+
+                case 'complete':
+                  const status = data.success ? 'success' : 'error';
+                  const msg = data.success
+                    ? 'Completed successfully in ' + formatDuration(data.duration)
+                    : 'Operation failed';
+                  appendLog(msg, status);
+
+                  if (data.total_processed) {
+                    appendLog('Total processed: ' + data.total_processed.toLocaleString() + ' rows', 'info');
+                  }
+                  if (data.speed) {
+                    appendLog('Speed: ' + Math.round(data.speed).toLocaleString() + ' rows/sec', 'info');
+                  }
+                  if (data.stats) {
+                    updateStats(data.stats);
+                  }
+
+                  setWsStatus('disconnected', 'Complete');
+                  ws.close();
+
+                  if (data.success) {
+                    setTimeout(function() { window.location.reload(); }, 1500);
+                  }
+                  break;
+
+                case 'error':
+                  appendLog('Error: ' + data.message, 'error');
+                  setWsStatus('disconnected', 'Error');
+                  break;
+
+                default:
+                  appendLog(JSON.stringify(data), 'info');
+              }
+            } catch (e) {
+              appendLog('Received: ' + event.data, 'info');
             }
           };
-          evt.onerror = () => {
-            append('[connection closed]');
-            evt.close();
+
+          ws.onerror = function(error) {
+            appendLog('WebSocket error occurred', 'error');
+            setWsStatus('disconnected', 'Error');
           };
-        })();
-      </script>
-    {% endif %}
+
+          ws.onclose = function(event) {
+            if (event.code !== 1000) {
+              const reason = event.code === 4001 ? 'Not authenticated'
+                           : event.code === 4002 ? 'Migration code not verified'
+                           : event.code === 4003 ? 'Superuser access required'
+                           : 'Connection closed (code: ' + event.code + ')';
+              appendLog(reason, 'error');
+            }
+            setWsStatus('disconnected', 'Disconnected');
+          };
+        }
+
+        // Check if we should auto-start a WebSocket action
+        {% if ws_action %}
+        startWebSocket('{{ ws_action }}');
+        {% endif %}
+
+        // Expose for manual triggering if needed
+        window.startMigrationWs = startWebSocket;
+      })();
+    </script>
   </body>
 </html>

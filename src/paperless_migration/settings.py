@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 import os
-import secrets
 from pathlib import Path
 from typing import Any
 
@@ -39,6 +38,11 @@ def __get_path(
 
 DATA_DIR = __get_path("PAPERLESS_DATA_DIR", BASE_DIR.parent / "data")
 EXPORT_DIR = __get_path("PAPERLESS_EXPORT_DIR", BASE_DIR.parent / "export")
+
+
+def _parse_redis_url() -> str:
+    """Parse Redis URL from environment with sensible defaults."""
+    return os.getenv("PAPERLESS_REDIS_URL", "redis://localhost:6379")
 
 
 def _parse_db_settings() -> dict[str, dict[str, Any]]:
@@ -97,9 +101,7 @@ def _parse_db_settings() -> dict[str, dict[str, Any]]:
 
 DATABASES = _parse_db_settings()
 
-SECRET_KEY = os.getenv(
-    "PAPERLESS_SECRET_KEY",
-)
+SECRET_KEY = os.getenv("PAPERLESS_SECRET_KEY")
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -128,6 +130,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "channels",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -166,6 +169,24 @@ TEMPLATES = [
     },
 ]
 
+# ASGI application for Channels
+ASGI_APPLICATION = "paperless_migration.asgi.application"
+
+# Channel layers configuration using Redis
+REDIS_URL = _parse_redis_url()
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [REDIS_URL],
+            "capacity": 1500,
+            "expiry": 10,
+        },
+    },
+}
+
+# Keep WSGI for compatibility
 WSGI_APPLICATION = "paperless_migration.wsgi.application"
 
 AUTHENTICATION_BACKENDS = [
@@ -203,9 +224,16 @@ MIGRATION_TRANSFORMED_PATH = __get_path(
 )
 MIGRATION_IMPORTED_PATH = Path(EXPORT_DIR / "import.completed").resolve()
 
+# Progress update frequency (rows between WebSocket updates)
+MIGRATION_PROGRESS_FREQUENCY = int(
+    os.getenv("PAPERLESS_MIGRATION_PROGRESS_FREQUENCY", "100"),
+)
+
 # One-time access code required for migration logins; stable across autoreload
 _code = os.getenv("PAPERLESS_MIGRATION_ACCESS_CODE")
 if not _code:
+    import secrets
+
     _code = secrets.token_urlsafe(12)
     os.environ["PAPERLESS_MIGRATION_ACCESS_CODE"] = _code
 MIGRATION_ACCESS_CODE = _code
