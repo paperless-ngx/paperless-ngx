@@ -3455,14 +3455,8 @@ requires-dist = [
     { name = "tika-client", specifier = "~=0.10.0" },
     { name = "torch", specifier = "~=2.9.1", index = "https://download.pytorch.org/whl/cpu" },
     { name = "tqdm", specifier = "~=4.67.1" },
-<<<<<<< HEAD
-    { name = "typer", specifier = "~=0.12" },
-    { name = "watchdog", specifier = "~=6.0" },
-    { name = "whitenoise", specifier = "~=6.9" },
-=======
     { name = "watchfiles", specifier = ">=1.1.1" },
     { name = "whitenoise", specifier = "~=6.11" },
->>>>>>> origin/dev
     { name = "whoosh-reloaded", specifier = ">=2.7.5" },
     { name = "zxing-cpp", marker = "(python_full_version != '3.12.*' and platform_machine == 'aarch64') or (python_full_version != '3.12.*' and platform_machine == 'x86_64') or (platform_machine != 'aarch64' and platform_machine != 'x86_64') or sys_platform != 'linux'", specifier = "~=2.3.0" },
     { name = "zxing-cpp", marker = "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux'", url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_aarch64.whl" },
@@ -5652,9 +5646,6 @@ wheels = [
 ]
 
 [[package]]
-<<<<<<< HEAD
-name = "typer"
-=======
 name = "txaio"
 version = "25.12.2"
 source = { registry = "https://pypi.org/simple" }
@@ -5673,26 +5664,15 @@ wheels = [
 
 [[package]]
 name = "typer-slim"
->>>>>>> origin/dev
 version = "0.21.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
-<<<<<<< HEAD
-    { name = "rich", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
-    { name = "shellingham", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
-    { name = "typing-extensions", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/36/bf/8825b5929afd84d0dabd606c67cd57b8388cb3ec385f7ef19c5cc2202069/typer-0.21.1.tar.gz", hash = "sha256:ea835607cd752343b6b2b7ce676893e5a0324082268b48f27aa058bdb7d2145d", size = 110371, upload-time = "2026-01-06T11:21:10.989Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/a0/1d/d9257dd49ff2ca23ea5f132edf1281a0c4f9de8a762b9ae399b670a59235/typer-0.21.1-py3-none-any.whl", hash = "sha256:7985e89081c636b88d172c2ee0cfe33c253160994d47bdfdc302defd7d1f1d01", size = 47381, upload-time = "2026-01-06T11:21:09.824Z" },
-=======
     { name = "typing-extensions", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/17/d4/064570dec6358aa9049d4708e4a10407d74c99258f8b2136bb8702303f1a/typer_slim-0.21.1.tar.gz", hash = "sha256:73495dd08c2d0940d611c5a8c04e91c2a0a98600cbd4ee19192255a233b6dbfd", size = 110478, upload-time = "2026-01-06T11:21:11.176Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c8/0a/4aca634faf693e33004796b6cee0ae2e1dba375a800c16ab8d3eff4bb800/typer_slim-0.21.1-py3-none-any.whl", hash = "sha256:6e6c31047f171ac93cc5a973c9e617dbc5ab2bddc4d0a3135dc161b4e2020e0d", size = 47444, upload-time = "2026-01-06T11:21:12.441Z" },
->>>>>>> origin/dev
 ]
 
 [[package]]
