@@ -1638,7 +1638,7 @@ class WorkflowAction(models.Model):
         verbose_name=_("webhook"),
     )
 
-    passwords = models.TextField(
+    passwords = models.JSONField(
         _("passwords"),
         null=True,
         blank=True,

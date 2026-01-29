@@ -848,13 +848,16 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         THEN:
             - The passwords field is correctly stored and retrieved
         """
-        passwords = "password1,password2\npassword3"
+        passwords = ["password1", "password2", "password3"]
         response = self.client.post(
             "/api/workflow_actions/",
-            {
-                "type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
-                "passwords": passwords,
-            },
+            json.dumps(
+                {
+                    "type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+                    "passwords": passwords,
+                },
+            ),
+            content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["passwords"], passwords)
@@ -882,10 +885,43 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         )
         response = self.client.post(
             "/api/workflow_actions/",
-            {
-                "type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
-                "passwords": "",
-            },
+            json.dumps(
+                {
+                    "type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+                    "passwords": "",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            "Passwords are required",
+            str(response.data["non_field_errors"][0]),
+        )
+        response = self.client.post(
+            "/api/workflow_actions/",
+            json.dumps(
+                {
+                    "type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+                    "passwords": [],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            "Passwords are required",
+            str(response.data["non_field_errors"][0]),
+        )
+        response = self.client.post(
+            "/api/workflow_actions/",
+            json.dumps(
+                {
+                    "type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+                    "passwords": ["", "password2"],
+                },
+            ),
+            content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(

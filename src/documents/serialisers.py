@@ -2675,11 +2675,14 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
             and attrs["type"] == WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL
         ):
             passwords = attrs.get("passwords")
-            if passwords is None or not isinstance(passwords, str):
-                raise serializers.ValidationError(
-                    "Passwords are required for password removal actions",
-                )
-            if not passwords.strip():
+            # ensure passwords is a non-empty list of non-empty strings
+            if (
+                passwords is None
+                or not isinstance(passwords, list)
+                or len(passwords) == 0
+                or any(not isinstance(pw, str) for pw in passwords)
+                or any(len(pw.strip()) == 0 for pw in passwords)
+            ):
                 raise serializers.ValidationError(
                     "Passwords are required for password removal actions",
                 )

@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="workflowaction",
             name="passwords",
-            field=models.TextField(
+            field=models.JSONField(
                 blank=True,
                 help_text="Passwords to try when removing PDF protection. Separate with commas or new lines.",
                 null=True,
