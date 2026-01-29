@@ -6,7 +6,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("paperless", "0004_applicationconfiguration_barcode_asn_prefix_and_more"),
+        ("paperless", "0005_applicationconfiguration_ai_enabled_and_more.py"),
     ]
 
     operations = [
