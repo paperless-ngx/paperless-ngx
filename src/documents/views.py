@@ -1,4 +1,5 @@
 import itertools
+import json
 import logging
 import os
 import platform
@@ -256,9 +257,6 @@ class IndexView(TemplateView):
             f"frontend/{self.get_frontend_language()}/polyfills.js"
         )
         context["main_js"] = f"frontend/{self.get_frontend_language()}/main.js"
-        context["webmanifest"] = (
-            f"frontend/{self.get_frontend_language()}/manifest.webmanifest"
-        )
         context["apple_touch_icon"] = (
             f"frontend/{self.get_frontend_language()}/apple-touch-icon.png"
         )
@@ -3538,4 +3536,43 @@ def serve_logo(request, filename=None):
         content_type=content_type,
         filename=app_logo.name,
         as_attachment=True,
+    )
+
+
+def serve_manifest(request):
+    """
+    Dynamically generates the PWA (Progressive Web App)  manifest with custom
+    app title. Uses PAPERLESS_APP_TITLE configuration if set.
+    """
+    general_config = GeneralConfig()
+
+    app_title = settings.APP_TITLE
+    if general_config.app_title is not None and len(general_config.app_title) > 0:
+        app_title = general_config.app_title
+
+    if app_title is None or len(app_title) == 0:
+        app_title = "Paperless-ngx"
+
+    manifest = {
+        "background_color": "white",
+        "description": "A supercharged version of paperless: scan, index and archive all your physical documents",
+        "display": "standalone",
+        "icons": [
+            {
+                "src": "favicon.ico",
+                "sizes": "256x256",
+            },
+            {
+                "src": "assets/logo-notext.svg",
+                "sizes": "any",
+            },
+        ],
+        "name": app_title,
+        "short_name": app_title,
+        "start_url": "/",
+    }
+
+    return HttpResponse(
+        json.dumps(manifest),
+        content_type="application/manifest+json",
     )

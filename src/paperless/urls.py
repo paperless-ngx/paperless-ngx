@@ -45,6 +45,7 @@ from documents.views import WorkflowActionViewSet
 from documents.views import WorkflowTriggerViewSet
 from documents.views import WorkflowViewSet
 from documents.views import serve_logo
+from documents.views import serve_manifest
 from paperless.consumers import StatusConsumer
 from paperless.views import ApplicationConfigurationViewSet
 from paperless.views import DisconnectSocialAccountView
@@ -277,6 +278,8 @@ urlpatterns = [
     ),
     # App logo
     re_path(r"^logo(?:/(?P<filename>.+))?/?$", serve_logo, name="app_logo"),
+    # PWA Manifest
+    path("manifest.webmanifest", serve_manifest, name="manifest"),
     # allauth
     path(
         "accounts/",

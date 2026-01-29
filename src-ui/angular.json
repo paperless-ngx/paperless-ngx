@@ -74,7 +74,6 @@
               "src/favicon.ico",
               "src/apple-touch-icon.png",
               "src/assets",
-              "src/manifest.webmanifest",
               {
                 "glob": "{pdf.worker.min.mjs,pdf.min.mjs}",
                 "input": "node_modules/pdfjs-dist/legacy/build/",

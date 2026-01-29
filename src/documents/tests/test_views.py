@@ -63,10 +63,6 @@ class TestViews(DirectoriesMixin, TestCase):
             )
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(
-                response.context_data["webmanifest"],
-                f"frontend/{language_actual}/manifest.webmanifest",
-            )
-            self.assertEqual(
                 response.context_data["styles_css"],
                 f"frontend/{language_actual}/styles.css",
             )
@@ -451,3 +447,98 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         )
         self.assertEqual(response.status_code, 403)
         self.assertIn(b"Insufficient permissions", response.content)
+
+
+class TestManifestView(DirectoriesMixin, TestCase):
+    """
+    Tests for the dynamic PWA manifest view
+    """
+
+    def test_manifest_default_name(self):
+        """
+        GIVEN:
+            - No custom app title configured
+        WHEN:
+            - Manifest is requested
+        THEN:
+            - Manifest returns default name "Paperless-ngx"
+            - Manifest has all required PWA fields
+        """
+        response = self.client.get("/manifest.webmanifest")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response["Content-Type"], "application/manifest+json")
+
+        manifest = json.loads(response.content)
+        self.assertEqual(manifest["name"], "Paperless-ngx")
+        self.assertEqual(manifest["short_name"], "Paperless-ngx")
+
+        self.assertEqual(manifest["display"], "standalone")
+        self.assertEqual(manifest["start_url"], "/")
+        self.assertIn("background_color", manifest)
+        self.assertIn("description", manifest)
+        self.assertIn("icons", manifest)
+        self.assertEqual(len(manifest["icons"]), 2)
+
+    @override_settings(APP_TITLE="My Custom Paperless")
+    def test_manifest_custom_name_from_settings(self):
+        """
+        GIVEN:
+            - Custom app title set via PAPERLESS_APP_TITLE environment variable
+        WHEN:
+            - Manifest is requested
+        THEN:
+            - Manifest returns custom app title
+        """
+        response = self.client.get("/manifest.webmanifest")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        manifest = json.loads(response.content)
+        self.assertEqual(manifest["name"], "My Custom Paperless")
+        self.assertEqual(manifest["short_name"], "My Custom Paperless")
+
+    def test_manifest_custom_name_from_config(self):
+        """
+        GIVEN:
+            - Custom app title set via ApplicationConfiguration
+        WHEN:
+            - Manifest is requested
+        THEN:
+            - Manifest returns custom app title from database config
+        """
+        config = ApplicationConfiguration.objects.first()
+        config.app_title = "Database Config Title"
+        config.save()
+
+        response = self.client.get("/manifest.webmanifest")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        manifest = json.loads(response.content)
+        self.assertEqual(manifest["name"], "Database Config Title")
+        self.assertEqual(manifest["short_name"], "Database Config Title")
+
+    @override_settings(APP_TITLE="Settings Title")
+    def test_manifest_config_priority(self):
+        """
+        GIVEN:
+            - Custom app title set in both settings and database config
+            - Database config has empty string
+        WHEN:
+            - Manifest is requested
+        THEN:
+            - Non-empty database config takes priority over settings
+            - Empty database config falls back to settings
+        """
+        config = ApplicationConfiguration.objects.first()
+        config.app_title = "Database Title Wins"
+        config.save()
+
+        response = self.client.get("/manifest.webmanifest")
+        manifest = json.loads(response.content)
+        self.assertEqual(manifest["name"], "Database Title Wins")
+
+        config.app_title = ""
+        config.save()
+
+        response = self.client.get("/manifest.webmanifest")
+        manifest = json.loads(response.content)
+        self.assertEqual(manifest["name"], "Settings Title")
