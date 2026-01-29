@@ -90,3 +90,11 @@ def get_date_parser() -> DateParserPluginBase:
 
     # 3. Instantiate the discovered class with the config
     return parser_class(config=config)
+
+
+__all__ = [
+    "DateParserConfig",
+    "DateParserPluginBase",
+    "RegexDateParserPlugin",
+    "get_date_parser",
+]
