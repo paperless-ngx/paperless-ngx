@@ -858,6 +858,35 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         yield reader
         reader.cleanup()
 
+    @override_settings(
+        CONSUMER_ENABLE_TAG_BARCODE=True,
+        CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
+    )
+    def test_barcode_without_tag_match(self):
+        """
+        GIVEN:
+            - Barcode that does not match any TAG mapping pattern
+            - TAG mapping configured for "TAG:" prefix only
+        WHEN:
+            - is_tag property is checked on an ASN barcode
+        THEN:
+            - Returns False
+        """
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-123.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.detect()
+
+            self.assertGreater(
+                len(reader.barcodes),
+                0,
+                "Should have detected at least one barcode",
+            )
+            asn_barcode = reader.barcodes[0]
+            self.assertFalse(
+                asn_barcode.is_tag,
+                f"ASN barcode '{asn_barcode.value}' should not match TAG: pattern",
+            )
+
     @override_settings(CONSUMER_ENABLE_TAG_BARCODE=True)
     def test_scan_file_without_matching_barcodes(self):
         """
@@ -964,3 +993,163 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
             # expect error to be caught and logged only
             tags = reader.metadata.tag_ids
             self.assertEqual(tags, None)
+
+    @override_settings(
+        CONSUMER_ENABLE_TAG_BARCODE=True,
+        CONSUMER_TAG_BARCODE_SPLIT=True,
+        CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
+    )
+    def test_split_on_tag_barcodes(self):
+        """
+        GIVEN:
+            - PDF containing barcodes with TAG: prefix
+            - Tag barcode splitting is enabled with TAG: mapping
+        WHEN:
+            - File is processed
+        THEN:
+            - Splits should occur at pages with TAG barcodes
+            - Tags should NOT be assigned when tag splitting is enabled (they're assigned during re-consumption)
+        """
+        test_file = self.BARCODE_SAMPLE_DIR / "split-by-tag-basic.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.detect()
+            separator_page_numbers = reader.get_separation_pages()
+
+            self.assertDictEqual(separator_page_numbers, {1: True, 3: True})
+
+            tags = reader.metadata.tag_ids
+            self.assertIsNone(tags)
+
+    @override_settings(
+        CONSUMER_ENABLE_TAG_BARCODE=True,
+        CONSUMER_TAG_BARCODE_SPLIT=False,
+        CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
+    )
+    def test_no_split_when_tag_split_disabled(self):
+        """
+        GIVEN:
+            - PDF containing TAG barcodes (TAG:invoice, TAG:receipt)
+            - Tag barcode splitting is disabled
+        WHEN:
+            - File is processed
+        THEN:
+            - No separation pages are identified
+            - Tags are still extracted and assigned
+        """
+        test_file = self.BARCODE_SAMPLE_DIR / "split-by-tag-basic.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.run()
+            separator_page_numbers = reader.get_separation_pages()
+
+            self.assertDictEqual(separator_page_numbers, {})
+
+            tags = reader.metadata.tag_ids
+            self.assertEqual(len(tags), 2)
+
+    @override_settings(
+        CONSUMER_ENABLE_BARCODES=True,
+        CONSUMER_ENABLE_TAG_BARCODE=True,
+        CONSUMER_TAG_BARCODE_SPLIT=True,
+        CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
+        CELERY_TASK_ALWAYS_EAGER=True,
+        OCR_MODE="skip",
+    )
+    def test_consume_barcode_file_tag_split_and_assignment(self):
+        """
+        GIVEN:
+            - PDF containing TAG barcodes on pages 2 and 4 (TAG:invoice, TAG:receipt)
+            - Tag barcode splitting is enabled
+        WHEN:
+            - File is consumed
+        THEN:
+            - PDF is split into 3 documents at barcode pages
+            - Each split document has the appropriate TAG barcodes extracted and assigned
+            - Document 1: page 1 (no tags)
+            - Document 2: pages 2-3 with TAG:invoice
+            - Document 3: pages 4-5 with TAG:receipt
+        """
+        test_file = self.BARCODE_SAMPLE_DIR / "split-by-tag-basic.pdf"
+        dst = settings.SCRATCH_DIR / "split-by-tag-basic.pdf"
+        shutil.copy(test_file, dst)
+
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
+            result = tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=dst,
+                ),
+                None,
+            )
+
+            self.assertEqual(result, "Barcode splitting complete!")
+
+            documents = Document.objects.all().order_by("id")
+            self.assertEqual(documents.count(), 3)
+
+            doc1 = documents[0]
+            self.assertEqual(doc1.tags.count(), 0)
+
+            doc2 = documents[1]
+            self.assertEqual(doc2.tags.count(), 1)
+            self.assertEqual(doc2.tags.first().name, "invoice")
+
+            doc3 = documents[2]
+            self.assertEqual(doc3.tags.count(), 1)
+            self.assertEqual(doc3.tags.first().name, "receipt")
+
+    @override_settings(
+        CONSUMER_ENABLE_TAG_BARCODE=True,
+        CONSUMER_TAG_BARCODE_SPLIT=True,
+        CONSUMER_TAG_BARCODE_MAPPING={"ASN(.*)": "ASN_\\g<1>", "TAG:(.*)": "\\g<1>"},
+    )
+    def test_split_by_mixed_asn_tag_backwards_compat(self):
+        """
+        GIVEN:
+            - PDF with mixed ASN and TAG barcodes
+            - Mapping that treats ASN barcodes as tags (backwards compatibility)
+            - ASN12345 on page 1, TAG:personal on page 3, ASN13456 on page 5, TAG:business on page 7
+        WHEN:
+            - File is consumed
+        THEN:
+            - Both ASN and TAG barcodes trigger splits
+            - Split points are at pages 3, 5, and 7 (page 1 never splits)
+            - 4 separate documents are produced
+        """
+        test_file = self.BARCODE_SAMPLE_DIR / "split-by-tag-mixed-asn.pdf"
+
+        with self.get_reader(test_file) as reader:
+            reader.detect()
+            separator_pages = reader.get_separation_pages()
+
+            self.assertDictEqual(separator_pages, {2: True, 4: True, 6: True})
+
+            document_list = reader.separate_pages(separator_pages)
+            self.assertEqual(len(document_list), 4)
+
+    @override_settings(
+        CONSUMER_ENABLE_TAG_BARCODE=True,
+        CONSUMER_TAG_BARCODE_SPLIT=True,
+        CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
+    )
+    def test_split_by_tag_multiple_per_page(self):
+        """
+        GIVEN:
+            - PDF with multiple TAG barcodes on same page
+            - TAG:invoice and TAG:expense on page 2, TAG:receipt on page 4
+        WHEN:
+            - File is processed
+        THEN:
+            - Pages with barcodes trigger splits
+            - Split points at pages 2 and 4
+            - 3 separate documents are produced
+        """
+        test_file = self.BARCODE_SAMPLE_DIR / "split-by-tag-multiple-per-page.pdf"
+
+        with self.get_reader(test_file) as reader:
+            reader.detect()
+            separator_pages = reader.get_separation_pages()
+
+            self.assertDictEqual(separator_pages, {1: True, 3: True})
+
+            document_list = reader.separate_pages(separator_pages)
+            self.assertEqual(len(document_list), 3)

@@ -170,11 +170,18 @@ Available options are `postgresql` and `mariadb`.
 
     !!! note
 
-        A small pool is typically sufficient — for example, a size of 4.
-        Make sure your PostgreSQL server's max_connections setting is large enough to handle:
-        ```(Paperless workers + Celery workers) × pool size + safety margin```
-        For example, with 4 Paperless workers and 2 Celery workers, and a pool size of 4:
-        (4 + 2) × 4 + 10 = 34 connections required.
+        A pool of 8-10 connections per worker is typically sufficient.
+        If you encounter error messages such as `couldn't get a connection`
+        or database connection timeouts, you probably need to increase the pool size.
+
+    !!! warning
+        Make sure your PostgreSQL `max_connections` setting is large enough to handle the connection pools:
+        `(NB_PAPERLESS_WORKERS + NB_CELERY_WORKERS) × POOL_SIZE + SAFETY_MARGIN`. For example, with
+        4 Paperless workers and 2 Celery workers, and a pool size of 8:``(4 + 2) × 8 + 10 = 58`,
+        so `max_connections = 60` (or even more) is appropriate.
+
+        This assumes only Paperless-ngx connects to your PostgreSQL instance. If you have other applications,
+        you should increase `max_connections` accordingly.
 
 #### [`PAPERLESS_DB_READ_CACHE_ENABLED=<bool>`](#PAPERLESS_DB_READ_CACHE_ENABLED) {#PAPERLESS_DB_READ_CACHE_ENABLED}
 
@@ -652,13 +659,19 @@ system. See the corresponding
 
 : Sync groups from the third party authentication system (e.g. OIDC) to Paperless-ngx. When enabled, users will be added or removed from groups based on their group membership in the third party authentication system. Groups must already exist in Paperless-ngx and have the same name as in the third party authentication system. Groups are updated upon logging in via the third party authentication system, see the corresponding [django-allauth documentation](https://docs.allauth.org/en/dev/socialaccount/signals.html).
 
-: In order to pass groups from the authentication system you will need to update your [PAPERLESS_SOCIALACCOUNT_PROVIDERS](#PAPERLESS_SOCIALACCOUNT_PROVIDERS) setting by adding a top-level "SCOPES" setting which includes "groups", e.g.:
+: In order to pass groups from the authentication system you will need to update your [PAPERLESS_SOCIALACCOUNT_PROVIDERS](#PAPERLESS_SOCIALACCOUNT_PROVIDERS) setting by adding a top-level "SCOPES" setting which includes "groups", or the custom groups claim configured in [`PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM`](#PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM) e.g.:
 
     ```json
     {"openid_connect":{"SCOPE": ["openid","profile","email","groups"]...
     ```
 
     Defaults to False
+
+#### [`PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM=<str>`](#PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM) {#PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM}
+
+: Allows you to define a custom groups claim. See [PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS](#PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS) which is required for this setting to take effect.
+
+    Defaults to "groups"
 
 #### [`PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS=<comma-separated-list>`](#PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS) {#PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS}
 
@@ -1139,8 +1152,9 @@ via the consumption directory, you can disable the consumer to save resources.
 
 #### [`PAPERLESS_CONSUMER_DELETE_DUPLICATES=<bool>`](#PAPERLESS_CONSUMER_DELETE_DUPLICATES) {#PAPERLESS_CONSUMER_DELETE_DUPLICATES}
 
-: When the consumer detects a duplicate document, it will not touch
-the original document. This default behavior can be changed here.
+: As of version 3.0 Paperless-ngx allows duplicate documents to be consumed by default, _except_ when
+this setting is enabled. When enabled, Paperless will check if a document with the same hash already
+exists in the system and delete the duplicate file from the consumption directory without consuming it.
 
     Defaults to false.
 
@@ -1168,21 +1182,45 @@ don't exist yet.
 
 #### [`PAPERLESS_CONSUMER_IGNORE_PATTERNS=<json>`](#PAPERLESS_CONSUMER_IGNORE_PATTERNS) {#PAPERLESS_CONSUMER_IGNORE_PATTERNS}
 
-: By default, paperless ignores certain files and folders in the
-consumption directory, such as system files created by the Mac OS
-or hidden folders some tools use to store data.
+: Additional regex patterns for files to ignore in the consumption directory. Patterns are matched against filenames only (not full paths)
+using Python's `re.match()`, which anchors at the start of the filename.
 
-    This can be adjusted by configuring a custom json array with
-    patterns to exclude.
+    See the [watchfiles documentation](https://watchfiles.helpmanual.io/api/filters/#watchfiles.BaseFilter.ignore_entity_patterns)
 
-    For example, `.DS_STORE/*` will ignore any files found in a folder
-    named `.DS_STORE`, including `.DS_STORE/bar.pdf` and `foo/.DS_STORE/bar.pdf`
+    This setting is for additional patterns beyond the built-in defaults. Common system files and directories are already ignored automatically.
+    The patterns will be compiled via Python's standard `re` module.
 
-    A pattern like `._*` will ignore anything starting with `._`, including:
-    `._foo.pdf` and `._bar/foo.pdf`
+    Example custom patterns:
 
-    Defaults to
-    `[".DS_Store", ".DS_STORE", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini", "@eaDir/*", "Thumbs.db"]`.
+    ```json
+    ["^temp_", "\\.bak$", "^~"]
+    ```
+
+    This would ignore:
+
+    - Files starting with `temp_` (e.g., `temp_scan.pdf`)
+    - Files ending with `.bak` (e.g., `document.pdf.bak`)
+    - Files starting with `~` (e.g., `~$document.docx`)
+
+    Defaults to `[]` (empty list, uses only built-in defaults).
+
+    The default ignores are `[.DS_Store, .DS_STORE, ._*, desktop.ini, Thumbs.db]` and cannot be overridden.
+
+#### [`PAPERLESS_CONSUMER_IGNORE_DIRS=<json>`](#PAPERLESS_CONSUMER_IGNORE_DIRS) {#PAPERLESS_CONSUMER_IGNORE_DIRS}
+
+: Additional directory names to ignore in the consumption directory. Directories matching these names (and all their contents) will be skipped.
+
+    This setting is for additional directories beyond the built-in defaults. Matching is done by directory name only, not full path.
+
+    Example:
+
+    ```json
+    ["temp", "incoming", ".hidden"]
+    ```
+
+    Defaults to `[]` (empty list, uses only built-in defaults).
+
+    The default ignores are `[.stfolder, .stversions, .localized, @eaDir, .Spotlight-V100, .Trashes, __MACOSX]` and cannot be overridden.
 
 #### [`PAPERLESS_CONSUMER_BARCODE_SCANNER=<string>`](#PAPERLESS_CONSUMER_BARCODE_SCANNER) {#PAPERLESS_CONSUMER_BARCODE_SCANNER}
 
@@ -1281,48 +1319,24 @@ within your documents.
 
     Defaults to false.
 
-### Polling {#polling}
+#### [`PAPERLESS_CONSUMER_POLLING_INTERVAL=<num>`](#PAPERLESS_CONSUMER_POLLING_INTERVAL) {#PAPERLESS_CONSUMER_POLLING_INTERVAL}
 
-#### [`PAPERLESS_CONSUMER_POLLING=<num>`](#PAPERLESS_CONSUMER_POLLING) {#PAPERLESS_CONSUMER_POLLING}
+: Configures how the consumer detects new files in the consumption directory.
 
-: If paperless won't find documents added to your consume folder, it
-might not be able to automatically detect filesystem changes. In
-that case, specify a polling interval in seconds here, which will
-then cause paperless to periodically check your consumption
-directory for changes. This will also disable listening for file
-system changes with `inotify`.
+    When set to `0` (default), paperless uses native filesystem notifications for efficient, immediate detection of new files.
 
-    Defaults to 0, which disables polling and uses filesystem
-    notifications.
+    When set to a positive number, paperless polls the consumption directory at that interval in seconds. Use polling for network filesystems (NFS, SMB/CIFS) where native notifications may not work reliably.
 
-#### [`PAPERLESS_CONSUMER_POLLING_RETRY_COUNT=<num>`](#PAPERLESS_CONSUMER_POLLING_RETRY_COUNT) {#PAPERLESS_CONSUMER_POLLING_RETRY_COUNT}
+    Defaults to 0.
 
-: If consumer polling is enabled, sets the maximum number of times
-paperless will check for a file to remain unmodified. If a file's
-modification time and size are identical for two consecutive checks, it
-will be consumed.
+#### [`PAPERLESS_CONSUMER_STABILITY_DELAY=<num>`](#PAPERLESS_CONSUMER_STABILITY_DELAY) {#PAPERLESS_CONSUMER_STABILITY_DELAY}
 
-    Defaults to 5.
+: Sets the time in seconds that a file must remain unchanged (same size and modification time) before paperless will begin consuming it.
 
-#### [`PAPERLESS_CONSUMER_POLLING_DELAY=<num>`](#PAPERLESS_CONSUMER_POLLING_DELAY) {#PAPERLESS_CONSUMER_POLLING_DELAY}
+    Increase this value if you experience issues with files being consumed before they are fully written, particularly on slower network storage or
+    with certain scanner quirks
 
-: If consumer polling is enabled, sets the delay in seconds between
-each check (above) paperless will do while waiting for a file to
-remain unmodified.
-
-    Defaults to 5.
-
-### iNotify {#inotify}
-
-#### [`PAPERLESS_CONSUMER_INOTIFY_DELAY=<num>`](#PAPERLESS_CONSUMER_INOTIFY_DELAY) {#PAPERLESS_CONSUMER_INOTIFY_DELAY}
-
-: Sets the time in seconds the consumer will wait for additional
-events from inotify before the consumer will consider a file ready
-and begin consumption. Certain scanners or network setups may
-generate multiple events for a single file, leading to multiple
-consumers working on the same file. Configure this to prevent that.
-
-    Defaults to 0.5 seconds.
+    Defaults to 5.0 seconds.
 
 ## Workflow webhooks
 
@@ -1543,6 +1557,20 @@ assigns or creates tags if a properly formatted barcode is detected.
 
     Please refer to the Python regex documentation for more information.
 
+#### [`PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT=<bool>`](#PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT) {#PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT}
+
+: Enables splitting of documents on tag barcodes, similar to how ASN barcodes work.
+
+    When enabled, documents will be split into separate PDFs at pages containing
+    tag barcodes that match the configured `PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING`
+    patterns. The page with the tag barcode will be retained in the new document.
+
+    Each split document will have the detected tags assigned to it.
+
+    This only has an effect if `PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE` is also enabled.
+
+    Defaults to false.
+
 ## Audit Trail
 
 #### [`PAPERLESS_AUDIT_LOG_ENABLED=<bool>`](#PAPERLESS_AUDIT_LOG_ENABLED) {#PAPERLESS_AUDIT_LOG_ENABLED}
@@ -1602,6 +1630,16 @@ processing. This only has an effect if
 : Configures the schedule to empty the trash of expired deleted documents.
 
     Defaults to `0 1 * * *`, once per day.
+
+## Share links
+
+#### [`PAPERLESS_SHARE_LINK_BUNDLE_CLEANUP_CRON=<cron expression>`](#PAPERLESS_SHARE_LINK_BUNDLE_CLEANUP_CRON) {#PAPERLESS_SHARE_LINK_BUNDLE_CLEANUP_CRON}
+
+: Controls how often Paperless-ngx removes expired share link bundles (and their generated ZIP archives).
+
+: If set to the string "disable", expired bundles are not cleaned up automatically.
+
+    Defaults to `0 2 * * *`, once per day at 02:00.
 
 ## Binaries
 
@@ -1824,3 +1862,67 @@ password. All of these options come from their similarly-named [Django settings]
 : The endpoint to use for the remote OCR engine. This is required for Azure AI.
 
     Defaults to None.
+
+## AI {#ai}
+
+#### [`PAPERLESS_AI_ENABLED=<bool>`](#PAPERLESS_AI_ENABLED) {#PAPERLESS_AI_ENABLED}
+
+: Enables the AI features in Paperless. This includes the AI-based
+suggestions. This setting is required to be set to true in order to use the AI features.
+
+    Defaults to false.
+
+#### [`PAPERLESS_AI_LLM_EMBEDDING_BACKEND=<str>`](#PAPERLESS_AI_LLM_EMBEDDING_BACKEND) {#PAPERLESS_AI_LLM_EMBEDDING_BACKEND}
+
+: The embedding backend to use for RAG. This can be either "openai" or "huggingface".
+
+    Defaults to None.
+
+#### [`PAPERLESS_AI_LLM_EMBEDDING_MODEL=<str>`](#PAPERLESS_AI_LLM_EMBEDDING_MODEL) {#PAPERLESS_AI_LLM_EMBEDDING_MODEL}
+
+: The model to use for the embedding backend for RAG. This can be set to any of the embedding models supported by the current embedding backend. If not supplied, defaults to "text-embedding-3-small" for OpenAI and "sentence-transformers/all-MiniLM-L6-v2" for Huggingface.
+
+    Defaults to None.
+
+#### [`PAPERLESS_AI_LLM_BACKEND=<str>`](#PAPERLESS_AI_LLM_BACKEND) {#PAPERLESS_AI_LLM_BACKEND}
+
+: The AI backend to use. This can be either "openai" or "ollama". If set to "ollama", the AI
+features will be run locally on your machine. If set to "openai", the AI features will be run
+using the OpenAI API. This setting is required to be set to use the AI features.
+
+    Defaults to None.
+
+    !!! note
+
+        The OpenAI API is a paid service. You will need to set up an OpenAI account and
+        will be charged for usage incurred by Paperless-ngx features and your document data
+        will (of course) be sent to the OpenAI API. Paperless-ngx does not endorse the use of the
+        OpenAI API in any way.
+
+        Refer to the OpenAI terms of service, and use at your own risk.
+
+#### [`PAPERLESS_AI_LLM_MODEL=<str>`](#PAPERLESS_AI_LLM_MODEL) {#PAPERLESS_AI_LLM_MODEL}
+
+: The model to use for the AI backend, i.e. "gpt-3.5-turbo", "gpt-4" or any of the models supported by the
+current backend. If not supplied, defaults to "gpt-3.5-turbo" for OpenAI and "llama3.1" for Ollama.
+
+    Defaults to None.
+
+#### [`PAPERLESS_AI_LLM_API_KEY=<str>`](#PAPERLESS_AI_LLM_API_KEY) {#PAPERLESS_AI_LLM_API_KEY}
+
+: The API key to use for the AI backend. This is required for the OpenAI backend (optional for others).
+
+    Defaults to None.
+
+#### [`PAPERLESS_AI_LLM_ENDPOINT=<str>`](#PAPERLESS_AI_LLM_ENDPOINT) {#PAPERLESS_AI_LLM_ENDPOINT}
+
+: The endpoint / url to use for the AI backend. This is required for the Ollama backend (optional for others).
+
+    Defaults to None.
+
+#### [`PAPERLESS_AI_LLM_INDEX_TASK_CRON=<cron expression>`](#PAPERLESS_AI_LLM_INDEX_TASK_CRON) {#PAPERLESS_AI_LLM_INDEX_TASK_CRON}
+
+: Configures the schedule to update the AI embeddings of text content and metadata for all documents. Only performed if
+AI is enabled and the LLM embedding backend is set.
+
+    Defaults to `10 2 * * *`, once per day.

@@ -4,6 +4,7 @@ import logging
 import math
 import re
 from datetime import datetime
+from datetime import timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING
 from typing import Literal
@@ -23,7 +24,9 @@ from django.core.validators import MinValueValidator
 from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
 from django.db.models import Count
+from django.db.models import Q
 from django.db.models.functions import Lower
+from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.dateparse import parse_datetime
 from django.utils.text import slugify
@@ -61,6 +64,7 @@ from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
 from documents.models import ShareLink
+from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import UiSettings
@@ -72,6 +76,7 @@ from documents.models import WorkflowTrigger
 from documents.parsers import is_mime_type_supported
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_groups_with_only_permission
+from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import set_permissions_for_object
 from documents.regex import validate_regex_pattern
 from documents.templating.filepath import validate_filepath_template_and_render
@@ -81,6 +86,9 @@ from documents.validators import url_validator
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
+
+    from django.db.models.query import QuerySet
+
 
 logger = logging.getLogger("paperless.serializers")
 
@@ -580,30 +588,34 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         ),
     )
     def get_children(self, obj):
-        filter_q = self.context.get("document_count_filter")
-        request = self.context.get("request")
-        if filter_q is None:
-            user = getattr(request, "user", None) if request else None
-            filter_q = get_document_count_filter_for_user(user)
-            self.context["document_count_filter"] = filter_q
+        children_map = self.context.get("children_map")
+        if children_map is not None:
+            children = children_map.get(obj.pk, [])
+        else:
+            filter_q = self.context.get("document_count_filter")
+            request = self.context.get("request")
+            if filter_q is None:
+                user = getattr(request, "user", None) if request else None
+                filter_q = get_document_count_filter_for_user(user)
+                self.context["document_count_filter"] = filter_q
 
-        children_queryset = (
-            obj.get_children_queryset()
-            .select_related("owner")
-            .annotate(document_count=Count("documents", filter=filter_q))
-        )
+            children = (
+                obj.get_children_queryset()
+                .select_related("owner")
+                .annotate(document_count=Count("documents", filter=filter_q))
+            )
 
-        view = self.context.get("view")
-        ordering = (
-            OrderingFilter().get_ordering(request, children_queryset, view)
-            if request and view
-            else None
-        )
-        ordering = ordering or (Lower("name"),)
-        children_queryset = children_queryset.order_by(*ordering)
+            view = self.context.get("view")
+            ordering = (
+                OrderingFilter().get_ordering(request, children, view)
+                if request and view
+                else None
+            )
+            ordering = ordering or (Lower("name"),)
+            children = children.order_by(*ordering)
 
         serializer = TagSerializer(
-            children_queryset,
+            children,
             many=True,
             user=self.user,
             full_perms=self.full_perms,
@@ -1010,6 +1022,32 @@ class NotesSerializer(serializers.ModelSerializer):
         return ret
 
 
+def _get_viewable_duplicates(
+    document: Document,
+    user: User | None,
+) -> QuerySet[Document]:
+    checksums = {document.checksum}
+    if document.archive_checksum:
+        checksums.add(document.archive_checksum)
+    duplicates = Document.global_objects.filter(
+        Q(checksum__in=checksums) | Q(archive_checksum__in=checksums),
+    ).exclude(pk=document.pk)
+    duplicates = duplicates.order_by("-created")
+    allowed = get_objects_for_user_owner_aware(
+        user,
+        "documents.view_document",
+        Document,
+        include_deleted=True,
+    )
+    return duplicates.filter(id__in=allowed)
+
+
+class DuplicateDocumentSummarySerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    title = serializers.CharField()
+    deleted_at = serializers.DateTimeField(allow_null=True)
+
+
 @extend_schema_serializer(
     deprecate_fields=["created_date"],
 )
@@ -1027,6 +1065,7 @@ class DocumentSerializer(
     archived_file_name = SerializerMethodField()
     created_date = serializers.DateField(required=False)
     page_count = SerializerMethodField()
+    duplicate_documents = SerializerMethodField()
 
     notes = NotesSerializer(many=True, required=False, read_only=True)
 
@@ -1051,6 +1090,16 @@ class DocumentSerializer(
 
     def get_page_count(self, obj) -> int | None:
         return obj.page_count
+
+    @extend_schema_field(DuplicateDocumentSummarySerializer(many=True))
+    def get_duplicate_documents(self, obj):
+        view = self.context.get("view")
+        if view and getattr(view, "action", None) != "retrieve":
+            return []
+        request = self.context.get("request")
+        user = request.user if request else None
+        duplicates = _get_viewable_duplicates(obj, user)
+        return list(duplicates.values("id", "title", "deleted_at"))
 
     def get_original_file_name(self, obj) -> str | None:
         return obj.original_filename
@@ -1229,6 +1278,7 @@ class DocumentSerializer(
             "archive_serial_number",
             "original_file_name",
             "archived_file_name",
+            "duplicate_documents",
             "owner",
             "permissions",
             "user_can_change",
@@ -2090,10 +2140,12 @@ class TasksViewSerializer(OwnedObjectSerializer):
             "result",
             "acknowledged",
             "related_document",
+            "duplicate_documents",
             "owner",
         )
 
     related_document = serializers.SerializerMethodField()
+    duplicate_documents = serializers.SerializerMethodField()
     created_doc_re = re.compile(r"New document id (\d+) created")
     duplicate_doc_re = re.compile(r"It is a duplicate of .* \(#(\d+)\)")
 
@@ -2117,6 +2169,17 @@ class TasksViewSerializer(OwnedObjectSerializer):
                     pass
 
         return result
+
+    @extend_schema_field(DuplicateDocumentSummarySerializer(many=True))
+    def get_duplicate_documents(self, obj):
+        related_document = self.get_related_document(obj)
+        request = self.context.get("request")
+        user = request.user if request else None
+        document = Document.global_objects.filter(pk=related_document).first()
+        if not related_document or not user or not document:
+            return []
+        duplicates = _get_viewable_duplicates(document, user)
+        return list(duplicates.values("id", "title", "deleted_at"))
 
 
 class RunTaskViewSerializer(serializers.Serializer):
@@ -2166,6 +2229,104 @@ class ShareLinkSerializer(OwnedObjectSerializer):
     def create(self, validated_data):
         validated_data["slug"] = get_random_string(50)
         return super().create(validated_data)
+
+
+class ShareLinkBundleSerializer(OwnedObjectSerializer):
+    document_ids = serializers.ListField(
+        child=serializers.IntegerField(min_value=1),
+        allow_empty=False,
+        write_only=True,
+    )
+    expiration_days = serializers.IntegerField(
+        required=False,
+        allow_null=True,
+        min_value=1,
+        write_only=True,
+    )
+    documents = serializers.PrimaryKeyRelatedField(
+        many=True,
+        read_only=True,
+    )
+    document_count = SerializerMethodField()
+
+    class Meta:
+        model = ShareLinkBundle
+        fields = (
+            "id",
+            "created",
+            "expiration",
+            "expiration_days",
+            "slug",
+            "file_version",
+            "status",
+            "size_bytes",
+            "last_error",
+            "built_at",
+            "documents",
+            "document_ids",
+            "document_count",
+        )
+        read_only_fields = (
+            "id",
+            "created",
+            "expiration",
+            "slug",
+            "status",
+            "size_bytes",
+            "last_error",
+            "built_at",
+            "documents",
+            "document_count",
+        )
+
+    def validate_document_ids(self, value):
+        unique_ids = set(value)
+        if len(unique_ids) != len(value):
+            raise serializers.ValidationError(
+                _("Duplicate document identifiers are not allowed."),
+            )
+        return value
+
+    def create(self, validated_data):
+        document_ids = validated_data.pop("document_ids")
+        expiration_days = validated_data.pop("expiration_days", None)
+        validated_data["slug"] = get_random_string(50)
+        if expiration_days:
+            validated_data["expiration"] = timezone.now() + timedelta(
+                days=expiration_days,
+            )
+        else:
+            validated_data["expiration"] = None
+
+        share_link_bundle = super().create(validated_data)
+
+        documents = list(
+            Document.objects.filter(pk__in=document_ids).only(
+                "pk",
+            ),
+        )
+        documents_by_id = {doc.pk: doc for doc in documents}
+        missing = [
+            str(doc_id) for doc_id in document_ids if doc_id not in documents_by_id
+        ]
+        if missing:
+            raise serializers.ValidationError(
+                {
+                    "document_ids": _(
+                        "Documents not found: %(ids)s",
+                    )
+                    % {"ids": ", ".join(missing)},
+                },
+            )
+
+        ordered_documents = [documents_by_id[doc_id] for doc_id in document_ids]
+        share_link_bundle.documents.set(ordered_documents)
+        share_link_bundle.document_total = len(ordered_documents)
+
+        return share_link_bundle
+
+    def get_document_count(self, obj: ShareLinkBundle) -> int:
+        return getattr(obj, "document_total") or obj.documents.count()
 
 
 class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
@@ -2295,8 +2456,11 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             "filter_has_all_tags",
             "filter_has_not_tags",
             "filter_custom_field_query",
+            "filter_has_any_correspondents",
             "filter_has_not_correspondents",
+            "filter_has_any_document_types",
             "filter_has_not_document_types",
+            "filter_has_any_storage_paths",
             "filter_has_not_storage_paths",
             "filter_has_correspondent",
             "filter_has_document_type",
@@ -2534,12 +2698,24 @@ class WorkflowSerializer(serializers.ModelSerializer):
                 filter_has_tags = trigger.pop("filter_has_tags", None)
                 filter_has_all_tags = trigger.pop("filter_has_all_tags", None)
                 filter_has_not_tags = trigger.pop("filter_has_not_tags", None)
+                filter_has_any_correspondents = trigger.pop(
+                    "filter_has_any_correspondents",
+                    None,
+                )
                 filter_has_not_correspondents = trigger.pop(
                     "filter_has_not_correspondents",
                     None,
                 )
+                filter_has_any_document_types = trigger.pop(
+                    "filter_has_any_document_types",
+                    None,
+                )
                 filter_has_not_document_types = trigger.pop(
                     "filter_has_not_document_types",
+                    None,
+                )
+                filter_has_any_storage_paths = trigger.pop(
+                    "filter_has_any_storage_paths",
                     None,
                 )
                 filter_has_not_storage_paths = trigger.pop(
@@ -2558,13 +2734,25 @@ class WorkflowSerializer(serializers.ModelSerializer):
                     trigger_instance.filter_has_all_tags.set(filter_has_all_tags)
                 if filter_has_not_tags is not None:
                     trigger_instance.filter_has_not_tags.set(filter_has_not_tags)
+                if filter_has_any_correspondents is not None:
+                    trigger_instance.filter_has_any_correspondents.set(
+                        filter_has_any_correspondents,
+                    )
                 if filter_has_not_correspondents is not None:
                     trigger_instance.filter_has_not_correspondents.set(
                         filter_has_not_correspondents,
                     )
+                if filter_has_any_document_types is not None:
+                    trigger_instance.filter_has_any_document_types.set(
+                        filter_has_any_document_types,
+                    )
                 if filter_has_not_document_types is not None:
                     trigger_instance.filter_has_not_document_types.set(
                         filter_has_not_document_types,
+                    )
+                if filter_has_any_storage_paths is not None:
+                    trigger_instance.filter_has_any_storage_paths.set(
+                        filter_has_any_storage_paths,
                     )
                 if filter_has_not_storage_paths is not None:
                     trigger_instance.filter_has_not_storage_paths.set(
@@ -2573,7 +2761,8 @@ class WorkflowSerializer(serializers.ModelSerializer):
                 set_triggers.append(trigger_instance)
 
         if actions is not None and actions is not serializers.empty:
-            for action in actions:
+            for index, action in enumerate(actions):
+                action["order"] = index
                 assign_tags = action.pop("assign_tags", None)
                 assign_view_users = action.pop("assign_view_users", None)
                 assign_view_groups = action.pop("assign_view_groups", None)
@@ -2699,6 +2888,16 @@ class WorkflowSerializer(serializers.ModelSerializer):
         self.prune_triggers_and_actions()
 
         return instance
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        actions = instance.actions.order_by("order", "pk")
+        data["actions"] = WorkflowActionSerializer(
+            actions,
+            many=True,
+            context=self.context,
+        ).data
+        return data
 
 
 class TrashSerializer(SerializerWithPerms):

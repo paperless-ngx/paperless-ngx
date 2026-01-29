@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from documents.models import Document
 from documents.models import PaperlessTask
 from documents.tests.utils import DirectoriesMixin
 from documents.views import TasksViewSet
@@ -258,7 +259,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
             task_id=str(uuid.uuid4()),
             task_file_name="task_one.pdf",
             status=celery.states.FAILURE,
-            result="test.pdf: Not consuming test.pdf: It is a duplicate.",
+            result="test.pdf: Unexpected error during ingestion.",
         )
 
         response = self.client.get(self.ENDPOINT)
@@ -270,7 +271,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
 
         self.assertEqual(
             returned_data["result"],
-            "test.pdf: Not consuming test.pdf: It is a duplicate.",
+            "test.pdf: Unexpected error during ingestion.",
         )
 
     def test_task_name_webui(self):
@@ -325,20 +326,34 @@ class TestTasks(DirectoriesMixin, APITestCase):
 
         self.assertEqual(returned_data["task_file_name"], "anothertest.pdf")
 
-    def test_task_result_failed_duplicate_includes_related_doc(self):
+    def test_task_result_duplicate_warning_includes_count(self):
         """
         GIVEN:
-            - A celery task failed with a duplicate error
+            - A celery task succeeds, but a duplicate exists
         WHEN:
             - API call is made to get tasks
         THEN:
-            - The returned data includes a related document link
+            - The returned data includes duplicate warning metadata
         """
+        checksum = "duplicate-checksum"
+        Document.objects.create(
+            title="Existing",
+            content="",
+            mime_type="application/pdf",
+            checksum=checksum,
+        )
+        created_doc = Document.objects.create(
+            title="Created",
+            content="",
+            mime_type="application/pdf",
+            checksum=checksum,
+            archive_checksum="another-checksum",
+        )
         PaperlessTask.objects.create(
             task_id=str(uuid.uuid4()),
             task_file_name="task_one.pdf",
-            status=celery.states.FAILURE,
-            result="Not consuming task_one.pdf: It is a duplicate of task_one_existing.pdf (#1234).",
+            status=celery.states.SUCCESS,
+            result=f"Success. New document id {created_doc.pk} created",
         )
 
         response = self.client.get(self.ENDPOINT)
@@ -348,7 +363,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
 
         returned_data = response.data[0]
 
-        self.assertEqual(returned_data["related_document"], "1234")
+        self.assertEqual(returned_data["related_document"], str(created_doc.pk))
 
     def test_run_train_classifier_task(self):
         """

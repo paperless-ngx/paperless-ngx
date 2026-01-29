@@ -1,9 +1,18 @@
 <div class="row pt-3 pb-3 pb-md-2 align-items-center">
   <div class="col-md text-truncate">
-    <h3 class="text-truncate" style="line-height: 1.4">
-      {{title}}
+    <h3 class="d-flex align-items-center mb-1" style="line-height: 1.4">
+      <span class="text-truncate">{{title}}</span>
+      @if (id) {
+        <span class="badge bg-primary text-primary-text-contrast ms-3 small fs-normal cursor-pointer" (click)="copyID()">
+          @if (copied) {
+            <i-bs width="1em" height="1em" name="clipboard-check"></i-bs>&nbsp;<ng-container i18n>Copied!</ng-container>
+          } @else {
+            ID: {{id}}
+          }
+        </span>
+      }
       @if (subTitle) {
-        <span class="h6 mb-0 d-block d-md-inline fw-normal ms-md-3 text-truncate" style="line-height: 1.4">{{subTitle}}</span>
+        <span class="h6 mb-0 mt-1 d-block d-md-inline fw-normal ms-md-3 text-truncate" style="line-height: 1.4">{{subTitle}}</span>
       }
       @if (info) {
         <button class="btn btn-sm btn-link text-muted me-auto p-0 p-md-2" title="What's this?" i18n-title type="button" [ngbPopover]="infoPopover" [autoClose]="true">

@@ -74,6 +74,20 @@ class ColorConvertChoices(models.TextChoices):
     CMYK = ("CMYK", _("CMYK"))
 
 
+class LLMEmbeddingBackend(models.TextChoices):
+    OPENAI = ("openai", _("OpenAI"))
+    HUGGINGFACE = ("huggingface", _("Huggingface"))
+
+
+class LLMBackend(models.TextChoices):
+    """
+    Matches to --llm-backend
+    """
+
+    OPENAI = ("openai", _("OpenAI"))
+    OLLAMA = ("ollama", _("Ollama"))
+
+
 class ApplicationConfiguration(AbstractSingletonModel):
     """
     Settings which are common across more than 1 parser
@@ -263,6 +277,66 @@ class ApplicationConfiguration(AbstractSingletonModel):
     barcode_tag_mapping = models.JSONField(
         verbose_name=_("Sets the tag barcode mapping"),
         null=True,
+    )
+
+    # PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT
+    barcode_tag_split = models.BooleanField(
+        verbose_name=_("Enables splitting on tag barcodes"),
+        null=True,
+    )
+
+    """
+    AI related settings
+    """
+
+    ai_enabled = models.BooleanField(
+        verbose_name=_("Enables AI features"),
+        null=True,
+        default=False,
+    )
+
+    llm_embedding_backend = models.CharField(
+        verbose_name=_("Sets the LLM embedding backend"),
+        blank=True,
+        null=True,
+        max_length=128,
+        choices=LLMEmbeddingBackend.choices,
+    )
+
+    llm_embedding_model = models.CharField(
+        verbose_name=_("Sets the LLM embedding model"),
+        blank=True,
+        null=True,
+        max_length=128,
+    )
+
+    llm_backend = models.CharField(
+        verbose_name=_("Sets the LLM backend"),
+        blank=True,
+        null=True,
+        max_length=128,
+        choices=LLMBackend.choices,
+    )
+
+    llm_model = models.CharField(
+        verbose_name=_("Sets the LLM model"),
+        blank=True,
+        null=True,
+        max_length=128,
+    )
+
+    llm_api_key = models.CharField(
+        verbose_name=_("Sets the LLM API key"),
+        blank=True,
+        null=True,
+        max_length=1024,
+    )
+
+    llm_endpoint = models.CharField(
+        verbose_name=_("Sets the LLM endpoint, optional"),
+        blank=True,
+        null=True,
+        max_length=256,
     )
 
     class Meta:

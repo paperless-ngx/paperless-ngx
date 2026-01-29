@@ -501,7 +501,7 @@ The `datetime` filter formats a datetime string or datetime object using Python'
 See the [strftime format code documentation](https://docs.python.org/3.13/library/datetime.html#strftime-and-strptime-format-codes)
 for the possible codes and their meanings.
 
-##### Date Localization
+##### Date Localization {#date-localization}
 
 The `localize_date` filter formats a date or datetime object into a localized string using Babel internationalization.
 This takes into account the provided locale for translation. Since this must be used on a date or datetime object,
@@ -805,6 +805,27 @@ See the relevant settings [`PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE`](configuratio
 and [`PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING`](configuration.md#PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING)
 for more information.
 
+#### Splitting on Tag Barcodes
+
+By default, tag barcodes only assign tags to documents without splitting them. However,
+you can enable document splitting on tag barcodes by setting
+[`PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT`](configuration.md#PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT)
+to `true`.
+
+When enabled, documents will be split at pages containing tag barcodes, similar to how
+ASN barcodes work. Key features:
+
+-   The page with the tag barcode is **retained** in the resulting document
+-   **Each split document extracts its own tags** - only tags on pages within that document are assigned
+-   Multiple tag barcodes can trigger multiple splits in the same document
+-   Works seamlessly with ASN barcodes - each split document gets its own ASN and tags
+
+This is useful for batch scanning where you place tag barcode pages between different
+documents to both separate and categorize them in a single operation.
+
+**Example:** A 6-page scan with TAG:invoice on page 3 and TAG:receipt on page 5 will create
+three documents: pages 1-2 (no tags), pages 3-4 (tagged "invoice"), and pages 5-6 (tagged "receipt").
+
 ## Automatic collation of double-sided documents {#collate}
 
 !!! note
@@ -851,8 +872,8 @@ followed by the even pages.
 
 It's important that the scan files get consumed in the correct order, and one at a time.
 You therefore need to make sure that Paperless is running while you upload the files into
-the directory; and if you're using [polling](configuration.md#polling), make sure that
-`CONSUMER_POLLING` is set to a value lower than it takes for the second scan to appear,
+the directory; and if you're using polling, make sure that
+`CONSUMER_POLLING_INTERVAL` is set to a value lower than it takes for the second scan to appear,
 like 5-10 or even lower.
 
 Another thing that might happen is that you start a double sided scan, but then forget

@@ -1,6 +1,7 @@
+# https://docs.codecov.com/docs/codecovyml-reference#codecov
 codecov:
   require_ci_to_pass: true
-  # https://docs.codecov.com/docs/components
+# https://docs.codecov.com/docs/components
 component_management:
   individual_components:
     - component_id: backend
@@ -9,35 +10,70 @@ component_management:
     - component_id: frontend
       paths:
         - src-ui/**
+# https://docs.codecov.com/docs/flags#step-2-flag-management-in-yaml
+# https://docs.codecov.com/docs/carryforward-flags
 flags:
-  backend:
+  # Backend Python versions
+  backend-python-3.10:
     paths:
       - src/**
     carryforward: true
-  frontend:
+  backend-python-3.11:
+    paths:
+      - src/**
+    carryforward: true
+  backend-python-3.12:
+    paths:
+      - src/**
+    carryforward: true
+  # Frontend (shards merge into single flag)
+  frontend-node-24.x:
     paths:
       - src-ui/**
     carryforward: true
-# https://docs.codecov.com/docs/pull-request-comments
 comment:
   layout: "header, diff, components, flags, files"
-  # https://docs.codecov.com/docs/javascript-bundle-analysis
   require_bundle_changes: true
   bundle_change_threshold: "50Kb"
 coverage:
+  # https://docs.codecov.com/docs/commit-status
   status:
     project:
-      default:
+      backend:
+        flags:
+          - backend-python-3.10
+          - backend-python-3.11
+          - backend-python-3.12
+        paths:
+          - src/**
         # https://docs.codecov.com/docs/commit-status#threshold
         threshold: 1%
+        removed_code_behavior: adjust_base
+      frontend:
+        flags:
+          - frontend-node-24.x
+        paths:
+          - src-ui/**
+        threshold: 1%
+        removed_code_behavior: adjust_base
     patch:
-      default:
-        # For the changed lines only, target 100% covered, but
-        # allow as low as 75%
+      backend:
+        flags:
+          - backend-python-3.10
+          - backend-python-3.11
+          - backend-python-3.12
+        paths:
+          - src/**
+        target: 100%
+        threshold: 25%
+      frontend:
+        flags:
+          - frontend-node-24.x
+        paths:
+          - src-ui/**
         target: 100%
         threshold: 25%
 # https://docs.codecov.com/docs/javascript-bundle-analysis
 bundle_analysis:
-  # Fail if the bundle size increases by more than 1MB
   warning_threshold: "1MB"
   status: true

@@ -2,6 +2,8 @@ import json
 import tempfile
 from datetime import timedelta
 from pathlib import Path
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -15,9 +17,15 @@ from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from rest_framework import status
 
+from documents.caching import get_llm_suggestion_cache
+from documents.caching import set_llm_suggestions_cache
+from documents.models import Correspondent
 from documents.models import Document
+from documents.models import DocumentType
 from documents.models import ShareLink
+from documents.models import StoragePath
 from documents.models import Tag
+from documents.signals.handlers import update_llm_suggestions_cache
 from documents.tests.utils import DirectoriesMixin
 from paperless.models import ApplicationConfiguration
 
@@ -270,3 +278,176 @@ class TestViews(DirectoriesMixin, TestCase):
             f"Possible N+1 queries detected: {num_queries_small} queries for 2 tags, "
             f"but {num_queries_large} queries for 50 tags"
         )
+
+
+class TestAISuggestions(DirectoriesMixin, TestCase):
+    def setUp(self):
+        self.user = User.objects.create_superuser(username="testuser")
+        self.document = Document.objects.create(
+            title="Test Document",
+            filename="test.pdf",
+            mime_type="application/pdf",
+        )
+        self.tag1 = Tag.objects.create(name="tag1")
+        self.correspondent1 = Correspondent.objects.create(name="correspondent1")
+        self.document_type1 = DocumentType.objects.create(name="type1")
+        self.path1 = StoragePath.objects.create(name="path1")
+        super().setUp()
+
+    @patch("documents.views.get_llm_suggestion_cache")
+    @patch("documents.views.refresh_suggestions_cache")
+    @override_settings(
+        AI_ENABLED=True,
+        LLM_BACKEND="mock_backend",
+    )
+    def test_suggestions_with_cached_llm(self, mock_refresh_cache, mock_get_cache):
+        mock_get_cache.return_value = MagicMock(suggestions={"tags": ["tag1", "tag2"]})
+
+        self.client.force_login(user=self.user)
+        response = self.client.get(f"/api/documents/{self.document.pk}/suggestions/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(), {"tags": ["tag1", "tag2"]})
+        mock_refresh_cache.assert_called_once_with(self.document.pk)
+
+    @patch("documents.views.get_ai_document_classification")
+    @override_settings(
+        AI_ENABLED=True,
+        LLM_BACKEND="mock_backend",
+    )
+    def test_suggestions_with_ai_enabled(
+        self,
+        mock_get_ai_classification,
+    ):
+        mock_get_ai_classification.return_value = {
+            "title": "AI Title",
+            "tags": ["tag1", "tag2"],
+            "correspondents": ["correspondent1"],
+            "document_types": ["type1"],
+            "storage_paths": ["path1"],
+            "dates": ["2023-01-01"],
+        }
+
+        self.client.force_login(user=self.user)
+        response = self.client.get(f"/api/documents/{self.document.pk}/suggestions/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.json(),
+            {
+                "title": "AI Title",
+                "tags": [self.tag1.pk],
+                "suggested_tags": ["tag2"],
+                "correspondents": [self.correspondent1.pk],
+                "suggested_correspondents": [],
+                "document_types": [self.document_type1.pk],
+                "suggested_document_types": [],
+                "storage_paths": [self.path1.pk],
+                "suggested_storage_paths": [],
+                "dates": ["2023-01-01"],
+            },
+        )
+
+    def test_invalidate_suggestions_cache(self):
+        self.client.force_login(user=self.user)
+        suggestions = {
+            "title": "AI Title",
+            "tags": ["tag1", "tag2"],
+            "correspondents": ["correspondent1"],
+            "document_types": ["type1"],
+            "storage_paths": ["path1"],
+            "dates": ["2023-01-01"],
+        }
+        set_llm_suggestions_cache(
+            self.document.pk,
+            suggestions,
+            backend="mock_backend",
+        )
+        self.assertEqual(
+            get_llm_suggestion_cache(
+                self.document.pk,
+                backend="mock_backend",
+            ).suggestions,
+            suggestions,
+        )
+        # post_save signal triggered
+        update_llm_suggestions_cache(
+            sender=None,
+            instance=self.document,
+        )
+        self.assertIsNone(
+            get_llm_suggestion_cache(
+                self.document.pk,
+                backend="mock_backend",
+            ),
+        )
+
+
+class TestAIChatStreamingView(DirectoriesMixin, TestCase):
+    ENDPOINT = "/api/documents/chat/"
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="pass")
+        self.client.force_login(user=self.user)
+        self.document = Document.objects.create(
+            title="Test Document",
+            filename="test.pdf",
+            mime_type="application/pdf",
+        )
+        super().setUp()
+
+    @override_settings(AI_ENABLED=False)
+    def test_post_ai_disabled(self):
+        response = self.client.post(
+            self.ENDPOINT,
+            data='{"q": "question"}',
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(b"AI is required for this feature", response.content)
+
+    @patch("documents.views.stream_chat_with_documents")
+    @patch("documents.views.get_objects_for_user_owner_aware")
+    @override_settings(AI_ENABLED=True)
+    def test_post_no_document_id(self, mock_get_objects, mock_stream_chat):
+        mock_get_objects.return_value = [self.document]
+        mock_stream_chat.return_value = iter([b"data"])
+        response = self.client.post(
+            self.ENDPOINT,
+            data='{"q": "question"}',
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/event-stream")
+
+    @patch("documents.views.stream_chat_with_documents")
+    @override_settings(AI_ENABLED=True)
+    def test_post_with_document_id(self, mock_stream_chat):
+        mock_stream_chat.return_value = iter([b"data"])
+        response = self.client.post(
+            self.ENDPOINT,
+            data=f'{{"q": "question", "document_id": {self.document.pk}}}',
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/event-stream")
+
+    @override_settings(AI_ENABLED=True)
+    def test_post_with_invalid_document_id(self):
+        response = self.client.post(
+            self.ENDPOINT,
+            data='{"q": "question", "document_id": 999999}',
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(b"Document not found", response.content)
+
+    @patch("documents.views.has_perms_owner_aware")
+    @override_settings(AI_ENABLED=True)
+    def test_post_with_document_id_no_permission(self, mock_has_perms):
+        mock_has_perms.return_value = False
+        response = self.client.post(
+            self.ENDPOINT,
+            data=f'{{"q": "question", "document_id": {self.document.pk}}}',
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertIn(b"Insufficient permissions", response.content)

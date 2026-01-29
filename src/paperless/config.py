@@ -116,6 +116,7 @@ class BarcodeConfig(BaseConfig):
     barcode_max_pages: int = dataclasses.field(init=False)
     barcode_enable_tag: bool = dataclasses.field(init=False)
     barcode_tag_mapping: dict[str, str] = dataclasses.field(init=False)
+    barcode_tag_split: bool = dataclasses.field(init=False)
 
     def __post_init__(self) -> None:
         app_config = self._get_config_instance()
@@ -153,6 +154,9 @@ class BarcodeConfig(BaseConfig):
         self.barcode_tag_mapping = (
             app_config.barcode_tag_mapping or settings.CONSUMER_TAG_BARCODE_MAPPING
         )
+        self.barcode_tag_split = (
+            app_config.barcode_tag_split or settings.CONSUMER_TAG_BARCODE_SPLIT
+        )
 
 
 @dataclasses.dataclass
@@ -169,3 +173,37 @@ class GeneralConfig(BaseConfig):
 
         self.app_title = app_config.app_title or None
         self.app_logo = app_config.app_logo.url if app_config.app_logo else None
+
+
+@dataclasses.dataclass
+class AIConfig(BaseConfig):
+    """
+    AI related settings that require global scope
+    """
+
+    ai_enabled: bool = dataclasses.field(init=False)
+    llm_embedding_backend: str = dataclasses.field(init=False)
+    llm_embedding_model: str = dataclasses.field(init=False)
+    llm_backend: str = dataclasses.field(init=False)
+    llm_model: str = dataclasses.field(init=False)
+    llm_api_key: str = dataclasses.field(init=False)
+    llm_endpoint: str = dataclasses.field(init=False)
+
+    def __post_init__(self) -> None:
+        app_config = self._get_config_instance()
+
+        self.ai_enabled = app_config.ai_enabled or settings.AI_ENABLED
+        self.llm_embedding_backend = (
+            app_config.llm_embedding_backend or settings.LLM_EMBEDDING_BACKEND
+        )
+        self.llm_embedding_model = (
+            app_config.llm_embedding_model or settings.LLM_EMBEDDING_MODEL
+        )
+        self.llm_backend = app_config.llm_backend or settings.LLM_BACKEND
+        self.llm_model = app_config.llm_model or settings.LLM_MODEL
+        self.llm_api_key = app_config.llm_api_key or settings.LLM_API_KEY
+        self.llm_endpoint = app_config.llm_endpoint or settings.LLM_ENDPOINT
+
+    @property
+    def llm_index_enabled(self) -> bool:
+        return bool(self.ai_enabled and self.llm_embedding_backend)

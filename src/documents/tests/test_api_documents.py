@@ -131,6 +131,10 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIn("content", results_full[0])
         self.assertIn("id", results_full[0])
 
+        # Content length is used internally for performance reasons.
+        # No need to expose this field.
+        self.assertNotIn("content_length", results_full[0])
+
         response = self.client.get("/api/documents/?fields=id", format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]

@@ -35,6 +35,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from documents.index import DelayedQuery
 from documents.permissions import PaperlessObjectPermissions
+from documents.tasks import llmindex_index
 from paperless.filters import GroupFilterSet
 from paperless.filters import UserFilterSet
 from paperless.models import ApplicationConfiguration
@@ -43,6 +44,7 @@ from paperless.serialisers import GroupSerializer
 from paperless.serialisers import PaperlessAuthTokenSerializer
 from paperless.serialisers import ProfileSerializer
 from paperless.serialisers import UserSerializer
+from paperless_ai.indexing import vector_store_file_exists
 
 
 class PaperlessObtainAuthTokenView(ObtainAuthToken):
@@ -357,6 +359,30 @@ class ApplicationConfigurationViewSet(ModelViewSet):
     @extend_schema(exclude=True)
     def create(self, request, *args, **kwargs):
         return Response(status=405)  # Not Allowed
+
+    def perform_update(self, serializer):
+        old_instance = ApplicationConfiguration.objects.all().first()
+        old_ai_index_enabled = (
+            old_instance.ai_enabled and old_instance.llm_embedding_backend
+        )
+
+        new_instance: ApplicationConfiguration = serializer.save()
+        new_ai_index_enabled = (
+            new_instance.ai_enabled and new_instance.llm_embedding_backend
+        )
+
+        if (
+            not old_ai_index_enabled
+            and new_ai_index_enabled
+            and not vector_store_file_exists()
+        ):
+            # AI index was just enabled and vector store file does not exist
+            llmindex_index.delay(
+                progress_bar_disable=True,
+                rebuild=True,
+                scheduled=False,
+                auto=True,
+            )
 
 
 @extend_schema_view(

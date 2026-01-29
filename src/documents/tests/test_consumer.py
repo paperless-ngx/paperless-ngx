@@ -485,21 +485,21 @@ class TestConsumer(
         with self.get_consumer(self.get_test_file()) as consumer:
             consumer.run()
 
-        with self.assertRaisesMessage(ConsumerError, "It is a duplicate"):
-            with self.get_consumer(self.get_test_file()) as consumer:
-                consumer.run()
+        with self.get_consumer(self.get_test_file()) as consumer:
+            consumer.run()
 
-        self._assert_first_last_send_progress(last_status="FAILED")
+        self.assertEqual(Document.objects.count(), 2)
+        self._assert_first_last_send_progress()
 
     def testDuplicates2(self):
         with self.get_consumer(self.get_test_file()) as consumer:
             consumer.run()
 
-        with self.assertRaisesMessage(ConsumerError, "It is a duplicate"):
-            with self.get_consumer(self.get_test_archive_file()) as consumer:
-                consumer.run()
+        with self.get_consumer(self.get_test_archive_file()) as consumer:
+            consumer.run()
 
-        self._assert_first_last_send_progress(last_status="FAILED")
+        self.assertEqual(Document.objects.count(), 2)
+        self._assert_first_last_send_progress()
 
     def testDuplicates3(self):
         with self.get_consumer(self.get_test_archive_file()) as consumer:
@@ -513,9 +513,10 @@ class TestConsumer(
 
         Document.objects.all().delete()
 
-        with self.assertRaisesMessage(ConsumerError, "document is in the trash"):
-            with self.get_consumer(self.get_test_file()) as consumer:
-                consumer.run()
+        with self.get_consumer(self.get_test_file()) as consumer:
+            consumer.run()
+
+        self.assertEqual(Document.objects.count(), 1)
 
     def testAsnExists(self):
         with self.get_consumer(
@@ -718,12 +719,45 @@ class TestConsumer(
         dst = self.get_test_file()
         self.assertIsFile(dst)
 
-        with self.assertRaises(ConsumerError):
+        expected_message = (
+            f"{dst.name}: Not consuming {dst.name}: "
+            f"It is a duplicate of {document.title} (#{document.pk})"
+        )
+
+        with self.assertRaisesMessage(ConsumerError, expected_message):
             with self.get_consumer(dst) as consumer:
                 consumer.run()
 
         self.assertIsNotFile(dst)
-        self._assert_first_last_send_progress(last_status="FAILED")
+        self.assertEqual(Document.objects.count(), 1)
+        self._assert_first_last_send_progress(last_status=ProgressStatusOptions.FAILED)
+
+    @override_settings(CONSUMER_DELETE_DUPLICATES=True)
+    def test_delete_duplicate_in_trash(self):
+        dst = self.get_test_file()
+        with self.get_consumer(dst) as consumer:
+            consumer.run()
+
+        # Move the existing document to trash
+        document = Document.objects.first()
+        document.delete()
+
+        dst = self.get_test_file()
+        self.assertIsFile(dst)
+
+        expected_message = (
+            f"{dst.name}: Not consuming {dst.name}: "
+            f"It is a duplicate of {document.title} (#{document.pk})"
+            f" Note: existing document is in the trash."
+        )
+
+        with self.assertRaisesMessage(ConsumerError, expected_message):
+            with self.get_consumer(dst) as consumer:
+                consumer.run()
+
+        self.assertIsNotFile(dst)
+        self.assertEqual(Document.global_objects.count(), 1)
+        self.assertEqual(Document.objects.count(), 0)
 
     @override_settings(CONSUMER_DELETE_DUPLICATES=False)
     def test_no_delete_duplicate(self):
@@ -743,15 +777,12 @@ class TestConsumer(
         dst = self.get_test_file()
         self.assertIsFile(dst)
 
-        with self.assertRaisesRegex(
-            ConsumerError,
-            r"sample\.pdf: Not consuming sample\.pdf: It is a duplicate of sample \(#\d+\)",
-        ):
-            with self.get_consumer(dst) as consumer:
-                consumer.run()
+        with self.get_consumer(dst) as consumer:
+            consumer.run()
 
-        self.assertIsFile(dst)
-        self._assert_first_last_send_progress(last_status="FAILED")
+        self.assertIsNotFile(dst)
+        self.assertEqual(Document.objects.count(), 2)
+        self._assert_first_last_send_progress()
 
     @override_settings(FILENAME_FORMAT="{title}")
     @mock.patch("documents.parsers.document_consumer_declaration.send")

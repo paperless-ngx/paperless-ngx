@@ -145,10 +145,13 @@ export enum TriggerFilterType {
   TagsAny = 'tags_any',
   TagsAll = 'tags_all',
   TagsNone = 'tags_none',
+  CorrespondentAny = 'correspondent_any',
   CorrespondentIs = 'correspondent_is',
   CorrespondentNot = 'correspondent_not',
+  DocumentTypeAny = 'document_type_any',
   DocumentTypeIs = 'document_type_is',
   DocumentTypeNot = 'document_type_not',
+  StoragePathAny = 'storage_path_any',
   StoragePathIs = 'storage_path_is',
   StoragePathNot = 'storage_path_not',
   CustomFieldQuery = 'custom_field_query',
@@ -172,8 +175,11 @@ type TriggerFilterAggregate = {
   filter_has_tags: number[]
   filter_has_all_tags: number[]
   filter_has_not_tags: number[]
+  filter_has_any_correspondents: number[]
   filter_has_not_correspondents: number[]
+  filter_has_any_document_types: number[]
   filter_has_not_document_types: number[]
+  filter_has_any_storage_paths: number[]
   filter_has_not_storage_paths: number[]
   filter_has_correspondent: number | null
   filter_has_document_type: number | null
@@ -220,6 +226,14 @@ const TRIGGER_FILTER_DEFINITIONS: TriggerFilterDefinition[] = [
     allowMultipleValues: true,
   },
   {
+    id: TriggerFilterType.CorrespondentAny,
+    name: $localize`Has any of these correspondents`,
+    inputType: 'select',
+    allowMultipleEntries: false,
+    allowMultipleValues: true,
+    selectItems: 'correspondents',
+  },
+  {
     id: TriggerFilterType.CorrespondentIs,
     name: $localize`Has correspondent`,
     inputType: 'select',
@@ -244,6 +258,14 @@ const TRIGGER_FILTER_DEFINITIONS: TriggerFilterDefinition[] = [
     selectItems: 'documentTypes',
   },
   {
+    id: TriggerFilterType.DocumentTypeAny,
+    name: $localize`Has any of these document types`,
+    inputType: 'select',
+    allowMultipleEntries: false,
+    allowMultipleValues: true,
+    selectItems: 'documentTypes',
+  },
+  {
     id: TriggerFilterType.DocumentTypeNot,
     name: $localize`Does not have document types`,
     inputType: 'select',
@@ -257,6 +279,14 @@ const TRIGGER_FILTER_DEFINITIONS: TriggerFilterDefinition[] = [
     inputType: 'select',
     allowMultipleEntries: false,
     allowMultipleValues: false,
+    selectItems: 'storagePaths',
+  },
+  {
+    id: TriggerFilterType.StoragePathAny,
+    name: $localize`Has any of these storage paths`,
+    inputType: 'select',
+    allowMultipleEntries: false,
+    allowMultipleValues: true,
     selectItems: 'storagePaths',
   },
   {
@@ -306,6 +336,15 @@ const FILTER_HANDLERS: Record<TriggerFilterType, FilterHandler> = {
     extract: (trigger) => trigger.filter_has_not_tags,
     hasValue: (value) => Array.isArray(value) && value.length > 0,
   },
+  [TriggerFilterType.CorrespondentAny]: {
+    apply: (aggregate, values) => {
+      aggregate.filter_has_any_correspondents = Array.isArray(values)
+        ? [...values]
+        : [values]
+    },
+    extract: (trigger) => trigger.filter_has_any_correspondents,
+    hasValue: (value) => Array.isArray(value) && value.length > 0,
+  },
   [TriggerFilterType.CorrespondentIs]: {
     apply: (aggregate, values) => {
       aggregate.filter_has_correspondent = Array.isArray(values)
@@ -333,6 +372,15 @@ const FILTER_HANDLERS: Record<TriggerFilterType, FilterHandler> = {
     extract: (trigger) => trigger.filter_has_document_type,
     hasValue: (value) => value !== null && value !== undefined,
   },
+  [TriggerFilterType.DocumentTypeAny]: {
+    apply: (aggregate, values) => {
+      aggregate.filter_has_any_document_types = Array.isArray(values)
+        ? [...values]
+        : [values]
+    },
+    extract: (trigger) => trigger.filter_has_any_document_types,
+    hasValue: (value) => Array.isArray(value) && value.length > 0,
+  },
   [TriggerFilterType.DocumentTypeNot]: {
     apply: (aggregate, values) => {
       aggregate.filter_has_not_document_types = Array.isArray(values)
@@ -350,6 +398,15 @@ const FILTER_HANDLERS: Record<TriggerFilterType, FilterHandler> = {
     },
     extract: (trigger) => trigger.filter_has_storage_path,
     hasValue: (value) => value !== null && value !== undefined,
+  },
+  [TriggerFilterType.StoragePathAny]: {
+    apply: (aggregate, values) => {
+      aggregate.filter_has_any_storage_paths = Array.isArray(values)
+        ? [...values]
+        : [values]
+    },
+    extract: (trigger) => trigger.filter_has_any_storage_paths,
+    hasValue: (value) => Array.isArray(value) && value.length > 0,
   },
   [TriggerFilterType.StoragePathNot]: {
     apply: (aggregate, values) => {
@@ -642,8 +699,11 @@ export class WorkflowEditDialogComponent
             filter_has_tags: [],
             filter_has_all_tags: [],
             filter_has_not_tags: [],
+            filter_has_any_correspondents: [],
             filter_has_not_correspondents: [],
+            filter_has_any_document_types: [],
             filter_has_not_document_types: [],
+            filter_has_any_storage_paths: [],
             filter_has_not_storage_paths: [],
             filter_has_correspondent: null,
             filter_has_document_type: null,
@@ -670,10 +730,16 @@ export class WorkflowEditDialogComponent
           trigger.filter_has_tags = aggregate.filter_has_tags
           trigger.filter_has_all_tags = aggregate.filter_has_all_tags
           trigger.filter_has_not_tags = aggregate.filter_has_not_tags
+          trigger.filter_has_any_correspondents =
+            aggregate.filter_has_any_correspondents
           trigger.filter_has_not_correspondents =
             aggregate.filter_has_not_correspondents
+          trigger.filter_has_any_document_types =
+            aggregate.filter_has_any_document_types
           trigger.filter_has_not_document_types =
             aggregate.filter_has_not_document_types
+          trigger.filter_has_any_storage_paths =
+            aggregate.filter_has_any_storage_paths
           trigger.filter_has_not_storage_paths =
             aggregate.filter_has_not_storage_paths
           trigger.filter_has_correspondent =
@@ -856,8 +922,11 @@ export class WorkflowEditDialogComponent
       case TriggerFilterType.TagsAny:
       case TriggerFilterType.TagsAll:
       case TriggerFilterType.TagsNone:
+      case TriggerFilterType.CorrespondentAny:
       case TriggerFilterType.CorrespondentNot:
+      case TriggerFilterType.DocumentTypeAny:
       case TriggerFilterType.DocumentTypeNot:
+      case TriggerFilterType.StoragePathAny:
       case TriggerFilterType.StoragePathNot:
         return true
       default:
@@ -1179,8 +1248,11 @@ export class WorkflowEditDialogComponent
       filter_has_tags: [],
       filter_has_all_tags: [],
       filter_has_not_tags: [],
+      filter_has_any_correspondents: [],
       filter_has_not_correspondents: [],
+      filter_has_any_document_types: [],
       filter_has_not_document_types: [],
+      filter_has_any_storage_paths: [],
       filter_has_not_storage_paths: [],
       filter_custom_field_query: null,
       filter_has_correspondent: null,
@@ -1283,11 +1355,6 @@ export class WorkflowEditDialogComponent
     const actionField = this.actionFields.at(event.previousIndex)
     this.actionFields.removeAt(event.previousIndex)
     this.actionFields.insert(event.currentIndex, actionField)
-    // removing id will effectively re-create the actions in this order
-    this.object.actions.forEach((a) => (a.id = null))
-    this.actionFields.controls.forEach((c) =>
-      c.get('id').setValue(null, { emitEvent: false })
-    )
   }
 
   save(): void {

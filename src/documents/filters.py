@@ -39,6 +39,7 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import PaperlessTask
 from documents.models import ShareLink
+from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
 
@@ -794,6 +795,29 @@ class ShareLinkFilterSet(FilterSet):
             "created": DATETIME_KWARGS,
             "expiration": DATETIME_KWARGS,
         }
+
+
+class ShareLinkBundleFilterSet(FilterSet):
+    documents = Filter(method="filter_documents")
+
+    class Meta:
+        model = ShareLinkBundle
+        fields = {
+            "created": DATETIME_KWARGS,
+            "expiration": DATETIME_KWARGS,
+            "status": ["exact"],
+        }
+
+    def filter_documents(self, queryset, name, value):
+        ids = []
+        if value:
+            try:
+                ids = [int(item) for item in value.split(",") if item]
+            except ValueError:
+                return queryset.none()
+        if not ids:
+            return queryset
+        return queryset.filter(documents__in=ids).distinct()
 
 
 class PaperlessTaskFilterSet(FilterSet):

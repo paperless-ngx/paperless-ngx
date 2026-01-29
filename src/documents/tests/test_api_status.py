@@ -1,4 +1,6 @@
 import os
+import shutil
+import tempfile
 from pathlib import Path
 from unittest import mock
 
@@ -16,9 +18,19 @@ class TestSystemStatus(APITestCase):
     ENDPOINT = "/api/status/"
 
     def setUp(self):
+        super().setUp()
         self.user = User.objects.create_superuser(
             username="temp_admin",
         )
+        self.tmp_dir = Path(tempfile.mkdtemp())
+        self.override = override_settings(MEDIA_ROOT=self.tmp_dir)
+        self.override.enable()
+
+    def tearDown(self):
+        super().tearDown()
+
+        self.override.disable()
+        shutil.rmtree(self.tmp_dir)
 
     def test_system_status(self):
         """
@@ -310,3 +322,69 @@ class TestSystemStatus(APITestCase):
             "ERROR",
         )
         self.assertIsNotNone(response.data["tasks"]["sanity_check_error"])
+
+    def test_system_status_ai_disabled(self):
+        """
+        GIVEN:
+            - The AI feature is disabled
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains the correct AI status
+        """
+        with override_settings(AI_ENABLED=False):
+            self.client.force_login(self.user)
+            response = self.client.get(self.ENDPOINT)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(response.data["tasks"]["llmindex_status"], "DISABLED")
+            self.assertIsNone(response.data["tasks"]["llmindex_error"])
+
+    def test_system_status_ai_enabled(self):
+        """
+        GIVEN:
+            - The AI index feature is enabled, but no tasks are found
+            - The AI index feature is enabled and a task is found
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains the correct AI status
+        """
+        with override_settings(AI_ENABLED=True, LLM_EMBEDDING_BACKEND="openai"):
+            self.client.force_login(self.user)
+
+            # No tasks found
+            response = self.client.get(self.ENDPOINT)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(response.data["tasks"]["llmindex_status"], "WARNING")
+
+            PaperlessTask.objects.create(
+                type=PaperlessTask.TaskType.SCHEDULED_TASK,
+                status=states.SUCCESS,
+                task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
+            )
+            response = self.client.get(self.ENDPOINT)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(response.data["tasks"]["llmindex_status"], "OK")
+            self.assertIsNone(response.data["tasks"]["llmindex_error"])
+
+    def test_system_status_ai_error(self):
+        """
+        GIVEN:
+            - The AI index feature is enabled and a task is found with an error
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains the correct AI status
+        """
+        with override_settings(AI_ENABLED=True, LLM_EMBEDDING_BACKEND="openai"):
+            PaperlessTask.objects.create(
+                type=PaperlessTask.TaskType.SCHEDULED_TASK,
+                status=states.FAILURE,
+                task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
+                result="AI index update failed",
+            )
+            self.client.force_login(self.user)
+            response = self.client.get(self.ENDPOINT)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(response.data["tasks"]["llmindex_status"], "ERROR")
+            self.assertIsNotNone(response.data["tasks"]["llmindex_error"])

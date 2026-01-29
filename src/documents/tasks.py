@@ -3,8 +3,10 @@ import hashlib
 import logging
 import shutil
 import uuid
+import zipfile
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from tempfile import mkstemp
 
 import tqdm
 from celery import Task
@@ -22,6 +24,8 @@ from whoosh.writing import AsyncWriter
 from documents import index
 from documents import sanity_checker
 from documents.barcodes import BarcodePlugin
+from documents.bulk_download import ArchiveOnlyStrategy
+from documents.bulk_download import OriginalsOnlyStrategy
 from documents.caching import clear_document_caches
 from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
@@ -39,6 +43,8 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import PaperlessTask
+from documents.models import ShareLink
+from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import WorkflowRun
@@ -54,6 +60,10 @@ from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
 from documents.signals.handlers import run_workflows
 from documents.workflows.utils import get_workflows_for_trigger
+from paperless.config import AIConfig
+from paperless_ai.indexing import llm_index_add_or_update_document
+from paperless_ai.indexing import llm_index_remove_document
+from paperless_ai.indexing import update_llm_index
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
@@ -242,6 +252,13 @@ def bulk_update_documents(document_ids):
         for doc in documents:
             index.update_document(writer, doc)
 
+    ai_config = AIConfig()
+    if ai_config.llm_index_enabled:
+        update_llm_index(
+            progress_bar_disable=True,
+            rebuild=False,
+        )
+
 
 @shared_task
 def update_document_content_maybe_archive_file(document_id):
@@ -340,6 +357,10 @@ def update_document_content_maybe_archive_file(document_id):
         )
         with index.open_index_writer() as writer:
             index.update_document(writer, document)
+
+        ai_config = AIConfig()
+        if ai_config.llm_index_enabled:
+            llm_index_add_or_update_document(document)
 
         clear_document_caches(document.pk)
 
@@ -558,3 +579,169 @@ def update_document_parent_tags(tag: Tag, new_parent: Tag) -> None:
 
     if affected:
         bulk_update_documents.delay(document_ids=list(affected))
+
+
+@shared_task
+def llmindex_index(
+    *,
+    progress_bar_disable=True,
+    rebuild=False,
+    scheduled=True,
+    auto=False,
+):
+    ai_config = AIConfig()
+    if ai_config.llm_index_enabled:
+        task = PaperlessTask.objects.create(
+            type=PaperlessTask.TaskType.SCHEDULED_TASK
+            if scheduled
+            else PaperlessTask.TaskType.AUTO
+            if auto
+            else PaperlessTask.TaskType.MANUAL_TASK,
+            task_id=uuid.uuid4(),
+            task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
+            status=states.STARTED,
+            date_created=timezone.now(),
+            date_started=timezone.now(),
+        )
+        from paperless_ai.indexing import update_llm_index
+
+        try:
+            result = update_llm_index(
+                progress_bar_disable=progress_bar_disable,
+                rebuild=rebuild,
+            )
+            task.status = states.SUCCESS
+            task.result = result
+        except Exception as e:
+            logger.error("LLM index error: " + str(e))
+            task.status = states.FAILURE
+            task.result = str(e)
+
+        task.date_done = timezone.now()
+        task.save(update_fields=["status", "result", "date_done"])
+    else:
+        logger.info("LLM index is disabled, skipping update.")
+
+
+@shared_task
+def update_document_in_llm_index(document):
+    llm_index_add_or_update_document(document)
+
+
+@shared_task
+def remove_document_from_llm_index(document):
+    llm_index_remove_document(document)
+
+
+@shared_task
+def build_share_link_bundle(bundle_id: int):
+    try:
+        bundle = (
+            ShareLinkBundle.objects.filter(pk=bundle_id)
+            .prefetch_related("documents")
+            .get()
+        )
+    except ShareLinkBundle.DoesNotExist:
+        logger.warning("Share link bundle %s no longer exists.", bundle_id)
+        return
+
+    bundle.remove_file()
+    bundle.status = ShareLinkBundle.Status.PROCESSING
+    bundle.last_error = None
+    bundle.size_bytes = None
+    bundle.built_at = None
+    bundle.file_path = ""
+    bundle.save(
+        update_fields=[
+            "status",
+            "last_error",
+            "size_bytes",
+            "built_at",
+            "file_path",
+        ],
+    )
+
+    documents = list(bundle.documents.all().order_by("pk"))
+
+    _, temp_zip_path_str = mkstemp(suffix=".zip", dir=settings.SCRATCH_DIR)
+    temp_zip_path = Path(temp_zip_path_str)
+
+    try:
+        strategy_class = (
+            ArchiveOnlyStrategy
+            if bundle.file_version == ShareLink.FileVersion.ARCHIVE
+            else OriginalsOnlyStrategy
+        )
+        with zipfile.ZipFile(temp_zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+            strategy = strategy_class(zipf)
+            for document in documents:
+                strategy.add_document(document)
+
+        output_dir = settings.SHARE_LINK_BUNDLE_DIR
+        output_dir.mkdir(parents=True, exist_ok=True)
+        final_path = (output_dir / f"{bundle.slug}.zip").resolve()
+        if final_path.exists():
+            final_path.unlink()
+        shutil.move(temp_zip_path, final_path)
+
+        bundle.file_path = f"{bundle.slug}.zip"
+        bundle.size_bytes = final_path.stat().st_size
+        bundle.status = ShareLinkBundle.Status.READY
+        bundle.built_at = timezone.now()
+        bundle.last_error = None
+        bundle.save(
+            update_fields=[
+                "file_path",
+                "size_bytes",
+                "status",
+                "built_at",
+                "last_error",
+            ],
+        )
+        logger.info("Built share link bundle %s", bundle.pk)
+    except Exception as exc:
+        logger.exception(
+            "Failed to build share link bundle %s: %s",
+            bundle_id,
+            exc,
+        )
+        bundle.status = ShareLinkBundle.Status.FAILED
+        bundle.last_error = {
+            "bundle_id": bundle_id,
+            "exception_type": exc.__class__.__name__,
+            "message": str(exc),
+            "timestamp": timezone.now().isoformat(),
+        }
+        bundle.save(update_fields=["status", "last_error"])
+        try:
+            temp_zip_path.unlink()
+        except OSError:
+            pass
+        raise
+    finally:
+        try:
+            temp_zip_path.unlink(missing_ok=True)
+        except OSError:
+            pass
+
+
+@shared_task
+def cleanup_expired_share_link_bundles():
+    now = timezone.now()
+    expired_qs = ShareLinkBundle.objects.filter(
+        expiration__isnull=False,
+        expiration__lt=now,
+    )
+    count = 0
+    for bundle in expired_qs.iterator():
+        count += 1
+        try:
+            bundle.delete()
+        except Exception as exc:
+            logger.warning(
+                "Failed to delete expired share link bundle %s: %s",
+                bundle.pk,
+                exc,
+            )
+    if count:
+        logger.info("Deleted %s expired share link bundle(s)", count)
