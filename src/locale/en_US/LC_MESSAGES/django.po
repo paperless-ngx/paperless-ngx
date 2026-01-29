@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-27 18:56+0000\n"
+"POT-Creation-Date: 2026-01-29 16:06+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1786,35 +1786,39 @@ msgstr ""
 msgid "Sets the tag barcode mapping"
 msgstr ""
 
-#: paperless/models.py:287
-msgid "Enables AI features"
+#: paperless/models.py:284
+msgid "Enables splitting on tag barcodes"
 msgstr ""
 
 #: paperless/models.py:293
+msgid "Enables AI features"
+msgstr ""
+
+#: paperless/models.py:299
 msgid "Sets the LLM embedding backend"
 msgstr ""
 
-#: paperless/models.py:301
+#: paperless/models.py:307
 msgid "Sets the LLM embedding model"
 msgstr ""
 
-#: paperless/models.py:308
+#: paperless/models.py:314
 msgid "Sets the LLM backend"
 msgstr ""
 
-#: paperless/models.py:316
+#: paperless/models.py:322
 msgid "Sets the LLM model"
 msgstr ""
 
-#: paperless/models.py:323
+#: paperless/models.py:329
 msgid "Sets the LLM API key"
 msgstr ""
 
-#: paperless/models.py:330
+#: paperless/models.py:336
 msgid "Sets the LLM endpoint, optional"
 msgstr ""
 
-#: paperless/models.py:337
+#: paperless/models.py:343
 msgid "paperless application settings"
 msgstr ""
 

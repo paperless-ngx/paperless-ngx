@@ -259,12 +259,26 @@
               </div>
             </div>
           </div>
+
           <div class="col-xl-6 ps-xl-5">
             <h5 class="mt-3" i18n>Bulk editing</h5>
             <div class="row mb-3">
               <div class="col">
                 <pngx-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs"></pngx-input-check>
                 <pngx-input-check i18n-title title="Apply on close" formControlName="bulkEditApplyOnClose"></pngx-input-check>
+              </div>
+            </div>
+
+            <h5 class="mt-3" i18n>PDF Editor</h5>
+            <div class="row">
+              <div class="col-md-3 col-form-label pt-0">
+                <span i18n>Default editing mode</span>
+              </div>
+              <div class="col">
+                <select class="form-select" formControlName="pdfEditorDefaultEditMode">
+                  <option [ngValue]="PdfEditorEditMode.Create" i18n>Create new document(s)</option>
+                  <option [ngValue]="PdfEditorEditMode.Update" i18n>Update existing document</option>
+                </select>
               </div>
             </div>
 

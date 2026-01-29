@@ -3,6 +3,7 @@
     "dockerComposeFile": "docker-compose.devcontainer.sqlite-tika.yml",
     "service": "paperless-development",
     "workspaceFolder": "/usr/src/paperless/paperless-ngx",
+    "forwardPorts": [4200, 8000],
     "containerEnv": {
         "UV_CACHE_DIR": "/usr/src/paperless/paperless-ngx/.uv-cache"
     },

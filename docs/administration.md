@@ -582,7 +582,7 @@ document.
 
 ### Detecting duplicates {#fuzzy_duplicate}
 
-Paperless already catches and prevents upload of exactly matching documents,
+Paperless-ngx already catches and warns of exactly matching documents,
 however a new scan of an existing document may not produce an exact bit for bit
 duplicate. But the content should be exact or close, allowing detection.
 

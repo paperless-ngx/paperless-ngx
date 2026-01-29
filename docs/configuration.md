@@ -1557,6 +1557,20 @@ assigns or creates tags if a properly formatted barcode is detected.
 
     Please refer to the Python regex documentation for more information.
 
+#### [`PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT=<bool>`](#PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT) {#PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT}
+
+: Enables splitting of documents on tag barcodes, similar to how ASN barcodes work.
+
+    When enabled, documents will be split into separate PDFs at pages containing
+    tag barcodes that match the configured `PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING`
+    patterns. The page with the tag barcode will be retained in the new document.
+
+    Each split document will have the detected tags assigned to it.
+
+    This only has an effect if `PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE` is also enabled.
+
+    Defaults to false.
+
 ## Audit Trail
 
 #### [`PAPERLESS_AUDIT_LOG_ENABLED=<bool>`](#PAPERLESS_AUDIT_LOG_ENABLED) {#PAPERLESS_AUDIT_LOG_ENABLED}

@@ -1,16 +1,16 @@
 import {
-  APP_INITIALIZER,
-  enableProdMode,
   importProvidersFrom,
+  inject,
+  provideAppInitializer,
   provideZoneChangeDetection,
 } from '@angular/core'
 
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { DatePipe, registerLocaleData } from '@angular/common'
 import {
-  HTTP_INTERCEPTORS,
   provideHttpClient,
   withFetch,
+  withInterceptors,
   withInterceptorsFromDi,
 } from '@angular/common/http'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -151,15 +151,14 @@ import { AppComponent } from './app/app.component'
 import { DirtyDocGuard } from './app/guards/dirty-doc.guard'
 import { DirtySavedViewGuard } from './app/guards/dirty-saved-view.guard'
 import { PermissionsGuard } from './app/guards/permissions.guard'
-import { ApiVersionInterceptor } from './app/interceptors/api-version.interceptor'
-import { CsrfInterceptor } from './app/interceptors/csrf.interceptor'
+import { withApiVersionInterceptor } from './app/interceptors/api-version.interceptor'
+import { withCsrfInterceptor } from './app/interceptors/csrf.interceptor'
 import { DocumentTitlePipe } from './app/pipes/document-title.pipe'
 import { FilterPipe } from './app/pipes/filter.pipe'
 import { UsernamePipe } from './app/pipes/username.pipe'
 import { SettingsService } from './app/services/settings.service'
 import { LocalizedDateParserFormatter } from './app/utils/ngb-date-parser-formatter'
 import { ISODateAdapter } from './app/utils/ngb-iso-date-adapter'
-import { environment } from './environments/environment'
 
 import localeAf from '@angular/common/locales/af'
 import localeAr from '@angular/common/locales/ar'
@@ -237,11 +236,11 @@ registerLocaleData(localeUk)
 registerLocaleData(localeZh)
 registerLocaleData(localeZhHant)
 
-function initializeApp(settings: SettingsService) {
-  return () => {
-    return settings.initializeSettings()
-  }
+function initializeApp() {
+  const settings = inject(SettingsService)
+  return settings.initializeSettings()
 }
+
 const icons = {
   airplane,
   archive,
@@ -363,10 +362,6 @@ const icons = {
   xLg,
 }
 
-if (environment.production) {
-  enableProdMode()
-}
-
 bootstrapApplication(AppComponent, {
   providers: [
     provideZoneChangeDetection(),
@@ -383,24 +378,9 @@ bootstrapApplication(AppComponent, {
       DragDropModule,
       NgxBootstrapIconsModule.pick(icons)
     ),
-    {
-      provide: APP_INITIALIZER,
-      useFactory: initializeApp,
-      deps: [SettingsService],
-      multi: true,
-    },
+    provideAppInitializer(initializeApp),
     DatePipe,
     CookieService,
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: CsrfInterceptor,
-      multi: true,
-    },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: ApiVersionInterceptor,
-      multi: true,
-    },
     FilterPipe,
     DocumentTitlePipe,
     { provide: NgbDateAdapter, useClass: ISODateAdapter },
@@ -412,6 +392,10 @@ bootstrapApplication(AppComponent, {
     CorrespondentNamePipe,
     DocumentTypeNamePipe,
     StoragePathNamePipe,
-    provideHttpClient(withInterceptorsFromDi(), withFetch()),
+    provideHttpClient(
+      withInterceptorsFromDi(),
+      withInterceptors([withCsrfInterceptor, withApiVersionInterceptor]),
+      withFetch()
+    ),
   ],
 }).catch((err) => console.error(err))
