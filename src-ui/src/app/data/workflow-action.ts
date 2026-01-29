@@ -99,5 +99,5 @@ export interface WorkflowAction extends ObjectWithId {
 
   webhook?: WorkflowActionWebhook
 
-  passwords?: string
+  passwords?: string[]
 }
