@@ -23,7 +23,6 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import Tag
 from documents.permissions import get_objects_for_user_owner_aware
-from documents.permissions import permitted_document_ids
 
 
 class Command(BaseCommand):
@@ -531,61 +530,6 @@ class Command(BaseCommand):
     def _tag_queryset(self, *, prefix: str, filter_q: Q):
         return Tag.objects.filter(name__startswith=prefix).annotate(
             document_count=Count("documents", filter=filter_q),
-        )
-
-    def _time_tag_counts(self, *, iterations: int, prefix: str, user):
-        if not Tag.objects.filter(name__startswith=prefix).exists():
-            return
-
-        self._time_query(
-            label="tag document_count (grouped)",
-            iterations=iterations,
-            fn=lambda: list(
-                Tag.documents.through.objects.filter(
-                    document_id__in=Subquery(permitted_document_ids(user)),
-                )
-                .values("tag_id")
-                .annotate(c=Count("document_id"))
-                .values_list("tag_id", "c"),
-            ),
-        )
-
-    def _time_custom_field_counts(
-        self,
-        *,
-        iterations: int,
-        prefix: str,
-        user,
-        superuser,
-    ):
-        if not CustomField.objects.filter(name__startswith=prefix).exists():
-            return
-
-        permitted = Subquery(permitted_document_ids(user))
-        super_permitted = CustomFieldInstance.objects.filter(
-            document__deleted_at__isnull=True,
-        ).values_list("document_id")
-
-        def _run(ids_subquery):
-            return list(
-                CustomFieldInstance.objects.filter(
-                    document_id__in=ids_subquery,
-                    field__name__startswith=prefix,
-                )
-                .values("field_id")
-                .annotate(c=Count("document_id"))
-                .values_list("field_id", "c"),
-            )
-
-        self._time_query(
-            label="custom fields document_count (grouped permitted)",
-            iterations=iterations,
-            fn=lambda: _run(permitted),
-        )
-        self._time_query(
-            label="custom fields document_count superuser baseline",
-            iterations=iterations,
-            fn=lambda: _run(super_permitted),
         )
 
     def _time_api_get(self, *, label: str, username: str, password: str, path: str):
