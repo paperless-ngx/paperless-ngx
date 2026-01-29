@@ -1386,11 +1386,7 @@ export class WorkflowEditDialogComponent
         if (action.type !== WorkflowActionType.Email) {
           action.email = null
         }
-        if (action.type === WorkflowActionType.PasswordRemoval) {
-          action.passwords = this.parsePasswords(action.passwords as any)
-        } else {
-          delete action.passwords
-        }
+        action.passwords = this.parsePasswords(action.passwords as any)
       })
     super.save()
   }
