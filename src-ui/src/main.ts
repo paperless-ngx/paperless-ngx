@@ -8,9 +8,9 @@ import {
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { DatePipe, registerLocaleData } from '@angular/common'
 import {
-  HTTP_INTERCEPTORS,
   provideHttpClient,
   withFetch,
+  withInterceptors,
   withInterceptorsFromDi,
 } from '@angular/common/http'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -151,8 +151,8 @@ import { AppComponent } from './app/app.component'
 import { DirtyDocGuard } from './app/guards/dirty-doc.guard'
 import { DirtySavedViewGuard } from './app/guards/dirty-saved-view.guard'
 import { PermissionsGuard } from './app/guards/permissions.guard'
-import { ApiVersionInterceptor } from './app/interceptors/api-version.interceptor'
-import { CsrfInterceptor } from './app/interceptors/csrf.interceptor'
+import { withApiVersionInterceptor } from './app/interceptors/api-version.interceptor'
+import { withCsrfInterceptor } from './app/interceptors/csrf.interceptor'
 import { DocumentTitlePipe } from './app/pipes/document-title.pipe'
 import { FilterPipe } from './app/pipes/filter.pipe'
 import { UsernamePipe } from './app/pipes/username.pipe'
@@ -381,16 +381,6 @@ bootstrapApplication(AppComponent, {
     provideAppInitializer(initializeApp),
     DatePipe,
     CookieService,
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: CsrfInterceptor,
-      multi: true,
-    },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: ApiVersionInterceptor,
-      multi: true,
-    },
     FilterPipe,
     DocumentTitlePipe,
     { provide: NgbDateAdapter, useClass: ISODateAdapter },
@@ -402,6 +392,10 @@ bootstrapApplication(AppComponent, {
     CorrespondentNamePipe,
     DocumentTypeNamePipe,
     StoragePathNamePipe,
-    provideHttpClient(withInterceptorsFromDi(), withFetch()),
+    provideHttpClient(
+      withInterceptorsFromDi(),
+      withInterceptors([withCsrfInterceptor, withApiVersionInterceptor]),
+      withFetch()
+    ),
   ],
 }).catch((err) => console.error(err))

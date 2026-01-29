@@ -69,10 +69,8 @@ import { environment } from 'src/environments/environment'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
 import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
-import {
-  DocumentDetailComponent,
-  ZoomSetting,
-} from './document-detail.component'
+import { DocumentDetailComponent } from './document-detail.component'
+import { ZoomSetting } from './zoom-setting'
 
 const doc: Document = {
   id: 3,

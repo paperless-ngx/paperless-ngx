@@ -33,7 +33,7 @@
 			"label": "Start: Frontend Angular",
 			"description": "Start the Frontend Angular Dev Server",
 			"type": "shell",
-			"command": "pnpm start",
+			"command": "pnpm exec ng serve --host 0.0.0.0",
 			"isBackground": true,
 			"options": {
 				"cwd": "${workspaceFolder}/src-ui"

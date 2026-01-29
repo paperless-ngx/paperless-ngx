@@ -106,16 +106,15 @@ import { TextComponent } from '../common/input/text/text.component'
 import { TextAreaComponent } from '../common/input/textarea/textarea.component'
 import { UrlComponent } from '../common/input/url/url.component'
 import { PageHeaderComponent } from '../common/page-header/page-header.component'
-import {
-  PDFEditorComponent,
-  PdfEditorEditMode,
-} from '../common/pdf-editor/pdf-editor.component'
+import { PdfEditorEditMode } from '../common/pdf-editor/pdf-editor-edit-mode'
+import { PDFEditorComponent } from '../common/pdf-editor/pdf-editor.component'
 import { ShareLinksDialogComponent } from '../common/share-links-dialog/share-links-dialog.component'
 import { SuggestionsDropdownComponent } from '../common/suggestions-dropdown/suggestions-dropdown.component'
 import { DocumentHistoryComponent } from '../document-history/document-history.component'
 import { DocumentNotesComponent } from '../document-notes/document-notes.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { MetadataCollapseComponent } from './metadata-collapse/metadata-collapse.component'
+import { ZoomSetting } from './zoom-setting'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -135,18 +134,6 @@ enum ContentRenderType {
   Other = 'other',
   Unknown = 'unknown',
   TIFF = 'tiff',
-}
-
-export enum ZoomSetting {
-  PageFit = 'page-fit',
-  PageWidth = 'page-width',
-  Quarter = '.25',
-  Half = '.5',
-  ThreeQuarters = '.75',
-  One = '1',
-  OneAndHalf = '1.5',
-  Two = '2',
-  Three = '3',
 }
 
 @Component({

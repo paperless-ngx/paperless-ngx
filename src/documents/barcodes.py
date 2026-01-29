@@ -61,6 +61,20 @@ class Barcode:
         """
         return self.value.startswith(self.settings.barcode_asn_prefix)
 
+    @property
+    def is_tag(self) -> bool:
+        """
+        Returns True if the barcode value matches any configured tag mapping pattern,
+        False otherwise.
+
+        Note: This does NOT exclude ASN or separator barcodes - they can also be used
+        as tags if they match a tag mapping pattern (e.g., {"ASN12.*": "JOHN"}).
+        """
+        for regex in self.settings.barcode_tag_mapping:
+            if re.match(regex, self.value, flags=re.IGNORECASE):
+                return True
+        return False
+
 
 class BarcodePlugin(ConsumeTaskPlugin):
     NAME: str = "BarcodePlugin"
@@ -145,8 +159,14 @@ class BarcodePlugin(ConsumeTaskPlugin):
         self.detect()
 
         # try reading tags from barcodes
+        # If tag splitting is enabled, skip this on the original document - let each split document extract its own tags
+        # However, if we're processing a split document (original_path is set), extract tags
         if (
             self.settings.barcode_enable_tag
+            and (
+                not self.settings.barcode_tag_split
+                or self.input_doc.original_path is not None
+            )
             and (tags := self.tags) is not None
             and len(tags) > 0
         ):
@@ -446,15 +466,24 @@ class BarcodePlugin(ConsumeTaskPlugin):
             for bc in self.barcodes
             if bc.is_separator and (not retain or (retain and bc.page > 0))
         }  # as below, dont include the first page if retain is enabled
-        if not self.settings.barcode_enable_asn:
-            return separator_pages
 
         # add the page numbers of the ASN barcodes
         # (except for first page, that might lead to infinite loops).
-        return {
-            **separator_pages,
-            **{bc.page: True for bc in self.barcodes if bc.is_asn and bc.page != 0},
-        }
+        if self.settings.barcode_enable_asn:
+            separator_pages = {
+                **separator_pages,
+                **{bc.page: True for bc in self.barcodes if bc.is_asn and bc.page != 0},
+            }
+
+        # add the page numbers of the TAG barcodes if splitting is enabled
+        # (except for first page, that might lead to infinite loops).
+        if self.settings.barcode_tag_split and self.settings.barcode_enable_tag:
+            separator_pages = {
+                **separator_pages,
+                **{bc.page: True for bc in self.barcodes if bc.is_tag and bc.page != 0},
+            }
+
+        return separator_pages
 
     def separate_pages(self, pages_to_split_on: dict[int, bool]) -> list[Path]:
         """
