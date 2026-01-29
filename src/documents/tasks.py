@@ -29,6 +29,7 @@ from documents.bulk_download import OriginalsOnlyStrategy
 from documents.caching import clear_document_caches
 from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
+from documents.consumer import AsnCheckPlugin
 from documents.consumer import ConsumerPlugin
 from documents.consumer import ConsumerPreflightPlugin
 from documents.consumer import WorkflowTriggerPlugin
@@ -157,8 +158,10 @@ def consume_file(
 
     plugins: list[type[ConsumeTaskPlugin]] = [
         ConsumerPreflightPlugin,
+        AsnCheckPlugin,
         CollatePlugin,
         BarcodePlugin,
+        AsnCheckPlugin,  # Re-run ASN check after barcode reading
         WorkflowTriggerPlugin,
         ConsumerPlugin,
     ]

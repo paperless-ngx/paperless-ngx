@@ -828,6 +828,32 @@ class ConsumerPreflightPlugin(
         settings.ORIGINALS_DIR.mkdir(parents=True, exist_ok=True)
         settings.ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
 
+    def run(self) -> None:
+        self._send_progress(
+            0,
+            100,
+            ProgressStatusOptions.STARTED,
+            ConsumerStatusShortMessage.NEW_FILE,
+        )
+
+        # Make sure that preconditions for consuming the file are met.
+
+        self.pre_check_file_exists()
+        self.pre_check_duplicate()
+        self.pre_check_directories()
+
+
+class AsnCheckPlugin(
+    NoCleanupPluginMixin,
+    NoSetupPluginMixin,
+    AlwaysRunPluginMixin,
+    LoggingMixin,
+    ConsumerPluginMixin,
+    ConsumeTaskPlugin,
+):
+    NAME: str = "AsnCheckPlugin"
+    logging_name = "paperless.consumer"
+
     def pre_check_asn_value(self):
         """
         Check that if override_asn is given, it is unique and within a valid range
@@ -865,16 +891,4 @@ class ConsumerPreflightPlugin(
             )
 
     def run(self) -> None:
-        self._send_progress(
-            0,
-            100,
-            ProgressStatusOptions.STARTED,
-            ConsumerStatusShortMessage.NEW_FILE,
-        )
-
-        # Make sure that preconditions for consuming the file are met.
-
-        self.pre_check_file_exists()
-        self.pre_check_duplicate()
-        self.pre_check_directories()
         self.pre_check_asn_value()
