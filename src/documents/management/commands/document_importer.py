@@ -383,8 +383,6 @@ class Command(CryptMixin, BaseCommand):
             else:
                 archive_path = None
 
-            document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
-
             with FileLock(settings.MEDIA_LOCK):
                 if Path(document.source_path).is_file():
                     raise FileExistsError(document.source_path)

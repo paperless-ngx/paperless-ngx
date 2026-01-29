@@ -497,7 +497,6 @@ class ConsumerPlugin(
                     create_source_path_directory(document.source_path)
 
                     self._write(
-                        document.storage_type,
                         self.unmodified_original
                         if self.unmodified_original is not None
                         else self.working_copy,
@@ -505,7 +504,6 @@ class ConsumerPlugin(
                     )
 
                     self._write(
-                        document.storage_type,
                         thumbnail,
                         document.thumbnail_path,
                     )
@@ -517,7 +515,6 @@ class ConsumerPlugin(
                         )
                         create_source_path_directory(document.archive_path)
                         self._write(
-                            document.storage_type,
                             archive_path,
                             document.archive_path,
                         )
@@ -637,8 +634,6 @@ class ConsumerPlugin(
             )
             self.log.debug(f"Creation date from st_mtime: {create_date}")
 
-        storage_type = Document.STORAGE_TYPE_UNENCRYPTED
-
         if self.metadata.filename:
             title = Path(self.metadata.filename).stem
         else:
@@ -665,7 +660,6 @@ class ConsumerPlugin(
             checksum=hashlib.md5(file_for_checksum.read_bytes()).hexdigest(),
             created=create_date,
             modified=create_date,
-            storage_type=storage_type,
             page_count=page_count,
             original_filename=self.filename,
         )
@@ -736,7 +730,7 @@ class ConsumerPlugin(
                 }
                 CustomFieldInstance.objects.create(**args)  # adds to document
 
-    def _write(self, storage_type, source, target):
+    def _write(self, source, target):
         with (
             Path(source).open("rb") as read_file,
             Path(target).open("wb") as write_file,
@@ -785,19 +779,45 @@ class ConsumerPreflightPlugin(
             Q(checksum=checksum) | Q(archive_checksum=checksum),
         )
         if existing_doc.exists():
-            msg = ConsumerStatusShortMessage.DOCUMENT_ALREADY_EXISTS
-            log_msg = f"Not consuming {self.filename}: It is a duplicate of {existing_doc.get().title} (#{existing_doc.get().pk})."
+            existing_doc = existing_doc.order_by("-created")
+            duplicates_in_trash = existing_doc.filter(deleted_at__isnull=False)
+            log_msg = (
+                f"Consuming duplicate {self.filename}: "
+                f"{existing_doc.count()} existing document(s) share the same content."
+            )
 
-            if existing_doc.first().deleted_at is not None:
-                msg = ConsumerStatusShortMessage.DOCUMENT_ALREADY_EXISTS_IN_TRASH
-                log_msg += " Note: existing document is in the trash."
+            if duplicates_in_trash.exists():
+                log_msg += " Note: at least one existing document is in the trash."
+
+            self.log.warning(log_msg)
 
             if settings.CONSUMER_DELETE_DUPLICATES:
+                duplicate = existing_doc.first()
+                duplicate_label = (
+                    duplicate.title
+                    or duplicate.original_filename
+                    or (Path(duplicate.filename).name if duplicate.filename else None)
+                    or str(duplicate.pk)
+                )
+
                 Path(self.input_doc.original_file).unlink()
-            self._fail(
-                msg,
-                log_msg,
-            )
+
+                failure_msg = (
+                    f"Not consuming {self.filename}: "
+                    f"It is a duplicate of {duplicate_label} (#{duplicate.pk})"
+                )
+                status_msg = ConsumerStatusShortMessage.DOCUMENT_ALREADY_EXISTS
+
+                if duplicates_in_trash.exists():
+                    status_msg = (
+                        ConsumerStatusShortMessage.DOCUMENT_ALREADY_EXISTS_IN_TRASH
+                    )
+                    failure_msg += " Note: existing document is in the trash."
+
+                self._fail(
+                    status_msg,
+                    failure_msg,
+                )
 
     def pre_check_directories(self):
         """

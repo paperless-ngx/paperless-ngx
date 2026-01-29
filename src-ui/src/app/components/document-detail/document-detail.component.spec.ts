@@ -48,6 +48,7 @@ import {
 } from 'src/app/data/filter-rule-type'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
@@ -66,11 +67,10 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
+import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
-import {
-  DocumentDetailComponent,
-  ZoomSetting,
-} from './document-detail.component'
+import { DocumentDetailComponent } from './document-detail.component'
+import { ZoomSetting } from './zoom-setting'
 
 const doc: Document = {
   id: 3,
@@ -156,6 +156,16 @@ describe('DocumentDetailComponent', () => {
         {
           provide: TagService,
           useValue: {
+            getCachedMany: (ids: number[]) =>
+              of(
+                ids.map((id) => ({
+                  id,
+                  name: `Tag${id}`,
+                  is_inbox_tag: true,
+                  color: '#ff0000',
+                  text_color: '#000000',
+                }))
+              ),
             listAll: () =>
               of({
                 count: 3,
@@ -290,16 +300,16 @@ describe('DocumentDetailComponent', () => {
       .spyOn(openDocumentsService, 'openDocument')
       .mockReturnValueOnce(of(true))
     fixture.detectChanges()
-    expect(component.activeNavID).toEqual(5) // DocumentDetailNavIDs.Notes
+    expect(component.activeNavID).toEqual(component.DocumentDetailNavIDs.Notes)
   })
 
   it('should change url on tab switch', () => {
     initNormally()
     const navigateSpy = jest.spyOn(router, 'navigate')
-    component.nav.select(5)
+    component.nav.select(component.DocumentDetailNavIDs.Notes)
     component.nav.navChange.next({
       activeId: 1,
-      nextId: 5,
+      nextId: component.DocumentDetailNavIDs.Notes,
       preventDefault: () => {},
     })
     fixture.detectChanges()
@@ -341,6 +351,18 @@ describe('DocumentDetailComponent', () => {
     expect(component.document).toEqual(doc)
   })
 
+  it('should fall back to details tab when duplicates tab is active but no duplicates', () => {
+    initNormally()
+    component.activeNavID = component.DocumentDetailNavIDs.Duplicates
+    const noDupDoc = { ...doc, duplicate_documents: [] }
+
+    component.updateComponent(noDupDoc)
+
+    expect(component.activeNavID).toEqual(
+      component.DocumentDetailNavIDs.Details
+    )
+  })
+
   it('should load already-opened document via param', () => {
     initNormally()
     jest.spyOn(documentService, 'get').mockReturnValueOnce(of(doc))
@@ -354,6 +376,38 @@ describe('DocumentDetailComponent', () => {
     )
     fixture.detectChanges() // calls ngOnInit
     expect(component.document).toEqual(doc)
+  })
+
+  it('should update cached open document duplicates when reloading an open doc', () => {
+    const openDoc = { ...doc, duplicate_documents: [{ id: 1, title: 'Old' }] }
+    const updatedDuplicates = [
+      { id: 2, title: 'Newer duplicate', deleted_at: null },
+    ]
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
+    jest.spyOn(documentService, 'get').mockReturnValue(
+      of({
+        ...doc,
+        modified: new Date('2024-01-02T00:00:00Z'),
+        duplicate_documents: updatedDuplicates,
+      })
+    )
+    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(openDoc)
+    const saveSpy = jest.spyOn(openDocumentsService, 'save')
+    jest.spyOn(openDocumentsService, 'openDocument').mockReturnValue(of(true))
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({
+        count: customFields.length,
+        all: customFields.map((f) => f.id),
+        results: customFields,
+      })
+    )
+
+    fixture.detectChanges()
+
+    expect(openDoc.duplicate_documents).toEqual(updatedDuplicates)
+    expect(saveSpy).toHaveBeenCalled()
   })
 
   it('should disable form if user cannot edit', () => {
@@ -382,8 +436,32 @@ describe('DocumentDetailComponent', () => {
     currentUserCan = true
   })
 
-  it('should support creating document type', () => {
+  it('should support creating tag, remove from suggestions', () => {
     initNormally()
+    component.suggestions = {
+      suggested_tags: ['Tag1', 'NewTag12'],
+    }
+    let openModal: NgbModalRef
+    modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
+    const modalSpy = jest.spyOn(modalService, 'open')
+    component.createTag('NewTag12')
+    expect(modalSpy).toHaveBeenCalled()
+    openModal.componentInstance.succeeded.next({
+      id: 12,
+      name: 'NewTag12',
+      is_inbox_tag: true,
+      color: '#ff0000',
+      text_color: '#000000',
+    })
+    expect(component.tagsInput.value).toContain(12)
+    expect(component.suggestions.suggested_tags).not.toContain('NewTag12')
+  })
+
+  it('should support creating document type, remove from suggestions', () => {
+    initNormally()
+    component.suggestions = {
+      suggested_document_types: ['DocumentType1', 'NewDocType2'],
+    }
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const modalSpy = jest.spyOn(modalService, 'open')
@@ -391,10 +469,16 @@ describe('DocumentDetailComponent', () => {
     expect(modalSpy).toHaveBeenCalled()
     openModal.componentInstance.succeeded.next({ id: 12, name: 'NewDocType12' })
     expect(component.documentForm.get('document_type').value).toEqual(12)
+    expect(component.suggestions.suggested_document_types).not.toContain(
+      'NewDocType2'
+    )
   })
 
-  it('should support creating correspondent', () => {
+  it('should support creating correspondent, remove from suggestions', () => {
     initNormally()
+    component.suggestions = {
+      suggested_correspondents: ['Correspondent1', 'NewCorrrespondent12'],
+    }
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const modalSpy = jest.spyOn(modalService, 'open')
@@ -405,6 +489,9 @@ describe('DocumentDetailComponent', () => {
       name: 'NewCorrrespondent12',
     })
     expect(component.documentForm.get('correspondent').value).toEqual(12)
+    expect(component.suggestions.suggested_correspondents).not.toContain(
+      'NewCorrrespondent12'
+    )
   })
 
   it('should support creating storage path', () => {
@@ -927,7 +1014,7 @@ describe('DocumentDetailComponent', () => {
   it('should display built-in pdf viewer if not disabled', () => {
     initNormally()
     component.document.archived_file_name = 'file.pdf'
-    jest.spyOn(settingsService, 'get').mockReturnValue(false)
+    settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, false)
     expect(component.useNativePdfViewer).toBeFalsy()
     fixture.detectChanges()
     expect(fixture.debugElement.query(By.css('pdf-viewer'))).not.toBeNull()
@@ -936,7 +1023,7 @@ describe('DocumentDetailComponent', () => {
   it('should display native pdf viewer if enabled', () => {
     initNormally()
     component.document.archived_file_name = 'file.pdf'
-    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+    settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, true)
     expect(component.useNativePdfViewer).toBeTruthy()
     fixture.detectChanges()
     expect(fixture.debugElement.query(By.css('object'))).not.toBeNull()
@@ -995,7 +1082,7 @@ describe('DocumentDetailComponent', () => {
     expect(component.document.custom_fields).toHaveLength(initialLength - 1)
     expect(component.customFieldFormFields).toHaveLength(initialLength - 1)
     expect(
-      fixture.debugElement.query(By.css('form')).nativeElement.textContent
+      fixture.debugElement.query(By.css('form ul')).nativeElement.textContent
     ).not.toContain('Field 1')
     const patchSpy = jest.spyOn(documentService, 'patch')
     component.save(true)
@@ -1086,10 +1173,22 @@ describe('DocumentDetailComponent', () => {
 
   it('should get suggestions', () => {
     const suggestionsSpy = jest.spyOn(documentService, 'getSuggestions')
-    suggestionsSpy.mockReturnValue(of({ tags: [42, 43] }))
+    suggestionsSpy.mockReturnValue(
+      of({
+        tags: [42, 43],
+        suggested_tags: [],
+        suggested_document_types: [],
+        suggested_correspondents: [],
+      })
+    )
     initNormally()
     expect(suggestionsSpy).toHaveBeenCalled()
-    expect(component.suggestions).toEqual({ tags: [42, 43] })
+    expect(component.suggestions).toEqual({
+      tags: [42, 43],
+      suggested_tags: [],
+      suggested_document_types: [],
+      suggested_correspondents: [],
+    })
   })
 
   it('should show error if needed for get suggestions', () => {
@@ -1207,6 +1306,88 @@ describe('DocumentDetailComponent', () => {
     )
     req.flush(true)
     expect(closeSpy).toHaveBeenCalled()
+  })
+
+  it('should support removing password protection from pdfs', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    initNormally()
+    component.password = 'secret'
+    component.removePassword()
+    const dialog =
+      modal.componentInstance as PasswordRemovalConfirmDialogComponent
+    dialog.updateDocument = false
+    dialog.includeMetadata = false
+    dialog.deleteOriginal = true
+    dialog.confirm()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    expect(req.request.body).toEqual({
+      documents: [doc.id],
+      method: 'remove_password',
+      parameters: {
+        password: 'secret',
+        update_document: false,
+        include_metadata: false,
+        delete_original: true,
+      },
+    })
+    req.flush(true)
+  })
+
+  it('should require the current password before removing it', () => {
+    initNormally()
+    const errorSpy = jest.spyOn(toastService, 'showError')
+    component.requiresPassword = true
+    component.password = ''
+
+    component.removePassword()
+
+    expect(errorSpy).toHaveBeenCalled()
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+  })
+
+  it('should handle failures when removing password protection', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    initNormally()
+    const errorSpy = jest.spyOn(toastService, 'showError')
+    component.password = 'secret'
+
+    component.removePassword()
+    const dialog =
+      modal.componentInstance as PasswordRemovalConfirmDialogComponent
+    dialog.confirm()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    req.error(new ErrorEvent('failed'))
+
+    expect(errorSpy).toHaveBeenCalled()
+    expect(component.networkActive).toBe(false)
+    expect(dialog.buttonsEnabled).toBe(true)
+  })
+
+  it('should refresh the document when removing password in update mode', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    const refreshSpy = jest.spyOn(openDocumentsService, 'refreshDocument')
+    initNormally()
+    component.password = 'secret'
+
+    component.removePassword()
+    const dialog =
+      modal.componentInstance as PasswordRemovalConfirmDialogComponent
+    dialog.confirm()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    req.flush(true)
+
+    expect(refreshSpy).toHaveBeenCalledWith(doc.id)
   })
 
   it('should support keyboard shortcuts', () => {

@@ -89,6 +89,18 @@ Additional tasks are available for common maintenance operations:
 - **Migrate Database**: To apply database migrations.
 - **Create Superuser**: To create an admin user for the application.
 
+## Committing from the Host Machine
+
+The DevContainer automatically installs pre-commit hooks during setup. However, these hooks are configured for use inside the container.
+
+If you want to commit changes from your host machine (outside the DevContainer), you need to set up pre-commit on your host. This installs it as a standalone tool.
+
+```bash
+uv tool install pre-commit && pre-commit install
+```
+
+After this, you can commit either from inside the DevContainer or from your host machine.
+
 ## Let's Get Started!
 
 Follow the steps above to get your development environment up and running. Happy coding!

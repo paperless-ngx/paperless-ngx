@@ -501,7 +501,7 @@ The `datetime` filter formats a datetime string or datetime object using Python'
 See the [strftime format code documentation](https://docs.python.org/3.13/library/datetime.html#strftime-and-strptime-format-codes)
 for the possible codes and their meanings.
 
-##### Date Localization
+##### Date Localization {#date-localization}
 
 The `localize_date` filter formats a date or datetime object into a localized string using Babel internationalization.
 This takes into account the provided locale for translation. Since this must be used on a date or datetime object,
@@ -872,8 +872,8 @@ followed by the even pages.
 
 It's important that the scan files get consumed in the correct order, and one at a time.
 You therefore need to make sure that Paperless is running while you upload the files into
-the directory; and if you're using [polling](configuration.md#polling), make sure that
-`CONSUMER_POLLING` is set to a value lower than it takes for the second scan to appear,
+the directory; and if you're using polling, make sure that
+`CONSUMER_POLLING_INTERVAL` is set to a value lower than it takes for the second scan to appear,
 like 5-10 or even lower.
 
 Another thing that might happen is that you start a double sided scan, but then forget

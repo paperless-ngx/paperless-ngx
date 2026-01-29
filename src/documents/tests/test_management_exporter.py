@@ -86,9 +86,8 @@ class TestExportImport(
             content="Content",
             checksum="82186aaa94f0b98697d704b90fd1c072",
             title="wow_dec",
-            filename="0000004.pdf.gpg",
+            filename="0000004.pdf",
             mime_type="application/pdf",
-            storage_type=Document.STORAGE_TYPE_GPG,
         )
 
         self.note = Note.objects.create(
@@ -242,10 +241,9 @@ class TestExportImport(
                     checksum = hashlib.md5(f.read()).hexdigest()
                 self.assertEqual(checksum, element["fields"]["checksum"])
 
-                self.assertEqual(
-                    element["fields"]["storage_type"],
-                    Document.STORAGE_TYPE_UNENCRYPTED,
-                )
+                # Generated field "content_length" should not be exported,
+                # it is automatically computed during import.
+                self.assertNotIn("content_length", element["fields"])
 
                 if document_exporter.EXPORTER_ARCHIVE_NAME in element:
                     fname = (
@@ -436,7 +434,7 @@ class TestExportImport(
         Document.objects.create(
             checksum="AAAAAAAAAAAAAAAAA",
             title="wow",
-            filename="0000004.pdf",
+            filename="0000010.pdf",
             mime_type="application/pdf",
         )
         self.assertRaises(FileNotFoundError, call_command, "document_exporter", target)

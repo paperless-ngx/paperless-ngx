@@ -12,6 +12,9 @@ from paperless_tika.parsers import TikaDocumentParser
     reason="No Gotenberg/Tika servers to test with",
 )
 @pytest.mark.django_db()
+@pytest.mark.live
+@pytest.mark.gotenberg
+@pytest.mark.tika
 class TestTikaParserAgainstServer:
     """
     This test case tests the Tika parsing against a live tika server,

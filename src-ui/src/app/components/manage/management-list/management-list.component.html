@@ -1,17 +1,48 @@
 <pngx-page-header title="{{ typeNamePlural | titlecase }}" info="View, add, edit and delete {{ typeNamePlural }}." infoLink="usage/#terms-and-definitions">
 
-  <button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()" [hidden]="selectedObjects.size === 0">
-    <i-bs  name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
+  <div ngbDropdown class="btn-group flex-fill d-sm-none">
+    <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle>
+      <i-bs name="text-indent-left"></i-bs>
+      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Select</ng-container></div>
+      @if (selectedObjects.size > 0) {
+        <pngx-clearable-badge [selected]="selectedObjects.size > 0" [number]="selectedObjects.size" (cleared)="selectNone()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
+      }
     </button>
-    <button type="button" class="btn btn-sm btn-outline-primary" (click)="setPermissions()" [disabled]="!userCanBulkEdit(PermissionAction.Change) || selectedObjects.size === 0">
-      <i-bs name="person-fill-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
-    </button>
-    <button type="button" class="btn btn-sm btn-outline-danger" (click)="delete()" [disabled]="!userCanBulkEdit(PermissionAction.Delete) || selectedObjects.size === 0">
-      <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
-    </button>
-    <button type="button" class="btn btn-sm btn-outline-primary ms-md-5" (click)="openCreateDialog()" *pngxIfPermissions="{ action: PermissionAction.Add, type: permissionType }">
-      <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Create</ng-container>
-    </button>
+    <div ngbDropdownMenu aria-labelledby="dropdownSelectMobile" class="shadow">
+      <button ngbDropdownItem (click)="selectNone()" i18n>Select none</button>
+      <button ngbDropdownItem (click)="selectPage(true)" i18n>Select page</button>
+      <button ngbDropdownItem (click)="selectAll()" i18n>Select all</button>
+    </div>
+  </div>
+
+  <div class="d-none d-sm-flex flex-fill me-3">
+    <div class="input-group input-group-sm">
+      <span class="input-group-text border-0" i18n>Select:</span>
+    </div>
+    <div class="btn-group btn-group-sm flex-nowrap">
+      @if (selectedObjects.size > 0) {
+        <button class="btn btn-sm btn-outline-secondary" (click)="selectNone()">
+          <i-bs name="slash-circle"></i-bs>&nbsp;<ng-container i18n>None</ng-container>
+        </button>
+      }
+      <button class="btn btn-sm btn-outline-primary" (click)="selectPage(true)">
+        <i-bs name="file-earmark-check"></i-bs>&nbsp;<ng-container i18n>Page</ng-container>
+      </button>
+      <button class="btn btn-sm btn-outline-primary" (click)="selectAll()">
+        <i-bs name="check-all"></i-bs>&nbsp;<ng-container i18n>All</ng-container>
+      </button>
+    </div>
+  </div>
+
+  <button type="button" class="btn btn-sm btn-outline-primary" (click)="setPermissions()" [disabled]="!userCanBulkEdit(PermissionAction.Change) || selectedObjects.size === 0">
+    <i-bs name="person-fill-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
+  </button>
+  <button type="button" class="btn btn-sm btn-outline-danger" (click)="delete()" [disabled]="!userCanBulkEdit(PermissionAction.Delete) || selectedObjects.size === 0">
+    <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+  </button>
+  <button type="button" class="btn btn-sm btn-outline-primary ms-md-5" (click)="openCreateDialog()" *pngxIfPermissions="{ action: PermissionAction.Add, type: permissionType }">
+    <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Create</ng-container>
+  </button>
 </pngx-page-header>
 
 <div class="row mb-3">
@@ -31,7 +62,7 @@
       <tr>
         <th scope="col">
           <div class="form-check m-0 ms-2 me-n2">
-            <input type="checkbox" class="form-check-input" id="all-objects" [(ngModel)]="togggleAll" [disabled]="data.length === 0" (click)="toggleAll($event); $event.stopPropagation();">
+            <input type="checkbox" class="form-check-input" id="all-objects" [(ngModel)]="togggleAll" [disabled]="data.length === 0" (change)="selectPage($event.target.checked); $event.stopPropagation();">
             <label class="form-check-label" for="all-objects"></label>
           </div>
         </th>
@@ -120,7 +151,14 @@
               <button (click)="openEditDialog(object)" *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }" ngbDropdownItem i18n>Edit</button>
               <button class="text-danger" (click)="openDeleteDialog(object)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }" ngbDropdownItem i18n>Delete</button>
               @if (getDocumentCount(object) > 0) {
-                <button (click)="filterDocuments(object)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }" ngbDropdownItem i18n>Filter Documents ({{ getDocumentCount(object) }})</button>
+                  <a
+                    *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }"
+                    ngbDropdownItem
+                    [routerLink]="getDocumentFilterUrl(object)"
+                    (click)="$event?.stopPropagation()"
+                    i18n
+                    >Filter Documents ({{ getDocumentCount(object) }})</a
+                  >
               }
             </div>
           </div>
@@ -135,9 +173,15 @@
         </div>
         @if (getDocumentCount(object) > 0) {
           <div class="btn-group d-none d-sm-inline-block">
-            <button class="btn btn-sm btn-outline-secondary" (click)="filterDocuments(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
-              <i-bs width="1em" height="1em" name="filter"></i-bs>&nbsp;<ng-container i18n>Documents</ng-container><span class="badge bg-light text-secondary ms-2">{{ getDocumentCount(object) }}</span>
-            </button>
+            <a
+              class="btn btn-sm btn-outline-secondary"
+              *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }"
+              [routerLink]="getDocumentFilterUrl(object)"
+              (click)="$event?.stopPropagation()"
+            >
+              <i-bs width="1em" height="1em" name="filter"></i-bs>&nbsp;<ng-container i18n>Documents</ng-container
+              ><span class="badge bg-light text-secondary ms-2">{{ getDocumentCount(object) }}</span>
+            </a>
           </div>
         }
       </div>

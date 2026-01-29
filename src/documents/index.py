@@ -10,6 +10,7 @@ from datetime import time
 from datetime import timedelta
 from datetime import timezone
 from shutil import rmtree
+from time import sleep
 from typing import TYPE_CHECKING
 from typing import Literal
 
@@ -32,6 +33,7 @@ from whoosh.highlight import HtmlFormatter
 from whoosh.idsets import BitSet
 from whoosh.idsets import DocIdSet
 from whoosh.index import FileIndex
+from whoosh.index import LockError
 from whoosh.index import create_in
 from whoosh.index import exists_in
 from whoosh.index import open_dir
@@ -97,11 +99,33 @@ def get_schema() -> Schema:
 
 
 def open_index(*, recreate=False) -> FileIndex:
-    try:
-        if exists_in(settings.INDEX_DIR) and not recreate:
-            return open_dir(settings.INDEX_DIR, schema=get_schema())
-    except Exception:
-        logger.exception("Error while opening the index, recreating.")
+    transient_exceptions = (FileNotFoundError, LockError)
+    max_retries = 3
+    retry_delay = 0.1
+
+    for attempt in range(max_retries + 1):
+        try:
+            if exists_in(settings.INDEX_DIR) and not recreate:
+                return open_dir(settings.INDEX_DIR, schema=get_schema())
+            break
+        except transient_exceptions as exc:
+            is_last_attempt = attempt == max_retries or recreate
+            if is_last_attempt:
+                logger.exception(
+                    "Error while opening the index after retries, recreating.",
+                )
+                break
+
+            logger.warning(
+                "Transient error while opening the index (attempt %s/%s): %s. Retrying.",
+                attempt + 1,
+                max_retries + 1,
+                exc,
+            )
+            sleep(retry_delay)
+        except Exception:
+            logger.exception("Error while opening the index, recreating.")
+            break
 
     # create_in doesn't handle corrupted indexes very well, remove the directory entirely first
     if settings.INDEX_DIR.is_dir():
@@ -578,7 +602,7 @@ def rewrite_natural_date_keywords(query_string: str) -> str:
 
             case "this year":
                 start = datetime(local_now.year, 1, 1, 0, 0, 0, tzinfo=tz)
-                end = datetime.combine(today, time.max, tzinfo=tz)
+                end = datetime(local_now.year, 12, 31, 23, 59, 59, tzinfo=tz)
 
             case "previous week":
                 days_since_monday = local_now.weekday()

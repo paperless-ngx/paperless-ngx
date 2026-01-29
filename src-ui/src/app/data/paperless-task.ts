@@ -1,3 +1,4 @@
+import { Document } from './document'
 import { ObjectWithId } from './object-with-id'
 
 export enum PaperlessTaskType {
@@ -11,6 +12,7 @@ export enum PaperlessTaskName {
   TrainClassifier = 'train_classifier',
   SanityCheck = 'check_sanity',
   IndexOptimize = 'index_optimize',
+  LLMIndexUpdate = 'llmindex_update',
 }
 
 export enum PaperlessTaskStatus {
@@ -40,6 +42,8 @@ export interface PaperlessTask extends ObjectWithId {
   result?: string
 
   related_document?: number
+
+  duplicate_documents?: Document[]
 
   owner?: number
 }

@@ -12,6 +12,7 @@ from typing import Final
 from urllib.parse import urlparse
 
 from celery.schedules import crontab
+from compression_middleware.middleware import CompressionMiddleware
 from dateparser.languages.loader import LocaleDataLoader
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
@@ -229,6 +230,28 @@ def _parse_beat_schedule() -> dict:
                 "expires": 59.0 * 60.0,
             },
         },
+        {
+            "name": "Rebuild LLM index",
+            "env_key": "PAPERLESS_LLM_INDEX_TASK_CRON",
+            # Default daily at 02:10
+            "env_default": "10 2 * * *",
+            "task": "documents.tasks.llmindex_index",
+            "options": {
+                # 1 hour before default schedule sends again
+                "expires": 23.0 * 60.0 * 60.0,
+            },
+        },
+        {
+            "name": "Cleanup expired share link bundles",
+            "env_key": "PAPERLESS_SHARE_LINK_BUNDLE_CLEANUP_CRON",
+            # Default daily at 02:00
+            "env_default": "0 2 * * *",
+            "task": "documents.tasks.cleanup_expired_share_link_bundles",
+            "options": {
+                # 1 hour before default schedule sends again
+                "expires": 23.0 * 60.0 * 60.0,
+            },
+        },
     ]
     for task in tasks:
         # Either get the environment setting or use the default
@@ -267,6 +290,7 @@ MEDIA_ROOT = __get_path("PAPERLESS_MEDIA_ROOT", BASE_DIR.parent / "media")
 ORIGINALS_DIR = MEDIA_ROOT / "documents" / "originals"
 ARCHIVE_DIR = MEDIA_ROOT / "documents" / "archive"
 THUMBNAIL_DIR = MEDIA_ROOT / "documents" / "thumbnails"
+SHARE_LINK_BUNDLE_DIR = MEDIA_ROOT / "documents" / "share_link_bundles"
 
 DATA_DIR = __get_path("PAPERLESS_DATA_DIR", BASE_DIR.parent / "data")
 
@@ -287,6 +311,7 @@ MODEL_FILE = __get_path(
     "PAPERLESS_MODEL_FILE",
     DATA_DIR / "classification_model.pickle",
 )
+LLM_INDEX_DIR = DATA_DIR / "llm_index"
 
 LOGGING_DIR = __get_path("PAPERLESS_LOGGING_DIR", DATA_DIR / "log")
 
@@ -321,6 +346,7 @@ INSTALLED_APPS = [
     "paperless_tesseract.apps.PaperlessTesseractConfig",
     "paperless_text.apps.PaperlessTextConfig",
     "paperless_mail.apps.PaperlessMailConfig",
+    "paperless_remote.apps.PaperlessRemoteParserConfig",
     "django.contrib.admin",
     "rest_framework",
     "rest_framework.authtoken",
@@ -331,6 +357,7 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.mfa",
+    "allauth.headless",
     "drf_spectacular",
     "drf_spectacular_sidecar",
     "treenode",
@@ -378,6 +405,19 @@ MIDDLEWARE = [
 # Optional to enable compression
 if __get_boolean("PAPERLESS_ENABLE_COMPRESSION", "yes"):  # pragma: no cover
     MIDDLEWARE.insert(0, "compression_middleware.middleware.CompressionMiddleware")
+
+# Workaround to not compress streaming responses (e.g. chat).
+# See https://github.com/friedelwolff/django-compression-middleware/pull/7
+original_process_response = CompressionMiddleware.process_response
+
+
+def patched_process_response(self, request, response):
+    if getattr(request, "compress_exempt", False):
+        return response
+    return original_process_response(self, request, response)
+
+
+CompressionMiddleware.process_response = patched_process_response
 
 ROOT_URLCONF = "paperless.urls"
 
@@ -512,6 +552,12 @@ SOCIALACCOUNT_PROVIDERS = json.loads(
 )
 SOCIAL_ACCOUNT_DEFAULT_GROUPS = __get_list("PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS")
 SOCIAL_ACCOUNT_SYNC_GROUPS = __get_boolean("PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS")
+SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM: Final[str] = os.getenv(
+    "PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM",
+    "groups",
+)
+
+HEADLESS_TOKEN_STRATEGY = "paperless.adapter.DrfTokenStrategy"
 
 MFA_TOTP_ISSUER = "Paperless-ngx"
 
@@ -584,6 +630,10 @@ X_FRAME_OPTIONS = "SAMEORIGIN"
 # The next 3 settings can also be set using just PAPERLESS_URL
 CSRF_TRUSTED_ORIGINS = __get_list("PAPERLESS_CSRF_TRUSTED_ORIGINS")
 
+if DEBUG:
+    # Allow access from the angular development server during debugging
+    CSRF_TRUSTED_ORIGINS.append("http://localhost:4200")
+
 # We allow CORS from localhost:8000
 CORS_ALLOWED_ORIGINS = __get_list(
     "PAPERLESS_CORS_ALLOWED_HOSTS",
@@ -593,6 +643,8 @@ CORS_ALLOWED_ORIGINS = __get_list(
 if DEBUG:
     # Allow access from the angular development server during debugging
     CORS_ALLOWED_ORIGINS.append("http://localhost:4200")
+
+CORS_ALLOW_CREDENTIALS = True
 
 CORS_EXPOSE_HEADERS = [
     "Content-Disposition",
@@ -867,6 +919,7 @@ LOGGING = {
     "loggers": {
         "paperless": {"handlers": ["file_paperless"], "level": "DEBUG"},
         "paperless_mail": {"handlers": ["file_mail"], "level": "DEBUG"},
+        "paperless_ai": {"handlers": ["file_paperless"], "level": "DEBUG"},
         "ocrmypdf": {"handlers": ["file_paperless"], "level": "INFO"},
         "celery": {"handlers": ["file_celery"], "level": "DEBUG"},
         "kombu": {"handlers": ["file_celery"], "level": "DEBUG"},
@@ -1010,29 +1063,30 @@ IGNORABLE_FILES: Final[list[str]] = [
     "Thumbs.db",
 ]
 
-CONSUMER_POLLING = int(os.getenv("PAPERLESS_CONSUMER_POLLING", 0))
+CONSUMER_POLLING_INTERVAL = float(os.getenv("PAPERLESS_CONSUMER_POLLING_INTERVAL", 0))
 
-CONSUMER_POLLING_DELAY = int(os.getenv("PAPERLESS_CONSUMER_POLLING_DELAY", 5))
-
-CONSUMER_POLLING_RETRY_COUNT = int(
-    os.getenv("PAPERLESS_CONSUMER_POLLING_RETRY_COUNT", 5),
-)
-
-CONSUMER_INOTIFY_DELAY: Final[float] = __get_float(
-    "PAPERLESS_CONSUMER_INOTIFY_DELAY",
-    0.5,
-)
+CONSUMER_STABILITY_DELAY = float(os.getenv("PAPERLESS_CONSUMER_STABILITY_DELAY", 5))
 
 CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES")
 
 CONSUMER_RECURSIVE = __get_boolean("PAPERLESS_CONSUMER_RECURSIVE")
 
-# Ignore glob patterns, relative to PAPERLESS_CONSUMPTION_DIR
+# Ignore regex patterns, matched against filename only
 CONSUMER_IGNORE_PATTERNS = list(
     json.loads(
         os.getenv(
             "PAPERLESS_CONSUMER_IGNORE_PATTERNS",
-            json.dumps(IGNORABLE_FILES),
+            json.dumps([]),
+        ),
+    ),
+)
+
+# Directories to always ignore.  These are matched by directory name, not full path
+CONSUMER_IGNORE_DIRS = list(
+    json.loads(
+        os.getenv(
+            "PAPERLESS_CONSUMER_IGNORE_DIRS",
+            json.dumps([]),
         ),
     ),
 )
@@ -1171,19 +1225,6 @@ EMAIL_PARSE_DEFAULT_LAYOUT = __get_int(
     "PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT",
     1,  # MailRule.PdfLayout.TEXT_HTML but that can't be imported here
 )
-
-# Pre-2.x versions of Paperless stored your documents locally with GPG
-# encryption, but that is no longer the default.  This behaviour is still
-# available, but it must be explicitly enabled by setting
-# `PAPERLESS_PASSPHRASE` in your environment or config file.  The default is to
-# store these files unencrypted.
-#
-# Translation:
-# * If you're a new user, you can safely ignore this setting.
-# * If you're upgrading from 1.x, this must be set, OR you can run
-#   `./manage.py change_storage_type gpg unencrypted` to decrypt your files,
-#   after which you can unset this value.
-PASSPHRASE = os.getenv("PAPERLESS_PASSPHRASE")
 
 # Trigger a script after every successful document consumption?
 PRE_CONSUME_SCRIPT = os.getenv("PAPERLESS_PRE_CONSUME_SCRIPT")
@@ -1400,3 +1441,23 @@ WEBHOOKS_ALLOW_INTERNAL_REQUESTS = __get_boolean(
     "PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS",
     "true",
 )
+
+###############################################################################
+# Remote Parser                                                               #
+###############################################################################
+REMOTE_OCR_ENGINE = os.getenv("PAPERLESS_REMOTE_OCR_ENGINE")
+REMOTE_OCR_API_KEY = os.getenv("PAPERLESS_REMOTE_OCR_API_KEY")
+REMOTE_OCR_ENDPOINT = os.getenv("PAPERLESS_REMOTE_OCR_ENDPOINT")
+
+################################################################################
+# AI Settings                                                                  #
+################################################################################
+AI_ENABLED = __get_boolean("PAPERLESS_AI_ENABLED", "NO")
+LLM_EMBEDDING_BACKEND = os.getenv(
+    "PAPERLESS_AI_LLM_EMBEDDING_BACKEND",
+)  # "huggingface" or "openai"
+LLM_EMBEDDING_MODEL = os.getenv("PAPERLESS_AI_LLM_EMBEDDING_MODEL")
+LLM_BACKEND = os.getenv("PAPERLESS_AI_LLM_BACKEND")  # "ollama" or "openai"
+LLM_MODEL = os.getenv("PAPERLESS_AI_LLM_MODEL")
+LLM_API_KEY = os.getenv("PAPERLESS_AI_LLM_API_KEY")
+LLM_ENDPOINT = os.getenv("PAPERLESS_AI_LLM_ENDPOINT")

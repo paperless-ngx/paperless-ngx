@@ -126,7 +126,6 @@ def generate_filename(
     doc: Document,
     *,
     counter=0,
-    append_gpg=True,
     archive_filename=False,
 ) -> Path:
     base_path: Path | None = None
@@ -169,9 +168,5 @@ def generate_filename(
         # No template, use document ID
         final_filename = f"{doc.pk:07}{counter_str}{filetype_str}"
         full_path = Path(final_filename)
-
-    # Add GPG extension if needed
-    if append_gpg and doc.storage_type == doc.STORAGE_TYPE_GPG:
-        full_path = full_path.with_suffix(full_path.suffix + ".gpg")
 
     return full_path
