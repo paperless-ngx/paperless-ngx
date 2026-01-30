@@ -193,7 +193,7 @@ def annotate_document_count_for_related_queryset(
     queryset,
     through_model,
     source_field: str,
-    target_field: str,
+    target_field: str = "document_id",
     user=None,
 ):
     """

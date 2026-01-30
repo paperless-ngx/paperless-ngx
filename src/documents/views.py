@@ -375,7 +375,6 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
     document_count_relation = "documents"
     document_count_through = None  # set to relation model to enable through counting
     document_count_source_field = None
-    document_count_target_field = None
 
     def get_document_count_filter(self):
         request = getattr(self, "request", None)
@@ -392,7 +391,6 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
                 base_qs,
                 through_model=self.document_count_through,
                 source_field=self.document_count_source_field,
-                target_field=self.document_count_target_field,
                 user=user,
             )
 
@@ -445,7 +443,6 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
     model = Tag
     document_count_through = Document.tags.through
     document_count_source_field = "tag_id"
-    document_count_target_field = "document_id"
 
     queryset = Tag.objects.select_related("owner").order_by(
         Lower("name"),
@@ -494,9 +491,8 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
                     Tag.objects.filter(pk__in=descendant_pks | {t.pk for t in all_tags})
                     .select_related("owner")
                     .order_by(*ordering),
-                    through_model=Document.tags.through,
-                    source_field="tag_id",
-                    target_field="document_id",
+                    through_model=self.document_count_through,
+                    source_field=self.document_count_source_field,
                     user=user,
                 ),
             )
@@ -2900,7 +2896,6 @@ class CustomFieldViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
     model = CustomField
     document_count_through = CustomFieldInstance
     document_count_source_field = "field_id"
-    document_count_target_field = "document_id"
 
     queryset = CustomField.objects.all().order_by("-created")
 
