@@ -42,7 +42,7 @@ EXPORT_DIR = __get_path("PAPERLESS_EXPORT_DIR", BASE_DIR.parent / "export")
 
 def _parse_redis_url() -> str:
     """Parse Redis URL from environment with sensible defaults."""
-    return os.getenv("PAPERLESS_REDIS_URL", "redis://localhost:6379")
+    return os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")
 
 
 def _parse_db_settings() -> dict[str, dict[str, Any]]:
