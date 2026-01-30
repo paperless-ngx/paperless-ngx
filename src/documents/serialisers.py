@@ -40,6 +40,7 @@ from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
 from rest_framework import fields
 from rest_framework import serializers
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.fields import SerializerMethodField
 from rest_framework.filters import OrderingFilter
 
@@ -436,6 +437,19 @@ class OwnedObjectSerializer(
         return instance
 
     def update(self, instance, validated_data):
+        user = getattr(self, "user", None)
+        is_superuser = user.is_superuser if user is not None else False
+        is_owner = instance.owner == user if user is not None else False
+        is_unowned = instance.owner is None
+
+        if (
+            ("owner" in validated_data and validated_data["owner"] != instance.owner)
+            or "set_permissions" in validated_data
+        ) and not (is_superuser or is_owner or is_unowned):
+            raise PermissionDenied(
+                _("Insufficient permissions."),
+            )
+
         if "set_permissions" in validated_data:
             self._set_permissions(validated_data["set_permissions"], instance)
         self.validate_unique_together(validated_data, instance)

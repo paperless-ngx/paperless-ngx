@@ -441,6 +441,59 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.assertTrue(checker.has_perm("change_document", doc))
         self.assertIn("change_document", get_perms(group1, doc))
 
+    def test_document_permissions_change_requires_owner(self):
+        owner = User.objects.create_user(username="owner")
+        editor = User.objects.create_user(username="editor")
+        editor.user_permissions.add(
+            *Permission.objects.all(),
+        )
+
+        doc = Document.objects.create(
+            title="Ownered doc",
+            content="sensitive",
+            checksum="abc123",
+            mime_type="application/pdf",
+            owner=owner,
+        )
+
+        assign_perm("view_document", editor, doc)
+        assign_perm("change_document", editor, doc)
+
+        self.client.force_authenticate(editor)
+        response = self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            json.dumps(
+                {
+                    "set_permissions": {
+                        "view": {
+                            "users": [editor.id],
+                            "groups": [],
+                        },
+                        "change": {
+                            "users": None,
+                            "groups": None,
+                        },
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        self.client.force_authenticate(editor)
+        response = self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            json.dumps(
+                {
+                    "owner": editor.id,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_dynamic_permissions_fields(self):
         user1 = User.objects.create_user(username="user1")
         user1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
