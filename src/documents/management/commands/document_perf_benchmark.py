@@ -18,6 +18,7 @@ from django.db.models import Subquery
 from guardian.shortcuts import assign_perm
 from rest_framework.test import APIClient
 
+from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
@@ -91,6 +92,18 @@ class Command(BaseCommand):
             help="How many tags to attach to each document (default: 1)",
         )
         parser.add_argument(
+            "--correspondents",
+            type=int,
+            default=0,
+            help="Number of correspondents to create (default: 0)",
+        )
+        parser.add_argument(
+            "--correspondents-per-doc",
+            type=int,
+            default=1,
+            help="How many correspondents to attach to each document (default: 1)",
+        )
+        parser.add_argument(
             "--custom-fields",
             type=int,
             default=0,
@@ -142,6 +155,8 @@ class Command(BaseCommand):
         prefix = options["prefix"]
         tags = options["tags"]
         tags_per_doc = options["tags_per_doc"]
+        correspondents = options["correspondents"]
+        correspondents_per_doc = options["correspondents_per_doc"]
         custom_fields = options["custom_fields"]
         custom_fields_per_doc = options["custom_fields_per_doc"]
 
@@ -206,6 +221,20 @@ class Command(BaseCommand):
                         chunk_size=chunk_size,
                     )
 
+            created_correspondents = []
+            if correspondents:
+                correspondents = self._seed_correspondents(
+                    prefix=prefix,
+                    count=correspondents,
+                )
+                if correspondents_per_doc and created_correspondents:
+                    self._assign_correspondents_to_documents(
+                        prefix=prefix,
+                        correspondents=created_correspondents,
+                        correspondents_per_doc=correspondents_per_doc,
+                        chunk_size=chunk_size,
+                    )
+
             created_custom_fields = []
             if custom_fields:
                 created_custom_fields = self._seed_custom_fields(prefix, custom_fields)
@@ -223,6 +252,7 @@ class Command(BaseCommand):
                     f"Dataset ready: {dataset_size} docs | owned by target {created_counts['owned']} | "
                     f"owned by other {created_counts['other_owned']} | unowned {created_counts['unowned']} | "
                     f"shared-perms {created_counts['shared']} | tags {len(created_tags)} | "
+                    f"correspondents {len(created_correspondents)} | "
                     f"custom fields {len(created_custom_fields)}",
                 ),
             )
@@ -407,6 +437,53 @@ class Command(BaseCommand):
         if rels:
             through.objects.bulk_create(rels, ignore_conflicts=True)
 
+    def _seed_correspondents(self, prefix: str, count: int) -> list[Correspondent]:
+        correspondents = [
+            Correspondent(
+                name=f"{prefix}-corr-{idx:03d}",
+            )
+            for idx in range(count)
+        ]
+        Correspondent.objects.bulk_create(correspondents, ignore_conflicts=True)
+        return list(Correspondent.objects.filter(name__startswith=prefix))
+
+    def _assign_correspondents_to_documents(
+        self,
+        *,
+        prefix: str,
+        correspondents: list[Correspondent],
+        correspondents_per_doc: int,
+        chunk_size: int,
+    ):
+        if not correspondents:
+            return
+        updates = []
+        corr_ids = [c.id for c in correspondents]
+        corr_count = len(corr_ids)
+        iterator = (
+            Document.objects.filter(title__startswith=prefix)
+            .values_list(
+                "id",
+                flat=True,
+            )
+            .iterator()
+        )
+        for idx, doc_id in enumerate(iterator):
+            corr_id = corr_ids[idx % corr_count]
+            updates.append(
+                Document(
+                    id=doc_id,
+                    correspondent_id=corr_id,
+                ),
+            )
+            if len(updates) >= chunk_size:
+                Document.objects.bulk_update(
+                    updates,
+                    fields=["correspondent"],
+                    batch_size=chunk_size,
+                )
+                updates.clear()
+
     def _seed_custom_fields(self, prefix: str, count: int) -> list[CustomField]:
         fields = [
             CustomField(
@@ -478,6 +555,13 @@ class Command(BaseCommand):
                 username=user,
                 password=pwd,
                 path="/api/documents/",
+            )
+            self.stdout.write(f"-> API correspondents ({user})")
+            self._time_api_get(
+                label=f"{user} /api/correspondents/",
+                username=user,
+                password=pwd,
+                path="/api/correspondents/",
             )
             self.stdout.write(f"-> API tags ({user})")
             self._time_api_get(
