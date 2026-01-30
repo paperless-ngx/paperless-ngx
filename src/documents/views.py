@@ -371,22 +371,40 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
     Mixin to add document count to queryset, permissions-aware if needed
     """
 
+    # Default simple relation path. Override for through-table/count specialization.
+    document_count_relation = "documents"
+    document_count_through = None  # set to relation model to enable through counting
+    document_count_source_field = None
+    document_count_target_field = None
+
     def get_document_count_filter(self):
         request = getattr(self, "request", None)
         user = getattr(request, "user", None) if request else None
         return get_document_count_filter_for_user(user)
 
     def get_queryset(self):
+        base_qs = super().get_queryset()
+
+        # Use optimized through-table counting when configured.
+        if self.document_count_through:
+            user = getattr(getattr(self, "request", None), "user", None)
+            return annotate_document_count_for_related_queryset(
+                base_qs,
+                through_model=self.document_count_through,
+                source_field=self.document_count_source_field,
+                target_field=self.document_count_target_field,
+                user=user,
+            )
+
+        # Fallback: simple Count on relation with permission filter.
         filter = self.get_document_count_filter()
-        return (
-            super()
-            .get_queryset()
-            .annotate(document_count=Count("documents", filter=filter))
+        return base_qs.annotate(
+            document_count=Count(self.document_count_relation, filter=filter),
         )
 
 
 @extend_schema_view(**generate_object_with_permissions_schema(CorrespondentSerializer))
-class CorrespondentViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
+class CorrespondentViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
     model = Correspondent
 
     queryset = Correspondent.objects.select_related("owner").order_by(Lower("name"))
@@ -423,32 +441,15 @@ class CorrespondentViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
 
 @extend_schema_view(**generate_object_with_permissions_schema(TagSerializer))
-class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
+class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
     model = Tag
+    document_count_through = Document.tags.through
+    document_count_source_field = "tag_id"
+    document_count_target_field = "document_id"
 
     queryset = Tag.objects.select_related("owner").order_by(
         Lower("name"),
     )
-
-    def _with_document_counts(self, queryset):
-        """
-        Annotate tags with a permissions-aware document_count using only the
-        through table plus a compact subquery of permitted document IDs. This
-        keeps PostgreSQL from evaluating large OR clauses against the documents
-        table for every tag.
-        """
-
-        user = getattr(self.request, "user", None)
-        return annotate_document_count_for_related_queryset(
-            queryset,
-            through_model=Document.tags.through,
-            source_field="tag_id",
-            target_field="document_id",
-            user=user,
-        )
-
-    def get_queryset(self):
-        return self._with_document_counts(self.queryset.all())
 
     def get_serializer_class(self, *args, **kwargs):
         if int(self.request.version) == 1:
@@ -487,11 +488,16 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         descendant_pks = {pk for tag in all_tags for pk in tag.get_descendants_pks()}
 
         if descendant_pks:
+            user = getattr(getattr(self, "request", None), "user", None)
             children_source = list(
-                self._with_document_counts(
+                annotate_document_count_for_related_queryset(
                     Tag.objects.filter(pk__in=descendant_pks | {t.pk for t in all_tags})
                     .select_related("owner")
                     .order_by(*ordering),
+                    through_model=Document.tags.through,
+                    source_field="tag_id",
+                    target_field="document_id",
+                    user=user,
                 ),
             )
         else:
@@ -519,7 +525,7 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
 
 @extend_schema_view(**generate_object_with_permissions_schema(DocumentTypeSerializer))
-class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
+class DocumentTypeViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
     model = DocumentType
 
     queryset = DocumentType.objects.select_related("owner").order_by(Lower("name"))
@@ -2363,7 +2369,7 @@ class BulkDownloadView(GenericAPIView):
 
 
 @extend_schema_view(**generate_object_with_permissions_schema(StoragePathSerializer))
-class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
+class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
     model = StoragePath
 
     queryset = StoragePath.objects.select_related("owner").order_by(
@@ -2880,7 +2886,7 @@ class WorkflowViewSet(ModelViewSet):
     )
 
 
-class CustomFieldViewSet(ModelViewSet):
+class CustomFieldViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
 
     serializer_class = CustomFieldSerializer
@@ -2892,29 +2898,11 @@ class CustomFieldViewSet(ModelViewSet):
     filterset_class = CustomFieldFilterSet
 
     model = CustomField
+    document_count_through = CustomFieldInstance
+    document_count_source_field = "field_id"
+    document_count_target_field = "document_id"
 
     queryset = CustomField.objects.all().order_by("-created")
-
-    def _with_document_counts(self, queryset):
-        """
-        Annotate custom fields with permissions-aware document_count by
-        counting CustomFieldInstance rows whose document is viewable by the
-        current user. Uses a correlated subquery to avoid large joins that
-        previously caused timeouts on big datasets.
-        """
-
-        user = getattr(self.request, "user", None)
-        return annotate_document_count_for_related_queryset(
-            queryset,
-            through_model=CustomFieldInstance,
-            source_field="field_id",
-            target_field="document_id",
-            user=user,
-        )
-
-    def get_queryset(self):
-        base_qs = super().get_queryset()
-        return self._with_document_counts(base_qs)
 
 
 @extend_schema_view(
