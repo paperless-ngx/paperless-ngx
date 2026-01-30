@@ -371,9 +371,8 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
     Mixin to add document count to queryset, permissions-aware if needed
     """
 
-    # Default simple relation path. Override for through-table/count specialization.
-    document_count_relation = "documents"
-    document_count_through = None  # set to relation model to enable through counting
+    # Default is simple relation path, override for through-table/count specialization.
+    document_count_through = None
     document_count_source_field = None
 
     def get_document_count_filter(self):
@@ -397,7 +396,7 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
         # Fallback: simple Count on relation with permission filter.
         filter = self.get_document_count_filter()
         return base_qs.annotate(
-            document_count=Count(self.document_count_relation, filter=filter),
+            document_count=Count("documents", filter=filter),
         )
 
 
