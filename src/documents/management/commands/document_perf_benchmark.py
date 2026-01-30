@@ -8,13 +8,17 @@ from time import perf_counter
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
 from django.db import connections
 from django.db import reset_queries
 from django.db.models import Count
+from django.db.models import IntegerField
 from django.db.models import Q
 from django.db.models import Subquery
+from django.db.models.functions import Cast
+from guardian.models import UserObjectPermission
 from guardian.shortcuts import assign_perm
 from rest_framework.test import APIClient
 
@@ -28,7 +32,7 @@ from documents.permissions import get_objects_for_user_owner_aware
 
 class Command(BaseCommand):
     # e.g. docker compose exec webserver / manage.py ...
-    # document_perf_benchmark --reuse-existing --documents 500000 --chunk-size 5000 --tags 40 --tags-per-doc 3 --custom-fields 6 --custom-fields-per-doc 2
+    # document_perf_benchmark --reuse-existing --documents 500000 --chunk-size 5000 --tags 40 --tags-per-doc 3 --correspondents 10 --correspondents-per-doc 1 --custom-fields 6 --custom-fields-per-doc 2
     help = (
         "Seed a synthetic dataset and benchmark permission-filtered document queries "
         "for superusers vs non-superusers."
@@ -188,12 +192,39 @@ class Command(BaseCommand):
                 )
 
         if skip_seed:
-            dataset_size = Document.objects.filter(title__startswith=prefix).count()
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f"Dataset ready (reused): {dataset_size} docs | prefix={prefix}",
-                ),
-            )
+            tags_dataset_size = Tag.objects.filter(name__startswith=prefix).count()
+            correspondents_dataset_size = Correspondent.objects.filter(
+                name__startswith=prefix,
+            ).count()
+            cfs_dataset_size = CustomField.objects.filter(
+                name__startswith=prefix,
+            ).count()
+            created_counts = {
+                "owned": Document.objects.filter(
+                    title__startswith=prefix,
+                    owner=target_user,
+                ).count(),
+                "other_owned": Document.objects.filter(
+                    title__startswith=prefix,
+                    owner=other_user,
+                ).count(),
+                "unowned": Document.objects.filter(
+                    title__startswith=prefix,
+                    owner__isnull=True,
+                ).count(),
+                "shared": Document.objects.filter(
+                    title__startswith=prefix,
+                    owner=other_user,
+                    id__in=UserObjectPermission.objects.filter(
+                        user=target_user,
+                        content_type=ContentType.objects.get_for_model(Document),
+                        permission__codename="view_document",
+                    )
+                    .annotate(object_pk_int=Cast("object_pk", IntegerField()))
+                    .values_list("object_pk_int", flat=True),
+                ).count(),
+            }
+
         else:
             self.stdout.write(
                 f"Seeding {document_total} documents (owner_ratio={owner_ratio}, "
@@ -220,6 +251,7 @@ class Command(BaseCommand):
                         tags_per_doc=tags_per_doc,
                         chunk_size=chunk_size,
                     )
+            tags_dataset_size = len(created_tags)
 
             created_correspondents = []
             if correspondents:
@@ -234,6 +266,7 @@ class Command(BaseCommand):
                         correspondents_per_doc=correspondents_per_doc,
                         chunk_size=chunk_size,
                     )
+            correspondents_dataset_size = len(created_correspondents)
 
             created_custom_fields = []
             if custom_fields:
@@ -245,17 +278,18 @@ class Command(BaseCommand):
                         per_doc=custom_fields_per_doc,
                         chunk_size=chunk_size,
                     )
+            cfs_dataset_size = len(created_custom_fields)
 
-            dataset_size = Document.objects.filter(title__startswith=prefix).count()
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f"Dataset ready: {dataset_size} docs | owned by target {created_counts['owned']} | "
-                    f"owned by other {created_counts['other_owned']} | unowned {created_counts['unowned']} | "
-                    f"shared-perms {created_counts['shared']} | tags {len(created_tags)} | "
-                    f"correspondents {len(created_correspondents)} | "
-                    f"custom fields {len(created_custom_fields)}",
-                ),
-            )
+        docs_dataset_size = Document.objects.filter(title__startswith=prefix).count()
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Dataset ready: {docs_dataset_size} docs | owned by target {created_counts['owned']} | "
+                f"owned by other {created_counts['other_owned']} | unowned {created_counts['unowned']} | "
+                f"shared-perms {created_counts['shared']} | tags {tags_dataset_size} | "
+                f"correspondents {correspondents_dataset_size} | "
+                f"custom fields {cfs_dataset_size}",
+            ),
+        )
 
         self.stdout.write("\nRunning benchmarks...\n")
         self._run_benchmarks(
