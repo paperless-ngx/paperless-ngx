@@ -699,6 +699,9 @@ class StoragePathField(serializers.PrimaryKeyRelatedField):
 
 class CustomFieldSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
+        # Ignore args passed by permissions mixin
+        kwargs.pop("user", None)
+        kwargs.pop("full_perms", None)
         context = kwargs.get("context")
         self.api_version = int(
             context.get("request").version
