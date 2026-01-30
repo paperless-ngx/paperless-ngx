@@ -176,7 +176,7 @@ def _permitted_document_ids(user):
     ).values_list("id", flat=True)
 
 
-def get_document_count_filter_for_user(user, *, relation_prefix: str = "documents"):
+def get_document_count_filter_for_user(user):
     """
     Return the Q object used to filter document counts for the given user.
 
@@ -184,9 +184,12 @@ def get_document_count_filter_for_user(user, *, relation_prefix: str = "document
     document IDs to keep the generated SQL simple and avoid large OR clauses.
     """
 
-    id_key = f"{relation_prefix}__id__in"
+    if getattr(user, "is_superuser", False):
+        # Superuser: no permission filtering needed
+        return Q(documents__deleted_at__isnull=True)
+
     permitted_ids = _permitted_document_ids(user)
-    return Q(**{id_key: permitted_ids})
+    return Q(documents__id__in=permitted_ids)
 
 
 def annotate_document_count_for_related_queryset(
