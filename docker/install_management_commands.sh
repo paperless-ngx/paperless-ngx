@@ -19,8 +19,7 @@ for command in decrypt_documents \
 	manage_superuser \
 	convert_mariadb_uuid \
 	prune_audit_logs \
-	createsuperuser \
-	document_perf_benchmark;
+	createsuperuser;
 do
 	echo "installing $command..."
 	sed "s/management_command/$command/g" management_script.sh >"$PWD/rootfs/usr/local/bin/$command"
