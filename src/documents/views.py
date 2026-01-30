@@ -32,7 +32,6 @@ from django.db.models import Count
 from django.db.models import IntegerField
 from django.db.models import Max
 from django.db.models import Model
-from django.db.models import Q
 from django.db.models import Sum
 from django.db.models import When
 from django.db.models.functions import Length
@@ -128,6 +127,7 @@ from documents.matching import match_storage_paths
 from documents.matching import match_tags
 from documents.models import Correspondent
 from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
@@ -147,6 +147,7 @@ from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessNotePermissions
 from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import ViewDocumentsPermissions
+from documents.permissions import annotate_document_count_for_related_queryset
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
@@ -429,6 +430,26 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         Lower("name"),
     )
 
+    def _with_document_counts(self, queryset):
+        """
+        Annotate tags with a permissions-aware document_count using only the
+        through table plus a compact subquery of permitted document IDs. This
+        keeps PostgreSQL from evaluating large OR clauses against the documents
+        table for every tag.
+        """
+
+        user = getattr(self.request, "user", None)
+        return annotate_document_count_for_related_queryset(
+            queryset,
+            through_model=Document.tags.through,
+            source_field="tag_id",
+            target_field="document_id",
+            user=user,
+        )
+
+    def get_queryset(self):
+        return self._with_document_counts(self.queryset.all())
+
     def get_serializer_class(self, *args, **kwargs):
         if int(self.request.version) == 1:
             return TagSerializerVersion1
@@ -466,12 +487,12 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         descendant_pks = {pk for tag in all_tags for pk in tag.get_descendants_pks()}
 
         if descendant_pks:
-            filter_q = self.get_document_count_filter()
             children_source = list(
-                Tag.objects.filter(pk__in=descendant_pks | {t.pk for t in all_tags})
-                .select_related("owner")
-                .annotate(document_count=Count("documents", filter=filter_q))
-                .order_by(*ordering),
+                self._with_document_counts(
+                    Tag.objects.filter(pk__in=descendant_pks | {t.pk for t in all_tags})
+                    .select_related("owner")
+                    .order_by(*ordering),
+                ),
             )
         else:
             children_source = all_tags
@@ -2874,31 +2895,26 @@ class CustomFieldViewSet(ModelViewSet):
 
     queryset = CustomField.objects.all().order_by("-created")
 
+    def _with_document_counts(self, queryset):
+        """
+        Annotate custom fields with permissions-aware document_count by
+        counting CustomFieldInstance rows whose document is viewable by the
+        current user. Uses a correlated subquery to avoid large joins that
+        previously caused timeouts on big datasets.
+        """
+
+        user = getattr(self.request, "user", None)
+        return annotate_document_count_for_related_queryset(
+            queryset,
+            through_model=CustomFieldInstance,
+            source_field="field_id",
+            target_field="document_id",
+            user=user,
+        )
+
     def get_queryset(self):
-        filter = (
-            Q(fields__document__deleted_at__isnull=True)
-            if self.request.user is None or self.request.user.is_superuser
-            else (
-                Q(
-                    fields__document__deleted_at__isnull=True,
-                    fields__document__id__in=get_objects_for_user_owner_aware(
-                        self.request.user,
-                        "documents.view_document",
-                        Document,
-                    ).values_list("id", flat=True),
-                )
-            )
-        )
-        return (
-            super()
-            .get_queryset()
-            .annotate(
-                document_count=Count(
-                    "fields",
-                    filter=filter,
-                ),
-            )
-        )
+        base_qs = super().get_queryset()
+        return self._with_document_counts(base_qs)
 
 
 @extend_schema_view(

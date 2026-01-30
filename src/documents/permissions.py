@@ -2,10 +2,17 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Count
+from django.db.models import IntegerField
+from django.db.models import OuterRef
 from django.db.models import Q
 from django.db.models import QuerySet
+from django.db.models import Subquery
+from django.db.models.functions import Cast
+from django.db.models.functions import Coalesce
 from guardian.core import ObjectPermissionChecker
 from guardian.models import GroupObjectPermission
+from guardian.models import UserObjectPermission
 from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_objects_for_user
 from guardian.shortcuts import get_users_with_perms
@@ -129,23 +136,89 @@ def set_permissions_for_object(permissions: dict, object, *, merge: bool = False
                         )
 
 
-def get_document_count_filter_for_user(user):
+def _permitted_document_ids(user):
     """
-    Return the Q object used to filter document counts for the given user.
+    Return a queryset of document IDs the user may view, limited to non-deleted
+    documents. This intentionally avoids ``get_objects_for_user`` to keep the
+    subquery small and index-friendly.
     """
 
+    base_docs = Document.objects.filter(deleted_at__isnull=True)
+
     if user is None or not getattr(user, "is_authenticated", False):
-        return Q(documents__deleted_at__isnull=True, documents__owner__isnull=True)
+        return base_docs.filter(owner__isnull=True).values_list("id", flat=True)
+
     if getattr(user, "is_superuser", False):
-        return Q(documents__deleted_at__isnull=True)
-    return Q(
-        documents__deleted_at__isnull=True,
-        documents__id__in=get_objects_for_user_owner_aware(
-            user,
-            "documents.view_document",
-            Document,
-        ).values_list("id", flat=True),
+        return base_docs.values_list("id", flat=True)
+
+    document_ct = ContentType.objects.get_for_model(Document)
+    perm_filter = {
+        "permission__codename": "view_document",
+        "permission__content_type": document_ct,
+    }
+
+    user_perm_docs = (
+        UserObjectPermission.objects.filter(user=user, **perm_filter)
+        .annotate(object_pk_int=Cast("object_pk", IntegerField()))
+        .values_list("object_pk_int", flat=True)
     )
+
+    group_perm_docs = (
+        GroupObjectPermission.objects.filter(group__user=user, **perm_filter)
+        .annotate(object_pk_int=Cast("object_pk", IntegerField()))
+        .values_list("object_pk_int", flat=True)
+    )
+
+    permitted_documents = user_perm_docs.union(group_perm_docs)
+
+    return base_docs.filter(
+        Q(owner=user) | Q(owner__isnull=True) | Q(id__in=permitted_documents),
+    ).values_list("id", flat=True)
+
+
+def get_document_count_filter_for_user(user, *, relation_prefix: str = "documents"):
+    """
+    Return the Q object used to filter document counts for the given user.
+
+    The filter is expressed as an ``id__in`` against a small subquery of permitted
+    document IDs to keep the generated SQL simple and avoid large OR clauses.
+    """
+
+    id_key = f"{relation_prefix}__id__in"
+    permitted_ids = _permitted_document_ids(user)
+    return Q(**{id_key: permitted_ids})
+
+
+def annotate_document_count_for_related_queryset(
+    queryset,
+    through_model,
+    source_field: str,
+    target_field: str,
+    user=None,
+):
+    """
+    Annotate a queryset with permissions-aware document counts using a subquery
+    against a relation table.
+
+    Args:
+        queryset: base queryset to annotate (must contain pk)
+        through_model: model representing the relation (e.g., Document.tags.through
+                       or CustomFieldInstance)
+        source_field: field on the relation pointing back to queryset pk
+        target_field: field on the relation pointing to Document id
+        user: the user for whom to filter permitted document ids
+    """
+
+    permitted_ids = _permitted_document_ids(user)
+    counts = (
+        through_model.objects.filter(
+            **{source_field: OuterRef("pk"), f"{target_field}__in": permitted_ids},
+        )
+        .values(source_field)
+        .annotate(c=Count(target_field))
+        .values("c")
+    )
+    return queryset.annotate(document_count=Coalesce(Subquery(counts[:1]), 0))
 
 
 def get_objects_for_user_owner_aware(user, perms, Model) -> QuerySet:
