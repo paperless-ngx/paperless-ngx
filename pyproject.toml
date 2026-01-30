@@ -283,6 +283,7 @@ omit = [
   "manage.py",
   "paperless/wsgi.py",
   "paperless/auth.py",
+  "src/documents/management/commands/document_perf_benchmark.py",
 ]
 
 [tool.coverage.report]
