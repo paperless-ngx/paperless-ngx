@@ -1,11 +1,9 @@
+import {
+  CdkVirtualScrollViewport,
+  ScrollingModule,
+} from '@angular/cdk/scrolling'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
 import {
   Component,
   Directive,
@@ -15,7 +13,12 @@ import {
   ViewContainerRef,
   forwardRef,
 } from '@angular/core'
-import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling'
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { NEGATIVE_NULL_FILTER_VALUE } from 'src/app/data/filter-rule-type'
 import {
@@ -125,10 +128,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       .overrideComponent(FilterableDropdownComponent, {
         remove: { imports: [ScrollingModule] },
         add: {
-          imports: [
-            MockCdkVirtualScrollViewportComponent,
-            MockCdkVirtualForOf,
-          ],
+          imports: [MockCdkVirtualScrollViewportComponent, MockCdkVirtualForOf],
         },
       })
       .compileComponents()

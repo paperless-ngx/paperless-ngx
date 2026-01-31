@@ -1,6 +1,11 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing'
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing'
 import {
   FormsModule,
   NG_VALUE_ACCESSOR,
@@ -240,7 +245,9 @@ describe('TagsComponent', () => {
 
   it('should handle error when loading tags', fakeAsync(() => {
     const tagService = TestBed.inject(TagService)
-    jest.spyOn(tagService, 'listFiltered').mockReturnValue(throwError(() => new Error('error')))
+    jest
+      .spyOn(tagService, 'listFiltered')
+      .mockReturnValue(throwError(() => new Error('error')))
     component.tagInput$.next('test')
     tick(200)
     expect(component.tagsLoading).toBeFalsy()

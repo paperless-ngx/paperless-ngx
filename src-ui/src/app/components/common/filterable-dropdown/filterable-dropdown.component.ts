@@ -1,4 +1,7 @@
-import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling'
+import {
+  CdkVirtualScrollViewport,
+  ScrollingModule,
+} from '@angular/cdk/scrolling'
 import { NgClass } from '@angular/common'
 import {
   Component,
