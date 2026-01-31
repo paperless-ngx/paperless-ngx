@@ -1307,6 +1307,7 @@ describe('FilterEditorComponent', () => {
       By.directive(FilterableDropdownComponent)
     )[0]
     tagsFilterableDropdown.triggerEventHandler('opened')
+    fixture.detectChanges()
     const tagButton = tagsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )[0]
@@ -1325,6 +1326,7 @@ describe('FilterEditorComponent', () => {
       By.directive(FilterableDropdownComponent)
     )[0] // Tags dropdown
     tagsFilterableDropdown.triggerEventHandler('opened')
+    fixture.detectChanges()
     const tagButtons = tagsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )
@@ -1376,6 +1378,7 @@ describe('FilterEditorComponent', () => {
       By.directive(FilterableDropdownComponent)
     )[1] // Corresp dropdown
     correspondentsFilterableDropdown.triggerEventHandler('opened')
+    fixture.detectChanges()
     const correspondentButtons = correspondentsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )
@@ -1415,6 +1418,7 @@ describe('FilterEditorComponent', () => {
       By.directive(FilterableDropdownComponent)
     )[1]
     correspondentsFilterableDropdown.triggerEventHandler('opened')
+    fixture.detectChanges()
     const notAssignedButton = correspondentsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )[0]
@@ -1446,6 +1450,7 @@ describe('FilterEditorComponent', () => {
       By.directive(FilterableDropdownComponent)
     )[2] // DocType dropdown
     documentTypesFilterableDropdown.triggerEventHandler('opened')
+    fixture.detectChanges()
     const documentTypeButtons = documentTypesFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )
@@ -1485,6 +1490,7 @@ describe('FilterEditorComponent', () => {
       By.directive(FilterableDropdownComponent)
     )[2]
     docTypesFilterableDropdown.triggerEventHandler('opened')
+    fixture.detectChanges()
     const notAssignedButton = docTypesFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )[0]
@@ -1516,6 +1522,7 @@ describe('FilterEditorComponent', () => {
       By.directive(FilterableDropdownComponent)
     )[3] // StoragePath dropdown
     storagePathFilterableDropdown.triggerEventHandler('opened')
+    fixture.detectChanges()
     const storagePathButtons = storagePathFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )
@@ -1555,6 +1562,7 @@ describe('FilterEditorComponent', () => {
       By.directive(FilterableDropdownComponent)
     )[3]
     storagePathsFilterableDropdown.triggerEventHandler('opened')
+    fixture.detectChanges()
     const notAssignedButton = storagePathsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )[0]

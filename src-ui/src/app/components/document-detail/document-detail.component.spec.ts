@@ -166,6 +166,17 @@ describe('DocumentDetailComponent', () => {
                   text_color: '#000000',
                 }))
               ),
+            getFew: (ids: number[]) =>
+              of({
+                results: ids.map((id) => ({
+                  id,
+                  name: `Tag${id}`,
+                  is_inbox_tag: true,
+                  color: '#ff0000',
+                  text_color: '#000000',
+                })),
+              }),
+            listFiltered: () => of({ results: [] }),
             listAll: () =>
               of({
                 count: 3,

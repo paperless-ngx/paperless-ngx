@@ -1,3 +1,4 @@
+import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling'
 import { NgClass } from '@angular/common'
 import {
   Component,
@@ -627,6 +628,7 @@ export class FilterableDropdownSelectionModel {
     NgxBootstrapIconsModule,
     NgbDropdownModule,
     NgClass,
+    ScrollingModule,
   ],
 })
 export class FilterableDropdownComponent
@@ -638,7 +640,7 @@ export class FilterableDropdownComponent
 
   @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
   @ViewChild('dropdown') dropdown: NgbDropdown
-  @ViewChild('buttonItems') buttonItems: ElementRef
+  @ViewChild('buttonItems') buttonItems: CdkVirtualScrollViewport
 
   public popperOptions = pngxPopperOptions
 
@@ -904,9 +906,19 @@ export class FilterableDropdownComponent
   }
 
   setButtonItemFocus() {
-    this.buttonItems.nativeElement.children[
-      this.keyboardIndex
-    ]?.children[0].focus()
+    this.buttonItems.scrollToIndex(this.keyboardIndex)
+    setTimeout(() => {
+      const element =
+        this.buttonItems.elementRef.nativeElement.querySelectorAll(
+          'pngx-toggleable-dropdown-button button'
+        )
+      // The button we want is the one corresponding to the index in the rendered range.
+      // CdkVirtualScrollViewport handles the offset.
+      const renderedRange = this.buttonItems.getRenderedRange()
+      const relativeIndex = this.keyboardIndex - renderedRange.start
+      const button = element[relativeIndex] as HTMLElement
+      button?.focus()
+    })
   }
 
   setButtonItemIndex(index: number) {
@@ -921,6 +933,10 @@ export class FilterableDropdownComponent
       this.manyToOne &&
       this.selectionModel.get(item.id) !== ToggleableItemState.Selected
     )
+  }
+
+  trackByItem(index: number, item: MatchingModel): any {
+    return item.id
   }
 
   extraButtonClicked() {

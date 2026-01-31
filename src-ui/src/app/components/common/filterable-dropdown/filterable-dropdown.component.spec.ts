@@ -6,6 +6,16 @@ import {
   fakeAsync,
   tick,
 } from '@angular/core/testing'
+import {
+  Component,
+  Directive,
+  ElementRef,
+  Input,
+  TemplateRef,
+  ViewContainerRef,
+  forwardRef,
+} from '@angular/core'
+import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { NEGATIVE_NULL_FILTER_VALUE } from 'src/app/data/filter-rule-type'
 import {
@@ -23,6 +33,52 @@ import {
   LogicalOperator,
 } from './filterable-dropdown.component'
 import { ToggleableItemState } from './toggleable-dropdown-button/toggleable-dropdown-button.component'
+
+@Component({
+  selector: 'cdk-virtual-scroll-viewport',
+  template: '<ng-content></ng-content>',
+  standalone: true,
+  providers: [
+    {
+      provide: CdkVirtualScrollViewport,
+      useExisting: forwardRef(() => MockCdkVirtualScrollViewportComponent),
+    },
+  ],
+})
+class MockCdkVirtualScrollViewportComponent {
+  constructor(public elementRef: ElementRef) {}
+
+  scrollToIndex(index: number) {}
+  getRenderedRange() {
+    return { start: 0, end: 100 }
+  }
+  checkViewportSize() {}
+}
+
+@Directive({
+  selector: '[cdkVirtualFor][cdkVirtualForOf]',
+  standalone: true,
+})
+class MockCdkVirtualForOf<T> {
+  constructor(
+    private viewContainer: ViewContainerRef,
+    private template: TemplateRef<any>
+  ) {}
+
+  @Input() cdkVirtualForTrackBy: any
+
+  @Input() set cdkVirtualForOf(collection: T[]) {
+    this.viewContainer.clear()
+    if (collection) {
+      collection.forEach((item, index) => {
+        this.viewContainer.createEmbeddedView(this.template, {
+          $implicit: item,
+          index,
+        })
+      })
+    }
+  }
+}
 
 const items: Tag[] = [
   {
@@ -65,7 +121,17 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
         provideHttpClientTesting(),
       ],
       imports: [NgxBootstrapIconsModule.pick(allIcons)],
-    }).compileComponents()
+    })
+      .overrideComponent(FilterableDropdownComponent, {
+        remove: { imports: [ScrollingModule] },
+        add: {
+          imports: [
+            MockCdkVirtualScrollViewportComponent,
+            MockCdkVirtualForOf,
+          ],
+        },
+      })
+      .compileComponents()
 
     hotkeyService = TestBed.inject(HotKeyService)
     fixture = TestBed.createComponent(FilterableDropdownComponent)
@@ -340,18 +406,22 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     filterInputEl.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
     )
+    tick()
     expect(document.activeElement).toEqual(itemButtons[0])
     itemButtons[0].dispatchEvent(
       new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
     )
+    tick()
     expect(document.activeElement).toEqual(itemButtons[1])
     itemButtons[1].dispatchEvent(
       new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true })
     )
+    tick()
     expect(document.activeElement).toEqual(itemButtons[0])
     itemButtons[0].dispatchEvent(
       new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true })
     )
+    tick()
     expect(document.activeElement).toEqual(filterInputEl)
     filterInputEl.value = 'foo'
     component.filterText = 'foo'
@@ -365,6 +435,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     filterInputEl.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
     )
+    tick()
     expect(document.activeElement).toEqual(itemButtons[0])
   }))
 
@@ -401,6 +472,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     itemButtons[0].dispatchEvent(
       new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
     )
+    tick()
     expect(document.activeElement).toEqual(itemButtons[1])
   }))
 
@@ -426,6 +498,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     itemButtons[0].dispatchEvent(
       new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
     )
+    tick()
     expect(document.activeElement).toEqual(itemButtons[1])
   }))
 

@@ -18,7 +18,7 @@ import { RouterModule } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { first, firstValueFrom, tap } from 'rxjs'
+import { Subject, catchError, debounceTime, distinctUntilChanged, first, firstValueFrom, of, switchMap, tap } from 'rxjs'
 import { Tag } from 'src/app/data/tag'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { EditDialogMode } from '../../edit-dialog/edit-dialog.component'
@@ -59,6 +59,16 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
   writeValue(newValue: number[]): void {
     this.value = newValue
+    // Ensure selected tags are loaded so they display correctly
+    if (this.value && this.value.length > 0) {
+      this.tagService.getFew(this.value).subscribe(result => {
+        // Merge these into the existing tags list if they aren't there
+        const newTags = result.results.filter(t => !this.tags.find(existing => existing.id === t.id))
+        if (newTags.length > 0) {
+          this.tags = [...this.tags, ...newTags]
+        }
+      })
+    }
   }
   registerOnChange(fn: any): void {
     this.onChange = fn
@@ -70,11 +80,35 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     this.disabled = isDisabled
   }
 
+  tagInput$ = new Subject<string>()
+  tagsLoading = false
+
   ngOnInit(): void {
-    this.tagService.listAll().subscribe((result) => {
-      this.tags = result.results
-    })
+    this.loadTags();
   }
+
+  loadTags() {
+    this.tagInput$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      tap(() => this.tagsLoading = true),
+      switchMap(term => {
+        return this.tagService.listFiltered(1, 50, 'name', false, term).pipe(
+          catchError(() => of({ results: [] })),
+          tap(() => this.tagsLoading = false)
+        )
+      })
+    ).subscribe(result => {
+      this.tags = result.results
+      // If we have selected values, ensure they aren't lost from the dropdown list visuals
+      // (Though ng-select usually handles this if we provide the object, here we only have IDs in this.value)
+      // For now, we rely on writeValue's getFew to populate the initial selection.
+    })
+
+    // Trigger initial load
+    this.tagInput$.next('');
+  }
+
 
   @Input()
   title = $localize`Tags`
@@ -175,10 +209,9 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
       (modal.componentInstance as TagEditDialogComponent).succeeded.pipe(
         first(),
         tap((newTag) => {
-          this.tagService.listAll().subscribe((tags) => {
-            this.tags = tags.results
-            add && this.addTag(newTag.id)
-          })
+           // On create, we just add the new tag to our local list so it can be selected
+           this.tags = [...this.tags, newTag];
+           add && this.addTag(newTag.id)
         })
       )
     )
