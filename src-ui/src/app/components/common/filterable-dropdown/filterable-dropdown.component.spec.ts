@@ -53,11 +53,15 @@ import { ToggleableItemState } from './toggleable-dropdown-button/toggleable-dro
 class MockCdkVirtualScrollViewportComponent {
   public elementRef = inject(ElementRef)
 
-  scrollToIndex(index: number) {}
+  scrollToIndex(index: number) {
+    // mock
+  }
   getRenderedRange() {
     return { start: 0, end: 100 }
   }
-  checkViewportSize() {}
+  checkViewportSize() {
+    // mock
+  }
 }
 
 @Directive({
