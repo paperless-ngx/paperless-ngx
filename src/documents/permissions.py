@@ -143,10 +143,7 @@ def _permitted_document_ids(user):
     subquery small and index-friendly.
     """
 
-    base_docs = Document.objects.filter(deleted_at__isnull=True)
-
-    if user is None or not getattr(user, "is_authenticated", False):
-        return base_docs.filter(owner__isnull=True).values_list("id", flat=True)
+    base_docs = Document.objects.filter(deleted_at__isnull=True).only("id", "owner")
 
     if getattr(user, "is_superuser", False):
         return base_docs.values_list("id", flat=True)
