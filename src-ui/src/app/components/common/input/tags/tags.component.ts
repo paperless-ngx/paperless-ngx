@@ -74,7 +74,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
       this.tagService.getFew(this.value).subscribe((result) => {
         // Merge these into the existing tags list if they aren't there
         const newTags = result.results.filter(
-          (t) => !this.tags.find((existing) => existing.id === t.id)
+          (t) => !this.tags.some((existing) => existing.id === t.id)
         )
         if (newTags.length > 0) {
           this.tags = [...this.tags, ...newTags]

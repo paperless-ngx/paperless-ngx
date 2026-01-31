@@ -69,8 +69,8 @@ class MockCdkVirtualScrollViewportComponent {
   standalone: true,
 })
 class MockCdkVirtualForOf<T> {
-  private viewContainer = inject(ViewContainerRef)
-  private template = inject(TemplateRef<any>)
+  private readonly viewContainer = inject(ViewContainerRef)
+  private readonly template = inject(TemplateRef<any>)
 
   @Input() cdkVirtualForTrackBy: any
 
