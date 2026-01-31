@@ -40,6 +40,7 @@ from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
 from rest_framework import fields
 from rest_framework import serializers
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.fields import SerializerMethodField
 from rest_framework.filters import OrderingFilter
 
@@ -436,6 +437,19 @@ class OwnedObjectSerializer(
         return instance
 
     def update(self, instance, validated_data):
+        user = getattr(self, "user", None)
+        is_superuser = user.is_superuser if user is not None else False
+        is_owner = instance.owner == user if user is not None else False
+        is_unowned = instance.owner is None
+
+        if (
+            ("owner" in validated_data and validated_data["owner"] != instance.owner)
+            or "set_permissions" in validated_data
+        ) and not (is_superuser or is_owner or is_unowned):
+            raise PermissionDenied(
+                _("Insufficient permissions."),
+            )
+
         if "set_permissions" in validated_data:
             self._set_permissions(validated_data["set_permissions"], instance)
         self.validate_unique_together(validated_data, instance)
@@ -580,30 +594,34 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         ),
     )
     def get_children(self, obj):
-        filter_q = self.context.get("document_count_filter")
-        request = self.context.get("request")
-        if filter_q is None:
-            user = getattr(request, "user", None) if request else None
-            filter_q = get_document_count_filter_for_user(user)
-            self.context["document_count_filter"] = filter_q
+        children_map = self.context.get("children_map")
+        if children_map is not None:
+            children = children_map.get(obj.pk, [])
+        else:
+            filter_q = self.context.get("document_count_filter")
+            request = self.context.get("request")
+            if filter_q is None:
+                user = getattr(request, "user", None) if request else None
+                filter_q = get_document_count_filter_for_user(user)
+                self.context["document_count_filter"] = filter_q
 
-        children_queryset = (
-            obj.get_children_queryset()
-            .select_related("owner")
-            .annotate(document_count=Count("documents", filter=filter_q))
-        )
+            children = (
+                obj.get_children_queryset()
+                .select_related("owner")
+                .annotate(document_count=Count("documents", filter=filter_q))
+            )
 
-        view = self.context.get("view")
-        ordering = (
-            OrderingFilter().get_ordering(request, children_queryset, view)
-            if request and view
-            else None
-        )
-        ordering = ordering or (Lower("name"),)
-        children_queryset = children_queryset.order_by(*ordering)
+            view = self.context.get("view")
+            ordering = (
+                OrderingFilter().get_ordering(request, children, view)
+                if request and view
+                else None
+            )
+            ordering = ordering or (Lower("name"),)
+            children = children.order_by(*ordering)
 
         serializer = TagSerializer(
-            children_queryset,
+            children,
             many=True,
             user=self.user,
             full_perms=self.full_perms,
