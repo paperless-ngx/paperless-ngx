@@ -577,6 +577,11 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     expect(component.selectionModel.getSelectedItems()).toEqual([nullItem])
   })
 
+  it('should return item id for trackByItem', () => {
+    const item = { id: 123, name: 'Test Item' }
+    expect(component.trackByItem(0, item)).toEqual(123)
+  })
+
   it('selection model should sort items by state', () => {
     component.selectionModel = selectionModel
     component.selectionModel.items = items.concat([{ id: 3, name: 'Item3' }])

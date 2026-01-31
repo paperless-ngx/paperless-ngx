@@ -1,6 +1,6 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing'
 import {
   FormsModule,
   NG_VALUE_ACCESSOR,
@@ -16,7 +16,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { of } from 'rxjs'
+import { of, throwError } from 'rxjs'
 import {
   DEFAULT_MATCHING_ALGORITHM,
   MATCH_ALL,
@@ -88,6 +88,10 @@ describe('TagsComponent', () => {
           provide: TagService,
           useValue: {
             listAll: () =>
+              of({
+                results: tags,
+              }),
+            listFiltered: () =>
               of({
                 results: tags,
               }),
@@ -233,4 +237,12 @@ describe('TagsComponent', () => {
     component.tags = [lone]
     expect(component.getParentChain(5)).toEqual([])
   })
+
+  it('should handle error when loading tags', fakeAsync(() => {
+    const tagService = TestBed.inject(TagService)
+    jest.spyOn(tagService, 'listFiltered').mockReturnValue(throwError(() => new Error('error')))
+    component.tagInput$.next('test')
+    tick(200)
+    expect(component.tagsLoading).toBeFalsy()
+  }))
 })
