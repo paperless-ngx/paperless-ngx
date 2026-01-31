@@ -1180,7 +1180,7 @@ class DocumentViewSet(
             ):
                 return HttpResponseForbidden("Insufficient permissions to delete notes")
 
-            note = Note.objects.get(id=int(request.GET.get("id")))
+            note = Note.objects.get(id=int(request.GET.get("id")), document=doc)
             if settings.AUDIT_LOG_ENABLED:
                 LogEntry.objects.log_create(
                     instance=doc,
@@ -1840,6 +1840,8 @@ class PostDocumentView(GenericAPIView):
     parser_classes = (parsers.MultiPartParser,)
 
     def post(self, request, *args, **kwargs):
+        if not request.user.has_perm("documents.add_document"):
+            return HttpResponseForbidden("Insufficient permissions")
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
