@@ -1,3 +1,4 @@
+/* eslint-disable @angular-eslint/component-selector, @angular-eslint/directive-selector */
 import {
   CdkVirtualScrollViewport,
   ScrollingModule,
@@ -12,6 +13,7 @@ import {
   TemplateRef,
   ViewContainerRef,
   forwardRef,
+  inject,
 } from '@angular/core'
 import {
   ComponentFixture,
@@ -49,7 +51,7 @@ import { ToggleableItemState } from './toggleable-dropdown-button/toggleable-dro
   ],
 })
 class MockCdkVirtualScrollViewportComponent {
-  constructor(public elementRef: ElementRef) {}
+  public elementRef = inject(ElementRef)
 
   scrollToIndex(index: number) {}
   getRenderedRange() {
@@ -63,10 +65,8 @@ class MockCdkVirtualScrollViewportComponent {
   standalone: true,
 })
 class MockCdkVirtualForOf<T> {
-  constructor(
-    private viewContainer: ViewContainerRef,
-    private template: TemplateRef<any>
-  ) {}
+  private viewContainer = inject(ViewContainerRef)
+  private template = inject(TemplateRef<any>)
 
   @Input() cdkVirtualForTrackBy: any
 

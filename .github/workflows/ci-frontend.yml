@@ -41,6 +41,8 @@ jobs:
             ~/.pnpm-store
             ~/.cache
           key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libpixman-1-dev
       - name: Install dependencies
         run: cd src-ui && pnpm install
   lint:
