@@ -145,6 +145,10 @@ def _permitted_document_ids(user):
 
     base_docs = Document.objects.filter(deleted_at__isnull=True).only("id", "owner")
 
+    if user is None or not getattr(user, "is_authenticated", False):
+        # Just Anonymous user e.g. for drf-spectacular
+        return base_docs.filter(owner__isnull=True).values_list("id", flat=True)
+
     if getattr(user, "is_superuser", False):
         return base_docs.values_list("id", flat=True)
 
