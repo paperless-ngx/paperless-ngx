@@ -217,11 +217,11 @@ With docker, while paperless is running:
 $ docker exec -it <container-name> <command> <arguments>
 ```
 
-Bare metal:
+Bare metal: you will have to activate or reference the virtual environment for python:
 
 ```shell-session
 $ cd /path/to/paperless/src
-$ python3 manage.py <command> <arguments> # (1)
+$ /paperless/.venv/bin/python manage.py <command> <arguments> #
 ```
 
 1.  Including `sudo -Hu <paperless_user>` may be required
