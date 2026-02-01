@@ -944,7 +944,7 @@ export class FilterableDropdownComponent
     this.buttonItems.scrollToIndex(this.keyboardIndex, 'auto')
     const offset =
       this.keyboardIndex - this.buttonItems.getRenderedRange().start
-    this.renderedButtons?.[offset]?.focus()
+    this.renderedButtons[offset]?.focus()
   }
 
   setButtonItemIndex(index: number) {
