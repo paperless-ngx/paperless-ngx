@@ -657,10 +657,6 @@ export class FilterableDropdownComponent
     return this._selectionModel.items
   }
 
-  private get filteredItems(): MatchingModel[] {
-    return this.filterPipe.transform(this.items, this.filterText)
-  }
-
   trackByItem(index: number, item: MatchingModel) {
     return item?.id ?? index
   }
