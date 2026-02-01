@@ -657,10 +657,6 @@ export class FilterableDropdownComponent
     return this._selectionModel.items
   }
 
-  trackByItem(index: number, item: MatchingModel) {
-    return item?.id ?? index
-  }
-
   @Input({ required: true })
   set selectionModel(model: FilterableDropdownSelectionModel) {
     if (this.selectionModel) {
@@ -785,6 +781,10 @@ export class FilterableDropdownComponent
           this.dropdown.open()
         })
     }
+  }
+
+  public trackByItem(index: number, item: MatchingModel) {
+    return item?.id ?? index
   }
 
   applyClicked() {
