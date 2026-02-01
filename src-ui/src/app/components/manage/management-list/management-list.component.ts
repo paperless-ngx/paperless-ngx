@@ -364,7 +364,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
       backdrop: 'static',
     })
     modal.componentInstance.title = $localize`Confirm delete`
-    modal.componentInstance.messageBold = $localize`This operation will permanently delete all objects.`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete the selected ${this.typeNamePlural}.`
     modal.componentInstance.message = $localize`This operation cannot be undone.`
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
