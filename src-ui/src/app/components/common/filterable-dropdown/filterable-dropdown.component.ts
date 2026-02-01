@@ -928,11 +928,6 @@ export class FilterableDropdownComponent
     }
   }
 
-  onFilterTextChange() {
-    this.keyboardIndex = -1
-    this.buttonItems?.scrollToIndex(0, 'auto')
-  }
-
   setButtonItemFocus() {
     this.buttonItems.scrollToIndex(this.keyboardIndex, 'auto')
 
