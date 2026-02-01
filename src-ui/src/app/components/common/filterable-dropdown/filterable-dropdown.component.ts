@@ -645,12 +645,13 @@ export class FilterableDropdownComponent
 
   @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
   @ViewChild('dropdown') dropdown: NgbDropdown
-  @ViewChild('buttonItems') buttonItems: CdkVirtualScrollViewport
+  @ViewChild('buttonsViewport') buttonsViewport: CdkVirtualScrollViewport
 
   private get renderedButtons(): Array<HTMLButtonElement> {
     return Array.from(
-      this.buttonItems?.elementRef.nativeElement.querySelectorAll('button') ??
-        []
+      this.buttonsViewport?.elementRef.nativeElement.querySelectorAll(
+        'button'
+      ) ?? []
     )
   }
 
@@ -820,7 +821,7 @@ export class FilterableDropdownComponent
     if (open) {
       setTimeout(() => {
         this.listFilterTextInput?.nativeElement.focus()
-        this.buttonItems?.checkViewportSize()
+        this.buttonsViewport?.checkViewportSize()
       }, 0)
       if (this.editing) {
         this.selectionModel.reset()
@@ -936,13 +937,13 @@ export class FilterableDropdownComponent
     // because of virtual scrolling, re-calculate the index
     const idx = this.renderedButtons.indexOf(button)
     if (idx >= 0) {
-      this.keyboardIndex = this.buttonItems.getRenderedRange().start + idx
+      this.keyboardIndex = this.buttonsViewport.getRenderedRange().start + idx
     }
   }
 
   setButtonItemFocus() {
     const offset =
-      this.keyboardIndex - this.buttonItems.getRenderedRange().start
+      this.keyboardIndex - this.buttonsViewport.getRenderedRange().start
     this.renderedButtons[offset]?.focus()
   }
 

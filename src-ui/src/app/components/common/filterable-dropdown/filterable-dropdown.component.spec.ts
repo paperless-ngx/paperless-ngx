@@ -266,11 +266,11 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     expect(document.activeElement).toEqual(
       component.listFilterTextInput.nativeElement
     )
-    expect(component.buttonItems.getRenderedRange().end).toEqual(3) // all items shown
+    expect(component.buttonsViewport.getRenderedRange().end).toEqual(3) // all items shown
 
     component.filterText = 'Tag2'
     fixture.detectChanges()
-    expect(component.buttonItems.getRenderedRange().end).toEqual(1) // filtered
+    expect(component.buttonsViewport.getRenderedRange().end).toEqual(1) // filtered
     component.dropdown.close()
     expect(component.filterText).toHaveLength(0)
   }))
@@ -325,7 +325,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       .dispatchEvent(new MouseEvent('click')) // open
     fixture.detectChanges()
     tick(100)
-    component.buttonItems?.checkViewportSize()
+    component.buttonsViewport?.checkViewportSize()
     fixture.detectChanges()
     const filterInputEl: HTMLInputElement =
       component.listFilterTextInput.nativeElement
@@ -372,7 +372,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       .dispatchEvent(new MouseEvent('click')) // open
     fixture.detectChanges()
     tick(100)
-    component.buttonItems?.checkViewportSize()
+    component.buttonsViewport?.checkViewportSize()
     fixture.detectChanges()
     const filterInputEl: HTMLInputElement =
       component.listFilterTextInput.nativeElement
@@ -410,7 +410,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       .dispatchEvent(new MouseEvent('click')) // open
     fixture.detectChanges()
     tick(100)
-    component.buttonItems?.checkViewportSize()
+    component.buttonsViewport?.checkViewportSize()
     fixture.detectChanges()
     const filterInputEl: HTMLInputElement =
       component.listFilterTextInput.nativeElement
