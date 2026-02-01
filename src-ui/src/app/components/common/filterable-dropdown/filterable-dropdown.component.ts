@@ -661,6 +661,10 @@ export class FilterableDropdownComponent
     return this.filterPipe.transform(this.items, this.filterText)
   }
 
+  trackByItem(index: number, item: MatchingModel) {
+    return item?.id ?? index
+  }
+
   @Input({ required: true })
   set selectionModel(model: FilterableDropdownSelectionModel) {
     if (this.selectionModel) {
