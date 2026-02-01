@@ -30,12 +30,12 @@
       }
       <div class="list-group-item">
         <div class="input-group input-group-sm">
-          <input class="form-control" type="text" spellcheck="false" [(ngModel)]="filterText" [placeholder]="filterPlaceholder" (keyup.enter)="listFilterEnter()" #listFilterTextInput>
+          <input class="form-control" type="text" spellcheck="false" [(ngModel)]="filterText" (ngModelChange)="onFilterTextChange()" [placeholder]="filterPlaceholder" (keyup.enter)="listFilterEnter()" #listFilterTextInput>
         </div>
       </div>
       @if (selectionModel.items) {
-        <div class="items" #buttonItems>
-          @for (item of selectionModel.items | filter: filterText:'name'; track item; let i = $index) {
+        <cdk-virtual-scroll-viewport class="items" [itemSize]="FILTERABLE_BUTTON_HEIGHT_PX" #buttonItems [style.height.px]="calculateViewportHeight()">
+          <div *cdkVirtualFor="let item of selectionModel.items | filter: filterText:'name'; track: item; let i = index">
             @if (allowSelectNone || item.id) {
               <pngx-toggleable-dropdown-button
                 [item]="item"
@@ -45,12 +45,12 @@
                 [count]="getUpdatedDocumentCount(item.id)"
                 (toggled)="selectionModel.toggle(item.id)"
                 (exclude)="excludeClicked(item.id)"
-                (click)="setButtonItemIndex(i - 1)"
+                (click)="setButtonItemIndex(i)"
                 [disabled]="disabled">
               </pngx-toggleable-dropdown-button>
             }
-          }
-        </div>
+          </div>
+        </cdk-virtual-scroll-viewport>
       }
       @if (editing) {
         @if ((selectionModel.items | filter: filterText:'name').length === 0 && createRef !== undefined) {

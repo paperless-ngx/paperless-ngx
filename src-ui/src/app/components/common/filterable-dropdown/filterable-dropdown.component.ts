@@ -1,3 +1,7 @@
+import {
+  CdkVirtualScrollViewport,
+  ScrollingModule,
+} from '@angular/cdk/scrolling'
 import { NgClass } from '@angular/common'
 import {
   Component,
@@ -627,18 +631,21 @@ export class FilterableDropdownSelectionModel {
     NgxBootstrapIconsModule,
     NgbDropdownModule,
     NgClass,
+    ScrollingModule,
   ],
 })
 export class FilterableDropdownComponent
   extends LoadingComponentWithPermissions
   implements OnInit
 {
+  public readonly FILTERABLE_BUTTON_HEIGHT_PX = 42
+
   private filterPipe = inject(FilterPipe)
   private hotkeyService = inject(HotKeyService)
 
   @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
   @ViewChild('dropdown') dropdown: NgbDropdown
-  @ViewChild('buttonItems') buttonItems: ElementRef
+  @ViewChild('buttonItems') buttonItems: CdkVirtualScrollViewport
 
   public popperOptions = pngxPopperOptions
 
@@ -648,6 +655,10 @@ export class FilterableDropdownComponent
 
   get items(): MatchingModel[] {
     return this._selectionModel.items
+  }
+
+  private get filteredItems(): MatchingModel[] {
+    return this.filterPipe.transform(this.items, this.filterText)
   }
 
   @Input({ required: true })
@@ -903,10 +914,34 @@ export class FilterableDropdownComponent
     if (setFocus) this.setButtonItemFocus()
   }
 
+  onFilterTextChange() {
+    this.keyboardIndex = -1
+    this.buttonItems?.scrollToIndex(0, 'auto')
+  }
+
   setButtonItemFocus() {
-    this.buttonItems.nativeElement.children[
-      this.keyboardIndex
-    ]?.children[0].focus()
+    this.buttonItems.scrollToIndex(this.keyboardIndex, 'auto')
+
+    // need to wait for render before focusing
+    requestAnimationFrame(() => {
+      const offset =
+        this.keyboardIndex - this.buttonItems.getRenderedRange().start
+      const contentWrapper =
+        this.buttonItems.elementRef.nativeElement.querySelector(
+          '.cdk-virtual-scroll-content-wrapper'
+        ) as HTMLElement
+      const itemHost = contentWrapper?.children?.[offset] as HTMLElement
+      const button = itemHost?.querySelector('button') as HTMLButtonElement
+      button?.focus()
+    })
+  }
+
+  public calculateViewportHeight(): number {
+    const filteredLength = this.filterPipe.transform(
+      this.items,
+      this.filterText
+    ).length
+    return Math.min(filteredLength * this.FILTERABLE_BUTTON_HEIGHT_PX, 400)
   }
 
   setButtonItemIndex(index: number) {
