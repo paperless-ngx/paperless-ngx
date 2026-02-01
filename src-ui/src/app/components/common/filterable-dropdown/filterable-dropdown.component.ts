@@ -649,9 +649,7 @@ export class FilterableDropdownComponent
 
   private get renderedButtons(): Array<HTMLButtonElement> {
     return Array.from(
-      this.buttonsViewport?.elementRef.nativeElement.querySelectorAll(
-        'button'
-      ) ?? []
+      this.buttonsViewport.elementRef.nativeElement.querySelectorAll('button')
     )
   }
 
