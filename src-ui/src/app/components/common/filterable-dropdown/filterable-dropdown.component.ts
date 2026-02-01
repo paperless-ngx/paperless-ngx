@@ -805,6 +805,7 @@ export class FilterableDropdownComponent
     if (open) {
       setTimeout(() => {
         this.listFilterTextInput?.nativeElement.focus()
+        this.buttonItems?.checkViewportSize()
       }, 0)
       if (this.editing) {
         this.selectionModel.reset()
@@ -872,12 +873,14 @@ export class FilterableDropdownComponent
             event.preventDefault()
           }
         } else if (event.target instanceof HTMLButtonElement) {
+          this.syncKeyboardIndexFromButton(event.target)
           this.focusNextButtonItem()
           event.preventDefault()
         }
         break
       case 'ArrowUp':
         if (event.target instanceof HTMLButtonElement) {
+          this.syncKeyboardIndexFromButton(event.target)
           if (this.keyboardIndex === 0) {
             this.listFilterTextInput.nativeElement.focus()
           } else {
@@ -914,6 +917,17 @@ export class FilterableDropdownComponent
     if (setFocus) this.setButtonItemFocus()
   }
 
+  private syncKeyboardIndexFromButton(button: HTMLButtonElement) {
+    const buttons = Array.from(
+      this.buttonItems?.elementRef.nativeElement.querySelectorAll('button') ??
+        []
+    )
+    const idx = buttons.indexOf(button)
+    if (idx >= 0) {
+      this.keyboardIndex = this.buttonItems.getRenderedRange().start + idx
+    }
+  }
+
   onFilterTextChange() {
     this.keyboardIndex = -1
     this.buttonItems?.scrollToIndex(0, 'auto')
@@ -922,18 +936,13 @@ export class FilterableDropdownComponent
   setButtonItemFocus() {
     this.buttonItems.scrollToIndex(this.keyboardIndex, 'auto')
 
-    // need to wait for render before focusing
-    requestAnimationFrame(() => {
-      const offset =
-        this.keyboardIndex - this.buttonItems.getRenderedRange().start
-      const contentWrapper =
-        this.buttonItems.elementRef.nativeElement.querySelector(
-          '.cdk-virtual-scroll-content-wrapper'
-        ) as HTMLElement
-      const itemHost = contentWrapper?.children?.[offset] as HTMLElement
-      const button = itemHost?.querySelector('button') as HTMLButtonElement
-      button?.focus()
-    })
+    const buttons =
+      this.buttonItems.elementRef.nativeElement.querySelectorAll('button')
+    const offset =
+      this.keyboardIndex - this.buttonItems.getRenderedRange().start
+    const button = (buttons?.[offset] ||
+      buttons?.[this.keyboardIndex]) as HTMLButtonElement
+    button?.focus()
   }
 
   public calculateViewportHeight(): number {
