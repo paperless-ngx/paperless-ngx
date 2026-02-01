@@ -647,6 +647,13 @@ export class FilterableDropdownComponent
   @ViewChild('dropdown') dropdown: NgbDropdown
   @ViewChild('buttonItems') buttonItems: CdkVirtualScrollViewport
 
+  private get renderedButtons(): Array<HTMLButtonElement> {
+    return Array.from(
+      this.buttonItems?.elementRef.nativeElement.querySelectorAll('button') ??
+        []
+    )
+  }
+
   public popperOptions = pngxPopperOptions
 
   filterText: string
@@ -758,6 +765,14 @@ export class FilterableDropdownComponent
   modelIsDirty: boolean = false
 
   private keyboardIndex: number
+
+  public get scrollViewportHeight(): number {
+    const filteredLength = this.filterPipe.transform(
+      this.items,
+      this.filterText
+    ).length
+    return Math.min(filteredLength * this.FILTERABLE_BUTTON_HEIGHT_PX, 400)
+  }
 
   constructor() {
     super()
@@ -918,11 +933,8 @@ export class FilterableDropdownComponent
   }
 
   private syncKeyboardIndexFromButton(button: HTMLButtonElement) {
-    const buttons = Array.from(
-      this.buttonItems?.elementRef.nativeElement.querySelectorAll('button') ??
-        []
-    )
-    const idx = buttons.indexOf(button)
+    // because of virtual scrolling, re-calculate the index
+    const idx = this.renderedButtons.indexOf(button)
     if (idx >= 0) {
       this.keyboardIndex = this.buttonItems.getRenderedRange().start + idx
     }
@@ -930,22 +942,11 @@ export class FilterableDropdownComponent
 
   setButtonItemFocus() {
     this.buttonItems.scrollToIndex(this.keyboardIndex, 'auto')
-
-    const buttons =
-      this.buttonItems.elementRef.nativeElement.querySelectorAll('button')
     const offset =
       this.keyboardIndex - this.buttonItems.getRenderedRange().start
-    const button = (buttons?.[offset] ||
-      buttons?.[this.keyboardIndex]) as HTMLButtonElement
-    button?.focus()
-  }
+    console.log(offset)
 
-  public calculateViewportHeight(): number {
-    const filteredLength = this.filterPipe.transform(
-      this.items,
-      this.filterText
-    ).length
-    return Math.min(filteredLength * this.FILTERABLE_BUTTON_HEIGHT_PX, 400)
+    this.renderedButtons?.[offset]?.focus()
   }
 
   setButtonItemIndex(index: number) {

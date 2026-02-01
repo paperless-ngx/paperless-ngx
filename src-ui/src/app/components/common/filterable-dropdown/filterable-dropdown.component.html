@@ -34,7 +34,7 @@
         </div>
       </div>
       @if (selectionModel.items) {
-        <cdk-virtual-scroll-viewport class="items" [itemSize]="FILTERABLE_BUTTON_HEIGHT_PX" #buttonItems [style.height.px]="calculateViewportHeight()">
+        <cdk-virtual-scroll-viewport class="items" [itemSize]="FILTERABLE_BUTTON_HEIGHT_PX" #buttonItems [style.height.px]="scrollViewportHeight">
           <div *cdkVirtualFor="let item of selectionModel.items | filter: filterText:'name'; trackBy: trackByItem; let i = index">
             @if (allowSelectNone || item.id) {
               <pngx-toggleable-dropdown-button
