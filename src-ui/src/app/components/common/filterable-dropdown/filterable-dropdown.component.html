@@ -45,7 +45,6 @@
                 [count]="getUpdatedDocumentCount(item.id)"
                 (toggled)="selectionModel.toggle(item.id)"
                 (exclude)="excludeClicked(item.id)"
-                (click)="setButtonItemIndex(i)"
                 [disabled]="disabled">
               </pngx-toggleable-dropdown-button>
             }

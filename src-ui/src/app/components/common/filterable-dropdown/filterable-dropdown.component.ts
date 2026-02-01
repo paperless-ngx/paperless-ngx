@@ -947,11 +947,6 @@ export class FilterableDropdownComponent
     this.renderedButtons[offset]?.focus()
   }
 
-  setButtonItemIndex(index: number) {
-    // just track the index in case user uses arrows
-    this.keyboardIndex = index
-  }
-
   hideCount(item: ObjectWithPermissions) {
     // counts are pointless when clicking item would add to the set of docs
     return (
