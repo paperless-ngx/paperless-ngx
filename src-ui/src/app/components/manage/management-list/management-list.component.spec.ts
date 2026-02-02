@@ -31,6 +31,7 @@ import {
   MATCH_NONE,
 } from 'src/app/data/matching-model'
 import { Tag } from 'src/app/data/tag'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
@@ -41,6 +42,7 @@ import {
 } from 'src/app/services/permissions.service'
 import { BulkEditObjectOperation } from 'src/app/services/rest/abstract-name-filter-service'
 import { TagService } from 'src/app/services/rest/tag.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogComponent } from '../../common/edit-dialog/edit-dialog.component'
@@ -79,6 +81,7 @@ describe('ManagementListComponent', () => {
   let toastService: ToastService
   let documentListViewService: DocumentListViewService
   let permissionsService: PermissionsService
+  let settingsService: SettingsService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -130,6 +133,7 @@ describe('ManagementListComponent', () => {
     modalService = TestBed.inject(NgbModal)
     toastService = TestBed.inject(ToastService)
     documentListViewService = TestBed.inject(DocumentListViewService)
+    settingsService = TestBed.inject(SettingsService)
     fixture = TestBed.createComponent(TagListComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
@@ -447,4 +451,66 @@ describe('ManagementListComponent', () => {
     ).getSelectableIDs.call({}, [{ id: 1 }, { id: 5 }] as any)
     expect(ids).toEqual([1, 5])
   })
+
+  it('pageSize getter should return stored page size or default to 25', () => {
+    jest.spyOn(settingsService, 'get').mockReturnValue({ tags: 50 })
+    component.typeNamePlural = 'tags'
+
+    expect(component.pageSize).toBe(50)
+  })
+
+  it('pageSize getter should return 25 when no size is stored', () => {
+    const settingsService = TestBed.inject(SettingsService)
+    jest.spyOn(settingsService, 'get').mockReturnValue({})
+    component.typeNamePlural = 'tags'
+
+    expect(component.pageSize).toBe(25)
+  })
+
+  it('pageSize setter should update settings, reset page and reload data on success', fakeAsync(() => {
+    const reloadSpy = jest.spyOn(component, 'reloadData')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+
+    jest.spyOn(settingsService, 'get').mockReturnValue({ tags: 25 })
+    jest.spyOn(settingsService, 'set').mockImplementation(() => {})
+    jest
+      .spyOn(settingsService, 'storeSettings')
+      .mockReturnValue(of({ success: true }))
+
+    component.typeNamePlural = 'tags'
+    component.page = 2
+    component.pageSize = 100
+
+    tick()
+
+    expect(settingsService.set).toHaveBeenCalledWith(
+      SETTINGS_KEYS.OBJECT_LIST_SIZES,
+      { tags: 100 }
+    )
+    expect(component.page).toBe(1)
+    expect(reloadSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).not.toHaveBeenCalled()
+  }))
+
+  it('pageSize setter should show error toast on settings store failure', fakeAsync(() => {
+    const reloadSpy = jest.spyOn(component, 'reloadData')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+
+    jest.spyOn(settingsService, 'get').mockReturnValue({ tags: 25 })
+    jest.spyOn(settingsService, 'set').mockImplementation(() => {})
+    jest
+      .spyOn(settingsService, 'storeSettings')
+      .mockReturnValue(throwError(() => new Error('error storing settings')))
+
+    component.typeNamePlural = 'tags'
+    component.pageSize = 50
+
+    tick()
+
+    expect(toastErrorSpy).toHaveBeenCalledWith(
+      'Error saving settings',
+      expect.any(Error)
+    )
+    expect(reloadSpy).not.toHaveBeenCalled()
+  }))
 })

@@ -63,6 +63,7 @@ export const SETTINGS_KEYS = {
   SIDEBAR_VIEWS_SHOW_COUNT:
     'general-settings:saved-views:sidebar-views-show-count',
   TOUR_COMPLETE: 'general-settings:tour-complete',
+  OBJECT_LIST_SIZES: 'general-settings:object-list-sizes',
   DEFAULT_PERMS_OWNER: 'general-settings:permissions:default-owner',
   DEFAULT_PERMS_VIEW_USERS: 'general-settings:permissions:default-view-users',
   DEFAULT_PERMS_VIEW_GROUPS: 'general-settings:permissions:default-view-groups',
@@ -200,6 +201,16 @@ export const SETTINGS: UiSetting[] = [
     key: SETTINGS_KEYS.TOUR_COMPLETE,
     type: 'boolean',
     default: false,
+  },
+  {
+    key: SETTINGS_KEYS.OBJECT_LIST_SIZES,
+    type: 'object',
+    default: {
+      correspondents: 25,
+      document_types: 25,
+      tags: 25,
+      storage_paths: 25,
+    },
   },
   {
     key: SETTINGS_KEYS.DEFAULT_PERMS_OWNER,
