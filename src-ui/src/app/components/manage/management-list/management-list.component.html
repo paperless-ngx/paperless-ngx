@@ -1,4 +1,4 @@
-<pngx-page-header title="{{ typeNamePlural | titlecase }}" info="View, add, edit and delete {{ typeNamePlural }}." infoLink="usage/#terms-and-definitions">
+<pngx-page-header title="{{ typeNamePlural | titlecase }}" info="View, add, edit and delete {{ typeNamePlural }}." infoLink="usage/#terms-and-definitions" [loading]="loading">
 
   <div ngbDropdown class="btn-group flex-fill d-sm-none">
     <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle>
@@ -92,7 +92,7 @@
       </tr>
     </thead>
     <tbody>
-      @if (loading) {
+      @if (loading && data.length === 0) {
         <tr>
           <td colspan="5">
             <div class="spinner-border spinner-border-sm me-2" role="status"></div>
@@ -107,7 +107,7 @@
   </table>
 </div>
 
-@if (!loading) {
+@if (!loading || data.length > 0) {
   <div class="d-flex mb-2">
     @if (collectionSize > 0) {
       <div>
