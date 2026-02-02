@@ -46,14 +46,30 @@
 </pngx-page-header>
 
 <div class="row mb-3">
-  <div class="col-md mb-2 mb-xl-0">
+  <div class="col mb-2 mb-xl-0">
     <div class="form-inline d-flex align-items-center">
       <label class="text-muted me-2 mb-0" i18n>Filter by:</label>
       <input class="form-control form-control-sm flex-fill w-auto" type="text" autofocus [(ngModel)]="nameFilter" (keyup)="onNameFilterKeyUp($event)" placeholder="Name" i18n-placeholder>
     </div>
   </div>
 
-  <ngb-pagination class="col-auto" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" [maxSize]="5" (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
+  <div class="col-auto mb-2 mb-xl-0">
+    <div class="form-inline d-flex align-items-center">
+      <div class="input-group input-group-sm w-auto d-none d-md-flex">
+        <span class="input-group-text border-0" i18n>Show:</span>
+      </div>
+      <div class="input-group input-group-sm w-auto me-3">
+        <select class="form-select form-select-sm" [(ngModel)]="pageSize">
+          <option [ngValue]="25">25</option>
+          <option [ngValue]="50">50</option>
+          <option [ngValue]="100">100</option>
+        </select>
+        <span class="input-group-text text-muted d-none d-md-flex" i18n>per page</span>
+      </div>
+      <ngb-pagination [pageSize]="pageSize" [collectionSize]="collectionSize" [(page)]="page" [maxSize]="5" (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
+    </div>
+  </div>
+
 </div>
 
 <div class="card border table-responsive mb-3">
@@ -102,7 +118,7 @@
       </div>
     }
     @if (collectionSize > 20) {
-      <ngb-pagination class="ms-auto" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" [maxSize]="5" (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
+      <ngb-pagination class="ms-auto" [pageSize]="pageSize" [collectionSize]="collectionSize" [(page)]="page" [maxSize]="5" (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
     }
   </div>
 }
