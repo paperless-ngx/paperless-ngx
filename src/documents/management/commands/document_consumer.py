@@ -28,7 +28,6 @@ from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.models import Tag
-from documents.parsers import get_supported_file_extensions
 from documents.tasks import consume_file
 
 if TYPE_CHECKING:
@@ -186,9 +185,6 @@ class ConsumerFilter(DefaultFilter):
     Extends DefaultFilter leveraging its built-in filtering:
     - `ignore_dirs`: Directory names to ignore (and all their contents)
     - `ignore_entity_patterns`: Regex patterns matched against filename/dirname only
-
-    We add custom logic for file extension filtering (only accept supported
-    document types), which the library doesn't provide.
     """
 
     # Regex patterns for files to always ignore (matched against filename only)
@@ -216,7 +212,6 @@ class ConsumerFilter(DefaultFilter):
     def __init__(
         self,
         *,
-        supported_extensions: frozenset[str] | None = None,
         ignore_patterns: list[str] | None = None,
         ignore_dirs: list[str] | None = None,
     ) -> None:
@@ -224,16 +219,9 @@ class ConsumerFilter(DefaultFilter):
         Initialize the consumer filter.
 
         Args:
-            supported_extensions: Set of file extensions to accept (e.g., {".pdf", ".png"}).
-                If None, uses get_supported_file_extensions().
             ignore_patterns: Additional regex patterns to ignore (matched against filename).
             ignore_dirs: Additional directory names to ignore (merged with defaults).
         """
-        # Get supported extensions
-        if supported_extensions is None:
-            supported_extensions = frozenset(get_supported_file_extensions())
-        self._supported_extensions = supported_extensions
-
         # Combine default and user patterns
         all_patterns: list[str] = list(self.DEFAULT_IGNORE_PATTERNS)
         if ignore_patterns:
@@ -261,8 +249,6 @@ class ConsumerFilter(DefaultFilter):
         - Hidden files/directories (starting with .)
         - Directories in ignore_dirs
         - Files/directories matching ignore_entity_patterns
-
-        We additionally filter files by extension.
         """
         # Let parent filter handle directory ignoring and pattern matching
         if not super().__call__(change, path):
@@ -274,13 +260,8 @@ class ConsumerFilter(DefaultFilter):
         if path_obj.is_dir():
             return True
 
-        # For files, check extension
-        return self._has_supported_extension(path_obj)
-
-    def _has_supported_extension(self, path: Path) -> bool:
-        """Check if the file has a supported extension."""
-        suffix = path.suffix.lower()
-        return suffix in self._supported_extensions
+        # No additional filtering beyond the defaults; accept file
+        return True
 
 
 def _tags_from_path(filepath: Path, consumption_dir: Path) -> list[int]:

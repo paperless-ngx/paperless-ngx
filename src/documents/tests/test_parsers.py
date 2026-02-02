@@ -7,8 +7,6 @@ from django.test import override_settings
 
 from documents.parsers import get_default_file_extension
 from documents.parsers import get_parser_class_for_mime_type
-from documents.parsers import get_supported_file_extensions
-from documents.parsers import is_file_ext_supported
 from paperless_tesseract.parsers import RasterisedDocumentParser
 from paperless_text.parsers import TextDocumentParser
 from paperless_tika.parsers import TikaDocumentParser
@@ -145,10 +143,7 @@ class TestParserAvailability(TestCase):
             ("image/webp", ".webp"),
         ]
 
-        supported_exts = get_supported_file_extensions()
-
         for mime_type, ext in supported_mimes_and_exts:
-            self.assertIn(ext, supported_exts)
             self.assertEqual(get_default_file_extension(mime_type), ext)
             self.assertIsInstance(
                 get_parser_class_for_mime_type(mime_type)(logging_group=None),
@@ -169,10 +164,7 @@ class TestParserAvailability(TestCase):
             ("text/csv", ".csv"),
         ]
 
-        supported_exts = get_supported_file_extensions()
-
         for mime_type, ext in supported_mimes_and_exts:
-            self.assertIn(ext, supported_exts)
             self.assertEqual(get_default_file_extension(mime_type), ext)
             self.assertIsInstance(
                 get_parser_class_for_mime_type(mime_type)(logging_group=None),
@@ -202,10 +194,8 @@ class TestParserAvailability(TestCase):
         with override_settings(TIKA_ENABLED=True, INSTALLED_APPS=["paperless_tika"]):
             app = apps.get_app_config("paperless_tika")
             app.ready()
-            supported_exts = get_supported_file_extensions()
 
         for mime_type, ext in supported_mimes_and_exts:
-            self.assertIn(ext, supported_exts)
             self.assertEqual(get_default_file_extension(mime_type), ext)
             self.assertIsInstance(
                 get_parser_class_for_mime_type(mime_type)(logging_group=None),
@@ -221,8 +211,3 @@ class TestParserAvailability(TestCase):
 
         # Test invalid mimetype returns no extension
         self.assertEqual(get_default_file_extension("aasdasd/dgfgf"), "")
-
-    def test_file_extension_support(self):
-        self.assertTrue(is_file_ext_supported(".pdf"))
-        self.assertFalse(is_file_ext_supported(".hsdfh"))
-        self.assertFalse(is_file_ext_supported(""))

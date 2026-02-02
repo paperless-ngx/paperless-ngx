@@ -85,34 +85,6 @@ def get_default_file_extension(mime_type: str) -> str:
         return ""
 
 
-@lru_cache(maxsize=8)
-def is_file_ext_supported(ext: str) -> bool:
-    """
-    Returns True if the file extension is supported, False otherwise
-    TODO: Investigate why this really exists, why not use mimetype
-    """
-    if ext:
-        return ext.lower() in get_supported_file_extensions()
-    else:
-        return False
-
-
-def get_supported_file_extensions() -> set[str]:
-    extensions = set()
-    for response in document_consumer_declaration.send(None):
-        parser_declaration = response[1]
-        supported_mime_types = parser_declaration["mime_types"]
-
-        for mime_type in supported_mime_types:
-            extensions.update(mimetypes.guess_all_extensions(mime_type))
-            # Python's stdlib might be behind, so also add what the parser
-            # says is the default extension
-            # This makes image/webp supported on Python < 3.11
-            extensions.add(supported_mime_types[mime_type])
-
-    return extensions
-
-
 def get_parser_class_for_mime_type(mime_type: str) -> type[DocumentParser] | None:
     """
     Returns the best parser (by weight) for the given mimetype or

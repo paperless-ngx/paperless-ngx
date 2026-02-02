@@ -90,7 +90,6 @@ def sample_pdf(tmp_path: Path) -> Path:
 def consumer_filter() -> ConsumerFilter:
     """Create a ConsumerFilter for testing."""
     return ConsumerFilter(
-        supported_extensions=frozenset({".pdf", ".png", ".jpg"}),
         ignore_patterns=[r"^custom_ignore"],
     )
 
@@ -103,15 +102,6 @@ def mock_consume_file_delay(mocker: MockerFixture) -> MagicMock:
     )
     mock_task.delay = mocker.MagicMock()
     return mock_task
-
-
-@pytest.fixture
-def mock_supported_extensions(mocker: MockerFixture) -> MagicMock:
-    """Mock get_supported_file_extensions to return only .pdf."""
-    return mocker.patch(
-        "documents.management.commands.document_consumer.get_supported_file_extensions",
-        return_value={".pdf"},
-    )
 
 
 def wait_for_mock_call(
@@ -336,8 +326,6 @@ class TestConsumerFilter:
             pytest.param("image.png", True, id="supported_png"),
             pytest.param("photo.jpg", True, id="supported_jpg"),
             pytest.param("document.PDF", True, id="case_insensitive"),
-            pytest.param("document.xyz", False, id="unsupported_ext"),
-            pytest.param("document", False, id="no_extension"),
             pytest.param(".DS_Store", False, id="ds_store"),
             pytest.param(".DS_STORE", False, id="ds_store_upper"),
             pytest.param("._document.pdf", False, id="macos_resource_fork"),
@@ -395,7 +383,6 @@ class TestConsumerFilter:
     def test_custom_ignore_dirs(self, tmp_path: Path) -> None:
         """Test filter respects custom ignore_dirs."""
         filter_obj = ConsumerFilter(
-            supported_extensions=frozenset({".pdf"}),
             ignore_dirs=["custom_ignored_dir"],
         )
 
@@ -413,25 +400,6 @@ class TestConsumerFilter:
         stfolder = tmp_path / ".stfolder"
         stfolder.mkdir()
         assert filter_obj(Change.added, str(stfolder)) is False
-
-
-class TestConsumerFilterDefaults:
-    """Tests for ConsumerFilter with default settings."""
-
-    def test_filter_with_mocked_extensions(
-        self,
-        tmp_path: Path,
-        mocker: MockerFixture,
-    ) -> None:
-        """Test filter works when using mocked extensions from parser."""
-        mocker.patch(
-            "documents.management.commands.document_consumer.get_supported_file_extensions",
-            return_value={".pdf", ".png"},
-        )
-        filter_obj = ConsumerFilter()
-        test_file = tmp_path / "document.pdf"
-        test_file.touch()
-        assert filter_obj(Change.added, str(test_file)) is True
 
 
 class TestConsumeFile:
@@ -605,7 +573,6 @@ class TestCommandValidation:
             cmd.handle(directory=str(sample_pdf), oneshot=True, testing=False)
 
 
-@pytest.mark.usefixtures("mock_supported_extensions")
 class TestCommandOneshot:
     """Tests for oneshot mode."""
 
@@ -651,25 +618,6 @@ class TestCommandOneshot:
         cmd.handle(directory=str(consumption_dir), oneshot=True, testing=False)
 
         mock_consume_file_delay.delay.assert_called_once()
-
-    def test_ignores_unsupported_extensions(
-        self,
-        consumption_dir: Path,
-        scratch_dir: Path,
-        mock_consume_file_delay: MagicMock,
-        settings: SettingsWrapper,
-    ) -> None:
-        """Test oneshot mode ignores unsupported file extensions."""
-        target = consumption_dir / "document.xyz"
-        target.write_bytes(b"content")
-
-        settings.SCRATCH_DIR = scratch_dir
-        settings.CONSUMER_IGNORE_PATTERNS = []
-
-        cmd = Command()
-        cmd.handle(directory=str(consumption_dir), oneshot=True, testing=False)
-
-        mock_consume_file_delay.delay.assert_not_called()
 
 
 class ConsumerThread(Thread):
@@ -739,7 +687,6 @@ class ConsumerThread(Thread):
 def start_consumer(
     consumption_dir: Path,
     scratch_dir: Path,
-    mock_supported_extensions: MagicMock,
 ) -> Generator[Callable[..., ConsumerThread], None, None]:
     """Start a consumer thread and ensure cleanup."""
     threads: list[ConsumerThread] = []
@@ -875,7 +822,6 @@ class TestCommandWatch:
         assert call_args.original_file.name == "valid.pdf"
 
     @pytest.mark.django_db
-    @pytest.mark.usefixtures("mock_supported_extensions")
     def test_stop_flag_stops_consumer(
         self,
         consumption_dir: Path,
@@ -1017,7 +963,6 @@ class TestCommandWatchEdgeCases:
 
         mock_consume_file_delay.delay.assert_not_called()
 
-    @pytest.mark.usefixtures("mock_supported_extensions")
     def test_handles_task_exception(
         self,
         consumption_dir: Path,
