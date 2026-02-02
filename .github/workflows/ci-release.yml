@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Wait for Docker build
-        uses: lewagon/wait-on-check-action@v1.4.1
+        uses: lewagon/wait-on-check-action@v1.5.0
         with:
           ref: ${{ github.sha }}
           check-name: 'Build Docker Image'
