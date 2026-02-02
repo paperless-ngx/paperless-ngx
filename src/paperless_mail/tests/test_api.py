@@ -21,7 +21,7 @@ from paperless_mail.tests.test_mail import BogusMailBox
 class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/mail_accounts/"
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.bogus_mailbox = BogusMailBox()
 
         patcher = mock.patch("paperless_mail.mail.MailBox")
@@ -36,7 +36,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
         self.user.save()
         self.client.force_authenticate(user=self.user)
 
-    def test_get_mail_accounts(self):
+    def test_get_mail_accounts(self) -> None:
         """
         GIVEN:
             - Configured mail accounts
@@ -73,7 +73,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_account1["imap_security"], account1.imap_security)
         self.assertEqual(returned_account1["character_set"], account1.character_set)
 
-    def test_create_mail_account(self):
+    def test_create_mail_account(self) -> None:
         """
         WHEN:
             - API request is made to add a mail account
@@ -108,7 +108,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_account1.imap_security, account1["imap_security"])
         self.assertEqual(returned_account1.character_set, account1["character_set"])
 
-    def test_delete_mail_account(self):
+    def test_delete_mail_account(self) -> None:
         """
         GIVEN:
             - Existing mail account
@@ -136,7 +136,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
 
         self.assertEqual(len(MailAccount.objects.all()), 0)
 
-    def test_update_mail_account(self):
+    def test_update_mail_account(self) -> None:
         """
         GIVEN:
             - Existing mail accounts
@@ -184,7 +184,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_account2.name, "Updated Name 2")
         self.assertEqual(returned_account2.password, "123xyz")
 
-    def test_mail_account_test_fail(self):
+    def test_mail_account_test_fail(self) -> None:
         """
         GIVEN:
             - Errnoeous mail account details
@@ -210,7 +210,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_mail_account_test_success(self):
+    def test_mail_account_test_success(self) -> None:
         """
         GIVEN:
             - Working mail account details
@@ -236,7 +236,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["success"], True)
 
-    def test_mail_account_test_existing(self):
+    def test_mail_account_test_existing(self) -> None:
         """
         GIVEN:
             - Testing server details for an existing account with obfuscated password (***)
@@ -272,7 +272,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["success"], True)
 
-    def test_get_mail_accounts_owner_aware(self):
+    def test_get_mail_accounts_owner_aware(self) -> None:
         """
         GIVEN:
             - Configured accounts with different users
@@ -343,7 +343,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
 class TestAPIMailRules(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/mail_rules/"
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.user = User.objects.create_user(username="temp_admin")
@@ -351,7 +351,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
         self.user.save()
         self.client.force_authenticate(user=self.user)
 
-    def test_get_mail_rules(self):
+    def test_get_mail_rules(self) -> None:
         """
         GIVEN:
             - Configured mail accounts and rules
@@ -415,7 +415,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_rule1["order"], rule1.order)
         self.assertEqual(returned_rule1["attachment_type"], rule1.attachment_type)
 
-    def test_create_mail_rule(self):
+    def test_create_mail_rule(self) -> None:
         """
         GIVEN:
             - Configured mail account exists
@@ -520,7 +520,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
             rule1["assign_owner_from_rule"],
         )
 
-    def test_delete_mail_rule(self):
+    def test_delete_mail_rule(self) -> None:
         """
         GIVEN:
             - Existing mail rule
@@ -564,7 +564,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
 
         self.assertEqual(len(MailRule.objects.all()), 0)
 
-    def test_update_mail_rule(self):
+    def test_update_mail_rule(self) -> None:
         """
         GIVEN:
             - Existing mail rule
@@ -614,7 +614,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_rule1.name, "Updated Name 1")
         self.assertEqual(returned_rule1.action, MailRule.MailAction.DELETE)
 
-    def test_get_mail_rules_owner_aware(self):
+    def test_get_mail_rules_owner_aware(self) -> None:
         """
         GIVEN:
             - Configured rules with different users
@@ -683,7 +683,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
         self.assertEqual(response.data["results"][1]["name"], rule2.name)
         self.assertEqual(response.data["results"][2]["name"], rule4.name)
 
-    def test_mailrule_maxage_validation(self):
+    def test_mailrule_maxage_validation(self) -> None:
         """
         GIVEN:
             - An existing mail account
@@ -728,7 +728,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
 class TestAPIProcessedMails(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/processed_mail/"
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.user = User.objects.create_user(username="temp_admin")
@@ -736,7 +736,7 @@ class TestAPIProcessedMails(DirectoriesMixin, APITestCase):
         self.user.save()
         self.client.force_authenticate(user=self.user)
 
-    def test_get_processed_mails_owner_aware(self):
+    def test_get_processed_mails_owner_aware(self) -> None:
         """
         GIVEN:
             - Configured processed mails with different users
@@ -821,7 +821,7 @@ class TestAPIProcessedMails(DirectoriesMixin, APITestCase):
         returned_ids = {r["id"] for r in response.data["results"]}
         self.assertSetEqual(returned_ids, {pm1.id, pm2.id, pm4.id})
 
-    def test_get_processed_mails_filter_by_rule(self):
+    def test_get_processed_mails_filter_by_rule(self) -> None:
         """
         GIVEN:
             - Processed mails belonging to two different rules
@@ -893,7 +893,7 @@ class TestAPIProcessedMails(DirectoriesMixin, APITestCase):
         returned_ids = {r["id"] for r in response.data["results"]}
         self.assertSetEqual(returned_ids, {pm1.id, pm2.id})
 
-    def test_bulk_delete_processed_mails(self):
+    def test_bulk_delete_processed_mails(self) -> None:
         """
         GIVEN:
             - Processed mails belonging to two different rules and different users

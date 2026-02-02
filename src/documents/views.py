@@ -1180,7 +1180,7 @@ class DocumentViewSet(
             ):
                 return HttpResponseForbidden("Insufficient permissions to delete notes")
 
-            note = Note.objects.get(id=int(request.GET.get("id")))
+            note = Note.objects.get(id=int(request.GET.get("id")), document=doc)
             if settings.AUDIT_LOG_ENABLED:
                 LogEntry.objects.log_create(
                     instance=doc,
@@ -1460,7 +1460,7 @@ class ChatStreamingView(GenericAPIView):
     ),
 )
 class UnifiedSearchViewSet(DocumentViewSet):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.searcher = None
 
@@ -1638,7 +1638,7 @@ class SavedViewViewSet(ModelViewSet, PassUserMixin):
             .prefetch_related("filter_rules")
         )
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         serializer.save(owner=self.request.user)
 
 
@@ -1840,6 +1840,8 @@ class PostDocumentView(GenericAPIView):
     parser_classes = (parsers.MultiPartParser,)
 
     def post(self, request, *args, **kwargs):
+        if not request.user.has_perm("documents.add_document"):
+            return HttpResponseForbidden("Insufficient permissions")
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 

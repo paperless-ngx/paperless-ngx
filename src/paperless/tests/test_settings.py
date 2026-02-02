@@ -21,7 +21,7 @@ class TestIgnoreDateParsing(TestCase):
     Tests the parsing of the PAPERLESS_IGNORE_DATES setting value
     """
 
-    def _parse_checker(self, test_cases):
+    def _parse_checker(self, test_cases) -> None:
         """
         Helper function to check ignore date parsing
 
@@ -34,7 +34,7 @@ class TestIgnoreDateParsing(TestCase):
                 expected_date_set,
             )
 
-    def test_no_ignore_dates_set(self):
+    def test_no_ignore_dates_set(self) -> None:
         """
         GIVEN:
             - No ignore dates are set
@@ -43,7 +43,7 @@ class TestIgnoreDateParsing(TestCase):
         """
         self.assertSetEqual(_parse_ignore_dates(""), set())
 
-    def test_single_ignore_dates_set(self):
+    def test_single_ignore_dates_set(self) -> None:
         """
         GIVEN:
             - Ignore dates are set per certain inputs
@@ -70,7 +70,7 @@ class TestIgnoreDateParsing(TestCase):
 
 
 class TestThreadCalculation(TestCase):
-    def test_workers_threads(self):
+    def test_workers_threads(self) -> None:
         """
         GIVEN:
             - Certain CPU counts
@@ -96,7 +96,7 @@ class TestThreadCalculation(TestCase):
 
 
 class TestRedisSocketConversion(TestCase):
-    def test_redis_socket_parsing(self):
+    def test_redis_socket_parsing(self) -> None:
         """
         GIVEN:
             - Various Redis connection URI formats
@@ -163,7 +163,7 @@ class TestCeleryScheduleParsing(TestCase):
     LLM_INDEX_EXPIRE_TIME = 23.0 * 60.0 * 60.0
     CLEANUP_EXPIRED_SHARE_BUNDLES_EXPIRE_TIME = 23.0 * 60.0 * 60.0
 
-    def test_schedule_configuration_default(self):
+    def test_schedule_configuration_default(self) -> None:
         """
         GIVEN:
             - No configured task schedules
@@ -224,7 +224,7 @@ class TestCeleryScheduleParsing(TestCase):
             schedule,
         )
 
-    def test_schedule_configuration_changed(self):
+    def test_schedule_configuration_changed(self) -> None:
         """
         GIVEN:
             - Email task is configured non-default
@@ -290,7 +290,7 @@ class TestCeleryScheduleParsing(TestCase):
             schedule,
         )
 
-    def test_schedule_configuration_disabled(self):
+    def test_schedule_configuration_disabled(self) -> None:
         """
         GIVEN:
             - Search index task is disabled
@@ -348,7 +348,7 @@ class TestCeleryScheduleParsing(TestCase):
             schedule,
         )
 
-    def test_schedule_configuration_disabled_all(self):
+    def test_schedule_configuration_disabled_all(self) -> None:
         """
         GIVEN:
             - All tasks are disabled
@@ -379,7 +379,7 @@ class TestCeleryScheduleParsing(TestCase):
 
 
 class TestDBSettings(TestCase):
-    def test_db_timeout_with_sqlite(self):
+    def test_db_timeout_with_sqlite(self) -> None:
         """
         GIVEN:
             - PAPERLESS_DB_TIMEOUT is set
@@ -403,7 +403,7 @@ class TestDBSettings(TestCase):
                 databases["default"]["OPTIONS"],
             )
 
-    def test_db_timeout_with_not_sqlite(self):
+    def test_db_timeout_with_not_sqlite(self) -> None:
         """
         GIVEN:
             - PAPERLESS_DB_TIMEOUT is set but db is not sqlite
@@ -437,7 +437,7 @@ class TestDBSettings(TestCase):
 
 
 class TestPaperlessURLSettings(TestCase):
-    def test_paperless_url(self):
+    def test_paperless_url(self) -> None:
         """
         GIVEN:
             - PAPERLESS_URL is set
@@ -461,7 +461,7 @@ class TestPaperlessURLSettings(TestCase):
 
 
 class TestPathSettings(TestCase):
-    def test_default_paths(self):
+    def test_default_paths(self) -> None:
         """
         GIVEN:
             - PAPERLESS_FORCE_SCRIPT_NAME is not set
@@ -481,7 +481,7 @@ class TestPathSettings(TestCase):
         )  # LOGOUT_REDIRECT_URL
 
     @mock.patch("os.environ", {"PAPERLESS_FORCE_SCRIPT_NAME": "/paperless"})
-    def test_subpath(self):
+    def test_subpath(self) -> None:
         """
         GIVEN:
             - PAPERLESS_FORCE_SCRIPT_NAME is set
@@ -507,7 +507,7 @@ class TestPathSettings(TestCase):
             "PAPERLESS_LOGOUT_REDIRECT_URL": "/foobar/",
         },
     )
-    def test_subpath_with_explicit_logout_url(self):
+    def test_subpath_with_explicit_logout_url(self) -> None:
         """
         GIVEN:
             - PAPERLESS_FORCE_SCRIPT_NAME is set and so is PAPERLESS_LOGOUT_REDIRECT_URL
@@ -537,5 +537,5 @@ class TestPathSettings(TestCase):
         ("en+zh-Hans+zh-Hant", ["en", "zh-Hans", "zh-Hant", "zh"]),
     ],
 )
-def test_parser_date_parser_languages(languages, expected):
+def test_parser_date_parser_languages(languages, expected) -> None:
     assert sorted(_parse_dateparser_languages(languages)) == sorted(expected)

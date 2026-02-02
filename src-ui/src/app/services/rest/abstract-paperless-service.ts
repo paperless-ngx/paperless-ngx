@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core'
 import { Observable } from 'rxjs'
-import { map, publishReplay, refCount, tap } from 'rxjs/operators'
+import { map, shareReplay, tap } from 'rxjs/operators'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { Results } from 'src/app/data/results'
 import { environment } from 'src/environments/environment'
@@ -90,7 +90,7 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
         sortField,
         sortReverse,
         extraParams
-      ).pipe(publishReplay(1), refCount())
+      ).pipe(shareReplay({ bufferSize: 1, refCount: true }))
     }
     return this._listAll
   }

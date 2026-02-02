@@ -42,6 +42,9 @@ export class PageHeaderComponent {
   @Input()
   infoLink: string
 
+  @Input()
+  loading: boolean = false
+
   public copyID() {
     this.copied = this.clipboard.copy(this.id.toString())
     clearTimeout(this.copyTimeout)

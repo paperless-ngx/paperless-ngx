@@ -34,7 +34,7 @@ class TestApiObjects(DirectoriesMixin, APITestCase):
         self.sp1 = StoragePath.objects.create(name="sp1", path="Something/{title}")
         self.sp2 = StoragePath.objects.create(name="sp2", path="Something2/{title}")
 
-    def test_object_filters(self):
+    def test_object_filters(self) -> None:
         response = self.client.get(
             f"/api/tags/?id={self.tag2.id}",
         )
@@ -91,7 +91,7 @@ class TestApiObjects(DirectoriesMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results), 2)
 
-    def test_correspondent_last_correspondence(self):
+    def test_correspondent_last_correspondence(self) -> None:
         """
         GIVEN:
             - Correspondent with documents
@@ -154,7 +154,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
 
         self.sp1 = StoragePath.objects.create(name="sp1", path="Something/{checksum}")
 
-    def test_api_get_storage_path(self):
+    def test_api_get_storage_path(self) -> None:
         """
         GIVEN:
             - API request to get all storage paths
@@ -172,7 +172,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertEqual(resp_storage_path["id"], self.sp1.id)
         self.assertEqual(resp_storage_path["path"], self.sp1.path)
 
-    def test_api_create_storage_path(self):
+    def test_api_create_storage_path(self) -> None:
         """
         GIVEN:
             - API request to create a storage paths
@@ -195,7 +195,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(StoragePath.objects.count(), 2)
 
-    def test_api_create_invalid_storage_path(self):
+    def test_api_create_invalid_storage_path(self) -> None:
         """
         GIVEN:
             - API request to create a storage paths
@@ -219,7 +219,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(StoragePath.objects.count(), 1)
 
-    def test_api_create_storage_path_rejects_traversal(self):
+    def test_api_create_storage_path_rejects_traversal(self) -> None:
         """
         GIVEN:
             - API request to create a storage paths
@@ -243,7 +243,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(StoragePath.objects.count(), 1)
 
-    def test_api_storage_path_placeholders(self):
+    def test_api_storage_path_placeholders(self) -> None:
         """
         GIVEN:
             - API request to create a storage path with placeholders
@@ -273,7 +273,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertEqual(StoragePath.objects.count(), 2)
 
     @mock.patch("documents.bulk_edit.bulk_update_documents.delay")
-    def test_api_update_storage_path(self, bulk_update_mock):
+    def test_api_update_storage_path(self, bulk_update_mock) -> None:
         """
         GIVEN:
             - API request to get all storage paths
@@ -302,7 +302,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertCountEqual([document.pk], args[0])
 
     @mock.patch("documents.bulk_edit.bulk_update_documents.delay")
-    def test_api_delete_storage_path(self, bulk_update_mock):
+    def test_api_delete_storage_path(self, bulk_update_mock) -> None:
         """
         GIVEN:
             - API request to delete a storage
@@ -330,7 +330,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         # only called once
         bulk_update_mock.assert_called_once_with([document.pk])
 
-    def test_test_storage_path(self):
+    def test_test_storage_path(self) -> None:
         """
         GIVEN:
             - API request to test a storage path
@@ -359,7 +359,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, "path/Something")
 
-    def test_test_storage_path_respects_none_placeholder_setting(self):
+    def test_test_storage_path_respects_none_placeholder_setting(self) -> None:
         """
         GIVEN:
             - A storage path template referencing an empty field
@@ -401,7 +401,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
 
 class TestBulkEditObjects(APITestCase):
     # See test_api_permissions.py for bulk tests on permissions
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.temp_admin = User.objects.create_superuser(username="temp_admin")
@@ -416,7 +416,7 @@ class TestBulkEditObjects(APITestCase):
         self.user2 = User.objects.create(username="user2")
         self.user3 = User.objects.create(username="user3")
 
-    def test_bulk_objects_delete(self):
+    def test_bulk_objects_delete(self) -> None:
         """
         GIVEN:
             - Existing objects
@@ -485,7 +485,7 @@ class TestBulkEditObjects(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(StoragePath.objects.count(), 0)
 
-    def test_bulk_edit_object_permissions_insufficient_global_perms(self):
+    def test_bulk_edit_object_permissions_insufficient_global_perms(self) -> None:
         """
         GIVEN:
             - Existing objects, user does not have global delete permissions
@@ -511,7 +511,7 @@ class TestBulkEditObjects(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(response.content, b"Insufficient permissions")
 
-    def test_bulk_edit_object_permissions_sufficient_global_perms(self):
+    def test_bulk_edit_object_permissions_sufficient_global_perms(self) -> None:
         """
         GIVEN:
             - Existing objects, user does have global delete permissions
@@ -540,7 +540,7 @@ class TestBulkEditObjects(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_bulk_edit_object_permissions_insufficient_object_perms(self):
+    def test_bulk_edit_object_permissions_insufficient_object_perms(self) -> None:
         """
         GIVEN:
             - Objects owned by user other than logged in user

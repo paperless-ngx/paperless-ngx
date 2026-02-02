@@ -60,7 +60,7 @@ class FakeEmbedding(BaseEmbedding):
 
 
 @pytest.mark.django_db
-def test_build_document_node(real_document):
+def test_build_document_node(real_document) -> None:
     nodes = indexing.build_document_node(real_document)
     assert len(nodes) > 0
     assert nodes[0].metadata["document_id"] == str(real_document.id)
@@ -71,7 +71,7 @@ def test_update_llm_index(
     temp_llm_index_dir,
     real_document,
     mock_embed_model,
-):
+) -> None:
     with patch("documents.models.Document.objects.all") as mock_all:
         mock_queryset = MagicMock()
         mock_queryset.exists.return_value = True
@@ -87,7 +87,7 @@ def test_update_llm_index_removes_meta(
     temp_llm_index_dir,
     real_document,
     mock_embed_model,
-):
+) -> None:
     # Pre-create a meta.json with incorrect data
     (temp_llm_index_dir / "meta.json").write_text(
         json.dumps({"embedding_model": "old", "dim": 1}),
@@ -117,7 +117,7 @@ def test_update_llm_index_partial_update(
     temp_llm_index_dir,
     real_document,
     mock_embed_model,
-):
+) -> None:
     doc2 = Document.objects.create(
         title="Test Document 2",
         content="This is some test content 2.",
@@ -166,7 +166,7 @@ def test_update_llm_index_partial_update(
 def test_get_or_create_storage_context_raises_exception(
     temp_llm_index_dir,
     mock_embed_model,
-):
+) -> None:
     with pytest.raises(Exception):
         indexing.get_or_create_storage_context(rebuild=False)
 
@@ -178,7 +178,7 @@ def test_load_or_build_index_builds_when_nodes_given(
     temp_llm_index_dir,
     real_document,
     mock_embed_model,
-):
+) -> None:
     with (
         patch(
             "paperless_ai.indexing.load_index_from_storage",
@@ -203,7 +203,7 @@ def test_load_or_build_index_builds_when_nodes_given(
 def test_load_or_build_index_raises_exception_when_no_nodes(
     temp_llm_index_dir,
     mock_embed_model,
-):
+) -> None:
     with (
         patch(
             "paperless_ai.indexing.load_index_from_storage",
@@ -222,7 +222,7 @@ def test_load_or_build_index_raises_exception_when_no_nodes(
 def test_load_or_build_index_succeeds_when_nodes_given(
     temp_llm_index_dir,
     mock_embed_model,
-):
+) -> None:
     with (
         patch(
             "paperless_ai.indexing.load_index_from_storage",
@@ -249,7 +249,7 @@ def test_add_or_update_document_updates_existing_entry(
     temp_llm_index_dir,
     real_document,
     mock_embed_model,
-):
+) -> None:
     indexing.update_llm_index(rebuild=True)
     indexing.llm_index_add_or_update_document(real_document)
 
@@ -261,7 +261,7 @@ def test_remove_document_deletes_node_from_docstore(
     temp_llm_index_dir,
     real_document,
     mock_embed_model,
-):
+) -> None:
     indexing.update_llm_index(rebuild=True)
     index = indexing.load_or_build_index()
     assert len(index.docstore.docs) == 1
@@ -275,7 +275,7 @@ def test_remove_document_deletes_node_from_docstore(
 def test_update_llm_index_no_documents(
     temp_llm_index_dir,
     mock_embed_model,
-):
+) -> None:
     with patch("documents.models.Document.objects.all") as mock_all:
         mock_queryset = MagicMock()
         mock_queryset.exists.return_value = False
@@ -291,7 +291,7 @@ def test_update_llm_index_no_documents(
 
 
 @pytest.mark.django_db
-def test_queue_llm_index_update_if_needed_enqueues_when_idle_or_skips_recent():
+def test_queue_llm_index_update_if_needed_enqueues_when_idle_or_skips_recent() -> None:
     # No existing tasks
     with patch("documents.tasks.llmindex_index") as mock_task:
         result = indexing.queue_llm_index_update_if_needed(
@@ -327,7 +327,7 @@ def test_queue_llm_index_update_if_needed_enqueues_when_idle_or_skips_recent():
 def test_query_similar_documents(
     temp_llm_index_dir,
     real_document,
-):
+) -> None:
     with (
         patch("paperless_ai.indexing.get_or_create_storage_context") as mock_storage,
         patch("paperless_ai.indexing.load_or_build_index") as mock_load_or_build_index,
@@ -374,7 +374,7 @@ def test_query_similar_documents(
 def test_query_similar_documents_triggers_update_when_index_missing(
     temp_llm_index_dir,
     real_document,
-):
+) -> None:
     with (
         patch(
             "paperless_ai.indexing.vector_store_file_exists",

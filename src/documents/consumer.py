@@ -123,7 +123,7 @@ class ConsumerPluginMixin:
         status: ProgressStatusOptions,
         message: ConsumerStatusShortMessage | str | None = None,
         document_id=None,
-    ):  # pragma: no cover
+    ) -> None:  # pragma: no cover
         self.status_mgr.send_progress(
             status,
             message,
@@ -161,7 +161,7 @@ class ConsumerPlugin(
 ):
     logging_name = LOGGING_NAME
 
-    def run_pre_consume_script(self):
+    def run_pre_consume_script(self) -> None:
         """
         If one is configured and exists, run the pre-consume script and
         handle its output and/or errors
@@ -204,7 +204,7 @@ class ConsumerPlugin(
                 exception=e,
             )
 
-    def run_post_consume_script(self, document: Document):
+    def run_post_consume_script(self, document: Document) -> None:
         """
         If one is configured and exists, run the pre-consume script and
         handle its output and/or errors
@@ -364,7 +364,10 @@ class ConsumerPlugin(
                 tempdir.cleanup()
             raise
 
-        def progress_callback(current_progress, max_progress):  # pragma: no cover
+        def progress_callback(
+            current_progress,
+            max_progress,
+        ) -> None:  # pragma: no cover
             # recalculate progress to be within 20 and 80
             p = int((current_progress / max_progress) * 50 + 20)
             self._send_progress(p, 100, ProgressStatusOptions.WORKING)
@@ -673,7 +676,7 @@ class ConsumerPlugin(
 
         return document
 
-    def apply_overrides(self, document):
+    def apply_overrides(self, document) -> None:
         if self.metadata.correspondent_id:
             document.correspondent = Correspondent.objects.get(
                 pk=self.metadata.correspondent_id,
@@ -733,7 +736,7 @@ class ConsumerPlugin(
                 }
                 CustomFieldInstance.objects.create(**args)  # adds to document
 
-    def _write(self, source, target):
+    def _write(self, source, target) -> None:
         with (
             Path(source).open("rb") as read_file,
             Path(target).open("wb") as write_file,
@@ -758,7 +761,7 @@ class ConsumerPreflightPlugin(
     NAME: str = "ConsumerPreflightPlugin"
     logging_name = LOGGING_NAME
 
-    def pre_check_file_exists(self):
+    def pre_check_file_exists(self) -> None:
         """
         Confirm the input file still exists where it should
         """
@@ -772,7 +775,7 @@ class ConsumerPreflightPlugin(
                 f"Cannot consume {self.input_doc.original_file}: File not found.",
             )
 
-    def pre_check_duplicate(self):
+    def pre_check_duplicate(self) -> None:
         """
         Using the MD5 of the file, check this exact file doesn't already exist
         """
@@ -822,7 +825,7 @@ class ConsumerPreflightPlugin(
                     failure_msg,
                 )
 
-    def pre_check_directories(self):
+    def pre_check_directories(self) -> None:
         """
         Ensure all required directories exist before attempting to use them
         """
@@ -857,7 +860,7 @@ class AsnCheckPlugin(
     NAME: str = "AsnCheckPlugin"
     logging_name = LOGGING_NAME
 
-    def pre_check_asn_value(self):
+    def pre_check_asn_value(self) -> None:
         """
         Check that if override_asn is given, it is unique and within a valid range
         """

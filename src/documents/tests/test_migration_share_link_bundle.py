@@ -5,7 +5,7 @@ class TestMigrateShareLinkBundlePermissions(TestMigrations):
     migrate_from = "0007_document_content_length"
     migrate_to = "0008_sharelinkbundle"
 
-    def setUpBeforeMigration(self, apps):
+    def setUpBeforeMigration(self, apps) -> None:
         User = apps.get_model("auth", "User")
         Group = apps.get_model("auth", "Group")
         self.Permission = apps.get_model("auth", "Permission")
@@ -15,7 +15,7 @@ class TestMigrateShareLinkBundlePermissions(TestMigrations):
         self.user.user_permissions.add(add_document.id)
         self.group.permissions.add(add_document.id)
 
-    def test_share_link_permissions_granted_to_add_document_holders(self):
+    def test_share_link_permissions_granted_to_add_document_holders(self) -> None:
         share_perms = self.Permission.objects.filter(
             codename__contains="sharelinkbundle",
         )
@@ -27,7 +27,7 @@ class TestReverseMigrateShareLinkBundlePermissions(TestMigrations):
     migrate_from = "0008_sharelinkbundle"
     migrate_to = "0007_document_content_length"
 
-    def setUpBeforeMigration(self, apps):
+    def setUpBeforeMigration(self, apps) -> None:
         User = apps.get_model("auth", "User")
         Group = apps.get_model("auth", "Group")
         self.Permission = apps.get_model("auth", "Permission")
@@ -42,7 +42,7 @@ class TestReverseMigrateShareLinkBundlePermissions(TestMigrations):
         self.user.user_permissions.add(add_document.id, *self.share_perm_ids)
         self.group.permissions.add(add_document.id, *self.share_perm_ids)
 
-    def test_share_link_permissions_revoked_on_reverse(self):
+    def test_share_link_permissions_revoked_on_reverse(self) -> None:
         self.assertFalse(
             self.user.user_permissions.filter(pk__in=self.share_perm_ids).exists(),
         )

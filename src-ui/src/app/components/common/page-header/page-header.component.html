@@ -15,7 +15,7 @@
         <span class="h6 mb-0 mt-1 d-block d-md-inline fw-normal ms-md-3 text-truncate" style="line-height: 1.4">{{subTitle}}</span>
       }
       @if (info) {
-        <button class="btn btn-sm btn-link text-muted me-auto p-0 p-md-2" title="What's this?" i18n-title type="button" [ngbPopover]="infoPopover" [autoClose]="true">
+        <button class="btn btn-sm btn-link text-muted p-0 p-md-2" title="What's this?" i18n-title type="button" [ngbPopover]="infoPopover" [autoClose]="true">
           <i-bs name="question-circle"></i-bs>
         </button>
         <ng-template #infoPopover>
@@ -25,6 +25,9 @@
             <i-bs class="ms-1" width=".8em" height=".8em" name="box-arrow-up-right"></i-bs>
           }
         </ng-template>
+      }
+      @if (loading) {
+        <output class="spinner-border spinner-border-sm fs-6 fw-normal" aria-hidden="true"><span class="visually-hidden" i18n>Loading...</span></output>
       }
     </h3>
   </div>

@@ -56,7 +56,7 @@ class TestBarcode(
     GetReaderPluginMixin,
     TestCase,
 ):
-    def test_scan_file_for_separating_barcodes(self):
+    def test_scan_file_for_separating_barcodes(self) -> None:
         """
         GIVEN:
             - PDF containing barcodes
@@ -77,7 +77,7 @@ class TestBarcode(
     @override_settings(
         CONSUMER_BARCODE_TIFF_SUPPORT=True,
     )
-    def test_scan_tiff_for_separating_barcodes(self):
+    def test_scan_tiff_for_separating_barcodes(self) -> None:
         """
         GIVEN:
             - TIFF image containing barcodes
@@ -132,7 +132,7 @@ class TestBarcode(
     @override_settings(
         CONSUMER_BARCODE_TIFF_SUPPORT=True,
     )
-    def test_scan_tiff_with_alpha_for_separating_barcodes(self):
+    def test_scan_tiff_with_alpha_for_separating_barcodes(self) -> None:
         """
         GIVEN:
             - TIFF image containing barcodes
@@ -149,7 +149,7 @@ class TestBarcode(
 
             self.assertDictEqual(separator_page_numbers, {1: False})
 
-    def test_scan_file_for_separating_barcodes_none_present(self):
+    def test_scan_file_for_separating_barcodes_none_present(self) -> None:
         """
         GIVEN:
             - File with no barcodes
@@ -167,7 +167,7 @@ class TestBarcode(
             self.assertEqual(reader.pdf_file, test_file)
             self.assertDictEqual(separator_page_numbers, {})
 
-    def test_scan_file_for_separating_barcodes_middle_page(self):
+    def test_scan_file_for_separating_barcodes_middle_page(self) -> None:
         """
         GIVEN:
             - PDF file containing a separator on page 1 (zero indexed)
@@ -185,7 +185,7 @@ class TestBarcode(
             self.assertEqual(reader.pdf_file, test_file)
             self.assertDictEqual(separator_page_numbers, {1: False})
 
-    def test_scan_file_for_separating_barcodes_multiple_pages(self):
+    def test_scan_file_for_separating_barcodes_multiple_pages(self) -> None:
         """
         GIVEN:
             - PDF file containing a separator on pages 2 and 5 (zero indexed)
@@ -203,7 +203,7 @@ class TestBarcode(
             self.assertEqual(reader.pdf_file, test_file)
             self.assertDictEqual(separator_page_numbers, {2: False, 5: False})
 
-    def test_scan_file_for_separating_barcodes_hard_to_detect(self):
+    def test_scan_file_for_separating_barcodes_hard_to_detect(self) -> None:
         """
         GIVEN:
             - PDF file containing a separator on page 1 (zero indexed)
@@ -228,7 +228,7 @@ class TestBarcode(
                 self.assertEqual(reader.pdf_file, test_file)
                 self.assertDictEqual(separator_page_numbers, {1: False})
 
-    def test_scan_file_for_separating_barcodes_unreadable(self):
+    def test_scan_file_for_separating_barcodes_unreadable(self) -> None:
         """
         GIVEN:
             - PDF file containing a separator on page 1 (zero indexed)
@@ -247,7 +247,7 @@ class TestBarcode(
             self.assertEqual(reader.pdf_file, test_file)
             self.assertDictEqual(separator_page_numbers, {})
 
-    def test_scan_file_for_separating_barcodes_fax_decode(self):
+    def test_scan_file_for_separating_barcodes_fax_decode(self) -> None:
         """
         GIVEN:
             - A PDF containing an image encoded as CCITT Group 4 encoding
@@ -265,7 +265,7 @@ class TestBarcode(
             self.assertEqual(reader.pdf_file, test_file)
             self.assertDictEqual(separator_page_numbers, {1: False})
 
-    def test_scan_file_for_separating_qr_barcodes(self):
+    def test_scan_file_for_separating_qr_barcodes(self) -> None:
         """
         GIVEN:
             - PDF file containing a separator on page 0 (zero indexed)
@@ -285,7 +285,7 @@ class TestBarcode(
             self.assertDictEqual(separator_page_numbers, {0: False})
 
     @override_settings(CONSUMER_BARCODE_STRING="CUSTOM BARCODE")
-    def test_scan_file_for_separating_custom_barcodes(self):
+    def test_scan_file_for_separating_custom_barcodes(self) -> None:
         """
         GIVEN:
             - PDF file containing a separator on page 0 (zero indexed)
@@ -305,7 +305,7 @@ class TestBarcode(
             self.assertDictEqual(separator_page_numbers, {0: False})
 
     @override_settings(CONSUMER_BARCODE_STRING="CUSTOM BARCODE")
-    def test_scan_file_for_separating_custom_qr_barcodes(self):
+    def test_scan_file_for_separating_custom_qr_barcodes(self) -> None:
         """
         GIVEN:
             - PDF file containing a separator on page 0 (zero indexed)
@@ -326,7 +326,7 @@ class TestBarcode(
             self.assertDictEqual(separator_page_numbers, {0: False})
 
     @override_settings(CONSUMER_BARCODE_STRING="CUSTOM BARCODE")
-    def test_scan_file_for_separating_custom_128_barcodes(self):
+    def test_scan_file_for_separating_custom_128_barcodes(self) -> None:
         """
         GIVEN:
             - PDF file containing a separator on page 0 (zero indexed)
@@ -346,7 +346,7 @@ class TestBarcode(
             self.assertEqual(reader.pdf_file, test_file)
             self.assertDictEqual(separator_page_numbers, {0: False})
 
-    def test_scan_file_for_separating_wrong_qr_barcodes(self):
+    def test_scan_file_for_separating_wrong_qr_barcodes(self) -> None:
         """
         GIVEN:
             - PDF file containing a separator on page 0 (zero indexed)
@@ -367,7 +367,7 @@ class TestBarcode(
             self.assertDictEqual(separator_page_numbers, {})
 
     @override_settings(CONSUMER_BARCODE_STRING="ADAR-NEXTDOC")
-    def test_scan_file_qr_barcodes_was_problem(self):
+    def test_scan_file_qr_barcodes_was_problem(self) -> None:
         """
         GIVEN:
             - Input PDF with certain QR codes that aren't detected at current size
@@ -386,7 +386,7 @@ class TestBarcode(
             self.assertGreater(len(reader.barcodes), 0)
             self.assertDictEqual(separator_page_numbers, {1: False})
 
-    def test_scan_file_for_separating_barcodes_password(self):
+    def test_scan_file_for_separating_barcodes_password(self) -> None:
         """
         GIVEN:
             - Password protected PDF
@@ -408,7 +408,7 @@ class TestBarcode(
                 self.assertEqual(reader.pdf_file, test_file)
                 self.assertDictEqual(separator_page_numbers, {})
 
-    def test_separate_pages(self):
+    def test_separate_pages(self) -> None:
         """
         GIVEN:
             - Input PDF 2 pages after separation
@@ -425,7 +425,7 @@ class TestBarcode(
             self.assertEqual(reader.pdf_file, test_file)
             self.assertEqual(len(documents), 2)
 
-    def test_separate_pages_double_code(self):
+    def test_separate_pages_double_code(self) -> None:
         """
         GIVEN:
             - Input PDF with two patch code pages in a row
@@ -442,7 +442,7 @@ class TestBarcode(
             self.assertEqual(len(documents), 2)
 
     @override_settings(CONSUMER_ENABLE_BARCODES=True)
-    def test_separate_pages_no_list(self):
+    def test_separate_pages_no_list(self) -> None:
         """
         GIVEN:
             - Input file to separate
@@ -463,7 +463,7 @@ class TestBarcode(
         CONSUMER_ENABLE_BARCODES=True,
         CONSUMER_BARCODE_TIFF_SUPPORT=True,
     )
-    def test_consume_barcode_unsupported_jpg_file(self):
+    def test_consume_barcode_unsupported_jpg_file(self) -> None:
         """
         GIVEN:
             - JPEG image as input
@@ -482,7 +482,7 @@ class TestBarcode(
         CONSUMER_ENABLE_BARCODES=True,
         CONSUMER_ENABLE_ASN_BARCODE=True,
     )
-    def test_separate_pages_by_asn_barcodes_and_patcht(self):
+    def test_separate_pages_by_asn_barcodes_and_patcht(self) -> None:
         """
         GIVEN:
             - Input PDF with a patch code on page 3 and ASN barcodes on pages 1,5,6,9,11
@@ -519,7 +519,7 @@ class TestBarcode(
         CONSUMER_ENABLE_BARCODES=True,
         CONSUMER_ENABLE_ASN_BARCODE=True,
     )
-    def test_separate_pages_by_asn_barcodes(self):
+    def test_separate_pages_by_asn_barcodes(self) -> None:
         """
         GIVEN:
             - Input PDF with ASN barcodes on pages 1,3,4,7,9
@@ -553,7 +553,7 @@ class TestBarcode(
         CONSUMER_ENABLE_ASN_BARCODE=True,
         CONSUMER_BARCODE_RETAIN_SPLIT_PAGES=True,
     )
-    def test_separate_pages_by_asn_barcodes_and_patcht_retain_pages(self):
+    def test_separate_pages_by_asn_barcodes_and_patcht_retain_pages(self) -> None:
         """
         GIVEN:
             - Input PDF with a patch code on page 3 and ASN barcodes on pages 1,5,6,9,11
@@ -584,7 +584,7 @@ class TestBarcode(
                 },
             )
 
-    def test_barcode_config(self):
+    def test_barcode_config(self) -> None:
         """
         GIVEN:
             - Barcode app config is set (settings are not)
@@ -615,7 +615,7 @@ class TestBarcodeNewConsume(
     TestCase,
 ):
     @override_settings(CONSUMER_ENABLE_BARCODES=True)
-    def test_consume_barcode_file(self):
+    def test_consume_barcode_file(self) -> None:
         """
         GIVEN:
             - Incoming file with at 1 barcode producing 2 documents
@@ -678,7 +678,7 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         reader.cleanup()
 
     @override_settings(CONSUMER_ASN_BARCODE_PREFIX="CUSTOM-PREFIX-")
-    def test_scan_file_for_asn_custom_prefix(self):
+    def test_scan_file_for_asn_custom_prefix(self) -> None:
         """
         GIVEN:
             - PDF containing an ASN barcode with custom prefix
@@ -696,7 +696,7 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
             self.assertEqual(reader.pdf_file, test_file)
             self.assertEqual(asn, 123)
 
-    def test_scan_file_for_asn_barcode(self):
+    def test_scan_file_for_asn_barcode(self) -> None:
         """
         GIVEN:
             - PDF containing an ASN barcode
@@ -715,7 +715,7 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
             self.assertEqual(reader.pdf_file, test_file)
             self.assertEqual(asn, 123)
 
-    def test_scan_file_for_asn_not_found(self):
+    def test_scan_file_for_asn_not_found(self) -> None:
         """
         GIVEN:
             - PDF without an ASN barcode
@@ -732,7 +732,7 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
             self.assertEqual(reader.pdf_file, test_file)
             self.assertEqual(asn, None)
 
-    def test_scan_file_for_asn_barcode_invalid(self):
+    def test_scan_file_for_asn_barcode_invalid(self) -> None:
         """
         GIVEN:
             - PDF containing an ASN barcode
@@ -754,7 +754,7 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
             self.assertEqual(asn, None)
 
     @override_settings(CONSUMER_ENABLE_ASN_BARCODE=True)
-    def test_consume_barcode_file_asn_assignment(self):
+    def test_consume_barcode_file_asn_assignment(self) -> None:
         """
         GIVEN:
             - PDF containing an ASN barcode
@@ -785,7 +785,7 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
             self.assertEqual(document.archive_serial_number, 123)
 
     @override_settings(CONSUMER_BARCODE_SCANNER="PYZBAR")
-    def test_scan_file_for_qrcode_without_upscale(self):
+    def test_scan_file_for_qrcode_without_upscale(self) -> None:
         """
         GIVEN:
             - A printed and scanned PDF document with a rather small QR code
@@ -805,7 +805,7 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
     @override_settings(CONSUMER_BARCODE_SCANNER="PYZBAR")
     @override_settings(CONSUMER_BARCODE_DPI=600)
     @override_settings(CONSUMER_BARCODE_UPSCALE=1.5)
-    def test_scan_file_for_qrcode_with_upscale(self):
+    def test_scan_file_for_qrcode_with_upscale(self) -> None:
         """
         GIVEN:
             - A printed and scanned PDF document with a rather small QR code
@@ -862,7 +862,7 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         CONSUMER_ENABLE_TAG_BARCODE=True,
         CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
     )
-    def test_barcode_without_tag_match(self):
+    def test_barcode_without_tag_match(self) -> None:
         """
         GIVEN:
             - Barcode that does not match any TAG mapping pattern
@@ -888,7 +888,7 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
             )
 
     @override_settings(CONSUMER_ENABLE_TAG_BARCODE=True)
-    def test_scan_file_without_matching_barcodes(self):
+    def test_scan_file_without_matching_barcodes(self) -> None:
         """
         GIVEN:
             - PDF containing tag barcodes but none with matching prefix (default "TAG:")
@@ -907,7 +907,7 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         CONSUMER_ENABLE_TAG_BARCODE=False,
         CONSUMER_TAG_BARCODE_MAPPING={"CUSTOM-PREFIX-(.*)": "\\g<1>"},
     )
-    def test_scan_file_with_matching_barcode_but_function_disabled(self):
+    def test_scan_file_with_matching_barcode_but_function_disabled(self) -> None:
         """
         GIVEN:
             - PDF containing a tag barcode with matching custom prefix
@@ -927,7 +927,7 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         CONSUMER_ENABLE_TAG_BARCODE=True,
         CONSUMER_TAG_BARCODE_MAPPING={"CUSTOM-PREFIX-(.*)": "\\g<1>"},
     )
-    def test_scan_file_for_tag_custom_prefix(self):
+    def test_scan_file_for_tag_custom_prefix(self) -> None:
         """
         GIVEN:
             - PDF containing a tag barcode with custom prefix
@@ -953,7 +953,7 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         CONSUMER_ENABLE_TAG_BARCODE=True,
         CONSUMER_TAG_BARCODE_MAPPING={"ASN(.*)": "\\g<1>"},
     )
-    def test_scan_file_for_many_custom_tags(self):
+    def test_scan_file_for_many_custom_tags(self) -> None:
         """
         GIVEN:
             - PDF containing multiple tag barcode with custom prefix
@@ -980,7 +980,7 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         CONSUMER_ENABLE_TAG_BARCODE=True,
         CONSUMER_TAG_BARCODE_MAPPING={"CUSTOM-PREFIX-(.*)": "\\g<3>"},
     )
-    def test_scan_file_for_tag_raises_value_error(self):
+    def test_scan_file_for_tag_raises_value_error(self) -> None:
         """
         GIVEN:
             - Any error occurs during tag barcode processing
@@ -999,7 +999,7 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         CONSUMER_TAG_BARCODE_SPLIT=True,
         CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
     )
-    def test_split_on_tag_barcodes(self):
+    def test_split_on_tag_barcodes(self) -> None:
         """
         GIVEN:
             - PDF containing barcodes with TAG: prefix
@@ -1025,7 +1025,7 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         CONSUMER_TAG_BARCODE_SPLIT=False,
         CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
     )
-    def test_no_split_when_tag_split_disabled(self):
+    def test_no_split_when_tag_split_disabled(self) -> None:
         """
         GIVEN:
             - PDF containing TAG barcodes (TAG:invoice, TAG:receipt)
@@ -1054,7 +1054,7 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         CELERY_TASK_ALWAYS_EAGER=True,
         OCR_MODE="skip",
     )
-    def test_consume_barcode_file_tag_split_and_assignment(self):
+    def test_consume_barcode_file_tag_split_and_assignment(self) -> None:
         """
         GIVEN:
             - PDF containing TAG barcodes on pages 2 and 4 (TAG:invoice, TAG:receipt)
@@ -1102,7 +1102,7 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         CONSUMER_TAG_BARCODE_SPLIT=True,
         CONSUMER_TAG_BARCODE_MAPPING={"ASN(.*)": "ASN_\\g<1>", "TAG:(.*)": "\\g<1>"},
     )
-    def test_split_by_mixed_asn_tag_backwards_compat(self):
+    def test_split_by_mixed_asn_tag_backwards_compat(self) -> None:
         """
         GIVEN:
             - PDF with mixed ASN and TAG barcodes
@@ -1131,7 +1131,7 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         CONSUMER_TAG_BARCODE_SPLIT=True,
         CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
     )
-    def test_split_by_tag_multiple_per_page(self):
+    def test_split_by_tag_multiple_per_page(self) -> None:
         """
         GIVEN:
             - PDF with multiple TAG barcodes on same page

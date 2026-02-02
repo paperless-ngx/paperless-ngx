@@ -414,13 +414,13 @@ class DelayedQuery:
 
 
 class ManualResultsPage(list):
-    def __init__(self, hits):
+    def __init__(self, hits) -> None:
         super().__init__(hits)
         self.results = ManualResults(hits)
 
 
 class ManualResults:
-    def __init__(self, hits):
+    def __init__(self, hits) -> None:
         self._docnums = [hit.docnum for hit in hits]
 
     def docs(self):

@@ -1,4 +1,3 @@
-import { AsyncPipe } from '@angular/common'
 import { Component, OnDestroy, OnInit, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
@@ -37,7 +36,6 @@ import { ProcessedMailDialogComponent } from './processed-mail-dialog/processed-
     PageHeaderComponent,
     IfPermissionsDirective,
     IfOwnerDirective,
-    AsyncPipe,
     FormsModule,
     ReactiveFormsModule,
     NgbDropdownModule,
@@ -48,8 +46,8 @@ export class MailComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy
 {
-  mailAccountService = inject(MailAccountService)
-  mailRuleService = inject(MailRuleService)
+  private readonly mailAccountService = inject(MailAccountService)
+  private readonly mailRuleService = inject(MailRuleService)
   private toastService = inject(ToastService)
   private modalService = inject(NgbModal)
   permissionsService = inject(PermissionsService)
@@ -58,8 +56,19 @@ export class MailComponent
 
   public MailAccountType = MailAccountType
 
-  mailAccounts: MailAccount[] = []
-  mailRules: MailRule[] = []
+  private _mailAccounts: MailAccount[] = []
+
+  public get mailAccounts() {
+    return this._mailAccounts
+  }
+  private set mailAccounts(accounts: MailAccount[]) {
+    this._mailAccounts = accounts
+    this.mailAccountsById = new Map(
+      accounts.map((account) => [account.id, account])
+    )
+  }
+  public mailAccountsById: Map<number, MailAccount> = new Map()
+  public mailRules: MailRule[] = []
 
   unsubscribeNotifier: Subject<any> = new Subject()
   oAuthAccountId: number
