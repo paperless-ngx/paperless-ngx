@@ -82,7 +82,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   public permissionType: PermissionType
   public extraColumns: ManagementListColumn[]
 
-  private settingsService = inject(SettingsService)
+  private readonly settingsService = inject(SettingsService)
 
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
 
