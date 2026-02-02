@@ -10,6 +10,7 @@ from django.utils import timezone
 from documents.plugins.date_parsing.base import DateParserConfig
 from documents.plugins.date_parsing.base import DateParserPluginBase
 from documents.plugins.date_parsing.regex_parser import RegexDateParserPlugin
+from paperless.config import OcrConfig
 from paperless.utils import ocr_to_dateparser_languages
 
 logger = logging.getLogger(__name__)
@@ -74,9 +75,9 @@ def get_date_parser() -> DateParserPluginBase:
 
     # 2. Load configuration from settings
     # TODO: Get the language from the settings and/or configuration object, depending
-    languages = languages = (
-        settings.DATE_PARSER_LANGUAGES
-        or ocr_to_dateparser_languages(settings.OCR_LANGUAGE)
+    ocr_config = OcrConfig()
+    languages = settings.DATE_PARSER_LANGUAGES or ocr_to_dateparser_languages(
+        ocr_config.language,
     )
 
     config = DateParserConfig(

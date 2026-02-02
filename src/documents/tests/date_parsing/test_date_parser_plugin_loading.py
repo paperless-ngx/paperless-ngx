@@ -191,6 +191,7 @@ class TestDiscoverParserClass:
         mock_entry_points.assert_called_once()
 
 
+@pytest.mark.django_db
 @pytest.mark.date_parsing
 @pytest.mark.usefixtures("mock_date_parser_settings")
 class TestGetDateParser:
