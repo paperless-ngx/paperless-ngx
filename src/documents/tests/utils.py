@@ -20,6 +20,7 @@ from django.db.migrations.executor import MigrationExecutor
 from django.test import TransactionTestCase
 from django.test import override_settings
 
+from documents.consumer import AsnCheckPlugin
 from documents.consumer import ConsumerPlugin
 from documents.consumer import ConsumerPreflightPlugin
 from documents.data_models import ConsumableDocument
@@ -371,6 +372,14 @@ class GetConsumerMixin:
             "task-id",
         )
         preflight_plugin.setup()
+        asncheck_plugin = AsnCheckPlugin(
+            doc,
+            overrides or DocumentMetadataOverrides(),
+            self.status,  # type: ignore
+            self.dirs.scratch_dir,
+            "task-id",
+        )
+        asncheck_plugin.setup()
         reader = ConsumerPlugin(
             doc,
             overrides or DocumentMetadataOverrides(),
@@ -381,6 +390,7 @@ class GetConsumerMixin:
         reader.setup()
         try:
             preflight_plugin.run()
+            asncheck_plugin.run()
             yield reader
         finally:
             reader.cleanup()

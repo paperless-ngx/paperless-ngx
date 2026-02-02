@@ -5,6 +5,7 @@ import tempfile
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import Final
 
 import magic
 from django.conf import settings
@@ -48,6 +49,8 @@ from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
 from paperless_mail.parsers import MailDocumentParser
+
+LOGGING_NAME: Final[str] = "paperless.consumer"
 
 
 class WorkflowTriggerPlugin(
@@ -156,7 +159,7 @@ class ConsumerPlugin(
     ConsumerPluginMixin,
     ConsumeTaskPlugin,
 ):
-    logging_name = "paperless.consumer"
+    logging_name = LOGGING_NAME
 
     def run_pre_consume_script(self) -> None:
         """
@@ -756,7 +759,7 @@ class ConsumerPreflightPlugin(
     ConsumeTaskPlugin,
 ):
     NAME: str = "ConsumerPreflightPlugin"
-    logging_name = "paperless.consumer"
+    logging_name = LOGGING_NAME
 
     def pre_check_file_exists(self) -> None:
         """
@@ -831,6 +834,32 @@ class ConsumerPreflightPlugin(
         settings.ORIGINALS_DIR.mkdir(parents=True, exist_ok=True)
         settings.ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
 
+    def run(self) -> None:
+        self._send_progress(
+            0,
+            100,
+            ProgressStatusOptions.STARTED,
+            ConsumerStatusShortMessage.NEW_FILE,
+        )
+
+        # Make sure that preconditions for consuming the file are met.
+
+        self.pre_check_file_exists()
+        self.pre_check_duplicate()
+        self.pre_check_directories()
+
+
+class AsnCheckPlugin(
+    NoCleanupPluginMixin,
+    NoSetupPluginMixin,
+    AlwaysRunPluginMixin,
+    LoggingMixin,
+    ConsumerPluginMixin,
+    ConsumeTaskPlugin,
+):
+    NAME: str = "AsnCheckPlugin"
+    logging_name = LOGGING_NAME
+
     def pre_check_asn_value(self) -> None:
         """
         Check that if override_asn is given, it is unique and within a valid range
@@ -868,16 +897,4 @@ class ConsumerPreflightPlugin(
             )
 
     def run(self) -> None:
-        self._send_progress(
-            0,
-            100,
-            ProgressStatusOptions.STARTED,
-            ConsumerStatusShortMessage.NEW_FILE,
-        )
-
-        # Make sure that preconditions for consuming the file are met.
-
-        self.pre_check_file_exists()
-        self.pre_check_duplicate()
-        self.pre_check_directories()
         self.pre_check_asn_value()
