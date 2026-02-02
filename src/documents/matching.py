@@ -34,7 +34,7 @@ def log_reason(
     matching_model: MatchingModel | WorkflowTrigger,
     document: Document,
     reason: str,
-):
+) -> None:
     class_name = type(matching_model).__name__
     name = (
         matching_model.name if hasattr(matching_model, "name") else str(matching_model)

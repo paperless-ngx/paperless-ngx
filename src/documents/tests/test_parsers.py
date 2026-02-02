@@ -16,7 +16,7 @@ from paperless_tika.parsers import TikaDocumentParser
 
 class TestParserDiscovery(TestCase):
     @mock.patch("documents.parsers.document_consumer_declaration.send")
-    def test_get_parser_class_1_parser(self, m, *args):
+    def test_get_parser_class_1_parser(self, m, *args) -> None:
         """
         GIVEN:
             - Parser declared for a given mimetype
@@ -43,7 +43,7 @@ class TestParserDiscovery(TestCase):
         self.assertEqual(get_parser_class_for_mime_type("application/pdf"), DummyParser)
 
     @mock.patch("documents.parsers.document_consumer_declaration.send")
-    def test_get_parser_class_n_parsers(self, m, *args):
+    def test_get_parser_class_n_parsers(self, m, *args) -> None:
         """
         GIVEN:
             - Two parsers declared for a given mimetype
@@ -85,7 +85,7 @@ class TestParserDiscovery(TestCase):
         )
 
     @mock.patch("documents.parsers.document_consumer_declaration.send")
-    def test_get_parser_class_0_parsers(self, m, *args):
+    def test_get_parser_class_0_parsers(self, m, *args) -> None:
         """
         GIVEN:
             - No parsers are declared
@@ -99,7 +99,7 @@ class TestParserDiscovery(TestCase):
             self.assertIsNone(get_parser_class_for_mime_type("application/pdf"))
 
     @mock.patch("documents.parsers.document_consumer_declaration.send")
-    def test_get_parser_class_no_valid_parser(self, m, *args):
+    def test_get_parser_class_no_valid_parser(self, m, *args) -> None:
         """
         GIVEN:
             - No parser declared for a given mimetype
@@ -128,7 +128,7 @@ class TestParserDiscovery(TestCase):
 
 
 class TestParserAvailability(TestCase):
-    def test_tesseract_parser(self):
+    def test_tesseract_parser(self) -> None:
         """
         GIVEN:
             - Various mime types
@@ -155,7 +155,7 @@ class TestParserAvailability(TestCase):
                 RasterisedDocumentParser,
             )
 
-    def test_text_parser(self):
+    def test_text_parser(self) -> None:
         """
         GIVEN:
             - Various mime types of a text form
@@ -179,7 +179,7 @@ class TestParserAvailability(TestCase):
                 TextDocumentParser,
             )
 
-    def test_tika_parser(self):
+    def test_tika_parser(self) -> None:
         """
         GIVEN:
             - Various mime types of a office document form
@@ -212,17 +212,17 @@ class TestParserAvailability(TestCase):
                 TikaDocumentParser,
             )
 
-    def test_no_parser_for_mime(self):
+    def test_no_parser_for_mime(self) -> None:
         self.assertIsNone(get_parser_class_for_mime_type("text/sdgsdf"))
 
-    def test_default_extension(self):
+    def test_default_extension(self) -> None:
         # Test no parser declared still returns a an extension
         self.assertEqual(get_default_file_extension("application/zip"), ".zip")
 
         # Test invalid mimetype returns no extension
         self.assertEqual(get_default_file_extension("aasdasd/dgfgf"), "")
 
-    def test_file_extension_support(self):
+    def test_file_extension_support(self) -> None:
         self.assertTrue(is_file_ext_supported(".pdf"))
         self.assertFalse(is_file_ext_supported(".hsdfh"))
         self.assertFalse(is_file_ext_supported(""))

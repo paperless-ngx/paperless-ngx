@@ -23,7 +23,7 @@ from documents.tests.utils import DirectoriesMixin
 
 
 class TestBulkEdit(DirectoriesMixin, TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.owner = User.objects.create(username="test_owner")
@@ -67,7 +67,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         self.doc4.tags.add(self.t1, self.t2)
         self.sp1 = StoragePath.objects.create(name="sp1", path="Something/{checksum}")
 
-    def test_set_correspondent(self):
+    def test_set_correspondent(self) -> None:
         self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 1)
         bulk_edit.set_correspondent(
             [self.doc1.id, self.doc2.id, self.doc3.id],
@@ -78,7 +78,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc1.id, self.doc2.id])
 
-    def test_unset_correspondent(self):
+    def test_unset_correspondent(self) -> None:
         self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 1)
         bulk_edit.set_correspondent([self.doc1.id, self.doc2.id, self.doc3.id], None)
         self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 0)
@@ -86,7 +86,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc2.id, self.doc3.id])
 
-    def test_set_document_type(self):
+    def test_set_document_type(self) -> None:
         self.assertEqual(Document.objects.filter(document_type=self.dt2).count(), 1)
         bulk_edit.set_document_type(
             [self.doc1.id, self.doc2.id, self.doc3.id],
@@ -97,7 +97,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc1.id, self.doc2.id])
 
-    def test_unset_document_type(self):
+    def test_unset_document_type(self) -> None:
         self.assertEqual(Document.objects.filter(document_type=self.dt2).count(), 1)
         bulk_edit.set_document_type([self.doc1.id, self.doc2.id, self.doc3.id], None)
         self.assertEqual(Document.objects.filter(document_type=self.dt2).count(), 0)
@@ -105,7 +105,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc2.id, self.doc3.id])
 
-    def test_set_document_storage_path(self):
+    def test_set_document_storage_path(self) -> None:
         """
         GIVEN:
             - 5 documents without defined storage path
@@ -128,7 +128,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
 
         self.assertCountEqual(kwargs["document_ids"], [self.doc1.id])
 
-    def test_unset_document_storage_path(self):
+    def test_unset_document_storage_path(self) -> None:
         """
         GIVEN:
             - 4 documents without defined storage path
@@ -159,7 +159,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
 
         self.assertCountEqual(kwargs["document_ids"], [self.doc1.id])
 
-    def test_add_tag(self):
+    def test_add_tag(self) -> None:
         self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 2)
         bulk_edit.add_tag(
             [self.doc1.id, self.doc2.id, self.doc3.id, self.doc4.id],
@@ -170,7 +170,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc1.id, self.doc3.id])
 
-    def test_remove_tag(self):
+    def test_remove_tag(self) -> None:
         self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 2)
         bulk_edit.remove_tag([self.doc1.id, self.doc3.id, self.doc4.id], self.t1.id)
         self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 1)
@@ -178,7 +178,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc4.id])
 
-    def test_modify_tags(self):
+    def test_modify_tags(self) -> None:
         tag_unrelated = Tag.objects.create(name="unrelated")
         self.doc2.tags.add(tag_unrelated)
         self.doc3.tags.add(tag_unrelated)
@@ -196,7 +196,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         # TODO: doc3 should not be affected, but the query for that is rather complicated
         self.assertCountEqual(kwargs["document_ids"], [self.doc2.id, self.doc3.id])
 
-    def test_modify_custom_fields(self):
+    def test_modify_custom_fields(self) -> None:
         """
         GIVEN:
             - 2 documents with custom fields
@@ -252,7 +252,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc1.id, self.doc2.id])
 
-    def test_modify_custom_fields_with_values(self):
+    def test_modify_custom_fields_with_values(self) -> None:
         """
         GIVEN:
             - 2 documents with custom fields
@@ -344,7 +344,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             self.doc2.custom_fields.filter(field=cf3).first().value,
         )
 
-    def test_modify_custom_fields_doclink_self_link(self):
+    def test_modify_custom_fields_doclink_self_link(self) -> None:
         """
         GIVEN:
             - 2 existing documents
@@ -373,7 +373,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             [self.doc1.id],
         )
 
-    def test_delete(self):
+    def test_delete(self) -> None:
         self.assertEqual(Document.objects.count(), 5)
         bulk_edit.delete([self.doc1.id, self.doc2.id])
         self.assertEqual(Document.objects.count(), 3)
@@ -383,7 +383,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         )
 
     @mock.patch("documents.tasks.bulk_update_documents.delay")
-    def test_set_permissions(self, m):
+    def test_set_permissions(self, m) -> None:
         doc_ids = [self.doc1.id, self.doc2.id, self.doc3.id]
 
         assign_perm("view_document", self.group1, self.doc1)
@@ -422,7 +422,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         self.assertEqual(groups_with_perms.count(), 1)
 
     @mock.patch("documents.tasks.bulk_update_documents.delay")
-    def test_set_permissions_merge(self, m):
+    def test_set_permissions_merge(self, m) -> None:
         doc_ids = [self.doc1.id, self.doc2.id, self.doc3.id]
 
         self.doc1.owner = self.user1
@@ -466,7 +466,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         self.assertEqual(groups_with_perms.count(), 2)
 
     @mock.patch("documents.models.Document.delete")
-    def test_delete_documents_old_uuid_field(self, m):
+    def test_delete_documents_old_uuid_field(self, m) -> None:
         m.side_effect = Exception("Data too long for column 'transaction_id' at row 1")
         doc_ids = [self.doc1.id, self.doc2.id, self.doc3.id]
         bulk_edit.delete(doc_ids)
@@ -476,7 +476,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
 
 
 class TestPDFActions(DirectoriesMixin, TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         sample1 = self.dirs.scratch_dir / "sample.pdf"
         shutil.copy(
@@ -572,7 +572,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.img_doc.save()
 
     @mock.patch("documents.tasks.consume_file.s")
-    def test_merge(self, mock_consume_file):
+    def test_merge(self, mock_consume_file) -> None:
         """
         GIVEN:
             - Existing documents
@@ -660,7 +660,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         )
 
     @mock.patch("documents.tasks.consume_file.s")
-    def test_merge_with_archive_fallback(self, mock_consume_file):
+    def test_merge_with_archive_fallback(self, mock_consume_file) -> None:
         """
         GIVEN:
             - Existing documents
@@ -687,7 +687,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
     @mock.patch("documents.tasks.consume_file.delay")
     @mock.patch("pikepdf.open")
-    def test_merge_with_errors(self, mock_open_pdf, mock_consume_file):
+    def test_merge_with_errors(self, mock_open_pdf, mock_consume_file) -> None:
         """
         GIVEN:
             - Existing documents
@@ -711,7 +711,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_consume_file.assert_not_called()
 
     @mock.patch("documents.tasks.consume_file.s")
-    def test_split(self, mock_consume_file):
+    def test_split(self, mock_consume_file) -> None:
         """
         GIVEN:
             - Existing documents
@@ -770,7 +770,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
     @mock.patch("documents.tasks.consume_file.delay")
     @mock.patch("pikepdf.Pdf.save")
-    def test_split_with_errors(self, mock_save_pdf, mock_consume_file):
+    def test_split_with_errors(self, mock_save_pdf, mock_consume_file) -> None:
         """
         GIVEN:
             - Existing documents
@@ -795,7 +795,12 @@ class TestPDFActions(DirectoriesMixin, TestCase):
     @mock.patch("documents.tasks.bulk_update_documents.si")
     @mock.patch("documents.tasks.update_document_content_maybe_archive_file.s")
     @mock.patch("celery.chord.delay")
-    def test_rotate(self, mock_chord, mock_update_document, mock_update_documents):
+    def test_rotate(
+        self,
+        mock_chord,
+        mock_update_document,
+        mock_update_documents,
+    ) -> None:
         """
         GIVEN:
             - Existing documents
@@ -868,7 +873,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
     @mock.patch("documents.tasks.update_document_content_maybe_archive_file.delay")
     @mock.patch("pikepdf.Pdf.save")
-    def test_delete_pages(self, mock_pdf_save, mock_update_archive_file):
+    def test_delete_pages(self, mock_pdf_save, mock_update_archive_file) -> None:
         """
         GIVEN:
             - Existing documents
@@ -893,7 +898,11 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
     @mock.patch("documents.tasks.update_document_content_maybe_archive_file.delay")
     @mock.patch("pikepdf.Pdf.save")
-    def test_delete_pages_with_error(self, mock_pdf_save, mock_update_archive_file):
+    def test_delete_pages_with_error(
+        self,
+        mock_pdf_save,
+        mock_update_archive_file,
+    ) -> None:
         """
         GIVEN:
             - Existing documents
@@ -917,7 +926,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
     @mock.patch("documents.bulk_edit.group")
     @mock.patch("documents.tasks.consume_file.s")
-    def test_edit_pdf_basic_operations(self, mock_consume_file, mock_group):
+    def test_edit_pdf_basic_operations(self, mock_consume_file, mock_group) -> None:
         """
         GIVEN:
             - Existing document
@@ -936,7 +945,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
     @mock.patch("documents.bulk_edit.group")
     @mock.patch("documents.tasks.consume_file.s")
-    def test_edit_pdf_with_user_override(self, mock_consume_file, mock_group):
+    def test_edit_pdf_with_user_override(self, mock_consume_file, mock_group) -> None:
         """
         GIVEN:
             - Existing document
@@ -956,7 +965,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
     @mock.patch("documents.bulk_edit.chord")
     @mock.patch("documents.tasks.consume_file.s")
-    def test_edit_pdf_with_delete_original(self, mock_consume_file, mock_chord):
+    def test_edit_pdf_with_delete_original(self, mock_consume_file, mock_chord) -> None:
         """
         GIVEN:
             - Existing document
@@ -974,7 +983,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_chord.assert_called_once()
 
     @mock.patch("documents.tasks.update_document_content_maybe_archive_file.delay")
-    def test_edit_pdf_with_update_document(self, mock_update_document):
+    def test_edit_pdf_with_update_document(self, mock_update_document) -> None:
         """
         GIVEN:
             - A single existing PDF document
@@ -1004,7 +1013,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
     @mock.patch("documents.bulk_edit.group")
     @mock.patch("documents.tasks.consume_file.s")
-    def test_edit_pdf_without_metadata(self, mock_consume_file, mock_group):
+    def test_edit_pdf_without_metadata(self, mock_consume_file, mock_group) -> None:
         """
         GIVEN:
             - Existing document
@@ -1023,7 +1032,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
     @mock.patch("documents.bulk_edit.group")
     @mock.patch("documents.tasks.consume_file.s")
-    def test_edit_pdf_open_failure(self, mock_consume_file, mock_group):
+    def test_edit_pdf_open_failure(self, mock_consume_file, mock_group) -> None:
         """
         GIVEN:
             - Existing document

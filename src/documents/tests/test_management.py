@@ -29,13 +29,13 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             mime_type="application/pdf",
         )
 
-    def test_archiver(self):
+    def test_archiver(self) -> None:
         doc = self.make_models()
         shutil.copy(sample_file, Path(self.dirs.originals_dir) / f"{doc.id:07}.pdf")
 
         call_command("document_archiver", "--processes", "1")
 
-    def test_handle_document(self):
+    def test_handle_document(self) -> None:
         doc = self.make_models()
         shutil.copy(sample_file, Path(self.dirs.originals_dir) / f"{doc.id:07}.pdf")
 
@@ -50,7 +50,7 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertTrue(filecmp.cmp(sample_file, doc.source_path))
         self.assertEqual(doc.archive_filename, "none/A.pdf")
 
-    def test_unknown_mime_type(self):
+    def test_unknown_mime_type(self) -> None:
         doc = self.make_models()
         doc.mime_type = "sdgfh"
         doc.save()
@@ -66,7 +66,7 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsFile(doc.source_path)
 
     @override_settings(FILENAME_FORMAT="{title}")
-    def test_naming_priorities(self):
+    def test_naming_priorities(self) -> None:
         doc1 = Document.objects.create(
             checksum="A",
             title="document",
@@ -96,19 +96,19 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
 class TestMakeIndex(TestCase):
     @mock.patch("documents.management.commands.document_index.index_reindex")
-    def test_reindex(self, m):
+    def test_reindex(self, m) -> None:
         call_command("document_index", "reindex")
         m.assert_called_once()
 
     @mock.patch("documents.management.commands.document_index.index_optimize")
-    def test_optimize(self, m):
+    def test_optimize(self, m) -> None:
         call_command("document_index", "optimize")
         m.assert_called_once()
 
 
 class TestRenamer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @override_settings(FILENAME_FORMAT="")
-    def test_rename(self):
+    def test_rename(self) -> None:
         doc = Document.objects.create(title="test", mime_type="image/jpeg")
         doc.filename = generate_filename(doc)
         doc.archive_filename = generate_filename(doc, archive_filename=True)
@@ -134,21 +134,21 @@ class TestCreateClassifier(TestCase):
     @mock.patch(
         "documents.management.commands.document_create_classifier.train_classifier",
     )
-    def test_create_classifier(self, m):
+    def test_create_classifier(self, m) -> None:
         call_command("document_create_classifier")
 
         m.assert_called_once()
 
 
 class TestSanityChecker(DirectoriesMixin, TestCase):
-    def test_no_issues(self):
+    def test_no_issues(self) -> None:
         with self.assertLogs() as capture:
             call_command("document_sanity_checker")
 
         self.assertEqual(len(capture.output), 1)
         self.assertIn("Sanity checker detected no issues.", capture.output[0])
 
-    def test_errors(self):
+    def test_errors(self) -> None:
         doc = Document.objects.create(
             title="test",
             content="test",
@@ -167,7 +167,7 @@ class TestSanityChecker(DirectoriesMixin, TestCase):
 
 class TestConvertMariaDBUUID(TestCase):
     @mock.patch("django.db.connection.schema_editor")
-    def test_convert(self, m):
+    def test_convert(self, m) -> None:
         m.alter_field.return_value = None
 
         stdout = StringIO()
@@ -179,7 +179,7 @@ class TestConvertMariaDBUUID(TestCase):
 
 
 class TestPruneAuditLogs(TestCase):
-    def test_prune_audit_logs(self):
+    def test_prune_audit_logs(self) -> None:
         LogEntry.objects.create(
             content_type=ContentType.objects.get_for_model(Document),
             object_id=1,
