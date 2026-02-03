@@ -2627,6 +2627,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
             "remove_change_groups",
             "email",
             "webhook",
+            "passwords",
         ]
 
     def validate(self, attrs):
@@ -2682,6 +2683,23 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "Webhook data is required for webhook actions",
             )
+
+        if (
+            "type" in attrs
+            and attrs["type"] == WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL
+        ):
+            passwords = attrs.get("passwords")
+            # ensure passwords is a non-empty list of non-empty strings
+            if (
+                passwords is None
+                or not isinstance(passwords, list)
+                or len(passwords) == 0
+                or any(not isinstance(pw, str) for pw in passwords)
+                or any(len(pw.strip()) == 0 for pw in passwords)
+            ):
+                raise serializers.ValidationError(
+                    "Passwords are required for password removal actions",
+                )
 
         return attrs
 
