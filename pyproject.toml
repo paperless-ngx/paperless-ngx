@@ -138,6 +138,7 @@ typing = [
   "django-stubs[compatible-mypy]",
   "djangorestframework-stubs[compatible-mypy]",
   "lxml-stubs",
+  "microsoft-python-type-stubs @ git+https://github.com/microsoft/python-type-stubs.git",
   "mypy",
   "mypy-baseline",
   "types-bleach",

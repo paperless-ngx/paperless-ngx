@@ -2585,6 +2585,11 @@ wheels = [
 ]
 
 [[package]]
+name = "microsoft-python-type-stubs"
+version = "0"
+source = { git = "https://github.com/microsoft/python-type-stubs.git#692c37c3969d22612b295ddf7e7af5907204a386" }
+
+[[package]]
 name = "mkdocs"
 version = "1.6.1"
 source = { registry = "https://pypi.org/simple" }
@@ -3302,6 +3307,7 @@ typing = [
     { name = "django-stubs", extra = ["compatible-mypy"], marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "djangorestframework-stubs", extra = ["compatible-mypy"], marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "lxml-stubs", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "microsoft-python-type-stubs", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "mypy", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "mypy-baseline", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "types-bleach", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -3443,6 +3449,7 @@ typing = [
     { name = "django-stubs", extras = ["compatible-mypy"] },
     { name = "djangorestframework-stubs", extras = ["compatible-mypy"] },
     { name = "lxml-stubs" },
+    { name = "microsoft-python-type-stubs", git = "https://github.com/microsoft/python-type-stubs.git" },
     { name = "mypy" },
     { name = "mypy-baseline" },
     { name = "types-bleach" },
