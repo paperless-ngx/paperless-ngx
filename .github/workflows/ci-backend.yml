@@ -106,14 +106,14 @@ jobs:
       DEFAULT_PYTHON: "3.12"
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.1
       - name: Set up Python
         id: setup-python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v6.2.0
         with:
           python-version: "${{ env.DEFAULT_PYTHON }}"
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v7.2.1
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
@@ -139,7 +139,11 @@ jobs:
           uv pip list
       - name: Check typing
         run: |
-          uv run mypy .
+          uv run \
+            mypy \
+            --verbose \
+            --warn-unused-configs \
+            .
       - name: Prune Mypy Cache
         # Runs even if 'Check typing' fails to save what was processed
         if: always()
