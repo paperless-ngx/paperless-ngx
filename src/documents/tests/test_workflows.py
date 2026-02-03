@@ -2,6 +2,7 @@ import datetime
 import json
 import shutil
 import socket
+import tempfile
 from datetime import timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -60,6 +61,7 @@ from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
+from documents.workflows.actions import execute_password_removal_action
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
@@ -3721,6 +3723,196 @@ class TestWorkflows(
                 )
 
         mock_post.assert_called_once()
+
+    @mock.patch("documents.bulk_edit.remove_password")
+    def test_password_removal_action_attempts_multiple_passwords(
+        self,
+        mock_remove_password,
+    ):
+        """
+        GIVEN:
+            - Workflow password removal action
+            - Multiple passwords provided
+        WHEN:
+            - Document updated triggering the workflow
+        THEN:
+            - Password removal is attempted until one succeeds
+        """
+        doc = Document.objects.create(
+            title="Protected",
+            checksum="pw-checksum",
+        )
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+            passwords="wrong, right\n extra ",
+        )
+        workflow = Workflow.objects.create(name="Password workflow")
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        mock_remove_password.side_effect = [
+            ValueError("wrong password"),
+            "OK",
+        ]
+
+        run_workflows(trigger.type, doc)
+
+        assert mock_remove_password.call_count == 2
+        mock_remove_password.assert_has_calls(
+            [
+                mock.call(
+                    [doc.id],
+                    password="wrong",
+                    update_document=True,
+                    user=doc.owner,
+                ),
+                mock.call(
+                    [doc.id],
+                    password="right",
+                    update_document=True,
+                    user=doc.owner,
+                ),
+            ],
+        )
+
+    @mock.patch("documents.bulk_edit.remove_password")
+    def test_password_removal_action_fails_without_correct_password(
+        self,
+        mock_remove_password,
+    ):
+        """
+        GIVEN:
+            - Workflow password removal action
+            - No correct password provided
+        WHEN:
+            - Document updated triggering the workflow
+        THEN:
+            - Password removal is attempted for all passwords and fails
+        """
+        doc = Document.objects.create(
+            title="Protected",
+            checksum="pw-checksum-2",
+        )
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+            passwords=" \n , ",
+        )
+        workflow = Workflow.objects.create(name="Password workflow missing passwords")
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        run_workflows(trigger.type, doc)
+
+        mock_remove_password.assert_not_called()
+
+    @mock.patch("documents.bulk_edit.remove_password")
+    def test_password_removal_action_skips_without_passwords(
+        self,
+        mock_remove_password,
+    ):
+        """
+        GIVEN:
+            - Workflow password removal action with no passwords
+        WHEN:
+            - Workflow is run
+        THEN:
+            - Password removal is not attempted
+        """
+        doc = Document.objects.create(
+            title="Protected",
+            checksum="pw-checksum-2",
+        )
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+            passwords="",
+        )
+        workflow = Workflow.objects.create(name="Password workflow missing passwords")
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        run_workflows(trigger.type, doc)
+
+        mock_remove_password.assert_not_called()
+
+    @mock.patch("documents.bulk_edit.remove_password")
+    def test_password_removal_consumable_document_deferred(
+        self,
+        mock_remove_password,
+    ):
+        """
+        GIVEN:
+            - Workflow password removal action
+            - Simulated consumption trigger (a ConsumableDocument is used)
+        WHEN:
+            - Document consumption is finished
+        THEN:
+            - Password removal is attempted
+        """
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+            passwords="first, second",
+        )
+
+        temp_dir = Path(tempfile.mkdtemp())
+        original_file = temp_dir / "file.pdf"
+        original_file.write_bytes(b"pdf content")
+        consumable = ConsumableDocument(
+            source=DocumentSource.ApiUpload,
+            original_file=original_file,
+        )
+
+        execute_password_removal_action(action, consumable, logging_group=None)
+
+        mock_remove_password.assert_not_called()
+
+        mock_remove_password.side_effect = [
+            ValueError("bad password"),
+            "OK",
+        ]
+
+        doc = Document.objects.create(
+            checksum="pw-checksum-consumed",
+            title="Protected",
+        )
+
+        document_consumption_finished.send(
+            sender=self.__class__,
+            document=doc,
+        )
+
+        assert mock_remove_password.call_count == 2
+        mock_remove_password.assert_has_calls(
+            [
+                mock.call(
+                    [doc.id],
+                    password="first",
+                    update_document=True,
+                    user=doc.owner,
+                ),
+                mock.call(
+                    [doc.id],
+                    password="second",
+                    update_document=True,
+                    user=doc.owner,
+                ),
+            ],
+        )
+
+        # ensure handler disconnected after first run
+        document_consumption_finished.send(
+            sender=self.__class__,
+            document=doc,
+        )
+        assert mock_remove_password.call_count == 2
 
 
 class TestWebhookSend:
