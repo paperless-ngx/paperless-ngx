@@ -1305,7 +1305,7 @@ name = "exceptiongroup"
 version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "(python_full_version < '3.13' and platform_machine != 'aarch64' and platform_machine != 'x86_64' and sys_platform == 'linux') or (python_full_version < '3.12' and platform_machine == 'aarch64' and sys_platform == 'linux') or (python_full_version < '3.12' and platform_machine == 'x86_64' and sys_platform == 'linux') or (python_full_version < '3.13' and sys_platform == 'darwin')" },
+    { name = "typing-extensions", marker = "(python_full_version < '3.11' and sys_platform == 'darwin') or (python_full_version < '3.11' and sys_platform == 'linux')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/50/79/66800aadf48771f6b62f7eb014e352e5d06856655206165d775e675a02c9/exceptiongroup-1.3.1.tar.gz", hash = "sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219", size = 30371, upload-time = "2025-11-21T23:01:54.787Z" }
 wheels = [
@@ -2876,6 +2876,15 @@ wheels = [
 ]
 
 [[package]]
+name = "mypy-baseline"
+version = "0.7.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/65/2a/03288dab6d5f24d187ba0c223f6b3035d9a29de3dd31a3e105a0d4f1b5da/mypy_baseline-0.7.3.tar.gz", hash = "sha256:325f0695310eb8f5c0f10fa7af36ee1b3785a9d26b886a61c07b4a8eddb28d29", size = 319108, upload-time = "2025-05-30T08:43:00.629Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1f/93/7780302b206a8e8e767ce763ef06159725d1323acbe55e46a1cd1ffd109d/mypy_baseline-0.7.3-py3-none-any.whl", hash = "sha256:bd7fa899e687d75af2e3f392a9d6d1790e65dae3d31fe12525cc14f26d866b74", size = 17868, upload-time = "2025-05-30T08:42:58.262Z" },
+]
+
+[[package]]
 name = "mypy-extensions"
 version = "1.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3294,6 +3303,7 @@ typing = [
     { name = "djangorestframework-stubs", extra = ["compatible-mypy"], marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "lxml-stubs", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "mypy", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "mypy-baseline", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "types-bleach", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "types-colorama", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "types-dateparser", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -3434,6 +3444,7 @@ typing = [
     { name = "djangorestframework-stubs", extras = ["compatible-mypy"] },
     { name = "lxml-stubs" },
     { name = "mypy" },
+    { name = "mypy-baseline" },
     { name = "types-bleach" },
     { name = "types-colorama" },
     { name = "types-dateparser" },

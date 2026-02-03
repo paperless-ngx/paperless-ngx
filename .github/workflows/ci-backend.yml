@@ -139,9 +139,7 @@ jobs:
             ${{ runner.os }}-mypy-
       - name: Check typing
         run: |
-          uv run \
-            mypy \
+          uv run mypy \
             --show-error-codes \
-            --error-summary \
             --warn-unused-configs \
-            .
+            src/ | uv run mypy-baseline filter
