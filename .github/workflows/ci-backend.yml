@@ -141,16 +141,6 @@ jobs:
         run: |
           uv run \
             mypy \
-            --verbose \
-            --warn-unused-configs \
+            --show-error-codes \
+            --show-error-stats \
             .
-      - name: Prune Mypy Cache
-        # Runs even if 'Check typing' fails to save what was processed
-        if: always()
-        run: |
-          if [ -d ".mypy_cache" ]; then
-            echo "Pruning .mypy_cache of files older than 7 days..."
-            find .mypy_cache -type f -atime +7 -delete
-            # Remove empty directories to keep the tree clean
-            find .mypy_cache -type d -empty -delete
-          fi
