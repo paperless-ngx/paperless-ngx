@@ -1989,11 +1989,11 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.get(f"/api/documents/{doc.pk}/suggestions/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    @mock.patch("documents.parsers.parse_date_generator")
+    @mock.patch("documents.views.get_date_parser")
     @override_settings(NUMBER_OF_SUGGESTED_DATES=0)
     def test_get_suggestions_dates_disabled(
         self,
-        parse_date_generator,
+        mock_get_date_parser: mock.MagicMock,
     ):
         """
         GIVEN:
@@ -2010,7 +2010,8 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
 
         self.client.get(f"/api/documents/{doc.pk}/suggestions/")
-        self.assertFalse(parse_date_generator.called)
+
+        mock_get_date_parser.assert_not_called()
 
     def test_saved_views(self) -> None:
         u1 = User.objects.create_superuser("user1")

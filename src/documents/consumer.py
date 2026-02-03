@@ -33,12 +33,12 @@ from documents.models import WorkflowTrigger
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import get_parser_class_for_mime_type
-from documents.parsers import parse_date
 from documents.permissions import set_permissions_for_object
 from documents.plugins.base import AlwaysRunPluginMixin
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import NoCleanupPluginMixin
 from documents.plugins.base import NoSetupPluginMixin
+from documents.plugins.date_parsing import get_date_parser
 from documents.plugins.helpers import ProgressManager
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.signals import document_consumption_finished
@@ -432,7 +432,8 @@ class ConsumerPlugin(
                     ProgressStatusOptions.WORKING,
                     ConsumerStatusShortMessage.PARSE_DATE,
                 )
-                date = parse_date(self.filename, text)
+                with get_date_parser() as date_parser:
+                    date = next(date_parser.parse(self.filename, text), None)
             archive_path = document_parser.get_archive_path()
             page_count = document_parser.get_page_count(self.working_copy, mime_type)
 
