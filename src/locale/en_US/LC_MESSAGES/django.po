@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-31 17:12+0000\n"
+"POT-Creation-Date: 2026-02-03 17:32+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -89,7 +89,7 @@ msgstr ""
 msgid "Automatic"
 msgstr ""
 
-#: documents/models.py:66 documents/models.py:444 documents/models.py:1646
+#: documents/models.py:66 documents/models.py:444 documents/models.py:1659
 #: paperless_mail/models.py:23 paperless_mail/models.py:143
 msgid "name"
 msgstr ""
@@ -252,7 +252,7 @@ msgid "The position of this document in your physical document archive."
 msgstr ""
 
 #: documents/models.py:313 documents/models.py:688 documents/models.py:742
-#: documents/models.py:1689
+#: documents/models.py:1702
 msgid "document"
 msgstr ""
 
@@ -1089,183 +1089,197 @@ msgid "Webhook"
 msgstr ""
 
 #: documents/models.py:1410
+msgid "Password removal"
+msgstr ""
+
+#: documents/models.py:1414
 msgid "Workflow Action Type"
 msgstr ""
 
-#: documents/models.py:1415 documents/models.py:1648
+#: documents/models.py:1419 documents/models.py:1661
 #: paperless_mail/models.py:145
 msgid "order"
 msgstr ""
 
-#: documents/models.py:1418
+#: documents/models.py:1422
 msgid "assign title"
 msgstr ""
 
-#: documents/models.py:1422
+#: documents/models.py:1426
 msgid "Assign a document title, must  be a Jinja2 template, see documentation."
 msgstr ""
 
-#: documents/models.py:1430 paperless_mail/models.py:274
+#: documents/models.py:1434 paperless_mail/models.py:274
 msgid "assign this tag"
 msgstr ""
 
-#: documents/models.py:1439 paperless_mail/models.py:282
+#: documents/models.py:1443 paperless_mail/models.py:282
 msgid "assign this document type"
 msgstr ""
 
-#: documents/models.py:1448 paperless_mail/models.py:296
+#: documents/models.py:1452 paperless_mail/models.py:296
 msgid "assign this correspondent"
 msgstr ""
 
-#: documents/models.py:1457
+#: documents/models.py:1461
 msgid "assign this storage path"
 msgstr ""
 
-#: documents/models.py:1466
+#: documents/models.py:1470
 msgid "assign this owner"
 msgstr ""
 
-#: documents/models.py:1473
+#: documents/models.py:1477
 msgid "grant view permissions to these users"
 msgstr ""
 
-#: documents/models.py:1480
+#: documents/models.py:1484
 msgid "grant view permissions to these groups"
 msgstr ""
 
-#: documents/models.py:1487
+#: documents/models.py:1491
 msgid "grant change permissions to these users"
 msgstr ""
 
-#: documents/models.py:1494
+#: documents/models.py:1498
 msgid "grant change permissions to these groups"
 msgstr ""
 
-#: documents/models.py:1501
+#: documents/models.py:1505
 msgid "assign these custom fields"
 msgstr ""
 
-#: documents/models.py:1505
+#: documents/models.py:1509
 msgid "custom field values"
 msgstr ""
 
-#: documents/models.py:1509
+#: documents/models.py:1513
 msgid "Optional values to assign to the custom fields."
 msgstr ""
 
-#: documents/models.py:1518
+#: documents/models.py:1522
 msgid "remove these tag(s)"
 msgstr ""
 
-#: documents/models.py:1523
+#: documents/models.py:1527
 msgid "remove all tags"
 msgstr ""
 
-#: documents/models.py:1530
+#: documents/models.py:1534
 msgid "remove these document type(s)"
 msgstr ""
 
-#: documents/models.py:1535
+#: documents/models.py:1539
 msgid "remove all document types"
 msgstr ""
 
-#: documents/models.py:1542
+#: documents/models.py:1546
 msgid "remove these correspondent(s)"
 msgstr ""
 
-#: documents/models.py:1547
+#: documents/models.py:1551
 msgid "remove all correspondents"
 msgstr ""
 
-#: documents/models.py:1554
+#: documents/models.py:1558
 msgid "remove these storage path(s)"
 msgstr ""
 
-#: documents/models.py:1559
+#: documents/models.py:1563
 msgid "remove all storage paths"
 msgstr ""
 
-#: documents/models.py:1566
+#: documents/models.py:1570
 msgid "remove these owner(s)"
 msgstr ""
 
-#: documents/models.py:1571
+#: documents/models.py:1575
 msgid "remove all owners"
 msgstr ""
 
-#: documents/models.py:1578
+#: documents/models.py:1582
 msgid "remove view permissions for these users"
 msgstr ""
 
-#: documents/models.py:1585
+#: documents/models.py:1589
 msgid "remove view permissions for these groups"
 msgstr ""
 
-#: documents/models.py:1592
+#: documents/models.py:1596
 msgid "remove change permissions for these users"
 msgstr ""
 
-#: documents/models.py:1599
+#: documents/models.py:1603
 msgid "remove change permissions for these groups"
 msgstr ""
 
-#: documents/models.py:1604
+#: documents/models.py:1608
 msgid "remove all permissions"
 msgstr ""
 
-#: documents/models.py:1611
+#: documents/models.py:1615
 msgid "remove these custom fields"
 msgstr ""
 
-#: documents/models.py:1616
+#: documents/models.py:1620
 msgid "remove all custom fields"
 msgstr ""
 
-#: documents/models.py:1625
+#: documents/models.py:1629
 msgid "email"
 msgstr ""
 
-#: documents/models.py:1634
+#: documents/models.py:1638
 msgid "webhook"
 msgstr ""
 
-#: documents/models.py:1638
+#: documents/models.py:1642
+msgid "passwords"
+msgstr ""
+
+#: documents/models.py:1646
+msgid ""
+"Passwords to try when removing PDF protection. Separate with commas or new "
+"lines."
+msgstr ""
+
+#: documents/models.py:1651
 msgid "workflow action"
 msgstr ""
 
-#: documents/models.py:1639
+#: documents/models.py:1652
 msgid "workflow actions"
 msgstr ""
 
-#: documents/models.py:1654
+#: documents/models.py:1667
 msgid "triggers"
 msgstr ""
 
-#: documents/models.py:1661
+#: documents/models.py:1674
 msgid "actions"
 msgstr ""
 
-#: documents/models.py:1664 paperless_mail/models.py:154
+#: documents/models.py:1677 paperless_mail/models.py:154
 msgid "enabled"
 msgstr ""
 
-#: documents/models.py:1675
+#: documents/models.py:1688
 msgid "workflow"
 msgstr ""
 
-#: documents/models.py:1679
+#: documents/models.py:1692
 msgid "workflow trigger type"
 msgstr ""
 
-#: documents/models.py:1693
+#: documents/models.py:1706
 msgid "date run"
 msgstr ""
 
-#: documents/models.py:1699
+#: documents/models.py:1712
 msgid "workflow run"
 msgstr ""
 
-#: documents/models.py:1700
+#: documents/models.py:1713
 msgid "workflow runs"
 msgstr ""
 
