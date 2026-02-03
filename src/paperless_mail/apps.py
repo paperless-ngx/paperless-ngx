@@ -10,7 +10,7 @@ class PaperlessMailConfig(AppConfig):
 
     verbose_name = _("Paperless mail")
 
-    def ready(self):
+    def ready(self) -> None:
         from documents.signals import document_consumer_declaration
 
         if settings.TIKA_ENABLED:

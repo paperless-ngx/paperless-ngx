@@ -118,7 +118,7 @@ class Tag(MatchingModel, TreeNodeModel):
         verbose_name = _("tag")
         verbose_name_plural = _("tags")
 
-    def clean(self):
+    def clean(self) -> None:
         # Prevent self-parenting and assigning a descendant as parent
         parent = self.get_parent()
         if parent == self:
@@ -410,7 +410,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
     def created_date(self):
         return self.created
 
-    def add_nested_tags(self, tags):
+    def add_nested_tags(self, tags) -> None:
         tag_ids = set()
         for tag in tags:
             tag_ids.add(tag.id)
@@ -862,7 +862,7 @@ class ShareLinkBundle(models.Model):
             return None
         return (settings.SHARE_LINK_BUNDLE_DIR / Path(self.file_path)).resolve()
 
-    def remove_file(self):
+    def remove_file(self) -> None:
         if self.absolute_file_path is not None and self.absolute_file_path.exists():
             try:
                 self.absolute_file_path.unlink()

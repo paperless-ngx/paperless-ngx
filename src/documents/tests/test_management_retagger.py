@@ -11,7 +11,7 @@ from documents.tests.utils import DirectoriesMixin
 
 
 class TestRetagger(DirectoriesMixin, TestCase):
-    def make_models(self):
+    def make_models(self) -> None:
         self.sp1 = StoragePath.objects.create(
             name="dummy a",
             path="{created_data}/{title}",
@@ -109,7 +109,7 @@ class TestRetagger(DirectoriesMixin, TestCase):
         super().setUp()
         self.make_models()
 
-    def test_add_tags(self):
+    def test_add_tags(self) -> None:
         call_command("document_retagger", "--tags")
         d_first, d_second, d_unrelated, d_auto = self.get_updated_docs()
 
@@ -121,21 +121,21 @@ class TestRetagger(DirectoriesMixin, TestCase):
         self.assertEqual(d_first.tags.first(), self.tag_first)
         self.assertEqual(d_second.tags.first(), self.tag_second)
 
-    def test_add_type(self):
+    def test_add_type(self) -> None:
         call_command("document_retagger", "--document_type")
         d_first, d_second, _, _ = self.get_updated_docs()
 
         self.assertEqual(d_first.document_type, self.doctype_first)
         self.assertEqual(d_second.document_type, self.doctype_second)
 
-    def test_add_correspondent(self):
+    def test_add_correspondent(self) -> None:
         call_command("document_retagger", "--correspondent")
         d_first, d_second, _, _ = self.get_updated_docs()
 
         self.assertEqual(d_first.correspondent, self.correspondent_first)
         self.assertEqual(d_second.correspondent, self.correspondent_second)
 
-    def test_overwrite_preserve_inbox(self):
+    def test_overwrite_preserve_inbox(self) -> None:
         self.d1.tags.add(self.tag_second)
 
         call_command("document_retagger", "--tags", "--overwrite")
@@ -158,7 +158,7 @@ class TestRetagger(DirectoriesMixin, TestCase):
         )
         self.assertEqual(d_auto.tags.count(), 0)
 
-    def test_add_tags_suggest(self):
+    def test_add_tags_suggest(self) -> None:
         call_command("document_retagger", "--tags", "--suggest")
         d_first, d_second, _, d_auto = self.get_updated_docs()
 
@@ -166,21 +166,21 @@ class TestRetagger(DirectoriesMixin, TestCase):
         self.assertEqual(d_second.tags.count(), 0)
         self.assertEqual(d_auto.tags.count(), 1)
 
-    def test_add_type_suggest(self):
+    def test_add_type_suggest(self) -> None:
         call_command("document_retagger", "--document_type", "--suggest")
         d_first, d_second, _, _ = self.get_updated_docs()
 
         self.assertIsNone(d_first.document_type)
         self.assertIsNone(d_second.document_type)
 
-    def test_add_correspondent_suggest(self):
+    def test_add_correspondent_suggest(self) -> None:
         call_command("document_retagger", "--correspondent", "--suggest")
         d_first, d_second, _, _ = self.get_updated_docs()
 
         self.assertIsNone(d_first.correspondent)
         self.assertIsNone(d_second.correspondent)
 
-    def test_add_tags_suggest_url(self):
+    def test_add_tags_suggest_url(self) -> None:
         call_command(
             "document_retagger",
             "--tags",
@@ -193,7 +193,7 @@ class TestRetagger(DirectoriesMixin, TestCase):
         self.assertEqual(d_second.tags.count(), 0)
         self.assertEqual(d_auto.tags.count(), 1)
 
-    def test_add_type_suggest_url(self):
+    def test_add_type_suggest_url(self) -> None:
         call_command(
             "document_retagger",
             "--document_type",
@@ -205,7 +205,7 @@ class TestRetagger(DirectoriesMixin, TestCase):
         self.assertIsNone(d_first.document_type)
         self.assertIsNone(d_second.document_type)
 
-    def test_add_correspondent_suggest_url(self):
+    def test_add_correspondent_suggest_url(self) -> None:
         call_command(
             "document_retagger",
             "--correspondent",
@@ -217,7 +217,7 @@ class TestRetagger(DirectoriesMixin, TestCase):
         self.assertIsNone(d_first.correspondent)
         self.assertIsNone(d_second.correspondent)
 
-    def test_add_storage_path(self):
+    def test_add_storage_path(self) -> None:
         """
         GIVEN:
             - 2 storage paths with documents which match them
@@ -240,7 +240,7 @@ class TestRetagger(DirectoriesMixin, TestCase):
         self.assertIsNone(d_second.storage_path)
         self.assertEqual(d_unrelated.storage_path, self.sp3)
 
-    def test_overwrite_storage_path(self):
+    def test_overwrite_storage_path(self) -> None:
         """
         GIVEN:
             - 2 storage paths with documents which match them
@@ -260,7 +260,7 @@ class TestRetagger(DirectoriesMixin, TestCase):
         self.assertIsNone(d_second.storage_path)
         self.assertEqual(d_unrelated.storage_path, self.sp2)
 
-    def test_id_range_parameter(self):
+    def test_id_range_parameter(self) -> None:
         commandOutput = ""
         Document.objects.create(
             checksum="E",

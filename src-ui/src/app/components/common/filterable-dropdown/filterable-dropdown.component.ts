@@ -1,3 +1,7 @@
+import {
+  CdkVirtualScrollViewport,
+  ScrollingModule,
+} from '@angular/cdk/scrolling'
 import { NgClass } from '@angular/common'
 import {
   Component,
@@ -627,18 +631,27 @@ export class FilterableDropdownSelectionModel {
     NgxBootstrapIconsModule,
     NgbDropdownModule,
     NgClass,
+    ScrollingModule,
   ],
 })
 export class FilterableDropdownComponent
   extends LoadingComponentWithPermissions
   implements OnInit
 {
+  public readonly FILTERABLE_BUTTON_HEIGHT_PX = 42
+
   private filterPipe = inject(FilterPipe)
   private hotkeyService = inject(HotKeyService)
 
   @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
   @ViewChild('dropdown') dropdown: NgbDropdown
-  @ViewChild('buttonItems') buttonItems: ElementRef
+  @ViewChild('buttonsViewport') buttonsViewport: CdkVirtualScrollViewport
+
+  private get renderedButtons(): Array<HTMLButtonElement> {
+    return Array.from(
+      this.buttonsViewport.elementRef.nativeElement.querySelectorAll('button')
+    )
+  }
 
   public popperOptions = pngxPopperOptions
 
@@ -752,6 +765,14 @@ export class FilterableDropdownComponent
 
   private keyboardIndex: number
 
+  public get scrollViewportHeight(): number {
+    const filteredLength = this.filterPipe.transform(
+      this.items,
+      this.filterText
+    ).length
+    return Math.min(filteredLength * this.FILTERABLE_BUTTON_HEIGHT_PX, 400)
+  }
+
   constructor() {
     super()
     this.selectionModelChange.subscribe((updatedModel) => {
@@ -776,6 +797,10 @@ export class FilterableDropdownComponent
     }
   }
 
+  public trackByItem(index: number, item: MatchingModel) {
+    return item?.id ?? index
+  }
+
   applyClicked() {
     if (this.selectionModel.isDirty()) {
       this.dropdown.close()
@@ -794,6 +819,7 @@ export class FilterableDropdownComponent
     if (open) {
       setTimeout(() => {
         this.listFilterTextInput?.nativeElement.focus()
+        this.buttonsViewport?.checkViewportSize()
       }, 0)
       if (this.editing) {
         this.selectionModel.reset()
@@ -861,12 +887,14 @@ export class FilterableDropdownComponent
             event.preventDefault()
           }
         } else if (event.target instanceof HTMLButtonElement) {
+          this.syncKeyboardIndexFromButton(event.target)
           this.focusNextButtonItem()
           event.preventDefault()
         }
         break
       case 'ArrowUp':
         if (event.target instanceof HTMLButtonElement) {
+          this.syncKeyboardIndexFromButton(event.target)
           if (this.keyboardIndex === 0) {
             this.listFilterTextInput.nativeElement.focus()
           } else {
@@ -903,15 +931,18 @@ export class FilterableDropdownComponent
     if (setFocus) this.setButtonItemFocus()
   }
 
-  setButtonItemFocus() {
-    this.buttonItems.nativeElement.children[
-      this.keyboardIndex
-    ]?.children[0].focus()
+  private syncKeyboardIndexFromButton(button: HTMLButtonElement) {
+    // because of virtual scrolling, re-calculate the index
+    const idx = this.renderedButtons.indexOf(button)
+    if (idx >= 0) {
+      this.keyboardIndex = this.buttonsViewport.getRenderedRange().start + idx
+    }
   }
 
-  setButtonItemIndex(index: number) {
-    // just track the index in case user uses arrows
-    this.keyboardIndex = index
+  setButtonItemFocus() {
+    const offset =
+      this.keyboardIndex - this.buttonsViewport.getRenderedRange().start
+    this.renderedButtons[offset]?.focus()
   }
 
   hideCount(item: ObjectWithPermissions) {

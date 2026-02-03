@@ -120,7 +120,7 @@ class StoragePathFilterSet(FilterSet):
 
 
 class ObjectFilter(Filter):
-    def __init__(self, *, exclude=False, in_list=False, field_name=""):
+    def __init__(self, *, exclude=False, in_list=False, field_name="") -> None:
         super().__init__()
         self.exclude = exclude
         self.in_list = in_list
@@ -255,7 +255,7 @@ class MimeTypeFilter(Filter):
 
 
 class SelectField(serializers.CharField):
-    def __init__(self, custom_field: CustomField):
+    def __init__(self, custom_field: CustomField) -> None:
         self._options = custom_field.extra_data["select_options"]
         super().__init__(max_length=16)
 
@@ -676,7 +676,7 @@ class CustomFieldQueryParser:
 
 @extend_schema_field(serializers.CharField)
 class CustomFieldQueryFilter(Filter):
-    def __init__(self, validation_prefix):
+    def __init__(self, validation_prefix) -> None:
         """
         A filter that filters documents based on custom field name and value.
 

@@ -65,7 +65,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger("paperless.handlers")
 
 
-def add_inbox_tags(sender, document: Document, logging_group=None, **kwargs):
+def add_inbox_tags(sender, document: Document, logging_group=None, **kwargs) -> None:
     if document.owner is not None:
         tags = get_objects_for_user_owner_aware(
             document.owner,
@@ -85,7 +85,7 @@ def _suggestion_printer(
     document: Document,
     selected: MatchingModel,
     base_url: str | None = None,
-):
+) -> None:
     """
     Smaller helper to reduce duplication when just outputting suggestions to the console
     """
@@ -111,7 +111,7 @@ def set_correspondent(
     stdout=None,
     style_func=None,
     **kwargs,
-):
+) -> None:
     if document.correspondent and not replace:
         return
 
@@ -167,7 +167,7 @@ def set_document_type(
     stdout=None,
     style_func=None,
     **kwargs,
-):
+) -> None:
     if document.document_type and not replace:
         return
 
@@ -223,7 +223,7 @@ def set_tags(
     stdout=None,
     style_func=None,
     **kwargs,
-):
+) -> None:
     if replace:
         Document.tags.through.objects.filter(document=document).exclude(
             Q(tag__is_inbox_tag=True),
@@ -280,7 +280,7 @@ def set_storage_path(
     stdout=None,
     style_func=None,
     **kwargs,
-):
+) -> None:
     if document.storage_path and not replace:
         return
 
@@ -328,7 +328,7 @@ def set_storage_path(
 
 
 # see empty_trash in documents/tasks.py for signal handling
-def cleanup_document_deletion(sender, instance, **kwargs):
+def cleanup_document_deletion(sender, instance, **kwargs) -> None:
     with FileLock(settings.MEDIA_LOCK):
         if settings.EMPTY_TRASH_DIR:
             # Find a non-conflicting filename in case a document with the same
@@ -416,13 +416,13 @@ def update_filename_and_move_files(
     sender,
     instance: Document | CustomFieldInstance,
     **kwargs,
-):
+) -> None:
     if isinstance(instance, CustomFieldInstance):
         if not _filename_template_uses_custom_fields(instance.document):
             return
         instance = instance.document
 
-    def validate_move(instance, old_path: Path, new_path: Path, root: Path):
+    def validate_move(instance, old_path: Path, new_path: Path, root: Path) -> None:
         if not new_path.is_relative_to(root):
             msg = (
                 f"Document {instance!s}: Refusing to move file outside root {root}: "
@@ -595,7 +595,7 @@ def update_filename_and_move_files(
 
 
 @shared_task
-def process_cf_select_update(custom_field: CustomField):
+def process_cf_select_update(custom_field: CustomField) -> None:
     """
     Update documents tied to a select custom field:
 
@@ -621,7 +621,11 @@ def process_cf_select_update(custom_field: CustomField):
 
 # should be disabled in /src/documents/management/commands/document_importer.py handle
 @receiver(models.signals.post_save, sender=CustomField)
-def check_paths_and_prune_custom_fields(sender, instance: CustomField, **kwargs):
+def check_paths_and_prune_custom_fields(
+    sender,
+    instance: CustomField,
+    **kwargs,
+) -> None:
     """
     When a custom field is updated, check if we need to update any documents. Done async to avoid slowing down the save operation.
     """
@@ -634,7 +638,7 @@ def check_paths_and_prune_custom_fields(sender, instance: CustomField, **kwargs)
 
 
 @receiver(models.signals.post_delete, sender=CustomField)
-def cleanup_custom_field_deletion(sender, instance: CustomField, **kwargs):
+def cleanup_custom_field_deletion(sender, instance: CustomField, **kwargs) -> None:
     """
     When a custom field is deleted, ensure no saved views reference it.
     """
@@ -671,7 +675,7 @@ def update_llm_suggestions_cache(sender, instance, **kwargs):
 
 @receiver(models.signals.post_delete, sender=User)
 @receiver(models.signals.post_delete, sender=Group)
-def cleanup_user_deletion(sender, instance: User | Group, **kwargs):
+def cleanup_user_deletion(sender, instance: User | Group, **kwargs) -> None:
     """
     When a user or group is deleted, remove non-cascading references.
     At the moment, just the default permission settings in UiSettings.
@@ -714,7 +718,7 @@ def cleanup_user_deletion(sender, instance: User | Group, **kwargs):
             )
 
 
-def add_to_index(sender, document, **kwargs):
+def add_to_index(sender, document, **kwargs) -> None:
     from documents import index
 
     index.add_or_update_document(document)
@@ -726,7 +730,7 @@ def run_workflows_added(
     logging_group=None,
     original_file=None,
     **kwargs,
-):
+) -> None:
     run_workflows(
         trigger_type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
         document=document,
@@ -736,7 +740,12 @@ def run_workflows_added(
     )
 
 
-def run_workflows_updated(sender, document: Document, logging_group=None, **kwargs):
+def run_workflows_updated(
+    sender,
+    document: Document,
+    logging_group=None,
+    **kwargs,
+) -> None:
     run_workflows(
         trigger_type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
         document=document,
@@ -844,7 +853,7 @@ def run_workflows(
 
 
 @before_task_publish.connect
-def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
+def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs) -> None:
     """
     Creates the PaperlessTask object in a pending state.  This is sent before
     the task reaches the broker, but before it begins executing on a worker.
@@ -886,7 +895,7 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
 
 
 @task_prerun.connect
-def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs):
+def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs) -> None:
     """
 
     Updates the PaperlessTask to be started.  Sent before the task begins execution
@@ -916,7 +925,7 @@ def task_postrun_handler(
     retval=None,
     state=None,
     **kwargs,
-):
+) -> None:
     """
     Updates the result of the PaperlessTask.
 
@@ -945,7 +954,7 @@ def task_failure_handler(
     args=None,
     traceback=None,
     **kwargs,
-):
+) -> None:
     """
     Updates the result of a failed PaperlessTask.
 
@@ -965,7 +974,7 @@ def task_failure_handler(
 
 
 @worker_process_init.connect
-def close_connection_pool_on_worker_init(**kwargs):
+def close_connection_pool_on_worker_init(**kwargs) -> None:
     """
     Close the DB connection pool for each Celery child process after it starts.
 

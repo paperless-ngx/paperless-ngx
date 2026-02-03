@@ -17,7 +17,7 @@ from paperless import version
 class TestSystemStatus(APITestCase):
     ENDPOINT = "/api/status/"
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.user = User.objects.create_superuser(
             username="temp_admin",
@@ -26,13 +26,13 @@ class TestSystemStatus(APITestCase):
         self.override = override_settings(MEDIA_ROOT=self.tmp_dir)
         self.override.enable()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         super().tearDown()
 
         self.override.disable()
         shutil.rmtree(self.tmp_dir)
 
-    def test_system_status(self):
+    def test_system_status(self) -> None:
         """
         GIVEN:
             - A user is logged in
@@ -58,7 +58,7 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.data["tasks"]["redis_status"], "ERROR")
         self.assertIsNotNone(response.data["tasks"]["redis_error"])
 
-    def test_system_status_insufficient_permissions(self):
+    def test_system_status_insufficient_permissions(self) -> None:
         """
         GIVEN:
             - A user is not logged in or does not have permissions
@@ -74,7 +74,7 @@ class TestSystemStatus(APITestCase):
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_system_status_container_detection(self):
+    def test_system_status_container_detection(self) -> None:
         """
         GIVEN:
             - The application is running in a containerized environment
@@ -93,7 +93,7 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.data["install_type"], "kubernetes")
 
     @mock.patch("redis.Redis.execute_command")
-    def test_system_status_redis_ping(self, mock_ping):
+    def test_system_status_redis_ping(self, mock_ping) -> None:
         """
         GIVEN:
             - Redies ping returns True
@@ -108,7 +108,7 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["tasks"]["redis_status"], "OK")
 
-    def test_system_status_redis_no_credentials(self):
+    def test_system_status_redis_no_credentials(self) -> None:
         """
         GIVEN:
             - Redis URL with credentials
@@ -128,7 +128,7 @@ class TestSystemStatus(APITestCase):
                 "redis://localhost:6379",
             )
 
-    def test_system_status_redis_socket(self):
+    def test_system_status_redis_socket(self) -> None:
         """
         GIVEN:
             - Redis URL is socket
@@ -148,7 +148,7 @@ class TestSystemStatus(APITestCase):
             )
 
     @mock.patch("celery.app.control.Inspect.ping")
-    def test_system_status_celery_ping(self, mock_ping):
+    def test_system_status_celery_ping(self, mock_ping) -> None:
         """
         GIVEN:
             - Celery ping returns pong
@@ -165,7 +165,7 @@ class TestSystemStatus(APITestCase):
 
     @override_settings(INDEX_DIR=Path("/tmp/index"))
     @mock.patch("whoosh.index.FileIndex.last_modified")
-    def test_system_status_index_ok(self, mock_last_modified):
+    def test_system_status_index_ok(self, mock_last_modified) -> None:
         """
         GIVEN:
             - The index last modified time is set
@@ -183,7 +183,7 @@ class TestSystemStatus(APITestCase):
 
     @override_settings(INDEX_DIR=Path("/tmp/index/"))
     @mock.patch("documents.index.open_index", autospec=True)
-    def test_system_status_index_error(self, mock_open_index):
+    def test_system_status_index_error(self, mock_open_index) -> None:
         """
         GIVEN:
             - The index is not found
@@ -201,7 +201,7 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.data["tasks"]["index_status"], "ERROR")
         self.assertIsNotNone(response.data["tasks"]["index_error"])
 
-    def test_system_status_classifier_ok(self):
+    def test_system_status_classifier_ok(self) -> None:
         """
         GIVEN:
             - The classifier is found
@@ -221,7 +221,7 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.data["tasks"]["classifier_status"], "OK")
         self.assertIsNone(response.data["tasks"]["classifier_error"])
 
-    def test_system_status_classifier_warning(self):
+    def test_system_status_classifier_warning(self) -> None:
         """
         GIVEN:
             - No classifier task is found
@@ -238,7 +238,7 @@ class TestSystemStatus(APITestCase):
             "WARNING",
         )
 
-    def test_system_status_classifier_error(self):
+    def test_system_status_classifier_error(self) -> None:
         """
         GIVEN:
             - An error occurred while loading the classifier
@@ -262,7 +262,7 @@ class TestSystemStatus(APITestCase):
         )
         self.assertIsNotNone(response.data["tasks"]["classifier_error"])
 
-    def test_system_status_sanity_check_ok(self):
+    def test_system_status_sanity_check_ok(self) -> None:
         """
         GIVEN:
             - The sanity check is successful
@@ -282,7 +282,7 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.data["tasks"]["sanity_check_status"], "OK")
         self.assertIsNone(response.data["tasks"]["sanity_check_error"])
 
-    def test_system_status_sanity_check_warning(self):
+    def test_system_status_sanity_check_warning(self) -> None:
         """
         GIVEN:
             - No sanity check task is found
@@ -299,7 +299,7 @@ class TestSystemStatus(APITestCase):
             "WARNING",
         )
 
-    def test_system_status_sanity_check_error(self):
+    def test_system_status_sanity_check_error(self) -> None:
         """
         GIVEN:
             - The sanity check failed
@@ -323,7 +323,7 @@ class TestSystemStatus(APITestCase):
         )
         self.assertIsNotNone(response.data["tasks"]["sanity_check_error"])
 
-    def test_system_status_ai_disabled(self):
+    def test_system_status_ai_disabled(self) -> None:
         """
         GIVEN:
             - The AI feature is disabled
@@ -339,7 +339,7 @@ class TestSystemStatus(APITestCase):
             self.assertEqual(response.data["tasks"]["llmindex_status"], "DISABLED")
             self.assertIsNone(response.data["tasks"]["llmindex_error"])
 
-    def test_system_status_ai_enabled(self):
+    def test_system_status_ai_enabled(self) -> None:
         """
         GIVEN:
             - The AI index feature is enabled, but no tasks are found
@@ -367,7 +367,7 @@ class TestSystemStatus(APITestCase):
             self.assertEqual(response.data["tasks"]["llmindex_status"], "OK")
             self.assertIsNone(response.data["tasks"]["llmindex_error"])
 
-    def test_system_status_ai_error(self):
+    def test_system_status_ai_error(self) -> None:
         """
         GIVEN:
             - The AI index feature is enabled and a task is found with an error
