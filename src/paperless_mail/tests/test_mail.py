@@ -1,6 +1,5 @@
 import dataclasses
 import email.contentmanager
-import random
 import time
 import uuid
 from collections import namedtuple
@@ -148,11 +147,7 @@ class BogusMailBox(AbstractContextManager):
 
         if "TO" in criteria:
             to_ = criteria[criteria.index("TO") + 1].strip('"')
-            msg = []
-            for m in self.messages:
-                for to_addrs in m.to:
-                    if to_ in to_addrs:
-                        msg.append(m)
+            msg = filter(lambda m: any(to_ in to_addr for to_addr in m.to), msg)
 
         if "UNFLAGGED" in criteria:
             msg = filter(lambda m: not m.flagged, msg)
@@ -204,7 +199,7 @@ def fake_magic_from_buffer(buffer, *, mime=False):
 
 class MessageBuilder:
     def __init__(self) -> None:
-        self._used_uids = set()
+        self._next_uid = 1
 
     def create_message(
         self,
@@ -257,10 +252,8 @@ class MessageBuilder:
         # TODO: Unsure how to add a uid to the actual EmailMessage. This hacks it in,
         #  based on how imap_tools uses regex to extract it.
         #  This should be a large enough pool
-        uid = random.randint(1, 10000)
-        while uid in self._used_uids:
-            uid = random.randint(1, 10000)
-        self._used_uids.add(uid)
+        uid = self._next_uid
+        self._next_uid += 1
 
         imap_msg._raw_uid_data = f"UID {uid}".encode()
 
