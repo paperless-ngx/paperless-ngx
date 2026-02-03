@@ -142,5 +142,6 @@ jobs:
           uv run \
             mypy \
             --show-error-codes \
-            --show-error-stats \
+            --error-summary \
+            --warn-unused-configs \
             .
