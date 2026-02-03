@@ -3,7 +3,7 @@ import uuid
 
 
 class LoggingMixin:
-    def renew_logging_group(self):
+    def renew_logging_group(self) -> None:
         """
         Creates a new UUID to group subsequent log calls together with
         the extra data named group

@@ -104,22 +104,6 @@
 
             <div class="row mb-3">
               <div class="col-md-3 col-form-label pt-0">
-                <span i18n>Items per page</span>
-              </div>
-              <div class="col">
-
-                <select class="form-select" formControlName="documentListItemPerPage">
-                  <option [ngValue]="10">10</option>
-                  <option [ngValue]="25">25</option>
-                  <option [ngValue]="50">50</option>
-                  <option [ngValue]="100">100</option>
-                </select>
-
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-3 col-form-label pt-0">
                 <span i18n>Sidebar</span>
               </div>
               <div class="col">
@@ -153,8 +137,28 @@
                 </button>
               </div>
             </div>
+          </div>
+          <div class="col-xl-6 ps-xl-5">
+            <h5 class="mt-3 mt-md-0" i18n>Global search</h5>
+            <div class="row">
+              <div class="col">
+                <pngx-input-check i18n-title title="Do not include advanced search results" formControlName="searchDbOnly"></pngx-input-check>
+              </div>
+            </div>
 
-            <h5 class="mt-3" id="update-checking" i18n>Update checking</h5>
+            <div class="row mb-3">
+              <div class="col-md-3 col-form-label pt-0">
+                <span i18n>Full search links to</span>
+              </div>
+              <div class="col mb-3">
+                <select class="form-select" formControlName="searchLink">
+                  <option [ngValue]="GlobalSearchType.TITLE_CONTENT" i18n>Title and content search</option>
+                  <option [ngValue]="GlobalSearchType.ADVANCED" i18n>Advanced search</option>
+                </select>
+              </div>
+            </div>
+
+            <h5 class="mt-3 mt-md-0" id="update-checking" i18n>Update checking</h5>
             <div class="row mb-3">
               <div class="col d-flex flex-row align-items-start">
                 <pngx-input-check i18n-title title="Enable update checking" formControlName="updateCheckingEnabled"></pngx-input-check>
@@ -179,11 +183,33 @@
                 <pngx-input-check i18n-title title="Show document counts in sidebar saved views" formControlName="sidebarViewsShowCount"></pngx-input-check>
               </div>
             </div>
-
           </div>
-          <div class="col-xl-6 ps-xl-5">
-            <h5 class="mt-3 mt-md-0" i18n>Document editing</h5>
+        </div>
 
+      </ng-template>
+    </li>
+
+    <li [ngbNavItem]="SettingsNavIDs.Documents">
+      <a ngbNavLink i18n>Documents</a>
+      <ng-template ngbNavContent>
+        <div class="row">
+          <div class="col-xl-6 pe-xl-5">
+            <h5 i18n>Documents</h5>
+            <div class="row mb-3">
+              <div class="col-md-3 col-form-label pt-0">
+                <span i18n>Items per page</span>
+              </div>
+              <div class="col">
+                <select class="form-select" formControlName="documentListItemPerPage">
+                  <option [ngValue]="10">10</option>
+                  <option [ngValue]="25">25</option>
+                  <option [ngValue]="50">50</option>
+                  <option [ngValue]="100">100</option>
+                </select>
+              </div>
+            </div>
+
+            <h5 class="mt-3" i18n>Document editing</h5>
             <div class="row">
               <div class="col">
                 <pngx-input-check i18n-title title="Use PDF viewer provided by the browser" i18n-hint hint="This is usually faster for displaying large PDF documents, but it might not work on some browsers." formControlName="useNativePdfViewer"></pngx-input-check>
@@ -209,36 +235,50 @@
               </div>
             </div>
 
-            <div class="row mb-3">
+            <div class="row">
               <div class="col">
                 <pngx-input-check i18n-title title="Show document thumbnail during loading" formControlName="documentEditingOverlayThumbnail"></pngx-input-check>
               </div>
             </div>
 
-            <h5 class="mt-3" i18n>Global search</h5>
-            <div class="row">
-              <div class="col">
-                <pngx-input-check i18n-title title="Do not include advanced search results" formControlName="searchDbOnly"></pngx-input-check>
-              </div>
-            </div>
-
             <div class="row mb-3">
-              <div class="col-md-3 col-form-label pt-0">
-                <span i18n>Full search links to</span>
-              </div>
-              <div class="col mb-3">
-                <select class="form-select" formControlName="searchLink">
-                  <option [ngValue]="GlobalSearchType.TITLE_CONTENT" i18n>Title and content search</option>
-                  <option [ngValue]="GlobalSearchType.ADVANCED" i18n>Advanced search</option>
-                </select>
+              <div class="col">
+                <p class="mb-2" i18n>Built-in fields to show:</p>
+                @for (option of documentDetailFieldOptions; track option.id) {
+                  <div class="form-check ms-3">
+                    <input class="form-check-input" type="checkbox"
+                      [id]="'documentDetailField-' + option.id"
+                      [checked]="isDocumentDetailFieldShown(option.id)"
+                      (change)="toggleDocumentDetailField(option.id, $event.target.checked)" />
+                    <label class="form-check-label" [for]="'documentDetailField-' + option.id">
+                      {{ option.label }}
+                    </label>
+                  </div>
+                }
+                <p class="small text-muted mt-1" i18n>Uncheck fields to hide them on the document details page.</p>
               </div>
             </div>
+          </div>
 
+          <div class="col-xl-6 ps-xl-5">
             <h5 class="mt-3" i18n>Bulk editing</h5>
             <div class="row mb-3">
               <div class="col">
                 <pngx-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs"></pngx-input-check>
                 <pngx-input-check i18n-title title="Apply on close" formControlName="bulkEditApplyOnClose"></pngx-input-check>
+              </div>
+            </div>
+
+            <h5 class="mt-3" i18n>PDF Editor</h5>
+            <div class="row">
+              <div class="col-md-3 col-form-label pt-0">
+                <span i18n>Default editing mode</span>
+              </div>
+              <div class="col">
+                <select class="form-select" formControlName="pdfEditorDefaultEditMode">
+                  <option [ngValue]="PdfEditorEditMode.Create" i18n>Create new document(s)</option>
+                  <option [ngValue]="PdfEditorEditMode.Update" i18n>Update existing document</option>
+                </select>
               </div>
             </div>
 
@@ -248,10 +288,8 @@
                 <pngx-input-check i18n-title title="Enable notes" formControlName="notesEnabled"></pngx-input-check>
               </div>
             </div>
-
           </div>
         </div>
-
       </ng-template>
     </li>
 

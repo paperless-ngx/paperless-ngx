@@ -31,6 +31,7 @@ import {
   MATCH_NONE,
 } from 'src/app/data/matching-model'
 import { Tag } from 'src/app/data/tag'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
@@ -41,6 +42,7 @@ import {
 } from 'src/app/services/permissions.service'
 import { BulkEditObjectOperation } from 'src/app/services/rest/abstract-name-filter-service'
 import { TagService } from 'src/app/services/rest/tag.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogComponent } from '../../common/edit-dialog/edit-dialog.component'
@@ -79,6 +81,7 @@ describe('ManagementListComponent', () => {
   let toastService: ToastService
   let documentListViewService: DocumentListViewService
   let permissionsService: PermissionsService
+  let settingsService: SettingsService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -130,6 +133,7 @@ describe('ManagementListComponent', () => {
     modalService = TestBed.inject(NgbModal)
     toastService = TestBed.inject(ToastService)
     documentListViewService = TestBed.inject(DocumentListViewService)
+    settingsService = TestBed.inject(SettingsService)
     fixture = TestBed.createComponent(TagListComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
@@ -163,8 +167,7 @@ describe('ManagementListComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const createButton = fixture.debugElement.queryAll(By.css('button'))[4]
-    createButton.triggerEventHandler('click')
+    component.openCreateDialog()
 
     expect(modal).not.toBeUndefined()
     const editDialog = modal.componentInstance as EditDialogComponent<Tag>
@@ -187,8 +190,7 @@ describe('ManagementListComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const editButton = fixture.debugElement.queryAll(By.css('button'))[7]
-    editButton.triggerEventHandler('click')
+    component.openEditDialog(tags[0])
 
     expect(modal).not.toBeUndefined()
     const editDialog = modal.componentInstance as EditDialogComponent<Tag>
@@ -212,8 +214,7 @@ describe('ManagementListComponent', () => {
     const deleteSpy = jest.spyOn(tagService, 'delete')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[8]
-    deleteButton.triggerEventHandler('click')
+    component.openDeleteDialog(tags[0])
 
     expect(modal).not.toBeUndefined()
     const editDialog = modal.componentInstance as ConfirmDialogComponent
@@ -229,6 +230,21 @@ describe('ManagementListComponent', () => {
     editDialog.confirmClicked.emit()
     expect(reloadSpy).toHaveBeenCalled()
   })
+
+  it('should use the all list length for collection size when provided', fakeAsync(() => {
+    jest.spyOn(tagService, 'listFiltered').mockReturnValueOnce(
+      of({
+        count: 1,
+        all: [1, 2, 3],
+        results: tags.slice(0, 1),
+      })
+    )
+
+    component.reloadData()
+    tick(100)
+
+    expect(component.collectionSize).toBe(3)
+  }))
 
   it('should support quick filter for objects', () => {
     const expectedUrl = documentListViewService.getQuickFilterUrl([
@@ -264,17 +280,82 @@ describe('ManagementListComponent', () => {
     expect(component.page).toEqual(1)
   })
 
-  it('should support toggle all items in view', () => {
+  it('should support toggle select page in vew', () => {
     expect(component.selectedObjects.size).toEqual(0)
-    const toggleAllSpy = jest.spyOn(component, 'toggleAll')
+    const selectPageSpy = jest.spyOn(component, 'selectPage')
     const checkButton = fixture.debugElement.queryAll(
       By.css('input.form-check-input')
     )[0]
-    checkButton.nativeElement.dispatchEvent(new Event('click'))
+    checkButton.nativeElement.dispatchEvent(new Event('change'))
     checkButton.nativeElement.checked = true
-    checkButton.nativeElement.dispatchEvent(new Event('click'))
-    expect(toggleAllSpy).toHaveBeenCalled()
+    checkButton.nativeElement.dispatchEvent(new Event('change'))
+    expect(selectPageSpy).toHaveBeenCalled()
     expect(component.selectedObjects.size).toEqual(tags.length)
+  })
+
+  it('selectNone should clear selection and reset toggle flag', () => {
+    component.selectedObjects = new Set([tags[0].id, tags[1].id])
+    component.togggleAll = true
+
+    component.selectNone()
+
+    expect(component.selectedObjects.size).toBe(0)
+    expect(component.togggleAll).toBe(false)
+  })
+
+  it('selectPage should select current page items or clear selection', () => {
+    component.selectPage(true)
+    expect(component.selectedObjects).toEqual(new Set(tags.map((t) => t.id)))
+    expect(component.togggleAll).toBe(true)
+
+    component.togggleAll = true
+    component.selectPage(false)
+    expect(component.selectedObjects.size).toBe(0)
+    expect(component.togggleAll).toBe(false)
+  })
+
+  it('selectAll should use all IDs when collection size exists', () => {
+    ;(component as any).allIDs = [1, 2, 3, 4]
+    component.collectionSize = 4
+
+    component.selectAll()
+
+    expect(component.selectedObjects).toEqual(new Set([1, 2, 3, 4]))
+    expect(component.togggleAll).toBe(true)
+  })
+
+  it('selectAll should clear selection when collection size is zero', () => {
+    component.selectedObjects = new Set([1])
+    component.collectionSize = 0
+    component.togggleAll = true
+
+    component.selectAll()
+
+    expect(component.selectedObjects.size).toBe(0)
+    expect(component.togggleAll).toBe(false)
+  })
+
+  it('toggleSelected should toggle object selection and update toggle state', () => {
+    component.toggleSelected(tags[0])
+    expect(component.selectedObjects.has(tags[0].id)).toBe(true)
+    expect(component.togggleAll).toBe(false)
+
+    component.toggleSelected(tags[1])
+    component.toggleSelected(tags[2])
+    expect(component.togggleAll).toBe(true)
+
+    component.toggleSelected(tags[1])
+    expect(component.selectedObjects.has(tags[1].id)).toBe(false)
+    expect(component.togggleAll).toBe(false)
+  })
+
+  it('areAllPageItemsSelected should return false when page has no selectable items', () => {
+    component.data = []
+    component.selectedObjects.clear()
+
+    expect((component as any).areAllPageItemsSelected()).toBe(false)
+
+    component.data = tags
   })
 
   it('should support bulk edit permissions', () => {
@@ -370,4 +451,66 @@ describe('ManagementListComponent', () => {
     ).getSelectableIDs.call({}, [{ id: 1 }, { id: 5 }] as any)
     expect(ids).toEqual([1, 5])
   })
+
+  it('pageSize getter should return stored page size or default to 25', () => {
+    jest.spyOn(settingsService, 'get').mockReturnValue({ tags: 50 })
+    component.typeNamePlural = 'tags'
+
+    expect(component.pageSize).toBe(50)
+  })
+
+  it('pageSize getter should return 25 when no size is stored', () => {
+    const settingsService = TestBed.inject(SettingsService)
+    jest.spyOn(settingsService, 'get').mockReturnValue({})
+    component.typeNamePlural = 'tags'
+
+    expect(component.pageSize).toBe(25)
+  })
+
+  it('pageSize setter should update settings, reset page and reload data on success', fakeAsync(() => {
+    const reloadSpy = jest.spyOn(component, 'reloadData')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+
+    jest.spyOn(settingsService, 'get').mockReturnValue({ tags: 25 })
+    jest.spyOn(settingsService, 'set').mockImplementation(() => {})
+    jest
+      .spyOn(settingsService, 'storeSettings')
+      .mockReturnValue(of({ success: true }))
+
+    component.typeNamePlural = 'tags'
+    component.page = 2
+    component.pageSize = 100
+
+    tick()
+
+    expect(settingsService.set).toHaveBeenCalledWith(
+      SETTINGS_KEYS.OBJECT_LIST_SIZES,
+      { tags: 100 }
+    )
+    expect(component.page).toBe(1)
+    expect(reloadSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).not.toHaveBeenCalled()
+  }))
+
+  it('pageSize setter should show error toast on settings store failure', fakeAsync(() => {
+    const reloadSpy = jest.spyOn(component, 'reloadData')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+
+    jest.spyOn(settingsService, 'get').mockReturnValue({ tags: 25 })
+    jest.spyOn(settingsService, 'set').mockImplementation(() => {})
+    jest
+      .spyOn(settingsService, 'storeSettings')
+      .mockReturnValue(throwError(() => new Error('error storing settings')))
+
+    component.typeNamePlural = 'tags'
+    component.pageSize = 50
+
+    tick()
+
+    expect(toastErrorSpy).toHaveBeenCalledWith(
+      'Error saving settings',
+      expect.any(Error)
+    )
+    expect(reloadSpy).not.toHaveBeenCalled()
+  }))
 })

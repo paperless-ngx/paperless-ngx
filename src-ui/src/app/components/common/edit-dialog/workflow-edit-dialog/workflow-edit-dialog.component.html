@@ -430,6 +430,24 @@
           </div>
         </div>
       }
+      @case (WorkflowActionType.PasswordRemoval) {
+        <div class="row">
+          <div class="col">
+            <p class="small" i18n>
+              One password per line. The workflow will try them in order until one succeeds.
+            </p>
+            <pngx-input-textarea
+              i18n-title
+              title="Passwords"
+              formControlName="passwords"
+              rows="4"
+              [error]="error?.actions?.[i]?.passwords"
+              hint="Passwords are stored in plain text. Use with caution."
+              i18n-hint
+            ></pngx-input-textarea>
+          </div>
+        </div>
+      }
       @case (WorkflowActionType.Deletion) {
         <div class="row" [formGroup]="formGroup.get('deletion')">
           <input type="hidden" formControlName="id" />

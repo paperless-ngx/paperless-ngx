@@ -16,7 +16,7 @@ class AIClient:
     A client for interacting with an LLM backend.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.settings = AIConfig()
         self.llm = self.get_llm()
 

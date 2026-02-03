@@ -580,39 +580,9 @@ document.
     documents, such as encrypted PDF documents. The archiver will skip over
     these documents each time it sees them.
 
-### Managing encryption {#encryption}
-
-!!! warning
-
-    Encryption was removed in [paperless-ng 0.9](changelog.md#paperless-ng-090)
-    because it did not really provide any additional security, the passphrase
-    was stored in a configuration file on the same system as the documents.
-    Furthermore, the entire text content of the documents is stored plain in
-    the database, even if your documents are encrypted. Filenames are not
-    encrypted as well. Finally, the web server provides transparent access to
-    your encrypted documents.
-
-    Consider running paperless on an encrypted filesystem instead, which
-    will then at least provide security against physical hardware theft.
-
-#### Enabling encryption
-
-Enabling encryption is no longer supported.
-
-#### Disabling encryption
-
-Basic usage to disable encryption of your document store:
-
-(Note: If `PAPERLESS_PASSPHRASE` isn't set already, you need to specify
-it here)
-
-```
-decrypt_documents [--passphrase SECR3TP4SSPHRA$E]
-```
-
 ### Detecting duplicates {#fuzzy_duplicate}
 
-Paperless already catches and prevents upload of exactly matching documents,
+Paperless-ngx already catches and warns of exactly matching documents,
 however a new scan of an existing document may not produce an exact bit for bit
 duplicate. But the content should be exact or close, allowing detection.
 

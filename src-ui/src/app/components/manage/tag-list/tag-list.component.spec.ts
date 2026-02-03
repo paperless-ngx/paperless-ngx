@@ -101,7 +101,7 @@ describe('TagListComponent', () => {
   it('should request only parent tags when no name filter is applied', () => {
     expect(tagService.listFiltered).toHaveBeenCalledWith(
       1,
-      null,
+      25,
       undefined,
       undefined,
       undefined,
@@ -116,7 +116,7 @@ describe('TagListComponent', () => {
     component.reloadData()
     expect(tagService.listFiltered).toHaveBeenCalledWith(
       1,
-      null,
+      25,
       undefined,
       undefined,
       'Tag',
@@ -138,16 +138,12 @@ describe('TagListComponent', () => {
     }
 
     component.data = [parent as any]
-    const selectEvent = { target: { checked: true } } as unknown as PointerEvent
-    component.toggleAll(selectEvent)
+    component.selectPage(true)
 
     expect(component.selectedObjects.has(10)).toBe(true)
     expect(component.selectedObjects.has(11)).toBe(true)
 
-    const deselectEvent = {
-      target: { checked: false },
-    } as unknown as PointerEvent
-    component.toggleAll(deselectEvent)
+    component.selectPage(false)
     expect(component.selectedObjects.size).toBe(0)
   })
 })

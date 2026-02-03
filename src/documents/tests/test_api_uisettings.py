@@ -13,7 +13,7 @@ from paperless.version import __full_version_str__
 class TestApiUiSettings(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/ui_settings/"
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.test_user = User.objects.create_superuser(username="test")
         self.test_user.first_name = "Test"
@@ -21,7 +21,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
         self.test_user.save()
         self.client.force_authenticate(user=self.test_user)
 
-    def test_api_get_ui_settings(self):
+    def test_api_get_ui_settings(self) -> None:
         response = self.client.get(self.ENDPOINT, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.maxDiff = None
@@ -53,7 +53,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
             },
         )
 
-    def test_api_set_ui_settings(self):
+    def test_api_set_ui_settings(self) -> None:
         settings = {
             "settings": {
                 "dark_mode": {
@@ -76,7 +76,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
             settings["settings"],
         )
 
-    def test_api_set_ui_settings_insufficient_global_permissions(self):
+    def test_api_set_ui_settings_insufficient_global_permissions(self) -> None:
         not_superuser = User.objects.create_user(username="test_not_superuser")
         self.client.force_authenticate(user=not_superuser)
 
@@ -96,7 +96,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_api_set_ui_settings_sufficient_global_permissions(self):
+    def test_api_set_ui_settings_sufficient_global_permissions(self) -> None:
         not_superuser = User.objects.create_user(username="test_not_superuser")
         not_superuser.user_permissions.add(
             *Permission.objects.filter(codename__contains="uisettings"),
@@ -120,7 +120,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_settings_must_be_dict(self):
+    def test_settings_must_be_dict(self) -> None:
         """
         GIVEN:
             - API request to update ui_settings with settings not being a dict
@@ -153,7 +153,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
         OUTLOOK_OAUTH_CLIENT_SECRET="jkl012",
         OUTLOOK_OAUTH_ENABLED=True,
     )
-    def test_settings_includes_oauth_urls_if_enabled(self):
+    def test_settings_includes_oauth_urls_if_enabled(self) -> None:
         response = self.client.get(self.ENDPOINT, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsNotNone(

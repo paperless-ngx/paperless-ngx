@@ -659,13 +659,19 @@ system. See the corresponding
 
 : Sync groups from the third party authentication system (e.g. OIDC) to Paperless-ngx. When enabled, users will be added or removed from groups based on their group membership in the third party authentication system. Groups must already exist in Paperless-ngx and have the same name as in the third party authentication system. Groups are updated upon logging in via the third party authentication system, see the corresponding [django-allauth documentation](https://docs.allauth.org/en/dev/socialaccount/signals.html).
 
-: In order to pass groups from the authentication system you will need to update your [PAPERLESS_SOCIALACCOUNT_PROVIDERS](#PAPERLESS_SOCIALACCOUNT_PROVIDERS) setting by adding a top-level "SCOPES" setting which includes "groups", e.g.:
+: In order to pass groups from the authentication system you will need to update your [PAPERLESS_SOCIALACCOUNT_PROVIDERS](#PAPERLESS_SOCIALACCOUNT_PROVIDERS) setting by adding a top-level "SCOPES" setting which includes "groups", or the custom groups claim configured in [`PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM`](#PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM) e.g.:
 
     ```json
     {"openid_connect":{"SCOPE": ["openid","profile","email","groups"]...
     ```
 
     Defaults to False
+
+#### [`PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM=<str>`](#PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM) {#PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM}
+
+: Allows you to define a custom groups claim. See [PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS](#PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS) which is required for this setting to take effect.
+
+    Defaults to "groups"
 
 #### [`PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS=<comma-separated-list>`](#PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS) {#PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS}
 
@@ -1146,8 +1152,9 @@ via the consumption directory, you can disable the consumer to save resources.
 
 #### [`PAPERLESS_CONSUMER_DELETE_DUPLICATES=<bool>`](#PAPERLESS_CONSUMER_DELETE_DUPLICATES) {#PAPERLESS_CONSUMER_DELETE_DUPLICATES}
 
-: When the consumer detects a duplicate document, it will not touch
-the original document. This default behavior can be changed here.
+: As of version 3.0 Paperless-ngx allows duplicate documents to be consumed by default, _except_ when
+this setting is enabled. When enabled, Paperless will check if a document with the same hash already
+exists in the system and delete the duplicate file from the consumption directory without consuming it.
 
     Defaults to false.
 
@@ -1550,6 +1557,20 @@ assigns or creates tags if a properly formatted barcode is detected.
 
     Please refer to the Python regex documentation for more information.
 
+#### [`PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT=<bool>`](#PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT) {#PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT}
+
+: Enables splitting of documents on tag barcodes, similar to how ASN barcodes work.
+
+    When enabled, documents will be split into separate PDFs at pages containing
+    tag barcodes that match the configured `PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING`
+    patterns. The page with the tag barcode will be retained in the new document.
+
+    Each split document will have the detected tags assigned to it.
+
+    This only has an effect if `PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE` is also enabled.
+
+    Defaults to false.
+
 ## Audit Trail
 
 #### [`PAPERLESS_AUDIT_LOG_ENABLED=<bool>`](#PAPERLESS_AUDIT_LOG_ENABLED) {#PAPERLESS_AUDIT_LOG_ENABLED}
@@ -1609,6 +1630,16 @@ processing. This only has an effect if
 : Configures the schedule to empty the trash of expired deleted documents.
 
     Defaults to `0 1 * * *`, once per day.
+
+## Share links
+
+#### [`PAPERLESS_SHARE_LINK_BUNDLE_CLEANUP_CRON=<cron expression>`](#PAPERLESS_SHARE_LINK_BUNDLE_CLEANUP_CRON) {#PAPERLESS_SHARE_LINK_BUNDLE_CLEANUP_CRON}
+
+: Controls how often Paperless-ngx removes expired share link bundles (and their generated ZIP archives).
+
+: If set to the string "disable", expired bundles are not cleaned up automatically.
+
+    Defaults to `0 2 * * *`, once per day at 02:00.
 
 ## Binaries
 

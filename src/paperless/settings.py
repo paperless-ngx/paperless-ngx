@@ -241,6 +241,17 @@ def _parse_beat_schedule() -> dict:
                 "expires": 23.0 * 60.0 * 60.0,
             },
         },
+        {
+            "name": "Cleanup expired share link bundles",
+            "env_key": "PAPERLESS_SHARE_LINK_BUNDLE_CLEANUP_CRON",
+            # Default daily at 02:00
+            "env_default": "0 2 * * *",
+            "task": "documents.tasks.cleanup_expired_share_link_bundles",
+            "options": {
+                # 1 hour before default schedule sends again
+                "expires": 23.0 * 60.0 * 60.0,
+            },
+        },
     ]
     for task in tasks:
         # Either get the environment setting or use the default
@@ -279,6 +290,7 @@ MEDIA_ROOT = __get_path("PAPERLESS_MEDIA_ROOT", BASE_DIR.parent / "media")
 ORIGINALS_DIR = MEDIA_ROOT / "documents" / "originals"
 ARCHIVE_DIR = MEDIA_ROOT / "documents" / "archive"
 THUMBNAIL_DIR = MEDIA_ROOT / "documents" / "thumbnails"
+SHARE_LINK_BUNDLE_DIR = MEDIA_ROOT / "documents" / "share_link_bundles"
 
 DATA_DIR = __get_path("PAPERLESS_DATA_DIR", BASE_DIR.parent / "data")
 
@@ -345,6 +357,7 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.mfa",
+    "allauth.headless",
     "drf_spectacular",
     "drf_spectacular_sidecar",
     "treenode",
@@ -539,6 +552,12 @@ SOCIALACCOUNT_PROVIDERS = json.loads(
 )
 SOCIAL_ACCOUNT_DEFAULT_GROUPS = __get_list("PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS")
 SOCIAL_ACCOUNT_SYNC_GROUPS = __get_boolean("PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS")
+SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM: Final[str] = os.getenv(
+    "PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM",
+    "groups",
+)
+
+HEADLESS_TOKEN_STRATEGY = "paperless.adapter.DrfTokenStrategy"
 
 MFA_TOTP_ISSUER = "Paperless-ngx"
 
@@ -1130,6 +1149,10 @@ CONSUMER_TAG_BARCODE_MAPPING = dict(
     ),
 )
 
+CONSUMER_TAG_BARCODE_SPLIT: Final[bool] = __get_boolean(
+    "PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT",
+)
+
 CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED: Final[bool] = __get_boolean(
     "PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED",
 )
@@ -1202,19 +1225,6 @@ EMAIL_PARSE_DEFAULT_LAYOUT = __get_int(
     "PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT",
     1,  # MailRule.PdfLayout.TEXT_HTML but that can't be imported here
 )
-
-# Pre-2.x versions of Paperless stored your documents locally with GPG
-# encryption, but that is no longer the default.  This behaviour is still
-# available, but it must be explicitly enabled by setting
-# `PAPERLESS_PASSPHRASE` in your environment or config file.  The default is to
-# store these files unencrypted.
-#
-# Translation:
-# * If you're a new user, you can safely ignore this setting.
-# * If you're upgrading from 1.x, this must be set, OR you can run
-#   `./manage.py change_storage_type gpg unencrypted` to decrypt your files,
-#   after which you can unset this value.
-PASSPHRASE = os.getenv("PAPERLESS_PASSPHRASE")
 
 # Trigger a script after every successful document consumption?
 PRE_CONSUME_SCRIPT = os.getenv("PAPERLESS_PRE_CONSUME_SCRIPT")

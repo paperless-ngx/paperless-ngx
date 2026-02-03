@@ -23,6 +23,7 @@ import {
   MatchingModel,
 } from 'src/app/data/matching-model'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import {
   SortableDirective,
   SortEvent,
@@ -37,6 +38,7 @@ import {
   AbstractNameFilterService,
   BulkEditObjectOperation,
 } from 'src/app/services/rest/abstract-name-filter-service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
@@ -80,10 +82,13 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   public permissionType: PermissionType
   public extraColumns: ManagementListColumn[]
 
+  private readonly settingsService = inject(SettingsService)
+
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
 
   public data: T[] = []
   private unfilteredData: T[] = []
+  private allIDs: number[] = []
 
   public page = 1
 
@@ -159,7 +164,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     this.service
       .listFiltered(
         this.page,
-        null,
+        this.pageSize,
         this.sortField,
         this.sortReverse,
         this._nameFilter,
@@ -171,7 +176,8 @@ export abstract class ManagementListComponent<T extends MatchingModel>
         tap((c) => {
           this.unfilteredData = c.results
           this.data = this.filterData(c.results)
-          this.collectionSize = c.count
+          this.collectionSize = c.all?.length ?? c.count
+          this.allIDs = c.all
         }),
         delay(100)
       )
@@ -278,6 +284,30 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     if (event.code == 'Escape') this.nameFilterDebounce.next(null)
   }
 
+  public get pageSize(): number {
+    return (
+      this.settingsService.get(SETTINGS_KEYS.OBJECT_LIST_SIZES)[
+        this.typeNamePlural
+      ] || 25
+    )
+  }
+
+  public set pageSize(newPageSize: number) {
+    this.settingsService.set(SETTINGS_KEYS.OBJECT_LIST_SIZES, {
+      ...this.settingsService.get(SETTINGS_KEYS.OBJECT_LIST_SIZES),
+      [this.typeNamePlural]: newPageSize,
+    })
+    this.settingsService.storeSettings().subscribe({
+      next: () => {
+        this.page = 1
+        this.reloadData()
+      },
+      error: (error) => {
+        this.toastService.showError($localize`Error saving settings`, error)
+      },
+    })
+  }
+
   userCanDelete(object: ObjectWithPermissions): boolean {
     return this.permissionsService.currentUserOwnsObject(object)
   }
@@ -300,16 +330,6 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     return ownsAll
   }
 
-  toggleAll(event: PointerEvent) {
-    const checked = (event.target as HTMLInputElement).checked
-    this.togggleAll = checked
-    if (checked) {
-      this.selectedObjects = new Set(this.getSelectableIDs(this.data))
-    } else {
-      this.clearSelection()
-    }
-  }
-
   protected getSelectableIDs(objects: T[]): number[] {
     return objects.map((o) => o.id)
   }
@@ -319,10 +339,38 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     this.selectedObjects.clear()
   }
 
+  selectNone() {
+    this.clearSelection()
+  }
+
+  selectPage(select: boolean) {
+    if (select) {
+      this.selectedObjects = new Set(this.getSelectableIDs(this.data))
+      this.togggleAll = this.areAllPageItemsSelected()
+    } else {
+      this.clearSelection()
+    }
+  }
+
+  selectAll() {
+    if (!this.collectionSize) {
+      this.clearSelection()
+      return
+    }
+    this.selectedObjects = new Set(this.allIDs)
+    this.togggleAll = this.areAllPageItemsSelected()
+  }
+
   toggleSelected(object) {
     this.selectedObjects.has(object.id)
       ? this.selectedObjects.delete(object.id)
       : this.selectedObjects.add(object.id)
+    this.togggleAll = this.areAllPageItemsSelected()
+  }
+
+  protected areAllPageItemsSelected(): boolean {
+    const ids = this.getSelectableIDs(this.data)
+    return ids.length > 0 && ids.every((id) => this.selectedObjects.has(id))
   }
 
   setPermissions() {
@@ -364,7 +412,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
       backdrop: 'static',
     })
     modal.componentInstance.title = $localize`Confirm delete`
-    modal.componentInstance.messageBold = $localize`This operation will permanently delete all objects.`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete the selected ${this.typeNamePlural}.`
     modal.componentInstance.message = $localize`This operation cannot be undone.`
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`

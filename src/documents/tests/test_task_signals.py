@@ -18,7 +18,11 @@ from documents.tests.utils import DirectoriesMixin
 
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
 class TestTaskSignalHandler(DirectoriesMixin, TestCase):
-    def util_call_before_task_publish_handler(self, headers_to_use, body_to_use):
+    def util_call_before_task_publish_handler(
+        self,
+        headers_to_use,
+        body_to_use,
+    ) -> None:
         """
         Simple utility to call the pre-run handle and ensure it created a single task
         instance
@@ -29,7 +33,7 @@ class TestTaskSignalHandler(DirectoriesMixin, TestCase):
 
         self.assertEqual(PaperlessTask.objects.all().count(), 1)
 
-    def test_before_task_publish_handler_consume(self):
+    def test_before_task_publish_handler_consume(self) -> None:
         """
         GIVEN:
             - A celery task is started via the consume folder
@@ -72,7 +76,7 @@ class TestTaskSignalHandler(DirectoriesMixin, TestCase):
         self.assertEqual(1, task.owner_id)
         self.assertEqual(celery.states.PENDING, task.status)
 
-    def test_task_prerun_handler(self):
+    def test_task_prerun_handler(self) -> None:
         """
         GIVEN:
             - A celery task is started via the consume folder
@@ -112,7 +116,7 @@ class TestTaskSignalHandler(DirectoriesMixin, TestCase):
 
         self.assertEqual(celery.states.STARTED, task.status)
 
-    def test_task_postrun_handler(self):
+    def test_task_postrun_handler(self) -> None:
         """
         GIVEN:
             - A celery task is started via the consume folder
@@ -154,7 +158,7 @@ class TestTaskSignalHandler(DirectoriesMixin, TestCase):
 
         self.assertEqual(celery.states.SUCCESS, task.status)
 
-    def test_task_failure_handler(self):
+    def test_task_failure_handler(self) -> None:
         """
         GIVEN:
             - A celery task is started via the consume folder

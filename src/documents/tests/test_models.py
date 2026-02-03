@@ -7,14 +7,14 @@ from documents.tests.factories import DocumentFactory
 
 
 class CorrespondentTestCase(TestCase):
-    def test___str__(self):
+    def test___str__(self) -> None:
         for s in ("test", "oχi", "test with fun_charÅc'\"terß"):
             correspondent = CorrespondentFactory.create(name=s)
             self.assertEqual(str(correspondent), s)
 
 
 class DocumentTestCase(TestCase):
-    def test_correspondent_deletion_does_not_cascade(self):
+    def test_correspondent_deletion_does_not_cascade(self) -> None:
         self.assertEqual(Correspondent.objects.all().count(), 0)
         correspondent = CorrespondentFactory.create()
         self.assertEqual(Correspondent.objects.all().count(), 1)

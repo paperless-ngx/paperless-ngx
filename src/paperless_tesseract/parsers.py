@@ -330,7 +330,7 @@ class RasterisedDocumentParser(DocumentParser):
 
         return ocrmypdf_args
 
-    def parse(self, document_path: Path, mime_type, file_name=None):
+    def parse(self, document_path: Path, mime_type, file_name=None) -> None:
         # This forces tesseract to use one core per page.
         os.environ["OMP_THREAD_LIMIT"] = "1"
         VALID_TEXT_LENGTH = 50

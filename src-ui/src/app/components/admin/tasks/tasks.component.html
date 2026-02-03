@@ -97,6 +97,12 @@
                   <br/><em>(<ng-container i18n>click for full output</ng-container>)</em>
                 }
               </ng-template>
+              @if (task.duplicate_documents?.length > 0) {
+                <div class="small text-warning-emphasis d-flex align-items-center gap-1">
+                  <i-bs class="lh-1" width="1em" height="1em" name="exclamation-triangle"></i-bs>
+                  <span i18n>Duplicate(s) detected</span>
+                </div>
+              }
             </td>
           }
           <td class="d-lg-none">

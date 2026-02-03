@@ -501,9 +501,22 @@ class Command(BaseCommand):
         stability_timeout_ms = int(stability_delay * 1000)
         testing_timeout_ms = int(self.testing_timeout_s * 1000)
 
-        # Start with no timeout (wait indefinitely for first event)
-        # unless in testing mode
-        timeout_ms = testing_timeout_ms if is_testing else 0
+        # Calculate appropriate timeout for watch loop
+        # In polling mode, rust_timeout must be significantly longer than poll_delay_ms
+        # to ensure poll cycles can complete before timing out
+        if is_testing:
+            if use_polling:
+                # For polling: timeout must be at least 3x the poll interval to allow
+                # multiple poll cycles. This prevents timeouts from interfering with
+                # the polling mechanism.
+                min_polling_timeout_ms = poll_delay_ms * 3
+                timeout_ms = max(min_polling_timeout_ms, testing_timeout_ms)
+            else:
+                # For native watching, use short timeout to check stop flag
+                timeout_ms = testing_timeout_ms
+        else:
+            # Not testing, wait indefinitely for first event
+            timeout_ms = 0
 
         self.stop_flag.clear()
 
@@ -543,8 +556,14 @@ class Command(BaseCommand):
                     # Check pending files at stability interval
                     timeout_ms = stability_timeout_ms
                 elif is_testing:
-                    # In testing, use short timeout to check stop flag
-                    timeout_ms = testing_timeout_ms
+                    # In testing, use appropriate timeout based on watch mode
+                    if use_polling:
+                        # For polling: ensure timeout allows polls to complete
+                        min_polling_timeout_ms = poll_delay_ms * 3
+                        timeout_ms = max(min_polling_timeout_ms, testing_timeout_ms)
+                    else:
+                        # For native watching, use short timeout to check stop flag
+                        timeout_ms = testing_timeout_ms
                 else:  # pragma: nocover
                     # No pending files, wait indefinitely
                     timeout_ms = 0

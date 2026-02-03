@@ -1,3 +1,4 @@
+import { Clipboard } from '@angular/cdk/clipboard'
 import { Component, Input, inject } from '@angular/core'
 import { Title } from '@angular/platform-browser'
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
@@ -13,8 +14,11 @@ import { environment } from 'src/environments/environment'
 })
 export class PageHeaderComponent {
   private titleService = inject(Title)
+  private clipboard = inject(Clipboard)
 
-  _title = ''
+  private _title = ''
+  public copied: boolean = false
+  private copyTimeout: any
 
   @Input()
   set title(title: string) {
@@ -27,6 +31,9 @@ export class PageHeaderComponent {
   }
 
   @Input()
+  id: number
+
+  @Input()
   subTitle: string = ''
 
   @Input()
@@ -34,4 +41,15 @@ export class PageHeaderComponent {
 
   @Input()
   infoLink: string
+
+  @Input()
+  loading: boolean = false
+
+  public copyID() {
+    this.copied = this.clipboard.copy(this.id.toString())
+    clearTimeout(this.copyTimeout)
+    this.copyTimeout = setTimeout(() => {
+      this.copied = false
+    }, 3000)
+  }
 }

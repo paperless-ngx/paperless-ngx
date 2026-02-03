@@ -129,7 +129,7 @@
         <div class="row fade" [class.show]="showRules">
           <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editMailRule(rule)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailRule) || !userCanEdit(rule)">{{rule.name}}</button></div>
           <div class="col-1 d-flex align-items-center d-none d-sm-flex">{{rule.order}}</div>
-          <div class="col-2 d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
+          <div class="col-2 d-flex align-items-center">{{ mailAccountsById.get(rule.account)?.name }}</div>
           <div class="col-2 d-flex align-items-center d-none d-sm-flex">
             <div class="form-check form-switch mb-0">
               <input #inputField type="checkbox" class="form-check-input cursor-pointer" [id]="rule.id+'_enable'" [(ngModel)]="rule.enabled" (change)="onMailRuleEnableToggled(rule)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }">

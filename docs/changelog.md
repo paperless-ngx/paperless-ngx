@@ -1,5 +1,24 @@
 # Changelog
 
+## paperless-ngx 2.20.6
+
+### Bug Fixes
+
+-   Fix: extract all ids for nested tags [@shamoon](https://github.com/shamoon) ([#11888](https://github.com/paperless-ngx/paperless-ngx/pull/11888))
+-   Fixhancement: change date calculation for 'this year' to include future documents [@shamoon](https://github.com/shamoon) ([#11884](https://github.com/paperless-ngx/paperless-ngx/pull/11884))
+-   Fix: Running management scripts under rootless could fail [@stumpylog](https://github.com/stumpylog) ([#11870](https://github.com/paperless-ngx/paperless-ngx/pull/11870))
+-   Fix: use correct field id for overrides [@shamoon](https://github.com/shamoon) ([#11869](https://github.com/paperless-ngx/paperless-ngx/pull/11869))
+
+### All App Changes
+
+<details>
+<summary>3 changes</summary>
+
+-   Fix: extract all ids for nested tags [@shamoon](https://github.com/shamoon) ([#11888](https://github.com/paperless-ngx/paperless-ngx/pull/11888))
+-   Fixhancement: change date calculation for 'this year' to include future documents [@shamoon](https://github.com/shamoon) ([#11884](https://github.com/paperless-ngx/paperless-ngx/pull/11884))
+-   Fix: use correct field id for overrides [@shamoon](https://github.com/shamoon) ([#11869](https://github.com/paperless-ngx/paperless-ngx/pull/11869))
+</details>
+
 ## paperless-ngx 2.20.5
 
 ### Bug Fixes

@@ -20,7 +20,7 @@ class TestTikaParser:
         settings: SettingsWrapper,
         tika_parser: TikaDocumentParser,
         sample_odt_file: Path,
-    ):
+    ) -> None:
         settings.TIME_ZONE = "America/Chicago"
         # Pretend parse response
         httpx_mock.add_response(
@@ -53,7 +53,7 @@ class TestTikaParser:
         httpx_mock: HTTPXMock,
         tika_parser: TikaDocumentParser,
         sample_odt_file: Path,
-    ):
+    ) -> None:
         httpx_mock.add_response(
             json={
                 "Content-Type": "application/vnd.oasis.opendocument.text",
@@ -76,7 +76,7 @@ class TestTikaParser:
         httpx_mock: HTTPXMock,
         tika_parser: TikaDocumentParser,
         sample_odt_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Document needs to be converted to PDF
@@ -108,7 +108,7 @@ class TestTikaParser:
         settings: SettingsWrapper,
         tika_parser: TikaDocumentParser,
         sample_odt_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Document needs to be converted to PDF
@@ -127,6 +127,8 @@ class TestTikaParser:
         tika_parser.convert_to_pdf(sample_odt_file, None)
 
         request = httpx_mock.get_request()
+
+        assert request is not None
 
         expected_field_name = "pdfa"
 
