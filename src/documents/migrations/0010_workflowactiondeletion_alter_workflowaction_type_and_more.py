@@ -7,7 +7,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "1076_alter_paperlesstask_task_name"),
+        ("documents", "0009_workflowaction_passwords_alter_workflowaction_type"),
     ]
 
     operations = [
