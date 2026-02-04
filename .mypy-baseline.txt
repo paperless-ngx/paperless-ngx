@@ -91,7 +91,6 @@ src/documents/classifier.py:0: error: Skipping analyzing "nltk.corpus": module i
 src/documents/classifier.py:0: error: Skipping analyzing "nltk.stem": module is installed, but missing library stubs or py.typed marker  [import-untyped]
 src/documents/classifier.py:0: error: Skipping analyzing "nltk.tokenize": module is installed, but missing library stubs or py.typed marker  [import-untyped]
 src/documents/classifier.py:0: error: Unsupported right operand type for in ("None")  [operator]
-src/documents/classifier.py:0: note: See https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports
 src/documents/conditionals.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
 src/documents/conditionals.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
 src/documents/conditionals.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
