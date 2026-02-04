@@ -99,3 +99,47 @@ jobs:
         run: |
           docker compose --file docker/compose/docker-compose.ci-test.yml logs
           docker compose --file docker/compose/docker-compose.ci-test.yml down
+  typing:
+    name: Check project typing
+    runs-on: ubuntu-24.04
+    env:
+      DEFAULT_PYTHON: "3.12"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.1
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "${{ env.DEFAULT_PYTHON }}"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7.2.1
+        with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
+          enable-cache: true
+          python-version: ${{ steps.setup-python.outputs.python-version }}
+      - name: Install Python dependencies
+        run: |
+          uv sync \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --group testing \
+            --group typing \
+            --frozen
+      - name: List installed Python dependencies
+        run: |
+          uv pip list
+      - name: Cache Mypy
+        uses: actions/cache@v5.0.3
+        with:
+          path: .mypy_cache
+          # Keyed by OS, Python version, and dependency hashes
+          key: ${{ runner.os }}-mypy-py${{ env.DEFAULT_PYTHON }}-${{ hashFiles('pyproject.toml', 'uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mypy-py${{ env.DEFAULT_PYTHON }}-
+            ${{ runner.os }}-mypy-
+      - name: Check typing
+        run: |
+          uv run mypy \
+            --show-error-codes \
+            --warn-unused-configs \
+            src/ | uv run mypy-baseline filter

@@ -43,6 +43,7 @@ from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
 from rest_framework import fields
 from rest_framework import serializers
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.fields import SerializerMethodField
 from rest_framework.filters import OrderingFilter
 
@@ -100,7 +101,7 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
     controls which fields should be displayed.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         # Don't pass the 'fields' arg up to the superclass
         fields = kwargs.pop("fields", None)
 
@@ -204,12 +205,12 @@ class SetPermissionsMixin:
                     del permissions_dict[action]
         return permissions_dict
 
-    def _set_permissions(self, permissions, object):
+    def _set_permissions(self, permissions, object) -> None:
         set_permissions_for_object(permissions, object)
 
 
 class SerializerWithPerms(serializers.Serializer):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         self.user = kwargs.pop("user", None)
         self.full_perms = kwargs.pop("full_perms", False)
         self.all_fields = kwargs.pop("all_fields", False)
@@ -258,7 +259,7 @@ class OwnedObjectSerializer(
     serializers.ModelSerializer,
     SetPermissionsMixin,
 ):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         if not self.all_fields:
@@ -408,7 +409,7 @@ class OwnedObjectSerializer(
     )
     # other methods in mixin
 
-    def validate_unique_together(self, validated_data, instance=None):
+    def validate_unique_together(self, validated_data, instance=None) -> None:
         # workaround for https://github.com/encode/django-rest-framework/issues/9358
         if "owner" in validated_data and "name" in self.Meta.fields:
             name = validated_data.get("name", instance.name if instance else None)
@@ -444,6 +445,19 @@ class OwnedObjectSerializer(
         return instance
 
     def update(self, instance, validated_data):
+        user = getattr(self, "user", None)
+        is_superuser = user.is_superuser if user is not None else False
+        is_owner = instance.owner == user if user is not None else False
+        is_unowned = instance.owner is None
+
+        if (
+            ("owner" in validated_data and validated_data["owner"] != instance.owner)
+            or "set_permissions" in validated_data
+        ) and not (is_superuser or is_owner or is_unowned):
+            raise PermissionDenied(
+                _("Insufficient permissions."),
+            )
+
         if "set_permissions" in validated_data:
             self._set_permissions(validated_data["set_permissions"], instance)
         self.validate_unique_together(validated_data, instance)
@@ -706,7 +720,7 @@ class StoragePathField(serializers.PrimaryKeyRelatedField):
 
 
 class CustomFieldSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         context = kwargs.get("context")
         self.api_version = int(
             context.get("request").version
@@ -832,7 +846,7 @@ class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
     Based on https://stackoverflow.com/a/62579804
     """
 
-    def __init__(self, method_name=None, *args, **kwargs):
+    def __init__(self, method_name=None, *args, **kwargs) -> None:
         self.method_name = method_name
         kwargs["source"] = "*"
         super(serializers.SerializerMethodField, self).__init__(*args, **kwargs)
@@ -1247,7 +1261,7 @@ class DocumentSerializer(
         CustomFieldInstance.deleted_objects.filter(document=instance).delete()
         return instance
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         self.truncate_content = kwargs.pop("truncate_content", False)
 
         # return full permissions if we're doing a PATCH or PUT
@@ -1442,7 +1456,7 @@ class DocumentListSerializer(serializers.Serializer):
         child=serializers.IntegerField(),
     )
 
-    def _validate_document_id_list(self, documents, name="documents"):
+    def _validate_document_id_list(self, documents, name="documents") -> None:
         if not isinstance(documents, list):
             raise serializers.ValidationError(f"{name} must be a list")
         if not all(isinstance(i, int) for i in documents):
@@ -1488,7 +1502,7 @@ class BulkEditSerializer(
 
     parameters = serializers.DictField(allow_empty=True, default={}, write_only=True)
 
-    def _validate_tag_id_list(self, tags, name="tags"):
+    def _validate_tag_id_list(self, tags, name="tags") -> None:
         if not isinstance(tags, list):
             raise serializers.ValidationError(f"{name} must be a list")
         if not all(isinstance(i, int) for i in tags):
@@ -1503,7 +1517,7 @@ class BulkEditSerializer(
         self,
         custom_fields,
         name="custom_fields",
-    ):
+    ) -> None:
         ids = custom_fields
         if isinstance(custom_fields, dict):
             try:
@@ -1562,7 +1576,7 @@ class BulkEditSerializer(
             # This will never happen as it is handled by the ChoiceField
             raise serializers.ValidationError("Unsupported method.")
 
-    def _validate_parameters_tags(self, parameters):
+    def _validate_parameters_tags(self, parameters) -> None:
         if "tag" in parameters:
             tag_id = parameters["tag"]
             try:
@@ -1572,7 +1586,7 @@ class BulkEditSerializer(
         else:
             raise serializers.ValidationError("tag not specified")
 
-    def _validate_parameters_document_type(self, parameters):
+    def _validate_parameters_document_type(self, parameters) -> None:
         if "document_type" in parameters:
             document_type_id = parameters["document_type"]
             if document_type_id is None:
@@ -1585,7 +1599,7 @@ class BulkEditSerializer(
         else:
             raise serializers.ValidationError("document_type not specified")
 
-    def _validate_parameters_correspondent(self, parameters):
+    def _validate_parameters_correspondent(self, parameters) -> None:
         if "correspondent" in parameters:
             correspondent_id = parameters["correspondent"]
             if correspondent_id is None:
@@ -1597,7 +1611,7 @@ class BulkEditSerializer(
         else:
             raise serializers.ValidationError("correspondent not specified")
 
-    def _validate_storage_path(self, parameters):
+    def _validate_storage_path(self, parameters) -> None:
         if "storage_path" in parameters:
             storage_path_id = parameters["storage_path"]
             if storage_path_id is None:
@@ -1611,7 +1625,7 @@ class BulkEditSerializer(
         else:
             raise serializers.ValidationError("storage path not specified")
 
-    def _validate_parameters_modify_tags(self, parameters):
+    def _validate_parameters_modify_tags(self, parameters) -> None:
         if "add_tags" in parameters:
             self._validate_tag_id_list(parameters["add_tags"], "add_tags")
         else:
@@ -1622,7 +1636,7 @@ class BulkEditSerializer(
         else:
             raise serializers.ValidationError("remove_tags not specified")
 
-    def _validate_parameters_modify_custom_fields(self, parameters):
+    def _validate_parameters_modify_custom_fields(self, parameters) -> None:
         if "add_custom_fields" in parameters:
             self._validate_custom_field_id_list_or_dict(
                 parameters["add_custom_fields"],
@@ -1645,7 +1659,7 @@ class BulkEditSerializer(
             raise serializers.ValidationError("Specified owner cannot be found")
         return ownerUser
 
-    def _validate_parameters_set_permissions(self, parameters):
+    def _validate_parameters_set_permissions(self, parameters) -> None:
         parameters["set_permissions"] = self.validate_set_permissions(
             parameters["set_permissions"],
         )
@@ -1654,7 +1668,7 @@ class BulkEditSerializer(
         if "merge" not in parameters:
             parameters["merge"] = False
 
-    def _validate_parameters_rotate(self, parameters):
+    def _validate_parameters_rotate(self, parameters) -> None:
         try:
             if (
                 "degrees" not in parameters
@@ -1664,7 +1678,7 @@ class BulkEditSerializer(
         except ValueError:
             raise serializers.ValidationError("invalid rotation degrees")
 
-    def _validate_parameters_split(self, parameters):
+    def _validate_parameters_split(self, parameters) -> None:
         if "pages" not in parameters:
             raise serializers.ValidationError("pages not specified")
         try:
@@ -1693,7 +1707,7 @@ class BulkEditSerializer(
         else:
             parameters["delete_originals"] = False
 
-    def _validate_parameters_delete_pages(self, parameters):
+    def _validate_parameters_delete_pages(self, parameters) -> None:
         if "pages" not in parameters:
             raise serializers.ValidationError("pages not specified")
         if not isinstance(parameters["pages"], list):
@@ -1701,7 +1715,7 @@ class BulkEditSerializer(
         if not all(isinstance(i, int) for i in parameters["pages"]):
             raise serializers.ValidationError("pages must be a list of integers")
 
-    def _validate_parameters_merge(self, parameters):
+    def _validate_parameters_merge(self, parameters) -> None:
         if "delete_originals" in parameters:
             if not isinstance(parameters["delete_originals"], bool):
                 raise serializers.ValidationError("delete_originals must be a boolean")
@@ -1713,7 +1727,7 @@ class BulkEditSerializer(
         else:
             parameters["archive_fallback"] = False
 
-    def _validate_parameters_edit_pdf(self, parameters, document_id):
+    def _validate_parameters_edit_pdf(self, parameters, document_id) -> None:
         if "operations" not in parameters:
             raise serializers.ValidationError("operations not specified")
         if not isinstance(parameters["operations"], list):
@@ -2198,7 +2212,7 @@ class AcknowledgeTasksViewSerializer(serializers.Serializer):
         child=serializers.IntegerField(),
     )
 
-    def _validate_task_id_list(self, tasks, name="tasks"):
+    def _validate_task_id_list(self, tasks, name="tasks") -> None:
         if not isinstance(tasks, list):
             raise serializers.ValidationError(f"{name} must be a list")
         if not all(isinstance(i, int) for i in tasks):
@@ -2403,7 +2417,7 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
             )
         return objects
 
-    def _validate_permissions(self, permissions):
+    def _validate_permissions(self, permissions) -> None:
         self.validate_set_permissions(
             permissions,
         )
@@ -2515,7 +2529,7 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
         return attrs
 
     @staticmethod
-    def normalize_workflow_trigger_sources(trigger):
+    def normalize_workflow_trigger_sources(trigger) -> None:
         """
         Convert sources to strings to handle django-multiselectfield v1.0 changes
         """
@@ -2613,6 +2627,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
             "remove_change_groups",
             "email",
             "webhook",
+            "passwords",
         ]
 
     def validate(self, attrs):
@@ -2669,6 +2684,23 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
                 "Webhook data is required for webhook actions",
             )
 
+        if (
+            "type" in attrs
+            and attrs["type"] == WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL
+        ):
+            passwords = attrs.get("passwords")
+            # ensure passwords is a non-empty list of non-empty strings
+            if (
+                passwords is None
+                or not isinstance(passwords, list)
+                or len(passwords) == 0
+                or any(not isinstance(pw, str) for pw in passwords)
+                or any(len(pw.strip()) == 0 for pw in passwords)
+            ):
+                raise serializers.ValidationError(
+                    "Passwords are required for password removal actions",
+                )
+
         return attrs
 
 
@@ -2689,7 +2721,12 @@ class WorkflowSerializer(serializers.ModelSerializer):
             "actions",
         ]
 
-    def update_triggers_and_actions(self, instance: Workflow, triggers, actions):
+    def update_triggers_and_actions(
+        self,
+        instance: Workflow,
+        triggers,
+        actions,
+    ) -> None:
         set_triggers = []
         set_actions = []
 
@@ -2849,7 +2886,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
             instance.actions.set(set_actions)
         instance.save()
 
-    def prune_triggers_and_actions(self):
+    def prune_triggers_and_actions(self) -> None:
         """
         ManyToMany fields dont support e.g. on_delete so we need to discard unattached
         triggers and actions manually

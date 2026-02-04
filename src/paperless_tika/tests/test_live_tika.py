@@ -26,7 +26,7 @@ class TestTikaParserAgainstServer:
         self,
         tika_parser: TikaDocumentParser,
         sample_odt_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - An input ODT format document
@@ -55,7 +55,7 @@ class TestTikaParserAgainstServer:
         self,
         tika_parser: TikaDocumentParser,
         sample_docx_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - An input DOCX format document
@@ -87,7 +87,7 @@ class TestTikaParserAgainstServer:
         self,
         tika_parser: TikaDocumentParser,
         sample_doc_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - An input DOC format document
@@ -114,7 +114,7 @@ class TestTikaParserAgainstServer:
         self,
         tika_parser: TikaDocumentParser,
         sample_broken_odt: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - An input ODT format document

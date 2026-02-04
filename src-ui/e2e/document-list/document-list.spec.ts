@@ -180,6 +180,9 @@ test('bulk edit', async ({ page }) => {
   await page.locator('pngx-document-card-small').nth(2).click()
 
   await page.getByRole('button', { name: 'Tags' }).click()
+  await page
+    .getByRole('textbox', { name: 'Filter tags' })
+    .fill('TagWithPartial')
   await page.getByRole('menuitem', { name: 'TagWithPartial' }).click()
 
   await page.getByRole('button', { name: 'Apply' }).click()

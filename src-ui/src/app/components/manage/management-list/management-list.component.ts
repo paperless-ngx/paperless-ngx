@@ -23,6 +23,7 @@ import {
   MatchingModel,
 } from 'src/app/data/matching-model'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import {
   SortableDirective,
   SortEvent,
@@ -37,6 +38,7 @@ import {
   AbstractNameFilterService,
   BulkEditObjectOperation,
 } from 'src/app/services/rest/abstract-name-filter-service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
@@ -79,6 +81,8 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   public typeNamePlural: string
   public permissionType: PermissionType
   public extraColumns: ManagementListColumn[]
+
+  private readonly settingsService = inject(SettingsService)
 
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
 
@@ -160,7 +164,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     this.service
       .listFiltered(
         this.page,
-        null,
+        this.pageSize,
         this.sortField,
         this.sortReverse,
         this._nameFilter,
@@ -280,6 +284,30 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     if (event.code == 'Escape') this.nameFilterDebounce.next(null)
   }
 
+  public get pageSize(): number {
+    return (
+      this.settingsService.get(SETTINGS_KEYS.OBJECT_LIST_SIZES)[
+        this.typeNamePlural
+      ] || 25
+    )
+  }
+
+  public set pageSize(newPageSize: number) {
+    this.settingsService.set(SETTINGS_KEYS.OBJECT_LIST_SIZES, {
+      ...this.settingsService.get(SETTINGS_KEYS.OBJECT_LIST_SIZES),
+      [this.typeNamePlural]: newPageSize,
+    })
+    this.settingsService.storeSettings().subscribe({
+      next: () => {
+        this.page = 1
+        this.reloadData()
+      },
+      error: (error) => {
+        this.toastService.showError($localize`Error saving settings`, error)
+      },
+    })
+  }
+
   userCanDelete(object: ObjectWithPermissions): boolean {
     return this.permissionsService.currentUserOwnsObject(object)
   }
@@ -384,7 +412,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
       backdrop: 'static',
     })
     modal.componentInstance.title = $localize`Confirm delete`
-    modal.componentInstance.messageBold = $localize`This operation will permanently delete all objects.`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete the selected ${this.typeNamePlural}.`
     modal.componentInstance.message = $localize`This operation cannot be undone.`
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`

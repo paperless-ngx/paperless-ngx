@@ -19,7 +19,7 @@ TEST_CHANNEL_LAYERS = {
 
 @override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
 class TestWebSockets(TestCase):
-    async def test_no_auth(self):
+    async def test_no_auth(self) -> None:
         communicator = WebsocketCommunicator(application, "/ws/status/")
         connected, _ = await communicator.connect()
         self.assertFalse(connected)
@@ -27,7 +27,7 @@ class TestWebSockets(TestCase):
 
     @mock.patch("paperless.consumers.StatusConsumer.close")
     @mock.patch("paperless.consumers.StatusConsumer._authenticated")
-    async def test_close_on_no_auth(self, _authenticated, mock_close):
+    async def test_close_on_no_auth(self, _authenticated, mock_close) -> None:
         _authenticated.return_value = True
 
         communicator = WebsocketCommunicator(application, "/ws/status/")
@@ -59,7 +59,7 @@ class TestWebSockets(TestCase):
         mock_close.assert_called_once()
 
     @mock.patch("paperless.consumers.StatusConsumer._authenticated")
-    async def test_auth(self, _authenticated):
+    async def test_auth(self, _authenticated) -> None:
         _authenticated.return_value = True
 
         communicator = WebsocketCommunicator(application, "/ws/status/")
@@ -69,7 +69,7 @@ class TestWebSockets(TestCase):
         await communicator.disconnect()
 
     @mock.patch("paperless.consumers.StatusConsumer._authenticated")
-    async def test_receive_status_update(self, _authenticated):
+    async def test_receive_status_update(self, _authenticated) -> None:
         _authenticated.return_value = True
 
         communicator = WebsocketCommunicator(application, "/ws/status/")
@@ -90,7 +90,7 @@ class TestWebSockets(TestCase):
 
         await communicator.disconnect()
 
-    async def test_status_update_check_perms(self):
+    async def test_status_update_check_perms(self) -> None:
         communicator = WebsocketCommunicator(application, "/ws/status/")
 
         communicator.scope["user"] = mock.Mock()
@@ -137,7 +137,7 @@ class TestWebSockets(TestCase):
         await communicator.disconnect()
 
     @mock.patch("paperless.consumers.StatusConsumer._authenticated")
-    async def test_receive_documents_deleted(self, _authenticated):
+    async def test_receive_documents_deleted(self, _authenticated) -> None:
         _authenticated.return_value = True
 
         communicator = WebsocketCommunicator(application, "/ws/status/")
@@ -159,7 +159,7 @@ class TestWebSockets(TestCase):
         await communicator.disconnect()
 
     @mock.patch("channels.layers.InMemoryChannelLayer.group_send")
-    def test_manager_send_progress(self, mock_group_send):
+    def test_manager_send_progress(self, mock_group_send) -> None:
         with ProgressManager(task_id="test") as manager:
             manager.send_progress(
                 ProgressStatusOptions.STARTED,
@@ -190,7 +190,7 @@ class TestWebSockets(TestCase):
         )
 
     @mock.patch("channels.layers.InMemoryChannelLayer.group_send")
-    def test_manager_send_documents_deleted(self, mock_group_send):
+    def test_manager_send_documents_deleted(self, mock_group_send) -> None:
         with DocumentsStatusManager() as manager:
             manager.send_documents_deleted([1, 2, 3])
 

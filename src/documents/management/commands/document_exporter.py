@@ -67,7 +67,7 @@ class Command(CryptMixin, BaseCommand):
         "easy import."
     )
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument("target")
 
         parser.add_argument(
@@ -186,7 +186,7 @@ class Command(CryptMixin, BaseCommand):
             help="If provided, is used to encrypt sensitive data in the export",
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
         self.target = Path(options["target"]).resolve()
         self.split_manifest: bool = options["split_manifest"]
         self.compare_checksums: bool = options["compare_checksums"]
@@ -244,7 +244,7 @@ class Command(CryptMixin, BaseCommand):
             if self.zip_export and temp_dir is not None:
                 temp_dir.cleanup()
 
-    def dump(self):
+    def dump(self) -> None:
         # 1. Take a snapshot of what files exist in the current export folder
         for x in self.target.glob("**/*"):
             if x.is_file():
@@ -498,7 +498,7 @@ class Command(CryptMixin, BaseCommand):
         self,
         content: list[dict] | dict,
         target: Path,
-    ):
+    ) -> None:
         """
         Writes the source content to the target json file.
         If --compare-json arg was used, don't write to target file if
@@ -528,7 +528,7 @@ class Command(CryptMixin, BaseCommand):
         source: Path,
         source_checksum: str | None,
         target: Path,
-    ):
+    ) -> None:
         """
         Copies the source to the target, if target doesn't exist or the target doesn't seem to match
         the source attributes

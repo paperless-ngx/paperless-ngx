@@ -9,22 +9,17 @@ import subprocess
 import tempfile
 from functools import lru_cache
 from pathlib import Path
-from re import Match
 from typing import TYPE_CHECKING
 
 from django.conf import settings
-from django.utils import timezone
 
 from documents.loggers import LoggingMixin
 from documents.signals import document_consumer_declaration
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
-from paperless.config import OcrConfig
-from paperless.utils import ocr_to_dateparser_languages
 
 if TYPE_CHECKING:
     import datetime
-    from collections.abc import Iterator
 
 # This regular expression will try to find dates in the document at
 # hand and will match the following formats:
@@ -259,75 +254,6 @@ def make_thumbnail_from_pdf(in_path: Path, temp_dir: Path, logging_group=None) -
     return out_path
 
 
-def parse_date(filename, text) -> datetime.datetime | None:
-    return next(parse_date_generator(filename, text), None)
-
-
-def parse_date_generator(filename, text) -> Iterator[datetime.datetime]:
-    """
-    Returns the date of the document.
-    """
-
-    def __parser(ds: str, date_order: str) -> datetime.datetime:
-        """
-        Call dateparser.parse with a particular date ordering
-        """
-        import dateparser
-
-        ocr_config = OcrConfig()
-        languages = settings.DATE_PARSER_LANGUAGES or ocr_to_dateparser_languages(
-            ocr_config.language,
-        )
-
-        return dateparser.parse(
-            ds,
-            settings={
-                "DATE_ORDER": date_order,
-                "PREFER_DAY_OF_MONTH": "first",
-                "RETURN_AS_TIMEZONE_AWARE": True,
-                "TIMEZONE": settings.TIME_ZONE,
-            },
-            locales=languages,
-        )
-
-    def __filter(date: datetime.datetime) -> datetime.datetime | None:
-        if (
-            date is not None
-            and date.year > 1900
-            and date <= timezone.now()
-            and date.date() not in settings.IGNORE_DATES
-        ):
-            return date
-        return None
-
-    def __process_match(
-        match: Match[str],
-        date_order: str,
-    ) -> datetime.datetime | None:
-        date_string = match.group(0)
-
-        try:
-            date = __parser(date_string, date_order)
-        except Exception:
-            # Skip all matches that do not parse to a proper date
-            date = None
-
-        return __filter(date)
-
-    def __process_content(content: str, date_order: str) -> Iterator[datetime.datetime]:
-        for m in re.finditer(DATE_REGEX, content):
-            date = __process_match(m, date_order)
-            if date is not None:
-                yield date
-
-    # if filename date parsing is enabled, search there first:
-    if settings.FILENAME_DATE_ORDER:
-        yield from __process_content(filename, settings.FILENAME_DATE_ORDER)
-
-    # Iterate through all regex matches in text and try to parse the date
-    yield from __process_content(text, settings.DATE_ORDER)
-
-
 class ParseError(Exception):
     pass
 
@@ -340,7 +266,7 @@ class DocumentParser(LoggingMixin):
 
     logging_name = "paperless.parsing"
 
-    def __init__(self, logging_group, progress_callback=None):
+    def __init__(self, logging_group, progress_callback=None) -> None:
         super().__init__()
         self.renew_logging_group()
         self.logging_group = logging_group
@@ -355,7 +281,7 @@ class DocumentParser(LoggingMixin):
         self.date: datetime.datetime | None = None
         self.progress_callback = progress_callback
 
-    def progress(self, current_progress, max_progress):
+    def progress(self, current_progress, max_progress) -> None:
         if self.progress_callback:
             self.progress_callback(current_progress, max_progress)
 
@@ -380,7 +306,7 @@ class DocumentParser(LoggingMixin):
     def extract_metadata(self, document_path, mime_type):
         return []
 
-    def get_page_count(self, document_path, mime_type):
+    def get_page_count(self, document_path, mime_type) -> None:
         return None
 
     def parse(self, document_path, mime_type, file_name=None):
@@ -401,6 +327,6 @@ class DocumentParser(LoggingMixin):
     def get_date(self) -> datetime.datetime | None:
         return self.date
 
-    def cleanup(self):
+    def cleanup(self) -> None:
         self.log.debug(f"Deleting directory {self.tempdir}")
         shutil.rmtree(self.tempdir)

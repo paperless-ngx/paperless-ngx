@@ -1,4 +1,5 @@
 import logging
+import re
 from pathlib import Path
 
 from django.conf import settings
@@ -14,6 +15,7 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
+from documents.signals import document_consumption_finished
 from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.workflows.webhooks import send_webhook
 
@@ -265,3 +267,74 @@ def execute_webhook_action(
             f"Error occurred sending webhook: {e}",
             extra={"group": logging_group},
         )
+
+
+def execute_password_removal_action(
+    action: WorkflowAction,
+    document: Document | ConsumableDocument,
+    logging_group,
+) -> None:
+    """
+    Try to remove a password from a document using the configured list.
+    """
+    passwords = action.passwords
+    if not passwords:
+        logger.warning(
+            "Password removal action %s has no passwords configured",
+            action.pk,
+            extra={"group": logging_group},
+        )
+        return
+
+    passwords = [
+        password.strip()
+        for password in re.split(r"[,\n]", passwords)
+        if password.strip()
+    ]
+
+    if isinstance(document, ConsumableDocument):
+        # hook the consumption-finished signal to attempt password removal later
+        def handler(sender, **kwargs):
+            consumed_document: Document = kwargs.get("document")
+            if consumed_document is not None:
+                execute_password_removal_action(
+                    action,
+                    consumed_document,
+                    logging_group,
+                )
+            document_consumption_finished.disconnect(handler)
+
+        document_consumption_finished.connect(handler, weak=False)
+        return
+
+    # import here to avoid circular dependency
+    from documents.bulk_edit import remove_password
+
+    for password in passwords:
+        try:
+            remove_password(
+                [document.id],
+                password=password,
+                update_document=True,
+                user=document.owner,
+            )
+            logger.info(
+                "Removed password from document %s using workflow action %s",
+                document.pk,
+                action.pk,
+                extra={"group": logging_group},
+            )
+            return
+        except ValueError as e:
+            logger.warning(
+                "Password removal failed for document %s with supplied password: %s",
+                document.pk,
+                e,
+                extra={"group": logging_group},
+            )
+
+    logger.error(
+        "Password removal failed for document %s after trying all provided passwords",
+        document.pk,
+        extra={"group": logging_group},
+    )

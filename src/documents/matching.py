@@ -34,7 +34,7 @@ def log_reason(
     matching_model: MatchingModel | WorkflowTrigger,
     document: Document,
     reason: str,
-):
+) -> None:
     class_name = type(matching_model).__name__
     name = (
         matching_model.name if hasattr(matching_model, "name") else str(matching_model)
@@ -65,8 +65,12 @@ def match_correspondents(document: Document, classifier: DocumentClassifier, use
 
     return list(
         filter(
-            lambda o: matches(o, document)
-            or (o.pk == pred_id and o.matching_algorithm == MatchingModel.MATCH_AUTO),
+            lambda o: (
+                matches(o, document)
+                or (
+                    o.pk == pred_id and o.matching_algorithm == MatchingModel.MATCH_AUTO
+                )
+            ),
             correspondents,
         ),
     )
@@ -92,8 +96,12 @@ def match_document_types(document: Document, classifier: DocumentClassifier, use
 
     return list(
         filter(
-            lambda o: matches(o, document)
-            or (o.pk == pred_id and o.matching_algorithm == MatchingModel.MATCH_AUTO),
+            lambda o: (
+                matches(o, document)
+                or (
+                    o.pk == pred_id and o.matching_algorithm == MatchingModel.MATCH_AUTO
+                )
+            ),
             document_types,
         ),
     )
@@ -114,10 +122,12 @@ def match_tags(document: Document, classifier: DocumentClassifier, user=None):
 
     return list(
         filter(
-            lambda o: matches(o, document)
-            or (
-                o.matching_algorithm == MatchingModel.MATCH_AUTO
-                and o.pk in predicted_tag_ids
+            lambda o: (
+                matches(o, document)
+                or (
+                    o.matching_algorithm == MatchingModel.MATCH_AUTO
+                    and o.pk in predicted_tag_ids
+                )
             ),
             tags,
         ),
@@ -145,8 +155,12 @@ def match_storage_paths(document: Document, classifier: DocumentClassifier, user
 
     return list(
         filter(
-            lambda o: matches(o, document)
-            or (o.pk == pred_id and o.matching_algorithm == MatchingModel.MATCH_AUTO),
+            lambda o: (
+                matches(o, document)
+                or (
+                    o.pk == pred_id and o.matching_algorithm == MatchingModel.MATCH_AUTO
+                )
+            ),
             storage_paths,
         ),
     )

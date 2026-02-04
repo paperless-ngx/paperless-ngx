@@ -1,6 +1,5 @@
 import dataclasses
 import email.contentmanager
-import random
 import time
 import uuid
 from collections import namedtuple
@@ -51,30 +50,30 @@ class _AttachmentDef:
 class BogusFolderManager:
     current_folder = "INBOX"
 
-    def set(self, new_folder):
+    def set(self, new_folder) -> None:
         if new_folder not in ["INBOX", "spam"]:
             raise MailboxFolderSelectError(None, "uhm")
         self.current_folder = new_folder
 
 
 class BogusClient:
-    def __init__(self, messages):
+    def __init__(self, messages) -> None:
         self.messages: list[MailMessage] = messages
         self.capabilities: list[str] = []
 
     def __enter__(self):
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         pass
 
-    def authenticate(self, mechanism, authobject):
+    def authenticate(self, mechanism, authobject) -> None:
         # authobject must be a callable object
         auth_bytes = authobject(None)
         if auth_bytes != b"\x00admin\x00w57\xc3\xa4\xc3\xb6\xc3\xbcw4b6huwb6nhu":
             raise MailboxLoginError("BAD", "OK")
 
-    def uid(self, command, *args):
+    def uid(self, command, *args) -> None:
         if command == "STORE":
             for message in self.messages:
                 if message.uid == args[0]:
@@ -94,7 +93,7 @@ class BogusMailBox(AbstractContextManager):
     # A dummy access token
     ACCESS_TOKEN = "ea7e075cd3acf2c54c48e600398d5d5a"
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.messages: list[MailMessage] = []
         self.messages_spam: list[MailMessage] = []
         self.folder = BogusFolderManager()
@@ -104,25 +103,25 @@ class BogusMailBox(AbstractContextManager):
     def __enter__(self):
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         pass
 
-    def updateClient(self):
+    def updateClient(self) -> None:
         self.client = BogusClient(self.messages)
 
-    def login(self, username, password):
+    def login(self, username, password) -> None:
         # This will raise a UnicodeEncodeError if the password is not ASCII only
         password.encode("ascii")
         # Otherwise, check for correct values
         if username != self.USERNAME or password != self.ASCII_PASSWORD:
             raise MailboxLoginError("BAD", "OK")
 
-    def login_utf8(self, username, password):
+    def login_utf8(self, username, password) -> None:
         # Expected to only be called with the UTF-8 password
         if username != self.USERNAME or password != self.UTF_PASSWORD:
             raise MailboxLoginError("BAD", "OK")
 
-    def xoauth2(self, username: str, access_token: str):
+    def xoauth2(self, username: str, access_token: str) -> None:
         if username != self.USERNAME or access_token != self.ACCESS_TOKEN:
             raise MailboxLoginError("BAD", "OK")
 
@@ -148,11 +147,7 @@ class BogusMailBox(AbstractContextManager):
 
         if "TO" in criteria:
             to_ = criteria[criteria.index("TO") + 1].strip('"')
-            msg = []
-            for m in self.messages:
-                for to_addrs in m.to:
-                    if to_ in to_addrs:
-                        msg.append(m)
+            msg = filter(lambda m: any(to_ in to_addr for to_addr in m.to), msg)
 
         if "UNFLAGGED" in criteria:
             msg = filter(lambda m: not m.flagged, msg)
@@ -166,10 +161,10 @@ class BogusMailBox(AbstractContextManager):
 
         return list(msg)
 
-    def delete(self, uid_list):
+    def delete(self, uid_list) -> None:
         self.messages = list(filter(lambda m: m.uid not in uid_list, self.messages))
 
-    def flag(self, uid_list, flag_set, value):
+    def flag(self, uid_list, flag_set, value) -> None:
         for message in self.messages:
             if message.uid in uid_list:
                 for flag in flag_set:
@@ -182,7 +177,7 @@ class BogusMailBox(AbstractContextManager):
                         if hasattr(message, "flags"):
                             del message.flags
 
-    def move(self, uid_list, folder):
+    def move(self, uid_list, folder) -> None:
         if folder == "spam":
             self.messages_spam += list(
                 filter(lambda m: m.uid in uid_list, self.messages),
@@ -203,8 +198,8 @@ def fake_magic_from_buffer(buffer, *, mime=False):
 
 
 class MessageBuilder:
-    def __init__(self):
-        self._used_uids = set()
+    def __init__(self) -> None:
+        self._next_uid = 1
 
     def create_message(
         self,
@@ -257,10 +252,8 @@ class MessageBuilder:
         # TODO: Unsure how to add a uid to the actual EmailMessage. This hacks it in,
         #  based on how imap_tools uses regex to extract it.
         #  This should be a large enough pool
-        uid = random.randint(1, 10000)
-        while uid in self._used_uids:
-            uid = random.randint(1, 10000)
-        self._used_uids.add(uid)
+        uid = self._next_uid
+        self._next_uid += 1
 
         imap_msg._raw_uid_data = f"UID {uid}".encode()
 
@@ -274,7 +267,10 @@ class MessageBuilder:
         return imap_msg
 
 
-def reset_bogus_mailbox(bogus_mailbox: BogusMailBox, message_builder: MessageBuilder):
+def reset_bogus_mailbox(
+    bogus_mailbox: BogusMailBox,
+    message_builder: MessageBuilder,
+) -> None:
     bogus_mailbox.messages = []
     bogus_mailbox.messages_spam = []
     bogus_mailbox.messages.append(
@@ -310,7 +306,7 @@ def reset_bogus_mailbox(bogus_mailbox: BogusMailBox, message_builder: MessageBui
 
 
 class MailMocker(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.bogus_mailbox = BogusMailBox()
         self.messageBuilder = MessageBuilder()
 
@@ -330,7 +326,7 @@ class MailMocker(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def assert_queue_consumption_tasks_call_args(
         self,
         expected_call_args: list[list[dict[str, str]]],
-    ):
+    ) -> None:
         """
         Verifies that queue_consumption_tasks has been called with the expected arguments.
 
@@ -377,7 +373,7 @@ class MailMocker(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                     else:
                         self.fail("No match for expected arg")
 
-    def apply_mail_actions(self):
+    def apply_mail_actions(self) -> None:
         """
         Applies pending actions to mails by inspecting calls to the queue_consumption_tasks method.
         """
@@ -387,7 +383,12 @@ class MailMocker(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             apply_mail_action([], rule.pk, message.uid, message.subject, message.date)
 
 
-def assert_eventually_equals(getter_fn, expected_value, timeout=1.0, interval=0.05):
+def assert_eventually_equals(
+    getter_fn,
+    expected_value,
+    timeout=1.0,
+    interval=0.05,
+) -> None:
     """
     Repeatedly calls `getter_fn()` until the result equals `expected_value`,
     or times out after `timeout` seconds.
@@ -395,7 +396,7 @@ def assert_eventually_equals(getter_fn, expected_value, timeout=1.0, interval=0.
     deadline = time.time() + timeout
     while time.time() < deadline:
         if getter_fn() == expected_value:
-            return
+            return None
         time.sleep(interval)
     actual = getter_fn()
     raise AssertionError(f"Expected {expected_value}, but got {actual}")
@@ -407,14 +408,14 @@ class TestMail(
     FileSystemAssertsMixin,
     TestCase,
 ):
-    def setUp(self):
+    def setUp(self) -> None:
         self.mailMocker = MailMocker()
         self.mailMocker.setUp()
         self.mail_account_handler = MailAccountHandler()
 
         super().setUp()
 
-    def test_get_correspondent(self):
+    def test_get_correspondent(self) -> None:
         message = namedtuple("MailMessage", [])
         message.from_ = "someone@somewhere.com"
         message.from_values = EmailAddress(
@@ -473,7 +474,7 @@ class TestMail(
         c = handler._get_correspondent(message, rule)
         self.assertEqual(c, someone_else)
 
-    def test_get_title(self):
+    def test_get_title(self) -> None:
         message = namedtuple("MailMessage", [])
         message.subject = "the message title"
         att = namedtuple("Attachment", [])
@@ -497,7 +498,7 @@ class TestMail(
         )
         self.assertEqual(handler._get_title(message, att, rule), None)
 
-    def test_handle_message(self):
+    def test_handle_message(self) -> None:
         message = self.mailMocker.messageBuilder.create_message(
             subject="the message title",
             from_="Myself",
@@ -526,7 +527,7 @@ class TestMail(
             ],
         )
 
-    def test_handle_empty_message(self):
+    def test_handle_empty_message(self) -> None:
         message = namedtuple("MailMessage", [])
 
         message.attachments = []
@@ -537,7 +538,7 @@ class TestMail(
         self.mailMocker._queue_consumption_tasks_mock.assert_not_called()
         self.assertEqual(result, 0)
 
-    def test_handle_unknown_mime_type(self):
+    def test_handle_unknown_mime_type(self) -> None:
         message = self.mailMocker.messageBuilder.create_message(
             attachments=[
                 _AttachmentDef(filename="f1.pdf"),
@@ -566,7 +567,7 @@ class TestMail(
             ],
         )
 
-    def test_handle_disposition(self):
+    def test_handle_disposition(self) -> None:
         message = self.mailMocker.messageBuilder.create_message(
             attachments=[
                 _AttachmentDef(
@@ -594,7 +595,7 @@ class TestMail(
             ],
         )
 
-    def test_handle_inline_files(self):
+    def test_handle_inline_files(self) -> None:
         message = self.mailMocker.messageBuilder.create_message(
             attachments=[
                 _AttachmentDef(
@@ -624,7 +625,7 @@ class TestMail(
             ],
         )
 
-    def test_filename_filter(self):
+    def test_filename_filter(self) -> None:
         """
         GIVEN:
             - Email with multiple similar named attachments
@@ -745,7 +746,7 @@ class TestMail(
                 )
 
     @pytest.mark.flaky(reruns=4)
-    def test_filename_filter_inline_no_consumption(self):
+    def test_filename_filter_inline_no_consumption(self) -> None:
         """
         GIVEN:
             - Rule that processes all attachments but filters by filename
@@ -787,7 +788,7 @@ class TestMail(
 
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 1)
 
-    def test_handle_mail_account_mark_read(self):
+    def test_handle_mail_account_mark_read(self) -> None:
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
@@ -817,7 +818,7 @@ class TestMail(
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
     @pytest.mark.flaky(reruns=4)
-    def test_handle_mail_account_delete(self):
+    def test_handle_mail_account_delete(self) -> None:
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
@@ -839,7 +840,7 @@ class TestMail(
 
         assert_eventually_equals(lambda: len(self.mailMocker.bogus_mailbox.messages), 1)
 
-    def test_handle_mail_account_delete_no_filters(self):
+    def test_handle_mail_account_delete_no_filters(self) -> None:
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
@@ -862,7 +863,7 @@ class TestMail(
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 0)
 
     @pytest.mark.flaky(reruns=4)
-    def test_handle_mail_account_flag(self):
+    def test_handle_mail_account_flag(self) -> None:
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
@@ -893,7 +894,7 @@ class TestMail(
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
     @pytest.mark.flaky(reruns=4)
-    def test_handle_mail_account_move(self):
+    def test_handle_mail_account_move(self) -> None:
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
@@ -918,7 +919,7 @@ class TestMail(
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 2)
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages_spam), 1)
 
-    def test_handle_mail_account_move_no_filters(self):
+    def test_handle_mail_account_move_no_filters(self) -> None:
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
@@ -943,7 +944,7 @@ class TestMail(
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 0)
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages_spam), 3)
 
-    def test_handle_mail_account_tag(self):
+    def test_handle_mail_account_tag(self) -> None:
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
@@ -983,7 +984,7 @@ class TestMail(
             0,
         )
 
-    def test_handle_mail_account_tag_gmail(self):
+    def test_handle_mail_account_tag_gmail(self) -> None:
         self.mailMocker.bogus_mailbox._host = "imap.gmail.com"
         self.mailMocker.bogus_mailbox.client.capabilities = ["X-GM-EXT-1"]
 
@@ -1017,7 +1018,7 @@ class TestMail(
         )
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
-    def test_tag_mail_action_applemail_wrong_input(self):
+    def test_tag_mail_action_applemail_wrong_input(self) -> None:
         self.assertRaises(
             MailError,
             TagMailAction,
@@ -1025,7 +1026,7 @@ class TestMail(
             supports_gmail_labels=False,
         )
 
-    def test_handle_mail_account_tag_applemail(self):
+    def test_handle_mail_account_tag_applemail(self) -> None:
         # all mails will be FLAGGED afterwards
 
         account = MailAccount.objects.create(
@@ -1057,7 +1058,7 @@ class TestMail(
         )
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
-    def test_error_login(self):
+    def test_error_login(self) -> None:
         """
         GIVEN:
             - Account configured with incorrect password
@@ -1080,7 +1081,7 @@ class TestMail(
             self.mail_account_handler.handle_mail_account(account)
 
     @pytest.mark.flaky(reruns=4)
-    def test_error_skip_account(self):
+    def test_error_skip_account(self) -> None:
         _ = MailAccount.objects.create(
             name="test",
             imap_server="",
@@ -1109,7 +1110,7 @@ class TestMail(
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages_spam), 1)
 
     @pytest.mark.flaky(reruns=4)
-    def test_error_skip_rule(self):
+    def test_error_skip_rule(self) -> None:
         account = MailAccount.objects.create(
             name="test2",
             imap_server="",
@@ -1140,7 +1141,7 @@ class TestMail(
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 2)
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages_spam), 1)
 
-    def test_error_folder_set(self):
+    def test_error_folder_set(self) -> None:
         """
         GIVEN:
             - Mail rule with non-existent folder
@@ -1173,7 +1174,7 @@ class TestMail(
         self.mailMocker.bogus_mailbox.folder.list.assert_called_once()
         self.mailMocker._queue_consumption_tasks_mock.assert_not_called()
 
-    def test_error_folder_set_error_listing(self):
+    def test_error_folder_set_error_listing(self) -> None:
         """
         GIVEN:
             - Mail rule with non-existent folder
@@ -1208,8 +1209,8 @@ class TestMail(
 
     @pytest.mark.flaky(reruns=4)
     @mock.patch("paperless_mail.mail.MailAccountHandler._get_correspondent")
-    def test_error_skip_mail(self, m):
-        def get_correspondent_fake(message, rule):
+    def test_error_skip_mail(self, m) -> None:
+        def get_correspondent_fake(message, rule) -> None:
             if message.from_ == "amazon@amazon.de":
                 raise ValueError("Does not compute.")
             else:
@@ -1243,7 +1244,7 @@ class TestMail(
             "amazon@amazon.de",
         )
 
-    def test_error_create_correspondent(self):
+    def test_error_create_correspondent(self) -> None:
         account = MailAccount.objects.create(
             name="test2",
             imap_server="",
@@ -1292,7 +1293,7 @@ class TestMail(
         )
 
     @pytest.mark.flaky(reruns=4)
-    def test_filters(self):
+    def test_filters(self) -> None:
         account = MailAccount.objects.create(
             name="test3",
             imap_server="",
@@ -1342,7 +1343,7 @@ class TestMail(
                     expected_mail_count,
                 )
 
-    def test_auth_plain_fallback(self):
+    def test_auth_plain_fallback(self) -> None:
         """
         GIVEN:
             - Mail account with password containing non-ASCII characters
@@ -1382,7 +1383,7 @@ class TestMail(
         )
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
-    def test_auth_plain_fallback_fails_still(self):
+    def test_auth_plain_fallback_fails_still(self) -> None:
         """
         GIVEN:
             - Mail account with password containing non-ASCII characters
@@ -1413,7 +1414,7 @@ class TestMail(
             account,
         )
 
-    def test_auth_with_valid_token(self):
+    def test_auth_with_valid_token(self) -> None:
         """
         GIVEN:
             - Mail account configured with access token
@@ -1454,7 +1455,7 @@ class TestMail(
         )
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
-    def test_disabled_rule(self):
+    def test_disabled_rule(self) -> None:
         """
         GIVEN:
             - Mail rule is disabled
@@ -1494,7 +1495,7 @@ class TestMail(
 
 
 class TestPostConsumeAction(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.account = MailAccount.objects.create(
             name="test",
             imap_server="imap.test.com",
@@ -1586,7 +1587,7 @@ class TestManagementCommand(TestCase):
     @mock.patch(
         "paperless_mail.management.commands.mail_fetcher.tasks.process_mail_accounts",
     )
-    def test_mail_fetcher(self, m):
+    def test_mail_fetcher(self, m) -> None:
         call_command("mail_fetcher")
 
         m.assert_called_once()
@@ -1594,7 +1595,7 @@ class TestManagementCommand(TestCase):
 
 class TestTasks(TestCase):
     @mock.patch("paperless_mail.tasks.MailAccountHandler.handle_mail_account")
-    def test_all_accounts(self, m):
+    def test_all_accounts(self, m) -> None:
         m.side_effect = lambda account: 6
 
         MailAccount.objects.create(
@@ -1628,7 +1629,7 @@ class TestTasks(TestCase):
         self.assertIn("No new", result)
 
     @mock.patch("paperless_mail.tasks.MailAccountHandler.handle_mail_account")
-    def test_accounts_no_enabled_rules(self, m):
+    def test_accounts_no_enabled_rules(self, m) -> None:
         m.side_effect = lambda account: 6
 
         MailAccount.objects.create(
@@ -1658,7 +1659,7 @@ class TestTasks(TestCase):
         self.assertEqual(m.call_count, 0)
 
     @mock.patch("paperless_mail.tasks.MailAccountHandler.handle_mail_account")
-    def test_process_with_account_ids(self, m):
+    def test_process_with_account_ids(self, m) -> None:
         m.side_effect = lambda account: 6
 
         account_a = MailAccount.objects.create(
@@ -1693,7 +1694,7 @@ class TestTasks(TestCase):
 
 
 class TestMailAccountTestView(APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.mailMocker = MailMocker()
         self.mailMocker.setUp()
         self.user = User.objects.create_user(
@@ -1703,7 +1704,7 @@ class TestMailAccountTestView(APITestCase):
         self.client.force_authenticate(user=self.user)
         self.url = "/api/mail_accounts/test/"
 
-    def test_mail_account_test_view_success(self):
+    def test_mail_account_test_view_success(self) -> None:
         data = {
             "imap_server": "imap.example.com",
             "imap_port": 993,
@@ -1717,7 +1718,7 @@ class TestMailAccountTestView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {"success": True})
 
-    def test_mail_account_test_view_mail_error(self):
+    def test_mail_account_test_view_mail_error(self) -> None:
         data = {
             "imap_server": "imap.example.com",
             "imap_port": 993,
@@ -1818,7 +1819,7 @@ class TestMailAccountTestView(APITestCase):
 
 
 class TestMailAccountProcess(APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.mailMocker = MailMocker()
         self.mailMocker.setUp()
         self.user = User.objects.create_superuser(
@@ -1838,14 +1839,14 @@ class TestMailAccountProcess(APITestCase):
         self.url = f"/api/mail_accounts/{self.account.pk}/process/"
 
     @mock.patch("paperless_mail.tasks.process_mail_accounts.delay")
-    def test_mail_account_process_view(self, m):
+    def test_mail_account_process_view(self, m) -> None:
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
 
 
 class TestMailRuleAPI(APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.user = User.objects.create_superuser(
             username="testuser",
             password="testpassword",
@@ -1862,7 +1863,7 @@ class TestMailRuleAPI(APITestCase):
         )
         self.url = "/api/mail_rules/"
 
-    def test_create_mail_rule(self):
+    def test_create_mail_rule(self) -> None:
         """
         GIVEN:
             - Valid data for creating a mail rule
@@ -1884,7 +1885,7 @@ class TestMailRuleAPI(APITestCase):
         rule = MailRule.objects.first()
         self.assertEqual(rule.name, "Test Rule")
 
-    def test_mail_rule_action_parameter_required_for_tag_or_move(self):
+    def test_mail_rule_action_parameter_required_for_tag_or_move(self) -> None:
         """
         GIVEN:
             - Valid data for creating a mail rule without action_parameter
