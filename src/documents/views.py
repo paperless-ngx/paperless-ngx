@@ -57,6 +57,7 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
+from django.views.decorators.http import require_safe
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
@@ -3542,6 +3543,7 @@ def serve_logo(request, filename=None):
     )
 
 
+@require_safe
 def serve_manifest(request):
     """
     Dynamically generates the PWA (Progressive Web App)  manifest with custom
