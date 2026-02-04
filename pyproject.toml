@@ -29,7 +29,7 @@ dependencies = [
   "django~=5.2.10",
   "django-allauth[mfa,socialaccount]~=65.14.0",
   "django-auditlog~=3.4.1",
-  "django-cachalot~=2.8.0",
+  "django-cachalot~=2.9.0",
   "django-celery-results~=2.6.0",
   "django-compression-middleware~=0.5.0",
   "django-cors-headers~=4.9.0",
@@ -76,7 +76,7 @@ dependencies = [
   "sentence-transformers>=4.1",
   "setproctitle~=1.3.4",
   "tika-client~=0.10.0",
-  "torch~=2.9.1",
+  "torch~=2.10.0",
   "tqdm~=4.67.1",
   "watchfiles>=1.1.1",
   "whitenoise~=6.11",
@@ -129,7 +129,7 @@ testing = [
 lint = [
   "pre-commit~=4.5.1",
   "pre-commit-uv~=4.2.0",
-  "ruff~=0.14.0",
+  "ruff~=0.15.0",
 ]
 
 typing = [
@@ -142,6 +142,7 @@ typing = [
   "mypy",
   "mypy-baseline",
   "types-bleach",
+  "types-channels",
   "types-colorama",
   "types-dateparser",
   "types-markdown",
@@ -161,6 +162,11 @@ environments = [
   "sys_platform == 'linux'",
 ]
 
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
 [tool.uv.sources]
 # Markers are chosen to select these almost exclusively when building the Docker image
 psycopg-c = [
@@ -175,11 +181,6 @@ zxing-cpp = [
 torch = [
   { index = "pytorch-cpu" },
 ]
-
-[[tool.uv.index]]
-name = "pytorch-cpu"
-url = "https://download.pytorch.org/whl/cpu"
-explicit = true
 
 [tool.ruff]
 target-version = "py310"
@@ -315,6 +316,13 @@ markers = [
 PAPERLESS_DISABLE_DBHANDLER = "true"
 PAPERLESS_CACHE_BACKEND = "django.core.cache.backends.locmem.LocMemCache"
 
+[tool.coverage.report]
+exclude_also = [
+  "if settings.AUDIT_LOG_ENABLED:",
+  "if AUDIT_LOG_ENABLED:",
+  "if TYPE_CHECKING:",
+]
+
 [tool.coverage.run]
 source = [
   "src/",
@@ -324,13 +332,6 @@ omit = [
   "manage.py",
   "paperless/wsgi.py",
   "paperless/auth.py",
-]
-
-[tool.coverage.report]
-exclude_also = [
-  "if settings.AUDIT_LOG_ENABLED:",
-  "if AUDIT_LOG_ENABLED:",
-  "if TYPE_CHECKING:",
 ]
 
 [tool.mypy]
@@ -352,3 +353,4 @@ django_settings_module = "paperless.settings"
 [tool.mypy-baseline]
 baseline_path = ".mypy-baseline.txt"
 sort_baseline = true
+ignore_categories = [ "note" ]

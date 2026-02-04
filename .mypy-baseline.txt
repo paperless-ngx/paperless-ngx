@@ -248,7 +248,6 @@ src/documents/index.py:0: error: Skipping analyzing "whoosh.searching": module i
 src/documents/index.py:0: error: Skipping analyzing "whoosh.util.times": module is installed, but missing library stubs or py.typed marker  [import-untyped]
 src/documents/index.py:0: error: Skipping analyzing "whoosh.writing": module is installed, but missing library stubs or py.typed marker  [import-untyped]
 src/documents/index.py:0: error: Value of type "ManualResults" is not indexable  [index]
-src/documents/index.py:0: note: Use "-> None" if function does not return a value
 src/documents/loggers.py:0: error: "LoggingMixin" has no attribute "logging_name"  [attr-defined]
 src/documents/mail.py:0: error: Incompatible types in assignment (expression has type "Message[str, str]", variable has type "bytes")  [assignment]
 src/documents/management/commands/convert_mariadb_uuid.py:0: error: Function is missing a type annotation  [no-untyped-def]
@@ -276,7 +275,6 @@ src/documents/management/commands/document_exporter.py:0: error: Missing type pa
 src/documents/management/commands/document_exporter.py:0: error: Skipping analyzing "allauth.mfa.models": module is installed, but missing library stubs or py.typed marker  [import-untyped]
 src/documents/management/commands/document_exporter.py:0: error: Skipping analyzing "allauth.socialaccount.models": module is installed, but missing library stubs or py.typed marker  [import-untyped]
 src/documents/management/commands/document_exporter.py:0: error: Skipping analyzing "auditlog.models": module is installed, but missing library stubs or py.typed marker  [import-untyped]
-src/documents/management/commands/document_exporter.py:0: note: See https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports
 src/documents/management/commands/document_fuzzy_match.py:0: error: Function is missing a type annotation  [no-untyped-def]
 src/documents/management/commands/document_fuzzy_match.py:0: error: Function is missing a type annotation  [no-untyped-def]
 src/documents/management/commands/document_importer.py:0: error: Argument 1 to "create_source_path_directory" has incompatible type "Path | None"; expected "Path"  [arg-type]
@@ -318,7 +316,6 @@ src/documents/management/commands/mixins.py:0: error: Function is missing a type
 src/documents/management/commands/mixins.py:0: error: Incompatible types in assignment (expression has type "list[dict[str, Sequence[str]]]", variable has type "CryptFields")  [assignment]
 src/documents/management/commands/mixins.py:0: error: Missing type parameters for generic type "dict"  [type-arg]
 src/documents/management/commands/mixins.py:0: error: Unsupported operand types for // ("None" and "int")  [operator]
-src/documents/management/commands/mixins.py:0: note: Left operand is of type "int | None"
 src/documents/management/commands/prune_audit_logs.py:0: error: Function is missing a type annotation  [no-untyped-def]
 src/documents/management/commands/prune_audit_logs.py:0: error: Function is missing a type annotation  [no-untyped-def]
 src/documents/management/commands/prune_audit_logs.py:0: error: Skipping analyzing "auditlog.models": module is installed, but missing library stubs or py.typed marker  [import-untyped]
@@ -343,8 +340,6 @@ src/documents/matching.py:0: error: Incompatible types in assignment (expression
 src/documents/matching.py:0: error: Unsupported left operand type for & ("None")  [operator]
 src/documents/matching.py:0: error: Unsupported left operand type for & ("None")  [operator]
 src/documents/matching.py:0: error: Value of type variable "AnyStr" of "fnmatch" cannot be "object"  [type-var]
-src/documents/matching.py:0: note: Left operand is of type "set[int] | None"
-src/documents/matching.py:0: note: Left operand is of type "set[int] | None"
 src/documents/migrations/0001_initial.py:0: error: Skipping analyzing "multiselectfield": module is installed, but missing library stubs or py.typed marker  [import-untyped]
 src/documents/migrations/0001_initial.py:0: error: Skipping analyzing "multiselectfield.db": module is installed, but missing library stubs or py.typed marker  [import-untyped]
 src/documents/migrations/0001_initial.py:0: error: Skipping analyzing "multiselectfield.db.fields": module is installed, but missing library stubs or py.typed marker  [import-untyped]
@@ -417,10 +412,6 @@ src/documents/models.py:0: error: Skipping analyzing "auditlog.registry": module
 src/documents/models.py:0: error: Skipping analyzing "django_softdelete.models": module is installed, but missing library stubs or py.typed marker  [import-untyped]
 src/documents/models.py:0: error: Skipping analyzing "multiselectfield": module is installed, but missing library stubs or py.typed marker  [import-untyped]
 src/documents/models.py:0: error: Skipping analyzing "treenode.models": module is installed, but missing library stubs or py.typed marker  [import-untyped]
-src/documents/models.py:0: note: Subclass:
-src/documents/models.py:0: note: Superclass:
-src/documents/models.py:0: note: def delete(self, using: Any = ..., *, keep_parents: Any = ...) -> Any
-src/documents/models.py:0: note: def delete(self, using: Any | None = ..., keep_parents: bool = ...) -> tuple[int, dict[str, int]]
 src/documents/parsers.py:0: error: Function is missing a return type annotation  [no-untyped-def]
 src/documents/parsers.py:0: error: Function is missing a return type annotation  [no-untyped-def]
 src/documents/parsers.py:0: error: Function is missing a return type annotation  [no-untyped-def]
@@ -446,7 +437,6 @@ src/documents/parsers.py:0: error: Value of type "str | None" is not indexable  
 src/documents/parsers.py:0: error: Value of type "str | None" is not indexable  [index]
 src/documents/parsers.py:0: error: Value of type "str | None" is not indexable  [index]
 src/documents/parsers.py:0: error: Value of type "str | None" is not indexable  [index]
-src/documents/parsers.py:0: note: Use "-> None" if function does not return a value
 src/documents/permissions.py:0: error: Function is missing a type annotation  [no-untyped-def]
 src/documents/permissions.py:0: error: Function is missing a type annotation  [no-untyped-def]
 src/documents/permissions.py:0: error: Function is missing a type annotation  [no-untyped-def]
@@ -467,13 +457,9 @@ src/documents/plugins/helpers.py:0: error: Argument 1 to "send" of "BaseStatusMa
 src/documents/plugins/helpers.py:0: error: Argument 1 to "send" of "BaseStatusManager" has incompatible type "dict[str, Collection[str]]"; expected "dict[str, str | int | None]"  [arg-type]
 src/documents/plugins/helpers.py:0: error: Function is missing a type annotation  [no-untyped-def]
 src/documents/plugins/helpers.py:0: error: Function is missing a type annotation  [no-untyped-def]
-src/documents/plugins/helpers.py:0: error: Library stubs not installed for "channels.layers"  [import-untyped]
 src/documents/plugins/helpers.py:0: error: Skipping analyzing "channels_redis.pubsub": module is installed, but missing library stubs or py.typed marker  [import-untyped]
-src/documents/plugins/helpers.py:0: note: (or run "mypy --install-types" to install all missing stub packages)
-src/documents/plugins/helpers.py:0: note: Hint: "python3 -m pip install types-channels"
 src/documents/regex.py:0: error: Function is missing a return type annotation  [no-untyped-def]
 src/documents/regex.py:0: error: Library stubs not installed for "regex"  [import-untyped]
-src/documents/regex.py:0: note: Hint: "python3 -m pip install types-regex"
 src/documents/sanity_checker.py:0: error: Argument 1 to "Path" has incompatible type "Path | None"; expected "str | PathLike[str]"  [arg-type]
 src/documents/sanity_checker.py:0: error: Cannot use Final inside a loop  [misc]
 src/documents/sanity_checker.py:0: error: Cannot use Final inside a loop  [misc]
@@ -676,8 +662,6 @@ src/documents/serialisers.py:0: error: Skipping analyzing "auditlog.context": mo
 src/documents/serialisers.py:0: error: Value of type "Any | None" is not indexable  [index]
 src/documents/serialisers.py:0: error: Value of type "Any | None" is not indexable  [index]
 src/documents/serialisers.py:0: error: Value of type "Match[str] | None" is not indexable  [index]
-src/documents/serialisers.py:0: note: See https://mypy.readthedocs.io/en/stable/common_issues.html#incompatible-overrides
-src/documents/serialisers.py:0: note: This violates the Liskov substitution principle
 src/documents/signals/handlers.py:0: error: "BaseDatabaseWrapper" has no attribute "close_pool"  [attr-defined]
 src/documents/signals/handlers.py:0: error: Argument 1 to "Path" has incompatible type "Any | None"; expected "str | PathLike[str]"  [arg-type]
 src/documents/signals/handlers.py:0: error: Argument 1 to "Path" has incompatible type "Any | None"; expected "str | PathLike[str]"  [arg-type]
@@ -948,8 +932,6 @@ src/documents/tests/test_api_workflows.py:0: error: Item "None" of "WorkflowTrig
 src/documents/tests/test_api_workflows.py:0: error: Item "None" of "WorkflowTrigger | None" has no attribute "filter_has_tags"  [union-attr]
 src/documents/tests/test_api_workflows.py:0: error: Item "None" of "WorkflowTrigger | None" has no attribute "filter_has_tags"  [union-attr]
 src/documents/tests/test_api_workflows.py:0: error: Item "None" of "WorkflowTrigger | None" has no attribute "id"  [union-attr]
-src/documents/tests/test_api_workflows.py:0: note: Use "-> None" if function does not return a value
-src/documents/tests/test_api_workflows.py:0: note: Use "-> None" if function does not return a value
 src/documents/tests/test_barcodes.py:0: error: "GetReaderPluginMixin" has no attribute "dirs"  [attr-defined]
 src/documents/tests/test_barcodes.py:0: error: Argument 1 to "contextmanager" has incompatible type "Callable[[TestAsnBarcode, Path], BarcodePlugin]"; expected "Callable[[TestAsnBarcode, Path], Iterator[Never]]"  [arg-type]
 src/documents/tests/test_barcodes.py:0: error: Argument 1 to "contextmanager" has incompatible type "Callable[[TestTagBarcode, Path], BarcodePlugin]"; expected "Callable[[TestTagBarcode, Path], Iterator[Never]]"  [arg-type]
@@ -984,7 +966,6 @@ src/documents/tests/test_barcodes.py:0: error: Need type annotation for "reader"
 src/documents/tests/test_barcodes.py:0: error: Need type annotation for "reader"  [var-annotated]
 src/documents/tests/test_barcodes.py:0: error: The return type of a generator function should be "Generator" or one of its supertypes  [misc]
 src/documents/tests/test_barcodes.py:0: error: The return type of a generator function should be "Generator" or one of its supertypes  [misc]
-src/documents/tests/test_barcodes.py:0: note: Use "-> None" if function does not return a value
 src/documents/tests/test_bulk_edit.py:0: error: Argument 2 to "set_correspondent" has incompatible type "None"; expected "Correspondent"  [arg-type]
 src/documents/tests/test_bulk_edit.py:0: error: Argument 2 to "set_correspondent" has incompatible type "int"; expected "Correspondent"  [arg-type]
 src/documents/tests/test_bulk_edit.py:0: error: Argument 2 to "set_document_type" has incompatible type "None"; expected "DocumentType"  [arg-type]
@@ -1033,7 +1014,6 @@ src/documents/tests/test_bulk_edit.py:0: error: Item "dict[Any, Any]" of "Group 
 src/documents/tests/test_bulk_edit.py:0: error: Too few arguments for "count" of "list"  [call-arg]
 src/documents/tests/test_bulk_edit.py:0: error: Too few arguments for "count" of "list"  [call-arg]
 src/documents/tests/test_bulk_edit.py:0: error: Unsupported operand types for - ("None" and "int")  [operator]
-src/documents/tests/test_bulk_edit.py:0: note: Left operand is of type "int | None"
 src/documents/tests/test_caching.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
 src/documents/tests/test_classifier.py:0: error: "None" has no attribute "classes_"  [attr-defined]
 src/documents/tests/test_classifier.py:0: error: "None" has no attribute "classes_"  [attr-defined]
@@ -1150,9 +1130,6 @@ src/documents/tests/test_consumer.py:0: error: Item "None" of "Document | None" 
 src/documents/tests/test_consumer.py:0: error: Item "None" of "DocumentType | Any | None" has no attribute "id"  [union-attr]
 src/documents/tests/test_consumer.py:0: error: Item "None" of "StoragePath | Any | None" has no attribute "id"  [union-attr]
 src/documents/tests/test_consumer.py:0: error: No overload variant of "copy" matches argument types "Any", "None"  [call-overload]
-src/documents/tests/test_consumer.py:0: note: Possible overload variants:
-src/documents/tests/test_consumer.py:0: note: def [_BytesPathT: bytes | PathLike[bytes]] copy(src: bytes | PathLike[bytes], dst: _BytesPathT, *, follow_symlinks: bool = ...) -> _BytesPathT | bytes
-src/documents/tests/test_consumer.py:0: note: def [_StrPathT: str | PathLike[str]] copy(src: str | PathLike[str], dst: _StrPathT, *, follow_symlinks: bool = ...) -> _StrPathT | str
 src/documents/tests/test_delayedquery.py:0: error: Function is missing a type annotation  [no-untyped-def]
 src/documents/tests/test_delayedquery.py:0: error: Function is missing a type annotation  [no-untyped-def]
 src/documents/tests/test_delayedquery.py:0: error: Need type annotation for "tests"  [var-annotated]
@@ -1730,8 +1707,6 @@ src/documents/views.py:0: error: Value of type "Iterable[SavedView]" is not inde
 src/documents/views.py:0: error: Value of type "Iterable[User]" is not indexable  [index]
 src/documents/views.py:0: error: Value of type "Iterable[Workflow]" is not indexable  [index]
 src/documents/views.py:0: error: Value of type "dict[str, _PingReply] | None" is not indexable  [index]
-src/documents/views.py:0: note: "__call__" is considered instance variable, to make it class variable use ClassVar[...]
-src/documents/views.py:0: note: Left operand is of type "Any | None"
 src/documents/workflows/actions.py:0: error: Argument "files" to "delay" of "Task" has incompatible type "dict[str, tuple[str, bytes, str]] | None"; expected "dict[Any, Any]"  [arg-type]
 src/documents/workflows/actions.py:0: error: Function is missing a return type annotation  [no-untyped-def]
 src/documents/workflows/actions.py:0: error: Function is missing a type annotation  [no-untyped-def]
@@ -1842,13 +1817,8 @@ src/paperless/admin.py:0: error: Item "None" of "dict[str, Any] | None" has no a
 src/paperless/admin.py:0: error: Missing type parameters for generic type "ModelForm"  [type-arg]
 src/paperless/admin.py:0: error: Missing type parameters for generic type "UserAdmin"  [type-arg]
 src/paperless/admin.py:0: error: Signature of "get_form" incompatible with supertype "django.contrib.admin.options.ModelAdmin"  [override]
-src/paperless/admin.py:0: note: Subclass:
-src/paperless/admin.py:0: note: Superclass:
-src/paperless/admin.py:0: note: def get_form(self, request: Any, obj: Any = ..., **kwargs: Any) -> Any
-src/paperless/admin.py:0: note: def get_form(self, request: HttpRequest, obj: Any | None = ..., change: bool = ..., **kwargs: Any) -> type[ModelForm[Any]]
 src/paperless/apps.py:0: error: Skipping analyzing "allauth.socialaccount.signals": module is installed, but missing library stubs or py.typed marker  [import-untyped]
-src/paperless/asgi.py:0: error: Library stubs not installed for "channels.auth"  [import-untyped]
-src/paperless/asgi.py:0: error: Library stubs not installed for "channels.routing"  [import-untyped]
+src/paperless/asgi.py:0: error: Argument 1 to "URLRouter" has incompatible type "list[URLPattern]"; expected "list[_ExtendedURLPattern | URLRouter]"  [arg-type]
 src/paperless/auth.py:0: error: Function is missing a type annotation  [no-untyped-def]
 src/paperless/auth.py:0: error: Function is missing a type annotation  [no-untyped-def]
 src/paperless/auth.py:0: error: No return value expected  [return-value]
@@ -1882,13 +1852,15 @@ src/paperless/consumers.py:0: error: Function is missing a type annotation  [no-
 src/paperless/consumers.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
 src/paperless/consumers.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
 src/paperless/consumers.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
-src/paperless/consumers.py:0: error: Item "None" of "Any | None" has no attribute "groups"  [union-attr]
-src/paperless/consumers.py:0: error: Item "None" of "Any | None" has no attribute "id"  [union-attr]
-src/paperless/consumers.py:0: error: Item "None" of "Any | None" has no attribute "id"  [union-attr]
-src/paperless/consumers.py:0: error: Item "None" of "Any | None" has no attribute "is_superuser"  [union-attr]
-src/paperless/consumers.py:0: error: Library stubs not installed for "channels.exceptions"  [import-untyped]
-src/paperless/consumers.py:0: error: Library stubs not installed for "channels.generic.websocket"  [import-untyped]
-src/paperless/consumers.py:0: note: Use "-> None" if function does not return a value
+src/paperless/consumers.py:0: error: Item "None" of "UserLazyObject | None" has no attribute "groups"  [union-attr]
+src/paperless/consumers.py:0: error: Item "None" of "UserLazyObject | None" has no attribute "id"  [union-attr]
+src/paperless/consumers.py:0: error: Item "None" of "UserLazyObject | None" has no attribute "id"  [union-attr]
+src/paperless/consumers.py:0: error: Item "None" of "UserLazyObject | None" has no attribute "is_authenticated"  [union-attr]
+src/paperless/consumers.py:0: error: Item "None" of "UserLazyObject | None" has no attribute "is_superuser"  [union-attr]
+src/paperless/consumers.py:0: error: Item "UserLazyObject" of "UserLazyObject | None" has no attribute "groups"  [union-attr]
+src/paperless/consumers.py:0: error: Item "UserLazyObject" of "UserLazyObject | None" has no attribute "id"  [union-attr]
+src/paperless/consumers.py:0: error: Item "UserLazyObject" of "UserLazyObject | None" has no attribute "id"  [union-attr]
+src/paperless/consumers.py:0: error: Item "UserLazyObject" of "UserLazyObject | None" has no attribute "is_superuser"  [union-attr]
 src/paperless/db_cache.py:0: error: Function is missing a type annotation  [no-untyped-def]
 src/paperless/db_cache.py:0: error: Function is missing a type annotation  [no-untyped-def]
 src/paperless/db_cache.py:0: error: Skipping analyzing "cachalot.api": module is installed, but missing library stubs or py.typed marker  [import-untyped]
@@ -1917,10 +1889,6 @@ src/paperless/serialisers.py:0: error: Skipping analyzing "allauth.mfa.adapter":
 src/paperless/serialisers.py:0: error: Skipping analyzing "allauth.mfa.models": module is installed, but missing library stubs or py.typed marker  [import-untyped]
 src/paperless/serialisers.py:0: error: Skipping analyzing "allauth.mfa.totp.internal.auth": module is installed, but missing library stubs or py.typed marker  [import-untyped]
 src/paperless/serialisers.py:0: error: Skipping analyzing "allauth.socialaccount.models": module is installed, but missing library stubs or py.typed marker  [import-untyped]
-src/paperless/serialisers.py:0: note: Subclass:
-src/paperless/serialisers.py:0: note: Superclass:
-src/paperless/serialisers.py:0: note: def run_validation(self, data: Any = ...) -> Any
-src/paperless/serialisers.py:0: note: def run_validation(self, data: Any) -> Any
 src/paperless/settings.py:0: error: "Sequence[str]" has no attribute "append"  [attr-defined]
 src/paperless/settings.py:0: error: "Sequence[str]" has no attribute "insert"  [attr-defined]
 src/paperless/settings.py:0: error: "object" has no attribute "update"  [attr-defined]
@@ -1952,9 +1920,6 @@ src/paperless/settings.py:0: error: Missing type parameters for generic type "di
 src/paperless/settings.py:0: error: Missing type parameters for generic type "dict"  [type-arg]
 src/paperless/settings.py:0: error: No overload variant of "getenv" matches argument types "Collection[str]", "Collection[str]"  [call-overload]
 src/paperless/settings.py:0: error: Skipping analyzing "compression_middleware.middleware": module is installed, but missing library stubs or py.typed marker  [import-untyped]
-src/paperless/settings.py:0: note: Possible overload variants:
-src/paperless/settings.py:0: note: def [_T] getenv(key: str, default: _T) -> str | _T
-src/paperless/settings.py:0: note: def getenv(key: str) -> str | None
 src/paperless/signals.py:0: error: Function is missing a type annotation  [no-untyped-def]
 src/paperless/signals.py:0: error: Function is missing a type annotation  [no-untyped-def]
 src/paperless/tests/test_adapter.py:0: error: Cannot assign to a method  [method-assign]
@@ -1981,8 +1946,19 @@ src/paperless/tests/test_websockets.py:0: error: Function is missing a type anno
 src/paperless/tests/test_websockets.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
 src/paperless/tests/test_websockets.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
 src/paperless/tests/test_websockets.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
-src/paperless/tests/test_websockets.py:0: error: Library stubs not installed for "channels.layers"  [import-untyped]
-src/paperless/tests/test_websockets.py:0: error: Library stubs not installed for "channels.testing"  [import-untyped]
+src/paperless/tests/test_websockets.py:0: error: Item "None" of "BaseChannelLayer | None" has no attribute "group_send"  [union-attr]
+src/paperless/tests/test_websockets.py:0: error: Item "None" of "BaseChannelLayer | None" has no attribute "group_send"  [union-attr]
+src/paperless/tests/test_websockets.py:0: error: Item "None" of "BaseChannelLayer | None" has no attribute "group_send"  [union-attr]
+src/paperless/tests/test_websockets.py:0: error: Item "None" of "BaseChannelLayer | None" has no attribute "group_send"  [union-attr]
+src/paperless/tests/test_websockets.py:0: error: Item "None" of "BaseChannelLayer | None" has no attribute "group_send"  [union-attr]
+src/paperless/tests/test_websockets.py:0: error: Item "None" of "BaseChannelLayer | None" has no attribute "group_send"  [union-attr]
+src/paperless/tests/test_websockets.py:0: error: Item "None" of "BaseChannelLayer | None" has no attribute "group_send"  [union-attr]
+src/paperless/tests/test_websockets.py:0: error: TypedDict "_WebsocketTestScope" has no key "user"  [typeddict-item]
+src/paperless/tests/test_websockets.py:0: error: TypedDict "_WebsocketTestScope" has no key "user"  [typeddict-item]
+src/paperless/tests/test_websockets.py:0: error: TypedDict "_WebsocketTestScope" has no key "user"  [typeddict-item]
+src/paperless/tests/test_websockets.py:0: error: TypedDict "_WebsocketTestScope" has no key "user"  [typeddict-item]
+src/paperless/tests/test_websockets.py:0: error: TypedDict "_WebsocketTestScope" has no key "user"  [typeddict-unknown-key]
+src/paperless/urls.py:0: error: Argument 2 to "path" has incompatible type "_ASGIApplicationProtocol"; expected "Callable[..., HttpResponseBase]"  [arg-type]
 src/paperless/urls.py:0: error: Skipping analyzing "allauth.account": module is installed, but missing library stubs or py.typed marker  [import-untyped]
 src/paperless/urls.py:0: error: Skipping analyzing "allauth.mfa.base": module is installed, but missing library stubs or py.typed marker  [import-untyped]
 src/paperless/urls.py:0: error: Skipping analyzing "allauth.socialaccount": module is installed, but missing library stubs or py.typed marker  [import-untyped]
