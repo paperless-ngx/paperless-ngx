@@ -142,6 +142,7 @@ typing = [
   "mypy",
   "mypy-baseline",
   "types-bleach",
+  "types-channels",
   "types-colorama",
   "types-dateparser",
   "types-markdown",
@@ -352,3 +353,4 @@ django_settings_module = "paperless.settings"
 [tool.mypy-baseline]
 baseline_path = ".mypy-baseline.txt"
 sort_baseline = true
+ignore_categories = [ "note" ]

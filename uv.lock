@@ -3311,6 +3311,7 @@ typing = [
     { name = "mypy", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "mypy-baseline", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "types-bleach", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "types-channels", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "types-colorama", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "types-dateparser", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "types-markdown", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -3453,6 +3454,7 @@ typing = [
     { name = "mypy" },
     { name = "mypy-baseline" },
     { name = "types-bleach" },
+    { name = "types-channels" },
     { name = "types-colorama" },
     { name = "types-dateparser" },
     { name = "types-markdown" },
@@ -5639,6 +5641,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/2a/98/ea454cea03e5f351323af6a482c65924f3c26c515efd9090dede58f2b4b6/types_cffi-1.17.0.20250915.tar.gz", hash = "sha256:4362e20368f78dabd5c56bca8004752cc890e07a71605d9e0d9e069dbaac8c06", size = 17229, upload-time = "2025-09-15T03:01:25.31Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/aa/ec/092f2b74b49ec4855cdb53050deb9699f7105b8fda6fe034c0781b8687f3/types_cffi-1.17.0.20250915-py3-none-any.whl", hash = "sha256:cef4af1116c83359c11bb4269283c50f0688e9fc1d7f0eeb390f3661546da52c", size = 20112, upload-time = "2025-09-15T03:01:24.187Z" },
+]
+
+[[package]]
+name = "types-channels"
+version = "4.3.0.20250822"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "asgiref", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "django-stubs", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/22/3d/e0a164b7eaab18ab2302b7a3d90843824b729d9fe1d7bdbb3769dfc9d77b/types_channels-4.3.0.20250822.tar.gz", hash = "sha256:29a4928fdaed6d444b93b69d44fcdb5a8fe32fa72d6a41016c5d39fa7bd7f474", size = 15357, upload-time = "2025-08-22T03:04:26.444Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cb/52/4e3094e43d460feacb9051ec4c3498f8272f69d92b772647211478b25079/types_channels-4.3.0.20250822-py3-none-any.whl", hash = "sha256:d3fc0a1467c8cc901686826408c8a673822e07aa79cbe1a6d21946e7e55d9ddf", size = 21125, upload-time = "2025-08-22T03:04:25.539Z" },
 ]
 
 [[package]]
