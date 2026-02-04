@@ -17363,18 +17363,6 @@
       "description": "Class member `TikaDocumentParser.get_settings` overrides parent class `DocumentParser` in an inconsistent manner\n  `TikaDocumentParser.get_settings` has type `BoundMethod[TikaDocumentParser, (self: TikaDocumentParser) -> OutputTypeConfig]`, which is not assignable to `BoundMethod[TikaDocumentParser, (self: TikaDocumentParser) -> Never]`, the type of `DocumentParser.get_settings`",
       "concise_description": "Class member `TikaDocumentParser.get_settings` overrides parent class `DocumentParser` in an inconsistent manner",
       "severity": "error"
-    },
-    {
-      "line": 106,
-      "column": 13,
-      "stop_line": 107,
-      "stop_column": 32,
-      "path": "src/paperless_tika/tests/test_live_tika.py",
-      "code": -2,
-      "name": "not-iterable",
-      "description": "`in` is not supported between `Literal['This is a test document, saved in the older .doc format']` and `None`",
-      "concise_description": "`in` is not supported between `Literal['This is a test document, saved in the older .doc format']` and `None`",
-      "severity": "error"
     }
   ]
 }

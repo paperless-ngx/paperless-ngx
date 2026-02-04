@@ -159,6 +159,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         """
         with override_settings(OCR_ROTATE_PAGES=False, OCR_ROTATE_PAGES_THRESHOLD=30.0):
             instance = ApplicationConfiguration.objects.all().first()
+            assert instance is not None
             instance.rotate_pages = True
             instance.rotate_pages_threshold = 15.0
             instance.save()
