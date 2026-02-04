@@ -49,12 +49,12 @@ repos:
           - 'prettier-plugin-organize-imports@4.1.0'
   # Python hooks
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.14
+    rev: v0.15.0
     hooks:
       - id: ruff-check
       - id: ruff-format
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: "v2.11.1"
+    rev: "v2.12.1"
     hooks:
       - id: pyproject-fmt
   # Dockerfile hooks
