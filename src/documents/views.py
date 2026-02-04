@@ -389,7 +389,7 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
             return annotate_document_count_for_related_queryset(
                 base_qs,
                 through_model=self.document_count_through,
-                source_field=self.document_count_source_field,
+                related_object_field=self.document_count_source_field,
                 user=user,
             )
 
@@ -491,7 +491,7 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
                     .select_related("owner")
                     .order_by(*ordering),
                     through_model=self.document_count_through,
-                    source_field=self.document_count_source_field,
+                    related_object_field=self.document_count_source_field,
                     user=user,
                 ),
             )

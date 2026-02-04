@@ -196,7 +196,7 @@ def get_document_count_filter_for_user(user):
 def annotate_document_count_for_related_queryset(
     queryset,
     through_model,
-    source_field: str,
+    related_object_field: str,
     target_field: str = "document_id",
     user=None,
 ):
@@ -216,9 +216,12 @@ def annotate_document_count_for_related_queryset(
     permitted_ids = _permitted_document_ids(user)
     counts = (
         through_model.objects.filter(
-            **{source_field: OuterRef("pk"), f"{target_field}__in": permitted_ids},
+            **{
+                related_object_field: OuterRef("pk"),
+                f"{target_field}__in": permitted_ids,
+            },
         )
-        .values(source_field)
+        .values(related_object_field)
         .annotate(c=Count(target_field))
         .values("c")
     )
