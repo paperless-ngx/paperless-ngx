@@ -107,7 +107,7 @@ class DeleteMailAction(BaseMailAction):
     A mail action that deletes mails after processing.
     """
 
-    def post_consume(self, M: MailBox, message_uid: str, parameter: str):
+    def post_consume(self, M: MailBox, message_uid: str, parameter: str) -> None:
         M.delete(message_uid)
 
 
@@ -119,7 +119,7 @@ class MarkReadMailAction(BaseMailAction):
     def get_criteria(self):
         return {"seen": False}
 
-    def post_consume(self, M: MailBox, message_uid: str, parameter: str):
+    def post_consume(self, M: MailBox, message_uid: str, parameter: str) -> None:
         M.flag(message_uid, [MailMessageFlags.SEEN], value=True)
 
 
@@ -128,7 +128,7 @@ class MoveMailAction(BaseMailAction):
     A mail action that moves mails to a different folder after processing.
     """
 
-    def post_consume(self, M, message_uid, parameter):
+    def post_consume(self, M, message_uid, parameter) -> None:
         M.move(message_uid, parameter)
 
 
@@ -140,7 +140,7 @@ class FlagMailAction(BaseMailAction):
     def get_criteria(self):
         return {"flagged": False}
 
-    def post_consume(self, M: MailBox, message_uid: str, parameter: str):
+    def post_consume(self, M: MailBox, message_uid: str, parameter: str) -> None:
         M.flag(message_uid, [MailMessageFlags.FLAGGED], value=True)
 
 
@@ -149,7 +149,7 @@ class TagMailAction(BaseMailAction):
     A mail action that tags mails after processing.
     """
 
-    def __init__(self, parameter: str, *, supports_gmail_labels: bool):
+    def __init__(self, parameter: str, *, supports_gmail_labels: bool) -> None:
         # The custom tag should look like "apple:<color>"
         if "apple:" in parameter.lower():
             _, self.color = parameter.split(":")
@@ -177,7 +177,7 @@ class TagMailAction(BaseMailAction):
         else:  # pragma: no cover
             raise ValueError("This should never happen.")
 
-    def post_consume(self, M: MailBox, message_uid: str, parameter: str):
+    def post_consume(self, M: MailBox, message_uid: str, parameter: str) -> None:
         if self.supports_gmail_labels:
             M.client.uid("STORE", message_uid, "+X-GM-LABELS", self.keyword)
 
@@ -205,7 +205,7 @@ class TagMailAction(BaseMailAction):
             raise MailError("No keyword specified.")
 
 
-def mailbox_login(mailbox: MailBox, account: MailAccount):
+def mailbox_login(mailbox: MailBox, account: MailAccount) -> None:
     logger = logging.getLogger("paperless_mail")
 
     try:
@@ -241,7 +241,7 @@ def apply_mail_action(
     message_uid: str,
     message_subject: str,
     message_date: datetime.datetime,
-):
+) -> None:
     """
     This shared task applies the mail action of a particular mail rule to the
     given mail. Creates a ProcessedMail object, so that the mail won't be
@@ -310,7 +310,7 @@ def error_callback(
     message_uid: str,
     message_subject: str,
     message_date: datetime.datetime,
-):
+) -> None:
     """
     A shared task that is called whenever something goes wrong during
     consumption of a file. See queue_consumption_tasks.
@@ -333,7 +333,7 @@ def queue_consumption_tasks(
     consume_tasks: list[Signature],
     rule: MailRule,
     message: MailMessage,
-):
+) -> None:
     """
     Queue a list of consumption tasks (Signatures for the consume_file shared
     task) with celery.
@@ -450,12 +450,12 @@ class MailAccountHandler(LoggingMixin):
         self.renew_logging_group()
         self._init_preprocessors()
 
-    def _init_preprocessors(self):
+    def _init_preprocessors(self) -> None:
         self._message_preprocessors: list[MailMessagePreprocessor] = []
         for preprocessor_type in self._message_preprocessor_types:
             self._init_preprocessor(preprocessor_type)
 
-    def _init_preprocessor(self, preprocessor_type):
+    def _init_preprocessor(self, preprocessor_type) -> None:
         if preprocessor_type.able_to_run():
             try:
                 self._message_preprocessors.append(preprocessor_type())

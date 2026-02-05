@@ -10,7 +10,7 @@ from documents.models import Document
 
 
 class TestTrashAPI(APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.user = User.objects.create_user(username="temp_admin")
@@ -18,7 +18,7 @@ class TestTrashAPI(APITestCase):
         self.client.force_authenticate(user=self.user)
         cache.clear()
 
-    def test_api_trash(self):
+    def test_api_trash(self) -> None:
         """
         GIVEN:
             - Existing document
@@ -68,7 +68,7 @@ class TestTrashAPI(APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(Document.global_objects.count(), 0)
 
-    def test_trash_api_empty_all(self):
+    def test_trash_api_empty_all(self) -> None:
         """
         GIVEN:
             - Existing documents in trash
@@ -101,7 +101,7 @@ class TestTrashAPI(APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(Document.global_objects.count(), 0)
 
-    def test_api_trash_show_owned_only(self):
+    def test_api_trash_show_owned_only(self) -> None:
         """
         GIVEN:
             - Existing documents in trash
@@ -153,7 +153,7 @@ class TestTrashAPI(APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data["count"], 3)
 
-    def test_api_trash_insufficient_permissions(self):
+    def test_api_trash_insufficient_permissions(self) -> None:
         """
         GIVEN:
             - Existing document with owner = user2 in trash
@@ -180,7 +180,7 @@ class TestTrashAPI(APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Document.global_objects.count(), 1)
 
-    def test_api_trash_invalid_params(self):
+    def test_api_trash_invalid_params(self) -> None:
         """
         GIVEN:
             - Existing documents

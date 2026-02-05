@@ -30,7 +30,7 @@ class TestDocument(TestCase):
         shutil.rmtree(self.thumb_dir)
         self.overrides.disable()
 
-    def test_file_deletion(self):
+    def test_file_deletion(self) -> None:
         document = Document.objects.create(
             correspondent=Correspondent.objects.create(name="Test0"),
             title="Title",
@@ -50,7 +50,7 @@ class TestDocument(TestCase):
             empty_trash([document.pk])
             self.assertEqual(mock_unlink.call_count, 2)
 
-    def test_document_soft_delete(self):
+    def test_document_soft_delete(self) -> None:
         document = Document.objects.create(
             correspondent=Correspondent.objects.create(name="Test0"),
             title="Title",
@@ -78,7 +78,7 @@ class TestDocument(TestCase):
             empty_trash([document.pk])
             self.assertEqual(mock_unlink.call_count, 2)
 
-    def test_file_name(self):
+    def test_file_name(self) -> None:
         doc = Document(
             mime_type="application/pdf",
             title="test",
@@ -86,7 +86,7 @@ class TestDocument(TestCase):
         )
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test.pdf")
 
-    def test_file_name_jpg(self):
+    def test_file_name_jpg(self) -> None:
         doc = Document(
             mime_type="image/jpeg",
             title="test",
@@ -94,7 +94,7 @@ class TestDocument(TestCase):
         )
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test.jpg")
 
-    def test_file_name_unknown(self):
+    def test_file_name_unknown(self) -> None:
         doc = Document(
             mime_type="application/zip",
             title="test",
@@ -102,7 +102,7 @@ class TestDocument(TestCase):
         )
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test.zip")
 
-    def test_file_name_invalid_type(self):
+    def test_file_name_invalid_type(self) -> None:
         doc = Document(
             mime_type="image/jpegasd",
             title="test",
@@ -111,7 +111,7 @@ class TestDocument(TestCase):
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test")
 
 
-def test_suggestion_content():
+def test_suggestion_content() -> None:
     """
     Check that the document for suggestion is cropped, only if it exceeds the length limit.
     """

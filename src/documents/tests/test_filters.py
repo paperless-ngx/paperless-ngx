@@ -167,7 +167,7 @@ class TestDateLocalization:
 
         assert f"Unsupported type {type(invalid_value)}" in str(excinfo.value)
 
-    def test_localize_date_raises_error_for_invalid_locale(self):
+    def test_localize_date_raises_error_for_invalid_locale(self) -> None:
         with pytest.raises(ValueError) as excinfo:
             localize_date(self.TEST_DATE, "medium", "invalid_locale_code")
 

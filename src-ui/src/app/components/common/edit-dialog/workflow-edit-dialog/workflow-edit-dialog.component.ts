@@ -139,6 +139,10 @@ export const WORKFLOW_ACTION_OPTIONS = [
     id: WorkflowActionType.Webhook,
     name: $localize`Webhook`,
   },
+  {
+    id: WorkflowActionType.PasswordRemoval,
+    name: $localize`Password removal`,
+  },
 ]
 
 export enum TriggerFilterType {
@@ -1202,9 +1206,23 @@ export class WorkflowEditDialogComponent
           headers: new FormControl(action.webhook?.headers),
           include_document: new FormControl(!!action.webhook?.include_document),
         }),
+        passwords: new FormControl(
+          this.formatPasswords(action.passwords ?? [])
+        ),
       }),
       { emitEvent }
     )
+  }
+
+  private formatPasswords(passwords: string[] = []): string {
+    return passwords.join('\n')
+  }
+
+  private parsePasswords(value: string = ''): string[] {
+    return value
+      .split(/[\n,]+/)
+      .map((entry) => entry.trim())
+      .filter((entry) => entry.length > 0)
   }
 
   private updateAllTriggerActionFields(emitEvent: boolean = false) {
@@ -1331,6 +1349,7 @@ export class WorkflowEditDialogComponent
         headers: null,
         include_document: false,
       },
+      passwords: [],
     }
     this.object.actions.push(action)
     this.createActionField(action)
@@ -1367,6 +1386,7 @@ export class WorkflowEditDialogComponent
         if (action.type !== WorkflowActionType.Email) {
           action.email = null
         }
+        action.passwords = this.parsePasswords(action.passwords as any)
       })
     super.save()
   }

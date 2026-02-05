@@ -3,6 +3,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import {
+  FormArray,
   FormControl,
   FormGroup,
   FormsModule,
@@ -993,5 +994,33 @@ describe('WorkflowEditDialogComponent', () => {
 
     component.removeSelectedCustomField(3, formGroup)
     expect(formGroup.get('assign_custom_fields').value).toEqual([])
+  })
+
+  it('should handle parsing of passwords from array to string and back on save', () => {
+    const passwordAction: WorkflowAction = {
+      id: 1,
+      type: WorkflowActionType.PasswordRemoval,
+      passwords: ['pass1', 'pass2'],
+    }
+    component.object = {
+      name: 'Workflow with Passwords',
+      id: 1,
+      order: 1,
+      enabled: true,
+      triggers: [],
+      actions: [passwordAction],
+    }
+    component.ngOnInit()
+
+    const formActions = component.objectForm.get('actions') as FormArray
+    expect(formActions.value[0].passwords).toBe('pass1\npass2')
+    formActions.at(0).get('passwords').setValue('pass1\npass2\npass3')
+    component.save()
+
+    expect(component.objectForm.get('actions').value[0].passwords).toEqual([
+      'pass1',
+      'pass2',
+      'pass3',
+    ])
   })
 })

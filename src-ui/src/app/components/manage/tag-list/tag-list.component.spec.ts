@@ -101,7 +101,7 @@ describe('TagListComponent', () => {
   it('should request only parent tags when no name filter is applied', () => {
     expect(tagService.listFiltered).toHaveBeenCalledWith(
       1,
-      null,
+      25,
       undefined,
       undefined,
       undefined,
@@ -116,7 +116,7 @@ describe('TagListComponent', () => {
     component.reloadData()
     expect(tagService.listFiltered).toHaveBeenCalledWith(
       1,
-      null,
+      25,
       undefined,
       undefined,
       'Tag',

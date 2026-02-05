@@ -15,7 +15,7 @@ from paperless.settings import _parse_cachalot_settings
 from paperless.settings import _parse_caches
 
 
-def test_all_redis_caches_have_same_custom_prefix(monkeypatch):
+def test_all_redis_caches_have_same_custom_prefix(monkeypatch) -> None:
     """
     Check that when setting a custom Redis prefix,
     it is set for both the Django default cache and the read cache.
@@ -29,7 +29,7 @@ def test_all_redis_caches_have_same_custom_prefix(monkeypatch):
 
 
 class TestDbCacheSettings:
-    def test_cachalot_default_settings(self):
+    def test_cachalot_default_settings(self) -> None:
         # Cachalot must be installed even if disabled,
         # so the cache can be invalidated anytime
         assert "cachalot" not in settings.INSTALLED_APPS
@@ -62,7 +62,7 @@ class TestDbCacheSettings:
             "PAPERLESS_READ_CACHE_TTL": "7200",
         },
     )
-    def test_cachalot_custom_settings(self):
+    def test_cachalot_custom_settings(self) -> None:
         settings = _parse_cachalot_settings()
 
         assert settings["CACHALOT_ENABLED"]
@@ -95,7 +95,7 @@ class TestDbCacheSettings:
         self,
         env_var_ttl: int,
         expected_cachalot_timeout: int,
-    ):
+    ) -> None:
         with patch.dict(os.environ, {"PAPERLESS_READ_CACHE_TTL": f"{env_var_ttl}"}):
             cachalot_timeout = _parse_cachalot_settings()["CACHALOT_TIMEOUT"]
             assert cachalot_timeout == expected_cachalot_timeout
@@ -106,7 +106,7 @@ class TestDbCacheSettings:
     CACHALOT_TIMEOUT=1,
 )
 @pytest.mark.django_db(transaction=True)
-def test_cache_hit_when_enabled():
+def test_cache_hit_when_enabled() -> None:
     cachalot_settings.reload()
 
     assert cachalot_settings.CACHALOT_ENABLED
@@ -141,7 +141,7 @@ def test_cache_hit_when_enabled():
 
 
 @pytest.mark.django_db(transaction=True)
-def test_cache_is_disabled_by_default():
+def test_cache_is_disabled_by_default() -> None:
     cachalot_settings.reload()
     # Invalidate the cache just in case
     invalidate_db_cache()

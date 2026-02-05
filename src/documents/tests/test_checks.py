@@ -10,7 +10,7 @@ from documents.checks import parser_check
 
 
 class TestDocumentChecks(TestCase):
-    def test_parser_check(self):
+    def test_parser_check(self) -> None:
         self.assertEqual(parser_check(None), [])
 
         with mock.patch("documents.checks.document_consumer_declaration.send") as m:
@@ -26,7 +26,7 @@ class TestDocumentChecks(TestCase):
                 ],
             )
 
-    def test_filename_format_check(self):
+    def test_filename_format_check(self) -> None:
         self.assertEqual(filename_format_check(None), [])
 
         with override_settings(FILENAME_FORMAT="{created}/{title}"):

@@ -3,7 +3,7 @@ import pickle
 from documents.caching import StoredLRUCache
 
 
-def test_lru_cache_entries():
+def test_lru_cache_entries() -> None:
     CACHE_TTL = 1
     # LRU cache with a capacity of 2 elements
     cache = StoredLRUCache("test_lru_cache_key", 2, backend_ttl=CACHE_TTL)
@@ -28,7 +28,7 @@ def test_lru_cache_entries():
     assert cache.get(1) == 1
 
 
-def test_stored_lru_cache_key_ttl(mocker):
+def test_stored_lru_cache_key_ttl(mocker) -> None:
     mock_backend = mocker.Mock()
     cache = StoredLRUCache("test_key", backend=mock_backend, backend_ttl=321)
 
