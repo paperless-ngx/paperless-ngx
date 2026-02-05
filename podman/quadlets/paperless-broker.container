@@ -1,0 +1,17 @@
+[Unit]
+Description=Paperless Broker Container
+
+[Container]
+ContainerName=paperless-broker
+Label=app=paperless
+Image=docker.io/library/redis:8
+AutoUpdate=registry
+Pod=paperless.pod
+Network=paperless.network
+Volume=redisdata:/data
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

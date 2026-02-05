@@ -1,0 +1,5 @@
+[Pod]
+Network=paperless.network
+
+[Install]
+WantedBy=multi-user.target default.target

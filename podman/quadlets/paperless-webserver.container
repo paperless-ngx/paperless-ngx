@@ -1,0 +1,28 @@
+[Unit]
+Description=Paperless Webserver Container
+Requires=paperless-db.service paperless-broker.service
+After=paperless-db.service paperless-broker.service
+
+[Container]
+ContainerName=paperless-webserver
+Label=app=paperless
+Environment=PAPERLESS_REDIS=redis://paperless-broker:6379
+Environment=PAPERLESS_DBHOST=paperless-db
+EnvironmentFile=paperless.env
+Image=ghcr.io/paperless-ngx/paperless-ngx:latest
+AutoUpdate=registry
+Pod=paperless.pod
+Network=paperless.network
+PublishPort=8000:8000
+Volume=data:/usr/src/paperless/data
+Volume=media:/usr/src/paperless/media
+Volume=%h/export:/usr/src/paperless/export
+Volume=%h/consume:/usr/src/paperless/consume
+
+[Service]
+ExecStartPre=mkdir -p %h/export
+ExecStartPre=mkdir -p %h/consume
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

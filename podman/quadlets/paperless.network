@@ -1,0 +1,8 @@
+[Unit]
+Description=Paperless Container Network
+
+[Network]
+Label=app=paperless
+
+[Install]
+WantedBy=default.target

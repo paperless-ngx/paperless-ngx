@@ -1,0 +1,20 @@
+[Unit]
+Description=Paperless Database Container
+
+[Container]
+ContainerName=paperless-db
+Label=app=paperless
+Environment=POSTGRES_DB=paperless
+Environment=POSTGRES_USER=paperless
+Environment=POSTGRES_PASSWORD=paperless
+Image=docker.io/library/postgres:18
+AutoUpdate=registry
+Pod=paperless.pod
+Network=paperless.network
+Volume=pgdata:/var/lib/postgresql
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target
