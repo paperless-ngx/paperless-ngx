@@ -47,7 +47,7 @@ updates:
           - "*pytest*"
           - "ruff"
           - "mkdocs-material"
-          - "pre-commit*"
+          - "prek*"
       # Django & DRF Ecosystem
       django-ecosystem:
         patterns:
