@@ -677,7 +677,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self,
         mock_consume_file,
         mock_delete_documents,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Existing documents
@@ -706,7 +706,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self,
         mock_consume_file,
         mock_delete_documents,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Existing documents with ASNs
@@ -731,7 +731,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         consume_file_args, _ = mock_consume_file.call_args
         self.assertEqual(consume_file_args[1].asn, 202)
 
-    def test_restore_archive_serial_numbers_task(self):
+    def test_restore_archive_serial_numbers_task(self) -> None:
         """
         GIVEN:
             - Existing document with no archive serial number
@@ -873,7 +873,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_chord,
         mock_consume_file,
         mock_delete_documents,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Existing documents
@@ -1126,7 +1126,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_chord,
         mock_consume_file,
         mock_delete_documents,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Existing document

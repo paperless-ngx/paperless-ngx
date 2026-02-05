@@ -1267,7 +1267,7 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
 
 
 class TestMetadataOverrides(TestCase):
-    def test_update_skip_asn_if_exists(self):
+    def test_update_skip_asn_if_exists(self) -> None:
         base = DocumentMetadataOverrides()
         incoming = DocumentMetadataOverrides(skip_asn_if_exists=True)
         base.update(incoming)
@@ -1285,7 +1285,7 @@ class TestBarcodeApplyDetectedASN(TestCase):
         - If skip_asn_if_exists is set, and ASN does not exist, set ASN
     """
 
-    def test_apply_detected_asn_skips_existing_when_flag_set(self):
+    def test_apply_detected_asn_skips_existing_when_flag_set(self) -> None:
         doc = Document.objects.create(
             checksum="X1",
             title="D1",
