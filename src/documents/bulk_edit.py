@@ -40,7 +40,7 @@ logger: logging.Logger = logging.getLogger("paperless.bulk_edit")
 @shared_task(bind=True)
 def restore_archive_serial_numbers_task(
     self,
-    backup: dict[int, int],
+    backup: dict[int, int | None],
     *args,
     **kwargs,
 ) -> None:
@@ -342,7 +342,7 @@ def set_permissions(
     doc_ids: list[int],
     set_permissions: dict,
     *,
-    owner: User = None,
+    owner: User | None = None,
     merge: bool = False,
 ) -> Literal["OK"]:
     qs = Document.objects.filter(id__in=doc_ids).select_related("owner")
