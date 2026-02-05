@@ -53,7 +53,7 @@ junit.xml
 # Django stuff:
 *.log
 
-# MkDocs documentation
+# Zensical documentation
 site/
 
 # PyBuilder

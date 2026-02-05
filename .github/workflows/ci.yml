@@ -79,7 +79,11 @@ jobs:
     runs-on: ubuntu-24.04
     needs:
       - pre-commit
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: actions/configure-pages@v5
       - name: Checkout
         uses: actions/checkout@v6
       - name: Set up Python
@@ -102,24 +106,13 @@ jobs:
             --python ${{ steps.setup-python.outputs.python-version }} \
             --dev \
             --frozen \
-            mkdocs build --config-file ./mkdocs.yml
-      - name: Deploy documentation
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          echo "docs.paperless-ngx.com" > "${{ github.workspace }}/docs/CNAME"
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          uv run \
-            --python ${{ steps.setup-python.outputs.python-version }} \
-            --dev \
-            --frozen \
-            mkdocs gh-deploy --force --no-history
-      - name: Upload artifact
-        uses: actions/upload-artifact@v5
+            zensical build --clean
+      - uses: actions/upload-pages-artifact@v4
         with:
-          name: documentation
-          path: site/
-          retention-days: 7
+          path: site
+      - uses: actions/deploy-pages@v4
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        id: deployment
   tests-backend:
     name: "Backend Tests (Python ${{ matrix.python-version }})"
     runs-on: ubuntu-24.04

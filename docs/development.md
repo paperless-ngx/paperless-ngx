@@ -338,13 +338,13 @@ LANGUAGES = [
 
 ## Building the documentation
 
-The documentation is built using material-mkdocs, see their [documentation](https://squidfunk.github.io/mkdocs-material/reference/).
+The documentation is built using Zensical, see their [documentation](https://zensical.org/docs/).
 If you want to build the documentation locally, this is how you do it:
 
 1.  Build the documentation
 
     ```bash
-    $ uv run mkdocs build --config-file mkdocs.yml
+    $ uv run zensical build
     ```
 
     _alternatively..._
@@ -355,7 +355,7 @@ If you want to build the documentation locally, this is how you do it:
     something.
 
     ```bash
-    $ uv run mkdocs serve
+    $ uv run zensical serve
     ```
 
 ## Building the Docker image
