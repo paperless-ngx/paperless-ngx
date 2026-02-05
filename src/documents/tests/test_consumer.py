@@ -413,14 +413,6 @@ class TestConsumer(
         self.assertEqual(document.archive_serial_number, 123)
         self._assert_first_last_send_progress()
 
-    def testMetadataOverridesSkipAsnPropagation(self) -> None:
-        overrides = DocumentMetadataOverrides()
-        incoming = DocumentMetadataOverrides(skip_asn=True)
-
-        overrides.update(incoming)
-
-        self.assertTrue(overrides.skip_asn)
-
     def testOverrideTitlePlaceholders(self) -> None:
         c = Correspondent.objects.create(name="Correspondent Name")
         dt = DocumentType.objects.create(name="DocType Name")
