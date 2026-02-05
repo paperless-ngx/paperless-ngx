@@ -91,12 +91,12 @@ Additional tasks are available for common maintenance operations:
 
 ## Committing from the Host Machine
 
-The DevContainer automatically installs pre-commit hooks during setup. However, these hooks are configured for use inside the container.
+The DevContainer automatically installs Git pre-commit hooks during setup. However, these hooks are configured for use inside the container.
 
-If you want to commit changes from your host machine (outside the DevContainer), you need to set up pre-commit on your host. This installs it as a standalone tool.
+If you want to commit changes from your host machine (outside the DevContainer), you need to set up prek on your host. This installs it as a standalone tool.
 
 ```bash
-uv tool install pre-commit && pre-commit install
+uv tool install prek && prek install
 ```
 
 After this, you can commit either from inside the DevContainer or from your host machine.

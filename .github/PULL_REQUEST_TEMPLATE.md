@@ -37,6 +37,6 @@ NOTE: PRs that do not address the following will not be merged, please do not sk
 - [ ] If applicable, I have included testing coverage for new code in this PR, for [backend](https://docs.paperless-ngx.com/development/#testing) and / or [front-end](https://docs.paperless-ngx.com/development/#testing-and-code-style) changes.
 - [ ] If applicable, I have tested my code for breaking changes & regressions on both mobile & desktop devices, using the latest version of major browsers.
 - [ ] If applicable, I have checked that all tests pass, see [documentation](https://docs.paperless-ngx.com/development/#back-end-development).
-- [ ] I have run all `pre-commit` hooks, see [documentation](https://docs.paperless-ngx.com/development/#code-formatting-with-pre-commit-hooks).
+- [ ] I have run all Git `pre-commit` hooks, see [documentation](https://docs.paperless-ngx.com/development/#code-formatting-with-pre-commit-hooks).
 - [ ] I have made corresponding changes to the documentation as needed.
 - [ ] In the description of the PR above I have disclosed the use of AI tools in the coding of this PR.

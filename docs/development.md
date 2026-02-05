@@ -81,7 +81,7 @@ first-time setup.
 5.  Install pre-commit hooks:
 
     ```bash
-    $ uv run pre-commit install
+    $ uv run prek install
     ```
 
 6.  Apply migrations and create a superuser (also can be done via the web UI) for your development instance:
@@ -217,7 +217,7 @@ commit. See [above](#code-formatting-with-pre-commit-hooks) for installation ins
 command such as
 
 ```bash
-$ git ls-files -- '*.ts' | xargs pre-commit run prettier --files
+$ git ls-files -- '*.ts' | xargs prek run prettier --files
 ```
 
 Front end testing uses Jest and Playwright. Unit tests and e2e tests,
