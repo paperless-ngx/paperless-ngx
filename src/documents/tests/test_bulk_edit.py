@@ -1123,9 +1123,9 @@ class TestPDFActions(DirectoriesMixin, TestCase):
     @mock.patch("documents.bulk_edit.chord")
     def test_edit_pdf_restore_on_failure(
         self,
-        mock_chord,
-        mock_consume_file,
-        mock_delete_documents,
+        mock_chord: mock.Mock,
+        mock_consume_file: mock.Mock,
+        mock_delete_documents: mock.Mock,
     ) -> None:
         """
         GIVEN:
@@ -1152,7 +1152,10 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertEqual(self.doc2.archive_serial_number, 333)
 
     @mock.patch("documents.tasks.update_document_content_maybe_archive_file.delay")
-    def test_edit_pdf_with_update_document(self, mock_update_document) -> None:
+    def test_edit_pdf_with_update_document(
+        self,
+        mock_update_document: mock.Mock,
+    ) -> None:
         """
         GIVEN:
             - A single existing PDF document
@@ -1182,7 +1185,11 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
     @mock.patch("documents.bulk_edit.group")
     @mock.patch("documents.tasks.consume_file.s")
-    def test_edit_pdf_without_metadata(self, mock_consume_file, mock_group) -> None:
+    def test_edit_pdf_without_metadata(
+        self,
+        mock_consume_file: mock.Mock,
+        mock_group: mock.Mock,
+    ) -> None:
         """
         GIVEN:
             - Existing document
@@ -1201,7 +1208,11 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
     @mock.patch("documents.bulk_edit.group")
     @mock.patch("documents.tasks.consume_file.s")
-    def test_edit_pdf_open_failure(self, mock_consume_file, mock_group) -> None:
+    def test_edit_pdf_open_failure(
+        self,
+        mock_consume_file: mock.Mock,
+        mock_group: mock.Mock,
+    ) -> None:
         """
         GIVEN:
             - Existing document

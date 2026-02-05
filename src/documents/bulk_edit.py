@@ -63,7 +63,7 @@ def release_archive_serial_numbers(doc_ids: list[int]) -> dict[int, int | None]:
     return backup
 
 
-def restore_archive_serial_numbers(backup: dict[int, int]) -> None:
+def restore_archive_serial_numbers(backup: dict[int, int | None]) -> None:
     """
     Restores ASNs using the provided backup map, intended for
     rollback when replacement consumption fails.
@@ -342,8 +342,8 @@ def set_permissions(
     doc_ids: list[int],
     set_permissions: dict,
     *,
-    owner=None,
-    merge=False,
+    owner: User = None,
+    merge: bool = False,
 ) -> Literal["OK"]:
     qs = Document.objects.filter(id__in=doc_ids).select_related("owner")
 
@@ -614,7 +614,7 @@ def delete_pages(doc_ids: list[int], pages: list[int]) -> Literal["OK"]:
 
 def edit_pdf(
     doc_ids: list[int],
-    operations: list[dict],
+    operations: list[dict[str, int]],
     *,
     delete_original: bool = False,
     update_document: bool = False,
