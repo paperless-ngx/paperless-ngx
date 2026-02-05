@@ -744,7 +744,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.doc1.save()
         Document.objects.filter(pk=self.doc1.id).update(archive_serial_number=None)
 
-        backup = {self.doc1.id: 444}
+        backup: dict[int, int | None] = {self.doc1.id: 444}
         bulk_edit.restore_archive_serial_numbers_task(backup)
 
         self.doc1.refresh_from_db()
