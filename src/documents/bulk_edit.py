@@ -47,7 +47,7 @@ def restore_archive_serial_numbers_task(
     restore_archive_serial_numbers(backup)
 
 
-def release_archive_serial_numbers(doc_ids: list[int]) -> dict[int, int]:
+def release_archive_serial_numbers(doc_ids: list[int]) -> dict[int, int | None]:
     """
     Clears ASNs on documents that are about to be replaced so new documents
     can be assigned ASNs without uniqueness collisions. Returns a backup map
@@ -340,7 +340,7 @@ def reprocess(doc_ids: list[int]) -> Literal["OK"]:
 
 def set_permissions(
     doc_ids: list[int],
-    set_permissions,
+    set_permissions: dict,
     *,
     owner=None,
     merge=False,

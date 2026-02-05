@@ -1296,7 +1296,7 @@ class TestBarcodeApplyDetectedASN(TestCase):
             input_doc=mock.Mock(),
             metadata=metadata,
             status_mgr=mock.Mock(),
-            base_tmp_dir=tempfile.gettempdir(),
+            base_tmp_dir=Path(tempfile.gettempdir()),
             task_id="test-task",
         )
 
