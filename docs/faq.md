@@ -64,7 +64,9 @@ elsewhere. Here are a couple notes about that.
     .ppt, .pptx, .odp, .xls, .xlsx, .ods).
 
 Paperless-ngx determines the type of a file by inspecting its content.
-The file extensions do not matter.
+The file extensions do not matter. However, files without extensions placed
+in the consumption directory will not be processed due to a known difference
+that was reported in issue #11974. Discussion is in #11999.
 
 ## _Will paperless-ngx run on Raspberry Pi?_
 
