@@ -11,6 +11,10 @@ on:
   pull_request:
     branches-ignore:
       - 'translations**'
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 env:
   DEFAULT_UV_VERSION: "0.9.x"
   # This is the default version of Python to use in most steps which aren't specific
