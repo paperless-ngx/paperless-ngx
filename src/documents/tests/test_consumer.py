@@ -14,6 +14,7 @@ from django.test import override_settings
 from django.utils import timezone
 from guardian.core import ObjectPermissionChecker
 
+from documents.barcodes import BarcodePlugin
 from documents.consumer import ConsumerError
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
@@ -411,14 +412,6 @@ class TestConsumer(
 
         self.assertEqual(document.archive_serial_number, 123)
         self._assert_first_last_send_progress()
-
-    def testMetadataOverridesSkipAsnPropagation(self) -> None:
-        overrides = DocumentMetadataOverrides()
-        incoming = DocumentMetadataOverrides(skip_asn=True)
-
-        overrides.update(incoming)
-
-        self.assertTrue(overrides.skip_asn)
 
     def testOverrideTitlePlaceholders(self) -> None:
         c = Correspondent.objects.create(name="Correspondent Name")
@@ -1271,3 +1264,46 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                         r"sample\.pdf: Error while executing post-consume script: Command '\[.*\]' returned non-zero exit status \d+\.",
                     ):
                         consumer.run_post_consume_script(doc)
+
+
+class TestMetadataOverrides(TestCase):
+    def test_update_skip_asn_if_exists(self) -> None:
+        base = DocumentMetadataOverrides()
+        incoming = DocumentMetadataOverrides(skip_asn_if_exists=True)
+        base.update(incoming)
+        self.assertTrue(base.skip_asn_if_exists)
+
+
+class TestBarcodeApplyDetectedASN(TestCase):
+    """
+    GIVEN:
+        - Existing Documents with ASN 123
+    WHEN:
+        - A BarcodePlugin which detected an ASN
+    THEN:
+        - If skip_asn_if_exists is set, and ASN exists, do not set ASN
+        - If skip_asn_if_exists is set, and ASN does not exist, set ASN
+    """
+
+    def test_apply_detected_asn_skips_existing_when_flag_set(self) -> None:
+        doc = Document.objects.create(
+            checksum="X1",
+            title="D1",
+            archive_serial_number=123,
+        )
+        metadata = DocumentMetadataOverrides(skip_asn_if_exists=True)
+        plugin = BarcodePlugin(
+            input_doc=mock.Mock(),
+            metadata=metadata,
+            status_mgr=mock.Mock(),
+            base_tmp_dir=Path(tempfile.gettempdir()),
+            task_id="test-task",
+        )
+
+        plugin._apply_detected_asn(123)
+        self.assertIsNone(plugin.metadata.asn)
+
+        doc.hard_delete()
+
+        plugin._apply_detected_asn(123)
+        self.assertEqual(plugin.metadata.asn, 123)

@@ -16,6 +16,7 @@ from pikepdf import Pdf
 from documents.converters import convert_from_tiff_to_pdf
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
+from documents.models import Document
 from documents.models import Tag
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import StopConsumeTaskError
@@ -129,6 +130,24 @@ class BarcodePlugin(ConsumeTaskPlugin):
         self._tiff_conversion_done = False
         self.barcodes: list[Barcode] = []
 
+    def _apply_detected_asn(self, detected_asn: int) -> None:
+        """
+        Apply a detected ASN to metadata if allowed.
+        """
+        if (
+            self.metadata.skip_asn_if_exists
+            and Document.global_objects.filter(
+                archive_serial_number=detected_asn,
+            ).exists()
+        ):
+            logger.info(
+                f"Found ASN in barcode {detected_asn} but skipping because it already exists.",
+            )
+            return
+
+        logger.info(f"Found ASN in barcode: {detected_asn}")
+        self.metadata.asn = detected_asn
+
     def run(self) -> None:
         # Some operations may use PIL, override pixel setting if needed
         maybe_override_pixel_limit()
@@ -206,13 +225,8 @@ class BarcodePlugin(ConsumeTaskPlugin):
 
         # Update/overwrite an ASN if possible
         # After splitting, as otherwise each split document gets the same ASN
-        if (
-            self.settings.barcode_enable_asn
-            and not self.metadata.skip_asn
-            and (located_asn := self.asn) is not None
-        ):
-            logger.info(f"Found ASN in barcode: {located_asn}")
-            self.metadata.asn = located_asn
+        if self.settings.barcode_enable_asn and (located_asn := self.asn) is not None:
+            self._apply_detected_asn(located_asn)
 
     def cleanup(self) -> None:
         self.temp_dir.cleanup()
