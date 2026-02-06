@@ -162,108 +162,91 @@ export class AppComponent implements OnInit, OnDestroy {
         })
     }
 
-    const prevBtnTitle = $localize`Prev`
-    const nextBtnTitle = $localize`Next`
-    const endBtnTitle = $localize`End`
-
-    this.tourService.initialize(
-      [
-        {
-          anchorId: 'tour.dashboard',
-          content: $localize`The dashboard can be used to show saved views, such as an 'Inbox'. Views are found under Manage > Saved Views once you have created some.`,
-          route: '/dashboard',
-          delayAfterNavigation: 500,
-          isOptional: false,
-        },
-        {
-          anchorId: 'tour.upload-widget',
-          content: $localize`Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.`,
-          route: '/dashboard',
-        },
-        {
-          anchorId: 'tour.documents',
-          content: $localize`The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.`,
-          route: '/documents?sort=created&reverse=1&page=1',
-          delayAfterNavigation: 500,
-          placement: 'bottom',
-        },
-        {
-          anchorId: 'tour.documents-filter-editor',
-          content: $localize`The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.`,
-          route: '/documents?sort=created&reverse=1&page=1',
-          placement: 'bottom',
-        },
-        {
-          anchorId: 'tour.documents-views',
-          content: $localize`Any combination of filters can be saved as a 'view' which can then be displayed on the dashboard and / or sidebar.`,
-          route: '/documents?sort=created&reverse=1&page=1',
-        },
-        {
-          anchorId: 'tour.tags',
-          content: $localize`Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.`,
-          route: '/tags',
-          backdropConfig: {
-            offset: 0,
-          },
-        },
-        {
-          anchorId: 'tour.mail',
-          content: $localize`Manage e-mail accounts and rules for automatically importing documents.`,
-          route: '/mail',
-          backdropConfig: {
-            offset: 0,
-          },
-        },
-        {
-          anchorId: 'tour.workflows',
-          content: $localize`Workflows give you more control over the document pipeline.`,
-          route: '/workflows',
-          backdropConfig: {
-            offset: 0,
-          },
-        },
-        {
-          anchorId: 'tour.file-tasks',
-          content: $localize`File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.`,
-          route: '/tasks',
-          backdropConfig: {
-            offset: 0,
-          },
-        },
-        {
-          anchorId: 'tour.settings',
-          content: $localize`Check out the settings for various tweaks to the web app.`,
-          route: '/settings',
-          backdropConfig: {
-            offset: 0,
-          },
-        },
-        {
-          anchorId: 'tour.outro',
-          title: $localize`Thank you! 🙏`,
-          content:
-            $localize`There are <em>tons</em> more features and info we didn't cover here, but this should get you started. Check out the documentation or visit the project on GitHub to learn more or to report issues.` +
-            '<br/><br/>' +
-            $localize`Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!`,
-          route: '/dashboard',
-          isOptional: false,
-          backdropConfig: {
-            offset: 0,
-          },
-        },
-      ],
+    this.tourService.initialize([
       {
-        enableBackdrop: true,
+        anchorId: 'tour.dashboard',
+        content: $localize`The dashboard can be used to show saved views, such as an 'Inbox'. Views are found under Manage > Saved Views once you have created some.`,
+        route: '/dashboard',
+        delayAfterNavigation: 500,
+        isOptional: false,
+      },
+      {
+        anchorId: 'tour.upload-widget',
+        content: $localize`Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.`,
+        route: '/dashboard',
+      },
+      {
+        anchorId: 'tour.documents',
+        content: $localize`The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.`,
+        route: '/documents?sort=created&reverse=1&page=1',
+        delayAfterNavigation: 500,
+        placement: 'bottom',
+      },
+      {
+        anchorId: 'tour.documents-filter-editor',
+        content: $localize`The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.`,
+        route: '/documents?sort=created&reverse=1&page=1',
+        placement: 'bottom',
+      },
+      {
+        anchorId: 'tour.documents-views',
+        content: $localize`Any combination of filters can be saved as a 'view' which can then be displayed on the dashboard and / or sidebar.`,
+        route: '/documents?sort=created&reverse=1&page=1',
+      },
+      {
+        anchorId: 'tour.tags',
+        content: $localize`Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.`,
+        route: '/tags',
         backdropConfig: {
-          offset: 10,
+          offset: 0,
         },
-        prevBtnTitle,
-        nextBtnTitle,
-        endBtnTitle,
-        isOptional: true,
-        useLegacyTitle: true,
-      }
-    )
+      },
+      {
+        anchorId: 'tour.mail',
+        content: $localize`Manage e-mail accounts and rules for automatically importing documents.`,
+        route: '/mail',
+        backdropConfig: {
+          offset: 0,
+        },
+      },
+      {
+        anchorId: 'tour.workflows',
+        content: $localize`Workflows give you more control over the document pipeline.`,
+        route: '/workflows',
+        backdropConfig: {
+          offset: 0,
+        },
+      },
+      {
+        anchorId: 'tour.file-tasks',
+        content: $localize`File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.`,
+        route: '/tasks',
+        backdropConfig: {
+          offset: 0,
+        },
+      },
+      {
+        anchorId: 'tour.settings',
+        content: $localize`Check out the settings for various tweaks to the web app.`,
+        route: '/settings',
+        backdropConfig: {
+          offset: 0,
+        },
+      },
+      {
+        anchorId: 'tour.outro',
+        title: $localize`Thank you! 🙏`,
+        content:
+          $localize`There are <em>tons</em> more features and info we didn't cover here, but this should get you started. Check out the documentation or visit the project on GitHub to learn more or to report issues.` +
+          '<br/><br/>' +
+          $localize`Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!`,
+        route: '/dashboard',
+        isOptional: false,
+        backdropConfig: {
+          offset: 0,
+        },
+      },
+    ])
 
     this.tourService.start$.subscribe(() => {
       this.renderer.addClass(document.body, 'tour-active')

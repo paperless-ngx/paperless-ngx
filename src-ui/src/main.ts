@@ -396,6 +396,16 @@ bootstrapApplication(AppComponent, {
       withInterceptors([withCsrfInterceptor, withApiVersionInterceptor]),
       withFetch()
     ),
-    provideUiTour(),
+    provideUiTour({
+      enableBackdrop: true,
+      backdropConfig: {
+        offset: 10,
+      },
+      prevBtnTitle: $localize`Prev`,
+      nextBtnTitle: $localize`Next`,
+      endBtnTitle: $localize`End`,
+      isOptional: true,
+      useLegacyTitle: true,
+    }),
   ],
 }).catch((err) => console.error(err))
