@@ -35,7 +35,7 @@ services:
       - "3143:3143" # IMAP
     restart: unless-stopped
   nginx:
-    image: docker.io/nginx:1.29-alpine
+    image: docker.io/nginx:1.29.5-alpine
     hostname: nginx
     container_name: nginx
     ports:
