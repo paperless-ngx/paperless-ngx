@@ -1,6 +1,6 @@
 import { Component, inject, OnDestroy, OnInit, Renderer2 } from '@angular/core'
 import { Router, RouterOutlet } from '@angular/router'
-import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
+import { TourNgBootstrap, TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { first, Subscription } from 'rxjs'
 import { ToastsComponent } from './components/common/toasts/toasts.component'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
@@ -21,12 +21,7 @@ import { WebsocketStatusService } from './services/websocket-status.service'
   selector: 'pngx-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  imports: [
-    FileDropComponent,
-    ToastsComponent,
-    TourNgBootstrapModule,
-    RouterOutlet,
-  ],
+  imports: [FileDropComponent, ToastsComponent, TourNgBootstrap, RouterOutlet],
 })
 export class AppComponent implements OnInit, OnDestroy {
   private settings = inject(SettingsService)
