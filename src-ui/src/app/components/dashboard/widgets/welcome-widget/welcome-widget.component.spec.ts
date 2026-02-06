@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { NgbAlert, NgbAlertModule } from '@ng-bootstrap/ng-bootstrap'
+import { provideUiTour } from 'ngx-ui-tour-ng-bootstrap'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 import { WelcomeWidgetComponent } from './welcome-widget.component'
@@ -11,7 +12,7 @@ describe('WelcomeWidgetComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      providers: [PermissionsGuard],
+      providers: [PermissionsGuard, provideUiTour()],
       imports: [NgbAlertModule, WelcomeWidgetComponent, WidgetFrameComponent],
     }).compileComponents()
 

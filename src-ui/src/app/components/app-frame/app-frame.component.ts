@@ -16,7 +16,7 @@ import {
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
+import { TourNgBootstrap } from 'ngx-ui-tour-ng-bootstrap'
 import { Observable } from 'rxjs'
 import { first } from 'rxjs/operators'
 import { Document } from 'src/app/data/document'
@@ -69,7 +69,7 @@ import { ToastsDropdownComponent } from './toasts-dropdown/toasts-dropdown.compo
     NgbNavModule,
     NgxBootstrapIconsModule,
     DragDropModule,
-    TourNgBootstrapModule,
+    TourNgBootstrap,
   ],
 })
 export class AppFrameComponent
