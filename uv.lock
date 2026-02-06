@@ -3098,7 +3098,7 @@ wheels = [
 
 [[package]]
 name = "openai"
-version = "2.16.0"
+version = "2.17.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -3110,9 +3110,9 @@ dependencies = [
     { name = "tqdm", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "typing-extensions", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b1/6c/e4c964fcf1d527fdf4739e7cc940c60075a4114d50d03871d5d5b1e13a88/openai-2.16.0.tar.gz", hash = "sha256:42eaa22ca0d8ded4367a77374104d7a2feafee5bd60a107c3c11b5243a11cd12", size = 629649, upload-time = "2026-01-27T23:28:02.579Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9c/a2/677f22c4b487effb8a09439fb6134034b5f0a39ca27df8b95fac23a93720/openai-2.17.0.tar.gz", hash = "sha256:47224b74bd20f30c6b0a6a329505243cb2f26d5cf84d9f8d0825ff8b35e9c999", size = 631445, upload-time = "2026-02-05T16:27:40.953Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/16/83/0315bf2cfd75a2ce8a7e54188e9456c60cec6c0cf66728ed07bd9859ff26/openai-2.16.0-py3-none-any.whl", hash = "sha256:5f46643a8f42899a84e80c38838135d7038e7718333ce61396994f887b09a59b", size = 1068612, upload-time = "2026-01-27T23:28:00.356Z" },
+    { url = "https://files.pythonhosted.org/packages/44/97/284535aa75e6e84ab388248b5a323fc296b1f70530130dee37f7f4fbe856/openai-2.17.0-py3-none-any.whl", hash = "sha256:4f393fd886ca35e113aac7ff239bcd578b81d8f104f5aedc7d3693eb2af1d338", size = 1069524, upload-time = "2026-02-05T16:27:38.941Z" },
 ]
 
 [[package]]
@@ -5395,6 +5395,10 @@ dependencies = [
     { name = "typing-extensions", marker = "sys_platform == 'darwin'" },
 ]
 wheels = [
+    { url = "https://download.pytorch.org/whl/cpu/torch-2.10.0-1-cp310-none-macosx_11_0_arm64.whl", hash = "sha256:4db72a4d257c45c3502f11764ee41460a87312fdc3dff47a8957812efe961725" },
+    { url = "https://download.pytorch.org/whl/cpu/torch-2.10.0-1-cp311-none-macosx_11_0_arm64.whl", hash = "sha256:0826ac8e409551e12b2360ac18b4161a838cbd111933e694752f351191331d09" },
+    { url = "https://download.pytorch.org/whl/cpu/torch-2.10.0-1-cp312-none-macosx_11_0_arm64.whl", hash = "sha256:7fbbf409143a4fe0812a40c0b46a436030a7e1d14fe8c5234dfbe44df47f617e" },
+    { url = "https://download.pytorch.org/whl/cpu/torch-2.10.0-1-cp313-none-macosx_11_0_arm64.whl", hash = "sha256:b39cafff7229699f9d6e172cac74d85fd71b568268e439e08d9c540e54732a3e" },
     { url = "https://download.pytorch.org/whl/cpu/torch-2.10.0-cp310-none-macosx_11_0_arm64.whl", hash = "sha256:2d16abfce6c92584ceeb00c3b2665d5798424dd9ed235ea69b72e045cd53ae97" },
     { url = "https://download.pytorch.org/whl/cpu/torch-2.10.0-cp311-none-macosx_11_0_arm64.whl", hash = "sha256:4584ab167995c0479f6821e3dceaf199c8166c811d3adbba5d8eedbbfa6764fd" },
     { url = "https://download.pytorch.org/whl/cpu/torch-2.10.0-cp312-none-macosx_11_0_arm64.whl", hash = "sha256:45a1c5057629444aeb1c452c18298fa7f30f2f7aeadd4dc41f9d340980294407" },
@@ -5619,11 +5623,11 @@ wheels = [
 
 [[package]]
 name = "types-dateparser"
-version = "1.2.2.20250809"
+version = "1.3.0.20260206"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/63/54/2d2b77d1beba5bdb7faeabc7d7f0b9b2f8e428f79f45a144ad7ab87d1a29/types_dateparser-1.2.2.20250809.tar.gz", hash = "sha256:a898f5527e6c34d213bc5d85254b8246d8b1e76239ed9243711198add0c8a29c", size = 15804, upload-time = "2025-08-09T03:15:11.298Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f5/e0/72045089c4503d22f21f53f04898eb0cf48ee7fad3d80187e32069f9593b/types_dateparser-1.3.0.20260206.tar.gz", hash = "sha256:8d2ee287aa33f0b26fe8cc48cd8e28f958ada839b2db5a4e3f54371dfe77a696", size = 16516, upload-time = "2026-02-06T04:03:39.022Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5d/5a/a5cf930804f639f5f1c58434613a1bbc1bd4641e29aec07444f316b41dff/types_dateparser-1.2.2.20250809-py3-none-any.whl", hash = "sha256:f12ae46abc3085e60e16fbe55730c5acbce980cbe3b176b17b08b4cef85850ef", size = 22140, upload-time = "2025-08-09T03:15:10.234Z" },
+    { url = "https://files.pythonhosted.org/packages/ec/31/2d8b6c693f015349885092173e604af2e480c3fd0a16cdb5ca97024238b0/types_dateparser-1.3.0.20260206-py3-none-any.whl", hash = "sha256:d6e5d33101b46d9cc14866f105806c80c9b8826492c75e9b323c8fc45ceb1390", size = 22963, upload-time = "2026-02-06T04:03:37.711Z" },
 ]
 
 [[package]]
