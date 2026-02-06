@@ -1,3 +1,7 @@
+---
+title: Home
+---
+
 <div class="grid-left" markdown>
 ![image](assets/logo_full_black.svg#only-light){.index-logo}
 ![image](assets/logo_full_white.svg#only-dark){.index-logo}

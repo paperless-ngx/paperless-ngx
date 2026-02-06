@@ -1,13 +1,31 @@
-:root > * {
-    --md-primary-fg-color: #17541f;
-    --md-primary-fg-color--dark: #17541f;
-    --md-primary-fg-color--light: #17541f;
-    --md-accent-fg-color: #2b8a38;
+:root>* {
+    --paperless-green: #17541f;
+    --paperless-green-accent: #2b8a38;
+    --md-primary-fg-color: var(--paperless-green);
+    --md-primary-fg-color--dark: var(--paperless-green);
+    --md-primary-fg-color--light: var(--paperless-green-accent);
+    --md-accent-fg-color: var(--paperless-green-accent);
     --md-typeset-a-color: #21652a;
+}
+
+.md-header,
+.md-tabs {
+    background-color: var(--paperless-green);
+    color: #fff;
+}
+
+.md-tabs__link {
+    color: rgba(255, 255, 255, 0.82);
+}
+
+.md-tabs__link:hover,
+.md-tabs__link--active {
+    color: #fff;
 }
 
 [data-md-color-scheme="slate"] {
     --md-hue: 222;
+    --md-default-bg-color: hsla(var(--md-hue), 15%, 10%, 1);
 }
 
 @media (min-width: 768px) {
@@ -69,8 +87,8 @@ h4 code {
 }
 
 /* Hide config vars from sidebar, toc and move the border on mobile case their hidden */
-.md-nav.md-nav--secondary .md-nav__item .md-nav__link[href*="PAPERLESS_"],
-.md-nav.md-nav--secondary .md-nav__item .md-nav__link[href*="USERMAP_"] {
+.md-nav.md-nav--secondary .md-nav__item:has(> .md-nav__link[href*="PAPERLESS_"]),
+.md-nav.md-nav--secondary .md-nav__item:has(> .md-nav__link[href*="USERMAP_"]) {
     display: none;
 }
 
@@ -83,18 +101,3 @@ h4 code {
         border-top: .05rem solid var(--md-default-fg-color--lightest);
     }
 }
-
-/* Show search shortcut key */
-[data-md-toggle="search"]:not(:checked) ~ .md-header .md-search__form::after {
-    position: absolute;
-    top: .3rem;
-    right: .3rem;
-    display: block;
-    padding: .1rem .4rem;
-    color: var(--md-default-fg-color--lighter);
-    font-weight: bold;
-    font-size: .8rem;
-    border: .05rem solid var(--md-default-fg-color--lighter);
-    border-radius: .1rem;
-    content: "/";
-  }
