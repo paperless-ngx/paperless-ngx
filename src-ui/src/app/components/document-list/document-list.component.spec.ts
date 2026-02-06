@@ -16,6 +16,7 @@ import {
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { provideUiTour } from 'ngx-ui-tour-ng-bootstrap'
 import { Subject, of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import {
@@ -105,6 +106,7 @@ describe('DocumentListComponent', () => {
         PermissionsGuard,
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
+        provideUiTour(),
       ],
     }).compileComponents()
 

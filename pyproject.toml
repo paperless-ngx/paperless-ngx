@@ -127,8 +127,7 @@ testing = [
 ]
 
 lint = [
-  "pre-commit~=4.5.1",
-  "pre-commit-uv~=4.2.0",
+  "prek~=0.3.0",
   "ruff~=0.15.0",
 ]
 

@@ -211,7 +211,7 @@ jobs:
           uv run \
             --python ${{ steps.setup-python.outputs.python-version }} \
             --dev \
-            pre-commit run --files changelog.md || true
+            prek run --files changelog.md || true
 
           git config --global user.name "github-actions"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
