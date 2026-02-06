@@ -1,3 +1,7 @@
+---
+title: FAQs
+---
+
 # Frequently Asked Questions
 
 ## _What's the general plan for Paperless-ngx?_

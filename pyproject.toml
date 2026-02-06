@@ -106,8 +106,7 @@ dev = [
 ]
 
 docs = [
-  "mkdocs-glightbox~=0.5.1",
-  "mkdocs-material~=9.7.0",
+  "zensical>=0.0.21",
 ]
 
 testing = [

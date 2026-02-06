@@ -1,4 +1,8 @@
-## Installation
+---
+title: Setup
+---
+
+# Installation
 
 You can go multiple routes to setup and run Paperless:
 

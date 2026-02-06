@@ -1,4 +1,8 @@
-# Usage Overview
+---
+title: Basic Usage
+---
+
+# Usage
 
 Paperless-ngx is an application that manages your personal documents. With
 the (optional) help of a document scanner (see [the scanners wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Scanner-&-Software-Recommendations)), Paperless-ngx transforms your unwieldy
