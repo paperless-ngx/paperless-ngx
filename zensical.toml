@@ -1,0 +1,128 @@
+[project]
+
+site_name = "Paperless-ngx"
+site_description = "Documentation for the Paperless-ngx document management system software."
+site_author = "the Paperless-ngx team"
+
+site_url = "https://docs.paperless-ngx.com/"
+
+copyright = """
+Copyright &copy; 2016 - 2026 Daniel Quinn, Jonas Winkler, and the Paperless-ngx team
+"""
+
+repo_url = "https://github.com/paperless-ngx/paperless-ngx"
+repo_name = "paperless-ngx/paperless-ngx"
+
+nav = [
+  "index.md",
+  "setup.md",
+  "usage.md",
+  "configuration.md",
+  "administration.md",
+  "advanced_usage.md",
+  "api.md",
+  "development.md",
+  "faq.md",
+  "troubleshooting.md",
+  "changelog.md",
+]
+
+edit_uri = "blob/main/docs/"
+
+extra_css = ["assets/extra.css"]
+
+[project.theme]
+
+logo = "assets/logo.svg"
+favicon = "assets/favicon.png"
+
+language = "en"
+
+features = [
+    "announce.dismiss",
+    "content.code.annotate",
+    "content.code.copy",
+    "content.code.select",
+    "content.footnote.tooltips",
+    "navigation.footer",
+    "navigation.instant",
+    "navigation.instant.prefetch",
+    "navigation.path",
+    "navigation.sections",
+    "navigation.tabs",
+    "navigation.top",
+    "navigation.tracking",
+    "search.highlight",
+    "toc.integrate",
+]
+
+# Palette toggle for automatic mode
+[[project.theme.palette]]
+media = "(prefers-color-scheme)"
+primary = "green"
+accent = "green"
+toggle.icon = "lucide/sun-moon"
+toggle.name = "Switch to light mode"
+
+# Palette toggle for light mode
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+primary = "green"
+accent = "green"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+# Palette toggle for dark mode
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+primary = "green"
+accent = "green"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to system preference"
+
+[project.theme.font]
+text = "Roboto"
+code = "Roboto Mono"
+
+# Extras
+[[project.extra.social]]
+icon = "fontawesome/brands/github"
+link = "https://github.com/paperless-ngx/paperless-ngx"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/docker"
+link = "https://hub.docker.com/r/paperlessngx/paperless-ngx"
+
+[[project.extra.social]]
+icon = "material/chat"
+link = "https://matrix.to/#/#paperless:matrix.org"
+
+# Extensions
+[project.markdown_extensions.attr_list]
+[project.markdown_extensions.md_in_html]
+[project.markdown_extensions.pymdownx.blocks.caption]
+[project.markdown_extensions.def_list]
+
+[project.markdown_extensions.pymdownx.highlight]
+anchor_linenums = true
+
+[project.markdown_extensions.pymdownx.inlinehilite]
+
+[project.markdown_extensions.pymdownx.tilde]
+
+[project.markdown_extensions.pymdownx.snippets]
+
+[project.markdown_extensions.admonition]
+
+[project.markdown_extensions.pymdownx.details]
+
+[project.markdown_extensions.pymdownx.superfences]
+custom_fences = [
+  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" }
+]
+
+[project.markdown_extensions.pymdownx.emoji]
+emoji_index = "zensical.extensions.emoji.twemoji"
+emoji_generator = "zensical.extensions.emoji.to_svg"

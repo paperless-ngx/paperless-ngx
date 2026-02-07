@@ -1,3 +1,7 @@
+---
+title: FAQs
+---
+
 # Frequently Asked Questions
 
 ## _What's the general plan for Paperless-ngx?_
@@ -63,8 +67,10 @@ elsewhere. Here are a couple notes about that.
     Paperless also supports various Office documents (.docx, .doc, odt,
     .ppt, .pptx, .odp, .xls, .xlsx, .ods).
 
-Paperless-ngx determines the type of a file by inspecting its content.
-The file extensions do not matter.
+Paperless-ngx determines the type of a file by inspecting its content
+rather than its file extensions. However, files processed via the
+consumption directory will be rejected if they have a file extension that
+not supported by any of the available parsers.
 
 ## _Will paperless-ngx run on Raspberry Pi?_
 

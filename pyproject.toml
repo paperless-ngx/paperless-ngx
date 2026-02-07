@@ -106,8 +106,7 @@ dev = [
 ]
 
 docs = [
-  "mkdocs-glightbox~=0.5.1",
-  "mkdocs-material~=9.7.0",
+  "zensical>=0.0.21",
 ]
 
 testing = [
@@ -140,6 +139,7 @@ typing = [
   "microsoft-python-type-stubs @ git+https://github.com/microsoft/python-type-stubs.git",
   "mypy",
   "mypy-baseline",
+  "pyrefly",
   "types-bleach",
   "types-channels",
   "types-colorama",
@@ -345,6 +345,11 @@ disallow_incomplete_defs = true
 disallow_untyped_defs = true
 warn_redundant_casts = true
 warn_unused_ignores = true
+
+[tool.pyrefly]
+search-path = [ "src" ]
+baseline = ".pyrefly-baseline.json"
+python-platform = "linux"
 
 [tool.django-stubs]
 django_settings_module = "paperless.settings"

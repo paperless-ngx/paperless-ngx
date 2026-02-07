@@ -116,9 +116,9 @@
 		},
 		{
 			"label": "Maintenance: Build Documentation",
-			"description": "Build the documentation with MkDocs",
+			"description": "Build the documentation with Zensical",
 			"type": "shell",
-			"command": "uv run mkdocs build --config-file mkdocs.yml && uv run mkdocs serve",
+			"command": "uv run zensical build && uv run zensical serve",
 			"group": "none",
 			"presentation": {
 				"echo": true,

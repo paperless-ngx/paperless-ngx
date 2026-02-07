@@ -70,7 +70,7 @@ jobs:
             --python ${{ steps.setup-python.outputs.python-version }} \
             --dev \
             --frozen \
-            mkdocs build --config-file ./mkdocs.yml
+            zensical build --clean
       # ---- Prepare Release ----
       - name: Generate requirements file
         run: |

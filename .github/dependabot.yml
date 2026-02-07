@@ -46,7 +46,7 @@ updates:
         patterns:
           - "*pytest*"
           - "ruff"
-          - "mkdocs-material"
+          - "zensical"
           - "prek*"
       # Django & DRF Ecosystem
       django-ecosystem:
