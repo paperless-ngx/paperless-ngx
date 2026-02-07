@@ -62,53 +62,13 @@
 </pngx-page-header>
 
 <ul ngbNav #nav="ngbNav" (navChange)="onNavChange($event)" [(activeId)]="activeNavID" class="nav-tabs">
-  @if (canViewTags) {
-    <li [ngbNavItem]="DocumentAttributesNavIDs.Tags">
+  @for (tab of visibleTabs; track tab.id) {
+    <li [ngbNavItem]="tab.id">
       <a ngbNavLink>
-        <i-bs class="me-1" name="tags"></i-bs><ng-container i18n>Tags</ng-container>
+        <i-bs class="me-1" [name]="tab.icon"></i-bs>{{ tab.label }}
       </a>
       <ng-template ngbNavContent>
-        <pngx-tag-list></pngx-tag-list>
-      </ng-template>
-    </li>
-  }
-  @if (canViewCorrespondents) {
-    <li [ngbNavItem]="DocumentAttributesNavIDs.Correspondents">
-      <a ngbNavLink>
-        <i-bs class="me-1" name="person"></i-bs><ng-container i18n>Correspondents</ng-container>
-      </a>
-      <ng-template ngbNavContent>
-        <pngx-correspondent-list></pngx-correspondent-list>
-      </ng-template>
-    </li>
-  }
-  @if (canViewDocumentTypes) {
-    <li [ngbNavItem]="DocumentAttributesNavIDs.DocumentTypes">
-      <a ngbNavLink>
-        <i-bs class="me-1" name="hash"></i-bs><ng-container i18n>Document types</ng-container>
-      </a>
-      <ng-template ngbNavContent>
-        <pngx-document-type-list></pngx-document-type-list>
-      </ng-template>
-    </li>
-  }
-  @if (canViewStoragePaths) {
-    <li [ngbNavItem]="DocumentAttributesNavIDs.StoragePaths">
-      <a ngbNavLink>
-        <i-bs class="me-1" name="folder"></i-bs><ng-container i18n>Storage paths</ng-container>
-      </a>
-      <ng-template ngbNavContent>
-        <pngx-storage-path-list></pngx-storage-path-list>
-      </ng-template>
-    </li>
-  }
-  @if (canViewCustomFields) {
-    <li [ngbNavItem]="DocumentAttributesNavIDs.CustomFields">
-      <a ngbNavLink>
-        <i-bs class="me-1" name="ui-radios"></i-bs><ng-container i18n>Custom fields</ng-container>
-      </a>
-      <ng-template ngbNavContent>
-        <pngx-custom-fields></pngx-custom-fields>
+        <ng-container [ngComponentOutlet]="tab.component"></ng-container>
       </ng-template>
     </li>
   }
