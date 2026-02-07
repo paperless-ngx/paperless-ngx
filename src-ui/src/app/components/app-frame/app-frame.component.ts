@@ -21,7 +21,7 @@ import { Observable } from 'rxjs'
 import { first } from 'rxjs/operators'
 import { Document } from 'src/app/data/document'
 import { SavedView } from 'src/app/data/saved-view'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { CollapsibleSection, SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { ComponentCanDeactivate } from 'src/app/guards/dirty-doc.guard'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
@@ -93,8 +93,6 @@ export class AppFrameComponent
   isMenuCollapsed: boolean = true
 
   slimSidebarAnimating: boolean = false
-
-  attributesSectionsCollapsed: boolean = true
 
   constructor() {
     super()
@@ -209,6 +207,31 @@ export class AppFrameComponent
 
   set slimSidebarEnabled(enabled: boolean) {
     this.settingsService.set(SETTINGS_KEYS.SLIM_SIDEBAR, enabled)
+    this.settingsService
+      .storeSettings()
+      .pipe(first())
+      .subscribe({
+        error: (error) => {
+          this.toastService.showError(
+            $localize`An error occurred while saving settings.`
+          )
+          console.warn(error)
+        },
+      })
+  }
+
+  get attributesSectionsCollapsed(): boolean {
+    return this.settingsService
+      .get(SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED)
+      .includes(CollapsibleSection.ATTRIBUTES)
+  }
+
+  set attributesSectionsCollapsed(collapsed: boolean) {
+    // TODO: refactor to be able to toggle individual sections, if implemented
+    this.settingsService.set(
+      SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED,
+      collapsed ? [CollapsibleSection.ATTRIBUTES] : []
+    )
     this.settingsService
       .storeSettings()
       .pipe(first())
