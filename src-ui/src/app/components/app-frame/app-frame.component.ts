@@ -223,7 +223,7 @@ export class AppFrameComponent
   get attributesSectionsCollapsed(): boolean {
     return this.settingsService
       .get(SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED)
-      .includes(CollapsibleSection.ATTRIBUTES)
+      ?.includes(CollapsibleSection.ATTRIBUTES)
   }
 
   set attributesSectionsCollapsed(collapsed: boolean) {
