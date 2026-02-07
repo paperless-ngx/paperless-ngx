@@ -109,6 +109,55 @@ first-time setup.
 
 8.  Continue with either back-end or front-end development – or both :-).
 
+### Using mise for local development
+
+If you use [mise](https://mise.jdx.dev/), the repository includes a local
+`.mise.toml` with tool versions and common tasks.
+
+1. Install tools from `.mise.toml`:
+
+    ```bash
+    mise install
+    ```
+
+2. Run initial setup tasks:
+
+    ```bash
+    mise run setup
+    mise run init:db
+    ```
+
+3. Optional: start Docker-backed services used during development:
+
+    ```bash
+    mise run services:start
+    ```
+
+4. Start development processes:
+
+    ```bash
+    mise run dev:all
+    ```
+
+    Or run each process in separate terminals:
+
+    ```bash
+    mise run dev:backend:web
+    mise run dev:backend:consumer
+    mise run dev:backend:worker
+    mise run dev:frontend
+    ```
+
+5. Useful additional tasks:
+
+    ```bash
+    mise run lint:backend
+    mise run lint:frontend
+    mise run test:backend
+    mise run test:frontend
+    mise run docs:serve
+    ```
+
 ## Back end development
 
 The back end is a [Django](https://www.djangoproject.com/) application.

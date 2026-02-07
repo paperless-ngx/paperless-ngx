@@ -1,0 +1,119 @@
+min_version = "2025.8.11"
+
+[tools]
+python = "3.12"
+node = "24"
+pnpm = "10.17.1"
+uv = "latest"
+"npm:concurrently" = "9"
+
+[env]
+_.path = ["./node_modules/.bin", "./src-ui/node_modules/.bin"]
+
+[tasks."setup:backend"]
+description = "Install backend deps and hooks"
+run = """
+if [ ! -f paperless.conf ]; then
+  cp paperless.conf.example paperless.conf
+fi
+mkdir -p consume media
+uv sync --group dev
+uv run prek install
+"""
+
+[tasks."setup:frontend"]
+description = "Install frontend dependencies"
+dir = "src-ui"
+run = "pnpm install"
+
+[tasks."init:db"]
+description = "Run migrations and create superuser"
+dir = "src"
+run = """
+uv run manage.py migrate
+uv run manage.py createsuperuser
+"""
+
+[tasks."services:start"]
+description = "Start optional docker-backed dev services"
+run = "./scripts/start_services.sh"
+
+[tasks."dev:backend:web"]
+description = "Start Django dev server"
+dir = "src"
+run = "python3 manage.py runserver"
+
+[tasks."dev:backend:consumer"]
+description = "Start document consumer"
+dir = "src"
+run = "python3 manage.py document_consumer"
+
+[tasks."dev:backend:worker"]
+description = "Start Celery worker"
+dir = "src"
+run = "celery --app paperless worker -l DEBUG"
+
+[tasks."dev:frontend"]
+description = "Start Angular development server"
+dir = "src-ui"
+run = "pnpm run start"
+
+[tasks."build:frontend"]
+description = "Build Angular production bundle"
+dir = "src-ui"
+run = "pnpm run build --configuration=production"
+
+[tasks."test:backend"]
+description = "Run full backend pytest suite"
+dir = "src"
+run = "uv run pytest"
+
+[tasks."test:frontend"]
+description = "Run frontend unit tests"
+dir = "src-ui"
+run = "pnpm run test"
+
+[tasks."lint:backend"]
+description = "Run backend Ruff lint"
+run = "uv run ruff check src"
+
+[tasks."lint:frontend"]
+description = "Run frontend lint"
+dir = "src-ui"
+run = "pnpm run lint"
+
+[tasks."check:hooks"]
+description = "Run all pre-commit hooks"
+run = "uv run prek run -a"
+
+[tasks."docs:build"]
+description = "Build project documentation"
+run = "uv run mkdocs build --config-file mkdocs.yml"
+
+[tasks."docs:serve"]
+description = "Serve docs with live reload"
+run = "uv run mkdocs serve"
+
+[tasks.setup]
+description = "Initial local setup"
+depends = ["setup:backend", "setup:frontend"]
+
+[tasks.dev]
+description = "Print backend/frontend startup tasks"
+run = """
+echo 'Run these in separate terminals:'
+echo '  mise run dev:backend:web'
+echo '  mise run dev:backend:consumer'
+echo '  mise run dev:backend:worker'
+echo '  mise run dev:frontend'
+"""
+
+[tasks."dev:all"]
+description = "Run backend and frontend together"
+run = """
+concurrently --kill-others --names web,consumer,worker,frontend \
+  "mise run dev:backend:web" \
+  "mise run dev:backend:consumer" \
+  "mise run dev:backend:worker" \
+  "mise run dev:frontend"
+"""
