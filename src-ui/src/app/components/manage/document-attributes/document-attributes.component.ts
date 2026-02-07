@@ -4,10 +4,8 @@ import {
   inject,
   OnDestroy,
   OnInit,
-  QueryList,
   Type,
   ViewChild,
-  ViewChildren,
 } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import {
@@ -129,10 +127,8 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
     },
   ]
 
-  @ViewChildren(ManagementListComponent)
-  private attributeLists?: QueryList<ManagementListComponent<any>>
-
-  @ViewChild(CustomFieldsComponent) private customFields?: CustomFieldsComponent
+  @ViewChild('activeOutlet', { read: NgComponentOutlet })
+  private activeOutlet?: NgComponentOutlet
 
   activeNavID: number = null
 
@@ -154,18 +150,14 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
 
   get activeAttributeList(): ManagementListComponent<any> | null {
     if (this.activeSection?.kind !== 'attributeList') return null
-    const permissionType = this.activeSection.permissionType
-    return (
-      this.attributeLists?.find(
-        (list) => list.permissionType === permissionType
-      ) ?? null
-    )
+    const instance = this.activeOutlet?.componentInstance
+    return instance instanceof ManagementListComponent ? instance : null
   }
 
   get activeCustomFields(): CustomFieldsComponent | null {
-    return this.activeSection?.kind === 'customFields'
-      ? (this.customFields ?? null)
-      : null
+    if (this.activeSection?.kind !== 'customFields') return null
+    const instance = this.activeOutlet?.componentInstance
+    return instance instanceof CustomFieldsComponent ? instance : null
   }
 
   get activeTabLabel(): string {
