@@ -1,4 +1,12 @@
-import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core'
+import { NgComponentOutlet } from '@angular/common'
+import {
+  Component,
+  inject,
+  OnDestroy,
+  OnInit,
+  Type,
+  ViewChild,
+} from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import {
   NgbDropdownModule,
@@ -30,6 +38,18 @@ enum DocumentAttributesNavIDs {
   CustomFields = 5,
 }
 
+type DocumentAttributesTabKind = 'bulk' | 'customFields'
+
+interface DocumentAttributesTab {
+  id: DocumentAttributesNavIDs
+  section: string
+  label: string
+  icon: string
+  permissionType: PermissionType
+  kind: DocumentAttributesTabKind
+  component: Type<any>
+}
+
 @Component({
   selector: 'pngx-document-attributes',
   templateUrl: './document-attributes.component.html',
@@ -38,14 +58,10 @@ enum DocumentAttributesNavIDs {
     PageHeaderComponent,
     NgbNavModule,
     NgbDropdownModule,
+    NgComponentOutlet,
     NgxBootstrapIconsModule,
     IfPermissionsDirective,
     ClearableBadgeComponent,
-    TagListComponent,
-    CorrespondentListComponent,
-    DocumentTypeListComponent,
-    StoragePathListComponent,
-    CustomFieldsComponent,
   ],
 })
 export class DocumentAttributesComponent implements OnInit, OnDestroy {
@@ -54,9 +70,56 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router)
   private readonly unsubscribeNotifier = new Subject<void>()
 
-  protected readonly DocumentAttributesNavIDs = DocumentAttributesNavIDs
   protected readonly PermissionAction = PermissionAction
   protected readonly PermissionType = PermissionType
+
+  readonly tabs: DocumentAttributesTab[] = [
+    {
+      id: DocumentAttributesNavIDs.Tags,
+      section: 'tags',
+      label: $localize`Tags`,
+      icon: 'tags',
+      permissionType: PermissionType.Tag,
+      kind: 'bulk',
+      component: TagListComponent,
+    },
+    {
+      id: DocumentAttributesNavIDs.Correspondents,
+      section: 'correspondents',
+      label: $localize`Correspondents`,
+      icon: 'person',
+      permissionType: PermissionType.Correspondent,
+      kind: 'bulk',
+      component: CorrespondentListComponent,
+    },
+    {
+      id: DocumentAttributesNavIDs.DocumentTypes,
+      section: 'documenttypes',
+      label: $localize`Document types`,
+      icon: 'hash',
+      permissionType: PermissionType.DocumentType,
+      kind: 'bulk',
+      component: DocumentTypeListComponent,
+    },
+    {
+      id: DocumentAttributesNavIDs.StoragePaths,
+      section: 'storagepaths',
+      label: $localize`Storage paths`,
+      icon: 'folder',
+      permissionType: PermissionType.StoragePath,
+      kind: 'bulk',
+      component: StoragePathListComponent,
+    },
+    {
+      id: DocumentAttributesNavIDs.CustomFields,
+      section: 'customfields',
+      label: $localize`Custom fields`,
+      icon: 'ui-radios',
+      permissionType: PermissionType.CustomField,
+      kind: 'customFields',
+      component: CustomFieldsComponent,
+    },
+  ]
 
   @ViewChild(TagListComponent) private tagList?: TagListComponent
   @ViewChild(CorrespondentListComponent)
@@ -69,6 +132,19 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
   private customFields?: CustomFieldsComponent
 
   activeNavID: number = null
+
+  get visibleTabs(): DocumentAttributesTab[] {
+    return this.tabs.filter((tab) =>
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        tab.permissionType
+      )
+    )
+  }
+
+  get activeTab(): DocumentAttributesTab | null {
+    return this.visibleTabs.find((t) => t.id === this.activeNavID) ?? null
+  }
 
   get activeBulkList(): ManagementListComponent<any> | null {
     switch (this.activeNavID) {
@@ -92,60 +168,12 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
   }
 
   get activeTabLabel(): string {
-    switch (this.activeNavID) {
-      case DocumentAttributesNavIDs.Tags:
-        return $localize`Tags`
-      case DocumentAttributesNavIDs.Correspondents:
-        return $localize`Correspondents`
-      case DocumentAttributesNavIDs.DocumentTypes:
-        return $localize`Document types`
-      case DocumentAttributesNavIDs.StoragePaths:
-        return $localize`Storage paths`
-      case DocumentAttributesNavIDs.CustomFields:
-        return $localize`Custom fields`
-      default:
-        return ''
-    }
+    return this.activeTab?.label ?? ''
   }
 
   get activeHeaderLoading(): boolean {
     return (
       this.activeBulkList?.loading ?? this.activeCustomFields?.loading ?? false
-    )
-  }
-
-  get canViewTags(): boolean {
-    return this.permissionsService.currentUserCan(
-      PermissionAction.View,
-      PermissionType.Tag
-    )
-  }
-
-  get canViewCorrespondents(): boolean {
-    return this.permissionsService.currentUserCan(
-      PermissionAction.View,
-      PermissionType.Correspondent
-    )
-  }
-
-  get canViewDocumentTypes(): boolean {
-    return this.permissionsService.currentUserCan(
-      PermissionAction.View,
-      PermissionType.DocumentType
-    )
-  }
-
-  get canViewStoragePaths(): boolean {
-    return this.permissionsService.currentUserCan(
-      PermissionAction.View,
-      PermissionType.StoragePath
-    )
-  }
-
-  get canViewCustomFields(): boolean {
-    return this.permissionsService.currentUserCan(
-      PermissionAction.View,
-      PermissionType.CustomField
     )
   }
 
@@ -189,49 +217,19 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
   }
 
   private getDefaultNavID(): DocumentAttributesNavIDs | null {
-    if (this.canViewTags) return DocumentAttributesNavIDs.Tags
-    if (this.canViewCorrespondents)
-      return DocumentAttributesNavIDs.Correspondents
-    if (this.canViewDocumentTypes) return DocumentAttributesNavIDs.DocumentTypes
-    if (this.canViewStoragePaths) return DocumentAttributesNavIDs.StoragePaths
-    if (this.canViewCustomFields) return DocumentAttributesNavIDs.CustomFields
-    return null
+    return this.visibleTabs[0]?.id ?? null
   }
 
   private getNavIDForSection(section: string): DocumentAttributesNavIDs | null {
-    if (!section) return null
-    const navIDKey: string = Object.keys(DocumentAttributesNavIDs).find(
-      (navID) => navID.toLowerCase() === section.toLowerCase()
-    )
-    if (!navIDKey) return null
+    const sectionKey = section?.toLowerCase()
+    if (!sectionKey) return null
 
-    const navID = DocumentAttributesNavIDs[navIDKey]
-    if (!this.isNavIDAllowed(navID)) return null
-    return navID
+    const tab = this.visibleTabs.find((t) => t.section === sectionKey)
+    return tab?.id ?? null
   }
 
   private getSectionForNavID(navID: number): string | null {
-    if (!this.isNavIDAllowed(navID)) return null
-    const [foundNavIDKey] = Object.entries(DocumentAttributesNavIDs).find(
-      ([, navIDValue]) => navIDValue === navID
-    )
-    return foundNavIDKey?.toLowerCase() ?? null
-  }
-
-  private isNavIDAllowed(navID: number): boolean {
-    switch (navID) {
-      case DocumentAttributesNavIDs.Tags:
-        return this.canViewTags
-      case DocumentAttributesNavIDs.Correspondents:
-        return this.canViewCorrespondents
-      case DocumentAttributesNavIDs.DocumentTypes:
-        return this.canViewDocumentTypes
-      case DocumentAttributesNavIDs.StoragePaths:
-        return this.canViewStoragePaths
-      case DocumentAttributesNavIDs.CustomFields:
-        return this.canViewCustomFields
-      default:
-        return false
-    }
+    const tab = this.visibleTabs.find((t) => t.id === navID)
+    return tab?.section ?? null
   }
 }
