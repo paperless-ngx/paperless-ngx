@@ -4385,7 +4385,11 @@ def resolve_to(monkeypatch: pytest.MonkeyPatch) -> Callable[[str], None]:
     """
 
     def _set(ip: str) -> None:
-        def fake_getaddrinfo(host: str, *_args: object, **_kwargs: object) -> list:
+        def fake_getaddrinfo(
+            host: str,
+            *_args: object,
+            **_kwargs: object,
+        ) -> list[tuple]:
             return [(socket.AF_INET, None, None, "", (ip, 0))]
 
         monkeypatch.setattr(socket, "getaddrinfo", fake_getaddrinfo)
@@ -4526,7 +4530,7 @@ class TestWebhookSecurity:
     def test_strips_user_supplied_host_header(
         self,
         httpx_mock: HTTPXMock,
-        resolve_to,
+        resolve_to: Callable[[str], None],
     ) -> None:
         """
         GIVEN:
