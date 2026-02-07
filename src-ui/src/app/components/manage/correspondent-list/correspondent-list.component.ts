@@ -1,4 +1,4 @@
-import { NgClass, NgTemplateOutlet, TitleCasePipe } from '@angular/common'
+import { NgClass, NgTemplateOutlet } from '@angular/common'
 import { Component, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { RouterModule } from '@angular/router'
@@ -14,9 +14,7 @@ import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { PermissionType } from 'src/app/services/permissions.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
-import { ClearableBadgeComponent } from '../../common/clearable-badge/clearable-badge.component'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
-import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { ManagementListComponent } from '../management-list/management-list.component'
 
 @Component({
@@ -27,8 +25,6 @@ import { ManagementListComponent } from '../management-list/management-list.comp
   imports: [
     SortableDirective,
     IfPermissionsDirective,
-    PageHeaderComponent,
-    TitleCasePipe,
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
@@ -37,7 +33,6 @@ import { ManagementListComponent } from '../management-list/management-list.comp
     NgbDropdownModule,
     NgbPaginationModule,
     NgxBootstrapIconsModule,
-    ClearableBadgeComponent,
   ],
 })
 export class CorrespondentListComponent extends ManagementListComponent<Correspondent> {
