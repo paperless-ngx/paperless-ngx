@@ -342,13 +342,13 @@ def execute_password_removal_action(
     )
 
 
-def execute_deletion_action(
+def execute_move_to_trash_action(
     action: WorkflowAction,
     document: Document,
     logging_group: uuid.UUID,
 ) -> None:
     """
-    Execute a deletion action for a workflow on an existing document.
+    Execute a move to trash action for a workflow on an existing document.
     Soft-deletes the document (moves to trash).
     """
     document.delete()
@@ -358,19 +358,19 @@ def execute_deletion_action(
     )
 
 
-def execute_deletion_action_consumption(
+def execute_move_to_trash_action_consumption(
     action: WorkflowAction,
     document: ConsumableDocument,
     logging_group: uuid.UUID,
 ) -> None:
     """
-    Execute a deletion action for a workflow during consumption.
+    Execute a move to trash action for a workflow during consumption.
     Stops consumption and deletes the original file.
     """
     if document.original_file.exists():
         document.original_file.unlink()
     logger.info(
-        f"Workflow delete action triggered during consumption, "
+        f"Workflow move to trash action triggered during consumption, "
         f"deleting file {document.original_file}",
         extra={"group": logging_group},
     )

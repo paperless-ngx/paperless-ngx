@@ -560,14 +560,17 @@ For security reasons, webhooks can be limited to specific ports and disallowed f
 [configuration settings](configuration.md#workflow-webhooks) to change this behavior. If you are allowing non-admins to create workflows,
 you may want to adjust these settings to prevent abuse.
 
-##### Delete {#workflow-action-delete}
+##### Move to Trash {#workflow-action-move-to-trash}
 
-"Delete" actions move the document to the trash. The document can be restored
+"Move to Trash" actions move the document to the trash. The document can be restored
 from the trash until the trash is emptied (after the configured delay or manually).
 
-The delete action will always be executed at the end of the workflow run,
-regardless of its position in the action list. After a delete action is executed
+The "Move to Trash" action will always be executed at the end of the workflow run,
+regardless of its position in the action list. After a "Move to Trash" action is executed
 no other workflow will be executed on the document.
+
+If a "Move to Trash" action is executed in a consume pipeline, the consumption
+will be aborted and the file will be deleted.
 
 #### Workflow placeholders
 
