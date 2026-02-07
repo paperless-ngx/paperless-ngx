@@ -144,7 +144,7 @@ export const WORKFLOW_ACTION_OPTIONS = [
     name: $localize`Password removal`,
   },
   {
-    id: WorkflowActionType.Deletion,
+    id: WorkflowActionType.MoveToTrash,
     name: $localize`Move to trash`,
   },
 ]

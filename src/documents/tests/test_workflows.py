@@ -3916,7 +3916,7 @@ class TestWorkflows(
         )
         assert mock_remove_password.call_count == 2
 
-    def test_workflow_delete_action_soft_delete(self):
+    def test_workflow_trash_action_soft_delete(self):
         """
         GIVEN:
             - Document updated workflow with delete action
@@ -3929,7 +3929,7 @@ class TestWorkflows(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
         )
         action = WorkflowAction.objects.create(
-            type=WorkflowAction.WorkflowActionType.DELETION,
+            type=WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
         )
         w = Workflow.objects.create(
             name="Workflow 1",
@@ -3959,10 +3959,10 @@ class TestWorkflows(
         PAPERLESS_URL="http://localhost:8000",
     )
     @mock.patch("django.core.mail.message.EmailMessage.send")
-    def test_workflow_deletion_with_email_action(self, mock_email_send):
+    def test_workflow_trash_with_email_action(self, mock_email_send):
         """
         GIVEN:
-            - Workflow with email action, then deletion action
+            - Workflow with email action, then move to trash action
         WHEN:
             - Document matches and workflow runs
         THEN:
@@ -3984,15 +3984,15 @@ class TestWorkflows(
             type=WorkflowAction.WorkflowActionType.EMAIL,
             email=email_action,
         )
-        deletion_workflow_action = WorkflowAction.objects.create(
-            type=WorkflowAction.WorkflowActionType.DELETION,
+        trash_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
         )
         w = Workflow.objects.create(
-            name="Workflow with email then deletion",
+            name="Workflow with email then move to trash",
             order=0,
         )
         w.triggers.add(trigger)
-        w.actions.add(email_workflow_action, deletion_workflow_action)
+        w.actions.add(email_workflow_action, trash_workflow_action)
         w.save()
 
         doc = Document.objects.create(
@@ -4014,10 +4014,10 @@ class TestWorkflows(
         PAPERLESS_URL="http://localhost:8000",
     )
     @mock.patch("documents.workflows.webhooks.send_webhook.delay")
-    def test_workflow_deletion_with_webhook_action(self, mock_webhook_delay):
+    def test_workflow_trash_with_webhook_action(self, mock_webhook_delay):
         """
         GIVEN:
-            - Workflow with webhook action (include_document=True), then deletion action
+            - Workflow with webhook action (include_document=True), then move to trash action
         WHEN:
             - Document matches and workflow runs
         THEN:
@@ -4041,15 +4041,15 @@ class TestWorkflows(
             type=WorkflowAction.WorkflowActionType.WEBHOOK,
             webhook=webhook_action,
         )
-        deletion_workflow_action = WorkflowAction.objects.create(
-            type=WorkflowAction.WorkflowActionType.DELETION,
+        trash_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
         )
         w = Workflow.objects.create(
-            name="Workflow with webhook then deletion",
+            name="Workflow with webhook then move to trash",
             order=0,
         )
         w.triggers.add(trigger)
-        w.actions.add(webhook_workflow_action, deletion_workflow_action)
+        w.actions.add(webhook_workflow_action, trash_workflow_action)
         w.save()
 
         test_file = shutil.copy(
@@ -4092,16 +4092,16 @@ class TestWorkflows(
         PAPERLESS_URL="http://localhost:8000",
     )
     @mock.patch("django.core.mail.message.EmailMessage.send")
-    def test_workflow_deletion_after_email_failure(self, mock_email_send) -> None:
+    def test_workflow_trash_after_email_failure(self, mock_email_send) -> None:
         """
         GIVEN:
-            - Workflow with email action (that fails), then deletion action
+            - Workflow with email action (that fails), then move to trash action
         WHEN:
             - Document matches and workflow runs
             - Email action raises exception
         THEN:
             - Email failure is logged
-            - Deletion still executes successfully (soft delete)
+            - Move to Trash still executes successfully (soft delete)
         """
         mock_email_send.side_effect = Exception("Email server error")
 
@@ -4118,15 +4118,15 @@ class TestWorkflows(
             type=WorkflowAction.WorkflowActionType.EMAIL,
             email=email_action,
         )
-        deletion_workflow_action = WorkflowAction.objects.create(
-            type=WorkflowAction.WorkflowActionType.DELETION,
+        trash_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
         )
         w = Workflow.objects.create(
-            name="Workflow with failing email then deletion",
+            name="Workflow with failing email then move to trash",
             order=0,
         )
         w.triggers.add(trigger)
-        w.actions.add(email_workflow_action, deletion_workflow_action)
+        w.actions.add(email_workflow_action, trash_workflow_action)
         w.save()
 
         doc = Document.objects.create(
@@ -4147,10 +4147,10 @@ class TestWorkflows(
         self.assertEqual(Document.objects.count(), 0)
         self.assertEqual(Document.deleted_objects.count(), 1)
 
-    def test_multiple_workflows_deletion_then_assignment(self):
+    def test_multiple_workflows_trash_then_assignment(self):
         """
         GIVEN:
-            - Workflow 1 (order=0) with deletion action
+            - Workflow 1 (order=0) with move to trash action
             - Workflow 2 (order=1) with assignment action
             - Both workflows match the same document
         WHEN:
@@ -4158,20 +4158,20 @@ class TestWorkflows(
         THEN:
             - First workflow runs and deletes document (soft delete)
             - Second workflow does not trigger (document no longer exists)
-            - Logs confirm deletion and skipping of remaining workflows
+            - Logs confirm move to trash and skipping of remaining workflows
         """
         trigger1 = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
         )
-        deletion_workflow_action = WorkflowAction.objects.create(
-            type=WorkflowAction.WorkflowActionType.DELETION,
+        trash_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
         )
         w1 = Workflow.objects.create(
-            name="Workflow 1 - Deletion",
+            name="Workflow 1 - Move to Trash",
             order=0,
         )
         w1.triggers.add(trigger1)
-        w1.actions.add(deletion_workflow_action)
+        w1.actions.add(trash_workflow_action)
         w1.save()
 
         trigger2 = WorkflowTrigger.objects.create(
@@ -4207,7 +4207,7 @@ class TestWorkflows(
         # We check logs instead of WorkflowRun.objects.count() because when the document
         # is soft-deleted, the WorkflowRun is cascade-deleted (hard delete) since it does
         # not inherit from the SoftDeleteModel. The logs confirm that the first workflow
-        # executed the deletion and remaining workflows were skipped.
+        # executed the move to trash and remaining workflows were skipped.
         log_output = "\n".join(cm.output)
         self.assertIn("Moved document", log_output)
         self.assertIn("to trash", log_output)
@@ -4233,7 +4233,7 @@ class TestWorkflows(
             filter_filename="*",
         )
         action = WorkflowAction.objects.create(
-            type=WorkflowAction.WorkflowActionType.DELETION,
+            type=WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
         )
         w = Workflow.objects.create(
             name="Workflow Delete During Consumption",
@@ -4296,15 +4296,15 @@ class TestWorkflows(
             assign_title="This should not be applied",
             assign_correspondent=self.c,
         )
-        deletion_workflow_action = WorkflowAction.objects.create(
-            type=WorkflowAction.WorkflowActionType.DELETION,
+        trash_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
         )
         w = Workflow.objects.create(
             name="Workflow Assignment then Delete During Consumption",
             order=0,
         )
         w.triggers.add(trigger)
-        w.actions.add(assignment_action, deletion_workflow_action)
+        w.actions.add(assignment_action, trash_workflow_action)
         w.save()
 
         # Create a test file to be consumed

@@ -809,7 +809,7 @@ def run_workflows(
 
         if matching.document_matches_workflow(document, workflow, trigger_type):
             action: WorkflowAction
-            has_deletion_action = False
+            has_move_to_trash_action = False
             for action in workflow.actions.order_by("order", "pk"):
                 message = f"Applying {action} from {workflow}"
                 if not use_overrides:
@@ -853,8 +853,8 @@ def run_workflows(
                     )
                 elif action.type == WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL:
                     execute_password_removal_action(action, document, logging_group)
-                elif action.type == WorkflowAction.WorkflowActionType.DELETION:
-                    has_deletion_action = True
+                elif action.type == WorkflowAction.WorkflowActionType.MOVE_TO_TRASH:
+                    has_move_to_trash_action = True
 
             if not use_overrides:
                 # limit title to 128 characters
@@ -869,7 +869,7 @@ def run_workflows(
                 document=document if not use_overrides else None,
             )
 
-            if has_deletion_action:
+            if has_move_to_trash_action:
                 if isinstance(document, Document) and not use_overrides:
                     execute_deletion_action(action, document, logging_group)
                 else:

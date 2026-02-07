@@ -897,10 +897,10 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                 str(response.data["non_field_errors"][0]),
             )
 
-    def test_deletion_action_validation(self) -> None:
+    def test_trash_action_validation(self) -> None:
         """
         GIVEN:
-            - API request to create a workflow with a deletion action
+            - API request to create a workflow with a trash action
         WHEN:
             - API is called
         THEN:
@@ -921,7 +921,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     ],
                     "actions": [
                         {
-                            "type": WorkflowAction.WorkflowActionType.DELETION,
+                            "type": WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
                         },
                     ],
                 },
@@ -945,7 +945,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     ],
                     "actions": [
                         {
-                            "type": WorkflowAction.WorkflowActionType.DELETION,
+                            "type": WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
                         },
                     ],
                 },
@@ -954,11 +954,11 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_deletion_action_as_last_action_valid(self) -> None:
+    def test_trash_action_as_last_action_valid(self) -> None:
         """
         GIVEN:
             - API request to create a workflow with multiple actions
-            - Deletion action is the last action
+            - Move to trash action is the last action
         WHEN:
             - API is called
         THEN:
@@ -968,7 +968,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             self.ENDPOINT,
             json.dumps(
                 {
-                    "name": "Workflow with Deletion Last",
+                    "name": "Workflow with Move to Trash Last",
                     "order": 1,
                     "triggers": [
                         {
@@ -987,7 +987,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                             "remove_all_tags": True,
                         },
                         {
-                            "type": WorkflowAction.WorkflowActionType.DELETION,
+                            "type": WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
                         },
                     ],
                 },
@@ -996,12 +996,12 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_update_workflow_add_deletion_at_end_valid(self) -> None:
+    def test_update_workflow_add_trash_at_end_valid(self) -> None:
         """
         GIVEN:
-            - Existing workflow without deletion action
+            - Existing workflow without trash action
         WHEN:
-            - PATCH to add deletion action at end
+            - PATCH to add trash action at end
         THEN:
             - HTTP 200 success
         """
@@ -1009,7 +1009,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             self.ENDPOINT,
             json.dumps(
                 {
-                    "name": "Workflow to Add Deletion",
+                    "name": "Workflow to Add Move to Trash",
                     "order": 1,
                     "triggers": [
                         {
@@ -1041,7 +1041,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                             "assign_title": "First Action",
                         },
                         {
-                            "type": WorkflowAction.WorkflowActionType.DELETION,
+                            "type": WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
                         },
                     ],
                 },
@@ -1050,12 +1050,12 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_update_workflow_remove_deletion_action_valid(self) -> None:
+    def test_update_workflow_remove_trash_action_valid(self) -> None:
         """
         GIVEN:
-            - Existing workflow with deletion action
+            - Existing workflow with trash action
         WHEN:
-            - PATCH to remove deletion action
+            - PATCH to remove trash action
         THEN:
             - HTTP 200 success
         """
@@ -1063,7 +1063,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             self.ENDPOINT,
             json.dumps(
                 {
-                    "name": "Workflow to Remove Deletion",
+                    "name": "Workflow to Remove move to trash",
                     "order": 1,
                     "triggers": [
                         {
@@ -1078,7 +1078,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                             "assign_title": "First Action",
                         },
                         {
-                            "type": WorkflowAction.WorkflowActionType.DELETION,
+                            "type": WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
                         },
                     ],
                 },
