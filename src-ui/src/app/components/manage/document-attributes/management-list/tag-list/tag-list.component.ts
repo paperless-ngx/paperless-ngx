@@ -7,13 +7,13 @@ import {
   NgbPaginationModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { TagEditDialogComponent } from 'src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
 import { Tag } from 'src/app/data/tag'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { PermissionType } from 'src/app/services/permissions.service'
 import { TagService } from 'src/app/services/rest/tag.service'
-import { TagEditDialogComponent } from '../../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { ManagementListComponent } from '../management-list.component'
 
 @Component({

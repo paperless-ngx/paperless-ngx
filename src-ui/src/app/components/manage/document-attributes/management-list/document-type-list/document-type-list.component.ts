@@ -7,13 +7,13 @@ import {
   NgbPaginationModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { DocumentTypeEditDialogComponent } from 'src/app/components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
 import { DocumentType } from 'src/app/data/document-type'
 import { FILTER_HAS_DOCUMENT_TYPE_ANY } from 'src/app/data/filter-rule-type'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { PermissionType } from 'src/app/services/permissions.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
-import { DocumentTypeEditDialogComponent } from '../../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
 import { ManagementListComponent } from '../management-list.component'
 
 @Component({

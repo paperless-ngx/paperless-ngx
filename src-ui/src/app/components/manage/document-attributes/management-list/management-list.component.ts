@@ -16,6 +16,10 @@ import {
   takeUntil,
   tap,
 } from 'rxjs/operators'
+import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
+import { EditDialogMode } from 'src/app/components/common/edit-dialog/edit-dialog.component'
+import { PermissionsDialogComponent } from 'src/app/components/common/permissions-dialog/permissions-dialog.component'
+import { LoadingComponentWithPermissions } from 'src/app/components/loading-component/loading.component'
 import {
   MATCH_AUTO,
   MATCH_NONE,
@@ -40,10 +44,6 @@ import {
 } from 'src/app/services/rest/abstract-name-filter-service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
-import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
-import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
-import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 export interface ManagementListColumn {
   key: string

@@ -7,13 +7,13 @@ import {
   NgbPaginationModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { StoragePathEditDialogComponent } from 'src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { FILTER_HAS_STORAGE_PATH_ANY } from 'src/app/data/filter-rule-type'
 import { StoragePath } from 'src/app/data/storage-path'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { PermissionType } from 'src/app/services/permissions.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
-import { StoragePathEditDialogComponent } from '../../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { ManagementListComponent } from '../management-list.component'
 
 @Component({
