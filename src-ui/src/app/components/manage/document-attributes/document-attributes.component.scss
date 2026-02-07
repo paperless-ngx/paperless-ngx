@@ -1,0 +1,34 @@
+// .attributes-tabs {
+//   border-bottom-color: rgba(var(--bs-body-color-rgb), 0.12);
+// }
+
+// .attributes-tabs .nav-link {
+//   position: relative;
+//   padding-bottom: 0.45rem;
+//   color: rgba(var(--bs-body-color-rgb));
+//   transition: color 140ms ease;
+// }
+
+// .attributes-tabs .nav-link::after {
+//   content: '';
+//   position: absolute;
+//   left: 0.2rem;
+//   right: 0.2rem;
+//   bottom: 0;
+//   height: var(--bs-nav-underline-border-width);
+//   border-radius: 1px;
+//   background: transparent;
+//   transition: background-color 140ms ease;
+// }
+
+// .attributes-tabs .nav-link:hover {
+//   color: rgba(var(--bs-body-color-rgb), 0.95);
+// }
+
+// .attributes-tabs .nav-link.active {
+//   color: var(--bs-primary);
+// }
+
+// .attributes-tabs .nav-link.active::after {
+//   background: var(--bs-primary);
+// }

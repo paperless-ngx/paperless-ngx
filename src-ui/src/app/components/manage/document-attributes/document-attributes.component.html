@@ -62,17 +62,17 @@
   }
 </pngx-page-header>
 
-<ul ngbNav #nav="ngbNav" (navChange)="onNavChange($event)" [(activeId)]="activeNavID" class="nav-tabs">
+<ul ngbNav #nav="ngbNav" (navChange)="onNavChange($event)" [(activeId)]="activeNavID" class="nav-underline">
   @for (section of visibleSections; track section.id) {
     <li [ngbNavItem]="section.id">
-      <a ngbNavLink>
+      <a ngbNavLink >
         <i-bs class="me-2" [name]="section.icon"></i-bs>{{ section.label }}
       </a>
     </li>
   }
 </ul>
 
-<div class="border-start border-end border-bottom p-3 mb-3 shadow-sm">
+<div class="my-3 shadow-sm">
   <ng-container
     [ngComponentOutlet]="activeSection?.component"
     #activeOutlet="ngComponentOutlet"
