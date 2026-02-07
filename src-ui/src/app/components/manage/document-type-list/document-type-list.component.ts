@@ -1,4 +1,4 @@
-import { NgClass, NgTemplateOutlet, TitleCasePipe } from '@angular/common'
+import { NgClass, NgTemplateOutlet } from '@angular/common'
 import { Component, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { RouterModule } from '@angular/router'
@@ -13,9 +13,7 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { PermissionType } from 'src/app/services/permissions.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
-import { ClearableBadgeComponent } from '../../common/clearable-badge/clearable-badge.component'
 import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
-import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { ManagementListComponent } from '../management-list/management-list.component'
 
 @Component({
@@ -24,8 +22,6 @@ import { ManagementListComponent } from '../management-list/management-list.comp
   styleUrls: ['./../management-list/management-list.component.scss'],
   imports: [
     SortableDirective,
-    PageHeaderComponent,
-    TitleCasePipe,
     IfPermissionsDirective,
     FormsModule,
     ReactiveFormsModule,
@@ -35,7 +31,6 @@ import { ManagementListComponent } from '../management-list/management-list.comp
     NgbDropdownModule,
     NgbPaginationModule,
     NgxBootstrapIconsModule,
-    ClearableBadgeComponent,
   ],
 })
 export class DocumentTypeListComponent extends ManagementListComponent<DocumentType> {
