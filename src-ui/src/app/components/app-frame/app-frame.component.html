@@ -175,15 +175,15 @@
             <span i18n>Manage</span>
           </h6>
           <ul class="nav flex-column mb-2">
-	            @if (canManageDocumentProperties) {
+	            @if (canManageAttributes) {
 	              <li class="nav-item app-link" tourAnchor="tour.tags">
 	                <a class="nav-link" routerLink="attributes" routerLinkActive="active" (click)="closeMenu()"
 	                  ngbPopover="Attributes" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
 	                  container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                  <i-bs class="me-1" name="stack"></i-bs><span>&nbsp;<ng-container i18n>Attributes</ng-container></span>
-                </a>
-              </li>
-            }
+	                  <i-bs class="me-1" name="stack"></i-bs><span>&nbsp;<ng-container i18n>Attributes</ng-container></span>
+	                </a>
+	              </li>
+	            }
             <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
               <a class="nav-link" routerLink="savedviews" routerLinkActive="active" (click)="closeMenu()"
                 ngbPopover="Saved Views" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
