@@ -110,10 +110,7 @@ describe('CustomFieldsComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reload')
 
-    const createButton = fixture.debugElement
-      .queryAll(By.css('button'))
-      .find((btn) => btn.nativeElement.textContent.trim().includes('Add Field'))
-    createButton.triggerEventHandler('click')
+    component.editField()
 
     expect(modal).not.toBeUndefined()
     const editDialog = modal.componentInstance as CustomFieldEditDialogComponent

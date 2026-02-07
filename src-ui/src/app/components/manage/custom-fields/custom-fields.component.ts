@@ -24,7 +24,6 @@ import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
-import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
@@ -32,7 +31,6 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
   templateUrl: './custom-fields.component.html',
   styleUrls: ['./custom-fields.component.scss'],
   imports: [
-    PageHeaderComponent,
     IfPermissionsDirective,
     NgbDropdownModule,
     NgbPaginationModule,

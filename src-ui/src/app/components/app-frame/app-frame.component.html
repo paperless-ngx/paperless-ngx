@@ -175,44 +175,15 @@
             <span i18n>Manage</span>
           </h6>
           <ul class="nav flex-column mb-2">
-            <li class="nav-item app-link"
-              *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }">
-              <a class="nav-link" routerLink="correspondents" routerLinkActive="active" (click)="closeMenu()"
-                ngbPopover="Correspondents" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
-                container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-1" name="person"></i-bs><span>&nbsp;<ng-container i18n>Correspondents</ng-container></span>
-              </a>
-            </li>
-            <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"
-              tourAnchor="tour.tags">
-              <a class="nav-link" routerLink="tags" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Tags"
-                i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body"
-                triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-1" name="tags"></i-bs><span>&nbsp;<ng-container i18n>Tags</ng-container></span>
-              </a>
-            </li>
-            <li class="nav-item app-link"
-              *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }">
-              <a class="nav-link" routerLink="documenttypes" routerLinkActive="active" (click)="closeMenu()"
-                ngbPopover="Document Types" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
-                container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-1" name="hash"></i-bs><span>&nbsp;<ng-container i18n>Document Types</ng-container></span>
-              </a>
-            </li>
-            <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }">
-              <a class="nav-link" routerLink="storagepaths" routerLinkActive="active" (click)="closeMenu()"
-                ngbPopover="Storage Paths" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
-                container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-1" name="folder"></i-bs><span>&nbsp;<ng-container i18n>Storage Paths</ng-container></span>
-              </a>
-            </li>
-            <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }">
-              <a class="nav-link" routerLink="customfields" routerLinkActive="active" (click)="closeMenu()"
-                ngbPopover="Custom Fields" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
-                container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-1" name="ui-radios"></i-bs><span>&nbsp;<ng-container i18n>Custom Fields</ng-container></span>
-              </a>
-            </li>
+	            @if (canManageDocumentProperties) {
+	              <li class="nav-item app-link" tourAnchor="tour.tags">
+	                <a class="nav-link" routerLink="attributes" routerLinkActive="active" (click)="closeMenu()"
+	                  ngbPopover="Attributes" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
+	                  container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+                  <i-bs class="me-1" name=""></i-bs><span>&nbsp;<ng-container i18n>Attributes</ng-container></span>
+                </a>
+              </li>
+            }
             <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
               <a class="nav-link" routerLink="savedviews" routerLinkActive="active" (click)="closeMenu()"
                 ngbPopover="Saved Views" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"

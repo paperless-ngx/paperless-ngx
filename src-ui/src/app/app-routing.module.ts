@@ -11,13 +11,9 @@ import { DashboardComponent } from './components/dashboard/dashboard.component'
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
 import { DocumentDetailComponent } from './components/document-detail/document-detail.component'
 import { DocumentListComponent } from './components/document-list/document-list.component'
-import { CorrespondentListComponent } from './components/manage/correspondent-list/correspondent-list.component'
-import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
-import { DocumentTypeListComponent } from './components/manage/document-type-list/document-type-list.component'
+import { DocumentAttributesComponent } from './components/manage/document-attributes/document-attributes.component'
 import { MailComponent } from './components/manage/mail/mail.component'
 import { SavedViewsComponent } from './components/manage/saved-views/saved-views.component'
-import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
-import { TagListComponent } from './components/manage/tag-list/tag-list.component'
 import { WorkflowsComponent } from './components/manage/workflows/workflows.component'
 import { NotFoundComponent } from './components/not-found/not-found.component'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
@@ -106,52 +102,76 @@ export const routes: Routes = [
         },
       },
       {
-        path: 'tags',
-        component: TagListComponent,
+        path: 'attributes',
+        component: DocumentAttributesComponent,
         canActivate: [PermissionsGuard],
         data: {
-          requiredPermission: {
-            action: PermissionAction.View,
-            type: PermissionType.Tag,
-          },
-          componentName: 'TagListComponent',
+          requiredPermissionAny: [
+            { action: PermissionAction.View, type: PermissionType.Tag },
+            {
+              action: PermissionAction.View,
+              type: PermissionType.Correspondent,
+            },
+            {
+              action: PermissionAction.View,
+              type: PermissionType.DocumentType,
+            },
+            { action: PermissionAction.View, type: PermissionType.StoragePath },
+            { action: PermissionAction.View, type: PermissionType.CustomField },
+          ],
+          componentName: 'DocumentAttributesComponent',
         },
       },
       {
-        path: 'documenttypes',
-        component: DocumentTypeListComponent,
+        path: 'attributes/:section',
+        component: DocumentAttributesComponent,
         canActivate: [PermissionsGuard],
         data: {
-          requiredPermission: {
-            action: PermissionAction.View,
-            type: PermissionType.DocumentType,
-          },
-          componentName: 'DocumentTypeListComponent',
+          requiredPermissionAny: [
+            { action: PermissionAction.View, type: PermissionType.Tag },
+            {
+              action: PermissionAction.View,
+              type: PermissionType.Correspondent,
+            },
+            {
+              action: PermissionAction.View,
+              type: PermissionType.DocumentType,
+            },
+            { action: PermissionAction.View, type: PermissionType.StoragePath },
+            { action: PermissionAction.View, type: PermissionType.CustomField },
+          ],
+          componentName: 'DocumentAttributesComponent',
         },
+      },
+      {
+        path: 'documentproperties',
+        redirectTo: '/attributes',
+        pathMatch: 'full',
+      },
+      {
+        path: 'documentproperties/:section',
+        redirectTo: '/attributes/:section',
+        pathMatch: 'full',
+      },
+      {
+        path: 'tags',
+        redirectTo: '/attributes/tags',
+        pathMatch: 'full',
       },
       {
         path: 'correspondents',
-        component: CorrespondentListComponent,
-        canActivate: [PermissionsGuard],
-        data: {
-          requiredPermission: {
-            action: PermissionAction.View,
-            type: PermissionType.Correspondent,
-          },
-          componentName: 'CorrespondentListComponent',
-        },
+        redirectTo: '/attributes/correspondents',
+        pathMatch: 'full',
+      },
+      {
+        path: 'documenttypes',
+        redirectTo: '/attributes/documenttypes',
+        pathMatch: 'full',
       },
       {
         path: 'storagepaths',
-        component: StoragePathListComponent,
-        canActivate: [PermissionsGuard],
-        data: {
-          requiredPermission: {
-            action: PermissionAction.View,
-            type: PermissionType.StoragePath,
-          },
-          componentName: 'StoragePathListComponent',
-        },
+        redirectTo: '/attributes/storagepaths',
+        pathMatch: 'full',
       },
       {
         path: 'logs',
@@ -239,15 +259,8 @@ export const routes: Routes = [
       },
       {
         path: 'customfields',
-        component: CustomFieldsComponent,
-        canActivate: [PermissionsGuard],
-        data: {
-          requiredPermission: {
-            action: PermissionAction.View,
-            type: PermissionType.CustomField,
-          },
-          componentName: 'CustomFieldsComponent',
-        },
+        redirectTo: '/attributes/customfields',
+        pathMatch: 'full',
       },
       {
         path: 'workflows',
