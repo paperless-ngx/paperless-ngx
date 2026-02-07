@@ -1,0 +1,117 @@
+<pngx-page-header
+  title="Attributes"
+  i18n-title
+  info="Manage tags, correspondents, document types, storage paths, and custom fields."
+  i18n-info
+  [subTitle]="activeTabLabel"
+  [loading]="activeHeaderLoading"
+  >
+  @if (activeBulkList) {
+    <div ngbDropdown class="btn-group flex-fill d-sm-none">
+      <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle>
+        <i-bs name="text-indent-left"></i-bs>
+        <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Select</ng-container></div>
+        @if (activeBulkList.selectedObjects.size > 0) {
+          <pngx-clearable-badge [selected]="activeBulkList.selectedObjects.size > 0" [number]="activeBulkList.selectedObjects.size" (cleared)="activeBulkList.selectNone()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
+        }
+      </button>
+      <div ngbDropdownMenu aria-labelledby="dropdownSelectMobile" class="shadow">
+        <button ngbDropdownItem (click)="activeBulkList.selectNone()" i18n>Select none</button>
+        <button ngbDropdownItem (click)="activeBulkList.selectPage(true)" i18n>Select page</button>
+        <button ngbDropdownItem (click)="activeBulkList.selectAll()" i18n>Select all</button>
+      </div>
+    </div>
+
+    <div class="d-none d-sm-flex flex-fill me-3">
+      <div class="input-group input-group-sm">
+        <span class="input-group-text border-0" i18n>Select:</span>
+      </div>
+      <div class="btn-group btn-group-sm flex-nowrap">
+        @if (activeBulkList.selectedObjects.size > 0) {
+          <button class="btn btn-sm btn-outline-secondary" (click)="activeBulkList.selectNone()">
+            <i-bs name="slash-circle"></i-bs>&nbsp;<ng-container i18n>None</ng-container>
+          </button>
+        }
+        <button class="btn btn-sm btn-outline-primary" (click)="activeBulkList.selectPage(true)">
+          <i-bs name="file-earmark-check"></i-bs>&nbsp;<ng-container i18n>Page</ng-container>
+        </button>
+        <button class="btn btn-sm btn-outline-primary" (click)="activeBulkList.selectAll()">
+          <i-bs name="check-all"></i-bs>&nbsp;<ng-container i18n>All</ng-container>
+        </button>
+      </div>
+    </div>
+
+    <button type="button" class="btn btn-sm btn-outline-primary" (click)="activeBulkList.setPermissions()"
+      [disabled]="!activeBulkList.userCanBulkEdit(PermissionAction.Change) || activeBulkList.selectedObjects.size === 0">
+      <i-bs name="person-fill-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="activeBulkList.delete()"
+      [disabled]="!activeBulkList.userCanBulkEdit(PermissionAction.Delete) || activeBulkList.selectedObjects.size === 0">
+      <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-primary ms-md-5" (click)="activeBulkList.openCreateDialog()"
+      *pngxIfPermissions="{ action: PermissionAction.Add, type: activeBulkList.permissionType }">
+      <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Create</ng-container>
+    </button>
+  } @else if (activeCustomFields) {
+    <button type="button" class="btn btn-sm btn-outline-primary" (click)="activeCustomFields.editField()"
+      *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.CustomField }">
+      <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Field</ng-container>
+    </button>
+  }
+</pngx-page-header>
+
+<ul ngbNav #nav="ngbNav" (navChange)="onNavChange($event)" [(activeId)]="activeNavID" class="nav-tabs">
+  @if (canViewTags) {
+    <li [ngbNavItem]="DocumentAttributesNavIDs.Tags">
+      <a ngbNavLink>
+        <ng-container i18n>Tags</ng-container>
+      </a>
+      <ng-template ngbNavContent>
+        <pngx-tag-list></pngx-tag-list>
+      </ng-template>
+    </li>
+  }
+  @if (canViewCorrespondents) {
+    <li [ngbNavItem]="DocumentAttributesNavIDs.Correspondents">
+      <a ngbNavLink>
+        </i-bs><ng-container i18n>Correspondents</ng-container>
+      </a>
+      <ng-template ngbNavContent>
+        <pngx-correspondent-list></pngx-correspondent-list>
+      </ng-template>
+    </li>
+  }
+  @if (canViewDocumentTypes) {
+    <li [ngbNavItem]="DocumentAttributesNavIDs.DocumentTypes">
+      <a ngbNavLink>
+        </i-bs><ng-container i18n>Document types</ng-container>
+      </a>
+      <ng-template ngbNavContent>
+        <pngx-document-type-list></pngx-document-type-list>
+      </ng-template>
+    </li>
+  }
+  @if (canViewStoragePaths) {
+    <li [ngbNavItem]="DocumentAttributesNavIDs.StoragePaths">
+      <a ngbNavLink>
+        </i-bs><ng-container i18n>Storage paths</ng-container>
+      </a>
+      <ng-template ngbNavContent>
+        <pngx-storage-path-list></pngx-storage-path-list>
+      </ng-template>
+    </li>
+  }
+  @if (canViewCustomFields) {
+    <li [ngbNavItem]="DocumentAttributesNavIDs.CustomFields">
+      <a ngbNavLink>
+        </i-bs><ng-container i18n>Custom fields</ng-container>
+      </a>
+      <ng-template ngbNavContent>
+        <pngx-custom-fields></pngx-custom-fields>
+      </ng-template>
+    </li>
+  }
+</ul>
+
+<div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>
