@@ -94,6 +94,8 @@ export class AppFrameComponent
 
   slimSidebarAnimating: boolean = false
 
+  attributesSectionsCollapsed: boolean = true
+
   constructor() {
     super()
     const permissionsService = this.permissionsService
@@ -141,9 +143,18 @@ export class AppFrameComponent
   toggleSlimSidebar(): void {
     this.slimSidebarAnimating = true
     this.slimSidebarEnabled = !this.slimSidebarEnabled
+    if (this.slimSidebarEnabled) {
+      this.attributesSectionsCollapsed = true
+    }
     setTimeout(() => {
       this.slimSidebarAnimating = false
     }, 200) // slightly longer than css animation for slim sidebar
+  }
+
+  toggleAttributesSections(event?: Event): void {
+    event?.preventDefault()
+    event?.stopPropagation()
+    this.attributesSectionsCollapsed = !this.attributesSectionsCollapsed
   }
 
   get versionString(): string {
