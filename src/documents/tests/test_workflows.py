@@ -7,6 +7,7 @@ from collections.abc import Callable
 from datetime import timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import Any
 from unittest import mock
 
 import pytest
@@ -4389,7 +4390,7 @@ def resolve_to(monkeypatch: pytest.MonkeyPatch) -> Callable[[str], None]:
             host: str,
             *_args: object,
             **_kwargs: object,
-        ) -> list[tuple]:
+        ) -> list[tuple[Any, ...]]:
             return [(socket.AF_INET, None, None, "", (ip, 0))]
 
         monkeypatch.setattr(socket, "getaddrinfo", fake_getaddrinfo)
