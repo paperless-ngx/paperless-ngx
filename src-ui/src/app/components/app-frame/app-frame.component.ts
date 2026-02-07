@@ -167,7 +167,7 @@ export class AppFrameComponent
     )
   }
 
-  get canManageDocumentProperties(): boolean {
+  get canManageAttributes(): boolean {
     return (
       this.permissionsService.currentUserCan(
         PermissionAction.View,
