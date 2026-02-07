@@ -375,11 +375,9 @@ describe('WorkflowEditDialogComponent', () => {
     component.addAction()
     expect(component.objectForm.get('actions').value[0].email).not.toBeNull()
     expect(component.objectForm.get('actions').value[0].webhook).not.toBeNull()
-    expect(component.objectForm.get('actions').value[0].deletion).not.toBeNull()
     component.save()
     expect(component.objectForm.get('actions').value[0].email).toBeNull()
     expect(component.objectForm.get('actions').value[0].webhook).toBeNull()
-    expect(component.objectForm.get('actions').value[0].deletion).toBeNull()
   })
 
   it('should require matching pattern when algorithm is not none', () => {

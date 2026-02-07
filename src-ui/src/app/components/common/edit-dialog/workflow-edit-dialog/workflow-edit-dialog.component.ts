@@ -145,7 +145,7 @@ export const WORKFLOW_ACTION_OPTIONS = [
   },
   {
     id: WorkflowActionType.Deletion,
-    name: $localize`Delete`,
+    name: $localize`Move to trash`,
   },
 ]
 
@@ -1213,9 +1213,6 @@ export class WorkflowEditDialogComponent
         passwords: new FormControl(
           this.formatPasswords(action.passwords ?? [])
         ),
-        deletion: new FormGroup({
-          id: new FormControl(action.deletion?.id),
-        }),
       }),
       { emitEvent }
     )
@@ -1357,9 +1354,6 @@ export class WorkflowEditDialogComponent
         include_document: false,
       },
       passwords: [],
-      deletion: {
-        id: null,
-      },
     }
     this.object.actions.push(action)
     this.createActionField(action)
@@ -1397,9 +1391,6 @@ export class WorkflowEditDialogComponent
           action.email = null
         }
         action.passwords = this.parsePasswords(action.passwords as any)
-        if (action.type !== WorkflowActionType.Deletion) {
-          action.deletion = null
-        }
       })
     super.save()
   }

@@ -922,7 +922,6 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     "actions": [
                         {
                             "type": WorkflowAction.WorkflowActionType.DELETION,
-                            "deletion": {},
                         },
                     ],
                 },
@@ -947,7 +946,6 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     "actions": [
                         {
                             "type": WorkflowAction.WorkflowActionType.DELETION,
-                            "deletion": {},
                         },
                     ],
                 },
@@ -990,7 +988,6 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                         },
                         {
                             "type": WorkflowAction.WorkflowActionType.DELETION,
-                            "deletion": {},
                         },
                     ],
                 },
@@ -1045,7 +1042,6 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                         },
                         {
                             "type": WorkflowAction.WorkflowActionType.DELETION,
-                            "deletion": {},
                         },
                     ],
                 },
@@ -1083,7 +1079,6 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                         },
                         {
                             "type": WorkflowAction.WorkflowActionType.DELETION,
-                            "deletion": {},
                         },
                     ],
                 },

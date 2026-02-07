@@ -1387,11 +1387,6 @@ class WorkflowActionWebhook(models.Model):
         return f"Workflow Webhook Action {self.pk}"
 
 
-class WorkflowActionDeletion(models.Model):
-    def __str__(self):
-        return f"Workflow Delete Action {self.pk}"
-
-
 class WorkflowAction(models.Model):
     class WorkflowActionType(models.IntegerChoices):
         ASSIGNMENT = (
@@ -1416,7 +1411,7 @@ class WorkflowAction(models.Model):
         )
         DELETION = (
             6,
-            _("Deletion"),
+            _("Move to trash"),
         )
 
     type = models.PositiveIntegerField(
@@ -1654,15 +1649,6 @@ class WorkflowAction(models.Model):
         help_text=_(
             "Passwords to try when removing PDF protection. Separate with commas or new lines.",
         ),
-    )
-
-    deletion = models.ForeignKey(
-        WorkflowActionDeletion,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="action",
-        verbose_name=_("delete"),
     )
 
     class Meta:

@@ -51,7 +51,6 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowAction
-from documents.models import WorkflowActionDeletion
 from documents.models import WorkflowActionEmail
 from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowRun
@@ -3928,14 +3927,8 @@ class TestWorkflows(
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
         )
-        delete_action = WorkflowActionDeletion.objects.create()
-        self.assertEqual(
-            str(delete_action),
-            f"Workflow Delete Action {delete_action.id}",
-        )
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.DELETION,
-            deletion=delete_action,
         )
         w = Workflow.objects.create(
             name="Workflow 1",
@@ -3990,10 +3983,8 @@ class TestWorkflows(
             type=WorkflowAction.WorkflowActionType.EMAIL,
             email=email_action,
         )
-        deletion_action = WorkflowActionDeletion.objects.create()
         deletion_workflow_action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.DELETION,
-            deletion=deletion_action,
         )
         w = Workflow.objects.create(
             name="Workflow with email then deletion",
@@ -4049,10 +4040,8 @@ class TestWorkflows(
             type=WorkflowAction.WorkflowActionType.WEBHOOK,
             webhook=webhook_action,
         )
-        deletion_action = WorkflowActionDeletion.objects.create()
         deletion_workflow_action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.DELETION,
-            deletion=deletion_action,
         )
         w = Workflow.objects.create(
             name="Workflow with webhook then deletion",
@@ -4128,10 +4117,8 @@ class TestWorkflows(
             type=WorkflowAction.WorkflowActionType.EMAIL,
             email=email_action,
         )
-        deletion_action = WorkflowActionDeletion.objects.create()
         deletion_workflow_action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.DELETION,
-            deletion=deletion_action,
         )
         w = Workflow.objects.create(
             name="Workflow with failing email then deletion",
@@ -4175,10 +4162,8 @@ class TestWorkflows(
         trigger1 = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
         )
-        deletion_action = WorkflowActionDeletion.objects.create()
         deletion_workflow_action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.DELETION,
-            deletion=deletion_action,
         )
         w1 = Workflow.objects.create(
             name="Workflow 1 - Deletion",
@@ -4246,10 +4231,8 @@ class TestWorkflows(
             sources=f"{DocumentSource.ConsumeFolder}",
             filter_filename="*",
         )
-        delete_action = WorkflowActionDeletion.objects.create()
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.DELETION,
-            deletion=delete_action,
         )
         w = Workflow.objects.create(
             name="Workflow Delete During Consumption",
@@ -4312,10 +4295,8 @@ class TestWorkflows(
             assign_title="This should not be applied",
             assign_correspondent=self.c,
         )
-        delete_action = WorkflowActionDeletion.objects.create()
         deletion_workflow_action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.DELETION,
-            deletion=delete_action,
         )
         w = Workflow.objects.create(
             name="Workflow Assignment then Delete During Consumption",
