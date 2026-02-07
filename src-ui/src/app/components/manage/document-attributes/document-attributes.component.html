@@ -65,7 +65,7 @@
   @if (canViewTags) {
     <li [ngbNavItem]="DocumentAttributesNavIDs.Tags">
       <a ngbNavLink>
-        <ng-container i18n>Tags</ng-container>
+        <i-bs class="me-1" name="tags"></i-bs><ng-container i18n>Tags</ng-container>
       </a>
       <ng-template ngbNavContent>
         <pngx-tag-list></pngx-tag-list>
@@ -75,7 +75,7 @@
   @if (canViewCorrespondents) {
     <li [ngbNavItem]="DocumentAttributesNavIDs.Correspondents">
       <a ngbNavLink>
-        </i-bs><ng-container i18n>Correspondents</ng-container>
+        <i-bs class="me-1" name="person"></i-bs><ng-container i18n>Correspondents</ng-container>
       </a>
       <ng-template ngbNavContent>
         <pngx-correspondent-list></pngx-correspondent-list>
@@ -85,7 +85,7 @@
   @if (canViewDocumentTypes) {
     <li [ngbNavItem]="DocumentAttributesNavIDs.DocumentTypes">
       <a ngbNavLink>
-        </i-bs><ng-container i18n>Document types</ng-container>
+        <i-bs class="me-1" name="hash"></i-bs><ng-container i18n>Document types</ng-container>
       </a>
       <ng-template ngbNavContent>
         <pngx-document-type-list></pngx-document-type-list>
@@ -95,7 +95,7 @@
   @if (canViewStoragePaths) {
     <li [ngbNavItem]="DocumentAttributesNavIDs.StoragePaths">
       <a ngbNavLink>
-        </i-bs><ng-container i18n>Storage paths</ng-container>
+        <i-bs class="me-1" name="folder"></i-bs><ng-container i18n>Storage paths</ng-container>
       </a>
       <ng-template ngbNavContent>
         <pngx-storage-path-list></pngx-storage-path-list>
@@ -105,7 +105,7 @@
   @if (canViewCustomFields) {
     <li [ngbNavItem]="DocumentAttributesNavIDs.CustomFields">
       <a ngbNavLink>
-        </i-bs><ng-container i18n>Custom fields</ng-container>
+        <i-bs class="me-1" name="ui-radios"></i-bs><ng-container i18n>Custom fields</ng-container>
       </a>
       <ng-template ngbNavContent>
         <pngx-custom-fields></pngx-custom-fields>
