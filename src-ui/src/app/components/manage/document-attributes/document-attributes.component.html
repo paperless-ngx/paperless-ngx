@@ -6,19 +6,19 @@
   [subTitle]="activeTabLabel"
   [loading]="activeHeaderLoading"
   >
-  @if (activeBulkList) {
+  @if (activeAttributeList) {
     <div ngbDropdown class="btn-group flex-fill d-sm-none">
       <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle>
         <i-bs name="text-indent-left"></i-bs>
         <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Select</ng-container></div>
-        @if (activeBulkList.selectedObjects.size > 0) {
-          <pngx-clearable-badge [selected]="activeBulkList.selectedObjects.size > 0" [number]="activeBulkList.selectedObjects.size" (cleared)="activeBulkList.selectNone()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
+        @if (activeAttributeList.selectedObjects.size > 0) {
+          <pngx-clearable-badge [selected]="activeAttributeList.selectedObjects.size > 0" [number]="activeAttributeList.selectedObjects.size" (cleared)="activeAttributeList.selectNone()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
         }
       </button>
       <div ngbDropdownMenu aria-labelledby="dropdownSelectMobile" class="shadow">
-        <button ngbDropdownItem (click)="activeBulkList.selectNone()" i18n>Select none</button>
-        <button ngbDropdownItem (click)="activeBulkList.selectPage(true)" i18n>Select page</button>
-        <button ngbDropdownItem (click)="activeBulkList.selectAll()" i18n>Select all</button>
+        <button ngbDropdownItem (click)="activeAttributeList.selectNone()" i18n>Select none</button>
+        <button ngbDropdownItem (click)="activeAttributeList.selectPage(true)" i18n>Select page</button>
+        <button ngbDropdownItem (click)="activeAttributeList.selectAll()" i18n>Select all</button>
       </div>
     </div>
 
@@ -27,30 +27,30 @@
         <span class="input-group-text border-0" i18n>Select:</span>
       </div>
       <div class="btn-group btn-group-sm flex-nowrap">
-        @if (activeBulkList.selectedObjects.size > 0) {
-          <button class="btn btn-sm btn-outline-secondary" (click)="activeBulkList.selectNone()">
+        @if (activeAttributeList.selectedObjects.size > 0) {
+          <button class="btn btn-sm btn-outline-secondary" (click)="activeAttributeList.selectNone()">
             <i-bs name="slash-circle"></i-bs>&nbsp;<ng-container i18n>None</ng-container>
           </button>
         }
-        <button class="btn btn-sm btn-outline-primary" (click)="activeBulkList.selectPage(true)">
+        <button class="btn btn-sm btn-outline-primary" (click)="activeAttributeList.selectPage(true)">
           <i-bs name="file-earmark-check"></i-bs>&nbsp;<ng-container i18n>Page</ng-container>
         </button>
-        <button class="btn btn-sm btn-outline-primary" (click)="activeBulkList.selectAll()">
+        <button class="btn btn-sm btn-outline-primary" (click)="activeAttributeList.selectAll()">
           <i-bs name="check-all"></i-bs>&nbsp;<ng-container i18n>All</ng-container>
         </button>
       </div>
     </div>
 
-    <button type="button" class="btn btn-sm btn-outline-primary" (click)="activeBulkList.setPermissions()"
-      [disabled]="!activeBulkList.userCanBulkEdit(PermissionAction.Change) || activeBulkList.selectedObjects.size === 0">
+    <button type="button" class="btn btn-sm btn-outline-primary" (click)="activeAttributeList.setPermissions()"
+      [disabled]="!activeAttributeList.userCanBulkEdit(PermissionAction.Change) || activeAttributeList.selectedObjects.size === 0">
       <i-bs name="person-fill-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
     </button>
-    <button type="button" class="btn btn-sm btn-outline-danger" (click)="activeBulkList.delete()"
-      [disabled]="!activeBulkList.userCanBulkEdit(PermissionAction.Delete) || activeBulkList.selectedObjects.size === 0">
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="activeAttributeList.delete()"
+      [disabled]="!activeAttributeList.userCanBulkEdit(PermissionAction.Delete) || activeAttributeList.selectedObjects.size === 0">
       <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
     </button>
-    <button type="button" class="btn btn-sm btn-outline-primary ms-md-5" (click)="activeBulkList.openCreateDialog()"
-      *pngxIfPermissions="{ action: PermissionAction.Add, type: activeBulkList.permissionType }">
+    <button type="button" class="btn btn-sm btn-outline-primary ms-md-5" (click)="activeAttributeList.openCreateDialog()"
+      *pngxIfPermissions="{ action: PermissionAction.Add, type: activeAttributeList.permissionType }">
       <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Create</ng-container>
     </button>
   } @else if (activeCustomFields) {
@@ -62,13 +62,13 @@
 </pngx-page-header>
 
 <ul ngbNav #nav="ngbNav" (navChange)="onNavChange($event)" [(activeId)]="activeNavID" class="nav-tabs">
-  @for (tab of visibleTabs; track tab.id) {
-    <li [ngbNavItem]="tab.id">
+  @for (section of visibleSections; track section.id) {
+    <li [ngbNavItem]="section.id">
       <a ngbNavLink>
-        <i-bs class="me-1" [name]="tab.icon"></i-bs>{{ tab.label }}
+        <i-bs class="me-2" [name]="section.icon"></i-bs>{{ section.label }}
       </a>
       <ng-template ngbNavContent>
-        <ng-container [ngComponentOutlet]="tab.component"></ng-container>
+        <ng-container [ngComponentOutlet]="section.component"></ng-container>
       </ng-template>
     </li>
   }
