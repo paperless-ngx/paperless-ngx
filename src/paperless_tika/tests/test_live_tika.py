@@ -102,6 +102,7 @@ class TestTikaParserAgainstServer:
             [sample_doc_file, "application/msword"],
         )
 
+        assert tika_parser.text is not None
         assert (
             "This is a test document, saved in the older .doc format"
             in tika_parser.text

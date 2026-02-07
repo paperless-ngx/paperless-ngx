@@ -128,6 +128,11 @@ jobs:
       - name: List installed Python dependencies
         run: |
           uv pip list
+      - name: Check typing (pyrefly)
+        run: |
+          uv run pyrefly \
+            check \
+            src/
       - name: Cache Mypy
         uses: actions/cache@v5.0.3
         with:
@@ -137,7 +142,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-mypy-py${{ env.DEFAULT_PYTHON }}-
             ${{ runner.os }}-mypy-
-      - name: Check typing
+      - name: Check typing (mypy)
         run: |
           uv run mypy \
             --show-error-codes \
