@@ -9,7 +9,7 @@ import { of } from 'rxjs'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
-import { PageHeaderComponent } from '../../../common/page-header/page-header.component'
+import { PageHeaderComponent } from '../../../../common/page-header/page-header.component'
 import { DocumentTypeListComponent } from './document-type-list.component'
 
 describe('DocumentTypeListComponent', () => {
