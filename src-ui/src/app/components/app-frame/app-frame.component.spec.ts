@@ -28,7 +28,10 @@ import {
   DjangoMessagesService,
 } from 'src/app/services/django-messages.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
-import { PermissionsService } from 'src/app/services/permissions.service'
+import {
+  PermissionType,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
 import { RemoteVersionService } from 'src/app/services/rest/remote-version.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SearchService } from 'src/app/services/rest/search.service'
@@ -258,7 +261,7 @@ describe('AppFrameComponent', () => {
     const toastSpy = jest.spyOn(toastService, 'showError')
     component.toggleSlimSidebar()
     httpTestingController
-      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .match(`${environment.apiBaseUrl}ui_settings/`)[0]
       .flush('error', {
         status: 500,
         statusText: 'error',
@@ -372,5 +375,37 @@ describe('AppFrameComponent', () => {
 
   it('should call maybeRefreshDocumentCounts after saved views reload', () => {
     expect(maybeRefreshSpy).toHaveBeenCalled()
+  })
+
+  it('should indicate attributes management availability when any permission is granted', () => {
+    jest
+      .spyOn(permissionsService, 'currentUserCan')
+      .mockImplementation((action, type) => {
+        return type === PermissionType.Tag
+      })
+
+    expect(component.canManageAttributes).toBe(true)
+  })
+
+  it('should persist attributes section collapse state', () => {
+    const setSpy = jest.spyOn(settingsService, 'set')
+    jest.spyOn(settingsService, 'storeSettings').mockReturnValue(of(true))
+
+    component.attributesSectionsCollapsed = true
+
+    expect(setSpy).toHaveBeenCalledWith(
+      SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED,
+      ['attributes']
+    )
+  })
+
+  it('should collapse attributes sections when enabling slim sidebar', () => {
+    jest.spyOn(settingsService, 'storeSettings').mockReturnValue(of(true))
+    settingsService.set(SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED, [])
+    settingsService.set(SETTINGS_KEYS.SLIM_SIDEBAR, false)
+
+    component.toggleSlimSidebar()
+
+    expect(component.attributesSectionsCollapsed).toBe(true)
   })
 })
