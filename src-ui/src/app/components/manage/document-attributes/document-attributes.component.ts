@@ -4,8 +4,10 @@ import {
   inject,
   OnDestroy,
   OnInit,
+  QueryList,
   Type,
   ViewChild,
+  ViewChildren,
 } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import {
@@ -38,15 +40,15 @@ enum DocumentAttributesNavIDs {
   CustomFields = 5,
 }
 
-type DocumentAttributesTabKind = 'bulk' | 'customFields'
+type DocumentAttributesSectionKind = 'attributeList' | 'customFields'
 
-interface DocumentAttributesTab {
+interface DocumentAttributesSection {
   id: DocumentAttributesNavIDs
-  section: string
+  path: string
   label: string
   icon: string
   permissionType: PermissionType
-  kind: DocumentAttributesTabKind
+  kind: DocumentAttributesSectionKind
   component: Type<any>
 }
 
@@ -73,46 +75,46 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
   protected readonly PermissionAction = PermissionAction
   protected readonly PermissionType = PermissionType
 
-  readonly tabs: DocumentAttributesTab[] = [
+  readonly sections: DocumentAttributesSection[] = [
     {
       id: DocumentAttributesNavIDs.Tags,
-      section: 'tags',
+      path: 'tags',
       label: $localize`Tags`,
       icon: 'tags',
       permissionType: PermissionType.Tag,
-      kind: 'bulk',
+      kind: 'attributeList',
       component: TagListComponent,
     },
     {
       id: DocumentAttributesNavIDs.Correspondents,
-      section: 'correspondents',
+      path: 'correspondents',
       label: $localize`Correspondents`,
       icon: 'person',
       permissionType: PermissionType.Correspondent,
-      kind: 'bulk',
+      kind: 'attributeList',
       component: CorrespondentListComponent,
     },
     {
       id: DocumentAttributesNavIDs.DocumentTypes,
-      section: 'documenttypes',
+      path: 'documenttypes',
       label: $localize`Document types`,
       icon: 'hash',
       permissionType: PermissionType.DocumentType,
-      kind: 'bulk',
+      kind: 'attributeList',
       component: DocumentTypeListComponent,
     },
     {
       id: DocumentAttributesNavIDs.StoragePaths,
-      section: 'storagepaths',
+      path: 'storagepaths',
       label: $localize`Storage paths`,
       icon: 'folder',
       permissionType: PermissionType.StoragePath,
-      kind: 'bulk',
+      kind: 'attributeList',
       component: StoragePathListComponent,
     },
     {
       id: DocumentAttributesNavIDs.CustomFields,
-      section: 'customfields',
+      path: 'customfields',
       label: $localize`Custom fields`,
       icon: 'ui-radios',
       permissionType: PermissionType.CustomField,
@@ -121,59 +123,54 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
     },
   ]
 
-  @ViewChild(TagListComponent) private tagList?: TagListComponent
-  @ViewChild(CorrespondentListComponent)
-  private correspondentList?: CorrespondentListComponent
-  @ViewChild(DocumentTypeListComponent)
-  private documentTypeList?: DocumentTypeListComponent
-  @ViewChild(StoragePathListComponent)
-  private storagePathList?: StoragePathListComponent
-  @ViewChild(CustomFieldsComponent)
-  private customFields?: CustomFieldsComponent
+  @ViewChildren(ManagementListComponent)
+  private attributeLists?: QueryList<ManagementListComponent<any>>
+
+  @ViewChild(CustomFieldsComponent) private customFields?: CustomFieldsComponent
 
   activeNavID: number = null
 
-  get visibleTabs(): DocumentAttributesTab[] {
-    return this.tabs.filter((tab) =>
+  get visibleSections(): DocumentAttributesSection[] {
+    return this.sections.filter((section) =>
       this.permissionsService.currentUserCan(
         PermissionAction.View,
-        tab.permissionType
+        section.permissionType
       )
     )
   }
 
-  get activeTab(): DocumentAttributesTab | null {
-    return this.visibleTabs.find((t) => t.id === this.activeNavID) ?? null
+  get activeSection(): DocumentAttributesSection | null {
+    return (
+      this.visibleSections.find((section) => section.id === this.activeNavID) ??
+      null
+    )
   }
 
-  get activeBulkList(): ManagementListComponent<any> | null {
-    switch (this.activeNavID) {
-      case DocumentAttributesNavIDs.Tags:
-        return this.tagList ?? null
-      case DocumentAttributesNavIDs.Correspondents:
-        return this.correspondentList ?? null
-      case DocumentAttributesNavIDs.DocumentTypes:
-        return this.documentTypeList ?? null
-      case DocumentAttributesNavIDs.StoragePaths:
-        return this.storagePathList ?? null
-      default:
-        return null
-    }
+  get activeAttributeList(): ManagementListComponent<any> | null {
+    if (this.activeSection?.kind !== 'attributeList') return null
+    const permissionType = this.activeSection.permissionType
+    return (
+      this.attributeLists?.find(
+        (list) => list.permissionType === permissionType
+      ) ?? null
+    )
   }
 
   get activeCustomFields(): CustomFieldsComponent | null {
-    return this.activeNavID === DocumentAttributesNavIDs.CustomFields
+    return this.activeSection?.kind === 'customFields'
       ? (this.customFields ?? null)
       : null
   }
 
   get activeTabLabel(): string {
-    return this.activeTab?.label ?? ''
+    return this.activeSection?.label ?? ''
   }
 
   get activeHeaderLoading(): boolean {
     return (
-      this.activeBulkList?.loading ?? this.activeCustomFields?.loading ?? false
+      this.activeAttributeList?.loading ??
+      this.activeCustomFields?.loading ??
+      false
     )
   }
 
@@ -217,19 +214,19 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
   }
 
   private getDefaultNavID(): DocumentAttributesNavIDs | null {
-    return this.visibleTabs[0]?.id ?? null
+    return this.visibleSections[0]?.id ?? null
   }
 
   private getNavIDForSection(section: string): DocumentAttributesNavIDs | null {
-    const sectionKey = section?.toLowerCase()
-    if (!sectionKey) return null
+    const path = section?.toLowerCase()
+    if (!path) return null
 
-    const tab = this.visibleTabs.find((t) => t.section === sectionKey)
-    return tab?.id ?? null
+    const found = this.visibleSections.find((s) => s.path === path)
+    return found?.id ?? null
   }
 
   private getSectionForNavID(navID: number): string | null {
-    const tab = this.visibleTabs.find((t) => t.id === navID)
-    return tab?.section ?? null
+    const section = this.visibleSections.find((s) => s.id === navID)
+    return section?.path ?? null
   }
 }
