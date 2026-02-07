@@ -47,6 +47,7 @@ interface DocumentAttributesSection {
   path: string
   label: string
   icon: string
+  infoLink?: string
   permissionType: PermissionType
   kind: DocumentAttributesSectionKind
   component: Type<any>
@@ -81,6 +82,7 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
       path: 'tags',
       label: $localize`Tags`,
       icon: 'tags',
+      infoLink: 'usage/#terms-and-definitions',
       permissionType: PermissionType.Tag,
       kind: 'attributeList',
       component: TagListComponent,
@@ -90,6 +92,7 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
       path: 'correspondents',
       label: $localize`Correspondents`,
       icon: 'person',
+      infoLink: 'usage/#terms-and-definitions',
       permissionType: PermissionType.Correspondent,
       kind: 'attributeList',
       component: CorrespondentListComponent,
@@ -99,6 +102,7 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
       path: 'documenttypes',
       label: $localize`Document types`,
       icon: 'hash',
+      infoLink: 'usage/#terms-and-definitions',
       permissionType: PermissionType.DocumentType,
       kind: 'attributeList',
       component: DocumentTypeListComponent,
@@ -108,6 +112,7 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
       path: 'storagepaths',
       label: $localize`Storage paths`,
       icon: 'folder',
+      infoLink: 'usage/#terms-and-definitions',
       permissionType: PermissionType.StoragePath,
       kind: 'attributeList',
       component: StoragePathListComponent,
@@ -117,6 +122,7 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
       path: 'customfields',
       label: $localize`Custom fields`,
       icon: 'ui-radios',
+      infoLink: 'usage/#custom-fields',
       permissionType: PermissionType.CustomField,
       kind: 'customFields',
       component: CustomFieldsComponent,
@@ -164,6 +170,10 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
 
   get activeTabLabel(): string {
     return this.activeSection?.label ?? ''
+  }
+
+  get activeInfoLink(): string {
+    return this.activeSection?.infoLink ?? null
   }
 
   get activeHeaderLoading(): boolean {
