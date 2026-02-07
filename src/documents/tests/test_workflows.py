@@ -3,6 +3,7 @@ import json
 import shutil
 import socket
 import tempfile
+from collections.abc import Callable
 from datetime import timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -4091,7 +4092,7 @@ class TestWorkflows(
         PAPERLESS_URL="http://localhost:8000",
     )
     @mock.patch("django.core.mail.message.EmailMessage.send")
-    def test_workflow_deletion_after_email_failure(self, mock_email_send):
+    def test_workflow_deletion_after_email_failure(self, mock_email_send) -> None:
         """
         GIVEN:
             - Workflow with email action (that fails), then deletion action
@@ -4378,13 +4379,13 @@ class TestWebhookSend:
 
 
 @pytest.fixture
-def resolve_to(monkeypatch):
+def resolve_to(monkeypatch: pytest.MonkeyPatch) -> Callable[[str], None]:
     """
     Force DNS resolution to a specific IP for any hostname.
     """
 
-    def _set(ip: str):
-        def fake_getaddrinfo(host, *_args, **_kwargs):
+    def _set(ip: str) -> None:
+        def fake_getaddrinfo(host: str, *_args: object, **_kwargs: object) -> list:
             return [(socket.AF_INET, None, None, "", (ip, 0))]
 
         monkeypatch.setattr(socket, "getaddrinfo", fake_getaddrinfo)
@@ -4591,7 +4592,7 @@ class TestDateWorkflowLocalization(
         self,
         title_template: str,
         expected_title: str,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Document added workflow with title template using localize_date filter
@@ -4656,7 +4657,7 @@ class TestDateWorkflowLocalization(
         self,
         title_template: str,
         expected_title: str,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Document updated workflow with title template using localize_date filter
@@ -4732,7 +4733,7 @@ class TestDateWorkflowLocalization(
         settings: SettingsWrapper,
         title_template: str,
         expected_title: str,
-    ):
+    ) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
             sources=f"{DocumentSource.ApiUpload}",

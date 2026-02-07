@@ -784,7 +784,7 @@ def run_workflows(
     workflows = get_workflows_for_trigger(trigger_type, workflow_to_run)
 
     for workflow in workflows:
-        if not use_overrides:
+        if isinstance(document, Document) and not use_overrides:
             try:
                 # This can be called from bulk_update_documents, which may be running multiple times
                 # Refresh this so the matching data is fresh and instance fields are re-freshed
@@ -870,10 +870,10 @@ def run_workflows(
             )
 
             if has_deletion_action:
-                if use_overrides:
-                    execute_deletion_action_consumption(action, document, logging_group)
-                else:
+                if isinstance(document, Document) and not use_overrides:
                     execute_deletion_action(action, document, logging_group)
+                else:
+                    execute_deletion_action_consumption(action, document, logging_group)
 
     if use_overrides:
         return overrides, "\n".join(messages)

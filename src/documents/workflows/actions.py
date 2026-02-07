@@ -1,5 +1,6 @@
 import logging
 import re
+import uuid
 from pathlib import Path
 
 from django.conf import settings
@@ -344,7 +345,7 @@ def execute_password_removal_action(
 def execute_deletion_action(
     action: WorkflowAction,
     document: Document,
-    logging_group,
+    logging_group: uuid.UUID,
 ) -> None:
     """
     Execute a deletion action for a workflow on an existing document.
@@ -360,7 +361,7 @@ def execute_deletion_action(
 def execute_deletion_action_consumption(
     action: WorkflowAction,
     document: ConsumableDocument,
-    logging_group,
+    logging_group: uuid.UUID,
 ) -> None:
     """
     Execute a deletion action for a workflow during consumption.

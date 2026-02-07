@@ -897,7 +897,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                 str(response.data["non_field_errors"][0]),
             )
 
-    def test_deletion_action_validation(self):
+    def test_deletion_action_validation(self) -> None:
         """
         GIVEN:
             - API request to create a workflow with a deletion action
@@ -954,7 +954,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_deletion_action_as_last_action_valid(self):
+    def test_deletion_action_as_last_action_valid(self) -> None:
         """
         GIVEN:
             - API request to create a workflow with multiple actions
@@ -996,7 +996,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_update_workflow_add_deletion_at_end_valid(self):
+    def test_update_workflow_add_deletion_at_end_valid(self) -> None:
         """
         GIVEN:
             - Existing workflow without deletion action
@@ -1050,7 +1050,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_update_workflow_remove_deletion_action_valid(self):
+    def test_update_workflow_remove_deletion_action_valid(self) -> None:
         """
         GIVEN:
             - Existing workflow with deletion action
