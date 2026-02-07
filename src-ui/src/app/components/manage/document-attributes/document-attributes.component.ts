@@ -15,12 +15,12 @@ import {
 } from 'src/app/services/permissions.service'
 import { ClearableBadgeComponent } from '../../common/clearable-badge/clearable-badge.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
-import { CorrespondentListComponent } from '../correspondent-list/correspondent-list.component'
 import { CustomFieldsComponent } from '../custom-fields/custom-fields.component'
-import { DocumentTypeListComponent } from '../document-type-list/document-type-list.component'
+import { CorrespondentListComponent } from '../management-list/correspondent-list/correspondent-list.component'
+import { DocumentTypeListComponent } from '../management-list/document-type-list/document-type-list.component'
 import { ManagementListComponent } from '../management-list/management-list.component'
-import { StoragePathListComponent } from '../storage-path-list/storage-path-list.component'
-import { TagListComponent } from '../tag-list/tag-list.component'
+import { StoragePathListComponent } from '../management-list/storage-path-list/storage-path-list.component'
+import { TagListComponent } from '../management-list/tag-list/tag-list.component'
 
 enum DocumentAttributesNavIDs {
   Tags = 1,

@@ -14,13 +14,13 @@ import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { PermissionType } from 'src/app/services/permissions.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
-import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
-import { ManagementListComponent } from '../management-list/management-list.component'
+import { CorrespondentEditDialogComponent } from '../../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
+import { ManagementListComponent } from '../management-list.component'
 
 @Component({
   selector: 'pngx-correspondent-list',
-  templateUrl: './../management-list/management-list.component.html',
-  styleUrls: ['./../management-list/management-list.component.scss'],
+  templateUrl: './../management-list.component.html',
+  styleUrls: ['./../management-list.component.scss'],
   providers: [{ provide: CustomDatePipe }],
   imports: [
     SortableDirective,

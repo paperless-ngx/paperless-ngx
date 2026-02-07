@@ -48,8 +48,8 @@ import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dial
 import { EditDialogComponent } from '../../common/edit-dialog/edit-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
-import { TagListComponent } from '../tag-list/tag-list.component'
 import { ManagementListComponent } from './management-list.component'
+import { TagListComponent } from './tag-list/tag-list.component'
 
 const tags: Tag[] = [
   {

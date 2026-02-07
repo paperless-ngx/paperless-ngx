@@ -13,13 +13,13 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { PermissionType } from 'src/app/services/permissions.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
-import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
-import { ManagementListComponent } from '../management-list/management-list.component'
+import { DocumentTypeEditDialogComponent } from '../../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
+import { ManagementListComponent } from '../management-list.component'
 
 @Component({
   selector: 'pngx-document-type-list',
-  templateUrl: './../management-list/management-list.component.html',
-  styleUrls: ['./../management-list/management-list.component.scss'],
+  templateUrl: './../management-list.component.html',
+  styleUrls: ['./../management-list.component.scss'],
   imports: [
     SortableDirective,
     IfPermissionsDirective,
