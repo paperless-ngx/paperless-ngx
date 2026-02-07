@@ -252,8 +252,10 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
         """
         self._assert_query_match_predicate(
             ["url_field", "exact", "https://docs.paperless-ngx.com/"],
-            lambda document: "url_field" in document
-            and document["url_field"] == "https://docs.paperless-ngx.com/",
+            lambda document: (
+                "url_field" in document
+                and document["url_field"] == "https://docs.paperless-ngx.com/"
+            ),
         )
 
     def test_filter_by_multiple_fields(self) -> None:
@@ -277,22 +279,26 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
     def test_exact(self) -> None:
         self._assert_query_match_predicate(
             ["string_field", "exact", "paperless"],
-            lambda document: "string_field" in document
-            and document["string_field"] == "paperless",
+            lambda document: (
+                "string_field" in document and document["string_field"] == "paperless"
+            ),
         )
 
     def test_in(self) -> None:
         self._assert_query_match_predicate(
             ["string_field", "in", ["paperless", "Paperless"]],
-            lambda document: "string_field" in document
-            and document["string_field"] in ("paperless", "Paperless"),
+            lambda document: (
+                "string_field" in document
+                and document["string_field"] in ("paperless", "Paperless")
+            ),
         )
 
     def test_isnull(self) -> None:
         self._assert_query_match_predicate(
             ["string_field", "isnull", True],
-            lambda document: "string_field" in document
-            and document["string_field"] is None,
+            lambda document: (
+                "string_field" in document and document["string_field"] is None
+            ),
         )
 
     def test_exists(self) -> None:
@@ -312,14 +318,16 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
         # or the name of the option. They function exactly the same.
         self._assert_query_match_predicate(
             ["select_field", "exact", "def-456"],
-            lambda document: "select_field" in document
-            and document["select_field"] == "def-456",
+            lambda document: (
+                "select_field" in document and document["select_field"] == "def-456"
+            ),
         )
         # This is the same as:
         self._assert_query_match_predicate(
             ["select_field", "exact", "B"],
-            lambda document: "select_field" in document
-            and document["select_field"] == "def-456",
+            lambda document: (
+                "select_field" in document and document["select_field"] == "def-456"
+            ),
         )
 
     # ==========================================================#
@@ -328,25 +336,31 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
     def test_icontains(self) -> None:
         self._assert_query_match_predicate(
             ["string_field", "icontains", "aper"],
-            lambda document: "string_field" in document
-            and document["string_field"] is not None
-            and "aper" in document["string_field"].lower(),
+            lambda document: (
+                "string_field" in document
+                and document["string_field"] is not None
+                and "aper" in document["string_field"].lower()
+            ),
         )
 
     def test_istartswith(self) -> None:
         self._assert_query_match_predicate(
             ["string_field", "istartswith", "paper"],
-            lambda document: "string_field" in document
-            and document["string_field"] is not None
-            and document["string_field"].lower().startswith("paper"),
+            lambda document: (
+                "string_field" in document
+                and document["string_field"] is not None
+                and document["string_field"].lower().startswith("paper")
+            ),
         )
 
     def test_iendswith(self) -> None:
         self._assert_query_match_predicate(
             ["string_field", "iendswith", "less"],
-            lambda document: "string_field" in document
-            and document["string_field"] is not None
-            and document["string_field"].lower().endswith("less"),
+            lambda document: (
+                "string_field" in document
+                and document["string_field"] is not None
+                and document["string_field"].lower().endswith("less")
+            ),
         )
 
     def test_url_field_istartswith(self) -> None:
@@ -354,9 +368,11 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
         # Just showing one of them here.
         self._assert_query_match_predicate(
             ["url_field", "istartswith", "http://"],
-            lambda document: "url_field" in document
-            and document["url_field"] is not None
-            and document["url_field"].startswith("http://"),
+            lambda document: (
+                "url_field" in document
+                and document["url_field"] is not None
+                and document["url_field"].startswith("http://")
+            ),
         )
 
     # ==========================================================#
@@ -365,41 +381,51 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
     def test_gt(self) -> None:
         self._assert_query_match_predicate(
             ["date_field", "gt", date(2024, 8, 22).isoformat()],
-            lambda document: "date_field" in document
-            and document["date_field"] is not None
-            and document["date_field"] > date(2024, 8, 22),
+            lambda document: (
+                "date_field" in document
+                and document["date_field"] is not None
+                and document["date_field"] > date(2024, 8, 22)
+            ),
         )
 
     def test_gte(self) -> None:
         self._assert_query_match_predicate(
             ["date_field", "gte", date(2024, 8, 22).isoformat()],
-            lambda document: "date_field" in document
-            and document["date_field"] is not None
-            and document["date_field"] >= date(2024, 8, 22),
+            lambda document: (
+                "date_field" in document
+                and document["date_field"] is not None
+                and document["date_field"] >= date(2024, 8, 22)
+            ),
         )
 
     def test_lt(self) -> None:
         self._assert_query_match_predicate(
             ["integer_field", "lt", 0],
-            lambda document: "integer_field" in document
-            and document["integer_field"] is not None
-            and document["integer_field"] < 0,
+            lambda document: (
+                "integer_field" in document
+                and document["integer_field"] is not None
+                and document["integer_field"] < 0
+            ),
         )
 
     def test_lte(self) -> None:
         self._assert_query_match_predicate(
             ["integer_field", "lte", 0],
-            lambda document: "integer_field" in document
-            and document["integer_field"] is not None
-            and document["integer_field"] <= 0,
+            lambda document: (
+                "integer_field" in document
+                and document["integer_field"] is not None
+                and document["integer_field"] <= 0
+            ),
         )
 
     def test_range(self) -> None:
         self._assert_query_match_predicate(
             ["float_field", "range", [-0.05, 0.05]],
-            lambda document: "float_field" in document
-            and document["float_field"] is not None
-            and -0.05 <= document["float_field"] <= 0.05,
+            lambda document: (
+                "float_field" in document
+                and document["float_field"] is not None
+                and -0.05 <= document["float_field"] <= 0.05
+            ),
         )
 
     def test_date_modifier(self) -> None:
@@ -407,19 +433,23 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
         # with the part of the date you are comparing with.
         self._assert_query_match_predicate(
             ["date_field", "year__gte", 2024],
-            lambda document: "date_field" in document
-            and document["date_field"] is not None
-            and document["date_field"].year >= 2024,
+            lambda document: (
+                "date_field" in document
+                and document["date_field"] is not None
+                and document["date_field"].year >= 2024
+            ),
         )
 
     def test_gt_monetary(self) -> None:
         self._assert_query_match_predicate(
             ["monetary_field", "gt", "99"],
-            lambda document: "monetary_field" in document
-            and document["monetary_field"] is not None
-            and (
-                document["monetary_field"] == "USD100.00"  # With currency symbol
-                or document["monetary_field"] == "101.00"  # No currency symbol
+            lambda document: (
+                "monetary_field" in document
+                and document["monetary_field"] is not None
+                and (
+                    document["monetary_field"] == "USD100.00"  # With currency symbol
+                    or document["monetary_field"] == "101.00"  # No currency symbol
+                )
             ),
         )
 
@@ -430,24 +460,30 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
         # Document link field "contains" performs a subset check.
         self._assert_query_match_predicate(
             ["documentlink_field", "contains", [1, 2]],
-            lambda document: "documentlink_field" in document
-            and document["documentlink_field"] is not None
-            and set(document["documentlink_field"]) >= {1, 2},
+            lambda document: (
+                "documentlink_field" in document
+                and document["documentlink_field"] is not None
+                and set(document["documentlink_field"]) >= {1, 2}
+            ),
         )
         # The order of IDs don't matter - this is the same as above.
         self._assert_query_match_predicate(
             ["documentlink_field", "contains", [2, 1]],
-            lambda document: "documentlink_field" in document
-            and document["documentlink_field"] is not None
-            and set(document["documentlink_field"]) >= {1, 2},
+            lambda document: (
+                "documentlink_field" in document
+                and document["documentlink_field"] is not None
+                and set(document["documentlink_field"]) >= {1, 2}
+            ),
         )
 
     def test_document_link_contains_empty_set(self) -> None:
         # An empty set is a subset of any set.
         self._assert_query_match_predicate(
             ["documentlink_field", "contains", []],
-            lambda document: "documentlink_field" in document
-            and document["documentlink_field"] is not None,
+            lambda document: (
+                "documentlink_field" in document
+                and document["documentlink_field"] is not None
+            ),
         )
 
     def test_document_link_contains_no_reverse_link(self) -> None:
@@ -455,9 +491,11 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
         # doesn't have a document link field and thus has no reverse link.
         self._assert_query_match_predicate(
             ["documentlink_field", "contains", [self.documents[6].id]],
-            lambda document: "documentlink_field" in document
-            and document["documentlink_field"] is not None
-            and set(document["documentlink_field"]) >= {self.documents[6].id},
+            lambda document: (
+                "documentlink_field" in document
+                and document["documentlink_field"] is not None
+                and set(document["documentlink_field"]) >= {self.documents[6].id}
+            ),
             match_nothing_ok=True,
         )
 
@@ -470,10 +508,12 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
                 "AND",
                 [["date_field", "year__exact", 2024], ["date_field", "month__lt", 9]],
             ],
-            lambda document: "date_field" in document
-            and document["date_field"] is not None
-            and document["date_field"].year == 2024
-            and document["date_field"].month < 9,
+            lambda document: (
+                "date_field" in document
+                and document["date_field"] is not None
+                and document["date_field"].year == 2024
+                and document["date_field"].month < 9
+            ),
         )
 
     def test_logical_or(self) -> None:
@@ -483,8 +523,9 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
                 "OR",
                 [["string_field", "exact", ""], ["string_field", "isnull", True]],
             ],
-            lambda document: "string_field" in document
-            and not bool(document["string_field"]),
+            lambda document: (
+                "string_field" in document and not bool(document["string_field"])
+            ),
         )
 
     def test_logical_not(self) -> None:
@@ -495,8 +536,11 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
                 "NOT",
                 ["string_field", "exact", "paperless"],
             ],
-            lambda document: not (
-                "string_field" in document and document["string_field"] == "paperless"
+            lambda document: (
+                not (
+                    "string_field" in document
+                    and document["string_field"] == "paperless"
+                )
             ),
         )
 

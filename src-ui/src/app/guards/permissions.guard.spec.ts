@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing'
 import { ActivatedRoute, RouterState } from '@angular/router'
-import { TourService } from 'ngx-ui-tour-ng-bootstrap'
+import { provideUiTour, TourService } from 'ngx-ui-tour-ng-bootstrap'
 import {
   PermissionAction,
-  PermissionType,
   PermissionsService,
+  PermissionType,
 } from '../services/permissions.service'
 import { ToastService } from '../services/toast.service'
 import { PermissionsGuard } from './permissions.guard'
@@ -45,6 +45,7 @@ describe('PermissionsGuard', () => {
         },
         TourService,
         ToastService,
+        provideUiTour(),
       ],
     })
 

@@ -145,7 +145,6 @@ import {
 } from 'ngx-bootstrap-icons'
 import { ColorSliderModule } from 'ngx-color/slider'
 import { CookieService } from 'ngx-cookie-service'
-import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { AppRoutingModule } from './app/app-routing.module'
 import { AppComponent } from './app/app.component'
 import { DirtyDocGuard } from './app/guards/dirty-doc.guard'
@@ -195,6 +194,7 @@ import localeUk from '@angular/common/locales/uk'
 import localeVi from '@angular/common/locales/vi'
 import localeZh from '@angular/common/locales/zh'
 import localeZhHant from '@angular/common/locales/zh-Hant'
+import { provideUiTour } from 'ngx-ui-tour-ng-bootstrap'
 import { CorrespondentNamePipe } from './app/pipes/correspondent-name.pipe'
 import { DocumentTypeNamePipe } from './app/pipes/document-type-name.pipe'
 import { StoragePathNamePipe } from './app/pipes/storage-path-name.pipe'
@@ -374,7 +374,6 @@ bootstrapApplication(AppComponent, {
       PdfViewerModule,
       NgSelectModule,
       ColorSliderModule,
-      TourNgBootstrapModule,
       DragDropModule,
       NgxBootstrapIconsModule.pick(icons)
     ),
@@ -397,5 +396,16 @@ bootstrapApplication(AppComponent, {
       withInterceptors([withCsrfInterceptor, withApiVersionInterceptor]),
       withFetch()
     ),
+    provideUiTour({
+      enableBackdrop: true,
+      backdropConfig: {
+        offset: 10,
+      },
+      prevBtnTitle: $localize`Prev`,
+      nextBtnTitle: $localize`Next`,
+      endBtnTitle: $localize`End`,
+      isOptional: true,
+      useLegacyTitle: true,
+    }),
   ],
 }).catch((err) => console.error(err))

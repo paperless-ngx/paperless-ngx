@@ -1362,7 +1362,7 @@ def _get_nltk_language_setting(ocr_lang: str) -> str | None:
     The common intersection between all languages in those 3 is handled here
 
     """
-    ocr_lang = ocr_lang.split("+")[0]
+    ocr_lang = ocr_lang.split("+", maxsplit=1)[0]
     iso_code_to_nltk = {
         "dan": "danish",
         "nld": "dutch",

@@ -81,7 +81,7 @@ first-time setup.
 5.  Install pre-commit hooks:
 
     ```bash
-    $ uv run pre-commit install
+    $ uv run prek install
     ```
 
 6.  Apply migrations and create a superuser (also can be done via the web UI) for your development instance:
@@ -217,7 +217,7 @@ commit. See [above](#code-formatting-with-pre-commit-hooks) for installation ins
 command such as
 
 ```bash
-$ git ls-files -- '*.ts' | xargs pre-commit run prettier --files
+$ git ls-files -- '*.ts' | xargs prek run prettier --files
 ```
 
 Front end testing uses Jest and Playwright. Unit tests and e2e tests,
@@ -481,3 +481,147 @@ To get started:
 
 5. The project is ready for debugging, start either run the fullstack debug or individual debug
    processes. Yo spin up the project without debugging run the task **Project Start: Run all Services**
+
+## Developing Date Parser Plugins
+
+Paperless-ngx uses a plugin system for date parsing, allowing you to extend or replace the default date parsing behavior. Plugins are discovered using [Python entry points](https://setuptools.pypa.io/en/latest/userguide/entry_point.html).
+
+### Creating a Date Parser Plugin
+
+To create a custom date parser plugin, you need to:
+
+1. Create a class that inherits from `DateParserPluginBase`
+2. Implement the required abstract method
+3. Register your plugin via an entry point
+
+#### 1. Implementing the Parser Class
+
+Your parser must extend `documents.plugins.date_parsing.DateParserPluginBase` and implement the `parse` method:
+
+```python
+from collections.abc import Iterator
+import datetime
+
+from documents.plugins.date_parsing import DateParserPluginBase
+
+
+class MyDateParserPlugin(DateParserPluginBase):
+    """
+    Custom date parser implementation.
+    """
+
+    def parse(self, filename: str, content: str) -> Iterator[datetime.datetime]:
+        """
+        Parse dates from the document's filename and content.
+
+        Args:
+            filename: The original filename of the document
+            content: The extracted text content of the document
+
+        Yields:
+            datetime.datetime: Valid datetime objects found in the document
+        """
+        # Your parsing logic here
+        # Use self.config to access configuration settings
+
+        # Example: parse dates from filename first
+        if self.config.filename_date_order:
+            # Your filename parsing logic
+            yield some_datetime
+
+        # Then parse dates from content
+        # Your content parsing logic
+        yield another_datetime
+```
+
+#### 2. Configuration and Helper Methods
+
+Your parser instance is initialized with a `DateParserConfig` object accessible via `self.config`. This provides:
+
+-   `languages: list[str]` - List of language codes for date parsing
+-   `timezone_str: str` - Timezone string for date localization
+-   `ignore_dates: set[datetime.date]` - Dates that should be filtered out
+-   `reference_time: datetime.datetime` - Current time for filtering future dates
+-   `filename_date_order: str | None` - Date order preference for filenames (e.g., "DMY", "MDY")
+-   `content_date_order: str` - Date order preference for content
+
+The base class provides two helper methods you can use:
+
+```python
+def _parse_string(
+    self,
+    date_string: str,
+    date_order: str,
+) -> datetime.datetime | None:
+    """
+    Parse a single date string using dateparser with configured settings.
+    """
+
+def _filter_date(
+    self,
+    date: datetime.datetime | None,
+) -> datetime.datetime | None:
+    """
+    Validate a parsed datetime against configured rules.
+    Filters out dates before 1900, future dates, and ignored dates.
+    """
+```
+
+#### 3. Resource Management (Optional)
+
+If your plugin needs to acquire or release resources (database connections, API clients, etc.), override the context manager methods. Paperless-ngx will always use plugins as context managers, ensuring resources can be released even in the event of errors.
+
+#### 4. Registering Your Plugin
+
+Register your plugin using a setuptools entry point in your package's `pyproject.toml`:
+
+```toml
+[project.entry-points."paperless_ngx.date_parsers"]
+my_parser = "my_package.parsers:MyDateParserPlugin"
+```
+
+The entry point name (e.g., `"my_parser"`) is used for sorting when multiple plugins are found. Paperless-ngx will use the first plugin alphabetically by name if multiple plugins are discovered.
+
+### Plugin Discovery
+
+Paperless-ngx automatically discovers and loads date parser plugins at runtime. The discovery process:
+
+1. Queries the `paperless_ngx.date_parsers` entry point group
+2. Validates that each plugin is a subclass of `DateParserPluginBase`
+3. Sorts valid plugins alphabetically by entry point name
+4. Uses the first valid plugin, or falls back to the default `RegexDateParserPlugin` if none are found
+
+If multiple plugins are installed, a warning is logged indicating which plugin was selected.
+
+### Example: Simple Date Parser
+
+Here's a minimal example that only looks for ISO 8601 dates:
+
+```python
+import datetime
+import re
+from collections.abc import Iterator
+
+from documents.plugins.date_parsing.base import DateParserPluginBase
+
+
+class ISODateParserPlugin(DateParserPluginBase):
+    """
+    Parser that only matches ISO 8601 formatted dates (YYYY-MM-DD).
+    """
+
+    ISO_REGEX = re.compile(r"\b(\d{4}-\d{2}-\d{2})\b")
+
+    def parse(self, filename: str, content: str) -> Iterator[datetime.datetime]:
+        # Combine filename and content for searching
+        text = f"{filename} {content}"
+
+        for match in self.ISO_REGEX.finditer(text):
+            date_string = match.group(1)
+            # Use helper method to parse with configured timezone
+            date = self._parse_string(date_string, "YMD")
+            # Use helper method to validate the date
+            filtered_date = self._filter_date(date)
+            if filtered_date is not None:
+                yield filtered_date
+```

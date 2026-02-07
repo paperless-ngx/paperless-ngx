@@ -7,7 +7,7 @@
     "containerEnv": {
         "UV_CACHE_DIR": "/usr/src/paperless/paperless-ngx/.uv-cache"
     },
-    "postCreateCommand": "/bin/bash -c 'rm -rf .venv/.* && uv sync --group dev && uv run pre-commit install'",
+    "postCreateCommand": "/bin/bash -c 'rm -rf .venv/.* && uv sync --group dev && uv run prek install'",
     "customizations": {
         "vscode": {
             "extensions": [
