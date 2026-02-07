@@ -68,11 +68,13 @@
       <a ngbNavLink>
         <i-bs class="me-2" [name]="section.icon"></i-bs>{{ section.label }}
       </a>
-      <ng-template ngbNavContent>
-        <ng-container [ngComponentOutlet]="section.component"></ng-container>
-      </ng-template>
     </li>
   }
 </ul>
 
-<div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>
+<div class="border-start border-end border-bottom p-3 mb-3 shadow-sm">
+  <ng-container
+    [ngComponentOutlet]="activeSection?.component"
+    #activeOutlet="ngComponentOutlet"
+  ></ng-container>
+</div>
