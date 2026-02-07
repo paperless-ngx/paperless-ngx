@@ -7,6 +7,7 @@ import {
   NgbPaginationModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { CorrespondentEditDialogComponent } from 'src/app/components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { Correspondent } from 'src/app/data/correspondent'
 import { FILTER_HAS_CORRESPONDENT_ANY } from 'src/app/data/filter-rule-type'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
@@ -14,7 +15,6 @@ import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { PermissionType } from 'src/app/services/permissions.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
-import { CorrespondentEditDialogComponent } from '../../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { ManagementListComponent } from '../management-list.component'
 
 @Component({
