@@ -13,13 +13,13 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { PermissionType } from 'src/app/services/permissions.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
-import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
-import { ManagementListComponent } from '../management-list/management-list.component'
+import { StoragePathEditDialogComponent } from '../../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { ManagementListComponent } from '../management-list.component'
 
 @Component({
   selector: 'pngx-storage-path-list',
-  templateUrl: './../management-list/management-list.component.html',
-  styleUrls: ['./../management-list/management-list.component.scss'],
+  templateUrl: './../management-list.component.html',
+  styleUrls: ['./../management-list.component.scss'],
   imports: [
     SortableDirective,
     IfPermissionsDirective,

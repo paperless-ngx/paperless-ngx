@@ -13,13 +13,13 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { PermissionType } from 'src/app/services/permissions.service'
 import { TagService } from 'src/app/services/rest/tag.service'
-import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
-import { ManagementListComponent } from '../management-list/management-list.component'
+import { TagEditDialogComponent } from '../../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
+import { ManagementListComponent } from '../management-list.component'
 
 @Component({
   selector: 'pngx-tag-list',
-  templateUrl: './../management-list/management-list.component.html',
-  styleUrls: ['./../management-list/management-list.component.scss'],
+  templateUrl: './../management-list.component.html',
+  styleUrls: ['./../management-list.component.scss'],
   imports: [
     SortableDirective,
     IfPermissionsDirective,

@@ -6,16 +6,17 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of } from 'rxjs'
+import { StoragePath } from 'src/app/data/storage-path'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
-import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
-import { PageHeaderComponent } from '../../common/page-header/page-header.component'
-import { DocumentTypeListComponent } from './document-type-list.component'
+import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { PageHeaderComponent } from '../../../common/page-header/page-header.component'
+import { StoragePathListComponent } from './storage-path-list.component'
 
-describe('DocumentTypeListComponent', () => {
-  let component: DocumentTypeListComponent
-  let fixture: ComponentFixture<DocumentTypeListComponent>
-  let documentTypeService: DocumentTypeService
+describe('StoragePathListComponent', () => {
+  let component: StoragePathListComponent
+  let fixture: ComponentFixture<StoragePathListComponent>
+  let storagePathService: StoragePathService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -24,7 +25,7 @@ describe('DocumentTypeListComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
-        DocumentTypeListComponent,
+        StoragePathListComponent,
         SortableDirective,
         PageHeaderComponent,
         IfPermissionsDirective,
@@ -36,28 +37,28 @@ describe('DocumentTypeListComponent', () => {
       ],
     }).compileComponents()
 
-    documentTypeService = TestBed.inject(DocumentTypeService)
-    jest.spyOn(documentTypeService, 'listFiltered').mockReturnValue(
+    storagePathService = TestBed.inject(StoragePathService)
+    jest.spyOn(storagePathService, 'listFiltered').mockReturnValue(
       of({
         count: 3,
         all: [1, 2, 3],
         results: [
           {
             id: 1,
-            name: 'DocumentType1',
+            name: 'StoragePath1',
           },
           {
             id: 2,
-            name: 'DocumentType2',
+            name: 'StoragePath2',
           },
           {
             id: 3,
-            name: 'DocumentType3',
+            name: 'StoragePath3',
           },
         ],
       })
     )
-    fixture = TestBed.createComponent(DocumentTypeListComponent)
+    fixture = TestBed.createComponent(StoragePathListComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
   })
@@ -65,8 +66,19 @@ describe('DocumentTypeListComponent', () => {
   // Tests are included in management-list.component.spec.ts
 
   it('should use correct delete message', () => {
-    expect(
-      component.getDeleteMessage({ id: 1, name: 'DocumentType1' })
-    ).toEqual('Do you really want to delete the document type "DocumentType1"?')
+    expect(component.getDeleteMessage({ id: 1, name: 'StoragePath1' })).toEqual(
+      'Do you really want to delete the storage path "StoragePath1"?'
+    )
+  })
+
+  it('should truncate path if necessary', () => {
+    const path: StoragePath = {
+      id: 1,
+      name: 'StoragePath1',
+      path: 'a'.repeat(100),
+    }
+    expect(component.extraColumns[0].valueFn(path)).toEqual(
+      `${'a'.repeat(49)}...`
+    )
   })
 })
