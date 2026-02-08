@@ -74,8 +74,6 @@ export class PngxPdfViewerComponent
   private hasLoaded = false
   private loadingTask?: PDFDocumentLoadingTask
   private resizeObserver?: ResizeObserver
-  private lastObservedWidth = 0
-  private lastObservedHeight = 0
   private pdf?: PDFDocumentProxy
   private pdfViewer?: PDFViewer | PDFSinglePageViewer
   private findReady = false
@@ -189,19 +187,7 @@ export class PngxPdfViewerComponent
     }
 
     this.resizeObserver = new ResizeObserver(() => {
-      const width = container.clientWidth
-      const height = container.clientHeight
-      if (
-        Math.abs(width - this.lastObservedWidth) < 1 &&
-        Math.abs(height - this.lastObservedHeight) < 1
-      ) {
-        return
-      }
-      this.lastObservedWidth = width
-      this.lastObservedHeight = height
-      if (this.pdfViewer) {
-        this.applyScale()
-      }
+      this.applyScale()
     })
     this.resizeObserver.observe(container)
   }
