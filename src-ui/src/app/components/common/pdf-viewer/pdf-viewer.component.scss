@@ -3,9 +3,6 @@
   width: 100%;
   height: 100%;
   position: relative;
-  --pdfViewer-padding-bottom: 0;
-  --page-margin: 0 auto 10px;
-  --page-border: 0;
 }
 
 :host ::ng-deep .pngx-pdf-viewer-container {
@@ -26,8 +23,8 @@
   --scale-round-x: 1px;
   --scale-round-y: 1px;
   direction: ltr;
-  margin: var(--page-margin);
-  border: var(--page-border);
+  margin: 0 auto 10px;
+  border: 0;
   position: relative;
   overflow: visible;
   background-clip: content-box;
@@ -36,11 +33,6 @@
 
 :host ::ng-deep .pdfViewer > .page:last-of-type {
   margin-bottom: 0;
-}
-
-:host ::ng-deep .pdfViewer.removePageBorders .page {
-  margin: var(--page-margin);
-  border: none;
 }
 
 :host ::ng-deep .pdfViewer.singlePageView {
