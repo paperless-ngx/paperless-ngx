@@ -261,8 +261,7 @@ export class PngxPdfViewerComponent
   private shouldObserveResize(): boolean {
     return (
       this.zoomScale === PdfZoomSetting.PageFit ||
-      this.zoomScale === PdfZoomSetting.PageWidth ||
-      this.renderMode === PdfRenderMode.All
+      this.zoomScale === PdfZoomSetting.PageWidth
     )
   }
 
