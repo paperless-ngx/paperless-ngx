@@ -61,7 +61,7 @@ export class PngxPdfViewerComponent
   @Input() rotation?: number
   @Input() renderMode: PdfRenderMode = PdfRenderMode.All
   @Input() selectable = true
-  @Input() searchQuery?: string
+  @Input() searchQuery = ''
   @Input() zoom: PdfZoomLevel = PdfZoomLevel.One
   @Input() zoomScale: PdfZoomScale = PdfZoomScale.PageWidth
 
@@ -70,10 +70,10 @@ export class PngxPdfViewerComponent
   @Output() error = new EventEmitter<unknown>()
 
   @ViewChild('container', { static: true })
-  private container?: ElementRef<HTMLDivElement>
+  private container!: ElementRef<HTMLDivElement>
 
   @ViewChild('viewer', { static: true })
-  private viewer?: ElementRef<HTMLDivElement>
+  private viewer!: ElementRef<HTMLDivElement>
 
   private hasLoaded = false
   private loadingTask?: PDFDocumentLoadingTask
@@ -179,34 +179,23 @@ export class PngxPdfViewerComponent
   }
 
   private setupResizeObserver(): void {
-    const container = this.container?.nativeElement
     this.resizeObserver?.disconnect()
-    if (!container || typeof ResizeObserver === 'undefined') {
-      return
-    }
-
     this.resizeObserver = new ResizeObserver(() => {
       this.applyScale()
     })
-    this.resizeObserver.observe(container)
+    this.resizeObserver.observe(this.container.nativeElement)
   }
 
   private initViewer(): void {
-    const container = this.container?.nativeElement
-    const viewer = this.viewer?.nativeElement
-    if (!container || !viewer) {
-      return
-    }
-
-    viewer.innerHTML = ''
+    this.viewer.nativeElement.innerHTML = ''
     this.pdfViewer?.cleanup()
     this.hasRenderedPage = false
     this.lastFindQuery = ''
 
     const textLayerMode = this.selectable === false ? 0 : 1
     const options = {
-      container,
-      viewer,
+      container: this.container.nativeElement,
+      viewer: this.viewer.nativeElement,
       eventBus: this.eventBus,
       linkService: this.linkService,
       findController: this.findController,
