@@ -1,10 +1,8 @@
 <pngx-page-header
-  title="Document Attributes"
-  i18n-title
+  [title]="activeTabLabel"
   info="Manage tags, correspondents, document types, storage paths, and custom fields."
   i18n-info
   [infoLink]="activeInfoLink"
-  [subTitle]="activeTabLabel"
   [loading]="activeHeaderLoading"
   >
   @if (activeAttributeList) {
