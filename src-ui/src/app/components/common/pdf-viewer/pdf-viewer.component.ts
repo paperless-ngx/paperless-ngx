@@ -178,8 +178,6 @@ export class PngxPdfViewerComponent
       this.applyViewerState()
       this.afterLoadComplete.emit(pdf)
     } catch (err) {
-      console.log(err)
-
       this.error.emit(err)
     }
   }
