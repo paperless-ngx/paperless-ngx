@@ -17,7 +17,7 @@
 :host ::ng-deep .pdfViewer {
   --scale-factor: 1;
   --page-bg-color: unset;
-  padding-bottom: 8px;
+  padding-bottom: 0;
 }
 
 :host ::ng-deep .pdfViewer .page {
@@ -152,4 +152,10 @@
 
 :host ::ng-deep .textLayer ::selection {
   background: rgba(30, 100, 255, 0.35);
+}
+
+:host ::ng-deep .annotationLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
