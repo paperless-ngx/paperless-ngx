@@ -147,7 +147,6 @@ export class PngxPdfViewerComponent
     this.eventBus.off('pagesinit', this.onPagesInit)
     this.eventBus.off('pagechanging', this.onPageChanging)
     this.resizeObserver?.disconnect()
-    this.cancelRender()
     this.loadingTask?.destroy()
     this.pdfViewer?.cleanup()
     this.pdfViewer = undefined
@@ -161,7 +160,6 @@ export class PngxPdfViewerComponent
     this.hasLoaded = true
     this.findReady = false
     this.pendingFind = false
-    this.cancelRender()
     this.loadingTask?.destroy()
 
     GlobalWorkerOptions.workerSrc = '/assets/js/pdf.worker.min.mjs'
@@ -229,10 +227,6 @@ export class PngxPdfViewerComponent
       }
     }
     return src
-  }
-
-  private cancelRender(): void {
-    // Placeholder for future render cancellation logic.
   }
 
   private setupResizeObserver(): void {
