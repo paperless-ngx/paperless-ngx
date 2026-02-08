@@ -121,7 +121,7 @@ jobs:
     name: "E2E Tests (${{ matrix.shard-index }}/${{ matrix.shard-count }})"
     needs: install-dependencies
     runs-on: ubuntu-24.04
-    container: mcr.microsoft.com/playwright:v1.58.1-noble
+    container: mcr.microsoft.com/playwright:v1.58.2-noble
     env:
       PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
