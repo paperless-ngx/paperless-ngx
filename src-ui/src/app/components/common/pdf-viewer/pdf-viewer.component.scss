@@ -3,6 +3,9 @@
   width: 100%;
   height: 100%;
   position: relative;
+  --pdfViewer-padding-bottom: 0;
+  --page-margin: 0 auto 10px;
+  --page-border: 0;
 }
 
 :host ::ng-deep .pngx-pdf-viewer-container {
@@ -23,14 +26,30 @@
   --scale-round-x: 1px;
   --scale-round-y: 1px;
   direction: ltr;
-  margin: 0 auto 10px;
+  margin: var(--page-margin);
+  border: var(--page-border);
   position: relative;
   overflow: visible;
+  background-clip: content-box;
   background-color: var(--page-bg-color, rgb(255 255 255));
+}
 
-  &:last-child {
-    margin-bottom: 0;
-  }
+:host ::ng-deep .pdfViewer > .page:last-of-type {
+  margin-bottom: 0;
+}
+
+:host ::ng-deep .pdfViewer.removePageBorders .page {
+  margin: var(--page-margin);
+  border: none;
+}
+
+:host ::ng-deep .pdfViewer.singlePageView {
+  display: inline-block;
+}
+
+:host ::ng-deep .pdfViewer.singlePageView .page {
+  margin: 0;
+  border: none;
 }
 
 :host ::ng-deep .pdfViewer .canvasWrapper {
