@@ -82,6 +82,7 @@ export class PngxPdfViewerComponent
   private pdfViewer?: PDFViewer | PDFSinglePageViewer
   private hasRenderedPage = false
   private lastFindQuery = ''
+  private lastViewerPage?: number
 
   private eventBus = new EventBus()
   private linkService = new PDFLinkService({ eventBus: this.eventBus })
@@ -98,6 +99,8 @@ export class PngxPdfViewerComponent
   }
   private onPagesInit = () => this.applyScale()
   private onPageChanging = (evt: { pageNumber: number }) => {
+    // Avoid [(page)] two-way binding re-triggers navigation
+    this.lastViewerPage = evt.pageNumber
     this.pageChange.emit(evt.pageNumber)
   }
 
@@ -230,8 +233,15 @@ export class PngxPdfViewerComponent
     if (typeof this.rotation === 'number' && hasPages) {
       this.pdfViewer.pagesRotation = this.rotation
     }
-    if (typeof this.page === 'number' && hasPages) {
+    if (
+      typeof this.page === 'number' &&
+      hasPages &&
+      this.page !== this.lastViewerPage
+    ) {
       this.pdfViewer.currentPageNumber = this.page
+    }
+    if (this.page === this.lastViewerPage) {
+      this.lastViewerPage = undefined
     }
     if (hasPages) {
       this.applyScale()
