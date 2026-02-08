@@ -51,7 +51,7 @@ export enum PdfZoomSetting {
 export class PngxPdfViewerComponent
   implements AfterViewInit, OnChanges, OnDestroy
 {
-  @Input() src: unknown
+  @Input() src?: string | { url: string; password?: string }
   @Input() page?: number
   @Output() pageChange = new EventEmitter<number>()
   @Input() rotation?: number
@@ -59,7 +59,7 @@ export class PngxPdfViewerComponent
   @Input() selectable?: boolean
   @Input() searchQuery?: string
   @Input() zoom?: number | string
-  @Input() zoomScale?: string
+  @Input() zoomScale?: PdfZoomSetting
 
   @Output() afterLoadComplete = new EventEmitter<PngxPdfDocumentProxy>()
   @Output() rendered = new EventEmitter<void>()
@@ -119,8 +119,7 @@ export class PngxPdfViewerComponent
       changes['page'] ||
       changes['zoom'] ||
       changes['zoomScale'] ||
-      changes['rotation'] ||
-      changes['renderMode']
+      changes['rotation']
     ) {
       this.applyViewerState()
     }
@@ -163,8 +162,7 @@ export class PngxPdfViewerComponent
     this.loadingTask?.destroy()
 
     GlobalWorkerOptions.workerSrc = '/assets/js/pdf.worker.min.mjs'
-    const source = await this.resolveDocumentSource()
-    this.loadingTask = getDocument(source)
+    this.loadingTask = getDocument(this.src)
 
     try {
       const pdf = await this.loadingTask.promise
@@ -172,61 +170,11 @@ export class PngxPdfViewerComponent
       this.linkService.setDocument(pdf)
       this.findController.onIsPageVisible = () => true
       this.pdfViewer?.setDocument(pdf)
-      this.pendingFind = true
       this.applyViewerState()
       this.afterLoadComplete.emit(pdf)
     } catch (err) {
       this.error.emit(err)
     }
-  }
-
-  private parseZoom(): number | undefined {
-    if (typeof this.zoom === 'number') {
-      return this.zoom
-    }
-    if (typeof this.zoom === 'string') {
-      const parsed = Number(this.zoom)
-      return Number.isFinite(parsed) ? parsed : undefined
-    }
-    return undefined
-  }
-
-  private normalizeSrc() {
-    if (typeof this.src === 'string') {
-      return { url: this.src }
-    }
-    return this.src
-  }
-
-  private async resolveDocumentSource() {
-    const src = this.normalizeSrc()
-    if (!src) {
-      return src
-    }
-    if (src instanceof ArrayBuffer) {
-      return { data: src }
-    }
-    if (ArrayBuffer.isView(src)) {
-      return { data: src }
-    }
-    if (typeof src === 'object') {
-      const candidate = src as {
-        data?: unknown
-        url?: string
-        password?: string
-      }
-      if (candidate.data) {
-        return candidate
-      }
-      if (candidate.url) {
-        const response = await fetch(candidate.url, {
-          credentials: 'same-origin',
-        })
-        const data = await response.arrayBuffer()
-        return { data, password: candidate.password }
-      }
-    }
-    return src
   }
 
   private setupResizeObserver(): void {
@@ -331,7 +279,9 @@ export class PngxPdfViewerComponent
     if (this.pdfViewer.pagesCount === 0) {
       return
     }
-    const zoomFactor = this.parseZoom() ?? 1
+    const zoomValue =
+      typeof this.zoom === 'number' ? this.zoom : Number(this.zoom)
+    const zoomFactor = Number.isFinite(zoomValue) ? zoomValue : 1
     const fitMode = this.zoomScale ?? PdfZoomSetting.PageWidth
     if (
       fitMode === PdfZoomSetting.PageFit ||
