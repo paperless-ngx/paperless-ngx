@@ -17,7 +17,7 @@ import {
   PDFDocumentProxy,
   PDFPageProxy,
   RenderTask,
-} from 'pdfjs-dist'
+} from 'pdfjs-dist/legacy/build/pdf.mjs'
 
 export type PngxPdfDocumentProxy = PDFDocumentProxy
 
