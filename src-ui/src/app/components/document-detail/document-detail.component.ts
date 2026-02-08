@@ -109,6 +109,7 @@ import { PdfEditorEditMode } from '../common/pdf-editor/pdf-editor-edit-mode'
 import { PDFEditorComponent } from '../common/pdf-editor/pdf-editor.component'
 import {
   PdfRenderMode,
+  PdfZoomSetting,
   PngxPdfDocumentProxy,
   PngxPdfViewerComponent,
 } from '../common/pdf-viewer/pdf-viewer.component'
@@ -118,7 +119,6 @@ import { DocumentHistoryComponent } from '../document-history/document-history.c
 import { DocumentNotesComponent } from '../document-notes/document-notes.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { MetadataCollapseComponent } from './metadata-collapse/metadata-collapse.component'
-import { ZoomSetting } from './zoom-setting'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -251,8 +251,8 @@ export class DocumentDetailComponent
 
   previewCurrentPage: number = 1
   previewNumPages: number
-  previewZoomSetting: ZoomSetting = ZoomSetting.One
-  previewZoomScale: ZoomSetting = ZoomSetting.PageWidth
+  previewZoomSetting: PdfZoomSetting = PdfZoomSetting.One
+  previewZoomScale: PdfZoomSetting = PdfZoomSetting.PageWidth
 
   store: BehaviorSubject<any>
   isDirty$: Observable<boolean>
@@ -1230,31 +1230,34 @@ export class DocumentDetailComponent
     }
   }
 
-  setZoom(setting: ZoomSetting) {
-    if (ZoomSetting.PageFit === setting || ZoomSetting.PageWidth === setting) {
+  setZoom(setting: PdfZoomSetting) {
+    if (
+      PdfZoomSetting.PageFit === setting ||
+      PdfZoomSetting.PageWidth === setting
+    ) {
       this.previewZoomScale = setting
-      this.previewZoomSetting = ZoomSetting.One
+      this.previewZoomSetting = PdfZoomSetting.One
     } else {
       this.previewZoomSetting = setting
-      this.previewZoomScale = ZoomSetting.PageWidth
+      this.previewZoomScale = PdfZoomSetting.PageWidth
     }
   }
 
   get zoomSettings() {
-    return Object.values(ZoomSetting).filter(
-      (setting) => setting !== ZoomSetting.PageWidth
+    return Object.values(PdfZoomSetting).filter(
+      (setting) => setting !== PdfZoomSetting.PageWidth
     )
   }
 
   get currentZoom() {
-    if (this.previewZoomScale === ZoomSetting.PageFit) {
-      return ZoomSetting.PageFit
+    if (this.previewZoomScale === PdfZoomSetting.PageFit) {
+      return PdfZoomSetting.PageFit
     } else return this.previewZoomSetting
   }
 
-  getZoomSettingTitle(setting: ZoomSetting): string {
+  getZoomSettingTitle(setting: PdfZoomSetting): string {
     switch (setting) {
-      case ZoomSetting.PageFit:
+      case PdfZoomSetting.PageFit:
         return $localize`Page Fit`
       default:
         return `${parseFloat(setting) * 100}%`
@@ -1262,25 +1265,25 @@ export class DocumentDetailComponent
   }
 
   increaseZoom(): void {
-    let currentIndex = Object.values(ZoomSetting).indexOf(
+    let currentIndex = Object.values(PdfZoomSetting).indexOf(
       this.previewZoomSetting
     )
-    if (this.previewZoomScale === ZoomSetting.PageFit) currentIndex = 5
-    this.previewZoomScale = ZoomSetting.PageWidth
+    if (this.previewZoomScale === PdfZoomSetting.PageFit) currentIndex = 5
+    this.previewZoomScale = PdfZoomSetting.PageWidth
     this.previewZoomSetting =
-      Object.values(ZoomSetting)[
-        Math.min(Object.values(ZoomSetting).length - 1, currentIndex + 1)
+      Object.values(PdfZoomSetting)[
+        Math.min(Object.values(PdfZoomSetting).length - 1, currentIndex + 1)
       ]
   }
 
   decreaseZoom(): void {
-    let currentIndex = Object.values(ZoomSetting).indexOf(
+    let currentIndex = Object.values(PdfZoomSetting).indexOf(
       this.previewZoomSetting
     )
-    if (this.previewZoomScale === ZoomSetting.PageFit) currentIndex = 4
-    this.previewZoomScale = ZoomSetting.PageWidth
+    if (this.previewZoomScale === PdfZoomSetting.PageFit) currentIndex = 4
+    this.previewZoomScale = PdfZoomSetting.PageWidth
     this.previewZoomSetting =
-      Object.values(ZoomSetting)[Math.max(2, currentIndex - 1)]
+      Object.values(PdfZoomSetting)[Math.max(2, currentIndex - 1)]
   }
 
   get showPermissions(): boolean {

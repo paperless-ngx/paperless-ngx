@@ -65,8 +65,8 @@ import { PermissionsUserComponent } from '../../common/input/permissions/permiss
 import { SelectComponent } from '../../common/input/select/select.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { PdfEditorEditMode } from '../../common/pdf-editor/pdf-editor-edit-mode'
+import { PdfZoomSetting } from '../../common/pdf-viewer/pdf-viewer.component'
 import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
-import { ZoomSetting } from '../../document-detail/zoom-setting'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 enum SettingsNavIDs {
@@ -196,7 +196,7 @@ export class SettingsComponent
 
   public readonly GlobalSearchType = GlobalSearchType
 
-  public readonly ZoomSetting = ZoomSetting
+  public readonly PdfZoomSetting = PdfZoomSetting
 
   public readonly PdfEditorEditMode = PdfEditorEditMode
 

@@ -26,6 +26,19 @@ export enum PdfRenderMode {
   Single = 'single',
   All = 'all',
 }
+
+export enum PdfZoomSetting {
+  PageFit = 'page-fit',
+  PageWidth = 'page-width',
+  Quarter = '.25',
+  Half = '.5',
+  ThreeQuarters = '.75',
+  One = '1',
+  OneAndHalf = '1.5',
+  Two = '2',
+  Three = '3',
+}
+
 @Component({
   selector: 'pngx-pdf-viewer',
   templateUrl: './pdf-viewer.component.html',
@@ -141,9 +154,10 @@ export class PngxPdfViewerComponent
 
     const renderToken = ++this.renderToken
     if (
-      (this.zoomScale === 'page-fit' || this.zoomScale === 'page-width') &&
+      (this.zoomScale === PdfZoomSetting.PageFit ||
+        this.zoomScale === PdfZoomSetting.PageWidth) &&
       (!container.clientWidth ||
-        (this.zoomScale === 'page-fit' && !container.clientHeight))
+        (this.zoomScale === PdfZoomSetting.PageFit && !container.clientHeight))
     ) {
       requestAnimationFrame(() => {
         if (renderToken === this.renderToken) {
@@ -231,14 +245,17 @@ export class PngxPdfViewerComponent
     const rotation = this.rotation ?? 0
     const baseViewport = page.getViewport({ scale: 1, rotation })
 
-    const fitMode = this.zoomScale
+    const fitMode = this.zoomScale ?? PdfZoomSetting.PageWidth
     const zoomFactor = this.parseZoom() ?? 1
     let scale = 1
-    if (fitMode === 'page-fit' || fitMode === 'page-width') {
+    if (
+      fitMode === PdfZoomSetting.PageFit ||
+      fitMode === PdfZoomSetting.PageWidth
+    ) {
       const container = this.container?.nativeElement
       const availableWidth = container?.clientWidth || baseViewport.width
       const availableHeight = container?.clientHeight || baseViewport.height
-      if (fitMode === 'page-width') {
+      if (fitMode === PdfZoomSetting.PageWidth) {
         scale = (availableWidth / baseViewport.width) * zoomFactor
       } else {
         scale =
@@ -364,8 +381,8 @@ export class PngxPdfViewerComponent
 
   private shouldObserveResize(): boolean {
     return (
-      this.zoomScale === 'page-fit' ||
-      this.zoomScale === 'page-width' ||
+      this.zoomScale === PdfZoomSetting.PageFit ||
+      this.zoomScale === PdfZoomSetting.PageWidth ||
       this.renderMode === PdfRenderMode.All
     )
   }
