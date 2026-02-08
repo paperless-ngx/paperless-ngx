@@ -23,14 +23,14 @@
           </div>
         }
         @if (!requiresPassword) {
-          <pdf-viewer
+          <pngx-pdf-viewer
             [src]="previewUrl"
             [original-size]="false"
             [show-borders]="false"
             [show-all]="true"
             (text-layer-rendered)="onPageRendered()"
             (error)="onError($event)" #pdfViewer>
-          </pdf-viewer>
+          </pngx-pdf-viewer>
         }
       }
     }

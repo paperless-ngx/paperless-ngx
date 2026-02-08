@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Component, inject, Input, OnDestroy, ViewChild } from '@angular/core'
 import { NgbPopover, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
-import { PdfViewerComponent, PdfViewerModule } from 'ng2-pdf-viewer'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first, Subject, takeUntil } from 'rxjs'
 import { Document } from 'src/app/data/document'
@@ -10,6 +9,7 @@ import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { PngxPdfViewerComponent } from '../pngx-pdf-viewer/pngx-pdf-viewer.component'
 
 @Component({
   selector: 'pngx-preview-popup',
@@ -18,7 +18,7 @@ import { SettingsService } from 'src/app/services/settings.service'
   imports: [
     NgbPopoverModule,
     DocumentTitlePipe,
-    PdfViewerModule,
+    PngxPdfViewerComponent,
     SafeUrlPipe,
     NgxBootstrapIconsModule,
   ],
@@ -61,7 +61,7 @@ export class PreviewPopupComponent implements OnDestroy {
 
   @ViewChild('popover') popover: NgbPopover
 
-  @ViewChild('pdfViewer') pdfViewer: PdfViewerComponent
+  @ViewChild('pdfViewer') pdfViewer: PngxPdfViewerComponent
 
   mouseOnPreview: boolean = false
 
@@ -117,6 +117,9 @@ export class PreviewPopupComponent implements OnDestroy {
   onPageRendered() {
     // Only triggered by the pngx pdf viewer
     if (this.documentService.searchQuery) {
+      if (!this.pdfViewer?.eventBus) {
+        return
+      }
       this.pdfViewer.eventBus.dispatch('find', {
         query: this.documentService.searchQuery,
         caseSensitive: false,

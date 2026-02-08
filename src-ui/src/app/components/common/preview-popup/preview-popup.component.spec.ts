@@ -78,7 +78,7 @@ describe('PreviewPopupComponent', () => {
     component.popover.open()
     fixture.detectChanges()
     expect(fixture.debugElement.query(By.css('object'))).toBeNull()
-    expect(fixture.debugElement.query(By.css('pdf-viewer'))).not.toBeNull()
+    expect(fixture.debugElement.query(By.css('pngx-pdf-viewer'))).not.toBeNull()
   })
 
   it('should show lock icon on password error', () => {

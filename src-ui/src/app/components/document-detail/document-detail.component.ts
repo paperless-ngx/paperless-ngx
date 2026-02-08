@@ -18,7 +18,6 @@ import {
   NgbNavModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
-import { PDFDocumentProxy, PdfViewerModule } from 'ng2-pdf-viewer'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { DeviceDetectorService } from 'ngx-device-detector'
 import { BehaviorSubject, Observable, of, Subject, timer } from 'rxjs'
@@ -108,6 +107,10 @@ import { UrlComponent } from '../common/input/url/url.component'
 import { PageHeaderComponent } from '../common/page-header/page-header.component'
 import { PdfEditorEditMode } from '../common/pdf-editor/pdf-editor-edit-mode'
 import { PDFEditorComponent } from '../common/pdf-editor/pdf-editor.component'
+import {
+  PngxPdfDocumentProxy,
+  PngxPdfViewerComponent,
+} from '../common/pngx-pdf-viewer/pngx-pdf-viewer.component'
 import { ShareLinksDialogComponent } from '../common/share-links-dialog/share-links-dialog.component'
 import { SuggestionsDropdownComponent } from '../common/suggestions-dropdown/suggestions-dropdown.component'
 import { DocumentHistoryComponent } from '../document-history/document-history.component'
@@ -168,9 +171,9 @@ enum ContentRenderType {
     NgbNavModule,
     NgbDropdownModule,
     NgxBootstrapIconsModule,
-    PdfViewerModule,
     TextAreaComponent,
     RouterModule,
+    PngxPdfViewerComponent,
   ],
 })
 export class DocumentDetailComponent
@@ -1204,7 +1207,7 @@ export class DocumentDetailComponent
       })
   }
 
-  pdfPreviewLoaded(pdf: PDFDocumentProxy) {
+  pdfPreviewLoaded(pdf: PngxPdfDocumentProxy) {
     this.previewNumPages = pdf.numPages
     if (this.password) this.requiresPassword = false
     setTimeout(() => {

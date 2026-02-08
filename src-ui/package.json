@@ -27,7 +27,6 @@
     "bootstrap": "^5.3.8",
     "file-saver": "^2.0.5",
     "mime-names": "^1.0.0",
-    "ng2-pdf-viewer": "^10.4.0",
     "ngx-bootstrap-icons": "^1.9.3",
     "ngx-color": "^10.1.0",
     "ngx-cookie-service": "^21.1.0",

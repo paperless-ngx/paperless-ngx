@@ -456,7 +456,7 @@
       @case (ContentRenderType.PDF) {
         @if (!useNativePdfViewer) {
           <div class="preview-sticky pdf-viewer-container">
-            <pdf-viewer
+            <pngx-pdf-viewer
               [src]="{ url: previewUrl, password: password }"
               [original-size]="false"
               [show-borders]="true"
@@ -466,7 +466,7 @@
               [zoom]="previewZoomSetting"
               (error)="onError($event)"
               (after-load-complete)="pdfPreviewLoaded($event)">
-            </pdf-viewer>
+            </pngx-pdf-viewer>
           </div>
         } @else {
           <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>

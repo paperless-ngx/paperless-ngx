@@ -21,7 +21,6 @@ import {
   NgbModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { PdfViewerModule } from 'ng2-pdf-viewer'
 import {
   NgxBootstrapIconsModule,
   airplane,
@@ -371,7 +370,6 @@ bootstrapApplication(AppComponent, {
       NgbModule,
       FormsModule,
       ReactiveFormsModule,
-      PdfViewerModule,
       NgSelectModule,
       ColorSliderModule,
       DragDropModule,

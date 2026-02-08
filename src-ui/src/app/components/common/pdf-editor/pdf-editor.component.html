@@ -1,4 +1,4 @@
-<pdf-viewer [src]="pdfSrc" [render-text]="false" zoom="0.4" (after-load-complete)="pdfLoaded($event)"></pdf-viewer>
+<pngx-pdf-viewer [src]="pdfSrc" zoom="0.4" (after-load-complete)="pdfLoaded($event)"></pngx-pdf-viewer>
 <div class="modal-header">
   <h4 class="modal-title">{{ title }}</h4>
   <button type="button" class="btn-close" aria-label="Close" (click)="cancel()"></button>
@@ -59,7 +59,7 @@
                 <span class="placeholder w-100 h-100"></span>
               </div>
             }
-            <pdf-viewer class="fade" [class.show]="p.loaded" [src]="pdfSrc" [page]="p.page" [rotation]="p.rotate" [original-size]="false" [show-all]="false" [render-text]="false" (page-rendered)="p.loaded = true"></pdf-viewer>
+            <pngx-pdf-viewer class="fade" [class.show]="p.loaded" [src]="pdfSrc" [page]="p.page" [rotation]="p.rotate" [original-size]="false" [show-all]="false" (page-rendered)="p.loaded = true"></pngx-pdf-viewer>
           } @placeholder {
             <div class="placeholder-glow w-100 h-100 z-10">
               <span class="placeholder w-100 h-100"></span>
