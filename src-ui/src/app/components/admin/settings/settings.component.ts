@@ -65,7 +65,7 @@ import { PermissionsUserComponent } from '../../common/input/permissions/permiss
 import { SelectComponent } from '../../common/input/select/select.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { PdfEditorEditMode } from '../../common/pdf-editor/pdf-editor-edit-mode'
-import { PdfZoomScale } from '../../common/pdf-viewer/pdf-viewer.component'
+import { PdfZoomScale } from '../../common/pdf-viewer/pdf-viewer.types'
 import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 

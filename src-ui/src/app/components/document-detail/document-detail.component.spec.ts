@@ -72,7 +72,7 @@ import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/
 import {
   PdfZoomLevel,
   PdfZoomScale,
-} from '../common/pdf-viewer/pdf-viewer.component'
+} from '../common/pdf-viewer/pdf-viewer.types'
 import { DocumentDetailComponent } from './document-detail.component'
 
 const doc: Document = {

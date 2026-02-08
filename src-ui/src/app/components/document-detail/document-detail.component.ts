@@ -107,13 +107,13 @@ import { UrlComponent } from '../common/input/url/url.component'
 import { PageHeaderComponent } from '../common/page-header/page-header.component'
 import { PdfEditorEditMode } from '../common/pdf-editor/pdf-editor-edit-mode'
 import { PDFEditorComponent } from '../common/pdf-editor/pdf-editor.component'
+import { PngxPdfViewerComponent } from '../common/pdf-viewer/pdf-viewer.component'
 import {
   PdfRenderMode,
   PdfZoomLevel,
   PdfZoomScale,
   PngxPdfDocumentProxy,
-  PngxPdfViewerComponent,
-} from '../common/pdf-viewer/pdf-viewer.component'
+} from '../common/pdf-viewer/pdf-viewer.types'
 import { ShareLinksDialogComponent } from '../common/share-links-dialog/share-links-dialog.component'
 import { SuggestionsDropdownComponent } from '../common/suggestions-dropdown/suggestions-dropdown.component'
 import { DocumentHistoryComponent } from '../document-history/document-history.component'

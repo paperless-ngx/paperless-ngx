@@ -1,5 +1,5 @@
 import { PdfEditorEditMode } from '../components/common/pdf-editor/pdf-editor-edit-mode'
-import { PdfZoomScale } from '../components/common/pdf-viewer/pdf-viewer.component'
+import { PdfZoomScale } from '../components/common/pdf-viewer/pdf-viewer.types'
 import { User } from './user'
 
 export interface UiSettings {

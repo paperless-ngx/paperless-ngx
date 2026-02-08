@@ -121,7 +121,19 @@ if (!URL.createObjectURL) {
 if (!URL.revokeObjectURL) {
   Object.defineProperty(window.URL, 'revokeObjectURL', { value: jest.fn() })
 }
-Object.defineProperty(window, 'ResizeObserver', { value: mock() })
+class MockResizeObserver {
+  constructor(_callback: ResizeObserverCallback) {}
+
+  observe = jest.fn()
+  unobserve = jest.fn()
+  disconnect = jest.fn()
+}
+
+Object.defineProperty(window, 'ResizeObserver', {
+  writable: true,
+  configurable: true,
+  value: MockResizeObserver,
+})
 
 if (typeof IntersectionObserver === 'undefined') {
   class MockIntersectionObserver {
