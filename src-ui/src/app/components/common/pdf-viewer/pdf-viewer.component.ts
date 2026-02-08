@@ -33,15 +33,13 @@ export class PngxPdfViewerComponent
   @Input() page?: number
   @Output() pageChange = new EventEmitter<number>()
   @Input() rotation?: number
-  @Input() showBorders?: boolean
   @Input() showAll?: boolean
-  @Input() renderText?: boolean
+  @Input() selectable?: boolean
   @Input() zoom?: number | string
   @Input() zoomScale?: string
 
   @Output() afterLoadComplete = new EventEmitter<PngxPdfDocumentProxy>()
-  @Output() pageRendered = new EventEmitter<void>()
-  @Output() textLayerRendered = new EventEmitter<void>()
+  @Output() rendered = new EventEmitter<void>()
   @Output() error = new EventEmitter<unknown>()
 
   // Placeholder to mirror ng2-pdf-viewer API used by callers.
@@ -72,7 +70,12 @@ export class PngxPdfViewerComponent
       this.setupResizeObserver()
     }
 
-    if (changes['page'] || changes['zoom'] || changes['zoomScale']) {
+    if (
+      changes['page'] ||
+      changes['zoom'] ||
+      changes['zoomScale'] ||
+      changes['selectable']
+    ) {
       this.renderDocument()
     }
   }
@@ -190,12 +193,11 @@ export class PngxPdfViewerComponent
         return
       }
 
-      if (this.renderText !== false) {
+      if (this.selectable !== false) {
         await this.renderTextLayer(page, pageContainer, viewport)
       }
 
-      this.pageRendered.emit()
-      this.textLayerRendered.emit()
+      this.rendered.emit()
       page.cleanup()
       pageContainer.dataset['pageNumber'] = String(clampedPage)
     }
@@ -207,10 +209,6 @@ export class PngxPdfViewerComponent
   } {
     const pageContainer = document.createElement('div')
     pageContainer.className = 'page'
-    if (this.showBorders) {
-      pageContainer.classList.add('show-borders')
-    }
-
     const canvas = document.createElement('canvas')
     pageContainer.appendChild(canvas)
     container.appendChild(pageContainer)

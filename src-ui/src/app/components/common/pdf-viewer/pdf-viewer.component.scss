@@ -13,11 +13,10 @@
 :host ::ng-deep .page {
   position: relative;
   margin: 0 auto 10px;
-}
 
-:host ::ng-deep .page.show-borders {
-  border: 1px solid var(--bs-border-color);
-  margin-bottom: 10px;
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 :host ::ng-deep .page canvas {
