@@ -1,5 +1,5 @@
 import { PdfEditorEditMode } from '../components/common/pdf-editor/pdf-editor-edit-mode'
-import { PdfZoomSetting } from '../components/common/pdf-viewer/pdf-viewer.component'
+import { PdfZoomScale } from '../components/common/pdf-viewer/pdf-viewer.component'
 import { User } from './user'
 
 export interface UiSettings {
@@ -310,7 +310,7 @@ export const SETTINGS: UiSetting[] = [
   {
     key: SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING,
     type: 'string',
-    default: PdfZoomSetting.PageWidth,
+    default: PdfZoomScale.PageWidth,
   },
   {
     key: SETTINGS_KEYS.AI_ENABLED,

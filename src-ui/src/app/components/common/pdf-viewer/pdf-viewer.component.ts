@@ -25,15 +25,19 @@ import {
 } from 'pdfjs-dist/web/pdf_viewer.mjs'
 
 export type PngxPdfDocumentProxy = PDFDocumentProxy
+export type PdfSource = string | { url: string; password?: string }
 
 export enum PdfRenderMode {
   Single = 'single',
   All = 'all',
 }
 
-export enum PdfZoomSetting {
+export enum PdfZoomScale {
   PageFit = 'page-fit',
   PageWidth = 'page-width',
+}
+
+export enum PdfZoomLevel {
   Quarter = '.25',
   Half = '.5',
   ThreeQuarters = '.75',
@@ -51,15 +55,15 @@ export enum PdfZoomSetting {
 export class PngxPdfViewerComponent
   implements AfterViewInit, OnChanges, OnDestroy
 {
-  @Input() src?: string | { url: string; password?: string }
+  @Input() src!: PdfSource
   @Input() page?: number
   @Output() pageChange = new EventEmitter<number>()
   @Input() rotation?: number
   @Input() renderMode: PdfRenderMode = PdfRenderMode.All
-  @Input() selectable?: boolean
+  @Input() selectable = true
   @Input() searchQuery?: string
-  @Input() zoom?: number | string
-  @Input() zoomScale?: PdfZoomSetting
+  @Input() zoom: PdfZoomLevel = PdfZoomLevel.One
+  @Input() zoomScale: PdfZoomScale = PdfZoomScale.PageWidth
 
   @Output() afterLoadComplete = new EventEmitter<PngxPdfDocumentProxy>()
   @Output() rendered = new EventEmitter<void>()
@@ -193,8 +197,8 @@ export class PngxPdfViewerComponent
 
   private shouldObserveResize(): boolean {
     return (
-      this.zoomScale === PdfZoomSetting.PageFit ||
-      this.zoomScale === PdfZoomSetting.PageWidth
+      this.zoomScale === PdfZoomScale.PageFit ||
+      this.zoomScale === PdfZoomScale.PageWidth
     )
   }
 
@@ -264,20 +268,10 @@ export class PngxPdfViewerComponent
     if (this.pdfViewer.pagesCount === 0) {
       return
     }
-    const zoomValue =
-      typeof this.zoom === 'number' ? this.zoom : Number(this.zoom)
-    const zoomFactor = Number.isFinite(zoomValue) ? zoomValue : 1
-    const fitMode = this.zoomScale ?? PdfZoomSetting.PageWidth
-    if (
-      fitMode === PdfZoomSetting.PageFit ||
-      fitMode === PdfZoomSetting.PageWidth
-    ) {
-      this.pdfViewer.currentScaleValue = fitMode
-      if (zoomFactor !== 1) {
-        this.pdfViewer.currentScale = this.pdfViewer.currentScale * zoomFactor
-      }
-    } else {
-      this.pdfViewer.currentScale = zoomFactor
+    const zoomFactor = Number(this.zoom) || 1
+    this.pdfViewer.currentScaleValue = this.zoomScale
+    if (zoomFactor !== 1) {
+      this.pdfViewer.currentScale = this.pdfViewer.currentScale * zoomFactor
     }
   }
 

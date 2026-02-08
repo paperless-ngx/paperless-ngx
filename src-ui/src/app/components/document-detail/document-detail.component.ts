@@ -109,7 +109,8 @@ import { PdfEditorEditMode } from '../common/pdf-editor/pdf-editor-edit-mode'
 import { PDFEditorComponent } from '../common/pdf-editor/pdf-editor.component'
 import {
   PdfRenderMode,
-  PdfZoomSetting,
+  PdfZoomLevel,
+  PdfZoomScale,
   PngxPdfDocumentProxy,
   PngxPdfViewerComponent,
 } from '../common/pdf-viewer/pdf-viewer.component'
@@ -251,8 +252,8 @@ export class DocumentDetailComponent
 
   previewCurrentPage: number = 1
   previewNumPages: number
-  previewZoomSetting: PdfZoomSetting = PdfZoomSetting.One
-  previewZoomScale: PdfZoomSetting = PdfZoomSetting.PageWidth
+  previewZoomSetting: PdfZoomLevel = PdfZoomLevel.One
+  previewZoomScale: PdfZoomScale = PdfZoomScale.PageWidth
 
   store: BehaviorSubject<any>
   isDirty$: Observable<boolean>
@@ -508,7 +509,9 @@ export class DocumentDetailComponent
   }
 
   ngOnInit(): void {
-    this.setZoom(this.settings.get(SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING))
+    this.setZoom(
+      this.settings.get(SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING) as PdfZoomScale
+    )
     this.documentForm.valueChanges
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((values) => {
@@ -1230,34 +1233,33 @@ export class DocumentDetailComponent
     }
   }
 
-  setZoom(setting: PdfZoomSetting) {
+  setZoom(setting: PdfZoomScale | PdfZoomLevel) {
     if (
-      PdfZoomSetting.PageFit === setting ||
-      PdfZoomSetting.PageWidth === setting
+      setting === PdfZoomScale.PageFit ||
+      setting === PdfZoomScale.PageWidth
     ) {
       this.previewZoomScale = setting
-      this.previewZoomSetting = PdfZoomSetting.One
-    } else {
-      this.previewZoomSetting = setting
-      this.previewZoomScale = PdfZoomSetting.PageWidth
+      this.previewZoomSetting = PdfZoomLevel.One
+      return
     }
+    this.previewZoomSetting = setting
+    this.previewZoomScale = PdfZoomScale.PageWidth
   }
 
   get zoomSettings() {
-    return Object.values(PdfZoomSetting).filter(
-      (setting) => setting !== PdfZoomSetting.PageWidth
-    )
+    return [PdfZoomScale.PageFit, ...Object.values(PdfZoomLevel)]
   }
 
   get currentZoom() {
-    if (this.previewZoomScale === PdfZoomSetting.PageFit) {
-      return PdfZoomSetting.PageFit
-    } else return this.previewZoomSetting
+    if (this.previewZoomScale === PdfZoomScale.PageFit) {
+      return PdfZoomScale.PageFit
+    }
+    return this.previewZoomSetting
   }
 
-  getZoomSettingTitle(setting: PdfZoomSetting): string {
+  getZoomSettingTitle(setting: PdfZoomScale | PdfZoomLevel): string {
     switch (setting) {
-      case PdfZoomSetting.PageFit:
+      case PdfZoomScale.PageFit:
         return $localize`Page Fit`
       default:
         return `${parseFloat(setting) * 100}%`
@@ -1265,25 +1267,24 @@ export class DocumentDetailComponent
   }
 
   increaseZoom(): void {
-    let currentIndex = Object.values(PdfZoomSetting).indexOf(
-      this.previewZoomSetting
-    )
-    if (this.previewZoomScale === PdfZoomSetting.PageFit) currentIndex = 5
-    this.previewZoomScale = PdfZoomSetting.PageWidth
+    const zoomLevels = Object.values(PdfZoomLevel)
+    let currentIndex = zoomLevels.indexOf(this.previewZoomSetting)
+    if (this.previewZoomScale === PdfZoomScale.PageFit) {
+      currentIndex = zoomLevels.indexOf(PdfZoomLevel.One)
+    }
+    this.previewZoomScale = PdfZoomScale.PageWidth
     this.previewZoomSetting =
-      Object.values(PdfZoomSetting)[
-        Math.min(Object.values(PdfZoomSetting).length - 1, currentIndex + 1)
-      ]
+      zoomLevels[Math.min(zoomLevels.length - 1, currentIndex + 1)]
   }
 
   decreaseZoom(): void {
-    let currentIndex = Object.values(PdfZoomSetting).indexOf(
-      this.previewZoomSetting
-    )
-    if (this.previewZoomScale === PdfZoomSetting.PageFit) currentIndex = 4
-    this.previewZoomScale = PdfZoomSetting.PageWidth
-    this.previewZoomSetting =
-      Object.values(PdfZoomSetting)[Math.max(2, currentIndex - 1)]
+    const zoomLevels = Object.values(PdfZoomLevel)
+    let currentIndex = zoomLevels.indexOf(this.previewZoomSetting)
+    if (this.previewZoomScale === PdfZoomScale.PageFit) {
+      currentIndex = zoomLevels.indexOf(PdfZoomLevel.ThreeQuarters)
+    }
+    this.previewZoomScale = PdfZoomScale.PageWidth
+    this.previewZoomSetting = zoomLevels[Math.max(0, currentIndex - 1)]
   }
 
   get showPermissions(): boolean {
