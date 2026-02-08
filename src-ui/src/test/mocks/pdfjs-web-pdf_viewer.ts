@@ -35,11 +35,13 @@ class BaseViewer {
   currentScale = 1
   currentScaleValue: string | number = 1
   pagesRotation = 0
+  options: Record<string, unknown>
 
   private eventBus?: EventBus
   private _currentPageNumber = 1
 
   constructor(options: { eventBus?: EventBus }) {
+    this.options = options as Record<string, unknown>
     this.eventBus = options.eventBus
   }
 

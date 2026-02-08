@@ -122,11 +122,19 @@ if (!URL.revokeObjectURL) {
   Object.defineProperty(window.URL, 'revokeObjectURL', { value: jest.fn() })
 }
 class MockResizeObserver {
-  constructor(_callback: ResizeObserverCallback) {}
+  private callback: ResizeObserverCallback
+
+  constructor(callback: ResizeObserverCallback) {
+    this.callback = callback
+  }
 
   observe = jest.fn()
   unobserve = jest.fn()
   disconnect = jest.fn()
+
+  trigger = (entries: ResizeObserverEntry[] = []) => {
+    this.callback(entries, this)
+  }
 }
 
 Object.defineProperty(window, 'ResizeObserver', {
