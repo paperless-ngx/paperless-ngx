@@ -462,6 +462,7 @@
               [(page)]="previewCurrentPage"
               [zoomScale]="previewZoomScale"
               [zoom]="previewZoomSetting"
+              [searchQuery]="documentsService.searchQuery"
               (error)="onError($event)"
               (afterLoadComplete)="pdfPreviewLoaded($event)">
             </pngx-pdf-viewer>

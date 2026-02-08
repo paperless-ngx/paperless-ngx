@@ -29,7 +29,7 @@ import {
 export class PreviewPopupComponent implements OnDestroy {
   PdfRenderMode = PdfRenderMode
   private settingsService = inject(SettingsService)
-  private documentService = inject(DocumentService)
+  public readonly documentService = inject(DocumentService)
   private http = inject(HttpClient)
 
   private _document: Document
@@ -64,8 +64,6 @@ export class PreviewPopupComponent implements OnDestroy {
   previewText: string
 
   @ViewChild('popover') popover: NgbPopover
-
-  @ViewChild('pdfViewer') pdfViewer: PngxPdfViewerComponent
 
   mouseOnPreview: boolean = false
 
@@ -115,21 +113,6 @@ export class PreviewPopupComponent implements OnDestroy {
       this.requiresPassword = true
     } else {
       this.error = true
-    }
-  }
-
-  onPageRendered() {
-    // Only triggered by the pngx pdf viewer
-    if (this.documentService.searchQuery) {
-      if (!this.pdfViewer?.eventBus) {
-        return
-      }
-      this.pdfViewer.eventBus.dispatch('find', {
-        query: this.documentService.searchQuery,
-        caseSensitive: false,
-        highlightAll: true,
-        phraseSearch: true,
-      })
     }
   }
 

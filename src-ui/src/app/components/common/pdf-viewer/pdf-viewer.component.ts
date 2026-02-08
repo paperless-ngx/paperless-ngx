@@ -15,10 +15,14 @@ import {
   GlobalWorkerOptions,
   PDFDocumentLoadingTask,
   PDFDocumentProxy,
-  PDFPageProxy,
-  RenderTask,
-  TextLayer,
 } from 'pdfjs-dist/legacy/build/pdf.mjs'
+import {
+  EventBus,
+  PDFFindController,
+  PDFLinkService,
+  PDFSinglePageViewer,
+  PDFViewer,
+} from 'pdfjs-dist/web/pdf_viewer.mjs'
 
 export type PngxPdfDocumentProxy = PDFDocumentProxy
 
@@ -53,6 +57,7 @@ export class PngxPdfViewerComponent
   @Input() rotation?: number
   @Input() renderMode: PdfRenderMode = PdfRenderMode.All
   @Input() selectable?: boolean
+  @Input() searchQuery?: string
   @Input() zoom?: number | string
   @Input() zoomScale?: string
 
@@ -60,22 +65,40 @@ export class PngxPdfViewerComponent
   @Output() rendered = new EventEmitter<void>()
   @Output() error = new EventEmitter<unknown>()
 
-  // Placeholder to mirror ng2-pdf-viewer API used by callers.
-  eventBus = {
-    dispatch: (_eventName: string, _payload?: unknown) => undefined,
-  }
-
   @ViewChild('container', { static: true })
   private container?: ElementRef<HTMLDivElement>
 
+  @ViewChild('viewer', { static: true })
+  private viewer?: ElementRef<HTMLDivElement>
+
   private hasLoaded = false
   private loadingTask?: PDFDocumentLoadingTask
-  private renderTasks: RenderTask[] = []
-  private textLayers: TextLayer[] = []
-  private renderToken = 0
   private resizeObserver?: ResizeObserver
   private lastObservedWidth = 0
   private lastObservedHeight = 0
+  private pdf?: PDFDocumentProxy
+  private pdfViewer?: PDFViewer | PDFSinglePageViewer
+  private findReady = false
+  private pendingFind = false
+
+  private eventBus = new EventBus()
+  private linkService = new PDFLinkService({ eventBus: this.eventBus })
+  private findController = new PDFFindController({
+    eventBus: this.eventBus,
+    linkService: this.linkService,
+    updateMatchesCountOnProgress: false,
+  })
+
+  private onPageRendered = () => {
+    if (!this.findReady) {
+      queueMicrotask(() => this.markFindReady())
+    }
+    this.rendered.emit()
+  }
+  private onPagesInit = () => this.applyScale()
+  private onPageChanging = (evt: { pageNumber: number }) => {
+    this.pageChange.emit(evt.pageNumber)
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['src']) {
@@ -88,32 +111,46 @@ export class PngxPdfViewerComponent
       this.setupResizeObserver()
     }
 
+    if (changes['selectable'] || changes['renderMode']) {
+      this.initViewer()
+    }
+
     if (
       changes['page'] ||
       changes['zoom'] ||
       changes['zoomScale'] ||
-      changes['selectable'] ||
+      changes['rotation'] ||
       changes['renderMode']
     ) {
-      this.renderDocument()
+      this.applyViewerState()
+    }
+
+    if (changes['searchQuery'] && this.pdf) {
+      this.dispatchFind()
     }
   }
 
   ngAfterViewInit(): void {
     this.setupResizeObserver()
+    this.initViewer()
     if (this.src && !this.hasLoaded) {
       this.loadDocument()
       return
     }
-    if (this.loadingTask) {
-      this.renderDocument()
+    if (this.pdf) {
+      this.applyViewerState()
     }
   }
 
   ngOnDestroy(): void {
+    this.eventBus.off('pagerendered', this.onPageRendered)
+    this.eventBus.off('pagesinit', this.onPagesInit)
+    this.eventBus.off('pagechanging', this.onPageChanging)
     this.resizeObserver?.disconnect()
     this.cancelRender()
     this.loadingTask?.destroy()
+    this.pdfViewer?.cleanup()
+    this.pdfViewer = undefined
   }
 
   private async loadDocument(): Promise<void> {
@@ -122,6 +159,8 @@ export class PngxPdfViewerComponent
     }
 
     this.hasLoaded = true
+    this.findReady = false
+    this.pendingFind = false
     this.cancelRender()
     this.loadingTask?.destroy()
 
@@ -131,144 +170,18 @@ export class PngxPdfViewerComponent
 
     try {
       const pdf = await this.loadingTask.promise
+      this.pdf = pdf
+      this.linkService.setDocument(pdf)
+      this.findController.onIsPageVisible = () => true
+      this.pdfViewer?.setDocument(pdf)
+      this.pendingFind = true
+      this.applyViewerState()
       this.afterLoadComplete.emit(pdf)
-      await this.renderDocument(pdf)
     } catch (err) {
+      console.log(err)
+
       this.error.emit(err)
     }
-  }
-
-  private async renderDocument(pdfDocument?: PDFDocumentProxy): Promise<void> {
-    const container = this.container?.nativeElement
-    if (!container) {
-      return
-    }
-
-    const pdf = pdfDocument ?? (await this.loadingTask?.promise)
-    if (!pdf) {
-      return
-    }
-
-    this.cancelRender()
-    container.innerHTML = ''
-
-    const renderToken = ++this.renderToken
-    if (
-      (this.zoomScale === PdfZoomSetting.PageFit ||
-        this.zoomScale === PdfZoomSetting.PageWidth) &&
-      (!container.clientWidth ||
-        (this.zoomScale === PdfZoomSetting.PageFit && !container.clientHeight))
-    ) {
-      requestAnimationFrame(() => {
-        if (renderToken === this.renderToken) {
-          void this.renderDocument(pdf)
-        }
-      })
-      return
-    }
-    const pagesToRender =
-      this.renderMode === PdfRenderMode.Single ? [this.page ?? 1] : []
-    if (pagesToRender.length === 0) {
-      for (let i = 1; i <= pdf.numPages; i++) {
-        pagesToRender.push(i)
-      }
-    }
-
-    for (const pageNumber of pagesToRender) {
-      if (renderToken !== this.renderToken) {
-        return
-      }
-
-      const clampedPage = this.clampPage(pageNumber, pdf)
-      if (clampedPage !== pageNumber) {
-        this.pageChange.emit(clampedPage)
-      }
-      const page = await pdf.getPage(clampedPage)
-      if (renderToken !== this.renderToken) {
-        return
-      }
-
-      const { pageContainer, canvas } = this.createPageCanvas(container)
-      const viewport = this.getViewport(page)
-      const outputScale = window.devicePixelRatio || 1
-      const renderViewport = viewport.clone({
-        scale: viewport.scale * outputScale,
-      })
-      pageContainer.style.width = `${viewport.width}px`
-      pageContainer.style.height = `${viewport.height}px`
-      canvas.width = renderViewport.width
-      canvas.height = renderViewport.height
-      canvas.style.width = `${viewport.width}px`
-      canvas.style.height = `${viewport.height}px`
-
-      const context = canvas.getContext('2d')
-      if (!context) {
-        continue
-      }
-
-      const renderTask = page.render({
-        canvas,
-        canvasContext: context,
-        viewport: renderViewport,
-      })
-      this.renderTasks.push(renderTask)
-      await renderTask.promise
-
-      if (renderToken !== this.renderToken) {
-        return
-      }
-
-      if (this.selectable !== false) {
-        await this.renderTextLayer(page, pageContainer, viewport)
-      }
-
-      this.rendered.emit()
-      page.cleanup()
-      pageContainer.dataset['pageNumber'] = String(clampedPage)
-    }
-  }
-
-  private createPageCanvas(container: HTMLDivElement): {
-    pageContainer: HTMLDivElement
-    canvas: HTMLCanvasElement
-  } {
-    const pageContainer = document.createElement('div')
-    pageContainer.className = 'page'
-    const canvas = document.createElement('canvas')
-    pageContainer.appendChild(canvas)
-    container.appendChild(pageContainer)
-
-    return { pageContainer, canvas }
-  }
-
-  private getViewport(page: PDFPageProxy) {
-    const rotation = this.rotation ?? 0
-    const baseViewport = page.getViewport({ scale: 1, rotation })
-
-    const fitMode = this.zoomScale ?? PdfZoomSetting.PageWidth
-    const zoomFactor = this.parseZoom() ?? 1
-    let scale = 1
-    if (
-      fitMode === PdfZoomSetting.PageFit ||
-      fitMode === PdfZoomSetting.PageWidth
-    ) {
-      const container = this.container?.nativeElement
-      const availableWidth = container?.clientWidth || baseViewport.width
-      const availableHeight = container?.clientHeight || baseViewport.height
-      if (fitMode === PdfZoomSetting.PageWidth) {
-        scale = (availableWidth / baseViewport.width) * zoomFactor
-      } else {
-        scale =
-          Math.min(
-            availableWidth / baseViewport.width,
-            availableHeight / baseViewport.height
-          ) * zoomFactor
-      }
-    } else {
-      scale = zoomFactor
-    }
-
-    return page.getViewport({ scale, rotation })
   }
 
   private parseZoom(): number | undefined {
@@ -320,34 +233,8 @@ export class PngxPdfViewerComponent
     return src
   }
 
-  private clampPage(page: number, pdf: PDFDocumentProxy): number {
-    if (page < 1) {
-      return 1
-    }
-    if (page > pdf.numPages) {
-      return pdf.numPages
-    }
-    return page
-  }
-
   private cancelRender(): void {
-    this.renderToken++
-    for (const task of this.renderTasks) {
-      try {
-        task.cancel()
-      } catch {
-        // ignore
-      }
-    }
-    this.renderTasks = []
-    for (const layer of this.textLayers) {
-      try {
-        layer.cancel()
-      } catch {
-        // ignore
-      }
-    }
-    this.textLayers = []
+    // Placeholder for future render cancellation logic.
   }
 
   private setupResizeObserver(): void {
@@ -372,8 +259,8 @@ export class PngxPdfViewerComponent
       }
       this.lastObservedWidth = width
       this.lastObservedHeight = height
-      if (this.loadingTask) {
-        this.renderDocument()
+      if (this.pdfViewer) {
+        this.applyScale()
       }
     })
     this.resizeObserver.observe(container)
@@ -387,24 +274,112 @@ export class PngxPdfViewerComponent
     )
   }
 
-  private async renderTextLayer(
-    page: PDFPageProxy,
-    pageContainer: HTMLDivElement,
-    viewport: ReturnType<PDFPageProxy['getViewport']>
-  ): Promise<void> {
-    const textLayerDiv = document.createElement('div')
-    textLayerDiv.className = 'textLayer'
-    textLayerDiv.style.width = `${viewport.width}px`
-    textLayerDiv.style.height = `${viewport.height}px`
-    pageContainer.appendChild(textLayerDiv)
+  private initViewer(): void {
+    const container = this.container?.nativeElement
+    const viewer = this.viewer?.nativeElement
+    if (!container || !viewer) {
+      return
+    }
 
-    const textContent = await page.getTextContent()
-    const textLayer = new TextLayer({
-      textContentSource: textContent,
-      container: textLayerDiv,
-      viewport,
+    viewer.innerHTML = ''
+    this.pdfViewer?.cleanup()
+    this.findReady = false
+    this.pendingFind = !!this.searchQuery
+
+    const textLayerMode = this.selectable === false ? 0 : 1
+    const options = {
+      container,
+      viewer,
+      eventBus: this.eventBus,
+      linkService: this.linkService,
+      findController: this.findController,
+      textLayerMode,
+    }
+
+    this.pdfViewer =
+      this.renderMode === PdfRenderMode.Single
+        ? new PDFSinglePageViewer(options)
+        : new PDFViewer(options)
+    this.linkService.setViewer(this.pdfViewer)
+
+    this.eventBus.off('pagerendered', this.onPageRendered)
+    this.eventBus.off('pagesinit', this.onPagesInit)
+    this.eventBus.off('pagechanging', this.onPageChanging)
+    this.eventBus.on('pagerendered', this.onPageRendered)
+    this.eventBus.on('pagesinit', this.onPagesInit)
+    this.eventBus.on('pagechanging', this.onPageChanging)
+
+    if (this.pdf) {
+      this.pdfViewer.setDocument(this.pdf)
+      this.applyViewerState()
+    }
+  }
+
+  private applyViewerState(): void {
+    if (!this.pdfViewer) {
+      return
+    }
+    const hasPages = this.pdfViewer.pagesCount > 0
+    if (typeof this.rotation === 'number' && hasPages) {
+      this.pdfViewer.pagesRotation = this.rotation
+    }
+    if (typeof this.page === 'number' && hasPages) {
+      this.pdfViewer.currentPageNumber = this.page
+    }
+    if (hasPages) {
+      this.applyScale()
+    }
+    this.dispatchFind()
+  }
+
+  private applyScale(): void {
+    if (!this.pdfViewer) {
+      return
+    }
+    if (this.pdfViewer.pagesCount === 0) {
+      return
+    }
+    const zoomFactor = this.parseZoom() ?? 1
+    const fitMode = this.zoomScale ?? PdfZoomSetting.PageWidth
+    if (
+      fitMode === PdfZoomSetting.PageFit ||
+      fitMode === PdfZoomSetting.PageWidth
+    ) {
+      this.pdfViewer.currentScaleValue = fitMode
+      if (zoomFactor !== 1) {
+        this.pdfViewer.currentScale = this.pdfViewer.currentScale * zoomFactor
+      }
+    } else {
+      this.pdfViewer.currentScale = zoomFactor
+    }
+  }
+
+  private markFindReady(): void {
+    if (this.findReady) {
+      return
+    }
+    this.findReady = true
+    if (this.pendingFind) {
+      this.pendingFind = false
+      this.dispatchFindInternal()
+    }
+  }
+
+  private dispatchFind(): void {
+    if (!this.findReady) {
+      this.pendingFind = true
+      return
+    }
+    this.dispatchFindInternal()
+  }
+
+  private dispatchFindInternal(): void {
+    const query = this.searchQuery?.trim() ?? ''
+    this.eventBus.dispatch('find', {
+      query,
+      caseSensitive: false,
+      highlightAll: query.length > 0,
+      phraseSearch: true,
     })
-    this.textLayers.push(textLayer)
-    await textLayer.render()
   }
 }

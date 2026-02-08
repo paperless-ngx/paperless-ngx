@@ -182,7 +182,7 @@ export class DocumentDetailComponent
   implements OnInit, OnDestroy, DirtyComponent
 {
   PdfRenderMode = PdfRenderMode
-  private documentsService = inject(DocumentService)
+  documentsService = inject(DocumentService)
   private route = inject(ActivatedRoute)
   private tagService = inject(TagService)
   private correspondentService = inject(CorrespondentService)

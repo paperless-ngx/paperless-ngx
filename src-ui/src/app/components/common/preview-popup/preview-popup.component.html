@@ -26,8 +26,8 @@
           <pngx-pdf-viewer
             [src]="previewUrl"
             [renderMode]="PdfRenderMode.All"
-            (rendered)="onPageRendered()"
-            (error)="onError($event)" #pdfViewer>
+            [searchQuery]="documentService.searchQuery"
+            (error)="onError($event)">
           </pngx-pdf-viewer>
         }
       }

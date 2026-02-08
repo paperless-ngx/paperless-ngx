@@ -2,39 +2,133 @@
   display: block;
   width: 100%;
   height: 100%;
+  position: relative;
 }
 
 :host ::ng-deep .pngx-pdf-viewer-container {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
   overflow: auto;
 }
 
-:host ::ng-deep .page {
-  position: relative;
+:host ::ng-deep .pdfViewer {
+  --scale-factor: 1;
+  --page-bg-color: unset;
+  padding-bottom: 8px;
+}
+
+:host ::ng-deep .pdfViewer .page {
+  --user-unit: 1;
+  --total-scale-factor: calc(var(--scale-factor) * var(--user-unit));
+  --scale-round-x: 1px;
+  --scale-round-y: 1px;
+  direction: ltr;
   margin: 0 auto 10px;
+  position: relative;
+  overflow: visible;
+  background-color: var(--page-bg-color, rgb(255 255 255));
 
   &:last-child {
     margin-bottom: 0;
   }
 }
 
-:host ::ng-deep .page canvas {
+:host ::ng-deep .pdfViewer .canvasWrapper {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+:host ::ng-deep .pdfViewer .canvasWrapper canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
   display: block;
+  width: 100%;
+  height: 100%;
+  contain: content;
 }
 
 :host ::ng-deep .textLayer {
   position: absolute;
+  text-align: initial;
   inset: 0;
-  color: transparent !important;
+  overflow: clip;
+  opacity: 1;
+  line-height: 1;
+  text-size-adjust: none;
+  transform-origin: 0 0;
+  caret-color: CanvasText;
+  z-index: 0;
   user-select: text;
+  --min-font-size: 1;
+  --text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
+  --min-font-size-inv: calc(1 / var(--min-font-size));
 }
 
-:host ::ng-deep .textLayer span {
+:host ::ng-deep .textLayer.highlighting {
+  touch-action: none;
+}
+
+:host ::ng-deep .textLayer :is(span, br) {
   position: absolute;
   white-space: pre;
-  transform-origin: 0 0;
-  color: transparent !important;
+  color: transparent;
+  cursor: text;
+  transform-origin: 0% 0%;
+}
+
+:host ::ng-deep .textLayer > :not(.markedContent),
+:host ::ng-deep .textLayer .markedContent span:not(.markedContent) {
+  z-index: 1;
+  --font-height: 0;
+  font-size: calc(var(--text-scale-factor) * var(--font-height));
+  --scale-x: 1;
+  --rotate: 0deg;
+  transform: rotate(var(--rotate)) scaleX(var(--scale-x))
+    scale(var(--min-font-size-inv));
+}
+
+:host ::ng-deep .textLayer .markedContent {
+  display: contents;
+}
+
+:host ::ng-deep .textLayer span[role='img'] {
+  user-select: none;
+  cursor: default;
+}
+
+:host ::ng-deep .textLayer .highlight {
+  --highlight-bg-color: rgb(180 0 170 / 0.25);
+  --highlight-selected-bg-color: rgb(0 100 0 / 0.25);
+  --highlight-backdrop-filter: none;
+  --highlight-selected-backdrop-filter: none;
+  margin: -1px;
+  padding: 1px;
+  background-color: var(--highlight-bg-color);
+  backdrop-filter: var(--highlight-backdrop-filter);
+  border-radius: 4px;
+}
+
+:host ::ng-deep .appended:is(.textLayer .highlight) {
+  position: initial;
+}
+
+:host ::ng-deep .begin:is(.textLayer .highlight) {
+  border-radius: 4px 0 0 4px;
+}
+
+:host ::ng-deep .end:is(.textLayer .highlight) {
+  border-radius: 0 4px 4px 0;
+}
+
+:host ::ng-deep .middle:is(.textLayer .highlight) {
+  border-radius: 0;
+}
+
+:host ::ng-deep .selected:is(.textLayer .highlight) {
+  background-color: var(--highlight-selected-bg-color);
 }
 
 :host ::ng-deep .textLayer ::selection {
