@@ -49,7 +49,6 @@ from documents.templating.utils import convert_format_str_to_template_format
 from documents.workflows.actions import build_workflow_action_context
 from documents.workflows.actions import execute_email_action
 from documents.workflows.actions import execute_move_to_trash_action
-from documents.workflows.actions import execute_move_to_trash_action_consumption
 from documents.workflows.actions import execute_password_removal_action
 from documents.workflows.actions import execute_webhook_action
 from documents.workflows.mutations import apply_assignment_to_document
@@ -870,14 +869,7 @@ def run_workflows(
             )
 
             if has_move_to_trash_action:
-                if use_overrides:
-                    execute_move_to_trash_action_consumption(
-                        action,
-                        document,
-                        logging_group,
-                    )
-                else:
-                    execute_move_to_trash_action(action, document, logging_group)
+                execute_move_to_trash_action(action, document, logging_group)
 
     if use_overrides:
         return overrides, "\n".join(messages)

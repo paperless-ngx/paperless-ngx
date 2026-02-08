@@ -344,36 +344,29 @@ def execute_password_removal_action(
 
 def execute_move_to_trash_action(
     action: WorkflowAction,
-    document: Document,
+    document: Document | ConsumableDocument,
     logging_group: uuid.UUID,
 ) -> None:
     """
-    Execute a move to trash action for a workflow on an existing document.
-    Soft-deletes the document (moves to trash).
+    Execute a move to trash action for a workflow on an existing document or a
+    document in consumption. In case of an existing document it soft-deletes
+    the document. In case of consumption it aborts consumption and deletes the
+    file.
     """
-    document.delete()
-    logger.debug(
-        f"Moved document {document} to trash",
-        extra={"group": logging_group},
-    )
-
-
-def execute_move_to_trash_action_consumption(
-    action: WorkflowAction,
-    document: ConsumableDocument,
-    logging_group: uuid.UUID,
-) -> None:
-    """
-    Execute a move to trash action for a workflow during consumption.
-    Stops consumption and deletes the original file.
-    """
-    if document.original_file.exists():
-        document.original_file.unlink()
-    logger.info(
-        f"Workflow move to trash action triggered during consumption, "
-        f"deleting file {document.original_file}",
-        extra={"group": logging_group},
-    )
-    raise StopConsumeTaskError(
-        "Document deleted by workflow action during consumption",
-    )
+    if isinstance(document, Document):
+        document.delete()
+        logger.debug(
+            f"Moved document {document} to trash",
+            extra={"group": logging_group},
+        )
+    else:
+        if document.original_file.exists():
+            document.original_file.unlink()
+        logger.info(
+            f"Workflow move to trash action triggered during consumption, "
+            f"deleting file {document.original_file}",
+            extra={"group": logging_group},
+        )
+        raise StopConsumeTaskError(
+            "Document deleted by workflow action during consumption",
+        )
