@@ -108,6 +108,7 @@ import { PageHeaderComponent } from '../common/page-header/page-header.component
 import { PdfEditorEditMode } from '../common/pdf-editor/pdf-editor-edit-mode'
 import { PDFEditorComponent } from '../common/pdf-editor/pdf-editor.component'
 import {
+  PdfRenderMode,
   PngxPdfDocumentProxy,
   PngxPdfViewerComponent,
 } from '../common/pdf-viewer/pdf-viewer.component'
@@ -180,6 +181,7 @@ export class DocumentDetailComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy, DirtyComponent
 {
+  PdfRenderMode = PdfRenderMode
   private documentsService = inject(DocumentService)
   private route = inject(ActivatedRoute)
   private tagService = inject(TagService)

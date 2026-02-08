@@ -25,7 +25,7 @@
         @if (!requiresPassword) {
           <pngx-pdf-viewer
             [src]="previewUrl"
-            [showAll]="true"
+            [renderMode]="PdfRenderMode.All"
             (rendered)="onPageRendered()"
             (error)="onError($event)" #pdfViewer>
           </pngx-pdf-viewer>

@@ -12,6 +12,7 @@ import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component'
 import {
+  PdfRenderMode,
   PngxPdfDocumentProxy,
   PngxPdfViewerComponent,
 } from '../pdf-viewer/pdf-viewer.component'
@@ -37,6 +38,7 @@ interface PageOperation {
   ],
 })
 export class PDFEditorComponent extends ConfirmDialogComponent {
+  PdfRenderMode = PdfRenderMode
   public PdfEditorEditMode = PdfEditorEditMode
 
   private documentService = inject(DocumentService)

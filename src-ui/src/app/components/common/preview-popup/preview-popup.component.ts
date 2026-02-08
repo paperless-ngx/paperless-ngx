@@ -9,7 +9,10 @@ import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { PngxPdfViewerComponent } from '../pdf-viewer/pdf-viewer.component'
+import {
+  PdfRenderMode,
+  PngxPdfViewerComponent,
+} from '../pdf-viewer/pdf-viewer.component'
 
 @Component({
   selector: 'pngx-preview-popup',
@@ -24,6 +27,7 @@ import { PngxPdfViewerComponent } from '../pdf-viewer/pdf-viewer.component'
   ],
 })
 export class PreviewPopupComponent implements OnDestroy {
+  PdfRenderMode = PdfRenderMode
   private settingsService = inject(SettingsService)
   private documentService = inject(DocumentService)
   private http = inject(HttpClient)

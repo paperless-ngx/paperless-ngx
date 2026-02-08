@@ -21,6 +21,11 @@ import {
 } from 'pdfjs-dist/legacy/build/pdf.mjs'
 
 export type PngxPdfDocumentProxy = PDFDocumentProxy
+
+export enum PdfRenderMode {
+  Single = 'single',
+  All = 'all',
+}
 @Component({
   selector: 'pngx-pdf-viewer',
   templateUrl: './pdf-viewer.component.html',
@@ -33,7 +38,7 @@ export class PngxPdfViewerComponent
   @Input() page?: number
   @Output() pageChange = new EventEmitter<number>()
   @Input() rotation?: number
-  @Input() showAll?: boolean
+  @Input() renderMode: PdfRenderMode = PdfRenderMode.All
   @Input() selectable?: boolean
   @Input() zoom?: number | string
   @Input() zoomScale?: string
@@ -146,7 +151,8 @@ export class PngxPdfViewerComponent
       })
       return
     }
-    const pagesToRender = this.showAll === false ? [this.page ?? 1] : []
+    const pagesToRender =
+      this.renderMode === PdfRenderMode.Single ? [this.page ?? 1] : []
     if (pagesToRender.length === 0) {
       for (let i = 1; i <= pdf.numPages; i++) {
         pagesToRender.push(i)
