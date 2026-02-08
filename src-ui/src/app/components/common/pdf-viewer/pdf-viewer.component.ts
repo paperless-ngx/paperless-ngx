@@ -125,7 +125,7 @@ export class PngxPdfViewerComponent
       this.applyViewerState()
     }
 
-    if (changes['searchQuery'] && this.pdf) {
+    if (changes['searchQuery']) {
       this.dispatchFindIfReady()
     }
   }
@@ -133,7 +133,7 @@ export class PngxPdfViewerComponent
   ngAfterViewInit(): void {
     this.setupResizeObserver()
     this.initViewer()
-    if (this.src && !this.hasLoaded) {
+    if (!this.hasLoaded) {
       this.loadDocument()
       return
     }
@@ -153,7 +153,7 @@ export class PngxPdfViewerComponent
   }
 
   private async loadDocument(): Promise<void> {
-    if (!this.src || this.hasLoaded) {
+    if (this.hasLoaded) {
       return
     }
 
@@ -254,10 +254,10 @@ export class PngxPdfViewerComponent
   }
 
   private dispatchFindIfReady(): void {
-    if (!this.pdf || !this.hasRenderedPage) {
+    if (!this.hasRenderedPage) {
       return
     }
-    const query = this.searchQuery?.trim() ?? ''
+    const query = this.searchQuery.trim()
     if (query === this.lastFindQuery) {
       return
     }
