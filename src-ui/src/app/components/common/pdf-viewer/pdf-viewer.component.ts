@@ -33,17 +33,15 @@ export class PngxPdfViewerComponent
   @Input() page?: number
   @Output() pageChange = new EventEmitter<number>()
   @Input() rotation?: number
-  @Input('original-size') originalSize?: boolean
-  @Input('show-borders') showBorders?: boolean
-  @Input('show-all') showAll?: boolean
-  @Input('render-text') renderText?: boolean
+  @Input() showBorders?: boolean
+  @Input() showAll?: boolean
+  @Input() renderText?: boolean
   @Input() zoom?: number | string
-  @Input('zoom-scale') zoomScale?: string
+  @Input() zoomScale?: string
 
-  @Output('after-load-complete') afterLoadComplete =
-    new EventEmitter<PngxPdfDocumentProxy>()
-  @Output('page-rendered') pageRendered = new EventEmitter<void>()
-  @Output('text-layer-rendered') textLayerRendered = new EventEmitter<void>()
+  @Output() afterLoadComplete = new EventEmitter<PngxPdfDocumentProxy>()
+  @Output() pageRendered = new EventEmitter<void>()
+  @Output() textLayerRendered = new EventEmitter<void>()
   @Output() error = new EventEmitter<unknown>()
 
   // Placeholder to mirror ng2-pdf-viewer API used by callers.

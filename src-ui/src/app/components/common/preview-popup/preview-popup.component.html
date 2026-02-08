@@ -25,10 +25,9 @@
         @if (!requiresPassword) {
           <pngx-pdf-viewer
             [src]="previewUrl"
-            [original-size]="false"
-            [show-borders]="false"
-            [show-all]="true"
-            (text-layer-rendered)="onPageRendered()"
+            [showBorders]="false"
+            [showAll]="true"
+            (textLayerRendered)="onPageRendered()"
             (error)="onError($event)" #pdfViewer>
           </pngx-pdf-viewer>
         }
