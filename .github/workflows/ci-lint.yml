@@ -21,4 +21,4 @@ jobs:
         with:
           python-version: "3.14"
       - name: Run prek
-        uses: j178/prek-action@v1.1.0
+        uses: j178/prek-action@v1.1.1
