@@ -185,21 +185,10 @@ export class PngxPdfViewerComponent
       return
     }
 
-    if (!this.shouldObserveResize()) {
-      return
-    }
-
     this.resizeObserver = new ResizeObserver(() => {
       this.applyScale()
     })
     this.resizeObserver.observe(container)
-  }
-
-  private shouldObserveResize(): boolean {
-    return (
-      this.zoomScale === PdfZoomScale.PageFit ||
-      this.zoomScale === PdfZoomScale.PageWidth
-    )
   }
 
   private initViewer(): void {
