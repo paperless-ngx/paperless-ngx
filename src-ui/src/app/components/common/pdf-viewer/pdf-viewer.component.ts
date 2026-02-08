@@ -79,7 +79,8 @@ export class PngxPdfViewerComponent
       changes['page'] ||
       changes['zoom'] ||
       changes['zoomScale'] ||
-      changes['selectable']
+      changes['selectable'] ||
+      changes['renderMode']
     ) {
       this.renderDocument()
     }
@@ -175,10 +176,14 @@ export class PngxPdfViewerComponent
 
       const { pageContainer, canvas } = this.createPageCanvas(container)
       const viewport = this.getViewport(page)
+      const outputScale = window.devicePixelRatio || 1
+      const renderViewport = viewport.clone({
+        scale: viewport.scale * outputScale,
+      })
       pageContainer.style.width = `${viewport.width}px`
       pageContainer.style.height = `${viewport.height}px`
-      canvas.width = viewport.width
-      canvas.height = viewport.height
+      canvas.width = renderViewport.width
+      canvas.height = renderViewport.height
       canvas.style.width = `${viewport.width}px`
       canvas.style.height = `${viewport.height}px`
 
@@ -190,7 +195,7 @@ export class PngxPdfViewerComponent
       const renderTask = page.render({
         canvas,
         canvasContext: context,
-        viewport,
+        viewport: renderViewport,
       })
       this.renderTasks.push(renderTask)
       await renderTask.promise
@@ -225,20 +230,25 @@ export class PngxPdfViewerComponent
   private getViewport(page: PDFPageProxy) {
     const rotation = this.rotation ?? 0
     const baseViewport = page.getViewport({ scale: 1, rotation })
-    let scale = this.parseZoom() ?? 1
 
-    if (this.zoomScale === 'page-fit' || this.zoomScale === 'page-width') {
+    const fitMode = this.zoomScale
+    const zoomFactor = this.parseZoom() ?? 1
+    let scale = 1
+    if (fitMode === 'page-fit' || fitMode === 'page-width') {
       const container = this.container?.nativeElement
       const availableWidth = container?.clientWidth || baseViewport.width
       const availableHeight = container?.clientHeight || baseViewport.height
-      if (this.zoomScale === 'page-width') {
-        scale = availableWidth / baseViewport.width
+      if (fitMode === 'page-width') {
+        scale = (availableWidth / baseViewport.width) * zoomFactor
       } else {
-        scale = Math.min(
-          availableWidth / baseViewport.width,
-          availableHeight / baseViewport.height
-        )
+        scale =
+          Math.min(
+            availableWidth / baseViewport.width,
+            availableHeight / baseViewport.height
+          ) * zoomFactor
       }
+    } else {
+      scale = zoomFactor
     }
 
     return page.getViewport({ scale, rotation })
@@ -353,7 +363,11 @@ export class PngxPdfViewerComponent
   }
 
   private shouldObserveResize(): boolean {
-    return this.zoomScale === 'page-fit' || this.zoomScale === 'page-width'
+    return (
+      this.zoomScale === 'page-fit' ||
+      this.zoomScale === 'page-width' ||
+      this.renderMode === PdfRenderMode.All
+    )
   }
 
   private async renderTextLayer(
