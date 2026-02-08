@@ -1,4 +1,4 @@
-<pngx-pdf-viewer [src]="pdfSrc" zoom="0.4" (after-load-complete)="pdfLoaded($event)"></pngx-pdf-viewer>
+<pngx-pdf-viewer class="visually-hidden" [src]="pdfSrc" [show-all]="false" [page]="1" [render-text]="false" (after-load-complete)="pdfLoaded($event)"></pngx-pdf-viewer>
 <div class="modal-header">
   <h4 class="modal-title">{{ title }}</h4>
   <button type="button" class="btn-close" aria-label="Close" (click)="cancel()"></button>
