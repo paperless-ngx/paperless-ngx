@@ -110,7 +110,7 @@ import { PDFEditorComponent } from '../common/pdf-editor/pdf-editor.component'
 import {
   PngxPdfDocumentProxy,
   PngxPdfViewerComponent,
-} from '../common/pngx-pdf-viewer/pngx-pdf-viewer.component'
+} from '../common/pdf-viewer/pdf-viewer.component'
 import { ShareLinksDialogComponent } from '../common/share-links-dialog/share-links-dialog.component'
 import { SuggestionsDropdownComponent } from '../common/suggestions-dropdown/suggestions-dropdown.component'
 import { DocumentHistoryComponent } from '../document-history/document-history.component'

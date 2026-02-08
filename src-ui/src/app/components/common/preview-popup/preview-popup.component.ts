@@ -9,7 +9,7 @@ import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { PngxPdfViewerComponent } from '../pngx-pdf-viewer/pngx-pdf-viewer.component'
+import { PngxPdfViewerComponent } from '../pdf-viewer/pdf-viewer.component'
 
 @Component({
   selector: 'pngx-preview-popup',

@@ -14,7 +14,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 import {
   PngxPdfDocumentProxy,
   PngxPdfViewerComponent,
-} from '../pngx-pdf-viewer/pngx-pdf-viewer.component'
+} from '../pdf-viewer/pdf-viewer.component'
 import { PdfEditorEditMode } from './pdf-editor-edit-mode'
 
 interface PageOperation {

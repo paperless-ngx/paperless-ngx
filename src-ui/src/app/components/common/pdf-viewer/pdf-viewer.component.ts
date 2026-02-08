@@ -23,8 +23,8 @@ import {
 export type PngxPdfDocumentProxy = PDFDocumentProxy
 @Component({
   selector: 'pngx-pdf-viewer',
-  templateUrl: './pngx-pdf-viewer.component.html',
-  styleUrl: './pngx-pdf-viewer.component.scss',
+  templateUrl: './pdf-viewer.component.html',
+  styleUrl: './pdf-viewer.component.scss',
 })
 export class PngxPdfViewerComponent
   implements AfterViewInit, OnChanges, OnDestroy
