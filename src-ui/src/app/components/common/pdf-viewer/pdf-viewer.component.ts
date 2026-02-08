@@ -76,8 +76,8 @@ export class PngxPdfViewerComponent
   private resizeObserver?: ResizeObserver
   private pdf?: PDFDocumentProxy
   private pdfViewer?: PDFViewer | PDFSinglePageViewer
-  private findReady = false
-  private pendingFind = false
+  private hasRenderedPage = false
+  private lastFindQuery = ''
 
   private eventBus = new EventBus()
   private linkService = new PDFLinkService({ eventBus: this.eventBus })
@@ -88,9 +88,8 @@ export class PngxPdfViewerComponent
   })
 
   private onPageRendered = () => {
-    if (!this.findReady) {
-      queueMicrotask(() => this.markFindReady())
-    }
+    this.hasRenderedPage = true
+    this.dispatchFindIfReady()
     this.rendered.emit()
   }
   private onPagesInit = () => this.applyScale()
@@ -123,7 +122,7 @@ export class PngxPdfViewerComponent
     }
 
     if (changes['searchQuery'] && this.pdf) {
-      this.dispatchFind()
+      this.dispatchFindIfReady()
     }
   }
 
@@ -155,8 +154,8 @@ export class PngxPdfViewerComponent
     }
 
     this.hasLoaded = true
-    this.findReady = false
-    this.pendingFind = false
+    this.hasRenderedPage = false
+    this.lastFindQuery = ''
     this.loadingTask?.destroy()
 
     GlobalWorkerOptions.workerSrc = '/assets/js/pdf.worker.min.mjs'
@@ -208,8 +207,8 @@ export class PngxPdfViewerComponent
 
     viewer.innerHTML = ''
     this.pdfViewer?.cleanup()
-    this.findReady = false
-    this.pendingFind = !!this.searchQuery
+    this.hasRenderedPage = false
+    this.lastFindQuery = ''
 
     const textLayerMode = this.selectable === false ? 0 : 1
     const options = {
@@ -255,7 +254,7 @@ export class PngxPdfViewerComponent
     if (hasPages) {
       this.applyScale()
     }
-    this.dispatchFind()
+    this.dispatchFindIfReady()
   }
 
   private applyScale(): void {
@@ -282,27 +281,15 @@ export class PngxPdfViewerComponent
     }
   }
 
-  private markFindReady(): void {
-    if (this.findReady) {
+  private dispatchFindIfReady(): void {
+    if (!this.pdf || !this.hasRenderedPage) {
       return
     }
-    this.findReady = true
-    if (this.pendingFind) {
-      this.pendingFind = false
-      this.dispatchFindInternal()
-    }
-  }
-
-  private dispatchFind(): void {
-    if (!this.findReady) {
-      this.pendingFind = true
-      return
-    }
-    this.dispatchFindInternal()
-  }
-
-  private dispatchFindInternal(): void {
     const query = this.searchQuery?.trim() ?? ''
+    if (query === this.lastFindQuery) {
+      return
+    }
+    this.lastFindQuery = query
     this.eventBus.dispatch('find', {
       query,
       caseSensitive: false,
