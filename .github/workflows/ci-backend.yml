@@ -23,7 +23,7 @@ concurrency:
   group: backend-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 env:
-  DEFAULT_UV_VERSION: "0.9.x"
+  DEFAULT_UV_VERSION: "0.10.x"
   NLTK_DATA: "/usr/share/nltk_data"
 jobs:
   test:
