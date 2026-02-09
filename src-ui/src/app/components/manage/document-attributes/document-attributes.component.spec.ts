@@ -14,7 +14,10 @@ import {
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
-import { DocumentAttributesComponent } from './document-attributes.component'
+import {
+  DocumentAttributesComponent,
+  DocumentAttributesSectionKind,
+} from './document-attributes.component'
 
 @Component({
   selector: 'pngx-dummy-section',
@@ -69,7 +72,7 @@ describe('DocumentAttributesComponent', () => {
         label: 'Tags',
         icon: 'tags',
         permissionType: PermissionType.Tag,
-        kind: 'attributeList',
+        kind: DocumentAttributesSectionKind.ManagementList,
         component: DummySectionComponent,
       },
       {
@@ -78,7 +81,7 @@ describe('DocumentAttributesComponent', () => {
         label: 'Custom fields',
         icon: 'ui-radios',
         permissionType: PermissionType.CustomField,
-        kind: 'customFields',
+        kind: DocumentAttributesSectionKind.CustomFields,
         component: DummySectionComponent,
       },
     ]

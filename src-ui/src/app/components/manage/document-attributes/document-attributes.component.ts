@@ -40,7 +40,10 @@ enum DocumentAttributesNavIDs {
   CustomFields = 5,
 }
 
-type DocumentAttributesSectionKind = 'attributeList' | 'customFields'
+export enum DocumentAttributesSectionKind {
+  ManagementList = 'managementList',
+  CustomFields = 'customFields',
+}
 
 interface DocumentAttributesSection {
   id: DocumentAttributesNavIDs
@@ -87,7 +90,7 @@ export class DocumentAttributesComponent
       icon: 'tags',
       infoLink: 'usage/#terms-and-definitions',
       permissionType: PermissionType.Tag,
-      kind: 'attributeList',
+      kind: DocumentAttributesSectionKind.ManagementList,
       component: TagListComponent,
     },
     {
@@ -97,7 +100,7 @@ export class DocumentAttributesComponent
       icon: 'person',
       infoLink: 'usage/#terms-and-definitions',
       permissionType: PermissionType.Correspondent,
-      kind: 'attributeList',
+      kind: DocumentAttributesSectionKind.ManagementList,
       component: CorrespondentListComponent,
     },
     {
@@ -107,7 +110,7 @@ export class DocumentAttributesComponent
       icon: 'hash',
       infoLink: 'usage/#terms-and-definitions',
       permissionType: PermissionType.DocumentType,
-      kind: 'attributeList',
+      kind: DocumentAttributesSectionKind.ManagementList,
       component: DocumentTypeListComponent,
     },
     {
@@ -117,7 +120,7 @@ export class DocumentAttributesComponent
       icon: 'folder',
       infoLink: 'usage/#terms-and-definitions',
       permissionType: PermissionType.StoragePath,
-      kind: 'attributeList',
+      kind: DocumentAttributesSectionKind.ManagementList,
       component: StoragePathListComponent,
     },
     {
@@ -127,7 +130,7 @@ export class DocumentAttributesComponent
       icon: 'ui-radios',
       infoLink: 'usage/#custom-fields',
       permissionType: PermissionType.CustomField,
-      kind: 'customFields',
+      kind: DocumentAttributesSectionKind.CustomFields,
       component: CustomFieldsComponent,
     },
   ]
@@ -156,13 +159,17 @@ export class DocumentAttributesComponent
   }
 
   get activeAttributeList(): ManagementListComponent<any> | null {
-    if (this.activeSection?.kind !== 'attributeList') return null
+    if (
+      this.activeSection?.kind !== DocumentAttributesSectionKind.ManagementList
+    )
+      return null
     const instance = this.activeOutlet?.componentInstance
     return instance instanceof ManagementListComponent ? instance : null
   }
 
   get activeCustomFields(): CustomFieldsComponent | null {
-    if (this.activeSection?.kind !== 'customFields') return null
+    if (this.activeSection?.kind !== DocumentAttributesSectionKind.CustomFields)
+      return null
     const instance = this.activeOutlet?.componentInstance
     return instance instanceof CustomFieldsComponent ? instance : null
   }
