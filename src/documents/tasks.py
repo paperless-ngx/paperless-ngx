@@ -8,7 +8,6 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from tempfile import mkstemp
 
-import tqdm
 from celery import Task
 from celery import shared_task
 from celery import states
@@ -19,6 +18,11 @@ from django.db import transaction
 from django.db.models.signals import post_save
 from django.utils import timezone
 from filelock import FileLock
+from rich.progress import BarColumn
+from rich.progress import Progress
+from rich.progress import TaskProgressColumn
+from rich.progress import TextColumn
+from rich.progress import TimeRemainingColumn
 from whoosh.writing import AsyncWriter
 
 from documents import index
@@ -83,9 +87,20 @@ def index_reindex(*, progress_bar_disable=False) -> None:
 
     ix = index.open_index(recreate=True)
 
-    with AsyncWriter(ix) as writer:
-        for document in tqdm.tqdm(documents, disable=progress_bar_disable):
+    with (
+        AsyncWriter(ix) as writer,
+        Progress(
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            TimeRemainingColumn(),
+            disable=progress_bar_disable,
+        ) as progress,
+    ):
+        task = progress.add_task("Reindexing documents", total=documents.count())
+        for document in documents:
             index.update_document(writer, document)
+            progress.update(task, advance=1)
 
 
 @shared_task

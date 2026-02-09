@@ -2,9 +2,13 @@ import logging
 import multiprocessing
 import shutil
 
-import tqdm
 from django import db
 from django.core.management.base import BaseCommand
+from rich.progress import BarColumn
+from rich.progress import Progress
+from rich.progress import TaskProgressColumn
+from rich.progress import TextColumn
+from rich.progress import TimeRemainingColumn
 
 from documents.management.commands.mixins import MultiProcessMixin
 from documents.management.commands.mixins import ProgressBarMixin
@@ -70,15 +74,19 @@ class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
         # with postgres.
         db.connections.close_all()
 
-        if self.process_count == 1:
-            for doc_id in ids:
-                _process_document(doc_id)
-        else:  # pragma: no cover
-            with multiprocessing.Pool(processes=self.process_count) as pool:
-                list(
-                    tqdm.tqdm(
-                        pool.imap_unordered(_process_document, ids),
-                        total=len(ids),
-                        disable=self.no_progress_bar,
-                    ),
-                )
+        with Progress(
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            TimeRemainingColumn(),
+            disable=self.no_progress_bar,
+        ) as progress:
+            task = progress.add_task("Generating thumbnails", total=len(ids))
+            if self.process_count == 1:
+                for doc_id in ids:
+                    _process_document(doc_id)
+                    progress.update(task, advance=1)
+            else:  # pragma: no cover
+                with multiprocessing.Pool(processes=self.process_count) as pool:
+                    for _ in pool.imap_unordered(_process_document, ids):
+                        progress.update(task, advance=1)

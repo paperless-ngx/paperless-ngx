@@ -1,7 +1,11 @@
 import logging
 
-import tqdm
 from django.core.management.base import BaseCommand
+from rich.progress import BarColumn
+from rich.progress import Progress
+from rich.progress import TaskProgressColumn
+from rich.progress import TextColumn
+from rich.progress import TimeRemainingColumn
 
 from documents.classifier import load_classifier
 from documents.management.commands.mixins import ProgressBarMixin
@@ -84,53 +88,62 @@ class Command(ProgressBarMixin, BaseCommand):
 
         classifier = load_classifier()
 
-        for document in tqdm.tqdm(documents, disable=self.no_progress_bar):
-            if options["correspondent"]:
-                set_correspondent(
-                    sender=None,
-                    document=document,
-                    classifier=classifier,
-                    replace=options["overwrite"],
-                    use_first=options["use_first"],
-                    suggest=options["suggest"],
-                    base_url=options["base_url"],
-                    stdout=self.stdout,
-                    style_func=self.style,
-                )
+        with Progress(
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            TimeRemainingColumn(),
+            disable=self.no_progress_bar,
+        ) as progress:
+            task = progress.add_task("Retagging documents", total=documents.count())
+            for document in documents:
+                if options["correspondent"]:
+                    set_correspondent(
+                        sender=None,
+                        document=document,
+                        classifier=classifier,
+                        replace=options["overwrite"],
+                        use_first=options["use_first"],
+                        suggest=options["suggest"],
+                        base_url=options["base_url"],
+                        stdout=self.stdout,
+                        style_func=self.style,
+                    )
 
-            if options["document_type"]:
-                set_document_type(
-                    sender=None,
-                    document=document,
-                    classifier=classifier,
-                    replace=options["overwrite"],
-                    use_first=options["use_first"],
-                    suggest=options["suggest"],
-                    base_url=options["base_url"],
-                    stdout=self.stdout,
-                    style_func=self.style,
-                )
+                if options["document_type"]:
+                    set_document_type(
+                        sender=None,
+                        document=document,
+                        classifier=classifier,
+                        replace=options["overwrite"],
+                        use_first=options["use_first"],
+                        suggest=options["suggest"],
+                        base_url=options["base_url"],
+                        stdout=self.stdout,
+                        style_func=self.style,
+                    )
 
-            if options["tags"]:
-                set_tags(
-                    sender=None,
-                    document=document,
-                    classifier=classifier,
-                    replace=options["overwrite"],
-                    suggest=options["suggest"],
-                    base_url=options["base_url"],
-                    stdout=self.stdout,
-                    style_func=self.style,
-                )
-            if options["storage_path"]:
-                set_storage_path(
-                    sender=None,
-                    document=document,
-                    classifier=classifier,
-                    replace=options["overwrite"],
-                    use_first=options["use_first"],
-                    suggest=options["suggest"],
-                    base_url=options["base_url"],
-                    stdout=self.stdout,
-                    style_func=self.style,
-                )
+                if options["tags"]:
+                    set_tags(
+                        sender=None,
+                        document=document,
+                        classifier=classifier,
+                        replace=options["overwrite"],
+                        suggest=options["suggest"],
+                        base_url=options["base_url"],
+                        stdout=self.stdout,
+                        style_func=self.style,
+                    )
+                if options["storage_path"]:
+                    set_storage_path(
+                        sender=None,
+                        document=document,
+                        classifier=classifier,
+                        replace=options["overwrite"],
+                        use_first=options["use_first"],
+                        suggest=options["suggest"],
+                        base_url=options["base_url"],
+                        stdout=self.stdout,
+                        style_func=self.style,
+                    )
+                progress.update(task, advance=1)

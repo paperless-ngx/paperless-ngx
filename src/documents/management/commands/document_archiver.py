@@ -1,10 +1,14 @@
 import logging
 import multiprocessing
 
-import tqdm
 from django import db
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from rich.progress import BarColumn
+from rich.progress import Progress
+from rich.progress import TaskProgressColumn
+from rich.progress import TextColumn
+from rich.progress import TimeRemainingColumn
 
 from documents.management.commands.mixins import MultiProcessMixin
 from documents.management.commands.mixins import ProgressBarMixin
@@ -75,20 +79,24 @@ class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
         try:
             logging.getLogger().handlers[0].level = logging.ERROR
 
-            if self.process_count == 1:
-                for doc_id in document_ids:
-                    update_document_content_maybe_archive_file(doc_id)
-            else:  # pragma: no cover
-                with multiprocessing.Pool(self.process_count) as pool:
-                    list(
-                        tqdm.tqdm(
-                            pool.imap_unordered(
-                                update_document_content_maybe_archive_file,
-                                document_ids,
-                            ),
-                            total=len(document_ids),
-                            disable=self.no_progress_bar,
-                        ),
-                    )
+            with Progress(
+                TextColumn("[progress.description]{task.description}"),
+                BarColumn(),
+                TaskProgressColumn(),
+                TimeRemainingColumn(),
+                disable=self.no_progress_bar,
+            ) as progress:
+                task = progress.add_task("Archiving documents", total=len(document_ids))
+                if self.process_count == 1:
+                    for doc_id in document_ids:
+                        update_document_content_maybe_archive_file(doc_id)
+                        progress.update(task, advance=1)
+                else:  # pragma: no cover
+                    with multiprocessing.Pool(self.process_count) as pool:
+                        for _ in pool.imap_unordered(
+                            update_document_content_maybe_archive_file,
+                            document_ids,
+                        ):
+                            progress.update(task, advance=1)
         except KeyboardInterrupt:
             self.stdout.write(self.style.NOTICE("Aborting..."))

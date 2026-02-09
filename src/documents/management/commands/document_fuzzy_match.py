@@ -3,9 +3,13 @@ import multiprocessing
 from typing import Final
 
 import rapidfuzz
-import tqdm
 from django.core.management import BaseCommand
 from django.core.management import CommandError
+from rich.progress import BarColumn
+from rich.progress import Progress
+from rich.progress import TaskProgressColumn
+from rich.progress import TextColumn
+from rich.progress import TimeRemainingColumn
 
 from documents.management.commands.mixins import MultiProcessMixin
 from documents.management.commands.mixins import ProgressBarMixin
@@ -106,19 +110,25 @@ class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
                 work_pkgs.append(_WorkPackage(first_doc, second_doc))
 
         # Don't spin up a pool of 1 process
-        if self.process_count == 1:
-            results = []
-            for work in tqdm.tqdm(work_pkgs, disable=self.no_progress_bar):
-                results.append(_process_and_match(work))
-        else:  # pragma: no cover
-            with multiprocessing.Pool(processes=self.process_count) as pool:
-                results = list(
-                    tqdm.tqdm(
-                        pool.imap_unordered(_process_and_match, work_pkgs),
-                        total=len(work_pkgs),
-                        disable=self.no_progress_bar,
-                    ),
-                )
+        with Progress(
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            TimeRemainingColumn(),
+            disable=self.no_progress_bar,
+        ) as progress:
+            task = progress.add_task("Fuzzy matching documents", total=len(work_pkgs))
+            if self.process_count == 1:
+                results = []
+                for work in work_pkgs:
+                    results.append(_process_and_match(work))
+                    progress.update(task, advance=1)
+            else:  # pragma: no cover
+                with multiprocessing.Pool(processes=self.process_count) as pool:
+                    results = []
+                    for result in pool.imap_unordered(_process_and_match, work_pkgs):
+                        results.append(result)
+                        progress.update(task, advance=1)
 
         # Check results
         messages = []

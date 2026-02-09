@@ -8,7 +8,11 @@ from typing import Final
 from celery import states
 from django.conf import settings
 from django.utils import timezone
-from tqdm import tqdm
+from rich.progress import BarColumn
+from rich.progress import Progress
+from rich.progress import TaskProgressColumn
+from rich.progress import TextColumn
+from rich.progress import TimeRemainingColumn
 
 from documents.models import Document
 from documents.models import PaperlessTask
@@ -92,76 +96,99 @@ def check_sanity(*, progress=False, scheduled=True) -> SanityCheckMessages:
         if logo_file in present_files:
             present_files.remove(logo_file)
 
-    for doc in tqdm(Document.global_objects.all(), disable=not progress):
-        # Check sanity of the thumbnail
-        thumbnail_path: Final[Path] = Path(doc.thumbnail_path).resolve()
-        if not thumbnail_path.exists() or not thumbnail_path.is_file():
-            messages.error(doc.pk, "Thumbnail of document does not exist.")
-        else:
-            if thumbnail_path in present_files:
-                present_files.remove(thumbnail_path)
-            try:
-                _ = thumbnail_path.read_bytes()
-            except OSError as e:
-                messages.error(doc.pk, f"Cannot read thumbnail file of document: {e}")
-
-        # Check sanity of the original file
-        # TODO: extract method
-        source_path: Final[Path] = Path(doc.source_path).resolve()
-        if not source_path.exists() or not source_path.is_file():
-            messages.error(doc.pk, "Original of document does not exist.")
-        else:
-            if source_path in present_files:
-                present_files.remove(source_path)
-            try:
-                checksum = hashlib.md5(source_path.read_bytes()).hexdigest()
-            except OSError as e:
-                messages.error(doc.pk, f"Cannot read original file of document: {e}")
+    documents = Document.global_objects.all()
+    with Progress(
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TaskProgressColumn(),
+        TimeRemainingColumn(),
+        disable=not progress,
+    ) as progress_bar:
+        task = progress_bar.add_task(
+            "Checking document sanity",
+            total=documents.count(),
+        )
+        for doc in documents:
+            # Check sanity of the thumbnail
+            thumbnail_path: Final[Path] = Path(doc.thumbnail_path).resolve()
+            if not thumbnail_path.exists() or not thumbnail_path.is_file():
+                messages.error(doc.pk, "Thumbnail of document does not exist.")
             else:
-                if checksum != doc.checksum:
-                    messages.error(
-                        doc.pk,
-                        "Checksum mismatch. "
-                        f"Stored: {doc.checksum}, actual: {checksum}.",
-                    )
-
-        # Check sanity of the archive file.
-        if doc.archive_checksum is not None and doc.archive_filename is None:
-            messages.error(
-                doc.pk,
-                "Document has an archive file checksum, but no archive filename.",
-            )
-        elif doc.archive_checksum is None and doc.archive_filename is not None:
-            messages.error(
-                doc.pk,
-                "Document has an archive file, but its checksum is missing.",
-            )
-        elif doc.has_archive_version:
-            archive_path: Final[Path] = Path(doc.archive_path).resolve()
-            if not archive_path.exists() or not archive_path.is_file():
-                messages.error(doc.pk, "Archived version of document does not exist.")
-            else:
-                if archive_path in present_files:
-                    present_files.remove(archive_path)
+                if thumbnail_path in present_files:
+                    present_files.remove(thumbnail_path)
                 try:
-                    checksum = hashlib.md5(archive_path.read_bytes()).hexdigest()
+                    _ = thumbnail_path.read_bytes()
                 except OSError as e:
                     messages.error(
                         doc.pk,
-                        f"Cannot read archive file of document : {e}",
+                        f"Cannot read thumbnail file of document: {e}",
+                    )
+
+            # Check sanity of the original file
+            # TODO: extract method
+            source_path: Final[Path] = Path(doc.source_path).resolve()
+            if not source_path.exists() or not source_path.is_file():
+                messages.error(doc.pk, "Original of document does not exist.")
+            else:
+                if source_path in present_files:
+                    present_files.remove(source_path)
+                try:
+                    checksum = hashlib.md5(source_path.read_bytes()).hexdigest()
+                except OSError as e:
+                    messages.error(
+                        doc.pk,
+                        f"Cannot read original file of document: {e}",
                     )
                 else:
-                    if checksum != doc.archive_checksum:
+                    if checksum != doc.checksum:
                         messages.error(
                             doc.pk,
-                            "Checksum mismatch of archived document. "
-                            f"Stored: {doc.archive_checksum}, "
-                            f"actual: {checksum}.",
+                            "Checksum mismatch. "
+                            f"Stored: {doc.checksum}, actual: {checksum}.",
                         )
 
-        # other document checks
-        if not doc.content:
-            messages.info(doc.pk, "Document contains no OCR data")
+            # Check sanity of the archive file.
+            if doc.archive_checksum is not None and doc.archive_filename is None:
+                messages.error(
+                    doc.pk,
+                    "Document has an archive file checksum, but no archive filename.",
+                )
+            elif doc.archive_checksum is None and doc.archive_filename is not None:
+                messages.error(
+                    doc.pk,
+                    "Document has an archive file, but its checksum is missing.",
+                )
+            elif doc.has_archive_version:
+                archive_path: Final[Path] = Path(doc.archive_path).resolve()
+                if not archive_path.exists() or not archive_path.is_file():
+                    messages.error(
+                        doc.pk,
+                        "Archived version of document does not exist.",
+                    )
+                else:
+                    if archive_path in present_files:
+                        present_files.remove(archive_path)
+                    try:
+                        checksum = hashlib.md5(archive_path.read_bytes()).hexdigest()
+                    except OSError as e:
+                        messages.error(
+                            doc.pk,
+                            f"Cannot read archive file of document : {e}",
+                        )
+                    else:
+                        if checksum != doc.archive_checksum:
+                            messages.error(
+                                doc.pk,
+                                "Checksum mismatch of archived document. "
+                                f"Stored: {doc.archive_checksum}, "
+                                f"actual: {checksum}.",
+                            )
+
+            # other document checks
+            if not doc.content:
+                messages.info(doc.pk, "Document contains no OCR data")
+
+            progress_bar.update(task, advance=1)
 
     for extra_file in present_files:
         messages.warning(None, f"Orphaned file in media dir: {extra_file}")

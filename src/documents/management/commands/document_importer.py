@@ -8,7 +8,6 @@ from pathlib import Path
 from zipfile import ZipFile
 from zipfile import is_zipfile
 
-import tqdm
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
@@ -23,6 +22,11 @@ from django.db import transaction
 from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save
 from filelock import FileLock
+from rich.progress import BarColumn
+from rich.progress import Progress
+from rich.progress import TaskProgressColumn
+from rich.progress import TextColumn
+from rich.progress import TimeRemainingColumn
 
 from documents.file_handling import create_source_path_directory
 from documents.management.commands.mixins import CryptMixin
@@ -365,8 +369,19 @@ class Command(CryptMixin, BaseCommand):
             filter(lambda r: r["model"] == "documents.document", self.manifest),
         )
 
-        for record in tqdm.tqdm(manifest_documents, disable=self.no_progress_bar):
-            document = Document.objects.get(pk=record["pk"])
+        with Progress(
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            TimeRemainingColumn(),
+            disable=self.no_progress_bar,
+        ) as progress:
+            task = progress.add_task(
+                "Importing documents",
+                total=len(manifest_documents),
+            )
+            for record in manifest_documents:
+                document = Document.objects.get(pk=record["pk"])
 
             doc_file = record[EXPORTER_FILE_NAME]
             document_path = self.source / doc_file
@@ -416,7 +431,8 @@ class Command(CryptMixin, BaseCommand):
                     #  archived files
                     copy_file_with_basic_stats(archive_path, document.archive_path)
 
-            document.save()
+                document.save()
+                progress.update(task, advance=1)
 
     def decrypt_secret_fields(self) -> None:
         """

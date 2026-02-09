@@ -6,7 +6,6 @@ import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import tqdm
 from allauth.mfa.models import Authenticator
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.models import SocialApp
@@ -24,6 +23,11 @@ from django.utils import timezone
 from filelock import FileLock
 from guardian.models import GroupObjectPermission
 from guardian.models import UserObjectPermission
+from rich.progress import BarColumn
+from rich.progress import Progress
+from rich.progress import TaskProgressColumn
+from rich.progress import TextColumn
+from rich.progress import TimeRemainingColumn
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -309,12 +313,19 @@ class Command(CryptMixin, BaseCommand):
             document_manifest = manifest_dict["documents"]
 
         # 3. Export files from each document
-        for index, document_dict in tqdm.tqdm(
-            enumerate(document_manifest),
-            total=len(document_manifest),
+        with Progress(
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            TimeRemainingColumn(),
             disable=self.no_progress_bar,
-        ):
-            document = document_map[document_dict["pk"]]
+        ) as progress:
+            task = progress.add_task(
+                "Exporting documents",
+                total=len(document_manifest),
+            )
+            for index, document_dict in enumerate(document_manifest):
+                document = document_map[document_dict["pk"]]
 
             # 3.1. generate a unique filename
             base_name = self.generate_base_name(document)
@@ -357,6 +368,7 @@ class Command(CryptMixin, BaseCommand):
                     content,
                     manifest_name,
                 )
+                progress.update(task, advance=1)
 
         # These were exported already
         if self.split_manifest:

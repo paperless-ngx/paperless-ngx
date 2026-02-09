@@ -5,7 +5,6 @@ from pathlib import Path
 
 import faiss
 import llama_index.core.settings as llama_settings
-import tqdm
 from celery import states
 from django.conf import settings
 from django.utils import timezone
@@ -22,6 +21,11 @@ from llama_index.core.storage.docstore import SimpleDocumentStore
 from llama_index.core.storage.index_store import SimpleIndexStore
 from llama_index.core.text_splitter import TokenTextSplitter
 from llama_index.vector_stores.faiss import FaissVectorStore
+from rich.progress import BarColumn
+from rich.progress import Progress
+from rich.progress import TaskProgressColumn
+from rich.progress import TextColumn
+from rich.progress import TimeRemainingColumn
 
 from documents.models import Document
 from documents.models import PaperlessTask
@@ -176,9 +180,18 @@ def update_llm_index(*, progress_bar_disable=False, rebuild=False) -> str:
         embed_model = get_embedding_model()
         llama_settings.Settings.embed_model = embed_model
         storage_context = get_or_create_storage_context(rebuild=True)
-        for document in tqdm.tqdm(documents, disable=progress_bar_disable):
-            document_nodes = build_document_node(document)
-            nodes.extend(document_nodes)
+        with Progress(
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            TimeRemainingColumn(),
+            disable=progress_bar_disable,
+        ) as progress:
+            task = progress.add_task("Building document nodes", total=documents.count())
+            for document in documents:
+                document_nodes = build_document_node(document)
+                nodes.extend(document_nodes)
+                progress.update(task, advance=1)
 
         index = VectorStoreIndex(
             nodes=nodes,
@@ -196,23 +209,33 @@ def update_llm_index(*, progress_bar_disable=False, rebuild=False) -> str:
             for node in index.docstore.get_nodes(all_node_ids)
         }
 
-        for document in tqdm.tqdm(documents, disable=progress_bar_disable):
-            doc_id = str(document.id)
-            document_modified = document.modified.isoformat()
+        with Progress(
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            TimeRemainingColumn(),
+            disable=progress_bar_disable,
+        ) as progress:
+            task = progress.add_task("Updating index nodes", total=documents.count())
+            for document in documents:
+                doc_id = str(document.id)
+                document_modified = document.modified.isoformat()
 
-            if doc_id in existing_nodes:
-                node = existing_nodes[doc_id]
-                node_modified = node.metadata.get("modified")
+                if doc_id in existing_nodes:
+                    node = existing_nodes[doc_id]
+                    node_modified = node.metadata.get("modified")
 
-                if node_modified == document_modified:
-                    continue
+                    if node_modified == document_modified:
+                        progress.update(task, advance=1)
+                        continue
 
-                # Again, delete from docstore, FAISS IndexFlatL2 are append-only
-                index.docstore.delete_document(node.node_id)
-                nodes.extend(build_document_node(document))
-            else:
-                # New document, add it
-                nodes.extend(build_document_node(document))
+                    # Again, delete from docstore, FAISS IndexFlatL2 are append-only
+                    index.docstore.delete_document(node.node_id)
+                    nodes.extend(build_document_node(document))
+                else:
+                    # New document, add it
+                    nodes.extend(build_document_node(document))
+                progress.update(task, advance=1)
 
         if nodes:
             msg = "LLM index updated successfully."
