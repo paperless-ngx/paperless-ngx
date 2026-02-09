@@ -100,10 +100,10 @@ const mock = () => {
   }
 }
 
-Object.defineProperty(window, 'open', { value: jest.fn() })
-Object.defineProperty(window, 'localStorage', { value: mock() })
-Object.defineProperty(window, 'sessionStorage', { value: mock() })
-Object.defineProperty(window, 'getComputedStyle', {
+Object.defineProperty(globalThis, 'open', { value: jest.fn() })
+Object.defineProperty(globalThis, 'localStorage', { value: mock() })
+Object.defineProperty(globalThis, 'sessionStorage', { value: mock() })
+Object.defineProperty(globalThis, 'getComputedStyle', {
   value: () => ['-webkit-appearance'],
 })
 Object.defineProperty(navigator, 'clipboard', {
@@ -115,14 +115,14 @@ Object.defineProperty(navigator, 'canShare', { value: () => true })
 if (!navigator.share) {
   Object.defineProperty(navigator, 'share', { value: jest.fn() })
 }
-if (!URL.createObjectURL) {
-  Object.defineProperty(window.URL, 'createObjectURL', { value: jest.fn() })
+if (!globalThis.URL.createObjectURL) {
+  Object.defineProperty(globalThis.URL, 'createObjectURL', { value: jest.fn() })
 }
-if (!URL.revokeObjectURL) {
-  Object.defineProperty(window.URL, 'revokeObjectURL', { value: jest.fn() })
+if (!globalThis.URL.revokeObjectURL) {
+  Object.defineProperty(globalThis.URL, 'revokeObjectURL', { value: jest.fn() })
 }
 class MockResizeObserver {
-  private callback: ResizeObserverCallback
+  private readonly callback: ResizeObserverCallback
 
   constructor(callback: ResizeObserverCallback) {
     this.callback = callback
@@ -137,7 +137,7 @@ class MockResizeObserver {
   }
 }
 
-Object.defineProperty(window, 'ResizeObserver', {
+Object.defineProperty(globalThis, 'ResizeObserver', {
   writable: true,
   configurable: true,
   value: MockResizeObserver,
@@ -156,7 +156,7 @@ if (typeof IntersectionObserver === 'undefined') {
     takeRecords = jest.fn()
   }
 
-  Object.defineProperty(window, 'IntersectionObserver', {
+  Object.defineProperty(globalThis, 'IntersectionObserver', {
     writable: true,
     configurable: true,
     value: MockIntersectionObserver,

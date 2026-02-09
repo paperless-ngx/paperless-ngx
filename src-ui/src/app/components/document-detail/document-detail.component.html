@@ -462,7 +462,7 @@
               [(page)]="previewCurrentPage"
               [zoomScale]="previewZoomScale"
               [zoom]="previewZoomSetting"
-              (error)="onError($event)"
+              (loadError)="onError($event)"
               (afterLoadComplete)="pdfPreviewLoaded($event)">
             </pngx-pdf-viewer>
           </div>

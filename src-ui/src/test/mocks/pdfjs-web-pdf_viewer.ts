@@ -1,13 +1,15 @@
 type EventHandler = (event?: unknown) => void
 
 export class EventBus {
-  private listeners = new Map<string, Set<EventHandler>>()
+  private readonly listeners = new Map<string, Set<EventHandler>>()
 
   on(eventName: string, listener: EventHandler): void {
-    if (!this.listeners.has(eventName)) {
-      this.listeners.set(eventName, new Set())
+    let listeners = this.listeners.get(eventName)
+    if (!listeners) {
+      listeners = new Set()
+      this.listeners.set(eventName, listeners)
     }
-    this.listeners.get(eventName)!.add(listener)
+    listeners.add(listener)
   }
 
   off(eventName: string, listener: EventHandler): void {
@@ -21,13 +23,19 @@ export class EventBus {
 
 export class PDFFindController {
   onIsPageVisible?: () => boolean
-
-  constructor(_options?: unknown) {}
 }
 
 export class PDFLinkService {
-  setDocument(_document: unknown): void {}
-  setViewer(_viewer: unknown): void {}
+  private document?: unknown
+  private viewer?: unknown
+
+  setDocument(document: unknown): void {
+    this.document = document
+  }
+
+  setViewer(viewer: unknown): void {
+    this.viewer = viewer
+  }
 }
 
 class BaseViewer {
@@ -35,13 +43,13 @@ class BaseViewer {
   currentScale = 1
   currentScaleValue: string | number = 1
   pagesRotation = 0
-  options: Record<string, unknown>
+  readonly options: Record<string, unknown>
 
-  private eventBus?: EventBus
+  private readonly eventBus?: EventBus
   private _currentPageNumber = 1
 
   constructor(options: { eventBus?: EventBus }) {
-    this.options = options as Record<string, unknown>
+    this.options = options
     this.eventBus = options.eventBus
   }
 
@@ -53,7 +61,9 @@ class BaseViewer {
     })
   }
 
-  cleanup(): void {}
+  cleanup(): void {
+    this.pagesCount = 0
+  }
 
   get currentPageNumber(): number {
     return this._currentPageNumber

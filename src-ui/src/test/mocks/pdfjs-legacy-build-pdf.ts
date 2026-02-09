@@ -6,8 +6,8 @@ export class PDFDocumentLoadingTask {
   promise: Promise<PDFDocumentProxy>
   destroyed = false
 
-  constructor(doc: PDFDocumentProxy) {
-    this.promise = Promise.resolve(doc)
+  constructor(promise: Promise<PDFDocumentProxy>) {
+    this.promise = promise
   }
 
   destroy(): void {
@@ -20,5 +20,5 @@ export const GlobalWorkerOptions = {
 }
 
 export const getDocument = (_src: unknown): PDFDocumentLoadingTask => {
-  return new PDFDocumentLoadingTask(new PDFDocumentProxy())
+  return new PDFDocumentLoadingTask(Promise.resolve(new PDFDocumentProxy()))
 }

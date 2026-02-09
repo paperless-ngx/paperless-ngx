@@ -51,13 +51,13 @@ export class PngxPdfViewerComponent
 
   @Output() afterLoadComplete = new EventEmitter<PngxPdfDocumentProxy>()
   @Output() rendered = new EventEmitter<void>()
-  @Output() error = new EventEmitter<unknown>()
+  @Output() loadError = new EventEmitter<unknown>()
 
   @ViewChild('container', { static: true })
-  private container!: ElementRef<HTMLDivElement>
+  private readonly container!: ElementRef<HTMLDivElement>
 
   @ViewChild('viewer', { static: true })
-  private viewer!: ElementRef<HTMLDivElement>
+  private readonly viewer!: ElementRef<HTMLDivElement>
 
   private hasLoaded = false
   private loadingTask?: PDFDocumentLoadingTask
@@ -68,21 +68,21 @@ export class PngxPdfViewerComponent
   private lastFindQuery = ''
   private lastViewerPage?: number
 
-  private eventBus = new EventBus()
-  private linkService = new PDFLinkService({ eventBus: this.eventBus })
-  private findController = new PDFFindController({
+  private readonly eventBus = new EventBus()
+  private readonly linkService = new PDFLinkService({ eventBus: this.eventBus })
+  private readonly findController = new PDFFindController({
     eventBus: this.eventBus,
     linkService: this.linkService,
     updateMatchesCountOnProgress: false,
   })
 
-  private onPageRendered = () => {
+  private readonly onPageRendered = () => {
     this.hasRenderedPage = true
     this.dispatchFindIfReady()
     this.rendered.emit()
   }
-  private onPagesInit = () => this.applyScale()
-  private onPageChanging = (evt: { pageNumber: number }) => {
+  private readonly onPagesInit = () => this.applyScale()
+  private readonly onPageChanging = (evt: { pageNumber: number }) => {
     // Avoid [(page)] two-way binding re-triggers navigation
     this.lastViewerPage = evt.pageNumber
     this.pageChange.emit(evt.pageNumber)
@@ -161,7 +161,7 @@ export class PngxPdfViewerComponent
       this.applyViewerState()
       this.afterLoadComplete.emit(pdf)
     } catch (err) {
-      this.error.emit(err)
+      this.loadError.emit(err)
     }
   }
 

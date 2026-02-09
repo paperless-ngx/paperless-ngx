@@ -126,7 +126,7 @@ describe('PngxPdfViewerComponent', () => {
 
   it('emits error when document load fails', async () => {
     const errorSpy = jest.fn()
-    component.error.subscribe(errorSpy)
+    component.loadError.subscribe(errorSpy)
 
     jest.spyOn(pdfjs, 'getDocument').mockImplementationOnce(() => {
       return {
