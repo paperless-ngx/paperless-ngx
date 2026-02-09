@@ -36,7 +36,7 @@ import { ManagementListComponent } from '../management-list.component'
   ],
 })
 export class CorrespondentListComponent extends ManagementListComponent<Correspondent> {
-  private datePipe = inject(CustomDatePipe)
+  private readonly datePipe = inject(CustomDatePipe)
 
   constructor() {
     super()

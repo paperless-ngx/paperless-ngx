@@ -136,7 +136,7 @@ export class DocumentAttributesComponent
   ]
 
   @ViewChild('activeOutlet', { read: NgComponentOutlet })
-  private activeOutlet?: NgComponentOutlet
+  private readonly activeOutlet?: NgComponentOutlet
 
   private lastHeaderLoading: boolean
 

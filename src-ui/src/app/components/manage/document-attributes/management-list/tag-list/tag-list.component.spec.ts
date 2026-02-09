@@ -138,12 +138,12 @@ describe('TagListComponent', () => {
     }
 
     component.data = [parent as any]
-    component.selectPage(true)
+    component.selectPage()
 
     expect(component.selectedObjects.has(10)).toBe(true)
     expect(component.selectedObjects.has(11)).toBe(true)
 
-    component.selectPage(false)
+    component.clearSelection()
     expect(component.selectedObjects.size).toBe(0)
   })
 })

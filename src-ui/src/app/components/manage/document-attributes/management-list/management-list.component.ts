@@ -69,13 +69,14 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   implements OnInit, OnDestroy
 {
   protected service: AbstractNameFilterService<T>
-  private modalService: NgbModal = inject(NgbModal)
+  private readonly modalService: NgbModal = inject(NgbModal)
   protected editDialogComponent: any
-  private toastService: ToastService = inject(ToastService)
-  private documentListViewService: DocumentListViewService = inject(
+  private readonly toastService: ToastService = inject(ToastService)
+  private readonly documentListViewService: DocumentListViewService = inject(
     DocumentListViewService
   )
-  private permissionsService: PermissionsService = inject(PermissionsService)
+  private readonly permissionsService: PermissionsService =
+    inject(PermissionsService)
   protected filterRuleType: number
   public typeName: string
   public typeNamePlural: string
@@ -196,7 +197,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   }
 
   openCreateDialog() {
-    var activeModal = this.modalService.open(this.editDialogComponent, {
+    const activeModal = this.modalService.open(this.editDialogComponent, {
       backdrop: 'static',
     })
     activeModal.componentInstance.dialogMode = EditDialogMode.CREATE
@@ -215,7 +216,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   }
 
   openEditDialog(object: T) {
-    var activeModal = this.modalService.open(this.editDialogComponent, {
+    const activeModal = this.modalService.open(this.editDialogComponent, {
       backdrop: 'static',
     })
     activeModal.componentInstance.object = object
@@ -243,7 +244,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   }
 
   openDeleteDialog(object: T) {
-    var activeModal = this.modalService.open(ConfirmDialogComponent, {
+    const activeModal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })
     activeModal.componentInstance.title = $localize`Confirm delete`
@@ -343,13 +344,9 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     this.clearSelection()
   }
 
-  selectPage(select: boolean) {
-    if (select) {
-      this.selectedObjects = new Set(this.getSelectableIDs(this.data))
-      this.togggleAll = this.areAllPageItemsSelected()
-    } else {
-      this.clearSelection()
-    }
+  selectPage() {
+    this.selectedObjects = new Set(this.getSelectableIDs(this.data))
+    this.togggleAll = this.areAllPageItemsSelected()
   }
 
   selectAll() {

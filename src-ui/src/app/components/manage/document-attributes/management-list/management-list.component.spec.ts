@@ -304,12 +304,12 @@ describe('ManagementListComponent', () => {
   })
 
   it('selectPage should select current page items or clear selection', () => {
-    component.selectPage(true)
+    component.selectPage()
     expect(component.selectedObjects).toEqual(new Set(tags.map((t) => t.id)))
     expect(component.togggleAll).toBe(true)
 
     component.togggleAll = true
-    component.selectPage(false)
+    component.clearSelection()
     expect(component.selectedObjects.size).toBe(0)
     expect(component.togggleAll).toBe(false)
   })

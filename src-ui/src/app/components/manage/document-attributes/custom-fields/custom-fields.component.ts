@@ -42,14 +42,14 @@ export class CustomFieldsComponent
   extends LoadingComponentWithPermissions
   implements OnInit
 {
-  private customFieldsService = inject(CustomFieldsService)
-  permissionsService = inject(PermissionsService)
-  private modalService = inject(NgbModal)
-  private toastService = inject(ToastService)
-  private documentListViewService = inject(DocumentListViewService)
-  private settingsService = inject(SettingsService)
-  private documentService = inject(DocumentService)
-  private savedViewService = inject(SavedViewService)
+  private readonly customFieldsService = inject(CustomFieldsService)
+  public readonly permissionsService = inject(PermissionsService)
+  private readonly modalService = inject(NgbModal)
+  private readonly toastService = inject(ToastService)
+  private readonly documentListViewService = inject(DocumentListViewService)
+  private readonly settingsService = inject(SettingsService)
+  private readonly documentService = inject(DocumentService)
+  private readonly savedViewService = inject(SavedViewService)
 
   public fields: CustomField[] = []
 
