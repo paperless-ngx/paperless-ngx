@@ -14,10 +14,7 @@ import {
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
-import {
-  DocumentAttributesComponent,
-  DocumentAttributesSectionKind,
-} from './document-attributes.component'
+import { DocumentAttributesComponent } from './document-attributes.component'
 
 @Component({
   selector: 'pngx-dummy-section',
@@ -72,7 +69,7 @@ describe('DocumentAttributesComponent', () => {
         label: 'Tags',
         icon: 'tags',
         permissionType: PermissionType.Tag,
-        kind: DocumentAttributesSectionKind.ManagementList,
+        kind: 'attributeList',
         component: DummySectionComponent,
       },
       {
@@ -81,7 +78,7 @@ describe('DocumentAttributesComponent', () => {
         label: 'Custom fields',
         icon: 'ui-radios',
         permissionType: PermissionType.CustomField,
-        kind: DocumentAttributesSectionKind.CustomFields,
+        kind: 'customFields',
         component: DummySectionComponent,
       },
     ]
@@ -120,6 +117,16 @@ describe('DocumentAttributesComponent', () => {
     expect(router.navigate).not.toHaveBeenCalled()
   })
 
+  it('should update active nav id when route section changes', () => {
+    ;(permissionsService.currentUserCan as jest.Mock).mockReturnValue(true)
+
+    fixture.detectChanges()
+    component.activeNavID = 1
+    paramMapSubject.next(convertToParamMap({ section: 'customfields' }))
+
+    expect(component.activeNavID).toBe(2)
+  })
+
   it('should redirect to dashboard when no sections are visible', () => {
     ;(permissionsService.currentUserCan as jest.Mock).mockReturnValue(false)
 
@@ -142,5 +149,16 @@ describe('DocumentAttributesComponent', () => {
     component.onNavChange({ nextId: 2 } as any)
 
     expect(router.navigate).toHaveBeenCalledWith(['attributes', 'customfields'])
+  })
+
+  it('should ignore nav changes for unknown sections', () => {
+    ;(permissionsService.currentUserCan as jest.Mock).mockReturnValue(true)
+
+    fixture.detectChanges()
+    paramMapSubject.next(convertToParamMap({ section: 'tags' }))
+
+    component.onNavChange({ nextId: 999 } as any)
+
+    expect(router.navigate).not.toHaveBeenCalled()
   })
 })

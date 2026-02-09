@@ -387,6 +387,73 @@ describe('AppFrameComponent', () => {
     expect(component.canManageAttributes).toBe(true)
   })
 
+  it('should indicate attributes management availability for other permission types', () => {
+    const canSpy = jest
+      .spyOn(permissionsService, 'currentUserCan')
+      .mockImplementation((action, type) => {
+        return type === PermissionType.Correspondent
+      })
+    expect(component.canManageAttributes).toBe(true)
+
+    canSpy.mockImplementation((action, type) => {
+      return type === PermissionType.DocumentType
+    })
+    expect(component.canManageAttributes).toBe(true)
+
+    canSpy.mockImplementation((action, type) => {
+      return type === PermissionType.StoragePath
+    })
+    expect(component.canManageAttributes).toBe(true)
+
+    canSpy.mockImplementation((action, type) => {
+      return type === PermissionType.CustomField
+    })
+    expect(component.canManageAttributes).toBe(true)
+  })
+
+  it('should toggle attributes sections and stop event bubbling', () => {
+    const preventDefault = jest.fn()
+    const stopPropagation = jest.fn()
+    const setSpy = jest.spyOn(settingsService, 'set')
+    jest.spyOn(settingsService, 'storeSettings').mockReturnValue(of(true))
+
+    component.toggleAttributesSections({
+      preventDefault,
+      stopPropagation,
+    } as any)
+
+    expect(preventDefault).toHaveBeenCalled()
+    expect(stopPropagation).toHaveBeenCalled()
+    expect(setSpy).toHaveBeenCalledWith(
+      SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED,
+      ['attributes']
+    )
+  })
+
+  it('should show error when saving slim sidebar setting fails', () => {
+    const toastSpy = jest.spyOn(toastService, 'showError')
+    jest.spyOn(console, 'warn').mockImplementation(() => {})
+    jest
+      .spyOn(settingsService, 'storeSettings')
+      .mockReturnValue(throwError(() => new Error('boom')))
+
+    component.slimSidebarEnabled = true
+
+    expect(toastSpy).toHaveBeenCalled()
+  })
+
+  it('should show error when saving attributes collapsed setting fails', () => {
+    const toastSpy = jest.spyOn(toastService, 'showError')
+    jest.spyOn(console, 'warn').mockImplementation(() => {})
+    jest
+      .spyOn(settingsService, 'storeSettings')
+      .mockReturnValue(throwError(() => new Error('boom')))
+
+    component.attributesSectionsCollapsed = true
+
+    expect(toastSpy).toHaveBeenCalled()
+  })
+
   it('should persist attributes section collapse state', () => {
     const setSpy = jest.spyOn(settingsService, 'set')
     jest.spyOn(settingsService, 'storeSettings').mockReturnValue(of(true))
