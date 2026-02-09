@@ -150,7 +150,15 @@ def run_convert(
 ) -> None:
     environment = os.environ.copy()
     if settings.CONVERT_MEMORY_LIMIT:
+        # MAGICK_MEMORY_LIMIT sets the maximum amount of RAM the pixel cache can use.
+        # MAGICK_MAP_LIMIT sets the maximum amount of memory-mapped I/O allowed.
+        #
+        # For large-format documents  ImageMagick will hit the RAM limit and
+        # immediately try to "map" the remaining data. If MAGICK_MAP_LIMIT isn't
+        # also set, the process may trigger an OOM kill because the default
+        # system/policy map limit is often too restrictive for these massive bitmaps.
         environment["MAGICK_MEMORY_LIMIT"] = settings.CONVERT_MEMORY_LIMIT
+        environment["MAGICK_MAP_LIMIT"] = settings.CONVERT_MEMORY_LIMIT
     if settings.CONVERT_TMPDIR:
         environment["MAGICK_TMPDIR"] = settings.CONVERT_TMPDIR
 
