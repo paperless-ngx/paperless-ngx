@@ -1,5 +1,7 @@
 import { NgComponentOutlet } from '@angular/common'
 import {
+  AfterViewChecked,
+  ChangeDetectorRef,
   Component,
   inject,
   OnDestroy,
@@ -65,10 +67,13 @@ interface DocumentAttributesSection {
     ClearableBadgeComponent,
   ],
 })
-export class DocumentAttributesComponent implements OnInit, OnDestroy {
+export class DocumentAttributesComponent
+  implements OnInit, OnDestroy, AfterViewChecked
+{
   private readonly permissionsService = inject(PermissionsService)
   private readonly activatedRoute = inject(ActivatedRoute)
   private readonly router = inject(Router)
+  private readonly cdr = inject(ChangeDetectorRef)
   private readonly unsubscribeNotifier = new Subject<void>()
 
   protected readonly PermissionAction = PermissionAction
@@ -129,6 +134,8 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
 
   @ViewChild('activeOutlet', { read: NgComponentOutlet })
   private activeOutlet?: NgComponentOutlet
+
+  private lastHeaderLoading: boolean
 
   activeNavID: number = null
 
@@ -205,6 +212,14 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribeNotifier.next()
     this.unsubscribeNotifier.complete()
+  }
+
+  ngAfterViewChecked(): void {
+    const current = this.activeHeaderLoading
+    if (this.lastHeaderLoading !== current) {
+      this.lastHeaderLoading = current
+      this.cdr.detectChanges()
+    }
   }
 
   onNavChange(navChangeEvent: NgbNavChangeEvent): void {
