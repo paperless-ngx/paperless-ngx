@@ -1046,6 +1046,7 @@ def _get_viewable_duplicates(
     duplicates = Document.global_objects.filter(
         Q(checksum__in=checksums) | Q(archive_checksum__in=checksums),
     ).exclude(pk=document.pk)
+    duplicates = duplicates.filter(head_version__isnull=True)
     duplicates = duplicates.order_by("-created")
     allowed = get_objects_for_user_owner_aware(
         user,
