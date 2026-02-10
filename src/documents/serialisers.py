@@ -1066,6 +1066,7 @@ class DocumentVersionInfoSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     added = serializers.DateTimeField()
     label = serializers.CharField(required=False, allow_null=True)
+    checksum = serializers.CharField(required=False, allow_null=True)
 
 
 @extend_schema_serializer(
@@ -1139,6 +1140,7 @@ class DocumentSerializer(
                 "id": doc.id,
                 "added": doc.added,
                 "label": doc.version_label,
+                "checksum": doc.checksum,
             }
 
         info = [build_info(doc) for doc in versions]

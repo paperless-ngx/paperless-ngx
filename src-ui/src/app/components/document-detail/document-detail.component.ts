@@ -1,4 +1,4 @@
-import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
+import { AsyncPipe, NgTemplateOutlet, SlicePipe } from '@angular/common'
 import { HttpClient, HttpResponse } from '@angular/common/http'
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import {
@@ -36,7 +36,7 @@ import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
 import { DataType } from 'src/app/data/datatype'
-import { Document } from 'src/app/data/document'
+import { Document, DocumentVersionInfo } from 'src/app/data/document'
 import { DocumentMetadata } from 'src/app/data/document-metadata'
 import { DocumentNote } from 'src/app/data/document-note'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
@@ -176,6 +176,7 @@ enum ContentRenderType {
     TextAreaComponent,
     RouterModule,
     PngxPdfViewerComponent,
+    SlicePipe,
   ],
 })
 export class DocumentDetailComponent
@@ -230,6 +231,7 @@ export class DocumentDetailComponent
   thumbUrl: string
   // Versioning: which document ID to use for file preview/download
   selectedVersionId: number
+  newVersionLabel: string = ''
   previewText: string
   previewLoaded: boolean = false
   tiffURL: string
@@ -673,8 +675,9 @@ export class DocumentDetailComponent
   updateComponent(doc: Document) {
     this.document = doc
     // Default selected version is the newest version
-    this.selectedVersionId = doc.versions?.length
-      ? Math.max(...doc.versions)
+    const versions = doc.versions ?? []
+    this.selectedVersionId = versions.length
+      ? Math.max(...versions.map((version) => version.id))
       : doc.id
     this.requiresPassword = false
     this.updateFormForCustomFields()
@@ -734,8 +737,12 @@ export class DocumentDetailComponent
     }
   }
 
-  get hasVersions(): boolean {
-    return this.document?.versions?.length > 1
+  getVersionBadge(version: DocumentVersionInfo): string {
+    console.log(version)
+
+    const checksum = version?.checksum ?? ''
+    if (!checksum) return '----'
+    return checksum.slice(0, 4).toUpperCase()
   }
 
   // Update file preview and download target to a specific version (by document id)
@@ -1186,14 +1193,16 @@ export class DocumentDetailComponent
     const file = input.files[0]
     // Reset input to allow re-selection of the same file later
     input.value = ''
+    const label = this.newVersionLabel?.trim()
     this.documentsService
-      .uploadVersion(this.documentId, file)
+      .uploadVersion(this.documentId, file, label)
       .pipe(first())
       .subscribe({
         next: () => {
           this.toastService.showInfo(
             $localize`Uploading new version. Processing will happen in the background.`
           )
+          this.newVersionLabel = ''
           // Refresh metadata to reflect that versions changed (when ready)
           this.openDocumentService.refreshDocument(this.documentId)
         },

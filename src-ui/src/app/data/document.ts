@@ -159,12 +159,19 @@ export interface Document extends ObjectWithPermissions {
 
   page_count?: number
 
+  duplicate_documents?: Document[]
+
   // Versioning
   head_version?: number
-  versions?: number[]
-
-  duplicate_documents?: Document[]
+  versions?: DocumentVersionInfo[]
 
   // Frontend only
   __changedFields?: string[]
+}
+
+export interface DocumentVersionInfo {
+  id: number
+  added?: Date
+  label?: string
+  checksum?: string
 }

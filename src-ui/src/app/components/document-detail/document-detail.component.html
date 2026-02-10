@@ -1,25 +1,46 @@
 <pngx-page-header [(title)]="title" [id]="documentId">
 
   @if (document?.versions?.length > 0) {
-    <div class="btn-group" ngbDropdown role="group">
-      <div class="btn-group" ngbDropdown role="group">
-        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" ngbDropdownToggle [disabled]="!hasVersions">
-          <i-bs name="layers"></i-bs>
-          <span class="d-none d-lg-inline ps-1" i18n>Version</span>
-        </button>
-        <div class="dropdown-menu shadow" ngbDropdownMenu>
-          @for (vid of document.versions; track vid) {
-            <button ngbDropdownItem (click)="selectVersion(vid)">
-              <span i18n>Version</span> {{vid}}
-              @if (selectedVersionId === vid) { <span>&nbsp;✓</span> }
-            </button>
-          }
-        </div>
-      </div>
-      <input #versionFileInput type="file" class="visually-hidden" (change)="onVersionFileSelected($event)" />
-      <button class="btn btn-sm btn-outline-secondary" title="Upload new version" i18n-title (click)="versionFileInput.click()" [disabled]="!userIsOwner || !userCanEdit">
-        <i-bs name="file-earmark-plus"></i-bs><span class="visually-hidden" i18n>Upload new version</span>
+    <div class="btn-group" ngbDropdown role="group" autoClose="outside">
+      <button class="btn btn-sm btn-outline-secondary dropdown-toggle" ngbDropdownToggle>
+        <i-bs name="layers"></i-bs>
+        <span class="d-none d-lg-inline ps-1" i18n>Version</span>
       </button>
+      <div class="dropdown-menu shadow" ngbDropdownMenu>
+        <div class="px-3 py-2">
+          <div class="input-group input-group-sm mb-2">
+            <span class="input-group-text" i18n>Label</span>
+            <input class="form-control" type="text" [(ngModel)]="newVersionLabel" i18n-placeholder placeholder="Optional" [disabled]="!userIsOwner || !userCanEdit" />
+          </div>
+          <input #versionFileInput type="file" class="visually-hidden" (change)="onVersionFileSelected($event)" />
+          <button class="btn btn-sm btn-outline-secondary w-100" (click)="versionFileInput.click()" [disabled]="!userIsOwner || !userCanEdit">
+            <i-bs name="file-earmark-plus"></i-bs><span class="ps-1" i18n>Add new version</span>
+          </button>
+        </div>
+        <div class="dropdown-divider"></div>
+        @for (version of document.versions; track version.id) {
+          <button ngbDropdownItem (click)="selectVersion(version.id)">
+            <div class="d-flex align-items-center w-100 version-item">
+              <span class="badge bg-light text-lowercase text-muted">
+                {{ version.checksum | slice:0:8 }}
+              </span>
+              <div class="flex-grow-1 ms-3 small">
+                <div class="small">
+                  @if (version.label) {
+                    {{ version.label }}
+                  } @else {
+                    <span i18n>ID</span> #{{version.id}}
+                  }
+                </div>
+                <div class="version-subtitle text-muted">
+                  {{ version.added | customDate:'short' }}
+                </div>
+              </div>
+              @if (selectedVersionId === version.id) { <span class="ms-2">✓</span> }
+            </div>
+          </button>
+        }
+      </div>
     </div>
   }
   @if (archiveContentRenderType === ContentRenderType.PDF && !useNativePdfViewer) {
