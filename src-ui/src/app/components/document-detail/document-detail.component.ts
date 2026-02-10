@@ -110,6 +110,7 @@ import { PDFEditorComponent } from '../common/pdf-editor/pdf-editor.component'
 import { PngxPdfViewerComponent } from '../common/pdf-viewer/pdf-viewer.component'
 import {
   PdfRenderMode,
+  PdfSource,
   PdfZoomLevel,
   PdfZoomScale,
   PngxPdfDocumentProxy,
@@ -227,6 +228,7 @@ export class DocumentDetailComponent
   title: string
   titleSubject: Subject<string> = new Subject()
   previewUrl: string
+  pdfSource?: PdfSource
   thumbUrl: string
   previewText: string
   previewLoaded: boolean = false
@@ -345,6 +347,17 @@ export class DocumentDetailComponent
     return ContentRenderType.Other
   }
 
+  private updatePdfSource() {
+    if (!this.previewUrl) {
+      this.pdfSource = undefined
+      return
+    }
+    this.pdfSource = {
+      url: this.previewUrl,
+      password: this.password || undefined,
+    }
+  }
+
   get isRTL() {
     if (!this.metadata || !this.metadata.lang) return false
     else {
@@ -421,6 +434,7 @@ export class DocumentDetailComponent
 
   private loadDocument(documentId: number): void {
     this.previewUrl = this.documentsService.getPreviewUrl(documentId)
+    this.updatePdfSource()
     this.http
       .get(this.previewUrl, { responseType: 'text' })
       .pipe(
@@ -1230,6 +1244,7 @@ export class DocumentDetailComponent
   onPasswordKeyUp(event: KeyboardEvent) {
     if ('Enter' == event.key) {
       this.password = (event.target as HTMLInputElement).value
+      this.updatePdfSource()
     }
   }
 

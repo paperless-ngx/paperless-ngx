@@ -81,7 +81,7 @@ export class PngxPdfViewerComponent
     this.dispatchFindIfReady()
     this.rendered.emit()
   }
-  private readonly onPagesInit = () => this.applyScale()
+  private readonly onPagesInit = () => this.applyViewerState()
   private readonly onPageChanging = (evt: { pageNumber: number }) => {
     // Avoid [(page)] two-way binding re-triggers navigation
     this.lastViewerPage = evt.pageNumber
@@ -90,8 +90,10 @@ export class PngxPdfViewerComponent
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['src']) {
-      this.hasLoaded = false
-      this.loadDocument()
+      this.resetViewerState()
+      if (this.src) {
+        this.loadDocument()
+      }
       return
     }
 
@@ -137,6 +139,21 @@ export class PngxPdfViewerComponent
     this.loadingTask?.destroy()
     this.pdfViewer?.cleanup()
     this.pdfViewer = undefined
+  }
+
+  private resetViewerState(): void {
+    this.hasLoaded = false
+    this.hasRenderedPage = false
+    this.lastFindQuery = ''
+    this.lastViewerPage = undefined
+    this.loadingTask?.destroy()
+    this.loadingTask = undefined
+    this.pdf = undefined
+    this.linkService.setDocument(null)
+    if (this.pdfViewer) {
+      this.pdfViewer.setDocument(null)
+      this.pdfViewer.currentPageNumber = 1
+    }
   }
 
   private async loadDocument(): Promise<void> {
@@ -222,7 +239,11 @@ export class PngxPdfViewerComponent
       hasPages &&
       this.page !== this.lastViewerPage
     ) {
-      this.pdfViewer.currentPageNumber = this.page
+      const nextPage = Math.min(
+        Math.max(Math.trunc(this.page), 1),
+        this.pdfViewer.pagesCount
+      )
+      this.pdfViewer.currentPageNumber = nextPage
     }
     if (this.page === this.lastViewerPage) {
       this.lastViewerPage = undefined
