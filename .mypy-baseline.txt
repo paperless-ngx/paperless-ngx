@@ -277,8 +277,6 @@ src/documents/management/commands/document_exporter.py:0: error: Skipping analyz
 src/documents/management/commands/document_exporter.py:0: error: Skipping analyzing "auditlog.models": module is installed, but missing library stubs or py.typed marker  [import-untyped]
 src/documents/management/commands/document_fuzzy_match.py:0: error: Function is missing a type annotation  [no-untyped-def]
 src/documents/management/commands/document_fuzzy_match.py:0: error: Function is missing a type annotation  [no-untyped-def]
-src/documents/management/commands/document_importer.py:0: error: Argument 1 to "create_source_path_directory" has incompatible type "Path | None"; expected "Path"  [arg-type]
-src/documents/management/commands/document_importer.py:0: error: Argument 2 to "copy_file_with_basic_stats" has incompatible type "Path | None"; expected "Path | str"  [arg-type]
 src/documents/management/commands/document_importer.py:0: error: Attribute "version" already defined on line 0  [no-redef]
 src/documents/management/commands/document_importer.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
 src/documents/management/commands/document_importer.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
