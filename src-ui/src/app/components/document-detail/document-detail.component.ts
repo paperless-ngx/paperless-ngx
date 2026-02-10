@@ -437,6 +437,7 @@ export class DocumentDetailComponent
   }
 
   private loadDocument(documentId: number): void {
+    let redirectedToHead = false
     this.selectedVersionId = documentId
     this.previewUrl = this.documentsService.getPreviewUrl(
       this.selectedVersionId
@@ -459,7 +460,24 @@ export class DocumentDetailComponent
     this.documentsService
       .get(documentId)
       .pipe(
-        catchError(() => {
+        catchError((error) => {
+          if (error?.status === 404) {
+            return this.documentsService.getHeadId(documentId).pipe(
+              map((result) => {
+                const headId = result?.head_id
+                if (headId && headId !== documentId) {
+                  const section =
+                    this.route.snapshot.paramMap.get('section') || 'details'
+                  redirectedToHead = true
+                  this.router.navigate(['documents', headId, section], {
+                    replaceUrl: true,
+                  })
+                }
+                return null
+              }),
+              catchError(() => of(null))
+            )
+          }
           // 404 is handled in the subscribe below
           return of(null)
         }),
@@ -470,6 +488,9 @@ export class DocumentDetailComponent
       .subscribe({
         next: (doc) => {
           if (!doc) {
+            if (redirectedToHead) {
+              return
+            }
             this.router.navigate(['404'], { replaceUrl: true })
             return
           }

@@ -805,6 +805,26 @@ class DocumentViewSet(
         )
         return super().get_serializer(*args, **kwargs)
 
+    @action(methods=["get"], detail=True, url_path="head")
+    def head(self, request, pk=None):
+        try:
+            doc = Document.global_objects.select_related(
+                "owner",
+                "head_version",
+            ).get(pk=pk)
+        except Document.DoesNotExist:
+            raise Http404
+
+        head_doc = doc if doc.head_version_id is None else doc.head_version
+        if request.user is not None and not has_perms_owner_aware(
+            request.user,
+            "view_document",
+            head_doc,
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
+
+        return Response({"head_id": head_doc.id})
+
     def update(self, request, *args, **kwargs):
         response = super().update(request, *args, **kwargs)
         from documents import index
