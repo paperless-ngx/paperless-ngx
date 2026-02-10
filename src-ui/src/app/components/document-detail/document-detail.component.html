@@ -19,12 +19,12 @@
         </div>
         <div class="dropdown-divider"></div>
         @for (version of document.versions; track version.id) {
-          <button ngbDropdownItem (click)="selectVersion(version.id)">
+          <div class="dropdown-item">
             <div class="d-flex align-items-center w-100 version-item">
               <span class="badge bg-light text-lowercase text-muted">
                 {{ version.checksum | slice:0:8 }}
               </span>
-              <div class="flex-grow-1 ms-3 small">
+              <button type="button" class="version-entry flex-grow-1 ms-3 small text-start" (click)="selectVersion(version.id)">
                 <div class="small">
                   @if (version.label) {
                     {{ version.label }}
@@ -35,10 +35,20 @@
                 <div class="version-subtitle text-muted">
                   {{ version.added | customDate:'short' }}
                 </div>
-              </div>
+              </button>
               @if (selectedVersionId === version.id) { <span class="ms-2">✓</span> }
+              <pngx-confirm-button
+                buttonClasses="btn-link btn-sm text-danger ms-2"
+                iconName="trash"
+                confirmMessage="Delete this version?"
+                i18n-confirmMessage
+                [disabled]="!userIsOwner || !userCanEdit"
+                (confirm)="deleteVersion(version.id)"
+              >
+                <span class="visually-hidden" i18n>Delete version</span>
+              </pngx-confirm-button>
             </div>
-          </button>
+          </div>
         }
       </div>
     </div>

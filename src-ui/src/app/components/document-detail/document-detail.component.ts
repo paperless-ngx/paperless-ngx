@@ -84,6 +84,7 @@ import { getFilenameFromContentDisposition } from 'src/app/utils/http'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
 import { DocumentDetailFieldID } from '../admin/settings/settings.component'
+import { ConfirmButtonComponent } from '../common/confirm-button/confirm-button.component'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
 import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
@@ -176,6 +177,7 @@ enum ContentRenderType {
     TextAreaComponent,
     RouterModule,
     PngxPdfViewerComponent,
+    ConfirmButtonComponent,
     SlicePipe,
   ],
 })
@@ -768,6 +770,24 @@ export class DocumentDetailComponent
           (this.previewText = $localize`An error occurred loading content: ${
             err.message ?? err.toString()
           }`),
+      })
+  }
+
+  deleteVersion(versionId: number) {
+    const wasSelected = this.selectedVersionId === versionId
+    this.documentsService
+      .deleteVersion(this.documentId, versionId)
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (result) => {
+          if (wasSelected && result?.current_version_id) {
+            this.selectVersion(result.current_version_id)
+          }
+          this.openDocumentService.refreshDocument(this.documentId)
+        },
+        error: (error) => {
+          this.toastService.showError($localize`Error deleting version`, error)
+        },
       })
   }
 
