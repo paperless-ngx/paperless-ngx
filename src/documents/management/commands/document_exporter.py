@@ -327,48 +327,50 @@ class Command(CryptMixin, BaseCommand):
             for index, document_dict in enumerate(document_manifest):
                 document = document_map[document_dict["pk"]]
 
-            # 3.1. generate a unique filename
-            base_name = self.generate_base_name(document)
+                # 3.1. generate a unique filename
+                base_name = self.generate_base_name(document)
 
-            # 3.2. write filenames into manifest
-            original_target, thumbnail_target, archive_target = (
-                self.generate_document_targets(document, base_name, document_dict)
-            )
-
-            # 3.3. write files to target folder
-            if not self.data_only:
-                self.copy_document_files(
-                    document,
-                    original_target,
-                    thumbnail_target,
-                    archive_target,
+                # 3.2. write filenames into manifest
+                original_target, thumbnail_target, archive_target = (
+                    self.generate_document_targets(document, base_name, document_dict)
                 )
 
-            if self.split_manifest:
-                manifest_name = base_name.with_name(f"{base_name.stem}-manifest.json")
-                if self.use_folder_prefix:
-                    manifest_name = Path("json") / manifest_name
-                manifest_name = (self.target / manifest_name).resolve()
-                manifest_name.parent.mkdir(parents=True, exist_ok=True)
-                content = [document_manifest[index]]
-                content += list(
-                    filter(
-                        lambda d: d["fields"]["document"] == document_dict["pk"],
-                        manifest_dict["notes"],
-                    ),
-                )
-                content += list(
-                    filter(
-                        lambda d: d["fields"]["document"] == document_dict["pk"],
-                        manifest_dict["custom_field_instances"],
-                    ),
-                )
+                # 3.3. write files to target folder
+                if not self.data_only:
+                    self.copy_document_files(
+                        document,
+                        original_target,
+                        thumbnail_target,
+                        archive_target,
+                    )
 
-                self.check_and_write_json(
-                    content,
-                    manifest_name,
-                )
-                progress.update(task, advance=1)
+                if self.split_manifest:
+                    manifest_name = base_name.with_name(
+                        f"{base_name.stem}-manifest.json",
+                    )
+                    if self.use_folder_prefix:
+                        manifest_name = Path("json") / manifest_name
+                    manifest_name = (self.target / manifest_name).resolve()
+                    manifest_name.parent.mkdir(parents=True, exist_ok=True)
+                    content = [document_manifest[index]]
+                    content += list(
+                        filter(
+                            lambda d: d["fields"]["document"] == document_dict["pk"],
+                            manifest_dict["notes"],
+                        ),
+                    )
+                    content += list(
+                        filter(
+                            lambda d: d["fields"]["document"] == document_dict["pk"],
+                            manifest_dict["custom_field_instances"],
+                        ),
+                    )
+
+                    self.check_and_write_json(
+                        content,
+                        manifest_name,
+                    )
+                    progress.update(task, advance=1)
 
         # These were exported already
         if self.split_manifest:

@@ -383,56 +383,56 @@ class Command(CryptMixin, BaseCommand):
             for record in manifest_documents:
                 document = Document.objects.get(pk=record["pk"])
 
-            doc_file = record[EXPORTER_FILE_NAME]
-            document_path = self.source / doc_file
+                doc_file = record[EXPORTER_FILE_NAME]
+                document_path = self.source / doc_file
 
-            if EXPORTER_THUMBNAIL_NAME in record:
-                thumb_file = record[EXPORTER_THUMBNAIL_NAME]
-                thumbnail_path = (self.source / thumb_file).resolve()
-            else:
-                thumbnail_path = None
+                if EXPORTER_THUMBNAIL_NAME in record:
+                    thumb_file = record[EXPORTER_THUMBNAIL_NAME]
+                    thumbnail_path = (self.source / thumb_file).resolve()
+                else:
+                    thumbnail_path = None
 
-            if EXPORTER_ARCHIVE_NAME in record:
-                archive_file = record[EXPORTER_ARCHIVE_NAME]
-                archive_path = self.source / archive_file
-            else:
-                archive_path = None
+                if EXPORTER_ARCHIVE_NAME in record:
+                    archive_file = record[EXPORTER_ARCHIVE_NAME]
+                    archive_path = self.source / archive_file
+                else:
+                    archive_path = None
 
-            with FileLock(settings.MEDIA_LOCK):
-                if Path(document.source_path).is_file():
-                    raise FileExistsError(document.source_path)
+                with FileLock(settings.MEDIA_LOCK):
+                    if Path(document.source_path).is_file():
+                        raise FileExistsError(document.source_path)
 
-                create_source_path_directory(document.source_path)
+                    create_source_path_directory(document.source_path)
 
-                copy_file_with_basic_stats(document_path, document.source_path)
+                    copy_file_with_basic_stats(document_path, document.source_path)
 
-                if thumbnail_path:
-                    if thumbnail_path.suffix in {".png", ".PNG"}:
-                        run_convert(
-                            density=300,
-                            scale="500x5000>",
-                            alpha="remove",
-                            strip=True,
-                            trim=False,
-                            auto_orient=True,
-                            input_file=f"{thumbnail_path}[0]",
-                            output_file=str(document.thumbnail_path),
-                        )
-                    else:
-                        copy_file_with_basic_stats(
-                            thumbnail_path,
-                            document.thumbnail_path,
-                        )
+                    if thumbnail_path:
+                        if thumbnail_path.suffix in {".png", ".PNG"}:
+                            run_convert(
+                                density=300,
+                                scale="500x5000>",
+                                alpha="remove",
+                                strip=True,
+                                trim=False,
+                                auto_orient=True,
+                                input_file=f"{thumbnail_path}[0]",
+                                output_file=str(document.thumbnail_path),
+                            )
+                        else:
+                            copy_file_with_basic_stats(
+                                thumbnail_path,
+                                document.thumbnail_path,
+                            )
 
-                if archive_path:
-                    create_source_path_directory(document.archive_path)
-                    # TODO: this assumes that the export is valid and
-                    #  archive_filename is present on all documents with
-                    #  archived files
-                    copy_file_with_basic_stats(archive_path, document.archive_path)
+                    if archive_path:
+                        create_source_path_directory(document.archive_path)
+                        # TODO: this assumes that the export is valid and
+                        #  archive_filename is present on all documents with
+                        #  archived files
+                        copy_file_with_basic_stats(archive_path, document.archive_path)
 
-                document.save()
-                progress.update(task, advance=1)
+                    document.save()
+                    progress.update(task, advance=1)
 
     def decrypt_secret_fields(self) -> None:
         """

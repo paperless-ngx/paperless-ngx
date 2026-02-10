@@ -76,6 +76,7 @@ def test_update_llm_index(
         mock_queryset = MagicMock()
         mock_queryset.exists.return_value = True
         mock_queryset.__iter__.return_value = iter([real_document])
+        mock_queryset.count.return_value = 1
         mock_all.return_value = mock_queryset
         indexing.update_llm_index(rebuild=True)
 
@@ -97,6 +98,7 @@ def test_update_llm_index_removes_meta(
         mock_queryset = MagicMock()
         mock_queryset.exists.return_value = True
         mock_queryset.__iter__.return_value = iter([real_document])
+        mock_queryset.count.return_value = 1
         mock_all.return_value = mock_queryset
         indexing.update_llm_index(rebuild=True)
 
@@ -129,6 +131,7 @@ def test_update_llm_index_partial_update(
         mock_queryset = MagicMock()
         mock_queryset.exists.return_value = True
         mock_queryset.__iter__.return_value = iter([real_document, doc2])
+        mock_queryset.count.return_value = 2
         mock_all.return_value = mock_queryset
 
         indexing.update_llm_index(rebuild=True)
@@ -149,6 +152,7 @@ def test_update_llm_index_partial_update(
         mock_queryset = MagicMock()
         mock_queryset.exists.return_value = True
         mock_queryset.__iter__.return_value = iter([updated_document, doc2, doc3])
+        mock_queryset.count.return_value = 3
         mock_all.return_value = mock_queryset
 
         # assert logs "Updating LLM index with %d new nodes and removing %d old nodes."
