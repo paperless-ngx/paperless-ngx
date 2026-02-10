@@ -1510,6 +1510,7 @@ class DocumentViewSet(
 
             async_task = consume_file.delay(
                 input_doc,
+                None,
             )
             logger.debug(
                 f"Updated document {doc.id} with new version",
