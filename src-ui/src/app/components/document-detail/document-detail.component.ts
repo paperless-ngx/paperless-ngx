@@ -777,13 +777,35 @@ export class DocumentDetailComponent
     const wasSelected = this.selectedVersionId === versionId
     this.documentsService
       .deleteVersion(this.documentId, versionId)
-      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .pipe(
+        switchMap((result) =>
+          this.documentsService
+            .getVersions(this.documentId)
+            .pipe(map((doc) => ({ doc, result })))
+        ),
+        first(),
+        takeUntil(this.unsubscribeNotifier)
+      )
       .subscribe({
-        next: (result) => {
-          if (wasSelected && result?.current_version_id) {
-            this.selectVersion(result.current_version_id)
+        next: ({ doc, result }) => {
+          if (doc?.versions) {
+            this.document.versions = doc.versions
+            const openDoc = this.openDocumentService.getOpenDocument(
+              this.documentId
+            )
+            if (openDoc) {
+              openDoc.versions = doc.versions
+              this.openDocumentService.save()
+            }
           }
-          this.openDocumentService.refreshDocument(this.documentId)
+
+          if (wasSelected) {
+            const fallbackId =
+              result?.current_version_id ??
+              doc?.versions?.[0]?.id ??
+              this.documentId
+            this.selectVersion(fallbackId)
+          }
         },
         error: (error) => {
           this.toastService.showError($localize`Error deleting version`, error)

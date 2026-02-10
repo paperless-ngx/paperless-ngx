@@ -197,11 +197,18 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     if (label) {
       formData.append('label', label)
     }
-    return this.http.post(
+    return this.http.post<string>(
       this.getResourceUrl(documentId, 'update_version'),
-      formData,
-      { reportProgress: true, observe: 'events' }
+      formData
     )
+  }
+
+  getVersions(documentId: number): Observable<Document> {
+    return this.http.get<Document>(this.getResourceUrl(documentId), {
+      params: {
+        fields: 'id,versions',
+      },
+    })
   }
 
   deleteVersion(headDocumentId: number, versionId: number) {
