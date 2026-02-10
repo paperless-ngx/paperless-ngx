@@ -116,6 +116,7 @@ import { PDFEditorComponent } from '../common/pdf-editor/pdf-editor.component'
 import { PngxPdfViewerComponent } from '../common/pdf-viewer/pdf-viewer.component'
 import {
   PdfRenderMode,
+  PdfSource,
   PdfZoomLevel,
   PdfZoomScale,
   PngxPdfDocumentProxy,
@@ -239,15 +240,17 @@ export class DocumentDetailComponent
   titleSubject: Subject<string> = new Subject()
   previewUrl: string
   thumbUrl: string
-  // Versioning: which document ID to use for file preview/download
-  selectedVersionId: number
-  newVersionLabel: string = ''
-  versionUploadState: UploadState = UploadState.Idle
-  versionUploadError: string | null = null
   previewText: string
   previewLoaded: boolean = false
   tiffURL: string
   tiffError: string
+
+  // Versioning
+  selectedVersionId: number
+  newVersionLabel: string = ''
+  pdfSource: PdfSource
+  versionUploadState: UploadState = UploadState.Idle
+  versionUploadError: string | null = null
 
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
@@ -362,6 +365,17 @@ export class DocumentDetailComponent
     return ContentRenderType.Other
   }
 
+  private updatePdfSource() {
+    if (!this.previewUrl) {
+      this.pdfSource = undefined
+      return
+    }
+    this.pdfSource = {
+      url: this.previewUrl,
+      password: this.password || undefined,
+    }
+  }
+
   get isRTL() {
     if (!this.metadata || !this.metadata.lang) return false
     else {
@@ -442,6 +456,7 @@ export class DocumentDetailComponent
     this.previewUrl = this.documentsService.getPreviewUrl(
       this.selectedVersionId
     )
+    this.updatePdfSource()
     this.http
       .get(this.previewUrl, { responseType: 'text' })
       .pipe(
@@ -786,6 +801,7 @@ export class DocumentDetailComponent
       false,
       this.selectedVersionId
     )
+    this.updatePdfSource()
     this.thumbUrl = this.documentsService.getThumbUrl(this.selectedVersionId)
     // For text previews, refresh content
     this.http
@@ -1442,6 +1458,7 @@ export class DocumentDetailComponent
   onPasswordKeyUp(event: KeyboardEvent) {
     if ('Enter' == event.key) {
       this.password = (event.target as HTMLInputElement).value
+      this.updatePdfSource()
     }
   }
 
