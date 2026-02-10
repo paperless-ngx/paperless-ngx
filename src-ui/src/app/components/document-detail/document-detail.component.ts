@@ -29,6 +29,7 @@ import {
   first,
   map,
   switchMap,
+  take,
   takeUntil,
   tap,
 } from 'rxjs/operators'
@@ -80,6 +81,7 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import { getFilenameFromContentDisposition } from 'src/app/utils/http'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
@@ -207,6 +209,7 @@ export class DocumentDetailComponent
   private componentRouterService = inject(ComponentRouterService)
   private deviceDetectorService = inject(DeviceDetectorService)
   private savedViewService = inject(SavedViewService)
+  private websocketStatusService = inject(WebsocketStatusService)
 
   @ViewChild('inputTitle')
   titleInput: TextComponent
@@ -1238,15 +1241,51 @@ export class DocumentDetailComponent
     const label = this.newVersionLabel?.trim()
     this.documentsService
       .uploadVersion(this.documentId, file, label)
-      .pipe(first())
-      .subscribe({
-        next: () => {
+      .pipe(
+        first(),
+        tap(() => {
           this.toastService.showInfo(
             $localize`Uploading new version. Processing will happen in the background.`
           )
           this.newVersionLabel = ''
-          // Refresh metadata to reflect that versions changed (when ready)
-          this.openDocumentService.refreshDocument(this.documentId)
+        }),
+        map((taskId) =>
+          typeof taskId === 'string'
+            ? taskId
+            : (taskId as { task_id?: string })?.task_id
+        ),
+        switchMap((taskId) => {
+          if (!taskId) {
+            return of(null)
+          }
+          return this.websocketStatusService
+            .onDocumentConsumptionFinished()
+            .pipe(
+              filter((status) => status.taskId === taskId),
+              take(1)
+            )
+        }),
+        switchMap((status) => {
+          if (!status) {
+            return of(null)
+          }
+          return this.documentsService.getVersions(this.documentId)
+        }),
+        takeUntil(this.unsubscribeNotifier),
+        takeUntil(this.docChangeNotifier)
+      )
+      .subscribe({
+        next: (doc) => {
+          if (doc?.versions) {
+            this.document.versions = doc.versions
+            const openDoc = this.openDocumentService.getOpenDocument(
+              this.documentId
+            )
+            if (openDoc) {
+              openDoc.versions = doc.versions
+              this.openDocumentService.save()
+            }
+          }
         },
         error: (error) => {
           this.toastService.showError(
