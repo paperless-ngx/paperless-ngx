@@ -1527,6 +1527,55 @@ class DocumentViewSet(
                 "Error updating document, check logs for more detail.",
             )
 
+    @action(
+        methods=["delete"],
+        detail=True,
+        url_path="versions/(?P<version_id>[^/.]+)",
+    )
+    def delete_version(self, request, pk=None, version_id=None):
+        try:
+            head_doc = Document.objects.select_related("owner").get(pk=pk)
+            if head_doc.head_version_id is not None:
+                head_doc = Document.objects.select_related("owner").get(
+                    pk=head_doc.head_version_id,
+                )
+        except Document.DoesNotExist:
+            raise Http404
+
+        if request.user is not None and not has_perms_owner_aware(
+            request.user,
+            "delete_document",
+            head_doc,
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
+
+        try:
+            version_doc = Document.objects.select_related("owner").get(
+                pk=version_id,
+            )
+        except Document.DoesNotExist:
+            raise Http404
+
+        if version_doc.head_version_id != head_doc.id:
+            raise Http404
+
+        from documents import index
+
+        index.remove_document_from_index(version_doc)
+        version_doc.delete()
+
+        current = (
+            Document.objects.filter(Q(id=head_doc.id) | Q(head_version=head_doc))
+            .order_by("-id")
+            .first()
+        )
+        return Response(
+            {
+                "result": "OK",
+                "current_version_id": current.id if current else head_doc.id,
+            },
+        )
+
 
 class ChatStreamingSerializer(serializers.Serializer):
     q = serializers.CharField(required=True)
