@@ -309,16 +309,28 @@ def modify_custom_fields(
 @shared_task
 def delete(doc_ids: list[int]) -> Literal["OK"]:
     try:
-        Document.objects.filter(id__in=doc_ids).delete()
+        head_ids = (
+            Document.objects.filter(id__in=doc_ids, head_version__isnull=True)
+            .values_list("id", flat=True)
+            .distinct()
+        )
+        version_ids = (
+            Document.objects.filter(head_version_id__in=head_ids)
+            .values_list("id", flat=True)
+            .distinct()
+        )
+        delete_ids = list({*doc_ids, *version_ids})
+
+        Document.objects.filter(id__in=delete_ids).delete()
 
         from documents import index
 
         with index.open_index_writer() as writer:
-            for id in doc_ids:
+            for id in delete_ids:
                 index.remove_document_by_id(writer, id)
 
         status_mgr = DocumentsStatusManager()
-        status_mgr.send_documents_deleted(doc_ids)
+        status_mgr.send_documents_deleted(delete_ids)
     except Exception as e:
         if "Data too long for column" in str(e):
             logger.warning(
