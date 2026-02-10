@@ -513,6 +513,7 @@ class ConsumerPlugin(
                     original_document.archive_checksum = None
                     if self.metadata.version_label is not None:
                         original_document.version_label = self.metadata.version_label
+                    original_document.added = timezone.now()
                     original_document.modified = timezone.now()
                     original_document.save()
                     document = original_document
