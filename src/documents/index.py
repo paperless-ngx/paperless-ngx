@@ -10,9 +10,11 @@ from datetime import time
 from datetime import timedelta
 from datetime import timezone
 from shutil import rmtree
+from time import sleep
 from typing import TYPE_CHECKING
 from typing import Literal
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.utils import timezone as django_timezone
 from django.utils.timezone import get_current_timezone
@@ -31,6 +33,7 @@ from whoosh.highlight import HtmlFormatter
 from whoosh.idsets import BitSet
 from whoosh.idsets import DocIdSet
 from whoosh.index import FileIndex
+from whoosh.index import LockError
 from whoosh.index import create_in
 from whoosh.index import exists_in
 from whoosh.index import open_dir
@@ -96,11 +99,33 @@ def get_schema() -> Schema:
 
 
 def open_index(*, recreate=False) -> FileIndex:
-    try:
-        if exists_in(settings.INDEX_DIR) and not recreate:
-            return open_dir(settings.INDEX_DIR, schema=get_schema())
-    except Exception:
-        logger.exception("Error while opening the index, recreating.")
+    transient_exceptions = (FileNotFoundError, LockError)
+    max_retries = 3
+    retry_delay = 0.1
+
+    for attempt in range(max_retries + 1):
+        try:
+            if exists_in(settings.INDEX_DIR) and not recreate:
+                return open_dir(settings.INDEX_DIR, schema=get_schema())
+            break
+        except transient_exceptions as exc:
+            is_last_attempt = attempt == max_retries or recreate
+            if is_last_attempt:
+                logger.exception(
+                    "Error while opening the index after retries, recreating.",
+                )
+                break
+
+            logger.warning(
+                "Transient error while opening the index (attempt %s/%s): %s. Retrying.",
+                attempt + 1,
+                max_retries + 1,
+                exc,
+            )
+            sleep(retry_delay)
+        except Exception:
+            logger.exception("Error while opening the index, recreating.")
+            break
 
     # create_in doesn't handle corrupted indexes very well, remove the directory entirely first
     if settings.INDEX_DIR.is_dir():
@@ -287,14 +312,74 @@ class DelayedQuery:
         self.first_score = None
         self.filter_queryset = filter_queryset
         self.suggested_correction = None
+        self._manual_hits_cache: list | None = None
 
     def __len__(self) -> int:
+        if self._manual_sort_requested():
+            manual_hits = self._manual_hits()
+            return len(manual_hits)
+
         page = self[0:1]
         return len(page)
+
+    def _manual_sort_requested(self):
+        ordering = self.query_params.get("ordering", "")
+        return ordering.lstrip("-").startswith("custom_field_")
+
+    def _manual_hits(self):
+        if self._manual_hits_cache is None:
+            q, mask, suggested_correction = self._get_query()
+            self.suggested_correction = suggested_correction
+
+            results = self.searcher.search(
+                q,
+                mask=mask,
+                filter=MappedDocIdSet(self.filter_queryset, self.searcher.ixreader),
+                limit=None,
+            )
+            results.fragmenter = highlight.ContextFragmenter(surround=50)
+            results.formatter = HtmlFormatter(tagname="span", between=" ... ")
+
+            if not self.first_score and len(results) > 0:
+                self.first_score = results[0].score
+
+            if self.first_score:
+                results.top_n = [
+                    (
+                        (hit[0] / self.first_score) if self.first_score else None,
+                        hit[1],
+                    )
+                    for hit in results.top_n
+                ]
+
+            hits_by_id = {hit["id"]: hit for hit in results}
+            matching_ids = list(hits_by_id.keys())
+
+            ordered_ids = list(
+                self.filter_queryset.filter(id__in=matching_ids).values_list(
+                    "id",
+                    flat=True,
+                ),
+            )
+            ordered_ids = list(dict.fromkeys(ordered_ids))
+
+            self._manual_hits_cache = [
+                hits_by_id[_id] for _id in ordered_ids if _id in hits_by_id
+            ]
+        return self._manual_hits_cache
 
     def __getitem__(self, item):
         if item.start in self.saved_results:
             return self.saved_results[item.start]
+
+        if self._manual_sort_requested():
+            manual_hits = self._manual_hits()
+            start = 0 if item.start is None else item.start
+            stop = item.stop
+            hits = manual_hits[start:stop] if stop is not None else manual_hits[start:]
+            page = ManualResultsPage(hits)
+            self.saved_results[start] = page
+            return page
 
         q, mask, suggested_correction = self._get_query()
         self.suggested_correction = suggested_correction
@@ -315,19 +400,31 @@ class DelayedQuery:
         if not self.first_score and len(page.results) > 0 and sortedby is None:
             self.first_score = page.results[0].score
 
-        page.results.top_n = list(
-            map(
-                lambda hit: (
-                    (hit[0] / self.first_score) if self.first_score else None,
-                    hit[1],
-                ),
-                page.results.top_n,
-            ),
-        )
+        page.results.top_n = [
+            (
+                (hit[0] / self.first_score) if self.first_score else None,
+                hit[1],
+            )
+            for hit in page.results.top_n
+        ]
 
         self.saved_results[item.start] = page
 
         return page
+
+
+class ManualResultsPage(list):
+    def __init__(self, hits) -> None:
+        super().__init__(hits)
+        self.results = ManualResults(hits)
+
+
+class ManualResults:
+    def __init__(self, hits) -> None:
+        self._docnums = [hit.docnum for hit in hits]
+
+    def docs(self):
+        return self._docnums
 
 
 class LocalDateParser(English):
@@ -461,32 +558,84 @@ def get_permissions_criterias(user: User | None = None) -> list:
 def rewrite_natural_date_keywords(query_string: str) -> str:
     """
     Rewrites natural date keywords (e.g. added:today or added:"yesterday") to UTC range syntax for Whoosh.
+    This resolves timezone issues with date parsing in Whoosh as well as adding support for more
+    natural date keywords.
     """
 
     tz = get_current_timezone()
     local_now = now().astimezone(tz)
-
     today = local_now.date()
-    yesterday = today - timedelta(days=1)
 
-    ranges = {
-        "today": (
-            datetime.combine(today, time.min, tzinfo=tz),
-            datetime.combine(today, time.max, tzinfo=tz),
-        ),
-        "yesterday": (
-            datetime.combine(yesterday, time.min, tzinfo=tz),
-            datetime.combine(yesterday, time.max, tzinfo=tz),
-        ),
-    }
-
-    pattern = r"(\b(?:added|created))\s*:\s*[\"']?(today|yesterday)[\"']?"
+    # all supported Keywords
+    pattern = r"(\b(?:added|created|modified))\s*:\s*[\"']?(today|yesterday|this month|previous month|previous week|previous quarter|this year|previous year)[\"']?"
 
     def repl(m):
-        field, keyword = m.group(1), m.group(2)
-        start, end = ranges[keyword]
+        field = m.group(1)
+        keyword = m.group(2).lower()
+
+        match keyword:
+            case "today":
+                start = datetime.combine(today, time.min, tzinfo=tz)
+                end = datetime.combine(today, time.max, tzinfo=tz)
+
+            case "yesterday":
+                yesterday = today - timedelta(days=1)
+                start = datetime.combine(yesterday, time.min, tzinfo=tz)
+                end = datetime.combine(yesterday, time.max, tzinfo=tz)
+
+            case "this month":
+                start = datetime(local_now.year, local_now.month, 1, 0, 0, 0, tzinfo=tz)
+                end = start + relativedelta(months=1) - timedelta(seconds=1)
+
+            case "previous month":
+                this_month_start = datetime(
+                    local_now.year,
+                    local_now.month,
+                    1,
+                    0,
+                    0,
+                    0,
+                    tzinfo=tz,
+                )
+                start = this_month_start - relativedelta(months=1)
+                end = this_month_start - timedelta(seconds=1)
+
+            case "this year":
+                start = datetime(local_now.year, 1, 1, 0, 0, 0, tzinfo=tz)
+                end = datetime(local_now.year, 12, 31, 23, 59, 59, tzinfo=tz)
+
+            case "previous week":
+                days_since_monday = local_now.weekday()
+                this_week_start = datetime.combine(
+                    today - timedelta(days=days_since_monday),
+                    time.min,
+                    tzinfo=tz,
+                )
+                start = this_week_start - timedelta(days=7)
+                end = this_week_start - timedelta(seconds=1)
+
+            case "previous quarter":
+                current_quarter = (local_now.month - 1) // 3 + 1
+                this_quarter_start_month = (current_quarter - 1) * 3 + 1
+                this_quarter_start = datetime(
+                    local_now.year,
+                    this_quarter_start_month,
+                    1,
+                    0,
+                    0,
+                    0,
+                    tzinfo=tz,
+                )
+                start = this_quarter_start - relativedelta(months=3)
+                end = this_quarter_start - timedelta(seconds=1)
+
+            case "previous year":
+                start = datetime(local_now.year - 1, 1, 1, 0, 0, 0, tzinfo=tz)
+                end = datetime(local_now.year - 1, 12, 31, 23, 59, 59, tzinfo=tz)
+
+        # Convert to UTC and format
         start_str = start.astimezone(timezone.utc).strftime("%Y%m%d%H%M%S")
         end_str = end.astimezone(timezone.utc).strftime("%Y%m%d%H%M%S")
         return f"{field}:[{start_str} TO {end_str}]"
 
-    return re.sub(pattern, repl, query_string)
+    return re.sub(pattern, repl, query_string, flags=re.IGNORECASE)

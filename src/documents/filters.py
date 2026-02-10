@@ -39,6 +39,7 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import PaperlessTask
 from documents.models import ShareLink
+from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
 
@@ -92,6 +93,12 @@ class TagFilterSet(FilterSet):
             "name": CHAR_KWARGS,
         }
 
+    is_root = BooleanFilter(
+        label="Is root tag",
+        field_name="tn_parent",
+        lookup_expr="isnull",
+    )
+
 
 class DocumentTypeFilterSet(FilterSet):
     class Meta:
@@ -113,7 +120,7 @@ class StoragePathFilterSet(FilterSet):
 
 
 class ObjectFilter(Filter):
-    def __init__(self, *, exclude=False, in_list=False, field_name=""):
+    def __init__(self, *, exclude=False, in_list=False, field_name="") -> None:
         super().__init__()
         self.exclude = exclude
         self.in_list = in_list
@@ -154,6 +161,7 @@ class InboxFilter(Filter):
 @extend_schema_field(serializers.CharField)
 class TitleContentFilter(Filter):
     def filter(self, qs, value):
+        value = value.strip() if isinstance(value, str) else value
         if value:
             return qs.filter(Q(title__icontains=value) | Q(content__icontains=value))
         else:
@@ -208,6 +216,7 @@ class CustomFieldFilterSet(FilterSet):
 @extend_schema_field(serializers.CharField)
 class CustomFieldsFilter(Filter):
     def filter(self, qs, value):
+        value = value.strip() if isinstance(value, str) else value
         if value:
             fields_with_matching_selects = CustomField.objects.filter(
                 extra_data__icontains=value,
@@ -238,6 +247,7 @@ class CustomFieldsFilter(Filter):
 
 class MimeTypeFilter(Filter):
     def filter(self, qs, value):
+        value = value.strip() if isinstance(value, str) else value
         if value:
             return qs.filter(mime_type__icontains=value)
         else:
@@ -245,7 +255,7 @@ class MimeTypeFilter(Filter):
 
 
 class SelectField(serializers.CharField):
-    def __init__(self, custom_field: CustomField):
+    def __init__(self, custom_field: CustomField) -> None:
         self._options = custom_field.extra_data["select_options"]
         super().__init__(max_length=16)
 
@@ -666,7 +676,7 @@ class CustomFieldQueryParser:
 
 @extend_schema_field(serializers.CharField)
 class CustomFieldQueryFilter(Filter):
-    def __init__(self, validation_prefix):
+    def __init__(self, validation_prefix) -> None:
         """
         A filter that filters documents based on custom field name and value.
 
@@ -785,6 +795,29 @@ class ShareLinkFilterSet(FilterSet):
             "created": DATETIME_KWARGS,
             "expiration": DATETIME_KWARGS,
         }
+
+
+class ShareLinkBundleFilterSet(FilterSet):
+    documents = Filter(method="filter_documents")
+
+    class Meta:
+        model = ShareLinkBundle
+        fields = {
+            "created": DATETIME_KWARGS,
+            "expiration": DATETIME_KWARGS,
+            "status": ["exact"],
+        }
+
+    def filter_documents(self, queryset, name, value):
+        ids = []
+        if value:
+            try:
+                ids = [int(item) for item in value.split(",") if item]
+            except ValueError:
+                return queryset.none()
+        if not ids:
+            return queryset
+        return queryset.filter(documents__in=ids).distinct()
 
 
 class PaperlessTaskFilterSet(FilterSet):

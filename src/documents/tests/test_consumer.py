@@ -14,6 +14,7 @@ from django.test import override_settings
 from django.utils import timezone
 from guardian.core import ObjectPermissionChecker
 
+from documents.barcodes import BarcodePlugin
 from documents.consumer import ConsumerError
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
@@ -35,7 +36,7 @@ from paperless_mail.parsers import MailDocumentParser
 
 
 class _BaseTestParser(DocumentParser):
-    def get_settings(self):
+    def get_settings(self) -> None:
         """
         This parser does not implement additional settings yet
         """
@@ -43,7 +44,7 @@ class _BaseTestParser(DocumentParser):
 
 
 class DummyParser(_BaseTestParser):
-    def __init__(self, logging_group, scratch_dir, archive_path):
+    def __init__(self, logging_group, scratch_dir, archive_path) -> None:
         super().__init__(logging_group, None)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=scratch_dir)
         self.archive_path = archive_path
@@ -51,7 +52,7 @@ class DummyParser(_BaseTestParser):
     def get_thumbnail(self, document_path, mime_type, file_name=None):
         return self.fake_thumb
 
-    def parse(self, document_path, mime_type, file_name=None):
+    def parse(self, document_path, mime_type, file_name=None) -> None:
         self.text = "The Text"
 
 
@@ -59,18 +60,18 @@ class CopyParser(_BaseTestParser):
     def get_thumbnail(self, document_path, mime_type, file_name=None):
         return self.fake_thumb
 
-    def __init__(self, logging_group, progress_callback=None):
+    def __init__(self, logging_group, progress_callback=None) -> None:
         super().__init__(logging_group, progress_callback)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=self.tempdir)
 
-    def parse(self, document_path, mime_type, file_name=None):
+    def parse(self, document_path, mime_type, file_name=None) -> None:
         self.text = "The text"
         self.archive_path = Path(self.tempdir / "archive.pdf")
         shutil.copy(document_path, self.archive_path)
 
 
 class FaultyParser(_BaseTestParser):
-    def __init__(self, logging_group, scratch_dir):
+    def __init__(self, logging_group, scratch_dir) -> None:
         super().__init__(logging_group)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=scratch_dir)
 
@@ -82,7 +83,7 @@ class FaultyParser(_BaseTestParser):
 
 
 class FaultyGenericExceptionParser(_BaseTestParser):
-    def __init__(self, logging_group, scratch_dir):
+    def __init__(self, logging_group, scratch_dir) -> None:
         super().__init__(logging_group)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=scratch_dir)
 
@@ -127,7 +128,7 @@ class TestConsumer(
         first_progress_max=100,
         last_progress=100,
         last_progress_max=100,
-    ):
+    ) -> None:
         self.assertGreaterEqual(len(self.status.payloads), 2)
 
         payload = self.status.payloads[0]
@@ -158,7 +159,7 @@ class TestConsumer(
     ):
         return FaultyGenericExceptionParser(logging_group, self.dirs.scratch_dir)
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         patcher = mock.patch("documents.parsers.document_consumer_declaration.send")
@@ -208,7 +209,7 @@ class TestConsumer(
         return dst
 
     @override_settings(FILENAME_FORMAT=None, TIME_ZONE="America/Chicago")
-    def testNormalOperation(self):
+    def testNormalOperation(self) -> None:
         filename = self.get_test_file()
 
         # Get the local time, as an aware datetime
@@ -250,7 +251,7 @@ class TestConsumer(
         self.assertEqual(document.created.day, rough_create_date_local.day)
 
     @override_settings(FILENAME_FORMAT=None)
-    def testDeleteMacFiles(self):
+    def testDeleteMacFiles(self) -> None:
         # https://github.com/jonaswinkler/paperless-ng/discussions/1037
 
         filename = self.get_test_file()
@@ -272,7 +273,7 @@ class TestConsumer(
         self.assertIsNotFile(shadow_file)
         self.assertIsNotFile(filename)
 
-    def testOverrideFilename(self):
+    def testOverrideFilename(self) -> None:
         filename = self.get_test_file()
         override_filename = "Statement for November.pdf"
 
@@ -290,7 +291,7 @@ class TestConsumer(
 
         self._assert_first_last_send_progress()
 
-    def testOverrideTitle(self):
+    def testOverrideTitle(self) -> None:
         with self.get_consumer(
             self.get_test_file(),
             DocumentMetadataOverrides(title="Override Title"),
@@ -304,7 +305,7 @@ class TestConsumer(
         self.assertEqual(document.title, "Override Title")
         self._assert_first_last_send_progress()
 
-    def testOverrideCorrespondent(self):
+    def testOverrideCorrespondent(self) -> None:
         c = Correspondent.objects.create(name="test")
 
         with self.get_consumer(
@@ -320,7 +321,7 @@ class TestConsumer(
         self.assertEqual(document.correspondent.id, c.id)
         self._assert_first_last_send_progress()
 
-    def testOverrideDocumentType(self):
+    def testOverrideDocumentType(self) -> None:
         dt = DocumentType.objects.create(name="test")
 
         with self.get_consumer(
@@ -334,7 +335,7 @@ class TestConsumer(
         self.assertEqual(document.document_type.id, dt.id)
         self._assert_first_last_send_progress()
 
-    def testOverrideStoragePath(self):
+    def testOverrideStoragePath(self) -> None:
         sp = StoragePath.objects.create(name="test")
 
         with self.get_consumer(
@@ -348,7 +349,7 @@ class TestConsumer(
         self.assertEqual(document.storage_path.id, sp.id)
         self._assert_first_last_send_progress()
 
-    def testOverrideTags(self):
+    def testOverrideTags(self) -> None:
         t1 = Tag.objects.create(name="t1")
         t2 = Tag.objects.create(name="t2")
         t3 = Tag.objects.create(name="t3")
@@ -366,7 +367,7 @@ class TestConsumer(
         self.assertIn(t3, document.tags.all())
         self._assert_first_last_send_progress()
 
-    def testOverrideCustomFields(self):
+    def testOverrideCustomFields(self) -> None:
         cf1 = CustomField.objects.create(name="Custom Field 1", data_type="string")
         cf2 = CustomField.objects.create(
             name="Custom Field 2",
@@ -400,7 +401,7 @@ class TestConsumer(
         )
         self._assert_first_last_send_progress()
 
-    def testOverrideAsn(self):
+    def testOverrideAsn(self) -> None:
         with self.get_consumer(
             self.get_test_file(),
             DocumentMetadataOverrides(asn=123),
@@ -412,7 +413,7 @@ class TestConsumer(
         self.assertEqual(document.archive_serial_number, 123)
         self._assert_first_last_send_progress()
 
-    def testOverrideTitlePlaceholders(self):
+    def testOverrideTitlePlaceholders(self) -> None:
         c = Correspondent.objects.create(name="Correspondent Name")
         dt = DocumentType.objects.create(name="DocType Name")
 
@@ -432,7 +433,7 @@ class TestConsumer(
         self.assertEqual(document.title, f"{c.name}{dt.name} {now.strftime('%m-%y')}")
         self._assert_first_last_send_progress()
 
-    def testOverrideOwner(self):
+    def testOverrideOwner(self) -> None:
         testuser = User.objects.create(username="testuser")
 
         with self.get_consumer(
@@ -446,7 +447,7 @@ class TestConsumer(
         self.assertEqual(document.owner, testuser)
         self._assert_first_last_send_progress()
 
-    def testOverridePermissions(self):
+    def testOverridePermissions(self) -> None:
         testuser = User.objects.create(username="testuser")
         testgroup = Group.objects.create(name="testgroup")
 
@@ -467,49 +468,50 @@ class TestConsumer(
         self.assertTrue(group_checker.has_perm("view_document", document))
         self._assert_first_last_send_progress()
 
-    def testNotAFile(self):
+    def testNotAFile(self) -> None:
         with self.assertRaisesMessage(ConsumerError, "File not found"):
             with self.get_consumer(Path("non-existing-file")) as consumer:
                 consumer.run()
         self._assert_first_last_send_progress(last_status="FAILED")
 
-    def testDuplicates1(self):
+    def testDuplicates1(self) -> None:
         with self.get_consumer(self.get_test_file()) as consumer:
             consumer.run()
 
-        with self.assertRaisesMessage(ConsumerError, "It is a duplicate"):
-            with self.get_consumer(self.get_test_file()) as consumer:
-                consumer.run()
-
-        self._assert_first_last_send_progress(last_status="FAILED")
-
-    def testDuplicates2(self):
         with self.get_consumer(self.get_test_file()) as consumer:
             consumer.run()
 
-        with self.assertRaisesMessage(ConsumerError, "It is a duplicate"):
-            with self.get_consumer(self.get_test_archive_file()) as consumer:
-                consumer.run()
+        self.assertEqual(Document.objects.count(), 2)
+        self._assert_first_last_send_progress()
 
-        self._assert_first_last_send_progress(last_status="FAILED")
+    def testDuplicates2(self) -> None:
+        with self.get_consumer(self.get_test_file()) as consumer:
+            consumer.run()
 
-    def testDuplicates3(self):
+        with self.get_consumer(self.get_test_archive_file()) as consumer:
+            consumer.run()
+
+        self.assertEqual(Document.objects.count(), 2)
+        self._assert_first_last_send_progress()
+
+    def testDuplicates3(self) -> None:
         with self.get_consumer(self.get_test_archive_file()) as consumer:
             consumer.run()
         with self.get_consumer(self.get_test_file()) as consumer:
             consumer.run()
 
-    def testDuplicateInTrash(self):
+    def testDuplicateInTrash(self) -> None:
         with self.get_consumer(self.get_test_file()) as consumer:
             consumer.run()
 
         Document.objects.all().delete()
 
-        with self.assertRaisesMessage(ConsumerError, "document is in the trash"):
-            with self.get_consumer(self.get_test_file()) as consumer:
-                consumer.run()
+        with self.get_consumer(self.get_test_file()) as consumer:
+            consumer.run()
 
-    def testAsnExists(self):
+        self.assertEqual(Document.objects.count(), 1)
+
+    def testAsnExists(self) -> None:
         with self.get_consumer(
             self.get_test_file(),
             DocumentMetadataOverrides(asn=123),
@@ -523,7 +525,7 @@ class TestConsumer(
             ) as consumer:
                 consumer.run()
 
-    def testAsnExistsInTrash(self):
+    def testAsnExistsInTrash(self) -> None:
         with self.get_consumer(
             self.get_test_file(),
             DocumentMetadataOverrides(asn=123),
@@ -541,7 +543,7 @@ class TestConsumer(
                 consumer.run()
 
     @mock.patch("documents.parsers.document_consumer_declaration.send")
-    def testNoParsers(self, m):
+    def testNoParsers(self, m) -> None:
         m.return_value = []
 
         with self.assertRaisesMessage(
@@ -554,7 +556,7 @@ class TestConsumer(
         self._assert_first_last_send_progress(last_status="FAILED")
 
     @mock.patch("documents.parsers.document_consumer_declaration.send")
-    def testFaultyParser(self, m):
+    def testFaultyParser(self, m) -> None:
         m.return_value = [
             (
                 None,
@@ -576,7 +578,7 @@ class TestConsumer(
         self._assert_first_last_send_progress(last_status="FAILED")
 
     @mock.patch("documents.parsers.document_consumer_declaration.send")
-    def testGenericParserException(self, m):
+    def testGenericParserException(self, m) -> None:
         m.return_value = [
             (
                 None,
@@ -598,7 +600,7 @@ class TestConsumer(
         self._assert_first_last_send_progress(last_status="FAILED")
 
     @mock.patch("documents.consumer.ConsumerPlugin._write")
-    def testPostSaveError(self, m):
+    def testPostSaveError(self, m) -> None:
         filename = self.get_test_file()
         m.side_effect = OSError("NO.")
 
@@ -618,7 +620,7 @@ class TestConsumer(
         self.assertEqual(Document.objects.all().count(), 0)
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
-    def testFilenameHandling(self):
+    def testFilenameHandling(self) -> None:
         with self.get_consumer(
             self.get_test_file(),
             DocumentMetadataOverrides(title="new docs"),
@@ -635,7 +637,7 @@ class TestConsumer(
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
     @mock.patch("documents.signals.handlers.generate_unique_filename")
-    def testFilenameHandlingUnstableFormat(self, m):
+    def testFilenameHandlingUnstableFormat(self, m) -> None:
         filenames = ["this", "that", "now this", "i cannot decide"]
 
         def get_filename():
@@ -663,7 +665,7 @@ class TestConsumer(
         self._assert_first_last_send_progress()
 
     @mock.patch("documents.consumer.load_classifier")
-    def testClassifyDocument(self, m):
+    def testClassifyDocument(self, m) -> None:
         correspondent = Correspondent.objects.create(
             name="test",
             matching_algorithm=Correspondent.MATCH_AUTO,
@@ -693,7 +695,7 @@ class TestConsumer(
         self._assert_first_last_send_progress()
 
     @override_settings(CONSUMER_DELETE_DUPLICATES=True)
-    def test_delete_duplicate(self):
+    def test_delete_duplicate(self) -> None:
         dst = self.get_test_file()
         self.assertIsFile(dst)
 
@@ -710,15 +712,48 @@ class TestConsumer(
         dst = self.get_test_file()
         self.assertIsFile(dst)
 
-        with self.assertRaises(ConsumerError):
+        expected_message = (
+            f"{dst.name}: Not consuming {dst.name}: "
+            f"It is a duplicate of {document.title} (#{document.pk})"
+        )
+
+        with self.assertRaisesMessage(ConsumerError, expected_message):
             with self.get_consumer(dst) as consumer:
                 consumer.run()
 
         self.assertIsNotFile(dst)
-        self._assert_first_last_send_progress(last_status="FAILED")
+        self.assertEqual(Document.objects.count(), 1)
+        self._assert_first_last_send_progress(last_status=ProgressStatusOptions.FAILED)
+
+    @override_settings(CONSUMER_DELETE_DUPLICATES=True)
+    def test_delete_duplicate_in_trash(self) -> None:
+        dst = self.get_test_file()
+        with self.get_consumer(dst) as consumer:
+            consumer.run()
+
+        # Move the existing document to trash
+        document = Document.objects.first()
+        document.delete()
+
+        dst = self.get_test_file()
+        self.assertIsFile(dst)
+
+        expected_message = (
+            f"{dst.name}: Not consuming {dst.name}: "
+            f"It is a duplicate of {document.title} (#{document.pk})"
+            f" Note: existing document is in the trash."
+        )
+
+        with self.assertRaisesMessage(ConsumerError, expected_message):
+            with self.get_consumer(dst) as consumer:
+                consumer.run()
+
+        self.assertIsNotFile(dst)
+        self.assertEqual(Document.global_objects.count(), 1)
+        self.assertEqual(Document.objects.count(), 0)
 
     @override_settings(CONSUMER_DELETE_DUPLICATES=False)
-    def test_no_delete_duplicate(self):
+    def test_no_delete_duplicate(self) -> None:
         dst = self.get_test_file()
         self.assertIsFile(dst)
 
@@ -735,19 +770,16 @@ class TestConsumer(
         dst = self.get_test_file()
         self.assertIsFile(dst)
 
-        with self.assertRaisesRegex(
-            ConsumerError,
-            r"sample\.pdf: Not consuming sample\.pdf: It is a duplicate of sample \(#\d+\)",
-        ):
-            with self.get_consumer(dst) as consumer:
-                consumer.run()
+        with self.get_consumer(dst) as consumer:
+            consumer.run()
 
-        self.assertIsFile(dst)
-        self._assert_first_last_send_progress(last_status="FAILED")
+        self.assertIsNotFile(dst)
+        self.assertEqual(Document.objects.count(), 2)
+        self._assert_first_last_send_progress()
 
     @override_settings(FILENAME_FORMAT="{title}")
     @mock.patch("documents.parsers.document_consumer_declaration.send")
-    def test_similar_filenames(self, m):
+    def test_similar_filenames(self, m) -> None:
         shutil.copy(
             Path(__file__).parent / "samples" / "simple.pdf",
             settings.CONSUMPTION_DIR / "simple.pdf",
@@ -798,7 +830,7 @@ class TestConsumer(
         sanity_check()
 
     @mock.patch("documents.consumer.run_subprocess")
-    def test_try_to_clean_invalid_pdf(self, m):
+    def test_try_to_clean_invalid_pdf(self, m) -> None:
         shutil.copy(
             Path(__file__).parent / "samples" / "invalid_pdf.pdf",
             settings.CONSUMPTION_DIR / "invalid_pdf.pdf",
@@ -826,7 +858,7 @@ class TestConsumer(
         mock_consumer_declaration_send: mock.Mock,
         mock_mail_parser_parse: mock.Mock,
         mock_mailrule_get: mock.Mock,
-    ):
+    ) -> None:
         """
         GIVEN:
             - A mail document from a mail rule
@@ -874,10 +906,10 @@ class TestConsumer(
 
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
 class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
-    def test_consume_date_from_content(self):
+    def test_consume_date_from_content(self) -> None:
         """
         GIVEN:
             - File content with date in DMY (default) format
@@ -906,7 +938,7 @@ class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
         )
 
     @override_settings(FILENAME_DATE_ORDER="YMD")
-    def test_consume_date_from_filename(self):
+    def test_consume_date_from_filename(self) -> None:
         """
         GIVEN:
             - File content with date in DMY (default) format
@@ -935,7 +967,7 @@ class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
             datetime.date(2022, 2, 1),
         )
 
-    def test_consume_date_filename_date_use_content(self):
+    def test_consume_date_filename_date_use_content(self) -> None:
         """
         GIVEN:
             - File content with date in DMY (default) format
@@ -968,7 +1000,7 @@ class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
     @override_settings(
         IGNORE_DATES=(datetime.date(2010, 12, 13), datetime.date(2011, 11, 12)),
     )
-    def test_consume_date_use_content_with_ignore(self):
+    def test_consume_date_use_content_with_ignore(self) -> None:
         """
         GIVEN:
             - File content with dates in DMY (default) format
@@ -1013,20 +1045,20 @@ class PreConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
 
     @mock.patch("documents.consumer.run_subprocess")
     @override_settings(PRE_CONSUME_SCRIPT=None)
-    def test_no_pre_consume_script(self, m):
+    def test_no_pre_consume_script(self, m) -> None:
         with self.get_consumer(self.test_file) as c:
             c.run()
             m.assert_not_called()
 
     @mock.patch("documents.consumer.run_subprocess")
     @override_settings(PRE_CONSUME_SCRIPT="does-not-exist")
-    def test_pre_consume_script_not_found(self, m):
+    def test_pre_consume_script_not_found(self, m) -> None:
         with self.get_consumer(self.test_file) as c:
             self.assertRaises(ConsumerError, c.run)
             m.assert_not_called()
 
     @mock.patch("documents.consumer.run_subprocess")
-    def test_pre_consume_script(self, m):
+    def test_pre_consume_script(self, m) -> None:
         with tempfile.NamedTemporaryFile() as script:
             with override_settings(PRE_CONSUME_SCRIPT=script.name):
                 with self.get_consumer(self.test_file) as c:
@@ -1049,7 +1081,7 @@ class PreConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                     }
                     self.assertDictEqual(environment, {**environment, **subset})
 
-    def test_script_with_output(self):
+    def test_script_with_output(self) -> None:
         """
         GIVEN:
             - A script which outputs to stdout and stderr
@@ -1082,7 +1114,7 @@ class PreConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                         cm.output,
                     )
 
-    def test_script_exit_non_zero(self):
+    def test_script_exit_non_zero(self) -> None:
         """
         GIVEN:
             - A script which exits with a non-zero exit code
@@ -1124,7 +1156,7 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
 
     @mock.patch("documents.consumer.run_subprocess")
     @override_settings(POST_CONSUME_SCRIPT=None)
-    def test_no_post_consume_script(self, m):
+    def test_no_post_consume_script(self, m) -> None:
         doc = Document.objects.create(title="Test", mime_type="application/pdf")
         tag1 = Tag.objects.create(name="a")
         tag2 = Tag.objects.create(name="b")
@@ -1136,7 +1168,7 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
         m.assert_not_called()
 
     @override_settings(POST_CONSUME_SCRIPT="does-not-exist")
-    def test_post_consume_script_not_found(self):
+    def test_post_consume_script_not_found(self) -> None:
         doc = Document.objects.create(title="Test", mime_type="application/pdf")
 
         with self.get_consumer(self.test_file) as consumer:
@@ -1147,7 +1179,7 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                 consumer.run_post_consume_script(doc)
 
     @mock.patch("documents.consumer.run_subprocess")
-    def test_post_consume_script_simple(self, m):
+    def test_post_consume_script_simple(self, m) -> None:
         with tempfile.NamedTemporaryFile() as script:
             with override_settings(POST_CONSUME_SCRIPT=script.name):
                 doc = Document.objects.create(title="Test", mime_type="application/pdf")
@@ -1158,7 +1190,7 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                 m.assert_called_once()
 
     @mock.patch("documents.consumer.run_subprocess")
-    def test_post_consume_script_with_correspondent_and_type(self, m):
+    def test_post_consume_script_with_correspondent_and_type(self, m) -> None:
         with tempfile.NamedTemporaryFile() as script:
             with override_settings(POST_CONSUME_SCRIPT=script.name):
                 c = Correspondent.objects.create(name="my_bank")
@@ -1205,7 +1237,7 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
 
                 self.assertDictEqual(environment, {**environment, **subset})
 
-    def test_script_exit_non_zero(self):
+    def test_script_exit_non_zero(self) -> None:
         """
         GIVEN:
             - A script which exits with a non-zero exit code
@@ -1232,3 +1264,46 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                         r"sample\.pdf: Error while executing post-consume script: Command '\[.*\]' returned non-zero exit status \d+\.",
                     ):
                         consumer.run_post_consume_script(doc)
+
+
+class TestMetadataOverrides(TestCase):
+    def test_update_skip_asn_if_exists(self) -> None:
+        base = DocumentMetadataOverrides()
+        incoming = DocumentMetadataOverrides(skip_asn_if_exists=True)
+        base.update(incoming)
+        self.assertTrue(base.skip_asn_if_exists)
+
+
+class TestBarcodeApplyDetectedASN(TestCase):
+    """
+    GIVEN:
+        - Existing Documents with ASN 123
+    WHEN:
+        - A BarcodePlugin which detected an ASN
+    THEN:
+        - If skip_asn_if_exists is set, and ASN exists, do not set ASN
+        - If skip_asn_if_exists is set, and ASN does not exist, set ASN
+    """
+
+    def test_apply_detected_asn_skips_existing_when_flag_set(self) -> None:
+        doc = Document.objects.create(
+            checksum="X1",
+            title="D1",
+            archive_serial_number=123,
+        )
+        metadata = DocumentMetadataOverrides(skip_asn_if_exists=True)
+        plugin = BarcodePlugin(
+            input_doc=mock.Mock(),
+            metadata=metadata,
+            status_mgr=mock.Mock(),
+            base_tmp_dir=Path(tempfile.gettempdir()),
+            task_id="test-task",
+        )
+
+        plugin._apply_detected_asn(123)
+        self.assertIsNone(plugin.metadata.asn)
+
+        doc.hard_delete()
+
+        plugin._apply_detected_asn(123)
+        self.assertEqual(plugin.metadata.asn, 123)

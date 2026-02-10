@@ -5,13 +5,21 @@ from paperless_text.parsers import TextDocumentParser
 
 
 class TestTextParser:
-    def test_thumbnail(self, text_parser: TextDocumentParser, sample_txt_file: Path):
+    def test_thumbnail(
+        self,
+        text_parser: TextDocumentParser,
+        sample_txt_file: Path,
+    ) -> None:
         # just make sure that it does not crash
         f = text_parser.get_thumbnail(sample_txt_file, "text/plain")
         assert f.exists()
         assert f.is_file()
 
-    def test_parse(self, text_parser: TextDocumentParser, sample_txt_file: Path):
+    def test_parse(
+        self,
+        text_parser: TextDocumentParser,
+        sample_txt_file: Path,
+    ) -> None:
         text_parser.parse(sample_txt_file, "text/plain")
 
         assert text_parser.get_text() == "This is a test file.\n"
@@ -21,7 +29,7 @@ class TestTextParser:
         self,
         text_parser: TextDocumentParser,
         malformed_txt_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Text file which contains invalid UTF bytes
@@ -37,7 +45,7 @@ class TestTextParser:
         assert text_parser.get_text() == "Pantothens�ure\n"
         assert text_parser.get_archive_path() is None
 
-    def test_thumbnail_large_file(self, text_parser: TextDocumentParser):
+    def test_thumbnail_large_file(self, text_parser: TextDocumentParser) -> None:
         """
         GIVEN:
             - A very large text file (>50MB)

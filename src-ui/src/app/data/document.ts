@@ -163,6 +163,8 @@ export interface Document extends ObjectWithPermissions {
   head_version?: number
   versions?: number[]
 
+  duplicate_documents?: Document[]
+
   // Frontend only
   __changedFields?: string[]
 }

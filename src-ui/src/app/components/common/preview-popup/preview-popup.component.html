@@ -14,7 +14,7 @@
         @if (previewText) {
           <div class="bg-light p-3 overflow-auto whitespace-preserve" width="100%">{{previewText}}</div>
         } @else {
-          <object [data]="previewURL | safeUrl" width="100%" class="bg-light" [class.p-2]="!isPdf"></object>
+          <object [data]="previewUrl | safeUrl" width="100%" class="bg-light" [class.p-2]="!isPdf"></object>
         }
       } @else {
         @if (requiresPassword) {
@@ -23,14 +23,12 @@
           </div>
         }
         @if (!requiresPassword) {
-          <pdf-viewer
-            [src]="previewURL"
-            [original-size]="false"
-            [show-borders]="false"
-            [show-all]="true"
-            (text-layer-rendered)="onPageRendered()"
-            (error)="onError($event)" #pdfViewer>
-          </pdf-viewer>
+          <pngx-pdf-viewer
+            [src]="previewUrl"
+            [renderMode]="PdfRenderMode.All"
+            [searchQuery]="documentService.searchQuery"
+            (loadError)="onError($event)">
+          </pngx-pdf-viewer>
         }
       }
     }

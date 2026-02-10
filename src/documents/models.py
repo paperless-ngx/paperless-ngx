@@ -20,7 +20,9 @@ if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
 
 from django.db.models import Case
+from django.db.models import PositiveIntegerField
 from django.db.models.functions import Cast
+from django.db.models.functions import Length
 from django.db.models.functions import Substr
 from django_softdelete.models import SoftDeleteModel
 
@@ -116,7 +118,7 @@ class Tag(MatchingModel, TreeNodeModel):
         verbose_name = _("tag")
         verbose_name_plural = _("tags")
 
-    def clean(self):
+    def clean(self) -> None:
         # Prevent self-parenting and assigning a descendant as parent
         parent = self.get_parent()
         if parent == self:
@@ -132,7 +134,7 @@ class Tag(MatchingModel, TreeNodeModel):
         height = 0 if self.pk is None else self.get_depth()
         deepest_new_depth = (new_parent_depth + 1) + height
         if deepest_new_depth > self.MAX_NESTING_DEPTH:
-            raise ValidationError(_("Maximum nesting depth exceeded."))
+            raise ValidationError({"parent": _("Maximum nesting depth exceeded.")})
 
         return super().clean()
 
@@ -154,13 +156,6 @@ class StoragePath(MatchingModel):
 
 
 class Document(SoftDeleteModel, ModelWithOwner):
-    STORAGE_TYPE_UNENCRYPTED = "unencrypted"
-    STORAGE_TYPE_GPG = "gpg"
-    STORAGE_TYPES = (
-        (STORAGE_TYPE_UNENCRYPTED, _("Unencrypted")),
-        (STORAGE_TYPE_GPG, _("Encrypted with GNU Privacy Guard")),
-    )
-
     correspondent = models.ForeignKey(
         Correspondent,
         blank=True,
@@ -199,6 +194,15 @@ class Document(SoftDeleteModel, ModelWithOwner):
         ),
     )
 
+    content_length = models.GeneratedField(
+        expression=Length("content"),
+        output_field=PositiveIntegerField(default=0),
+        db_persist=True,
+        null=False,
+        serialize=False,
+        help_text="Length of the content field in characters. Automatically maintained by the database for faster statistics computation.",
+    )
+
     mime_type = models.CharField(_("mime type"), max_length=256, editable=False)
 
     tags = models.ManyToManyField(
@@ -212,7 +216,6 @@ class Document(SoftDeleteModel, ModelWithOwner):
         _("checksum"),
         max_length=32,
         editable=False,
-        unique=True,
         help_text=_("The checksum of the original document."),
     )
 
@@ -248,14 +251,6 @@ class Document(SoftDeleteModel, ModelWithOwner):
         auto_now=True,
         editable=False,
         db_index=True,
-    )
-
-    storage_type = models.CharField(
-        _("storage type"),
-        max_length=11,
-        choices=STORAGE_TYPES,
-        default=STORAGE_TYPE_UNENCRYPTED,
-        editable=False,
     )
 
     added = models.DateTimeField(
@@ -362,12 +357,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
 
     @property
     def source_path(self) -> Path:
-        if self.filename:
-            fname = str(self.filename)
-        else:
-            fname = f"{self.pk:07}{self.file_type}"
-            if self.storage_type == self.STORAGE_TYPE_GPG:
-                fname += ".gpg"  # pragma: no cover
+        fname = str(self.filename) if self.filename else f"{self.pk:07}{self.file_type}"
 
         return (settings.ORIGINALS_DIR / Path(fname)).resolve()
 
@@ -416,8 +406,6 @@ class Document(SoftDeleteModel, ModelWithOwner):
     @property
     def thumbnail_path(self) -> Path:
         webp_file_name = f"{self.pk:07}.webp"
-        if self.storage_type == self.STORAGE_TYPE_GPG:
-            webp_file_name += ".gpg"
 
         webp_file_path = settings.THUMBNAIL_DIR / Path(webp_file_name)
 
@@ -431,7 +419,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
     def created_date(self):
         return self.created
 
-    def add_nested_tags(self, tags):
+    def add_nested_tags(self, tags) -> None:
         tag_ids = set()
         for tag in tags:
             tag_ids.add(tag.id)
@@ -607,6 +595,7 @@ class PaperlessTask(ModelWithOwner):
         TRAIN_CLASSIFIER = ("train_classifier", _("Train Classifier"))
         CHECK_SANITY = ("check_sanity", _("Check Sanity"))
         INDEX_OPTIMIZE = ("index_optimize", _("Index Optimize"))
+        LLMINDEX_UPDATE = ("llmindex_update", _("LLM Index Update"))
 
     task_id = models.CharField(
         max_length=255,
@@ -784,6 +773,114 @@ class ShareLink(SoftDeleteModel):
 
     def __str__(self):
         return f"Share Link for {self.document.title}"
+
+
+class ShareLinkBundle(models.Model):
+    class Status(models.TextChoices):
+        PENDING = ("pending", _("Pending"))
+        PROCESSING = ("processing", _("Processing"))
+        READY = ("ready", _("Ready"))
+        FAILED = ("failed", _("Failed"))
+
+    created = models.DateTimeField(
+        _("created"),
+        default=timezone.now,
+        db_index=True,
+        blank=True,
+        editable=False,
+    )
+
+    expiration = models.DateTimeField(
+        _("expiration"),
+        blank=True,
+        null=True,
+        db_index=True,
+    )
+
+    slug = models.SlugField(
+        _("slug"),
+        db_index=True,
+        unique=True,
+        blank=True,
+        editable=False,
+    )
+
+    owner = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        related_name="share_link_bundles",
+        on_delete=models.SET_NULL,
+        verbose_name=_("owner"),
+    )
+
+    file_version = models.CharField(
+        max_length=50,
+        choices=ShareLink.FileVersion.choices,
+        default=ShareLink.FileVersion.ARCHIVE,
+    )
+
+    status = models.CharField(
+        max_length=50,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
+
+    size_bytes = models.PositiveIntegerField(
+        _("size (bytes)"),
+        blank=True,
+        null=True,
+    )
+
+    last_error = models.JSONField(
+        _("last error"),
+        blank=True,
+        null=True,
+        default=None,
+    )
+
+    file_path = models.CharField(
+        _("file path"),
+        max_length=512,
+        blank=True,
+    )
+
+    built_at = models.DateTimeField(
+        _("built at"),
+        null=True,
+        blank=True,
+    )
+
+    documents = models.ManyToManyField(
+        "documents.Document",
+        related_name="share_link_bundles",
+        verbose_name=_("documents"),
+    )
+
+    class Meta:
+        ordering = ("-created",)
+        verbose_name = _("share link bundle")
+        verbose_name_plural = _("share link bundles")
+
+    def __str__(self):
+        return _("Share link bundle %(slug)s") % {"slug": self.slug}
+
+    @property
+    def absolute_file_path(self) -> Path | None:
+        if not self.file_path:
+            return None
+        return (settings.SHARE_LINK_BUNDLE_DIR / Path(self.file_path)).resolve()
+
+    def remove_file(self) -> None:
+        if self.absolute_file_path is not None and self.absolute_file_path.exists():
+            try:
+                self.absolute_file_path.unlink()
+            except OSError:
+                pass
+
+    def delete(self, using=None, *, keep_parents=False):
+        self.remove_file()
+        return super().delete(using=using, keep_parents=keep_parents)
 
 
 class CustomField(models.Model):
@@ -976,7 +1073,7 @@ if settings.AUDIT_LOG_ENABLED:
     auditlog.register(
         Document,
         m2m_fields={"tags"},
-        exclude_fields=["modified"],
+        exclude_fields=["content_length", "modified"],
     )
     auditlog.register(Correspondent)
     auditlog.register(Tag)
@@ -1074,12 +1171,40 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has these tag(s)"),
     )
 
+    filter_has_all_tags = models.ManyToManyField(
+        Tag,
+        blank=True,
+        related_name="workflowtriggers_has_all",
+        verbose_name=_("has all of these tag(s)"),
+    )
+
+    filter_has_not_tags = models.ManyToManyField(
+        Tag,
+        blank=True,
+        related_name="workflowtriggers_has_not",
+        verbose_name=_("does not have these tag(s)"),
+    )
+
     filter_has_document_type = models.ForeignKey(
         DocumentType,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
         verbose_name=_("has this document type"),
+    )
+
+    filter_has_any_document_types = models.ManyToManyField(
+        DocumentType,
+        blank=True,
+        related_name="workflowtriggers_has_any_document_type",
+        verbose_name=_("has one of these document types"),
+    )
+
+    filter_has_not_document_types = models.ManyToManyField(
+        DocumentType,
+        blank=True,
+        related_name="workflowtriggers_has_not_document_type",
+        verbose_name=_("does not have these document type(s)"),
     )
 
     filter_has_correspondent = models.ForeignKey(
@@ -1090,12 +1215,47 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has this correspondent"),
     )
 
+    filter_has_not_correspondents = models.ManyToManyField(
+        Correspondent,
+        blank=True,
+        related_name="workflowtriggers_has_not_correspondent",
+        verbose_name=_("does not have these correspondent(s)"),
+    )
+
+    filter_has_any_correspondents = models.ManyToManyField(
+        Correspondent,
+        blank=True,
+        related_name="workflowtriggers_has_any_correspondent",
+        verbose_name=_("has one of these correspondents"),
+    )
+
     filter_has_storage_path = models.ForeignKey(
         StoragePath,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
         verbose_name=_("has this storage path"),
+    )
+
+    filter_has_any_storage_paths = models.ManyToManyField(
+        StoragePath,
+        blank=True,
+        related_name="workflowtriggers_has_any_storage_path",
+        verbose_name=_("has one of these storage paths"),
+    )
+
+    filter_has_not_storage_paths = models.ManyToManyField(
+        StoragePath,
+        blank=True,
+        related_name="workflowtriggers_has_not_storage_path",
+        verbose_name=_("does not have these storage path(s)"),
+    )
+
+    filter_custom_field_query = models.TextField(
+        _("filter custom field query"),
+        null=True,
+        blank=True,
+        help_text=_("JSON-encoded custom field query expression."),
     )
 
     schedule_offset_days = models.IntegerField(
@@ -1254,12 +1414,18 @@ class WorkflowAction(models.Model):
             4,
             _("Webhook"),
         )
+        PASSWORD_REMOVAL = (
+            5,
+            _("Password removal"),
+        )
 
     type = models.PositiveIntegerField(
         _("Workflow Action Type"),
         choices=WorkflowActionType.choices,
         default=WorkflowActionType.ASSIGNMENT,
     )
+
+    order = models.PositiveIntegerField(_("order"), default=0)
 
     assign_title = models.TextField(
         _("assign title"),
@@ -1481,6 +1647,15 @@ class WorkflowAction(models.Model):
         verbose_name=_("webhook"),
     )
 
+    passwords = models.JSONField(
+        _("passwords"),
+        null=True,
+        blank=True,
+        help_text=_(
+            "Passwords to try when removing PDF protection. Separate with commas or new lines.",
+        ),
+    )
+
     class Meta:
         verbose_name = _("workflow action")
         verbose_name_plural = _("workflow actions")
@@ -1514,7 +1689,7 @@ class Workflow(models.Model):
         return f"Workflow: {self.name}"
 
 
-class WorkflowRun(models.Model):
+class WorkflowRun(SoftDeleteModel):
     workflow = models.ForeignKey(
         Workflow,
         on_delete=models.CASCADE,

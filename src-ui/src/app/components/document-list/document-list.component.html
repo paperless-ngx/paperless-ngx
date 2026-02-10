@@ -1,14 +1,34 @@
 <pngx-page-header [title]="getTitle()">
-
-  <div ngbDropdown class="btn-group flex-fill">
-    <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
+  <div ngbDropdown class="btn-group flex-fill d-sm-none">
+    <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle>
       <i-bs name="text-indent-left"></i-bs>
       <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Select</ng-container></div>
+      @if (list.selected.size > 0) {
+        <pngx-clearable-badge [selected]="list.selected.size > 0" [number]="list.selected.size" (cleared)="list.selectNone()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
+      }
     </button>
-    <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
+    <div ngbDropdownMenu aria-labelledby="dropdownSelectMobile" class="shadow">
       <button ngbDropdownItem (click)="list.selectNone()" i18n>Select none</button>
       <button ngbDropdownItem (click)="list.selectPage()" i18n>Select page</button>
       <button ngbDropdownItem (click)="list.selectAll()" i18n>Select all</button>
+    </div>
+  </div>
+  <div class="d-none d-sm-flex flex-fill me-3">
+    <div class="input-group input-group-sm">
+      <span class="input-group-text border-0" i18n>Select:</span>
+    </div>
+    <div class="btn-group btn-group-sm flex-nowrap">
+      @if (list.selected.size > 0) {
+        <button class="btn btn-sm btn-outline-secondary" (click)="list.selectNone()">
+          <i-bs name="slash-circle"></i-bs>&nbsp;<ng-container i18n>None</ng-container>
+        </button>
+      }
+      <button class="btn btn-sm btn-outline-primary" (click)="list.selectPage()">
+        <i-bs name="file-earmark-check"></i-bs>&nbsp;<ng-container i18n>Page</ng-container>
+      </button>
+      <button class="btn btn-sm btn-outline-primary" (click)="list.selectAll()">
+        <i-bs name="check-all"></i-bs>&nbsp;<ng-container i18n>All</ng-container>
+      </button>
     </div>
   </div>
   <div ngbDropdown class="btn-group flex-fill">
@@ -126,8 +146,13 @@
       @if (!list.isReloading && isFiltered) {
         <button class="btn btn-link py-0" (click)="resetFilters()">
           <i-bs width="1em" height="1em" name="x"></i-bs><small i18n>Reset filters</small>
-          </button>
-        }
+        </button>
+      }
+      @if (!list.isReloading && list.selected.size > 0) {
+        <button class="btn btn-link py-0" (click)="list.selectNone()">
+          <i-bs width="1em" height="1em" name="slash-circle" class="me-1"></i-bs><small i18n>Clear selection</small>
+        </button>
+      }
       </div>
       @if (list.collectionSize) {
         <ngb-pagination [pageSize]="list.pageSize" [collectionSize]="list.collectionSize" [(page)]="list.currentPage" [maxSize]="5"

@@ -1,0 +1,252 @@
+name: Docker Build
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-beta.rc[0-9]+'
+    branches:
+      - dev
+      - beta
+  pull_request:
+    branches:
+      - dev
+      - main
+  workflow_dispatch:
+concurrency:
+  group: docker-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+env:
+  REGISTRY: ghcr.io
+jobs:
+  build-arch:
+    name: Build ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            arch: amd64
+            platform: linux/amd64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+            platform: linux/arm64
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      should-push: ${{ steps.check-push.outputs.should-push }}
+      push-external: ${{ steps.check-push.outputs.push-external }}
+      repository: ${{ steps.repo.outputs.name }}
+      ref-name: ${{ steps.ref.outputs.name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.1
+      - name: Determine ref name
+        id: ref
+        run: |
+          ref_name="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
+          # Sanitize by replacing / with - for use in tags and cache keys
+          sanitized_ref="${ref_name//\//-}"
+
+          echo "ref_name=${ref_name}"
+          echo "sanitized_ref=${sanitized_ref}"
+
+          echo "name=${sanitized_ref}" >> $GITHUB_OUTPUT
+      - name: Check push permissions
+        id: check-push
+        env:
+          REF_NAME: ${{ steps.ref.outputs.name }}
+        run: |
+          # should-push: Should we push to GHCR?
+          # True for:
+          #   1. Pushes (tags/dev/beta) - filtered via the workflow triggers
+          #   2. Manual dispatch - always push to GHCR
+          #   3. Internal PRs where the branch name starts with 'feature-' or 'fix-'
+
+          should_push="false"
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            should_push="true"
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            should_push="true"
+          elif [[ "${{ github.event_name }}" == "pull_request" && "${{ github.event.pull_request.head.repo.full_name }}" == "${{ github.repository }}" ]]; then
+            if [[ "${REF_NAME}" == feature-* || "${REF_NAME}" == fix-* ]]; then
+              should_push="true"
+            fi
+          fi
+
+          echo "should-push=${should_push}"
+          echo "should-push=${should_push}" >> $GITHUB_OUTPUT
+
+          # push-external: Should we also push to Docker Hub and Quay.io?
+          # Only for main repo on dev/beta branches or version tags
+          push_external="false"
+          if [[ "${should_push}" == "true" && "${{ github.repository_owner }}" == "paperless-ngx" ]]; then
+            case "${REF_NAME}" in
+              dev|beta)
+                push_external="true"
+                ;;
+            esac
+            case "${{ github.ref }}" in
+              refs/tags/v*|*beta.rc*)
+                push_external="true"
+                ;;
+            esac
+          fi
+          echo "push-external=${push_external}"
+          echo "push-external=${push_external}" >> $GITHUB_OUTPUT
+      - name: Set repository name
+        id: repo
+        run: |
+          repo_name="${{ github.repository }}"
+          repo_name="${repo_name,,}"
+
+          echo "repository=${repo_name}"
+          echo "name=${repo_name}" >> $GITHUB_OUTPUT
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.12.0
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3.7.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Maximize space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+      - name: Docker metadata
+        id: docker-meta
+        uses: docker/metadata-action@v5.10.0
+        with:
+          images: |
+            ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}
+          tags: |
+            type=ref,event=branch
+            type=raw,value=${{ steps.ref.outputs.name }},enable=${{ github.event_name == 'pull_request' }}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+      - name: Build and push by digest
+        id: build
+        uses: docker/build-push-action@v6.18.0
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: ${{ matrix.platform }}
+          labels: ${{ steps.docker-meta.outputs.labels }}
+          build-args: |
+            PNGX_TAG_VERSION=${{ steps.docker-meta.outputs.version }}
+          outputs: type=image,name=${{ env.REGISTRY }}/${{ steps.repo.outputs.name }},push-by-digest=true,name-canonical=true,push=${{ steps.check-push.outputs.should-push }}
+          cache-from: |
+            type=registry,ref=${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}/cache/app:${{ steps.ref.outputs.name }}-${{ matrix.arch }}
+            type=registry,ref=${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}/cache/app:dev-${{ matrix.arch }}
+          cache-to: ${{ steps.check-push.outputs.should-push == 'true' && format('type=registry,mode=max,ref={0}/{1}/cache/app:{2}-{3}', env.REGISTRY, steps.repo.outputs.name, steps.ref.outputs.name, matrix.arch) || '' }}
+      - name: Export digest
+        if: steps.check-push.outputs.should-push == 'true'
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          echo "digest=${digest}"
+          touch "/tmp/digests/${digest#sha256:}"
+      - name: Upload digest
+        if: steps.check-push.outputs.should-push == 'true'
+        uses: actions/upload-artifact@v6.0.0
+        with:
+          name: digests-${{ matrix.arch }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+  merge-and-push:
+    name: Merge and Push Manifest
+    runs-on: ubuntu-24.04
+    needs: build-arch
+    if: needs.build-arch.outputs.should-push == 'true'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v7.0.0
+        with:
+          path: /tmp/digests
+          pattern: digests-*
+          merge-multiple: true
+      - name: List digests
+        run: |
+          echo "Downloaded digests:"
+          ls -la /tmp/digests/
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.12.0
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3.7.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to Docker Hub
+        if: needs.build-arch.outputs.push-external == 'true'
+        uses: docker/login-action@v3.7.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to Quay.io
+        if: needs.build-arch.outputs.push-external == 'true'
+        uses: docker/login-action@v3.7.0
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_ROBOT_TOKEN }}
+      - name: Docker metadata
+        id: docker-meta
+        uses: docker/metadata-action@v5.10.0
+        with:
+          images: |
+            ${{ env.REGISTRY }}/${{ needs.build-arch.outputs.repository }}
+          tags: |
+            type=ref,event=branch
+            type=raw,value=${{ needs.build-arch.outputs.ref-name }},enable=${{ github.event_name == 'pull_request' }}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+      - name: Create manifest list and push
+        working-directory: /tmp/digests
+        env:
+          REPOSITORY: ${{ needs.build-arch.outputs.repository }}
+        run: |
+          tags=$(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "${DOCKER_METADATA_OUTPUT_JSON}")
+
+          digests=""
+          for digest in *; do
+            digests+="${{ env.REGISTRY }}/${REPOSITORY}@sha256:${digest} "
+          done
+
+          echo "Creating manifest with tags: ${tags}"
+          echo "From digests: ${digests}"
+
+          docker buildx imagetools create ${tags} ${digests}
+      - name: Inspect image
+        run: |
+          docker buildx imagetools inspect ${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}
+      - name: Copy to Docker Hub
+        if: needs.build-arch.outputs.push-external == 'true'
+        env:
+          TAGS: ${{ steps.docker-meta.outputs.tags }}
+          GHCR_REPO: ${{ env.REGISTRY }}/${{ needs.build-arch.outputs.repository }}
+        run: |
+          for tag in ${TAGS}; do
+            dockerhub_tag="${tag/${GHCR_REPO}/docker.io/paperlessngx/paperless-ngx}"
+            echo "Copying ${tag} to ${dockerhub_tag}"
+            skopeo copy --all "docker://${tag}" "docker://${dockerhub_tag}"
+          done
+      - name: Copy to Quay.io
+        if: needs.build-arch.outputs.push-external == 'true'
+        env:
+          TAGS: ${{ steps.docker-meta.outputs.tags }}
+          GHCR_REPO: ${{ env.REGISTRY }}/${{ needs.build-arch.outputs.repository }}
+        run: |
+          for tag in ${TAGS}; do
+            quay_tag="${tag/${GHCR_REPO}/quay.io/paperlessngx/paperless-ngx}"
+            echo "Copying ${tag} to ${quay_tag}"
+            skopeo copy --all "docker://${tag}" "docker://${quay_tag}"
+          done

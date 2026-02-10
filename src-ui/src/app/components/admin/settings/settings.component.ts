@@ -64,15 +64,16 @@ import { PermissionsGroupComponent } from '../../common/input/permissions/permis
 import { PermissionsUserComponent } from '../../common/input/permissions/permissions-user/permissions-user.component'
 import { SelectComponent } from '../../common/input/select/select.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
+import { PdfEditorEditMode } from '../../common/pdf-editor/pdf-editor-edit-mode'
+import { PdfZoomScale } from '../../common/pdf-viewer/pdf-viewer.types'
 import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
-import { ZoomSetting } from '../../document-detail/document-detail.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 enum SettingsNavIDs {
   General = 1,
-  Permissions = 2,
-  Notifications = 3,
-  SavedViews = 4,
+  Documents = 2,
+  Permissions = 3,
+  Notifications = 4,
 }
 
 const systemLanguage = { code: '', name: $localize`Use system language` }
@@ -80,6 +81,25 @@ const systemDateFormat = {
   code: '',
   name: $localize`Use date format of display language`,
 }
+
+export enum DocumentDetailFieldID {
+  ArchiveSerialNumber = 'archive_serial_number',
+  Correspondent = 'correspondent',
+  DocumentType = 'document_type',
+  StoragePath = 'storage_path',
+  Tags = 'tags',
+}
+
+const documentDetailFieldOptions = [
+  {
+    id: DocumentDetailFieldID.ArchiveSerialNumber,
+    label: $localize`Archive serial number`,
+  },
+  { id: DocumentDetailFieldID.Correspondent, label: $localize`Correspondent` },
+  { id: DocumentDetailFieldID.DocumentType, label: $localize`Document type` },
+  { id: DocumentDetailFieldID.StoragePath, label: $localize`Storage path` },
+  { id: DocumentDetailFieldID.Tags, label: $localize`Tags` },
+]
 
 @Component({
   selector: 'pngx-settings',
@@ -144,8 +164,10 @@ export class SettingsComponent
     defaultPermsEditGroups: new FormControl(null),
     useNativePdfViewer: new FormControl(null),
     pdfViewerDefaultZoom: new FormControl(null),
+    pdfEditorDefaultEditMode: new FormControl(null),
     documentEditingRemoveInboxTags: new FormControl(null),
     documentEditingOverlayThumbnail: new FormControl(null),
+    documentDetailsHiddenFields: new FormControl([]),
     searchDbOnly: new FormControl(null),
     searchLink: new FormControl(null),
 
@@ -174,7 +196,11 @@ export class SettingsComponent
 
   public readonly GlobalSearchType = GlobalSearchType
 
-  public readonly ZoomSetting = ZoomSetting
+  public readonly PdfZoomScale = PdfZoomScale
+
+  public readonly PdfEditorEditMode = PdfEditorEditMode
+
+  public readonly documentDetailFieldOptions = documentDetailFieldOptions
 
   get systemStatusHasErrors(): boolean {
     return (
@@ -292,6 +318,9 @@ export class SettingsComponent
       pdfViewerDefaultZoom: this.settings.get(
         SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING
       ),
+      pdfEditorDefaultEditMode: this.settings.get(
+        SETTINGS_KEYS.PDF_EDITOR_DEFAULT_EDIT_MODE
+      ),
       displayLanguage: this.settings.getLanguage(),
       dateLocale: this.settings.get(SETTINGS_KEYS.DATE_LOCALE),
       dateFormat: this.settings.get(SETTINGS_KEYS.DATE_FORMAT),
@@ -335,6 +364,9 @@ export class SettingsComponent
       ),
       documentEditingOverlayThumbnail: this.settings.get(
         SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL
+      ),
+      documentDetailsHiddenFields: this.settings.get(
+        SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS
       ),
       searchDbOnly: this.settings.get(SETTINGS_KEYS.SEARCH_DB_ONLY),
       searchLink: this.settings.get(SETTINGS_KEYS.SEARCH_FULL_TYPE),
@@ -459,6 +491,10 @@ export class SettingsComponent
       this.settingsForm.value.pdfViewerDefaultZoom
     )
     this.settings.set(
+      SETTINGS_KEYS.PDF_EDITOR_DEFAULT_EDIT_MODE,
+      this.settingsForm.value.pdfEditorDefaultEditMode
+    )
+    this.settings.set(
       SETTINGS_KEYS.DATE_LOCALE,
       this.settingsForm.value.dateLocale
     )
@@ -527,6 +563,10 @@ export class SettingsComponent
       this.settingsForm.value.documentEditingOverlayThumbnail
     )
     this.settings.set(
+      SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS,
+      this.settingsForm.value.documentDetailsHiddenFields
+    )
+    this.settings.set(
       SETTINGS_KEYS.SEARCH_DB_ONLY,
       this.settingsForm.value.searchDbOnly
     )
@@ -585,6 +625,26 @@ export class SettingsComponent
 
   clearThemeColor() {
     this.settingsForm.get('themeColor').patchValue('')
+  }
+
+  isDocumentDetailFieldShown(fieldId: string): boolean {
+    const hiddenFields =
+      this.settingsForm.value.documentDetailsHiddenFields || []
+    return !hiddenFields.includes(fieldId)
+  }
+
+  toggleDocumentDetailField(fieldId: string, checked: boolean) {
+    const hiddenFields = new Set(
+      this.settingsForm.value.documentDetailsHiddenFields || []
+    )
+    if (checked) {
+      hiddenFields.delete(fieldId)
+    } else {
+      hiddenFields.add(fieldId)
+    }
+    this.settingsForm
+      .get('documentDetailsHiddenFields')
+      .setValue(Array.from(hiddenFields))
   }
 
   showSystemStatus() {

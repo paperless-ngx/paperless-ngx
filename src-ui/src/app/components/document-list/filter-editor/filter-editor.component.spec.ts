@@ -21,6 +21,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { provideUiTour } from 'ngx-ui-tour-ng-bootstrap'
 import { of, throwError } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
@@ -251,6 +252,7 @@ describe('FilterEditorComponent', () => {
         SettingsService,
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
+        provideUiTour(),
       ],
     }).compileComponents()
 
@@ -1306,7 +1308,8 @@ describe('FilterEditorComponent', () => {
     const tagsFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[0]
-    tagsFilterableDropdown.triggerEventHandler('opened')
+    tagsFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const tagButton = tagsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )[0]
@@ -1324,7 +1327,8 @@ describe('FilterEditorComponent', () => {
     const tagsFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[0] // Tags dropdown
-    tagsFilterableDropdown.triggerEventHandler('opened')
+    tagsFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const tagButtons = tagsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )
@@ -1375,7 +1379,8 @@ describe('FilterEditorComponent', () => {
     const correspondentsFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[1] // Corresp dropdown
-    correspondentsFilterableDropdown.triggerEventHandler('opened')
+    correspondentsFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const correspondentButtons = correspondentsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )
@@ -1414,7 +1419,8 @@ describe('FilterEditorComponent', () => {
     const correspondentsFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[1]
-    correspondentsFilterableDropdown.triggerEventHandler('opened')
+    correspondentsFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const notAssignedButton = correspondentsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )[0]
@@ -1445,7 +1451,8 @@ describe('FilterEditorComponent', () => {
     const documentTypesFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[2] // DocType dropdown
-    documentTypesFilterableDropdown.triggerEventHandler('opened')
+    documentTypesFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const documentTypeButtons = documentTypesFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )
@@ -1484,7 +1491,8 @@ describe('FilterEditorComponent', () => {
     const docTypesFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[2]
-    docTypesFilterableDropdown.triggerEventHandler('opened')
+    docTypesFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const notAssignedButton = docTypesFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )[0]
@@ -1515,7 +1523,8 @@ describe('FilterEditorComponent', () => {
     const storagePathFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[3] // StoragePath dropdown
-    storagePathFilterableDropdown.triggerEventHandler('opened')
+    storagePathFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const storagePathButtons = storagePathFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )
@@ -1554,7 +1563,8 @@ describe('FilterEditorComponent', () => {
     const storagePathsFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[3]
-    storagePathsFilterableDropdown.triggerEventHandler('opened')
+    storagePathsFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const notAssignedButton = storagePathsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )[0]

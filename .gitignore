@@ -40,6 +40,7 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+.uv-cache
 nosetests.xml
 coverage.xml
 *,cover
@@ -53,7 +54,7 @@ junit.xml
 # Django stuff:
 *.log
 
-# MkDocs documentation
+# Zensical documentation
 site/
 
 # PyBuilder

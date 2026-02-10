@@ -23,7 +23,6 @@ import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
@@ -84,7 +83,6 @@ describe('MailComponent', () => {
         CustomDatePipe,
         ConfirmDialogComponent,
         CheckComponent,
-        SafeHtmlPipe,
         SelectComponent,
         TextComponent,
         PasswordComponent,
@@ -408,5 +406,14 @@ describe('MailComponent', () => {
     component.ngOnInit()
     jest.advanceTimersByTime(200)
     expect(editSpy).toHaveBeenCalled()
+  })
+
+  it('should open processed mails dialog', () => {
+    completeSetup()
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
+    component.viewProcessedMail(mailRules[0] as MailRule)
+    const dialog = modal.componentInstance as any
+    expect(dialog.rule).toEqual(mailRules[0])
   })
 })

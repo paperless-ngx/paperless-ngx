@@ -29,7 +29,7 @@ class MockOpenIDProvider:
 
 # see allauth.socialaccount.providers.openid_connect.provider.OpenIDConnectProviderAccount
 class MockOpenIDConnectProviderAccount:
-    def __init__(self, mock_social_account_dict):
+    def __init__(self, mock_social_account_dict) -> None:
         self.account = mock_social_account_dict
 
     def to_str(self):
@@ -41,7 +41,7 @@ class MockOpenIDConnectProvider:
     id = "openid_connect"
     name = "OpenID Connect"
 
-    def __init__(self, app=None):
+    def __init__(self, app=None) -> None:
         self.app = app
         self.name = app.name
 
@@ -52,7 +52,7 @@ class MockOpenIDConnectProvider:
 class TestApiProfile(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/profile/"
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.user = User.objects.create_superuser(
@@ -62,7 +62,7 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
         )
         self.client.force_authenticate(user=self.user)
 
-    def setupSocialAccount(self):
+    def setupSocialAccount(self) -> None:
         SocialApp.objects.create(
             name="Keycloak",
             provider="openid_connect",
@@ -73,7 +73,7 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
             bulk=False,
         )
 
-    def test_get_profile(self):
+    def test_get_profile(self) -> None:
         """
         GIVEN:
             - Configured user
@@ -96,7 +96,11 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
     @mock.patch(
         "allauth.socialaccount.adapter.DefaultSocialAccountAdapter.list_providers",
     )
-    def test_get_profile_w_social(self, mock_list_providers, mock_get_provider_account):
+    def test_get_profile_w_social(
+        self,
+        mock_list_providers,
+        mock_get_provider_account,
+    ) -> None:
         """
         GIVEN:
             - Configured user and setup social account
@@ -136,7 +140,7 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
             ],
         )
 
-    def test_profile_w_social_removed_app(self):
+    def test_profile_w_social_removed_app(self) -> None:
         """
         GIVEN:
             - Configured user and setup social account
@@ -166,7 +170,7 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
             ],
         )
 
-    def test_update_profile(self):
+    def test_update_profile(self) -> None:
         """
         GIVEN:
             - Configured user
@@ -192,7 +196,66 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
         self.assertEqual(user.first_name, user_data["first_name"])
         self.assertEqual(user.last_name, user_data["last_name"])
 
-    def test_update_auth_token(self):
+    def test_update_profile_invalid_password_returns_field_error(self) -> None:
+        """
+        GIVEN:
+            - Configured user
+        WHEN:
+            - API call is made to update profile with weak password
+        THEN:
+            - Profile update fails with password field error
+        """
+
+        user_data = {
+            "email": "new@email.com",
+            "password": "short",  # shorter than default validator threshold
+            "first_name": "new first name",
+            "last_name": "new last name",
+        }
+
+        response = self.client.patch(self.ENDPOINT, user_data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("password", response.data)
+        self.assertIsInstance(response.data["password"], list)
+        self.assertTrue(
+            any(
+                "too short" in message.lower() for message in response.data["password"]
+            ),
+        )
+
+    def test_update_profile_placeholder_password_skips_validation(self) -> None:
+        """
+        GIVEN:
+            - Configured user with existing password
+        WHEN:
+            - API call is made with the obfuscated placeholder password value
+        THEN:
+            - Profile is updated without changing the password or running validators
+        """
+
+        original_password = "orig-pass-12345"
+        self.user.set_password(original_password)
+        self.user.save()
+
+        user_data = {
+            "email": "new@email.com",
+            "password": "*" * 12,  # matches obfuscated value from serializer
+            "first_name": "new first name",
+            "last_name": "new last name",
+        }
+
+        response = self.client.patch(self.ENDPOINT, user_data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        user = User.objects.get(username=self.user.username)
+        self.assertTrue(user.check_password(original_password))
+        self.assertEqual(user.email, user_data["email"])
+        self.assertEqual(user.first_name, user_data["first_name"])
+        self.assertEqual(user.last_name, user_data["last_name"])
+
+    def test_update_auth_token(self) -> None:
         """
         GIVEN:
             - Configured user
@@ -215,7 +278,7 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
 
         self.assertNotEqual(token1.key, token2.key)
 
-    def test_profile_not_logged_in(self):
+    def test_profile_not_logged_in(self) -> None:
         """
         GIVEN:
             - User not logged in
@@ -239,7 +302,7 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
     def test_get_social_account_providers(
         self,
         mock_list_providers,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Configured user
@@ -274,7 +337,7 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
     def test_get_social_account_providers_openid(
         self,
         mock_list_providers,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Configured user and openid social account provider
@@ -296,7 +359,7 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
             2,
         )
 
-    def test_disconnect_social_account(self):
+    def test_disconnect_social_account(self) -> None:
         """
         GIVEN:
             - Configured user
@@ -335,13 +398,13 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
 class TestApiTOTPViews(APITestCase):
     ENDPOINT = "/api/profile/totp/"
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.user = User.objects.create_superuser(username="temp_admin")
         self.client.force_authenticate(user=self.user)
 
-    def test_get_totp(self):
+    def test_get_totp(self) -> None:
         """
         GIVEN:
             - Existing user account
@@ -359,7 +422,7 @@ class TestApiTOTPViews(APITestCase):
         self.assertIn("secret", response.data)
 
     @mock.patch("allauth.mfa.totp.internal.auth.validate_totp_code")
-    def test_activate_totp(self, mock_validate_totp_code):
+    def test_activate_totp(self, mock_validate_totp_code) -> None:
         """
         GIVEN:
             - Existing user account
@@ -382,7 +445,7 @@ class TestApiTOTPViews(APITestCase):
         self.assertTrue(Authenticator.objects.filter(user=self.user).exists())
         self.assertIn("recovery_codes", response.data)
 
-    def test_deactivate_totp(self):
+    def test_deactivate_totp(self) -> None:
         """
         GIVEN:
             - Existing user account with TOTP enabled

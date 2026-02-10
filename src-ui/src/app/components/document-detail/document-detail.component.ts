@@ -8,7 +8,7 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { ActivatedRoute, Router } from '@angular/router'
+import { ActivatedRoute, Router, RouterModule } from '@angular/router'
 import {
   NgbDateStruct,
   NgbDropdownModule,
@@ -18,10 +18,9 @@ import {
   NgbNavModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
-import { PDFDocumentProxy, PdfViewerModule } from 'ng2-pdf-viewer'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { DeviceDetectorService } from 'ngx-device-detector'
-import { BehaviorSubject, Observable, of, Subject } from 'rxjs'
+import { BehaviorSubject, Observable, of, Subject, timer } from 'rxjs'
 import {
   catchError,
   debounceTime,
@@ -31,6 +30,7 @@ import {
   map,
   switchMap,
   takeUntil,
+  tap,
 } from 'rxjs/operators'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
@@ -76,18 +76,22 @@ import { DocumentTypeService } from 'src/app/services/rest/document-type.service
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { getFilenameFromContentDisposition } from 'src/app/utils/http'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
+import { DocumentDetailFieldID } from '../admin/settings/settings.component'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
+import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
 import { EditDialogMode } from '../common/edit-dialog/edit-dialog.component'
 import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { TagEditDialogComponent } from '../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { EmailDocumentDialogComponent } from '../common/email-document-dialog/email-document-dialog.component'
 import { CheckComponent } from '../common/input/check/check.component'
 import { DateComponent } from '../common/input/date/date.component'
@@ -101,11 +105,17 @@ import { TextComponent } from '../common/input/text/text.component'
 import { TextAreaComponent } from '../common/input/textarea/textarea.component'
 import { UrlComponent } from '../common/input/url/url.component'
 import { PageHeaderComponent } from '../common/page-header/page-header.component'
+import { PdfEditorEditMode } from '../common/pdf-editor/pdf-editor-edit-mode'
+import { PDFEditorComponent } from '../common/pdf-editor/pdf-editor.component'
+import { PngxPdfViewerComponent } from '../common/pdf-viewer/pdf-viewer.component'
 import {
-  PDFEditorComponent,
-  PdfEditorEditMode,
-} from '../common/pdf-editor/pdf-editor.component'
+  PdfRenderMode,
+  PdfZoomLevel,
+  PdfZoomScale,
+  PngxPdfDocumentProxy,
+} from '../common/pdf-viewer/pdf-viewer.types'
 import { ShareLinksDialogComponent } from '../common/share-links-dialog/share-links-dialog.component'
+import { SuggestionsDropdownComponent } from '../common/suggestions-dropdown/suggestions-dropdown.component'
 import { DocumentHistoryComponent } from '../document-history/document-history.component'
 import { DocumentNotesComponent } from '../document-notes/document-notes.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
@@ -119,6 +129,7 @@ enum DocumentDetailNavIDs {
   Notes = 5,
   Permissions = 6,
   History = 7,
+  Duplicates = 8,
 }
 
 enum ContentRenderType {
@@ -128,18 +139,6 @@ enum ContentRenderType {
   Other = 'other',
   Unknown = 'unknown',
   TIFF = 'tiff',
-}
-
-export enum ZoomSetting {
-  PageFit = 'page-fit',
-  PageWidth = 'page-width',
-  Quarter = '.25',
-  Half = '.5',
-  ThreeQuarters = '.75',
-  One = '1',
-  OneAndHalf = '1.5',
-  Two = '2',
-  Three = '3',
 }
 
 @Component({
@@ -162,6 +161,7 @@ export enum ZoomSetting {
     NumberComponent,
     MonetaryComponent,
     UrlComponent,
+    SuggestionsDropdownComponent,
     CustomDatePipe,
     FileSizePipe,
     IfPermissionsDirective,
@@ -173,16 +173,19 @@ export enum ZoomSetting {
     NgbNavModule,
     NgbDropdownModule,
     NgxBootstrapIconsModule,
-    PdfViewerModule,
     TextAreaComponent,
+    RouterModule,
+    PngxPdfViewerComponent,
   ],
 })
 export class DocumentDetailComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy, DirtyComponent
 {
-  private documentsService = inject(DocumentService)
+  PdfRenderMode = PdfRenderMode
+  documentsService = inject(DocumentService)
   private route = inject(ActivatedRoute)
+  private tagService = inject(TagService)
   private correspondentService = inject(CorrespondentService)
   private documentTypeService = inject(DocumentTypeService)
   private router = inject(Router)
@@ -205,6 +208,8 @@ export class DocumentDetailComponent
   @ViewChild('inputTitle')
   titleInput: TextComponent
 
+  @ViewChild('tagsInput') tagsInput: TagsComponent
+
   expandOriginalMetadata = false
   expandArchivedMetadata = false
 
@@ -216,6 +221,7 @@ export class DocumentDetailComponent
   document: Document
   metadata: DocumentMetadata
   suggestions: DocumentSuggestions
+  suggestionsLoading: boolean = false
   users: User[]
 
   title: string
@@ -248,8 +254,8 @@ export class DocumentDetailComponent
 
   previewCurrentPage: number = 1
   previewNumPages: number
-  previewZoomSetting: ZoomSetting = ZoomSetting.One
-  previewZoomScale: ZoomSetting = ZoomSetting.PageWidth
+  previewZoomSetting: PdfZoomLevel = PdfZoomLevel.One
+  previewZoomScale: PdfZoomScale = PdfZoomScale.PageWidth
 
   store: BehaviorSubject<any>
   isDirty$: Observable<boolean>
@@ -271,6 +277,8 @@ export class DocumentDetailComponent
 
   public readonly DataType = DataType
 
+  public readonly DocumentDetailFieldID = DocumentDetailFieldID
+
   @ViewChild('nav') nav: NgbNav
   @ViewChild('versionFileInput') versionFileInput
   @ViewChild('pdfPreview') set pdfPreview(element) {
@@ -278,10 +286,10 @@ export class DocumentDetailComponent
     if (
       element &&
       element.nativeElement.offsetParent !== null &&
-      this.nav?.activeId == 4
+      this.nav?.activeId == DocumentDetailNavIDs.Preview
     ) {
       // its visible
-      setTimeout(() => this.nav?.select(1))
+      setTimeout(() => this.nav?.select(DocumentDetailNavIDs.Details))
     }
   }
 
@@ -300,6 +308,10 @@ export class DocumentDetailComponent
     return this.deviceDetectorService.isMobile()
   }
 
+  get aiEnabled(): boolean {
+    return this.settings.get(SETTINGS_KEYS.AI_ENABLED)
+  }
+
   get archiveContentRenderType(): ContentRenderType {
     return this.document?.archived_file_name
       ? this.getRenderType('application/pdf')
@@ -312,6 +324,12 @@ export class DocumentDetailComponent
 
   get showThumbnailOverlay(): boolean {
     return this.settings.get(SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL)
+  }
+
+  isFieldHidden(fieldId: DocumentDetailFieldID): boolean {
+    return this.settings
+      .get(SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS)
+      .includes(fieldId)
   }
 
   private getRenderType(mimeType: string): ContentRenderType {
@@ -446,6 +464,11 @@ export class DocumentDetailComponent
           const openDocument = this.openDocumentService.getOpenDocument(
             this.documentId
           )
+          // update duplicate documents if present
+          if (openDocument && doc?.duplicate_documents) {
+            openDocument.duplicate_documents = doc.duplicate_documents
+            this.openDocumentService.save()
+          }
           const useDoc = openDocument || doc
           if (openDocument) {
             if (
@@ -492,7 +515,9 @@ export class DocumentDetailComponent
   }
 
   ngOnInit(): void {
-    this.setZoom(this.settings.get(SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING))
+    this.setZoom(
+      this.settings.get(SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING) as PdfZoomScale
+    )
     this.documentForm.valueChanges
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((values) => {
@@ -621,7 +646,10 @@ export class DocumentDetailComponent
       })
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        if (this.openDocumentService.isDirty(this.document)) this.saveEditNext()
+        if (this.openDocumentService.isDirty(this.document)) {
+          if (this.hasNext()) this.saveEditNext()
+          else this.save(true)
+        }
       })
   }
 
@@ -688,28 +716,22 @@ export class DocumentDetailComponent
         PermissionType.Document
       )
     ) {
-      this.documentsService
-        .getSuggestions(doc.id)
-        .pipe(
-          first(),
-          takeUntil(this.unsubscribeNotifier),
-          takeUntil(this.docChangeNotifier)
-        )
-        .subscribe({
-          next: (result) => {
-            this.suggestions = result
-          },
-          error: (error) => {
-            this.suggestions = null
-            this.toastService.showError(
-              $localize`Error retrieving suggestions.`,
-              error
-            )
-          },
-        })
+      this.tagService.getCachedMany(doc.tags).subscribe((tags) => {
+        // only show suggestions if document has inbox tags
+        if (tags.some((tag) => tag.is_inbox_tag)) {
+          this.getSuggestions()
+        }
+      })
     }
     this.title = this.documentTitlePipe.transform(doc.title)
     this.prepareForm(doc)
+
+    if (
+      this.activeNavID === DocumentDetailNavIDs.Duplicates &&
+      !doc?.duplicate_documents?.length
+    ) {
+      this.activeNavID = DocumentDetailNavIDs.Details
+    }
   }
 
   get hasVersions(): boolean {
@@ -746,6 +768,63 @@ export class DocumentDetailComponent
     return this.documentForm.get('custom_fields') as FormArray
   }
 
+  getSuggestions() {
+    this.suggestionsLoading = true
+    this.documentsService
+      .getSuggestions(this.documentId)
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        takeUntil(this.docChangeNotifier)
+      )
+      .subscribe({
+        next: (result) => {
+          this.suggestions = result
+          this.suggestionsLoading = false
+        },
+        error: (error) => {
+          this.suggestions = null
+          this.suggestionsLoading = false
+          this.toastService.showError(
+            $localize`Error retrieving suggestions.`,
+            error
+          )
+        },
+      })
+  }
+
+  createTag(newName: string) {
+    var modal = this.modalService.open(TagEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    if (newName) modal.componentInstance.object = { name: newName }
+    modal.componentInstance.succeeded
+      .pipe(
+        tap((newTag: Tag) => {
+          // remove from suggestions if present
+          if (this.suggestions) {
+            this.suggestions = {
+              ...this.suggestions,
+              suggested_tags: this.suggestions.suggested_tags.filter(
+                (tag) => tag !== newTag.name
+              ),
+            }
+          }
+        }),
+        switchMap((newTag: Tag) => {
+          return this.tagService
+            .listAll()
+            .pipe(map((tags) => ({ newTag, tags })))
+        }),
+        takeUntil(this.unsubscribeNotifier)
+      )
+      .subscribe(({ newTag, tags }) => {
+        this.tagsInput.tags = tags.results
+        this.tagsInput.addTag(newTag.id)
+      })
+  }
+
   createDocumentType(newName: string) {
     var modal = this.modalService.open(DocumentTypeEditDialogComponent, {
       backdrop: 'static',
@@ -765,6 +844,12 @@ export class DocumentDetailComponent
         this.documentTypes = documentTypes.results
         this.documentForm.get('document_type').setValue(newDocumentType.id)
         this.documentForm.get('document_type').markAsDirty()
+        if (this.suggestions) {
+          this.suggestions.suggested_document_types =
+            this.suggestions.suggested_document_types.filter(
+              (dt) => dt !== newName
+            )
+        }
       })
   }
 
@@ -789,6 +874,12 @@ export class DocumentDetailComponent
         this.correspondents = correspondents.results
         this.documentForm.get('correspondent').setValue(newCorrespondent.id)
         this.documentForm.get('correspondent').markAsDirty()
+        if (this.suggestions) {
+          this.suggestions.suggested_correspondents =
+            this.suggestions.suggested_correspondents.filter(
+              (c) => c !== newName
+            )
+        }
       })
   }
 
@@ -1187,7 +1278,7 @@ export class DocumentDetailComponent
       })
   }
 
-  pdfPreviewLoaded(pdf: PDFDocumentProxy) {
+  pdfPreviewLoaded(pdf: PngxPdfDocumentProxy) {
     this.previewNumPages = pdf.numPages
     if (this.password) this.requiresPassword = false
     setTimeout(() => {
@@ -1208,31 +1299,33 @@ export class DocumentDetailComponent
     }
   }
 
-  setZoom(setting: ZoomSetting) {
-    if (ZoomSetting.PageFit === setting || ZoomSetting.PageWidth === setting) {
+  setZoom(setting: PdfZoomScale | PdfZoomLevel) {
+    if (
+      setting === PdfZoomScale.PageFit ||
+      setting === PdfZoomScale.PageWidth
+    ) {
       this.previewZoomScale = setting
-      this.previewZoomSetting = ZoomSetting.One
-    } else {
-      this.previewZoomSetting = setting
-      this.previewZoomScale = ZoomSetting.PageWidth
+      this.previewZoomSetting = PdfZoomLevel.One
+      return
     }
+    this.previewZoomSetting = setting
+    this.previewZoomScale = PdfZoomScale.PageWidth
   }
 
   get zoomSettings() {
-    return Object.values(ZoomSetting).filter(
-      (setting) => setting !== ZoomSetting.PageWidth
-    )
+    return [PdfZoomScale.PageFit, ...Object.values(PdfZoomLevel)]
   }
 
   get currentZoom() {
-    if (this.previewZoomScale === ZoomSetting.PageFit) {
-      return ZoomSetting.PageFit
-    } else return this.previewZoomSetting
+    if (this.previewZoomScale === PdfZoomScale.PageFit) {
+      return PdfZoomScale.PageFit
+    }
+    return this.previewZoomSetting
   }
 
-  getZoomSettingTitle(setting: ZoomSetting): string {
+  getZoomSettingTitle(setting: PdfZoomScale | PdfZoomLevel): string {
     switch (setting) {
-      case ZoomSetting.PageFit:
+      case PdfZoomScale.PageFit:
         return $localize`Page Fit`
       default:
         return `${parseFloat(setting) * 100}%`
@@ -1240,25 +1333,24 @@ export class DocumentDetailComponent
   }
 
   increaseZoom(): void {
-    let currentIndex = Object.values(ZoomSetting).indexOf(
-      this.previewZoomSetting
-    )
-    if (this.previewZoomScale === ZoomSetting.PageFit) currentIndex = 5
-    this.previewZoomScale = ZoomSetting.PageWidth
+    const zoomLevels = Object.values(PdfZoomLevel)
+    let currentIndex = zoomLevels.indexOf(this.previewZoomSetting)
+    if (this.previewZoomScale === PdfZoomScale.PageFit) {
+      currentIndex = zoomLevels.indexOf(PdfZoomLevel.One)
+    }
+    this.previewZoomScale = PdfZoomScale.PageWidth
     this.previewZoomSetting =
-      Object.values(ZoomSetting)[
-        Math.min(Object.values(ZoomSetting).length - 1, currentIndex + 1)
-      ]
+      zoomLevels[Math.min(zoomLevels.length - 1, currentIndex + 1)]
   }
 
   decreaseZoom(): void {
-    let currentIndex = Object.values(ZoomSetting).indexOf(
-      this.previewZoomSetting
-    )
-    if (this.previewZoomScale === ZoomSetting.PageFit) currentIndex = 4
-    this.previewZoomScale = ZoomSetting.PageWidth
-    this.previewZoomSetting =
-      Object.values(ZoomSetting)[Math.max(2, currentIndex - 1)]
+    const zoomLevels = Object.values(PdfZoomLevel)
+    let currentIndex = zoomLevels.indexOf(this.previewZoomSetting)
+    if (this.previewZoomScale === PdfZoomScale.PageFit) {
+      currentIndex = zoomLevels.indexOf(PdfZoomLevel.ThreeQuarters)
+    }
+    this.previewZoomScale = PdfZoomScale.PageWidth
+    this.previewZoomSetting = zoomLevels[Math.max(0, currentIndex - 1)]
   }
 
   get showPermissions(): boolean {
@@ -1491,6 +1583,63 @@ export class DocumentDetailComponent
       })
   }
 
+  removePassword() {
+    if (this.requiresPassword || !this.password) {
+      this.toastService.showError(
+        $localize`Please enter the current password before attempting to remove it.`
+      )
+      return
+    }
+    const modal = this.modalService.open(
+      PasswordRemovalConfirmDialogComponent,
+      {
+        backdrop: 'static',
+      }
+    )
+    modal.componentInstance.title = $localize`Remove password protection`
+    modal.componentInstance.message = $localize`Create an unprotected copy or replace the existing file.`
+    modal.componentInstance.btnCaption = $localize`Start`
+
+    modal.componentInstance.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        const dialog =
+          modal.componentInstance as PasswordRemovalConfirmDialogComponent
+        dialog.buttonsEnabled = false
+        this.networkActive = true
+        this.documentsService
+          .bulkEdit([this.document.id], 'remove_password', {
+            password: this.password,
+            update_document: dialog.updateDocument,
+            include_metadata: dialog.includeMetadata,
+            delete_original: dialog.deleteOriginal,
+          })
+          .pipe(first(), takeUntil(this.unsubscribeNotifier))
+          .subscribe({
+            next: () => {
+              this.toastService.showInfo(
+                $localize`Password removal operation for "${this.document.title}" will begin in the background.`
+              )
+              this.networkActive = false
+              modal.close()
+              if (!dialog.updateDocument && dialog.deleteOriginal) {
+                this.openDocumentService.closeDocument(this.document)
+              } else if (dialog.updateDocument) {
+                this.openDocumentService.refreshDocument(this.documentId)
+              }
+            },
+            error: (error) => {
+              dialog.buttonsEnabled = true
+              this.networkActive = false
+              this.toastService.showError(
+                $localize`Error executing password removal operation`,
+                error
+              )
+            },
+          })
+      })
+  }
+
   printDocument() {
     const printUrl = this.documentsService.getDownloadUrl(
       this.document.id,
@@ -1515,9 +1664,18 @@ export class DocumentDetailComponent
                 URL.revokeObjectURL(blobUrl)
               }
             } catch (err) {
-              this.toastService.showError($localize`Print failed.`, err)
-              document.body.removeChild(iframe)
-              URL.revokeObjectURL(blobUrl)
+              // FF throws cross-origin error on onafterprint
+              const isCrossOriginAfterPrintError =
+                err instanceof DOMException &&
+                err.message.includes('onafterprint')
+              if (!isCrossOriginAfterPrintError) {
+                this.toastService.showError($localize`Print failed.`, err)
+              }
+              timer(100).subscribe(() => {
+                // delay to avoid FF print failure
+                document.body.removeChild(iframe)
+                URL.revokeObjectURL(blobUrl)
+              })
             }
           }
         },
@@ -1544,7 +1702,7 @@ export class DocumentDetailComponent
     const modal = this.modalService.open(EmailDocumentDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.documentId = this.document.id
+    modal.componentInstance.documentIds = [this.document.id]
     modal.componentInstance.hasArchiveVersion =
       !!this.document?.archived_file_name
   }

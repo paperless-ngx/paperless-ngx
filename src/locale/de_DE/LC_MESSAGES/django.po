@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-14 03:21+0000\n"
-"PO-Revision-Date: 2025-09-14 03:22\n"
+"POT-Creation-Date: 2025-12-12 17:41+0000\n"
+"PO-Revision-Date: 2025-12-12 17:44\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -21,1172 +21,1221 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumente"
 
-#: documents/filters.py:386
+#: documents/filters.py:395
 msgid "Value must be valid JSON."
 msgstr "Wert muss gültiges JSON sein."
 
-#: documents/filters.py:405
+#: documents/filters.py:414
 msgid "Invalid custom field query expression"
 msgstr "Ungültiger benutzerdefinierter Feldabfrageausdruck"
 
-#: documents/filters.py:415
+#: documents/filters.py:424
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Ungültige Ausdrucksliste. Darf nicht leer sein."
 
-#: documents/filters.py:436
+#: documents/filters.py:445
 msgid "Invalid logical operator {op!r}"
 msgstr "Ungültiger logischer Operator {op!r}"
 
-#: documents/filters.py:450
+#: documents/filters.py:459
 msgid "Maximum number of query conditions exceeded."
 msgstr "Maximale Anzahl an Abfragebedingungen überschritten."
 
-#: documents/filters.py:515
+#: documents/filters.py:524
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} ist kein gültiges benutzerdefiniertes Feld."
 
-#: documents/filters.py:552
+#: documents/filters.py:561
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} unterstützt den Abfrageausdruck {expr!r} nicht."
 
-#: documents/filters.py:660
+#: documents/filters.py:669 documents/models.py:135
 msgid "Maximum nesting depth exceeded."
 msgstr "Maximale Verschachtelungstiefe überschritten."
 
-#: documents/filters.py:845
+#: documents/filters.py:854
 msgid "Custom field not found"
 msgstr "Benutzerdefiniertes Feld nicht gefunden"
 
-#: documents/models.py:36 documents/models.py:735
+#: documents/models.py:38 documents/models.py:768
 msgid "owner"
 msgstr "Eigentümer"
 
-#: documents/models.py:53 documents/models.py:950
+#: documents/models.py:55 documents/models.py:983
 msgid "None"
-msgstr "Keiner"
+msgstr "Keine"
 
-#: documents/models.py:54 documents/models.py:951
+#: documents/models.py:56 documents/models.py:984
 msgid "Any word"
 msgstr "Irgendein Wort"
 
-#: documents/models.py:55 documents/models.py:952
+#: documents/models.py:57 documents/models.py:985
 msgid "All words"
 msgstr "Alle Wörter"
 
-#: documents/models.py:56 documents/models.py:953
+#: documents/models.py:58 documents/models.py:986
 msgid "Exact match"
 msgstr "Exakte Übereinstimmung"
 
-#: documents/models.py:57 documents/models.py:954
+#: documents/models.py:59 documents/models.py:987
 msgid "Regular expression"
 msgstr "Regulärer Ausdruck"
 
-#: documents/models.py:58 documents/models.py:955
+#: documents/models.py:60 documents/models.py:988
 msgid "Fuzzy word"
 msgstr "Ungenaues Wort"
 
-#: documents/models.py:59
+#: documents/models.py:61
 msgid "Automatic"
 msgstr "Automatisch"
 
-#: documents/models.py:62 documents/models.py:423 documents/models.py:1451
+#: documents/models.py:64 documents/models.py:456 documents/models.py:1526
 #: paperless_mail/models.py:23 paperless_mail/models.py:143
 msgid "name"
 msgstr "Name"
 
-#: documents/models.py:64 documents/models.py:1019
+#: documents/models.py:66 documents/models.py:1052
 msgid "match"
 msgstr "Zuweisungsmuster"
 
-#: documents/models.py:67 documents/models.py:1022
+#: documents/models.py:69 documents/models.py:1055
 msgid "matching algorithm"
 msgstr "Zuweisungsalgorithmus"
 
-#: documents/models.py:72 documents/models.py:1027
+#: documents/models.py:74 documents/models.py:1060
 msgid "is insensitive"
 msgstr "Groß-/Kleinschreibung irrelevant"
 
-#: documents/models.py:95 documents/models.py:146
+#: documents/models.py:97 documents/models.py:170
 msgid "correspondent"
 msgstr "Korrespondent"
 
-#: documents/models.py:96
+#: documents/models.py:98
 msgid "correspondents"
 msgstr "Korrespondenten"
 
-#: documents/models.py:100
+#: documents/models.py:102
 msgid "color"
 msgstr "Farbe"
 
-#: documents/models.py:103
+#: documents/models.py:107
 msgid "is inbox tag"
 msgstr "Posteingangs-Tag"
 
-#: documents/models.py:106
+#: documents/models.py:110
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
 msgstr "Markiert das Tag als Posteingangs-Tag. Neue Dokumente werden immer mit diesem Tag versehen."
 
-#: documents/models.py:112
+#: documents/models.py:116
 msgid "tag"
 msgstr "Tag"
 
-#: documents/models.py:113 documents/models.py:184
+#: documents/models.py:117 documents/models.py:208
 msgid "tags"
 msgstr "Tags"
 
-#: documents/models.py:118 documents/models.py:166
+#: documents/models.py:123
+msgid "Cannot set itself as parent."
+msgstr "Kann sich nicht selbst als übergeordnetes Element festlegen."
+
+#: documents/models.py:125
+msgid "Cannot set parent to a descendant."
+msgstr "Kann das übergeordnete Element nicht auf ein Nachfolgeelement setzen."
+
+#: documents/models.py:142 documents/models.py:190
 msgid "document type"
 msgstr "Dokumenttyp"
 
-#: documents/models.py:119
+#: documents/models.py:143
 msgid "document types"
 msgstr "Dokumenttypen"
 
-#: documents/models.py:124
+#: documents/models.py:148
 msgid "path"
 msgstr "Pfad"
 
-#: documents/models.py:128 documents/models.py:155
+#: documents/models.py:152 documents/models.py:179
 msgid "storage path"
 msgstr "Speicherpfad"
 
-#: documents/models.py:129
+#: documents/models.py:153
 msgid "storage paths"
 msgstr "Speicherpfade"
 
-#: documents/models.py:136
+#: documents/models.py:160
 msgid "Unencrypted"
 msgstr "Nicht verschlüsselt"
 
-#: documents/models.py:137
+#: documents/models.py:161
 msgid "Encrypted with GNU Privacy Guard"
 msgstr "Durch GNU Privacy Guard verschlüsselt"
 
-#: documents/models.py:158
+#: documents/models.py:182
 msgid "title"
 msgstr "Titel"
 
-#: documents/models.py:170 documents/models.py:649
+#: documents/models.py:194 documents/models.py:682
 msgid "content"
 msgstr "Inhalt"
 
-#: documents/models.py:173
+#: documents/models.py:197
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
 msgstr "Der Inhalt des Dokuments in Textform. Dieses Feld wird primär für die Suche verwendet."
 
-#: documents/models.py:178
+#: documents/models.py:202
 msgid "mime type"
 msgstr "MIME-Typ"
 
-#: documents/models.py:188
+#: documents/models.py:212
 msgid "checksum"
 msgstr "Prüfsumme"
 
-#: documents/models.py:192
+#: documents/models.py:216
 msgid "The checksum of the original document."
 msgstr "Die Prüfsumme des originalen Dokuments."
 
-#: documents/models.py:196
+#: documents/models.py:220
 msgid "archive checksum"
 msgstr "Archiv-Prüfsumme"
 
-#: documents/models.py:201
+#: documents/models.py:225
 msgid "The checksum of the archived document."
 msgstr "Die Prüfsumme des archivierten Dokuments."
 
-#: documents/models.py:205
+#: documents/models.py:229
 msgid "page count"
 msgstr "Seitenzahl"
 
-#: documents/models.py:212
+#: documents/models.py:236
 msgid "The number of pages of the document."
 msgstr "Die Anzahl der Seiten des Dokuments."
 
-#: documents/models.py:217 documents/models.py:655 documents/models.py:693
-#: documents/models.py:765 documents/models.py:824
+#: documents/models.py:241 documents/models.py:688 documents/models.py:726
+#: documents/models.py:798 documents/models.py:857
 msgid "created"
 msgstr "Ausgestellt"
 
-#: documents/models.py:223
+#: documents/models.py:247
 msgid "modified"
 msgstr "Geändert"
 
-#: documents/models.py:230
+#: documents/models.py:254
 msgid "storage type"
 msgstr "Speichertyp"
 
-#: documents/models.py:238
+#: documents/models.py:262
 msgid "added"
 msgstr "Hinzugefügt"
 
-#: documents/models.py:245
+#: documents/models.py:269
 msgid "filename"
 msgstr "Dateiname"
 
-#: documents/models.py:251
+#: documents/models.py:275
 msgid "Current filename in storage"
 msgstr "Aktueller Dateiname im Datenspeicher"
 
-#: documents/models.py:255
+#: documents/models.py:279
 msgid "archive filename"
 msgstr "Archiv-Dateiname"
 
-#: documents/models.py:261
+#: documents/models.py:285
 msgid "Current archive filename in storage"
 msgstr "Aktueller Dateiname im Archiv"
 
-#: documents/models.py:265
+#: documents/models.py:289
 msgid "original filename"
 msgstr "Ursprünglicher Dateiname"
 
-#: documents/models.py:271
+#: documents/models.py:295
 msgid "The original name of the file when it was uploaded"
 msgstr "Ursprünglicher Dateiname beim Hochladen"
 
-#: documents/models.py:278
+#: documents/models.py:302
 msgid "archive serial number"
 msgstr "Archiv-Seriennummer"
 
-#: documents/models.py:288
+#: documents/models.py:312
 msgid "The position of this document in your physical document archive."
 msgstr "Die Position dieses Dokuments in Ihrem physischen Dokumentenarchiv."
 
-#: documents/models.py:294 documents/models.py:666 documents/models.py:720
-#: documents/models.py:1494
+#: documents/models.py:318 documents/models.py:699 documents/models.py:753
+#: documents/models.py:1569
 msgid "document"
 msgstr "Dokument"
 
-#: documents/models.py:295
+#: documents/models.py:319
 msgid "documents"
 msgstr "Dokumente"
 
-#: documents/models.py:404
+#: documents/models.py:437
 msgid "Table"
 msgstr "Tabelle"
 
-#: documents/models.py:405
+#: documents/models.py:438
 msgid "Small Cards"
 msgstr "Kleine Karten"
 
-#: documents/models.py:406
+#: documents/models.py:439
 msgid "Large Cards"
 msgstr "Große Karten"
 
-#: documents/models.py:409
+#: documents/models.py:442
 msgid "Title"
 msgstr "Titel"
 
-#: documents/models.py:410 documents/models.py:971
+#: documents/models.py:443 documents/models.py:1004
 msgid "Created"
 msgstr "Ausgestellt"
 
-#: documents/models.py:411 documents/models.py:970
+#: documents/models.py:444 documents/models.py:1003
 msgid "Added"
 msgstr "Hinzugefügt"
 
-#: documents/models.py:412
+#: documents/models.py:445
 msgid "Tags"
 msgstr "Tags"
 
-#: documents/models.py:413
+#: documents/models.py:446
 msgid "Correspondent"
 msgstr "Korrespondent"
 
-#: documents/models.py:414
+#: documents/models.py:447
 msgid "Document Type"
 msgstr "Dokumenttyp"
 
-#: documents/models.py:415
+#: documents/models.py:448
 msgid "Storage Path"
 msgstr "Speicherpfad"
 
-#: documents/models.py:416
+#: documents/models.py:449
 msgid "Note"
 msgstr "Notiz"
 
-#: documents/models.py:417
+#: documents/models.py:450
 msgid "Owner"
 msgstr "Eigentümer"
 
-#: documents/models.py:418
+#: documents/models.py:451
 msgid "Shared"
 msgstr "Freigegeben"
 
-#: documents/models.py:419
+#: documents/models.py:452
 msgid "ASN"
 msgstr "ASN"
 
-#: documents/models.py:420
+#: documents/models.py:453
 msgid "Pages"
 msgstr "Seiten"
 
-#: documents/models.py:426
+#: documents/models.py:459
 msgid "show on dashboard"
 msgstr "Auf Startseite zeigen"
 
-#: documents/models.py:429
+#: documents/models.py:462
 msgid "show in sidebar"
 msgstr "In Seitenleiste zeigen"
 
-#: documents/models.py:433
+#: documents/models.py:466
 msgid "sort field"
 msgstr "Sortierfeld"
 
-#: documents/models.py:438
+#: documents/models.py:471
 msgid "sort reverse"
 msgstr "Umgekehrte Sortierung"
 
-#: documents/models.py:441
+#: documents/models.py:474
 msgid "View page size"
 msgstr "Ansichts-Seitengröße"
 
-#: documents/models.py:449
+#: documents/models.py:482
 msgid "View display mode"
 msgstr "Ansichts-Anzeigemodus"
 
-#: documents/models.py:456
+#: documents/models.py:489
 msgid "Document display fields"
 msgstr "Angezeigte Dokumentenfelder"
 
-#: documents/models.py:463 documents/models.py:526
+#: documents/models.py:496 documents/models.py:559
 msgid "saved view"
 msgstr "Gespeicherte Ansicht"
 
-#: documents/models.py:464
+#: documents/models.py:497
 msgid "saved views"
 msgstr "Gespeicherte Ansichten"
 
-#: documents/models.py:472
+#: documents/models.py:505
 msgid "title contains"
 msgstr "Titel enthält"
 
-#: documents/models.py:473
+#: documents/models.py:506
 msgid "content contains"
 msgstr "Inhalt enthält"
 
-#: documents/models.py:474
+#: documents/models.py:507
 msgid "ASN is"
 msgstr "ASN ist"
 
-#: documents/models.py:475
+#: documents/models.py:508
 msgid "correspondent is"
 msgstr "Korrespondent ist"
 
-#: documents/models.py:476
+#: documents/models.py:509
 msgid "document type is"
 msgstr "Dokumenttyp ist"
 
-#: documents/models.py:477
+#: documents/models.py:510
 msgid "is in inbox"
 msgstr "Ist im Posteingang"
 
-#: documents/models.py:478
+#: documents/models.py:511
 msgid "has tag"
 msgstr "Hat Tag"
 
-#: documents/models.py:479
+#: documents/models.py:512
 msgid "has any tag"
 msgstr "Hat irgendein Tag"
 
-#: documents/models.py:480
+#: documents/models.py:513
 msgid "created before"
 msgstr "Ausgestellt vor"
 
-#: documents/models.py:481
+#: documents/models.py:514
 msgid "created after"
 msgstr "Ausgestellt nach"
 
-#: documents/models.py:482
+#: documents/models.py:515
 msgid "created year is"
 msgstr "Ausgestellt im Jahr"
 
-#: documents/models.py:483
+#: documents/models.py:516
 msgid "created month is"
 msgstr "Ausgestellt im Monat"
 
-#: documents/models.py:484
+#: documents/models.py:517
 msgid "created day is"
 msgstr "Ausstellungstag ist"
 
-#: documents/models.py:485
+#: documents/models.py:518
 msgid "added before"
 msgstr "Hinzugefügt vor"
 
-#: documents/models.py:486
+#: documents/models.py:519
 msgid "added after"
 msgstr "Hinzugefügt nach"
 
-#: documents/models.py:487
+#: documents/models.py:520
 msgid "modified before"
 msgstr "Geändert vor"
 
-#: documents/models.py:488
+#: documents/models.py:521
 msgid "modified after"
 msgstr "Geändert nach"
 
-#: documents/models.py:489
+#: documents/models.py:522
 msgid "does not have tag"
 msgstr "Hat nicht folgendes Tag"
 
-#: documents/models.py:490
+#: documents/models.py:523
 msgid "does not have ASN"
 msgstr "Dokument hat keine ASN"
 
-#: documents/models.py:491
+#: documents/models.py:524
 msgid "title or content contains"
 msgstr "Titel oder Inhalt enthält"
 
-#: documents/models.py:492
+#: documents/models.py:525
 msgid "fulltext query"
 msgstr "Volltextsuche"
 
-#: documents/models.py:493
+#: documents/models.py:526
 msgid "more like this"
 msgstr "Ähnliche Dokumente"
 
-#: documents/models.py:494
+#: documents/models.py:527
 msgid "has tags in"
 msgstr "hat Tags in"
 
-#: documents/models.py:495
+#: documents/models.py:528
 msgid "ASN greater than"
 msgstr "ASN größer als"
 
-#: documents/models.py:496
+#: documents/models.py:529
 msgid "ASN less than"
 msgstr "ASN kleiner als"
 
-#: documents/models.py:497
+#: documents/models.py:530
 msgid "storage path is"
 msgstr "Speicherpfad ist"
 
-#: documents/models.py:498
+#: documents/models.py:531
 msgid "has correspondent in"
 msgstr "hat Korrespondenten in"
 
-#: documents/models.py:499
+#: documents/models.py:532
 msgid "does not have correspondent in"
 msgstr "hat keinen Korrespondenten in"
 
-#: documents/models.py:500
+#: documents/models.py:533
 msgid "has document type in"
 msgstr "hat Dokumenttyp in"
 
-#: documents/models.py:501
+#: documents/models.py:534
 msgid "does not have document type in"
 msgstr "hat keinen Dokumenttyp in"
 
-#: documents/models.py:502
+#: documents/models.py:535
 msgid "has storage path in"
 msgstr "hat Speicherpfad in"
 
-#: documents/models.py:503
+#: documents/models.py:536
 msgid "does not have storage path in"
 msgstr "hat keinen Speicherpfad in"
 
-#: documents/models.py:504
+#: documents/models.py:537
 msgid "owner is"
 msgstr "Eigentümer ist"
 
-#: documents/models.py:505
+#: documents/models.py:538
 msgid "has owner in"
 msgstr "hat Eigentümer in"
 
-#: documents/models.py:506
+#: documents/models.py:539
 msgid "does not have owner"
 msgstr "hat keinen Eigentümer"
 
-#: documents/models.py:507
+#: documents/models.py:540
 msgid "does not have owner in"
 msgstr "hat keinen Eigentümer in"
 
-#: documents/models.py:508
+#: documents/models.py:541
 msgid "has custom field value"
 msgstr "Hat benutzerdefinierten Feld-Wert"
 
-#: documents/models.py:509
+#: documents/models.py:542
 msgid "is shared by me"
 msgstr "Ist von mir freigegeben"
 
-#: documents/models.py:510
+#: documents/models.py:543
 msgid "has custom fields"
 msgstr "hat benutzerdefinierte Felder"
 
-#: documents/models.py:511
+#: documents/models.py:544
 msgid "has custom field in"
 msgstr "hat die benutzerdefinierten Felder"
 
-#: documents/models.py:512
+#: documents/models.py:545
 msgid "does not have custom field in"
 msgstr "hat nicht die benutzerdefinierten Felder"
 
-#: documents/models.py:513
+#: documents/models.py:546
 msgid "does not have custom field"
 msgstr "hat nicht das benutzerdefinierte Feld"
 
-#: documents/models.py:514
+#: documents/models.py:547
 msgid "custom fields query"
 msgstr "benutzerdefinierte Feldabfrage"
 
-#: documents/models.py:515
+#: documents/models.py:548
 msgid "created to"
 msgstr "erstellt zu"
 
-#: documents/models.py:516
+#: documents/models.py:549
 msgid "created from"
 msgstr "erstellt von"
 
-#: documents/models.py:517
+#: documents/models.py:550
 msgid "added to"
 msgstr "hinzugefügt zu"
 
-#: documents/models.py:518
+#: documents/models.py:551
 msgid "added from"
 msgstr "hinzugefügt von"
 
-#: documents/models.py:519
+#: documents/models.py:552
 msgid "mime type is"
 msgstr "MIME-Typ ist"
 
-#: documents/models.py:529
+#: documents/models.py:562
 msgid "rule type"
 msgstr "Regeltyp"
 
-#: documents/models.py:531
+#: documents/models.py:564
 msgid "value"
 msgstr "Wert"
 
-#: documents/models.py:534
+#: documents/models.py:567
 msgid "filter rule"
 msgstr "Filterregel"
 
-#: documents/models.py:535
+#: documents/models.py:568
 msgid "filter rules"
 msgstr "Filterregeln"
 
-#: documents/models.py:559
+#: documents/models.py:592
 msgid "Auto Task"
 msgstr "Automatische Aufgabe"
 
-#: documents/models.py:560
+#: documents/models.py:593
 msgid "Scheduled Task"
 msgstr "Geplante Aufgabe"
 
-#: documents/models.py:561
+#: documents/models.py:594
 msgid "Manual Task"
 msgstr "Manuelle Aufgabe"
 
-#: documents/models.py:564
+#: documents/models.py:597
 msgid "Consume File"
 msgstr "Datei verarbeiten"
 
-#: documents/models.py:565
+#: documents/models.py:598
 msgid "Train Classifier"
 msgstr "Klassifikator trainieren"
 
-#: documents/models.py:566
+#: documents/models.py:599
 msgid "Check Sanity"
 msgstr "Plausibilität prüfen"
 
-#: documents/models.py:567
+#: documents/models.py:600
 msgid "Index Optimize"
 msgstr "Indexoptimierung"
 
-#: documents/models.py:572
+#: documents/models.py:605
 msgid "Task ID"
 msgstr "Aufgaben-ID"
 
-#: documents/models.py:573
+#: documents/models.py:606
 msgid "Celery ID for the Task that was run"
 msgstr "Celery-ID für die ausgeführte Aufgabe"
 
-#: documents/models.py:578
+#: documents/models.py:611
 msgid "Acknowledged"
 msgstr "Bestätigt"
 
-#: documents/models.py:579
+#: documents/models.py:612
 msgid "If the task is acknowledged via the frontend or API"
 msgstr "Wenn die Aufgabe über die Benutzeroberfläche oder die API bestätigt wird"
 
-#: documents/models.py:585
+#: documents/models.py:618
 msgid "Task Filename"
 msgstr "Aufgaben-Dateiname"
 
-#: documents/models.py:586
+#: documents/models.py:619
 msgid "Name of the file which the Task was run for"
 msgstr "Name der Datei, für die die Aufgabe ausgeführt wurde"
 
-#: documents/models.py:593
+#: documents/models.py:626
 msgid "Task Name"
 msgstr "Aufgabenname"
 
-#: documents/models.py:594
+#: documents/models.py:627
 msgid "Name of the task that was run"
 msgstr "Name der ausgeführten Aufgabe"
 
-#: documents/models.py:601
+#: documents/models.py:634
 msgid "Task State"
 msgstr "Aufgabenstatus"
 
-#: documents/models.py:602
+#: documents/models.py:635
 msgid "Current state of the task being run"
 msgstr "Aktueller Status der laufenden Aufgabe"
 
-#: documents/models.py:608
+#: documents/models.py:641
 msgid "Created DateTime"
 msgstr "Erstellungsdatum/-zeit"
 
-#: documents/models.py:609
+#: documents/models.py:642
 msgid "Datetime field when the task result was created in UTC"
 msgstr "Zeitpunkt, an dem das Ergebnis der Aufgabe erstellt wurde (in UTC)"
 
-#: documents/models.py:615
+#: documents/models.py:648
 msgid "Started DateTime"
 msgstr "Startdatum/-zeit"
 
-#: documents/models.py:616
+#: documents/models.py:649
 msgid "Datetime field when the task was started in UTC"
 msgstr "Zeitpunkt, an dem die Aufgabe erstellt wurde (in UTC)"
 
-#: documents/models.py:622
+#: documents/models.py:655
 msgid "Completed DateTime"
 msgstr "Abschlussdatum/-zeit"
 
-#: documents/models.py:623
+#: documents/models.py:656
 msgid "Datetime field when the task was completed in UTC"
 msgstr "Zeitpunkt, an dem die Aufgabe abgeschlossen wurde (in UTC)"
 
-#: documents/models.py:629
+#: documents/models.py:662
 msgid "Result Data"
 msgstr "Ergebnisdaten"
 
-#: documents/models.py:631
+#: documents/models.py:664
 msgid "The data returned by the task"
 msgstr "Die von der Aufgabe zurückgegebenen Daten"
 
-#: documents/models.py:639
+#: documents/models.py:672
 msgid "Task Type"
 msgstr "Aufgabentyp"
 
-#: documents/models.py:640
+#: documents/models.py:673
 msgid "The type of task that was run"
 msgstr "Art der ausgeführten Aufgabe"
 
-#: documents/models.py:651
+#: documents/models.py:684
 msgid "Note for the document"
 msgstr "Notiz für das Dokument"
 
-#: documents/models.py:675
+#: documents/models.py:708
 msgid "user"
 msgstr "Benutzer"
 
-#: documents/models.py:680
+#: documents/models.py:713
 msgid "note"
 msgstr "Notiz"
 
-#: documents/models.py:681
+#: documents/models.py:714
 msgid "notes"
 msgstr "Notizen"
 
-#: documents/models.py:689
+#: documents/models.py:722
 msgid "Archive"
 msgstr "Archiv"
 
-#: documents/models.py:690
+#: documents/models.py:723
 msgid "Original"
 msgstr "Original"
 
-#: documents/models.py:701 paperless_mail/models.py:75
+#: documents/models.py:734 paperless_mail/models.py:75
 msgid "expiration"
 msgstr "Ablauf"
 
-#: documents/models.py:708
+#: documents/models.py:741
 msgid "slug"
 msgstr "Slug"
 
-#: documents/models.py:740
+#: documents/models.py:773
 msgid "share link"
 msgstr "Freigabelink"
 
-#: documents/models.py:741
+#: documents/models.py:774
 msgid "share links"
 msgstr "Freigabelinks"
 
-#: documents/models.py:753
+#: documents/models.py:786
 msgid "String"
 msgstr "Zeichenkette"
 
-#: documents/models.py:754
+#: documents/models.py:787
 msgid "URL"
 msgstr "URL"
 
-#: documents/models.py:755
+#: documents/models.py:788
 msgid "Date"
 msgstr "Datum"
 
-#: documents/models.py:756
+#: documents/models.py:789
 msgid "Boolean"
 msgstr "Wahrheitswert"
 
-#: documents/models.py:757
+#: documents/models.py:790
 msgid "Integer"
 msgstr "Ganzzahl"
 
-#: documents/models.py:758
+#: documents/models.py:791
 msgid "Float"
 msgstr "Gleitkommazahl"
 
-#: documents/models.py:759
+#: documents/models.py:792
 msgid "Monetary"
 msgstr "Währung"
 
-#: documents/models.py:760
+#: documents/models.py:793
 msgid "Document Link"
 msgstr "Dokumentenverknüpfung"
 
-#: documents/models.py:761
+#: documents/models.py:794
 msgid "Select"
 msgstr "Auswahl"
 
-#: documents/models.py:762
+#: documents/models.py:795
 msgid "Long Text"
-msgstr ""
+msgstr "Langer Text"
 
-#: documents/models.py:774
+#: documents/models.py:807
 msgid "data type"
 msgstr "Datentyp"
 
-#: documents/models.py:781
+#: documents/models.py:814
 msgid "extra data"
 msgstr "Zusätzliche Daten"
 
-#: documents/models.py:785
+#: documents/models.py:818
 msgid "Extra data for the custom field, such as select options"
 msgstr "Zusätzliche Daten für das benutzerdefinierte Feld, z. B. Auswahloptionen"
 
-#: documents/models.py:791
+#: documents/models.py:824
 msgid "custom field"
 msgstr "Benutzerdefiniertes Feld"
 
-#: documents/models.py:792
+#: documents/models.py:825
 msgid "custom fields"
 msgstr "Benutzerdefinierte Felder"
 
-#: documents/models.py:892
+#: documents/models.py:925
 msgid "custom field instance"
 msgstr "Benutzerdefinierte Feld-Instanz"
 
-#: documents/models.py:893
+#: documents/models.py:926
 msgid "custom field instances"
 msgstr "Benutzerdefinierte Feld-Instanzen"
 
-#: documents/models.py:958
+#: documents/models.py:991
 msgid "Consumption Started"
 msgstr "Verarbeitung gestartet"
 
-#: documents/models.py:959
+#: documents/models.py:992
 msgid "Document Added"
 msgstr "Dokument hinzugefügt"
 
-#: documents/models.py:960
+#: documents/models.py:993
 msgid "Document Updated"
 msgstr "Dokument aktualisiert"
 
-#: documents/models.py:961
+#: documents/models.py:994
 msgid "Scheduled"
 msgstr "Geplant"
 
-#: documents/models.py:964
+#: documents/models.py:997
 msgid "Consume Folder"
 msgstr "Importordner"
 
-#: documents/models.py:965
+#: documents/models.py:998
 msgid "Api Upload"
 msgstr "API-Upload"
 
-#: documents/models.py:966
+#: documents/models.py:999
 msgid "Mail Fetch"
 msgstr "E-Mail-Abruf"
 
-#: documents/models.py:967
+#: documents/models.py:1000
 msgid "Web UI"
 msgstr "Weboberfläche"
 
-#: documents/models.py:972
+#: documents/models.py:1005
 msgid "Modified"
 msgstr "Geändert"
 
-#: documents/models.py:973
+#: documents/models.py:1006
 msgid "Custom Field"
 msgstr "Benutzerdefiniertes Feld"
 
-#: documents/models.py:976
+#: documents/models.py:1009
 msgid "Workflow Trigger Type"
-msgstr "Workflow-Auslösertyp"
+msgstr "Arbeitsablauf-Auslösertyp"
 
-#: documents/models.py:988
+#: documents/models.py:1021
 msgid "filter path"
 msgstr "Pfad filtern"
 
-#: documents/models.py:993
+#: documents/models.py:1026
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
 msgstr "Nur Dokumente, die mit diesem Pfad (falls angegeben) übereinstimmen, verarbeiten. Platzhalter wie * sind erlaubt. Groß- und Kleinschreibung wird nicht beachtet."
 
-#: documents/models.py:1000
+#: documents/models.py:1033
 msgid "filter filename"
 msgstr "Dateinamen filtern"
 
-#: documents/models.py:1005 paperless_mail/models.py:200
+#: documents/models.py:1038 paperless_mail/models.py:200
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "Nur Dokumente, die vollständig mit diesem Dateinamen (falls angegeben) übereinstimmen, verarbeiten. Platzhalter wie *.pdf oder *rechnung* sind erlaubt. Groß- und Kleinschreibung wird nicht beachtet."
 
-#: documents/models.py:1016
+#: documents/models.py:1049
 msgid "filter documents from this mail rule"
 msgstr "Dokumente aus dieser E-Mail-Regel filtern"
 
-#: documents/models.py:1032
+#: documents/models.py:1065
 msgid "has these tag(s)"
 msgstr "hat diese(n) Tag(s)"
 
-#: documents/models.py:1040
+#: documents/models.py:1072
+msgid "has all of these tag(s)"
+msgstr "hat alle diese Tags"
+
+#: documents/models.py:1079
+msgid "does not have these tag(s)"
+msgstr "hat diese Tags nicht"
+
+#: documents/models.py:1087
 msgid "has this document type"
 msgstr "hat diesen Dokumenttyp"
 
-#: documents/models.py:1048
+#: documents/models.py:1094
+msgid "does not have these document type(s)"
+msgstr "hat diese Dokumenttypen nicht"
+
+#: documents/models.py:1102
 msgid "has this correspondent"
 msgstr "hat diesen Korrespondenten"
 
-#: documents/models.py:1056
-msgid "has this storage path"
-msgstr "Hat diesen Speicherpfad"
+#: documents/models.py:1109
+msgid "does not have these correspondent(s)"
+msgstr "hat diese Korrespondenten nicht"
 
-#: documents/models.py:1060
+#: documents/models.py:1117
+msgid "has this storage path"
+msgstr "hat diesen Speicherpfad"
+
+#: documents/models.py:1124
+msgid "does not have these storage path(s)"
+msgstr "hat diese Speicherpfade nicht"
+
+#: documents/models.py:1128
+msgid "filter custom field query"
+msgstr "Filtern Benutzerdefinierte Feldabfrage"
+
+#: documents/models.py:1131
+msgid "JSON-encoded custom field query expression."
+msgstr "JSON-kodierte Abfrage eines benutzerdefinierten Felds."
+
+#: documents/models.py:1135
 msgid "schedule offset days"
 msgstr "Zeitplanversatz (Tage)"
 
-#: documents/models.py:1063
+#: documents/models.py:1138
 msgid "The number of days to offset the schedule trigger by."
 msgstr "Die Anzahl der Tage, um die der Zeitplanauslöser verschoben werden soll."
 
-#: documents/models.py:1068
+#: documents/models.py:1143
 msgid "schedule is recurring"
 msgstr "Zeitplan wiederholt sich"
 
-#: documents/models.py:1071
+#: documents/models.py:1146
 msgid "If the schedule should be recurring."
 msgstr "Ob der Zeitplan wiederholt werden soll."
 
-#: documents/models.py:1076
+#: documents/models.py:1151
 msgid "schedule recurring delay in days"
 msgstr "Zeitplan-Wiederholungsverzögerung in Tagen"
 
-#: documents/models.py:1080
+#: documents/models.py:1155
 msgid "The number of days between recurring schedule triggers."
 msgstr "Die Anzahl der Tage zwischen wiederkehrenden Zeitplanauslösern."
 
-#: documents/models.py:1085
+#: documents/models.py:1160
 msgid "schedule date field"
 msgstr "Zeitplan-Datumsfeld"
 
-#: documents/models.py:1090
+#: documents/models.py:1165
 msgid "The field to check for a schedule trigger."
 msgstr "Das zu prüfende Feld für einen Zeitplanauslöser."
 
-#: documents/models.py:1099
+#: documents/models.py:1174
 msgid "schedule date custom field"
 msgstr "Benutzerdefiniertes Zeitplan-Datumsfeld"
 
-#: documents/models.py:1103
+#: documents/models.py:1178
 msgid "workflow trigger"
 msgstr "Arbeitsablauf-Auslöser"
 
-#: documents/models.py:1104
+#: documents/models.py:1179
 msgid "workflow triggers"
 msgstr "Arbeitsablauf-Auslöser"
 
-#: documents/models.py:1112
+#: documents/models.py:1187
 msgid "email subject"
 msgstr "E-Mail-Betreff"
 
-#: documents/models.py:1116
+#: documents/models.py:1191
 msgid "The subject of the email, can include some placeholders, see documentation."
 msgstr "Der Betreff der E-Mail kann Platzhalter beinhalten, siehe Dokumentation."
 
-#: documents/models.py:1122
+#: documents/models.py:1197
 msgid "email body"
 msgstr "E-Mail-Inhalt"
 
-#: documents/models.py:1125
+#: documents/models.py:1200
 msgid "The body (message) of the email, can include some placeholders, see documentation."
 msgstr "Der Text der E-Mail kann Platzhalter beinhalten, siehe Dokumentation."
 
-#: documents/models.py:1131
+#: documents/models.py:1206
 msgid "emails to"
 msgstr "E-Mails an"
 
-#: documents/models.py:1134
+#: documents/models.py:1209
 msgid "The destination email addresses, comma separated."
 msgstr "Die Empfänger-E-Mail-Adressen, kommagetrennt."
 
-#: documents/models.py:1140
+#: documents/models.py:1215
 msgid "include document in email"
 msgstr "Dokument in E-Mail einbeziehen"
 
-#: documents/models.py:1151
+#: documents/models.py:1226
 msgid "webhook url"
 msgstr "Webhook-URL"
 
-#: documents/models.py:1154
+#: documents/models.py:1229
 msgid "The destination URL for the notification."
 msgstr "Die Ziel-URL für die Benachrichtigung."
 
-#: documents/models.py:1159
+#: documents/models.py:1234
 msgid "use parameters"
 msgstr "verwende Parameter"
 
-#: documents/models.py:1164
+#: documents/models.py:1239
 msgid "send as JSON"
 msgstr "als JSON senden"
 
-#: documents/models.py:1168
+#: documents/models.py:1243
 msgid "webhook parameters"
 msgstr "Webhook-Parameter"
 
-#: documents/models.py:1171
+#: documents/models.py:1246
 msgid "The parameters to send with the webhook URL if body not used."
 msgstr "Die Parameter, die mit der Webhook-URL gesendet werden sollen, wenn kein Inhalt verwendet wird."
 
-#: documents/models.py:1175
+#: documents/models.py:1250
 msgid "webhook body"
 msgstr "Webhook-Inhalt"
 
-#: documents/models.py:1178
+#: documents/models.py:1253
 msgid "The body to send with the webhook URL if parameters not used."
 msgstr "Der Inhalt, der mit der Webhook-URL gesendet werden soll, wenn Parameter nicht verwendet werden."
 
-#: documents/models.py:1182
+#: documents/models.py:1257
 msgid "webhook headers"
 msgstr "Webhook-Kopfzeilen"
 
-#: documents/models.py:1185
+#: documents/models.py:1260
 msgid "The headers to send with the webhook URL."
 msgstr "Die Kopfzeilen, die mit der Webhook-URL gesendet werden sollen."
 
-#: documents/models.py:1190
+#: documents/models.py:1265
 msgid "include document in webhook"
 msgstr "Dokument in Webhook einbeziehen"
 
-#: documents/models.py:1201
+#: documents/models.py:1276
 msgid "Assignment"
 msgstr "Zuordnung"
 
-#: documents/models.py:1205
+#: documents/models.py:1280
 msgid "Removal"
 msgstr "Entfernung"
 
-#: documents/models.py:1209 documents/templates/account/password_reset.html:15
+#: documents/models.py:1284 documents/templates/account/password_reset.html:15
 msgid "Email"
 msgstr "E-Mail"
 
-#: documents/models.py:1213
+#: documents/models.py:1288
 msgid "Webhook"
 msgstr "Webhook"
 
-#: documents/models.py:1217
+#: documents/models.py:1292
 msgid "Workflow Action Type"
 msgstr "Arbeitsablauf-Aktionstyp"
 
-#: documents/models.py:1223
+#: documents/models.py:1298
 msgid "assign title"
 msgstr "Titel zuweisen"
 
-#: documents/models.py:1227
+#: documents/models.py:1302
 msgid "Assign a document title, must  be a Jinja2 template, see documentation."
-msgstr "Dokumen-Titel zuweisen (muss eine Jinja2-Vorlage sein, siehe Dokumentation)."
+msgstr "Dokumenttitel zuweisen (muss eine Jinja2-Vorlage sein, siehe Dokumentation)."
 
-#: documents/models.py:1235 paperless_mail/models.py:274
+#: documents/models.py:1310 paperless_mail/models.py:274
 msgid "assign this tag"
 msgstr "Dieses Tag zuweisen"
 
-#: documents/models.py:1244 paperless_mail/models.py:282
+#: documents/models.py:1319 paperless_mail/models.py:282
 msgid "assign this document type"
 msgstr "Diesen Dokumenttyp zuweisen"
 
-#: documents/models.py:1253 paperless_mail/models.py:296
+#: documents/models.py:1328 paperless_mail/models.py:296
 msgid "assign this correspondent"
 msgstr "Diesen Korrespondenten zuweisen"
 
-#: documents/models.py:1262
+#: documents/models.py:1337
 msgid "assign this storage path"
 msgstr "Diesen Speicherpfad zuweisen"
 
-#: documents/models.py:1271
+#: documents/models.py:1346
 msgid "assign this owner"
 msgstr "Diesen Eigentümer zuordnen"
 
-#: documents/models.py:1278
+#: documents/models.py:1353
 msgid "grant view permissions to these users"
 msgstr "Diesen Benutzern Anzeigeberechtigungen erteilen"
 
-#: documents/models.py:1285
+#: documents/models.py:1360
 msgid "grant view permissions to these groups"
 msgstr "Diesen Gruppen Anzeigeberechtigungen erteilen"
 
-#: documents/models.py:1292
+#: documents/models.py:1367
 msgid "grant change permissions to these users"
 msgstr "Diesen Benutzern Bearbeitungsberechtigungen erteilen"
 
-#: documents/models.py:1299
+#: documents/models.py:1374
 msgid "grant change permissions to these groups"
 msgstr "Diesen Gruppen Bearbeitungsberechtigungen erteilen"
 
-#: documents/models.py:1306
+#: documents/models.py:1381
 msgid "assign these custom fields"
 msgstr "Diese benutzerdefinierten Felder zuweisen"
 
-#: documents/models.py:1310
+#: documents/models.py:1385
 msgid "custom field values"
 msgstr "Benutzerdefinierte Feldwerte"
 
-#: documents/models.py:1314
+#: documents/models.py:1389
 msgid "Optional values to assign to the custom fields."
 msgstr "Optionale Werte, die den benutzerdefinierten Feldern zugewiesen werden."
 
-#: documents/models.py:1323
+#: documents/models.py:1398
 msgid "remove these tag(s)"
 msgstr "Diese(n) Tag(s) entfernen"
 
-#: documents/models.py:1328
+#: documents/models.py:1403
 msgid "remove all tags"
 msgstr "Alle Tags entfernen"
 
-#: documents/models.py:1335
+#: documents/models.py:1410
 msgid "remove these document type(s)"
 msgstr "Diese(n) Dokumenttyp(en) entfernen"
 
-#: documents/models.py:1340
+#: documents/models.py:1415
 msgid "remove all document types"
 msgstr "Alle Dokumenttypen entfernen"
 
-#: documents/models.py:1347
+#: documents/models.py:1422
 msgid "remove these correspondent(s)"
 msgstr "Diese(n) Korrespondenten entfernen"
 
-#: documents/models.py:1352
+#: documents/models.py:1427
 msgid "remove all correspondents"
 msgstr "Alle Korrespondenten entfernen"
 
-#: documents/models.py:1359
+#: documents/models.py:1434
 msgid "remove these storage path(s)"
 msgstr "Diese(n) Speicherpfad(e) entfernen"
 
-#: documents/models.py:1364
+#: documents/models.py:1439
 msgid "remove all storage paths"
 msgstr "Alle Speicherpfade entfernen"
 
-#: documents/models.py:1371
+#: documents/models.py:1446
 msgid "remove these owner(s)"
 msgstr "Diese(n) Eigentümer entfernen"
 
-#: documents/models.py:1376
+#: documents/models.py:1451
 msgid "remove all owners"
 msgstr "Alle Eigentümer entfernen"
 
-#: documents/models.py:1383
+#: documents/models.py:1458
 msgid "remove view permissions for these users"
 msgstr "Anzeigeberechtigungen für diese Benutzer entfernen"
 
-#: documents/models.py:1390
+#: documents/models.py:1465
 msgid "remove view permissions for these groups"
 msgstr "Anzeigeberechtigungen für diese Gruppen entfernen"
 
-#: documents/models.py:1397
+#: documents/models.py:1472
 msgid "remove change permissions for these users"
 msgstr "Bearbeitungsberechtigungen für diese Benutzer entfernen"
 
-#: documents/models.py:1404
+#: documents/models.py:1479
 msgid "remove change permissions for these groups"
 msgstr "Bearbeitungsberechtigungen für diese Gruppen entfernen"
 
-#: documents/models.py:1409
+#: documents/models.py:1484
 msgid "remove all permissions"
 msgstr "Alle Berechtigungen entfernen"
 
-#: documents/models.py:1416
+#: documents/models.py:1491
 msgid "remove these custom fields"
 msgstr "Diese benutzerdefinierten Felder entfernen"
 
-#: documents/models.py:1421
+#: documents/models.py:1496
 msgid "remove all custom fields"
 msgstr "Alle benutzerdefinierten Felder entfernen"
 
-#: documents/models.py:1430
+#: documents/models.py:1505
 msgid "email"
 msgstr "E-Mail"
 
-#: documents/models.py:1439
+#: documents/models.py:1514
 msgid "webhook"
 msgstr "Webhook"
 
-#: documents/models.py:1443
+#: documents/models.py:1518
 msgid "workflow action"
-msgstr "Workflow-Aktion"
+msgstr "Arbeitsablauf-Aktion"
 
-#: documents/models.py:1444
+#: documents/models.py:1519
 msgid "workflow actions"
-msgstr "Workflow-Aktionen"
+msgstr "Arbeitsablauf-Aktionen"
 
-#: documents/models.py:1453 paperless_mail/models.py:145
+#: documents/models.py:1528 paperless_mail/models.py:145
 msgid "order"
 msgstr "Reihenfolge"
 
-#: documents/models.py:1459
+#: documents/models.py:1534
 msgid "triggers"
 msgstr "Auslöser"
 
-#: documents/models.py:1466
+#: documents/models.py:1541
 msgid "actions"
 msgstr "Aktionen"
 
-#: documents/models.py:1469 paperless_mail/models.py:154
+#: documents/models.py:1544 paperless_mail/models.py:154
 msgid "enabled"
 msgstr "aktiviert"
 
-#: documents/models.py:1480
+#: documents/models.py:1555
 msgid "workflow"
 msgstr "Arbeitsablauf"
 
-#: documents/models.py:1484
+#: documents/models.py:1559
 msgid "workflow trigger type"
 msgstr "Arbeitsablauf-Auslösertyp"
 
-#: documents/models.py:1498
+#: documents/models.py:1573
 msgid "date run"
 msgstr "Ausführungsdatum"
 
-#: documents/models.py:1504
+#: documents/models.py:1579
 msgid "workflow run"
 msgstr "Arbeitsablauf-Ausführung"
 
-#: documents/models.py:1505
+#: documents/models.py:1580
 msgid "workflow runs"
 msgstr "Arbeitsablauf wird ausgeführt"
 
-#: documents/serialisers.py:139
-#, python-format
-msgid "Invalid regular expression: %(error)s"
-msgstr "Ungültiger regulärer Ausdruck: %(error)s"
-
-#: documents/serialisers.py:565
+#: documents/serialisers.py:640
 msgid "Invalid color."
 msgstr "Ungültige Farbe."
 
-#: documents/serialisers.py:1700
+#: documents/serialisers.py:1826
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Dateityp %(type)s nicht unterstützt"
 
-#: documents/serialisers.py:1794
+#: documents/serialisers.py:1870
+#, python-format
+msgid "Custom field id must be an integer: %(id)s"
+msgstr "id eines benutzerdefinierten Felds muss eine Ganzzahl sein: %(id)s"
+
+#: documents/serialisers.py:1877
+#, python-format
+msgid "Custom field with id %(id)s does not exist"
+msgstr "Benutzerdefiniertes Feld mit ID %(id)s existiert nicht"
+
+#: documents/serialisers.py:1894 documents/serialisers.py:1904
+msgid "Custom fields must be a list of integers or an object mapping ids to values."
+msgstr "Benutzerdefinierte Felder müssen eine Liste von Ganzzahlen oder ein Objekt mit Zuordnung von IDs zu Werten sein."
+
+#: documents/serialisers.py:1899
+msgid "Some custom fields don't exist or were specified twice."
+msgstr "Einige benutzerdefinierte Felder existieren nicht oder wurden zweimal angegeben."
+
+#: documents/serialisers.py:2014
 msgid "Invalid variable detected."
 msgstr "Ungültige Variable erkannt."
 
@@ -1627,151 +1676,151 @@ msgstr "Legt die Tag-Barcode-Zuweisung fest"
 msgid "paperless application settings"
 msgstr "Paperless-ngx-Anwendungseinstellungen"
 
-#: paperless/settings.py:772
+#: paperless/settings.py:773
 msgid "English (US)"
 msgstr "Englisch (US)"
 
-#: paperless/settings.py:773
+#: paperless/settings.py:774
 msgid "Arabic"
 msgstr "Arabisch"
 
-#: paperless/settings.py:774
+#: paperless/settings.py:775
 msgid "Afrikaans"
 msgstr "Afrikanisch"
 
-#: paperless/settings.py:775
+#: paperless/settings.py:776
 msgid "Belarusian"
 msgstr "Belarussisch"
 
-#: paperless/settings.py:776
+#: paperless/settings.py:777
 msgid "Bulgarian"
 msgstr "Bulgarisch"
 
-#: paperless/settings.py:777
+#: paperless/settings.py:778
 msgid "Catalan"
 msgstr "Katalanisch"
 
-#: paperless/settings.py:778
+#: paperless/settings.py:779
 msgid "Czech"
 msgstr "Tschechisch"
 
-#: paperless/settings.py:779
+#: paperless/settings.py:780
 msgid "Danish"
 msgstr "Dänisch"
 
-#: paperless/settings.py:780
+#: paperless/settings.py:781
 msgid "German"
 msgstr "Deutsch"
 
-#: paperless/settings.py:781
+#: paperless/settings.py:782
 msgid "Greek"
 msgstr "Griechisch"
 
-#: paperless/settings.py:782
+#: paperless/settings.py:783
 msgid "English (GB)"
 msgstr "Englisch (UK)"
 
-#: paperless/settings.py:783
+#: paperless/settings.py:784
 msgid "Spanish"
 msgstr "Spanisch"
 
-#: paperless/settings.py:784
+#: paperless/settings.py:785
 msgid "Persian"
 msgstr "Persisch"
 
-#: paperless/settings.py:785
+#: paperless/settings.py:786
 msgid "Finnish"
 msgstr "Finnisch"
 
-#: paperless/settings.py:786
+#: paperless/settings.py:787
 msgid "French"
 msgstr "Französisch"
 
-#: paperless/settings.py:787
+#: paperless/settings.py:788
 msgid "Hungarian"
 msgstr "Ungarisch"
 
-#: paperless/settings.py:788
+#: paperless/settings.py:789
 msgid "Italian"
 msgstr "Italienisch"
 
-#: paperless/settings.py:789
+#: paperless/settings.py:790
 msgid "Japanese"
 msgstr "Japanisch"
 
-#: paperless/settings.py:790
+#: paperless/settings.py:791
 msgid "Korean"
 msgstr "Koreanisch"
 
-#: paperless/settings.py:791
+#: paperless/settings.py:792
 msgid "Luxembourgish"
 msgstr "Luxemburgisch"
 
-#: paperless/settings.py:792
+#: paperless/settings.py:793
 msgid "Norwegian"
 msgstr "Norwegisch"
 
-#: paperless/settings.py:793
+#: paperless/settings.py:794
 msgid "Dutch"
 msgstr "Niederländisch"
 
-#: paperless/settings.py:794
+#: paperless/settings.py:795
 msgid "Polish"
 msgstr "Polnisch"
 
-#: paperless/settings.py:795
+#: paperless/settings.py:796
 msgid "Portuguese (Brazil)"
 msgstr "Portugiesisch (Brasilien)"
 
-#: paperless/settings.py:796
+#: paperless/settings.py:797
 msgid "Portuguese"
 msgstr "Portugiesisch"
 
-#: paperless/settings.py:797
+#: paperless/settings.py:798
 msgid "Romanian"
 msgstr "Rumänisch"
 
-#: paperless/settings.py:798
+#: paperless/settings.py:799
 msgid "Russian"
 msgstr "Russisch"
 
-#: paperless/settings.py:799
+#: paperless/settings.py:800
 msgid "Slovak"
 msgstr "Slowakisch"
 
-#: paperless/settings.py:800
+#: paperless/settings.py:801
 msgid "Slovenian"
 msgstr "Slowenisch"
 
-#: paperless/settings.py:801
+#: paperless/settings.py:802
 msgid "Serbian"
 msgstr "Serbisch"
 
-#: paperless/settings.py:802
+#: paperless/settings.py:803
 msgid "Swedish"
 msgstr "Schwedisch"
 
-#: paperless/settings.py:803
+#: paperless/settings.py:804
 msgid "Turkish"
 msgstr "Türkisch"
 
-#: paperless/settings.py:804
+#: paperless/settings.py:805
 msgid "Ukrainian"
 msgstr "Ukrainisch"
 
-#: paperless/settings.py:805
+#: paperless/settings.py:806
 msgid "Vietnamese"
 msgstr "Vietnamesisch"
 
-#: paperless/settings.py:806
+#: paperless/settings.py:807
 msgid "Chinese Simplified"
 msgstr "Chinesisch (vereinfacht)"
 
-#: paperless/settings.py:807
+#: paperless/settings.py:808
 msgid "Chinese Traditional"
 msgstr "Chinesisch (traditionell)"
 
-#: paperless/urls.py:368
+#: paperless/urls.py:370
 msgid "Paperless-ngx administration"
 msgstr "Paperless-ngx Administration"
 

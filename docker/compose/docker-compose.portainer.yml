@@ -32,10 +32,10 @@ services:
     volumes:
       - redisdata:/data
   db:
-    image: docker.io/library/postgres:17
+    image: docker.io/library/postgres:18
     restart: unless-stopped
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql
     environment:
       POSTGRES_DB: paperless
       POSTGRES_USER: paperless

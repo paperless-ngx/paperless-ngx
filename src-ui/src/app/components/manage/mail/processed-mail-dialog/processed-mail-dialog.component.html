@@ -1,0 +1,107 @@
+<div class="modal-header">
+  <h6 class="modal-title" id="modal-basic-title" i18n>Processed Mail for <em>{{ rule.name }}</em></h6>
+  <button class="btn btn-sm btn-link text-muted me-auto p-0 p-md-2" title="What's this?" i18n-title type="button" [ngbPopover]="infoPopover" [autoClose]="true">
+    <i-bs name="question-circle"></i-bs>
+  </button>
+  <ng-template #infoPopover>
+    <a href="https://docs.paperless-ngx.com/usage#processed-mail" target="_blank" referrerpolicy="noopener noreferrer" i18n>Read more</a>
+    <i-bs class="ms-1" width=".8em" height=".8em" name="box-arrow-up-right"></i-bs>
+  </ng-template>
+  <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
+</div>
+<div class="modal-body">
+  @if (loading) {
+    <div class="text-center my-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden" i18n>Loading...</span>
+      </div>
+    </div>
+  } @else if (processedMails.length === 0) {
+    <span i18n>No processed email messages found.</span>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-hover table-sm align-middle">
+        <thead>
+          <tr>
+            <th scope="col" style="width: 40px;">
+              <div class="form-check m-0 ms-2 me-n2">
+                <input type="checkbox" class="form-check-input" id="all-objects" [(ngModel)]="toggleAllEnabled" [disabled]="processedMails.length === 0" (click)="toggleAll($event); $event.stopPropagation();">
+                <label class="form-check-label" for="all-objects"></label>
+              </div>
+            </th>
+            <th scope="col" i18n>Subject</th>
+            <th scope="col" i18n>Received</th>
+            <th scope="col" i18n>Processed</th>
+            <th scope="col" i18n>Status</th>
+            <th scope="col" i18n>Error</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (mail of processedMails; track mail.id) {
+            <ng-template #statusTooltip>
+              <div class="small text-light font-monospace">
+                  {{mail.status}}
+              </div>
+            </ng-template>
+            <tr>
+              <td>
+                <div class="form-check m-0 ms-2 me-n2">
+                  <input type="checkbox" class="form-check-input" [id]="mail.id" [checked]="selectedMailIds.has(mail.id)" (click)="toggleSelected(mail); $event.stopPropagation();">
+                  <label class="form-check-label" [for]="mail.id"></label>
+                </div>
+              </td>
+              <td>{{ mail.subject }}</td>
+              <td>{{ mail.received | customDate:'longDate' }}</td>
+              <td>{{ mail.processed | customDate:'longDate' }}</td>
+              <td>
+                @switch (mail.status) {
+                  @case ('SUCCESS') {
+                    <i-bs name="check-circle" title="SUCCESS" class="text-success" [ngbTooltip]="statusTooltip"></i-bs>
+                  }
+                  @case ('FAILED') {
+                    <i-bs name="exclamation-triangle" title="FAILED" class="text-danger" [ngbTooltip]="statusTooltip"></i-bs>
+                  }
+                  @default {
+                    <i-bs name="slash-circle" title="{{ mail.status }}" class="text-muted" [ngbTooltip]="statusTooltip"></i-bs>
+                  }
+                }
+              </td>
+              <td>
+                <ng-template #errorPopover>
+                  <pre class="small">
+                    {{ mail.error }}
+                  </pre>
+                </ng-template>
+                @if (mail.error) {
+                  <span class="text-danger" triggers="mouseenter:mouseleave" [ngbPopover]="errorPopover">{{ mail.error | slice:0:20 }}</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="btn-toolbar">
+      <button type="button" class="btn btn-outline-secondary me-2" (click)="clearSelection()" [disabled]="selectedMailIds.size === 0" i18n>Clear</button>
+      <pngx-confirm-button
+        label="Delete selected"
+        i18n-label
+        title="Delete selected"
+        i18n-title
+        buttonClasses="btn-outline-danger"
+        iconName="trash"
+        [disabled]="selectedMailIds.size === 0"
+        (confirm)="deleteSelected()">
+      </pngx-confirm-button>
+      <div class="ms-auto">
+        <ngb-pagination
+          [collectionSize]="processedMails.length"
+          [(page)]="page"
+          [pageSize]="50"
+          [maxSize]="5"
+          (pageChange)="loadProcessedMails()">
+        </ngb-pagination>
+      </div>
+    </div>
+  }
+</div>

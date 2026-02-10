@@ -99,36 +99,36 @@ def generate_unique_filename(doc, *, archive_filename=False) -> Path:
             return new_filename
 
 
+def format_filename(document: Document, template_str: str) -> str | None:
+    rendered_filename = validate_filepath_template_and_render(
+        template_str,
+        document,
+    )
+    if rendered_filename is None:
+        return None
+
+    # Apply this setting.  It could become a filter in the future (or users could use |default)
+    if settings.FILENAME_FORMAT_REMOVE_NONE:
+        rendered_filename = rendered_filename.replace("/-none-/", "/")
+        rendered_filename = rendered_filename.replace(" -none-", "")
+        rendered_filename = rendered_filename.replace("-none-", "")
+        rendered_filename = rendered_filename.strip(os.sep)
+
+    rendered_filename = rendered_filename.replace(
+        "-none-",
+        "none",
+    )  # backward compatibility
+
+    return rendered_filename
+
+
 def generate_filename(
     doc: Document,
     *,
     counter=0,
-    append_gpg=True,
     archive_filename=False,
 ) -> Path:
     base_path: Path | None = None
-
-    def format_filename(document: Document, template_str: str) -> str | None:
-        rendered_filename = validate_filepath_template_and_render(
-            template_str,
-            document,
-        )
-        if rendered_filename is None:
-            return None
-
-        # Apply this setting.  It could become a filter in the future (or users could use |default)
-        if settings.FILENAME_FORMAT_REMOVE_NONE:
-            rendered_filename = rendered_filename.replace("/-none-/", "/")
-            rendered_filename = rendered_filename.replace(" -none-", "")
-            rendered_filename = rendered_filename.replace("-none-", "")
-            rendered_filename = rendered_filename.strip(os.sep)
-
-        rendered_filename = rendered_filename.replace(
-            "-none-",
-            "none",
-        )  # backward compatibility
-
-        return rendered_filename
 
     # Determine the source of the format string
     if doc.storage_path is not None:
@@ -168,9 +168,5 @@ def generate_filename(
         # No template, use document ID
         final_filename = f"{doc.pk:07}{counter_str}{filetype_str}"
         full_path = Path(final_filename)
-
-    # Add GPG extension if needed
-    if append_gpg and doc.storage_type == doc.STORAGE_TYPE_GPG:
-        full_path = full_path.with_suffix(full_path.suffix + ".gpg")
 
     return full_path

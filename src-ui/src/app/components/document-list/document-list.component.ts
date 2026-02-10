@@ -21,7 +21,7 @@ import {
   NgbPaginationModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
+import { TourNgBootstrap } from 'ngx-ui-tour-ng-bootstrap'
 import { filter, first, map, Subject, switchMap, takeUntil } from 'rxjs'
 import {
   DEFAULT_DISPLAY_FIELDS,
@@ -56,6 +56,7 @@ import {
   filterRulesDiffer,
   isFullTextFilterRule,
 } from 'src/app/utils/filter-rules'
+import { ClearableBadgeComponent } from '../common/clearable-badge/clearable-badge.component'
 import { CustomFieldDisplayComponent } from '../common/custom-field-display/custom-field-display.component'
 import { PageHeaderComponent } from '../common/page-header/page-header.component'
 import { PreviewPopupComponent } from '../common/preview-popup/preview-popup.component'
@@ -72,6 +73,7 @@ import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-vi
   templateUrl: './document-list.component.html',
   styleUrls: ['./document-list.component.scss'],
   imports: [
+    ClearableBadgeComponent,
     CustomFieldDisplayComponent,
     PageHeaderComponent,
     BulkEditorComponent,
@@ -97,7 +99,7 @@ import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-vi
     NgbPaginationModule,
     NgClass,
     RouterModule,
-    TourNgBootstrapModule,
+    TourNgBootstrap,
   ],
 })
 export class DocumentListComponent

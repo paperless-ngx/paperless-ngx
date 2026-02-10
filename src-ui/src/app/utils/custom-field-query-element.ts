@@ -1,4 +1,4 @@
-import { Subject, debounceTime, distinctUntilChanged } from 'rxjs'
+import { Subject, distinctUntilChanged } from 'rxjs'
 import { v4 as uuidv4 } from 'uuid'
 import {
   CUSTOM_FIELD_QUERY_VALUE_TYPES_BY_OPERATOR,
@@ -110,7 +110,22 @@ export class CustomFieldQueryAtom extends CustomFieldQueryElement {
 
   protected override connectValueModelChanged(): void {
     this.valueModelChanged
-      .pipe(debounceTime(1000), distinctUntilChanged())
+      .pipe(
+        distinctUntilChanged((previous, current) => {
+          if (Array.isArray(previous) && Array.isArray(current)) {
+            if (previous.length !== current.length) {
+              return false
+            }
+            for (let i = 0; i < previous.length; i++) {
+              if (previous[i] !== current[i]) {
+                return false
+              }
+            }
+            return true
+          }
+          return previous === current
+        })
+      )
       .subscribe(() => {
         this.changed.next(this)
       })

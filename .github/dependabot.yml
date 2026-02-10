@@ -41,30 +41,56 @@ updates:
       - "backend"
       - "dependencies"
     groups:
+      # Development & CI/CD Tooling
       development:
         patterns:
           - "*pytest*"
           - "ruff"
-          - "mkdocs-material"
-          - "pre-commit*"
-      django:
+          - "zensical"
+          - "prek*"
+      # Django & DRF Ecosystem
+      django-ecosystem:
         patterns:
           - "*django*"
           - "drf-*"
-      major-versions:
+          - "djangorestframework"
+          - "whitenoise"
+          - "bleach"
+          - "jinja2"
+      # Async, Task Queuing & Caching
+      async-tasks:
+        patterns:
+          - "celery*"
+          - "channels*"
+          - "flower"
+          - "redis"
+      # Document, PDF, and OCR Processing
+      document-processing:
+        patterns:
+          - "ocrmypdf"
+          - "pdf2image"
+          - "pyzbar"
+          - "zxing-cpp"
+          - "tika-client"
+          - "gotenberg-client"
+          - "python-magic"
+          - "python-gnupg"
+      # Data, NLP, and Search
+      data-nlp-search:
+        patterns:
+          - "nltk"
+          - "scikit-learn"
+          - "langdetect"
+          - "rapidfuzz"
+          - "whoosh-reloaded"
+      # Utilities (Patch Updates)
+      utilities-patch:
         update-types:
-          - "major"
-      small-changes:
+          - "patch"
+      # Utilities (Minor Updates)
+      utilities-minor:
         update-types:
           - "minor"
-          - "patch"
-        exclude-patterns:
-          - "*django*"
-          - "drf-*"
-      pre-built:
-        patterns:
-          - psycopg*
-          - zxing-cpp
   # Enable updates for GitHub Actions
   - package-ecosystem: "github-actions"
     target-branch: "dev"

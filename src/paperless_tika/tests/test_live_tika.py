@@ -12,6 +12,9 @@ from paperless_tika.parsers import TikaDocumentParser
     reason="No Gotenberg/Tika servers to test with",
 )
 @pytest.mark.django_db()
+@pytest.mark.live
+@pytest.mark.gotenberg
+@pytest.mark.tika
 class TestTikaParserAgainstServer:
     """
     This test case tests the Tika parsing against a live tika server,
@@ -23,7 +26,7 @@ class TestTikaParserAgainstServer:
         self,
         tika_parser: TikaDocumentParser,
         sample_odt_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - An input ODT format document
@@ -52,7 +55,7 @@ class TestTikaParserAgainstServer:
         self,
         tika_parser: TikaDocumentParser,
         sample_docx_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - An input DOCX format document
@@ -84,7 +87,7 @@ class TestTikaParserAgainstServer:
         self,
         tika_parser: TikaDocumentParser,
         sample_doc_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - An input DOC format document
@@ -99,6 +102,7 @@ class TestTikaParserAgainstServer:
             [sample_doc_file, "application/msword"],
         )
 
+        assert tika_parser.text is not None
         assert (
             "This is a test document, saved in the older .doc format"
             in tika_parser.text
@@ -111,7 +115,7 @@ class TestTikaParserAgainstServer:
         self,
         tika_parser: TikaDocumentParser,
         sample_broken_odt: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - An input ODT format document

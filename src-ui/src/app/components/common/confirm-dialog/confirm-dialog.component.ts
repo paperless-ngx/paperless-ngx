@@ -2,14 +2,13 @@ import { DecimalPipe } from '@angular/common'
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject } from 'rxjs'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
   selector: 'pngx-confirm-dialog',
   templateUrl: './confirm-dialog.component.html',
   styleUrls: ['./confirm-dialog.component.scss'],
-  imports: [DecimalPipe, SafeHtmlPipe],
+  imports: [DecimalPipe],
 })
 export class ConfirmDialogComponent extends LoadingComponentWithPermissions {
   activeModal = inject(NgbActiveModal)

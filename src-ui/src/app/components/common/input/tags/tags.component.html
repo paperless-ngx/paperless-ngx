@@ -1,8 +1,10 @@
 <div class="mb-3 paperless-input-select paperless-input-tags" [class.disabled]="disabled" [class.pb-3]="getSuggestions().length > 0">
   <div class="row">
-    <div class="d-flex align-items-center" [class.col-md-3]="horizontal">
-      <label class="form-label" [class.mb-md-0]="horizontal" for="tags">{{title}}</label>
-    </div>
+    @if (title) {
+      <div class="d-flex align-items-center" [class.col-md-3]="horizontal">
+        <label class="form-label" [class.mb-md-0]="horizontal" for="tags">{{title}}</label>
+      </div>
+    }
     <div class="position-relative" [class.col-md-9]="horizontal">
       <div class="input-group flex-nowrap">
         <ng-select #tagSelect name="tags" [items]="tags" bindLabel="name" bindValue="id" [(ngModel)]="value"
@@ -26,7 +28,7 @@
             </button>
           </ng-template>
           <ng-template ng-option-tmp let-item="item" let-index="index" let-search="searchTerm">
-            <div class="tag-option-row d-flex align-items-center">
+            <div class="tag-option-row d-flex align-items-center" [class.w-auto]="!getTag(item.id)?.parent">
               @if (item.id && tags) {
                 @if (getTag(item.id)?.parent) {
                   <i-bs name="list-nested" class="me-1"></i-bs>

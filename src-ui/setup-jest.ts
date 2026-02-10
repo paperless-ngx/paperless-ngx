@@ -28,6 +28,7 @@ import localeFa from '@angular/common/locales/fa'
 import localeFi from '@angular/common/locales/fi'
 import localeFr from '@angular/common/locales/fr'
 import localeHu from '@angular/common/locales/hu'
+import localeId from '@angular/common/locales/id'
 import localeIt from '@angular/common/locales/it'
 import localeJa from '@angular/common/locales/ja'
 import localeKo from '@angular/common/locales/ko'
@@ -63,6 +64,7 @@ registerLocaleData(localeFa)
 registerLocaleData(localeFi)
 registerLocaleData(localeFr)
 registerLocaleData(localeHu)
+registerLocaleData(localeId)
 registerLocaleData(localeIt)
 registerLocaleData(localeJa)
 registerLocaleData(localeKo)
@@ -98,10 +100,10 @@ const mock = () => {
   }
 }
 
-Object.defineProperty(window, 'open', { value: jest.fn() })
-Object.defineProperty(window, 'localStorage', { value: mock() })
-Object.defineProperty(window, 'sessionStorage', { value: mock() })
-Object.defineProperty(window, 'getComputedStyle', {
+Object.defineProperty(globalThis, 'open', { value: jest.fn() })
+Object.defineProperty(globalThis, 'localStorage', { value: mock() })
+Object.defineProperty(globalThis, 'sessionStorage', { value: mock() })
+Object.defineProperty(globalThis, 'getComputedStyle', {
   value: () => ['-webkit-appearance'],
 })
 Object.defineProperty(navigator, 'clipboard', {
@@ -113,13 +115,33 @@ Object.defineProperty(navigator, 'canShare', { value: () => true })
 if (!navigator.share) {
   Object.defineProperty(navigator, 'share', { value: jest.fn() })
 }
-if (!URL.createObjectURL) {
-  Object.defineProperty(window.URL, 'createObjectURL', { value: jest.fn() })
+if (!globalThis.URL.createObjectURL) {
+  Object.defineProperty(globalThis.URL, 'createObjectURL', { value: jest.fn() })
 }
-if (!URL.revokeObjectURL) {
-  Object.defineProperty(window.URL, 'revokeObjectURL', { value: jest.fn() })
+if (!globalThis.URL.revokeObjectURL) {
+  Object.defineProperty(globalThis.URL, 'revokeObjectURL', { value: jest.fn() })
 }
-Object.defineProperty(window, 'ResizeObserver', { value: mock() })
+class MockResizeObserver {
+  private readonly callback: ResizeObserverCallback
+
+  constructor(callback: ResizeObserverCallback) {
+    this.callback = callback
+  }
+
+  observe = jest.fn()
+  unobserve = jest.fn()
+  disconnect = jest.fn()
+
+  trigger = (entries: ResizeObserverEntry[] = []) => {
+    this.callback(entries, this)
+  }
+}
+
+Object.defineProperty(globalThis, 'ResizeObserver', {
+  writable: true,
+  configurable: true,
+  value: MockResizeObserver,
+})
 
 if (typeof IntersectionObserver === 'undefined') {
   class MockIntersectionObserver {
@@ -134,7 +156,7 @@ if (typeof IntersectionObserver === 'undefined') {
     takeRecords = jest.fn()
   }
 
-  Object.defineProperty(window, 'IntersectionObserver', {
+  Object.defineProperty(globalThis, 'IntersectionObserver', {
     writable: true,
     configurable: true,
     value: MockIntersectionObserver,
@@ -144,5 +166,19 @@ if (typeof IntersectionObserver === 'undefined') {
 HTMLCanvasElement.prototype.getContext = <
   typeof HTMLCanvasElement.prototype.getContext
 >jest.fn()
+
+if (!HTMLElement.prototype.scrollTo) {
+  HTMLElement.prototype.scrollTo = jest.fn()
+}
+
+jest.mock('uuid', () => ({
+  v4: jest.fn(() =>
+    'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (char: string) => {
+      const random = Math.floor(Math.random() * 16)
+      const value = char === 'x' ? random : (random & 0x3) | 0x8
+      return value.toString(16)
+    })
+  ),
+}))
 
 jest.mock('pdfjs-dist')

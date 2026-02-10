@@ -1,0 +1,189 @@
+name: Frontend Tests
+on:
+  push:
+    branches-ignore:
+      - 'translations**'
+    paths:
+      - 'src-ui/**'
+      - '.github/workflows/ci-frontend.yml'
+  pull_request:
+    branches-ignore:
+      - 'translations**'
+    paths:
+      - 'src-ui/**'
+      - '.github/workflows/ci-frontend.yml'
+  workflow_dispatch:
+concurrency:
+  group: frontend-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  install-dependencies:
+    name: Install Dependencies
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: Use Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: 'pnpm'
+          cache-dependency-path: 'src-ui/pnpm-lock.yaml'
+      - name: Cache frontend dependencies
+        id: cache-frontend-deps
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.pnpm-store
+            ~/.cache
+          key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
+      - name: Install dependencies
+        run: cd src-ui && pnpm install
+  lint:
+    name: Lint
+    needs: install-dependencies
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: Use Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: 'pnpm'
+          cache-dependency-path: 'src-ui/pnpm-lock.yaml'
+      - name: Cache frontend dependencies
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.pnpm-store
+            ~/.cache
+          key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
+      - name: Re-link Angular CLI
+        run: cd src-ui && pnpm link @angular/cli
+      - name: Run lint
+        run: cd src-ui && pnpm run lint
+  unit-tests:
+    name: "Unit Tests (${{ matrix.shard-index }}/${{ matrix.shard-count }})"
+    needs: install-dependencies
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [24.x]
+        shard-index: [1, 2, 3, 4]
+        shard-count: [4]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: Use Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: 'pnpm'
+          cache-dependency-path: 'src-ui/pnpm-lock.yaml'
+      - name: Cache frontend dependencies
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.pnpm-store
+            ~/.cache
+          key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
+      - name: Re-link Angular CLI
+        run: cd src-ui && pnpm link @angular/cli
+      - name: Run Jest unit tests
+        run: cd src-ui && pnpm run test --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
+      - name: Upload test results to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          flags: frontend-node-${{ matrix.node-version }}
+          directory: src-ui/
+          report_type: test_results
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          flags: frontend-node-${{ matrix.node-version }}
+          directory: src-ui/coverage/
+  e2e-tests:
+    name: "E2E Tests (${{ matrix.shard-index }}/${{ matrix.shard-count }})"
+    needs: install-dependencies
+    runs-on: ubuntu-24.04
+    container: mcr.microsoft.com/playwright:v1.58.2-noble
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [24.x]
+        shard-index: [1, 2]
+        shard-count: [2]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: Use Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: 'pnpm'
+          cache-dependency-path: 'src-ui/pnpm-lock.yaml'
+      - name: Cache frontend dependencies
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.pnpm-store
+            ~/.cache
+          key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
+      - name: Re-link Angular CLI
+        run: cd src-ui && pnpm link @angular/cli
+      - name: Install dependencies
+        run: cd src-ui && pnpm install --no-frozen-lockfile
+      - name: Run Playwright E2E tests
+        run: cd src-ui && pnpm exec playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
+  bundle-analysis:
+    name: Bundle Analysis
+    needs: [unit-tests, e2e-tests]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: Use Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: 'pnpm'
+          cache-dependency-path: 'src-ui/pnpm-lock.yaml'
+      - name: Cache frontend dependencies
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.pnpm-store
+            ~/.cache
+          key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
+      - name: Re-link Angular CLI
+        run: cd src-ui && pnpm link @angular/cli
+      - name: Build and analyze
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: cd src-ui && pnpm run build --configuration=production

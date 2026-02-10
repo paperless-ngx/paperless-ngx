@@ -1,0 +1,78 @@
+name: Documentation
+on:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - 'docs/**'
+      - 'zensical.toml'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/ci-docs.yml'
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'zensical.toml'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/ci-docs.yml'
+  workflow_dispatch:
+concurrency:
+  group: docs-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+env:
+  DEFAULT_UV_VERSION: "0.9.x"
+  DEFAULT_PYTHON_VERSION: "3.11"
+jobs:
+  build:
+    name: Build Documentation
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/configure-pages@v5
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
+          enable-cache: true
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+      - name: Install Python dependencies
+        run: |
+          uv sync --python ${{ steps.setup-python.outputs.python-version }} --dev --frozen
+      - name: Build documentation
+        run: |
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --dev \
+            --frozen \
+            zensical build --clean
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+          name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
+  deploy:
+    name: Deploy Documentation
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy GitHub Pages
+        uses: actions/deploy-pages@v4
+        id: deployment
+        with:
+          artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}

@@ -18,6 +18,7 @@ from rest_framework.routers import DefaultRouter
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
+from documents.views import ChatStreamingView
 from documents.views import CorrespondentViewSet
 from documents.views import CustomFieldViewSet
 from documents.views import DocumentTypeViewSet
@@ -30,6 +31,7 @@ from documents.views import SavedViewViewSet
 from documents.views import SearchAutoCompleteView
 from documents.views import SelectionDataView
 from documents.views import SharedLinkView
+from documents.views import ShareLinkBundleViewSet
 from documents.views import ShareLinkViewSet
 from documents.views import StatisticsView
 from documents.views import StoragePathViewSet
@@ -57,6 +59,7 @@ from paperless.views import UserViewSet
 from paperless_mail.views import MailAccountViewSet
 from paperless_mail.views import MailRuleViewSet
 from paperless_mail.views import OauthCallbackView
+from paperless_mail.views import ProcessedMailViewSet
 
 api_router = DefaultRouter()
 api_router.register(r"correspondents", CorrespondentViewSet)
@@ -71,12 +74,14 @@ api_router.register(r"users", UserViewSet, basename="users")
 api_router.register(r"groups", GroupViewSet, basename="groups")
 api_router.register(r"mail_accounts", MailAccountViewSet)
 api_router.register(r"mail_rules", MailRuleViewSet)
+api_router.register(r"share_link_bundles", ShareLinkBundleViewSet)
 api_router.register(r"share_links", ShareLinkViewSet)
 api_router.register(r"workflow_triggers", WorkflowTriggerViewSet)
 api_router.register(r"workflow_actions", WorkflowActionViewSet)
 api_router.register(r"workflows", WorkflowViewSet)
 api_router.register(r"custom_fields", CustomFieldViewSet)
 api_router.register(r"config", ApplicationConfigurationViewSet)
+api_router.register(r"processed_mail", ProcessedMailViewSet)
 
 
 urlpatterns = [
@@ -136,6 +141,11 @@ urlpatterns = [
                                 "^selection_data/",
                                 SelectionDataView.as_view(),
                                 name="selection_data",
+                            ),
+                            re_path(
+                                "^chat/",
+                                ChatStreamingView.as_view(),
+                                name="chat_streaming_view",
                             ),
                         ],
                     ),
@@ -220,6 +230,7 @@ urlpatterns = [
                         ],
                     ),
                 ),
+                re_path("^auth/headless/", include("allauth.headless.urls")),
                 re_path(
                     "^$",  # Redirect to the API swagger view
                     RedirectView.as_view(url="schema/view/"),

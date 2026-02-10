@@ -23,7 +23,7 @@ from documents.tests.utils import DirectoriesMixin
 
 
 class TestApiAuth(DirectoriesMixin, APITestCase):
-    def test_auth_required(self):
+    def test_auth_required(self) -> None:
         d = Document.objects.create(title="Test")
 
         self.assertEqual(
@@ -87,19 +87,19 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
             status.HTTP_401_UNAUTHORIZED,
         )
 
-    def test_api_version_no_auth(self):
+    def test_api_version_no_auth(self) -> None:
         response = self.client.get("/api/documents/")
         self.assertNotIn("X-Api-Version", response)
         self.assertNotIn("X-Version", response)
 
-    def test_api_version_with_auth(self):
+    def test_api_version_with_auth(self) -> None:
         user = User.objects.create_superuser(username="test")
         self.client.force_authenticate(user)
         response = self.client.get("/api/documents/")
         self.assertIn("X-Api-Version", response)
         self.assertIn("X-Version", response)
 
-    def test_api_insufficient_permissions(self):
+    def test_api_insufficient_permissions(self) -> None:
         user = User.objects.create_user(username="test")
         self.client.force_authenticate(user)
 
@@ -132,7 +132,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
             status.HTTP_403_FORBIDDEN,
         )
 
-    def test_api_sufficient_permissions(self):
+    def test_api_sufficient_permissions(self) -> None:
         user = User.objects.create_user(username="test")
         user.user_permissions.add(*Permission.objects.all())
         user.is_staff = True
@@ -161,7 +161,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
             status.HTTP_200_OK,
         )
 
-    def test_api_get_object_permissions(self):
+    def test_api_get_object_permissions(self) -> None:
         user1 = User.objects.create_user(username="test1")
         user2 = User.objects.create_user(username="test2")
         user1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
@@ -192,7 +192,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
             status.HTTP_404_NOT_FOUND,
         )
 
-    def test_api_default_owner(self):
+    def test_api_default_owner(self) -> None:
         """
         GIVEN:
             - API request to create an object (Tag)
@@ -221,7 +221,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         tag1 = Tag.objects.filter(name="test1").first()
         self.assertEqual(tag1.owner, user1)
 
-    def test_api_set_no_owner(self):
+    def test_api_set_no_owner(self) -> None:
         """
         GIVEN:
             - API request to create an object (Tag)
@@ -251,7 +251,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         tag1 = Tag.objects.filter(name="test1").first()
         self.assertEqual(tag1.owner, None)
 
-    def test_api_set_owner_w_permissions(self):
+    def test_api_set_owner_w_permissions(self) -> None:
         """
         GIVEN:
             - API request to create an object (Tag) that supplies set_permissions object
@@ -299,7 +299,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.assertEqual(checker.has_perm("view_tag", tag1), True)
         self.assertIn("view_tag", get_perms(group1, tag1))
 
-    def test_api_set_other_owner_w_permissions(self):
+    def test_api_set_other_owner_w_permissions(self) -> None:
         """
         GIVEN:
             - API request to create an object (Tag)
@@ -344,7 +344,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.assertEqual(tag1.owner, user2)
         self.assertIn("view_tag", get_perms(group1, tag1))
 
-    def test_api_set_doc_permissions(self):
+    def test_api_set_doc_permissions(self) -> None:
         """
         GIVEN:
             - API request to update doc permissions and owner
@@ -395,7 +395,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.assertTrue(checker.has_perm("view_document", doc))
         self.assertIn("view_document", get_perms(group1, doc))
 
-    def test_patch_doesnt_remove_permissions(self):
+    def test_patch_doesnt_remove_permissions(self) -> None:
         """
         GIVEN:
             - existing document with permissions set
@@ -441,7 +441,60 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.assertTrue(checker.has_perm("change_document", doc))
         self.assertIn("change_document", get_perms(group1, doc))
 
-    def test_dynamic_permissions_fields(self):
+    def test_document_permissions_change_requires_owner(self) -> None:
+        owner = User.objects.create_user(username="owner")
+        editor = User.objects.create_user(username="editor")
+        editor.user_permissions.add(
+            *Permission.objects.all(),
+        )
+
+        doc = Document.objects.create(
+            title="Ownered doc",
+            content="sensitive",
+            checksum="abc123",
+            mime_type="application/pdf",
+            owner=owner,
+        )
+
+        assign_perm("view_document", editor, doc)
+        assign_perm("change_document", editor, doc)
+
+        self.client.force_authenticate(editor)
+        response = self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            json.dumps(
+                {
+                    "set_permissions": {
+                        "view": {
+                            "users": [editor.id],
+                            "groups": [],
+                        },
+                        "change": {
+                            "users": None,
+                            "groups": None,
+                        },
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        self.client.force_authenticate(editor)
+        response = self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            json.dumps(
+                {
+                    "owner": editor.id,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_dynamic_permissions_fields(self) -> None:
         user1 = User.objects.create_user(username="user1")
         user1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
         user2 = User.objects.create_user(username="user2")
@@ -512,7 +565,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.assertNotIn("is_shared_by_requester", results[0])
 
     @mock.patch("allauth.mfa.adapter.DefaultMFAAdapter.is_mfa_enabled")
-    def test_basic_auth_mfa_enabled(self, mock_is_mfa_enabled):
+    def test_basic_auth_mfa_enabled(self, mock_is_mfa_enabled) -> None:
         """
         GIVEN:
             - User with MFA enabled
@@ -536,7 +589,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.assertEqual(response.data["detail"], "MFA required")
 
     @mock.patch("allauth.mfa.totp.internal.auth.TOTP.validate_code")
-    def test_get_token_mfa_enabled(self, mock_validate_code):
+    def test_get_token_mfa_enabled(self, mock_validate_code) -> None:
         """
         GIVEN:
             - User with MFA enabled
@@ -604,13 +657,13 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
 class TestApiUser(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/users/"
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.user = User.objects.create_superuser(username="temp_admin")
         self.client.force_authenticate(user=self.user)
 
-    def test_get_users(self):
+    def test_get_users(self) -> None:
         """
         GIVEN:
             - Configured users
@@ -638,7 +691,7 @@ class TestApiUser(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_user2["first_name"], user1.first_name)
         self.assertEqual(returned_user2["last_name"], user1.last_name)
 
-    def test_create_user(self):
+    def test_create_user(self) -> None:
         """
         WHEN:
             - API request is made to add a user account
@@ -648,7 +701,7 @@ class TestApiUser(DirectoriesMixin, APITestCase):
 
         user1 = {
             "username": "testuser",
-            "password": "test",
+            "password": "areallysupersecretpassword235",
             "first_name": "Test",
             "last_name": "User",
         }
@@ -666,7 +719,7 @@ class TestApiUser(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_user1.first_name, user1["first_name"])
         self.assertEqual(returned_user1.last_name, user1["last_name"])
 
-    def test_delete_user(self):
+    def test_delete_user(self) -> None:
         """
         GIVEN:
             - Existing user account
@@ -693,7 +746,7 @@ class TestApiUser(DirectoriesMixin, APITestCase):
 
         self.assertEqual(User.objects.count(), nUsers - 1)
 
-    def test_update_user(self):
+    def test_update_user(self) -> None:
         """
         GIVEN:
             - Existing user accounts
@@ -730,7 +783,7 @@ class TestApiUser(DirectoriesMixin, APITestCase):
             f"{self.ENDPOINT}{user1.pk}/",
             data={
                 "first_name": "Updated Name 2",
-                "password": "123xyz",
+                "password": "newreallystrongpassword456",
             },
         )
 
@@ -740,7 +793,7 @@ class TestApiUser(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_user2.first_name, "Updated Name 2")
         self.assertNotEqual(returned_user2.password, initial_password)
 
-    def test_deactivate_totp(self):
+    def test_deactivate_totp(self) -> None:
         """
         GIVEN:
             - Existing user account with TOTP enabled
@@ -793,7 +846,7 @@ class TestApiUser(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_only_superusers_can_create_or_alter_superuser_status(self):
+    def test_only_superusers_can_create_or_alter_superuser_status(self) -> None:
         """
         GIVEN:
             - Existing user account
@@ -871,13 +924,13 @@ class TestApiUser(DirectoriesMixin, APITestCase):
 class TestApiGroup(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/groups/"
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.user = User.objects.create_superuser(username="temp_admin")
         self.client.force_authenticate(user=self.user)
 
-    def test_get_groups(self):
+    def test_get_groups(self) -> None:
         """
         GIVEN:
             - Configured groups
@@ -899,7 +952,7 @@ class TestApiGroup(DirectoriesMixin, APITestCase):
 
         self.assertEqual(returned_group1["name"], group1.name)
 
-    def test_create_group(self):
+    def test_create_group(self) -> None:
         """
         WHEN:
             - API request is made to add a group
@@ -922,7 +975,7 @@ class TestApiGroup(DirectoriesMixin, APITestCase):
 
         self.assertEqual(returned_group1.name, group1["name"])
 
-    def test_delete_group(self):
+    def test_delete_group(self) -> None:
         """
         GIVEN:
             - Existing group
@@ -944,7 +997,7 @@ class TestApiGroup(DirectoriesMixin, APITestCase):
 
         self.assertEqual(len(Group.objects.all()), 0)
 
-    def test_update_group(self):
+    def test_update_group(self) -> None:
         """
         GIVEN:
             - Existing groups
@@ -972,7 +1025,7 @@ class TestApiGroup(DirectoriesMixin, APITestCase):
 
 
 class TestBulkEditObjectPermissions(APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.temp_admin = User.objects.create_superuser(username="temp_admin")
@@ -987,7 +1040,7 @@ class TestBulkEditObjectPermissions(APITestCase):
         self.user2 = User.objects.create(username="user2")
         self.user3 = User.objects.create(username="user3")
 
-    def test_bulk_object_set_permissions(self):
+    def test_bulk_object_set_permissions(self) -> None:
         """
         GIVEN:
             - Existing objects
@@ -1103,7 +1156,7 @@ class TestBulkEditObjectPermissions(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(StoragePath.objects.get(pk=self.sp1.id).owner, self.user3)
 
-    def test_bulk_object_set_permissions_merge(self):
+    def test_bulk_object_set_permissions_merge(self) -> None:
         """
         GIVEN:
             - Existing objects
@@ -1178,7 +1231,7 @@ class TestBulkEditObjectPermissions(APITestCase):
         # user3 should be removed
         self.assertNotIn(self.user3, get_users_with_perms(self.t1))
 
-    def test_bulk_edit_object_permissions_insufficient_perms(self):
+    def test_bulk_edit_object_permissions_insufficient_perms(self) -> None:
         """
         GIVEN:
             - Objects owned by user other than logged in user
@@ -1207,7 +1260,7 @@ class TestBulkEditObjectPermissions(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(response.content, b"Insufficient permissions")
 
-    def test_bulk_edit_object_permissions_validation(self):
+    def test_bulk_edit_object_permissions_validation(self) -> None:
         """
         GIVEN:
             - Existing objects
@@ -1281,12 +1334,12 @@ class TestBulkEditObjectPermissions(APITestCase):
 
 
 class TestFullPermissionsFlag(APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.admin = User.objects.create_superuser(username="admin")
 
-    def test_full_perms_flag(self):
+    def test_full_perms_flag(self) -> None:
         """
         GIVEN:
             - API request to list documents

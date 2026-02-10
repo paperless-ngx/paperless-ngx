@@ -11,19 +11,21 @@ jobs:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
+        env:
+          GH_REF: ${{ github.ref }} # sonar rule:githubactions:S7630 - avoid injection
         with:
           token: ${{ secrets.PNGX_BOT_PAT }}
-          ref: ${{ github.head_ref }}
+          ref: ${{ env.GH_REF }}
       - name: Set up Python
         id: setup-python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
       - name: Install system dependencies
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends gettext
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
       - name: Install backend python dependencies
@@ -37,15 +39,15 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 10
-      - name: Use Node.js 20
-        uses: actions/setup-node@v4
+      - name: Use Node.js 24
+        uses: actions/setup-node@v6
         with:
-          node-version: 20.x
+          node-version: 24.x
           cache: 'pnpm'
           cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       - name: Cache frontend dependencies
         id: cache-frontend-deps
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.pnpm-store
@@ -61,7 +63,7 @@ jobs:
           cd src-ui
           pnpm run ng extract-i18n
       - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v6
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           file_pattern: 'src-ui/messages.xlf src/locale/en_US/LC_MESSAGES/django.po'
           commit_message: "Auto translate strings"

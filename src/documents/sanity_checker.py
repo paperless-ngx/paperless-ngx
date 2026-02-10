@@ -16,23 +16,23 @@ from paperless.config import GeneralConfig
 
 
 class SanityCheckMessages:
-    def __init__(self):
+    def __init__(self) -> None:
         self._messages: dict[int, list[dict]] = defaultdict(list)
         self.has_error = False
         self.has_warning = False
 
-    def error(self, doc_pk, message):
+    def error(self, doc_pk, message) -> None:
         self._messages[doc_pk].append({"level": logging.ERROR, "message": message})
         self.has_error = True
 
-    def warning(self, doc_pk, message):
+    def warning(self, doc_pk, message) -> None:
         self._messages[doc_pk].append({"level": logging.WARNING, "message": message})
         self.has_warning = True
 
-    def info(self, doc_pk, message):
+    def info(self, doc_pk, message) -> None:
         self._messages[doc_pk].append({"level": logging.INFO, "message": message})
 
-    def log_messages(self):
+    def log_messages(self) -> None:
         logger = logging.getLogger("paperless.sanity_checker")
 
         if len(self._messages) == 0:
@@ -76,7 +76,9 @@ def check_sanity(*, progress=False, scheduled=True) -> SanityCheckMessages:
     messages = SanityCheckMessages()
 
     present_files = {
-        x.resolve() for x in Path(settings.MEDIA_ROOT).glob("**/*") if not x.is_dir()
+        x.resolve()
+        for x in Path(settings.MEDIA_ROOT).glob("**/*")
+        if not x.is_dir() and x.name not in settings.IGNORABLE_FILES
     }
 
     lockfile = Path(settings.MEDIA_LOCK).resolve()

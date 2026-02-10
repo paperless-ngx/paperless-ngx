@@ -1,3 +1,5 @@
+import { PdfEditorEditMode } from '../components/common/pdf-editor/pdf-editor-edit-mode'
+import { PdfZoomScale } from '../components/common/pdf-viewer/pdf-viewer.types'
 import { User } from './user'
 
 export interface UiSettings {
@@ -61,6 +63,7 @@ export const SETTINGS_KEYS = {
   SIDEBAR_VIEWS_SHOW_COUNT:
     'general-settings:saved-views:sidebar-views-show-count',
   TOUR_COMPLETE: 'general-settings:tour-complete',
+  OBJECT_LIST_SIZES: 'general-settings:object-list-sizes',
   DEFAULT_PERMS_OWNER: 'general-settings:permissions:default-owner',
   DEFAULT_PERMS_VIEW_USERS: 'general-settings:permissions:default-view-users',
   DEFAULT_PERMS_VIEW_GROUPS: 'general-settings:permissions:default-view-groups',
@@ -70,12 +73,17 @@ export const SETTINGS_KEYS = {
     'general-settings:document-editing:remove-inbox-tags',
   DOCUMENT_EDITING_OVERLAY_THUMBNAIL:
     'general-settings:document-editing:overlay-thumbnail',
+  DOCUMENT_DETAILS_HIDDEN_FIELDS:
+    'general-settings:document-details:hidden-fields',
   SEARCH_DB_ONLY: 'general-settings:search:db-only',
   SEARCH_FULL_TYPE: 'general-settings:search:more-link',
+  PDF_EDITOR_DEFAULT_EDIT_MODE:
+    'general-settings:document-editing:default-edit-mode',
   EMPTY_TRASH_DELAY: 'trash_delay',
   GMAIL_OAUTH_URL: 'gmail_oauth_url',
   OUTLOOK_OAUTH_URL: 'outlook_oauth_url',
   EMAIL_ENABLED: 'email_enabled',
+  AI_ENABLED: 'ai_enabled',
 }
 
 export const SETTINGS: UiSetting[] = [
@@ -195,6 +203,16 @@ export const SETTINGS: UiSetting[] = [
     default: false,
   },
   {
+    key: SETTINGS_KEYS.OBJECT_LIST_SIZES,
+    type: 'object',
+    default: {
+      correspondents: 25,
+      document_types: 25,
+      tags: 25,
+      storage_paths: 25,
+    },
+  },
+  {
     key: SETTINGS_KEYS.DEFAULT_PERMS_OWNER,
     type: 'number',
     default: undefined,
@@ -255,6 +273,11 @@ export const SETTINGS: UiSetting[] = [
     default: true,
   },
   {
+    key: SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS,
+    type: 'array',
+    default: [],
+  },
+  {
     key: SETTINGS_KEYS.SEARCH_DB_ONLY,
     type: 'boolean',
     default: false,
@@ -287,6 +310,16 @@ export const SETTINGS: UiSetting[] = [
   {
     key: SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING,
     type: 'string',
-    default: 'page-width', // ZoomSetting from 'document-detail.component'
+    default: PdfZoomScale.PageWidth,
+  },
+  {
+    key: SETTINGS_KEYS.AI_ENABLED,
+    type: 'boolean',
+    default: false,
+  },
+  {
+    key: SETTINGS_KEYS.PDF_EDITOR_DEFAULT_EDIT_MODE,
+    type: 'string',
+    default: PdfEditorEditMode.Create,
   },
 ]

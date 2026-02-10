@@ -23,7 +23,7 @@ class TestFuzzyMatchCommand(TestCase):
         )
         return stdout.getvalue(), stderr.getvalue()
 
-    def test_invalid_ratio_lower_limit(self):
+    def test_invalid_ratio_lower_limit(self) -> None:
         """
         GIVEN:
             - Invalid ratio below lower limit
@@ -34,9 +34,9 @@ class TestFuzzyMatchCommand(TestCase):
         """
         with self.assertRaises(CommandError) as e:
             self.call_command("--ratio", "-1")
-            self.assertIn("The ratio must be between 0 and 100", str(e))
+        self.assertIn("The ratio must be between 0 and 100", str(e.exception))
 
-    def test_invalid_ratio_upper_limit(self):
+    def test_invalid_ratio_upper_limit(self) -> None:
         """
         GIVEN:s
             - Invalid ratio above upper
@@ -47,9 +47,9 @@ class TestFuzzyMatchCommand(TestCase):
         """
         with self.assertRaises(CommandError) as e:
             self.call_command("--ratio", "101")
-            self.assertIn("The ratio must be between 0 and 100", str(e))
+        self.assertIn("The ratio must be between 0 and 100", str(e.exception))
 
-    def test_invalid_process_count(self):
+    def test_invalid_process_count(self) -> None:
         """
         GIVEN:
             - Invalid process count less than 0 above upper
@@ -60,9 +60,9 @@ class TestFuzzyMatchCommand(TestCase):
         """
         with self.assertRaises(CommandError) as e:
             self.call_command("--processes", "0")
-            self.assertIn("There must be at least 1 process", str(e))
+        self.assertIn("There must be at least 1 process", str(e.exception))
 
-    def test_no_matches(self):
+    def test_no_matches(self) -> None:
         """
         GIVEN:
             - 2 documents exist
@@ -89,7 +89,7 @@ class TestFuzzyMatchCommand(TestCase):
         stdout, _ = self.call_command()
         self.assertIn("No matches found", stdout)
 
-    def test_with_matches(self):
+    def test_with_matches(self) -> None:
         """
         GIVEN:
             - 2 documents exist
@@ -118,7 +118,7 @@ class TestFuzzyMatchCommand(TestCase):
         stdout, _ = self.call_command("--processes", "1")
         self.assertRegex(stdout, self.MSG_REGEX)
 
-    def test_with_3_matches(self):
+    def test_with_3_matches(self) -> None:
         """
         GIVEN:
             - 3 documents exist
@@ -157,7 +157,7 @@ class TestFuzzyMatchCommand(TestCase):
         for line in lines:
             self.assertRegex(line, self.MSG_REGEX)
 
-    def test_document_deletion(self):
+    def test_document_deletion(self) -> None:
         """
         GIVEN:
             - 3 documents exist
@@ -206,3 +206,29 @@ class TestFuzzyMatchCommand(TestCase):
         self.assertEqual(Document.objects.count(), 2)
         self.assertIsNotNone(Document.objects.get(pk=1))
         self.assertIsNotNone(Document.objects.get(pk=2))
+
+    def test_empty_content(self) -> None:
+        """
+        GIVEN:
+            - 2 documents exist, content is empty (pw-protected)
+        WHEN:
+            - Command is called
+        THEN:
+            - No matches are found
+        """
+        Document.objects.create(
+            checksum="BEEFCAFE",
+            title="A",
+            content="",
+            mime_type="application/pdf",
+            filename="test.pdf",
+        )
+        Document.objects.create(
+            checksum="DEADBEAF",
+            title="A",
+            content="",
+            mime_type="application/pdf",
+            filename="other_test.pdf",
+        )
+        stdout, _ = self.call_command()
+        self.assertIn("No matches found", stdout)

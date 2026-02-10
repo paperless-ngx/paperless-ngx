@@ -1,27 +1,34 @@
 import datetime
+import json
 import shutil
 import socket
+import tempfile
 from datetime import timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.core import mail
 from django.test import override_settings
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
+from httpx import ConnectError
 from httpx import HTTPError
 from httpx import HTTPStatusError
 from pytest_httpx import HTTPXMock
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 
+from documents.file_handling import create_source_path_directory
+from documents.file_handling import generate_unique_filename
 from documents.signals.handlers import run_workflows
-from documents.signals.handlers import send_webhook
+from documents.workflows.webhooks import send_webhook
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -29,8 +36,10 @@ from pytest_django.fixtures import SettingsWrapper
 
 from documents import tasks
 from documents.data_models import ConsumableDocument
+from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.matching import document_matches_workflow
+from documents.matching import existing_document_matches_workflow
 from documents.matching import prefilter_documents_by_workflowtrigger
 from documents.models import Correspondent
 from documents.models import CustomField
@@ -46,11 +55,13 @@ from documents.models import WorkflowActionEmail
 from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
+from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_consumption_finished
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
+from documents.workflows.actions import execute_password_removal_action
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
@@ -109,7 +120,7 @@ class TestWorkflows(
 
         return super().setUp()
 
-    def test_workflow_match(self):
+    def test_workflow_match(self) -> None:
         """
         GIVEN:
             - Existing workflow
@@ -228,7 +239,7 @@ class TestWorkflows(
         expected_str = f"Document matched {trigger} from {w}"
         self.assertIn(expected_str, info)
 
-    def test_workflow_match_mailrule(self):
+    def test_workflow_match_mailrule(self) -> None:
         """
         GIVEN:
             - Existing workflow
@@ -330,7 +341,7 @@ class TestWorkflows(
         expected_str = f"Document matched {trigger} from {w}"
         self.assertIn(expected_str, info)
 
-    def test_workflow_match_multiple(self):
+    def test_workflow_match_multiple(self) -> None:
         """
         GIVEN:
             - Multiple existing workflows
@@ -425,7 +436,7 @@ class TestWorkflows(
         expected_str = f"Document matched {trigger2} from {w2}"
         self.assertIn(expected_str, cm.output[1])
 
-    def test_workflow_fnmatch_path(self):
+    def test_workflow_fnmatch_path(self) -> None:
         """
         GIVEN:
             - Existing workflow
@@ -473,7 +484,7 @@ class TestWorkflows(
         expected_str = f"Document matched {trigger} from {w}"
         self.assertIn(expected_str, cm.output[0])
 
-    def test_workflow_no_match_filename(self):
+    def test_workflow_no_match_filename(self) -> None:
         """
         GIVEN:
             - Existing workflow
@@ -548,7 +559,7 @@ class TestWorkflows(
         expected_str = f"Document filename {test_file.name} does not match"
         self.assertIn(expected_str, cm.output[1])
 
-    def test_workflow_no_match_path(self):
+    def test_workflow_no_match_path(self) -> None:
         """
         GIVEN:
             - Existing workflow
@@ -632,7 +643,7 @@ class TestWorkflows(
         expected_str = f"Document path {test_file} does not match"
         self.assertIn(expected_str, cm.output[1])
 
-    def test_workflow_no_match_mail_rule(self):
+    def test_workflow_no_match_mail_rule(self) -> None:
         """
         GIVEN:
             - Existing workflow
@@ -717,7 +728,7 @@ class TestWorkflows(
         expected_str = "Document mail rule 99 !="
         self.assertIn(expected_str, cm.output[1])
 
-    def test_workflow_no_match_source(self):
+    def test_workflow_no_match_source(self) -> None:
         """
         GIVEN:
             - Existing workflow
@@ -801,7 +812,7 @@ class TestWorkflows(
         expected_str = f"Document source {DocumentSource.ApiUpload.name} not in ['{DocumentSource.ConsumeFolder.name}', '{DocumentSource.MailFetch.name}']"
         self.assertIn(expected_str, cm.output[1])
 
-    def test_document_added_no_match_trigger_type(self):
+    def test_document_added_no_match_trigger_type(self) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
         )
@@ -836,7 +847,7 @@ class TestWorkflows(
             expected_str = f"No matching triggers with type {WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED} found"
             self.assertIn(expected_str, cm.output[1])
 
-    def test_workflow_repeat_custom_fields(self):
+    def test_workflow_repeat_custom_fields(self) -> None:
         """
         GIVEN:
             - Existing workflows which assign the same custom field
@@ -889,7 +900,7 @@ class TestWorkflows(
         expected_str = f"Document matched {trigger} from {w}"
         self.assertIn(expected_str, cm.output[0])
 
-    def test_document_added_workflow(self):
+    def test_document_added_workflow(self) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
             filter_filename="*sample*",
@@ -937,7 +948,7 @@ class TestWorkflows(
         self.assertEqual(doc.correspondent, self.c2)
         self.assertEqual(doc.title, f"Doc created in {created.year}")
 
-    def test_document_added_no_match_filename(self):
+    def test_document_added_no_match_filename(self) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
             filter_filename="*foobar*",
@@ -973,7 +984,7 @@ class TestWorkflows(
             expected_str = f"Document filename {doc.original_filename} does not match"
             self.assertIn(expected_str, cm.output[1])
 
-    def test_document_added_match_content_matching(self):
+    def test_document_added_match_content_matching(self) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
             matching_algorithm=MatchingModel.MATCH_LITERAL,
@@ -1011,7 +1022,7 @@ class TestWorkflows(
             expected_str = f"Document matched {trigger} from {w}"
             self.assertIn(expected_str, cm.output[1])
 
-    def test_document_added_no_match_content_matching(self):
+    def test_document_added_no_match_content_matching(self) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
             matching_algorithm=MatchingModel.MATCH_LITERAL,
@@ -1048,7 +1059,7 @@ class TestWorkflows(
             expected_str = f"Document content matching settings for algorithm '{trigger.matching_algorithm}' did not match"
             self.assertIn(expected_str, cm.output[1])
 
-    def test_document_added_no_match_tags(self):
+    def test_document_added_no_match_tags(self) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
         )
@@ -1080,10 +1091,515 @@ class TestWorkflows(
             )
             expected_str = f"Document did not match {w}"
             self.assertIn(expected_str, cm.output[0])
-            expected_str = f"Document tags {doc.tags.all()} do not include {trigger.filter_has_tags.all()}"
+            expected_str = f"Document tags {list(doc.tags.all())} do not include {list(trigger.filter_has_tags.all())}"
             self.assertIn(expected_str, cm.output[1])
 
-    def test_document_added_no_match_doctype(self):
+    def test_document_added_no_match_all_tags(self) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        trigger.filter_has_all_tags.set([self.t1, self.t2])
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        doc.tags.set([self.t1])
+        doc.save()
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = (
+                f"Document tags {list(doc.tags.all())} do not contain all of"
+                f" {list(trigger.filter_has_all_tags.all())}"
+            )
+            self.assertIn(expected_str, cm.output[1])
+
+    def test_document_added_excluded_tags(self) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        trigger.filter_has_not_tags.set([self.t3])
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        doc.tags.set([self.t3])
+        doc.save()
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = (
+                f"Document tags {list(doc.tags.all())} include excluded tags"
+                f" {list(trigger.filter_has_not_tags.all())}"
+            )
+            self.assertIn(expected_str, cm.output[1])
+
+    def test_document_added_excluded_correspondent(self) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        trigger.filter_has_not_correspondents.set([self.c])
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = (
+                f"Document correspondent {doc.correspondent} is excluded by"
+                f" {list(trigger.filter_has_not_correspondents.all())}"
+            )
+            self.assertIn(expected_str, cm.output[1])
+
+    def test_document_added_excluded_document_types(self) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        trigger.filter_has_not_document_types.set([self.dt])
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            document_type=self.dt,
+            original_filename="sample.pdf",
+        )
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = (
+                f"Document doc type {doc.document_type} is excluded by"
+                f" {list(trigger.filter_has_not_document_types.all())}"
+            )
+            self.assertIn(expected_str, cm.output[1])
+
+    def test_document_added_excluded_storage_paths(self) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        trigger.filter_has_not_storage_paths.set([self.sp])
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            storage_path=self.sp,
+            original_filename="sample.pdf",
+        )
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = (
+                f"Document storage path {doc.storage_path} is excluded by"
+                f" {list(trigger.filter_has_not_storage_paths.all())}"
+            )
+            self.assertIn(expected_str, cm.output[1])
+
+    def test_document_added_any_filters(self) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        trigger.filter_has_any_correspondents.set([self.c])
+        trigger.filter_has_any_document_types.set([self.dt])
+        trigger.filter_has_any_storage_paths.set([self.sp])
+
+        matching_doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            document_type=self.dt,
+            storage_path=self.sp,
+            original_filename="sample.pdf",
+            checksum="checksum-any-match",
+        )
+
+        matched, reason = existing_document_matches_workflow(matching_doc, trigger)
+        self.assertTrue(matched)
+        self.assertIsNone(reason)
+
+        wrong_correspondent = Document.objects.create(
+            title="wrong correspondent",
+            correspondent=self.c2,
+            document_type=self.dt,
+            storage_path=self.sp,
+            original_filename="sample2.pdf",
+        )
+        matched, reason = existing_document_matches_workflow(
+            wrong_correspondent,
+            trigger,
+        )
+        self.assertFalse(matched)
+        self.assertIn("correspondent", reason)
+
+        other_document_type = DocumentType.objects.create(name="Other")
+        wrong_document_type = Document.objects.create(
+            title="wrong doc type",
+            correspondent=self.c,
+            document_type=other_document_type,
+            storage_path=self.sp,
+            original_filename="sample3.pdf",
+            checksum="checksum-wrong-doc-type",
+        )
+        matched, reason = existing_document_matches_workflow(
+            wrong_document_type,
+            trigger,
+        )
+        self.assertFalse(matched)
+        self.assertIn("doc type", reason)
+
+        other_storage_path = StoragePath.objects.create(
+            name="Other path",
+            path="/other/",
+        )
+        wrong_storage_path = Document.objects.create(
+            title="wrong storage",
+            correspondent=self.c,
+            document_type=self.dt,
+            storage_path=other_storage_path,
+            original_filename="sample4.pdf",
+            checksum="checksum-wrong-storage-path",
+        )
+        matched, reason = existing_document_matches_workflow(
+            wrong_storage_path,
+            trigger,
+        )
+        self.assertFalse(matched)
+        self.assertIn("storage path", reason)
+
+    def test_document_added_custom_field_query_no_match(self) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_custom_field_query=json.dumps(
+                [
+                    "AND",
+                    [[self.cf1.id, "exact", "expected"]],
+                ],
+            ),
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        workflow = Workflow.objects.create(name="Workflow 1", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+        workflow.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=self.cf1,
+            value_text="other",
+        )
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {workflow}"
+            self.assertIn(expected_str, cm.output[0])
+            self.assertIn(
+                "Document custom fields do not match the configured custom field query",
+                cm.output[1],
+            )
+
+    def test_document_added_custom_field_query_match(self) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_custom_field_query=json.dumps(
+                [
+                    "AND",
+                    [[self.cf1.id, "exact", "expected"]],
+                ],
+            ),
+        )
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=self.cf1,
+            value_text="expected",
+        )
+
+        matched, reason = existing_document_matches_workflow(doc, trigger)
+        self.assertTrue(matched)
+        self.assertIsNone(reason)
+
+    def test_prefilter_documents_custom_field_query(self) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_custom_field_query=json.dumps(
+                [
+                    "AND",
+                    [[self.cf1.id, "exact", "match"]],
+                ],
+            ),
+        )
+        doc1 = Document.objects.create(
+            title="doc 1",
+            correspondent=self.c,
+            original_filename="doc1.pdf",
+            checksum="checksum1",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc1,
+            field=self.cf1,
+            value_text="match",
+        )
+
+        doc2 = Document.objects.create(
+            title="doc 2",
+            correspondent=self.c,
+            original_filename="doc2.pdf",
+            checksum="checksum2",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc2,
+            field=self.cf1,
+            value_text="different",
+        )
+
+        filtered = prefilter_documents_by_workflowtrigger(
+            Document.objects.all(),
+            trigger,
+        )
+        self.assertIn(doc1, filtered)
+        self.assertNotIn(doc2, filtered)
+
+    def test_prefilter_documents_any_filters(self) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        trigger.filter_has_any_correspondents.set([self.c])
+        trigger.filter_has_any_document_types.set([self.dt])
+        trigger.filter_has_any_storage_paths.set([self.sp])
+
+        allowed_document = Document.objects.create(
+            title="allowed",
+            correspondent=self.c,
+            document_type=self.dt,
+            storage_path=self.sp,
+            original_filename="doc-allowed.pdf",
+            checksum="checksum-any-allowed",
+        )
+        blocked_document = Document.objects.create(
+            title="blocked",
+            correspondent=self.c2,
+            document_type=self.dt,
+            storage_path=self.sp,
+            original_filename="doc-blocked.pdf",
+            checksum="checksum-any-blocked",
+        )
+
+        filtered = prefilter_documents_by_workflowtrigger(
+            Document.objects.all(),
+            trigger,
+        )
+
+        self.assertIn(allowed_document, filtered)
+        self.assertNotIn(blocked_document, filtered)
+
+    def test_consumption_trigger_requires_filter_configuration(self) -> None:
+        serializer = WorkflowTriggerSerializer(
+            data={
+                "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            },
+        )
+
+        self.assertFalse(serializer.is_valid())
+        errors = serializer.errors.get("non_field_errors", [])
+        self.assertIn(
+            "File name, path or mail rule filter are required",
+            [str(error) for error in errors],
+        )
+
+    def test_workflow_trigger_serializer_clears_empty_custom_field_query(self) -> None:
+        serializer = WorkflowTriggerSerializer(
+            data={
+                "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+                "filter_custom_field_query": "",
+            },
+        )
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertIsNone(serializer.validated_data.get("filter_custom_field_query"))
+
+    def test_existing_document_invalid_custom_field_query_configuration(self) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_custom_field_query="{ not json",
+        )
+
+        document = Document.objects.create(
+            title="doc invalid query",
+            original_filename="invalid.pdf",
+            checksum="checksum-invalid-query",
+        )
+
+        matched, reason = existing_document_matches_workflow(document, trigger)
+        self.assertFalse(matched)
+        self.assertEqual(reason, "Invalid custom field query configuration")
+
+    def test_prefilter_documents_returns_none_for_invalid_custom_field_query(
+        self,
+    ) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_custom_field_query="{ not json",
+        )
+
+        Document.objects.create(
+            title="doc",
+            original_filename="doc.pdf",
+            checksum="checksum-prefilter-invalid",
+        )
+
+        filtered = prefilter_documents_by_workflowtrigger(
+            Document.objects.all(),
+            trigger,
+        )
+
+        self.assertEqual(list(filtered), [])
+
+    def test_prefilter_documents_applies_all_filters(self) -> None:
+        other_document_type = DocumentType.objects.create(name="Other Type")
+        other_storage_path = StoragePath.objects.create(
+            name="Blocked path",
+            path="/blocked/",
+        )
+
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_has_correspondent=self.c,
+            filter_has_document_type=self.dt,
+            filter_has_storage_path=self.sp,
+        )
+        trigger.filter_has_tags.set([self.t1])
+        trigger.filter_has_all_tags.set([self.t1, self.t2])
+        trigger.filter_has_not_tags.set([self.t3])
+        trigger.filter_has_not_correspondents.set([self.c2])
+        trigger.filter_has_not_document_types.set([other_document_type])
+        trigger.filter_has_not_storage_paths.set([other_storage_path])
+
+        allowed_document = Document.objects.create(
+            title="allowed",
+            correspondent=self.c,
+            document_type=self.dt,
+            storage_path=self.sp,
+            original_filename="allow.pdf",
+            checksum="checksum-prefilter-allowed",
+        )
+        allowed_document.tags.set([self.t1, self.t2])
+
+        blocked_document = Document.objects.create(
+            title="blocked",
+            correspondent=self.c2,
+            document_type=other_document_type,
+            storage_path=other_storage_path,
+            original_filename="block.pdf",
+            checksum="checksum-prefilter-blocked",
+        )
+        blocked_document.tags.set([self.t1, self.t3])
+
+        filtered = prefilter_documents_by_workflowtrigger(
+            Document.objects.all(),
+            trigger,
+        )
+
+        self.assertIn(allowed_document, filtered)
+        self.assertNotIn(blocked_document, filtered)
+
+    def test_document_added_no_match_doctype(self) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
             filter_has_document_type=self.dt,
@@ -1116,7 +1632,7 @@ class TestWorkflows(
             expected_str = f"Document doc type {doc.document_type} does not match {trigger.filter_has_document_type}"
             self.assertIn(expected_str, cm.output[1])
 
-    def test_document_added_no_match_correspondent(self):
+    def test_document_added_no_match_correspondent(self) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
             filter_has_correspondent=self.c,
@@ -1150,7 +1666,7 @@ class TestWorkflows(
             expected_str = f"Document correspondent {doc.correspondent} does not match {trigger.filter_has_correspondent}"
             self.assertIn(expected_str, cm.output[1])
 
-    def test_document_added_no_match_storage_path(self):
+    def test_document_added_no_match_storage_path(self) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
             filter_has_storage_path=self.sp,
@@ -1182,7 +1698,7 @@ class TestWorkflows(
             expected_str = f"Document storage path {doc.storage_path} does not match {trigger.filter_has_storage_path}"
             self.assertIn(expected_str, cm.output[1])
 
-    def test_document_added_invalid_title_placeholders(self):
+    def test_document_added_invalid_title_placeholders(self) -> None:
         """
         GIVEN:
             - Existing workflow with added trigger type
@@ -1223,7 +1739,7 @@ class TestWorkflows(
 
         self.assertEqual(doc.title, "Doc {created_year]")
 
-    def test_document_updated_workflow(self):
+    def test_document_updated_workflow(self) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
             filter_has_document_type=self.dt,
@@ -1255,7 +1771,7 @@ class TestWorkflows(
 
         self.assertEqual(doc.custom_fields.all().count(), 1)
 
-    def test_document_consumption_workflow_month_placeholder_addded(self):
+    def test_document_consumption_workflow_month_placeholder_addded(self) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
             sources=f"{DocumentSource.ApiUpload}",
@@ -1294,7 +1810,7 @@ class TestWorkflows(
                 r"Doc added in \w{3,}",
             )  # Match any 3-letter month name
 
-    def test_document_updated_workflow_existing_custom_field(self):
+    def test_document_updated_workflow_existing_custom_field(self) -> None:
         """
         GIVEN:
             - Existing workflow with UPDATED trigger and action that assigns a custom field with a value
@@ -1338,7 +1854,7 @@ class TestWorkflows(
         doc.refresh_from_db()
         self.assertEqual(doc.custom_fields.get(field=self.cf1).value, "new value")
 
-    def test_document_updated_workflow_merge_permissions(self):
+    def test_document_updated_workflow_merge_permissions(self) -> None:
         """
         GIVEN:
             - Existing workflow with UPDATED trigger and action that sets permissions
@@ -1406,7 +1922,7 @@ class TestWorkflows(
         # group2 should have been added
         self.assertIn(self.group2, group_perms)
 
-    def test_workflow_scheduled_trigger_created(self):
+    def test_workflow_scheduled_trigger_created(self) -> None:
         """
         GIVEN:
             - Existing workflow with SCHEDULED trigger against the created field and action that assigns owner
@@ -1449,7 +1965,7 @@ class TestWorkflows(
         doc.refresh_from_db()
         self.assertEqual(doc.owner, self.user2)
 
-    def test_workflow_scheduled_trigger_added(self):
+    def test_workflow_scheduled_trigger_added(self) -> None:
         """
         GIVEN:
             - Existing workflow with SCHEDULED trigger against the added field and action that assigns owner
@@ -1492,7 +2008,7 @@ class TestWorkflows(
         self.assertEqual(doc.owner, self.user2)
 
     @mock.patch("documents.models.Document.objects.filter", autospec=True)
-    def test_workflow_scheduled_trigger_modified(self, mock_filter):
+    def test_workflow_scheduled_trigger_modified(self, mock_filter) -> None:
         """
         GIVEN:
             - Existing workflow with SCHEDULED trigger against the modified field and action that assigns owner
@@ -1534,7 +2050,7 @@ class TestWorkflows(
         doc.refresh_from_db()
         self.assertEqual(doc.owner, self.user2)
 
-    def test_workflow_scheduled_trigger_custom_field(self):
+    def test_workflow_scheduled_trigger_custom_field(self) -> None:
         """
         GIVEN:
             - Existing workflow with SCHEDULED trigger against a custom field and action that assigns owner
@@ -1580,7 +2096,7 @@ class TestWorkflows(
         doc.refresh_from_db()
         self.assertEqual(doc.owner, self.user2)
 
-    def test_workflow_scheduled_already_run(self):
+    def test_workflow_scheduled_already_run(self) -> None:
         """
         GIVEN:
             - Existing workflow with SCHEDULED trigger
@@ -1631,7 +2147,7 @@ class TestWorkflows(
         doc.refresh_from_db()
         self.assertIsNone(doc.owner)
 
-    def test_workflow_scheduled_trigger_too_early(self):
+    def test_workflow_scheduled_trigger_too_early(self) -> None:
         """
         GIVEN:
             - Existing workflow with SCHEDULED trigger and recurring interval of 7 days
@@ -1685,7 +2201,69 @@ class TestWorkflows(
             doc.refresh_from_db()
             self.assertIsNone(doc.owner)
 
-    def test_workflow_scheduled_trigger_negative_offset_customfield(self):
+    def test_workflow_scheduled_recurring_respects_latest_run(self) -> None:
+        """
+        GIVEN:
+            - Scheduled workflow marked as recurring with a 1-day interval
+            - Document that matches the trigger
+            - Two prior runs exist: one 2 days ago and one 1 hour ago
+        WHEN:
+            - Scheduled workflows are checked again
+        THEN:
+            - Workflow does not run because the most recent run is inside the interval
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.CREATED,
+            schedule_is_recurring=True,
+            schedule_recurring_interval_days=1,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+            created=timezone.now().date() - timedelta(days=3),
+        )
+
+        WorkflowRun.objects.create(
+            workflow=w,
+            document=doc,
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            run_at=timezone.now() - timedelta(days=2),
+        )
+        WorkflowRun.objects.create(
+            workflow=w,
+            document=doc,
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            run_at=timezone.now() - timedelta(hours=1),
+        )
+
+        tasks.check_scheduled_workflows()
+
+        doc.refresh_from_db()
+        self.assertIsNone(doc.owner)
+        self.assertEqual(
+            WorkflowRun.objects.filter(
+                workflow=w,
+                document=doc,
+                type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            ).count(),
+            2,
+        )
+
+    def test_workflow_scheduled_trigger_negative_offset_customfield(self) -> None:
         """
         GIVEN:
             - Workflow with offset -7 (i.e., 7 days *before* the date)
@@ -1747,7 +2325,7 @@ class TestWorkflows(
         doc2.refresh_from_db()
         self.assertIsNone(doc2.owner)
 
-    def test_workflow_scheduled_trigger_negative_offset_created(self):
+    def test_workflow_scheduled_trigger_negative_offset_created(self) -> None:
         """
         GIVEN:
             - Existing workflow with SCHEDULED trigger and negative offset of -7 days (so 7 days before date)
@@ -1798,7 +2376,7 @@ class TestWorkflows(
         doc2.refresh_from_db()
         self.assertIsNone(doc2.owner)  # has not triggered yet
 
-    def test_offset_positive_means_after(self):
+    def test_offset_positive_means_after(self) -> None:
         """
         GIVEN:
             - Document created 30 days ago
@@ -1832,7 +2410,7 @@ class TestWorkflows(
         doc.refresh_from_db()
         self.assertEqual(doc.owner, self.user2)
 
-    def test_workflow_scheduled_filters_queryset(self):
+    def test_workflow_scheduled_filters_queryset(self) -> None:
         """
         GIVEN:
             - Existing workflow with scheduled trigger
@@ -1883,7 +2461,7 @@ class TestWorkflows(
         )
         self.assertEqual(filtered_docs.count(), 5)
 
-    def test_workflow_enabled_disabled(self):
+    def test_workflow_enabled_disabled(self) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
             filter_filename="*sample*",
@@ -1929,7 +2507,7 @@ class TestWorkflows(
         self.assertEqual(doc.title, "Title assign owner")
         self.assertEqual(doc.owner, self.user2)
 
-    def test_new_trigger_type_raises_exception(self):
+    def test_new_trigger_type_raises_exception(self) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=99,
         )
@@ -1949,7 +2527,7 @@ class TestWorkflows(
         )
         self.assertRaises(Exception, document_matches_workflow, doc, w, 99)
 
-    def test_removal_action_document_updated_workflow(self):
+    def test_removal_action_document_updated_workflow(self) -> None:
         """
         GIVEN:
             - Workflow with removal action
@@ -2023,7 +2601,7 @@ class TestWorkflows(
         group_perms: QuerySet = get_groups_with_perms(doc)
         self.assertNotIn(self.group1, group_perms)
 
-    def test_removal_action_document_updated_removeall(self):
+    def test_removal_action_document_updated_removeall(self) -> None:
         """
         GIVEN:
             - Workflow with removal action with remove all fields set
@@ -2094,7 +2672,7 @@ class TestWorkflows(
         group_perms: QuerySet = get_groups_with_perms(doc)
         self.assertNotIn(self.group1, group_perms)
 
-    def test_removal_action_document_consumed(self):
+    def test_removal_action_document_consumed(self) -> None:
         """
         GIVEN:
             - Workflow with assignment and removal actions
@@ -2225,7 +2803,7 @@ class TestWorkflows(
         expected_str = f"Document matched {trigger} from {w}"
         self.assertIn(expected_str, info)
 
-    def test_removal_action_document_consumed_remove_all(self):
+    def test_removal_action_document_consumed_remove_all(self) -> None:
         """
         GIVEN:
             - Workflow with assignment and removal actions with remove all fields set
@@ -2336,7 +2914,7 @@ class TestWorkflows(
         expected_str = f"Document matched {trigger} from {w}"
         self.assertIn(expected_str, info)
 
-    def test_workflow_with_tag_actions_doesnt_overwrite_other_actions(self):
+    def test_workflow_with_tag_actions_doesnt_overwrite_other_actions(self) -> None:
         """
         GIVEN:
             - Document updated workflow filtered by has tag with two actions, first adds owner, second removes a tag
@@ -2390,9 +2968,83 @@ class TestWorkflows(
         EMAIL_ENABLED=True,
         PAPERLESS_URL="http://localhost:8000",
     )
+    @mock.patch("django.core.mail.message.EmailMessage.send")
+    def test_workflow_assignment_then_email_includes_attachment(self, mock_email_send):
+        """
+        GIVEN:
+            - Workflow with assignment and email actions
+            - Email action configured to include the document
+        WHEN:
+            - Workflow is run on a newly created document
+        THEN:
+            - Email action sends the document as an attachment
+        """
+
+        storage_path = StoragePath.objects.create(
+            name="sp2",
+            path="workflow/{{ document.pk }}",
+        )
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+        )
+        assignment_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.ASSIGNMENT,
+            assign_storage_path=storage_path,
+            assign_owner=self.user2,
+        )
+        assignment_action.assign_tags.add(self.t1)
+
+        email_action_config = WorkflowActionEmail.objects.create(
+            subject="Doc ready {doc_title}",
+            body="Document URL: {doc_url}",
+            to="owner@example.com",
+            include_document=True,
+        )
+        email_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.EMAIL,
+            email=email_action_config,
+        )
+
+        workflow = Workflow.objects.create(name="Assignment then email", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.set([assignment_action, email_action])
+
+        temp_working_copy = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "working-copy.pdf",
+        )
+
+        Document.objects.create(
+            title="workflow doc",
+            correspondent=self.c,
+            checksum="wf-assignment-email",
+            mime_type="application/pdf",
+        )
+
+        consumable_document = ConsumableDocument(
+            source=DocumentSource.ConsumeFolder,
+            original_file=temp_working_copy,
+        )
+
+        mock_email_send.return_value = 1
+
+        with self.assertNoLogs("paperless.workflows", level="ERROR"):
+            run_workflows(
+                WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                consumable_document,
+                overrides=DocumentMetadataOverrides(),
+            )
+
+        mock_email_send.assert_called_once()
+
+    @override_settings(
+        PAPERLESS_EMAIL_HOST="localhost",
+        EMAIL_ENABLED=True,
+        PAPERLESS_URL="http://localhost:8000",
+    )
     @mock.patch("httpx.post")
     @mock.patch("django.core.mail.message.EmailMessage.send")
-    def test_workflow_email_action(self, mock_email_send, mock_post):
+    def test_workflow_email_action(self, mock_email_send, mock_post) -> None:
         """
         GIVEN:
             - Document updated workflow with email action
@@ -2445,7 +3097,7 @@ class TestWorkflows(
         PAPERLESS_URL="http://localhost:8000",
     )
     @mock.patch("django.core.mail.message.EmailMessage.send")
-    def test_workflow_email_include_file(self, mock_email_send):
+    def test_workflow_email_include_file(self, mock_email_send) -> None:
         """
         GIVEN:
             - Document updated workflow with email action
@@ -2512,9 +3164,73 @@ class TestWorkflows(
         mock_email_send.assert_called_once()
 
     @override_settings(
+        PAPERLESS_EMAIL_HOST="localhost",
+        EMAIL_ENABLED=True,
+        PAPERLESS_URL="http://localhost:8000",
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    )
+    def test_workflow_email_attachment_uses_storage_filename(self) -> None:
+        """
+        GIVEN:
+            - Document updated workflow with include document action
+            - Document stored with formatted storage-path filename
+        WHEN:
+            - Workflow sends an email
+        THEN:
+            - Attachment filename matches the stored filename
+        """
+
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        email_action = WorkflowActionEmail.objects.create(
+            subject="Test Notification: {doc_title}",
+            body="Test message: {doc_url}",
+            to="me@example.com",
+            include_document=True,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.EMAIL,
+            email=email_action,
+        )
+        workflow = Workflow.objects.create(
+            name="Workflow attachment filename",
+            order=0,
+        )
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+        workflow.save()
+
+        storage_path = StoragePath.objects.create(
+            name="Fancy Path",
+            path="formatted/{{ document.pk }}/{{ title }}",
+        )
+        doc = Document.objects.create(
+            title="workflow doc",
+            correspondent=self.c,
+            checksum="workflow-email-attachment",
+            mime_type="application/pdf",
+            storage_path=storage_path,
+            original_filename="workflow-orig.pdf",
+        )
+
+        # eg what happens in update_filename_and_move_files
+        generated = generate_unique_filename(doc)
+        destination = (settings.ORIGINALS_DIR / generated).resolve()
+        create_source_path_directory(destination)
+        shutil.copy(self.SAMPLE_DIR / "simple.pdf", destination)
+        Document.objects.filter(pk=doc.pk).update(filename=generated.as_posix())
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        self.assertEqual(len(mail.outbox), 1)
+        attachment_names = [att[0] for att in mail.outbox[0].attachments]
+        self.assertEqual(attachment_names, [Path(generated).name])
+
+    @override_settings(
         EMAIL_ENABLED=False,
     )
-    def test_workflow_email_action_no_email_setup(self):
+    def test_workflow_email_action_no_email_setup(self) -> None:
         """
         GIVEN:
             - Document updated workflow with email action
@@ -2550,7 +3266,7 @@ class TestWorkflows(
             original_filename="sample.pdf",
         )
 
-        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
+        with self.assertLogs("paperless.workflows.actions", level="ERROR") as cm:
             run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
             expected_str = "Email backend has not been configured"
@@ -2561,7 +3277,7 @@ class TestWorkflows(
         PAPERLESS_URL="http://localhost:8000",
     )
     @mock.patch("django.core.mail.message.EmailMessage.send")
-    def test_workflow_email_action_fail(self, mock_email_send):
+    def test_workflow_email_action_fail(self, mock_email_send) -> None:
         """
         GIVEN:
             - Document updated workflow with email action
@@ -2598,7 +3314,7 @@ class TestWorkflows(
             original_filename="sample.pdf",
         )
 
-        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
+        with self.assertLogs("paperless.workflows", level="ERROR") as cm:
             run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
             expected_str = "Error occurred sending email"
@@ -2611,7 +3327,11 @@ class TestWorkflows(
     )
     @mock.patch("httpx.post")
     @mock.patch("django.core.mail.message.EmailMessage.send")
-    def test_workflow_email_consumption_started(self, mock_email_send, mock_post):
+    def test_workflow_email_consumption_started(
+        self,
+        mock_email_send,
+        mock_post,
+    ) -> None:
         """
         GIVEN:
             - Workflow with email action and consumption trigger
@@ -2666,9 +3386,11 @@ class TestWorkflows(
 
     @override_settings(
         PAPERLESS_URL="http://localhost:8000",
+        PAPERLESS_FORCE_SCRIPT_NAME="/paperless",
+        BASE_URL="/paperless/",
     )
-    @mock.patch("documents.signals.handlers.send_webhook.delay")
-    def test_workflow_webhook_action_body(self, mock_post):
+    @mock.patch("documents.workflows.webhooks.send_webhook.delay")
+    def test_workflow_webhook_action_body(self, mock_post) -> None:
         """
         GIVEN:
             - Document updated workflow with webhook action which uses body
@@ -2687,7 +3409,7 @@ class TestWorkflows(
         )
         webhook_action = WorkflowActionWebhook.objects.create(
             use_params=False,
-            body="Test message: {{doc_url}}",
+            body="Test message: {{doc_url}} with id {{doc_id}}",
             url="http://paperless-ngx.com",
             include_document=False,
         )
@@ -2717,7 +3439,10 @@ class TestWorkflows(
 
         mock_post.assert_called_once_with(
             url="http://paperless-ngx.com",
-            data=f"Test message: http://localhost:8000/documents/{doc.id}/",
+            data=(
+                f"Test message: http://localhost:8000/paperless/documents/{doc.id}/"
+                f" with id {doc.id}"
+            ),
             headers={},
             files=None,
             as_json=False,
@@ -2726,8 +3451,8 @@ class TestWorkflows(
     @override_settings(
         PAPERLESS_URL="http://localhost:8000",
     )
-    @mock.patch("documents.signals.handlers.send_webhook.delay")
-    def test_workflow_webhook_action_w_files(self, mock_post):
+    @mock.patch("documents.workflows.webhooks.send_webhook.delay")
+    def test_workflow_webhook_action_w_files(self, mock_post) -> None:
         """
         GIVEN:
             - Document updated workflow with webhook action which includes document
@@ -2788,7 +3513,7 @@ class TestWorkflows(
     @override_settings(
         PAPERLESS_URL="http://localhost:8000",
     )
-    def test_workflow_webhook_action_fail(self):
+    def test_workflow_webhook_action_fail(self) -> None:
         """
         GIVEN:
             - Document updated workflow with webhook action
@@ -2829,13 +3554,13 @@ class TestWorkflows(
         )
 
         # fails because no file
-        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
+        with self.assertLogs("paperless.workflows", level="ERROR") as cm:
             run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
             expected_str = "Error occurred sending webhook"
             self.assertIn(expected_str, cm.output[0])
 
-    def test_workflow_webhook_action_url_invalid_params_headers(self):
+    def test_workflow_webhook_action_url_invalid_params_headers(self) -> None:
         """
         GIVEN:
             - Document updated workflow with webhook action
@@ -2872,7 +3597,7 @@ class TestWorkflows(
             original_filename="sample.pdf",
         )
 
-        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
+        with self.assertLogs("paperless.workflows", level="ERROR") as cm:
             run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
             expected_str = "Error occurred parsing webhook params"
@@ -2880,15 +3605,15 @@ class TestWorkflows(
             expected_str = "Error occurred parsing webhook headers"
             self.assertIn(expected_str, cm.output[1])
 
-    @mock.patch("httpx.post")
-    def test_workflow_webhook_send_webhook_task(self, mock_post):
+    @mock.patch("httpx.Client.post")
+    def test_workflow_webhook_send_webhook_task(self, mock_post) -> None:
         mock_post.return_value = mock.Mock(
             status_code=200,
             json=mock.Mock(return_value={"status": "ok"}),
             raise_for_status=mock.Mock(),
         )
 
-        with self.assertLogs("paperless.handlers") as cm:
+        with self.assertLogs("paperless.workflows") as cm:
             send_webhook(
                 url="http://paperless-ngx.com",
                 data="Test message",
@@ -2901,8 +3626,6 @@ class TestWorkflows(
                 content="Test message",
                 headers={},
                 files=None,
-                follow_redirects=False,
-                timeout=5,
             )
 
             expected_str = "Webhook sent to http://paperless-ngx.com"
@@ -2920,12 +3643,10 @@ class TestWorkflows(
                 data={"message": "Test message"},
                 headers={},
                 files=None,
-                follow_redirects=False,
-                timeout=5,
             )
 
-    @mock.patch("httpx.post")
-    def test_workflow_webhook_send_webhook_retry(self, mock_http):
+    @mock.patch("httpx.Client.post")
+    def test_workflow_webhook_send_webhook_retry(self, mock_http) -> None:
         mock_http.return_value.raise_for_status = mock.Mock(
             side_effect=HTTPStatusError(
                 "Error",
@@ -2934,7 +3655,7 @@ class TestWorkflows(
             ),
         )
 
-        with self.assertLogs("paperless.handlers") as cm:
+        with self.assertLogs("paperless.workflows") as cm:
             with self.assertRaises(HTTPStatusError):
                 send_webhook(
                     url="http://paperless-ngx.com",
@@ -2950,8 +3671,8 @@ class TestWorkflows(
                 )
                 self.assertIn(expected_str, cm.output[0])
 
-    @mock.patch("documents.signals.handlers.send_webhook.delay")
-    def test_workflow_webhook_action_consumption(self, mock_post):
+    @mock.patch("documents.workflows.webhooks.send_webhook.delay")
+    def test_workflow_webhook_action_consumption(self, mock_post) -> None:
         """
         GIVEN:
             - Workflow with webhook action and consumption trigger
@@ -3003,12 +3724,202 @@ class TestWorkflows(
 
         mock_post.assert_called_once()
 
+    @mock.patch("documents.bulk_edit.remove_password")
+    def test_password_removal_action_attempts_multiple_passwords(
+        self,
+        mock_remove_password,
+    ):
+        """
+        GIVEN:
+            - Workflow password removal action
+            - Multiple passwords provided
+        WHEN:
+            - Document updated triggering the workflow
+        THEN:
+            - Password removal is attempted until one succeeds
+        """
+        doc = Document.objects.create(
+            title="Protected",
+            checksum="pw-checksum",
+        )
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+            passwords="wrong, right\n extra ",
+        )
+        workflow = Workflow.objects.create(name="Password workflow")
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        mock_remove_password.side_effect = [
+            ValueError("wrong password"),
+            "OK",
+        ]
+
+        run_workflows(trigger.type, doc)
+
+        assert mock_remove_password.call_count == 2
+        mock_remove_password.assert_has_calls(
+            [
+                mock.call(
+                    [doc.id],
+                    password="wrong",
+                    update_document=True,
+                    user=doc.owner,
+                ),
+                mock.call(
+                    [doc.id],
+                    password="right",
+                    update_document=True,
+                    user=doc.owner,
+                ),
+            ],
+        )
+
+    @mock.patch("documents.bulk_edit.remove_password")
+    def test_password_removal_action_fails_without_correct_password(
+        self,
+        mock_remove_password,
+    ):
+        """
+        GIVEN:
+            - Workflow password removal action
+            - No correct password provided
+        WHEN:
+            - Document updated triggering the workflow
+        THEN:
+            - Password removal is attempted for all passwords and fails
+        """
+        doc = Document.objects.create(
+            title="Protected",
+            checksum="pw-checksum-2",
+        )
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+            passwords=" \n , ",
+        )
+        workflow = Workflow.objects.create(name="Password workflow missing passwords")
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        run_workflows(trigger.type, doc)
+
+        mock_remove_password.assert_not_called()
+
+    @mock.patch("documents.bulk_edit.remove_password")
+    def test_password_removal_action_skips_without_passwords(
+        self,
+        mock_remove_password,
+    ):
+        """
+        GIVEN:
+            - Workflow password removal action with no passwords
+        WHEN:
+            - Workflow is run
+        THEN:
+            - Password removal is not attempted
+        """
+        doc = Document.objects.create(
+            title="Protected",
+            checksum="pw-checksum-2",
+        )
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+            passwords="",
+        )
+        workflow = Workflow.objects.create(name="Password workflow missing passwords")
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        run_workflows(trigger.type, doc)
+
+        mock_remove_password.assert_not_called()
+
+    @mock.patch("documents.bulk_edit.remove_password")
+    def test_password_removal_consumable_document_deferred(
+        self,
+        mock_remove_password,
+    ):
+        """
+        GIVEN:
+            - Workflow password removal action
+            - Simulated consumption trigger (a ConsumableDocument is used)
+        WHEN:
+            - Document consumption is finished
+        THEN:
+            - Password removal is attempted
+        """
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+            passwords="first, second",
+        )
+
+        temp_dir = Path(tempfile.mkdtemp())
+        original_file = temp_dir / "file.pdf"
+        original_file.write_bytes(b"pdf content")
+        consumable = ConsumableDocument(
+            source=DocumentSource.ApiUpload,
+            original_file=original_file,
+        )
+
+        execute_password_removal_action(action, consumable, logging_group=None)
+
+        mock_remove_password.assert_not_called()
+
+        mock_remove_password.side_effect = [
+            ValueError("bad password"),
+            "OK",
+        ]
+
+        doc = Document.objects.create(
+            checksum="pw-checksum-consumed",
+            title="Protected",
+        )
+
+        document_consumption_finished.send(
+            sender=self.__class__,
+            document=doc,
+        )
+
+        assert mock_remove_password.call_count == 2
+        mock_remove_password.assert_has_calls(
+            [
+                mock.call(
+                    [doc.id],
+                    password="first",
+                    update_document=True,
+                    user=doc.owner,
+                ),
+                mock.call(
+                    [doc.id],
+                    password="second",
+                    update_document=True,
+                    user=doc.owner,
+                ),
+            ],
+        )
+
+        # ensure handler disconnected after first run
+        document_consumption_finished.send(
+            sender=self.__class__,
+            document=doc,
+        )
+        assert mock_remove_password.call_count == 2
+
 
 class TestWebhookSend:
     def test_send_webhook_data_or_json(
         self,
         httpx_mock: HTTPXMock,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Nothing
@@ -3060,7 +3971,7 @@ def resolve_to(monkeypatch):
 
 
 class TestWebhookSecurity:
-    def test_blocks_invalid_scheme_or_hostname(self, httpx_mock: HTTPXMock):
+    def test_blocks_invalid_scheme_or_hostname(self, httpx_mock: HTTPXMock) -> None:
         """
         GIVEN:
             - Invalid URL schemes or hostnames
@@ -3088,7 +3999,7 @@ class TestWebhookSecurity:
             )
 
     @override_settings(WEBHOOKS_ALLOWED_PORTS=[80, 443])
-    def test_blocks_disallowed_port(self, httpx_mock: HTTPXMock):
+    def test_blocks_disallowed_port(self, httpx_mock: HTTPXMock) -> None:
         """
         GIVEN:
             - URL with a disallowed port
@@ -3109,7 +4020,11 @@ class TestWebhookSecurity:
         assert httpx_mock.get_request() is None
 
     @override_settings(WEBHOOKS_ALLOW_INTERNAL_REQUESTS=False)
-    def test_blocks_private_loopback_linklocal(self, httpx_mock: HTTPXMock, resolve_to):
+    def test_blocks_private_loopback_linklocal(
+        self,
+        httpx_mock: HTTPXMock,
+        resolve_to,
+    ) -> None:
         """
         GIVEN:
             - URL with a private, loopback, or link-local IP address
@@ -3120,7 +4035,7 @@ class TestWebhookSecurity:
             - ValueError is raised
         """
         resolve_to("127.0.0.1")
-        with pytest.raises(ValueError):
+        with pytest.raises(ConnectError):
             send_webhook(
                 "http://paperless-ngx.com",
                 data="",
@@ -3129,7 +4044,11 @@ class TestWebhookSecurity:
                 as_json=False,
             )
 
-    def test_allows_public_ip_and_sends(self, httpx_mock: HTTPXMock, resolve_to):
+    def test_allows_public_ip_and_sends(
+        self,
+        httpx_mock: HTTPXMock,
+        resolve_to,
+    ) -> None:
         """
         GIVEN:
             - URL with a public IP address
@@ -3150,9 +4069,10 @@ class TestWebhookSecurity:
         )
 
         req = httpx_mock.get_request()
-        assert req.url.host == "paperless-ngx.com"
+        assert req.url.host == "52.207.186.75"
+        assert req.headers["host"] == "paperless-ngx.com"
 
-    def test_follow_redirects_disabled(self, httpx_mock: HTTPXMock, resolve_to):
+    def test_follow_redirects_disabled(self, httpx_mock: HTTPXMock, resolve_to) -> None:
         """
         GIVEN:
             - A URL that redirects
@@ -3180,7 +4100,11 @@ class TestWebhookSecurity:
 
         assert len(httpx_mock.get_requests()) == 1
 
-    def test_strips_user_supplied_host_header(self, httpx_mock: HTTPXMock, resolve_to):
+    def test_strips_user_supplied_host_header(
+        self,
+        httpx_mock: HTTPXMock,
+        resolve_to,
+    ) -> None:
         """
         GIVEN:
             - A URL with a user-supplied Host header

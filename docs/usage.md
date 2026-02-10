@@ -1,4 +1,8 @@
-# Usage Overview
+---
+title: Basic Usage
+---
+
+# Usage
 
 Paperless-ngx is an application that manages your personal documents. With
 the (optional) help of a document scanner (see [the scanners wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Scanner-&-Software-Recommendations)), Paperless-ngx transforms your unwieldy
@@ -261,6 +265,10 @@ different means. These are as follows:
 Paperless is set up to check your mails every 10 minutes. This can be
 configured via [`PAPERLESS_EMAIL_TASK_CRON`](configuration.md#PAPERLESS_EMAIL_TASK_CRON)
 
+#### Processed Mail
+
+Paperless keeps track of emails it has processed in order to avoid processing the same mail multiple times. This uses the message `UID` provided by the mail server, which should be unique for each message. You can view and manage processed mails from the web UI under Mail > Processed Mails. If you need to re-process a message, you can delete the corresponding processed mail entry, which will allow Paperless-ngx to process the email again the next time the mail fetch task runs.
+
 #### OAuth Email Setup
 
 Paperless-ngx supports OAuth2 authentication for Gmail and Outlook email accounts. To set up an email account with OAuth2, you will need to create a 'developer' app with the respective provider and obtain the client ID and client secret and set the appropriate [configuration variables](configuration.md#email_oauth). You will also need to set either [`PAPERLESS_OAUTH_CALLBACK_BASE_URL`](configuration.md#PAPERLESS_OAUTH_CALLBACK_BASE_URL) or [`PAPERLESS_URL`](configuration.md#PAPERLESS_URL) to the correct value for the OAuth2 flow to work correctly.
@@ -274,6 +282,28 @@ Once setup, navigating to the email settings page in Paperless-ngx will allow yo
 You can also submit a document using the REST API, see [POSTing documents](api.md#file-uploads)
 for details.
 
+## Document Suggestions
+
+Paperless-ngx can suggest tags, correspondents, document types and storage paths for documents based on the content of the document. This is done using a (non-LLM) machine learning model that is trained on the documents in your database. The suggestions are shown in the document detail page and can be accepted or rejected by the user.
+
+## AI Features
+
+Paperless-ngx includes several features that use AI to enhance the document management experience. These features are optional and can be enabled or disabled in the settings. If you are using the AI features, you may want to also enable the "LLM index" feature, which supports Retrieval-Augmented Generation (RAG) designed to improve the quality of AI responses. The LLM index feature is not enabled by default and requires additional configuration.
+
+!!! warning
+
+    Remember that Paperless-ngx will send document content to the AI provider you have configured, so consider the privacy implications of using these features, especially if using a remote model (e.g. OpenAI), instead of the default local model.
+
+The AI features work by creating an embedding of the text content and metadata of documents, which is then used for various tasks such as similarity search and question answering. This uses the FAISS vector store.
+
+### AI-Enhanced Suggestions
+
+If enabled, Paperless-ngx can use an AI LLM model to suggest document titles, dates, tags, correspondents and document types for documents. This feature will always be "opt-in" and does not disable the existing classifier-based suggestion system. Currently, both remote (via the OpenAI API) and local (via Ollama) models are supported, see [configuration](configuration.md#ai) for details.
+
+### Document Chat
+
+Paperless-ngx can use an AI LLM model to answer questions about a document or across multiple documents. Again, this feature works best when RAG is enabled. The chat feature is available in the upper app toolbar and will switch between chatting across multiple documents or a single document based on the current view.
+
 ## Sharing documents from Paperless-ngx
 
 Paperless-ngx supports sharing documents with other users by assigning them [permissions](#object-permissions)
@@ -282,12 +312,14 @@ or using [email](#workflow-action-email) or [webhook](#workflow-action-webhook) 
 
 ### Share Links
 
-"Share links" are shareable public links to files and can be created and managed under the 'Send' button on the document detail screen.
+"Share links" are public links to files (or an archive of files) and can be created and managed under the 'Send' button on the document detail screen or from the bulk editor.
 
--   Share links do not require a user to login and thus link directly to a file.
+-   Share links do not require a user to login and thus link directly to a file or bundled download.
 -   Links are unique and are of the form `{paperless-url}/share/{randomly-generated-slug}`.
 -   Links can optionally have an expiration time set.
 -   After a link expires or is deleted users will be redirected to the regular paperless-ngx login.
+-   From the document detail screen you can create a share link for that single document.
+-   From the bulk editor you can create a **share link bundle** for any selection. Paperless-ngx prepares a ZIP archive in the background and exposes a single share link. You can revisit the "Manage share link bundles" dialog to monitor progress, retry failed bundles, or delete links.
 
 !!! tip
 
@@ -410,7 +442,7 @@ fields and permissions, which will be merged.
 
 #### Types {#workflow-trigger-types}
 
-Currently, there are three events that correspond to workflow trigger 'types':
+Currently, there are four events that correspond to workflow trigger 'types':
 
 1. **Consumption Started**: _before_ a document is consumed, so events can include filters by source (mail, consumption
    folder or API), file path, file name, mail rule
@@ -423,7 +455,7 @@ Currently, there are three events that correspond to workflow trigger 'types':
    added, created, updated date or you can specify a (date) custom field. You can also specify a day offset from the date (positive
    offsets will trigger after the date, negative offsets will trigger before).
 
-The following flow diagram illustrates the three document trigger types:
+The following flow diagram illustrates the four document trigger types:
 
 ```mermaid
 flowchart TD
@@ -439,6 +471,10 @@ flowchart TD
     'Updated'
     trigger(s)"}
 
+    scheduled{"Documents
+    matching
+    trigger(s)"}
+
     A[New Document] --> consumption
     consumption --> |Yes| C[Workflow Actions Run]
     consumption --> |No| D
@@ -451,6 +487,11 @@ flowchart TD
     updated --> |Yes| J[Workflow Actions Run]
     updated --> |No| K
     J --> K[Document Saved]
+    L[Scheduled Task Check<br/>hourly at :05] --> M[Get All Scheduled Triggers]
+    M --> scheduled
+    scheduled --> |Yes| N[Workflow Actions Run]
+    scheduled --> |No| O[Document Saved]
+    N --> O
 ```
 
 #### Filters {#workflow-trigger-filters}
@@ -458,15 +499,24 @@ flowchart TD
 Workflows allow you to filter by:
 
 -   Source, e.g. documents uploaded via consume folder, API (& the web UI) and mail fetch
--   File name, including wildcards e.g. \*.pdf will apply to all pdfs
+-   File name, including wildcards e.g. \*.pdf will apply to all pdfs.
 -   File path, including wildcards. Note that enabling `PAPERLESS_CONSUMER_RECURSIVE` would allow, for
     example, automatically assigning documents to different owners based on the upload directory.
 -   Mail rule. Choosing this option will force 'mail fetch' to be the workflow source.
 -   Content matching (`Added`, `Updated` and `Scheduled` triggers only). Filter document content using the matching settings.
--   Tags (`Added`, `Updated` and `Scheduled` triggers only). Filter for documents with any of the specified tags
--   Document type (`Added`, `Updated` and `Scheduled` triggers only). Filter documents with this doc type
--   Correspondent (`Added`, `Updated` and `Scheduled` triggers only). Filter documents with this correspondent
--   Storage path (`Added`, `Updated` and `Scheduled` triggers only). Filter documents with this storage path
+
+There are also 'advanced' filters available for `Added`, `Updated` and `Scheduled` triggers:
+
+-   Any Tags: Filter for documents with any of the specified tags.
+-   All Tags: Filter for documents with all of the specified tags.
+-   No Tags: Filter for documents with none of the specified tags.
+-   Document type: Filter documents with this document type.
+-   Not Document types: Filter documents without any of these document types.
+-   Correspondent: Filter documents with this correspondent.
+-   Not Correspondents: Filter documents without any of these correspondents.
+-   Storage path: Filter documents with this storage path.
+-   Not Storage paths: Filter documents without any of these storage paths.
+-   Custom field query: Filter documents with a custom field query (the same as used for the document list filters).
 
 ### Workflow Actions
 
@@ -516,12 +566,12 @@ you may want to adjust these settings to prevent abuse.
 
 #### Workflow placeholders
 
-Titles can be assigned by workflows using [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/templates/).
-This allows for complex logic to be used to generate the title, including [logical structures](https://jinja.palletsprojects.com/en/3.1.x/templates/#list-of-control-structures)
+Titles and webhook payloads can be generated by workflows using [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/templates/).
+This allows for complex logic to be used, including [logical structures](https://jinja.palletsprojects.com/en/3.1.x/templates/#list-of-control-structures)
 and [filters](https://jinja.palletsprojects.com/en/3.1.x/templates/#id11).
 The template is provided as a string.
 
-Using Jinja2 Templates is also useful for [Date localization](advanced_usage.md#Date-Localization) in the title.
+Using Jinja2 Templates is also useful for [Date localization](advanced_usage.md#date-localization) in the title.
 
 The available inputs differ depending on the type of workflow trigger.
 This is because at the time of consumption (when the text is to be set), no automatic tags etc. have been
@@ -540,6 +590,7 @@ applied. You can use the following placeholders in the template with any trigger
 -   `{{added_time}}`: added time in HH:MM format
 -   `{{original_filename}}`: original file name without extension
 -   `{{filename}}`: current file name without extension
+-   `{{doc_title}}`: current document title (cannot be used in title assignment)
 
 The following placeholders are only available for "added" or "updated" triggers
 
@@ -552,6 +603,7 @@ The following placeholders are only available for "added" or "updated" triggers
 -   `{{created_day}}`: created day
 -   `{{created_time}}`: created time in HH:MM format
 -   `{{doc_url}}`: URL to the document in the web UI. Requires the `PAPERLESS_URL` setting to be set.
+-   `{{doc_id}}`: Document ID
 
 ##### Examples
 
@@ -633,7 +685,7 @@ When you first delete a document it is moved to the 'trash' until either it is e
 You can set how long documents remain in the trash before being automatically deleted with [`PAPERLESS_EMPTY_TRASH_DELAY`](configuration.md#PAPERLESS_EMPTY_TRASH_DELAY), which defaults
 to 30 days. Until the file is actually deleted (e.g. the trash is emptied), all files and database content remains intact and can be restored at any point up until that time.
 
-Additionally you may configure a directory where deleted files are moved to when they the trash is emptied with [`PAPERLESS_EMPTY_TRASH_DIR`](configuration.md#PAPERLESS_EMPTY_TRASH_DIR).
+Additionally you may configure a directory where deleted files are moved to when the trash is emptied with [`PAPERLESS_EMPTY_TRASH_DIR`](configuration.md#PAPERLESS_EMPTY_TRASH_DIR).
 Note that the empty trash directory only stores the original file, the archive file and all database information is permanently removed once a document is fully deleted.
 
 ## Best practices {#basic-searching}
@@ -877,6 +929,21 @@ how regularly you intend to scan documents and use paperless.
     and put documents you need to process in the TODO box. When you
     performed the task associated with the document, move it to the
     inbox.
+
+## Remote OCR
+
+!!! important
+
+    This feature is disabled by default and will always remain strictly "opt-in".
+
+Paperless-ngx supports performing OCR on documents using remote services. At the moment, this is limited to
+[Microsoft's Azure "Document Intelligence" service](https://azure.microsoft.com/en-us/products/ai-services/ai-document-intelligence).
+This is of course a paid service (with a free tier) which requires an Azure account and subscription. Azure AI is not affiliated with
+Paperless-ngx in any way. When enabled, Paperless-ngx will automatically send appropriate documents to Azure for OCR processing, bypassing
+the local OCR engine. See the [configuration](configuration.md#PAPERLESS_REMOTE_OCR_ENGINE) options for more details.
+
+Additionally, when using a commercial service with this feature, consider both potential costs as well as any associated file size
+or page limitations (e.g. with a free tier).
 
 ## Architecture
 

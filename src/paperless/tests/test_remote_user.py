@@ -12,14 +12,14 @@ from paperless.settings import _parse_remote_user_settings
 
 
 class TestRemoteUser(DirectoriesMixin, APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.user = User.objects.create_superuser(
             username="temp_admin",
         )
 
-    def test_remote_user(self):
+    def test_remote_user(self) -> None:
         """
         GIVEN:
             - Configured user
@@ -54,7 +54,7 @@ class TestRemoteUser(DirectoriesMixin, APITestCase):
 
             self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_remote_user_api(self):
+    def test_remote_user_api(self) -> None:
         """
         GIVEN:
             - Configured user
@@ -100,7 +100,7 @@ class TestRemoteUser(DirectoriesMixin, APITestCase):
             ],
         },
     )
-    def test_remote_user_api_disabled(self):
+    def test_remote_user_api_disabled(self) -> None:
         """
         GIVEN:
             - Configured user
@@ -123,7 +123,7 @@ class TestRemoteUser(DirectoriesMixin, APITestCase):
             [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN],
         )
 
-    def test_remote_user_header_setting(self):
+    def test_remote_user_header_setting(self) -> None:
         """
         GIVEN:
             - Remote user header name is set

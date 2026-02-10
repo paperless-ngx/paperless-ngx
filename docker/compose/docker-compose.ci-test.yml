@@ -4,7 +4,7 @@
 # correct networking for the tests
 services:
   gotenberg:
-    image: docker.io/gotenberg/gotenberg:8.23
+    image: docker.io/gotenberg/gotenberg:8.26
     hostname: gotenberg
     container_name: gotenberg
     network_mode: host
@@ -23,3 +23,24 @@ services:
     container_name: tika
     network_mode: host
     restart: unless-stopped
+  greenmail:
+    image: greenmail/standalone:2.1.8
+    hostname: greenmail
+    container_name: greenmail
+    environment:
+      # Enable only IMAP for now (SMTP available via 3025 if needed later)
+      GREENMAIL_OPTS: >-
+        -Dgreenmail.setup.test.imap -Dgreenmail.users=test@localhost:test -Dgreenmail.users.login=test@localhost -Dgreenmail.verbose
+    ports:
+      - "3143:3143" # IMAP
+    restart: unless-stopped
+  nginx:
+    image: docker.io/nginx:1.29.5-alpine
+    hostname: nginx
+    container_name: nginx
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    volumes:
+      - ../../docs/assets:/usr/share/nginx/html/assets:ro
+      - ./test-nginx.conf:/etc/nginx/conf.d/default.conf:ro

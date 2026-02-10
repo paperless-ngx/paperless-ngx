@@ -1,3 +1,7 @@
+import {
+  CdkVirtualScrollViewport,
+  ScrollingModule,
+} from '@angular/cdk/scrolling'
 import { NgClass } from '@angular/common'
 import {
   Component,
@@ -32,6 +36,14 @@ export interface ChangedItems {
   itemsToRemove: MatchingModel[]
 }
 
+type BranchSummary = {
+  items: MatchingModel[]
+  firstIndex: number
+  special: boolean
+  selected: boolean
+  hasDocs: boolean
+}
+
 export enum LogicalOperator {
   And = 'and',
   Or = 'or',
@@ -53,8 +65,13 @@ export class FilterableDropdownSelectionModel {
   temporaryIntersection: Intersection = this._intersection
 
   private _documentCounts: SelectionDataItem[] = []
+  public documentCountSortingEnabled = false
+
   public set documentCounts(counts: SelectionDataItem[]) {
     this._documentCounts = counts
+    if (this.documentCountSortingEnabled) {
+      this.sortItems()
+    }
   }
 
   private _items: MatchingModel[] = []
@@ -147,6 +164,10 @@ export class FilterableDropdownSelectionModel {
         return a.name.localeCompare(b.name)
       }
     })
+
+    if (this._documentCounts.length) {
+      this.promoteBranchesWithDocumentCounts()
+    }
   }
 
   private selectionStates = new Map<number, ToggleableItemState>()
@@ -380,6 +401,180 @@ export class FilterableDropdownSelectionModel {
     return this._documentCounts.find((c) => c.id === id)?.document_count
   }
 
+  private promoteBranchesWithDocumentCounts() {
+    const parentById = this.buildParentById()
+    const findRootId = this.createRootFinder(parentById)
+    const getRootDocCount = this.createRootDocCounter()
+    const summaries = this.buildBranchSummaries(findRootId, getRootDocCount)
+    const orderedBranches = this.orderBranchesByPriority(summaries)
+
+    this._items = orderedBranches.flatMap((summary) => summary.items)
+  }
+
+  private buildParentById(): Map<number, number | null> {
+    const parentById = new Map<number, number | null>()
+
+    for (const item of this._items) {
+      if (typeof item?.id === 'number') {
+        const parentValue = (item as any)['parent']
+        parentById.set(
+          item.id,
+          typeof parentValue === 'number' ? parentValue : null
+        )
+      }
+    }
+
+    return parentById
+  }
+
+  private createRootFinder(
+    parentById: Map<number, number | null>
+  ): (id: number) => number {
+    const rootMemo = new Map<number, number>()
+
+    const findRootId = (id: number): number => {
+      const cached = rootMemo.get(id)
+      if (cached !== undefined) {
+        return cached
+      }
+
+      const parentId = parentById.get(id)
+      if (parentId === undefined || parentId === null) {
+        rootMemo.set(id, id)
+        return id
+      }
+
+      const rootId = findRootId(parentId)
+      rootMemo.set(id, rootId)
+      return rootId
+    }
+
+    return findRootId
+  }
+
+  private createRootDocCounter(): (rootId: number) => number {
+    const docCountMemo = new Map<number, number>()
+
+    return (rootId: number): number => {
+      const cached = docCountMemo.get(rootId)
+      if (cached !== undefined) {
+        return cached
+      }
+
+      const explicit = this.getDocumentCount(rootId)
+      if (typeof explicit === 'number') {
+        docCountMemo.set(rootId, explicit)
+        return explicit
+      }
+
+      const rootItem = this._items.find((i) => i.id === rootId)
+      const fallback =
+        typeof (rootItem as any)?.['document_count'] === 'number'
+          ? (rootItem as any)['document_count']
+          : 0
+
+      docCountMemo.set(rootId, fallback)
+      return fallback
+    }
+  }
+
+  private buildBranchSummaries(
+    findRootId: (id: number) => number,
+    getRootDocCount: (rootId: number) => number
+  ): Map<string, BranchSummary> {
+    const summaries = new Map<string, BranchSummary>()
+
+    for (const [index, item] of this._items.entries()) {
+      const { key, special, rootId } = this.describeBranchItem(
+        item,
+        index,
+        findRootId
+      )
+
+      let summary = summaries.get(key)
+      if (!summary) {
+        summary = {
+          items: [],
+          firstIndex: index,
+          special,
+          selected: false,
+          hasDocs:
+            special || rootId === null ? false : getRootDocCount(rootId) > 0,
+        }
+        summaries.set(key, summary)
+      }
+
+      summary.items.push(item)
+
+      if (this.shouldMarkSummarySelected(summary, item)) {
+        summary.selected = true
+      }
+    }
+
+    return summaries
+  }
+
+  private describeBranchItem(
+    item: MatchingModel,
+    index: number,
+    findRootId: (id: number) => number
+  ): { key: string; special: boolean; rootId: number | null } {
+    if (item?.id === null) {
+      return { key: 'null', special: true, rootId: null }
+    }
+
+    if (item?.id === NEGATIVE_NULL_FILTER_VALUE) {
+      return { key: 'neg-null', special: true, rootId: null }
+    }
+
+    if (typeof item?.id === 'number') {
+      const rootId = findRootId(item.id)
+      return { key: `root-${rootId}`, special: false, rootId }
+    }
+
+    return { key: `misc-${index}`, special: false, rootId: null }
+  }
+
+  private shouldMarkSummarySelected(
+    summary: BranchSummary,
+    item: MatchingModel
+  ): boolean {
+    if (summary.special) {
+      return false
+    }
+
+    if (typeof item?.id !== 'number') {
+      return false
+    }
+
+    return this.getNonTemporary(item.id) !== ToggleableItemState.NotSelected
+  }
+
+  private orderBranchesByPriority(
+    summaries: Map<string, BranchSummary>
+  ): BranchSummary[] {
+    return Array.from(summaries.values()).sort((a, b) => {
+      const rankDiff = this.branchRank(a) - this.branchRank(b)
+      if (rankDiff !== 0) {
+        return rankDiff
+      }
+      if (a.hasDocs !== b.hasDocs) {
+        return a.hasDocs ? -1 : 1
+      }
+      return a.firstIndex - b.firstIndex
+    })
+  }
+
+  private branchRank(summary: BranchSummary): number {
+    if (summary.special) {
+      return -1
+    }
+    if (summary.selected) {
+      return 0
+    }
+    return 1
+  }
+
   init(map: Map<number, ToggleableItemState>) {
     this.temporarySelectionStates = map
     this.apply()
@@ -436,18 +631,27 @@ export class FilterableDropdownSelectionModel {
     NgxBootstrapIconsModule,
     NgbDropdownModule,
     NgClass,
+    ScrollingModule,
   ],
 })
 export class FilterableDropdownComponent
   extends LoadingComponentWithPermissions
   implements OnInit
 {
+  public readonly FILTERABLE_BUTTON_HEIGHT_PX = 42
+
   private filterPipe = inject(FilterPipe)
   private hotkeyService = inject(HotKeyService)
 
   @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
   @ViewChild('dropdown') dropdown: NgbDropdown
-  @ViewChild('buttonItems') buttonItems: ElementRef
+  @ViewChild('buttonsViewport') buttonsViewport: CdkVirtualScrollViewport
+
+  private get renderedButtons(): Array<HTMLButtonElement> {
+    return Array.from(
+      this.buttonsViewport.elementRef.nativeElement.querySelectorAll('button')
+    )
+  }
 
   public popperOptions = pngxPopperOptions
 
@@ -465,8 +669,9 @@ export class FilterableDropdownComponent
       this.selectionModel.changed.complete()
       model.items = this.selectionModel.items
       model.manyToOne = this.selectionModel.manyToOne
-      model.singleSelect = this.editing && !this.selectionModel.manyToOne
+      model.singleSelect = this._editing && !model.manyToOne
     }
+    model.documentCountSortingEnabled = this._editing
     model.changed.subscribe((updatedModel) => {
       this.selectionModelChange.next(updatedModel)
     })
@@ -496,8 +701,21 @@ export class FilterableDropdownComponent
   @Input()
   allowSelectNone: boolean = false
 
+  private _editing = false
+
   @Input()
-  editing = false
+  set editing(value: boolean) {
+    this._editing = value
+    if (this.selectionModel) {
+      this.selectionModel.singleSelect =
+        this._editing && !this.selectionModel.manyToOne
+      this.selectionModel.documentCountSortingEnabled = this._editing
+    }
+  }
+
+  get editing() {
+    return this._editing
+  }
 
   @Input()
   applyOnClose = false
@@ -547,6 +765,14 @@ export class FilterableDropdownComponent
 
   private keyboardIndex: number
 
+  public get scrollViewportHeight(): number {
+    const filteredLength = this.filterPipe.transform(
+      this.items,
+      this.filterText
+    ).length
+    return Math.min(filteredLength * this.FILTERABLE_BUTTON_HEIGHT_PX, 400)
+  }
+
   constructor() {
     super()
     this.selectionModelChange.subscribe((updatedModel) => {
@@ -571,6 +797,10 @@ export class FilterableDropdownComponent
     }
   }
 
+  public trackByItem(index: number, item: MatchingModel) {
+    return item?.id ?? index
+  }
+
   applyClicked() {
     if (this.selectionModel.isDirty()) {
       this.dropdown.close()
@@ -589,6 +819,7 @@ export class FilterableDropdownComponent
     if (open) {
       setTimeout(() => {
         this.listFilterTextInput?.nativeElement.focus()
+        this.buttonsViewport?.checkViewportSize()
       }, 0)
       if (this.editing) {
         this.selectionModel.reset()
@@ -656,12 +887,14 @@ export class FilterableDropdownComponent
             event.preventDefault()
           }
         } else if (event.target instanceof HTMLButtonElement) {
+          this.syncKeyboardIndexFromButton(event.target)
           this.focusNextButtonItem()
           event.preventDefault()
         }
         break
       case 'ArrowUp':
         if (event.target instanceof HTMLButtonElement) {
+          this.syncKeyboardIndexFromButton(event.target)
           if (this.keyboardIndex === 0) {
             this.listFilterTextInput.nativeElement.focus()
           } else {
@@ -698,15 +931,18 @@ export class FilterableDropdownComponent
     if (setFocus) this.setButtonItemFocus()
   }
 
-  setButtonItemFocus() {
-    this.buttonItems.nativeElement.children[
-      this.keyboardIndex
-    ]?.children[0].focus()
+  private syncKeyboardIndexFromButton(button: HTMLButtonElement) {
+    // because of virtual scrolling, re-calculate the index
+    const idx = this.renderedButtons.indexOf(button)
+    if (idx >= 0) {
+      this.keyboardIndex = this.buttonsViewport.getRenderedRange().start + idx
+    }
   }
 
-  setButtonItemIndex(index: number) {
-    // just track the index in case user uses arrows
-    this.keyboardIndex = index
+  setButtonItemFocus() {
+    const offset =
+      this.keyboardIndex - this.buttonsViewport.getRenderedRange().start
+    this.renderedButtons[offset]?.focus()
   }
 
   hideCount(item: ObjectWithPermissions) {

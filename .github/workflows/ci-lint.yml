@@ -1,0 +1,24 @@
+name: Lint
+on:
+  push:
+    branches-ignore:
+      - 'translations**'
+  pull_request:
+    branches-ignore:
+      - 'translations**'
+concurrency:
+  group: lint-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  lint:
+    name: Linting via prek
+    runs-on: ubuntu-slim
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+      - name: Install Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "3.14"
+      - name: Run prek
+        uses: j178/prek-action@v1.1.1

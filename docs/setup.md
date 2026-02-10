@@ -1,4 +1,8 @@
-## Installation
+---
+title: Setup
+---
+
+# Installation
 
 You can go multiple routes to setup and run Paperless:
 
@@ -124,8 +128,7 @@ account. The script essentially automatically performs the steps described in [D
         system notifications with `inotify`. When storing the consumption
         directory on such a file system, paperless will not pick up new
         files with the default configuration. You will need to use
-        [`PAPERLESS_CONSUMER_POLLING`](configuration.md#PAPERLESS_CONSUMER_POLLING), which will disable inotify. See
-        [here](configuration.md#polling).
+        [`PAPERLESS_CONSUMER_POLLING_INTERVAL`](configuration.md#PAPERLESS_CONSUMER_POLLING_INTERVAL), which will disable inotify.
 
 5.  Run `docker compose pull`. This will pull the image from the GitHub container registry
     by default but you can change the image to pull from Docker Hub by changing the `image`
@@ -326,7 +329,7 @@ are released, dependency support is confirmed, etc.
 
     !!! warning
 
-        Ensure your Redis instance [is secured](https://redis.io/docs/getting-started/#securing-redis).
+        Ensure your Redis instance [is secured](https://redis.io/docs/latest/operate/oss_and_stack/management/security/).
 
 7.  Create the following directories if they are missing:
 

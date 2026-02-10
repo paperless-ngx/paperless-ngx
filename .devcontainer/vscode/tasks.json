@@ -33,7 +33,7 @@
 			"label": "Start: Frontend Angular",
 			"description": "Start the Frontend Angular Dev Server",
 			"type": "shell",
-			"command": "pnpm start",
+			"command": "pnpm exec ng serve --host 0.0.0.0",
 			"isBackground": true,
 			"options": {
 				"cwd": "${workspaceFolder}/src-ui"
@@ -116,9 +116,9 @@
 		},
 		{
 			"label": "Maintenance: Build Documentation",
-			"description": "Build the documentation with MkDocs",
+			"description": "Build the documentation with Zensical",
 			"type": "shell",
-			"command": "uv run mkdocs build --config-file mkdocs.yml && uv run mkdocs serve",
+			"command": "uv run zensical build && uv run zensical serve",
 			"group": "none",
 			"presentation": {
 				"echo": true,
@@ -174,12 +174,22 @@
 		{
 			"label": "Maintenance: Install Frontend Dependencies",
 			"description": "Install frontend (pnpm) dependencies",
-			"type": "pnpm",
-			"script": "install",
-			"path": "src-ui",
+			"type": "shell",
+			"command": "pnpm install",
 			"group": "clean",
 			"problemMatcher": [],
-			"detail": "install dependencies from package"
+			"options": {
+				"cwd": "${workspaceFolder}/src-ui"
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": true,
+				"panel": "shared",
+				"showReuseMessage": false,
+				"clear": true,
+				"revealProblems": "onProblem"
+			}
 		},
 		{
 			"description": "Clean install frontend dependencies and build the frontend for production",

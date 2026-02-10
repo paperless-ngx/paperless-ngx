@@ -16,6 +16,7 @@ from pikepdf import Pdf
 from documents.converters import convert_from_tiff_to_pdf
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
+from documents.models import Document
 from documents.models import Tag
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import StopConsumeTaskError
@@ -59,6 +60,20 @@ class Barcode:
         False otherwise
         """
         return self.value.startswith(self.settings.barcode_asn_prefix)
+
+    @property
+    def is_tag(self) -> bool:
+        """
+        Returns True if the barcode value matches any configured tag mapping pattern,
+        False otherwise.
+
+        Note: This does NOT exclude ASN or separator barcodes - they can also be used
+        as tags if they match a tag mapping pattern (e.g., {"ASN12.*": "JOHN"}).
+        """
+        for regex in self.settings.barcode_tag_mapping:
+            if re.match(regex, self.value, flags=re.IGNORECASE):
+                return True
+        return False
 
 
 class BarcodePlugin(ConsumeTaskPlugin):
@@ -115,6 +130,24 @@ class BarcodePlugin(ConsumeTaskPlugin):
         self._tiff_conversion_done = False
         self.barcodes: list[Barcode] = []
 
+    def _apply_detected_asn(self, detected_asn: int) -> None:
+        """
+        Apply a detected ASN to metadata if allowed.
+        """
+        if (
+            self.metadata.skip_asn_if_exists
+            and Document.global_objects.filter(
+                archive_serial_number=detected_asn,
+            ).exists()
+        ):
+            logger.info(
+                f"Found ASN in barcode {detected_asn} but skipping because it already exists.",
+            )
+            return
+
+        logger.info(f"Found ASN in barcode: {detected_asn}")
+        self.metadata.asn = detected_asn
+
     def run(self) -> None:
         # Some operations may use PIL, override pixel setting if needed
         maybe_override_pixel_limit()
@@ -126,8 +159,14 @@ class BarcodePlugin(ConsumeTaskPlugin):
         self.detect()
 
         # try reading tags from barcodes
+        # If tag splitting is enabled, skip this on the original document - let each split document extract its own tags
+        # However, if we're processing a split document (original_path is set), extract tags
         if (
             self.settings.barcode_enable_tag
+            and (
+                not self.settings.barcode_tag_split
+                or self.input_doc.original_path is not None
+            )
             and (tags := self.tags) is not None
             and len(tags) > 0
         ):
@@ -164,6 +203,9 @@ class BarcodePlugin(ConsumeTaskPlugin):
                         mailrule_id=self.input_doc.mailrule_id,
                         # Can't use same folder or the consume might grab it again
                         original_file=(tmp_dir / new_document.name).resolve(),
+                        # Adding optional original_path for later uses in
+                        # workflow matching
+                        original_path=self.input_doc.original_file,
                     ),
                     # All the same metadata
                     self.metadata,
@@ -184,8 +226,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
         # Update/overwrite an ASN if possible
         # After splitting, as otherwise each split document gets the same ASN
         if self.settings.barcode_enable_asn and (located_asn := self.asn) is not None:
-            logger.info(f"Found ASN in barcode: {located_asn}")
-            self.metadata.asn = located_asn
+            self._apply_detected_asn(located_asn)
 
     def cleanup(self) -> None:
         self.temp_dir.cleanup()
@@ -425,15 +466,24 @@ class BarcodePlugin(ConsumeTaskPlugin):
             for bc in self.barcodes
             if bc.is_separator and (not retain or (retain and bc.page > 0))
         }  # as below, dont include the first page if retain is enabled
-        if not self.settings.barcode_enable_asn:
-            return separator_pages
 
         # add the page numbers of the ASN barcodes
         # (except for first page, that might lead to infinite loops).
-        return {
-            **separator_pages,
-            **{bc.page: True for bc in self.barcodes if bc.is_asn and bc.page != 0},
-        }
+        if self.settings.barcode_enable_asn:
+            separator_pages = {
+                **separator_pages,
+                **{bc.page: True for bc in self.barcodes if bc.is_asn and bc.page != 0},
+            }
+
+        # add the page numbers of the TAG barcodes if splitting is enabled
+        # (except for first page, that might lead to infinite loops).
+        if self.settings.barcode_tag_split and self.settings.barcode_enable_tag:
+            separator_pages = {
+                **separator_pages,
+                **{bc.page: True for bc in self.barcodes if bc.is_tag and bc.page != 0},
+            }
+
+        return separator_pages
 
     def separate_pages(self, pages_to_split_on: dict[int, bool]) -> list[Path]:
         """

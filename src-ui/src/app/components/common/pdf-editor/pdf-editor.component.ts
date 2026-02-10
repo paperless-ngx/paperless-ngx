@@ -6,10 +6,17 @@ import {
 import { Component, inject } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { PDFDocumentProxy, PdfViewerModule } from 'ng2-pdf-viewer'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component'
+import { PngxPdfViewerComponent } from '../pdf-viewer/pdf-viewer.component'
+import {
+  PdfRenderMode,
+  PngxPdfDocumentProxy,
+} from '../pdf-viewer/pdf-viewer.types'
+import { PdfEditorEditMode } from './pdf-editor-edit-mode'
 
 interface PageOperation {
   page: number
@@ -19,11 +26,6 @@ interface PageOperation {
   loaded?: boolean
 }
 
-export enum PdfEditorEditMode {
-  Update = 'update',
-  Create = 'create',
-}
-
 @Component({
   selector: 'pngx-pdf-editor',
   templateUrl: './pdf-editor.component.html',
@@ -31,20 +33,24 @@ export enum PdfEditorEditMode {
   imports: [
     DragDropModule,
     FormsModule,
-    PdfViewerModule,
     NgxBootstrapIconsModule,
+    PngxPdfViewerComponent,
   ],
 })
 export class PDFEditorComponent extends ConfirmDialogComponent {
+  PdfRenderMode = PdfRenderMode
   public PdfEditorEditMode = PdfEditorEditMode
 
   private documentService = inject(DocumentService)
+  private readonly settingsService = inject(SettingsService)
   activeModal: NgbActiveModal = inject(NgbActiveModal)
 
   documentID: number
   pages: PageOperation[] = []
   totalPages = 0
-  editMode: PdfEditorEditMode = PdfEditorEditMode.Create
+  editMode: PdfEditorEditMode = this.settingsService.get(
+    SETTINGS_KEYS.PDF_EDITOR_DEFAULT_EDIT_MODE
+  )
   deleteOriginal: boolean = false
   includeMetadata: boolean = true
 
@@ -52,7 +58,7 @@ export class PDFEditorComponent extends ConfirmDialogComponent {
     return this.documentService.getPreviewUrl(this.documentID)
   }
 
-  pdfLoaded(pdf: PDFDocumentProxy) {
+  pdfLoaded(pdf: PngxPdfDocumentProxy) {
     this.totalPages = pdf.numPages
     this.pages = Array.from({ length: this.totalPages }, (_, i) => ({
       page: i + 1,
