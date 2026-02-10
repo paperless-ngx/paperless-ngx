@@ -436,11 +436,18 @@ class Document(SoftDeleteModel, ModelWithOwner):
         tags_to_add = self.tags.model.objects.filter(id__in=tag_ids)
         self.tags.add(*tags_to_add)
 
-    def delete(self, using=None, *, keep_parents=False):
+    def delete(
+        self,
+        *args,
+        **kwargs,
+    ):
         # If deleting a head document, move all versions to trash as well.
         if self.head_version_id is None:
             Document.objects.filter(head_version=self).delete()
-        return super().delete(using=using, keep_parents=keep_parents)
+        return super().delete(
+            *args,
+            **kwargs,
+        )
 
 
 class SavedView(ModelWithOwner):
