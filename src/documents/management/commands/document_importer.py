@@ -5,6 +5,7 @@ import tempfile
 from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
+from typing import TYPE_CHECKING
 from zipfile import ZipFile
 from zipfile import is_zipfile
 
@@ -425,6 +426,8 @@ class Command(CryptMixin, BaseCommand):
                             )
 
                     if archive_path:
+                        if TYPE_CHECKING:
+                            assert document.archive_path is not None
                         create_source_path_directory(document.archive_path)
                         # TODO: this assumes that the export is valid and
                         #  archive_filename is present on all documents with
