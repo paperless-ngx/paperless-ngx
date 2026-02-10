@@ -8,14 +8,40 @@
       </button>
       <div class="dropdown-menu shadow" ngbDropdownMenu>
         <div class="px-3 py-2">
-          <div class="input-group input-group-sm mb-2">
-            <span class="input-group-text" i18n>Label</span>
-            <input class="form-control" type="text" [(ngModel)]="newVersionLabel" i18n-placeholder placeholder="Optional" [disabled]="!userIsOwner || !userCanEdit" />
-          </div>
-          <input #versionFileInput type="file" class="visually-hidden" (change)="onVersionFileSelected($event)" />
-          <button class="btn btn-sm btn-outline-secondary w-100" (click)="versionFileInput.click()" [disabled]="!userIsOwner || !userCanEdit">
-            <i-bs name="file-earmark-plus"></i-bs><span class="ps-1" i18n>Add new version</span>
-          </button>
+          @if (versionUploadState === UploadState.Idle) {
+            <div class="input-group input-group-sm mb-2">
+              <span class="input-group-text" i18n>Label</span>
+              <input class="form-control" type="text" [(ngModel)]="newVersionLabel" i18n-placeholder placeholder="Optional" [disabled]="!userIsOwner || !userCanEdit" />
+            </div>
+            <input #versionFileInput type="file" class="visually-hidden" (change)="onVersionFileSelected($event)" />
+            <button class="btn btn-sm btn-outline-secondary w-100" (click)="versionFileInput.click()" [disabled]="!userIsOwner || !userCanEdit">
+              <i-bs name="file-earmark-plus"></i-bs><span class="ps-1" i18n>Add new version</span>
+            </button>
+          } @else {
+            @switch (versionUploadState) {
+              @case (UploadState.Uploading) {
+                <div class="small text-muted mt-1 d-flex align-items-center">
+                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  <span i18n>Uploading version...</span>
+                </div>
+              }
+              @case (UploadState.Processing) {
+                <div class="small text-muted mt-1 d-flex align-items-center">
+                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  <span i18n>Processing version...</span>
+                </div>
+              }
+              @case (UploadState.Failed) {
+                <div class="small text-danger mt-1 d-flex align-items-center justify-content-between">
+                  <span i18n>Version upload failed.</span>
+                  <button type="button" class="btn btn-link btn-sm p-0 ms-2" (click)="clearVersionUploadStatus()" i18n>Dismiss</button>
+                </div>
+                @if (versionUploadError) {
+                  <div class="small text-muted mt-1">{{ versionUploadError }}</div>
+                }
+              }
+            }
+          }
         </div>
         <div class="dropdown-divider"></div>
         @for (version of document.versions; track version.id) {

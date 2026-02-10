@@ -20,7 +20,7 @@ import {
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { DeviceDetectorService } from 'ngx-device-detector'
-import { BehaviorSubject, Observable, of, Subject, timer } from 'rxjs'
+import { BehaviorSubject, merge, Observable, of, Subject, timer } from 'rxjs'
 import {
   catchError,
   debounceTime,
@@ -81,7 +81,10 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
+import {
+  UploadState,
+  WebsocketStatusService,
+} from 'src/app/services/websocket-status.service'
 import { getFilenameFromContentDisposition } from 'src/app/utils/http'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
@@ -188,6 +191,8 @@ export class DocumentDetailComponent
   implements OnInit, OnDestroy, DirtyComponent
 {
   PdfRenderMode = PdfRenderMode
+  UploadState = UploadState
+
   documentsService = inject(DocumentService)
   private route = inject(ActivatedRoute)
   private tagService = inject(TagService)
@@ -237,6 +242,8 @@ export class DocumentDetailComponent
   // Versioning: which document ID to use for file preview/download
   selectedVersionId: number
   newVersionLabel: string = ''
+  versionUploadState: UploadState = UploadState.Idle
+  versionUploadError: string | null = null
   previewText: string
   previewLoaded: boolean = false
   tiffURL: string
@@ -1239,6 +1246,8 @@ export class DocumentDetailComponent
     // Reset input to allow re-selection of the same file later
     input.value = ''
     const label = this.newVersionLabel?.trim()
+    this.versionUploadState = UploadState.Uploading
+    this.versionUploadError = null
     this.documentsService
       .uploadVersion(this.documentId, file, label)
       .pipe(
@@ -1248,6 +1257,7 @@ export class DocumentDetailComponent
             $localize`Uploading new version. Processing will happen in the background.`
           )
           this.newVersionLabel = ''
+          this.versionUploadState = UploadState.Processing
         }),
         map((taskId) =>
           typeof taskId === 'string'
@@ -1256,17 +1266,31 @@ export class DocumentDetailComponent
         ),
         switchMap((taskId) => {
           if (!taskId) {
+            this.versionUploadState = UploadState.Failed
+            this.versionUploadError = $localize`Missing task ID.`
             return of(null)
           }
-          return this.websocketStatusService
-            .onDocumentConsumptionFinished()
-            .pipe(
+          return merge(
+            this.websocketStatusService.onDocumentConsumptionFinished().pipe(
               filter((status) => status.taskId === taskId),
-              take(1)
+              map(() => ({ state: 'success' as const }))
+            ),
+            this.websocketStatusService.onDocumentConsumptionFailed().pipe(
+              filter((status) => status.taskId === taskId),
+              map((status) => ({
+                state: 'failed' as const,
+                message: status.message,
+              }))
             )
+          ).pipe(take(1))
         }),
-        switchMap((status) => {
-          if (!status) {
+        switchMap((result) => {
+          if (!result || result.state !== 'success') {
+            if (result?.state === 'failed') {
+              this.versionUploadState = UploadState.Failed
+              this.versionUploadError =
+                result.message || $localize`Upload failed.`
+            }
             return of(null)
           }
           return this.documentsService.getVersions(this.documentId)
@@ -1285,15 +1309,26 @@ export class DocumentDetailComponent
               openDoc.versions = doc.versions
               this.openDocumentService.save()
             }
+            this.selectVersion(
+              Math.max(...doc.versions.map((version) => version.id))
+            )
+            this.clearVersionUploadStatus()
           }
         },
         error: (error) => {
+          this.versionUploadState = UploadState.Failed
+          this.versionUploadError = error?.message || $localize`Upload failed.`
           this.toastService.showError(
             $localize`Error uploading new version`,
             error
           )
         },
       })
+  }
+
+  clearVersionUploadStatus() {
+    this.versionUploadState = UploadState.Idle
+    this.versionUploadError = null
   }
 
   download(original: boolean = false) {
