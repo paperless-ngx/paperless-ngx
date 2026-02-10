@@ -317,6 +317,14 @@ class Document(SoftDeleteModel, ModelWithOwner):
         verbose_name=_("head version of document"),
     )
 
+    version_label = models.CharField(
+        _("version label"),
+        max_length=64,
+        blank=True,
+        null=True,
+        help_text=_("Optional short label for a document version."),
+    )
+
     class Meta:
         ordering = ("-created",)
         verbose_name = _("document")

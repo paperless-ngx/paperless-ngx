@@ -191,9 +191,12 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     return url
   }
 
-  uploadVersion(documentId: number, file: File) {
+  uploadVersion(documentId: number, file: File, label?: string) {
     const formData = new FormData()
     formData.append('document', file, file.name)
+    if (label) {
+      formData.append('label', label)
+    }
     return this.http.post(
       this.getResourceUrl(documentId, 'update_version'),
       formData,

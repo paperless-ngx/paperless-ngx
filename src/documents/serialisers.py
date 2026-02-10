@@ -1062,6 +1062,12 @@ class DuplicateDocumentSummarySerializer(serializers.Serializer):
     deleted_at = serializers.DateTimeField(allow_null=True)
 
 
+class DocumentVersionInfoSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    added = serializers.DateTimeField()
+    label = serializers.CharField(required=False, allow_null=True)
+
+
 @extend_schema_serializer(
     deprecate_fields=["created_date"],
 )
@@ -1083,7 +1089,7 @@ class DocumentSerializer(
 
     notes = NotesSerializer(many=True, required=False, read_only=True)
     head_version = serializers.PrimaryKeyRelatedField(read_only=True)
-    versions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    versions = SerializerMethodField()
 
     custom_fields = CustomFieldInstanceSerializer(
         many=True,
@@ -1117,6 +1123,28 @@ class DocumentSerializer(
         duplicates = _get_viewable_duplicates(obj, user)
         return list(duplicates.values("id", "title", "deleted_at"))
 
+    @extend_schema_field(DocumentVersionInfoSerializer(many=True))
+    def get_versions(self, obj):
+        head_doc = obj if obj.head_version_id is None else obj.head_version
+        versions_qs = Document.objects.filter(head_version=head_doc).only(
+            "id",
+            "added",
+            "checksum",
+            "version_label",
+        )
+        versions = [*versions_qs, head_doc]
+
+        def build_info(doc: Document) -> dict[str, object]:
+            return {
+                "id": doc.id,
+                "added": doc.added,
+                "label": doc.version_label,
+            }
+
+        info = [build_info(doc) for doc in versions]
+        info.sort(key=lambda item: item["id"], reverse=True)
+        return info
+
     def get_original_file_name(self, obj) -> str | None:
         return obj.original_filename
 
@@ -1135,10 +1163,6 @@ class DocumentSerializer(
         api_version = int(
             request.version if request else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
         )
-
-        if doc.get("versions") is not None:
-            doc["versions"] = sorted(doc["versions"], reverse=True)
-            doc["versions"].append(doc["id"])
 
         if api_version < 9 and "created" in self.fields:
             # provide created as a datetime for backwards compatibility
@@ -2009,6 +2033,13 @@ class DocumentVersionSerializer(serializers.Serializer):
     document = serializers.FileField(
         label="Document",
         write_only=True,
+    )
+    label = serializers.CharField(
+        label="Version label",
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        max_length=64,
     )
 
     validate_document = PostDocumentSerializer().validate_document

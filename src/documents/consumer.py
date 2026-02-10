@@ -511,6 +511,8 @@ class ConsumerPlugin(
                     original_document.filename = None
                     original_document.archive_filename = None
                     original_document.archive_checksum = None
+                    if self.metadata.version_label is not None:
+                        original_document.version_label = self.metadata.version_label
                     original_document.modified = timezone.now()
                     original_document.save()
                     document = original_document
@@ -737,6 +739,9 @@ class ConsumerPlugin(
 
         if self.metadata.asn is not None:
             document.archive_serial_number = self.metadata.asn
+
+        if self.metadata.version_label is not None:
+            document.version_label = self.metadata.version_label
 
         if self.metadata.owner_id:
             document.owner = User.objects.get(

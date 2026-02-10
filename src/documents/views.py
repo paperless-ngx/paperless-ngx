@@ -1471,7 +1471,7 @@ class DocumentViewSet(
                 "Error emailing documents, check logs for more detail.",
             )
 
-    @action(methods=["post"], detail=True)
+    @action(methods=["post"], detail=True, parser_classes=[parsers.MultiPartParser])
     def update_version(self, request, pk=None):
         serializer = DocumentVersionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -1489,6 +1489,7 @@ class DocumentViewSet(
 
         try:
             doc_name, doc_data = serializer.validated_data.get("document")
+            label = serializer.validated_data.get("label")
 
             t = int(mktime(datetime.now().timetuple()))
 
@@ -1508,9 +1509,13 @@ class DocumentViewSet(
                 head_version_id=doc.pk,
             )
 
+            overrides = DocumentMetadataOverrides()
+            if label:
+                overrides.version_label = label.strip()
+
             async_task = consume_file.delay(
                 input_doc,
-                None,
+                overrides,
             )
             logger.debug(
                 f"Updated document {doc.id} with new version",

@@ -31,6 +31,7 @@ class DocumentMetadataOverrides:
     change_groups: list[int] | None = None
     custom_fields: dict | None = None
     skip_asn_if_exists: bool = False
+    version_label: str | None = None
 
     def update(self, other: "DocumentMetadataOverrides") -> "DocumentMetadataOverrides":
         """
@@ -52,6 +53,8 @@ class DocumentMetadataOverrides:
             self.owner_id = other.owner_id
         if other.skip_asn_if_exists:
             self.skip_asn_if_exists = True
+        if other.version_label is not None:
+            self.version_label = other.version_label
 
         # merge
         if self.tag_ids is None:
