@@ -1810,8 +1810,8 @@ class TestMailAccountTestView(APITestCase):
     )
     def test_mail_account_test_view_refresh_token_fails(
         self,
-        mock_mock_refresh_account_oauth_token,
-    ):
+        mock_mock_refresh_account_oauth_token: mock.MagicMock,
+    ) -> None:
         """
         GIVEN:
             - Mail account with expired token
