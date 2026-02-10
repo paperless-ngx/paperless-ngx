@@ -7,7 +7,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "1071_tag_tn_ancestors_count_tag_tn_ancestors_pks_and_more"),
+        ("documents", "0010_alter_document_content_length"),
     ]
 
     operations = [
