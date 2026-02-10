@@ -3072,7 +3072,6 @@ dependencies = [
     { name = "python-gnupg", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "python-ipware", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "python-magic", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
-    { name = "pyzbar", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "rapidfuzz", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "redis", extra = ["hiredis"], marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "regex", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -3225,7 +3224,6 @@ requires-dist = [
     { name = "python-gnupg", specifier = "~=0.5.4" },
     { name = "python-ipware", specifier = "~=3.0.0" },
     { name = "python-magic", specifier = "~=0.4.27" },
-    { name = "pyzbar", specifier = "~=0.1.9" },
     { name = "rapidfuzz", specifier = "~=3.14.0" },
     { name = "redis", extras = ["hiredis"], specifier = "~=5.2.1" },
     { name = "regex", specifier = ">=2025.9.18" },
@@ -4276,14 +4274,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/b1/5e/f77dc6b9036943e285ba76b49e118d9ea929885becb0a29ba8a7c75e29fe/pyyaml-6.0.3-cp314-cp314t-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:00c4bdeba853cc34e7dd471f16b4114f4162dc03e6b7afcc2128711f0eca823c", size = 839261, upload-time = "2025-09-25T21:32:51.808Z" },
     { url = "https://files.pythonhosted.org/packages/ce/88/a9db1376aa2a228197c58b37302f284b5617f56a5d959fd1763fb1675ce6/pyyaml-6.0.3-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:66e1674c3ef6f541c35191caae2d429b967b99e02040f5ba928632d9a7f0f065", size = 805272, upload-time = "2025-09-25T21:32:52.941Z" },
     { url = "https://files.pythonhosted.org/packages/da/92/1446574745d74df0c92e6aa4a7b0b3130706a4142b2d1a5869f2eaa423c6/pyyaml-6.0.3-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:16249ee61e95f858e83976573de0f5b2893b3677ba71c9dd36b9cf8be9ac6d65", size = 829923, upload-time = "2025-09-25T21:32:54.537Z" },
-]
-
-[[package]]
-name = "pyzbar"
-version = "0.1.9"
-source = { registry = "https://pypi.org/simple" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/6d/24/81ebe6a1c00760471a3028a23cbe0b94e5fa2926e5ba47adc895920887bc/pyzbar-0.1.9-py2.py3-none-any.whl", hash = "sha256:4559628b8192feb25766d954b36a3753baaf5c97c03135aec7e4a026036b475d", size = 32560, upload-time = "2022-03-15T14:53:40.637Z" },
 ]
 
 [[package]]

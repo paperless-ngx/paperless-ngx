@@ -20,7 +20,6 @@ src/documents/admin.py:0: error: Skipping analyzing "auditlog.models": module is
 src/documents/admin.py:0: error: Skipping analyzing "treenode.admin": module is installed, but missing library stubs or py.typed marker  [import-untyped]
 src/documents/barcodes.py:0: error: "Image" has no attribute "filename"  [attr-defined]
 src/documents/barcodes.py:0: error: Cannot find implementation or library stub for module named "zxingcpp"  [import-not-found]
-src/documents/barcodes.py:0: error: Skipping analyzing "pyzbar": module is installed, but missing library stubs or py.typed marker  [import-untyped]
 src/documents/bulk_download.py:0: error: Return type "None" of "add_document" incompatible with return type "Never" in supertype "BulkArchiveStrategy"  [override]
 src/documents/bulk_download.py:0: error: Return type "None" of "add_document" incompatible with return type "Never" in supertype "BulkArchiveStrategy"  [override]
 src/documents/bulk_download.py:0: error: Return type "None" of "add_document" incompatible with return type "Never" in supertype "BulkArchiveStrategy"  [override]

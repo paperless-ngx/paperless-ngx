@@ -28,8 +28,6 @@ from documents.utils import maybe_override_pixel_limit
 from paperless.config import BarcodeConfig
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     from PIL import Image
 
 logger = logging.getLogger("paperless.barcodes")
@@ -262,26 +260,6 @@ class BarcodePlugin(ConsumeTaskPlugin):
 
         return barcodes
 
-    @staticmethod
-    def read_barcodes_pyzbar(image: Image.Image) -> list[str]:
-        barcodes = []
-
-        from pyzbar import pyzbar
-
-        # Decode the barcode image
-        detected_barcodes = pyzbar.decode(image)
-
-        # Traverse through all the detected barcodes in image
-        for barcode in detected_barcodes:
-            if barcode.data:
-                decoded_barcode = barcode.data.decode("utf-8")
-                barcodes.append(decoded_barcode)
-                logger.debug(
-                    f"Barcode of type {barcode.type} found: {decoded_barcode}",
-                )
-
-        return barcodes
-
     def detect(self) -> None:
         """
         Scan all pages of the PDF as images, updating barcodes and the pages
@@ -293,14 +271,6 @@ class BarcodePlugin(ConsumeTaskPlugin):
 
         # No op if not a TIFF
         self.convert_from_tiff_to_pdf()
-
-        # Choose the library for reading
-        if settings.CONSUMER_BARCODE_SCANNER == "PYZBAR":
-            reader: Callable[[Image.Image], list[str]] = self.read_barcodes_pyzbar
-            logger.debug("Scanning for barcodes using PYZBAR")
-        else:
-            reader = self.read_barcodes_zxing
-            logger.debug("Scanning for barcodes using ZXING")
 
         try:
             # Read number of pages from pdf
@@ -349,7 +319,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
                     )
 
                 # Detect barcodes
-                for barcode_value in reader(page):
+                for barcode_value in self.read_barcodes_zxing(page):
                     self.barcodes.append(
                         Barcode(current_page_number, barcode_value, self.settings),
                     )

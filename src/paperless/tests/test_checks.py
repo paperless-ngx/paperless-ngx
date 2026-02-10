@@ -206,11 +206,6 @@ class TestBarcodeSettingsChecks(DirectoriesMixin, TestCase):
 
         self.assertIn('Invalid Barcode Scanner ""', msg.msg)
 
-    @override_settings(CONSUMER_BARCODE_SCANNER="PYZBAR")
-    def test_barcode_scanner_valid(self) -> None:
-        msgs = settings_values_check(None)
-        self.assertEqual(len(msgs), 0)
-
 
 class TestEmailCertSettingsChecks(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @override_settings(EMAIL_CERTIFICATE_FILE=Path("/tmp/not_actually_here.pem"))

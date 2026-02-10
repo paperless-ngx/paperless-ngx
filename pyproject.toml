@@ -68,7 +68,6 @@ dependencies = [
   "python-gnupg~=0.5.4",
   "python-ipware~=3.0.0",
   "python-magic~=0.4.27",
-  "pyzbar~=0.1.9",
   "rapidfuzz~=3.14.0",
   "redis[hiredis]~=5.2.1",
   "regex>=2025.9.18",

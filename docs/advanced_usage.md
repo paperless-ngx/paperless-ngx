@@ -774,7 +774,6 @@ At this time, the library utilized for detection of barcodes supports the follow
 -   QR Code
 -   SQ Code
 
-You may check for updates on the [zbar library homepage](https://github.com/mchehab/zbar).
 For usage in Paperless, the type of barcode does not matter, only the contents of it.
 
 For how to enable barcode usage, see [the configuration](configuration.md#barcodes).

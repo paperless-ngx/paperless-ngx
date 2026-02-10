@@ -167,17 +167,6 @@ def settings_values_check(app_configs, **kwargs):
             )
         return msgs
 
-    def _barcode_scanner_validate():
-        """
-        Validates the barcode scanner type
-        """
-        msgs = []
-        if settings.CONSUMER_BARCODE_SCANNER not in ["PYZBAR", "ZXING"]:
-            msgs.append(
-                Error(f'Invalid Barcode Scanner "{settings.CONSUMER_BARCODE_SCANNER}"'),
-            )
-        return msgs
-
     def _email_certificate_validate():
         msgs = []
         # Existence checks
@@ -195,7 +184,6 @@ def settings_values_check(app_configs, **kwargs):
     return (
         _ocrmypdf_settings_check()
         + _timezone_validate()
-        + _barcode_scanner_validate()
         + _email_certificate_validate()
     )
 
