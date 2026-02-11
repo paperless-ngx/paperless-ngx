@@ -511,7 +511,7 @@ class ConsumerPlugin(
                     original_document.checksum = hashlib.md5(
                         file_for_checksum.read_bytes(),
                     ).hexdigest()
-                    original_document.content = text
+                    original_document.content = ""
                     original_document.page_count = page_count
                     original_document.mime_type = mime_type
                     original_document.original_filename = self.filename
