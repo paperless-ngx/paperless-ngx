@@ -83,8 +83,22 @@ describe('DocumentHistoryComponent', () => {
         expect(result).toBe(correspondentName)
       })
     expect(getCachedSpy).toHaveBeenCalledWith(parseInt(correspondentId))
-    // no correspondent found
-    getCachedSpy.mockReturnValue(of(null))
+  })
+
+  it('getPrettyName should memoize results to avoid resubscribe loops', () => {
+    const correspondentId = '1'
+    const getCachedSpy = jest
+      .spyOn(correspondentService, 'getCached')
+      .mockReturnValue(of({ name: 'John Doe' }))
+    const a = component.getPrettyName(DataType.Correspondent, correspondentId)
+    const b = component.getPrettyName(DataType.Correspondent, correspondentId)
+    expect(a).toBe(b)
+    expect(getCachedSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('getPrettyName should fall back to the correspondent id when missing', () => {
+    const correspondentId = '1'
+    jest.spyOn(correspondentService, 'getCached').mockReturnValue(of(null))
     component
       .getPrettyName(DataType.Correspondent, correspondentId)
       .subscribe((result) => {
@@ -104,8 +118,11 @@ describe('DocumentHistoryComponent', () => {
         expect(result).toBe(documentTypeName)
       })
     expect(getCachedSpy).toHaveBeenCalledWith(parseInt(documentTypeId))
-    // no document type found
-    getCachedSpy.mockReturnValue(of(null))
+  })
+
+  it('getPrettyName should fall back to the document type id when missing', () => {
+    const documentTypeId = '1'
+    jest.spyOn(documentTypeService, 'getCached').mockReturnValue(of(null))
     component
       .getPrettyName(DataType.DocumentType, documentTypeId)
       .subscribe((result) => {
@@ -125,8 +142,11 @@ describe('DocumentHistoryComponent', () => {
         expect(result).toBe(storagePath)
       })
     expect(getCachedSpy).toHaveBeenCalledWith(parseInt(storagePathId))
-    // no storage path found
-    getCachedSpy.mockReturnValue(of(null))
+  })
+
+  it('getPrettyName should fall back to the storage path id when missing', () => {
+    const storagePathId = '1'
+    jest.spyOn(storagePathService, 'getCached').mockReturnValue(of(null))
     component
       .getPrettyName(DataType.StoragePath, storagePathId)
       .subscribe((result) => {
@@ -144,8 +164,11 @@ describe('DocumentHistoryComponent', () => {
       expect(result).toBe(ownerUsername)
     })
     expect(getCachedSpy).toHaveBeenCalledWith(parseInt(ownerId))
-    // no user found
-    getCachedSpy.mockReturnValue(of(null))
+  })
+
+  it('getPrettyName should fall back to the owner id when missing', () => {
+    const ownerId = '1'
+    jest.spyOn(userService, 'getCached').mockReturnValue(of(null))
     component.getPrettyName('owner', ownerId).subscribe((result) => {
       expect(result).toBe(ownerId)
     })
