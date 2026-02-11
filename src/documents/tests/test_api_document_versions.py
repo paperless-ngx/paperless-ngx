@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from unittest import mock
 
+from auditlog.models import LogEntry
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -106,18 +108,26 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         # Audit log entry is created against the root document.
-        from auditlog.models import LogEntry
-
-        entry = LogEntry.objects.get_for_object(root).order_by("-timestamp").first()
+        entry = (
+            LogEntry.objects.filter(
+                content_type=ContentType.objects.get_for_model(Document),
+                object_id=root.id,
+            )
+            .order_by("-timestamp")
+            .first()
+        )
         self.assertIsNotNone(entry)
         assert entry is not None
-        self.assertEqual(entry.actor_id, self.user.id)
+        self.assertIsNotNone(entry.actor)
+        assert entry.actor is not None
+        self.assertEqual(entry.actor.id, self.user.id)
         self.assertEqual(entry.action, LogEntry.Action.UPDATE)
         self.assertEqual(
             entry.changes,
             {"Version Deleted": ["None", version_id]},
         )
-        self.assertEqual(entry.additional_data.get("version_id"), version_id)
+        additional_data = entry.additional_data or {}
+        self.assertEqual(additional_data.get("version_id"), version_id)
 
     def test_delete_version_returns_404_when_version_not_related(self) -> None:
         root = Document.objects.create(
