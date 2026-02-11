@@ -74,7 +74,7 @@
               <span class="badge bg-light text-lowercase text-muted">
                 {{ version.checksum | slice:0:8 }}
               </span>
-              <button type="button" class="version-entry flex-grow-1 ms-3 small text-start" (click)="selectVersion(version.id)">
+              <button type="button" class="btn btn-link link-underline link-underline-opacity-0 flex-grow-1 ms-3 small text-start" (click)="selectVersion(version.id)">
                 <div class="small">
                   @if (version.version_label) {
                     {{ version.version_label }}
