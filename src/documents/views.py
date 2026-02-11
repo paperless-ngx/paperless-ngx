@@ -805,6 +805,15 @@ class DocumentViewSet(
         )
         return super().get_serializer(*args, **kwargs)
 
+    @extend_schema(
+        operation_id="documents_root",
+        responses=inline_serializer(
+            name="DocumentRootResponse",
+            fields={
+                "root_id": serializers.IntegerField(),
+            },
+        ),
+    )
     @action(methods=["get"], detail=True, url_path="root")
     def root(self, request, pk=None):
         try:
@@ -1494,6 +1503,13 @@ class DocumentViewSet(
                 "Error emailing documents, check logs for more detail.",
             )
 
+    @extend_schema(
+        operation_id="documents_update_version",
+        request=DocumentVersionSerializer,
+        responses={
+            200: OpenApiTypes.STR,
+        },
+    )
     @action(methods=["post"], detail=True, parser_classes=[parsers.MultiPartParser])
     def update_version(self, request, pk=None):
         serializer = DocumentVersionSerializer(data=request.data)
@@ -1552,10 +1568,27 @@ class DocumentViewSet(
                 "Error updating document, check logs for more detail.",
             )
 
+    @extend_schema(
+        operation_id="documents_delete_version",
+        parameters=[
+            OpenApiParameter(
+                name="version_id",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+            ),
+        ],
+        responses=inline_serializer(
+            name="DeleteDocumentVersionResult",
+            fields={
+                "result": serializers.CharField(),
+                "current_version_id": serializers.IntegerField(),
+            },
+        ),
+    )
     @action(
         methods=["delete"],
         detail=True,
-        url_path="versions/(?P<version_id>[^/.]+)",
+        url_path=r"versions/(?P<version_id>\d+)",
     )
     def delete_version(self, request, pk=None, version_id=None):
         try:

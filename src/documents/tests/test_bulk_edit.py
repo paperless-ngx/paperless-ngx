@@ -984,9 +984,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         """
         with self.assertLogs("paperless.bulk_edit", level="INFO") as cm:
             result = bulk_edit.rotate([self.doc2.id, self.img_doc.id], 90)
-            output_str = cm.output[1]
-            expected_str = "Document 4 is not a PDF, skipping rotation"
-            self.assertIn(expected_str, output_str)
+            expected_str = f"Document {self.img_doc.id} is not a PDF, skipping rotation"
+            self.assertTrue(any(expected_str in line for line in cm.output))
             self.assertEqual(mock_consume_delay.call_count, 1)
             consumable, overrides = mock_consume_delay.call_args[0]
             self.assertEqual(consumable.root_document_id, self.doc2.id)
