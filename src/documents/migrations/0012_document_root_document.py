@@ -23,4 +23,15 @@ class Migration(migrations.Migration):
                 verbose_name="root document for this version",
             ),
         ),
+        migrations.AddField(
+            model_name="document",
+            name="version_label",
+            field=models.CharField(
+                blank=True,
+                help_text="Optional short label for a document version.",
+                max_length=64,
+                null=True,
+                verbose_name="version label",
+            ),
+        ),
     ]
