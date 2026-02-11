@@ -825,16 +825,6 @@ class DocumentViewSet(
 
         return Response({"root_id": root_doc.id})
 
-    @action(methods=["get"], detail=True, url_path="head")
-    def head(self, request, pk=None):
-        """
-        Backwards-compatible alias for the `root` endpoint.
-        """
-        response = self.root(request, pk=pk)
-        if isinstance(response, Response):
-            return Response({"head_id": response.data.get("root_id")})
-        return response
-
     def update(self, request, *args, **kwargs):
         response = super().update(request, *args, **kwargs)
         from documents import index
