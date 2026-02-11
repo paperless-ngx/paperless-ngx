@@ -37,7 +37,7 @@ import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
 import { DataType } from 'src/app/data/datatype'
-import { Document, DocumentVersionInfo } from 'src/app/data/document'
+import { Document } from 'src/app/data/document'
 import { DocumentMetadata } from 'src/app/data/document-metadata'
 import { DocumentNote } from 'src/app/data/document-note'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
@@ -783,12 +783,6 @@ export class DocumentDetailComponent
     ) {
       this.activeNavID = DocumentDetailNavIDs.Details
     }
-  }
-
-  getVersionBadge(version: DocumentVersionInfo): string {
-    const checksum = version?.checksum ?? ''
-    if (!checksum) return '----'
-    return checksum.slice(0, 4).toUpperCase()
   }
 
   // Update file preview and download target to a specific version (by document id)
