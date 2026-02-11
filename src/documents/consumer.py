@@ -546,7 +546,9 @@ class ConsumerPlugin(
 
                     # Create a log entry for the version addition, if enabled
                     if settings.AUDIT_LOG_ENABLED:
-                        from auditlog.models import LogEntry
+                        from auditlog.models import (  # type: ignore[import-untyped]
+                            LogEntry,
+                        )
 
                         LogEntry.objects.log_create(
                             instance=root_doc,
