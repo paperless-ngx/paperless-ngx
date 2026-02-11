@@ -1,4 +1,3 @@
-import hashlib
 import shutil
 from datetime import date
 from pathlib import Path
@@ -1241,10 +1240,20 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_consume_file.assert_not_called()
 
     @mock.patch("documents.bulk_edit.update_document_content_maybe_archive_file.delay")
+    @mock.patch("documents.tasks.consume_file.delay")
+    @mock.patch("documents.bulk_edit.tempfile.mkdtemp")
     @mock.patch("pikepdf.open")
-    def test_remove_password_update_document(self, mock_open, mock_update_document):
+    def test_remove_password_update_document(
+        self,
+        mock_open,
+        mock_mkdtemp,
+        mock_consume_delay,
+        mock_update_document,
+    ):
         doc = self.doc1
-        original_checksum = doc.checksum
+        temp_dir = self.dirs.scratch_dir / "remove-password-update"
+        temp_dir.mkdir(parents=True, exist_ok=True)
+        mock_mkdtemp.return_value = str(temp_dir)
 
         fake_pdf = mock.MagicMock()
         fake_pdf.pages = [mock.Mock(), mock.Mock(), mock.Mock()]
@@ -1264,12 +1273,17 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertEqual(result, "OK")
         mock_open.assert_called_once_with(doc.source_path, password="secret")
         fake_pdf.remove_unreferenced_resources.assert_called_once()
-        doc.refresh_from_db()
-        self.assertNotEqual(doc.checksum, original_checksum)
-        expected_checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
-        self.assertEqual(doc.checksum, expected_checksum)
-        self.assertEqual(doc.page_count, len(fake_pdf.pages))
-        mock_update_document.assert_called_once_with(document_id=doc.id)
+        mock_update_document.assert_not_called()
+        mock_consume_delay.assert_called_once()
+        consumable, overrides = mock_consume_delay.call_args[0]
+        expected_path = temp_dir / f"{doc.id}_unprotected.pdf"
+        self.assertTrue(expected_path.exists())
+        self.assertEqual(
+            Path(consumable.original_file).resolve(),
+            expected_path.resolve(),
+        )
+        self.assertEqual(consumable.root_document_id, doc.id)
+        self.assertIsNotNone(overrides)
 
     @mock.patch("documents.bulk_edit.chord")
     @mock.patch("documents.bulk_edit.group")
