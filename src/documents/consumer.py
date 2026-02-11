@@ -531,10 +531,6 @@ class ConsumerPlugin(
                         settings.AUDIT_LOG_ENABLED
                         and self.metadata.actor_id is not None
                     ):
-                        from auditlog.models import (
-                            LogEntry,  # type: ignore[import-untyped]
-                        )
-
                         actor = User.objects.filter(pk=self.metadata.actor_id).first()
                         if actor is not None:
                             from auditlog.context import (  # type: ignore[import-untyped]
