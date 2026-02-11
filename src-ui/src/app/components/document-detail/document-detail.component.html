@@ -25,7 +25,7 @@
   </button>
 
   @if (document?.versions?.length > 0) {
-    <div class="btn-group" ngbDropdown role="group" autoClose="outside">
+    <div class="btn-group" ngbDropdown autoClose="outside">
       <button class="btn btn-sm btn-outline-secondary dropdown-toggle" ngbDropdownToggle>
         <i-bs name="file-earmark-diff"></i-bs>
         <span class="d-none d-lg-inline ps-1" i18n>Versions</span>
@@ -45,13 +45,13 @@
             @switch (versionUploadState) {
               @case (UploadState.Uploading) {
                 <div class="small text-muted mt-1 d-flex align-items-center">
-                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  <output class="spinner-border spinner-border-sm me-2" aria-hidden="true"></output>
                   <span i18n>Uploading version...</span>
                 </div>
               }
               @case (UploadState.Processing) {
                 <div class="small text-muted mt-1 d-flex align-items-center">
-                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  <output class="spinner-border spinner-border-sm me-2" aria-hidden="true"></output>
                   <span i18n>Processing version...</span>
                 </div>
               }
