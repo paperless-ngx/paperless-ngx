@@ -131,6 +131,24 @@ const customFields = [
   },
 ]
 
+function createFileInput(file?: File) {
+  const input = document.createElement('input')
+  input.type = 'file'
+  const files = file
+    ? ({
+        0: file,
+        length: 1,
+        item: () => file,
+      } as unknown as FileList)
+    : ({
+        length: 0,
+        item: () => null,
+      } as unknown as FileList)
+  Object.defineProperty(input, 'files', { value: files })
+  input.value = ''
+  return input
+}
+
 describe('DocumentDetailComponent', () => {
   let component: DocumentDetailComponent
   let fixture: ComponentFixture<DocumentDetailComponent>
@@ -1727,24 +1745,6 @@ describe('DocumentDetailComponent', () => {
       })
     )
     fixture.detectChanges()
-  }
-
-  function createFileInput(file?: File) {
-    const input = document.createElement('input')
-    input.type = 'file'
-    const files = file
-      ? ({
-          0: file,
-          length: 1,
-          item: () => file,
-        } as unknown as FileList)
-      : ({
-          length: 0,
-          item: () => null,
-        } as unknown as FileList)
-    Object.defineProperty(input, 'files', { value: files })
-    input.value = ''
-    return input
   }
 
   it('createDisabled should return true if the user does not have permission to add the specified data type', () => {
