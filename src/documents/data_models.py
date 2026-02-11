@@ -32,6 +32,7 @@ class DocumentMetadataOverrides:
     custom_fields: dict | None = None
     skip_asn_if_exists: bool = False
     version_label: str | None = None
+    actor_id: int | None = None
 
     def update(self, other: "DocumentMetadataOverrides") -> "DocumentMetadataOverrides":
         """
@@ -51,6 +52,8 @@ class DocumentMetadataOverrides:
             self.storage_path_id = other.storage_path_id
         if other.owner_id is not None:
             self.owner_id = other.owner_id
+        if other.actor_id is not None:
+            self.actor_id = other.actor_id
         if other.skip_asn_if_exists:
             self.skip_asn_if_exists = True
         if other.version_label is not None:

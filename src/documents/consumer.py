@@ -489,14 +489,15 @@ class ConsumerPlugin(
                     # If this is a new version of an existing document, we need
                     # to make sure we're not creating a new document, but updating
                     # the existing one.
+                    root_doc = Document.objects.get(
+                        pk=self.input_doc.root_document_id,
+                    )
                     original_document = Document.objects.get(
                         pk=self.input_doc.root_document_id,
                     )
                     self.log.debug("Saving record for updated version to database")
                     original_document.pk = None
-                    original_document.root_document = Document.objects.get(
-                        pk=self.input_doc.root_document_id,
-                    )
+                    original_document.root_document = root_doc
                     file_for_checksum = (
                         self.unmodified_original
                         if self.unmodified_original is not None
@@ -517,7 +518,42 @@ class ConsumerPlugin(
                         original_document.version_label = self.metadata.version_label
                     original_document.added = timezone.now()
                     original_document.modified = timezone.now()
-                    original_document.save()
+                    actor = None
+
+                    # Save the new version, potentially creating an audit log entry for the version addition if enabled.
+                    if (
+                        settings.AUDIT_LOG_ENABLED
+                        and self.metadata.actor_id is not None
+                    ):
+                        from auditlog.models import LogEntry
+
+                        actor = User.objects.filter(pk=self.metadata.actor_id).first()
+                        if actor is not None:
+                            from auditlog.context import set_actor
+
+                            with set_actor(actor):
+                                original_document.save()
+                        else:
+                            original_document.save()
+                    else:
+                        original_document.save()
+
+                    # Create a log entry for the version addition, if enabled
+                    if settings.AUDIT_LOG_ENABLED:
+                        from auditlog.models import LogEntry
+
+                        LogEntry.objects.log_create(
+                            instance=root_doc,
+                            changes={
+                                "Version Added": ["None", original_document.id],
+                            },
+                            action=LogEntry.Action.UPDATE,
+                            actor=actor,
+                            additional_data={
+                                "reason": "Version added",
+                                "version_id": original_document.id,
+                            },
+                        )
                     document = original_document
                 else:
                     document = self._store(

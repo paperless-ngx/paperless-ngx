@@ -414,7 +414,12 @@ def set_permissions(
     return "OK"
 
 
-def rotate(doc_ids: list[int], degrees: int) -> Literal["OK"]:
+def rotate(
+    doc_ids: list[int],
+    degrees: int,
+    *,
+    user: User | None = None,
+) -> Literal["OK"]:
     logger.info(
         f"Attempting to rotate {len(doc_ids)} documents by {degrees} degrees.",
     )
@@ -447,6 +452,8 @@ def rotate(doc_ids: list[int], degrees: int) -> Literal["OK"]:
 
             # Preserve metadata/permissions via overrides; mark as new version
             overrides = DocumentMetadataOverrides().from_document(root_doc)
+            if user is not None:
+                overrides.actor_id = user.id
 
             consume_file.delay(
                 ConsumableDocument(
@@ -645,7 +652,12 @@ def split(
     return "OK"
 
 
-def delete_pages(doc_ids: list[int], pages: list[int]) -> Literal["OK"]:
+def delete_pages(
+    doc_ids: list[int],
+    pages: list[int],
+    *,
+    user: User | None = None,
+) -> Literal["OK"]:
     logger.info(
         f"Attempting to delete pages {pages} from {len(doc_ids)} documents",
     )
@@ -675,6 +687,8 @@ def delete_pages(doc_ids: list[int], pages: list[int]) -> Literal["OK"]:
             pdf.save(filepath)
 
         overrides = DocumentMetadataOverrides().from_document(root_doc)
+        if user is not None:
+            overrides.actor_id = user.id
         consume_file.delay(
             ConsumableDocument(
                 source=DocumentSource.ConsumeFolder,
@@ -759,6 +773,7 @@ def edit_pdf(
             )
             if user is not None:
                 overrides.owner_id = user.id
+                overrides.actor_id = user.id
             consume_file.delay(
                 ConsumableDocument(
                     source=DocumentSource.ConsumeFolder,
@@ -776,6 +791,7 @@ def edit_pdf(
             )
             if user is not None:
                 overrides.owner_id = user.id
+                overrides.actor_id = user.id
             if not delete_original:
                 overrides.skip_asn_if_exists = True
             if delete_original and len(pdf_docs) == 1:
@@ -865,6 +881,7 @@ def remove_password(
                     )
                     if user is not None:
                         overrides.owner_id = user.id
+                        overrides.actor_id = user.id
                     consume_file.delay(
                         ConsumableDocument(
                             source=DocumentSource.ConsumeFolder,
@@ -882,6 +899,7 @@ def remove_password(
                     )
                     if user is not None:
                         overrides.owner_id = user.id
+                        overrides.actor_id = user.id
 
                     consume_tasks.append(
                         consume_file.s(

@@ -1545,6 +1545,8 @@ class DocumentViewSet(
             overrides = DocumentMetadataOverrides()
             if label:
                 overrides.version_label = label.strip()
+            if request.user is not None:
+                overrides.actor_id = request.user.id
 
             async_task = consume_file.delay(
                 input_doc,
@@ -1600,7 +1602,24 @@ class DocumentViewSet(
         from documents import index
 
         index.remove_document_from_index(version_doc)
+        version_doc_id = version_doc.id
         version_doc.delete()
+        if settings.AUDIT_LOG_ENABLED:
+            actor = (
+                request.user if request.user and request.user.is_authenticated else None
+            )
+            LogEntry.objects.log_create(
+                instance=root_doc,
+                changes={
+                    "Version Deleted": [version_doc_id, "None"],
+                },
+                action=LogEntry.Action.UPDATE,
+                actor=actor,
+                additional_data={
+                    "reason": "Version deleted",
+                    "version_id": version_doc_id,
+                },
+            )
 
         current = (
             Document.objects.filter(Q(id=root_doc.id) | Q(root_document=root_doc))
@@ -1913,13 +1932,13 @@ class BulkEditView(PassUserMixin):
         "modify_custom_fields": "custom_fields",
         "set_permissions": None,
         "delete": "deleted_at",
-        "rotate": "checksum",
-        "delete_pages": "checksum",
+        "rotate": None,
+        "delete_pages": None,
         "split": None,
         "merge": None,
-        "edit_pdf": "checksum",
+        "edit_pdf": None,
         "reprocess": "checksum",
-        "remove_password": "checksum",
+        "remove_password": None,
     }
 
     permission_classes = (IsAuthenticated,)
@@ -1937,6 +1956,8 @@ class BulkEditView(PassUserMixin):
         if method in [
             bulk_edit.split,
             bulk_edit.merge,
+            bulk_edit.rotate,
+            bulk_edit.delete_pages,
             bulk_edit.edit_pdf,
             bulk_edit.remove_password,
         ]:

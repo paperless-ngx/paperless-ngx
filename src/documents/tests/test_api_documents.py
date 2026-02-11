@@ -554,6 +554,36 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(response.data[1]["actor"])
         self.assertEqual(response.data[1]["action"], "create")
 
+    def test_document_history_logs_version_deletion(self) -> None:
+        root_doc = Document.objects.create(
+            title="Root",
+            checksum="123",
+            mime_type="application/pdf",
+            owner=self.user,
+        )
+        version_doc = Document.objects.create(
+            title="Version",
+            checksum="456",
+            mime_type="application/pdf",
+            root_document=root_doc,
+            owner=self.user,
+        )
+
+        response = self.client.delete(
+            f"/api/documents/{root_doc.pk}/versions/{version_doc.pk}/",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.get(f"/api/documents/{root_doc.pk}/history/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]["actor"]["id"], self.user.id)
+        self.assertEqual(response.data[0]["action"], "update")
+        self.assertEqual(
+            response.data[0]["changes"],
+            {"Version Deleted": [version_doc.pk, "None"]},
+        )
+
     @override_settings(AUDIT_LOG_ENABLED=False)
     def test_document_history_action_disabled(self) -> None:
         """
