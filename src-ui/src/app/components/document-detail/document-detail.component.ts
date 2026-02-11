@@ -215,7 +215,7 @@ export class DocumentDetailComponent
   private componentRouterService = inject(ComponentRouterService)
   private deviceDetectorService = inject(DeviceDetectorService)
   private savedViewService = inject(SavedViewService)
-  private websocketStatusService = inject(WebsocketStatusService)
+  private readonly websocketStatusService = inject(WebsocketStatusService)
 
   @ViewChild('inputTitle')
   titleInput: TextComponent
@@ -1320,7 +1320,7 @@ export class DocumentDetailComponent
           ).pipe(take(1))
         }),
         switchMap((result) => {
-          if (!result || result.state !== 'success') {
+          if (result?.state !== 'success') {
             if (result?.state === 'failed') {
               this.versionUploadState = UploadState.Failed
               this.versionUploadError =

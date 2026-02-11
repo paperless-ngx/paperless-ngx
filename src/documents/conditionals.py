@@ -129,7 +129,6 @@ def metadata_etag(request, pk: int) -> str | None:
     if doc is None:
         return None
     return doc.checksum
-    return None
 
 
 def metadata_last_modified(request, pk: int) -> datetime | None:
@@ -142,7 +141,6 @@ def metadata_last_modified(request, pk: int) -> datetime | None:
     if doc is None:
         return None
     return doc.modified
-    return None
 
 
 def preview_etag(request, pk: int) -> str | None:
@@ -158,7 +156,6 @@ def preview_etag(request, pk: int) -> str | None:
         and request.query_params["original"] == "true"
     )
     return doc.checksum if use_original else doc.archive_checksum
-    return None
 
 
 def preview_last_modified(request, pk: int) -> datetime | None:
@@ -170,7 +167,6 @@ def preview_last_modified(request, pk: int) -> datetime | None:
     if doc is None:
         return None
     return doc.modified
-    return None
 
 
 def thumbnail_last_modified(request: Any, pk: int) -> datetime | None:
