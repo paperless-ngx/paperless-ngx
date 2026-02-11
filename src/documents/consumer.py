@@ -516,6 +516,7 @@ class ConsumerPlugin(
                     original_document.page_count = page_count
                     original_document.mime_type = mime_type
                     original_document.original_filename = self.filename
+                    original_document.storage_path = root_doc.storage_path
                     # Clear unique file path fields so they can be generated uniquely later
                     original_document.filename = None
                     original_document.archive_filename = None
