@@ -233,6 +233,13 @@ describe(`DocumentService`, () => {
     )
   })
 
+  it('should return the correct preview URL for a specific version', () => {
+    const url = service.getPreviewUrl(documents[0].id, false, 123)
+    expect(url).toEqual(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/preview/?version=123`
+    )
+  })
+
   it('should return the correct thumb URL for a single document', () => {
     let url = service.getThumbUrl(documents[0].id)
     expect(url).toEqual(
@@ -288,6 +295,43 @@ describe(`DocumentService`, () => {
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/history/`
     )
+  })
+
+  it('should call appropriate api endpoint for getting root document id', () => {
+    subscription = service.getRootId(documents[0].id).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/root/`
+    )
+    expect(req.request.method).toEqual('GET')
+    req.flush({ root_id: documents[0].id })
+  })
+
+  it('should call appropriate api endpoint for deleting a document version', () => {
+    subscription = service.deleteVersion(documents[0].id, 10).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/versions/10/`
+    )
+    expect(req.request.method).toEqual('DELETE')
+    req.flush({ result: 'OK', current_version_id: documents[0].id })
+  })
+
+  it('should call appropriate api endpoint for uploading a new version', () => {
+    const file = new File(['hello'], 'test.pdf', { type: 'application/pdf' })
+
+    subscription = service
+      .uploadVersion(documents[0].id, file, 'Label')
+      .subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/update_version/`
+    )
+    expect(req.request.method).toEqual('POST')
+    expect(req.request.body).toBeInstanceOf(FormData)
+
+    const body = req.request.body as FormData
+    expect(body.get('label')).toEqual('Label')
+    expect(body.get('document')).toBeInstanceOf(File)
+
+    req.flush('task-id')
   })
 })
 

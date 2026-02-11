@@ -354,6 +354,88 @@ describe('DocumentDetailComponent', () => {
     expect(component.document).toEqual(doc)
   })
 
+  it('should redirect to root when opening a version document id', () => {
+    const navigateSpy = jest.spyOn(router, 'navigate')
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 10, section: 'details' })))
+    jest
+      .spyOn(documentService, 'get')
+      .mockReturnValueOnce(throwError(() => ({ status: 404 }) as any))
+    const getRootSpy = jest
+      .spyOn(documentService, 'getRootId')
+      .mockReturnValue(of({ root_id: 3 }))
+    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(null)
+    jest
+      .spyOn(openDocumentsService, 'openDocument')
+      .mockReturnValueOnce(of(true))
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({
+        count: customFields.length,
+        all: customFields.map((f) => f.id),
+        results: customFields,
+      })
+    )
+
+    fixture.detectChanges()
+    httpTestingController.expectOne(component.previewUrl).flush('preview')
+
+    expect(getRootSpy).toHaveBeenCalledWith(10)
+    expect(navigateSpy).toHaveBeenCalledWith(['documents', 3, 'details'], {
+      replaceUrl: true,
+    })
+  })
+
+  it('should not render a delete button for the root/original version', () => {
+    const docWithVersions = {
+      ...doc,
+      versions: [
+        {
+          id: doc.id,
+          added: new Date('2024-01-01T00:00:00Z'),
+          label: 'Original',
+          checksum: 'aaaa',
+          is_root: true,
+        },
+        {
+          id: 10,
+          added: new Date('2024-01-02T00:00:00Z'),
+          label: 'Edited',
+          checksum: 'bbbb',
+          is_root: false,
+        },
+      ],
+    } as Document
+
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
+    jest.spyOn(documentService, 'get').mockReturnValueOnce(of(docWithVersions))
+    jest
+      .spyOn(documentService, 'getMetadata')
+      .mockReturnValue(of({ has_archive_version: true } as any))
+    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(null)
+    jest
+      .spyOn(openDocumentsService, 'openDocument')
+      .mockReturnValueOnce(of(true))
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({
+        count: customFields.length,
+        all: customFields.map((f) => f.id),
+        results: customFields,
+      })
+    )
+
+    fixture.detectChanges()
+    httpTestingController.expectOne(component.previewUrl).flush('preview')
+    fixture.detectChanges()
+
+    const deleteButtons = fixture.debugElement.queryAll(
+      By.css('pngx-confirm-button')
+    )
+    expect(deleteButtons.length).toEqual(1)
+  })
+
   it('should fall back to details tab when duplicates tab is active but no duplicates', () => {
     initNormally()
     component.activeNavID = component.DocumentDetailNavIDs.Duplicates
