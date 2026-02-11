@@ -8,8 +8,8 @@ concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 env:
-  DEFAULT_UV_VERSION: "0.9.x"
-  DEFAULT_PYTHON_VERSION: "3.11"
+  DEFAULT_UV_VERSION: "0.10.x"
+  DEFAULT_PYTHON_VERSION: "3.12"
 jobs:
   wait-for-docker:
     name: Wait for Docker Build
