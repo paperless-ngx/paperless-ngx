@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from unittest import mock
 
-from auditlog.models import LogEntry
+from auditlog.models import LogEntry  # type: ignore[import-untyped]
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from rest_framework import status

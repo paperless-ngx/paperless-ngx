@@ -7,7 +7,9 @@ from datetime import datetime
 from datetime import timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING
+from typing import Any
 from typing import Literal
+from typing import TypedDict
 
 import magic
 from celery import states
@@ -89,6 +91,8 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from django.db.models.query import QuerySet
+    from rest_framework.relations import ManyRelatedField
+    from rest_framework.relations import RelatedField
 
 
 logger = logging.getLogger("paperless.serializers")
@@ -1071,6 +1075,14 @@ class DocumentVersionInfoSerializer(serializers.Serializer):
     is_root = serializers.BooleanField()
 
 
+class _DocumentVersionInfo(TypedDict):
+    id: int
+    added: datetime
+    version_label: str | None
+    checksum: str | None
+    is_root: bool
+
+
 @extend_schema_serializer(
     deprecate_fields=["created_date"],
 )
@@ -1091,7 +1103,9 @@ class DocumentSerializer(
     duplicate_documents = SerializerMethodField()
 
     notes = NotesSerializer(many=True, required=False, read_only=True)
-    root_document = serializers.PrimaryKeyRelatedField(read_only=True)
+    root_document: RelatedField[Document, Document, Any] | ManyRelatedField = (
+        serializers.PrimaryKeyRelatedField(read_only=True)
+    )
     versions = SerializerMethodField()
 
     custom_fields = CustomFieldInstanceSerializer(
@@ -1129,6 +1143,8 @@ class DocumentSerializer(
     @extend_schema_field(DocumentVersionInfoSerializer(many=True))
     def get_versions(self, obj):
         root_doc = obj if obj.root_document_id is None else obj.root_document
+        if root_doc is None:
+            return []
         versions_qs = Document.objects.filter(root_document=root_doc).only(
             "id",
             "added",
@@ -1137,7 +1153,7 @@ class DocumentSerializer(
         )
         versions = [*versions_qs, root_doc]
 
-        def build_info(doc: Document) -> dict[str, object]:
+        def build_info(doc: Document) -> _DocumentVersionInfo:
             return {
                 "id": doc.id,
                 "added": doc.added,
@@ -2249,7 +2265,7 @@ class TasksViewSerializer(OwnedObjectSerializer):
         return list(duplicates.values("id", "title", "deleted_at"))
 
 
-class RunTaskViewSerializer(serializers.Serializer):
+class RunTaskViewSerializer(serializers.Serializer[dict[str, Any]]):
     task_name = serializers.ChoiceField(
         choices=PaperlessTask.TaskName.choices,
         label="Task Name",
@@ -2257,7 +2273,7 @@ class RunTaskViewSerializer(serializers.Serializer):
     )
 
 
-class AcknowledgeTasksViewSerializer(serializers.Serializer):
+class AcknowledgeTasksViewSerializer(serializers.Serializer[dict[str, Any]]):
     tasks = serializers.ListField(
         required=True,
         label="Tasks",
@@ -3004,7 +3020,7 @@ class TrashSerializer(SerializerWithPerms):
         write_only=True,
     )
 
-    def validate_documents(self, documents):
+    def validate_documents(self, documents: list[int]) -> list[int]:
         count = Document.deleted_objects.filter(id__in=documents).count()
         if not count == len(documents):
             raise serializers.ValidationError(

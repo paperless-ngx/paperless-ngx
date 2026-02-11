@@ -103,9 +103,10 @@ class ConsumerStatusShortMessage(str, Enum):
 
 class ConsumerPluginMixin:
     if TYPE_CHECKING:
+        from logging import Logger
         from logging import LoggerAdapter
 
-        log: "LoggerAdapter"
+        log: "LoggerAdapter"  # type: ignore[type-arg]
 
     def __init__(
         self,
@@ -126,7 +127,7 @@ class ConsumerPluginMixin:
                 f"Document root document id: {input_doc.root_document_id}",
             )
             root_document = Document.objects.get(pk=input_doc.root_document_id)
-            version_index = root_document.versions.count()
+            version_index = Document.objects.filter(root_document=root_document).count()
             self.filename += f"_v{version_index}"
 
     def _send_progress(
@@ -530,11 +531,15 @@ class ConsumerPlugin(
                         settings.AUDIT_LOG_ENABLED
                         and self.metadata.actor_id is not None
                     ):
-                        from auditlog.models import LogEntry
+                        from auditlog.models import (
+                            LogEntry,  # type: ignore[import-untyped]
+                        )
 
                         actor = User.objects.filter(pk=self.metadata.actor_id).first()
                         if actor is not None:
-                            from auditlog.context import set_actor
+                            from auditlog.context import (  # type: ignore[import-untyped]
+                                set_actor,
+                            )
 
                             with set_actor(actor):
                                 original_document.save()

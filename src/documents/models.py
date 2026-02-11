@@ -1,6 +1,5 @@
 import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING
 from typing import Final
 
 import pathvalidate
@@ -156,12 +155,7 @@ class StoragePath(MatchingModel):
         verbose_name_plural = _("storage paths")
 
 
-class Document(SoftDeleteModel, ModelWithOwner):
-    if TYPE_CHECKING:
-        from django.db.models.query import QuerySet
-
-        versions: "QuerySet[Document]"
-
+class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-missing]
     correspondent = models.ForeignKey(
         Correspondent,
         blank=True,
@@ -1748,5 +1742,5 @@ class WorkflowRun(SoftDeleteModel):
         verbose_name = _("workflow run")
         verbose_name_plural = _("workflow runs")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"WorkflowRun of {self.workflow} at {self.run_at} on {self.document}"

@@ -1291,12 +1291,12 @@ class TestPDFActions(DirectoriesMixin, TestCase):
     @mock.patch("pikepdf.open")
     def test_remove_password_creates_consumable_document(
         self,
-        mock_open,
-        mock_mkdtemp,
-        mock_consume_file,
-        mock_group,
-        mock_chord,
-    ):
+        mock_open: mock.Mock,
+        mock_mkdtemp: mock.Mock,
+        mock_consume_file: mock.Mock,
+        mock_group: mock.Mock,
+        mock_chord: mock.Mock,
+    ) -> None:
         doc = self.doc2
         temp_dir = self.dirs.scratch_dir / "remove-password"
         temp_dir.mkdir(parents=True, exist_ok=True)
@@ -1305,8 +1305,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         fake_pdf = mock.MagicMock()
         fake_pdf.pages = [mock.Mock(), mock.Mock()]
 
-        def save_side_effect(target_path):
-            Path(target_path).write_bytes(b"password removed")
+        def save_side_effect(target_path: Path) -> None:
+            target_path.write_bytes(b"password removed")
 
         fake_pdf.save.side_effect = save_side_effect
         mock_open.return_value.__enter__.return_value = fake_pdf
@@ -1348,13 +1348,13 @@ class TestPDFActions(DirectoriesMixin, TestCase):
     @mock.patch("pikepdf.open")
     def test_remove_password_deletes_original(
         self,
-        mock_open,
-        mock_mkdtemp,
-        mock_consume_file,
-        mock_group,
-        mock_chord,
-        mock_delete,
-    ):
+        mock_open: mock.Mock,
+        mock_mkdtemp: mock.Mock,
+        mock_consume_file: mock.Mock,
+        mock_group: mock.Mock,
+        mock_chord: mock.Mock,
+        mock_delete: mock.Mock,
+    ) -> None:
         doc = self.doc2
         temp_dir = self.dirs.scratch_dir / "remove-password-delete"
         temp_dir.mkdir(parents=True, exist_ok=True)
@@ -1363,8 +1363,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         fake_pdf = mock.MagicMock()
         fake_pdf.pages = [mock.Mock(), mock.Mock()]
 
-        def save_side_effect(target_path):
-            Path(target_path).write_bytes(b"password removed")
+        def save_side_effect(target_path: Path) -> None:
+            target_path.write_bytes(b"password removed")
 
         fake_pdf.save.side_effect = save_side_effect
         mock_open.return_value.__enter__.return_value = fake_pdf
@@ -1387,7 +1387,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_delete.si.assert_called_once_with([doc.id])
 
     @mock.patch("pikepdf.open")
-    def test_remove_password_open_failure(self, mock_open):
+    def test_remove_password_open_failure(self, mock_open: mock.Mock) -> None:
         mock_open.side_effect = RuntimeError("wrong password")
 
         with self.assertLogs("paperless.bulk_edit", level="ERROR") as cm:

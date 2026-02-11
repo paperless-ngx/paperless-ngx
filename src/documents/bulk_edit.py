@@ -811,17 +811,17 @@ def edit_pdf(
             if delete_original and len(pdf_docs) == 1:
                 overrides.asn = root_doc.archive_serial_number
             for idx, pdf in enumerate(pdf_docs, start=1):
-                filepath: Path = (
+                version_filepath: Path = (
                     Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
                     / f"{root_doc.id}_edit_{idx}.pdf"
                 )
                 pdf.remove_unreferenced_resources()
-                pdf.save(filepath)
+                pdf.save(version_filepath)
                 consume_tasks.append(
                     consume_file.s(
                         ConsumableDocument(
                             source=DocumentSource.ConsumeFolder,
-                            original_file=filepath,
+                            original_file=version_filepath,
                         ),
                         overrides,
                     ),

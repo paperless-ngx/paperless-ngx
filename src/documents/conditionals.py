@@ -1,5 +1,6 @@
 from datetime import datetime
 from datetime import timezone
+from typing import Any
 
 from django.conf import settings
 from django.core.cache import cache
@@ -55,7 +56,12 @@ def _resolve_effective_doc(pk: int, request) -> Document | None:
 
     # Default behavior: if pk is a root doc, prefer its newest child version
     if request_doc.root_document_id is None:
-        latest = root_doc.versions.only("id").order_by("id").last()
+        latest = (
+            Document.objects.filter(root_document=root_doc)
+            .only("id")
+            .order_by("id")
+            .last()
+        )
         return latest or root_doc
 
     # pk is already a version
@@ -167,7 +173,7 @@ def preview_last_modified(request, pk: int) -> datetime | None:
     return None
 
 
-def thumbnail_last_modified(request, pk: int) -> datetime | None:
+def thumbnail_last_modified(request: Any, pk: int) -> datetime | None:
     """
     Returns the filesystem last modified either from cache or from filesystem.
     Cache should be (slightly?) faster than filesystem

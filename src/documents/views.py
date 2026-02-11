@@ -10,6 +10,7 @@ from collections import deque
 from datetime import datetime
 from pathlib import Path
 from time import mktime
+from typing import Any
 from typing import Literal
 from unicodedata import normalize
 from urllib.parse import quote
@@ -37,8 +38,10 @@ from django.db.models import Sum
 from django.db.models import When
 from django.db.models.functions import Lower
 from django.db.models.manager import Manager
+from django.db.models.query import QuerySet
 from django.http import FileResponse
 from django.http import Http404
+from django.http import HttpRequest
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
@@ -83,6 +86,7 @@ from rest_framework.mixins import ListModelMixin
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.mixins import UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
@@ -825,6 +829,8 @@ class DocumentViewSet(
             raise Http404
 
         root_doc = doc if doc.root_document_id is None else doc.root_document
+        if root_doc is None:
+            raise Http404
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "view_document",
@@ -889,7 +895,7 @@ class DocumentViewSet(
             ):
                 raise Http404
             return candidate
-        latest = root_doc.versions.order_by("id").last()
+        latest = Document.objects.filter(root_document=root_doc).order_by("id").last()
         return latest or root_doc
 
     def file_response(self, pk, request, disposition):
@@ -1922,7 +1928,7 @@ class SavedViewViewSet(ModelViewSet, PassUserMixin):
             .prefetch_related("filter_rules")
         )
 
-    def perform_create(self, serializer) -> None:
+    def perform_create(self, serializer: serializers.BaseSerializer[Any]) -> None:
         serializer.save(owner=self.request.user)
 
 
@@ -3466,7 +3472,7 @@ class CustomFieldViewSet(ModelViewSet):
 
     queryset = CustomField.objects.all().order_by("-created")
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[CustomField]:
         filter = (
             Q(fields__document__deleted_at__isnull=True)
             if self.request.user is None or self.request.user.is_superuser
@@ -3779,11 +3785,16 @@ class TrashView(ListModelMixin, PassUserMixin):
 
     queryset = Document.deleted_objects.all()
 
-    def get(self, request, format=None):
+    def get(self, request: Request, format: str | None = None) -> Response:
         self.serializer_class = DocumentSerializer
         return self.list(request, format)
 
-    def post(self, request, *args, **kwargs):
+    def post(
+        self,
+        request: Request,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Response | HttpResponse:
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -3807,7 +3818,7 @@ class TrashView(ListModelMixin, PassUserMixin):
         return Response({"result": "OK", "doc_ids": doc_ids})
 
 
-def serve_logo(request, filename=None):
+def serve_logo(request: HttpRequest, filename: str | None = None) -> FileResponse:
     """
     Serves the configured logo file with Content-Disposition: attachment.
     Prevents inline execution of SVGs. See GHSA-6p53-hqqw-8j62
