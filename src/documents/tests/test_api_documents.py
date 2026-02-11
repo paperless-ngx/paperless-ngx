@@ -581,7 +581,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.data[0]["action"], "update")
         self.assertEqual(
             response.data[0]["changes"],
-            {"Version Deleted": [version_doc.pk, "None"]},
+            {"Version Deleted": ["None", version_doc.pk]},
         )
 
     @override_settings(AUDIT_LOG_ENABLED=False)

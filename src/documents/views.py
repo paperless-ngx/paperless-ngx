@@ -1611,7 +1611,7 @@ class DocumentViewSet(
             LogEntry.objects.log_create(
                 instance=root_doc,
                 changes={
-                    "Version Deleted": [version_doc_id, "None"],
+                    "Version Deleted": ["None", version_doc_id],
                 },
                 action=LogEntry.Action.UPDATE,
                 actor=actor,
