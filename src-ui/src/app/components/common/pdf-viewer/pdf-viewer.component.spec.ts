@@ -65,6 +65,13 @@ describe('PngxPdfViewerComponent', () => {
     const pageSpy = jest.fn()
     component.pageChange.subscribe(pageSpy)
 
+    // In real usage the viewer may have multiple pages; our pdfjs mock defaults
+    // to a single page, so explicitly simulate a multi-page document here.
+    const pdf = (component as any).pdf as { numPages: number }
+    pdf.numPages = 3
+    const viewer = (component as any).pdfViewer as PDFViewer
+    viewer.setDocument(pdf)
+
     component.zoomScale = PdfZoomScale.PageFit
     component.zoom = PdfZoomLevel.Two
     component.rotation = 90
@@ -81,7 +88,6 @@ describe('PngxPdfViewerComponent', () => {
       page: new SimpleChange(undefined, 2, false),
     })
 
-    const viewer = (component as any).pdfViewer as PDFViewer
     expect(viewer.pagesRotation).toBe(90)
     expect(viewer.currentPageNumber).toBe(2)
     expect(pageSpy).toHaveBeenCalledWith(2)
@@ -196,6 +202,8 @@ describe('PngxPdfViewerComponent', () => {
     const scaleSpy = jest.spyOn(component as any, 'applyViewerState')
     const resizeSpy = jest.spyOn(component as any, 'setupResizeObserver')
 
+    // Angular sets the input value before calling ngOnChanges; mirror that here.
+    component.src = 'test.pdf'
     component.ngOnChanges({
       src: new SimpleChange(undefined, 'test.pdf', true),
       zoomScale: new SimpleChange(
