@@ -393,14 +393,14 @@ describe('DocumentDetailComponent', () => {
         {
           id: doc.id,
           added: new Date('2024-01-01T00:00:00Z'),
-          label: 'Original',
+          version_label: 'Original',
           checksum: 'aaaa',
           is_root: true,
         },
         {
           id: 10,
           added: new Date('2024-01-02T00:00:00Z'),
-          label: 'Edited',
+          version_label: 'Edited',
           checksum: 'bbbb',
           is_root: false,
         },

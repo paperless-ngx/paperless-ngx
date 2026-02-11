@@ -328,7 +328,7 @@ describe(`DocumentService`, () => {
     expect(req.request.body).toBeInstanceOf(FormData)
 
     const body = req.request.body as FormData
-    expect(body.get('label')).toEqual('Label')
+    expect(body.get('version_label')).toEqual('Label')
     expect(body.get('document')).toBeInstanceOf(File)
 
     req.flush('task-id')

@@ -1528,7 +1528,7 @@ class DocumentViewSet(
 
         try:
             doc_name, doc_data = serializer.validated_data.get("document")
-            label = serializer.validated_data.get("label")
+            version_label = serializer.validated_data.get("version_label")
 
             t = int(mktime(datetime.now().timetuple()))
 
@@ -1549,8 +1549,8 @@ class DocumentViewSet(
             )
 
             overrides = DocumentMetadataOverrides()
-            if label:
-                overrides.version_label = label.strip()
+            if version_label:
+                overrides.version_label = version_label.strip()
             if request.user is not None:
                 overrides.actor_id = request.user.id
 

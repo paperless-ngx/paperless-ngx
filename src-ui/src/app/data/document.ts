@@ -172,7 +172,7 @@ export interface Document extends ObjectWithPermissions {
 export interface DocumentVersionInfo {
   id: number
   added?: Date
-  label?: string
+  version_label?: string
   checksum?: string
   is_root: boolean
 }

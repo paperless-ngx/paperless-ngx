@@ -76,8 +76,8 @@
               </span>
               <button type="button" class="version-entry flex-grow-1 ms-3 small text-start" (click)="selectVersion(version.id)">
                 <div class="small">
-                  @if (version.label) {
-                    {{ version.label }}
+                  @if (version.version_label) {
+                    {{ version.version_label }}
                   } @else {
                     <span i18n>ID</span> #{{version.id}}
                   }

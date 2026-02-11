@@ -1066,7 +1066,7 @@ class DuplicateDocumentSummarySerializer(serializers.Serializer):
 class DocumentVersionInfoSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     added = serializers.DateTimeField()
-    label = serializers.CharField(required=False, allow_null=True)
+    version_label = serializers.CharField(required=False, allow_null=True)
     checksum = serializers.CharField(required=False, allow_null=True)
     is_root = serializers.BooleanField()
 
@@ -1141,7 +1141,7 @@ class DocumentSerializer(
             return {
                 "id": doc.id,
                 "added": doc.added,
-                "label": doc.version_label,
+                "version_label": doc.version_label,
                 "checksum": doc.checksum,
                 "is_root": doc.id == root_doc.id,
             }
@@ -2039,7 +2039,7 @@ class DocumentVersionSerializer(serializers.Serializer):
         label="Document",
         write_only=True,
     )
-    label = serializers.CharField(
+    version_label = serializers.CharField(
         label="Version label",
         required=False,
         allow_blank=True,
