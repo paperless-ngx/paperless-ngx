@@ -102,6 +102,11 @@ class ConsumerStatusShortMessage(str, Enum):
 
 
 class ConsumerPluginMixin:
+    if TYPE_CHECKING:
+        from logging import LoggerAdapter
+
+        log: "LoggerAdapter"
+
     def __init__(
         self,
         input_doc: ConsumableDocument,

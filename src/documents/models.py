@@ -1,5 +1,6 @@
 import datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Final
 
 import pathvalidate
@@ -156,6 +157,11 @@ class StoragePath(MatchingModel):
 
 
 class Document(SoftDeleteModel, ModelWithOwner):
+    if TYPE_CHECKING:
+        from django.db.models.query import QuerySet
+
+        versions: "QuerySet[Document]"
+
     correspondent = models.ForeignKey(
         Correspondent,
         blank=True,
