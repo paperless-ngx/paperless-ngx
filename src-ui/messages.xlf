@@ -7917,7 +7917,7 @@
       <trans-unit id="4958946940233632319" datatype="html">
         <source>No entries found.</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-history/document-history.component.html</context>
+          <context context-type="sourcefile">src/app/components/document-detail/document-history/document-history.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
       </trans-unit>
