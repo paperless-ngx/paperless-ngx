@@ -102,12 +102,14 @@ def _get_root_and_current_docs_by_root_id(
         "root_document_id",
         "-id",
     ):
-        latest_versions_by_root_id.setdefault(version_doc.root_document_id, version_doc)
+        root_id = version_doc.root_document_id
+        if root_id is None:
+            continue
+        latest_versions_by_root_id.setdefault(root_id, version_doc)
 
-    current_docs = {
-        root_id: latest_versions_by_root_id.get(root_id, root_docs.get(root_id))
-        for root_id in root_ids
-        if root_id in root_docs
+    current_docs: dict[int, Document] = {
+        root_id: latest_versions_by_root_id.get(root_id, root_docs[root_id])
+        for root_id in root_docs
     }
     return root_docs, current_docs
 
@@ -662,13 +664,19 @@ def delete_pages(
         f"Attempting to delete pages {pages} from {len(doc_ids)} documents",
     )
     doc = Document.objects.select_related("root_document").get(id=doc_ids[0])
-    root_doc = doc if doc.root_document_id is None else doc.root_document
+    root_doc: Document
+    if doc.root_document_id is None or doc.root_document is None:
+        root_doc = doc
+    else:
+        root_doc = doc.root_document
+
     source_doc = (
         Document.objects.filter(Q(id=root_doc.id) | Q(root_document=root_doc))
         .order_by("-id")
         .first()
-        or root_doc
     )
+    if source_doc is None:
+        source_doc = root_doc
     pages = sorted(pages)  # sort pages to avoid index issues
     import pikepdf
 
@@ -727,13 +735,19 @@ def edit_pdf(
         f"Editing PDF of document {doc_ids[0]} with {len(operations)} operations",
     )
     doc = Document.objects.select_related("root_document").get(id=doc_ids[0])
-    root_doc = doc if doc.root_document_id is None else doc.root_document
+    root_doc: Document
+    if doc.root_document_id is None or doc.root_document is None:
+        root_doc = doc
+    else:
+        root_doc = doc.root_document
+
     source_doc = (
         Document.objects.filter(Q(id=root_doc.id) | Q(root_document=root_doc))
         .order_by("-id")
         .first()
-        or root_doc
     )
+    if source_doc is None:
+        source_doc = root_doc
     import pikepdf
 
     pdf_docs: list[pikepdf.Pdf] = []
@@ -853,13 +867,19 @@ def remove_password(
 
     for doc_id in doc_ids:
         doc = Document.objects.select_related("root_document").get(id=doc_id)
-        root_doc = doc if doc.root_document_id is None else doc.root_document
+        root_doc: Document
+        if doc.root_document_id is None or doc.root_document is None:
+            root_doc = doc
+        else:
+            root_doc = doc.root_document
+
         source_doc = (
             Document.objects.filter(Q(id=root_doc.id) | Q(root_document=root_doc))
             .order_by("-id")
             .first()
-            or root_doc
         )
+        if source_doc is None:
+            source_doc = root_doc
         try:
             logger.info(
                 f"Attempting password removal from document {doc_ids[0]}",
