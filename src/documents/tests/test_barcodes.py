@@ -781,14 +781,15 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         WHEN:
             - ASN barcode detection is run with default settings
         THEN:
-            - ASN is not detected
+            - ASN 123 is detected
         """
 
         test_file = self.BARCODE_SAMPLE_DIR / "barcode-qr-asn-000123-upscale-dpi.pdf"
 
         with self.get_reader(test_file) as reader:
             reader.detect()
-            self.assertEqual(len(reader.barcodes), 0)
+            self.assertEqual(len(reader.barcodes), 1)
+            self.assertEqual(reader.asn, 123)
 
     @override_settings(CONSUMER_BARCODE_DPI=600)
     @override_settings(CONSUMER_BARCODE_UPSCALE=1.5)
@@ -798,7 +799,6 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
             - A printed and scanned PDF document with a rather small QR code
         WHEN:
             - ASN barcode detection is run with 600dpi and an upscale factor of 1.5
-              when you cannot switch to zxing (aarch64 build problems of zxing)
         THEN:
             - ASN 123 is detected
         """
