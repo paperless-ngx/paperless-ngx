@@ -7,7 +7,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "0010_alter_document_content_length"),
+        ("documents", "0011_optimize_integer_field_sizes"),
     ]
 
     operations = [
