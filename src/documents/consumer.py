@@ -501,7 +501,7 @@ class ConsumerPlugin(
                         pk=self.input_doc.root_document_id,
                     )
                     self.log.debug("Saving record for updated version to database")
-                    original_document.pk = None
+                    setattr(original_document, "pk", None)
                     original_document.root_document = root_doc
                     file_for_checksum = (
                         self.unmodified_original

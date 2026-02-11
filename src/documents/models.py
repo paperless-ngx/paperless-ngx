@@ -161,8 +161,6 @@ class Document(SoftDeleteModel, ModelWithOwner):
         from django.db.models.query import QuerySet
 
         versions: "QuerySet[Document]"
-        pk: int | None
-        id: int | None
 
     correspondent = models.ForeignKey(
         Correspondent,
