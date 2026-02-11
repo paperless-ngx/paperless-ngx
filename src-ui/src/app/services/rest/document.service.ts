@@ -211,15 +211,15 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     })
   }
 
-  getHeadId(documentId: number) {
-    return this.http.get<{ head_id: number }>(
-      this.getResourceUrl(documentId, 'head')
+  getRootId(documentId: number) {
+    return this.http.get<{ root_id: number }>(
+      this.getResourceUrl(documentId, 'root')
     )
   }
 
-  deleteVersion(headDocumentId: number, versionId: number) {
+  deleteVersion(rootDocumentId: number, versionId: number) {
     return this.http.delete<{ result: string; current_version_id: number }>(
-      this.getResourceUrl(headDocumentId, `versions/${versionId}`)
+      this.getResourceUrl(rootDocumentId, `versions/${versionId}`)
     )
   }
 

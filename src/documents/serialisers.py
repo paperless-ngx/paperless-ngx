@@ -1046,7 +1046,7 @@ def _get_viewable_duplicates(
     duplicates = Document.global_objects.filter(
         Q(checksum__in=checksums) | Q(archive_checksum__in=checksums),
     ).exclude(pk=document.pk)
-    duplicates = duplicates.filter(head_version__isnull=True)
+    duplicates = duplicates.filter(root_document__isnull=True)
     duplicates = duplicates.order_by("-created")
     allowed = get_objects_for_user_owner_aware(
         user,
@@ -1068,6 +1068,7 @@ class DocumentVersionInfoSerializer(serializers.Serializer):
     added = serializers.DateTimeField()
     label = serializers.CharField(required=False, allow_null=True)
     checksum = serializers.CharField(required=False, allow_null=True)
+    is_root = serializers.BooleanField()
 
 
 @extend_schema_serializer(
@@ -1090,7 +1091,7 @@ class DocumentSerializer(
     duplicate_documents = SerializerMethodField()
 
     notes = NotesSerializer(many=True, required=False, read_only=True)
-    head_version = serializers.PrimaryKeyRelatedField(read_only=True)
+    root_document = serializers.PrimaryKeyRelatedField(read_only=True)
     versions = SerializerMethodField()
 
     custom_fields = CustomFieldInstanceSerializer(
@@ -1127,14 +1128,14 @@ class DocumentSerializer(
 
     @extend_schema_field(DocumentVersionInfoSerializer(many=True))
     def get_versions(self, obj):
-        head_doc = obj if obj.head_version_id is None else obj.head_version
-        versions_qs = Document.objects.filter(head_version=head_doc).only(
+        root_doc = obj if obj.root_document_id is None else obj.root_document
+        versions_qs = Document.objects.filter(root_document=root_doc).only(
             "id",
             "added",
             "checksum",
             "version_label",
         )
-        versions = [*versions_qs, head_doc]
+        versions = [*versions_qs, root_doc]
 
         def build_info(doc: Document) -> dict[str, object]:
             return {
@@ -1142,6 +1143,7 @@ class DocumentSerializer(
                 "added": doc.added,
                 "label": doc.version_label,
                 "checksum": doc.checksum,
+                "is_root": doc.id == root_doc.id,
             }
 
         info = [build_info(doc) for doc in versions]
@@ -1336,7 +1338,7 @@ class DocumentSerializer(
             "remove_inbox_tags",
             "page_count",
             "mime_type",
-            "head_version",
+            "root_document",
             "versions",
         )
         list_serializer_class = OwnedObjectListSerializer

@@ -778,7 +778,7 @@ class DocumentViewSet(
 
     def get_queryset(self):
         return (
-            Document.objects.filter(head_version__isnull=True)
+            Document.objects.filter(root_document__isnull=True)
             .distinct()
             .order_by("-created")
             .annotate(num_notes=Count("notes"))
@@ -805,25 +805,35 @@ class DocumentViewSet(
         )
         return super().get_serializer(*args, **kwargs)
 
-    @action(methods=["get"], detail=True, url_path="head")
-    def head(self, request, pk=None):
+    @action(methods=["get"], detail=True, url_path="root")
+    def root(self, request, pk=None):
         try:
             doc = Document.global_objects.select_related(
                 "owner",
-                "head_version",
+                "root_document",
             ).get(pk=pk)
         except Document.DoesNotExist:
             raise Http404
 
-        head_doc = doc if doc.head_version_id is None else doc.head_version
+        root_doc = doc if doc.root_document_id is None else doc.root_document
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "view_document",
-            head_doc,
+            root_doc,
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
-        return Response({"head_id": head_doc.id})
+        return Response({"root_id": root_doc.id})
+
+    @action(methods=["get"], detail=True, url_path="head")
+    def head(self, request, pk=None):
+        """
+        Backwards-compatible alias for the `root` endpoint.
+        """
+        response = self.root(request, pk=pk)
+        if isinstance(response, Response):
+            return Response({"head_id": response.data.get("root_id")})
+        return response
 
     def update(self, request, *args, **kwargs):
         response = super().update(request, *args, **kwargs)
@@ -861,7 +871,7 @@ class DocumentViewSet(
             and request.query_params["original"] == "true"
         )
 
-    def _resolve_file_doc(self, head_doc: Document, request):
+    def _resolve_file_doc(self, root_doc: Document, request):
         version_param = request.query_params.get("version")
         if version_param:
             try:
@@ -874,36 +884,39 @@ class DocumentViewSet(
                 )
             except Document.DoesNotExist:
                 raise Http404
-            if candidate.id != head_doc.id and candidate.head_version_id != head_doc.id:
+            if (
+                candidate.id != root_doc.id
+                and candidate.root_document_id != root_doc.id
+            ):
                 raise Http404
             return candidate
-        latest = head_doc.versions.order_by("id").last()
-        return latest or head_doc
+        latest = root_doc.versions.order_by("id").last()
+        return latest or root_doc
 
     def file_response(self, pk, request, disposition):
         request_doc = Document.global_objects.select_related("owner").get(id=pk)
-        head_doc = (
+        root_doc = (
             request_doc
-            if request_doc.head_version_id is None
+            if request_doc.root_document_id is None
             else Document.global_objects.select_related("owner").get(
-                id=request_doc.head_version_id,
+                id=request_doc.root_document_id,
             )
         )
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "view_document",
-            head_doc,
+            root_doc,
         ):
             return HttpResponseForbidden("Insufficient permissions")
         # If a version is explicitly requested, use it. Otherwise:
-        # - if pk is a head document: serve newest version
+        # - if pk is a root document: serve newest version
         # - if pk is a version: serve that version
         if "version" in request.query_params:
-            file_doc = self._resolve_file_doc(head_doc, request)
+            file_doc = self._resolve_file_doc(root_doc, request)
         else:
             file_doc = (
-                self._resolve_file_doc(head_doc, request)
-                if request_doc.head_version_id is None
+                self._resolve_file_doc(root_doc, request)
+                if request_doc.root_document_id is None
                 else request_doc
             )
         return serve_file(
@@ -945,17 +958,17 @@ class DocumentViewSet(
     def metadata(self, request, pk=None):
         try:
             request_doc = Document.objects.select_related("owner").get(pk=pk)
-            head_doc = (
+            root_doc = (
                 request_doc
-                if request_doc.head_version_id is None
+                if request_doc.root_document_id is None
                 else Document.objects.select_related("owner").get(
-                    id=request_doc.head_version_id,
+                    id=request_doc.root_document_id,
                 )
             )
             if request.user is not None and not has_perms_owner_aware(
                 request.user,
                 "view_document",
-                head_doc,
+                root_doc,
             ):
                 return HttpResponseForbidden("Insufficient permissions")
         except Document.DoesNotExist:
@@ -963,11 +976,11 @@ class DocumentViewSet(
 
         # Choose the effective document (newest version by default, or explicit via ?version=)
         if "version" in request.query_params:
-            doc = self._resolve_file_doc(head_doc, request)
+            doc = self._resolve_file_doc(root_doc, request)
         else:
             doc = (
-                self._resolve_file_doc(head_doc, request)
-                if request_doc.head_version_id is None
+                self._resolve_file_doc(root_doc, request)
+                if request_doc.root_document_id is None
                 else request_doc
             )
 
@@ -1140,26 +1153,26 @@ class DocumentViewSet(
     def preview(self, request, pk=None):
         try:
             request_doc = Document.objects.select_related("owner").get(id=pk)
-            head_doc = (
+            root_doc = (
                 request_doc
-                if request_doc.head_version_id is None
+                if request_doc.root_document_id is None
                 else Document.objects.select_related("owner").get(
-                    id=request_doc.head_version_id,
+                    id=request_doc.root_document_id,
                 )
             )
             if request.user is not None and not has_perms_owner_aware(
                 request.user,
                 "view_document",
-                head_doc,
+                root_doc,
             ):
                 return HttpResponseForbidden("Insufficient permissions")
 
             if "version" in request.query_params:
-                file_doc = self._resolve_file_doc(head_doc, request)
+                file_doc = self._resolve_file_doc(root_doc, request)
             else:
                 file_doc = (
-                    self._resolve_file_doc(head_doc, request)
-                    if request_doc.head_version_id is None
+                    self._resolve_file_doc(root_doc, request)
+                    if request_doc.root_document_id is None
                     else request_doc
                 )
 
@@ -1178,25 +1191,25 @@ class DocumentViewSet(
     def thumb(self, request, pk=None):
         try:
             request_doc = Document.objects.select_related("owner").get(id=pk)
-            head_doc = (
+            root_doc = (
                 request_doc
-                if request_doc.head_version_id is None
+                if request_doc.root_document_id is None
                 else Document.objects.select_related("owner").get(
-                    id=request_doc.head_version_id,
+                    id=request_doc.root_document_id,
                 )
             )
             if request.user is not None and not has_perms_owner_aware(
                 request.user,
                 "view_document",
-                head_doc,
+                root_doc,
             ):
                 return HttpResponseForbidden("Insufficient permissions")
             if "version" in request.query_params:
-                file_doc = self._resolve_file_doc(head_doc, request)
+                file_doc = self._resolve_file_doc(root_doc, request)
             else:
                 file_doc = (
-                    self._resolve_file_doc(head_doc, request)
-                    if request_doc.head_version_id is None
+                    self._resolve_file_doc(root_doc, request)
+                    if request_doc.root_document_id is None
                     else request_doc
                 )
             handle = file_doc.thumbnail_file
@@ -1526,7 +1539,7 @@ class DocumentViewSet(
             input_doc = ConsumableDocument(
                 source=DocumentSource.ApiUpload,
                 original_file=temp_file_path,
-                head_version_id=doc.pk,
+                root_document_id=doc.pk,
             )
 
             overrides = DocumentMetadataOverrides()
@@ -1554,10 +1567,10 @@ class DocumentViewSet(
     )
     def delete_version(self, request, pk=None, version_id=None):
         try:
-            head_doc = Document.objects.select_related("owner").get(pk=pk)
-            if head_doc.head_version_id is not None:
-                head_doc = Document.objects.select_related("owner").get(
-                    pk=head_doc.head_version_id,
+            root_doc = Document.objects.select_related("owner").get(pk=pk)
+            if root_doc.root_document_id is not None:
+                root_doc = Document.objects.select_related("owner").get(
+                    pk=root_doc.root_document_id,
                 )
         except Document.DoesNotExist:
             raise Http404
@@ -1565,7 +1578,7 @@ class DocumentViewSet(
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "delete_document",
-            head_doc,
+            root_doc,
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
@@ -1576,7 +1589,12 @@ class DocumentViewSet(
         except Document.DoesNotExist:
             raise Http404
 
-        if version_doc.head_version_id != head_doc.id:
+        if version_doc.id == root_doc.id:
+            return HttpResponseBadRequest(
+                "Cannot delete the root/original version. Delete the document instead.",
+            )
+
+        if version_doc.root_document_id != root_doc.id:
             raise Http404
 
         from documents import index
@@ -1585,14 +1603,14 @@ class DocumentViewSet(
         version_doc.delete()
 
         current = (
-            Document.objects.filter(Q(id=head_doc.id) | Q(head_version=head_doc))
+            Document.objects.filter(Q(id=root_doc.id) | Q(root_document=root_doc))
             .order_by("-id")
             .first()
         )
         return Response(
             {
                 "result": "OK",
-                "current_version_id": current.id if current else head_doc.id,
+                "current_version_id": current.id if current else root_doc.id,
             },
         )
 

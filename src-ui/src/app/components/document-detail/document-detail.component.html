@@ -87,16 +87,18 @@
                 </div>
               </button>
               @if (selectedVersionId === version.id) { <span class="ms-2">✓</span> }
-              <pngx-confirm-button
-                buttonClasses="btn-link btn-sm text-danger ms-2"
-                iconName="trash"
-                confirmMessage="Delete this version?"
-                i18n-confirmMessage
-                [disabled]="!userIsOwner || !userCanEdit"
-                (confirm)="deleteVersion(version.id)"
-              >
-                <span class="visually-hidden" i18n>Delete version</span>
-              </pngx-confirm-button>
+              @if (!version.is_root) {
+                <pngx-confirm-button
+                  buttonClasses="btn-link btn-sm text-danger ms-2"
+                  iconName="trash"
+                  confirmMessage="Delete this version?"
+                  i18n-confirmMessage
+                  [disabled]="!userIsOwner || !userCanEdit"
+                  (confirm)="deleteVersion(version.id)"
+                >
+                  <span class="visually-hidden" i18n>Delete version</span>
+                </pngx-confirm-button>
+              }
             </div>
           </div>
         }

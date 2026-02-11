@@ -116,10 +116,12 @@ class ConsumerPluginMixin:
 
         self.filename = self.metadata.filename or self.input_doc.original_file.name
 
-        if input_doc.head_version_id:
-            self.log.debug(f"Document head version id: {input_doc.head_version_id}")
-            head_version = Document.objects.get(pk=input_doc.head_version_id)
-            version_index = head_version.versions.count()
+        if input_doc.root_document_id:
+            self.log.debug(
+                f"Document root document id: {input_doc.root_document_id}",
+            )
+            root_document = Document.objects.get(pk=input_doc.root_document_id)
+            version_index = root_document.versions.count()
             self.filename += f"_v{version_index}"
 
     def _send_progress(
@@ -483,17 +485,17 @@ class ConsumerPlugin(
         try:
             with transaction.atomic():
                 # store the document.
-                if self.input_doc.head_version_id:
+                if self.input_doc.root_document_id:
                     # If this is a new version of an existing document, we need
                     # to make sure we're not creating a new document, but updating
                     # the existing one.
                     original_document = Document.objects.get(
-                        pk=self.input_doc.head_version_id,
+                        pk=self.input_doc.root_document_id,
                     )
                     self.log.debug("Saving record for updated version to database")
                     original_document.pk = None
-                    original_document.head_version = Document.objects.get(
-                        pk=self.input_doc.head_version_id,
+                    original_document.root_document = Document.objects.get(
+                        pk=self.input_doc.root_document_id,
                     )
                     file_for_checksum = (
                         self.unmodified_original

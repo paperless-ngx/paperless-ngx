@@ -163,7 +163,7 @@ class ConsumableDocument:
 
     source: DocumentSource
     original_file: Path
-    head_version_id: int | None = None
+    root_document_id: int | None = None
     original_path: Path | None = None
     mailrule_id: int | None = None
     mime_type: str = dataclasses.field(init=False, default=None)

@@ -158,7 +158,7 @@ def consume_file(
 
     plugins: list[type[ConsumeTaskPlugin]] = (
         [ConsumerPreflightPlugin, ConsumerPlugin]
-        if input_doc.head_version_id is not None
+        if input_doc.root_document_id is not None
         else [
             ConsumerPreflightPlugin,
             AsnCheckPlugin,

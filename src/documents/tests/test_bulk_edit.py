@@ -940,7 +940,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             doc_ids,
         ):
             consumable, overrides = call.args
-            self.assertEqual(consumable.head_version_id, expected_id)
+            self.assertEqual(consumable.root_document_id, expected_id)
             self.assertIsNotNone(overrides)
         self.assertEqual(result, "OK")
 
@@ -990,7 +990,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             self.assertIn(expected_str, output_str)
             self.assertEqual(mock_consume_delay.call_count, 1)
             consumable, overrides = mock_consume_delay.call_args[0]
-            self.assertEqual(consumable.head_version_id, self.doc2.id)
+            self.assertEqual(consumable.root_document_id, self.doc2.id)
             self.assertIsNotNone(overrides)
             self.assertEqual(result, "OK")
 
@@ -1013,7 +1013,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_pdf_save.assert_called_once()
         mock_consume_delay.assert_called_once()
         consumable, overrides = mock_consume_delay.call_args[0]
-        self.assertEqual(consumable.head_version_id, self.doc2.id)
+        self.assertEqual(consumable.root_document_id, self.doc2.id)
         self.assertTrue(str(consumable.original_file).endswith("_pages_deleted.pdf"))
         self.assertIsNotNone(overrides)
         self.assertEqual(result, "OK")
@@ -1162,7 +1162,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertEqual(result, "OK")
         mock_consume_delay.assert_called_once()
         consumable, overrides = mock_consume_delay.call_args[0]
-        self.assertEqual(consumable.head_version_id, self.doc2.id)
+        self.assertEqual(consumable.root_document_id, self.doc2.id)
         self.assertTrue(str(consumable.original_file).endswith("_edited.pdf"))
         self.assertIsNotNone(overrides)
 

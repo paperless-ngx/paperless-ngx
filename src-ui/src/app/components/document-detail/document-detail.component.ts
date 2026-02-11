@@ -451,7 +451,7 @@ export class DocumentDetailComponent
   }
 
   private loadDocument(documentId: number): void {
-    let redirectedToHead = false
+    let redirectedToRoot = false
     this.selectedVersionId = documentId
     this.previewUrl = this.documentsService.getPreviewUrl(
       this.selectedVersionId
@@ -477,14 +477,14 @@ export class DocumentDetailComponent
       .pipe(
         catchError((error) => {
           if (error?.status === 404) {
-            return this.documentsService.getHeadId(documentId).pipe(
+            return this.documentsService.getRootId(documentId).pipe(
               map((result) => {
-                const headId = result?.head_id
-                if (headId && headId !== documentId) {
+                const rootId = result?.root_id
+                if (rootId && rootId !== documentId) {
                   const section =
                     this.route.snapshot.paramMap.get('section') || 'details'
-                  redirectedToHead = true
-                  this.router.navigate(['documents', headId, section], {
+                  redirectedToRoot = true
+                  this.router.navigate(['documents', rootId, section], {
                     replaceUrl: true,
                   })
                 }
@@ -503,7 +503,7 @@ export class DocumentDetailComponent
       .subscribe({
         next: (doc) => {
           if (!doc) {
-            if (redirectedToHead) {
+            if (redirectedToRoot) {
               return
             }
             this.router.navigate(['404'], { replaceUrl: true })
@@ -786,8 +786,6 @@ export class DocumentDetailComponent
   }
 
   getVersionBadge(version: DocumentVersionInfo): string {
-    console.log(version)
-
     const checksum = version?.checksum ?? ''
     if (!checksum) return '----'
     return checksum.slice(0, 4).toUpperCase()

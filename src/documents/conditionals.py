@@ -18,19 +18,19 @@ def _resolve_effective_doc(pk: int, request) -> Document | None:
     """
     Resolve which Document row should be considered for caching keys:
     - If a version is requested, use that version
-    - If pk is a head doc, use its newest child version if present, else the head.
+    - If pk is a root doc, use its newest child version if present, else the root.
     - Else, pk is a version, use that version.
     Returns None if resolution fails (treat as no-cache).
     """
     try:
-        request_doc = Document.objects.only("id", "head_version_id").get(pk=pk)
+        request_doc = Document.objects.only("id", "root_document_id").get(pk=pk)
     except Document.DoesNotExist:
         return None
 
-    head_doc = (
+    root_doc = (
         request_doc
-        if request_doc.head_version_id is None
-        else Document.objects.only("id").get(id=request_doc.head_version_id)
+        if request_doc.root_document_id is None
+        else Document.objects.only("id").get(id=request_doc.root_document_id)
     )
 
     version_param = (
@@ -41,19 +41,22 @@ def _resolve_effective_doc(pk: int, request) -> Document | None:
     if version_param:
         try:
             version_id = int(version_param)
-            candidate = Document.objects.only("id", "head_version_id").get(
+            candidate = Document.objects.only("id", "root_document_id").get(
                 id=version_id,
             )
-            if candidate.id != head_doc.id and candidate.head_version_id != head_doc.id:
+            if (
+                candidate.id != root_doc.id
+                and candidate.root_document_id != root_doc.id
+            ):
                 return None
             return candidate
         except Exception:
             return None
 
-    # Default behavior: if pk is a head doc, prefer its newest child version
-    if request_doc.head_version_id is None:
-        latest = head_doc.versions.only("id").order_by("id").last()
-        return latest or head_doc
+    # Default behavior: if pk is a root doc, prefer its newest child version
+    if request_doc.root_document_id is None:
+        latest = root_doc.versions.only("id").order_by("id").last()
+        return latest or root_doc
 
     # pk is already a version
     return request_doc

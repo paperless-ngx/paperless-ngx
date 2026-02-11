@@ -309,13 +309,13 @@ def modify_custom_fields(
 @shared_task
 def delete(doc_ids: list[int]) -> Literal["OK"]:
     try:
-        head_ids = (
-            Document.objects.filter(id__in=doc_ids, head_version__isnull=True)
+        root_ids = (
+            Document.objects.filter(id__in=doc_ids, root_document__isnull=True)
             .values_list("id", flat=True)
             .distinct()
         )
         version_ids = (
-            Document.objects.filter(head_version_id__in=head_ids)
+            Document.objects.filter(root_document_id__in=root_ids)
             .values_list("id", flat=True)
             .distinct()
         )
@@ -407,7 +407,7 @@ def rotate(doc_ids: list[int], degrees: int) -> Literal["OK"]:
                 ConsumableDocument(
                     source=DocumentSource.ConsumeFolder,
                     original_file=filepath,
-                    head_version_id=doc.id,
+                    root_document_id=doc.id,
                 ),
                 overrides,
             )
@@ -627,7 +627,7 @@ def delete_pages(doc_ids: list[int], pages: list[int]) -> Literal["OK"]:
             ConsumableDocument(
                 source=DocumentSource.ConsumeFolder,
                 original_file=filepath,
-                head_version_id=doc.id,
+                root_document_id=doc.id,
             ),
             overrides,
         )
@@ -704,7 +704,7 @@ def edit_pdf(
                 ConsumableDocument(
                     source=DocumentSource.ConsumeFolder,
                     original_file=filepath,
-                    head_version_id=doc.id,
+                    root_document_id=doc.id,
                 ),
                 overrides,
             )
