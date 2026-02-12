@@ -128,7 +128,15 @@ class ConsumerPluginMixin:
             )
             root_document = Document.objects.get(pk=input_doc.root_document_id)
             version_index = Document.objects.filter(root_document=root_document).count()
-            self.filename += f"_v{version_index}"
+            filename_path = Path(self.filename)
+            if filename_path.suffix:
+                self.filename = str(
+                    filename_path.with_name(
+                        f"{filename_path.stem}_v{version_index}{filename_path.suffix}",
+                    ),
+                )
+            else:
+                self.filename = f"{self.filename}_v{version_index}"
 
     def _send_progress(
         self,

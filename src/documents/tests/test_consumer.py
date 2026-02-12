@@ -733,7 +733,7 @@ class TestConsumer(
         )
         consumer.setup()
         try:
-            self.assertTrue(consumer.filename.endswith("_v0"))
+            self.assertTrue(consumer.filename.endswith("_v0.pdf"))
             consumer.run()
         finally:
             consumer.cleanup()
@@ -744,7 +744,7 @@ class TestConsumer(
         assert version is not None
         assert version.original_filename is not None
         self.assertEqual(version.version_label, "v2")
-        self.assertTrue(version.original_filename.endswith("_v0"))
+        self.assertTrue(version.original_filename.endswith("_v0.pdf"))
 
     @mock.patch("documents.consumer.load_classifier")
     def testClassifyDocument(self, m) -> None:
