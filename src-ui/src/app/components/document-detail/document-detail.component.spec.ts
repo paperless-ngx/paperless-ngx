@@ -688,6 +688,18 @@ describe('DocumentDetailComponent', () => {
     expect(navigateSpy).toHaveBeenCalledWith(['404'], { replaceUrl: true })
   })
 
+  it('discard should request the currently selected version', () => {
+    initNormally()
+    const getSpy = jest.spyOn(documentService, 'get')
+    getSpy.mockClear()
+    getSpy.mockReturnValueOnce(of(doc))
+
+    component.selectedVersionId = 10
+    component.discard()
+
+    expect(getSpy).toHaveBeenCalledWith(component.documentId, 10)
+  })
+
   it('should 404 on invalid id', () => {
     const navigateSpy = jest.spyOn(router, 'navigate')
     jest

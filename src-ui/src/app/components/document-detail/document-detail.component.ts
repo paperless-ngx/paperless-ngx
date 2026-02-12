@@ -1059,7 +1059,7 @@ export class DocumentDetailComponent
 
   discard() {
     this.documentsService
-      .get(this.documentId)
+      .get(this.documentId, this.selectedVersionId)
       .pipe(
         first(),
         takeUntil(this.unsubscribeNotifier),
