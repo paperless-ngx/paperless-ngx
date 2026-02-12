@@ -157,7 +157,10 @@ def consume_file(
         overrides = DocumentMetadataOverrides()
 
     plugins: list[type[ConsumeTaskPlugin]] = (
-        [ConsumerPreflightPlugin, ConsumerPlugin]
+        [
+            ConsumerPreflightPlugin,
+            ConsumerPlugin,
+        ]
         if input_doc.root_document_id is not None
         else [
             ConsumerPreflightPlugin,

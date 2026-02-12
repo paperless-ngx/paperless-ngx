@@ -16,6 +16,9 @@ from guardian.core import ObjectPermissionChecker
 
 from documents.barcodes import BarcodePlugin
 from documents.consumer import ConsumerError
+from documents.consumer import ConsumerPlugin
+from documents.consumer import ConsumerPreflightPlugin
+from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.models import Correspondent
@@ -29,6 +32,7 @@ from documents.parsers import ParseError
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.tasks import sanity_check
 from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import GetConsumerMixin
 from paperless_mail.models import MailRule
@@ -663,6 +667,82 @@ class TestConsumer(
         self.assertIsFile(document.archive_path)
 
         self._assert_first_last_send_progress()
+
+    @mock.patch("documents.consumer.load_classifier")
+    def test_version_label_override_applies(self, m) -> None:
+        m.return_value = MagicMock()
+
+        with self.get_consumer(
+            self.get_test_file(),
+            DocumentMetadataOverrides(version_label="v1"),
+        ) as consumer:
+            consumer.run()
+
+        document = Document.objects.first()
+
+        self.assertEqual(document.version_label, "v1")
+
+        self._assert_first_last_send_progress()
+
+    @override_settings(AUDIT_LOG_ENABLED=True)
+    @mock.patch("documents.consumer.load_classifier")
+    def test_consume_version_creates_new_version(self, m) -> None:
+        m.return_value = MagicMock()
+
+        with self.get_consumer(self.get_test_file()) as consumer:
+            consumer.run()
+
+        root_doc = Document.objects.first()
+        self.assertIsNotNone(root_doc)
+        assert root_doc is not None
+
+        actor = User.objects.create_user(
+            username="actor",
+            email="actor@example.com",
+            password="password",
+        )
+
+        version_file = self.get_test_file2()
+        status = DummyProgressManager(version_file.name, None)
+        overrides = DocumentMetadataOverrides(
+            version_label="v2",
+            actor_id=actor.pk,
+        )
+        doc = ConsumableDocument(
+            DocumentSource.ApiUpload,
+            original_file=version_file,
+            root_document_id=root_doc.pk,
+        )
+        preflight = ConsumerPreflightPlugin(
+            doc,
+            overrides,
+            status,  # type: ignore[arg-type]
+            self.dirs.scratch_dir,
+            "task-id",
+        )
+        preflight.setup()
+        preflight.run()
+
+        consumer = ConsumerPlugin(
+            doc,
+            overrides,
+            status,  # type: ignore[arg-type]
+            self.dirs.scratch_dir,
+            "task-id",
+        )
+        consumer.setup()
+        try:
+            self.assertTrue(consumer.filename.endswith("_v0"))
+            consumer.run()
+        finally:
+            consumer.cleanup()
+
+        versions = Document.objects.filter(root_document=root_doc)
+        self.assertEqual(versions.count(), 1)
+        version = versions.first()
+        assert version is not None
+        self.assertEqual(version.version_label, "v2")
+        self.assertTrue(version.original_filename.endswith("_v0"))
 
     @mock.patch("documents.consumer.load_classifier")
     def testClassifyDocument(self, m) -> None:

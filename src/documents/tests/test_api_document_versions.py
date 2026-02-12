@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
 from unittest import mock
 
 from auditlog.models import LogEntry  # type: ignore[import-untyped]
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -12,6 +14,9 @@ from rest_framework.test import APITestCase
 from documents.data_models import DocumentSource
 from documents.models import Document
 from documents.tests.utils import DirectoriesMixin
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
@@ -27,6 +32,27 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
             b"%PDF-1.4\n1 0 obj\n<<>>\nendobj\n%%EOF",
             content_type="application/pdf",
         )
+
+    def _write_file(self, path: Path, content: bytes = b"data") -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(content)
+
+    def _create_pdf(
+        self,
+        *,
+        title: str,
+        checksum: str,
+        root_document: Document | None = None,
+    ) -> Document:
+        doc = Document.objects.create(
+            title=title,
+            checksum=checksum,
+            mime_type="application/pdf",
+            root_document=root_document,
+        )
+        self._write_file(doc.source_path, b"pdf")
+        self._write_file(doc.thumbnail_path, b"thumb")
+        return doc
 
     def test_root_endpoint_returns_root_for_version_and_root(self) -> None:
         root = Document.objects.create(
@@ -48,6 +74,44 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         resp_version = self.client.get(f"/api/documents/{version.id}/root/")
         self.assertEqual(resp_version.status_code, status.HTTP_200_OK)
         self.assertEqual(resp_version.data["root_id"], root.id)
+
+    def test_root_endpoint_returns_404_for_missing_document(self) -> None:
+        resp = self.client.get("/api/documents/9999/root/")
+
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_root_endpoint_returns_404_when_root_document_missing(self) -> None:
+        doc = Document(
+            title="orphan",
+            checksum="orphan",
+            mime_type="application/pdf",
+        )
+        doc.root_document_id = 123
+        doc.root_document = None
+
+        with mock.patch("documents.views.Document.global_objects") as manager:
+            manager.select_related.return_value.get.return_value = doc
+            resp = self.client.get("/api/documents/123/root/")
+
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_root_endpoint_returns_403_when_user_lacks_permission(self) -> None:
+        owner = User.objects.create_user(username="owner")
+        viewer = User.objects.create_user(username="viewer")
+        viewer.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+            owner=owner,
+        )
+        self.client.force_authenticate(user=viewer)
+
+        resp = self.client.get(f"/api/documents/{root.id}/root/")
+
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_delete_version_disallows_deleting_root(self) -> None:
         root = Document.objects.create(
@@ -185,6 +249,138 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertFalse(Document.objects.filter(id=version.id).exists())
         self.assertEqual(resp.data["current_version_id"], root.id)
 
+    def test_delete_version_returns_404_when_root_missing(self) -> None:
+        resp = self.client.delete("/api/documents/9999/versions/123/")
+
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_version_returns_403_without_permission(self) -> None:
+        owner = User.objects.create_user(username="owner")
+        other = User.objects.create_user(username="other")
+        other.user_permissions.add(
+            Permission.objects.get(codename="delete_document"),
+        )
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+            owner=owner,
+        )
+        version = Document.objects.create(
+            title="v1",
+            checksum="v1",
+            mime_type="application/pdf",
+            root_document=root,
+        )
+        self.client.force_authenticate(user=other)
+
+        resp = self.client.delete(
+            f"/api/documents/{root.id}/versions/{version.id}/",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_delete_version_returns_404_when_version_missing(self) -> None:
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+        )
+
+        resp = self.client.delete(f"/api/documents/{root.id}/versions/9999/")
+
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_download_version_param_errors(self) -> None:
+        root = self._create_pdf(title="root", checksum="root")
+
+        resp = self.client.get(
+            f"/api/documents/{root.id}/download/?version=not-a-number",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+        resp = self.client.get(f"/api/documents/{root.id}/download/?version=9999")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+        other_root = self._create_pdf(title="other", checksum="other")
+        other_version = self._create_pdf(
+            title="other-v1",
+            checksum="other-v1",
+            root_document=other_root,
+        )
+        resp = self.client.get(
+            f"/api/documents/{root.id}/download/?version={other_version.id}",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_download_preview_thumb_with_version_param(self) -> None:
+        root = self._create_pdf(title="root", checksum="root")
+        version = self._create_pdf(
+            title="v1",
+            checksum="v1",
+            root_document=root,
+        )
+        self._write_file(version.source_path, b"version")
+        self._write_file(version.thumbnail_path, b"thumb")
+
+        resp = self.client.get(
+            f"/api/documents/{root.id}/download/?version={version.id}",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.content, b"version")
+
+        resp = self.client.get(
+            f"/api/documents/{root.id}/preview/?version={version.id}",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.content, b"version")
+
+        resp = self.client.get(
+            f"/api/documents/{root.id}/thumb/?version={version.id}",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.content, b"thumb")
+
+    def test_metadata_version_param_uses_version(self) -> None:
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+        )
+        version = Document.objects.create(
+            title="v1",
+            checksum="v1",
+            mime_type="application/pdf",
+            root_document=root,
+        )
+
+        with mock.patch("documents.views.DocumentViewSet.get_metadata") as metadata:
+            metadata.return_value = []
+            resp = self.client.get(
+                f"/api/documents/{root.id}/metadata/?version={version.id}",
+            )
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertTrue(metadata.called)
+
+    def test_metadata_returns_403_when_user_lacks_permission(self) -> None:
+        owner = User.objects.create_user(username="owner")
+        other = User.objects.create_user(username="other")
+        other.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
+        doc = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+            owner=owner,
+        )
+        self.client.force_authenticate(user=other)
+
+        resp = self.client.get(f"/api/documents/{doc.id}/metadata/")
+
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_update_version_enqueues_consume_with_overrides(self) -> None:
         root = Document.objects.create(
             title="root",
@@ -212,6 +408,24 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(input_doc.source, DocumentSource.ApiUpload)
         self.assertEqual(overrides.version_label, "New Version")
         self.assertEqual(overrides.actor_id, self.user.id)
+
+    def test_update_version_returns_500_on_consume_failure(self) -> None:
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+        )
+        upload = self._make_pdf_upload()
+
+        with mock.patch("documents.views.consume_file") as consume_mock:
+            consume_mock.delay.side_effect = Exception("boom")
+            resp = self.client.post(
+                f"/api/documents/{root.id}/update_version/",
+                {"document": upload},
+                format="multipart",
+            )
+
+        self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def test_update_version_returns_403_without_permission(self) -> None:
         owner = User.objects.create_user(username="owner")
