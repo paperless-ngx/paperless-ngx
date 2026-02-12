@@ -809,6 +809,14 @@ class DocumentViewSet(
         )
         return super().get_serializer(*args, **kwargs)
 
+    @staticmethod
+    def _get_root_doc(doc: Document) -> Document:
+        # Use root_document_id to avoid a query when this is already a root.
+        # If root_document isn't available, fall back to the document itself.
+        if doc.root_document_id is None:
+            return doc
+        return doc.root_document or doc
+
     @extend_schema(
         operation_id="documents_root",
         responses=inline_serializer(
@@ -828,9 +836,7 @@ class DocumentViewSet(
         except Document.DoesNotExist:
             raise Http404
 
-        root_doc = doc if doc.root_document_id is None else doc.root_document
-        if root_doc is None:
-            raise Http404
+        root_doc = self._get_root_doc(doc)
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "view_document",
@@ -899,14 +905,11 @@ class DocumentViewSet(
         return latest or root_doc
 
     def file_response(self, pk, request, disposition):
-        request_doc = Document.global_objects.select_related("owner").get(id=pk)
-        root_doc = (
-            request_doc
-            if request_doc.root_document_id is None
-            else Document.global_objects.select_related("owner").get(
-                id=request_doc.root_document_id,
-            )
-        )
+        request_doc = Document.global_objects.select_related(
+            "owner",
+            "root_document",
+        ).get(id=pk)
+        root_doc = self._get_root_doc(request_doc)
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "view_document",
@@ -962,14 +965,11 @@ class DocumentViewSet(
     )
     def metadata(self, request, pk=None):
         try:
-            request_doc = Document.objects.select_related("owner").get(pk=pk)
-            root_doc = (
-                request_doc
-                if request_doc.root_document_id is None
-                else Document.objects.select_related("owner").get(
-                    id=request_doc.root_document_id,
-                )
-            )
+            request_doc = Document.objects.select_related(
+                "owner",
+                "root_document",
+            ).get(pk=pk)
+            root_doc = self._get_root_doc(request_doc)
             if request.user is not None and not has_perms_owner_aware(
                 request.user,
                 "view_document",
@@ -1157,14 +1157,11 @@ class DocumentViewSet(
     )
     def preview(self, request, pk=None):
         try:
-            request_doc = Document.objects.select_related("owner").get(id=pk)
-            root_doc = (
-                request_doc
-                if request_doc.root_document_id is None
-                else Document.objects.select_related("owner").get(
-                    id=request_doc.root_document_id,
-                )
-            )
+            request_doc = Document.objects.select_related(
+                "owner",
+                "root_document",
+            ).get(id=pk)
+            root_doc = self._get_root_doc(request_doc)
             if request.user is not None and not has_perms_owner_aware(
                 request.user,
                 "view_document",
@@ -1195,14 +1192,11 @@ class DocumentViewSet(
     @method_decorator(last_modified(thumbnail_last_modified))
     def thumb(self, request, pk=None):
         try:
-            request_doc = Document.objects.select_related("owner").get(id=pk)
-            root_doc = (
-                request_doc
-                if request_doc.root_document_id is None
-                else Document.objects.select_related("owner").get(
-                    id=request_doc.root_document_id,
-                )
-            )
+            request_doc = Document.objects.select_related(
+                "owner",
+                "root_document",
+            ).get(id=pk)
+            root_doc = self._get_root_doc(request_doc)
             if request.user is not None and not has_perms_owner_aware(
                 request.user,
                 "view_document",
@@ -1598,11 +1592,11 @@ class DocumentViewSet(
     )
     def delete_version(self, request, pk=None, version_id=None):
         try:
-            root_doc = Document.objects.select_related("owner").get(pk=pk)
-            if root_doc.root_document_id is not None:
-                root_doc = Document.objects.select_related("owner").get(
-                    pk=root_doc.root_document_id,
-                )
+            root_doc = Document.objects.select_related(
+                "owner",
+                "root_document",
+            ).get(pk=pk)
+            root_doc = self._get_root_doc(root_doc)
         except Document.DoesNotExist:
             raise Http404
 
