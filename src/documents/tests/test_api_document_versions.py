@@ -133,7 +133,10 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
             content="v2-content",
         )
 
-        with mock.patch("documents.index.remove_document_from_index"):
+        with (
+            mock.patch("documents.index.remove_document_from_index"),
+            mock.patch("documents.index.add_or_update_document"),
+        ):
             resp = self.client.delete(f"/api/documents/{root.id}/versions/{v2.id}/")
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -142,7 +145,10 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         root.refresh_from_db()
         self.assertEqual(root.content, "root-content")
 
-        with mock.patch("documents.index.remove_document_from_index"):
+        with (
+            mock.patch("documents.index.remove_document_from_index"),
+            mock.patch("documents.index.add_or_update_document"),
+        ):
             resp = self.client.delete(f"/api/documents/{root.id}/versions/{v1.id}/")
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -165,7 +171,10 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         )
         version_id = version.id
 
-        with mock.patch("documents.index.remove_document_from_index"):
+        with (
+            mock.patch("documents.index.remove_document_from_index"),
+            mock.patch("documents.index.add_or_update_document"),
+        ):
             resp = self.client.delete(
                 f"/api/documents/{root.id}/versions/{version_id}/",
             )
@@ -232,7 +241,10 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
             root_document=root,
         )
 
-        with mock.patch("documents.index.remove_document_from_index"):
+        with (
+            mock.patch("documents.index.remove_document_from_index"),
+            mock.patch("documents.index.add_or_update_document"),
+        ):
             resp = self.client.delete(
                 f"/api/documents/{version.id}/versions/{version.id}/",
             )
@@ -245,6 +257,32 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         resp = self.client.delete("/api/documents/9999/versions/123/")
 
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_version_reindexes_root_document(self) -> None:
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+        )
+        version = Document.objects.create(
+            title="v1",
+            checksum="v1",
+            mime_type="application/pdf",
+            root_document=root,
+        )
+
+        with (
+            mock.patch("documents.index.remove_document_from_index") as remove_index,
+            mock.patch("documents.index.add_or_update_document") as add_or_update,
+        ):
+            resp = self.client.delete(
+                f"/api/documents/{root.id}/versions/{version.id}/",
+            )
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        remove_index.assert_called_once_with(version)
+        add_or_update.assert_called_once()
+        self.assertEqual(add_or_update.call_args[0][0].id, root.id)
 
     def test_delete_version_returns_403_without_permission(self) -> None:
         owner = User.objects.create_user(username="owner")

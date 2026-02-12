@@ -1716,6 +1716,7 @@ class DocumentViewSet(
         index.remove_document_from_index(version_doc)
         version_doc_id = version_doc.id
         version_doc.delete()
+        index.add_or_update_document(root_doc)
         if settings.AUDIT_LOG_ENABLED:
             actor = (
                 request.user if request.user and request.user.is_authenticated else None
