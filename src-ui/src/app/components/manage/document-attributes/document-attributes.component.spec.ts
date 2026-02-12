@@ -14,7 +14,10 @@ import {
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
-import { DocumentAttributesComponent } from './document-attributes.component'
+import {
+  DocumentAttributesComponent,
+  DocumentAttributesSectionKind,
+} from './document-attributes.component'
 
 @Component({
   selector: 'pngx-dummy-section',
@@ -69,7 +72,7 @@ describe('DocumentAttributesComponent', () => {
         label: 'Tags',
         icon: 'tags',
         permissionType: PermissionType.Tag,
-        kind: 'attributeList',
+        kind: DocumentAttributesSectionKind.ManagementList,
         component: DummySectionComponent,
       },
       {
@@ -78,18 +81,18 @@ describe('DocumentAttributesComponent', () => {
         label: 'Custom fields',
         icon: 'ui-radios',
         permissionType: PermissionType.CustomField,
-        kind: 'customFields',
+        kind: DocumentAttributesSectionKind.CustomFields,
         component: DummySectionComponent,
       },
     ]
   })
 
   it('should navigate to default section when no section is provided', () => {
-    ;(permissionsService.currentUserCan as jest.Mock).mockImplementation(
-      (action, type) => {
+    jest
+      .spyOn(permissionsService, 'currentUserCan')
+      .mockImplementation((action, type) => {
         return action === PermissionAction.View && type === PermissionType.Tag
-      }
-    )
+      })
 
     fixture.detectChanges()
     paramMapSubject.next(convertToParamMap({}))
@@ -101,14 +104,14 @@ describe('DocumentAttributesComponent', () => {
   })
 
   it('should set active section from route param when valid', () => {
-    ;(permissionsService.currentUserCan as jest.Mock).mockImplementation(
-      (action, type) => {
+    jest
+      .spyOn(permissionsService, 'currentUserCan')
+      .mockImplementation((action, type) => {
         return (
           action === PermissionAction.View &&
           type === PermissionType.CustomField
         )
-      }
-    )
+      })
 
     fixture.detectChanges()
     paramMapSubject.next(convertToParamMap({ section: 'customfields' }))
@@ -118,7 +121,7 @@ describe('DocumentAttributesComponent', () => {
   })
 
   it('should update active nav id when route section changes', () => {
-    ;(permissionsService.currentUserCan as jest.Mock).mockReturnValue(true)
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
 
     fixture.detectChanges()
     component.activeNavID = 1
@@ -128,7 +131,7 @@ describe('DocumentAttributesComponent', () => {
   })
 
   it('should redirect to dashboard when no sections are visible', () => {
-    ;(permissionsService.currentUserCan as jest.Mock).mockReturnValue(false)
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(false)
 
     fixture.detectChanges()
     paramMapSubject.next(convertToParamMap({}))
@@ -139,9 +142,9 @@ describe('DocumentAttributesComponent', () => {
   })
 
   it('should navigate when a nav change occurs', () => {
-    ;(permissionsService.currentUserCan as jest.Mock).mockImplementation(
-      () => true
-    )
+    jest
+      .spyOn(permissionsService, 'currentUserCan')
+      .mockImplementation(() => true)
 
     fixture.detectChanges()
     paramMapSubject.next(convertToParamMap({ section: 'tags' }))
@@ -152,7 +155,7 @@ describe('DocumentAttributesComponent', () => {
   })
 
   it('should ignore nav changes for unknown sections', () => {
-    ;(permissionsService.currentUserCan as jest.Mock).mockReturnValue(true)
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
 
     fixture.detectChanges()
     paramMapSubject.next(convertToParamMap({ section: 'tags' }))
@@ -160,5 +163,27 @@ describe('DocumentAttributesComponent', () => {
     component.onNavChange({ nextId: 999 } as any)
 
     expect(router.navigate).not.toHaveBeenCalled()
+  })
+
+  it('should return activeManagementList correctly', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    expect(component.activeManagementList).toBeNull()
+
+    component.activeNavID = 1
+    expect(component.activeSection.kind).toBe(
+      DocumentAttributesSectionKind.ManagementList
+    )
+    expect(component.activeManagementList).toBeDefined()
+  })
+
+  it('should return activeCustomFields correctly', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    expect(component.activeCustomFields).toBeNull()
+
+    component.activeNavID = 2
+    expect(component.activeSection.kind).toBe(
+      DocumentAttributesSectionKind.CustomFields
+    )
+    expect(component.activeCustomFields).toBeDefined()
   })
 })

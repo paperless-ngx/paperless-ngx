@@ -5,19 +5,19 @@
   [infoLink]="activeInfoLink"
   [loading]="activeHeaderLoading"
   >
-  @if (activeAttributeList) {
+  @if (activeManagementList) {
     <div ngbDropdown class="btn-group flex-fill d-sm-none">
       <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle>
         <i-bs name="text-indent-left"></i-bs>
         <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Select</ng-container></div>
-        @if (activeAttributeList.selectedObjects.size > 0) {
-          <pngx-clearable-badge [selected]="activeAttributeList.selectedObjects.size > 0" [number]="activeAttributeList.selectedObjects.size" (cleared)="activeAttributeList.selectNone()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
+        @if (activeManagementList.selectedObjects.size > 0) {
+          <pngx-clearable-badge [selected]="activeManagementList.selectedObjects.size > 0" [number]="activeManagementList.selectedObjects.size" (cleared)="activeManagementList.selectNone()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
         }
       </button>
       <div ngbDropdownMenu aria-labelledby="dropdownSelectMobile" class="shadow">
-        <button ngbDropdownItem (click)="activeAttributeList.selectNone()" i18n>Select none</button>
-        <button ngbDropdownItem (click)="activeAttributeList.selectPage(true)" i18n>Select page</button>
-        <button ngbDropdownItem (click)="activeAttributeList.selectAll()" i18n>Select all</button>
+        <button ngbDropdownItem (click)="activeManagementList.selectNone()" i18n>Select none</button>
+        <button ngbDropdownItem (click)="activeManagementList.selectPage(true)" i18n>Select page</button>
+        <button ngbDropdownItem (click)="activeManagementList.selectAll()" i18n>Select all</button>
       </div>
     </div>
 
@@ -26,30 +26,30 @@
         <span class="input-group-text border-0" i18n>Select:</span>
       </div>
       <div class="btn-group btn-group-sm flex-nowrap">
-        @if (activeAttributeList.selectedObjects.size > 0) {
-          <button class="btn btn-sm btn-outline-secondary" (click)="activeAttributeList.selectNone()">
+        @if (activeManagementList.selectedObjects.size > 0) {
+          <button class="btn btn-sm btn-outline-secondary" (click)="activeManagementList.selectNone()">
             <i-bs name="slash-circle"></i-bs>&nbsp;<ng-container i18n>None</ng-container>
           </button>
         }
-        <button class="btn btn-sm btn-outline-primary" (click)="activeAttributeList.selectPage(true)">
+        <button class="btn btn-sm btn-outline-primary" (click)="activeManagementList.selectPage(true)">
           <i-bs name="file-earmark-check"></i-bs>&nbsp;<ng-container i18n>Page</ng-container>
         </button>
-        <button class="btn btn-sm btn-outline-primary" (click)="activeAttributeList.selectAll()">
+        <button class="btn btn-sm btn-outline-primary" (click)="activeManagementList.selectAll()">
           <i-bs name="check-all"></i-bs>&nbsp;<ng-container i18n>All</ng-container>
         </button>
       </div>
     </div>
 
-    <button type="button" class="btn btn-sm btn-outline-primary" (click)="activeAttributeList.setPermissions()"
-      [disabled]="!activeAttributeList.userCanBulkEdit(PermissionAction.Change) || activeAttributeList.selectedObjects.size === 0">
+    <button type="button" class="btn btn-sm btn-outline-primary" (click)="activeManagementList.setPermissions()"
+      [disabled]="!activeManagementList.userCanBulkEdit(PermissionAction.Change) || activeManagementList.selectedObjects.size === 0">
       <i-bs name="person-fill-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
     </button>
-    <button type="button" class="btn btn-sm btn-outline-danger" (click)="activeAttributeList.delete()"
-      [disabled]="!activeAttributeList.userCanBulkEdit(PermissionAction.Delete) || activeAttributeList.selectedObjects.size === 0">
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="activeManagementList.delete()"
+      [disabled]="!activeManagementList.userCanBulkEdit(PermissionAction.Delete) || activeManagementList.selectedObjects.size === 0">
       <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
     </button>
-    <button type="button" class="btn btn-sm btn-outline-primary ms-md-5" (click)="activeAttributeList.openCreateDialog()"
-      *pngxIfPermissions="{ action: PermissionAction.Add, type: activeAttributeList.permissionType }">
+    <button type="button" class="btn btn-sm btn-outline-primary ms-md-5" (click)="activeManagementList.openCreateDialog()"
+      *pngxIfPermissions="{ action: PermissionAction.Add, type: activeManagementList.permissionType }">
       <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Create</ng-container>
     </button>
   } @else if (activeCustomFields) {

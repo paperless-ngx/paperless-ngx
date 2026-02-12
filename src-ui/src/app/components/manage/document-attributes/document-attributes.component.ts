@@ -158,7 +158,7 @@ export class DocumentAttributesComponent
     )
   }
 
-  get activeAttributeList(): ManagementListComponent<any> | null {
+  get activeManagementList(): ManagementListComponent<any> | null {
     if (
       this.activeSection?.kind !== DocumentAttributesSectionKind.ManagementList
     )
@@ -184,7 +184,7 @@ export class DocumentAttributesComponent
 
   get activeHeaderLoading(): boolean {
     return (
-      this.activeAttributeList?.loading ??
+      this.activeManagementList?.loading ??
       this.activeCustomFields?.loading ??
       false
     )
