@@ -1897,6 +1897,47 @@ describe('DocumentDetailComponent', () => {
     expect(urlRevokeSpy).toHaveBeenCalled()
   })
 
+  it('should include version in download and print only for non-latest selected version', () => {
+    initNormally()
+    component.document.versions = [
+      { id: doc.id, is_root: true },
+      { id: 10, is_root: false },
+    ] as any
+
+    const getDownloadUrlSpy = jest
+      .spyOn(documentService, 'getDownloadUrl')
+      .mockReturnValueOnce('download-latest')
+      .mockReturnValueOnce('print-latest')
+      .mockReturnValueOnce('download-non-latest')
+      .mockReturnValueOnce('print-non-latest')
+
+    component.selectedVersionId = 10
+    component.download()
+    expect(getDownloadUrlSpy).toHaveBeenNthCalledWith(1, doc.id, false, null)
+    httpTestingController
+      .expectOne('download-latest')
+      .error(new ProgressEvent('failed'))
+
+    component.printDocument()
+    expect(getDownloadUrlSpy).toHaveBeenNthCalledWith(2, doc.id, false, null)
+    httpTestingController
+      .expectOne('print-latest')
+      .error(new ProgressEvent('failed'))
+
+    component.selectedVersionId = doc.id
+    component.download()
+    expect(getDownloadUrlSpy).toHaveBeenNthCalledWith(3, doc.id, false, doc.id)
+    httpTestingController
+      .expectOne('download-non-latest')
+      .error(new ProgressEvent('failed'))
+
+    component.printDocument()
+    expect(getDownloadUrlSpy).toHaveBeenNthCalledWith(4, doc.id, false, doc.id)
+    httpTestingController
+      .expectOne('print-non-latest')
+      .error(new ProgressEvent('failed'))
+  })
+
   it('should download a file with the correct filename', () => {
     const mockBlob = new Blob(['test content'], { type: 'text/plain' })
     const mockResponse = new HttpResponse({

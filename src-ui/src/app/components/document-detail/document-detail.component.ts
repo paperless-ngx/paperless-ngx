@@ -1399,11 +1399,24 @@ export class DocumentDetailComponent
     this.versionUploadError = null
   }
 
+  private getSelectedNonLatestVersionId(): number | null {
+    const versions = this.document?.versions ?? []
+    if (!versions.length || !this.selectedVersionId) {
+      return null
+    }
+    const latestVersionId = Math.max(...versions.map((version) => version.id))
+    return this.selectedVersionId === latestVersionId
+      ? null
+      : this.selectedVersionId
+  }
+
   download(original: boolean = false) {
     this.downloading = true
+    const selectedVersionId = this.getSelectedNonLatestVersionId()
     const downloadUrl = this.documentsService.getDownloadUrl(
-      this.selectedVersionId || this.documentId,
-      original
+      this.documentId,
+      original,
+      selectedVersionId
     )
     this.http
       .get(downloadUrl, { observe: 'response', responseType: 'blob' })
@@ -1835,9 +1848,11 @@ export class DocumentDetailComponent
   }
 
   printDocument() {
+    const selectedVersionId = this.getSelectedNonLatestVersionId()
     const printUrl = this.documentsService.getDownloadUrl(
       this.document.id,
-      false
+      false,
+      selectedVersionId
     )
     this.http
       .get(printUrl, { responseType: 'blob' })
