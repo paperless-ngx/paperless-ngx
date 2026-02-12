@@ -71,19 +71,21 @@
         @for (version of document.versions; track version.id) {
           <div class="dropdown-item">
             <div class="d-flex align-items-center w-100 version-item">
-              <span class="badge bg-light text-lowercase text-muted">
-                {{ version.checksum | slice:0:8 }}
-              </span>
-              <button type="button" class="btn btn-link link-underline link-underline-opacity-0 flex-grow-1 ms-3 small text-start" (click)="selectVersion(version.id)">
-                <div class="small">
-                  @if (version.version_label) {
-                    {{ version.version_label }}
-                  } @else {
-                    <span i18n>ID</span> #{{version.id}}
-                  }
+              <button type="button" class="btn btn-link link-underline link-underline-opacity-0 d-flex align-items-center flex-grow-1 small ps-0 text-start" (click)="selectVersion(version.id)">
+                <div class="badge bg-light text-lowercase text-muted">
+                  {{ version.checksum | slice:0:8 }}
                 </div>
-                <div class="version-subtitle text-muted">
-                  {{ version.added | customDate:'short' }}
+                <div class="d-flex flex-column small ms-2">
+                  <div>
+                    @if (version.version_label) {
+                      {{ version.version_label }}
+                    } @else {
+                      <span i18n>ID</span> #{{version.id}}
+                    }
+                  </div>
+                  <div class="text-muted">
+                    {{ version.added | customDate:'short' }}
+                  </div>
                 </div>
               </button>
               @if (selectedVersionId === version.id) { <span class="ms-2">✓</span> }
