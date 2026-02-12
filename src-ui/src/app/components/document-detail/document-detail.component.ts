@@ -366,13 +366,9 @@ export class DocumentDetailComponent
   }
 
   private updatePdfSource() {
-    if (!this.previewUrl) {
-      this.pdfSource = undefined
-      return
-    }
     this.pdfSource = {
       url: this.previewUrl,
-      password: this.password || undefined,
+      password: this.password,
     }
   }
 
