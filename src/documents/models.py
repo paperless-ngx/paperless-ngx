@@ -67,7 +67,7 @@ class MatchingModel(ModelWithOwner):
 
     match = models.CharField(_("match"), max_length=256, blank=True)
 
-    matching_algorithm = models.PositiveIntegerField(
+    matching_algorithm = models.PositiveSmallIntegerField(
         _("matching algorithm"),
         choices=MATCHING_ALGORITHMS,
         default=MATCH_ANY,
@@ -547,7 +547,7 @@ class SavedViewFilterRule(models.Model):
         verbose_name=_("saved view"),
     )
 
-    rule_type = models.PositiveIntegerField(_("rule type"), choices=RULE_TYPES)
+    rule_type = models.PositiveSmallIntegerField(_("rule type"), choices=RULE_TYPES)
 
     value = models.CharField(_("value"), max_length=255, blank=True, null=True)
 
@@ -1102,7 +1102,7 @@ class WorkflowTrigger(models.Model):
         MODIFIED = "modified", _("Modified")
         CUSTOM_FIELD = "custom_field", _("Custom Field")
 
-    type = models.PositiveIntegerField(
+    type = models.PositiveSmallIntegerField(
         _("Workflow Trigger Type"),
         choices=WorkflowTriggerType.choices,
         default=WorkflowTriggerType.CONSUMPTION,
@@ -1148,7 +1148,7 @@ class WorkflowTrigger(models.Model):
 
     match = models.CharField(_("match"), max_length=256, blank=True)
 
-    matching_algorithm = models.PositiveIntegerField(
+    matching_algorithm = models.PositiveSmallIntegerField(
         _("matching algorithm"),
         choices=WorkflowTriggerMatching.choices,
         default=WorkflowTriggerMatching.NONE,
@@ -1249,7 +1249,7 @@ class WorkflowTrigger(models.Model):
         help_text=_("JSON-encoded custom field query expression."),
     )
 
-    schedule_offset_days = models.IntegerField(
+    schedule_offset_days = models.SmallIntegerField(
         _("schedule offset days"),
         default=0,
         help_text=_(
@@ -1265,7 +1265,7 @@ class WorkflowTrigger(models.Model):
         ),
     )
 
-    schedule_recurring_interval_days = models.PositiveIntegerField(
+    schedule_recurring_interval_days = models.PositiveSmallIntegerField(
         _("schedule recurring delay in days"),
         default=1,
         validators=[MinValueValidator(1)],
@@ -1410,13 +1410,13 @@ class WorkflowAction(models.Model):
             _("Password removal"),
         )
 
-    type = models.PositiveIntegerField(
+    type = models.PositiveSmallIntegerField(
         _("Workflow Action Type"),
         choices=WorkflowActionType.choices,
         default=WorkflowActionType.ASSIGNMENT,
     )
 
-    order = models.PositiveIntegerField(_("order"), default=0)
+    order = models.PositiveSmallIntegerField(_("order"), default=0)
 
     assign_title = models.TextField(
         _("assign title"),
@@ -1658,7 +1658,7 @@ class WorkflowAction(models.Model):
 class Workflow(models.Model):
     name = models.CharField(_("name"), max_length=256, unique=True)
 
-    order = models.IntegerField(_("order"), default=0)
+    order = models.SmallIntegerField(_("order"), default=0)
 
     triggers = models.ManyToManyField(
         WorkflowTrigger,
@@ -1688,7 +1688,7 @@ class WorkflowRun(SoftDeleteModel):
         verbose_name=_("workflow"),
     )
 
-    type = models.PositiveIntegerField(
+    type = models.PositiveSmallIntegerField(
         _("workflow trigger type"),
         choices=WorkflowTrigger.WorkflowTriggerType.choices,
         null=True,

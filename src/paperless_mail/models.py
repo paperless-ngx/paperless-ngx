@@ -24,7 +24,7 @@ class MailAccount(document_models.ModelWithOwner):
 
     imap_server = models.CharField(_("IMAP server"), max_length=256)
 
-    imap_port = models.IntegerField(
+    imap_port = models.PositiveIntegerField(
         _("IMAP port"),
         blank=True,
         null=True,
@@ -34,7 +34,7 @@ class MailAccount(document_models.ModelWithOwner):
         ),
     )
 
-    imap_security = models.PositiveIntegerField(
+    imap_security = models.PositiveSmallIntegerField(
         _("IMAP security"),
         choices=ImapSecurity.choices,
         default=ImapSecurity.SSL,
@@ -56,7 +56,7 @@ class MailAccount(document_models.ModelWithOwner):
         ),
     )
 
-    account_type = models.PositiveIntegerField(
+    account_type = models.PositiveSmallIntegerField(
         _("account type"),
         choices=MailAccountType.choices,
         default=MailAccountType.IMAP,
@@ -142,7 +142,7 @@ class MailRule(document_models.ModelWithOwner):
 
     name = models.CharField(_("name"), max_length=256)
 
-    order = models.IntegerField(_("order"), default=0)
+    order = models.SmallIntegerField(_("order"), default=0)
 
     account = models.ForeignKey(
         MailAccount,
@@ -215,13 +215,13 @@ class MailRule(document_models.ModelWithOwner):
         ),
     )
 
-    maximum_age = models.PositiveIntegerField(
+    maximum_age = models.PositiveSmallIntegerField(
         _("maximum age"),
         default=30,
         help_text=_("Specified in days."),
     )
 
-    attachment_type = models.PositiveIntegerField(
+    attachment_type = models.PositiveSmallIntegerField(
         _("attachment type"),
         choices=AttachmentProcessing.choices,
         default=AttachmentProcessing.ATTACHMENTS_ONLY,
@@ -231,19 +231,19 @@ class MailRule(document_models.ModelWithOwner):
         ),
     )
 
-    consumption_scope = models.PositiveIntegerField(
+    consumption_scope = models.PositiveSmallIntegerField(
         _("consumption scope"),
         choices=ConsumptionScope.choices,
         default=ConsumptionScope.ATTACHMENTS_ONLY,
     )
 
-    pdf_layout = models.PositiveIntegerField(
+    pdf_layout = models.PositiveSmallIntegerField(
         _("pdf layout"),
         choices=PdfLayout.choices,
         default=PdfLayout.DEFAULT,
     )
 
-    action = models.PositiveIntegerField(
+    action = models.PositiveSmallIntegerField(
         _("action"),
         choices=MailAction.choices,
         default=MailAction.MARK_READ,
@@ -262,7 +262,7 @@ class MailRule(document_models.ModelWithOwner):
         ),
     )
 
-    assign_title_from = models.PositiveIntegerField(
+    assign_title_from = models.PositiveSmallIntegerField(
         _("assign title from"),
         choices=TitleSource.choices,
         default=TitleSource.FROM_SUBJECT,
@@ -282,7 +282,7 @@ class MailRule(document_models.ModelWithOwner):
         verbose_name=_("assign this document type"),
     )
 
-    assign_correspondent_from = models.PositiveIntegerField(
+    assign_correspondent_from = models.PositiveSmallIntegerField(
         _("assign correspondent from"),
         choices=CorrespondentSource.choices,
         default=CorrespondentSource.FROM_NOTHING,
