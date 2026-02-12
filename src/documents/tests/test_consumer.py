@@ -679,6 +679,7 @@ class TestConsumer(
             consumer.run()
 
         document = Document.objects.first()
+        assert document is not None
 
         self.assertEqual(document.version_label, "v1")
 
@@ -1260,7 +1261,7 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                 consumer.run_post_consume_script(doc)
 
     @mock.patch("documents.consumer.run_subprocess")
-    def test_post_consume_script_simple(self, m) -> None:
+    def test_post_consume_script_simple(self, m: mock.MagicMock) -> None:
         with tempfile.NamedTemporaryFile() as script:
             with override_settings(POST_CONSUME_SCRIPT=script.name):
                 doc = Document.objects.create(title="Test", mime_type="application/pdf")
@@ -1271,7 +1272,10 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                 m.assert_called_once()
 
     @mock.patch("documents.consumer.run_subprocess")
-    def test_post_consume_script_with_correspondent_and_type(self, m) -> None:
+    def test_post_consume_script_with_correspondent_and_type(
+        self,
+        m: mock.MagicMock,
+    ) -> None:
         with tempfile.NamedTemporaryFile() as script:
             with override_settings(POST_CONSUME_SCRIPT=script.name):
                 c = Correspondent.objects.create(name="my_bank")
