@@ -993,6 +993,23 @@ class DocumentViewSet(
         latest = Document.objects.filter(root_document=root_doc).order_by("-id").first()
         return latest or root_doc
 
+    def _get_effective_file_doc(
+        self,
+        request_doc: Document,
+        root_doc: Document,
+        request: Request,
+    ) -> Document:
+        # If a version is explicitly requested, use it. Otherwise:
+        # - if pk is a root document: serve newest version
+        # - if pk is a version: serve that version
+        if "version" in request.query_params:
+            return self._resolve_file_doc(root_doc, request)
+        return (
+            self._resolve_file_doc(root_doc, request)
+            if request_doc.root_document_id is None
+            else request_doc
+        )
+
     def file_response(self, pk, request, disposition):
         request_doc = Document.global_objects.select_related(
             "owner",
@@ -1005,17 +1022,7 @@ class DocumentViewSet(
             root_doc,
         ):
             return HttpResponseForbidden("Insufficient permissions")
-        # If a version is explicitly requested, use it. Otherwise:
-        # - if pk is a root document: serve newest version
-        # - if pk is a version: serve that version
-        if "version" in request.query_params:
-            file_doc = self._resolve_file_doc(root_doc, request)
-        else:
-            file_doc = (
-                self._resolve_file_doc(root_doc, request)
-                if request_doc.root_document_id is None
-                else request_doc
-            )
+        file_doc = self._get_effective_file_doc(request_doc, root_doc, request)
         return serve_file(
             doc=file_doc,
             use_archive=not self.original_requested(request)
@@ -1068,15 +1075,9 @@ class DocumentViewSet(
         except Document.DoesNotExist:
             raise Http404
 
-        # Choose the effective document (newest version by default, or explicit via ?version=)
-        if "version" in request.query_params:
-            doc = self._resolve_file_doc(root_doc, request)
-        else:
-            doc = (
-                self._resolve_file_doc(root_doc, request)
-                if request_doc.root_document_id is None
-                else request_doc
-            )
+        # Choose the effective document (newest version by default,
+        # or explicit via ?version=).
+        doc = self._get_effective_file_doc(request_doc, root_doc, request)
 
         document_cached_metadata = get_metadata_cache(doc.pk)
 
@@ -1258,14 +1259,7 @@ class DocumentViewSet(
             ):
                 return HttpResponseForbidden("Insufficient permissions")
 
-            if "version" in request.query_params:
-                file_doc = self._resolve_file_doc(root_doc, request)
-            else:
-                file_doc = (
-                    self._resolve_file_doc(root_doc, request)
-                    if request_doc.root_document_id is None
-                    else request_doc
-                )
+            file_doc = self._get_effective_file_doc(request_doc, root_doc, request)
 
             return serve_file(
                 doc=file_doc,
@@ -1292,14 +1286,7 @@ class DocumentViewSet(
                 root_doc,
             ):
                 return HttpResponseForbidden("Insufficient permissions")
-            if "version" in request.query_params:
-                file_doc = self._resolve_file_doc(root_doc, request)
-            else:
-                file_doc = (
-                    self._resolve_file_doc(root_doc, request)
-                    if request_doc.root_document_id is None
-                    else request_doc
-                )
+            file_doc = self._get_effective_file_doc(request_doc, root_doc, request)
             handle = file_doc.thumbnail_file
 
             return HttpResponse(handle, content_type="image/webp")
