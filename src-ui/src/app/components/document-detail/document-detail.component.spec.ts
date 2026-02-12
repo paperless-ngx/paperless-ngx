@@ -410,6 +410,35 @@ describe('DocumentDetailComponent', () => {
     })
   })
 
+  it('should navigate to 404 when root lookup fails', () => {
+    const navigateSpy = jest.spyOn(router, 'navigate')
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 10, section: 'details' })))
+    jest
+      .spyOn(documentService, 'get')
+      .mockReturnValueOnce(throwError(() => ({ status: 404 }) as any))
+    jest
+      .spyOn(documentService, 'getRootId')
+      .mockReturnValue(throwError(() => new Error('boom')))
+    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(null)
+    jest
+      .spyOn(openDocumentsService, 'openDocument')
+      .mockReturnValueOnce(of(true))
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({
+        count: customFields.length,
+        all: customFields.map((f) => f.id),
+        results: customFields,
+      })
+    )
+
+    fixture.detectChanges()
+    httpTestingController.expectOne(component.previewUrl).flush('preview')
+
+    expect(navigateSpy).toHaveBeenCalledWith(['404'], { replaceUrl: true })
+  })
+
   it('should not render a delete button for the root/original version', () => {
     const docWithVersions = {
       ...doc,

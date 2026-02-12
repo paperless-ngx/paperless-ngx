@@ -219,6 +219,25 @@ describe('PngxPdfViewerComponent', () => {
     expect(scaleSpy).not.toHaveBeenCalled()
   })
 
+  it('resets viewer state on src change', () => {
+    const mockViewer = {
+      setDocument: jest.fn(),
+      currentPageNumber: 7,
+      cleanup: jest.fn(),
+    }
+    ;(component as any).pdfViewer = mockViewer
+    ;(component as any).loadingTask = { destroy: jest.fn() }
+    jest.spyOn(component as any, 'loadDocument').mockImplementation(() => {})
+
+    component.src = 'test.pdf'
+    component.ngOnChanges({
+      src: new SimpleChange(undefined, 'test.pdf', true),
+    })
+
+    expect(mockViewer.setDocument).toHaveBeenCalledWith(null)
+    expect(mockViewer.currentPageNumber).toBe(1)
+  })
+
   it('applies viewer state after view init when already loaded', () => {
     const applySpy = jest.spyOn(component as any, 'applyViewerState')
     ;(component as any).hasLoaded = true

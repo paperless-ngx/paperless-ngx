@@ -306,6 +306,14 @@ describe(`DocumentService`, () => {
     req.flush({ root_id: documents[0].id })
   })
 
+  it('should call appropriate api endpoint for getting document versions', () => {
+    subscription = service.getVersions(documents[0].id).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/?fields=id,versions`
+    )
+    expect(req.request.method).toEqual('GET')
+  })
+
   it('should call appropriate api endpoint for deleting a document version', () => {
     subscription = service.deleteVersion(documents[0].id, 10).subscribe()
     const req = httpTestingController.expectOne(
