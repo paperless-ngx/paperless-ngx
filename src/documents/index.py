@@ -185,10 +185,20 @@ def update_document(writer: AsyncWriter, doc: Document) -> None:
         only_with_perms_in=["view_document"],
     )
     viewer_ids: str = ",".join([str(u.id) for u in users_with_perms])
+    effective_content = doc.content
+    if doc.root_document_id is None:
+        latest_version = (
+            Document.objects.filter(root_document=doc)
+            .only("content")
+            .order_by("-id")
+            .first()
+        )
+        if latest_version is not None:
+            effective_content = latest_version.content
     writer.update_document(
         id=doc.pk,
         title=doc.title,
-        content=doc.content,
+        content=effective_content,
         correspondent=doc.correspondent.name if doc.correspondent else None,
         correspondent_id=doc.correspondent.id if doc.correspondent else None,
         has_correspondent=doc.correspondent is not None,

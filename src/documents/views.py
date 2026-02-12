@@ -30,12 +30,16 @@ from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.models import Case
 from django.db.models import Count
+from django.db.models import F
 from django.db.models import IntegerField
 from django.db.models import Max
 from django.db.models import Model
+from django.db.models import OuterRef
 from django.db.models import Q
+from django.db.models import Subquery
 from django.db.models import Sum
 from django.db.models import When
+from django.db.models.functions import Coalesce
 from django.db.models.functions import Lower
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
@@ -763,7 +767,7 @@ class DocumentViewSet(
         ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = DocumentFilterSet
-    search_fields = ("title", "correspondent__name", "content")
+    search_fields = ("title", "correspondent__name", "effective_content")
     ordering_fields = (
         "id",
         "title",
@@ -781,10 +785,16 @@ class DocumentViewSet(
     )
 
     def get_queryset(self):
+        latest_version_content = Subquery(
+            Document.objects.filter(root_document=OuterRef("pk"))
+            .order_by("-id")
+            .values("content")[:1],
+        )
         return (
             Document.objects.filter(root_document__isnull=True)
             .distinct()
             .order_by("-created")
+            .annotate(effective_content=Coalesce(latest_version_content, F("content")))
             .annotate(num_notes=Count("notes"))
             .select_related("correspondent", "storage_path", "document_type", "owner")
             .prefetch_related("tags", "custom_fields", "notes")
@@ -847,14 +857,45 @@ class DocumentViewSet(
         return Response({"root_id": root_doc.id})
 
     def update(self, request, *args, **kwargs):
-        response = super().update(request, *args, **kwargs)
+        partial = kwargs.pop("partial", False)
+        root_doc = self.get_object()
+        content_updated = "content" in request.data
+        updated_content = request.data.get("content") if content_updated else None
+        latest_doc = self._get_latest_doc_for_root(root_doc)
+
+        data = request.data.copy()
+        serializer_partial = partial
+        if content_updated and latest_doc.id != root_doc.id:
+            if updated_content is None:
+                raise ValidationError({"content": ["This field may not be null."]})
+            data.pop("content", None)
+            serializer_partial = True
+
+        serializer = self.get_serializer(
+            root_doc,
+            data=data,
+            partial=serializer_partial,
+        )
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if content_updated and latest_doc.id != root_doc.id:
+            latest_doc.content = updated_content
+            latest_doc.save(update_fields=["content", "modified"])
+
+        if getattr(root_doc, "_prefetched_objects_cache", None):
+            root_doc._prefetched_objects_cache = {}
+
+        refreshed_doc = self.get_queryset().get(pk=root_doc.pk)
+        response = Response(self.get_serializer(refreshed_doc).data)
+
         from documents import index
 
-        index.add_or_update_document(self.get_object())
+        index.add_or_update_document(refreshed_doc)
 
         document_updated.send(
             sender=self.__class__,
-            document=self.get_object(),
+            document=refreshed_doc,
         )
 
         return response
@@ -902,6 +943,11 @@ class DocumentViewSet(
                 raise Http404
             return candidate
         latest = Document.objects.filter(root_document=root_doc).order_by("id").last()
+        return latest or root_doc
+
+    @staticmethod
+    def _get_latest_doc_for_root(root_doc: Document) -> Document:
+        latest = Document.objects.filter(root_document=root_doc).order_by("-id").first()
         return latest or root_doc
 
     def file_response(self, pk, request, disposition):

@@ -330,13 +330,19 @@ export class DocumentDetailComponent
   }
 
   get archiveContentRenderType(): ContentRenderType {
-    return this.document?.archived_file_name
+    const hasArchiveVersion =
+      this.metadata?.has_archive_version ?? !!this.document?.archived_file_name
+    return hasArchiveVersion
       ? this.getRenderType('application/pdf')
-      : this.getRenderType(this.document?.mime_type)
+      : this.getRenderType(
+          this.metadata?.original_mime_type || this.document?.mime_type
+        )
   }
 
   get originalContentRenderType(): ContentRenderType {
-    return this.getRenderType(this.document?.mime_type)
+    return this.getRenderType(
+      this.metadata?.original_mime_type || this.document?.mime_type
+    )
   }
 
   get showThumbnailOverlay(): boolean {
@@ -370,6 +376,39 @@ export class DocumentDetailComponent
       url: this.previewUrl,
       password: this.password,
     }
+  }
+
+  private loadMetadataForSelectedVersion() {
+    this.documentsService
+      .getMetadata(this.documentId, this.selectedVersionId)
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        takeUntil(this.docChangeNotifier)
+      )
+      .subscribe({
+        next: (result) => {
+          this.metadata = result
+          this.tiffURL = null
+          this.tiffError = null
+          if (this.archiveContentRenderType === ContentRenderType.TIFF) {
+            this.tryRenderTiff()
+          }
+          if (
+            this.archiveContentRenderType !== ContentRenderType.PDF ||
+            this.useNativePdfViewer
+          ) {
+            this.previewLoaded = true
+          }
+        },
+        error: (error) => {
+          this.metadata = {} // allow display to fallback to <object> tag
+          this.toastService.showError(
+            $localize`Error retrieving metadata`,
+            error
+          )
+        },
+      })
   }
 
   get isRTL() {
@@ -724,36 +763,10 @@ export class DocumentDetailComponent
     this.selectedVersionId = versions.length
       ? Math.max(...versions.map((version) => version.id))
       : doc.id
+    this.previewLoaded = false
     this.requiresPassword = false
     this.updateFormForCustomFields()
-    if (this.archiveContentRenderType === ContentRenderType.TIFF) {
-      this.tryRenderTiff()
-    }
-    this.documentsService
-      .getMetadata(doc.id)
-      .pipe(
-        first(),
-        takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier)
-      )
-      .subscribe({
-        next: (result) => {
-          this.metadata = result
-          if (
-            this.archiveContentRenderType !== ContentRenderType.PDF ||
-            this.useNativePdfViewer
-          ) {
-            this.previewLoaded = true
-          }
-        },
-        error: (error) => {
-          this.metadata = {} // allow display to fallback to <object> tag
-          this.toastService.showError(
-            $localize`Error retrieving metadata`,
-            error
-          )
-        },
-      })
+    this.loadMetadataForSelectedVersion()
     if (
       this.permissionsService.currentUserHasObjectPermissions(
         PermissionAction.Change,
@@ -785,6 +798,7 @@ export class DocumentDetailComponent
   // Update file preview and download target to a specific version (by document id)
   selectVersion(versionId: number) {
     this.selectedVersionId = versionId
+    this.previewLoaded = false
     this.previewUrl = this.documentsService.getPreviewUrl(
       this.documentId,
       false,
@@ -792,6 +806,7 @@ export class DocumentDetailComponent
     )
     this.updatePdfSource()
     this.thumbUrl = this.documentsService.getThumbUrl(this.selectedVersionId)
+    this.loadMetadataForSelectedVersion()
     // For text previews, refresh content
     this.http
       .get(this.previewUrl, { responseType: 'text' })
@@ -1840,7 +1855,7 @@ export class DocumentDetailComponent
     const modal = this.modalService.open(ShareLinksDialogComponent)
     modal.componentInstance.documentId = this.document.id
     modal.componentInstance.hasArchiveVersion =
-      !!this.document?.archived_file_name
+      this.metadata?.has_archive_version ?? !!this.document?.archived_file_name
   }
 
   get emailEnabled(): boolean {
@@ -1853,7 +1868,7 @@ export class DocumentDetailComponent
     })
     modal.componentInstance.documentIds = [this.document.id]
     modal.componentInstance.hasArchiveVersion =
-      !!this.document?.archived_file_name
+      this.metadata?.has_archive_version ?? !!this.document?.archived_file_name
   }
 
   private tryRenderTiff() {

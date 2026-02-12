@@ -165,6 +165,14 @@ describe(`DocumentService`, () => {
     expect(req.request.method).toEqual('GET')
   })
 
+  it('should call appropriate api endpoint for versioned metadata', () => {
+    subscription = service.getMetadata(documents[0].id, 123).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/metadata/?version=123`
+    )
+    expect(req.request.method).toEqual('GET')
+  })
+
   it('should call appropriate api endpoint for getting selection data', () => {
     const ids = [documents[0].id]
     subscription = service.getSelectionData(ids).subscribe()

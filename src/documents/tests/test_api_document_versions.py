@@ -116,18 +116,21 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
             title="root",
             checksum="root",
             mime_type="application/pdf",
+            content="root-content",
         )
         v1 = Document.objects.create(
             title="v1",
             checksum="v1",
             mime_type="application/pdf",
             root_document=root,
+            content="v1-content",
         )
         v2 = Document.objects.create(
             title="v2",
             checksum="v2",
             mime_type="application/pdf",
             root_document=root,
+            content="v2-content",
         )
 
         with mock.patch("documents.index.remove_document_from_index"):
@@ -136,6 +139,8 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertFalse(Document.objects.filter(id=v2.id).exists())
         self.assertEqual(resp.data["current_version_id"], v1.id)
+        root.refresh_from_db()
+        self.assertEqual(root.content, "root-content")
 
         with mock.patch("documents.index.remove_document_from_index"):
             resp = self.client.delete(f"/api/documents/{root.id}/versions/{v1.id}/")
@@ -143,6 +148,8 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertFalse(Document.objects.filter(id=v1.id).exists())
         self.assertEqual(resp.data["current_version_id"], root.id)
+        root.refresh_from_db()
+        self.assertEqual(root.content, "root-content")
 
     def test_delete_version_writes_audit_log_entry(self) -> None:
         root = Document.objects.create(
@@ -454,3 +461,60 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         )
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_patch_content_updates_latest_version_content(self) -> None:
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+            content="root-content",
+        )
+        v1 = Document.objects.create(
+            title="v1",
+            checksum="v1",
+            mime_type="application/pdf",
+            root_document=root,
+            content="v1-content",
+        )
+        v2 = Document.objects.create(
+            title="v2",
+            checksum="v2",
+            mime_type="application/pdf",
+            root_document=root,
+            content="v2-content",
+        )
+
+        resp = self.client.patch(
+            f"/api/documents/{root.id}/",
+            {"content": "edited-content"},
+            format="json",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.data["content"], "edited-content")
+        root.refresh_from_db()
+        v1.refresh_from_db()
+        v2.refresh_from_db()
+        self.assertEqual(v2.content, "edited-content")
+        self.assertEqual(root.content, "root-content")
+        self.assertEqual(v1.content, "v1-content")
+
+    def test_retrieve_returns_latest_version_content(self) -> None:
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+            content="root-content",
+        )
+        Document.objects.create(
+            title="v1",
+            checksum="v1",
+            mime_type="application/pdf",
+            root_document=root,
+            content="v1-content",
+        )
+
+        resp = self.client.get(f"/api/documents/{root.id}/")
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.data["content"], "v1-content")

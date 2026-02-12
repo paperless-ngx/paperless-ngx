@@ -242,8 +242,15 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     )
   }
 
-  getMetadata(id: number): Observable<DocumentMetadata> {
-    return this.http.get<DocumentMetadata>(this.getResourceUrl(id, 'metadata'))
+  getMetadata(
+    id: number,
+    versionID: number = null
+  ): Observable<DocumentMetadata> {
+    let url = new URL(this.getResourceUrl(id, 'metadata'))
+    if (versionID) {
+      url.searchParams.append('version', versionID.toString())
+    }
+    return this.http.get<DocumentMetadata>(url.toString())
   }
 
   bulkEdit(ids: number[], method: string, args: any) {

@@ -8,6 +8,7 @@ from contextlib import contextmanager
 from typing import TYPE_CHECKING
 
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import FieldError
 from django.db.models import Case
 from django.db.models import CharField
 from django.db.models import Count
@@ -163,9 +164,32 @@ class TitleContentFilter(Filter):
     def filter(self, qs, value):
         value = value.strip() if isinstance(value, str) else value
         if value:
-            return qs.filter(Q(title__icontains=value) | Q(content__icontains=value))
+            try:
+                return qs.filter(
+                    Q(title__icontains=value) | Q(effective_content__icontains=value),
+                )
+            except FieldError:
+                return qs.filter(
+                    Q(title__icontains=value) | Q(content__icontains=value),
+                )
         else:
             return qs
+
+
+@extend_schema_field(serializers.CharField)
+class EffectiveContentFilter(Filter):
+    def filter(self, qs, value):
+        value = value.strip() if isinstance(value, str) else value
+        if not value:
+            return qs
+        try:
+            return qs.filter(
+                **{f"effective_content__{self.lookup_expr}": value},
+            )
+        except FieldError:
+            return qs.filter(
+                **{f"content__{self.lookup_expr}": value},
+            )
 
 
 @extend_schema_field(serializers.BooleanField)
@@ -724,6 +748,11 @@ class DocumentFilterSet(FilterSet):
 
     title_content = TitleContentFilter()
 
+    content__istartswith = EffectiveContentFilter(lookup_expr="istartswith")
+    content__iendswith = EffectiveContentFilter(lookup_expr="iendswith")
+    content__icontains = EffectiveContentFilter(lookup_expr="icontains")
+    content__iexact = EffectiveContentFilter(lookup_expr="iexact")
+
     owner__id__none = ObjectFilter(field_name="owner", exclude=True)
 
     custom_fields__icontains = CustomFieldsFilter()
@@ -764,7 +793,6 @@ class DocumentFilterSet(FilterSet):
         fields = {
             "id": ID_KWARGS,
             "title": CHAR_KWARGS,
-            "content": CHAR_KWARGS,
             "archive_serial_number": INT_KWARGS,
             "created": DATE_KWARGS,
             "added": DATETIME_KWARGS,

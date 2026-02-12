@@ -1177,6 +1177,8 @@ class DocumentSerializer(
 
     def to_representation(self, instance):
         doc = super().to_representation(instance)
+        if "content" in self.fields and hasattr(instance, "effective_content"):
+            doc["content"] = getattr(instance, "effective_content") or ""
         if self.truncate_content and "content" in self.fields:
             doc["content"] = doc.get("content")[0:550]
 
