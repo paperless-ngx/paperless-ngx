@@ -859,13 +859,17 @@ class DocumentViewSet(
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
         root_doc = self.get_object()
+        content_doc = (
+            self._resolve_file_doc(root_doc, request)
+            if "version" in request.query_params
+            else self._get_latest_doc_for_root(root_doc)
+        )
         content_updated = "content" in request.data
         updated_content = request.data.get("content") if content_updated else None
-        latest_doc = self._get_latest_doc_for_root(root_doc)
 
         data = request.data.copy()
         serializer_partial = partial
-        if content_updated and latest_doc.id != root_doc.id:
+        if content_updated and content_doc.id != root_doc.id:
             if updated_content is None:
                 raise ValidationError({"content": ["This field may not be null."]})
             data.pop("content", None)
@@ -879,15 +883,18 @@ class DocumentViewSet(
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 
-        if content_updated and latest_doc.id != root_doc.id:
-            latest_doc.content = updated_content
-            latest_doc.save(update_fields=["content", "modified"])
+        if content_updated and content_doc.id != root_doc.id:
+            content_doc.content = updated_content
+            content_doc.save(update_fields=["content", "modified"])
 
         if getattr(root_doc, "_prefetched_objects_cache", None):
             root_doc._prefetched_objects_cache = {}
 
         refreshed_doc = self.get_queryset().get(pk=root_doc.pk)
-        response = Response(self.get_serializer(refreshed_doc).data)
+        response_data = self.get_serializer(refreshed_doc).data
+        if "version" in request.query_params and "content" in response_data:
+            response_data["content"] = content_doc.content
+        response = Response(response_data)
 
         from documents import index
 

@@ -298,6 +298,14 @@ describe(`DocumentService`, () => {
     expect(req.request.body.remove_inbox_tags).toEqual(true)
   })
 
+  it('should pass selected version to patch when provided', () => {
+    subscription = service.patch(documents[0], 123).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/?version=123`
+    )
+    expect(req.request.method).toEqual('PATCH')
+  })
+
   it('should call appropriate api endpoint for getting audit log', () => {
     subscription = service.getHistory(documents[0].id).subscribe()
     const req = httpTestingController.expectOne(

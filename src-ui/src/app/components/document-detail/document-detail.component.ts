@@ -1079,7 +1079,7 @@ export class DocumentDetailComponent
     this.networkActive = true
     ;(document.activeElement as HTMLElement)?.dispatchEvent(new Event('change'))
     this.documentsService
-      .patch(this.getChangedFields())
+      .patch(this.getChangedFields(), this.selectedVersionId)
       .pipe(first())
       .subscribe({
         next: (docValues) => {
@@ -1134,7 +1134,7 @@ export class DocumentDetailComponent
     this.networkActive = true
     this.store.next(this.documentForm.value)
     this.documentsService
-      .patch(this.getChangedFields())
+      .patch(this.getChangedFields(), this.selectedVersionId)
       .pipe(
         switchMap((updateResult) => {
           this.savedViewService.maybeRefreshDocumentCounts()

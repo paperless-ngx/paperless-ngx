@@ -740,6 +740,18 @@ describe('DocumentDetailComponent', () => {
     )
   })
 
+  it('save should target currently selected version', () => {
+    initNormally()
+    component.selectedVersionId = 10
+    const patchSpy = jest.spyOn(documentService, 'patch')
+    patchSpy.mockReturnValue(of(doc))
+
+    component.save()
+
+    expect(patchSpy).toHaveBeenCalled()
+    expect(patchSpy.mock.calls[0][1]).toEqual(10)
+  })
+
   it('should show toast error on save if error occurs', () => {
     currentUserHasObjectPermissions = true
     initNormally()

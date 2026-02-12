@@ -499,6 +499,43 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(root.content, "root-content")
         self.assertEqual(v1.content, "v1-content")
 
+    def test_patch_content_updates_selected_version_content(self) -> None:
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+            content="root-content",
+        )
+        v1 = Document.objects.create(
+            title="v1",
+            checksum="v1",
+            mime_type="application/pdf",
+            root_document=root,
+            content="v1-content",
+        )
+        v2 = Document.objects.create(
+            title="v2",
+            checksum="v2",
+            mime_type="application/pdf",
+            root_document=root,
+            content="v2-content",
+        )
+
+        resp = self.client.patch(
+            f"/api/documents/{root.id}/?version={v1.id}",
+            {"content": "edited-v1"},
+            format="json",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.data["content"], "edited-v1")
+        root.refresh_from_db()
+        v1.refresh_from_db()
+        v2.refresh_from_db()
+        self.assertEqual(v1.content, "edited-v1")
+        self.assertEqual(v2.content, "v2-content")
+        self.assertEqual(root.content, "root-content")
+
     def test_retrieve_returns_latest_version_content(self) -> None:
         root = Document.objects.create(
             title="root",

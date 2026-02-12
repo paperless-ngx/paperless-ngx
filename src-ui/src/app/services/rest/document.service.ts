@@ -227,11 +227,14 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     return this.http.get<number>(this.getResourceUrl(null, 'next_asn'))
   }
 
-  patch(o: Document): Observable<Document> {
+  patch(o: Document, versionID: number = null): Observable<Document> {
     o.remove_inbox_tags = !!this.settingsService.get(
       SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS
     )
-    return super.patch(o)
+    this.clearCache()
+    return this.http.patch<Document>(this.getResourceUrl(o.id), o, {
+      params: versionID ? { version: versionID.toString() } : {},
+    })
   }
 
   uploadDocument(formData) {
