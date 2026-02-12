@@ -473,6 +473,7 @@ export class DocumentDetailComponent
       .pipe(
         catchError((error) => {
           if (error?.status === 404) {
+            // if not found, check if there's root document that exists and redirect if so
             return this.documentsService.getRootId(documentId).pipe(
               map((result) => {
                 const rootId = result?.root_id
@@ -835,10 +836,7 @@ export class DocumentDetailComponent
           }
 
           if (wasSelected) {
-            const fallbackId =
-              result?.current_version_id ??
-              doc?.versions?.[0]?.id ??
-              this.documentId
+            const fallbackId = result?.current_version_id ?? this.documentId
             this.selectVersion(fallbackId)
           }
         },

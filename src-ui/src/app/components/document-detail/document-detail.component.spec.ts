@@ -1618,7 +1618,9 @@ describe('DocumentDetailComponent', () => {
     expect(selectSpy).toHaveBeenCalledWith(99)
 
     component.selectedVersionId = 3
-    deleteSpy.mockReturnValueOnce(of({ result: 'ok' }))
+    deleteSpy.mockReturnValueOnce(
+      of({ result: 'ok', current_version_id: null })
+    )
     versionsSpy.mockReturnValueOnce(
       of({
         id: doc.id,
@@ -1629,7 +1631,7 @@ describe('DocumentDetailComponent', () => {
       } as Document)
     )
     component.deleteVersion(3)
-    expect(selectSpy).toHaveBeenCalledWith(7)
+    expect(selectSpy).toHaveBeenCalledWith(component.documentId)
 
     deleteSpy.mockReturnValueOnce(throwError(() => new Error('nope')))
     component.deleteVersion(10)
