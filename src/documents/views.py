@@ -856,6 +856,25 @@ class DocumentViewSet(
 
         return Response({"root_id": root_doc.id})
 
+    def retrieve(
+        self,
+        request: Request,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Response:
+        response = super().retrieve(request, *args, **kwargs)
+        if (
+            "version" not in request.query_params
+            or not isinstance(response.data, dict)
+            or "content" not in response.data
+        ):
+            return response
+
+        root_doc = self.get_object()
+        content_doc = self._resolve_file_doc(root_doc, request)
+        response.data["content"] = content_doc.content or ""
+        return response
+
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
         root_doc = self.get_object()
