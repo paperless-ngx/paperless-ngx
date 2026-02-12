@@ -173,7 +173,6 @@ src/documents/filters.py:0: error: Function is missing a type annotation  [no-un
 src/documents/filters.py:0: error: Function is missing a type annotation  [no-untyped-def]
 src/documents/filters.py:0: error: Function is missing a type annotation  [no-untyped-def]
 src/documents/filters.py:0: error: Function is missing a type annotation  [no-untyped-def]
-src/documents/filters.py:0: error: Function is missing a type annotation  [no-untyped-def]
 src/documents/filters.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
 src/documents/filters.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
 src/documents/filters.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]

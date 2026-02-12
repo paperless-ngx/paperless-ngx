@@ -884,7 +884,9 @@ class DocumentViewSet(
         self.perform_update(serializer)
 
         if content_updated and content_doc.id != root_doc.id:
-            content_doc.content = updated_content
+            content_doc.content = (
+                str(updated_content) if updated_content is not None else ""
+            )
             content_doc.save(update_fields=["content", "modified"])
 
         if getattr(root_doc, "_prefetched_objects_cache", None):

@@ -6,6 +6,7 @@ import json
 import operator
 from contextlib import contextmanager
 from typing import TYPE_CHECKING
+from typing import Any
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
@@ -161,7 +162,7 @@ class InboxFilter(Filter):
 
 @extend_schema_field(serializers.CharField)
 class TitleContentFilter(Filter):
-    def filter(self, qs, value):
+    def filter(self, qs: Any, value: Any) -> Any:
         value = value.strip() if isinstance(value, str) else value
         if value:
             try:
@@ -178,7 +179,7 @@ class TitleContentFilter(Filter):
 
 @extend_schema_field(serializers.CharField)
 class EffectiveContentFilter(Filter):
-    def filter(self, qs, value):
+    def filter(self, qs: Any, value: Any) -> Any:
         value = value.strip() if isinstance(value, str) else value
         if not value:
             return qs
