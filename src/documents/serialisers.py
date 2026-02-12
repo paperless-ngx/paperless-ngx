@@ -1145,13 +1145,25 @@ class DocumentSerializer(
         root_doc = obj if obj.root_document_id is None else obj.root_document
         if root_doc is None:
             return []
-        versions_qs = Document.objects.filter(root_document=root_doc).only(
-            "id",
-            "added",
-            "checksum",
-            "version_label",
+
+        prefetched_cache = getattr(obj, "_prefetched_objects_cache", None)
+        prefetched_versions = (
+            prefetched_cache.get("versions")
+            if isinstance(prefetched_cache, dict)
+            else None
         )
-        versions = [*versions_qs, root_doc]
+
+        versions: list[Document]
+        if prefetched_versions is not None:
+            versions = [*prefetched_versions, root_doc]
+        else:
+            versions_qs = Document.objects.filter(root_document=root_doc).only(
+                "id",
+                "added",
+                "checksum",
+                "version_label",
+            )
+            versions = [*versions_qs, root_doc]
 
         def build_info(doc: Document) -> _DocumentVersionInfo:
             return {
