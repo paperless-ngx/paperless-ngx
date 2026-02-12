@@ -674,6 +674,10 @@ export class DocumentDetailComponent
         this.loadDocument(documentId)
       })
 
+    this.docChangeNotifier
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => this.clearVersionUploadStatus())
+
     this.route.paramMap
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((paramMap) => {
@@ -1311,6 +1315,7 @@ export class DocumentDetailComponent
   onVersionFileSelected(event: Event) {
     const input = event.target as HTMLInputElement
     if (!input?.files || input.files.length === 0) return
+    const uploadDocumentId = this.documentId
     const file = input.files[0]
     // Reset input to allow re-selection of the same file later
     input.value = ''
@@ -1318,7 +1323,7 @@ export class DocumentDetailComponent
     this.versionUploadState = UploadState.Uploading
     this.versionUploadError = null
     this.documentsService
-      .uploadVersion(this.documentId, file, label)
+      .uploadVersion(uploadDocumentId, file, label)
       .pipe(
         first(),
         tap(() => {
@@ -1351,7 +1356,10 @@ export class DocumentDetailComponent
                 message: status.message,
               }))
             )
-          ).pipe(take(1))
+          ).pipe(
+            takeUntil(merge(this.unsubscribeNotifier, this.docChangeNotifier)),
+            take(1)
+          )
         }),
         switchMap((result) => {
           if (result?.state !== 'success') {
@@ -1362,13 +1370,14 @@ export class DocumentDetailComponent
             }
             return of(null)
           }
-          return this.documentsService.getVersions(this.documentId)
+          return this.documentsService.getVersions(uploadDocumentId)
         }),
         takeUntil(this.unsubscribeNotifier),
         takeUntil(this.docChangeNotifier)
       )
       .subscribe({
         next: (doc) => {
+          if (uploadDocumentId !== this.documentId) return
           if (doc?.versions) {
             this.document.versions = doc.versions
             const openDoc = this.openDocumentService.getOpenDocument(
@@ -1385,6 +1394,7 @@ export class DocumentDetailComponent
           }
         },
         error: (error) => {
+          if (uploadDocumentId !== this.documentId) return
           this.versionUploadState = UploadState.Failed
           this.versionUploadError = error?.message || $localize`Upload failed.`
           this.toastService.showError(

@@ -1842,6 +1842,43 @@ describe('DocumentDetailComponent', () => {
     expect(errorSpy).toHaveBeenCalled()
   })
 
+  it('should clear and isolate version upload state on document change', () => {
+    initNormally()
+    httpTestingController.expectOne(component.previewUrl).flush('preview')
+
+    component.versionUploadState = UploadState.Failed
+    component.versionUploadError = 'boom'
+    component.docChangeNotifier.next(999)
+    expect(component.versionUploadState).toBe(UploadState.Idle)
+    expect(component.versionUploadError).toBeNull()
+
+    const uploadSpy = jest.spyOn(documentService, 'uploadVersion')
+    const versionsSpy = jest.spyOn(documentService, 'getVersions')
+    const finished$ = new Subject<any>()
+    const failed$ = new Subject<any>()
+    jest
+      .spyOn(websocketStatusService, 'onDocumentConsumptionFinished')
+      .mockReturnValueOnce(finished$ as any)
+    jest
+      .spyOn(websocketStatusService, 'onDocumentConsumptionFailed')
+      .mockReturnValueOnce(failed$ as any)
+
+    uploadSpy.mockReturnValueOnce(of('task-stale'))
+    component.onVersionFileSelected({
+      target: createFileInput(
+        new File(['data'], 'version.pdf', { type: 'application/pdf' })
+      ),
+    } as any)
+    expect(component.versionUploadState).toBe(UploadState.Processing)
+
+    component.docChangeNotifier.next(1000)
+    failed$.next({ taskId: 'task-stale', message: 'stale-error' })
+
+    expect(component.versionUploadState).toBe(UploadState.Idle)
+    expect(component.versionUploadError).toBeNull()
+    expect(versionsSpy).not.toHaveBeenCalled()
+  })
+
   it('createDisabled should return true if the user does not have permission to add the specified data type', () => {
     currentUserCan = false
     expect(component.createDisabled(DataType.Correspondent)).toBeTruthy()
