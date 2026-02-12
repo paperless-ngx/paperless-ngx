@@ -155,11 +155,22 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     }).pipe(map((response) => response.results.map((doc) => doc.id)))
   }
 
-  get(id: number): Observable<Document> {
+  get(
+    id: number,
+    versionID: number = null,
+    fields: string = null
+  ): Observable<Document> {
+    const params: { full_perms: boolean; version?: string; fields?: string } = {
+      full_perms: true,
+    }
+    if (versionID) {
+      params.version = versionID.toString()
+    }
+    if (fields) {
+      params.fields = fields
+    }
     return this.http.get<Document>(this.getResourceUrl(id), {
-      params: {
-        full_perms: true,
-      },
+      params,
     })
   }
 
@@ -179,16 +190,27 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     return url.toString()
   }
 
-  getThumbUrl(id: number): string {
-    return this.getResourceUrl(id, 'thumb')
+  getThumbUrl(id: number, versionID: number = null): string {
+    let url = new URL(this.getResourceUrl(id, 'thumb'))
+    if (versionID) {
+      url.searchParams.append('version', versionID.toString())
+    }
+    return url.toString()
   }
 
-  getDownloadUrl(id: number, original: boolean = false): string {
-    let url = this.getResourceUrl(id, 'download')
+  getDownloadUrl(
+    id: number,
+    original: boolean = false,
+    versionID: number = null
+  ): string {
+    let url = new URL(this.getResourceUrl(id, 'download'))
     if (original) {
-      url += '?original=true'
+      url.searchParams.append('original', 'true')
     }
-    return url
+    if (versionID) {
+      url.searchParams.append('version', versionID.toString())
+    }
+    return url.toString()
   }
 
   uploadVersion(documentId: number, file: File, versionLabel?: string) {

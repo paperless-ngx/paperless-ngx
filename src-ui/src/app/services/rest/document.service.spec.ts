@@ -253,6 +253,10 @@ describe(`DocumentService`, () => {
     expect(url).toEqual(
       `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/thumb/`
     )
+    url = service.getThumbUrl(documents[0].id, 123)
+    expect(url).toEqual(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/thumb/?version=123`
+    )
   })
 
   it('should return the correct download URL for a single document', () => {
@@ -264,6 +268,22 @@ describe(`DocumentService`, () => {
     expect(url).toEqual(
       `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/download/?original=true`
     )
+    url = service.getDownloadUrl(documents[0].id, false, 123)
+    expect(url).toEqual(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/download/?version=123`
+    )
+    url = service.getDownloadUrl(documents[0].id, true, 123)
+    expect(url).toEqual(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/download/?original=true&version=123`
+    )
+  })
+
+  it('should pass optional get params for version and fields', () => {
+    subscription = service.get(documents[0].id, 123, 'content').subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/?full_perms=true&version=123&fields=content`
+    )
+    expect(req.request.method).toEqual('GET')
   })
 
   it('should set search query', () => {
