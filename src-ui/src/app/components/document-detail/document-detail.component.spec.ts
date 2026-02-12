@@ -318,6 +318,27 @@ describe('DocumentDetailComponent', () => {
     component = fixture.componentInstance
   })
 
+  function initNormally() {
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
+    jest
+      .spyOn(documentService, 'get')
+      .mockReturnValueOnce(of(Object.assign({}, doc)))
+    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(null)
+    jest
+      .spyOn(openDocumentsService, 'openDocument')
+      .mockReturnValueOnce(of(true))
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({
+        count: customFields.length,
+        all: customFields.map((f) => f.id),
+        results: customFields,
+      })
+    )
+    fixture.detectChanges()
+  }
+
   it('should load four tabs via url params', () => {
     jest
       .spyOn(activatedRoute, 'paramMap', 'get')
@@ -1674,6 +1695,7 @@ describe('DocumentDetailComponent', () => {
     const uploadSpy = jest.spyOn(documentService, 'uploadVersion')
     const versionsSpy = jest.spyOn(documentService, 'getVersions')
     const infoSpy = jest.spyOn(toastService, 'showInfo')
+    const errorSpy = jest.spyOn(toastService, 'showError')
     const finishedSpy = jest.spyOn(
       websocketStatusService,
       'onDocumentConsumptionFinished'
@@ -1755,28 +1777,17 @@ describe('DocumentDetailComponent', () => {
     component.clearVersionUploadStatus()
     expect(component.versionUploadState).toBe(UploadState.Idle)
     expect(component.versionUploadError).toBeNull()
-  })
 
-  function initNormally() {
-    jest
-      .spyOn(activatedRoute, 'paramMap', 'get')
-      .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
-    jest
-      .spyOn(documentService, 'get')
-      .mockReturnValueOnce(of(Object.assign({}, doc)))
-    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(null)
-    jest
-      .spyOn(openDocumentsService, 'openDocument')
-      .mockReturnValueOnce(of(true))
-    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
-      of({
-        count: customFields.length,
-        all: customFields.map((f) => f.id),
-        results: customFields,
-      })
-    )
-    fixture.detectChanges()
-  }
+    uploadSpy.mockReturnValueOnce(throwError(() => new Error('upload blew up')))
+    component.onVersionFileSelected({
+      target: createFileInput(
+        new File(['data'], 'version.pdf', { type: 'application/pdf' })
+      ),
+    } as any)
+    expect(component.versionUploadState).toBe(UploadState.Failed)
+    expect(component.versionUploadError).toBe('upload blew up')
+    expect(errorSpy).toHaveBeenCalled()
+  })
 
   it('createDisabled should return true if the user does not have permission to add the specified data type', () => {
     currentUserCan = false
