@@ -805,8 +805,38 @@ export class DocumentDetailComponent
       this.selectedVersionId
     )
     this.updatePdfSource()
-    this.thumbUrl = this.documentsService.getThumbUrl(this.selectedVersionId)
+    this.thumbUrl = this.documentsService.getThumbUrl(
+      this.documentId,
+      this.selectedVersionId
+    )
     this.loadMetadataForSelectedVersion()
+    this.documentsService
+      .get(this.documentId, this.selectedVersionId, 'content')
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        takeUntil(this.docChangeNotifier)
+      )
+      .subscribe({
+        next: (doc) => {
+          const content = doc?.content ?? ''
+          this.document.content = content
+          this.documentForm.patchValue(
+            {
+              content,
+            },
+            {
+              emitEvent: false,
+            }
+          )
+        },
+        error: (error) => {
+          this.toastService.showError(
+            $localize`Error retrieving version content`,
+            error
+          )
+        },
+      })
     // For text previews, refresh content
     this.http
       .get(this.previewUrl, { responseType: 'text' })

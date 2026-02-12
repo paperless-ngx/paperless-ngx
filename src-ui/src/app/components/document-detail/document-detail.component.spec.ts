@@ -1616,6 +1616,9 @@ describe('DocumentDetailComponent', () => {
 
     previewSpy.mockReturnValueOnce('preview-version')
     jest.spyOn(documentService, 'getThumbUrl').mockReturnValue('thumb-version')
+    jest
+      .spyOn(documentService, 'get')
+      .mockReturnValue(of({ content: 'version-content' } as Document))
 
     component.selectVersion(10)
     httpTestingController.expectOne('preview-version').flush('version text')
@@ -1623,6 +1626,7 @@ describe('DocumentDetailComponent', () => {
     expect(component.previewUrl).toBe('preview-version')
     expect(component.thumbUrl).toBe('thumb-version')
     expect(component.previewText).toBe('version text')
+    expect(component.documentForm.get('content').value).toBe('version-content')
     const pdfSource = component.pdfSource as { url: string; password?: string }
     expect(pdfSource.url).toBe('preview-version')
     expect(pdfSource.password).toBeUndefined()
