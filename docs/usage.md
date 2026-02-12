@@ -89,6 +89,16 @@ You can view the document, edit its metadata, assign tags, correspondents,
 document types, and custom fields. You can also view the document history,
 download the document or share it via a share link.
 
+### Document File Versions
+
+Think of versions as **file history** for a document.
+
+-   Versions track the underlying file and extracted text content (OCR/text).
+-   Metadata such as tags, correspondent, document type, storage path and custom fields stay on the "root" document.
+-   By default, search and document content use the latest version.
+-   In document detail, selecting a version switches the preview, file metadata and content (and download etc buttons) to that version.
+-   Deleting a non-root version keeps metadata and falls back to the latest remaining version.
+
 ### Management Lists
 
 Paperless-ngx includes management lists for tags, correspondents, document types
