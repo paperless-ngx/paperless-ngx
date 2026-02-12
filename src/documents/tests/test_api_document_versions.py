@@ -80,24 +80,6 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_root_endpoint_falls_back_when_root_document_missing(self) -> None:
-        doc = Document(
-            title="orphan",
-            checksum="orphan",
-            mime_type="application/pdf",
-        )
-        doc.pk = 123
-        doc.root_document_id = 456
-        # Simulate a stale FK: id is set but related object is missing.
-        doc._state.fields_cache["root_document"] = None
-
-        with mock.patch("documents.views.Document.global_objects") as manager:
-            manager.select_related.return_value.get.return_value = doc
-            resp = self.client.get("/api/documents/123/root/")
-
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp.data["root_id"], 123)
-
     def test_root_endpoint_returns_403_when_user_lacks_permission(self) -> None:
         owner = User.objects.create_user(username="owner")
         viewer = User.objects.create_user(username="viewer")

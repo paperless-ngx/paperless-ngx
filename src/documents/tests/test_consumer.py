@@ -741,6 +741,7 @@ class TestConsumer(
         self.assertEqual(versions.count(), 1)
         version = versions.first()
         assert version is not None
+        assert version.original_filename is not None
         self.assertEqual(version.version_label, "v2")
         self.assertTrue(version.original_filename.endswith("_v0"))
 
