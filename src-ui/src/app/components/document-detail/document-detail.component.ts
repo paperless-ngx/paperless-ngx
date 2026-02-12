@@ -379,8 +379,9 @@ export class DocumentDetailComponent
   }
 
   private loadMetadataForSelectedVersion() {
+    const selectedVersionId = this.getSelectedNonLatestVersionId()
     this.documentsService
-      .getMetadata(this.documentId, this.selectedVersionId)
+      .getMetadata(this.documentId, selectedVersionId)
       .pipe(
         first(),
         takeUntil(this.unsubscribeNotifier),

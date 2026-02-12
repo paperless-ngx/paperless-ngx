@@ -1216,7 +1216,32 @@ describe('DocumentDetailComponent', () => {
     const metadataSpy = jest.spyOn(documentService, 'getMetadata')
     metadataSpy.mockReturnValue(of({ has_archive_version: true }))
     initNormally()
-    expect(metadataSpy).toHaveBeenCalled()
+    expect(metadataSpy).toHaveBeenCalledWith(doc.id, null)
+  })
+
+  it('should pass metadata version only for non-latest selected versions', () => {
+    const metadataSpy = jest.spyOn(documentService, 'getMetadata')
+    metadataSpy.mockReturnValue(of({ has_archive_version: true }))
+    initNormally()
+    httpTestingController.expectOne(component.previewUrl).flush('preview')
+
+    expect(metadataSpy).toHaveBeenCalledWith(doc.id, null)
+
+    metadataSpy.mockClear()
+    component.document.versions = [
+      { id: doc.id, is_root: true },
+      { id: 10, is_root: false },
+    ] as any
+    jest.spyOn(documentService, 'getPreviewUrl').mockReturnValue('preview-root')
+    jest.spyOn(documentService, 'getThumbUrl').mockReturnValue('thumb-root')
+    jest
+      .spyOn(documentService, 'get')
+      .mockReturnValue(of({ content: 'root' } as Document))
+
+    component.selectVersion(doc.id)
+    httpTestingController.expectOne('preview-root').flush('root')
+
+    expect(metadataSpy).toHaveBeenCalledWith(doc.id, doc.id)
   })
 
   it('should show an error if failed metadata retrieval', () => {
