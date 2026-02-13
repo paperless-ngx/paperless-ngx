@@ -183,6 +183,41 @@ class ConsumerPlugin(
 ):
     logging_name = LOGGING_NAME
 
+    def _clone_root_into_version(
+        self,
+        root_doc: Document,
+        *,
+        text: str | None,
+        page_count: int | None,
+        mime_type: str,
+    ) -> Document:
+        self.log.debug("Saving record for updated version to database")
+        version_doc = Document.objects.get(pk=root_doc.pk)
+        setattr(version_doc, "pk", None)
+        version_doc.root_document = root_doc
+        file_for_checksum = (
+            self.unmodified_original
+            if self.unmodified_original is not None
+            else self.working_copy
+        )
+        version_doc.checksum = hashlib.md5(
+            file_for_checksum.read_bytes(),
+        ).hexdigest()
+        version_doc.content = text or ""
+        version_doc.page_count = page_count
+        version_doc.mime_type = mime_type
+        version_doc.original_filename = self.filename
+        version_doc.storage_path = root_doc.storage_path
+        # Clear unique file path fields so they can be generated uniquely later
+        version_doc.filename = None
+        version_doc.archive_filename = None
+        version_doc.archive_checksum = None
+        if self.metadata.version_label is not None:
+            version_doc.version_label = self.metadata.version_label
+        version_doc.added = timezone.now()
+        version_doc.modified = timezone.now()
+        return version_doc
+
     def run_pre_consume_script(self) -> None:
         """
         If one is configured and exists, run the pre-consume script and
@@ -506,33 +541,12 @@ class ConsumerPlugin(
                     root_doc = Document.objects.get(
                         pk=self.input_doc.root_document_id,
                     )
-                    original_document = Document.objects.get(
-                        pk=self.input_doc.root_document_id,
+                    original_document = self._clone_root_into_version(
+                        root_doc,
+                        text=text,
+                        page_count=page_count,
+                        mime_type=mime_type,
                     )
-                    self.log.debug("Saving record for updated version to database")
-                    setattr(original_document, "pk", None)
-                    original_document.root_document = root_doc
-                    file_for_checksum = (
-                        self.unmodified_original
-                        if self.unmodified_original is not None
-                        else self.working_copy
-                    )
-                    original_document.checksum = hashlib.md5(
-                        file_for_checksum.read_bytes(),
-                    ).hexdigest()
-                    original_document.content = text or ""
-                    original_document.page_count = page_count
-                    original_document.mime_type = mime_type
-                    original_document.original_filename = self.filename
-                    original_document.storage_path = root_doc.storage_path
-                    # Clear unique file path fields so they can be generated uniquely later
-                    original_document.filename = None
-                    original_document.archive_filename = None
-                    original_document.archive_checksum = None
-                    if self.metadata.version_label is not None:
-                        original_document.version_label = self.metadata.version_label
-                    original_document.added = timezone.now()
-                    original_document.modified = timezone.now()
                     actor = None
 
                     # Save the new version, potentially creating an audit log entry for the version addition if enabled.
