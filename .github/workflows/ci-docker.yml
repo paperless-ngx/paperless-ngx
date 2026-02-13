@@ -130,7 +130,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
       - name: Build and push by digest
         id: build
-        uses: docker/build-push-action@v6.18.0
+        uses: docker/build-push-action@v6.19.2
         with:
           context: .
           file: ./Dockerfile
