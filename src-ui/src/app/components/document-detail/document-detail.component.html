@@ -457,7 +457,7 @@
         @if (!useNativePdfViewer) {
           <div class="preview-sticky pdf-viewer-container">
             <pngx-pdf-viewer
-              [src]="{ url: previewUrl, password: password }"
+              [src]="pdfSource"
               [renderMode]="PdfRenderMode.All"
               [(page)]="previewCurrentPage"
               [zoomScale]="previewZoomScale"

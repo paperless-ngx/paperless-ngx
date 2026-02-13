@@ -150,4 +150,8 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
+
+  & .annotationTextContent {
+    opacity: 0;
+  }
 }
