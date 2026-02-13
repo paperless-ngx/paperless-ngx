@@ -97,7 +97,6 @@ src/documents/conditionals.py:0: error: Function is missing a type annotation fo
 src/documents/conditionals.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
 src/documents/conditionals.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
 src/documents/conditionals.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
-src/documents/conditionals.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
 src/documents/consumer.py:0: error: "ConsumerPluginMixin" has no attribute "input_doc"  [attr-defined]
 src/documents/consumer.py:0: error: "ConsumerPluginMixin" has no attribute "metadata"  [attr-defined]
 src/documents/consumer.py:0: error: "ConsumerPluginMixin" has no attribute "metadata"  [attr-defined]
