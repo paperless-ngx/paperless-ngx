@@ -357,6 +357,7 @@ def delete(doc_ids: list[int]) -> Literal["OK"]:
         )
         version_ids = (
             Document.objects.filter(root_document_id__in=root_ids)
+            .exclude(id__in=doc_ids)
             .values_list("id", flat=True)
             .distinct()
         )
