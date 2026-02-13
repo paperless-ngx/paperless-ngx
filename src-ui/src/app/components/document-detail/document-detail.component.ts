@@ -240,7 +240,6 @@ export class DocumentDetailComponent
 
   // Versioning
   selectedVersionId: number
-  pdfSource: PdfSource
 
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
