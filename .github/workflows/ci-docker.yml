@@ -41,7 +41,7 @@ jobs:
       ref-name: ${{ steps.ref.outputs.name }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
       - name: Determine ref name
         id: ref
         run: |
@@ -130,7 +130,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
       - name: Build and push by digest
         id: build
-        uses: docker/build-push-action@v6.18.0
+        uses: docker/build-push-action@v6.19.2
         with:
           context: .
           file: ./Dockerfile

@@ -28,14 +28,14 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
       # ---- Frontend Build ----
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v4.2.0
         with:
           version: 10
       - name: Use Node.js 24
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.2.0
         with:
           node-version: 24.x
           cache: 'pnpm'
@@ -47,11 +47,11 @@ jobs:
       # ---- Backend Setup ----
       - name: Set up Python
         id: setup-python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v6.2.0
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v7.3.0
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
@@ -118,7 +118,7 @@ jobs:
           sudo chown -R 1000:1000 paperless-ngx/
           tar -cJf paperless-ngx.tar.xz paperless-ngx/
       - name: Upload release artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v6.0.0
         with:
           name: release
           path: dist/paperless-ngx.tar.xz
@@ -133,7 +133,7 @@ jobs:
       version: ${{ steps.get-version.outputs.version }}
     steps:
       - name: Download release artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v7.0.0
         with:
           name: release
           path: ./
@@ -148,7 +148,7 @@ jobs:
           fi
       - name: Create release and changelog
         id: create-release
-        uses: release-drafter/release-drafter@v6
+        uses: release-drafter/release-drafter@v6.2.0
         with:
           name: Paperless-ngx ${{ steps.get-version.outputs.version }}
           tag: ${{ steps.get-version.outputs.version }}
@@ -159,7 +159,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload release archive
-        uses: shogo82148/actions-upload-release-asset@v1
+        uses: shogo82148/actions-upload-release-asset@v1.9.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           upload_url: ${{ steps.create-release.outputs.upload_url }}
@@ -176,16 +176,16 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
         with:
           ref: main
       - name: Set up Python
         id: setup-python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v6.2.0
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v7.3.0
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
@@ -218,7 +218,7 @@ jobs:
           git commit -am "Changelog ${{ needs.publish-release.outputs.version }} - GHA"
           git push origin ${{ needs.publish-release.outputs.version }}-changelog
       - name: Create pull request
-        uses: actions/github-script@v8
+        uses: actions/github-script@v8.0.0
         with:
           script: |
             const { repo, owner } = context.repo;

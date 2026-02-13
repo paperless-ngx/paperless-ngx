@@ -33,16 +33,16 @@ jobs:
     name: Build Documentation
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v5.0.0
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
       - name: Set up Python
         id: setup-python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v6.2.0
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v7.3.0
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
@@ -58,7 +58,7 @@ jobs:
             --frozen \
             zensical build --clean
       - name: Upload GitHub Pages artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v4.0.0
         with:
           path: site
           name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
@@ -72,7 +72,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy GitHub Pages
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v4.0.5
         id: deployment
         with:
           artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
