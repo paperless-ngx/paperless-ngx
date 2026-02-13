@@ -1,4 +1,4 @@
-import { AsyncPipe, NgTemplateOutlet, SlicePipe } from '@angular/common'
+import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
 import { HttpClient, HttpResponse } from '@angular/common/http'
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import {
@@ -20,7 +20,7 @@ import {
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { DeviceDetectorService } from 'ngx-device-detector'
-import { BehaviorSubject, merge, Observable, of, Subject, timer } from 'rxjs'
+import { BehaviorSubject, Observable, of, Subject, timer } from 'rxjs'
 import {
   catchError,
   debounceTime,
@@ -29,7 +29,6 @@ import {
   first,
   map,
   switchMap,
-  take,
   takeUntil,
   tap,
 } from 'rxjs/operators'
@@ -37,7 +36,7 @@ import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
 import { DataType } from 'src/app/data/datatype'
-import { Document } from 'src/app/data/document'
+import { Document, DocumentVersionInfo } from 'src/app/data/document'
 import { DocumentMetadata } from 'src/app/data/document-metadata'
 import { DocumentNote } from 'src/app/data/document-note'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
@@ -81,15 +80,10 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
-import {
-  UploadState,
-  WebsocketStatusService,
-} from 'src/app/services/websocket-status.service'
 import { getFilenameFromContentDisposition } from 'src/app/utils/http'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
 import { DocumentDetailFieldID } from '../admin/settings/settings.component'
-import { ConfirmButtonComponent } from '../common/confirm-button/confirm-button.component'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
 import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
@@ -126,6 +120,7 @@ import { SuggestionsDropdownComponent } from '../common/suggestions-dropdown/sug
 import { DocumentNotesComponent } from '../document-notes/document-notes.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { DocumentHistoryComponent } from './document-history/document-history.component'
+import { DocumentVersionDropdownComponent } from './document-version-dropdown/document-version-dropdown.component'
 import { MetadataCollapseComponent } from './metadata-collapse/metadata-collapse.component'
 
 enum DocumentDetailNavIDs {
@@ -183,8 +178,7 @@ enum ContentRenderType {
     TextAreaComponent,
     RouterModule,
     PngxPdfViewerComponent,
-    ConfirmButtonComponent,
-    SlicePipe,
+    DocumentVersionDropdownComponent,
   ],
 })
 export class DocumentDetailComponent
@@ -192,7 +186,6 @@ export class DocumentDetailComponent
   implements OnInit, OnDestroy, DirtyComponent
 {
   PdfRenderMode = PdfRenderMode
-  UploadState = UploadState
 
   documentsService = inject(DocumentService)
   private route = inject(ActivatedRoute)
@@ -215,7 +208,6 @@ export class DocumentDetailComponent
   private componentRouterService = inject(ComponentRouterService)
   private deviceDetectorService = inject(DeviceDetectorService)
   private savedViewService = inject(SavedViewService)
-  private readonly websocketStatusService = inject(WebsocketStatusService)
 
   @ViewChild('inputTitle')
   titleInput: TextComponent
@@ -247,10 +239,7 @@ export class DocumentDetailComponent
 
   // Versioning
   selectedVersionId: number
-  newVersionLabel: string = ''
   pdfSource: PdfSource
-  versionUploadState: UploadState = UploadState.Idle
-  versionUploadError: string | null = null
 
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
@@ -297,7 +286,6 @@ export class DocumentDetailComponent
   public readonly DocumentDetailFieldID = DocumentDetailFieldID
 
   @ViewChild('nav') nav: NgbNav
-  @ViewChild('versionFileInput') versionFileInput
   @ViewChild('pdfPreview') set pdfPreview(element) {
     // this gets called when component added or removed from DOM
     if (
@@ -674,10 +662,6 @@ export class DocumentDetailComponent
         this.loadDocument(documentId)
       })
 
-    this.docChangeNotifier
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(() => this.clearVersionUploadStatus())
-
     this.route.paramMap
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((paramMap) => {
@@ -859,41 +843,17 @@ export class DocumentDetailComponent
       })
   }
 
-  deleteVersion(versionId: number) {
-    const wasSelected = this.selectedVersionId === versionId
-    this.documentsService
-      .deleteVersion(this.documentId, versionId)
-      .pipe(
-        switchMap((result) =>
-          this.documentsService
-            .getVersions(this.documentId)
-            .pipe(map((doc) => ({ doc, result })))
-        ),
-        first(),
-        takeUntil(this.unsubscribeNotifier)
-      )
-      .subscribe({
-        next: ({ doc, result }) => {
-          if (doc?.versions) {
-            this.document.versions = doc.versions
-            const openDoc = this.openDocumentService.getOpenDocument(
-              this.documentId
-            )
-            if (openDoc) {
-              openDoc.versions = doc.versions
-              this.openDocumentService.save()
-            }
-          }
+  onVersionSelected(versionId: number) {
+    this.selectVersion(versionId)
+  }
 
-          if (wasSelected) {
-            const fallbackId = result?.current_version_id ?? this.documentId
-            this.selectVersion(fallbackId)
-          }
-        },
-        error: (error) => {
-          this.toastService.showError($localize`Error deleting version`, error)
-        },
-      })
+  onVersionsUpdated(versions: DocumentVersionInfo[]) {
+    this.document.versions = versions
+    const openDoc = this.openDocumentService.getOpenDocument(this.documentId)
+    if (openDoc) {
+      openDoc.versions = versions
+      this.openDocumentService.save()
+    }
   }
 
   get customFieldFormFields(): FormArray {
@@ -1310,104 +1270,6 @@ export class DocumentDetailComponent
           },
         })
     })
-  }
-
-  onVersionFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement
-    if (!input?.files || input.files.length === 0) return
-    const uploadDocumentId = this.documentId
-    const file = input.files[0]
-    // Reset input to allow re-selection of the same file later
-    input.value = ''
-    const label = this.newVersionLabel?.trim()
-    this.versionUploadState = UploadState.Uploading
-    this.versionUploadError = null
-    this.documentsService
-      .uploadVersion(uploadDocumentId, file, label)
-      .pipe(
-        first(),
-        tap(() => {
-          this.toastService.showInfo(
-            $localize`Uploading new version. Processing will happen in the background.`
-          )
-          this.newVersionLabel = ''
-          this.versionUploadState = UploadState.Processing
-        }),
-        map((taskId) =>
-          typeof taskId === 'string'
-            ? taskId
-            : (taskId as { task_id?: string })?.task_id
-        ),
-        switchMap((taskId) => {
-          if (!taskId) {
-            this.versionUploadState = UploadState.Failed
-            this.versionUploadError = $localize`Missing task ID.`
-            return of(null)
-          }
-          return merge(
-            this.websocketStatusService.onDocumentConsumptionFinished().pipe(
-              filter((status) => status.taskId === taskId),
-              map(() => ({ state: 'success' as const }))
-            ),
-            this.websocketStatusService.onDocumentConsumptionFailed().pipe(
-              filter((status) => status.taskId === taskId),
-              map((status) => ({
-                state: 'failed' as const,
-                message: status.message,
-              }))
-            )
-          ).pipe(
-            takeUntil(merge(this.unsubscribeNotifier, this.docChangeNotifier)),
-            take(1)
-          )
-        }),
-        switchMap((result) => {
-          if (result?.state !== 'success') {
-            if (result?.state === 'failed') {
-              this.versionUploadState = UploadState.Failed
-              this.versionUploadError =
-                result.message || $localize`Upload failed.`
-            }
-            return of(null)
-          }
-          return this.documentsService.getVersions(uploadDocumentId)
-        }),
-        takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier)
-      )
-      .subscribe({
-        next: (doc) => {
-          if (uploadDocumentId !== this.documentId) return
-          if (doc?.versions) {
-            this.document.versions = doc.versions
-            const openDoc = this.openDocumentService.getOpenDocument(
-              this.documentId
-            )
-            if (openDoc) {
-              openDoc.versions = doc.versions
-              this.openDocumentService.save()
-            }
-            this.selectVersion(
-              Math.max(...doc.versions.map((version) => version.id))
-            )
-            this.clearVersionUploadStatus()
-          }
-        },
-        error: (error) => {
-          if (uploadDocumentId !== this.documentId) return
-          this.versionUploadState = UploadState.Failed
-          this.versionUploadError = error?.message || $localize`Upload failed.`
-          this.toastService.showError(
-            $localize`Error uploading new version`,
-            error
-          )
-        },
-      })
-  }
-
-  clearVersionUploadStatus() {
-    this.versionUploadState = UploadState.Idle
-    this.versionUploadError = null
   }
 
   private getSelectedNonLatestVersionId(): number | null {

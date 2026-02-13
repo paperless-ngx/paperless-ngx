@@ -30,7 +30,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { DeviceDetectorService } from 'ngx-device-detector'
-import { Subject, of, throwError } from 'rxjs'
+import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomFieldDataType } from 'src/app/data/custom-field'
@@ -65,10 +65,6 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
-import {
-  UploadState,
-  WebsocketStatusService,
-} from 'src/app/services/websocket-status.service'
 import { environment } from 'src/environments/environment'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
 import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
@@ -131,24 +127,6 @@ const customFields = [
   },
 ]
 
-function createFileInput(file?: File) {
-  const input = document.createElement('input')
-  input.type = 'file'
-  const files = file
-    ? ({
-        0: file,
-        length: 1,
-        item: () => file,
-      } as unknown as FileList)
-    : ({
-        length: 0,
-        item: () => null,
-      } as unknown as FileList)
-  Object.defineProperty(input, 'files', { value: files })
-  input.value = ''
-  return input
-}
-
 describe('DocumentDetailComponent', () => {
   let component: DocumentDetailComponent
   let fixture: ComponentFixture<DocumentDetailComponent>
@@ -164,7 +142,6 @@ describe('DocumentDetailComponent', () => {
   let deviceDetectorService: DeviceDetectorService
   let httpTestingController: HttpTestingController
   let componentRouterService: ComponentRouterService
-  let websocketStatusService: WebsocketStatusService
 
   let currentUserCan = true
   let currentUserHasObjectPermissions = true
@@ -314,7 +291,6 @@ describe('DocumentDetailComponent', () => {
     fixture = TestBed.createComponent(DocumentDetailComponent)
     httpTestingController = TestBed.inject(HttpTestingController)
     componentRouterService = TestBed.inject(ComponentRouterService)
-    websocketStatusService = TestBed.inject(WebsocketStatusService)
     component = fixture.componentInstance
   })
 
@@ -1675,208 +1651,6 @@ describe('DocumentDetailComponent', () => {
       .error(new ErrorEvent('fail'))
 
     expect(component.previewText).toContain('An error occurred loading content')
-  })
-
-  it('deleteVersion should update versions, fall back, and surface errors', () => {
-    initNormally()
-    httpTestingController.expectOne(component.previewUrl).flush('preview')
-
-    component.document.versions = [
-      {
-        id: 3,
-        added: new Date(),
-        version_label: 'Original',
-        checksum: 'aaaa',
-        is_root: true,
-      },
-      {
-        id: 10,
-        added: new Date(),
-        version_label: 'Edited',
-        checksum: 'bbbb',
-        is_root: false,
-      },
-    ]
-    component.selectedVersionId = 10
-
-    const openDoc = { ...doc, versions: [] } as Document
-    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(openDoc)
-    const saveSpy = jest.spyOn(openDocumentsService, 'save')
-    const deleteSpy = jest.spyOn(documentService, 'deleteVersion')
-    const versionsSpy = jest.spyOn(documentService, 'getVersions')
-    const selectSpy = jest
-      .spyOn(component, 'selectVersion')
-      .mockImplementation(() => {})
-    const errorSpy = jest.spyOn(toastService, 'showError')
-
-    deleteSpy.mockReturnValueOnce(of({ result: 'ok', current_version_id: 99 }))
-    versionsSpy.mockReturnValueOnce(
-      of({ id: doc.id, versions: [{ id: 99, is_root: false }] } as Document)
-    )
-    component.deleteVersion(10)
-
-    expect(component.document.versions).toEqual([{ id: 99, is_root: false }])
-    expect(openDoc.versions).toEqual([{ id: 99, is_root: false }])
-    expect(saveSpy).toHaveBeenCalled()
-    expect(selectSpy).toHaveBeenCalledWith(99)
-
-    component.selectedVersionId = 3
-    deleteSpy.mockReturnValueOnce(
-      of({ result: 'ok', current_version_id: null })
-    )
-    versionsSpy.mockReturnValueOnce(
-      of({
-        id: doc.id,
-        versions: [
-          { id: 7, is_root: false },
-          { id: 9, is_root: false },
-        ],
-      } as Document)
-    )
-    component.deleteVersion(3)
-    expect(selectSpy).toHaveBeenCalledWith(component.documentId)
-
-    deleteSpy.mockReturnValueOnce(throwError(() => new Error('nope')))
-    component.deleteVersion(10)
-    expect(errorSpy).toHaveBeenCalled()
-  })
-
-  it('onVersionFileSelected should cover upload flows and reset status', () => {
-    initNormally()
-    httpTestingController.expectOne(component.previewUrl).flush('preview')
-
-    const uploadSpy = jest.spyOn(documentService, 'uploadVersion')
-    const versionsSpy = jest.spyOn(documentService, 'getVersions')
-    const infoSpy = jest.spyOn(toastService, 'showInfo')
-    const errorSpy = jest.spyOn(toastService, 'showError')
-    const finishedSpy = jest.spyOn(
-      websocketStatusService,
-      'onDocumentConsumptionFinished'
-    )
-    const failedSpy = jest.spyOn(
-      websocketStatusService,
-      'onDocumentConsumptionFailed'
-    )
-    const selectSpy = jest
-      .spyOn(component, 'selectVersion')
-      .mockImplementation(() => {})
-    const openDoc = { ...doc, versions: [] } as Document
-    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(openDoc)
-    const saveSpy = jest.spyOn(openDocumentsService, 'save')
-
-    component.onVersionFileSelected({ target: createFileInput() } as any)
-    expect(uploadSpy).not.toHaveBeenCalled()
-
-    const fileMissing = new File(['data'], 'version.pdf', {
-      type: 'application/pdf',
-    })
-    component.newVersionLabel = '  label  '
-    uploadSpy.mockReturnValueOnce(of({}))
-    component.onVersionFileSelected({
-      target: createFileInput(fileMissing),
-    } as any)
-    expect(uploadSpy).toHaveBeenCalledWith(
-      component.documentId,
-      fileMissing,
-      'label'
-    )
-    expect(component.newVersionLabel).toBe('')
-    expect(component.versionUploadState).toBe(UploadState.Failed)
-    expect(component.versionUploadError).toBe('Missing task ID.')
-    expect(infoSpy).toHaveBeenCalled()
-
-    const finishedFail$ = new Subject<any>()
-    const failedFail$ = new Subject<any>()
-    finishedSpy.mockReturnValueOnce(finishedFail$ as any)
-    failedSpy.mockReturnValueOnce(failedFail$ as any)
-    uploadSpy.mockReturnValueOnce(of('task-1'))
-    component.onVersionFileSelected({
-      target: createFileInput(
-        new File(['data'], 'version.pdf', { type: 'application/pdf' })
-      ),
-    } as any)
-    expect(component.versionUploadState).toBe(UploadState.Processing)
-    failedFail$.next({ taskId: 'task-1', message: 'nope' })
-    expect(component.versionUploadState).toBe(UploadState.Failed)
-    expect(component.versionUploadError).toBe('nope')
-    expect(versionsSpy).not.toHaveBeenCalled()
-
-    const finishedOk$ = new Subject<any>()
-    const failedOk$ = new Subject<any>()
-    finishedSpy.mockReturnValueOnce(finishedOk$ as any)
-    failedSpy.mockReturnValueOnce(failedOk$ as any)
-    uploadSpy.mockReturnValueOnce(of({ task_id: 'task-2' }))
-    const versions = [
-      { id: 7, is_root: false },
-      { id: 12, is_root: false },
-    ] as any
-    versionsSpy.mockReturnValueOnce(of({ id: doc.id, versions } as Document))
-    component.onVersionFileSelected({
-      target: createFileInput(
-        new File(['data'], 'version.pdf', { type: 'application/pdf' })
-      ),
-    } as any)
-    finishedOk$.next({ taskId: 'task-2' })
-
-    expect(component.document.versions).toEqual(versions)
-    expect(openDoc.versions).toEqual(versions)
-    expect(saveSpy).toHaveBeenCalled()
-    expect(selectSpy).toHaveBeenCalledWith(12)
-    expect(component.versionUploadState).toBe(UploadState.Idle)
-    expect(component.versionUploadError).toBeNull()
-
-    component.versionUploadState = UploadState.Failed
-    component.versionUploadError = 'boom'
-    component.clearVersionUploadStatus()
-    expect(component.versionUploadState).toBe(UploadState.Idle)
-    expect(component.versionUploadError).toBeNull()
-
-    uploadSpy.mockReturnValueOnce(throwError(() => new Error('upload blew up')))
-    component.onVersionFileSelected({
-      target: createFileInput(
-        new File(['data'], 'version.pdf', { type: 'application/pdf' })
-      ),
-    } as any)
-    expect(component.versionUploadState).toBe(UploadState.Failed)
-    expect(component.versionUploadError).toBe('upload blew up')
-    expect(errorSpy).toHaveBeenCalled()
-  })
-
-  it('should clear and isolate version upload state on document change', () => {
-    initNormally()
-    httpTestingController.expectOne(component.previewUrl).flush('preview')
-
-    component.versionUploadState = UploadState.Failed
-    component.versionUploadError = 'boom'
-    component.docChangeNotifier.next(999)
-    expect(component.versionUploadState).toBe(UploadState.Idle)
-    expect(component.versionUploadError).toBeNull()
-
-    const uploadSpy = jest.spyOn(documentService, 'uploadVersion')
-    const versionsSpy = jest.spyOn(documentService, 'getVersions')
-    const finished$ = new Subject<any>()
-    const failed$ = new Subject<any>()
-    jest
-      .spyOn(websocketStatusService, 'onDocumentConsumptionFinished')
-      .mockReturnValueOnce(finished$ as any)
-    jest
-      .spyOn(websocketStatusService, 'onDocumentConsumptionFailed')
-      .mockReturnValueOnce(failed$ as any)
-
-    uploadSpy.mockReturnValueOnce(of('task-stale'))
-    component.onVersionFileSelected({
-      target: createFileInput(
-        new File(['data'], 'version.pdf', { type: 'application/pdf' })
-      ),
-    } as any)
-    expect(component.versionUploadState).toBe(UploadState.Processing)
-
-    component.docChangeNotifier.next(1000)
-    failed$.next({ taskId: 'task-stale', message: 'stale-error' })
-
-    expect(component.versionUploadState).toBe(UploadState.Idle)
-    expect(component.versionUploadError).toBeNull()
-    expect(versionsSpy).not.toHaveBeenCalled()
   })
 
   it('createDisabled should return true if the user does not have permission to add the specified data type', () => {

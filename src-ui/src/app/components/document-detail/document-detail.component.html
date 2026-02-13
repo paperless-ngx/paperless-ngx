@@ -24,89 +24,15 @@
     <i-bs width="1.2em" height="1.2em" name="trash"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
   </button>
 
-  @if (document?.versions?.length > 0) {
-    <div class="btn-group" ngbDropdown autoClose="outside">
-      <button class="btn btn-sm btn-outline-secondary dropdown-toggle" ngbDropdownToggle>
-        <i-bs name="file-earmark-diff"></i-bs>
-        <span class="d-none d-lg-inline ps-1" i18n>Versions</span>
-      </button>
-      <div class="dropdown-menu shadow" ngbDropdownMenu>
-        <div class="px-3 py-2">
-          @if (versionUploadState === UploadState.Idle) {
-            <div class="input-group input-group-sm mb-2">
-              <span class="input-group-text" i18n>Label</span>
-              <input class="form-control" type="text" [(ngModel)]="newVersionLabel" i18n-placeholder placeholder="Optional" [disabled]="!userIsOwner || !userCanEdit" />
-            </div>
-            <input #versionFileInput type="file" class="visually-hidden" (change)="onVersionFileSelected($event)" />
-            <button class="btn btn-sm btn-outline-secondary w-100" (click)="versionFileInput.click()" [disabled]="!userIsOwner || !userCanEdit">
-              <i-bs name="file-earmark-plus"></i-bs><span class="ps-1" i18n>Add new version</span>
-            </button>
-          } @else {
-            @switch (versionUploadState) {
-              @case (UploadState.Uploading) {
-                <div class="small text-muted mt-1 d-flex align-items-center">
-                  <output class="spinner-border spinner-border-sm me-2" aria-hidden="true"></output>
-                  <span i18n>Uploading version...</span>
-                </div>
-              }
-              @case (UploadState.Processing) {
-                <div class="small text-muted mt-1 d-flex align-items-center">
-                  <output class="spinner-border spinner-border-sm me-2" aria-hidden="true"></output>
-                  <span i18n>Processing version...</span>
-                </div>
-              }
-              @case (UploadState.Failed) {
-                <div class="small text-danger mt-1 d-flex align-items-center justify-content-between">
-                  <span i18n>Version upload failed.</span>
-                  <button type="button" class="btn btn-link btn-sm p-0 ms-2" (click)="clearVersionUploadStatus()" i18n>Dismiss</button>
-                </div>
-                @if (versionUploadError) {
-                  <div class="small text-muted mt-1">{{ versionUploadError }}</div>
-                }
-              }
-            }
-          }
-        </div>
-        <div class="dropdown-divider"></div>
-        @for (version of document.versions; track version.id) {
-          <div class="dropdown-item">
-            <div class="d-flex align-items-center w-100 version-item">
-              <button type="button" class="btn btn-link link-underline link-underline-opacity-0 d-flex align-items-center flex-grow-1 small ps-0 text-start" (click)="selectVersion(version.id)">
-                <div class="badge bg-light text-lowercase text-muted">
-                  {{ version.checksum | slice:0:8 }}
-                </div>
-                <div class="d-flex flex-column small ms-2">
-                  <div>
-                    @if (version.version_label) {
-                      {{ version.version_label }}
-                    } @else {
-                      <span i18n>ID</span> #{{version.id}}
-                    }
-                  </div>
-                  <div class="text-muted">
-                    {{ version.added | customDate:'short' }}
-                  </div>
-                </div>
-              </button>
-              @if (selectedVersionId === version.id) { <span class="ms-2">✓</span> }
-              @if (!version.is_root) {
-                <pngx-confirm-button
-                  buttonClasses="btn-link btn-sm text-danger ms-2"
-                  iconName="trash"
-                  confirmMessage="Delete this version?"
-                  i18n-confirmMessage
-                  [disabled]="!userIsOwner || !userCanEdit"
-                  (confirm)="deleteVersion(version.id)"
-                >
-                  <span class="visually-hidden" i18n>Delete version</span>
-                </pngx-confirm-button>
-              }
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-  }
+  <pngx-document-version-dropdown
+    [documentId]="documentId"
+    [versions]="document?.versions ?? []"
+    [selectedVersionId]="selectedVersionId"
+    [userIsOwner]="userIsOwner"
+    [userCanEdit]="userCanEdit"
+    (versionSelected)="onVersionSelected($event)"
+    (versionsUpdated)="onVersionsUpdated($event)"
+  />
 
   <div class="btn-group">
     <button (click)="download()" class="btn btn-sm btn-outline-primary" [disabled]="downloading">
