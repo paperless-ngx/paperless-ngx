@@ -15,6 +15,7 @@ on:
 concurrency:
   group: docker-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+permissions: {}
 env:
   REGISTRY: ghcr.io
 jobs:

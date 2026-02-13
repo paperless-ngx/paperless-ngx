@@ -18,6 +18,7 @@ on:
     branches: [dev]
   schedule:
     - cron: '28 13 * * 5'
+permissions: {}
 jobs:
   analyze:
     name: Analyze

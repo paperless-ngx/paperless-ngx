@@ -9,10 +9,13 @@ on:
 concurrency:
   group: lint-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+permissions: {}
 jobs:
   lint:
     name: Linting via prek
     runs-on: ubuntu-slim
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2

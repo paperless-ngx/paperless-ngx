@@ -3,10 +3,7 @@ on:
   schedule:
     - cron: '0 3 * * *'
   workflow_dispatch:
-permissions:
-  issues: write
-  pull-requests: write
-  discussions: write
+permissions: {}
 concurrency:
   group: lock
 jobs:
@@ -14,6 +11,9 @@ jobs:
     name: 'Stale'
     if: github.repository_owner == 'paperless-ngx'
     runs-on: ubuntu-24.04
+    permissions:
+      issues: write
+      pull-requests: write
     steps:
       - uses: actions/stale@v10
         with:
@@ -36,6 +36,10 @@ jobs:
     name: 'Lock Old Threads'
     if: github.repository_owner == 'paperless-ngx'
     runs-on: ubuntu-24.04
+    permissions:
+      issues: write
+      pull-requests: write
+      discussions: write
     steps:
       - uses: dessant/lock-threads@v6
         with:
@@ -56,6 +60,8 @@ jobs:
     name: 'Close Answered Discussions'
     if: github.repository_owner == 'paperless-ngx'
     runs-on: ubuntu-24.04
+    permissions:
+      discussions: write
     steps:
       - uses: actions/github-script@v8
         with:
@@ -113,6 +119,8 @@ jobs:
     name: 'Close Outdated Discussions'
     if: github.repository_owner == 'paperless-ngx'
     runs-on: ubuntu-24.04
+    permissions:
+      discussions: write
     steps:
       - uses: actions/github-script@v8
         with:
@@ -205,6 +213,8 @@ jobs:
     name: 'Close Unsupported Feature Requests'
     if: github.repository_owner == 'paperless-ngx'
     runs-on: ubuntu-24.04
+    permissions:
+      discussions: write
     steps:
       - uses: actions/github-script@v8
         with:

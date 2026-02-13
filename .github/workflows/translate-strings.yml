@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - dev
+permissions: {}
 jobs:
   generate-translate-strings:
     name: Generate Translation Strings

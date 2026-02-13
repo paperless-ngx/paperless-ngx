@@ -7,13 +7,14 @@ on:
     branches:
       - main
       - dev
-permissions:
-  contents: read
+permissions: {}
 jobs:
   pr_opened_or_reopened:
     name: pr_opened_or_reopened
     runs-on: ubuntu-24.04
     permissions:
+      # release-drafter reads its config file from the repo
+      contents: read
       # write permission is required for autolabeler
       pull-requests: write
     if: github.event_name == 'pull_request_target' && (github.event.action == 'opened' || github.event.action == 'reopened') && github.event.pull_request.user.login != 'dependabot'
