@@ -50,6 +50,7 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import Note
 from documents.models import User
+from documents.versioning import get_latest_version_for_root
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -185,16 +186,11 @@ def update_document(writer: AsyncWriter, doc: Document) -> None:
         only_with_perms_in=["view_document"],
     )
     viewer_ids: str = ",".join([str(u.id) for u in users_with_perms])
-    effective_content = doc.content
-    if doc.root_document_id is None:
-        latest_version = (
-            Document.objects.filter(root_document=doc)
-            .only("content")
-            .order_by("-id")
-            .first()
-        )
-        if latest_version is not None:
-            effective_content = latest_version.content
+    effective_content = (
+        get_latest_version_for_root(doc).content
+        if doc.root_document_id is None
+        else doc.content
+    )
     writer.update_document(
         id=doc.pk,
         title=doc.title,

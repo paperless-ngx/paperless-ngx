@@ -206,6 +206,11 @@ from documents.tasks import sanity_check
 from documents.tasks import train_classifier
 from documents.tasks import update_document_parent_tags
 from documents.utils import get_boolean
+from documents.versioning import VersionResolutionError
+from documents.versioning import get_latest_version_for_root
+from documents.versioning import get_request_version_param
+from documents.versioning import get_root_document
+from documents.versioning import resolve_requested_version_for_root
 from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import AIConfig
@@ -834,14 +839,6 @@ class DocumentViewSet(
         )
         return super().get_serializer(*args, **kwargs)
 
-    @staticmethod
-    def _get_root_doc(doc: Document) -> Document:
-        # Use root_document_id to avoid a query when this is already a root.
-        # If root_document isn't available, fall back to the document itself.
-        if doc.root_document_id is None:
-            return doc
-        return doc.root_document or doc
-
     @extend_schema(
         operation_id="documents_root",
         responses=inline_serializer(
@@ -861,7 +858,7 @@ class DocumentViewSet(
         except Document.DoesNotExist:
             raise Http404
 
-        root_doc = self._get_root_doc(doc)
+        root_doc = get_root_document(doc)
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "view_document",
@@ -896,7 +893,7 @@ class DocumentViewSet(
         content_doc = (
             self._resolve_file_doc(root_doc, request)
             if "version" in request.query_params
-            else self._get_latest_doc_for_root(root_doc)
+            else get_latest_version_for_root(root_doc)
         )
         content_updated = "content" in request.data
         updated_content = request.data.get("content") if content_updated else None
@@ -967,31 +964,18 @@ class DocumentViewSet(
         )
 
     def _resolve_file_doc(self, root_doc: Document, request):
-        version_param = request.query_params.get("version")
-        if version_param:
-            try:
-                version_id = int(version_param)
-            except (TypeError, ValueError):
+        if get_request_version_param(request):
+            resolution = resolve_requested_version_for_root(
+                root_doc,
+                request,
+                include_deleted=True,
+            )
+            if resolution.error == VersionResolutionError.INVALID:
                 raise NotFound("Invalid version parameter")
-            try:
-                candidate = Document.global_objects.select_related("owner").get(
-                    id=version_id,
-                )
-            except Document.DoesNotExist:
+            if resolution.document is None:
                 raise Http404
-            if (
-                candidate.id != root_doc.id
-                and candidate.root_document_id != root_doc.id
-            ):
-                raise Http404
-            return candidate
-        latest = Document.objects.filter(root_document=root_doc).order_by("id").last()
-        return latest or root_doc
-
-    @staticmethod
-    def _get_latest_doc_for_root(root_doc: Document) -> Document:
-        latest = Document.objects.filter(root_document=root_doc).order_by("-id").first()
-        return latest or root_doc
+            return resolution.document
+        return get_latest_version_for_root(root_doc)
 
     def _get_effective_file_doc(
         self,
@@ -1015,7 +999,7 @@ class DocumentViewSet(
             "owner",
             "root_document",
         ).get(id=pk)
-        root_doc = self._get_root_doc(request_doc)
+        root_doc = get_root_document(request_doc)
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "view_document",
@@ -1065,7 +1049,7 @@ class DocumentViewSet(
                 "owner",
                 "root_document",
             ).get(pk=pk)
-            root_doc = self._get_root_doc(request_doc)
+            root_doc = get_root_document(request_doc)
             if request.user is not None and not has_perms_owner_aware(
                 request.user,
                 "view_document",
@@ -1251,7 +1235,7 @@ class DocumentViewSet(
                 "owner",
                 "root_document",
             ).get(id=pk)
-            root_doc = self._get_root_doc(request_doc)
+            root_doc = get_root_document(request_doc)
             if request.user is not None and not has_perms_owner_aware(
                 request.user,
                 "view_document",
@@ -1279,7 +1263,7 @@ class DocumentViewSet(
                 "owner",
                 "root_document",
             ).get(id=pk)
-            root_doc = self._get_root_doc(request_doc)
+            root_doc = get_root_document(request_doc)
             if request.user is not None and not has_perms_owner_aware(
                 request.user,
                 "view_document",
@@ -1672,7 +1656,7 @@ class DocumentViewSet(
                 "owner",
                 "root_document",
             ).get(pk=pk)
-            root_doc = self._get_root_doc(root_doc)
+            root_doc = get_root_document(root_doc)
         except Document.DoesNotExist:
             raise Http404
 

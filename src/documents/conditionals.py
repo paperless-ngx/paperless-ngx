@@ -13,59 +13,7 @@ from documents.caching import CLASSIFIER_VERSION_KEY
 from documents.caching import get_thumbnail_modified_key
 from documents.classifier import DocumentClassifier
 from documents.models import Document
-
-
-def _resolve_effective_doc(pk: int, request) -> Document | None:
-    """
-    Resolve which Document row should be considered for caching keys:
-    - If a version is requested, use that version
-    - If pk is a root doc, use its newest child version if present, else the root.
-    - Else, pk is a version, use that version.
-    Returns None if resolution fails (treat as no-cache).
-    """
-    try:
-        request_doc = Document.objects.only("id", "root_document_id").get(pk=pk)
-    except Document.DoesNotExist:
-        return None
-
-    root_doc = (
-        request_doc
-        if request_doc.root_document_id is None
-        else Document.objects.only("id").get(id=request_doc.root_document_id)
-    )
-
-    version_param = (
-        request.query_params.get("version")
-        if hasattr(request, "query_params")
-        else None
-    )
-    if version_param:
-        try:
-            version_id = int(version_param)
-            candidate = Document.objects.only("id", "root_document_id").get(
-                id=version_id,
-            )
-            if (
-                candidate.id != root_doc.id
-                and candidate.root_document_id != root_doc.id
-            ):
-                return None
-            return candidate
-        except Exception:
-            return None
-
-    # Default behavior: if pk is a root doc, prefer its newest child version
-    if request_doc.root_document_id is None:
-        latest = (
-            Document.objects.filter(root_document=root_doc)
-            .only("id")
-            .order_by("id")
-            .last()
-        )
-        return latest or root_doc
-
-    # pk is already a version
-    return request_doc
+from documents.versioning import resolve_effective_document_by_pk
 
 
 def suggestions_etag(request, pk: int) -> str | None:
@@ -125,7 +73,7 @@ def metadata_etag(request, pk: int) -> str | None:
     Metadata is extracted from the original file, so use its checksum as the
     ETag
     """
-    doc = _resolve_effective_doc(pk, request)
+    doc = resolve_effective_document_by_pk(pk, request).document
     if doc is None:
         return None
     return doc.checksum
@@ -137,7 +85,7 @@ def metadata_last_modified(request, pk: int) -> datetime | None:
     not the modification of the original file, but of the database object, but might as well
     error on the side of more cautious
     """
-    doc = _resolve_effective_doc(pk, request)
+    doc = resolve_effective_document_by_pk(pk, request).document
     if doc is None:
         return None
     return doc.modified
@@ -147,7 +95,7 @@ def preview_etag(request, pk: int) -> str | None:
     """
     ETag for the document preview, using the original or archive checksum, depending on the request
     """
-    doc = _resolve_effective_doc(pk, request)
+    doc = resolve_effective_document_by_pk(pk, request).document
     if doc is None:
         return None
     use_original = (
@@ -163,7 +111,7 @@ def preview_last_modified(request, pk: int) -> datetime | None:
     Uses the documents modified time to set the Last-Modified header.  Not strictly
     speaking correct, but close enough and quick
     """
-    doc = _resolve_effective_doc(pk, request)
+    doc = resolve_effective_document_by_pk(pk, request).document
     if doc is None:
         return None
     return doc.modified
@@ -175,7 +123,7 @@ def thumbnail_last_modified(request: Any, pk: int) -> datetime | None:
     Cache should be (slightly?) faster than filesystem
     """
     try:
-        doc = _resolve_effective_doc(pk, request)
+        doc = resolve_effective_document_by_pk(pk, request).document
         if doc is None:
             return None
         if not doc.thumbnail_path.exists():
@@ -195,5 +143,5 @@ def thumbnail_last_modified(request: Any, pk: int) -> datetime | None:
         )
         cache.set(doc_key, last_modified, CACHE_50_MINUTES)
         return last_modified
-    except Document.DoesNotExist:  # pragma: no cover
+    except (Document.DoesNotExist, OSError):  # pragma: no cover
         return None

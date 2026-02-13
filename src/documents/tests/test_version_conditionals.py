@@ -3,12 +3,12 @@ from unittest import mock
 
 from django.test import TestCase
 
-from documents.conditionals import _resolve_effective_doc
 from documents.conditionals import metadata_etag
 from documents.conditionals import preview_etag
 from documents.conditionals import thumbnail_last_modified
 from documents.models import Document
 from documents.tests.utils import DirectoriesMixin
+from documents.versioning import resolve_effective_document_by_pk
 
 
 class TestConditionals(DirectoriesMixin, TestCase):
@@ -56,8 +56,12 @@ class TestConditionals(DirectoriesMixin, TestCase):
             query_params={"version": str(other_version.id)},
         )
 
-        self.assertIsNone(_resolve_effective_doc(root.id, invalid_request))
-        self.assertIsNone(_resolve_effective_doc(root.id, unrelated_request))
+        self.assertIsNone(
+            resolve_effective_document_by_pk(root.id, invalid_request).document,
+        )
+        self.assertIsNone(
+            resolve_effective_document_by_pk(root.id, unrelated_request).document,
+        )
 
     def test_thumbnail_last_modified_uses_effective_document_for_cache_key(
         self,
