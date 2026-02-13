@@ -52,11 +52,11 @@ test('dashboard saved view document links', async ({ page }) => {
 test('test slim sidebar', async ({ page }) => {
   await page.routeFromHAR(REQUESTS_HAR1, { notFound: 'fallback' })
   await page.goto('/dashboard')
-  await page.locator('#sidebarMenu').getByRole('button').click()
+  await page.locator('.sidebar-slim-toggler').click()
   await expect(
     page.getByRole('link', { name: 'Dashboard' }).getByText('Dashboard')
   ).toBeHidden()
-  await page.locator('#sidebarMenu').getByRole('button').click()
+  await page.locator('.sidebar-slim-toggler').click()
   await expect(
     page.getByRole('link', { name: 'Dashboard' }).getByText('Dashboard')
   ).toBeVisible()

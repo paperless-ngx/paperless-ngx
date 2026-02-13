@@ -33,6 +33,7 @@ const mail_rules = [
     action: MailAction.MarkRead,
     assign_title_from: MailMetadataTitleOption.FromSubject,
     assign_owner_from_rule: true,
+    stop_processing: false,
   },
   {
     name: 'Mail Rule 2',
@@ -52,6 +53,7 @@ const mail_rules = [
     action: MailAction.Delete,
     assign_title_from: MailMetadataTitleOption.FromSubject,
     assign_owner_from_rule: true,
+    stop_processing: false,
   },
   {
     name: 'Mail Rule 3',
@@ -71,6 +73,7 @@ const mail_rules = [
     action: MailAction.Flag,
     assign_title_from: MailMetadataTitleOption.FromSubject,
     assign_owner_from_rule: false,
+    stop_processing: false,
   },
 ]
 

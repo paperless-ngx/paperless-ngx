@@ -1,4 +1,4 @@
-import { NgClass, NgTemplateOutlet, TitleCasePipe } from '@angular/common'
+import { NgClass, NgTemplateOutlet } from '@angular/common'
 import { Component, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { RouterModule } from '@angular/router'
@@ -7,25 +7,21 @@ import {
   NgbPaginationModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { TagEditDialogComponent } from 'src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
 import { Tag } from 'src/app/data/tag'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { PermissionType } from 'src/app/services/permissions.service'
 import { TagService } from 'src/app/services/rest/tag.service'
-import { ClearableBadgeComponent } from '../../common/clearable-badge/clearable-badge.component'
-import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
-import { PageHeaderComponent } from '../../common/page-header/page-header.component'
-import { ManagementListComponent } from '../management-list/management-list.component'
+import { ManagementListComponent } from '../management-list.component'
 
 @Component({
   selector: 'pngx-tag-list',
-  templateUrl: './../management-list/management-list.component.html',
-  styleUrls: ['./../management-list/management-list.component.scss'],
+  templateUrl: './../management-list.component.html',
+  styleUrls: ['./../management-list.component.scss'],
   imports: [
     SortableDirective,
-    PageHeaderComponent,
-    TitleCasePipe,
     IfPermissionsDirective,
     FormsModule,
     ReactiveFormsModule,
@@ -35,7 +31,6 @@ import { ManagementListComponent } from '../management-list/management-list.comp
     NgbDropdownModule,
     NgbPaginationModule,
     NgxBootstrapIconsModule,
-    ClearableBadgeComponent,
   ],
 })
 export class TagListComponent extends ManagementListComponent<Tag> {

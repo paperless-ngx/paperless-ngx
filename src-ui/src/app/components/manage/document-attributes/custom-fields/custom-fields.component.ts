@@ -7,6 +7,10 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { delay, takeUntil, tap } from 'rxjs'
+import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
+import { CustomFieldEditDialogComponent } from 'src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { EditDialogMode } from 'src/app/components/common/edit-dialog/edit-dialog.component'
+import { LoadingComponentWithPermissions } from 'src/app/components/loading-component/loading.component'
 import { CustomField, DATA_TYPE_LABELS } from 'src/app/data/custom-field'
 import {
   CustomFieldQueryLogicalOperator,
@@ -21,18 +25,12 @@ import { DocumentService } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
-import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
-import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
-import { PageHeaderComponent } from '../../common/page-header/page-header.component'
-import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
   selector: 'pngx-custom-fields',
   templateUrl: './custom-fields.component.html',
   styleUrls: ['./custom-fields.component.scss'],
   imports: [
-    PageHeaderComponent,
     IfPermissionsDirective,
     NgbDropdownModule,
     NgbPaginationModule,
@@ -44,14 +42,14 @@ export class CustomFieldsComponent
   extends LoadingComponentWithPermissions
   implements OnInit
 {
-  private customFieldsService = inject(CustomFieldsService)
-  permissionsService = inject(PermissionsService)
-  private modalService = inject(NgbModal)
-  private toastService = inject(ToastService)
-  private documentListViewService = inject(DocumentListViewService)
-  private settingsService = inject(SettingsService)
-  private documentService = inject(DocumentService)
-  private savedViewService = inject(SavedViewService)
+  private readonly customFieldsService = inject(CustomFieldsService)
+  public readonly permissionsService = inject(PermissionsService)
+  private readonly modalService = inject(NgbModal)
+  private readonly toastService = inject(ToastService)
+  private readonly documentListViewService = inject(DocumentListViewService)
+  private readonly settingsService = inject(SettingsService)
+  private readonly documentService = inject(DocumentService)
+  private readonly savedViewService = inject(SavedViewService)
 
   public fields: CustomField[] = []
 

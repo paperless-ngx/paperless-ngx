@@ -44,12 +44,12 @@ import { BulkEditObjectOperation } from 'src/app/services/rest/abstract-name-fil
 import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
-import { EditDialogComponent } from '../../common/edit-dialog/edit-dialog.component'
-import { PageHeaderComponent } from '../../common/page-header/page-header.component'
-import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
-import { TagListComponent } from '../tag-list/tag-list.component'
+import { ConfirmDialogComponent } from '../../../common/confirm-dialog/confirm-dialog.component'
+import { EditDialogComponent } from '../../../common/edit-dialog/edit-dialog.component'
+import { PageHeaderComponent } from '../../../common/page-header/page-header.component'
+import { PermissionsDialogComponent } from '../../../common/permissions-dialog/permissions-dialog.component'
 import { ManagementListComponent } from './management-list.component'
+import { TagListComponent } from './tag-list/tag-list.component'
 
 const tags: Tag[] = [
   {
@@ -304,12 +304,12 @@ describe('ManagementListComponent', () => {
   })
 
   it('selectPage should select current page items or clear selection', () => {
-    component.selectPage(true)
+    component.selectPage()
     expect(component.selectedObjects).toEqual(new Set(tags.map((t) => t.id)))
     expect(component.togggleAll).toBe(true)
 
     component.togggleAll = true
-    component.selectPage(false)
+    component.clearSelection()
     expect(component.selectedObjects.size).toBe(0)
     expect(component.togggleAll).toBe(false)
   })

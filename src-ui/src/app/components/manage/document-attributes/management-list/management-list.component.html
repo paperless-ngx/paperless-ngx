@@ -1,50 +1,3 @@
-<pngx-page-header title="{{ typeNamePlural | titlecase }}" info="View, add, edit and delete {{ typeNamePlural }}." infoLink="usage/#terms-and-definitions" [loading]="loading">
-
-  <div ngbDropdown class="btn-group flex-fill d-sm-none">
-    <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle>
-      <i-bs name="text-indent-left"></i-bs>
-      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Select</ng-container></div>
-      @if (selectedObjects.size > 0) {
-        <pngx-clearable-badge [selected]="selectedObjects.size > 0" [number]="selectedObjects.size" (cleared)="selectNone()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
-      }
-    </button>
-    <div ngbDropdownMenu aria-labelledby="dropdownSelectMobile" class="shadow">
-      <button ngbDropdownItem (click)="selectNone()" i18n>Select none</button>
-      <button ngbDropdownItem (click)="selectPage(true)" i18n>Select page</button>
-      <button ngbDropdownItem (click)="selectAll()" i18n>Select all</button>
-    </div>
-  </div>
-
-  <div class="d-none d-sm-flex flex-fill me-3">
-    <div class="input-group input-group-sm">
-      <span class="input-group-text border-0" i18n>Select:</span>
-    </div>
-    <div class="btn-group btn-group-sm flex-nowrap">
-      @if (selectedObjects.size > 0) {
-        <button class="btn btn-sm btn-outline-secondary" (click)="selectNone()">
-          <i-bs name="slash-circle"></i-bs>&nbsp;<ng-container i18n>None</ng-container>
-        </button>
-      }
-      <button class="btn btn-sm btn-outline-primary" (click)="selectPage(true)">
-        <i-bs name="file-earmark-check"></i-bs>&nbsp;<ng-container i18n>Page</ng-container>
-      </button>
-      <button class="btn btn-sm btn-outline-primary" (click)="selectAll()">
-        <i-bs name="check-all"></i-bs>&nbsp;<ng-container i18n>All</ng-container>
-      </button>
-    </div>
-  </div>
-
-  <button type="button" class="btn btn-sm btn-outline-primary" (click)="setPermissions()" [disabled]="!userCanBulkEdit(PermissionAction.Change) || selectedObjects.size === 0">
-    <i-bs name="person-fill-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
-  </button>
-  <button type="button" class="btn btn-sm btn-outline-danger" (click)="delete()" [disabled]="!userCanBulkEdit(PermissionAction.Delete) || selectedObjects.size === 0">
-    <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
-  </button>
-  <button type="button" class="btn btn-sm btn-outline-primary ms-md-5" (click)="openCreateDialog()" *pngxIfPermissions="{ action: PermissionAction.Add, type: permissionType }">
-    <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Create</ng-container>
-  </button>
-</pngx-page-header>
-
 <div class="row mb-3">
   <div class="col mb-2 mb-xl-0">
     <div class="form-inline d-flex align-items-center">
@@ -76,19 +29,19 @@
   <table class="table table-striped align-middle shadow-sm mb-0">
     <thead>
       <tr>
-        <th scope="col">
+        <th>
           <div class="form-check m-0 ms-2 me-n2">
-            <input type="checkbox" class="form-check-input" id="all-objects" [(ngModel)]="togggleAll" [disabled]="data.length === 0" (change)="selectPage($event.target.checked); $event.stopPropagation();">
+            <input type="checkbox" class="form-check-input" id="all-objects" [(ngModel)]="togggleAll" [disabled]="data.length === 0" (change)="$event.target.checked ? selectPage() : clearSelection(); $event.stopPropagation();">
             <label class="form-check-label" for="all-objects"></label>
           </div>
         </th>
-        <th scope="col" class="fw-normal" pngxSortable="name" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name</th>
-        <th scope="col" class="fw-normal d-none d-sm-table-cell" pngxSortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th>
-        <th scope="col" class="fw-normal" pngxSortable="document_count" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Document count</th>
+        <th class="fw-normal" pngxSortable="name" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name</th>
+        <th class="fw-normal d-none d-sm-table-cell" pngxSortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th>
+        <th class="fw-normal" pngxSortable="document_count" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Document count</th>
         @for (column of extraColumns; track column) {
-          <th scope="col" class="fw-normal" [ngClass]="{ 'd-none d-sm-table-cell' : column.hideOnMobile }" pngxSortable="{{column.key}}" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)">{{column.name}}</th>
+          <th class="fw-normal" [ngClass]="{ 'd-none d-sm-table-cell' : column.hideOnMobile }" pngxSortable="{{column.key}}" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)">{{column.name}}</th>
         }
-        <th scope="col" class="fw-normal" i18n>Actions</th>
+        <th class="fw-normal" i18n>Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -131,16 +84,16 @@
         <label class="form-check-label" for="{{typeName}}{{object.id}}"></label>
       </div>
     </td>
-    <td scope="row" class="name-cell" style="--depth: {{depth}}">
+    <td class="name-cell" style="--depth: {{depth}}">
       @if (depth > 0) {
         <div class="indicator"></div>
       }
       <button class="btn btn-link ms-0 ps-0 text-start" (click)="userCanEdit(object) ? openEditDialog(object) : null; $event.stopPropagation()">{{ object.name }}</button>
     </td>
-    <td scope="row" class="d-none d-sm-table-cell">{{ getMatching(object) }}</td>
-    <td scope="row">{{ getDocumentCount(object) }}</td>
+    <td class="d-none d-sm-table-cell">{{ getMatching(object) }}</td>
+    <td>{{ getDocumentCount(object) }}</td>
     @for (column of extraColumns; track column) {
-      <td scope="row" [ngClass]="{ 'd-none d-sm-table-cell' : column.hideOnMobile }">
+      <td [ngClass]="{ 'd-none d-sm-table-cell' : column.hideOnMobile }">
         @if (column.badgeFn) {
           <span
             class="badge"
@@ -156,7 +109,7 @@
         }
       </td>
     }
-    <td scope="row">
+    <td>
       <div class="btn-toolbar gap-2">
         <div class="btn-group d-block d-sm-none">
           <div ngbDropdown container="body" class="d-inline-block">

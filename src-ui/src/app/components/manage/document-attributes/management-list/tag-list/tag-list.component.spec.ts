@@ -9,7 +9,7 @@ import { of } from 'rxjs'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { TagService } from 'src/app/services/rest/tag.service'
-import { PageHeaderComponent } from '../../common/page-header/page-header.component'
+import { PageHeaderComponent } from '../../../../common/page-header/page-header.component'
 import { TagListComponent } from './tag-list.component'
 
 describe('TagListComponent', () => {
@@ -138,12 +138,12 @@ describe('TagListComponent', () => {
     }
 
     component.data = [parent as any]
-    component.selectPage(true)
+    component.selectPage()
 
     expect(component.selectedObjects.has(10)).toBe(true)
     expect(component.selectedObjects.has(11)).toBe(true)
 
-    component.selectPage(false)
+    component.clearSelection()
     expect(component.selectedObjects.size).toBe(0)
   })
 })
