@@ -50,7 +50,6 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import Note
 from documents.models import User
-from documents.versioning import get_latest_version_for_root
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -159,7 +158,11 @@ def open_index_searcher() -> Searcher:
         searcher.close()
 
 
-def update_document(writer: AsyncWriter, doc: Document) -> None:
+def update_document(
+    writer: AsyncWriter,
+    doc: Document,
+    effective_content: str | None = None,
+) -> None:
     tags = ",".join([t.name for t in doc.tags.all()])
     tags_ids = ",".join([str(t.id) for t in doc.tags.all()])
     notes = ",".join([str(c.note) for c in Note.objects.filter(document=doc)])
@@ -186,15 +189,10 @@ def update_document(writer: AsyncWriter, doc: Document) -> None:
         only_with_perms_in=["view_document"],
     )
     viewer_ids: str = ",".join([str(u.id) for u in users_with_perms])
-    effective_content = (
-        get_latest_version_for_root(doc).content
-        if doc.root_document_id is None
-        else doc.content
-    )
     writer.update_document(
         id=doc.pk,
         title=doc.title,
-        content=effective_content,
+        content=effective_content or doc.content,
         correspondent=doc.correspondent.name if doc.correspondent else None,
         correspondent_id=doc.correspondent.id if doc.correspondent else None,
         has_correspondent=doc.correspondent is not None,
@@ -237,9 +235,12 @@ def remove_document_by_id(writer: AsyncWriter, doc_id) -> None:
     writer.delete_by_term("id", doc_id)
 
 
-def add_or_update_document(document: Document) -> None:
+def add_or_update_document(
+    document: Document,
+    effective_content: str | None = None,
+) -> None:
     with open_index_writer() as writer:
-        update_document(writer, document)
+        update_document(writer, document, effective_content=effective_content)
 
 
 def remove_document_from_index(document: Document) -> None:

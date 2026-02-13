@@ -232,3 +232,7 @@ class TestTaskSignalHandler(DirectoriesMixin, TestCase):
         self.assertEqual(add.call_count, 2)
         self.assertEqual(add.call_args_list[0].args[0].id, version.id)
         self.assertEqual(add.call_args_list[1].args[0].id, root.id)
+        self.assertEqual(
+            add.call_args_list[1].kwargs,
+            {"effective_content": version.content},
+        )
