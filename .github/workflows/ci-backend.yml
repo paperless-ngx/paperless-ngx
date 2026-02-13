@@ -22,6 +22,7 @@ on:
 concurrency:
   group: backend-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+permissions: {}
 env:
   DEFAULT_UV_VERSION: "0.10.x"
   NLTK_DATA: "/usr/share/nltk_data"
@@ -29,6 +30,8 @@ jobs:
   test:
     name: "Python ${{ matrix.python-version }}"
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     strategy:
       matrix:
         python-version: ['3.10', '3.11', '3.12']
@@ -102,6 +105,8 @@ jobs:
   typing:
     name: Check project typing
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     env:
       DEFAULT_PYTHON: "3.12"
     steps:

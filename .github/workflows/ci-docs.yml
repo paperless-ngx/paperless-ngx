@@ -21,10 +21,7 @@ on:
 concurrency:
   group: docs-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+permissions: {}
 env:
   DEFAULT_UV_VERSION: "0.10.x"
   DEFAULT_PYTHON_VERSION: "3.12"
@@ -32,6 +29,8 @@ jobs:
   build:
     name: Build Documentation
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - uses: actions/configure-pages@v5
       - name: Checkout
@@ -67,6 +66,10 @@ jobs:
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

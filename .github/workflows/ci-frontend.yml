@@ -16,10 +16,13 @@ on:
 concurrency:
   group: frontend-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+permissions: {}
 jobs:
   install-dependencies:
     name: Install Dependencies
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -47,6 +50,8 @@ jobs:
     name: Lint
     needs: install-dependencies
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -75,6 +80,8 @@ jobs:
     name: "Unit Tests (${{ matrix.shard-index }}/${{ matrix.shard-count }})"
     needs: install-dependencies
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -121,6 +128,8 @@ jobs:
     name: "E2E Tests (${{ matrix.shard-index }}/${{ matrix.shard-count }})"
     needs: install-dependencies
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     container: mcr.microsoft.com/playwright:v1.58.2-noble
     env:
       PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
@@ -161,6 +170,8 @@ jobs:
     name: Bundle Analysis
     needs: [unit-tests, e2e-tests]
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v6
