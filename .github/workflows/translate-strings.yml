@@ -11,7 +11,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
         env:
           GH_REF: ${{ github.ref }} # sonar rule:githubactions:S7630 - avoid injection
         with:
@@ -19,13 +19,13 @@ jobs:
           ref: ${{ env.GH_REF }}
       - name: Set up Python
         id: setup-python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v6.2.0
       - name: Install system dependencies
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends gettext
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v7.3.0
         with:
           enable-cache: true
       - name: Install backend python dependencies
@@ -36,18 +36,18 @@ jobs:
       - name: Generate backend translation strings
         run: cd src/ && uv run manage.py makemessages -l en_US -i "samples*"
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v4.2.0
         with:
           version: 10
       - name: Use Node.js 24
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.2.0
         with:
           node-version: 24.x
           cache: 'pnpm'
           cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       - name: Cache frontend dependencies
         id: cache-frontend-deps
-        uses: actions/cache@v5
+        uses: actions/cache@v5.0.3
         with:
           path: |
             ~/.pnpm-store
@@ -63,7 +63,7 @@ jobs:
           cd src-ui
           pnpm run ng extract-i18n
       - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v7
+        uses: stefanzweifel/git-auto-commit-action@v7.1.0
         with:
           file_pattern: 'src-ui/messages.xlf src/locale/en_US/LC_MESSAGES/django.po'
           commit_message: "Auto translate strings"
