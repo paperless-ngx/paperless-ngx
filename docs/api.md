@@ -315,13 +315,13 @@ The following methods are supported:
             -   `"doc": OUTPUT_DOCUMENT_INDEX` Optional index of the output document for split operations.
     -   Optional `parameters`:
         -   `"delete_original": true` to delete the original documents after editing.
-        -   `"update_document": true` to add the edited PDF as a new version of the selected/root document.
+        -   `"update_document": true` to add the edited PDF as a new version of the root document.
         -   `"include_metadata": true` to copy metadata from the original document to the edited document.
 -   `remove_password`
     -   Requires `parameters`:
         -   `"password": "PASSWORD_STRING"` The password to remove from the PDF documents.
     -   Optional `parameters`:
-        -   `"update_document": true` to add the password-less PDF as a new version of the selected/root document.
+        -   `"update_document": true` to add the password-less PDF as a new version of the root document.
         -   `"delete_original": true` to delete the original document after editing.
         -   `"include_metadata": true` to copy metadata from the original document to the new password-less document.
 -   `merge`
