@@ -964,18 +964,17 @@ class DocumentViewSet(
         )
 
     def _resolve_file_doc(self, root_doc: Document, request):
-        if get_request_version_param(request):
-            resolution = resolve_requested_version_for_root(
-                root_doc,
-                request,
-                include_deleted=True,
-            )
-            if resolution.error == VersionResolutionError.INVALID:
-                raise NotFound("Invalid version parameter")
-            if resolution.document is None:
-                raise Http404
-            return resolution.document
-        return get_latest_version_for_root(root_doc)
+        version_requested = get_request_version_param(request) is not None
+        resolution = resolve_requested_version_for_root(
+            root_doc,
+            request,
+            include_deleted=version_requested,
+        )
+        if resolution.error == VersionResolutionError.INVALID:
+            raise NotFound("Invalid version parameter")
+        if resolution.document is None:
+            raise Http404
+        return resolution.document
 
     def _get_effective_file_doc(
         self,
@@ -983,16 +982,12 @@ class DocumentViewSet(
         root_doc: Document,
         request: Request,
     ) -> Document:
-        # If a version is explicitly requested, use it. Otherwise:
-        # - if pk is a root document: serve newest version
-        # - if pk is a version: serve that version
-        if "version" in request.query_params:
-            return self._resolve_file_doc(root_doc, request)
-        return (
-            self._resolve_file_doc(root_doc, request)
-            if request_doc.root_document_id is None
-            else request_doc
-        )
+        if (
+            request_doc.root_document_id is not None
+            and get_request_version_param(request) is None
+        ):
+            return request_doc
+        return self._resolve_file_doc(root_doc, request)
 
     def file_response(self, pk, request, disposition):
         request_doc = Document.global_objects.select_related(
