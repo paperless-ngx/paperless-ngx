@@ -2017,6 +2017,8 @@ class BulkEditView(PassUserMixin):
         "modify_custom_fields": "custom_fields",
         "set_permissions": None,
         "delete": "deleted_at",
+        # These operations create new documents/versions no longer altering
+        # fields on the selected document in place
         "rotate": None,
         "delete_pages": None,
         "split": None,
