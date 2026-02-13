@@ -175,44 +175,60 @@
             <span i18n>Manage</span>
           </h6>
           <ul class="nav flex-column mb-2">
-            <li class="nav-item app-link"
-              *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }">
-              <a class="nav-link" routerLink="correspondents" routerLinkActive="active" (click)="closeMenu()"
-                ngbPopover="Correspondents" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
-                container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-1" name="person"></i-bs><span>&nbsp;<ng-container i18n>Correspondents</ng-container></span>
-              </a>
-            </li>
-            <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"
-              tourAnchor="tour.tags">
-              <a class="nav-link" routerLink="tags" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Tags"
-                i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body"
-                triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-1" name="tags"></i-bs><span>&nbsp;<ng-container i18n>Tags</ng-container></span>
-              </a>
-            </li>
-            <li class="nav-item app-link"
-              *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }">
-              <a class="nav-link" routerLink="documenttypes" routerLinkActive="active" (click)="closeMenu()"
-                ngbPopover="Document Types" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
-                container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-1" name="hash"></i-bs><span>&nbsp;<ng-container i18n>Document Types</ng-container></span>
-              </a>
-            </li>
-            <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }">
-              <a class="nav-link" routerLink="storagepaths" routerLinkActive="active" (click)="closeMenu()"
-                ngbPopover="Storage Paths" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
-                container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-1" name="folder"></i-bs><span>&nbsp;<ng-container i18n>Storage Paths</ng-container></span>
-              </a>
-            </li>
-            <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }">
-              <a class="nav-link" routerLink="customfields" routerLinkActive="active" (click)="closeMenu()"
-                ngbPopover="Custom Fields" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
-                container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-1" name="ui-radios"></i-bs><span>&nbsp;<ng-container i18n>Custom Fields</ng-container></span>
-              </a>
-            </li>
+            @if (canManageAttributes) {
+              <li class="nav-item app-link" tourAnchor="tour.tags">
+                <div class="d-flex align-items-center attributes-row">
+                  <a class="nav-link flex-fill" routerLink="attributes" routerLinkActive="active" (click)="closeMenu()"
+                    ngbPopover="Attributes" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
+                    container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+                    <i-bs class="me-1" name="stack"></i-bs><span>&nbsp;<ng-container i18n>Attributes</ng-container></span>
+                  </a>
+                  @if (!slimSidebarEnabled) {
+                    <button
+                      type="button"
+                      class="btn btn-link btn-sm text-muted p-0 me-3 attributes-expand-btn"
+                      (click)="toggleAttributesSections($event)"
+                      [attr.aria-label]="attributesSectionsCollapsed ? 'Expand attributes sections' : 'Collapse attributes sections'"
+                      i18n-aria-label
+                    >
+                      <i-bs [name]="attributesSectionsCollapsed ? 'plus-circle' : 'dash-circle'"></i-bs>
+                    </button>
+                  }
+                </div>
+                <div
+                  class="attributes-submenu ms-2"
+                  [ngbCollapse]="slimSidebarEnabled || attributesSectionsCollapsed"
+                >
+                  <ul class="nav flex-column">
+                    <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }">
+                      <a class="nav-link py-1" routerLink="attributes/tags" routerLinkActive="active" (click)="closeMenu()">
+                        <i-bs class="me-1" name="tags"></i-bs><span>&nbsp;<ng-container i18n>Tags</ng-container></span>
+                      </a>
+                    </li>
+                    <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }">
+                      <a class="nav-link py-1" routerLink="attributes/correspondents" routerLinkActive="active" (click)="closeMenu()">
+                        <i-bs class="me-1" name="person"></i-bs><span>&nbsp;<ng-container i18n>Correspondents</ng-container></span>
+                      </a>
+                    </li>
+                    <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }">
+                      <a class="nav-link py-1" routerLink="attributes/documenttypes" routerLinkActive="active" (click)="closeMenu()">
+                        <i-bs class="me-1" name="hash"></i-bs><span>&nbsp;<ng-container i18n>Document types</ng-container></span>
+                      </a>
+                    </li>
+                    <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }">
+                      <a class="nav-link py-1" routerLink="attributes/storagepaths" routerLinkActive="active" (click)="closeMenu()">
+                        <i-bs class="me-1" name="folder"></i-bs><span>&nbsp;<ng-container i18n>Storage paths</ng-container></span>
+                      </a>
+                    </li>
+                    <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }">
+                      <a class="nav-link py-1" routerLink="attributes/customfields" routerLinkActive="active" (click)="closeMenu()">
+                        <i-bs class="me-1" name="ui-radios"></i-bs><span>&nbsp;<ng-container i18n>Custom fields</ng-container></span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            }
             <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
               <a class="nav-link" routerLink="savedviews" routerLinkActive="active" (click)="closeMenu()"
                 ngbPopover="Saved Views" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"

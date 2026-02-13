@@ -26,9 +26,9 @@ import { PermissionsService } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
-import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
-import { PageHeaderComponent } from '../../common/page-header/page-header.component'
+import { ConfirmDialogComponent } from '../../../common/confirm-dialog/confirm-dialog.component'
+import { CustomFieldEditDialogComponent } from '../../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { PageHeaderComponent } from '../../../common/page-header/page-header.component'
 import { CustomFieldsComponent } from './custom-fields.component'
 
 const fields: CustomField[] = [
@@ -110,10 +110,7 @@ describe('CustomFieldsComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reload')
 
-    const createButton = fixture.debugElement
-      .queryAll(By.css('button'))
-      .find((btn) => btn.nativeElement.textContent.trim().includes('Add Field'))
-    createButton.triggerEventHandler('click')
+    component.editField()
 
     expect(modal).not.toBeUndefined()
     const editDialog = modal.componentInstance as CustomFieldEditDialogComponent
