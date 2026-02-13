@@ -1653,6 +1653,58 @@ describe('DocumentDetailComponent', () => {
     expect(component.previewText).toContain('An error occurred loading content')
   })
 
+  it('selectVersion should show toast if version content retrieval fails', () => {
+    initNormally()
+    httpTestingController.expectOne(component.previewUrl).flush('preview')
+
+    jest.spyOn(documentService, 'getPreviewUrl').mockReturnValue('preview-ok')
+    jest.spyOn(documentService, 'getThumbUrl').mockReturnValue('thumb-ok')
+    jest
+      .spyOn(documentService, 'getMetadata')
+      .mockReturnValue(of({ has_archive_version: true } as any))
+    const contentError = new Error('content failed')
+    jest
+      .spyOn(documentService, 'get')
+      .mockReturnValue(throwError(() => contentError))
+    const toastSpy = jest.spyOn(toastService, 'showError')
+
+    component.selectVersion(10)
+    httpTestingController.expectOne('preview-ok').flush('preview text')
+
+    expect(toastSpy).toHaveBeenCalledWith(
+      'Error retrieving version content',
+      contentError
+    )
+  })
+
+  it('onVersionSelected should delegate to selectVersion', () => {
+    const selectVersionSpy = jest
+      .spyOn(component, 'selectVersion')
+      .mockImplementation(() => {})
+
+    component.onVersionSelected(42)
+
+    expect(selectVersionSpy).toHaveBeenCalledWith(42)
+  })
+
+  it('onVersionsUpdated should sync open document versions and save', () => {
+    component.documentId = doc.id
+    component.document = { ...doc, versions: [] } as Document
+    const updatedVersions = [
+      { id: doc.id, is_root: true },
+      { id: 10, is_root: false },
+    ] as any
+    const openDoc = { ...doc, versions: [] } as Document
+    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(openDoc)
+    const saveSpy = jest.spyOn(openDocumentsService, 'save')
+
+    component.onVersionsUpdated(updatedVersions)
+
+    expect(component.document.versions).toEqual(updatedVersions)
+    expect(openDoc.versions).toEqual(updatedVersions)
+    expect(saveSpy).toHaveBeenCalled()
+  })
+
   it('createDisabled should return true if the user does not have permission to add the specified data type', () => {
     currentUserCan = false
     expect(component.createDisabled(DataType.Correspondent)).toBeTruthy()

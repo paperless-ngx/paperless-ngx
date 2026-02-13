@@ -178,6 +178,40 @@ describe('DocumentVersionDropdownComponent', () => {
     expect(documentService.getVersions).not.toHaveBeenCalled()
   })
 
+  it('onVersionFileSelected should fail when backend response has no task id', () => {
+    const file = new File(['test'], 'new-version.pdf', {
+      type: 'application/pdf',
+    })
+    const input = document.createElement('input')
+    Object.defineProperty(input, 'files', { value: [file] })
+    documentService.uploadVersion.mockReturnValue(of({} as any))
+
+    component.onVersionFileSelected({ target: input } as Event)
+
+    expect(component.versionUploadState).toEqual(UploadState.Failed)
+    expect(component.versionUploadError).toEqual('Missing task ID.')
+    expect(documentService.getVersions).not.toHaveBeenCalled()
+  })
+
+  it('onVersionFileSelected should show error when upload request fails', () => {
+    const file = new File(['test'], 'new-version.pdf', {
+      type: 'application/pdf',
+    })
+    const input = document.createElement('input')
+    Object.defineProperty(input, 'files', { value: [file] })
+    const error = new Error('upload failed')
+    documentService.uploadVersion.mockReturnValue(throwError(() => error))
+
+    component.onVersionFileSelected({ target: input } as Event)
+
+    expect(component.versionUploadState).toEqual(UploadState.Failed)
+    expect(component.versionUploadError).toEqual('upload failed')
+    expect(toastService.showError).toHaveBeenCalledWith(
+      'Error uploading new version',
+      error
+    )
+  })
+
   it('ngOnChanges should clear upload status on document switch', () => {
     component.versionUploadState = UploadState.Failed
     component.versionUploadError = 'something failed'
