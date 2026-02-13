@@ -10325,7 +10325,7 @@ Erro ao enviar documentos por e-mail</target>
           <context context-type="sourcefile">src/app/data/custom-field-query.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="translated">Contém (maiúsculas de minúsculas)</target>
+        <target state="translated">Contém (maiúsculas ou minúsculas)</target>
       </trans-unit>
       <trans-unit id="7732309408488818531" datatype="html">
         <source>Greater than</source>
