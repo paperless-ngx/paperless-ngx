@@ -2012,6 +2012,29 @@ describe('DocumentDetailComponent', () => {
       .error(new ProgressEvent('failed'))
   })
 
+  it('should omit version in download and print when no version is selected', () => {
+    initNormally()
+    component.document.versions = [] as any
+    ;(component as any).selectedVersionId = undefined
+
+    const getDownloadUrlSpy = jest
+      .spyOn(documentService, 'getDownloadUrl')
+      .mockReturnValueOnce('download-no-version')
+      .mockReturnValueOnce('print-no-version')
+
+    component.download()
+    expect(getDownloadUrlSpy).toHaveBeenNthCalledWith(1, doc.id, false, null)
+    httpTestingController
+      .expectOne('download-no-version')
+      .error(new ProgressEvent('failed'))
+
+    component.printDocument()
+    expect(getDownloadUrlSpy).toHaveBeenNthCalledWith(2, doc.id, false, null)
+    httpTestingController
+      .expectOne('print-no-version')
+      .error(new ProgressEvent('failed'))
+  })
+
   it('should download a file with the correct filename', () => {
     const mockBlob = new Blob(['test content'], { type: 'text/plain' })
     const mockResponse = new HttpResponse({
