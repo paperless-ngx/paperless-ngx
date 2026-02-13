@@ -989,18 +989,43 @@ class DocumentViewSet(
             return request_doc
         return self._resolve_file_doc(root_doc, request)
 
-    def file_response(self, pk, request, disposition):
-        request_doc = Document.global_objects.select_related(
-            "owner",
-            "root_document",
-        ).get(id=pk)
-        root_doc = get_root_document(request_doc)
+    def _resolve_request_and_root_doc(
+        self,
+        pk,
+        request: Request,
+        *,
+        include_deleted: bool = False,
+    ) -> tuple[Document, Document] | HttpResponseForbidden:
+        manager = Document.global_objects if include_deleted else Document.objects
+        try:
+            request_doc = manager.select_related(
+                "owner",
+                "root_document",
+            ).get(id=pk)
+        except Document.DoesNotExist:
+            raise Http404
+
+        root_doc = get_root_document(
+            request_doc,
+            include_deleted=include_deleted,
+        )
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "view_document",
             root_doc,
         ):
             return HttpResponseForbidden("Insufficient permissions")
+        return request_doc, root_doc
+
+    def file_response(self, pk, request, disposition):
+        resolved = self._resolve_request_and_root_doc(
+            pk,
+            request,
+            include_deleted=True,
+        )
+        if isinstance(resolved, HttpResponseForbidden):
+            return resolved
+        request_doc, root_doc = resolved
         file_doc = self._get_effective_file_doc(request_doc, root_doc, request)
         return serve_file(
             doc=file_doc,
@@ -1039,20 +1064,10 @@ class DocumentViewSet(
         condition(etag_func=metadata_etag, last_modified_func=metadata_last_modified),
     )
     def metadata(self, request, pk=None):
-        try:
-            request_doc = Document.objects.select_related(
-                "owner",
-                "root_document",
-            ).get(pk=pk)
-            root_doc = get_root_document(request_doc)
-            if request.user is not None and not has_perms_owner_aware(
-                request.user,
-                "view_document",
-                root_doc,
-            ):
-                return HttpResponseForbidden("Insufficient permissions")
-        except Document.DoesNotExist:
-            raise Http404
+        resolved = self._resolve_request_and_root_doc(pk, request)
+        if isinstance(resolved, HttpResponseForbidden):
+            return resolved
+        request_doc, root_doc = resolved
 
         # Choose the effective document (newest version by default,
         # or explicit via ?version=).
@@ -1225,19 +1240,12 @@ class DocumentViewSet(
         condition(etag_func=preview_etag, last_modified_func=preview_last_modified),
     )
     def preview(self, request, pk=None):
-        try:
-            request_doc = Document.objects.select_related(
-                "owner",
-                "root_document",
-            ).get(id=pk)
-            root_doc = get_root_document(request_doc)
-            if request.user is not None and not has_perms_owner_aware(
-                request.user,
-                "view_document",
-                root_doc,
-            ):
-                return HttpResponseForbidden("Insufficient permissions")
+        resolved = self._resolve_request_and_root_doc(pk, request)
+        if isinstance(resolved, HttpResponseForbidden):
+            return resolved
+        request_doc, root_doc = resolved
 
+        try:
             file_doc = self._get_effective_file_doc(request_doc, root_doc, request)
 
             return serve_file(
@@ -1246,30 +1254,24 @@ class DocumentViewSet(
                 and file_doc.has_archive_version,
                 disposition="inline",
             )
-        except (FileNotFoundError, Document.DoesNotExist):
+        except FileNotFoundError:
             raise Http404
 
     @action(methods=["get"], detail=True, filter_backends=[])
     @method_decorator(cache_control(no_cache=True))
     @method_decorator(last_modified(thumbnail_last_modified))
     def thumb(self, request, pk=None):
+        resolved = self._resolve_request_and_root_doc(pk, request)
+        if isinstance(resolved, HttpResponseForbidden):
+            return resolved
+        request_doc, root_doc = resolved
+
         try:
-            request_doc = Document.objects.select_related(
-                "owner",
-                "root_document",
-            ).get(id=pk)
-            root_doc = get_root_document(request_doc)
-            if request.user is not None and not has_perms_owner_aware(
-                request.user,
-                "view_document",
-                root_doc,
-            ):
-                return HttpResponseForbidden("Insufficient permissions")
             file_doc = self._get_effective_file_doc(request_doc, root_doc, request)
             handle = file_doc.thumbnail_file
 
             return HttpResponse(handle, content_type="image/webp")
-        except (FileNotFoundError, Document.DoesNotExist):
+        except FileNotFoundError:
             raise Http404
 
     @action(methods=["get"], detail=True)
