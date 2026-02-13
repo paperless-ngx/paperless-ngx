@@ -920,9 +920,6 @@ class DocumentViewSet(
             )
             content_doc.save(update_fields=["content", "modified"])
 
-        if getattr(root_doc, "_prefetched_objects_cache", None):
-            root_doc._prefetched_objects_cache = {}
-
         refreshed_doc = self.get_queryset().get(pk=root_doc.pk)
         response_data = self.get_serializer(refreshed_doc).data
         if "version" in request.query_params and "content" in response_data:
