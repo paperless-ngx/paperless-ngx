@@ -1242,6 +1242,38 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.document_type_id)
         self.assertIsNone(overrides.tag_ids)
 
+    def test_document_filters_use_latest_version_content(self) -> None:
+        root = Document.objects.create(
+            title="versioned root",
+            checksum="root",
+            mime_type="application/pdf",
+            content="root-content",
+        )
+        version = Document.objects.create(
+            title="versioned root",
+            checksum="v1",
+            mime_type="application/pdf",
+            root_document=root,
+            content="latest-version-content",
+        )
+
+        response = self.client.get(
+            "/api/documents/?content__icontains=latest-version-content",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], root.id)
+        self.assertEqual(results[0]["content"], version.content)
+
+        response = self.client.get(
+            "/api/documents/?title_content=latest-version-content",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], root.id)
+
     def test_create_wrong_endpoint(self) -> None:
         response = self.client.post(
             "/api/documents/",

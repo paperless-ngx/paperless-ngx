@@ -1,17 +1,21 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from unittest import TestCase
 from unittest import mock
 
 from auditlog.models import LogEntry  # type: ignore[import-untyped]
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import FieldError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.data_models import DocumentSource
+from documents.filters import EffectiveContentFilter
+from documents.filters import TitleContentFilter
 from documents.models import Document
 from documents.tests.utils import DirectoriesMixin
 
@@ -393,6 +397,28 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertTrue(metadata.called)
 
+    def test_metadata_version_param_errors(self) -> None:
+        root = self._create_pdf(title="root", checksum="root")
+
+        resp = self.client.get(
+            f"/api/documents/{root.id}/metadata/?version=not-a-number",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+        resp = self.client.get(f"/api/documents/{root.id}/metadata/?version=9999")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+        other_root = self._create_pdf(title="other", checksum="other")
+        other_version = self._create_pdf(
+            title="other-v1",
+            checksum="other-v1",
+            root_document=other_root,
+        )
+        resp = self.client.get(
+            f"/api/documents/{root.id}/metadata/?version={other_version.id}",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_metadata_returns_403_when_user_lacks_permission(self) -> None:
         owner = User.objects.create_user(username="owner")
         other = User.objects.create_user(username="other")
@@ -613,3 +639,39 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data["content"], "v1-content")
+
+
+class TestVersionAwareFilters(TestCase):
+    def test_title_content_filter_falls_back_to_content(self) -> None:
+        queryset = mock.Mock()
+        fallback_queryset = mock.Mock()
+        queryset.filter.side_effect = [FieldError("missing field"), fallback_queryset]
+
+        result = TitleContentFilter().filter(queryset, " latest ")
+
+        self.assertIs(result, fallback_queryset)
+        self.assertEqual(queryset.filter.call_count, 2)
+
+    def test_effective_content_filter_falls_back_to_content_lookup(self) -> None:
+        queryset = mock.Mock()
+        fallback_queryset = mock.Mock()
+        queryset.filter.side_effect = [FieldError("missing field"), fallback_queryset]
+
+        result = EffectiveContentFilter(lookup_expr="icontains").filter(
+            queryset,
+            " latest ",
+        )
+
+        self.assertIs(result, fallback_queryset)
+        first_kwargs = queryset.filter.call_args_list[0].kwargs
+        second_kwargs = queryset.filter.call_args_list[1].kwargs
+        self.assertEqual(first_kwargs, {"effective_content__icontains": "latest"})
+        self.assertEqual(second_kwargs, {"content__icontains": "latest"})
+
+    def test_effective_content_filter_returns_input_for_empty_values(self) -> None:
+        queryset = mock.Mock()
+
+        result = EffectiveContentFilter(lookup_expr="icontains").filter(queryset, "   ")
+
+        self.assertIs(result, queryset)
+        queryset.filter.assert_not_called()

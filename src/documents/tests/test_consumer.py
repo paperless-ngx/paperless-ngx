@@ -98,11 +98,18 @@ class FaultyGenericExceptionParser(_BaseTestParser):
         raise Exception("Generic exception.")
 
 
-def fake_magic_from_file(file, *, mime=False):
+def fake_magic_from_file(file, *, mime=False):  # NOSONAR
     if mime:
         filepath = Path(file)
         if filepath.name.startswith("invalid_pdf"):
             return "application/octet-stream"
+        if filepath.suffix == "":
+            try:
+                with Path(filepath).open("rb") as handle:
+                    if handle.read(4) == b"%PDF":
+                        return "application/pdf"
+            except OSError:
+                pass
         if filepath.suffix == ".pdf":
             return "application/pdf"
         elif filepath.suffix == ".png":
@@ -747,6 +754,65 @@ class TestConsumer(
         self.assertTrue(version.original_filename.endswith("_v0.pdf"))
         self.assertTrue(bool(version.content))
 
+    @override_settings(AUDIT_LOG_ENABLED=True)
+    @mock.patch("documents.consumer.load_classifier")
+    def test_consume_version_with_missing_actor_and_filename_without_suffix(
+        self,
+        m: mock.Mock,
+    ) -> None:
+        m.return_value = MagicMock()
+
+        with self.get_consumer(self.get_test_file()) as consumer:
+            consumer.run()
+
+        root_doc = Document.objects.first()
+        self.assertIsNotNone(root_doc)
+        assert root_doc is not None
+
+        version_file = self.get_test_file2()
+        status = DummyProgressManager(version_file.name, None)
+        overrides = DocumentMetadataOverrides(
+            filename="version-upload",
+            actor_id=999999,
+        )
+        doc = ConsumableDocument(
+            DocumentSource.ApiUpload,
+            original_file=version_file,
+            root_document_id=root_doc.pk,
+        )
+
+        preflight = ConsumerPreflightPlugin(
+            doc,
+            overrides,
+            status,  # type: ignore[arg-type]
+            self.dirs.scratch_dir,
+            "task-id",
+        )
+        preflight.setup()
+        preflight.run()
+
+        consumer = ConsumerPlugin(
+            doc,
+            overrides,
+            status,  # type: ignore[arg-type]
+            self.dirs.scratch_dir,
+            "task-id",
+        )
+        consumer.setup()
+        try:
+            self.assertEqual(consumer.filename, "version-upload_v0")
+            consumer.run()
+        finally:
+            consumer.cleanup()
+
+        version = (
+            Document.objects.filter(root_document=root_doc).order_by("-id").first()
+        )
+        self.assertIsNotNone(version)
+        assert version is not None
+        self.assertEqual(version.original_filename, "version-upload_v0")
+        self.assertTrue(bool(version.content))
+
     @mock.patch("documents.consumer.load_classifier")
     def testClassifyDocument(self, m) -> None:
         correspondent = Correspondent.objects.create(
@@ -1358,6 +1424,19 @@ class TestMetadataOverrides(TestCase):
         incoming = DocumentMetadataOverrides(skip_asn_if_exists=True)
         base.update(incoming)
         self.assertTrue(base.skip_asn_if_exists)
+
+    def test_update_actor_and_version_label(self) -> None:
+        base = DocumentMetadataOverrides(
+            actor_id=1,
+            version_label="root",
+        )
+        incoming = DocumentMetadataOverrides(
+            actor_id=2,
+            version_label="v2",
+        )
+        base.update(incoming)
+        self.assertEqual(base.actor_id, 2)
+        self.assertEqual(base.version_label, "v2")
 
 
 class TestBarcodeApplyDetectedASN(TestCase):
