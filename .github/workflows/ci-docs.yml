@@ -26,8 +26,8 @@ permissions:
   pages: write
   id-token: write
 env:
-  DEFAULT_UV_VERSION: "0.9.x"
-  DEFAULT_PYTHON_VERSION: "3.11"
+  DEFAULT_UV_VERSION: "0.10.x"
+  DEFAULT_PYTHON_VERSION: "3.12"
 jobs:
   build:
     name: Build Documentation

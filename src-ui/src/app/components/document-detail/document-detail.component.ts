@@ -231,6 +231,7 @@ export class DocumentDetailComponent
   title: string
   titleSubject: Subject<string> = new Subject()
   previewUrl: string
+  pdfSource?: PdfSource
   thumbUrl: string
   previewText: string
   previewLoaded: boolean = false
