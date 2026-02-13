@@ -68,7 +68,6 @@ dependencies = [
   "python-gnupg~=0.5.4",
   "python-ipware~=3.0.0",
   "python-magic~=0.4.27",
-  "pyzbar~=0.1.9",
   "rapidfuzz~=3.14.0",
   "redis[hiredis]~=5.2.1",
   "regex>=2025.9.18",
@@ -81,7 +80,7 @@ dependencies = [
   "watchfiles>=1.1.1",
   "whitenoise~=6.11",
   "whoosh-reloaded>=2.7.5",
-  "zxing-cpp~=2.3.0",
+  "zxing-cpp~=3.0.0",
 ]
 
 optional-dependencies.mariadb = [
@@ -171,10 +170,6 @@ explicit = true
 psycopg-c = [
   { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.0/psycopg_c-3.3.0-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
   { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.0/psycopg_c-3.3.0-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
-]
-zxing-cpp = [
-  { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
-  { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
 ]
 
 torch = [

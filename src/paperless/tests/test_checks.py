@@ -187,31 +187,6 @@ class TestTimezoneSettingsChecks(DirectoriesMixin, TestCase):
         self.assertIn('Timezone "TheMoon\\MyCrater"', msg.msg)
 
 
-class TestBarcodeSettingsChecks(DirectoriesMixin, TestCase):
-    @override_settings(CONSUMER_BARCODE_SCANNER="Invalid")
-    def test_barcode_scanner_invalid(self) -> None:
-        msgs = settings_values_check(None)
-        self.assertEqual(len(msgs), 1)
-
-        msg = msgs[0]
-
-        self.assertIn('Invalid Barcode Scanner "Invalid"', msg.msg)
-
-    @override_settings(CONSUMER_BARCODE_SCANNER="")
-    def test_barcode_scanner_empty(self) -> None:
-        msgs = settings_values_check(None)
-        self.assertEqual(len(msgs), 1)
-
-        msg = msgs[0]
-
-        self.assertIn('Invalid Barcode Scanner ""', msg.msg)
-
-    @override_settings(CONSUMER_BARCODE_SCANNER="PYZBAR")
-    def test_barcode_scanner_valid(self) -> None:
-        msgs = settings_values_check(None)
-        self.assertEqual(len(msgs), 0)
-
-
 class TestEmailCertSettingsChecks(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @override_settings(EMAIL_CERTIFICATE_FILE=Path("/tmp/not_actually_here.pem"))
     def test_not_valid_file(self) -> None:

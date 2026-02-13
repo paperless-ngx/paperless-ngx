@@ -154,8 +154,6 @@ ARG RUNTIME_PACKAGES="\
   libmagic1 \
   media-types \
   zlib1g \
-  # Barcode splitter
-  libzbar0 \
   poppler-utils"
 
 # Install basic runtime packages.

@@ -69,7 +69,6 @@ updates:
         patterns:
           - "ocrmypdf"
           - "pdf2image"
-          - "pyzbar"
           - "zxing-cpp"
           - "tika-client"
           - "gotenberg-client"
