@@ -103,13 +103,8 @@ def fake_magic_from_file(file, *, mime=False):  # NOSONAR
         filepath = Path(file)
         if filepath.name.startswith("invalid_pdf"):
             return "application/octet-stream"
-        if filepath.suffix == "":
-            try:
-                with Path(filepath).open("rb") as handle:
-                    if handle.read(4) == b"%PDF":
-                        return "application/pdf"
-            except OSError:
-                pass
+        if filepath.name.startswith("valid_pdf"):
+            return "application/pdf"
         if filepath.suffix == ".pdf":
             return "application/pdf"
         elif filepath.suffix == ".png":
@@ -772,7 +767,7 @@ class TestConsumer(
         version_file = self.get_test_file2()
         status = DummyProgressManager(version_file.name, None)
         overrides = DocumentMetadataOverrides(
-            filename="version-upload",
+            filename="valid_pdf_version-upload",
             actor_id=999999,
         )
         doc = ConsumableDocument(
@@ -800,7 +795,7 @@ class TestConsumer(
         )
         consumer.setup()
         try:
-            self.assertEqual(consumer.filename, "version-upload_v0")
+            self.assertEqual(consumer.filename, "valid_pdf_version-upload_v0")
             consumer.run()
         finally:
             consumer.cleanup()
@@ -810,7 +805,7 @@ class TestConsumer(
         )
         self.assertIsNotNone(version)
         assert version is not None
-        self.assertEqual(version.original_filename, "version-upload_v0")
+        self.assertEqual(version.original_filename, "valid_pdf_version-upload_v0")
         self.assertTrue(bool(version.content))
 
     @mock.patch("documents.consumer.load_classifier")
