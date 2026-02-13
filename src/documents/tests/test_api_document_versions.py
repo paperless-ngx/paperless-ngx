@@ -465,6 +465,39 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(overrides.version_label, "New Version")
         self.assertEqual(overrides.actor_id, self.user.id)
 
+    def test_update_version_with_version_pk_normalizes_to_root(self) -> None:
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+        )
+        version = Document.objects.create(
+            title="v1",
+            checksum="v1",
+            mime_type="application/pdf",
+            root_document=root,
+        )
+        upload = self._make_pdf_upload()
+
+        async_task = mock.Mock()
+        async_task.id = "task-123"
+
+        with mock.patch("documents.views.consume_file") as consume_mock:
+            consume_mock.delay.return_value = async_task
+            resp = self.client.post(
+                f"/api/documents/{version.id}/update_version/",
+                {"document": upload, "version_label": "  New Version  "},
+                format="multipart",
+            )
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.data, "task-123")
+        consume_mock.delay.assert_called_once()
+        input_doc, overrides = consume_mock.delay.call_args[0]
+        self.assertEqual(input_doc.root_document_id, root.id)
+        self.assertEqual(overrides.version_label, "New Version")
+        self.assertEqual(overrides.actor_id, self.user.id)
+
     def test_update_version_returns_500_on_consume_failure(self) -> None:
         root = Document.objects.create(
             title="root",

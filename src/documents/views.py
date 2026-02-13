@@ -1573,11 +1573,15 @@ class DocumentViewSet(
         serializer.is_valid(raise_exception=True)
 
         try:
-            doc = Document.objects.select_related("owner").get(pk=pk)
+            request_doc = Document.objects.select_related(
+                "owner",
+                "root_document",
+            ).get(pk=pk)
+            root_doc = get_root_document(request_doc)
             if request.user is not None and not has_perms_owner_aware(
                 request.user,
                 "change_document",
-                doc,
+                root_doc,
             ):
                 return HttpResponseForbidden("Insufficient permissions")
         except Document.DoesNotExist:
@@ -1602,7 +1606,7 @@ class DocumentViewSet(
             input_doc = ConsumableDocument(
                 source=DocumentSource.ApiUpload,
                 original_file=temp_file_path,
-                root_document_id=doc.pk,
+                root_document_id=root_doc.pk,
             )
 
             overrides = DocumentMetadataOverrides()
@@ -1616,7 +1620,7 @@ class DocumentViewSet(
                 overrides,
             )
             logger.debug(
-                f"Updated document {doc.id} with new version",
+                f"Updated document {root_doc.id} with new version",
             )
             return Response(async_task.id)
         except Exception as e:
