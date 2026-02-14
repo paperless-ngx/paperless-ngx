@@ -345,7 +345,7 @@ def execute_password_removal_action(
 def execute_move_to_trash_action(
     action: WorkflowAction,
     document: Document | ConsumableDocument,
-    logging_group: uuid.UUID,
+    logging_group: uuid.UUID | None,
 ) -> None:
     """
     Execute a move to trash action for a workflow on an existing document or a
