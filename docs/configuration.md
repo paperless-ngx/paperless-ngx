@@ -1222,14 +1222,6 @@ using Python's `re.match()`, which anchors at the start of the filename.
 
     The default ignores are `[.stfolder, .stversions, .localized, @eaDir, .Spotlight-V100, .Trashes, __MACOSX]` and cannot be overridden.
 
-#### [`PAPERLESS_CONSUMER_BARCODE_SCANNER=<string>`](#PAPERLESS_CONSUMER_BARCODE_SCANNER) {#PAPERLESS_CONSUMER_BARCODE_SCANNER}
-
-: Sets the barcode scanner used for barcode functionality.
-
-    Currently, "PYZBAR" (the default) or "ZXING" might be selected.
-    If you have problems that your Barcodes/QR-Codes are not detected
-    (especially with bad scan quality and/or small codes), try the other one.
-
 #### [`PAPERLESS_PRE_CONSUME_SCRIPT=<filename>`](#PAPERLESS_PRE_CONSUME_SCRIPT) {#PAPERLESS_PRE_CONSUME_SCRIPT}
 
 : After some initial validation, Paperless can trigger an arbitrary

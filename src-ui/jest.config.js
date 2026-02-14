@@ -31,6 +31,10 @@ module.exports = {
   moduleNameMapper: {
     ...esmPreset.moduleNameMapper,
     '^src/(.*)': '<rootDir>/src/$1',
+    '^pdfjs-dist/legacy/build/pdf\\.mjs$':
+      '<rootDir>/src/test/mocks/pdfjs-legacy-build-pdf.ts',
+    '^pdfjs-dist/web/pdf_viewer\\.mjs$':
+      '<rootDir>/src/test/mocks/pdfjs-web-pdf_viewer.ts',
   },
   workerIdleMemoryLimit: '512MB',
   reporters: [

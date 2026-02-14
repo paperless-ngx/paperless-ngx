@@ -4,7 +4,6 @@ from contextlib import contextmanager
 from pathlib import Path
 from unittest import mock
 
-import pytest
 from django.conf import settings
 from django.test import TestCase
 from django.test import override_settings
@@ -25,13 +24,6 @@ from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
 from paperless.models import ApplicationConfiguration
 
-try:
-    import zxingcpp  # noqa: F401
-
-    HAS_ZXING_LIB = True
-except ImportError:
-    HAS_ZXING_LIB = False
-
 
 class GetReaderPluginMixin:
     @contextmanager
@@ -48,7 +40,6 @@ class GetReaderPluginMixin:
         reader.cleanup()
 
 
-@override_settings(CONSUMER_BARCODE_SCANNER="PYZBAR")
 class TestBarcode(
     DirectoriesMixin,
     FileSystemAssertsMixin,
@@ -606,7 +597,6 @@ class TestBarcode(
             self.assertDictEqual(separator_page_numbers, {0: False})
 
 
-@override_settings(CONSUMER_BARCODE_SCANNER="PYZBAR")
 class TestBarcodeNewConsume(
     DirectoriesMixin,
     FileSystemAssertsMixin,
@@ -784,36 +774,12 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
 
             self.assertEqual(document.archive_serial_number, 123)
 
-    @override_settings(CONSUMER_BARCODE_SCANNER="PYZBAR")
     def test_scan_file_for_qrcode_without_upscale(self) -> None:
         """
         GIVEN:
             - A printed and scanned PDF document with a rather small QR code
         WHEN:
             - ASN barcode detection is run with default settings
-            - pyzbar is used for detection, as zxing would behave differently, and detect the QR code
-        THEN:
-            - ASN is not detected
-        """
-
-        test_file = self.BARCODE_SAMPLE_DIR / "barcode-qr-asn-000123-upscale-dpi.pdf"
-
-        with self.get_reader(test_file) as reader:
-            reader.detect()
-            self.assertEqual(len(reader.barcodes), 0)
-
-    @override_settings(CONSUMER_BARCODE_SCANNER="PYZBAR")
-    @override_settings(CONSUMER_BARCODE_DPI=600)
-    @override_settings(CONSUMER_BARCODE_UPSCALE=1.5)
-    def test_scan_file_for_qrcode_with_upscale(self) -> None:
-        """
-        GIVEN:
-            - A printed and scanned PDF document with a rather small QR code
-        WHEN:
-            - ASN barcode detection is run with 600dpi and an upscale factor of 1.5 and pyzbar
-            - pyzbar is used for detection, as zxing would behave differently.
-              Upscaling is a workaround for detection problems with pyzbar,
-              when you cannot switch to zxing (aarch64 build problems of zxing)
         THEN:
             - ASN 123 is detected
         """
@@ -825,23 +791,24 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
             self.assertEqual(len(reader.barcodes), 1)
             self.assertEqual(reader.asn, 123)
 
+    @override_settings(CONSUMER_BARCODE_DPI=600)
+    @override_settings(CONSUMER_BARCODE_UPSCALE=1.5)
+    def test_scan_file_for_qrcode_with_upscale(self) -> None:
+        """
+        GIVEN:
+            - A printed and scanned PDF document with a rather small QR code
+        WHEN:
+            - ASN barcode detection is run with 600dpi and an upscale factor of 1.5
+        THEN:
+            - ASN 123 is detected
+        """
 
-@pytest.mark.skipif(
-    not HAS_ZXING_LIB,
-    reason="No zxingcpp",
-)
-@override_settings(CONSUMER_BARCODE_SCANNER="ZXING")
-class TestBarcodeZxing(TestBarcode):
-    pass
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-qr-asn-000123-upscale-dpi.pdf"
 
-
-@pytest.mark.skipif(
-    not HAS_ZXING_LIB,
-    reason="No zxingcpp",
-)
-@override_settings(CONSUMER_BARCODE_SCANNER="ZXING")
-class TestAsnBarcodesZxing(TestAsnBarcode):
-    pass
+        with self.get_reader(test_file) as reader:
+            reader.detect()
+            self.assertEqual(len(reader.barcodes), 1)
+            self.assertEqual(reader.asn, 123)
 
 
 class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, TestCase):

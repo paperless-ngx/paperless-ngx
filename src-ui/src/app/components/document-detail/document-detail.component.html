@@ -456,17 +456,15 @@
       @case (ContentRenderType.PDF) {
         @if (!useNativePdfViewer) {
           <div class="preview-sticky pdf-viewer-container">
-            <pdf-viewer
-              [src]="{ url: previewUrl, password: password }"
-              [original-size]="false"
-              [show-borders]="true"
-              [show-all]="true"
+            <pngx-pdf-viewer
+              [src]="pdfSource"
+              [renderMode]="PdfRenderMode.All"
               [(page)]="previewCurrentPage"
-              [zoom-scale]="previewZoomScale"
+              [zoomScale]="previewZoomScale"
               [zoom]="previewZoomSetting"
-              (error)="onError($event)"
-              (after-load-complete)="pdfPreviewLoaded($event)">
-            </pdf-viewer>
+              (loadError)="onError($event)"
+              (afterLoadComplete)="pdfPreviewLoaded($event)">
+            </pngx-pdf-viewer>
           </div>
         } @else {
           <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>

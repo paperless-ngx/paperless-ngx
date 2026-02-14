@@ -18,7 +18,6 @@ import {
   NgbNavModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
-import { PDFDocumentProxy, PdfViewerModule } from 'ng2-pdf-viewer'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { DeviceDetectorService } from 'ngx-device-detector'
 import { BehaviorSubject, Observable, of, Subject, timer } from 'rxjs'
@@ -108,13 +107,20 @@ import { UrlComponent } from '../common/input/url/url.component'
 import { PageHeaderComponent } from '../common/page-header/page-header.component'
 import { PdfEditorEditMode } from '../common/pdf-editor/pdf-editor-edit-mode'
 import { PDFEditorComponent } from '../common/pdf-editor/pdf-editor.component'
+import { PngxPdfViewerComponent } from '../common/pdf-viewer/pdf-viewer.component'
+import {
+  PdfRenderMode,
+  PdfSource,
+  PdfZoomLevel,
+  PdfZoomScale,
+  PngxPdfDocumentProxy,
+} from '../common/pdf-viewer/pdf-viewer.types'
 import { ShareLinksDialogComponent } from '../common/share-links-dialog/share-links-dialog.component'
 import { SuggestionsDropdownComponent } from '../common/suggestions-dropdown/suggestions-dropdown.component'
-import { DocumentHistoryComponent } from '../document-history/document-history.component'
 import { DocumentNotesComponent } from '../document-notes/document-notes.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
+import { DocumentHistoryComponent } from './document-history/document-history.component'
 import { MetadataCollapseComponent } from './metadata-collapse/metadata-collapse.component'
-import { ZoomSetting } from './zoom-setting'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -168,16 +174,17 @@ enum ContentRenderType {
     NgbNavModule,
     NgbDropdownModule,
     NgxBootstrapIconsModule,
-    PdfViewerModule,
     TextAreaComponent,
     RouterModule,
+    PngxPdfViewerComponent,
   ],
 })
 export class DocumentDetailComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy, DirtyComponent
 {
-  private documentsService = inject(DocumentService)
+  PdfRenderMode = PdfRenderMode
+  documentsService = inject(DocumentService)
   private route = inject(ActivatedRoute)
   private tagService = inject(TagService)
   private correspondentService = inject(CorrespondentService)
@@ -221,6 +228,7 @@ export class DocumentDetailComponent
   title: string
   titleSubject: Subject<string> = new Subject()
   previewUrl: string
+  pdfSource?: PdfSource
   thumbUrl: string
   previewText: string
   previewLoaded: boolean = false
@@ -246,8 +254,8 @@ export class DocumentDetailComponent
 
   previewCurrentPage: number = 1
   previewNumPages: number
-  previewZoomSetting: ZoomSetting = ZoomSetting.One
-  previewZoomScale: ZoomSetting = ZoomSetting.PageWidth
+  previewZoomSetting: PdfZoomLevel = PdfZoomLevel.One
+  previewZoomScale: PdfZoomScale = PdfZoomScale.PageWidth
 
   store: BehaviorSubject<any>
   isDirty$: Observable<boolean>
@@ -339,6 +347,17 @@ export class DocumentDetailComponent
     return ContentRenderType.Other
   }
 
+  private updatePdfSource() {
+    if (!this.previewUrl) {
+      this.pdfSource = undefined
+      return
+    }
+    this.pdfSource = {
+      url: this.previewUrl,
+      password: this.password || undefined,
+    }
+  }
+
   get isRTL() {
     if (!this.metadata || !this.metadata.lang) return false
     else {
@@ -415,6 +434,7 @@ export class DocumentDetailComponent
 
   private loadDocument(documentId: number): void {
     this.previewUrl = this.documentsService.getPreviewUrl(documentId)
+    this.updatePdfSource()
     this.http
       .get(this.previewUrl, { responseType: 'text' })
       .pipe(
@@ -503,7 +523,9 @@ export class DocumentDetailComponent
   }
 
   ngOnInit(): void {
-    this.setZoom(this.settings.get(SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING))
+    this.setZoom(
+      this.settings.get(SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING) as PdfZoomScale
+    )
     this.documentForm.valueChanges
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((values) => {
@@ -1204,7 +1226,7 @@ export class DocumentDetailComponent
       })
   }
 
-  pdfPreviewLoaded(pdf: PDFDocumentProxy) {
+  pdfPreviewLoaded(pdf: PngxPdfDocumentProxy) {
     this.previewNumPages = pdf.numPages
     if (this.password) this.requiresPassword = false
     setTimeout(() => {
@@ -1222,34 +1244,37 @@ export class DocumentDetailComponent
   onPasswordKeyUp(event: KeyboardEvent) {
     if ('Enter' == event.key) {
       this.password = (event.target as HTMLInputElement).value
+      this.updatePdfSource()
     }
   }
 
-  setZoom(setting: ZoomSetting) {
-    if (ZoomSetting.PageFit === setting || ZoomSetting.PageWidth === setting) {
+  setZoom(setting: PdfZoomScale | PdfZoomLevel) {
+    if (
+      setting === PdfZoomScale.PageFit ||
+      setting === PdfZoomScale.PageWidth
+    ) {
       this.previewZoomScale = setting
-      this.previewZoomSetting = ZoomSetting.One
-    } else {
-      this.previewZoomSetting = setting
-      this.previewZoomScale = ZoomSetting.PageWidth
+      this.previewZoomSetting = PdfZoomLevel.One
+      return
     }
+    this.previewZoomSetting = setting
+    this.previewZoomScale = PdfZoomScale.PageWidth
   }
 
   get zoomSettings() {
-    return Object.values(ZoomSetting).filter(
-      (setting) => setting !== ZoomSetting.PageWidth
-    )
+    return [PdfZoomScale.PageFit, ...Object.values(PdfZoomLevel)]
   }
 
   get currentZoom() {
-    if (this.previewZoomScale === ZoomSetting.PageFit) {
-      return ZoomSetting.PageFit
-    } else return this.previewZoomSetting
+    if (this.previewZoomScale === PdfZoomScale.PageFit) {
+      return PdfZoomScale.PageFit
+    }
+    return this.previewZoomSetting
   }
 
-  getZoomSettingTitle(setting: ZoomSetting): string {
+  getZoomSettingTitle(setting: PdfZoomScale | PdfZoomLevel): string {
     switch (setting) {
-      case ZoomSetting.PageFit:
+      case PdfZoomScale.PageFit:
         return $localize`Page Fit`
       default:
         return `${parseFloat(setting) * 100}%`
@@ -1257,25 +1282,24 @@ export class DocumentDetailComponent
   }
 
   increaseZoom(): void {
-    let currentIndex = Object.values(ZoomSetting).indexOf(
-      this.previewZoomSetting
-    )
-    if (this.previewZoomScale === ZoomSetting.PageFit) currentIndex = 5
-    this.previewZoomScale = ZoomSetting.PageWidth
+    const zoomLevels = Object.values(PdfZoomLevel)
+    let currentIndex = zoomLevels.indexOf(this.previewZoomSetting)
+    if (this.previewZoomScale === PdfZoomScale.PageFit) {
+      currentIndex = zoomLevels.indexOf(PdfZoomLevel.One)
+    }
+    this.previewZoomScale = PdfZoomScale.PageWidth
     this.previewZoomSetting =
-      Object.values(ZoomSetting)[
-        Math.min(Object.values(ZoomSetting).length - 1, currentIndex + 1)
-      ]
+      zoomLevels[Math.min(zoomLevels.length - 1, currentIndex + 1)]
   }
 
   decreaseZoom(): void {
-    let currentIndex = Object.values(ZoomSetting).indexOf(
-      this.previewZoomSetting
-    )
-    if (this.previewZoomScale === ZoomSetting.PageFit) currentIndex = 4
-    this.previewZoomScale = ZoomSetting.PageWidth
-    this.previewZoomSetting =
-      Object.values(ZoomSetting)[Math.max(2, currentIndex - 1)]
+    const zoomLevels = Object.values(PdfZoomLevel)
+    let currentIndex = zoomLevels.indexOf(this.previewZoomSetting)
+    if (this.previewZoomScale === PdfZoomScale.PageFit) {
+      currentIndex = zoomLevels.indexOf(PdfZoomLevel.ThreeQuarters)
+    }
+    this.previewZoomScale = PdfZoomScale.PageWidth
+    this.previewZoomSetting = zoomLevels[Math.max(0, currentIndex - 1)]
   }
 
   get showPermissions(): boolean {

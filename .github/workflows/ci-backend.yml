@@ -23,7 +23,7 @@ concurrency:
   group: backend-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 env:
-  DEFAULT_UV_VERSION: "0.9.x"
+  DEFAULT_UV_VERSION: "0.10.x"
   NLTK_DATA: "/usr/share/nltk_data"
 jobs:
   test:
@@ -55,7 +55,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends \
-            unpaper tesseract-ocr imagemagick ghostscript libzbar0 poppler-utils
+            unpaper tesseract-ocr imagemagick ghostscript poppler-utils
       - name: Configure ImageMagick
         run: |
           sudo cp docker/rootfs/etc/ImageMagick-6/paperless-policy.xml /etc/ImageMagick-6/policy.xml

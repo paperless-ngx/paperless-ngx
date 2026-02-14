@@ -1,5 +1,5 @@
 import { PdfEditorEditMode } from '../components/common/pdf-editor/pdf-editor-edit-mode'
-import { ZoomSetting } from '../components/document-detail/zoom-setting'
+import { PdfZoomScale } from '../components/common/pdf-viewer/pdf-viewer.types'
 import { User } from './user'
 
 export interface UiSettings {
@@ -17,6 +17,10 @@ export interface UiSetting {
 export enum GlobalSearchType {
   ADVANCED = 'advanced',
   TITLE_CONTENT = 'title-content',
+}
+
+export enum CollapsibleSection {
+  ATTRIBUTES = 'attributes',
 }
 
 export const PAPERLESS_GREEN_HEX = '#17541f'
@@ -51,6 +55,8 @@ export const SETTINGS_KEYS = {
   NOTES_ENABLED: 'general-settings:notes-enabled',
   AUDITLOG_ENABLED: 'general-settings:auditlog-enabled',
   SLIM_SIDEBAR: 'general-settings:slim-sidebar',
+  ATTRIBUTES_SECTIONS_COLLAPSED:
+    'general-settings:attributes-sections-collapsed',
   UPDATE_CHECKING_ENABLED: 'general-settings:update-checking:enabled',
   UPDATE_CHECKING_BACKEND_SETTING:
     'general-settings:update-checking:backend-setting',
@@ -111,6 +117,11 @@ export const SETTINGS: UiSetting[] = [
     key: SETTINGS_KEYS.SLIM_SIDEBAR,
     type: 'boolean',
     default: false,
+  },
+  {
+    key: SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED,
+    type: 'array',
+    default: [],
   },
   {
     key: SETTINGS_KEYS.DOCUMENT_LIST_SIZE,
@@ -310,7 +321,7 @@ export const SETTINGS: UiSetting[] = [
   {
     key: SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING,
     type: 'string',
-    default: ZoomSetting.PageWidth,
+    default: PdfZoomScale.PageWidth,
   },
   {
     key: SETTINGS_KEYS.AI_ENABLED,

@@ -963,7 +963,7 @@ def task_postrun_handler(
         task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
 
         if task_instance is not None:
-            task_instance.status = state
+            task_instance.status = state or states.FAILURE
             task_instance.result = retval
             task_instance.date_done = timezone.now()
             task_instance.save()

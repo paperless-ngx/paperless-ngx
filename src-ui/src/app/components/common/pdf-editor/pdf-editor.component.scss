@@ -15,13 +15,13 @@
   background-color: gray;
   height: 240px;
 
-  pdf-viewer {
+  pngx-pdf-viewer {
     width: 100%;
     height: 100%;
   }
 }
 
-::ng-deep .ng2-pdf-viewer-container {
+::ng-deep .pngx-pdf-viewer-container {
   overflow: hidden;
 }
 

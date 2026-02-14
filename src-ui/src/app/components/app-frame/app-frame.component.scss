@@ -177,6 +177,15 @@ main {
   }
 }
 
+.attributes-row .attributes-expand-btn {
+  opacity: 0.2;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.attributes-row:hover .attributes-expand-btn {
+  opacity: 1;
+}
+
 .sidebar-heading {
   font-size: 0.75rem;
   text-transform: uppercase;
@@ -281,7 +290,7 @@ main {
 .navbar .dropdown-menu {
   font-size: 0.875rem; // body size
 
-  a i-bs {
+  a i-bs, button i-bs {
     opacity: 0.6;
   }
 }

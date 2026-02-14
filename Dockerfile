@@ -30,7 +30,7 @@ RUN set -eux \
 # Purpose: Installs s6-overlay and rootfs
 # Comments:
 #  - Don't leave anything extra in here either
-FROM ghcr.io/astral-sh/uv:0.9.29-python3.12-trixie-slim AS s6-overlay-base
+FROM ghcr.io/astral-sh/uv:0.10.0-python3.12-trixie-slim AS s6-overlay-base
 
 WORKDIR /usr/src/s6
 
@@ -154,8 +154,6 @@ ARG RUNTIME_PACKAGES="\
   libmagic1 \
   media-types \
   zlib1g \
-  # Barcode splitter
-  libzbar0 \
   poppler-utils"
 
 # Install basic runtime packages.

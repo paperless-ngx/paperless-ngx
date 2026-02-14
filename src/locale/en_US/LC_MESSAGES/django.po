@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-03 20:10+0000\n"
+"POT-Creation-Date: 2026-02-13 17:37+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -2220,7 +2220,7 @@ msgstr ""
 msgid "account"
 msgstr ""
 
-#: paperless_mail/models.py:157 paperless_mail/models.py:318
+#: paperless_mail/models.py:157 paperless_mail/models.py:326
 msgid "folder"
 msgstr ""
 
@@ -2312,26 +2312,36 @@ msgstr ""
 msgid "Assign the rule owner to documents"
 msgstr ""
 
-#: paperless_mail/models.py:326
-msgid "uid"
+#: paperless_mail/models.py:305
+msgid "Stop processing further rules"
+msgstr ""
+
+#: paperless_mail/models.py:308
+msgid ""
+"If True, no further rules will be processed after this one if any document "
+"is queued."
 msgstr ""
 
 #: paperless_mail/models.py:334
-msgid "subject"
+msgid "uid"
 msgstr ""
 
 #: paperless_mail/models.py:342
+msgid "subject"
+msgstr ""
+
+#: paperless_mail/models.py:350
 msgid "received"
 msgstr ""
 
-#: paperless_mail/models.py:349
+#: paperless_mail/models.py:357
 msgid "processed"
 msgstr ""
 
-#: paperless_mail/models.py:355
+#: paperless_mail/models.py:363
 msgid "status"
 msgstr ""
 
-#: paperless_mail/models.py:363
+#: paperless_mail/models.py:371
 msgid "error"
 msgstr ""

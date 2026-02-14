@@ -86,7 +86,6 @@
             ],
             "scripts": [],
             "allowedCommonJsDependencies": [
-              "ng2-pdf-viewer",
               "file-saver",
               "utif"
             ],

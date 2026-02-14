@@ -96,4 +96,52 @@ describe('PermissionsGuard', () => {
     expect(canActivate).toHaveProperty('root') // returns UrlTree
     expect(toastSpy).toHaveBeenCalled()
   })
+
+  it('should activate when any required permission is granted', () => {
+    jest
+      .spyOn(permissionsService, 'currentUserCan')
+      .mockImplementation((action, type) => {
+        return type === PermissionType.Tag
+      })
+
+    const canActivate = guard.canActivate(
+      {
+        data: {
+          requiredPermissionAny: [
+            { action: PermissionAction.View, type: PermissionType.Tag },
+            {
+              action: PermissionAction.View,
+              type: PermissionType.DocumentType,
+            },
+          ],
+        },
+      } as any,
+      routerState.snapshot
+    )
+
+    expect(canActivate).toBeTruthy()
+  })
+
+  it('should not activate when no required permission is granted', () => {
+    jest
+      .spyOn(permissionsService, 'currentUserCan')
+      .mockImplementation(() => false)
+
+    const canActivate = guard.canActivate(
+      {
+        data: {
+          requiredPermissionAny: [
+            { action: PermissionAction.View, type: PermissionType.Tag },
+            {
+              action: PermissionAction.View,
+              type: PermissionType.DocumentType,
+            },
+          ],
+        },
+      } as any,
+      routerState.snapshot
+    )
+
+    expect(canActivate).toHaveProperty('root')
+  })
 })

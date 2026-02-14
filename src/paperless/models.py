@@ -105,7 +105,7 @@ class ApplicationConfiguration(AbstractSingletonModel):
     Settings for the Tesseract based OCR parser
     """
 
-    pages = models.PositiveIntegerField(
+    pages = models.PositiveSmallIntegerField(
         verbose_name=_("Do OCR from page 1 to this value"),
         null=True,
         validators=[MinValueValidator(1)],
@@ -134,7 +134,7 @@ class ApplicationConfiguration(AbstractSingletonModel):
         choices=ArchiveFileChoices.choices,
     )
 
-    image_dpi = models.PositiveIntegerField(
+    image_dpi = models.PositiveSmallIntegerField(
         verbose_name=_("Sets image DPI fallback value"),
         null=True,
         validators=[MinValueValidator(1)],
@@ -254,14 +254,14 @@ class ApplicationConfiguration(AbstractSingletonModel):
     )
 
     # PAPERLESS_CONSUMER_BARCODE_DPI
-    barcode_dpi = models.PositiveIntegerField(
+    barcode_dpi = models.PositiveSmallIntegerField(
         verbose_name=_("Sets the barcode DPI"),
         null=True,
         validators=[MinValueValidator(1)],
     )
 
     # PAPERLESS_CONSUMER_BARCODE_MAX_PAGES
-    barcode_max_pages = models.PositiveIntegerField(
+    barcode_max_pages = models.PositiveSmallIntegerField(
         verbose_name=_("Sets the maximum pages for barcode"),
         null=True,
         validators=[MinValueValidator(1)],

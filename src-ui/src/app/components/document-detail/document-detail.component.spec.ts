@@ -69,8 +69,11 @@ import { environment } from 'src/environments/environment'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
 import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
+import {
+  PdfZoomLevel,
+  PdfZoomScale,
+} from '../common/pdf-viewer/pdf-viewer.types'
 import { DocumentDetailComponent } from './document-detail.component'
-import { ZoomSetting } from './zoom-setting'
 
 const doc: Document = {
   id: 3,
@@ -860,7 +863,7 @@ describe('DocumentDetailComponent', () => {
 
   it('should support zoom controls', () => {
     initNormally()
-    component.setZoom(ZoomSetting.One) // from select
+    component.setZoom(PdfZoomLevel.One) // from select
     expect(component.previewZoomSetting).toEqual('1')
     component.increaseZoom()
     expect(component.previewZoomSetting).toEqual('1.5')
@@ -868,18 +871,18 @@ describe('DocumentDetailComponent', () => {
     expect(component.previewZoomSetting).toEqual('2')
     component.decreaseZoom()
     expect(component.previewZoomSetting).toEqual('1.5')
-    component.setZoom(ZoomSetting.One) // from select
+    component.setZoom(PdfZoomLevel.One) // from select
     component.decreaseZoom()
     expect(component.previewZoomSetting).toEqual('.75')
 
-    component.setZoom(ZoomSetting.PageFit) // from select
+    component.setZoom(PdfZoomScale.PageFit) // from select
     expect(component.previewZoomScale).toEqual('page-fit')
     expect(component.previewZoomSetting).toEqual('1')
     component.increaseZoom()
     expect(component.previewZoomSetting).toEqual('1.5')
     expect(component.previewZoomScale).toEqual('page-width')
 
-    component.setZoom(ZoomSetting.PageFit) // from select
+    component.setZoom(PdfZoomScale.PageFit) // from select
     expect(component.previewZoomScale).toEqual('page-fit')
     expect(component.previewZoomSetting).toEqual('1')
     component.decreaseZoom()
@@ -889,10 +892,10 @@ describe('DocumentDetailComponent', () => {
 
   it('should select correct zoom setting in dropdown', () => {
     initNormally()
-    component.setZoom(ZoomSetting.PageFit)
-    expect(component.currentZoom).toEqual(ZoomSetting.PageFit)
-    component.setZoom(ZoomSetting.Quarter)
-    expect(component.currentZoom).toEqual(ZoomSetting.Quarter)
+    component.setZoom(PdfZoomScale.PageFit)
+    expect(component.currentZoom).toEqual(PdfZoomScale.PageFit)
+    component.setZoom(PdfZoomLevel.Quarter)
+    expect(component.currentZoom).toEqual(PdfZoomLevel.Quarter)
   })
 
   it('should support updating notes dynamically', () => {
@@ -1017,7 +1020,7 @@ describe('DocumentDetailComponent', () => {
     settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, false)
     expect(component.useNativePdfViewer).toBeFalsy()
     fixture.detectChanges()
-    expect(fixture.debugElement.query(By.css('pdf-viewer'))).not.toBeNull()
+    expect(fixture.debugElement.query(By.css('pngx-pdf-viewer'))).not.toBeNull()
   })
 
   it('should display native pdf viewer if enabled', () => {
