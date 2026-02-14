@@ -784,6 +784,8 @@ def run_workflows(
 
     for workflow in workflows:
         if not use_overrides:
+            if TYPE_CHECKING:
+                assert isinstance(document, Document)
             try:
                 # This can be called from bulk_update_documents, which may be running multiple times
                 # Refresh this so the matching data is fresh and instance fields are re-freshed
@@ -872,6 +874,8 @@ def run_workflows(
                 execute_move_to_trash_action(action, document, logging_group)
 
     if use_overrides:
+        if TYPE_CHECKING:
+            assert overrides is not None
         return overrides, "\n".join(messages)
 
 
