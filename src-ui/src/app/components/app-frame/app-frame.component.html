@@ -46,9 +46,9 @@
           <p class="small mb-0 px-3 text-muted" i18n>Logged in as {{this.settingsService.displayName}}</p>
           <div class="dropdown-divider"></div>
         </div>
-        <button ngbDropdownItem class="nav-link" (click)="editProfile()">
+        <a ngbDropdownItem class="nav-link" (click)="editProfile()">
           <i-bs class="me-2" name="person"></i-bs><ng-container i18n>My Profile</ng-container>
-        </button>
+        </a>
         <a ngbDropdownItem class="nav-link" routerLink="settings" (click)="closeMenu()"
           *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }">
           <i-bs class="me-2" name="gear"></i-bs><ng-container i18n>Settings</ng-container>
