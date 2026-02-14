@@ -2,13 +2,16 @@ import os
 from pathlib import Path
 from unittest import mock
 
+import pytest
 from django.test import TestCase
 from django.test import override_settings
+from pytest_mock import MockerFixture
 
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from paperless.checks import audit_log_check
 from paperless.checks import binaries_check
+from paperless.checks import check_deprecated_db_settings
 from paperless.checks import debug_mode_check
 from paperless.checks import paths_check
 from paperless.checks import settings_values_check
@@ -237,3 +240,67 @@ class TestAuditLogChecks(TestCase):
                     ("auditlog table was found but audit log is disabled."),
                     msg.msg,
                 )
+
+
+class TestDeprecatedDbSettings:
+    """Test suite for deprecated database settings system check."""
+
+    def test_no_deprecated_vars_no_warning(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """Test that no warning is raised when no deprecated vars are set."""
+        mocker.patch.dict(os.environ, {}, clear=True)
+
+        warnings = check_deprecated_db_settings(None)
+        assert warnings == []
+
+    @pytest.mark.parametrize(
+        ("env_var", "expected_hint_fragment"),
+        [
+            ("PAPERLESS_DB_TIMEOUT", "timeout"),
+            ("PAPERLESS_DB_POOLSIZE", "pool.min_size,pool.max_size"),
+            ("PAPERLESS_DBSSLMODE", "sslmode"),
+            ("PAPERLESS_DBSSLROOTCERT", "sslrootcert"),
+            ("PAPERLESS_DBSSLCERT", "sslcert"),
+            ("PAPERLESS_DBSSLKEY", "sslkey"),
+        ],
+    )
+    def test_deprecated_var_triggers_warning(
+        self,
+        mocker: MockerFixture,
+        env_var: str,
+        expected_hint_fragment: str,
+    ) -> None:
+        """Test that each deprecated var triggers appropriate warning."""
+        mocker.patch.dict(os.environ, {env_var: "some_value"}, clear=True)
+
+        warnings = check_deprecated_db_settings(None)
+
+        assert len(warnings) == 1
+        assert warnings[0].id == "paperless.W001"
+        assert env_var in warnings[0].hint
+        assert expected_hint_fragment in warnings[0].hint
+        assert "v3.2" in warnings[0].hint
+
+    def test_multiple_deprecated_vars(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """Test that multiple deprecated vars are all listed in warning."""
+        mocker.patch.dict(
+            os.environ,
+            {
+                "PAPERLESS_DB_TIMEOUT": "30",
+                "PAPERLESS_DB_POOLSIZE": "10",
+                "PAPERLESS_DBSSLMODE": "require",
+            },
+            clear=True,
+        )
+
+        warnings = check_deprecated_db_settings(None)
+
+        assert len(warnings) == 1
+        assert "PAPERLESS_DB_TIMEOUT" in warnings[0].hint
+        assert "PAPERLESS_DB_POOLSIZE" in warnings[0].hint
+        assert "PAPERLESS_DBSSLMODE" in warnings[0].hint

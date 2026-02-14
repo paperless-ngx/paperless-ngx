@@ -202,3 +202,51 @@ def audit_log_check(app_configs, **kwargs):
         )
 
     return result
+
+
+@register()
+def check_deprecated_db_settings(app_configs, **kwargs) -> list[Warning]:
+    """Check for deprecated database environment variables.
+
+    Detects legacy advanced options that should be migrated to
+    PAPERLESS_DB_OPTIONS.
+
+    Returns:
+        List of Django Warning instances for any deprecated vars found.
+    """
+    deprecated_vars = {
+        "PAPERLESS_DB_TIMEOUT": "timeout (or connect_timeout for Postgres/MariaDB)",
+        "PAPERLESS_DB_POOLSIZE": "pool.min_size,pool.max_size",
+        "PAPERLESS_DBSSLMODE": "sslmode (or ssl_mode for MariaDB)",
+        "PAPERLESS_DBSSLROOTCERT": "sslrootcert (or ssl.ca for MariaDB)",
+        "PAPERLESS_DBSSLCERT": "sslcert (or ssl.cert for MariaDB)",
+        "PAPERLESS_DBSSLKEY": "sslkey (or ssl.key for MariaDB)",
+    }
+
+    found_vars = []
+    for var_name in deprecated_vars:
+        if os.getenv(var_name):
+            found_vars.append(var_name)
+
+    if not found_vars:
+        return []
+
+    # Build migration example
+    examples = []
+    for var in found_vars:
+        examples.append(f"{var} -> PAPERLESS_DB_OPTIONS={deprecated_vars[var]}=<value>")
+
+    return [
+        Warning(
+            "Deprecated database environment variables detected",
+            # TODO: Need to check this URL
+            hint=(
+                f"Found: {', '.join(found_vars)}. "
+                "These will be removed in v3.2. "
+                "Migrate to PAPERLESS_DB_OPTIONS instead. "
+                f"Examples: {'; '.join(examples[:3])}. "
+                "See https://docs.paperless-ngx.com/migration/"
+            ),
+            id="paperless.W001",
+        ),
+    ]

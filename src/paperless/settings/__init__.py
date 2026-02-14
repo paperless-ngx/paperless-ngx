@@ -16,6 +16,7 @@ from dateparser.languages.loader import LocaleDataLoader
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
+from paperless.settings.custom import parse_db_settings
 from paperless.settings.parsers import get_bool_from_env
 from paperless.settings.parsers import get_float_from_env
 from paperless.settings.parsers import get_int_from_env
@@ -662,92 +663,9 @@ EMAIL_CERTIFICATE_FILE = get_path_from_env("PAPERLESS_EMAIL_CERTIFICATE_LOCATION
 ###############################################################################
 # Database                                                                    #
 ###############################################################################
-def _parse_db_settings() -> dict:
-    databases = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": DATA_DIR / "db.sqlite3",
-            "OPTIONS": {},
-        },
-    }
-    if os.getenv("PAPERLESS_DBHOST"):
-        # Have sqlite available as a second option for management commands
-        # This is important when migrating to/from sqlite
-        databases["sqlite"] = databases["default"].copy()
+DATABASES = parse_db_settings(DATA_DIR)
 
-        databases["default"] = {
-            "HOST": os.getenv("PAPERLESS_DBHOST"),
-            "NAME": os.getenv("PAPERLESS_DBNAME", "paperless"),
-            "USER": os.getenv("PAPERLESS_DBUSER", "paperless"),
-            "PASSWORD": os.getenv("PAPERLESS_DBPASS", "paperless"),
-            "OPTIONS": {},
-        }
-        if os.getenv("PAPERLESS_DBPORT"):
-            databases["default"]["PORT"] = os.getenv("PAPERLESS_DBPORT")
-
-        # Leave room for future extensibility
-        if os.getenv("PAPERLESS_DBENGINE") == "mariadb":
-            engine = "django.db.backends.mysql"
-            # Contrary to Postgres, Django does not natively support connection pooling for MariaDB.
-            # However, since MariaDB uses threads instead of forks, establishing connections is significantly faster
-            # compared to PostgreSQL, so the lack of pooling is not an issue
-            options = {
-                "read_default_file": "/etc/mysql/my.cnf",
-                "charset": "utf8mb4",
-                "ssl_mode": os.getenv("PAPERLESS_DBSSLMODE", "PREFERRED"),
-                "ssl": {
-                    "ca": os.getenv("PAPERLESS_DBSSLROOTCERT", None),
-                    "cert": os.getenv("PAPERLESS_DBSSLCERT", None),
-                    "key": os.getenv("PAPERLESS_DBSSLKEY", None),
-                },
-            }
-
-        else:  # Default to PostgresDB
-            engine = "django.db.backends.postgresql"
-            options = {
-                "sslmode": os.getenv("PAPERLESS_DBSSLMODE", "prefer"),
-                "sslrootcert": os.getenv("PAPERLESS_DBSSLROOTCERT", None),
-                "sslcert": os.getenv("PAPERLESS_DBSSLCERT", None),
-                "sslkey": os.getenv("PAPERLESS_DBSSLKEY", None),
-            }
-            if int(os.getenv("PAPERLESS_DB_POOLSIZE", 0)) > 0:
-                options.update(
-                    {
-                        "pool": {
-                            "min_size": 1,
-                            "max_size": int(os.getenv("PAPERLESS_DB_POOLSIZE")),
-                        },
-                    },
-                )
-
-        databases["default"]["ENGINE"] = engine
-        databases["default"]["OPTIONS"].update(options)
-
-    if os.getenv("PAPERLESS_DB_TIMEOUT") is not None:
-        if databases["default"]["ENGINE"] == "django.db.backends.sqlite3":
-            databases["default"]["OPTIONS"].update(
-                {"timeout": int(os.getenv("PAPERLESS_DB_TIMEOUT"))},
-            )
-        else:
-            databases["default"]["OPTIONS"].update(
-                {"connect_timeout": int(os.getenv("PAPERLESS_DB_TIMEOUT"))},
-            )
-            databases["sqlite"]["OPTIONS"].update(
-                {"timeout": int(os.getenv("PAPERLESS_DB_TIMEOUT"))},
-            )
-    return databases
-
-
-DATABASES = _parse_db_settings()
-
-if os.getenv("PAPERLESS_DBENGINE") == "mariadb":
-    # Silence Django error on old MariaDB versions.
-    # VARCHAR can support > 255 in modern versions
-    # https://docs.djangoproject.com/en/4.1/ref/checks/#database
-    # https://mariadb.com/kb/en/innodb-system-variables/#innodb_large_prefix
-    SILENCED_SYSTEM_CHECKS = ["mysql.W003"]
-
-DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 ###############################################################################
 # Internationalization                                                        #
