@@ -59,6 +59,8 @@ from documents.workflows.utils import get_workflows_for_trigger
 from paperless.config import AIConfig
 
 if TYPE_CHECKING:
+    import uuid
+
     from documents.classifier import DocumentClassifier
     from documents.data_models import ConsumableDocument
     from documents.data_models import DocumentMetadataOverrides
@@ -728,7 +730,7 @@ def add_to_index(sender, document, **kwargs) -> None:
 def run_workflows_added(
     sender,
     document: Document,
-    logging_group=None,
+    logging_group: uuid.UUID | None = None,
     original_file=None,
     **kwargs,
 ) -> None:
@@ -744,7 +746,7 @@ def run_workflows_added(
 def run_workflows_updated(
     sender,
     document: Document,
-    logging_group=None,
+    logging_group: uuid.UUID | None = None,
     **kwargs,
 ) -> None:
     run_workflows(
@@ -758,7 +760,7 @@ def run_workflows(
     trigger_type: WorkflowTrigger.WorkflowTriggerType,
     document: Document | ConsumableDocument,
     workflow_to_run: Workflow | None = None,
-    logging_group=None,
+    logging_group: uuid.UUID | None = None,
     overrides: DocumentMetadataOverrides | None = None,
     original_file: Path | None = None,
 ) -> tuple[DocumentMetadataOverrides, str] | None:
