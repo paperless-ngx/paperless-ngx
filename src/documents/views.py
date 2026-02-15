@@ -10,6 +10,7 @@ from collections import deque
 from datetime import datetime
 from pathlib import Path
 from time import mktime
+from typing import TYPE_CHECKING
 from typing import Literal
 from unicodedata import normalize
 from urllib.parse import quote
@@ -3005,6 +3006,9 @@ def serve_file(
     follow_formatting: bool = False,
 ):
     if use_archive:
+        if TYPE_CHECKING:
+            assert doc.archive_filename
+
         file_handle = doc.archive_file
         filename = (
             doc.archive_filename
@@ -3013,6 +3017,9 @@ def serve_file(
         )
         mime_type = "application/pdf"
     else:
+        if TYPE_CHECKING:
+            assert doc.filename
+
         file_handle = doc.source_file
         filename = doc.filename if follow_formatting else doc.get_public_filename()
         mime_type = doc.mime_type
