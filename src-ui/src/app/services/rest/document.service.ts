@@ -176,12 +176,19 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     return this.getResourceUrl(id, 'thumb')
   }
 
-  getDownloadUrl(id: number, original: boolean = false): string {
-    let url = this.getResourceUrl(id, 'download')
+  getDownloadUrl(
+    id: number,
+    original: boolean = false,
+    follow_formatting: boolean = false
+  ): string {
+    let url = new URL(this.getResourceUrl(id, 'download'))
     if (original) {
-      url += '?original=true'
+      url.searchParams.append('original', 'true')
     }
-    return url
+    if (follow_formatting) {
+      url.searchParams.append('follow_formatting', 'true')
+    }
+    return url.toString()
   }
 
   getNextAsn(): Observable<number> {

@@ -270,6 +270,7 @@ export class DocumentDetailComponent
   customFields: CustomField[]
 
   public downloading: boolean = false
+  public useFormattedFilename: boolean = false
 
   public readonly CustomFieldDataType = CustomFieldDataType
 
@@ -1154,11 +1155,12 @@ export class DocumentDetailComponent
     })
   }
 
-  download(original: boolean = false) {
+  download(original: boolean = false, follow_formatting: boolean = false) {
     this.downloading = true
     const downloadUrl = this.documentsService.getDownloadUrl(
       this.documentId,
-      original
+      original,
+      follow_formatting
     )
     this.http
       .get(downloadUrl, { observe: 'response', responseType: 'blob' })
