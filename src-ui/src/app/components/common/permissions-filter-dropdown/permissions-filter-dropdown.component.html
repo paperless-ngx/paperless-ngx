@@ -1,7 +1,6 @@
 <div class="btn-group w-100" ngbDropdown role="group">
   <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="isActive ? 'btn-primary' : 'btn-outline-primary'" [disabled]="disabled">
-    <i-bs name="person-fill-lock"></i-bs>
-    <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
+    <i-bs name="person-fill-lock"></i-bs><div class="d-none d-sm-inline ms-1">{{title}}</div>
     <pngx-clearable-badge [selected]="isActive" (cleared)="reset()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
   </button>
   <div class="dropdown-menu permission-filter-dropdown shadow py-0 w-2" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">

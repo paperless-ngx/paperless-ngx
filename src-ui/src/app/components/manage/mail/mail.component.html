@@ -11,16 +11,16 @@
   <h4>
     <ng-container i18n>Mail accounts</ng-container>
     <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editMailAccount()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailAccount }">
-      <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Account</ng-container>
+      <i-bs name="plus-circle" class="me-1"></i-bs><ng-container i18n>Add Account</ng-container>
     </button>
     @if (gmailOAuthUrl) {
       <a class="btn btn-sm btn-outline-secondary ms-2" [href]="gmailOAuthUrl" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailAccount }">
-        <i-bs name="google"></i-bs>&nbsp;<ng-container i18n>Connect Gmail Account</ng-container>
+        <i-bs name="google" class="me-1"></i-bs><ng-container i18n>Connect Gmail Account</ng-container>
       </a>
     }
     @if (outlookOAuthUrl) {
       <a class="btn btn-sm btn-outline-secondary ms-2" [href]="outlookOAuthUrl" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailAccount }">
-        <i-bs name="microsoft"></i-bs>&nbsp;<ng-container i18n>Connect Outlook Account</ng-container>
+        <i-bs name="microsoft" class="me-1"></i-bs><ng-container i18n>Connect Outlook Account</ng-container>
       </a>
     }
   </h4>
@@ -72,18 +72,18 @@
             <div class="btn-toolbar d-none d-sm-flex gap-2" role="toolbar">
               <div class="btn-group">
                 <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" [disabled]="!userCanEdit(account)" class="btn btn-sm btn-outline-secondary" type="button" (click)="editMailAccount(account)">
-                  <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
+                  <i-bs width="1em" height="1em" name="pencil" class="me-1"></i-bs><ng-container i18n>Edit</ng-container>
                 </button>
                 <button *pngxIfOwner="account" class="btn btn-sm btn-outline-secondary" type="button" (click)="editPermissions(account)">
-                  <i-bs width="1em" height="1em" name="person-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
+                  <i-bs width="1em" height="1em" name="person-lock" class="me-1"></i-bs><ng-container i18n>Permissions</ng-container>
                 </button>
                 <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailAccount }" [disabled]="!userIsOwner(account)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailAccount(account)">
-                  <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+                  <i-bs width="1em" height="1em" name="trash" class="me-1"></i-bs><ng-container i18n>Delete</ng-container>
                 </button>
               </div>
               <div class="btn-group">
                 <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" [disabled]="!userIsOwner(account)" class="btn btn-sm btn-outline-secondary" type="button" (click)="processAccount(account)">
-                  <i-bs width="1em" height="1em" name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Process Mail</ng-container>
+                  <i-bs width="1em" height="1em" name="arrow-clockwise" class="me-1"></i-bs><ng-container i18n>Process Mail</ng-container>
                 </button>
               </div>
             </div>
@@ -102,7 +102,7 @@
   <h4 class="mt-4">
     <ng-container i18n>Mail rules</ng-container>
     <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editMailRule()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailRule }">
-      <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Rule</ng-container>
+      <i-bs name="plus-circle" class="me-1"></i-bs><ng-container i18n>Add Rule</ng-container>
     </button>
   </h4>
   <ul class="list-group">
@@ -140,7 +140,7 @@
           </div>
           <div class="col d-flex align-items-center d-none d-sm-flex" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.ProcessedMail }">
             <button class="btn btn-sm btn-outline-secondary" type="button" (click)="viewProcessedMail(rule)">
-              <i-bs width="1em" height="1em" name="clock-history"></i-bs>&nbsp;<ng-container i18n>View Processed Mail</ng-container>
+              <i-bs width="1em" height="1em" name="clock-history" class="me-1"></i-bs><ng-container i18n>View Processed Mail</ng-container>
             </button>
           </div>
           <div class="col-3">
@@ -160,18 +160,18 @@
             <div class="btn-toolbar d-none d-sm-flex gap-2" role="toolbar">
               <div class="btn-group">
                 <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" [disabled]="!userCanEdit(rule)" class="btn btn-sm btn-outline-secondary" type="button" (click)="editMailRule(rule)">
-                  <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
+                  <i-bs width="1em" height="1em" name="pencil" class="me-1"></i-bs><ng-container i18n>Edit</ng-container>
                 </button>
                 <button *pngxIfOwner="rule" class="btn btn-sm btn-outline-secondary" type="button" (click)="editPermissions(rule)">
-                  <i-bs width="1em" height="1em" name="person-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
+                  <i-bs width="1em" height="1em" name="person-lock" class="me-1"></i-bs><ng-container i18n>Permissions</ng-container>
                 </button>
                 <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailRule }" [disabled]="!userIsOwner(rule)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailRule(rule)">
-                  <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+                  <i-bs width="1em" height="1em" name="trash" class="me-1"></i-bs><ng-container i18n>Delete</ng-container>
                 </button>
               </div>
               <div class="btn-group">
                 <button *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailRule }" class="btn btn-sm btn-outline-secondary" type="button" (click)="copyMailRule(rule)">
-                  <i-bs width="1em" height="1em" name="files"></i-bs>&nbsp;<ng-container i18n>Copy</ng-container>
+                  <i-bs width="1em" height="1em" name="files" class="me-1"></i-bs><ng-container i18n>Copy</ng-container>
                 </button>
               </div>
             </div>

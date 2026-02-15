@@ -6,10 +6,10 @@
   >
   <div class="btn-toolbar col col-md-auto align-items-center gap-2">
     <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedTasks.size === 0">
-      <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
+      <i-bs name="x" class="me-1"></i-bs><ng-container i18n>Clear selection</ng-container>
     </button>
     <button class="btn btn-sm btn-outline-primary me-2" (click)="dismissTasks()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }" [disabled]="tasksService.total === 0">
-      <i-bs name="check2-all"></i-bs>&nbsp;{{dismissButtonText}}
+      <i-bs name="check2-all" class="me-1"></i-bs>{{dismissButtonText}}
     </button>
     <div class="form-inline d-flex align-items-center">
       <div class="input-group input-group-sm flex-fill w-auto flex-nowrap">
@@ -113,12 +113,12 @@
           <td scope="row">
             <div class="btn-group" role="group">
               <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }">
-                <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Dismiss</ng-container>
+                <i-bs name="check" class="me-1"></i-bs><ng-container i18n>Dismiss</ng-container>
               </button>
               <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
                 @if (task.related_document) {
                   <button class="btn btn-sm btn-outline-primary" (click)="dismissAndGo(task); $event.stopPropagation();">
-                    <i-bs name="file-text"></i-bs>&nbsp;<ng-container i18n>Open Document</ng-container>
+                    <i-bs name="file-text" class="me-1"></i-bs><ng-container i18n>Open Document</ng-container>
                   </button>
                 }
               </ng-container>

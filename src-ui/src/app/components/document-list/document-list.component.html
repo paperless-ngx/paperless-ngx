@@ -1,8 +1,7 @@
 <pngx-page-header [title]="getTitle()">
   <div ngbDropdown class="btn-group flex-fill d-sm-none">
     <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle>
-      <i-bs name="text-indent-left"></i-bs>
-      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Select</ng-container></div>
+      <i-bs name="text-indent-left"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Select</ng-container></div>
       @if (list.selected.size > 0) {
         <pngx-clearable-badge [selected]="list.selected.size > 0" [number]="list.selected.size" (cleared)="list.selectNone()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
       }
@@ -20,21 +19,20 @@
     <div class="btn-group btn-group-sm flex-nowrap">
       @if (list.selected.size > 0) {
         <button class="btn btn-sm btn-outline-secondary" (click)="list.selectNone()">
-          <i-bs name="slash-circle"></i-bs>&nbsp;<ng-container i18n>None</ng-container>
+          <i-bs name="slash-circle" class="me-1"></i-bs><ng-container i18n>None</ng-container>
         </button>
       }
       <button class="btn btn-sm btn-outline-primary" (click)="list.selectPage()">
-        <i-bs name="file-earmark-check"></i-bs>&nbsp;<ng-container i18n>Page</ng-container>
+        <i-bs name="file-earmark-check" class="me-1"></i-bs><ng-container i18n>Page</ng-container>
       </button>
       <button class="btn btn-sm btn-outline-primary" (click)="list.selectAll()">
-        <i-bs name="check-all"></i-bs>&nbsp;<ng-container i18n>All</ng-container>
+        <i-bs name="check-all" class="me-1"></i-bs><ng-container i18n>All</ng-container>
       </button>
     </div>
   </div>
   <div ngbDropdown class="btn-group flex-fill">
     <button class="btn btn-sm btn-outline-primary" id="dropdownDisplayFields" ngbDropdownToggle>
-      <i-bs name="card-heading"></i-bs>
-      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Show</ng-container></div>
+      <i-bs name="card-heading"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Show</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="dropdownDisplayFields" class="shadow">
       <div class="px-3">
@@ -64,8 +62,7 @@
 
   <div ngbDropdown class="btn-group flex-fill">
     <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle>
-      <i-bs name="arrow-down-up"></i-bs>
-      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Sort</ng-container></div>
+      <i-bs name="arrow-down-up"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Sort</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow dropdown-menu-right">
       <div class="w-100 d-flex pb-2 mb-1 border-bottom">
@@ -90,8 +87,7 @@
 
   <div class="btn-group flex-fill" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }" ngbDropdown role="group">
     <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" tourAnchor="tour.documents-views" ngbDropdownToggle>
-      <i-bs class="me-1" name="window-stack"></i-bs>
-      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Views</ng-container></div>
+      <i-bs name="window-stack"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Views</ng-container></div>
       @if (savedViewIsModified) {
         <div class="position-absolute top-0 start-100 p-2 translate-middle badge bg-secondary border border-light rounded-circle">
           <span class="visually-hidden">selected</span>

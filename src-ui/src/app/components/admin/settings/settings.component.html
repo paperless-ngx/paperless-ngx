@@ -5,13 +5,13 @@
   i18n-info
   >
   <button class="btn btn-sm btn-outline-primary" (click)="tourService.start()">
-    <i-bs class="me-1" name="airplane"></i-bs>&nbsp;<ng-container i18n>Start tour</ng-container>
+    <i-bs class="me-2" name="airplane"></i-bs><ng-container i18n>Start tour</ng-container>
   </button>
   @if (permissionsService.isAdmin()) {
     <button class="btn btn-sm btn-outline-primary position-relative ms-md-5 me-1" (click)="showSystemStatus()"
       [disabled]="!systemStatus">
       @if (!systemStatus) {
-        <div class="spinner-border spinner-border-sm me-1 h-75" role="status"></div>
+        <div class="spinner-border spinner-border-sm me-2 h-75" role="status"></div>
       } @else {
         <i-bs class="me-2" name="card-checklist"></i-bs>
         @if (systemStatusHasErrors) {
@@ -28,7 +28,7 @@
     </button>
     <a class="btn btn-sm btn-primary" href="admin/" target="_blank">
       <ng-container i18n>Open Django Admin</ng-container>
-      &nbsp;<i-bs name="arrow-up-right"></i-bs>
+      <i-bs class="ms-2" name="arrow-up-right"></i-bs>
     </a>
   }
 </pngx-page-header>

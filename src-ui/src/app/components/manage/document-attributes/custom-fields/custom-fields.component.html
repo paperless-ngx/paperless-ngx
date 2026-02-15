@@ -43,10 +43,10 @@
           </div>
           <div class="btn-group d-none d-sm-inline-block">
             <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.CustomField }" class="btn btn-sm btn-outline-secondary" type="button" (click)="editField(field)">
-              <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
+              <i-bs width="1em" height="1em" name="pencil" class="me-1"></i-bs><ng-container i18n>Edit</ng-container>
             </button>
             <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.CustomField }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteField(field)">
-              <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+              <i-bs width="1em" height="1em" name="trash" class="me-1"></i-bs><ng-container i18n>Delete</ng-container>
             </button>
           </div>
           @if (field.document_count > 0) {
@@ -55,7 +55,7 @@
                 class="btn btn-sm btn-outline-secondary"
                 [routerLink]="getDocumentFilterUrl(field)"
               >
-                <i-bs width="1em" height="1em" name="filter"></i-bs>&nbsp;<ng-container i18n>Documents</ng-container
+                <i-bs width="1em" height="1em" name="filter" class="me-1"></i-bs><ng-container i18n>Documents</ng-container
                 ><span class="badge bg-light text-secondary ms-2">{{ field.document_count }}</span>
               </a>
             </div>
