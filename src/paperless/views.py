@@ -198,7 +198,7 @@ class ExternalLoginExchangeView(GenericAPIView):
             return HttpResponseBadRequest("Invalid or expired code")
 
         token, _ = Token.objects.get_or_create(user=user)
-        return Response({"token": token.key, "token_type": "Token"})
+        return Response({"token": token.key})
 
 
 class StandardPagination(PageNumberPagination):

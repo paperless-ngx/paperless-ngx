@@ -81,8 +81,7 @@ The REST api provides five different forms of authentication.
 
     ```json
     {
-        "token": "<drf-token>",
-        "token_type": "Token"
+        "token": "<drf-token>"
     }
     ```
 
