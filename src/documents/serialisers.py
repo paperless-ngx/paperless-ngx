@@ -2927,7 +2927,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
         return instance
 
-    def to_representation(self, instance):
+    def to_representation(self, instance: Workflow) -> dict[str, Any]:
         data = super().to_representation(instance)
         actions = instance.actions.order_by("order", "pk")
         data["actions"] = WorkflowActionSerializer(
