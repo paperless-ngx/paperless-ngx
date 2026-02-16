@@ -5,10 +5,13 @@ from unittest import mock
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import override_settings
+from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
@@ -397,6 +400,292 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, "folder/Something")
+
+    def test_test_storage_path_requires_document_view_permission(self) -> None:
+        owner = User.objects.create_user(username="owner")
+        unprivileged = User.objects.create_user(username="unprivileged")
+        document = Document.objects.create(
+            mime_type="application/pdf",
+            owner=owner,
+            title="Sensitive",
+            checksum="123",
+        )
+        self.client.force_authenticate(user=unprivileged)
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "document": document.id,
+                    "path": "path/{{ title }}",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("document", response.data)
+
+    def test_test_storage_path_allows_shared_document_view_permission(self) -> None:
+        owner = User.objects.create_user(username="owner")
+        viewer = User.objects.create_user(username="viewer")
+        document = Document.objects.create(
+            mime_type="application/pdf",
+            owner=owner,
+            title="Shared",
+            checksum="123",
+        )
+        assign_perm("view_document", viewer, document)
+
+        self.client.force_authenticate(user=viewer)
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "document": document.id,
+                    "path": "path/{{ title }}",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, "path/Shared")
+
+    def test_test_storage_path_exposes_basic_document_context_but_not_sensitive_owner_data(
+        self,
+    ) -> None:
+        owner = User.objects.create_user(
+            username="owner",
+            password="password",
+            email="owner@example.com",
+        )
+        document = Document.objects.create(
+            mime_type="application/pdf",
+            owner=owner,
+            title="Document",
+            content="Top secret content",
+            page_count=2,
+            checksum="123",
+        )
+        self.client.force_authenticate(user=owner)
+
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "document": document.id,
+                    "path": "{{ document.owner.username }}",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, "owner")
+
+        for expression, expected in (
+            ("{{ document.content }}", "Top secret content"),
+            ("{{ document.id }}", str(document.id)),
+            ("{{ document.page_count }}", "2"),
+        ):
+            response = self.client.post(
+                f"{self.ENDPOINT}test/",
+                json.dumps(
+                    {
+                        "document": document.id,
+                        "path": expression,
+                    },
+                ),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(response.data, expected)
+
+        for expression in (
+            "{{ document.owner.password }}",
+            "{{ document.owner.email }}",
+        ):
+            response = self.client.post(
+                f"{self.ENDPOINT}test/",
+                json.dumps(
+                    {
+                        "document": document.id,
+                        "path": expression,
+                    },
+                ),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertIsNone(response.data)
+
+    def test_test_storage_path_includes_related_objects_for_visible_document(
+        self,
+    ) -> None:
+        owner = User.objects.create_user(username="owner")
+        viewer = User.objects.create_user(username="viewer")
+        private_correspondent = Correspondent.objects.create(
+            name="Private Correspondent",
+            owner=owner,
+        )
+        document = Document.objects.create(
+            mime_type="application/pdf",
+            owner=owner,
+            correspondent=private_correspondent,
+            title="Document",
+            checksum="123",
+        )
+        assign_perm("view_document", viewer, document)
+
+        self.client.force_authenticate(user=viewer)
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "document": document.id,
+                    "path": "{{ correspondent }}",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, "Private Correspondent")
+
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "document": document.id,
+                    "path": (
+                        "{{ document.correspondent.name if document.correspondent else 'none' }}"
+                    ),
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, "Private Correspondent")
+
+    def test_test_storage_path_superuser_can_view_private_related_objects(self) -> None:
+        owner = User.objects.create_user(username="owner")
+        private_correspondent = Correspondent.objects.create(
+            name="Private Correspondent",
+            owner=owner,
+        )
+        document = Document.objects.create(
+            mime_type="application/pdf",
+            owner=owner,
+            correspondent=private_correspondent,
+            title="Document",
+            checksum="123",
+        )
+
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "document": document.id,
+                    "path": (
+                        "{{ document.correspondent.name if document.correspondent else 'none' }}"
+                    ),
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, "Private Correspondent")
+
+    def test_test_storage_path_includes_doc_type_storage_path_and_tags(
+        self,
+    ) -> None:
+        owner = User.objects.create_user(username="owner")
+        viewer = User.objects.create_user(username="viewer")
+        private_document_type = DocumentType.objects.create(
+            name="Private Type",
+            owner=owner,
+        )
+        private_storage_path = StoragePath.objects.create(
+            name="Private Storage Path",
+            path="private/path",
+            owner=owner,
+        )
+        private_tag = Tag.objects.create(
+            name="Private Tag",
+            owner=owner,
+        )
+        document = Document.objects.create(
+            mime_type="application/pdf",
+            owner=owner,
+            document_type=private_document_type,
+            storage_path=private_storage_path,
+            title="Document",
+            checksum="123",
+        )
+        document.tags.add(private_tag)
+        assign_perm("view_document", viewer, document)
+
+        self.client.force_authenticate(user=viewer)
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "document": document.id,
+                    "path": (
+                        "{{ document.document_type.name if document.document_type else 'none' }}/"
+                        "{{ document.storage_path.path if document.storage_path else 'none' }}/"
+                        "{{ document.tags[0].name if document.tags else 'none' }}"
+                    ),
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, "Private Type/private/path/Private Tag")
+
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "document": document.id,
+                    "path": "{{ document_type }}/{{ tag_list if tag_list else 'none' }}",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, "Private Type/Private Tag")
+
+    def test_test_storage_path_includes_custom_fields_for_visible_document(
+        self,
+    ) -> None:
+        owner = User.objects.create_user(username="owner")
+        viewer = User.objects.create_user(username="viewer")
+        document = Document.objects.create(
+            mime_type="application/pdf",
+            owner=owner,
+            title="Document",
+            checksum="123",
+        )
+        custom_field = CustomField.objects.create(
+            name="Secret Number",
+            data_type=CustomField.FieldDataType.INT,
+        )
+        CustomFieldInstance.objects.create(
+            document=document,
+            field=custom_field,
+            value_int=42,
+        )
+        assign_perm("view_document", viewer, document)
+
+        self.client.force_authenticate(user=viewer)
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "document": document.id,
+                    "path": "{{ custom_fields | get_cf_value('Secret Number', 'none') }}",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, "42")
 
 
 class TestBulkEditObjects(APITestCase):

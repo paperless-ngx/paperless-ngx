@@ -2411,7 +2411,10 @@ class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
         """
         Test storage path against a document
         """
-        serializer = StoragePathTestSerializer(data=request.data)
+        serializer = StoragePathTestSerializer(
+            data=request.data,
+            context={"request": request},
+        )
         serializer.is_valid(raise_exception=True)
 
         document = serializer.validated_data.get("document")
