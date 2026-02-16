@@ -75,7 +75,7 @@
     }
     <div class="btn-group">
       <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="setPermissions()" [disabled]="!userOwnsAll || !userCanEditAll">
-        <i-bs name="person-fill-lock"></i-bs><div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Permissions</ng-container></div>
+        <i-bs name="person-fill-lock"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Permissions</ng-container></div>
       </button>
     </div>
   </div>
@@ -83,18 +83,17 @@
     <div class="btn-toolbar">
       <div ngbDropdown>
         <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" [disabled]="!userCanEdit && !userCanAdd" ngbDropdownToggle>
-          <i-bs name="three-dots"></i-bs>
-          <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
+          <i-bs name="three-dots"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Actions</ng-container></div>
         </button>
         <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
           <button ngbDropdownItem (click)="reprocessSelected()" [disabled]="!userCanEditAll && !userCanEditAll">
-            <i-bs name="body-text"></i-bs>&nbsp;<ng-container i18n>Reprocess</ng-container>
+            <i-bs name="body-text" class="me-1"></i-bs><ng-container i18n>Reprocess</ng-container>
           </button>
           <button ngbDropdownItem (click)="rotateSelected()" [disabled]="!userOwnsAll && !userCanEditAll">
-            <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
+            <i-bs name="arrow-clockwise" class="me-1"></i-bs><ng-container i18n>Rotate</ng-container>
           </button>
           <button ngbDropdownItem (click)="mergeSelected()" [disabled]="!userCanAdd || list.selected.size < 2">
-            <i-bs name="journals"></i-bs>&nbsp;<ng-container i18n>Merge</ng-container>
+            <i-bs name="journals" class="me-1"></i-bs><ng-container i18n>Merge</ng-container>
           </button>
         </div>
       </div>
@@ -106,22 +105,20 @@
         ngbDropdownToggle
         [disabled]="disabled || list.selected.size === 0"
       >
-        <i-bs name="send"></i-bs>
-        <div class="d-none d-sm-inline">
-          &nbsp;<ng-container i18n>Send</ng-container>
+        <i-bs name="send"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Send</ng-container>
         </div>
       </button>
       <div ngbDropdownMenu aria-labelledby="dropdownSend" class="shadow">
         <button ngbDropdownItem (click)="createShareLinkBundle()">
-          <i-bs name="link"></i-bs>&nbsp;<ng-container i18n>Create a share link bundle</ng-container>
+          <i-bs name="link" class="me-1"></i-bs><ng-container i18n>Create a share link bundle</ng-container>
         </button>
         <button ngbDropdownItem (click)="manageShareLinkBundles()">
-          <i-bs name="list-ul"></i-bs>&nbsp;<ng-container i18n>Manage share link bundles</ng-container>
+          <i-bs name="list-ul" class="me-1"></i-bs><ng-container i18n>Manage share link bundles</ng-container>
         </button>
         <div class="dropdown-divider"></div>
         @if (emailEnabled) {
           <button ngbDropdownItem (click)="emailSelected()">
-            <i-bs name="envelope"></i-bs>&nbsp;<ng-container i18n>Email</ng-container>
+            <i-bs name="envelope" class="me-1"></i-bs><ng-container i18n>Email</ng-container>
           </button>
         }
       </div>
@@ -136,7 +133,7 @@
             <span class="visually-hidden">Preparing download...</span>
           </div>
         }
-        <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Download</ng-container></div>
+        <div class="d-none d-sm-inline ms-1"><ng-container i18n>Download</ng-container></div>
       </button>
       <div ngbDropdown class="me-2 d-flex btn-group" role="group">
         <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle-split rounded-end" ngbDropdownToggle></button>
@@ -164,7 +161,7 @@
 
     <div class="btn-group btn-group-sm">
       <button type="button" class="btn btn-sm btn-outline-danger" (click)="applyDelete()" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }" [disabled]="!userOwnsAll">
-        <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+        <i-bs name="trash" class="me-1"></i-bs><ng-container i18n>Delete</ng-container>
       </button>
     </div>
   </div>

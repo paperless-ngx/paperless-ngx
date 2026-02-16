@@ -4,7 +4,7 @@
       <label class="form-label" [class.mb-md-0]="horizontal" [for]="inputId">{{title}}</label>
       @if (removable) {
         <button type="button" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
-          <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Remove</ng-container>
+          <i-bs name="x" class="me-1"></i-bs><ng-container i18n>Remove</ng-container>
           </button>
         }
       </div>

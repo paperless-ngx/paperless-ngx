@@ -5,7 +5,7 @@
       @if (id) {
         <span class="badge bg-primary text-primary-text-contrast ms-3 small fs-normal cursor-pointer" (click)="copyID()">
           @if (copied) {
-            <i-bs width="1em" height="1em" name="clipboard-check"></i-bs>&nbsp;<ng-container i18n>Copied!</ng-container>
+            <i-bs width="1em" height="1em" name="clipboard-check" class="me-1"></i-bs><ng-container i18n>Copied!</ng-container>
           } @else {
             ID: {{id}}
           }

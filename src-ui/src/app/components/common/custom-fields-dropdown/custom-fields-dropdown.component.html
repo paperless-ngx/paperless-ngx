@@ -1,7 +1,6 @@
 <div ngbDropdown #fieldDropdown="ngbDropdown" (openChange)="onOpenClose($event)" [popperOptions]="popperOptions">
     <button type="button" class="btn btn-sm btn-outline-primary" id="customFieldsDropdown" [disabled]="disabled" ngbDropdownToggle>
-      <i-bs name="ui-radios"></i-bs>
-      <div class="d-none d-lg-inline">&nbsp;<ng-container i18n>Custom Fields</ng-container></div>
+      <i-bs name="ui-radios"></i-bs><div class="d-none d-lg-inline ms-1"><ng-container i18n>Custom Fields</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="customFieldsDropdown" class="shadow custom-fields-dropdown">
         <div class="list-group list-group-flush" (keydown)="listKeyDown($event)">
@@ -18,7 +17,7 @@
             @if (!filterText?.length || filteredFields.length === 0) {
                 <button class="list-group-item list-group-item-action bg-light" (click)="createField(filterText)" [disabled]="!canCreateFields" #button>
                     <small>
-                        <i-bs width=".9em" height=".9em" name="asterisk"></i-bs>&nbsp;<ng-container i18n>Create new field</ng-container>
+                        <i-bs width=".9em" height=".9em" name="asterisk" class="me-1"></i-bs><ng-container i18n>Create new field</ng-container>
                     </small>
                 </button>
             }

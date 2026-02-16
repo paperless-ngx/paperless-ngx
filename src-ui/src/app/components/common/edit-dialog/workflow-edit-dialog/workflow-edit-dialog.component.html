@@ -30,7 +30,7 @@
               <div class="d-flex">
                 <p class="p-2" i18n>Trigger Workflow On:</p>
                 <button type="button" class="btn btn-sm btn-outline-primary ms-auto mb-3" (click)="addTrigger()">
-                  <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Trigger</ng-container>
+                  <i-bs name="plus-circle" class="me-1"></i-bs><ng-container i18n>Add Trigger</ng-container>
                 </button>
               </div>
               <div ngbAccordion [closeOthers]="true">
@@ -72,7 +72,7 @@
               <div class="d-flex">
                 <p class="p-2" i18n>Apply Actions:</p>
                 <button type="button" class="btn btn-sm btn-outline-primary ms-auto mb-3" (click)="addAction()">
-                  <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Action</ng-container>
+                  <i-bs name="plus-circle" class="me-1"></i-bs><ng-container i18n>Add Action</ng-container>
                 </button>
               </div>
               <div ngbAccordion [closeOthers]="true" cdkDropList (cdkDropListDropped)="onActionDrop($event)">
@@ -187,7 +187,7 @@
                 (click)="addFilter(formGroup)"
                 [disabled]="!canAddFilter(formGroup)"
               >
-                <i-bs name="plus-circle"></i-bs>&nbsp;<span i18n>Add filter</span>
+                <i-bs name="plus-circle" class="me-1"></i-bs><span i18n>Add filter</span>
               </button>
             </div>
             <ul class="mt-2 list-group filters" formArrayName="filters">

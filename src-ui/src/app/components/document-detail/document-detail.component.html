@@ -56,29 +56,28 @@
 
   <div class="ms-auto" ngbDropdown>
     <button class="btn btn-sm btn-outline-primary" id="actionsDropdown" ngbDropdownToggle>
-      <i-bs name="three-dots"></i-bs>
-      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
+      <i-bs name="three-dots"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Actions</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
       <button ngbDropdownItem (click)="reprocess()" [disabled]="!userCanEdit || !userIsOwner">
-        <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs>&nbsp;<span i18n>Reprocess</span>
+        <i-bs width="1em" height="1em" name="arrow-counterclockwise" class="me-1"></i-bs><span i18n>Reprocess</span>
       </button>
 
       <button ngbDropdownItem (click)="printDocument()" [hidden]="useNativePdfViewer || isMobile">
-        <i-bs width="1em" height="1em" name="printer"></i-bs>&nbsp;<span i18n>Print</span>
+        <i-bs width="1em" height="1em" name="printer" class="me-1"></i-bs><span i18n>Print</span>
       </button>
 
       <button ngbDropdownItem (click)="moreLike()">
-        <i-bs width="1em" height="1em" name="diagram-3"></i-bs>&nbsp;<span i18n>More like this</span>
+        <i-bs width="1em" height="1em" name="diagram-3" class="me-1"></i-bs><span i18n>More like this</span>
       </button>
 
       <button ngbDropdownItem (click)="editPdf()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF">
-        <i-bs name="pencil"></i-bs>&nbsp;<ng-container i18n>PDF Editor</ng-container>
+        <i-bs name="pencil" class="me-1"></i-bs><ng-container i18n>PDF Editor</ng-container>
       </button>
 
       @if (userIsOwner && (requiresPassword || password)) {
         <button ngbDropdownItem (click)="removePassword()" [disabled]="!password">
-          <i-bs name="unlock"></i-bs>&nbsp;<ng-container i18n>Remove Password</ng-container>
+          <i-bs name="unlock" class="me-1"></i-bs><ng-container i18n>Remove Password</ng-container>
         </button>
       }
     </div>
@@ -86,16 +85,15 @@
 
   <div class="ms-auto" ngbDropdown>
     <button class="btn btn-sm btn-outline-primary" id="sendDropdown" ngbDropdownToggle>
-      <i-bs name="send"></i-bs>
-      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Send</ng-container></div>
+      <i-bs name="send"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Send</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
       <button ngbDropdownItem (click)="openShareLinks()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }">
-        <i-bs name="link"></i-bs>&nbsp;<span i18n>Share Links</span>
+        <i-bs name="link" class="me-1"></i-bs><span i18n>Share Links</span>
       </button>
       @if (emailEnabled) {
         <button ngbDropdownItem (click)="openEmailDocument()">
-          <i-bs name="envelope"></i-bs>&nbsp;<span i18n>Email</span>
+          <i-bs name="envelope" class="me-1"></i-bs><span i18n>Email</span>
         </button>
       }
     </div>
