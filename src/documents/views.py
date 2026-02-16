@@ -390,7 +390,16 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
 
     # Default is simple relation path, override for through-table/count specialization.
     document_count_through = None
-    document_count_source_field = None
+    document_count_source_field: str | None = None
+
+    def _get_document_count_source_field(self) -> str:
+        if self.document_count_source_field is None:
+            msg = (
+                "document_count_source_field must be set when "
+                "document_count_through is configured"
+            )
+            raise ValueError(msg)
+        return self.document_count_source_field
 
     def get_document_count_filter(self):
         request = getattr(self, "request", None)
@@ -406,7 +415,7 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
             return annotate_document_count_for_related_queryset(
                 base_qs,
                 through_model=self.document_count_through,
-                related_object_field=self.document_count_source_field,
+                related_object_field=self._get_document_count_source_field(),
                 user=user,
             )
 
@@ -508,7 +517,7 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
                     .select_related("owner")
                     .order_by(*ordering),
                     through_model=self.document_count_through,
-                    related_object_field=self.document_count_source_field,
+                    related_object_field=self._get_document_count_source_field(),
                     user=user,
                 ),
             )
