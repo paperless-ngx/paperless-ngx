@@ -3368,7 +3368,7 @@ class SharedLinkView(View):
         return response
 
 
-def serve_file(*, doc: Document, use_archive: bool, disposition: str):
+def serve_file(*, doc: Document, use_archive: bool, disposition: str) -> HttpResponse:
     if use_archive:
         file_handle = doc.archive_file
         filename = doc.get_public_filename(archive=True)
