@@ -48,6 +48,9 @@ from documents.views import serve_logo
 from paperless.consumers import StatusConsumer
 from paperless.views import ApplicationConfigurationViewSet
 from paperless.views import DisconnectSocialAccountView
+from paperless.views import ExternalLoginCompleteView
+from paperless.views import ExternalLoginExchangeView
+from paperless.views import ExternalLoginStartView
 from paperless.views import FaviconView
 from paperless.views import GenerateAuthTokenView
 from paperless.views import GroupViewSet
@@ -94,6 +97,28 @@ urlpatterns = [
                     include(
                         ("rest_framework.urls", "rest_framework"),
                         namespace="rest_framework",
+                    ),
+                ),
+                re_path(
+                    "^auth/external-login/",
+                    include(
+                        [
+                            path(
+                                "start/",
+                                ExternalLoginStartView.as_view(),
+                                name="external_auth_start",
+                            ),
+                            path(
+                                "complete/",
+                                ExternalLoginCompleteView.as_view(),
+                                name="external_auth_complete",
+                            ),
+                            path(
+                                "exchange/",
+                                ExternalLoginExchangeView.as_view(),
+                                name="external_auth_exchange",
+                            ),
+                        ],
                     ),
                 ),
                 re_path(

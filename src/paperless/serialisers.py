@@ -68,6 +68,10 @@ class PaperlessAuthTokenSerializer(AuthTokenSerializer):
         return attrs
 
 
+class ExternalAuthCodeExchangeSerializer(serializers.Serializer):
+    code = serializers.CharField(trim_whitespace=False)
+
+
 class UserSerializer(PasswordValidationMixin, serializers.ModelSerializer):
     password = ObfuscatedPasswordField(required=False)
     user_permissions = serializers.SlugRelatedField(

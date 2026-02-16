@@ -1,0 +1,17 @@
+{% extends "paperless-ngx/base.html" %}
+{% load i18n %}
+
+{% block head_title %}
+    {{ title }}
+{% endblock head_title %}
+
+{% block form_top_content %}
+    <h2 class="h4 mb-3">{{ title }}</h2>
+    <p>{{ message }}</p>
+{% endblock form_top_content %}
+
+{% block form_content %}
+    <div class="d-grid mt-3">
+        <a class="btn btn-primary" href="{% url 'account_login' %}">{% translate "Back to sign in" %}</a>
+    </div>
+{% endblock form_content %}

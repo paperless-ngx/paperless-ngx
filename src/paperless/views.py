@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from pathlib import Path
+from urllib.parse import urlencode
 
 from allauth.mfa import signals
 from allauth.mfa.adapter import get_adapter as get_mfa_adapter
@@ -17,6 +18,10 @@ from django.http import FileResponse
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseNotFound
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+from django.urls import reverse
+from django.utils.translation import gettext as _
 from django.views.generic import View
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
@@ -36,10 +41,19 @@ from rest_framework.viewsets import ModelViewSet
 from documents.index import DelayedQuery
 from documents.permissions import PaperlessObjectPermissions
 from documents.tasks import llmindex_index
+from paperless.external_auth import build_external_auth_callback_url
+from paperless.external_auth import consume_external_auth_code
+from paperless.external_auth import external_auth_is_enabled
+from paperless.external_auth import get_external_auth_flow
+from paperless.external_auth import is_allowed_redirect_uri
+from paperless.external_auth import issue_external_auth_code
+from paperless.external_auth import pop_external_auth_flow
+from paperless.external_auth import save_external_auth_flow
 from paperless.filters import GroupFilterSet
 from paperless.filters import UserFilterSet
 from paperless.models import ApplicationConfiguration
 from paperless.serialisers import ApplicationConfigurationSerializer
+from paperless.serialisers import ExternalAuthCodeExchangeSerializer
 from paperless.serialisers import GroupSerializer
 from paperless.serialisers import PaperlessAuthTokenSerializer
 from paperless.serialisers import ProfileSerializer
@@ -49,6 +63,142 @@ from paperless_ai.indexing import vector_store_file_exists
 
 class PaperlessObtainAuthTokenView(ObtainAuthToken):
     serializer_class = PaperlessAuthTokenSerializer
+
+
+def _external_auth_error_response(
+    request,
+    *,
+    status_code: int,
+    title: str,
+    message: str,
+):
+    return render(
+        request,
+        "paperless-ngx/external_auth_error.html",
+        {
+            "title": title,
+            "message": message,
+        },
+        status=status_code,
+    )
+
+
+class ExternalLoginStartView(View):
+    def get(self, request, *args, **kwargs):
+        if not external_auth_is_enabled():
+            return _external_auth_error_response(
+                request,
+                status_code=403,
+                title=_("External app login unavailable"),
+                message=_(
+                    "External app login is not configured on this server.",
+                ),
+            )
+
+        redirect_uri = request.GET.get("redirect_uri")
+        if not redirect_uri:
+            return _external_auth_error_response(
+                request,
+                status_code=400,
+                title=_("Invalid login request"),
+                message=_("Missing redirect URI."),
+            )
+        if not is_allowed_redirect_uri(redirect_uri):
+            return _external_auth_error_response(
+                request,
+                status_code=400,
+                title=_("Invalid login request"),
+                message=_("Redirect URI is not allowed."),
+            )
+
+        save_external_auth_flow(
+            request,
+            redirect_uri=redirect_uri,
+            state=request.GET.get("state"),
+        )
+
+        if request.user.is_authenticated:
+            return HttpResponseRedirect(reverse("external_auth_complete"))
+
+        return HttpResponseRedirect(
+            f"{reverse('account_login')}?{urlencode({'next': reverse('external_auth_complete')})}",
+        )
+
+
+class ExternalLoginCompleteView(View):
+    def get(self, request, *args, **kwargs):
+        if get_external_auth_flow(request) is None:
+            return _external_auth_error_response(
+                request,
+                status_code=400,
+                title=_("Login request expired"),
+                message=_(
+                    "This external login request is invalid or has expired. "
+                    "Please restart login from your app.",
+                ),
+            )
+
+        if not request.user.is_authenticated:
+            return HttpResponseRedirect(
+                f"{reverse('account_login')}?{urlencode({'next': reverse('external_auth_complete')})}",
+            )
+
+        flow = pop_external_auth_flow(request)
+        if flow is None:
+            return _external_auth_error_response(
+                request,
+                status_code=400,
+                title=_("Login request expired"),
+                message=_(
+                    "This external login request is invalid or has expired. "
+                    "Please restart login from your app.",
+                ),
+            )
+
+        code = issue_external_auth_code(request.user.pk)
+        callback_url = build_external_auth_callback_url(
+            flow["redirect_uri"],
+            code=code,
+            state=flow["state"],
+        )
+
+        return render(
+            request,
+            "paperless-ngx/external_auth_success.html",
+            {
+                "callback_url": callback_url,
+            },
+        )
+
+
+@extend_schema_view(
+    post=extend_schema(
+        request=ExternalAuthCodeExchangeSerializer,
+        responses={
+            (200, "application/json"): OpenApiTypes.OBJECT,
+            400: OpenApiTypes.STR,
+        },
+    ),
+)
+class ExternalLoginExchangeView(GenericAPIView):
+    authentication_classes = []
+    permission_classes = []
+    serializer_class = ExternalAuthCodeExchangeSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user_id = consume_external_auth_code(serializer.validated_data["code"])
+        if user_id is None:
+            return HttpResponseBadRequest("Invalid or expired code")
+
+        user = User.objects.filter(pk=user_id, is_active=True).first()
+        if user is None:
+            return HttpResponseBadRequest("Invalid or expired code")
+
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({"token": token.key, "token_type": "Token"})
 
 
 class StandardPagination(PageNumberPagination):
