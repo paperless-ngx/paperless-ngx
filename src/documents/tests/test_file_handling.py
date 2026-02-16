@@ -1382,11 +1382,11 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
     def test_template_with_security(self):
         """
         GIVEN:
-            - Filename format with one or more undefined variables
+            - Filename format with an unavailable document attribute
         WHEN:
             - Filepath for a document with this format is called
         THEN:
-            - The first undefined variable is logged
+            - The missing attribute is logged
             - The default format is used
         """
         doc_a = Document.objects.create(
@@ -1408,7 +1408,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             self.assertEqual(len(capture.output), 1)
             self.assertEqual(
                 capture.output[0],
-                "WARNING:paperless.templating:Template attempted restricted operation: <bound method Model.save of <Document: 2020-06-25 Does Matter>> is not safely callable",
+                "ERROR:paperless.templating:Template variable error: 'dict object' has no attribute 'save'",
             )
 
     def test_template_with_custom_fields(self):
