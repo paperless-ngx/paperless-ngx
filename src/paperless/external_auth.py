@@ -1,4 +1,5 @@
 import secrets
+from typing import cast
 from urllib.parse import parse_qsl
 from urllib.parse import urlencode
 from urllib.parse import urlsplit
@@ -119,4 +120,7 @@ def build_external_auth_callback_url(
     if state is not None:
         query.append(("state", state))
 
-    return urlunsplit(parsed._replace(query=urlencode(query)))
+    return cast(
+        "str",
+        urlunsplit(parsed._replace(query=urlencode(query))),
+    )

@@ -100,12 +100,11 @@ class TestCustomAccountAdapter(TestCase):
     def test_get_login_redirect_url_for_external_auth_flow(self) -> None:
         adapter = get_adapter()
         request = HttpRequest()
-        request.session = {
-            EXTERNAL_AUTH_FLOW_SESSION_KEY: {
-                "redirect_uri": "app://callback",
-                "state": "test-state",
-                "created_at": 9999999999,
-            },
+        request.session = self.client.session
+        request.session[EXTERNAL_AUTH_FLOW_SESSION_KEY] = {
+            "redirect_uri": "app://callback",
+            "state": "test-state",
+            "created_at": 9999999999,
         }
 
         self.assertEqual(
@@ -200,12 +199,11 @@ class TestCustomSocialAccountAdapter(TestCase):
     def test_get_login_redirect_url_for_external_auth_flow(self) -> None:
         adapter = get_social_adapter()
         request = HttpRequest()
-        request.session = {
-            EXTERNAL_AUTH_FLOW_SESSION_KEY: {
-                "redirect_uri": "app://callback",
-                "state": "test-state",
-                "created_at": 9999999999,
-            },
+        request.session = self.client.session
+        request.session[EXTERNAL_AUTH_FLOW_SESSION_KEY] = {
+            "redirect_uri": "app://callback",
+            "state": "test-state",
+            "created_at": 9999999999,
         }
 
         self.assertEqual(

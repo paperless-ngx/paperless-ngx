@@ -56,7 +56,7 @@ class TestExternalAuth(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertEqual(
-            response.url,
+            response["Location"],
             "/accounts/login/?next=%2Fapi%2Fauth%2Fexternal-login%2Fcomplete%2F",
         )
 
@@ -78,7 +78,7 @@ class TestExternalAuth(TestCase):
             {"redirect_uri": "app://callback"},
         )
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
-        self.assertEqual(response.url, "/api/auth/external-login/complete/")
+        self.assertEqual(response["Location"], "/api/auth/external-login/complete/")
 
     def test_complete_without_flow_returns_bad_request(self) -> None:
         response = self.client.get("/api/auth/external-login/complete/")
@@ -95,7 +95,7 @@ class TestExternalAuth(TestCase):
         response = self.client.get("/api/auth/external-login/complete/")
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertEqual(
-            response.url,
+            response["Location"],
             "/accounts/login/?next=%2Fapi%2Fauth%2Fexternal-login%2Fcomplete%2F",
         )
 
