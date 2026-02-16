@@ -359,6 +359,9 @@ jobs:
   build-docker-image:
     name: Build Docker image for ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
     if: (github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || startsWith(github.ref, 'refs/heads/fix-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || contains(github.ref, 'beta.rc') || startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/heads/l10n_'))) || (github.event_name == 'pull_request' && (startsWith(github.head_ref, 'feature-') || startsWith(github.head_ref, 'fix-') || github.head_ref == 'dev' || github.head_ref == 'beta' || contains(github.head_ref, 'beta.rc') || startsWith(github.head_ref, 'l10n_')))
     concurrency:
       group: ${{ github.workflow }}-build-docker-image-${{ github.ref_name }}
@@ -597,6 +600,8 @@ jobs:
   publish-release:
     name: "Publish Release"
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     outputs:
       prerelease: ${{ steps.get_version.outputs.prerelease }}
       changelog: ${{ steps.create-release.outputs.body }}
@@ -643,6 +648,10 @@ jobs:
   append-changelog:
     name: "Append Changelog"
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
     needs:
       - publish-release
     if: needs.publish-release.outputs.prerelease == 'false'
