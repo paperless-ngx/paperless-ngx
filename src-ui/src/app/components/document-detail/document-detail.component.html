@@ -25,7 +25,7 @@
   </button>
 
   <div class="btn-group">
-    <button (click)="download()" class="btn btn-sm btn-outline-primary" [disabled]="downloading">
+    <button (click)="download(false, useFormattedFilename)" class="btn btn-sm btn-outline-primary" [disabled]="downloading">
       @if (downloading) {
         <div class="spinner-border spinner-border-sm" role="status"></div>
       } @else {
@@ -34,14 +34,21 @@
       <span class="d-none d-lg-inline ps-1" i18n>Download</span>
     </button>
 
-    @if (metadata?.has_archive_version) {
-      <div class="btn-group" ngbDropdown role="group">
-        <button class="btn btn-sm btn-outline-primary dropdown-toggle" [disabled]="downloading" ngbDropdownToggle></button>
-        <div class="dropdown-menu shadow" ngbDropdownMenu>
-          <button ngbDropdownItem (click)="download(true)" [disabled]="downloading" i18n>Download original</button>
-        </div>
+    <div class="btn-group" ngbDropdown role="group">
+      <button class="btn btn-sm btn-outline-primary dropdown-toggle" [disabled]="downloading" ngbDropdownToggle></button>
+      <div class="dropdown-menu shadow" ngbDropdownMenu>
+        @if (metadata?.has_archive_version) {
+          <button ngbDropdownItem (click)="download(true, useFormattedFilename)" [disabled]="downloading" i18n>Download original</button>
+          <div class="dropdown-divider"></div>
+        }
+        <form class="px-3 py-1">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="downloadUseFormatting" [(ngModel)]="useFormattedFilename" [ngModelOptions]="{standalone: true}" />
+            <label class="form-check-label" for="downloadUseFormatting" i18n>Use formatted filename</label>
+          </div>
+        </form>
       </div>
-    }
+    </div>
   </div>
 
   <div class="ms-auto" ngbDropdown>

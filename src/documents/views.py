@@ -10,6 +10,7 @@ from collections import deque
 from datetime import datetime
 from pathlib import Path
 from time import mktime
+from typing import TYPE_CHECKING
 from typing import Literal
 from unicodedata import normalize
 from urllib.parse import quote
@@ -606,6 +607,12 @@ class EmailDocumentDetailSchema(EmailSerializer):
                 type=OpenApiTypes.BOOL,
                 location=OpenApiParameter.QUERY,
             ),
+            OpenApiParameter(
+                name="follow_formatting",
+                description="Whether or not to use the filename on disk",
+                type=OpenApiTypes.BOOL,
+                location=OpenApiParameter.QUERY,
+            ),
         ],
         responses={200: OpenApiTypes.BINARY},
     ),
@@ -876,6 +883,13 @@ class DocumentViewSet(
             and request.query_params["original"] == "true"
         )
 
+    @staticmethod
+    def follow_formatting_requested(request):
+        return (
+            "follow_formatting" in request.query_params
+            and request.query_params["follow_formatting"] == "true"
+        )
+
     def file_response(self, pk, request, disposition):
         doc = Document.global_objects.select_related("owner").get(id=pk)
         if request.user is not None and not has_perms_owner_aware(
@@ -884,11 +898,13 @@ class DocumentViewSet(
             doc,
         ):
             return HttpResponseForbidden("Insufficient permissions")
+
         return serve_file(
             doc=doc,
             use_archive=not self.original_requested(request)
             and doc.has_archive_version,
             disposition=disposition,
+            follow_formatting=self.follow_formatting_requested(request),
         )
 
     def get_metadata(self, file, mime_type):
@@ -3022,14 +3038,30 @@ class SharedLinkView(View):
         return response
 
 
-def serve_file(*, doc: Document, use_archive: bool, disposition: str):
+def serve_file(
+    *,
+    doc: Document,
+    use_archive: bool,
+    disposition: str,
+    follow_formatting: bool = False,
+):
     if use_archive:
+        if TYPE_CHECKING:
+            assert doc.archive_filename
+
         file_handle = doc.archive_file
-        filename = doc.get_public_filename(archive=True)
+        filename = (
+            doc.archive_filename
+            if follow_formatting
+            else doc.get_public_filename(archive=True)
+        )
         mime_type = "application/pdf"
     else:
+        if TYPE_CHECKING:
+            assert doc.filename
+
         file_handle = doc.source_file
-        filename = doc.get_public_filename()
+        filename = doc.filename if follow_formatting else doc.get_public_filename()
         mime_type = doc.mime_type
         # Support browser previewing csv files by using text mime type
         if mime_type in {"application/csv", "text/csv"} and disposition == "inline":

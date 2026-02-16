@@ -445,6 +445,40 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.content, content)
 
+    @override_settings(FILENAME_FORMAT="")
+    def test_download_follow_formatting(self) -> None:
+        content = b"This is a test"
+        content_archive = b"This is the same test but archived"
+
+        doc = Document.objects.create(
+            title="none",
+            filename="my_document.pdf",
+            archive_filename="archived.pdf",
+            mime_type="application/pdf",
+        )
+
+        with Path(doc.source_path).open("wb") as f:
+            f.write(content)
+
+        with Path(doc.archive_path).open("wb") as f:
+            f.write(content_archive)
+
+        # Without follow_formatting, should use public filename
+        response = self.client.get(f"/api/documents/{doc.pk}/download/")
+        self.assertIn("none.pdf", response["Content-Disposition"])
+
+        # With follow_formatting, should use actual filename on disk
+        response = self.client.get(
+            f"/api/documents/{doc.pk}/download/?follow_formatting=true",
+        )
+        self.assertIn("archived.pdf", response["Content-Disposition"])
+
+        # With follow_formatting and original, should use source filename
+        response = self.client.get(
+            f"/api/documents/{doc.pk}/download/?original=true&follow_formatting=true",
+        )
+        self.assertIn("my_document.pdf", response["Content-Disposition"])
+
     def test_document_actions_not_existing_file(self) -> None:
         doc = Document.objects.create(
             title="none",

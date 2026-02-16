@@ -249,6 +249,13 @@ describe(`DocumentService`, () => {
     expect(url).toEqual(
       `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/download/?original=true`
     )
+    url = service.getDownloadUrl(documents[0].id, false, true)
+    expect(url).toEqual(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/download/?follow_formatting=true`
+    )
+    url = service.getDownloadUrl(documents[0].id, true, true)
+    expect(url).toContain('original=true')
+    expect(url).toContain('follow_formatting=true')
   })
 
   it('should set search query', () => {
