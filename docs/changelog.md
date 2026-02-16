@@ -1,5 +1,15 @@
 # Changelog
 
+## paperless-ngx 2.20.7
+
+### Bug Fixes
+
+-   Performance fix: use subqueries to improve object retrieval in large installs [@shamoon](https://github.com/shamoon) ([#11950](https://github.com/paperless-ngx/paperless-ngx/pull/11950))
+
+### All App Changes
+
+-   Performance fix: use subqueries to improve object retrieval in large installs [@shamoon](https://github.com/shamoon) ([#11950](https://github.com/paperless-ngx/paperless-ngx/pull/11950))
+
 ## paperless-ngx 2.20.6
 
 ### Bug Fixes
