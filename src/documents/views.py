@@ -175,6 +175,7 @@ from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import RunTaskViewSerializer
 from documents.serialisers import SavedViewSerializer
 from documents.serialisers import SearchResultSerializer
+from documents.serialisers import SerializerWithPerms
 from documents.serialisers import ShareLinkBundleSerializer
 from documents.serialisers import ShareLinkSerializer
 from documents.serialisers import StoragePathSerializer
@@ -272,17 +273,22 @@ class PassUserMixin(GenericAPIView):
     """
 
     def get_serializer(self, *args, **kwargs):
-        kwargs.setdefault("user", self.request.user)
-        try:
-            full_perms = get_boolean(
-                str(self.request.query_params.get("full_perms", "false")),
+        serializer_class = self.get_serializer_class()
+        if isinstance(serializer_class, type) and issubclass(
+            serializer_class,
+            SerializerWithPerms,
+        ):
+            kwargs.setdefault("user", self.request.user)
+            try:
+                full_perms = get_boolean(
+                    str(self.request.query_params.get("full_perms", "false")),
+                )
+            except ValueError:
+                full_perms = False
+            kwargs.setdefault(
+                "full_perms",
+                full_perms,
             )
-        except ValueError:
-            full_perms = False
-        kwargs.setdefault(
-            "full_perms",
-            full_perms,
-        )
         return super().get_serializer(*args, **kwargs)
 
 
