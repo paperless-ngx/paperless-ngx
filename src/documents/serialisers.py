@@ -7,6 +7,7 @@ from datetime import datetime
 from datetime import timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING
+from typing import Any
 from typing import Literal
 
 import magic
@@ -720,7 +721,7 @@ class StoragePathField(serializers.PrimaryKeyRelatedField):
 
 
 class CustomFieldSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs):
         context = kwargs.get("context")
         self.api_version = int(
             context.get("request").version
@@ -2968,8 +2969,22 @@ class StoragePathTestSerializer(SerializerWithPerms):
     )
 
     document = serializers.PrimaryKeyRelatedField(
-        queryset=Document.objects.all(),
+        queryset=Document.objects.none(),
         required=True,
         label="Document",
         write_only=True,
     )
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        request = self.context.get("request")
+        user = getattr(request, "user", None) if request else None
+        if user is not None and user.is_authenticated:
+            document_field = self.fields.get("document")
+            if not isinstance(document_field, serializers.PrimaryKeyRelatedField):
+                return
+            document_field.queryset = get_objects_for_user_owner_aware(
+                user,
+                "documents.view_document",
+                Document,
+            )
