@@ -79,13 +79,10 @@ jobs:
       - name: Check files
         uses: pre-commit/action@v3.0.1
   documentation:
-    name: "Build & Deploy Documentation"
+    name: "Build Documentation"
     runs-on: ubuntu-24.04
     needs:
       - pre-commit
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/configure-pages@v5
       - name: Checkout
@@ -111,12 +108,26 @@ jobs:
             --dev \
             --frozen \
             zensical build --clean
+      - name: Upload documentation artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: documentation
+          path: site/
       - uses: actions/upload-pages-artifact@v4
         with:
           path: site
           name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
+  deploy-documentation:
+    name: "Deploy Documentation"
+    runs-on: ubuntu-24.04
+    needs:
+      - documentation
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - uses: actions/deploy-pages@v4
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         id: deployment
         with:
           artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
