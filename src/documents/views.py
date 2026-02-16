@@ -185,6 +185,7 @@ from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import RunTaskViewSerializer
 from documents.serialisers import SavedViewSerializer
 from documents.serialisers import SearchResultSerializer
+from documents.serialisers import SerializerWithPerms
 from documents.serialisers import ShareLinkBundleSerializer
 from documents.serialisers import ShareLinkSerializer
 from documents.serialisers import StoragePathSerializer
@@ -287,17 +288,22 @@ class PassUserMixin(GenericAPIView):
     """
 
     def get_serializer(self, *args, **kwargs):
-        kwargs.setdefault("user", self.request.user)
-        try:
-            full_perms = get_boolean(
-                str(self.request.query_params.get("full_perms", "false")),
+        serializer_class = self.get_serializer_class()
+        if isinstance(serializer_class, type) and issubclass(
+            serializer_class,
+            SerializerWithPerms,
+        ):
+            kwargs.setdefault("user", self.request.user)
+            try:
+                full_perms = get_boolean(
+                    str(self.request.query_params.get("full_perms", "false")),
+                )
+            except ValueError:
+                full_perms = False
+            kwargs.setdefault(
+                "full_perms",
+                full_perms,
             )
-        except ValueError:
-            full_perms = False
-        kwargs.setdefault(
-            "full_perms",
-            full_perms,
-        )
         return super().get_serializer(*args, **kwargs)
 
 
@@ -404,8 +410,17 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
     """
 
     # Default is simple relation path, override for through-table/count specialization.
-    document_count_through = None
-    document_count_source_field = None
+    document_count_through: type[Model] | None = None
+    document_count_source_field: str | None = None
+
+    def _get_document_count_source_field(self) -> str:
+        if self.document_count_source_field is None:
+            msg = (
+                "document_count_source_field must be set when "
+                "document_count_through is configured"
+            )
+            raise ValueError(msg)
+        return self.document_count_source_field
 
     def get_document_count_filter(self):
         request = getattr(self, "request", None)
@@ -421,7 +436,7 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
             return annotate_document_count_for_related_queryset(
                 base_qs,
                 through_model=self.document_count_through,
-                related_object_field=self.document_count_source_field,
+                related_object_field=self._get_document_count_source_field(),
                 user=user,
             )
 
@@ -523,7 +538,7 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
                     .select_related("owner")
                     .order_by(*ordering),
                     through_model=self.document_count_through,
-                    related_object_field=self.document_count_source_field,
+                    related_object_field=self._get_document_count_source_field(),
                     user=user,
                 ),
             )
