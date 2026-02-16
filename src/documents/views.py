@@ -395,7 +395,7 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
     """
 
     # Default is simple relation path, override for through-table/count specialization.
-    document_count_through = None
+    document_count_through: type[Model] | None = None
     document_count_source_field: str | None = None
 
     def _get_document_count_source_field(self) -> str:

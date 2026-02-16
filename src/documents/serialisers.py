@@ -2952,7 +2952,7 @@ class TrashSerializer(SerializerWithPerms):
         write_only=True,
     )
 
-    def validate_documents(self, documents):
+    def validate_documents(self, documents: list[int]) -> list[int]:
         count = Document.deleted_objects.filter(id__in=documents).count()
         if not count == len(documents):
             raise serializers.ValidationError(

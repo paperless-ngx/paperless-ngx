@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
@@ -199,12 +201,12 @@ def get_document_count_filter_for_user(user):
 
 
 def annotate_document_count_for_related_queryset(
-    queryset,
-    through_model,
+    queryset: QuerySet[Any],
+    through_model: Any,
     related_object_field: str,
     target_field: str = "document_id",
-    user=None,
-):
+    user: User | None = None,
+) -> QuerySet[Any]:
     """
     Annotate a queryset with permissions-aware document counts using a subquery
     against a relation table.
@@ -234,11 +236,11 @@ def annotate_document_count_for_related_queryset(
 
 
 def get_objects_for_user_owner_aware(
-    user,
-    perms,
-    Model,
+    user: User | None,
+    perms: str | list[str],
+    Model: Any,
     *,
-    include_deleted=False,
+    include_deleted: bool = False,
 ) -> QuerySet:
     """
     Returns objects the user owns, are unowned, or has explicit perms.
@@ -314,7 +316,7 @@ class AcknowledgeTasksPermissions(BasePermission):
         "POST": ["documents.change_paperlesstask"],
     }
 
-    def has_permission(self, request, view):
+    def has_permission(self, request: Any, view: Any) -> bool:
         if not request.user or not request.user.is_authenticated:  # pragma: no cover
             return False
 
