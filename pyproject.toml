@@ -3,11 +3,9 @@ name = "paperless-ngx"
 version = "2.20.7"
 description = "A community-supported supercharged document management system: scan, index and archive all your physical documents"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 classifiers = [
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
@@ -26,7 +24,7 @@ dependencies = [
   "dateparser~=1.2",
   # WARNING: django does not use semver.
   #          Only patch versions are guaranteed to not introduce breaking changes.
-  "django~=5.2.10",
+  "django~=6.0.2",
   "django-allauth[mfa,socialaccount]~=65.14.0",
   "django-auditlog~=3.4.1",
   "django-cachalot~=2.9.0",
