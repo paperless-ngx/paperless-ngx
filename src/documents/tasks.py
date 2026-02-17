@@ -60,6 +60,7 @@ from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
 from documents.signals.handlers import run_workflows
+from documents.signals.handlers import send_websocket_document_updated
 from documents.workflows.utils import get_workflows_for_trigger
 from paperless.config import AIConfig
 from paperless_ai.indexing import llm_index_add_or_update_document
@@ -532,6 +533,11 @@ def check_scheduled_workflows() -> None:
                         run_workflows(
                             trigger_type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
                             workflow_to_run=workflow,
+                            document=document,
+                        )
+                        # Scheduled workflows dont send document_updated signal, so send a websocket update here to ensure clients are updated
+                        send_websocket_document_updated(
+                            sender=None,
                             document=document,
                         )
 
