@@ -144,6 +144,11 @@ enum ContentRenderType {
   TIFF = 'tiff',
 }
 
+interface IncomingDocumentUpdate {
+  document_id: number
+  modified?: string
+}
+
 @Component({
   selector: 'pngx-document-detail',
   templateUrl: './document-detail.component.html',
@@ -265,6 +270,7 @@ export class DocumentDetailComponent
   unsubscribeNotifier: Subject<any> = new Subject()
   docChangeNotifier: Subject<any> = new Subject()
   private incomingUpdateModal: NgbModalRef
+  private pendingIncomingUpdate: IncomingDocumentUpdate
 
   requiresPassword: boolean = false
   password: string
@@ -483,8 +489,16 @@ export class DocumentDetailComponent
     this.incomingUpdateModal = null
   }
 
+  private flushPendingIncomingUpdate() {
+    if (!this.pendingIncomingUpdate || this.networkActive) return
+    const pendingUpdate = this.pendingIncomingUpdate
+    this.pendingIncomingUpdate = null
+    this.handleIncomingDocumentUpdated(pendingUpdate)
+  }
+
   private loadDocument(documentId: number, forceRemote: boolean = false): void {
     this.closeIncomingUpdateModal()
+    this.pendingIncomingUpdate = null
     this.previewUrl = this.documentsService.getPreviewUrl(documentId)
     this.updatePdfSource()
     this.http
@@ -578,12 +592,17 @@ export class DocumentDetailComponent
       })
   }
 
-  private handleIncomingDocumentUpdated(data: {
-    document_id: number
-    modified?: string
-  }): void {
-    if (!this.documentId || data.document_id !== this.documentId) return
-    if (!this.document || this.networkActive) return
+  private handleIncomingDocumentUpdated(data: IncomingDocumentUpdate): void {
+    if (
+      !this.documentId ||
+      !this.document ||
+      data.document_id !== this.documentId
+    )
+      return
+    if (this.networkActive) {
+      this.pendingIncomingUpdate = data
+      return
+    }
 
     if (this.openDocumentService.isDirty(this.document)) {
       this.showIncomingUpdateModal(data.modified)
@@ -1064,11 +1083,13 @@ export class DocumentDetailComponent
           this.networkActive = false
           this.error = null
           if (close) {
+            this.pendingIncomingUpdate = null
             this.close(() =>
               this.openDocumentService.refreshDocument(this.documentId)
             )
           } else {
             this.openDocumentService.refreshDocument(this.documentId)
+            this.flushPendingIncomingUpdate()
           }
           this.savedViewService.maybeRefreshDocumentCounts()
         },
@@ -1093,6 +1114,7 @@ export class DocumentDetailComponent
               error
             )
           }
+          this.flushPendingIncomingUpdate()
         },
       })
   }
@@ -1132,6 +1154,7 @@ export class DocumentDetailComponent
           this.closeIncomingUpdateModal()
           this.error = null
           this.networkActive = false
+          this.pendingIncomingUpdate = null
           if (closeResult && updateResult && nextDocId) {
             this.router.navigate(['documents', nextDocId])
             this.titleInput?.focus()
@@ -1141,6 +1164,7 @@ export class DocumentDetailComponent
           this.networkActive = false
           this.error = error.error
           this.toastService.showError($localize`Error saving document`, error)
+          this.flushPendingIncomingUpdate()
         },
       })
   }

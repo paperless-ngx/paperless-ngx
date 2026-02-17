@@ -1236,6 +1236,24 @@ describe('DocumentDetailComponent', () => {
     expect(confirmDialog.messageBold).toContain('Document was updated at')
   })
 
+  it('should queue incoming update while network is active and flush after', () => {
+    initNormally()
+    const loadSpy = jest.spyOn(component as any, 'loadDocument')
+
+    component.networkActive = true
+    ;(component as any).handleIncomingDocumentUpdated({
+      document_id: component.documentId,
+      modified: '2026-02-17T00:00:00Z',
+    })
+
+    expect(loadSpy).not.toHaveBeenCalled()
+
+    component.networkActive = false
+    ;(component as any).flushPendingIncomingUpdate()
+
+    expect(loadSpy).toHaveBeenCalledWith(component.documentId, true)
+  })
+
   it('should change preview element by render type', () => {
     initNormally()
     component.document.archived_file_name = 'file.pdf'
