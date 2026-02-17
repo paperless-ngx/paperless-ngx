@@ -1205,7 +1205,9 @@ describe('DocumentDetailComponent', () => {
     expect(errorSpy).toHaveBeenCalled()
   })
 
-  it('should show remote update warning when open local draft is older than backend on init', () => {
+  it('should show incoming update modal when open local draft is older than backend on init', () => {
+    let openModal: NgbModalRef
+    modalService.activeInstances.subscribe((modals) => (openModal = modals[0]))
     const modalSpy = jest.spyOn(modalService, 'open')
     const openDoc = Object.assign({}, doc, {
       __changedFields: ['title'],
@@ -1227,11 +1229,11 @@ describe('DocumentDetailComponent', () => {
       })
     )
     fixture.detectChanges() // calls ngOnInit
-    expect(component.remoteUpdateDetected).toBeTruthy()
-    expect(component.remoteUpdateModified).toEqual(
-      remoteDoc.modified.toISOString()
-    )
-    expect(modalSpy).not.toHaveBeenCalledWith(ConfirmDialogComponent)
+    expect(modalSpy).toHaveBeenCalledWith(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    const confirmDialog = openModal.componentInstance as ConfirmDialogComponent
+    expect(confirmDialog.messageBold).toContain('Remote update detected at')
   })
 
   it('should change preview element by render type', () => {

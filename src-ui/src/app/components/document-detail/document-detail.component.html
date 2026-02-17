@@ -95,22 +95,6 @@
   <div class="col-md-6 col-xl-5 mb-4">
 
     <form [formGroup]='documentForm' (ngSubmit)="save()">
-      @if (remoteUpdateDetected) {
-        <div class="alert alert-warning d-flex flex-column flex-md-row align-items-md-center gap-2" role="alert">
-          <div class="flex-fill">
-            <div class="fw-semibold" i18n>Document was updated.</div>
-            @if (remoteUpdateModified) {
-              <div class="small" i18n>Remote update detected at {{ remoteUpdateModified | date:'medium' }}.</div>
-            }
-            <div class="small" i18n>Saving your local edits now may overwrite remote changes.</div>
-          </div>
-          <div class="btn-group btn-group-sm">
-            <button type="button" class="btn btn-warning" (click)="reloadRemoteVersion()" i18n>Reload</button>
-            <button type="button" class="btn btn-outline-secondary" (click)="dismissRemoteUpdateWarning()" i18n>Dismiss</button>
-          </div>
-        </div>
-      }
-
       <div class="btn-toolbar mb-1 border-bottom">
         <div class="btn-group pb-3">
           <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Close" (click)="close()">
