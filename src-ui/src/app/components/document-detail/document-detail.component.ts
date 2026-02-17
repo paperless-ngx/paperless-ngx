@@ -1,4 +1,4 @@
-import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
+import { AsyncPipe, DatePipe, NgTemplateOutlet } from '@angular/common'
 import { HttpClient, HttpResponse } from '@angular/common/http'
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import {
@@ -80,6 +80,7 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import { getFilenameFromContentDisposition } from 'src/app/utils/http'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
@@ -163,6 +164,7 @@ enum ContentRenderType {
     MonetaryComponent,
     UrlComponent,
     SuggestionsDropdownComponent,
+    DatePipe,
     CustomDatePipe,
     FileSizePipe,
     IfPermissionsDirective,
@@ -205,6 +207,7 @@ export class DocumentDetailComponent
   private componentRouterService = inject(ComponentRouterService)
   private deviceDetectorService = inject(DeviceDetectorService)
   private savedViewService = inject(SavedViewService)
+  private websocketStatusService = inject(WebsocketStatusService)
 
   @ViewChild('inputTitle')
   titleInput: TextComponent
@@ -270,6 +273,8 @@ export class DocumentDetailComponent
   customFields: CustomField[]
 
   public downloading: boolean = false
+  remoteUpdateDetected: boolean = false
+  remoteUpdateModified: string | null = null
 
   public readonly CustomFieldDataType = CustomFieldDataType
 
@@ -432,7 +437,14 @@ export class DocumentDetailComponent
       )
   }
 
-  private loadDocument(documentId: number): void {
+  private hasLocalEdits(doc: Document): boolean {
+    return (
+      this.openDocumentService.isDirty(doc) || !!doc.__changedFields?.length
+    )
+  }
+
+  private loadDocument(documentId: number, forceRemote: boolean = false): void {
+    this.dismissRemoteUpdateWarning()
     this.previewUrl = this.documentsService.getPreviewUrl(documentId)
     this.updatePdfSource()
     this.http
@@ -477,21 +489,28 @@ export class DocumentDetailComponent
             openDocument.duplicate_documents = doc.duplicate_documents
             this.openDocumentService.save()
           }
-          const useDoc = openDocument || doc
-          if (openDocument) {
-            if (
-              new Date(doc.modified) > new Date(openDocument.modified) &&
-              !this.modalService.hasOpenModals()
-            ) {
-              const modal = this.modalService.open(ConfirmDialogComponent)
-              modal.componentInstance.title = $localize`Document changes detected`
-              modal.componentInstance.messageBold = $localize`The version of this document in your browser session appears older than the existing version.`
-              modal.componentInstance.message = $localize`Saving the document here may overwrite other changes that were made. To restore the existing version, discard your changes or close the document.`
-              modal.componentInstance.cancelBtnClass = 'visually-hidden'
-              modal.componentInstance.btnCaption = $localize`Ok`
-              modal.componentInstance.confirmClicked.subscribe(() =>
-                modal.close()
-              )
+          let useDoc = openDocument || doc
+          if (openDocument && forceRemote) {
+            Object.assign(openDocument, doc)
+            openDocument.__changedFields = []
+            this.openDocumentService.setDirty(openDocument, false)
+            this.openDocumentService.save()
+            useDoc = openDocument
+          } else if (openDocument) {
+            if (new Date(doc.modified) > new Date(openDocument.modified)) {
+              if (this.hasLocalEdits(openDocument)) {
+                this.remoteUpdateDetected = true
+                this.remoteUpdateModified = doc.modified
+                  ? new Date(doc.modified).toISOString()
+                  : null
+              } else {
+                // No local edits to preserve, so keep the tab in sync automatically.
+                Object.assign(openDocument, doc)
+                openDocument.__changedFields = []
+                this.openDocumentService.setDirty(openDocument, false)
+                this.openDocumentService.save()
+                useDoc = openDocument
+              }
             }
           } else {
             this.openDocumentService
@@ -520,6 +539,38 @@ export class DocumentDetailComponent
           this.setupDirtyTracking(useDoc, doc)
         },
       })
+  }
+
+  private handleIncomingDocumentUpdated(data: {
+    document_id: number
+    modified?: string
+  }): void {
+    if (!this.documentId || data.document_id !== this.documentId) return
+    if (!this.document || this.networkActive) return
+
+    if (this.openDocumentService.isDirty(this.document)) {
+      this.remoteUpdateDetected = true
+      this.remoteUpdateModified = data.modified ?? null
+    } else {
+      this.docChangeNotifier.next(this.documentId)
+      this.loadDocument(this.documentId, true)
+      this.toastService.showInfo(
+        $localize`Document reloaded with latest changes.`
+      )
+    }
+  }
+
+  dismissRemoteUpdateWarning() {
+    this.remoteUpdateDetected = false
+    this.remoteUpdateModified = null
+  }
+
+  reloadRemoteVersion() {
+    if (!this.documentId) return
+
+    this.docChangeNotifier.next(this.documentId)
+    this.loadDocument(this.documentId, true)
+    this.toastService.showInfo($localize`Document reloaded.`)
   }
 
   ngOnInit(): void {
@@ -579,6 +630,11 @@ export class DocumentDetailComponent
     }
 
     this.getCustomFields()
+
+    this.websocketStatusService
+      .onDocumentUpdated()
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((data) => this.handleIncomingDocumentUpdated(data))
 
     this.route.paramMap
       .pipe(
@@ -914,6 +970,7 @@ export class DocumentDetailComponent
       )
       .subscribe({
         next: (doc) => {
+          this.dismissRemoteUpdateWarning()
           Object.assign(this.document, doc)
           doc['permissions_form'] = {
             owner: doc.owner,
@@ -960,6 +1017,7 @@ export class DocumentDetailComponent
       .pipe(first())
       .subscribe({
         next: (docValues) => {
+          this.dismissRemoteUpdateWarning()
           // in case data changed while saving eg removing inbox_tags
           this.documentForm.patchValue(docValues)
           const newValues = Object.assign({}, this.documentForm.value)
@@ -1039,6 +1097,7 @@ export class DocumentDetailComponent
       .pipe(first())
       .subscribe({
         next: ({ updateResult, nextDocId, closeResult }) => {
+          this.dismissRemoteUpdateWarning()
           this.error = null
           this.networkActive = false
           if (closeResult && updateResult && nextDocId) {
@@ -1135,7 +1194,7 @@ export class DocumentDetailComponent
         .subscribe({
           next: () => {
             this.toastService.showInfo(
-              $localize`Reprocess operation for "${this.document.title}" will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.`
+              $localize`Reprocess operation for "${this.document.title}" will begin in the background.`
             )
             if (modal) {
               modal.close()

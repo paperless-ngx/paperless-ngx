@@ -1205,17 +1205,19 @@ describe('DocumentDetailComponent', () => {
     expect(errorSpy).toHaveBeenCalled()
   })
 
-  it('should warn when open document does not match doc retrieved from backend on init', () => {
-    let openModal: NgbModalRef
-    modalService.activeInstances.subscribe((modals) => (openModal = modals[0]))
+  it('should show remote update warning when open local draft is older than backend on init', () => {
     const modalSpy = jest.spyOn(modalService, 'open')
-    const openDoc = Object.assign({}, doc)
+    const openDoc = Object.assign({}, doc, {
+      __changedFields: ['title'],
+    })
     // simulate a document being modified elsewhere and db updated
-    doc.modified = new Date()
+    const remoteDoc = Object.assign({}, doc, {
+      modified: new Date(new Date(doc.modified).getTime() + 1000),
+    })
     jest
       .spyOn(activatedRoute, 'paramMap', 'get')
       .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
-    jest.spyOn(documentService, 'get').mockReturnValueOnce(of(doc))
+    jest.spyOn(documentService, 'get').mockReturnValueOnce(of(remoteDoc))
     jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(openDoc)
     jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
       of({
@@ -1225,11 +1227,11 @@ describe('DocumentDetailComponent', () => {
       })
     )
     fixture.detectChanges() // calls ngOnInit
-    expect(modalSpy).toHaveBeenCalledWith(ConfirmDialogComponent)
-    const closeSpy = jest.spyOn(openModal, 'close')
-    const confirmDialog = openModal.componentInstance as ConfirmDialogComponent
-    confirmDialog.confirmClicked.next(confirmDialog)
-    expect(closeSpy).toHaveBeenCalled()
+    expect(component.remoteUpdateDetected).toBeTruthy()
+    expect(component.remoteUpdateModified).toEqual(
+      remoteDoc.modified.toISOString()
+    )
+    expect(modalSpy).not.toHaveBeenCalledWith(ConfirmDialogComponent)
   })
 
   it('should change preview element by render type', () => {
