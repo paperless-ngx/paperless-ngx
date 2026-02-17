@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core'
 import { Subject } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import { User } from '../data/user'
+import { WebsocketDocumentUpdatedMessage } from '../data/websocket-document-updated-message'
 import { WebsocketDocumentsDeletedMessage } from '../data/websocket-documents-deleted-message'
 import { WebsocketProgressMessage } from '../data/websocket-progress-message'
 import { SettingsService } from './settings.service'
@@ -9,6 +10,7 @@ import { SettingsService } from './settings.service'
 export enum WebsocketStatusType {
   STATUS_UPDATE = 'status_update',
   DOCUMENTS_DELETED = 'documents_deleted',
+  DOCUMENT_UPDATED = 'document_updated',
 }
 
 // see ProgressStatusOptions in src/documents/plugins/helpers.py
@@ -103,6 +105,8 @@ export class WebsocketStatusService {
   private documentConsumptionFinishedSubject = new Subject<FileStatus>()
   private documentConsumptionFailedSubject = new Subject<FileStatus>()
   private documentDeletedSubject = new Subject<boolean>()
+  private documentUpdatedSubject =
+    new Subject<WebsocketDocumentUpdatedMessage>()
   private connectionStatusSubject = new Subject<boolean>()
 
   private get(taskId: string, filename?: string) {
@@ -169,12 +173,21 @@ export class WebsocketStatusService {
         data: messageData,
       }: {
         type: WebsocketStatusType
-        data: WebsocketProgressMessage | WebsocketDocumentsDeletedMessage
+        data:
+          | WebsocketProgressMessage
+          | WebsocketDocumentsDeletedMessage
+          | WebsocketDocumentUpdatedMessage
       } = JSON.parse(ev.data)
 
       switch (type) {
         case WebsocketStatusType.DOCUMENTS_DELETED:
           this.documentDeletedSubject.next(true)
+          break
+
+        case WebsocketStatusType.DOCUMENT_UPDATED:
+          this.handleDocumentUpdated(
+            messageData as WebsocketDocumentUpdatedMessage
+          )
           break
 
         case WebsocketStatusType.STATUS_UPDATE:
@@ -184,7 +197,11 @@ export class WebsocketStatusService {
     }
   }
 
-  private canViewMessage(messageData: WebsocketProgressMessage): boolean {
+  private canViewMessage(messageData: {
+    owner_id?: number
+    users_can_view?: number[]
+    groups_can_view?: number[]
+  }): boolean {
     // see paperless.consumers.StatusConsumer._can_view
     const user: User = this.settingsService.currentUser
     return (
@@ -244,6 +261,15 @@ export class WebsocketStatusService {
     }
   }
 
+  handleDocumentUpdated(messageData: WebsocketDocumentUpdatedMessage) {
+    // fallback if backend didn't restrict message
+    if (!this.canViewMessage(messageData)) {
+      return
+    }
+
+    this.documentUpdatedSubject.next(messageData)
+  }
+
   fail(status: FileStatus, message: string) {
     status.message = message
     status.phase = FileStatusPhase.FAILED
@@ -295,6 +321,10 @@ export class WebsocketStatusService {
 
   onDocumentDeleted() {
     return this.documentDeletedSubject
+  }
+
+  onDocumentUpdated() {
+    return this.documentUpdatedSubject
   }
 
   onConnectionStatus() {

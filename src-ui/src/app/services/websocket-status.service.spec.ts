@@ -416,4 +416,25 @@ describe('ConsumerStatusService', () => {
     websocketStatusService.disconnect()
     expect(deleted).toBeTruthy()
   })
+
+  it('should trigger updated subject on document updated', () => {
+    let updated = false
+    websocketStatusService.onDocumentUpdated().subscribe((data) => {
+      updated = true
+      expect(data.document_id).toEqual(12)
+    })
+
+    websocketStatusService.connect()
+    server.send({
+      type: WebsocketStatusType.DOCUMENT_UPDATED,
+      data: {
+        document_id: 12,
+        modified: '2026-02-17T00:00:00Z',
+        owner_id: 1,
+      },
+    })
+
+    websocketStatusService.disconnect()
+    expect(updated).toBeTruthy()
+  })
 })
