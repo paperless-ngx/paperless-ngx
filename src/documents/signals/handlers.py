@@ -23,6 +23,7 @@ from django.db.models import Q
 from django.dispatch import receiver
 from django.utils import timezone
 from filelock import FileLock
+from rest_framework import serializers
 
 from documents import matching
 from documents.caching import clear_document_caches
@@ -64,6 +65,7 @@ if TYPE_CHECKING:
     from documents.data_models import DocumentMetadataOverrides
 
 logger = logging.getLogger("paperless.handlers")
+DRF_DATETIME_FIELD = serializers.DateTimeField()
 
 
 def add_inbox_tags(sender, document: Document, logging_group=None, **kwargs) -> None:
@@ -769,7 +771,9 @@ def send_websocket_document_updated(
     with DocumentsStatusManager() as status_mgr:
         status_mgr.send_document_updated(
             document_id=document.id,
-            modified=document.modified.isoformat() if document.modified else None,
+            modified=DRF_DATETIME_FIELD.to_representation(document.modified)
+            if document.modified
+            else None,
             owner_id=doc_overrides.owner_id,
             users_can_view=doc_overrides.view_users,
             groups_can_view=doc_overrides.view_groups,
