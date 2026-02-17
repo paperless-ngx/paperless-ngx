@@ -449,7 +449,7 @@ export class DocumentDetailComponent
     )
   }
 
-  private showIncomingUpdateModal(modified?: string | Date): void {
+  private showIncomingUpdateModal(modified?: string): void {
     if (this.incomingUpdateModal) return
 
     const modal = this.modalService.open(ConfirmDialogComponent, {
@@ -495,12 +495,6 @@ export class DocumentDetailComponent
     const pendingUpdate = this.pendingIncomingUpdate
     this.pendingIncomingUpdate = null
     this.handleIncomingDocumentUpdated(pendingUpdate)
-  }
-
-  private getModifiedRawValue(modified: string | Date): string | null {
-    if (!modified) return null
-    if (typeof modified === 'string') return modified
-    return modified.toISOString()
   }
 
   private loadDocument(documentId: number, forceRemote: boolean = false): void {
@@ -613,7 +607,7 @@ export class DocumentDetailComponent
     }
     // If modified timestamp of the incoming update is the same as the last local save,
     // we assume this update is from our own save and dont notify
-    const incomingModified = this.getModifiedRawValue(data.modified)
+    const incomingModified = data.modified
     if (
       incomingModified &&
       this.lastLocalSaveModified &&
@@ -1089,9 +1083,7 @@ export class DocumentDetailComponent
       .subscribe({
         next: (docValues) => {
           this.closeIncomingUpdateModal()
-          this.lastLocalSaveModified = this.getModifiedRawValue(
-            docValues.modified
-          )
+          this.lastLocalSaveModified = docValues.modified ?? null
           // in case data changed while saving eg removing inbox_tags
           this.documentForm.patchValue(docValues)
           const newValues = Object.assign({}, this.documentForm.value)

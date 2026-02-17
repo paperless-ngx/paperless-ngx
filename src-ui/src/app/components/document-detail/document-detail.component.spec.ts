@@ -83,9 +83,9 @@ const doc: Document = {
   storage_path: 31,
   tags: [41, 42, 43],
   content: 'text content',
-  added: new Date('May 4, 2014 03:24:00'),
-  created: new Date('May 4, 2014 03:24:00'),
-  modified: new Date('May 4, 2014 03:24:00'),
+  added: new Date('May 4, 2014 03:24:00').toISOString(),
+  created: new Date('May 4, 2014 03:24:00').toISOString(),
+  modified: new Date('May 4, 2014 03:24:00').toISOString(),
   archive_serial_number: null,
   original_file_name: 'file.pdf',
   owner: null,
@@ -392,7 +392,7 @@ describe('DocumentDetailComponent', () => {
     jest.spyOn(documentService, 'get').mockReturnValue(
       of({
         ...doc,
-        modified: new Date('2024-01-02T00:00:00Z'),
+        modified: '2024-01-02T00:00:00Z',
         duplicate_documents: updatedDuplicates,
       })
     )
@@ -1214,7 +1214,7 @@ describe('DocumentDetailComponent', () => {
     })
     // simulate a document being modified elsewhere and db updated
     const remoteDoc = Object.assign({}, doc, {
-      modified: new Date(new Date(doc.modified).getTime() + 1000),
+      modified: new Date(new Date(doc.modified).getTime() + 1000).toISOString(),
     })
     jest
       .spyOn(activatedRoute, 'paramMap', 'get')
