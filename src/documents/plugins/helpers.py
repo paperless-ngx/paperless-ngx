@@ -100,3 +100,25 @@ class DocumentsStatusManager(BaseStatusManager):
         }
 
         self.send(payload)
+
+    def send_document_updated(
+        self,
+        *,
+        document_id: int,
+        modified: str | None = None,
+        owner_id: int | None = None,
+        users_can_view: list[int] | None = None,
+        groups_can_view: list[int] | None = None,
+    ) -> None:
+        payload = {
+            "type": "document_updated",
+            "data": {
+                "document_id": document_id,
+                "modified": modified,
+                "owner_id": owner_id,
+                "users_can_view": users_can_view or [],
+                "groups_can_view": groups_can_view or [],
+            },
+        }
+
+        self.send(payload)

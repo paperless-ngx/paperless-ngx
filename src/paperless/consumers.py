@@ -52,3 +52,10 @@ class StatusConsumer(WebsocketConsumer):
             self.close()
         else:
             self.send(json.dumps(event))
+
+    def document_updated(self, event) -> None:
+        if not self._authenticated():
+            self.close()
+        else:
+            if self._can_view(event["data"]):
+                self.send(json.dumps(event))
