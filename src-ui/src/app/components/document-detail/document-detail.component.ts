@@ -271,6 +271,7 @@ export class DocumentDetailComponent
   docChangeNotifier: Subject<any> = new Subject()
   private incomingUpdateModal: NgbModalRef
   private pendingIncomingUpdate: IncomingDocumentUpdate
+  private lastLocalSaveModified: string | null = null
 
   requiresPassword: boolean = false
   password: string
@@ -496,9 +497,16 @@ export class DocumentDetailComponent
     this.handleIncomingDocumentUpdated(pendingUpdate)
   }
 
+  private getModifiedRawValue(modified: string | Date): string | null {
+    if (!modified) return null
+    if (typeof modified === 'string') return modified
+    return modified.toISOString()
+  }
+
   private loadDocument(documentId: number, forceRemote: boolean = false): void {
     this.closeIncomingUpdateModal()
     this.pendingIncomingUpdate = null
+    this.lastLocalSaveModified = null
     this.previewUrl = this.documentsService.getPreviewUrl(documentId)
     this.updatePdfSource()
     this.http
@@ -603,6 +611,18 @@ export class DocumentDetailComponent
       this.pendingIncomingUpdate = data
       return
     }
+    // If modified timestamp of the incoming update is the same as the last local save,
+    // we assume this update is from our own save and dont notify
+    const incomingModified = this.getModifiedRawValue(data.modified)
+    if (
+      incomingModified &&
+      this.lastLocalSaveModified &&
+      incomingModified === this.lastLocalSaveModified
+    ) {
+      this.lastLocalSaveModified = null
+      return
+    }
+    this.lastLocalSaveModified = null
 
     if (this.openDocumentService.isDirty(this.document)) {
       this.showIncomingUpdateModal(data.modified)
@@ -1069,6 +1089,9 @@ export class DocumentDetailComponent
       .subscribe({
         next: (docValues) => {
           this.closeIncomingUpdateModal()
+          this.lastLocalSaveModified = this.getModifiedRawValue(
+            docValues.modified
+          )
           // in case data changed while saving eg removing inbox_tags
           this.documentForm.patchValue(docValues)
           const newValues = Object.assign({}, this.documentForm.value)
@@ -1095,6 +1118,7 @@ export class DocumentDetailComponent
         },
         error: (error) => {
           this.networkActive = false
+          this.lastLocalSaveModified = null
           const canEdit =
             this.permissionsService.currentUserHasObjectPermissions(
               PermissionAction.Change,
@@ -1155,6 +1179,7 @@ export class DocumentDetailComponent
           this.error = null
           this.networkActive = false
           this.pendingIncomingUpdate = null
+          this.lastLocalSaveModified = null
           if (closeResult && updateResult && nextDocId) {
             this.router.navigate(['documents', nextDocId])
             this.titleInput?.focus()
@@ -1162,6 +1187,7 @@ export class DocumentDetailComponent
         },
         error: (error) => {
           this.networkActive = false
+          this.lastLocalSaveModified = null
           this.error = error.error
           this.toastService.showError($localize`Error saving document`, error)
           this.flushPendingIncomingUpdate()

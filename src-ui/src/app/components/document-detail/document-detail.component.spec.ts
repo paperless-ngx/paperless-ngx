@@ -1239,6 +1239,7 @@ describe('DocumentDetailComponent', () => {
   it('should queue incoming update while network is active and flush after', () => {
     initNormally()
     const loadSpy = jest.spyOn(component as any, 'loadDocument')
+    const toastSpy = jest.spyOn(toastService, 'showInfo')
 
     component.networkActive = true
     ;(component as any).handleIncomingDocumentUpdated({
@@ -1252,6 +1253,28 @@ describe('DocumentDetailComponent', () => {
     ;(component as any).flushPendingIncomingUpdate()
 
     expect(loadSpy).toHaveBeenCalledWith(component.documentId, true)
+    expect(toastSpy).toHaveBeenCalledWith(
+      'Document reloaded with latest changes.'
+    )
+  })
+
+  it('should ignore queued incoming update matching local save modified', () => {
+    initNormally()
+    const loadSpy = jest.spyOn(component as any, 'loadDocument')
+    const toastSpy = jest.spyOn(toastService, 'showInfo')
+
+    component.networkActive = true
+    ;(component as any).lastLocalSaveModified = '2026-02-17T00:00:00+00:00'
+    ;(component as any).handleIncomingDocumentUpdated({
+      document_id: component.documentId,
+      modified: '2026-02-17T00:00:00+00:00',
+    })
+
+    component.networkActive = false
+    ;(component as any).flushPendingIncomingUpdate()
+
+    expect(loadSpy).not.toHaveBeenCalled()
+    expect(toastSpy).not.toHaveBeenCalled()
   })
 
   it('should change preview element by render type', () => {
