@@ -1233,7 +1233,7 @@ describe('DocumentDetailComponent', () => {
       backdrop: 'static',
     })
     const confirmDialog = openModal.componentInstance as ConfirmDialogComponent
-    expect(confirmDialog.messageBold).toContain('Remote update detected at')
+    expect(confirmDialog.messageBold).toContain('Document was updated at')
   })
 
   it('should change preview element by render type', () => {
