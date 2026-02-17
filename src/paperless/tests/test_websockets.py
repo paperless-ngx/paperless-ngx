@@ -158,6 +158,39 @@ class TestWebSockets(TestCase):
 
         await communicator.disconnect()
 
+    @mock.patch("paperless.consumers.StatusConsumer._can_view")
+    @mock.patch("paperless.consumers.StatusConsumer._authenticated")
+    async def test_receive_document_updated(self, _authenticated, _can_view) -> None:
+        _authenticated.return_value = True
+        _can_view.return_value = True
+
+        communicator = WebsocketCommunicator(application, "/ws/status/")
+        connected, _ = await communicator.connect()
+        self.assertTrue(connected)
+
+        message = {
+            "type": "document_updated",
+            "data": {
+                "document_id": 10,
+                "modified": "2026-02-17T00:00:00Z",
+                "owner_id": 1,
+                "users_can_view": [1],
+                "groups_can_view": [],
+            },
+        }
+
+        channel_layer = get_channel_layer()
+        await channel_layer.group_send(
+            "status_updates",
+            message,
+        )
+
+        response = await communicator.receive_json_from()
+
+        self.assertEqual(response, message)
+
+        await communicator.disconnect()
+
     @mock.patch("channels.layers.InMemoryChannelLayer.group_send")
     def test_manager_send_progress(self, mock_group_send) -> None:
         with ProgressManager(task_id="test") as manager:

@@ -45,6 +45,7 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
+from documents.plugins.helpers import DocumentsStatusManager
 from documents.templating.utils import convert_format_str_to_template_format
 from documents.workflows.actions import build_workflow_action_context
 from documents.workflows.actions import execute_email_action
@@ -751,6 +752,28 @@ def run_workflows_updated(
         document=document,
         logging_group=logging_group,
     )
+
+
+def send_websocket_document_updated(
+    sender,
+    document: Document,
+    **kwargs,
+) -> None:
+    # At this point, workflows may already have applied additional changes.
+    document.refresh_from_db()
+
+    from documents.data_models import DocumentMetadataOverrides
+
+    doc_overrides = DocumentMetadataOverrides.from_document(document)
+
+    with DocumentsStatusManager() as status_mgr:
+        status_mgr.send_document_updated(
+            document_id=document.id,
+            modified=document.modified.isoformat() if document.modified else None,
+            owner_id=doc_overrides.owner_id,
+            users_can_view=doc_overrides.view_users,
+            groups_can_view=doc_overrides.view_groups,
+        )
 
 
 def run_workflows(
