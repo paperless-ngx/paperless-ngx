@@ -12,6 +12,7 @@ from datetime import timedelta
 from http import HTTPStatus
 from pathlib import Path
 from time import mktime
+from time import sleep
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Literal
@@ -4990,11 +4991,29 @@ class SystemStatusView(PassUserMixin):
         celery_error = None
         celery_url = None
         try:
-            celery_ping = celery_app.control.inspect().ping()
-            celery_url = next(iter(celery_ping.keys()))
-            first_worker_ping = celery_ping[celery_url]
-            if first_worker_ping["ok"] == "pong":
-                celery_active = "OK"
+            celery_ping = None
+            for ping_attempt in range(3):
+                celery_ping = celery_app.control.inspect().ping()
+                if celery_ping:
+                    break
+                if ping_attempt < 2:
+                    sleep(0.25)
+
+            if not celery_ping:
+                celery_active = "WARNING"
+                celery_error = (
+                    "No celery workers responded to ping. This may be temporary."
+                )
+            else:
+                celery_url, first_worker_ping = next(iter(celery_ping.items()))
+                if (
+                    isinstance(first_worker_ping, dict)
+                    and first_worker_ping.get("ok") == "pong"
+                ):
+                    celery_active = "OK"
+                else:
+                    celery_active = "WARNING"
+                    celery_error = "Celery worker responded unexpectedly."
         except Exception as e:
             celery_active = "ERROR"
             logger.exception(
