@@ -128,15 +128,15 @@ export interface Document extends ObjectWithPermissions {
   checksum?: string
 
   // UTC
-  created?: Date
+  created?: string // ISO string
 
-  modified?: Date
+  modified?: string // ISO string
 
-  added?: Date
+  added?: string // ISO string
 
   mime_type?: string
 
-  deleted_at?: Date
+  deleted_at?: string // ISO string
 
   original_file_name?: string
 
