@@ -1,4 +1,4 @@
-import { AsyncPipe, DatePipe, NgTemplateOutlet } from '@angular/common'
+import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
 import { HttpClient, HttpResponse } from '@angular/common/http'
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import {
@@ -13,6 +13,7 @@ import {
   NgbDateStruct,
   NgbDropdownModule,
   NgbModal,
+  NgbModalRef,
   NgbNav,
   NgbNavChangeEvent,
   NgbNavModule,
@@ -165,7 +166,6 @@ enum ContentRenderType {
     MonetaryComponent,
     UrlComponent,
     SuggestionsDropdownComponent,
-    DatePipe,
     CustomDatePipe,
     FileSizePipe,
     IfPermissionsDirective,
@@ -270,6 +270,7 @@ export class DocumentDetailComponent
   isDirty$: Observable<boolean>
   unsubscribeNotifier: Subject<any> = new Subject()
   docChangeNotifier: Subject<any> = new Subject()
+  private incomingUpdateModal: NgbModalRef
 
   requiresPassword: boolean = false
   password: string
@@ -280,8 +281,6 @@ export class DocumentDetailComponent
 
   public downloading: boolean = false
   public useFormattedFilename: boolean = false
-  remoteUpdateDetected: boolean = false
-  remoteUpdateModified: string | null = null
 
   public readonly CustomFieldDataType = CustomFieldDataType
 
@@ -486,9 +485,50 @@ export class DocumentDetailComponent
     )
   }
 
+  private showIncomingUpdateModal(modified?: string | Date): void {
+    if (this.incomingUpdateModal) return
+
+    const modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    this.incomingUpdateModal = modal
+
+    let formattedModified = null
+    if (modified) {
+      const parsed = new Date(modified)
+      if (!isNaN(parsed.getTime())) {
+        formattedModified = parsed.toLocaleString()
+      }
+    }
+
+    modal.componentInstance.title = $localize`Document was updated.`
+    modal.componentInstance.messageBold = formattedModified
+      ? $localize`Document was updated at ${formattedModified}.`
+      : $localize`This document was updated elsewhere.`
+    modal.componentInstance.message = $localize`Reload to discard your local unsaved edits and load the latest remote version.`
+    modal.componentInstance.btnClass = 'btn-warning'
+    modal.componentInstance.btnCaption = $localize`Reload`
+    modal.componentInstance.cancelBtnCaption = $localize`Dismiss`
+
+    modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      modal.close()
+      this.reloadRemoteVersion()
+    })
+    modal.result.finally(() => {
+      this.incomingUpdateModal = null
+    })
+  }
+
+  private closeIncomingUpdateModal() {
+    if (!this.incomingUpdateModal) return
+    this.incomingUpdateModal.close()
+    this.incomingUpdateModal = null
+  }
+
   private loadDocument(documentId: number, forceRemote: boolean = false): void {
     let redirectedToRoot = false
-    this.dismissRemoteUpdateWarning()
+    this.closeIncomingUpdateModal()
     this.selectedVersionId = documentId
     this.previewUrl = this.documentsService.getPreviewUrl(
       this.selectedVersionId
@@ -567,10 +607,7 @@ export class DocumentDetailComponent
           } else if (openDocument) {
             if (new Date(doc.modified) > new Date(openDocument.modified)) {
               if (this.hasLocalEdits(openDocument)) {
-                this.remoteUpdateDetected = true
-                this.remoteUpdateModified = doc.modified
-                  ? new Date(doc.modified).toISOString()
-                  : null
+                this.showIncomingUpdateModal(doc.modified)
               } else {
                 // No local edits to preserve, so keep the tab in sync automatically.
                 Object.assign(openDocument, doc)
@@ -617,8 +654,7 @@ export class DocumentDetailComponent
     if (!this.document || this.networkActive) return
 
     if (this.openDocumentService.isDirty(this.document)) {
-      this.remoteUpdateDetected = true
-      this.remoteUpdateModified = data.modified ?? null
+      this.showIncomingUpdateModal(data.modified)
     } else {
       this.docChangeNotifier.next(this.documentId)
       this.loadDocument(this.documentId, true)
@@ -628,14 +664,10 @@ export class DocumentDetailComponent
     }
   }
 
-  dismissRemoteUpdateWarning() {
-    this.remoteUpdateDetected = false
-    this.remoteUpdateModified = null
-  }
-
-  reloadRemoteVersion() {
+  private reloadRemoteVersion() {
     if (!this.documentId) return
 
+    this.closeIncomingUpdateModal()
     this.docChangeNotifier.next(this.documentId)
     this.loadDocument(this.documentId, true)
     this.toastService.showInfo($localize`Document reloaded.`)
@@ -1089,7 +1121,7 @@ export class DocumentDetailComponent
       )
       .subscribe({
         next: (doc) => {
-          this.dismissRemoteUpdateWarning()
+          this.closeIncomingUpdateModal()
           Object.assign(this.document, doc)
           doc['permissions_form'] = {
             owner: doc.owner,
@@ -1136,7 +1168,7 @@ export class DocumentDetailComponent
       .pipe(first())
       .subscribe({
         next: (docValues) => {
-          this.dismissRemoteUpdateWarning()
+          this.closeIncomingUpdateModal()
           // in case data changed while saving eg removing inbox_tags
           this.documentForm.patchValue(docValues)
           const newValues = Object.assign({}, this.documentForm.value)
@@ -1216,7 +1248,7 @@ export class DocumentDetailComponent
       .pipe(first())
       .subscribe({
         next: ({ updateResult, nextDocId, closeResult }) => {
-          this.dismissRemoteUpdateWarning()
+          this.closeIncomingUpdateModal()
           this.error = null
           this.networkActive = false
           if (closeResult && updateResult && nextDocId) {
