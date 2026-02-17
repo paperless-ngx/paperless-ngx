@@ -151,6 +151,50 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["tasks"]["celery_status"], "OK")
 
+    @mock.patch("celery.app.control.Inspect.ping")
+    def test_system_status_celery_ping_none(self, mock_ping) -> None:
+        """
+        GIVEN:
+            - Celery ping returns no worker responses
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains an error celery status
+        """
+        mock_ping.return_value = None
+        self.client.force_login(self.user)
+        response = self.client.get(self.ENDPOINT)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["tasks"]["celery_status"], "WARNING")
+        self.assertEqual(
+            response.data["tasks"]["celery_error"],
+            "No celery workers responded to ping. This may be temporary.",
+        )
+
+    @mock.patch("documents.views.sleep")
+    @mock.patch("celery.app.control.Inspect.ping")
+    def test_system_status_celery_ping_retry_success(
+        self,
+        mock_ping,
+        mock_sleep,
+    ) -> None:
+        """
+        GIVEN:
+            - Celery ping fails once but succeeds on retry
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains an OK celery status
+        """
+        mock_ping.side_effect = [None, {"hostname": {"ok": "pong"}}]
+        self.client.force_login(self.user)
+        response = self.client.get(self.ENDPOINT)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["tasks"]["celery_status"], "OK")
+        self.assertIsNone(response.data["tasks"]["celery_error"])
+        self.assertEqual(mock_ping.call_count, 2)
+        mock_sleep.assert_called_once_with(0.25)
+
     @override_settings(INDEX_DIR=Path("/tmp/index"))
     @mock.patch("whoosh.index.FileIndex.last_modified")
     def test_system_status_index_ok(self, mock_last_modified):
