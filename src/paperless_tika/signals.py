@@ -21,5 +21,8 @@ def tika_consumer_declaration(sender, **kwargs):
             "application/vnd.oasis.opendocument.text": ".odt",
             "application/vnd.oasis.opendocument.graphics": ".odg",
             "text/rtf": ".rtf",
+            "application/vnd.apple.pages": ".pages",
+            "application/vnd.apple.numbers": ".numbers",
+            "application/vnd.apple.keynote": ".key",
         },
     }
