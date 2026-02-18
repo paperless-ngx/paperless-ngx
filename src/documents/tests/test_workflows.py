@@ -640,7 +640,9 @@ class TestWorkflows(
 
         expected_str = f"Document did not match {w}"
         self.assertIn(expected_str, cm.output[0])
-        expected_str = f"Document path {test_file} does not match"
+        expected_str = (
+            f"Document path {Path(test_file).resolve(strict=False)} does not match"
+        )
         self.assertIn(expected_str, cm.output[1])
 
     def test_workflow_no_match_mail_rule(self) -> None:

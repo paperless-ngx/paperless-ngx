@@ -4,6 +4,7 @@ import logging
 import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import Any
 
 from celery import shared_task
 from celery import states
@@ -1027,7 +1028,11 @@ def add_or_update_document_in_llm_index(sender, document, **kwargs):
 
 
 @receiver(models.signals.post_delete, sender=Document)
-def delete_document_from_llm_index(sender, instance: Document, **kwargs):
+def delete_document_from_llm_index(
+    sender: Any,
+    instance: Document,
+    **kwargs: Any,
+) -> None:
     """
     Delete a document from the LLM index when it is deleted.
     """
