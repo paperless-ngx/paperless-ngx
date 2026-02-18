@@ -180,6 +180,7 @@ class TestWebSockets(TestCase):
         }
 
         channel_layer = get_channel_layer()
+        assert channel_layer is not None
         await channel_layer.group_send(
             "status_updates",
             message,
@@ -223,7 +224,10 @@ class TestWebSockets(TestCase):
         )
 
     @mock.patch("channels.layers.InMemoryChannelLayer.group_send")
-    def test_manager_send_documents_deleted(self, mock_group_send) -> None:
+    def test_manager_send_documents_deleted(
+        self,
+        mock_group_send: mock.MagicMock,
+    ) -> None:
         with DocumentsStatusManager() as manager:
             manager.send_documents_deleted([1, 2, 3])
 

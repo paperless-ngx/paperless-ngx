@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 from asgiref.sync import async_to_sync
 from channels.exceptions import AcceptConnection
@@ -53,7 +54,7 @@ class StatusConsumer(WebsocketConsumer):
         else:
             self.send(json.dumps(event))
 
-    def document_updated(self, event) -> None:
+    def document_updated(self, event: Any) -> None:
         if not self._authenticated():
             self.close()
         else:

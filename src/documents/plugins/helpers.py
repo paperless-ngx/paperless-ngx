@@ -110,7 +110,7 @@ class DocumentsStatusManager(BaseStatusManager):
         users_can_view: list[int] | None = None,
         groups_can_view: list[int] | None = None,
     ) -> None:
-        payload = {
+        payload: dict[str, str | int | None] = {
             "type": "document_updated",
             "data": {
                 "document_id": document_id,
