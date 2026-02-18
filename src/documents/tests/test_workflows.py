@@ -3,6 +3,7 @@ import json
 import shutil
 import socket
 import tempfile
+from collections.abc import Callable
 from datetime import timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -4135,7 +4136,7 @@ class TestWebhookSecurity:
     def test_strips_user_supplied_host_header(
         self,
         httpx_mock: HTTPXMock,
-        resolve_to,
+        resolve_to: Callable[[str], None],
     ) -> None:
         """
         GIVEN:
