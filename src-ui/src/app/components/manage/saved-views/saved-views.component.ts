@@ -6,8 +6,10 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { dirtyCheck } from '@ngneat/dirty-check-forms'
 import { BehaviorSubject, Observable, takeUntil } from 'rxjs'
+import { PermissionsDialogComponent } from 'src/app/components/common/permissions-dialog/permissions-dialog.component'
 import { DisplayMode } from 'src/app/data/document'
 import { SavedView } from 'src/app/data/saved-view'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
@@ -48,6 +50,7 @@ export class SavedViewsComponent
   private permissionsService = inject(PermissionsService)
   private settings = inject(SettingsService)
   private toastService = inject(ToastService)
+  private modalService = inject(NgbModal)
 
   DisplayMode = DisplayMode
 
@@ -70,11 +73,7 @@ export class SavedViewsComponent
   }
 
   ngOnInit(): void {
-    this.loading = true
-    this.savedViewService.listAll().subscribe((r) => {
-      this.savedViews = r.results
-      this.initialize()
-    })
+    this.reloadViews()
   }
 
   ngOnDestroy(): void {
@@ -145,10 +144,7 @@ export class SavedViewsComponent
         $localize`Saved view "${savedView.name}" deleted.`
       )
       this.savedViewService.clearCache()
-      this.savedViewService.listAll().subscribe((r) => {
-        this.savedViews = r.results
-        this.initialize()
-      })
+      this.reloadViews()
     })
   }
 
@@ -168,7 +164,7 @@ export class SavedViewsComponent
       this.savedViewService.patchMany(changed).subscribe({
         next: () => {
           this.toastService.showInfo($localize`Views saved successfully.`)
-          this.store.next(this.savedViewsForm.value)
+          this.reloadViews()
         },
         error: (error) => {
           this.toastService.showError(
@@ -189,5 +185,48 @@ export class SavedViewsComponent
 
   public canDeleteSavedView(view: SavedView): boolean {
     return this.permissionsService.currentUserOwnsObject(view)
+  }
+
+  public editPermissions(savedView: SavedView): void {
+    if (!this.canDeleteSavedView(savedView)) {
+      return
+    }
+    const modal = this.modalService.open(PermissionsDialogComponent, {
+      backdrop: 'static',
+    })
+    const dialog = modal.componentInstance as PermissionsDialogComponent
+    dialog.object = savedView
+
+    modal.componentInstance.confirmClicked.subscribe(({ permissions }) => {
+      modal.componentInstance.buttonsEnabled = false
+      const view = {
+        id: savedView.id,
+        owner: permissions.owner,
+      }
+      view['set_permissions'] = permissions.set_permissions
+      this.savedViewService.patch(view as SavedView).subscribe({
+        next: () => {
+          this.toastService.showInfo($localize`Permissions updated`)
+          modal.close()
+          this.reloadViews()
+        },
+        error: (error) => {
+          this.toastService.showError(
+            $localize`Error updating permissions`,
+            error
+          )
+        },
+      })
+    })
+  }
+
+  private reloadViews(): void {
+    this.loading = true
+    this.savedViewService
+      .listAll(null, null, { full_perms: true })
+      .subscribe((r) => {
+        this.savedViews = r.results
+        this.initialize()
+      })
   }
 }
