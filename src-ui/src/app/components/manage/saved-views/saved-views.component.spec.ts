@@ -7,11 +7,13 @@ import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject, of, throwError } from 'rxjs'
 import { SavedView } from 'src/app/data/saved-view'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
 import { CheckComponent } from '../../common/input/check/check.component'
@@ -31,6 +33,7 @@ describe('SavedViewsComponent', () => {
   let component: SavedViewsComponent
   let fixture: ComponentFixture<SavedViewsComponent>
   let savedViewService: SavedViewService
+  let settingsService: SettingsService
   let toastService: ToastService
   let modalService: NgbModal
 
@@ -79,6 +82,7 @@ describe('SavedViewsComponent', () => {
     }).compileComponents()
 
     savedViewService = TestBed.inject(SavedViewService)
+    settingsService = TestBed.inject(SettingsService)
     toastService = TestBed.inject(ToastService)
     modalService = TestBed.inject(NgbModal)
     fixture = TestBed.createComponent(SavedViewsComponent)
@@ -97,13 +101,12 @@ describe('SavedViewsComponent', () => {
 
   it('should support save saved views, show error', () => {
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastSpy = jest.spyOn(toastService, 'show')
     const savedViewPatchSpy = jest.spyOn(savedViewService, 'patchMany')
     const control = component.savedViewsForm
       .get('savedViews')
       .get(savedViews[0].id.toString())
-      .get('show_on_dashboard')
-    control.setValue(!savedViews[0].show_on_dashboard)
+      .get('name')
+    control.setValue(`${savedViews[0].name}-changed`)
     control.markAsDirty()
 
     // saved views error first
@@ -113,13 +116,12 @@ describe('SavedViewsComponent', () => {
     component.save()
     expect(toastErrorSpy).toHaveBeenCalled()
     expect(savedViewPatchSpy).toHaveBeenCalled()
-    toastSpy.mockClear()
     toastErrorSpy.mockClear()
     savedViewPatchSpy.mockClear()
 
     // succeed saved views
     savedViewPatchSpy.mockReturnValueOnce(of(savedViews as SavedView[]))
-    control.setValue(savedViews[0].show_on_dashboard)
+    control.setValue(savedViews[0].name)
     control.markAsDirty()
     component.save()
     expect(toastErrorSpy).not.toHaveBeenCalled()
@@ -135,24 +137,52 @@ describe('SavedViewsComponent', () => {
     component.savedViewsForm
       .get('savedViews')
       .get(view.id.toString())
-      .get('show_on_dashboard')
-      .setValue(!view.show_on_dashboard)
+      .get('name')
+      .setValue('changed-view-name')
     component.savedViewsForm
       .get('savedViews')
       .get(view.id.toString())
-      .get('show_on_dashboard')
+      .get('name')
       .markAsDirty()
     fixture.detectChanges()
 
     component.save()
-    expect(patchSpy).toHaveBeenCalledWith([
-      expect.objectContaining({
-        id: view.id,
-        name: view.name,
-        show_in_sidebar: view.show_in_sidebar,
-        show_on_dashboard: !view.show_on_dashboard,
-      }),
-    ])
+    expect(patchSpy).toHaveBeenCalled()
+    const patchBody = patchSpy.mock.calls[0][0][0]
+    expect(patchBody).toMatchObject({
+      id: view.id,
+      name: 'changed-view-name',
+    })
+    expect(patchBody.show_on_dashboard).toBeUndefined()
+    expect(patchBody.show_in_sidebar).toBeUndefined()
+  })
+
+  it('should persist visibility changes to user settings', () => {
+    const patchSpy = jest.spyOn(savedViewService, 'patchMany')
+    const setSpy = jest.spyOn(settingsService, 'set')
+    const storeSpy = jest
+      .spyOn(settingsService, 'storeSettings')
+      .mockReturnValue(of({ success: true }))
+
+    const dashboardControl = component.savedViewsForm
+      .get('savedViews')
+      .get(savedViews[0].id.toString())
+      .get('show_on_dashboard')
+    dashboardControl.setValue(false)
+    dashboardControl.markAsDirty()
+
+    component.save()
+
+    expect(patchSpy).not.toHaveBeenCalled()
+    expect(setSpy).toHaveBeenCalledWith(
+      SETTINGS_KEYS.DASHBOARD_VIEWS_VISIBLE_IDS,
+      []
+    )
+    expect(setSpy).toHaveBeenCalledWith(
+      SETTINGS_KEYS.SIDEBAR_VIEWS_VISIBLE_IDS,
+      [savedViews[0].id]
+    )
+    expect(storeSpy).toHaveBeenCalled()
   })
 
   it('should support delete saved view', () => {

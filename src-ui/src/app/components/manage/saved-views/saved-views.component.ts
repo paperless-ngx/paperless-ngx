@@ -8,10 +8,11 @@ import {
 } from '@angular/forms'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { dirtyCheck } from '@ngneat/dirty-check-forms'
-import { BehaviorSubject, Observable, takeUntil } from 'rxjs'
+import { BehaviorSubject, Observable, of, switchMap, takeUntil } from 'rxjs'
 import { PermissionsDialogComponent } from 'src/app/components/common/permissions-dialog/permissions-dialog.component'
 import { DisplayMode } from 'src/app/data/document'
 import { SavedView } from 'src/app/data/saved-view'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import {
   PermissionAction,
@@ -107,9 +108,9 @@ export class SavedViewsComponent
           name: new FormControl({ value: null, disabled: !canEdit }),
           show_on_dashboard: new FormControl({
             value: null,
-            disabled: !canEdit,
+            disabled: false,
           }),
-          show_in_sidebar: new FormControl({ value: null, disabled: !canEdit }),
+          show_in_sidebar: new FormControl({ value: null, disabled: false }),
           page_size: new FormControl({ value: null, disabled: !canEdit }),
           display_mode: new FormControl({ value: null, disabled: !canEdit }),
           display_fields: new FormControl({ value: [], disabled: !canEdit }),
@@ -153,27 +154,80 @@ export class SavedViewsComponent
   }
 
   public save() {
-    // only patch views that have actually changed
+    // Save only changed views, then save the visibility changes into user settings.
+    const groups = Object.values(this.savedViewsGroup.controls) as FormGroup[]
+    const visibilityChanged = groups.some(
+      (group) =>
+        group.get('show_on_dashboard')?.dirty ||
+        group.get('show_in_sidebar')?.dirty
+    )
+
     const changed: SavedView[] = []
-    Object.values(this.savedViewsGroup.controls)
-      .filter((g: FormGroup) => g.enabled && !g.pristine)
-      .forEach((group: FormGroup) => {
-        changed.push(group.getRawValue())
-      })
-    if (changed.length) {
-      this.savedViewService.patchMany(changed).subscribe({
-        next: () => {
-          this.toastService.showInfo($localize`Views saved successfully.`)
-          this.reloadViews()
-        },
-        error: (error) => {
-          this.toastService.showError(
-            $localize`Error while saving views.`,
-            error
-          )
-        },
-      })
+    const dashboardVisibleIds: number[] = []
+    const sidebarVisibleIds: number[] = []
+
+    groups.forEach((group) => {
+      const value = group.getRawValue()
+      if (value.show_on_dashboard) {
+        dashboardVisibleIds.push(value.id)
+      }
+      if (value.show_in_sidebar) {
+        sidebarVisibleIds.push(value.id)
+      }
+
+      if (!group.get('name')?.enabled) {
+        // Quick check for user doesn't have permissions, then bail
+        return
+      }
+
+      const modelFieldsChanged =
+        group.get('name')?.dirty ||
+        group.get('page_size')?.dirty ||
+        group.get('display_mode')?.dirty ||
+        group.get('display_fields')?.dirty
+
+      if (!modelFieldsChanged) {
+        return
+      }
+
+      delete value.show_on_dashboard
+      delete value.show_in_sidebar
+      changed.push(value)
+    })
+    if (!changed.length && !visibilityChanged) {
+      return
     }
+
+    // First save only changed views
+    let saveOperation = of([])
+    if (changed.length) {
+      saveOperation = saveOperation.pipe(
+        switchMap(() => this.savedViewService.patchMany(changed))
+      )
+    }
+    // Then save the visibility changes in the settings
+    if (visibilityChanged) {
+      this.settings.set(SETTINGS_KEYS.DASHBOARD_VIEWS_VISIBLE_IDS, [
+        ...new Set(dashboardVisibleIds),
+      ])
+      this.settings.set(SETTINGS_KEYS.SIDEBAR_VIEWS_VISIBLE_IDS, [
+        ...new Set(sidebarVisibleIds),
+      ])
+      saveOperation = saveOperation.pipe(
+        switchMap(() => this.settings.storeSettings())
+      )
+    }
+
+    saveOperation.subscribe({
+      next: () => {
+        this.toastService.showInfo($localize`Views saved successfully.`)
+        this.savedViewService.clearCache()
+        this.reloadViews()
+      },
+      error: (error) => {
+        this.toastService.showError($localize`Error while saving views.`, error)
+      },
+    })
   }
 
   public canEditSavedView(view: SavedView): boolean {
@@ -223,7 +277,7 @@ export class SavedViewsComponent
   private reloadViews(): void {
     this.loading = true
     this.savedViewService
-      .listAll(null, null, { full_perms: true })
+      .list(1, 100000, null, null, { full_perms: true })
       .subscribe((r) => {
         this.savedViews = r.results
         this.initialize()
