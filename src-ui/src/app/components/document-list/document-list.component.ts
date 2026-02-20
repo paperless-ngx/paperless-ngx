@@ -462,6 +462,15 @@ export class DocumentListComponent
         display_mode: this.list.displayMode,
         display_fields: this.activeDisplayFields,
       }
+      const permissions = formValue.permissions_form
+      if (permissions) {
+        if (permissions.owner !== null && permissions.owner !== undefined) {
+          savedView.owner = permissions.owner
+        }
+        if (permissions.set_permissions) {
+          savedView['set_permissions'] = permissions.set_permissions
+        }
+      }
 
       this.savedViewService
         .create(savedView)

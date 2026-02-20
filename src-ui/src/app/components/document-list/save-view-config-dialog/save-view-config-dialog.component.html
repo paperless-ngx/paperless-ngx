@@ -8,6 +8,7 @@
     <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
     <pngx-input-check i18n-title title="Show in sidebar" formControlName="showInSideBar"></pngx-input-check>
     <pngx-input-check i18n-title title="Show on dashboard" formControlName="showOnDashboard"></pngx-input-check>
+    <pngx-permissions-form [users]="users" accordion="true" formControlName="permissions_form"></pngx-permissions-form>
     @if (error?.filter_rules) {
       <div class="alert alert-danger" role="alert">
         <h6 class="alert-heading" i18n>Filter rules error occurred while saving this view</h6>

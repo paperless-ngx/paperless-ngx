@@ -567,12 +567,35 @@ describe('DocumentListComponent', () => {
     component.saveViewConfigAs()
 
     const modalCloseSpy = jest.spyOn(openModal, 'close')
+    const permissions = {
+      owner: 5,
+      set_permissions: {
+        view: {
+          users: [4],
+          groups: [3],
+        },
+        change: {
+          users: [2],
+          groups: [1],
+        },
+      },
+    }
     openModal.componentInstance.saveClicked.next({
       name: 'Foo Bar',
-      show_on_dashboard: true,
-      show_in_sidebar: true,
+      showOnDashboard: true,
+      showInSideBar: true,
+      permissions_form: permissions,
     })
     expect(savedViewServiceCreate).toHaveBeenCalled()
+    expect(savedViewServiceCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Foo Bar',
+        show_on_dashboard: true,
+        show_in_sidebar: true,
+        owner: permissions.owner,
+        set_permissions: permissions.set_permissions,
+      })
+    )
     expect(modalSpy).toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalled()
     expect(modalCloseSpy).toHaveBeenCalled()
@@ -618,8 +641,8 @@ describe('DocumentListComponent', () => {
 
     openModal.componentInstance.saveClicked.next({
       name: 'Foo Bar',
-      show_on_dashboard: true,
-      show_in_sidebar: true,
+      showOnDashboard: true,
+      showInSideBar: true,
     })
     expect(openModal.componentInstance.error).toEqual({ filter_rules: ['11'] })
   })
