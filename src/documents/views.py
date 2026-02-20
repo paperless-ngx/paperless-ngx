@@ -2111,7 +2111,7 @@ class SavedViewViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet):
         OrderingFilter,
         ObjectOwnedOrGrantedPermissionsFilter,
     )
-    ordering_fields = ("name", "show_on_dashboard", "show_in_sidebar")
+    ordering_fields = ("name",)
 
 
 @extend_schema_view(
