@@ -22,7 +22,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { TourNgBootstrap } from 'ngx-ui-tour-ng-bootstrap'
-import { filter, first, map, Subject, switchMap, takeUntil } from 'rxjs'
+import { filter, first, map, of, Subject, switchMap, takeUntil } from 'rxjs'
 import {
   DEFAULT_DISPLAY_FIELDS,
   DisplayField,
@@ -454,8 +454,9 @@ export class DocumentListComponent
       modal.componentInstance.buttonsEnabled = false
       let savedView: SavedView = {
         name: formValue.name,
-        show_on_dashboard: formValue.showOnDashboard,
-        show_in_sidebar: formValue.showInSideBar,
+        // Visibility is in per-user UISettings.
+        show_on_dashboard: false,
+        show_in_sidebar: false,
         filter_rules: this.list.filterRules,
         sort_reverse: this.list.sortReverse,
         sort_field: this.list.sortField,
@@ -476,11 +477,28 @@ export class DocumentListComponent
         .create(savedView)
         .pipe(first())
         .subscribe({
-          next: () => {
-            modal.close()
-            this.toastService.showInfo(
-              $localize`View "${savedView.name}" created successfully.`
+          next: (createdView) => {
+            this.saveCreatedViewVisibility(
+              createdView,
+              formValue.showOnDashboard,
+              formValue.showInSideBar
             )
+              .pipe(first())
+              .subscribe({
+                next: () => {
+                  modal.close()
+                  this.toastService.showInfo(
+                    $localize`View "${savedView.name}" created successfully.`
+                  )
+                },
+                error: (error) => {
+                  modal.close()
+                  this.toastService.showError(
+                    $localize`View "${savedView.name}" created successfully, but could not update visibility settings.`,
+                    error
+                  )
+                },
+              })
           },
           error: (httpError) => {
             let error = httpError.error
@@ -492,6 +510,35 @@ export class DocumentListComponent
           },
         })
     })
+  }
+
+  private saveCreatedViewVisibility(
+    createdView: SavedView,
+    showOnDashboard: boolean,
+    showInSideBar: boolean
+  ) {
+    if (!showOnDashboard && !showInSideBar) {
+      return of(null)
+    }
+
+    const dashboardViewIds = this.savedViewService.dashboardViews.map(
+      (v) => v.id
+    )
+    const sidebarViewIds = this.savedViewService.sidebarViews.map((v) => v.id)
+    if (showOnDashboard) {
+      dashboardViewIds.push(createdView.id)
+    }
+    if (showInSideBar) {
+      sidebarViewIds.push(createdView.id)
+    }
+
+    this.settingsService.set(SETTINGS_KEYS.DASHBOARD_VIEWS_VISIBLE_IDS, [
+      ...new Set(dashboardViewIds),
+    ])
+    this.settingsService.set(SETTINGS_KEYS.SIDEBAR_VIEWS_VISIBLE_IDS, [
+      ...new Set(sidebarViewIds),
+    ])
+    return this.settingsService.storeSettings()
   }
 
   openDocumentDetail(document: Document | number) {
