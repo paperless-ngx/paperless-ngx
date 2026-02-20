@@ -2110,8 +2110,14 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         mock_get_date_parser.assert_not_called()
 
     def test_saved_views(self) -> None:
-        u1 = User.objects.create_superuser("user1")
-        u2 = User.objects.create_superuser("user2")
+        u1 = User.objects.create_user("user1")
+        u2 = User.objects.create_user("user2")
+        u3 = User.objects.create_user("user3")
+
+        view_perm = Permission.objects.get(codename="view_savedview")
+        change_perm = Permission.objects.get(codename="change_savedview")
+        for user in [u1, u2, u3]:
+            user.user_permissions.add(view_perm, change_perm)
 
         v1 = SavedView.objects.create(
             owner=u1,
@@ -2120,14 +2126,14 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             show_on_dashboard=False,
             show_in_sidebar=False,
         )
-        SavedView.objects.create(
+        v2 = SavedView.objects.create(
             owner=u2,
             name="test2",
             sort_field="",
             show_on_dashboard=False,
             show_in_sidebar=False,
         )
-        SavedView.objects.create(
+        v3 = SavedView.objects.create(
             owner=u2,
             name="test3",
             sort_field="",
@@ -2135,36 +2141,62 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             show_in_sidebar=False,
         )
 
-        response = self.client.get("/api/saved_views/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["count"], 0)
-
-        self.assertEqual(
-            self.client.get(f"/api/saved_views/{v1.id}/").status_code,
-            status.HTTP_404_NOT_FOUND,
-        )
+        assign_perm("view_savedview", u1, v2)
+        assign_perm("change_savedview", u1, v2)
+        assign_perm("view_savedview", u1, v3)
 
         self.client.force_authenticate(user=u1)
 
         response = self.client.get("/api/saved_views/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["count"], 3)
 
+        for view_id in [v1.id, v2.id, v3.id]:
+            self.assertEqual(
+                self.client.get(f"/api/saved_views/{view_id}/").status_code,
+                status.HTTP_200_OK,
+            )
+
+        response = self.client.patch(
+            f"/api/saved_views/{v2.id}/",
+            {"show_in_sidebar": True},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.patch(
+            f"/api/saved_views/{v3.id}/",
+            {"show_in_sidebar": True},
+            format="json",
+        )
         self.assertEqual(
-            self.client.get(f"/api/saved_views/{v1.id}/").status_code,
-            status.HTTP_200_OK,
+            response.status_code,
+            status.HTTP_403_FORBIDDEN,
         )
 
-        self.client.force_authenticate(user=u2)
+        response = self.client.patch(
+            f"/api/saved_views/{v2.id}/",
+            {
+                "set_permissions": {
+                    "view": {"users": [u3.id]},
+                },
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        response = self.client.patch(
+            f"/api/saved_views/{v2.id}/",
+            {"owner": u1.id},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        self.client.force_authenticate(user=u3)
 
         response = self.client.get("/api/saved_views/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["count"], 2)
-
-        self.assertEqual(
-            self.client.get(f"/api/saved_views/{v1.id}/").status_code,
-            status.HTTP_404_NOT_FOUND,
-        )
+        self.assertEqual(response.data["count"], 0)
 
     def test_saved_view_create_update_patch(self) -> None:
         User.objects.create_user("user1")
