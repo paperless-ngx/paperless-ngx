@@ -3,9 +3,9 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { of, throwError } from 'rxjs'
+import { Subject, of, throwError } from 'rxjs'
 import { SavedView } from 'src/app/data/saved-view'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
@@ -32,6 +32,7 @@ describe('SavedViewsComponent', () => {
   let fixture: ComponentFixture<SavedViewsComponent>
   let savedViewService: SavedViewService
   let toastService: ToastService
+  let modalService: NgbModal
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -79,10 +80,11 @@ describe('SavedViewsComponent', () => {
 
     savedViewService = TestBed.inject(SavedViewService)
     toastService = TestBed.inject(ToastService)
+    modalService = TestBed.inject(NgbModal)
     fixture = TestBed.createComponent(SavedViewsComponent)
     component = fixture.componentInstance
 
-    jest.spyOn(savedViewService, 'listAll').mockReturnValue(
+    jest.spyOn(savedViewService, 'list').mockReturnValue(
       of({
         all: savedViews.map((v) => v.id),
         count: savedViews.length,
@@ -178,5 +180,43 @@ describe('SavedViewsComponent', () => {
         .get(view.id.toString())
         .get('show_on_dashboard').value
     ).toEqual(view.show_on_dashboard)
+  })
+
+  it('should support editing permissions', () => {
+    const confirmClicked = new Subject<any>()
+    const modalRef = {
+      componentInstance: {
+        confirmClicked,
+        buttonsEnabled: true,
+      },
+      close: jest.fn(),
+    } as any
+    jest.spyOn(modalService, 'open').mockReturnValue(modalRef)
+    const patchSpy = jest.spyOn(savedViewService, 'patch')
+    patchSpy.mockReturnValue(of(savedViews[0] as SavedView))
+
+    component.editPermissions(savedViews[0] as SavedView)
+    confirmClicked.next({
+      permissions: {
+        owner: 1,
+        set_permissions: {
+          view: { users: [2], groups: [] },
+          change: { users: [], groups: [3] },
+        },
+      },
+      merge: true,
+    })
+
+    expect(patchSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: savedViews[0].id,
+        owner: 1,
+        set_permissions: {
+          view: { users: [2], groups: [] },
+          change: { users: [], groups: [3] },
+        },
+      })
+    )
+    expect(modalRef.close).toHaveBeenCalled()
   })
 })

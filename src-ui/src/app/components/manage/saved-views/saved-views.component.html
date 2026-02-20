@@ -27,6 +27,12 @@
           <div class="col-auto">
             @if (canDeleteSavedView(view)) {
               <label class="form-label" for="name_{{view.id}}" i18n>Actions</label>
+              <button
+                class="btn btn-sm btn-outline-secondary form-control mb-2"
+                type="button"
+                (click)="editPermissions(view)"
+                *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.SavedView }"
+                i18n>Permissions</button>
               <pngx-confirm-button
                 label="Delete"
                 i18n-label
