@@ -699,4 +699,17 @@ export class SettingsService {
     ])
     return this.storeSettings()
   }
+
+  updateSavedViewsVisibility(
+    dashboardVisibleViewIds: number[],
+    sidebarVisibleViewIds: number[]
+  ): Observable<any> {
+    this.set(SETTINGS_KEYS.DASHBOARD_VIEWS_VISIBLE_IDS, [
+      ...new Set(dashboardVisibleViewIds),
+    ])
+    this.set(SETTINGS_KEYS.SIDEBAR_VIEWS_VISIBLE_IDS, [
+      ...new Set(sidebarVisibleViewIds),
+    ])
+    return this.storeSettings()
+  }
 }

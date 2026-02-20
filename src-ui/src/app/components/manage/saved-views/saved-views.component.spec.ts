@@ -7,7 +7,6 @@ import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject, of, throwError } from 'rxjs'
 import { SavedView } from 'src/app/data/saved-view'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { PermissionsService } from 'src/app/services/permissions.service'
@@ -159,9 +158,8 @@ describe('SavedViewsComponent', () => {
 
   it('should persist visibility changes to user settings', () => {
     const patchSpy = jest.spyOn(savedViewService, 'patchMany')
-    const setSpy = jest.spyOn(settingsService, 'set')
-    const storeSpy = jest
-      .spyOn(settingsService, 'storeSettings')
+    const updateVisibilitySpy = jest
+      .spyOn(settingsService, 'updateSavedViewsVisibility')
       .mockReturnValue(of({ success: true }))
 
     const dashboardControl = component.savedViewsForm
@@ -174,15 +172,7 @@ describe('SavedViewsComponent', () => {
     component.save()
 
     expect(patchSpy).not.toHaveBeenCalled()
-    expect(setSpy).toHaveBeenCalledWith(
-      SETTINGS_KEYS.DASHBOARD_VIEWS_VISIBLE_IDS,
-      []
-    )
-    expect(setSpy).toHaveBeenCalledWith(
-      SETTINGS_KEYS.SIDEBAR_VIEWS_VISIBLE_IDS,
-      [savedViews[0].id]
-    )
-    expect(storeSpy).toHaveBeenCalled()
+    expect(updateVisibilitySpy).toHaveBeenCalledWith([], [savedViews[0].id])
   })
 
   it('should support delete saved view', () => {
