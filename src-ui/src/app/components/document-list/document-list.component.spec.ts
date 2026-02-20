@@ -466,7 +466,7 @@ describe('DocumentListComponent', () => {
   })
 
   it('should handle error on view saving', () => {
-    component.list.activateSavedView({
+    const view: SavedView = {
       id: 10,
       name: 'Saved View 10',
       sort_field: 'added',
@@ -477,7 +477,16 @@ describe('DocumentListComponent', () => {
           value: '20',
         },
       ],
-    })
+    }
+    jest.spyOn(savedViewService, 'getCached').mockReturnValue(of(view))
+    const queryParams = { view: view.id.toString() }
+    jest
+      .spyOn(activatedRoute, 'queryParamMap', 'get')
+      .mockReturnValue(of(convertToParamMap(queryParams)))
+    activatedRoute.snapshot.queryParams = queryParams
+    router.routerState.snapshot.url = '/view/10/'
+    fixture.detectChanges()
+
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     jest
       .spyOn(savedViewService, 'patch')
@@ -487,6 +496,40 @@ describe('DocumentListComponent', () => {
       'Failed to save view "Saved View 10".',
       expect.any(Error)
     )
+  })
+
+  it('should not save a view without object change permissions', () => {
+    const view: SavedView = {
+      id: 10,
+      name: 'Saved View 10',
+      sort_field: 'added',
+      sort_reverse: true,
+      filter_rules: [
+        {
+          rule_type: FILTER_HAS_TAGS_ANY,
+          value: '20',
+        },
+      ],
+      owner: 999,
+      user_can_change: false,
+    }
+    jest.spyOn(savedViewService, 'getCached').mockReturnValue(of(view))
+    jest
+      .spyOn(permissionService, 'currentUserHasObjectPermissions')
+      .mockReturnValue(false)
+    const queryParams = { view: view.id.toString() }
+    jest
+      .spyOn(activatedRoute, 'queryParamMap', 'get')
+      .mockReturnValue(of(convertToParamMap(queryParams)))
+    activatedRoute.snapshot.queryParams = queryParams
+    router.routerState.snapshot.url = '/view/10/'
+    fixture.detectChanges()
+
+    const patchSpy = jest.spyOn(savedViewService, 'patch')
+
+    component.saveViewConfig()
+
+    expect(patchSpy).not.toHaveBeenCalled()
   })
 
   it('should support edited view saving as', () => {

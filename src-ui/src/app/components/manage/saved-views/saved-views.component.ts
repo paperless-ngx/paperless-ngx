@@ -11,6 +11,10 @@ import { BehaviorSubject, Observable, takeUntil } from 'rxjs'
 import { DisplayMode } from 'src/app/data/document'
 import { SavedView } from 'src/app/data/saved-view'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import {
+  PermissionAction,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -41,6 +45,7 @@ export class SavedViewsComponent
   implements OnInit, OnDestroy
 {
   private savedViewService = inject(SavedViewService)
+  private permissionsService = inject(PermissionsService)
   private settings = inject(SettingsService)
   private toastService = inject(ToastService)
 
@@ -95,16 +100,20 @@ export class SavedViewsComponent
         display_mode: view.display_mode,
         display_fields: view.display_fields,
       }
+      const canEdit = this.canEditSavedView(view)
       this.savedViewsGroup.addControl(
         view.id.toString(),
         new FormGroup({
-          id: new FormControl(null),
-          name: new FormControl(null),
-          show_on_dashboard: new FormControl(null),
-          show_in_sidebar: new FormControl(null),
-          page_size: new FormControl(null),
-          display_mode: new FormControl(null),
-          display_fields: new FormControl([]),
+          id: new FormControl({ value: null, disabled: !canEdit }),
+          name: new FormControl({ value: null, disabled: !canEdit }),
+          show_on_dashboard: new FormControl({
+            value: null,
+            disabled: !canEdit,
+          }),
+          show_in_sidebar: new FormControl({ value: null, disabled: !canEdit }),
+          page_size: new FormControl({ value: null, disabled: !canEdit }),
+          display_mode: new FormControl({ value: null, disabled: !canEdit }),
+          display_fields: new FormControl({ value: [], disabled: !canEdit }),
         })
       )
     }
@@ -126,6 +135,9 @@ export class SavedViewsComponent
   }
 
   public deleteSavedView(savedView: SavedView) {
+    if (!this.canDeleteSavedView(savedView)) {
+      return
+    }
     this.savedViewService.delete(savedView).subscribe(() => {
       this.savedViewsGroup.removeControl(savedView.id.toString())
       this.savedViews.splice(this.savedViews.indexOf(savedView), 1)
@@ -148,9 +160,9 @@ export class SavedViewsComponent
     // only patch views that have actually changed
     const changed: SavedView[] = []
     Object.values(this.savedViewsGroup.controls)
-      .filter((g: FormGroup) => !g.pristine)
+      .filter((g: FormGroup) => g.enabled && !g.pristine)
       .forEach((group: FormGroup) => {
-        changed.push(group.value)
+        changed.push(group.getRawValue())
       })
     if (changed.length) {
       this.savedViewService.patchMany(changed).subscribe({
@@ -166,5 +178,16 @@ export class SavedViewsComponent
         },
       })
     }
+  }
+
+  public canEditSavedView(view: SavedView): boolean {
+    return this.permissionsService.currentUserHasObjectPermissions(
+      PermissionAction.Change,
+      view
+    )
+  }
+
+  public canDeleteSavedView(view: SavedView): boolean {
+    return this.permissionsService.currentUserOwnsObject(view)
   }
 }

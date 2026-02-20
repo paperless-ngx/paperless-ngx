@@ -3,7 +3,6 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { By } from '@angular/platform-browser'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
@@ -57,6 +56,8 @@ describe('SavedViewsComponent', () => {
           provide: PermissionsService,
           useValue: {
             currentUserCan: () => true,
+            currentUserHasObjectPermissions: () => true,
+            currentUserOwnsObject: () => true,
           },
         },
         {
@@ -96,12 +97,11 @@ describe('SavedViewsComponent', () => {
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastSpy = jest.spyOn(toastService, 'show')
     const savedViewPatchSpy = jest.spyOn(savedViewService, 'patchMany')
-
-    const toggle = fixture.debugElement.query(
-      By.css('.form-check.form-switch input')
-    )
-    toggle.nativeElement.checked = true
-    toggle.nativeElement.dispatchEvent(new Event('change'))
+    const control = component.savedViewsForm
+      .get('savedViews')
+      .get(savedViews[0].id.toString())
+      .get('show_on_dashboard')
+    control.setValue(!savedViews[0].show_on_dashboard)
 
     // saved views error first
     savedViewPatchSpy.mockReturnValueOnce(
@@ -116,6 +116,7 @@ describe('SavedViewsComponent', () => {
 
     // succeed saved views
     savedViewPatchSpy.mockReturnValueOnce(of(savedViews as SavedView[]))
+    control.setValue(savedViews[0].show_on_dashboard)
     component.save()
     expect(toastErrorSpy).not.toHaveBeenCalled()
     expect(savedViewPatchSpy).toHaveBeenCalled()
@@ -127,25 +128,21 @@ describe('SavedViewsComponent', () => {
     expect(patchSpy).not.toHaveBeenCalled()
 
     const view = savedViews[0]
-    const toggle = fixture.debugElement.query(
-      By.css('.form-check.form-switch input')
-    )
-    toggle.nativeElement.checked = true
-    toggle.nativeElement.dispatchEvent(new Event('change'))
-    // register change
-    component.savedViewsForm.get('savedViews').get(view.id.toString()).value[
-      'show_on_dashboard'
-    ] = !view.show_on_dashboard
+    component.savedViewsForm
+      .get('savedViews')
+      .get(view.id.toString())
+      .get('show_on_dashboard')
+      .setValue(!view.show_on_dashboard)
     fixture.detectChanges()
 
     component.save()
     expect(patchSpy).toHaveBeenCalledWith([
-      {
+      expect.objectContaining({
         id: view.id,
         name: view.name,
         show_in_sidebar: view.show_in_sidebar,
         show_on_dashboard: !view.show_on_dashboard,
-      },
+      }),
     ])
   })
 
@@ -162,14 +159,17 @@ describe('SavedViewsComponent', () => {
 
   it('should support reset', () => {
     const view = savedViews[0]
-    component.savedViewsForm.get('savedViews').get(view.id.toString()).value[
-      'show_on_dashboard'
-    ] = !view.show_on_dashboard
+    component.savedViewsForm
+      .get('savedViews')
+      .get(view.id.toString())
+      .get('show_on_dashboard')
+      .setValue(!view.show_on_dashboard)
     component.reset()
     expect(
-      component.savedViewsForm.get('savedViews').get(view.id.toString()).value[
-        'show_on_dashboard'
-      ]
+      component.savedViewsForm
+        .get('savedViews')
+        .get(view.id.toString())
+        .get('show_on_dashboard').value
     ).toEqual(view.show_on_dashboard)
   })
 })
