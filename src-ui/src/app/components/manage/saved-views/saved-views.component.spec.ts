@@ -102,6 +102,7 @@ describe('SavedViewsComponent', () => {
       .get(savedViews[0].id.toString())
       .get('show_on_dashboard')
     control.setValue(!savedViews[0].show_on_dashboard)
+    control.markAsDirty()
 
     // saved views error first
     savedViewPatchSpy.mockReturnValueOnce(
@@ -117,6 +118,7 @@ describe('SavedViewsComponent', () => {
     // succeed saved views
     savedViewPatchSpy.mockReturnValueOnce(of(savedViews as SavedView[]))
     control.setValue(savedViews[0].show_on_dashboard)
+    control.markAsDirty()
     component.save()
     expect(toastErrorSpy).not.toHaveBeenCalled()
     expect(savedViewPatchSpy).toHaveBeenCalled()
@@ -133,6 +135,11 @@ describe('SavedViewsComponent', () => {
       .get(view.id.toString())
       .get('show_on_dashboard')
       .setValue(!view.show_on_dashboard)
+    component.savedViewsForm
+      .get('savedViews')
+      .get(view.id.toString())
+      .get('show_on_dashboard')
+      .markAsDirty()
     fixture.detectChanges()
 
     component.save()
