@@ -454,9 +454,6 @@ export class DocumentListComponent
       modal.componentInstance.buttonsEnabled = false
       let savedView: SavedView = {
         name: formValue.name,
-        // Visibility is in per-user UISettings.
-        show_on_dashboard: false,
-        show_in_sidebar: false,
         filter_rules: this.list.filterRules,
         sort_reverse: this.list.sortReverse,
         sort_field: this.list.sortField,

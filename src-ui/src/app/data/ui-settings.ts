@@ -255,12 +255,12 @@ export const SETTINGS: UiSetting[] = [
   {
     key: SETTINGS_KEYS.DASHBOARD_VIEWS_VISIBLE_IDS,
     type: 'array',
-    default: null,
+    default: [],
   },
   {
     key: SETTINGS_KEYS.SIDEBAR_VIEWS_VISIBLE_IDS,
     type: 'array',
-    default: null,
+    default: [],
   },
   {
     key: SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER,
