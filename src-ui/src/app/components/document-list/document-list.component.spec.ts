@@ -563,6 +563,10 @@ describe('DocumentListComponent', () => {
     const modalSpy = jest.spyOn(modalService, 'open')
     const toastSpy = jest.spyOn(toastService, 'showInfo')
     const savedViewServiceCreate = jest.spyOn(savedViewService, 'create')
+    const settingsSetSpy = jest.spyOn(settingsService, 'set')
+    const settingsStoreSpy = jest
+      .spyOn(settingsService, 'storeSettings')
+      .mockReturnValue(of({ success: true }))
     savedViewServiceCreate.mockReturnValueOnce(of(modifiedView))
     component.saveViewConfigAs()
 
@@ -590,12 +594,21 @@ describe('DocumentListComponent', () => {
     expect(savedViewServiceCreate).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'Foo Bar',
-        show_on_dashboard: true,
-        show_in_sidebar: true,
+        show_on_dashboard: false,
+        show_in_sidebar: false,
         owner: permissions.owner,
         set_permissions: permissions.set_permissions,
       })
     )
+    expect(settingsSetSpy).toHaveBeenCalledWith(
+      SETTINGS_KEYS.DASHBOARD_VIEWS_VISIBLE_IDS,
+      expect.arrayContaining([modifiedView.id])
+    )
+    expect(settingsSetSpy).toHaveBeenCalledWith(
+      SETTINGS_KEYS.SIDEBAR_VIEWS_VISIBLE_IDS,
+      expect.arrayContaining([modifiedView.id])
+    )
+    expect(settingsStoreSpy).toHaveBeenCalled()
     expect(modalSpy).toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalled()
     expect(modalCloseSpy).toHaveBeenCalled()
@@ -629,6 +642,7 @@ describe('DocumentListComponent', () => {
 
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
+    const settingsStoreSpy = jest.spyOn(settingsService, 'storeSettings')
     jest.spyOn(savedViewService, 'create').mockReturnValueOnce(
       throwError(
         () =>
@@ -644,6 +658,7 @@ describe('DocumentListComponent', () => {
       showOnDashboard: true,
       showInSideBar: true,
     })
+    expect(settingsStoreSpy).not.toHaveBeenCalled()
     expect(openModal.componentInstance.error).toEqual({ filter_rules: ['11'] })
   })
 
