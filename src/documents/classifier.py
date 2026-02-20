@@ -494,6 +494,14 @@ class DocumentClassifier:
     def predict_correspondent(self, content: str) -> int | None:
         if self.correspondent_classifier:
             X = self._vectorize(content)
+            threshold = settings.CLASSIFIER_CONFIDENCE_THRESHOLD
+            if threshold > 0.0:
+                proba = self.correspondent_classifier.predict_proba(X)[0]
+                max_idx = proba.argmax()
+                predicted_class = int(self.correspondent_classifier.classes_[max_idx])
+                if predicted_class != -1 and float(proba[max_idx]) >= threshold:
+                    return predicted_class
+                return None
             correspondent_id = self.correspondent_classifier.predict(X)
             if correspondent_id != -1:
                 return correspondent_id
