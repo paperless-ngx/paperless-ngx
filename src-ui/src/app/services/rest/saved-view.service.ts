@@ -67,9 +67,9 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
     return this.savedViews
   }
 
-  private getVisibleViewIds(setting: string): number[] | null {
+  private getVisibleViewIds(setting: string): number[] {
     const configured = this.settingsService.get(setting)
-    return Array.isArray(configured) ? configured : null
+    return Array.isArray(configured) ? configured : []
   }
 
   private withUserVisibility(view: SavedView): SavedView {
@@ -84,14 +84,14 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
     const visibleIds = this.getVisibleViewIds(
       SETTINGS_KEYS.DASHBOARD_VIEWS_VISIBLE_IDS
     )
-    return visibleIds ? visibleIds.includes(view.id) : !!view.show_on_dashboard
+    return visibleIds.includes(view.id)
   }
 
   private isSidebarVisible(view: SavedView): boolean {
     const visibleIds = this.getVisibleViewIds(
       SETTINGS_KEYS.SIDEBAR_VIEWS_VISIBLE_IDS
     )
-    return visibleIds ? visibleIds.includes(view.id) : !!view.show_in_sidebar
+    return visibleIds.includes(view.id)
   }
 
   get sidebarViews(): SavedView[] {

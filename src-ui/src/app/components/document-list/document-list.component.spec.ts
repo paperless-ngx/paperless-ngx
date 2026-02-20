@@ -593,8 +593,6 @@ describe('DocumentListComponent', () => {
     expect(savedViewServiceCreate).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'Foo Bar',
-        show_on_dashboard: false,
-        show_in_sidebar: false,
         owner: permissions.owner,
         set_permissions: permissions.set_permissions,
       })
