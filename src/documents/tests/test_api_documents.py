@@ -2170,6 +2170,13 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             {"show_in_sidebar": True},
             format="json",
         )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        response = self.client.patch(
+            f"/api/saved_views/{v2.id}/",
+            {"sort_field": "added"},
+            format="json",
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         response = self.client.patch(
