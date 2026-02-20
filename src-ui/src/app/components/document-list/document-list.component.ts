@@ -532,13 +532,10 @@ export class DocumentListComponent
       sidebarViewIds.push(createdView.id)
     }
 
-    this.settingsService.set(SETTINGS_KEYS.DASHBOARD_VIEWS_VISIBLE_IDS, [
-      ...new Set(dashboardViewIds),
-    ])
-    this.settingsService.set(SETTINGS_KEYS.SIDEBAR_VIEWS_VISIBLE_IDS, [
-      ...new Set(sidebarViewIds),
-    ])
-    return this.settingsService.storeSettings()
+    return this.settingsService.updateSavedViewsVisibility(
+      dashboardViewIds,
+      sidebarViewIds
+    )
   }
 
   openDocumentDetail(document: Document | number) {

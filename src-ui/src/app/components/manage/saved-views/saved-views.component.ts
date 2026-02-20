@@ -12,7 +12,6 @@ import { BehaviorSubject, Observable, of, switchMap, takeUntil } from 'rxjs'
 import { PermissionsDialogComponent } from 'src/app/components/common/permissions-dialog/permissions-dialog.component'
 import { DisplayMode } from 'src/app/data/document'
 import { SavedView } from 'src/app/data/saved-view'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import {
   PermissionAction,
@@ -207,14 +206,13 @@ export class SavedViewsComponent
     }
     // Then save the visibility changes in the settings
     if (visibilityChanged) {
-      this.settings.set(SETTINGS_KEYS.DASHBOARD_VIEWS_VISIBLE_IDS, [
-        ...new Set(dashboardVisibleIds),
-      ])
-      this.settings.set(SETTINGS_KEYS.SIDEBAR_VIEWS_VISIBLE_IDS, [
-        ...new Set(sidebarVisibleIds),
-      ])
       saveOperation = saveOperation.pipe(
-        switchMap(() => this.settings.storeSettings())
+        switchMap(() =>
+          this.settings.updateSavedViewsVisibility(
+            dashboardVisibleIds,
+            sidebarVisibleIds
+          )
+        )
       )
     }
 

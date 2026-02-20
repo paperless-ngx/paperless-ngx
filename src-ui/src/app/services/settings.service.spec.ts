@@ -320,7 +320,7 @@ describe('SettingsService', () => {
     expect(req.request.method).toEqual('POST')
   })
 
-  it('should update saved view sorting', () => {
+  it('should update saved view sorting and visibility', () => {
     httpTestingController
       .expectOne(`${environment.apiBaseUrl}ui_settings/`)
       .flush(ui_settings)
@@ -340,6 +340,15 @@ describe('SettingsService', () => {
     expect(setSpy).toHaveBeenCalledWith(
       SETTINGS_KEYS.SIDEBAR_VIEWS_SORT_ORDER,
       [1, 4]
+    )
+    settingsService.updateSavedViewsVisibility([1, 4], [4, 1])
+    expect(setSpy).toHaveBeenCalledWith(
+      SETTINGS_KEYS.DASHBOARD_VIEWS_VISIBLE_IDS,
+      [1, 4]
+    )
+    expect(setSpy).toHaveBeenCalledWith(
+      SETTINGS_KEYS.SIDEBAR_VIEWS_VISIBLE_IDS,
+      [4, 1]
     )
     httpTestingController
       .expectOne(`${environment.apiBaseUrl}ui_settings/`)
