@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name="stop_processing",
             field=models.BooleanField(
                 default=False,
-                help_text="If True, no further rules will be processed after this one if any document is consumed.",
+                help_text="If True, no further rules will be processed after this one if any document is queued.",
                 verbose_name="Stop processing further rules",
             ),
         ),
