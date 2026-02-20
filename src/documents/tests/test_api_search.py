@@ -1307,13 +1307,14 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         tag1 = Tag.objects.create(name="bank tag1")
         Tag.objects.create(name="tag2")
 
-        SavedView.objects.create(
+        shared_view = SavedView.objects.create(
             name="bank view",
             show_on_dashboard=True,
             show_in_sidebar=True,
             sort_field="",
-            owner=user1,
+            owner=user2,
         )
+        assign_perm("view_savedview", user1, shared_view)
         mail_account1 = MailAccount.objects.create(name="bank mail account 1")
         mail_account2 = MailAccount.objects.create(name="mail account 2")
         mail_rule1 = MailRule.objects.create(
