@@ -99,12 +99,7 @@
         </ul>
 
         <div class="nav-group mt-3 mb-1" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
-          @if (savedViewService.loading) {
-            <h6 class="sidebar-heading px-3 text-muted">
-              <span i18n>Saved views</span>
-              <div class="spinner-border spinner-border-sm fw-normal ms-2" role="status"></div>
-            </h6>
-          } @else if (savedViewService.sidebarViews?.length > 0) {
+          @if (savedViewService.sidebarViews?.length > 0) {
             <h6 class="sidebar-heading px-3 text-muted">
               <span i18n>Saved views</span>
             </h6>
@@ -134,6 +129,11 @@
                 </li>
               }
             </ul>
+          } @else if (savedViewService.loading) {
+            <h6 class="sidebar-heading px-3 text-muted">
+              <span i18n>Saved views</span>
+              <div class="spinner-border spinner-border-sm fw-normal ms-2" role="status"></div>
+            </h6>
           }
         </div>
 
