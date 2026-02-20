@@ -143,6 +143,10 @@ export const WORKFLOW_ACTION_OPTIONS = [
     id: WorkflowActionType.PasswordRemoval,
     name: $localize`Password removal`,
   },
+  {
+    id: WorkflowActionType.MoveToTrash,
+    name: $localize`Move to trash`,
+  },
 ]
 
 export enum TriggerFilterType {

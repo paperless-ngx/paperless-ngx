@@ -48,6 +48,7 @@ from documents.permissions import get_objects_for_user_owner_aware
 from documents.templating.utils import convert_format_str_to_template_format
 from documents.workflows.actions import build_workflow_action_context
 from documents.workflows.actions import execute_email_action
+from documents.workflows.actions import execute_move_to_trash_action
 from documents.workflows.actions import execute_password_removal_action
 from documents.workflows.actions import execute_webhook_action
 from documents.workflows.mutations import apply_assignment_to_document
@@ -58,6 +59,8 @@ from documents.workflows.utils import get_workflows_for_trigger
 from paperless.config import AIConfig
 
 if TYPE_CHECKING:
+    import uuid
+
     from documents.classifier import DocumentClassifier
     from documents.data_models import ConsumableDocument
     from documents.data_models import DocumentMetadataOverrides
@@ -727,7 +730,7 @@ def add_to_index(sender, document, **kwargs) -> None:
 def run_workflows_added(
     sender,
     document: Document,
-    logging_group=None,
+    logging_group: uuid.UUID | None = None,
     original_file=None,
     **kwargs,
 ) -> None:
@@ -743,7 +746,7 @@ def run_workflows_added(
 def run_workflows_updated(
     sender,
     document: Document,
-    logging_group=None,
+    logging_group: uuid.UUID | None = None,
     **kwargs,
 ) -> None:
     run_workflows(
@@ -757,7 +760,7 @@ def run_workflows(
     trigger_type: WorkflowTrigger.WorkflowTriggerType,
     document: Document | ConsumableDocument,
     workflow_to_run: Workflow | None = None,
-    logging_group=None,
+    logging_group: uuid.UUID | None = None,
     overrides: DocumentMetadataOverrides | None = None,
     original_file: Path | None = None,
 ) -> tuple[DocumentMetadataOverrides, str] | None:
@@ -783,14 +786,33 @@ def run_workflows(
 
     for workflow in workflows:
         if not use_overrides:
-            # This can be called from bulk_update_documents, which may be running multiple times
-            # Refresh this so the matching data is fresh and instance fields are re-freshed
-            # Otherwise, this instance might be behind and overwrite the work another process did
-            document.refresh_from_db()
-            doc_tag_ids = list(document.tags.values_list("pk", flat=True))
+            if TYPE_CHECKING:
+                assert isinstance(document, Document)
+            try:
+                # This can be called from bulk_update_documents, which may be running multiple times
+                # Refresh this so the matching data is fresh and instance fields are re-freshed
+                # Otherwise, this instance might be behind and overwrite the work another process did
+                document.refresh_from_db()
+                doc_tag_ids = list(document.tags.values_list("pk", flat=True))
+            except Document.DoesNotExist:
+                # Document was hard deleted by a previous workflow or another process
+                logger.info(
+                    "Document no longer exists, skipping remaining workflows",
+                    extra={"group": logging_group},
+                )
+                break
+
+            # Check if document was soft deleted (moved to trash)
+            if document.is_deleted:
+                logger.info(
+                    "Document was moved to trash, skipping remaining workflows",
+                    extra={"group": logging_group},
+                )
+                break
 
         if matching.document_matches_workflow(document, workflow, trigger_type):
             action: WorkflowAction
+            has_move_to_trash_action = False
             for action in workflow.actions.order_by("order", "pk"):
                 message = f"Applying {action} from {workflow}"
                 if not use_overrides:
@@ -834,6 +856,8 @@ def run_workflows(
                     )
                 elif action.type == WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL:
                     execute_password_removal_action(action, document, logging_group)
+                elif action.type == WorkflowAction.WorkflowActionType.MOVE_TO_TRASH:
+                    has_move_to_trash_action = True
 
             if not use_overrides:
                 # limit title to 128 characters
@@ -848,7 +872,12 @@ def run_workflows(
                 document=document if not use_overrides else None,
             )
 
+            if has_move_to_trash_action:
+                execute_move_to_trash_action(action, document, logging_group)
+
     if use_overrides:
+        if TYPE_CHECKING:
+            assert overrides is not None
         return overrides, "\n".join(messages)
 
 
