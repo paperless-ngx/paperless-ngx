@@ -62,6 +62,10 @@ export const SETTINGS_KEYS = {
     'general-settings:update-checking:backend-setting',
   SAVED_VIEWS_WARN_ON_UNSAVED_CHANGE:
     'general-settings:saved-views:warn-on-unsaved-change',
+  DASHBOARD_VIEWS_VISIBLE_IDS:
+    'general-settings:saved-views:dashboard-views-visible-ids',
+  SIDEBAR_VIEWS_VISIBLE_IDS:
+    'general-settings:saved-views:sidebar-views-visible-ids',
   DASHBOARD_VIEWS_SORT_ORDER:
     'general-settings:saved-views:dashboard-views-sort-order',
   SIDEBAR_VIEWS_SORT_ORDER:
@@ -247,6 +251,16 @@ export const SETTINGS: UiSetting[] = [
     key: SETTINGS_KEYS.DEFAULT_PERMS_EDIT_GROUPS,
     type: 'array',
     default: [],
+  },
+  {
+    key: SETTINGS_KEYS.DASHBOARD_VIEWS_VISIBLE_IDS,
+    type: 'array',
+    default: null,
+  },
+  {
+    key: SETTINGS_KEYS.SIDEBAR_VIEWS_VISIBLE_IDS,
+    type: 'array',
+    default: null,
   },
   {
     key: SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER,
