@@ -1309,8 +1309,6 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
 
         shared_view = SavedView.objects.create(
             name="bank view",
-            show_on_dashboard=True,
-            show_in_sidebar=True,
             sort_field="",
             owner=user2,
         )

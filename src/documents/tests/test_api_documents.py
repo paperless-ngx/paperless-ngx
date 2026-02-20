@@ -2123,22 +2123,16 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             owner=u1,
             name="test1",
             sort_field="",
-            show_on_dashboard=False,
-            show_in_sidebar=False,
         )
         v2 = SavedView.objects.create(
             owner=u2,
             name="test2",
             sort_field="",
-            show_on_dashboard=False,
-            show_in_sidebar=False,
         )
         v3 = SavedView.objects.create(
             owner=u2,
             name="test3",
             sort_field="",
-            show_on_dashboard=False,
-            show_in_sidebar=False,
         )
 
         assign_perm("view_savedview", u1, v2)
@@ -2159,13 +2153,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         response = self.client.patch(
             f"/api/saved_views/{v2.id}/",
-            {"show_in_sidebar": True},
-            format="json",
-        )
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-        response = self.client.patch(
-            f"/api/saved_views/{v2.id}/",
             {"sort_field": "added"},
             format="json",
         )
@@ -2173,7 +2160,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         response = self.client.patch(
             f"/api/saved_views/{v3.id}/",
-            {"show_in_sidebar": True},
+            {"sort_field": "added"},
             format="json",
         )
         self.assertEqual(
@@ -2210,8 +2197,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         view = {
             "name": "test",
-            "show_on_dashboard": True,
-            "show_in_sidebar": True,
             "sort_field": "created2",
             "filter_rules": [{"rule_type": 4, "value": "test"}],
         }
@@ -2226,13 +2211,13 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         response = self.client.patch(
             f"/api/saved_views/{v1.id}/",
-            {"show_in_sidebar": False},
+            {"sort_reverse": True},
             format="json",
         )
 
         v1 = SavedView.objects.get(id=v1.id)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertFalse(v1.show_in_sidebar)
+        self.assertTrue(v1.sort_reverse)
         self.assertEqual(v1.filter_rules.count(), 1)
 
         view["filter_rules"] = [{"rule_type": 12, "value": "secret"}]
@@ -2266,8 +2251,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         view = {
             "name": "test",
-            "show_on_dashboard": True,
-            "show_in_sidebar": True,
             "sort_field": "created2",
             "filter_rules": [{"rule_type": 4, "value": "test"}],
             "page_size": 20,
@@ -2355,8 +2338,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         """
         view = {
             "name": "test",
-            "show_on_dashboard": True,
-            "show_in_sidebar": True,
             "sort_field": "created2",
             "filter_rules": [{"rule_type": 4, "value": "test"}],
             "page_size": 20,
@@ -2432,8 +2413,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             owner=self.user,
             name="test",
             sort_field=SavedView.DisplayFields.CUSTOM_FIELD % custom_field.id,
-            show_on_dashboard=True,
-            show_in_sidebar=True,
             display_fields=[
                 SavedView.DisplayFields.TITLE,
                 SavedView.DisplayFields.CREATED,

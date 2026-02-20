@@ -1427,8 +1427,6 @@ class SavedViewSerializer(OwnedObjectSerializer):
         fields = [
             "id",
             "name",
-            "show_on_dashboard",
-            "show_in_sidebar",
             "sort_field",
             "sort_reverse",
             "filter_rules",
@@ -1460,17 +1458,6 @@ class SavedViewSerializer(OwnedObjectSerializer):
         return attrs
 
     def update(self, instance, validated_data):
-        user = getattr(self, "user", None)
-        is_superuser = user.is_superuser if user is not None else False
-        is_owner = instance.owner == user if user is not None else False
-        is_unowned = instance.owner is None
-        if not (is_superuser or is_owner or is_unowned) and (
-            "show_on_dashboard" in validated_data or "show_in_sidebar" in validated_data
-        ):
-            raise PermissionDenied(
-                _("Insufficient permissions."),
-            )
-
         if "filter_rules" in validated_data:
             rules_data = validated_data.pop("filter_rules")
         else:
