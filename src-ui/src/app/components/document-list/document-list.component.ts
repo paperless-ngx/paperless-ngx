@@ -47,7 +47,10 @@ import { UsernamePipe } from 'src/app/pipes/username.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { HotKeyService } from 'src/app/services/hot-key.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
-import { PermissionsService } from 'src/app/services/permissions.service'
+import {
+  PermissionAction,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -148,12 +151,18 @@ export class DocumentListComponent
 
   unmodifiedFilterRules: FilterRule[] = []
   private unmodifiedSavedView: SavedView
+  private activeSavedView: SavedView | null = null
 
   private unsubscribeNotifier: Subject<any> = new Subject()
 
   get savedViewIsModified(): boolean {
-    if (!this.list.activeSavedViewId || !this.unmodifiedSavedView) return false
-    else {
+    if (
+      !this.list.activeSavedViewId ||
+      !this.unmodifiedSavedView ||
+      !this.activeSavedViewCanChange
+    ) {
+      return false
+    } else {
       return (
         this.unmodifiedSavedView.sort_field !== this.list.sortField ||
         this.unmodifiedSavedView.sort_reverse !== this.list.sortReverse ||
@@ -178,6 +187,16 @@ export class DocumentListComponent
         )
       )
     }
+  }
+
+  get activeSavedViewCanChange(): boolean {
+    if (!this.activeSavedView) {
+      return false
+    }
+    return this.permissionService.currentUserHasObjectPermissions(
+      PermissionAction.Change,
+      this.activeSavedView
+    )
   }
 
   get isFiltered() {
@@ -264,11 +283,13 @@ export class DocumentListComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(({ view }) => {
         if (!view) {
+          this.activeSavedView = null
           this.router.navigate(['404'], {
             replaceUrl: true,
           })
           return
         }
+        this.activeSavedView = view
         this.unmodifiedSavedView = view
         this.list.activateSavedViewWithQueryParams(
           view,
@@ -292,6 +313,7 @@ export class DocumentListComponent
           // loading a saved view on /documents
           this.loadViewConfig(parseInt(queryParams.get('view')))
         } else {
+          this.activeSavedView = null
           this.list.activateSavedView(null)
           this.list.loadFromQueryParams(queryParams)
           this.unmodifiedFilterRules = []
@@ -374,7 +396,7 @@ export class DocumentListComponent
   }
 
   saveViewConfig() {
-    if (this.list.activeSavedViewId != null) {
+    if (this.list.activeSavedViewId != null && this.activeSavedViewCanChange) {
       let savedView: SavedView = {
         id: this.list.activeSavedViewId,
         filter_rules: this.list.filterRules,
@@ -388,6 +410,7 @@ export class DocumentListComponent
         .pipe(first())
         .subscribe({
           next: (view) => {
+            this.activeSavedView = view
             this.unmodifiedSavedView = view
             this.toastService.showInfo(
               $localize`View "${this.list.activeSavedViewTitle}" saved successfully.`
@@ -409,6 +432,11 @@ export class DocumentListComponent
       .getCached(viewID)
       .pipe(first())
       .subscribe((view) => {
+        if (!view) {
+          this.activeSavedView = null
+          return
+        }
+        this.activeSavedView = view
         this.unmodifiedSavedView = view
         this.list.activateSavedView(view)
         this.list.reload(() => {
