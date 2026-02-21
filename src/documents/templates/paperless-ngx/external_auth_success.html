@@ -12,19 +12,20 @@
 {% endblock form_top_content %}
 
 {% block form_content %}
-    <input type="hidden" name="action" value="approve" id="consent-action">
     <div class="d-grid gap-2 mt-3">
         <button
             class="btn btn-primary"
             type="submit"
-            onclick="document.getElementById('consent-action').value='approve';"
+            name="action"
+            value="approve"
         >
             {% translate "Approve and continue" %}
         </button>
         <button
             class="btn btn-outline-secondary"
             type="submit"
-            onclick="document.getElementById('consent-action').value='deny';"
+            name="action"
+            value="deny"
         >
             {% translate "Deny" %}
         </button>
