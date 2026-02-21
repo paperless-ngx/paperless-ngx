@@ -104,6 +104,8 @@ class TestCustomAccountAdapter(TestCase):
         request.session[EXTERNAL_AUTH_FLOW_SESSION_KEY] = {
             "redirect_uri": "app://callback",
             "state": "test-state",
+            "code_challenge": "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM",
+            "code_challenge_method": "S256",
             "created_at": 9999999999,
         }
 
@@ -203,6 +205,8 @@ class TestCustomSocialAccountAdapter(TestCase):
         request.session[EXTERNAL_AUTH_FLOW_SESSION_KEY] = {
             "redirect_uri": "app://callback",
             "state": "test-state",
+            "code_challenge": "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM",
+            "code_challenge_method": "S256",
             "created_at": 9999999999,
         }
 

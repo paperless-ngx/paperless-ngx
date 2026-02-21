@@ -722,6 +722,8 @@ If both the [PAPERLESS_ACCOUNT_DEFAULT_GROUPS](#PAPERLESS_ACCOUNT_DEFAULT_GROUPS
 
 : Allowed callback URIs for third-party app login handoff via `/api/auth/external-login/start/`.
 Only exact URI matches are accepted.
+Using `http://` callback URIs is less secure because callback parameters can be intercepted or logged in transit.
+Prefer custom schemes or `https://` callbacks, and only allow `http://` for trusted local development scenarios.
 
     Defaults to None (feature disabled)
 

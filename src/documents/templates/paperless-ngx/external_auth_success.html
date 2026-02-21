@@ -2,23 +2,31 @@
 {% load i18n %}
 
 {% block head_title %}
-    {% translate "Login successful" %}
+    {% translate "Approve app access" %}
 {% endblock head_title %}
 
 {% block form_top_content %}
-    <h2 class="h4 mb-3">{% translate "Login successful" %}</h2>
-    <p>{% translate "Returning to your app..." %}</p>
+    <h2 class="h4 mb-3">{% translate "Approve app access" %}</h2>
+    <p>{% translate "Allow this app to receive a login code for your account?" %}</p>
+    <p class="small text-muted">{% blocktranslate with callback_uri=callback_uri %}Callback: {{ callback_uri }}{% endblocktranslate %}</p>
 {% endblock form_top_content %}
 
 {% block form_content %}
-    <div class="d-grid mt-3">
-        <a class="btn btn-primary" href="{{ callback_url }}">{% translate "Continue" %}</a>
+    <input type="hidden" name="action" value="approve" id="consent-action">
+    <div class="d-grid gap-2 mt-3">
+        <button
+            class="btn btn-primary"
+            type="submit"
+            onclick="document.getElementById('consent-action').value='approve';"
+        >
+            {% translate "Approve and continue" %}
+        </button>
+        <button
+            class="btn btn-outline-secondary"
+            type="submit"
+            onclick="document.getElementById('consent-action').value='deny';"
+        >
+            {% translate "Deny" %}
+        </button>
     </div>
-    <p class="mt-3 text-muted">{% translate "You can close this tab." %}</p>
 {% endblock form_content %}
-
-{% block after_form_content %}
-    <script type="text/javascript">
-        window.location.replace("{{ callback_url|escapejs }}");
-    </script>
-{% endblock after_form_content %}
