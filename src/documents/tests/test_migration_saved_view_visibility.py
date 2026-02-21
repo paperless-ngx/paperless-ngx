@@ -17,10 +17,10 @@ class TestMigrateSavedViewVisibilityToUiSettings(TestMigrations):
 
         self.user_with_empty_settings = User.objects.create(username="user1")
         self.user_with_existing_settings = User.objects.create(username="user2")
-        self.user_without_settings = User.objects.create(username="user3")
+        self.user_with_owned_views = User.objects.create(username="user3")
         self.user_with_empty_settings_id = self.user_with_empty_settings.id
         self.user_with_existing_settings_id = self.user_with_existing_settings.id
-        self.user_without_settings_id = self.user_without_settings.id
+        self.user_with_owned_views_id = self.user_with_owned_views.id
 
         self.dashboard_view = SavedView.objects.create(
             owner=self.user_with_empty_settings,
@@ -41,6 +41,13 @@ class TestMigrateSavedViewVisibilityToUiSettings(TestMigrations):
             name="hidden",
             show_on_dashboard=False,
             show_in_sidebar=False,
+            sort_field="created",
+        )
+        self.other_owner_visible_view = SavedView.objects.create(
+            owner=self.user_with_owned_views,
+            name="other-owner-visible",
+            show_on_dashboard=True,
+            show_in_sidebar=True,
             sort_field="created",
         )
 
@@ -83,15 +90,15 @@ class TestMigrateSavedViewVisibilityToUiSettings(TestMigrations):
         self.assertEqual(existing_settings["preserve"], "value")
 
         created_settings = UiSettings.objects.get(
-            user_id=self.user_without_settings_id,
+            user_id=self.user_with_owned_views_id,
         ).settings
         self.assertCountEqual(
             created_settings[DASHBOARD_VIEWS_VISIBLE_IDS_KEY],
-            [self.dashboard_view.id],
+            [self.other_owner_visible_view.id],
         )
         self.assertCountEqual(
             created_settings[SIDEBAR_VIEWS_VISIBLE_IDS_KEY],
-            [self.dashboard_view.id, self.sidebar_only_view.id],
+            [self.other_owner_visible_view.id],
         )
 
 
@@ -123,6 +130,11 @@ class TestReverseMigrateSavedViewVisibilityFromUiSettings(TestMigrations):
             name="view-3",
             sort_field="created",
         )
+        self.view4 = SavedView.objects.create(
+            owner=user2,
+            name="view-4",
+            sort_field="created",
+        )
 
         UiSettings.objects.create(
             user=user1,
@@ -134,23 +146,30 @@ class TestReverseMigrateSavedViewVisibilityFromUiSettings(TestMigrations):
         UiSettings.objects.create(
             user=user2,
             settings={
-                DASHBOARD_VIEWS_VISIBLE_IDS_KEY: [self.view2.id, self.view3.id],
-                SIDEBAR_VIEWS_VISIBLE_IDS_KEY: [],
+                DASHBOARD_VIEWS_VISIBLE_IDS_KEY: [
+                    self.view2.id,
+                    self.view3.id,
+                    self.view4.id,
+                ],
+                SIDEBAR_VIEWS_VISIBLE_IDS_KEY: [self.view4.id],
             },
         )
         UiSettings.objects.create(user=user3, settings={})
 
-    def test_visibility_fields_restored_from_any_user_visibility(self) -> None:
+    def test_visibility_fields_restored_from_owner_visibility(self) -> None:
         SavedView = self.apps.get_model("documents", "SavedView")
 
         restored_view1 = SavedView.objects.get(pk=self.view1.id)
         restored_view2 = SavedView.objects.get(pk=self.view2.id)
         restored_view3 = SavedView.objects.get(pk=self.view3.id)
+        restored_view4 = SavedView.objects.get(pk=self.view4.id)
 
         self.assertTrue(restored_view1.show_on_dashboard)
-        self.assertTrue(restored_view2.show_on_dashboard)
-        self.assertTrue(restored_view3.show_on_dashboard)
+        self.assertFalse(restored_view2.show_on_dashboard)
+        self.assertFalse(restored_view3.show_on_dashboard)
+        self.assertTrue(restored_view4.show_on_dashboard)
 
         self.assertFalse(restored_view1.show_in_sidebar)
         self.assertTrue(restored_view2.show_in_sidebar)
         self.assertFalse(restored_view3.show_in_sidebar)
+        self.assertTrue(restored_view4.show_in_sidebar)
