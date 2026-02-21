@@ -76,6 +76,16 @@ export class SavedViewsComponent
     this.reloadViews()
   }
 
+  private reloadViews(): void {
+    this.loading = true
+    this.savedViewService
+      .listAll(null, null, { full_perms: true })
+      .subscribe((r) => {
+        this.savedViews = r.results
+        this.initialize()
+      })
+  }
+
   ngOnDestroy(): void {
     this.settings.organizingSidebarSavedViews = false
     super.ngOnDestroy()
@@ -134,9 +144,6 @@ export class SavedViewsComponent
   }
 
   public deleteSavedView(savedView: SavedView) {
-    if (!this.canDeleteSavedView(savedView)) {
-      return
-    }
     this.savedViewService.delete(savedView).subscribe(() => {
       this.savedViewsGroup.removeControl(savedView.id.toString())
       this.savedViews.splice(this.savedViews.indexOf(savedView), 1)
@@ -173,6 +180,9 @@ export class SavedViewsComponent
       if (value.show_in_sidebar) {
         sidebarVisibleIds.push(value.id)
       }
+      // Would be fine to send, but no longer stored on the model
+      delete value.show_on_dashboard
+      delete value.show_in_sidebar
 
       if (!group.get('name')?.enabled) {
         // Quick check for user doesn't have permissions, then bail
@@ -189,22 +199,19 @@ export class SavedViewsComponent
         return
       }
 
-      delete value.show_on_dashboard
-      delete value.show_in_sidebar
       changed.push(value)
     })
+
     if (!changed.length && !visibilityChanged) {
       return
     }
 
-    // First save only changed views
     let saveOperation = of([])
     if (changed.length) {
       saveOperation = saveOperation.pipe(
         switchMap(() => this.savedViewService.patchMany(changed))
       )
     }
-    // Then save the visibility changes in the settings
     if (visibilityChanged) {
       saveOperation = saveOperation.pipe(
         switchMap(() =>
@@ -240,9 +247,6 @@ export class SavedViewsComponent
   }
 
   public editPermissions(savedView: SavedView): void {
-    if (!this.canDeleteSavedView(savedView)) {
-      return
-    }
     const modal = this.modalService.open(PermissionsDialogComponent, {
       backdrop: 'static',
     })
@@ -270,15 +274,5 @@ export class SavedViewsComponent
         },
       })
     })
-  }
-
-  private reloadViews(): void {
-    this.loading = true
-    this.savedViewService
-      .list(1, 100000, null, null, { full_perms: true })
-      .subscribe((r) => {
-        this.savedViews = r.results
-        this.initialize()
-      })
   }
 }
