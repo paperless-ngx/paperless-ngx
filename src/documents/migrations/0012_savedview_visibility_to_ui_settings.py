@@ -3,6 +3,7 @@
 from django.db import migrations
 from django.db import models
 
+# from src-ui/src/app/data/ui-settings.ts
 DASHBOARD_VIEWS_VISIBLE_IDS_KEY = (
     "general-settings:saved-views:dashboard-views-visible-ids"
 )
@@ -27,12 +28,19 @@ def _set_default_visibility_ids(apps, schema_editor):
     UiSettings = apps.get_model("documents", "UiSettings")
     User = apps.get_model("auth", "User")
 
-    dashboard_visible_ids = list(
-        SavedView.objects.filter(show_on_dashboard=True).values_list("id", flat=True),
-    )
-    sidebar_visible_ids = list(
-        SavedView.objects.filter(show_in_sidebar=True).values_list("id", flat=True),
-    )
+    dashboard_visible_ids_by_owner: dict[int, list[int]] = {}
+    for owner_id, view_id in SavedView.objects.filter(
+        owner__isnull=False,
+        show_on_dashboard=True,
+    ).values_list("owner_id", "id"):
+        dashboard_visible_ids_by_owner.setdefault(owner_id, []).append(view_id)
+
+    sidebar_visible_ids_by_owner: dict[int, list[int]] = {}
+    for owner_id, view_id in SavedView.objects.filter(
+        owner__isnull=False,
+        show_in_sidebar=True,
+    ).values_list("owner_id", "id"):
+        sidebar_visible_ids_by_owner.setdefault(owner_id, []).append(view_id)
 
     for user in User.objects.all():
         ui_settings, _ = UiSettings.objects.get_or_create(
@@ -46,10 +54,14 @@ def _set_default_visibility_ids(apps, schema_editor):
         changed = False
 
         if current_settings.get(DASHBOARD_VIEWS_VISIBLE_IDS_KEY) is None:
-            current_settings[DASHBOARD_VIEWS_VISIBLE_IDS_KEY] = dashboard_visible_ids
+            current_settings[DASHBOARD_VIEWS_VISIBLE_IDS_KEY] = (
+                dashboard_visible_ids_by_owner.get(user.id, [])
+            )
             changed = True
         if current_settings.get(SIDEBAR_VIEWS_VISIBLE_IDS_KEY) is None:
-            current_settings[SIDEBAR_VIEWS_VISIBLE_IDS_KEY] = sidebar_visible_ids
+            current_settings[SIDEBAR_VIEWS_VISIBLE_IDS_KEY] = (
+                sidebar_visible_ids_by_owner.get(user.id, [])
+            )
             changed = True
 
         if changed:
@@ -61,27 +73,33 @@ def _restore_visibility_fields(apps, schema_editor):
     SavedView = apps.get_model("documents", "SavedView")
     UiSettings = apps.get_model("documents", "UiSettings")
 
-    dashboard_visible_ids = set()
-    sidebar_visible_ids = set()
-
+    dashboard_visible_ids_by_owner: dict[int, set[int]] = {}
+    sidebar_visible_ids_by_owner: dict[int, set[int]] = {}
     for ui_settings in UiSettings.objects.all():
         current_settings = ui_settings.settings
         if not isinstance(current_settings, dict):
             continue
-        dashboard_visible_ids.update(
-            _parse_visible_ids(current_settings.get(DASHBOARD_VIEWS_VISIBLE_IDS_KEY)),
+        dashboard_visible_ids_by_owner[ui_settings.user_id] = _parse_visible_ids(
+            current_settings.get(DASHBOARD_VIEWS_VISIBLE_IDS_KEY),
         )
-        sidebar_visible_ids.update(
-            _parse_visible_ids(current_settings.get(SIDEBAR_VIEWS_VISIBLE_IDS_KEY)),
+        sidebar_visible_ids_by_owner[ui_settings.user_id] = _parse_visible_ids(
+            current_settings.get(SIDEBAR_VIEWS_VISIBLE_IDS_KEY),
         )
 
     SavedView.objects.update(show_on_dashboard=False, show_in_sidebar=False)
-    if dashboard_visible_ids:
-        SavedView.objects.filter(id__in=dashboard_visible_ids).update(
+    for owner_id, dashboard_visible_ids in dashboard_visible_ids_by_owner.items():
+        if not dashboard_visible_ids:
+            continue
+        SavedView.objects.filter(
+            owner_id=owner_id,
+            id__in=dashboard_visible_ids,
+        ).update(
             show_on_dashboard=True,
         )
-    if sidebar_visible_ids:
-        SavedView.objects.filter(id__in=sidebar_visible_ids).update(
+    for owner_id, sidebar_visible_ids in sidebar_visible_ids_by_owner.items():
+        if not sidebar_visible_ids:
+            continue
+        SavedView.objects.filter(owner_id=owner_id, id__in=sidebar_visible_ids).update(
             show_in_sidebar=True,
         )
 
