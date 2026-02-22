@@ -725,7 +725,7 @@ EMAIL_CERTIFICATE_FILE = __get_optional_path("PAPERLESS_EMAIL_CERTIFICATE_LOCATI
 # Database                                                                    #
 ###############################################################################
 
-DATABASES = parse_db_settings()
+DATABASES = parse_db_settings(DATA_DIR)
 
 if os.getenv("PAPERLESS_DBENGINE") == "mariadb":
     # Silence Django error on old MariaDB versions.
