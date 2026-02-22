@@ -33,7 +33,7 @@ import { TextComponent } from '../../common/input/text/text.component'
 })
 export class SaveViewConfigDialogComponent implements OnInit {
   private modal = inject(NgbActiveModal)
-  private userService = inject(UserService)
+  private readonly userService = inject(UserService)
 
   @Output()
   public saveClicked = new EventEmitter()
