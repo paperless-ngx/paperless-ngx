@@ -175,6 +175,25 @@ describe('SavedViewsComponent', () => {
     expect(updateVisibilitySpy).toHaveBeenCalledWith([], [savedViews[0].id])
   })
 
+  it('should skip model updates for views that cannot be edited', () => {
+    const patchSpy = jest.spyOn(savedViewService, 'patchMany')
+    const updateVisibilitySpy = jest.spyOn(
+      settingsService,
+      'updateSavedViewsVisibility'
+    )
+    const nameControl = component.savedViewsForm
+      .get('savedViews')
+      .get(savedViews[0].id.toString())
+      .get('name')
+
+    nameControl.disable()
+
+    component.save()
+
+    expect(patchSpy).not.toHaveBeenCalled()
+    expect(updateVisibilitySpy).not.toHaveBeenCalled()
+  })
+
   it('should support delete saved view', () => {
     const toastSpy = jest.spyOn(toastService, 'showInfo')
     const deleteSpy = jest.spyOn(savedViewService, 'delete')
