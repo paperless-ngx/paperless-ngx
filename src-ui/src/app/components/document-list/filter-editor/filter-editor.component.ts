@@ -1101,6 +1101,9 @@ export class FilterEditorComponent
   @Output()
   filterRulesChange = new EventEmitter<FilterRule[]>()
 
+  @Output()
+  resetFilterRules = new EventEmitter<FilterRule[]>()
+
   @Input()
   set selectionData(selectionData: SelectionData) {
     this.tagDocumentCounts = selectionData?.selected_tags ?? null
@@ -1244,7 +1247,7 @@ export class FilterEditorComponent
     this.textFilterTarget = TEXT_FILTER_TARGET_TITLE_CONTENT
     this.documentService.searchQuery = ''
     this.filterRules = this._unmodifiedFilterRules
-    this.updateRules()
+    this.resetFilterRules.next(this.filterRules)
   }
 
   toggleTag(tagId: number) {

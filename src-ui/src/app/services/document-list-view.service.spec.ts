@@ -164,7 +164,7 @@ describe('DocumentListViewService', () => {
         value: tags__id__in,
       },
     ]
-    documentListViewService.filterRules = filterRulesAny
+    documentListViewService.setFilterRules(filterRulesAny)
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&tags__id__in=${tags__id__in}`
     )
@@ -178,7 +178,7 @@ describe('DocumentListViewService', () => {
     )
     expect(req.request.method).toEqual('GET')
     // reset the list
-    documentListViewService.filterRules = []
+    documentListViewService.setFilterRules([])
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
     )
@@ -210,7 +210,7 @@ describe('DocumentListViewService', () => {
         value: tags__id__in,
       },
     ]
-    documentListViewService.filterRules = filterRulesAny
+    documentListViewService.setFilterRules(filterRulesAny)
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&tags__id__in=${tags__id__in}`
     )
@@ -218,7 +218,7 @@ describe('DocumentListViewService', () => {
     req.flush('Generic error', { status: 404, statusText: 'Unexpected error' })
     expect(documentListViewService.error).toEqual('Generic error')
     // reset the list
-    documentListViewService.filterRules = []
+    documentListViewService.setFilterRules([])
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
     )
@@ -295,11 +295,39 @@ describe('DocumentListViewService', () => {
   })
 
   it('should use filter rules to update query params', () => {
-    documentListViewService.filterRules = filterRules
+    documentListViewService.setFilterRules(filterRules)
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/?page=${documentListViewService.currentPage}&page_size=${documentListViewService.pageSize}&ordering=-created&truncate_content=true&tags__id__all=${tags__id__all}`
     )
     expect(req.request.method).toEqual('GET')
+  })
+
+  it('should support setting filter rules and resetting to page one', () => {
+    documentListViewService.currentPage = 2
+    let req = httpTestingController.expectOne((request) =>
+      request.urlWithParams.startsWith(
+        `${environment.apiBaseUrl}documents/?page=2&page_size=50&ordering=-created&truncate_content=true`
+      )
+    )
+    expect(req.request.method).toEqual('GET')
+    req.flush(full_results)
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/selection_data/`
+    )
+    req.flush([])
+
+    documentListViewService.setFilterRules(filterRules, true)
+
+    const filteredReqs = httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&tags__id__all=${tags__id__all}`
+    )
+    expect(filteredReqs).toHaveLength(1)
+    filteredReqs[0].flush(full_results)
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/selection_data/`
+    )
+    req.flush([])
+    expect(documentListViewService.currentPage).toEqual(1)
   })
 
   it('should support quick filter', () => {
@@ -336,7 +364,7 @@ describe('DocumentListViewService', () => {
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-added&truncate_content=true&tags__id__all=9`
     )
-    documentListViewService.filterRules = []
+    documentListViewService.setFilterRules([])
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-added&truncate_content=true`
     )
@@ -348,7 +376,7 @@ describe('DocumentListViewService', () => {
   })
 
   it('should support navigating next / previous', () => {
-    documentListViewService.filterRules = []
+    documentListViewService.setFilterRules([])
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
     )
@@ -558,7 +586,7 @@ describe('DocumentListViewService', () => {
     req.flush(full_results)
     expect(documentListViewService.selected.size).toEqual(6)
 
-    documentListViewService.filterRules = filterRules
+    documentListViewService.setFilterRules(filterRules)
     httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&tags__id__all=9`
     )
@@ -592,7 +620,7 @@ describe('DocumentListViewService', () => {
 
     documentListViewService.loadSavedView(view2)
     expect(documentListViewService.sortField).toEqual('score')
-    documentListViewService.filterRules = []
+    documentListViewService.setFilterRules([])
     expect(documentListViewService.sortField).toEqual('created')
     httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`

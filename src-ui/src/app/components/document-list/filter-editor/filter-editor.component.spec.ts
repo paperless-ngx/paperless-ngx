@@ -2107,6 +2107,22 @@ describe('FilterEditorComponent', () => {
     expect(component.filterRules).toEqual(rules)
   })
 
+  it('should emit reset filter rules when resetting', () => {
+    const rules = [{ rule_type: FILTER_HAS_TAGS_ANY, value: '2' }]
+    component.unmodifiedFilterRules = rules
+    component.filterRules = [
+      { rule_type: FILTER_DOES_NOT_HAVE_TAG, value: '2' },
+    ]
+
+    const resetFilterRulesSpy = jest.spyOn(component.resetFilterRules, 'next')
+    const filterRulesChangeSpy = jest.spyOn(component.filterRulesChange, 'next')
+
+    component.resetSelected()
+
+    expect(resetFilterRulesSpy).toHaveBeenCalledWith(rules)
+    expect(filterRulesChangeSpy).not.toHaveBeenCalled()
+  })
+
   it('should support resetting text field', () => {
     component.textFilter = 'foo'
     component.resetTextField()
