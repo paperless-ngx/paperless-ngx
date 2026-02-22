@@ -86,13 +86,26 @@ class MailAccountViewSet(ModelViewSet, PassUserMixin):
         request.data["name"] = datetime.datetime.now().isoformat()
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        existing_account = None
+        account_id = request.data.get("id")
 
         # account exists, use the password from there instead of *** and refresh_token / expiration
         if (
             len(serializer.validated_data.get("password").replace("*", "")) == 0
-            and request.data["id"] is not None
+            and account_id is not None
         ):
-            existing_account = MailAccount.objects.get(pk=request.data["id"])
+            try:
+                existing_account = MailAccount.objects.get(pk=account_id)
+            except (TypeError, ValueError, MailAccount.DoesNotExist):
+                return HttpResponseBadRequest("Invalid account")
+
+            if not has_perms_owner_aware(
+                request.user,
+                "change_mailaccount",
+                existing_account,
+            ):
+                return HttpResponseForbidden("Insufficient permissions")
+
             serializer.validated_data["password"] = existing_account.password
             serializer.validated_data["account_type"] = existing_account.account_type
             serializer.validated_data["refresh_token"] = existing_account.refresh_token
@@ -106,7 +119,8 @@ class MailAccountViewSet(ModelViewSet, PassUserMixin):
         ) as M:
             try:
                 if (
-                    account.is_token
+                    existing_account is not None
+                    and account.is_token
                     and account.expiration is not None
                     and account.expiration < timezone.now()
                 ):
