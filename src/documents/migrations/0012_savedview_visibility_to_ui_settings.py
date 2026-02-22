@@ -16,10 +16,9 @@ def _parse_visible_ids(raw_value) -> set[int]:
 
     parsed_ids = set()
     for raw_id in raw_value:
-        if isinstance(raw_id, int):
-            parsed_ids.add(raw_id)
-        elif isinstance(raw_id, str) and raw_id.isdigit():
-            parsed_ids.add(int(raw_id))
+        raw_id_string = str(raw_id)
+        if raw_id_string.isdigit():
+            parsed_ids.add(int(raw_id_string))
     return parsed_ids
 
 
