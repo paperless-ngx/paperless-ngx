@@ -14,9 +14,16 @@ from django.urls import reverse
 from rest_framework.authtoken.models import Token
 
 from documents.models import Document
+from paperless.external_auth import get_external_auth_flow
 from paperless.signals import handle_social_account_updated
 
 logger = logging.getLogger("paperless.auth")
+
+
+def _external_auth_login_redirect_url(request) -> str | None:
+    if get_external_auth_flow(request) is not None:
+        return reverse("external_auth_complete")
+    return None
 
 
 class CustomAccountAdapter(DefaultAccountAdapter):
@@ -46,6 +53,12 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             raise ValidationError("Regular login is disabled")
 
         return super().pre_authenticate(request, **credentials)
+
+    def get_login_redirect_url(self, request):
+        external_auth_redirect = _external_auth_login_redirect_url(request)
+        if external_auth_redirect is not None:
+            return external_auth_redirect
+        return super().get_login_redirect_url(request)
 
     def is_safe_url(self, url):
         """
@@ -122,6 +135,21 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         """
         url = reverse("base")
         return url
+
+    def get_login_redirect_url(self, request):
+        external_auth_redirect = _external_auth_login_redirect_url(request)
+        if external_auth_redirect is not None:
+            return external_auth_redirect
+
+        parent_get_login_redirect_url = getattr(
+            super(),
+            "get_login_redirect_url",
+            None,
+        )
+        if callable(parent_get_login_redirect_url):
+            return parent_get_login_redirect_url(request)
+
+        return reverse("base")
 
     def save_user(self, request, sociallogin, form=None):
         """

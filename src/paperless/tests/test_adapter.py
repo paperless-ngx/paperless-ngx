@@ -15,6 +15,7 @@ from django.urls import reverse
 from rest_framework.authtoken.models import Token
 
 from paperless.adapter import DrfTokenStrategy
+from paperless.external_auth import EXTERNAL_AUTH_FLOW_SESSION_KEY
 
 
 class TestCustomAccountAdapter(TestCase):
@@ -91,6 +92,27 @@ class TestCustomAccountAdapter(TestCase):
                     adapter.get_reset_password_from_key_url("UID-KEY"),
                     expected_url,
                 )
+
+    @override_settings(
+        EXTERNAL_AUTH_ALLOWED_REDIRECT_URIS=["app://callback"],
+        EXTERNAL_AUTH_FLOW_TTL_SECONDS=600,
+    )
+    def test_get_login_redirect_url_for_external_auth_flow(self) -> None:
+        adapter = get_adapter()
+        request = HttpRequest()
+        request.session = self.client.session
+        request.session[EXTERNAL_AUTH_FLOW_SESSION_KEY] = {
+            "redirect_uri": "app://callback",
+            "state": "test-state",
+            "code_challenge": "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM",
+            "code_challenge_method": "S256",
+            "created_at": 9999999999,
+        }
+
+        self.assertEqual(
+            adapter.get_login_redirect_url(request),
+            reverse("external_auth_complete"),
+        )
 
     @override_settings(ACCOUNT_DEFAULT_GROUPS=["group1", "group2"])
     def test_save_user_adds_groups(self) -> None:
@@ -171,6 +193,27 @@ class TestCustomSocialAccountAdapter(TestCase):
         self.assertEqual(user.groups.count(), 1)
         self.assertTrue(user.groups.filter(name="group1").exists())
         self.assertFalse(user.groups.filter(name="group2").exists())
+
+    @override_settings(
+        EXTERNAL_AUTH_ALLOWED_REDIRECT_URIS=["app://callback"],
+        EXTERNAL_AUTH_FLOW_TTL_SECONDS=600,
+    )
+    def test_get_login_redirect_url_for_external_auth_flow(self) -> None:
+        adapter = get_social_adapter()
+        request = HttpRequest()
+        request.session = self.client.session
+        request.session[EXTERNAL_AUTH_FLOW_SESSION_KEY] = {
+            "redirect_uri": "app://callback",
+            "state": "test-state",
+            "code_challenge": "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM",
+            "code_challenge_method": "S256",
+            "created_at": 9999999999,
+        }
+
+        self.assertEqual(
+            adapter.get_login_redirect_url(request),
+            reverse("external_auth_complete"),
+        )
 
     def test_error_logged_on_authentication_error(self) -> None:
         adapter = get_social_adapter()

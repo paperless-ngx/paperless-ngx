@@ -1,0 +1,33 @@
+{% extends "paperless-ngx/base.html" %}
+{% load i18n %}
+
+{% block head_title %}
+    {% translate "Approve app access" %}
+{% endblock head_title %}
+
+{% block form_top_content %}
+    <h2 class="h4 mb-3">{% translate "Approve app access" %}</h2>
+    <p>{% translate "Allow this app to receive a login code for your account?" %}</p>
+    <p class="small text-muted">{% blocktranslate with callback_uri=callback_uri %}Callback: {{ callback_uri }}{% endblocktranslate %}</p>
+{% endblock form_top_content %}
+
+{% block form_content %}
+    <div class="d-grid gap-2 mt-3">
+        <button
+            class="btn btn-primary"
+            type="submit"
+            name="action"
+            value="approve"
+        >
+            {% translate "Approve and continue" %}
+        </button>
+        <button
+            class="btn btn-outline-secondary"
+            type="submit"
+            name="action"
+            value="deny"
+        >
+            {% translate "Deny" %}
+        </button>
+    </div>
+{% endblock form_content %}
