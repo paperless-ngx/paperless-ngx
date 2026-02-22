@@ -254,6 +254,7 @@ export class SavedViewsComponent
     })
     const dialog = modal.componentInstance as PermissionsDialogComponent
     dialog.object = savedView
+    dialog.note = $localize`Note: Sharing saved views does not share the underlying documents.`
 
     modal.componentInstance.confirmClicked.subscribe(({ permissions }) => {
       modal.componentInstance.buttonsEnabled = false
