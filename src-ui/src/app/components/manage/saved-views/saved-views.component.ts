@@ -8,6 +8,7 @@ import {
 } from '@angular/forms'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { dirtyCheck } from '@ngneat/dirty-check-forms'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { BehaviorSubject, Observable, of, switchMap, takeUntil } from 'rxjs'
 import { PermissionsDialogComponent } from 'src/app/components/common/permissions-dialog/permissions-dialog.component'
 import { DisplayMode } from 'src/app/data/document'
@@ -40,6 +41,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     FormsModule,
     ReactiveFormsModule,
     AsyncPipe,
+    NgxBootstrapIconsModule,
   ],
 })
 export class SavedViewsComponent
