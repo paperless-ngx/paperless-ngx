@@ -784,17 +784,17 @@ below.
 
 ### Document Splitting {#document-splitting}
 
-There are multiple configuration options resulting in a consumed document being split.
-By default, no document splitting is enabled. When enabled, Paperless will look for a barcode
-with the configured value and create a new document starting from the next page.
-The page with the barcode on it will _not_ be retained. It is expected to be a page existing
-only for triggering the split.
+If document splitting is enabled, Paperless splits *after* a separator barcode by default.
+This means:
 
-This behaviour can be altered by configuring Paperless to retain the page containing the
-separation barcode. In this case, Paperless will start a new document whenever a page
-containing the barcode with the configured value is detected. In other words, it
-is expected for the first page of each document to contain the barcode, similar to the ASN
-based document splitting explained below.
+-   any page containing the configured separator barcode starts a new document, starting with the **next** page
+-   pages containing the separator barcode are discarded
+
+This is intended for dedicated separator sheets such as PATCH-T pages.
+
+If [`PAPERLESS_CONSUMER_BARCODE_RETAIN_SPLIT_PAGES`](configuration.md#PAPERLESS_CONSUMER_BARCODE_RETAIN_SPLIT_PAGES)
+is enabled, the page containing the separator barcode is retained instead. In this mode,
+each page containing the separator barcode becomes the **first** page of a new document.
 
 ### Archive Serial Number Assignment
 
@@ -803,10 +803,9 @@ archive serial number, allowing quick reference back to the original, paper docu
 
 If document splitting via barcode is also enabled, documents will be split when an ASN
 barcode is located. However, differing from the splitting, the page with the
-barcode _will_ be retained. Each time a ASN barcode is detected, Paperless will split
-the document and create a new document starting with the page containing the barcode.
-This allows application of a barcode to any page, including one which holds data to
-keep in the document.
+barcode _will_ be retained. Each detected ASN barcode starts a new document *starting with
+that page*. This allows placing ASN barcodes on content pages that should remain part of
+the document.
 
 ### Tag Assignment
 
