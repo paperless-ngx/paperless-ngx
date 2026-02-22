@@ -272,7 +272,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["success"], True)
 
-    def test_mail_account_test_existing_nonexistent_id_forbidden(self):
+    def test_mail_account_test_existing_nonexistent_id_forbidden(self) -> None:
         response = self.client.post(
             f"{self.ENDPOINT}test/",
             json.dumps(

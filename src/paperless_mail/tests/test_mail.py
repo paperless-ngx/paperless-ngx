@@ -1855,7 +1855,7 @@ class TestMailAccountTestView(APITestCase):
             expected_str = "Unable to refresh oauth token"
             self.assertIn(expected_str, error_str)
 
-    def test_mail_account_test_view_existing_forbidden_for_other_owner(self):
+    def test_mail_account_test_view_existing_forbidden_for_other_owner(self) -> None:
         other_user = User.objects.create_user(
             username="otheruser",
             password="testpassword",
@@ -1884,7 +1884,9 @@ class TestMailAccountTestView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(response.content.decode(), "Insufficient permissions")
 
-    def test_mail_account_test_view_requires_add_permission_without_account_id(self):
+    def test_mail_account_test_view_requires_add_permission_without_account_id(
+        self,
+    ) -> None:
         self.user.user_permissions.remove(
             *Permission.objects.filter(codename__in=["add_mailaccount"]),
         )
