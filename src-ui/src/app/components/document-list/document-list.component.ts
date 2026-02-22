@@ -493,5 +493,6 @@ export class DocumentListComponent
 
   resetFilters() {
     this.filterEditor.resetSelected()
+    this.list.currentPage = 1
   }
 }
