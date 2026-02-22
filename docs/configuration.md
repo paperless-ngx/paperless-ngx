@@ -1441,6 +1441,10 @@ change this.
 #### [`PAPERLESS_CONSUMER_BARCODE_RETAIN_SPLIT_PAGES=<bool>`](#PAPERLESS_CONSUMER_BARCODE_RETAIN_SPLIT_PAGES) {#PAPERLESS_CONSUMER_BARCODE_RETAIN_SPLIT_PAGES}
 
 : If set to true, all pages that are split by a barcode (such as PATCHT) will be kept.
+  
+    Note that this setting will alter default splitting behaviour - please refer
+    to the [advanced usage documentation - barcode section](advanced_usage.md#barcodes)
+    for more details.
 
     Defaults to false.
 
