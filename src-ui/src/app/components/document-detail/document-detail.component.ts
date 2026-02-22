@@ -215,7 +215,7 @@ export class DocumentDetailComponent
   private componentRouterService = inject(ComponentRouterService)
   private deviceDetectorService = inject(DeviceDetectorService)
   private savedViewService = inject(SavedViewService)
-  private websocketStatusService = inject(WebsocketStatusService)
+  private readonly websocketStatusService = inject(WebsocketStatusService)
 
   @ViewChild('inputTitle')
   titleInput: TextComponent
@@ -503,7 +503,7 @@ export class DocumentDetailComponent
     let formattedModified = null
     if (modified) {
       const parsed = new Date(modified)
-      if (!isNaN(parsed.getTime())) {
+      if (!Number.isNaN(parsed.getTime())) {
         formattedModified = parsed.toLocaleString()
       }
     }

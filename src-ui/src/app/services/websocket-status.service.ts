@@ -102,19 +102,20 @@ export enum UploadState {
   providedIn: 'root',
 })
 export class WebsocketStatusService {
-  private settingsService = inject(SettingsService)
+  private readonly settingsService = inject(SettingsService)
 
   private statusWebSocket: WebSocket
 
   private consumerStatus: FileStatus[] = []
 
-  private documentDetectedSubject = new Subject<FileStatus>()
-  private documentConsumptionFinishedSubject = new Subject<FileStatus>()
-  private documentConsumptionFailedSubject = new Subject<FileStatus>()
-  private documentDeletedSubject = new Subject<boolean>()
-  private documentUpdatedSubject =
+  private readonly documentDetectedSubject = new Subject<FileStatus>()
+  private readonly documentConsumptionFinishedSubject =
+    new Subject<FileStatus>()
+  private readonly documentConsumptionFailedSubject = new Subject<FileStatus>()
+  private readonly documentDeletedSubject = new Subject<boolean>()
+  private readonly documentUpdatedSubject =
     new Subject<WebsocketDocumentUpdatedMessage>()
-  private connectionStatusSubject = new Subject<boolean>()
+  private readonly connectionStatusSubject = new Subject<boolean>()
 
   private get(taskId: string, filename?: string) {
     let status =
