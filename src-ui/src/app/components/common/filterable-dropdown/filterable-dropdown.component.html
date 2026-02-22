@@ -1,7 +1,6 @@
 <div class="btn-group w-100" ngbDropdown role="group" (openChange)="dropdownOpenChange($event)" #dropdown="ngbDropdown" (keydown)="listKeyDown($event)" [popperOptions]="popperOptions">
   <button class="btn btn-sm" id="dropdown_{{name}}" ngbDropdownToggle [ngClass]="!editing && selectionModel.selectionSize() > 0 ? 'btn-primary' : 'btn-outline-primary'" [disabled]="disabled">
-    <i-bs name="{{icon}}"></i-bs>
-    <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
+    <i-bs name="{{icon}}"></i-bs><div class="d-none d-sm-inline ms-1">{{title}}</div>
     @if (!editing && selectionModel.totalCount > 0) {
       <pngx-clearable-badge [number]="selectionModel.totalCount" [selected]="selectionModel.selectionSize() > 0" (cleared)="reset()"></pngx-clearable-badge>
     }

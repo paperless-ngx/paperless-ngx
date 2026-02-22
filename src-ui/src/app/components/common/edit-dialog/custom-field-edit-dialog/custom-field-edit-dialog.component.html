@@ -17,7 +17,7 @@
       @switch (objectForm.get('data_type').value) {
         @case (CustomFieldDataType.Select) {
           <button type="button" class="btn btn-sm btn-primary my-2" (click)="addSelectOption()">
-            <span i18n>Add option</span>&nbsp;<i-bs name="plus-circle"></i-bs>
+            <span i18n>Add option</span><i-bs class="ms-1" name="plus-circle"></i-bs>
           </button>
           <div formArrayName="select_options">
             @for (option of objectForm.controls.extra_data.controls.select_options.controls; track option; let i = $index) {

@@ -1,7 +1,6 @@
 <div class="btn-group w-100" ngbDropdown role="group" [popperOptions]="popperOptions" [placement]="placement">
   <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="createdDateTo || createdDateFrom ? 'btn-primary' : 'btn-outline-primary'" [disabled]="disabled">
-    <i-bs width="1em" height="1em" name="calendar-event-fill"></i-bs>
-    <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
+    <i-bs width="1em" height="1em" name="calendar-event-fill"></i-bs><div class="d-none d-sm-inline ms-1">{{title}}</div>
     <pngx-clearable-badge [selected]="isActive" (cleared)="reset()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
   </button>
   <div class="dropdown-menu date-dropdown shadow p-2" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">

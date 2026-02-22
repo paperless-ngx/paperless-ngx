@@ -243,9 +243,19 @@ describe('AppFrameComponent', () => {
 
   it('should support toggling slim sidebar and saving', fakeAsync(() => {
     const saveSettingSpy = jest.spyOn(settingsService, 'set')
+    settingsService.set(SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED, [])
     expect(component.slimSidebarEnabled).toBeFalsy()
     expect(component.slimSidebarAnimating).toBeFalsy()
     component.toggleSlimSidebar()
+    const requests = httpTestingController.match(
+      `${environment.apiBaseUrl}ui_settings/`
+    )
+    expect(requests).toHaveLength(1)
+    expect(requests[0].request.body.settings.slim_sidebar).toBe(true)
+    expect(
+      requests[0].request.body.settings.attributes_sections_collapsed
+    ).toEqual(['attributes'])
+    requests[0].flush({ success: true })
     expect(component.slimSidebarAnimating).toBeTruthy()
     tick(200)
     expect(component.slimSidebarAnimating).toBeFalsy()
@@ -253,6 +263,10 @@ describe('AppFrameComponent', () => {
     expect(saveSettingSpy).toHaveBeenCalledWith(
       SETTINGS_KEYS.SLIM_SIDEBAR,
       true
+    )
+    expect(saveSettingSpy).toHaveBeenCalledWith(
+      SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED,
+      ['attributes']
     )
   }))
 

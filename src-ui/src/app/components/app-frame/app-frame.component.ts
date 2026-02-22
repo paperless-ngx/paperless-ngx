@@ -140,10 +140,24 @@ export class AppFrameComponent
 
   toggleSlimSidebar(): void {
     this.slimSidebarAnimating = true
-    this.slimSidebarEnabled = !this.slimSidebarEnabled
-    if (this.slimSidebarEnabled) {
-      this.attributesSectionsCollapsed = true
+    const slimSidebarEnabled = !this.slimSidebarEnabled
+    this.settingsService.set(SETTINGS_KEYS.SLIM_SIDEBAR, slimSidebarEnabled)
+    if (slimSidebarEnabled) {
+      this.settingsService.set(SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED, [
+        CollapsibleSection.ATTRIBUTES,
+      ])
     }
+    this.settingsService
+      .storeSettings()
+      .pipe(first())
+      .subscribe({
+        error: (error) => {
+          this.toastService.showError(
+            $localize`An error occurred while saving settings.`
+          )
+          console.warn(error)
+        },
+      })
     setTimeout(() => {
       this.slimSidebarAnimating = false
     }, 200) // slightly longer than css animation for slim sidebar

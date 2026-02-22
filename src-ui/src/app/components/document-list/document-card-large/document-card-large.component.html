@@ -66,16 +66,16 @@
           <div class="btn-group">
             @if (document) {
               <a class="btn btn-sm btn-outline-secondary" (click)="clickMoreLike.emit()">
-                <i-bs name="diagram-3"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>More like this</span>
+                <i-bs name="diagram-3" class="me-1"></i-bs><span class="d-none d-md-inline" i18n>More like this</span>
               </a>
               <a routerLink="/documents/{{document.id}}" class="btn btn-sm btn-outline-secondary" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-                <i-bs name="file-earmark-richtext"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Open</span>
+                <i-bs name="file-earmark-richtext" class="me-1"></i-bs><span class="d-none d-md-inline" i18n>Open</span>
               </a>
               <pngx-preview-popup [document]="document" #popupPreview>
-                <i-bs name="eye"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>View</span>
+                <i-bs name="eye" class="me-1"></i-bs><span class="d-none d-md-inline" i18n>View</span>
               </pngx-preview-popup>
               <a class="btn btn-sm btn-outline-secondary" [href]="getDownloadUrl()">
-                <i-bs name="download"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Download</span>
+                <i-bs name="download" class="me-1"></i-bs><span class="d-none d-md-inline" i18n>Download</span>
               </a>
             } @else {
               <div class="placeholder btn btn-sm btn-outline-secondary bg-secondary" style="width: 60px;">&nbsp;</div>
