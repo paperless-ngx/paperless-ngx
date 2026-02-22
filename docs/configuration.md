@@ -1442,10 +1442,6 @@ change this.
 
 : If set to true, all pages that are split by a barcode (such as PATCHT) will be kept.
 
-    Note that this setting will alter default splitting behaviour - please refer
-    to the [advanced usage documentation - barcode section](advanced_usage.md#barcodes)
-    for more details.
-
     Defaults to false.
 
 #### [`PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE=<bool>`](#PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE) {#PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE}
