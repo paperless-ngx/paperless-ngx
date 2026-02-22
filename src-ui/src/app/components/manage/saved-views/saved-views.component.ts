@@ -46,11 +46,11 @@ export class SavedViewsComponent
   extends LoadingComponentWithPermissions
   implements OnInit, OnDestroy
 {
-  private savedViewService = inject(SavedViewService)
-  private permissionsService = inject(PermissionsService)
-  private settings = inject(SettingsService)
-  private toastService = inject(ToastService)
-  private modalService = inject(NgbModal)
+  private readonly savedViewService = inject(SavedViewService)
+  private readonly permissionsService = inject(PermissionsService)
+  private readonly settings = inject(SettingsService)
+  private readonly toastService = inject(ToastService)
+  private readonly modalService = inject(NgbModal)
 
   DisplayMode = DisplayMode
 
