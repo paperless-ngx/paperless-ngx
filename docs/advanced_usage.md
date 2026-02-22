@@ -786,11 +786,11 @@ below.
 
 There are multiple configuration options resulting in a consumed document being split.
 By default, no document splitting is enabled. When enabled, Paperless will look for a barcode
-with the configured value and create a new document starting from the next page. 
+with the configured value and create a new document starting from the next page.
 The page with the barcode on it will _not_ be retained. It is expected to be a page existing
 only for triggering the split.
 
-This behaviour can be altered by configuring Paperless to retain the page containing the 
+This behaviour can be altered by configuring Paperless to retain the page containing the
 separation barcode. In this case, Paperless will start a new document whenever a page
 containing the barcode with the configured value is detected. In other words, it
 is expected for the first page of each document to contain the barcode, similar to the ASN
