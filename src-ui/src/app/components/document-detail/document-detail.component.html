@@ -1,7 +1,7 @@
 <pngx-page-header [(title)]="title" [id]="documentId">
   @if (archiveContentRenderType === ContentRenderType.PDF && !useNativePdfViewer) {
     @if (previewNumPages) {
-      <div class="input-group input-group-sm d-none d-md-flex">
+      <div class="input-group input-group-sm ms-2 d-none d-md-flex">
         <div class="input-group-text" i18n>Page</div>
           <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages" [(ngModel)]="previewCurrentPage" />
         <div class="input-group-text" i18n>of {{previewNumPages}}</div>
@@ -23,6 +23,16 @@
   <button type="button" class="btn btn-sm btn-outline-danger me-md-4" (click)="delete()" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }">
     <i-bs width="1.2em" height="1.2em" name="trash"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
   </button>
+
+  <pngx-document-version-dropdown
+    [documentId]="documentId"
+    [versions]="document?.versions ?? []"
+    [selectedVersionId]="selectedVersionId"
+    [userIsOwner]="userIsOwner"
+    [userCanEdit]="userCanEdit"
+    (versionSelected)="onVersionSelected($event)"
+    (versionsUpdated)="onVersionsUpdated($event)"
+  />
 
   <div class="btn-group">
     <button (click)="download()" class="btn btn-sm btn-outline-primary" [disabled]="downloading">

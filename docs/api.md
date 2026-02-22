@@ -211,6 +211,21 @@ However, querying the tasks endpoint with the returned UUID e.g.
 `/api/tasks/?task_id={uuid}` will provide information on the state of the
 consumption including the ID of a created document if consumption succeeded.
 
+## Document Versions
+
+Document versions are file-level versions linked to one root document.
+
+-   Root document metadata (title, tags, correspondent, document type, storage path, custom fields, permissions) remains shared.
+-   Version-specific file data (file, mime type, checksums, archive info, extracted text content) belongs to the selected/latest version.
+
+Version-aware endpoints:
+
+-   `GET /api/documents/{id}/`: returns root document data; `content` resolves to latest version content by default. Use `?version={version_id}` to resolve content for a specific version.
+-   `PATCH /api/documents/{id}/`: content updates target the selected version (`?version={version_id}`) or latest version by default; non-content metadata updates target the root document.
+-   `GET /api/documents/{id}/download/`, `GET /api/documents/{id}/preview/`, `GET /api/documents/{id}/thumb/`, `GET /api/documents/{id}/metadata/`: accept `?version={version_id}`.
+-   `POST /api/documents/{id}/update_version/`: uploads a new version using multipart form field `document` and optional `version_label`.
+-   `DELETE /api/documents/{root_id}/versions/{version_id}/`: deletes a non-root version.
+
 ## Permissions
 
 All objects (documents, tags, etc.) allow setting object-level permissions
@@ -300,13 +315,13 @@ The following methods are supported:
             -   `"doc": OUTPUT_DOCUMENT_INDEX` Optional index of the output document for split operations.
     -   Optional `parameters`:
         -   `"delete_original": true` to delete the original documents after editing.
-        -   `"update_document": true` to update the existing document with the edited PDF.
+        -   `"update_document": true` to add the edited PDF as a new version of the root document.
         -   `"include_metadata": true` to copy metadata from the original document to the edited document.
 -   `remove_password`
     -   Requires `parameters`:
         -   `"password": "PASSWORD_STRING"` The password to remove from the PDF documents.
     -   Optional `parameters`:
-        -   `"update_document": true` to replace the existing document with the password-less PDF.
+        -   `"update_document": true` to add the password-less PDF as a new version of the root document.
         -   `"delete_original": true` to delete the original document after editing.
         -   `"include_metadata": true` to copy metadata from the original document to the new password-less document.
 -   `merge`

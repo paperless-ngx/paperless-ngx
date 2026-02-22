@@ -16,6 +16,9 @@ from guardian.core import ObjectPermissionChecker
 
 from documents.barcodes import BarcodePlugin
 from documents.consumer import ConsumerError
+from documents.consumer import ConsumerPlugin
+from documents.consumer import ConsumerPreflightPlugin
+from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.models import Correspondent
@@ -29,6 +32,7 @@ from documents.parsers import ParseError
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.tasks import sanity_check
 from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import GetConsumerMixin
 from paperless_mail.models import MailRule
@@ -94,11 +98,13 @@ class FaultyGenericExceptionParser(_BaseTestParser):
         raise Exception("Generic exception.")
 
 
-def fake_magic_from_file(file, *, mime=False):
+def fake_magic_from_file(file, *, mime=False):  # NOSONAR
     if mime:
         filepath = Path(file)
         if filepath.name.startswith("invalid_pdf"):
             return "application/octet-stream"
+        if filepath.name.startswith("valid_pdf"):
+            return "application/pdf"
         if filepath.suffix == ".pdf":
             return "application/pdf"
         elif filepath.suffix == ".png":
@@ -665,6 +671,144 @@ class TestConsumer(
         self._assert_first_last_send_progress()
 
     @mock.patch("documents.consumer.load_classifier")
+    def test_version_label_override_applies(self, m) -> None:
+        m.return_value = MagicMock()
+
+        with self.get_consumer(
+            self.get_test_file(),
+            DocumentMetadataOverrides(version_label="v1"),
+        ) as consumer:
+            consumer.run()
+
+        document = Document.objects.first()
+        assert document is not None
+
+        self.assertEqual(document.version_label, "v1")
+
+        self._assert_first_last_send_progress()
+
+    @override_settings(AUDIT_LOG_ENABLED=True)
+    @mock.patch("documents.consumer.load_classifier")
+    def test_consume_version_creates_new_version(self, m) -> None:
+        m.return_value = MagicMock()
+
+        with self.get_consumer(self.get_test_file()) as consumer:
+            consumer.run()
+
+        root_doc = Document.objects.first()
+        self.assertIsNotNone(root_doc)
+        assert root_doc is not None
+
+        actor = User.objects.create_user(
+            username="actor",
+            email="actor@example.com",
+            password="password",
+        )
+
+        version_file = self.get_test_file2()
+        status = DummyProgressManager(version_file.name, None)
+        overrides = DocumentMetadataOverrides(
+            version_label="v2",
+            actor_id=actor.pk,
+        )
+        doc = ConsumableDocument(
+            DocumentSource.ApiUpload,
+            original_file=version_file,
+            root_document_id=root_doc.pk,
+        )
+        preflight = ConsumerPreflightPlugin(
+            doc,
+            overrides,
+            status,  # type: ignore[arg-type]
+            self.dirs.scratch_dir,
+            "task-id",
+        )
+        preflight.setup()
+        preflight.run()
+
+        consumer = ConsumerPlugin(
+            doc,
+            overrides,
+            status,  # type: ignore[arg-type]
+            self.dirs.scratch_dir,
+            "task-id",
+        )
+        consumer.setup()
+        try:
+            self.assertTrue(consumer.filename.endswith("_v0.pdf"))
+            consumer.run()
+        finally:
+            consumer.cleanup()
+
+        versions = Document.objects.filter(root_document=root_doc)
+        self.assertEqual(versions.count(), 1)
+        version = versions.first()
+        assert version is not None
+        assert version.original_filename is not None
+        self.assertEqual(version.version_label, "v2")
+        self.assertTrue(version.original_filename.endswith("_v0.pdf"))
+        self.assertTrue(bool(version.content))
+
+    @override_settings(AUDIT_LOG_ENABLED=True)
+    @mock.patch("documents.consumer.load_classifier")
+    def test_consume_version_with_missing_actor_and_filename_without_suffix(
+        self,
+        m: mock.Mock,
+    ) -> None:
+        m.return_value = MagicMock()
+
+        with self.get_consumer(self.get_test_file()) as consumer:
+            consumer.run()
+
+        root_doc = Document.objects.first()
+        self.assertIsNotNone(root_doc)
+        assert root_doc is not None
+
+        version_file = self.get_test_file2()
+        status = DummyProgressManager(version_file.name, None)
+        overrides = DocumentMetadataOverrides(
+            filename="valid_pdf_version-upload",
+            actor_id=999999,
+        )
+        doc = ConsumableDocument(
+            DocumentSource.ApiUpload,
+            original_file=version_file,
+            root_document_id=root_doc.pk,
+        )
+
+        preflight = ConsumerPreflightPlugin(
+            doc,
+            overrides,
+            status,  # type: ignore[arg-type]
+            self.dirs.scratch_dir,
+            "task-id",
+        )
+        preflight.setup()
+        preflight.run()
+
+        consumer = ConsumerPlugin(
+            doc,
+            overrides,
+            status,  # type: ignore[arg-type]
+            self.dirs.scratch_dir,
+            "task-id",
+        )
+        consumer.setup()
+        try:
+            self.assertEqual(consumer.filename, "valid_pdf_version-upload_v0")
+            consumer.run()
+        finally:
+            consumer.cleanup()
+
+        version = (
+            Document.objects.filter(root_document=root_doc).order_by("-id").first()
+        )
+        self.assertIsNotNone(version)
+        assert version is not None
+        self.assertEqual(version.original_filename, "valid_pdf_version-upload_v0")
+        self.assertTrue(bool(version.content))
+
+    @mock.patch("documents.consumer.load_classifier")
     def testClassifyDocument(self, m) -> None:
         correspondent = Correspondent.objects.create(
             name="test",
@@ -1179,7 +1323,7 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                 consumer.run_post_consume_script(doc)
 
     @mock.patch("documents.consumer.run_subprocess")
-    def test_post_consume_script_simple(self, m) -> None:
+    def test_post_consume_script_simple(self, m: mock.MagicMock) -> None:
         with tempfile.NamedTemporaryFile() as script:
             with override_settings(POST_CONSUME_SCRIPT=script.name):
                 doc = Document.objects.create(title="Test", mime_type="application/pdf")
@@ -1190,7 +1334,10 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                 m.assert_called_once()
 
     @mock.patch("documents.consumer.run_subprocess")
-    def test_post_consume_script_with_correspondent_and_type(self, m) -> None:
+    def test_post_consume_script_with_correspondent_and_type(
+        self,
+        m: mock.MagicMock,
+    ) -> None:
         with tempfile.NamedTemporaryFile() as script:
             with override_settings(POST_CONSUME_SCRIPT=script.name):
                 c = Correspondent.objects.create(name="my_bank")
@@ -1272,6 +1419,19 @@ class TestMetadataOverrides(TestCase):
         incoming = DocumentMetadataOverrides(skip_asn_if_exists=True)
         base.update(incoming)
         self.assertTrue(base.skip_asn_if_exists)
+
+    def test_update_actor_and_version_label(self) -> None:
+        base = DocumentMetadataOverrides(
+            actor_id=1,
+            version_label="root",
+        )
+        incoming = DocumentMetadataOverrides(
+            actor_id=2,
+            version_label="v2",
+        )
+        base.update(incoming)
+        self.assertEqual(base.actor_id, 2)
+        self.assertEqual(base.version_label, "v2")
 
 
 class TestBarcodeApplyDetectedASN(TestCase):

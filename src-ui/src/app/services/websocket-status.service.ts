@@ -89,6 +89,13 @@ export class FileStatus {
   }
 }
 
+export enum UploadState {
+  Idle = 'idle',
+  Uploading = 'uploading',
+  Processing = 'processing',
+  Failed = 'failed',
+}
+
 @Injectable({
   providedIn: 'root',
 })

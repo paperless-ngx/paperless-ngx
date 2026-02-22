@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import logging
 import tempfile
 from pathlib import Path
@@ -71,6 +70,48 @@ def restore_archive_serial_numbers(backup: dict[int, int | None]) -> None:
     for doc_id, asn in backup.items():
         Document.objects.filter(pk=doc_id).update(archive_serial_number=asn)
     logger.info(f"Restored archive serial numbers for documents {list(backup.keys())}")
+
+
+def _get_root_ids_by_doc_id(doc_ids: list[int]) -> dict[int, int]:
+    """
+    Resolve each provided document id to its root document id.
+
+    - If the id is already a root document: root id is itself.
+    - If the id is a version document: root id is its `root_document_id`.
+    """
+    qs = Document.objects.filter(id__in=doc_ids).only("id", "root_document_id")
+    return {doc.id: doc.root_document_id or doc.id for doc in qs}
+
+
+def _get_root_and_current_docs_by_root_id(
+    root_ids: set[int],
+) -> tuple[dict[int, Document], dict[int, Document]]:
+    """
+    Returns:
+      - root_docs: root_id -> root Document
+      - current_docs: root_id -> newest version Document (or root if none)
+    """
+    root_docs = {
+        doc.id: doc
+        for doc in Document.objects.filter(id__in=root_ids).select_related(
+            "owner",
+        )
+    }
+    latest_versions_by_root_id: dict[int, Document] = {}
+    for version_doc in Document.objects.filter(root_document_id__in=root_ids).order_by(
+        "root_document_id",
+        "-id",
+    ):
+        root_id = version_doc.root_document_id
+        if root_id is None:
+            continue
+        latest_versions_by_root_id.setdefault(root_id, version_doc)
+
+    current_docs: dict[int, Document] = {
+        root_id: latest_versions_by_root_id.get(root_id, root_docs[root_id])
+        for root_id in root_docs
+    }
+    return root_docs, current_docs
 
 
 def set_correspondent(
@@ -309,16 +350,29 @@ def modify_custom_fields(
 @shared_task
 def delete(doc_ids: list[int]) -> Literal["OK"]:
     try:
-        Document.objects.filter(id__in=doc_ids).delete()
+        root_ids = (
+            Document.objects.filter(id__in=doc_ids, root_document__isnull=True)
+            .values_list("id", flat=True)
+            .distinct()
+        )
+        version_ids = (
+            Document.objects.filter(root_document_id__in=root_ids)
+            .exclude(id__in=doc_ids)
+            .values_list("id", flat=True)
+            .distinct()
+        )
+        delete_ids = list({*doc_ids, *version_ids})
+
+        Document.objects.filter(id__in=delete_ids).delete()
 
         from documents import index
 
         with index.open_index_writer() as writer:
-            for id in doc_ids:
+            for id in delete_ids:
                 index.remove_document_by_id(writer, id)
 
         status_mgr = DocumentsStatusManager()
-        status_mgr.send_documents_deleted(doc_ids)
+        status_mgr.send_documents_deleted(delete_ids)
     except Exception as e:
         if "Data too long for column" in str(e):
             logger.warning(
@@ -363,43 +417,60 @@ def set_permissions(
     return "OK"
 
 
-def rotate(doc_ids: list[int], degrees: int) -> Literal["OK"]:
+def rotate(
+    doc_ids: list[int],
+    degrees: int,
+    *,
+    user: User | None = None,
+) -> Literal["OK"]:
     logger.info(
         f"Attempting to rotate {len(doc_ids)} documents by {degrees} degrees.",
     )
-    qs = Document.objects.filter(id__in=doc_ids)
-    affected_docs: list[int] = []
+    doc_to_root_id = _get_root_ids_by_doc_id(doc_ids)
+    root_ids = set(doc_to_root_id.values())
+    root_docs_by_id, current_docs_by_root_id = _get_root_and_current_docs_by_root_id(
+        root_ids,
+    )
     import pikepdf
 
-    rotate_tasks = []
-    for doc in qs:
-        if doc.mime_type != "application/pdf":
+    for root_id in root_ids:
+        root_doc = root_docs_by_id[root_id]
+        source_doc = current_docs_by_root_id[root_id]
+        if source_doc.mime_type != "application/pdf":
             logger.warning(
-                f"Document {doc.id} is not a PDF, skipping rotation.",
+                f"Document {root_doc.id} is not a PDF, skipping rotation.",
             )
             continue
         try:
-            with pikepdf.open(doc.source_path, allow_overwriting_input=True) as pdf:
+            # Write rotated output to a temp file and create a new version via consume pipeline
+            filepath: Path = (
+                Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
+                / f"{root_doc.id}_rotated.pdf"
+            )
+            with pikepdf.open(source_doc.source_path) as pdf:
                 for page in pdf.pages:
                     page.rotate(degrees, relative=True)
-                pdf.save()
-                doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
-                doc.save()
-                rotate_tasks.append(
-                    update_document_content_maybe_archive_file.s(
-                        document_id=doc.id,
-                    ),
-                )
-                logger.info(
-                    f"Rotated document {doc.id} by {degrees} degrees",
-                )
-                affected_docs.append(doc.id)
-        except Exception as e:
-            logger.exception(f"Error rotating document {doc.id}: {e}")
+                pdf.remove_unreferenced_resources()
+                pdf.save(filepath)
 
-    if len(affected_docs) > 0:
-        bulk_update_task = bulk_update_documents.si(document_ids=affected_docs)
-        chord(header=rotate_tasks, body=bulk_update_task).delay()
+            # Preserve metadata/permissions via overrides; mark as new version
+            overrides = DocumentMetadataOverrides().from_document(root_doc)
+            if user is not None:
+                overrides.actor_id = user.id
+
+            consume_file.delay(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=filepath,
+                    root_document_id=root_doc.id,
+                ),
+                overrides,
+            )
+            logger.info(
+                f"Queued new rotated version for document {root_doc.id} by {degrees} degrees",
+            )
+        except Exception as e:
+            logger.exception(f"Error rotating document {root_doc.id}: {e}")
 
     return "OK"
 
@@ -584,30 +655,62 @@ def split(
     return "OK"
 
 
-def delete_pages(doc_ids: list[int], pages: list[int]) -> Literal["OK"]:
+def delete_pages(
+    doc_ids: list[int],
+    pages: list[int],
+    *,
+    user: User | None = None,
+) -> Literal["OK"]:
     logger.info(
         f"Attempting to delete pages {pages} from {len(doc_ids)} documents",
     )
-    doc = Document.objects.get(id=doc_ids[0])
+    doc = Document.objects.select_related("root_document").get(id=doc_ids[0])
+    root_doc: Document
+    if doc.root_document_id is None or doc.root_document is None:
+        root_doc = doc
+    else:
+        root_doc = doc.root_document
+
+    source_doc = (
+        Document.objects.filter(Q(id=root_doc.id) | Q(root_document=root_doc))
+        .order_by("-id")
+        .first()
+    )
+    if source_doc is None:
+        source_doc = root_doc
     pages = sorted(pages)  # sort pages to avoid index issues
     import pikepdf
 
     try:
-        with pikepdf.open(doc.source_path, allow_overwriting_input=True) as pdf:
+        # Produce edited PDF to a temp file and create a new version
+        filepath: Path = (
+            Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
+            / f"{root_doc.id}_pages_deleted.pdf"
+        )
+        with pikepdf.open(source_doc.source_path) as pdf:
             offset = 1  # pages are 1-indexed
             for page_num in pages:
                 pdf.pages.remove(pdf.pages[page_num - offset])
                 offset += 1  # remove() changes the index of the pages
             pdf.remove_unreferenced_resources()
-            pdf.save()
-            doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
-            if doc.page_count is not None:
-                doc.page_count = doc.page_count - len(pages)
-            doc.save()
-            update_document_content_maybe_archive_file.delay(document_id=doc.id)
-            logger.info(f"Deleted pages {pages} from document {doc.id}")
+            pdf.save(filepath)
+
+        overrides = DocumentMetadataOverrides().from_document(root_doc)
+        if user is not None:
+            overrides.actor_id = user.id
+        consume_file.delay(
+            ConsumableDocument(
+                source=DocumentSource.ConsumeFolder,
+                original_file=filepath,
+                root_document_id=root_doc.id,
+            ),
+            overrides,
+        )
+        logger.info(
+            f"Queued new version for document {root_doc.id} after deleting pages {pages}",
+        )
     except Exception as e:
-        logger.exception(f"Error deleting pages from document {doc.id}: {e}")
+        logger.exception(f"Error deleting pages from document {root_doc.id}: {e}")
 
     return "OK"
 
@@ -632,13 +735,26 @@ def edit_pdf(
     logger.info(
         f"Editing PDF of document {doc_ids[0]} with {len(operations)} operations",
     )
-    doc = Document.objects.get(id=doc_ids[0])
+    doc = Document.objects.select_related("root_document").get(id=doc_ids[0])
+    root_doc: Document
+    if doc.root_document_id is None or doc.root_document is None:
+        root_doc = doc
+    else:
+        root_doc = doc.root_document
+
+    source_doc = (
+        Document.objects.filter(Q(id=root_doc.id) | Q(root_document=root_doc))
+        .order_by("-id")
+        .first()
+    )
+    if source_doc is None:
+        source_doc = root_doc
     import pikepdf
 
     pdf_docs: list[pikepdf.Pdf] = []
 
     try:
-        with pikepdf.open(doc.source_path) as src:
+        with pikepdf.open(source_doc.source_path) as src:
             # prepare output documents
             max_idx = max(op.get("doc", 0) for op in operations)
             pdf_docs = [pikepdf.new() for _ in range(max_idx + 1)]
@@ -657,42 +773,56 @@ def edit_pdf(
                     dst.pages[-1].rotate(op["rotate"], relative=True)
 
         if update_document:
-            temp_path = doc.source_path.with_suffix(".tmp.pdf")
+            # Create a new version from the edited PDF rather than replacing in-place
             pdf = pdf_docs[0]
             pdf.remove_unreferenced_resources()
-            # save the edited PDF to a temporary file in case of errors
-            pdf.save(temp_path)
-            # replace the original document with the edited one
-            temp_path.replace(doc.source_path)
-            doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
-            doc.page_count = len(pdf.pages)
-            doc.save()
-            update_document_content_maybe_archive_file.delay(document_id=doc.id)
-        else:
-            consume_tasks = []
+            filepath: Path = (
+                Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
+                / f"{root_doc.id}_edited.pdf"
+            )
+            pdf.save(filepath)
             overrides = (
-                DocumentMetadataOverrides().from_document(doc)
+                DocumentMetadataOverrides().from_document(root_doc)
                 if include_metadata
                 else DocumentMetadataOverrides()
             )
             if user is not None:
                 overrides.owner_id = user.id
+                overrides.actor_id = user.id
+            consume_file.delay(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=filepath,
+                    root_document_id=root_doc.id,
+                ),
+                overrides,
+            )
+        else:
+            consume_tasks = []
+            overrides = (
+                DocumentMetadataOverrides().from_document(root_doc)
+                if include_metadata
+                else DocumentMetadataOverrides()
+            )
+            if user is not None:
+                overrides.owner_id = user.id
+                overrides.actor_id = user.id
             if not delete_original:
                 overrides.skip_asn_if_exists = True
             if delete_original and len(pdf_docs) == 1:
-                overrides.asn = doc.archive_serial_number
+                overrides.asn = root_doc.archive_serial_number
             for idx, pdf in enumerate(pdf_docs, start=1):
-                filepath: Path = (
+                version_filepath: Path = (
                     Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
-                    / f"{doc.id}_edit_{idx}.pdf"
+                    / f"{root_doc.id}_edit_{idx}.pdf"
                 )
                 pdf.remove_unreferenced_resources()
-                pdf.save(filepath)
+                pdf.save(version_filepath)
                 consume_tasks.append(
                     consume_file.s(
                         ConsumableDocument(
                             source=DocumentSource.ConsumeFolder,
-                            original_file=filepath,
+                            original_file=version_filepath,
                         ),
                         overrides,
                     ),
@@ -714,7 +844,7 @@ def edit_pdf(
                 group(consume_tasks).delay()
 
     except Exception as e:
-        logger.exception(f"Error editing document {doc.id}: {e}")
+        logger.exception(f"Error editing document {root_doc.id}: {e}")
         raise ValueError(
             f"An error occurred while editing the document: {e}",
         ) from e
@@ -737,38 +867,61 @@ def remove_password(
     import pikepdf
 
     for doc_id in doc_ids:
-        doc = Document.objects.get(id=doc_id)
+        doc = Document.objects.select_related("root_document").get(id=doc_id)
+        root_doc: Document
+        if doc.root_document_id is None or doc.root_document is None:
+            root_doc = doc
+        else:
+            root_doc = doc.root_document
+
+        source_doc = (
+            Document.objects.filter(Q(id=root_doc.id) | Q(root_document=root_doc))
+            .order_by("-id")
+            .first()
+        )
+        if source_doc is None:
+            source_doc = root_doc
         try:
             logger.info(
                 f"Attempting password removal from document {doc_ids[0]}",
             )
-            with pikepdf.open(doc.source_path, password=password) as pdf:
-                temp_path = doc.source_path.with_suffix(".tmp.pdf")
+            with pikepdf.open(source_doc.source_path, password=password) as pdf:
+                filepath: Path = (
+                    Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
+                    / f"{root_doc.id}_unprotected.pdf"
+                )
                 pdf.remove_unreferenced_resources()
-                pdf.save(temp_path)
+                pdf.save(filepath)
 
                 if update_document:
-                    # replace the original document with the unprotected one
-                    temp_path.replace(doc.source_path)
-                    doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
-                    doc.page_count = len(pdf.pages)
-                    doc.save()
-                    update_document_content_maybe_archive_file.delay(document_id=doc.id)
-                else:
-                    consume_tasks = []
+                    # Create a new version rather than modifying the root/original in place.
                     overrides = (
-                        DocumentMetadataOverrides().from_document(doc)
+                        DocumentMetadataOverrides().from_document(root_doc)
                         if include_metadata
                         else DocumentMetadataOverrides()
                     )
                     if user is not None:
                         overrides.owner_id = user.id
-
-                    filepath: Path = (
-                        Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
-                        / f"{doc.id}_unprotected.pdf"
+                        overrides.actor_id = user.id
+                    consume_file.delay(
+                        ConsumableDocument(
+                            source=DocumentSource.ConsumeFolder,
+                            original_file=filepath,
+                            root_document_id=root_doc.id,
+                        ),
+                        overrides,
                     )
-                    temp_path.replace(filepath)
+                else:
+                    consume_tasks = []
+                    overrides = (
+                        DocumentMetadataOverrides().from_document(root_doc)
+                        if include_metadata
+                        else DocumentMetadataOverrides()
+                    )
+                    if user is not None:
+                        overrides.owner_id = user.id
+                        overrides.actor_id = user.id
+
                     consume_tasks.append(
                         consume_file.s(
                             ConsumableDocument(
@@ -780,12 +933,17 @@ def remove_password(
                     )
 
                     if delete_original:
-                        chord(header=consume_tasks, body=delete.si([doc.id])).delay()
+                        chord(
+                            header=consume_tasks,
+                            body=delete.si([doc.id]),
+                        ).delay()
                     else:
                         group(consume_tasks).delay()
 
         except Exception as e:
-            logger.exception(f"Error removing password from document {doc.id}: {e}")
+            logger.exception(
+                f"Error removing password from document {root_doc.id}: {e}",
+            )
             raise ValueError(
                 f"An error occurred while removing the password: {e}",
             ) from e
