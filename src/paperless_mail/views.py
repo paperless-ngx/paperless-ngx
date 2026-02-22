@@ -262,6 +262,7 @@ class OauthCallbackView(GenericAPIView):
                 imap_server=imap_server,
                 refresh_token=refresh_token,
                 expiration=timezone.now() + timedelta(seconds=expires_in),
+                owner=request.user,
                 defaults=defaults,
             )
             return HttpResponseRedirect(
