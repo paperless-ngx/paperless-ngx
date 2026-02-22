@@ -272,6 +272,24 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["success"], True)
 
+    def test_mail_account_test_existing_nonexistent_id_forbidden(self):
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "id": 999999,
+                    "imap_server": "server.example.com",
+                    "imap_port": 443,
+                    "imap_security": MailAccount.ImapSecurity.SSL,
+                    "username": "admin",
+                    "password": "******",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.content.decode(), "Insufficient permissions")
+
     def test_get_mail_accounts_owner_aware(self) -> None:
         """
         GIVEN:
