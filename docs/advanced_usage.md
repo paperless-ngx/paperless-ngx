@@ -784,9 +784,17 @@ below.
 
 ### Document Splitting {#document-splitting}
 
-When enabled, Paperless will look for a barcode with the configured value and create a new document
-starting from the next page. The page with the barcode on it will _not_ be retained. It
-is expected to be a page existing only for triggering the split.
+If document splitting is enabled, Paperless splits _after_ a separator barcode by default.
+This means:
+
+-   any page containing the configured separator barcode starts a new document, starting with the **next** page
+-   pages containing the separator barcode are discarded
+
+This is intended for dedicated separator sheets such as PATCH-T pages.
+
+If [`PAPERLESS_CONSUMER_BARCODE_RETAIN_SPLIT_PAGES`](configuration.md#PAPERLESS_CONSUMER_BARCODE_RETAIN_SPLIT_PAGES)
+is enabled, the page containing the separator barcode is retained instead. In this mode,
+each page containing the separator barcode becomes the **first** page of a new document.
 
 ### Archive Serial Number Assignment
 
@@ -795,8 +803,9 @@ archive serial number, allowing quick reference back to the original, paper docu
 
 If document splitting via barcode is also enabled, documents will be split when an ASN
 barcode is located. However, differing from the splitting, the page with the
-barcode _will_ be retained. This allows application of a barcode to any page, including
-one which holds data to keep in the document.
+barcode _will_ be retained. Each detected ASN barcode starts a new document _starting with
+that page_. This allows placing ASN barcodes on content pages that should remain part of
+the document.
 
 ### Tag Assignment
 
