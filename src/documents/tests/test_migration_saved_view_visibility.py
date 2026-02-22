@@ -18,9 +18,11 @@ class TestMigrateSavedViewVisibilityToUiSettings(TestMigrations):
         self.user_with_empty_settings = User.objects.create(username="user1")
         self.user_with_existing_settings = User.objects.create(username="user2")
         self.user_with_owned_views = User.objects.create(username="user3")
+        self.user_with_invalid_settings = User.objects.create(username="user4")
         self.user_with_empty_settings_id = self.user_with_empty_settings.id
         self.user_with_existing_settings_id = self.user_with_existing_settings.id
         self.user_with_owned_views_id = self.user_with_owned_views.id
+        self.user_with_invalid_settings_id = self.user_with_invalid_settings.id
 
         self.dashboard_view = SavedView.objects.create(
             owner=self.user_with_empty_settings,
@@ -50,6 +52,13 @@ class TestMigrateSavedViewVisibilityToUiSettings(TestMigrations):
             show_in_sidebar=True,
             sort_field="created",
         )
+        self.invalid_settings_owner_view = SavedView.objects.create(
+            owner=self.user_with_invalid_settings,
+            name="invalid-settings-owner-visible",
+            show_on_dashboard=True,
+            show_in_sidebar=False,
+            sort_field="created",
+        )
 
         UiSettings.objects.create(user=self.user_with_empty_settings, settings={})
         UiSettings.objects.create(
@@ -59,6 +68,10 @@ class TestMigrateSavedViewVisibilityToUiSettings(TestMigrations):
                 SIDEBAR_VIEWS_VISIBLE_IDS_KEY: [self.dashboard_view.id],
                 "preserve": "value",
             },
+        )
+        UiSettings.objects.create(
+            user=self.user_with_invalid_settings,
+            settings=[],
         )
 
     def test_visibility_defaults_are_seeded_and_existing_values_preserved(self) -> None:
@@ -101,6 +114,19 @@ class TestMigrateSavedViewVisibilityToUiSettings(TestMigrations):
             [self.other_owner_visible_view.id],
         )
 
+        invalid_settings = UiSettings.objects.get(
+            user_id=self.user_with_invalid_settings_id,
+        ).settings
+        self.assertIsInstance(invalid_settings, dict)
+        self.assertCountEqual(
+            invalid_settings[DASHBOARD_VIEWS_VISIBLE_IDS_KEY],
+            [self.invalid_settings_owner_view.id],
+        )
+        self.assertEqual(
+            invalid_settings[SIDEBAR_VIEWS_VISIBLE_IDS_KEY],
+            [],
+        )
+
 
 class TestReverseMigrateSavedViewVisibilityFromUiSettings(TestMigrations):
     migrate_from = "0012_savedview_visibility_to_ui_settings"
@@ -114,6 +140,7 @@ class TestReverseMigrateSavedViewVisibilityFromUiSettings(TestMigrations):
         user1 = User.objects.create(username="user1")
         user2 = User.objects.create(username="user2")
         user3 = User.objects.create(username="user3")
+        user4 = User.objects.create(username="user4")
 
         self.view1 = SavedView.objects.create(
             owner=user1,
@@ -135,11 +162,16 @@ class TestReverseMigrateSavedViewVisibilityFromUiSettings(TestMigrations):
             name="view-4",
             sort_field="created",
         )
+        self.view5 = SavedView.objects.create(
+            owner=user4,
+            name="view-5",
+            sort_field="created",
+        )
 
         UiSettings.objects.create(
             user=user1,
             settings={
-                DASHBOARD_VIEWS_VISIBLE_IDS_KEY: [self.view1.id],
+                DASHBOARD_VIEWS_VISIBLE_IDS_KEY: [str(self.view1.id)],
                 SIDEBAR_VIEWS_VISIBLE_IDS_KEY: [self.view2.id],
             },
         )
@@ -155,6 +187,7 @@ class TestReverseMigrateSavedViewVisibilityFromUiSettings(TestMigrations):
             },
         )
         UiSettings.objects.create(user=user3, settings={})
+        UiSettings.objects.create(user=user4, settings=[])
 
     def test_visibility_fields_restored_from_owner_visibility(self) -> None:
         SavedView = self.apps.get_model("documents", "SavedView")
@@ -163,6 +196,7 @@ class TestReverseMigrateSavedViewVisibilityFromUiSettings(TestMigrations):
         restored_view2 = SavedView.objects.get(pk=self.view2.id)
         restored_view3 = SavedView.objects.get(pk=self.view3.id)
         restored_view4 = SavedView.objects.get(pk=self.view4.id)
+        restored_view5 = SavedView.objects.get(pk=self.view5.id)
 
         self.assertTrue(restored_view1.show_on_dashboard)
         self.assertFalse(restored_view2.show_on_dashboard)
@@ -173,3 +207,5 @@ class TestReverseMigrateSavedViewVisibilityFromUiSettings(TestMigrations):
         self.assertTrue(restored_view2.show_in_sidebar)
         self.assertFalse(restored_view3.show_in_sidebar)
         self.assertTrue(restored_view4.show_in_sidebar)
+        self.assertFalse(restored_view5.show_on_dashboard)
+        self.assertFalse(restored_view5.show_in_sidebar)
