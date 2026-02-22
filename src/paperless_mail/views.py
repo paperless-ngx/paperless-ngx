@@ -89,15 +89,18 @@ class MailAccountViewSet(ModelViewSet, PassUserMixin):
         existing_account = None
         account_id = request.data.get("id")
 
-        # account exists, use the password from there instead of *** and refresh_token / expiration
-        if (
-            len(serializer.validated_data.get("password").replace("*", "")) == 0
-            and account_id is not None
+        # testing a new connection requires add permission
+        if account_id is None and not request.user.has_perms(
+            ["paperless_mail.add_mailaccount"],
         ):
+            return HttpResponseForbidden("Insufficient permissions")
+
+        # testing an existing account requires change permission on that account
+        if account_id is not None:
             try:
                 existing_account = MailAccount.objects.get(pk=account_id)
             except (TypeError, ValueError, MailAccount.DoesNotExist):
-                return HttpResponseBadRequest("Invalid account")
+                return HttpResponseForbidden("Insufficient permissions")
 
             if not has_perms_owner_aware(
                 request.user,
@@ -106,6 +109,11 @@ class MailAccountViewSet(ModelViewSet, PassUserMixin):
             ):
                 return HttpResponseForbidden("Insufficient permissions")
 
+        # account exists, use the password from there instead of ***
+        if (
+            len(serializer.validated_data.get("password").replace("*", "")) == 0
+            and existing_account is not None
+        ):
             serializer.validated_data["password"] = existing_account.password
             serializer.validated_data["account_type"] = existing_account.account_type
             serializer.validated_data["refresh_token"] = existing_account.refresh_token
