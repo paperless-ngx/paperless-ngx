@@ -22,7 +22,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { TourNgBootstrap } from 'ngx-ui-tour-ng-bootstrap'
-import { filter, first, map, of, Subject, switchMap, takeUntil } from 'rxjs'
+import { filter, first, map, Subject, switchMap, takeUntil } from 'rxjs'
 import {
   DEFAULT_DISPLAY_FIELDS,
   DisplayField,
@@ -514,10 +514,6 @@ export class DocumentListComponent
     showOnDashboard: boolean,
     showInSideBar: boolean
   ) {
-    if (!showOnDashboard && !showInSideBar) {
-      return of(null)
-    }
-
     const dashboardViewIds = this.savedViewService.dashboardViews.map(
       (v) => v.id
     )
