@@ -1,16 +1,13 @@
 import os
 from pathlib import Path
-from typing import TypeAlias
+from typing import Any
 
 from paperless.settings.parsers import get_choice_from_env
 from paperless.settings.parsers import get_int_from_env
 from paperless.settings.parsers import parse_dict_from_str
 
-# ENGINE/NAME/HOST/USER/PASSWORD (str), PORT (int), OPTIONS (dict)
-DatabaseConfig: TypeAlias = dict[str, str | int | dict[str, str | int | dict | None]]
 
-
-def parse_db_settings(data_dir: Path) -> dict[str, DatabaseConfig]:
+def parse_db_settings(data_dir: Path) -> dict[str, dict[str, Any]]:
     """Parse database settings from environment variables.
 
     Core connection variables (no deprecation):
@@ -33,6 +30,9 @@ def parse_db_settings(data_dir: Path) -> dict[str, DatabaseConfig]:
         {"sqlite", "postgresql", "mariadb"},
         default="sqlite",
     )
+
+    db_config: dict[str, Any]
+    base_options: dict[str, Any]
 
     match engine:
         case "sqlite":
@@ -84,6 +84,8 @@ def parse_db_settings(data_dir: Path) -> dict[str, DatabaseConfig]:
                     "key": os.getenv("PAPERLESS_DBSSLKEY"),
                 },
             }
+        case _:  # pragma: no cover
+            raise NotImplementedError(engine)
 
     # Handle port setting for external databases
     if (
