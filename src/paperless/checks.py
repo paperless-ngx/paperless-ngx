@@ -205,48 +205,40 @@ def audit_log_check(app_configs, **kwargs):
 
 
 @register()
-def check_deprecated_db_settings(app_configs, **kwargs) -> list[Warning]:
+def check_deprecated_db_settings(
+    app_configs: object,
+    **kwargs: object,
+) -> list[Warning]:
     """Check for deprecated database environment variables.
 
     Detects legacy advanced options that should be migrated to
-    PAPERLESS_DB_OPTIONS.
-
-    Returns:
-        List of Django Warning instances for any deprecated vars found.
+    PAPERLESS_DB_OPTIONS. Returns one Warning per deprecated variable found.
     """
-    deprecated_vars = {
-        "PAPERLESS_DB_TIMEOUT": "timeout (or connect_timeout for Postgres/MariaDB)",
-        "PAPERLESS_DB_POOLSIZE": "pool.min_size,pool.max_size",
-        "PAPERLESS_DBSSLMODE": "sslmode (or ssl_mode for MariaDB)",
-        "PAPERLESS_DBSSLROOTCERT": "sslrootcert (or ssl.ca for MariaDB)",
-        "PAPERLESS_DBSSLCERT": "sslcert (or ssl.cert for MariaDB)",
-        "PAPERLESS_DBSSLKEY": "sslkey (or ssl.key for MariaDB)",
+    deprecated_vars: dict[str, str] = {
+        "PAPERLESS_DB_TIMEOUT": "timeout",
+        "PAPERLESS_DB_POOLSIZE": "pool.min_size / pool.max_size",
+        "PAPERLESS_DBSSLMODE": "sslmode",
+        "PAPERLESS_DBSSLROOTCERT": "sslrootcert",
+        "PAPERLESS_DBSSLCERT": "sslcert",
+        "PAPERLESS_DBSSLKEY": "sslkey",
     }
 
-    found_vars = []
-    for var_name in deprecated_vars:
-        if os.getenv(var_name):
-            found_vars.append(var_name)
+    warnings: list[Warning] = []
 
-    if not found_vars:
-        return []
-
-    # Build migration example
-    examples = []
-    for var in found_vars:
-        examples.append(f"{var} -> PAPERLESS_DB_OPTIONS={deprecated_vars[var]}=<value>")
-
-    return [
-        Warning(
-            "Deprecated database environment variables detected",
-            # TODO: Need to check this URL
-            hint=(
-                f"Found: {', '.join(found_vars)}. "
-                "These will be removed in v3.2. "
-                "Migrate to PAPERLESS_DB_OPTIONS instead. "
-                f"Examples: {'; '.join(examples[:3])}. "
-                "See https://docs.paperless-ngx.com/migration/"
+    for var_name, db_option_key in deprecated_vars.items():
+        if not os.getenv(var_name):
+            continue
+        warnings.append(
+            Warning(
+                f"Deprecated environment variable: {var_name}",
+                hint=(
+                    f"{var_name} is no longer supported and will be removed in v3.2. "
+                    f"Set the equivalent option via PAPERLESS_DB_OPTIONS instead. "
+                    f'Example: PAPERLESS_DB_OPTIONS=\'{{"{db_option_key}": "<value>"}}\'. '
+                    "See https://docs.paperless-ngx.com/migration/ for the full reference."
+                ),
+                id="paperless.W001",
             ),
-            id="paperless.W001",
-        ),
-    ]
+        )
+
+    return warnings

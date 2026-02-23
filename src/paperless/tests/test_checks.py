@@ -3,6 +3,7 @@ from pathlib import Path
 from unittest import mock
 
 import pytest
+from django.core.checks import Warning
 from django.test import TestCase
 from django.test import override_settings
 from pytest_mock import MockerFixture
@@ -242,65 +243,165 @@ class TestAuditLogChecks(TestCase):
                 )
 
 
-class TestDeprecatedDbSettings:
-    """Test suite for deprecated database settings system check."""
+DEPRECATED_VARS: dict[str, str] = {
+    "PAPERLESS_DB_TIMEOUT": "timeout",
+    "PAPERLESS_DB_POOLSIZE": "pool.min_size / pool.max_size",
+    "PAPERLESS_DBSSLMODE": "sslmode",
+    "PAPERLESS_DBSSLROOTCERT": "sslrootcert",
+    "PAPERLESS_DBSSLCERT": "sslcert",
+    "PAPERLESS_DBSSLKEY": "sslkey",
+}
 
-    def test_no_deprecated_vars_no_warning(
+
+class TestDeprecatedDbSettings:
+    """Test suite for the check_deprecated_db_settings system check."""
+
+    def test_no_deprecated_vars_returns_empty(
         self,
         mocker: MockerFixture,
     ) -> None:
-        """Test that no warning is raised when no deprecated vars are set."""
+        """No warnings when none of the deprecated vars are present."""
+        # clear=True ensures vars from the outer test environment do not leak in
         mocker.patch.dict(os.environ, {}, clear=True)
-
-        warnings = check_deprecated_db_settings(None)
-        assert warnings == []
+        result = check_deprecated_db_settings(None)
+        assert result == []
 
     @pytest.mark.parametrize(
-        ("env_var", "expected_hint_fragment"),
+        ("env_var", "db_option_key"),
         [
             ("PAPERLESS_DB_TIMEOUT", "timeout"),
-            ("PAPERLESS_DB_POOLSIZE", "pool.min_size,pool.max_size"),
+            ("PAPERLESS_DB_POOLSIZE", "pool.min_size / pool.max_size"),
             ("PAPERLESS_DBSSLMODE", "sslmode"),
             ("PAPERLESS_DBSSLROOTCERT", "sslrootcert"),
             ("PAPERLESS_DBSSLCERT", "sslcert"),
             ("PAPERLESS_DBSSLKEY", "sslkey"),
         ],
+        ids=[
+            "db-timeout",
+            "db-poolsize",
+            "ssl-mode",
+            "ssl-rootcert",
+            "ssl-cert",
+            "ssl-key",
+        ],
     )
-    def test_deprecated_var_triggers_warning(
+    def test_single_deprecated_var_produces_one_warning(
         self,
         mocker: MockerFixture,
         env_var: str,
-        expected_hint_fragment: str,
+        db_option_key: str,
     ) -> None:
-        """Test that each deprecated var triggers appropriate warning."""
+        """Each deprecated var in isolation produces exactly one warning."""
         mocker.patch.dict(os.environ, {env_var: "some_value"}, clear=True)
+        result = check_deprecated_db_settings(None)
 
-        warnings = check_deprecated_db_settings(None)
+        assert len(result) == 1
+        warning = result[0]
+        assert isinstance(warning, Warning)
+        assert warning.id == "paperless.W001"
+        assert env_var in warning.hint
+        assert db_option_key in warning.hint
 
-        assert len(warnings) == 1
-        assert warnings[0].id == "paperless.W001"
-        assert env_var in warnings[0].hint
-        assert expected_hint_fragment in warnings[0].hint
-        assert "v3.2" in warnings[0].hint
-
-    def test_multiple_deprecated_vars(
+    def test_multiple_deprecated_vars_produce_one_warning_each(
         self,
         mocker: MockerFixture,
     ) -> None:
-        """Test that multiple deprecated vars are all listed in warning."""
+        """Each deprecated var present in the environment gets its own warning."""
+        set_vars = {
+            "PAPERLESS_DB_TIMEOUT": "30",
+            "PAPERLESS_DB_POOLSIZE": "10",
+            "PAPERLESS_DBSSLMODE": "require",
+        }
+        mocker.patch.dict(os.environ, set_vars, clear=True)
+        result = check_deprecated_db_settings(None)
+
+        assert len(result) == len(set_vars)
+        assert all(isinstance(w, Warning) for w in result)
+        assert all(w.id == "paperless.W001" for w in result)
+        all_hints = " ".join(w.hint for w in result)
+        for var_name in set_vars:
+            assert var_name in all_hints
+
+    def test_all_deprecated_vars_produces_one_warning_each(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """All deprecated vars set simultaneously produces one warning per var."""
+        all_vars = {var: "some_value" for var in DEPRECATED_VARS}
+        mocker.patch.dict(os.environ, all_vars, clear=True)
+        result = check_deprecated_db_settings(None)
+
+        assert len(result) == len(DEPRECATED_VARS)
+        assert all(isinstance(w, Warning) for w in result)
+        assert all(w.id == "paperless.W001" for w in result)
+
+    def test_unset_vars_not_mentioned_in_warnings(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """Vars absent from the environment do not appear in any warning."""
         mocker.patch.dict(
             os.environ,
-            {
-                "PAPERLESS_DB_TIMEOUT": "30",
-                "PAPERLESS_DB_POOLSIZE": "10",
-                "PAPERLESS_DBSSLMODE": "require",
-            },
+            {"PAPERLESS_DB_TIMEOUT": "30"},
             clear=True,
         )
+        result = check_deprecated_db_settings(None)
 
-        warnings = check_deprecated_db_settings(None)
+        assert len(result) == 1
+        assert "PAPERLESS_DB_TIMEOUT" in result[0].hint
+        unset_vars = [v for v in DEPRECATED_VARS if v != "PAPERLESS_DB_TIMEOUT"]
+        for var_name in unset_vars:
+            assert var_name not in result[0].hint
 
-        assert len(warnings) == 1
-        assert "PAPERLESS_DB_TIMEOUT" in warnings[0].hint
-        assert "PAPERLESS_DB_POOLSIZE" in warnings[0].hint
-        assert "PAPERLESS_DBSSLMODE" in warnings[0].hint
+    def test_empty_string_var_not_treated_as_set(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """A var set to an empty string is not flagged as a deprecated setting."""
+        mocker.patch.dict(
+            os.environ,
+            {"PAPERLESS_DB_TIMEOUT": ""},
+            clear=True,
+        )
+        result = check_deprecated_db_settings(None)
+        assert result == []
+
+    def test_warning_mentions_migration_target(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """Each warning hints at PAPERLESS_DB_OPTIONS as the migration target."""
+        mocker.patch.dict(
+            os.environ,
+            {"PAPERLESS_DBSSLMODE": "require"},
+            clear=True,
+        )
+        result = check_deprecated_db_settings(None)
+
+        assert len(result) == 1
+        assert "PAPERLESS_DB_OPTIONS" in result[0].hint
+
+    def test_warning_message_identifies_var(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """The warning message (not just the hint) identifies the offending var."""
+        mocker.patch.dict(
+            os.environ,
+            {"PAPERLESS_DBSSLCERT": "/path/to/cert.pem"},
+            clear=True,
+        )
+        result = check_deprecated_db_settings(None)
+
+        assert len(result) == 1
+        assert "PAPERLESS_DBSSLCERT" in result[0].msg
+
+    def test_check_accepts_app_configs_argument(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """The check function accepts the app_configs argument Django passes."""
+        mocker.patch.dict(os.environ, {}, clear=True)
+        # Django passes app_configs as a list or None depending on invocation
+        assert check_deprecated_db_settings(None) == []
+        assert check_deprecated_db_settings([]) == []
