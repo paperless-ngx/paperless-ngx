@@ -1924,6 +1924,7 @@ src/paperless/tests/test_websockets.py:0: error: Item "None" of "BaseChannelLaye
 src/paperless/tests/test_websockets.py:0: error: Item "None" of "BaseChannelLayer | None" has no attribute "group_send"  [union-attr]
 src/paperless/tests/test_websockets.py:0: error: Item "None" of "BaseChannelLayer | None" has no attribute "group_send"  [union-attr]
 src/paperless/tests/test_websockets.py:0: error: Item "None" of "BaseChannelLayer | None" has no attribute "group_send"  [union-attr]
+src/paperless/tests/test_websockets.py:0: error: Item "None" of "BaseChannelLayer | None" has no attribute "group_send"  [union-attr]
 src/paperless/tests/test_websockets.py:0: error: TypedDict "_WebsocketTestScope" has no key "user"  [typeddict-item]
 src/paperless/tests/test_websockets.py:0: error: TypedDict "_WebsocketTestScope" has no key "user"  [typeddict-item]
 src/paperless/tests/test_websockets.py:0: error: TypedDict "_WebsocketTestScope" has no key "user"  [typeddict-item]
