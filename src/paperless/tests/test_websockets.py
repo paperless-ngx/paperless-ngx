@@ -48,6 +48,20 @@ class TestWebSockets(TestCase):
         mock_close.assert_called_once()
         mock_close.reset_mock()
 
+        message = {
+            "type": "document_updated",
+            "data": {"document_id": 10, "modified": "2026-02-17T00:00:00Z"},
+        }
+
+        await channel_layer.group_send(
+            "status_updates",
+            message,
+        )
+        await communicator.receive_nothing()
+
+        mock_close.assert_called_once()
+        mock_close.reset_mock()
+
         message = {"type": "documents_deleted", "data": {"documents": [1, 2, 3]}}
 
         await channel_layer.group_send(
