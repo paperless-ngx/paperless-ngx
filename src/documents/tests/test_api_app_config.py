@@ -69,6 +69,8 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 "barcode_enable_tag": None,
                 "barcode_tag_mapping": None,
                 "barcode_tag_split": None,
+                "barcode_enable_custom_field": None,
+                "barcode_custom_field_mapping": None,
                 "ai_enabled": False,
                 "llm_embedding_backend": None,
                 "llm_embedding_model": None,
@@ -142,6 +144,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                     "user_args": "",
                     "language": "",
                     "barcode_tag_mapping": "",
+                    "barcode_custom_field_mapping": "",
                 },
             ),
             content_type="application/json",
@@ -151,6 +154,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         self.assertEqual(config.user_args, None)
         self.assertEqual(config.language, None)
         self.assertEqual(config.barcode_tag_mapping, None)
+        self.assertEqual(config.barcode_custom_field_mapping, None)
 
     def test_api_replace_app_logo(self) -> None:
         """

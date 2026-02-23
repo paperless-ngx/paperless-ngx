@@ -279,6 +279,20 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     category: ConfigCategory.Barcode,
   },
   {
+    key: 'barcode_enable_custom_field',
+    title: $localize`Enable Custom Field Barcode`,
+    type: ConfigOptionType.Boolean,
+    config_key: 'PAPERLESS_CONSUMER_ENABLE_CUSTOM_FIELD_BARCODE',
+    category: ConfigCategory.Barcode,
+  },
+  {
+    key: 'barcode_custom_field_mapping',
+    title: $localize`Custom Field Mapping`,
+    type: ConfigOptionType.JSON,
+    config_key: 'PAPERLESS_CONSUMER_CUSTOM_FIELD_BARCODE_MAPPING',
+    category: ConfigCategory.Barcode,
+  },
+  {
     key: 'ai_enabled',
     title: $localize`AI Enabled`,
     type: ConfigOptionType.Boolean,

@@ -853,6 +853,19 @@ CONSUMER_TAG_BARCODE_SPLIT: Final[bool] = get_bool_from_env(
     "PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT",
 )
 
+CONSUMER_ENABLE_CUSTOM_FIELD_BARCODE: Final[bool] = get_bool_from_env(
+    "PAPERLESS_CONSUMER_ENABLE_CUSTOM_FIELD_BARCODE",
+)
+
+CONSUMER_CUSTOM_FIELD_BARCODE_MAPPING = dict(
+    json.loads(
+        os.getenv(
+            "PAPERLESS_CONSUMER_CUSTOM_FIELD_BARCODE_MAPPING",
+            "{}",
+        ),
+    ),
+)
+
 CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED: Final[bool] = get_bool_from_env(
     "PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED",
 )

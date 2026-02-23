@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-17 22:44+0000\n"
+"POT-Creation-Date: 2026-03-20 18:48+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1582,25 +1582,8 @@ msgstr ""
 msgid "As a final step, please complete the following form:"
 msgstr ""
 
-#: documents/validators.py:24
-#, python-brace-format
-msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
-
-#: documents/validators.py:29
-#, python-brace-format
-msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
-
 #: documents/validators.py:36
-msgid ""
-"URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '."
-"join(allowed_schemes)}"
-msgstr ""
-
-#: documents/validators.py:45
-#, python-brace-format
-msgid "Unable to parse URI {value}"
+msgid ", "
 msgstr ""
 
 #: documents/views.py:3581
@@ -1824,35 +1807,43 @@ msgstr ""
 msgid "Enables splitting on tag barcodes"
 msgstr ""
 
-#: paperless/models.py:293
+#: paperless/models.py:290
+msgid "Enables custom field barcode"
+msgstr ""
+
+#: paperless/models.py:296
+msgid "Sets the custom field barcode mapping"
+msgstr ""
+
+#: paperless/models.py:305
 msgid "Enables AI features"
 msgstr ""
 
-#: paperless/models.py:299
+#: paperless/models.py:311
 msgid "Sets the LLM embedding backend"
 msgstr ""
 
-#: paperless/models.py:307
+#: paperless/models.py:319
 msgid "Sets the LLM embedding model"
 msgstr ""
 
-#: paperless/models.py:314
+#: paperless/models.py:326
 msgid "Sets the LLM backend"
 msgstr ""
 
-#: paperless/models.py:322
+#: paperless/models.py:334
 msgid "Sets the LLM model"
 msgstr ""
 
-#: paperless/models.py:329
+#: paperless/models.py:341
 msgid "Sets the LLM API key"
 msgstr ""
 
-#: paperless/models.py:336
+#: paperless/models.py:348
 msgid "Sets the LLM endpoint, optional"
 msgstr ""
 
-#: paperless/models.py:343
+#: paperless/models.py:355
 msgid "paperless application settings"
 msgstr ""
 

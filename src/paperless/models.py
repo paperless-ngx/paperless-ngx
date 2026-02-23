@@ -285,6 +285,18 @@ class ApplicationConfiguration(AbstractSingletonModel):
         null=True,
     )
 
+    # PAPERLESS_CONSUMER_ENABLE_CUSTOM_FIELD_BARCODE
+    barcode_enable_custom_field = models.BooleanField(
+        verbose_name=_("Enables custom field barcode"),
+        null=True,
+    )
+
+    # PAPERLESS_CONSUMER_CUSTOM_FIELD_BARCODE_MAPPING
+    barcode_custom_field_mapping = models.JSONField(
+        verbose_name=_("Sets the custom field barcode mapping"),
+        null=True,
+    )
+
     """
     AI related settings
     """
