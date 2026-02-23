@@ -65,6 +65,7 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import { environment } from 'src/environments/environment'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
 import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
@@ -325,6 +326,29 @@ describe('DocumentDetailComponent', () => {
       .mockReturnValueOnce(of(true))
     fixture.detectChanges()
     expect(component.activeNavID).toEqual(component.DocumentDetailNavIDs.Notes)
+  })
+
+  it('should switch from preview to details when pdf preview enters the DOM', fakeAsync(() => {
+    component.nav = {
+      activeId: component.DocumentDetailNavIDs.Preview,
+      select: jest.fn(),
+    } as any
+    ;(component as any).pdfPreview = {
+      nativeElement: { offsetParent: {} },
+    }
+
+    tick()
+    expect(component.nav.select).toHaveBeenCalledWith(
+      component.DocumentDetailNavIDs.Details
+    )
+  }))
+
+  it('should forward title key up value to titleSubject', () => {
+    const subjectSpy = jest.spyOn(component.titleSubject, 'next')
+
+    component.titleKeyUp({ target: { value: 'Updated title' } })
+
+    expect(subjectSpy).toHaveBeenCalledWith('Updated title')
   })
 
   it('should change url on tab switch', () => {
@@ -1417,6 +1441,23 @@ describe('DocumentDetailComponent', () => {
     expect(confirmDialog.messageBold).toContain('Document was updated at')
   })
 
+  it('should react to websocket document updated notifications', () => {
+    initNormally()
+    const updateMessage = {
+      document_id: component.documentId,
+      modified: '2026-02-17T00:00:00Z',
+      owner_id: 1,
+    }
+    const handleSpy = jest
+      .spyOn(component as any, 'handleIncomingDocumentUpdated')
+      .mockImplementation(() => {})
+    const websocketStatusService = TestBed.inject(WebsocketStatusService)
+
+    websocketStatusService.handleDocumentUpdated(updateMessage)
+
+    expect(handleSpy).toHaveBeenCalledWith(updateMessage)
+  })
+
   it('should queue incoming update while network is active and flush after', () => {
     initNormally()
     const loadSpy = jest.spyOn(component as any, 'loadDocument')
@@ -1456,6 +1497,122 @@ describe('DocumentDetailComponent', () => {
 
     expect(loadSpy).not.toHaveBeenCalled()
     expect(toastSpy).not.toHaveBeenCalled()
+  })
+
+  it('should clear pdf source if preview URL is empty', () => {
+    component.pdfSource = { url: '/preview', password: 'secret' } as any
+    component.previewUrl = null
+    ;(component as any).updatePdfSource()
+
+    expect(component.pdfSource).toBeUndefined()
+  })
+
+  it('should close incoming update modal if one is open', () => {
+    const modalRef = { close: jest.fn() } as unknown as NgbModalRef
+    ;(component as any).incomingUpdateModal = modalRef
+    ;(component as any).closeIncomingUpdateModal()
+
+    expect(modalRef.close).toHaveBeenCalled()
+    expect((component as any).incomingUpdateModal).toBeNull()
+  })
+
+  it('should reload remote version when incoming update modal is confirmed', async () => {
+    let openModal: NgbModalRef
+    modalService.activeInstances.subscribe((modals) => (openModal = modals[0]))
+    const reloadSpy = jest
+      .spyOn(component as any, 'reloadRemoteVersion')
+      .mockImplementation(() => {})
+
+    ;(component as any).showIncomingUpdateModal('2026-02-17T00:00:00Z')
+
+    const dialog = openModal.componentInstance as ConfirmDialogComponent
+    dialog.confirmClicked.next()
+    await openModal.result
+
+    expect(dialog.buttonsEnabled).toBe(false)
+    expect(reloadSpy).toHaveBeenCalled()
+    expect((component as any).incomingUpdateModal).toBeNull()
+  })
+
+  it('should overwrite open document state when loading remote version with force', () => {
+    const openDoc = Object.assign({}, doc, {
+      title: 'Locally edited title',
+      __changedFields: ['title'],
+    })
+    const remoteDoc = Object.assign({}, doc, {
+      title: 'Remote title',
+      modified: '2026-02-17T00:00:00Z',
+    })
+    jest.spyOn(documentService, 'get').mockReturnValue(of(remoteDoc))
+    jest.spyOn(documentService, 'getMetadata').mockReturnValue(
+      of({
+        has_archive_version: false,
+        original_mime_type: 'application/pdf',
+      })
+    )
+    jest.spyOn(documentService, 'getSuggestions').mockReturnValue(
+      of({
+        suggested_tags: [],
+        suggested_document_types: [],
+        suggested_correspondents: [],
+      })
+    )
+    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(openDoc)
+    const setDirtySpy = jest.spyOn(openDocumentsService, 'setDirty')
+    const saveSpy = jest.spyOn(openDocumentsService, 'save')
+
+    ;(component as any).loadDocument(doc.id, true)
+
+    expect(openDoc.title).toEqual('Remote title')
+    expect(openDoc.__changedFields).toEqual([])
+    expect(setDirtySpy).toHaveBeenCalledWith(openDoc, false)
+    expect(saveSpy).toHaveBeenCalled()
+  })
+
+  it('should ignore incoming update for a different document id', () => {
+    initNormally()
+    const loadSpy = jest.spyOn(component as any, 'loadDocument')
+
+    ;(component as any).handleIncomingDocumentUpdated({
+      document_id: component.documentId + 1,
+      modified: '2026-02-17T00:00:00Z',
+    })
+
+    expect(loadSpy).not.toHaveBeenCalled()
+  })
+
+  it('should show incoming update modal when local document has unsaved edits', () => {
+    initNormally()
+    jest.spyOn(openDocumentsService, 'isDirty').mockReturnValue(true)
+    const modalSpy = jest
+      .spyOn(component as any, 'showIncomingUpdateModal')
+      .mockImplementation(() => {})
+
+    ;(component as any).handleIncomingDocumentUpdated({
+      document_id: component.documentId,
+      modified: '2026-02-17T00:00:00Z',
+    })
+
+    expect(modalSpy).toHaveBeenCalledWith('2026-02-17T00:00:00Z')
+  })
+
+  it('should reload current document and show toast when reloading remote version', () => {
+    component.documentId = doc.id
+    const closeModalSpy = jest
+      .spyOn(component as any, 'closeIncomingUpdateModal')
+      .mockImplementation(() => {})
+    const loadSpy = jest
+      .spyOn(component as any, 'loadDocument')
+      .mockImplementation(() => {})
+    const notifySpy = jest.spyOn(component.docChangeNotifier, 'next')
+    const toastSpy = jest.spyOn(toastService, 'showInfo')
+
+    ;(component as any).reloadRemoteVersion()
+
+    expect(closeModalSpy).toHaveBeenCalled()
+    expect(notifySpy).toHaveBeenCalledWith(doc.id)
+    expect(loadSpy).toHaveBeenCalledWith(doc.id, true)
+    expect(toastSpy).toHaveBeenCalledWith('Document reloaded.')
   })
 
   it('should change preview element by render type', () => {
@@ -1764,6 +1921,14 @@ describe('DocumentDetailComponent', () => {
     expect(component.createDisabled(DataType.DocumentType)).toBeFalsy()
     expect(component.createDisabled(DataType.StoragePath)).toBeFalsy()
     expect(component.createDisabled(DataType.Tag)).toBeFalsy()
+  })
+
+  it('should expose add permission via userCanAdd getter', () => {
+    currentUserCan = true
+    expect(component.userCanAdd).toBeTruthy()
+
+    currentUserCan = false
+    expect(component.userCanAdd).toBeFalsy()
   })
 
   it('should call tryRenderTiff when no archive and file is tiff', () => {

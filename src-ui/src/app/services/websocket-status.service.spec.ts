@@ -437,4 +437,21 @@ describe('ConsumerStatusService', () => {
     websocketStatusService.disconnect()
     expect(updated).toBeTruthy()
   })
+
+  it('should ignore document updated events the user cannot view', () => {
+    let updated = false
+    websocketStatusService.onDocumentUpdated().subscribe(() => {
+      updated = true
+    })
+
+    websocketStatusService.handleDocumentUpdated({
+      document_id: 12,
+      modified: '2026-02-17T00:00:00Z',
+      owner_id: 2,
+      users_can_view: [],
+      groups_can_view: [],
+    })
+
+    expect(updated).toBeFalsy()
+  })
 })
