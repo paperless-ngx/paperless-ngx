@@ -781,9 +781,7 @@ def send_websocket_document_updated(
     with DocumentsStatusManager() as status_mgr:
         status_mgr.send_document_updated(
             document_id=document.id,
-            modified=DRF_DATETIME_FIELD.to_representation(document.modified)
-            if document.modified
-            else None,
+            modified=DRF_DATETIME_FIELD.to_representation(document.modified),
             owner_id=doc_overrides.owner_id,
             users_can_view=doc_overrides.view_users,
             groups_can_view=doc_overrides.view_groups,

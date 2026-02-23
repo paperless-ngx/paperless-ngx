@@ -147,7 +147,7 @@ enum ContentRenderType {
 
 interface IncomingDocumentUpdate {
   document_id: number
-  modified?: string
+  modified: string
 }
 
 @Component({
@@ -492,7 +492,7 @@ export class DocumentDetailComponent
     )
   }
 
-  private showIncomingUpdateModal(modified?: string): void {
+  private showIncomingUpdateModal(modified: string): void {
     if (this.incomingUpdateModal) return
 
     const modal = this.modalService.open(ConfirmDialogComponent, {
@@ -501,17 +501,11 @@ export class DocumentDetailComponent
     this.incomingUpdateModal = modal
 
     let formattedModified = null
-    if (modified) {
-      const parsed = new Date(modified)
-      if (!Number.isNaN(parsed.getTime())) {
-        formattedModified = parsed.toLocaleString()
-      }
-    }
+    const parsed = new Date(modified)
+    formattedModified = parsed.toLocaleString()
 
-    modal.componentInstance.title = $localize`Document was updated.`
-    modal.componentInstance.messageBold = formattedModified
-      ? $localize`Document was updated at ${formattedModified}.`
-      : $localize`This document was updated elsewhere.`
+    modal.componentInstance.title = $localize`Document was updated`
+    modal.componentInstance.messageBold = $localize`Document was updated at ${formattedModified}.`
     modal.componentInstance.message = $localize`Reload to discard your local unsaved edits and load the latest remote version.`
     modal.componentInstance.btnClass = 'btn-warning'
     modal.componentInstance.btnCaption = $localize`Reload`

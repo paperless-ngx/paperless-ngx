@@ -108,7 +108,7 @@ class DocumentsStatusManager(BaseStatusManager):
         self,
         *,
         document_id: int,
-        modified: str | None = None,
+        modified: str,
         owner_id: int | None = None,
         users_can_view: list[int] | None = None,
         groups_can_view: list[int] | None = None,
