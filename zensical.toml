@@ -16,6 +16,7 @@ repo_name = "paperless-ngx/paperless-ngx"
 nav = [
   "index.md",
   "setup.md",
+	"migration.md",
   "usage.md",
   "configuration.md",
   "administration.md",

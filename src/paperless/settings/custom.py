@@ -103,6 +103,7 @@ def parse_db_settings(data_dir: Path) -> dict[str, dict[str, Any]]:
     db_config["OPTIONS"] = parse_dict_from_str(
         os.getenv("PAPERLESS_DB_OPTIONS"),
         defaults=base_options,
+        separator=";",
         type_map={
             # SQLite options
             "timeout": int,

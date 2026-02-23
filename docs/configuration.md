@@ -51,137 +51,163 @@ matcher.
 ### Database
 
 By default, Paperless uses **SQLite** with a database stored at `data/db.sqlite3`.
-To switch to **PostgreSQL** or **MariaDB**, set [`PAPERLESS_DBHOST`](#PAPERLESS_DBHOST) and optionally configure other
-database-related environment variables.
+For multi-user or higher-throughput deployments, **PostgreSQL** (recommended) or
+**MariaDB** can be used instead by setting [`PAPERLESS_DBENGINE`](#PAPERLESS_DBENGINE)
+and the relevant connection variables.
+
+#### [`PAPERLESS_DBENGINE=<engine>`](#PAPERLESS_DBENGINE) {#PAPERLESS_DBENGINE}
+
+: Specifies the database engine to use. Accepted values are `sqlite`, `postgresql`,
+and `mariadb`.
+
+    Defaults to `sqlite` if not set.
+
+    PostgreSQL and MariaDB both require [`PAPERLESS_DBHOST`](#PAPERLESS_DBHOST) to be
+    set. SQLite does not use any other connection variables; the database file is always
+    located at `<PAPERLESS_DATA_DIR>/db.sqlite3`.
+
+    !!! warning
+        Using MariaDB comes with some caveats.
+        See [MySQL Caveats](advanced_usage.md#mysql-caveats).
 
 #### [`PAPERLESS_DBHOST=<hostname>`](#PAPERLESS_DBHOST) {#PAPERLESS_DBHOST}
 
-: If unset, Paperless uses **SQLite** by default.
-
-    Set `PAPERLESS_DBHOST` to switch to PostgreSQL or MariaDB instead.
-
-#### [`PAPERLESS_DBENGINE=<engine_name>`](#PAPERLESS_DBENGINE) {#PAPERLESS_DBENGINE}
-
-: Optional. Specifies the database engine to use when connecting to a remote database.
-Available options are `postgresql` and `mariadb`.
-
-    Defaults to `postgresql` if `PAPERLESS_DBHOST` is set.
-
-    !!! warning
-
-        Using MariaDB comes with some caveats. See [MySQL Caveats](advanced_usage.md#mysql-caveats).
+: Hostname of the PostgreSQL or MariaDB database server. Required when
+`PAPERLESS_DBENGINE` is `postgresql` or `mariadb`.
 
 #### [`PAPERLESS_DBPORT=<port>`](#PAPERLESS_DBPORT) {#PAPERLESS_DBPORT}
 
 : Port to use when connecting to PostgreSQL or MariaDB.
 
-    Default is `5432` for PostgreSQL and `3306` for MariaDB.
+    Defaults to `5432` for PostgreSQL and `3306` for MariaDB.
 
 #### [`PAPERLESS_DBNAME=<name>`](#PAPERLESS_DBNAME) {#PAPERLESS_DBNAME}
 
-: Name of the database to connect to when using PostgreSQL or MariaDB.
+: Name of the PostgreSQL or MariaDB database to connect to.
 
-    Defaults to "paperless".
+    Defaults to `paperless`.
 
-#### [`PAPERLESS_DBUSER=<name>`](#PAPERLESS_DBUSER) {#PAPERLESS_DBUSER}
+#### [`PAPERLESS_DBUSER=<user>`](#PAPERLESS_DBUSER) {#PAPERLESS_DBUSER}
 
 : Username for authenticating with the PostgreSQL or MariaDB database.
 
-    Defaults to "paperless".
+    Defaults to `paperless`.
 
 #### [`PAPERLESS_DBPASS=<password>`](#PAPERLESS_DBPASS) {#PAPERLESS_DBPASS}
 
 : Password for the PostgreSQL or MariaDB database user.
 
-    Defaults to "paperless".
+    Defaults to `paperless`.
 
-#### [`PAPERLESS_DBSSLMODE=<mode>`](#PAPERLESS_DBSSLMODE) {#PAPERLESS_DBSSLMODE}
+#### [`PAPERLESS_DB_OPTIONS=<options>`](#PAPERLESS_DB_OPTIONS) {#PAPERLESS_DB_OPTIONS}
 
-: SSL mode to use when connecting to PostgreSQL or MariaDB.
+: Advanced database connection options as a semicolon-delimited key-value string.
+Keys and values are separated by `=`. Dot-notation produces nested option
+dictionaries; for example, `pool.max_size=20` sets
+`OPTIONS["pool"]["max_size"] = 20`.
 
-    See [the official documentation about
-    sslmode for PostgreSQL](https://www.postgresql.org/docs/current/libpq-ssl.html).
+    Options specified here are merged over the engine defaults. Unrecognised keys
+    are passed through to the underlying database driver without validation, so a
+    typo will be silently ignored rather than producing an error.
 
-    See [the official documentation about
-    sslmode for MySQL and MariaDB](https://dev.mysql.com/doc/refman/8.0/en/connection-options.html#option_general_ssl-mode).
+    Refer to your database driver's documentation for the full set of accepted keys:
 
-    *Note*: SSL mode values differ between PostgreSQL and MariaDB.
+    - PostgreSQL: [libpq connection parameters](https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS)
+    - MariaDB: [MariaDB Connector/Python](https://mariadb.com/kb/en/mariadb-connector-python/)
+    - SQLite: [SQLite PRAGMA statements](https://www.sqlite.org/pragma.html)
 
-    Default is `prefer` for PostgreSQL and `PREFERRED` for MariaDB.
+    **Examples:**
 
-#### [`PAPERLESS_DBSSLROOTCERT=<ca-path>`](#PAPERLESS_DBSSLROOTCERT) {#PAPERLESS_DBSSLROOTCERT}
+```bash
+    # PostgreSQL: require SSL, set a custom CA certificate, and limit the pool size
+    PAPERLESS_DB_OPTIONS="sslmode=require;sslrootcert=/certs/ca.pem;pool.max_size=5"
 
-: Path to the SSL root certificate used to verify the database server.
+    # MariaDB: require SSL with a custom CA certificate
+    PAPERLESS_DB_OPTIONS="ssl_mode=REQUIRED;ssl.ca=/certs/ca.pem"
 
-    See [the official documentation about
-    sslmode for PostgreSQL](https://www.postgresql.org/docs/current/libpq-ssl.html).
-    Changes the location of `root.crt`.
+    # PostgreSQL: set a connection timeout
+    PAPERLESS_DB_OPTIONS="connect_timeout=10"
+```
 
-    See [the official documentation about
-    sslmode for MySQL and MariaDB](https://dev.mysql.com/doc/refman/8.0/en/connection-options.html#option_general_ssl-ca).
+    !!! note "PostgreSQL connection pooling"
+        Pool size is controlled via `pool.min_size` and `pool.max_size`. When
+        configuring pooling, ensure your PostgreSQL `max_connections` is large enough
+        to handle all pool connections across all workers:
+        `(web_workers + celery_workers) * pool.max_size + safety_margin`.
 
-    Defaults to unset, using the standard location in the home directory.
+#### ~~[`PAPERLESS_DBSSLMODE`](#PAPERLESS_DBSSLMODE)~~ {#PAPERLESS_DBSSLMODE}
 
-#### [`PAPERLESS_DBSSLCERT=<client-cert-path>`](#PAPERLESS_DBSSLCERT) {#PAPERLESS_DBSSLCERT}
+!!! failure "Removed in v3"
+Use [`PAPERLESS_DB_OPTIONS`](#PAPERLESS_DB_OPTIONS) instead.
 
-: Path to the client SSL certificate used when connecting securely.
+```bash
+    # PostgreSQL
+    PAPERLESS_DB_OPTIONS="sslmode=require"
 
-    See [the official documentation about
-    sslmode for PostgreSQL](https://www.postgresql.org/docs/current/libpq-ssl.html).
+    # MariaDB
+    PAPERLESS_DB_OPTIONS="ssl_mode=REQUIRED"
+```
 
-    See [the official documentation about
-    sslmode for MySQL and MariaDB](https://dev.mysql.com/doc/refman/8.0/en/connection-options.html#option_general_ssl-cert).
+#### ~~[`PAPERLESS_DBSSLROOTCERT`](#PAPERLESS_DBSSLROOTCERT)~~ {#PAPERLESS_DBSSLROOTCERT}
 
-    Changes the location of `postgresql.crt`.
+!!! failure "Removed in v3"
+Use [`PAPERLESS_DB_OPTIONS`](#PAPERLESS_DB_OPTIONS) instead.
 
-    Defaults to unset, using the standard location in the home directory.
+```bash
+    # PostgreSQL
+    PAPERLESS_DB_OPTIONS="sslrootcert=/path/to/ca.pem"
 
-#### [`PAPERLESS_DBSSLKEY=<client-cert-key>`](#PAPERLESS_DBSSLKEY) {#PAPERLESS_DBSSLKEY}
+    # MariaDB
+    PAPERLESS_DB_OPTIONS="ssl.ca=/path/to/ca.pem"
+```
 
-: Path to the client SSL private key used when connecting securely.
+#### ~~[`PAPERLESS_DBSSLCERT`](#PAPERLESS_DBSSLCERT)~~ {#PAPERLESS_DBSSLCERT}
 
-    See [the official documentation about
-    sslmode for PostgreSQL](https://www.postgresql.org/docs/current/libpq-ssl.html).
+!!! failure "Removed in v3"
+Use [`PAPERLESS_DB_OPTIONS`](#PAPERLESS_DB_OPTIONS) instead.
 
-    See [the official documentation about
-    sslmode for MySQL and MariaDB](https://dev.mysql.com/doc/refman/8.0/en/connection-options.html#option_general_ssl-key).
+```bash
+    # PostgreSQL
+    PAPERLESS_DB_OPTIONS="sslcert=/path/to/client.crt"
 
-    Changes the location of `postgresql.key`.
+    # MariaDB
+    PAPERLESS_DB_OPTIONS="ssl.cert=/path/to/client.crt"
+```
 
-    Defaults to unset, using the standard location in the home directory.
+#### ~~[`PAPERLESS_DBSSLKEY`](#PAPERLESS_DBSSLKEY)~~ {#PAPERLESS_DBSSLKEY}
 
-#### [`PAPERLESS_DB_TIMEOUT=<int>`](#PAPERLESS_DB_TIMEOUT) {#PAPERLESS_DB_TIMEOUT}
+!!! failure "Removed in v3"
+Use [`PAPERLESS_DB_OPTIONS`](#PAPERLESS_DB_OPTIONS) instead.
 
-: Sets how long a database connection should wait before timing out.
+```bash
+    # PostgreSQL
+    PAPERLESS_DB_OPTIONS="sslkey=/path/to/client.key"
 
-    For SQLite, this sets how long to wait if the database is locked.
-    For PostgreSQL or MariaDB, this sets the connection timeout.
+    # MariaDB
+    PAPERLESS_DB_OPTIONS="ssl.key=/path/to/client.key"
+```
 
-    Defaults to unset, which uses Django’s built-in defaults.
+#### ~~[`PAPERLESS_DB_TIMEOUT`](#PAPERLESS_DB_TIMEOUT)~~ {#PAPERLESS_DB_TIMEOUT}
 
-#### [`PAPERLESS_DB_POOLSIZE=<int>`](#PAPERLESS_DB_POOLSIZE) {#PAPERLESS_DB_POOLSIZE}
+!!! failure "Removed in v3"
+Use [`PAPERLESS_DB_OPTIONS`](#PAPERLESS_DB_OPTIONS) instead.
 
-: Defines the maximum number of database connections to keep in the pool.
+```bash
+    # SQLite
+    PAPERLESS_DB_OPTIONS="timeout=30"
 
-    Only applies to PostgreSQL. This setting is ignored for other database engines.
+    # PostgreSQL or MariaDB
+    PAPERLESS_DB_OPTIONS="connect_timeout=30"
+```
 
-    The value must be greater than or equal to 1 to be used.
-    Defaults to unset, which disables connection pooling.
+#### ~~[`PAPERLESS_DB_POOLSIZE`](#PAPERLESS_DB_POOLSIZE)~~ {#PAPERLESS_DB_POOLSIZE}
 
-    !!! note
+!!! failure "Removed in v3"
+Use [`PAPERLESS_DB_OPTIONS`](#PAPERLESS_DB_OPTIONS) instead.
 
-        A pool of 8-10 connections per worker is typically sufficient.
-        If you encounter error messages such as `couldn't get a connection`
-        or database connection timeouts, you probably need to increase the pool size.
-
-    !!! warning
-        Make sure your PostgreSQL `max_connections` setting is large enough to handle the connection pools:
-        `(NB_PAPERLESS_WORKERS + NB_CELERY_WORKERS) × POOL_SIZE + SAFETY_MARGIN`. For example, with
-        4 Paperless workers and 2 Celery workers, and a pool size of 8:``(4 + 2) × 8 + 10 = 58`,
-        so `max_connections = 60` (or even more) is appropriate.
-
-        This assumes only Paperless-ngx connects to your PostgreSQL instance. If you have other applications,
-        you should increase `max_connections` accordingly.
+```bash
+    PAPERLESS_DB_OPTIONS="pool.max_size=10"
+```
 
 #### [`PAPERLESS_DB_READ_CACHE_ENABLED=<bool>`](#PAPERLESS_DB_READ_CACHE_ENABLED) {#PAPERLESS_DB_READ_CACHE_ENABLED}
 

@@ -448,7 +448,7 @@ class TestParseDbSettings:
                     "PAPERLESS_DBNAME": "customdb",
                     "PAPERLESS_DBUSER": "customuser",
                     "PAPERLESS_DBPASS": "custompass",
-                    "PAPERLESS_DB_OPTIONS": "pool.max_size=50,pool.min_size=2,sslmode=require",
+                    "PAPERLESS_DB_OPTIONS": "pool.max_size=50;pool.min_size=2;sslmode=require",
                 },
                 {
                     "default": {
@@ -579,7 +579,7 @@ class TestParseDbSettings:
                     "PAPERLESS_DBPORT": "5555",
                     "PAPERLESS_DBUSER": "my-cool-user",
                     "PAPERLESS_DBPASS": "my-secure-password",
-                    "PAPERLESS_DB_OPTIONS": "ssl.ca=/path/to/ca.pem,ssl_mode=REQUIRED",
+                    "PAPERLESS_DB_OPTIONS": "ssl.ca=/path/to/ca.pem;ssl_mode=REQUIRED",
                 },
                 {
                     "default": {
