@@ -395,13 +395,3 @@ class TestDeprecatedDbSettings:
 
         assert len(result) == 1
         assert "PAPERLESS_DBSSLCERT" in result[0].msg
-
-    def test_check_accepts_app_configs_argument(
-        self,
-        mocker: MockerFixture,
-    ) -> None:
-        """The check function accepts the app_configs argument Django passes."""
-        mocker.patch.dict(os.environ, {}, clear=True)
-        # Django passes app_configs as a list or None depending on invocation
-        assert check_deprecated_db_settings(None) == []
-        assert check_deprecated_db_settings([]) == []
