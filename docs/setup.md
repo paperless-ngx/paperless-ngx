@@ -12,6 +12,8 @@ title: Setup
     ```
     _Piping bash directly from the internet make you nervous too? Inspect [the script](https://github.com/paperless-ngx/paperless-ngx/blob/main/install-paperless-ngx.sh) before running!_
 
+## Overview
+
 There are multiple ways to install and run Paperless-ngx:
 
 | Route                                                                                                             | Best for                                                                             | Effort |
@@ -44,6 +46,7 @@ described below.
 #### Prerequisites
 
 -   Docker and Docker Compose must be [installed](https://docs.docker.com/engine/install/){:target="\_blank"}.
+-   macOS users will need [GNU sed](https://formulae.brew.sh/formula/gnu-sed) with support for running as `sed` as well as [wget](https://formulae.brew.sh/formula/wget).
 
 #### Run the installation script
 
@@ -51,12 +54,7 @@ described below.
 bash -c "$(curl --location --silent --show-error https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/install-paperless-ngx.sh)"
 ```
 
-!!! note
-
-    macOS users will need to install [GNU sed](https://formulae.brew.sh/formula/gnu-sed) with support
-    for running as `sed` as well as [wget](https://formulae.brew.sh/formula/wget).
-
-## Docker Compose Installation {#docker}
+## Docker Compose Install {#docker}
 
 #### Prerequisites
 
@@ -159,7 +157,7 @@ Some file systems, such as NFS network shares, don't support file system notific
 directory on such a file system, Paperless-ngx will not pick up new files with the default configuration. You will need to use
 [`PAPERLESS_CONSUMER_POLLING`](configuration.md#PAPERLESS_CONSUMER_POLLING), which will disable inotify. See [here](configuration.md#polling).
 
-## Bare Metal Installation {#bare_metal}
+## Bare Metal Install {#bare_metal}
 
 #### Prerequisites
 
@@ -452,7 +450,7 @@ directory on such a file system, Paperless-ngx will not pick up new files with t
     instructions](https://www.nltk.org/data.html) for details on how to
     download the data.
 
-### Build the Docker image yourself {#docker_build}
+## Build the Docker image yourself {#docker_build data-toc-label="Building the Docker image"}
 
 Building the Docker image yourself is typically used for development, but it can also be used for production
 if you want to customize the image. See [Building the Docker image](development.md#docker_build) in the
@@ -634,12 +632,7 @@ commands as well.
     if preferred.
 9.  Start the containers as before, using `docker compose`.
 
-## Moving data between database types {#db_swaps}
-
-The best way to migrate between database types is to perform an [export](administration.md#exporter) and then
-[import](administration.md#importer) into a clean installation of Paperless-ngx.
-
-## Considerations for less powerful devices {#less-powerful-devices data-toc-label="Less Powerful Devices"}
+## Running Paperless-ngx on less powerful devices {#less-powerful-devices data-toc-label="Less Powerful Devices"}
 
 Paperless runs on Raspberry Pi. Some tasks can be slow on lower-powered
 hardware, but a few settings can improve performance:
@@ -686,10 +679,12 @@ For details, refer to [configuration](configuration.md).
     The actual matching of the algorithm is fast and works on Raspberry Pi
     as well as on any other device.
 
-## Using a reverse proxy with Paperless-ngx {#reverse_proxy data-toc-label="Using a Reverse Proxy"}
+## Additional considerations
+
+**Using a reverse proxy with Paperless-ngx**
 
 Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Using-a-Reverse-Proxy-with-Paperless-ngx#nginx) for user-maintained documentation on using nginx with Paperless-ngx.
 
-## Enhancing security {#security}
+**Enhancing security**
 
 Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Using-Security-Tools-with-Paperless-ngx) for user-maintained documentation on configuring security tools like Fail2ban with Paperless-ngx.
