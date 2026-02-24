@@ -10,18 +10,18 @@ title: Setup
     ```shell-session
     bash -c "$(curl --location --silent --show-error https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/install-paperless-ngx.sh)"
     ```
-    _Piping bash directly from the internet make you nervous too? Inspect [the script](https://github.com/paperless-ngx/paperless-ngx/blob/main/install-paperless-ngx.sh) before running!_
+    _If piping a script directly from the internet makes you nervous, inspect [the script](https://github.com/paperless-ngx/paperless-ngx/blob/main/install-paperless-ngx.sh) first!_
 
 ## Overview
 
-There are multiple ways to install and run Paperless-ngx:
+Choose the installation route that best fits your setup:
 
-| Route                                                                                                             | Best for                                                                             | Effort |
-| ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ------ |
-| [Installation script](#docker_script)                                                                             | Fastest first-time setup with guided prompts. Recommended for most users.            | Low    |
-| [Docker Compose templates](#docker)                                                                               | Manual control over compose files and settings                                       | Medium |
-| [Bare metal](#bare_metal)                                                                                         | Advanced setups, packaging, and development-adjacent workflows                       | High   |
-| [Hosted providers (wiki)](https://github.com/paperless-ngx/paperless-ngx/wiki/Related-Projects#hosting-providers) | Managed hosting options maintained by the community &mdash; check details carefully! | Varies |
+| Route                                                                                                             | Best for                                                                            | Effort |
+| ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------ |
+| [Installation script](#docker_script)                                                                             | Fastest first-time setup with guided prompts (recommended for most users)           | Low    |
+| [Docker Compose templates](#docker)                                                                               | Manual control over compose files and settings                                      | Medium |
+| [Bare metal](#bare_metal)                                                                                         | Advanced setups, packaging, and development-adjacent workflows                      | High   |
+| [Hosted providers (wiki)](https://github.com/paperless-ngx/paperless-ngx/wiki/Related-Projects#hosting-providers) | Managed hosting options maintained by the community &mdash; check details carefully | Varies |
 
 For most users, Docker is the best option. It is faster to set up,
 easier to maintain, and ships with sensible defaults.
@@ -33,15 +33,14 @@ for advanced users and contributors.
 !!! info
 
     Because [superuser](usage.md#superusers) accounts have full access to all objects and documents, you may want to create a separate user account for daily use,
-    or 'downgrade' your superuser account to a normal user account after setting things up.
+    or "downgrade" your superuser account to a normal user account after setup.
 
 ## Installation Script {#docker_script}
 
 Paperless-ngx provides an interactive script for Docker Compose setups.
-The script asks a few configuration questions, then creates the
-required files, pulls the image, starts the containers, and creates
-your [superuser](usage.md#superusers) account. In short, it automates the [Docker Compose setup](#docker)
-described below.
+It asks a few configuration questions, then creates the required files,
+pulls the image, starts the containers, and creates your [superuser](usage.md#superusers)
+account. In short, it automates the [Docker Compose setup](#docker) described below.
 
 #### Prerequisites
 
@@ -53,6 +52,12 @@ described below.
 ```shell-session
 bash -c "$(curl --location --silent --show-error https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/install-paperless-ngx.sh)"
 ```
+
+#### After installation
+
+Paperless-ngx should be available at `http://127.0.0.1:8000` (or similar,
+depending on your configuration). When you first access the web interface,
+you will be prompted to create a [superuser](usage.md#superusers) account.
 
 ## Docker Compose Install {#docker}
 
@@ -116,13 +121,14 @@ bash -c "$(curl --location --silent --show-error https://raw.githubusercontent.c
         appending `_FILE` to configuration values. For example [`PAPERLESS_DBUSER`](configuration.md#PAPERLESS_DBUSER)
         can be set using `PAPERLESS_DBUSER_FILE=/var/run/secrets/password.txt`.
 
-4.  Run `docker compose pull`. This will pull the image from the GitHub container registry
-    by default but you can change the image to pull from Docker Hub by changing the `image`
+4.  Run `docker compose pull`. This pulls the image from the GitHub container registry
+    by default, but you can pull from Docker Hub by changing the `image`
     line to `image: paperlessngx/paperless-ngx:latest`.
 
 5.  Run `docker compose up -d`. This will create and start the necessary containers.
 
-Your Paperless-ngx instance should now be accessible at `http://127.0.0.1:8000` (or similar, depending on your configuration).
+Your Paperless-ngx instance should now be accessible at
+`http://127.0.0.1:8000` (or similar, depending on your configuration).
 When you first access the web interface, you will be prompted to create
 a [superuser](usage.md#superusers) account.
 
@@ -153,16 +159,17 @@ Your entry for Paperless should contain something like:
 
 ##### File systems without inotify support (e.g. NFS) {#polling data-toc-label="Polling"}
 
-Some file systems, such as NFS network shares, don't support file system notifications with `inotify`. When storing the consumption
-directory on such a file system, Paperless-ngx will not pick up new files with the default configuration. You will need to use
-[`PAPERLESS_CONSUMER_POLLING`](configuration.md#PAPERLESS_CONSUMER_POLLING), which will disable inotify. See [here](configuration.md#polling).
+Some file systems, such as NFS network shares, don't support file system
+notifications with `inotify`. When the consumption directory is on such a
+file system, Paperless-ngx will not pick up new files with the default
+configuration. Use [`PAPERLESS_CONSUMER_POLLING`](configuration.md#PAPERLESS_CONSUMER_POLLING)
+to enable polling and disable inotify. See [here](configuration.md#polling).
 
 ## Bare Metal Install {#bare_metal}
 
 #### Prerequisites
 
 -   Paperless runs on Linux only, Windows is not supported.
-
 -   Python 3 is required with versions 3.10 - 3.12 currently supported. Newer versions may work, but some dependencies may not be fully compatible.
 
 #### Installation
@@ -231,7 +238,7 @@ directory on such a file system, Paperless-ngx will not pick up new files with t
 
 2.  Install `redis` >= 6.0 and configure it to start automatically.
 
-3.  Optional. Install `postgresql` and configure a database, user and
+3.  Optional: Install `postgresql` and configure a database, user, and
     password for Paperless-ngx. If you do not wish to use PostgreSQL,
     MariaDB and SQLite are available as well.
 
@@ -249,7 +256,7 @@ directory on such a file system, Paperless-ngx will not pick up new files with t
     ```
 
 5.  Download a release archive from
-    <https://github.com/paperless-ngx/paperless-ngx/releases>, for example:
+    <https://github.com/paperless-ngx/paperless-ngx/releases>. For example:
 
     ```shell-session
     curl -O -L https://github.com/paperless-ngx/paperless-ngx/releases/download/vX.Y.Z/paperless-ngx-vX.Y.Z.tar.xz
@@ -363,7 +370,7 @@ directory on such a file system, Paperless-ngx will not pick up new files with t
     sudo -Hu paperless python3 manage.py runserver
     ```
 
-    and point your browser to `http://localhost:8000` if
+    Then point your browser to `http://localhost:8000` if
     accessing from the same device on which Paperless-ngx is installed.
     If accessing from another machine, set up systemd services. You may need
     to set `PAPERLESS_DEBUG=true` in order for the development server to work
