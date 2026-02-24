@@ -8,8 +8,7 @@ There are multiple ways to install and run Paperless-ngx:
 
 -   [Use the installation script for a Docker setup](#docker_script)
 -   [Use the Docker Compose templates directly](#docker)
--   [Build the Docker image yourself](#docker_build)
--   [Install Paperless-ngx directly on your system manually ("bare metal")](#bare_metal)
+-   [Install Paperless-ngx directly on your system ("bare metal")](#bare_metal)
 -   A user-maintained list of commercial hosting providers can be found [in the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Related-Projects#hosting-providers)
 
 For most users, Docker is the best option. It is faster to set up,
@@ -151,47 +150,6 @@ bash -c "$(curl --location --silent --show-error https://raw.githubusercontent.c
     `http://127.0.0.1:8000` (or similar, depending on your configuration).
     When you first access the web interface, you will be
     prompted to create a [superuser](usage.md#superusers) account.
-
-### Build the Docker image yourself {#docker_build}
-
-1.  Clone the entire Paperless-ngx repository:
-
-    ```shell-session
-    git clone https://github.com/paperless-ngx/paperless-ngx
-    ```
-
-    The main branch always reflects the latest stable version.
-
-2.  Copy one `docker/compose/docker-compose.*.yml` file to
-    `docker-compose.yml` in the repository root, depending on your
-    preferred database backend. Copy `docker-compose.env` into the
-    project root as well.
-
-3.  In the `docker-compose.yml` file, find the line that instructs
-    Docker Compose to pull the Paperless-ngx image:
-
-    ```yaml
-    webserver:
-        image: ghcr.io/paperless-ngx/paperless-ngx:latest
-    ```
-
-    and replace it with a line that instructs Docker Compose to build
-    the image from the current working directory instead:
-
-    ```yaml
-    webserver:
-        build:
-            context: .
-    ```
-
-4.  Follow the [Docker setup](#docker) above, except when asked to run
-    `docker compose pull` to pull the image, run
-
-    ```shell-session
-    docker compose build
-    ```
-
-    instead to build the image.
 
 ### Bare Metal Route {#bare_metal}
 
@@ -485,6 +443,12 @@ Support for older versions may be dropped as they reach end of life.
     instructions](https://www.nltk.org/data.html) for details on how to
     download the data.
 
+### Build the Docker image yourself {#docker_build}
+
+Building the Docker image yourself is typically used for development, but it can also be used for production
+if you want to customize the image. See [Building the Docker image](development.md#docker_build) in the
+development documentation.
+
 # Migrating to Paperless-ngx
 
 You can migrate to Paperless-ngx from Paperless-ng or from the original
@@ -559,7 +523,7 @@ Migration to Paperless-ngx is then performed in a few simple steps:
     the Docker Compose files from
     [here](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose)
     or clone the repository to build the image yourself (see
-    [above](#docker_build)). You can either replace your current paperless
+    [development docs](development.md#docker_build)). You can either replace your current paperless
     folder or put Paperless-ngx in
     a different location.
 
