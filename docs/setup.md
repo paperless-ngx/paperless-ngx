@@ -281,7 +281,7 @@ to enable polling and disable inotify. See [here](configuration.md#polling).
     needs. Required settings for getting Paperless-ngx running are:
 
     -   [`PAPERLESS_REDIS`](configuration.md#PAPERLESS_REDIS) should point to your Redis server, such as
-        <redis://localhost:6379>.
+        `redis://localhost:6379`.
     -   [`PAPERLESS_DBENGINE`](configuration.md#PAPERLESS_DBENGINE) is optional, and should be one of `postgres`,
         `mariadb`, or `sqlite`
     -   [`PAPERLESS_DBHOST`](configuration.md#PAPERLESS_DBHOST) should be the hostname on which your
