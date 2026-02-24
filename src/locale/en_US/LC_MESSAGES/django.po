@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-16 17:32+0000\n"
+"POT-Creation-Date: 2026-02-24 00:43+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -89,7 +89,7 @@ msgstr ""
 msgid "Automatic"
 msgstr ""
 
-#: documents/models.py:66 documents/models.py:444 documents/models.py:1659
+#: documents/models.py:66 documents/models.py:444 documents/models.py:1663
 #: paperless_mail/models.py:23 paperless_mail/models.py:143
 msgid "name"
 msgstr ""
@@ -252,7 +252,7 @@ msgid "The position of this document in your physical document archive."
 msgstr ""
 
 #: documents/models.py:313 documents/models.py:688 documents/models.py:742
-#: documents/models.py:1702
+#: documents/models.py:1706
 msgid "document"
 msgstr ""
 
@@ -1093,193 +1093,197 @@ msgid "Password removal"
 msgstr ""
 
 #: documents/models.py:1414
+msgid "Move to trash"
+msgstr ""
+
+#: documents/models.py:1418
 msgid "Workflow Action Type"
 msgstr ""
 
-#: documents/models.py:1419 documents/models.py:1661
+#: documents/models.py:1423 documents/models.py:1665
 #: paperless_mail/models.py:145
 msgid "order"
 msgstr ""
 
-#: documents/models.py:1422
+#: documents/models.py:1426
 msgid "assign title"
 msgstr ""
 
-#: documents/models.py:1426
+#: documents/models.py:1430
 msgid "Assign a document title, must  be a Jinja2 template, see documentation."
 msgstr ""
 
-#: documents/models.py:1434 paperless_mail/models.py:274
+#: documents/models.py:1438 paperless_mail/models.py:274
 msgid "assign this tag"
 msgstr ""
 
-#: documents/models.py:1443 paperless_mail/models.py:282
+#: documents/models.py:1447 paperless_mail/models.py:282
 msgid "assign this document type"
 msgstr ""
 
-#: documents/models.py:1452 paperless_mail/models.py:296
+#: documents/models.py:1456 paperless_mail/models.py:296
 msgid "assign this correspondent"
 msgstr ""
 
-#: documents/models.py:1461
+#: documents/models.py:1465
 msgid "assign this storage path"
 msgstr ""
 
-#: documents/models.py:1470
+#: documents/models.py:1474
 msgid "assign this owner"
 msgstr ""
 
-#: documents/models.py:1477
+#: documents/models.py:1481
 msgid "grant view permissions to these users"
 msgstr ""
 
-#: documents/models.py:1484
+#: documents/models.py:1488
 msgid "grant view permissions to these groups"
 msgstr ""
 
-#: documents/models.py:1491
+#: documents/models.py:1495
 msgid "grant change permissions to these users"
 msgstr ""
 
-#: documents/models.py:1498
+#: documents/models.py:1502
 msgid "grant change permissions to these groups"
 msgstr ""
 
-#: documents/models.py:1505
+#: documents/models.py:1509
 msgid "assign these custom fields"
 msgstr ""
 
-#: documents/models.py:1509
+#: documents/models.py:1513
 msgid "custom field values"
 msgstr ""
 
-#: documents/models.py:1513
+#: documents/models.py:1517
 msgid "Optional values to assign to the custom fields."
 msgstr ""
 
-#: documents/models.py:1522
+#: documents/models.py:1526
 msgid "remove these tag(s)"
 msgstr ""
 
-#: documents/models.py:1527
+#: documents/models.py:1531
 msgid "remove all tags"
 msgstr ""
 
-#: documents/models.py:1534
+#: documents/models.py:1538
 msgid "remove these document type(s)"
 msgstr ""
 
-#: documents/models.py:1539
+#: documents/models.py:1543
 msgid "remove all document types"
 msgstr ""
 
-#: documents/models.py:1546
+#: documents/models.py:1550
 msgid "remove these correspondent(s)"
 msgstr ""
 
-#: documents/models.py:1551
+#: documents/models.py:1555
 msgid "remove all correspondents"
 msgstr ""
 
-#: documents/models.py:1558
+#: documents/models.py:1562
 msgid "remove these storage path(s)"
 msgstr ""
 
-#: documents/models.py:1563
+#: documents/models.py:1567
 msgid "remove all storage paths"
 msgstr ""
 
-#: documents/models.py:1570
+#: documents/models.py:1574
 msgid "remove these owner(s)"
 msgstr ""
 
-#: documents/models.py:1575
+#: documents/models.py:1579
 msgid "remove all owners"
 msgstr ""
 
-#: documents/models.py:1582
+#: documents/models.py:1586
 msgid "remove view permissions for these users"
 msgstr ""
 
-#: documents/models.py:1589
+#: documents/models.py:1593
 msgid "remove view permissions for these groups"
 msgstr ""
 
-#: documents/models.py:1596
+#: documents/models.py:1600
 msgid "remove change permissions for these users"
 msgstr ""
 
-#: documents/models.py:1603
+#: documents/models.py:1607
 msgid "remove change permissions for these groups"
 msgstr ""
 
-#: documents/models.py:1608
+#: documents/models.py:1612
 msgid "remove all permissions"
 msgstr ""
 
-#: documents/models.py:1615
+#: documents/models.py:1619
 msgid "remove these custom fields"
 msgstr ""
 
-#: documents/models.py:1620
+#: documents/models.py:1624
 msgid "remove all custom fields"
 msgstr ""
 
-#: documents/models.py:1629
+#: documents/models.py:1633
 msgid "email"
 msgstr ""
 
-#: documents/models.py:1638
+#: documents/models.py:1642
 msgid "webhook"
 msgstr ""
 
-#: documents/models.py:1642
+#: documents/models.py:1646
 msgid "passwords"
 msgstr ""
 
-#: documents/models.py:1646
+#: documents/models.py:1650
 msgid ""
 "Passwords to try when removing PDF protection. Separate with commas or new "
 "lines."
 msgstr ""
 
-#: documents/models.py:1651
+#: documents/models.py:1655
 msgid "workflow action"
 msgstr ""
 
-#: documents/models.py:1652
+#: documents/models.py:1656
 msgid "workflow actions"
 msgstr ""
 
-#: documents/models.py:1667
+#: documents/models.py:1671
 msgid "triggers"
 msgstr ""
 
-#: documents/models.py:1674
+#: documents/models.py:1678
 msgid "actions"
 msgstr ""
 
-#: documents/models.py:1677 paperless_mail/models.py:154
+#: documents/models.py:1681 paperless_mail/models.py:154
 msgid "enabled"
 msgstr ""
 
-#: documents/models.py:1688
+#: documents/models.py:1692
 msgid "workflow"
 msgstr ""
 
-#: documents/models.py:1692
+#: documents/models.py:1696
 msgid "workflow trigger type"
 msgstr ""
 
-#: documents/models.py:1706
+#: documents/models.py:1710
 msgid "date run"
 msgstr ""
 
-#: documents/models.py:1712
+#: documents/models.py:1716
 msgid "workflow run"
 msgstr ""
 
-#: documents/models.py:1713
+#: documents/models.py:1717
 msgid "workflow runs"
 msgstr ""
 
