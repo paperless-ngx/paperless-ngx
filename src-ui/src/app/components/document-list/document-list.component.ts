@@ -212,6 +212,14 @@ export class DocumentListComponent
     this.list.setSort(event.column, event.reverse)
   }
 
+  onFilterRulesChange(filterRules: FilterRule[]) {
+    this.list.setFilterRules(filterRules)
+  }
+
+  onFilterRulesReset(filterRules: FilterRule[]) {
+    this.list.setFilterRules(filterRules, true)
+  }
+
   get isBulkEditing(): boolean {
     return this.list.selected.size > 0
   }
@@ -300,7 +308,7 @@ export class DocumentListComponent
         if (this.list.selected.size > 0) {
           this.list.selectNone()
         } else if (this.isFiltered) {
-          this.filterEditor.resetSelected()
+          this.resetFilters()
         }
       })
 

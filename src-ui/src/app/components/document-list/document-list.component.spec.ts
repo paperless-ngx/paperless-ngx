@@ -147,21 +147,21 @@ describe('DocumentListComponent', () => {
   })
 
   it('should show score sort fields on fulltext queries', () => {
-    documentListService.filterRules = [
+    documentListService.setFilterRules([
       {
         rule_type: FILTER_HAS_TAGS_ANY,
         value: '10',
       },
-    ]
+    ])
     fixture.detectChanges()
     expect(component.getSortFields()).toEqual(documentListService.sortFields)
 
-    documentListService.filterRules = [
+    documentListService.setFilterRules([
       {
         rule_type: FILTER_FULLTEXT_QUERY,
         value: 'foo',
       },
-    ]
+    ])
     fixture.detectChanges()
     expect(component.getSortFields()).toEqual(
       documentListService.sortFieldsFullText
@@ -170,12 +170,12 @@ describe('DocumentListComponent', () => {
 
   it('should determine if filtered, support reset', () => {
     fixture.detectChanges()
-    documentListService.filterRules = [
+    documentListService.setFilterRules([
       {
         rule_type: FILTER_HAS_TAGS_ANY,
         value: '10',
       },
-    ]
+    ])
     documentListService.isReloading = false
     fixture.detectChanges()
     expect(component.isFiltered).toBeTruthy()
@@ -183,6 +183,20 @@ describe('DocumentListComponent', () => {
     component.resetFilters()
     fixture.detectChanges()
     expect(fixture.nativeElement.textContent.match(/Reset/g)).toHaveLength(1)
+  })
+
+  it('should apply filter rule changes via list service', () => {
+    const setFilterRulesSpy = jest.spyOn(documentListService, 'setFilterRules')
+    const rules = [{ rule_type: FILTER_HAS_TAGS_ANY, value: '10' }]
+    component.onFilterRulesChange(rules)
+    expect(setFilterRulesSpy).toHaveBeenCalledWith(rules)
+  })
+
+  it('should reset filter rules to page one via list service', () => {
+    const setFilterRulesSpy = jest.spyOn(documentListService, 'setFilterRules')
+    const rules = [{ rule_type: FILTER_HAS_TAGS_ANY, value: '10' }]
+    component.onFilterRulesReset(rules)
+    expect(setFilterRulesSpy).toHaveBeenCalledWith(rules, true)
   })
 
   it('should load saved view from URL', () => {
@@ -217,7 +231,7 @@ describe('DocumentListComponent', () => {
       .spyOn(activatedRoute, 'paramMap', 'get')
       .mockReturnValue(of(convertToParamMap(queryParams)))
     activatedRoute.snapshot.queryParams = queryParams
-    fixture.detectChanges()
+    component.ngOnInit()
     expect(getSavedViewSpy).toHaveBeenCalledWith(view.id)
     expect(activateSavedViewSpy).toHaveBeenCalledWith(
       view,

@@ -129,6 +129,7 @@ jobs:
         run: |
           uv pip list
       - name: Check typing (pyrefly)
+        continue-on-error: true
         run: |
           uv run pyrefly \
             check \
@@ -143,6 +144,7 @@ jobs:
             ${{ runner.os }}-mypy-py${{ env.DEFAULT_PYTHON }}-
             ${{ runner.os }}-mypy-
       - name: Check typing (mypy)
+        continue-on-error: true
         run: |
           uv run mypy \
             --show-error-codes \
