@@ -863,6 +863,66 @@ class TestMail(
 
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 0)
 
+    def test_handle_mail_account_overlapping_rules_only_first_consumes(self):
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+
+        first_rule = MailRule.objects.create(
+            name="testrule-first",
+            account=account,
+            action=MailRule.MailAction.DELETE,
+            filter_subject="Claim",
+            order=1,
+        )
+        _ = MailRule.objects.create(
+            name="testrule-second",
+            account=account,
+            action=MailRule.MailAction.DELETE,
+            filter_subject="Claim",
+            order=2,
+        )
+
+        self.mail_account_handler.handle_mail_account(account)
+        self.mailMocker.apply_mail_actions()
+
+        self.assertEqual(self.mailMocker._queue_consumption_tasks_mock.call_count, 1)
+        queued_rule = self.mailMocker._queue_consumption_tasks_mock.call_args.kwargs[
+            "rule"
+        ]
+        self.assertEqual(queued_rule.id, first_rule.id)
+
+    def test_handle_mail_account_skip_duplicate_uids_from_fetch(self):
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        _ = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.DELETE,
+            filter_subject="Duplicated mail",
+        )
+
+        duplicated_message = self.mailMocker.messageBuilder.create_message(
+            subject="Duplicated mail",
+        )
+        self.mailMocker.bogus_mailbox.messages = [
+            duplicated_message,
+            duplicated_message,
+        ]
+        self.mailMocker.bogus_mailbox.updateClient()
+
+        self.mail_account_handler.handle_mail_account(account)
+        self.mailMocker.apply_mail_actions()
+
+        self.assertEqual(self.mailMocker._queue_consumption_tasks_mock.call_count, 1)
+
     @pytest.mark.flaky(reruns=4)
     def test_handle_mail_account_flag(self) -> None:
         account = MailAccount.objects.create(
