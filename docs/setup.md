@@ -15,12 +15,15 @@ You can go multiple routes to setup and run Paperless:
 The Docker routes are quick & easy. These are the recommended routes.
 This configures all the stuff from the above automatically so that it
 just works and uses sensible defaults for all configuration options.
-Here you find a cheat-sheet for docker beginners: [CLI
-Basics](https://www.sehn.tech/refs/devops-with-docker/)
 
 The bare metal route is complicated to setup but makes it easier should
 you want to contribute some code back. You need to configure and run the
 above mentioned components yourself.
+
+!!! note
+
+    Because superuser accounts have full access to all objects and documents, you may want to create a separate user account for daily use,
+    or 'downgrade' your superuser account to a normal user account after setting things up.
 
 ### Use the Installation Script {#docker_script}
 
