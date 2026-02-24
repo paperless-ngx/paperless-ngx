@@ -863,7 +863,7 @@ class TestMail(
 
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 0)
 
-    def test_handle_mail_account_overlapping_rules_only_first_consumes(self):
+    def test_handle_mail_account_overlapping_rules_only_first_consumes(self) -> None:
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
@@ -895,7 +895,7 @@ class TestMail(
         ]
         self.assertEqual(queued_rule.id, first_rule.id)
 
-    def test_handle_mail_account_skip_duplicate_uids_from_fetch(self):
+    def test_handle_mail_account_skip_duplicate_uids_from_fetch(self) -> None:
         account = MailAccount.objects.create(
             name="test",
             imap_server="",

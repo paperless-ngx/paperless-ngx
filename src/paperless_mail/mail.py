@@ -536,7 +536,7 @@ class MailAccountHandler(LoggingMixin):
         self.log.debug(f"Processing mail account {account}")
 
         total_processed_files = 0
-        consumed_messages: set[tuple[str, str]] = set()
+        consumed_messages: set[tuple[str, str | None]] = set()
         try:
             with get_mailbox(
                 account.imap_server,
@@ -607,8 +607,8 @@ class MailAccountHandler(LoggingMixin):
         rule: MailRule,
         *,
         supports_gmail_labels: bool,
-        consumed_messages: set[tuple[str, str]],
-    ):
+        consumed_messages: set[tuple[str, str | None]],
+    ) -> int:
         folders = [rule.folder]
         # In case of MOVE, make sure also the destination exists
         if rule.action == MailRule.MailAction.MOVE:
@@ -655,7 +655,7 @@ class MailAccountHandler(LoggingMixin):
 
         mails_processed = 0
         total_processed_files = 0
-        rule_seen_messages: set[tuple[str, str]] = set()
+        rule_seen_messages: set[tuple[str, str | None]] = set()
 
         for message in messages:
             if TYPE_CHECKING:
