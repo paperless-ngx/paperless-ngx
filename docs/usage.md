@@ -372,6 +372,11 @@ permissions can be granted to limit access to certain parts of the UI (and corre
 
 Superusers can access all parts of the front and backend application as well as any and all objects. Superuser status can only be granted by another superuser.
 
+!!! tip
+
+    Because superuser accounts can see all objects and documents, you may want to use a regular account for day-to-day use. Additional superuser accounts can
+    be created via [cli](administration.md#create-superuser) or granted superuser status from an existing superuser account.
+
 #### Admin Status
 
 Admin status (Django 'staff status') grants access to viewing the paperless logs and the system status dialog
