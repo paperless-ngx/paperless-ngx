@@ -4,12 +4,22 @@ title: Setup
 
 # Installation
 
+!!! tip "Quick Start"
+
+    If you just want Paperless-ngx running quickly, use our installation script:
+    ```shell-session
+    bash -c "$(curl --location --silent --show-error https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/install-paperless-ngx.sh)"
+    ```
+    _Piping bash directly from the internet make you nervous too? Inspect [the script](https://github.com/paperless-ngx/paperless-ngx/blob/main/install-paperless-ngx.sh) before running!_
+
 There are multiple ways to install and run Paperless-ngx:
 
--   [Use the installation script for a Docker setup](#docker_script)
--   [Use the Docker Compose templates directly](#docker)
--   [Install Paperless-ngx directly on your system ("bare metal")](#bare_metal)
--   A user-maintained list of commercial hosting providers can be found [in the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Related-Projects#hosting-providers)
+| Route                                                                                                             | Best for                                                                             | Effort |
+| ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ------ |
+| [Installation script](#docker_script)                                                                             | Fastest first-time setup with guided prompts. Recommended for most users.            | Low    |
+| [Docker Compose templates](#docker)                                                                               | Manual control over compose files and settings                                       | Medium |
+| [Bare metal](#bare_metal)                                                                                         | Advanced setups, packaging, and development-adjacent workflows                       | High   |
+| [Hosted providers (wiki)](https://github.com/paperless-ngx/paperless-ngx/wiki/Related-Projects#hosting-providers) | Managed hosting options maintained by the community &mdash; check details carefully! | Varies |
 
 For most users, Docker is the best option. It is faster to set up,
 easier to maintain, and ships with sensible defaults.
@@ -18,12 +28,12 @@ The bare-metal route gives you more control, but it requires manual
 installation and operation of all components. It is usually best suited
 for advanced users and contributors.
 
-!!! tip
+!!! info
 
     Because [superuser](usage.md#superusers) accounts have full access to all objects and documents, you may want to create a separate user account for daily use,
     or 'downgrade' your superuser account to a normal user account after setting things up.
 
-### Use the Installation Script {#docker_script}
+## Installation Script {#docker_script}
 
 Paperless-ngx provides an interactive script for Docker Compose setups.
 The script asks a few configuration questions, then creates the
@@ -31,11 +41,11 @@ required files, pulls the image, starts the containers, and creates
 your [superuser](usage.md#superusers) account. In short, it automates the [Docker Compose setup](#docker)
 described below.
 
-**Prerequisites**
+#### Prerequisites
 
 -   Docker and Docker Compose must be [installed](https://docs.docker.com/engine/install/){:target="\_blank"}.
 
-**Run the installation script**
+#### Run the installation script
 
 ```shell-session
 bash -c "$(curl --location --silent --show-error https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/install-paperless-ngx.sh)"
@@ -46,13 +56,13 @@ bash -c "$(curl --location --silent --show-error https://raw.githubusercontent.c
     macOS users will need to install [GNU sed](https://formulae.brew.sh/formula/gnu-sed) with support
     for running as `sed` as well as [wget](https://formulae.brew.sh/formula/wget).
 
-### Use Docker Compose {#docker}
+## Docker Compose Installation {#docker}
 
-**Prerequisites**
+#### Prerequisites
 
 -   Docker and Docker Compose must be [installed](https://docs.docker.com/engine/install/){:target="\_blank"}.
 
-**Installation**
+#### Installation
 
 1.  Go to the [/docker/compose directory on the project
     page](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose){:target="\_blank"}
@@ -91,29 +101,6 @@ bash -c "$(curl --location --silent --show-error https://raw.githubusercontent.c
         - 8010:8000
     ```
 
-    **Rootless**
-
-    !!! warning
-
-        It is currently not possible to run the container rootless if additional languages are specified via `PAPERLESS_OCR_LANGUAGES`.
-
-    If you want to run Paperless as a rootless container, make this
-    change in `docker-compose.yml`:
-
-    -   Set the `user` running the container to map to the `paperless`
-        user in the container. This value (`user_id` below) should be
-        the same ID that `USERMAP_UID` and `USERMAP_GID` are set to in
-        the next step. See `USERMAP_UID` and `USERMAP_GID`
-        [here](configuration.md#docker).
-
-    Your entry for Paperless should contain something like:
-
-    > ```
-    > webserver:
-    >   image: ghcr.io/paperless-ngx/paperless-ngx:latest
-    >   user: <user_id>
-    > ```
-
 3.  Modify `docker-compose.env` with any configuration options you need.
     See the [configuration documentation](configuration.md) for all options.
 
@@ -131,34 +118,56 @@ bash -c "$(curl --location --silent --show-error https://raw.githubusercontent.c
         appending `_FILE` to configuration values. For example [`PAPERLESS_DBUSER`](configuration.md#PAPERLESS_DBUSER)
         can be set using `PAPERLESS_DBUSER_FILE=/var/run/secrets/password.txt`.
 
-    !!! warning
-
-        Some file systems, such as NFS network shares, don't support file
-        system notifications with `inotify`. When storing the consumption
-        directory on such a file system, Paperless-ngx will not pick up new
-        files with the default configuration. You will need to use
-        [`PAPERLESS_CONSUMER_POLLING`](configuration.md#PAPERLESS_CONSUMER_POLLING), which will disable inotify. See
-        [here](configuration.md#polling).
-
 4.  Run `docker compose pull`. This will pull the image from the GitHub container registry
     by default but you can change the image to pull from Docker Hub by changing the `image`
     line to `image: paperlessngx/paperless-ngx:latest`.
 
 5.  Run `docker compose up -d`. This will create and start the necessary containers.
 
-6.  Your Paperless-ngx instance should now be accessible at
-    `http://127.0.0.1:8000` (or similar, depending on your configuration).
-    When you first access the web interface, you will be
-    prompted to create a [superuser](usage.md#superusers) account.
+Your Paperless-ngx instance should now be accessible at `http://127.0.0.1:8000` (or similar, depending on your configuration).
+When you first access the web interface, you will be prompted to create
+a [superuser](usage.md#superusers) account.
 
-### Bare Metal Route {#bare_metal}
+#### Optional Advanced Compose Configurations {#advanced_compose data-toc-label="Advanced Compose Configurations"}
 
-Paperless runs on Linux only. The following procedure has been tested on
-a minimal Debian installation. Windows is not supported.
+##### Rootless
 
-Paperless requires Python 3. At this time, 3.10 - 3.12 are tested versions.
-Newer versions may work, but some dependencies may not fully support newer versions.
-Support for older versions may be dropped as they reach end of life.
+!!! warning
+
+    It is currently not possible to run the container rootless if additional languages are specified via `PAPERLESS_OCR_LANGUAGES`.
+
+If you want to run Paperless as a rootless container, make this
+change in `docker-compose.yml`:
+
+-   Set the `user` running the container to map to the `paperless`
+    user in the container. This value (`user_id` below) should be
+    the same ID that `USERMAP_UID` and `USERMAP_GID` are set to in
+    `docker-compose.env`. See `USERMAP_UID` and `USERMAP_GID`
+    [here](configuration.md#docker).
+
+Your entry for Paperless should contain something like:
+
+> ```
+> webserver:
+>   image: ghcr.io/paperless-ngx/paperless-ngx:latest
+>   user: <user_id>
+> ```
+
+##### File systems without inotify support (e.g. NFS) {#polling data-toc-label="Polling"}
+
+Some file systems, such as NFS network shares, don't support file system notifications with `inotify`. When storing the consumption
+directory on such a file system, Paperless-ngx will not pick up new files with the default configuration. You will need to use
+[`PAPERLESS_CONSUMER_POLLING`](configuration.md#PAPERLESS_CONSUMER_POLLING), which will disable inotify. See [here](configuration.md#polling).
+
+## Bare Metal Installation {#bare_metal}
+
+#### Prerequisites
+
+-   Paperless runs on Linux only, Windows is not supported.
+
+-   Python 3 is required with versions 3.10 - 3.12 currently supported. Newer versions may work, but some dependencies may not be fully compatible.
+
+#### Installation
 
 1.  Install dependencies. Paperless requires the following packages:
 
@@ -449,12 +458,12 @@ Building the Docker image yourself is typically used for development, but it can
 if you want to customize the image. See [Building the Docker image](development.md#docker_build) in the
 development documentation.
 
-# Migrating to Paperless-ngx
+## Migrating to Paperless-ngx
 
 You can migrate to Paperless-ngx from Paperless-ng or from the original
 Paperless project.
 
-## Migrating from Paperless-ng
+<h3 id="migration_ng">Migrating from Paperless-ng</h3>
 
 Paperless-ngx is meant to be a drop-in replacement for Paperless-ng, and
 upgrading should be trivial for most users, especially when using
@@ -482,7 +491,7 @@ for example using:
 `git remote set-url origin https://github.com/paperless-ngx/paperless-ngx`
 and then pull the latest version.
 
-## Migrating from Paperless
+<h3 id="migration_paperless">Migrating from Paperless</h3>
 
 At its core, Paperless-ngx is still Paperless and fully compatible.
 However, some things have changed under the hood, so you need to adapt
@@ -579,7 +588,7 @@ Migration to Paperless-ngx is then performed in a few simple steps:
 10. Optionally, follow the instructions below to migrate your existing
     data to PostgreSQL.
 
-## Migrating from LinuxServer.io Docker Image
+<h3 id="migration_lsio">Migrating from LinuxServer.io Docker Image</h3>
 
 As with any upgrade or large change, it is highly recommended to
 create a backup before starting. This assumes the image was running
@@ -625,41 +634,12 @@ commands as well.
     if preferred.
 9.  Start the containers as before, using `docker compose`.
 
-## Moving data from SQLite to PostgreSQL or MySQL/MariaDB {#sqlite_to_psql}
+## Moving data between database types {#db_swaps}
 
 The best way to migrate between database types is to perform an [export](administration.md#exporter) and then
 [import](administration.md#importer) into a clean installation of Paperless-ngx.
 
-## Moving back to Paperless
-
-If you migrated to Paperless-ngx and later decide to move back, you can
-do so with a few simple steps.
-
-Paperless-ngx modified the database schema slightly. However, these
-changes can be reverted while keeping your current data, so that your
-current data will be compatible with original Paperless. Thumbnails
-were also changed from PNG to WEBP format and will need to be
-re-generated.
-
-Execute this:
-
-```shell-session
-$ cd /path/to/paperless
-$ docker compose run --rm webserver migrate documents 0023
-```
-
-Or without docker:
-
-```shell-session
-$ cd /path/to/paperless/src
-$ python3 manage.py migrate documents 0023
-```
-
-After regenerating thumbnails, you'll need to clear your cookies
-(Paperless-ngx comes with updated dependencies that handle cookies
-differently) and probably your cache as well.
-
-# Considerations for less powerful devices {#less-powerful-devices}
+## Considerations for less powerful devices {#less-powerful-devices data-toc-label="Less Powerful Devices"}
 
 Paperless runs on Raspberry Pi. Some tasks can be slow on lower-powered
 hardware, but a few settings can improve performance:
@@ -706,10 +686,10 @@ For details, refer to [configuration](configuration.md).
     The actual matching of the algorithm is fast and works on Raspberry Pi
     as well as on any other device.
 
-# Using nginx as a reverse proxy {#nginx}
+## Using a reverse proxy with Paperless-ngx {#reverse_proxy data-toc-label="Using a Reverse Proxy"}
 
 Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Using-a-Reverse-Proxy-with-Paperless-ngx#nginx) for user-maintained documentation on using nginx with Paperless-ngx.
 
-# Enhancing security {#security}
+## Enhancing security {#security}
 
 Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Using-Security-Tools-with-Paperless-ngx) for user-maintained documentation on configuring security tools like Fail2ban with Paperless-ngx.
