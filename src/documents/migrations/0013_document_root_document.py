@@ -7,7 +7,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "0011_optimize_integer_field_sizes"),
+        ("documents", "0012_alter_workflowaction_type"),
     ]
 
     operations = [
