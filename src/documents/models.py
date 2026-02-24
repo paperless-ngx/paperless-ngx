@@ -1439,6 +1439,10 @@ class WorkflowAction(models.Model):
             5,
             _("Password removal"),
         )
+        MOVE_TO_TRASH = (
+            6,
+            _("Move to trash"),
+        )
 
     type = models.PositiveSmallIntegerField(
         _("Workflow Action Type"),

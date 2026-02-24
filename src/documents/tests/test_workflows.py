@@ -3,9 +3,11 @@ import json
 import shutil
 import socket
 import tempfile
+from collections.abc import Callable
 from datetime import timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import Any
 from unittest import mock
 
 import pytest
@@ -55,6 +57,7 @@ from documents.models import WorkflowActionEmail
 from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
+from documents.plugins.base import StopConsumeTaskError
 from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_consumption_finished
 from documents.tests.utils import DirectoriesMixin
@@ -3914,6 +3917,427 @@ class TestWorkflows(
         )
         assert mock_remove_password.call_count == 2
 
+    def test_workflow_trash_action_soft_delete(self):
+        """
+        GIVEN:
+            - Document updated workflow with delete action
+        WHEN:
+            - Document that matches is updated
+        THEN:
+            - Document is moved to trash (soft deleted)
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        self.assertEqual(Document.objects.count(), 1)
+        self.assertEqual(Document.deleted_objects.count(), 0)
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        self.assertEqual(Document.objects.count(), 0)
+        self.assertEqual(Document.deleted_objects.count(), 1)
+
+    @override_settings(
+        PAPERLESS_EMAIL_HOST="localhost",
+        EMAIL_ENABLED=True,
+        PAPERLESS_URL="http://localhost:8000",
+    )
+    @mock.patch("django.core.mail.message.EmailMessage.send")
+    def test_workflow_trash_with_email_action(self, mock_email_send):
+        """
+        GIVEN:
+            - Workflow with email action, then move to trash action
+        WHEN:
+            - Document matches and workflow runs
+        THEN:
+            - Email is sent first
+            - Document is moved to trash (soft deleted)
+        """
+        mock_email_send.return_value = 1
+
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        email_action = WorkflowActionEmail.objects.create(
+            subject="Document deleted: {doc_title}",
+            body="Document {doc_title} will be deleted",
+            to="user@example.com",
+            include_document=False,
+        )
+        email_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.EMAIL,
+            email=email_action,
+        )
+        trash_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
+        )
+        w = Workflow.objects.create(
+            name="Workflow with email then move to trash",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(email_workflow_action, trash_workflow_action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        self.assertEqual(Document.objects.count(), 1)
+        self.assertEqual(Document.deleted_objects.count(), 0)
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        mock_email_send.assert_called_once()
+        self.assertEqual(Document.objects.count(), 0)
+        self.assertEqual(Document.deleted_objects.count(), 1)
+
+    @override_settings(
+        PAPERLESS_URL="http://localhost:8000",
+    )
+    @mock.patch("documents.workflows.webhooks.send_webhook.delay")
+    def test_workflow_trash_with_webhook_action(self, mock_webhook_delay):
+        """
+        GIVEN:
+            - Workflow with webhook action (include_document=True), then move to trash action
+        WHEN:
+            - Document matches and workflow runs
+        THEN:
+            - Webhook .delay() is called with complete data including file bytes
+            - Document is moved to trash (soft deleted)
+            - Webhook task has all necessary data and doesn't rely on document existence
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        webhook_action = WorkflowActionWebhook.objects.create(
+            use_params=True,
+            params={
+                "title": "{{doc_title}}",
+                "message": "Document being deleted",
+            },
+            url="https://paperless-ngx.com/webhook",
+            include_document=True,
+        )
+        webhook_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.WEBHOOK,
+            webhook=webhook_action,
+        )
+        trash_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
+        )
+        w = Workflow.objects.create(
+            name="Workflow with webhook then move to trash",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(webhook_workflow_action, trash_workflow_action)
+        w.save()
+
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="simple.pdf",
+            filename=test_file,
+            mime_type="application/pdf",
+        )
+
+        self.assertEqual(Document.objects.count(), 1)
+        self.assertEqual(Document.deleted_objects.count(), 0)
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        mock_webhook_delay.assert_called_once()
+        call_kwargs = mock_webhook_delay.call_args[1]
+        self.assertEqual(call_kwargs["url"], "https://paperless-ngx.com/webhook")
+        self.assertEqual(
+            call_kwargs["data"],
+            {"title": "sample test", "message": "Document being deleted"},
+        )
+        self.assertIsNotNone(call_kwargs["files"])
+        self.assertIn("file", call_kwargs["files"])
+        self.assertEqual(call_kwargs["files"]["file"][0], "simple.pdf")
+        self.assertEqual(call_kwargs["files"]["file"][2], "application/pdf")
+        self.assertIsInstance(call_kwargs["files"]["file"][1], bytes)
+
+        self.assertEqual(Document.objects.count(), 0)
+        self.assertEqual(Document.deleted_objects.count(), 1)
+
+    @override_settings(
+        PAPERLESS_EMAIL_HOST="localhost",
+        EMAIL_ENABLED=True,
+        PAPERLESS_URL="http://localhost:8000",
+    )
+    @mock.patch("django.core.mail.message.EmailMessage.send")
+    def test_workflow_trash_after_email_failure(self, mock_email_send) -> None:
+        """
+        GIVEN:
+            - Workflow with email action (that fails), then move to trash action
+        WHEN:
+            - Document matches and workflow runs
+            - Email action raises exception
+        THEN:
+            - Email failure is logged
+            - Move to Trash still executes successfully (soft delete)
+        """
+        mock_email_send.side_effect = Exception("Email server error")
+
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        email_action = WorkflowActionEmail.objects.create(
+            subject="Document deleted: {doc_title}",
+            body="Document {doc_title} will be deleted",
+            to="user@example.com",
+            include_document=False,
+        )
+        email_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.EMAIL,
+            email=email_action,
+        )
+        trash_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
+        )
+        w = Workflow.objects.create(
+            name="Workflow with failing email then move to trash",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(email_workflow_action, trash_workflow_action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        self.assertEqual(Document.objects.count(), 1)
+        self.assertEqual(Document.deleted_objects.count(), 0)
+
+        with self.assertLogs("paperless.workflows.actions", level="ERROR") as cm:
+            run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+            expected_str = "Error occurred sending notification email"
+            self.assertIn(expected_str, cm.output[0])
+
+        self.assertEqual(Document.objects.count(), 0)
+        self.assertEqual(Document.deleted_objects.count(), 1)
+
+    def test_multiple_workflows_trash_then_assignment(self):
+        """
+        GIVEN:
+            - Workflow 1 (order=0) with move to trash action
+            - Workflow 2 (order=1) with assignment action
+            - Both workflows match the same document
+        WHEN:
+            - Workflows run sequentially
+        THEN:
+            - First workflow runs and deletes document (soft delete)
+            - Second workflow does not trigger (document no longer exists)
+            - Logs confirm move to trash and skipping of remaining workflows
+        """
+        trigger1 = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        trash_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
+        )
+        w1 = Workflow.objects.create(
+            name="Workflow 1 - Move to Trash",
+            order=0,
+        )
+        w1.triggers.add(trigger1)
+        w1.actions.add(trash_workflow_action)
+        w1.save()
+
+        trigger2 = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        assignment_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.ASSIGNMENT,
+            assign_correspondent=self.c2,
+        )
+        w2 = Workflow.objects.create(
+            name="Workflow 2 - Assignment",
+            order=1,
+        )
+        w2.triggers.add(trigger2)
+        w2.actions.add(assignment_action)
+        w2.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        self.assertEqual(Document.objects.count(), 1)
+        self.assertEqual(Document.deleted_objects.count(), 0)
+
+        with self.assertLogs("paperless", level="DEBUG") as cm:
+            run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        self.assertEqual(Document.objects.count(), 0)
+        self.assertEqual(Document.deleted_objects.count(), 1)
+
+        # We check logs instead of WorkflowRun.objects.count() because when the document
+        # is soft-deleted, the WorkflowRun is cascade-deleted (hard delete) since it does
+        # not inherit from the SoftDeleteModel. The logs confirm that the first workflow
+        # executed the move to trash and remaining workflows were skipped.
+        log_output = "\n".join(cm.output)
+        self.assertIn("Moved document", log_output)
+        self.assertIn("to trash", log_output)
+        self.assertIn(
+            "Document was moved to trash, skipping remaining workflows",
+            log_output,
+        )
+
+    def test_workflow_delete_action_during_consumption(self):
+        """
+        GIVEN:
+            - Workflow with consumption trigger and delete action
+        WHEN:
+            - Document is being consumed and workflow runs
+        THEN:
+            - StopConsumeTaskError is raised to halt consumption
+            - Original file is deleted
+            - No document is created
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            sources=f"{DocumentSource.ConsumeFolder}",
+            filter_filename="*",
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
+        )
+        w = Workflow.objects.create(
+            name="Workflow Delete During Consumption",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        # Create a test file to be consumed
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
+        test_file_path = Path(test_file)
+        self.assertTrue(test_file_path.exists())
+
+        # Create a ConsumableDocument
+        consumable_doc = ConsumableDocument(
+            source=DocumentSource.ConsumeFolder,
+            original_file=test_file_path,
+        )
+
+        self.assertEqual(Document.objects.count(), 0)
+
+        # Run workflows with overrides (consumption flow)
+        with self.assertRaises(StopConsumeTaskError) as context:
+            run_workflows(
+                WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                consumable_doc,
+                overrides=DocumentMetadataOverrides(),
+            )
+
+        self.assertIn("deleted by workflow action", str(context.exception))
+
+        # File should be deleted
+        self.assertFalse(test_file_path.exists())
+
+        # No document should be created
+        self.assertEqual(Document.objects.count(), 0)
+
+    def test_workflow_delete_action_during_consumption_with_assignment(self):
+        """
+        GIVEN:
+            - Workflow with consumption trigger, assignment action, then delete action
+        WHEN:
+            - Document is being consumed and workflow runs
+        THEN:
+            - StopConsumeTaskError is raised to halt consumption
+            - Original file is deleted
+            - No document is created (even though assignment would have worked)
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            sources=f"{DocumentSource.ConsumeFolder}",
+            filter_filename="*",
+        )
+        assignment_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.ASSIGNMENT,
+            assign_title="This should not be applied",
+            assign_correspondent=self.c,
+        )
+        trash_workflow_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
+        )
+        w = Workflow.objects.create(
+            name="Workflow Assignment then Delete During Consumption",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(assignment_action, trash_workflow_action)
+        w.save()
+
+        # Create a test file to be consumed
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple2.pdf",
+        )
+        test_file_path = Path(test_file)
+        self.assertTrue(test_file_path.exists())
+
+        # Create a ConsumableDocument
+        consumable_doc = ConsumableDocument(
+            source=DocumentSource.ConsumeFolder,
+            original_file=test_file_path,
+        )
+
+        self.assertEqual(Document.objects.count(), 0)
+
+        # Run workflows with overrides (consumption flow)
+        with self.assertRaises(StopConsumeTaskError):
+            run_workflows(
+                WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                consumable_doc,
+                overrides=DocumentMetadataOverrides(),
+            )
+
+        # File should be deleted
+        self.assertFalse(test_file_path.exists())
+
+        # No document should be created
+        self.assertEqual(Document.objects.count(), 0)
+
 
 class TestWebhookSend:
     def test_send_webhook_data_or_json(
@@ -3956,13 +4380,17 @@ class TestWebhookSend:
 
 
 @pytest.fixture
-def resolve_to(monkeypatch):
+def resolve_to(monkeypatch: pytest.MonkeyPatch) -> Callable[[str], None]:
     """
     Force DNS resolution to a specific IP for any hostname.
     """
 
-    def _set(ip: str):
-        def fake_getaddrinfo(host, *_args, **_kwargs):
+    def _set(ip: str) -> None:
+        def fake_getaddrinfo(
+            host: str,
+            *_args: object,
+            **_kwargs: object,
+        ) -> list[tuple[Any, ...]]:
             return [(socket.AF_INET, None, None, "", (ip, 0))]
 
         monkeypatch.setattr(socket, "getaddrinfo", fake_getaddrinfo)
@@ -4103,7 +4531,7 @@ class TestWebhookSecurity:
     def test_strips_user_supplied_host_header(
         self,
         httpx_mock: HTTPXMock,
-        resolve_to,
+        resolve_to: Callable[[str], None],
     ) -> None:
         """
         GIVEN:
@@ -4169,7 +4597,7 @@ class TestDateWorkflowLocalization(
         self,
         title_template: str,
         expected_title: str,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Document added workflow with title template using localize_date filter
@@ -4234,7 +4662,7 @@ class TestDateWorkflowLocalization(
         self,
         title_template: str,
         expected_title: str,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Document updated workflow with title template using localize_date filter
@@ -4310,7 +4738,7 @@ class TestDateWorkflowLocalization(
         settings: SettingsWrapper,
         title_template: str,
         expected_title: str,
-    ):
+    ) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
             sources=f"{DocumentSource.ApiUpload}",

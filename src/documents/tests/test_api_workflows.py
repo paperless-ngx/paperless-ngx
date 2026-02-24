@@ -896,3 +896,210 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                 "Passwords are required",
                 str(response.data["non_field_errors"][0]),
             )
+
+    def test_trash_action_validation(self) -> None:
+        """
+        GIVEN:
+            - API request to create a workflow with a trash action
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP response
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow 2",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow 3",
+                    "order": 2,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_trash_action_as_last_action_valid(self) -> None:
+        """
+        GIVEN:
+            - API request to create a workflow with multiple actions
+            - Move to trash action is the last action
+        WHEN:
+            - API is called
+        THEN:
+            - Workflow is created successfully
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow with Move to Trash Last",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
+                            "assign_title": "Assigned Title",
+                        },
+                        {
+                            "type": WorkflowAction.WorkflowActionType.REMOVAL,
+                            "remove_all_tags": True,
+                        },
+                        {
+                            "type": WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_update_workflow_add_trash_at_end_valid(self) -> None:
+        """
+        GIVEN:
+            - Existing workflow without trash action
+        WHEN:
+            - PATCH to add trash action at end
+        THEN:
+            - HTTP 200 success
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow to Add Move to Trash",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
+                            "assign_title": "First Action",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        workflow_id = response.data["id"]
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{workflow_id}/",
+            json.dumps(
+                {
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
+                            "assign_title": "First Action",
+                        },
+                        {
+                            "type": WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_update_workflow_remove_trash_action_valid(self) -> None:
+        """
+        GIVEN:
+            - Existing workflow with trash action
+        WHEN:
+            - PATCH to remove trash action
+        THEN:
+            - HTTP 200 success
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow to Remove move to trash",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
+                            "assign_title": "First Action",
+                        },
+                        {
+                            "type": WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        workflow_id = response.data["id"]
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{workflow_id}/",
+            json.dumps(
+                {
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
+                            "assign_title": "Only Action",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

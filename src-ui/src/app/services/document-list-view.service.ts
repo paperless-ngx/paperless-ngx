@@ -342,7 +342,7 @@ export class DocumentListViewService {
       })
   }
 
-  set filterRules(filterRules: FilterRule[]) {
+  setFilterRules(filterRules: FilterRule[], resetPage: boolean = false) {
     if (
       !isFullTextFilterRule(filterRules) &&
       this.activeListViewState.sortField == 'score'
@@ -350,6 +350,9 @@ export class DocumentListViewService {
       this.activeListViewState.sortField = 'created'
     }
     this.activeListViewState.filterRules = filterRules
+    if (resetPage) {
+      this.activeListViewState.currentPage = 1
+    }
     this.reload()
     this.reduceSelectionToFilter()
     this.saveDocumentListView()
@@ -479,7 +482,7 @@ export class DocumentListViewService {
 
   quickFilter(filterRules: FilterRule[]) {
     this._activeSavedViewId = null
-    this.filterRules = filterRules
+    this.setFilterRules(filterRules)
     this.router.navigate(['documents'])
   }
 

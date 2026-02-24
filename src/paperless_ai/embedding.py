@@ -23,6 +23,7 @@ def get_embedding_model() -> BaseEmbedding:
             return OpenAIEmbedding(
                 model=config.llm_embedding_model or "text-embedding-3-small",
                 api_key=config.llm_api_key,
+                api_base=config.llm_endpoint or None,
             )
         case LLMEmbeddingBackend.HUGGINGFACE:
             return HuggingFaceEmbedding(

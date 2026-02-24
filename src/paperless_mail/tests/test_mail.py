@@ -8,6 +8,7 @@ from datetime import timedelta
 from unittest import mock
 
 import pytest
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.db import DatabaseError
@@ -1734,6 +1735,10 @@ class TestMailAccountTestView(APITestCase):
             username="testuser",
             password="testpassword",
         )
+        self.user.user_permissions.add(
+            *Permission.objects.filter(codename__in=["add_mailaccount"]),
+        )
+        self.user.save()
         self.client.force_authenticate(user=self.user)
         self.url = "/api/mail_accounts/test/"
 
@@ -1849,6 +1854,56 @@ class TestMailAccountTestView(APITestCase):
             error_str = cm.output[0]
             expected_str = "Unable to refresh oauth token"
             self.assertIn(expected_str, error_str)
+
+    def test_mail_account_test_view_existing_forbidden_for_other_owner(self) -> None:
+        other_user = User.objects.create_user(
+            username="otheruser",
+            password="testpassword",
+        )
+        existing_account = MailAccount.objects.create(
+            name="Owned account",
+            imap_server="imap.example.com",
+            imap_port=993,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            username="admin",
+            password="secret",
+            owner=other_user,
+        )
+        data = {
+            "id": existing_account.id,
+            "imap_server": "imap.example.com",
+            "imap_port": 993,
+            "imap_security": MailAccount.ImapSecurity.SSL,
+            "username": "admin",
+            "password": "****",
+            "is_token": False,
+        }
+
+        response = self.client.post(self.url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.content.decode(), "Insufficient permissions")
+
+    def test_mail_account_test_view_requires_add_permission_without_account_id(
+        self,
+    ) -> None:
+        self.user.user_permissions.remove(
+            *Permission.objects.filter(codename__in=["add_mailaccount"]),
+        )
+        self.user.save()
+        data = {
+            "imap_server": "imap.example.com",
+            "imap_port": 993,
+            "imap_security": MailAccount.ImapSecurity.SSL,
+            "username": "admin",
+            "password": "secret",
+            "is_token": False,
+        }
+
+        response = self.client.post(self.url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.content.decode(), "Insufficient permissions")
 
 
 class TestMailAccountProcess(APITestCase):

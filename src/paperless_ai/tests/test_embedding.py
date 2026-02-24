@@ -65,12 +65,14 @@ def test_get_embedding_model_openai(mock_ai_config):
     mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OPENAI
     mock_ai_config.return_value.llm_embedding_model = "text-embedding-3-small"
     mock_ai_config.return_value.llm_api_key = "test_api_key"
+    mock_ai_config.return_value.llm_endpoint = "http://test-url"
 
     with patch("paperless_ai.embedding.OpenAIEmbedding") as MockOpenAIEmbedding:
         model = get_embedding_model()
         MockOpenAIEmbedding.assert_called_once_with(
             model="text-embedding-3-small",
             api_key="test_api_key",
+            api_base="http://test-url",
         )
         assert model == MockOpenAIEmbedding.return_value
 
