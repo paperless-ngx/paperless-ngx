@@ -32,24 +32,30 @@ required files, pulls the image, starts the containers, and creates
 your [superuser](usage.md#superusers) account. In short, it automates the [Docker Compose setup](#docker)
 described below.
 
-1.  Make sure that Docker and Docker Compose are [installed](https://docs.docker.com/engine/install/){:target="\_blank"}.
+**Prerequisites**
 
-2.  Download and run the installation script:
+-   Docker and Docker Compose must be [installed](https://docs.docker.com/engine/install/){:target="\_blank"}.
 
-    ```shell-session
-    bash -c "$(curl --location --silent --show-error https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/install-paperless-ngx.sh)"
-    ```
+**Run the installation script**
 
-    !!! note
+```shell-session
+bash -c "$(curl --location --silent --show-error https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/install-paperless-ngx.sh)"
+```
 
-        macOS users will need to install [GNU sed](https://formulae.brew.sh/formula/gnu-sed) with support
-        for running as `sed` as well as [wget](https://formulae.brew.sh/formula/wget).
+!!! note
+
+    macOS users will need to install [GNU sed](https://formulae.brew.sh/formula/gnu-sed) with support
+    for running as `sed` as well as [wget](https://formulae.brew.sh/formula/wget).
 
 ### Use Docker Compose {#docker}
 
-1.  Make sure that Docker and Docker Compose are [installed](https://docs.docker.com/engine/install/){:target="\_blank"}.
+**Prerequisites**
 
-2.  Go to the [/docker/compose directory on the project
+-   Docker and Docker Compose must be [installed](https://docs.docker.com/engine/install/){:target="\_blank"}.
+
+**Installation**
+
+1.  Go to the [/docker/compose directory on the project
     page](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose){:target="\_blank"}
     and download one `docker-compose.*.yml` file for your preferred
     database backend. Save it in a local directory as `docker-compose.yml`.
@@ -63,7 +69,7 @@ described below.
         For new installations, it is recommended to use PostgreSQL as the
         database backend.
 
-3.  Modify `docker-compose.yml` as needed. For example, you may want to
+2.  Modify `docker-compose.yml` as needed. For example, you may want to
     change the paths for `consume`, `media`, and other directories to
     use bind mounts.
     Find the line that specifies where to mount the directory, e.g.:
@@ -109,7 +115,7 @@ described below.
     >   user: <user_id>
     > ```
 
-4.  Modify `docker-compose.env` with any configuration options you need.
+3.  Modify `docker-compose.env` with any configuration options you need.
     See the [configuration documentation](configuration.md) for all options.
 
     You may also need to set `USERMAP_UID` and `USERMAP_GID` to
@@ -135,13 +141,13 @@ described below.
         [`PAPERLESS_CONSUMER_POLLING`](configuration.md#PAPERLESS_CONSUMER_POLLING), which will disable inotify. See
         [here](configuration.md#polling).
 
-5.  Run `docker compose pull`. This will pull the image from the GitHub container registry
+4.  Run `docker compose pull`. This will pull the image from the GitHub container registry
     by default but you can change the image to pull from Docker Hub by changing the `image`
     line to `image: paperlessngx/paperless-ngx:latest`.
 
-6.  Run `docker compose up -d`. This will create and start the necessary containers.
+5.  Run `docker compose up -d`. This will create and start the necessary containers.
 
-7.  Your Paperless-ngx instance should now be accessible at
+6.  Your Paperless-ngx instance should now be accessible at
     `http://127.0.0.1:8000` (or similar, depending on your configuration).
     When you first access the web interface, you will be
     prompted to create a [superuser](usage.md#superusers) account.
