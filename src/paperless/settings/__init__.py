@@ -284,7 +284,7 @@ DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
 # Directories                                                                 #
 ###############################################################################
 
-BASE_DIR: Path = Path(__file__).resolve().parent.parent
+BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent
 
 STATIC_ROOT = __get_path("PAPERLESS_STATICDIR", BASE_DIR.parent / "static")
 
