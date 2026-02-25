@@ -316,7 +316,7 @@ MODEL_FILE = __get_path(
 # document type, or storage path. 0.0 disables the threshold.
 CLASSIFIER_MATCH_THRESHOLD: Final[float] = __get_float(
     "PAPERLESS_CLASSIFIER_MATCH_THRESHOLD",
-    0.0,
+    0.6,
 )
 LLM_INDEX_DIR = DATA_DIR / "llm_index"
 

@@ -1022,6 +1022,15 @@ still perform some basic text pre-processing before matching.
 
     Defaults to true, enabling the feature.
 
+#### [`PAPERLESS_CLASSIFIER_MATCH_THRESHOLD=<float>`](#PAPERLESS_CLASSIFIER_MATCH_THRESHOLD) {#PAPERLESS_CLASSIFIER_MATCH_THRESHOLD}
+
+: Sets the minimum confidence score (0.0-1.0) required for the automatic
+classifier to assign a correspondent, document type, or storage path to a
+document. Predictions below this threshold are discarded and the field is
+left unassigned, preventing low-confidence guesses from being applied.
+
+    Defaults to 0.6.
+
 #### [`PAPERLESS_DATE_PARSER_LANGUAGES=<lang>`](#PAPERLESS_DATE_PARSER_LANGUAGES) {#PAPERLESS_DATE_PARSER_LANGUAGES}
 
 Specifies which language Paperless should use when parsing dates from documents.
