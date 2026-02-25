@@ -311,6 +311,13 @@ MODEL_FILE = __get_path(
     "PAPERLESS_MODEL_FILE",
     DATA_DIR / "classification_model.pickle",
 )
+
+# Minimum confidence (0.0-1.0) for the ML classifier to assign a correspondent,
+# document type, or storage path. 0.0 disables the threshold.
+CLASSIFIER_MATCH_THRESHOLD: Final[float] = __get_float(
+    "PAPERLESS_CLASSIFIER_MATCH_THRESHOLD",
+    0.0,
+)
 LLM_INDEX_DIR = DATA_DIR / "llm_index"
 
 LOGGING_DIR = __get_path("PAPERLESS_LOGGING_DIR", DATA_DIR / "log")
