@@ -18,6 +18,7 @@ from typing import TypeVar
 from django import db
 from django.core.management import CommandError
 from django_rich.management import RichCommand
+from rich.console import Console
 from rich.progress import BarColumn
 from rich.progress import MofNCompleteColumn
 from rich.progress import Progress
@@ -142,6 +143,12 @@ class PaperlessCommand(RichCommand):
         """
         Create a configured Progress instance.
 
+        Progress output is directed to stderr to match the convention that
+        progress bars are transient UI feedback, not command output. This
+        mirrors tqdm's default behavior and prevents progress bar rendering
+        from interfering with stdout-based assertions in tests or piped
+        command output.
+
         Args:
             description: Text to display alongside the progress bar.
 
@@ -155,7 +162,7 @@ class PaperlessCommand(RichCommand):
             MofNCompleteColumn(),
             TimeElapsedColumn(),
             TimeRemainingColumn(),
-            console=self.console,
+            console=Console(stderr=True),
             transient=False,
         )
 

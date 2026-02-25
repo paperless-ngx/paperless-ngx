@@ -5,13 +5,19 @@ from documents.management.commands.base import PaperlessCommand
 from documents.models import Document
 from documents.parsers import get_parser_class_for_mime_type
 
+logger = logging.getLogger("paperless.management.thumbnails")
+
 
 def _process_document(doc_id: int) -> None:
     document: Document = Document.objects.get(id=doc_id)
     parser_class = get_parser_class_for_mime_type(document.mime_type)
 
     if parser_class is None:
-        print(f"{document} No parser for mime type {document.mime_type}")  # noqa: T201
+        logger.warning(
+            "%s: No parser for mime type %s",
+            document,
+            document.mime_type,
+        )
         return
 
     parser = parser_class(logging_group=None)

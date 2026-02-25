@@ -140,7 +140,7 @@ class TestFuzzyMatchCommand(TestCase):
             mime_type="application/pdf",
             filename="final_test.pdf",
         )
-        stdout, _ = self.call_command()
+        stdout, _ = self.call_command("--no-progress-bar")
         lines = [x.strip() for x in stdout.splitlines() if x.strip()]
         self.assertEqual(len(lines), 3)
         for line in lines:

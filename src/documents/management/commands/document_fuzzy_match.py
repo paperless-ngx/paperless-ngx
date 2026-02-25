@@ -62,9 +62,10 @@ class Command(PaperlessCommand):
         RATIO_MAX: Final[float] = 100.0
 
         if options["delete"]:
-            self.console.print(
-                "[yellow]The command is configured to delete documents. "
-                "Use with caution.[/yellow]",
+            self.stdout.write(
+                self.style.WARNING(
+                    "The command is configured to delete documents.  Use with caution",
+                ),
             )
 
         opt_ratio = options["ratio"]
@@ -90,17 +91,21 @@ class Command(PaperlessCommand):
                 work_pkgs.append(_WorkPackage(first_doc, second_doc))
 
         results: list[_WorkResult] = []
-        for result in self.process_parallel(
-            _process_and_match,
-            work_pkgs,
-            description="Matching...",
-        ):
-            if result.error:
-                self.console.print(
-                    f"[red]Failed: {result.error}[/red]",
-                )
-            elif result.result is not None:
-                results.append(result.result)
+        if self.process_count == 1:
+            for work in self.track(work_pkgs, description="Matching..."):
+                results.append(_process_and_match(work))
+        else:  # pragma: no cover
+            for proc_result in self.process_parallel(
+                _process_and_match,
+                work_pkgs,
+                description="Matching...",
+            ):
+                if proc_result.error:
+                    self.console.print(
+                        f"[red]Failed: {proc_result.error}[/red]",
+                    )
+                elif proc_result.result is not None:
+                    results.append(proc_result.result)
 
         messages: list[str] = []
         maybe_delete_ids: list[int] = []
@@ -120,8 +125,9 @@ class Command(PaperlessCommand):
         self.stdout.writelines(messages)
 
         if options["delete"]:
-            self.console.print(
-                f"[yellow]Deleting {len(maybe_delete_ids)} documents "
-                f"based on ratio matches[/yellow]",
+            self.stdout.write(
+                self.style.NOTICE(
+                    f"Deleting {len(maybe_delete_ids)} documents based on ratio matches",
+                ),
             )
             Document.objects.filter(pk__in=maybe_delete_ids).delete()
