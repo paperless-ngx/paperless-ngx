@@ -149,7 +149,6 @@ typing = [
   "types-pytz",
   "types-redis",
   "types-setuptools",
-  "types-tqdm",
 ]
 
 [tool.uv]
