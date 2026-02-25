@@ -549,28 +549,6 @@ class ColorField(serializers.Field):
         return 1
 
 
-class TagSerializerVersion1(MatchingModelSerializer, OwnedObjectSerializer):
-    colour = ColorField(source="color", default="#a6cee3")
-
-    class Meta:
-        model = Tag
-        fields = (
-            "id",
-            "slug",
-            "name",
-            "colour",
-            "match",
-            "matching_algorithm",
-            "is_insensitive",
-            "is_inbox_tag",
-            "document_count",
-            "owner",
-            "permissions",
-            "user_can_change",
-            "set_permissions",
-        )
-
-
 class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     def get_text_color(self, obj) -> str:
         try:
