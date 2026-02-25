@@ -37,6 +37,7 @@ dependencies = [
   "django-filter~=25.1",
   "django-guardian~=3.2.0",
   "django-multiselectfield~=1.0.1",
+  "django-rich~=2.2.0",
   "django-soft-delete~=1.0.18",
   "django-treenode>=0.23.2",
   "djangorestframework~=3.16",
@@ -76,7 +77,6 @@ dependencies = [
   "setproctitle~=1.3.4",
   "tika-client~=0.10.0",
   "torch~=2.10.0",
-  "tqdm~=4.67.1",
   "watchfiles>=1.1.1",
   "whitenoise~=6.11",
   "whoosh-reloaded>=2.7.5",
@@ -304,6 +304,7 @@ markers = [
   "tika: Tests requiring Tika service",
   "greenmail: Tests requiring Greenmail service",
   "date_parsing: Tests which cover date parsing from content or filename",
+  "management: Tests which cover management commands/functionality",
 ]
 
 [tool.pytest_env]

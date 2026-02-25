@@ -1,3 +1,4 @@
+import pytest
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
@@ -10,6 +11,7 @@ from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin
 
 
+@pytest.mark.management
 class TestRetagger(DirectoriesMixin, TestCase):
     def make_models(self) -> None:
         self.sp1 = StoragePath.objects.create(

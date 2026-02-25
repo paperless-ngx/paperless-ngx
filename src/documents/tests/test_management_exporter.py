@@ -7,6 +7,7 @@ from pathlib import Path
 from unittest import mock
 from zipfile import ZipFile
 
+import pytest
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.models import SocialApp
 from allauth.socialaccount.models import SocialToken
@@ -45,6 +46,7 @@ from documents.tests.utils import paperless_environment
 from paperless_mail.models import MailAccount
 
 
+@pytest.mark.management
 class TestExportImport(
     DirectoriesMixin,
     FileSystemAssertsMixin,
@@ -846,6 +848,7 @@ class TestExportImport(
         self.assertEqual(Document.objects.all().count(), 4)
 
 
+@pytest.mark.management
 class TestCryptExportImport(
     DirectoriesMixin,
     FileSystemAssertsMixin,

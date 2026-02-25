@@ -4,6 +4,7 @@ from io import StringIO
 from pathlib import Path
 from unittest import mock
 
+import pytest
 from auditlog.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
@@ -19,6 +20,7 @@ from documents.tests.utils import FileSystemAssertsMixin
 sample_file: Path = Path(__file__).parent / "samples" / "simple.pdf"
 
 
+@pytest.mark.management
 @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
 class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def make_models(self):
@@ -94,6 +96,7 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertEqual(doc2.archive_filename, "document_01.pdf")
 
 
+@pytest.mark.management
 class TestMakeIndex(TestCase):
     @mock.patch("documents.management.commands.document_index.index_reindex")
     def test_reindex(self, m) -> None:
@@ -106,6 +109,7 @@ class TestMakeIndex(TestCase):
         m.assert_called_once()
 
 
+@pytest.mark.management
 class TestRenamer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @override_settings(FILENAME_FORMAT="")
     def test_rename(self) -> None:
@@ -140,6 +144,7 @@ class TestCreateClassifier(TestCase):
         m.assert_called_once()
 
 
+@pytest.mark.management
 class TestSanityChecker(DirectoriesMixin, TestCase):
     def test_no_issues(self) -> None:
         with self.assertLogs() as capture:
@@ -165,6 +170,7 @@ class TestSanityChecker(DirectoriesMixin, TestCase):
         self.assertIn("Checksum mismatch. Stored: abc, actual:", capture.output[1])
 
 
+@pytest.mark.management
 class TestConvertMariaDBUUID(TestCase):
     @mock.patch("django.db.connection.schema_editor")
     def test_convert(self, m) -> None:
@@ -178,6 +184,7 @@ class TestConvertMariaDBUUID(TestCase):
         self.assertIn("Successfully converted", stdout.getvalue())
 
 
+@pytest.mark.management
 class TestPruneAuditLogs(TestCase):
     def test_prune_audit_logs(self) -> None:
         LogEntry.objects.create(
