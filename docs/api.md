@@ -60,6 +60,36 @@ The REST api provides five different forms of authentication.
     [here](advanced_usage.md#openid-connect-and-social-authentication) for more
     information on social accounts.
 
+6.  External app browser login (one-time code exchange)
+
+    When
+    [`PAPERLESS_EXTERNAL_AUTH_ALLOWED_REDIRECT_URIS`](configuration.md#PAPERLESS_EXTERNAL_AUTH_ALLOWED_REDIRECT_URIS)
+    is configured, third-party apps can:
+
+    -   Open `/api/auth/external-login/start/?redirect_uri=<callback>&state=<opaque-state>&code_challenge=<pkce-challenge>&code_challenge_method=S256` in a browser.
+    -   Let the user authenticate with any enabled Paperless login method.
+    -   Approve access on the consent screen shown by Paperless.
+    -   Receive a redirect to `<callback>?code=<one-time-code>&state=<opaque-state>` (or `<callback>?error=access_denied&state=<opaque-state>` if denied).
+    -   Exchange the code at `/api/auth/external-login/exchange/` with JSON body:
+
+    ```json
+    {
+        "code": "one-time-code",
+        "code_verifier": "pkce-code-verifier",
+        "redirect_uri": "your-registered-callback-uri"
+    }
+    ```
+
+    Use custom schemes or `https://` callback URIs where possible. Plain `http://` callbacks are less secure and should be limited to trusted local development.
+
+    The exchange response returns a token payload:
+
+    ```json
+    {
+        "token": "<drf-token>"
+    }
+    ```
+
 ## Searching for documents
 
 Full text searching is available on the `/api/documents/` endpoint. Two

@@ -718,6 +718,27 @@ If both the [PAPERLESS_ACCOUNT_DEFAULT_GROUPS](#PAPERLESS_ACCOUNT_DEFAULT_GROUPS
 
     Defaults to False
 
+#### [`PAPERLESS_EXTERNAL_AUTH_ALLOWED_REDIRECT_URIS=<comma-separated-list>`](#PAPERLESS_EXTERNAL_AUTH_ALLOWED_REDIRECT_URIS) {#PAPERLESS_EXTERNAL_AUTH_ALLOWED_REDIRECT_URIS}
+
+: Allowed callback URIs for third-party app login handoff via `/api/auth/external-login/start/`.
+Only exact URI matches are accepted.
+Using `http://` callback URIs is less secure because callback parameters can be intercepted or logged in transit.
+Prefer custom schemes or `https://` callbacks, and only allow `http://` for trusted local development scenarios.
+
+    Defaults to None (feature disabled)
+
+#### [`PAPERLESS_EXTERNAL_AUTH_CODE_TTL_SECONDS=<int>`](#PAPERLESS_EXTERNAL_AUTH_CODE_TTL_SECONDS) {#PAPERLESS_EXTERNAL_AUTH_CODE_TTL_SECONDS}
+
+: Lifetime in seconds for one-time external login exchange codes.
+
+    Defaults to 60
+
+#### [`PAPERLESS_EXTERNAL_AUTH_FLOW_TTL_SECONDS=<int>`](#PAPERLESS_EXTERNAL_AUTH_FLOW_TTL_SECONDS) {#PAPERLESS_EXTERNAL_AUTH_FLOW_TTL_SECONDS}
+
+: Lifetime in seconds for in-browser external login flow state stored in the session.
+
+    Defaults to 600
+
 #### [`PAPERLESS_ACCOUNT_SESSION_REMEMBER=<bool>`](#PAPERLESS_ACCOUNT_SESSION_REMEMBER) {#PAPERLESS_ACCOUNT_SESSION_REMEMBER}
 
 : If false, sessions will expire at browser close, if true will use `PAPERLESS_SESSION_COOKIE_AGE` for expiration. See the corresponding
