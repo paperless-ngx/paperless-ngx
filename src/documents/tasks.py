@@ -156,15 +156,22 @@ def consume_file(
     if overrides is None:
         overrides = DocumentMetadataOverrides()
 
-    plugins: list[type[ConsumeTaskPlugin]] = [
-        ConsumerPreflightPlugin,
-        AsnCheckPlugin,
-        CollatePlugin,
-        BarcodePlugin,
-        AsnCheckPlugin,  # Re-run ASN check after barcode reading
-        WorkflowTriggerPlugin,
-        ConsumerPlugin,
-    ]
+    plugins: list[type[ConsumeTaskPlugin]] = (
+        [
+            ConsumerPreflightPlugin,
+            ConsumerPlugin,
+        ]
+        if input_doc.root_document_id is not None
+        else [
+            ConsumerPreflightPlugin,
+            AsnCheckPlugin,
+            CollatePlugin,
+            BarcodePlugin,
+            AsnCheckPlugin,  # Re-run ASN check after barcode reading
+            WorkflowTriggerPlugin,
+            ConsumerPlugin,
+        ]
+    )
 
     with (
         ProgressManager(

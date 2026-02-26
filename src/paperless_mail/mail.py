@@ -536,6 +536,7 @@ class MailAccountHandler(LoggingMixin):
         self.log.debug(f"Processing mail account {account}")
 
         total_processed_files = 0
+        consumed_messages: set[tuple[str, str | None]] = set()
         try:
             with get_mailbox(
                 account.imap_server,
@@ -574,6 +575,7 @@ class MailAccountHandler(LoggingMixin):
                             M,
                             rule,
                             supports_gmail_labels=supports_gmail_labels,
+                            consumed_messages=consumed_messages,
                         )
                         if total_processed_files > 0 and rule.stop_processing:
                             self.log.debug(
@@ -605,7 +607,8 @@ class MailAccountHandler(LoggingMixin):
         rule: MailRule,
         *,
         supports_gmail_labels: bool,
-    ):
+        consumed_messages: set[tuple[str, str | None]],
+    ) -> int:
         folders = [rule.folder]
         # In case of MOVE, make sure also the destination exists
         if rule.action == MailRule.MailAction.MOVE:
@@ -652,10 +655,25 @@ class MailAccountHandler(LoggingMixin):
 
         mails_processed = 0
         total_processed_files = 0
+        rule_seen_messages: set[tuple[str, str | None]] = set()
 
         for message in messages:
             if TYPE_CHECKING:
                 assert isinstance(message, MailMessage)
+
+            message_key = (rule.folder, message.uid)
+            if message_key in rule_seen_messages:
+                self.log.debug(
+                    f"Skipping duplicate fetched mail '{message.uid}' subject '{message.subject}' from '{message.from_}'.",
+                )
+                continue
+            rule_seen_messages.add(message_key)
+
+            if message_key in consumed_messages:
+                self.log.debug(
+                    f"Skipping mail '{message.uid}' subject '{message.subject}' from '{message.from_}', already queued by a previous rule in this run.",
+                )
+                continue
 
             if ProcessedMail.objects.filter(
                 rule=rule,
@@ -669,6 +687,8 @@ class MailAccountHandler(LoggingMixin):
 
             try:
                 processed_files = self._handle_message(message, rule)
+                if processed_files > 0:
+                    consumed_messages.add(message_key)
 
                 total_processed_files += processed_files
                 mails_processed += 1

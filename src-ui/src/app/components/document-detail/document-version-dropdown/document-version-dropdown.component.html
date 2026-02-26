@@ -1,0 +1,134 @@
+<div class="btn-group" ngbDropdown autoClose="outside">
+  <button class="btn btn-sm btn-outline-secondary dropdown-toggle" ngbDropdownToggle>
+    <i-bs name="file-earmark-diff"></i-bs>
+    <span class="d-none d-lg-inline ps-1" i18n>Versions</span>
+  </button>
+  <div class="dropdown-menu shadow" ngbDropdownMenu>
+    <div class="px-3 py-2 mb-2">
+      @if (versionUploadState === UploadState.Idle) {
+        <div class="input-group input-group-sm mb-2">
+          <span class="input-group-text" i18n>Label</span>
+          <input
+            class="form-control"
+            type="text"
+            [(ngModel)]="newVersionLabel"
+            i18n-placeholder
+            placeholder="Optional"
+            [disabled]="!userIsOwner || !userCanEdit"
+          />
+        </div>
+        <input
+          #versionFileInput
+          type="file"
+          class="visually-hidden"
+          (change)="onVersionFileSelected($event)"
+        />
+        <button
+          class="btn btn-sm btn-outline-secondary w-100"
+          (click)="versionFileInput.click()"
+          [disabled]="!userIsOwner || !userCanEdit"
+        >
+          <i-bs name="file-earmark-plus"></i-bs><span class="ps-1" i18n>Add new version</span>
+        </button>
+      } @else {
+        @switch (versionUploadState) {
+          @case (UploadState.Uploading) {
+            <div class="small text-muted mt-1 d-flex align-items-center">
+              <output class="spinner-border spinner-border-sm me-2" aria-hidden="true"></output>
+              <span i18n>Uploading version...</span>
+            </div>
+          }
+          @case (UploadState.Processing) {
+            <div class="small text-muted mt-1 d-flex align-items-center">
+              <output class="spinner-border spinner-border-sm me-2" aria-hidden="true"></output>
+              <span i18n>Processing version...</span>
+            </div>
+          }
+          @case (UploadState.Failed) {
+            <div class="small text-danger mt-1 d-flex align-items-center justify-content-between">
+              <span i18n>Version upload failed.</span>
+              <button type="button" class="btn btn-link btn-sm p-0 ms-2" (click)="clearVersionUploadStatus()" i18n>Dismiss</button>
+            </div>
+            @if (versionUploadError) {
+              <div class="small text-muted mt-1">{{ versionUploadError }}</div>
+            }
+          }
+        }
+      }
+    </div>
+    @for (version of versions; track version.id) {
+      <div class="dropdown-item border-top px-0">
+        <div class="d-flex align-items-center w-100 py-2 version-item">
+          <div class="btn btn-link link-underline link-underline-opacity-0 d-flex align-items-center small text-start p-0 version-link"
+            (click)="selectVersion(version.id)"
+          >
+            <div class="check mx-3">
+              @if (selectedVersionId === version.id) {
+                <i-bs name="check-circle"></i-bs>
+              } @else {
+                <i-bs class="text-muted" name="circle"></i-bs>
+              }
+            </div>
+            <div class="d-flex flex-column">
+              <div class="input-group input-group-sm mb-1">
+                @if (isEditingVersion(version.id)) {
+                  <input
+                    class="form-control"
+                    type="text"
+                    [(ngModel)]="versionLabelDraft"
+                    i18n-placeholder
+                    placeholder="Version label"
+                    [disabled]="savingVersionLabelId !== null"
+                    (keydown.enter)="submitEditedVersionLabel(version, $event)"
+                    (keydown.escape)="cancelEditingVersion($event)"
+                    (click)="$event.stopPropagation()"
+                  />
+                } @else {
+                  <span class="input-group-text version-label">
+                    @if (version.version_label) {
+                      {{ version.version_label }}
+                    } @else {
+                      <span i18n>Version</span>&nbsp;#{{ version.id }}
+                    }
+                  </span>
+                }
+                @if (canEditLabels) {
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    [disabled]="savingVersionLabelId !== null"
+                    (click)="isEditingVersion(version.id) ? submitEditedVersionLabel(version, $event) : beginEditingVersion(version, $event)"
+                  >
+                    @if (isEditingVersion(version.id)) {
+                      <i-bs width=".8rem" height=".8rem" name="check-lg"></i-bs>
+                    } @else {
+                      <i-bs width=".8rem" height=".8rem" name="pencil"></i-bs>
+                    }
+                  </button>
+                }
+              </div>
+              <div class="d-flex text-muted small align-items-center mt-1">
+                {{ version.added | customDate:'short' }}
+                <div class="badge bg-light text-muted ms-auto">
+                  {{ version.checksum | slice:0:8 }}
+                </div>
+              </div>
+            </div>
+          </div>
+          @if (!version.is_root) {
+            <pngx-confirm-button
+              buttonClasses="btn btn-sm btn-link text-danger mx-1"
+              iconName="trash"
+              confirmMessage="Delete this version?"
+              i18n-confirmMessage
+              [disabled]="!userIsOwner || !userCanEdit"
+              (confirm)="deleteVersion(version.id)"
+            >
+              <span class="visually-hidden" i18n>Delete version</span>
+            </pngx-confirm-button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

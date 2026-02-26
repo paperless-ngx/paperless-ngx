@@ -1,5 +1,6 @@
 import logging
 import re
+import uuid
 from pathlib import Path
 
 from django.conf import settings
@@ -15,6 +16,7 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
+from documents.plugins.base import StopConsumeTaskError
 from documents.signals import document_consumption_finished
 from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.workflows.webhooks import send_webhook
@@ -338,3 +340,33 @@ def execute_password_removal_action(
         document.pk,
         extra={"group": logging_group},
     )
+
+
+def execute_move_to_trash_action(
+    action: WorkflowAction,
+    document: Document | ConsumableDocument,
+    logging_group: uuid.UUID | None,
+) -> None:
+    """
+    Execute a move to trash action for a workflow on an existing document or a
+    document in consumption. In case of an existing document it soft-deletes
+    the document. In case of consumption it aborts consumption and deletes the
+    file.
+    """
+    if isinstance(document, Document):
+        document.delete()
+        logger.debug(
+            f"Moved document {document} to trash",
+            extra={"group": logging_group},
+        )
+    else:
+        if document.original_file.exists():
+            document.original_file.unlink()
+        logger.info(
+            f"Workflow move to trash action triggered during consumption, "
+            f"deleting file {document.original_file}",
+            extra={"group": logging_group},
+        )
+        raise StopConsumeTaskError(
+            "Document deleted by workflow action during consumption",
+        )

@@ -161,6 +161,18 @@ export interface Document extends ObjectWithPermissions {
 
   duplicate_documents?: Document[]
 
+  // Versioning
+  root_document?: number
+  versions?: DocumentVersionInfo[]
+
   // Frontend only
   __changedFields?: string[]
+}
+
+export interface DocumentVersionInfo {
+  id: number
+  added?: Date
+  version_label?: string
+  checksum?: string
+  is_root: boolean
 }

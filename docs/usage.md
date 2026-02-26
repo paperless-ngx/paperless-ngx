@@ -89,6 +89,16 @@ You can view the document, edit its metadata, assign tags, correspondents,
 document types, and custom fields. You can also view the document history,
 download the document or share it via a share link.
 
+### Document File Versions
+
+Think of versions as **file history** for a document.
+
+-   Versions track the underlying file and extracted text content (OCR/text).
+-   Metadata such as tags, correspondent, document type, storage path and custom fields stay on the "root" document.
+-   By default, search and document content use the latest version.
+-   In document detail, selecting a version switches the preview, file metadata and content (and download etc buttons) to that version.
+-   Deleting a non-root version keeps metadata and falls back to the latest remaining version.
+
 ### Management Lists
 
 Paperless-ngx includes management lists for tags, correspondents, document types
@@ -372,6 +382,11 @@ permissions can be granted to limit access to certain parts of the UI (and corre
 
 Superusers can access all parts of the front and backend application as well as any and all objects. Superuser status can only be granted by another superuser.
 
+!!! tip
+
+    Because superuser accounts can see all objects and documents, you may want to use a regular account for day-to-day use. Additional superuser accounts can
+    be created via [cli](administration.md#create-superuser) or granted superuser status from an existing superuser account.
+
 #### Admin Status
 
 Admin status (Django 'staff status') grants access to viewing the paperless logs and the system status dialog
@@ -563,6 +578,18 @@ The following workflow action types are available:
 For security reasons, webhooks can be limited to specific ports and disallowed from connecting to local URLs. See the relevant
 [configuration settings](configuration.md#workflow-webhooks) to change this behavior. If you are allowing non-admins to create workflows,
 you may want to adjust these settings to prevent abuse.
+
+##### Move to Trash {#workflow-action-move-to-trash}
+
+"Move to Trash" actions move the document to the trash. The document can be restored
+from the trash until the trash is emptied (after the configured delay or manually).
+
+The "Move to Trash" action will always be executed at the end of the workflow run,
+regardless of its position in the action list. After a "Move to Trash" action is executed
+no other workflow will be executed on the document.
+
+If a "Move to Trash" action is executed in a consume pipeline, the consumption
+will be aborted and the file will be deleted.
 
 #### Workflow placeholders
 
