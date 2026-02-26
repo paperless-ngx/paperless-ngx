@@ -1813,7 +1813,13 @@ describe('DocumentDetailComponent', () => {
 
     component.selectedVersionId = 10
     component.download()
-    expect(getDownloadUrlSpy).toHaveBeenNthCalledWith(1, doc.id, false, null)
+    expect(getDownloadUrlSpy).toHaveBeenNthCalledWith(
+      1,
+      doc.id,
+      false,
+      null,
+      false
+    )
     httpTestingController
       .expectOne('download-latest')
       .error(new ProgressEvent('failed'))
@@ -1826,7 +1832,13 @@ describe('DocumentDetailComponent', () => {
 
     component.selectedVersionId = doc.id
     component.download()
-    expect(getDownloadUrlSpy).toHaveBeenNthCalledWith(3, doc.id, false, doc.id)
+    expect(getDownloadUrlSpy).toHaveBeenNthCalledWith(
+      3,
+      doc.id,
+      false,
+      doc.id,
+      false
+    )
     httpTestingController
       .expectOne('download-non-latest')
       .error(new ProgressEvent('failed'))
@@ -1849,7 +1861,13 @@ describe('DocumentDetailComponent', () => {
       .mockReturnValueOnce('print-no-version')
 
     component.download()
-    expect(getDownloadUrlSpy).toHaveBeenNthCalledWith(1, doc.id, false, null)
+    expect(getDownloadUrlSpy).toHaveBeenNthCalledWith(
+      1,
+      doc.id,
+      false,
+      null,
+      false
+    )
     httpTestingController
       .expectOne('download-no-version')
       .error(new ProgressEvent('failed'))
