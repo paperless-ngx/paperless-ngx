@@ -327,7 +327,7 @@ class TestDeprecatedDbSettings:
         mocker: MockerFixture,
     ) -> None:
         """All deprecated vars set simultaneously produces one warning per var."""
-        all_vars = {var: "some_value" for var in DEPRECATED_VARS}
+        all_vars = dict.fromkeys(DEPRECATED_VARS, "some_value")
         mocker.patch.dict(os.environ, all_vars, clear=True)
         result = check_deprecated_db_settings(None)
 
