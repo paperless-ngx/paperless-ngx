@@ -192,7 +192,6 @@ from documents.serialisers import ShareLinkSerializer
 from documents.serialisers import StoragePathSerializer
 from documents.serialisers import StoragePathTestSerializer
 from documents.serialisers import TagSerializer
-from documents.serialisers import TagSerializerVersion1
 from documents.serialisers import TasksViewSerializer
 from documents.serialisers import TrashSerializer
 from documents.serialisers import UiSettingsViewSerializer
@@ -488,18 +487,13 @@ class CorrespondentViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
 @extend_schema_view(**generate_object_with_permissions_schema(TagSerializer))
 class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
     model = Tag
+    serializer_class = TagSerializer
     document_count_through = Document.tags.through
     document_count_source_field = "tag_id"
 
     queryset = Tag.objects.select_related("owner").order_by(
         Lower("name"),
     )
-
-    def get_serializer_class(self, *args, **kwargs):
-        if int(self.request.version) == 1:
-            return TagSerializerVersion1
-        else:
-            return TagSerializer
 
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
