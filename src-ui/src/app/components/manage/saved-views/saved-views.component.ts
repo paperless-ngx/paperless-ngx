@@ -81,7 +81,7 @@ export class SavedViewsComponent
   private reloadViews(): void {
     this.loading = true
     this.savedViewService
-      .listAll(null, null, { full_perms: true })
+      .list(null, null, null, false, { full_perms: true })
       .subscribe((r) => {
         this.savedViews = r.results
         this.initialize()
