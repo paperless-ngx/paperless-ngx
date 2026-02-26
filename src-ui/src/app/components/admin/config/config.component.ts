@@ -208,4 +208,12 @@ export class ConfigComponent
         },
       })
   }
+
+  public isSet(key: string): boolean {
+    return this.configForm.get(key).value != null
+  }
+
+  public resetOption(key: string) {
+    this.configForm.get(key).setValue(null)
+  }
 }
