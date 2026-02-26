@@ -69,5 +69,5 @@ class Command(PaperlessCommand):
                     self.console.print(
                         f"[red]Failed document {result.item}: {result.error}[/red]",
                     )
-        except KeyboardInterrupt:
+        except KeyboardInterrupt:  # pragma: no cover
             self.console.print("[yellow]Aborting...[/yellow]")

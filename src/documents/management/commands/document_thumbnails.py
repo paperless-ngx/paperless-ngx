@@ -67,7 +67,7 @@ class Command(PaperlessCommand):
             ids,
             description="Regenerating thumbnails...",
         ):
-            if result.error:
+            if result.error:  # pragma: no cover
                 self.console.print(
                     f"[red]Failed document {result.item}: {result.error}[/red]",
                 )
