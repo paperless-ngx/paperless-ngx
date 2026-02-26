@@ -272,10 +272,10 @@ describe(`DocumentService`, () => {
     expect(url).toEqual(
       `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/download/?version=123`
     )
-    url = service.getDownloadUrl(documents[0].id, true, 123)
-    expect(url).toEqual(
-      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/download/?original=true&version=123`
-    )
+    url = service.getDownloadUrl(documents[0].id, true, 123, true)
+    expect(url).toContain('original=true')
+    expect(url).toContain('version=123')
+    expect(url).toContain('follow_formatting=true')
   })
 
   it('should pass optional get params for version and fields', () => {

@@ -202,7 +202,8 @@ export class DocumentService extends AbstractPaperlessService<Document> {
   getDownloadUrl(
     id: number,
     original: boolean = false,
-    versionID: number = null
+    versionID: number = null,
+    followFormatting: boolean = false
   ): string {
     let url = new URL(this.getResourceUrl(id, 'download'))
     if (original) {
@@ -210,6 +211,9 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     }
     if (versionID) {
       url.searchParams.append('version', versionID.toString())
+    }
+    if (followFormatting) {
+      url.searchParams.append('follow_formatting', 'true')
     }
     return url.toString()
   }
