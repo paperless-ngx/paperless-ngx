@@ -2105,7 +2105,6 @@ src/paperless_mail/mail.py:0: error: Function is missing a return type annotatio
 src/paperless_mail/mail.py:0: error: Function is missing a return type annotation  [no-untyped-def]
 src/paperless_mail/mail.py:0: error: Function is missing a return type annotation  [no-untyped-def]
 src/paperless_mail/mail.py:0: error: Function is missing a return type annotation  [no-untyped-def]
-src/paperless_mail/mail.py:0: error: Function is missing a return type annotation  [no-untyped-def]
 src/paperless_mail/mail.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
 src/paperless_mail/mail.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
 src/paperless_mail/mail.py:0: error: Function is missing a type annotation for one or more arguments  [no-untyped-def]
