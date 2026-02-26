@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import TYPE_CHECKING
 from typing import Any
 
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from django.http import HttpRequest
 
 
-class VersionResolutionError(str, Enum):
+class VersionResolutionError(StrEnum):
     INVALID = "invalid"
     NOT_FOUND = "not_found"
 

@@ -1,5 +1,5 @@
+from datetime import UTC
 from datetime import datetime
-from datetime import timezone
 from typing import Any
 
 from django.conf import settings
@@ -139,7 +139,7 @@ def thumbnail_last_modified(request: Any, pk: int) -> datetime | None:
         # No cache, get the timestamp and cache the datetime
         last_modified = datetime.fromtimestamp(
             doc.thumbnail_path.stat().st_mtime,
-            tz=timezone.utc,
+            tz=UTC,
         )
         cache.set(doc_key, last_modified, CACHE_50_MINUTES)
         return last_modified

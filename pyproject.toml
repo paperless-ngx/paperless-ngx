@@ -3,10 +3,9 @@ name = "paperless-ngx"
 version = "2.20.8"
 description = "A community-supported supercharged document management system: scan, index and archive all your physical documents"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 classifiers = [
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
@@ -177,7 +176,7 @@ torch = [
 ]
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py311"
 line-length = 88
 src = [
   "src",

@@ -2,7 +2,7 @@ import datetime
 import hashlib
 import os
 import tempfile
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Final
@@ -80,7 +80,7 @@ class ConsumerError(Exception):
     pass
 
 
-class ConsumerStatusShortMessage(str, Enum):
+class ConsumerStatusShortMessage(StrEnum):
     DOCUMENT_ALREADY_EXISTS = "document_already_exists"
     DOCUMENT_ALREADY_EXISTS_IN_TRASH = "document_already_exists_in_trash"
     ASN_ALREADY_EXISTS = "asn_already_exists"

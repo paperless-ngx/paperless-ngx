@@ -101,50 +101,50 @@ class TestFilterDate:
         [
             # Valid Dates
             pytest.param(
-                datetime.datetime(2024, 1, 10, tzinfo=datetime.timezone.utc),
-                datetime.datetime(2024, 1, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2024, 1, 10, tzinfo=datetime.UTC),
+                datetime.datetime(2024, 1, 10, tzinfo=datetime.UTC),
                 id="valid_past_date",
             ),
             pytest.param(
-                datetime.datetime(2024, 1, 15, 12, 0, 0, tzinfo=datetime.timezone.utc),
-                datetime.datetime(2024, 1, 15, 12, 0, 0, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2024, 1, 15, 12, 0, 0, tzinfo=datetime.UTC),
+                datetime.datetime(2024, 1, 15, 12, 0, 0, tzinfo=datetime.UTC),
                 id="exactly_at_reference",
             ),
             pytest.param(
-                datetime.datetime(1901, 1, 1, tzinfo=datetime.timezone.utc),
-                datetime.datetime(1901, 1, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1901, 1, 1, tzinfo=datetime.UTC),
+                datetime.datetime(1901, 1, 1, tzinfo=datetime.UTC),
                 id="year_1901_valid",
             ),
             # Date is > reference_time
             pytest.param(
-                datetime.datetime(2024, 1, 16, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2024, 1, 16, tzinfo=datetime.UTC),
                 None,
                 id="future_date_day_after",
             ),
             # date.date() in ignore_dates
             pytest.param(
-                datetime.datetime(2024, 1, 1, 0, 0, 0, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2024, 1, 1, 0, 0, 0, tzinfo=datetime.UTC),
                 None,
                 id="ignored_date_midnight_jan1",
             ),
             pytest.param(
-                datetime.datetime(2024, 1, 1, 10, 30, 0, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2024, 1, 1, 10, 30, 0, tzinfo=datetime.UTC),
                 None,
                 id="ignored_date_midday_jan1",
             ),
             pytest.param(
-                datetime.datetime(2024, 12, 25, 15, 0, 0, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2024, 12, 25, 15, 0, 0, tzinfo=datetime.UTC),
                 None,
                 id="ignored_date_dec25_future",
             ),
             # date.year <= 1900
             pytest.param(
-                datetime.datetime(1899, 12, 31, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1899, 12, 31, tzinfo=datetime.UTC),
                 None,
                 id="year_1899",
             ),
             pytest.param(
-                datetime.datetime(1900, 1, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1900, 1, 1, tzinfo=datetime.UTC),
                 None,
                 id="year_1900_boundary",
             ),
@@ -176,7 +176,7 @@ class TestFilterDate:
             1,
             12,
             0,
-            tzinfo=datetime.timezone.utc,
+            tzinfo=datetime.UTC,
         )
         another_ignored = datetime.datetime(
             2024,
@@ -184,7 +184,7 @@ class TestFilterDate:
             25,
             15,
             30,
-            tzinfo=datetime.timezone.utc,
+            tzinfo=datetime.UTC,
         )
         allowed_date = datetime.datetime(
             2024,
@@ -192,7 +192,7 @@ class TestFilterDate:
             2,
             12,
             0,
-            tzinfo=datetime.timezone.utc,
+            tzinfo=datetime.UTC,
         )
 
         assert parser._filter_date(ignored_date) is None
@@ -204,7 +204,7 @@ class TestFilterDate:
         regex_parser: RegexDateParserPlugin,
     ) -> None:
         """Should work with timezone-aware datetimes."""
-        date_utc = datetime.datetime(2024, 1, 10, 12, 0, tzinfo=datetime.timezone.utc)
+        date_utc = datetime.datetime(2024, 1, 10, 12, 0, tzinfo=datetime.UTC)
 
         result = regex_parser._filter_date(date_utc)
 
@@ -221,8 +221,8 @@ class TestRegexDateParser:
                 "report-2023-12-25.txt",
                 "Event recorded on 25/12/2022.",
                 [
-                    datetime.datetime(2023, 12, 25, tzinfo=datetime.timezone.utc),
-                    datetime.datetime(2022, 12, 25, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2023, 12, 25, tzinfo=datetime.UTC),
+                    datetime.datetime(2022, 12, 25, tzinfo=datetime.UTC),
                 ],
                 id="filename-y-m-d_and_content-d-m-y",
             ),
@@ -230,8 +230,8 @@ class TestRegexDateParser:
                 "img_2023.01.02.jpg",
                 "Taken on 01/02/2023",
                 [
-                    datetime.datetime(2023, 1, 2, tzinfo=datetime.timezone.utc),
-                    datetime.datetime(2023, 2, 1, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2023, 1, 2, tzinfo=datetime.UTC),
+                    datetime.datetime(2023, 2, 1, tzinfo=datetime.UTC),
                 ],
                 id="ambiguous-dates-respect-orders",
             ),
@@ -239,7 +239,7 @@ class TestRegexDateParser:
                 "notes.txt",
                 "bad date 99/99/9999 and 25/12/2022",
                 [
-                    datetime.datetime(2022, 12, 25, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2022, 12, 25, tzinfo=datetime.UTC),
                 ],
                 id="parse-exception-skips-bad-and-yields-good",
             ),
@@ -275,24 +275,24 @@ class TestRegexDateParser:
                 or "2023.12.25" in date_string
                 or "2023-12-25" in date_string
             ):
-                return datetime.datetime(2023, 12, 25, tzinfo=datetime.timezone.utc)
+                return datetime.datetime(2023, 12, 25, tzinfo=datetime.UTC)
 
             # content DMY 25/12/2022
             if "25/12/2022" in date_string or "25-12-2022" in date_string:
-                return datetime.datetime(2022, 12, 25, tzinfo=datetime.timezone.utc)
+                return datetime.datetime(2022, 12, 25, tzinfo=datetime.UTC)
 
             # filename YMD 2023.01.02
             if "2023.01.02" in date_string or "2023-01-02" in date_string:
-                return datetime.datetime(2023, 1, 2, tzinfo=datetime.timezone.utc)
+                return datetime.datetime(2023, 1, 2, tzinfo=datetime.UTC)
 
             # ambiguous 01/02/2023 -> respect DATE_ORDER setting
             if "01/02/2023" in date_string:
                 if date_order == "DMY":
-                    return datetime.datetime(2023, 2, 1, tzinfo=datetime.timezone.utc)
+                    return datetime.datetime(2023, 2, 1, tzinfo=datetime.UTC)
                 if date_order == "YMD":
-                    return datetime.datetime(2023, 1, 2, tzinfo=datetime.timezone.utc)
+                    return datetime.datetime(2023, 1, 2, tzinfo=datetime.UTC)
                 # fallback
-                return datetime.datetime(2023, 2, 1, tzinfo=datetime.timezone.utc)
+                return datetime.datetime(2023, 2, 1, tzinfo=datetime.UTC)
 
             # simulate parse failure for malformed input
             if "99/99/9999" in date_string or "bad date" in date_string:
@@ -328,7 +328,7 @@ class TestRegexDateParser:
                 12,
                 0,
                 0,
-                tzinfo=datetime.timezone.utc,
+                tzinfo=datetime.UTC,
             ),
             filename_date_order="YMD",
             content_date_order="DMY",
@@ -344,13 +344,13 @@ class TestRegexDateParser:
         ) -> datetime.datetime | None:
             if "10/12/2023" in date_string or "10-12-2023" in date_string:
                 # ignored date
-                return datetime.datetime(2023, 12, 10, tzinfo=datetime.timezone.utc)
+                return datetime.datetime(2023, 12, 10, tzinfo=datetime.UTC)
             if "01/02/2024" in date_string or "01-02-2024" in date_string:
                 # future relative to reference_time -> filtered
-                return datetime.datetime(2024, 2, 1, tzinfo=datetime.timezone.utc)
+                return datetime.datetime(2024, 2, 1, tzinfo=datetime.UTC)
             if "05/01/2023" in date_string or "05-01-2023" in date_string:
                 # valid
-                return datetime.datetime(2023, 1, 5, tzinfo=datetime.timezone.utc)
+                return datetime.datetime(2023, 1, 5, tzinfo=datetime.UTC)
             return None
 
         mocker.patch(target, side_effect=fake_parse)
@@ -358,7 +358,7 @@ class TestRegexDateParser:
         content = "Ignored: 10/12/2023, Future: 01/02/2024, Keep: 05/01/2023"
         results = list(parser.parse("whatever.txt", content))
 
-        assert results == [datetime.datetime(2023, 1, 5, tzinfo=datetime.timezone.utc)]
+        assert results == [datetime.datetime(2023, 1, 5, tzinfo=datetime.UTC)]
 
     def test_parse_handles_no_matches_and_returns_empty_list(
         self,
@@ -392,7 +392,7 @@ class TestRegexDateParser:
                 12,
                 0,
                 0,
-                tzinfo=datetime.timezone.utc,
+                tzinfo=datetime.UTC,
             ),
             filename_date_order=None,
             content_date_order="DMY",
@@ -409,9 +409,9 @@ class TestRegexDateParser:
         ) -> datetime.datetime | None:
             # return distinct datetimes so we can tell which source was parsed
             if "25/12/2022" in date_string:
-                return datetime.datetime(2022, 12, 25, tzinfo=datetime.timezone.utc)
+                return datetime.datetime(2022, 12, 25, tzinfo=datetime.UTC)
             if "2023-12-25" in date_string:
-                return datetime.datetime(2023, 12, 25, tzinfo=datetime.timezone.utc)
+                return datetime.datetime(2023, 12, 25, tzinfo=datetime.UTC)
             return None
 
         mock = mocker.patch(target, side_effect=fake_parse)
@@ -429,5 +429,5 @@ class TestRegexDateParser:
         assert "25/12/2022" in called_date_string
         # And the parser should have yielded the corresponding datetime
         assert results == [
-            datetime.datetime(2022, 12, 25, tzinfo=datetime.timezone.utc),
+            datetime.datetime(2022, 12, 25, tzinfo=datetime.UTC),
         ]
