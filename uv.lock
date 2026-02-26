@@ -1138,6 +1138,19 @@ wheels = [
 ]
 
 [[package]]
+name = "django-rich"
+version = "2.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "rich", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a6/67/e307a5fef657e7992468f567b521534c52e01bdda5a1ae5b12de679a670f/django_rich-2.2.0.tar.gz", hash = "sha256:ecec7842d040024ed8a225699388535e46b87277550c33f46193b52cece2f780", size = 62427, upload-time = "2025-09-18T11:42:17.182Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/27/ed/23fa669493d78cd67e7f6734fa380f8690f2b4d75b4f72fd645a52c3b32a/django_rich-2.2.0-py3-none-any.whl", hash = "sha256:a0d2c916bd9750b6e9beb57407aef5e836c8705d7dbe9e4fd4725f7bbe41c407", size = 9210, upload-time = "2025-09-18T11:42:15.779Z" },
+]
+
+[[package]]
 name = "django-soft-delete"
 version = "1.0.22"
 source = { registry = "https://pypi.org/simple" }
@@ -3041,6 +3054,7 @@ dependencies = [
     { name = "django-filter", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "django-guardian", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "django-multiselectfield", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "django-rich", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "django-soft-delete", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "django-treenode", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "djangorestframework", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -3081,7 +3095,6 @@ dependencies = [
     { name = "tika-client", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "torch", version = "2.10.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
     { name = "torch", version = "2.10.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'linux'" },
-    { name = "tqdm", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "watchfiles", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "whitenoise", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "whoosh-reloaded", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -3162,7 +3175,6 @@ typing = [
     { name = "types-pytz", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "types-redis", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "types-setuptools", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
-    { name = "types-tqdm", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
 
 [package.metadata]
@@ -3186,6 +3198,7 @@ requires-dist = [
     { name = "django-filter", specifier = "~=25.1" },
     { name = "django-guardian", specifier = "~=3.3.0" },
     { name = "django-multiselectfield", specifier = "~=1.0.1" },
+    { name = "django-rich", specifier = "~=2.2.0" },
     { name = "django-soft-delete", specifier = "~=1.0.18" },
     { name = "django-treenode", specifier = ">=0.23.2" },
     { name = "djangorestframework", specifier = "~=3.16" },
@@ -3232,7 +3245,6 @@ requires-dist = [
     { name = "setproctitle", specifier = "~=1.3.4" },
     { name = "tika-client", specifier = "~=0.10.0" },
     { name = "torch", specifier = "~=2.10.0", index = "https://download.pytorch.org/whl/cpu" },
-    { name = "tqdm", specifier = "~=4.67.1" },
     { name = "watchfiles", specifier = ">=1.1.1" },
     { name = "whitenoise", specifier = "~=6.11" },
     { name = "whoosh-reloaded", specifier = ">=2.7.5" },
@@ -3297,7 +3309,6 @@ typing = [
     { name = "types-pytz" },
     { name = "types-redis" },
     { name = "types-setuptools" },
-    { name = "types-tqdm" },
 ]
 
 [[package]]
@@ -5572,18 +5583,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/aa/7e/116539b9610585e34771611e33c88a4c706491fa3565500f5a63139f8731/types_setuptools-80.10.0.20260124.tar.gz", hash = "sha256:1b86d9f0368858663276a0cbe5fe5a9722caf94b5acde8aba0399a6e90680f20", size = 43299, upload-time = "2026-01-24T03:18:39.527Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/2b/7f/016dc5cc718ec6ccaa84fb73ed409ef1c261793fd5e637cdfaa18beb40a9/types_setuptools-80.10.0.20260124-py3-none-any.whl", hash = "sha256:efed7e044f01adb9c2806c7a8e1b6aa3656b8e382379b53d5f26ee3db24d4c01", size = 64333, upload-time = "2026-01-24T03:18:38.344Z" },
-]
-
-[[package]]
-name = "types-tqdm"
-version = "4.67.3.20260205"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "types-requests", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/53/46/790b9872523a48163bdda87d47849b4466017640e5259d06eed539340afd/types_tqdm-4.67.3.20260205.tar.gz", hash = "sha256:f3023682d4aa3bbbf908c8c6bb35f35692d319460d9bbd3e646e8852f3dd9f85", size = 17597, upload-time = "2026-02-05T04:03:19.721Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/cc/da/7f761868dbaa328392356fab30c18ab90d14cce86b269e7e63328f29d4a3/types_tqdm-4.67.3.20260205-py3-none-any.whl", hash = "sha256:85c31731e81dc3c5cecc34c6c8b2e5166fafa722468f58840c2b5ac6a8c5c173", size = 23894, upload-time = "2026-02-05T04:03:18.48Z" },
 ]
 
 [[package]]

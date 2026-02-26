@@ -1,10 +1,7 @@
 import logging
 
-import tqdm
-from django.core.management.base import BaseCommand
-
 from documents.classifier import load_classifier
-from documents.management.commands.mixins import ProgressBarMixin
+from documents.management.commands.base import PaperlessCommand
 from documents.models import Document
 from documents.signals.handlers import set_correspondent
 from documents.signals.handlers import set_document_type
@@ -14,7 +11,7 @@ from documents.signals.handlers import set_tags
 logger = logging.getLogger("paperless.management.retagger")
 
 
-class Command(ProgressBarMixin, BaseCommand):
+class Command(PaperlessCommand):
     help = (
         "Using the current classification model, assigns correspondents, tags "
         "and document types to all documents, effectively allowing you to "
@@ -23,6 +20,7 @@ class Command(ProgressBarMixin, BaseCommand):
     )
 
     def add_arguments(self, parser):
+        super().add_arguments(parser)
         parser.add_argument("-c", "--correspondent", default=False, action="store_true")
         parser.add_argument("-T", "--tags", default=False, action="store_true")
         parser.add_argument("-t", "--document_type", default=False, action="store_true")
@@ -34,7 +32,7 @@ class Command(ProgressBarMixin, BaseCommand):
             action="store_true",
             help=(
                 "By default this command won't try to assign a correspondent "
-                "if more than one matches the document.  Use this flag if "
+                "if more than one matches the document. Use this flag if "
                 "you'd rather it just pick the first one it finds."
             ),
         )
@@ -49,7 +47,6 @@ class Command(ProgressBarMixin, BaseCommand):
                 "and tags that do not match anymore due to changed rules."
             ),
         )
-        self.add_argument_progress_bar_mixin(parser)
         parser.add_argument(
             "--suggest",
             default=False,
@@ -68,8 +65,6 @@ class Command(ProgressBarMixin, BaseCommand):
         )
 
     def handle(self, *args, **options):
-        self.handle_progress_bar_mixin(**options)
-
         if options["inbox_only"]:
             queryset = Document.objects.filter(tags__is_inbox_tag=True)
         else:
@@ -84,7 +79,7 @@ class Command(ProgressBarMixin, BaseCommand):
 
         classifier = load_classifier()
 
-        for document in tqdm.tqdm(documents, disable=self.no_progress_bar):
+        for document in self.track(documents, description="Retagging..."):
             if options["correspondent"]:
                 set_correspondent(
                     sender=None,
@@ -122,6 +117,7 @@ class Command(ProgressBarMixin, BaseCommand):
                     stdout=self.stdout,
                     style_func=self.style,
                 )
+
             if options["storage_path"]:
                 set_storage_path(
                     sender=None,

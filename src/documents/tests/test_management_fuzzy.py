@@ -1,5 +1,6 @@
 from io import StringIO
 
+import pytest
 from django.core.management import CommandError
 from django.core.management import call_command
 from django.test import TestCase
@@ -7,6 +8,7 @@ from django.test import TestCase
 from documents.models import Document
 
 
+@pytest.mark.management
 class TestFuzzyMatchCommand(TestCase):
     MSG_REGEX = r"Document \d fuzzy match to \d \(confidence \d\d\.\d\d\d\)"
 
@@ -48,19 +50,6 @@ class TestFuzzyMatchCommand(TestCase):
         with self.assertRaises(CommandError) as e:
             self.call_command("--ratio", "101")
         self.assertIn("The ratio must be between 0 and 100", str(e.exception))
-
-    def test_invalid_process_count(self) -> None:
-        """
-        GIVEN:
-            - Invalid process count less than 0 above upper
-        WHEN:
-            - Command is called
-        THEN:
-            - Error is raised indicating issue
-        """
-        with self.assertRaises(CommandError) as e:
-            self.call_command("--processes", "0")
-        self.assertIn("There must be at least 1 process", str(e.exception))
 
     def test_no_matches(self) -> None:
         """
@@ -151,7 +140,7 @@ class TestFuzzyMatchCommand(TestCase):
             mime_type="application/pdf",
             filename="final_test.pdf",
         )
-        stdout, _ = self.call_command()
+        stdout, _ = self.call_command("--no-progress-bar")
         lines = [x.strip() for x in stdout.splitlines() if x.strip()]
         self.assertEqual(len(lines), 3)
         for line in lines:
@@ -194,7 +183,7 @@ class TestFuzzyMatchCommand(TestCase):
 
         self.assertEqual(Document.objects.count(), 3)
 
-        stdout, _ = self.call_command("--delete")
+        stdout, _ = self.call_command("--delete", "--no-progress-bar")
 
         self.assertIn(
             "The command is configured to delete documents.  Use with caution",

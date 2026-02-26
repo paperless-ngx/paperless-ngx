@@ -577,6 +577,7 @@ class TestTagsFromPath:
         assert len(tag_ids) == 0
 
 
+@pytest.mark.management
 class TestCommandValidation:
     """Tests for command argument validation."""
 
@@ -605,6 +606,7 @@ class TestCommandValidation:
             cmd.handle(directory=str(sample_pdf), oneshot=True, testing=False)
 
 
+@pytest.mark.management
 @pytest.mark.usefixtures("mock_supported_extensions")
 class TestCommandOneshot:
     """Tests for oneshot mode."""
@@ -775,6 +777,7 @@ def start_consumer(
             )
 
 
+@pytest.mark.management
 @pytest.mark.django_db
 class TestCommandWatch:
     """Integration tests for the watch loop."""
@@ -896,6 +899,7 @@ class TestCommandWatch:
         assert not thread.is_alive()
 
 
+@pytest.mark.management
 @pytest.mark.django_db
 class TestCommandWatchPolling:
     """Tests for polling mode."""
@@ -928,6 +932,7 @@ class TestCommandWatchPolling:
         mock_consume_file_delay.delay.assert_called()
 
 
+@pytest.mark.management
 @pytest.mark.django_db
 class TestCommandWatchRecursive:
     """Tests for recursive watching."""
@@ -991,6 +996,7 @@ class TestCommandWatchRecursive:
         assert len(overrides.tag_ids) == 2
 
 
+@pytest.mark.management
 @pytest.mark.django_db
 class TestCommandWatchEdgeCases:
     """Tests for edge cases and error handling."""

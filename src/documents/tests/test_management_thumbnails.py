@@ -2,6 +2,7 @@ import shutil
 from pathlib import Path
 from unittest import mock
 
+import pytest
 from django.core.management import call_command
 from django.test import TestCase
 
@@ -12,6 +13,7 @@ from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 
 
+@pytest.mark.management
 class TestMakeThumbnails(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def make_models(self) -> None:
         self.d1 = Document.objects.create(
