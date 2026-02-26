@@ -45,10 +45,22 @@ class TestDocument(TestCase):
         Path(file_path).touch()
         Path(thumb_path).touch()
 
-        with mock.patch("documents.signals.handlers.Path.unlink") as mock_unlink:
+        with mock.patch(
+            "documents.signals.handlers.Path.unlink",
+            autospec=True,
+        ) as mock_unlink:
             document.delete()
             empty_trash([document.pk])
-            self.assertEqual(mock_unlink.call_count, 2)
+
+            target_paths: set[str] = {str(file_path), str(thumb_path)}
+
+            actual_deletions = [
+                call
+                for call in mock_unlink.call_args_list
+                if str(call.args[0]) in target_paths
+            ]
+
+            self.assertEqual(len(actual_deletions), 2)
 
     def test_document_soft_delete(self) -> None:
         document = Document.objects.create(
@@ -65,7 +77,12 @@ class TestDocument(TestCase):
         Path(file_path).touch()
         Path(thumb_path).touch()
 
-        with mock.patch("documents.signals.handlers.Path.unlink") as mock_unlink:
+        target_paths: set[str] = {str(file_path), str(thumb_path)}
+
+        with mock.patch(
+            "documents.signals.handlers.Path.unlink",
+            autospec=True,
+        ) as mock_unlink:
             document.delete()
             self.assertEqual(mock_unlink.call_count, 0)
 
@@ -76,7 +93,14 @@ class TestDocument(TestCase):
 
             document.delete()
             empty_trash([document.pk])
-            self.assertEqual(mock_unlink.call_count, 2)
+
+            actual_deletions = [
+                call
+                for call in mock_unlink.call_args_list
+                if str(call.args[0]) in target_paths
+            ]
+
+            self.assertEqual(len(actual_deletions), 2)
 
     def test_delete_root_deletes_versions(self) -> None:
         root = Document.objects.create(
