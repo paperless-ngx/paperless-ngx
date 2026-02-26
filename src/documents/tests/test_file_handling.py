@@ -336,7 +336,11 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             added=d1,
         )
 
-        self.assertEqual(generate_filename(doc1), Path("232-01-09.pdf"))
+        # Account for 3.14 padding changes
+        expected_year: str = d1.strftime("%Y")
+        expected_filename: Path = Path(f"{expected_year}-01-09.pdf")
+
+        self.assertEqual(generate_filename(doc1), expected_filename)
 
         doc1.added = timezone.make_aware(datetime.datetime(2020, 11, 16, 1, 1, 1))
 
