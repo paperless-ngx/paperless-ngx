@@ -1,0 +1,17 @@
+.version-item {
+  .check {
+    width: 1rem;
+    height: 100%;
+  }
+
+  > .version-link {
+    .flex-column {
+      width: 260px;
+    }
+
+    .input-group .version-label, .input-group input {
+      width: 140px;
+      flex: 1 1 auto;
+    }
+  }
+}

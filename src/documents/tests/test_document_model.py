@@ -78,6 +78,28 @@ class TestDocument(TestCase):
             empty_trash([document.pk])
             self.assertEqual(mock_unlink.call_count, 2)
 
+    def test_delete_root_deletes_versions(self) -> None:
+        root = Document.objects.create(
+            correspondent=Correspondent.objects.create(name="Test0"),
+            title="Head",
+            content="content",
+            checksum="checksum",
+            mime_type="application/pdf",
+        )
+        Document.objects.create(
+            root_document=root,
+            correspondent=root.correspondent,
+            title="Version",
+            content="content",
+            checksum="checksum2",
+            mime_type="application/pdf",
+        )
+
+        root.delete()
+
+        self.assertEqual(Document.objects.count(), 0)
+        self.assertEqual(Document.deleted_objects.count(), 2)
+
     def test_file_name(self) -> None:
         doc = Document(
             mime_type="application/pdf",

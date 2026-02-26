@@ -554,6 +554,36 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(response.data[1]["actor"])
         self.assertEqual(response.data[1]["action"], "create")
 
+    def test_document_history_logs_version_deletion(self) -> None:
+        root_doc = Document.objects.create(
+            title="Root",
+            checksum="123",
+            mime_type="application/pdf",
+            owner=self.user,
+        )
+        version_doc = Document.objects.create(
+            title="Version",
+            checksum="456",
+            mime_type="application/pdf",
+            root_document=root_doc,
+            owner=self.user,
+        )
+
+        response = self.client.delete(
+            f"/api/documents/{root_doc.pk}/versions/{version_doc.pk}/",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.get(f"/api/documents/{root_doc.pk}/history/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]["actor"]["id"], self.user.id)
+        self.assertEqual(response.data[0]["action"], "update")
+        self.assertEqual(
+            response.data[0]["changes"],
+            {"Version Deleted": ["None", version_doc.pk]},
+        )
+
     @override_settings(AUDIT_LOG_ENABLED=False)
     def test_document_history_action_disabled(self) -> None:
         """
@@ -1211,6 +1241,38 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.correspondent_id)
         self.assertIsNone(overrides.document_type_id)
         self.assertIsNone(overrides.tag_ids)
+
+    def test_document_filters_use_latest_version_content(self) -> None:
+        root = Document.objects.create(
+            title="versioned root",
+            checksum="root",
+            mime_type="application/pdf",
+            content="root-content",
+        )
+        version = Document.objects.create(
+            title="versioned root",
+            checksum="v1",
+            mime_type="application/pdf",
+            root_document=root,
+            content="latest-version-content",
+        )
+
+        response = self.client.get(
+            "/api/documents/?content__icontains=latest-version-content",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], root.id)
+        self.assertEqual(results[0]["content"], version.content)
+
+        response = self.client.get(
+            "/api/documents/?title_content=latest-version-content",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], root.id)
 
     def test_create_wrong_endpoint(self) -> None:
         response = self.client.post(
