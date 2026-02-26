@@ -21,7 +21,7 @@ class TestDateLocalization:
         14,
         30,
         5,
-        tzinfo=datetime.timezone.utc,
+        tzinfo=datetime.UTC,
     )
 
     TEST_DATETIME_STRING: str = "2023-10-26T14:30:05+00:00"

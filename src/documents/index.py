@@ -5,10 +5,10 @@ import math
 import re
 from collections import Counter
 from contextlib import contextmanager
+from datetime import UTC
 from datetime import datetime
 from datetime import time
 from datetime import timedelta
-from datetime import timezone
 from shutil import rmtree
 from time import sleep
 from typing import TYPE_CHECKING
@@ -437,7 +437,7 @@ class ManualResults:
 class LocalDateParser(English):
     def reverse_timezone_offset(self, d):
         return (d.replace(tzinfo=django_timezone.get_current_timezone())).astimezone(
-            timezone.utc,
+            UTC,
         )
 
     def date_from(self, *args, **kwargs):
@@ -641,8 +641,8 @@ def rewrite_natural_date_keywords(query_string: str) -> str:
                 end = datetime(local_now.year - 1, 12, 31, 23, 59, 59, tzinfo=tz)
 
         # Convert to UTC and format
-        start_str = start.astimezone(timezone.utc).strftime("%Y%m%d%H%M%S")
-        end_str = end.astimezone(timezone.utc).strftime("%Y%m%d%H%M%S")
+        start_str = start.astimezone(UTC).strftime("%Y%m%d%H%M%S")
+        end_str = end.astimezone(UTC).strftime("%Y%m%d%H%M%S")
         return f"{field}:[{start_str} TO {end_str}]"
 
     return re.sub(pattern, repl, query_string, flags=re.IGNORECASE)
