@@ -1,0 +1,9 @@
+repos:
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: 'v3.8.1'
+    hooks:
+      - id: prettier
+        types_or: [javascript, ts]
+        additional_dependencies:
+          - prettier@3.3.3
+          - 'prettier-plugin-organize-imports@4.1.0'

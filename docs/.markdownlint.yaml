@@ -1,0 +1,6 @@
+default: true
+MD013: false # line length -- mdformat handles this
+MD033: false # inline HTML -- MkDocs uses it
+MD041: false # first line heading -- not always true in MkDocs
+MD046: # code block style
+  style: fenced
