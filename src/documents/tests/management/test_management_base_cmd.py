@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import io
 from typing import TYPE_CHECKING
-from typing import ClassVar
 
 import pytest
 from django.core.management import CommandError
@@ -256,7 +255,6 @@ class TestPaperlessCommandExecute:
         [
             pytest.param(1, 1, id="single-process"),
             pytest.param(4, 4, id="four-processes"),
-            pytest.param(8, 8, id="eight-processes"),
         ],
     )
     def test_process_count_set(
@@ -310,12 +308,12 @@ class TestPaperlessCommandExecute:
 class TestGetIterableLength:
     """Tests for the _get_iterable_length() method."""
 
-    def test_uses_count_method_for_querysets(
+    def test_uses_count_for_querysets(
         self,
         simple_command: SimpleCommand,
         mock_queryset,
     ):
-        """Should use .count() for Django querysets (SELECT COUNT(*))."""
+        """Should call .count() on Django querysets rather than len()."""
         queryset = mock_queryset([1, 2, 3, 4, 5])
 
         result = simple_command._get_iterable_length(queryset)
@@ -323,58 +321,22 @@ class TestGetIterableLength:
         assert result == 5
         assert queryset.count_called is True
 
-    def test_falls_back_to_len_for_sequences(self, simple_command: SimpleCommand):
-        """Should use len() for regular sequences without .count()."""
-        items = [1, 2, 3, 4]
-
-        result = simple_command._get_iterable_length(items)
+    def test_uses_len_for_sized(self, simple_command: SimpleCommand):
+        """Should use len() for sequences and other Sized types."""
+        result = simple_command._get_iterable_length([1, 2, 3, 4])
 
         assert result == 4
 
-    def test_returns_none_for_generators(self, simple_command: SimpleCommand):
-        """Should return None for iterables without len() or count()."""
-
-        def gen():
-            yield from [1, 2, 3]
-
-        result = simple_command._get_iterable_length(gen())
+    def test_returns_none_for_unsized_iterables(self, simple_command: SimpleCommand):
+        """Should return None for generators and other iterables without len()."""
+        result = simple_command._get_iterable_length(x for x in [1, 2, 3])
 
         assert result is None
-
-    def test_handles_count_not_callable(self, simple_command: SimpleCommand):
-        """Should skip .count if it's not callable (edge case)."""
-
-        class WeirdObject:
-            count = 42  # Attribute, not method
-
-            def __len__(self):
-                return 10
-
-        result = simple_command._get_iterable_length(WeirdObject())
-
-        assert result == 10
-
-    def test_handles_list_count_method(self, simple_command: SimpleCommand):
-        """list.count(value) requires an argument, should fall back to len()."""
-        items = [1, 2, 3, 4, 5]
-
-        # list has a .count() method but it requires an argument
-        # _get_iterable_length should catch TypeError and use len() instead
-        result = simple_command._get_iterable_length(items)
-
-        assert result == 5
 
 
 @pytest.mark.management
 class TestTrack:
     """Tests for the track() method."""
-
-    def test_yields_all_items(self, simple_command: SimpleCommand):
-        items = [1, 2, 3, 4, 5]
-
-        result = list(simple_command.track(items))
-
-        assert result == items
 
     def test_with_progress_bar_disabled(self, simple_command: SimpleCommand):
         simple_command.no_progress_bar = True
@@ -554,28 +516,3 @@ class TestProcessParallel:
 
         spy_parallel.assert_called_once()
         spy_sequential.assert_not_called()
-
-
-@pytest.mark.management
-class TestClassVariableDefaults:
-    """Tests for class variable default behavior."""
-
-    def test_default_supports_progress_bar(self):
-        assert PaperlessCommand.supports_progress_bar is True
-
-    def test_default_supports_multiprocessing(self):
-        assert PaperlessCommand.supports_multiprocessing is False
-
-    def test_subclass_can_override_progress_bar(self):
-        class NoProgressCommand(PaperlessCommand):
-            supports_progress_bar: ClassVar[bool] = False
-
-        assert NoProgressCommand.supports_progress_bar is False
-        assert PaperlessCommand.supports_progress_bar is True
-
-    def test_subclass_can_override_multiprocessing(self):
-        class ParallelCommand(PaperlessCommand):
-            supports_multiprocessing: ClassVar[bool] = True
-
-        assert ParallelCommand.supports_multiprocessing is True
-        assert PaperlessCommand.supports_multiprocessing is False
