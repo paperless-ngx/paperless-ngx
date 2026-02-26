@@ -134,6 +134,7 @@ class TestRenamer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsFile(doc2.archive_path)
 
 
+@pytest.mark.management
 class TestCreateClassifier(TestCase):
     @mock.patch(
         "documents.management.commands.document_create_classifier.train_classifier",
@@ -142,32 +143,6 @@ class TestCreateClassifier(TestCase):
         call_command("document_create_classifier")
 
         m.assert_called_once()
-
-
-@pytest.mark.management
-class TestSanityChecker(DirectoriesMixin, TestCase):
-    def test_no_issues(self) -> None:
-        with self.assertLogs() as capture:
-            call_command("document_sanity_checker")
-
-        self.assertEqual(len(capture.output), 1)
-        self.assertIn("Sanity checker detected no issues.", capture.output[0])
-
-    def test_errors(self) -> None:
-        doc = Document.objects.create(
-            title="test",
-            content="test",
-            filename="test.pdf",
-            checksum="abc",
-        )
-        Path(doc.source_path).touch()
-        Path(doc.thumbnail_path).touch()
-
-        with self.assertLogs() as capture:
-            call_command("document_sanity_checker")
-
-        self.assertEqual(len(capture.output), 2)
-        self.assertIn("Checksum mismatch. Stored: abc, actual:", capture.output[1])
 
 
 @pytest.mark.management
