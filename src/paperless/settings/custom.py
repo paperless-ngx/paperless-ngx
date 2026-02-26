@@ -25,11 +25,16 @@ def parse_db_settings(data_dir: Path) -> dict[str, dict[str, Any]]:
     Returns:
         A databases dict suitable for Django DATABASES setting.
     """
-    engine = get_choice_from_env(
-        "PAPERLESS_DBENGINE",
-        {"sqlite", "postgresql", "mariadb"},
-        default="sqlite",
-    )
+    try:
+        engine = get_choice_from_env(
+            "PAPERLESS_DBENGINE",
+            {"sqlite", "postgresql", "mariadb"},
+            default="sqlite",
+        )
+    except ValueError:
+        # MariaDB users already had to set PAPERLESS_DBENGINE, so it was picked up above
+        # SQLite users didn't need to set anything
+        engine = "postgresql" if "PAPERLESS_DBHOST" in os.environ else "sqlite"
 
     db_config: dict[str, Any]
     base_options: dict[str, Any]
