@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        python-version: ['3.11', '3.12', '13', '3.14']
+        python-version: ['3.11', '3.12', '3.13', '3.14']
       fail-fast: false
     steps:
       - name: Checkout
