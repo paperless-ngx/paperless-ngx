@@ -1,0 +1,218 @@
+from documents.tests.utils import TestMigrations
+
+SAVED_VIEWS_KEY = "saved_views"
+DASHBOARD_VIEWS_VISIBLE_IDS_KEY = "dashboard_views_visible_ids"
+SIDEBAR_VIEWS_VISIBLE_IDS_KEY = "sidebar_views_visible_ids"
+
+
+class TestMigrateSavedViewVisibilityToUiSettings(TestMigrations):
+    migrate_from = "0013_document_root_document"
+    migrate_to = "0014_savedview_visibility_to_ui_settings"
+
+    def setUpBeforeMigration(self, apps) -> None:
+        User = apps.get_model("auth", "User")
+        SavedView = apps.get_model("documents", "SavedView")
+        UiSettings = apps.get_model("documents", "UiSettings")
+
+        self.user_with_empty_settings = User.objects.create(username="user1")
+        self.user_with_existing_settings = User.objects.create(username="user2")
+        self.user_with_owned_views = User.objects.create(username="user3")
+        self.user_with_invalid_settings = User.objects.create(username="user4")
+        self.user_with_empty_settings_id = self.user_with_empty_settings.id
+        self.user_with_existing_settings_id = self.user_with_existing_settings.id
+        self.user_with_owned_views_id = self.user_with_owned_views.id
+        self.user_with_invalid_settings_id = self.user_with_invalid_settings.id
+
+        self.dashboard_view = SavedView.objects.create(
+            owner=self.user_with_empty_settings,
+            name="dashboard",
+            show_on_dashboard=True,
+            show_in_sidebar=True,
+            sort_field="created",
+        )
+        self.sidebar_only_view = SavedView.objects.create(
+            owner=self.user_with_empty_settings,
+            name="sidebar-only",
+            show_on_dashboard=False,
+            show_in_sidebar=True,
+            sort_field="created",
+        )
+        self.hidden_view = SavedView.objects.create(
+            owner=self.user_with_empty_settings,
+            name="hidden",
+            show_on_dashboard=False,
+            show_in_sidebar=False,
+            sort_field="created",
+        )
+        self.other_owner_visible_view = SavedView.objects.create(
+            owner=self.user_with_owned_views,
+            name="other-owner-visible",
+            show_on_dashboard=True,
+            show_in_sidebar=True,
+            sort_field="created",
+        )
+        self.invalid_settings_owner_view = SavedView.objects.create(
+            owner=self.user_with_invalid_settings,
+            name="invalid-settings-owner-visible",
+            show_on_dashboard=True,
+            show_in_sidebar=False,
+            sort_field="created",
+        )
+
+        UiSettings.objects.create(user=self.user_with_empty_settings, settings={})
+        UiSettings.objects.create(
+            user=self.user_with_existing_settings,
+            settings={
+                SAVED_VIEWS_KEY: {
+                    DASHBOARD_VIEWS_VISIBLE_IDS_KEY: [self.sidebar_only_view.id],
+                    SIDEBAR_VIEWS_VISIBLE_IDS_KEY: [self.dashboard_view.id],
+                    "warn_on_unsaved_change": True,
+                },
+                "preserve": "value",
+            },
+        )
+        UiSettings.objects.create(
+            user=self.user_with_invalid_settings,
+            settings=[],
+        )
+
+    def test_visibility_defaults_are_seeded_and_existing_values_preserved(self) -> None:
+        UiSettings = self.apps.get_model("documents", "UiSettings")
+
+        seeded_settings = UiSettings.objects.get(
+            user_id=self.user_with_empty_settings_id,
+        ).settings
+        self.assertCountEqual(
+            seeded_settings[SAVED_VIEWS_KEY][DASHBOARD_VIEWS_VISIBLE_IDS_KEY],
+            [self.dashboard_view.id],
+        )
+        self.assertCountEqual(
+            seeded_settings[SAVED_VIEWS_KEY][SIDEBAR_VIEWS_VISIBLE_IDS_KEY],
+            [self.dashboard_view.id, self.sidebar_only_view.id],
+        )
+
+        existing_settings = UiSettings.objects.get(
+            user_id=self.user_with_existing_settings_id,
+        ).settings
+        self.assertEqual(
+            existing_settings[SAVED_VIEWS_KEY][DASHBOARD_VIEWS_VISIBLE_IDS_KEY],
+            [self.sidebar_only_view.id],
+        )
+        self.assertEqual(
+            existing_settings[SAVED_VIEWS_KEY][SIDEBAR_VIEWS_VISIBLE_IDS_KEY],
+            [self.dashboard_view.id],
+        )
+        self.assertTrue(existing_settings[SAVED_VIEWS_KEY]["warn_on_unsaved_change"])
+        self.assertEqual(existing_settings["preserve"], "value")
+
+        created_settings = UiSettings.objects.get(
+            user_id=self.user_with_owned_views_id,
+        ).settings
+        self.assertCountEqual(
+            created_settings[SAVED_VIEWS_KEY][DASHBOARD_VIEWS_VISIBLE_IDS_KEY],
+            [self.other_owner_visible_view.id],
+        )
+        self.assertCountEqual(
+            created_settings[SAVED_VIEWS_KEY][SIDEBAR_VIEWS_VISIBLE_IDS_KEY],
+            [self.other_owner_visible_view.id],
+        )
+
+        invalid_settings = UiSettings.objects.get(
+            user_id=self.user_with_invalid_settings_id,
+        ).settings
+        self.assertIsInstance(invalid_settings, dict)
+        self.assertCountEqual(
+            invalid_settings[SAVED_VIEWS_KEY][DASHBOARD_VIEWS_VISIBLE_IDS_KEY],
+            [self.invalid_settings_owner_view.id],
+        )
+        self.assertEqual(
+            invalid_settings[SAVED_VIEWS_KEY][SIDEBAR_VIEWS_VISIBLE_IDS_KEY],
+            [],
+        )
+
+
+class TestReverseMigrateSavedViewVisibilityFromUiSettings(TestMigrations):
+    migrate_from = "0014_savedview_visibility_to_ui_settings"
+    migrate_to = "0013_document_root_document"
+
+    def setUpBeforeMigration(self, apps) -> None:
+        User = apps.get_model("auth", "User")
+        SavedView = apps.get_model("documents", "SavedView")
+        UiSettings = apps.get_model("documents", "UiSettings")
+
+        user1 = User.objects.create(username="user1")
+        user2 = User.objects.create(username="user2")
+        user3 = User.objects.create(username="user3")
+        user4 = User.objects.create(username="user4")
+
+        self.view1 = SavedView.objects.create(
+            owner=user1,
+            name="view-1",
+            sort_field="created",
+        )
+        self.view2 = SavedView.objects.create(
+            owner=user1,
+            name="view-2",
+            sort_field="created",
+        )
+        self.view3 = SavedView.objects.create(
+            owner=user1,
+            name="view-3",
+            sort_field="created",
+        )
+        self.view4 = SavedView.objects.create(
+            owner=user2,
+            name="view-4",
+            sort_field="created",
+        )
+        self.view5 = SavedView.objects.create(
+            owner=user4,
+            name="view-5",
+            sort_field="created",
+        )
+
+        UiSettings.objects.create(
+            user=user1,
+            settings={
+                SAVED_VIEWS_KEY: {
+                    DASHBOARD_VIEWS_VISIBLE_IDS_KEY: [str(self.view1.id)],
+                    SIDEBAR_VIEWS_VISIBLE_IDS_KEY: [self.view2.id],
+                },
+            },
+        )
+        UiSettings.objects.create(
+            user=user2,
+            settings={
+                SAVED_VIEWS_KEY: {
+                    DASHBOARD_VIEWS_VISIBLE_IDS_KEY: [
+                        self.view2.id,
+                        self.view3.id,
+                        self.view4.id,
+                    ],
+                    SIDEBAR_VIEWS_VISIBLE_IDS_KEY: [self.view4.id],
+                },
+            },
+        )
+        UiSettings.objects.create(user=user3, settings={})
+        UiSettings.objects.create(user=user4, settings=[])
+
+    def test_visibility_fields_restored_from_owner_visibility(self) -> None:
+        SavedView = self.apps.get_model("documents", "SavedView")
+
+        restored_view1 = SavedView.objects.get(pk=self.view1.id)
+        restored_view2 = SavedView.objects.get(pk=self.view2.id)
+        restored_view3 = SavedView.objects.get(pk=self.view3.id)
+        restored_view4 = SavedView.objects.get(pk=self.view4.id)
+        restored_view5 = SavedView.objects.get(pk=self.view5.id)
+
+        self.assertTrue(restored_view1.show_on_dashboard)
+        self.assertFalse(restored_view2.show_on_dashboard)
+        self.assertFalse(restored_view3.show_on_dashboard)
+        self.assertTrue(restored_view4.show_on_dashboard)
+
+        self.assertFalse(restored_view1.show_in_sidebar)
+        self.assertTrue(restored_view2.show_in_sidebar)
+        self.assertFalse(restored_view3.show_in_sidebar)
+        self.assertTrue(restored_view4.show_in_sidebar)
+        self.assertFalse(restored_view5.show_on_dashboard)
+        self.assertFalse(restored_view5.show_in_sidebar)

@@ -2087,24 +2087,21 @@ class LogViewSet(ViewSet):
         return Response(existing_logs)
 
 
-class SavedViewViewSet(ModelViewSet, PassUserMixin):
+@extend_schema_view(**generate_object_with_permissions_schema(SavedViewSerializer))
+class SavedViewViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet):
     model = SavedView
 
-    queryset = SavedView.objects.all()
+    queryset = SavedView.objects.select_related("owner").prefetch_related(
+        "filter_rules",
+    )
     serializer_class = SavedViewSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
-
-    def get_queryset(self):
-        user = self.request.user
-        return (
-            SavedView.objects.filter(owner=user)
-            .select_related("owner")
-            .prefetch_related("filter_rules")
-        )
-
-    def perform_create(self, serializer: serializers.BaseSerializer[Any]) -> None:
-        serializer.save(owner=self.request.user)
+    filter_backends = (
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
+    ordering_fields = ("name",)
 
 
 @extend_schema_view(
@@ -2632,7 +2629,11 @@ class GlobalSearchView(PassUserMixin):
                     )
             docs = docs[:OBJECT_LIMIT]
         saved_views = (
-            SavedView.objects.filter(owner=request.user, name__icontains=query)
+            get_objects_for_user_owner_aware(
+                request.user,
+                "view_savedview",
+                SavedView,
+            ).filter(name__icontains=query)
             if request.user.has_perm("documents.view_savedview")
             else []
         )

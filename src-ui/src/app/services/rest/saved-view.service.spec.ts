@@ -57,6 +57,11 @@ describe(`Additional service tests for SavedViewService`, () => {
   let settingsService
 
   it('should retrieve saved views and sort them', () => {
+    jest.spyOn(settingsService, 'get').mockImplementation((key) => {
+      if (key === SETTINGS_KEYS.DASHBOARD_VIEWS_VISIBLE_IDS) return [1, 2, 3]
+      if (key === SETTINGS_KEYS.SIDEBAR_VIEWS_VISIBLE_IDS) return [1, 2, 3]
+      return []
+    })
     service.reload()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
@@ -93,7 +98,9 @@ describe(`Additional service tests for SavedViewService`, () => {
   it('should sort dashboard views', () => {
     service['savedViews'] = saved_views
     jest.spyOn(settingsService, 'get').mockImplementation((key) => {
+      if (key === SETTINGS_KEYS.DASHBOARD_VIEWS_VISIBLE_IDS) return [1, 2, 3]
       if (key === SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER) return [3, 1, 2]
+      return []
     })
     expect(service.dashboardViews).toEqual([
       saved_views[2],
@@ -102,16 +109,36 @@ describe(`Additional service tests for SavedViewService`, () => {
     ])
   })
 
+  it('should use user-specific dashboard visibility when configured', () => {
+    service['savedViews'] = saved_views
+    jest.spyOn(settingsService, 'get').mockImplementation((key) => {
+      if (key === SETTINGS_KEYS.DASHBOARD_VIEWS_VISIBLE_IDS) return [4, 2]
+      if (key === SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER) return []
+    })
+    expect(service.dashboardViews).toEqual([saved_views[1], saved_views[3]])
+  })
+
   it('should sort sidebar views', () => {
     service['savedViews'] = saved_views
     jest.spyOn(settingsService, 'get').mockImplementation((key) => {
+      if (key === SETTINGS_KEYS.SIDEBAR_VIEWS_VISIBLE_IDS) return [1, 2, 3]
       if (key === SETTINGS_KEYS.SIDEBAR_VIEWS_SORT_ORDER) return [3, 1, 2]
+      return []
     })
     expect(service.sidebarViews).toEqual([
       saved_views[2],
       saved_views[0],
       saved_views[1],
     ])
+  })
+
+  it('should use user-specific sidebar visibility when configured', () => {
+    service['savedViews'] = saved_views
+    jest.spyOn(settingsService, 'get').mockImplementation((key) => {
+      if (key === SETTINGS_KEYS.SIDEBAR_VIEWS_VISIBLE_IDS) return [4, 2]
+      if (key === SETTINGS_KEYS.SIDEBAR_VIEWS_SORT_ORDER) return []
+    })
+    expect(service.sidebarViews).toEqual([saved_views[1], saved_views[3]])
   })
 
   it('should treat empty display_fields as null', () => {

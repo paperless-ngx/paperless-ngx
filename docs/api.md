@@ -466,3 +466,8 @@ Initial API version.
 -   The document `created` field is now a date, not a datetime. The
     `created_date` field is considered deprecated and will be removed in a
     future version.
+
+#### Version 10
+
+-   The `show_on_dashboard` and `show_in_sidebar` fields of saved views have been
+    removed. Relevant settings are now stored in the UISettings model.

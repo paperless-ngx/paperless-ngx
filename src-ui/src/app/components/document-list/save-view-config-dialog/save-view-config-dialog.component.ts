@@ -13,14 +13,22 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { User } from 'src/app/data/user'
 import { CheckComponent } from '../../common/input/check/check.component'
+import { PermissionsFormComponent } from '../../common/input/permissions/permissions-form/permissions-form.component'
 import { TextComponent } from '../../common/input/text/text.component'
 
 @Component({
   selector: 'pngx-save-view-config-dialog',
   templateUrl: './save-view-config-dialog.component.html',
   styleUrls: ['./save-view-config-dialog.component.scss'],
-  imports: [CheckComponent, TextComponent, FormsModule, ReactiveFormsModule],
+  imports: [
+    CheckComponent,
+    TextComponent,
+    PermissionsFormComponent,
+    FormsModule,
+    ReactiveFormsModule,
+  ],
 })
 export class SaveViewConfigDialogComponent implements OnInit {
   private modal = inject(NgbActiveModal)
@@ -35,6 +43,8 @@ export class SaveViewConfigDialogComponent implements OnInit {
   buttonsEnabled = true
 
   closeEnabled = false
+
+  users: User[]
 
   _defaultName = ''
 
@@ -52,6 +62,7 @@ export class SaveViewConfigDialogComponent implements OnInit {
     name: new FormControl(''),
     showInSideBar: new FormControl(false),
     showOnDashboard: new FormControl(false),
+    permissions_form: new FormControl(null),
   })
 
   ngOnInit(): void {
@@ -62,7 +73,16 @@ export class SaveViewConfigDialogComponent implements OnInit {
   }
 
   save() {
-    this.saveClicked.emit(this.saveViewConfigForm.value)
+    const formValue = this.saveViewConfigForm.value
+    const saveViewConfig = {
+      name: formValue.name,
+      showInSideBar: formValue.showInSideBar,
+      showOnDashboard: formValue.showOnDashboard,
+    }
+    if (formValue.permissions_form) {
+      saveViewConfig['permissions_form'] = formValue.permissions_form
+    }
+    this.saveClicked.emit(saveViewConfig)
   }
 
   cancel() {

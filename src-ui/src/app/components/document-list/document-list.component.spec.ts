@@ -168,6 +168,10 @@ describe('DocumentListComponent', () => {
     )
   })
 
+  it('should not allow changing a saved view when none is active', () => {
+    expect(component.activeSavedViewCanChange).toBeFalsy()
+  })
+
   it('should determine if filtered, support reset', () => {
     fixture.detectChanges()
     documentListService.setFilterRules([
@@ -297,6 +301,19 @@ describe('DocumentListComponent', () => {
     )
     component.loadViewConfig(10)
     expect(setCountSpy).toHaveBeenCalledWith(expect.any(Object), 3)
+  })
+
+  it('should reset active saved view when loading unknown view config', () => {
+    component['activeSavedView'] = { id: 1 } as SavedView
+    const activateSpy = jest.spyOn(documentListService, 'activateSavedView')
+    const reloadSpy = jest.spyOn(documentListService, 'reload')
+    jest.spyOn(savedViewService, 'getCached').mockReturnValue(of(null))
+
+    component.loadViewConfig(10)
+
+    expect(component['activeSavedView']).toBeNull()
+    expect(activateSpy).not.toHaveBeenCalled()
+    expect(reloadSpy).not.toHaveBeenCalled()
   })
 
   it('should support 3 different display modes', () => {
@@ -466,7 +483,7 @@ describe('DocumentListComponent', () => {
   })
 
   it('should handle error on view saving', () => {
-    component.list.activateSavedView({
+    const view: SavedView = {
       id: 10,
       name: 'Saved View 10',
       sort_field: 'added',
@@ -477,7 +494,16 @@ describe('DocumentListComponent', () => {
           value: '20',
         },
       ],
-    })
+    }
+    jest.spyOn(savedViewService, 'getCached').mockReturnValue(of(view))
+    const queryParams = { view: view.id.toString() }
+    jest
+      .spyOn(activatedRoute, 'queryParamMap', 'get')
+      .mockReturnValue(of(convertToParamMap(queryParams)))
+    activatedRoute.snapshot.queryParams = queryParams
+    router.routerState.snapshot.url = '/view/10/'
+    fixture.detectChanges()
+
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     jest
       .spyOn(savedViewService, 'patch')
@@ -487,6 +513,40 @@ describe('DocumentListComponent', () => {
       'Failed to save view "Saved View 10".',
       expect.any(Error)
     )
+  })
+
+  it('should not save a view without object change permissions', () => {
+    const view: SavedView = {
+      id: 10,
+      name: 'Saved View 10',
+      sort_field: 'added',
+      sort_reverse: true,
+      filter_rules: [
+        {
+          rule_type: FILTER_HAS_TAGS_ANY,
+          value: '20',
+        },
+      ],
+      owner: 999,
+      user_can_change: false,
+    }
+    jest.spyOn(savedViewService, 'getCached').mockReturnValue(of(view))
+    jest
+      .spyOn(permissionService, 'currentUserHasObjectPermissions')
+      .mockReturnValue(false)
+    const queryParams = { view: view.id.toString() }
+    jest
+      .spyOn(activatedRoute, 'queryParamMap', 'get')
+      .mockReturnValue(of(convertToParamMap(queryParams)))
+    activatedRoute.snapshot.queryParams = queryParams
+    router.routerState.snapshot.url = '/view/10/'
+    fixture.detectChanges()
+
+    const patchSpy = jest.spyOn(savedViewService, 'patch')
+
+    component.saveViewConfig()
+
+    expect(patchSpy).not.toHaveBeenCalled()
   })
 
   it('should support edited view saving as', () => {
@@ -520,19 +580,105 @@ describe('DocumentListComponent', () => {
     const modalSpy = jest.spyOn(modalService, 'open')
     const toastSpy = jest.spyOn(toastService, 'showInfo')
     const savedViewServiceCreate = jest.spyOn(savedViewService, 'create')
+    jest
+      .spyOn(savedViewService, 'dashboardViews', 'get')
+      .mockReturnValue([{ id: 77 } as SavedView])
+    jest
+      .spyOn(savedViewService, 'sidebarViews', 'get')
+      .mockReturnValue([{ id: 88 } as SavedView])
+    const updateVisibilitySpy = jest
+      .spyOn(settingsService, 'updateSavedViewsVisibility')
+      .mockReturnValue(of({ success: true }))
     savedViewServiceCreate.mockReturnValueOnce(of(modifiedView))
+    component.saveViewConfigAs()
+
+    const modalCloseSpy = jest.spyOn(openModal, 'close')
+    const permissions = {
+      owner: 5,
+      set_permissions: {
+        view: {
+          users: [4],
+          groups: [3],
+        },
+        change: {
+          users: [2],
+          groups: [1],
+        },
+      },
+    }
+    openModal.componentInstance.saveClicked.next({
+      name: 'Foo Bar',
+      showOnDashboard: true,
+      showInSideBar: true,
+      permissions_form: permissions,
+    })
+    expect(savedViewServiceCreate).toHaveBeenCalled()
+    expect(savedViewServiceCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Foo Bar',
+        owner: permissions.owner,
+        set_permissions: permissions.set_permissions,
+      })
+    )
+    expect(updateVisibilitySpy).toHaveBeenCalledWith(
+      expect.arrayContaining([77, modifiedView.id]),
+      expect.arrayContaining([88, modifiedView.id])
+    )
+    expect(modalSpy).toHaveBeenCalled()
+    expect(toastSpy).toHaveBeenCalled()
+    expect(modalCloseSpy).toHaveBeenCalled()
+  })
+
+  it('should show error when visibility update fails after creating a view', () => {
+    const view: SavedView = {
+      id: 10,
+      name: 'Saved View 10',
+      sort_field: 'added',
+      sort_reverse: true,
+      filter_rules: [
+        {
+          rule_type: FILTER_HAS_TAGS_ANY,
+          value: '20',
+        },
+      ],
+    }
+    jest.spyOn(savedViewService, 'getCached').mockReturnValue(of(view))
+    const queryParams = { view: view.id.toString() }
+    jest
+      .spyOn(activatedRoute, 'queryParamMap', 'get')
+      .mockReturnValue(of(convertToParamMap(queryParams)))
+    activatedRoute.snapshot.queryParams = queryParams
+    router.routerState.snapshot.url = '/view/10/'
+    fixture.detectChanges()
+
+    let openModal: NgbModalRef
+    modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
+    jest
+      .spyOn(savedViewService, 'create')
+      .mockReturnValueOnce(of({ ...view, id: 42, name: 'Foo Bar' }))
+    jest.spyOn(savedViewService, 'dashboardViews', 'get').mockReturnValue([])
+    jest.spyOn(savedViewService, 'sidebarViews', 'get').mockReturnValue([])
+    jest
+      .spyOn(settingsService, 'updateSavedViewsVisibility')
+      .mockReturnValueOnce(
+        throwError(() => new Error('unable to save visibility settings'))
+      )
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+
     component.saveViewConfigAs()
 
     const modalCloseSpy = jest.spyOn(openModal, 'close')
     openModal.componentInstance.saveClicked.next({
       name: 'Foo Bar',
-      show_on_dashboard: true,
-      show_in_sidebar: true,
+      showOnDashboard: true,
+      showInSideBar: false,
     })
-    expect(savedViewServiceCreate).toHaveBeenCalled()
-    expect(modalSpy).toHaveBeenCalled()
-    expect(toastSpy).toHaveBeenCalled()
+
     expect(modalCloseSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalledWith(
+      'View "Foo Bar" created successfully, but could not update visibility settings.',
+      expect.any(Error)
+    )
   })
 
   it('should handle error on edited view saving as', () => {
@@ -563,6 +709,10 @@ describe('DocumentListComponent', () => {
 
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
+    const updateVisibilitySpy = jest.spyOn(
+      settingsService,
+      'updateSavedViewsVisibility'
+    )
     jest.spyOn(savedViewService, 'create').mockReturnValueOnce(
       throwError(
         () =>
@@ -575,9 +725,10 @@ describe('DocumentListComponent', () => {
 
     openModal.componentInstance.saveClicked.next({
       name: 'Foo Bar',
-      show_on_dashboard: true,
-      show_in_sidebar: true,
+      showOnDashboard: true,
+      showInSideBar: true,
     })
+    expect(updateVisibilitySpy).not.toHaveBeenCalled()
     expect(openModal.componentInstance.error).toEqual({ filter_rules: ['11'] })
   })
 

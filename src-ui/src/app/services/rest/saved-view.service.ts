@@ -36,7 +36,9 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
     return super.list(page, pageSize, sortField, sortReverse, extraParams).pipe(
       tap({
         next: (r) => {
-          this.savedViews = r.results
+          const views = r.results.map((view) => this.withUserVisibility(view))
+          this.savedViews = views
+          r.results = views
           this._loading = false
           this.settingsService.dashboardIsEmpty =
             this.dashboardViews.length === 0
@@ -65,8 +67,35 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
     return this.savedViews
   }
 
+  private getVisibleViewIds(setting: string): number[] {
+    const configured = this.settingsService.get(setting)
+    return Array.isArray(configured) ? configured : []
+  }
+
+  private withUserVisibility(view: SavedView): SavedView {
+    return {
+      ...view,
+      show_on_dashboard: this.isDashboardVisible(view),
+      show_in_sidebar: this.isSidebarVisible(view),
+    }
+  }
+
+  private isDashboardVisible(view: SavedView): boolean {
+    const visibleIds = this.getVisibleViewIds(
+      SETTINGS_KEYS.DASHBOARD_VIEWS_VISIBLE_IDS
+    )
+    return visibleIds.includes(view.id)
+  }
+
+  private isSidebarVisible(view: SavedView): boolean {
+    const visibleIds = this.getVisibleViewIds(
+      SETTINGS_KEYS.SIDEBAR_VIEWS_VISIBLE_IDS
+    )
+    return visibleIds.includes(view.id)
+  }
+
   get sidebarViews(): SavedView[] {
-    const sidebarViews = this.savedViews.filter((v) => v.show_in_sidebar)
+    const sidebarViews = this.savedViews.filter((v) => this.isSidebarVisible(v))
 
     const sorted: number[] = this.settingsService.get(
       SETTINGS_KEYS.SIDEBAR_VIEWS_SORT_ORDER
@@ -81,7 +110,9 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
   }
 
   get dashboardViews(): SavedView[] {
-    const dashboardViews = this.savedViews.filter((v) => v.show_on_dashboard)
+    const dashboardViews = this.savedViews.filter((v) =>
+      this.isDashboardVisible(v)
+    )
 
     const sorted: number[] = this.settingsService.get(
       SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER

@@ -473,13 +473,6 @@ class SavedView(ModelWithOwner):
 
     name = models.CharField(_("name"), max_length=128)
 
-    show_on_dashboard = models.BooleanField(
-        _("show on dashboard"),
-    )
-    show_in_sidebar = models.BooleanField(
-        _("show in sidebar"),
-    )
-
     sort_field = models.CharField(
         _("sort field"),
         max_length=128,

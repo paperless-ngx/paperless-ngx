@@ -41,6 +41,9 @@ export class PermissionsDialogComponent {
   title = $localize`Set permissions`
 
   @Input()
+  note: string = null
+
+  @Input()
   set object(o: ObjectWithPermissions) {
     this.o = o
     this.title = $localize`Edit permissions for ` + o['name']
