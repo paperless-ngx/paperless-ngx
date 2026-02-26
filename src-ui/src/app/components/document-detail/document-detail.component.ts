@@ -36,7 +36,7 @@ import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
 import { DataType } from 'src/app/data/datatype'
-import { Document } from 'src/app/data/document'
+import { Document, DocumentVersionInfo } from 'src/app/data/document'
 import { DocumentMetadata } from 'src/app/data/document-metadata'
 import { DocumentNote } from 'src/app/data/document-note'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
@@ -120,6 +120,7 @@ import { SuggestionsDropdownComponent } from '../common/suggestions-dropdown/sug
 import { DocumentNotesComponent } from '../document-notes/document-notes.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { DocumentHistoryComponent } from './document-history/document-history.component'
+import { DocumentVersionDropdownComponent } from './document-version-dropdown/document-version-dropdown.component'
 import { MetadataCollapseComponent } from './metadata-collapse/metadata-collapse.component'
 
 enum DocumentDetailNavIDs {
@@ -177,6 +178,7 @@ enum ContentRenderType {
     TextAreaComponent,
     RouterModule,
     PngxPdfViewerComponent,
+    DocumentVersionDropdownComponent,
   ],
 })
 export class DocumentDetailComponent
@@ -184,6 +186,7 @@ export class DocumentDetailComponent
   implements OnInit, OnDestroy, DirtyComponent
 {
   PdfRenderMode = PdfRenderMode
+
   documentsService = inject(DocumentService)
   private route = inject(ActivatedRoute)
   private tagService = inject(TagService)
@@ -235,6 +238,9 @@ export class DocumentDetailComponent
   tiffURL: string
   tiffError: string
 
+  // Versioning
+  selectedVersionId: number
+
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
   storagePaths: StoragePath[]
@@ -270,6 +276,7 @@ export class DocumentDetailComponent
   customFields: CustomField[]
 
   public downloading: boolean = false
+  public useFormattedFilename: boolean = false
 
   public readonly CustomFieldDataType = CustomFieldDataType
 
@@ -312,13 +319,19 @@ export class DocumentDetailComponent
   }
 
   get archiveContentRenderType(): ContentRenderType {
-    return this.document?.archived_file_name
+    const hasArchiveVersion =
+      this.metadata?.has_archive_version ?? !!this.document?.archived_file_name
+    return hasArchiveVersion
       ? this.getRenderType('application/pdf')
-      : this.getRenderType(this.document?.mime_type)
+      : this.getRenderType(
+          this.metadata?.original_mime_type || this.document?.mime_type
+        )
   }
 
   get originalContentRenderType(): ContentRenderType {
-    return this.getRenderType(this.document?.mime_type)
+    return this.getRenderType(
+      this.metadata?.original_mime_type || this.document?.mime_type
+    )
   }
 
   get showThumbnailOverlay(): boolean {
@@ -348,14 +361,44 @@ export class DocumentDetailComponent
   }
 
   private updatePdfSource() {
-    if (!this.previewUrl) {
-      this.pdfSource = undefined
-      return
-    }
     this.pdfSource = {
       url: this.previewUrl,
-      password: this.password || undefined,
+      password: this.password,
     }
+  }
+
+  private loadMetadataForSelectedVersion() {
+    const selectedVersionId = this.getSelectedNonLatestVersionId()
+    this.documentsService
+      .getMetadata(this.documentId, selectedVersionId)
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        takeUntil(this.docChangeNotifier)
+      )
+      .subscribe({
+        next: (result) => {
+          this.metadata = result
+          this.tiffURL = null
+          this.tiffError = null
+          if (this.archiveContentRenderType === ContentRenderType.TIFF) {
+            this.tryRenderTiff()
+          }
+          if (
+            this.archiveContentRenderType !== ContentRenderType.PDF ||
+            this.useNativePdfViewer
+          ) {
+            this.previewLoaded = true
+          }
+        },
+        error: (error) => {
+          this.metadata = {} // allow display to fallback to <object> tag
+          this.toastService.showError(
+            $localize`Error retrieving metadata`,
+            error
+          )
+        },
+      })
   }
 
   get isRTL() {
@@ -433,7 +476,11 @@ export class DocumentDetailComponent
   }
 
   private loadDocument(documentId: number): void {
-    this.previewUrl = this.documentsService.getPreviewUrl(documentId)
+    let redirectedToRoot = false
+    this.selectedVersionId = documentId
+    this.previewUrl = this.documentsService.getPreviewUrl(
+      this.selectedVersionId
+    )
     this.updatePdfSource()
     this.http
       .get(this.previewUrl, { responseType: 'text' })
@@ -449,11 +496,29 @@ export class DocumentDetailComponent
             err.message ?? err.toString()
           }`),
       })
-    this.thumbUrl = this.documentsService.getThumbUrl(documentId)
+    this.thumbUrl = this.documentsService.getThumbUrl(this.selectedVersionId)
     this.documentsService
       .get(documentId)
       .pipe(
-        catchError(() => {
+        catchError((error) => {
+          if (error?.status === 404) {
+            // if not found, check if there's root document that exists and redirect if so
+            return this.documentsService.getRootId(documentId).pipe(
+              map((result) => {
+                const rootId = result?.root_id
+                if (rootId && rootId !== documentId) {
+                  const section =
+                    this.route.snapshot.paramMap.get('section') || 'details'
+                  redirectedToRoot = true
+                  this.router.navigate(['documents', rootId, section], {
+                    replaceUrl: true,
+                  })
+                }
+                return null
+              }),
+              catchError(() => of(null))
+            )
+          }
           // 404 is handled in the subscribe below
           return of(null)
         }),
@@ -464,6 +529,9 @@ export class DocumentDetailComponent
       .subscribe({
         next: (doc) => {
           if (!doc) {
+            if (redirectedToRoot) {
+              return
+            }
             this.router.navigate(['404'], { replaceUrl: true })
             return
           }
@@ -680,36 +748,15 @@ export class DocumentDetailComponent
 
   updateComponent(doc: Document) {
     this.document = doc
+    // Default selected version is the newest version
+    const versions = doc.versions ?? []
+    this.selectedVersionId = versions.length
+      ? Math.max(...versions.map((version) => version.id))
+      : doc.id
+    this.previewLoaded = false
     this.requiresPassword = false
     this.updateFormForCustomFields()
-    if (this.archiveContentRenderType === ContentRenderType.TIFF) {
-      this.tryRenderTiff()
-    }
-    this.documentsService
-      .getMetadata(doc.id)
-      .pipe(
-        first(),
-        takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier)
-      )
-      .subscribe({
-        next: (result) => {
-          this.metadata = result
-          if (
-            this.archiveContentRenderType !== ContentRenderType.PDF ||
-            this.useNativePdfViewer
-          ) {
-            this.previewLoaded = true
-          }
-        },
-        error: (error) => {
-          this.metadata = {} // allow display to fallback to <object> tag
-          this.toastService.showError(
-            $localize`Error retrieving metadata`,
-            error
-          )
-        },
-      })
+    this.loadMetadataForSelectedVersion()
     if (
       this.permissionsService.currentUserHasObjectPermissions(
         PermissionAction.Change,
@@ -735,6 +782,78 @@ export class DocumentDetailComponent
       !doc?.duplicate_documents?.length
     ) {
       this.activeNavID = DocumentDetailNavIDs.Details
+    }
+  }
+
+  // Update file preview and download target to a specific version (by document id)
+  selectVersion(versionId: number) {
+    this.selectedVersionId = versionId
+    this.previewLoaded = false
+    this.previewUrl = this.documentsService.getPreviewUrl(
+      this.documentId,
+      false,
+      this.selectedVersionId
+    )
+    this.updatePdfSource()
+    this.thumbUrl = this.documentsService.getThumbUrl(
+      this.documentId,
+      this.selectedVersionId
+    )
+    this.loadMetadataForSelectedVersion()
+    this.documentsService
+      .get(this.documentId, this.selectedVersionId, 'content')
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        takeUntil(this.docChangeNotifier)
+      )
+      .subscribe({
+        next: (doc) => {
+          const content = doc?.content ?? ''
+          this.document.content = content
+          this.documentForm.patchValue(
+            {
+              content,
+            },
+            {
+              emitEvent: false,
+            }
+          )
+        },
+        error: (error) => {
+          this.toastService.showError(
+            $localize`Error retrieving version content`,
+            error
+          )
+        },
+      })
+    // For text previews, refresh content
+    this.http
+      .get(this.previewUrl, { responseType: 'text' })
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        takeUntil(this.docChangeNotifier)
+      )
+      .subscribe({
+        next: (res) => (this.previewText = res.toString()),
+        error: (err) =>
+          (this.previewText = $localize`An error occurred loading content: ${
+            err.message ?? err.toString()
+          }`),
+      })
+  }
+
+  onVersionSelected(versionId: number) {
+    this.selectVersion(versionId)
+  }
+
+  onVersionsUpdated(versions: DocumentVersionInfo[]) {
+    this.document.versions = versions
+    const openDoc = this.openDocumentService.getOpenDocument(this.documentId)
+    if (openDoc) {
+      openDoc.versions = versions
+      this.openDocumentService.save()
     }
   }
 
@@ -906,7 +1025,7 @@ export class DocumentDetailComponent
 
   discard() {
     this.documentsService
-      .get(this.documentId)
+      .get(this.documentId, this.selectedVersionId)
       .pipe(
         first(),
         takeUntil(this.unsubscribeNotifier),
@@ -956,7 +1075,7 @@ export class DocumentDetailComponent
     this.networkActive = true
     ;(document.activeElement as HTMLElement)?.dispatchEvent(new Event('change'))
     this.documentsService
-      .patch(this.getChangedFields())
+      .patch(this.getChangedFields(), this.selectedVersionId)
       .pipe(first())
       .subscribe({
         next: (docValues) => {
@@ -1011,7 +1130,7 @@ export class DocumentDetailComponent
     this.networkActive = true
     this.store.next(this.documentForm.value)
     this.documentsService
-      .patch(this.getChangedFields())
+      .patch(this.getChangedFields(), this.selectedVersionId)
       .pipe(
         switchMap((updateResult) => {
           this.savedViewService.maybeRefreshDocumentCounts()
@@ -1154,11 +1273,25 @@ export class DocumentDetailComponent
     })
   }
 
+  private getSelectedNonLatestVersionId(): number | null {
+    const versions = this.document?.versions ?? []
+    if (!versions.length || !this.selectedVersionId) {
+      return null
+    }
+    const latestVersionId = Math.max(...versions.map((version) => version.id))
+    return this.selectedVersionId === latestVersionId
+      ? null
+      : this.selectedVersionId
+  }
+
   download(original: boolean = false) {
     this.downloading = true
+    const selectedVersionId = this.getSelectedNonLatestVersionId()
     const downloadUrl = this.documentsService.getDownloadUrl(
       this.documentId,
-      original
+      original,
+      selectedVersionId,
+      this.useFormattedFilename
     )
     this.http
       .get(downloadUrl, { observe: 'response', responseType: 'blob' })
@@ -1590,9 +1723,11 @@ export class DocumentDetailComponent
   }
 
   printDocument() {
+    const selectedVersionId = this.getSelectedNonLatestVersionId()
     const printUrl = this.documentsService.getDownloadUrl(
       this.document.id,
-      false
+      false,
+      selectedVersionId
     )
     this.http
       .get(printUrl, { responseType: 'blob' })
@@ -1640,7 +1775,7 @@ export class DocumentDetailComponent
     const modal = this.modalService.open(ShareLinksDialogComponent)
     modal.componentInstance.documentId = this.document.id
     modal.componentInstance.hasArchiveVersion =
-      !!this.document?.archived_file_name
+      this.metadata?.has_archive_version ?? !!this.document?.archived_file_name
   }
 
   get emailEnabled(): boolean {
@@ -1653,7 +1788,7 @@ export class DocumentDetailComponent
     })
     modal.componentInstance.documentIds = [this.document.id]
     modal.componentInstance.hasArchiveVersion =
-      !!this.document?.archived_file_name
+      this.metadata?.has_archive_version ?? !!this.document?.archived_file_name
   }
 
   private tryRenderTiff() {

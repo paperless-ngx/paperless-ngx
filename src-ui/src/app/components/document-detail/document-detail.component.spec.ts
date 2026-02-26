@@ -294,6 +294,27 @@ describe('DocumentDetailComponent', () => {
     component = fixture.componentInstance
   })
 
+  function initNormally() {
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
+    jest
+      .spyOn(documentService, 'get')
+      .mockReturnValueOnce(of(Object.assign({}, doc)))
+    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(null)
+    jest
+      .spyOn(openDocumentsService, 'openDocument')
+      .mockReturnValueOnce(of(true))
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({
+        count: customFields.length,
+        all: customFields.map((f) => f.id),
+        results: customFields,
+      })
+    )
+    fixture.detectChanges()
+  }
+
   it('should load four tabs via url params', () => {
     jest
       .spyOn(activatedRoute, 'paramMap', 'get')
@@ -352,6 +373,117 @@ describe('DocumentDetailComponent', () => {
   it('should load non-open document via param', () => {
     initNormally()
     expect(component.document).toEqual(doc)
+  })
+
+  it('should redirect to root when opening a version document id', () => {
+    const navigateSpy = jest.spyOn(router, 'navigate')
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 10, section: 'details' })))
+    jest
+      .spyOn(documentService, 'get')
+      .mockReturnValueOnce(throwError(() => ({ status: 404 }) as any))
+    const getRootSpy = jest
+      .spyOn(documentService, 'getRootId')
+      .mockReturnValue(of({ root_id: 3 }))
+    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(null)
+    jest
+      .spyOn(openDocumentsService, 'openDocument')
+      .mockReturnValueOnce(of(true))
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({
+        count: customFields.length,
+        all: customFields.map((f) => f.id),
+        results: customFields,
+      })
+    )
+
+    fixture.detectChanges()
+    httpTestingController.expectOne(component.previewUrl).flush('preview')
+
+    expect(getRootSpy).toHaveBeenCalledWith(10)
+    expect(navigateSpy).toHaveBeenCalledWith(['documents', 3, 'details'], {
+      replaceUrl: true,
+    })
+  })
+
+  it('should navigate to 404 when root lookup fails', () => {
+    const navigateSpy = jest.spyOn(router, 'navigate')
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 10, section: 'details' })))
+    jest
+      .spyOn(documentService, 'get')
+      .mockReturnValueOnce(throwError(() => ({ status: 404 }) as any))
+    jest
+      .spyOn(documentService, 'getRootId')
+      .mockReturnValue(throwError(() => new Error('boom')))
+    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(null)
+    jest
+      .spyOn(openDocumentsService, 'openDocument')
+      .mockReturnValueOnce(of(true))
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({
+        count: customFields.length,
+        all: customFields.map((f) => f.id),
+        results: customFields,
+      })
+    )
+
+    fixture.detectChanges()
+    httpTestingController.expectOne(component.previewUrl).flush('preview')
+
+    expect(navigateSpy).toHaveBeenCalledWith(['404'], { replaceUrl: true })
+  })
+
+  it('should not render a delete button for the root/original version', () => {
+    const docWithVersions = {
+      ...doc,
+      versions: [
+        {
+          id: doc.id,
+          added: new Date('2024-01-01T00:00:00Z'),
+          version_label: 'Original',
+          checksum: 'aaaa',
+          is_root: true,
+        },
+        {
+          id: 10,
+          added: new Date('2024-01-02T00:00:00Z'),
+          version_label: 'Edited',
+          checksum: 'bbbb',
+          is_root: false,
+        },
+      ],
+    } as Document
+
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
+    jest.spyOn(documentService, 'get').mockReturnValueOnce(of(docWithVersions))
+    jest
+      .spyOn(documentService, 'getMetadata')
+      .mockReturnValue(of({ has_archive_version: true } as any))
+    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(null)
+    jest
+      .spyOn(openDocumentsService, 'openDocument')
+      .mockReturnValueOnce(of(true))
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({
+        count: customFields.length,
+        all: customFields.map((f) => f.id),
+        results: customFields,
+      })
+    )
+
+    fixture.detectChanges()
+    httpTestingController.expectOne(component.previewUrl).flush('preview')
+    fixture.detectChanges()
+
+    const deleteButtons = fixture.debugElement.queryAll(
+      By.css('pngx-confirm-button')
+    )
+    expect(deleteButtons.length).toEqual(1)
   })
 
   it('should fall back to details tab when duplicates tab is active but no duplicates', () => {
@@ -532,6 +664,18 @@ describe('DocumentDetailComponent', () => {
     expect(navigateSpy).toHaveBeenCalledWith(['404'], { replaceUrl: true })
   })
 
+  it('discard should request the currently selected version', () => {
+    initNormally()
+    const getSpy = jest.spyOn(documentService, 'get')
+    getSpy.mockClear()
+    getSpy.mockReturnValueOnce(of(doc))
+
+    component.selectedVersionId = 10
+    component.discard()
+
+    expect(getSpy).toHaveBeenCalledWith(component.documentId, 10)
+  })
+
   it('should 404 on invalid id', () => {
     const navigateSpy = jest.spyOn(router, 'navigate')
     jest
@@ -582,6 +726,18 @@ describe('DocumentDetailComponent', () => {
     expect(toastSpy).toHaveBeenCalledWith(
       'Document "Doc 3" saved successfully.'
     )
+  })
+
+  it('save should target currently selected version', () => {
+    initNormally()
+    component.selectedVersionId = 10
+    const patchSpy = jest.spyOn(documentService, 'patch')
+    patchSpy.mockReturnValue(of(doc))
+
+    component.save()
+
+    expect(patchSpy).toHaveBeenCalled()
+    expect(patchSpy.mock.calls[0][1]).toEqual(10)
   })
 
   it('should show toast error on save if error occurs', () => {
@@ -1036,7 +1192,32 @@ describe('DocumentDetailComponent', () => {
     const metadataSpy = jest.spyOn(documentService, 'getMetadata')
     metadataSpy.mockReturnValue(of({ has_archive_version: true }))
     initNormally()
-    expect(metadataSpy).toHaveBeenCalled()
+    expect(metadataSpy).toHaveBeenCalledWith(doc.id, null)
+  })
+
+  it('should pass metadata version only for non-latest selected versions', () => {
+    const metadataSpy = jest.spyOn(documentService, 'getMetadata')
+    metadataSpy.mockReturnValue(of({ has_archive_version: true }))
+    initNormally()
+    httpTestingController.expectOne(component.previewUrl).flush('preview')
+
+    expect(metadataSpy).toHaveBeenCalledWith(doc.id, null)
+
+    metadataSpy.mockClear()
+    component.document.versions = [
+      { id: doc.id, is_root: true },
+      { id: 10, is_root: false },
+    ] as any
+    jest.spyOn(documentService, 'getPreviewUrl').mockReturnValue('preview-root')
+    jest.spyOn(documentService, 'getThumbUrl').mockReturnValue('thumb-root')
+    jest
+      .spyOn(documentService, 'get')
+      .mockReturnValue(of({ content: 'root' } as Document))
+
+    component.selectVersion(doc.id)
+    httpTestingController.expectOne('preview-root').flush('root')
+
+    expect(metadataSpy).toHaveBeenCalledWith(doc.id, doc.id)
   })
 
   it('should show an error if failed metadata retrieval', () => {
@@ -1441,26 +1622,88 @@ describe('DocumentDetailComponent', () => {
     expect(closeSpy).toHaveBeenCalled()
   })
 
-  function initNormally() {
-    jest
-      .spyOn(activatedRoute, 'paramMap', 'get')
-      .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
+  it('selectVersion should update preview and handle preview failures', () => {
+    const previewSpy = jest.spyOn(documentService, 'getPreviewUrl')
+    initNormally()
+    httpTestingController.expectOne(component.previewUrl).flush('preview')
+
+    previewSpy.mockReturnValueOnce('preview-version')
+    jest.spyOn(documentService, 'getThumbUrl').mockReturnValue('thumb-version')
     jest
       .spyOn(documentService, 'get')
-      .mockReturnValueOnce(of(Object.assign({}, doc)))
-    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(null)
+      .mockReturnValue(of({ content: 'version-content' } as Document))
+
+    component.selectVersion(10)
+    httpTestingController.expectOne('preview-version').flush('version text')
+
+    expect(component.previewUrl).toBe('preview-version')
+    expect(component.thumbUrl).toBe('thumb-version')
+    expect(component.previewText).toBe('version text')
+    expect(component.documentForm.get('content').value).toBe('version-content')
+    const pdfSource = component.pdfSource as { url: string; password?: string }
+    expect(pdfSource.url).toBe('preview-version')
+    expect(pdfSource.password).toBeUndefined()
+
+    previewSpy.mockReturnValueOnce('preview-error')
+    component.selectVersion(11)
+    httpTestingController
+      .expectOne('preview-error')
+      .error(new ErrorEvent('fail'))
+
+    expect(component.previewText).toContain('An error occurred loading content')
+  })
+
+  it('selectVersion should show toast if version content retrieval fails', () => {
+    initNormally()
+    httpTestingController.expectOne(component.previewUrl).flush('preview')
+
+    jest.spyOn(documentService, 'getPreviewUrl').mockReturnValue('preview-ok')
+    jest.spyOn(documentService, 'getThumbUrl').mockReturnValue('thumb-ok')
     jest
-      .spyOn(openDocumentsService, 'openDocument')
-      .mockReturnValueOnce(of(true))
-    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
-      of({
-        count: customFields.length,
-        all: customFields.map((f) => f.id),
-        results: customFields,
-      })
+      .spyOn(documentService, 'getMetadata')
+      .mockReturnValue(of({ has_archive_version: true } as any))
+    const contentError = new Error('content failed')
+    jest
+      .spyOn(documentService, 'get')
+      .mockReturnValue(throwError(() => contentError))
+    const toastSpy = jest.spyOn(toastService, 'showError')
+
+    component.selectVersion(10)
+    httpTestingController.expectOne('preview-ok').flush('preview text')
+
+    expect(toastSpy).toHaveBeenCalledWith(
+      'Error retrieving version content',
+      contentError
     )
-    fixture.detectChanges()
-  }
+  })
+
+  it('onVersionSelected should delegate to selectVersion', () => {
+    const selectVersionSpy = jest
+      .spyOn(component, 'selectVersion')
+      .mockImplementation(() => {})
+
+    component.onVersionSelected(42)
+
+    expect(selectVersionSpy).toHaveBeenCalledWith(42)
+  })
+
+  it('onVersionsUpdated should sync open document versions and save', () => {
+    component.documentId = doc.id
+    component.document = { ...doc, versions: [] } as Document
+    const updatedVersions = [
+      { id: doc.id, is_root: true },
+      { id: 10, is_root: false },
+    ] as any
+    const openDoc = { ...doc, versions: [] } as Document
+    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(openDoc)
+    const saveSpy = jest.spyOn(openDocumentsService, 'save')
+
+    component.onVersionsUpdated(updatedVersions)
+
+    expect(component.document.versions).toEqual(updatedVersions)
+    expect(openDoc.versions).toEqual(updatedVersions)
+    expect(saveSpy).toHaveBeenCalled()
+  })
 
   it('createDisabled should return true if the user does not have permission to add the specified data type', () => {
     currentUserCan = false
@@ -1552,6 +1795,88 @@ describe('DocumentDetailComponent', () => {
     expect(shareSpy).not.toHaveBeenCalled()
     expect(createSpy).toHaveBeenCalledWith('a')
     expect(urlRevokeSpy).toHaveBeenCalled()
+  })
+
+  it('should include version in download and print only for non-latest selected version', () => {
+    initNormally()
+    component.document.versions = [
+      { id: doc.id, is_root: true },
+      { id: 10, is_root: false },
+    ] as any
+
+    const getDownloadUrlSpy = jest
+      .spyOn(documentService, 'getDownloadUrl')
+      .mockReturnValueOnce('download-latest')
+      .mockReturnValueOnce('print-latest')
+      .mockReturnValueOnce('download-non-latest')
+      .mockReturnValueOnce('print-non-latest')
+
+    component.selectedVersionId = 10
+    component.download()
+    expect(getDownloadUrlSpy).toHaveBeenNthCalledWith(
+      1,
+      doc.id,
+      false,
+      null,
+      false
+    )
+    httpTestingController
+      .expectOne('download-latest')
+      .error(new ProgressEvent('failed'))
+
+    component.printDocument()
+    expect(getDownloadUrlSpy).toHaveBeenNthCalledWith(2, doc.id, false, null)
+    httpTestingController
+      .expectOne('print-latest')
+      .error(new ProgressEvent('failed'))
+
+    component.selectedVersionId = doc.id
+    component.download()
+    expect(getDownloadUrlSpy).toHaveBeenNthCalledWith(
+      3,
+      doc.id,
+      false,
+      doc.id,
+      false
+    )
+    httpTestingController
+      .expectOne('download-non-latest')
+      .error(new ProgressEvent('failed'))
+
+    component.printDocument()
+    expect(getDownloadUrlSpy).toHaveBeenNthCalledWith(4, doc.id, false, doc.id)
+    httpTestingController
+      .expectOne('print-non-latest')
+      .error(new ProgressEvent('failed'))
+  })
+
+  it('should omit version in download and print when no version is selected', () => {
+    initNormally()
+    component.document.versions = [] as any
+    ;(component as any).selectedVersionId = undefined
+
+    const getDownloadUrlSpy = jest
+      .spyOn(documentService, 'getDownloadUrl')
+      .mockReturnValueOnce('download-no-version')
+      .mockReturnValueOnce('print-no-version')
+
+    component.download()
+    expect(getDownloadUrlSpy).toHaveBeenNthCalledWith(
+      1,
+      doc.id,
+      false,
+      null,
+      false
+    )
+    httpTestingController
+      .expectOne('download-no-version')
+      .error(new ProgressEvent('failed'))
+
+    component.printDocument()
+    expect(getDownloadUrlSpy).toHaveBeenNthCalledWith(2, doc.id, false, null)
+    httpTestingController
+      .expectOne('print-no-version')
+      .error(new ProgressEvent('failed'))
   })
 
   it('should download a file with the correct filename', () => {

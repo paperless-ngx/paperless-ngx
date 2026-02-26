@@ -158,7 +158,11 @@ def open_index_searcher() -> Searcher:
         searcher.close()
 
 
-def update_document(writer: AsyncWriter, doc: Document) -> None:
+def update_document(
+    writer: AsyncWriter,
+    doc: Document,
+    effective_content: str | None = None,
+) -> None:
     tags = ",".join([t.name for t in doc.tags.all()])
     tags_ids = ",".join([str(t.id) for t in doc.tags.all()])
     notes = ",".join([str(c.note) for c in Note.objects.filter(document=doc)])
@@ -188,7 +192,7 @@ def update_document(writer: AsyncWriter, doc: Document) -> None:
     writer.update_document(
         id=doc.pk,
         title=doc.title,
-        content=doc.content,
+        content=effective_content or doc.content,
         correspondent=doc.correspondent.name if doc.correspondent else None,
         correspondent_id=doc.correspondent.id if doc.correspondent else None,
         has_correspondent=doc.correspondent is not None,
@@ -231,9 +235,12 @@ def remove_document_by_id(writer: AsyncWriter, doc_id) -> None:
     writer.delete_by_term("id", doc_id)
 
 
-def add_or_update_document(document: Document) -> None:
+def add_or_update_document(
+    document: Document,
+    effective_content: str | None = None,
+) -> None:
     with open_index_writer() as writer:
-        update_document(writer, document)
+        update_document(writer, document, effective_content=effective_content)
 
 
 def remove_document_from_index(document: Document) -> None:

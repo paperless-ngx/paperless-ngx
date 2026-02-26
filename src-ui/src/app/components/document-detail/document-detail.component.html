@@ -1,7 +1,7 @@
 <pngx-page-header [(title)]="title" [id]="documentId">
   @if (archiveContentRenderType === ContentRenderType.PDF && !useNativePdfViewer) {
     @if (previewNumPages) {
-      <div class="input-group input-group-sm d-none d-md-flex">
+      <div class="input-group input-group-sm ms-2 d-none d-md-flex">
         <div class="input-group-text" i18n>Page</div>
           <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages" [(ngModel)]="previewCurrentPage" />
         <div class="input-group-text" i18n>of {{previewNumPages}}</div>
@@ -24,6 +24,16 @@
     <i-bs width="1.2em" height="1.2em" name="trash"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
   </button>
 
+  <pngx-document-version-dropdown
+    [documentId]="documentId"
+    [versions]="document?.versions ?? []"
+    [selectedVersionId]="selectedVersionId"
+    [userIsOwner]="userIsOwner"
+    [userCanEdit]="userCanEdit"
+    (versionSelected)="onVersionSelected($event)"
+    (versionsUpdated)="onVersionsUpdated($event)"
+  />
+
   <div class="btn-group">
     <button (click)="download()" class="btn btn-sm btn-outline-primary" [disabled]="downloading">
       @if (downloading) {
@@ -34,14 +44,21 @@
       <span class="d-none d-lg-inline ps-1" i18n>Download</span>
     </button>
 
-    @if (metadata?.has_archive_version) {
-      <div class="btn-group" ngbDropdown role="group">
-        <button class="btn btn-sm btn-outline-primary dropdown-toggle" [disabled]="downloading" ngbDropdownToggle></button>
-        <div class="dropdown-menu shadow" ngbDropdownMenu>
+    <div class="btn-group" ngbDropdown role="group">
+      <button class="btn btn-sm btn-outline-primary dropdown-toggle" [disabled]="downloading" ngbDropdownToggle></button>
+      <div class="dropdown-menu shadow" ngbDropdownMenu>
+        @if (metadata?.has_archive_version) {
           <button ngbDropdownItem (click)="download(true)" [disabled]="downloading" i18n>Download original</button>
-        </div>
+          <div class="dropdown-divider"></div>
+        }
+        <form class="px-3 py-1">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="downloadUseFormatting" [(ngModel)]="useFormattedFilename" [ngModelOptions]="{standalone: true}" />
+            <label class="form-check-label" for="downloadUseFormatting" i18n>Use formatted filename</label>
+          </div>
+        </form>
       </div>
-    }
+    </div>
   </div>
 
   <div class="ms-auto" ngbDropdown>

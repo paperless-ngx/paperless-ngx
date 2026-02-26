@@ -9,6 +9,7 @@ from decimal import Decimal
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Literal
+from typing import TypedDict
 
 import magic
 from celery import states
@@ -90,6 +91,8 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from django.db.models.query import QuerySet
+    from rest_framework.relations import ManyRelatedField
+    from rest_framework.relations import RelatedField
 
 
 logger = logging.getLogger("paperless.serializers")
@@ -1025,6 +1028,7 @@ def _get_viewable_duplicates(
     duplicates = Document.global_objects.filter(
         Q(checksum__in=checksums) | Q(archive_checksum__in=checksums),
     ).exclude(pk=document.pk)
+    duplicates = duplicates.filter(root_document__isnull=True)
     duplicates = duplicates.order_by("-created")
     allowed = get_objects_for_user_owner_aware(
         user,
@@ -1039,6 +1043,22 @@ class DuplicateDocumentSummarySerializer(serializers.Serializer):
     id = serializers.IntegerField()
     title = serializers.CharField()
     deleted_at = serializers.DateTimeField(allow_null=True)
+
+
+class DocumentVersionInfoSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    added = serializers.DateTimeField()
+    version_label = serializers.CharField(required=False, allow_null=True)
+    checksum = serializers.CharField(required=False, allow_null=True)
+    is_root = serializers.BooleanField()
+
+
+class _DocumentVersionInfo(TypedDict):
+    id: int
+    added: datetime
+    version_label: str | None
+    checksum: str | None
+    is_root: bool
 
 
 @extend_schema_serializer(
@@ -1061,6 +1081,10 @@ class DocumentSerializer(
     duplicate_documents = SerializerMethodField()
 
     notes = NotesSerializer(many=True, required=False, read_only=True)
+    root_document: RelatedField[Document, Document, Any] | ManyRelatedField = (
+        serializers.PrimaryKeyRelatedField(read_only=True)
+    )
+    versions = SerializerMethodField()
 
     custom_fields = CustomFieldInstanceSerializer(
         many=True,
@@ -1094,6 +1118,44 @@ class DocumentSerializer(
         duplicates = _get_viewable_duplicates(obj, user)
         return list(duplicates.values("id", "title", "deleted_at"))
 
+    @extend_schema_field(DocumentVersionInfoSerializer(many=True))
+    def get_versions(self, obj):
+        root_doc = obj if obj.root_document_id is None else obj.root_document
+        if root_doc is None:
+            return []
+
+        prefetched_cache = getattr(obj, "_prefetched_objects_cache", None)
+        prefetched_versions = (
+            prefetched_cache.get("versions")
+            if isinstance(prefetched_cache, dict)
+            else None
+        )
+
+        versions: list[Document]
+        if prefetched_versions is not None:
+            versions = [*prefetched_versions, root_doc]
+        else:
+            versions_qs = Document.objects.filter(root_document=root_doc).only(
+                "id",
+                "added",
+                "checksum",
+                "version_label",
+            )
+            versions = [*versions_qs, root_doc]
+
+        def build_info(doc: Document) -> _DocumentVersionInfo:
+            return {
+                "id": doc.id,
+                "added": doc.added,
+                "version_label": doc.version_label,
+                "checksum": doc.checksum,
+                "is_root": doc.id == root_doc.id,
+            }
+
+        info = [build_info(doc) for doc in versions]
+        info.sort(key=lambda item: item["id"], reverse=True)
+        return info
+
     def get_original_file_name(self, obj) -> str | None:
         return obj.original_filename
 
@@ -1105,6 +1167,8 @@ class DocumentSerializer(
 
     def to_representation(self, instance):
         doc = super().to_representation(instance)
+        if "content" in self.fields and hasattr(instance, "effective_content"):
+            doc["content"] = getattr(instance, "effective_content") or ""
         if self.truncate_content and "content" in self.fields:
             doc["content"] = doc.get("content")[0:550]
 
@@ -1282,6 +1346,8 @@ class DocumentSerializer(
             "remove_inbox_tags",
             "page_count",
             "mime_type",
+            "root_document",
+            "versions",
         )
         list_serializer_class = OwnedObjectListSerializer
 
@@ -1976,6 +2042,38 @@ class PostDocumentSerializer(serializers.Serializer):
             return created.date()
 
 
+class DocumentVersionSerializer(serializers.Serializer):
+    document = serializers.FileField(
+        label="Document",
+        write_only=True,
+    )
+    version_label = serializers.CharField(
+        label="Version label",
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        max_length=64,
+    )
+
+    validate_document = PostDocumentSerializer().validate_document
+
+
+class DocumentVersionLabelSerializer(serializers.Serializer):
+    version_label = serializers.CharField(
+        label="Version label",
+        required=True,
+        allow_blank=True,
+        allow_null=True,
+        max_length=64,
+    )
+
+    def validate_version_label(self, value):
+        if value is None:
+            return None
+        normalized = value.strip()
+        return normalized or None
+
+
 class BulkDownloadSerializer(DocumentListSerializer):
     content = serializers.ChoiceField(
         choices=["archive", "originals", "both"],
@@ -2175,7 +2273,7 @@ class TasksViewSerializer(OwnedObjectSerializer):
         return list(duplicates.values("id", "title", "deleted_at"))
 
 
-class RunTaskViewSerializer(serializers.Serializer):
+class RunTaskViewSerializer(serializers.Serializer[dict[str, Any]]):
     task_name = serializers.ChoiceField(
         choices=PaperlessTask.TaskName.choices,
         label="Task Name",
@@ -2183,7 +2281,7 @@ class RunTaskViewSerializer(serializers.Serializer):
     )
 
 
-class AcknowledgeTasksViewSerializer(serializers.Serializer):
+class AcknowledgeTasksViewSerializer(serializers.Serializer[dict[str, Any]]):
     tasks = serializers.ListField(
         required=True,
         label="Tasks",

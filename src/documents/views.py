@@ -10,6 +10,8 @@ from collections import deque
 from datetime import datetime
 from pathlib import Path
 from time import mktime
+from typing import TYPE_CHECKING
+from typing import Any
 from typing import Literal
 from unicodedata import normalize
 from urllib.parse import quote
@@ -29,15 +31,22 @@ from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.models import Case
 from django.db.models import Count
+from django.db.models import F
 from django.db.models import IntegerField
 from django.db.models import Max
 from django.db.models import Model
+from django.db.models import OuterRef
+from django.db.models import Prefetch
+from django.db.models import Q
+from django.db.models import Subquery
 from django.db.models import Sum
 from django.db.models import When
+from django.db.models.functions import Coalesce
 from django.db.models.functions import Lower
 from django.db.models.manager import Manager
 from django.http import FileResponse
 from django.http import Http404
+from django.http import HttpRequest
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
@@ -82,6 +91,7 @@ from rest_framework.mixins import ListModelMixin
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.mixins import UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
@@ -169,6 +179,8 @@ from documents.serialisers import CustomFieldSerializer
 from documents.serialisers import DocumentListSerializer
 from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
+from documents.serialisers import DocumentVersionLabelSerializer
+from documents.serialisers import DocumentVersionSerializer
 from documents.serialisers import EmailSerializer
 from documents.serialisers import NotesSerializer
 from documents.serialisers import PostDocumentSerializer
@@ -197,6 +209,11 @@ from documents.tasks import sanity_check
 from documents.tasks import train_classifier
 from documents.tasks import update_document_parent_tags
 from documents.utils import get_boolean
+from documents.versioning import VersionResolutionError
+from documents.versioning import get_latest_version_for_root
+from documents.versioning import get_request_version_param
+from documents.versioning import get_root_document
+from documents.versioning import resolve_requested_version_for_root
 from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import AIConfig
@@ -600,6 +617,12 @@ class EmailDocumentDetailSchema(EmailSerializer):
                 type=OpenApiTypes.BOOL,
                 location=OpenApiParameter.QUERY,
             ),
+            OpenApiParameter(
+                name="follow_formatting",
+                description="Whether or not to use the filename on disk",
+                type=OpenApiTypes.BOOL,
+                location=OpenApiParameter.QUERY,
+            ),
         ],
         responses={200: OpenApiTypes.BINARY},
     ),
@@ -778,7 +801,7 @@ class DocumentViewSet(
     GenericViewSet,
 ):
     model = Document
-    queryset = Document.objects.annotate(num_notes=Count("notes"))
+    queryset = Document.objects.all()
     serializer_class = DocumentSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
@@ -789,7 +812,7 @@ class DocumentViewSet(
         ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = DocumentFilterSet
-    search_fields = ("title", "correspondent__name", "content")
+    search_fields = ("title", "correspondent__name", "effective_content")
     ordering_fields = (
         "id",
         "title",
@@ -807,12 +830,33 @@ class DocumentViewSet(
     )
 
     def get_queryset(self):
+        latest_version_content = Subquery(
+            Document.objects.filter(root_document=OuterRef("pk"))
+            .order_by("-id")
+            .values("content")[:1],
+        )
         return (
-            Document.objects.distinct()
+            Document.objects.filter(root_document__isnull=True)
+            .distinct()
             .order_by("-created")
+            .annotate(effective_content=Coalesce(latest_version_content, F("content")))
             .annotate(num_notes=Count("notes"))
             .select_related("correspondent", "storage_path", "document_type", "owner")
-            .prefetch_related("tags", "custom_fields", "notes")
+            .prefetch_related(
+                Prefetch(
+                    "versions",
+                    queryset=Document.objects.only(
+                        "id",
+                        "added",
+                        "checksum",
+                        "version_label",
+                        "root_document_id",
+                    ),
+                ),
+                "tags",
+                "custom_fields",
+                "notes",
+            )
         )
 
     def get_serializer(self, *args, **kwargs):
@@ -834,15 +878,100 @@ class DocumentViewSet(
         )
         return super().get_serializer(*args, **kwargs)
 
+    @extend_schema(
+        operation_id="documents_root",
+        responses=inline_serializer(
+            name="DocumentRootResponse",
+            fields={
+                "root_id": serializers.IntegerField(),
+            },
+        ),
+    )
+    @action(methods=["get"], detail=True, url_path="root")
+    def root(self, request, pk=None):
+        try:
+            doc = Document.global_objects.select_related(
+                "owner",
+                "root_document",
+            ).get(pk=pk)
+        except Document.DoesNotExist:
+            raise Http404
+
+        root_doc = get_root_document(doc)
+        if request.user is not None and not has_perms_owner_aware(
+            request.user,
+            "view_document",
+            root_doc,
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
+
+        return Response({"root_id": root_doc.id})
+
+    def retrieve(
+        self,
+        request: Request,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Response:
+        response = super().retrieve(request, *args, **kwargs)
+        if (
+            "version" not in request.query_params
+            or not isinstance(response.data, dict)
+            or "content" not in response.data
+        ):
+            return response
+
+        root_doc = self.get_object()
+        content_doc = self._resolve_file_doc(root_doc, request)
+        response.data["content"] = content_doc.content or ""
+        return response
+
     def update(self, request, *args, **kwargs):
-        response = super().update(request, *args, **kwargs)
+        partial = kwargs.pop("partial", False)
+        root_doc = self.get_object()
+        content_doc = (
+            self._resolve_file_doc(root_doc, request)
+            if "version" in request.query_params
+            else get_latest_version_for_root(root_doc)
+        )
+        content_updated = "content" in request.data
+        updated_content = request.data.get("content") if content_updated else None
+
+        data = request.data.copy()
+        serializer_partial = partial
+        if content_updated and content_doc.id != root_doc.id:
+            if updated_content is None:
+                raise ValidationError({"content": ["This field may not be null."]})
+            data.pop("content", None)
+            serializer_partial = True
+
+        serializer = self.get_serializer(
+            root_doc,
+            data=data,
+            partial=serializer_partial,
+        )
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if content_updated and content_doc.id != root_doc.id:
+            content_doc.content = (
+                str(updated_content) if updated_content is not None else ""
+            )
+            content_doc.save(update_fields=["content", "modified"])
+
+        refreshed_doc = self.get_queryset().get(pk=root_doc.pk)
+        response_data = self.get_serializer(refreshed_doc).data
+        if "version" in request.query_params and "content" in response_data:
+            response_data["content"] = content_doc.content
+        response = Response(response_data)
+
         from documents import index
 
-        index.add_or_update_document(self.get_object())
+        index.add_or_update_document(refreshed_doc)
 
         document_updated.send(
             sender=self.__class__,
-            document=self.get_object(),
+            document=refreshed_doc,
         )
 
         return response
@@ -870,19 +999,76 @@ class DocumentViewSet(
             and request.query_params["original"] == "true"
         )
 
-    def file_response(self, pk, request, disposition):
-        doc = Document.global_objects.select_related("owner").get(id=pk)
+    def _resolve_file_doc(self, root_doc: Document, request):
+        version_requested = get_request_version_param(request) is not None
+        resolution = resolve_requested_version_for_root(
+            root_doc,
+            request,
+            include_deleted=version_requested,
+        )
+        if resolution.error == VersionResolutionError.INVALID:
+            raise NotFound("Invalid version parameter")
+        if resolution.document is None:
+            raise Http404
+        return resolution.document
+
+    def _get_effective_file_doc(
+        self,
+        request_doc: Document,
+        root_doc: Document,
+        request: Request,
+    ) -> Document:
+        if (
+            request_doc.root_document_id is not None
+            and get_request_version_param(request) is None
+        ):
+            return request_doc
+        return self._resolve_file_doc(root_doc, request)
+
+    def _resolve_request_and_root_doc(
+        self,
+        pk,
+        request: Request,
+        *,
+        include_deleted: bool = False,
+    ) -> tuple[Document, Document] | HttpResponseForbidden:
+        manager = Document.global_objects if include_deleted else Document.objects
+        try:
+            request_doc = manager.select_related(
+                "owner",
+                "root_document",
+            ).get(id=pk)
+        except Document.DoesNotExist:
+            raise Http404
+
+        root_doc = get_root_document(
+            request_doc,
+            include_deleted=include_deleted,
+        )
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "view_document",
-            doc,
+            root_doc,
         ):
             return HttpResponseForbidden("Insufficient permissions")
+        return request_doc, root_doc
+
+    def file_response(self, pk, request, disposition):
+        resolved = self._resolve_request_and_root_doc(
+            pk,
+            request,
+            include_deleted=True,
+        )
+        if isinstance(resolved, HttpResponseForbidden):
+            return resolved
+        request_doc, root_doc = resolved
+        file_doc = self._get_effective_file_doc(request_doc, root_doc, request)
         return serve_file(
-            doc=doc,
+            doc=file_doc,
             use_archive=not self.original_requested(request)
-            and doc.has_archive_version,
+            and file_doc.has_archive_version,
             disposition=disposition,
+            follow_formatting=request.query_params.get("follow_formatting", False),
         )
 
     def get_metadata(self, file, mime_type):
@@ -915,16 +1101,14 @@ class DocumentViewSet(
         condition(etag_func=metadata_etag, last_modified_func=metadata_last_modified),
     )
     def metadata(self, request, pk=None):
-        try:
-            doc = Document.objects.select_related("owner").get(pk=pk)
-            if request.user is not None and not has_perms_owner_aware(
-                request.user,
-                "view_document",
-                doc,
-            ):
-                return HttpResponseForbidden("Insufficient permissions")
-        except Document.DoesNotExist:
-            raise Http404
+        resolved = self._resolve_request_and_root_doc(pk, request)
+        if isinstance(resolved, HttpResponseForbidden):
+            return resolved
+        request_doc, root_doc = resolved
+
+        # Choose the effective document (newest version by default,
+        # or explicit via ?version=).
+        doc = self._get_effective_file_doc(request_doc, root_doc, request)
 
         document_cached_metadata = get_metadata_cache(doc.pk)
 
@@ -1093,29 +1277,38 @@ class DocumentViewSet(
         condition(etag_func=preview_etag, last_modified_func=preview_last_modified),
     )
     def preview(self, request, pk=None):
+        resolved = self._resolve_request_and_root_doc(pk, request)
+        if isinstance(resolved, HttpResponseForbidden):
+            return resolved
+        request_doc, root_doc = resolved
+
         try:
-            response = self.file_response(pk, request, "inline")
-            return response
-        except (FileNotFoundError, Document.DoesNotExist):
+            file_doc = self._get_effective_file_doc(request_doc, root_doc, request)
+
+            return serve_file(
+                doc=file_doc,
+                use_archive=not self.original_requested(request)
+                and file_doc.has_archive_version,
+                disposition="inline",
+            )
+        except FileNotFoundError:
             raise Http404
 
     @action(methods=["get"], detail=True, filter_backends=[])
     @method_decorator(cache_control(no_cache=True))
     @method_decorator(last_modified(thumbnail_last_modified))
     def thumb(self, request, pk=None):
-        try:
-            doc = Document.objects.select_related("owner").get(id=pk)
-            if request.user is not None and not has_perms_owner_aware(
-                request.user,
-                "view_document",
-                doc,
-            ):
-                return HttpResponseForbidden("Insufficient permissions")
+        resolved = self._resolve_request_and_root_doc(pk, request)
+        if isinstance(resolved, HttpResponseForbidden):
+            return resolved
+        request_doc, root_doc = resolved
 
-            handle = doc.thumbnail_file
+        try:
+            file_doc = self._get_effective_file_doc(request_doc, root_doc, request)
+            handle = file_doc.thumbnail_file
 
             return HttpResponse(handle, content_type="image/webp")
-        except (FileNotFoundError, Document.DoesNotExist):
+        except FileNotFoundError:
             raise Http404
 
     @action(methods=["get"], detail=True)
@@ -1404,6 +1597,246 @@ class DocumentViewSet(
                 "Error emailing documents, check logs for more detail.",
             )
 
+    @extend_schema(
+        operation_id="documents_update_version",
+        request=DocumentVersionSerializer,
+        responses={
+            200: OpenApiTypes.STR,
+        },
+    )
+    @action(methods=["post"], detail=True, parser_classes=[parsers.MultiPartParser])
+    def update_version(self, request, pk=None):
+        serializer = DocumentVersionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            request_doc = Document.objects.select_related(
+                "owner",
+                "root_document",
+            ).get(pk=pk)
+            root_doc = get_root_document(request_doc)
+            if request.user is not None and not has_perms_owner_aware(
+                request.user,
+                "change_document",
+                root_doc,
+            ):
+                return HttpResponseForbidden("Insufficient permissions")
+        except Document.DoesNotExist:
+            raise Http404
+
+        try:
+            doc_name, doc_data = serializer.validated_data.get("document")
+            version_label = serializer.validated_data.get("version_label")
+
+            t = int(mktime(datetime.now().timetuple()))
+
+            settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
+
+            temp_file_path = Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR)) / Path(
+                pathvalidate.sanitize_filename(doc_name),
+            )
+
+            temp_file_path.write_bytes(doc_data)
+
+            os.utime(temp_file_path, times=(t, t))
+
+            input_doc = ConsumableDocument(
+                source=DocumentSource.ApiUpload,
+                original_file=temp_file_path,
+                root_document_id=root_doc.pk,
+            )
+
+            overrides = DocumentMetadataOverrides()
+            if version_label:
+                overrides.version_label = version_label.strip()
+            if request.user is not None:
+                overrides.actor_id = request.user.id
+
+            async_task = consume_file.delay(
+                input_doc,
+                overrides,
+            )
+            logger.debug(
+                f"Updated document {root_doc.id} with new version",
+            )
+            return Response(async_task.id)
+        except Exception as e:
+            logger.warning(f"An error occurred updating document: {e!s}")
+            return HttpResponseServerError(
+                "Error updating document, check logs for more detail.",
+            )
+
+    def _get_root_doc_for_version_action(self, pk) -> Document:
+        try:
+            root_doc = Document.objects.select_related(
+                "owner",
+                "root_document",
+            ).get(pk=pk)
+        except Document.DoesNotExist:
+            raise Http404
+        return get_root_document(root_doc)
+
+    def _get_version_doc_for_root(self, root_doc: Document, version_id) -> Document:
+        try:
+            version_doc = Document.objects.select_related("owner").get(
+                pk=version_id,
+            )
+        except Document.DoesNotExist:
+            raise Http404
+
+        if (
+            version_doc.id != root_doc.id
+            and version_doc.root_document_id != root_doc.id
+        ):
+            raise Http404
+        return version_doc
+
+    @extend_schema(
+        operation_id="documents_delete_version",
+        parameters=[
+            OpenApiParameter(
+                name="version_id",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+            ),
+        ],
+        responses=inline_serializer(
+            name="DeleteDocumentVersionResult",
+            fields={
+                "result": serializers.CharField(),
+                "current_version_id": serializers.IntegerField(),
+            },
+        ),
+    )
+    @action(
+        methods=["delete"],
+        detail=True,
+        url_path=r"versions/(?P<version_id>\d+)",
+    )
+    def delete_version(self, request, pk=None, version_id=None):
+        root_doc = self._get_root_doc_for_version_action(pk)
+
+        if request.user is not None and not has_perms_owner_aware(
+            request.user,
+            "delete_document",
+            root_doc,
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
+
+        version_doc = self._get_version_doc_for_root(root_doc, version_id)
+
+        if version_doc.id == root_doc.id:
+            return HttpResponseBadRequest(
+                "Cannot delete the root/original version. Delete the document instead.",
+            )
+
+        from documents import index
+
+        index.remove_document_from_index(version_doc)
+        version_doc_id = version_doc.id
+        version_doc.delete()
+        index.add_or_update_document(root_doc)
+        if settings.AUDIT_LOG_ENABLED:
+            actor = (
+                request.user if request.user and request.user.is_authenticated else None
+            )
+            LogEntry.objects.log_create(
+                instance=root_doc,
+                changes={
+                    "Version Deleted": ["None", version_doc_id],
+                },
+                action=LogEntry.Action.UPDATE,
+                actor=actor,
+                additional_data={
+                    "reason": "Version deleted",
+                    "version_id": version_doc_id,
+                },
+            )
+
+        current = (
+            Document.objects.filter(Q(id=root_doc.id) | Q(root_document=root_doc))
+            .order_by("-id")
+            .first()
+        )
+        return Response(
+            {
+                "result": "OK",
+                "current_version_id": current.id if current else root_doc.id,
+            },
+        )
+
+    @extend_schema(
+        operation_id="documents_update_version_label",
+        request=DocumentVersionLabelSerializer,
+        parameters=[
+            OpenApiParameter(
+                name="version_id",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+            ),
+        ],
+        responses=inline_serializer(
+            name="UpdateDocumentVersionLabelResult",
+            fields={
+                "id": serializers.IntegerField(),
+                "added": serializers.DateTimeField(),
+                "version_label": serializers.CharField(
+                    required=False,
+                    allow_null=True,
+                ),
+                "checksum": serializers.CharField(
+                    required=False,
+                    allow_null=True,
+                ),
+                "is_root": serializers.BooleanField(),
+            },
+        ),
+    )
+    @delete_version.mapping.patch
+    def update_version_label(self, request, pk=None, version_id=None):
+        serializer = DocumentVersionLabelSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        root_doc = self._get_root_doc_for_version_action(pk)
+        if request.user is not None and not has_perms_owner_aware(
+            request.user,
+            "change_document",
+            root_doc,
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
+
+        version_doc = self._get_version_doc_for_root(root_doc, version_id)
+        old_label = version_doc.version_label
+        version_doc.version_label = serializer.validated_data["version_label"]
+        version_doc.save(update_fields=["version_label"])
+
+        if settings.AUDIT_LOG_ENABLED and old_label != version_doc.version_label:
+            actor = (
+                request.user if request.user and request.user.is_authenticated else None
+            )
+            LogEntry.objects.log_create(
+                instance=root_doc,
+                changes={
+                    "Version Label": [old_label, version_doc.version_label],
+                },
+                action=LogEntry.Action.UPDATE,
+                actor=actor,
+                additional_data={
+                    "reason": "Version label updated",
+                    "version_id": version_doc.id,
+                },
+            )
+
+        return Response(
+            {
+                "id": version_doc.id,
+                "added": version_doc.added,
+                "version_label": version_doc.version_label,
+                "checksum": version_doc.checksum,
+                "is_root": version_doc.id == root_doc.id,
+            },
+        )
+
 
 class ChatStreamingSerializer(serializers.Serializer):
     q = serializers.CharField(required=True)
@@ -1492,7 +1925,7 @@ class ChatStreamingView(GenericAPIView):
     ),
 )
 class UnifiedSearchViewSet(DocumentViewSet):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.searcher = None
 
@@ -1670,7 +2103,7 @@ class SavedViewViewSet(ModelViewSet, PassUserMixin):
             .prefetch_related("filter_rules")
         )
 
-    def perform_create(self, serializer) -> None:
+    def perform_create(self, serializer: serializers.BaseSerializer[Any]) -> None:
         serializer.save(owner=self.request.user)
 
 
@@ -1703,13 +2136,15 @@ class BulkEditView(PassUserMixin):
         "modify_custom_fields": "custom_fields",
         "set_permissions": None,
         "delete": "deleted_at",
-        "rotate": "checksum",
-        "delete_pages": "checksum",
+        # These operations create new documents/versions no longer altering
+        # fields on the selected document in place
+        "rotate": None,
+        "delete_pages": None,
         "split": None,
         "merge": None,
-        "edit_pdf": "checksum",
+        "edit_pdf": None,
         "reprocess": "checksum",
-        "remove_password": "checksum",
+        "remove_password": None,
     }
 
     permission_classes = (IsAuthenticated,)
@@ -1727,6 +2162,8 @@ class BulkEditView(PassUserMixin):
         if method in [
             bulk_edit.split,
             bulk_edit.merge,
+            bulk_edit.rotate,
+            bulk_edit.delete_pages,
             bulk_edit.edit_pdf,
             bulk_edit.remove_password,
         ]:
@@ -3016,14 +3453,30 @@ class SharedLinkView(View):
         return response
 
 
-def serve_file(*, doc: Document, use_archive: bool, disposition: str) -> HttpResponse:
+def serve_file(
+    *,
+    doc: Document,
+    use_archive: bool,
+    disposition: str,
+    follow_formatting: bool = False,
+) -> HttpResponse:
     if use_archive:
+        if TYPE_CHECKING:
+            assert doc.archive_filename
+
         file_handle = doc.archive_file
-        filename = doc.get_public_filename(archive=True)
+        filename = (
+            doc.archive_filename
+            if follow_formatting
+            else doc.get_public_filename(archive=True)
+        )
         mime_type = "application/pdf"
     else:
+        if TYPE_CHECKING:
+            assert doc.filename
+
         file_handle = doc.source_file
-        filename = doc.get_public_filename()
+        filename = doc.filename if follow_formatting else doc.get_public_filename()
         mime_type = doc.mime_type
         # Support browser previewing csv files by using text mime type
         if mime_type in {"application/csv", "text/csv"} and disposition == "inline":
@@ -3504,11 +3957,16 @@ class TrashView(ListModelMixin, PassUserMixin):
 
     queryset = Document.deleted_objects.all()
 
-    def get(self, request, format=None):
+    def get(self, request: Request, format: str | None = None) -> Response:
         self.serializer_class = DocumentSerializer
         return self.list(request, format)
 
-    def post(self, request, *args, **kwargs):
+    def post(
+        self,
+        request: Request,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Response | HttpResponse:
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -3532,7 +3990,7 @@ class TrashView(ListModelMixin, PassUserMixin):
         return Response({"result": "OK", "doc_ids": doc_ids})
 
 
-def serve_logo(request, filename=None):
+def serve_logo(request: HttpRequest, filename: str | None = None) -> FileResponse:
     """
     Serves the configured logo file with Content-Disposition: attachment.
     Prevents inline execution of SVGs. See GHSA-6p53-hqqw-8j62

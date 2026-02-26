@@ -7,6 +7,7 @@ import {
   DOCUMENT_SORT_FIELDS,
   DOCUMENT_SORT_FIELDS_FULLTEXT,
   Document,
+  DocumentVersionInfo,
 } from 'src/app/data/document'
 import { DocumentMetadata } from 'src/app/data/document-metadata'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
@@ -155,44 +156,123 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     }).pipe(map((response) => response.results.map((doc) => doc.id)))
   }
 
-  get(id: number): Observable<Document> {
+  get(
+    id: number,
+    versionID: number = null,
+    fields: string = null
+  ): Observable<Document> {
+    const params: { full_perms: boolean; version?: string; fields?: string } = {
+      full_perms: true,
+    }
+    if (versionID) {
+      params.version = versionID.toString()
+    }
+    if (fields) {
+      params.fields = fields
+    }
     return this.http.get<Document>(this.getResourceUrl(id), {
-      params: {
-        full_perms: true,
-      },
+      params,
     })
   }
 
-  getPreviewUrl(id: number, original: boolean = false): string {
+  getPreviewUrl(
+    id: number,
+    original: boolean = false,
+    versionID: number = null
+  ): string {
     let url = new URL(this.getResourceUrl(id, 'preview'))
     if (this._searchQuery) url.hash = `#search="${this.searchQuery}"`
     if (original) {
       url.searchParams.append('original', 'true')
     }
+    if (versionID) {
+      url.searchParams.append('version', versionID.toString())
+    }
     return url.toString()
   }
 
-  getThumbUrl(id: number): string {
-    return this.getResourceUrl(id, 'thumb')
+  getThumbUrl(id: number, versionID: number = null): string {
+    let url = new URL(this.getResourceUrl(id, 'thumb'))
+    if (versionID) {
+      url.searchParams.append('version', versionID.toString())
+    }
+    return url.toString()
   }
 
-  getDownloadUrl(id: number, original: boolean = false): string {
-    let url = this.getResourceUrl(id, 'download')
+  getDownloadUrl(
+    id: number,
+    original: boolean = false,
+    versionID: number = null,
+    followFormatting: boolean = false
+  ): string {
+    let url = new URL(this.getResourceUrl(id, 'download'))
     if (original) {
-      url += '?original=true'
+      url.searchParams.append('original', 'true')
     }
-    return url
+    if (versionID) {
+      url.searchParams.append('version', versionID.toString())
+    }
+    if (followFormatting) {
+      url.searchParams.append('follow_formatting', 'true')
+    }
+    return url.toString()
+  }
+
+  uploadVersion(documentId: number, file: File, versionLabel?: string) {
+    const formData = new FormData()
+    formData.append('document', file, file.name)
+    if (versionLabel) {
+      formData.append('version_label', versionLabel)
+    }
+    return this.http.post<string>(
+      this.getResourceUrl(documentId, 'update_version'),
+      formData
+    )
+  }
+
+  getVersions(documentId: number): Observable<Document> {
+    return this.http.get<Document>(this.getResourceUrl(documentId), {
+      params: {
+        fields: 'id,versions',
+      },
+    })
+  }
+
+  getRootId(documentId: number) {
+    return this.http.get<{ root_id: number }>(
+      this.getResourceUrl(documentId, 'root')
+    )
+  }
+
+  deleteVersion(rootDocumentId: number, versionId: number) {
+    return this.http.delete<{ result: string; current_version_id: number }>(
+      this.getResourceUrl(rootDocumentId, `versions/${versionId}`)
+    )
+  }
+
+  updateVersionLabel(
+    rootDocumentId: number,
+    versionId: number,
+    versionLabel: string | null
+  ): Observable<DocumentVersionInfo> {
+    return this.http.patch<DocumentVersionInfo>(
+      this.getResourceUrl(rootDocumentId, `versions/${versionId}`),
+      { version_label: versionLabel }
+    )
   }
 
   getNextAsn(): Observable<number> {
     return this.http.get<number>(this.getResourceUrl(null, 'next_asn'))
   }
 
-  patch(o: Document): Observable<Document> {
+  patch(o: Document, versionID: number = null): Observable<Document> {
     o.remove_inbox_tags = !!this.settingsService.get(
       SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS
     )
-    return super.patch(o)
+    this.clearCache()
+    return this.http.patch<Document>(this.getResourceUrl(o.id), o, {
+      params: versionID ? { version: versionID.toString() } : {},
+    })
   }
 
   uploadDocument(formData) {
@@ -203,8 +283,15 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     )
   }
 
-  getMetadata(id: number): Observable<DocumentMetadata> {
-    return this.http.get<DocumentMetadata>(this.getResourceUrl(id, 'metadata'))
+  getMetadata(
+    id: number,
+    versionID: number = null
+  ): Observable<DocumentMetadata> {
+    let url = new URL(this.getResourceUrl(id, 'metadata'))
+    if (versionID) {
+      url.searchParams.append('version', versionID.toString())
+    }
+    return this.http.get<DocumentMetadata>(url.toString())
   }
 
   bulkEdit(ids: number[], method: string, args: any) {

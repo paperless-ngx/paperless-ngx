@@ -102,6 +102,12 @@ class ConsumerStatusShortMessage(str, Enum):
 
 
 class ConsumerPluginMixin:
+    if TYPE_CHECKING:
+        from logging import Logger
+        from logging import LoggerAdapter
+
+        log: "LoggerAdapter"  # type: ignore[type-arg]
+
     def __init__(
         self,
         input_doc: ConsumableDocument,
@@ -115,6 +121,22 @@ class ConsumerPluginMixin:
         self.renew_logging_group()
 
         self.filename = self.metadata.filename or self.input_doc.original_file.name
+
+        if input_doc.root_document_id:
+            self.log.debug(
+                f"Document root document id: {input_doc.root_document_id}",
+            )
+            root_document = Document.objects.get(pk=input_doc.root_document_id)
+            version_index = Document.objects.filter(root_document=root_document).count()
+            filename_path = Path(self.filename)
+            if filename_path.suffix:
+                self.filename = str(
+                    filename_path.with_name(
+                        f"{filename_path.stem}_v{version_index}{filename_path.suffix}",
+                    ),
+                )
+            else:
+                self.filename = f"{self.filename}_v{version_index}"
 
     def _send_progress(
         self,
@@ -160,6 +182,41 @@ class ConsumerPlugin(
     ConsumeTaskPlugin,
 ):
     logging_name = LOGGING_NAME
+
+    def _clone_root_into_version(
+        self,
+        root_doc: Document,
+        *,
+        text: str | None,
+        page_count: int | None,
+        mime_type: str,
+    ) -> Document:
+        self.log.debug("Saving record for updated version to database")
+        version_doc = Document.objects.get(pk=root_doc.pk)
+        setattr(version_doc, "pk", None)
+        version_doc.root_document = root_doc
+        file_for_checksum = (
+            self.unmodified_original
+            if self.unmodified_original is not None
+            else self.working_copy
+        )
+        version_doc.checksum = hashlib.md5(
+            file_for_checksum.read_bytes(),
+        ).hexdigest()
+        version_doc.content = text or ""
+        version_doc.page_count = page_count
+        version_doc.mime_type = mime_type
+        version_doc.original_filename = self.filename
+        version_doc.storage_path = root_doc.storage_path
+        # Clear unique file path fields so they can be generated uniquely later
+        version_doc.filename = None
+        version_doc.archive_filename = None
+        version_doc.archive_checksum = None
+        if self.metadata.version_label is not None:
+            version_doc.version_label = self.metadata.version_label
+        version_doc.added = timezone.now()
+        version_doc.modified = timezone.now()
+        return version_doc
 
     def run_pre_consume_script(self) -> None:
         """
@@ -477,12 +534,65 @@ class ConsumerPlugin(
         try:
             with transaction.atomic():
                 # store the document.
-                document = self._store(
-                    text=text,
-                    date=date,
-                    page_count=page_count,
-                    mime_type=mime_type,
-                )
+                if self.input_doc.root_document_id:
+                    # If this is a new version of an existing document, we need
+                    # to make sure we're not creating a new document, but updating
+                    # the existing one.
+                    root_doc = Document.objects.get(
+                        pk=self.input_doc.root_document_id,
+                    )
+                    original_document = self._clone_root_into_version(
+                        root_doc,
+                        text=text,
+                        page_count=page_count,
+                        mime_type=mime_type,
+                    )
+                    actor = None
+
+                    # Save the new version, potentially creating an audit log entry for the version addition if enabled.
+                    if (
+                        settings.AUDIT_LOG_ENABLED
+                        and self.metadata.actor_id is not None
+                    ):
+                        actor = User.objects.filter(pk=self.metadata.actor_id).first()
+                        if actor is not None:
+                            from auditlog.context import (  # type: ignore[import-untyped]
+                                set_actor,
+                            )
+
+                            with set_actor(actor):
+                                original_document.save()
+                        else:
+                            original_document.save()
+                    else:
+                        original_document.save()
+
+                    # Create a log entry for the version addition, if enabled
+                    if settings.AUDIT_LOG_ENABLED:
+                        from auditlog.models import (  # type: ignore[import-untyped]
+                            LogEntry,
+                        )
+
+                        LogEntry.objects.log_create(
+                            instance=root_doc,
+                            changes={
+                                "Version Added": ["None", original_document.id],
+                            },
+                            action=LogEntry.Action.UPDATE,
+                            actor=actor,
+                            additional_data={
+                                "reason": "Version added",
+                                "version_id": original_document.id,
+                            },
+                        )
+                    document = original_document
+                else:
+                    document = self._store(
+                        text=text,
+                        date=date,
+                        page_count=page_count,
+                        mime_type=mime_type,
+                    )
 
                 # If we get here, it was successful. Proceed with post-consume
                 # hooks. If they fail, nothing will get changed.
@@ -699,6 +809,9 @@ class ConsumerPlugin(
 
         if self.metadata.asn is not None:
             document.archive_serial_number = self.metadata.asn
+
+        if self.metadata.version_label is not None:
+            document.version_label = self.metadata.version_label
 
         if self.metadata.owner_id:
             document.owner = User.objects.get(

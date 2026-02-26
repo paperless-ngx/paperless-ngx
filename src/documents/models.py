@@ -155,7 +155,7 @@ class StoragePath(MatchingModel):
         verbose_name_plural = _("storage paths")
 
 
-class Document(SoftDeleteModel, ModelWithOwner):
+class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-missing]
     correspondent = models.ForeignKey(
         Correspondent,
         blank=True,
@@ -308,6 +308,23 @@ class Document(SoftDeleteModel, ModelWithOwner):
         ),
     )
 
+    root_document = models.ForeignKey(
+        "self",
+        blank=True,
+        null=True,
+        related_name="versions",
+        on_delete=models.CASCADE,
+        verbose_name=_("root document for this version"),
+    )
+
+    version_label = models.CharField(
+        _("version label"),
+        max_length=64,
+        blank=True,
+        null=True,
+        help_text=_("Optional short label for a document version."),
+    )
+
     class Meta:
         ordering = ("-created",)
         verbose_name = _("document")
@@ -418,6 +435,19 @@ class Document(SoftDeleteModel, ModelWithOwner):
 
         tags_to_add = self.tags.model.objects.filter(id__in=tag_ids)
         self.tags.add(*tags_to_add)
+
+    def delete(
+        self,
+        *args,
+        **kwargs,
+    ):
+        # If deleting a root document, move all its versions to trash as well.
+        if self.root_document_id is None:
+            Document.objects.filter(root_document=self).delete()
+        return super().delete(
+            *args,
+            **kwargs,
+        )
 
 
 class SavedView(ModelWithOwner):
@@ -1716,5 +1746,5 @@ class WorkflowRun(SoftDeleteModel):
         verbose_name = _("workflow run")
         verbose_name_plural = _("workflow runs")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"WorkflowRun of {self.workflow} at {self.run_at} on {self.document}"

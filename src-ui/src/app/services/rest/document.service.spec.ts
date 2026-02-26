@@ -165,6 +165,14 @@ describe(`DocumentService`, () => {
     expect(req.request.method).toEqual('GET')
   })
 
+  it('should call appropriate api endpoint for versioned metadata', () => {
+    subscription = service.getMetadata(documents[0].id, 123).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/metadata/?version=123`
+    )
+    expect(req.request.method).toEqual('GET')
+  })
+
   it('should call appropriate api endpoint for getting selection data', () => {
     const ids = [documents[0].id]
     subscription = service.getSelectionData(ids).subscribe()
@@ -233,10 +241,21 @@ describe(`DocumentService`, () => {
     )
   })
 
+  it('should return the correct preview URL for a specific version', () => {
+    const url = service.getPreviewUrl(documents[0].id, false, 123)
+    expect(url).toEqual(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/preview/?version=123`
+    )
+  })
+
   it('should return the correct thumb URL for a single document', () => {
     let url = service.getThumbUrl(documents[0].id)
     expect(url).toEqual(
       `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/thumb/`
+    )
+    url = service.getThumbUrl(documents[0].id, 123)
+    expect(url).toEqual(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/thumb/?version=123`
     )
   })
 
@@ -249,6 +268,22 @@ describe(`DocumentService`, () => {
     expect(url).toEqual(
       `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/download/?original=true`
     )
+    url = service.getDownloadUrl(documents[0].id, false, 123)
+    expect(url).toEqual(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/download/?version=123`
+    )
+    url = service.getDownloadUrl(documents[0].id, true, 123, true)
+    expect(url).toContain('original=true')
+    expect(url).toContain('version=123')
+    expect(url).toContain('follow_formatting=true')
+  })
+
+  it('should pass optional get params for version and fields', () => {
+    subscription = service.get(documents[0].id, 123, 'content').subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/?full_perms=true&version=123&fields=content`
+    )
+    expect(req.request.method).toEqual('GET')
   })
 
   it('should set search query', () => {
@@ -283,11 +318,76 @@ describe(`DocumentService`, () => {
     expect(req.request.body.remove_inbox_tags).toEqual(true)
   })
 
+  it('should pass selected version to patch when provided', () => {
+    subscription = service.patch(documents[0], 123).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/?version=123`
+    )
+    expect(req.request.method).toEqual('PATCH')
+  })
+
   it('should call appropriate api endpoint for getting audit log', () => {
     subscription = service.getHistory(documents[0].id).subscribe()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/history/`
     )
+  })
+
+  it('should call appropriate api endpoint for getting root document id', () => {
+    subscription = service.getRootId(documents[0].id).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/root/`
+    )
+    expect(req.request.method).toEqual('GET')
+    req.flush({ root_id: documents[0].id })
+  })
+
+  it('should call appropriate api endpoint for getting document versions', () => {
+    subscription = service.getVersions(documents[0].id).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/?fields=id,versions`
+    )
+    expect(req.request.method).toEqual('GET')
+  })
+
+  it('should call appropriate api endpoint for deleting a document version', () => {
+    subscription = service.deleteVersion(documents[0].id, 10).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/versions/10/`
+    )
+    expect(req.request.method).toEqual('DELETE')
+    req.flush({ result: 'OK', current_version_id: documents[0].id })
+  })
+
+  it('should call appropriate api endpoint for updating a document version label', () => {
+    subscription = service
+      .updateVersionLabel(documents[0].id, 10, 'Updated label')
+      .subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/versions/10/`
+    )
+    expect(req.request.method).toEqual('PATCH')
+    expect(req.request.body).toEqual({ version_label: 'Updated label' })
+    req.flush({ id: 10, version_label: 'Updated label', is_root: false })
+  })
+
+  it('should call appropriate api endpoint for uploading a new version', () => {
+    const file = new File(['hello'], 'test.pdf', { type: 'application/pdf' })
+
+    subscription = service
+      .uploadVersion(documents[0].id, file, 'Label')
+      .subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/update_version/`
+    )
+    expect(req.request.method).toEqual('POST')
+    expect(req.request.body).toBeInstanceOf(FormData)
+
+    const body = req.request.body as FormData
+    expect(body.get('version_label')).toEqual('Label')
+    expect(body.get('document')).toBeInstanceOf(File)
+
+    req.flush('task-id')
   })
 })
 
