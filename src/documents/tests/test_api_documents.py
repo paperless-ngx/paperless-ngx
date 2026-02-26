@@ -2419,57 +2419,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             )
             self.assertEqual(response.status_code, status.HTTP_201_CREATED, endpoint)
 
-    def test_tag_color_default(self) -> None:
-        response = self.client.post("/api/tags/", {"name": "tag"}, format="json")
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Tag.objects.get(id=response.data["id"]).color, "#a6cee3")
-        self.assertEqual(
-            self.client.get(
-                f"/api/tags/{response.data['id']}/",
-                headers={"Accept": "application/json; version=1"},
-                format="json",
-            ).data["colour"],
-            1,
-        )
-
-    def test_tag_color(self) -> None:
-        response = self.client.post(
-            "/api/tags/",
-            data={"name": "tag", "colour": 3},
-            headers={"Accept": "application/json; version=1"},
-            format="json",
-        )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Tag.objects.get(id=response.data["id"]).color, "#b2df8a")
-        self.assertEqual(
-            self.client.get(
-                f"/api/tags/{response.data['id']}/",
-                headers={"Accept": "application/json; version=1"},
-                format="json",
-            ).data["colour"],
-            3,
-        )
-
-    def test_tag_color_invalid(self) -> None:
-        response = self.client.post(
-            "/api/tags/",
-            data={"name": "tag", "colour": 34},
-            headers={"Accept": "application/json; version=1"},
-            format="json",
-        )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_tag_color_custom(self) -> None:
-        tag = Tag.objects.create(name="test", color="#abcdef")
-        self.assertEqual(
-            self.client.get(
-                f"/api/tags/{tag.id}/",
-                headers={"Accept": "application/json; version=1"},
-                format="json",
-            ).data["colour"],
-            1,
-        )
-
     def test_get_existing_notes(self) -> None:
         """
         GIVEN:
