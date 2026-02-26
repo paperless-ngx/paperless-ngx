@@ -9,6 +9,7 @@ import {
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { TagEditDialogComponent } from 'src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
+import { Results } from 'src/app/data/results'
 import { Tag } from 'src/app/data/tag'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
@@ -74,6 +75,16 @@ export class TagListComponent extends ManagementListComponent<Tag> {
     // When filtering by name, exclude children if their parent is also present
     const availableIds = new Set(data.map((tag) => tag.id))
     return data.filter((tag) => !tag.parent || !availableIds.has(tag.parent))
+  }
+
+  protected override getCollectionSize(results: Results<Tag>): number {
+    // Tag list pages are requested with is_root=true (when unfiltered), so
+    // pagination must follow root count even though `all` includes descendants
+    return results.count
+  }
+
+  protected override getDisplayCollectionSize(results: Results<Tag>): number {
+    return super.getCollectionSize(results)
   }
 
   protected override getSelectableIDs(tags: Tag[]): number[] {

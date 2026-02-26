@@ -2391,7 +2391,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">254</context>
+          <context context-type="linenumber">265</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
@@ -2441,11 +2441,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">250</context>
+          <context context-type="linenumber">261</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">411</context>
+          <context context-type="linenumber">422</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1373208150912772963" datatype="html">
@@ -2479,7 +2479,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">413</context>
+          <context context-type="linenumber">424</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
@@ -2806,7 +2806,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">415</context>
+          <context context-type="linenumber">426</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
@@ -4691,7 +4691,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/tag-list/tag-list.component.ts</context>
-          <context context-type="linenumber">48</context>
+          <context context-type="linenumber">49</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8621797738551294959" datatype="html">
@@ -8546,7 +8546,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">130</context>
+          <context context-type="linenumber">132</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
@@ -9354,7 +9354,7 @@
         <source>Automatic</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">128</context>
+          <context context-type="linenumber">130</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
@@ -9365,63 +9365,63 @@
         <source>Successfully created <x id="PH" equiv-text="this.typeName"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">207</context>
+          <context context-type="linenumber">218</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3928835053823658072" datatype="html">
         <source>Error occurred while creating <x id="PH" equiv-text="this.typeName"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">212</context>
+          <context context-type="linenumber">223</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4835942264662718903" datatype="html">
         <source>Successfully updated <x id="PH" equiv-text="this.typeName"/> &quot;<x id="PH_1" equiv-text="object.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">227</context>
+          <context context-type="linenumber">238</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6442673774206210733" datatype="html">
         <source>Error occurred while saving <x id="PH" equiv-text="this.typeName"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">232</context>
+          <context context-type="linenumber">243</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8371896857609524947" datatype="html">
         <source>Associated documents will not be deleted.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">252</context>
+          <context context-type="linenumber">263</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6639207128255974941" datatype="html">
         <source>Error while deleting element</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">268</context>
+          <context context-type="linenumber">279</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2976110979192587241" datatype="html">
         <source>Error saving settings</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">307</context>
+          <context context-type="linenumber">318</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4863024195229581844" datatype="html">
         <source>Permissions updated successfully</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">391</context>
+          <context context-type="linenumber">402</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4639647950943944112" datatype="html">
         <source>Error updating permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">398</context>
+          <context context-type="linenumber">409</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
@@ -9432,21 +9432,21 @@
         <source>This operation will permanently delete the selected <x id="PH" equiv-text="this.typeNamePlural"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">412</context>
+          <context context-type="linenumber">423</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5897787932098828336" datatype="html">
         <source>Objects deleted successfully</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">426</context>
+          <context context-type="linenumber">437</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8273353839648035634" datatype="html">
         <source>Error deleting objects</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">432</context>
+          <context context-type="linenumber">443</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5101757640976222639" datatype="html">
@@ -9474,21 +9474,21 @@
         <source>tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/tag-list/tag-list.component.ts</context>
-          <context context-type="linenumber">42</context>
+          <context context-type="linenumber">43</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4975748273657042999" datatype="html">
         <source>tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/tag-list/tag-list.component.ts</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">44</context>
         </context-group>
       </trans-unit>
       <trans-unit id="93754014749412887" datatype="html">
         <source>Do you really want to delete the tag &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/tag-list/tag-list.component.ts</context>
-          <context context-type="linenumber">59</context>
+          <context context-type="linenumber">60</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8957855217409261143" datatype="html">
