@@ -864,6 +864,14 @@ class TestMail(
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 0)
 
     def test_handle_mail_account_overlapping_rules_only_first_consumes(self) -> None:
+        """
+        GIVEN:
+            - Multiple rules that match the same mail
+        WHEN:
+            - Mail account is processed
+        THEN:
+            - Only the first rule should be applied
+        """
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
@@ -896,6 +904,14 @@ class TestMail(
         self.assertEqual(queued_rule.id, first_rule.id)
 
     def test_handle_mail_account_skip_duplicate_uids_from_fetch(self) -> None:
+        """
+        GIVEN:
+            - Multiple mails with the same UID returned from the mailbox fetch method
+        WHEN:
+            - Mail account is processed
+        THEN:
+            - Only one of the mails should be processed, to avoid duplicate processing due to fetch issues
+        """
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
