@@ -14,7 +14,6 @@ import {
 } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { User } from 'src/app/data/user'
-import { UserService } from 'src/app/services/rest/user.service'
 import { CheckComponent } from '../../common/input/check/check.component'
 import { PermissionsFormComponent } from '../../common/input/permissions/permissions-form/permissions-form.component'
 import { TextComponent } from '../../common/input/text/text.component'
@@ -33,7 +32,6 @@ import { TextComponent } from '../../common/input/text/text.component'
 })
 export class SaveViewConfigDialogComponent implements OnInit {
   private modal = inject(NgbActiveModal)
-  private readonly userService = inject(UserService)
 
   @Output()
   public saveClicked = new EventEmitter()
@@ -71,9 +69,6 @@ export class SaveViewConfigDialogComponent implements OnInit {
     // wait to enable close button so it doesn't steal focus from input since its the first clickable element in the DOM
     setTimeout(() => {
       this.closeEnabled = true
-    })
-    this.userService.listAll().subscribe((r) => {
-      this.users = r.results
     })
   }
 
