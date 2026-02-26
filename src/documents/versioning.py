@@ -2,9 +2,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
+from typing import TYPE_CHECKING
 from typing import Any
 
 from documents.models import Document
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
 
 class VersionResolutionError(str, Enum):
@@ -12,7 +16,7 @@ class VersionResolutionError(str, Enum):
     NOT_FOUND = "not_found"
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class VersionResolution:
     document: Document | None
     error: VersionResolutionError | None = None
@@ -22,7 +26,7 @@ def _document_manager(*, include_deleted: bool) -> Any:
     return Document.global_objects if include_deleted else Document.objects
 
 
-def get_request_version_param(request: Any) -> str | None:
+def get_request_version_param(request: HttpRequest) -> str | None:
     if hasattr(request, "query_params"):
         return request.query_params.get("version")
     return None
