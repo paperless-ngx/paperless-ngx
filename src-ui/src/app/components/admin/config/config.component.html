@@ -19,13 +19,18 @@
                                 <div class="col">
                                     <div class="card bg-light">
                                         <div class="card-body">
-                                            <div class="card-title">
-                                                <h6>
-                                                    {{option.title}}
-                                                    <a class="btn btn-sm btn-link" title="Read the documentation about this setting" i18n-title [href]="getDocsUrl(option.config_key)" target="_blank" referrerpolicy="no-referrer">
-                                                        <i-bs  name="info-circle"></i-bs>
-                                                    </a>
+                                            <div class="card-title d-flex align-items-center">
+                                                <h6 class="mb-0">
+                                                  {{option.title}}
                                                 </h6>
+                                                <a class="btn btn-sm btn-link" title="Read the documentation about this setting" i18n-title [href]="getDocsUrl(option.config_key)" target="_blank" referrerpolicy="no-referrer">
+                                                    <i-bs name="info-circle"></i-bs>
+                                                </a>
+                                                @if (isSet(option.key)) {
+                                                  <button type="button" class="btn btn-sm btn-link text-danger ms-auto pe-0" title="Reset" i18n-title (click)="resetOption(option.key)">
+                                                      <i-bs class="me-1" name="x"></i-bs><ng-container i18n>Reset</ng-container>
+                                                  </button>
+                                                }
                                             </div>
                                             <div class="mb-n3">
                                                 @switch (option.type) {
