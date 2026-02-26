@@ -43,7 +43,8 @@ class NoProgressBarCommand(PaperlessCommand):
 
     def handle(self, *args, **options):
         items = list(range(3))
-        for item in self.track(items):
+        for _ in self.track(items):
+            # We don't need to actually work
             pass
         self.stdout.write("Done")
 
