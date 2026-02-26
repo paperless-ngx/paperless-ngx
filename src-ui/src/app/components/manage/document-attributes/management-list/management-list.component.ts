@@ -27,6 +27,7 @@ import {
   MatchingModel,
 } from 'src/app/data/matching-model'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
+import { Results } from 'src/app/data/results'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import {
   SortableDirective,
@@ -94,6 +95,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   public page = 1
 
   public collectionSize = 0
+  public displayCollectionSize = 0
 
   public sortField: string
   public sortReverse: boolean
@@ -147,6 +149,14 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     return data
   }
 
+  protected getCollectionSize(results: Results<T>): number {
+    return results.all?.length ?? results.count
+  }
+
+  protected getDisplayCollectionSize(results: Results<T>): number {
+    return this.getCollectionSize(results)
+  }
+
   getDocumentCount(object: MatchingModel): number {
     return (
       object.document_count ??
@@ -177,7 +187,8 @@ export abstract class ManagementListComponent<T extends MatchingModel>
         tap((c) => {
           this.unfilteredData = c.results
           this.data = this.filterData(c.results)
-          this.collectionSize = c.all?.length ?? c.count
+          this.collectionSize = this.getCollectionSize(c)
+          this.displayCollectionSize = this.getDisplayCollectionSize(c)
           this.allIDs = c.all
         }),
         delay(100)
