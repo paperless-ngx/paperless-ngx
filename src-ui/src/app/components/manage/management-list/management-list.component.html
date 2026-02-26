@@ -62,9 +62,9 @@
 
 @if (!loading) {
   <div class="d-flex mb-2">
-    @if (collectionSize > 0) {
+    @if (displayCollectionSize > 0) {
       <div>
-        <ng-container i18n>{collectionSize, plural, =1 {One {{typeName}}} other {{{collectionSize || 0}} total {{typeNamePlural}}}}</ng-container>
+        <ng-container i18n>{displayCollectionSize, plural, =1 {One {{typeName}}} other {{{displayCollectionSize || 0}} total {{typeNamePlural}}}}</ng-container>
         @if (selectedObjects.size > 0) {
           &nbsp;({{selectedObjects.size}} selected)
         }
