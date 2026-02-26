@@ -36,6 +36,7 @@ import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-butt
 @Component({
   selector: 'pngx-document-version-dropdown',
   templateUrl: './document-version-dropdown.component.html',
+  styleUrls: ['./document-version-dropdown.component.scss'],
   imports: [
     FormsModule,
     NgbDropdownModule,

@@ -4,7 +4,7 @@
     <span class="d-none d-lg-inline ps-1" i18n>Versions</span>
   </button>
   <div class="dropdown-menu shadow" ngbDropdownMenu>
-    <div class="px-3 py-2">
+    <div class="px-3 py-2 mb-2">
       @if (versionUploadState === UploadState.Idle) {
         <div class="input-group input-group-sm mb-2">
           <span class="input-group-text" i18n>Label</span>
@@ -56,79 +56,77 @@
         }
       }
     </div>
-    <div class="dropdown-divider"></div>
     @for (version of versions; track version.id) {
-      <div class="dropdown-item">
-        <div class="d-flex align-items-start w-100 version-item">
-          <button
-            type="button"
-            class="btn btn-link link-underline link-underline-opacity-0 d-flex align-items-center small ps-0 text-start"
+      <div class="dropdown-item border-top">
+        <div class="d-flex align-items-center w-100 version-item">
+          <div class="btn btn-link link-underline link-underline-opacity-0 d-flex align-items-center small text-start version-link"
             (click)="selectVersion(version.id)"
           >
-            <div class="badge bg-light text-lowercase text-muted">
+            <div class="check me-3">
+              @if (selectedVersionId === version.id) {
+                <i-bs name="check2-square"></i-bs>
+              } @else {
+                &nbsp;
+              }
+            </div>
+            <div class="d-flex flex-column">
+              <div class="input-group input-group-sm mb-1">
+                @if (isEditingVersion(version.id)) {
+                  <input
+                    class="form-control"
+                    type="text"
+                    [(ngModel)]="versionLabelDraft"
+                    i18n-placeholder
+                    placeholder="Version label"
+                    [disabled]="savingVersionLabelId !== null"
+                    (keydown.enter)="submitEditedVersionLabel(version, $event)"
+                    (keydown.escape)="cancelEditingVersion($event)"
+                    (click)="$event.stopPropagation()"
+                  />
+                } @else {
+                  <span class="input-group-text">
+                    @if (version.version_label) {
+                      {{ version.version_label }}
+                    } @else {
+                      <span i18n>Version</span>&nbsp;#{{ version.id }}
+                    }
+                  </span>
+                }
+                @if (canEditLabels) {
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    [disabled]="savingVersionLabelId !== null"
+                    (click)="isEditingVersion(version.id) ? submitEditedVersionLabel(version, $event) : beginEditingVersion(version, $event)"
+                  >
+                    @if (isEditingVersion(version.id)) {
+                      <i-bs width=".8rem" height=".8rem" name="check-lg"></i-bs>
+                    } @else {
+                      <i-bs width=".8rem" height=".8rem" name="pencil"></i-bs>
+                    }
+                  </button>
+                }
+              </div>
+              <div class="text-muted small">
+                {{ version.added | customDate:'short' }}
+              </div>
+            </div>
+            <div class="badge bg-light text-lowercase text-muted ms-3">
               {{ version.checksum | slice:0:8 }}
             </div>
-          </button>
-          <div class="d-flex flex-column small ms-2 flex-grow-1 min-w-0">
-            @if (isEditingVersion(version.id)) {
-              <input
-                class="form-control form-control-sm"
-                type="text"
-                [(ngModel)]="versionLabelDraft"
-                i18n-placeholder
-                placeholder="Version label"
-                [disabled]="savingVersionLabelId !== null"
-                (keydown.enter)="submitEditedVersionLabel(version, $event)"
-                (keydown.escape)="cancelEditingVersion($event)"
-                (click)="$event.stopPropagation()"
-              />
-            } @else {
-              <button
-                type="button"
-                class="btn btn-link link-underline link-underline-opacity-0 p-0 small text-start"
-                (click)="selectVersion(version.id)"
-              >
-                @if (version.version_label) {
-                  {{ version.version_label }}
-                } @else {
-                  <span i18n>ID</span> #{{ version.id }}
-                }
-              </button>
-            }
-            <div class="text-muted">
-              {{ version.added | customDate:'short' }}
-            </div>
           </div>
-          <div class="d-flex align-items-center ms-2">
-            @if (canEditLabels) {
-              <button
-                type="button"
-                class="btn btn-link btn-sm text-secondary p-0"
-                [disabled]="savingVersionLabelId !== null"
-                (click)="isEditingVersion(version.id) ? submitEditedVersionLabel(version, $event) : beginEditingVersion(version, $event)"
-                [attr.aria-label]="isEditingVersion(version.id) ? 'Save version label' : 'Edit version label'"
-              >
-                @if (isEditingVersion(version.id)) {
-                  <i-bs name="check-lg"></i-bs>
-                } @else {
-                  <i-bs name="pencil"></i-bs>
-                }
-              </button>
-            }
-            @if (!version.is_root) {
-              <pngx-confirm-button
-                buttonClasses="btn-link btn-sm text-danger ms-2"
-                iconName="trash"
-                confirmMessage="Delete this version?"
-                i18n-confirmMessage
-                [disabled]="!userIsOwner || !userCanEdit"
-                (confirm)="deleteVersion(version.id)"
-              >
-                <span class="visually-hidden" i18n>Delete version</span>
-              </pngx-confirm-button>
-            }
-          </div>
-          @if (selectedVersionId === version.id) { <span class="ms-2">✓</span> }
+          @if (!version.is_root) {
+            <pngx-confirm-button
+              buttonClasses="btn btn-sm btn-link text-danger"
+              iconName="trash"
+              confirmMessage="Delete this version?"
+              i18n-confirmMessage
+              [disabled]="!userIsOwner || !userCanEdit"
+              (confirm)="deleteVersion(version.id)"
+            >
+              <span class="visually-hidden" i18n>Delete version</span>
+            </pngx-confirm-button>
+          }
         </div>
       </div>
     }
