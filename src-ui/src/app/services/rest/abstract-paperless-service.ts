@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core'
-import { Observable } from 'rxjs'
-import { map, shareReplay, tap } from 'rxjs/operators'
+import { Observable, of } from 'rxjs'
+import { catchError, map, shareReplay, switchMap, tap } from 'rxjs/operators'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { Results } from 'src/app/data/results'
 import { environment } from 'src/environments/environment'
@@ -77,6 +77,7 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
   }
 
   private _listAll: Observable<Results<T>>
+  private _cachedItems = new Map<number, Observable<T>>()
 
   listAll(
     sortField?: string,
@@ -96,14 +97,27 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
   }
 
   getCached(id: number): Observable<T> {
-    return this.listAll().pipe(
-      map((list) => list.results.find((o) => o.id == id))
-    )
+    if (!this._cachedItems.has(id)) {
+      this._cachedItems.set(
+        id,
+        this.listAll().pipe(
+          switchMap((list) => {
+            const found = list.results.find((o) => o.id == id)
+            if (found) return of(found)
+            return this.get(id).pipe(catchError(() => of(undefined)))
+          }),
+          shareReplay({ bufferSize: 1, refCount: true })
+        )
+      )
+    }
+    return this._cachedItems.get(id)
   }
 
   getCachedMany(ids: number[]): Observable<T[]> {
     return this.listAll().pipe(
-      map((list) => ids.map((id) => list.results.find((o) => o.id == id)))
+      map((list) =>
+        ids.map((id) => list.results.find((o) => o.id == id)).filter(Boolean)
+      )
     )
   }
 
@@ -131,6 +145,7 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
 
   clearCache() {
     this._listAll = null
+    this._cachedItems.clear()
   }
 
   get(id: number): Observable<T> {

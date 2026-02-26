@@ -112,6 +112,89 @@ export const commonAbstractPaperlessServiceTests = (endpoint, ServiceClass) => {
       expect(req2.request.method).toEqual('GET')
       req2.flush([])
     })
+
+    test('getCached should return object from listAll when found', () => {
+      const o = { id: 1, name: 'Test' }
+      let result
+      subscription = service.getCached(1).subscribe((r) => (result = r))
+      httpTestingController
+        .expectOne(
+          `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
+        )
+        .flush({ results: [o] })
+      expect(result).toEqual(o)
+    })
+
+    test('getCached should fetch from API when ID not in listAll', () => {
+      const o = { id: 9999, name: 'NewItem' }
+      let result
+      subscription = service.getCached(9999).subscribe((r) => (result = r))
+      httpTestingController
+        .expectOne(
+          `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
+        )
+        .flush({ results: [] })
+      httpTestingController
+        .expectOne(`${environment.apiBaseUrl}${endpoint}/9999/`)
+        .flush(o)
+      expect(result).toEqual(o)
+    })
+
+    test('getCached should return undefined when ID not found and API returns error', () => {
+      let result = 'not-set'
+      subscription = service.getCached(9999).subscribe((r) => (result = r))
+      httpTestingController
+        .expectOne(
+          `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
+        )
+        .flush({ results: [] })
+      httpTestingController
+        .expectOne(`${environment.apiBaseUrl}${endpoint}/9999/`)
+        .flush('Not found', { status: 404, statusText: 'Not found' })
+      expect(result).toBeUndefined()
+    })
+
+    test('getCached should not make duplicate API calls for the same unknown ID', () => {
+      const o = { id: 9999, name: 'NewItem' }
+      let result1, result2
+      service.getCached(9999).subscribe((r) => (result1 = r))
+      service.getCached(9999).subscribe((r) => (result2 = r))
+      httpTestingController
+        .expectOne(
+          `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
+        )
+        .flush({ results: [] })
+      httpTestingController
+        .expectOne(`${environment.apiBaseUrl}${endpoint}/9999/`)
+        .flush(o)
+      expect(result1).toEqual(o)
+      expect(result2).toEqual(o)
+    })
+
+    test('getCached should refetch after clearCache()', () => {
+      const o = { id: 9999, name: 'NewItem' }
+      subscription = service.getCached(9999).subscribe()
+      httpTestingController
+        .expectOne(
+          `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
+        )
+        .flush({ results: [] })
+      httpTestingController
+        .expectOne(`${environment.apiBaseUrl}${endpoint}/9999/`)
+        .flush(o)
+
+      service.clearCache()
+
+      subscription = service.getCached(9999).subscribe()
+      httpTestingController
+        .expectOne(
+          `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
+        )
+        .flush({ results: [o] })
+      httpTestingController.expectNone(
+        `${environment.apiBaseUrl}${endpoint}/9999/`
+      )
+    })
   })
 
   beforeEach(() => {

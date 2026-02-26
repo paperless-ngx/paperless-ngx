@@ -168,15 +168,15 @@
               [error]="error?.created"></pngx-input-date>
               @if (!isFieldHidden(DocumentDetailFieldID.Correspondent)) {
                 <pngx-input-select [items]="correspondents" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.Correspondent)"
-                (createNew)="createCorrespondent($event)" [hideAddButton]="createDisabled(DataType.Correspondent)" [suggestions]="suggestions?.correspondents" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }"></pngx-input-select>
+                (createNew)="createCorrespondent($event)" [hideAddButton]="createDisabled(DataType.Correspondent)" [suggestions]="suggestions?.correspondents" [fetchItem]="fetchCorrespondent" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }"></pngx-input-select>
               }
               @if (!isFieldHidden(DocumentDetailFieldID.DocumentType)) {
                 <pngx-input-select [items]="documentTypes" i18n-title title="Document type" formControlName="document_type" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.DocumentType)"
-                (createNew)="createDocumentType($event)" [hideAddButton]="createDisabled(DataType.DocumentType)" [suggestions]="suggestions?.document_types" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }"></pngx-input-select>
+                (createNew)="createDocumentType($event)" [hideAddButton]="createDisabled(DataType.DocumentType)" [suggestions]="suggestions?.document_types" [fetchItem]="fetchDocumentType" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }"></pngx-input-select>
               }
               @if (!isFieldHidden(DocumentDetailFieldID.StoragePath)) {
                 <pngx-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.StoragePath)"
-                (createNew)="createStoragePath($event)" [hideAddButton]="createDisabled(DataType.StoragePath)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></pngx-input-select>
+                (createNew)="createStoragePath($event)" [hideAddButton]="createDisabled(DataType.StoragePath)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default" [fetchItem]="fetchStoragePath" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></pngx-input-select>
               }
               @if (!isFieldHidden(DocumentDetailFieldID.Tags)) {
                 <pngx-input-tags #tagsInput formControlName="tags" [suggestions]="suggestions?.tags" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.Tag)" [hideAddButton]="createDisabled(DataType.Tag)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></pngx-input-tags>

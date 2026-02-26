@@ -32,14 +32,8 @@ export abstract class ObjectNamePipe implements PipeTransform {
         this.permissionType
       )
     ) {
-      return this.objectService.listAll().pipe(
-        map((objects) => {
-          this.objects = objects.results
-          return (
-            this.objects.find((o) => o.id === obejctId)?.name ||
-            $localize`Private`
-          )
-        }),
+      return this.objectService.getCached(obejctId).pipe(
+        map((o) => o?.name ?? $localize`Private`),
         catchError(() => of(''))
       )
     } else {

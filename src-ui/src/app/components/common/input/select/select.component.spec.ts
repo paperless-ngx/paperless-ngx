@@ -11,6 +11,7 @@ import {
 } from '@angular/forms'
 import { RouterTestingModule } from '@angular/router/testing'
 import { NgSelectModule } from '@ng-select/ng-select'
+import { of, throwError } from 'rxjs'
 import {
   DEFAULT_MATCHING_ALGORITHM,
   MATCH_ALL,
@@ -84,6 +85,52 @@ describe('SelectComponent', () => {
       private: true,
     })
   })
+
+  it('should fetch unknown item from API when not in items list', fakeAsync(() => {
+    const mockFetch = jest
+      .fn()
+      .mockReturnValue(of({ id: 99, name: 'NewFolder' }))
+    component.fetchItem = mockFetch
+    component.value = 99
+    component.items = [...items]
+    tick()
+    fixture.detectChanges()
+
+    expect(mockFetch).toHaveBeenCalledWith(99)
+    expect(component.items).toContainEqual(
+      expect.objectContaining({ id: 99, name: 'NewFolder' })
+    )
+    expect(component.items.find((i) => i.id === 99)?.private).toBeFalsy()
+  }))
+
+  it('should fall back to Private when API fetch fails', fakeAsync(() => {
+    const mockFetch = jest
+      .fn()
+      .mockReturnValue(throwError(() => ({ status: 403 })))
+    component.fetchItem = mockFetch
+    component.value = 99
+    component.items = [...items]
+    tick()
+    fixture.detectChanges()
+
+    expect(mockFetch).toHaveBeenCalledWith(99)
+    expect(component.items).toContainEqual(
+      expect.objectContaining({ id: 99, private: true })
+    )
+  }))
+
+  it('should not fetch the same unknown ID twice', fakeAsync(() => {
+    const mockFetch = jest
+      .fn()
+      .mockReturnValue(of({ id: 99, name: 'NewFolder' }))
+    component.fetchItem = mockFetch
+    component.value = 99
+    component.items = [...items]
+    component.checkForPrivateItems(99)
+    tick()
+
+    expect(mockFetch).toHaveBeenCalledTimes(1)
+  }))
 
   it('should support suggestions', () => {
     expect(component.value).toBeUndefined()

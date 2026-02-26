@@ -245,6 +245,10 @@ export class DocumentDetailComponent
   documentTypes: DocumentType[]
   storagePaths: StoragePath[]
 
+  fetchCorrespondent = (id: number) => this.correspondentService.get(id)
+  fetchDocumentType = (id: number) => this.documentTypeService.get(id)
+  fetchStoragePath = (id: number) => this.storagePathService.get(id)
+
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
     content: new FormControl(''),

@@ -34,16 +34,10 @@ describe('ObjectNamePipe', () => {
   })
 
   it('should return object name if user has permission', (done) => {
-    const mockObjects = {
-      results: [
-        { id: 1, name: 'Object 1' },
-        { id: 2, name: 'Object 2' },
-      ],
-      count: 2,
-      all: [1, 2],
-    }
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
-    jest.spyOn(objectService, 'listAll').mockReturnValue(of(mockObjects))
+    jest
+      .spyOn(objectService, 'getCached')
+      .mockReturnValue(of({ id: 1, name: 'Object 1' } as MatchingModel))
 
     pipe.transform(1).subscribe((result) => {
       expect(result).toBe('Object 1')
@@ -52,13 +46,8 @@ describe('ObjectNamePipe', () => {
   })
 
   it('should return Private string if object not found', (done) => {
-    const mockObjects = {
-      results: [{ id: 2, name: 'Object 2' }],
-      count: 1,
-      all: [2],
-    }
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
-    jest.spyOn(objectService, 'listAll').mockReturnValue(of(mockObjects))
+    jest.spyOn(objectService, 'getCached').mockReturnValue(of(undefined))
 
     pipe.transform(1).subscribe((result) => {
       expect(result).toBe('Private')
@@ -78,7 +67,7 @@ describe('ObjectNamePipe', () => {
   it('should handle error and return empty string', (done) => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     jest
-      .spyOn(objectService, 'listAll')
+      .spyOn(objectService, 'getCached')
       .mockReturnValueOnce(throwError(() => new Error('Error getting objects')))
 
     pipe.transform(1).subscribe((result) => {
