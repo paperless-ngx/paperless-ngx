@@ -229,7 +229,7 @@ describe('ManagementListComponent', () => {
     expect(reloadSpy).toHaveBeenCalled()
   })
 
-  it('should use the all list length for collection size when provided', fakeAsync(() => {
+  it('should use API count for pagination and all ids for displayed total', fakeAsync(() => {
     jest.spyOn(tagService, 'listFiltered').mockReturnValueOnce(
       of({
         count: 1,
@@ -241,7 +241,8 @@ describe('ManagementListComponent', () => {
     component.reloadData()
     tick(100)
 
-    expect(component.collectionSize).toBe(3)
+    expect(component.collectionSize).toBe(1)
+    expect(component.displayCollectionSize).toBe(3)
   }))
 
   it('should support quick filter for objects', () => {
