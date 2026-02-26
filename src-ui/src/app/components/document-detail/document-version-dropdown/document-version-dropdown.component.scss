@@ -5,14 +5,13 @@
   }
 
   > .version-link {
-    min-width: 300px;
-
     .flex-column {
-      width: 170px;
+      width: 260px;
     }
 
-    .input-group .input-group-text, .input-group input {
+    .input-group .version-label, .input-group input {
       width: 140px;
+      flex: 1 1 auto;
     }
   }
 }

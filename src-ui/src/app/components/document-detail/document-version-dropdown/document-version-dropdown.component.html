@@ -57,12 +57,12 @@
       }
     </div>
     @for (version of versions; track version.id) {
-      <div class="dropdown-item border-top">
-        <div class="d-flex align-items-center w-100 version-item">
-          <div class="btn btn-link link-underline link-underline-opacity-0 d-flex align-items-center small text-start version-link"
+      <div class="dropdown-item border-top px-0">
+        <div class="d-flex align-items-center w-100 py-2 version-item">
+          <div class="btn btn-link link-underline link-underline-opacity-0 d-flex align-items-center small text-start p-0 version-link"
             (click)="selectVersion(version.id)"
           >
-            <div class="check me-3">
+            <div class="check mx-3">
               @if (selectedVersionId === version.id) {
                 <i-bs name="check2-square"></i-bs>
               } @else {
@@ -84,7 +84,7 @@
                     (click)="$event.stopPropagation()"
                   />
                 } @else {
-                  <span class="input-group-text">
+                  <span class="input-group-text version-label">
                     @if (version.version_label) {
                       {{ version.version_label }}
                     } @else {
@@ -107,17 +107,17 @@
                   </button>
                 }
               </div>
-              <div class="text-muted small">
+              <div class="d-flex text-muted small align-items-center mt-1">
                 {{ version.added | customDate:'short' }}
+                <div class="badge bg-light text-muted ms-auto">
+                  {{ version.checksum | slice:0:8 }}
+                </div>
               </div>
-            </div>
-            <div class="badge bg-light text-lowercase text-muted ms-3">
-              {{ version.checksum | slice:0:8 }}
             </div>
           </div>
           @if (!version.is_root) {
             <pngx-confirm-button
-              buttonClasses="btn btn-sm btn-link text-danger"
+              buttonClasses="btn btn-sm btn-link text-danger mx-1"
               iconName="trash"
               confirmMessage="Delete this version?"
               i18n-confirmMessage
