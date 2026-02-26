@@ -2,7 +2,9 @@ import re
 import shutil
 from pathlib import Path
 from unittest import mock
+from unittest.mock import MagicMock
 
+import numpy as np
 import pytest
 from django.conf import settings
 from django.test import TestCase
@@ -781,3 +783,87 @@ def test_preprocess_content_nltk_load_fail(mocker) -> None:
         expected_preprocess_content = f.read().rstrip()
     result = classifier.preprocess_content(content)
     assert result == expected_preprocess_content
+
+
+class TestClassifierConfidenceThreshold(TestCase):
+    def _make_classifier(self) -> DocumentClassifier:
+        classifier = DocumentClassifier()
+        classifier.correspondent_classifier = MagicMock()
+        classifier._vectorize = MagicMock(return_value=MagicMock())
+        return classifier
+
+    def test_threshold_zero_uses_original_predict(self) -> None:
+        """
+        GIVEN:
+            - Threshold is set to 0.0 (disabled)
+        WHEN:
+            - Classifier predicts a correspondent
+        THEN:
+            - Original predict() behavior is used (accepts all predictions)
+        """
+        classifier = self._make_classifier()
+        classifier.correspondent_classifier.predict.return_value = np.array([1])
+
+        with override_settings(CLASSIFIER_CONFIDENCE_THRESHOLD=0.0):
+            result = classifier.predict_correspondent("test content")
+
+        self.assertEqual(result, 1)
+        classifier.correspondent_classifier.predict.assert_called_once()
+        classifier.correspondent_classifier.predict_proba.assert_not_called()
+
+    def test_threshold_accepts_high_confidence(self) -> None:
+        """
+        GIVEN:
+            - Threshold is set to 0.85
+            - Classifier returns a prediction with 0.95 confidence
+        WHEN:
+            - Classifier predicts a correspondent
+        THEN:
+            - The prediction is accepted
+        """
+        classifier = self._make_classifier()
+        classifier.correspondent_classifier.predict_proba.return_value = np.array([[0.05, 0.95]])
+        classifier.correspondent_classifier.classes_ = np.array([-1, 5])
+
+        with override_settings(CLASSIFIER_CONFIDENCE_THRESHOLD=0.85):
+            result = classifier.predict_correspondent("test content")
+
+        self.assertEqual(result, 5)
+
+    def test_threshold_rejects_low_confidence(self) -> None:
+        """
+        GIVEN:
+            - Threshold is set to 0.85
+            - Classifier returns a prediction with 0.60 confidence
+        WHEN:
+            - Classifier predicts a correspondent
+        THEN:
+            - The prediction is rejected (returns None)
+        """
+        classifier = self._make_classifier()
+        classifier.correspondent_classifier.predict_proba.return_value = np.array([[0.40, 0.60]])
+        classifier.correspondent_classifier.classes_ = np.array([-1, 5])
+
+        with override_settings(CLASSIFIER_CONFIDENCE_THRESHOLD=0.85):
+            result = classifier.predict_correspondent("test content")
+
+        self.assertIsNone(result)
+
+    def test_threshold_rejects_null_class(self) -> None:
+        """
+        GIVEN:
+            - Threshold is set to 0.85
+            - Classifier's top prediction is the null class (-1) at 0.95 confidence
+        WHEN:
+            - Classifier predicts a correspondent
+        THEN:
+            - The prediction is rejected (returns None)
+        """
+        classifier = self._make_classifier()
+        classifier.correspondent_classifier.predict_proba.return_value = np.array([[0.95, 0.05]])
+        classifier.correspondent_classifier.classes_ = np.array([-1, 5])
+
+        with override_settings(CLASSIFIER_CONFIDENCE_THRESHOLD=0.85):
+            result = classifier.predict_correspondent("test content")
+
+        self.assertIsNone(result)

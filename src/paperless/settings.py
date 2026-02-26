@@ -311,6 +311,10 @@ MODEL_FILE = __get_path(
     "PAPERLESS_MODEL_FILE",
     DATA_DIR / "classification_model.pickle",
 )
+CLASSIFIER_CONFIDENCE_THRESHOLD: Final[float] = __get_float(
+    "PAPERLESS_CLASSIFIER_CONFIDENCE_THRESHOLD",
+    0.0,
+)
 LLM_INDEX_DIR = DATA_DIR / "llm_index"
 
 LOGGING_DIR = __get_path("PAPERLESS_LOGGING_DIR", DATA_DIR / "log")
