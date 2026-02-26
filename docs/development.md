@@ -358,7 +358,7 @@ If you want to build the documentation locally, this is how you do it:
     $ uv run zensical serve
     ```
 
-## Building the Docker image
+## Building the Docker image {#docker_build}
 
 The docker image is primarily built by the GitHub actions workflow, but
 it can be faster when developing to build and tag an image locally.
