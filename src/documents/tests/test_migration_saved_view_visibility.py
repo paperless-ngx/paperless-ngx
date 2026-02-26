@@ -1,9 +1,8 @@
 from documents.tests.utils import TestMigrations
 
-DASHBOARD_VIEWS_VISIBLE_IDS_KEY = (
-    "general-settings:saved-views:dashboard-views-visible-ids"
-)
-SIDEBAR_VIEWS_VISIBLE_IDS_KEY = "general-settings:saved-views:sidebar-views-visible-ids"
+SAVED_VIEWS_KEY = "saved_views"
+DASHBOARD_VIEWS_VISIBLE_IDS_KEY = "dashboard_views_visible_ids"
+SIDEBAR_VIEWS_VISIBLE_IDS_KEY = "sidebar_views_visible_ids"
 
 
 class TestMigrateSavedViewVisibilityToUiSettings(TestMigrations):
@@ -64,8 +63,11 @@ class TestMigrateSavedViewVisibilityToUiSettings(TestMigrations):
         UiSettings.objects.create(
             user=self.user_with_existing_settings,
             settings={
-                DASHBOARD_VIEWS_VISIBLE_IDS_KEY: [self.sidebar_only_view.id],
-                SIDEBAR_VIEWS_VISIBLE_IDS_KEY: [self.dashboard_view.id],
+                SAVED_VIEWS_KEY: {
+                    DASHBOARD_VIEWS_VISIBLE_IDS_KEY: [self.sidebar_only_view.id],
+                    SIDEBAR_VIEWS_VISIBLE_IDS_KEY: [self.dashboard_view.id],
+                    "warn_on_unsaved_change": True,
+                },
                 "preserve": "value",
             },
         )
@@ -81,11 +83,11 @@ class TestMigrateSavedViewVisibilityToUiSettings(TestMigrations):
             user_id=self.user_with_empty_settings_id,
         ).settings
         self.assertCountEqual(
-            seeded_settings[DASHBOARD_VIEWS_VISIBLE_IDS_KEY],
+            seeded_settings[SAVED_VIEWS_KEY][DASHBOARD_VIEWS_VISIBLE_IDS_KEY],
             [self.dashboard_view.id],
         )
         self.assertCountEqual(
-            seeded_settings[SIDEBAR_VIEWS_VISIBLE_IDS_KEY],
+            seeded_settings[SAVED_VIEWS_KEY][SIDEBAR_VIEWS_VISIBLE_IDS_KEY],
             [self.dashboard_view.id, self.sidebar_only_view.id],
         )
 
@@ -93,24 +95,25 @@ class TestMigrateSavedViewVisibilityToUiSettings(TestMigrations):
             user_id=self.user_with_existing_settings_id,
         ).settings
         self.assertEqual(
-            existing_settings[DASHBOARD_VIEWS_VISIBLE_IDS_KEY],
+            existing_settings[SAVED_VIEWS_KEY][DASHBOARD_VIEWS_VISIBLE_IDS_KEY],
             [self.sidebar_only_view.id],
         )
         self.assertEqual(
-            existing_settings[SIDEBAR_VIEWS_VISIBLE_IDS_KEY],
+            existing_settings[SAVED_VIEWS_KEY][SIDEBAR_VIEWS_VISIBLE_IDS_KEY],
             [self.dashboard_view.id],
         )
+        self.assertTrue(existing_settings[SAVED_VIEWS_KEY]["warn_on_unsaved_change"])
         self.assertEqual(existing_settings["preserve"], "value")
 
         created_settings = UiSettings.objects.get(
             user_id=self.user_with_owned_views_id,
         ).settings
         self.assertCountEqual(
-            created_settings[DASHBOARD_VIEWS_VISIBLE_IDS_KEY],
+            created_settings[SAVED_VIEWS_KEY][DASHBOARD_VIEWS_VISIBLE_IDS_KEY],
             [self.other_owner_visible_view.id],
         )
         self.assertCountEqual(
-            created_settings[SIDEBAR_VIEWS_VISIBLE_IDS_KEY],
+            created_settings[SAVED_VIEWS_KEY][SIDEBAR_VIEWS_VISIBLE_IDS_KEY],
             [self.other_owner_visible_view.id],
         )
 
@@ -119,11 +122,11 @@ class TestMigrateSavedViewVisibilityToUiSettings(TestMigrations):
         ).settings
         self.assertIsInstance(invalid_settings, dict)
         self.assertCountEqual(
-            invalid_settings[DASHBOARD_VIEWS_VISIBLE_IDS_KEY],
+            invalid_settings[SAVED_VIEWS_KEY][DASHBOARD_VIEWS_VISIBLE_IDS_KEY],
             [self.invalid_settings_owner_view.id],
         )
         self.assertEqual(
-            invalid_settings[SIDEBAR_VIEWS_VISIBLE_IDS_KEY],
+            invalid_settings[SAVED_VIEWS_KEY][SIDEBAR_VIEWS_VISIBLE_IDS_KEY],
             [],
         )
 
@@ -171,19 +174,23 @@ class TestReverseMigrateSavedViewVisibilityFromUiSettings(TestMigrations):
         UiSettings.objects.create(
             user=user1,
             settings={
-                DASHBOARD_VIEWS_VISIBLE_IDS_KEY: [str(self.view1.id)],
-                SIDEBAR_VIEWS_VISIBLE_IDS_KEY: [self.view2.id],
+                SAVED_VIEWS_KEY: {
+                    DASHBOARD_VIEWS_VISIBLE_IDS_KEY: [str(self.view1.id)],
+                    SIDEBAR_VIEWS_VISIBLE_IDS_KEY: [self.view2.id],
+                },
             },
         )
         UiSettings.objects.create(
             user=user2,
             settings={
-                DASHBOARD_VIEWS_VISIBLE_IDS_KEY: [
-                    self.view2.id,
-                    self.view3.id,
-                    self.view4.id,
-                ],
-                SIDEBAR_VIEWS_VISIBLE_IDS_KEY: [self.view4.id],
+                SAVED_VIEWS_KEY: {
+                    DASHBOARD_VIEWS_VISIBLE_IDS_KEY: [
+                        self.view2.id,
+                        self.view3.id,
+                        self.view4.id,
+                    ],
+                    SIDEBAR_VIEWS_VISIBLE_IDS_KEY: [self.view4.id],
+                },
             },
         )
         UiSettings.objects.create(user=user3, settings={})

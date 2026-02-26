@@ -4,10 +4,9 @@ from django.db import migrations
 from django.db import models
 
 # from src-ui/src/app/data/ui-settings.ts
-DASHBOARD_VIEWS_VISIBLE_IDS_KEY = (
-    "general-settings:saved-views:dashboard-views-visible-ids"
-)
-SIDEBAR_VIEWS_VISIBLE_IDS_KEY = "general-settings:saved-views:sidebar-views-visible-ids"
+SAVED_VIEWS_KEY = "saved_views"
+DASHBOARD_VIEWS_VISIBLE_IDS_KEY = "dashboard_views_visible_ids"
+SIDEBAR_VIEWS_VISIBLE_IDS_KEY = "sidebar_views_visible_ids"
 
 
 def _parse_visible_ids(raw_value) -> set[int]:
@@ -51,17 +50,24 @@ def _set_default_visibility_ids(apps, schema_editor):
             current_settings = {}
 
         changed = False
+        saved_views_settings = current_settings.get(SAVED_VIEWS_KEY)
+        if not isinstance(saved_views_settings, dict):
+            saved_views_settings = {}
+            changed = True
 
-        if current_settings.get(DASHBOARD_VIEWS_VISIBLE_IDS_KEY) is None:
-            current_settings[DASHBOARD_VIEWS_VISIBLE_IDS_KEY] = (
+        if saved_views_settings.get(DASHBOARD_VIEWS_VISIBLE_IDS_KEY) is None:
+            saved_views_settings[DASHBOARD_VIEWS_VISIBLE_IDS_KEY] = (
                 dashboard_visible_ids_by_owner.get(user.id, [])
             )
             changed = True
-        if current_settings.get(SIDEBAR_VIEWS_VISIBLE_IDS_KEY) is None:
-            current_settings[SIDEBAR_VIEWS_VISIBLE_IDS_KEY] = (
+
+        if saved_views_settings.get(SIDEBAR_VIEWS_VISIBLE_IDS_KEY) is None:
+            saved_views_settings[SIDEBAR_VIEWS_VISIBLE_IDS_KEY] = (
                 sidebar_visible_ids_by_owner.get(user.id, [])
             )
             changed = True
+
+        current_settings[SAVED_VIEWS_KEY] = saved_views_settings
 
         if changed:
             ui_settings.settings = current_settings
@@ -78,11 +84,16 @@ def _restore_visibility_fields(apps, schema_editor):
         current_settings = ui_settings.settings
         if not isinstance(current_settings, dict):
             continue
+        saved_views_settings = current_settings.get(SAVED_VIEWS_KEY)
+        if not isinstance(saved_views_settings, dict):
+            saved_views_settings = {}
+
         dashboard_visible_ids_by_owner[ui_settings.user_id] = _parse_visible_ids(
-            current_settings.get(DASHBOARD_VIEWS_VISIBLE_IDS_KEY),
+            saved_views_settings.get(DASHBOARD_VIEWS_VISIBLE_IDS_KEY),
         )
+
         sidebar_visible_ids_by_owner[ui_settings.user_id] = _parse_visible_ids(
-            current_settings.get(SIDEBAR_VIEWS_VISIBLE_IDS_KEY),
+            saved_views_settings.get(SIDEBAR_VIEWS_VISIBLE_IDS_KEY),
         )
 
     SavedView.objects.update(show_on_dashboard=False, show_in_sidebar=False)
