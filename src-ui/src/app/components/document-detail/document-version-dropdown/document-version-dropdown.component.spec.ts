@@ -17,7 +17,10 @@ describe('DocumentVersionDropdownComponent', () => {
   let component: DocumentVersionDropdownComponent
   let fixture: ComponentFixture<DocumentVersionDropdownComponent>
   let documentService: jest.Mocked<
-    Pick<DocumentService, 'deleteVersion' | 'getVersions' | 'uploadVersion'>
+    Pick<
+      DocumentService,
+      'deleteVersion' | 'getVersions' | 'uploadVersion' | 'updateVersionLabel'
+    >
   >
   let toastService: jest.Mocked<Pick<ToastService, 'showError' | 'showInfo'>>
   let finished$: Subject<{ taskId: string }>
@@ -30,6 +33,7 @@ describe('DocumentVersionDropdownComponent', () => {
       deleteVersion: jest.fn(),
       getVersions: jest.fn(),
       uploadVersion: jest.fn(),
+      updateVersionLabel: jest.fn(),
     }
     toastService = {
       showError: jest.fn(),
@@ -127,6 +131,96 @@ describe('DocumentVersionDropdownComponent', () => {
     )
   })
 
+  it('beginEditingVersion should set active row and draft label', () => {
+    component.userCanEdit = true
+    component.userIsOwner = true
+    const version = {
+      id: 10,
+      is_root: false,
+      checksum: 'bbbb',
+      version_label: 'Current',
+    } as DocumentVersionInfo
+
+    component.beginEditingVersion(version)
+
+    expect(component.editingVersionId).toEqual(10)
+    expect(component.versionLabelDraft).toEqual('Current')
+  })
+
+  it('submitEditedVersionLabel should close editor without save if unchanged', () => {
+    const version = {
+      id: 10,
+      is_root: false,
+      checksum: 'bbbb',
+      version_label: 'Current',
+    } as DocumentVersionInfo
+    const saveSpy = jest.spyOn(component, 'saveVersionLabel')
+    component.editingVersionId = 10
+    component.versionLabelDraft = '  Current  '
+
+    component.submitEditedVersionLabel(version)
+
+    expect(saveSpy).not.toHaveBeenCalled()
+    expect(component.editingVersionId).toBeNull()
+    expect(component.versionLabelDraft).toEqual('')
+  })
+
+  it('submitEditedVersionLabel should call saveVersionLabel when changed', () => {
+    const version = {
+      id: 10,
+      is_root: false,
+      checksum: 'bbbb',
+      version_label: 'Current',
+    } as DocumentVersionInfo
+    const saveSpy = jest
+      .spyOn(component, 'saveVersionLabel')
+      .mockImplementation(() => {})
+    component.editingVersionId = 10
+    component.versionLabelDraft = '  Updated  '
+
+    component.submitEditedVersionLabel(version)
+
+    expect(saveSpy).toHaveBeenCalledWith(10, 'Updated')
+    expect(component.editingVersionId).toBeNull()
+  })
+
+  it('saveVersionLabel should update the version and emit versionsUpdated', () => {
+    documentService.updateVersionLabel.mockReturnValue(
+      of({
+        id: 10,
+        version_label: 'Updated',
+        is_root: false,
+      } as any)
+    )
+    const emitSpy = jest.spyOn(component.versionsUpdated, 'emit')
+
+    component.saveVersionLabel(10, 'Updated')
+
+    expect(documentService.updateVersionLabel).toHaveBeenCalledWith(
+      3,
+      10,
+      'Updated'
+    )
+    expect(emitSpy).toHaveBeenCalledWith([
+      { id: 3, is_root: true, checksum: 'aaaa' },
+      { id: 10, is_root: false, checksum: 'bbbb', version_label: 'Updated' },
+    ])
+    expect(component.savingVersionLabelId).toBeNull()
+  })
+
+  it('saveVersionLabel should show error toast on failure', () => {
+    const error = new Error('save failed')
+    documentService.updateVersionLabel.mockReturnValue(throwError(() => error))
+
+    component.saveVersionLabel(10, 'Updated')
+
+    expect(toastService.showError).toHaveBeenCalledWith(
+      'Error updating version label',
+      error
+    )
+    expect(component.savingVersionLabelId).toBeNull()
+  })
+
   it('onVersionFileSelected should upload and update versions after websocket success', () => {
     const versions: DocumentVersionInfo[] = [
       { id: 3, is_root: true, checksum: 'aaaa' },
@@ -215,6 +309,8 @@ describe('DocumentVersionDropdownComponent', () => {
   it('ngOnChanges should clear upload status on document switch', () => {
     component.versionUploadState = UploadState.Failed
     component.versionUploadError = 'something failed'
+    component.editingVersionId = 10
+    component.versionLabelDraft = 'draft'
 
     component.ngOnChanges({
       documentId: new SimpleChange(3, 4, false),
@@ -222,5 +318,7 @@ describe('DocumentVersionDropdownComponent', () => {
 
     expect(component.versionUploadState).toEqual(UploadState.Idle)
     expect(component.versionUploadError).toBeNull()
+    expect(component.editingVersionId).toBeNull()
+    expect(component.versionLabelDraft).toEqual('')
   })
 })

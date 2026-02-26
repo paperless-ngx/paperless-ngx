@@ -359,6 +359,18 @@ describe(`DocumentService`, () => {
     req.flush({ result: 'OK', current_version_id: documents[0].id })
   })
 
+  it('should call appropriate api endpoint for updating a document version label', () => {
+    subscription = service
+      .updateVersionLabel(documents[0].id, 10, 'Updated label')
+      .subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/versions/10/`
+    )
+    expect(req.request.method).toEqual('PATCH')
+    expect(req.request.body).toEqual({ version_label: 'Updated label' })
+    req.flush({ id: 10, version_label: 'Updated label', is_root: false })
+  })
+
   it('should call appropriate api endpoint for uploading a new version', () => {
     const file = new File(['hello'], 'test.pdf', { type: 'application/pdf' })
 

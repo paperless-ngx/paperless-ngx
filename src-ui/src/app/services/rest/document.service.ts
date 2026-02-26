@@ -7,6 +7,7 @@ import {
   DOCUMENT_SORT_FIELDS,
   DOCUMENT_SORT_FIELDS_FULLTEXT,
   Document,
+  DocumentVersionInfo,
 } from 'src/app/data/document'
 import { DocumentMetadata } from 'src/app/data/document-metadata'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
@@ -242,6 +243,17 @@ export class DocumentService extends AbstractPaperlessService<Document> {
   deleteVersion(rootDocumentId: number, versionId: number) {
     return this.http.delete<{ result: string; current_version_id: number }>(
       this.getResourceUrl(rootDocumentId, `versions/${versionId}`)
+    )
+  }
+
+  updateVersionLabel(
+    rootDocumentId: number,
+    versionId: number,
+    versionLabel: string | null
+  ): Observable<DocumentVersionInfo> {
+    return this.http.patch<DocumentVersionInfo>(
+      this.getResourceUrl(rootDocumentId, `versions/${versionId}`),
+      { version_label: versionLabel }
     )
   }
 

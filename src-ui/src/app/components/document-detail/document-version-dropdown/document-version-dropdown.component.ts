@@ -15,6 +15,7 @@ import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { merge, of, Subject } from 'rxjs'
 import {
   filter,
+  finalize,
   first,
   map,
   switchMap,
@@ -59,6 +60,9 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
   newVersionLabel: string = ''
   versionUploadState: UploadState = UploadState.Idle
   versionUploadError: string | null = null
+  savingVersionLabelId: number | null = null
+  editingVersionId: number | null = null
+  versionLabelDraft: string = ''
 
   private readonly documentsService = inject(DocumentService)
   private readonly toastService = inject(ToastService)
@@ -70,6 +74,7 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
     if (changes.documentId && !changes.documentId.firstChange) {
       this.documentChange$.next()
       this.clearVersionUploadStatus()
+      this.cancelEditingVersion()
     }
   }
 
@@ -82,6 +87,43 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
 
   selectVersion(versionId: number): void {
     this.versionSelected.emit(versionId)
+  }
+
+  get canEditLabels(): boolean {
+    return this.userIsOwner && this.userCanEdit
+  }
+
+  isEditingVersion(versionId: number): boolean {
+    return this.editingVersionId === versionId
+  }
+
+  beginEditingVersion(version: DocumentVersionInfo, event?: Event): void {
+    event?.preventDefault()
+    event?.stopPropagation()
+    if (!this.canEditLabels || this.savingVersionLabelId !== null) return
+    this.editingVersionId = version.id
+    this.versionLabelDraft = version.version_label ?? ''
+  }
+
+  cancelEditingVersion(event?: Event): void {
+    event?.preventDefault()
+    event?.stopPropagation()
+    this.editingVersionId = null
+    this.versionLabelDraft = ''
+  }
+
+  submitEditedVersionLabel(version: DocumentVersionInfo, event?: Event): void {
+    event?.preventDefault()
+    event?.stopPropagation()
+    if (this.savingVersionLabelId !== null) return
+    const nextLabel = this.versionLabelDraft?.trim() || null
+    const currentLabel = version.version_label?.trim() || null
+    if (nextLabel === currentLabel) {
+      this.cancelEditingVersion()
+      return
+    }
+    this.saveVersionLabel(version.id, nextLabel)
+    this.cancelEditingVersion()
   }
 
   deleteVersion(versionId: number): void {
@@ -110,6 +152,41 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
         },
         error: (error) => {
           this.toastService.showError($localize`Error deleting version`, error)
+        },
+      })
+  }
+
+  saveVersionLabel(versionId: number, versionLabel: string | null): void {
+    if (this.savingVersionLabelId !== null) return
+    this.savingVersionLabelId = versionId
+    this.documentsService
+      .updateVersionLabel(this.documentId, versionId, versionLabel)
+      .pipe(
+        first(),
+        finalize(() => {
+          if (this.savingVersionLabelId === versionId) {
+            this.savingVersionLabelId = null
+          }
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe({
+        next: (updatedVersion) => {
+          const updatedVersions = this.versions.map((version) =>
+            version.id === versionId
+              ? {
+                  ...version,
+                  version_label: updatedVersion.version_label,
+                }
+              : version
+          )
+          this.versionsUpdated.emit(updatedVersions)
+        },
+        error: (error) => {
+          this.toastService.showError(
+            $localize`Error updating version label`,
+            error
+          )
         },
       })
   }

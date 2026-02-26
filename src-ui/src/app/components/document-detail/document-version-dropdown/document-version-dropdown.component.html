@@ -59,37 +59,76 @@
     <div class="dropdown-divider"></div>
     @for (version of versions; track version.id) {
       <div class="dropdown-item">
-        <div class="d-flex align-items-center w-100 version-item">
-          <button type="button" class="btn btn-link link-underline link-underline-opacity-0 d-flex align-items-center flex-grow-1 small ps-0 text-start" (click)="selectVersion(version.id)">
+        <div class="d-flex align-items-start w-100 version-item">
+          <button
+            type="button"
+            class="btn btn-link link-underline link-underline-opacity-0 d-flex align-items-center small ps-0 text-start"
+            (click)="selectVersion(version.id)"
+          >
             <div class="badge bg-light text-lowercase text-muted">
               {{ version.checksum | slice:0:8 }}
             </div>
-            <div class="d-flex flex-column small ms-2">
-              <div>
+          </button>
+          <div class="d-flex flex-column small ms-2 flex-grow-1 min-w-0">
+            @if (isEditingVersion(version.id)) {
+              <input
+                class="form-control form-control-sm"
+                type="text"
+                [(ngModel)]="versionLabelDraft"
+                i18n-placeholder
+                placeholder="Version label"
+                [disabled]="savingVersionLabelId !== null"
+                (keydown.enter)="submitEditedVersionLabel(version, $event)"
+                (keydown.escape)="cancelEditingVersion($event)"
+                (click)="$event.stopPropagation()"
+              />
+            } @else {
+              <button
+                type="button"
+                class="btn btn-link link-underline link-underline-opacity-0 p-0 small text-start"
+                (click)="selectVersion(version.id)"
+              >
                 @if (version.version_label) {
                   {{ version.version_label }}
                 } @else {
-                  <span i18n>ID</span> #{{version.id}}
+                  <span i18n>ID</span> #{{ version.id }}
                 }
-              </div>
-              <div class="text-muted">
-                {{ version.added | customDate:'short' }}
-              </div>
+              </button>
+            }
+            <div class="text-muted">
+              {{ version.added | customDate:'short' }}
             </div>
-          </button>
+          </div>
+          <div class="d-flex align-items-center ms-2">
+            @if (canEditLabels) {
+              <button
+                type="button"
+                class="btn btn-link btn-sm text-secondary p-0"
+                [disabled]="savingVersionLabelId !== null"
+                (click)="isEditingVersion(version.id) ? submitEditedVersionLabel(version, $event) : beginEditingVersion(version, $event)"
+                [attr.aria-label]="isEditingVersion(version.id) ? 'Save version label' : 'Edit version label'"
+              >
+                @if (isEditingVersion(version.id)) {
+                  <i-bs name="check-lg"></i-bs>
+                } @else {
+                  <i-bs name="pencil"></i-bs>
+                }
+              </button>
+            }
+            @if (!version.is_root) {
+              <pngx-confirm-button
+                buttonClasses="btn-link btn-sm text-danger ms-2"
+                iconName="trash"
+                confirmMessage="Delete this version?"
+                i18n-confirmMessage
+                [disabled]="!userIsOwner || !userCanEdit"
+                (confirm)="deleteVersion(version.id)"
+              >
+                <span class="visually-hidden" i18n>Delete version</span>
+              </pngx-confirm-button>
+            }
+          </div>
           @if (selectedVersionId === version.id) { <span class="ms-2">✓</span> }
-          @if (!version.is_root) {
-            <pngx-confirm-button
-              buttonClasses="btn-link btn-sm text-danger ms-2"
-              iconName="trash"
-              confirmMessage="Delete this version?"
-              i18n-confirmMessage
-              [disabled]="!userIsOwner || !userCanEdit"
-              (confirm)="deleteVersion(version.id)"
-            >
-              <span class="visually-hidden" i18n>Delete version</span>
-            </pngx-confirm-button>
-          }
         </div>
       </div>
     }
