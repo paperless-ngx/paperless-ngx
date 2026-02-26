@@ -1155,12 +1155,12 @@ export class DocumentDetailComponent
     })
   }
 
-  download(original: boolean = false, follow_formatting: boolean = false) {
+  download(original: boolean = false) {
     this.downloading = true
     const downloadUrl = this.documentsService.getDownloadUrl(
       this.documentId,
       original,
-      follow_formatting
+      this.useFormattedFilename
     )
     this.http
       .get(downloadUrl, { observe: 'response', responseType: 'blob' })

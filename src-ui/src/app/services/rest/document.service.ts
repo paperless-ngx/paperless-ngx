@@ -179,13 +179,13 @@ export class DocumentService extends AbstractPaperlessService<Document> {
   getDownloadUrl(
     id: number,
     original: boolean = false,
-    follow_formatting: boolean = false
+    followFormatting: boolean = false
   ): string {
     let url = new URL(this.getResourceUrl(id, 'download'))
     if (original) {
       url.searchParams.append('original', 'true')
     }
-    if (follow_formatting) {
+    if (followFormatting) {
       url.searchParams.append('follow_formatting', 'true')
     }
     return url.toString()

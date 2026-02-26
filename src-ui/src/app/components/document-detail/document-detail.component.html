@@ -25,7 +25,7 @@
   </button>
 
   <div class="btn-group">
-    <button (click)="download(false, useFormattedFilename)" class="btn btn-sm btn-outline-primary" [disabled]="downloading">
+    <button (click)="download()" class="btn btn-sm btn-outline-primary" [disabled]="downloading">
       @if (downloading) {
         <div class="spinner-border spinner-border-sm" role="status"></div>
       } @else {
@@ -38,7 +38,7 @@
       <button class="btn btn-sm btn-outline-primary dropdown-toggle" [disabled]="downloading" ngbDropdownToggle></button>
       <div class="dropdown-menu shadow" ngbDropdownMenu>
         @if (metadata?.has_archive_version) {
-          <button ngbDropdownItem (click)="download(true, useFormattedFilename)" [disabled]="downloading" i18n>Download original</button>
+          <button ngbDropdownItem (click)="download(true)" [disabled]="downloading" i18n>Download original</button>
           <div class="dropdown-divider"></div>
         }
         <form class="px-3 py-1">

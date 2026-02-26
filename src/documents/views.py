@@ -883,13 +883,6 @@ class DocumentViewSet(
             and request.query_params["original"] == "true"
         )
 
-    @staticmethod
-    def follow_formatting_requested(request):
-        return (
-            "follow_formatting" in request.query_params
-            and request.query_params["follow_formatting"] == "true"
-        )
-
     def file_response(self, pk, request, disposition):
         doc = Document.global_objects.select_related("owner").get(id=pk)
         if request.user is not None and not has_perms_owner_aware(
@@ -904,7 +897,7 @@ class DocumentViewSet(
             use_archive=not self.original_requested(request)
             and doc.has_archive_version,
             disposition=disposition,
-            follow_formatting=self.follow_formatting_requested(request),
+            follow_formatting=request.query_params.get("follow_formatting", False),
         )
 
     def get_metadata(self, file, mime_type):
@@ -3570,7 +3563,7 @@ class TrashView(ListModelMixin, PassUserMixin):
         return Response({"result": "OK", "doc_ids": doc_ids})
 
 
-def serve_logo(request, filename: str | None = None) -> FileResponse:
+def serve_logo(request, filename=None):
     """
     Serves the configured logo file with Content-Disposition: attachment.
     Prevents inline execution of SVGs. See GHSA-6p53-hqqw-8j62
