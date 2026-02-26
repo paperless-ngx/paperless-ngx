@@ -7,8 +7,8 @@ SIDEBAR_VIEWS_VISIBLE_IDS_KEY = "general-settings:saved-views:sidebar-views-visi
 
 
 class TestMigrateSavedViewVisibilityToUiSettings(TestMigrations):
-    migrate_from = "0011_optimize_integer_field_sizes"
-    migrate_to = "0012_savedview_visibility_to_ui_settings"
+    migrate_from = "0013_document_root_document"
+    migrate_to = "0014_savedview_visibility_to_ui_settings"
 
     def setUpBeforeMigration(self, apps) -> None:
         User = apps.get_model("auth", "User")
@@ -129,8 +129,8 @@ class TestMigrateSavedViewVisibilityToUiSettings(TestMigrations):
 
 
 class TestReverseMigrateSavedViewVisibilityFromUiSettings(TestMigrations):
-    migrate_from = "0012_savedview_visibility_to_ui_settings"
-    migrate_to = "0011_optimize_integer_field_sizes"
+    migrate_from = "0014_savedview_visibility_to_ui_settings"
+    migrate_to = "0013_document_root_document"
 
     def setUpBeforeMigration(self, apps) -> None:
         User = apps.get_model("auth", "User")

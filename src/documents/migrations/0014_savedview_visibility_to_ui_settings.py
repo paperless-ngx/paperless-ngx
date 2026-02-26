@@ -105,7 +105,7 @@ def _restore_visibility_fields(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "0011_optimize_integer_field_sizes"),
+        ("documents", "0013_document_root_document"),
     ]
 
     operations = [
