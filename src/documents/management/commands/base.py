@@ -7,16 +7,20 @@ Provides automatic progress bar and multiprocessing support with minimal boilerp
 from __future__ import annotations
 
 import os
+from collections.abc import Iterable
+from collections.abc import Sized
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import as_completed
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
+from typing import Any
 from typing import ClassVar
 from typing import Generic
 from typing import TypeVar
 
 from django import db
 from django.core.management import CommandError
+from django.db.models import QuerySet
 from django_rich.management import RichCommand
 from rich.console import Console
 from rich.progress import BarColumn
@@ -28,11 +32,12 @@ from rich.progress import TimeElapsedColumn
 from rich.progress import TimeRemainingColumn
 
 if TYPE_CHECKING:
-    from argparse import ArgumentParser
     from collections.abc import Callable
     from collections.abc import Generator
     from collections.abc import Iterable
     from collections.abc import Sequence
+
+    from django.core.management import CommandParser
 
 T = TypeVar("T")
 R = TypeVar("R")
@@ -95,7 +100,7 @@ class PaperlessCommand(RichCommand):
     no_progress_bar: bool
     process_count: int
 
-    def add_arguments(self, parser: ArgumentParser) -> None:
+    def add_arguments(self, parser: CommandParser) -> None:
         """Add arguments based on supported features."""
         super().add_arguments(parser)
 
@@ -116,7 +121,7 @@ class PaperlessCommand(RichCommand):
                 help=f"Number of processes to use (default: {default_processes})",
             )
 
-    def execute(self, *args, **options) -> int:
+    def execute(self, *args: Any, **options: Any) -> str | None:
         """
         Set up instance state before handle() is called.
 
@@ -166,7 +171,7 @@ class PaperlessCommand(RichCommand):
             transient=False,
         )
 
-    def _get_iterable_length(self, iterable: Iterable[T]) -> int | None:
+    def _get_iterable_length(self, iterable: Iterable[object]) -> int | None:
         """
         Attempt to determine the length of an iterable without consuming it.
 
@@ -179,21 +184,13 @@ class PaperlessCommand(RichCommand):
         Returns:
             The length if determinable, None otherwise.
         """
-        # Django querysets have .count() which is a SELECT COUNT(*)
-        # This is much more efficient than len() which evaluates the queryset
-        # Note: list.count(value) requires an argument, so we catch TypeError
-        if hasattr(iterable, "count") and callable(iterable.count):
-            try:
-                return iterable.count()
-            except TypeError:
-                # list.count() requires an argument, fall through to len()
-                pass
+        if isinstance(iterable, QuerySet):
+            return iterable.count()
 
-        # Fall back to len() for sequences
-        try:
-            return len(iterable)  # type: ignore[arg-type]
-        except TypeError:
-            return None
+        if isinstance(iterable, Sized):
+            return len(iterable)
+
+        return None
 
     def track(
         self,

@@ -8,6 +8,7 @@ from typing import ClassVar
 
 import pytest
 from django.core.management import CommandError
+from django.db.models import QuerySet
 from rich.console import Console
 
 from documents.management.commands.base import PaperlessCommand
@@ -121,7 +122,7 @@ def mock_queryset():
     This verifies we use .count() instead of len() for querysets.
     """
 
-    class MockQuerySet:
+    class MockQuerySet(QuerySet):
         def __init__(self, items: list):
             self._items = items
             self.count_called = False
