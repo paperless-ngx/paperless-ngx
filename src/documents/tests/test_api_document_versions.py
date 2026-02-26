@@ -325,6 +325,107 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_update_version_label_updates_and_trims(self) -> None:
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+        )
+        version = Document.objects.create(
+            title="v1",
+            checksum="v1",
+            mime_type="application/pdf",
+            root_document=root,
+            version_label="old",
+        )
+
+        resp = self.client.patch(
+            f"/api/documents/{root.id}/versions/{version.id}/",
+            {"version_label": "  Label 1  "},
+            format="json",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        version.refresh_from_db()
+        self.assertEqual(version.version_label, "Label 1")
+        self.assertEqual(resp.data["version_label"], "Label 1")
+        self.assertEqual(resp.data["id"], version.id)
+        self.assertFalse(resp.data["is_root"])
+
+    def test_update_version_label_clears_on_blank(self) -> None:
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+            version_label="Root Label",
+        )
+
+        resp = self.client.patch(
+            f"/api/documents/{root.id}/versions/{root.id}/",
+            {"version_label": "   "},
+            format="json",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        root.refresh_from_db()
+        self.assertIsNone(root.version_label)
+        self.assertIsNone(resp.data["version_label"])
+        self.assertTrue(resp.data["is_root"])
+
+    def test_update_version_label_returns_403_without_permission(self) -> None:
+        owner = User.objects.create_user(username="owner")
+        other = User.objects.create_user(username="other")
+        other.user_permissions.add(
+            Permission.objects.get(codename="change_document"),
+        )
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+            owner=owner,
+        )
+        version = Document.objects.create(
+            title="v1",
+            checksum="v1",
+            mime_type="application/pdf",
+            root_document=root,
+        )
+        self.client.force_authenticate(user=other)
+
+        resp = self.client.patch(
+            f"/api/documents/{root.id}/versions/{version.id}/",
+            {"version_label": "Blocked"},
+            format="json",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_update_version_label_returns_404_for_unrelated_version(self) -> None:
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+        )
+        other_root = Document.objects.create(
+            title="other",
+            checksum="other",
+            mime_type="application/pdf",
+        )
+        other_version = Document.objects.create(
+            title="other-v1",
+            checksum="other-v1",
+            mime_type="application/pdf",
+            root_document=other_root,
+        )
+
+        resp = self.client.patch(
+            f"/api/documents/{root.id}/versions/{other_version.id}/",
+            {"version_label": "Nope"},
+            format="json",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_download_version_param_errors(self) -> None:
         root = self._create_pdf(title="root", checksum="root")
 

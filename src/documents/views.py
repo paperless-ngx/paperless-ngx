@@ -178,6 +178,7 @@ from documents.serialisers import CustomFieldSerializer
 from documents.serialisers import DocumentListSerializer
 from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
+from documents.serialisers import DocumentVersionLabelSerializer
 from documents.serialisers import DocumentVersionSerializer
 from documents.serialisers import EmailSerializer
 from documents.serialisers import NotesSerializer
@@ -1663,6 +1664,31 @@ class DocumentViewSet(
                 "Error updating document, check logs for more detail.",
             )
 
+    def _get_root_doc_for_version_action(self, pk) -> Document:
+        try:
+            root_doc = Document.objects.select_related(
+                "owner",
+                "root_document",
+            ).get(pk=pk)
+        except Document.DoesNotExist:
+            raise Http404
+        return get_root_document(root_doc)
+
+    def _get_version_doc_for_root(self, root_doc: Document, version_id) -> Document:
+        try:
+            version_doc = Document.objects.select_related("owner").get(
+                pk=version_id,
+            )
+        except Document.DoesNotExist:
+            raise Http404
+
+        if (
+            version_doc.id != root_doc.id
+            and version_doc.root_document_id != root_doc.id
+        ):
+            raise Http404
+        return version_doc
+
     @extend_schema(
         operation_id="documents_delete_version",
         parameters=[
@@ -1686,14 +1712,7 @@ class DocumentViewSet(
         url_path=r"versions/(?P<version_id>\d+)",
     )
     def delete_version(self, request, pk=None, version_id=None):
-        try:
-            root_doc = Document.objects.select_related(
-                "owner",
-                "root_document",
-            ).get(pk=pk)
-            root_doc = get_root_document(root_doc)
-        except Document.DoesNotExist:
-            raise Http404
+        root_doc = self._get_root_doc_for_version_action(pk)
 
         if request.user is not None and not has_perms_owner_aware(
             request.user,
@@ -1702,20 +1721,12 @@ class DocumentViewSet(
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
-        try:
-            version_doc = Document.objects.select_related("owner").get(
-                pk=version_id,
-            )
-        except Document.DoesNotExist:
-            raise Http404
+        version_doc = self._get_version_doc_for_root(root_doc, version_id)
 
         if version_doc.id == root_doc.id:
             return HttpResponseBadRequest(
                 "Cannot delete the root/original version. Delete the document instead.",
             )
-
-        if version_doc.root_document_id != root_doc.id:
-            raise Http404
 
         from documents import index
 
@@ -1749,6 +1760,78 @@ class DocumentViewSet(
             {
                 "result": "OK",
                 "current_version_id": current.id if current else root_doc.id,
+            },
+        )
+
+    @extend_schema(
+        operation_id="documents_update_version_label",
+        request=DocumentVersionLabelSerializer,
+        parameters=[
+            OpenApiParameter(
+                name="version_id",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+            ),
+        ],
+        responses=inline_serializer(
+            name="UpdateDocumentVersionLabelResult",
+            fields={
+                "id": serializers.IntegerField(),
+                "added": serializers.DateTimeField(),
+                "version_label": serializers.CharField(
+                    required=False,
+                    allow_null=True,
+                ),
+                "checksum": serializers.CharField(
+                    required=False,
+                    allow_null=True,
+                ),
+                "is_root": serializers.BooleanField(),
+            },
+        ),
+    )
+    @delete_version.mapping.patch
+    def update_version_label(self, request, pk=None, version_id=None):
+        serializer = DocumentVersionLabelSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        root_doc = self._get_root_doc_for_version_action(pk)
+        if request.user is not None and not has_perms_owner_aware(
+            request.user,
+            "change_document",
+            root_doc,
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
+
+        version_doc = self._get_version_doc_for_root(root_doc, version_id)
+        old_label = version_doc.version_label
+        version_doc.version_label = serializer.validated_data["version_label"]
+        version_doc.save(update_fields=["version_label"])
+
+        if settings.AUDIT_LOG_ENABLED and old_label != version_doc.version_label:
+            actor = (
+                request.user if request.user and request.user.is_authenticated else None
+            )
+            LogEntry.objects.log_create(
+                instance=root_doc,
+                changes={
+                    "Version Label": [old_label, version_doc.version_label],
+                },
+                action=LogEntry.Action.UPDATE,
+                actor=actor,
+                additional_data={
+                    "reason": "Version label updated",
+                    "version_id": version_doc.id,
+                },
+            )
+
+        return Response(
+            {
+                "id": version_doc.id,
+                "added": version_doc.added,
+                "version_label": version_doc.version_label,
+                "checksum": version_doc.checksum,
+                "is_root": version_doc.id == root_doc.id,
             },
         )
 

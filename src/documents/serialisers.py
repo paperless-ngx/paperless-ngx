@@ -2080,6 +2080,22 @@ class DocumentVersionSerializer(serializers.Serializer):
     validate_document = PostDocumentSerializer().validate_document
 
 
+class DocumentVersionLabelSerializer(serializers.Serializer):
+    version_label = serializers.CharField(
+        label="Version label",
+        required=True,
+        allow_blank=True,
+        allow_null=True,
+        max_length=64,
+    )
+
+    def validate_version_label(self, value):
+        if value is None:
+            return None
+        normalized = value.strip()
+        return normalized or None
+
+
 class BulkDownloadSerializer(DocumentListSerializer):
     content = serializers.ChoiceField(
         choices=["archive", "originals", "both"],
