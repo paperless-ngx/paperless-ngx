@@ -202,3 +202,43 @@ def audit_log_check(app_configs, **kwargs):
         )
 
     return result
+
+
+@register()
+def check_deprecated_db_settings(
+    app_configs: object,
+    **kwargs: object,
+) -> list[Warning]:
+    """Check for deprecated database environment variables.
+
+    Detects legacy advanced options that should be migrated to
+    PAPERLESS_DB_OPTIONS. Returns one Warning per deprecated variable found.
+    """
+    deprecated_vars: dict[str, str] = {
+        "PAPERLESS_DB_TIMEOUT": "timeout",
+        "PAPERLESS_DB_POOLSIZE": "pool.min_size / pool.max_size",
+        "PAPERLESS_DBSSLMODE": "sslmode",
+        "PAPERLESS_DBSSLROOTCERT": "sslrootcert",
+        "PAPERLESS_DBSSLCERT": "sslcert",
+        "PAPERLESS_DBSSLKEY": "sslkey",
+    }
+
+    warnings: list[Warning] = []
+
+    for var_name, db_option_key in deprecated_vars.items():
+        if not os.getenv(var_name):
+            continue
+        warnings.append(
+            Warning(
+                f"Deprecated environment variable: {var_name}",
+                hint=(
+                    f"{var_name} is no longer supported and will be removed in v3.2. "
+                    f"Set the equivalent option via PAPERLESS_DB_OPTIONS instead. "
+                    f'Example: PAPERLESS_DB_OPTIONS=\'{{"{db_option_key}": "<value>"}}\'. '
+                    "See https://docs.paperless-ngx.com/migration/ for the full reference."
+                ),
+                id="paperless.W001",
+            ),
+        )
+
+    return warnings

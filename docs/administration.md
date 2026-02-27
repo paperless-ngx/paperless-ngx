@@ -62,6 +62,10 @@ copies you created in the steps above.
 
 ## Updating Paperless {#updating}
 
+!!! warning
+
+    Please review the [migration instructions](migration-v3.md) before upgrading Paperless-ngx to v3.0, it includes some breaking changes that require manual intervention before upgrading.
+
 ### Docker Route {#docker-updating}
 
 If a new release of paperless-ngx is available, upgrading depends on how

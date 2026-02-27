@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-26 18:09+0000\n"
+"POT-Creation-Date: 2026-02-27 22:38+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1856,151 +1856,151 @@ msgstr ""
 msgid "paperless application settings"
 msgstr ""
 
-#: paperless/settings.py:819
+#: paperless/settings/__init__.py:746
 msgid "English (US)"
 msgstr ""
 
-#: paperless/settings.py:820
+#: paperless/settings/__init__.py:747
 msgid "Arabic"
 msgstr ""
 
-#: paperless/settings.py:821
+#: paperless/settings/__init__.py:748
 msgid "Afrikaans"
 msgstr ""
 
-#: paperless/settings.py:822
+#: paperless/settings/__init__.py:749
 msgid "Belarusian"
 msgstr ""
 
-#: paperless/settings.py:823
+#: paperless/settings/__init__.py:750
 msgid "Bulgarian"
 msgstr ""
 
-#: paperless/settings.py:824
+#: paperless/settings/__init__.py:751
 msgid "Catalan"
 msgstr ""
 
-#: paperless/settings.py:825
+#: paperless/settings/__init__.py:752
 msgid "Czech"
 msgstr ""
 
-#: paperless/settings.py:826
+#: paperless/settings/__init__.py:753
 msgid "Danish"
 msgstr ""
 
-#: paperless/settings.py:827
+#: paperless/settings/__init__.py:754
 msgid "German"
 msgstr ""
 
-#: paperless/settings.py:828
+#: paperless/settings/__init__.py:755
 msgid "Greek"
 msgstr ""
 
-#: paperless/settings.py:829
+#: paperless/settings/__init__.py:756
 msgid "English (GB)"
 msgstr ""
 
-#: paperless/settings.py:830
+#: paperless/settings/__init__.py:757
 msgid "Spanish"
 msgstr ""
 
-#: paperless/settings.py:831
+#: paperless/settings/__init__.py:758
 msgid "Persian"
 msgstr ""
 
-#: paperless/settings.py:832
+#: paperless/settings/__init__.py:759
 msgid "Finnish"
 msgstr ""
 
-#: paperless/settings.py:833
+#: paperless/settings/__init__.py:760
 msgid "French"
 msgstr ""
 
-#: paperless/settings.py:834
+#: paperless/settings/__init__.py:761
 msgid "Hungarian"
 msgstr ""
 
-#: paperless/settings.py:835
+#: paperless/settings/__init__.py:762
 msgid "Indonesian"
 msgstr ""
 
-#: paperless/settings.py:836
+#: paperless/settings/__init__.py:763
 msgid "Italian"
 msgstr ""
 
-#: paperless/settings.py:837
+#: paperless/settings/__init__.py:764
 msgid "Japanese"
 msgstr ""
 
-#: paperless/settings.py:838
+#: paperless/settings/__init__.py:765
 msgid "Korean"
 msgstr ""
 
-#: paperless/settings.py:839
+#: paperless/settings/__init__.py:766
 msgid "Luxembourgish"
 msgstr ""
 
-#: paperless/settings.py:840
+#: paperless/settings/__init__.py:767
 msgid "Norwegian"
 msgstr ""
 
-#: paperless/settings.py:841
+#: paperless/settings/__init__.py:768
 msgid "Dutch"
 msgstr ""
 
-#: paperless/settings.py:842
+#: paperless/settings/__init__.py:769
 msgid "Polish"
 msgstr ""
 
-#: paperless/settings.py:843
+#: paperless/settings/__init__.py:770
 msgid "Portuguese (Brazil)"
 msgstr ""
 
-#: paperless/settings.py:844
+#: paperless/settings/__init__.py:771
 msgid "Portuguese"
 msgstr ""
 
-#: paperless/settings.py:845
+#: paperless/settings/__init__.py:772
 msgid "Romanian"
 msgstr ""
 
-#: paperless/settings.py:846
+#: paperless/settings/__init__.py:773
 msgid "Russian"
 msgstr ""
 
-#: paperless/settings.py:847
+#: paperless/settings/__init__.py:774
 msgid "Slovak"
 msgstr ""
 
-#: paperless/settings.py:848
+#: paperless/settings/__init__.py:775
 msgid "Slovenian"
 msgstr ""
 
-#: paperless/settings.py:849
+#: paperless/settings/__init__.py:776
 msgid "Serbian"
 msgstr ""
 
-#: paperless/settings.py:850
+#: paperless/settings/__init__.py:777
 msgid "Swedish"
 msgstr ""
 
-#: paperless/settings.py:851
+#: paperless/settings/__init__.py:778
 msgid "Turkish"
 msgstr ""
 
-#: paperless/settings.py:852
+#: paperless/settings/__init__.py:779
 msgid "Ukrainian"
 msgstr ""
 
-#: paperless/settings.py:853
+#: paperless/settings/__init__.py:780
 msgid "Vietnamese"
 msgstr ""
 
-#: paperless/settings.py:854
+#: paperless/settings/__init__.py:781
 msgid "Chinese Simplified"
 msgstr ""
 
-#: paperless/settings.py:855
+#: paperless/settings/__init__.py:782
 msgid "Chinese Traditional"
 msgstr ""
 
