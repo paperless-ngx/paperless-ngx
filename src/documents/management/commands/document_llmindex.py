@@ -1,22 +1,22 @@
-from django.core.management import BaseCommand
-from django.db import transaction
+from typing import Any
 
-from documents.management.commands.mixins import ProgressBarMixin
+from documents.management.commands.base import PaperlessCommand
 from documents.tasks import llmindex_index
 
 
-class Command(ProgressBarMixin, BaseCommand):
+class Command(PaperlessCommand):
     help = "Manages the LLM-based vector index for Paperless."
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser: Any) -> None:
+        super().add_arguments(parser)
         parser.add_argument("command", choices=["rebuild", "update"])
-        self.add_argument_progress_bar_mixin(parser)
 
-    def handle(self, *args, **options):
-        self.handle_progress_bar_mixin(**options)
-        with transaction.atomic():
-            llmindex_index(
-                progress_bar_disable=self.no_progress_bar,
-                rebuild=options["command"] == "rebuild",
-                scheduled=False,
-            )
+    def handle(self, *args: Any, **options: Any) -> None:
+        llmindex_index(
+            rebuild=options["command"] == "rebuild",
+            scheduled=False,
+            iter_wrapper=lambda docs: self.track(
+                docs,
+                description="Indexing documents...",
+            ),
+        )
