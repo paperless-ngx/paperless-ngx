@@ -1504,7 +1504,7 @@ describe('DocumentDetailComponent', () => {
     component.previewUrl = null
     ;(component as any).updatePdfSource()
 
-    expect(component.pdfSource).toBeUndefined()
+    expect(component.pdfSource).toEqual({ url: null, password: undefined })
   })
 
   it('should close incoming update modal if one is open', () => {
