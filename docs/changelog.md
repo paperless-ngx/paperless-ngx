@@ -2,7 +2,15 @@
 
 ## paperless-ngx 2.20.8
 
+### Security
+
+-   Resolve [GHSA-7qqc-wrcw-2fj9](https://github.com/paperless-ngx/paperless-ngx/security/advisories/GHSA-7qqc-wrcw-2fj9)
+
 ## paperless-ngx 2.20.7
+
+### Security
+
+-   Resolve [GHSA-x395-6h48-wr8v](https://github.com/paperless-ngx/paperless-ngx/security/advisories/GHSA-x395-6h48-wr8v)
 
 ### Bug Fixes
 
@@ -21,6 +29,10 @@
 </details>
 
 ## paperless-ngx 2.20.6
+
+### Security
+
+-   Resolve [GHSA-jqwv-hx7q-fxh3](https://github.com/paperless-ngx/paperless-ngx/security/advisories/GHSA-jqwv-hx7q-fxh3) and [GHSA-w47q-3m69-84v8](https://github.com/paperless-ngx/paperless-ngx/security/advisories/GHSA-w47q-3m69-84v8)
 
 ### Bug Fixes
 
