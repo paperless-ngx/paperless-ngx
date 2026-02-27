@@ -119,15 +119,4 @@ def parse_db_settings(data_dir: Path) -> dict[str, dict[str, Any]]:
         },
     )
 
-    databases = {"default": db_config}
-
-    # Add SQLite fallback for PostgreSQL/MariaDB
-    # TODO: Is this really useful/used?
-    if engine in ("postgresql", "mariadb"):
-        databases["sqlite"] = {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": str((data_dir / "db.sqlite3").resolve()),
-            "OPTIONS": {},
-        }
-
-    return databases
+    return {"default": db_config}

@@ -59,11 +59,6 @@ class TestParseDbSettings:
                             "sslkey": None,
                         },
                     },
-                    "sqlite": {
-                        "ENGINE": "django.db.backends.sqlite3",
-                        "NAME": None,  # Will be replaced with tmp_path
-                        "OPTIONS": {},
-                    },
                 },
                 id="postgresql-defaults",
             ),
@@ -96,11 +91,6 @@ class TestParseDbSettings:
                             },
                         },
                     },
-                    "sqlite": {
-                        "ENGINE": "django.db.backends.sqlite3",
-                        "NAME": None,  # Will be replaced with tmp_path
-                        "OPTIONS": {},
-                    },
                 },
                 id="postgresql-overrides",
             ),
@@ -128,11 +118,6 @@ class TestParseDbSettings:
                             },
                         },
                     },
-                    "sqlite": {
-                        "ENGINE": "django.db.backends.sqlite3",
-                        "NAME": None,  # Will be replaced with tmp_path
-                        "OPTIONS": {},
-                    },
                 },
                 id="postgresql-legacy-poolsize",
             ),
@@ -158,11 +143,6 @@ class TestParseDbSettings:
                             "sslkey": None,
                             "connect_timeout": 30,
                         },
-                    },
-                    "sqlite": {
-                        "ENGINE": "django.db.backends.sqlite3",
-                        "NAME": None,  # Will be replaced with tmp_path
-                        "OPTIONS": {},
                     },
                 },
                 id="postgresql-legacy-ssl-and-timeout",
@@ -190,11 +170,6 @@ class TestParseDbSettings:
                                 "key": None,
                             },
                         },
-                    },
-                    "sqlite": {
-                        "ENGINE": "django.db.backends.sqlite3",
-                        "NAME": None,  # Will be replaced with tmp_path
-                        "OPTIONS": {},
                     },
                 },
                 id="mariadb-defaults",
@@ -227,11 +202,6 @@ class TestParseDbSettings:
                                 "key": None,
                             },
                         },
-                    },
-                    "sqlite": {
-                        "ENGINE": "django.db.backends.sqlite3",
-                        "NAME": None,  # Will be replaced with tmp_path
-                        "OPTIONS": {},
                     },
                 },
                 id="mariadb-overrides",
@@ -266,11 +236,6 @@ class TestParseDbSettings:
                             "connect_timeout": 25,
                         },
                     },
-                    "sqlite": {
-                        "ENGINE": "django.db.backends.sqlite3",
-                        "NAME": None,  # Will be replaced with tmp_path
-                        "OPTIONS": {},
-                    },
                 },
                 id="mariadb-legacy-ssl-and-timeout",
             ),
@@ -293,10 +258,6 @@ class TestParseDbSettings:
             and expected_database_settings["default"]["NAME"] is None
         ):
             expected_database_settings["default"]["NAME"] = str(
-                tmp_path / "db.sqlite3",
-            )
-        if "sqlite" in expected_database_settings:
-            expected_database_settings["sqlite"]["NAME"] = str(
                 tmp_path / "db.sqlite3",
             )
 
