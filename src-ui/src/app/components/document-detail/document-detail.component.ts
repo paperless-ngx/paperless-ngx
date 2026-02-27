@@ -486,54 +486,6 @@ export class DocumentDetailComponent
       )
   }
 
-  private hasLocalEdits(doc: Document): boolean {
-    return (
-      this.openDocumentService.isDirty(doc) || !!doc.__changedFields?.length
-    )
-  }
-
-  private showIncomingUpdateModal(modified: string): void {
-    if (this.incomingUpdateModal) return
-
-    const modal = this.modalService.open(ConfirmDialogComponent, {
-      backdrop: 'static',
-    })
-    this.incomingUpdateModal = modal
-
-    let formattedModified = null
-    const parsed = new Date(modified)
-    formattedModified = parsed.toLocaleString()
-
-    modal.componentInstance.title = $localize`Document was updated`
-    modal.componentInstance.messageBold = $localize`Document was updated at ${formattedModified}.`
-    modal.componentInstance.message = $localize`Reload to discard your local unsaved edits and load the latest remote version.`
-    modal.componentInstance.btnClass = 'btn-warning'
-    modal.componentInstance.btnCaption = $localize`Reload`
-    modal.componentInstance.cancelBtnCaption = $localize`Dismiss`
-
-    modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
-      modal.componentInstance.buttonsEnabled = false
-      modal.close()
-      this.reloadRemoteVersion()
-    })
-    modal.result.finally(() => {
-      this.incomingUpdateModal = null
-    })
-  }
-
-  private closeIncomingUpdateModal() {
-    if (!this.incomingUpdateModal) return
-    this.incomingUpdateModal.close()
-    this.incomingUpdateModal = null
-  }
-
-  private flushPendingIncomingUpdate() {
-    if (!this.pendingIncomingUpdate || this.networkActive) return
-    const pendingUpdate = this.pendingIncomingUpdate
-    this.pendingIncomingUpdate = null
-    this.handleIncomingDocumentUpdated(pendingUpdate)
-  }
-
   private loadDocument(documentId: number, forceRemote: boolean = false): void {
     let redirectedToRoot = false
     this.closeIncomingUpdateModal()
@@ -654,6 +606,54 @@ export class DocumentDetailComponent
           this.setupDirtyTracking(useDoc, doc)
         },
       })
+  }
+
+  private hasLocalEdits(doc: Document): boolean {
+    return (
+      this.openDocumentService.isDirty(doc) || !!doc.__changedFields?.length
+    )
+  }
+
+  private showIncomingUpdateModal(modified: string): void {
+    if (this.incomingUpdateModal) return
+
+    const modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    this.incomingUpdateModal = modal
+
+    let formattedModified = null
+    const parsed = new Date(modified)
+    formattedModified = parsed.toLocaleString()
+
+    modal.componentInstance.title = $localize`Document was updated`
+    modal.componentInstance.messageBold = $localize`Document was updated at ${formattedModified}.`
+    modal.componentInstance.message = $localize`Reload to discard your local unsaved edits and load the latest remote version.`
+    modal.componentInstance.btnClass = 'btn-warning'
+    modal.componentInstance.btnCaption = $localize`Reload`
+    modal.componentInstance.cancelBtnCaption = $localize`Dismiss`
+
+    modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      modal.close()
+      this.reloadRemoteVersion()
+    })
+    modal.result.finally(() => {
+      this.incomingUpdateModal = null
+    })
+  }
+
+  private closeIncomingUpdateModal() {
+    if (!this.incomingUpdateModal) return
+    this.incomingUpdateModal.close()
+    this.incomingUpdateModal = null
+  }
+
+  private flushPendingIncomingUpdate() {
+    if (!this.pendingIncomingUpdate || this.networkActive) return
+    const pendingUpdate = this.pendingIncomingUpdate
+    this.pendingIncomingUpdate = null
+    this.handleIncomingDocumentUpdated(pendingUpdate)
   }
 
   private handleIncomingDocumentUpdated(data: IncomingDocumentUpdate): void {
