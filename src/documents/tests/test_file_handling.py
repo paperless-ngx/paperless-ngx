@@ -281,6 +281,32 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertEqual(generate_filename(d1), Path("652 - the_doc.pdf"))
         self.assertEqual(generate_filename(d2), Path("none - the_doc.pdf"))
 
+    @override_settings(FILENAME_FORMAT="{title}.{version_label}")
+    def test_version_label(self) -> None:
+        d1 = Document.objects.create(
+            title="the_doc",
+            mime_type="application/pdf",
+            checksum="A",
+            version_label="Version #2",
+        )
+        d2 = Document.objects.create(
+            title="the_doc",
+            mime_type="application/pdf",
+            checksum="B",
+        )
+        d3 = Document.objects.create(
+            title="the_doc",
+            mime_type="application/pdf",
+            checksum="C",
+            version_label="Super weird %@\"'<> ¯\\_(ツ)_/¯",
+        )
+        self.assertEqual(generate_filename(d1), Path("the_doc.Version #2.pdf"))
+        self.assertEqual(generate_filename(d2), Path("the_doc.none.pdf"))
+        self.assertEqual(
+            generate_filename(d3),
+            Path("the_doc.the_doc.Super weird %@-'-- ¯-_(ツ)_-¯.pdf.pdf"),
+        )
+
     @override_settings(FILENAME_FORMAT="{title} {tag_list}")
     def test_tag_list(self) -> None:
         doc = Document.objects.create(title="doc1", mime_type="application/pdf")
