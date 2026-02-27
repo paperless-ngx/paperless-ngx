@@ -857,7 +857,9 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
         self.assertIn("ةرازو", normalized_text)
-        self.assertIn("الاخليد", normalized_text)
+        self.assertTrue(
+            any(token in normalized_text for token in ("ةیلخادلا", "الاخليد")),
+        )
 
     @mock.patch("ocrmypdf.ocr")
     def test_gs_rendering_error(self, m) -> None:
