@@ -13,7 +13,6 @@ class Command(PaperlessCommand):
         parser.add_argument("command", choices=["reindex", "optimize"])
 
     def handle(self, *args, **options):
-        self.handle_progress_bar_mixin(**options)
         with transaction.atomic():
             if options["command"] == "reindex":
                 index_reindex(

@@ -378,7 +378,6 @@ class ApplicationConfigurationViewSet(ModelViewSet):
         ):
             # AI index was just enabled and vector store file does not exist
             llmindex_index.delay(
-                progress_bar_disable=True,
                 rebuild=True,
                 scheduled=False,
                 auto=True,
