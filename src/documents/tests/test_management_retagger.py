@@ -100,8 +100,8 @@ def document_types(db) -> DocumentTypeTuple:
 @pytest.fixture()
 def documents(storage_paths: StoragePathTuple, tags: TagTuple) -> DocumentTuple:
     """Four documents with varied content used across most retagger tests."""
-    sp1, sp2, sp3 = storage_paths
-    tag_first, tag_second, tag_inbox, tag_no_match, tag_auto = tags
+    _, _, sp3 = storage_paths
+    _, _, tag_inbox, tag_no_match, tag_auto = tags
 
     d1 = DocumentFactory(checksum="A", title="A", content="first document")
     d2 = DocumentFactory(checksum="B", title="B", content="second document")
@@ -155,7 +155,7 @@ class TestRetaggerTags(DirectoriesMixin):
         tags: TagTuple,
     ) -> None:
         d1, *_ = documents
-        tag_first, tag_second, tag_inbox, tag_no_match, tag_auto = tags
+        tag_first, tag_second, tag_inbox, tag_no_match, _ = tags
         d1.tags.add(tag_second)
 
         call_command("document_retagger", "--tags", "--overwrite")
