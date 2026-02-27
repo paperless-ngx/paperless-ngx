@@ -116,98 +116,107 @@ dictionaries; for example, `pool.max_size=20` sets
     - MariaDB: [MariaDB Connector/Python](https://mariadb.com/kb/en/mariadb-connector-python/)
     - SQLite: [SQLite PRAGMA statements](https://www.sqlite.org/pragma.html)
 
-    **Examples:**
-
-```bash
-    # PostgreSQL: require SSL, set a custom CA certificate, and limit the pool size
-    PAPERLESS_DB_OPTIONS="sslmode=require;sslrootcert=/certs/ca.pem;pool.max_size=5"
-
-    # MariaDB: require SSL with a custom CA certificate
-    PAPERLESS_DB_OPTIONS="ssl_mode=REQUIRED;ssl.ca=/certs/ca.pem"
-
-    # PostgreSQL: set a connection timeout
-    PAPERLESS_DB_OPTIONS="connect_timeout=10"
-```
-
     !!! note "PostgreSQL connection pooling"
+
         Pool size is controlled via `pool.min_size` and `pool.max_size`. When
         configuring pooling, ensure your PostgreSQL `max_connections` is large enough
         to handle all pool connections across all workers:
         `(web_workers + celery_workers) * pool.max_size + safety_margin`.
 
+    **Examples:**
+
+    ```bash title="PostgreSQL: require SSL, set a custom CA certificate, and limit the pool size"
+    PAPERLESS_DB_OPTIONS="sslmode=require;sslrootcert=/certs/ca.pem;pool.max_size=5"
+    ```
+
+    ```bash title="MariaDB: require SSL with a custom CA certificate"
+    PAPERLESS_DB_OPTIONS="ssl_mode=REQUIRED;ssl.ca=/certs/ca.pem"
+    ```
+
+    ```bash title="SQLite: set a busy timeout of 30 seconds"
+    # PostgreSQL: set a connection timeout
+    PAPERLESS_DB_OPTIONS="connect_timeout=10"
+    ```
+
 #### ~~[`PAPERLESS_DBSSLMODE`](#PAPERLESS_DBSSLMODE)~~ {#PAPERLESS_DBSSLMODE}
 
 !!! failure "Removed in v3"
-Use [`PAPERLESS_DB_OPTIONS`](#PAPERLESS_DB_OPTIONS) instead.
 
-```bash
-    # PostgreSQL
+    Use [`PAPERLESS_DB_OPTIONS`](#PAPERLESS_DB_OPTIONS) instead.
+
+    ```bash title="PostgreSQL"
     PAPERLESS_DB_OPTIONS="sslmode=require"
+    ```
 
-    # MariaDB
+    ```bash title="MariaDB"
     PAPERLESS_DB_OPTIONS="ssl_mode=REQUIRED"
-```
+    ```
 
 #### ~~[`PAPERLESS_DBSSLROOTCERT`](#PAPERLESS_DBSSLROOTCERT)~~ {#PAPERLESS_DBSSLROOTCERT}
 
 !!! failure "Removed in v3"
-Use [`PAPERLESS_DB_OPTIONS`](#PAPERLESS_DB_OPTIONS) instead.
 
-```bash
-    # PostgreSQL
+    Use [`PAPERLESS_DB_OPTIONS`](#PAPERLESS_DB_OPTIONS) instead.
+
+    ```bash title="PostgreSQL"
     PAPERLESS_DB_OPTIONS="sslrootcert=/path/to/ca.pem"
+    ```
 
-    # MariaDB
+    ```bash title="MariaDB"
     PAPERLESS_DB_OPTIONS="ssl.ca=/path/to/ca.pem"
-```
+    ```
 
 #### ~~[`PAPERLESS_DBSSLCERT`](#PAPERLESS_DBSSLCERT)~~ {#PAPERLESS_DBSSLCERT}
 
 !!! failure "Removed in v3"
-Use [`PAPERLESS_DB_OPTIONS`](#PAPERLESS_DB_OPTIONS) instead.
 
-```bash
-    # PostgreSQL
+    Use [`PAPERLESS_DB_OPTIONS`](#PAPERLESS_DB_OPTIONS) instead.
+
+    ```bash title="PostgreSQL"
     PAPERLESS_DB_OPTIONS="sslcert=/path/to/client.crt"
+    ```
 
-    # MariaDB
+    ```bash title="MariaDB"
     PAPERLESS_DB_OPTIONS="ssl.cert=/path/to/client.crt"
-```
+    ```
 
 #### ~~[`PAPERLESS_DBSSLKEY`](#PAPERLESS_DBSSLKEY)~~ {#PAPERLESS_DBSSLKEY}
 
 !!! failure "Removed in v3"
-Use [`PAPERLESS_DB_OPTIONS`](#PAPERLESS_DB_OPTIONS) instead.
 
-```bash
-    # PostgreSQL
+    Use [`PAPERLESS_DB_OPTIONS`](#PAPERLESS_DB_OPTIONS) instead.
+
+    ```bash title="PostgreSQL"
     PAPERLESS_DB_OPTIONS="sslkey=/path/to/client.key"
+    ```
 
-    # MariaDB
+    ```bash title="MariaDB"
     PAPERLESS_DB_OPTIONS="ssl.key=/path/to/client.key"
-```
+    ```
 
 #### ~~[`PAPERLESS_DB_TIMEOUT`](#PAPERLESS_DB_TIMEOUT)~~ {#PAPERLESS_DB_TIMEOUT}
 
 !!! failure "Removed in v3"
-Use [`PAPERLESS_DB_OPTIONS`](#PAPERLESS_DB_OPTIONS) instead.
 
-```bash
-    # SQLite
+    Use [`PAPERLESS_DB_OPTIONS`](#PAPERLESS_DB_OPTIONS) instead.
+
+    ```bash title="SQLite"
     PAPERLESS_DB_OPTIONS="timeout=30"
+    ```
 
-    # PostgreSQL or MariaDB
+    ```bash title="PostgreSQL or MariaDB"
     PAPERLESS_DB_OPTIONS="connect_timeout=30"
-```
+    ```
 
 #### ~~[`PAPERLESS_DB_POOLSIZE`](#PAPERLESS_DB_POOLSIZE)~~ {#PAPERLESS_DB_POOLSIZE}
 
 !!! failure "Removed in v3"
-Use [`PAPERLESS_DB_OPTIONS`](#PAPERLESS_DB_OPTIONS) instead.
 
-```bash
+    Use [`PAPERLESS_DB_OPTIONS`](#PAPERLESS_DB_OPTIONS) instead.
+
+    ```bash
     PAPERLESS_DB_OPTIONS="pool.max_size=10"
-```
+    ```
 
 #### [`PAPERLESS_DB_READ_CACHE_ENABLED=<bool>`](#PAPERLESS_DB_READ_CACHE_ENABLED) {#PAPERLESS_DB_READ_CACHE_ENABLED}
 
