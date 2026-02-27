@@ -6,6 +6,7 @@ from unittest import mock
 import httpx
 import pytest
 from django.test.html import parse_html
+from django.utils import timezone
 from pytest_django.fixtures import SettingsWrapper
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
@@ -634,13 +635,14 @@ class TestParser:
         THEN:
             - Resulting HTML is as expected
         """
-        mail = mail_parser.parse_file_to_message(html_email_file)
-        html_file = mail_parser.mail_to_html(mail)
+        with timezone.override("UTC"):
+            mail = mail_parser.parse_file_to_message(html_email_file)
+            html_file = mail_parser.mail_to_html(mail)
 
-        expected_html = parse_html(html_email_html_file.read_text())
-        actual_html = parse_html(html_file.read_text())
+            expected_html = parse_html(html_email_html_file.read_text())
+            actual_html = parse_html(html_file.read_text())
 
-        assert expected_html == actual_html
+            assert expected_html == actual_html
 
     def test_generate_pdf_from_mail(
         self,
