@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import TYPE_CHECKING
 
-from rich.console import RenderableType
 from rich.table import Table
 from rich.text import Text
 
@@ -18,6 +17,8 @@ from documents.signals.handlers import set_storage_path
 from documents.signals.handlers import set_tags
 
 if TYPE_CHECKING:
+    from rich.console import RenderableType
+
     from documents.models import Correspondent
     from documents.models import DocumentType
     from documents.models import StoragePath
