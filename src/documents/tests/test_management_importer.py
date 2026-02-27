@@ -4,6 +4,7 @@ from io import StringIO
 from pathlib import Path
 from zipfile import ZipFile
 
+import pytest
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -18,6 +19,7 @@ from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
 
 
+@pytest.mark.management
 class TestCommandImport(
     DirectoriesMixin,
     FileSystemAssertsMixin,

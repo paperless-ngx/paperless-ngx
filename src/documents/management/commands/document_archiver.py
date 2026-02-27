@@ -1,20 +1,15 @@
 import logging
-import multiprocessing
 
-import tqdm
-from django import db
 from django.conf import settings
-from django.core.management.base import BaseCommand
 
-from documents.management.commands.mixins import MultiProcessMixin
-from documents.management.commands.mixins import ProgressBarMixin
+from documents.management.commands.base import PaperlessCommand
 from documents.models import Document
 from documents.tasks import update_document_content_maybe_archive_file
 
 logger = logging.getLogger("paperless.management.archiver")
 
 
-class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
+class Command(PaperlessCommand):
     help = (
         "Using the current classification model, assigns correspondents, tags "
         "and document types to all documents, effectively allowing you to "
@@ -22,7 +17,10 @@ class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
         "modified) after their initial import."
     )
 
+    supports_multiprocessing = True
+
     def add_arguments(self, parser):
+        super().add_arguments(parser)
         parser.add_argument(
             "-f",
             "--overwrite",
@@ -44,13 +42,8 @@ class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
                 "run on this specific document."
             ),
         )
-        self.add_argument_progress_bar_mixin(parser)
-        self.add_argument_processes_mixin(parser)
 
     def handle(self, *args, **options):
-        self.handle_processes_mixin(**options)
-        self.handle_progress_bar_mixin(**options)
-
         settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
 
         overwrite = options["overwrite"]
@@ -60,35 +53,21 @@ class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
         else:
             documents = Document.objects.all()
 
-        document_ids = list(
-            map(
-                lambda doc: doc.id,
-                filter(lambda d: overwrite or not d.has_archive_version, documents),
-            ),
-        )
-
-        # Note to future self: this prevents django from reusing database
-        # connections between processes, which is bad and does not work
-        # with postgres.
-        db.connections.close_all()
+        document_ids = [
+            doc.id for doc in documents if overwrite or not doc.has_archive_version
+        ]
 
         try:
             logging.getLogger().handlers[0].level = logging.ERROR
 
-            if self.process_count == 1:
-                for doc_id in document_ids:
-                    update_document_content_maybe_archive_file(doc_id)
-            else:  # pragma: no cover
-                with multiprocessing.Pool(self.process_count) as pool:
-                    list(
-                        tqdm.tqdm(
-                            pool.imap_unordered(
-                                update_document_content_maybe_archive_file,
-                                document_ids,
-                            ),
-                            total=len(document_ids),
-                            disable=self.no_progress_bar,
-                        ),
+            for result in self.process_parallel(
+                update_document_content_maybe_archive_file,
+                document_ids,
+                description="Archiving...",
+            ):
+                if result.error:
+                    self.console.print(
+                        f"[red]Failed document {result.item}: {result.error}[/red]",
                     )
-        except KeyboardInterrupt:
-            self.stdout.write(self.style.NOTICE("Aborting..."))
+        except KeyboardInterrupt:  # pragma: no cover
+            self.console.print("[yellow]Aborting...[/yellow]")

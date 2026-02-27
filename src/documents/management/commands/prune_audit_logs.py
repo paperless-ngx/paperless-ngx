@@ -1,27 +1,21 @@
 from auditlog.models import LogEntry
-from django.core.management.base import BaseCommand
 from django.db import transaction
-from tqdm import tqdm
 
-from documents.management.commands.mixins import ProgressBarMixin
+from documents.management.commands.base import PaperlessCommand
 
 
-class Command(BaseCommand, ProgressBarMixin):
-    """
-    Prune the audit logs of objects that no longer exist.
-    """
+class Command(PaperlessCommand):
+    """Prune the audit logs of objects that no longer exist."""
 
     help = "Prunes the audit logs of objects that no longer exist."
 
-    def add_arguments(self, parser):
-        self.add_argument_progress_bar_mixin(parser)
-
-    def handle(self, **options):
-        self.handle_progress_bar_mixin(**options)
+    def handle(self, *args, **options):
         with transaction.atomic():
-            for log_entry in tqdm(LogEntry.objects.all(), disable=self.no_progress_bar):
+            for log_entry in self.track(
+                LogEntry.objects.all(),
+                description="Pruning audit logs...",
+            ):
                 model_class = log_entry.content_type.model_class()
-                # use global_objects for SoftDeleteModel
                 objects = (
                     model_class.global_objects
                     if hasattr(model_class, "global_objects")
@@ -32,8 +26,8 @@ class Command(BaseCommand, ProgressBarMixin):
                     and not objects.filter(pk=log_entry.object_id).exists()
                 ):
                     log_entry.delete()
-                    tqdm.write(
-                        self.style.NOTICE(
-                            f"Deleted audit log entry for {model_class.__name__} #{log_entry.object_id}",
-                        ),
+                    self.console.print(
+                        f"Deleted audit log entry for "
+                        f"{model_class.__name__} #{log_entry.object_id}",
+                        style="yellow",
                     )
