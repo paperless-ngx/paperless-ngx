@@ -10,7 +10,6 @@ class Command(PaperlessCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("command", choices=["reindex", "optimize"])
-        self.add_argument_progress_bar_mixin(parser)
 
     def handle(self, *args, **options):
         self.handle_progress_bar_mixin(**options)
