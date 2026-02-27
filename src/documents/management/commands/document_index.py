@@ -9,6 +9,7 @@ class Command(PaperlessCommand):
     help = "Manages the document index."
 
     def add_arguments(self, parser):
+        super().add_arguments(parser)
         parser.add_argument("command", choices=["reindex", "optimize"])
 
     def handle(self, *args, **options):
