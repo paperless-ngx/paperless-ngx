@@ -74,7 +74,7 @@ See [`PAPERLESS_DBENGINE`](configuration.md#PAPERLESS_DBENGINE) for accepted val
 
 ## Database Advanced Options
 
-The individual SSL, timeout, and pooling variables have been removed in favour of a
+The individual SSL, timeout, and pooling variables have been removed in favor of a
 single [`PAPERLESS_DB_OPTIONS`](configuration.md#PAPERLESS_DB_OPTIONS) string. This
 consolidates a growing set of engine-specific variables into one place, and allows
 any option supported by the underlying database driver to be set without requiring a

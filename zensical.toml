@@ -16,10 +16,12 @@ repo_name = "paperless-ngx/paperless-ngx"
 nav = [
   "index.md",
   "setup.md",
-  "migration.md",
   "usage.md",
   "configuration.md",
-  "administration.md",
+  { Administration = [
+    "administration.md",
+    { "v3 Migration Guide" = "migration-v3.md" },
+  ] },
   "advanced_usage.md",
   "api.md",
   "development.md",
