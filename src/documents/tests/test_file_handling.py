@@ -304,7 +304,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertEqual(generate_filename(d2), Path("the_doc.none.pdf"))
         self.assertEqual(
             generate_filename(d3),
-            Path("the_doc.the_doc.Super weird %@-'-- ¯-_(ツ)_-¯.pdf.pdf"),
+            Path("the_doc.Super weird %@-'-- ¯-_(ツ)_-¯.pdf"),
         )
 
     @override_settings(FILENAME_FORMAT="{title} {tag_list}")
