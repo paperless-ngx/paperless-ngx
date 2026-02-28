@@ -58,6 +58,7 @@ def apply_assignment_to_document(
                 "",  # dont pass the title to avoid recursion
                 "",  # no urls in titles
                 document.pk,
+                document.version_label,
             )
         except Exception:  # pragma: no cover
             logger.exception(
