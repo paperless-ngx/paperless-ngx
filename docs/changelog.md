@@ -1,5 +1,25 @@
 # Changelog
 
+## paperless-ngx 2.20.9
+
+### Security
+
+-   Resolve [GHSA-386h-chg4-cfw9](https://github.com/paperless-ngx/paperless-ngx/security/advisories/GHSA-386h-chg4-cfw9)
+
+### Bug Fixes
+
+-   Fixhancement: config option reset [@shamoon](https://github.com/shamoon) ([#12176](https://github.com/paperless-ngx/paperless-ngx/pull/12176))
+-   Fix: correct page count by separating display vs collection sizes for tags [@shamoon](https://github.com/shamoon) ([#12170](https://github.com/paperless-ngx/paperless-ngx/pull/12170))
+
+### All App Changes
+
+<details>
+<summary>2 changes</summary>
+
+-   Fixhancement: config option reset [@shamoon](https://github.com/shamoon) ([#12176](https://github.com/paperless-ngx/paperless-ngx/pull/12176))
+-   Fix: correct page count by separating display vs collection sizes for tags [@shamoon](https://github.com/shamoon) ([#12170](https://github.com/paperless-ngx/paperless-ngx/pull/12170))
+</details>
+
 ## paperless-ngx 2.20.8
 
 ### Security
