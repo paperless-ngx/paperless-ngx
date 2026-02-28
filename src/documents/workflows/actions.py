@@ -49,6 +49,7 @@ def build_workflow_action_context(
             "added": timezone.localtime(document.added),
             "created": document.created,
             "id": document.pk,
+            "version_label": document.version_label,
         }
 
     correspondent_obj = (
@@ -81,6 +82,7 @@ def build_workflow_action_context(
         "added": timezone.localtime(timezone.now()),
         "created": overrides.created if overrides else None,
         "id": "",
+        "version_label": overrides.version_label if overrides else None,
     }
 
 
@@ -116,6 +118,7 @@ def execute_email_action(
             context["title"],
             context["doc_url"],
             context["id"],
+            context["version_label"],
         )
         if action.email.subject
         else ""
@@ -133,6 +136,7 @@ def execute_email_action(
             context["title"],
             context["doc_url"],
             context["id"],
+            context["version_label"],
         )
         if action.email.body
         else ""
@@ -212,6 +216,7 @@ def execute_webhook_action(
                             context["title"],
                             context["doc_url"],
                             context["id"],
+                            context["version_label"],
                         )
                 except Exception as e:
                     logger.error(
@@ -231,6 +236,7 @@ def execute_webhook_action(
                 context["title"],
                 context["doc_url"],
                 context["id"],
+                context["version_label"],
             )
         headers = {}
         if action.webhook.headers:

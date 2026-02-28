@@ -3412,7 +3412,10 @@ class TestWorkflows(
         )
         webhook_action = WorkflowActionWebhook.objects.create(
             use_params=False,
-            body="Test message: {{doc_url}} with id {{doc_id}}",
+            body=(
+                "Test message: {{doc_url}} with id {{doc_id}} "
+                "and version {{version_label}}"
+            ),
             url="http://paperless-ngx.com",
             include_document=False,
         )
@@ -3436,6 +3439,7 @@ class TestWorkflows(
             title="sample test",
             correspondent=self.c,
             original_filename="sample.pdf",
+            version_label="v3",
         )
 
         run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
@@ -3444,7 +3448,7 @@ class TestWorkflows(
             url="http://paperless-ngx.com",
             data=(
                 f"Test message: http://localhost:8000/paperless/documents/{doc.id}/"
-                f" with id {doc.id}"
+                f" with id {doc.id} and version {doc.version_label}"
             ),
             headers={},
             files=None,

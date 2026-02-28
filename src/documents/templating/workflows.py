@@ -41,6 +41,7 @@ def parse_w_workflow_placeholders(
     doc_title: str | None = None,
     doc_url: str | None = None,
     doc_id: int | None = None,
+    version_label: str | None = None,
 ) -> str:
     """
     Available title placeholders for Workflows depend on what has already been assigned,
@@ -82,6 +83,8 @@ def parse_w_workflow_placeholders(
         formatting.update({"doc_url": doc_url})
     if doc_id is not None:
         formatting.update({"doc_id": str(doc_id)})
+    if version_label is not None:
+        formatting.update({"version_label": version_label})
 
     logger.debug(f"Parsing Workflow Jinja template: {text}")
     try:
