@@ -2905,6 +2905,54 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
+    def test_create_share_link_requires_view_permission_for_document(self):
+        """
+        GIVEN:
+            - A user with add_sharelink but without view permission on a document
+        WHEN:
+            - API request is made to create a share link for that document
+        THEN:
+            - Share link creation is denied until view permission is granted
+        """
+        user1 = User.objects.create_user(username="test1")
+        user1.user_permissions.add(*Permission.objects.filter(codename="add_sharelink"))
+        user1.save()
+
+        user2 = User.objects.create_user(username="test2")
+        user2.save()
+
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document which will be protected",
+            owner=user2,
+        )
+
+        self.client.force_authenticate(user1)
+
+        create_resp = self.client.post(
+            "/api/share_links/",
+            data={
+                "document": doc.pk,
+                "file_version": "original",
+            },
+            format="json",
+        )
+        self.assertEqual(create_resp.status_code, status.HTTP_403_FORBIDDEN)
+
+        assign_perm("view_document", user1, doc)
+
+        create_resp = self.client.post(
+            "/api/share_links/",
+            data={
+                "document": doc.pk,
+                "file_version": "original",
+            },
+            format="json",
+        )
+        self.assertEqual(create_resp.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(create_resp.data["document"], doc.pk)
+
     def test_next_asn(self):
         """
         GIVEN:

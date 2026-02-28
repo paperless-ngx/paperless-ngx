@@ -75,6 +75,7 @@ from documents.parsers import is_mime_type_supported
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import get_objects_for_user_owner_aware
+from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
 from documents.regex import validate_regex_pattern
 from documents.templating.filepath import validate_filepath_template_and_render
@@ -2178,6 +2179,17 @@ class ShareLinkSerializer(OwnedObjectSerializer):
     def create(self, validated_data):
         validated_data["slug"] = get_random_string(50)
         return super().create(validated_data)
+
+    def validate_document(self, document):
+        if self.user is not None and has_perms_owner_aware(
+            self.user,
+            "view_document",
+            document,
+        ):
+            return document
+        raise PermissionDenied(
+            _("Insufficient permissions."),
+        )
 
 
 class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
