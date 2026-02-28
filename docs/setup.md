@@ -504,7 +504,8 @@ installation. Keep these points in mind:
 -   Read the [changelog](changelog.md) and
     take note of breaking changes.
 -   Decide whether to stay on SQLite or migrate to PostgreSQL.
-    Both work fine with
+    See [documentation](#sqlite_to_psql) for details on moving data
+    from SQLite to PostgreSQL. Both work fine with
     Paperless. However, if you already have a database server running
     for other services, you might as well use it for Paperless as well.
 -   The task scheduler of Paperless, which is used to execute periodic
