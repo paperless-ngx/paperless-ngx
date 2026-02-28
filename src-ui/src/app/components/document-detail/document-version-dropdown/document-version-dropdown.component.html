@@ -57,7 +57,7 @@
       }
     </div>
     @for (version of versions; track version.id) {
-      <div class="dropdown-item border-top px-0">
+      <div class="dropdown-item border-top px-0" [class.pe-3]="versions.length === 1">
         <div class="d-flex align-items-center w-100 py-2 version-item">
           <div class="btn btn-link link-underline link-underline-opacity-0 d-flex align-items-center small text-start p-0 version-link"
             (click)="selectVersion(version.id)"
@@ -88,7 +88,7 @@
                     @if (version.version_label) {
                       {{ version.version_label }}
                     } @else {
-                      <span i18n>Version</span>&nbsp;#{{ version.id }}
+                      <ng-container i18n>Version</ng-container>&nbsp;{{ versions.length - $index }}&nbsp;<span class="text-muted small">(#{{ version.id }})</span>
                     }
                   </span>
                 }
