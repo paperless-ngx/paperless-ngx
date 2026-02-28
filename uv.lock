@@ -1991,7 +1991,7 @@ wheels = [
 
 [[package]]
 name = "paperless-ngx"
-version = "2.20.8"
+version = "2.20.9"
 source = { virtual = "." }
 dependencies = [
     { name = "babel", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
