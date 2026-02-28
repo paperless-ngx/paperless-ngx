@@ -2,6 +2,10 @@
 
 ## paperless-ngx 2.20.9
 
+### Security
+
+-   Resolve [GHSA-386h-chg4-cfw9](https://github.com/paperless-ngx/paperless-ngx/security/advisories/GHSA-386h-chg4-cfw9)
+
 ### Bug Fixes
 
 -   Fixhancement: config option reset [@shamoon](https://github.com/shamoon) ([#12176](https://github.com/paperless-ngx/paperless-ngx/pull/12176))
