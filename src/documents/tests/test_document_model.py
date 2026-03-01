@@ -156,6 +156,54 @@ class TestDocument(TestCase):
         )
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test")
 
+    def test_version_index_for_root_is_zero(self) -> None:
+        root = Document.objects.create(
+            title="Root",
+            content="content",
+            checksum="checksum-root",
+            mime_type="application/pdf",
+            created=date(2025, 1, 1),
+        )
+
+        self.assertEqual(root.version_index, 0)
+
+    def test_version_index_uses_id_ordering(self) -> None:
+        root = Document.objects.create(
+            title="Root",
+            content="content",
+            checksum="checksum-root",
+            mime_type="application/pdf",
+            created=date(2025, 1, 1),
+        )
+        v1 = Document.objects.create(
+            root_document=root,
+            title="V1",
+            content="content",
+            checksum="checksum-v1",
+            mime_type="application/pdf",
+            created=date(2025, 1, 3),
+        )
+        v2 = Document.objects.create(
+            root_document=root,
+            title="V2",
+            content="content",
+            checksum="checksum-v2",
+            mime_type="application/pdf",
+            created=date(2025, 1, 2),
+        )
+        v3 = Document.objects.create(
+            root_document=root,
+            title="V3",
+            content="content",
+            checksum="checksum-v3",
+            mime_type="application/pdf",
+            created=date(2025, 1, 1),
+        )
+
+        self.assertEqual(v1.version_index, 1)
+        self.assertEqual(v2.version_index, 2)
+        self.assertEqual(v3.version_index, 3)
+
 
 def test_suggestion_content() -> None:
     """
