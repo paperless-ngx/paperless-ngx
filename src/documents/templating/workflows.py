@@ -63,7 +63,7 @@ def parse_w_workflow_placeholders(
         "owner_username": owner_username,
         "original_filename": Path(original_filename).stem,
         "filename": Path(filename).stem,
-        "version_label": version_label,
+        "version_label": version_label or "",
     }
     if created is not None:
         formatting.update(
