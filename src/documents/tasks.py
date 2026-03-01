@@ -4,11 +4,13 @@ import logging
 import shutil
 import uuid
 import zipfile
+from collections.abc import Callable
+from collections.abc import Iterable
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from tempfile import mkstemp
+from typing import TypeVar
 
-import tqdm
 from celery import Task
 from celery import shared_task
 from celery import states
@@ -66,9 +68,17 @@ from paperless_ai.indexing import llm_index_add_or_update_document
 from paperless_ai.indexing import llm_index_remove_document
 from paperless_ai.indexing import update_llm_index
 
+_T = TypeVar("_T")
+IterWrapper = Callable[[Iterable[_T]], Iterable[_T]]
+
+
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
 logger = logging.getLogger("paperless.tasks")
+
+
+def _identity(iterable: Iterable[_T]) -> Iterable[_T]:
+    return iterable
 
 
 @shared_task
@@ -78,13 +88,13 @@ def index_optimize() -> None:
     writer.commit(optimize=True)
 
 
-def index_reindex(*, progress_bar_disable=False) -> None:
+def index_reindex(*, iter_wrapper: IterWrapper[Document] = _identity) -> None:
     documents = Document.objects.all()
 
     ix = index.open_index(recreate=True)
 
     with AsyncWriter(ix) as writer:
-        for document in tqdm.tqdm(documents, disable=progress_bar_disable):
+        for document in iter_wrapper(documents):
             index.update_document(writer, document)
 
 
@@ -265,7 +275,6 @@ def bulk_update_documents(document_ids) -> None:
     ai_config = AIConfig()
     if ai_config.llm_index_enabled:
         update_llm_index(
-            progress_bar_disable=True,
             rebuild=False,
         )
 
@@ -594,7 +603,7 @@ def update_document_parent_tags(tag: Tag, new_parent: Tag) -> None:
 @shared_task
 def llmindex_index(
     *,
-    progress_bar_disable=True,
+    iter_wrapper: IterWrapper[Document] = _identity,
     rebuild=False,
     scheduled=True,
     auto=False,
@@ -617,7 +626,7 @@ def llmindex_index(
 
         try:
             result = update_llm_index(
-                progress_bar_disable=progress_bar_disable,
+                iter_wrapper=iter_wrapper,
                 rebuild=rebuild,
             )
             task.status = states.SUCCESS
