@@ -59,6 +59,7 @@ def apply_assignment_to_document(
                 "",  # no urls in titles
                 document.pk,
                 document.version_label,
+                document.version_index,
             )
         except Exception:  # pragma: no cover
             logger.exception(

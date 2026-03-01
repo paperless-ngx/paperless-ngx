@@ -409,6 +409,21 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         self.assertEqual(generate_filename(document), Path("0013579.pdf"))
 
+    @override_settings(FILENAME_FORMAT="{version_index}")
+    def test_format_version_index(self) -> None:
+        root = Document.objects.create(
+            checksum="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            mime_type="application/pdf",
+        )
+        version = Document.objects.create(
+            root_document=root,
+            checksum="bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            mime_type="application/pdf",
+        )
+
+        self.assertEqual(generate_filename(root), Path("0.pdf"))
+        self.assertEqual(generate_filename(version), Path("1.pdf"))
+
     @override_settings(FILENAME_FORMAT=None)
     def test_format_none(self) -> None:
         document = Document()

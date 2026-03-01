@@ -6,6 +6,7 @@ from pathlib import PurePath
 
 import pathvalidate
 from django.utils import timezone
+from django.utils.functional import SimpleLazyObject
 from django.utils.text import slugify as django_slugify
 from jinja2 import StrictUndefined
 from jinja2 import Template
@@ -156,14 +157,15 @@ def get_basic_metadata_context(
     document: Document,
     *,
     no_value_default: str = NO_VALUE_PLACEHOLDER,
-) -> dict[str, str]:
+    version_index: object | None = None,
+) -> dict[str, object]:
     """
     Given a Document, constructs some basic information about it.  If certain values are not set,
     they will be replaced with the no_value_default.
 
     Regardless of set or not, the values will be sanitized
     """
-    return {
+    context: dict[str, object] = {
         "title": pathvalidate.sanitize_filename(
             document.title,
             replacement_text="-",
@@ -198,15 +200,22 @@ def get_basic_metadata_context(
         else no_value_default,
     }
 
+    if version_index is not None:
+        context["version_index"] = version_index
+
+    return context
+
 
 def get_safe_document_context(
     document: Document,
     tags: Iterable[Tag],
+    *,
+    version_index: object | None = None,
 ) -> dict[str, object]:
     """
     Build a document context object to avoid supplying entire model instance.
     """
-    return {
+    context: dict[str, object] = {
         "id": document.pk,
         "pk": document.pk,
         "title": document.title,
@@ -243,6 +252,11 @@ def get_safe_document_context(
         if document.storage_path
         else None,
     }
+
+    if version_index is not None:
+        context["version_index"] = version_index
+
+    return context
 
 
 def get_tags_context(tags: Iterable[Tag]) -> dict[str, str | list[str]]:
@@ -354,9 +368,20 @@ def validate_filepath_template_and_render(
         custom_fields = CustomFieldInstance.global_objects.filter(document=document)
 
     # Build the context dictionary
+    lazy_version_index = SimpleLazyObject(lambda: document.version_index)
     context = (
-        {"document": get_safe_document_context(document, tags=tags_list)}
-        | get_basic_metadata_context(document, no_value_default=NO_VALUE_PLACEHOLDER)
+        {
+            "document": get_safe_document_context(
+                document,
+                tags=tags_list,
+                version_index=lazy_version_index,
+            ),
+        }
+        | get_basic_metadata_context(
+            document,
+            no_value_default=NO_VALUE_PLACEHOLDER,
+            version_index=lazy_version_index,
+        )
         | get_creation_date_context(document)
         | get_added_date_context(document)
         | get_tags_context(tags_list)

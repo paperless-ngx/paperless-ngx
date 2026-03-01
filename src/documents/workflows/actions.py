@@ -6,6 +6,7 @@ from pathlib import Path
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.utils.functional import SimpleLazyObject
 
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
@@ -24,6 +25,16 @@ from documents.workflows.webhooks import send_webhook
 logger = logging.getLogger("paperless.workflows.actions")
 
 
+def _get_consumable_version_index(document: ConsumableDocument) -> int:
+    if document.root_document_id is None:
+        return 0
+
+    # The document is not yet saved, so use the next index in the version chain.
+    return (
+        Document.objects.filter(root_document_id=document.root_document_id).count() + 1
+    )
+
+
 def build_workflow_action_context(
     document: Document | ConsumableDocument,
     overrides: DocumentMetadataOverrides | None,
@@ -34,6 +45,11 @@ def build_workflow_action_context(
     use_overrides = overrides is not None
 
     if not use_overrides:
+        version_index = (
+            document.version_index
+            if isinstance(document, Document)
+            else _get_consumable_version_index(document)
+        )
         return {
             "title": document.title,
             "doc_url": f"{settings.PAPERLESS_URL}{settings.BASE_URL}documents/{document.pk}/",
@@ -50,6 +66,7 @@ def build_workflow_action_context(
             "created": document.created,
             "id": document.pk,
             "version_label": document.version_label,
+            "version_index": version_index,
         }
 
     correspondent_obj = (
@@ -69,6 +86,11 @@ def build_workflow_action_context(
     )
 
     filename = document.original_file if document.original_file else ""
+    version_index = (
+        SimpleLazyObject(lambda: _get_consumable_version_index(document))
+        if isinstance(document, ConsumableDocument)
+        else SimpleLazyObject(lambda: document.version_index)
+    )
     return {
         "title": overrides.title
         if overrides and overrides.title
@@ -83,6 +105,7 @@ def build_workflow_action_context(
         "created": overrides.created if overrides else None,
         "id": "",
         "version_label": overrides.version_label if overrides else None,
+        "version_index": version_index,
     }
 
 
@@ -119,6 +142,7 @@ def execute_email_action(
             context["doc_url"],
             context["id"],
             context["version_label"],
+            context["version_index"],
         )
         if action.email.subject
         else ""
@@ -137,6 +161,7 @@ def execute_email_action(
             context["doc_url"],
             context["id"],
             context["version_label"],
+            context["version_index"],
         )
         if action.email.body
         else ""
@@ -217,6 +242,7 @@ def execute_webhook_action(
                             context["doc_url"],
                             context["id"],
                             context["version_label"],
+                            context["version_index"],
                         )
                 except Exception as e:
                     logger.error(
@@ -237,6 +263,7 @@ def execute_webhook_action(
                 context["doc_url"],
                 context["id"],
                 context["version_label"],
+                context["version_index"],
             )
         headers = {}
         if action.webhook.headers:

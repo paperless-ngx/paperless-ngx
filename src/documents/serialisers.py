@@ -2749,6 +2749,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
                         created_month_name_short="",
                         created_day="",
                         created_time="",
+                        version_index="",
                     )
                 except (ValueError, KeyError) as e:
                     raise serializers.ValidationError(

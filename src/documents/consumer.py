@@ -715,6 +715,17 @@ class ConsumerPlugin(
             else None
         )
 
+        version_index = (
+            0
+            if self.input_doc.root_document_id is None
+            else (
+                Document.objects.filter(
+                    root_document_id=self.input_doc.root_document_id,
+                ).count()
+                + 1
+            )
+        )
+
         return parse_w_workflow_placeholders(
             title,
             correspondent_name,
@@ -724,6 +735,7 @@ class ConsumerPlugin(
             self.filename,
             self.filename,
             version_label=self.metadata.version_label,
+            version_index=version_index,
         )
 
     def _store(

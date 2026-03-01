@@ -355,6 +355,35 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
 
         self.assertEqual(Workflow.objects.count(), 1)
 
+    def test_api_create_assign_title_accepts_version_index(self) -> None:
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow with version index",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "assign_title": "Version {version_index}",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        workflow = Workflow.objects.get(name="Workflow with version index")
+        self.assertEqual(
+            workflow.actions.first().assign_title,
+            "Version {version_index}",
+        )
+
     def test_api_create_workflow_trigger_action_empty_fields(self) -> None:
         """
         GIVEN:

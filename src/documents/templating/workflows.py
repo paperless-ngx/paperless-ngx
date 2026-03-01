@@ -42,6 +42,7 @@ def parse_w_workflow_placeholders(
     doc_url: str | None = None,
     doc_id: int | None = None,
     version_label: str | None = None,
+    version_index: int | None = None,
 ) -> str:
     """
     Available title placeholders for Workflows depend on what has already been assigned,
@@ -64,6 +65,7 @@ def parse_w_workflow_placeholders(
         "original_filename": Path(original_filename).stem,
         "filename": Path(filename).stem,
         "version_label": version_label or "",
+        "version_index": version_index or "1",
     }
     if created is not None:
         formatting.update(

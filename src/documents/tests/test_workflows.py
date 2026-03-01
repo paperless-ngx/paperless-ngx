@@ -951,6 +951,38 @@ class TestWorkflows(
         self.assertEqual(doc.correspondent, self.c2)
         self.assertEqual(doc.title, f"Doc created in {created.year}")
 
+    def test_document_updated_workflow_version_index_placeholder(self) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Version {{ version_index }}",
+        )
+        workflow = Workflow.objects.create(
+            name="Workflow version index",
+            order=0,
+        )
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+        workflow.save()
+
+        root = Document.objects.create(
+            title="root",
+            checksum="cccccccccccccccccccccccccccccccc",
+            mime_type="application/pdf",
+        )
+        version = Document.objects.create(
+            title="v1",
+            checksum="dddddddddddddddddddddddddddddddd",
+            mime_type="application/pdf",
+            root_document=root,
+        )
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, version)
+        version.refresh_from_db()
+
+        self.assertEqual(version.title, "Version 1")
+
     def test_document_added_no_match_filename(self) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
