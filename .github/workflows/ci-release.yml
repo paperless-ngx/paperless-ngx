@@ -118,7 +118,7 @@ jobs:
           sudo chown -R 1000:1000 paperless-ngx/
           tar -cJf paperless-ngx.tar.xz paperless-ngx/
       - name: Upload release artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: release
           path: dist/paperless-ngx.tar.xz
@@ -133,7 +133,7 @@ jobs:
       version: ${{ steps.get-version.outputs.version }}
     steps:
       - name: Download release artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: release
           path: ./
