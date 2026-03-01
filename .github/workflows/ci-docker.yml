@@ -130,7 +130,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
       - name: Build and push by digest
         id: build
-        uses: docker/build-push-action@v6.18.0
+        uses: docker/build-push-action@v6.19.2
         with:
           context: .
           file: ./Dockerfile
@@ -152,7 +152,7 @@ jobs:
           touch "/tmp/digests/${digest#sha256:}"
       - name: Upload digest
         if: steps.check-push.outputs.should-push == 'true'
-        uses: actions/upload-artifact@v6.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: digests-${{ matrix.arch }}
           path: /tmp/digests/*
@@ -168,7 +168,7 @@ jobs:
       packages: write
     steps:
       - name: Download digests
-        uses: actions/download-artifact@v7.0.0
+        uses: actions/download-artifact@v8
         with:
           path: /tmp/digests
           pattern: digests-*
