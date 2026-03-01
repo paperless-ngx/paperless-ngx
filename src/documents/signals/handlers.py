@@ -4,6 +4,7 @@ import logging
 import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import Any
 
 from celery import shared_task
 from celery import states
@@ -23,6 +24,7 @@ from django.db.models import Q
 from django.dispatch import receiver
 from django.utils import timezone
 from filelock import FileLock
+from rest_framework import serializers
 
 from documents import matching
 from documents.caching import clear_document_caches
@@ -45,6 +47,7 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
+from documents.plugins.helpers import DocumentsStatusManager
 from documents.templating.utils import convert_format_str_to_template_format
 from documents.workflows.actions import build_workflow_action_context
 from documents.workflows.actions import execute_email_action
@@ -66,6 +69,7 @@ if TYPE_CHECKING:
     from documents.data_models import DocumentMetadataOverrides
 
 logger = logging.getLogger("paperless.handlers")
+DRF_DATETIME_FIELD = serializers.DateTimeField()
 
 
 def add_inbox_tags(sender, document: Document, logging_group=None, **kwargs) -> None:
@@ -762,6 +766,28 @@ def run_workflows_updated(
     )
 
 
+def send_websocket_document_updated(
+    sender,
+    document: Document,
+    **kwargs,
+) -> None:
+    # At this point, workflows may already have applied additional changes.
+    document.refresh_from_db()
+
+    from documents.data_models import DocumentMetadataOverrides
+
+    doc_overrides = DocumentMetadataOverrides.from_document(document)
+
+    with DocumentsStatusManager() as status_mgr:
+        status_mgr.send_document_updated(
+            document_id=document.id,
+            modified=DRF_DATETIME_FIELD.to_representation(document.modified),
+            owner_id=doc_overrides.owner_id,
+            users_can_view=doc_overrides.view_users,
+            groups_can_view=doc_overrides.view_groups,
+        )
+
+
 def run_workflows(
     trigger_type: WorkflowTrigger.WorkflowTriggerType,
     document: Document | ConsumableDocument,
@@ -1035,7 +1061,11 @@ def add_or_update_document_in_llm_index(sender, document, **kwargs):
 
 
 @receiver(models.signals.post_delete, sender=Document)
-def delete_document_from_llm_index(sender, instance: Document, **kwargs):
+def delete_document_from_llm_index(
+    sender: Any,
+    instance: Document,
+    **kwargs: Any,
+) -> None:
     """
     Delete a document from the LLM index when it is deleted.
     """

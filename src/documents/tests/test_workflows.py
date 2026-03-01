@@ -643,7 +643,9 @@ class TestWorkflows(
 
         expected_str = f"Document did not match {w}"
         self.assertIn(expected_str, cm.output[0])
-        expected_str = f"Document path {test_file} does not match"
+        expected_str = (
+            f"Document path {Path(test_file).resolve(strict=False)} does not match"
+        )
         self.assertIn(expected_str, cm.output[1])
 
     def test_workflow_no_match_mail_rule(self) -> None:
@@ -1967,6 +1969,36 @@ class TestWorkflows(
 
         doc.refresh_from_db()
         self.assertEqual(doc.owner, self.user2)
+
+    @mock.patch("documents.tasks.send_websocket_document_updated")
+    def test_workflow_scheduled_trigger_sends_websocket_update(
+        self,
+        mock_send_websocket_document_updated,
+    ) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            schedule_offset_days=1,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.CREATED,
+        )
+        action = WorkflowAction.objects.create(assign_owner=self.user2)
+        workflow = Workflow.objects.create(name="Workflow 1", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+            created=timezone.now() - timedelta(days=2),
+        )
+
+        tasks.check_scheduled_workflows()
+
+        self.assertEqual(mock_send_websocket_document_updated.call_count, 1)
+        self.assertEqual(
+            mock_send_websocket_document_updated.call_args.kwargs["document"].pk,
+            doc.pk,
+        )
 
     def test_workflow_scheduled_trigger_added(self) -> None:
         """
