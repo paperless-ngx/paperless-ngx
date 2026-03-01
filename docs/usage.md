@@ -618,6 +618,7 @@ applied. You can use the following placeholders in the template with any trigger
 -   `{{original_filename}}`: original file name without extension
 -   `{{filename}}`: current file name without extension
 -   `{{doc_title}}`: current document title (cannot be used in title assignment)
+-   `{{version_label}}`: the document version label (empty if not explicitly set)
 
 The following placeholders are only available for "added" or "updated" triggers
 
@@ -626,7 +627,7 @@ The following placeholders are only available for "added" or "updated" triggers
 -   `{{created_year_short}}`: created year
 -   `{{created_month}}`: created month
 -   `{{created_month_name}}`: created month name
--   `{created_month_name_short}}`: created month short name
+-   `{{created_month_name_short}}`: created month short name
 -   `{{created_day}}`: created day
 -   `{{created_time}}`: created time in HH:MM format
 -   `{{doc_url}}`: URL to the document in the web UI. Requires the `PAPERLESS_URL` setting to be set.

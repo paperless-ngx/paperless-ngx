@@ -428,7 +428,11 @@ class TestConsumer(
             DocumentMetadataOverrides(
                 correspondent_id=c.pk,
                 document_type_id=dt.pk,
-                title="{{correspondent}}{{document_type}} {{added_month}}-{{added_year_short}}",
+                title=(
+                    "{{correspondent}}{{document_type}} "
+                    "{{added_month}}-{{added_year_short}}.{{version_label}}"
+                ),
+                version_label="v2",
             ),
         ) as consumer:
             consumer.run()
@@ -436,7 +440,10 @@ class TestConsumer(
             document = Document.objects.first()
 
         now = timezone.now()
-        self.assertEqual(document.title, f"{c.name}{dt.name} {now.strftime('%m-%y')}")
+        self.assertEqual(
+            document.title,
+            f"{c.name}{dt.name} {now.strftime('%m-%y')}.v2",
+        )
         self._assert_first_last_send_progress()
 
     def testOverrideOwner(self) -> None:

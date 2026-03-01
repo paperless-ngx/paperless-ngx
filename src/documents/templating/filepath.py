@@ -113,6 +113,7 @@ def create_dummy_document():
         archive_filename="/dummy/archive_filename.pdf",
         original_filename="original_file.pdf",
         archive_serial_number=12345,
+        version_label="Version #1",
     )
     return dummy_doc
 
@@ -189,6 +190,12 @@ def get_basic_metadata_context(
         if document.original_filename
         else no_value_default,
         "doc_pk": f"{document.pk:07}",
+        "version_label": pathvalidate.sanitize_filename(
+            document.version_label,
+            replacement_text="-",
+        )
+        if document.version_label
+        else no_value_default,
     }
 
 

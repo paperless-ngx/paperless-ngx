@@ -332,6 +332,7 @@ Paperless provides the following variables for use within filenames:
 -   `{{ owner_username }}`: Username of document owner, if any, or "none"
 -   `{{ original_name }}`: Document original filename, minus the extension, if any, or "none"
 -   `{{ doc_pk }}`: The paperless identifier (primary key) for the document.
+-   `{{ version_label }}`: The document version label or "none" if not explicitly set.
 
 !!! warning
 
