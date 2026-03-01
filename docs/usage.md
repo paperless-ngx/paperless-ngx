@@ -570,7 +570,7 @@ applied. You can use the following placeholders in the template with any trigger
 -   `{{added_day}}`: added day
 -   `{{added_time}}`: added time in HH:MM format
 -   `{{original_filename}}`: original file name without extension
--   `{{filename}}`: current file name without extension
+-   `{{filename}}`: current file name without extension (for "added" workflows this may not be final yet, you can use `{{original_filename}}`)
 -   `{{doc_title}}`: current document title
 
 The following placeholders are only available for "added" or "updated" triggers
