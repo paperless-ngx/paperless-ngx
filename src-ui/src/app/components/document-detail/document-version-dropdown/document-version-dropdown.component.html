@@ -88,7 +88,7 @@
                     @if (version.version_label) {
                       {{ version.version_label }}
                     } @else {
-                      <ng-container i18n>Version</ng-container>&nbsp;{{ versions.length - $index }}&nbsp;<span class="text-muted small">(#{{ version.id }})</span>
+                      <span class="fst-italic"><ng-container i18n>Version</ng-container>&nbsp;{{ versions.length - $index }}&nbsp;<span class="text-muted small">(#{{ version.id }})</span></span>
                     }
                   </span>
                 }
