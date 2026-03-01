@@ -723,6 +723,7 @@ class ConsumerPlugin(
             local_added,
             self.filename,
             self.filename,
+            version_label=self.metadata.version_label,
         )
 
     def _store(

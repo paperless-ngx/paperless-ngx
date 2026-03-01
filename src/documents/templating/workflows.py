@@ -63,6 +63,7 @@ def parse_w_workflow_placeholders(
         "owner_username": owner_username,
         "original_filename": Path(original_filename).stem,
         "filename": Path(filename).stem,
+        "version_label": version_label,
     }
     if created is not None:
         formatting.update(
@@ -83,8 +84,6 @@ def parse_w_workflow_placeholders(
         formatting.update({"doc_url": doc_url})
     if doc_id is not None:
         formatting.update({"doc_id": str(doc_id)})
-    if version_label is not None:
-        formatting.update({"version_label": version_label})
 
     logger.debug(f"Parsing Workflow Jinja template: {text}")
     try:
