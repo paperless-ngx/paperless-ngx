@@ -427,6 +427,16 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
     def created_date(self):
         return self.created
 
+    @property
+    def version_index(self):
+        if self.root_document_id is None or self.pk is None:
+            return 0
+
+        return Document.objects.filter(
+            root_document_id=self.root_document_id,
+            id__lte=self.id,
+        ).count()
+
     def add_nested_tags(self, tags) -> None:
         tag_ids = set()
         for tag in tags:
