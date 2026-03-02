@@ -152,7 +152,7 @@ jobs:
           touch "/tmp/digests/${digest#sha256:}"
       - name: Upload digest
         if: steps.check-push.outputs.should-push == 'true'
-        uses: actions/upload-artifact@v6.0.0
+        uses: actions/upload-artifact@v7.0.0
         with:
           name: digests-${{ matrix.arch }}
           path: /tmp/digests/*
@@ -168,7 +168,7 @@ jobs:
       packages: write
     steps:
       - name: Download digests
-        uses: actions/download-artifact@v7.0.0
+        uses: actions/download-artifact@v8.0.0
         with:
           path: /tmp/digests
           pattern: digests-*
