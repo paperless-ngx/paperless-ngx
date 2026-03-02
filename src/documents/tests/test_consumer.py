@@ -726,6 +726,13 @@ class TestConsumer(
         self.assertIsNotNone(root_doc)
         assert root_doc is not None
 
+        root_storage_path = StoragePath.objects.create(
+            name="version-root-path",
+            path="root/{{title}}",
+        )
+        root_doc.storage_path = root_storage_path
+        root_doc.save()
+
         actor = User.objects.create_user(
             username="actor",
             email="actor@example.com",
@@ -836,6 +843,63 @@ class TestConsumer(
         self.assertEqual(version.version_index, 1)
         self.assertEqual(version.original_filename, "valid_pdf_version-upload")
         self.assertTrue(bool(version.content))
+
+    @override_settings(AUDIT_LOG_ENABLED=True)
+    @mock.patch("documents.consumer.load_classifier")
+    def test_consume_version_index_monotonic_after_version_deletion(self, m) -> None:
+        m.return_value = MagicMock()
+
+        with self.get_consumer(self.get_test_file()) as consumer:
+            consumer.run()
+
+        root_doc = Document.objects.first()
+        self.assertIsNotNone(root_doc)
+        assert root_doc is not None
+
+        def consume_version(version_file: Path) -> Document:
+            status = DummyProgressManager(version_file.name, None)
+            overrides = DocumentMetadataOverrides()
+            doc = ConsumableDocument(
+                DocumentSource.ApiUpload,
+                original_file=version_file,
+                root_document_id=root_doc.pk,
+            )
+            preflight = ConsumerPreflightPlugin(
+                doc,
+                overrides,
+                status,  # type: ignore[arg-type]
+                self.dirs.scratch_dir,
+                "task-id",
+            )
+            preflight.setup()
+            preflight.run()
+
+            consumer = ConsumerPlugin(
+                doc,
+                overrides,
+                status,  # type: ignore[arg-type]
+                self.dirs.scratch_dir,
+                "task-id",
+            )
+            consumer.setup()
+            try:
+                consumer.run()
+            finally:
+                consumer.cleanup()
+
+            version = (
+                Document.objects.filter(root_document=root_doc).order_by("-id").first()
+            )
+            assert version is not None
+            return version
+
+        v1 = consume_version(self.get_test_file2())
+        self.assertEqual(v1.version_index, 1)
+        v1.delete()
+
+        # The next version should have version_index 2, even though version_index 1 was deleted
+        v2 = consume_version(self.get_test_file())
+        self.assertEqual(v2.version_index, 2)
 
     @mock.patch("documents.consumer.load_classifier")
     def testClassifyDocument(self, m) -> None:

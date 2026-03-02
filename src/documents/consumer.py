@@ -204,7 +204,6 @@ class ConsumerPlugin(
         version_doc.page_count = page_count
         version_doc.mime_type = mime_type
         version_doc.original_filename = self.filename
-        version_doc.storage_path = root_doc_frozen.storage_path
         # Clear unique file path fields so they can be generated uniquely later
         version_doc.filename = None
         version_doc.archive_filename = None

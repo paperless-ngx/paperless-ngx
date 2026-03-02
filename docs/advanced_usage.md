@@ -262,6 +262,10 @@ your files differently, you can do that by adjusting the
 or using [storage paths (see below)](#storage-paths). Paperless adds the
 correct file extension e.g. `.pdf`, `.jpg` automatically.
 
+When a document has file versions, each version uses the same naming rules and
+storage path resolution as any other document file, with an added version suffix
+such as `_v1`, `_v2`, etc.
+
 This variable allows you to configure the filename (folders are allowed)
 using placeholders. For example, configuring this to
 
@@ -353,6 +357,8 @@ If paperless detects that two documents share the same filename,
 paperless will automatically append `_01`, `_02`, etc to the filename.
 This happens if all the placeholders in a filename evaluate to the same
 value.
+For versioned files, this counter is appended after the version suffix
+(for example `statement_v2_01.pdf`).
 
 If there are any errors in the placeholders included in `PAPERLESS_FILENAME_FORMAT`,
 paperless will fall back to using the default naming scheme instead.
