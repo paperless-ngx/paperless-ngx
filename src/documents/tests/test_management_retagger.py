@@ -220,6 +220,34 @@ class TestRetaggerDocumentType(DirectoriesMixin):
         assert d_first.document_type is None
         assert d_second.document_type is None
 
+    @pytest.mark.parametrize(
+        ("use_first_flag", "expects_assignment"),
+        [
+            pytest.param(["--use-first"], True, id="use_first_assigns_first_match"),
+            pytest.param([], False, id="no_use_first_skips_ambiguous_match"),
+        ],
+    )
+    def test_use_first_with_multiple_matches(
+        self,
+        use_first_flag: list[str],
+        *,
+        expects_assignment: bool,
+    ) -> None:
+        DocumentTypeFactory(
+            match="ambiguous",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+        )
+        DocumentTypeFactory(
+            match="ambiguous",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+        )
+        doc = DocumentFactory(content="ambiguous content")
+
+        call_command("document_retagger", "--document_type", *use_first_flag)
+
+        doc.refresh_from_db()
+        assert (doc.document_type is not None) is expects_assignment
+
 
 # ---------------------------------------------------------------------------
 # Correspondent assignment
@@ -252,6 +280,34 @@ class TestRetaggerCorrespondent(DirectoriesMixin):
 
         assert d_first.correspondent is None
         assert d_second.correspondent is None
+
+    @pytest.mark.parametrize(
+        ("use_first_flag", "expects_assignment"),
+        [
+            pytest.param(["--use-first"], True, id="use_first_assigns_first_match"),
+            pytest.param([], False, id="no_use_first_skips_ambiguous_match"),
+        ],
+    )
+    def test_use_first_with_multiple_matches(
+        self,
+        use_first_flag: list[str],
+        *,
+        expects_assignment: bool,
+    ) -> None:
+        CorrespondentFactory(
+            match="ambiguous",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+        )
+        CorrespondentFactory(
+            match="ambiguous",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+        )
+        doc = DocumentFactory(content="ambiguous content")
+
+        call_command("document_retagger", "--correspondent", *use_first_flag)
+
+        doc.refresh_from_db()
+        assert (doc.correspondent is not None) is expects_assignment
 
 
 # ---------------------------------------------------------------------------
@@ -293,6 +349,34 @@ class TestRetaggerStoragePath(DirectoriesMixin):
         assert d_auto.storage_path == sp1
         assert d_second.storage_path is None
         assert d_unrelated.storage_path == sp2
+
+    @pytest.mark.parametrize(
+        ("use_first_flag", "expects_assignment"),
+        [
+            pytest.param(["--use-first"], True, id="use_first_assigns_first_match"),
+            pytest.param([], False, id="no_use_first_skips_ambiguous_match"),
+        ],
+    )
+    def test_use_first_with_multiple_matches(
+        self,
+        use_first_flag: list[str],
+        *,
+        expects_assignment: bool,
+    ) -> None:
+        StoragePathFactory(
+            match="ambiguous",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+        )
+        StoragePathFactory(
+            match="ambiguous",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+        )
+        doc = DocumentFactory(content="ambiguous content")
+
+        call_command("document_retagger", "--storage_path", *use_first_flag)
+
+        doc.refresh_from_db()
+        assert (doc.storage_path is not None) is expects_assignment
 
 
 # ---------------------------------------------------------------------------
