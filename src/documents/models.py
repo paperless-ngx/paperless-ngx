@@ -319,6 +319,14 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         verbose_name=_("root document for this version"),
     )
 
+    version_index = models.PositiveIntegerField(
+        _("version index"),
+        blank=True,
+        null=True,
+        db_index=True,
+        help_text=_("Index of this version within the root document."),
+    )
+
     version_label = models.CharField(
         _("version label"),
         max_length=64,
@@ -331,6 +339,16 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         ordering = ("-created",)
         verbose_name = _("document")
         verbose_name_plural = _("documents")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["root_document", "version_index"],
+                condition=models.Q(
+                    root_document__isnull=False,
+                    version_index__isnull=False,
+                ),
+                name="documents_document_root_version_index_uniq",
+            ),
+        ]
 
     def __str__(self) -> str:
         created = self.created.isoformat()
