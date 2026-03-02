@@ -1119,6 +1119,7 @@ class WorkflowTrigger(models.Model):
         DOCUMENT_ADDED = 2, _("Document Added")
         DOCUMENT_UPDATED = 3, _("Document Updated")
         SCHEDULED = 4, _("Scheduled")
+        VERSION_ADDED = 5, _("Version Added")
 
     class DocumentSourceChoices(models.IntegerChoices):
         CONSUME_FOLDER = DocumentSource.ConsumeFolder.value, _("Consume Folder")

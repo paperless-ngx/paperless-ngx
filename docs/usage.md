@@ -457,7 +457,7 @@ fields and permissions, which will be merged.
 
 #### Types {#workflow-trigger-types}
 
-Currently, there are four events that correspond to workflow trigger 'types':
+Currently, there are five events that correspond to workflow trigger 'types':
 
 1. **Consumption Started**: _before_ a document is consumed, so events can include filters by source (mail, consumption
    folder or API), file path, file name, mail rule
@@ -469,8 +469,10 @@ Currently, there are four events that correspond to workflow trigger 'types':
 4. **Scheduled**: a scheduled trigger that can be used to run workflows at a specific time. The date used can be either the document
    added, created, updated date or you can specify a (date) custom field. You can also specify a day offset from the date (positive
    offsets will trigger after the date, negative offsets will trigger before).
+5. **Version Added**: when a new version is added for an existing document. This trigger evaluates filters against the root document
+   and applies actions to the root document.
 
-The following flow diagram illustrates the four document trigger types:
+The following flow diagram illustrates the document trigger types:
 
 ```mermaid
 flowchart TD
