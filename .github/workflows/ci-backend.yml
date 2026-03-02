@@ -35,18 +35,18 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
       - name: Start containers
         run: |
           docker compose --file docker/compose/docker-compose.ci-test.yml pull --quiet
           docker compose --file docker/compose/docker-compose.ci-test.yml up --detach
       - name: Set up Python
         id: setup-python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v6.2.0
         with:
           python-version: "${{ matrix.python-version }}"
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v7.3.0
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
@@ -83,13 +83,13 @@ jobs:
             pytest
       - name: Upload test results to Codecov
         if: always()
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v5.5.2
         with:
           flags: backend-python-${{ matrix.python-version }}
           files: junit.xml
           report_type: test_results
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v5.5.2
         with:
           flags: backend-python-${{ matrix.python-version }}
           files: coverage.xml
@@ -106,14 +106,14 @@ jobs:
       DEFAULT_PYTHON: "3.12"
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
       - name: Set up Python
         id: setup-python
         uses: actions/setup-python@v6.2.0
         with:
           python-version: "${{ env.DEFAULT_PYTHON }}"
       - name: Install uv
-        uses: astral-sh/setup-uv@v7.2.1
+        uses: astral-sh/setup-uv@v7.3.0
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
