@@ -4,7 +4,7 @@
 # correct networking for the tests
 services:
   gotenberg:
-    image: docker.io/gotenberg/gotenberg:8.26
+    image: docker.io/gotenberg/gotenberg:8.27
     hostname: gotenberg
     container_name: gotenberg
     network_mode: host
