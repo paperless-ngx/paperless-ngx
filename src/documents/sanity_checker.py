@@ -62,19 +62,40 @@ class SanityCheckMessages:
         self._messages: dict[int | None, list[MessageEntry]] = defaultdict(list)
         self.has_error: bool = False
         self.has_warning: bool = False
+        self.has_info: bool = False
+        self.document_count: int = 0
+        self.document_error_count: int = 0
+        self.document_warning_count: int = 0
+        self.document_info_count: int = 0
+        self.global_warning_count: int = 0
 
     # -- Recording ----------------------------------------------------------
 
     def error(self, doc_pk: int | None, message: str) -> None:
         self._messages[doc_pk].append({"level": logging.ERROR, "message": message})
         self.has_error = True
+        if doc_pk is not None:
+            self.document_count += 1
+            self.document_error_count += 1
 
     def warning(self, doc_pk: int | None, message: str) -> None:
         self._messages[doc_pk].append({"level": logging.WARNING, "message": message})
         self.has_warning = True
 
+        if doc_pk is not None:
+            self.document_count += 1
+            self.document_warning_count += 1
+        else:
+            # This is the only type of global message we do right now
+            self.global_warning_count += 1
+
     def info(self, doc_pk: int | None, message: str) -> None:
         self._messages[doc_pk].append({"level": logging.INFO, "message": message})
+        self.has_info = True
+
+        if doc_pk is not None:
+            self.document_count += 1
+            self.document_info_count += 1
 
     # -- Iteration / query --------------------------------------------------
 
@@ -92,43 +113,16 @@ class SanityCheckMessages:
     # -- Summarize Helpers --------------------------------------------------
 
     @property
-    def document_count(self) -> int:
-        return len(self._messages) - (1 if self.has_global_issues else 0)
-
-    @property
     def has_global_issues(self) -> bool:
         return None in self._messages
 
     @property
-    def document_error_count(self) -> int:
-        """Number of documents (not global) with at least one error."""
-        return sum(
-            1
-            for pk, msgs in self._messages.items()
-            if pk is not None and any(m["level"] == logging.ERROR for m in msgs)
-        )
-
-    @property
-    def document_warning_count(self) -> int:
-        """Number of documents (not global) with at least one warning."""
-        return sum(
-            1
-            for pk, msgs in self._messages.items()
-            if pk is not None and any(m["level"] == logging.WARNING for m in msgs)
-        )
-
-    @property
-    def global_error_count(self) -> int:
-        """Number of global (non-document) error messages."""
-        return sum(
-            1 for m in self._messages.get(None, []) if m["level"] == logging.ERROR
-        )
-
-    @property
-    def global_warning_count(self) -> int:
-        """Number of global (non-document) warning messages."""
-        return sum(
-            1 for m in self._messages.get(None, []) if m["level"] == logging.WARNING
+    def total_issue_count(self) -> int:
+        """Total number of error and warning messages across all documents and global."""
+        return (
+            self.document_error_count
+            + self.document_warning_count
+            + self.global_warning_count
         )
 
     # -- Logging output (used by Celery task path) --------------------------
@@ -339,9 +333,20 @@ def check_sanity(
         messages.warning(None, f"Orphaned file in media dir: {extra_file}")
 
     paperless_task.status = states.SUCCESS if not messages.has_error else states.FAILURE
-    paperless_task.result = f"{len(messages)} issues found."
-    if messages.has_error:
-        paperless_task.result += " Check logs for details."
+    if messages.total_issue_count == 0:
+        paperless_task.result = "No issues found."
+    else:
+        parts: list[str] = []
+        if messages.document_error_count:
+            parts.append(f"{messages.document_error_count} document(s) with errors")
+        if messages.document_warning_count:
+            parts.append(f"{messages.document_warning_count} document(s) with warnings")
+        if messages.global_warning_count:
+            parts.append(f"{messages.global_warning_count} global warning(s)")
+        paperless_task.result = ", ".join(parts) + " found."
+        if messages.has_error:
+            paperless_task.result += " Check logs for details."
+
     paperless_task.date_done = timezone.now()
     paperless_task.save(update_fields=["status", "result", "date_done"])
 

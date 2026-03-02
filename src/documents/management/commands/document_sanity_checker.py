@@ -27,7 +27,11 @@ class Command(PaperlessCommand):
     def _render_results(self, messages: SanityCheckMessages) -> None:
         """Render sanity check results as a Rich table."""
 
-        if len(messages) == 0:
+        if (
+            not messages.has_error
+            and not messages.has_warning
+            and not messages.has_info
+        ):
             self.console.print(
                 Panel(
                     "[green]No issues detected.[/green]",
@@ -86,26 +90,21 @@ class Command(PaperlessCommand):
             parts.append(
                 f"{messages.document_warning_count} document(s) with [yellow]warnings[/yellow]",
             )
-        if messages.global_error_count:
-            parts.append(
-                f"{messages.global_error_count} global [bold red]error(s)[/bold red]",
-            )
+        if messages.document_info_count:
+            parts.append(f"{messages.document_info_count} document(s) with infos")
         if messages.global_warning_count:
             parts.append(
                 f"{messages.global_warning_count} global [yellow]warning(s)[/yellow]",
             )
 
         if parts:
-            # Oxford-style join: "A, B and C" or "A and B"
             if len(parts) > 1:
                 summary = ", ".join(parts[:-1]) + " and " + parts[-1]
             else:
                 summary = parts[0]
             self.console.print(f"\nFound {summary}.")
         else:
-            self.console.print(
-                f"\nFound {messages.document_count} document(s) with infos only.",
-            )
+            self.console.print("\nNo issues found.")
 
     def handle(self, *args: Any, **options: Any) -> None:
         messages = check_sanity(

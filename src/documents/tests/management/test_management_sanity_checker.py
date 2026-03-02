@@ -102,29 +102,55 @@ class TestRenderResultsSummary:
         msgs = SanityCheckMessages()
         msgs.error(sample_doc.pk, "broken")
         output = _render_to_string(msgs)
+        assert "1 document(s) with" in output
         assert "errors" in output
-        assert "Found 1 document(s)" in output
 
     def test_warnings_only(self, sample_doc: Document) -> None:
         msgs = SanityCheckMessages()
         msgs.warning(sample_doc.pk, "odd")
         output = _render_to_string(msgs)
+        assert "1 document(s) with" in output
         assert "warnings" in output
-
-    def test_errors_and_warnings(self, sample_doc: Document) -> None:
-        msgs = SanityCheckMessages()
-        msgs.error(sample_doc.pk, "broken")
-        msgs.warning(None, "orphan")
-        output = _render_to_string(msgs)
-        assert "errors" in output
-        assert "warnings" in output
-        assert "Found 2 document(s)" in output
 
     def test_infos_only(self, sample_doc: Document) -> None:
         msgs = SanityCheckMessages()
         msgs.info(sample_doc.pk, "no OCR")
         output = _render_to_string(msgs)
-        assert "infos" in output
+        assert "1 document(s) with infos" in output
+
+    def test_empty_messages(self) -> None:
+        msgs = SanityCheckMessages()
+        output = _render_to_string(msgs)
+        assert "No issues detected." in output
+
+    def test_document_errors_and_global_warnings(self, sample_doc: Document) -> None:
+        msgs = SanityCheckMessages()
+        msgs.error(sample_doc.pk, "broken")
+        msgs.warning(None, "orphan")
+        output = _render_to_string(msgs)
+        assert "1 document(s) with" in output
+        assert "errors" in output
+        assert "1 global warning(s)" in output
+        assert "2 document(s)" not in output
+
+    def test_global_warnings_only(self) -> None:
+        msgs = SanityCheckMessages()
+        msgs.warning(None, "extra file")
+        output = _render_to_string(msgs)
+        assert "1 global warning(s)" in output
+        assert "document(s) with" not in output
+
+    def test_all_levels_combined(self, sample_doc: Document) -> None:
+        msgs = SanityCheckMessages()
+        msgs.error(sample_doc.pk, "broken")
+        msgs.warning(sample_doc.pk, "odd")
+        msgs.info(sample_doc.pk, "fyi")
+        msgs.warning(None, "extra file")
+        output = _render_to_string(msgs)
+        assert "1 document(s) with errors" in output
+        assert "1 document(s) with warnings" in output
+        assert "1 document(s) with infos" in output
+        assert "1 global warning(s)" in output
 
 
 # ---------------------------------------------------------------------------
@@ -136,12 +162,6 @@ class TestRenderResultsSummary:
 @pytest.mark.management
 class TestDocumentSanityCheckerCommand:
     def test_no_issues(self, sample_doc: Document) -> None:
-        out = StringIO()
-        call_command("document_sanity_checker", "--no-progress-bar", stdout=out)
-        assert "No issues detected" in out.getvalue()
-
-    @pytest.mark.usefixtures("_media_settings")
-    def test_no_issues_empty_archive(self) -> None:
         out = StringIO()
         call_command("document_sanity_checker", "--no-progress-bar", stdout=out)
         assert "No issues detected" in out.getvalue()

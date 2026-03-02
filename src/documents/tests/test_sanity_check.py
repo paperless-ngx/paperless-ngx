@@ -31,7 +31,7 @@ class TestCheckSanityNoDocuments:
         messages = check_sanity()
         assert not messages.has_error
         assert not messages.has_warning
-        assert len(messages) == 0
+        assert messages.total_issue_count == 0
 
     @pytest.mark.usefixtures("_media_settings")
     def test_no_issues_logs_clean(self, caplog: pytest.LogCaptureFixture) -> None:
@@ -47,7 +47,7 @@ class TestCheckSanityHealthyDocument:
         messages = check_sanity()
         assert not messages.has_error
         assert not messages.has_warning
-        assert len(messages) == 0
+        assert messages.total_issue_count == 0
 
 
 @pytest.mark.django_db
