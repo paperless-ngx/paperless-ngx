@@ -86,11 +86,50 @@ class SanityCheckMessages:
         """Iterate over (doc_pk, messages) pairs."""
         yield from self._messages.items()
 
-    def __len__(self) -> int:
-        return len(self._messages)
-
     def __getitem__(self, item: int | None) -> list[MessageEntry]:
         return self._messages[item]
+
+    # -- Summarize Helpers --------------------------------------------------
+
+    @property
+    def document_count(self) -> int:
+        return len(self._messages) - (1 if self.has_global_issues else 0)
+
+    @property
+    def has_global_issues(self) -> bool:
+        return None in self._messages
+
+    @property
+    def document_error_count(self) -> int:
+        """Number of documents (not global) with at least one error."""
+        return sum(
+            1
+            for pk, msgs in self._messages.items()
+            if pk is not None and any(m["level"] == logging.ERROR for m in msgs)
+        )
+
+    @property
+    def document_warning_count(self) -> int:
+        """Number of documents (not global) with at least one warning."""
+        return sum(
+            1
+            for pk, msgs in self._messages.items()
+            if pk is not None and any(m["level"] == logging.WARNING for m in msgs)
+        )
+
+    @property
+    def global_error_count(self) -> int:
+        """Number of global (non-document) error messages."""
+        return sum(
+            1 for m in self._messages.get(None, []) if m["level"] == logging.ERROR
+        )
+
+    @property
+    def global_warning_count(self) -> int:
+        """Number of global (non-document) warning messages."""
+        return sum(
+            1 for m in self._messages.get(None, []) if m["level"] == logging.WARNING
+        )
 
     # -- Logging output (used by Celery task path) --------------------------
 

@@ -26,10 +26,9 @@ class Command(PaperlessCommand):
 
     def _render_results(self, messages: SanityCheckMessages) -> None:
         """Render sanity check results as a Rich table."""
-        console = self.console
 
         if len(messages) == 0:
-            console.print(
+            self.console.print(
                 Panel(
                     "[green]No issues detected.[/green]",
                     title="Sanity Check",
@@ -75,16 +74,38 @@ class Command(PaperlessCommand):
                     Text(str(msg["message"])),
                 )
 
-        console.print(table)
+        self.console.print(table)
 
-        # Summary line
         parts: list[str] = []
-        if messages.has_error:
-            parts.append("[bold red]errors[/bold red]")
-        if messages.has_warning:
-            parts.append("[yellow]warnings[/yellow]")
-        summary = " and ".join(parts) if parts else "infos"
-        console.print(f"\nFound {len(messages)} document(s) with {summary}.")
+
+        if messages.document_error_count:
+            parts.append(
+                f"{messages.document_error_count} document(s) with [bold red]errors[/bold red]",
+            )
+        if messages.document_warning_count:
+            parts.append(
+                f"{messages.document_warning_count} document(s) with [yellow]warnings[/yellow]",
+            )
+        if messages.global_error_count:
+            parts.append(
+                f"{messages.global_error_count} global [bold red]error(s)[/bold red]",
+            )
+        if messages.global_warning_count:
+            parts.append(
+                f"{messages.global_warning_count} global [yellow]warning(s)[/yellow]",
+            )
+
+        if parts:
+            # Oxford-style join: "A, B and C" or "A and B"
+            if len(parts) > 1:
+                summary = ", ".join(parts[:-1]) + " and " + parts[-1]
+            else:
+                summary = parts[0]
+            self.console.print(f"\nFound {summary}.")
+        else:
+            self.console.print(
+                f"\nFound {messages.document_count} document(s) with infos only.",
+            )
 
     def handle(self, *args: Any, **options: Any) -> None:
         messages = check_sanity(
