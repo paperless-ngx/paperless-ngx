@@ -19,7 +19,7 @@ class CorrespondentFactory(DjangoModelFactory):
     class Meta:
         model = Correspondent
 
-    name = factory.Faker("company")
+    name = factory.Sequence(lambda n: f"{factory.Faker('company')} {n}")
     match = ""
     matching_algorithm = MatchingModel.MATCH_NONE
 
@@ -28,7 +28,7 @@ class DocumentTypeFactory(DjangoModelFactory):
     class Meta:
         model = DocumentType
 
-    name = factory.Faker("bs")
+    name = factory.Sequence(lambda n: f"{factory.Faker('bs')} {n}")
     match = ""
     matching_algorithm = MatchingModel.MATCH_NONE
 
@@ -37,7 +37,7 @@ class TagFactory(DjangoModelFactory):
     class Meta:
         model = Tag
 
-    name = factory.Faker("word")
+    name = factory.Sequence(lambda n: f"{factory.Faker('word')} {n}")
     match = ""
     matching_algorithm = MatchingModel.MATCH_NONE
     is_inbox_tag = False
@@ -47,7 +47,9 @@ class StoragePathFactory(DjangoModelFactory):
     class Meta:
         model = StoragePath
 
-    name = factory.Faker("file_path", depth=2, extension="")
+    name = factory.Sequence(
+        lambda n: f"{factory.Faker('file_path', depth=2, extension='')} {n}",
+    )
     path = factory.LazyAttribute(lambda o: f"{o.name}/{{title}}")
     match = ""
     matching_algorithm = MatchingModel.MATCH_NONE
