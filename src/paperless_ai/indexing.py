@@ -1,11 +1,13 @@
 import logging
 import shutil
+from collections.abc import Callable
+from collections.abc import Iterable
 from datetime import timedelta
 from pathlib import Path
+from typing import TypeVar
 
 import faiss
 import llama_index.core.settings as llama_settings
-import tqdm
 from celery import states
 from django.conf import settings
 from django.utils import timezone
@@ -28,6 +30,14 @@ from documents.models import PaperlessTask
 from paperless_ai.embedding import build_llm_index_text
 from paperless_ai.embedding import get_embedding_dim
 from paperless_ai.embedding import get_embedding_model
+
+_T = TypeVar("_T")
+IterWrapper = Callable[[Iterable[_T]], Iterable[_T]]
+
+
+def _identity(iterable: Iterable[_T]) -> Iterable[_T]:
+    return iterable
+
 
 logger = logging.getLogger("paperless_ai.indexing")
 
@@ -156,7 +166,11 @@ def vector_store_file_exists():
     return Path(settings.LLM_INDEX_DIR / "default__vector_store.json").exists()
 
 
-def update_llm_index(*, progress_bar_disable=False, rebuild=False) -> str:
+def update_llm_index(
+    *,
+    iter_wrapper: IterWrapper[Document] = _identity,
+    rebuild=False,
+) -> str:
     """
     Rebuild or update the LLM index.
     """
@@ -176,7 +190,7 @@ def update_llm_index(*, progress_bar_disable=False, rebuild=False) -> str:
         embed_model = get_embedding_model()
         llama_settings.Settings.embed_model = embed_model
         storage_context = get_or_create_storage_context(rebuild=True)
-        for document in tqdm.tqdm(documents, disable=progress_bar_disable):
+        for document in iter_wrapper(documents):
             document_nodes = build_document_node(document)
             nodes.extend(document_nodes)
 
@@ -184,7 +198,7 @@ def update_llm_index(*, progress_bar_disable=False, rebuild=False) -> str:
             nodes=nodes,
             storage_context=storage_context,
             embed_model=embed_model,
-            show_progress=not progress_bar_disable,
+            show_progress=False,
         )
         msg = "LLM index rebuilt successfully."
     else:
@@ -196,7 +210,7 @@ def update_llm_index(*, progress_bar_disable=False, rebuild=False) -> str:
             for node in index.docstore.get_nodes(all_node_ids)
         }
 
-        for document in tqdm.tqdm(documents, disable=progress_bar_disable):
+        for document in iter_wrapper(documents):
             doc_id = str(document.id)
             document_modified = document.modified.isoformat()
 
