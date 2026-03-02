@@ -36,7 +36,7 @@ extra_css = ["assets/extra.css"]
 
 [project.theme]
 
-logo = "assets/logo.svg"
+logo = "assets/logo_leaf_white.svg"
 favicon = "assets/favicon.png"
 
 language = "en"
