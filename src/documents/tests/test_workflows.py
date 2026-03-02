@@ -1786,6 +1786,89 @@ class TestWorkflows(
             ).exists(),
         )
 
+    def test_version_added_workflow_runs_on_root_document(self) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.VERSION_ADDED,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Updated by version",
+            assign_owner=self.user2,
+        )
+        workflow = Workflow.objects.create(
+            name="Version workflow",
+            order=0,
+        )
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        root_doc = Document.objects.create(
+            title="root",
+            correspondent=self.c,
+            original_filename="root.pdf",
+        )
+        version_doc = Document.objects.create(
+            title="version",
+            correspondent=self.c,
+            original_filename="version.pdf",
+            root_document=root_doc,
+        )
+
+        document_consumption_finished.send(
+            sender=self.__class__,
+            document=version_doc,
+        )
+
+        root_doc.refresh_from_db()
+        version_doc.refresh_from_db()
+
+        self.assertEqual(root_doc.title, "Updated by version")
+        self.assertEqual(root_doc.owner, self.user2)
+        self.assertIsNone(version_doc.owner)
+        self.assertEqual(
+            WorkflowRun.objects.filter(
+                workflow=workflow,
+                type=WorkflowTrigger.WorkflowTriggerType.VERSION_ADDED,
+                document=root_doc,
+            ).count(),
+            1,
+        )
+
+    def test_version_added_workflow_ignored_for_root_documents(self) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.VERSION_ADDED,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Should not run",
+        )
+        workflow = Workflow.objects.create(
+            name="Version workflow",
+            order=0,
+        )
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        root_doc = Document.objects.create(
+            title="root",
+            correspondent=self.c,
+            original_filename="root.pdf",
+        )
+
+        document_consumption_finished.send(
+            sender=self.__class__,
+            document=root_doc,
+        )
+
+        root_doc.refresh_from_db()
+
+        self.assertEqual(root_doc.title, "root")
+        self.assertFalse(
+            WorkflowRun.objects.filter(
+                workflow=workflow,
+                type=WorkflowTrigger.WorkflowTriggerType.VERSION_ADDED,
+                document=root_doc,
+            ).exists(),
+        )
+
     def test_document_updated_workflow(self) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,

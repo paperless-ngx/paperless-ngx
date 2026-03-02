@@ -120,6 +120,10 @@ export const WORKFLOW_TYPE_OPTIONS = [
     id: WorkflowTriggerType.Scheduled,
     name: $localize`Scheduled`,
   },
+  {
+    id: WorkflowTriggerType.VersionAdded,
+    name: $localize`Version Added`,
+  },
 ]
 
 export const WORKFLOW_ACTION_OPTIONS = [

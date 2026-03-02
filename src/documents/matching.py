@@ -689,6 +689,7 @@ def document_matches_workflow(
                 trigger_type == WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED
                 or trigger_type == WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED
                 or trigger_type == WorkflowTrigger.WorkflowTriggerType.SCHEDULED
+                or trigger_type == WorkflowTrigger.WorkflowTriggerType.VERSION_ADDED
             ):
                 trigger_matched, reason = existing_document_matches_workflow(
                     document,
