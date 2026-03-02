@@ -237,20 +237,30 @@ def consume_file(
 @shared_task
 def sanity_check(*, scheduled=True, raise_on_error=True):
     messages = sanity_checker.check_sanity(scheduled=scheduled)
-
     messages.log_messages()
 
+    if not messages.has_error and not messages.has_warning and not messages.has_info:
+        return "No issues detected."
+
+    parts: list[str] = []
+    if messages.document_error_count:
+        parts.append(f"{messages.document_error_count} document(s) with errors")
+    if messages.document_warning_count:
+        parts.append(f"{messages.document_warning_count} document(s) with warnings")
+    if messages.document_info_count:
+        parts.append(f"{messages.document_info_count} document(s) with infos")
+    if messages.global_warning_count:
+        parts.append(f"{messages.global_warning_count} global warning(s)")
+
+    summary = ", ".join(parts) + " found."
+
     if messages.has_error:
-        message = "Sanity check exited with errors. See log."
+        message = summary + " Check logs for details."
         if raise_on_error:
             raise SanityCheckFailedException(message)
         return message
-    elif messages.has_warning:
-        return "Sanity check exited with warnings. See log."
-    elif len(messages) > 0:
-        return "Sanity check exited with infos. See log."
-    else:
-        return "No issues detected."
+
+    return summary
 
 
 @shared_task
