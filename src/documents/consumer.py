@@ -43,6 +43,7 @@ from documents.plugins.helpers import ProgressManager
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
+from documents.signals import document_updated
 from documents.signals.handlers import run_workflows
 from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.utils import copy_basic_file_stats
@@ -645,6 +646,12 @@ class ConsumerPlugin(
                 # renaming logic to acquire the lock as well.
                 # This triggers things like file renaming
                 document.save()
+
+                if document.root_document_id:
+                    document_updated.send(
+                        sender=self.__class__,
+                        document=document.root_document,
+                    )
 
                 # Delete the file only if it was successfully consumed
                 self.log.debug(f"Deleting original file {self.input_doc.original_file}")

@@ -452,13 +452,22 @@ def check_scheduled_workflows() -> None:
 
                 match trigger.schedule_date_field:
                     case WorkflowTrigger.ScheduleDateField.ADDED:
-                        documents = Document.objects.filter(added__lte=threshold)
+                        documents = Document.objects.filter(
+                            root_document__isnull=True,
+                            added__lte=threshold,
+                        )
 
                     case WorkflowTrigger.ScheduleDateField.CREATED:
-                        documents = Document.objects.filter(created__lte=threshold)
+                        documents = Document.objects.filter(
+                            root_document__isnull=True,
+                            created__lte=threshold,
+                        )
 
                     case WorkflowTrigger.ScheduleDateField.MODIFIED:
-                        documents = Document.objects.filter(modified__lte=threshold)
+                        documents = Document.objects.filter(
+                            root_document__isnull=True,
+                            modified__lte=threshold,
+                        )
 
                     case WorkflowTrigger.ScheduleDateField.CUSTOM_FIELD:
                         # cap earliest date to avoid massive scans
@@ -496,7 +505,10 @@ def check_scheduled_workflows() -> None:
                             )
                         ]
 
-                        documents = Document.objects.filter(id__in=matched_ids)
+                        documents = Document.objects.filter(
+                            root_document__isnull=True,
+                            id__in=matched_ids,
+                        )
 
                 if documents.count() > 0:
                     documents = prefilter_documents_by_workflowtrigger(

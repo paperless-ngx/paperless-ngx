@@ -1742,6 +1742,48 @@ class TestWorkflows(
 
         self.assertEqual(doc.title, "Doc {created_year]")
 
+    def test_document_updated_workflow_ignores_version_documents(self) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        workflow = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        root_doc = Document.objects.create(
+            title="root",
+            correspondent=self.c,
+            original_filename="root.pdf",
+        )
+        version_doc = Document.objects.create(
+            title="version",
+            correspondent=self.c,
+            original_filename="version.pdf",
+            root_document=root_doc,
+        )
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, version_doc)
+
+        root_doc.refresh_from_db()
+        version_doc.refresh_from_db()
+
+        self.assertIsNone(root_doc.owner)
+        self.assertIsNone(version_doc.owner)
+        self.assertFalse(
+            WorkflowRun.objects.filter(
+                workflow=workflow,
+                type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+                document=version_doc,
+            ).exists(),
+        )
+
     def test_document_updated_workflow(self) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
@@ -2009,6 +2051,60 @@ class TestWorkflows(
 
         doc.refresh_from_db()
         self.assertEqual(doc.owner, self.user2)
+
+    def test_workflow_scheduled_trigger_ignores_version_documents(self) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            schedule_offset_days=1,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.ADDED,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        workflow = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        root_doc = Document.objects.create(
+            title="root",
+            correspondent=self.c,
+            original_filename="root.pdf",
+            added=timezone.now() - timedelta(days=10),
+        )
+        version_doc = Document.objects.create(
+            title="version",
+            correspondent=self.c,
+            original_filename="version.pdf",
+            root_document=root_doc,
+            added=timezone.now() - timedelta(days=10),
+        )
+
+        tasks.check_scheduled_workflows()
+
+        root_doc.refresh_from_db()
+        version_doc.refresh_from_db()
+
+        self.assertEqual(root_doc.owner, self.user2)
+        self.assertIsNone(version_doc.owner)
+        self.assertEqual(
+            WorkflowRun.objects.filter(
+                workflow=workflow,
+                type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+                document=root_doc,
+            ).count(),
+            1,
+        )
+        self.assertFalse(
+            WorkflowRun.objects.filter(
+                workflow=workflow,
+                type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+                document=version_doc,
+            ).exists(),
+        )
 
     @mock.patch("documents.models.Document.objects.filter", autospec=True)
     def test_workflow_scheduled_trigger_modified(self, mock_filter) -> None:

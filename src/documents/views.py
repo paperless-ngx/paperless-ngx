@@ -1758,6 +1758,11 @@ class DocumentViewSet(
             .order_by("-id")
             .first()
         )
+
+        document_updated.send(
+            sender=self.__class__,
+            document=root_doc,
+        )
         return Response(
             {
                 "result": "OK",
@@ -1826,6 +1831,11 @@ class DocumentViewSet(
                     "version_id": version_doc.id,
                 },
             )
+
+        document_updated.send(
+            sender=self.__class__,
+            document=root_doc,
+        )
 
         return Response(
             {
