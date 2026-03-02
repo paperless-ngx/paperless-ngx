@@ -71,8 +71,8 @@ class Command(PaperlessCommand):
                 )
                 table.add_row(
                     Text(label, style=style),
-                    doc_label,
-                    msg["message"],
+                    Text(doc_label),
+                    Text(str(msg["message"])),
                 )
 
         console.print(table)

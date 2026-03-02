@@ -226,7 +226,7 @@ def _check_archive(
         except OSError as e:
             messages.error(
                 doc.pk,
-                f"Cannot read archive file of document : {e}",
+                f"Cannot read archive file of document: {e}",
             )
         else:
             if checksum != doc.archive_checksum:
