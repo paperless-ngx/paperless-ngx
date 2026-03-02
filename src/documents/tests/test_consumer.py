@@ -762,7 +762,7 @@ class TestConsumer(
         )
         consumer.setup()
         try:
-            self.assertTrue(consumer.filename.endswith("_v0.pdf"))
+            self.assertEqual(consumer.filename, version_file.name)
             consumer.run()
         finally:
             consumer.cleanup()
@@ -772,8 +772,9 @@ class TestConsumer(
         version = versions.first()
         assert version is not None
         assert version.original_filename is not None
+        self.assertEqual(version.version_index, 1)
         self.assertEqual(version.version_label, "v2")
-        self.assertTrue(version.original_filename.endswith("_v0.pdf"))
+        self.assertEqual(version.original_filename, version_file.name)
         self.assertTrue(bool(version.content))
 
     @override_settings(AUDIT_LOG_ENABLED=True)
@@ -822,7 +823,7 @@ class TestConsumer(
         )
         consumer.setup()
         try:
-            self.assertEqual(consumer.filename, "valid_pdf_version-upload_v0")
+            self.assertEqual(consumer.filename, "valid_pdf_version-upload")
             consumer.run()
         finally:
             consumer.cleanup()
@@ -832,7 +833,8 @@ class TestConsumer(
         )
         self.assertIsNotNone(version)
         assert version is not None
-        self.assertEqual(version.original_filename, "valid_pdf_version-upload_v0")
+        self.assertEqual(version.version_index, 1)
+        self.assertEqual(version.original_filename, "valid_pdf_version-upload")
         self.assertTrue(bool(version.content))
 
     @mock.patch("documents.consumer.load_classifier")

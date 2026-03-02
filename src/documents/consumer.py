@@ -11,6 +11,7 @@ import magic
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.db.models import Max
 from django.db.models import Q
 from django.utils import timezone
 from filelock import FileLock
@@ -124,22 +125,6 @@ class ConsumerPluginMixin:
 
         self.filename = self.metadata.filename or self.input_doc.original_file.name
 
-        if input_doc.root_document_id:
-            self.log.debug(
-                f"Document root document id: {input_doc.root_document_id}",
-            )
-            root_document = Document.objects.get(pk=input_doc.root_document_id)
-            version_index = Document.objects.filter(root_document=root_document).count()
-            filename_path = Path(self.filename)
-            if filename_path.suffix:
-                self.filename = str(
-                    filename_path.with_name(
-                        f"{filename_path.stem}_v{version_index}{filename_path.suffix}",
-                    ),
-                )
-            else:
-                self.filename = f"{self.filename}_v{version_index}"
-
     def _send_progress(
         self,
         current_progress: int,
@@ -194,9 +179,19 @@ class ConsumerPlugin(
         mime_type: str,
     ) -> Document:
         self.log.debug("Saving record for updated version to database")
-        version_doc = Document.objects.get(pk=root_doc.pk)
+        root_doc_frozen = Document.objects.select_for_update().get(pk=root_doc.pk)
+        next_version_index = (
+            Document.global_objects.filter(
+                root_document_id=root_doc_frozen.pk,
+            ).aggregate(
+                max_index=Max("version_index"),
+            )["max_index"]
+            or 0
+        )
+        version_doc = Document.objects.get(pk=root_doc_frozen.pk)
         setattr(version_doc, "pk", None)
-        version_doc.root_document = root_doc
+        version_doc.root_document = root_doc_frozen
+        version_doc.version_index = next_version_index + 1
         file_for_checksum = (
             self.unmodified_original
             if self.unmodified_original is not None
@@ -209,7 +204,7 @@ class ConsumerPlugin(
         version_doc.page_count = page_count
         version_doc.mime_type = mime_type
         version_doc.original_filename = self.filename
-        version_doc.storage_path = root_doc.storage_path
+        version_doc.storage_path = root_doc_frozen.storage_path
         # Clear unique file path fields so they can be generated uniquely later
         version_doc.filename = None
         version_doc.archive_filename = None
