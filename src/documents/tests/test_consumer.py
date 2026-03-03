@@ -633,8 +633,12 @@ class TestConsumer(
 
         self._assert_first_last_send_progress()
 
-    @override_settings(FILENAME_FORMAT="a" * 1100)
-    def testFilenameHandlingFallsBackWhenGeneratedPathExceedsDbLimit(self):
+    @mock.patch("documents.consumer.generate_unique_filename")
+    def testFilenameHandlingFallsBackWhenGeneratedPathExceedsDbLimit(self, m):
+        m.side_effect = lambda doc, archive_filename=False: Path(
+            ("a" * 1100 + ".pdf") if not archive_filename else ("b" * 1100 + ".pdf"),
+        )
+
         with self.get_consumer(
             self.get_test_file(),
             DocumentMetadataOverrides(title="new docs"),
