@@ -462,6 +462,10 @@ def update_filename_and_move_files(
             old_source_path = instance.source_path
             move_original = False
 
+            old_archive_filename = instance.archive_filename
+            old_archive_path = instance.archive_path
+            move_archive = False
+
             candidate_filename = generate_filename(instance)
             if len(str(candidate_filename)) > Document.MAX_STORED_FILENAME_LENGTH:
                 msg = (
@@ -489,10 +493,6 @@ def update_filename_and_move_files(
             # Need to convert to string to be able to save it to the db
             instance.filename = str(new_filename)
             move_original = old_filename != instance.filename
-
-            old_archive_filename = instance.archive_filename
-            old_archive_path = instance.archive_path
-            move_archive = False
 
             if instance.has_archive_version:
                 archive_candidate = generate_filename(instance, archive_filename=True)
