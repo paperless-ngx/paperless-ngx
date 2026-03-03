@@ -59,6 +59,7 @@ if TYPE_CHECKING:
     from documents.data_models import DocumentMetadataOverrides
 
 logger = logging.getLogger("paperless.handlers")
+MAX_STORED_FILENAME_LENGTH = 1024
 
 
 def add_inbox_tags(sender, document: Document, logging_group=None, **kwargs):
@@ -460,8 +461,18 @@ def update_filename_and_move_files(
 
             old_filename = instance.filename
             old_source_path = instance.source_path
+            move_original = False
 
             candidate_filename = generate_filename(instance)
+            if len(str(candidate_filename)) > MAX_STORED_FILENAME_LENGTH:
+                msg = (
+                    f"Document {instance!s}: Generated filename exceeds db path "
+                    f"limit ({len(str(candidate_filename))} > "
+                    f"{MAX_STORED_FILENAME_LENGTH}): {candidate_filename!s}"
+                )
+                logger.warning(msg)
+                raise CannotMoveFilesException(msg)
+
             candidate_source_path = (
                 settings.ORIGINALS_DIR / candidate_filename
             ).resolve()
@@ -482,9 +493,18 @@ def update_filename_and_move_files(
 
             old_archive_filename = instance.archive_filename
             old_archive_path = instance.archive_path
+            move_archive = False
 
             if instance.has_archive_version:
                 archive_candidate = generate_filename(instance, archive_filename=True)
+                if len(str(archive_candidate)) > MAX_STORED_FILENAME_LENGTH:
+                    msg = (
+                        f"Document {instance!s}: Generated archive filename exceeds "
+                        f"db path limit ({len(str(archive_candidate))} > "
+                        f"{MAX_STORED_FILENAME_LENGTH}): {archive_candidate!s}"
+                    )
+                    logger.warning(msg)
+                    raise CannotMoveFilesException(msg)
                 archive_candidate_path = (
                     settings.ARCHIVE_DIR / archive_candidate
                 ).resolve()
