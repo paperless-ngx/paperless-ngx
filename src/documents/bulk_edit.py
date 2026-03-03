@@ -26,7 +26,6 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.permissions import set_permissions_for_object
 from documents.plugins.helpers import DocumentsStatusManager
-from documents.serialisers import SourceModeChoices
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
 from documents.tasks import update_document_content_maybe_archive_file
@@ -37,6 +36,13 @@ if TYPE_CHECKING:
     from django.contrib.auth.models import User
 
 logger: logging.Logger = logging.getLogger("paperless.bulk_edit")
+
+SourceMode = Literal["latest_version", "explicit_selection"]
+
+
+class SourceModeChoices:
+    LATEST_VERSION: SourceMode = "latest_version"
+    EXPLICIT_SELECTION: SourceMode = "explicit_selection"
 
 
 @shared_task(bind=True)
@@ -109,12 +115,14 @@ def _get_root_and_current_docs_by_root_id(
 def _resolve_root_and_source_doc(
     doc: Document,
     *,
-    source_mode: SourceModeChoices = SourceModeChoices.LATEST_VERSION,
+    source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
 ) -> tuple[Document, Document]:
     root_doc = get_root_document(doc)
 
     if source_mode == SourceModeChoices.EXPLICIT_SELECTION:
         return root_doc, doc
+    if source_mode != SourceModeChoices.LATEST_VERSION:
+        raise ValueError(f"Unsupported source mode: {source_mode}")
 
     # Version IDs are explicit by default, only a selected root resolves to latest
     if doc.root_document_id is not None:
@@ -430,7 +438,7 @@ def rotate(
     doc_ids: list[int],
     degrees: int,
     *,
-    source_mode: SourceModeChoices = SourceModeChoices.LATEST_VERSION,
+    source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
 ) -> Literal["OK"]:
     logger.info(
@@ -679,7 +687,7 @@ def delete_pages(
     doc_ids: list[int],
     pages: list[int],
     *,
-    source_mode: SourceModeChoices = SourceModeChoices.LATEST_VERSION,
+    source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
 ) -> Literal["OK"]:
     logger.info(
@@ -734,7 +742,7 @@ def edit_pdf(
     delete_original: bool = False,
     update_document: bool = False,
     include_metadata: bool = True,
-    source_mode: SourceModeChoices = SourceModeChoices.LATEST_VERSION,
+    source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
 ) -> Literal["OK"]:
     """
@@ -863,7 +871,7 @@ def remove_password(
     update_document: bool = False,
     delete_original: bool = False,
     include_metadata: bool = True,
-    source_mode: SourceModeChoices = SourceModeChoices.LATEST_VERSION,
+    source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
 ) -> Literal["OK"]:
     """

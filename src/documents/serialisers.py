@@ -1517,11 +1517,6 @@ class DocumentListSerializer(serializers.Serializer):
         return documents
 
 
-class SourceModeChoices:
-    LATEST_VERSION = "latest_version"
-    EXPLICIT_SELECTION = "explicit_selection"
-
-
 class BulkEditSerializer(
     SerializerWithPerms,
     DocumentListSerializer,
@@ -1729,11 +1724,11 @@ class BulkEditSerializer(
             raise serializers.ValidationError("invalid rotation degrees")
 
     def _validate_source_mode(self, parameters) -> None:
-        source_mode = parameters.get("source_mode", SourceModeChoices.LATEST_VERSION)
-        if source_mode not in {
-            SourceModeChoices.LATEST_VERSION,
-            SourceModeChoices.EXPLICIT_SELECTION,
-        }:
+        source_mode = parameters.get(
+            "source_mode",
+            bulk_edit.SourceModeChoices.LATEST_VERSION,
+        )
+        if source_mode not in bulk_edit.SourceModeChoices.__dict__.values():
             raise serializers.ValidationError("Invalid source_mode")
         parameters["source_mode"] = source_mode
 
