@@ -451,6 +451,419 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name="CustomFieldInstance",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("deleted_at", models.DateTimeField(blank=True, null=True)),
+                ("restored_at", models.DateTimeField(blank=True, null=True)),
+                ("transaction_id", models.UUIDField(blank=True, null=True)),
+                (
+                    "created",
+                    models.DateTimeField(
+                        db_index=True,
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="created",
+                    ),
+                ),
+                ("value_text", models.CharField(max_length=128, null=True)),
+                ("value_bool", models.BooleanField(null=True)),
+                ("value_url", models.URLField(null=True)),
+                ("value_date", models.DateField(null=True)),
+                ("value_int", models.IntegerField(null=True)),
+                ("value_float", models.FloatField(null=True)),
+                ("value_monetary", models.CharField(max_length=128, null=True)),
+                (
+                    "value_monetary_amount",
+                    models.GeneratedField(
+                        db_persist=True,
+                        expression=models.Case(
+                            models.When(
+                                then=django.db.models.functions.comparison.Cast(
+                                    django.db.models.functions.text.Substr(
+                                        "value_monetary",
+                                        1,
+                                    ),
+                                    output_field=models.DecimalField(
+                                        decimal_places=2,
+                                        max_digits=65,
+                                    ),
+                                ),
+                                value_monetary__regex="^\\d+",
+                            ),
+                            default=django.db.models.functions.comparison.Cast(
+                                django.db.models.functions.text.Substr(
+                                    "value_monetary",
+                                    4,
+                                ),
+                                output_field=models.DecimalField(
+                                    decimal_places=2,
+                                    max_digits=65,
+                                ),
+                            ),
+                            output_field=models.DecimalField(
+                                decimal_places=2,
+                                max_digits=65,
+                            ),
+                        ),
+                        output_field=models.DecimalField(
+                            decimal_places=2,
+                            max_digits=65,
+                        ),
+                    ),
+                ),
+                ("value_document_ids", models.JSONField(null=True)),
+                ("value_select", models.CharField(max_length=16, null=True)),
+                ("value_long_text", models.TextField(null=True)),
+                (
+                    "field",
+                    models.ForeignKey(
+                        editable=False,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="fields",
+                        to="documents.customfield",
+                    ),
+                ),
+                (
+                    "document",
+                    models.ForeignKey(
+                        editable=False,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="custom_fields",
+                        to="documents.document",
+                    ),
+                ),
+            ],
+            options={
+                "verbose_name": "custom field instance",
+                "verbose_name_plural": "custom field instances",
+                "ordering": ("created",),
+            },
+        ),
+        migrations.CreateModel(
+            name="DocumentType",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=128, verbose_name="name")),
+                (
+                    "match",
+                    models.CharField(blank=True, max_length=256, verbose_name="match"),
+                ),
+                (
+                    "matching_algorithm",
+                    models.PositiveIntegerField(
+                        choices=[
+                            (0, "None"),
+                            (1, "Any word"),
+                            (2, "All words"),
+                            (3, "Exact match"),
+                            (4, "Regular expression"),
+                            (5, "Fuzzy word"),
+                            (6, "Automatic"),
+                        ],
+                        default=1,
+                        verbose_name="matching algorithm",
+                    ),
+                ),
+                (
+                    "is_insensitive",
+                    models.BooleanField(default=True, verbose_name="is insensitive"),
+                ),
+                (
+                    "owner",
+                    models.ForeignKey(
+                        blank=True,
+                        default=None,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="owner",
+                    ),
+                ),
+            ],
+            options={
+                "verbose_name": "document type",
+                "verbose_name_plural": "document types",
+                "ordering": ("name",),
+                "abstract": False,
+            },
+        ),
+        migrations.CreateModel(
+            name="StoragePath",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=128, verbose_name="name")),
+                (
+                    "match",
+                    models.CharField(blank=True, max_length=256, verbose_name="match"),
+                ),
+                (
+                    "matching_algorithm",
+                    models.PositiveIntegerField(
+                        choices=[
+                            (0, "None"),
+                            (1, "Any word"),
+                            (2, "All words"),
+                            (3, "Exact match"),
+                            (4, "Regular expression"),
+                            (5, "Fuzzy word"),
+                            (6, "Automatic"),
+                        ],
+                        default=1,
+                        verbose_name="matching algorithm",
+                    ),
+                ),
+                (
+                    "is_insensitive",
+                    models.BooleanField(default=True, verbose_name="is insensitive"),
+                ),
+                ("path", models.TextField(verbose_name="path")),
+                (
+                    "owner",
+                    models.ForeignKey(
+                        blank=True,
+                        default=None,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="owner",
+                    ),
+                ),
+            ],
+            options={
+                "verbose_name": "storage path",
+                "verbose_name_plural": "storage paths",
+                "ordering": ("name",),
+                "abstract": False,
+            },
+        ),
+        migrations.CreateModel(
+            name="Tag",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "tn_ancestors_pks",
+                    models.TextField(
+                        blank=True,
+                        default="",
+                        editable=False,
+                        verbose_name="Ancestors pks",
+                    ),
+                ),
+                (
+                    "tn_ancestors_count",
+                    models.PositiveIntegerField(
+                        default=0,
+                        editable=False,
+                        verbose_name="Ancestors count",
+                    ),
+                ),
+                (
+                    "tn_children_pks",
+                    models.TextField(
+                        blank=True,
+                        default="",
+                        editable=False,
+                        verbose_name="Children pks",
+                    ),
+                ),
+                (
+                    "tn_children_count",
+                    models.PositiveIntegerField(
+                        default=0,
+                        editable=False,
+                        verbose_name="Children count",
+                    ),
+                ),
+                (
+                    "tn_depth",
+                    models.PositiveIntegerField(
+                        default=0,
+                        editable=False,
+                        validators=[
+                            django.core.validators.MinValueValidator(0),
+                            django.core.validators.MaxValueValidator(10),
+                        ],
+                        verbose_name="Depth",
+                    ),
+                ),
+                (
+                    "tn_descendants_pks",
+                    models.TextField(
+                        blank=True,
+                        default="",
+                        editable=False,
+                        verbose_name="Descendants pks",
+                    ),
+                ),
+                (
+                    "tn_descendants_count",
+                    models.PositiveIntegerField(
+                        default=0,
+                        editable=False,
+                        verbose_name="Descendants count",
+                    ),
+                ),
+                (
+                    "tn_index",
+                    models.PositiveIntegerField(
+                        default=0,
+                        editable=False,
+                        verbose_name="Index",
+                    ),
+                ),
+                (
+                    "tn_level",
+                    models.PositiveIntegerField(
+                        default=1,
+                        editable=False,
+                        validators=[
+                            django.core.validators.MinValueValidator(1),
+                            django.core.validators.MaxValueValidator(10),
+                        ],
+                        verbose_name="Level",
+                    ),
+                ),
+                (
+                    "tn_priority",
+                    models.PositiveIntegerField(
+                        default=0,
+                        validators=[
+                            django.core.validators.MinValueValidator(0),
+                            django.core.validators.MaxValueValidator(9999999999),
+                        ],
+                        verbose_name="Priority",
+                    ),
+                ),
+                (
+                    "tn_order",
+                    models.PositiveIntegerField(
+                        default=0,
+                        editable=False,
+                        verbose_name="Order",
+                    ),
+                ),
+                (
+                    "tn_siblings_pks",
+                    models.TextField(
+                        blank=True,
+                        default="",
+                        editable=False,
+                        verbose_name="Siblings pks",
+                    ),
+                ),
+                (
+                    "tn_siblings_count",
+                    models.PositiveIntegerField(
+                        default=0,
+                        editable=False,
+                        verbose_name="Siblings count",
+                    ),
+                ),
+                ("name", models.CharField(max_length=128, verbose_name="name")),
+                (
+                    "match",
+                    models.CharField(blank=True, max_length=256, verbose_name="match"),
+                ),
+                (
+                    "matching_algorithm",
+                    models.PositiveIntegerField(
+                        choices=[
+                            (0, "None"),
+                            (1, "Any word"),
+                            (2, "All words"),
+                            (3, "Exact match"),
+                            (4, "Regular expression"),
+                            (5, "Fuzzy word"),
+                            (6, "Automatic"),
+                        ],
+                        default=1,
+                        verbose_name="matching algorithm",
+                    ),
+                ),
+                (
+                    "is_insensitive",
+                    models.BooleanField(default=True, verbose_name="is insensitive"),
+                ),
+                (
+                    "color",
+                    models.CharField(
+                        default="#a6cee3",
+                        max_length=7,
+                        verbose_name="color",
+                    ),
+                ),
+                (
+                    "is_inbox_tag",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags.",
+                        verbose_name="is inbox tag",
+                    ),
+                ),
+                (
+                    "owner",
+                    models.ForeignKey(
+                        blank=True,
+                        default=None,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="owner",
+                    ),
+                ),
+                (
+                    "tn_parent",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="tn_children",
+                        to="documents.tag",
+                        verbose_name="Parent",
+                    ),
+                ),
+            ],
+            options={
+                "verbose_name": "tag",
+                "verbose_name_plural": "tags",
+                "ordering": ("name",),
+                "abstract": False,
+            },
+        ),
+        migrations.CreateModel(
             name="Document",
             fields=[
                 (
@@ -620,6 +1033,28 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
+                    "document_type",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="documents",
+                        to="documents.documenttype",
+                        verbose_name="document type",
+                    ),
+                ),
+                (
+                    "storage_path",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="documents",
+                        to="documents.storagepath",
+                        verbose_name="storage path",
+                    ),
+                ),
+                (
                     "owner",
                     models.ForeignKey(
                         blank=True,
@@ -637,170 +1072,14 @@ class Migration(migrations.Migration):
                 "ordering": ("-created",),
             },
         ),
-        migrations.CreateModel(
-            name="CustomFieldInstance",
-            fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                ("deleted_at", models.DateTimeField(blank=True, null=True)),
-                ("restored_at", models.DateTimeField(blank=True, null=True)),
-                ("transaction_id", models.UUIDField(blank=True, null=True)),
-                (
-                    "created",
-                    models.DateTimeField(
-                        db_index=True,
-                        default=django.utils.timezone.now,
-                        editable=False,
-                        verbose_name="created",
-                    ),
-                ),
-                ("value_text", models.CharField(max_length=128, null=True)),
-                ("value_bool", models.BooleanField(null=True)),
-                ("value_url", models.URLField(null=True)),
-                ("value_date", models.DateField(null=True)),
-                ("value_int", models.IntegerField(null=True)),
-                ("value_float", models.FloatField(null=True)),
-                ("value_monetary", models.CharField(max_length=128, null=True)),
-                (
-                    "value_monetary_amount",
-                    models.GeneratedField(
-                        db_persist=True,
-                        expression=models.Case(
-                            models.When(
-                                then=django.db.models.functions.comparison.Cast(
-                                    django.db.models.functions.text.Substr(
-                                        "value_monetary",
-                                        1,
-                                    ),
-                                    output_field=models.DecimalField(
-                                        decimal_places=2,
-                                        max_digits=65,
-                                    ),
-                                ),
-                                value_monetary__regex="^\\d+",
-                            ),
-                            default=django.db.models.functions.comparison.Cast(
-                                django.db.models.functions.text.Substr(
-                                    "value_monetary",
-                                    4,
-                                ),
-                                output_field=models.DecimalField(
-                                    decimal_places=2,
-                                    max_digits=65,
-                                ),
-                            ),
-                            output_field=models.DecimalField(
-                                decimal_places=2,
-                                max_digits=65,
-                            ),
-                        ),
-                        output_field=models.DecimalField(
-                            decimal_places=2,
-                            max_digits=65,
-                        ),
-                    ),
-                ),
-                ("value_document_ids", models.JSONField(null=True)),
-                ("value_select", models.CharField(max_length=16, null=True)),
-                ("value_long_text", models.TextField(null=True)),
-                (
-                    "field",
-                    models.ForeignKey(
-                        editable=False,
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name="fields",
-                        to="documents.customfield",
-                    ),
-                ),
-                (
-                    "document",
-                    models.ForeignKey(
-                        editable=False,
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name="custom_fields",
-                        to="documents.document",
-                    ),
-                ),
-            ],
-            options={
-                "verbose_name": "custom field instance",
-                "verbose_name_plural": "custom field instances",
-                "ordering": ("created",),
-            },
-        ),
-        migrations.CreateModel(
-            name="DocumentType",
-            fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                ("name", models.CharField(max_length=128, verbose_name="name")),
-                (
-                    "match",
-                    models.CharField(blank=True, max_length=256, verbose_name="match"),
-                ),
-                (
-                    "matching_algorithm",
-                    models.PositiveIntegerField(
-                        choices=[
-                            (0, "None"),
-                            (1, "Any word"),
-                            (2, "All words"),
-                            (3, "Exact match"),
-                            (4, "Regular expression"),
-                            (5, "Fuzzy word"),
-                            (6, "Automatic"),
-                        ],
-                        default=1,
-                        verbose_name="matching algorithm",
-                    ),
-                ),
-                (
-                    "is_insensitive",
-                    models.BooleanField(default=True, verbose_name="is insensitive"),
-                ),
-                (
-                    "owner",
-                    models.ForeignKey(
-                        blank=True,
-                        default=None,
-                        null=True,
-                        on_delete=django.db.models.deletion.SET_NULL,
-                        to=settings.AUTH_USER_MODEL,
-                        verbose_name="owner",
-                    ),
-                ),
-            ],
-            options={
-                "verbose_name": "document type",
-                "verbose_name_plural": "document types",
-                "ordering": ("name",),
-                "abstract": False,
-            },
-        ),
         migrations.AddField(
             model_name="document",
-            name="document_type",
-            field=models.ForeignKey(
+            name="tags",
+            field=models.ManyToManyField(
                 blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.SET_NULL,
                 related_name="documents",
-                to="documents.documenttype",
-                verbose_name="document type",
+                to="documents.tag",
+                verbose_name="tags",
             ),
         ),
         migrations.CreateModel(
@@ -1253,287 +1532,6 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "share links",
                 "ordering": ("created",),
             },
-        ),
-        migrations.CreateModel(
-            name="StoragePath",
-            fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                ("name", models.CharField(max_length=128, verbose_name="name")),
-                (
-                    "match",
-                    models.CharField(blank=True, max_length=256, verbose_name="match"),
-                ),
-                (
-                    "matching_algorithm",
-                    models.PositiveIntegerField(
-                        choices=[
-                            (0, "None"),
-                            (1, "Any word"),
-                            (2, "All words"),
-                            (3, "Exact match"),
-                            (4, "Regular expression"),
-                            (5, "Fuzzy word"),
-                            (6, "Automatic"),
-                        ],
-                        default=1,
-                        verbose_name="matching algorithm",
-                    ),
-                ),
-                (
-                    "is_insensitive",
-                    models.BooleanField(default=True, verbose_name="is insensitive"),
-                ),
-                ("path", models.TextField(verbose_name="path")),
-                (
-                    "owner",
-                    models.ForeignKey(
-                        blank=True,
-                        default=None,
-                        null=True,
-                        on_delete=django.db.models.deletion.SET_NULL,
-                        to=settings.AUTH_USER_MODEL,
-                        verbose_name="owner",
-                    ),
-                ),
-            ],
-            options={
-                "verbose_name": "storage path",
-                "verbose_name_plural": "storage paths",
-                "ordering": ("name",),
-                "abstract": False,
-            },
-        ),
-        migrations.AddField(
-            model_name="document",
-            name="storage_path",
-            field=models.ForeignKey(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.SET_NULL,
-                related_name="documents",
-                to="documents.storagepath",
-                verbose_name="storage path",
-            ),
-        ),
-        migrations.CreateModel(
-            name="Tag",
-            fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                (
-                    "tn_ancestors_pks",
-                    models.TextField(
-                        blank=True,
-                        default="",
-                        editable=False,
-                        verbose_name="Ancestors pks",
-                    ),
-                ),
-                (
-                    "tn_ancestors_count",
-                    models.PositiveIntegerField(
-                        default=0,
-                        editable=False,
-                        verbose_name="Ancestors count",
-                    ),
-                ),
-                (
-                    "tn_children_pks",
-                    models.TextField(
-                        blank=True,
-                        default="",
-                        editable=False,
-                        verbose_name="Children pks",
-                    ),
-                ),
-                (
-                    "tn_children_count",
-                    models.PositiveIntegerField(
-                        default=0,
-                        editable=False,
-                        verbose_name="Children count",
-                    ),
-                ),
-                (
-                    "tn_depth",
-                    models.PositiveIntegerField(
-                        default=0,
-                        editable=False,
-                        validators=[
-                            django.core.validators.MinValueValidator(0),
-                            django.core.validators.MaxValueValidator(10),
-                        ],
-                        verbose_name="Depth",
-                    ),
-                ),
-                (
-                    "tn_descendants_pks",
-                    models.TextField(
-                        blank=True,
-                        default="",
-                        editable=False,
-                        verbose_name="Descendants pks",
-                    ),
-                ),
-                (
-                    "tn_descendants_count",
-                    models.PositiveIntegerField(
-                        default=0,
-                        editable=False,
-                        verbose_name="Descendants count",
-                    ),
-                ),
-                (
-                    "tn_index",
-                    models.PositiveIntegerField(
-                        default=0,
-                        editable=False,
-                        verbose_name="Index",
-                    ),
-                ),
-                (
-                    "tn_level",
-                    models.PositiveIntegerField(
-                        default=1,
-                        editable=False,
-                        validators=[
-                            django.core.validators.MinValueValidator(1),
-                            django.core.validators.MaxValueValidator(10),
-                        ],
-                        verbose_name="Level",
-                    ),
-                ),
-                (
-                    "tn_priority",
-                    models.PositiveIntegerField(
-                        default=0,
-                        validators=[
-                            django.core.validators.MinValueValidator(0),
-                            django.core.validators.MaxValueValidator(9999999999),
-                        ],
-                        verbose_name="Priority",
-                    ),
-                ),
-                (
-                    "tn_order",
-                    models.PositiveIntegerField(
-                        default=0,
-                        editable=False,
-                        verbose_name="Order",
-                    ),
-                ),
-                (
-                    "tn_siblings_pks",
-                    models.TextField(
-                        blank=True,
-                        default="",
-                        editable=False,
-                        verbose_name="Siblings pks",
-                    ),
-                ),
-                (
-                    "tn_siblings_count",
-                    models.PositiveIntegerField(
-                        default=0,
-                        editable=False,
-                        verbose_name="Siblings count",
-                    ),
-                ),
-                ("name", models.CharField(max_length=128, verbose_name="name")),
-                (
-                    "match",
-                    models.CharField(blank=True, max_length=256, verbose_name="match"),
-                ),
-                (
-                    "matching_algorithm",
-                    models.PositiveIntegerField(
-                        choices=[
-                            (0, "None"),
-                            (1, "Any word"),
-                            (2, "All words"),
-                            (3, "Exact match"),
-                            (4, "Regular expression"),
-                            (5, "Fuzzy word"),
-                            (6, "Automatic"),
-                        ],
-                        default=1,
-                        verbose_name="matching algorithm",
-                    ),
-                ),
-                (
-                    "is_insensitive",
-                    models.BooleanField(default=True, verbose_name="is insensitive"),
-                ),
-                (
-                    "color",
-                    models.CharField(
-                        default="#a6cee3",
-                        max_length=7,
-                        verbose_name="color",
-                    ),
-                ),
-                (
-                    "is_inbox_tag",
-                    models.BooleanField(
-                        default=False,
-                        help_text="Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags.",
-                        verbose_name="is inbox tag",
-                    ),
-                ),
-                (
-                    "owner",
-                    models.ForeignKey(
-                        blank=True,
-                        default=None,
-                        null=True,
-                        on_delete=django.db.models.deletion.SET_NULL,
-                        to=settings.AUTH_USER_MODEL,
-                        verbose_name="owner",
-                    ),
-                ),
-                (
-                    "tn_parent",
-                    models.ForeignKey(
-                        blank=True,
-                        null=True,
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name="tn_children",
-                        to="documents.tag",
-                        verbose_name="Parent",
-                    ),
-                ),
-            ],
-            options={
-                "verbose_name": "tag",
-                "verbose_name_plural": "tags",
-                "ordering": ("name",),
-                "abstract": False,
-            },
-        ),
-        migrations.AddField(
-            model_name="document",
-            name="tags",
-            field=models.ManyToManyField(
-                blank=True,
-                related_name="documents",
-                to="documents.tag",
-                verbose_name="tags",
-            ),
         ),
         migrations.CreateModel(
             name="UiSettings",
