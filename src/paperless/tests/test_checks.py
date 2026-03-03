@@ -3,6 +3,7 @@ from pathlib import Path
 from unittest import mock
 
 import pytest
+from django.core.checks import Error
 from django.core.checks import Warning
 from django.test import TestCase
 from django.test import override_settings
@@ -13,6 +14,7 @@ from documents.tests.utils import FileSystemAssertsMixin
 from paperless.checks import audit_log_check
 from paperless.checks import binaries_check
 from paperless.checks import check_deprecated_db_settings
+from paperless.checks import check_v3_minimum_upgrade_version
 from paperless.checks import debug_mode_check
 from paperless.checks import paths_check
 from paperless.checks import settings_values_check
@@ -395,3 +397,240 @@ class TestDeprecatedDbSettings:
 
         assert len(result) == 1
         assert "PAPERLESS_DBSSLCERT" in result[0].msg
+
+
+class TestV3MinimumUpgradeVersionCheck:
+    """Test suite for check_v3_minimum_upgrade_version system check."""
+
+    @pytest.fixture
+    def build_conn_mock(self, mocker: MockerFixture):
+        """Factory fixture that builds a connections['default'] mock.
+
+        Usage::
+
+            conn = build_conn_mock(tables=["django_migrations"], applied=["1075_..."])
+        """
+
+        def _build(tables: list[str], applied: list[str]) -> mock.MagicMock:
+            conn = mocker.MagicMock()
+            conn.introspection.table_names.return_value = tables
+            cursor = conn.cursor.return_value.__enter__.return_value
+            cursor.fetchall.return_value = [(name,) for name in applied]
+            return conn
+
+        return _build
+
+    def test_no_migrations_table_fresh_install(
+        self,
+        mocker: MockerFixture,
+        build_conn_mock,
+    ) -> None:
+        """
+        GIVEN:
+            - No django_migrations table exists in the database
+        WHEN:
+            - The v3 upgrade check runs
+        THEN:
+            - No errors are reported (fresh install, nothing to enforce)
+        """
+        mocker.patch.dict(
+            "paperless.checks.connections",
+            {"default": build_conn_mock([], [])},
+        )
+        assert check_v3_minimum_upgrade_version(None) == []
+
+    def test_no_documents_migrations_fresh_install(
+        self,
+        mocker: MockerFixture,
+        build_conn_mock,
+    ) -> None:
+        """
+        GIVEN:
+            - django_migrations table exists but has no documents app rows
+        WHEN:
+            - The v3 upgrade check runs
+        THEN:
+            - No errors are reported (fresh install, nothing to enforce)
+        """
+        mocker.patch.dict(
+            "paperless.checks.connections",
+            {"default": build_conn_mock(["django_migrations"], [])},
+        )
+        assert check_v3_minimum_upgrade_version(None) == []
+
+    def test_v3_state_with_0001_squashed(
+        self,
+        mocker: MockerFixture,
+        build_conn_mock,
+    ) -> None:
+        """
+        GIVEN:
+            - 0001_squashed is recorded in django_migrations
+        WHEN:
+            - The v3 upgrade check runs
+        THEN:
+            - No errors are reported (DB is already in a valid v3 state)
+        """
+        mocker.patch.dict(
+            "paperless.checks.connections",
+            {
+                "default": build_conn_mock(
+                    ["django_migrations"],
+                    ["0001_squashed", "0002_squashed", "0003_workflowaction_order"],
+                ),
+            },
+        )
+        assert check_v3_minimum_upgrade_version(None) == []
+
+    def test_v3_state_with_0002_squashed_only(
+        self,
+        mocker: MockerFixture,
+        build_conn_mock,
+    ) -> None:
+        """
+        GIVEN:
+            - Only 0002_squashed is recorded in django_migrations
+        WHEN:
+            - The v3 upgrade check runs
+        THEN:
+            - No errors are reported (0002_squashed alone confirms a valid v3 state)
+        """
+        mocker.patch.dict(
+            "paperless.checks.connections",
+            {"default": build_conn_mock(["django_migrations"], ["0002_squashed"])},
+        )
+        assert check_v3_minimum_upgrade_version(None) == []
+
+    def test_v2_20_9_state_ready_to_upgrade(
+        self,
+        mocker: MockerFixture,
+        build_conn_mock,
+    ) -> None:
+        """
+        GIVEN:
+            - 1075_workflowaction_order (the last v2.20.9 migration) is in the DB
+        WHEN:
+            - The v3 upgrade check runs
+        THEN:
+            - No errors are reported (squash will pick up cleanly from this state)
+        """
+        mocker.patch.dict(
+            "paperless.checks.connections",
+            {
+                "default": build_conn_mock(
+                    ["django_migrations"],
+                    [
+                        "1074_workflowrun_deleted_at_workflowrun_restored_at_and_more",
+                        "1075_workflowaction_order",
+                    ],
+                ),
+            },
+        )
+        assert check_v3_minimum_upgrade_version(None) == []
+
+    def test_v2_20_8_raises_error(
+        self,
+        mocker: MockerFixture,
+        build_conn_mock,
+    ) -> None:
+        """
+        GIVEN:
+            - 1074 (last v2.20.8 migration) is applied but 1075 is not
+        WHEN:
+            - The v3 upgrade check runs
+        THEN:
+            - An Error with id paperless.E002 is returned
+        """
+        mocker.patch.dict(
+            "paperless.checks.connections",
+            {
+                "default": build_conn_mock(
+                    ["django_migrations"],
+                    ["1074_workflowrun_deleted_at_workflowrun_restored_at_and_more"],
+                ),
+            },
+        )
+        result = check_v3_minimum_upgrade_version(None)
+        assert len(result) == 1
+        assert isinstance(result[0], Error)
+        assert result[0].id == "paperless.E002"
+
+    def test_very_old_version_raises_error(
+        self,
+        mocker: MockerFixture,
+        build_conn_mock,
+    ) -> None:
+        """
+        GIVEN:
+            - Only old migrations (well below v2.20.9) are applied
+        WHEN:
+            - The v3 upgrade check runs
+        THEN:
+            - An Error with id paperless.E002 is returned
+        """
+        mocker.patch.dict(
+            "paperless.checks.connections",
+            {
+                "default": build_conn_mock(
+                    ["django_migrations"],
+                    ["1000_update_paperless_all", "1022_paperlesstask"],
+                ),
+            },
+        )
+        result = check_v3_minimum_upgrade_version(None)
+        assert len(result) == 1
+        assert isinstance(result[0], Error)
+        assert result[0].id == "paperless.E002"
+
+    def test_error_hint_mentions_v2_20_9(
+        self,
+        mocker: MockerFixture,
+        build_conn_mock,
+    ) -> None:
+        """
+        GIVEN:
+            - DB is on an old v2 version (pre-v2.20.9)
+        WHEN:
+            - The v3 upgrade check runs
+        THEN:
+            - The error hint explicitly references v2.20.9 so users know what to do
+        """
+        mocker.patch.dict(
+            "paperless.checks.connections",
+            {"default": build_conn_mock(["django_migrations"], ["1022_paperlesstask"])},
+        )
+        result = check_v3_minimum_upgrade_version(None)
+        assert len(result) == 1
+        assert "v2.20.9" in result[0].hint
+
+    def test_db_error_is_swallowed(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - A DatabaseError is raised when querying the DB
+        WHEN:
+            - The v3 upgrade check runs
+        THEN:
+            - No exception propagates and an empty list is returned
+        """
+        from django.db import DatabaseError
+
+        conn = mocker.MagicMock()
+        conn.introspection.table_names.side_effect = DatabaseError("connection refused")
+        mocker.patch.dict("paperless.checks.connections", {"default": conn})
+        assert check_v3_minimum_upgrade_version(None) == []
+
+    def test_operational_error_is_swallowed(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - An OperationalError is raised when querying the DB
+        WHEN:
+            - The v3 upgrade check runs
+        THEN:
+            - No exception propagates and an empty list is returned
+        """
+        from django.db import OperationalError
+
+        conn = mocker.MagicMock()
+        conn.introspection.table_names.side_effect = OperationalError("DB unavailable")
+        mocker.patch.dict("paperless.checks.connections", {"default": conn})
+        assert check_v3_minimum_upgrade_version(None) == []
