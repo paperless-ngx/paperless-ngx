@@ -1238,8 +1238,8 @@
           <context context-type="linenumber">82</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="8035757452478567832" datatype="html">
-        <source>Update existing document</source>
+      <trans-unit id="7860582931776068318" datatype="html">
+        <source>Add document version</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">280</context>
@@ -8411,8 +8411,8 @@
           <context context-type="linenumber">832</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="6390006284731990222" datatype="html">
-        <source>This operation will permanently rotate the original version of <x id="PH" equiv-text="this.list.selected.size"/> document(s).</source>
+      <trans-unit id="5203024009814367559" datatype="html">
+        <source>This operation will add rotated versions of the <x id="PH" equiv-text="this.list.selected.size"/> document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">833</context>
