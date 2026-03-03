@@ -26,9 +26,12 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.permissions import set_permissions_for_object
 from documents.plugins.helpers import DocumentsStatusManager
+from documents.serialisers import SourceModeChoices
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
 from documents.tasks import update_document_content_maybe_archive_file
+from documents.versioning import get_latest_version_for_root
+from documents.versioning import get_root_document
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import User
@@ -97,21 +100,27 @@ def _get_root_and_current_docs_by_root_id(
             "owner",
         )
     }
-    latest_versions_by_root_id: dict[int, Document] = {}
-    for version_doc in Document.objects.filter(root_document_id__in=root_ids).order_by(
-        "root_document_id",
-        "-id",
-    ):
-        root_id = version_doc.root_document_id
-        if root_id is None:
-            continue
-        latest_versions_by_root_id.setdefault(root_id, version_doc)
-
-    current_docs: dict[int, Document] = {
-        root_id: latest_versions_by_root_id.get(root_id, root_docs[root_id])
-        for root_id in root_docs
-    }
+    current_docs: dict[int, Document] = {}
+    for root_id, root_doc in root_docs.items():
+        current_docs[root_id] = get_latest_version_for_root(root_doc)
     return root_docs, current_docs
+
+
+def _resolve_root_and_source_doc(
+    doc: Document,
+    *,
+    source_mode: SourceModeChoices = SourceModeChoices.LATEST_VERSION,
+) -> tuple[Document, Document]:
+    root_doc = get_root_document(doc)
+
+    if source_mode == SourceModeChoices.EXPLICIT_SELECTION:
+        return root_doc, doc
+
+    # Version IDs are explicit by default, only a selected root resolves to latest
+    if doc.root_document_id is not None:
+        return root_doc, doc
+
+    return root_doc, get_latest_version_for_root(root_doc)
 
 
 def set_correspondent(
@@ -421,21 +430,32 @@ def rotate(
     doc_ids: list[int],
     degrees: int,
     *,
+    source_mode: SourceModeChoices = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
 ) -> Literal["OK"]:
     logger.info(
         f"Attempting to rotate {len(doc_ids)} documents by {degrees} degrees.",
     )
-    doc_to_root_id = _get_root_ids_by_doc_id(doc_ids)
-    root_ids = set(doc_to_root_id.values())
-    root_docs_by_id, current_docs_by_root_id = _get_root_and_current_docs_by_root_id(
-        root_ids,
-    )
+    docs_by_id = {
+        doc.id: doc
+        for doc in Document.objects.select_related("root_document").filter(
+            id__in=doc_ids,
+        )
+    }
+    docs_by_root_id: dict[int, tuple[Document, Document]] = {}
+    for doc_id in doc_ids:
+        doc = docs_by_id.get(doc_id)
+        if doc is None:
+            continue
+        root_doc, source_doc = _resolve_root_and_source_doc(
+            doc,
+            source_mode=source_mode,
+        )
+        docs_by_root_id.setdefault(root_doc.id, (root_doc, source_doc))
+
     import pikepdf
 
-    for root_id in root_ids:
-        root_doc = root_docs_by_id[root_id]
-        source_doc = current_docs_by_root_id[root_id]
+    for root_doc, source_doc in docs_by_root_id.values():
         if source_doc.mime_type != "application/pdf":
             logger.warning(
                 f"Document {root_doc.id} is not a PDF, skipping rotation.",
@@ -659,25 +679,17 @@ def delete_pages(
     doc_ids: list[int],
     pages: list[int],
     *,
+    source_mode: SourceModeChoices = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
 ) -> Literal["OK"]:
     logger.info(
         f"Attempting to delete pages {pages} from {len(doc_ids)} documents",
     )
     doc = Document.objects.select_related("root_document").get(id=doc_ids[0])
-    root_doc: Document
-    if doc.root_document_id is None or doc.root_document is None:
-        root_doc = doc
-    else:
-        root_doc = doc.root_document
-
-    source_doc = (
-        Document.objects.filter(Q(id=root_doc.id) | Q(root_document=root_doc))
-        .order_by("-id")
-        .first()
+    root_doc, source_doc = _resolve_root_and_source_doc(
+        doc,
+        source_mode=source_mode,
     )
-    if source_doc is None:
-        source_doc = root_doc
     pages = sorted(pages)  # sort pages to avoid index issues
     import pikepdf
 
@@ -722,6 +734,7 @@ def edit_pdf(
     delete_original: bool = False,
     update_document: bool = False,
     include_metadata: bool = True,
+    source_mode: SourceModeChoices = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
 ) -> Literal["OK"]:
     """
@@ -736,19 +749,10 @@ def edit_pdf(
         f"Editing PDF of document {doc_ids[0]} with {len(operations)} operations",
     )
     doc = Document.objects.select_related("root_document").get(id=doc_ids[0])
-    root_doc: Document
-    if doc.root_document_id is None or doc.root_document is None:
-        root_doc = doc
-    else:
-        root_doc = doc.root_document
-
-    source_doc = (
-        Document.objects.filter(Q(id=root_doc.id) | Q(root_document=root_doc))
-        .order_by("-id")
-        .first()
+    root_doc, source_doc = _resolve_root_and_source_doc(
+        doc,
+        source_mode=source_mode,
     )
-    if source_doc is None:
-        source_doc = root_doc
     import pikepdf
 
     pdf_docs: list[pikepdf.Pdf] = []
@@ -859,6 +863,7 @@ def remove_password(
     update_document: bool = False,
     delete_original: bool = False,
     include_metadata: bool = True,
+    source_mode: SourceModeChoices = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
 ) -> Literal["OK"]:
     """
@@ -868,19 +873,10 @@ def remove_password(
 
     for doc_id in doc_ids:
         doc = Document.objects.select_related("root_document").get(id=doc_id)
-        root_doc: Document
-        if doc.root_document_id is None or doc.root_document is None:
-            root_doc = doc
-        else:
-            root_doc = doc.root_document
-
-        source_doc = (
-            Document.objects.filter(Q(id=root_doc.id) | Q(root_document=root_doc))
-            .order_by("-id")
-            .first()
+        root_doc, source_doc = _resolve_root_and_source_doc(
+            doc,
+            source_mode=source_mode,
         )
-        if source_doc is None:
-            source_doc = root_doc
         try:
             logger.info(
                 f"Attempting password removal from document {doc_ids[0]}",
