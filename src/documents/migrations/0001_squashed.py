@@ -387,168 +387,6 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name="CustomField",
-            fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                (
-                    "created",
-                    models.DateTimeField(
-                        db_index=True,
-                        default=django.utils.timezone.now,
-                        editable=False,
-                        verbose_name="created",
-                    ),
-                ),
-                ("name", models.CharField(max_length=128)),
-                (
-                    "data_type",
-                    models.CharField(
-                        choices=[
-                            ("string", "String"),
-                            ("url", "URL"),
-                            ("date", "Date"),
-                            ("boolean", "Boolean"),
-                            ("integer", "Integer"),
-                            ("float", "Float"),
-                            ("monetary", "Monetary"),
-                            ("documentlink", "Document Link"),
-                            ("select", "Select"),
-                            ("longtext", "Long Text"),
-                        ],
-                        editable=False,
-                        max_length=50,
-                        verbose_name="data type",
-                    ),
-                ),
-                (
-                    "extra_data",
-                    models.JSONField(
-                        blank=True,
-                        help_text="Extra data for the custom field, such as select options",
-                        null=True,
-                        verbose_name="extra data",
-                    ),
-                ),
-            ],
-            options={
-                "verbose_name": "custom field",
-                "verbose_name_plural": "custom fields",
-                "ordering": ("created",),
-                "constraints": [
-                    models.UniqueConstraint(
-                        fields=("name",),
-                        name="documents_customfield_unique_name",
-                    ),
-                ],
-            },
-        ),
-        migrations.CreateModel(
-            name="CustomFieldInstance",
-            fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                ("deleted_at", models.DateTimeField(blank=True, null=True)),
-                ("restored_at", models.DateTimeField(blank=True, null=True)),
-                ("transaction_id", models.UUIDField(blank=True, null=True)),
-                (
-                    "created",
-                    models.DateTimeField(
-                        db_index=True,
-                        default=django.utils.timezone.now,
-                        editable=False,
-                        verbose_name="created",
-                    ),
-                ),
-                ("value_text", models.CharField(max_length=128, null=True)),
-                ("value_bool", models.BooleanField(null=True)),
-                ("value_url", models.URLField(null=True)),
-                ("value_date", models.DateField(null=True)),
-                ("value_int", models.IntegerField(null=True)),
-                ("value_float", models.FloatField(null=True)),
-                ("value_monetary", models.CharField(max_length=128, null=True)),
-                (
-                    "value_monetary_amount",
-                    models.GeneratedField(
-                        db_persist=True,
-                        expression=models.Case(
-                            models.When(
-                                then=django.db.models.functions.comparison.Cast(
-                                    django.db.models.functions.text.Substr(
-                                        "value_monetary",
-                                        1,
-                                    ),
-                                    output_field=models.DecimalField(
-                                        decimal_places=2,
-                                        max_digits=65,
-                                    ),
-                                ),
-                                value_monetary__regex="^\\d+",
-                            ),
-                            default=django.db.models.functions.comparison.Cast(
-                                django.db.models.functions.text.Substr(
-                                    "value_monetary",
-                                    4,
-                                ),
-                                output_field=models.DecimalField(
-                                    decimal_places=2,
-                                    max_digits=65,
-                                ),
-                            ),
-                            output_field=models.DecimalField(
-                                decimal_places=2,
-                                max_digits=65,
-                            ),
-                        ),
-                        output_field=models.DecimalField(
-                            decimal_places=2,
-                            max_digits=65,
-                        ),
-                    ),
-                ),
-                ("value_document_ids", models.JSONField(null=True)),
-                ("value_select", models.CharField(max_length=16, null=True)),
-                ("value_long_text", models.TextField(null=True)),
-                (
-                    "field",
-                    models.ForeignKey(
-                        editable=False,
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name="fields",
-                        to="documents.customfield",
-                    ),
-                ),
-                (
-                    "document",
-                    models.ForeignKey(
-                        editable=False,
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name="custom_fields",
-                        to="documents.document",
-                    ),
-                ),
-            ],
-            options={
-                "verbose_name": "custom field instance",
-                "verbose_name_plural": "custom field instances",
-                "ordering": ("created",),
-            },
-        ),
-        migrations.CreateModel(
             name="DocumentType",
             fields=[
                 (
@@ -1139,6 +977,168 @@ class Migration(migrations.Migration):
             options={
                 "verbose_name": "note",
                 "verbose_name_plural": "notes",
+                "ordering": ("created",),
+            },
+        ),
+        migrations.CreateModel(
+            name="CustomField",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        db_index=True,
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="created",
+                    ),
+                ),
+                ("name", models.CharField(max_length=128)),
+                (
+                    "data_type",
+                    models.CharField(
+                        choices=[
+                            ("string", "String"),
+                            ("url", "URL"),
+                            ("date", "Date"),
+                            ("boolean", "Boolean"),
+                            ("integer", "Integer"),
+                            ("float", "Float"),
+                            ("monetary", "Monetary"),
+                            ("documentlink", "Document Link"),
+                            ("select", "Select"),
+                            ("longtext", "Long Text"),
+                        ],
+                        editable=False,
+                        max_length=50,
+                        verbose_name="data type",
+                    ),
+                ),
+                (
+                    "extra_data",
+                    models.JSONField(
+                        blank=True,
+                        help_text="Extra data for the custom field, such as select options",
+                        null=True,
+                        verbose_name="extra data",
+                    ),
+                ),
+            ],
+            options={
+                "verbose_name": "custom field",
+                "verbose_name_plural": "custom fields",
+                "ordering": ("created",),
+                "constraints": [
+                    models.UniqueConstraint(
+                        fields=("name",),
+                        name="documents_customfield_unique_name",
+                    ),
+                ],
+            },
+        ),
+        migrations.CreateModel(
+            name="CustomFieldInstance",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("deleted_at", models.DateTimeField(blank=True, null=True)),
+                ("restored_at", models.DateTimeField(blank=True, null=True)),
+                ("transaction_id", models.UUIDField(blank=True, null=True)),
+                (
+                    "created",
+                    models.DateTimeField(
+                        db_index=True,
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="created",
+                    ),
+                ),
+                ("value_text", models.CharField(max_length=128, null=True)),
+                ("value_bool", models.BooleanField(null=True)),
+                ("value_url", models.URLField(null=True)),
+                ("value_date", models.DateField(null=True)),
+                ("value_int", models.IntegerField(null=True)),
+                ("value_float", models.FloatField(null=True)),
+                ("value_monetary", models.CharField(max_length=128, null=True)),
+                (
+                    "value_monetary_amount",
+                    models.GeneratedField(
+                        db_persist=True,
+                        expression=models.Case(
+                            models.When(
+                                then=django.db.models.functions.comparison.Cast(
+                                    django.db.models.functions.text.Substr(
+                                        "value_monetary",
+                                        1,
+                                    ),
+                                    output_field=models.DecimalField(
+                                        decimal_places=2,
+                                        max_digits=65,
+                                    ),
+                                ),
+                                value_monetary__regex="^\\d+",
+                            ),
+                            default=django.db.models.functions.comparison.Cast(
+                                django.db.models.functions.text.Substr(
+                                    "value_monetary",
+                                    4,
+                                ),
+                                output_field=models.DecimalField(
+                                    decimal_places=2,
+                                    max_digits=65,
+                                ),
+                            ),
+                            output_field=models.DecimalField(
+                                decimal_places=2,
+                                max_digits=65,
+                            ),
+                        ),
+                        output_field=models.DecimalField(
+                            decimal_places=2,
+                            max_digits=65,
+                        ),
+                    ),
+                ),
+                ("value_document_ids", models.JSONField(null=True)),
+                ("value_select", models.CharField(max_length=16, null=True)),
+                ("value_long_text", models.TextField(null=True)),
+                (
+                    "field",
+                    models.ForeignKey(
+                        editable=False,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="fields",
+                        to="documents.customfield",
+                    ),
+                ),
+                (
+                    "document",
+                    models.ForeignKey(
+                        editable=False,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="custom_fields",
+                        to="documents.document",
+                    ),
+                ),
+            ],
+            options={
+                "verbose_name": "custom field instance",
+                "verbose_name_plural": "custom field instances",
                 "ordering": ("created",),
             },
         ),
