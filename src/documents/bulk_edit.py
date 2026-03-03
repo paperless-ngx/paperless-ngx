@@ -90,8 +90,6 @@ def _resolve_root_and_source_doc(
 
     if source_mode == SourceModeChoices.EXPLICIT_SELECTION:
         return root_doc, doc
-    if source_mode != SourceModeChoices.LATEST_VERSION:
-        raise ValueError(f"Unsupported source mode: {source_mode}")
 
     # Version IDs are explicit by default, only a selected root resolves to latest
     if doc.root_document_id is not None:
