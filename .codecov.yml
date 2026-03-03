@@ -14,15 +14,19 @@ component_management:
 # https://docs.codecov.com/docs/carryforward-flags
 flags:
   # Backend Python versions
-  backend-python-3.10:
-    paths:
-      - src/**
-    carryforward: true
   backend-python-3.11:
     paths:
       - src/**
     carryforward: true
   backend-python-3.12:
+    paths:
+      - src/**
+    carryforward: true
+  backend-python-3.13:
+    paths:
+      - src/**
+    carryforward: true
+  backend-python-3.14:
     paths:
       - src/**
     carryforward: true
@@ -41,9 +45,10 @@ coverage:
     project:
       backend:
         flags:
-          - backend-python-3.10
           - backend-python-3.11
           - backend-python-3.12
+          - backend-python-3.13
+          - backend-python-3.14
         paths:
           - src/**
         # https://docs.codecov.com/docs/commit-status#threshold
@@ -59,9 +64,10 @@ coverage:
     patch:
       backend:
         flags:
-          - backend-python-3.10
           - backend-python-3.11
           - backend-python-3.12
+          - backend-python-3.13
+          - backend-python-3.14
         paths:
           - src/**
         target: 100%
