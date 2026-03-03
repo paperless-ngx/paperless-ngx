@@ -46,6 +46,7 @@ export class PDFEditorComponent extends ConfirmDialogComponent {
   activeModal: NgbActiveModal = inject(NgbActiveModal)
 
   documentID: number
+  versionID?: number
   pages: PageOperation[] = []
   totalPages = 0
   editMode: PdfEditorEditMode = this.settingsService.get(
@@ -55,7 +56,11 @@ export class PDFEditorComponent extends ConfirmDialogComponent {
   includeMetadata: boolean = true
 
   get pdfSrc(): string {
-    return this.documentService.getPreviewUrl(this.documentID)
+    return this.documentService.getPreviewUrl(
+      this.documentID,
+      false,
+      this.versionID
+    )
   }
 
   pdfLoaded(pdf: PngxPdfDocumentProxy) {

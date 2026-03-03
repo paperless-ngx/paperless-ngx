@@ -1661,22 +1661,25 @@ describe('DocumentDetailComponent', () => {
     const closeSpy = jest.spyOn(openDocumentsService, 'closeDocument')
     const errorSpy = jest.spyOn(toastService, 'showError')
     initNormally()
+    component.selectedVersionId = 10
     component.editPdf()
     expect(modal).not.toBeUndefined()
     modal.componentInstance.documentID = doc.id
+    expect(modal.componentInstance.versionID).toBe(10)
     modal.componentInstance.pages = [{ page: 1, rotate: 0, splitAfter: false }]
     modal.componentInstance.confirm()
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/bulk_edit/`
     )
     expect(req.request.body).toEqual({
-      documents: [doc.id],
+      documents: [10],
       method: 'edit_pdf',
       parameters: {
         operations: [{ page: 1, rotate: 0, doc: 0 }],
         delete_original: false,
         update_document: false,
         include_metadata: true,
+        source_mode: 'explicit_selection',
       },
     })
     req.error(new ErrorEvent('failed'))
@@ -1698,6 +1701,7 @@ describe('DocumentDetailComponent', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[0]))
     initNormally()
+    component.selectedVersionId = 10
     component.password = 'secret'
     component.removePassword()
     const dialog =
@@ -1710,13 +1714,14 @@ describe('DocumentDetailComponent', () => {
       `${environment.apiBaseUrl}documents/bulk_edit/`
     )
     expect(req.request.body).toEqual({
-      documents: [doc.id],
+      documents: [10],
       method: 'remove_password',
       parameters: {
         password: 'secret',
         update_document: false,
         include_metadata: false,
         delete_original: true,
+        source_mode: 'explicit_selection',
       },
     })
     req.flush(true)

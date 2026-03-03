@@ -1517,6 +1517,11 @@ class DocumentListSerializer(serializers.Serializer):
         return documents
 
 
+class SourceModeChoices:
+    LATEST_VERSION = "latest_version"
+    EXPLICIT_SELECTION = "explicit_selection"
+
+
 class BulkEditSerializer(
     SerializerWithPerms,
     DocumentListSerializer,
@@ -1723,6 +1728,15 @@ class BulkEditSerializer(
         except ValueError:
             raise serializers.ValidationError("invalid rotation degrees")
 
+    def _validate_source_mode(self, parameters) -> None:
+        source_mode = parameters.get("source_mode", SourceModeChoices.LATEST_VERSION)
+        if source_mode not in {
+            SourceModeChoices.LATEST_VERSION,
+            SourceModeChoices.EXPLICIT_SELECTION,
+        }:
+            raise serializers.ValidationError("Invalid source_mode")
+        parameters["source_mode"] = source_mode
+
     def _validate_parameters_split(self, parameters) -> None:
         if "pages" not in parameters:
             raise serializers.ValidationError("pages not specified")
@@ -1822,6 +1836,9 @@ class BulkEditSerializer(
     def validate(self, attrs):
         method = attrs["method"]
         parameters = attrs["parameters"]
+
+        if "source_mode" in parameters:
+            self._validate_source_mode(parameters)
 
         if method == bulk_edit.set_correspondent:
             self._validate_parameters_correspondent(parameters)
