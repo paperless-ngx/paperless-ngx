@@ -919,6 +919,7 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
     @override_settings(
         CONSUMER_ENABLE_TAG_BARCODE=True,
         CONSUMER_TAG_BARCODE_MAPPING={"ASN(.*)": "\\g<1>"},
+        CONSUMER_ENABLE_ASN_BARCODE=False,
     )
     def test_scan_file_for_many_custom_tags(self) -> None:
         """

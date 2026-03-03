@@ -1758,6 +1758,11 @@ class DocumentViewSet(
             .order_by("-id")
             .first()
         )
+
+        document_updated.send(
+            sender=self.__class__,
+            document=root_doc,
+        )
         return Response(
             {
                 "result": "OK",
@@ -1826,6 +1831,11 @@ class DocumentViewSet(
                     "version_id": version_doc.id,
                 },
             )
+
+        document_updated.send(
+            sender=self.__class__,
+            document=root_doc,
+        )
 
         return Response(
             {
@@ -2434,6 +2444,13 @@ class SelectionDataView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         ids = serializer.validated_data.get("documents")
+        permitted_documents = get_objects_for_user_owner_aware(
+            request.user,
+            "documents.view_document",
+            Document,
+        )
+        if permitted_documents.filter(pk__in=ids).count() != len(ids):
+            return HttpResponseForbidden("Insufficient permissions")
 
         correspondents = Correspondent.objects.annotate(
             document_count=Count(

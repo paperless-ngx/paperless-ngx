@@ -329,14 +329,14 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         FILENAME_FORMAT="{added_year}-{added_month}-{added_day}",
     )
     def test_added_year_month_day(self) -> None:
-        d1 = timezone.make_aware(datetime.datetime(232, 1, 9, 1, 1, 1))
+        d1 = timezone.make_aware(datetime.datetime(1232, 1, 9, 1, 1, 1))
         doc1 = Document.objects.create(
             title="doc1",
             mime_type="application/pdf",
             added=d1,
         )
 
-        self.assertEqual(generate_filename(doc1), Path("232-01-09.pdf"))
+        self.assertEqual(generate_filename(doc1), Path("1232-01-09.pdf"))
 
         doc1.added = timezone.make_aware(datetime.datetime(2020, 11, 16, 1, 1, 1))
 

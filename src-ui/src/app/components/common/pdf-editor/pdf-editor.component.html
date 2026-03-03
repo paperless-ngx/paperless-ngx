@@ -84,7 +84,7 @@
       <input type="radio" class="btn-check" [(ngModel)]="editMode" [value]="PdfEditorEditMode.Update" id="editModeUpdate" name="editmode" [disabled]="hasSplit()">
       <label for="editModeUpdate" class="btn btn-outline-primary btn-sm">
         <i-bs name="pencil"></i-bs>
-        <span class="form-check-label ms-2" i18n>Update existing document</span>
+        <span class="form-check-label ms-2" i18n>Add document version</span>
       </label>
     </div>
     @if (editMode === PdfEditorEditMode.Create) {

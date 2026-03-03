@@ -5,6 +5,7 @@ from pathlib import Path
 from bleach import clean
 from bleach import linkify
 from django.conf import settings
+from django.utils import timezone
 from django.utils.timezone import is_naive
 from django.utils.timezone import make_aware
 from gotenberg_client import GotenbergClient
@@ -332,7 +333,9 @@ class MailDocumentParser(DocumentParser):
         if data["attachments"]:
             data["attachments_label"] = "Attachments"
 
-        data["date"] = clean_html(mail.date.astimezone().strftime("%Y-%m-%d %H:%M"))
+        data["date"] = clean_html(
+            timezone.localtime(mail.date).strftime("%Y-%m-%d %H:%M"),
+        )
         data["content"] = clean_html(mail.text.strip())
 
         from django.template.loader import render_to_string

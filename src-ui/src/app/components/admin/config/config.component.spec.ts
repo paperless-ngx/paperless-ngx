@@ -144,4 +144,18 @@ describe('ConfigComponent', () => {
     component.uploadFile(new File([], 'test.png'), 'app_logo')
     expect(initSpy).toHaveBeenCalled()
   })
+
+  it('should reset option to null', () => {
+    component.configForm.patchValue({ output_type: OutputTypeConfig.PDF_A })
+    expect(component.isSet('output_type')).toBeTruthy()
+    component.resetOption('output_type')
+    expect(component.configForm.get('output_type').value).toBeNull()
+    expect(component.isSet('output_type')).toBeFalsy()
+    component.configForm.patchValue({ app_title: 'Test Title' })
+    component.resetOption('app_title')
+    expect(component.configForm.get('app_title').value).toBeNull()
+    component.configForm.patchValue({ barcodes_enabled: true })
+    component.resetOption('barcodes_enabled')
+    expect(component.configForm.get('barcodes_enabled').value).toBeNull()
+  })
 })

@@ -21,6 +21,16 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
         self.test_user.save()
         self.client.force_authenticate(user=self.test_user)
 
+    @override_settings(
+        APP_TITLE=None,
+        APP_LOGO=None,
+        AUDIT_LOG_ENABLED=True,
+        EMPTY_TRASH_DELAY=30,
+        ENABLE_UPDATE_CHECK="default",
+        EMAIL_ENABLED=False,
+        GMAIL_OAUTH_ENABLED=False,
+        OUTLOOK_OAUTH_ENABLED=False,
+    )
     def test_api_get_ui_settings(self) -> None:
         response = self.client.get(self.ENDPOINT, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)

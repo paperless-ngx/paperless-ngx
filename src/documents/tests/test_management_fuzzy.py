@@ -140,7 +140,7 @@ class TestFuzzyMatchCommand(TestCase):
             mime_type="application/pdf",
             filename="final_test.pdf",
         )
-        stdout, _ = self.call_command("--no-progress-bar")
+        stdout, _ = self.call_command("--no-progress-bar", "--processes", "1")
         lines = [x.strip() for x in stdout.splitlines() if x.strip()]
         self.assertEqual(len(lines), 3)
         for line in lines:
@@ -183,7 +183,12 @@ class TestFuzzyMatchCommand(TestCase):
 
         self.assertEqual(Document.objects.count(), 3)
 
-        stdout, _ = self.call_command("--delete", "--no-progress-bar")
+        stdout, _ = self.call_command(
+            "--delete",
+            "--no-progress-bar",
+            "--processes",
+            "1",
+        )
 
         self.assertIn(
             "The command is configured to delete documents.  Use with caution",

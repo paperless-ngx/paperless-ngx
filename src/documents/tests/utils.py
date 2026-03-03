@@ -33,11 +33,11 @@ from documents.plugins.helpers import ProgressStatusOptions
 def setup_directories():
     dirs = namedtuple("Dirs", ())
 
-    dirs.data_dir = Path(tempfile.mkdtemp())
-    dirs.scratch_dir = Path(tempfile.mkdtemp())
-    dirs.media_dir = Path(tempfile.mkdtemp())
-    dirs.consumption_dir = Path(tempfile.mkdtemp())
-    dirs.static_dir = Path(tempfile.mkdtemp())
+    dirs.data_dir = Path(tempfile.mkdtemp()).resolve()
+    dirs.scratch_dir = Path(tempfile.mkdtemp()).resolve()
+    dirs.media_dir = Path(tempfile.mkdtemp()).resolve()
+    dirs.consumption_dir = Path(tempfile.mkdtemp()).resolve()
+    dirs.static_dir = Path(tempfile.mkdtemp()).resolve()
     dirs.index_dir = dirs.data_dir / "index"
     dirs.originals_dir = dirs.media_dir / "documents" / "originals"
     dirs.thumbnail_dir = dirs.media_dir / "documents" / "thumbnails"

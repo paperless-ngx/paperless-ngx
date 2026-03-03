@@ -830,7 +830,7 @@ export class BulkEditorComponent
     })
     const rotateDialog = modal.componentInstance as RotateConfirmDialogComponent
     rotateDialog.title = $localize`Rotate confirm`
-    rotateDialog.messageBold = $localize`This operation will permanently rotate the original version of ${this.list.selected.size} document(s).`
+    rotateDialog.messageBold = $localize`This operation will add rotated versions of the ${this.list.selected.size} document(s).`
     rotateDialog.btnClass = 'btn-danger'
     rotateDialog.btnCaption = $localize`Proceed`
     rotateDialog.documentID = Array.from(this.list.selected)[0]

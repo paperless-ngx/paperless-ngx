@@ -75,7 +75,7 @@ class MatchingModel(ModelWithOwner):
 
     is_insensitive = models.BooleanField(_("is insensitive"), default=True)
 
-    class Meta:
+    class Meta(ModelWithOwner.Meta):
         abstract = True
         ordering = ("name",)
         constraints = [

@@ -1,6 +1,6 @@
 [project]
 name = "paperless-ngx"
-version = "2.20.8"
+version = "2.20.9"
 description = "A community-supported supercharged document management system: scan, index and archive all your physical documents"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -111,6 +111,7 @@ docs = [
 testing = [
   "daphne",
   "factory-boy~=3.3.1",
+  "faker~=40.5.1",
   "imagehash",
   "pytest~=9.0.0",
   "pytest-cov~=7.0.0",
