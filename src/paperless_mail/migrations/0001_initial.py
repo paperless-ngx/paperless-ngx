@@ -15,6 +15,41 @@ class Migration(migrations.Migration):
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
+    replaces = [
+    ("paperless_mail", "0001_initial"),
+    ("paperless_mail", "0001_initial_squashed_0009_mailrule_assign_tags"),
+    ("paperless_mail", "0002_auto_20201117_1334"),
+    ("paperless_mail", "0003_auto_20201118_1940"),
+    ("paperless_mail", "0004_mailrule_order"),
+    ("paperless_mail", "0005_help_texts"),
+    ("paperless_mail", "0006_auto_20210101_2340"),
+    ("paperless_mail", "0007_auto_20210106_0138"),
+    ("paperless_mail", "0008_auto_20210516_0940"),
+    ("paperless_mail", "0009_alter_mailrule_action_alter_mailrule_folder"),
+    ("paperless_mail", "0009_mailrule_assign_tags"),
+    ("paperless_mail", "0010_auto_20220311_1602"),
+    ("paperless_mail", "0011_remove_mailrule_assign_tag"),
+    ("paperless_mail", "0011_remove_mailrule_assign_tag_squashed_0024_alter_mailrule_name_and_more"),
+    ("paperless_mail", "0012_alter_mailrule_assign_tags"),
+    ("paperless_mail", "0013_merge_20220412_1051"),
+    ("paperless_mail", "0014_alter_mailrule_action"),
+    ("paperless_mail", "0015_alter_mailrule_action"),
+    ("paperless_mail", "0016_mailrule_consumption_scope"),
+    ("paperless_mail", "0017_mailaccount_owner_mailrule_owner"),
+    ("paperless_mail", "0018_processedmail"),
+    ("paperless_mail", "0019_mailrule_filter_to"),
+    ("paperless_mail", "0020_mailaccount_is_token"),
+    ("paperless_mail", "0021_alter_mailaccount_password"),
+    ("paperless_mail", "0022_mailrule_assign_owner_from_rule_and_more"),
+    ("paperless_mail", "0023_remove_mailrule_filter_attachment_filename_and_more"),
+    ("paperless_mail", "0024_alter_mailrule_name_and_more"),
+    ("paperless_mail", "0025_alter_mailaccount_owner_alter_mailrule_owner_and_more"),
+    ("paperless_mail", "0026_mailrule_enabled"),
+    ("paperless_mail", "0027_mailaccount_expiration_mailaccount_account_type_and_more"),
+    ("paperless_mail", "0028_alter_mailaccount_password_and_more"),
+    ("paperless_mail", "0029_mailrule_pdf_layout"),
+]
+
     operations = [
         migrations.CreateModel(
             name='MailAccount',
