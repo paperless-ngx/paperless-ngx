@@ -250,8 +250,8 @@ def check_v3_minimum_upgrade_version(
         Error(
             "Cannot upgrade to Paperless-ngx v3 from this version.",
             hint=(
-                "v3 requires upgrading from v2.20.9 first. "
-                "Please upgrade to v2.20.9, run migrations, then upgrade to v3. "
+                "Upgrading to v3 can only be performed from v2.20.9."
+                "Please upgrade to v2.20.9, run migrations, then upgrade to v3."
                 "See https://docs.paperless-ngx.com/setup/#upgrading for details."
             ),
             id="paperless.E002",
