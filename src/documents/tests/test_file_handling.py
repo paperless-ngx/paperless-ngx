@@ -1699,6 +1699,21 @@ class TestCustomFieldFilenameUpdates(
         self.assertTrue(Path(self.doc.source_path).is_file())
         self.assertLessEqual(m.call_count, 1)
 
+    @override_settings(FILENAME_FORMAT=None)
+    def test_overlong_storage_path_keeps_existing_filename(self):
+        initial_filename = generate_filename(self.doc)
+        Document.objects.filter(pk=self.doc.pk).update(filename=str(initial_filename))
+        self.doc.refresh_from_db()
+        Path(self.doc.source_path).parent.mkdir(parents=True, exist_ok=True)
+        Path(self.doc.source_path).touch()
+
+        self.doc.storage_path = StoragePath.objects.create(path="a" * 1100)
+        self.doc.save()
+
+        self.doc.refresh_from_db()
+        self.assertEqual(Path(self.doc.filename), initial_filename)
+        self.assertTrue(Path(self.doc.source_path).is_file())
+
 
 class TestPathDateLocalization:
     """

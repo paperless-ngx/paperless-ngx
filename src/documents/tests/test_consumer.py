@@ -633,6 +633,33 @@ class TestConsumer(
 
         self._assert_first_last_send_progress()
 
+    @mock.patch("documents.consumer.generate_unique_filename")
+    def testFilenameHandlingFallsBackWhenGeneratedPathExceedsDbLimit(self, m):
+        m.side_effect = lambda doc, archive_filename=False: Path(
+            ("a" * 1100 + ".pdf") if not archive_filename else ("b" * 1100 + ".pdf"),
+        )
+
+        with self.get_consumer(
+            self.get_test_file(),
+            DocumentMetadataOverrides(title="new docs"),
+        ) as consumer:
+            consumer.run()
+
+        document = Document.objects.first()
+        self.assertIsNotNone(document)
+        assert document is not None
+
+        self.assertEqual(document.filename, f"{document.pk:07d}.pdf")
+        self.assertLessEqual(len(document.filename), 1024)
+        self.assertLessEqual(
+            len(document.archive_filename),
+            1024,
+        )
+        self.assertIsFile(document.source_path)
+        self.assertIsFile(document.archive_path)
+
+        self._assert_first_last_send_progress()
+
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
     @mock.patch("documents.signals.handlers.generate_unique_filename")
     def testFilenameHandlingUnstableFormat(self, m):
