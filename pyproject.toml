@@ -111,6 +111,7 @@ docs = [
 testing = [
   "daphne",
   "factory-boy~=3.3.1",
+  "faker~=40.5.1",
   "imagehash",
   "pytest~=9.0.0",
   "pytest-cov~=7.0.0",

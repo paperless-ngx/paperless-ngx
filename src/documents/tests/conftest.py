@@ -114,3 +114,14 @@ def authenticated_rest_api_client(rest_api_client: APIClient):
     user = UserModel.objects.create_user(username="testuser", password="password")
     rest_api_client.force_authenticate(user=user)
     yield rest_api_client
+
+
+@pytest.fixture(scope="session", autouse=True)
+def faker_session_locale():
+    """Set Faker locale for reproducibility."""
+    return "en_US"
+
+
+@pytest.fixture(scope="session", autouse=True)
+def faker_seed():
+    return 12345

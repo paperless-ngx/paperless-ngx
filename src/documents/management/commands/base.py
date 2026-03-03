@@ -6,11 +6,14 @@ Provides automatic progress bar and multiprocessing support with minimal boilerp
 
 from __future__ import annotations
 
+import logging
 import os
+from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Sized
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import as_completed
+from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 from typing import Any
@@ -22,7 +25,11 @@ from django import db
 from django.core.management import CommandError
 from django.db.models import QuerySet
 from django_rich.management import RichCommand
+from rich import box
 from rich.console import Console
+from rich.console import Group
+from rich.console import RenderableType
+from rich.live import Live
 from rich.progress import BarColumn
 from rich.progress import MofNCompleteColumn
 from rich.progress import Progress
@@ -30,17 +37,89 @@ from rich.progress import SpinnerColumn
 from rich.progress import TextColumn
 from rich.progress import TimeElapsedColumn
 from rich.progress import TimeRemainingColumn
+from rich.table import Table
+from rich.text import Text
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
     from collections.abc import Generator
-    from collections.abc import Iterable
     from collections.abc import Sequence
 
     from django.core.management import CommandParser
 
 T = TypeVar("T")
 R = TypeVar("R")
+
+
+@dataclass(slots=True, frozen=True)
+class _BufferedRecord:
+    level: int
+    name: str
+    message: str
+
+
+class BufferingLogHandler(logging.Handler):
+    """Captures log records during a command run for deferred rendering.
+
+    Attach to a logger before a long operation and call ``render()``
+    afterwards to emit the buffered records via Rich, optionally filtered
+    by minimum level.
+    """
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._records: list[_BufferedRecord] = []
+
+    def emit(self, record: logging.LogRecord) -> None:
+        self._records.append(
+            _BufferedRecord(
+                level=record.levelno,
+                name=record.name,
+                message=self.format(record),
+            ),
+        )
+
+    def render(
+        self,
+        console: Console,
+        *,
+        min_level: int = logging.DEBUG,
+        title: str = "Log Output",
+    ) -> None:
+        records = [r for r in self._records if r.level >= min_level]
+        if not records:
+            return
+
+        table = Table(
+            title=title,
+            show_header=True,
+            header_style="bold",
+            show_lines=False,
+            box=box.SIMPLE,
+        )
+        table.add_column("Level", style="bold", width=8)
+        table.add_column("Logger", style="dim")
+        table.add_column("Message", no_wrap=False)
+
+        _level_styles: dict[int, str] = {
+            logging.DEBUG: "dim",
+            logging.INFO: "cyan",
+            logging.WARNING: "yellow",
+            logging.ERROR: "red",
+            logging.CRITICAL: "bold red",
+        }
+
+        for record in records:
+            style = _level_styles.get(record.level, "")
+            table.add_row(
+                Text(logging.getLevelName(record.level), style=style),
+                record.name,
+                record.message,
+            )
+
+        console.print(table)
+
+    def clear(self) -> None:
+        self._records.clear()
 
 
 @dataclass(frozen=True, slots=True)
@@ -91,6 +170,23 @@ class PaperlessCommand(RichCommand):
                 for result in self.process_parallel(process_doc, ids):
                     if result.error:
                         self.console.print(f"[red]Failed: {result.error}[/red]")
+
+        class Command(PaperlessCommand):
+            help = "Import documents with live stats"
+
+            def handle(self, *args, **options):
+                stats = ImportStats()
+
+                def render_stats() -> Table:
+                    ...  # build Rich Table from stats
+
+                for item in self.track_with_stats(
+                    items,
+                    description="Importing...",
+                    stats_renderer=render_stats,
+                ):
+                    result = import_item(item)
+                    stats.imported += 1
     """
 
     supports_progress_bar: ClassVar[bool] = True
@@ -128,13 +224,11 @@ class PaperlessCommand(RichCommand):
         This is called by Django's command infrastructure after argument parsing
         but before handle(). We use it to set instance attributes from options.
         """
-        # Set progress bar state
         if self.supports_progress_bar:
             self.no_progress_bar = options.get("no_progress_bar", False)
         else:
             self.no_progress_bar = True
 
-        # Set multiprocessing state
         if self.supports_multiprocessing:
             self.process_count = options.get("processes", 1)
             if self.process_count < 1:
@@ -144,9 +238,69 @@ class PaperlessCommand(RichCommand):
 
         return super().execute(*args, **options)
 
+    @contextmanager
+    def buffered_logging(
+        self,
+        *logger_names: str,
+        level: int = logging.DEBUG,
+    ) -> Generator[BufferingLogHandler, None, None]:
+        """Context manager that captures log output from named loggers.
+
+        Installs a ``BufferingLogHandler`` on each named logger for the
+        duration of the block, suppressing propagation to avoid interleaving
+        with the Rich live display. The handler is removed on exit regardless
+        of whether an exception occurred.
+
+        Usage::
+
+            with self.buffered_logging("paperless", "documents") as log_buf:
+                # ... run progress loop ...
+            if options["verbose"]:
+                log_buf.render(self.console)
+        """
+        handler = BufferingLogHandler()
+        handler.setFormatter(logging.Formatter("%(message)s"))
+
+        loggers: list[logging.Logger] = []
+        original_propagate: dict[str, bool] = {}
+
+        for name in logger_names:
+            log = logging.getLogger(name)
+            log.addHandler(handler)
+            original_propagate[name] = log.propagate
+            log.propagate = False
+            loggers.append(log)
+
+        try:
+            yield handler
+        finally:
+            for log in loggers:
+                log.removeHandler(handler)
+                log.propagate = original_propagate[log.name]
+
+    @staticmethod
+    def _progress_columns() -> tuple[Any, ...]:
+        """
+        Return the standard set of progress bar columns.
+
+        Extracted so both _create_progress (standalone) and track_with_stats
+        (inside Live) use identical column configuration without duplication.
+        """
+        return (
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            MofNCompleteColumn(),
+            TimeElapsedColumn(),
+            TimeRemainingColumn(),
+        )
+
     def _create_progress(self, description: str) -> Progress:
         """
-        Create a configured Progress instance.
+        Create a standalone Progress instance with its own stderr Console.
+
+        Use this for track(). For track_with_stats(), Progress is created
+        directly inside a Live context instead.
 
         Progress output is directed to stderr to match the convention that
         progress bars are transient UI feedback, not command output. This
@@ -161,12 +315,7 @@ class PaperlessCommand(RichCommand):
             A Progress instance configured with appropriate columns.
         """
         return Progress(
-            SpinnerColumn(),
-            TextColumn("[progress.description]{task.description}"),
-            BarColumn(),
-            MofNCompleteColumn(),
-            TimeElapsedColumn(),
-            TimeRemainingColumn(),
+            *self._progress_columns(),
             console=Console(stderr=True),
             transient=False,
         )
@@ -222,7 +371,6 @@ class PaperlessCommand(RichCommand):
             yield from iterable
             return
 
-        # Attempt to determine total if not provided
         if total is None:
             total = self._get_iterable_length(iterable)
 
@@ -231,6 +379,87 @@ class PaperlessCommand(RichCommand):
             for item in iterable:
                 yield item
                 progress.advance(task_id)
+
+    def track_with_stats(
+        self,
+        iterable: Iterable[T],
+        *,
+        description: str = "Processing...",
+        stats_renderer: Callable[[], RenderableType],
+        total: int | None = None,
+    ) -> Generator[T, None, None]:
+        """
+        Iterate over items with a progress bar and a live-updating stats display.
+
+        The progress bar and stats renderable are combined in a single Live
+        context, so the stats panel re-renders in place below the progress bar
+        after each item is processed.
+
+        Respects --no-progress-bar flag. When disabled, yields items without
+        any display (stats are still updated by the caller's loop body, so
+        they will be accurate for any post-loop summary the caller prints).
+
+        Args:
+            iterable: The items to iterate over.
+            description: Text to display alongside the progress bar.
+            stats_renderer: Zero-argument callable that returns a Rich
+                renderable. Called after each item to refresh the display.
+                The caller typically closes over a mutable dataclass and
+                rebuilds a Table from it on each call.
+            total: Total number of items. If None, attempts to determine
+                automatically via .count() (for querysets) or len().
+
+        Yields:
+            Items from the iterable.
+
+        Example:
+            @dataclass
+            class Stats:
+                processed: int = 0
+                failed: int = 0
+
+            stats = Stats()
+
+            def render_stats() -> Table:
+                table = Table(box=None)
+                table.add_column("Processed")
+                table.add_column("Failed")
+                table.add_row(str(stats.processed), str(stats.failed))
+                return table
+
+            for item in self.track_with_stats(
+                items,
+                description="Importing...",
+                stats_renderer=render_stats,
+            ):
+                try:
+                    import_item(item)
+                    stats.processed += 1
+                except Exception:
+                    stats.failed += 1
+        """
+        if self.no_progress_bar:
+            yield from iterable
+            return
+
+        if total is None:
+            total = self._get_iterable_length(iterable)
+
+        stderr_console = Console(stderr=True)
+
+        # Progress is created without its own console so Live controls rendering.
+        progress = Progress(*self._progress_columns())
+        task_id = progress.add_task(description, total=total)
+
+        with Live(
+            Group(progress, stats_renderer()),
+            console=stderr_console,
+            refresh_per_second=4,
+        ) as live:
+            for item in iterable:
+                yield item
+                progress.advance(task_id)
+                live.update(Group(progress, stats_renderer()))
 
     def process_parallel(
         self,
@@ -269,7 +498,7 @@ class PaperlessCommand(RichCommand):
         total = len(items)
 
         if self.process_count == 1:
-            # Sequential execution in main process - critical for testing
+            # Sequential execution in main process - critical for testing, so we don't fork in fork, etc
             yield from self._process_sequential(fn, items, description, total)
         else:
             # Parallel execution with ProcessPoolExecutor
@@ -298,6 +527,7 @@ class PaperlessCommand(RichCommand):
         total: int,
     ) -> Generator[ProcessResult[T, R], None, None]:
         """Process items in parallel using ProcessPoolExecutor."""
+
         # Close database connections before forking - required for PostgreSQL
         db.connections.close_all()
 
