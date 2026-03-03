@@ -50,8 +50,6 @@ from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
 from paperless_mail.parsers import MailDocumentParser
 
-MAX_STORED_FILENAME_LENGTH = 1024
-
 
 class WorkflowTriggerPlugin(
     NoCleanupPluginMixin,
@@ -497,7 +495,10 @@ class ConsumerPlugin(
                 # place. If this fails, we'll also rollback the transaction.
                 with FileLock(settings.MEDIA_LOCK):
                     generated_filename = generate_unique_filename(document)
-                    if len(str(generated_filename)) > MAX_STORED_FILENAME_LENGTH:
+                    if (
+                        len(str(generated_filename))
+                        > Document.MAX_STORED_FILENAME_LENGTH
+                    ):
                         self.log.warning(
                             "Generated source filename exceeds db path limit, falling back to default naming",
                         )
@@ -529,7 +530,7 @@ class ConsumerPlugin(
                         )
                         if (
                             len(str(generated_archive_filename))
-                            > MAX_STORED_FILENAME_LENGTH
+                            > Document.MAX_STORED_FILENAME_LENGTH
                         ):
                             self.log.warning(
                                 "Generated archive filename exceeds db path limit, falling back to default naming",
