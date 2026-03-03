@@ -405,31 +405,6 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         self.assertTrue(Document.objects.filter(id=self.doc1.id).exists())
         self.assertFalse(Document.objects.filter(id=version.id).exists())
 
-    def test_get_root_and_current_doc_mapping(self) -> None:
-        version1 = Document.objects.create(
-            checksum="B-v1",
-            title="B version 1",
-            root_document=self.doc2,
-        )
-        version2 = Document.objects.create(
-            checksum="B-v2",
-            title="B version 2",
-            root_document=self.doc2,
-        )
-
-        root_ids_by_doc_id = bulk_edit._get_root_ids_by_doc_id(
-            [self.doc2.id, version1.id, version2.id],
-        )
-        self.assertEqual(root_ids_by_doc_id[self.doc2.id], self.doc2.id)
-        self.assertEqual(root_ids_by_doc_id[version1.id], self.doc2.id)
-        self.assertEqual(root_ids_by_doc_id[version2.id], self.doc2.id)
-
-        root_docs, current_docs = bulk_edit._get_root_and_current_docs_by_root_id(
-            {self.doc2.id},
-        )
-        self.assertEqual(root_docs[self.doc2.id].id, self.doc2.id)
-        self.assertEqual(current_docs[self.doc2.id].id, version2.id)
-
     def test_resolve_root_and_source_doc_latest_version_prefers_newest_version(
         self,
     ) -> None:

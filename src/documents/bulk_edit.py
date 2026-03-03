@@ -81,37 +81,6 @@ def restore_archive_serial_numbers(backup: dict[int, int | None]) -> None:
     logger.info(f"Restored archive serial numbers for documents {list(backup.keys())}")
 
 
-def _get_root_ids_by_doc_id(doc_ids: list[int]) -> dict[int, int]:
-    """
-    Resolve each provided document id to its root document id.
-
-    - If the id is already a root document: root id is itself.
-    - If the id is a version document: root id is its `root_document_id`.
-    """
-    qs = Document.objects.filter(id__in=doc_ids).only("id", "root_document_id")
-    return {doc.id: doc.root_document_id or doc.id for doc in qs}
-
-
-def _get_root_and_current_docs_by_root_id(
-    root_ids: set[int],
-) -> tuple[dict[int, Document], dict[int, Document]]:
-    """
-    Returns:
-      - root_docs: root_id -> root Document
-      - current_docs: root_id -> newest version Document (or root if none)
-    """
-    root_docs = {
-        doc.id: doc
-        for doc in Document.objects.filter(id__in=root_ids).select_related(
-            "owner",
-        )
-    }
-    current_docs: dict[int, Document] = {}
-    for root_id, root_doc in root_docs.items():
-        current_docs[root_id] = get_latest_version_for_root(root_doc)
-    return root_docs, current_docs
-
-
 def _resolve_root_and_source_doc(
     doc: Document,
     *,
