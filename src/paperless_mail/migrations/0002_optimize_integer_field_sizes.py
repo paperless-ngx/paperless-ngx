@@ -6,7 +6,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("paperless_mail", "0001_initial"),
+        ("paperless_mail", "0001_squashed"),
     ]
 
     operations = [
