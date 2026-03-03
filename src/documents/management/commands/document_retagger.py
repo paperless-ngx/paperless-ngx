@@ -260,69 +260,74 @@ class Command(PaperlessCommand):
         def render_stats() -> RenderableType:
             return _build_stats_table(stats, suggest=suggest)
 
-        for document in self.track_with_stats(
-            documents,
-            description="Retagging...",
-            stats_renderer=render_stats,
-        ):
-            suggestion = DocumentSuggestion(document=document)
+        with self.buffered_logging(
+            "paperless",
+            "paperless.handlers",
+            "documents",
+        ) as log_buf:
+            for document in self.track_with_stats(
+                documents,
+                description="Retagging...",
+                stats_renderer=render_stats,
+            ):
+                suggestion = DocumentSuggestion(document=document)
 
-            if do_correspondent:
-                correspondent = set_correspondent(
-                    None,
-                    document,
-                    classifier=classifier,
-                    replace=overwrite,
-                    use_first=use_first,
-                    dry_run=suggest,
-                )
-                if correspondent is not None:
-                    stats.correspondents += 1
-                    suggestion.correspondent = correspondent
+                if do_correspondent:
+                    correspondent = set_correspondent(
+                        None,
+                        document,
+                        classifier=classifier,
+                        replace=overwrite,
+                        use_first=use_first,
+                        dry_run=suggest,
+                    )
+                    if correspondent is not None:
+                        stats.correspondents += 1
+                        suggestion.correspondent = correspondent
 
-            if do_document_type:
-                document_type = set_document_type(
-                    None,
-                    document,
-                    classifier=classifier,
-                    replace=overwrite,
-                    use_first=use_first,
-                    dry_run=suggest,
-                )
-                if document_type is not None:
-                    stats.document_types += 1
-                    suggestion.document_type = document_type
+                if do_document_type:
+                    document_type = set_document_type(
+                        None,
+                        document,
+                        classifier=classifier,
+                        replace=overwrite,
+                        use_first=use_first,
+                        dry_run=suggest,
+                    )
+                    if document_type is not None:
+                        stats.document_types += 1
+                        suggestion.document_type = document_type
 
-            if do_tags:
-                tags_to_add, tags_to_remove = set_tags(
-                    None,
-                    document,
-                    classifier=classifier,
-                    replace=overwrite,
-                    dry_run=suggest,
-                )
-                stats.tags_added += len(tags_to_add)
-                stats.tags_removed += len(tags_to_remove)
-                suggestion.tags_to_add = frozenset(tags_to_add)
-                suggestion.tags_to_remove = frozenset(tags_to_remove)
+                if do_tags:
+                    tags_to_add, tags_to_remove = set_tags(
+                        None,
+                        document,
+                        classifier=classifier,
+                        replace=overwrite,
+                        dry_run=suggest,
+                    )
+                    stats.tags_added += len(tags_to_add)
+                    stats.tags_removed += len(tags_to_remove)
+                    suggestion.tags_to_add = frozenset(tags_to_add)
+                    suggestion.tags_to_remove = frozenset(tags_to_remove)
 
-            if do_storage_path:
-                storage_path = set_storage_path(
-                    None,
-                    document,
-                    classifier=classifier,
-                    replace=overwrite,
-                    use_first=use_first,
-                    dry_run=suggest,
-                )
-                if storage_path is not None:
-                    stats.storage_paths += 1
-                    suggestion.storage_path = storage_path
+                if do_storage_path:
+                    storage_path = set_storage_path(
+                        None,
+                        document,
+                        classifier=classifier,
+                        replace=overwrite,
+                        use_first=use_first,
+                        dry_run=suggest,
+                    )
+                    if storage_path is not None:
+                        stats.storage_paths += 1
+                        suggestion.storage_path = storage_path
 
-            stats.documents_processed += 1
+                stats.documents_processed += 1
 
-            if suggest:
-                suggestions.append(suggestion)
+                if suggest:
+                    suggestions.append(suggestion)
 
         # Post-loop output
         if suggest:
@@ -333,3 +338,5 @@ class Command(PaperlessCommand):
                 self.console.print("[green]No changes suggested.[/green]")
         else:
             self.console.print(_build_summary_table(stats))
+
+        log_buf.render(self.console, min_level=logging.INFO, title="Retagger Log")
