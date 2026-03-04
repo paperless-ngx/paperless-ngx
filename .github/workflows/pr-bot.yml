@@ -2,14 +2,13 @@ name: PR Bot
 on:
   pull_request_target:
     types: [opened]
-permissions:
-  contents: read
-  pull-requests: write
 jobs:
   anti-slop:
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       issues: read
+      pull-requests: write
     steps:
       - uses: peakoss/anti-slop@v0
         with:
@@ -18,6 +17,9 @@ jobs:
   pr-bot:
     name: Automated PR Bot
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Label PR by file path or branch name
         # see .github/labeler.yml for the labeler config
