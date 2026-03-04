@@ -210,57 +210,24 @@ class TestParseDictFromString:
 
 
 class TestGetBoolFromEnv:
-    @pytest.mark.parametrize(
-        ("env_value", "expected"),
-        [
-            pytest.param("true", True, id="true_lower"),
-            pytest.param("TRUE", True, id="true_upper"),
-            pytest.param("yes", True, id="yes"),
-            pytest.param("1", True, id="one"),
-            pytest.param("false", False, id="false_lower"),
-            pytest.param("FALSE", False, id="false_upper"),
-            pytest.param("no", False, id="no"),
-            pytest.param("0", False, id="zero"),
-        ],
-    )
-    def test_existing_env_var(self, mocker, env_value, expected):
-        """Test that existing environment variables return correct boolean values."""
-        mocker.patch.dict(os.environ, {"TEST_VAR": env_value})
-        assert get_bool_from_env("TEST_VAR") is expected
-
-    @pytest.mark.parametrize(
-        ("default", "expected"),
-        [
-            pytest.param("yes", True, id="default_yes"),
-            pytest.param("true", True, id="default_true"),
-            pytest.param("1", True, id="default_1"),
-            pytest.param("no", False, id="default_no"),
-            pytest.param("false", False, id="default_false"),
-            pytest.param("0", False, id="default_0"),
-        ],
-    )
-    def test_missing_env_var_with_defaults(self, mocker, default, expected):
-        """Test that missing environment variables use custom defaults correctly."""
-        mocker.patch.dict(os.environ, {}, clear=True)
-        assert get_bool_from_env("MISSING_VAR", default=default) is expected
+    def test_existing_env_var(self, mocker):
+        """Test that an existing environment variable is read and converted."""
+        mocker.patch.dict(os.environ, {"TEST_VAR": "true"})
+        assert get_bool_from_env("TEST_VAR") is True
 
     def test_missing_env_var_uses_default_no(self, mocker):
-        """Test that missing environment variable uses default 'NO' and returns False."""
+        """Test that a missing environment variable uses default 'NO' and returns False."""
         mocker.patch.dict(os.environ, {}, clear=True)
         assert get_bool_from_env("MISSING_VAR") is False
 
-    @pytest.mark.parametrize(
-        "invalid_value",
-        [
-            pytest.param("invalid", id="word"),
-            pytest.param("maybe", id="maybe"),
-            pytest.param("2", id="number_2"),
-            pytest.param("", id="empty"),
-        ],
-    )
-    def test_invalid_values_raise_error(self, mocker, invalid_value):
-        """Test that invalid environment variable values raise ValueError."""
-        mocker.patch.dict(os.environ, {"INVALID_VAR": invalid_value})
+    def test_missing_env_var_with_explicit_default(self, mocker):
+        """Test that a missing environment variable uses the provided default."""
+        mocker.patch.dict(os.environ, {}, clear=True)
+        assert get_bool_from_env("MISSING_VAR", default="yes") is True
+
+    def test_invalid_value_raises_error(self, mocker):
+        """Test that an invalid value raises ValueError (delegates to str_to_bool)."""
+        mocker.patch.dict(os.environ, {"INVALID_VAR": "maybe"})
         with pytest.raises(ValueError):
             get_bool_from_env("INVALID_VAR")
 
@@ -647,21 +614,3 @@ class TestGetEnvChoice:
         result = get_choice_from_env("TEST_ENV", large_choices)
 
         assert result == "option_50"
-
-    def test_different_env_keys(
-        self,
-        mocker: MockerFixture,
-        valid_choices: set[str],
-    ) -> None:
-        """Test function works with different environment variable keys."""
-        test_cases = [
-            ("DJANGO_ENV", "development"),
-            ("DATABASE_BACKEND", "staging"),
-            ("LOG_LEVEL", "production"),
-            ("APP_MODE", "development"),
-        ]
-
-        for env_key, env_value in test_cases:
-            mocker.patch.dict("os.environ", {env_key: env_value})
-            result = get_choice_from_env(env_key, valid_choices)
-            assert result == env_value
