@@ -1,5 +1,23 @@
 # Changelog
 
+## paperless-ngx 2.20.10
+
+### Bug Fixes
+
+-   Fix: support string coercion in filepath jinja templates [@shamoon](https://github.com/shamoon) ([#12244](https://github.com/paperless-ngx/paperless-ngx/pull/12244))
+-   Fix: apply ordering after annotating tag document count [@shamoon](https://github.com/shamoon) ([#12238](https://github.com/paperless-ngx/paperless-ngx/pull/12238))
+-   Fix: enforce path limit for db filename fields [@shamoon](https://github.com/shamoon) ([#12235](https://github.com/paperless-ngx/paperless-ngx/pull/12235))
+
+### All App Changes
+
+<details>
+<summary>3 changes</summary>
+
+-   Fix: support string coercion in filepath jinja templates [@shamoon](https://github.com/shamoon) ([#12244](https://github.com/paperless-ngx/paperless-ngx/pull/12244))
+-   Fix: apply ordering after annotating tag document count [@shamoon](https://github.com/shamoon) ([#12238](https://github.com/paperless-ngx/paperless-ngx/pull/12238))
+-   Fix: enforce path limit for db filename fields [@shamoon](https://github.com/shamoon) ([#12235](https://github.com/paperless-ngx/paperless-ngx/pull/12235))
+</details>
+
 ## paperless-ngx 2.20.9
 
 ### Security

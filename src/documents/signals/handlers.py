@@ -472,8 +472,22 @@ def update_filename_and_move_files(
 
             old_filename = instance.filename
             old_source_path = instance.source_path
+            move_original = False
+
+            old_archive_filename = instance.archive_filename
+            old_archive_path = instance.archive_path
+            move_archive = False
 
             candidate_filename = generate_filename(instance)
+            if len(str(candidate_filename)) > Document.MAX_STORED_FILENAME_LENGTH:
+                msg = (
+                    f"Document {instance!s}: Generated filename exceeds db path "
+                    f"limit ({len(str(candidate_filename))} > "
+                    f"{Document.MAX_STORED_FILENAME_LENGTH}): {candidate_filename!s}"
+                )
+                logger.warning(msg)
+                raise CannotMoveFilesException(msg)
+
             candidate_source_path = (
                 settings.ORIGINALS_DIR / candidate_filename
             ).resolve()
@@ -492,11 +506,16 @@ def update_filename_and_move_files(
             instance.filename = str(new_filename)
             move_original = old_filename != instance.filename
 
-            old_archive_filename = instance.archive_filename
-            old_archive_path = instance.archive_path
-
             if instance.has_archive_version:
                 archive_candidate = generate_filename(instance, archive_filename=True)
+                if len(str(archive_candidate)) > Document.MAX_STORED_FILENAME_LENGTH:
+                    msg = (
+                        f"Document {instance!s}: Generated archive filename exceeds "
+                        f"db path limit ({len(str(archive_candidate))} > "
+                        f"{Document.MAX_STORED_FILENAME_LENGTH}): {archive_candidate!s}"
+                    )
+                    logger.warning(msg)
+                    raise CannotMoveFilesException(msg)
                 archive_candidate_path = (
                     settings.ARCHIVE_DIR / archive_candidate
                 ).resolve()

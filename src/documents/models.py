@@ -156,6 +156,8 @@ class StoragePath(MatchingModel):
 
 
 class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-missing]
+    MAX_STORED_FILENAME_LENGTH: Final[int] = 1024
+
     correspondent = models.ForeignKey(
         Correspondent,
         blank=True,
@@ -262,7 +264,7 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
 
     filename = models.FilePathField(
         _("filename"),
-        max_length=1024,
+        max_length=MAX_STORED_FILENAME_LENGTH,
         editable=False,
         default=None,
         unique=True,
@@ -272,7 +274,7 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
 
     archive_filename = models.FilePathField(
         _("archive filename"),
-        max_length=1024,
+        max_length=MAX_STORED_FILENAME_LENGTH,
         editable=False,
         default=None,
         unique=True,
@@ -282,7 +284,7 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
 
     original_filename = models.CharField(
         _("original filename"),
-        max_length=1024,
+        max_length=MAX_STORED_FILENAME_LENGTH,
         editable=False,
         default=None,
         unique=False,
@@ -472,13 +474,6 @@ class SavedView(ModelWithOwner):
         CUSTOM_FIELD = ("custom_field_%d", ("Custom Field"))
 
     name = models.CharField(_("name"), max_length=128)
-
-    show_on_dashboard = models.BooleanField(
-        _("show on dashboard"),
-    )
-    show_in_sidebar = models.BooleanField(
-        _("show in sidebar"),
-    )
 
     sort_field = models.CharField(
         _("sort field"),

@@ -16,6 +16,12 @@
     </div>
   </form>
 
+  @if (note) {
+    <div class="small text-muted fst-italic mt-2">
+      {{ note }}
+    </div>
+  }
+
 </div>
 <div class="modal-footer">
   @if (!buttonsEnabled) {

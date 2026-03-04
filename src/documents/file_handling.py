@@ -127,17 +127,21 @@ def generate_filename(
     *,
     counter=0,
     archive_filename=False,
+    use_format=True,
 ) -> Path:
     base_path: Path | None = None
 
     # Determine the source of the format string
-    if doc.storage_path is not None:
-        filename_format = doc.storage_path.path
-    elif settings.FILENAME_FORMAT is not None:
-        # Maybe convert old to new style
-        filename_format = convert_format_str_to_template_format(
-            settings.FILENAME_FORMAT,
-        )
+    if use_format:
+        if doc.storage_path is not None:
+            filename_format = doc.storage_path.path
+        elif settings.FILENAME_FORMAT is not None:
+            # Maybe convert old to new style
+            filename_format = convert_format_str_to_template_format(
+                settings.FILENAME_FORMAT,
+            )
+        else:
+            filename_format = None
     else:
         filename_format = None
 
