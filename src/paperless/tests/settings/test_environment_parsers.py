@@ -4,8 +4,12 @@ from pathlib import Path
 import pytest
 from pytest_mock import MockerFixture
 
+from paperless.settings.parsers import get_bool_from_env
 from paperless.settings.parsers import get_choice_from_env
+from paperless.settings.parsers import get_float_from_env
 from paperless.settings.parsers import get_int_from_env
+from paperless.settings.parsers import get_list_from_env
+from paperless.settings.parsers import get_path_from_env
 from paperless.settings.parsers import parse_dict_from_str
 from paperless.settings.parsers import str_to_bool
 
@@ -205,6 +209,62 @@ class TestParseDictFromString:
         assert isinstance(result["database"]["port"], int)
 
 
+class TestGetBoolFromEnv:
+    @pytest.mark.parametrize(
+        ("env_value", "expected"),
+        [
+            pytest.param("true", True, id="true_lower"),
+            pytest.param("TRUE", True, id="true_upper"),
+            pytest.param("yes", True, id="yes"),
+            pytest.param("1", True, id="one"),
+            pytest.param("false", False, id="false_lower"),
+            pytest.param("FALSE", False, id="false_upper"),
+            pytest.param("no", False, id="no"),
+            pytest.param("0", False, id="zero"),
+        ],
+    )
+    def test_existing_env_var(self, mocker, env_value, expected):
+        """Test that existing environment variables return correct boolean values."""
+        mocker.patch.dict(os.environ, {"TEST_VAR": env_value})
+        assert get_bool_from_env("TEST_VAR") is expected
+
+    @pytest.mark.parametrize(
+        ("default", "expected"),
+        [
+            pytest.param("yes", True, id="default_yes"),
+            pytest.param("true", True, id="default_true"),
+            pytest.param("1", True, id="default_1"),
+            pytest.param("no", False, id="default_no"),
+            pytest.param("false", False, id="default_false"),
+            pytest.param("0", False, id="default_0"),
+        ],
+    )
+    def test_missing_env_var_with_defaults(self, mocker, default, expected):
+        """Test that missing environment variables use custom defaults correctly."""
+        mocker.patch.dict(os.environ, {}, clear=True)
+        assert get_bool_from_env("MISSING_VAR", default=default) is expected
+
+    def test_missing_env_var_uses_default_no(self, mocker):
+        """Test that missing environment variable uses default 'NO' and returns False."""
+        mocker.patch.dict(os.environ, {}, clear=True)
+        assert get_bool_from_env("MISSING_VAR") is False
+
+    @pytest.mark.parametrize(
+        "invalid_value",
+        [
+            pytest.param("invalid", id="word"),
+            pytest.param("maybe", id="maybe"),
+            pytest.param("2", id="number_2"),
+            pytest.param("", id="empty"),
+        ],
+    )
+    def test_invalid_values_raise_error(self, mocker, invalid_value):
+        """Test that invalid environment variable values raise ValueError."""
+        mocker.patch.dict(os.environ, {"INVALID_VAR": invalid_value})
+        with pytest.raises(ValueError):
+            get_bool_from_env("INVALID_VAR")
+
+
 class TestGetIntFromEnv:
     @pytest.mark.parametrize(
         ("env_value", "expected"),
@@ -257,6 +317,199 @@ class TestGetIntFromEnv:
         mocker.patch.dict(os.environ, {"INVALID_INT": invalid_value})
         with pytest.raises(ValueError):
             get_int_from_env("INVALID_INT")
+
+
+class TestGetFloatFromEnv:
+    @pytest.mark.parametrize(
+        ("env_value", "expected"),
+        [
+            pytest.param("3.14", 3.14, id="pi"),
+            pytest.param("42", 42.0, id="int_as_float"),
+            pytest.param("-2.5", -2.5, id="negative"),
+            pytest.param("0.0", 0.0, id="zero_float"),
+            pytest.param("0", 0.0, id="zero_int"),
+            pytest.param("1.5e2", 150.0, id="sci_positive"),
+            pytest.param("1e-3", 0.001, id="sci_negative"),
+            pytest.param("-1.23e4", -12300.0, id="sci_large"),
+        ],
+    )
+    def test_existing_env_var_valid_floats(self, mocker, env_value, expected):
+        """Test that existing environment variables with valid floats return correct values."""
+        mocker.patch.dict(os.environ, {"FLOAT_VAR": env_value})
+        assert get_float_from_env("FLOAT_VAR") == expected
+
+    @pytest.mark.parametrize(
+        ("default", "expected"),
+        [
+            pytest.param(3.14, 3.14, id="pi_default"),
+            pytest.param(0.0, 0.0, id="zero_default"),
+            pytest.param(-2.5, -2.5, id="negative_default"),
+            pytest.param(None, None, id="none_default"),
+        ],
+    )
+    def test_missing_env_var_with_defaults(self, mocker, default, expected):
+        """Test that missing environment variables return provided defaults."""
+        mocker.patch.dict(os.environ, {}, clear=True)
+        assert get_float_from_env("MISSING_VAR", default=default) == expected
+
+    def test_missing_env_var_no_default(self, mocker):
+        """Test that missing environment variable with no default returns None."""
+        mocker.patch.dict(os.environ, {}, clear=True)
+        assert get_float_from_env("MISSING_VAR") is None
+
+    @pytest.mark.parametrize(
+        "invalid_value",
+        [
+            pytest.param("not_a_number", id="text"),
+            pytest.param("42.5.0", id="double_decimal"),
+            pytest.param("42a", id="alpha_suffix"),
+            pytest.param("", id="empty"),
+            pytest.param(" ", id="whitespace"),
+            pytest.param("true", id="boolean"),
+            pytest.param("1.2.3", id="triple_decimal"),
+        ],
+    )
+    def test_invalid_float_values_raise_error(self, mocker, invalid_value):
+        """Test that invalid float values raise ValueError."""
+        mocker.patch.dict(os.environ, {"INVALID_FLOAT": invalid_value})
+        with pytest.raises(ValueError):
+            get_float_from_env("INVALID_FLOAT")
+
+
+class TestGetPathFromEnv:
+    @pytest.mark.parametrize(
+        "env_value",
+        [
+            pytest.param("/tmp/test", id="absolute"),
+            pytest.param("relative/path", id="relative"),
+            pytest.param("/path/with spaces/file.txt", id="spaces"),
+            pytest.param(".", id="current_dir"),
+            pytest.param("..", id="parent_dir"),
+            pytest.param("/", id="root"),
+        ],
+    )
+    def test_existing_env_var_paths(self, mocker, env_value):
+        """Test that existing environment variables with paths return resolved Path objects."""
+        mocker.patch.dict(os.environ, {"PATH_VAR": env_value})
+        result = get_path_from_env("PATH_VAR")
+        assert isinstance(result, Path)
+        assert result == Path(env_value).resolve()
+
+    def test_missing_env_var_no_default(self, mocker):
+        """Test that missing environment variable with no default returns None."""
+        mocker.patch.dict(os.environ, {}, clear=True)
+        assert get_path_from_env("MISSING_VAR") is None
+
+    def test_missing_env_var_with_none_default(self, mocker):
+        """Test that missing environment variable with None default returns None."""
+        mocker.patch.dict(os.environ, {}, clear=True)
+        assert get_path_from_env("MISSING_VAR", default=None) is None
+
+    @pytest.mark.parametrize(
+        "default_path_str",
+        [
+            pytest.param("/default/path", id="absolute_default"),
+            pytest.param("relative/default", id="relative_default"),
+            pytest.param(".", id="current_default"),
+        ],
+    )
+    def test_missing_env_var_with_path_defaults(self, mocker, default_path_str):
+        """Test that missing environment variables return resolved default Path objects."""
+        mocker.patch.dict(os.environ, {}, clear=True)
+        default_path = Path(default_path_str)
+        result = get_path_from_env("MISSING_VAR", default=default_path)
+        assert isinstance(result, Path)
+        assert result == default_path.resolve()
+
+    def test_relative_paths_are_resolved(self, mocker):
+        """Test that relative paths are properly resolved to absolute paths."""
+        mocker.patch.dict(os.environ, {"REL_PATH": "relative/path"})
+        result = get_path_from_env("REL_PATH")
+        assert result is not None
+        assert result.is_absolute()
+
+
+class TestGetListFromEnv:
+    @pytest.mark.parametrize(
+        ("env_value", "expected"),
+        [
+            pytest.param("a,b,c", ["a", "b", "c"], id="basic_comma_separated"),
+            pytest.param("single", ["single"], id="single_element"),
+            pytest.param("", [], id="empty_string"),
+            pytest.param("a, b , c", ["a", "b", "c"], id="whitespace_trimmed"),
+            pytest.param("a,,b,c", ["a", "b", "c"], id="empty_elements_removed"),
+        ],
+    )
+    def test_existing_env_var_basic_parsing(self, mocker, env_value, expected):
+        """Test that existing environment variables are parsed correctly."""
+        mocker.patch.dict(os.environ, {"LIST_VAR": env_value})
+        result = get_list_from_env("LIST_VAR")
+        assert result == expected
+
+    @pytest.mark.parametrize(
+        ("separator", "env_value", "expected"),
+        [
+            pytest.param("|", "a|b|c", ["a", "b", "c"], id="pipe_separator"),
+            pytest.param(":", "a:b:c", ["a", "b", "c"], id="colon_separator"),
+            pytest.param(";", "a;b;c", ["a", "b", "c"], id="semicolon_separator"),
+        ],
+    )
+    def test_custom_separators(self, mocker, separator, env_value, expected):
+        """Test that custom separators work correctly."""
+        mocker.patch.dict(os.environ, {"LIST_VAR": env_value})
+        result = get_list_from_env("LIST_VAR", separator=separator)
+        assert result == expected
+
+    @pytest.mark.parametrize(
+        ("default", "expected"),
+        [
+            pytest.param(
+                ["default1", "default2"],
+                ["default1", "default2"],
+                id="string_list_default",
+            ),
+            pytest.param([1, 2, 3], [1, 2, 3], id="int_list_default"),
+            pytest.param(None, [], id="none_default_returns_empty_list"),
+        ],
+    )
+    def test_missing_env_var_with_defaults(self, mocker, default, expected):
+        """Test that missing environment variables return provided defaults."""
+        mocker.patch.dict(os.environ, {}, clear=True)
+        result = get_list_from_env("MISSING_VAR", default=default)
+        assert result == expected
+
+    def test_missing_env_var_no_default(self, mocker):
+        """Test that missing environment variable with no default returns empty list."""
+        mocker.patch.dict(os.environ, {}, clear=True)
+        result = get_list_from_env("MISSING_VAR")
+        assert result == []
+
+    def test_required_env_var_missing_raises_error(self, mocker):
+        """Test that missing required environment variable raises ValueError."""
+        mocker.patch.dict(os.environ, {}, clear=True)
+        with pytest.raises(
+            ValueError,
+            match="Required environment variable 'REQUIRED_VAR' is not set",
+        ):
+            get_list_from_env("REQUIRED_VAR", required=True)
+
+    def test_required_env_var_with_default_does_not_raise(self, mocker):
+        """Test that required environment variable with default does not raise error."""
+        mocker.patch.dict(os.environ, {}, clear=True)
+        result = get_list_from_env("REQUIRED_VAR", default=["default"], required=True)
+        assert result == ["default"]
+
+    def test_strip_whitespace_false(self, mocker):
+        """Test that whitespace is preserved when strip_whitespace=False."""
+        mocker.patch.dict(os.environ, {"LIST_VAR": " a , b , c "})
+        result = get_list_from_env("LIST_VAR", strip_whitespace=False)
+        assert result == [" a ", " b ", " c "]
+
+    def test_remove_empty_false(self, mocker):
+        """Test that empty elements are preserved when remove_empty=False."""
+        mocker.patch.dict(os.environ, {"LIST_VAR": "a,,b,,c"})
+        result = get_list_from_env("LIST_VAR", remove_empty=False)
+        assert result == ["a", "", "b", "", "c"]
 
 
 class TestGetEnvChoice:
