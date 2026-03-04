@@ -24,6 +24,7 @@ from django.db.models import Q
 from django.dispatch import receiver
 from django.utils import timezone
 from filelock import FileLock
+from rest_framework import serializers
 
 from documents import matching
 from documents.caching import clear_document_caches
@@ -48,6 +49,7 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
+from documents.plugins.helpers import DocumentsStatusManager
 from documents.templating.utils import convert_format_str_to_template_format
 from documents.workflows.actions import build_workflow_action_context
 from documents.workflows.actions import execute_email_action
@@ -69,6 +71,7 @@ if TYPE_CHECKING:
     from documents.data_models import DocumentMetadataOverrides
 
 logger = logging.getLogger("paperless.handlers")
+DRF_DATETIME_FIELD = serializers.DateTimeField()
 
 
 def add_inbox_tags(sender, document: Document, logging_group=None, **kwargs) -> None:
@@ -469,8 +472,22 @@ def update_filename_and_move_files(
 
             old_filename = instance.filename
             old_source_path = instance.source_path
+            move_original = False
+
+            old_archive_filename = instance.archive_filename
+            old_archive_path = instance.archive_path
+            move_archive = False
 
             candidate_filename = generate_filename(instance)
+            if len(str(candidate_filename)) > Document.MAX_STORED_FILENAME_LENGTH:
+                msg = (
+                    f"Document {instance!s}: Generated filename exceeds db path "
+                    f"limit ({len(str(candidate_filename))} > "
+                    f"{Document.MAX_STORED_FILENAME_LENGTH}): {candidate_filename!s}"
+                )
+                logger.warning(msg)
+                raise CannotMoveFilesException(msg)
+
             candidate_source_path = (
                 settings.ORIGINALS_DIR / candidate_filename
             ).resolve()
@@ -489,11 +506,16 @@ def update_filename_and_move_files(
             instance.filename = str(new_filename)
             move_original = old_filename != instance.filename
 
-            old_archive_filename = instance.archive_filename
-            old_archive_path = instance.archive_path
-
             if instance.has_archive_version:
                 archive_candidate = generate_filename(instance, archive_filename=True)
+                if len(str(archive_candidate)) > Document.MAX_STORED_FILENAME_LENGTH:
+                    msg = (
+                        f"Document {instance!s}: Generated archive filename exceeds "
+                        f"db path limit ({len(str(archive_candidate))} > "
+                        f"{Document.MAX_STORED_FILENAME_LENGTH}): {archive_candidate!s}"
+                    )
+                    logger.warning(msg)
+                    raise CannotMoveFilesException(msg)
                 archive_candidate_path = (
                     settings.ARCHIVE_DIR / archive_candidate
                 ).resolve()
@@ -762,6 +784,28 @@ def run_workflows_updated(
         document=document,
         logging_group=logging_group,
     )
+
+
+def send_websocket_document_updated(
+    sender,
+    document: Document,
+    **kwargs,
+) -> None:
+    # At this point, workflows may already have applied additional changes.
+    document.refresh_from_db()
+
+    from documents.data_models import DocumentMetadataOverrides
+
+    doc_overrides = DocumentMetadataOverrides.from_document(document)
+
+    with DocumentsStatusManager() as status_mgr:
+        status_mgr.send_document_updated(
+            document_id=document.id,
+            modified=DRF_DATETIME_FIELD.to_representation(document.modified),
+            owner_id=doc_overrides.owner_id,
+            users_can_view=doc_overrides.view_users,
+            groups_can_view=doc_overrides.view_groups,
+        )
 
 
 def run_workflows(
@@ -1045,7 +1089,11 @@ def add_or_update_document_in_llm_index(sender, document, **kwargs):
 
 
 @receiver(models.signals.post_delete, sender=Document)
-def delete_document_from_llm_index(sender, instance: Document, **kwargs):
+def delete_document_from_llm_index(
+    sender: Any,
+    instance: Document,
+    **kwargs: Any,
+) -> None:
     """
     Delete a document from the LLM index when it is deleted.
     """

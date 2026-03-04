@@ -1,6 +1,6 @@
 [project]
 name = "paperless-ngx"
-version = "2.20.9"
+version = "2.20.10"
 description = "A community-supported supercharged document management system: scan, index and archive all your physical documents"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -309,6 +309,7 @@ markers = [
 [tool.pytest_env]
 PAPERLESS_DISABLE_DBHANDLER = "true"
 PAPERLESS_CACHE_BACKEND = "django.core.cache.backends.locmem.LocMemCache"
+PAPERLESS_CHANNELS_BACKEND = "channels.layers.InMemoryChannelLayer"
 
 [tool.coverage.report]
 exclude_also = [

@@ -104,11 +104,9 @@
         }
       }
 
-      <div *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.SavedView }">
-        @if (list.activeSavedViewId) {
-          <button ngbDropdownItem (click)="saveViewConfig()" [disabled]="!savedViewIsModified" i18n>Save "{{list.activeSavedViewTitle}}"</button>
-        }
-      </div>
+      @if (list.activeSavedViewId && activeSavedViewCanChange) {
+        <button ngbDropdownItem (click)="saveViewConfig()" [disabled]="!savedViewIsModified" i18n>Save "{{list.activeSavedViewTitle}}"</button>
+      }
       <button ngbDropdownItem (click)="saveViewConfigAs()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.SavedView }" i18n>Save as...</button>
       <a ngbDropdownItem routerLink="/savedviews" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }" i18n>All saved views</a>
     </div>
