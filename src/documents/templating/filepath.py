@@ -79,6 +79,23 @@ class PlaceholderString(str):
 NO_VALUE_PLACEHOLDER = PlaceholderString("-none-")
 
 
+class MatchingModelContext:
+    """
+    Safe template context for related objects.
+
+    Keeps legacy behavior where including the object ina template yields the related object's
+    name as a string, while still exposing limited attributes.
+    """
+
+    def __init__(self, *, id: int, name: str, path: str | None = None):
+        self.id = id
+        self.name = name
+        self.path = path
+
+    def __str__(self) -> str:
+        return self.name
+
+
 _template_environment.undefined = _LogStrictUndefined
 
 _template_environment.filters["get_cf_value"] = get_cf_value
@@ -221,19 +238,26 @@ def get_safe_document_context(
         else None,
         "tags": [{"name": tag.name, "id": tag.id} for tag in tags],
         "correspondent": (
-            {"name": document.correspondent.name, "id": document.correspondent.id}
+            MatchingModelContext(
+                name=document.correspondent.name,
+                id=document.correspondent.id,
+            )
             if document.correspondent
             else None
         ),
         "document_type": (
-            {"name": document.document_type.name, "id": document.document_type.id}
+            MatchingModelContext(
+                name=document.document_type.name,
+                id=document.document_type.id,
+            )
             if document.document_type
             else None
         ),
-        "storage_path": {
-            "path": document.storage_path.path,
-            "id": document.storage_path.id,
-        }
+        "storage_path": MatchingModelContext(
+            name=document.storage_path.name,
+            path=document.storage_path.path,
+            id=document.storage_path.id,
+        )
         if document.storage_path
         else None,
     }
