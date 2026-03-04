@@ -731,6 +731,7 @@ class TestConsumer(
             path="root/{{title}}",
         )
         root_doc.storage_path = root_storage_path
+        root_doc.archive_serial_number = 42
         root_doc.save()
 
         actor = User.objects.create_user(
@@ -781,6 +782,7 @@ class TestConsumer(
         assert version.original_filename is not None
         self.assertEqual(version.version_index, 1)
         self.assertEqual(version.version_label, "v2")
+        self.assertIsNone(version.archive_serial_number)
         self.assertEqual(version.original_filename, version_file.name)
         self.assertTrue(bool(version.content))
 
