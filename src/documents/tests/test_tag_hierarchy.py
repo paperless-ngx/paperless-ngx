@@ -147,6 +147,16 @@ class TestTagHierarchy(APITestCase):
         assert serializer.data  # triggers serialization
         assert "document_count_filter" in context
 
+    def test_tag_list_can_order_by_document_count_with_children(self) -> None:
+        self.document.tags.add(self.child)
+
+        response = self.client.get(
+            "/api/tags/",
+            {"ordering": "document_count"},
+        )
+
+        assert response.status_code == 200
+
     def test_cannot_set_parent_to_self(self):
         tag = Tag.objects.create(name="Selfie")
         resp = self.client.patch(
