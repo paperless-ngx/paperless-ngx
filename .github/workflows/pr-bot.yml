@@ -4,8 +4,16 @@ on:
     types: [opened]
 permissions:
   contents: read
+  issues: read
   pull-requests: write
 jobs:
+  anti-slop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: peakoss/anti-slop@v0
+        with:
+          max-failures: 4
+          failure-add-pr-labels: 'ai'
   pr-bot:
     name: Automated PR Bot
     runs-on: ubuntu-latest
