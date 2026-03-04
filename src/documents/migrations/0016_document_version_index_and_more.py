@@ -7,7 +7,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "0013_document_root_document"),
+        ("documents", "0015_savedview_visibility_to_ui_settings"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
