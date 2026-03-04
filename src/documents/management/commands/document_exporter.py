@@ -3,6 +3,8 @@ import json
 import os
 import shutil
 import tempfile
+from itertools import chain
+from itertools import islice
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -19,6 +21,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import serializers
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import transaction
 from django.utils import timezone
 from filelock import FileLock
@@ -26,6 +29,8 @@ from guardian.models import GroupObjectPermission
 from guardian.models import UserObjectPermission
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from django.db.models import QuerySet
 
 if settings.AUDIT_LOG_ENABLED:
@@ -58,6 +63,22 @@ from paperless import version
 from paperless.models import ApplicationConfiguration
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+
+
+def serialize_queryset_batched(
+    queryset: "QuerySet",
+    *,
+    batch_size: int = 500,
+) -> "Generator[list[dict], None, None]":
+    """Yield batches of serialized records from a QuerySet.
+
+    Each batch is a list of dicts in Django's Python serialization format.
+    Uses QuerySet.iterator() to avoid loading the full queryset into memory,
+    and islice to collect chunk-sized batches serialized in a single call.
+    """
+    iterator = queryset.iterator(chunk_size=batch_size)
+    while chunk := list(islice(iterator, batch_size)):
+        yield serializers.serialize("python", chunk)
 
 
 class Command(CryptMixin, BaseCommand):
@@ -186,6 +207,17 @@ class Command(CryptMixin, BaseCommand):
             help="If provided, is used to encrypt sensitive data in the export",
         )
 
+        parser.add_argument(
+            "--batch-size",
+            type=int,
+            default=500,
+            help=(
+                "Number of records to process per batch during serialization. "
+                "Lower values reduce peak memory usage; higher values improve "
+                "throughput. Default: 500."
+            ),
+        )
+
     def handle(self, *args, **options) -> None:
         self.target = Path(options["target"]).resolve()
         self.split_manifest: bool = options["split_manifest"]
@@ -200,6 +232,7 @@ class Command(CryptMixin, BaseCommand):
         self.data_only: bool = options["data_only"]
         self.no_progress_bar: bool = options["no_progress_bar"]
         self.passphrase: str | None = options.get("passphrase")
+        self.batch_size: int = options["batch_size"]
 
         self.files_in_export_dir: set[Path] = set()
         self.exported_files: set[str] = set()
@@ -294,8 +327,13 @@ class Command(CryptMixin, BaseCommand):
 
             # Build an overall manifest
             for key, object_query in manifest_key_to_object_query.items():
-                manifest_dict[key] = json.loads(
-                    serializers.serialize("json", object_query),
+                manifest_dict[key] = list(
+                    chain.from_iterable(
+                        serialize_queryset_batched(
+                            object_query,
+                            batch_size=self.batch_size,
+                        ),
+                    ),
                 )
 
             self.encrypt_secret_fields(manifest_dict)
@@ -512,14 +550,24 @@ class Command(CryptMixin, BaseCommand):
             self.files_in_export_dir.remove(target)
             if self.compare_json:
                 target_checksum = hashlib.md5(target.read_bytes()).hexdigest()
-                src_str = json.dumps(content, indent=2, ensure_ascii=False)
+                src_str = json.dumps(
+                    content,
+                    cls=DjangoJSONEncoder,
+                    indent=2,
+                    ensure_ascii=False,
+                )
                 src_checksum = hashlib.md5(src_str.encode("utf-8")).hexdigest()
                 if src_checksum == target_checksum:
                     perform_write = False
 
         if perform_write:
             target.write_text(
-                json.dumps(content, indent=2, ensure_ascii=False),
+                json.dumps(
+                    content,
+                    cls=DjangoJSONEncoder,
+                    indent=2,
+                    ensure_ascii=False,
+                ),
                 encoding="utf-8",
             )
 
