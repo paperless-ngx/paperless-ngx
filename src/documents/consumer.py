@@ -170,7 +170,7 @@ class ConsumerPlugin(
 ):
     logging_name = LOGGING_NAME
 
-    def _clone_root_into_version(
+    def _create_version_from_root(
         self,
         root_doc: Document,
         *,
@@ -188,30 +188,29 @@ class ConsumerPlugin(
             )["max_index"]
             or 0
         )
-        version_doc = Document.objects.get(pk=root_doc_frozen.pk)
-        setattr(version_doc, "pk", None)
-        version_doc.root_document = root_doc_frozen
-        version_doc.version_index = next_version_index + 1
         file_for_checksum = (
             self.unmodified_original
             if self.unmodified_original is not None
             else self.working_copy
         )
-        version_doc.checksum = hashlib.md5(
-            file_for_checksum.read_bytes(),
-        ).hexdigest()
-        version_doc.content = text or ""
-        version_doc.page_count = page_count
-        version_doc.mime_type = mime_type
-        version_doc.original_filename = self.filename
-        # Clear unique file path fields so they can be generated uniquely later
-        version_doc.filename = None
-        version_doc.archive_filename = None
-        version_doc.archive_checksum = None
+        version_doc = Document(
+            root_document=root_doc_frozen,
+            version_index=next_version_index + 1,
+            checksum=hashlib.md5(
+                file_for_checksum.read_bytes(),
+            ).hexdigest(),
+            content=text or "",
+            page_count=page_count,
+            mime_type=mime_type,
+            original_filename=self.filename,
+            owner_id=root_doc_frozen.owner_id,
+            created=root_doc_frozen.created,
+            title=root_doc_frozen.title,
+            added=timezone.now(),
+            modified=timezone.now(),
+        )
         if self.metadata.version_label is not None:
             version_doc.version_label = self.metadata.version_label
-        version_doc.added = timezone.now()
-        version_doc.modified = timezone.now()
         return version_doc
 
     def run_pre_consume_script(self) -> None:
@@ -537,7 +536,7 @@ class ConsumerPlugin(
                     root_doc = Document.objects.get(
                         pk=self.input_doc.root_document_id,
                     )
-                    original_document = self._clone_root_into_version(
+                    original_document = self._create_version_from_root(
                         root_doc,
                         text=text,
                         page_count=page_count,
