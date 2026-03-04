@@ -414,7 +414,7 @@ if DEBUG:
 # We allow CORS from localhost:8000
 CORS_ALLOWED_ORIGINS = get_list_from_env(
     "PAPERLESS_CORS_ALLOWED_HOSTS",
-    ["http://localhost:8000"],
+    default=["http://localhost:8000"],
 )
 
 if DEBUG:
@@ -427,7 +427,7 @@ CORS_EXPOSE_HEADERS = [
     "Content-Disposition",
 ]
 
-ALLOWED_HOSTS = get_list_from_env("PAPERLESS_ALLOWED_HOSTS", ["*"])
+ALLOWED_HOSTS = get_list_from_env("PAPERLESS_ALLOWED_HOSTS", default=["*"])
 if ALLOWED_HOSTS != ["*"]:
     # always allow localhost. Necessary e.g. for healthcheck in docker.
     ALLOWED_HOSTS.append("localhost")
@@ -1080,10 +1080,13 @@ OUTLOOK_OAUTH_ENABLED = bool(
 ###############################################################################
 WEBHOOKS_ALLOWED_SCHEMES = {
     s.lower()
-    for s in get_list_from_env("PAPERLESS_WEBHOOKS_ALLOWED_SCHEMES", ["http", "https"])
+    for s in get_list_from_env(
+        "PAPERLESS_WEBHOOKS_ALLOWED_SCHEMES",
+        default=["http", "https"],
+    )
 }
 WEBHOOKS_ALLOWED_PORTS = {
-    int(p) for p in get_list_from_env("PAPERLESS_WEBHOOKS_ALLOWED_PORTS", [])
+    int(p) for p in get_list_from_env("PAPERLESS_WEBHOOKS_ALLOWED_PORTS", default=[])
 }
 WEBHOOKS_ALLOW_INTERNAL_REQUESTS = get_bool_from_env(
     "PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS",
