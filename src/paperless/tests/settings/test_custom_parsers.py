@@ -1,3 +1,4 @@
+import datetime
 import os
 from pathlib import Path
 from typing import Any
@@ -7,8 +8,10 @@ from celery.schedules import crontab
 from pytest_mock import MockerFixture
 
 from paperless.settings.custom import parse_beat_schedule
+from paperless.settings.custom import parse_dateparser_languages
 from paperless.settings.custom import parse_db_settings
 from paperless.settings.custom import parse_hosting_settings
+from paperless.settings.custom import parse_ignore_dates
 from paperless.settings.custom import parse_redis_url
 
 
@@ -57,6 +60,24 @@ class TestRedisSocketConversion:
                 "redis://myredishost:6379",
                 ("redis://myredishost:6379", "redis://myredishost:6379"),
                 id="host_with_port_unchanged",
+            ),
+            # Credentials in unix:// URL contain multiple colons (user:password@)
+            # Regression test for https://github.com/paperless-ngx/paperless-ngx/pull/12239
+            pytest.param(
+                "unix://user:password@/run/redis/redis.sock",
+                (
+                    "redis+socket://user:password@/run/redis/redis.sock",
+                    "unix://user:password@/run/redis/redis.sock",
+                ),
+                id="redis_py_style_socket_with_credentials",
+            ),
+            pytest.param(
+                "redis+socket://user:password@/run/redis/redis.sock",
+                (
+                    "redis+socket://user:password@/run/redis/redis.sock",
+                    "unix://user:password@/run/redis/redis.sock",
+                ),
+                id="celery_style_socket_with_credentials",
             ),
         ],
     )
@@ -512,3 +533,85 @@ class TestParseDbSettings:
         settings = parse_db_settings(tmp_path)
 
         assert settings == expected_database_settings
+
+
+class TestParseIgnoreDates:
+    """Tests the parsing of the PAPERLESS_IGNORE_DATES setting value."""
+
+    def test_no_ignore_dates_set(self) -> None:
+        """
+        GIVEN:
+            - No ignore dates are set
+        THEN:
+            - No ignore dates are parsed
+        """
+        assert parse_ignore_dates("", "YMD") == set()
+
+    @pytest.mark.parametrize(
+        ("env_str", "date_format", "expected"),
+        [
+            pytest.param(
+                "1985-05-01",
+                "YMD",
+                {datetime.date(1985, 5, 1)},
+                id="single-ymd",
+            ),
+            pytest.param(
+                "1985-05-01,1991-12-05",
+                "YMD",
+                {datetime.date(1985, 5, 1), datetime.date(1991, 12, 5)},
+                id="multiple-ymd",
+            ),
+            pytest.param(
+                "2010-12-13",
+                "YMD",
+                {datetime.date(2010, 12, 13)},
+                id="single-ymd-2",
+            ),
+            pytest.param(
+                "11.01.10",
+                "DMY",
+                {datetime.date(2010, 1, 11)},
+                id="single-dmy",
+            ),
+            pytest.param(
+                "11.01.2001,15-06-1996",
+                "DMY",
+                {datetime.date(2001, 1, 11), datetime.date(1996, 6, 15)},
+                id="multiple-dmy",
+            ),
+        ],
+    )
+    def test_ignore_dates_parsed(
+        self,
+        env_str: str,
+        date_format: str,
+        expected: set[datetime.date],
+    ) -> None:
+        """
+        GIVEN:
+            - Ignore dates are set per certain inputs
+        THEN:
+            - All ignore dates are parsed
+        """
+        assert parse_ignore_dates(env_str, date_format) == expected
+
+
+@pytest.mark.parametrize(
+    ("languages", "expected"),
+    [
+        ("de", ["de"]),
+        ("zh", ["zh"]),
+        ("fr+en", ["fr", "en"]),
+        # Locales must be supported
+        ("en-001+fr-CA", ["en-001", "fr-CA"]),
+        ("en-001+fr", ["en-001", "fr"]),
+        # Special case for Chinese: variants seem to miss some dates,
+        # so we always add "zh" as a fallback.
+        ("en+zh-Hans-HK", ["en", "zh-Hans-HK", "zh"]),
+        ("en+zh-Hans", ["en", "zh-Hans", "zh"]),
+        ("en+zh-Hans+zh-Hant", ["en", "zh-Hans", "zh-Hant", "zh"]),
+    ],
+)
+def test_parse_dateparser_languages(languages: str, expected: list[str]) -> None:
+    assert sorted(parse_dateparser_languages(languages)) == sorted(expected)

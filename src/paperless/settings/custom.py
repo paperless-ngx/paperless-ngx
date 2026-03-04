@@ -1,12 +1,17 @@
+import datetime
+import logging
 import os
 from pathlib import Path
 from typing import Any
 
 from celery.schedules import crontab
+from dateparser.languages.loader import LocaleDataLoader
 
 from paperless.settings.parsers import get_choice_from_env
 from paperless.settings.parsers import get_int_from_env
 from paperless.settings.parsers import parse_dict_from_str
+
+logger = logging.getLogger(__name__)
 
 
 def parse_hosting_settings() -> tuple[str | None, str, str, str, str]:
@@ -295,3 +300,48 @@ def parse_db_settings(data_dir: Path) -> dict[str, dict[str, Any]]:
     )
 
     return {"default": db_config}
+
+
+def parse_dateparser_languages(languages: str | None) -> list[str]:
+    language_list = languages.split("+") if languages else []
+    # There is an unfixed issue in zh-Hant and zh-Hans locales in the dateparser lib.
+    # See: https://github.com/scrapinghub/dateparser/issues/875
+    for index, language in enumerate(language_list):
+        if language.startswith("zh-") and "zh" not in language_list:
+            logger.warning(
+                f"Chinese locale detected: {language}. dateparser might fail to parse"
+                f' some dates with this locale, so Chinese ("zh") will be used as a fallback.',
+            )
+            language_list.append("zh")
+
+    return list(LocaleDataLoader().get_locale_map(locales=language_list))
+
+
+def parse_ignore_dates(
+    env_ignore: str,
+    date_order: str,
+) -> set[datetime.date]:
+    """
+    If the PAPERLESS_IGNORE_DATES environment variable is set, parse the
+    user provided string(s) into dates
+
+    Args:
+        env_ignore (str): The value of the environment variable, comma separated dates
+        date_order (str): The format of the date strings.
+
+    Returns:
+        set[datetime.date]: The set of parsed date objects
+    """
+    import dateparser
+
+    ignored_dates = set()
+    for s in env_ignore.split(","):
+        d = dateparser.parse(
+            s,
+            settings={
+                "DATE_ORDER": date_order,
+            },
+        )
+        if d:
+            ignored_dates.add(d.date())
+    return ignored_dates

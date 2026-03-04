@@ -11,13 +11,14 @@ from typing import Final
 from urllib.parse import urlparse
 
 from compression_middleware.middleware import CompressionMiddleware
-from dateparser.languages.loader import LocaleDataLoader
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
 from paperless.settings.custom import parse_beat_schedule
+from paperless.settings.custom import parse_dateparser_languages
 from paperless.settings.custom import parse_db_settings
 from paperless.settings.custom import parse_hosting_settings
+from paperless.settings.custom import parse_ignore_dates
 from paperless.settings.custom import parse_redis_url
 from paperless.settings.parsers import get_bool_from_env
 from paperless.settings.parsers import get_float_from_env
@@ -934,23 +935,9 @@ DATE_ORDER = os.getenv("PAPERLESS_DATE_ORDER", "DMY")
 FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
 
 
-def _parse_dateparser_languages(languages: str | None):
-    language_list = languages.split("+") if languages else []
-    # There is an unfixed issue in zh-Hant and zh-Hans locales in the dateparser lib.
-    # See: https://github.com/scrapinghub/dateparser/issues/875
-    for index, language in enumerate(language_list):
-        if language.startswith("zh-") and "zh" not in language_list:
-            logger.warning(
-                f'Chinese locale detected: {language}. dateparser might fail to parse some dates with this locale, so Chinese ("zh") will be used as a fallback.',
-            )
-            language_list.append("zh")
-
-    return list(LocaleDataLoader().get_locale_map(locales=language_list))
-
-
 # If not set, we will infer it at runtime
 DATE_PARSER_LANGUAGES = (
-    _parse_dateparser_languages(
+    parse_dateparser_languages(
         os.getenv("PAPERLESS_DATE_PARSER_LANGUAGES"),
     )
     if os.getenv("PAPERLESS_DATE_PARSER_LANGUAGES")
@@ -996,42 +983,11 @@ if AUDIT_LOG_ENABLED:
     MIDDLEWARE.append("auditlog.middleware.AuditlogMiddleware")
 
 
-def _parse_ignore_dates(
-    env_ignore: str,
-    date_order: str = DATE_ORDER,
-) -> set[datetime.datetime]:
-    """
-    If the PAPERLESS_IGNORE_DATES environment variable is set, parse the
-    user provided string(s) into dates
-
-    Args:
-        env_ignore (str): The value of the environment variable, comma separated dates
-        date_order (str, optional): The format of the date strings.
-                                    Defaults to DATE_ORDER.
-
-    Returns:
-        Set[datetime.datetime]: The set of parsed date objects
-    """
-    import dateparser
-
-    ignored_dates = set()
-    for s in env_ignore.split(","):
-        d = dateparser.parse(
-            s,
-            settings={
-                "DATE_ORDER": date_order,
-            },
-        )
-        if d:
-            ignored_dates.add(d.date())
-    return ignored_dates
-
-
 # List dates that should be ignored when trying to parse date from document text
 IGNORE_DATES: set[datetime.date] = set()
 
 if os.getenv("PAPERLESS_IGNORE_DATES") is not None:
-    IGNORE_DATES = _parse_ignore_dates(os.getenv("PAPERLESS_IGNORE_DATES"))
+    IGNORE_DATES = parse_ignore_dates(os.getenv("PAPERLESS_IGNORE_DATES"), DATE_ORDER)
 
 ENABLE_UPDATE_CHECK = os.getenv("PAPERLESS_ENABLE_UPDATE_CHECK", "default")
 if ENABLE_UPDATE_CHECK != "default":
