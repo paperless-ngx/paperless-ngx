@@ -4,11 +4,12 @@ on:
     types: [opened]
 permissions:
   contents: read
-  issues: read
   pull-requests: write
 jobs:
   anti-slop:
     runs-on: ubuntu-latest
+    permissions:
+      issues: read
     steps:
       - uses: peakoss/anti-slop@v0
         with:
