@@ -156,6 +156,8 @@ class StoragePath(MatchingModel):
 
 
 class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-missing]
+    MAX_STORED_FILENAME_LENGTH: Final[int] = 1024
+
     correspondent = models.ForeignKey(
         Correspondent,
         blank=True,
@@ -262,7 +264,7 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
 
     filename = models.FilePathField(
         _("filename"),
-        max_length=1024,
+        max_length=MAX_STORED_FILENAME_LENGTH,
         editable=False,
         default=None,
         unique=True,
@@ -272,7 +274,7 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
 
     archive_filename = models.FilePathField(
         _("archive filename"),
-        max_length=1024,
+        max_length=MAX_STORED_FILENAME_LENGTH,
         editable=False,
         default=None,
         unique=True,
@@ -282,7 +284,7 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
 
     original_filename = models.CharField(
         _("original filename"),
-        max_length=1024,
+        max_length=MAX_STORED_FILENAME_LENGTH,
         editable=False,
         default=None,
         unique=False,

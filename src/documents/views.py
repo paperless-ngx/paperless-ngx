@@ -530,13 +530,13 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
             user = getattr(getattr(self, "request", None), "user", None)
             children_source = list(
                 annotate_document_count_for_related_queryset(
-                    Tag.objects.filter(pk__in=descendant_pks | {t.pk for t in all_tags})
-                    .select_related("owner")
-                    .order_by(*ordering),
+                    Tag.objects.filter(
+                        pk__in=descendant_pks | {t.pk for t in all_tags},
+                    ).select_related("owner"),
                     through_model=self.document_count_through,
                     related_object_field=self._get_document_count_source_field(),
                     user=user,
-                ),
+                ).order_by(*ordering),
             )
         else:
             children_source = all_tags
