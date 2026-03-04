@@ -7,7 +7,7 @@ SIDEBAR_VIEWS_VISIBLE_IDS_KEY = "sidebar_views_visible_ids"
 
 class TestMigrateSavedViewVisibilityToUiSettings(TestMigrations):
     migrate_from = "0013_document_root_document"
-    migrate_to = "0014_savedview_visibility_to_ui_settings"
+    migrate_to = "0015_savedview_visibility_to_ui_settings"
 
     def setUpBeforeMigration(self, apps) -> None:
         User = apps.get_model("auth", "User")
@@ -132,8 +132,8 @@ class TestMigrateSavedViewVisibilityToUiSettings(TestMigrations):
 
 
 class TestReverseMigrateSavedViewVisibilityFromUiSettings(TestMigrations):
-    migrate_from = "0014_savedview_visibility_to_ui_settings"
-    migrate_to = "0013_document_root_document"
+    migrate_from = "0015_savedview_visibility_to_ui_settings"
+    migrate_to = "0014_alter_paperlesstask_task_name"
 
     def setUpBeforeMigration(self, apps) -> None:
         User = apps.get_model("auth", "User")
