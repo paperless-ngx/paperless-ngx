@@ -19,6 +19,7 @@ from documents.classifier import load_classifier
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.file_handling import create_source_path_directory
+from documents.file_handling import generate_filename
 from documents.file_handling import generate_unique_filename
 from documents.loggers import LoggingMixin
 from documents.models import Correspondent
@@ -493,7 +494,19 @@ class ConsumerPlugin(
                 # After everything is in the database, copy the files into
                 # place. If this fails, we'll also rollback the transaction.
                 with FileLock(settings.MEDIA_LOCK):
-                    document.filename = generate_unique_filename(document)
+                    generated_filename = generate_unique_filename(document)
+                    if (
+                        len(str(generated_filename))
+                        > Document.MAX_STORED_FILENAME_LENGTH
+                    ):
+                        self.log.warning(
+                            "Generated source filename exceeds db path limit, falling back to default naming",
+                        )
+                        generated_filename = generate_filename(
+                            document,
+                            use_format=False,
+                        )
+                    document.filename = generated_filename
                     create_source_path_directory(document.source_path)
 
                     self._write(
@@ -511,10 +524,23 @@ class ConsumerPlugin(
                     )
 
                     if archive_path and Path(archive_path).is_file():
-                        document.archive_filename = generate_unique_filename(
+                        generated_archive_filename = generate_unique_filename(
                             document,
                             archive_filename=True,
                         )
+                        if (
+                            len(str(generated_archive_filename))
+                            > Document.MAX_STORED_FILENAME_LENGTH
+                        ):
+                            self.log.warning(
+                                "Generated archive filename exceeds db path limit, falling back to default naming",
+                            )
+                            generated_archive_filename = generate_filename(
+                                document,
+                                archive_filename=True,
+                                use_format=False,
+                            )
+                        document.archive_filename = generated_archive_filename
                         create_source_path_directory(document.archive_path)
                         self._write(
                             document.storage_type,

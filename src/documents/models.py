@@ -160,6 +160,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
         (STORAGE_TYPE_UNENCRYPTED, _("Unencrypted")),
         (STORAGE_TYPE_GPG, _("Encrypted with GNU Privacy Guard")),
     )
+    MAX_STORED_FILENAME_LENGTH: Final[int] = 1024
 
     correspondent = models.ForeignKey(
         Correspondent,
@@ -267,7 +268,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
 
     filename = models.FilePathField(
         _("filename"),
-        max_length=1024,
+        max_length=MAX_STORED_FILENAME_LENGTH,
         editable=False,
         default=None,
         unique=True,
@@ -277,7 +278,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
 
     archive_filename = models.FilePathField(
         _("archive filename"),
-        max_length=1024,
+        max_length=MAX_STORED_FILENAME_LENGTH,
         editable=False,
         default=None,
         unique=True,
@@ -287,7 +288,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
 
     original_filename = models.CharField(
         _("original filename"),
-        max_length=1024,
+        max_length=MAX_STORED_FILENAME_LENGTH,
         editable=False,
         default=None,
         unique=False,
