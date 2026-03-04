@@ -10,6 +10,7 @@ SIDEBAR_VIEWS_VISIBLE_IDS_KEY = "sidebar_views_visible_ids"
 
 
 def _parse_visible_ids(raw_value) -> set[int]:
+    """Return integer SavedView IDs parsed from a JSON list value."""
     if not isinstance(raw_value, list):
         return set()
 
@@ -22,6 +23,11 @@ def _parse_visible_ids(raw_value) -> set[int]:
 
 
 def _set_default_visibility_ids(apps, schema_editor):
+    """
+    Move SavedView visibility from boolean model props into JSON UiSettings.settings.saved_views, specifically:
+      settings.saved_views.dashboard_views_visible_ids
+      settings.saved_views.sidebar_views_visible_ids
+    """
     SavedView = apps.get_model("documents", "SavedView")
     UiSettings = apps.get_model("documents", "UiSettings")
     User = apps.get_model("auth", "User")
