@@ -4698,7 +4698,7 @@ class TestDateWorkflowLocalization(
         14,
         30,
         5,
-        tzinfo=datetime.timezone.utc,
+        tzinfo=datetime.UTC,
     )
 
     @pytest.mark.parametrize(

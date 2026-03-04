@@ -172,7 +172,7 @@ to enable polling and disable inotify. See [here](configuration.md#polling).
 #### Prerequisites
 
 -   Paperless runs on Linux only, Windows is not supported.
--   Python 3 is required with versions 3.10 - 3.12 currently supported. Newer versions may work, but some dependencies may not be fully compatible.
+-   Python 3.11, 3.12, 3.13, or 3.14 is required. As a policy, Paperless-ngx aims to support at least the three most recent Python versions and drops support for versions as they reach end-of-life. Newer versions may work, but some dependencies may not be fully compatible.
 
 #### Installation
 
