@@ -493,17 +493,23 @@ TEMPLATES = [
     },
 ]
 
+_CHANNELS_BACKEND = os.environ.get(
+    "PAPERLESS_CHANNELS_BACKEND",
+    "channels_redis.pubsub.RedisPubSubChannelLayer",
+)
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels_redis.pubsub.RedisPubSubChannelLayer",
-        "CONFIG": {
-            "hosts": [_CHANNELS_REDIS_URL],
-            "capacity": 2000,  # default 100
-            "expiry": 15,  # default 60
-            "prefix": _REDIS_KEY_PREFIX,
-        },
+        "BACKEND": _CHANNELS_BACKEND,
     },
 }
+
+if _CHANNELS_BACKEND.startswith("channels_redis."):
+    CHANNEL_LAYERS["default"]["CONFIG"] = {
+        "hosts": [_CHANNELS_REDIS_URL],
+        "capacity": 2000,  # default 100
+        "expiry": 15,  # default 60
+        "prefix": _REDIS_KEY_PREFIX,
+    }
 
 ###############################################################################
 # Email (SMTP) Backend                                                        #

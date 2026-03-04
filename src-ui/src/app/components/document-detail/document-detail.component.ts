@@ -13,6 +13,7 @@ import {
   NgbDateStruct,
   NgbDropdownModule,
   NgbModal,
+  NgbModalRef,
   NgbNav,
   NgbNavChangeEvent,
   NgbNavModule,
@@ -80,6 +81,7 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import { getFilenameFromContentDisposition } from 'src/app/utils/http'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
@@ -141,6 +143,11 @@ enum ContentRenderType {
   Other = 'other',
   Unknown = 'unknown',
   TIFF = 'tiff',
+}
+
+interface IncomingDocumentUpdate {
+  document_id: number
+  modified: string
 }
 
 @Component({
@@ -208,6 +215,7 @@ export class DocumentDetailComponent
   private componentRouterService = inject(ComponentRouterService)
   private deviceDetectorService = inject(DeviceDetectorService)
   private savedViewService = inject(SavedViewService)
+  private readonly websocketStatusService = inject(WebsocketStatusService)
 
   @ViewChild('inputTitle')
   titleInput: TextComponent
@@ -267,6 +275,9 @@ export class DocumentDetailComponent
   isDirty$: Observable<boolean>
   unsubscribeNotifier: Subject<any> = new Subject()
   docChangeNotifier: Subject<any> = new Subject()
+  private incomingUpdateModal: NgbModalRef
+  private pendingIncomingUpdate: IncomingDocumentUpdate
+  private lastLocalSaveModified: string | null = null
 
   requiresPassword: boolean = false
   password: string
@@ -475,9 +486,12 @@ export class DocumentDetailComponent
       )
   }
 
-  private loadDocument(documentId: number): void {
+  private loadDocument(documentId: number, forceRemote: boolean = false): void {
     let redirectedToRoot = false
+    this.closeIncomingUpdateModal()
+    this.pendingIncomingUpdate = null
     this.selectedVersionId = documentId
+    this.lastLocalSaveModified = null
     this.previewUrl = this.documentsService.getPreviewUrl(
       this.selectedVersionId
     )
@@ -545,21 +559,25 @@ export class DocumentDetailComponent
             openDocument.duplicate_documents = doc.duplicate_documents
             this.openDocumentService.save()
           }
-          const useDoc = openDocument || doc
-          if (openDocument) {
-            if (
-              new Date(doc.modified) > new Date(openDocument.modified) &&
-              !this.modalService.hasOpenModals()
-            ) {
-              const modal = this.modalService.open(ConfirmDialogComponent)
-              modal.componentInstance.title = $localize`Document changes detected`
-              modal.componentInstance.messageBold = $localize`The version of this document in your browser session appears older than the existing version.`
-              modal.componentInstance.message = $localize`Saving the document here may overwrite other changes that were made. To restore the existing version, discard your changes or close the document.`
-              modal.componentInstance.cancelBtnClass = 'visually-hidden'
-              modal.componentInstance.btnCaption = $localize`Ok`
-              modal.componentInstance.confirmClicked.subscribe(() =>
-                modal.close()
-              )
+          let useDoc = openDocument || doc
+          if (openDocument && forceRemote) {
+            Object.assign(openDocument, doc)
+            openDocument.__changedFields = []
+            this.openDocumentService.setDirty(openDocument, false)
+            this.openDocumentService.save()
+            useDoc = openDocument
+          } else if (openDocument) {
+            if (new Date(doc.modified) > new Date(openDocument.modified)) {
+              if (this.hasLocalEdits(openDocument)) {
+                this.showIncomingUpdateModal(doc.modified)
+              } else {
+                // No local edits to preserve, so keep the tab in sync automatically.
+                Object.assign(openDocument, doc)
+                openDocument.__changedFields = []
+                this.openDocumentService.setDirty(openDocument, false)
+                this.openDocumentService.save()
+                useDoc = openDocument
+              }
             }
           } else {
             this.openDocumentService
@@ -588,6 +606,98 @@ export class DocumentDetailComponent
           this.setupDirtyTracking(useDoc, doc)
         },
       })
+  }
+
+  private hasLocalEdits(doc: Document): boolean {
+    return (
+      this.openDocumentService.isDirty(doc) || !!doc.__changedFields?.length
+    )
+  }
+
+  private showIncomingUpdateModal(modified: string): void {
+    if (this.incomingUpdateModal) return
+
+    const modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    this.incomingUpdateModal = modal
+
+    let formattedModified = null
+    const parsed = new Date(modified)
+    formattedModified = parsed.toLocaleString()
+
+    modal.componentInstance.title = $localize`Document was updated`
+    modal.componentInstance.messageBold = $localize`Document was updated at ${formattedModified}.`
+    modal.componentInstance.message = $localize`Reload to discard your local unsaved edits and load the latest remote version.`
+    modal.componentInstance.btnClass = 'btn-warning'
+    modal.componentInstance.btnCaption = $localize`Reload`
+    modal.componentInstance.cancelBtnCaption = $localize`Dismiss`
+
+    modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      modal.close()
+      this.reloadRemoteVersion()
+    })
+    modal.result.finally(() => {
+      this.incomingUpdateModal = null
+    })
+  }
+
+  private closeIncomingUpdateModal() {
+    if (!this.incomingUpdateModal) return
+    this.incomingUpdateModal.close()
+    this.incomingUpdateModal = null
+  }
+
+  private flushPendingIncomingUpdate() {
+    if (!this.pendingIncomingUpdate || this.networkActive) return
+    const pendingUpdate = this.pendingIncomingUpdate
+    this.pendingIncomingUpdate = null
+    this.handleIncomingDocumentUpdated(pendingUpdate)
+  }
+
+  private handleIncomingDocumentUpdated(data: IncomingDocumentUpdate): void {
+    if (
+      !this.documentId ||
+      !this.document ||
+      data.document_id !== this.documentId
+    )
+      return
+    if (this.networkActive) {
+      this.pendingIncomingUpdate = data
+      return
+    }
+    // If modified timestamp of the incoming update is the same as the last local save,
+    // we assume this update is from our own save and dont notify
+    const incomingModified = data.modified
+    if (
+      incomingModified &&
+      this.lastLocalSaveModified &&
+      incomingModified === this.lastLocalSaveModified
+    ) {
+      this.lastLocalSaveModified = null
+      return
+    }
+    this.lastLocalSaveModified = null
+
+    if (this.openDocumentService.isDirty(this.document)) {
+      this.showIncomingUpdateModal(data.modified)
+    } else {
+      this.docChangeNotifier.next(this.documentId)
+      this.loadDocument(this.documentId, true)
+      this.toastService.showInfo(
+        $localize`Document reloaded with latest changes.`
+      )
+    }
+  }
+
+  private reloadRemoteVersion() {
+    if (!this.documentId) return
+
+    this.closeIncomingUpdateModal()
+    this.docChangeNotifier.next(this.documentId)
+    this.loadDocument(this.documentId, true)
+    this.toastService.showInfo($localize`Document reloaded.`)
   }
 
   ngOnInit(): void {
@@ -647,6 +757,11 @@ export class DocumentDetailComponent
     }
 
     this.getCustomFields()
+
+    this.websocketStatusService
+      .onDocumentUpdated()
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((data) => this.handleIncomingDocumentUpdated(data))
 
     this.route.paramMap
       .pipe(
@@ -1033,6 +1148,7 @@ export class DocumentDetailComponent
       )
       .subscribe({
         next: (doc) => {
+          this.closeIncomingUpdateModal()
           Object.assign(this.document, doc)
           doc['permissions_form'] = {
             owner: doc.owner,
@@ -1079,6 +1195,8 @@ export class DocumentDetailComponent
       .pipe(first())
       .subscribe({
         next: (docValues) => {
+          this.closeIncomingUpdateModal()
+          this.lastLocalSaveModified = docValues.modified ?? null
           // in case data changed while saving eg removing inbox_tags
           this.documentForm.patchValue(docValues)
           const newValues = Object.assign({}, this.documentForm.value)
@@ -1093,16 +1211,19 @@ export class DocumentDetailComponent
           this.networkActive = false
           this.error = null
           if (close) {
+            this.pendingIncomingUpdate = null
             this.close(() =>
               this.openDocumentService.refreshDocument(this.documentId)
             )
           } else {
             this.openDocumentService.refreshDocument(this.documentId)
+            this.flushPendingIncomingUpdate()
           }
           this.savedViewService.maybeRefreshDocumentCounts()
         },
         error: (error) => {
           this.networkActive = false
+          this.lastLocalSaveModified = null
           const canEdit =
             this.permissionsService.currentUserHasObjectPermissions(
               PermissionAction.Change,
@@ -1122,6 +1243,7 @@ export class DocumentDetailComponent
               error
             )
           }
+          this.flushPendingIncomingUpdate()
         },
       })
   }
@@ -1158,8 +1280,11 @@ export class DocumentDetailComponent
       .pipe(first())
       .subscribe({
         next: ({ updateResult, nextDocId, closeResult }) => {
+          this.closeIncomingUpdateModal()
           this.error = null
           this.networkActive = false
+          this.pendingIncomingUpdate = null
+          this.lastLocalSaveModified = null
           if (closeResult && updateResult && nextDocId) {
             this.router.navigate(['documents', nextDocId])
             this.titleInput?.focus()
@@ -1167,8 +1292,10 @@ export class DocumentDetailComponent
         },
         error: (error) => {
           this.networkActive = false
+          this.lastLocalSaveModified = null
           this.error = error.error
           this.toastService.showError($localize`Error saving document`, error)
+          this.flushPendingIncomingUpdate()
         },
       })
   }
@@ -1254,7 +1381,7 @@ export class DocumentDetailComponent
         .subscribe({
           next: () => {
             this.toastService.showInfo(
-              $localize`Reprocess operation for "${this.document.title}" will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.`
+              $localize`Reprocess operation for "${this.document.title}" will begin in the background.`
             )
             if (modal) {
               modal.close()

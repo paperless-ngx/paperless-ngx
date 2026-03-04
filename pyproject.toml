@@ -310,6 +310,7 @@ markers = [
 [tool.pytest_env]
 PAPERLESS_DISABLE_DBHANDLER = "true"
 PAPERLESS_CACHE_BACKEND = "django.core.cache.backends.locmem.LocMemCache"
+PAPERLESS_CHANNELS_BACKEND = "channels.layers.InMemoryChannelLayer"
 
 [tool.coverage.report]
 exclude_also = [
