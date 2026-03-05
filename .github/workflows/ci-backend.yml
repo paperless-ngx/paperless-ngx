@@ -3,21 +3,9 @@ on:
   push:
     branches-ignore:
       - 'translations**'
-    paths:
-      - 'src/**'
-      - 'pyproject.toml'
-      - 'uv.lock'
-      - 'docker/compose/docker-compose.ci-test.yml'
-      - '.github/workflows/ci-backend.yml'
   pull_request:
     branches-ignore:
       - 'translations**'
-    paths:
-      - 'src/**'
-      - 'pyproject.toml'
-      - 'uv.lock'
-      - 'docker/compose/docker-compose.ci-test.yml'
-      - '.github/workflows/ci-backend.yml'
   workflow_dispatch:
 concurrency:
   group: backend-${{ github.event.pull_request.number || github.ref }}
@@ -26,7 +14,35 @@ env:
   DEFAULT_UV_VERSION: "0.10.x"
   NLTK_DATA: "/usr/share/nltk_data"
 jobs:
+  changes:
+    name: Detect Backend Changes
+    runs-on: ubuntu-24.04
+    outputs:
+      backend_changed: ${{ steps.manual.outputs.backend || steps.filter.outputs.backend || 'false' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+      - name: Mark backend changes for manual runs
+        id: manual
+        if: github.event_name == 'workflow_dispatch'
+        run: echo "backend=true" >> "$GITHUB_OUTPUT"
+      - name: Detect backend changes
+        id: filter
+        if: github.event_name != 'workflow_dispatch'
+        uses: dorny/paths-filter@v3.0.2
+        with:
+          filters: |
+            backend:
+              - 'src/**'
+              - 'pyproject.toml'
+              - 'uv.lock'
+              - 'docker/compose/docker-compose.ci-test.yml'
+              - '.github/workflows/ci-backend.yml'
   test:
+    needs: changes
+    if: needs.changes.outputs.backend_changed == 'true'
     name: "Python ${{ matrix.python-version }}"
     runs-on: ubuntu-24.04
     strategy:
@@ -100,6 +116,8 @@ jobs:
           docker compose --file docker/compose/docker-compose.ci-test.yml logs
           docker compose --file docker/compose/docker-compose.ci-test.yml down
   typing:
+    needs: changes
+    if: needs.changes.outputs.backend_changed == 'true'
     name: Check project typing
     runs-on: ubuntu-24.04
     env:
@@ -150,3 +168,27 @@ jobs:
             --show-error-codes \
             --warn-unused-configs \
             src/ | uv run mypy-baseline filter
+  gate:
+    name: Backend CI Gate
+    needs: [changes, test, typing]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Validate backend workflow results
+        run: |
+          if [[ "${{ needs.changes.outputs.backend_changed }}" != "true" ]]; then
+            echo "No backend-relevant changes detected."
+            exit 0
+          fi
+
+          if [[ "${{ needs.test.result }}" != "success" ]]; then
+            echo "::error::Backend test job result: ${{ needs.test.result }}"
+            exit 1
+          fi
+
+          if [[ "${{ needs.typing.result }}" != "success" ]]; then
+            echo "::error::Backend typing job result: ${{ needs.typing.result }}"
+            exit 1
+          fi
+
+          echo "Backend checks passed."

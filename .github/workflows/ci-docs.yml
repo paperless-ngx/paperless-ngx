@@ -4,19 +4,7 @@ on:
     branches:
       - main
       - dev
-    paths:
-      - 'docs/**'
-      - 'zensical.toml'
-      - 'pyproject.toml'
-      - 'uv.lock'
-      - '.github/workflows/ci-docs.yml'
   pull_request:
-    paths:
-      - 'docs/**'
-      - 'zensical.toml'
-      - 'pyproject.toml'
-      - 'uv.lock'
-      - '.github/workflows/ci-docs.yml'
   workflow_dispatch:
 concurrency:
   group: docs-${{ github.event.pull_request.number || github.ref }}
@@ -29,7 +17,35 @@ env:
   DEFAULT_UV_VERSION: "0.10.x"
   DEFAULT_PYTHON_VERSION: "3.12"
 jobs:
+  changes:
+    name: Detect Docs Changes
+    runs-on: ubuntu-24.04
+    outputs:
+      docs_changed: ${{ steps.manual.outputs.docs || steps.filter.outputs.docs || 'false' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+      - name: Mark docs changes for manual runs
+        id: manual
+        if: github.event_name == 'workflow_dispatch'
+        run: echo "docs=true" >> "$GITHUB_OUTPUT"
+      - name: Detect docs changes
+        id: filter
+        if: github.event_name != 'workflow_dispatch'
+        uses: dorny/paths-filter@v3.0.2
+        with:
+          filters: |
+            docs:
+              - 'docs/**'
+              - 'zensical.toml'
+              - 'pyproject.toml'
+              - 'uv.lock'
+              - '.github/workflows/ci-docs.yml'
   build:
+    needs: changes
+    if: needs.changes.outputs.docs_changed == 'true'
     name: Build Documentation
     runs-on: ubuntu-24.04
     steps:
@@ -64,8 +80,8 @@ jobs:
           name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
   deploy:
     name: Deploy Documentation
-    needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [changes, build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.docs_changed == 'true'
     runs-on: ubuntu-24.04
     environment:
       name: github-pages
@@ -76,3 +92,22 @@ jobs:
         id: deployment
         with:
           artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
+  gate:
+    name: Docs CI Gate
+    needs: [changes, build]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Validate docs workflow results
+        run: |
+          if [[ "${{ needs.changes.outputs.docs_changed }}" != "true" ]]; then
+            echo "No docs-relevant changes detected."
+            exit 0
+          fi
+
+          if [[ "${{ needs.build.result }}" != "success" ]]; then
+            echo "::error::Docs build job result: ${{ needs.build.result }}"
+            exit 1
+          fi
+
+          echo "Docs checks passed."
