@@ -7,6 +7,9 @@ from documents.models import Document
 class Command(PaperlessCommand):
     help = "Rename all documents"
 
+    supports_progress_bar = True
+    supports_multiprocessing = False
+
     def handle(self, *args, **options):
         for document in self.track(Document.objects.all(), description="Renaming..."):
             post_save.send(Document, instance=document, created=False)

@@ -88,6 +88,7 @@ class Command(CryptMixin, PaperlessCommand):
     )
 
     supports_progress_bar = True
+    supports_multiprocessing = False
 
     def add_arguments(self, parser) -> None:
         super().add_arguments(parser)
