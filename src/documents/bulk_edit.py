@@ -476,12 +476,14 @@ def merge(
     metadata_document_id: int | None = None,
     delete_originals: bool = False,
     archive_fallback: bool = False,
+    source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
 ) -> Literal["OK"]:
     logger.info(
         f"Attempting to merge {len(doc_ids)} documents into a single document.",
     )
-    qs = Document.objects.filter(id__in=doc_ids)
+    qs = Document.objects.select_related("root_document").filter(id__in=doc_ids)
+    docs_by_id = {doc.id: doc for doc in qs}
     affected_docs: list[int] = []
     import pikepdf
 
@@ -490,14 +492,20 @@ def merge(
     handoff_asn: int | None = None
     # use doc_ids to preserve order
     for doc_id in doc_ids:
-        doc = qs.get(id=doc_id)
+        doc = docs_by_id.get(doc_id)
+        if doc is None:
+            continue
+        _, source_doc = _resolve_root_and_source_doc(
+            doc,
+            source_mode=source_mode,
+        )
         try:
             doc_path = (
-                doc.archive_path
+                source_doc.archive_path
                 if archive_fallback
-                and doc.mime_type != "application/pdf"
-                and doc.has_archive_version
-                else doc.source_path
+                and source_doc.mime_type != "application/pdf"
+                and source_doc.has_archive_version
+                else source_doc.source_path
             )
             with pikepdf.open(str(doc_path)) as pdf:
                 version = max(version, pdf.pdf_version)
@@ -579,18 +587,23 @@ def split(
     pages: list[list[int]],
     *,
     delete_originals: bool = False,
+    source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
 ) -> Literal["OK"]:
     logger.info(
         f"Attempting to split document {doc_ids[0]} into {len(pages)} documents",
     )
-    doc = Document.objects.get(id=doc_ids[0])
+    doc = Document.objects.select_related("root_document").get(id=doc_ids[0])
+    _, source_doc = _resolve_root_and_source_doc(
+        doc,
+        source_mode=source_mode,
+    )
     import pikepdf
 
     consume_tasks = []
 
     try:
-        with pikepdf.open(doc.source_path) as pdf:
+        with pikepdf.open(source_doc.source_path) as pdf:
             for idx, split_doc in enumerate(pages):
                 dst: pikepdf.Pdf = pikepdf.new()
                 for page in split_doc:

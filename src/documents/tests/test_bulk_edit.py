@@ -660,6 +660,33 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
         self.assertEqual(result, "OK")
 
+    @mock.patch("pikepdf.open")
+    @mock.patch("documents.tasks.consume_file.s")
+    def test_merge_uses_latest_version_source_for_root_selection(
+        self,
+        mock_consume_file,
+        mock_open_pdf,
+    ) -> None:
+        version_file = self.dirs.scratch_dir / "sample2_version_merge.pdf"
+        shutil.copy(self.doc2.source_path, version_file)
+        version = Document.objects.create(
+            checksum="B-v1",
+            title="B version 1",
+            root_document=self.doc2,
+            filename=version_file,
+            mime_type="application/pdf",
+        )
+        fake_pdf = mock.MagicMock()
+        fake_pdf.pdf_version = "1.7"
+        fake_pdf.pages = [mock.Mock()]
+        mock_open_pdf.return_value.__enter__.return_value = fake_pdf
+
+        result = bulk_edit.merge([self.doc2.id])
+
+        self.assertEqual(result, "OK")
+        mock_open_pdf.assert_called_once_with(str(version.source_path))
+        mock_consume_file.assert_not_called()
+
     @mock.patch("documents.bulk_edit.delete.si")
     @mock.patch("documents.tasks.consume_file.s")
     def test_merge_and_delete_originals(
@@ -867,6 +894,36 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertIsNone(consume_file_args[1].asn)
 
         self.assertEqual(result, "OK")
+
+    @mock.patch("documents.bulk_edit.group")
+    @mock.patch("pikepdf.open")
+    @mock.patch("documents.tasks.consume_file.s")
+    def test_split_uses_latest_version_source_for_root_selection(
+        self,
+        mock_consume_file,
+        mock_open_pdf,
+        mock_group,
+    ) -> None:
+        version_file = self.dirs.scratch_dir / "sample2_version_split.pdf"
+        shutil.copy(self.doc2.source_path, version_file)
+        version = Document.objects.create(
+            checksum="B-v1",
+            title="B version 1",
+            root_document=self.doc2,
+            filename=version_file,
+            mime_type="application/pdf",
+        )
+        fake_pdf = mock.MagicMock()
+        fake_pdf.pages = [mock.Mock(), mock.Mock()]
+        mock_open_pdf.return_value.__enter__.return_value = fake_pdf
+        mock_group.return_value.delay.return_value = None
+
+        result = bulk_edit.split([self.doc2.id], [[1], [2]])
+
+        self.assertEqual(result, "OK")
+        mock_open_pdf.assert_called_once_with(version.source_path)
+        mock_consume_file.assert_not_called()
+        mock_group.return_value.delay.assert_not_called()
 
     @mock.patch("documents.bulk_edit.delete.si")
     @mock.patch("documents.tasks.consume_file.s")
