@@ -8,14 +8,12 @@ from pathlib import Path
 from zipfile import ZipFile
 from zipfile import is_zipfile
 
-import tqdm
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldDoesNotExist
 from django.core.management import call_command
-from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
 from django.core.serializers.base import DeserializationError
 from django.db import IntegrityError
@@ -25,6 +23,7 @@ from django.db.models.signals import post_save
 from filelock import FileLock
 
 from documents.file_handling import create_source_path_directory
+from documents.management.commands.base import PaperlessCommand
 from documents.management.commands.mixins import CryptMixin
 from documents.models import Correspondent
 from documents.models import CustomField
@@ -57,21 +56,17 @@ def disable_signal(sig, receiver, sender, *, weak: bool | None = None) -> Genera
         sig.connect(receiver=receiver, sender=sender, **kwargs)
 
 
-class Command(CryptMixin, BaseCommand):
+class Command(CryptMixin, PaperlessCommand):
     help = (
         "Using a manifest.json file, load the data from there, and import the "
         "documents it refers to."
     )
 
-    def add_arguments(self, parser) -> None:
-        parser.add_argument("source")
+    supports_progress_bar = True
 
-        parser.add_argument(
-            "--no-progress-bar",
-            default=False,
-            action="store_true",
-            help="If set, the progress bar will not be shown",
-        )
+    def add_arguments(self, parser) -> None:
+        super().add_arguments(parser)
+        parser.add_argument("source")
 
         parser.add_argument(
             "--data-only",
@@ -231,7 +226,6 @@ class Command(CryptMixin, BaseCommand):
 
         self.source = Path(options["source"]).resolve()
         self.data_only: bool = options["data_only"]
-        self.no_progress_bar: bool = options["no_progress_bar"]
         self.passphrase: str | None = options.get("passphrase")
         self.version: str | None = None
         self.salt: str | None = None
@@ -365,7 +359,7 @@ class Command(CryptMixin, BaseCommand):
             filter(lambda r: r["model"] == "documents.document", self.manifest),
         )
 
-        for record in tqdm.tqdm(manifest_documents, disable=self.no_progress_bar):
+        for record in self.track(manifest_documents, description="Copying files..."):
             document = Document.objects.get(pk=record["pk"])
 
             doc_file = record[EXPORTER_FILE_NAME]
