@@ -405,7 +405,9 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         self.assertTrue(Document.objects.filter(id=self.doc1.id).exists())
         self.assertFalse(Document.objects.filter(id=version.id).exists())
 
-    def test_get_root_and_current_doc_mapping(self) -> None:
+    def test_resolve_root_and_source_doc_latest_version_prefers_newest_version(
+        self,
+    ) -> None:
         version1 = Document.objects.create(
             checksum="B-v1",
             title="B version 1",
@@ -417,18 +419,14 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             root_document=self.doc2,
         )
 
-        root_ids_by_doc_id = bulk_edit._get_root_ids_by_doc_id(
-            [self.doc2.id, version1.id, version2.id],
+        root_doc, source_doc = bulk_edit._resolve_root_and_source_doc(
+            self.doc2,
+            source_mode="latest_version",
         )
-        self.assertEqual(root_ids_by_doc_id[self.doc2.id], self.doc2.id)
-        self.assertEqual(root_ids_by_doc_id[version1.id], self.doc2.id)
-        self.assertEqual(root_ids_by_doc_id[version2.id], self.doc2.id)
 
-        root_docs, current_docs = bulk_edit._get_root_and_current_docs_by_root_id(
-            {self.doc2.id},
-        )
-        self.assertEqual(root_docs[self.doc2.id].id, self.doc2.id)
-        self.assertEqual(current_docs[self.doc2.id].id, version2.id)
+        self.assertEqual(root_doc.id, self.doc2.id)
+        self.assertEqual(source_doc.id, version2.id)
+        self.assertNotEqual(source_doc.id, version1.id)
 
     @mock.patch("documents.tasks.bulk_update_documents.delay")
     def test_set_permissions(self, m) -> None:
@@ -662,6 +660,33 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
         self.assertEqual(result, "OK")
 
+    @mock.patch("pikepdf.open")
+    @mock.patch("documents.tasks.consume_file.s")
+    def test_merge_uses_latest_version_source_for_root_selection(
+        self,
+        mock_consume_file,
+        mock_open_pdf,
+    ) -> None:
+        version_file = self.dirs.scratch_dir / "sample2_version_merge.pdf"
+        shutil.copy(self.doc2.source_path, version_file)
+        version = Document.objects.create(
+            checksum="B-v1",
+            title="B version 1",
+            root_document=self.doc2,
+            filename=version_file,
+            mime_type="application/pdf",
+        )
+        fake_pdf = mock.MagicMock()
+        fake_pdf.pdf_version = "1.7"
+        fake_pdf.pages = [mock.Mock()]
+        mock_open_pdf.return_value.__enter__.return_value = fake_pdf
+
+        result = bulk_edit.merge([self.doc2.id])
+
+        self.assertEqual(result, "OK")
+        mock_open_pdf.assert_called_once_with(str(version.source_path))
+        mock_consume_file.assert_not_called()
+
     @mock.patch("documents.bulk_edit.delete.si")
     @mock.patch("documents.tasks.consume_file.s")
     def test_merge_and_delete_originals(
@@ -870,6 +895,36 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
         self.assertEqual(result, "OK")
 
+    @mock.patch("documents.bulk_edit.group")
+    @mock.patch("pikepdf.open")
+    @mock.patch("documents.tasks.consume_file.s")
+    def test_split_uses_latest_version_source_for_root_selection(
+        self,
+        mock_consume_file,
+        mock_open_pdf,
+        mock_group,
+    ) -> None:
+        version_file = self.dirs.scratch_dir / "sample2_version_split.pdf"
+        shutil.copy(self.doc2.source_path, version_file)
+        version = Document.objects.create(
+            checksum="B-v1",
+            title="B version 1",
+            root_document=self.doc2,
+            filename=version_file,
+            mime_type="application/pdf",
+        )
+        fake_pdf = mock.MagicMock()
+        fake_pdf.pages = [mock.Mock(), mock.Mock()]
+        mock_open_pdf.return_value.__enter__.return_value = fake_pdf
+        mock_group.return_value.delay.return_value = None
+
+        result = bulk_edit.split([self.doc2.id], [[1], [2]])
+
+        self.assertEqual(result, "OK")
+        mock_open_pdf.assert_called_once_with(version.source_path)
+        mock_consume_file.assert_not_called()
+        mock_group.return_value.delay.assert_not_called()
+
     @mock.patch("documents.bulk_edit.delete.si")
     @mock.patch("documents.tasks.consume_file.s")
     @mock.patch("documents.bulk_edit.chord")
@@ -1041,6 +1096,34 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             self.assertIsNotNone(overrides)
             self.assertEqual(result, "OK")
 
+    @mock.patch("documents.data_models.magic.from_file", return_value="application/pdf")
+    @mock.patch("documents.tasks.consume_file.delay")
+    @mock.patch("pikepdf.open")
+    def test_rotate_explicit_selection_uses_root_source_when_root_selected(
+        self,
+        mock_open,
+        mock_consume_delay,
+        mock_magic,
+    ):
+        Document.objects.create(
+            checksum="B-v1",
+            title="B version 1",
+            root_document=self.doc2,
+        )
+        fake_pdf = mock.MagicMock()
+        fake_pdf.pages = [mock.Mock()]
+        mock_open.return_value.__enter__.return_value = fake_pdf
+
+        result = bulk_edit.rotate(
+            [self.doc2.id],
+            90,
+            source_mode="explicit_selection",
+        )
+
+        self.assertEqual(result, "OK")
+        mock_open.assert_called_once_with(self.doc2.source_path)
+        mock_consume_delay.assert_called_once()
+
     @mock.patch("documents.tasks.consume_file.delay")
     @mock.patch("pikepdf.Pdf.save")
     @mock.patch("documents.data_models.magic.from_file", return_value="application/pdf")
@@ -1064,6 +1147,34 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertTrue(str(consumable.original_file).endswith("_pages_deleted.pdf"))
         self.assertIsNotNone(overrides)
         self.assertEqual(result, "OK")
+
+    @mock.patch("documents.data_models.magic.from_file", return_value="application/pdf")
+    @mock.patch("documents.tasks.consume_file.delay")
+    @mock.patch("pikepdf.open")
+    def test_delete_pages_explicit_selection_uses_root_source_when_root_selected(
+        self,
+        mock_open,
+        mock_consume_delay,
+        mock_magic,
+    ):
+        Document.objects.create(
+            checksum="B-v1",
+            title="B version 1",
+            root_document=self.doc2,
+        )
+        fake_pdf = mock.MagicMock()
+        fake_pdf.pages = [mock.Mock(), mock.Mock()]
+        mock_open.return_value.__enter__.return_value = fake_pdf
+
+        result = bulk_edit.delete_pages(
+            [self.doc2.id],
+            [1],
+            source_mode="explicit_selection",
+        )
+
+        self.assertEqual(result, "OK")
+        mock_open.assert_called_once_with(self.doc2.source_path)
+        mock_consume_delay.assert_called_once()
 
     @mock.patch("documents.tasks.consume_file.delay")
     @mock.patch("pikepdf.Pdf.save")
@@ -1213,6 +1324,40 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertTrue(str(consumable.original_file).endswith("_edited.pdf"))
         self.assertIsNotNone(overrides)
 
+    @mock.patch("documents.data_models.magic.from_file", return_value="application/pdf")
+    @mock.patch("documents.tasks.consume_file.delay")
+    @mock.patch("pikepdf.new")
+    @mock.patch("pikepdf.open")
+    def test_edit_pdf_explicit_selection_uses_root_source_when_root_selected(
+        self,
+        mock_open,
+        mock_new,
+        mock_consume_delay,
+        mock_magic,
+    ):
+        Document.objects.create(
+            checksum="B-v1",
+            title="B version 1",
+            root_document=self.doc2,
+        )
+        fake_pdf = mock.MagicMock()
+        fake_pdf.pages = [mock.Mock()]
+        mock_open.return_value.__enter__.return_value = fake_pdf
+        output_pdf = mock.MagicMock()
+        output_pdf.pages = []
+        mock_new.return_value = output_pdf
+
+        result = bulk_edit.edit_pdf(
+            [self.doc2.id],
+            operations=[{"page": 1}],
+            update_document=True,
+            source_mode="explicit_selection",
+        )
+
+        self.assertEqual(result, "OK")
+        mock_open.assert_called_once_with(self.doc2.source_path)
+        mock_consume_delay.assert_called_once()
+
     @mock.patch("documents.bulk_edit.group")
     @mock.patch("documents.tasks.consume_file.s")
     def test_edit_pdf_without_metadata(
@@ -1332,6 +1477,34 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         )
         self.assertEqual(consumable.root_document_id, doc.id)
         self.assertIsNotNone(overrides)
+
+    @mock.patch("documents.data_models.magic.from_file", return_value="application/pdf")
+    @mock.patch("documents.tasks.consume_file.delay")
+    @mock.patch("pikepdf.open")
+    def test_remove_password_explicit_selection_uses_root_source_when_root_selected(
+        self,
+        mock_open,
+        mock_consume_delay,
+        mock_magic,
+    ) -> None:
+        Document.objects.create(
+            checksum="A-v1",
+            title="A version 1",
+            root_document=self.doc1,
+        )
+        fake_pdf = mock.MagicMock()
+        mock_open.return_value.__enter__.return_value = fake_pdf
+
+        result = bulk_edit.remove_password(
+            [self.doc1.id],
+            password="secret",
+            update_document=True,
+            source_mode="explicit_selection",
+        )
+
+        self.assertEqual(result, "OK")
+        mock_open.assert_called_once_with(self.doc1.source_path, password="secret")
+        mock_consume_delay.assert_called_once()
 
     @mock.patch("documents.bulk_edit.chord")
     @mock.patch("documents.bulk_edit.group")

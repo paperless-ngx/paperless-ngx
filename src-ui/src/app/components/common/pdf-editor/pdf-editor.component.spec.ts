@@ -3,6 +3,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { DocumentService } from 'src/app/services/rest/document.service'
 import { PDFEditorComponent } from './pdf-editor.component'
 
 describe('PDFEditorComponent', () => {
@@ -138,5 +139,17 @@ describe('PDFEditorComponent', () => {
     expect(component.pages[0].page).toBe(1)
     expect(component.pages[1].page).toBe(2)
     expect(component.pages[2].page).toBe(3)
+  })
+
+  it('should include selected version in preview source when provided', () => {
+    const documentService = TestBed.inject(DocumentService)
+    const previewSpy = jest
+      .spyOn(documentService, 'getPreviewUrl')
+      .mockReturnValue('preview-version')
+    component.documentID = 3
+    component.versionID = 10
+
+    expect(component.pdfSrc).toBe('preview-version')
+    expect(previewSpy).toHaveBeenCalledWith(3, false, 10)
   })
 })

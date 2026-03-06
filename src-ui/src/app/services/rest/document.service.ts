@@ -37,6 +37,11 @@ export interface SelectionData {
   selected_custom_fields: SelectionDataItem[]
 }
 
+export enum BulkEditSourceMode {
+  LATEST_VERSION = 'latest_version',
+  EXPLICIT_SELECTION = 'explicit_selection',
+}
+
 @Injectable({
   providedIn: 'root',
 })
