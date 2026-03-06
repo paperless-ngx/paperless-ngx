@@ -1009,6 +1009,71 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results), 0)
 
+    def test_documents_title_content_filter_accent_folding(self) -> None:
+        """
+        GIVEN:
+            - Documents with accented characters in title and content
+        WHEN:
+            - Filtering with title_content using non-accented query
+        THEN:
+            - Documents with accented characters are matched
+        """
+        doc1 = Document.objects.create(
+            title="A naïve résumé",
+            content="The café served crème brûlée",
+            checksum="A",
+            mime_type="application/pdf",
+        )
+        Document.objects.create(
+            title="Invoice",
+            content="Payment received",
+            checksum="B",
+            mime_type="application/pdf",
+        )
+
+        # Search without accent should match accented title
+        response = self.client.get("/api/documents/?title_content=naive")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], doc1.id)
+
+        # Search with accent should also match
+        response = self.client.get("/api/documents/?title_content=résumé")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], doc1.id)
+
+        # Search without accent should match accented content
+        response = self.client.get("/api/documents/?title_content=cafe")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], doc1.id)
+
+    @override_settings(INDEX_ACCENT_FOLD=False)
+    def test_documents_title_content_filter_accent_folding_disabled(self) -> None:
+        """
+        GIVEN:
+            - Accent folding is disabled via settings
+            - Documents with accented characters
+        WHEN:
+            - Filtering with title_content using non-accented query
+        THEN:
+            - Documents with accented characters are NOT matched
+        """
+        Document.objects.create(
+            title="A naïve résumé",
+            content="The café served crème brûlée",
+            checksum="A",
+            mime_type="application/pdf",
+        )
+
+        response = self.client.get("/api/documents/?title_content=naive")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), 0)
+
     def test_documents_title_content_filter_strips_boundary_whitespace(self) -> None:
         doc = Document.objects.create(
             title="Testwort",

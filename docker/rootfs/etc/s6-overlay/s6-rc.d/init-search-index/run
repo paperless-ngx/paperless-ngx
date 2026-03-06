@@ -3,7 +3,7 @@
 
 declare -r log_prefix="[init-index]"
 
-declare -r index_version=9
+declare -r index_version=10
 declare -r data_dir="${PAPERLESS_DATA_DIR:-/usr/src/paperless/data}"
 declare -r index_version_file="${data_dir}/.index_version"
 

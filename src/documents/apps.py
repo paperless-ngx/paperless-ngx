@@ -8,8 +8,17 @@ class DocumentsConfig(AppConfig):
     verbose_name = _("Documents")
 
     def ready(self) -> None:
+        from django.conf import settings
+        from django.db.backends.signals import connection_created
+
         from documents.signals import document_consumption_finished
         from documents.signals import document_updated
+
+        if settings.INDEX_ACCENT_FOLD:
+            import documents.db
+
+            connection_created.connect(documents.db.setup_sqlite_unaccent)
+
         from documents.signals.handlers import add_inbox_tags
         from documents.signals.handlers import add_or_update_document_in_llm_index
         from documents.signals.handlers import add_to_index
@@ -32,6 +41,6 @@ class DocumentsConfig(AppConfig):
         document_updated.connect(run_workflows_updated)
         document_updated.connect(send_websocket_document_updated)
 
-        import documents.schema  # noqa: F401
+        import documents.schema
 
         AppConfig.ready(self)
