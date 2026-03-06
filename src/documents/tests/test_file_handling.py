@@ -77,6 +77,58 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             settings.ORIGINALS_DIR / "test" / "test.pdf",
         )
 
+    @override_settings(FILENAME_FORMAT=None)
+    def test_root_storage_path_change_updates_version_files(self) -> None:
+        old_storage_path = StoragePath.objects.create(
+            name="old-path",
+            path="old/{{title}}",
+        )
+        new_storage_path = StoragePath.objects.create(
+            name="new-path",
+            path="new/{{title}}",
+        )
+
+        root_doc = Document.objects.create(
+            title="rootdoc",
+            mime_type="application/pdf",
+            checksum="root-checksum",
+            storage_path=old_storage_path,
+        )
+        version_doc = Document.objects.create(
+            title="version-title",
+            mime_type="application/pdf",
+            checksum="version-checksum",
+            root_document=root_doc,
+            version_index=1,
+        )
+
+        Document.objects.filter(pk=root_doc.pk).update(
+            filename=generate_filename(root_doc),
+        )
+        Document.objects.filter(pk=version_doc.pk).update(
+            filename=generate_filename(version_doc),
+        )
+        root_doc.refresh_from_db()
+        version_doc.refresh_from_db()
+
+        create_source_path_directory(root_doc.source_path)
+        Path(root_doc.source_path).touch()
+        create_source_path_directory(version_doc.source_path)
+        Path(version_doc.source_path).touch()
+
+        root_doc.storage_path = new_storage_path
+        root_doc.save()
+
+        root_doc.refresh_from_db()
+        version_doc.refresh_from_db()
+
+        self.assertEqual(root_doc.filename, "new/rootdoc.pdf")
+        self.assertEqual(version_doc.filename, "new/rootdoc_v1.pdf")
+        self.assertIsFile(root_doc.source_path)
+        self.assertIsFile(version_doc.source_path)
+        self.assertIsNotFile(settings.ORIGINALS_DIR / "old" / "rootdoc.pdf")
+        self.assertIsNotFile(settings.ORIGINALS_DIR / "old" / "rootdoc_v1.pdf")
+
     @override_settings(FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_file_renaming_missing_permissions(self) -> None:
         document = Document()
@@ -336,7 +388,11 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             added=d1,
         )
 
-        self.assertEqual(generate_filename(doc1), Path("1232-01-09.pdf"))
+        # Account for 3.14 padding changes
+        expected_year: str = d1.strftime("%Y")
+        expected_filename: Path = Path(f"{expected_year}-01-09.pdf")
+
+        self.assertEqual(generate_filename(doc1), expected_filename)
 
         doc1.added = timezone.make_aware(datetime.datetime(2020, 11, 16, 1, 1, 1))
 
@@ -1220,6 +1276,94 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         self.assertEqual(
             generate_filename(text_doc, archive_filename=True),
             Path("logs.pdf"),
+        )
+
+    @override_settings(FILENAME_FORMAT="{title}")
+    def test_version_index_suffix_for_template_filename(self) -> None:
+        root_doc = Document.objects.create(
+            title="the_doc",
+            mime_type="application/pdf",
+            checksum="root-checksum",
+        )
+        version_doc = Document.objects.create(
+            title="the_doc",
+            mime_type="application/pdf",
+            checksum="version-checksum",
+            root_document=root_doc,
+            version_index=1,
+        )
+
+        self.assertEqual(generate_filename(version_doc), Path("the_doc_v1.pdf"))
+        self.assertEqual(
+            generate_filename(version_doc, counter=1),
+            Path("the_doc_v1_01.pdf"),
+        )
+
+    @override_settings(FILENAME_FORMAT=None)
+    def test_version_index_suffix_for_default_filename(self) -> None:
+        root_doc = Document.objects.create(
+            title="root",
+            mime_type="text/plain",
+            checksum="root-checksum",
+        )
+        version_doc = Document.objects.create(
+            title="root",
+            mime_type="text/plain",
+            checksum="version-checksum",
+            root_document=root_doc,
+            version_index=2,
+        )
+
+        self.assertEqual(
+            generate_filename(version_doc),
+            Path(f"{root_doc.pk:07d}_v2.txt"),
+        )
+        self.assertEqual(
+            generate_filename(version_doc, archive_filename=True),
+            Path(f"{root_doc.pk:07d}_v2.pdf"),
+        )
+
+    @override_settings(FILENAME_FORMAT="{original_name}")
+    def test_version_index_suffix_with_original_name_placeholder(self) -> None:
+        root_doc = Document.objects.create(
+            title="root",
+            mime_type="application/pdf",
+            checksum="root-checksum",
+            original_filename="root-upload.pdf",
+        )
+        version_doc = Document.objects.create(
+            title="root",
+            mime_type="application/pdf",
+            checksum="version-checksum",
+            root_document=root_doc,
+            version_index=1,
+            original_filename="version-upload.pdf",
+        )
+
+        self.assertEqual(generate_filename(version_doc), Path("root-upload_v1.pdf"))
+
+    def test_version_index_suffix_with_storage_path(self) -> None:
+        storage_path = StoragePath.objects.create(
+            name="vtest",
+            path="folder/{{title}}",
+        )
+        root_doc = Document.objects.create(
+            title="storage_doc",
+            mime_type="application/pdf",
+            checksum="root-checksum",
+            storage_path=storage_path,
+        )
+        version_doc = Document.objects.create(
+            title="version_title_should_not_be_used",
+            mime_type="application/pdf",
+            checksum="version-checksum",
+            root_document=root_doc,
+            version_index=3,
+        )
+
+        self.assertEqual(
+            generate_filename(version_doc),
+            Path("folder/storage_doc_v3.pdf"),
         )
 
     @override_settings(

@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from channels_redis.pubsub import RedisPubSubChannelLayer
 
 
-class ProgressStatusOptions(str, enum.Enum):
+class ProgressStatusOptions(enum.StrEnum):
     STARTED = "STARTED"
     WORKING = "WORKING"
     SUCCESS = "SUCCESS"

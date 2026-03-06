@@ -2,7 +2,7 @@ import datetime
 import hashlib
 import os
 import tempfile
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Final
@@ -11,6 +11,7 @@ import magic
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.db.models import Max
 from django.db.models import Q
 from django.utils import timezone
 from filelock import FileLock
@@ -82,7 +83,7 @@ class ConsumerError(Exception):
     pass
 
 
-class ConsumerStatusShortMessage(str, Enum):
+class ConsumerStatusShortMessage(StrEnum):
     DOCUMENT_ALREADY_EXISTS = "document_already_exists"
     DOCUMENT_ALREADY_EXISTS_IN_TRASH = "document_already_exists_in_trash"
     ASN_ALREADY_EXISTS = "asn_already_exists"
@@ -123,22 +124,6 @@ class ConsumerPluginMixin:
         self.renew_logging_group()
 
         self.filename = self.metadata.filename or self.input_doc.original_file.name
-
-        if input_doc.root_document_id:
-            self.log.debug(
-                f"Document root document id: {input_doc.root_document_id}",
-            )
-            root_document = Document.objects.get(pk=input_doc.root_document_id)
-            version_index = Document.objects.filter(root_document=root_document).count()
-            filename_path = Path(self.filename)
-            if filename_path.suffix:
-                self.filename = str(
-                    filename_path.with_name(
-                        f"{filename_path.stem}_v{version_index}{filename_path.suffix}",
-                    ),
-                )
-            else:
-                self.filename = f"{self.filename}_v{version_index}"
 
     def _send_progress(
         self,
@@ -185,7 +170,7 @@ class ConsumerPlugin(
 ):
     logging_name = LOGGING_NAME
 
-    def _clone_root_into_version(
+    def _create_version_from_root(
         self,
         root_doc: Document,
         *,
@@ -194,30 +179,38 @@ class ConsumerPlugin(
         mime_type: str,
     ) -> Document:
         self.log.debug("Saving record for updated version to database")
-        version_doc = Document.objects.get(pk=root_doc.pk)
-        setattr(version_doc, "pk", None)
-        version_doc.root_document = root_doc
+        root_doc_frozen = Document.objects.select_for_update().get(pk=root_doc.pk)
+        next_version_index = (
+            Document.global_objects.filter(
+                root_document_id=root_doc_frozen.pk,
+            ).aggregate(
+                max_index=Max("version_index"),
+            )["max_index"]
+            or 0
+        )
         file_for_checksum = (
             self.unmodified_original
             if self.unmodified_original is not None
             else self.working_copy
         )
-        version_doc.checksum = hashlib.md5(
-            file_for_checksum.read_bytes(),
-        ).hexdigest()
-        version_doc.content = text or ""
-        version_doc.page_count = page_count
-        version_doc.mime_type = mime_type
-        version_doc.original_filename = self.filename
-        version_doc.storage_path = root_doc.storage_path
-        # Clear unique file path fields so they can be generated uniquely later
-        version_doc.filename = None
-        version_doc.archive_filename = None
-        version_doc.archive_checksum = None
+        version_doc = Document(
+            root_document=root_doc_frozen,
+            version_index=next_version_index + 1,
+            checksum=hashlib.md5(
+                file_for_checksum.read_bytes(),
+            ).hexdigest(),
+            content=text or "",
+            page_count=page_count,
+            mime_type=mime_type,
+            original_filename=self.filename,
+            owner_id=root_doc_frozen.owner_id,
+            created=root_doc_frozen.created,
+            title=root_doc_frozen.title,
+            added=timezone.now(),
+            modified=timezone.now(),
+        )
         if self.metadata.version_label is not None:
             version_doc.version_label = self.metadata.version_label
-        version_doc.added = timezone.now()
-        version_doc.modified = timezone.now()
         return version_doc
 
     def run_pre_consume_script(self) -> None:
@@ -543,7 +536,7 @@ class ConsumerPlugin(
                     root_doc = Document.objects.get(
                         pk=self.input_doc.root_document_id,
                     )
-                    original_document = self._clone_root_into_version(
+                    original_document = self._create_version_from_root(
                         root_doc,
                         text=text,
                         page_count=page_count,

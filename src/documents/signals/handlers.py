@@ -620,6 +620,16 @@ def update_filename_and_move_files(
                 root=settings.ARCHIVE_DIR,
             )
 
+    # Keep version files in sync with root
+    if instance.root_document_id is None:
+        for version_doc in Document.objects.filter(root_document_id=instance.pk).only(
+            "pk",
+        ):
+            update_filename_and_move_files(
+                Document,
+                version_doc,
+            )
+
 
 @shared_task
 def process_cf_select_update(custom_field: CustomField) -> None:
