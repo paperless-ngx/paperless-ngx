@@ -17,6 +17,7 @@ class Command(PaperlessCommand):
         "modified) after their initial import."
     )
 
+    supports_progress_bar = True
     supports_multiprocessing = True
 
     def add_arguments(self, parser):

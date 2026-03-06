@@ -180,6 +180,9 @@ class Command(PaperlessCommand):
         "modified) after their initial import."
     )
 
+    supports_progress_bar = True
+    supports_multiprocessing = False
+
     def add_arguments(self, parser) -> None:
         super().add_arguments(parser)
         parser.add_argument("-c", "--correspondent", default=False, action="store_true")

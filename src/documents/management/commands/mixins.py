@@ -1,6 +1,5 @@
 import base64
 import os
-from argparse import ArgumentParser
 from typing import TypedDict
 
 from cryptography.fernet import Fernet
@@ -19,25 +18,6 @@ class CryptFields(TypedDict):
     exporter_key: str
     model_name: str
     fields: list[str]
-
-
-class ProgressBarMixin:
-    """
-    Many commands use a progress bar, which can be disabled
-    via this class
-    """
-
-    def add_argument_progress_bar_mixin(self, parser: ArgumentParser) -> None:
-        parser.add_argument(
-            "--no-progress-bar",
-            default=False,
-            action="store_true",
-            help="If set, the progress bar will not be shown",
-        )
-
-    def handle_progress_bar_mixin(self, *args, **options) -> None:
-        self.no_progress_bar = options["no_progress_bar"]
-        self.use_progress_bar = not self.no_progress_bar
 
 
 class CryptMixin:

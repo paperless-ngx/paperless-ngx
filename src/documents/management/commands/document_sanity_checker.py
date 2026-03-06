@@ -24,6 +24,9 @@ _LEVEL_STYLE: dict[int, tuple[str, str]] = {
 class Command(PaperlessCommand):
     help = "This command checks your document archive for issues."
 
+    supports_progress_bar = True
+    supports_multiprocessing = False
+
     def _render_results(self, messages: SanityCheckMessages) -> None:
         """Render sanity check results as a Rich table."""
 
