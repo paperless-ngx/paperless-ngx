@@ -370,7 +370,12 @@ class Command(CryptMixin, BaseCommand):
         self.stdout.write("Copy files into paperless...")
 
         document_records = [
-            record
+            {
+                "pk": record["pk"],
+                EXPORTER_FILE_NAME: record[EXPORTER_FILE_NAME],
+                EXPORTER_THUMBNAIL_NAME: record.get(EXPORTER_THUMBNAIL_NAME),
+                EXPORTER_ARCHIVE_NAME: record.get(EXPORTER_ARCHIVE_NAME),
+            }
             for manifest_path in self.manifest_paths
             for record in iter_manifest_records(manifest_path)
             if record["model"] == "documents.document"
@@ -382,13 +387,13 @@ class Command(CryptMixin, BaseCommand):
             doc_file = record[EXPORTER_FILE_NAME]
             document_path = self.source / doc_file
 
-            if EXPORTER_THUMBNAIL_NAME in record:
+            if record[EXPORTER_THUMBNAIL_NAME]:
                 thumb_file = record[EXPORTER_THUMBNAIL_NAME]
                 thumbnail_path = (self.source / thumb_file).resolve()
             else:
                 thumbnail_path = None
 
-            if EXPORTER_ARCHIVE_NAME in record:
+            if record[EXPORTER_ARCHIVE_NAME]:
                 archive_file = record[EXPORTER_ARCHIVE_NAME]
                 archive_path = self.source / archive_file
             else:

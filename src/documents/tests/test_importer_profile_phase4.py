@@ -99,3 +99,30 @@ class TestImporterProfilePhase4(DirectoriesMixin, SampleDirMixin, TestCase):
                         first = False
                     out.write("\n]\n")
         tmp_path.unlink(missing_ok=True)
+
+        # Baseline: full record list (old _import_files_from_manifest approach)
+        with profile_block("baseline: full record list (doc records only)"):
+            _ = [
+                record
+                for path in manifest_paths
+                for record in iter_manifest_records(path)
+                if record["model"] == "documents.document"
+            ]
+
+        # New: slim dict list (current _import_files_from_manifest approach)
+        from documents.settings import EXPORTER_ARCHIVE_NAME
+        from documents.settings import EXPORTER_FILE_NAME
+        from documents.settings import EXPORTER_THUMBNAIL_NAME
+
+        with profile_block("new: slim dict list (4 keys only)"):
+            _ = [
+                {
+                    "pk": record["pk"],
+                    EXPORTER_FILE_NAME: record[EXPORTER_FILE_NAME],
+                    EXPORTER_THUMBNAIL_NAME: record.get(EXPORTER_THUMBNAIL_NAME),
+                    EXPORTER_ARCHIVE_NAME: record.get(EXPORTER_ARCHIVE_NAME),
+                }
+                for path in manifest_paths
+                for record in iter_manifest_records(path)
+                if record["model"] == "documents.document"
+            ]
