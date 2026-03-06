@@ -158,6 +158,7 @@ jobs:
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
+          archive: false
   merge-and-push:
     name: Merge and Push Manifest
     runs-on: ubuntu-24.04
