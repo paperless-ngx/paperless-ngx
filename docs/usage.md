@@ -95,6 +95,7 @@ Think of versions as **file history** for a document.
 
 -   Versions track the underlying file and extracted text content (OCR/text).
 -   Metadata such as tags, correspondent, document type, storage path and custom fields stay on the "root" document.
+-   Version files follow normal filename formatting (including storage paths) and add a `_vN` suffix (for example `_v1`, `_v2`).
 -   By default, search and document content use the latest version.
 -   In document detail, selecting a version switches the preview, file metadata and content (and download etc buttons) to that version.
 -   Deleting a non-root version keeps metadata and falls back to the latest remaining version.
