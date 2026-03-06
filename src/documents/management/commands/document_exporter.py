@@ -605,15 +605,13 @@ class Command(CryptMixin, BaseCommand):
         """Encrypt sensitive fields in a single record, if passphrase is set."""
         if not self.passphrase:
             return
-        model = record.get("model", "")
-        for cfg in self.CRYPT_FIELDS:
-            if model == cfg["model_name"]:
-                for field in cfg["fields"]:
-                    if record["fields"].get(field):
-                        record["fields"][field] = self.encrypt_string(
-                            value=record["fields"][field],
-                        )
-                break
+        fields = self.CRYPT_FIELDS_BY_MODEL.get(record.get("model", ""))
+        if fields:
+            for field in fields:
+                if record["fields"].get(field):
+                    record["fields"][field] = self.encrypt_string(
+                        value=record["fields"][field],
+                    )
 
     def _write_split_manifest(
         self,
