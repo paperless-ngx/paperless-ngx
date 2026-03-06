@@ -71,7 +71,7 @@ class CryptMixin:
     key_size = 32
     kdf_algorithm = "pbkdf2_sha256"
 
-    CRYPT_FIELDS: CryptFields = [
+    CRYPT_FIELDS: list[CryptFields] = [
         {
             "exporter_key": "mail_accounts",
             "model_name": "paperless_mail.mailaccount",
