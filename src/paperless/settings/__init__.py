@@ -309,6 +309,7 @@ EMPTY_TRASH_DIR = (
 # threads.
 MEDIA_LOCK = MEDIA_ROOT / "media.lock"
 INDEX_DIR = DATA_DIR / "index"
+INDEX_ACCENT_FOLD = __get_boolean("PAPERLESS_INDEX_ACCENT_FOLD", "YES")
 MODEL_FILE = __get_path(
     "PAPERLESS_MODEL_FILE",
     DATA_DIR / "classification_model.pickle",
