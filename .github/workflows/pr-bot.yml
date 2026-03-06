@@ -10,7 +10,7 @@ jobs:
       issues: read
       pull-requests: write
     steps:
-      - uses: peakoss/anti-slop@v0
+      - uses: peakoss/anti-slop@v0.2.1
         with:
           max-failures: 4
           failure-add-pr-labels: 'ai'
