@@ -8,20 +8,47 @@ from django.db import models
 
 logger = logging.getLogger(__name__)
 
+_CHUNK_SIZE = 65536  # 64 KiB — avoids loading entire files into memory
+_BATCH_SIZE = 500  # documents per bulk_update call
+_PROGRESS_INTERVAL = 500  # log a progress line every N documents
+
+
+def _sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as fh:
+        while chunk := fh.read(_CHUNK_SIZE):
+            h.update(chunk)
+    return h.hexdigest()
+
 
 def recompute_checksums(apps, schema_editor):
     """Recompute all document checksums from MD5 to SHA256."""
     Document = apps.get_model("documents", "Document")
 
-    for doc in Document.objects.all().iterator():
-        updated_fields = []
+    total = Document.objects.count()
+    if total == 0:
+        return
+
+    logger.info("Recomputing SHA-256 checksums for %d document(s)...", total)
+
+    batch: list = []
+    processed = 0
+
+    for doc in Document.objects.only(
+        "pk",
+        "filename",
+        "checksum",
+        "archive_filename",
+        "archive_checksum",
+    ).iterator(chunk_size=_BATCH_SIZE):
+        updated_fields: list[str] = []
 
         # Reconstruct source path the same way Document.source_path does
         fname = str(doc.filename) if doc.filename else f"{doc.pk:07}.pdf"
         source_path = (settings.ORIGINALS_DIR / Path(fname)).resolve()
 
         if source_path.exists():
-            doc.checksum = hashlib.sha256(source_path.read_bytes()).hexdigest()
+            doc.checksum = _sha256(source_path)
             updated_fields.append("checksum")
         else:
             logger.warning(
@@ -36,9 +63,7 @@ def recompute_checksums(apps, schema_editor):
                 settings.ARCHIVE_DIR / Path(str(doc.archive_filename))
             ).resolve()
             if archive_path.exists():
-                doc.archive_checksum = hashlib.sha256(
-                    archive_path.read_bytes(),
-                ).hexdigest()
+                doc.archive_checksum = _sha256(archive_path)
                 updated_fields.append("archive_checksum")
             else:
                 logger.warning(
@@ -48,7 +73,29 @@ def recompute_checksums(apps, schema_editor):
                 )
 
         if updated_fields:
-            doc.save(update_fields=updated_fields)
+            batch.append(doc)
+
+        processed += 1
+
+        if len(batch) >= _BATCH_SIZE:
+            Document.objects.bulk_update(batch, ["checksum", "archive_checksum"])
+            batch.clear()
+
+        if processed % _PROGRESS_INTERVAL == 0:
+            logger.info(
+                "SHA-256 checksum progress: %d/%d (%d%%)",
+                processed,
+                total,
+                processed * 100 // total,
+            )
+
+    if batch:
+        Document.objects.bulk_update(batch, ["checksum", "archive_checksum"])
+
+    logger.info(
+        "SHA-256 checksum recomputation complete: %d document(s) processed.",
+        total,
+    )
 
 
 class Migration(migrations.Migration):
