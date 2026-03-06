@@ -216,14 +216,14 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
 
     checksum = models.CharField(
         _("checksum"),
-        max_length=32,
+        max_length=64,
         editable=False,
         help_text=_("The checksum of the original document."),
     )
 
     archive_checksum = models.CharField(
         _("archive checksum"),
-        max_length=32,
+        max_length=64,
         editable=False,
         blank=True,
         null=True,
