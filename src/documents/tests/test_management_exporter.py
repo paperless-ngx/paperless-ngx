@@ -63,8 +63,8 @@ class TestExportImport(
 
         self.d1 = Document.objects.create(
             content="Content",
-            checksum="42995833e01aea9b3edee44bbfdd7ce1",
-            archive_checksum="62acb0bcbfbcaa62ca6ad3668e4e404b",
+            checksum="1093cf6e32adbd16b06969df09215d42c4a3a8938cc18b39455953f08d1ff2ab",
+            archive_checksum="706124ecde3c31616992fa979caed17a726b1c9ccdba70e82a4ff796cea97ccf",
             title="wow1",
             filename="0000001.pdf",
             mime_type="application/pdf",
@@ -72,21 +72,21 @@ class TestExportImport(
         )
         self.d2 = Document.objects.create(
             content="Content",
-            checksum="9c9691e51741c1f4f41a20896af31770",
+            checksum="550d1bae0f746d4f7c6be07054eb20cc2f11988a58ef64ceae45e98f85e92a5b",
             title="wow2",
             filename="0000002.pdf",
             mime_type="application/pdf",
         )
         self.d3 = Document.objects.create(
             content="Content",
-            checksum="d38d7ed02e988e072caf924e0f3fcb76",
+            checksum="f1ba6b7ff8548214a75adec228f5468a14fe187f445bc0b9485cbf1c35b15915",
             title="wow2",
             filename="0000003.pdf",
             mime_type="application/pdf",
         )
         self.d4 = Document.objects.create(
             content="Content",
-            checksum="82186aaa94f0b98697d704b90fd1c072",
+            checksum="a81b16b6b313cfd7e60eb7b12598d1343b58622b4030cfa19a2724a02e98db1b",
             title="wow_dec",
             filename="0000004.pdf",
             mime_type="application/pdf",
@@ -240,7 +240,7 @@ class TestExportImport(
                 )
 
                 with Path(fname).open("rb") as f:
-                    checksum = hashlib.md5(f.read()).hexdigest()
+                    checksum = hashlib.sha256(f.read()).hexdigest()
                 self.assertEqual(checksum, element["fields"]["checksum"])
 
                 # Generated field "content_length" should not be exported,
@@ -254,7 +254,7 @@ class TestExportImport(
                     self.assertIsFile(fname)
 
                     with Path(fname).open("rb") as f:
-                        checksum = hashlib.md5(f.read()).hexdigest()
+                        checksum = hashlib.sha256(f.read()).hexdigest()
                     self.assertEqual(checksum, element["fields"]["archive_checksum"])
 
             elif element["model"] == "documents.note":

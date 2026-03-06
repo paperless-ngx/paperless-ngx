@@ -58,6 +58,7 @@ from documents.models import WorkflowTrigger
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
+from documents.utils import compute_checksum
 from documents.utils import copy_file_with_basic_stats
 from paperless import version
 from paperless.models import ApplicationConfiguration
@@ -549,14 +550,14 @@ class Command(CryptMixin, BaseCommand):
         if target in self.files_in_export_dir:
             self.files_in_export_dir.remove(target)
             if self.compare_json:
-                target_checksum = hashlib.md5(target.read_bytes()).hexdigest()
+                target_checksum = compute_checksum(target)
                 src_str = json.dumps(
                     content,
                     cls=DjangoJSONEncoder,
                     indent=2,
                     ensure_ascii=False,
                 )
-                src_checksum = hashlib.md5(src_str.encode("utf-8")).hexdigest()
+                src_checksum = hashlib.sha256(src_str.encode("utf-8")).hexdigest()
                 if src_checksum == target_checksum:
                     perform_write = False
 
@@ -592,7 +593,7 @@ class Command(CryptMixin, BaseCommand):
             source_stat = source.stat()
             target_stat = target.stat()
             if self.compare_checksums and source_checksum:
-                target_checksum = hashlib.md5(target.read_bytes()).hexdigest()
+                target_checksum = compute_checksum(target)
                 perform_copy = target_checksum != source_checksum
             elif (
                 source_stat.st_mtime != target_stat.st_mtime

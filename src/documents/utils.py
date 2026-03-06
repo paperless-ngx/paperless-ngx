@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import shutil
 from os import utime
@@ -128,3 +129,15 @@ def get_boolean(boolstr: str) -> bool:
     Return a boolean value from a string representation.
     """
     return bool(boolstr.lower() in ("yes", "y", "1", "t", "true"))
+
+
+def compute_checksum(path: Path, chunk_size: int = 65536) -> str:
+    """
+    Return the SHA256 hex digest of the file at *path*, reading in chunks
+    of *chunk_size* bytes to avoid loading the entire file into memory.
+    """
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        while chunk := f.read(chunk_size):
+            h.update(chunk)
+    return h.hexdigest()
