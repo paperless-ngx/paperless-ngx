@@ -335,7 +335,7 @@ SCRATCH_DIR = __get_path(
 env_apps = __get_list("PAPERLESS_APPS")
 
 INSTALLED_APPS = [
-    "whitenoise.runserver_nostatic",
+    "servestatic.runserver_nostatic",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -391,7 +391,7 @@ if DEBUG:
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "servestatic.middleware.ServeStaticMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.locale.LocaleMiddleware",
@@ -466,7 +466,7 @@ WHITENOISE_STATIC_PREFIX = "/static/"
 
 STORAGES = {
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        "BACKEND": "servestatic.storage.CompressedStaticFilesStorage",
     },
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
 }
