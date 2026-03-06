@@ -1,6 +1,8 @@
 import os
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
+from unittest import mock
 
 import pytest
 from django.core.checks import Error
@@ -390,7 +392,10 @@ class TestV3MinimumUpgradeVersionCheck:
     """Test suite for check_v3_minimum_upgrade_version system check."""
 
     @pytest.fixture
-    def build_conn_mock(self, mocker: MockerFixture):
+    def build_conn_mock(
+        self,
+        mocker: MockerFixture,
+    ) -> Callable[[list[str], list[str]], mock.MagicMock]:
         """Factory fixture that builds a connections['default'] mock.
 
         Usage::
@@ -410,7 +415,7 @@ class TestV3MinimumUpgradeVersionCheck:
     def test_no_migrations_table_fresh_install(
         self,
         mocker: MockerFixture,
-        build_conn_mock,
+        build_conn_mock: Callable[[list[str], list[str]], mock.MagicMock],
     ) -> None:
         """
         GIVEN:
@@ -429,7 +434,7 @@ class TestV3MinimumUpgradeVersionCheck:
     def test_no_documents_migrations_fresh_install(
         self,
         mocker: MockerFixture,
-        build_conn_mock,
+        build_conn_mock: Callable[[list[str], list[str]], mock.MagicMock],
     ) -> None:
         """
         GIVEN:
@@ -448,7 +453,7 @@ class TestV3MinimumUpgradeVersionCheck:
     def test_v3_state_with_0001_squashed(
         self,
         mocker: MockerFixture,
-        build_conn_mock,
+        build_conn_mock: Callable[[list[str], list[str]], mock.MagicMock],
     ) -> None:
         """
         GIVEN:
@@ -472,7 +477,7 @@ class TestV3MinimumUpgradeVersionCheck:
     def test_v3_state_with_0002_squashed_only(
         self,
         mocker: MockerFixture,
-        build_conn_mock,
+        build_conn_mock: Callable[[list[str], list[str]], mock.MagicMock],
     ) -> None:
         """
         GIVEN:
@@ -491,7 +496,7 @@ class TestV3MinimumUpgradeVersionCheck:
     def test_v2_20_9_state_ready_to_upgrade(
         self,
         mocker: MockerFixture,
-        build_conn_mock,
+        build_conn_mock: Callable[[list[str], list[str]], mock.MagicMock],
     ) -> None:
         """
         GIVEN:
@@ -518,7 +523,7 @@ class TestV3MinimumUpgradeVersionCheck:
     def test_v2_20_8_raises_error(
         self,
         mocker: MockerFixture,
-        build_conn_mock,
+        build_conn_mock: Callable[[list[str], list[str]], mock.MagicMock],
     ) -> None:
         """
         GIVEN:
@@ -545,7 +550,7 @@ class TestV3MinimumUpgradeVersionCheck:
     def test_very_old_version_raises_error(
         self,
         mocker: MockerFixture,
-        build_conn_mock,
+        build_conn_mock: Callable[[list[str], list[str]], mock.MagicMock],
     ) -> None:
         """
         GIVEN:
@@ -572,7 +577,7 @@ class TestV3MinimumUpgradeVersionCheck:
     def test_error_hint_mentions_v2_20_9(
         self,
         mocker: MockerFixture,
-        build_conn_mock,
+        build_conn_mock: Callable[[list[str], list[str]], mock.MagicMock],
     ) -> None:
         """
         GIVEN:
