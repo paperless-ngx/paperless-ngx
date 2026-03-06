@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db import migrations
 from django.db import models
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("paperless.migrations")
 
 _CHUNK_SIZE = 65536  # 64 KiB — avoids loading entire files into memory
 _BATCH_SIZE = 500  # documents per bulk_update call
