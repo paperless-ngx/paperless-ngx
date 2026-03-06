@@ -60,7 +60,7 @@ class DocumentFactory(DjangoModelFactory):
         model = Document
 
     title = factory.Faker("sentence", nb_words=4)
-    checksum = factory.Faker("md5")
+    checksum = factory.Faker("sha256")
     content = factory.Faker("paragraph")
     correspondent = None
     document_type = None

@@ -56,6 +56,7 @@ from documents.models import WorkflowTrigger
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
+from documents.utils import compute_checksum
 from documents.utils import copy_file_with_basic_stats
 from paperless import version
 from paperless.models import ApplicationConfiguration
@@ -693,7 +694,7 @@ class Command(CryptMixin, PaperlessCommand):
             source_stat = source.stat()
             target_stat = target.stat()
             if self.compare_checksums and source_checksum:
-                target_checksum = hashlib.md5(target.read_bytes()).hexdigest()
+                target_checksum = compute_checksum(target)
                 perform_copy = target_checksum != source_checksum
             elif (
                 source_stat.st_mtime != target_stat.st_mtime
