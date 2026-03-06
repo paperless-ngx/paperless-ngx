@@ -10,10 +10,13 @@
         <ul class="list-group"
             cdkDropList
             (cdkDropListDropped)="onDrop($event)">
-            @for (documentID of documentIDs; track documentID) {
+            @for (document of documents; track document.id) {
                 <li class="list-group-item" cdkDrag>
                     <i-bs name="grip-vertical" class="me-2"></i-bs>
-                    {{getDocument(documentID)?.title}}
+                    @if (document.correspondent) {
+                      <b>{{document.correspondent | correspondentName | async}}:</b>
+                    }
+                    {{document.title}}
                 </li>
             }
         </ul>
