@@ -1723,6 +1723,15 @@ class BulkEditSerializer(
         except ValueError:
             raise serializers.ValidationError("invalid rotation degrees")
 
+    def _validate_source_mode(self, parameters) -> None:
+        source_mode = parameters.get(
+            "source_mode",
+            bulk_edit.SourceModeChoices.LATEST_VERSION,
+        )
+        if source_mode not in bulk_edit.SourceModeChoices.__dict__.values():
+            raise serializers.ValidationError("Invalid source_mode")
+        parameters["source_mode"] = source_mode
+
     def _validate_parameters_split(self, parameters) -> None:
         if "pages" not in parameters:
             raise serializers.ValidationError("pages not specified")
@@ -1822,6 +1831,9 @@ class BulkEditSerializer(
     def validate(self, attrs):
         method = attrs["method"]
         parameters = attrs["parameters"]
+
+        if "source_mode" in parameters:
+            self._validate_source_mode(parameters)
 
         if method == bulk_edit.set_correspondent:
             self._validate_parameters_correspondent(parameters)
