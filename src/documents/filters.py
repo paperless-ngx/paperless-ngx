@@ -163,15 +163,23 @@ class InboxFilter(Filter):
 @extend_schema_field(serializers.CharField)
 class TitleContentFilter(Filter):
     def filter(self, qs: Any, value: Any) -> Any:
+        from django.conf import settings
+
         value = value.strip() if isinstance(value, str) else value
         if value:
+            if settings.INDEX_ACCENT_FOLD:
+                lookup = "unaccent__icontains"
+            else:
+                lookup = "icontains"
             try:
                 return qs.filter(
-                    Q(title__icontains=value) | Q(effective_content__icontains=value),
+                    Q(**{f"title__{lookup}": value})
+                    | Q(**{f"effective_content__{lookup}": value}),
                 )
             except FieldError:
                 return qs.filter(
-                    Q(title__icontains=value) | Q(content__icontains=value),
+                    Q(**{f"title__{lookup}": value})
+                    | Q(**{f"content__{lookup}": value}),
                 )
         else:
             return qs
