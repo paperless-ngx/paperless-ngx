@@ -435,13 +435,13 @@ class Command(CryptMixin, BaseCommand):
             document.save()
 
     def _decrypt_record_if_needed(self, record: dict) -> dict:
-        for crypt_config in self.CRYPT_FIELDS:
-            if record["model"] == crypt_config["model_name"]:
-                for field in crypt_config["fields"]:
-                    if record["fields"].get(field):
-                        record["fields"][field] = self.decrypt_string(
-                            value=record["fields"][field],
-                        )
+        fields = self.CRYPT_FIELDS_BY_MODEL.get(record.get("model", ""))
+        if fields:
+            for field in fields:
+                if record["fields"].get(field):
+                    record["fields"][field] = self.decrypt_string(
+                        value=record["fields"][field],
+                    )
         return record
 
     def decrypt_secret_fields(self) -> None:
