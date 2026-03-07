@@ -3,6 +3,8 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from llama_index.core.llms import ChatMessage
+    from llama_index.llms.ollama import Ollama
+    from llama_index.llms.openai import OpenAI
 
 from paperless.config import AIConfig
 from paperless_ai.base_model import DocumentClassifierSchema
@@ -19,7 +21,7 @@ class AIClient:
         self.settings = AIConfig()
         self.llm = self.get_llm()
 
-    def get_llm(self):
+    def get_llm(self) -> "Ollama | OpenAI":
         if self.settings.llm_backend == "ollama":
             from llama_index.llms.ollama import Ollama
 
