@@ -159,7 +159,6 @@ class StreamingManifestWriter:
             self.discard()
         else:
             self.close()
-        return False
 
 
 class Command(CryptMixin, BaseCommand):
