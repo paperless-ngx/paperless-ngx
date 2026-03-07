@@ -1,9 +1,8 @@
 import logging
+from typing import TYPE_CHECKING
 
-from llama_index.core.llms import ChatMessage
-from llama_index.core.program.function_program import get_function_tool
-from llama_index.llms.ollama import Ollama
-from llama_index.llms.openai import OpenAI
+if TYPE_CHECKING:
+    from llama_index.core.llms import ChatMessage
 
 from paperless.config import AIConfig
 from paperless_ai.base_model import DocumentClassifierSchema
@@ -20,14 +19,18 @@ class AIClient:
         self.settings = AIConfig()
         self.llm = self.get_llm()
 
-    def get_llm(self) -> Ollama | OpenAI:
+    def get_llm(self):
         if self.settings.llm_backend == "ollama":
+            from llama_index.llms.ollama import Ollama
+
             return Ollama(
                 model=self.settings.llm_model or "llama3.1",
                 base_url=self.settings.llm_endpoint or "http://localhost:11434",
                 request_timeout=120,
             )
         elif self.settings.llm_backend == "openai":
+            from llama_index.llms.openai import OpenAI
+
             return OpenAI(
                 model=self.settings.llm_model or "gpt-3.5-turbo",
                 api_base=self.settings.llm_endpoint or None,
@@ -42,6 +45,9 @@ class AIClient:
             self.settings.llm_backend,
             self.settings.llm_model,
         )
+
+        from llama_index.core.llms import ChatMessage
+        from llama_index.core.program.function_program import get_function_tool
 
         user_msg = ChatMessage(role="user", content=prompt)
         tool = get_function_tool(DocumentClassifierSchema)
@@ -58,7 +64,7 @@ class AIClient:
         parsed = DocumentClassifierSchema(**tool_calls[0].tool_kwargs)
         return parsed.model_dump()
 
-    def run_chat(self, messages: list[ChatMessage]) -> str:
+    def run_chat(self, messages: list["ChatMessage"]) -> str:
         logger.debug(
             "Running chat query against %s with model %s",
             self.settings.llm_backend,

@@ -45,7 +45,7 @@ def test_stream_chat_with_one_document_full_content(mock_document) -> None:
         patch("paperless_ai.chat.AIClient") as mock_client_cls,
         patch("paperless_ai.chat.load_or_build_index") as mock_load_index,
         patch(
-            "paperless_ai.chat.RetrieverQueryEngine.from_args",
+            "llama_index.core.query_engine.RetrieverQueryEngine.from_args",
         ) as mock_query_engine_cls,
     ):
         mock_client = MagicMock()
@@ -76,7 +76,7 @@ def test_stream_chat_with_multiple_documents_retrieval(patch_embed_nodes) -> Non
         patch("paperless_ai.chat.AIClient") as mock_client_cls,
         patch("paperless_ai.chat.load_or_build_index") as mock_load_index,
         patch(
-            "paperless_ai.chat.RetrieverQueryEngine.from_args",
+            "llama_index.core.query_engine.RetrieverQueryEngine.from_args",
         ) as mock_query_engine_cls,
         patch.object(VectorStoreIndex, "as_retriever") as mock_as_retriever,
     ):
