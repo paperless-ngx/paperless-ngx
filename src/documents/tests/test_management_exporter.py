@@ -753,6 +753,31 @@ class TestExportImport(
             call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
 
+    def test_folder_prefix_with_split(self) -> None:
+        """
+        GIVEN:
+            - Request to export documents to directory
+        WHEN:
+            - Option use_folder_prefix is used
+            - Option split manifest is used
+        THEN:
+            - Documents can be imported again
+        """
+        shutil.rmtree(Path(self.dirs.media_dir) / "documents")
+        shutil.copytree(
+            Path(__file__).parent / "samples" / "documents",
+            Path(self.dirs.media_dir) / "documents",
+        )
+
+        self._do_export(use_folder_prefix=True, split_manifest=True)
+
+        with paperless_environment():
+            self.assertEqual(Document.objects.count(), 4)
+            Document.objects.all().delete()
+            self.assertEqual(Document.objects.count(), 0)
+            call_command("document_importer", "--no-progress-bar", self.target)
+            self.assertEqual(Document.objects.count(), 4)
+
     def test_import_db_transaction_failed(self) -> None:
         """
         GIVEN:
