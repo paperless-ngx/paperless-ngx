@@ -3,11 +3,13 @@ import {
   DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
+import { AsyncPipe } from '@angular/common'
 import { Component, OnInit, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { takeUntil } from 'rxjs'
 import { Document } from 'src/app/data/document'
+import { CorrespondentNamePipe } from 'src/app/pipes/correspondent-name.pipe'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { ConfirmDialogComponent } from '../confirm-dialog.component'
@@ -17,6 +19,8 @@ import { ConfirmDialogComponent } from '../confirm-dialog.component'
   templateUrl: './merge-confirm-dialog.component.html',
   styleUrl: './merge-confirm-dialog.component.scss',
   imports: [
+    AsyncPipe,
+    CorrespondentNamePipe,
     DragDropModule,
     FormsModule,
     ReactiveFormsModule,
