@@ -18,13 +18,13 @@ def mock_ai_config():
 
 @pytest.fixture
 def mock_ollama_llm():
-    with patch("paperless_ai.client.Ollama") as MockOllama:
+    with patch("llama_index.llms.ollama.Ollama") as MockOllama:
         yield MockOllama
 
 
 @pytest.fixture
 def mock_openai_llm():
-    with patch("paperless_ai.client.OpenAI") as MockOpenAI:
+    with patch("llama_index.llms.openai.OpenAI") as MockOpenAI:
         yield MockOpenAI
 
 
