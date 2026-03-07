@@ -49,6 +49,7 @@ dependencies = [
   "flower~=2.0.1",
   "gotenberg-client~=0.13.1",
   "httpx-oauth~=0.16",
+  "ijson>=3.2",
   "imap-tools~=1.11.0",
   "jinja2~=3.1.5",
   "langdetect~=1.0.9",
@@ -304,6 +305,7 @@ markers = [
   "greenmail: Tests requiring Greenmail service",
   "date_parsing: Tests which cover date parsing from content or filename",
   "management: Tests which cover management commands/functionality",
+  "profiling: Benchmarks for comparing implementation performance (not assertions, inspect output manually)",
 ]
 
 [tool.pytest_env]

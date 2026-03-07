@@ -8,6 +8,7 @@ from pathlib import Path
 from zipfile import ZipFile
 from zipfile import is_zipfile
 
+import ijson
 import tqdm
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -45,6 +46,15 @@ from paperless import version
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
+
+
+def iter_manifest_records(path: Path) -> Generator[dict, None, None]:
+    """Yield records one at a time from a manifest JSON array via ijson."""
+    try:
+        with path.open("rb") as f:
+            yield from ijson.items(f, "item")
+    except ijson.JSONError as e:
+        raise CommandError(f"Failed to parse manifest file {path}: {e}") from e
 
 
 @contextmanager
@@ -147,14 +157,9 @@ class Command(CryptMixin, BaseCommand):
         Loads manifest data from the various JSON files for parsing and loading the database
         """
         main_manifest_path: Path = self.source / "manifest.json"
-
-        with main_manifest_path.open() as infile:
-            self.manifest = json.load(infile)
         self.manifest_paths.append(main_manifest_path)
 
         for file in Path(self.source).glob("**/*-manifest.json"):
-            with file.open() as infile:
-                self.manifest += json.load(infile)
             self.manifest_paths.append(file)
 
     def load_metadata(self) -> None:
@@ -236,7 +241,6 @@ class Command(CryptMixin, BaseCommand):
         self.version: str | None = None
         self.salt: str | None = None
         self.manifest_paths = []
-        self.manifest = []
 
         # Create a temporary directory for extracting a zip file into it, even if supplied source is no zip file to keep code cleaner.
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -296,6 +300,9 @@ class Command(CryptMixin, BaseCommand):
             else:
                 self.stdout.write(self.style.NOTICE("Data only import completed"))
 
+            for tmp in getattr(self, "_decrypted_tmp_paths", []):
+                tmp.unlink(missing_ok=True)
+
         self.stdout.write("Updating search index...")
         call_command(
             "document_index",
@@ -348,11 +355,12 @@ class Command(CryptMixin, BaseCommand):
                     ) from e
 
         self.stdout.write("Checking the manifest")
-        for record in self.manifest:
-            # Only check if the document files exist if this is not data only
-            # We don't care about documents for a data only import
-            if not self.data_only and record["model"] == "documents.document":
-                check_document_validity(record)
+        for manifest_path in self.manifest_paths:
+            for record in iter_manifest_records(manifest_path):
+                # Only check if the document files exist if this is not data only
+                # We don't care about documents for a data only import
+                if not self.data_only and record["model"] == "documents.document":
+                    check_document_validity(record)
 
     def _import_files_from_manifest(self) -> None:
         settings.ORIGINALS_DIR.mkdir(parents=True, exist_ok=True)
@@ -361,23 +369,31 @@ class Command(CryptMixin, BaseCommand):
 
         self.stdout.write("Copy files into paperless...")
 
-        manifest_documents = list(
-            filter(lambda r: r["model"] == "documents.document", self.manifest),
-        )
+        document_records = [
+            {
+                "pk": record["pk"],
+                EXPORTER_FILE_NAME: record[EXPORTER_FILE_NAME],
+                EXPORTER_THUMBNAIL_NAME: record.get(EXPORTER_THUMBNAIL_NAME),
+                EXPORTER_ARCHIVE_NAME: record.get(EXPORTER_ARCHIVE_NAME),
+            }
+            for manifest_path in self.manifest_paths
+            for record in iter_manifest_records(manifest_path)
+            if record["model"] == "documents.document"
+        ]
 
-        for record in tqdm.tqdm(manifest_documents, disable=self.no_progress_bar):
+        for record in tqdm.tqdm(document_records, disable=self.no_progress_bar):
             document = Document.objects.get(pk=record["pk"])
 
             doc_file = record[EXPORTER_FILE_NAME]
             document_path = self.source / doc_file
 
-            if EXPORTER_THUMBNAIL_NAME in record:
+            if record[EXPORTER_THUMBNAIL_NAME]:
                 thumb_file = record[EXPORTER_THUMBNAIL_NAME]
                 thumbnail_path = (self.source / thumb_file).resolve()
             else:
                 thumbnail_path = None
 
-            if EXPORTER_ARCHIVE_NAME in record:
+            if record[EXPORTER_ARCHIVE_NAME]:
                 archive_file = record[EXPORTER_ARCHIVE_NAME]
                 archive_path = self.source / archive_file
             else:
@@ -418,33 +434,43 @@ class Command(CryptMixin, BaseCommand):
 
             document.save()
 
+    def _decrypt_record_if_needed(self, record: dict) -> dict:
+        fields = self.CRYPT_FIELDS_BY_MODEL.get(record.get("model", ""))
+        if fields:
+            for field in fields:
+                if record["fields"].get(field):
+                    record["fields"][field] = self.decrypt_string(
+                        value=record["fields"][field],
+                    )
+        return record
+
     def decrypt_secret_fields(self) -> None:
         """
-        The converse decryption of some fields out of the export before importing to database
+        The converse decryption of some fields out of the export before importing to database.
+        Streams records from each manifest path and writes decrypted content to a temp file.
         """
-        if self.passphrase:
-            # Salt has been loaded from metadata.json at this point, so it cannot be None
-            self.setup_crypto(passphrase=self.passphrase, salt=self.salt)
-
-            had_at_least_one_record = False
-
-            for crypt_config in self.CRYPT_FIELDS:
-                importer_model: str = crypt_config["model_name"]
-                crypt_fields: str = crypt_config["fields"]
-                for record in filter(
-                    lambda x: x["model"] == importer_model,
-                    self.manifest,
-                ):
-                    had_at_least_one_record = True
-                    for field in crypt_fields:
-                        if record["fields"][field]:
-                            record["fields"][field] = self.decrypt_string(
-                                value=record["fields"][field],
-                            )
-
-            if had_at_least_one_record:
-                # It's annoying, but the DB is loaded from the JSON directly
-                # Maybe could change that in the future?
-                (self.source / "manifest.json").write_text(
-                    json.dumps(self.manifest, indent=2, ensure_ascii=False),
-                )
+        if not self.passphrase:
+            return
+        # Salt has been loaded from metadata.json at this point, so it cannot be None
+        self.setup_crypto(passphrase=self.passphrase, salt=self.salt)
+        self._decrypted_tmp_paths: list[Path] = []
+        new_paths: list[Path] = []
+        for manifest_path in self.manifest_paths:
+            tmp = manifest_path.with_name(manifest_path.stem + ".decrypted.json")
+            with tmp.open("w", encoding="utf-8") as out:
+                out.write("[\n")
+                first = True
+                for record in iter_manifest_records(manifest_path):
+                    if not first:
+                        out.write(",\n")
+                    json.dump(
+                        self._decrypt_record_if_needed(record),
+                        out,
+                        indent=2,
+                        ensure_ascii=False,
+                    )
+                    first = False
+                out.write("\n]\n")
+            self._decrypted_tmp_paths.append(tmp)
+            new_paths.append(tmp)
+        self.manifest_paths = new_paths
