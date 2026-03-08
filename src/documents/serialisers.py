@@ -1453,10 +1453,10 @@ class SavedViewSerializer(OwnedObjectSerializer):
             sidebar_ids = set()
             user = request.user if request else None
             if user is not None and hasattr(user, "ui_settings"):
-                settings = user.ui_settings.settings or None
+                ui_settings = user.ui_settings.settings or None
                 saved_views = None
-                if isinstance(settings, dict):
-                    saved_views = settings.get("saved_views", {})
+                if isinstance(ui_settings, dict):
+                    saved_views = ui_settings.get("saved_views", {})
                 if isinstance(saved_views, dict):
                     dashboard_ids = set(
                         saved_views.get("dashboard_views_visible_ids", []),
