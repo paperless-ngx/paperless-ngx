@@ -30,7 +30,7 @@
               <div class="d-flex">
                 <p class="p-2" i18n>Trigger Workflow On:</p>
                 <button type="button" class="btn btn-sm btn-outline-primary ms-auto mb-3" (click)="addTrigger()">
-                  <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Trigger</ng-container>
+                  <i-bs name="plus-circle" class="me-1"></i-bs><ng-container i18n>Add Trigger</ng-container>
                 </button>
               </div>
               <div ngbAccordion [closeOthers]="true">
@@ -72,7 +72,7 @@
               <div class="d-flex">
                 <p class="p-2" i18n>Apply Actions:</p>
                 <button type="button" class="btn btn-sm btn-outline-primary ms-auto mb-3" (click)="addAction()">
-                  <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Action</ng-container>
+                  <i-bs name="plus-circle" class="me-1"></i-bs><ng-container i18n>Add Action</ng-container>
                 </button>
               </div>
               <div ngbAccordion [closeOthers]="true" cdkDropList (cdkDropListDropped)="onActionDrop($event)">
@@ -187,7 +187,7 @@
                 (click)="addFilter(formGroup)"
                 [disabled]="!canAddFilter(formGroup)"
               >
-                <i-bs name="plus-circle"></i-bs>&nbsp;<span i18n>Add filter</span>
+                <i-bs name="plus-circle" class="me-1"></i-bs><span i18n>Add filter</span>
               </button>
             </div>
             <ul class="mt-2 list-group filters" formArrayName="filters">
@@ -427,6 +427,31 @@
             }
             <pngx-input-entries i18n-title title="Webhook headers" formControlName="headers" [error]="error?.actions?.[i]?.headers"></pngx-input-entries>
             <pngx-input-switch i18n-title title="Include document" formControlName="include_document"></pngx-input-switch>
+          </div>
+        </div>
+      }
+      @case (WorkflowActionType.PasswordRemoval) {
+        <div class="row">
+          <div class="col">
+            <p class="small" i18n>
+              One password per line. The workflow will try them in order until one succeeds.
+            </p>
+            <pngx-input-textarea
+              i18n-title
+              title="Passwords"
+              formControlName="passwords"
+              rows="4"
+              [error]="error?.actions?.[i]?.passwords"
+              hint="Passwords are stored in plain text. Use with caution."
+              i18n-hint
+            ></pngx-input-textarea>
+          </div>
+        </div>
+      }
+      @case (WorkflowActionType.MoveToTrash) {
+        <div class="row">
+          <div class="col">
+            <p class="text-muted small" i18n>The document will be moved to the trash at the end of the workflow run.</p>
           </div>
         </div>
       }

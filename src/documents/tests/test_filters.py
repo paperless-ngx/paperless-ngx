@@ -21,7 +21,7 @@ class TestDateLocalization:
         14,
         30,
         5,
-        tzinfo=datetime.timezone.utc,
+        tzinfo=datetime.UTC,
     )
 
     TEST_DATETIME_STRING: str = "2023-10-26T14:30:05+00:00"
@@ -167,7 +167,7 @@ class TestDateLocalization:
 
         assert f"Unsupported type {type(invalid_value)}" in str(excinfo.value)
 
-    def test_localize_date_raises_error_for_invalid_locale(self):
+    def test_localize_date_raises_error_for_invalid_locale(self) -> None:
         with pytest.raises(ValueError) as excinfo:
             localize_date(self.TEST_DATE, "medium", "invalid_locale_code")
 

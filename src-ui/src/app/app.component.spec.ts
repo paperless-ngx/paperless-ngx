@@ -9,7 +9,11 @@ import {
 import { Router, RouterModule } from '@angular/router'
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap'
 import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
+import {
+  provideUiTour,
+  TourNgBootstrap,
+  TourService,
+} from 'ngx-ui-tour-ng-bootstrap'
 import { Subject } from 'rxjs'
 import { routes } from './app-routing.module'
 import { AppComponent } from './app.component'
@@ -40,12 +44,12 @@ describe('AppComponent', () => {
   beforeEach(async () => {
     TestBed.configureTestingModule({
       imports: [
-        TourNgBootstrapModule,
         RouterModule.forRoot(routes),
         NgbModalModule,
         AppComponent,
         ToastsComponent,
         FileDropComponent,
+        TourNgBootstrap,
         NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
@@ -53,6 +57,7 @@ describe('AppComponent', () => {
         DirtySavedViewGuard,
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
+        provideUiTour(),
       ],
     }).compileComponents()
 

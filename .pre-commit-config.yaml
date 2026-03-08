@@ -1,6 +1,7 @@
 # This file configures pre-commit hooks.
 # See https://pre-commit.com/ for general information
 # See https://pre-commit.com/hooks.html for a listing of possible hooks
+# We actually run via https://github.com/j178/prek which is compatible
 repos:
   # General hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -37,7 +38,7 @@ repos:
           - json
   # See https://github.com/prettier/prettier/issues/15742 for the fork reason
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: 'v3.6.2'
+    rev: 'v3.8.1'
     hooks:
       - id: prettier
         types_or:
@@ -49,12 +50,12 @@ repos:
           - 'prettier-plugin-organize-imports@4.1.0'
   # Python hooks
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.5
+    rev: v0.15.0
     hooks:
       - id: ruff-check
       - id: ruff-format
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: "v2.11.1"
+    rev: "v2.12.1"
     hooks:
       - id: pyproject-fmt
   # Dockerfile hooks
@@ -76,7 +77,7 @@ repos:
     hooks:
       - id: shellcheck
   - repo: https://github.com/google/yamlfmt
-    rev: v0.20.0
+    rev: v0.21.0
     hooks:
       - id: yamlfmt
         exclude: "^src-ui/pnpm-lock.yaml"

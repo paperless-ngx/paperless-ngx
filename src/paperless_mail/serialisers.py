@@ -102,6 +102,7 @@ class MailRuleSerializer(OwnedObjectSerializer):
             "user_can_change",
             "permissions",
             "set_permissions",
+            "stop_processing",
         ]
 
     def update(self, instance, validated_data):

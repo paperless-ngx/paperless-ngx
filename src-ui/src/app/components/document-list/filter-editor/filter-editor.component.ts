@@ -16,7 +16,7 @@ import {
   NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
+import { TourNgBootstrap } from 'ngx-ui-tour-ng-bootstrap'
 import { Observable, Subject, from } from 'rxjs'
 import {
   catchError,
@@ -251,7 +251,7 @@ const DEFAULT_TEXT_FILTER_MODIFIER_OPTIONS = [
     NgbTypeaheadModule,
     FormsModule,
     ReactiveFormsModule,
-    TourNgBootstrapModule,
+    TourNgBootstrap,
   ],
 })
 export class FilterEditorComponent
@@ -1101,6 +1101,9 @@ export class FilterEditorComponent
   @Output()
   filterRulesChange = new EventEmitter<FilterRule[]>()
 
+  @Output()
+  resetFilterRules = new EventEmitter<FilterRule[]>()
+
   @Input()
   set selectionData(selectionData: SelectionData) {
     this.tagDocumentCounts = selectionData?.selected_tags ?? null
@@ -1244,7 +1247,7 @@ export class FilterEditorComponent
     this.textFilterTarget = TEXT_FILTER_TARGET_TITLE_CONTENT
     this.documentService.searchQuery = ''
     this.filterRules = this._unmodifiedFilterRules
-    this.updateRules()
+    this.resetFilterRules.next(this.filterRules)
   }
 
   toggleTag(tagId: number) {

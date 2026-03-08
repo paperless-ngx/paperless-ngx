@@ -4,6 +4,7 @@ from io import StringIO
 from pathlib import Path
 from zipfile import ZipFile
 
+import pytest
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -18,13 +19,14 @@ from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
 
 
+@pytest.mark.management
 class TestCommandImport(
     DirectoriesMixin,
     FileSystemAssertsMixin,
     SampleDirMixin,
     TestCase,
 ):
-    def test_check_manifest_exists(self):
+    def test_check_manifest_exists(self) -> None:
         """
         GIVEN:
             - Source directory exists
@@ -45,7 +47,7 @@ class TestCommandImport(
             str(e.exception),
         )
 
-    def test_check_manifest_malformed(self):
+    def test_check_manifest_malformed(self) -> None:
         """
         GIVEN:
             - Source directory exists
@@ -71,7 +73,7 @@ class TestCommandImport(
             str(e.exception),
         )
 
-    def test_check_manifest_file_not_found(self):
+    def test_check_manifest_file_not_found(self) -> None:
         """
         GIVEN:
             - Source directory exists
@@ -97,7 +99,7 @@ class TestCommandImport(
             )
         self.assertIn('The manifest file refers to "noexist.pdf"', str(e.exception))
 
-    def test_import_permission_error(self):
+    def test_import_permission_error(self) -> None:
         """
         GIVEN:
             - Original file which cannot be read from
@@ -138,7 +140,7 @@ class TestCommandImport(
                 cmd.check_manifest_validity()
             self.assertIn("Failed to read from archive file", str(cm.exception))
 
-    def test_import_source_not_existing(self):
+    def test_import_source_not_existing(self) -> None:
         """
         GIVEN:
             - Source given doesn't exist
@@ -151,7 +153,7 @@ class TestCommandImport(
             call_command("document_importer", Path("/tmp/notapath"))
         self.assertIn("That path doesn't exist", str(cm.exception))
 
-    def test_import_source_not_readable(self):
+    def test_import_source_not_readable(self) -> None:
         """
         GIVEN:
             - Source given isn't readable
@@ -170,7 +172,7 @@ class TestCommandImport(
                 str(cm.exception),
             )
 
-    def test_import_source_does_not_exist(self):
+    def test_import_source_does_not_exist(self) -> None:
         """
         GIVEN:
             - Source directory does not exist
@@ -187,7 +189,7 @@ class TestCommandImport(
             call_command("document_importer", "--no-progress-bar", str(path))
         self.assertIn("That path doesn't exist", str(e.exception))
 
-    def test_import_files_exist(self):
+    def test_import_files_exist(self) -> None:
         """
         GIVEN:
             - Source directory does exist
@@ -216,7 +218,7 @@ class TestCommandImport(
             str(stdout.read()),
         )
 
-    def test_import_with_user_exists(self):
+    def test_import_with_user_exists(self) -> None:
         """
         GIVEN:
             - Source directory does exist
@@ -244,7 +246,7 @@ class TestCommandImport(
             stdout.read(),
         )
 
-    def test_import_with_documents_exists(self):
+    def test_import_with_documents_exists(self) -> None:
         """
         GIVEN:
             - Source directory does exist
@@ -280,7 +282,7 @@ class TestCommandImport(
             str(stdout.read()),
         )
 
-    def test_import_no_metadata_or_version_file(self):
+    def test_import_no_metadata_or_version_file(self) -> None:
         """
         GIVEN:
             - A source directory with a manifest file only
@@ -306,7 +308,7 @@ class TestCommandImport(
 
         self.assertIn("No version.json or metadata.json file located", stdout_str)
 
-    def test_import_version_file(self):
+    def test_import_version_file(self) -> None:
         """
         GIVEN:
             - A source directory with a manifest file and version file
@@ -336,7 +338,7 @@ class TestCommandImport(
         self.assertIn("Version mismatch:", stdout_str)
         self.assertIn("importing 2.8.1", stdout_str)
 
-    def test_import_zipped_export(self):
+    def test_import_zipped_export(self) -> None:
         """
         GIVEN:
             - A zip file with correct content (manifest.json and version.json inside)

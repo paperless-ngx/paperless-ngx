@@ -3,10 +3,14 @@ import hashlib
 import logging
 import shutil
 import uuid
+import zipfile
+from collections.abc import Callable
+from collections.abc import Iterable
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from tempfile import mkstemp
+from typing import TypeVar
 
-import tqdm
 from celery import Task
 from celery import shared_task
 from celery import states
@@ -22,9 +26,12 @@ from whoosh.writing import AsyncWriter
 from documents import index
 from documents import sanity_checker
 from documents.barcodes import BarcodePlugin
+from documents.bulk_download import ArchiveOnlyStrategy
+from documents.bulk_download import OriginalsOnlyStrategy
 from documents.caching import clear_document_caches
 from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
+from documents.consumer import AsnCheckPlugin
 from documents.consumer import ConsumerPlugin
 from documents.consumer import ConsumerPreflightPlugin
 from documents.consumer import WorkflowTriggerPlugin
@@ -39,6 +46,8 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import PaperlessTask
+from documents.models import ShareLink
+from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import WorkflowRun
@@ -53,32 +62,45 @@ from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
 from documents.signals.handlers import run_workflows
+from documents.signals.handlers import send_websocket_document_updated
 from documents.workflows.utils import get_workflows_for_trigger
+from paperless.config import AIConfig
+from paperless_ai.indexing import llm_index_add_or_update_document
+from paperless_ai.indexing import llm_index_remove_document
+from paperless_ai.indexing import update_llm_index
+
+_T = TypeVar("_T")
+IterWrapper = Callable[[Iterable[_T]], Iterable[_T]]
+
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
 logger = logging.getLogger("paperless.tasks")
 
 
+def _identity(iterable: Iterable[_T]) -> Iterable[_T]:
+    return iterable
+
+
 @shared_task
-def index_optimize():
+def index_optimize() -> None:
     ix = index.open_index()
     writer = AsyncWriter(ix)
     writer.commit(optimize=True)
 
 
-def index_reindex(*, progress_bar_disable=False):
+def index_reindex(*, iter_wrapper: IterWrapper[Document] = _identity) -> None:
     documents = Document.objects.all()
 
     ix = index.open_index(recreate=True)
 
     with AsyncWriter(ix) as writer:
-        for document in tqdm.tqdm(documents, disable=progress_bar_disable):
+        for document in iter_wrapper(documents):
             index.update_document(writer, document)
 
 
 @shared_task
-def train_classifier(*, scheduled=True):
+def train_classifier(*, scheduled=True) -> None:
     task = PaperlessTask.objects.create(
         type=PaperlessTask.TaskType.SCHEDULED_TASK
         if scheduled
@@ -145,13 +167,22 @@ def consume_file(
     if overrides is None:
         overrides = DocumentMetadataOverrides()
 
-    plugins: list[type[ConsumeTaskPlugin]] = [
-        ConsumerPreflightPlugin,
-        CollatePlugin,
-        BarcodePlugin,
-        WorkflowTriggerPlugin,
-        ConsumerPlugin,
-    ]
+    plugins: list[type[ConsumeTaskPlugin]] = (
+        [
+            ConsumerPreflightPlugin,
+            ConsumerPlugin,
+        ]
+        if input_doc.root_document_id is not None
+        else [
+            ConsumerPreflightPlugin,
+            AsnCheckPlugin,
+            CollatePlugin,
+            BarcodePlugin,
+            AsnCheckPlugin,  # Re-run ASN check after barcode reading
+            WorkflowTriggerPlugin,
+            ConsumerPlugin,
+        ]
+    )
 
     with (
         ProgressManager(
@@ -207,24 +238,34 @@ def consume_file(
 @shared_task
 def sanity_check(*, scheduled=True, raise_on_error=True):
     messages = sanity_checker.check_sanity(scheduled=scheduled)
-
     messages.log_messages()
 
+    if not messages.has_error and not messages.has_warning and not messages.has_info:
+        return "No issues detected."
+
+    parts: list[str] = []
+    if messages.document_error_count:
+        parts.append(f"{messages.document_error_count} document(s) with errors")
+    if messages.document_warning_count:
+        parts.append(f"{messages.document_warning_count} document(s) with warnings")
+    if messages.document_info_count:
+        parts.append(f"{messages.document_info_count} document(s) with infos")
+    if messages.global_warning_count:
+        parts.append(f"{messages.global_warning_count} global warning(s)")
+
+    summary = ", ".join(parts) + " found."
+
     if messages.has_error:
-        message = "Sanity check exited with errors. See log."
+        message = summary + " Check logs for details."
         if raise_on_error:
             raise SanityCheckFailedException(message)
         return message
-    elif messages.has_warning:
-        return "Sanity check exited with warnings. See log."
-    elif len(messages) > 0:
-        return "Sanity check exited with infos. See log."
-    else:
-        return "No issues detected."
+
+    return summary
 
 
 @shared_task
-def bulk_update_documents(document_ids):
+def bulk_update_documents(document_ids) -> None:
     documents = Document.objects.filter(id__in=document_ids)
 
     ix = index.open_index()
@@ -242,9 +283,15 @@ def bulk_update_documents(document_ids):
         for doc in documents:
             index.update_document(writer, doc)
 
+    ai_config = AIConfig()
+    if ai_config.llm_index_enabled:
+        update_llm_index(
+            rebuild=False,
+        )
+
 
 @shared_task
-def update_document_content_maybe_archive_file(document_id):
+def update_document_content_maybe_archive_file(document_id) -> None:
     """
     Re-creates OCR content and thumbnail for a document, and archive file if
     it exists.
@@ -341,6 +388,10 @@ def update_document_content_maybe_archive_file(document_id):
         with index.open_index_writer() as writer:
             index.update_document(writer, document)
 
+        ai_config = AIConfig()
+        if ai_config.llm_index_enabled:
+            llm_index_add_or_update_document(document)
+
         clear_document_caches(document.pk)
 
     except Exception:
@@ -352,7 +403,7 @@ def update_document_content_maybe_archive_file(document_id):
 
 
 @shared_task
-def empty_trash(doc_ids=None):
+def empty_trash(doc_ids=None) -> None:
     if doc_ids is None:
         logger.info("Emptying trash of all expired documents")
     documents = (
@@ -389,7 +440,7 @@ def empty_trash(doc_ids=None):
 
 
 @shared_task
-def check_scheduled_workflows():
+def check_scheduled_workflows() -> None:
     """
     Check and run all enabled scheduled workflows.
 
@@ -421,13 +472,22 @@ def check_scheduled_workflows():
 
                 match trigger.schedule_date_field:
                     case WorkflowTrigger.ScheduleDateField.ADDED:
-                        documents = Document.objects.filter(added__lte=threshold)
+                        documents = Document.objects.filter(
+                            root_document__isnull=True,
+                            added__lte=threshold,
+                        )
 
                     case WorkflowTrigger.ScheduleDateField.CREATED:
-                        documents = Document.objects.filter(created__lte=threshold)
+                        documents = Document.objects.filter(
+                            root_document__isnull=True,
+                            created__lte=threshold,
+                        )
 
                     case WorkflowTrigger.ScheduleDateField.MODIFIED:
-                        documents = Document.objects.filter(modified__lte=threshold)
+                        documents = Document.objects.filter(
+                            root_document__isnull=True,
+                            modified__lte=threshold,
+                        )
 
                     case WorkflowTrigger.ScheduleDateField.CUSTOM_FIELD:
                         # cap earliest date to avoid massive scans
@@ -465,7 +525,10 @@ def check_scheduled_workflows():
                             )
                         ]
 
-                        documents = Document.objects.filter(id__in=matched_ids)
+                        documents = Document.objects.filter(
+                            root_document__isnull=True,
+                            id__in=matched_ids,
+                        )
 
                 if documents.count() > 0:
                     documents = prefilter_documents_by_workflowtrigger(
@@ -508,6 +571,11 @@ def check_scheduled_workflows():
                         run_workflows(
                             trigger_type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
                             workflow_to_run=workflow,
+                            document=document,
+                        )
+                        # Scheduled workflows dont send document_updated signal, so send a websocket update here to ensure clients are updated
+                        send_websocket_document_updated(
+                            sender=None,
                             document=document,
                         )
 
@@ -558,3 +626,169 @@ def update_document_parent_tags(tag: Tag, new_parent: Tag) -> None:
 
     if affected:
         bulk_update_documents.delay(document_ids=list(affected))
+
+
+@shared_task
+def llmindex_index(
+    *,
+    iter_wrapper: IterWrapper[Document] = _identity,
+    rebuild=False,
+    scheduled=True,
+    auto=False,
+) -> None:
+    ai_config = AIConfig()
+    if ai_config.llm_index_enabled:
+        task = PaperlessTask.objects.create(
+            type=PaperlessTask.TaskType.SCHEDULED_TASK
+            if scheduled
+            else PaperlessTask.TaskType.AUTO
+            if auto
+            else PaperlessTask.TaskType.MANUAL_TASK,
+            task_id=uuid.uuid4(),
+            task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
+            status=states.STARTED,
+            date_created=timezone.now(),
+            date_started=timezone.now(),
+        )
+        from paperless_ai.indexing import update_llm_index
+
+        try:
+            result = update_llm_index(
+                iter_wrapper=iter_wrapper,
+                rebuild=rebuild,
+            )
+            task.status = states.SUCCESS
+            task.result = result
+        except Exception as e:
+            logger.error("LLM index error: " + str(e))
+            task.status = states.FAILURE
+            task.result = str(e)
+
+        task.date_done = timezone.now()
+        task.save(update_fields=["status", "result", "date_done"])
+    else:
+        logger.info("LLM index is disabled, skipping update.")
+
+
+@shared_task
+def update_document_in_llm_index(document) -> None:
+    llm_index_add_or_update_document(document)
+
+
+@shared_task
+def remove_document_from_llm_index(document) -> None:
+    llm_index_remove_document(document)
+
+
+@shared_task
+def build_share_link_bundle(bundle_id: int) -> None:
+    try:
+        bundle = (
+            ShareLinkBundle.objects.filter(pk=bundle_id)
+            .prefetch_related("documents")
+            .get()
+        )
+    except ShareLinkBundle.DoesNotExist:
+        logger.warning("Share link bundle %s no longer exists.", bundle_id)
+        return
+
+    bundle.remove_file()
+    bundle.status = ShareLinkBundle.Status.PROCESSING
+    bundle.last_error = None
+    bundle.size_bytes = None
+    bundle.built_at = None
+    bundle.file_path = ""
+    bundle.save(
+        update_fields=[
+            "status",
+            "last_error",
+            "size_bytes",
+            "built_at",
+            "file_path",
+        ],
+    )
+
+    documents = list(bundle.documents.all().order_by("pk"))
+
+    _, temp_zip_path_str = mkstemp(suffix=".zip", dir=settings.SCRATCH_DIR)
+    temp_zip_path = Path(temp_zip_path_str)
+
+    try:
+        strategy_class = (
+            ArchiveOnlyStrategy
+            if bundle.file_version == ShareLink.FileVersion.ARCHIVE
+            else OriginalsOnlyStrategy
+        )
+        with zipfile.ZipFile(temp_zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+            strategy = strategy_class(zipf)
+            for document in documents:
+                strategy.add_document(document)
+
+        output_dir = settings.SHARE_LINK_BUNDLE_DIR
+        output_dir.mkdir(parents=True, exist_ok=True)
+        final_path = (output_dir / f"{bundle.slug}.zip").resolve()
+        if final_path.exists():
+            final_path.unlink()
+        shutil.move(temp_zip_path, final_path)
+
+        bundle.file_path = f"{bundle.slug}.zip"
+        bundle.size_bytes = final_path.stat().st_size
+        bundle.status = ShareLinkBundle.Status.READY
+        bundle.built_at = timezone.now()
+        bundle.last_error = None
+        bundle.save(
+            update_fields=[
+                "file_path",
+                "size_bytes",
+                "status",
+                "built_at",
+                "last_error",
+            ],
+        )
+        logger.info("Built share link bundle %s", bundle.pk)
+    except Exception as exc:
+        logger.exception(
+            "Failed to build share link bundle %s: %s",
+            bundle_id,
+            exc,
+        )
+        bundle.status = ShareLinkBundle.Status.FAILED
+        bundle.last_error = {
+            "bundle_id": bundle_id,
+            "exception_type": exc.__class__.__name__,
+            "message": str(exc),
+            "timestamp": timezone.now().isoformat(),
+        }
+        bundle.save(update_fields=["status", "last_error"])
+        try:
+            temp_zip_path.unlink()
+        except OSError:
+            pass
+        raise
+    finally:
+        try:
+            temp_zip_path.unlink(missing_ok=True)
+        except OSError:
+            pass
+
+
+@shared_task
+def cleanup_expired_share_link_bundles() -> None:
+    now = timezone.now()
+    expired_qs = ShareLinkBundle.objects.filter(
+        expiration__isnull=False,
+        expiration__lt=now,
+    )
+    count = 0
+    for bundle in expired_qs.iterator():
+        count += 1
+        try:
+            bundle.delete()
+        except Exception as exc:
+            logger.warning(
+                "Failed to delete expired share link bundle %s: %s",
+                bundle.pk,
+                exc,
+            )
+    if count:
+        logger.info("Deleted %s expired share link bundle(s)", count)

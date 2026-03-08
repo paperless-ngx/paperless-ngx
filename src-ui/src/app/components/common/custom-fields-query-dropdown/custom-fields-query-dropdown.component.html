@@ -1,8 +1,7 @@
 @if (useDropdown) {
   <div class="btn-group w-100" role="group" ngbDropdown #dropdown="ngbDropdown" (openChange)="onOpenChange($event)" [popperOptions]="popperOptions">
     <button class="btn btn-sm btn-outline-primary" id="dropdown_toggle" ngbDropdownToggle [disabled]="disabled">
-      <i-bs name="{{icon}}"></i-bs>
-      <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
+      <i-bs name="{{icon}}"></i-bs><div class="d-none d-sm-inline ms-1">{{title}}</div>
       @if (isActive) {
         <pngx-clearable-badge [selected]="isActive" (cleared)="reset()"></pngx-clearable-badge>
       }

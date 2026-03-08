@@ -6,7 +6,7 @@
   infoLink="usage/#workflows"
   >
   <button type="button" class="btn btn-sm btn-outline-primary" (click)="editWorkflow()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Workflow }">
-    <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Workflow</ng-container>
+    <i-bs name="plus-circle" class="me-1"></i-bs><ng-container i18n>Add Workflow</ng-container>
   </button>
 </pngx-page-header>
 
@@ -60,15 +60,15 @@
           <div class="btn-toolbar d-none d-sm-flex gap-2" role="toolbar">
             <div class="btn-group">
               <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Workflow }" class="btn btn-sm btn-outline-secondary" type="button" (click)="editWorkflow(workflow)">
-                <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
+                <i-bs width="1em" height="1em" name="pencil" class="me-1"></i-bs><ng-container i18n>Edit</ng-container>
               </button>
               <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Workflow }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteWorkflow(workflow)">
-                <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+                <i-bs width="1em" height="1em" name="trash" class="me-1"></i-bs><ng-container i18n>Delete</ng-container>
               </button>
             </div>
             <div class="btn-group">
               <button *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Workflow }" class="btn btn-sm btn-outline-secondary" type="button" (click)="copyWorkflow(workflow)">
-                <i-bs width="1em" height="1em" name="files"></i-bs>&nbsp;<ng-container i18n>Copy</ng-container>
+                <i-bs width="1em" height="1em" name="files" class="me-1"></i-bs><ng-container i18n>Copy</ng-container>
               </button>
             </div>
           </div>

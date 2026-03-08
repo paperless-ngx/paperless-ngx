@@ -246,7 +246,7 @@ class Command(CryptMixin, BaseCommand):
                 self.source = Path(tmp_dir)
             self._run_import()
 
-    def _run_import(self):
+    def _run_import(self) -> None:
         self.pre_check()
         self.load_metadata()
         self.load_manifest_files()
@@ -382,8 +382,6 @@ class Command(CryptMixin, BaseCommand):
                 archive_path = self.source / archive_file
             else:
                 archive_path = None
-
-            document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
             with FileLock(settings.MEDIA_LOCK):
                 if Path(document.source_path).is_file():

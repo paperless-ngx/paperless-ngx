@@ -33,6 +33,8 @@
 			"**/coverage.json": true
 		},
 		"python.defaultInterpreterPath": ".venv/bin/python3",
+		"python.analysis.inlayHints.pytestParameters": true,
+		"python.testing.pytestEnabled": true,
 	},
 	"extensions": {
 		"recommendations": ["ms-python.python", "charliermarsh.ruff", "editorconfig.editorconfig"],

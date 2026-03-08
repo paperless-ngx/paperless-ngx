@@ -1,5 +1,6 @@
 import shutil
 import tempfile
+import unicodedata
 import uuid
 from pathlib import Path
 from unittest import mock
@@ -19,7 +20,7 @@ from paperless_tesseract.parsers import post_process_text
 class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     SAMPLE_FILES = Path(__file__).resolve().parent / "samples"
 
-    def assertContainsStrings(self, content, strings):
+    def assertContainsStrings(self, content, strings) -> None:
         # Asserts that all strings appear in content, in the given order.
         indices = []
         for s in strings:
@@ -29,7 +30,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 self.fail(f"'{s}' is not in '{content}'")
         self.assertListEqual(indices, sorted(indices))
 
-    def test_post_process_text(self):
+    def test_post_process_text(self) -> None:
         text_cases = [
             ("simple     string", "simple string"),
             ("simple    newline\n   testing string", "simple newline\ntesting string"),
@@ -47,7 +48,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 f"strip_exceess_whitespace({source}) != '{result}', but '{actual_result}'",
             )
 
-    def test_get_text_from_pdf(self):
+    def test_get_text_from_pdf(self) -> None:
         parser = RasterisedDocumentParser(uuid.uuid4())
         text = parser.extract_text(
             None,
@@ -56,7 +57,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         self.assertContainsStrings(text.strip(), ["This is a test document."])
 
-    def test_get_page_count(self):
+    def test_get_page_count(self) -> None:
         """
         GIVEN:
             - PDF file with a single page
@@ -80,7 +81,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
         self.assertEqual(page_count, 6)
 
-    def test_get_page_count_password_protected(self):
+    def test_get_page_count_password_protected(self) -> None:
         """
         GIVEN:
             - Password protected PDF file
@@ -98,7 +99,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             self.assertEqual(page_count, None)
             self.assertIn("Unable to determine PDF page count", cm.output[0])
 
-    def test_thumbnail(self):
+    def test_thumbnail(self) -> None:
         parser = RasterisedDocumentParser(uuid.uuid4())
         thumb = parser.get_thumbnail(
             str(self.SAMPLE_FILES / "simple-digital.pdf"),
@@ -107,8 +108,8 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsFile(thumb)
 
     @mock.patch("documents.parsers.run_convert")
-    def test_thumbnail_fallback(self, m):
-        def call_convert(input_file, output_file, **kwargs):
+    def test_thumbnail_fallback(self, m) -> None:
+        def call_convert(input_file, output_file, **kwargs) -> None:
             if ".pdf" in str(input_file):
                 raise ParseError("Does not compute.")
             else:
@@ -123,7 +124,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
         self.assertIsFile(thumb)
 
-    def test_thumbnail_encrypted(self):
+    def test_thumbnail_encrypted(self) -> None:
         parser = RasterisedDocumentParser(uuid.uuid4())
         thumb = parser.get_thumbnail(
             str(self.SAMPLE_FILES / "encrypted.pdf"),
@@ -131,7 +132,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
         self.assertIsFile(thumb)
 
-    def test_get_dpi(self):
+    def test_get_dpi(self) -> None:
         parser = RasterisedDocumentParser(None)
 
         dpi = parser.get_dpi(str(self.SAMPLE_FILES / "simple-no-dpi.png"))
@@ -140,7 +141,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         dpi = parser.get_dpi(str(self.SAMPLE_FILES / "simple.png"))
         self.assertEqual(dpi, 72)
 
-    def test_simple_digital(self):
+    def test_simple_digital(self) -> None:
         parser = RasterisedDocumentParser(None)
 
         parser.parse(
@@ -152,7 +153,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         self.assertContainsStrings(parser.get_text(), ["This is a test document."])
 
-    def test_with_form(self):
+    def test_with_form(self) -> None:
         parser = RasterisedDocumentParser(None)
 
         parser.parse(
@@ -168,7 +169,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     @override_settings(OCR_MODE="redo")
-    def test_with_form_error(self):
+    def test_with_form_error(self) -> None:
         parser = RasterisedDocumentParser(None)
 
         parser.parse(
@@ -183,7 +184,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     @override_settings(OCR_MODE="skip")
-    def test_signed(self):
+    def test_signed(self) -> None:
         parser = RasterisedDocumentParser(None)
 
         parser.parse(str(self.SAMPLE_FILES / "signed.pdf"), "application/pdf")
@@ -198,7 +199,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     @override_settings(OCR_MODE="skip")
-    def test_encrypted(self):
+    def test_encrypted(self) -> None:
         parser = RasterisedDocumentParser(None)
 
         parser.parse(
@@ -210,7 +211,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertEqual(parser.get_text(), "")
 
     @override_settings(OCR_MODE="redo")
-    def test_with_form_error_notext(self):
+    def test_with_form_error_notext(self) -> None:
         parser = RasterisedDocumentParser(None)
         parser.parse(
             str(self.SAMPLE_FILES / "with-form.pdf"),
@@ -223,7 +224,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     @override_settings(OCR_MODE="force")
-    def test_with_form_force(self):
+    def test_with_form_force(self) -> None:
         parser = RasterisedDocumentParser(None)
 
         parser.parse(
@@ -236,7 +237,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             ["Please enter your name in here:", "This is a PDF document with a form."],
         )
 
-    def test_image_simple(self):
+    def test_image_simple(self) -> None:
         parser = RasterisedDocumentParser(None)
 
         parser.parse(str(self.SAMPLE_FILES / "simple.png"), "image/png")
@@ -245,7 +246,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         self.assertContainsStrings(parser.get_text(), ["This is a test document."])
 
-    def test_image_simple_alpha(self):
+    def test_image_simple_alpha(self) -> None:
         parser = RasterisedDocumentParser(None)
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -261,7 +262,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
             self.assertContainsStrings(parser.get_text(), ["This is a test document."])
 
-    def test_image_calc_a4_dpi(self):
+    def test_image_calc_a4_dpi(self) -> None:
         parser = RasterisedDocumentParser(None)
 
         dpi = parser.calculate_a4_dpi(
@@ -271,11 +272,11 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertEqual(dpi, 62)
 
     @mock.patch("paperless_tesseract.parsers.RasterisedDocumentParser.calculate_a4_dpi")
-    def test_image_dpi_fail(self, m):
+    def test_image_dpi_fail(self, m) -> None:
         m.return_value = None
         parser = RasterisedDocumentParser(None)
 
-        def f():
+        def f() -> None:
             parser.parse(
                 str(self.SAMPLE_FILES / "simple-no-dpi.png"),
                 "image/png",
@@ -284,7 +285,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertRaises(ParseError, f)
 
     @override_settings(OCR_IMAGE_DPI=72, MAX_IMAGE_PIXELS=0)
-    def test_image_no_dpi_default(self):
+    def test_image_no_dpi_default(self) -> None:
         parser = RasterisedDocumentParser(None)
 
         parser.parse(str(self.SAMPLE_FILES / "simple-no-dpi.png"), "image/png")
@@ -296,7 +297,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             ["this is a test document."],
         )
 
-    def test_multi_page(self):
+    def test_multi_page(self) -> None:
         parser = RasterisedDocumentParser(None)
         parser.parse(
             str(self.SAMPLE_FILES / "multi-page-digital.pdf"),
@@ -309,7 +310,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     @override_settings(OCR_PAGES=2, OCR_MODE="skip")
-    def test_multi_page_pages_skip(self):
+    def test_multi_page_pages_skip(self) -> None:
         parser = RasterisedDocumentParser(None)
         parser.parse(
             str(self.SAMPLE_FILES / "multi-page-digital.pdf"),
@@ -322,7 +323,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     @override_settings(OCR_PAGES=2, OCR_MODE="redo")
-    def test_multi_page_pages_redo(self):
+    def test_multi_page_pages_redo(self) -> None:
         parser = RasterisedDocumentParser(None)
         parser.parse(
             str(self.SAMPLE_FILES / "multi-page-digital.pdf"),
@@ -335,7 +336,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     @override_settings(OCR_PAGES=2, OCR_MODE="force")
-    def test_multi_page_pages_force(self):
+    def test_multi_page_pages_force(self) -> None:
         parser = RasterisedDocumentParser(None)
         parser.parse(
             str(self.SAMPLE_FILES / "multi-page-digital.pdf"),
@@ -348,7 +349,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     @override_settings(OCR_MODE="skip")
-    def test_multi_page_analog_pages_skip(self):
+    def test_multi_page_analog_pages_skip(self) -> None:
         parser = RasterisedDocumentParser(None)
         parser.parse(
             str(self.SAMPLE_FILES / "multi-page-images.pdf"),
@@ -361,7 +362,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     @override_settings(OCR_PAGES=2, OCR_MODE="redo")
-    def test_multi_page_analog_pages_redo(self):
+    def test_multi_page_analog_pages_redo(self) -> None:
         """
         GIVEN:
             - File with text contained in images but no text layer
@@ -383,7 +384,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertNotIn("page 3", parser.get_text().lower())
 
     @override_settings(OCR_PAGES=1, OCR_MODE="force")
-    def test_multi_page_analog_pages_force(self):
+    def test_multi_page_analog_pages_force(self) -> None:
         """
         GIVEN:
             - File with text contained in images but no text layer
@@ -406,7 +407,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertNotIn("page 3", parser.get_text().lower())
 
     @override_settings(OCR_MODE="skip_noarchive")
-    def test_skip_noarchive_withtext(self):
+    def test_skip_noarchive_withtext(self) -> None:
         """
         GIVEN:
             - File with existing text layer
@@ -429,7 +430,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     @override_settings(OCR_MODE="skip_noarchive")
-    def test_skip_noarchive_notext(self):
+    def test_skip_noarchive_notext(self) -> None:
         """
         GIVEN:
             - File with text contained in images but no text layer
@@ -454,7 +455,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsNotNone(parser.archive_path)
 
     @override_settings(OCR_SKIP_ARCHIVE_FILE="never")
-    def test_skip_archive_never_withtext(self):
+    def test_skip_archive_never_withtext(self) -> None:
         """
         GIVEN:
             - File with existing text layer
@@ -477,7 +478,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     @override_settings(OCR_SKIP_ARCHIVE_FILE="never")
-    def test_skip_archive_never_withimages(self):
+    def test_skip_archive_never_withimages(self) -> None:
         """
         GIVEN:
             - File with text contained in images but no text layer
@@ -500,7 +501,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     @override_settings(OCR_SKIP_ARCHIVE_FILE="with_text")
-    def test_skip_archive_withtext_withtext(self):
+    def test_skip_archive_withtext_withtext(self) -> None:
         """
         GIVEN:
             - File with existing text layer
@@ -523,7 +524,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     @override_settings(OCR_SKIP_ARCHIVE_FILE="with_text")
-    def test_skip_archive_withtext_withimages(self):
+    def test_skip_archive_withtext_withimages(self) -> None:
         """
         GIVEN:
             - File with text contained in images but no text layer
@@ -546,7 +547,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     @override_settings(OCR_SKIP_ARCHIVE_FILE="always")
-    def test_skip_archive_always_withtext(self):
+    def test_skip_archive_always_withtext(self) -> None:
         """
         GIVEN:
             - File with existing text layer
@@ -569,7 +570,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     @override_settings(OCR_SKIP_ARCHIVE_FILE="always")
-    def test_skip_archive_always_withimages(self):
+    def test_skip_archive_always_withimages(self) -> None:
         """
         GIVEN:
             - File with text contained in images but no text layer
@@ -592,7 +593,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     @override_settings(OCR_MODE="skip")
-    def test_multi_page_mixed(self):
+    def test_multi_page_mixed(self) -> None:
         """
         GIVEN:
             - File with some text contained in images and some in text layer
@@ -621,7 +622,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIn("[OCR skipped on page(s) 4-6]", sidecar)
 
     @override_settings(OCR_MODE="redo")
-    def test_single_page_mixed(self):
+    def test_single_page_mixed(self) -> None:
         """
         GIVEN:
             - File with some text contained in images and some in text layer
@@ -660,7 +661,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     @override_settings(OCR_MODE="skip_noarchive")
-    def test_multi_page_mixed_no_archive(self):
+    def test_multi_page_mixed_no_archive(self) -> None:
         """
         GIVEN:
             - File with some text contained in images and some in text layer
@@ -683,7 +684,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     @override_settings(OCR_MODE="skip", OCR_ROTATE_PAGES=True)
-    def test_rotate(self):
+    def test_rotate(self) -> None:
         parser = RasterisedDocumentParser(None)
         parser.parse(str(self.SAMPLE_FILES / "rotated.pdf"), "application/pdf")
         self.assertContainsStrings(
@@ -696,7 +697,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             ],
         )
 
-    def test_multi_page_tiff(self):
+    def test_multi_page_tiff(self) -> None:
         """
         GIVEN:
             - Multi-page TIFF image
@@ -716,7 +717,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             ["page 1", "page 2", "page 3"],
         )
 
-    def test_multi_page_tiff_alpha(self):
+    def test_multi_page_tiff_alpha(self) -> None:
         """
         GIVEN:
             - Multi-page TIFF image
@@ -740,7 +741,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 ["page 1", "page 2", "page 3"],
             )
 
-    def test_multi_page_tiff_alpha_srgb(self):
+    def test_multi_page_tiff_alpha_srgb(self) -> None:
         """
         GIVEN:
             - Multi-page TIFF image
@@ -767,7 +768,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 ["page 1", "page 2", "page 3"],
             )
 
-    def test_ocrmypdf_parameters(self):
+    def test_ocrmypdf_parameters(self) -> None:
         parser = RasterisedDocumentParser(None)
         params = parser.construct_ocrmypdf_parameters(
             input_file="input.pdf",
@@ -831,7 +832,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             params = parser.construct_ocrmypdf_parameters("", "", "", "")
             self.assertNotIn("max_image_mpixels", params)
 
-    def test_rtl_language_detection(self):
+    def test_rtl_language_detection(self) -> None:
         """
         GIVEN:
             - File with text in an RTL language
@@ -847,11 +848,21 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             "application/pdf",
         )
 
-        # Copied from the PDF to here.  Don't even look at it
-        self.assertIn("ةﯾﻠﺧﺎدﻻ ةرازو", parser.get_text())
+        # OCR output for RTL text varies across platforms/versions due to
+        # bidi controls and presentation forms; normalize before assertion.
+        normalized_text = "".join(
+            char
+            for char in unicodedata.normalize("NFKC", parser.get_text())
+            if unicodedata.category(char) != "Cf" and not char.isspace()
+        )
+
+        self.assertIn("ةرازو", normalized_text)
+        self.assertTrue(
+            any(token in normalized_text for token in ("ةیلخادلا", "الاخليد")),
+        )
 
     @mock.patch("ocrmypdf.ocr")
-    def test_gs_rendering_error(self, m):
+    def test_gs_rendering_error(self, m) -> None:
         m.side_effect = SubprocessOutputError("Ghostscript PDF/A rendering failed")
         parser = RasterisedDocumentParser(None)
 
@@ -866,39 +877,39 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 class TestParserFileTypes(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     SAMPLE_FILES = Path(__file__).parent / "samples"
 
-    def test_bmp(self):
+    def test_bmp(self) -> None:
         parser = RasterisedDocumentParser(None)
         parser.parse(str(self.SAMPLE_FILES / "simple.bmp"), "image/bmp")
         self.assertIsFile(parser.archive_path)
         self.assertIn("this is a test document", parser.get_text().lower())
 
-    def test_jpg(self):
+    def test_jpg(self) -> None:
         parser = RasterisedDocumentParser(None)
         parser.parse(str(self.SAMPLE_FILES / "simple.jpg"), "image/jpeg")
         self.assertIsFile(parser.archive_path)
         self.assertIn("this is a test document", parser.get_text().lower())
 
-    def test_heic(self):
+    def test_heic(self) -> None:
         parser = RasterisedDocumentParser(None)
         parser.parse(str(self.SAMPLE_FILES / "simple.heic"), "image/heic")
         self.assertIsFile(parser.archive_path)
         self.assertIn("pizza", parser.get_text().lower())
 
     @override_settings(OCR_IMAGE_DPI=200)
-    def test_gif(self):
+    def test_gif(self) -> None:
         parser = RasterisedDocumentParser(None)
         parser.parse(str(self.SAMPLE_FILES / "simple.gif"), "image/gif")
         self.assertIsFile(parser.archive_path)
         self.assertIn("this is a test document", parser.get_text().lower())
 
-    def test_tiff(self):
+    def test_tiff(self) -> None:
         parser = RasterisedDocumentParser(None)
         parser.parse(str(self.SAMPLE_FILES / "simple.tif"), "image/tiff")
         self.assertIsFile(parser.archive_path)
         self.assertIn("this is a test document", parser.get_text().lower())
 
     @override_settings(OCR_IMAGE_DPI=72)
-    def test_webp(self):
+    def test_webp(self) -> None:
         parser = RasterisedDocumentParser(None)
         parser.parse(
             str(self.SAMPLE_FILES / "document.webp"),

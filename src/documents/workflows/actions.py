@@ -1,4 +1,6 @@
 import logging
+import re
+import uuid
 from pathlib import Path
 
 from django.conf import settings
@@ -14,6 +16,8 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
+from documents.plugins.base import StopConsumeTaskError
+from documents.signals import document_consumption_finished
 from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.workflows.webhooks import send_webhook
 
@@ -44,6 +48,7 @@ def build_workflow_action_context(
             "current_filename": document.filename or "",
             "added": timezone.localtime(document.added),
             "created": document.created,
+            "id": document.pk,
         }
 
     correspondent_obj = (
@@ -75,6 +80,7 @@ def build_workflow_action_context(
         "current_filename": filename,
         "added": timezone.localtime(timezone.now()),
         "created": overrides.created if overrides else None,
+        "id": "",
     }
 
 
@@ -109,6 +115,7 @@ def execute_email_action(
             context["created"],
             context["title"],
             context["doc_url"],
+            context["id"],
         )
         if action.email.subject
         else ""
@@ -125,6 +132,7 @@ def execute_email_action(
             context["created"],
             context["title"],
             context["doc_url"],
+            context["id"],
         )
         if action.email.body
         else ""
@@ -203,6 +211,7 @@ def execute_webhook_action(
                             context["created"],
                             context["title"],
                             context["doc_url"],
+                            context["id"],
                         )
                 except Exception as e:
                     logger.error(
@@ -221,6 +230,7 @@ def execute_webhook_action(
                 context["created"],
                 context["title"],
                 context["doc_url"],
+                context["id"],
             )
         headers = {}
         if action.webhook.headers:
@@ -258,4 +268,105 @@ def execute_webhook_action(
         logger.exception(
             f"Error occurred sending webhook: {e}",
             extra={"group": logging_group},
+        )
+
+
+def execute_password_removal_action(
+    action: WorkflowAction,
+    document: Document | ConsumableDocument,
+    logging_group,
+) -> None:
+    """
+    Try to remove a password from a document using the configured list.
+    """
+    passwords = action.passwords
+    if not passwords:
+        logger.warning(
+            "Password removal action %s has no passwords configured",
+            action.pk,
+            extra={"group": logging_group},
+        )
+        return
+
+    passwords = [
+        password.strip()
+        for password in re.split(r"[,\n]", passwords)
+        if password.strip()
+    ]
+
+    if isinstance(document, ConsumableDocument):
+        # hook the consumption-finished signal to attempt password removal later
+        def handler(sender, **kwargs):
+            consumed_document: Document = kwargs.get("document")
+            if consumed_document is not None:
+                execute_password_removal_action(
+                    action,
+                    consumed_document,
+                    logging_group,
+                )
+            document_consumption_finished.disconnect(handler)
+
+        document_consumption_finished.connect(handler, weak=False)
+        return
+
+    # import here to avoid circular dependency
+    from documents.bulk_edit import remove_password
+
+    for password in passwords:
+        try:
+            remove_password(
+                [document.id],
+                password=password,
+                update_document=True,
+                user=document.owner,
+            )
+            logger.info(
+                "Removed password from document %s using workflow action %s",
+                document.pk,
+                action.pk,
+                extra={"group": logging_group},
+            )
+            return
+        except ValueError as e:
+            logger.warning(
+                "Password removal failed for document %s with supplied password: %s",
+                document.pk,
+                e,
+                extra={"group": logging_group},
+            )
+
+    logger.error(
+        "Password removal failed for document %s after trying all provided passwords",
+        document.pk,
+        extra={"group": logging_group},
+    )
+
+
+def execute_move_to_trash_action(
+    action: WorkflowAction,
+    document: Document | ConsumableDocument,
+    logging_group: uuid.UUID | None,
+) -> None:
+    """
+    Execute a move to trash action for a workflow on an existing document or a
+    document in consumption. In case of an existing document it soft-deletes
+    the document. In case of consumption it aborts consumption and deletes the
+    file.
+    """
+    if isinstance(document, Document):
+        document.delete()
+        logger.debug(
+            f"Moved document {document} to trash",
+            extra={"group": logging_group},
+        )
+    else:
+        if document.original_file.exists():
+            document.original_file.unlink()
+        logger.info(
+            f"Workflow move to trash action triggered during consumption, "
+            f"deleting file {document.original_file}",
+            extra={"group": logging_group},
+        )
+        raise StopConsumeTaskError(
+            "Document deleted by workflow action during consumption",
         )

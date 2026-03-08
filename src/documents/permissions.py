@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
@@ -68,7 +70,12 @@ def get_groups_with_only_permission(obj, codename):
     return Group.objects.filter(id__in=group_object_perm_group_ids).distinct()
 
 
-def set_permissions_for_object(permissions: dict, object, *, merge: bool = False):
+def set_permissions_for_object(
+    permissions: dict,
+    object,
+    *,
+    merge: bool = False,
+) -> None:
     """
     Set permissions for an object. The permissions are given as a mapping of actions
     to a dict of user / group id lists, e.g.
@@ -194,12 +201,12 @@ def get_document_count_filter_for_user(user):
 
 
 def annotate_document_count_for_related_queryset(
-    queryset,
-    through_model,
+    queryset: QuerySet[Any],
+    through_model: Any,
     related_object_field: str,
     target_field: str = "document_id",
-    user=None,
-):
+    user: User | None = None,
+) -> QuerySet[Any]:
     """
     Annotate a queryset with permissions-aware document counts using a subquery
     against a relation table.
@@ -228,13 +235,29 @@ def annotate_document_count_for_related_queryset(
     return queryset.annotate(document_count=Coalesce(Subquery(counts[:1]), 0))
 
 
-def get_objects_for_user_owner_aware(user, perms, Model) -> QuerySet:
-    objects_owned = Model.objects.filter(owner=user)
-    objects_unowned = Model.objects.filter(owner__isnull=True)
+def get_objects_for_user_owner_aware(
+    user: User | None,
+    perms: str | list[str],
+    Model: Any,
+    *,
+    include_deleted: bool = False,
+) -> QuerySet:
+    """
+    Returns objects the user owns, are unowned, or has explicit perms.
+    When include_deleted is True, soft-deleted items are also included.
+    """
+    manager = (
+        Model.global_objects
+        if include_deleted and hasattr(Model, "global_objects")
+        else Model.objects
+    )
+
+    objects_owned = manager.filter(owner=user)
+    objects_unowned = manager.filter(owner__isnull=True)
     objects_with_perms = get_objects_for_user(
         user=user,
         perms=perms,
-        klass=Model,
+        klass=manager.all(),
         accept_global_perms=False,
     )
     return objects_owned | objects_unowned | objects_with_perms
@@ -293,7 +316,7 @@ class AcknowledgeTasksPermissions(BasePermission):
         "POST": ["documents.change_paperlesstask"],
     }
 
-    def has_permission(self, request, view):
+    def has_permission(self, request: Any, view: Any) -> bool:
         if not request.user or not request.user.is_authenticated:  # pragma: no cover
             return False
 

@@ -1,0 +1,49 @@
+<div class="btn-group">
+  <button type="button" class="btn btn-sm btn-outline-primary" (click)="clickSuggest()" [disabled]="loading || (suggestions && !aiEnabled)">
+    @if (loading) {
+      <div class="spinner-border spinner-border-sm" role="status"></div>
+    } @else {
+      <i-bs width="1.2em" height="1.2em" name="stars"></i-bs>
+    }
+    <span class="d-none d-lg-inline ps-1" i18n>Suggest</span>
+    @if (totalSuggestions > 0) {
+      <span class="badge bg-primary ms-2">{{ totalSuggestions }}</span>
+    }
+  </button>
+
+  @if (aiEnabled) {
+    <div class="btn-group" ngbDropdown #dropdown="ngbDropdown" [popperOptions]="popperOptions">
+      <button type="button" class="btn btn-sm btn-outline-primary" ngbDropdownToggle [disabled]="loading || !suggestions" aria-expanded="false" aria-controls="suggestionsDropdown" aria-label="Suggestions dropdown">
+        <span class="visually-hidden" i18n>Show suggestions</span>
+      </button>
+
+      <div ngbDropdownMenu aria-labelledby="suggestionsDropdown" class="shadow suggestions-dropdown">
+        <div class="list-group list-group-flush small pb-0">
+          @if (!suggestions?.suggested_tags && !suggestions?.suggested_document_types && !suggestions?.suggested_correspondents) {
+            <div class="list-group-item text-muted fst-italic">
+              <small class="text-muted small fst-italic" i18n>No novel suggestions</small>
+            </div>
+          }
+          @if (suggestions?.suggested_tags.length > 0) {
+            <small class="list-group-item text-uppercase text-muted small">Tags</small>
+            @for (tag of suggestions.suggested_tags; track tag) {
+              <button type="button" class="list-group-item list-group-item-action bg-light" (click)="addTag.emit(tag)" i18n>{{ tag }}</button>
+            }
+          }
+          @if (suggestions?.suggested_document_types.length > 0) {
+            <div class="list-group-item text-uppercase text-muted small">Document Types</div>
+            @for (type of suggestions.suggested_document_types; track type) {
+              <button type="button" class="list-group-item list-group-item-action bg-light" (click)="addDocumentType.emit(type)" i18n>{{ type }}</button>
+            }
+          }
+          @if (suggestions?.suggested_correspondents.length > 0) {
+            <div class="list-group-item text-uppercase text-muted small">Correspondents</div>
+            @for (correspondent of suggestions.suggested_correspondents; track correspondent) {
+              <button type="button" class="list-group-item list-group-item-action bg-light" (click)="addCorrespondent.emit(correspondent)" i18n>{{ correspondent }}</button>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

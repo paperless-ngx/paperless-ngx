@@ -172,7 +172,7 @@ to enable polling and disable inotify. See [here](configuration.md#polling).
 #### Prerequisites
 
 -   Paperless runs on Linux only, Windows is not supported.
--   Python 3 is required with versions 3.10 - 3.12 currently supported. Newer versions may work, but some dependencies may not be fully compatible.
+-   Python 3.11, 3.12, 3.13, or 3.14 is required. As a policy, Paperless-ngx aims to support at least the three most recent Python versions and drops support for versions as they reach end-of-life. Newer versions may work, but some dependencies may not be fully compatible.
 
 #### Installation
 
@@ -190,13 +190,12 @@ to enable polling and disable inotify. See [here](configuration.md#polling).
     -   `libpq-dev` for PostgreSQL
     -   `libmagic-dev` for mime type detection
     -   `mariadb-client` for MariaDB compile time
-    -   `libzbar0` for barcode detection
     -   `poppler-utils` for barcode detection
 
     Use this list for your preferred package management:
 
     ```
-    python3 python3-pip python3-dev imagemagick fonts-liberation gnupg libpq-dev default-libmysqlclient-dev pkg-config libmagic-dev libzbar0 poppler-utils
+    python3 python3-pip python3-dev imagemagick fonts-liberation gnupg libpq-dev default-libmysqlclient-dev pkg-config libmagic-dev poppler-utils
     ```
 
     These dependencies are required for OCRmyPDF, which is used for text
@@ -505,9 +504,8 @@ installation. Keep these points in mind:
 -   Read the [changelog](changelog.md) and
     take note of breaking changes.
 -   Decide whether to stay on SQLite or migrate to PostgreSQL.
-    See [documentation](#sqlite_to_psql) for details on moving data
-    from SQLite to PostgreSQL. Both work fine with
-    Paperless. However, if you already have a database server running
+    Both work fine with Paperless-ngx.
+    However, if you already have a database server running
     for other services, you might as well use it for Paperless as well.
 -   The task scheduler of Paperless, which is used to execute periodic
     tasks such as email checking and maintenance, requires a

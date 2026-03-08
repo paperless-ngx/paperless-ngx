@@ -3,14 +3,18 @@ from datetime import timedelta
 from pathlib import Path
 from unittest import mock
 
+import pytest
+from celery import states
 from django.conf import settings
 from django.test import TestCase
+from django.test import override_settings
 from django.utils import timezone
 
 from documents import tasks
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import PaperlessTask
 from documents.models import Tag
 from documents.sanity_checker import SanityCheckFailedException
 from documents.sanity_checker import SanityCheckMessages
@@ -20,7 +24,7 @@ from documents.tests.utils import FileSystemAssertsMixin
 
 
 class TestIndexReindex(DirectoriesMixin, TestCase):
-    def test_index_reindex(self):
+    def test_index_reindex(self) -> None:
         Document.objects.create(
             title="test",
             content="my document",
@@ -32,7 +36,7 @@ class TestIndexReindex(DirectoriesMixin, TestCase):
 
         tasks.index_reindex()
 
-    def test_index_optimize(self):
+    def test_index_optimize(self) -> None:
         Document.objects.create(
             title="test",
             content="my document",
@@ -47,12 +51,12 @@ class TestIndexReindex(DirectoriesMixin, TestCase):
 
 class TestClassifier(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @mock.patch("documents.tasks.load_classifier")
-    def test_train_classifier_no_auto_matching(self, load_classifier):
+    def test_train_classifier_no_auto_matching(self, load_classifier) -> None:
         tasks.train_classifier()
         load_classifier.assert_not_called()
 
     @mock.patch("documents.tasks.load_classifier")
-    def test_train_classifier_with_auto_tag(self, load_classifier):
+    def test_train_classifier_with_auto_tag(self, load_classifier) -> None:
         load_classifier.return_value = None
         Tag.objects.create(matching_algorithm=Tag.MATCH_AUTO, name="test")
         tasks.train_classifier()
@@ -60,7 +64,7 @@ class TestClassifier(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsNotFile(settings.MODEL_FILE)
 
     @mock.patch("documents.tasks.load_classifier")
-    def test_train_classifier_with_auto_type(self, load_classifier):
+    def test_train_classifier_with_auto_type(self, load_classifier) -> None:
         load_classifier.return_value = None
         DocumentType.objects.create(matching_algorithm=Tag.MATCH_AUTO, name="test")
         tasks.train_classifier()
@@ -68,14 +72,14 @@ class TestClassifier(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsNotFile(settings.MODEL_FILE)
 
     @mock.patch("documents.tasks.load_classifier")
-    def test_train_classifier_with_auto_correspondent(self, load_classifier):
+    def test_train_classifier_with_auto_correspondent(self, load_classifier) -> None:
         load_classifier.return_value = None
         Correspondent.objects.create(matching_algorithm=Tag.MATCH_AUTO, name="test")
         tasks.train_classifier()
         load_classifier.assert_called_once()
         self.assertIsNotFile(settings.MODEL_FILE)
 
-    def test_train_classifier(self):
+    def test_train_classifier(self) -> None:
         c = Correspondent.objects.create(matching_algorithm=Tag.MATCH_AUTO, name="test")
         doc = Document.objects.create(correspondent=c, content="test", title="test")
         self.assertIsNotFile(settings.MODEL_FILE)
@@ -102,59 +106,87 @@ class TestClassifier(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             self.assertNotEqual(mtime2, mtime3)
 
 
-class TestSanityCheck(DirectoriesMixin, TestCase):
-    @mock.patch("documents.tasks.sanity_checker.check_sanity")
-    def test_sanity_check_success(self, m):
-        m.return_value = SanityCheckMessages()
-        self.assertEqual(tasks.sanity_check(), "No issues detected.")
-        m.assert_called_once()
+@pytest.mark.django_db
+class TestSanityCheck:
+    @pytest.fixture
+    def mock_check_sanity(self, mocker) -> mock.MagicMock:
+        return mocker.patch("documents.tasks.sanity_checker.check_sanity")
 
-    @mock.patch("documents.tasks.sanity_checker.check_sanity")
-    def test_sanity_check_error(self, m):
-        messages = SanityCheckMessages()
-        messages.error(None, "Some error")
-        m.return_value = messages
-        self.assertRaises(SanityCheckFailedException, tasks.sanity_check)
-        m.assert_called_once()
+    def test_sanity_check_success(self, mock_check_sanity: mock.MagicMock) -> None:
+        mock_check_sanity.return_value = SanityCheckMessages()
+        assert tasks.sanity_check() == "No issues detected."
+        mock_check_sanity.assert_called_once()
 
-    @mock.patch("documents.tasks.sanity_checker.check_sanity")
-    def test_sanity_check_error_no_raise(self, m):
+    def test_sanity_check_error_raises(
+        self,
+        mock_check_sanity: mock.MagicMock,
+        sample_doc: Document,
+    ) -> None:
         messages = SanityCheckMessages()
-        messages.error(None, "Some error")
-        m.return_value = messages
-        # No exception should be raised
+        messages.error(sample_doc.pk, "some error")
+        mock_check_sanity.return_value = messages
+        with pytest.raises(SanityCheckFailedException):
+            tasks.sanity_check()
+        mock_check_sanity.assert_called_once()
+
+    def test_sanity_check_error_no_raise(
+        self,
+        mock_check_sanity: mock.MagicMock,
+        sample_doc: Document,
+    ) -> None:
+        messages = SanityCheckMessages()
+        messages.error(sample_doc.pk, "some error")
+        mock_check_sanity.return_value = messages
         result = tasks.sanity_check(raise_on_error=False)
-        self.assertEqual(
-            result,
-            "Sanity check exited with errors. See log.",
-        )
-        m.assert_called_once()
+        assert "1 document(s) with errors" in result
+        assert "Check logs for details." in result
+        mock_check_sanity.assert_called_once()
 
-    @mock.patch("documents.tasks.sanity_checker.check_sanity")
-    def test_sanity_check_warning(self, m):
+    def test_sanity_check_warning_only(
+        self,
+        mock_check_sanity: mock.MagicMock,
+    ) -> None:
         messages = SanityCheckMessages()
-        messages.warning(None, "Some warning")
-        m.return_value = messages
-        self.assertEqual(
-            tasks.sanity_check(),
-            "Sanity check exited with warnings. See log.",
-        )
-        m.assert_called_once()
+        messages.warning(None, "extra file")
+        mock_check_sanity.return_value = messages
+        result = tasks.sanity_check()
+        assert result == "1 global warning(s) found."
+        mock_check_sanity.assert_called_once()
 
-    @mock.patch("documents.tasks.sanity_checker.check_sanity")
-    def test_sanity_check_info(self, m):
+    def test_sanity_check_info_only(
+        self,
+        mock_check_sanity: mock.MagicMock,
+        sample_doc: Document,
+    ) -> None:
         messages = SanityCheckMessages()
-        messages.info(None, "Some info")
-        m.return_value = messages
-        self.assertEqual(
-            tasks.sanity_check(),
-            "Sanity check exited with infos. See log.",
-        )
-        m.assert_called_once()
+        messages.info(sample_doc.pk, "some info")
+        mock_check_sanity.return_value = messages
+        result = tasks.sanity_check()
+        assert result == "1 document(s) with infos found."
+        mock_check_sanity.assert_called_once()
+
+    def test_sanity_check_errors_warnings_and_infos(
+        self,
+        mock_check_sanity: mock.MagicMock,
+        sample_doc: Document,
+    ) -> None:
+        messages = SanityCheckMessages()
+        messages.error(sample_doc.pk, "broken")
+        messages.warning(sample_doc.pk, "odd")
+        messages.info(sample_doc.pk, "fyi")
+        messages.warning(None, "extra file")
+        mock_check_sanity.return_value = messages
+        result = tasks.sanity_check(raise_on_error=False)
+        assert "1 document(s) with errors" in result
+        assert "1 document(s) with warnings" in result
+        assert "1 document(s) with infos" in result
+        assert "1 global warning(s)" in result
+        assert "Check logs for details." in result
+        mock_check_sanity.assert_called_once()
 
 
 class TestBulkUpdate(DirectoriesMixin, TestCase):
-    def test_bulk_update_documents(self):
+    def test_bulk_update_documents(self) -> None:
         doc1 = Document.objects.create(
             title="test",
             content="my document",
@@ -177,7 +209,7 @@ class TestEmptyTrashTask(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         - Document is only deleted if it has been in trash for more than delay (default 30 days)
     """
 
-    def test_empty_trash(self):
+    def test_empty_trash(self) -> None:
         doc = Document.objects.create(
             title="test",
             content="my document",
@@ -201,7 +233,7 @@ class TestEmptyTrashTask(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
 
 class TestUpdateContent(DirectoriesMixin, TestCase):
-    def test_update_content_maybe_archive_file(self):
+    def test_update_content_maybe_archive_file(self) -> None:
         """
         GIVEN:
             - Existing document with archive file
@@ -242,7 +274,7 @@ class TestUpdateContent(DirectoriesMixin, TestCase):
         self.assertNotEqual(Document.objects.get(pk=doc.pk).content, "test")
         self.assertNotEqual(Document.objects.get(pk=doc.pk).archive_checksum, "wow")
 
-    def test_update_content_maybe_archive_file_no_archive(self):
+    def test_update_content_maybe_archive_file_no_archive(self) -> None:
         """
         GIVEN:
             - Existing document without archive file
@@ -270,3 +302,103 @@ class TestUpdateContent(DirectoriesMixin, TestCase):
 
         tasks.update_document_content_maybe_archive_file(doc.pk)
         self.assertNotEqual(Document.objects.get(pk=doc.pk).content, "test")
+
+
+class TestAIIndex(DirectoriesMixin, TestCase):
+    @override_settings(
+        AI_ENABLED=True,
+        LLM_EMBEDDING_BACKEND="huggingface",
+    )
+    def test_ai_index_success(self) -> None:
+        """
+        GIVEN:
+            - Document exists, AI is enabled, llm index backend is set
+        WHEN:
+            - llmindex_index task is called
+        THEN:
+            - update_llm_index is called, and the task is marked as success
+        """
+        Document.objects.create(
+            title="test",
+            content="my document",
+            checksum="wow",
+        )
+        # lazy-loaded so mock the actual function
+        with mock.patch("paperless_ai.indexing.update_llm_index") as update_llm_index:
+            update_llm_index.return_value = "LLM index updated successfully."
+            tasks.llmindex_index()
+            update_llm_index.assert_called_once()
+            task = PaperlessTask.objects.get(
+                task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
+            )
+            self.assertEqual(task.status, states.SUCCESS)
+            self.assertEqual(task.result, "LLM index updated successfully.")
+
+    @override_settings(
+        AI_ENABLED=True,
+        LLM_EMBEDDING_BACKEND="huggingface",
+    )
+    def test_ai_index_failure(self) -> None:
+        """
+        GIVEN:
+            - Document exists, AI is enabled, llm index backend is set
+        WHEN:
+            - llmindex_index task is called
+        THEN:
+            - update_llm_index raises an exception, and the task is marked as failure
+        """
+        Document.objects.create(
+            title="test",
+            content="my document",
+            checksum="wow",
+        )
+        # lazy-loaded so mock the actual function
+        with mock.patch("paperless_ai.indexing.update_llm_index") as update_llm_index:
+            update_llm_index.side_effect = Exception("LLM index update failed.")
+            tasks.llmindex_index()
+            update_llm_index.assert_called_once()
+            task = PaperlessTask.objects.get(
+                task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
+            )
+            self.assertEqual(task.status, states.FAILURE)
+            self.assertIn("LLM index update failed.", task.result)
+
+    def test_update_document_in_llm_index(self) -> None:
+        """
+        GIVEN:
+            - Nothing
+        WHEN:
+            - update_document_in_llm_index task is called
+        THEN:
+            - llm_index_add_or_update_document is called
+        """
+        doc = Document.objects.create(
+            title="test",
+            content="my document",
+            checksum="wow",
+        )
+        with mock.patch(
+            "documents.tasks.llm_index_add_or_update_document",
+        ) as llm_index_add_or_update_document:
+            tasks.update_document_in_llm_index(doc)
+            llm_index_add_or_update_document.assert_called_once_with(doc)
+
+    def test_remove_document_from_llm_index(self) -> None:
+        """
+        GIVEN:
+            - Nothing
+        WHEN:
+            - remove_document_from_llm_index task is called
+        THEN:
+            - llm_index_remove_document is called
+        """
+        doc = Document.objects.create(
+            title="test",
+            content="my document",
+            checksum="wow",
+        )
+        with mock.patch(
+            "documents.tasks.llm_index_remove_document",
+        ) as llm_index_remove_document:
+            tasks.remove_document_from_llm_index(doc)
+            llm_index_remove_document.assert_called_once_with(doc)

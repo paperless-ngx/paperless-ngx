@@ -7,7 +7,7 @@ from rest_framework.test import APITestCase
 class TestApiSchema(APITestCase):
     ENDPOINT = "/api/schema/"
 
-    def test_valid_schema(self):
+    def test_valid_schema(self) -> None:
         """
         Test that the schema is valid
         """
@@ -16,7 +16,7 @@ class TestApiSchema(APITestCase):
         except CommandError as e:
             self.fail(f"Schema validation failed: {e}")
 
-    def test_get_schema_endpoints(self):
+    def test_get_schema_endpoints(self) -> None:
         """
         Test that the schema endpoints exist and return a 200 status code
         """

@@ -1,11 +1,10 @@
 import filecmp
-import hashlib
 import shutil
-import tempfile
 from io import StringIO
 from pathlib import Path
 from unittest import mock
 
+import pytest
 from auditlog.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
@@ -21,6 +20,7 @@ from documents.tests.utils import FileSystemAssertsMixin
 sample_file: Path = Path(__file__).parent / "samples" / "simple.pdf"
 
 
+@pytest.mark.management
 @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
 class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def make_models(self):
@@ -31,13 +31,13 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             mime_type="application/pdf",
         )
 
-    def test_archiver(self):
+    def test_archiver(self) -> None:
         doc = self.make_models()
         shutil.copy(sample_file, Path(self.dirs.originals_dir) / f"{doc.id:07}.pdf")
 
         call_command("document_archiver", "--processes", "1")
 
-    def test_handle_document(self):
+    def test_handle_document(self) -> None:
         doc = self.make_models()
         shutil.copy(sample_file, Path(self.dirs.originals_dir) / f"{doc.id:07}.pdf")
 
@@ -52,7 +52,7 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertTrue(filecmp.cmp(sample_file, doc.source_path))
         self.assertEqual(doc.archive_filename, "none/A.pdf")
 
-    def test_unknown_mime_type(self):
+    def test_unknown_mime_type(self) -> None:
         doc = self.make_models()
         doc.mime_type = "sdgfh"
         doc.save()
@@ -68,7 +68,7 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsFile(doc.source_path)
 
     @override_settings(FILENAME_FORMAT="{title}")
-    def test_naming_priorities(self):
+    def test_naming_priorities(self) -> None:
         doc1 = Document.objects.create(
             checksum="A",
             title="document",
@@ -96,81 +96,23 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertEqual(doc2.archive_filename, "document_01.pdf")
 
 
-class TestDecryptDocuments(FileSystemAssertsMixin, TestCase):
-    @mock.patch("documents.management.commands.decrypt_documents.input")
-    def test_decrypt(self, m):
-        media_dir = tempfile.mkdtemp()
-        originals_dir = Path(media_dir) / "documents" / "originals"
-        thumb_dir = Path(media_dir) / "documents" / "thumbnails"
-        originals_dir.mkdir(parents=True, exist_ok=True)
-        thumb_dir.mkdir(parents=True, exist_ok=True)
-
-        with override_settings(
-            ORIGINALS_DIR=originals_dir,
-            THUMBNAIL_DIR=thumb_dir,
-            PASSPHRASE="test",
-            FILENAME_FORMAT=None,
-        ):
-            doc = Document.objects.create(
-                checksum="82186aaa94f0b98697d704b90fd1c072",
-                title="wow",
-                filename="0000004.pdf.gpg",
-                mime_type="application/pdf",
-                storage_type=Document.STORAGE_TYPE_GPG,
-            )
-
-            shutil.copy(
-                (
-                    Path(__file__).parent
-                    / "samples"
-                    / "documents"
-                    / "originals"
-                    / "0000004.pdf.gpg"
-                ),
-                originals_dir / "0000004.pdf.gpg",
-            )
-            shutil.copy(
-                (
-                    Path(__file__).parent
-                    / "samples"
-                    / "documents"
-                    / "thumbnails"
-                    / "0000004.webp.gpg"
-                ),
-                thumb_dir / f"{doc.id:07}.webp.gpg",
-            )
-
-            call_command("decrypt_documents")
-
-            doc.refresh_from_db()
-
-            self.assertEqual(doc.storage_type, Document.STORAGE_TYPE_UNENCRYPTED)
-            self.assertEqual(doc.filename, "0000004.pdf")
-            self.assertIsFile(Path(originals_dir) / "0000004.pdf")
-            self.assertIsFile(doc.source_path)
-            self.assertIsFile(Path(thumb_dir) / f"{doc.id:07}.webp")
-            self.assertIsFile(doc.thumbnail_path)
-
-            with doc.source_file as f:
-                checksum: str = hashlib.md5(f.read()).hexdigest()
-                self.assertEqual(checksum, doc.checksum)
-
-
+@pytest.mark.management
 class TestMakeIndex(TestCase):
     @mock.patch("documents.management.commands.document_index.index_reindex")
-    def test_reindex(self, m):
+    def test_reindex(self, m) -> None:
         call_command("document_index", "reindex")
         m.assert_called_once()
 
     @mock.patch("documents.management.commands.document_index.index_optimize")
-    def test_optimize(self, m):
+    def test_optimize(self, m) -> None:
         call_command("document_index", "optimize")
         m.assert_called_once()
 
 
+@pytest.mark.management
 class TestRenamer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @override_settings(FILENAME_FORMAT="")
-    def test_rename(self):
+    def test_rename(self) -> None:
         doc = Document.objects.create(title="test", mime_type="image/jpeg")
         doc.filename = generate_filename(doc)
         doc.archive_filename = generate_filename(doc, archive_filename=True)
@@ -192,44 +134,21 @@ class TestRenamer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsFile(doc2.archive_path)
 
 
+@pytest.mark.management
 class TestCreateClassifier(TestCase):
     @mock.patch(
         "documents.management.commands.document_create_classifier.train_classifier",
     )
-    def test_create_classifier(self, m):
+    def test_create_classifier(self, m) -> None:
         call_command("document_create_classifier")
 
         m.assert_called_once()
 
 
-class TestSanityChecker(DirectoriesMixin, TestCase):
-    def test_no_issues(self):
-        with self.assertLogs() as capture:
-            call_command("document_sanity_checker")
-
-        self.assertEqual(len(capture.output), 1)
-        self.assertIn("Sanity checker detected no issues.", capture.output[0])
-
-    def test_errors(self):
-        doc = Document.objects.create(
-            title="test",
-            content="test",
-            filename="test.pdf",
-            checksum="abc",
-        )
-        Path(doc.source_path).touch()
-        Path(doc.thumbnail_path).touch()
-
-        with self.assertLogs() as capture:
-            call_command("document_sanity_checker")
-
-        self.assertEqual(len(capture.output), 2)
-        self.assertIn("Checksum mismatch. Stored: abc, actual:", capture.output[1])
-
-
+@pytest.mark.management
 class TestConvertMariaDBUUID(TestCase):
     @mock.patch("django.db.connection.schema_editor")
-    def test_convert(self, m):
+    def test_convert(self, m) -> None:
         m.alter_field.return_value = None
 
         stdout = StringIO()
@@ -240,8 +159,9 @@ class TestConvertMariaDBUUID(TestCase):
         self.assertIn("Successfully converted", stdout.getvalue())
 
 
+@pytest.mark.management
 class TestPruneAuditLogs(TestCase):
-    def test_prune_audit_logs(self):
+    def test_prune_audit_logs(self) -> None:
         LogEntry.objects.create(
             content_type=ContentType.objects.get_for_model(Document),
             object_id=1,

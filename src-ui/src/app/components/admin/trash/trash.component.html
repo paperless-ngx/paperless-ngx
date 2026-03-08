@@ -5,16 +5,16 @@
     i18n-info
     infoLink="usage/#document-trash">
     <button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()" [hidden]="selectedDocuments.size === 0">
-        <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
+        <i-bs name="x" class="me-1"></i-bs><ng-container i18n>Clear selection</ng-container>
     </button>
     <button type="button" class="btn btn-sm btn-outline-primary" (click)="restoreAll(selectedDocuments)" [disabled]="selectedDocuments.size === 0">
-        <i-bs name="arrow-counterclockwise"></i-bs>&nbsp;<ng-container i18n>Restore selected</ng-container>
+        <i-bs name="arrow-counterclockwise" class="me-1"></i-bs><ng-container i18n>Restore selected</ng-container>
     </button>
     <button type="button" class="btn btn-sm btn-outline-danger" (click)="emptyTrash(selectedDocuments)" [disabled]="selectedDocuments.size === 0">
-        <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete selected</ng-container>
+        <i-bs name="trash" class="me-1"></i-bs><ng-container i18n>Delete selected</ng-container>
     </button>
     <button type="button" class="btn btn-sm btn-outline-danger" (click)="emptyTrash()" [disabled]="documentsInTrash.length === 0">
-        <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Empty trash</ng-container>
+        <i-bs name="trash" class="me-1"></i-bs><ng-container i18n>Empty trash</ng-container>
     </button>
 </pngx-page-header>
 
@@ -75,10 +75,10 @@
                     </div>
                     <div class="btn-group d-none d-sm-block">
                         <button class="btn btn-sm btn-outline-secondary" (click)="restore(document); $event.stopPropagation();">
-                            <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs>&nbsp;<ng-container i18n>Restore</ng-container>
+                            <i-bs width="1em" height="1em" name="arrow-counterclockwise" class="me-1"></i-bs><ng-container i18n>Restore</ng-container>
                         </button>
                         <button class="btn btn-sm btn-outline-danger" (click)="delete(document); $event.stopPropagation();">
-                            <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+                            <i-bs width="1em" height="1em" name="trash" class="me-1"></i-bs><ng-container i18n>Delete</ng-container>
                         </button>
                     </div>
                     </td>

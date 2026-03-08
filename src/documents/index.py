@@ -5,10 +5,10 @@ import math
 import re
 from collections import Counter
 from contextlib import contextmanager
+from datetime import UTC
 from datetime import datetime
 from datetime import time
 from datetime import timedelta
-from datetime import timezone
 from shutil import rmtree
 from time import sleep
 from typing import TYPE_CHECKING
@@ -158,7 +158,11 @@ def open_index_searcher() -> Searcher:
         searcher.close()
 
 
-def update_document(writer: AsyncWriter, doc: Document) -> None:
+def update_document(
+    writer: AsyncWriter,
+    doc: Document,
+    effective_content: str | None = None,
+) -> None:
     tags = ",".join([t.name for t in doc.tags.all()])
     tags_ids = ",".join([str(t.id) for t in doc.tags.all()])
     notes = ",".join([str(c.note) for c in Note.objects.filter(document=doc)])
@@ -188,7 +192,7 @@ def update_document(writer: AsyncWriter, doc: Document) -> None:
     writer.update_document(
         id=doc.pk,
         title=doc.title,
-        content=doc.content,
+        content=effective_content or doc.content,
         correspondent=doc.correspondent.name if doc.correspondent else None,
         correspondent_id=doc.correspondent.id if doc.correspondent else None,
         has_correspondent=doc.correspondent is not None,
@@ -231,9 +235,12 @@ def remove_document_by_id(writer: AsyncWriter, doc_id) -> None:
     writer.delete_by_term("id", doc_id)
 
 
-def add_or_update_document(document: Document) -> None:
+def add_or_update_document(
+    document: Document,
+    effective_content: str | None = None,
+) -> None:
     with open_index_writer() as writer:
-        update_document(writer, document)
+        update_document(writer, document, effective_content=effective_content)
 
 
 def remove_document_from_index(document: Document) -> None:
@@ -414,13 +421,13 @@ class DelayedQuery:
 
 
 class ManualResultsPage(list):
-    def __init__(self, hits):
+    def __init__(self, hits) -> None:
         super().__init__(hits)
         self.results = ManualResults(hits)
 
 
 class ManualResults:
-    def __init__(self, hits):
+    def __init__(self, hits) -> None:
         self._docnums = [hit.docnum for hit in hits]
 
     def docs(self):
@@ -430,7 +437,7 @@ class ManualResults:
 class LocalDateParser(English):
     def reverse_timezone_offset(self, d):
         return (d.replace(tzinfo=django_timezone.get_current_timezone())).astimezone(
-            timezone.utc,
+            UTC,
         )
 
     def date_from(self, *args, **kwargs):
@@ -634,8 +641,8 @@ def rewrite_natural_date_keywords(query_string: str) -> str:
                 end = datetime(local_now.year - 1, 12, 31, 23, 59, 59, tzinfo=tz)
 
         # Convert to UTC and format
-        start_str = start.astimezone(timezone.utc).strftime("%Y%m%d%H%M%S")
-        end_str = end.astimezone(timezone.utc).strftime("%Y%m%d%H%M%S")
+        start_str = start.astimezone(UTC).strftime("%Y%m%d%H%M%S")
+        end_str = end.astimezone(UTC).strftime("%Y%m%d%H%M%S")
         return f"{field}:[{start_str} TO {end_str}]"
 
     return re.sub(pattern, repl, query_string, flags=re.IGNORECASE)

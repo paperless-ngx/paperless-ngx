@@ -73,6 +73,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 }
 
 @mixin dark-mode {
+  color-scheme: dark;
   --pngx-body-color-accent: #{$text-color-dark-bg-accent};
   --pngx-bg-alt: #242529;
   --pngx-bg-alt2: #232323;

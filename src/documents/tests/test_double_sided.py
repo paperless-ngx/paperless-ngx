@@ -27,7 +27,7 @@ from documents.tests.utils import FileSystemAssertsMixin
 class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     SAMPLE_DIR = Path(__file__).parent / "samples"
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.dirs.double_sided_dir = self.dirs.consumption_dir / "double-sided"
         self.dirs.double_sided_dir.mkdir()
@@ -56,13 +56,13 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsNotFile(dst)
         return msg
 
-    def create_staging_file(self, src="double-sided-odd.pdf", datetime=None):
+    def create_staging_file(self, src="double-sided-odd.pdf", datetime=None) -> None:
         shutil.copy(self.SAMPLE_DIR / src, self.staging_file)
         if datetime is None:
             datetime = dt.datetime.now()
         os.utime(str(self.staging_file), (datetime.timestamp(),) * 2)
 
-    def test_odd_numbered_moved_to_staging(self):
+    def test_odd_numbered_moved_to_staging(self) -> None:
         """
         GIVEN:
             - No staging file exists
@@ -85,7 +85,7 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
         self.assertIn("Received odd numbered pages", msg)
 
-    def test_collation(self):
+    def test_collation(self) -> None:
         """
         GIVEN:
             - A staging file not older than TIMEOUT_MINUTES with odd pages exists
@@ -113,7 +113,7 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             r"This is page 4.*This is page 5",
         )
 
-    def test_staging_file_expiration(self):
+    def test_staging_file_expiration(self) -> None:
         """
         GIVEN:
             - A staging file older than TIMEOUT_MINUTES exists
@@ -131,7 +131,7 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsFile(self.staging_file)
         self.assertIn("Received odd numbered pages", msg)
 
-    def test_less_odd_pages_then_even_fails(self):
+    def test_less_odd_pages_then_even_fails(self) -> None:
         """
         GIVEN:
             - A valid staging file
@@ -151,7 +151,7 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsNotFile(self.staging_file)
 
     @override_settings(CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT=True)
-    def test_tiff_upload_enabled(self):
+    def test_tiff_upload_enabled(self) -> None:
         """
         GIVEN:
             - CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT is true
@@ -169,7 +169,7 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         Pdf.open(self.staging_file)
 
     @override_settings(CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT=False)
-    def test_tiff_upload_disabled(self):
+    def test_tiff_upload_disabled(self) -> None:
         """
         GIVEN:
             - CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT is false
@@ -188,7 +188,7 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     @override_settings(CONSUMER_COLLATE_DOUBLE_SIDED_SUBDIR_NAME="quux")
-    def test_different_upload_dir_name(self):
+    def test_different_upload_dir_name(self) -> None:
         """
         GIVEN:
             - No staging file exists
@@ -201,7 +201,7 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.consume_file("double-sided-odd.pdf", Path("..") / "quux" / "foo.pdf")
         self.assertIsFile(self.staging_file)
 
-    def test_only_double_sided_dir_is_handled(self):
+    def test_only_double_sided_dir_is_handled(self) -> None:
         """
         GIVEN:
             - No staging file exists
@@ -214,7 +214,7 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsNotFile(self.staging_file)
         self.assertRegex(msg, r"Success. New document id \d+ created")
 
-    def test_subdirectory_upload(self):
+    def test_subdirectory_upload(self) -> None:
         """
         GIVEN:
             - A staging file exists
@@ -224,23 +224,24 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         THEN:
             - The collated file gets put into foo/bar
         """
+        # TODO: parameterize this instead
         for path in [
             Path("foo") / "bar" / "double-sided",
             Path("double-sided") / "foo" / "bar",
         ]:
-            with self.subTest(path=path):
+            with self.subTest(path=str(path)):
                 # Ensure we get fresh directories for each run
                 self.tearDown()
                 self.setUp()
 
                 self.create_staging_file()
-                self.consume_file("double-sided-odd.pdf", path / "foo.pdf")
+                self.consume_file("double-sided-odd.pdf", Path(path) / "foo.pdf")
                 self.assertIsFile(
                     self.dirs.consumption_dir / "foo" / "bar" / "foo-collated.pdf",
                 )
 
     @override_settings(CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED=False)
-    def test_disabled_double_sided_dir_upload(self):
+    def test_disabled_double_sided_dir_upload(self) -> None:
         """
         GIVEN:
             - CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED is false

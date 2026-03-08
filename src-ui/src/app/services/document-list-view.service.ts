@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core'
-import { ParamMap, Router } from '@angular/router'
+import { ParamMap, Router, UrlTree } from '@angular/router'
 import { Observable, Subject, first, takeUntil } from 'rxjs'
 import {
   DEFAULT_DISPLAY_FIELDS,
@@ -342,7 +342,7 @@ export class DocumentListViewService {
       })
   }
 
-  set filterRules(filterRules: FilterRule[]) {
+  setFilterRules(filterRules: FilterRule[], resetPage: boolean = false) {
     if (
       !isFullTextFilterRule(filterRules) &&
       this.activeListViewState.sortField == 'score'
@@ -350,6 +350,9 @@ export class DocumentListViewService {
       this.activeListViewState.sortField = 'created'
     }
     this.activeListViewState.filterRules = filterRules
+    if (resetPage) {
+      this.activeListViewState.currentPage = 1
+    }
     this.reload()
     this.reduceSelectionToFilter()
     this.saveDocumentListView()
@@ -479,8 +482,20 @@ export class DocumentListViewService {
 
   quickFilter(filterRules: FilterRule[]) {
     this._activeSavedViewId = null
-    this.filterRules = filterRules
+    this.setFilterRules(filterRules)
     this.router.navigate(['documents'])
+  }
+
+  getQuickFilterUrl(filterRules: FilterRule[]): UrlTree {
+    const defaultState = {
+      ...this.defaultListViewState(),
+      ...this.listViewStates.get(null),
+      filterRules,
+    }
+    const params = paramsFromViewState(defaultState)
+    return this.router.createUrlTree(['/documents'], {
+      queryParams: params,
+    })
   }
 
   getLastPage(): number {

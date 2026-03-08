@@ -39,7 +39,7 @@ class TestMailOAuth(
         settings.OUTLOOK_OAUTH_CLIENT_SECRET = "test_outlook_client_secret"
         super().setUp()
 
-    def test_generate_paths(self):
+    def test_generate_paths(self) -> None:
         """
         GIVEN:
             - Mocked settings for OAuth callback and base URLs
@@ -148,7 +148,7 @@ class TestMailOAuth(
         )
 
     @mock.patch("httpx_oauth.oauth2.BaseOAuth2.get_access_token")
-    def test_oauth_callback_view_fails(self, mock_get_access_token):
+    def test_oauth_callback_view_fails(self, mock_get_access_token) -> None:
         """
         GIVEN:
             - Mocked settings for Gmail and Outlook OAuth client IDs and secrets
@@ -193,7 +193,7 @@ class TestMailOAuth(
 
             self.assertIn("Error getting access token: test_error", cm.output[0])
 
-    def test_oauth_callback_view_insufficient_permissions(self):
+    def test_oauth_callback_view_insufficient_permissions(self) -> None:
         """
         GIVEN:
             - Mocked settings for Gmail and Outlook OAuth client IDs and secrets
@@ -223,7 +223,7 @@ class TestMailOAuth(
             MailAccount.objects.filter(imap_server="outlook.office365.com").exists(),
         )
 
-    def test_oauth_callback_view_no_code(self):
+    def test_oauth_callback_view_no_code(self) -> None:
         """
         GIVEN:
             - Mocked settings for Gmail and Outlook OAuth client IDs and secrets
@@ -244,7 +244,7 @@ class TestMailOAuth(
             MailAccount.objects.filter(imap_server="outlook.office365.com").exists(),
         )
 
-    def test_oauth_callback_view_invalid_state(self):
+    def test_oauth_callback_view_invalid_state(self) -> None:
         """
         GIVEN:
             - Mocked settings for Gmail and Outlook OAuth client IDs and secrets

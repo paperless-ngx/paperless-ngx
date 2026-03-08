@@ -22,7 +22,7 @@ from documents.tests.utils import DirectoriesMixin
 
 
 class TestBulkEdit(DirectoriesMixin, TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.owner = User.objects.create(username="test_owner")
@@ -66,7 +66,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         self.doc4.tags.add(self.t1, self.t2)
         self.sp1 = StoragePath.objects.create(name="sp1", path="Something/{checksum}")
 
-    def test_set_correspondent(self):
+    def test_set_correspondent(self) -> None:
         self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 1)
         bulk_edit.set_correspondent(
             [self.doc1.id, self.doc2.id, self.doc3.id],
@@ -77,7 +77,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc1.id, self.doc2.id])
 
-    def test_unset_correspondent(self):
+    def test_unset_correspondent(self) -> None:
         self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 1)
         bulk_edit.set_correspondent([self.doc1.id, self.doc2.id, self.doc3.id], None)
         self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 0)
@@ -85,7 +85,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc2.id, self.doc3.id])
 
-    def test_set_document_type(self):
+    def test_set_document_type(self) -> None:
         self.assertEqual(Document.objects.filter(document_type=self.dt2).count(), 1)
         bulk_edit.set_document_type(
             [self.doc1.id, self.doc2.id, self.doc3.id],
@@ -96,7 +96,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc1.id, self.doc2.id])
 
-    def test_unset_document_type(self):
+    def test_unset_document_type(self) -> None:
         self.assertEqual(Document.objects.filter(document_type=self.dt2).count(), 1)
         bulk_edit.set_document_type([self.doc1.id, self.doc2.id, self.doc3.id], None)
         self.assertEqual(Document.objects.filter(document_type=self.dt2).count(), 0)
@@ -104,7 +104,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc2.id, self.doc3.id])
 
-    def test_set_document_storage_path(self):
+    def test_set_document_storage_path(self) -> None:
         """
         GIVEN:
             - 5 documents without defined storage path
@@ -127,7 +127,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
 
         self.assertCountEqual(kwargs["document_ids"], [self.doc1.id])
 
-    def test_unset_document_storage_path(self):
+    def test_unset_document_storage_path(self) -> None:
         """
         GIVEN:
             - 4 documents without defined storage path
@@ -158,7 +158,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
 
         self.assertCountEqual(kwargs["document_ids"], [self.doc1.id])
 
-    def test_add_tag(self):
+    def test_add_tag(self) -> None:
         self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 2)
         bulk_edit.add_tag(
             [self.doc1.id, self.doc2.id, self.doc3.id, self.doc4.id],
@@ -169,7 +169,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc1.id, self.doc3.id])
 
-    def test_remove_tag(self):
+    def test_remove_tag(self) -> None:
         self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 2)
         bulk_edit.remove_tag([self.doc1.id, self.doc3.id, self.doc4.id], self.t1.id)
         self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 1)
@@ -177,7 +177,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc4.id])
 
-    def test_modify_tags(self):
+    def test_modify_tags(self) -> None:
         tag_unrelated = Tag.objects.create(name="unrelated")
         self.doc2.tags.add(tag_unrelated)
         self.doc3.tags.add(tag_unrelated)
@@ -195,7 +195,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         # TODO: doc3 should not be affected, but the query for that is rather complicated
         self.assertCountEqual(kwargs["document_ids"], [self.doc2.id, self.doc3.id])
 
-    def test_modify_custom_fields(self):
+    def test_modify_custom_fields(self) -> None:
         """
         GIVEN:
             - 2 documents with custom fields
@@ -251,7 +251,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc1.id, self.doc2.id])
 
-    def test_modify_custom_fields_with_values(self):
+    def test_modify_custom_fields_with_values(self) -> None:
         """
         GIVEN:
             - 2 documents with custom fields
@@ -343,7 +343,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             self.doc2.custom_fields.filter(field=cf3).first().value,
         )
 
-    def test_modify_custom_fields_doclink_self_link(self):
+    def test_modify_custom_fields_doclink_self_link(self) -> None:
         """
         GIVEN:
             - 2 existing documents
@@ -372,7 +372,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             [self.doc1.id],
         )
 
-    def test_delete(self):
+    def test_delete(self) -> None:
         self.assertEqual(Document.objects.count(), 5)
         bulk_edit.delete([self.doc1.id, self.doc2.id])
         self.assertEqual(Document.objects.count(), 3)
@@ -381,8 +381,55 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             [self.doc3.id, self.doc4.id, self.doc5.id],
         )
 
+    def test_delete_root_document_deletes_all_versions(self) -> None:
+        version = Document.objects.create(
+            checksum="A-v1",
+            title="A version",
+            root_document=self.doc1,
+        )
+
+        bulk_edit.delete([self.doc1.id])
+
+        self.assertFalse(Document.objects.filter(id=self.doc1.id).exists())
+        self.assertFalse(Document.objects.filter(id=version.id).exists())
+
+    def test_delete_version_document_keeps_root(self) -> None:
+        version = Document.objects.create(
+            checksum="A-v1",
+            title="A version",
+            root_document=self.doc1,
+        )
+
+        bulk_edit.delete([version.id])
+
+        self.assertTrue(Document.objects.filter(id=self.doc1.id).exists())
+        self.assertFalse(Document.objects.filter(id=version.id).exists())
+
+    def test_resolve_root_and_source_doc_latest_version_prefers_newest_version(
+        self,
+    ) -> None:
+        version1 = Document.objects.create(
+            checksum="B-v1",
+            title="B version 1",
+            root_document=self.doc2,
+        )
+        version2 = Document.objects.create(
+            checksum="B-v2",
+            title="B version 2",
+            root_document=self.doc2,
+        )
+
+        root_doc, source_doc = bulk_edit._resolve_root_and_source_doc(
+            self.doc2,
+            source_mode="latest_version",
+        )
+
+        self.assertEqual(root_doc.id, self.doc2.id)
+        self.assertEqual(source_doc.id, version2.id)
+        self.assertNotEqual(source_doc.id, version1.id)
+
     @mock.patch("documents.tasks.bulk_update_documents.delay")
-    def test_set_permissions(self, m):
+    def test_set_permissions(self, m) -> None:
         doc_ids = [self.doc1.id, self.doc2.id, self.doc3.id]
 
         assign_perm("view_document", self.group1, self.doc1)
@@ -421,7 +468,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         self.assertEqual(groups_with_perms.count(), 1)
 
     @mock.patch("documents.tasks.bulk_update_documents.delay")
-    def test_set_permissions_merge(self, m):
+    def test_set_permissions_merge(self, m) -> None:
         doc_ids = [self.doc1.id, self.doc2.id, self.doc3.id]
 
         self.doc1.owner = self.user1
@@ -465,7 +512,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         self.assertEqual(groups_with_perms.count(), 2)
 
     @mock.patch("documents.models.Document.delete")
-    def test_delete_documents_old_uuid_field(self, m):
+    def test_delete_documents_old_uuid_field(self, m) -> None:
         m.side_effect = Exception("Data too long for column 'transaction_id' at row 1")
         doc_ids = [self.doc1.id, self.doc2.id, self.doc3.id]
         bulk_edit.delete(doc_ids)
@@ -475,7 +522,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
 
 
 class TestPDFActions(DirectoriesMixin, TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         sample1 = self.dirs.scratch_dir / "sample.pdf"
         shutil.copy(
@@ -571,7 +618,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.img_doc.save()
 
     @mock.patch("documents.tasks.consume_file.s")
-    def test_merge(self, mock_consume_file):
+    def test_merge(self, mock_consume_file) -> None:
         """
         GIVEN:
             - Existing documents
@@ -602,6 +649,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             expected_filename,
         )
         self.assertEqual(consume_file_args[1].title, None)
+        # No metadata_document_id, delete_originals False, so ASN should be None
+        self.assertIsNone(consume_file_args[1].asn)
 
         # With metadata_document_id overrides
         result = bulk_edit.merge(doc_ids, metadata_document_id=metadata_document_id)
@@ -611,12 +660,37 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
         self.assertEqual(result, "OK")
 
+    @mock.patch("pikepdf.open")
+    @mock.patch("documents.tasks.consume_file.s")
+    def test_merge_uses_latest_version_source_for_root_selection(
+        self,
+        mock_consume_file,
+        mock_open_pdf,
+    ) -> None:
+        version_file = self.dirs.scratch_dir / "sample2_version_merge.pdf"
+        shutil.copy(self.doc2.source_path, version_file)
+        version = Document.objects.create(
+            checksum="B-v1",
+            title="B version 1",
+            root_document=self.doc2,
+            filename=version_file,
+            mime_type="application/pdf",
+        )
+        fake_pdf = mock.MagicMock()
+        fake_pdf.pdf_version = "1.7"
+        fake_pdf.pages = [mock.Mock()]
+        mock_open_pdf.return_value.__enter__.return_value = fake_pdf
+
+        result = bulk_edit.merge([self.doc2.id])
+
+        self.assertEqual(result, "OK")
+        mock_open_pdf.assert_called_once_with(str(version.source_path))
+        mock_consume_file.assert_not_called()
+
     @mock.patch("documents.bulk_edit.delete.si")
     @mock.patch("documents.tasks.consume_file.s")
-    @mock.patch("documents.bulk_edit.chain")
     def test_merge_and_delete_originals(
         self,
-        mock_chain,
         mock_consume_file,
         mock_delete_documents,
     ):
@@ -630,6 +704,12 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             - Document deletion task should be called
         """
         doc_ids = [self.doc1.id, self.doc2.id, self.doc3.id]
+        self.doc1.archive_serial_number = 101
+        self.doc2.archive_serial_number = 102
+        self.doc3.archive_serial_number = 103
+        self.doc1.save()
+        self.doc2.save()
+        self.doc3.save()
 
         result = bulk_edit.merge(doc_ids, delete_originals=True)
         self.assertEqual(result, "OK")
@@ -640,7 +720,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
         mock_consume_file.assert_called()
         mock_delete_documents.assert_called()
-        mock_chain.assert_called_once()
+        consume_sig = mock_consume_file.return_value
+        consume_sig.apply_async.assert_called_once()
 
         consume_file_args, _ = mock_consume_file.call_args
         self.assertEqual(
@@ -648,6 +729,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             expected_filename,
         )
         self.assertEqual(consume_file_args[1].title, None)
+        self.assertEqual(consume_file_args[1].asn, 101)
 
         delete_documents_args, _ = mock_delete_documents.call_args
         self.assertEqual(
@@ -655,8 +737,94 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             doc_ids,
         )
 
+        self.doc1.refresh_from_db()
+        self.doc2.refresh_from_db()
+        self.doc3.refresh_from_db()
+        self.assertIsNone(self.doc1.archive_serial_number)
+        self.assertIsNone(self.doc2.archive_serial_number)
+        self.assertIsNone(self.doc3.archive_serial_number)
+
+    @mock.patch("documents.bulk_edit.delete.si")
     @mock.patch("documents.tasks.consume_file.s")
-    def test_merge_with_archive_fallback(self, mock_consume_file):
+    def test_merge_and_delete_originals_restore_on_failure(
+        self,
+        mock_consume_file,
+        mock_delete_documents,
+    ) -> None:
+        """
+        GIVEN:
+            - Existing documents
+        WHEN:
+            - Merge action with deleting documents is called with 1 document
+            - Error occurs when queuing consume file task
+        THEN:
+            - Archive serial numbers are restored
+        """
+        doc_ids = [self.doc1.id]
+        self.doc1.archive_serial_number = 111
+        self.doc1.save()
+        sig = mock.Mock()
+        sig.apply_async.side_effect = Exception("boom")
+        mock_consume_file.return_value = sig
+
+        with self.assertRaises(Exception):
+            bulk_edit.merge(doc_ids, delete_originals=True)
+
+        self.doc1.refresh_from_db()
+        self.assertEqual(self.doc1.archive_serial_number, 111)
+
+    @mock.patch("documents.bulk_edit.delete.si")
+    @mock.patch("documents.tasks.consume_file.s")
+    def test_merge_and_delete_originals_metadata_handoff(
+        self,
+        mock_consume_file,
+        mock_delete_documents,
+    ) -> None:
+        """
+        GIVEN:
+            - Existing documents with ASNs
+        WHEN:
+            - Merge with delete_originals=True and metadata_document_id set
+        THEN:
+            - Handoff ASN uses metadata document ASN
+        """
+        doc_ids = [self.doc1.id, self.doc2.id]
+        self.doc1.archive_serial_number = 101
+        self.doc2.archive_serial_number = 202
+        self.doc1.save()
+        self.doc2.save()
+
+        result = bulk_edit.merge(
+            doc_ids,
+            metadata_document_id=self.doc2.id,
+            delete_originals=True,
+        )
+        self.assertEqual(result, "OK")
+
+        consume_file_args, _ = mock_consume_file.call_args
+        self.assertEqual(consume_file_args[1].asn, 202)
+
+    def test_restore_archive_serial_numbers_task(self) -> None:
+        """
+        GIVEN:
+            - Existing document with no archive serial number
+        WHEN:
+            - Restore archive serial number task is called with backup data
+        THEN:
+            - Document archive serial number is restored
+        """
+        self.doc1.archive_serial_number = 444
+        self.doc1.save()
+        Document.objects.filter(pk=self.doc1.id).update(archive_serial_number=None)
+
+        backup: dict[int, int | None] = {self.doc1.id: 444}
+        bulk_edit.restore_archive_serial_numbers_task(backup)
+
+        self.doc1.refresh_from_db()
+        self.assertEqual(self.doc1.archive_serial_number, 444)
+
+    @mock.patch("documents.tasks.consume_file.s")
+    def test_merge_with_archive_fallback(self, mock_consume_file) -> None:
         """
         GIVEN:
             - Existing documents
@@ -683,7 +851,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
     @mock.patch("documents.tasks.consume_file.delay")
     @mock.patch("pikepdf.open")
-    def test_merge_with_errors(self, mock_open_pdf, mock_consume_file):
+    def test_merge_with_errors(self, mock_open_pdf, mock_consume_file) -> None:
         """
         GIVEN:
             - Existing documents
@@ -707,7 +875,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_consume_file.assert_not_called()
 
     @mock.patch("documents.tasks.consume_file.s")
-    def test_split(self, mock_consume_file):
+    def test_split(self, mock_consume_file) -> None:
         """
         GIVEN:
             - Existing documents
@@ -723,8 +891,39 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertEqual(mock_consume_file.call_count, 2)
         consume_file_args, _ = mock_consume_file.call_args
         self.assertEqual(consume_file_args[1].title, "B (split 2)")
+        self.assertIsNone(consume_file_args[1].asn)
 
         self.assertEqual(result, "OK")
+
+    @mock.patch("documents.bulk_edit.group")
+    @mock.patch("pikepdf.open")
+    @mock.patch("documents.tasks.consume_file.s")
+    def test_split_uses_latest_version_source_for_root_selection(
+        self,
+        mock_consume_file,
+        mock_open_pdf,
+        mock_group,
+    ) -> None:
+        version_file = self.dirs.scratch_dir / "sample2_version_split.pdf"
+        shutil.copy(self.doc2.source_path, version_file)
+        version = Document.objects.create(
+            checksum="B-v1",
+            title="B version 1",
+            root_document=self.doc2,
+            filename=version_file,
+            mime_type="application/pdf",
+        )
+        fake_pdf = mock.MagicMock()
+        fake_pdf.pages = [mock.Mock(), mock.Mock()]
+        mock_open_pdf.return_value.__enter__.return_value = fake_pdf
+        mock_group.return_value.delay.return_value = None
+
+        result = bulk_edit.split([self.doc2.id], [[1], [2]])
+
+        self.assertEqual(result, "OK")
+        mock_open_pdf.assert_called_once_with(version.source_path)
+        mock_consume_file.assert_not_called()
+        mock_group.return_value.delay.assert_not_called()
 
     @mock.patch("documents.bulk_edit.delete.si")
     @mock.patch("documents.tasks.consume_file.s")
@@ -747,6 +946,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         """
         doc_ids = [self.doc2.id]
         pages = [[1, 2], [3]]
+        self.doc2.archive_serial_number = 200
+        self.doc2.save()
 
         result = bulk_edit.split(doc_ids, pages, delete_originals=True)
         self.assertEqual(result, "OK")
@@ -764,9 +965,45 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             doc_ids,
         )
 
+        self.doc2.refresh_from_db()
+        self.assertIsNone(self.doc2.archive_serial_number)
+
+    @mock.patch("documents.bulk_edit.delete.si")
+    @mock.patch("documents.tasks.consume_file.s")
+    @mock.patch("documents.bulk_edit.chord")
+    def test_split_restore_on_failure(
+        self,
+        mock_chord,
+        mock_consume_file,
+        mock_delete_documents,
+    ) -> None:
+        """
+        GIVEN:
+            - Existing documents
+        WHEN:
+            - Split action with deleting documents is called with 1 document and 2 page groups
+            - Error occurs when queuing chord task
+        THEN:
+            - Archive serial numbers are restored
+        """
+        doc_ids = [self.doc2.id]
+        pages = [[1, 2]]
+        self.doc2.archive_serial_number = 222
+        self.doc2.save()
+
+        sig = mock.Mock()
+        sig.apply_async.side_effect = Exception("boom")
+        mock_chord.return_value = sig
+
+        result = bulk_edit.split(doc_ids, pages, delete_originals=True)
+        self.assertEqual(result, "OK")
+
+        self.doc2.refresh_from_db()
+        self.assertEqual(self.doc2.archive_serial_number, 222)
+
     @mock.patch("documents.tasks.consume_file.delay")
     @mock.patch("pikepdf.Pdf.save")
-    def test_split_with_errors(self, mock_save_pdf, mock_consume_file):
+    def test_split_with_errors(self, mock_save_pdf, mock_consume_file) -> None:
         """
         GIVEN:
             - Existing documents
@@ -788,10 +1025,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
         mock_consume_file.assert_not_called()
 
-    @mock.patch("documents.tasks.bulk_update_documents.si")
-    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.s")
-    @mock.patch("celery.chord.delay")
-    def test_rotate(self, mock_chord, mock_update_document, mock_update_documents):
+    @mock.patch("documents.tasks.consume_file.delay")
+    def test_rotate(self, mock_consume_delay):
         """
         GIVEN:
             - Existing documents
@@ -802,19 +1037,22 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         """
         doc_ids = [self.doc1.id, self.doc2.id]
         result = bulk_edit.rotate(doc_ids, 90)
-        self.assertEqual(mock_update_document.call_count, 2)
-        mock_update_documents.assert_called_once()
-        mock_chord.assert_called_once()
+        self.assertEqual(mock_consume_delay.call_count, 2)
+        for call, expected_id in zip(
+            mock_consume_delay.call_args_list,
+            doc_ids,
+        ):
+            consumable, overrides = call.args
+            self.assertEqual(consumable.root_document_id, expected_id)
+            self.assertIsNotNone(overrides)
         self.assertEqual(result, "OK")
 
-    @mock.patch("documents.tasks.bulk_update_documents.si")
-    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.s")
+    @mock.patch("documents.tasks.consume_file.delay")
     @mock.patch("pikepdf.Pdf.save")
     def test_rotate_with_error(
         self,
         mock_pdf_save,
-        mock_update_archive_file,
-        mock_update_documents,
+        mock_consume_delay,
     ):
         """
         GIVEN:
@@ -833,16 +1071,12 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             error_str = cm.output[0]
             expected_str = "Error rotating document"
             self.assertIn(expected_str, error_str)
-            mock_update_archive_file.assert_not_called()
+            mock_consume_delay.assert_not_called()
 
-    @mock.patch("documents.tasks.bulk_update_documents.si")
-    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.s")
-    @mock.patch("celery.chord.delay")
+    @mock.patch("documents.tasks.consume_file.delay")
     def test_rotate_non_pdf(
         self,
-        mock_chord,
-        mock_update_document,
-        mock_update_documents,
+        mock_consume_delay,
     ):
         """
         GIVEN:
@@ -854,17 +1088,46 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         """
         with self.assertLogs("paperless.bulk_edit", level="INFO") as cm:
             result = bulk_edit.rotate([self.doc2.id, self.img_doc.id], 90)
-            output_str = cm.output[1]
-            expected_str = "Document 4 is not a PDF, skipping rotation"
-            self.assertIn(expected_str, output_str)
-            self.assertEqual(mock_update_document.call_count, 1)
-            mock_update_documents.assert_called_once()
-            mock_chord.assert_called_once()
+            expected_str = f"Document {self.img_doc.id} is not a PDF, skipping rotation"
+            self.assertTrue(any(expected_str in line for line in cm.output))
+            self.assertEqual(mock_consume_delay.call_count, 1)
+            consumable, overrides = mock_consume_delay.call_args[0]
+            self.assertEqual(consumable.root_document_id, self.doc2.id)
+            self.assertIsNotNone(overrides)
             self.assertEqual(result, "OK")
 
-    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.delay")
+    @mock.patch("documents.data_models.magic.from_file", return_value="application/pdf")
+    @mock.patch("documents.tasks.consume_file.delay")
+    @mock.patch("pikepdf.open")
+    def test_rotate_explicit_selection_uses_root_source_when_root_selected(
+        self,
+        mock_open,
+        mock_consume_delay,
+        mock_magic,
+    ):
+        Document.objects.create(
+            checksum="B-v1",
+            title="B version 1",
+            root_document=self.doc2,
+        )
+        fake_pdf = mock.MagicMock()
+        fake_pdf.pages = [mock.Mock()]
+        mock_open.return_value.__enter__.return_value = fake_pdf
+
+        result = bulk_edit.rotate(
+            [self.doc2.id],
+            90,
+            source_mode="explicit_selection",
+        )
+
+        self.assertEqual(result, "OK")
+        mock_open.assert_called_once_with(self.doc2.source_path)
+        mock_consume_delay.assert_called_once()
+
+    @mock.patch("documents.tasks.consume_file.delay")
     @mock.patch("pikepdf.Pdf.save")
-    def test_delete_pages(self, mock_pdf_save, mock_update_archive_file):
+    @mock.patch("documents.data_models.magic.from_file", return_value="application/pdf")
+    def test_delete_pages(self, mock_magic, mock_pdf_save, mock_consume_delay):
         """
         GIVEN:
             - Existing documents
@@ -872,24 +1135,50 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             - Delete pages action is called with 1 document and 2 pages
         THEN:
             - Save should be called once
-            - Archive file should be updated once
-            - The document's page_count should be reduced by the number of deleted pages
+            - A new version should be enqueued via consume_file
         """
         doc_ids = [self.doc2.id]
-        initial_page_count = self.doc2.page_count
         pages = [1, 3]
         result = bulk_edit.delete_pages(doc_ids, pages)
         mock_pdf_save.assert_called_once()
-        mock_update_archive_file.assert_called_once()
+        mock_consume_delay.assert_called_once()
+        consumable, overrides = mock_consume_delay.call_args[0]
+        self.assertEqual(consumable.root_document_id, self.doc2.id)
+        self.assertTrue(str(consumable.original_file).endswith("_pages_deleted.pdf"))
+        self.assertIsNotNone(overrides)
         self.assertEqual(result, "OK")
 
-        expected_page_count = initial_page_count - len(pages)
-        self.doc2.refresh_from_db()
-        self.assertEqual(self.doc2.page_count, expected_page_count)
+    @mock.patch("documents.data_models.magic.from_file", return_value="application/pdf")
+    @mock.patch("documents.tasks.consume_file.delay")
+    @mock.patch("pikepdf.open")
+    def test_delete_pages_explicit_selection_uses_root_source_when_root_selected(
+        self,
+        mock_open,
+        mock_consume_delay,
+        mock_magic,
+    ):
+        Document.objects.create(
+            checksum="B-v1",
+            title="B version 1",
+            root_document=self.doc2,
+        )
+        fake_pdf = mock.MagicMock()
+        fake_pdf.pages = [mock.Mock(), mock.Mock()]
+        mock_open.return_value.__enter__.return_value = fake_pdf
 
-    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.delay")
+        result = bulk_edit.delete_pages(
+            [self.doc2.id],
+            [1],
+            source_mode="explicit_selection",
+        )
+
+        self.assertEqual(result, "OK")
+        mock_open.assert_called_once_with(self.doc2.source_path)
+        mock_consume_delay.assert_called_once()
+
+    @mock.patch("documents.tasks.consume_file.delay")
     @mock.patch("pikepdf.Pdf.save")
-    def test_delete_pages_with_error(self, mock_pdf_save, mock_update_archive_file):
+    def test_delete_pages_with_error(self, mock_pdf_save, mock_consume_delay):
         """
         GIVEN:
             - Existing documents
@@ -898,7 +1187,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             - PikePDF raises an error
         THEN:
             - Save should be called once
-            - Archive file should not be updated
+            - No new version should be enqueued
         """
         mock_pdf_save.side_effect = Exception("Error saving PDF")
         doc_ids = [self.doc2.id]
@@ -909,11 +1198,11 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             error_str = cm.output[0]
             expected_str = "Error deleting pages from document"
             self.assertIn(expected_str, error_str)
-            mock_update_archive_file.assert_not_called()
+            mock_consume_delay.assert_not_called()
 
     @mock.patch("documents.bulk_edit.group")
     @mock.patch("documents.tasks.consume_file.s")
-    def test_edit_pdf_basic_operations(self, mock_consume_file, mock_group):
+    def test_edit_pdf_basic_operations(self, mock_consume_file, mock_group) -> None:
         """
         GIVEN:
             - Existing document
@@ -932,7 +1221,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
     @mock.patch("documents.bulk_edit.group")
     @mock.patch("documents.tasks.consume_file.s")
-    def test_edit_pdf_with_user_override(self, mock_consume_file, mock_group):
+    def test_edit_pdf_with_user_override(self, mock_consume_file, mock_group) -> None:
         """
         GIVEN:
             - Existing document
@@ -952,7 +1241,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
     @mock.patch("documents.bulk_edit.chord")
     @mock.patch("documents.tasks.consume_file.s")
-    def test_edit_pdf_with_delete_original(self, mock_consume_file, mock_chord):
+    def test_edit_pdf_with_delete_original(self, mock_consume_file, mock_chord) -> None:
         """
         GIVEN:
             - Existing document
@@ -964,26 +1253,62 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_chord.return_value.delay.return_value = None
         doc_ids = [self.doc2.id]
         operations = [{"page": 1}, {"page": 2}]
+        self.doc2.archive_serial_number = 250
+        self.doc2.save()
 
         result = bulk_edit.edit_pdf(doc_ids, operations, delete_original=True)
         self.assertEqual(result, "OK")
         mock_chord.assert_called_once()
+        consume_file_args, _ = mock_consume_file.call_args
+        self.assertEqual(consume_file_args[1].asn, 250)
+        self.doc2.refresh_from_db()
+        self.assertIsNone(self.doc2.archive_serial_number)
 
-    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.delay")
-    def test_edit_pdf_with_update_document(self, mock_update_document):
+    @mock.patch("documents.bulk_edit.delete.si")
+    @mock.patch("documents.tasks.consume_file.s")
+    @mock.patch("documents.bulk_edit.chord")
+    def test_edit_pdf_restore_on_failure(
+        self,
+        mock_chord: mock.Mock,
+        mock_consume_file: mock.Mock,
+        mock_delete_documents: mock.Mock,
+    ) -> None:
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - edit_pdf is called with delete_original=True
+            - Error occurs when queuing chord task
+        THEN:
+            - Archive serial numbers are restored
+        """
+        doc_ids = [self.doc2.id]
+        operations = [{"page": 1}]
+        self.doc2.archive_serial_number = 333
+        self.doc2.save()
+
+        sig = mock.Mock()
+        sig.apply_async.side_effect = Exception("boom")
+        mock_chord.return_value = sig
+
+        with self.assertRaises(Exception):
+            bulk_edit.edit_pdf(doc_ids, operations, delete_original=True)
+
+        self.doc2.refresh_from_db()
+        self.assertEqual(self.doc2.archive_serial_number, 333)
+
+    @mock.patch("documents.tasks.consume_file.delay")
+    def test_edit_pdf_with_update_document(self, mock_consume_delay):
         """
         GIVEN:
             - A single existing PDF document
         WHEN:
             - edit_pdf is called with update_document=True and a single output
         THEN:
-            - The original document is updated in-place
-            - The update_document_content_maybe_archive_file task is triggered
+            - A version update is enqueued targeting the existing document
         """
         doc_ids = [self.doc2.id]
         operations = [{"page": 1}, {"page": 2}]
-        original_checksum = self.doc2.checksum
-        original_page_count = self.doc2.page_count
 
         result = bulk_edit.edit_pdf(
             doc_ids,
@@ -993,14 +1318,53 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(result, "OK")
-        self.doc2.refresh_from_db()
-        self.assertNotEqual(self.doc2.checksum, original_checksum)
-        self.assertNotEqual(self.doc2.page_count, original_page_count)
-        mock_update_document.assert_called_once_with(document_id=self.doc2.id)
+        mock_consume_delay.assert_called_once()
+        consumable, overrides = mock_consume_delay.call_args[0]
+        self.assertEqual(consumable.root_document_id, self.doc2.id)
+        self.assertTrue(str(consumable.original_file).endswith("_edited.pdf"))
+        self.assertIsNotNone(overrides)
+
+    @mock.patch("documents.data_models.magic.from_file", return_value="application/pdf")
+    @mock.patch("documents.tasks.consume_file.delay")
+    @mock.patch("pikepdf.new")
+    @mock.patch("pikepdf.open")
+    def test_edit_pdf_explicit_selection_uses_root_source_when_root_selected(
+        self,
+        mock_open,
+        mock_new,
+        mock_consume_delay,
+        mock_magic,
+    ):
+        Document.objects.create(
+            checksum="B-v1",
+            title="B version 1",
+            root_document=self.doc2,
+        )
+        fake_pdf = mock.MagicMock()
+        fake_pdf.pages = [mock.Mock()]
+        mock_open.return_value.__enter__.return_value = fake_pdf
+        output_pdf = mock.MagicMock()
+        output_pdf.pages = []
+        mock_new.return_value = output_pdf
+
+        result = bulk_edit.edit_pdf(
+            [self.doc2.id],
+            operations=[{"page": 1}],
+            update_document=True,
+            source_mode="explicit_selection",
+        )
+
+        self.assertEqual(result, "OK")
+        mock_open.assert_called_once_with(self.doc2.source_path)
+        mock_consume_delay.assert_called_once()
 
     @mock.patch("documents.bulk_edit.group")
     @mock.patch("documents.tasks.consume_file.s")
-    def test_edit_pdf_without_metadata(self, mock_consume_file, mock_group):
+    def test_edit_pdf_without_metadata(
+        self,
+        mock_consume_file: mock.Mock,
+        mock_group: mock.Mock,
+    ) -> None:
         """
         GIVEN:
             - Existing document
@@ -1019,7 +1383,11 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
     @mock.patch("documents.bulk_edit.group")
     @mock.patch("documents.tasks.consume_file.s")
-    def test_edit_pdf_open_failure(self, mock_consume_file, mock_group):
+    def test_edit_pdf_open_failure(
+        self,
+        mock_consume_file: mock.Mock,
+        mock_group: mock.Mock,
+    ) -> None:
         """
         GIVEN:
             - Existing document
@@ -1063,3 +1431,190 @@ class TestPDFActions(DirectoriesMixin, TestCase):
                 bulk_edit.edit_pdf(doc_ids, operations, update_document=True)
         mock_group.assert_not_called()
         mock_consume_file.assert_not_called()
+
+    @mock.patch("documents.bulk_edit.update_document_content_maybe_archive_file.delay")
+    @mock.patch("documents.tasks.consume_file.delay")
+    @mock.patch("documents.bulk_edit.tempfile.mkdtemp")
+    @mock.patch("pikepdf.open")
+    def test_remove_password_update_document(
+        self,
+        mock_open,
+        mock_mkdtemp,
+        mock_consume_delay,
+        mock_update_document,
+    ):
+        doc = self.doc1
+        temp_dir = self.dirs.scratch_dir / "remove-password-update"
+        temp_dir.mkdir(parents=True, exist_ok=True)
+        mock_mkdtemp.return_value = str(temp_dir)
+
+        fake_pdf = mock.MagicMock()
+        fake_pdf.pages = [mock.Mock(), mock.Mock(), mock.Mock()]
+
+        def save_side_effect(target_path):
+            Path(target_path).write_bytes(b"new pdf content")
+
+        fake_pdf.save.side_effect = save_side_effect
+        mock_open.return_value.__enter__.return_value = fake_pdf
+
+        result = bulk_edit.remove_password(
+            [doc.id],
+            password="secret",
+            update_document=True,
+        )
+
+        self.assertEqual(result, "OK")
+        mock_open.assert_called_once_with(doc.source_path, password="secret")
+        fake_pdf.remove_unreferenced_resources.assert_called_once()
+        mock_update_document.assert_not_called()
+        mock_consume_delay.assert_called_once()
+        consumable, overrides = mock_consume_delay.call_args[0]
+        expected_path = temp_dir / f"{doc.id}_unprotected.pdf"
+        self.assertTrue(expected_path.exists())
+        self.assertEqual(
+            Path(consumable.original_file).resolve(),
+            expected_path.resolve(),
+        )
+        self.assertEqual(consumable.root_document_id, doc.id)
+        self.assertIsNotNone(overrides)
+
+    @mock.patch("documents.data_models.magic.from_file", return_value="application/pdf")
+    @mock.patch("documents.tasks.consume_file.delay")
+    @mock.patch("pikepdf.open")
+    def test_remove_password_explicit_selection_uses_root_source_when_root_selected(
+        self,
+        mock_open,
+        mock_consume_delay,
+        mock_magic,
+    ) -> None:
+        Document.objects.create(
+            checksum="A-v1",
+            title="A version 1",
+            root_document=self.doc1,
+        )
+        fake_pdf = mock.MagicMock()
+        mock_open.return_value.__enter__.return_value = fake_pdf
+
+        result = bulk_edit.remove_password(
+            [self.doc1.id],
+            password="secret",
+            update_document=True,
+            source_mode="explicit_selection",
+        )
+
+        self.assertEqual(result, "OK")
+        mock_open.assert_called_once_with(self.doc1.source_path, password="secret")
+        mock_consume_delay.assert_called_once()
+
+    @mock.patch("documents.bulk_edit.chord")
+    @mock.patch("documents.bulk_edit.group")
+    @mock.patch("documents.tasks.consume_file.s")
+    @mock.patch("documents.bulk_edit.tempfile.mkdtemp")
+    @mock.patch("pikepdf.open")
+    def test_remove_password_creates_consumable_document(
+        self,
+        mock_open: mock.Mock,
+        mock_mkdtemp: mock.Mock,
+        mock_consume_file: mock.Mock,
+        mock_group: mock.Mock,
+        mock_chord: mock.Mock,
+    ) -> None:
+        doc = self.doc2
+        temp_dir = self.dirs.scratch_dir / "remove-password"
+        temp_dir.mkdir(parents=True, exist_ok=True)
+        mock_mkdtemp.return_value = str(temp_dir)
+
+        fake_pdf = mock.MagicMock()
+        fake_pdf.pages = [mock.Mock(), mock.Mock()]
+
+        def save_side_effect(target_path: Path) -> None:
+            target_path.write_bytes(b"password removed")
+
+        fake_pdf.save.side_effect = save_side_effect
+        mock_open.return_value.__enter__.return_value = fake_pdf
+        mock_group.return_value.delay.return_value = None
+
+        user = User.objects.create(username="owner")
+
+        result = bulk_edit.remove_password(
+            [doc.id],
+            password="secret",
+            include_metadata=False,
+            update_document=False,
+            delete_original=False,
+            user=user,
+        )
+
+        self.assertEqual(result, "OK")
+        mock_open.assert_called_once_with(doc.source_path, password="secret")
+        mock_consume_file.assert_called_once()
+        consume_args, _ = mock_consume_file.call_args
+        consumable_document = consume_args[0]
+        overrides = consume_args[1]
+        expected_path = temp_dir / f"{doc.id}_unprotected.pdf"
+        self.assertTrue(expected_path.exists())
+        self.assertEqual(
+            Path(consumable_document.original_file).resolve(),
+            expected_path.resolve(),
+        )
+        self.assertEqual(overrides.owner_id, user.id)
+        mock_group.assert_called_once_with([mock_consume_file.return_value])
+        mock_group.return_value.delay.assert_called_once()
+        mock_chord.assert_not_called()
+
+    @mock.patch("documents.bulk_edit.delete")
+    @mock.patch("documents.bulk_edit.chord")
+    @mock.patch("documents.bulk_edit.group")
+    @mock.patch("documents.tasks.consume_file.s")
+    @mock.patch("documents.bulk_edit.tempfile.mkdtemp")
+    @mock.patch("pikepdf.open")
+    def test_remove_password_deletes_original(
+        self,
+        mock_open: mock.Mock,
+        mock_mkdtemp: mock.Mock,
+        mock_consume_file: mock.Mock,
+        mock_group: mock.Mock,
+        mock_chord: mock.Mock,
+        mock_delete: mock.Mock,
+    ) -> None:
+        doc = self.doc2
+        temp_dir = self.dirs.scratch_dir / "remove-password-delete"
+        temp_dir.mkdir(parents=True, exist_ok=True)
+        mock_mkdtemp.return_value = str(temp_dir)
+
+        fake_pdf = mock.MagicMock()
+        fake_pdf.pages = [mock.Mock(), mock.Mock()]
+
+        def save_side_effect(target_path: Path) -> None:
+            target_path.write_bytes(b"password removed")
+
+        fake_pdf.save.side_effect = save_side_effect
+        mock_open.return_value.__enter__.return_value = fake_pdf
+        mock_chord.return_value.delay.return_value = None
+
+        result = bulk_edit.remove_password(
+            [doc.id],
+            password="secret",
+            include_metadata=False,
+            update_document=False,
+            delete_original=True,
+        )
+
+        self.assertEqual(result, "OK")
+        mock_open.assert_called_once_with(doc.source_path, password="secret")
+        mock_consume_file.assert_called_once()
+        mock_group.assert_not_called()
+        mock_chord.assert_called_once()
+        mock_chord.return_value.delay.assert_called_once()
+        mock_delete.si.assert_called_once_with([doc.id])
+
+    @mock.patch("pikepdf.open")
+    def test_remove_password_open_failure(self, mock_open: mock.Mock) -> None:
+        mock_open.side_effect = RuntimeError("wrong password")
+
+        with self.assertLogs("paperless.bulk_edit", level="ERROR") as cm:
+            with self.assertRaises(ValueError) as exc:
+                bulk_edit.remove_password([self.doc1.id], password="secret")
+
+        self.assertIn("wrong password", str(exc.exception))
+        self.assertIn("Error removing password from document", cm.output[0])

@@ -9,17 +9,22 @@
   </div>
   <div class="modal-body">
     <div class="row">
-      <div class="col-md-4">
+      <div class="col-md-6">
         <pngx-input-text [horizontal]="true" i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-4">
         <pngx-input-select [horizontal]="true" i18n-title title="Account" [items]="accounts" formControlName="account"></pngx-input-select>
-      </div>
-      <div class="col-md-3">
-        <pngx-input-number [horizontal]="true" i18n-title title="Order" formControlName="order" [showAdd]="false" [error]="error?.order"></pngx-input-number>
       </div>
       <div class="col-md-2 pt-2">
         <pngx-input-switch [horizontal]="true" i18n-title title="Enabled" formControlName="enabled"></pngx-input-switch>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <pngx-input-number [horizontal]="true" i18n-title title="Order" formControlName="order" [showAdd]="false" [error]="error?.order"></pngx-input-number>
+      </div>
+      <div class="col-md-6">
+        <pngx-input-switch [horizontal]="true" i18n-title title="Stop further processing" formControlName="stop_processing" i18n-hint hint="Stop processing further rules if this rule queues any document(s)."></pngx-input-switch>
       </div>
     </div>
     <hr class="mt-0"/>

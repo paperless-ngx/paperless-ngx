@@ -137,6 +137,12 @@ const LANGUAGE_OPTIONS = [
     dateInputFormat: 'yyyy.mm.dd',
   },
   {
+    code: 'id-id',
+    name: $localize`Indonesian`,
+    englishName: 'Indonesian',
+    dateInputFormat: 'dd-mm-yyyy',
+  },
+  {
     code: 'it-it',
     name: $localize`Italian`,
     englishName: 'Italian',
@@ -690,6 +696,19 @@ export class SettingsService {
   updateSidebarViewsSort(sidebarViews: SavedView[]): Observable<any> {
     this.set(SETTINGS_KEYS.SIDEBAR_VIEWS_SORT_ORDER, [
       ...new Set(sidebarViews.map((v) => v.id)),
+    ])
+    return this.storeSettings()
+  }
+
+  updateSavedViewsVisibility(
+    dashboardVisibleViewIds: number[],
+    sidebarVisibleViewIds: number[]
+  ): Observable<any> {
+    this.set(SETTINGS_KEYS.DASHBOARD_VIEWS_VISIBLE_IDS, [
+      ...new Set(dashboardVisibleViewIds),
+    ])
+    this.set(SETTINGS_KEYS.SIDEBAR_VIEWS_VISIBLE_IDS, [
+      ...new Set(sidebarVisibleViewIds),
     ])
     return this.storeSettings()
   }

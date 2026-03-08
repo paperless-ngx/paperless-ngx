@@ -167,17 +167,6 @@ def settings_values_check(app_configs, **kwargs):
             )
         return msgs
 
-    def _barcode_scanner_validate():
-        """
-        Validates the barcode scanner type
-        """
-        msgs = []
-        if settings.CONSUMER_BARCODE_SCANNER not in ["PYZBAR", "ZXING"]:
-            msgs.append(
-                Error(f'Invalid Barcode Scanner "{settings.CONSUMER_BARCODE_SCANNER}"'),
-            )
-        return msgs
-
     def _email_certificate_validate():
         msgs = []
         # Existence checks
@@ -195,7 +184,6 @@ def settings_values_check(app_configs, **kwargs):
     return (
         _ocrmypdf_settings_check()
         + _timezone_validate()
-        + _barcode_scanner_validate()
         + _email_certificate_validate()
     )
 
@@ -214,3 +202,98 @@ def audit_log_check(app_configs, **kwargs):
         )
 
     return result
+
+
+@register()
+def check_v3_minimum_upgrade_version(
+    app_configs: object,
+    **kwargs: object,
+) -> list[Error]:
+    """Enforce that upgrades to v3 must start from v2.20.9.
+
+    v3 squashes all prior migrations into 0001_squashed and 0002_squashed.
+    If a user skips v2.20.9, the data migration in 1075_workflowaction_order
+    never runs and the squash may apply schema changes against an incomplete
+    database state.
+    """
+    from django.db import DatabaseError
+    from django.db import OperationalError
+
+    try:
+        all_tables = connections["default"].introspection.table_names()
+
+        if "django_migrations" not in all_tables:
+            return []
+
+        with connections["default"].cursor() as cursor:
+            cursor.execute(
+                "SELECT name FROM django_migrations WHERE app = %s",
+                ["documents"],
+            )
+            applied: set[str] = {row[0] for row in cursor.fetchall()}
+
+        if not applied:
+            return []
+
+        # Already in a valid v3 state
+        if {"0001_squashed", "0002_squashed"} & applied:
+            return []
+
+        # On v2.20.9 exactly — squash will pick up cleanly from here
+        if "1075_workflowaction_order" in applied:
+            return []
+
+    except (DatabaseError, OperationalError):
+        return []
+
+    return [
+        Error(
+            "Cannot upgrade to Paperless-ngx v3 from this version.",
+            hint=(
+                "Upgrading to v3 can only be performed from v2.20.9."
+                "Please upgrade to v2.20.9, run migrations, then upgrade to v3."
+                "See https://docs.paperless-ngx.com/setup/#upgrading for details."
+            ),
+            id="paperless.E002",
+        ),
+    ]
+
+
+@register()
+def check_deprecated_db_settings(
+    app_configs: object,
+    **kwargs: object,
+) -> list[Warning]:
+    """Check for deprecated database environment variables.
+
+    Detects legacy advanced options that should be migrated to
+    PAPERLESS_DB_OPTIONS. Returns one Warning per deprecated variable found.
+    """
+    deprecated_vars: dict[str, str] = {
+        "PAPERLESS_DB_TIMEOUT": "timeout",
+        "PAPERLESS_DB_POOLSIZE": "pool.min_size / pool.max_size",
+        "PAPERLESS_DBSSLMODE": "sslmode",
+        "PAPERLESS_DBSSLROOTCERT": "sslrootcert",
+        "PAPERLESS_DBSSLCERT": "sslcert",
+        "PAPERLESS_DBSSLKEY": "sslkey",
+    }
+
+    warnings: list[Warning] = []
+
+    for var_name, db_option_key in deprecated_vars.items():
+        if not os.getenv(var_name):
+            continue
+        warnings.append(
+            Warning(
+                f"Deprecated environment variable: {var_name}",
+                hint=(
+                    f"{var_name} is no longer supported and will be removed in v3.2. "
+                    f"Set the equivalent option via PAPERLESS_DB_OPTIONS instead. "
+                    f'Example: PAPERLESS_DB_OPTIONS=\'{{"{db_option_key}": "<value>"}}\'. '
+                    "See https://docs.paperless-ngx.com/migration/ for the full reference."
+                ),
+                id="paperless.W001",
+            ),
+        )
+
+    return warnings

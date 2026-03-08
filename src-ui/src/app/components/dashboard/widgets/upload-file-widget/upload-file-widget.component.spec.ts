@@ -9,6 +9,7 @@ import {
 import { By } from '@angular/platform-browser'
 import { RouterTestingModule } from '@angular/router/testing'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { provideUiTour } from 'ngx-ui-tour-ng-bootstrap'
 import { routes } from 'src/app/app-routing.module'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { PermissionsService } from 'src/app/services/permissions.service'
@@ -61,6 +62,7 @@ describe('UploadFileWidgetComponent', () => {
         },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
+        provideUiTour(),
       ],
     }).compileComponents()
 

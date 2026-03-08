@@ -1,5 +1,7 @@
 import email
 import email.contentmanager
+import shutil
+import subprocess
 import tempfile
 from email.message import Message
 from email.mime.application import MIMEApplication
@@ -19,7 +21,7 @@ from paperless_mail.tests.test_mail import _AttachmentDef
 
 
 class MessageEncryptor:
-    def __init__(self):
+    def __init__(self) -> None:
         self.gpg_home = tempfile.mkdtemp()
         self.gpg = gnupg.GPG(gnupghome=self.gpg_home)
         self._testUser = "testuser@example.com"
@@ -33,6 +35,30 @@ class MessageEncryptor:
             no_protection=True,
         )
         self.gpg.gen_key(input_data)
+
+    def cleanup(self) -> None:
+        """
+        Kill the gpg-agent process and clean up the temporary GPG home directory.
+
+        This uses gpgconf to properly terminate the agent, which is the officially
+        recommended cleanup method from the GnuPG project. python-gnupg does not
+        provide built-in cleanup methods as it's only a wrapper around the gpg CLI.
+        """
+        # Kill the gpg-agent using the official GnuPG cleanup tool
+        try:
+            subprocess.run(
+                ["gpgconf", "--kill", "gpg-agent"],
+                env={"GNUPGHOME": self.gpg_home},
+                check=False,
+                capture_output=True,
+                timeout=5,
+            )
+        except (FileNotFoundError, subprocess.TimeoutExpired):
+            # gpgconf not found or hung - agent will timeout eventually
+            pass
+
+        # Clean up the temporary directory
+        shutil.rmtree(self.gpg_home, ignore_errors=True)
 
     @staticmethod
     def get_email_body_without_headers(email_message: Message) -> bytes:
@@ -85,42 +111,54 @@ class MessageEncryptor:
 
 
 class TestMailMessageGpgDecryptor(TestMail):
-    def setUp(self):
-        self.messageEncryptor = MessageEncryptor()
+    @classmethod
+    def setUpClass(cls) -> None:
+        """Create GPG encryptor once for all tests in this class."""
+        super().setUpClass()
+        cls.messageEncryptor = MessageEncryptor()
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        """Clean up GPG resources after all tests complete."""
+        if hasattr(cls, "messageEncryptor"):
+            cls.messageEncryptor.cleanup()
+        super().tearDownClass()
+
+    def setUp(self) -> None:
         with override_settings(
             EMAIL_GNUPG_HOME=self.messageEncryptor.gpg_home,
             EMAIL_ENABLE_GPG_DECRYPTOR=True,
         ):
             super().setUp()
 
-    def test_preprocessor_is_able_to_run(self):
+    def test_preprocessor_is_able_to_run(self) -> None:
         with override_settings(
             EMAIL_GNUPG_HOME=self.messageEncryptor.gpg_home,
             EMAIL_ENABLE_GPG_DECRYPTOR=True,
         ):
             self.assertTrue(MailMessageDecryptor.able_to_run())
 
-    def test_preprocessor_is_able_to_run2(self):
+    def test_preprocessor_is_able_to_run2(self) -> None:
         with override_settings(
             EMAIL_GNUPG_HOME=None,
             EMAIL_ENABLE_GPG_DECRYPTOR=True,
         ):
             self.assertTrue(MailMessageDecryptor.able_to_run())
 
-    def test_is_not_able_to_run_disabled(self):
+    def test_is_not_able_to_run_disabled(self) -> None:
         with override_settings(
             EMAIL_ENABLE_GPG_DECRYPTOR=False,
         ):
             self.assertFalse(MailMessageDecryptor.able_to_run())
 
-    def test_is_not_able_to_run_bogus_path(self):
+    def test_is_not_able_to_run_bogus_path(self) -> None:
         with override_settings(
             EMAIL_ENABLE_GPG_DECRYPTOR=True,
             EMAIL_GNUPG_HOME="_)@# notapath &%#$",
         ):
             self.assertFalse(MailMessageDecryptor.able_to_run())
 
-    def test_fails_at_initialization(self):
+    def test_fails_at_initialization(self) -> None:
         with (
             mock.patch("gnupg.GPG.__init__") as mock_run,
             override_settings(
@@ -136,17 +174,32 @@ class TestMailMessageGpgDecryptor(TestMail):
             handler = MailAccountHandler()
             self.assertEqual(len(handler._message_preprocessors), 0)
 
-    def test_decrypt_fails(self):
+    def test_decrypt_fails(self) -> None:
         encrypted_message, _ = self.create_encrypted_unencrypted_message_pair()
+        # This test creates its own empty GPG home to test decryption failure
         empty_gpg_home = tempfile.mkdtemp()
-        with override_settings(
-            EMAIL_ENABLE_GPG_DECRYPTOR=True,
-            EMAIL_GNUPG_HOME=empty_gpg_home,
-        ):
-            message_decryptor = MailMessageDecryptor()
-            self.assertRaises(Exception, message_decryptor.run, encrypted_message)
+        try:
+            with override_settings(
+                EMAIL_ENABLE_GPG_DECRYPTOR=True,
+                EMAIL_GNUPG_HOME=empty_gpg_home,
+            ):
+                message_decryptor = MailMessageDecryptor()
+                self.assertRaises(Exception, message_decryptor.run, encrypted_message)
+        finally:
+            # Clean up the temporary GPG home used only by this test
+            try:
+                subprocess.run(
+                    ["gpgconf", "--kill", "gpg-agent"],
+                    env={"GNUPGHOME": empty_gpg_home},
+                    check=False,
+                    capture_output=True,
+                    timeout=5,
+                )
+            except (FileNotFoundError, subprocess.TimeoutExpired):
+                pass
+            shutil.rmtree(empty_gpg_home, ignore_errors=True)
 
-    def test_decrypt_encrypted_mail(self):
+    def test_decrypt_encrypted_mail(self) -> None:
         """
         Creates a mail with attachments. Then encrypts it with a new key.
         Verifies that this encrypted message can be decrypted with attachments intact.
@@ -188,7 +241,7 @@ class TestMailMessageGpgDecryptor(TestMail):
         encrypted_message = self.messageEncryptor.encrypt(message)
         return encrypted_message, message
 
-    def test_handle_encrypted_message(self):
+    def test_handle_encrypted_message(self) -> None:
         message = self.mailMocker.messageBuilder.create_message(
             subject="the message title",
             from_="Myself",

@@ -12,6 +12,7 @@ import { of, throwError } from 'rxjs'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { PngxPdfViewerComponent } from '../pdf-viewer/pdf-viewer.component'
 import { PreviewPopupComponent } from './preview-popup.component'
 
 const doc = {
@@ -78,7 +79,7 @@ describe('PreviewPopupComponent', () => {
     component.popover.open()
     fixture.detectChanges()
     expect(fixture.debugElement.query(By.css('object'))).toBeNull()
-    expect(fixture.debugElement.query(By.css('pdf-viewer'))).not.toBeNull()
+    expect(fixture.debugElement.query(By.css('pngx-pdf-viewer'))).not.toBeNull()
   })
 
   it('should show lock icon on password error', () => {
@@ -159,23 +160,15 @@ describe('PreviewPopupComponent', () => {
     expect(component.popover.isOpen()).toBeFalsy()
   })
 
-  it('should dispatch find event on viewer loaded if searchQuery set', () => {
+  it('should pass searchQuery to viewer', () => {
     documentService.searchQuery = 'test'
     settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, false)
     component.popover.open()
-    jest.advanceTimersByTime(1000)
     fixture.detectChanges()
-    // normally setup by pdf-viewer
-    jest.replaceProperty(component.pdfViewer, 'eventBus', {
-      dispatch: jest.fn(),
-    } as any)
-    const dispatchSpy = jest.spyOn(component.pdfViewer.eventBus, 'dispatch')
-    component.onPageRendered()
-    expect(dispatchSpy).toHaveBeenCalledWith('find', {
-      query: 'test',
-      caseSensitive: false,
-      highlightAll: true,
-      phraseSearch: true,
-    })
+    const viewer = fixture.debugElement.query(
+      By.directive(PngxPdfViewerComponent)
+    )
+    expect(viewer).not.toBeNull()
+    expect(viewer.componentInstance.searchQuery).toBe('test')
   })
 })

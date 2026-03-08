@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 from asgiref.sync import async_to_sync
 from channels.exceptions import AcceptConnection
@@ -34,21 +35,28 @@ class StatusConsumer(WebsocketConsumer):
             )
             raise AcceptConnection
 
-    def disconnect(self, close_code):
+    def disconnect(self, close_code) -> None:
         async_to_sync(self.channel_layer.group_discard)(
             "status_updates",
             self.channel_name,
         )
 
-    def status_update(self, event):
+    def status_update(self, event) -> None:
         if not self._authenticated():
             self.close()
         else:
             if self._can_view(event["data"]):
                 self.send(json.dumps(event))
 
-    def documents_deleted(self, event):
+    def documents_deleted(self, event) -> None:
         if not self._authenticated():
             self.close()
         else:
             self.send(json.dumps(event))
+
+    def document_updated(self, event: Any) -> None:
+        if not self._authenticated():
+            self.close()
+        else:
+            if self._can_view(event["data"]):
+                self.send(json.dumps(event))

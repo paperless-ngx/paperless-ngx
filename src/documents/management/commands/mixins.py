@@ -21,33 +21,13 @@ class CryptFields(TypedDict):
     fields: list[str]
 
 
-class MultiProcessMixin:
-    """
-    Small class to handle adding an argument and validating it
-    for the use of multiple processes
-    """
-
-    def add_argument_processes_mixin(self, parser: ArgumentParser):
-        parser.add_argument(
-            "--processes",
-            default=max(1, os.cpu_count() // 4),
-            type=int,
-            help="Number of processes to distribute work amongst",
-        )
-
-    def handle_processes_mixin(self, *args, **options):
-        self.process_count = options["processes"]
-        if self.process_count < 1:
-            raise CommandError("There must be at least 1 process")
-
-
 class ProgressBarMixin:
     """
     Many commands use a progress bar, which can be disabled
     via this class
     """
 
-    def add_argument_progress_bar_mixin(self, parser: ArgumentParser):
+    def add_argument_progress_bar_mixin(self, parser: ArgumentParser) -> None:
         parser.add_argument(
             "--no-progress-bar",
             default=False,
@@ -55,7 +35,7 @@ class ProgressBarMixin:
             help="If set, the progress bar will not be shown",
         )
 
-    def handle_progress_bar_mixin(self, *args, **options):
+    def handle_progress_bar_mixin(self, *args, **options) -> None:
         self.no_progress_bar = options["no_progress_bar"]
         self.use_progress_bar = not self.no_progress_bar
 
@@ -91,7 +71,7 @@ class CryptMixin:
     key_size = 32
     kdf_algorithm = "pbkdf2_sha256"
 
-    CRYPT_FIELDS: CryptFields = [
+    CRYPT_FIELDS: list[CryptFields] = [
         {
             "exporter_key": "mail_accounts",
             "model_name": "paperless_mail.mailaccount",
@@ -109,6 +89,10 @@ class CryptMixin:
             ],
         },
     ]
+    # O(1) lookup for per-record encryption; derived from CRYPT_FIELDS at class definition time
+    CRYPT_FIELDS_BY_MODEL: dict[str, list[str]] = {
+        cfg["model_name"]: cfg["fields"] for cfg in CRYPT_FIELDS
+    }
 
     def get_crypt_params(self) -> dict[str, dict[str, str | int]]:
         return {
@@ -120,7 +104,7 @@ class CryptMixin:
             },
         }
 
-    def load_crypt_params(self, metadata: dict):
+    def load_crypt_params(self, metadata: dict) -> None:
         # Load up the values for setting up decryption
         self.kdf_algorithm: str = metadata[EXPORTER_CRYPTO_SETTINGS_NAME][
             EXPORTER_CRYPTO_ALGO_NAME
@@ -135,7 +119,7 @@ class CryptMixin:
             EXPORTER_CRYPTO_SALT_NAME
         ]
 
-    def setup_crypto(self, *, passphrase: str, salt: str | None = None):
+    def setup_crypto(self, *, passphrase: str, salt: str | None = None) -> None:
         """
         Constructs a class for encryption or decryption using the specified passphrase and salt
 

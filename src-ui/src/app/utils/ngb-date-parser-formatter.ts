@@ -106,15 +106,25 @@ export class LocalizedDateParserFormatter extends NgbDateParserFormatter {
     value = this.preformatDateInput(value)
     let match = this.getDateParseRegex().exec(value)
     if (match) {
+      const currentYear = new Date().getFullYear()
+      const currentCentury = currentYear - (currentYear % 100)
+
+      let year = +match.groups.year
+      if (year < 100) {
+        let fourDigitYear = currentCentury + year
+        // Mimic python-dateutil: keep result within -50/+49 years of current year
+        if (fourDigitYear > currentYear + 49) {
+          fourDigitYear -= 100
+        } else if (fourDigitYear <= currentYear - 50) {
+          fourDigitYear += 100
+        }
+        year = fourDigitYear
+      }
+
       let dateStruct = {
         day: +match.groups.day,
         month: +match.groups.month,
-        year: +match.groups.year,
-      }
-      if (dateStruct.year <= new Date().getFullYear() - 2000) {
-        dateStruct.year += 2000
-      } else if (dateStruct.year < 100) {
-        dateStruct.year += 1900
+        year,
       }
       return dateStruct
     } else {

@@ -29,7 +29,7 @@ class DocumentWrapper:
 
 
 class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.user = User.objects.create_superuser(username="temp_admin")
@@ -167,7 +167,7 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
         reference_predicate: Callable[[DocumentWrapper], bool],
         *,
         match_nothing_ok=False,
-    ):
+    ) -> None:
         """
         Checks the results of the query against a callable reference predicate.
         """
@@ -208,7 +208,7 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
         ]
         self.assertEqual(reference_document_ids, response_document_ids)
 
-    def _assert_validation_error(self, query: str, path: list, keyword: str):
+    def _assert_validation_error(self, query: str, path: list, keyword: str) -> None:
         """
         Asserts that the query raises a validation error.
         Checks the message to make sure it points to the right place.
@@ -240,7 +240,7 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
     # ==========================================================#
     # Sanity checks                                             #
     # ==========================================================#
-    def test_name_value_association(self):
+    def test_name_value_association(self) -> None:
         """
         GIVEN:
             - A document with `{"string_field": "https://docs.paperless-ngx.com/",
@@ -252,11 +252,13 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
         """
         self._assert_query_match_predicate(
             ["url_field", "exact", "https://docs.paperless-ngx.com/"],
-            lambda document: "url_field" in document
-            and document["url_field"] == "https://docs.paperless-ngx.com/",
+            lambda document: (
+                "url_field" in document
+                and document["url_field"] == "https://docs.paperless-ngx.com/"
+            ),
         )
 
-    def test_filter_by_multiple_fields(self):
+    def test_filter_by_multiple_fields(self) -> None:
         """
         GIVEN:
             - A document with `{"string_field": "https://docs.paperless-ngx.com/",
@@ -274,220 +276,259 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
     # ==========================================================#
     # Basic expressions supported by all custom field types     #
     # ==========================================================#
-    def test_exact(self):
+    def test_exact(self) -> None:
         self._assert_query_match_predicate(
             ["string_field", "exact", "paperless"],
-            lambda document: "string_field" in document
-            and document["string_field"] == "paperless",
+            lambda document: (
+                "string_field" in document and document["string_field"] == "paperless"
+            ),
         )
 
-    def test_in(self):
+    def test_in(self) -> None:
         self._assert_query_match_predicate(
             ["string_field", "in", ["paperless", "Paperless"]],
-            lambda document: "string_field" in document
-            and document["string_field"] in ("paperless", "Paperless"),
+            lambda document: (
+                "string_field" in document
+                and document["string_field"] in ("paperless", "Paperless")
+            ),
         )
 
-    def test_isnull(self):
+    def test_isnull(self) -> None:
         self._assert_query_match_predicate(
             ["string_field", "isnull", True],
-            lambda document: "string_field" in document
-            and document["string_field"] is None,
+            lambda document: (
+                "string_field" in document and document["string_field"] is None
+            ),
         )
 
-    def test_exists(self):
+    def test_exists(self) -> None:
         self._assert_query_match_predicate(
             ["string_field", "exists", True],
             lambda document: "string_field" in document,
         )
 
-    def test_exists_false(self):
+    def test_exists_false(self) -> None:
         self._assert_query_match_predicate(
             ["string_field", "exists", False],
             lambda document: "string_field" not in document,
         )
 
-    def test_select(self):
+    def test_select(self) -> None:
         # For select fields, you can either specify the id of the option
         # or the name of the option. They function exactly the same.
         self._assert_query_match_predicate(
             ["select_field", "exact", "def-456"],
-            lambda document: "select_field" in document
-            and document["select_field"] == "def-456",
+            lambda document: (
+                "select_field" in document and document["select_field"] == "def-456"
+            ),
         )
         # This is the same as:
         self._assert_query_match_predicate(
             ["select_field", "exact", "B"],
-            lambda document: "select_field" in document
-            and document["select_field"] == "def-456",
+            lambda document: (
+                "select_field" in document and document["select_field"] == "def-456"
+            ),
         )
 
     # ==========================================================#
     # Expressions for string, URL, and monetary fields          #
     # ==========================================================#
-    def test_icontains(self):
+    def test_icontains(self) -> None:
         self._assert_query_match_predicate(
             ["string_field", "icontains", "aper"],
-            lambda document: "string_field" in document
-            and document["string_field"] is not None
-            and "aper" in document["string_field"].lower(),
+            lambda document: (
+                "string_field" in document
+                and document["string_field"] is not None
+                and "aper" in document["string_field"].lower()
+            ),
         )
 
-    def test_istartswith(self):
+    def test_istartswith(self) -> None:
         self._assert_query_match_predicate(
             ["string_field", "istartswith", "paper"],
-            lambda document: "string_field" in document
-            and document["string_field"] is not None
-            and document["string_field"].lower().startswith("paper"),
+            lambda document: (
+                "string_field" in document
+                and document["string_field"] is not None
+                and document["string_field"].lower().startswith("paper")
+            ),
         )
 
-    def test_iendswith(self):
+    def test_iendswith(self) -> None:
         self._assert_query_match_predicate(
             ["string_field", "iendswith", "less"],
-            lambda document: "string_field" in document
-            and document["string_field"] is not None
-            and document["string_field"].lower().endswith("less"),
+            lambda document: (
+                "string_field" in document
+                and document["string_field"] is not None
+                and document["string_field"].lower().endswith("less")
+            ),
         )
 
-    def test_url_field_istartswith(self):
+    def test_url_field_istartswith(self) -> None:
         # URL fields supports all of the expressions above.
         # Just showing one of them here.
         self._assert_query_match_predicate(
             ["url_field", "istartswith", "http://"],
-            lambda document: "url_field" in document
-            and document["url_field"] is not None
-            and document["url_field"].startswith("http://"),
+            lambda document: (
+                "url_field" in document
+                and document["url_field"] is not None
+                and document["url_field"].startswith("http://")
+            ),
         )
 
     # ==========================================================#
     # Arithmetic comparisons                                    #
     # ==========================================================#
-    def test_gt(self):
+    def test_gt(self) -> None:
         self._assert_query_match_predicate(
             ["date_field", "gt", date(2024, 8, 22).isoformat()],
-            lambda document: "date_field" in document
-            and document["date_field"] is not None
-            and document["date_field"] > date(2024, 8, 22),
+            lambda document: (
+                "date_field" in document
+                and document["date_field"] is not None
+                and document["date_field"] > date(2024, 8, 22)
+            ),
         )
 
-    def test_gte(self):
+    def test_gte(self) -> None:
         self._assert_query_match_predicate(
             ["date_field", "gte", date(2024, 8, 22).isoformat()],
-            lambda document: "date_field" in document
-            and document["date_field"] is not None
-            and document["date_field"] >= date(2024, 8, 22),
+            lambda document: (
+                "date_field" in document
+                and document["date_field"] is not None
+                and document["date_field"] >= date(2024, 8, 22)
+            ),
         )
 
-    def test_lt(self):
+    def test_lt(self) -> None:
         self._assert_query_match_predicate(
             ["integer_field", "lt", 0],
-            lambda document: "integer_field" in document
-            and document["integer_field"] is not None
-            and document["integer_field"] < 0,
+            lambda document: (
+                "integer_field" in document
+                and document["integer_field"] is not None
+                and document["integer_field"] < 0
+            ),
         )
 
-    def test_lte(self):
+    def test_lte(self) -> None:
         self._assert_query_match_predicate(
             ["integer_field", "lte", 0],
-            lambda document: "integer_field" in document
-            and document["integer_field"] is not None
-            and document["integer_field"] <= 0,
+            lambda document: (
+                "integer_field" in document
+                and document["integer_field"] is not None
+                and document["integer_field"] <= 0
+            ),
         )
 
-    def test_range(self):
+    def test_range(self) -> None:
         self._assert_query_match_predicate(
             ["float_field", "range", [-0.05, 0.05]],
-            lambda document: "float_field" in document
-            and document["float_field"] is not None
-            and -0.05 <= document["float_field"] <= 0.05,
+            lambda document: (
+                "float_field" in document
+                and document["float_field"] is not None
+                and -0.05 <= document["float_field"] <= 0.05
+            ),
         )
 
-    def test_date_modifier(self):
+    def test_date_modifier(self) -> None:
         # For date fields you can optionally prefix the operator
         # with the part of the date you are comparing with.
         self._assert_query_match_predicate(
             ["date_field", "year__gte", 2024],
-            lambda document: "date_field" in document
-            and document["date_field"] is not None
-            and document["date_field"].year >= 2024,
+            lambda document: (
+                "date_field" in document
+                and document["date_field"] is not None
+                and document["date_field"].year >= 2024
+            ),
         )
 
-    def test_gt_monetary(self):
+    def test_gt_monetary(self) -> None:
         self._assert_query_match_predicate(
             ["monetary_field", "gt", "99"],
-            lambda document: "monetary_field" in document
-            and document["monetary_field"] is not None
-            and (
-                document["monetary_field"] == "USD100.00"  # With currency symbol
-                or document["monetary_field"] == "101.00"  # No currency symbol
+            lambda document: (
+                "monetary_field" in document
+                and document["monetary_field"] is not None
+                and (
+                    document["monetary_field"] == "USD100.00"  # With currency symbol
+                    or document["monetary_field"] == "101.00"  # No currency symbol
+                )
             ),
         )
 
     # ==========================================================#
     # Subset check (document link field only)                   #
     # ==========================================================#
-    def test_document_link_contains(self):
+    def test_document_link_contains(self) -> None:
         # Document link field "contains" performs a subset check.
         self._assert_query_match_predicate(
             ["documentlink_field", "contains", [1, 2]],
-            lambda document: "documentlink_field" in document
-            and document["documentlink_field"] is not None
-            and set(document["documentlink_field"]) >= {1, 2},
+            lambda document: (
+                "documentlink_field" in document
+                and document["documentlink_field"] is not None
+                and set(document["documentlink_field"]) >= {1, 2}
+            ),
         )
         # The order of IDs don't matter - this is the same as above.
         self._assert_query_match_predicate(
             ["documentlink_field", "contains", [2, 1]],
-            lambda document: "documentlink_field" in document
-            and document["documentlink_field"] is not None
-            and set(document["documentlink_field"]) >= {1, 2},
+            lambda document: (
+                "documentlink_field" in document
+                and document["documentlink_field"] is not None
+                and set(document["documentlink_field"]) >= {1, 2}
+            ),
         )
 
-    def test_document_link_contains_empty_set(self):
+    def test_document_link_contains_empty_set(self) -> None:
         # An empty set is a subset of any set.
         self._assert_query_match_predicate(
             ["documentlink_field", "contains", []],
-            lambda document: "documentlink_field" in document
-            and document["documentlink_field"] is not None,
+            lambda document: (
+                "documentlink_field" in document
+                and document["documentlink_field"] is not None
+            ),
         )
 
-    def test_document_link_contains_no_reverse_link(self):
+    def test_document_link_contains_no_reverse_link(self) -> None:
         # An edge case is that the document in the value list
         # doesn't have a document link field and thus has no reverse link.
         self._assert_query_match_predicate(
             ["documentlink_field", "contains", [self.documents[6].id]],
-            lambda document: "documentlink_field" in document
-            and document["documentlink_field"] is not None
-            and set(document["documentlink_field"]) >= {self.documents[6].id},
+            lambda document: (
+                "documentlink_field" in document
+                and document["documentlink_field"] is not None
+                and set(document["documentlink_field"]) >= {self.documents[6].id}
+            ),
             match_nothing_ok=True,
         )
 
     # ==========================================================#
     # Logical expressions                                       #
     # ==========================================================#
-    def test_logical_and(self):
+    def test_logical_and(self) -> None:
         self._assert_query_match_predicate(
             [
                 "AND",
                 [["date_field", "year__exact", 2024], ["date_field", "month__lt", 9]],
             ],
-            lambda document: "date_field" in document
-            and document["date_field"] is not None
-            and document["date_field"].year == 2024
-            and document["date_field"].month < 9,
+            lambda document: (
+                "date_field" in document
+                and document["date_field"] is not None
+                and document["date_field"].year == 2024
+                and document["date_field"].month < 9
+            ),
         )
 
-    def test_logical_or(self):
+    def test_logical_or(self) -> None:
         # This is also the recommend way to check for "empty" text, URL, and monetary fields.
         self._assert_query_match_predicate(
             [
                 "OR",
                 [["string_field", "exact", ""], ["string_field", "isnull", True]],
             ],
-            lambda document: "string_field" in document
-            and not bool(document["string_field"]),
+            lambda document: (
+                "string_field" in document and not bool(document["string_field"])
+            ),
         )
 
-    def test_logical_not(self):
+    def test_logical_not(self) -> None:
         # This means `NOT ((document has string_field) AND (string_field iexact "paperless"))`,
         # not `(document has string_field) AND (NOT (string_field iexact "paperless"))`!
         self._assert_query_match_predicate(
@@ -495,8 +536,11 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
                 "NOT",
                 ["string_field", "exact", "paperless"],
             ],
-            lambda document: not (
-                "string_field" in document and document["string_field"] == "paperless"
+            lambda document: (
+                not (
+                    "string_field" in document
+                    and document["string_field"] == "paperless"
+                )
             ),
         )
 
@@ -504,63 +548,63 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
     # Tests for invalid queries                                 #
     # ==========================================================#
 
-    def test_invalid_json(self):
+    def test_invalid_json(self) -> None:
         self._assert_validation_error(
             "not valid json",
             ["custom_field_query"],
             "must be valid JSON",
         )
 
-    def test_invalid_expression(self):
+    def test_invalid_expression(self) -> None:
         self._assert_validation_error(
             json.dumps("valid json but not valid expr"),
             ["custom_field_query"],
             "Invalid custom field query expression",
         )
 
-    def test_invalid_custom_field_name(self):
+    def test_invalid_custom_field_name(self) -> None:
         self._assert_validation_error(
             json.dumps(["invalid name", "iexact", "foo"]),
             ["custom_field_query", "0"],
             "is not a valid custom field",
         )
 
-    def test_invalid_operator(self):
+    def test_invalid_operator(self) -> None:
         self._assert_validation_error(
             json.dumps(["integer_field", "iexact", "foo"]),
             ["custom_field_query", "1"],
             "does not support query expr",
         )
 
-    def test_invalid_value(self):
+    def test_invalid_value(self) -> None:
         self._assert_validation_error(
             json.dumps(["select_field", "exact", []]),
             ["custom_field_query", "2"],
             "string",
         )
 
-    def test_invalid_logical_operator(self):
+    def test_invalid_logical_operator(self) -> None:
         self._assert_validation_error(
             json.dumps(["invalid op", ["integer_field", "gt", 0]]),
             ["custom_field_query", "0"],
             "Invalid logical operator",
         )
 
-    def test_invalid_expr_list(self):
+    def test_invalid_expr_list(self) -> None:
         self._assert_validation_error(
             json.dumps(["AND", "not a list"]),
             ["custom_field_query", "1"],
             "Invalid expression list",
         )
 
-    def test_invalid_operator_prefix(self):
+    def test_invalid_operator_prefix(self) -> None:
         self._assert_validation_error(
             json.dumps(["integer_field", "foo__gt", 0]),
             ["custom_field_query", "1"],
             "does not support query expr",
         )
 
-    def test_query_too_deep(self):
+    def test_query_too_deep(self) -> None:
         query = ["string_field", "exact", "paperless"]
         for _ in range(10):
             query = ["NOT", query]
@@ -570,7 +614,7 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
             "Maximum nesting depth exceeded",
         )
 
-    def test_query_too_many_atoms(self):
+    def test_query_too_many_atoms(self) -> None:
         atom = ["string_field", "exact", "paperless"]
         query = ["AND", [atom for _ in range(21)]]
         self._assert_validation_error(

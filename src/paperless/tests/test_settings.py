@@ -9,7 +9,6 @@ from celery.schedules import crontab
 from paperless.settings import _parse_base_paths
 from paperless.settings import _parse_beat_schedule
 from paperless.settings import _parse_dateparser_languages
-from paperless.settings import _parse_db_settings
 from paperless.settings import _parse_ignore_dates
 from paperless.settings import _parse_paperless_url
 from paperless.settings import _parse_redis_url
@@ -21,7 +20,7 @@ class TestIgnoreDateParsing(TestCase):
     Tests the parsing of the PAPERLESS_IGNORE_DATES setting value
     """
 
-    def _parse_checker(self, test_cases):
+    def _parse_checker(self, test_cases) -> None:
         """
         Helper function to check ignore date parsing
 
@@ -34,7 +33,7 @@ class TestIgnoreDateParsing(TestCase):
                 expected_date_set,
             )
 
-    def test_no_ignore_dates_set(self):
+    def test_no_ignore_dates_set(self) -> None:
         """
         GIVEN:
             - No ignore dates are set
@@ -43,7 +42,7 @@ class TestIgnoreDateParsing(TestCase):
         """
         self.assertSetEqual(_parse_ignore_dates(""), set())
 
-    def test_single_ignore_dates_set(self):
+    def test_single_ignore_dates_set(self) -> None:
         """
         GIVEN:
             - Ignore dates are set per certain inputs
@@ -70,7 +69,7 @@ class TestIgnoreDateParsing(TestCase):
 
 
 class TestThreadCalculation(TestCase):
-    def test_workers_threads(self):
+    def test_workers_threads(self) -> None:
         """
         GIVEN:
             - Certain CPU counts
@@ -96,7 +95,7 @@ class TestThreadCalculation(TestCase):
 
 
 class TestRedisSocketConversion(TestCase):
-    def test_redis_socket_parsing(self):
+    def test_redis_socket_parsing(self) -> None:
         """
         GIVEN:
             - Various Redis connection URI formats
@@ -160,8 +159,10 @@ class TestCeleryScheduleParsing(TestCase):
     SANITY_EXPIRE_TIME = ((7.0 * 24.0) - 1.0) * 60.0 * 60.0
     EMPTY_TRASH_EXPIRE_TIME = 23.0 * 60.0 * 60.0
     RUN_SCHEDULED_WORKFLOWS_EXPIRE_TIME = 59.0 * 60.0
+    LLM_INDEX_EXPIRE_TIME = 23.0 * 60.0 * 60.0
+    CLEANUP_EXPIRED_SHARE_BUNDLES_EXPIRE_TIME = 23.0 * 60.0 * 60.0
 
-    def test_schedule_configuration_default(self):
+    def test_schedule_configuration_default(self) -> None:
         """
         GIVEN:
             - No configured task schedules
@@ -204,11 +205,25 @@ class TestCeleryScheduleParsing(TestCase):
                     "schedule": crontab(minute="5", hour="*/1"),
                     "options": {"expires": self.RUN_SCHEDULED_WORKFLOWS_EXPIRE_TIME},
                 },
+                "Rebuild LLM index": {
+                    "task": "documents.tasks.llmindex_index",
+                    "schedule": crontab(minute=10, hour=2),
+                    "options": {
+                        "expires": self.LLM_INDEX_EXPIRE_TIME,
+                    },
+                },
+                "Cleanup expired share link bundles": {
+                    "task": "documents.tasks.cleanup_expired_share_link_bundles",
+                    "schedule": crontab(minute=0, hour=2),
+                    "options": {
+                        "expires": self.CLEANUP_EXPIRED_SHARE_BUNDLES_EXPIRE_TIME,
+                    },
+                },
             },
             schedule,
         )
 
-    def test_schedule_configuration_changed(self):
+    def test_schedule_configuration_changed(self) -> None:
         """
         GIVEN:
             - Email task is configured non-default
@@ -256,11 +271,25 @@ class TestCeleryScheduleParsing(TestCase):
                     "schedule": crontab(minute="5", hour="*/1"),
                     "options": {"expires": self.RUN_SCHEDULED_WORKFLOWS_EXPIRE_TIME},
                 },
+                "Rebuild LLM index": {
+                    "task": "documents.tasks.llmindex_index",
+                    "schedule": crontab(minute=10, hour=2),
+                    "options": {
+                        "expires": self.LLM_INDEX_EXPIRE_TIME,
+                    },
+                },
+                "Cleanup expired share link bundles": {
+                    "task": "documents.tasks.cleanup_expired_share_link_bundles",
+                    "schedule": crontab(minute=0, hour=2),
+                    "options": {
+                        "expires": self.CLEANUP_EXPIRED_SHARE_BUNDLES_EXPIRE_TIME,
+                    },
+                },
             },
             schedule,
         )
 
-    def test_schedule_configuration_disabled(self):
+    def test_schedule_configuration_disabled(self) -> None:
         """
         GIVEN:
             - Search index task is disabled
@@ -300,11 +329,25 @@ class TestCeleryScheduleParsing(TestCase):
                     "schedule": crontab(minute="5", hour="*/1"),
                     "options": {"expires": self.RUN_SCHEDULED_WORKFLOWS_EXPIRE_TIME},
                 },
+                "Rebuild LLM index": {
+                    "task": "documents.tasks.llmindex_index",
+                    "schedule": crontab(minute=10, hour=2),
+                    "options": {
+                        "expires": self.LLM_INDEX_EXPIRE_TIME,
+                    },
+                },
+                "Cleanup expired share link bundles": {
+                    "task": "documents.tasks.cleanup_expired_share_link_bundles",
+                    "schedule": crontab(minute=0, hour=2),
+                    "options": {
+                        "expires": self.CLEANUP_EXPIRED_SHARE_BUNDLES_EXPIRE_TIME,
+                    },
+                },
             },
             schedule,
         )
 
-    def test_schedule_configuration_disabled_all(self):
+    def test_schedule_configuration_disabled_all(self) -> None:
         """
         GIVEN:
             - All tasks are disabled
@@ -322,6 +365,8 @@ class TestCeleryScheduleParsing(TestCase):
                 "PAPERLESS_INDEX_TASK_CRON": "disable",
                 "PAPERLESS_EMPTY_TRASH_TASK_CRON": "disable",
                 "PAPERLESS_WORKFLOW_SCHEDULED_TASK_CRON": "disable",
+                "PAPERLESS_LLM_INDEX_TASK_CRON": "disable",
+                "PAPERLESS_SHARE_LINK_BUNDLE_CLEANUP_CRON": "disable",
             },
         ):
             schedule = _parse_beat_schedule()
@@ -332,66 +377,8 @@ class TestCeleryScheduleParsing(TestCase):
         )
 
 
-class TestDBSettings(TestCase):
-    def test_db_timeout_with_sqlite(self):
-        """
-        GIVEN:
-            - PAPERLESS_DB_TIMEOUT is set
-        WHEN:
-            - Settings are parsed
-        THEN:
-            - PAPERLESS_DB_TIMEOUT set for sqlite
-        """
-        with mock.patch.dict(
-            os.environ,
-            {
-                "PAPERLESS_DB_TIMEOUT": "10",
-            },
-        ):
-            databases = _parse_db_settings()
-
-            self.assertDictEqual(
-                {
-                    "timeout": 10.0,
-                },
-                databases["default"]["OPTIONS"],
-            )
-
-    def test_db_timeout_with_not_sqlite(self):
-        """
-        GIVEN:
-            - PAPERLESS_DB_TIMEOUT is set but db is not sqlite
-        WHEN:
-            - Settings are parsed
-        THEN:
-            - PAPERLESS_DB_TIMEOUT set correctly in non-sqlite db & for fallback sqlite db
-        """
-        with mock.patch.dict(
-            os.environ,
-            {
-                "PAPERLESS_DBHOST": "127.0.0.1",
-                "PAPERLESS_DB_TIMEOUT": "10",
-            },
-        ):
-            databases = _parse_db_settings()
-
-            self.assertDictEqual(
-                databases["default"]["OPTIONS"],
-                databases["default"]["OPTIONS"]
-                | {
-                    "connect_timeout": 10.0,
-                },
-            )
-            self.assertDictEqual(
-                {
-                    "timeout": 10.0,
-                },
-                databases["sqlite"]["OPTIONS"],
-            )
-
-
 class TestPaperlessURLSettings(TestCase):
-    def test_paperless_url(self):
+    def test_paperless_url(self) -> None:
         """
         GIVEN:
             - PAPERLESS_URL is set
@@ -415,7 +402,7 @@ class TestPaperlessURLSettings(TestCase):
 
 
 class TestPathSettings(TestCase):
-    def test_default_paths(self):
+    def test_default_paths(self) -> None:
         """
         GIVEN:
             - PAPERLESS_FORCE_SCRIPT_NAME is not set
@@ -435,7 +422,7 @@ class TestPathSettings(TestCase):
         )  # LOGOUT_REDIRECT_URL
 
     @mock.patch("os.environ", {"PAPERLESS_FORCE_SCRIPT_NAME": "/paperless"})
-    def test_subpath(self):
+    def test_subpath(self) -> None:
         """
         GIVEN:
             - PAPERLESS_FORCE_SCRIPT_NAME is set
@@ -461,7 +448,7 @@ class TestPathSettings(TestCase):
             "PAPERLESS_LOGOUT_REDIRECT_URL": "/foobar/",
         },
     )
-    def test_subpath_with_explicit_logout_url(self):
+    def test_subpath_with_explicit_logout_url(self) -> None:
         """
         GIVEN:
             - PAPERLESS_FORCE_SCRIPT_NAME is set and so is PAPERLESS_LOGOUT_REDIRECT_URL
@@ -491,5 +478,5 @@ class TestPathSettings(TestCase):
         ("en+zh-Hans+zh-Hant", ["en", "zh-Hans", "zh-Hant", "zh"]),
     ],
 )
-def test_parser_date_parser_languages(languages, expected):
+def test_parser_date_parser_languages(languages, expected) -> None:
     assert sorted(_parse_dateparser_languages(languages)) == sorted(expected)

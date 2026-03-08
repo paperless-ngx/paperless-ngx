@@ -173,7 +173,7 @@
                     <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
                   } @else {
                     <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskName.IndexOptimize)">
-                      <i-bs name="play-fill"></i-bs>&nbsp;
+                      <i-bs name="play-fill" class="me-1"></i-bs>
                       <ng-container i18n>Run Task</ng-container>
                     </button>
                   }
@@ -207,7 +207,7 @@
                     <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
                   } @else {
                     <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskName.TrainClassifier)">
-                      <i-bs name="play-fill"></i-bs>&nbsp;
+                      <i-bs name="play-fill" class="me-1"></i-bs>
                       <ng-container i18n>Run Task</ng-container>
                     </button>
                   }
@@ -241,7 +241,7 @@
                     <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
                   } @else {
                     <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskName.SanityCheck)">
-                      <i-bs name="play-fill"></i-bs>&nbsp;
+                      <i-bs name="play-fill" class="me-1"></i-bs>
                       <ng-container i18n>Run Task</ng-container>
                     </button>
                   }
@@ -266,6 +266,43 @@
                   }
                 </span>
               </dd>
+              @if (aiEnabled) {
+                <dt i18n>AI Index</dt>
+                <dd class="d-flex align-items-center">
+                  <button class="btn btn-sm d-flex align-items-center btn-dark text-uppercase small" [ngbPopover]="llmIndexStatus" triggers="click mouseenter:mouseleave">
+                    {{status.tasks.llmindex_status}}
+                    @if (status.tasks.llmindex_status === 'OK') {
+                      @if (isStale(status.tasks.llmindex_last_modified)) {
+                        <i-bs name="exclamation-triangle-fill" class="text-warning ms-2 lh-1"></i-bs>
+                      } @else {
+                        <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
+                      }
+                    } @else {
+                      <i-bs name="exclamation-triangle-fill" class="ms-2 lh-1"
+                      [class.text-danger]="status.tasks.llmindex_status === SystemStatusItemStatus.ERROR"
+                      [class.text-warning]="status.tasks.llmindex_status === SystemStatusItemStatus.WARNING"
+                      [class.text-muted]="status.tasks.llmindex_status === SystemStatusItemStatus.DISABLED"></i-bs>
+                    }
+                  </button>
+                  @if (currentUserIsSuperUser) {
+                    @if (isRunning(PaperlessTaskName.LLMIndexUpdate)) {
+                      <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
+                    } @else {
+                      <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskName.LLMIndexUpdate)">
+                        <i-bs name="play-fill" class="me-1"></i-bs>
+                        <ng-container i18n>Run Task</ng-container>
+                      </button>
+                    }
+                  }
+                </dd>
+                <ng-template #llmIndexStatus>
+                  @if (status.tasks.llmindex_status === 'OK') {
+                    <h6><ng-container i18n>Last Run</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.llmindex_last_modified | customDate:'medium'}}</span>
+                  } @else {
+                    <h6><ng-container i18n>Error</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.llmindex_error}}</span>
+                  }
+                </ng-template>
+              }
             </dl>
           </div>
         </div>
@@ -276,10 +313,10 @@
 <div class="modal-footer">
   <button class="btn btn-sm d-flex align-items-center btn-dark btn btn-sm d-flex align-items-center btn-dark btn-outline-secondary" (click)="copy()">
     @if (!copied) {
-      <i-bs name="clipboard-fill"></i-bs>&nbsp;
+      <i-bs name="clipboard-fill" class="me-1"></i-bs>
     }
     @if (copied) {
-      <i-bs name="clipboard-check-fill"></i-bs>&nbsp;
+      <i-bs name="clipboard-check-fill" class="me-1"></i-bs>
     }
     <ng-container i18n>Copy</ng-container>
   </button>

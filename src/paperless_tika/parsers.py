@@ -53,7 +53,7 @@ class TikaDocumentParser(DocumentParser):
             )
             return []
 
-    def parse(self, document_path: Path, mime_type: str, file_name=None):
+    def parse(self, document_path: Path, mime_type: str, file_name=None) -> None:
         self.log.info(f"Sending {document_path} to Tika server")
 
         try:

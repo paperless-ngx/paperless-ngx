@@ -262,6 +262,10 @@ your files differently, you can do that by adjusting the
 or using [storage paths (see below)](#storage-paths). Paperless adds the
 correct file extension e.g. `.pdf`, `.jpg` automatically.
 
+When a document has file versions, each version uses the same naming rules and
+storage path resolution as any other document file, with an added version suffix
+such as `_v1`, `_v2`, etc.
+
 This variable allows you to configure the filename (folders are allowed)
 using placeholders. For example, configuring this to
 
@@ -353,6 +357,8 @@ If paperless detects that two documents share the same filename,
 paperless will automatically append `_01`, `_02`, etc to the filename.
 This happens if all the placeholders in a filename evaluate to the same
 value.
+For versioned files, this counter is appended after the version suffix
+(for example `statement_v2_01.pdf`).
 
 If there are any errors in the placeholders included in `PAPERLESS_FILENAME_FORMAT`,
 paperless will fall back to using the default naming scheme instead.
@@ -503,7 +509,7 @@ The `datetime` filter formats a datetime string or datetime object using Python'
 See the [strftime format code documentation](https://docs.python.org/3.13/library/datetime.html#strftime-and-strptime-format-codes)
 for the possible codes and their meanings.
 
-##### Date Localization
+##### Date Localization {#date-localization}
 
 The `localize_date` filter formats a date or datetime object into a localized string using Babel internationalization.
 This takes into account the provided locale for translation. Since this must be used on a date or datetime object,
@@ -776,7 +782,6 @@ At this time, the library utilized for detection of barcodes supports the follow
 -   QR Code
 -   SQ Code
 
-You may check for updates on the [zbar library homepage](https://github.com/mchehab/zbar).
 For usage in Paperless, the type of barcode does not matter, only the contents of it.
 
 For how to enable barcode usage, see [the configuration](configuration.md#barcodes).
@@ -785,9 +790,17 @@ below.
 
 ### Document Splitting {#document-splitting}
 
-When enabled, Paperless will look for a barcode with the configured value and create a new document
-starting from the next page. The page with the barcode on it will _not_ be retained. It
-is expected to be a page existing only for triggering the split.
+If document splitting is enabled, Paperless splits _after_ a separator barcode by default.
+This means:
+
+-   any page containing the configured separator barcode starts a new document, starting with the **next** page
+-   pages containing the separator barcode are discarded
+
+This is intended for dedicated separator sheets such as PATCH-T pages.
+
+If [`PAPERLESS_CONSUMER_BARCODE_RETAIN_SPLIT_PAGES`](configuration.md#PAPERLESS_CONSUMER_BARCODE_RETAIN_SPLIT_PAGES)
+is enabled, the page containing the separator barcode is retained instead. In this mode,
+each page containing the separator barcode becomes the **first** page of a new document.
 
 ### Archive Serial Number Assignment
 
@@ -796,8 +809,9 @@ archive serial number, allowing quick reference back to the original, paper docu
 
 If document splitting via barcode is also enabled, documents will be split when an ASN
 barcode is located. However, differing from the splitting, the page with the
-barcode _will_ be retained. This allows application of a barcode to any page, including
-one which holds data to keep in the document.
+barcode _will_ be retained. Each detected ASN barcode starts a new document _starting with
+that page_. This allows placing ASN barcodes on content pages that should remain part of
+the document.
 
 ### Tag Assignment
 
@@ -806,6 +820,27 @@ When enabled, Paperless will parse barcodes and attempt to interpret and assign 
 See the relevant settings [`PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE`](configuration.md#PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE)
 and [`PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING`](configuration.md#PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING)
 for more information.
+
+#### Splitting on Tag Barcodes
+
+By default, tag barcodes only assign tags to documents without splitting them. However,
+you can enable document splitting on tag barcodes by setting
+[`PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT`](configuration.md#PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT)
+to `true`.
+
+When enabled, documents will be split at pages containing tag barcodes, similar to how
+ASN barcodes work. Key features:
+
+-   The page with the tag barcode is **retained** in the resulting document
+-   **Each split document extracts its own tags** - only tags on pages within that document are assigned
+-   Multiple tag barcodes can trigger multiple splits in the same document
+-   Works seamlessly with ASN barcodes - each split document gets its own ASN and tags
+
+This is useful for batch scanning where you place tag barcode pages between different
+documents to both separate and categorize them in a single operation.
+
+**Example:** A 6-page scan with TAG:invoice on page 3 and TAG:receipt on page 5 will create
+three documents: pages 1-2 (no tags), pages 3-4 (tagged "invoice"), and pages 5-6 (tagged "receipt").
 
 ## Automatic collation of double-sided documents {#collate}
 
@@ -853,8 +888,8 @@ followed by the even pages.
 
 It's important that the scan files get consumed in the correct order, and one at a time.
 You therefore need to make sure that Paperless is running while you upload the files into
-the directory; and if you're using [polling](configuration.md#polling), make sure that
-`CONSUMER_POLLING` is set to a value lower than it takes for the second scan to appear,
+the directory; and if you're using polling, make sure that
+`CONSUMER_POLLING_INTERVAL` is set to a value lower than it takes for the second scan to appear,
 like 5-10 or even lower.
 
 Another thing that might happen is that you start a double sided scan, but then forget

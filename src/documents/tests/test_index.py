@@ -15,7 +15,7 @@ from documents.tests.utils import DirectoriesMixin
 
 
 class TestAutoComplete(DirectoriesMixin, TestCase):
-    def test_auto_complete(self):
+    def test_auto_complete(self) -> None:
         doc1 = Document.objects.create(
             title="doc1",
             checksum="A",
@@ -41,7 +41,7 @@ class TestAutoComplete(DirectoriesMixin, TestCase):
         self.assertListEqual(index.autocomplete(ix, "tes", limit=1), [b"test2"])
         self.assertListEqual(index.autocomplete(ix, "tes", limit=0), [])
 
-    def test_archive_serial_number_ranging(self):
+    def test_archive_serial_number_ranging(self) -> None:
         """
         GIVEN:
             - Document with an archive serial number above schema allowed size
@@ -74,7 +74,7 @@ class TestAutoComplete(DirectoriesMixin, TestCase):
                 expected_str = "ERROR:paperless.index:Not indexing Archive Serial Number 4294967296 of document 1"
                 self.assertIn(expected_str, error_str)
 
-    def test_archive_serial_number_is_none(self):
+    def test_archive_serial_number_is_none(self) -> None:
         """
         GIVEN:
             - Document with no archive serial number
@@ -99,7 +99,7 @@ class TestAutoComplete(DirectoriesMixin, TestCase):
             self.assertIsNone(kwargs["asn"])
 
     @override_settings(TIME_ZONE="Pacific/Auckland")
-    def test_added_today_respects_local_timezone_boundary(self):
+    def test_added_today_respects_local_timezone_boundary(self) -> None:
         tz = get_current_timezone()
         fixed_now = datetime(2025, 7, 20, 15, 0, 0, tzinfo=tz)
 
@@ -152,7 +152,7 @@ class TestRewriteNaturalDateKeywords(SimpleTestCase):
             self.assertIn(fragment, result)
         return result
 
-    def test_range_keywords(self):
+    def test_range_keywords(self) -> None:
         """
         Test various different range keywords
         """
@@ -205,14 +205,14 @@ class TestRewriteNaturalDateKeywords(SimpleTestCase):
             with self.subTest(query=query):
                 self._assert_rewrite_contains(query, now_dt, *fragments)
 
-    def test_additional_fields(self):
+    def test_additional_fields(self) -> None:
         fixed_now = datetime(2025, 7, 20, 15, 30, 45, tzinfo=timezone.utc)
         # created
         self._assert_rewrite_contains("created:today", fixed_now, "created:[20250720")
         # modified
         self._assert_rewrite_contains("modified:today", fixed_now, "modified:[20250720")
 
-    def test_basic_syntax_variants(self):
+    def test_basic_syntax_variants(self) -> None:
         """
         Test that quoting, casing, and multi-clause queries are parsed.
         """
@@ -234,7 +234,7 @@ class TestRewriteNaturalDateKeywords(SimpleTestCase):
         self.assertIn("added:[20250720", result)
         self.assertIn("created:[20250719", result)
 
-    def test_no_match(self):
+    def test_no_match(self) -> None:
         """
         Test that queries without keywords are unchanged.
         """
@@ -243,7 +243,7 @@ class TestRewriteNaturalDateKeywords(SimpleTestCase):
         self.assertEqual(query, result)
 
     @override_settings(TIME_ZONE="Pacific/Auckland")
-    def test_timezone_awareness(self):
+    def test_timezone_awareness(self) -> None:
         """
         Test timezone conversion.
         """
@@ -255,13 +255,13 @@ class TestRewriteNaturalDateKeywords(SimpleTestCase):
 
 
 class TestIndexResilience(DirectoriesMixin, SimpleTestCase):
-    def _assert_recreate_called(self, mock_create_in):
+    def _assert_recreate_called(self, mock_create_in) -> None:
         mock_create_in.assert_called_once()
         path_arg, schema_arg = mock_create_in.call_args.args
         self.assertEqual(path_arg, settings.INDEX_DIR)
         self.assertEqual(schema_arg.__class__.__name__, "Schema")
 
-    def test_transient_missing_segment_does_not_force_recreate(self):
+    def test_transient_missing_segment_does_not_force_recreate(self) -> None:
         """
         GIVEN:
             - Index directory exists
@@ -298,7 +298,7 @@ class TestIndexResilience(DirectoriesMixin, SimpleTestCase):
         mock_create_in.assert_not_called()
         self.assertEqual(file_marker.read_text(), "keep")
 
-    def test_transient_errors_exhaust_retries_and_recreate(self):
+    def test_transient_errors_exhaust_retries_and_recreate(self) -> None:
         """
         GIVEN:
             - Index directory exists
@@ -335,7 +335,7 @@ class TestIndexResilience(DirectoriesMixin, SimpleTestCase):
             cm.output[0],
         )
 
-    def test_non_transient_error_recreates_index(self):
+    def test_non_transient_error_recreates_index(self) -> None:
         """
         GIVEN:
             - Index directory exists

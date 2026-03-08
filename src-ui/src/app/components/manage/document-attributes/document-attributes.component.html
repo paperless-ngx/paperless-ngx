@@ -1,0 +1,77 @@
+<pngx-page-header
+  [title]="activeTabLabel"
+  info="Manage tags, correspondents, document types, storage paths, and custom fields."
+  i18n-info
+  [infoLink]="activeInfoLink"
+  [loading]="activeHeaderLoading"
+  >
+  @if (activeManagementList) {
+    <div ngbDropdown class="btn-group flex-fill d-sm-none">
+      <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle>
+        <i-bs name="text-indent-left"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Select</ng-container></div>
+        @if (activeManagementList.selectedObjects.size > 0) {
+          <pngx-clearable-badge [selected]="activeManagementList.selectedObjects.size > 0" [number]="activeManagementList.selectedObjects.size" (cleared)="activeManagementList.selectNone()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
+        }
+      </button>
+      <div ngbDropdownMenu aria-labelledby="dropdownSelectMobile" class="shadow">
+        <button ngbDropdownItem (click)="activeManagementList.selectNone()" i18n>Select none</button>
+        <button ngbDropdownItem (click)="activeManagementList.selectPage(true)" i18n>Select page</button>
+        <button ngbDropdownItem (click)="activeManagementList.selectAll()" i18n>Select all</button>
+      </div>
+    </div>
+
+    <div class="d-none d-sm-flex flex-fill me-3">
+      <div class="input-group input-group-sm">
+        <span class="input-group-text border-0" i18n>Select:</span>
+      </div>
+      <div class="btn-group btn-group-sm flex-nowrap">
+        @if (activeManagementList.selectedObjects.size > 0) {
+          <button class="btn btn-sm btn-outline-secondary" (click)="activeManagementList.selectNone()">
+            <i-bs name="slash-circle" class="me-1"></i-bs><ng-container i18n>None</ng-container>
+          </button>
+        }
+        <button class="btn btn-sm btn-outline-primary" (click)="activeManagementList.selectPage(true)">
+          <i-bs name="file-earmark-check" class="me-1"></i-bs><ng-container i18n>Page</ng-container>
+        </button>
+        <button class="btn btn-sm btn-outline-primary" (click)="activeManagementList.selectAll()">
+          <i-bs name="check-all" class="me-1"></i-bs><ng-container i18n>All</ng-container>
+        </button>
+      </div>
+    </div>
+
+    <button type="button" class="btn btn-sm btn-outline-primary" (click)="activeManagementList.setPermissions()"
+      [disabled]="!activeManagementList.userCanBulkEdit(PermissionAction.Change) || activeManagementList.selectedObjects.size === 0">
+      <i-bs name="person-fill-lock" class="me-1"></i-bs><ng-container i18n>Permissions</ng-container>
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="activeManagementList.delete()"
+      [disabled]="!activeManagementList.userCanBulkEdit(PermissionAction.Delete) || activeManagementList.selectedObjects.size === 0">
+      <i-bs name="trash" class="me-1"></i-bs><ng-container i18n>Delete</ng-container>
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-primary ms-md-5" (click)="activeManagementList.openCreateDialog()"
+      *pngxIfPermissions="{ action: PermissionAction.Add, type: activeManagementList.permissionType }">
+      <i-bs name="plus-circle" class="me-1"></i-bs><ng-container i18n>Create</ng-container>
+    </button>
+  } @else if (activeCustomFields) {
+    <button type="button" class="btn btn-sm btn-outline-primary" (click)="activeCustomFields.editField()"
+      *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.CustomField }">
+      <i-bs name="plus-circle" class="me-1"></i-bs><ng-container i18n>Add Field</ng-container>
+    </button>
+  }
+</pngx-page-header>
+
+<ul ngbNav #nav="ngbNav" (navChange)="onNavChange($event)" [(activeId)]="activeNavID" class="nav-underline">
+  @for (section of visibleSections; track section.id) {
+    <li [ngbNavItem]="section.id">
+      <a ngbNavLink >
+        <i-bs class="me-2" [name]="section.icon"></i-bs>{{ section.label }}
+      </a>
+    </li>
+  }
+</ul>
+
+<div class="my-3 shadow-sm">
+  <ng-container
+    [ngComponentOutlet]="activeSection?.component"
+    #activeOutlet="ngComponentOutlet"
+  ></ng-container>
+</div>

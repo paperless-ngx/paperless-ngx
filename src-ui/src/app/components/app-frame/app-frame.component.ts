@@ -16,12 +16,12 @@ import {
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
+import { TourNgBootstrap } from 'ngx-ui-tour-ng-bootstrap'
 import { Observable } from 'rxjs'
 import { first } from 'rxjs/operators'
 import { Document } from 'src/app/data/document'
 import { SavedView } from 'src/app/data/saved-view'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { CollapsibleSection, SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { ComponentCanDeactivate } from 'src/app/guards/dirty-doc.guard'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
@@ -44,6 +44,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
+import { ChatComponent } from '../chat/chat/chat.component'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
@@ -59,6 +60,7 @@ import { ToastsDropdownComponent } from './toasts-dropdown/toasts-dropdown.compo
     DocumentTitlePipe,
     IfPermissionsDirective,
     ToastsDropdownComponent,
+    ChatComponent,
     RouterModule,
     NgClass,
     NgbDropdownModule,
@@ -67,7 +69,7 @@ import { ToastsDropdownComponent } from './toasts-dropdown/toasts-dropdown.compo
     NgbNavModule,
     NgxBootstrapIconsModule,
     DragDropModule,
-    TourNgBootstrapModule,
+    TourNgBootstrap,
   ],
 })
 export class AppFrameComponent
@@ -138,10 +140,33 @@ export class AppFrameComponent
 
   toggleSlimSidebar(): void {
     this.slimSidebarAnimating = true
-    this.slimSidebarEnabled = !this.slimSidebarEnabled
+    const slimSidebarEnabled = !this.slimSidebarEnabled
+    this.settingsService.set(SETTINGS_KEYS.SLIM_SIDEBAR, slimSidebarEnabled)
+    if (slimSidebarEnabled) {
+      this.settingsService.set(SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED, [
+        CollapsibleSection.ATTRIBUTES,
+      ])
+    }
+    this.settingsService
+      .storeSettings()
+      .pipe(first())
+      .subscribe({
+        error: (error) => {
+          this.toastService.showError(
+            $localize`An error occurred while saving settings.`
+          )
+          console.warn(error)
+        },
+      })
     setTimeout(() => {
       this.slimSidebarAnimating = false
     }, 200) // slightly longer than css animation for slim sidebar
+  }
+
+  toggleAttributesSections(event?: Event): void {
+    event?.preventDefault()
+    event?.stopPropagation()
+    this.attributesSectionsCollapsed = !this.attributesSectionsCollapsed
   }
 
   get versionString(): string {
@@ -165,6 +190,31 @@ export class AppFrameComponent
     )
   }
 
+  get canManageAttributes(): boolean {
+    return (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Tag
+      ) ||
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Correspondent
+      ) ||
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.DocumentType
+      ) ||
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.StoragePath
+      ) ||
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.CustomField
+      )
+    )
+  }
+
   get slimSidebarEnabled(): boolean {
     return this.settingsService.get(SETTINGS_KEYS.SLIM_SIDEBAR)
   }
@@ -182,6 +232,35 @@ export class AppFrameComponent
           console.warn(error)
         },
       })
+  }
+
+  get attributesSectionsCollapsed(): boolean {
+    return this.settingsService
+      .get(SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED)
+      ?.includes(CollapsibleSection.ATTRIBUTES)
+  }
+
+  set attributesSectionsCollapsed(collapsed: boolean) {
+    // TODO: refactor to be able to toggle individual sections, if implemented
+    this.settingsService.set(
+      SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED,
+      collapsed ? [CollapsibleSection.ATTRIBUTES] : []
+    )
+    this.settingsService
+      .storeSettings()
+      .pipe(first())
+      .subscribe({
+        error: (error) => {
+          this.toastService.showError(
+            $localize`An error occurred while saving settings.`
+          )
+          console.warn(error)
+        },
+      })
+  }
+
+  get aiEnabled(): boolean {
+    return this.settingsService.get(SETTINGS_KEYS.AI_ENABLED)
   }
 
   closeMenu() {

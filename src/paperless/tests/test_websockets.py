@@ -19,7 +19,7 @@ TEST_CHANNEL_LAYERS = {
 
 @override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
 class TestWebSockets(TestCase):
-    async def test_no_auth(self):
+    async def test_no_auth(self) -> None:
         communicator = WebsocketCommunicator(application, "/ws/status/")
         connected, _ = await communicator.connect()
         self.assertFalse(connected)
@@ -27,7 +27,7 @@ class TestWebSockets(TestCase):
 
     @mock.patch("paperless.consumers.StatusConsumer.close")
     @mock.patch("paperless.consumers.StatusConsumer._authenticated")
-    async def test_close_on_no_auth(self, _authenticated, mock_close):
+    async def test_close_on_no_auth(self, _authenticated, mock_close) -> None:
         _authenticated.return_value = True
 
         communicator = WebsocketCommunicator(application, "/ws/status/")
@@ -48,6 +48,20 @@ class TestWebSockets(TestCase):
         mock_close.assert_called_once()
         mock_close.reset_mock()
 
+        message = {
+            "type": "document_updated",
+            "data": {"document_id": 10, "modified": "2026-02-17T00:00:00Z"},
+        }
+
+        await channel_layer.group_send(
+            "status_updates",
+            message,
+        )
+        await communicator.receive_nothing()
+
+        mock_close.assert_called_once()
+        mock_close.reset_mock()
+
         message = {"type": "documents_deleted", "data": {"documents": [1, 2, 3]}}
 
         await channel_layer.group_send(
@@ -59,7 +73,7 @@ class TestWebSockets(TestCase):
         mock_close.assert_called_once()
 
     @mock.patch("paperless.consumers.StatusConsumer._authenticated")
-    async def test_auth(self, _authenticated):
+    async def test_auth(self, _authenticated) -> None:
         _authenticated.return_value = True
 
         communicator = WebsocketCommunicator(application, "/ws/status/")
@@ -69,7 +83,7 @@ class TestWebSockets(TestCase):
         await communicator.disconnect()
 
     @mock.patch("paperless.consumers.StatusConsumer._authenticated")
-    async def test_receive_status_update(self, _authenticated):
+    async def test_receive_status_update(self, _authenticated) -> None:
         _authenticated.return_value = True
 
         communicator = WebsocketCommunicator(application, "/ws/status/")
@@ -90,7 +104,7 @@ class TestWebSockets(TestCase):
 
         await communicator.disconnect()
 
-    async def test_status_update_check_perms(self):
+    async def test_status_update_check_perms(self) -> None:
         communicator = WebsocketCommunicator(application, "/ws/status/")
 
         communicator.scope["user"] = mock.Mock()
@@ -137,7 +151,7 @@ class TestWebSockets(TestCase):
         await communicator.disconnect()
 
     @mock.patch("paperless.consumers.StatusConsumer._authenticated")
-    async def test_receive_documents_deleted(self, _authenticated):
+    async def test_receive_documents_deleted(self, _authenticated) -> None:
         _authenticated.return_value = True
 
         communicator = WebsocketCommunicator(application, "/ws/status/")
@@ -158,8 +172,42 @@ class TestWebSockets(TestCase):
 
         await communicator.disconnect()
 
+    @mock.patch("paperless.consumers.StatusConsumer._can_view")
+    @mock.patch("paperless.consumers.StatusConsumer._authenticated")
+    async def test_receive_document_updated(self, _authenticated, _can_view) -> None:
+        _authenticated.return_value = True
+        _can_view.return_value = True
+
+        communicator = WebsocketCommunicator(application, "/ws/status/")
+        connected, _ = await communicator.connect()
+        self.assertTrue(connected)
+
+        message = {
+            "type": "document_updated",
+            "data": {
+                "document_id": 10,
+                "modified": "2026-02-17T00:00:00Z",
+                "owner_id": 1,
+                "users_can_view": [1],
+                "groups_can_view": [],
+            },
+        }
+
+        channel_layer = get_channel_layer()
+        assert channel_layer is not None
+        await channel_layer.group_send(
+            "status_updates",
+            message,
+        )
+
+        response = await communicator.receive_json_from()
+
+        self.assertEqual(response, message)
+
+        await communicator.disconnect()
+
     @mock.patch("channels.layers.InMemoryChannelLayer.group_send")
-    def test_manager_send_progress(self, mock_group_send):
+    def test_manager_send_progress(self, mock_group_send) -> None:
         with ProgressManager(task_id="test") as manager:
             manager.send_progress(
                 ProgressStatusOptions.STARTED,
@@ -190,7 +238,10 @@ class TestWebSockets(TestCase):
         )
 
     @mock.patch("channels.layers.InMemoryChannelLayer.group_send")
-    def test_manager_send_documents_deleted(self, mock_group_send):
+    def test_manager_send_documents_deleted(
+        self,
+        mock_group_send: mock.MagicMock,
+    ) -> None:
         with DocumentsStatusManager() as manager:
             manager.send_documents_deleted([1, 2, 3])
 

@@ -4,6 +4,7 @@ import logging
 import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import Any
 
 from celery import shared_task
 from celery import states
@@ -23,19 +24,24 @@ from django.db.models import Q
 from django.dispatch import receiver
 from django.utils import timezone
 from filelock import FileLock
+from rest_framework import serializers
 
 from documents import matching
 from documents.caching import clear_document_caches
+from documents.caching import invalidate_llm_suggestions_cache
+from documents.data_models import ConsumableDocument
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_filename
 from documents.file_handling import generate_unique_filename
+from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
-from documents.models import MatchingModel
+from documents.models import DocumentType
 from documents.models import PaperlessTask
 from documents.models import SavedView
+from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import UiSettings
 from documents.models import Workflow
@@ -43,25 +49,32 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
+from documents.plugins.helpers import DocumentsStatusManager
 from documents.templating.utils import convert_format_str_to_template_format
 from documents.workflows.actions import build_workflow_action_context
 from documents.workflows.actions import execute_email_action
+from documents.workflows.actions import execute_move_to_trash_action
+from documents.workflows.actions import execute_password_removal_action
 from documents.workflows.actions import execute_webhook_action
 from documents.workflows.mutations import apply_assignment_to_document
 from documents.workflows.mutations import apply_assignment_to_overrides
 from documents.workflows.mutations import apply_removal_to_document
 from documents.workflows.mutations import apply_removal_to_overrides
 from documents.workflows.utils import get_workflows_for_trigger
+from paperless.config import AIConfig
 
 if TYPE_CHECKING:
+    import uuid
+
     from documents.classifier import DocumentClassifier
     from documents.data_models import ConsumableDocument
     from documents.data_models import DocumentMetadataOverrides
 
 logger = logging.getLogger("paperless.handlers")
+DRF_DATETIME_FIELD = serializers.DateTimeField()
 
 
-def add_inbox_tags(sender, document: Document, logging_group=None, **kwargs):
+def add_inbox_tags(sender, document: Document, logging_group=None, **kwargs) -> None:
     if document.owner is not None:
         tags = get_objects_for_user_owner_aware(
             document.owner,
@@ -74,47 +87,41 @@ def add_inbox_tags(sender, document: Document, logging_group=None, **kwargs):
     document.add_nested_tags(inbox_tags)
 
 
-def _suggestion_printer(
-    stdout,
-    style_func,
-    suggestion_type: str,
-    document: Document,
-    selected: MatchingModel,
-    base_url: str | None = None,
-):
-    """
-    Smaller helper to reduce duplication when just outputting suggestions to the console
-    """
-    doc_str = str(document)
-    if base_url is not None:
-        stdout.write(style_func.SUCCESS(doc_str))
-        stdout.write(style_func.SUCCESS(f"{base_url}/documents/{document.pk}"))
-    else:
-        stdout.write(style_func.SUCCESS(f"{doc_str} [{document.pk}]"))
-    stdout.write(f"Suggest {suggestion_type}: {selected}")
-
-
 def set_correspondent(
-    sender,
+    sender: object,
     document: Document,
     *,
-    logging_group=None,
+    logging_group: object = None,
     classifier: DocumentClassifier | None = None,
-    replace=False,
-    use_first=True,
-    suggest=False,
-    base_url=None,
-    stdout=None,
-    style_func=None,
-    **kwargs,
-):
+    replace: bool = False,
+    use_first: bool = True,
+    dry_run: bool = False,
+    **kwargs: Any,
+) -> Correspondent | None:
+    """
+    Assign a correspondent to a document based on classifier results.
+
+    Args:
+        document: The document to classify.
+        logging_group: Optional logging group for structured log output.
+        classifier: The trained classifier. If None, only rule-based matching runs.
+        replace: If True, overwrite an existing correspondent assignment.
+        use_first: If True, pick the first match when multiple correspondents
+            match. If False, skip assignment when multiple match.
+        dry_run: If True, compute and return the selection without saving.
+        **kwargs: Absorbed for Django signal compatibility (e.g. sender, signal).
+
+    Returns:
+        The correspondent that was (or would be) assigned, or None if no match
+        was found or assignment was skipped.
+    """
     if document.correspondent and not replace:
-        return
+        return None
 
     potential_correspondents = matching.match_correspondents(document, classifier)
-
     potential_count = len(potential_correspondents)
     selected = potential_correspondents[0] if potential_correspondents else None
+
     if potential_count > 1:
         if use_first:
             logger.debug(
@@ -128,49 +135,53 @@ def set_correspondent(
                 f"not assigning any correspondent",
                 extra={"group": logging_group},
             )
-            return
+            return None
 
-    if selected or replace:
-        if suggest:
-            _suggestion_printer(
-                stdout,
-                style_func,
-                "correspondent",
-                document,
-                selected,
-                base_url,
-            )
-        else:
-            logger.info(
-                f"Assigning correspondent {selected} to {document}",
-                extra={"group": logging_group},
-            )
+    if (selected or replace) and not dry_run:
+        logger.info(
+            f"Assigning correspondent {selected} to {document}",
+            extra={"group": logging_group},
+        )
+        document.correspondent = selected
+        document.save(update_fields=("correspondent",))
 
-            document.correspondent = selected
-            document.save(update_fields=("correspondent",))
+    return selected
 
 
 def set_document_type(
-    sender,
+    sender: object,
     document: Document,
     *,
-    logging_group=None,
+    logging_group: object = None,
     classifier: DocumentClassifier | None = None,
-    replace=False,
-    use_first=True,
-    suggest=False,
-    base_url=None,
-    stdout=None,
-    style_func=None,
-    **kwargs,
-):
+    replace: bool = False,
+    use_first: bool = True,
+    dry_run: bool = False,
+    **kwargs: Any,
+) -> DocumentType | None:
+    """
+    Assign a document type to a document based on classifier results.
+
+    Args:
+        document: The document to classify.
+        logging_group: Optional logging group for structured log output.
+        classifier: The trained classifier. If None, only rule-based matching runs.
+        replace: If True, overwrite an existing document type assignment.
+        use_first: If True, pick the first match when multiple types match.
+            If False, skip assignment when multiple match.
+        dry_run: If True, compute and return the selection without saving.
+        **kwargs: Absorbed for Django signal compatibility (e.g. sender, signal).
+
+    Returns:
+        The document type that was (or would be) assigned, or None if no match
+        was found or assignment was skipped.
+    """
     if document.document_type and not replace:
-        return
+        return None
 
-    potential_document_type = matching.match_document_types(document, classifier)
-
-    potential_count = len(potential_document_type)
-    selected = potential_document_type[0] if potential_document_type else None
+    potential_document_types = matching.match_document_types(document, classifier)
+    potential_count = len(potential_document_types)
+    selected = potential_document_types[0] if potential_document_types else None
 
     if potential_count > 1:
         if use_first:
@@ -185,42 +196,64 @@ def set_document_type(
                 f"not assigning any document type",
                 extra={"group": logging_group},
             )
-            return
+            return None
 
-    if selected or replace:
-        if suggest:
-            _suggestion_printer(
-                stdout,
-                style_func,
-                "document type",
-                document,
-                selected,
-                base_url,
-            )
-        else:
-            logger.info(
-                f"Assigning document type {selected} to {document}",
-                extra={"group": logging_group},
-            )
+    if (selected or replace) and not dry_run:
+        logger.info(
+            f"Assigning document type {selected} to {document}",
+            extra={"group": logging_group},
+        )
+        document.document_type = selected
+        document.save(update_fields=("document_type",))
 
-            document.document_type = selected
-            document.save(update_fields=("document_type",))
+    return selected
 
 
 def set_tags(
-    sender,
+    sender: object,
     document: Document,
     *,
-    logging_group=None,
+    logging_group: object = None,
     classifier: DocumentClassifier | None = None,
-    replace=False,
-    suggest=False,
-    base_url=None,
-    stdout=None,
-    style_func=None,
-    **kwargs,
-):
+    replace: bool = False,
+    dry_run: bool = False,
+    **kwargs: Any,
+) -> tuple[set[Tag], set[Tag]]:
+    """
+    Assign tags to a document based on classifier results.
+
+    When replace=True, existing auto-matched and rule-matched tags are removed
+    before applying the new set (inbox tags and manually-added tags are preserved).
+
+    Args:
+        document: The document to classify.
+        logging_group: Optional logging group for structured log output.
+        classifier: The trained classifier. If None, only rule-based matching runs.
+        replace: If True, remove existing classifier-managed tags before applying
+            new ones. Inbox tags and manually-added tags are always preserved.
+        dry_run: If True, compute what would change without saving anything.
+        **kwargs: Absorbed for Django signal compatibility (e.g. sender, signal).
+
+    Returns:
+        A two-tuple of (tags_added, tags_removed). In non-replace mode,
+        tags_removed is always an empty set. In dry_run mode, neither set
+        is applied to the database.
+    """
+    # Compute which tags would be removed under replace mode.
+    # The filter mirrors the .delete() call below: keep inbox tags and
+    # manually-added tags (match="" and not auto-matched).
     if replace:
+        tags_to_remove: set[Tag] = set(
+            document.tags.exclude(
+                is_inbox_tag=True,
+            ).exclude(
+                Q(match="") & ~Q(matching_algorithm=Tag.MATCH_AUTO),
+            ),
+        )
+    else:
+        tags_to_remove = set()
+
+    if replace and not dry_run:
         Document.tags.through.objects.filter(document=document).exclude(
             Q(tag__is_inbox_tag=True),
         ).exclude(
@@ -228,65 +261,53 @@ def set_tags(
         ).delete()
 
     current_tags = set(document.tags.all())
-
     matched_tags = matching.match_tags(document, classifier)
+    tags_to_add = set(matched_tags) - current_tags
 
-    relevant_tags = set(matched_tags) - current_tags
-
-    if suggest:
-        extra_tags = current_tags - set(matched_tags)
-        extra_tags = [
-            t for t in extra_tags if t.matching_algorithm == MatchingModel.MATCH_AUTO
-        ]
-        if not relevant_tags and not extra_tags:
-            return
-        doc_str = style_func.SUCCESS(str(document))
-        if base_url:
-            stdout.write(doc_str)
-            stdout.write(f"{base_url}/documents/{document.pk}")
-        else:
-            stdout.write(doc_str + style_func.SUCCESS(f" [{document.pk}]"))
-        if relevant_tags:
-            stdout.write("Suggest tags: " + ", ".join([t.name for t in relevant_tags]))
-        if extra_tags:
-            stdout.write("Extra tags: " + ", ".join([t.name for t in extra_tags]))
-    else:
-        if not relevant_tags:
-            return
-
-        message = 'Tagging "{}" with "{}"'
+    if tags_to_add and not dry_run:
         logger.info(
-            message.format(document, ", ".join([t.name for t in relevant_tags])),
+            f'Tagging "{document}" with "{", ".join(t.name for t in tags_to_add)}"',
             extra={"group": logging_group},
         )
+        document.add_nested_tags(tags_to_add)
 
-        document.add_nested_tags(relevant_tags)
+    return tags_to_add, tags_to_remove
 
 
 def set_storage_path(
-    sender,
+    sender: object,
     document: Document,
     *,
-    logging_group=None,
+    logging_group: object = None,
     classifier: DocumentClassifier | None = None,
-    replace=False,
-    use_first=True,
-    suggest=False,
-    base_url=None,
-    stdout=None,
-    style_func=None,
-    **kwargs,
-):
+    replace: bool = False,
+    use_first: bool = True,
+    dry_run: bool = False,
+    **kwargs: Any,
+) -> StoragePath | None:
+    """
+    Assign a storage path to a document based on classifier results.
+
+    Args:
+        document: The document to classify.
+        logging_group: Optional logging group for structured log output.
+        classifier: The trained classifier. If None, only rule-based matching runs.
+        replace: If True, overwrite an existing storage path assignment.
+        use_first: If True, pick the first match when multiple paths match.
+            If False, skip assignment when multiple match.
+        dry_run: If True, compute and return the selection without saving.
+        **kwargs: Absorbed for Django signal compatibility (e.g. sender, signal).
+
+    Returns:
+        The storage path that was (or would be) assigned, or None if no match
+        was found or assignment was skipped.
+    """
     if document.storage_path and not replace:
-        return
+        return None
 
-    potential_storage_path = matching.match_storage_paths(
-        document,
-        classifier,
-    )
-
-    potential_count = len(potential_storage_path)
-    selected = potential_storage_path[0] if potential_storage_path else None
+    potential_storage_paths = matching.match_storage_paths(document, classifier)
+    potential_count = len(potential_storage_paths)
+    selected = potential_storage_paths[0] if potential_storage_paths else None
 
     if potential_count > 1:
         if use_first:
@@ -301,30 +322,21 @@ def set_storage_path(
                 f"not assigning any storage directory",
                 extra={"group": logging_group},
             )
-            return
+            return None
 
-    if selected or replace:
-        if suggest:
-            _suggestion_printer(
-                stdout,
-                style_func,
-                "storage directory",
-                document,
-                selected,
-                base_url,
-            )
-        else:
-            logger.info(
-                f"Assigning storage path {selected} to {document}",
-                extra={"group": logging_group},
-            )
+    if (selected or replace) and not dry_run:
+        logger.info(
+            f"Assigning storage path {selected} to {document}",
+            extra={"group": logging_group},
+        )
+        document.storage_path = selected
+        document.save(update_fields=("storage_path",))
 
-            document.storage_path = selected
-            document.save(update_fields=("storage_path",))
+    return selected
 
 
 # see empty_trash in documents/tasks.py for signal handling
-def cleanup_document_deletion(sender, instance, **kwargs):
+def cleanup_document_deletion(sender, instance, **kwargs) -> None:
     with FileLock(settings.MEDIA_LOCK):
         if settings.EMPTY_TRASH_DIR:
             # Find a non-conflicting filename in case a document with the same
@@ -412,13 +424,13 @@ def update_filename_and_move_files(
     sender,
     instance: Document | CustomFieldInstance,
     **kwargs,
-):
+) -> None:
     if isinstance(instance, CustomFieldInstance):
         if not _filename_template_uses_custom_fields(instance.document):
             return
         instance = instance.document
 
-    def validate_move(instance, old_path: Path, new_path: Path, root: Path):
+    def validate_move(instance, old_path: Path, new_path: Path, root: Path) -> None:
         if not new_path.is_relative_to(root):
             msg = (
                 f"Document {instance!s}: Refusing to move file outside root {root}: "
@@ -608,9 +620,19 @@ def update_filename_and_move_files(
                 root=settings.ARCHIVE_DIR,
             )
 
+    # Keep version files in sync with root
+    if instance.root_document_id is None:
+        for version_doc in Document.objects.filter(root_document_id=instance.pk).only(
+            "pk",
+        ):
+            update_filename_and_move_files(
+                Document,
+                version_doc,
+            )
+
 
 @shared_task
-def process_cf_select_update(custom_field: CustomField):
+def process_cf_select_update(custom_field: CustomField) -> None:
     """
     Update documents tied to a select custom field:
 
@@ -636,7 +658,11 @@ def process_cf_select_update(custom_field: CustomField):
 
 # should be disabled in /src/documents/management/commands/document_importer.py handle
 @receiver(models.signals.post_save, sender=CustomField)
-def check_paths_and_prune_custom_fields(sender, instance: CustomField, **kwargs):
+def check_paths_and_prune_custom_fields(
+    sender,
+    instance: CustomField,
+    **kwargs,
+) -> None:
     """
     When a custom field is updated, check if we need to update any documents. Done async to avoid slowing down the save operation.
     """
@@ -649,7 +675,7 @@ def check_paths_and_prune_custom_fields(sender, instance: CustomField, **kwargs)
 
 
 @receiver(models.signals.post_delete, sender=CustomField)
-def cleanup_custom_field_deletion(sender, instance: CustomField, **kwargs):
+def cleanup_custom_field_deletion(sender, instance: CustomField, **kwargs) -> None:
     """
     When a custom field is deleted, ensure no saved views reference it.
     """
@@ -675,9 +701,18 @@ def cleanup_custom_field_deletion(sender, instance: CustomField, **kwargs):
         )
 
 
+@receiver(models.signals.post_save, sender=Document)
+def update_llm_suggestions_cache(sender, instance, **kwargs):
+    """
+    Invalidate the LLM suggestions cache when a document is saved.
+    """
+    # Invalidate the cache for the document
+    invalidate_llm_suggestions_cache(instance.pk)
+
+
 @receiver(models.signals.post_delete, sender=User)
 @receiver(models.signals.post_delete, sender=Group)
-def cleanup_user_deletion(sender, instance: User | Group, **kwargs):
+def cleanup_user_deletion(sender, instance: User | Group, **kwargs) -> None:
     """
     When a user or group is deleted, remove non-cascading references.
     At the moment, just the default permission settings in UiSettings.
@@ -720,19 +755,25 @@ def cleanup_user_deletion(sender, instance: User | Group, **kwargs):
             )
 
 
-def add_to_index(sender, document, **kwargs):
+def add_to_index(sender, document, **kwargs) -> None:
     from documents import index
 
     index.add_or_update_document(document)
+    if document.root_document_id is not None and document.root_document is not None:
+        # keep in sync when a new version is consumed.
+        index.add_or_update_document(
+            document.root_document,
+            effective_content=document.content,
+        )
 
 
 def run_workflows_added(
     sender,
     document: Document,
-    logging_group=None,
+    logging_group: uuid.UUID | None = None,
     original_file=None,
     **kwargs,
-):
+) -> None:
     run_workflows(
         trigger_type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
         document=document,
@@ -742,7 +783,12 @@ def run_workflows_added(
     )
 
 
-def run_workflows_updated(sender, document: Document, logging_group=None, **kwargs):
+def run_workflows_updated(
+    sender,
+    document: Document,
+    logging_group: uuid.UUID | None = None,
+    **kwargs,
+) -> None:
     run_workflows(
         trigger_type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
         document=document,
@@ -750,11 +796,33 @@ def run_workflows_updated(sender, document: Document, logging_group=None, **kwar
     )
 
 
+def send_websocket_document_updated(
+    sender,
+    document: Document,
+    **kwargs,
+) -> None:
+    # At this point, workflows may already have applied additional changes.
+    document.refresh_from_db()
+
+    from documents.data_models import DocumentMetadataOverrides
+
+    doc_overrides = DocumentMetadataOverrides.from_document(document)
+
+    with DocumentsStatusManager() as status_mgr:
+        status_mgr.send_document_updated(
+            document_id=document.id,
+            modified=DRF_DATETIME_FIELD.to_representation(document.modified),
+            owner_id=doc_overrides.owner_id,
+            users_can_view=doc_overrides.view_users,
+            groups_can_view=doc_overrides.view_groups,
+        )
+
+
 def run_workflows(
     trigger_type: WorkflowTrigger.WorkflowTriggerType,
     document: Document | ConsumableDocument,
     workflow_to_run: Workflow | None = None,
-    logging_group=None,
+    logging_group: uuid.UUID | None = None,
     overrides: DocumentMetadataOverrides | None = None,
     original_file: Path | None = None,
 ) -> tuple[DocumentMetadataOverrides, str] | None:
@@ -770,6 +838,14 @@ def run_workflows(
     """
 
     use_overrides = overrides is not None
+
+    if isinstance(document, Document) and document.root_document_id is not None:
+        logger.debug(
+            "Skipping workflow execution for version document %s",
+            document.pk,
+        )
+        return None
+
     if original_file is None:
         original_file = (
             document.source_path if not use_overrides else document.original_file
@@ -780,14 +856,33 @@ def run_workflows(
 
     for workflow in workflows:
         if not use_overrides:
-            # This can be called from bulk_update_documents, which may be running multiple times
-            # Refresh this so the matching data is fresh and instance fields are re-freshed
-            # Otherwise, this instance might be behind and overwrite the work another process did
-            document.refresh_from_db()
-            doc_tag_ids = list(document.tags.values_list("pk", flat=True))
+            if TYPE_CHECKING:
+                assert isinstance(document, Document)
+            try:
+                # This can be called from bulk_update_documents, which may be running multiple times
+                # Refresh this so the matching data is fresh and instance fields are re-freshed
+                # Otherwise, this instance might be behind and overwrite the work another process did
+                document.refresh_from_db()
+                doc_tag_ids = list(document.tags.values_list("pk", flat=True))
+            except Document.DoesNotExist:
+                # Document was hard deleted by a previous workflow or another process
+                logger.info(
+                    "Document no longer exists, skipping remaining workflows",
+                    extra={"group": logging_group},
+                )
+                break
+
+            # Check if document was soft deleted (moved to trash)
+            if document.is_deleted:
+                logger.info(
+                    "Document was moved to trash, skipping remaining workflows",
+                    extra={"group": logging_group},
+                )
+                break
 
         if matching.document_matches_workflow(document, workflow, trigger_type):
             action: WorkflowAction
+            has_move_to_trash_action = False
             for action in workflow.actions.order_by("order", "pk"):
                 message = f"Applying {action} from {workflow}"
                 if not use_overrides:
@@ -829,6 +924,10 @@ def run_workflows(
                         logging_group,
                         original_file,
                     )
+                elif action.type == WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL:
+                    execute_password_removal_action(action, document, logging_group)
+                elif action.type == WorkflowAction.WorkflowActionType.MOVE_TO_TRASH:
+                    has_move_to_trash_action = True
 
             if not use_overrides:
                 # limit title to 128 characters
@@ -843,12 +942,17 @@ def run_workflows(
                 document=document if not use_overrides else None,
             )
 
+            if has_move_to_trash_action:
+                execute_move_to_trash_action(action, document, logging_group)
+
     if use_overrides:
+        if TYPE_CHECKING:
+            assert overrides is not None
         return overrides, "\n".join(messages)
 
 
 @before_task_publish.connect
-def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
+def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs) -> None:
     """
     Creates the PaperlessTask object in a pending state.  This is sent before
     the task reaches the broker, but before it begins executing on a worker.
@@ -890,7 +994,7 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
 
 
 @task_prerun.connect
-def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs):
+def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs) -> None:
     """
 
     Updates the PaperlessTask to be started.  Sent before the task begins execution
@@ -920,7 +1024,7 @@ def task_postrun_handler(
     retval=None,
     state=None,
     **kwargs,
-):
+) -> None:
     """
     Updates the result of the PaperlessTask.
 
@@ -931,7 +1035,7 @@ def task_postrun_handler(
         task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
 
         if task_instance is not None:
-            task_instance.status = state
+            task_instance.status = state or states.FAILURE
             task_instance.result = retval
             task_instance.date_done = timezone.now()
             task_instance.save()
@@ -949,7 +1053,7 @@ def task_failure_handler(
     args=None,
     traceback=None,
     **kwargs,
-):
+) -> None:
     """
     Updates the result of a failed PaperlessTask.
 
@@ -969,7 +1073,7 @@ def task_failure_handler(
 
 
 @worker_process_init.connect
-def close_connection_pool_on_worker_init(**kwargs):
+def close_connection_pool_on_worker_init(**kwargs) -> None:
     """
     Close the DB connection pool for each Celery child process after it starts.
 
@@ -981,3 +1085,30 @@ def close_connection_pool_on_worker_init(**kwargs):
     for conn in connections.all(initialized_only=True):
         if conn.alias == "default" and hasattr(conn, "pool") and conn.pool:
             conn.close_pool()
+
+
+def add_or_update_document_in_llm_index(sender, document, **kwargs):
+    """
+    Add or update a document in the LLM index when it is created or updated.
+    """
+    ai_config = AIConfig()
+    if ai_config.llm_index_enabled:
+        from documents.tasks import update_document_in_llm_index
+
+        update_document_in_llm_index.delay(document)
+
+
+@receiver(models.signals.post_delete, sender=Document)
+def delete_document_from_llm_index(
+    sender: Any,
+    instance: Document,
+    **kwargs: Any,
+) -> None:
+    """
+    Delete a document from the LLM index when it is deleted.
+    """
+    ai_config = AIConfig()
+    if ai_config.llm_index_enabled:
+        from documents.tasks import remove_document_from_llm_index
+
+        remove_document_from_llm_index.delay(instance)

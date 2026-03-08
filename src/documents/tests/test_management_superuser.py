@@ -2,6 +2,7 @@ import os
 from io import StringIO
 from unittest import mock
 
+import pytest
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.test import TestCase
@@ -9,6 +10,7 @@ from django.test import TestCase
 from documents.tests.utils import DirectoriesMixin
 
 
+@pytest.mark.management
 class TestManageSuperUser(DirectoriesMixin, TestCase):
     def call_command(self, environ):
         out = StringIO()
@@ -21,7 +23,7 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
             )
         return out.getvalue()
 
-    def test_no_user(self):
+    def test_no_user(self) -> None:
         """
         GIVEN:
             - Environment does not contain admin user info
@@ -33,15 +35,14 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
 
         # just the consumer user which is created
         # during migration, and AnonymousUser
-        self.assertEqual(User.objects.count(), 2)
-        self.assertTrue(User.objects.filter(username="consumer").exists())
+        self.assertEqual(User.objects.count(), 1)
         self.assertEqual(User.objects.filter(is_superuser=True).count(), 0)
         self.assertEqual(
             out,
             "Please check if PAPERLESS_ADMIN_PASSWORD has been set in the environment\n",
         )
 
-    def test_create(self):
+    def test_create(self) -> None:
         """
         GIVEN:
             - Environment does contain admin user password
@@ -54,12 +55,12 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
         # count is 3 as there's the consumer
         # user already created during migration, and AnonymousUser
         user: User = User.objects.get_by_natural_key("admin")
-        self.assertEqual(User.objects.count(), 3)
+        self.assertEqual(User.objects.count(), 2)
         self.assertTrue(user.is_superuser)
         self.assertEqual(user.email, "root@localhost")
         self.assertEqual(out, 'Created superuser "admin" with provided password.\n')
 
-    def test_some_superuser_exists(self):
+    def test_some_superuser_exists(self) -> None:
         """
         GIVEN:
             - A super user already exists
@@ -71,7 +72,7 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
 
         out = self.call_command(environ={"PAPERLESS_ADMIN_PASSWORD": "123456"})
 
-        self.assertEqual(User.objects.count(), 3)
+        self.assertEqual(User.objects.count(), 2)
         with self.assertRaises(User.DoesNotExist):
             User.objects.get_by_natural_key("admin")
         self.assertEqual(
@@ -79,7 +80,7 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
             "Did not create superuser, the DB already contains superusers\n",
         )
 
-    def test_admin_superuser_exists(self):
+    def test_admin_superuser_exists(self) -> None:
         """
         GIVEN:
             - A super user already exists
@@ -92,12 +93,12 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
 
         out = self.call_command(environ={"PAPERLESS_ADMIN_PASSWORD": "123456"})
 
-        self.assertEqual(User.objects.count(), 3)
+        self.assertEqual(User.objects.count(), 2)
         user: User = User.objects.get_by_natural_key("admin")
         self.assertTrue(user.check_password("password"))
         self.assertEqual(out, "Did not create superuser, a user admin already exists\n")
 
-    def test_admin_user_exists(self):
+    def test_admin_user_exists(self) -> None:
         """
         GIVEN:
             - A user already exists with the username admin
@@ -111,13 +112,13 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
 
         out = self.call_command(environ={"PAPERLESS_ADMIN_PASSWORD": "123456"})
 
-        self.assertEqual(User.objects.count(), 3)
+        self.assertEqual(User.objects.count(), 2)
         user: User = User.objects.get_by_natural_key("admin")
         self.assertTrue(user.check_password("password"))
         self.assertFalse(user.is_superuser)
         self.assertEqual(out, "Did not create superuser, a user admin already exists\n")
 
-    def test_no_password(self):
+    def test_no_password(self) -> None:
         """
         GIVEN:
             - No environment data is set
@@ -133,7 +134,7 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
             "Please check if PAPERLESS_ADMIN_PASSWORD has been set in the environment\n",
         )
 
-    def test_user_email(self):
+    def test_user_email(self) -> None:
         """
         GIVEN:
             - Environment does contain admin user password
@@ -150,13 +151,13 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
         )
 
         user: User = User.objects.get_by_natural_key("admin")
-        self.assertEqual(User.objects.count(), 3)
+        self.assertEqual(User.objects.count(), 2)
         self.assertTrue(user.is_superuser)
         self.assertEqual(user.email, "hello@world.com")
         self.assertEqual(user.username, "admin")
         self.assertEqual(out, 'Created superuser "admin" with provided password.\n')
 
-    def test_user_username(self):
+    def test_user_username(self) -> None:
         """
         GIVEN:
             - Environment does contain admin user password
@@ -174,7 +175,7 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
         )
 
         user: User = User.objects.get_by_natural_key("super")
-        self.assertEqual(User.objects.count(), 3)
+        self.assertEqual(User.objects.count(), 2)
         self.assertTrue(user.is_superuser)
         self.assertEqual(user.email, "hello@world.com")
         self.assertEqual(user.username, "super")
