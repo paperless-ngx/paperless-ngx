@@ -11,12 +11,21 @@
             cdkDropList
             (cdkDropListDropped)="onDrop($event)">
             @for (document of documents; track document.id) {
-                <li class="list-group-item" cdkDrag>
+                <li class="list-group-item d-flex align-items-center" cdkDrag>
                     <i-bs name="grip-vertical" class="me-2"></i-bs>
-                    @if (document.correspondent) {
-                      <b>{{document.correspondent | correspondentName | async}}:</b>
-                    }
-                    {{document.title}}
+                    <div class="d-flex flex-column">
+                        <div>
+                          @if (document.correspondent) {
+                            <b>{{document.correspondent | correspondentName | async}}: </b>
+                          }{{document.title}}
+                        </div>
+                        <small class="text-muted">
+                          {{document.created | customDate:'mediumDate'}}
+                          @if (document.page_count) {
+                            | {document.page_count, plural, =1 {One page} other {{{document.page_count}} pages}}
+                          }
+                        </small>
+                    </div>
                 </li>
             }
         </ul>
