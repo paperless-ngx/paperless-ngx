@@ -550,7 +550,7 @@ def merge(
     if delete_originals and handoff_asn is not None:
         overrides.asn = handoff_asn
 
-    logger.info("Adding the merged document to the task queue.")
+    logger.info("Adding merged document to the task queue.")
 
     consume_task = consume_file.s(
         ConsumableDocument(

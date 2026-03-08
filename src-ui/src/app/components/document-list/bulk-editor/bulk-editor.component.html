@@ -1,6 +1,6 @@
 <div class="d-flex flex-wrap gap-4">
   <div class="d-flex flex-wrap align-items-center gap-2" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-    <span class="me-2" i18n>Edit:</span>
+    <label class="me-2" i18n>Edit:</label>
     @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.Tag)) {
       <pngx-filterable-dropdown title="Tags" icon="tag-fill" i18n-title
         filterPlaceholder="Filter tags" i18n-filterPlaceholder
