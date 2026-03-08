@@ -1440,6 +1440,35 @@ class SavedViewSerializer(OwnedObjectSerializer):
             "set_permissions",
         ]
 
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+
+        request = self.context.get("request")
+        api_version = int(
+            request.version if request else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
+        )
+
+        if api_version < 10:
+            dashboard_ids = set()
+            sidebar_ids = set()
+            user = request.user if request else None
+            if user is not None and hasattr(user, "ui_settings"):
+                settings = user.ui_settings.settings or None
+                saved_views = None
+                if isinstance(settings, dict):
+                    saved_views = settings.get("saved_views", {})
+                if isinstance(saved_views, dict):
+                    dashboard_ids = set(
+                        saved_views.get("dashboard_views_visible_ids", []),
+                    )
+                    sidebar_ids = set(
+                        saved_views.get("sidebar_views_visible_ids", []),
+                    )
+            ret["show_on_dashboard"] = instance.id in dashboard_ids
+            ret["show_in_sidebar"] = instance.id in sidebar_ids
+
+        return ret
+
     def validate(self, attrs):
         attrs = super().validate(attrs)
         if "display_fields" in attrs and attrs["display_fields"] is not None:
