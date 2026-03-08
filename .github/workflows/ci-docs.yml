@@ -1,9 +1,8 @@
 name: Documentation
 on:
   push:
-    branches:
-      - main
-      - dev
+    branches-ignore:
+      - 'translations**'
   pull_request:
   workflow_dispatch:
 concurrency:
