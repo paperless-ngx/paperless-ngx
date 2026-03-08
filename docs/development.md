@@ -81,7 +81,7 @@ first-time setup.
 5.  Install pre-commit hooks:
 
     ```bash
-    $ uv run prek install
+    uv run prek install
     ```
 
 6.  Apply migrations and create a superuser (also can be done via the web UI) for your development instance:
