@@ -3,21 +3,60 @@ on:
   push:
     branches-ignore:
       - 'translations**'
-    paths:
-      - 'src-ui/**'
-      - '.github/workflows/ci-frontend.yml'
   pull_request:
     branches-ignore:
       - 'translations**'
-    paths:
-      - 'src-ui/**'
-      - '.github/workflows/ci-frontend.yml'
   workflow_dispatch:
 concurrency:
   group: frontend-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
+  changes:
+    name: Detect Frontend Changes
+    runs-on: ubuntu-24.04
+    outputs:
+      frontend_changed: ${{ steps.force.outputs.run_all == 'true' || steps.filter.outputs.frontend == 'true' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+      - name: Decide run mode
+        id: force
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "run_all=true" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event_name }}" == "push" && ( "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "dev" ) ]]; then
+            echo "run_all=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_all=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Set diff range
+        id: range
+        if: steps.force.outputs.run_all != 'true'
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "base=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event.created }}" == "true" ]]; then
+            echo "base=origin/${{ github.event.repository.default_branch }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "base=${{ github.event.before }}" >> "$GITHUB_OUTPUT"
+          fi
+          echo "ref=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+      - name: Detect changes
+        id: filter
+        if: steps.force.outputs.run_all != 'true'
+        uses: dorny/paths-filter@v3.0.2
+        with:
+          base: ${{ steps.range.outputs.base }}
+          ref: ${{ steps.range.outputs.ref }}
+          filters: |
+            frontend:
+              - 'src-ui/**'
+              - '.github/workflows/ci-frontend.yml'
   install-dependencies:
+    needs: changes
+    if: needs.changes.outputs.frontend_changed == 'true'
     name: Install Dependencies
     runs-on: ubuntu-24.04
     steps:
@@ -45,7 +84,8 @@ jobs:
         run: cd src-ui && pnpm install
   lint:
     name: Lint
-    needs: install-dependencies
+    needs: [changes, install-dependencies]
+    if: needs.changes.outputs.frontend_changed == 'true'
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
@@ -73,7 +113,8 @@ jobs:
         run: cd src-ui && pnpm run lint
   unit-tests:
     name: "Unit Tests (${{ matrix.shard-index }}/${{ matrix.shard-count }})"
-    needs: install-dependencies
+    needs: [changes, install-dependencies]
+    if: needs.changes.outputs.frontend_changed == 'true'
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -119,7 +160,8 @@ jobs:
           directory: src-ui/coverage/
   e2e-tests:
     name: "E2E Tests (${{ matrix.shard-index }}/${{ matrix.shard-count }})"
-    needs: install-dependencies
+    needs: [changes, install-dependencies]
+    if: needs.changes.outputs.frontend_changed == 'true'
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/playwright:v1.58.2-noble
     env:
@@ -159,7 +201,8 @@ jobs:
         run: cd src-ui && pnpm exec playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
   bundle-analysis:
     name: Bundle Analysis
-    needs: [unit-tests, e2e-tests]
+    needs: [changes, unit-tests, e2e-tests]
+    if: needs.changes.outputs.frontend_changed == 'true'
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
@@ -187,3 +230,42 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: cd src-ui && pnpm run build --configuration=production
+  gate:
+    name: Frontend CI Gate
+    needs: [changes, install-dependencies, lint, unit-tests, e2e-tests, bundle-analysis]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check gate
+        run: |
+          if [[ "${{ needs.changes.outputs.frontend_changed }}" != "true" ]]; then
+            echo "No frontend-relevant changes detected."
+            exit 0
+          fi
+
+          if [[ "${{ needs['install-dependencies'].result }}" != "success" ]]; then
+            echo "::error::Frontend install job result: ${{ needs['install-dependencies'].result }}"
+            exit 1
+          fi
+
+          if [[ "${{ needs.lint.result }}" != "success" ]]; then
+            echo "::error::Frontend lint job result: ${{ needs.lint.result }}"
+            exit 1
+          fi
+
+          if [[ "${{ needs['unit-tests'].result }}" != "success" ]]; then
+            echo "::error::Frontend unit-tests job result: ${{ needs['unit-tests'].result }}"
+            exit 1
+          fi
+
+          if [[ "${{ needs['e2e-tests'].result }}" != "success" ]]; then
+            echo "::error::Frontend e2e-tests job result: ${{ needs['e2e-tests'].result }}"
+            exit 1
+          fi
+
+          if [[ "${{ needs['bundle-analysis'].result }}" != "success" ]]; then
+            echo "::error::Frontend bundle-analysis job result: ${{ needs['bundle-analysis'].result }}"
+            exit 1
+          fi
+
+          echo "Frontend checks passed."
