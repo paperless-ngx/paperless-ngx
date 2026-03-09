@@ -1752,6 +1752,7 @@ class BulkEditSerializer(
     SourceModeValidationMixin,
 ):
     # TODO: remove this and related backwards compatibility code when API v9 is dropped
+    # split, delete_pages can be removed entirely
     MOVED_DOCUMENT_ACTION_ENDPOINTS = {
         "rotate": "/api/documents/rotate/",
         "merge": "/api/documents/merge/",
