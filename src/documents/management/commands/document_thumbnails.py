@@ -36,6 +36,7 @@ def _process_document(doc_id: int) -> None:
 class Command(PaperlessCommand):
     help = "This will regenerate the thumbnails for all documents."
 
+    supports_progress_bar = True
     supports_multiprocessing = True
 
     def add_arguments(self, parser) -> None:

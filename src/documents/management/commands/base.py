@@ -304,7 +304,7 @@ class PaperlessCommand(RichCommand):
 
         Progress output is directed to stderr to match the convention that
         progress bars are transient UI feedback, not command output. This
-        mirrors tqdm's default behavior and prevents progress bar rendering
+        mirrors the convention that progress bars are transient UI feedback and prevents progress bar rendering
         from interfering with stdout-based assertions in tests or piped
         command output.
 
