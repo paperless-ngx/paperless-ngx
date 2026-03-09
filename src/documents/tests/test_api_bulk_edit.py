@@ -422,6 +422,34 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(args[0], [self.doc1.id])
         self.assertEqual(len(kwargs), 0)
 
+    @mock.patch("documents.views.bulk_edit.delete")
+    def test_delete_documents_endpoint(self, m) -> None:
+        self.setup_mock(m, "delete")
+        response = self.client.post(
+            "/api/documents/delete/",
+            json.dumps({"documents": [self.doc1.id]}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertEqual(args[0], [self.doc1.id])
+        self.assertEqual(len(kwargs), 0)
+
+    @mock.patch("documents.views.bulk_edit.reprocess")
+    def test_reprocess_documents_endpoint(self, m) -> None:
+        self.setup_mock(m, "reprocess")
+        response = self.client.post(
+            "/api/documents/reprocess/",
+            json.dumps({"documents": [self.doc1.id]}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertEqual(args[0], [self.doc1.id])
+        self.assertEqual(len(kwargs), 0)
+
     @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
     def test_api_set_storage_path(self, m) -> None:
         """
@@ -1218,6 +1246,8 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     def test_bulk_edit_allows_legacy_file_methods_with_warning(self) -> None:
         method_payloads = {
+            "delete": {},
+            "reprocess": {},
             "rotate": {"degrees": 90},
             "merge": {"metadata_document_id": self.doc2.id},
             "edit_pdf": {"operations": [{"page": 1}]},

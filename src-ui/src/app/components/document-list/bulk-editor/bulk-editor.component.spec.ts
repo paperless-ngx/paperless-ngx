@@ -849,13 +849,11 @@ describe('BulkEditorComponent', () => {
     expect(modal).not.toBeUndefined()
     modal.componentInstance.confirm()
     let req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
+      `${environment.apiBaseUrl}documents/delete/`
     )
     req.flush(true)
     expect(req.request.body).toEqual({
       documents: [3, 4],
-      method: 'delete',
-      parameters: {},
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
@@ -868,7 +866,7 @@ describe('BulkEditorComponent', () => {
     fixture.detectChanges()
     component.applyDelete()
     req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
+      `${environment.apiBaseUrl}documents/delete/`
     )
   })
 
@@ -944,13 +942,11 @@ describe('BulkEditorComponent', () => {
     expect(modal).not.toBeUndefined()
     modal.componentInstance.confirm()
     let req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
+      `${environment.apiBaseUrl}documents/reprocess/`
     )
     req.flush(true)
     expect(req.request.body).toEqual({
       documents: [3, 4],
-      method: 'reprocess',
-      parameters: {},
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`

@@ -950,8 +950,8 @@ describe('DocumentDetailComponent', () => {
 
   it('should support reprocess, confirm and close modal after started', () => {
     initNormally()
-    const bulkEditSpy = jest.spyOn(documentService, 'bulkEdit')
-    bulkEditSpy.mockReturnValue(of(true))
+    const reprocessSpy = jest.spyOn(documentService, 'reprocessDocuments')
+    reprocessSpy.mockReturnValue(of(true))
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const modalSpy = jest.spyOn(modalService, 'open')
@@ -959,7 +959,7 @@ describe('DocumentDetailComponent', () => {
     component.reprocess()
     const modalCloseSpy = jest.spyOn(openModal, 'close')
     openModal.componentInstance.confirmClicked.next()
-    expect(bulkEditSpy).toHaveBeenCalledWith([doc.id], 'reprocess', {})
+    expect(reprocessSpy).toHaveBeenCalledWith([doc.id])
     expect(modalSpy).toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalled()
     expect(modalCloseSpy).toHaveBeenCalled()
@@ -967,13 +967,13 @@ describe('DocumentDetailComponent', () => {
 
   it('should show error if redo ocr call fails', () => {
     initNormally()
-    const bulkEditSpy = jest.spyOn(documentService, 'bulkEdit')
+    const reprocessSpy = jest.spyOn(documentService, 'reprocessDocuments')
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const toastSpy = jest.spyOn(toastService, 'showError')
     component.reprocess()
     const modalCloseSpy = jest.spyOn(openModal, 'close')
-    bulkEditSpy.mockReturnValue(throwError(() => new Error('error occurred')))
+    reprocessSpy.mockReturnValue(throwError(() => new Error('error occurred')))
     openModal.componentInstance.confirmClicked.next()
     expect(toastSpy).toHaveBeenCalled()
     expect(modalCloseSpy).not.toHaveBeenCalled()

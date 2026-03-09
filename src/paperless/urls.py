@@ -21,6 +21,7 @@ from documents.views import BulkEditView
 from documents.views import ChatStreamingView
 from documents.views import CorrespondentViewSet
 from documents.views import CustomFieldViewSet
+from documents.views import DeleteDocumentsView
 from documents.views import DocumentTypeViewSet
 from documents.views import EditPdfDocumentsView
 from documents.views import GlobalSearchView
@@ -30,6 +31,7 @@ from documents.views import MergeDocumentsView
 from documents.views import PostDocumentView
 from documents.views import RemoteVersionView
 from documents.views import RemovePasswordDocumentsView
+from documents.views import ReprocessDocumentsView
 from documents.views import RotateDocumentsView
 from documents.views import SavedViewViewSet
 from documents.views import SearchAutoCompleteView
@@ -135,6 +137,16 @@ urlpatterns = [
                                 "^bulk_edit/",
                                 BulkEditView.as_view(),
                                 name="bulk_edit",
+                            ),
+                            re_path(
+                                "^delete/",
+                                DeleteDocumentsView.as_view(),
+                                name="delete_documents",
+                            ),
+                            re_path(
+                                "^reprocess/",
+                                ReprocessDocumentsView.as_view(),
+                                name="reprocess_documents",
                             ),
                             re_path(
                                 "^rotate/",

@@ -1379,27 +1379,25 @@ export class DocumentDetailComponent
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.confirmClicked.subscribe(() => {
       modal.componentInstance.buttonsEnabled = false
-      this.documentsService
-        .bulkEdit([this.document.id], 'reprocess', {})
-        .subscribe({
-          next: () => {
-            this.toastService.showInfo(
-              $localize`Reprocess operation for "${this.document.title}" will begin in the background.`
-            )
-            if (modal) {
-              modal.close()
-            }
-          },
-          error: (error) => {
-            if (modal) {
-              modal.componentInstance.buttonsEnabled = true
-            }
-            this.toastService.showError(
-              $localize`Error executing operation`,
-              error
-            )
-          },
-        })
+      this.documentsService.reprocessDocuments([this.document.id]).subscribe({
+        next: () => {
+          this.toastService.showInfo(
+            $localize`Reprocess operation for "${this.document.title}" will begin in the background.`
+          )
+          if (modal) {
+            modal.close()
+          }
+        },
+        error: (error) => {
+          if (modal) {
+            modal.componentInstance.buttonsEnabled = true
+          }
+          this.toastService.showError(
+            $localize`Error executing operation`,
+            error
+          )
+        },
+      })
     })
   }
 

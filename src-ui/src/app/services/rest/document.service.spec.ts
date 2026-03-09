@@ -230,6 +230,30 @@ describe(`DocumentService`, () => {
     })
   })
 
+  it('should call appropriate api endpoint for delete documents', () => {
+    const ids = [1, 2, 3]
+    subscription = service.deleteDocuments(ids).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/delete/`
+    )
+    expect(req.request.method).toEqual('POST')
+    expect(req.request.body).toEqual({
+      documents: ids,
+    })
+  })
+
+  it('should call appropriate api endpoint for reprocess documents', () => {
+    const ids = [1, 2, 3]
+    subscription = service.reprocessDocuments(ids).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/reprocess/`
+    )
+    expect(req.request.method).toEqual('POST')
+    expect(req.request.body).toEqual({
+      documents: ids,
+    })
+  })
+
   it('should call appropriate api endpoint for rotate documents', () => {
     const ids = [1, 2, 3]
     subscription = service.rotateDocuments(ids, 90).subscribe()

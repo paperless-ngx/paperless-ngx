@@ -50,8 +50,6 @@ export type DocumentBulkEditMethod =
   | 'remove_tag'
   | 'modify_tags'
   | 'modify_custom_fields'
-  | 'delete'
-  | 'reprocess'
   | 'set_permissions'
 
 export interface MergeDocumentsRequest {
@@ -345,6 +343,18 @@ export class DocumentService extends AbstractPaperlessService<Document> {
       documents: ids,
       method: method,
       parameters: args,
+    })
+  }
+
+  deleteDocuments(ids: number[]) {
+    return this.http.post(this.getResourceUrl(null, 'delete'), {
+      documents: ids,
+    })
+  }
+
+  reprocessDocuments(ids: number[]) {
+    return this.http.post(this.getResourceUrl(null, 'reprocess'), {
+      documents: ids,
     })
   }
 

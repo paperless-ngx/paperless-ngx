@@ -1745,6 +1745,14 @@ class RemovePasswordDocumentsSerializer(
     )
 
 
+class DeleteDocumentsSerializer(DocumentListSerializer):
+    pass
+
+
+class ReprocessDocumentsSerializer(DocumentListSerializer):
+    pass
+
+
 class BulkEditSerializer(
     SerializerWithPerms,
     DocumentListSerializer,
@@ -1754,6 +1762,8 @@ class BulkEditSerializer(
     # TODO: remove this and related backwards compatibility code when API v9 is dropped
     # split, delete_pages can be removed entirely
     MOVED_DOCUMENT_ACTION_ENDPOINTS = {
+        "delete": "/api/documents/delete/",
+        "reprocess": "/api/documents/reprocess/",
         "rotate": "/api/documents/rotate/",
         "merge": "/api/documents/merge/",
         "edit_pdf": "/api/documents/edit_pdf/",
@@ -1772,8 +1782,6 @@ class BulkEditSerializer(
             "remove_tag",
             "modify_tags",
             "modify_custom_fields",
-            "delete",
-            "reprocess",
             "set_permissions",
             *LEGACY_DOCUMENT_ACTION_METHODS,
         ],

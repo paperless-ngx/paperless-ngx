@@ -31,12 +31,14 @@ class TestApiSchema(APITestCase):
         self.assertEqual(schema_response.status_code, status.HTTP_200_OK)
 
         paths = schema_response.data["paths"]
+        self.assertIn("/api/documents/delete/", paths)
+        self.assertIn("/api/documents/reprocess/", paths)
         self.assertIn("/api/documents/rotate/", paths)
         self.assertIn("/api/documents/merge/", paths)
         self.assertIn("/api/documents/edit_pdf/", paths)
         self.assertIn("/api/documents/remove_password/", paths)
 
-    def test_schema_bulk_edit_advertises_legacy_file_edit_methods(self) -> None:
+    def test_schema_bulk_edit_advertises_legacy_document_action_methods(self) -> None:
         schema_response = self.client.get(self.ENDPOINT)
         self.assertEqual(schema_response.status_code, status.HTTP_200_OK)
 
@@ -48,7 +50,9 @@ class TestApiSchema(APITestCase):
         enum_ref = method_schema["allOf"][0]["$ref"].split("/")[-1]
         advertised_methods = schema[enum_ref]["enum"]
 
-        for file_method in [
+        for action_method in [
+            "delete",
+            "reprocess",
             "rotate",
             "merge",
             "edit_pdf",
@@ -56,4 +60,4 @@ class TestApiSchema(APITestCase):
             "split",
             "delete_pages",
         ]:
-            self.assertIn(file_method, advertised_methods)
+            self.assertIn(action_method, advertised_methods)

@@ -787,10 +787,16 @@ export class BulkEditorComponent
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
           modal.componentInstance.buttonsEnabled = false
-          this.executeBulkEditMethod(modal, 'delete', {})
+          this.executeDocumentAction(
+            modal,
+            this.documentService.deleteDocuments(Array.from(this.list.selected))
+          )
         })
     } else {
-      this.executeBulkEditMethod(null, 'delete', {})
+      this.executeDocumentAction(
+        null,
+        this.documentService.deleteDocuments(Array.from(this.list.selected))
+      )
     }
   }
 
@@ -829,7 +835,12 @@ export class BulkEditorComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         modal.componentInstance.buttonsEnabled = false
-        this.executeBulkEditMethod(modal, 'reprocess', {})
+        this.executeDocumentAction(
+          modal,
+          this.documentService.reprocessDocuments(
+            Array.from(this.list.selected)
+          )
+        )
       })
   }
 

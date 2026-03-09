@@ -176,6 +176,7 @@ from documents.serialisers import BulkEditObjectsSerializer
 from documents.serialisers import BulkEditSerializer
 from documents.serialisers import CorrespondentSerializer
 from documents.serialisers import CustomFieldSerializer
+from documents.serialisers import DeleteDocumentsSerializer
 from documents.serialisers import DocumentListSerializer
 from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
@@ -187,6 +188,7 @@ from documents.serialisers import MergeDocumentsSerializer
 from documents.serialisers import NotesSerializer
 from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import RemovePasswordDocumentsSerializer
+from documents.serialisers import ReprocessDocumentsSerializer
 from documents.serialisers import RotateDocumentsSerializer
 from documents.serialisers import RunTaskViewSerializer
 from documents.serialisers import SavedViewSerializer
@@ -2418,6 +2420,60 @@ class MergeDocumentsView(DocumentOperationPermissionMixin):
             method=bulk_edit.merge,
             validated_data=serializer.validated_data,
             operation_label="document merge",
+        )
+
+
+@extend_schema_view(
+    post=extend_schema(
+        operation_id="documents_delete",
+        description="Move selected documents to trash",
+        responses={
+            200: inline_serializer(
+                name="DeleteDocumentsResult",
+                fields={
+                    "result": serializers.CharField(),
+                },
+            ),
+        },
+    ),
+)
+class DeleteDocumentsView(DocumentOperationPermissionMixin):
+    serializer_class = DeleteDocumentsSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return self._execute_document_action(
+            method=bulk_edit.delete,
+            validated_data=serializer.validated_data,
+            operation_label="document delete",
+        )
+
+
+@extend_schema_view(
+    post=extend_schema(
+        operation_id="documents_reprocess",
+        description="Reprocess selected documents",
+        responses={
+            200: inline_serializer(
+                name="ReprocessDocumentsResult",
+                fields={
+                    "result": serializers.CharField(),
+                },
+            ),
+        },
+    ),
+)
+class ReprocessDocumentsView(DocumentOperationPermissionMixin):
+    serializer_class = ReprocessDocumentsSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return self._execute_document_action(
+            method=bulk_edit.reprocess,
+            validated_data=serializer.validated_data,
+            operation_label="document reprocess",
         )
 
 
