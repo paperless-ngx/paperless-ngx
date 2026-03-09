@@ -41,6 +41,7 @@ from documents.models import SavedView
 from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import UiSettings
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
@@ -2199,6 +2200,205 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.get("/api/saved_views/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 0)
+
+    def test_saved_view_api_version_backward_compatibility(self) -> None:
+        """
+        GIVEN:
+            - Saved views and UiSettings with visibility preferences
+        WHEN:
+            - API request with version=9 (legacy)
+            - API request with version=10 (current)
+        THEN:
+            - Version 9 returns show_on_dashboard and show_in_sidebar from UiSettings
+            - Version 10 omits these fields (moved to UiSettings)
+        """
+        v1 = SavedView.objects.create(
+            owner=self.user,
+            name="dashboard_view",
+            sort_field="created",
+        )
+        v2 = SavedView.objects.create(
+            owner=self.user,
+            name="sidebar_view",
+            sort_field="created",
+        )
+        v3 = SavedView.objects.create(
+            owner=self.user,
+            name="hidden_view",
+            sort_field="created",
+        )
+
+        UiSettings.objects.update_or_create(
+            user=self.user,
+            defaults={
+                "settings": {
+                    "saved_views": {
+                        "dashboard_views_visible_ids": [v1.id],
+                        "sidebar_views_visible_ids": [v2.id],
+                    },
+                },
+            },
+        )
+
+        response_v9 = self.client.get(
+            "/api/saved_views/",
+            headers={"Accept": "application/json; version=9"},
+            format="json",
+        )
+        self.assertEqual(response_v9.status_code, status.HTTP_200_OK)
+        results_v9 = {r["id"]: r for r in response_v9.data["results"]}
+        self.assertIn("show_on_dashboard", results_v9[v1.id])
+        self.assertIn("show_in_sidebar", results_v9[v1.id])
+        self.assertTrue(results_v9[v1.id]["show_on_dashboard"])
+        self.assertFalse(results_v9[v1.id]["show_in_sidebar"])
+        self.assertTrue(results_v9[v2.id]["show_in_sidebar"])
+        self.assertFalse(results_v9[v2.id]["show_on_dashboard"])
+        self.assertFalse(results_v9[v3.id]["show_on_dashboard"])
+        self.assertFalse(results_v9[v3.id]["show_in_sidebar"])
+
+        response_v10 = self.client.get(
+            "/api/saved_views/",
+            headers={"Accept": "application/json; version=10"},
+            format="json",
+        )
+        self.assertEqual(response_v10.status_code, status.HTTP_200_OK)
+        results_v10 = {r["id"]: r for r in response_v10.data["results"]}
+        self.assertNotIn("show_on_dashboard", results_v10[v1.id])
+        self.assertNotIn("show_in_sidebar", results_v10[v1.id])
+
+    def test_saved_view_api_version_9_user_without_ui_settings(self) -> None:
+        """
+        GIVEN:
+            - User with no UiSettings and a saved view
+        WHEN:
+            - API request with version=9
+        THEN:
+            - show_on_dashboard and show_in_sidebar are False (default)
+        """
+        SavedView.objects.create(
+            owner=self.user,
+            name="test_view",
+            sort_field="created",
+        )
+        UiSettings.objects.filter(user=self.user).delete()
+
+        response = self.client.get(
+            "/api/saved_views/",
+            headers={"Accept": "application/json; version=9"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        result = response.data["results"][0]
+        self.assertFalse(result["show_on_dashboard"])
+        self.assertFalse(result["show_in_sidebar"])
+
+    def test_saved_view_api_version_9_create_writes_visibility_to_ui_settings(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - No UiSettings for the current user
+        WHEN:
+            - A saved view is created through API version 9 with visibility flags
+        THEN:
+            - Visibility is persisted in UiSettings.saved_views
+        """
+        UiSettings.objects.filter(user=self.user).delete()
+
+        response = self.client.post(
+            "/api/saved_views/",
+            {
+                "name": "legacy-v9-create",
+                "sort_field": "created",
+                "filter_rules": [],
+                "show_on_dashboard": True,
+                "show_in_sidebar": False,
+            },
+            headers={"Accept": "application/json; version=9"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(response.data["show_on_dashboard"])
+        self.assertFalse(response.data["show_in_sidebar"])
+
+        self.user.refresh_from_db()
+        self.assertTrue(hasattr(self.user, "ui_settings"))
+        saved_view_settings = self.user.ui_settings.settings["saved_views"]
+        self.assertListEqual(
+            saved_view_settings["dashboard_views_visible_ids"],
+            [response.data["id"]],
+        )
+        self.assertListEqual(saved_view_settings["sidebar_views_visible_ids"], [])
+
+    def test_saved_view_api_version_9_patch_writes_visibility_to_ui_settings(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - Existing saved views and UiSettings visibility ids
+        WHEN:
+            - A saved view is updated through API version 9 visibility flags
+        THEN:
+            - The per-user UiSettings visibility ids are updated
+        """
+        v1 = SavedView.objects.create(
+            owner=self.user,
+            name="legacy-v9-patch-1",
+            sort_field="created",
+        )
+        v2 = SavedView.objects.create(
+            owner=self.user,
+            name="legacy-v9-patch-2",
+            sort_field="created",
+        )
+        UiSettings.objects.update_or_create(
+            user=self.user,
+            defaults={
+                "settings": {
+                    "saved_views": {
+                        "dashboard_views_visible_ids": [v1.id],
+                        "sidebar_views_visible_ids": [v1.id, v2.id],
+                    },
+                },
+            },
+        )
+
+        response = self.client.patch(
+            f"/api/saved_views/{v1.id}/",
+            {
+                "show_on_dashboard": False,
+            },
+            headers={"Accept": "application/json; version=9"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(response.data["show_on_dashboard"])
+        self.assertTrue(response.data["show_in_sidebar"])
+
+        self.user.refresh_from_db()
+        saved_view_settings = self.user.ui_settings.settings["saved_views"]
+        self.assertListEqual(saved_view_settings["dashboard_views_visible_ids"], [])
+        self.assertListEqual(
+            saved_view_settings["sidebar_views_visible_ids"],
+            [v1.id, v2.id],
+        )
+
+        response = self.client.patch(
+            f"/api/saved_views/{v1.id}/",
+            {
+                "show_in_sidebar": False,
+            },
+            headers={"Accept": "application/json; version=9"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(response.data["show_on_dashboard"])
+        self.assertFalse(response.data["show_in_sidebar"])
+
+        self.user.refresh_from_db()
+        saved_view_settings = self.user.ui_settings.settings["saved_views"]
+        self.assertListEqual(saved_view_settings["dashboard_views_visible_ids"], [])
+        self.assertListEqual(saved_view_settings["sidebar_views_visible_ids"], [v2.id])
 
     def test_saved_view_create_update_patch(self) -> None:
         User.objects.create_user("user1")
