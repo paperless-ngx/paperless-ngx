@@ -305,7 +305,6 @@ markers = [
   "greenmail: Tests requiring Greenmail service",
   "date_parsing: Tests which cover date parsing from content or filename",
   "management: Tests which cover management commands/functionality",
-  "profiling: Benchmarks for comparing implementation performance (not assertions, inspect output manually)",
 ]
 
 [tool.pytest_env]
