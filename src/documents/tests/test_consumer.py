@@ -715,9 +715,16 @@ class TestConsumer(
         self._assert_first_last_send_progress()
 
     @override_settings(AUDIT_LOG_ENABLED=True)
+    @mock.patch("documents.consumer.document_updated.send")
+    @mock.patch("documents.consumer.document_version_added.send")
     @mock.patch("documents.consumer.load_classifier")
-    def test_consume_version_creates_new_version(self, m) -> None:
-        m.return_value = MagicMock()
+    def test_consume_version_creates_new_version(
+        self,
+        mock_load_classifier: mock.Mock,
+        mock_document_version_added_send: mock.Mock,
+        mock_document_updated_send: mock.Mock,
+    ) -> None:
+        mock_load_classifier.return_value = MagicMock()
 
         with self.get_consumer(self.get_test_file()) as consumer:
             consumer.run()
@@ -785,6 +792,16 @@ class TestConsumer(
         self.assertIsNone(version.archive_serial_number)
         self.assertEqual(version.original_filename, version_file.name)
         self.assertTrue(bool(version.content))
+        mock_document_version_added_send.assert_called_once()
+        self.assertEqual(
+            mock_document_version_added_send.call_args.kwargs["document"].id,
+            version.id,
+        )
+        mock_document_updated_send.assert_called_once()
+        self.assertEqual(
+            mock_document_updated_send.call_args.kwargs["document"].id,
+            root_doc.id,
+        )
 
     @override_settings(AUDIT_LOG_ENABLED=True)
     @mock.patch("documents.consumer.load_classifier")

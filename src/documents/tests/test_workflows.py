@@ -60,6 +60,7 @@ from documents.models import WorkflowTrigger
 from documents.plugins.base import StopConsumeTaskError
 from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_consumption_finished
+from documents.signals import document_version_added
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
@@ -1813,7 +1814,7 @@ class TestWorkflows(
             root_document=root_doc,
         )
 
-        document_consumption_finished.send(
+        document_version_added.send(
             sender=self.__class__,
             document=version_doc,
         )
@@ -1831,42 +1832,6 @@ class TestWorkflows(
                 document=root_doc,
             ).count(),
             1,
-        )
-
-    def test_version_added_workflow_ignored_for_root_documents(self) -> None:
-        trigger = WorkflowTrigger.objects.create(
-            type=WorkflowTrigger.WorkflowTriggerType.VERSION_ADDED,
-        )
-        action = WorkflowAction.objects.create(
-            assign_title="Should not run",
-        )
-        workflow = Workflow.objects.create(
-            name="Version workflow",
-            order=0,
-        )
-        workflow.triggers.add(trigger)
-        workflow.actions.add(action)
-
-        root_doc = Document.objects.create(
-            title="root",
-            correspondent=self.c,
-            original_filename="root.pdf",
-        )
-
-        document_consumption_finished.send(
-            sender=self.__class__,
-            document=root_doc,
-        )
-
-        root_doc.refresh_from_db()
-
-        self.assertEqual(root_doc.title, "root")
-        self.assertFalse(
-            WorkflowRun.objects.filter(
-                workflow=workflow,
-                type=WorkflowTrigger.WorkflowTriggerType.VERSION_ADDED,
-                document=root_doc,
-            ).exists(),
         )
 
     def test_document_updated_workflow(self) -> None:
