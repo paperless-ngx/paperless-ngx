@@ -42,6 +42,47 @@ export enum BulkEditSourceMode {
   EXPLICIT_SELECTION = 'explicit_selection',
 }
 
+export type DocumentBulkEditMethod =
+  | 'set_correspondent'
+  | 'set_document_type'
+  | 'set_storage_path'
+  | 'add_tag'
+  | 'remove_tag'
+  | 'modify_tags'
+  | 'modify_custom_fields'
+  | 'delete'
+  | 'reprocess'
+  | 'set_permissions'
+
+export interface MergeDocumentsRequest {
+  metadata_document_id?: number
+  delete_originals?: boolean
+  archive_fallback?: boolean
+  source_mode?: BulkEditSourceMode
+}
+
+export interface EditPdfOperation {
+  page: number
+  rotate?: number
+  doc?: number
+}
+
+export interface EditPdfDocumentsRequest {
+  operations: EditPdfOperation[]
+  delete_original?: boolean
+  update_document?: boolean
+  include_metadata?: boolean
+  source_mode?: BulkEditSourceMode
+}
+
+export interface RemovePasswordDocumentsRequest {
+  password: string
+  update_document?: boolean
+  delete_original?: boolean
+  include_metadata?: boolean
+  source_mode?: BulkEditSourceMode
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -299,7 +340,7 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     return this.http.get<DocumentMetadata>(url.toString())
   }
 
-  bulkEdit(ids: number[], method: string, args: any) {
+  bulkEdit(ids: number[], method: DocumentBulkEditMethod, args: any) {
     return this.http.post(this.getResourceUrl(null, 'bulk_edit'), {
       documents: ids,
       method: method,
@@ -319,24 +360,27 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     })
   }
 
-  mergeDocuments(ids: number[], args: any = {}) {
+  mergeDocuments(ids: number[], request: MergeDocumentsRequest = {}) {
     return this.http.post(this.getResourceUrl(null, 'merge'), {
       documents: ids,
-      ...args,
+      ...request,
     })
   }
 
-  editPdfDocuments(ids: number[], args: any) {
+  editPdfDocuments(ids: number[], request: EditPdfDocumentsRequest) {
     return this.http.post(this.getResourceUrl(null, 'edit_pdf'), {
       documents: ids,
-      ...args,
+      ...request,
     })
   }
 
-  removePasswordDocuments(ids: number[], args: any) {
+  removePasswordDocuments(
+    ids: number[],
+    request: RemovePasswordDocumentsRequest
+  ) {
     return this.http.post(this.getResourceUrl(null, 'remove_password'), {
       documents: ids,
-      ...args,
+      ...request,
     })
   }
 

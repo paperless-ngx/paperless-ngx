@@ -29,7 +29,9 @@ import { CorrespondentService } from 'src/app/services/rest/correspondent.servic
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import {
+  DocumentBulkEditMethod,
   DocumentService,
+  MergeDocumentsRequest,
   SelectionDataItem,
 } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
@@ -257,7 +259,7 @@ export class BulkEditorComponent
 
   private executeBulkOperation(
     modal: NgbModalRef,
-    method: string,
+    method: DocumentBulkEditMethod,
     args: any,
     overrideDocumentIDs?: number[]
   ) {
@@ -869,15 +871,15 @@ export class BulkEditorComponent
     mergeDialog.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        const args = {}
+        const args: MergeDocumentsRequest = {}
         if (mergeDialog.metadataDocumentID > -1) {
-          args['metadata_document_id'] = mergeDialog.metadataDocumentID
+          args.metadata_document_id = mergeDialog.metadataDocumentID
         }
         if (mergeDialog.deleteOriginals) {
-          args['delete_originals'] = true
+          args.delete_originals = true
         }
         if (mergeDialog.archiveFallback) {
-          args['archive_fallback'] = true
+          args.archive_fallback = true
         }
         mergeDialog.buttonsEnabled = false
         this.executeOperation(
