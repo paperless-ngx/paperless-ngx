@@ -2283,8 +2283,10 @@ class BulkEditView(DocumentOperationPermissionMixin):
         request_method = request.data.get("method")
         api_version = int(request.version or settings.REST_FRAMEWORK["DEFAULT_VERSION"])
         # TODO: remove this and related backwards compatibility code when API v9 is dropped
-        if request_method in BulkEditSerializer.LEGACY_FILE_METHODS:
-            endpoint = BulkEditSerializer.LEGACY_FILE_METHOD_ENDPOINTS[request_method]
+        if request_method in BulkEditSerializer.LEGACY_DOCUMENT_ACTION_METHODS:
+            endpoint = BulkEditSerializer.MOVED_DOCUMENT_ACTION_ENDPOINTS[
+                request_method
+            ]
             logger.warning(
                 "Deprecated bulk_edit method '%s' requested on API version %s. "
                 "Use '%s' instead.",

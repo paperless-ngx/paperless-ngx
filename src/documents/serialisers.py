@@ -1752,7 +1752,7 @@ class BulkEditSerializer(
     SourceModeValidationMixin,
 ):
     # TODO: remove this and related backwards compatibility code when API v9 is dropped
-    LEGACY_FILE_METHOD_ENDPOINTS = {
+    MOVED_DOCUMENT_ACTION_ENDPOINTS = {
         "rotate": "/api/documents/rotate/",
         "merge": "/api/documents/merge/",
         "edit_pdf": "/api/documents/edit_pdf/",
@@ -1760,7 +1760,7 @@ class BulkEditSerializer(
         "split": "/api/documents/edit_pdf/",
         "delete_pages": "/api/documents/edit_pdf/",
     }
-    LEGACY_FILE_METHODS = tuple(LEGACY_FILE_METHOD_ENDPOINTS.keys())
+    LEGACY_DOCUMENT_ACTION_METHODS = tuple(MOVED_DOCUMENT_ACTION_ENDPOINTS.keys())
 
     method = serializers.ChoiceField(
         choices=[
@@ -1774,7 +1774,7 @@ class BulkEditSerializer(
             "delete",
             "reprocess",
             "set_permissions",
-            *LEGACY_FILE_METHODS,
+            *LEGACY_DOCUMENT_ACTION_METHODS,
         ],
         label="Method",
         write_only=True,
