@@ -505,8 +505,8 @@ class TestExportImport(
         self.assertIsFile(expected_file)
 
         with ZipFile(expected_file) as zip:
-            # Extras are from the directories, which also appear in the listing
-            self.assertEqual(len(zip.namelist()), 14)
+            # Direct ZipFile writing doesn't add directory entries (unlike shutil.make_archive)
+            self.assertEqual(len(zip.namelist()), 11)
             self.assertIn("manifest.json", zip.namelist())
             self.assertIn("metadata.json", zip.namelist())
 
@@ -556,6 +556,59 @@ class TestExportImport(
             self.assertEqual(len(zip.namelist()), 11)
             self.assertIn("manifest.json", zip.namelist())
             self.assertIn("metadata.json", zip.namelist())
+
+    def test_export_zip_atomic_on_failure(self) -> None:
+        """
+        GIVEN:
+            - Request to export documents to zipfile
+        WHEN:
+            - Export raises an exception mid-way
+        THEN:
+            - No .zip file is written at the final path
+            - The .tmp file is cleaned up
+        """
+        args = ["document_exporter", self.target, "--zip"]
+
+        with mock.patch.object(
+            document_exporter.Command,
+            "dump",
+            side_effect=RuntimeError("simulated failure"),
+        ):
+            with self.assertRaises(RuntimeError):
+                call_command(*args)
+
+        expected_zip = self.target / f"export-{timezone.localdate().isoformat()}.zip"
+        expected_tmp = (
+            self.target / f"export-{timezone.localdate().isoformat()}.zip.tmp"
+        )
+        self.assertIsNotFile(expected_zip)
+        self.assertIsNotFile(expected_tmp)
+
+    def test_export_zip_no_scratch_dir(self) -> None:
+        """
+        GIVEN:
+            - Request to export documents to zipfile
+        WHEN:
+            - Documents are exported
+        THEN:
+            - No files are written under SCRATCH_DIR during the export
+              (the old workaround used a temp dir there)
+        """
+        from django.conf import settings
+
+        shutil.rmtree(Path(self.dirs.media_dir) / "documents")
+        shutil.copytree(
+            Path(__file__).parent / "samples" / "documents",
+            Path(self.dirs.media_dir) / "documents",
+        )
+
+        scratch_before = set(settings.SCRATCH_DIR.glob("paperless-export*"))
+
+        args = ["document_exporter", self.target, "--zip"]
+        call_command(*args)
+
+        scratch_after = set(settings.SCRATCH_DIR.glob("paperless-export*"))
+        self.assertEqual(scratch_before, scratch_after)
 
     def test_export_target_not_exists(self) -> None:
         """
