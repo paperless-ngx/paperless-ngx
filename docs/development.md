@@ -75,13 +75,13 @@ first-time setup.
 4.  Install the Python dependencies:
 
     ```bash
-    $ uv sync --group dev
+    uv sync --group dev
     ```
 
 5.  Install pre-commit hooks:
 
     ```bash
-    $ uv run prek install
+    uv run prek install
     ```
 
 6.  Apply migrations and create a superuser (also can be done via the web UI) for your development instance:
@@ -89,8 +89,8 @@ first-time setup.
     ```bash
     # src/
 
-    $ uv run manage.py migrate
-    $ uv run manage.py createsuperuser
+    uv run manage.py migrate
+    uv run manage.py createsuperuser
     ```
 
 7.  You can now either ...
@@ -103,7 +103,7 @@ first-time setup.
 
     -   spin up a bare Redis container
 
-        ```
+        ```bash
         docker run -d -p 6379:6379 --restart unless-stopped redis:latest
         ```
 
@@ -118,18 +118,18 @@ work well for development, but you can use whatever you want.
 Configure the IDE to use the `src/`-folder as the base source folder.
 Configure the following launch configurations in your IDE:
 
--   `python3 manage.py runserver`
--   `python3 manage.py document_consumer`
--   `celery --app paperless worker -l DEBUG` (or any other log level)
+-   `uv run manage.py runserver`
+-   `uv run manage.py document_consumer`
+-   `uv run celery --app paperless worker -l DEBUG` (or any other log level)
 
 To start them all:
 
 ```bash
 # src/
 
-$ python3 manage.py runserver & \
-  python3 manage.py document_consumer & \
-  celery --app paperless worker -l DEBUG
+uv run manage.py runserver & \
+  uv run manage.py document_consumer & \
+  uv run celery --app paperless worker -l DEBUG
 ```
 
 You might need the front end to test your back end code.
@@ -140,8 +140,8 @@ To build the front end once use this command:
 ```bash
 # src-ui/
 
-$ pnpm install
-$ ng build --configuration production
+pnpm install
+pnpm ng build --configuration production
 ```
 
 ### Testing
@@ -199,7 +199,7 @@ The front end is built using AngularJS. In order to get started, you need Node.j
 4.  You can launch a development server by running:
 
     ```bash
-    ng serve
+    pnpm ng serve
     ```
 
     This will automatically update whenever you save. However, in-place
@@ -217,21 +217,21 @@ commit. See [above](#code-formatting-with-pre-commit-hooks) for installation ins
 command such as
 
 ```bash
-$ git ls-files -- '*.ts' | xargs prek run prettier --files
+git ls-files -- '*.ts' | xargs uv run prek run prettier --files
 ```
 
 Front end testing uses Jest and Playwright. Unit tests and e2e tests,
 respectively, can be run non-interactively with:
 
 ```bash
-$ ng test
-$ npx playwright test
+pnpm ng test
+pnpm playwright test
 ```
 
 Playwright also includes a UI which can be run with:
 
 ```bash
-$ npx playwright test --ui
+pnpm playwright test --ui
 ```
 
 ### Building the frontend
@@ -239,7 +239,7 @@ $ npx playwright test --ui
 In order to build the front end and serve it as part of Django, execute:
 
 ```bash
-$ ng build --configuration production
+pnpm ng build --configuration production
 ```
 
 This will build the front end and put it in a location from which the
@@ -312,10 +312,10 @@ end (such as error messages).
 -   The source language of the project is "en_US".
 -   Localization files end up in the folder `src/locale/`.
 -   In order to extract strings from the application, call
-    `python3 manage.py makemessages -l en_US`. This is important after
+    `uv run manage.py makemessages -l en_US`. This is important after
     making changes to translatable strings.
 -   The message files need to be compiled for them to show up in the
-    application. Call `python3 manage.py compilemessages` to do this.
+    application. Call `uv run manage.py compilemessages` to do this.
     The generated files don't get committed into git, since these are
     derived artifacts. The build pipeline takes care of executing this
     command.

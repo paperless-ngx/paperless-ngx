@@ -1395,7 +1395,10 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
                 {
                     "documents": [self.doc2.id],
                     "method": "edit_pdf",
-                    "parameters": {"operations": [{"page": 1}]},
+                    "parameters": {
+                        "operations": [{"page": 1}],
+                        "source_mode": "explicit_selection",
+                    },
                 },
             ),
             content_type="application/json",
@@ -1407,6 +1410,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         args, kwargs = m.call_args
         self.assertCountEqual(args[0], [self.doc2.id])
         self.assertEqual(kwargs["operations"], [{"page": 1}])
+        self.assertEqual(kwargs["source_mode"], "explicit_selection")
         self.assertEqual(kwargs["user"], self.user)
 
     def test_edit_pdf_invalid_params(self) -> None:
@@ -1571,6 +1575,24 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             b"update_document only allowed with a single output document",
             response.content,
         )
+
+        # invalid source mode
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "edit_pdf",
+                    "parameters": {
+                        "operations": [{"page": 1}],
+                        "source_mode": "not_a_mode",
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"Invalid source_mode", response.content)
 
     @mock.patch("documents.serialisers.bulk_edit.edit_pdf")
     def test_edit_pdf_page_out_of_bounds(self, m) -> None:

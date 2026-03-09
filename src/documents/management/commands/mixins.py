@@ -71,7 +71,7 @@ class CryptMixin:
     key_size = 32
     kdf_algorithm = "pbkdf2_sha256"
 
-    CRYPT_FIELDS: CryptFields = [
+    CRYPT_FIELDS: list[CryptFields] = [
         {
             "exporter_key": "mail_accounts",
             "model_name": "paperless_mail.mailaccount",
@@ -89,6 +89,10 @@ class CryptMixin:
             ],
         },
     ]
+    # O(1) lookup for per-record encryption; derived from CRYPT_FIELDS at class definition time
+    CRYPT_FIELDS_BY_MODEL: dict[str, list[str]] = {
+        cfg["model_name"]: cfg["fields"] for cfg in CRYPT_FIELDS
+    }
 
     def get_crypt_params(self) -> dict[str, dict[str, str | int]]:
         return {

@@ -1,4 +1,4 @@
-from llama_index.core.bridge.pydantic import BaseModel
+from pydantic import BaseModel
 
 
 class DocumentClassifierSchema(BaseModel):
