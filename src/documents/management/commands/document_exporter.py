@@ -7,7 +7,6 @@ from itertools import islice
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import tqdm
 from allauth.mfa.models import Authenticator
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.models import SocialApp
@@ -18,7 +17,6 @@ from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core import serializers
-from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import transaction
@@ -37,6 +35,7 @@ if settings.AUDIT_LOG_ENABLED:
 
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_filename
+from documents.management.commands.base import PaperlessCommand
 from documents.management.commands.mixins import CryptMixin
 from documents.models import Correspondent
 from documents.models import CustomField
@@ -161,14 +160,18 @@ class StreamingManifestWriter:
             self.close()
 
 
-class Command(CryptMixin, BaseCommand):
+class Command(CryptMixin, PaperlessCommand):
     help = (
         "Decrypt and rename all files in our collection into a given target "
         "directory.  And include a manifest file containing document data for "
         "easy import."
     )
 
+    supports_progress_bar = True
+    supports_multiprocessing = False
+
     def add_arguments(self, parser) -> None:
+        super().add_arguments(parser)
         parser.add_argument("target")
 
         parser.add_argument(
@@ -276,13 +279,6 @@ class Command(CryptMixin, BaseCommand):
         )
 
         parser.add_argument(
-            "--no-progress-bar",
-            default=False,
-            action="store_true",
-            help="If set, the progress bar will not be shown",
-        )
-
-        parser.add_argument(
             "--passphrase",
             help="If provided, is used to encrypt sensitive data in the export",
         )
@@ -310,7 +306,6 @@ class Command(CryptMixin, BaseCommand):
         self.no_thumbnail: bool = options["no_thumbnail"]
         self.zip_export: bool = options["zip"]
         self.data_only: bool = options["data_only"]
-        self.no_progress_bar: bool = options["no_progress_bar"]
         self.passphrase: str | None = options.get("passphrase")
         self.batch_size: int = options["batch_size"]
 
@@ -451,10 +446,12 @@ class Command(CryptMixin, BaseCommand):
             }
 
             # 3. Export files from each document
-            for document_dict in tqdm.tqdm(
-                document_manifest,
-                total=len(document_manifest),
-                disable=self.no_progress_bar,
+            for index, document_dict in enumerate(
+                self.track(
+                    document_manifest,
+                    description="Exporting documents...",
+                    total=len(document_manifest),
+                ),
             ):
                 document = document_map[document_dict["pk"]]
 

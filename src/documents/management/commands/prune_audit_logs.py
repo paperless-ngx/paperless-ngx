@@ -9,6 +9,9 @@ class Command(PaperlessCommand):
 
     help = "Prunes the audit logs of objects that no longer exist."
 
+    supports_progress_bar = True
+    supports_multiprocessing = False
+
     def handle(self, *args, **options):
         with transaction.atomic():
             for log_entry in self.track(
