@@ -24,10 +24,6 @@ from paperless.parsers.registry import get_parser_registry
 from paperless.parsers.registry import init_builtin_parsers
 from paperless.parsers.registry import reset_parser_registry
 
-# ---------------------------------------------------------------------------
-# Shared fixtures
-# ---------------------------------------------------------------------------
-
 
 @pytest.fixture(autouse=True)
 def clean_registry() -> None:
@@ -123,11 +119,6 @@ def dummy_parser_cls() -> type:
     return DummyParser
 
 
-# ---------------------------------------------------------------------------
-# TestParserProtocol
-# ---------------------------------------------------------------------------
-
-
 class TestParserProtocol:
     """Verify runtime isinstance() checks against ParserProtocol."""
 
@@ -182,11 +173,6 @@ class TestParserProtocol:
             {missing_method: None},  # Replace with None — not callable
         )
         assert not isinstance(partial_cls(), ParserProtocol)
-
-
-# ---------------------------------------------------------------------------
-# TestRegistrySingleton
-# ---------------------------------------------------------------------------
 
 
 class TestRegistrySingleton:
@@ -258,11 +244,6 @@ class TestRegistrySingleton:
         init_builtin_parsers()
 
         assert reg_module._registry is first_registry
-
-
-# ---------------------------------------------------------------------------
-# TestParserRegistryGetParserForFile
-# ---------------------------------------------------------------------------
 
 
 class TestParserRegistryGetParserForFile:
@@ -485,11 +466,6 @@ class TestParserRegistryGetParserForFile:
         assert result is AcceptingBuiltin
 
 
-# ---------------------------------------------------------------------------
-# TestDiscover
-# ---------------------------------------------------------------------------
-
-
 class TestDiscover:
     """Verify entrypoint discovery in ParserRegistry.discover()."""
 
@@ -663,11 +639,6 @@ class TestDiscover:
         assert "4.2.0" in info_messages
         assert "Log Tester" in info_messages
         assert "loggable_ep" in info_messages
-
-
-# ---------------------------------------------------------------------------
-# TestLogSummary
-# ---------------------------------------------------------------------------
 
 
 class TestLogSummary:
