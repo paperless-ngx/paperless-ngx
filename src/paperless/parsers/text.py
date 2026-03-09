@@ -26,6 +26,8 @@ if TYPE_CHECKING:
     import datetime
     from types import TracebackType
 
+    from paperless.parsers import MetadataEntry
+
 logger = logging.getLogger("paperless.parsing.text")
 
 _SUPPORTED_MIME_TYPES: dict[str, str] = {
@@ -275,6 +277,20 @@ class TextDocumentParser:
             Always None — page count is not meaningful for plain text.
         """
         return None
+
+    def extract_metadata(
+        self,
+        document_path: Path,
+        mime_type: str,
+    ) -> list[MetadataEntry]:
+        """Extract format-specific metadata from the document.
+
+        Returns
+        -------
+        list[MetadataEntry]
+            Always ``[]`` — plain text files carry no structured metadata.
+        """
+        return []
 
     # ------------------------------------------------------------------
     # Private helpers

@@ -38,6 +38,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from typing import Protocol
 from typing import Self
+from typing import TypedDict
 from typing import runtime_checkable
 
 if TYPE_CHECKING:
@@ -46,8 +47,30 @@ if TYPE_CHECKING:
     from types import TracebackType
 
 __all__ = [
+    "MetadataEntry",
     "ParserProtocol",
 ]
+
+
+class MetadataEntry(TypedDict):
+    """A single metadata field extracted from a document.
+
+    All four keys are required. Values are always serialised to strings —
+    type-specific conversion (dates, integers, lists) is the responsibility
+    of the parser before returning.
+    """
+
+    namespace: str
+    """URI of the metadata namespace (e.g. 'http://ns.adobe.com/pdf/1.3/')."""
+
+    prefix: str
+    """Conventional namespace prefix (e.g. 'pdf', 'xmp', 'dc')."""
+
+    key: str
+    """Field name within the namespace (e.g. 'Author', 'CreateDate')."""
+
+    value: str
+    """String representation of the field value."""
 
 
 @runtime_checkable
@@ -278,6 +301,41 @@ class ParserProtocol(Protocol):
         -------
         int | None
             Page count, or None if the parser cannot determine it.
+        """
+        ...
+
+    def extract_metadata(
+        self,
+        document_path: Path,
+        mime_type: str,
+    ) -> list[MetadataEntry]:
+        """Extract format-specific metadata from the document.
+
+        Called by the API view layer on demand — not during the consumption
+        pipeline. Results are returned to the frontend for per-file display.
+
+        For documents with an archive version, this method is called twice:
+        once for the original file (with its native MIME type) and once for
+        the archive file (with ``"application/pdf"``). Parsers that produce
+        archives should handle both cases.
+
+        Implementations must not raise. A failure to read metadata is not
+        fatal — log a warning and return whatever partial results were
+        collected, or ``[]`` if none.
+
+        Parameters
+        ----------
+        document_path:
+            Absolute path to the file to extract metadata from.
+        mime_type:
+            MIME type of the file at ``document_path``. May be
+            ``"application/pdf"`` when called for the archive version.
+
+        Returns
+        -------
+        list[MetadataEntry]
+            Zero or more metadata entries. Returns ``[]`` if no metadata
+            could be extracted or the format does not support it.
         """
         ...
 

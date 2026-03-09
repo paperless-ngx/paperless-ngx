@@ -189,6 +189,37 @@ class TestTextParserThumbnail:
         assert text_parser.get_page_count(sample_txt_file, "text/plain") is None
 
 
+class TestTextParserMetadata:
+    """Verify extract_metadata behaviour."""
+
+    def test_extract_metadata_returns_empty_list(
+        self,
+        text_parser: TextDocumentParser,
+        sample_txt_file: Path,
+    ) -> None:
+        result = text_parser.extract_metadata(sample_txt_file, "text/plain")
+
+        assert result == []
+
+    def test_extract_metadata_returns_list_type(
+        self,
+        text_parser: TextDocumentParser,
+        sample_txt_file: Path,
+    ) -> None:
+        result = text_parser.extract_metadata(sample_txt_file, "text/plain")
+
+        assert isinstance(result, list)
+
+    def test_extract_metadata_ignores_mime_type(
+        self,
+        text_parser: TextDocumentParser,
+        sample_txt_file: Path,
+    ) -> None:
+        """extract_metadata returns [] regardless of the mime_type argument."""
+        assert text_parser.extract_metadata(sample_txt_file, "application/pdf") == []
+        assert text_parser.extract_metadata(sample_txt_file, "text/csv") == []
+
+
 class TestTextParserRegistry:
     """Verify that TextDocumentParser is registered by default."""
 

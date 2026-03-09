@@ -66,7 +66,6 @@ def dummy_parser_cls() -> type:
             self,
             document_path: Path,
             mime_type: str,
-            file_name: str | None = None,
             *,
             produce_archive: bool = True,
         ) -> None:
@@ -85,7 +84,6 @@ def dummy_parser_cls() -> type:
             self,
             document_path: Path,
             mime_type: str,
-            file_name: str | None = None,
         ) -> Path:
             return Path("/tmp/thumbnail.webp")
 
@@ -95,6 +93,13 @@ def dummy_parser_cls() -> type:
             mime_type: str,
         ) -> int | None:
             return None
+
+        def extract_metadata(
+            self,
+            document_path: Path,
+            mime_type: str,
+        ) -> list:
+            return []
 
         def __enter__(self) -> Self:
             return self
