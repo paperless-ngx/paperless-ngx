@@ -119,15 +119,22 @@ class TestCommandImport(
             # No read permissions
             original_path.chmod(0o222)
 
+            manifest_path = Path(temp_dir) / "manifest.json"
+            manifest_path.write_text(
+                json.dumps(
+                    [
+                        {
+                            "model": "documents.document",
+                            EXPORTER_FILE_NAME: "original.pdf",
+                            EXPORTER_ARCHIVE_NAME: "archive.pdf",
+                        },
+                    ],
+                ),
+            )
+
             cmd = Command()
             cmd.source = Path(temp_dir)
-            cmd.manifest = [
-                {
-                    "model": "documents.document",
-                    EXPORTER_FILE_NAME: "original.pdf",
-                    EXPORTER_ARCHIVE_NAME: "archive.pdf",
-                },
-            ]
+            cmd.manifest_paths = [manifest_path]
             cmd.data_only = False
             with self.assertRaises(CommandError) as cm:
                 cmd.check_manifest_validity()
@@ -296,7 +303,7 @@ class TestCommandImport(
         (self.dirs.scratch_dir / "manifest.json").touch()
 
         # We're not building a manifest, so it fails, but this test doesn't care
-        with self.assertRaises(json.decoder.JSONDecodeError):
+        with self.assertRaises(CommandError):
             call_command(
                 "document_importer",
                 "--no-progress-bar",
@@ -325,7 +332,7 @@ class TestCommandImport(
         )
 
         # We're not building a manifest, so it fails, but this test doesn't care
-        with self.assertRaises(json.decoder.JSONDecodeError):
+        with self.assertRaises(CommandError):
             call_command(
                 "document_importer",
                 "--no-progress-bar",

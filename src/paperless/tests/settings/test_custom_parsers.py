@@ -1,10 +1,279 @@
+import datetime
 import os
 from pathlib import Path
+from typing import Any
 
 import pytest
+from celery.schedules import crontab
 from pytest_mock import MockerFixture
 
+from paperless.settings.custom import parse_beat_schedule
+from paperless.settings.custom import parse_dateparser_languages
 from paperless.settings.custom import parse_db_settings
+from paperless.settings.custom import parse_hosting_settings
+from paperless.settings.custom import parse_ignore_dates
+from paperless.settings.custom import parse_redis_url
+
+
+class TestRedisSocketConversion:
+    @pytest.mark.parametrize(
+        ("input_url", "expected"),
+        [
+            pytest.param(
+                None,
+                ("redis://localhost:6379", "redis://localhost:6379"),
+                id="none_uses_default",
+            ),
+            pytest.param(
+                "redis+socket:///run/redis/redis.sock",
+                (
+                    "redis+socket:///run/redis/redis.sock",
+                    "unix:///run/redis/redis.sock",
+                ),
+                id="celery_style_socket",
+            ),
+            pytest.param(
+                "unix:///run/redis/redis.sock",
+                (
+                    "redis+socket:///run/redis/redis.sock",
+                    "unix:///run/redis/redis.sock",
+                ),
+                id="redis_py_style_socket",
+            ),
+            pytest.param(
+                "redis+socket:///run/redis/redis.sock?virtual_host=5",
+                (
+                    "redis+socket:///run/redis/redis.sock?virtual_host=5",
+                    "unix:///run/redis/redis.sock?db=5",
+                ),
+                id="celery_style_socket_with_db",
+            ),
+            pytest.param(
+                "unix:///run/redis/redis.sock?db=10",
+                (
+                    "redis+socket:///run/redis/redis.sock?virtual_host=10",
+                    "unix:///run/redis/redis.sock?db=10",
+                ),
+                id="redis_py_style_socket_with_db",
+            ),
+            pytest.param(
+                "redis://myredishost:6379",
+                ("redis://myredishost:6379", "redis://myredishost:6379"),
+                id="host_with_port_unchanged",
+            ),
+            # Credentials in unix:// URL contain multiple colons (user:password@)
+            # Regression test for https://github.com/paperless-ngx/paperless-ngx/pull/12239
+            pytest.param(
+                "unix://user:password@/run/redis/redis.sock",
+                (
+                    "redis+socket://user:password@/run/redis/redis.sock",
+                    "unix://user:password@/run/redis/redis.sock",
+                ),
+                id="redis_py_style_socket_with_credentials",
+            ),
+            pytest.param(
+                "redis+socket://user:password@/run/redis/redis.sock",
+                (
+                    "redis+socket://user:password@/run/redis/redis.sock",
+                    "unix://user:password@/run/redis/redis.sock",
+                ),
+                id="celery_style_socket_with_credentials",
+            ),
+        ],
+    )
+    def test_redis_socket_parsing(
+        self,
+        input_url: str | None,
+        expected: tuple[str, str],
+    ) -> None:
+        """
+        GIVEN:
+            - Various Redis connection URI formats
+        WHEN:
+            - The URI is parsed
+        THEN:
+            - Socket based URIs are translated
+            - Non-socket URIs are unchanged
+            - None provided uses default
+        """
+        result = parse_redis_url(input_url)
+        assert expected == result
+
+
+class TestParseHostingSettings:
+    @pytest.mark.parametrize(
+        ("env", "expected"),
+        [
+            pytest.param(
+                {},
+                (
+                    None,
+                    "/",
+                    "/accounts/login/",
+                    "/dashboard",
+                    "/accounts/login/?loggedout=1",
+                ),
+                id="no_env_vars",
+            ),
+            pytest.param(
+                {"PAPERLESS_FORCE_SCRIPT_NAME": "/paperless"},
+                (
+                    "/paperless",
+                    "/paperless/",
+                    "/paperless/accounts/login/",
+                    "/paperless/dashboard",
+                    "/paperless/accounts/login/?loggedout=1",
+                ),
+                id="force_script_name_only",
+            ),
+            pytest.param(
+                {
+                    "PAPERLESS_FORCE_SCRIPT_NAME": "/docs",
+                    "PAPERLESS_LOGOUT_REDIRECT_URL": "/custom/logout",
+                },
+                (
+                    "/docs",
+                    "/docs/",
+                    "/docs/accounts/login/",
+                    "/docs/dashboard",
+                    "/custom/logout",
+                ),
+                id="force_script_name_and_logout_redirect",
+            ),
+        ],
+    )
+    def test_parse_hosting_settings(
+        self,
+        mocker: MockerFixture,
+        env: dict[str, str],
+        expected: tuple[str | None, str, str, str, str],
+    ) -> None:
+        """Test parse_hosting_settings with various env configurations."""
+        mocker.patch.dict(os.environ, env, clear=True)
+
+        result = parse_hosting_settings()
+
+        assert result == expected
+
+
+def make_expected_schedule(
+    overrides: dict[str, dict[str, Any]] | None = None,
+    disabled: set[str] | None = None,
+) -> dict[str, Any]:
+    """
+    Build the expected schedule with optional overrides and disabled tasks.
+    """
+
+    mail_expire = 9.0 * 60.0
+    classifier_expire = 59.0 * 60.0
+    index_expire = 23.0 * 60.0 * 60.0
+    sanity_expire = ((7.0 * 24.0) - 1.0) * 60.0 * 60.0
+    empty_trash_expire = 23.0 * 60.0 * 60.0
+    workflow_expire = 59.0 * 60.0
+    llm_index_expire = 23.0 * 60.0 * 60.0
+    share_link_cleanup_expire = 23.0 * 60.0 * 60.0
+
+    schedule: dict[str, Any] = {
+        "Check all e-mail accounts": {
+            "task": "paperless_mail.tasks.process_mail_accounts",
+            "schedule": crontab(minute="*/10"),
+            "options": {"expires": mail_expire},
+        },
+        "Train the classifier": {
+            "task": "documents.tasks.train_classifier",
+            "schedule": crontab(minute="5", hour="*/1"),
+            "options": {"expires": classifier_expire},
+        },
+        "Optimize the index": {
+            "task": "documents.tasks.index_optimize",
+            "schedule": crontab(minute=0, hour=0),
+            "options": {"expires": index_expire},
+        },
+        "Perform sanity check": {
+            "task": "documents.tasks.sanity_check",
+            "schedule": crontab(minute=30, hour=0, day_of_week="sun"),
+            "options": {"expires": sanity_expire},
+        },
+        "Empty trash": {
+            "task": "documents.tasks.empty_trash",
+            "schedule": crontab(minute=0, hour="1"),
+            "options": {"expires": empty_trash_expire},
+        },
+        "Check and run scheduled workflows": {
+            "task": "documents.tasks.check_scheduled_workflows",
+            "schedule": crontab(minute="5", hour="*/1"),
+            "options": {"expires": workflow_expire},
+        },
+        "Rebuild LLM index": {
+            "task": "documents.tasks.llmindex_index",
+            "schedule": crontab(minute="10", hour="2"),
+            "options": {"expires": llm_index_expire},
+        },
+        "Cleanup expired share link bundles": {
+            "task": "documents.tasks.cleanup_expired_share_link_bundles",
+            "schedule": crontab(minute=0, hour="2"),
+            "options": {"expires": share_link_cleanup_expire},
+        },
+    }
+
+    overrides = overrides or {}
+    disabled = disabled or set()
+
+    for key, val in overrides.items():
+        schedule[key] = {**schedule.get(key, {}), **val}
+
+    for key in disabled:
+        schedule.pop(key, None)
+
+    return schedule
+
+
+class TestParseBeatSchedule:
+    @pytest.mark.parametrize(
+        ("env", "expected"),
+        [
+            pytest.param({}, make_expected_schedule(), id="defaults"),
+            pytest.param(
+                {"PAPERLESS_EMAIL_TASK_CRON": "*/50 * * * mon"},
+                make_expected_schedule(
+                    overrides={
+                        "Check all e-mail accounts": {
+                            "schedule": crontab(minute="*/50", day_of_week="mon"),
+                        },
+                    },
+                ),
+                id="email-changed",
+            ),
+            pytest.param(
+                {"PAPERLESS_INDEX_TASK_CRON": "disable"},
+                make_expected_schedule(disabled={"Optimize the index"}),
+                id="index-disabled",
+            ),
+            pytest.param(
+                {
+                    "PAPERLESS_EMAIL_TASK_CRON": "disable",
+                    "PAPERLESS_TRAIN_TASK_CRON": "disable",
+                    "PAPERLESS_SANITY_TASK_CRON": "disable",
+                    "PAPERLESS_INDEX_TASK_CRON": "disable",
+                    "PAPERLESS_EMPTY_TRASH_TASK_CRON": "disable",
+                    "PAPERLESS_WORKFLOW_SCHEDULED_TASK_CRON": "disable",
+                    "PAPERLESS_LLM_INDEX_TASK_CRON": "disable",
+                    "PAPERLESS_SHARE_LINK_BUNDLE_CLEANUP_CRON": "disable",
+                },
+                {},
+                id="all-disabled",
+            ),
+        ],
+    )
+    def test_parse_beat_schedule(
+        self,
+        env: dict[str, str],
+        expected: dict[str, Any],
+        mocker: MockerFixture,
+    ) -> None:
+        mocker.patch.dict(os.environ, env, clear=False)
+        schedule = parse_beat_schedule()
+        assert schedule == expected
 
 
 class TestParseDbSettings:
@@ -264,3 +533,85 @@ class TestParseDbSettings:
         settings = parse_db_settings(tmp_path)
 
         assert settings == expected_database_settings
+
+
+class TestParseIgnoreDates:
+    """Tests the parsing of the PAPERLESS_IGNORE_DATES setting value."""
+
+    def test_no_ignore_dates_set(self) -> None:
+        """
+        GIVEN:
+            - No ignore dates are set
+        THEN:
+            - No ignore dates are parsed
+        """
+        assert parse_ignore_dates("", "YMD") == set()
+
+    @pytest.mark.parametrize(
+        ("env_str", "date_format", "expected"),
+        [
+            pytest.param(
+                "1985-05-01",
+                "YMD",
+                {datetime.date(1985, 5, 1)},
+                id="single-ymd",
+            ),
+            pytest.param(
+                "1985-05-01,1991-12-05",
+                "YMD",
+                {datetime.date(1985, 5, 1), datetime.date(1991, 12, 5)},
+                id="multiple-ymd",
+            ),
+            pytest.param(
+                "2010-12-13",
+                "YMD",
+                {datetime.date(2010, 12, 13)},
+                id="single-ymd-2",
+            ),
+            pytest.param(
+                "11.01.10",
+                "DMY",
+                {datetime.date(2010, 1, 11)},
+                id="single-dmy",
+            ),
+            pytest.param(
+                "11.01.2001,15-06-1996",
+                "DMY",
+                {datetime.date(2001, 1, 11), datetime.date(1996, 6, 15)},
+                id="multiple-dmy",
+            ),
+        ],
+    )
+    def test_ignore_dates_parsed(
+        self,
+        env_str: str,
+        date_format: str,
+        expected: set[datetime.date],
+    ) -> None:
+        """
+        GIVEN:
+            - Ignore dates are set per certain inputs
+        THEN:
+            - All ignore dates are parsed
+        """
+        assert parse_ignore_dates(env_str, date_format) == expected
+
+
+@pytest.mark.parametrize(
+    ("languages", "expected"),
+    [
+        ("de", ["de"]),
+        ("zh", ["zh"]),
+        ("fr+en", ["fr", "en"]),
+        # Locales must be supported
+        ("en-001+fr-CA", ["en-001", "fr-CA"]),
+        ("en-001+fr", ["en-001", "fr"]),
+        # Special case for Chinese: variants seem to miss some dates,
+        # so we always add "zh" as a fallback.
+        ("en+zh-Hans-HK", ["en", "zh-Hans-HK", "zh"]),
+        ("en+zh-Hans", ["en", "zh-Hans", "zh"]),
+        ("en+zh-Hans+zh-Hant", ["en", "zh-Hans", "zh-Hant", "zh"]),
+    ],
+)
+def test_parse_dateparser_languages(languages: str, expected: list[str]) -> None:
+    assert sorted(parse_dateparser_languages(languages)) == sorted(expected)

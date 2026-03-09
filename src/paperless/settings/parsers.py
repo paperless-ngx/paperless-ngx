@@ -156,6 +156,108 @@ def parse_dict_from_str(
     return settings
 
 
+def get_bool_from_env(key: str, default: str = "NO") -> bool:
+    """
+    Return a boolean value based on whatever the user has supplied in the
+    environment based on whether the value "looks like" it's True or not.
+    """
+    return str_to_bool(os.getenv(key, default))
+
+
+@overload
+def get_float_from_env(key: str) -> float | None: ...
+
+
+@overload
+def get_float_from_env(key: str, default: None) -> float | None: ...
+
+
+@overload
+def get_float_from_env(key: str, default: float) -> float: ...
+
+
+def get_float_from_env(key: str, default: float | None = None) -> float | None:
+    """
+    Return a float value based on the environment variable.
+    If default is provided, returns that value when key is missing.
+    If default is None, returns None when key is missing.
+    """
+    if key not in os.environ:
+        return default
+
+    return float(os.environ[key])
+
+
+@overload
+def get_path_from_env(key: str) -> Path | None: ...
+
+
+@overload
+def get_path_from_env(key: str, default: None) -> Path | None: ...
+
+
+@overload
+def get_path_from_env(key: str, default: Path | str) -> Path: ...
+
+
+def get_path_from_env(key: str, default: Path | str | None = None) -> Path | None:
+    """
+    Return a Path object based on the environment variable.
+    If default is provided, returns that value when key is missing.
+    If default is None, returns None when key is missing.
+    """
+    if key not in os.environ:
+        return default if default is None else Path(default).resolve()
+
+    return Path(os.environ[key]).resolve()
+
+
+def get_list_from_env(
+    key: str,
+    separator: str = ",",
+    default: list[T] | None = None,
+    *,
+    strip_whitespace: bool = True,
+    remove_empty: bool = True,
+    required: bool = False,
+) -> list[str] | list[T]:
+    """
+    Get and parse a list from an environment variable or return a default.
+
+    Args:
+        key: Environment variable name
+        separator: Character(s) to split on (default: ',')
+        default: Default value to return if env var is not set or empty
+        strip_whitespace: Whether to strip whitespace from each element
+        remove_empty: Whether to remove empty strings from the result
+        required: If True, raise an error when the env var is missing and no default provided
+
+    Returns:
+        List of strings or list of type-cast values, or default if env var is empty/None
+
+    Raises:
+        ValueError: If required=True and env var is missing and there is no default
+    """
+    # Get the environment variable value
+    env_value = os.environ.get(key)
+
+    # Handle required environment variables
+    if required and env_value is None and default is None:
+        raise ValueError(f"Required environment variable '{key}' is not set")
+
+    if env_value:
+        items = env_value.split(separator)
+        if strip_whitespace:
+            items = [item.strip() for item in items]
+        if remove_empty:
+            items = [item for item in items if item]
+        return items
+    elif default is not None:
+        return default
+    else:
+        return []
+
+
 def get_choice_from_env(
     env_key: str,
     choices: set[str],
