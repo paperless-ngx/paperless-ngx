@@ -615,8 +615,8 @@ class TestExportImport(
         self.assertIsFile(expected_file)
 
         with ZipFile(expected_file) as zip:
-            # Direct ZipFile writing doesn't add directory entries (unlike shutil.make_archive)
-            self.assertEqual(len(zip.namelist()), 11)
+            # 11 files + 3 directory marker entries for the subdirectory structure
+            self.assertEqual(len(zip.namelist()), 14)
             self.assertIn("manifest.json", zip.namelist())
             self.assertIn("metadata.json", zip.namelist())
 

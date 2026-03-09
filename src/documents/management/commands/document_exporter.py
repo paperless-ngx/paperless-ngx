@@ -330,6 +330,7 @@ class Command(CryptMixin, PaperlessCommand):
         self.files_in_export_dir: set[Path] = set()
         self.exported_files: set[str] = set()
         self.zip_file: zipfile.ZipFile | None = None
+        self._zip_dirs: set[str] = set()
 
         if self.zip_export:
             zip_name = options["zip_name"]
@@ -751,6 +752,19 @@ class Command(CryptMixin, PaperlessCommand):
             manifest_name.parent.mkdir(parents=True, exist_ok=True)
         self.check_and_write_json(content, manifest_name)
 
+    def _ensure_zip_dirs(self, arcname: str) -> None:
+        """Write directory marker entries for all parent directories of arcname.
+
+        Some zip viewers only show folder structure when explicit directory
+        entries exist, so we add them to avoid confusing users.
+        """
+        parts = Path(arcname).parts[:-1]
+        for i in range(len(parts)):
+            dir_arc = "/".join(parts[: i + 1]) + "/"
+            if dir_arc not in self._zip_dirs:
+                self._zip_dirs.add(dir_arc)
+                self.zip_file.mkdir(dir_arc)
+
     def check_and_write_json(
         self,
         content: list[dict] | dict,
@@ -765,6 +779,7 @@ class Command(CryptMixin, PaperlessCommand):
 
         if self.zip_export:
             arcname = str(target.resolve().relative_to(self.target))
+            self._ensure_zip_dirs(arcname)
             self.zip_file.writestr(
                 arcname,
                 json.dumps(
@@ -816,6 +831,7 @@ class Command(CryptMixin, PaperlessCommand):
 
         if self.zip_export:
             arcname = str(target.resolve().relative_to(self.target))
+            self._ensure_zip_dirs(arcname)
             self.zip_file.write(source, arcname=arcname)
             return
 
