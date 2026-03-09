@@ -257,56 +257,70 @@ export class BulkEditorComponent
     this.unsubscribeNotifier.complete()
   }
 
-  private executeBulkOperation(
+  private executeBulkEditMethod(
     modal: NgbModalRef,
     method: DocumentBulkEditMethod,
     args: any,
     overrideDocumentIDs?: number[]
   ) {
-    this.executeOperation(
-      modal,
-      this.documentService.bulkEdit(
+    if (modal) {
+      modal.componentInstance.buttonsEnabled = false
+    }
+    this.documentService
+      .bulkEdit(
         overrideDocumentIDs ?? Array.from(this.list.selected),
         method,
         args
-      ),
-      args
-    )
+      )
+      .pipe(first())
+      .subscribe({
+        next: () => this.handleOperationSuccess(modal),
+        error: (error) => this.handleOperationError(modal, error),
+      })
   }
 
-  private executeOperation(
+  private executeDocumentAction(
     modal: NgbModalRef,
     request: Observable<any>,
-    args: any = {}
+    options: { deleteOriginals?: boolean } = {}
   ) {
     if (modal) {
       modal.componentInstance.buttonsEnabled = false
     }
     request.pipe(first()).subscribe({
       next: () => {
-        if (args['delete_originals']) {
-          this.list.selected.clear()
-        }
-        this.list.reload()
-        this.list.reduceSelectionToFilter()
-        this.list.selected.forEach((id) => {
-          this.openDocumentService.refreshDocument(id)
-        })
-        this.savedViewService.maybeRefreshDocumentCounts()
-        if (modal) {
-          modal.close()
-        }
+        this.handleOperationSuccess(modal, options.deleteOriginals ?? false)
       },
-      error: (error) => {
-        if (modal) {
-          modal.componentInstance.buttonsEnabled = true
-        }
-        this.toastService.showError(
-          $localize`Error executing bulk operation`,
-          error
-        )
-      },
+      error: (error) => this.handleOperationError(modal, error),
     })
+  }
+
+  private handleOperationSuccess(
+    modal: NgbModalRef,
+    clearSelection: boolean = false
+  ) {
+    if (clearSelection) {
+      this.list.selected.clear()
+    }
+    this.list.reload()
+    this.list.reduceSelectionToFilter()
+    this.list.selected.forEach((id) => {
+      this.openDocumentService.refreshDocument(id)
+    })
+    this.savedViewService.maybeRefreshDocumentCounts()
+    if (modal) {
+      modal.close()
+    }
+  }
+
+  private handleOperationError(modal: NgbModalRef, error: any) {
+    if (modal) {
+      modal.componentInstance.buttonsEnabled = true
+    }
+    this.toastService.showError(
+      $localize`Error executing bulk operation`,
+      error
+    )
   }
 
   private applySelectionData(
@@ -457,13 +471,13 @@ export class BulkEditorComponent
       modal.componentInstance.confirmClicked
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
-          this.executeBulkOperation(modal, 'modify_tags', {
+          this.executeBulkEditMethod(modal, 'modify_tags', {
             add_tags: changedTags.itemsToAdd.map((t) => t.id),
             remove_tags: changedTags.itemsToRemove.map((t) => t.id),
           })
         })
     } else {
-      this.executeBulkOperation(null, 'modify_tags', {
+      this.executeBulkEditMethod(null, 'modify_tags', {
         add_tags: changedTags.itemsToAdd.map((t) => t.id),
         remove_tags: changedTags.itemsToRemove.map((t) => t.id),
       })
@@ -497,12 +511,12 @@ export class BulkEditorComponent
       modal.componentInstance.confirmClicked
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
-          this.executeBulkOperation(modal, 'set_correspondent', {
+          this.executeBulkEditMethod(modal, 'set_correspondent', {
             correspondent: correspondent ? correspondent.id : null,
           })
         })
     } else {
-      this.executeBulkOperation(null, 'set_correspondent', {
+      this.executeBulkEditMethod(null, 'set_correspondent', {
         correspondent: correspondent ? correspondent.id : null,
       })
     }
@@ -535,12 +549,12 @@ export class BulkEditorComponent
       modal.componentInstance.confirmClicked
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
-          this.executeBulkOperation(modal, 'set_document_type', {
+          this.executeBulkEditMethod(modal, 'set_document_type', {
             document_type: documentType ? documentType.id : null,
           })
         })
     } else {
-      this.executeBulkOperation(null, 'set_document_type', {
+      this.executeBulkEditMethod(null, 'set_document_type', {
         document_type: documentType ? documentType.id : null,
       })
     }
@@ -573,12 +587,12 @@ export class BulkEditorComponent
       modal.componentInstance.confirmClicked
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
-          this.executeBulkOperation(modal, 'set_storage_path', {
+          this.executeBulkEditMethod(modal, 'set_storage_path', {
             storage_path: storagePath ? storagePath.id : null,
           })
         })
     } else {
-      this.executeBulkOperation(null, 'set_storage_path', {
+      this.executeBulkEditMethod(null, 'set_storage_path', {
         storage_path: storagePath ? storagePath.id : null,
       })
     }
@@ -635,7 +649,7 @@ export class BulkEditorComponent
       modal.componentInstance.confirmClicked
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
-          this.executeBulkOperation(modal, 'modify_custom_fields', {
+          this.executeBulkEditMethod(modal, 'modify_custom_fields', {
             add_custom_fields: changedCustomFields.itemsToAdd.map((f) => f.id),
             remove_custom_fields: changedCustomFields.itemsToRemove.map(
               (f) => f.id
@@ -643,7 +657,7 @@ export class BulkEditorComponent
           })
         })
     } else {
-      this.executeBulkOperation(null, 'modify_custom_fields', {
+      this.executeBulkEditMethod(null, 'modify_custom_fields', {
         add_custom_fields: changedCustomFields.itemsToAdd.map((f) => f.id),
         remove_custom_fields: changedCustomFields.itemsToRemove.map(
           (f) => f.id
@@ -773,10 +787,10 @@ export class BulkEditorComponent
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
           modal.componentInstance.buttonsEnabled = false
-          this.executeBulkOperation(modal, 'delete', {})
+          this.executeBulkEditMethod(modal, 'delete', {})
         })
     } else {
-      this.executeBulkOperation(null, 'delete', {})
+      this.executeBulkEditMethod(null, 'delete', {})
     }
   }
 
@@ -815,7 +829,7 @@ export class BulkEditorComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         modal.componentInstance.buttonsEnabled = false
-        this.executeBulkOperation(modal, 'reprocess', {})
+        this.executeBulkEditMethod(modal, 'reprocess', {})
       })
   }
 
@@ -826,7 +840,7 @@ export class BulkEditorComponent
     modal.componentInstance.confirmClicked.subscribe(
       ({ permissions, merge }) => {
         modal.componentInstance.buttonsEnabled = false
-        this.executeBulkOperation(modal, 'set_permissions', {
+        this.executeBulkEditMethod(modal, 'set_permissions', {
           ...permissions,
           merge,
         })
@@ -849,7 +863,7 @@ export class BulkEditorComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         rotateDialog.buttonsEnabled = false
-        this.executeOperation(
+        this.executeDocumentAction(
           modal,
           this.documentService.rotateDocuments(
             Array.from(this.list.selected),
@@ -882,10 +896,10 @@ export class BulkEditorComponent
           args.archive_fallback = true
         }
         mergeDialog.buttonsEnabled = false
-        this.executeOperation(
+        this.executeDocumentAction(
           modal,
           this.documentService.mergeDocuments(mergeDialog.documentIDs, args),
-          args
+          { deleteOriginals: !!args.delete_originals }
         )
         this.toastService.showInfo(
           $localize`Merged document will be queued for consumption.`
