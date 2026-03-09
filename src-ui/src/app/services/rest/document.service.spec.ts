@@ -230,6 +230,64 @@ describe(`DocumentService`, () => {
     })
   })
 
+  it('should call appropriate api endpoint for rotate documents', () => {
+    const ids = [1, 2, 3]
+    subscription = service.rotateDocuments(ids, 90).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/rotate/`
+    )
+    expect(req.request.method).toEqual('POST')
+    expect(req.request.body).toEqual({
+      documents: ids,
+      degrees: 90,
+      source_mode: 'latest_version',
+    })
+  })
+
+  it('should call appropriate api endpoint for merge documents', () => {
+    const ids = [1, 2, 3]
+    const args = { metadata_document_id: 1, delete_originals: true }
+    subscription = service.mergeDocuments(ids, args).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/merge/`
+    )
+    expect(req.request.method).toEqual('POST')
+    expect(req.request.body).toEqual({
+      documents: ids,
+      metadata_document_id: 1,
+      delete_originals: true,
+    })
+  })
+
+  it('should call appropriate api endpoint for edit pdf', () => {
+    const ids = [1]
+    const args = { operations: [{ page: 1, rotate: 90, doc: 0 }] }
+    subscription = service.editPdfDocuments(ids, args).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/edit_pdf/`
+    )
+    expect(req.request.method).toEqual('POST')
+    expect(req.request.body).toEqual({
+      documents: ids,
+      operations: [{ page: 1, rotate: 90, doc: 0 }],
+    })
+  })
+
+  it('should call appropriate api endpoint for remove password', () => {
+    const ids = [1]
+    const args = { password: 'secret', update_document: true }
+    subscription = service.removePasswordDocuments(ids, args).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/remove_password/`
+    )
+    expect(req.request.method).toEqual('POST')
+    expect(req.request.body).toEqual({
+      documents: ids,
+      password: 'secret',
+      update_document: true,
+    })
+  })
+
   it('should return the correct preview URL for a single document', () => {
     let url = service.getPreviewUrl(documents[0].id)
     expect(url).toEqual(

@@ -307,6 +307,39 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     })
   }
 
+  rotateDocuments(
+    ids: number[],
+    degrees: number,
+    sourceMode: BulkEditSourceMode = BulkEditSourceMode.LATEST_VERSION
+  ) {
+    return this.http.post(this.getResourceUrl(null, 'rotate'), {
+      documents: ids,
+      degrees,
+      source_mode: sourceMode,
+    })
+  }
+
+  mergeDocuments(ids: number[], args: any = {}) {
+    return this.http.post(this.getResourceUrl(null, 'merge'), {
+      documents: ids,
+      ...args,
+    })
+  }
+
+  editPdfDocuments(ids: number[], args: any) {
+    return this.http.post(this.getResourceUrl(null, 'edit_pdf'), {
+      documents: ids,
+      ...args,
+    })
+  }
+
+  removePasswordDocuments(ids: number[], args: any) {
+    return this.http.post(this.getResourceUrl(null, 'remove_password'), {
+      documents: ids,
+      ...args,
+    })
+  }
+
   getSelectionData(ids: number[]): Observable<SelectionData> {
     return this.http.post<SelectionData>(
       this.getResourceUrl(null, 'selection_data'),

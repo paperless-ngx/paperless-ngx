@@ -1669,18 +1669,15 @@ describe('DocumentDetailComponent', () => {
     modal.componentInstance.pages = [{ page: 1, rotate: 0, splitAfter: false }]
     modal.componentInstance.confirm()
     let req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
+      `${environment.apiBaseUrl}documents/edit_pdf/`
     )
     expect(req.request.body).toEqual({
       documents: [10],
-      method: 'edit_pdf',
-      parameters: {
-        operations: [{ page: 1, rotate: 0, doc: 0 }],
-        delete_original: false,
-        update_document: false,
-        include_metadata: true,
-        source_mode: 'explicit_selection',
-      },
+      operations: [{ page: 1, rotate: 0, doc: 0 }],
+      delete_original: false,
+      update_document: false,
+      include_metadata: true,
+      source_mode: 'explicit_selection',
     })
     req.error(new ErrorEvent('failed'))
     expect(errorSpy).toHaveBeenCalled()
@@ -1691,7 +1688,7 @@ describe('DocumentDetailComponent', () => {
     modal.componentInstance.deleteOriginal = true
     modal.componentInstance.confirm()
     req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
+      `${environment.apiBaseUrl}documents/edit_pdf/`
     )
     req.flush(true)
     expect(closeSpy).toHaveBeenCalled()
@@ -1711,18 +1708,15 @@ describe('DocumentDetailComponent', () => {
     dialog.deleteOriginal = true
     dialog.confirm()
     const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
+      `${environment.apiBaseUrl}documents/remove_password/`
     )
     expect(req.request.body).toEqual({
       documents: [10],
-      method: 'remove_password',
-      parameters: {
-        password: 'secret',
-        update_document: false,
-        include_metadata: false,
-        delete_original: true,
-        source_mode: 'explicit_selection',
-      },
+      password: 'secret',
+      update_document: false,
+      include_metadata: false,
+      delete_original: true,
+      source_mode: 'explicit_selection',
     })
     req.flush(true)
   })
@@ -1737,7 +1731,7 @@ describe('DocumentDetailComponent', () => {
 
     expect(errorSpy).toHaveBeenCalled()
     httpTestingController.expectNone(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
+      `${environment.apiBaseUrl}documents/remove_password/`
     )
   })
 
@@ -1753,7 +1747,7 @@ describe('DocumentDetailComponent', () => {
       modal.componentInstance as PasswordRemovalConfirmDialogComponent
     dialog.confirm()
     const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
+      `${environment.apiBaseUrl}documents/remove_password/`
     )
     req.error(new ErrorEvent('failed'))
 
@@ -1774,7 +1768,7 @@ describe('DocumentDetailComponent', () => {
       modal.componentInstance as PasswordRemovalConfirmDialogComponent
     dialog.confirm()
     const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
+      `${environment.apiBaseUrl}documents/remove_password/`
     )
     req.flush(true)
 

@@ -12,7 +12,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { saveAs } from 'file-saver'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { first, map, Subject, switchMap, takeUntil } from 'rxjs'
+import { first, map, Observable, Subject, switchMap, takeUntil } from 'rxjs'
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
 import { CustomField } from 'src/app/data/custom-field'
 import { MatchingModel } from 'src/app/data/matching-model'
@@ -261,41 +261,50 @@ export class BulkEditorComponent
     args: any,
     overrideDocumentIDs?: number[]
   ) {
-    if (modal) {
-      modal.componentInstance.buttonsEnabled = false
-    }
-    this.documentService
-      .bulkEdit(
+    this.executeOperation(
+      modal,
+      this.documentService.bulkEdit(
         overrideDocumentIDs ?? Array.from(this.list.selected),
         method,
         args
-      )
-      .pipe(first())
-      .subscribe({
-        next: () => {
-          if (args['delete_originals']) {
-            this.list.selected.clear()
-          }
-          this.list.reload()
-          this.list.reduceSelectionToFilter()
-          this.list.selected.forEach((id) => {
-            this.openDocumentService.refreshDocument(id)
-          })
-          this.savedViewService.maybeRefreshDocumentCounts()
-          if (modal) {
-            modal.close()
-          }
-        },
-        error: (error) => {
-          if (modal) {
-            modal.componentInstance.buttonsEnabled = true
-          }
-          this.toastService.showError(
-            $localize`Error executing bulk operation`,
-            error
-          )
-        },
-      })
+      ),
+      args
+    )
+  }
+
+  private executeOperation(
+    modal: NgbModalRef,
+    request: Observable<any>,
+    args: any = {}
+  ) {
+    if (modal) {
+      modal.componentInstance.buttonsEnabled = false
+    }
+    request.pipe(first()).subscribe({
+      next: () => {
+        if (args['delete_originals']) {
+          this.list.selected.clear()
+        }
+        this.list.reload()
+        this.list.reduceSelectionToFilter()
+        this.list.selected.forEach((id) => {
+          this.openDocumentService.refreshDocument(id)
+        })
+        this.savedViewService.maybeRefreshDocumentCounts()
+        if (modal) {
+          modal.close()
+        }
+      },
+      error: (error) => {
+        if (modal) {
+          modal.componentInstance.buttonsEnabled = true
+        }
+        this.toastService.showError(
+          $localize`Error executing bulk operation`,
+          error
+        )
+      },
+    })
   }
 
   private applySelectionData(
@@ -838,9 +847,13 @@ export class BulkEditorComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         rotateDialog.buttonsEnabled = false
-        this.executeBulkOperation(modal, 'rotate', {
-          degrees: rotateDialog.degrees,
-        })
+        this.executeOperation(
+          modal,
+          this.documentService.rotateDocuments(
+            Array.from(this.list.selected),
+            rotateDialog.degrees
+          )
+        )
       })
   }
 
@@ -867,7 +880,11 @@ export class BulkEditorComponent
           args['archive_fallback'] = true
         }
         mergeDialog.buttonsEnabled = false
-        this.executeBulkOperation(modal, 'merge', args, mergeDialog.documentIDs)
+        this.executeOperation(
+          modal,
+          this.documentService.mergeDocuments(mergeDialog.documentIDs, args),
+          args
+        )
         this.toastService.showInfo(
           $localize`Merged document will be queued for consumption.`
         )
