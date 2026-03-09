@@ -181,9 +181,13 @@ from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
 from documents.serialisers import DocumentVersionLabelSerializer
 from documents.serialisers import DocumentVersionSerializer
+from documents.serialisers import EditPdfDocumentsSerializer
 from documents.serialisers import EmailSerializer
+from documents.serialisers import MergeDocumentsSerializer
 from documents.serialisers import NotesSerializer
 from documents.serialisers import PostDocumentSerializer
+from documents.serialisers import RemovePasswordDocumentsSerializer
+from documents.serialisers import RotateDocumentsSerializer
 from documents.serialisers import RunTaskViewSerializer
 from documents.serialisers import SavedViewSerializer
 from documents.serialisers import SearchResultSerializer
@@ -2114,6 +2118,125 @@ class SavedViewViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet):
     ordering_fields = ("name",)
 
 
+class DocumentOperationPermissionMixin(PassUserMixin):
+    permission_classes = (IsAuthenticated,)
+    parser_classes = (parsers.JSONParser,)
+    METHOD_NAMES_REQUIRING_USER = {
+        "split",
+        "merge",
+        "rotate",
+        "delete_pages",
+        "edit_pdf",
+        "remove_password",
+    }
+
+    def _has_document_permissions(
+        self,
+        *,
+        user: User,
+        documents: list[int],
+        method,
+        parameters: dict[str, Any],
+    ) -> bool:
+        if user.is_superuser:
+            return True
+
+        document_objs = Document.objects.select_related("owner").filter(
+            pk__in=documents,
+        )
+        user_is_owner_of_all_documents = all(
+            (doc.owner == user or doc.owner is None) for doc in document_objs
+        )
+
+        # check global and object permissions for all documents
+        has_perms = user.has_perm("documents.change_document") and all(
+            has_perms_owner_aware(user, "change_document", doc) for doc in document_objs
+        )
+
+        # check ownership for methods that change original document
+        if (
+            (
+                has_perms
+                and method
+                in [
+                    bulk_edit.set_permissions,
+                    bulk_edit.delete,
+                    bulk_edit.rotate,
+                    bulk_edit.delete_pages,
+                    bulk_edit.edit_pdf,
+                    bulk_edit.remove_password,
+                ]
+            )
+            or (
+                method in [bulk_edit.merge, bulk_edit.split]
+                and parameters.get("delete_originals")
+            )
+            or (method == bulk_edit.edit_pdf and parameters.get("update_document"))
+        ):
+            has_perms = user_is_owner_of_all_documents
+
+        # check global add permissions for methods that create documents
+        if (
+            has_perms
+            and (
+                method in [bulk_edit.split, bulk_edit.merge]
+                or (
+                    method in [bulk_edit.edit_pdf, bulk_edit.remove_password]
+                    and not parameters.get("update_document")
+                )
+            )
+            and not user.has_perm("documents.add_document")
+        ):
+            has_perms = False
+
+        # check global delete permissions for methods that delete documents
+        if (
+            has_perms
+            and (
+                method == bulk_edit.delete
+                or (
+                    method in [bulk_edit.merge, bulk_edit.split]
+                    and parameters.get("delete_originals")
+                )
+            )
+            and not user.has_perm("documents.delete_document")
+        ):
+            has_perms = False
+
+        return has_perms
+
+    def _execute_document_action(
+        self,
+        *,
+        method,
+        validated_data: dict[str, Any],
+        operation_label: str,
+    ):
+        documents = validated_data["documents"]
+        parameters = {k: v for k, v in validated_data.items() if k != "documents"}
+        user = self.request.user
+
+        if method.__name__ in self.METHOD_NAMES_REQUIRING_USER:
+            parameters["user"] = user
+
+        if not self._has_document_permissions(
+            user=user,
+            documents=documents,
+            method=method,
+            parameters=parameters,
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
+
+        try:
+            result = method(documents, **parameters)
+            return Response({"result": result})
+        except Exception as e:
+            logger.warning(f"An error occurred performing {operation_label}: {e!s}")
+            return HttpResponseBadRequest(
+                f"Error performing {operation_label}, check logs for more detail.",
+            )
+
+
 @extend_schema_view(
     post=extend_schema(
         operation_id="bulk_edit",
@@ -2132,7 +2255,7 @@ class SavedViewViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet):
         },
     ),
 )
-class BulkEditView(PassUserMixin):
+class BulkEditView(DocumentOperationPermissionMixin):
     MODIFIED_FIELD_BY_METHOD = {
         "set_correspondent": "correspondent",
         "set_document_type": "document_type",
@@ -2154,11 +2277,21 @@ class BulkEditView(PassUserMixin):
         "remove_password": None,
     }
 
-    permission_classes = (IsAuthenticated,)
     serializer_class = BulkEditSerializer
-    parser_classes = (parsers.JSONParser,)
 
     def post(self, request, *args, **kwargs):
+        request_method = request.data.get("method")
+        api_version = int(request.version or settings.REST_FRAMEWORK["DEFAULT_VERSION"])
+        if request_method in BulkEditSerializer.LEGACY_FILE_METHODS:
+            endpoint = BulkEditSerializer.LEGACY_FILE_METHOD_ENDPOINTS[request_method]
+            logger.warning(
+                "Deprecated bulk_edit method '%s' requested on API version %s. "
+                "Use '%s' instead.",
+                request_method,
+                api_version,
+                endpoint,
+            )
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -2166,82 +2299,15 @@ class BulkEditView(PassUserMixin):
         method = serializer.validated_data.get("method")
         parameters = serializer.validated_data.get("parameters")
         documents = serializer.validated_data.get("documents")
-        if method in [
-            bulk_edit.split,
-            bulk_edit.merge,
-            bulk_edit.rotate,
-            bulk_edit.delete_pages,
-            bulk_edit.edit_pdf,
-            bulk_edit.remove_password,
-        ]:
+        if method.__name__ in self.METHOD_NAMES_REQUIRING_USER:
             parameters["user"] = user
-
-        if not user.is_superuser:
-            document_objs = Document.objects.select_related("owner").filter(
-                pk__in=documents,
-            )
-            user_is_owner_of_all_documents = all(
-                (doc.owner == user or doc.owner is None) for doc in document_objs
-            )
-
-            # check global and object permissions for all documents
-            has_perms = user.has_perm("documents.change_document") and all(
-                has_perms_owner_aware(user, "change_document", doc)
-                for doc in document_objs
-            )
-
-            # check ownership for methods that change original document
-            if (
-                (
-                    has_perms
-                    and method
-                    in [
-                        bulk_edit.set_permissions,
-                        bulk_edit.delete,
-                        bulk_edit.rotate,
-                        bulk_edit.delete_pages,
-                        bulk_edit.edit_pdf,
-                        bulk_edit.remove_password,
-                    ]
-                )
-                or (
-                    method in [bulk_edit.merge, bulk_edit.split]
-                    and parameters["delete_originals"]
-                )
-                or (method == bulk_edit.edit_pdf and parameters["update_document"])
-            ):
-                has_perms = user_is_owner_of_all_documents
-
-            # check global add permissions for methods that create documents
-            if (
-                has_perms
-                and (
-                    method in [bulk_edit.split, bulk_edit.merge]
-                    or (
-                        method in [bulk_edit.edit_pdf, bulk_edit.remove_password]
-                        and not parameters["update_document"]
-                    )
-                )
-                and not user.has_perm("documents.add_document")
-            ):
-                has_perms = False
-
-            # check global delete permissions for methods that delete documents
-            if (
-                has_perms
-                and (
-                    method == bulk_edit.delete
-                    or (
-                        method in [bulk_edit.merge, bulk_edit.split]
-                        and parameters["delete_originals"]
-                    )
-                )
-                and not user.has_perm("documents.delete_document")
-            ):
-                has_perms = False
-
-            if not has_perms:
-                return HttpResponseForbidden("Insufficient permissions")
+        if not self._has_document_permissions(
+            user=user,
+            documents=documents,
+            method=method,
+            parameters=parameters,
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
 
         try:
             modified_field = self.MODIFIED_FIELD_BY_METHOD.get(method.__name__, None)
@@ -2296,6 +2362,114 @@ class BulkEditView(PassUserMixin):
             return HttpResponseBadRequest(
                 "Error performing bulk edit, check logs for more detail.",
             )
+
+
+@extend_schema_view(
+    post=extend_schema(
+        operation_id="documents_rotate",
+        description="Rotate one or more documents",
+        responses={
+            200: inline_serializer(
+                name="RotateDocumentsResult",
+                fields={
+                    "result": serializers.CharField(),
+                },
+            ),
+        },
+    ),
+)
+class RotateDocumentsView(DocumentOperationPermissionMixin):
+    serializer_class = RotateDocumentsSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return self._execute_document_action(
+            method=bulk_edit.rotate,
+            validated_data=serializer.validated_data,
+            operation_label="document rotate",
+        )
+
+
+@extend_schema_view(
+    post=extend_schema(
+        operation_id="documents_merge",
+        description="Merge selected documents into a new document",
+        responses={
+            200: inline_serializer(
+                name="MergeDocumentsResult",
+                fields={
+                    "result": serializers.CharField(),
+                },
+            ),
+        },
+    ),
+)
+class MergeDocumentsView(DocumentOperationPermissionMixin):
+    serializer_class = MergeDocumentsSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return self._execute_document_action(
+            method=bulk_edit.merge,
+            validated_data=serializer.validated_data,
+            operation_label="document merge",
+        )
+
+
+@extend_schema_view(
+    post=extend_schema(
+        operation_id="documents_edit_pdf",
+        description="Perform PDF edit operations on a selected document",
+        responses={
+            200: inline_serializer(
+                name="EditPdfDocumentsResult",
+                fields={
+                    "result": serializers.CharField(),
+                },
+            ),
+        },
+    ),
+)
+class EditPdfDocumentsView(DocumentOperationPermissionMixin):
+    serializer_class = EditPdfDocumentsSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return self._execute_document_action(
+            method=bulk_edit.edit_pdf,
+            validated_data=serializer.validated_data,
+            operation_label="PDF edit",
+        )
+
+
+@extend_schema_view(
+    post=extend_schema(
+        operation_id="documents_remove_password",
+        description="Remove password protection from selected PDFs",
+        responses={
+            200: inline_serializer(
+                name="RemovePasswordDocumentsResult",
+                fields={
+                    "result": serializers.CharField(),
+                },
+            ),
+        },
+    ),
+)
+class RemovePasswordDocumentsView(DocumentOperationPermissionMixin):
+    serializer_class = RemovePasswordDocumentsSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return self._execute_document_action(
+            method=bulk_edit.remove_password,
+            validated_data=serializer.validated_data,
+            operation_label="password removal",
+        )
 
 
 @extend_schema_view(

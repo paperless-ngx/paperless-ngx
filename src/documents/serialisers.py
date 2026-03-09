@@ -1655,11 +1655,112 @@ class DocumentListSerializer(serializers.Serializer):
         return documents
 
 
+class SourceModeValidationMixin:
+    def validate_source_mode(self, source_mode: str) -> str:
+        if source_mode not in bulk_edit.SourceModeChoices.__dict__.values():
+            raise serializers.ValidationError("Invalid source_mode")
+        return source_mode
+
+
+class RotateDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
+    degrees = serializers.IntegerField(required=True)
+    source_mode = serializers.CharField(
+        required=False,
+        default=bulk_edit.SourceModeChoices.LATEST_VERSION,
+    )
+
+
+class MergeDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
+    metadata_document_id = serializers.IntegerField(
+        required=False,
+        allow_null=True,
+    )
+    delete_originals = serializers.BooleanField(required=False, default=False)
+    archive_fallback = serializers.BooleanField(required=False, default=False)
+    source_mode = serializers.CharField(
+        required=False,
+        default=bulk_edit.SourceModeChoices.LATEST_VERSION,
+    )
+
+
+class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
+    operations = serializers.ListField(required=True)
+    delete_original = serializers.BooleanField(required=False, default=False)
+    update_document = serializers.BooleanField(required=False, default=False)
+    include_metadata = serializers.BooleanField(required=False, default=True)
+    source_mode = serializers.CharField(
+        required=False,
+        default=bulk_edit.SourceModeChoices.LATEST_VERSION,
+    )
+
+    def validate(self, attrs):
+        documents = attrs["documents"]
+        if len(documents) > 1:
+            raise serializers.ValidationError(
+                "Edit PDF method only supports one document",
+            )
+
+        operations = attrs["operations"]
+        if not isinstance(operations, list):
+            raise serializers.ValidationError("operations must be a list")
+
+        for op in operations:
+            if not isinstance(op, dict):
+                raise serializers.ValidationError("invalid operation entry")
+            if "page" not in op or not isinstance(op["page"], int):
+                raise serializers.ValidationError("page must be an integer")
+            if "rotate" in op and not isinstance(op["rotate"], int):
+                raise serializers.ValidationError("rotate must be an integer")
+            if "doc" in op and not isinstance(op["doc"], int):
+                raise serializers.ValidationError("doc must be an integer")
+
+        if attrs["update_document"]:
+            max_idx = max(op.get("doc", 0) for op in operations)
+            if max_idx > 0:
+                raise serializers.ValidationError(
+                    "update_document only allowed with a single output document",
+                )
+
+        doc = Document.objects.get(id=documents[0])
+        if doc.page_count:
+            for op in operations:
+                if op["page"] < 1 or op["page"] > doc.page_count:
+                    raise serializers.ValidationError(
+                        f"Page {op['page']} is out of bounds for document with {doc.page_count} pages.",
+                    )
+        return attrs
+
+
+class RemovePasswordDocumentsSerializer(
+    DocumentListSerializer,
+    SourceModeValidationMixin,
+):
+    password = serializers.CharField(required=True)
+    update_document = serializers.BooleanField(required=False, default=False)
+    delete_original = serializers.BooleanField(required=False, default=False)
+    include_metadata = serializers.BooleanField(required=False, default=True)
+    source_mode = serializers.CharField(
+        required=False,
+        default=bulk_edit.SourceModeChoices.LATEST_VERSION,
+    )
+
+
 class BulkEditSerializer(
     SerializerWithPerms,
     DocumentListSerializer,
     SetPermissionsMixin,
+    SourceModeValidationMixin,
 ):
+    LEGACY_FILE_METHOD_ENDPOINTS = {
+        "rotate": "/api/documents/rotate/",
+        "merge": "/api/documents/merge/",
+        "edit_pdf": "/api/documents/edit_pdf/",
+        "remove_password": "/api/documents/remove_password/",
+        "split": "/api/documents/edit_pdf/",
+        "delete_pages": "/api/documents/edit_pdf/",
+    }
+    LEGACY_FILE_METHODS = tuple(LEGACY_FILE_METHOD_ENDPOINTS.keys())
+
     method = serializers.ChoiceField(
         choices=[
             "set_correspondent",
@@ -1672,12 +1773,7 @@ class BulkEditSerializer(
             "delete",
             "reprocess",
             "set_permissions",
-            "rotate",
-            "merge",
-            "split",
-            "delete_pages",
-            "edit_pdf",
-            "remove_password",
+            *LEGACY_FILE_METHODS,
         ],
         label="Method",
         write_only=True,
@@ -1755,8 +1851,7 @@ class BulkEditSerializer(
             return bulk_edit.edit_pdf
         elif method == "remove_password":
             return bulk_edit.remove_password
-        else:  # pragma: no cover
-            # This will never happen as it is handled by the ChoiceField
+        else:
             raise serializers.ValidationError("Unsupported method.")
 
     def _validate_parameters_tags(self, parameters) -> None:
@@ -1866,9 +1961,7 @@ class BulkEditSerializer(
             "source_mode",
             bulk_edit.SourceModeChoices.LATEST_VERSION,
         )
-        if source_mode not in bulk_edit.SourceModeChoices.__dict__.values():
-            raise serializers.ValidationError("Invalid source_mode")
-        parameters["source_mode"] = source_mode
+        parameters["source_mode"] = self.validate_source_mode(source_mode)
 
     def _validate_parameters_split(self, parameters) -> None:
         if "pages" not in parameters:
