@@ -1,8 +1,9 @@
 import hashlib
+import io
 import json
 import os
 import shutil
-import tempfile
+import zipfile
 from itertools import islice
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -97,6 +98,8 @@ class StreamingManifestWriter:
         *,
         compare_json: bool = False,
         files_in_export_dir: "set[Path] | None" = None,
+        zip_file: "zipfile.ZipFile | None" = None,
+        zip_arcname: str | None = None,
     ) -> None:
         self._path = path.resolve()
         self._tmp_path = self._path.with_suffix(self._path.suffix + ".tmp")
@@ -104,12 +107,20 @@ class StreamingManifestWriter:
         self._files_in_export_dir: set[Path] = (
             files_in_export_dir if files_in_export_dir is not None else set()
         )
+        self._zip_file = zip_file
+        self._zip_arcname = zip_arcname
+        self._zip_mode = zip_file is not None
         self._file = None
         self._first = True
 
     def open(self) -> None:
-        self._path.parent.mkdir(parents=True, exist_ok=True)
-        self._file = self._tmp_path.open("w", encoding="utf-8")
+        if self._zip_mode:
+            # zipfile only allows one open write handle at a time, so buffer
+            # the manifest in memory and write it atomically on close()
+            self._file = io.StringIO()
+        else:
+            self._path.parent.mkdir(parents=True, exist_ok=True)
+            self._file = self._tmp_path.open("w", encoding="utf-8")
         self._file.write("[")
         self._first = True
 
@@ -130,15 +141,18 @@ class StreamingManifestWriter:
         if self._file is None:
             return
         self._file.write("\n]")
+        if self._zip_mode:
+            self._zip_file.writestr(self._zip_arcname, self._file.getvalue())
         self._file.close()
         self._file = None
-        self._finalize()
+        if not self._zip_mode:
+            self._finalize()
 
     def discard(self) -> None:
         if self._file is not None:
             self._file.close()
             self._file = None
-        if self._tmp_path.exists():
+        if not self._zip_mode and self._tmp_path.exists():
             self._tmp_path.unlink()
 
     def _finalize(self) -> None:
@@ -315,18 +329,12 @@ class Command(CryptMixin, PaperlessCommand):
 
         self.files_in_export_dir: set[Path] = set()
         self.exported_files: set[str] = set()
+        self.zip_file: zipfile.ZipFile | None = None
 
-        # If zipping, save the original target for later and
-        # get a temporary directory for the target instead
-        temp_dir = None
-        self.original_target = self.target
         if self.zip_export:
-            settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
-            temp_dir = tempfile.TemporaryDirectory(
-                dir=settings.SCRATCH_DIR,
-                prefix="paperless-export",
-            )
-            self.target = Path(temp_dir.name).resolve()
+            zip_name = options["zip_name"]
+            self.zip_path = (self.target / zip_name).with_suffix(".zip")
+            self.zip_tmp_path = self.zip_path.parent / (self.zip_path.name + ".tmp")
 
         if not self.target.exists():
             raise CommandError("That path doesn't exist")
@@ -337,30 +345,53 @@ class Command(CryptMixin, PaperlessCommand):
         if not os.access(self.target, os.W_OK):
             raise CommandError("That path doesn't appear to be writable")
 
+        if self.zip_export:
+            if self.compare_checksums:
+                self.stdout.write(
+                    self.style.WARNING(
+                        "--compare-checksums is ignored when --zip is used",
+                    ),
+                )
+            if self.compare_json:
+                self.stdout.write(
+                    self.style.WARNING(
+                        "--compare-json is ignored when --zip is used",
+                    ),
+                )
+
         try:
             # Prevent any ongoing changes in the documents
             with FileLock(settings.MEDIA_LOCK):
-                self.dump()
-
-                # We've written everything to the temporary directory in this case,
-                # now make an archive in the original target, with all files stored
-                if self.zip_export and temp_dir is not None:
-                    shutil.make_archive(
-                        self.original_target / options["zip_name"],
-                        format="zip",
-                        root_dir=temp_dir.name,
+                if self.zip_export:
+                    self.zip_file = zipfile.ZipFile(
+                        self.zip_tmp_path,
+                        "w",
+                        compression=zipfile.ZIP_DEFLATED,
+                        allowZip64=True,
                     )
 
+                self.dump()
+
+                if self.zip_export and self.zip_file is not None:
+                    self.zip_file.close()
+                    self.zip_file = None
+                    self.zip_tmp_path.rename(self.zip_path)
+
         finally:
-            # Always cleanup the temporary directory, if one was created
-            if self.zip_export and temp_dir is not None:
-                temp_dir.cleanup()
+            # Ensure zip_file is closed and the incomplete .tmp is removed on failure
+            if self.zip_file is not None:
+                self.zip_file.close()
+                self.zip_file = None
+            if self.zip_export and self.zip_tmp_path.exists():
+                self.zip_tmp_path.unlink()
 
     def dump(self) -> None:
         # 1. Take a snapshot of what files exist in the current export folder
-        for x in self.target.glob("**/*"):
-            if x.is_file():
-                self.files_in_export_dir.add(x.resolve())
+        # (skipped in zip mode — always write fresh, no skip/compare logic applies)
+        if not self.zip_export:
+            for x in self.target.glob("**/*"):
+                if x.is_file():
+                    self.files_in_export_dir.add(x.resolve())
 
         # 2. Create manifest, containing all correspondents, types, tags, storage paths
         # note, documents and ui_settings
@@ -421,6 +452,8 @@ class Command(CryptMixin, PaperlessCommand):
             manifest_path,
             compare_json=self.compare_json,
             files_in_export_dir=self.files_in_export_dir,
+            zip_file=self.zip_file,
+            zip_arcname="manifest.json",
         ) as writer:
             with transaction.atomic():
                 for key, qs in manifest_key_to_object_query.items():
@@ -539,8 +572,12 @@ class Command(CryptMixin, PaperlessCommand):
                         self.target,
                     )
             else:
-                # 5. Remove anything in the original location (before moving the zip)
-                for item in self.original_target.glob("*"):
+                # 5. Remove pre-existing files/dirs from target, keeping the
+                # in-progress zip (.tmp) and any prior zip at the final path
+                skip = {self.zip_path.resolve(), self.zip_tmp_path.resolve()}
+                for item in self.target.glob("*"):
+                    if item.resolve() in skip:
+                        continue
                     if item.is_dir():
                         shutil.rmtree(item)
                     else:
@@ -710,7 +747,8 @@ class Command(CryptMixin, PaperlessCommand):
         if self.use_folder_prefix:
             manifest_name = Path("json") / manifest_name
         manifest_name = (self.target / manifest_name).resolve()
-        manifest_name.parent.mkdir(parents=True, exist_ok=True)
+        if not self.zip_export:
+            manifest_name.parent.mkdir(parents=True, exist_ok=True)
         self.check_and_write_json(content, manifest_name)
 
     def check_and_write_json(
@@ -724,6 +762,19 @@ class Command(CryptMixin, PaperlessCommand):
         the file exists and checksum is identical to content checksum.
         This preserves the file timestamps when no changes are made.
         """
+
+        if self.zip_export:
+            arcname = str(target.resolve().relative_to(self.target))
+            self.zip_file.writestr(
+                arcname,
+                json.dumps(
+                    content,
+                    cls=DjangoJSONEncoder,
+                    indent=2,
+                    ensure_ascii=False,
+                ),
+            )
+            return
 
         target = target.resolve()
         perform_write = True
@@ -762,6 +813,11 @@ class Command(CryptMixin, PaperlessCommand):
         Copies the source to the target, if target doesn't exist or the target doesn't seem to match
         the source attributes
         """
+
+        if self.zip_export:
+            arcname = str(target.resolve().relative_to(self.target))
+            self.zip_file.write(source, arcname=arcname)
+            return
 
         target = target.resolve()
         if target in self.files_in_export_dir:
