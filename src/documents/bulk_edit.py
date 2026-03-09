@@ -29,11 +29,20 @@ from documents.plugins.helpers import DocumentsStatusManager
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
 from documents.tasks import update_document_content_maybe_archive_file
+from documents.versioning import get_latest_version_for_root
+from documents.versioning import get_root_document
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import User
 
 logger: logging.Logger = logging.getLogger("paperless.bulk_edit")
+
+SourceMode = Literal["latest_version", "explicit_selection"]
+
+
+class SourceModeChoices:
+    LATEST_VERSION: SourceMode = "latest_version"
+    EXPLICIT_SELECTION: SourceMode = "explicit_selection"
 
 
 @shared_task(bind=True)
@@ -72,46 +81,21 @@ def restore_archive_serial_numbers(backup: dict[int, int | None]) -> None:
     logger.info(f"Restored archive serial numbers for documents {list(backup.keys())}")
 
 
-def _get_root_ids_by_doc_id(doc_ids: list[int]) -> dict[int, int]:
-    """
-    Resolve each provided document id to its root document id.
+def _resolve_root_and_source_doc(
+    doc: Document,
+    *,
+    source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
+) -> tuple[Document, Document]:
+    root_doc = get_root_document(doc)
 
-    - If the id is already a root document: root id is itself.
-    - If the id is a version document: root id is its `root_document_id`.
-    """
-    qs = Document.objects.filter(id__in=doc_ids).only("id", "root_document_id")
-    return {doc.id: doc.root_document_id or doc.id for doc in qs}
+    if source_mode == SourceModeChoices.EXPLICIT_SELECTION:
+        return root_doc, doc
 
+    # Version IDs are explicit by default, only a selected root resolves to latest
+    if doc.root_document_id is not None:
+        return root_doc, doc
 
-def _get_root_and_current_docs_by_root_id(
-    root_ids: set[int],
-) -> tuple[dict[int, Document], dict[int, Document]]:
-    """
-    Returns:
-      - root_docs: root_id -> root Document
-      - current_docs: root_id -> newest version Document (or root if none)
-    """
-    root_docs = {
-        doc.id: doc
-        for doc in Document.objects.filter(id__in=root_ids).select_related(
-            "owner",
-        )
-    }
-    latest_versions_by_root_id: dict[int, Document] = {}
-    for version_doc in Document.objects.filter(root_document_id__in=root_ids).order_by(
-        "root_document_id",
-        "-id",
-    ):
-        root_id = version_doc.root_document_id
-        if root_id is None:
-            continue
-        latest_versions_by_root_id.setdefault(root_id, version_doc)
-
-    current_docs: dict[int, Document] = {
-        root_id: latest_versions_by_root_id.get(root_id, root_docs[root_id])
-        for root_id in root_docs
-    }
-    return root_docs, current_docs
+    return root_doc, get_latest_version_for_root(root_doc)
 
 
 def set_correspondent(
@@ -421,21 +405,32 @@ def rotate(
     doc_ids: list[int],
     degrees: int,
     *,
+    source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
 ) -> Literal["OK"]:
     logger.info(
         f"Attempting to rotate {len(doc_ids)} documents by {degrees} degrees.",
     )
-    doc_to_root_id = _get_root_ids_by_doc_id(doc_ids)
-    root_ids = set(doc_to_root_id.values())
-    root_docs_by_id, current_docs_by_root_id = _get_root_and_current_docs_by_root_id(
-        root_ids,
-    )
+    docs_by_id = {
+        doc.id: doc
+        for doc in Document.objects.select_related("root_document").filter(
+            id__in=doc_ids,
+        )
+    }
+    docs_by_root_id: dict[int, tuple[Document, Document]] = {}
+    for doc_id in doc_ids:
+        doc = docs_by_id.get(doc_id)
+        if doc is None:
+            continue
+        root_doc, source_doc = _resolve_root_and_source_doc(
+            doc,
+            source_mode=source_mode,
+        )
+        docs_by_root_id.setdefault(root_doc.id, (root_doc, source_doc))
+
     import pikepdf
 
-    for root_id in root_ids:
-        root_doc = root_docs_by_id[root_id]
-        source_doc = current_docs_by_root_id[root_id]
+    for root_doc, source_doc in docs_by_root_id.values():
         if source_doc.mime_type != "application/pdf":
             logger.warning(
                 f"Document {root_doc.id} is not a PDF, skipping rotation.",
@@ -481,12 +476,14 @@ def merge(
     metadata_document_id: int | None = None,
     delete_originals: bool = False,
     archive_fallback: bool = False,
+    source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
 ) -> Literal["OK"]:
     logger.info(
         f"Attempting to merge {len(doc_ids)} documents into a single document.",
     )
-    qs = Document.objects.filter(id__in=doc_ids)
+    qs = Document.objects.select_related("root_document").filter(id__in=doc_ids)
+    docs_by_id = {doc.id: doc for doc in qs}
     affected_docs: list[int] = []
     import pikepdf
 
@@ -495,14 +492,20 @@ def merge(
     handoff_asn: int | None = None
     # use doc_ids to preserve order
     for doc_id in doc_ids:
-        doc = qs.get(id=doc_id)
+        doc = docs_by_id.get(doc_id)
+        if doc is None:
+            continue
+        _, source_doc = _resolve_root_and_source_doc(
+            doc,
+            source_mode=source_mode,
+        )
         try:
             doc_path = (
-                doc.archive_path
+                source_doc.archive_path
                 if archive_fallback
-                and doc.mime_type != "application/pdf"
-                and doc.has_archive_version
-                else doc.source_path
+                and source_doc.mime_type != "application/pdf"
+                and source_doc.has_archive_version
+                else source_doc.source_path
             )
             with pikepdf.open(str(doc_path)) as pdf:
                 version = max(version, pdf.pdf_version)
@@ -584,18 +587,23 @@ def split(
     pages: list[list[int]],
     *,
     delete_originals: bool = False,
+    source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
 ) -> Literal["OK"]:
     logger.info(
         f"Attempting to split document {doc_ids[0]} into {len(pages)} documents",
     )
-    doc = Document.objects.get(id=doc_ids[0])
+    doc = Document.objects.select_related("root_document").get(id=doc_ids[0])
+    _, source_doc = _resolve_root_and_source_doc(
+        doc,
+        source_mode=source_mode,
+    )
     import pikepdf
 
     consume_tasks = []
 
     try:
-        with pikepdf.open(doc.source_path) as pdf:
+        with pikepdf.open(source_doc.source_path) as pdf:
             for idx, split_doc in enumerate(pages):
                 dst: pikepdf.Pdf = pikepdf.new()
                 for page in split_doc:
@@ -659,25 +667,17 @@ def delete_pages(
     doc_ids: list[int],
     pages: list[int],
     *,
+    source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
 ) -> Literal["OK"]:
     logger.info(
         f"Attempting to delete pages {pages} from {len(doc_ids)} documents",
     )
     doc = Document.objects.select_related("root_document").get(id=doc_ids[0])
-    root_doc: Document
-    if doc.root_document_id is None or doc.root_document is None:
-        root_doc = doc
-    else:
-        root_doc = doc.root_document
-
-    source_doc = (
-        Document.objects.filter(Q(id=root_doc.id) | Q(root_document=root_doc))
-        .order_by("-id")
-        .first()
+    root_doc, source_doc = _resolve_root_and_source_doc(
+        doc,
+        source_mode=source_mode,
     )
-    if source_doc is None:
-        source_doc = root_doc
     pages = sorted(pages)  # sort pages to avoid index issues
     import pikepdf
 
@@ -722,6 +722,7 @@ def edit_pdf(
     delete_original: bool = False,
     update_document: bool = False,
     include_metadata: bool = True,
+    source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
 ) -> Literal["OK"]:
     """
@@ -736,19 +737,10 @@ def edit_pdf(
         f"Editing PDF of document {doc_ids[0]} with {len(operations)} operations",
     )
     doc = Document.objects.select_related("root_document").get(id=doc_ids[0])
-    root_doc: Document
-    if doc.root_document_id is None or doc.root_document is None:
-        root_doc = doc
-    else:
-        root_doc = doc.root_document
-
-    source_doc = (
-        Document.objects.filter(Q(id=root_doc.id) | Q(root_document=root_doc))
-        .order_by("-id")
-        .first()
+    root_doc, source_doc = _resolve_root_and_source_doc(
+        doc,
+        source_mode=source_mode,
     )
-    if source_doc is None:
-        source_doc = root_doc
     import pikepdf
 
     pdf_docs: list[pikepdf.Pdf] = []
@@ -859,6 +851,7 @@ def remove_password(
     update_document: bool = False,
     delete_original: bool = False,
     include_metadata: bool = True,
+    source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
 ) -> Literal["OK"]:
     """
@@ -868,19 +861,10 @@ def remove_password(
 
     for doc_id in doc_ids:
         doc = Document.objects.select_related("root_document").get(id=doc_id)
-        root_doc: Document
-        if doc.root_document_id is None or doc.root_document is None:
-            root_doc = doc
-        else:
-            root_doc = doc.root_document
-
-        source_doc = (
-            Document.objects.filter(Q(id=root_doc.id) | Q(root_document=root_doc))
-            .order_by("-id")
-            .first()
+        root_doc, source_doc = _resolve_root_and_source_doc(
+            doc,
+            source_mode=source_mode,
         )
-        if source_doc is None:
-            source_doc = root_doc
         try:
             logger.info(
                 f"Attempting password removal from document {doc_ids[0]}",

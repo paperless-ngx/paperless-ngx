@@ -1,22 +1,9 @@
 name: Documentation
 on:
   push:
-    branches:
-      - main
-      - dev
-    paths:
-      - 'docs/**'
-      - 'zensical.toml'
-      - 'pyproject.toml'
-      - 'uv.lock'
-      - '.github/workflows/ci-docs.yml'
+    branches-ignore:
+      - 'translations**'
   pull_request:
-    paths:
-      - 'docs/**'
-      - 'zensical.toml'
-      - 'pyproject.toml'
-      - 'uv.lock'
-      - '.github/workflows/ci-docs.yml'
   workflow_dispatch:
 concurrency:
   group: docs-${{ github.event.pull_request.number || github.ref }}
@@ -29,7 +16,55 @@ env:
   DEFAULT_UV_VERSION: "0.10.x"
   DEFAULT_PYTHON_VERSION: "3.12"
 jobs:
+  changes:
+    name: Detect Docs Changes
+    runs-on: ubuntu-slim
+    outputs:
+      docs_changed: ${{ steps.force.outputs.run_all == 'true' || steps.filter.outputs.docs == 'true' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+      - name: Decide run mode
+        id: force
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "run_all=true" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event_name }}" == "push" && ( "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "dev" ) ]]; then
+            echo "run_all=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_all=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Set diff range
+        id: range
+        if: steps.force.outputs.run_all != 'true'
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "base=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event.created }}" == "true" ]]; then
+            echo "base=origin/${{ github.event.repository.default_branch }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "base=${{ github.event.before }}" >> "$GITHUB_OUTPUT"
+          fi
+          echo "ref=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+      - name: Detect changes
+        id: filter
+        if: steps.force.outputs.run_all != 'true'
+        uses: dorny/paths-filter@v3.0.2
+        with:
+          base: ${{ steps.range.outputs.base }}
+          ref: ${{ steps.range.outputs.ref }}
+          filters: |
+            docs:
+              - 'docs/**'
+              - 'zensical.toml'
+              - 'pyproject.toml'
+              - 'uv.lock'
+              - '.github/workflows/ci-docs.yml'
   build:
+    needs: changes
+    if: needs.changes.outputs.docs_changed == 'true'
     name: Build Documentation
     runs-on: ubuntu-24.04
     steps:
@@ -64,8 +99,8 @@ jobs:
           name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
   deploy:
     name: Deploy Documentation
-    needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [changes, build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.docs_changed == 'true'
     runs-on: ubuntu-24.04
     environment:
       name: github-pages
@@ -76,3 +111,22 @@ jobs:
         id: deployment
         with:
           artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
+  gate:
+    name: Docs CI Gate
+    needs: [changes, build]
+    if: always()
+    runs-on: ubuntu-slim
+    steps:
+      - name: Check gate
+        run: |
+          if [[ "${{ needs.changes.outputs.docs_changed }}" != "true" ]]; then
+            echo "No docs-relevant changes detected."
+            exit 0
+          fi
+
+          if [[ "${{ needs.build.result }}" != "success" ]]; then
+            echo "::error::Docs build job result: ${{ needs.build.result }}"
+            exit 1
+          fi
+
+          echo "Docs checks passed."

@@ -40,6 +40,7 @@ def _process_and_match(work: _WorkPackage) -> _WorkResult:
 class Command(PaperlessCommand):
     help = "Searches for documents where the content almost matches"
 
+    supports_progress_bar = True
     supports_multiprocessing = True
 
     def add_arguments(self, parser):

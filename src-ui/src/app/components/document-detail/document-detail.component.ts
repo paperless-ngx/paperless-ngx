@@ -74,7 +74,10 @@ import {
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
-import { DocumentService } from 'src/app/services/rest/document.service'
+import {
+  BulkEditSourceMode,
+  DocumentService,
+} from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
@@ -1753,20 +1756,23 @@ export class DocumentDetailComponent
       size: 'xl',
       scrollable: true,
     })
+    const sourceDocumentId = this.selectedVersionId ?? this.document.id
     modal.componentInstance.title = $localize`PDF Editor`
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.documentID = this.document.id
+    modal.componentInstance.versionID = sourceDocumentId
     modal.componentInstance.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         modal.componentInstance.buttonsEnabled = false
         this.documentsService
-          .bulkEdit([this.document.id], 'edit_pdf', {
+          .bulkEdit([sourceDocumentId], 'edit_pdf', {
             operations: modal.componentInstance.getOperations(),
             delete_original: modal.componentInstance.deleteOriginal,
             update_document:
               modal.componentInstance.editMode == PdfEditorEditMode.Update,
             include_metadata: modal.componentInstance.includeMetadata,
+            source_mode: BulkEditSourceMode.EXPLICIT_SELECTION,
           })
           .pipe(first(), takeUntil(this.unsubscribeNotifier))
           .subscribe({
@@ -1812,16 +1818,18 @@ export class DocumentDetailComponent
     modal.componentInstance.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
+        const sourceDocumentId = this.selectedVersionId ?? this.document.id
         const dialog =
           modal.componentInstance as PasswordRemovalConfirmDialogComponent
         dialog.buttonsEnabled = false
         this.networkActive = true
         this.documentsService
-          .bulkEdit([this.document.id], 'remove_password', {
+          .bulkEdit([sourceDocumentId], 'remove_password', {
             password: this.password,
             update_document: dialog.updateDocument,
             include_metadata: dialog.includeMetadata,
             delete_original: dialog.deleteOriginal,
+            source_mode: BulkEditSourceMode.EXPLICIT_SELECTION,
           })
           .pipe(first(), takeUntil(this.unsubscribeNotifier))
           .subscribe({
