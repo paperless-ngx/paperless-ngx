@@ -141,7 +141,7 @@ To build the front end once use this command:
 # src-ui/
 
 pnpm install
-pnpm exec ng build --configuration production
+pnpm ng build --configuration production
 ```
 
 ### Testing
@@ -199,7 +199,7 @@ The front end is built using AngularJS. In order to get started, you need Node.j
 4.  You can launch a development server by running:
 
     ```bash
-    pnpm exec ng serve
+    pnpm ng serve
     ```
 
     This will automatically update whenever you save. However, in-place
@@ -224,14 +224,14 @@ Front end testing uses Jest and Playwright. Unit tests and e2e tests,
 respectively, can be run non-interactively with:
 
 ```bash
-pnpm exec ng test
-pnpm exec playwright test
+pnpm ng test
+pnpm playwright test
 ```
 
 Playwright also includes a UI which can be run with:
 
 ```bash
-pnpm exec playwright test --ui
+pnpm playwright test --ui
 ```
 
 ### Building the frontend
@@ -239,7 +239,7 @@ pnpm exec playwright test --ui
 In order to build the front end and serve it as part of Django, execute:
 
 ```bash
-pnpm exec ng build --configuration production
+pnpm ng build --configuration production
 ```
 
 This will build the front end and put it in a location from which the
