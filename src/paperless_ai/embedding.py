@@ -1,13 +1,12 @@
 import json
 from typing import TYPE_CHECKING
 
+from django.conf import settings
+
 if TYPE_CHECKING:
     from pathlib import Path
 
-from django.conf import settings
-from llama_index.core.base.embeddings.base import BaseEmbedding
-from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-from llama_index.embeddings.openai import OpenAIEmbedding
+    from llama_index.core.base.embeddings.base import BaseEmbedding
 
 from documents.models import Document
 from documents.models import Note
@@ -15,17 +14,21 @@ from paperless.config import AIConfig
 from paperless.models import LLMEmbeddingBackend
 
 
-def get_embedding_model() -> BaseEmbedding:
+def get_embedding_model() -> "BaseEmbedding":
     config = AIConfig()
 
     match config.llm_embedding_backend:
         case LLMEmbeddingBackend.OPENAI:
+            from llama_index.embeddings.openai import OpenAIEmbedding
+
             return OpenAIEmbedding(
                 model=config.llm_embedding_model or "text-embedding-3-small",
                 api_key=config.llm_api_key,
                 api_base=config.llm_endpoint or None,
             )
         case LLMEmbeddingBackend.HUGGINGFACE:
+            from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+
             return HuggingFaceEmbedding(
                 model_name=config.llm_embedding_model
                 or "sentence-transformers/all-MiniLM-L6-v2",

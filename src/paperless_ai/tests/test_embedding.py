@@ -67,7 +67,7 @@ def test_get_embedding_model_openai(mock_ai_config):
     mock_ai_config.return_value.llm_api_key = "test_api_key"
     mock_ai_config.return_value.llm_endpoint = "http://test-url"
 
-    with patch("paperless_ai.embedding.OpenAIEmbedding") as MockOpenAIEmbedding:
+    with patch("llama_index.embeddings.openai.OpenAIEmbedding") as MockOpenAIEmbedding:
         model = get_embedding_model()
         MockOpenAIEmbedding.assert_called_once_with(
             model="text-embedding-3-small",
@@ -84,7 +84,7 @@ def test_get_embedding_model_huggingface(mock_ai_config):
     )
 
     with patch(
-        "paperless_ai.embedding.HuggingFaceEmbedding",
+        "llama_index.embeddings.huggingface.HuggingFaceEmbedding",
     ) as MockHuggingFaceEmbedding:
         model = get_embedding_model()
         MockHuggingFaceEmbedding.assert_called_once_with(

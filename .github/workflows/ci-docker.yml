@@ -149,15 +149,16 @@ jobs:
           mkdir -p /tmp/digests
           digest="${{ steps.build.outputs.digest }}"
           echo "digest=${digest}"
-          touch "/tmp/digests/${digest#sha256:}"
+          echo "${digest}" > "/tmp/digests/digest-${{ matrix.arch }}.txt"
       - name: Upload digest
         if: steps.check-push.outputs.should-push == 'true'
         uses: actions/upload-artifact@v7.0.0
         with:
           name: digests-${{ matrix.arch }}
-          path: /tmp/digests/*
+          path: /tmp/digests/digest-${{ matrix.arch }}.txt
           if-no-files-found: error
           retention-days: 1
+          archive: false
   merge-and-push:
     name: Merge and Push Manifest
     runs-on: ubuntu-24.04
@@ -171,7 +172,7 @@ jobs:
         uses: actions/download-artifact@v8.0.0
         with:
           path: /tmp/digests
-          pattern: digests-*
+          pattern: digest-*.txt
           merge-multiple: true
       - name: List digests
         run: |
@@ -217,8 +218,9 @@ jobs:
           tags=$(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "${DOCKER_METADATA_OUTPUT_JSON}")
 
           digests=""
-          for digest in *; do
-            digests+="${{ env.REGISTRY }}/${REPOSITORY}@sha256:${digest} "
+          for digest_file in digest-*.txt; do
+            digest=$(cat "${digest_file}")
+            digests+="${{ env.REGISTRY }}/${REPOSITORY}@${digest} "
           done
 
           echo "Creating manifest with tags: ${tags}"

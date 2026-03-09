@@ -181,11 +181,11 @@ def test_load_or_build_index_builds_when_nodes_given(
 ) -> None:
     with (
         patch(
-            "paperless_ai.indexing.load_index_from_storage",
+            "llama_index.core.load_index_from_storage",
             side_effect=ValueError("Index not found"),
         ),
         patch(
-            "paperless_ai.indexing.VectorStoreIndex",
+            "llama_index.core.VectorStoreIndex",
             return_value=MagicMock(),
         ) as mock_index_cls,
         patch(
@@ -206,7 +206,7 @@ def test_load_or_build_index_raises_exception_when_no_nodes(
 ) -> None:
     with (
         patch(
-            "paperless_ai.indexing.load_index_from_storage",
+            "llama_index.core.load_index_from_storage",
             side_effect=ValueError("Index not found"),
         ),
         patch(
@@ -225,11 +225,11 @@ def test_load_or_build_index_succeeds_when_nodes_given(
 ) -> None:
     with (
         patch(
-            "paperless_ai.indexing.load_index_from_storage",
+            "llama_index.core.load_index_from_storage",
             side_effect=ValueError("Index not found"),
         ),
         patch(
-            "paperless_ai.indexing.VectorStoreIndex",
+            "llama_index.core.VectorStoreIndex",
             return_value=MagicMock(),
         ) as mock_index_cls,
         patch(
@@ -334,7 +334,7 @@ def test_query_similar_documents(
         patch(
             "paperless_ai.indexing.vector_store_file_exists",
         ) as mock_vector_store_exists,
-        patch("paperless_ai.indexing.VectorIndexRetriever") as mock_retriever_cls,
+        patch("llama_index.core.retrievers.VectorIndexRetriever") as mock_retriever_cls,
         patch("paperless_ai.indexing.Document.objects.filter") as mock_filter,
     ):
         mock_storage.return_value = MagicMock()
