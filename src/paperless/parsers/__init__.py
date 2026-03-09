@@ -4,15 +4,14 @@ paperless.parsers
 
 Public interface for the Paperless-ngx parser plugin system.
 
-This module defines :class:`ParserProtocol` — the structural contract that
-every document parser must satisfy — whether it is a built-in parser shipped
-with Paperless-ngx or a third-party parser installed via a Python entrypoint.
+This module defines ParserProtocol — the structural contract that every
+document parser must satisfy, whether it is a built-in parser shipped with
+Paperless-ngx or a third-party parser installed via a Python entrypoint.
 
-Phase 1/2 scope
----------------
-Only the Protocol is defined here.  The transitional :class:`DocumentParser`
-ABC (Phase 3) and concrete built-in parsers (Phase 3+) will be added in later
-phases, so there are intentionally no imports of parser implementations here.
+Phase 1/2 scope: only the Protocol is defined here. The transitional
+DocumentParser ABC (Phase 3) and concrete built-in parsers (Phase 3+) will
+be added in later phases, so there are intentionally no imports of parser
+implementations here.
 
 Usage example (third-party parser)::
 
@@ -58,21 +57,18 @@ class ParserProtocol(Protocol):
     """Structural contract for all Paperless-ngx document parsers.
 
     Both built-in parsers and third-party plugins (discovered via the
-    ``paperless_ngx.parsers`` entrypoint group) must satisfy this Protocol.
-    Because it is decorated with :func:`typing.runtime_checkable`,
-    ``isinstance(obj, ParserProtocol)`` works at runtime based on method
-    presence, which is useful for validation in :meth:`ParserRegistry.discover`.
+    "paperless_ngx.parsers" entrypoint group) must satisfy this Protocol.
+    Because it is decorated with runtime_checkable, isinstance(obj,
+    ParserProtocol) works at runtime based on method presence, which is
+    useful for validation in ParserRegistry.discover.
 
-    Class-level identity attributes
-    --------------------------------
-    Parsers are required to expose four string attributes at the **class**
-    level so the registry can log attribution information without
-    instantiating the parser:
+    Parsers must expose four string attributes at the class level so the
+    registry can log attribution information without instantiating the parser:
 
     name : str
-        Human-readable parser name (e.g. ``"Tesseract OCR"``).
+        Human-readable parser name (e.g. "Tesseract OCR").
     version : str
-        Semantic version string (e.g. ``"1.2.3"``).
+        Semantic version string (e.g. "1.2.3").
     author : str
         Author or organisation name.
     url : str
@@ -96,16 +92,16 @@ class ParserProtocol(Protocol):
     def supported_mime_types(cls) -> dict[str, str]:
         """Return a mapping of supported MIME types to preferred file extensions.
 
-        The keys are MIME type strings (e.g. ``"application/pdf"``), and the
-        values are the preferred file extension **including** the leading dot
-        (e.g. ``".pdf"``).  The registry uses this mapping both to decide
-        whether a parser is a candidate for a given file and to determine the
-        default extension when creating archive copies.
+        The keys are MIME type strings (e.g. "application/pdf"), and the
+        values are the preferred file extension including the leading dot
+        (e.g. ".pdf").  The registry uses this mapping both to decide whether
+        a parser is a candidate for a given file and to determine the default
+        extension when creating archive copies.
 
         Returns
         -------
         dict[str, str]
-            ``{mime_type: extension}`` mapping — may be empty if the parser
+            {mime_type: extension} mapping — may be empty if the parser
             has been temporarily disabled.
         """
         ...
@@ -117,15 +113,15 @@ class ParserProtocol(Protocol):
         filename: str,
         path: Path | None = None,
     ) -> int | None:
-        """Return a priority score for handling ``mime_type`` on ``filename``.
+        """Return a priority score for handling this file, or None to decline.
 
-        The registry calls this method after confirming that the MIME type is
-        in :meth:`supported_mime_types`.  Parsers may inspect ``filename``
-        (and optionally the file at ``path``) to refine their confidence level.
+        The registry calls this after confirming that the MIME type is in
+        supported_mime_types. Parsers may inspect filename and optionally
+        the file at path to refine their confidence level.
 
-        A higher score wins.  Return ``None`` to explicitly decline handling
-        a file even though the MIME type is listed as supported (e.g. when the
-        parser detects a feature flag is disabled, or a licence has expired).
+        A higher score wins. Return None to explicitly decline handling a file
+        even though the MIME type is listed as supported (e.g. when a feature
+        flag is disabled, or a required service is not configured).
 
         Parameters
         ----------
@@ -134,15 +130,14 @@ class ParserProtocol(Protocol):
         filename:
             The original filename, including extension.
         path:
-            Optional filesystem path to the file.  Parsers that need to
+            Optional filesystem path to the file. Parsers that need to
             inspect file content (e.g. magic-byte sniffing) may use this.
-            The path may be ``None`` when scoring happens before the file
-            is available locally.
+            May be None when scoring happens before the file is available locally.
 
         Returns
         -------
         int | None
-            Priority score (higher wins), or ``None`` to decline.
+            Priority score (higher wins), or None to decline.
         """
         ...
 
@@ -154,19 +149,20 @@ class ParserProtocol(Protocol):
     def can_produce_archive(self) -> bool:
         """Whether this parser can produce a searchable PDF archive copy.
 
-        If ``True``, the consumption pipeline will request an archive version
-        when the document is processed.  If ``False``, only the thumbnail and
-        text extraction will be performed.
+        If True, the consumption pipeline may request an archive version when
+        processing the document, subject to the ARCHIVE_FILE_GENERATION
+        setting. If False, only thumbnail and text extraction are performed.
         """
         ...
 
     @property
     def requires_pdf_rendition(self) -> bool:
-        """Whether the parser requires a pre-rendered PDF before parsing.
+        """Whether the parser must produce a PDF for the frontend to display.
 
-        Some parsers (e.g. image-based OCR engines) work on rasterised PDFs
-        rather than the original file.  When ``True``, the pipeline will
-        convert the source document to PDF before calling :meth:`parse`.
+        True for formats the browser cannot display natively (e.g. DOCX, ODT).
+        When True, the pipeline always stores the PDF output regardless of the
+        ARCHIVE_FILE_GENERATION setting, since the original format cannot be
+        shown to the user.
         """
         ...
 
@@ -178,14 +174,13 @@ class ParserProtocol(Protocol):
         self,
         document_path: Path,
         mime_type: str,
-        file_name: str | None = None,
         *,
         produce_archive: bool = True,
     ) -> None:
-        """Parse ``document_path`` and populate internal state.
+        """Parse document_path and populate internal state.
 
-        After a successful call, callers retrieve results via
-        :meth:`get_text`, :meth:`get_date`, and :meth:`get_archive_path`.
+        After a successful call, callers retrieve results via get_text,
+        get_date, and get_archive_path.
 
         Parameters
         ----------
@@ -193,21 +188,16 @@ class ParserProtocol(Protocol):
             Absolute path to the document file to parse.
         mime_type:
             Detected MIME type of the document.
-        file_name:
-            Original filename as provided by the user.  May differ from the
-            stem of ``document_path`` (which is usually a UUID-based name).
         produce_archive:
-            When ``True`` (the default) and :attr:`can_produce_archive` is
-            also ``True``, the parser should produce a searchable PDF at the
-            path returned by :meth:`get_archive_path`.  Pass ``False`` when
-            only text extraction and thumbnail generation are required and
-            disk I/O should be minimised.
+            When True (the default) and can_produce_archive is also True,
+            the parser should produce a searchable PDF at the path returned
+            by get_archive_path. Pass False when only text extraction and
+            thumbnail generation are required and disk I/O should be minimised.
 
         Raises
         ------
         documents.parsers.ParseError
-            If parsing fails for any reason.  The consumption pipeline will
-            catch this and handle failure appropriately.
+            If parsing fails for any reason.
         """
         ...
 
@@ -216,35 +206,34 @@ class ParserProtocol(Protocol):
     # ------------------------------------------------------------------
 
     def get_text(self) -> str | None:
-        """Return the plain-text content extracted during :meth:`parse`.
+        """Return the plain-text content extracted during parse.
 
         Returns
         -------
         str | None
-            Extracted text, or ``None`` if no text could be found.
+            Extracted text, or None if no text could be found.
         """
         ...
 
     def get_date(self) -> datetime.datetime | None:
-        """Return the document date detected during :meth:`parse`.
+        """Return the document date detected during parse.
 
         Returns
         -------
         datetime.datetime | None
-            Detected document date, or ``None`` if no date was found.
+            Detected document date, or None if no date was found.
         """
         ...
 
     def get_archive_path(self) -> Path | None:
-        """Return the path to the generated archive PDF (if any).
+        """Return the path to the generated archive PDF, or None.
 
         Returns
         -------
         Path | None
-            Path to the searchable PDF archive, or ``None`` if no archive
-            was produced (e.g. because ``produce_archive=False`` was passed
-            to :meth:`parse`, or the parser does not support archive
-            production).
+            Path to the searchable PDF archive, or None if no archive was
+            produced (e.g. because produce_archive=False or the parser does
+            not support archive generation).
         """
         ...
 
@@ -252,17 +241,12 @@ class ParserProtocol(Protocol):
     # Thumbnail and metadata
     # ------------------------------------------------------------------
 
-    def get_thumbnail(
-        self,
-        document_path: Path,
-        mime_type: str,
-        file_name: str | None = None,
-    ) -> Path:
+    def get_thumbnail(self, document_path: Path, mime_type: str) -> Path:
         """Generate and return the path to a thumbnail image for the document.
 
-        Unlike :meth:`parse`, this method may be called independently of
-        :meth:`parse`.  The returned path must point to an existing WebP image
-        file inside the parser's temporary working directory.
+        May be called independently of parse. The returned path must point to
+        an existing WebP image file inside the parser's temporary working
+        directory.
 
         Parameters
         ----------
@@ -270,8 +254,6 @@ class ParserProtocol(Protocol):
             Absolute path to the source document.
         mime_type:
             Detected MIME type of the document.
-        file_name:
-            Original filename.
 
         Returns
         -------
@@ -297,7 +279,7 @@ class ParserProtocol(Protocol):
         Returns
         -------
         int | None
-            Page count, or ``None`` if the parser cannot determine it.
+            Page count, or None if the parser cannot determine it.
         """
         ...
 
@@ -308,8 +290,8 @@ class ParserProtocol(Protocol):
     def __enter__(self) -> Self:
         """Enter the parser context, returning the parser instance.
 
-        Implementations should perform any resource allocation (e.g. creating
-        a temporary working directory) here if not done in ``__init__``.
+        Implementations should perform any resource allocation here if not
+        done in __init__ (e.g. creating API clients or temp directories).
 
         Returns
         -------
@@ -324,18 +306,18 @@ class ParserProtocol(Protocol):
         exc_val: BaseException | None,
         exc_tb: object,
     ) -> None:
-        """Exit the parser context and release resources.
+        """Exit the parser context and release all resources.
 
-        Implementations must clean up all temporary files and other
-        resources regardless of whether an exception occurred.
+        Implementations must clean up all temporary files and other resources
+        regardless of whether an exception occurred.
 
         Parameters
         ----------
         exc_type:
-            The exception class, or ``None`` if no exception was raised.
+            The exception class, or None if no exception was raised.
         exc_val:
-            The exception instance, or ``None``.
+            The exception instance, or None.
         exc_tb:
-            The traceback, or ``None``.
+            The traceback, or None.
         """
         ...

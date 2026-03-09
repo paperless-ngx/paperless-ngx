@@ -8,30 +8,29 @@ plugins installed via Python entrypoints.
 
 Public surface
 --------------
-:func:`get_parser_registry`
-    Lazy-initialise and return the shared :class:`ParserRegistry`.  This is
-    the primary entry point for production code.
+get_parser_registry
+    Lazy-initialise and return the shared ParserRegistry. This is the primary
+    entry point for production code.
 
-:func:`init_builtin_parsers`
-    Register built-in parsers only, without entrypoint discovery.  Safe to
-    call from Celery ``worker_process_init`` where importing all entrypoints
+init_builtin_parsers
+    Register built-in parsers only, without entrypoint discovery. Safe to
+    call from Celery worker_process_init where importing all entrypoints
     would be wasteful or cause side effects.
 
-:func:`reset_parser_registry`
-    Reset module-level state.  **For tests only.**
+reset_parser_registry
+    Reset module-level state. For tests only.
 
 Entrypoint group
 ----------------
 Third-party parsers must advertise themselves under the
-``paperless_ngx.parsers`` entrypoint group in their ``pyproject.toml``::
+"paperless_ngx.parsers" entrypoint group in their pyproject.toml::
 
     [project.entry-points."paperless_ngx.parsers"]
     my_parser = "my_package.parsers:MyParser"
 
-The loaded class must expose the following attributes *at the class level*
+The loaded class must expose the following attributes at the class level
 (not just on instances) for the registry to accept it:
-``name``, ``version``, ``author``, ``url``,
-``supported_mime_types`` (callable), ``score`` (callable).
+name, version, author, url, supported_mime_types (callable), score (callable).
 """
 
 from __future__ import annotations
@@ -69,16 +68,14 @@ _REQUIRED_ATTRS: tuple[str, ...] = (
 
 
 def get_parser_registry() -> ParserRegistry:
-    """Return the shared :class:`ParserRegistry` instance.
+    """Return the shared ParserRegistry instance.
 
     On the first call this function:
 
-    1. Creates a new :class:`ParserRegistry`.
-    2. Calls :meth:`~ParserRegistry.register_defaults` to install built-in
-       parsers.
-    3. Calls :meth:`~ParserRegistry.discover` to load third-party plugins via
-       ``importlib.metadata`` entrypoints.
-    4. Calls :meth:`~ParserRegistry.log_summary` to emit a startup summary.
+    1. Creates a new ParserRegistry.
+    2. Calls register_defaults to install built-in parsers.
+    3. Calls discover to load third-party plugins via importlib.metadata entrypoints.
+    4. Calls log_summary to emit a startup summary.
 
     Subsequent calls return the same instance immediately.
 
@@ -104,13 +101,12 @@ def get_parser_registry() -> ParserRegistry:
 def init_builtin_parsers() -> None:
     """Register built-in parsers without performing entrypoint discovery.
 
-    This function is intended for use in Celery ``worker_process_init``
-    handlers and similar contexts where importing all installed entrypoints
-    would be wasteful, slow, or could produce undesirable side effects.
+    Intended for use in Celery worker_process_init handlers where importing
+    all installed entrypoints would be wasteful, slow, or could produce
+    undesirable side effects. Entrypoint discovery (third-party plugins) is
+    deliberately not performed.
 
-    It is safe to call this function multiple times; subsequent calls are
-    no-ops.  Entrypoint discovery (i.e. third-party plugins) is deliberately
-    **not** performed.
+    Safe to call multiple times — subsequent calls are no-ops.
 
     Returns
     -------
@@ -126,15 +122,13 @@ def init_builtin_parsers() -> None:
 def reset_parser_registry() -> None:
     """Reset the module-level registry state to its initial values.
 
-    This resets both :data:`_registry` and :data:`_discovery_complete` so
-    that the next call to :func:`get_parser_registry` will re-initialise
-    everything from scratch.
+    Resets _registry and _discovery_complete so the next call to
+    get_parser_registry will re-initialise everything from scratch.
 
-    .. warning::
-        **FOR TESTS ONLY.**  Do not call this function in production code.
-        Resetting the registry mid-request will cause all subsequent parser
-        lookups to go through discovery again, which is expensive and may
-        have unexpected side effects in multi-threaded environments.
+    FOR TESTS ONLY. Do not call this in production code — resetting the
+    registry mid-request causes all subsequent parser lookups to go through
+    discovery again, which is expensive and may have unexpected side effects
+    in multi-threaded environments.
 
     Returns
     -------
@@ -156,19 +150,18 @@ class ParserRegistry:
 
     Parsers are partitioned into two lists:
 
-    ``_builtins``
-        Parser classes registered via :meth:`register_builtin` (populated by
-        :meth:`register_defaults` in Phase 3+).
+    _builtins
+        Parser classes registered via register_builtin (populated by
+        register_defaults in Phase 3+).
 
-    ``_external``
-        Parser classes loaded from installed Python entrypoints via
-        :meth:`discover`.
+    _external
+        Parser classes loaded from installed Python entrypoints via discover.
 
     When resolving a parser for a file, external parsers are evaluated
-    alongside built-in parsers using a uniform scoring mechanism.  Both lists
-    are iterated together; the class with the highest :meth:`~ParserProtocol.score`
-    wins.  If an external parser wins, its attribution details are logged so
-    users can identify which third-party package handled their document.
+    alongside built-in parsers using a uniform scoring mechanism. Both lists
+    are iterated together; the class with the highest score wins. If an
+    external parser wins, its attribution details are logged so users can
+    identify which third-party package handled their document.
     """
 
     def __init__(self) -> None:
@@ -183,14 +176,13 @@ class ParserRegistry:
         """Register a built-in parser class.
 
         Built-in parsers are shipped with Paperless-ngx and are appended to
-        the ``_builtins`` list.  They are never overridden by external parsers;
+        the _builtins list. They are never overridden by external parsers;
         instead, scoring determines which parser wins for any given file.
 
         Parameters
         ----------
         parser_class:
-            The parser class to register.  Must satisfy
-            :class:`~paperless.parsers.ParserProtocol`.
+            The parser class to register. Must satisfy ParserProtocol.
         """
         self._builtins.append(parser_class)
 
@@ -208,19 +200,18 @@ class ParserRegistry:
     # ------------------------------------------------------------------
 
     def discover(self) -> None:
-        """Load third-party parsers from the ``paperless_ngx.parsers`` entrypoint group.
+        """Load third-party parsers from the "paperless_ngx.parsers" entrypoint group.
 
         For each advertised entrypoint the method:
 
-        1. Calls ``ep.load()`` to import the class.
+        1. Calls ep.load() to import the class.
         2. Validates that the class exposes all required attributes.
-        3. On success, appends the class to :attr:`_external` and logs an
-           info message.
-        4. On failure (import error or missing attributes), logs an
-           appropriate warning/error and continues to the next entrypoint.
+        3. On success, appends the class to _external and logs an info message.
+        4. On failure (import error or missing attributes), logs an appropriate
+           warning/error and continues to the next entrypoint.
 
-        Errors during discovery of a single parser do not prevent other
-        parsers from being loaded.
+        Errors during discovery of a single parser do not prevent other parsers
+        from being loaded.
 
         Returns
         -------
@@ -313,22 +304,20 @@ class ParserRegistry:
         filename: str,
         path: Path | None = None,
     ) -> type | None:
-        """Return the best parser class for the given file, or ``None``.
+        """Return the best parser class for the given file, or None.
 
         All registered parsers (external first, then built-ins) are evaluated
-        against the file.  A parser is eligible if:
+        against the file. A parser is eligible if mime_type appears in the dict
+        returned by its supported_mime_types classmethod, and its score
+        classmethod returns a non-None integer.
 
-        * ``mime_type`` appears in the dict returned by its
-          ``supported_mime_types()`` classmethod, **and**
-        * its ``score()`` classmethod returns a non-``None`` integer.
-
-        The parser with the highest score wins.  When two parsers return the
+        The parser with the highest score wins. When two parsers return the
         same score, the one that appears earlier in the evaluation order wins
         (external parsers are evaluated before built-ins, giving third-party
         packages a chance to override defaults at equal priority).
 
-        When an external parser is selected, its identity is logged at
-        ``INFO`` level so operators can trace which package handled a document.
+        When an external parser is selected, its identity is logged at INFO
+        level so operators can trace which package handled a document.
 
         Parameters
         ----------
@@ -337,14 +326,13 @@ class ParserRegistry:
         filename:
             The original filename, including extension.
         path:
-            Optional filesystem path to the file.  Forwarded to each
-            parser's ``score()`` method.
+            Optional filesystem path to the file. Forwarded to each
+            parser's score method.
 
         Returns
         -------
         type | None
-            The winning parser class, or ``None`` if no parser can handle
-            the file.
+            The winning parser class, or None if no parser can handle the file.
         """
         best_score: int | None = None
         best_parser: type | None = None
