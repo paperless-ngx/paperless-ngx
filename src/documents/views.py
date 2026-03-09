@@ -2282,6 +2282,7 @@ class BulkEditView(DocumentOperationPermissionMixin):
     def post(self, request, *args, **kwargs):
         request_method = request.data.get("method")
         api_version = int(request.version or settings.REST_FRAMEWORK["DEFAULT_VERSION"])
+        # TODO: remove this and related backwards compatibility code when API v9 is dropped
         if request_method in BulkEditSerializer.LEGACY_FILE_METHODS:
             endpoint = BulkEditSerializer.LEGACY_FILE_METHOD_ENDPOINTS[request_method]
             logger.warning(

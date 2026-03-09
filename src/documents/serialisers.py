@@ -1751,6 +1751,7 @@ class BulkEditSerializer(
     SetPermissionsMixin,
     SourceModeValidationMixin,
 ):
+    # TODO: remove this and related backwards compatibility code when API v9 is dropped
     LEGACY_FILE_METHOD_ENDPOINTS = {
         "rotate": "/api/documents/rotate/",
         "merge": "/api/documents/merge/",
