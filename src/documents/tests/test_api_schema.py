@@ -25,3 +25,35 @@ class TestApiSchema(APITestCase):
 
         ui_response = self.client.get(self.ENDPOINT + "view/")
         self.assertEqual(ui_response.status_code, status.HTTP_200_OK)
+
+    def test_schema_includes_dedicated_document_edit_endpoints(self) -> None:
+        schema_response = self.client.get(self.ENDPOINT)
+        self.assertEqual(schema_response.status_code, status.HTTP_200_OK)
+
+        paths = schema_response.data["paths"]
+        self.assertIn("/api/documents/rotate/", paths)
+        self.assertIn("/api/documents/merge/", paths)
+        self.assertIn("/api/documents/edit_pdf/", paths)
+        self.assertIn("/api/documents/remove_password/", paths)
+
+    def test_schema_bulk_edit_advertises_legacy_file_edit_methods(self) -> None:
+        schema_response = self.client.get(self.ENDPOINT)
+        self.assertEqual(schema_response.status_code, status.HTTP_200_OK)
+
+        schema = schema_response.data["components"]["schemas"]
+        bulk_schema = schema["BulkEditRequest"]
+        method_schema = bulk_schema["properties"]["method"]
+
+        # drf-spectacular emits the enum as a referenced schema for this field
+        enum_ref = method_schema["allOf"][0]["$ref"].split("/")[-1]
+        advertised_methods = schema[enum_ref]["enum"]
+
+        for file_method in [
+            "rotate",
+            "merge",
+            "edit_pdf",
+            "remove_password",
+            "split",
+            "delete_pages",
+        ]:
+            self.assertIn(file_method, advertised_methods)
