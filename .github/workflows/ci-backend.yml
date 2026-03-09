@@ -16,7 +16,7 @@ env:
 jobs:
   changes:
     name: Detect Backend Changes
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     outputs:
       backend_changed: ${{ steps.force.outputs.run_all == 'true' || steps.filter.outputs.backend == 'true' }}
     steps:
@@ -192,7 +192,7 @@ jobs:
     name: Backend CI Gate
     needs: [changes, test, typing]
     if: always()
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       - name: Check gate
         run: |

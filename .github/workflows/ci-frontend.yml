@@ -13,7 +13,7 @@ concurrency:
 jobs:
   changes:
     name: Detect Frontend Changes
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     outputs:
       frontend_changed: ${{ steps.force.outputs.run_all == 'true' || steps.filter.outputs.frontend == 'true' }}
     steps:
@@ -234,7 +234,7 @@ jobs:
     name: Frontend CI Gate
     needs: [changes, install-dependencies, lint, unit-tests, e2e-tests, bundle-analysis]
     if: always()
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       - name: Check gate
         run: |

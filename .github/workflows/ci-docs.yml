@@ -18,7 +18,7 @@ env:
 jobs:
   changes:
     name: Detect Docs Changes
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     outputs:
       docs_changed: ${{ steps.force.outputs.run_all == 'true' || steps.filter.outputs.docs == 'true' }}
     steps:
@@ -115,7 +115,7 @@ jobs:
     name: Docs CI Gate
     needs: [changes, build]
     if: always()
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       - name: Check gate
         run: |
