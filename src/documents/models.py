@@ -361,6 +361,42 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
             res += f" {self.title}"
         return res
 
+    def get_effective_content(self) -> str | None:
+        """
+        Returns the effective content for the document.
+
+        For root documents, this is the latest version's content when available.
+        For version documents, this is always the document's own content.
+        If the queryset already annotated ``effective_content``, that value is used.
+        """
+        if hasattr(self, "effective_content"):
+            return getattr(self, "effective_content")
+
+        if self.root_document_id is not None or self.pk is None:
+            return self.content
+
+        prefetched_cache = getattr(self, "_prefetched_objects_cache", None)
+        prefetched_versions = (
+            prefetched_cache.get("versions")
+            if isinstance(prefetched_cache, dict)
+            else None
+        )
+        if prefetched_versions:
+            latest_prefetched = max(prefetched_versions, key=lambda doc: doc.id)
+            return latest_prefetched.content
+
+        latest_version_content = (
+            Document.objects.filter(root_document=self)
+            .order_by("-id")
+            .values_list("content", flat=True)
+            .first()
+        )
+        return (
+            latest_version_content
+            if latest_version_content is not None
+            else self.content
+        )
+
     @property
     def suggestion_content(self):
         """
@@ -373,15 +409,21 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         This improves processing speed for large documents while keeping
         enough context for accurate suggestions.
         """
-        if not self.content or len(self.content) <= 1200000:
-            return self.content
+        effective_content = self.get_effective_content()
+        if not effective_content or len(effective_content) <= 1200000:
+            return effective_content
         else:
             # Use 80% from the start and 20% from the end
             # to preserve both opening and closing context.
             head_len = 800000
             tail_len = 200000
 
-            return " ".join((self.content[:head_len], self.content[-tail_len:]))
+            return " ".join(
+                (
+                    effective_content[:head_len],
+                    effective_content[-tail_len:],
+                ),
+            )
 
     @property
     def source_path(self) -> Path:

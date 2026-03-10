@@ -156,6 +156,46 @@ class TestDocument(TestCase):
         )
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test")
 
+    def test_suggestion_content_uses_latest_version_content_for_root_documents(
+        self,
+    ) -> None:
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+            content="outdated root content",
+        )
+        version = Document.objects.create(
+            title="v1",
+            checksum="v1",
+            mime_type="application/pdf",
+            root_document=root,
+            content="latest version content",
+        )
+
+        self.assertEqual(root.suggestion_content, version.content)
+
+    def test_content_length_is_per_document_row_for_versions(self) -> None:
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+            content="abc",
+        )
+        version = Document.objects.create(
+            title="v1",
+            checksum="v1",
+            mime_type="application/pdf",
+            root_document=root,
+            content="abcdefgh",
+        )
+
+        root.refresh_from_db()
+        version.refresh_from_db()
+
+        self.assertEqual(root.content_length, 3)
+        self.assertEqual(version.content_length, 8)
+
 
 def test_suggestion_content() -> None:
     """
