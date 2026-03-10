@@ -1,7 +1,4 @@
 """
-paperless.parsers.registry
-==========================
-
 Singleton registry that tracks all document parsers available to
 Paperless-ngx — both built-ins shipped with the application and third-party
 plugins installed via Python entrypoints.
@@ -41,6 +38,8 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+    from paperless.parsers import ParserProtocol
 
 logger = logging.getLogger("paperless.parsers.registry")
 
@@ -117,6 +116,7 @@ def init_builtin_parsers() -> None:
     if _registry is None:
         _registry = ParserRegistry()
         _registry.register_defaults()
+        _registry.log_summary()
 
 
 def reset_parser_registry() -> None:
@@ -165,14 +165,14 @@ class ParserRegistry:
     """
 
     def __init__(self) -> None:
-        self._external: list[type] = []
-        self._builtins: list[type] = []
+        self._external: list[type[ParserProtocol]] = []
+        self._builtins: list[type[ParserProtocol]] = []
 
     # ------------------------------------------------------------------
     # Registration
     # ------------------------------------------------------------------
 
-    def register_builtin(self, parser_class: type) -> None:
+    def register_builtin(self, parser_class: type[ParserProtocol]) -> None:
         """Register a built-in parser class.
 
         Built-in parsers are shipped with Paperless-ngx and are appended to
@@ -189,11 +189,14 @@ class ParserRegistry:
     def register_defaults(self) -> None:
         """Register the built-in parsers that ship with Paperless-ngx.
 
-        Populated in Phase 3 when built-in parsers implement the new
-        interface.  In Phase 1/2 this is intentionally a no-op so that the
-        registry infrastructure can be tested in isolation without depending
-        on any concrete parser implementations.
+        Each parser that has been migrated to the new ParserProtocol interface
+        is registered here.  Parsers are added in ascending weight order so
+        that log output is predictable; scoring determines which parser wins
+        at runtime regardless of registration order.
         """
+        from paperless.parsers.text import TextDocumentParser
+
+        self.register_builtin(TextDocumentParser)
 
     # ------------------------------------------------------------------
     # Discovery
@@ -303,7 +306,7 @@ class ParserRegistry:
         mime_type: str,
         filename: str,
         path: Path | None = None,
-    ) -> type | None:
+    ) -> type[ParserProtocol] | None:
         """Return the best parser class for the given file, or None.
 
         All registered parsers (external first, then built-ins) are evaluated
@@ -331,11 +334,11 @@ class ParserRegistry:
 
         Returns
         -------
-        type | None
+        type[ParserProtocol] | None
             The winning parser class, or None if no parser can handle the file.
         """
         best_score: int | None = None
-        best_parser: type | None = None
+        best_parser: type[ParserProtocol] | None = None
 
         # External parsers are placed first so that, at equal scores, an
         # external parser wins over a built-in (first-seen policy).

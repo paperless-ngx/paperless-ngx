@@ -1,7 +1,4 @@
 """
-paperless.parsers
-=================
-
 Public interface for the Paperless-ngx parser plugin system.
 
 This module defines ParserProtocol — the structural contract that every
@@ -46,6 +43,7 @@ from typing import runtime_checkable
 if TYPE_CHECKING:
     import datetime
     from pathlib import Path
+    from types import TracebackType
 
 __all__ = [
     "ParserProtocol",
@@ -304,7 +302,7 @@ class ParserProtocol(Protocol):
         self,
         exc_type: type[BaseException] | None,
         exc_val: BaseException | None,
-        exc_tb: object,
+        exc_tb: TracebackType | None,
     ) -> None:
         """Exit the parser context and release all resources.
 

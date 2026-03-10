@@ -25,20 +25,6 @@ from paperless.parsers.registry import init_builtin_parsers
 from paperless.parsers.registry import reset_parser_registry
 
 
-@pytest.fixture(autouse=True)
-def clean_registry() -> None:
-    """Reset the global parser registry before and after every test.
-
-    GIVEN: The registry module carries module-level singleton state.
-    WHEN:  Any test is executed.
-    THEN:  Each test starts and ends with a clean slate, preventing state
-           leak between tests.
-    """
-    reset_parser_registry()
-    yield
-    reset_parser_registry()
-
-
 @pytest.fixture()
 def dummy_parser_cls() -> type:
     """Return a class that fully satisfies :class:`ParserProtocol`.
