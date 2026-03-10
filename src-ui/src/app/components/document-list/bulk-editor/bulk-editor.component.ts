@@ -12,7 +12,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { saveAs } from 'file-saver'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { first, map, Subject, switchMap, takeUntil } from 'rxjs'
+import { first, map, Observable, Subject, switchMap, takeUntil } from 'rxjs'
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
 import { CustomField } from 'src/app/data/custom-field'
 import { MatchingModel } from 'src/app/data/matching-model'
@@ -29,7 +29,9 @@ import { CorrespondentService } from 'src/app/services/rest/correspondent.servic
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import {
+  DocumentBulkEditMethod,
   DocumentService,
+  MergeDocumentsRequest,
   SelectionDataItem,
 } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
@@ -255,9 +257,9 @@ export class BulkEditorComponent
     this.unsubscribeNotifier.complete()
   }
 
-  private executeBulkOperation(
+  private executeBulkEditMethod(
     modal: NgbModalRef,
-    method: string,
+    method: DocumentBulkEditMethod,
     args: any,
     overrideDocumentIDs?: number[]
   ) {
@@ -272,30 +274,53 @@ export class BulkEditorComponent
       )
       .pipe(first())
       .subscribe({
-        next: () => {
-          if (args['delete_originals']) {
-            this.list.selected.clear()
-          }
-          this.list.reload()
-          this.list.reduceSelectionToFilter()
-          this.list.selected.forEach((id) => {
-            this.openDocumentService.refreshDocument(id)
-          })
-          this.savedViewService.maybeRefreshDocumentCounts()
-          if (modal) {
-            modal.close()
-          }
-        },
-        error: (error) => {
-          if (modal) {
-            modal.componentInstance.buttonsEnabled = true
-          }
-          this.toastService.showError(
-            $localize`Error executing bulk operation`,
-            error
-          )
-        },
+        next: () => this.handleOperationSuccess(modal),
+        error: (error) => this.handleOperationError(modal, error),
       })
+  }
+
+  private executeDocumentAction(
+    modal: NgbModalRef,
+    request: Observable<any>,
+    options: { deleteOriginals?: boolean } = {}
+  ) {
+    if (modal) {
+      modal.componentInstance.buttonsEnabled = false
+    }
+    request.pipe(first()).subscribe({
+      next: () => {
+        this.handleOperationSuccess(modal, options.deleteOriginals ?? false)
+      },
+      error: (error) => this.handleOperationError(modal, error),
+    })
+  }
+
+  private handleOperationSuccess(
+    modal: NgbModalRef,
+    clearSelection: boolean = false
+  ) {
+    if (clearSelection) {
+      this.list.selected.clear()
+    }
+    this.list.reload()
+    this.list.reduceSelectionToFilter()
+    this.list.selected.forEach((id) => {
+      this.openDocumentService.refreshDocument(id)
+    })
+    this.savedViewService.maybeRefreshDocumentCounts()
+    if (modal) {
+      modal.close()
+    }
+  }
+
+  private handleOperationError(modal: NgbModalRef, error: any) {
+    if (modal) {
+      modal.componentInstance.buttonsEnabled = true
+    }
+    this.toastService.showError(
+      $localize`Error executing bulk operation`,
+      error
+    )
   }
 
   private applySelectionData(
@@ -446,13 +471,13 @@ export class BulkEditorComponent
       modal.componentInstance.confirmClicked
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
-          this.executeBulkOperation(modal, 'modify_tags', {
+          this.executeBulkEditMethod(modal, 'modify_tags', {
             add_tags: changedTags.itemsToAdd.map((t) => t.id),
             remove_tags: changedTags.itemsToRemove.map((t) => t.id),
           })
         })
     } else {
-      this.executeBulkOperation(null, 'modify_tags', {
+      this.executeBulkEditMethod(null, 'modify_tags', {
         add_tags: changedTags.itemsToAdd.map((t) => t.id),
         remove_tags: changedTags.itemsToRemove.map((t) => t.id),
       })
@@ -486,12 +511,12 @@ export class BulkEditorComponent
       modal.componentInstance.confirmClicked
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
-          this.executeBulkOperation(modal, 'set_correspondent', {
+          this.executeBulkEditMethod(modal, 'set_correspondent', {
             correspondent: correspondent ? correspondent.id : null,
           })
         })
     } else {
-      this.executeBulkOperation(null, 'set_correspondent', {
+      this.executeBulkEditMethod(null, 'set_correspondent', {
         correspondent: correspondent ? correspondent.id : null,
       })
     }
@@ -524,12 +549,12 @@ export class BulkEditorComponent
       modal.componentInstance.confirmClicked
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
-          this.executeBulkOperation(modal, 'set_document_type', {
+          this.executeBulkEditMethod(modal, 'set_document_type', {
             document_type: documentType ? documentType.id : null,
           })
         })
     } else {
-      this.executeBulkOperation(null, 'set_document_type', {
+      this.executeBulkEditMethod(null, 'set_document_type', {
         document_type: documentType ? documentType.id : null,
       })
     }
@@ -562,12 +587,12 @@ export class BulkEditorComponent
       modal.componentInstance.confirmClicked
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
-          this.executeBulkOperation(modal, 'set_storage_path', {
+          this.executeBulkEditMethod(modal, 'set_storage_path', {
             storage_path: storagePath ? storagePath.id : null,
           })
         })
     } else {
-      this.executeBulkOperation(null, 'set_storage_path', {
+      this.executeBulkEditMethod(null, 'set_storage_path', {
         storage_path: storagePath ? storagePath.id : null,
       })
     }
@@ -624,7 +649,7 @@ export class BulkEditorComponent
       modal.componentInstance.confirmClicked
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
-          this.executeBulkOperation(modal, 'modify_custom_fields', {
+          this.executeBulkEditMethod(modal, 'modify_custom_fields', {
             add_custom_fields: changedCustomFields.itemsToAdd.map((f) => f.id),
             remove_custom_fields: changedCustomFields.itemsToRemove.map(
               (f) => f.id
@@ -632,7 +657,7 @@ export class BulkEditorComponent
           })
         })
     } else {
-      this.executeBulkOperation(null, 'modify_custom_fields', {
+      this.executeBulkEditMethod(null, 'modify_custom_fields', {
         add_custom_fields: changedCustomFields.itemsToAdd.map((f) => f.id),
         remove_custom_fields: changedCustomFields.itemsToRemove.map(
           (f) => f.id
@@ -762,10 +787,16 @@ export class BulkEditorComponent
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
           modal.componentInstance.buttonsEnabled = false
-          this.executeBulkOperation(modal, 'delete', {})
+          this.executeDocumentAction(
+            modal,
+            this.documentService.deleteDocuments(Array.from(this.list.selected))
+          )
         })
     } else {
-      this.executeBulkOperation(null, 'delete', {})
+      this.executeDocumentAction(
+        null,
+        this.documentService.deleteDocuments(Array.from(this.list.selected))
+      )
     }
   }
 
@@ -804,7 +835,12 @@ export class BulkEditorComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         modal.componentInstance.buttonsEnabled = false
-        this.executeBulkOperation(modal, 'reprocess', {})
+        this.executeDocumentAction(
+          modal,
+          this.documentService.reprocessDocuments(
+            Array.from(this.list.selected)
+          )
+        )
       })
   }
 
@@ -815,7 +851,7 @@ export class BulkEditorComponent
     modal.componentInstance.confirmClicked.subscribe(
       ({ permissions, merge }) => {
         modal.componentInstance.buttonsEnabled = false
-        this.executeBulkOperation(modal, 'set_permissions', {
+        this.executeBulkEditMethod(modal, 'set_permissions', {
           ...permissions,
           merge,
         })
@@ -838,9 +874,13 @@ export class BulkEditorComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         rotateDialog.buttonsEnabled = false
-        this.executeBulkOperation(modal, 'rotate', {
-          degrees: rotateDialog.degrees,
-        })
+        this.executeDocumentAction(
+          modal,
+          this.documentService.rotateDocuments(
+            Array.from(this.list.selected),
+            rotateDialog.degrees
+          )
+        )
       })
   }
 
@@ -856,18 +896,22 @@ export class BulkEditorComponent
     mergeDialog.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        const args = {}
+        const args: MergeDocumentsRequest = {}
         if (mergeDialog.metadataDocumentID > -1) {
-          args['metadata_document_id'] = mergeDialog.metadataDocumentID
+          args.metadata_document_id = mergeDialog.metadataDocumentID
         }
         if (mergeDialog.deleteOriginals) {
-          args['delete_originals'] = true
+          args.delete_originals = true
         }
         if (mergeDialog.archiveFallback) {
-          args['archive_fallback'] = true
+          args.archive_fallback = true
         }
         mergeDialog.buttonsEnabled = false
-        this.executeBulkOperation(modal, 'merge', args, mergeDialog.documentIDs)
+        this.executeDocumentAction(
+          modal,
+          this.documentService.mergeDocuments(mergeDialog.documentIDs, args),
+          { deleteOriginals: !!args.delete_originals }
+        )
         this.toastService.showInfo(
           $localize`Merged document will be queued for consumption.`
         )

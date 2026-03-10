@@ -703,15 +703,6 @@ class StoragePathField(serializers.PrimaryKeyRelatedField):
 
 
 class CustomFieldSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        context = kwargs.get("context")
-        self.api_version = int(
-            context.get("request").version
-            if context and context.get("request")
-            else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
-        )
-        super().__init__(*args, **kwargs)
-
     data_type = serializers.ChoiceField(
         choices=CustomField.FieldDataType,
         read_only=False,
@@ -790,38 +781,6 @@ class CustomFieldSerializer(serializers.ModelSerializer):
                 {"error": "extra_data.default_currency must be a 3-character string"},
             )
         return super().validate(attrs)
-
-    def to_internal_value(self, data):
-        ret = super().to_internal_value(data)
-
-        if (
-            self.api_version < 7
-            and ret.get("data_type", "") == CustomField.FieldDataType.SELECT
-            and isinstance(ret.get("extra_data", {}).get("select_options"), list)
-        ):
-            ret["extra_data"]["select_options"] = [
-                {
-                    "label": option,
-                    "id": get_random_string(length=16),
-                }
-                for option in ret["extra_data"]["select_options"]
-            ]
-
-        return ret
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-
-        if (
-            self.api_version < 7
-            and instance.data_type == CustomField.FieldDataType.SELECT
-        ):
-            # Convert the select options with ids to a list of strings
-            ret["extra_data"]["select_options"] = [
-                option["label"] for option in ret["extra_data"]["select_options"]
-            ]
-
-        return ret
 
 
 class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
@@ -937,50 +896,6 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
 
         return data
 
-    def get_api_version(self):
-        return int(
-            self.context.get("request").version
-            if self.context.get("request")
-            else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
-        )
-
-    def to_internal_value(self, data):
-        ret = super().to_internal_value(data)
-
-        if (
-            self.get_api_version() < 7
-            and ret.get("field").data_type == CustomField.FieldDataType.SELECT
-            and ret.get("value") is not None
-        ):
-            # Convert the index of the option in the field.extra_data["select_options"]
-            # list to the options unique id
-            ret["value"] = ret.get("field").extra_data["select_options"][ret["value"]][
-                "id"
-            ]
-
-        return ret
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-
-        if (
-            self.get_api_version() < 7
-            and instance.field.data_type == CustomField.FieldDataType.SELECT
-        ):
-            # return the index of the option in the field.extra_data["select_options"] list
-            ret["value"] = next(
-                (
-                    idx
-                    for idx, option in enumerate(
-                        instance.field.extra_data["select_options"],
-                    )
-                    if option["id"] == instance.value
-                ),
-                None,
-            )
-
-        return ret
-
     class Meta:
         model = CustomFieldInstance
         fields = [
@@ -1003,20 +918,6 @@ class NotesSerializer(serializers.ModelSerializer):
         model = Note
         fields = ["id", "note", "created", "user"]
         ordering = ["-created"]
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-
-        request = self.context.get("request")
-        api_version = int(
-            request.version if request else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
-        )
-
-        if api_version < 8 and "user" in ret:
-            user_id = ret["user"]["id"]
-            ret["user"] = user_id
-
-        return ret
 
 
 def _get_viewable_duplicates(
@@ -1172,22 +1073,6 @@ class DocumentSerializer(
             doc["content"] = getattr(instance, "effective_content") or ""
         if self.truncate_content and "content" in self.fields:
             doc["content"] = doc.get("content")[0:550]
-
-        request = self.context.get("request")
-        api_version = int(
-            request.version if request else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
-        )
-
-        if api_version < 9 and "created" in self.fields:
-            # provide created as a datetime for backwards compatibility
-            from django.utils import timezone
-
-            doc["created"] = timezone.make_aware(
-                datetime.combine(
-                    instance.created,
-                    datetime.min.time(),
-                ),
-            ).isoformat()
         return doc
 
     def to_internal_value(self, data):
@@ -1655,11 +1540,124 @@ class DocumentListSerializer(serializers.Serializer):
         return documents
 
 
+class SourceModeValidationMixin:
+    def validate_source_mode(self, source_mode: str) -> str:
+        if source_mode not in bulk_edit.SourceModeChoices.__dict__.values():
+            raise serializers.ValidationError("Invalid source_mode")
+        return source_mode
+
+
+class RotateDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
+    degrees = serializers.IntegerField(required=True)
+    source_mode = serializers.CharField(
+        required=False,
+        default=bulk_edit.SourceModeChoices.LATEST_VERSION,
+    )
+
+
+class MergeDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
+    metadata_document_id = serializers.IntegerField(
+        required=False,
+        allow_null=True,
+    )
+    delete_originals = serializers.BooleanField(required=False, default=False)
+    archive_fallback = serializers.BooleanField(required=False, default=False)
+    source_mode = serializers.CharField(
+        required=False,
+        default=bulk_edit.SourceModeChoices.LATEST_VERSION,
+    )
+
+
+class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
+    operations = serializers.ListField(required=True)
+    delete_original = serializers.BooleanField(required=False, default=False)
+    update_document = serializers.BooleanField(required=False, default=False)
+    include_metadata = serializers.BooleanField(required=False, default=True)
+    source_mode = serializers.CharField(
+        required=False,
+        default=bulk_edit.SourceModeChoices.LATEST_VERSION,
+    )
+
+    def validate(self, attrs):
+        documents = attrs["documents"]
+        if len(documents) > 1:
+            raise serializers.ValidationError(
+                "Edit PDF method only supports one document",
+            )
+
+        operations = attrs["operations"]
+        if not isinstance(operations, list):
+            raise serializers.ValidationError("operations must be a list")
+
+        for op in operations:
+            if not isinstance(op, dict):
+                raise serializers.ValidationError("invalid operation entry")
+            if "page" not in op or not isinstance(op["page"], int):
+                raise serializers.ValidationError("page must be an integer")
+            if "rotate" in op and not isinstance(op["rotate"], int):
+                raise serializers.ValidationError("rotate must be an integer")
+            if "doc" in op and not isinstance(op["doc"], int):
+                raise serializers.ValidationError("doc must be an integer")
+
+        if attrs["update_document"]:
+            max_idx = max(op.get("doc", 0) for op in operations)
+            if max_idx > 0:
+                raise serializers.ValidationError(
+                    "update_document only allowed with a single output document",
+                )
+
+        doc = Document.objects.get(id=documents[0])
+        if doc.page_count:
+            for op in operations:
+                if op["page"] < 1 or op["page"] > doc.page_count:
+                    raise serializers.ValidationError(
+                        f"Page {op['page']} is out of bounds for document with {doc.page_count} pages.",
+                    )
+        return attrs
+
+
+class RemovePasswordDocumentsSerializer(
+    DocumentListSerializer,
+    SourceModeValidationMixin,
+):
+    password = serializers.CharField(required=True)
+    update_document = serializers.BooleanField(required=False, default=False)
+    delete_original = serializers.BooleanField(required=False, default=False)
+    include_metadata = serializers.BooleanField(required=False, default=True)
+    source_mode = serializers.CharField(
+        required=False,
+        default=bulk_edit.SourceModeChoices.LATEST_VERSION,
+    )
+
+
+class DeleteDocumentsSerializer(DocumentListSerializer):
+    pass
+
+
+class ReprocessDocumentsSerializer(DocumentListSerializer):
+    pass
+
+
 class BulkEditSerializer(
     SerializerWithPerms,
     DocumentListSerializer,
     SetPermissionsMixin,
+    SourceModeValidationMixin,
 ):
+    # TODO: remove this and related backwards compatibility code when API v9 is dropped
+    # split, delete_pages can be removed entirely
+    MOVED_DOCUMENT_ACTION_ENDPOINTS = {
+        "delete": "/api/documents/delete/",
+        "reprocess": "/api/documents/reprocess/",
+        "rotate": "/api/documents/rotate/",
+        "merge": "/api/documents/merge/",
+        "edit_pdf": "/api/documents/edit_pdf/",
+        "remove_password": "/api/documents/remove_password/",
+        "split": "/api/documents/edit_pdf/",
+        "delete_pages": "/api/documents/edit_pdf/",
+    }
+    LEGACY_DOCUMENT_ACTION_METHODS = tuple(MOVED_DOCUMENT_ACTION_ENDPOINTS.keys())
+
     method = serializers.ChoiceField(
         choices=[
             "set_correspondent",
@@ -1669,15 +1667,8 @@ class BulkEditSerializer(
             "remove_tag",
             "modify_tags",
             "modify_custom_fields",
-            "delete",
-            "reprocess",
             "set_permissions",
-            "rotate",
-            "merge",
-            "split",
-            "delete_pages",
-            "edit_pdf",
-            "remove_password",
+            *LEGACY_DOCUMENT_ACTION_METHODS,
         ],
         label="Method",
         write_only=True,
@@ -1755,8 +1746,7 @@ class BulkEditSerializer(
             return bulk_edit.edit_pdf
         elif method == "remove_password":
             return bulk_edit.remove_password
-        else:  # pragma: no cover
-            # This will never happen as it is handled by the ChoiceField
+        else:
             raise serializers.ValidationError("Unsupported method.")
 
     def _validate_parameters_tags(self, parameters) -> None:
@@ -1866,9 +1856,7 @@ class BulkEditSerializer(
             "source_mode",
             bulk_edit.SourceModeChoices.LATEST_VERSION,
         )
-        if source_mode not in bulk_edit.SourceModeChoices.__dict__.values():
-            raise serializers.ValidationError("Invalid source_mode")
-        parameters["source_mode"] = source_mode
+        parameters["source_mode"] = self.validate_source_mode(source_mode)
 
     def _validate_parameters_split(self, parameters) -> None:
         if "pages" not in parameters:

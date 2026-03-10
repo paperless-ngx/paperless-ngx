@@ -152,7 +152,7 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
             context={
                 "request": types.SimpleNamespace(
                     method="GET",
-                    version="7",
+                    version="9",
                 ),
             },
         )

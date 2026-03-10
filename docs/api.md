@@ -305,51 +305,15 @@ The following methods are supported:
         -   `"merge": true or false` (defaults to false)
     -   The `merge` flag determines if the supplied permissions will overwrite all existing permissions (including
         removing them) or be merged with existing permissions.
--   `edit_pdf`
-    -   Requires `parameters`:
-        -   `"doc_ids": [DOCUMENT_ID]` A list of a single document ID to edit.
-        -   `"operations": [OPERATION, ...]` A list of operations to perform on the documents. Each operation is a dictionary
-            with the following keys:
-            -   `"page": PAGE_NUMBER` The page number to edit (1-based).
-            -   `"rotate": DEGREES` Optional rotation in degrees (90, 180, 270).
-            -   `"doc": OUTPUT_DOCUMENT_INDEX` Optional index of the output document for split operations.
-    -   Optional `parameters`:
-        -   `"delete_original": true` to delete the original documents after editing.
-        -   `"update_document": true` to add the edited PDF as a new version of the root document.
-        -   `"include_metadata": true` to copy metadata from the original document to the edited document.
--   `remove_password`
-    -   Requires `parameters`:
-        -   `"password": "PASSWORD_STRING"` The password to remove from the PDF documents.
-    -   Optional `parameters`:
-        -   `"update_document": true` to add the password-less PDF as a new version of the root document.
-        -   `"delete_original": true` to delete the original document after editing.
-        -   `"include_metadata": true` to copy metadata from the original document to the new password-less document.
--   `merge`
-    -   No additional `parameters` required.
-    -   The ordering of the merged document is determined by the list of IDs.
-    -   Optional `parameters`:
-        -   `"metadata_document_id": DOC_ID` apply metadata (tags, correspondent, etc.) from this document to the merged document.
-        -   `"delete_originals": true` to delete the original documents. This requires the calling user being the owner of
-            all documents that are merged.
--   `split`
-    -   Requires `parameters`:
-        -   `"pages": [..]` The list should be a list of pages and/or a ranges, separated by commas e.g. `"[1,2-3,4,5-7]"`
-    -   Optional `parameters`:
-        -   `"delete_originals": true` to delete the original document after consumption. This requires the calling user being the owner of
-            the document.
-    -   The split operation only accepts a single document.
--   `rotate`
-    -   Requires `parameters`:
-        -   `"degrees": DEGREES`. Must be an integer i.e. 90, 180, 270
--   `delete_pages`
-    -   Requires `parameters`:
-        -   `"pages": [..]` The list should be a list of integers e.g. `"[2,3,4]"`
-    -   The delete_pages operation only accepts a single document.
 -   `modify_custom_fields`
     -   Requires `parameters`:
         -   `"add_custom_fields": { CUSTOM_FIELD_ID: VALUE }`: JSON object consisting of custom field id:value pairs to add to the document, can also be a list of custom field IDs
             to add with empty values.
         -   `"remove_custom_fields": [CUSTOM_FIELD_ID]`: custom field ids to remove from the document.
+
+#### Document-editing operations
+
+Beginning with version 10+, the API supports individual endpoints for document-editing operations (`merge`, `rotate`, `edit_pdf`, etc), thus their documentation can be found in the API spec / viewer. Legacy document-editing methods via `/api/documents/bulk_edit/` are still supported for compatibility, are deprecated and clients should migrate to the individual endpoints before they are removed in a future version.
 
 ### Objects
 
@@ -369,41 +333,38 @@ operations, using the endpoint: `/api/bulk_edit_objects/`, which requires a json
 
 ## API Versioning
 
-The REST API is versioned since Paperless-ngx 1.3.0.
+The REST API is versioned.
 
 -   Versioning ensures that changes to the API don't break older
     clients.
 -   Clients specify the specific version of the API they wish to use
     with every request and Paperless will handle the request using the
     specified API version.
--   Even if the underlying data model changes, older API versions will
-    always serve compatible data.
--   If no version is specified, Paperless will serve version 1 to ensure
-    compatibility with older clients that do not request a specific API
-    version.
+-   Even if the underlying data model changes, supported older API
+    versions continue to serve compatible data.
+-   If no version is specified, Paperless serves the configured default
+    API version (currently `10`).
+-   Supported API versions are currently `9` and `10`.
 
 API versions are specified by submitting an additional HTTP `Accept`
 header with every request:
 
 ```
-Accept: application/json; version=6
+Accept: application/json; version=10
 ```
 
-If an invalid version is specified, Paperless 1.3.0 will respond with
-"406 Not Acceptable" and an error message in the body. Earlier
-versions of Paperless will serve API version 1 regardless of whether a
-version is specified via the `Accept` header.
+If an invalid version is specified, Paperless responds with
+`406 Not Acceptable` and an error message in the body.
 
 If a client wishes to verify whether it is compatible with any given
 server, the following procedure should be performed:
 
-1.  Perform an _authenticated_ request against any API endpoint. If the
-    server is on version 1.3.0 or newer, the server will add two custom
-    headers to the response:
+1.  Perform an _authenticated_ request against any API endpoint. The
+    server will add two custom headers to the response:
 
     ```
-    X-Api-Version: 2
-    X-Version: 1.3.0
+    X-Api-Version: 10
+    X-Version: <server-version>
     ```
 
 2.  Determine whether the client is compatible with this server based on
@@ -470,4 +431,9 @@ Initial API version.
 #### Version 10
 
 -   The `show_on_dashboard` and `show_in_sidebar` fields of saved views have been
-    removed. Relevant settings are now stored in the UISettings model.
+    removed. Relevant settings are now stored in the UISettings model. Compatibility is maintained
+    for versions < 10 until support for API v9 is dropped.
+-   Document-editing operations such as `merge`, `rotate`, and `edit_pdf` have been
+    moved from the bulk edit endpoint to their own individual endpoints. Using these methods via
+    the bulk edit endpoint is still supported for compatibility with versions < 10 until support
+    for API v9 is dropped.
