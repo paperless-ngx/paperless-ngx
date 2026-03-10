@@ -69,7 +69,9 @@ def dummy_parser_cls() -> type:
             *,
             produce_archive: bool = True,
         ) -> None:
-            pass
+            """
+            Required to exist, but doesn't need to do anything
+            """
 
         def get_text(self) -> str | None:
             return None
@@ -105,7 +107,9 @@ def dummy_parser_cls() -> type:
             return self
 
         def __exit__(self, exc_type, exc_val, exc_tb) -> None:
-            pass
+            """
+            Required to exist, but doesn't need to do anything
+            """
 
     return DummyParser
 

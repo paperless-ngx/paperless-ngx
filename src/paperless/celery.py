@@ -19,13 +19,14 @@ app.autodiscover_tasks()
 
 
 @worker_process_init.connect
-def on_worker_process_init(**kwargs) -> None:
-    """Register built-in parsers eagerly in each Celery worker process.
+def on_worker_process_init(**kwargs) -> None:  # pragma: no cover
+    """
+    Register built-in parsers eagerly in each Celery worker process.
 
     This registers only the built-in parsers (no entrypoint discovery) so
     that workers can begin consuming documents immediately.  Entrypoint
     discovery for third-party parsers is deferred to the first call of
-    ``get_parser_registry()`` inside a task, keeping ``worker_process_init``
+    get_parser_registry() inside a task, keeping worker_process_init
     well within its 4-second timeout budget.
     """
     from paperless.parsers.registry import init_builtin_parsers
