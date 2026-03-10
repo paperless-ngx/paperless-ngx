@@ -116,7 +116,6 @@ def init_builtin_parsers() -> None:
     if _registry is None:
         _registry = ParserRegistry()
         _registry.register_defaults()
-        _registry.log_summary()
 
 
 def reset_parser_registry() -> None:
