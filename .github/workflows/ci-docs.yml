@@ -43,7 +43,7 @@ jobs:
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             echo "base=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_OUTPUT"
           elif [[ "${{ github.event.created }}" == "true" ]]; then
-            echo "base=origin/${{ github.event.repository.default_branch }}" >> "$GITHUB_OUTPUT"
+            echo "base=${{ github.event.repository.default_branch }}" >> "$GITHUB_OUTPUT"
           else
             echo "base=${{ github.event.before }}" >> "$GITHUB_OUTPUT"
           fi

@@ -33,7 +33,6 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
 from documents.models import Tag
-from documents.parsers import run_convert
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_CRYPTO_SETTINGS_NAME
 from documents.settings import EXPORTER_FILE_NAME
@@ -403,22 +402,10 @@ class Command(CryptMixin, PaperlessCommand):
                 copy_file_with_basic_stats(document_path, document.source_path)
 
                 if thumbnail_path:
-                    if thumbnail_path.suffix in {".png", ".PNG"}:
-                        run_convert(
-                            density=300,
-                            scale="500x5000>",
-                            alpha="remove",
-                            strip=True,
-                            trim=False,
-                            auto_orient=True,
-                            input_file=f"{thumbnail_path}[0]",
-                            output_file=str(document.thumbnail_path),
-                        )
-                    else:
-                        copy_file_with_basic_stats(
-                            thumbnail_path,
-                            document.thumbnail_path,
-                        )
+                    copy_file_with_basic_stats(
+                        thumbnail_path,
+                        document.thumbnail_path,
+                    )
 
                 if archive_path:
                     create_source_path_directory(document.archive_path)

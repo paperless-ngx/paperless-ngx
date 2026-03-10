@@ -177,7 +177,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results[0]), 0)
 
-    def test_document_fields_api_version_8_respects_created(self) -> None:
+    def test_document_fields_respects_created(self) -> None:
         Document.objects.create(
             title="legacy",
             checksum="123",
@@ -187,7 +187,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         response = self.client.get(
             "/api/documents/?fields=id",
-            headers={"Accept": "application/json; version=8"},
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -197,25 +196,22 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         response = self.client.get(
             "/api/documents/?fields=id,created",
-            headers={"Accept": "application/json; version=8"},
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertIn("id", results[0])
         self.assertIn("created", results[0])
-        self.assertRegex(results[0]["created"], r"^2024-01-15T00:00:00.*$")
+        self.assertEqual(results[0]["created"], "2024-01-15")
 
-    def test_document_legacy_created_format(self) -> None:
+    def test_document_created_format(self) -> None:
         """
         GIVEN:
             - Existing document
         WHEN:
-            - Document is requested with api version ≥ 9
-            - Document is requested with api version < 9
+            - Document is requested
         THEN:
             - Document created field is returned as date
-            - Document created field is returned as datetime
         """
         doc = Document.objects.create(
             title="none",
@@ -226,14 +222,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         response = self.client.get(
             f"/api/documents/{doc.pk}/",
-            headers={"Accept": "application/json; version=8"},
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertRegex(response.data["created"], r"^2023-01-01T00:00:00.*$")
-
-        response = self.client.get(
-            f"/api/documents/{doc.pk}/",
-            headers={"Accept": "application/json; version=9"},
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["created"], "2023-01-01")
@@ -2803,26 +2791,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             },
         )
 
-    def test_docnote_serializer_v7(self) -> None:
-        doc = Document.objects.create(
-            title="test",
-            mime_type="application/pdf",
-            content="this is a document which will have notes!",
-        )
-        Note.objects.create(
-            note="This is a note.",
-            document=doc,
-            user=self.user,
-        )
-        self.assertEqual(
-            self.client.get(
-                f"/api/documents/{doc.pk}/",
-                headers={"Accept": "application/json; version=7"},
-                format="json",
-            ).data["notes"][0]["user"],
-            self.user.id,
-        )
-
     def test_create_note(self) -> None:
         """
         GIVEN:
@@ -3591,14 +3559,13 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             )
 
 
-class TestDocumentApiV2(DirectoriesMixin, APITestCase):
+class TestDocumentApiTagColors(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
         self.user = User.objects.create_superuser(username="temp_admin")
 
         self.client.force_authenticate(user=self.user)
-        self.client.defaults["HTTP_ACCEPT"] = "application/json; version=2"
 
     def test_tag_validate_color(self) -> None:
         self.assertEqual(

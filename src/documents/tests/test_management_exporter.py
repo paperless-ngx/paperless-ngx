@@ -147,7 +147,6 @@ class TestExportImport(
         else:
             raise ValueError(f"document with id {id} does not exist in manifest")
 
-    @override_settings(PASSPHRASE="test")
     def _do_export(
         self,
         *,
@@ -441,7 +440,6 @@ class TestExportImport(
         )
         self.assertRaises(FileNotFoundError, call_command, "document_exporter", target)
 
-    @override_settings(PASSPHRASE="test")
     def test_export_zipped(self) -> None:
         """
         GIVEN:
@@ -473,7 +471,6 @@ class TestExportImport(
             self.assertIn("manifest.json", zip.namelist())
             self.assertIn("metadata.json", zip.namelist())
 
-    @override_settings(PASSPHRASE="test")
     def test_export_zipped_format(self) -> None:
         """
         GIVEN:
@@ -510,7 +507,6 @@ class TestExportImport(
             self.assertIn("manifest.json", zip.namelist())
             self.assertIn("metadata.json", zip.namelist())
 
-    @override_settings(PASSPHRASE="test")
     def test_export_zipped_with_delete(self) -> None:
         """
         GIVEN:
