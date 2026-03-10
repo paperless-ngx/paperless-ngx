@@ -124,7 +124,7 @@ def _restore_visibility_fields(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "0014_alter_paperlesstask_task_name"),
+        ("documents", "0013_alter_paperlesstask_task_name"),
     ]
 
     operations = [
