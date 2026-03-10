@@ -1,7 +1,13 @@
+from __future__ import annotations
+
 import json
+from typing import TYPE_CHECKING
 from typing import Any
 
 from channels.generic.websocket import AsyncWebsocketConsumer
+
+if TYPE_CHECKING:
+    from documents.plugins.helpers import PermissionsData
 
 
 class StatusConsumer(AsyncWebsocketConsumer):
@@ -9,7 +15,7 @@ class StatusConsumer(AsyncWebsocketConsumer):
         user: Any = self.scope.get("user")
         return user is not None and user.is_authenticated
 
-    async def _can_view(self, data: dict[str, Any]) -> bool:
+    async def _can_view(self, data: PermissionsData) -> bool:
         user: Any = self.scope.get("user")
         if user is None:
             return False
