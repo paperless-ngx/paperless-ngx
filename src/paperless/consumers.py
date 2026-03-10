@@ -6,10 +6,13 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 
 class StatusConsumer(AsyncWebsocketConsumer):
     def _authenticated(self) -> bool:
-        return "user" in self.scope and self.scope["user"].is_authenticated
+        user: Any = self.scope.get("user")
+        return user is not None and user.is_authenticated
 
-    async def _can_view(self, data) -> bool:
-        user = self.scope.get("user") if self.scope.get("user") else None
+    async def _can_view(self, data: dict[str, Any]) -> bool:
+        user: Any = self.scope.get("user")
+        if user is None:
+            return False
         owner_id = data.get("owner_id")
         users_can_view = data.get("users_can_view", [])
         groups_can_view = data.get("groups_can_view", [])
@@ -30,22 +33,22 @@ class StatusConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add("status_updates", self.channel_name)
         await self.accept()
 
-    async def disconnect(self, close_code) -> None:
+    async def disconnect(self, code: int) -> None:
         await self.channel_layer.group_discard("status_updates", self.channel_name)
 
-    async def status_update(self, event) -> None:
+    async def status_update(self, event: dict[str, Any]) -> None:
         if not self._authenticated():
             await self.close()
         elif await self._can_view(event["data"]):
             await self.send(json.dumps(event))
 
-    async def documents_deleted(self, event) -> None:
+    async def documents_deleted(self, event: dict[str, Any]) -> None:
         if not self._authenticated():
             await self.close()
         else:
             await self.send(json.dumps(event))
 
-    async def document_updated(self, event: Any) -> None:
+    async def document_updated(self, event: dict[str, Any]) -> None:
         if not self._authenticated():
             await self.close()
         elif await self._can_view(event["data"]):
