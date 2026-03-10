@@ -703,15 +703,6 @@ class StoragePathField(serializers.PrimaryKeyRelatedField):
 
 
 class CustomFieldSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        context = kwargs.get("context")
-        self.api_version = int(
-            context.get("request").version
-            if context and context.get("request")
-            else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
-        )
-        super().__init__(*args, **kwargs)
-
     data_type = serializers.ChoiceField(
         choices=CustomField.FieldDataType,
         read_only=False,
@@ -790,38 +781,6 @@ class CustomFieldSerializer(serializers.ModelSerializer):
                 {"error": "extra_data.default_currency must be a 3-character string"},
             )
         return super().validate(attrs)
-
-    def to_internal_value(self, data):
-        ret = super().to_internal_value(data)
-
-        if (
-            self.api_version < 7
-            and ret.get("data_type", "") == CustomField.FieldDataType.SELECT
-            and isinstance(ret.get("extra_data", {}).get("select_options"), list)
-        ):
-            ret["extra_data"]["select_options"] = [
-                {
-                    "label": option,
-                    "id": get_random_string(length=16),
-                }
-                for option in ret["extra_data"]["select_options"]
-            ]
-
-        return ret
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-
-        if (
-            self.api_version < 7
-            and instance.data_type == CustomField.FieldDataType.SELECT
-        ):
-            # Convert the select options with ids to a list of strings
-            ret["extra_data"]["select_options"] = [
-                option["label"] for option in ret["extra_data"]["select_options"]
-            ]
-
-        return ret
 
 
 class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
@@ -937,50 +896,6 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
 
         return data
 
-    def get_api_version(self):
-        return int(
-            self.context.get("request").version
-            if self.context.get("request")
-            else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
-        )
-
-    def to_internal_value(self, data):
-        ret = super().to_internal_value(data)
-
-        if (
-            self.get_api_version() < 7
-            and ret.get("field").data_type == CustomField.FieldDataType.SELECT
-            and ret.get("value") is not None
-        ):
-            # Convert the index of the option in the field.extra_data["select_options"]
-            # list to the options unique id
-            ret["value"] = ret.get("field").extra_data["select_options"][ret["value"]][
-                "id"
-            ]
-
-        return ret
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-
-        if (
-            self.get_api_version() < 7
-            and instance.field.data_type == CustomField.FieldDataType.SELECT
-        ):
-            # return the index of the option in the field.extra_data["select_options"] list
-            ret["value"] = next(
-                (
-                    idx
-                    for idx, option in enumerate(
-                        instance.field.extra_data["select_options"],
-                    )
-                    if option["id"] == instance.value
-                ),
-                None,
-            )
-
-        return ret
-
     class Meta:
         model = CustomFieldInstance
         fields = [
@@ -1003,20 +918,6 @@ class NotesSerializer(serializers.ModelSerializer):
         model = Note
         fields = ["id", "note", "created", "user"]
         ordering = ["-created"]
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-
-        request = self.context.get("request")
-        api_version = int(
-            request.version if request else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
-        )
-
-        if api_version < 8 and "user" in ret:
-            user_id = ret["user"]["id"]
-            ret["user"] = user_id
-
-        return ret
 
 
 def _get_viewable_duplicates(
@@ -1172,22 +1073,6 @@ class DocumentSerializer(
             doc["content"] = getattr(instance, "effective_content") or ""
         if self.truncate_content and "content" in self.fields:
             doc["content"] = doc.get("content")[0:550]
-
-        request = self.context.get("request")
-        api_version = int(
-            request.version if request else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
-        )
-
-        if api_version < 9 and "created" in self.fields:
-            # provide created as a datetime for backwards compatibility
-            from django.utils import timezone
-
-            doc["created"] = timezone.make_aware(
-                datetime.combine(
-                    instance.created,
-                    datetime.min.time(),
-                ),
-            ).isoformat()
         return doc
 
     def to_internal_value(self, data):
