@@ -1,186 +1,169 @@
-from unittest import mock
-
+import pytest
 from channels.layers import get_channel_layer
 from channels.testing import WebsocketCommunicator
-from django.test import TestCase
-from django.test import override_settings
 
 from documents.plugins.helpers import DocumentsStatusManager
 from documents.plugins.helpers import ProgressManager
 from documents.plugins.helpers import ProgressStatusOptions
 from paperless.asgi import application
 
-TEST_CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
-    },
-}
 
+class TestWebSockets:
+    @pytest.fixture(autouse=True)
+    def anyio_backend(self):
+        return "asyncio"
 
-@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
-class TestWebSockets(TestCase):
+    @pytest.mark.anyio
     async def test_no_auth(self) -> None:
         communicator = WebsocketCommunicator(application, "/ws/status/")
         connected, _ = await communicator.connect()
-        self.assertFalse(connected)
+        assert not connected
         await communicator.disconnect()
 
-    @mock.patch("paperless.consumers.StatusConsumer.close")
-    @mock.patch("paperless.consumers.StatusConsumer._authenticated")
-    async def test_close_on_no_auth(self, _authenticated, mock_close) -> None:
-        _authenticated.return_value = True
+    @pytest.mark.anyio
+    async def test_close_on_no_auth(self, mocker) -> None:
+        mock_auth = mocker.patch(
+            "paperless.consumers.StatusConsumer._authenticated",
+            return_value=True,
+        )
+        mock_close = mocker.patch(
+            "paperless.consumers.StatusConsumer.close",
+            new_callable=mocker.AsyncMock,
+        )
 
         communicator = WebsocketCommunicator(application, "/ws/status/")
         connected, _ = await communicator.connect()
-        self.assertTrue(connected)
+        assert connected
 
-        message = {"type": "status_update", "data": {"task_id": "test"}}
-
-        _authenticated.return_value = False
-
+        mock_auth.return_value = False
         channel_layer = get_channel_layer()
+
         await channel_layer.group_send(
             "status_updates",
-            message,
+            {"type": "status_update", "data": {"task_id": "test"}},
         )
         await communicator.receive_nothing()
-
-        mock_close.assert_called_once()
+        mock_close.assert_awaited_once()
         mock_close.reset_mock()
 
-        message = {
-            "type": "document_updated",
-            "data": {"document_id": 10, "modified": "2026-02-17T00:00:00Z"},
-        }
-
         await channel_layer.group_send(
             "status_updates",
-            message,
+            {
+                "type": "document_updated",
+                "data": {"document_id": 10, "modified": "2026-02-17T00:00:00Z"},
+            },
         )
         await communicator.receive_nothing()
-
-        mock_close.assert_called_once()
+        mock_close.assert_awaited_once()
         mock_close.reset_mock()
 
-        message = {"type": "documents_deleted", "data": {"documents": [1, 2, 3]}}
-
         await channel_layer.group_send(
             "status_updates",
-            message,
+            {"type": "documents_deleted", "data": {"documents": [1, 2, 3]}},
         )
         await communicator.receive_nothing()
+        mock_close.assert_awaited_once()
 
-        mock_close.assert_called_once()
-
-    @mock.patch("paperless.consumers.StatusConsumer._authenticated")
-    async def test_auth(self, _authenticated) -> None:
-        _authenticated.return_value = True
-
-        communicator = WebsocketCommunicator(application, "/ws/status/")
-        connected, _ = await communicator.connect()
-        self.assertTrue(connected)
-
-        await communicator.disconnect()
-
-    @mock.patch("paperless.consumers.StatusConsumer._authenticated")
-    async def test_receive_status_update(self, _authenticated) -> None:
-        _authenticated.return_value = True
-
-        communicator = WebsocketCommunicator(application, "/ws/status/")
-        connected, _ = await communicator.connect()
-        self.assertTrue(connected)
-
-        message = {"type": "status_update", "data": {"task_id": "test"}}
-
-        channel_layer = get_channel_layer()
-        await channel_layer.group_send(
-            "status_updates",
-            message,
+    @pytest.mark.anyio
+    async def test_auth(self, mocker) -> None:
+        mocker.patch(
+            "paperless.consumers.StatusConsumer._authenticated",
+            return_value=True,
         )
 
-        response = await communicator.receive_json_from()
-
-        self.assertEqual(response, message)
+        communicator = WebsocketCommunicator(application, "/ws/status/")
+        connected, _ = await communicator.connect()
+        assert connected
 
         await communicator.disconnect()
 
-    async def test_status_update_check_perms(self) -> None:
+    @pytest.mark.anyio
+    async def test_receive_status_update(self, mocker) -> None:
+        mocker.patch(
+            "paperless.consumers.StatusConsumer._authenticated",
+            return_value=True,
+        )
+
         communicator = WebsocketCommunicator(application, "/ws/status/")
-
-        communicator.scope["user"] = mock.Mock()
-        communicator.scope["user"].is_authenticated = True
-        communicator.scope["user"].is_superuser = False
-        communicator.scope["user"].id = 1
-
         connected, _ = await communicator.connect()
-        self.assertTrue(connected)
+        assert connected
 
-        # Test as owner
+        message = {"type": "status_update", "data": {"task_id": "test"}}
+        channel_layer = get_channel_layer()
+        await channel_layer.group_send("status_updates", message)
+
+        assert await communicator.receive_json_from() == message
+
+        await communicator.disconnect()
+
+    @pytest.mark.anyio
+    async def test_status_update_check_perms(self, mocker) -> None:
+        user = mocker.MagicMock()
+        user.is_authenticated = True
+        user.is_superuser = False
+        user.id = 1
+
+        communicator = WebsocketCommunicator(application, "/ws/status/")
+        communicator.scope["user"] = user
+        connected, _ = await communicator.connect()
+        assert connected
+
+        channel_layer = get_channel_layer()
+
+        # Message received as owner
         message = {"type": "status_update", "data": {"task_id": "test", "owner_id": 1}}
-        channel_layer = get_channel_layer()
-        await channel_layer.group_send(
-            "status_updates",
-            message,
-        )
-        response = await communicator.receive_json_from()
-        self.assertEqual(response, message)
+        await channel_layer.group_send("status_updates", message)
+        assert await communicator.receive_json_from() == message
 
-        # Test with a group that the user belongs to
-        communicator.scope["user"].groups.filter.return_value.exists.return_value = True
+        # Message received via group membership
+        user.groups.filter.return_value.aexists = mocker.AsyncMock(return_value=True)
         message = {
             "type": "status_update",
             "data": {"task_id": "test", "owner_id": 2, "groups_can_view": [1]},
         }
-        channel_layer = get_channel_layer()
-        await channel_layer.group_send(
-            "status_updates",
-            message,
-        )
-        response = await communicator.receive_json_from()
-        self.assertEqual(response, message)
+        await channel_layer.group_send("status_updates", message)
+        assert await communicator.receive_json_from() == message
 
-        # Test with a different owner_id
+        # Message not received for different owner with no group match
         message = {"type": "status_update", "data": {"task_id": "test", "owner_id": 2}}
-        channel_layer = get_channel_layer()
-        await channel_layer.group_send(
-            "status_updates",
-            message,
-        )
-        response = await communicator.receive_nothing()
-        self.assertNotEqual(response, message)
+        await channel_layer.group_send("status_updates", message)
+        assert await communicator.receive_nothing()
+
         await communicator.disconnect()
 
-    @mock.patch("paperless.consumers.StatusConsumer._authenticated")
-    async def test_receive_documents_deleted(self, _authenticated) -> None:
-        _authenticated.return_value = True
+    @pytest.mark.anyio
+    async def test_receive_documents_deleted(self, mocker) -> None:
+        mocker.patch(
+            "paperless.consumers.StatusConsumer._authenticated",
+            return_value=True,
+        )
 
         communicator = WebsocketCommunicator(application, "/ws/status/")
         connected, _ = await communicator.connect()
-        self.assertTrue(connected)
+        assert connected
 
         message = {"type": "documents_deleted", "data": {"documents": [1, 2, 3]}}
-
         channel_layer = get_channel_layer()
-        await channel_layer.group_send(
-            "status_updates",
-            message,
-        )
+        await channel_layer.group_send("status_updates", message)
 
-        response = await communicator.receive_json_from()
-
-        self.assertEqual(response, message)
+        assert await communicator.receive_json_from() == message
 
         await communicator.disconnect()
 
-    @mock.patch("paperless.consumers.StatusConsumer._can_view")
-    @mock.patch("paperless.consumers.StatusConsumer._authenticated")
-    async def test_receive_document_updated(self, _authenticated, _can_view) -> None:
-        _authenticated.return_value = True
-        _can_view.return_value = True
+    @pytest.mark.anyio
+    async def test_receive_document_updated(self, mocker) -> None:
+        mocker.patch(
+            "paperless.consumers.StatusConsumer._authenticated",
+            return_value=True,
+        )
+        mocker.patch(
+            "paperless.consumers.StatusConsumer._can_view",
+            return_value=True,
+        )
 
         communicator = WebsocketCommunicator(application, "/ws/status/")
         connected, _ = await communicator.connect()
-        self.assertTrue(connected)
+        assert connected
 
         message = {
             "type": "document_updated",
@@ -192,67 +175,51 @@ class TestWebSockets(TestCase):
                 "groups_can_view": [],
             },
         }
-
         channel_layer = get_channel_layer()
-        assert channel_layer is not None
-        await channel_layer.group_send(
-            "status_updates",
-            message,
-        )
+        await channel_layer.group_send("status_updates", message)
 
-        response = await communicator.receive_json_from()
-
-        self.assertEqual(response, message)
+        assert await communicator.receive_json_from() == message
 
         await communicator.disconnect()
 
-    @mock.patch("channels.layers.InMemoryChannelLayer.group_send")
-    def test_manager_send_progress(self, mock_group_send) -> None:
+    def test_manager_send_progress(self, mocker) -> None:
+        mock_group_send = mocker.patch(
+            "channels.layers.InMemoryChannelLayer.group_send",
+        )
+
         with ProgressManager(task_id="test") as manager:
             manager.send_progress(
                 ProgressStatusOptions.STARTED,
                 "Test message",
                 1,
                 10,
-                extra_args={
-                    "foo": "bar",
-                },
+                extra_args={"foo": "bar"},
             )
 
-        message = mock_group_send.call_args[0][1]
-
-        self.assertEqual(
-            message,
-            {
-                "type": "status_update",
-                "data": {
-                    "filename": None,
-                    "task_id": "test",
-                    "current_progress": 1,
-                    "max_progress": 10,
-                    "status": ProgressStatusOptions.STARTED,
-                    "message": "Test message",
-                    "foo": "bar",
-                },
+        assert mock_group_send.call_args[0][1] == {
+            "type": "status_update",
+            "data": {
+                "filename": None,
+                "task_id": "test",
+                "current_progress": 1,
+                "max_progress": 10,
+                "status": ProgressStatusOptions.STARTED,
+                "message": "Test message",
+                "foo": "bar",
             },
+        }
+
+    def test_manager_send_documents_deleted(self, mocker) -> None:
+        mock_group_send = mocker.patch(
+            "channels.layers.InMemoryChannelLayer.group_send",
         )
 
-    @mock.patch("channels.layers.InMemoryChannelLayer.group_send")
-    def test_manager_send_documents_deleted(
-        self,
-        mock_group_send: mock.MagicMock,
-    ) -> None:
         with DocumentsStatusManager() as manager:
             manager.send_documents_deleted([1, 2, 3])
 
-        message = mock_group_send.call_args[0][1]
-
-        self.assertEqual(
-            message,
-            {
-                "type": "documents_deleted",
-                "data": {
-                    "documents": [1, 2, 3],
-                },
+        assert mock_group_send.call_args[0][1] == {
+            "type": "documents_deleted",
+            "data": {
+                "documents": [1, 2, 3],
             },
-        )
+        }
