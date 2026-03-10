@@ -849,13 +849,11 @@ describe('BulkEditorComponent', () => {
     expect(modal).not.toBeUndefined()
     modal.componentInstance.confirm()
     let req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
+      `${environment.apiBaseUrl}documents/delete/`
     )
     req.flush(true)
     expect(req.request.body).toEqual({
       documents: [3, 4],
-      method: 'delete',
-      parameters: {},
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
@@ -868,7 +866,7 @@ describe('BulkEditorComponent', () => {
     fixture.detectChanges()
     component.applyDelete()
     req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
+      `${environment.apiBaseUrl}documents/delete/`
     )
   })
 
@@ -944,13 +942,11 @@ describe('BulkEditorComponent', () => {
     expect(modal).not.toBeUndefined()
     modal.componentInstance.confirm()
     let req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
+      `${environment.apiBaseUrl}documents/reprocess/`
     )
     req.flush(true)
     expect(req.request.body).toEqual({
       documents: [3, 4],
-      method: 'reprocess',
-      parameters: {},
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
@@ -979,13 +975,13 @@ describe('BulkEditorComponent', () => {
     modal.componentInstance.rotate()
     modal.componentInstance.confirm()
     let req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
+      `${environment.apiBaseUrl}documents/rotate/`
     )
     req.flush(true)
     expect(req.request.body).toEqual({
       documents: [3, 4],
-      method: 'rotate',
-      parameters: { degrees: 90 },
+      degrees: 90,
+      source_mode: 'latest_version',
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
@@ -1021,13 +1017,12 @@ describe('BulkEditorComponent', () => {
     modal.componentInstance.metadataDocumentID = 3
     modal.componentInstance.confirm()
     let req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
+      `${environment.apiBaseUrl}documents/merge/`
     )
     req.flush(true)
     expect(req.request.body).toEqual({
       documents: [3, 4],
-      method: 'merge',
-      parameters: { metadata_document_id: 3 },
+      metadata_document_id: 3,
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
@@ -1040,13 +1035,13 @@ describe('BulkEditorComponent', () => {
     modal.componentInstance.deleteOriginals = true
     modal.componentInstance.confirm()
     req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
+      `${environment.apiBaseUrl}documents/merge/`
     )
     req.flush(true)
     expect(req.request.body).toEqual({
       documents: [3, 4],
-      method: 'merge',
-      parameters: { metadata_document_id: 3, delete_originals: true },
+      metadata_document_id: 3,
+      delete_originals: true,
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
@@ -1061,13 +1056,13 @@ describe('BulkEditorComponent', () => {
     modal.componentInstance.archiveFallback = true
     modal.componentInstance.confirm()
     req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
+      `${environment.apiBaseUrl}documents/merge/`
     )
     req.flush(true)
     expect(req.request.body).toEqual({
       documents: [3, 4],
-      method: 'merge',
-      parameters: { metadata_document_id: 3, archive_fallback: true },
+      metadata_document_id: 3,
+      archive_fallback: true,
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`

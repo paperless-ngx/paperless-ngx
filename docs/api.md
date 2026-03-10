@@ -305,51 +305,15 @@ The following methods are supported:
         -   `"merge": true or false` (defaults to false)
     -   The `merge` flag determines if the supplied permissions will overwrite all existing permissions (including
         removing them) or be merged with existing permissions.
--   `edit_pdf`
-    -   Requires `parameters`:
-        -   `"doc_ids": [DOCUMENT_ID]` A list of a single document ID to edit.
-        -   `"operations": [OPERATION, ...]` A list of operations to perform on the documents. Each operation is a dictionary
-            with the following keys:
-            -   `"page": PAGE_NUMBER` The page number to edit (1-based).
-            -   `"rotate": DEGREES` Optional rotation in degrees (90, 180, 270).
-            -   `"doc": OUTPUT_DOCUMENT_INDEX` Optional index of the output document for split operations.
-    -   Optional `parameters`:
-        -   `"delete_original": true` to delete the original documents after editing.
-        -   `"update_document": true` to add the edited PDF as a new version of the root document.
-        -   `"include_metadata": true` to copy metadata from the original document to the edited document.
--   `remove_password`
-    -   Requires `parameters`:
-        -   `"password": "PASSWORD_STRING"` The password to remove from the PDF documents.
-    -   Optional `parameters`:
-        -   `"update_document": true` to add the password-less PDF as a new version of the root document.
-        -   `"delete_original": true` to delete the original document after editing.
-        -   `"include_metadata": true` to copy metadata from the original document to the new password-less document.
--   `merge`
-    -   No additional `parameters` required.
-    -   The ordering of the merged document is determined by the list of IDs.
-    -   Optional `parameters`:
-        -   `"metadata_document_id": DOC_ID` apply metadata (tags, correspondent, etc.) from this document to the merged document.
-        -   `"delete_originals": true` to delete the original documents. This requires the calling user being the owner of
-            all documents that are merged.
--   `split`
-    -   Requires `parameters`:
-        -   `"pages": [..]` The list should be a list of pages and/or a ranges, separated by commas e.g. `"[1,2-3,4,5-7]"`
-    -   Optional `parameters`:
-        -   `"delete_originals": true` to delete the original document after consumption. This requires the calling user being the owner of
-            the document.
-    -   The split operation only accepts a single document.
--   `rotate`
-    -   Requires `parameters`:
-        -   `"degrees": DEGREES`. Must be an integer i.e. 90, 180, 270
--   `delete_pages`
-    -   Requires `parameters`:
-        -   `"pages": [..]` The list should be a list of integers e.g. `"[2,3,4]"`
-    -   The delete_pages operation only accepts a single document.
 -   `modify_custom_fields`
     -   Requires `parameters`:
         -   `"add_custom_fields": { CUSTOM_FIELD_ID: VALUE }`: JSON object consisting of custom field id:value pairs to add to the document, can also be a list of custom field IDs
             to add with empty values.
         -   `"remove_custom_fields": [CUSTOM_FIELD_ID]`: custom field ids to remove from the document.
+
+#### Document-editing operations
+
+Beginning with version 10+, the API supports individual endpoints for document-editing operations (`merge`, `rotate`, `edit_pdf`, etc), thus their documentation can be found in the API spec / viewer. Legacy document-editing methods via `/api/documents/bulk_edit/` are still supported for compatibility, are deprecated and clients should migrate to the individual endpoints before they are removed in a future version.
 
 ### Objects
 
@@ -467,4 +431,9 @@ Initial API version.
 #### Version 10
 
 -   The `show_on_dashboard` and `show_in_sidebar` fields of saved views have been
-    removed. Relevant settings are now stored in the UISettings model.
+    removed. Relevant settings are now stored in the UISettings model. Compatibility is maintained
+    for versions < 10 until support for API v9 is dropped.
+-   Document-editing operations such as `merge`, `rotate`, and `edit_pdf` have been
+    moved from the bulk edit endpoint to their own individual endpoints. Using these methods via
+    the bulk edit endpoint is still supported for compatibility with versions < 10 until support
+    for API v9 is dropped.
