@@ -30,6 +30,7 @@ def _process_document(doc_id: int) -> None:
         )
         shutil.move(thumb, document.thumbnail_path)
     finally:
+        # TODO(stumpylog): Cleanup once all parsers are handled
         parser.cleanup()
 
 
