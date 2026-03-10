@@ -192,18 +192,6 @@ class BarcodePlugin(ConsumeTaskPlugin):
                 self.metadata.tag_ids = tags
             logger.info(f"Found tags in barcode: {tags}")
 
-        # try reading custom fields from barcodes
-        if (
-            self.settings.barcode_enable_custom_field
-            and (custom_fields := self.custom_fields) is not None
-            and len(custom_fields) > 0
-        ):
-            if self.metadata.custom_fields:
-                self.metadata.custom_fields.update(custom_fields)
-            else:
-                self.metadata.custom_fields = custom_fields
-            logger.info(f"Found custom fields in barcode: {custom_fields}")
-
         # Lastly attempt to split documents
         if self.settings.barcodes_enabled and (
             separator_pages := self.get_separation_pages()
@@ -250,6 +238,18 @@ class BarcodePlugin(ConsumeTaskPlugin):
 
             # Request the consume task stops
             raise StopConsumeTaskError(msg)
+
+        # try reading custom fields from barcodes
+        if (
+            self.settings.barcode_enable_custom_field
+            and (custom_fields := self.custom_fields) is not None
+            and len(custom_fields) > 0
+        ):
+            if self.metadata.custom_fields:
+                self.metadata.custom_fields.update(custom_fields)
+            else:
+                self.metadata.custom_fields = custom_fields
+            logger.info(f"Found custom fields in barcode: {custom_fields}")
 
         # Update/overwrite an ASN if possible
         # After splitting, as otherwise each split document gets the same ASN
