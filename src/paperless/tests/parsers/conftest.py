@@ -2,7 +2,6 @@ from collections.abc import Generator
 from pathlib import Path
 
 import pytest
-
 from paperless_text.parsers import TextDocumentParser
 
 
