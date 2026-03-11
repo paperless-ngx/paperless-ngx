@@ -838,6 +838,61 @@ class DocumentViewSet(
         "custom_field_",
     )
 
+    def _get_selection_data_for_queryset(self, queryset):
+        correspondents = Correspondent.objects.annotate(
+            document_count=Count(
+                "documents",
+                filter=Q(documents__in=queryset),
+                distinct=True,
+            ),
+        )
+        tags = Tag.objects.annotate(
+            document_count=Count(
+                "documents",
+                filter=Q(documents__in=queryset),
+                distinct=True,
+            ),
+        )
+        document_types = DocumentType.objects.annotate(
+            document_count=Count(
+                "documents",
+                filter=Q(documents__in=queryset),
+                distinct=True,
+            ),
+        )
+        storage_paths = StoragePath.objects.annotate(
+            document_count=Count(
+                "documents",
+                filter=Q(documents__in=queryset),
+                distinct=True,
+            ),
+        )
+        custom_fields = CustomField.objects.annotate(
+            document_count=Count(
+                "fields__document",
+                filter=Q(fields__document__in=queryset),
+                distinct=True,
+            ),
+        )
+
+        return {
+            "selected_correspondents": [
+                {"id": t.id, "document_count": t.document_count} for t in correspondents
+            ],
+            "selected_tags": [
+                {"id": t.id, "document_count": t.document_count} for t in tags
+            ],
+            "selected_document_types": [
+                {"id": t.id, "document_count": t.document_count} for t in document_types
+            ],
+            "selected_storage_paths": [
+                {"id": t.id, "document_count": t.document_count} for t in storage_paths
+            ],
+            "selected_custom_fields": [
+                {"id": t.id, "document_count": t.document_count} for t in custom_fields
+            ],
+        }
+
     def get_queryset(self):
         latest_version_content = Subquery(
             Document.objects.filter(root_document=OuterRef("pk"))
@@ -984,6 +1039,25 @@ class DocumentViewSet(
         )
 
         return response
+
+    def list(self, request, *args, **kwargs):
+        if not get_boolean(
+            str(request.query_params.get("include_selection_data", "false")),
+        ):
+            return super().list(request, *args, **kwargs)
+
+        queryset = self.filter_queryset(self.get_queryset())
+        selection_data = self._get_selection_data_for_queryset(queryset)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            response = self.get_paginated_response(serializer.data)
+            response.data["selection_data"] = selection_data
+            return response
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({"results": serializer.data, "selection_data": selection_data})
 
     def destroy(self, request, *args, **kwargs):
         from documents import index
@@ -2024,6 +2098,21 @@ class UnifiedSearchViewSet(DocumentViewSet):
                         if hasattr(queryset, "suggested_correction")
                         else None
                     )
+
+                    if get_boolean(
+                        str(
+                            request.query_params.get(
+                                "include_selection_data",
+                                "false",
+                            ),
+                        ),
+                    ):
+                        result_ids = response.data.get("all", [])
+                        response.data["selection_data"] = (
+                            self._get_selection_data_for_queryset(
+                                Document.objects.filter(pk__in=result_ids),
+                            )
+                        )
 
                     return response
             except NotFound:
