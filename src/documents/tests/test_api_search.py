@@ -89,6 +89,46 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(len(results), 0)
         self.assertCountEqual(response.data["all"], [])
 
+    def test_search_with_include_selection_data(self) -> None:
+        correspondent = Correspondent.objects.create(name="c1")
+        doc_type = DocumentType.objects.create(name="dt1")
+        storage_path = StoragePath.objects.create(name="sp1")
+        tag = Tag.objects.create(name="tag")
+
+        matching_doc = Document.objects.create(
+            title="bank statement",
+            content="bank content",
+            checksum="A",
+            correspondent=correspondent,
+            document_type=doc_type,
+            storage_path=storage_path,
+        )
+        matching_doc.tags.add(tag)
+
+        with AsyncWriter(index.open_index()) as writer:
+            index.update_document(writer, matching_doc)
+
+        response = self.client.get(
+            "/api/documents/?query=bank&include_selection_data=true",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("selection_data", response.data)
+
+        selected_correspondent = next(
+            item
+            for item in response.data["selection_data"]["selected_correspondents"]
+            if item["id"] == correspondent.id
+        )
+        selected_tag = next(
+            item
+            for item in response.data["selection_data"]["selected_tags"]
+            if item["id"] == tag.id
+        )
+
+        self.assertEqual(selected_correspondent["document_count"], 1)
+        self.assertEqual(selected_tag["document_count"], 1)
+
     def test_search_custom_field_ordering(self) -> None:
         custom_field = CustomField.objects.create(
             name="Sortable field",
