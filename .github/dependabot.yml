@@ -12,6 +12,8 @@ updates:
     open-pull-requests-limit: 10
     schedule:
       interval: "monthly"
+    cooldown:
+      default-days: 7
     labels:
       - "frontend"
       - "dependencies"
@@ -36,7 +38,9 @@ updates:
     directory: "/"
     # Check for updates once a week
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+    cooldown:
+      default-days: 7
     labels:
       - "backend"
       - "dependencies"
@@ -97,6 +101,8 @@ updates:
     schedule:
       # Check for updates to GitHub Actions every month
       interval: "monthly"
+    cooldown:
+      default-days: 7
     labels:
       - "ci-cd"
       - "dependencies"
@@ -112,7 +118,9 @@ updates:
       - "/"
       - "/.devcontainer/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
@@ -123,7 +131,9 @@ updates:
   - package-ecosystem: "docker-compose"
     directory: "/docker/compose/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
