@@ -147,3 +147,9 @@ updates:
       postgres:
         patterns:
           - "docker.io/library/postgres*"
+  - package-ecosystem: "pre-commit" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "monthly"
+    cooldown:
+      default-days: 7
