@@ -169,7 +169,7 @@ def match_storage_paths(document: Document, classifier: DocumentClassifier, user
 def matches(matching_model: MatchingModel, document: Document):
     search_flags = 0
 
-    document_content = document.content
+    document_content = document.get_effective_content() or ""
 
     # Check that match is not empty
     if not matching_model.match.strip():
