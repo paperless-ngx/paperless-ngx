@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
@@ -138,6 +139,7 @@ describe('BulkEditorComponent', () => {
           },
         },
         FilterPipe,
+        DatePipe,
         SettingsService,
         {
           provide: UserService,
