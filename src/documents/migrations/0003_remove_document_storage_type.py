@@ -5,7 +5,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "0003_workflowaction_order"),
+        ("documents", "0002_squashed"),
     ]
 
     operations = [
