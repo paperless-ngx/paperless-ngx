@@ -15,7 +15,7 @@
       }
 
       @if (document && displayFields?.includes(DisplayField.TAGS)) {
-        <div class="tags d-flex flex-column text-end position-absolute me-1 fs-6">
+        <div class="tags d-flex flex-column text-end position-absolute me-1 fs-6" [class.tags-no-wrap]="document.tags.length > 3">
           @for (tagID of tagIDs; track tagID) {
             <pngx-tag [tagID]="tagID" (click)="clickTag.emit(tagID);$event.stopPropagation()" [clickable]="true" linkTitle="Toggle tag filter" i18n-linkTitle></pngx-tag>
           }
