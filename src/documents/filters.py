@@ -166,23 +166,28 @@ class TitleContentFilter(Filter):
         from django.conf import settings
 
         value = value.strip() if isinstance(value, str) else value
-        if value:
-            if settings.INDEX_ACCENT_FOLD:
-                lookup = "unaccent__icontains"
-            else:
-                lookup = "icontains"
-            try:
-                return qs.filter(
-                    Q(**{f"title__{lookup}": value})
-                    | Q(**{f"effective_content__{lookup}": value}),
-                )
-            except FieldError:
-                return qs.filter(
-                    Q(**{f"title__{lookup}": value})
-                    | Q(**{f"content__{lookup}": value}),
-                )
-        else:
+        if not value:
             return qs
+
+        if settings.INDEX_ACCENT_FOLD:
+            return self._filter_accent_fold(qs, value)
+        return self._filter_plain(qs, value, "icontains")
+
+    @staticmethod
+    def _filter_plain(qs: Any, value: str, lookup: str) -> Any:
+        try:
+            return qs.filter(
+                Q(**{f"title__{lookup}": value})
+                | Q(**{f"effective_content__{lookup}": value}),
+            )
+        except FieldError:
+            return qs.filter(
+                Q(**{f"title__{lookup}": value}) | Q(**{f"content__{lookup}": value}),
+            )
+
+    @staticmethod
+    def _filter_accent_fold(qs: Any, value: str) -> Any:
+        return TitleContentFilter._filter_plain(qs, value, "unaccent__icontains")
 
 
 @extend_schema_field(serializers.CharField)
