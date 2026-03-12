@@ -3,6 +3,8 @@ import { Document } from './document'
 export interface Results<T> {
   count: number
 
+  display_count?: number
+
   results: T[]
 }
 
