@@ -1644,9 +1644,9 @@ describe('DocumentDetailComponent', () => {
     expect(
       fixture.debugElement.query(By.css('.preview-sticky img'))
     ).not.toBeUndefined()
-    ;(component.document.mime_type =
+    ;((component.document.mime_type =
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
-      fixture.detectChanges()
+      fixture.detectChanges())
     expect(component.archiveContentRenderType).toEqual(
       component.ContentRenderType.Other
     )
