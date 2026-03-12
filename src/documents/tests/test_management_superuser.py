@@ -20,6 +20,7 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
                 "--no-color",
                 stdout=out,
                 stderr=StringIO(),
+                skip_checks=True,
             )
         return out.getvalue()
 

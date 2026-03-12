@@ -147,7 +147,7 @@ class TestCreateClassifier:
             "documents.management.commands.document_create_classifier.train_classifier",
         )
 
-        call_command("document_create_classifier", "--skip-checks")
+        call_command("document_create_classifier", skip_checks=True)
 
         m.assert_called_once_with(scheduled=False, status_callback=mocker.ANY)
         assert callable(m.call_args.kwargs["status_callback"])
@@ -176,7 +176,7 @@ class TestConvertMariaDBUUID(TestCase):
         m.alter_field.return_value = None
 
         stdout = StringIO()
-        call_command("convert_mariadb_uuid", stdout=stdout)
+        call_command("convert_mariadb_uuid", stdout=stdout, skip_checks=True)
 
         m.assert_called_once()
 

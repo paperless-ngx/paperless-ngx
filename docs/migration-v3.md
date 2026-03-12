@@ -72,6 +72,30 @@ PAPERLESS_DBHOST: postgres
 
 See [`PAPERLESS_DBENGINE`](configuration.md#PAPERLESS_DBENGINE) for accepted values.
 
+## Management Command: `--skip-checks` Removed
+
+The `--skip-checks` flag has been removed from all Paperless-ngx management commands
+(`document_exporter`, `document_importer`, `document_retagger`, `document_archiver`,
+`document_thumbnails`, `document_index`, `document_renamer`, `document_sanity_checker`,
+`document_fuzzy_match`, and others).
+
+These commands now set `requires_system_checks = []` internally, which both skips
+redundant checks at runtime (they are already run as a dedicated step during Docker
+startup via `init-system-checks`) and removes `--skip-checks` from the argument parser.
+
+#### Action Required
+
+Remove `--skip-checks` from any scripts, cron jobs, or automation that invokes
+these commands:
+
+```bash
+# v2
+document_exporter /backup --skip-checks
+
+# v3
+document_exporter /backup
+```
+
 ## Database Advanced Options
 
 The individual SSL, timeout, and pooling variables have been removed in favor of a

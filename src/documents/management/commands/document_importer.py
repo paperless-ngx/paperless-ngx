@@ -205,7 +205,7 @@ class Command(CryptMixin, PaperlessCommand):
                 ContentType.objects.all().delete()
                 Permission.objects.all().delete()
                 for manifest_path in self.manifest_paths:
-                    call_command("loaddata", manifest_path)
+                    call_command("loaddata", manifest_path, skip_checks=True)
         except (FieldDoesNotExist, DeserializationError, IntegrityError) as e:
             self.stdout.write(self.style.ERROR("Database import failed"))
             if (
