@@ -46,7 +46,7 @@ repos:
           - ts
           - markdown
         additional_dependencies:
-          - prettier@3.3.3
+          - prettier@3.8.1
           - 'prettier-plugin-organize-imports@4.1.0'
   # Python hooks
   - repo: https://github.com/astral-sh/ruff-pre-commit
