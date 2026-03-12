@@ -810,6 +810,62 @@ class TestBulkEditObjects(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(StoragePath.objects.count(), 0)
 
+    def test_bulk_objects_delete_all_filtered(self) -> None:
+        """
+        GIVEN:
+            - Existing objects that can be filtered by name
+        WHEN:
+            - bulk_edit_objects API endpoint is called with all=true and filters
+        THEN:
+            - Matching objects are deleted without passing explicit IDs
+        """
+        Correspondent.objects.create(name="c2")
+
+        response = self.client.post(
+            "/api/bulk_edit_objects/",
+            json.dumps(
+                {
+                    "all": True,
+                    "filters": {"name__icontains": "c"},
+                    "object_type": "correspondents",
+                    "operation": "delete",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Correspondent.objects.count(), 0)
+
+    def test_bulk_objects_delete_all_filtered_tags_includes_descendants(self) -> None:
+        """
+        GIVEN:
+            - Root tag with descendants
+        WHEN:
+            - bulk_edit_objects API endpoint is called with all=true
+        THEN:
+            - Root tags and descendants are deleted
+        """
+        parent = Tag.objects.create(name="parent")
+        child = Tag.objects.create(name="child", tn_parent=parent)
+
+        response = self.client.post(
+            "/api/bulk_edit_objects/",
+            json.dumps(
+                {
+                    "all": True,
+                    "filters": {"is_root": True},
+                    "object_type": "tags",
+                    "operation": "delete",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(Tag.objects.filter(id=parent.id).exists())
+        self.assertFalse(Tag.objects.filter(id=child.id).exists())
+
     def test_bulk_edit_object_permissions_insufficient_global_perms(self) -> None:
         """
         GIVEN:
@@ -897,3 +953,40 @@ class TestBulkEditObjects(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(response.content, b"Insufficient permissions")
+
+    def test_bulk_edit_all_filtered_permissions_insufficient_object_perms(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - Filter-matching objects include one that the user cannot edit
+        WHEN:
+            - bulk_edit_objects API endpoint is called with all=true
+        THEN:
+            - Operation applies only to editable objects
+        """
+        self.t2.owner = User.objects.get(username="temp_admin")
+        self.t2.save()
+
+        self.user1.user_permissions.add(
+            *Permission.objects.filter(codename="delete_tag"),
+        )
+        self.user1.save()
+        self.client.force_authenticate(user=self.user1)
+
+        response = self.client.post(
+            "/api/bulk_edit_objects/",
+            json.dumps(
+                {
+                    "all": True,
+                    "filters": {"name__icontains": "t"},
+                    "object_type": "tags",
+                    "operation": "delete",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(Tag.objects.filter(id=self.t2.id).exists())
+        self.assertFalse(Tag.objects.filter(id=self.t1.id).exists())
