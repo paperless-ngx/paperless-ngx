@@ -145,6 +145,22 @@ class TestApiObjects(DirectoriesMixin, APITestCase):
             response.data["last_correspondence"],
         )
 
+    def test_paginated_objects_include_all_only_for_legacy_version(self) -> None:
+        response_v10 = self.client.get("/api/correspondents/")
+        self.assertEqual(response_v10.status_code, status.HTTP_200_OK)
+        self.assertNotIn("all", response_v10.data)
+
+        response_v9 = self.client.get(
+            "/api/correspondents/",
+            headers={"Accept": "application/json; version=9"},
+        )
+        self.assertEqual(response_v9.status_code, status.HTTP_200_OK)
+        self.assertIn("all", response_v9.data)
+        self.assertCountEqual(
+            response_v9.data["all"],
+            [self.c1.id, self.c2.id, self.c3.id],
+        )
+
 
 class TestApiStoragePaths(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/storage_paths/"
