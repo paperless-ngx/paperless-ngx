@@ -129,6 +129,7 @@ class TestWebSockets:
         assert await communicator.receive_json_from() == message
 
         # Message not received for different owner with no group match
+        user.groups.filter.return_value.aexists = mocker.AsyncMock(return_value=False)
         message = {"type": "status_update", "data": {"task_id": "test", "owner_id": 2}}
         await channel_layer.group_send("status_updates", message)
         assert await communicator.receive_nothing()
