@@ -358,7 +358,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   }
 
   private getBulkEditFilters(): { [key: string]: any } {
-    const filters = { ...(this.currentExtraParams ?? {}) }
+    const filters = { ...this.currentExtraParams }
     if (this._nameFilter?.length) {
       filters['name__icontains'] = this._nameFilter
     }
