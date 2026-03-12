@@ -156,7 +156,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   }
 
   protected getDisplayCollectionSize(results: Results<T>): number {
-    return this.getCollectionSize(results)
+    return results.display_count ?? this.getCollectionSize(results)
   }
 
   getDocumentCount(object: MatchingModel): number {
@@ -375,6 +375,13 @@ export abstract class ManagementListComponent<T extends MatchingModel>
       return
     }
 
+    this.fetchAllFilteredIds((ids) => {
+      this.selectedObjects = new Set(ids)
+      this.togggleAll = this.areAllPageItemsSelected()
+    })
+  }
+
+  private fetchAllFilteredIds(onLoaded?: (ids: number[]) => void): void {
     this.service
       .listFiltered(
         1,
@@ -395,8 +402,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
       )
       .subscribe((ids) => {
         this.allIDs = ids
-        this.selectedObjects = new Set(ids)
-        this.togggleAll = this.areAllPageItemsSelected()
+        onLoaded?.(ids)
       })
   }
 

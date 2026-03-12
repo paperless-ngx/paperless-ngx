@@ -230,10 +230,11 @@ describe('ManagementListComponent', () => {
     expect(reloadSpy).toHaveBeenCalled()
   })
 
-  it('should use API count for pagination and displayed total', fakeAsync(() => {
+  it('should use API count for pagination and nested ids for displayed total', fakeAsync(() => {
     jest.spyOn(tagService, 'listFiltered').mockReturnValueOnce(
       of({
         count: 1,
+        display_count: 3,
         results: tags.slice(0, 1),
       })
     )
@@ -242,7 +243,7 @@ describe('ManagementListComponent', () => {
     tick(100)
 
     expect(component.collectionSize).toBe(1)
-    expect(component.displayCollectionSize).toBe(1)
+    expect(component.displayCollectionSize).toBe(3)
   }))
 
   it('should support quick filter for objects', () => {
@@ -323,8 +324,9 @@ describe('ManagementListComponent', () => {
     expect(component.togggleAll).toBe(true)
   })
 
-  it('selectAll should fetch IDs when all IDs are not preloaded', () => {
+  it('selectAll should fetch IDs when clicked', () => {
     ;(tagService.listFiltered as jest.Mock).mockClear()
+    ;(component as any).allIDs = []
     component.collectionSize = tags.length
 
     component.selectAll()

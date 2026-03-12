@@ -556,6 +556,7 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         response = self.get_paginated_response(serializer.data)
+        response.data["display_count"] = len(children_source)
         api_version = int(request.version or settings.REST_FRAMEWORK["DEFAULT_VERSION"])
         if descendant_pks and api_version < 10:
             # Include children in the "all" field, if needed
