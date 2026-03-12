@@ -231,6 +231,7 @@ export class FilterableDropdownSelectionModel {
       state == ToggleableItemState.Excluded
     ) {
       this.temporarySelectionStates.delete(id)
+      this.clearDescendantSelections(id)
     }
 
     if (!id) {
@@ -257,6 +258,7 @@ export class FilterableDropdownSelectionModel {
 
       if (this.manyToOne || this.singleSelect) {
         this.temporarySelectionStates.set(id, ToggleableItemState.Excluded)
+        this.clearDescendantSelections(id)
 
         if (this.singleSelect) {
           for (let key of this.temporarySelectionStates.keys()) {
@@ -277,9 +279,15 @@ export class FilterableDropdownSelectionModel {
           newState = ToggleableItemState.NotSelected
         }
         this.temporarySelectionStates.set(id, newState)
+        if (newState == ToggleableItemState.Excluded) {
+          this.clearDescendantSelections(id)
+        }
       }
     } else if (!id || state == ToggleableItemState.Excluded) {
       this.temporarySelectionStates.delete(id)
+      if (id) {
+        this.clearDescendantSelections(id)
+      }
     }
 
     if (fireEvent) {
@@ -289,6 +297,33 @@ export class FilterableDropdownSelectionModel {
 
   private getNonTemporary(id: number) {
     return this.selectionStates.get(id) || ToggleableItemState.NotSelected
+  }
+
+  private clearDescendantSelections(id: number) {
+    for (const descendantID of this.getDescendantIDs(id)) {
+      this.temporarySelectionStates.delete(descendantID)
+    }
+  }
+
+  private getDescendantIDs(id: number): number[] {
+    const descendants: number[] = []
+    const queue: number[] = [id]
+
+    while (queue.length) {
+      const parentID = queue.shift()
+      for (const item of this._items) {
+        if (
+          typeof item?.id === 'number' &&
+          typeof (item as any)['parent'] === 'number' &&
+          (item as any)['parent'] === parentID
+        ) {
+          descendants.push(item.id)
+          queue.push(item.id)
+        }
+      }
+    }
+
+    return descendants
   }
 
   get logicalOperator(): LogicalOperator {
