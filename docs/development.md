@@ -6,23 +6,23 @@ on Paperless-ngx.
 Check out the source from GitHub. The repository is organized in the
 following way:
 
--   `main` always represents the latest release and will only see
-    changes when a new release is made.
--   `dev` contains the code that will be in the next release.
--   `feature-X` contains bigger changes that will be in some release, but
-    not necessarily the next one.
+- `main` always represents the latest release and will only see
+  changes when a new release is made.
+- `dev` contains the code that will be in the next release.
+- `feature-X` contains bigger changes that will be in some release, but
+  not necessarily the next one.
 
 When making functional changes to Paperless-ngx, _always_ make your changes
 on the `dev` branch.
 
 Apart from that, the folder structure is as follows:
 
--   `docs/` - Documentation.
--   `src-ui/` - Code of the front end.
--   `src/` - Code of the back end.
--   `scripts/` - Various scripts that help with different parts of
-    development.
--   `docker/` - Files required to build the docker image.
+- `docs/` - Documentation.
+- `src-ui/` - Code of the front end.
+- `src/` - Code of the back end.
+- `scripts/` - Various scripts that help with different parts of
+  development.
+- `docker/` - Files required to build the docker image.
 
 ## Contributing to Paperless-ngx
 
@@ -94,18 +94,17 @@ first-time setup.
     ```
 
 7.  You can now either ...
+    - install Redis or
 
-    -   install Redis or
+    - use the included `scripts/start_services.sh` to use Docker to fire
+      up a Redis instance (and some other services such as Tika,
+      Gotenberg and a database server) or
 
-    -   use the included `scripts/start_services.sh` to use Docker to fire
-        up a Redis instance (and some other services such as Tika,
-        Gotenberg and a database server) or
+    - spin up a bare Redis container
 
-    -   spin up a bare Redis container
-
-        ```bash
-        docker run -d -p 6379:6379 --restart unless-stopped redis:latest
-        ```
+      ```bash
+      docker run -d -p 6379:6379 --restart unless-stopped redis:latest
+      ```
 
 8.  Continue with either back-end or front-end development – or both :-).
 
@@ -118,9 +117,9 @@ work well for development, but you can use whatever you want.
 Configure the IDE to use the `src/`-folder as the base source folder.
 Configure the following launch configurations in your IDE:
 
--   `uv run manage.py runserver`
--   `uv run manage.py document_consumer`
--   `uv run celery --app paperless worker -l DEBUG` (or any other log level)
+- `uv run manage.py runserver`
+- `uv run manage.py document_consumer`
+- `uv run celery --app paperless worker -l DEBUG` (or any other log level)
 
 To start them all:
 
@@ -146,11 +145,11 @@ pnpm ng build --configuration production
 
 ### Testing
 
--   Run `pytest` in the `src/` directory to execute all tests. This also
-    generates a HTML coverage report. When running tests, `paperless.conf`
-    is loaded as well. However, the tests rely on the default
-    configuration. This is not ideal. But for now, make sure no settings
-    except for DEBUG are overridden when testing.
+- Run `pytest` in the `src/` directory to execute all tests. This also
+  generates a HTML coverage report. When running tests, `paperless.conf`
+  is loaded as well. However, the tests rely on the default
+  configuration. This is not ideal. But for now, make sure no settings
+  except for DEBUG are overridden when testing.
 
 !!! note
 
@@ -254,14 +253,14 @@ these parts have to be translated separately.
 
 ### Front end localization
 
--   The AngularJS front end does localization according to the [Angular
-    documentation](https://angular.io/guide/i18n).
--   The source language of the project is "en_US".
--   The source strings end up in the file `src-ui/messages.xlf`.
--   The translated strings need to be placed in the
-    `src-ui/src/locale/` folder.
--   In order to extract added or changed strings from the source files,
-    call `ng extract-i18n`.
+- The AngularJS front end does localization according to the [Angular
+  documentation](https://angular.io/guide/i18n).
+- The source language of the project is "en_US".
+- The source strings end up in the file `src-ui/messages.xlf`.
+- The translated strings need to be placed in the
+  `src-ui/src/locale/` folder.
+- In order to extract added or changed strings from the source files,
+  call `ng extract-i18n`.
 
 Adding new languages requires adding the translated files in the
 `src-ui/src/locale/` folder and adjusting a couple files.
@@ -307,18 +306,18 @@ A majority of the strings that appear in the back end appear only when
 the admin is used. However, some of these are still shown on the front
 end (such as error messages).
 
--   The django application does localization according to the [Django
-    documentation](https://docs.djangoproject.com/en/3.1/topics/i18n/translation/).
--   The source language of the project is "en_US".
--   Localization files end up in the folder `src/locale/`.
--   In order to extract strings from the application, call
-    `uv run manage.py makemessages -l en_US`. This is important after
-    making changes to translatable strings.
--   The message files need to be compiled for them to show up in the
-    application. Call `uv run manage.py compilemessages` to do this.
-    The generated files don't get committed into git, since these are
-    derived artifacts. The build pipeline takes care of executing this
-    command.
+- The django application does localization according to the [Django
+  documentation](https://docs.djangoproject.com/en/3.1/topics/i18n/translation/).
+- The source language of the project is "en_US".
+- Localization files end up in the folder `src/locale/`.
+- In order to extract strings from the application, call
+  `uv run manage.py makemessages -l en_US`. This is important after
+  making changes to translatable strings.
+- The message files need to be compiled for them to show up in the
+  application. Call `uv run manage.py compilemessages` to do this.
+  The generated files don't get committed into git, since these are
+  derived artifacts. The build pipeline takes care of executing this
+  command.
 
 Adding new languages requires adding the translated files in the
 `src/locale/`-folder and adjusting the file
@@ -381,10 +380,10 @@ base code.
 Paperless-ngx uses parsers to add documents. A parser is
 responsible for:
 
--   Retrieving the content from the original
--   Creating a thumbnail
--   _optional:_ Retrieving a created date from the original
--   _optional:_ Creating an archived document from the original
+- Retrieving the content from the original
+- Creating a thumbnail
+- _optional:_ Retrieving a created date from the original
+- _optional:_ Creating an archived document from the original
 
 Custom parsers can be added to Paperless-ngx to support more file types. In
 order to do that, you need to write the parser itself and announce its
@@ -442,17 +441,17 @@ def myparser_consumer_declaration(sender, **kwargs):
     }
 ```
 
--   `parser` is a reference to a class that extends `DocumentParser`.
--   `weight` is used whenever two or more parsers are able to parse a
-    file: The parser with the higher weight wins. This can be used to
-    override the parsers provided by Paperless-ngx.
--   `mime_types` is a dictionary. The keys are the mime types your
-    parser supports and the value is the default file extension that
-    Paperless-ngx should use when storing files and serving them for
-    download. We could guess that from the file extensions, but some
-    mime types have many extensions associated with them and the Python
-    methods responsible for guessing the extension do not always return
-    the same value.
+- `parser` is a reference to a class that extends `DocumentParser`.
+- `weight` is used whenever two or more parsers are able to parse a
+  file: The parser with the higher weight wins. This can be used to
+  override the parsers provided by Paperless-ngx.
+- `mime_types` is a dictionary. The keys are the mime types your
+  parser supports and the value is the default file extension that
+  Paperless-ngx should use when storing files and serving them for
+  download. We could guess that from the file extensions, but some
+  mime types have many extensions associated with them and the Python
+  methods responsible for guessing the extension do not always return
+  the same value.
 
 ## Using Visual Studio Code devcontainer
 
@@ -471,9 +470,8 @@ To get started:
 2. VS Code will prompt you with "Reopen in container". Do so and wait for the environment to start.
 
 3. In case your host operating system is Windows:
-
-    - The Source Control view in Visual Studio Code might show: "The detected Git repository is potentially unsafe as the folder is owned by someone other than the current user." Use "Manage Unsafe Repositories" to fix this.
-    - Git might have detecteded modifications for all files, because Windows is using CRLF line endings. Run `git checkout .` in the containers terminal to fix this issue.
+   - The Source Control view in Visual Studio Code might show: "The detected Git repository is potentially unsafe as the folder is owned by someone other than the current user." Use "Manage Unsafe Repositories" to fix this.
+   - Git might have detecteded modifications for all files, because Windows is using CRLF line endings. Run `git checkout .` in the containers terminal to fix this issue.
 
 4. Initialize the project by running the task **Project Setup: Run all Init Tasks**. This
    will initialize the database tables and create a superuser. Then you can compile the front end
@@ -538,12 +536,12 @@ class MyDateParserPlugin(DateParserPluginBase):
 
 Your parser instance is initialized with a `DateParserConfig` object accessible via `self.config`. This provides:
 
--   `languages: list[str]` - List of language codes for date parsing
--   `timezone_str: str` - Timezone string for date localization
--   `ignore_dates: set[datetime.date]` - Dates that should be filtered out
--   `reference_time: datetime.datetime` - Current time for filtering future dates
--   `filename_date_order: str | None` - Date order preference for filenames (e.g., "DMY", "MDY")
--   `content_date_order: str` - Date order preference for content
+- `languages: list[str]` - List of language codes for date parsing
+- `timezone_str: str` - Timezone string for date localization
+- `ignore_dates: set[datetime.date]` - Dates that should be filtered out
+- `reference_time: datetime.datetime` - Current time for filtering future dates
+- `filename_date_order: str | None` - Date order preference for filenames (e.g., "DMY", "MDY")
+- `content_date_order: str` - Date order preference for content
 
 The base class provides two helper methods you can use:
 

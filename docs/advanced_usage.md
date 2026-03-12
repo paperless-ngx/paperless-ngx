@@ -25,20 +25,20 @@ documents.
 
 The following algorithms are available:
 
--   **None:** No matching will be performed.
--   **Any:** Looks for any occurrence of any word provided in match in
-    the PDF. If you define the match as `Bank1 Bank2`, it will match
-    documents containing either of these terms.
--   **All:** Requires that every word provided appears in the PDF,
-    albeit not in the order provided.
--   **Exact:** Matches only if the match appears exactly as provided
-    (i.e. preserve ordering) in the PDF.
--   **Regular expression:** Parses the match as a regular expression and
-    tries to find a match within the document.
--   **Fuzzy match:** Uses a partial matching based on locating the tag text
-    inside the document, using a [partial ratio](https://rapidfuzz.github.io/RapidFuzz/Usage/fuzz.html#partial-ratio)
--   **Auto:** Tries to automatically match new documents. This does not
-    require you to set a match. See the [notes below](#automatic-matching).
+- **None:** No matching will be performed.
+- **Any:** Looks for any occurrence of any word provided in match in
+  the PDF. If you define the match as `Bank1 Bank2`, it will match
+  documents containing either of these terms.
+- **All:** Requires that every word provided appears in the PDF,
+  albeit not in the order provided.
+- **Exact:** Matches only if the match appears exactly as provided
+  (i.e. preserve ordering) in the PDF.
+- **Regular expression:** Parses the match as a regular expression and
+  tries to find a match within the document.
+- **Fuzzy match:** Uses a partial matching based on locating the tag text
+  inside the document, using a [partial ratio](https://rapidfuzz.github.io/RapidFuzz/Usage/fuzz.html#partial-ratio)
+- **Auto:** Tries to automatically match new documents. This does not
+  require you to set a match. See the [notes below](#automatic-matching).
 
 When using the _any_ or _all_ matching algorithms, you can search for
 terms that consist of multiple words by enclosing them in double quotes.
@@ -69,33 +69,33 @@ Paperless tries to hide much of the involved complexity with this
 approach. However, there are a couple caveats you need to keep in mind
 when using this feature:
 
--   Changes to your documents are not immediately reflected by the
-    matching algorithm. The neural network needs to be _trained_ on your
-    documents after changes. Paperless periodically (default: once each
-    hour) checks for changes and does this automatically for you.
--   The Auto matching algorithm only takes documents into account which
-    are NOT placed in your inbox (i.e. have any inbox tags assigned to
-    them). This ensures that the neural network only learns from
-    documents which you have correctly tagged before.
--   The matching algorithm can only work if there is a correlation
-    between the tag, correspondent, document type, or storage path and
-    the document itself. Your bank statements usually contain your bank
-    account number and the name of the bank, so this works reasonably
-    well, However, tags such as "TODO" cannot be automatically
-    assigned.
--   The matching algorithm needs a reasonable number of documents to
-    identify when to assign tags, correspondents, storage paths, and
-    types. If one out of a thousand documents has the correspondent
-    "Very obscure web shop I bought something five years ago", it will
-    probably not assign this correspondent automatically if you buy
-    something from them again. The more documents, the better.
--   Paperless also needs a reasonable amount of negative examples to
-    decide when not to assign a certain tag, correspondent, document
-    type, or storage path. This will usually be the case as you start
-    filling up paperless with documents. Example: If all your documents
-    are either from "Webshop" or "Bank", paperless will assign one
-    of these correspondents to ANY new document, if both are set to
-    automatic matching.
+- Changes to your documents are not immediately reflected by the
+  matching algorithm. The neural network needs to be _trained_ on your
+  documents after changes. Paperless periodically (default: once each
+  hour) checks for changes and does this automatically for you.
+- The Auto matching algorithm only takes documents into account which
+  are NOT placed in your inbox (i.e. have any inbox tags assigned to
+  them). This ensures that the neural network only learns from
+  documents which you have correctly tagged before.
+- The matching algorithm can only work if there is a correlation
+  between the tag, correspondent, document type, or storage path and
+  the document itself. Your bank statements usually contain your bank
+  account number and the name of the bank, so this works reasonably
+  well, However, tags such as "TODO" cannot be automatically
+  assigned.
+- The matching algorithm needs a reasonable number of documents to
+  identify when to assign tags, correspondents, storage paths, and
+  types. If one out of a thousand documents has the correspondent
+  "Very obscure web shop I bought something five years ago", it will
+  probably not assign this correspondent automatically if you buy
+  something from them again. The more documents, the better.
+- Paperless also needs a reasonable amount of negative examples to
+  decide when not to assign a certain tag, correspondent, document
+  type, or storage path. This will usually be the case as you start
+  filling up paperless with documents. Example: If all your documents
+  are either from "Webshop" or "Bank", paperless will assign one
+  of these correspondents to ANY new document, if both are set to
+  automatic matching.
 
 ## Hooking into the consumption process {#consume-hooks}
 
@@ -243,12 +243,12 @@ webserver:
 
 Troubleshooting:
 
--   Monitor the Docker Compose log
-    `cd ~/paperless-ngx; docker compose logs -f`
--   Check your script's permission e.g. in case of permission error
-    `sudo chmod 755 post-consumption-example.sh`
--   Pipe your scripts's output to a log file e.g.
-    `echo "${DOCUMENT_ID}" | tee --append /usr/src/paperless/scripts/post-consumption-example.log`
+- Monitor the Docker Compose log
+  `cd ~/paperless-ngx; docker compose logs -f`
+- Check your script's permission e.g. in case of permission error
+  `sudo chmod 755 post-consumption-example.sh`
+- Pipe your scripts's output to a log file e.g.
+  `echo "${DOCUMENT_ID}" | tee --append /usr/src/paperless/scripts/post-consumption-example.log`
 
 ## File name handling {#file-name-handling}
 
@@ -307,35 +307,35 @@ will create a directory structure as follows:
 
 Paperless provides the following variables for use within filenames:
 
--   `{{ asn }}`: The archive serial number of the document, or "none".
--   `{{ correspondent }}`: The name of the correspondent, or "none".
--   `{{ document_type }}`: The name of the document type, or "none".
--   `{{ tag_list }}`: A comma separated list of all tags assigned to the
-    document.
--   `{{ title }}`: The title of the document.
--   `{{ created }}`: The full date (ISO 8601 format, e.g. `2024-03-14`) the document was created.
--   `{{ created_year }}`: Year created only, formatted as the year with
-    century.
--   `{{ created_year_short }}`: Year created only, formatted as the year
-    without century, zero padded.
--   `{{ created_month }}`: Month created only (number 01-12).
--   `{{ created_month_name }}`: Month created name, as per locale
--   `{{ created_month_name_short }}`: Month created abbreviated name, as per
-    locale
--   `{{ created_day }}`: Day created only (number 01-31).
--   `{{ added }}`: The full date (ISO format) the document was added to
-    paperless.
--   `{{ added_year }}`: Year added only.
--   `{{ added_year_short }}`: Year added only, formatted as the year without
-    century, zero padded.
--   `{{ added_month }}`: Month added only (number 01-12).
--   `{{ added_month_name }}`: Month added name, as per locale
--   `{{ added_month_name_short }}`: Month added abbreviated name, as per
-    locale
--   `{{ added_day }}`: Day added only (number 01-31).
--   `{{ owner_username }}`: Username of document owner, if any, or "none"
--   `{{ original_name }}`: Document original filename, minus the extension, if any, or "none"
--   `{{ doc_pk }}`: The paperless identifier (primary key) for the document.
+- `{{ asn }}`: The archive serial number of the document, or "none".
+- `{{ correspondent }}`: The name of the correspondent, or "none".
+- `{{ document_type }}`: The name of the document type, or "none".
+- `{{ tag_list }}`: A comma separated list of all tags assigned to the
+  document.
+- `{{ title }}`: The title of the document.
+- `{{ created }}`: The full date (ISO 8601 format, e.g. `2024-03-14`) the document was created.
+- `{{ created_year }}`: Year created only, formatted as the year with
+  century.
+- `{{ created_year_short }}`: Year created only, formatted as the year
+  without century, zero padded.
+- `{{ created_month }}`: Month created only (number 01-12).
+- `{{ created_month_name }}`: Month created name, as per locale
+- `{{ created_month_name_short }}`: Month created abbreviated name, as per
+  locale
+- `{{ created_day }}`: Day created only (number 01-31).
+- `{{ added }}`: The full date (ISO format) the document was added to
+  paperless.
+- `{{ added_year }}`: Year added only.
+- `{{ added_year_short }}`: Year added only, formatted as the year without
+  century, zero padded.
+- `{{ added_month }}`: Month added only (number 01-12).
+- `{{ added_month_name }}`: Month added name, as per locale
+- `{{ added_month_name_short }}`: Month added abbreviated name, as per
+  locale
+- `{{ added_day }}`: Day added only (number 01-31).
+- `{{ owner_username }}`: Username of document owner, if any, or "none"
+- `{{ original_name }}`: Document original filename, minus the extension, if any, or "none"
+- `{{ doc_pk }}`: The paperless identifier (primary key) for the document.
 
 !!! warning
 
@@ -388,10 +388,10 @@ before empty placeholders are removed as well, empty directories are omitted.
 When a single storage layout is not sufficient for your use case, storage paths allow for more complex
 structure to set precisely where each document is stored in the file system.
 
--   Each storage path is a [`PAPERLESS_FILENAME_FORMAT`](configuration.md#PAPERLESS_FILENAME_FORMAT) and
-    follows the rules described above
--   Each document is assigned a storage path using the matching algorithms described above, but can be
-    overwritten at any time
+- Each storage path is a [`PAPERLESS_FILENAME_FORMAT`](configuration.md#PAPERLESS_FILENAME_FORMAT) and
+  follows the rules described above
+- Each document is assigned a storage path using the matching algorithms described above, but can be
+  overwritten at any time
 
 For example, you could define the following two storage paths:
 
@@ -457,13 +457,13 @@ The `get_cf_value` filter retrieves a value from custom field data with optional
 
 ###### Parameters
 
--   `custom_fields`: This _must_ be the provided custom field data
--   `name` (str): Name of the custom field to retrieve
--   `default` (str, optional): Default value to return if field is not found or has no value
+- `custom_fields`: This _must_ be the provided custom field data
+- `name` (str): Name of the custom field to retrieve
+- `default` (str, optional): Default value to return if field is not found or has no value
 
 ###### Returns
 
--   `str | None`: The field value, default value, or `None` if neither exists
+- `str | None`: The field value, default value, or `None` if neither exists
 
 ###### Examples
 
@@ -487,12 +487,12 @@ The `datetime` filter formats a datetime string or datetime object using Python'
 
 ###### Parameters
 
--   `value` (str | datetime): Date/time value to format (strings will be parsed automatically)
--   `format` (str): Python strftime format string
+- `value` (str | datetime): Date/time value to format (strings will be parsed automatically)
+- `format` (str): Python strftime format string
 
 ###### Returns
 
--   `str`: Formatted datetime string
+- `str`: Formatted datetime string
 
 ###### Examples
 
@@ -525,13 +525,13 @@ An ISO string can also be provided to control the output format.
 
 ###### Parameters
 
--   `value` (date | datetime | str): Date, datetime object or ISO string to format (datetime should be timezone-aware)
--   `format` (str): Format type - either a Babel preset ('short', 'medium', 'long', 'full') or custom pattern
--   `locale` (str): Locale code for localization (e.g., 'en_US', 'fr_FR', 'de_DE')
+- `value` (date | datetime | str): Date, datetime object or ISO string to format (datetime should be timezone-aware)
+- `format` (str): Format type - either a Babel preset ('short', 'medium', 'long', 'full') or custom pattern
+- `locale` (str): Locale code for localization (e.g., 'en_US', 'fr_FR', 'de_DE')
 
 ###### Returns
 
--   `str`: Localized, formatted date string
+- `str`: Localized, formatted date string
 
 ###### Examples
 
@@ -565,15 +565,15 @@ See the [supported format codes](https://unicode.org/reports/tr35/tr35-dates.htm
 
 ### Format Presets
 
--   **short**: Abbreviated format (e.g., "1/15/24")
--   **medium**: Medium-length format (e.g., "Jan 15, 2024")
--   **long**: Long format with full month name (e.g., "January 15, 2024")
--   **full**: Full format including day of week (e.g., "Monday, January 15, 2024")
+- **short**: Abbreviated format (e.g., "1/15/24")
+- **medium**: Medium-length format (e.g., "Jan 15, 2024")
+- **long**: Long format with full month name (e.g., "January 15, 2024")
+- **full**: Full format including day of week (e.g., "Monday, January 15, 2024")
 
 #### Additional Variables
 
--   `{{ tag_name_list }}`: A list of tag names applied to the document, ordered by the tag name. Note this is a list, not a single string
--   `{{ custom_fields }}`: A mapping of custom field names to their type and value. A user can access the mapping by field name or check if a field is applied by checking its existence in the variable.
+- `{{ tag_name_list }}`: A list of tag names applied to the document, ordered by the tag name. Note this is a list, not a single string
+- `{{ custom_fields }}`: A mapping of custom field names to their type and value. A user can access the mapping by field name or check if a field is applied by checking its existence in the variable.
 
 !!! tip
 
@@ -675,15 +675,15 @@ installation, you can use volumes to accomplish this:
 
 ```yaml
 services:
+  # ...
+  webserver:
+    environment:
+      - PAPERLESS_ENABLE_FLOWER
+    ports:
+      - 5555:5555 # (2)!
     # ...
-    webserver:
-        environment:
-            - PAPERLESS_ENABLE_FLOWER
-        ports:
-            - 5555:5555 # (2)!
-        # ...
-        volumes:
-            - /path/to/my/flowerconfig.py:/usr/src/paperless/src/paperless/flowerconfig.py:ro # (1)!
+    volumes:
+      - /path/to/my/flowerconfig.py:/usr/src/paperless/src/paperless/flowerconfig.py:ro # (1)!
 ```
 
 1. Note the `:ro` tag means the file will be mounted as read only.
@@ -714,11 +714,11 @@ For example, using Docker Compose:
 
 ```yaml
 services:
+  # ...
+  webserver:
     # ...
-    webserver:
-        # ...
-        volumes:
-            - /path/to/my/scripts:/custom-cont-init.d:ro # (1)!
+    volumes:
+      - /path/to/my/scripts:/custom-cont-init.d:ro # (1)!
 ```
 
 1. Note the `:ro` tag means the folder will be mounted as read only. This is for extra security against changes
@@ -771,16 +771,16 @@ Paperless is able to utilize barcodes for automatically performing some tasks.
 
 At this time, the library utilized for detection of barcodes supports the following types:
 
--   AN-13/UPC-A
--   UPC-E
--   EAN-8
--   Code 128
--   Code 93
--   Code 39
--   Codabar
--   Interleaved 2 of 5
--   QR Code
--   SQ Code
+- AN-13/UPC-A
+- UPC-E
+- EAN-8
+- Code 128
+- Code 93
+- Code 39
+- Codabar
+- Interleaved 2 of 5
+- QR Code
+- SQ Code
 
 For usage in Paperless, the type of barcode does not matter, only the contents of it.
 
@@ -793,8 +793,8 @@ below.
 If document splitting is enabled, Paperless splits _after_ a separator barcode by default.
 This means:
 
--   any page containing the configured separator barcode starts a new document, starting with the **next** page
--   pages containing the separator barcode are discarded
+- any page containing the configured separator barcode starts a new document, starting with the **next** page
+- pages containing the separator barcode are discarded
 
 This is intended for dedicated separator sheets such as PATCH-T pages.
 
@@ -831,10 +831,10 @@ to `true`.
 When enabled, documents will be split at pages containing tag barcodes, similar to how
 ASN barcodes work. Key features:
 
--   The page with the tag barcode is **retained** in the resulting document
--   **Each split document extracts its own tags** - only tags on pages within that document are assigned
--   Multiple tag barcodes can trigger multiple splits in the same document
--   Works seamlessly with ASN barcodes - each split document gets its own ASN and tags
+- The page with the tag barcode is **retained** in the resulting document
+- **Each split document extracts its own tags** - only tags on pages within that document are assigned
+- Multiple tag barcodes can trigger multiple splits in the same document
+- Works seamlessly with ASN barcodes - each split document gets its own ASN and tags
 
 This is useful for batch scanning where you place tag barcode pages between different
 documents to both separate and categorize them in a single operation.
@@ -996,9 +996,9 @@ If using docker, you'll need to add the following volume mounts to your `docker-
 
 ```yaml
 webserver:
-    volumes:
-        - /home/user/.gnupg/pubring.gpg:/usr/src/paperless/.gnupg/pubring.gpg
-        - <path to gpg-agent socket>:/usr/src/paperless/.gnupg/S.gpg-agent
+  volumes:
+    - /home/user/.gnupg/pubring.gpg:/usr/src/paperless/.gnupg/pubring.gpg
+    - <path to gpg-agent socket>:/usr/src/paperless/.gnupg/S.gpg-agent
 ```
 
 For a 'bare-metal' installation no further configuration is necessary. If you
@@ -1006,9 +1006,9 @@ want to use a separate `GNUPG_HOME`, you can do so by configuring the [PAPERLESS
 
 ### Troubleshooting
 
--   Make sure, that `gpg-agent` is running on your host machine
--   Make sure, that encryption and decryption works from inside the container using the `gpg` commands from above.
--   Check that all files in `/usr/src/paperless/.gnupg` have correct permissions
+- Make sure, that `gpg-agent` is running on your host machine
+- Make sure, that encryption and decryption works from inside the container using the `gpg` commands from above.
+- Check that all files in `/usr/src/paperless/.gnupg` have correct permissions
 
 ```shell
 paperless@9da1865df327:~/.gnupg$ ls -al

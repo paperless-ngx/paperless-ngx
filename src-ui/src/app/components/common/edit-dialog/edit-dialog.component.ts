@@ -31,8 +31,8 @@ export enum EditDialogMode {
 
 @Directive()
 export abstract class EditDialogComponent<
-    T extends ObjectWithPermissions | ObjectWithId,
-  >
+  T extends ObjectWithPermissions | ObjectWithId,
+>
   extends LoadingComponentWithPermissions
   implements OnInit
 {
