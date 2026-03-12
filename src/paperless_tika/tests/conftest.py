@@ -12,6 +12,7 @@ def tika_parser() -> Generator[TikaDocumentParser, None, None]:
         parser = TikaDocumentParser(logging_group=None)
         yield parser
     finally:
+        # TODO(stumpylog): Cleanup once all parsers are handled
         parser.cleanup()
 
 

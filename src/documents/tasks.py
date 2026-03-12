@@ -399,6 +399,7 @@ def update_document_content_maybe_archive_file(document_id) -> None:
             f"Error while parsing document {document} (ID: {document_id})",
         )
     finally:
+        # TODO(stumpylog): Cleanup once all parsers are handled
         parser.cleanup()
 
 
