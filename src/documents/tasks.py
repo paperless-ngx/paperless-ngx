@@ -100,7 +100,11 @@ def index_reindex(*, iter_wrapper: IterWrapper[Document] = _identity) -> None:
 
 
 @shared_task
-def train_classifier(*, scheduled=True) -> None:
+def train_classifier(
+    *,
+    scheduled=True,
+    status_callback: Callable[[str], None] | None = None,
+) -> None:
     task = PaperlessTask.objects.create(
         type=PaperlessTask.TaskType.SCHEDULED_TASK
         if scheduled
@@ -136,7 +140,7 @@ def train_classifier(*, scheduled=True) -> None:
         classifier = DocumentClassifier()
 
     try:
-        if classifier.train():
+        if classifier.train(status_callback=status_callback):
             logger.info(
                 f"Saving updated classifier model to {settings.MODEL_FILE}...",
             )
