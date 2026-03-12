@@ -5,7 +5,7 @@ export interface Results<T> {
 
   results: T[]
 
-  all: number[]
+  all?: number[]
 }
 
 export interface SelectionDataItem {
