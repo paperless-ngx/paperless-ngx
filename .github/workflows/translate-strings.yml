@@ -40,7 +40,7 @@ jobs:
         with:
           version: 10
       - name: Use Node.js 24
-        uses: actions/setup-node@v6.2.0
+        uses: actions/setup-node@v6.3.0
         with:
           node-version: 24.x
           cache: 'pnpm'
