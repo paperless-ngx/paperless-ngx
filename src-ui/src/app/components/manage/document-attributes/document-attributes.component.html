@@ -9,8 +9,8 @@
     <div ngbDropdown class="btn-group flex-fill d-sm-none">
       <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle>
         <i-bs name="text-indent-left"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Select</ng-container></div>
-        @if (activeManagementList.selectedObjects.size > 0) {
-          <pngx-clearable-badge [selected]="activeManagementList.selectedObjects.size > 0" [number]="activeManagementList.selectedObjects.size" (cleared)="activeManagementList.selectNone()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
+        @if (activeManagementList.hasSelection) {
+          <pngx-clearable-badge [selected]="activeManagementList.hasSelection" [number]="activeManagementList.selectedCount" (cleared)="activeManagementList.selectNone()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
         }
       </button>
       <div ngbDropdownMenu aria-labelledby="dropdownSelectMobile" class="shadow">
@@ -25,7 +25,7 @@
         <span class="input-group-text border-0" i18n>Select:</span>
       </div>
       <div class="btn-group btn-group-sm flex-nowrap">
-        @if (activeManagementList.selectedObjects.size > 0) {
+        @if (activeManagementList.hasSelection) {
           <button class="btn btn-sm btn-outline-secondary" (click)="activeManagementList.selectNone()">
             <i-bs name="slash-circle" class="me-1"></i-bs><ng-container i18n>None</ng-container>
           </button>
@@ -40,11 +40,11 @@
     </div>
 
     <button type="button" class="btn btn-sm btn-outline-primary" (click)="activeManagementList.setPermissions()"
-      [disabled]="!activeManagementList.userCanBulkEdit(PermissionAction.Change) || activeManagementList.selectedObjects.size === 0">
+      [disabled]="!activeManagementList.userCanBulkEdit(PermissionAction.Change) || !activeManagementList.hasSelection">
       <i-bs name="person-fill-lock" class="me-1"></i-bs><ng-container i18n>Permissions</ng-container>
     </button>
     <button type="button" class="btn btn-sm btn-outline-danger" (click)="activeManagementList.delete()"
-      [disabled]="!activeManagementList.userCanBulkEdit(PermissionAction.Delete) || activeManagementList.selectedObjects.size === 0">
+      [disabled]="!activeManagementList.userCanBulkEdit(PermissionAction.Delete) || !activeManagementList.hasSelection">
       <i-bs name="trash" class="me-1"></i-bs><ng-container i18n>Delete</ng-container>
     </button>
     <button type="button" class="btn btn-sm btn-outline-primary ms-md-5" (click)="activeManagementList.openCreateDialog()"
