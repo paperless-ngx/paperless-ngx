@@ -1528,13 +1528,17 @@ class DocumentViewSet(
 
         return Response(sorted(entries, key=lambda x: x["timestamp"], reverse=True))
 
+    @extend_schema(
+        operation_id="documents_email_document",
+        deprecated=True,
+    )
     @action(
         methods=["post"],
         detail=True,
         url_path="email",
         permission_classes=[IsAuthenticated, ViewDocumentsPermissions],
     )
-    # TODO: deprecated as of 2.19, remove in future release
+    # TODO: deprecated, remove with drop of support for API v9
     def email_document(self, request, pk=None):
         request_data = request.data.copy()
         request_data.setlist("documents", [pk])
