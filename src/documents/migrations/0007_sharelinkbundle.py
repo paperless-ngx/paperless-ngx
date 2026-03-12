@@ -46,7 +46,7 @@ def revoke_share_link_bundle_permissions(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("documents", "0007_document_content_length"),
+        ("documents", "0006_document_content_length"),
     ]
 
     operations = [

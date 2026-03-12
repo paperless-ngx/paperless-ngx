@@ -7,6 +7,7 @@ from pathlib import Path
 
 from django.conf import settings
 from django.core.checks import Error
+from django.core.checks import Tags
 from django.core.checks import Warning
 from django.core.checks import register
 from django.db import connections
@@ -204,15 +205,16 @@ def audit_log_check(app_configs, **kwargs):
     return result
 
 
-@register()
+@register(Tags.compatibility)
 def check_v3_minimum_upgrade_version(
     app_configs: object,
     **kwargs: object,
 ) -> list[Error]:
-    """Enforce that upgrades to v3 must start from v2.20.9.
+    """
+    Enforce that upgrades to v3 must start from v2.20.10.
 
     v3 squashes all prior migrations into 0001_squashed and 0002_squashed.
-    If a user skips v2.20.9, the data migration in 1075_workflowaction_order
+    If a user skips v2.20.10, the data migration in 1075_workflowaction_order
     never runs and the squash may apply schema changes against an incomplete
     database state.
     """
@@ -239,7 +241,7 @@ def check_v3_minimum_upgrade_version(
         if {"0001_squashed", "0002_squashed"} & applied:
             return []
 
-        # On v2.20.9 exactly — squash will pick up cleanly from here
+        # On v2.20.10 exactly — squash will pick up cleanly from here
         if "1075_workflowaction_order" in applied:
             return []
 
@@ -250,8 +252,8 @@ def check_v3_minimum_upgrade_version(
         Error(
             "Cannot upgrade to Paperless-ngx v3 from this version.",
             hint=(
-                "Upgrading to v3 can only be performed from v2.20.9."
-                "Please upgrade to v2.20.9, run migrations, then upgrade to v3."
+                "Upgrading to v3 can only be performed from v2.20.10."
+                "Please upgrade to v2.20.10, run migrations, then upgrade to v3."
                 "See https://docs.paperless-ngx.com/setup/#upgrading for details."
             ),
             id="paperless.E002",
