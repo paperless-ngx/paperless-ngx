@@ -7,7 +7,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "0006_alter_document_checksum_unique"),
+        ("documents", "0005_alter_document_checksum_unique"),
     ]
 
     operations = [

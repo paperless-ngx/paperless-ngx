@@ -29,7 +29,7 @@ repos:
       - id: check-case-conflict
       - id: detect-private-key
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.1
+    rev: v2.4.2
     hooks:
       - id: codespell
         additional_dependencies: [tomli]
@@ -46,8 +46,8 @@ repos:
           - ts
           - markdown
         additional_dependencies:
-          - prettier@3.3.3
-          - 'prettier-plugin-organize-imports@4.1.0'
+          - prettier@3.8.1
+          - 'prettier-plugin-organize-imports@4.3.0'
   # Python hooks
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.5
@@ -65,7 +65,7 @@ repos:
       - id: hadolint
   # Shell script hooks
   - repo: https://github.com/lovesegfault/beautysh
-    rev: v6.4.2
+    rev: v6.4.3
     hooks:
       - id: beautysh
         types: [file]

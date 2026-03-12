@@ -42,12 +42,12 @@ The `CONSUMER_BARCODE_SCANNER` setting has been removed. zxing-cpp is now the on
 
 ### Action Required
 
--   If you were already using `CONSUMER_BARCODE_SCANNER=ZXING`, simply remove the setting.
--   If you had `CONSUMER_BARCODE_SCANNER=PYZBAR` or were using the default, no functional changes are needed beyond
-    removing the setting. zxing-cpp supports all the same barcode formats and you should see improved detection
-    reliability.
--   The `libzbar0` / `libzbar-dev` system packages are no longer required and can be removed from any custom Docker
-    images or host installations.
+- If you were already using `CONSUMER_BARCODE_SCANNER=ZXING`, simply remove the setting.
+- If you had `CONSUMER_BARCODE_SCANNER=PYZBAR` or were using the default, no functional changes are needed beyond
+  removing the setting. zxing-cpp supports all the same barcode formats and you should see improved detection
+  reliability.
+- The `libzbar0` / `libzbar-dev` system packages are no longer required and can be removed from any custom Docker
+  images or host installations.
 
 ## Database Engine
 

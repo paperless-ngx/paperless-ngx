@@ -209,7 +209,6 @@ def parse_db_settings(data_dir: Path) -> dict[str, dict[str, Any]]:
         engine = get_choice_from_env(
             "PAPERLESS_DBENGINE",
             {"sqlite", "postgresql", "mariadb"},
-            default="sqlite",
         )
     except ValueError:
         # MariaDB users already had to set PAPERLESS_DBENGINE, so it was picked up above

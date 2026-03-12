@@ -6,7 +6,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "0004_remove_document_storage_type"),
+        ("documents", "0003_remove_document_storage_type"),
     ]
 
     operations = [
