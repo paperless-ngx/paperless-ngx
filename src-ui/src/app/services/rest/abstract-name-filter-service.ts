@@ -47,9 +47,12 @@ export abstract class AbstractNameFilterService<
     }
     if (all) {
       params['all'] = true
-      params['filters'] = filters
+      if (filters) {
+        params['filters'] = filters
+      }
+    } else {
+      params['objects'] = objects
     }
-    params['objects'] = objects
     if (operation === BulkEditObjectOperation.SetPermissions) {
       params['owner'] = permissions?.owner
       params['permissions'] = permissions?.set_permissions
