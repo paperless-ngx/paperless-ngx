@@ -66,10 +66,10 @@ Full text searching is available on the `/api/documents/` endpoint. Two
 specific query parameters cause the API to return full text search
 results:
 
--   `/api/documents/?query=your%20search%20query`: Search for a document
-    using a full text query. For details on the syntax, see [Basic Usage - Searching](usage.md#basic-usage_searching).
--   `/api/documents/?more_like_id=1234`: Search for documents similar to
-    the document with id 1234.
+- `/api/documents/?query=your%20search%20query`: Search for a document
+  using a full text query. For details on the syntax, see [Basic Usage - Searching](usage.md#basic-usage_searching).
+- `/api/documents/?more_like_id=1234`: Search for documents similar to
+  the document with id 1234.
 
 Pagination works exactly the same as it does for normal requests on this
 endpoint.
@@ -106,12 +106,12 @@ attribute with various information about the search results:
 }
 ```
 
--   `score` is an indication how well this document matches the query
-    relative to the other search results.
--   `highlights` is an excerpt from the document content and highlights
-    the search terms with `<span>` tags as shown above.
--   `rank` is the index of the search results. The first result will
-    have rank 0.
+- `score` is an indication how well this document matches the query
+  relative to the other search results.
+- `highlights` is an excerpt from the document content and highlights
+  the search terms with `<span>` tags as shown above.
+- `rank` is the index of the search results. The first result will
+  have rank 0.
 
 ### Filtering by custom fields
 
@@ -122,33 +122,33 @@ use cases:
 1. Documents with a custom field "due" (date) between Aug 1, 2024 and
    Sept 1, 2024 (inclusive):
 
-    `?custom_field_query=["due", "range", ["2024-08-01", "2024-09-01"]]`
+   `?custom_field_query=["due", "range", ["2024-08-01", "2024-09-01"]]`
 
 2. Documents with a custom field "customer" (text) that equals "bob"
    (case sensitive):
 
-    `?custom_field_query=["customer", "exact", "bob"]`
+   `?custom_field_query=["customer", "exact", "bob"]`
 
 3. Documents with a custom field "answered" (boolean) set to `true`:
 
-    `?custom_field_query=["answered", "exact", true]`
+   `?custom_field_query=["answered", "exact", true]`
 
 4. Documents with a custom field "favorite animal" (select) set to either
    "cat" or "dog":
 
-    `?custom_field_query=["favorite animal", "in", ["cat", "dog"]]`
+   `?custom_field_query=["favorite animal", "in", ["cat", "dog"]]`
 
 5. Documents with a custom field "address" (text) that is empty:
 
-    `?custom_field_query=["OR", [["address", "isnull", true], ["address", "exact", ""]]]`
+   `?custom_field_query=["OR", [["address", "isnull", true], ["address", "exact", ""]]]`
 
 6. Documents that don't have a field called "foo":
 
-    `?custom_field_query=["foo", "exists", false]`
+   `?custom_field_query=["foo", "exists", false]`
 
 7. Documents that have document links "references" to both document 3 and 7:
 
-    `?custom_field_query=["references", "contains", [3, 7]]`
+   `?custom_field_query=["references", "contains", [3, 7]]`
 
 All field types support basic operations including `exact`, `in`, `isnull`,
 and `exists`. String, URL, and monetary fields support case-insensitive
@@ -164,8 +164,8 @@ Get auto completions for a partial search term.
 
 Query parameters:
 
--   `term`: The incomplete term.
--   `limit`: Amount of results. Defaults to 10.
+- `term`: The incomplete term.
+- `limit`: Amount of results. Defaults to 10.
 
 Results returned by the endpoint are ordered by importance of the term
 in the document index. The first result is the term that has the highest
@@ -189,19 +189,19 @@ from there.
 
 The endpoint supports the following optional form fields:
 
--   `title`: Specify a title that the consumer should use for the
-    document.
--   `created`: Specify a DateTime where the document was created (e.g.
-    "2016-04-19" or "2016-04-19 06:15:00+02:00").
--   `correspondent`: Specify the ID of a correspondent that the consumer
-    should use for the document.
--   `document_type`: Similar to correspondent.
--   `storage_path`: Similar to correspondent.
--   `tags`: Similar to correspondent. Specify this multiple times to
-    have multiple tags added to the document.
--   `archive_serial_number`: An optional archive serial number to set.
--   `custom_fields`: Either an array of custom field ids to assign (with an empty
-    value) to the document or an object mapping field id -> value.
+- `title`: Specify a title that the consumer should use for the
+  document.
+- `created`: Specify a DateTime where the document was created (e.g.
+  "2016-04-19" or "2016-04-19 06:15:00+02:00").
+- `correspondent`: Specify the ID of a correspondent that the consumer
+  should use for the document.
+- `document_type`: Similar to correspondent.
+- `storage_path`: Similar to correspondent.
+- `tags`: Similar to correspondent. Specify this multiple times to
+  have multiple tags added to the document.
+- `archive_serial_number`: An optional archive serial number to set.
+- `custom_fields`: Either an array of custom field ids to assign (with an empty
+  value) to the document or an object mapping field id -> value.
 
 The endpoint will immediately return HTTP 200 if the document consumption
 process was started successfully, with the UUID of the consumption task
@@ -215,16 +215,16 @@ consumption including the ID of a created document if consumption succeeded.
 
 Document versions are file-level versions linked to one root document.
 
--   Root document metadata (title, tags, correspondent, document type, storage path, custom fields, permissions) remains shared.
--   Version-specific file data (file, mime type, checksums, archive info, extracted text content) belongs to the selected/latest version.
+- Root document metadata (title, tags, correspondent, document type, storage path, custom fields, permissions) remains shared.
+- Version-specific file data (file, mime type, checksums, archive info, extracted text content) belongs to the selected/latest version.
 
 Version-aware endpoints:
 
--   `GET /api/documents/{id}/`: returns root document data; `content` resolves to latest version content by default. Use `?version={version_id}` to resolve content for a specific version.
--   `PATCH /api/documents/{id}/`: content updates target the selected version (`?version={version_id}`) or latest version by default; non-content metadata updates target the root document.
--   `GET /api/documents/{id}/download/`, `GET /api/documents/{id}/preview/`, `GET /api/documents/{id}/thumb/`, `GET /api/documents/{id}/metadata/`: accept `?version={version_id}`.
--   `POST /api/documents/{id}/update_version/`: uploads a new version using multipart form field `document` and optional `version_label`.
--   `DELETE /api/documents/{root_id}/versions/{version_id}/`: deletes a non-root version.
+- `GET /api/documents/{id}/`: returns root document data; `content` resolves to latest version content by default. Use `?version={version_id}` to resolve content for a specific version.
+- `PATCH /api/documents/{id}/`: content updates target the selected version (`?version={version_id}`) or latest version by default; non-content metadata updates target the root document.
+- `GET /api/documents/{id}/download/`, `GET /api/documents/{id}/preview/`, `GET /api/documents/{id}/thumb/`, `GET /api/documents/{id}/metadata/`: accept `?version={version_id}`.
+- `POST /api/documents/{id}/update_version/`: uploads a new version using multipart form field `document` and optional `version_label`.
+- `DELETE /api/documents/{root_id}/versions/{version_id}/`: deletes a non-root version.
 
 ## Permissions
 
@@ -282,34 +282,34 @@ a json payload of the format:
 
 The following methods are supported:
 
--   `set_correspondent`
-    -   Requires `parameters`: `{ "correspondent": CORRESPONDENT_ID }`
--   `set_document_type`
-    -   Requires `parameters`: `{ "document_type": DOCUMENT_TYPE_ID }`
--   `set_storage_path`
-    -   Requires `parameters`: `{ "storage_path": STORAGE_PATH_ID }`
--   `add_tag`
-    -   Requires `parameters`: `{ "tag": TAG_ID }`
--   `remove_tag`
-    -   Requires `parameters`: `{ "tag": TAG_ID }`
--   `modify_tags`
-    -   Requires `parameters`: `{ "add_tags": [LIST_OF_TAG_IDS] }` and `{ "remove_tags": [LIST_OF_TAG_IDS] }`
--   `delete`
-    -   No `parameters` required
--   `reprocess`
-    -   No `parameters` required
--   `set_permissions`
-    -   Requires `parameters`:
-        -   `"set_permissions": PERMISSIONS_OBJ` (see format [above](#permissions)) and / or
-        -   `"owner": OWNER_ID or null`
-        -   `"merge": true or false` (defaults to false)
-    -   The `merge` flag determines if the supplied permissions will overwrite all existing permissions (including
-        removing them) or be merged with existing permissions.
--   `modify_custom_fields`
-    -   Requires `parameters`:
-        -   `"add_custom_fields": { CUSTOM_FIELD_ID: VALUE }`: JSON object consisting of custom field id:value pairs to add to the document, can also be a list of custom field IDs
-            to add with empty values.
-        -   `"remove_custom_fields": [CUSTOM_FIELD_ID]`: custom field ids to remove from the document.
+- `set_correspondent`
+  - Requires `parameters`: `{ "correspondent": CORRESPONDENT_ID }`
+- `set_document_type`
+  - Requires `parameters`: `{ "document_type": DOCUMENT_TYPE_ID }`
+- `set_storage_path`
+  - Requires `parameters`: `{ "storage_path": STORAGE_PATH_ID }`
+- `add_tag`
+  - Requires `parameters`: `{ "tag": TAG_ID }`
+- `remove_tag`
+  - Requires `parameters`: `{ "tag": TAG_ID }`
+- `modify_tags`
+  - Requires `parameters`: `{ "add_tags": [LIST_OF_TAG_IDS] }` and `{ "remove_tags": [LIST_OF_TAG_IDS] }`
+- `delete`
+  - No `parameters` required
+- `reprocess`
+  - No `parameters` required
+- `set_permissions`
+  - Requires `parameters`:
+    - `"set_permissions": PERMISSIONS_OBJ` (see format [above](#permissions)) and / or
+    - `"owner": OWNER_ID or null`
+    - `"merge": true or false` (defaults to false)
+  - The `merge` flag determines if the supplied permissions will overwrite all existing permissions (including
+    removing them) or be merged with existing permissions.
+- `modify_custom_fields`
+  - Requires `parameters`:
+    - `"add_custom_fields": { CUSTOM_FIELD_ID: VALUE }`: JSON object consisting of custom field id:value pairs to add to the document, can also be a list of custom field IDs
+      to add with empty values.
+    - `"remove_custom_fields": [CUSTOM_FIELD_ID]`: custom field ids to remove from the document.
 
 #### Document-editing operations
 
@@ -335,16 +335,16 @@ operations, using the endpoint: `/api/bulk_edit_objects/`, which requires a json
 
 The REST API is versioned.
 
--   Versioning ensures that changes to the API don't break older
-    clients.
--   Clients specify the specific version of the API they wish to use
-    with every request and Paperless will handle the request using the
-    specified API version.
--   Even if the underlying data model changes, supported older API
-    versions continue to serve compatible data.
--   If no version is specified, Paperless serves the configured default
-    API version (currently `10`).
--   Supported API versions are currently `9` and `10`.
+- Versioning ensures that changes to the API don't break older
+  clients.
+- Clients specify the specific version of the API they wish to use
+  with every request and Paperless will handle the request using the
+  specified API version.
+- Even if the underlying data model changes, supported older API
+  versions continue to serve compatible data.
+- If no version is specified, Paperless serves the configured default
+  API version (currently `10`).
+- Supported API versions are currently `9` and `10`.
 
 API versions are specified by submitting an additional HTTP `Accept`
 header with every request:
@@ -384,56 +384,56 @@ Initial API version.
 
 #### Version 2
 
--   Added field `Tag.color`. This read/write string field contains a hex
-    color such as `#a6cee3`.
--   Added read-only field `Tag.text_color`. This field contains the text
-    color to use for a specific tag, which is either black or white
-    depending on the brightness of `Tag.color`.
--   Removed field `Tag.colour`.
+- Added field `Tag.color`. This read/write string field contains a hex
+  color such as `#a6cee3`.
+- Added read-only field `Tag.text_color`. This field contains the text
+  color to use for a specific tag, which is either black or white
+  depending on the brightness of `Tag.color`.
+- Removed field `Tag.colour`.
 
 #### Version 3
 
--   Permissions endpoints have been added.
--   The format of the `/api/ui_settings/` has changed.
+- Permissions endpoints have been added.
+- The format of the `/api/ui_settings/` has changed.
 
 #### Version 4
 
--   Consumption templates were refactored to workflows and API endpoints
-    changed as such.
+- Consumption templates were refactored to workflows and API endpoints
+  changed as such.
 
 #### Version 5
 
--   Added bulk deletion methods for documents and objects.
+- Added bulk deletion methods for documents and objects.
 
 #### Version 6
 
--   Moved acknowledge tasks endpoint to be under `/api/tasks/acknowledge/`.
+- Moved acknowledge tasks endpoint to be under `/api/tasks/acknowledge/`.
 
 #### Version 7
 
--   The format of select type custom fields has changed to return the options
-    as an array of objects with `id` and `label` fields as opposed to a simple
-    list of strings. When creating or updating a custom field value of a
-    document for a select type custom field, the value should be the `id` of
-    the option whereas previously was the index of the option.
+- The format of select type custom fields has changed to return the options
+  as an array of objects with `id` and `label` fields as opposed to a simple
+  list of strings. When creating or updating a custom field value of a
+  document for a select type custom field, the value should be the `id` of
+  the option whereas previously was the index of the option.
 
 #### Version 8
 
--   The user field of document notes now returns a simplified user object
-    rather than just the user ID.
+- The user field of document notes now returns a simplified user object
+  rather than just the user ID.
 
 #### Version 9
 
--   The document `created` field is now a date, not a datetime. The
-    `created_date` field is considered deprecated and will be removed in a
-    future version.
+- The document `created` field is now a date, not a datetime. The
+  `created_date` field is considered deprecated and will be removed in a
+  future version.
 
 #### Version 10
 
--   The `show_on_dashboard` and `show_in_sidebar` fields of saved views have been
-    removed. Relevant settings are now stored in the UISettings model. Compatibility is maintained
-    for versions < 10 until support for API v9 is dropped.
--   Document-editing operations such as `merge`, `rotate`, and `edit_pdf` have been
-    moved from the bulk edit endpoint to their own individual endpoints. Using these methods via
-    the bulk edit endpoint is still supported for compatibility with versions < 10 until support
-    for API v9 is dropped.
+- The `show_on_dashboard` and `show_in_sidebar` fields of saved views have been
+  removed. Relevant settings are now stored in the UISettings model. Compatibility is maintained
+  for versions < 10 until support for API v9 is dropped.
+- Document-editing operations such as `merge`, `rotate`, and `edit_pdf` have been
+  moved from the bulk edit endpoint to their own individual endpoints. Using these methods via
+  the bulk edit endpoint is still supported for compatibility with versions < 10 until support
+  for API v9 is dropped.
