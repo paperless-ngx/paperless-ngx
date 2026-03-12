@@ -13,6 +13,7 @@ import {
   debounceTime,
   delay,
   distinctUntilChanged,
+  map,
   takeUntil,
   tap,
 } from 'rxjs/operators'
@@ -91,6 +92,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   public data: T[] = []
   private unfilteredData: T[] = []
   private allIDs: number[] = []
+  private currentExtraParams: { [key: string]: any } = null
 
   public page = 1
 
@@ -150,7 +152,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   }
 
   protected getCollectionSize(results: Results<T>): number {
-    return results.all?.length ?? results.count
+    return results.count
   }
 
   protected getDisplayCollectionSize(results: Results<T>): number {
@@ -171,6 +173,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
 
   reloadData(extraParams: { [key: string]: any } = null) {
     this.loading = true
+    this.currentExtraParams = extraParams
     this.clearSelection()
     this.service
       .listFiltered(
@@ -189,7 +192,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
           this.data = this.filterData(c.results)
           this.collectionSize = this.getCollectionSize(c)
           this.displayCollectionSize = this.getDisplayCollectionSize(c)
-          this.allIDs = c.all
+          this.allIDs = []
         }),
         delay(100)
       )
@@ -365,8 +368,36 @@ export abstract class ManagementListComponent<T extends MatchingModel>
       this.clearSelection()
       return
     }
-    this.selectedObjects = new Set(this.allIDs)
-    this.togggleAll = this.areAllPageItemsSelected()
+
+    if (this.allIDs.length > 0) {
+      this.selectedObjects = new Set(this.allIDs)
+      this.togggleAll = this.areAllPageItemsSelected()
+      return
+    }
+
+    this.service
+      .listFiltered(
+        1,
+        100000,
+        this.sortField,
+        this.sortReverse,
+        this._nameFilter,
+        true,
+        this.currentExtraParams
+      )
+      .pipe(
+        takeUntil(this.unsubscribeNotifier),
+        map((results) =>
+          Array.from(
+            new Set(this.getSelectableIDs(this.filterData(results.results)))
+          )
+        )
+      )
+      .subscribe((ids) => {
+        this.allIDs = ids
+        this.selectedObjects = new Set(ids)
+        this.togggleAll = this.areAllPageItemsSelected()
+      })
   }
 
   toggleSelected(object) {
