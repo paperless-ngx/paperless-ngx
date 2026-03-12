@@ -161,3 +161,7 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "monthly"
+    groups:
+      pre-commit-dependencies:
+        patterns:
+          - "*"
