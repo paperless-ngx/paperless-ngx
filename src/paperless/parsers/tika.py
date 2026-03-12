@@ -228,6 +228,9 @@ class TikaDocumentParser:
         documents.parsers.ParseError
             If Tika or Gotenberg returns an error.
         """
+        if TYPE_CHECKING:
+            assert self._tika_client is not None
+
         logger.info("Sending %s to Tika server", document_path)
 
         try:
