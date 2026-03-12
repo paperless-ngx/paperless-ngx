@@ -5,11 +5,11 @@ from pathlib import Path
 
 import pytest
 from httpx import codes
+from paperless_tika.parsers import TikaDocumentParser
 from pytest_django.fixtures import SettingsWrapper
 from pytest_httpx import HTTPXMock
 
 from documents.parsers import ParseError
-from paperless_tika.parsers import TikaDocumentParser
 
 
 @pytest.mark.django_db()
