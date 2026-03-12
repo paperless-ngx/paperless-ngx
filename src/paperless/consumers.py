@@ -20,11 +20,10 @@ class StatusConsumer(AsyncWebsocketConsumer):
         if user.is_superuser or user.id == owner_id or user.id in users_can_view:
             return True
 
-        for group_id in groups_can_view:
-            if await user.groups.filter(pk=group_id).aexists():
-                return True
-
-        return False
+        return (
+            groups_can_view
+            and await user.groups.filter(pk__in=groups_can_view).aexists()
+        )
 
     async def connect(self) -> None:
         if not self._authenticated():
