@@ -40,6 +40,7 @@ from documents.plugins.base import AlwaysRunPluginMixin
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import NoCleanupPluginMixin
 from documents.plugins.base import NoSetupPluginMixin
+from documents.plugins.base import StopConsumeTaskError
 from documents.plugins.date_parsing import get_date_parser
 from documents.plugins.helpers import ProgressManager
 from documents.plugins.helpers import ProgressStatusOptions
@@ -960,10 +961,14 @@ class ConsumerPreflightPlugin(
                     )
                     failure_msg += " Note: existing document is in the trash."
 
-                self._fail(
+                self._send_progress(
+                    100,
+                    100,
+                    ProgressStatusOptions.FAILED,
                     status_msg,
-                    failure_msg,
                 )
+                self.log.error(failure_msg)
+                raise StopConsumeTaskError(failure_msg)
 
     def pre_check_directories(self) -> None:
         """
