@@ -2571,11 +2571,23 @@ class ShareLinkBundleSerializer(OwnedObjectSerializer):
 
 class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
     objects = serializers.ListField(
-        required=True,
-        allow_empty=False,
+        required=False,
+        allow_empty=True,
         label="Objects",
         write_only=True,
         child=serializers.IntegerField(),
+    )
+
+    all = serializers.BooleanField(
+        default=False,
+        required=False,
+        write_only=True,
+    )
+
+    filters = serializers.DictField(
+        required=False,
+        allow_empty=True,
+        write_only=True,
     )
 
     object_type = serializers.ChoiceField(
@@ -2650,10 +2662,20 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
 
     def validate(self, attrs):
         object_type = attrs["object_type"]
-        objects = attrs["objects"]
+        objects = attrs.get("objects")
+        apply_to_all = attrs.get("all", False)
         operation = attrs.get("operation")
 
-        self._validate_objects(objects, object_type)
+        if apply_to_all:
+            attrs.setdefault("objects", [])
+        else:
+            if objects is None:
+                raise serializers.ValidationError(
+                    "objects is required unless all is true.",
+                )
+            if len(objects) == 0:
+                raise serializers.ValidationError("objects must not be empty")
+            self._validate_objects(objects, object_type)
 
         if operation == "set_permissions":
             permissions = attrs.get("permissions")
