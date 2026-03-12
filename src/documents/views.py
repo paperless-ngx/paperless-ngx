@@ -555,7 +555,8 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         response = self.get_paginated_response(serializer.data)
-        if descendant_pks:
+        api_version = int(request.version or settings.REST_FRAMEWORK["DEFAULT_VERSION"])
+        if descendant_pks and api_version < 10:
             # Include children in the "all" field, if needed
             response.data["all"] = [tag.pk for tag in children_source]
         return response
@@ -2084,7 +2085,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
                             ),
                         ),
                     ):
-                        result_ids = response.data.get("all", [])
+                        result_ids = queryset.get_result_ids()
                         response.data["selection_data"] = (
                             self._get_selection_data_for_queryset(
                                 Document.objects.filter(pk__in=result_ids),
