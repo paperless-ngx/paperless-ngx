@@ -778,7 +778,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             safe_fallback=False,
         )
 
-        self.assertEqual(params["input_file"], "input.pdf")
+        self.assertEqual(params["input_file_or_options"], "input.pdf")
         self.assertEqual(params["output_file"], "output.pdf")
         self.assertEqual(params["sidecar"], "sidecar.txt")
 
