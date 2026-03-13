@@ -18,13 +18,13 @@ services:
       - "--log-level=warn"
       - "--log-format=text"
   tika:
-    image: docker.io/apache/tika:latest
+    image: docker.io/apache/tika:3.2.3.0
     hostname: tika
     container_name: tika
     network_mode: host
     restart: unless-stopped
   greenmail:
-    image: greenmail/standalone:2.1.8
+    image: docker.io/greenmail/standalone:2.1.8
     hostname: greenmail
     container_name: greenmail
     environment:

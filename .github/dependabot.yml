@@ -157,6 +157,9 @@ updates:
       postgres:
         patterns:
           - "docker.io/library/postgres*"
+      greenmail:
+        patterns:
+          - "docker.io/greenmail*"
   - package-ecosystem: "pre-commit" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
