@@ -51,9 +51,26 @@ from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
+from paperless.parsers.text import TextDocumentParser
 from paperless_mail.parsers import MailDocumentParser
 
 LOGGING_NAME: Final[str] = "paperless.consumer"
+
+
+def _parser_cleanup(parser: DocumentParser) -> None:
+    """
+    Call cleanup on a parser, handling the new-style context-manager parsers.
+
+    New-style parsers (e.g. TextDocumentParser) use __exit__ for teardown
+    instead of a cleanup() method.  This shim will be removed once all existing parsers
+    have switched to the new style and this consumer is updated to use it
+
+    TODO(stumpylog): Remove me in the future
+    """
+    if isinstance(parser, TextDocumentParser):
+        parser.__exit__(None, None, None)
+    else:
+        parser.cleanup()
 
 
 class WorkflowTriggerPlugin(
@@ -459,6 +476,9 @@ class ConsumerPlugin(
                     self.filename,
                     self.input_doc.mailrule_id,
                 )
+            elif isinstance(document_parser, TextDocumentParser):
+                # TODO(stumpylog): Remove me in the future
+                document_parser.parse(self.working_copy, mime_type)
             else:
                 document_parser.parse(self.working_copy, mime_type, self.filename)
 
@@ -469,11 +489,15 @@ class ConsumerPlugin(
                 ProgressStatusOptions.WORKING,
                 ConsumerStatusShortMessage.GENERATING_THUMBNAIL,
             )
-            thumbnail = document_parser.get_thumbnail(
-                self.working_copy,
-                mime_type,
-                self.filename,
-            )
+            if isinstance(document_parser, TextDocumentParser):
+                # TODO(stumpylog): Remove me in the future
+                thumbnail = document_parser.get_thumbnail(self.working_copy, mime_type)
+            else:
+                thumbnail = document_parser.get_thumbnail(
+                    self.working_copy,
+                    mime_type,
+                    self.filename,
+                )
 
             text = document_parser.get_text()
             date = document_parser.get_date()
@@ -490,7 +514,7 @@ class ConsumerPlugin(
             page_count = document_parser.get_page_count(self.working_copy, mime_type)
 
         except ParseError as e:
-            document_parser.cleanup()
+            _parser_cleanup(document_parser)
             if tempdir:
                 tempdir.cleanup()
             self._fail(
@@ -500,7 +524,7 @@ class ConsumerPlugin(
                 exception=e,
             )
         except Exception as e:
-            document_parser.cleanup()
+            _parser_cleanup(document_parser)
             if tempdir:
                 tempdir.cleanup()
             self._fail(
@@ -702,7 +726,7 @@ class ConsumerPlugin(
                 exception=e,
             )
         finally:
-            document_parser.cleanup()
+            _parser_cleanup(document_parser)
             tempdir.cleanup()
 
         self.run_post_consume_script(document)
