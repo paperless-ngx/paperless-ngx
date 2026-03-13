@@ -17,7 +17,10 @@ class Command(PaperlessCommand):
     def handle(self, *args, **options) -> None:
         start = time.monotonic()
 
-        with self.buffered_logging("paperless.tasks"):
+        with (
+            self.buffered_logging("paperless.tasks"),
+            self.buffered_logging("paperless.classifier"),
+        ):
             train_classifier(
                 scheduled=False,
                 status_callback=lambda msg: self.console.print(f"  {msg}"),
