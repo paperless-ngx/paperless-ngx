@@ -2,10 +2,11 @@
 Tests for paperless.parsers.remote.RemoteDocumentParser.
 
 All tests use the context-manager protocol for parser lifecycle.  The Azure
-AI client is always mocked via the ``mocker`` fixture so no real network
-calls are made.  Django settings are overridden via the pytest-django
-``settings`` fixture (or the ``azure_settings`` / ``no_engine_settings``
-helpers defined in conftest.py).
+AI client is mocked via the ``make_azure_mock`` fixture (a factory).  Django
+settings are overridden via the pytest-django ``settings`` fixture or the
+``azure_settings`` / ``no_engine_settings`` convenience fixtures from
+conftest.py — both of which are applied with ``@pytest.mark.usefixtures``
+when their value is not needed inside the test body.
 """
 
 from __future__ import annotations
@@ -19,27 +20,11 @@ from paperless.parsers import ParserProtocol
 from paperless.parsers.remote import RemoteDocumentParser
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from pathlib import Path
 
     from pytest_django.fixtures import SettingsWrapper
     from pytest_mock import MockerFixture
-
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
-
-def _make_azure_mock(text: str = "Extracted text.") -> Mock:
-    """Return a configured mock Azure DocumentIntelligenceClient."""
-    mock_client = Mock()
-    mock_poller = Mock()
-    mock_poller.wait.return_value = None
-    mock_poller.details = {"operation_id": "fake-op-id"}
-    mock_poller.result.return_value.content = text
-    mock_client.begin_analyze_document.return_value = mock_poller
-    mock_client.get_analyze_result_pdf.return_value = [b"%PDF-1.4 FAKE"]
-    return mock_client
 
 
 # ---------------------------------------------------------------------------
@@ -93,10 +78,8 @@ class TestRemoteParserSupportedMimeTypes:
         }
         assert expected == set(mime_types.keys())
 
-    def test_returns_full_set_when_not_configured(
-        self,
-        no_engine_settings: SettingsWrapper,
-    ) -> None:
+    @pytest.mark.usefixtures("no_engine_settings")
+    def test_returns_full_set_when_not_configured(self) -> None:
         """
         GIVEN: No remote engine is configured
         WHEN:  supported_mime_types() is called
@@ -114,6 +97,7 @@ class TestRemoteParserSupportedMimeTypes:
 class TestRemoteParserScore:
     """score() encodes the activation logic: None when unconfigured, 20 when active."""
 
+    @pytest.mark.usefixtures("azure_settings")
     @pytest.mark.parametrize(
         "mime_type",
         [
@@ -126,23 +110,16 @@ class TestRemoteParserScore:
             "image/webp",
         ],
     )
-    def test_score_returns_20_when_configured(
-        self,
-        azure_settings: SettingsWrapper,
-        mime_type: str,
-    ) -> None:
+    def test_score_returns_20_when_configured(self, mime_type: str) -> None:
         result = RemoteDocumentParser.score(mime_type, "doc.pdf")
         assert result == 20
 
+    @pytest.mark.usefixtures("no_engine_settings")
     @pytest.mark.parametrize(
         "mime_type",
         ["application/pdf", "image/png", "image/jpeg"],
     )
-    def test_score_returns_none_when_no_engine(
-        self,
-        no_engine_settings: SettingsWrapper,
-        mime_type: str,
-    ) -> None:
+    def test_score_returns_none_when_no_engine(self, mime_type: str) -> None:
         result = RemoteDocumentParser.score(mime_type, "doc.pdf")
         assert result is None
 
@@ -166,17 +143,13 @@ class TestRemoteParserScore:
         result = RemoteDocumentParser.score("application/pdf", "doc.pdf")
         assert result is None
 
-    def test_score_returns_none_for_unsupported_mime_type(
-        self,
-        azure_settings: SettingsWrapper,
-    ) -> None:
+    @pytest.mark.usefixtures("azure_settings")
+    def test_score_returns_none_for_unsupported_mime_type(self) -> None:
         result = RemoteDocumentParser.score("text/plain", "doc.txt")
         assert result is None
 
-    def test_score_higher_than_tesseract_default(
-        self,
-        azure_settings: SettingsWrapper,
-    ) -> None:
+    @pytest.mark.usefixtures("azure_settings")
+    def test_score_higher_than_tesseract_default(self) -> None:
         """Remote parser (20) outranks the tesseract default (10) when configured."""
         score = RemoteDocumentParser.score("application/pdf", "doc.pdf")
         assert score is not None and score > 10
@@ -229,14 +202,15 @@ class TestRemoteParserLifecycle:
 
 
 class TestRemoteParserParse:
+    @pytest.mark.usefixtures("azure_settings")
     def test_parse_returns_text_from_azure(
         self,
         remote_parser: RemoteDocumentParser,
         sample_pdf_file: Path,
-        azure_settings: SettingsWrapper,
+        make_azure_mock: Callable[[str], Mock],
         mocker: MockerFixture,
     ) -> None:
-        mock_client = _make_azure_mock("Hello from Azure.")
+        mock_client = make_azure_mock("Hello from Azure.")
         mocker.patch(
             "azure.ai.documentintelligence.DocumentIntelligenceClient",
             return_value=mock_client,
@@ -246,17 +220,17 @@ class TestRemoteParserParse:
 
         assert remote_parser.get_text() == "Hello from Azure."
 
+    @pytest.mark.usefixtures("azure_settings")
     def test_parse_sets_archive_path(
         self,
         remote_parser: RemoteDocumentParser,
         sample_pdf_file: Path,
-        azure_settings: SettingsWrapper,
+        make_azure_mock: Callable[[str], Mock],
         mocker: MockerFixture,
     ) -> None:
-        mock_client = _make_azure_mock()
         mocker.patch(
             "azure.ai.documentintelligence.DocumentIntelligenceClient",
-            return_value=mock_client,
+            return_value=make_azure_mock(),
         )
 
         remote_parser.parse(sample_pdf_file, "application/pdf")
@@ -266,14 +240,15 @@ class TestRemoteParserParse:
         assert archive.exists()
         assert archive.suffix == ".pdf"
 
+    @pytest.mark.usefixtures("azure_settings")
     def test_parse_closes_client_on_success(
         self,
         remote_parser: RemoteDocumentParser,
         sample_pdf_file: Path,
-        azure_settings: SettingsWrapper,
+        make_azure_mock: Callable[[str], Mock],
         mocker: MockerFixture,
     ) -> None:
-        mock_client = _make_azure_mock()
+        mock_client = make_azure_mock()
         mocker.patch(
             "azure.ai.documentintelligence.DocumentIntelligenceClient",
             return_value=mock_client,
@@ -283,11 +258,11 @@ class TestRemoteParserParse:
 
         mock_client.close.assert_called_once()
 
+    @pytest.mark.usefixtures("no_engine_settings")
     def test_parse_sets_empty_text_when_not_configured(
         self,
         remote_parser: RemoteDocumentParser,
         sample_pdf_file: Path,
-        no_engine_settings: SettingsWrapper,
     ) -> None:
         remote_parser.parse(sample_pdf_file, "application/pdf")
 
@@ -300,17 +275,17 @@ class TestRemoteParserParse:
     ) -> None:
         assert remote_parser.get_text() is None
 
+    @pytest.mark.usefixtures("azure_settings")
     def test_get_date_always_none(
         self,
         remote_parser: RemoteDocumentParser,
         sample_pdf_file: Path,
-        azure_settings: SettingsWrapper,
+        make_azure_mock: Callable[[str], Mock],
         mocker: MockerFixture,
     ) -> None:
-        mock_client = _make_azure_mock()
         mocker.patch(
             "azure.ai.documentintelligence.DocumentIntelligenceClient",
-            return_value=mock_client,
+            return_value=make_azure_mock(),
         )
 
         remote_parser.parse(sample_pdf_file, "application/pdf")
@@ -323,12 +298,12 @@ class TestRemoteParserParse:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.usefixtures("azure_settings")
 class TestRemoteParserParseError:
     def test_parse_returns_none_on_azure_error(
         self,
         remote_parser: RemoteDocumentParser,
         sample_pdf_file: Path,
-        azure_settings: SettingsWrapper,
         mocker: MockerFixture,
     ) -> None:
         mock_client = Mock()
@@ -346,7 +321,6 @@ class TestRemoteParserParseError:
         self,
         remote_parser: RemoteDocumentParser,
         sample_pdf_file: Path,
-        azure_settings: SettingsWrapper,
         mocker: MockerFixture,
     ) -> None:
         mock_client = Mock()
@@ -364,7 +338,6 @@ class TestRemoteParserParseError:
         self,
         remote_parser: RemoteDocumentParser,
         sample_pdf_file: Path,
-        azure_settings: SettingsWrapper,
         mocker: MockerFixture,
     ) -> None:
         mock_client = Mock()
@@ -475,10 +448,8 @@ class TestRemoteParserRegistry:
 
         assert RemoteDocumentParser in registry._builtins
 
-    def test_get_parser_returns_remote_when_configured(
-        self,
-        azure_settings: SettingsWrapper,
-    ) -> None:
+    @pytest.mark.usefixtures("azure_settings")
+    def test_get_parser_returns_remote_when_configured(self) -> None:
         from paperless.parsers.registry import get_parser_registry
 
         registry = get_parser_registry()
@@ -486,10 +457,8 @@ class TestRemoteParserRegistry:
 
         assert parser_cls is RemoteDocumentParser
 
-    def test_get_parser_returns_none_for_pdf_when_not_configured(
-        self,
-        no_engine_settings: SettingsWrapper,
-    ) -> None:
+    @pytest.mark.usefixtures("no_engine_settings")
+    def test_get_parser_returns_none_for_pdf_when_not_configured(self) -> None:
         """With no tesseract parser registered yet, PDF has no handler if remote is off."""
         from paperless.parsers.registry import ParserRegistry
 
