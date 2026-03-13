@@ -7,7 +7,6 @@ so it is easy to see which files belong to which test module.
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from unittest.mock import Mock
 
 import pytest
 
@@ -15,7 +14,6 @@ from paperless.parsers.remote import RemoteDocumentParser
 from paperless.parsers.text import TextDocumentParser
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
     from collections.abc import Generator
     from pathlib import Path
 
@@ -165,37 +163,3 @@ def no_engine_settings(settings: SettingsWrapper) -> SettingsWrapper:
     settings.REMOTE_OCR_API_KEY = None
     settings.REMOTE_OCR_ENDPOINT = None
     return settings
-
-
-# ------------------------------------------------------------------
-# Azure mock factory
-# ------------------------------------------------------------------
-
-
-@pytest.fixture()
-def make_azure_mock() -> Callable[[str], Mock]:
-    """Return a factory that builds a mock Azure DocumentIntelligenceClient.
-
-    Usage::
-
-        mock_client = make_azure_mock()            # default text
-        mock_client = make_azure_mock("My text.")  # custom extracted text
-
-    Returns
-    -------
-    Callable[[str], Mock]
-        Factory function that accepts an optional ``text`` argument and
-        returns a fully configured mock client.
-    """
-
-    def _factory(text: str = "Extracted text.") -> Mock:
-        mock_client = Mock()
-        mock_poller = Mock()
-        mock_poller.wait.return_value = None
-        mock_poller.details = {"operation_id": "fake-op-id"}
-        mock_poller.result.return_value.content = text
-        mock_client.begin_analyze_document.return_value = mock_poller
-        mock_client.get_analyze_result_pdf.return_value = [b"%PDF-1.4 FAKE"]
-        return mock_client
-
-    return _factory
