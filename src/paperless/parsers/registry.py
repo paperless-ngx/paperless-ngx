@@ -193,9 +193,11 @@ class ParserRegistry:
         that log output is predictable; scoring determines which parser wins
         at runtime regardless of registration order.
         """
+        from paperless.parsers.remote import RemoteDocumentParser
         from paperless.parsers.text import TextDocumentParser
 
         self.register_builtin(TextDocumentParser)
+        self.register_builtin(RemoteDocumentParser)
 
     # ------------------------------------------------------------------
     # Discovery
