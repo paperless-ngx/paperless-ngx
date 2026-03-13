@@ -3,10 +3,15 @@ from __future__ import annotations
 from typing import Any
 
 
-def get_parser(logging_group: object = None) -> Any:
+def get_parser(*args: Any, **kwargs: Any) -> Any:
     from paperless.parsers.remote import RemoteDocumentParser
 
-    return RemoteDocumentParser(logging_group)
+    # The new RemoteDocumentParser does not accept the progress_callback
+    # kwarg injected by the old signal-based consumer.  logging_group is
+    # forwarded as a positional arg.
+    # Phase 4 will replace this signal path with the new ParserRegistry.
+    kwargs.pop("progress_callback", None)
+    return RemoteDocumentParser(*args, **kwargs)
 
 
 def get_supported_mime_types() -> dict[str, str]:
