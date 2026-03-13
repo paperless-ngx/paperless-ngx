@@ -4,10 +4,10 @@ from unittest import mock
 
 from django.test import TestCase
 from django.test import override_settings
+from paperless_remote.parsers import RemoteDocumentParser
 
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
-from paperless_remote.parsers import RemoteDocumentParser
 from paperless_remote.signals import get_parser
 
 
