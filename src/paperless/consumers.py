@@ -1,62 +1,51 @@
 import json
 from typing import Any
 
-from asgiref.sync import async_to_sync
-from channels.exceptions import AcceptConnection
-from channels.exceptions import DenyConnection
-from channels.generic.websocket import WebsocketConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer
 
 
-class StatusConsumer(WebsocketConsumer):
-    def _authenticated(self):
-        return "user" in self.scope and self.scope["user"].is_authenticated
+class StatusConsumer(AsyncWebsocketConsumer):
+    def _authenticated(self) -> bool:
+        user: Any = self.scope.get("user")
+        return user is not None and user.is_authenticated
 
-    def _can_view(self, data):
-        user = self.scope.get("user") if self.scope.get("user") else None
+    async def _can_view(self, data: dict[str, Any]) -> bool:
+        user: Any = self.scope.get("user")
+        if user is None:
+            return False
         owner_id = data.get("owner_id")
         users_can_view = data.get("users_can_view", [])
         groups_can_view = data.get("groups_can_view", [])
-        return (
-            user.is_superuser
-            or user.id == owner_id
-            or user.id in users_can_view
-            or any(
-                user.groups.filter(pk=group_id).exists() for group_id in groups_can_view
-            )
-        )
 
-    def connect(self):
+        if user.is_superuser or user.id == owner_id or user.id in users_can_view:
+            return True
+
+        return await user.groups.filter(pk__in=groups_can_view).aexists()
+
+    async def connect(self) -> None:
         if not self._authenticated():
-            raise DenyConnection
-        else:
-            async_to_sync(self.channel_layer.group_add)(
-                "status_updates",
-                self.channel_name,
-            )
-            raise AcceptConnection
+            await self.close()
+            return
+        await self.channel_layer.group_add("status_updates", self.channel_name)
+        await self.accept()
 
-    def disconnect(self, close_code) -> None:
-        async_to_sync(self.channel_layer.group_discard)(
-            "status_updates",
-            self.channel_name,
-        )
+    async def disconnect(self, code: int) -> None:
+        await self.channel_layer.group_discard("status_updates", self.channel_name)
 
-    def status_update(self, event) -> None:
+    async def status_update(self, event: dict[str, Any]) -> None:
         if not self._authenticated():
-            self.close()
-        else:
-            if self._can_view(event["data"]):
-                self.send(json.dumps(event))
+            await self.close()
+        elif await self._can_view(event["data"]):
+            await self.send(json.dumps(event))
 
-    def documents_deleted(self, event) -> None:
+    async def documents_deleted(self, event: dict[str, Any]) -> None:
         if not self._authenticated():
-            self.close()
+            await self.close()
         else:
-            self.send(json.dumps(event))
+            await self.send(json.dumps(event))
 
-    def document_updated(self, event: Any) -> None:
+    async def document_updated(self, event: dict[str, Any]) -> None:
         if not self._authenticated():
-            self.close()
-        else:
-            if self._can_view(event["data"]):
-                self.send(json.dumps(event))
+            await self.close()
+        elif await self._can_view(event["data"]):
+            await self.send(json.dumps(event))

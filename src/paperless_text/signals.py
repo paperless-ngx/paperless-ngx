@@ -1,7 +1,13 @@
 def get_parser(*args, **kwargs):
-    from paperless_text.parsers import TextDocumentParser
+    from paperless.parsers.text import TextDocumentParser
 
-    return TextDocumentParser(*args, **kwargs)
+    # The new TextDocumentParser does not accept the legacy logging_group /
+    # progress_callback kwargs injected by the old signal-based consumer.
+    # These are dropped here; Phase 4 will replace this signal path with the
+    # new ParserRegistry so the shim can be removed at that point.
+    kwargs.pop("logging_group", None)
+    kwargs.pop("progress_callback", None)
+    return TextDocumentParser()
 
 
 def text_consumer_declaration(sender, **kwargs):
