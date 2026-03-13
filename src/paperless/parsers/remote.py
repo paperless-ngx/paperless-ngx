@@ -377,6 +377,13 @@ class RemoteDocumentParser:
         str | None
             Extracted text, or None if the Azure call failed.
         """
+        if TYPE_CHECKING:
+            # Callers must have already validated config via engine_is_valid():
+            # engine_is_valid() asserts api_key is not None and (for azureai)
+            # endpoint is not None, so these casts are provably safe.
+            assert config.endpoint is not None
+            assert config.api_key is not None
+
         from azure.ai.documentintelligence import DocumentIntelligenceClient
         from azure.ai.documentintelligence.models import AnalyzeDocumentRequest
         from azure.ai.documentintelligence.models import AnalyzeOutputOption

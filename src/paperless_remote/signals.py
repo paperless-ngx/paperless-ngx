@@ -1,10 +1,15 @@
-def get_parser(*args, **kwargs):
+from __future__ import annotations
+
+from typing import Any
+
+
+def get_parser(logging_group: object = None) -> Any:
     from paperless.parsers.remote import RemoteDocumentParser
 
-    return RemoteDocumentParser(*args, **kwargs)
+    return RemoteDocumentParser(logging_group)
 
 
-def get_supported_mime_types():
+def get_supported_mime_types() -> dict[str, str]:
     from django.conf import settings
 
     from paperless.parsers.remote import RemoteDocumentParser
@@ -20,7 +25,7 @@ def get_supported_mime_types():
     return RemoteDocumentParser.supported_mime_types()
 
 
-def remote_consumer_declaration(sender, **kwargs):
+def remote_consumer_declaration(sender: Any, **kwargs: Any) -> dict[str, Any]:
     return {
         "parser": get_parser,
         "weight": 5,
