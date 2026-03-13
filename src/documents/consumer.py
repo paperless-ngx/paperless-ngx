@@ -449,6 +449,12 @@ class ConsumerPlugin(
             progress_callback=progress_callback,
         )
 
+        # New-style parsers use __enter__/__exit__ for resource management.
+        # _parser_cleanup (below) handles __exit__; call __enter__ here.
+        # TODO(stumpylog): Remove me in the future
+        if isinstance(document_parser, (TextDocumentParser, TikaDocumentParser)):
+            document_parser.__enter__()
+
         self.log.debug(f"Parser: {type(document_parser).__name__}")
 
         # Parse the document. This may take some time.

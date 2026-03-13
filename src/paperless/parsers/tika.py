@@ -63,12 +63,11 @@ class TikaDocumentParser:
     True and the PDF is always produced regardless of the ``produce_archive``
     flag passed to ``parse``.
 
-    The underlying ``TikaClient`` HTTP connection is opened once in
-    ``__enter__`` via an ``ExitStack`` and shared across ``parse`` and
-    ``extract_metadata`` calls, then closed in ``__exit__``.  When the parser
-    is used without a context manager (e.g. the legacy view-layer metadata
-    path), ``extract_metadata`` falls back to creating a short-lived client
-    for that call only.
+    Both ``TikaClient`` and ``GotenbergClient`` are opened once in
+    ``__enter__`` via an ``ExitStack`` and shared across ``parse``,
+    ``extract_metadata``, and ``_convert_to_pdf`` calls, then closed via
+    ``ExitStack.close()`` in ``__exit__``.  The parser must always be used
+    as a context manager.
 
     Class attributes
     ----------------
@@ -175,11 +174,18 @@ class TikaDocumentParser:
         self._archive_path: Path | None = None
         self._exit_stack = ExitStack()
         self._tika_client: TikaClient | None = None
+        self._gotenberg_client: GotenbergClient | None = None
 
     def __enter__(self) -> Self:
         self._tika_client = self._exit_stack.enter_context(
             TikaClient(
                 tika_url=settings.TIKA_ENDPOINT,
+                timeout=settings.CELERY_TASK_TIME_LIMIT,
+            ),
+        )
+        self._gotenberg_client = self._exit_stack.enter_context(
+            GotenbergClient(
+                host=settings.TIKA_GOTENBERG_ENDPOINT,
                 timeout=settings.CELERY_TASK_TIME_LIMIT,
             ),
         )
@@ -191,7 +197,7 @@ class TikaDocumentParser:
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None:
-        self._exit_stack.__exit__(exc_type, exc_val, exc_tb)
+        self._exit_stack.close()
         logger.debug("Cleaning up temporary directory %s", self._tempdir)
         shutil.rmtree(self._tempdir, ignore_errors=True)
 
@@ -348,25 +354,16 @@ class TikaDocumentParser:
     ) -> list[MetadataEntry]:
         """Extract format-specific metadata via the Tika metadata endpoint.
 
-        When the parser is used as a context manager, the shared
-        ``TikaClient`` opened in ``__enter__`` is reused.  When called
-        outside a context manager (e.g. the legacy view-layer metadata path),
-        a short-lived ``TikaClient`` is created for this call only.
-
         Returns
         -------
         list[MetadataEntry]
             All key/value pairs returned by Tika, or ``[]`` on error.
         """
+        if TYPE_CHECKING:
+            assert self._tika_client is not None
+
         try:
-            if self._tika_client is not None:
-                parsed = self._tika_client.metadata.from_file(document_path, mime_type)
-            else:
-                with TikaClient(
-                    tika_url=settings.TIKA_ENDPOINT,
-                    timeout=settings.CELERY_TASK_TIME_LIMIT,
-                ) as client:
-                    parsed = client.metadata.from_file(document_path, mime_type)
+            parsed = self._tika_client.metadata.from_file(document_path, mime_type)
             return [
                 {
                     "namespace": "",
@@ -406,17 +403,14 @@ class TikaDocumentParser:
         documents.parsers.ParseError
             If Gotenberg returns an error.
         """
+        if TYPE_CHECKING:
+            assert self._gotenberg_client is not None
+
         pdf_path = self._tempdir / "convert.pdf"
 
         logger.info("Converting %s to PDF as %s", document_path, pdf_path)
 
-        with (
-            GotenbergClient(
-                host=settings.TIKA_GOTENBERG_ENDPOINT,
-                timeout=settings.CELERY_TASK_TIME_LIMIT,
-            ) as client,
-            client.libre_office.to_pdf() as route,
-        ):
+        with self._gotenberg_client.libre_office.to_pdf() as route:
             # Set the output format of the resulting PDF.
             # OutputTypeConfig reads the database-stored ApplicationConfiguration
             # first, then falls back to the PAPERLESS_OCR_OUTPUT_TYPE env var.
