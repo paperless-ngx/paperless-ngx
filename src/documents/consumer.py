@@ -51,6 +51,7 @@ from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
+from paperless.parsers.remote import RemoteDocumentParser
 from paperless.parsers.text import TextDocumentParser
 from paperless_mail.parsers import MailDocumentParser
 
@@ -67,7 +68,7 @@ def _parser_cleanup(parser: DocumentParser) -> None:
 
     TODO(stumpylog): Remove me in the future
     """
-    if isinstance(parser, TextDocumentParser):
+    if isinstance(parser, (TextDocumentParser, RemoteDocumentParser)):
         parser.__exit__(None, None, None)
     else:
         parser.cleanup()
@@ -476,7 +477,10 @@ class ConsumerPlugin(
                     self.filename,
                     self.input_doc.mailrule_id,
                 )
-            elif isinstance(document_parser, TextDocumentParser):
+            elif isinstance(
+                document_parser,
+                (TextDocumentParser, RemoteDocumentParser),
+            ):
                 # TODO(stumpylog): Remove me in the future
                 document_parser.parse(self.working_copy, mime_type)
             else:
@@ -489,7 +493,7 @@ class ConsumerPlugin(
                 ProgressStatusOptions.WORKING,
                 ConsumerStatusShortMessage.GENERATING_THUMBNAIL,
             )
-            if isinstance(document_parser, TextDocumentParser):
+            if isinstance(document_parser, (TextDocumentParser, RemoteDocumentParser)):
                 # TODO(stumpylog): Remove me in the future
                 thumbnail = document_parser.get_thumbnail(self.working_copy, mime_type)
             else:
