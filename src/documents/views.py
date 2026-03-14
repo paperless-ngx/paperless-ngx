@@ -3368,6 +3368,7 @@ class RemoteVersionView(GenericAPIView):
                 resp = httpx.get(
                     "https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest",
                     headers={"Accept": "application/json"},
+                    timeout=10.0,
                 )
                 resp.raise_for_status()
                 data = resp.json()
