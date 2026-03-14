@@ -139,7 +139,7 @@ class TestRetaggerTags(DirectoriesMixin):
     @pytest.mark.usefixtures("documents")
     def test_add_tags(self, tags: TagTuple) -> None:
         tag_first, tag_second, *_ = tags
-        call_command("document_retagger", "--tags")
+        call_command("document_retagger", "--tags", skip_checks=True)
         d_first, d_second, d_unrelated, d_auto = _get_docs()
 
         assert d_first.tags.count() == 1
@@ -158,7 +158,7 @@ class TestRetaggerTags(DirectoriesMixin):
         tag_first, tag_second, tag_inbox, tag_no_match, _ = tags
         d1.tags.add(tag_second)
 
-        call_command("document_retagger", "--tags", "--overwrite")
+        call_command("document_retagger", "--tags", "--overwrite", skip_checks=True)
 
         d_first, d_second, d_unrelated, d_auto = _get_docs()
 
@@ -180,7 +180,13 @@ class TestRetaggerTags(DirectoriesMixin):
         ],
     )
     def test_suggest_does_not_apply_tags(self, extra_args: list[str]) -> None:
-        call_command("document_retagger", "--tags", "--suggest", *extra_args)
+        call_command(
+            "document_retagger",
+            "--tags",
+            "--suggest",
+            *extra_args,
+            skip_checks=True,
+        )
         d_first, d_second, _, d_auto = _get_docs()
 
         assert d_first.tags.count() == 0
@@ -199,7 +205,7 @@ class TestRetaggerDocumentType(DirectoriesMixin):
     @pytest.mark.usefixtures("documents")
     def test_add_type(self, document_types: DocumentTypeTuple) -> None:
         dt_first, dt_second = document_types
-        call_command("document_retagger", "--document_type")
+        call_command("document_retagger", "--document_type", skip_checks=True)
         d_first, d_second, _, _ = _get_docs()
 
         assert d_first.document_type == dt_first
@@ -214,7 +220,13 @@ class TestRetaggerDocumentType(DirectoriesMixin):
         ],
     )
     def test_suggest_does_not_apply_document_type(self, extra_args: list[str]) -> None:
-        call_command("document_retagger", "--document_type", "--suggest", *extra_args)
+        call_command(
+            "document_retagger",
+            "--document_type",
+            "--suggest",
+            *extra_args,
+            skip_checks=True,
+        )
         d_first, d_second, _, _ = _get_docs()
 
         assert d_first.document_type is None
@@ -243,7 +255,12 @@ class TestRetaggerDocumentType(DirectoriesMixin):
         )
         doc = DocumentFactory(content="ambiguous content")
 
-        call_command("document_retagger", "--document_type", *use_first_flag)
+        call_command(
+            "document_retagger",
+            "--document_type",
+            *use_first_flag,
+            skip_checks=True,
+        )
 
         doc.refresh_from_db()
         assert (doc.document_type is not None) is expects_assignment
@@ -260,7 +277,7 @@ class TestRetaggerCorrespondent(DirectoriesMixin):
     @pytest.mark.usefixtures("documents")
     def test_add_correspondent(self, correspondents: CorrespondentTuple) -> None:
         c_first, c_second = correspondents
-        call_command("document_retagger", "--correspondent")
+        call_command("document_retagger", "--correspondent", skip_checks=True)
         d_first, d_second, _, _ = _get_docs()
 
         assert d_first.correspondent == c_first
@@ -275,7 +292,13 @@ class TestRetaggerCorrespondent(DirectoriesMixin):
         ],
     )
     def test_suggest_does_not_apply_correspondent(self, extra_args: list[str]) -> None:
-        call_command("document_retagger", "--correspondent", "--suggest", *extra_args)
+        call_command(
+            "document_retagger",
+            "--correspondent",
+            "--suggest",
+            *extra_args,
+            skip_checks=True,
+        )
         d_first, d_second, _, _ = _get_docs()
 
         assert d_first.correspondent is None
@@ -304,7 +327,12 @@ class TestRetaggerCorrespondent(DirectoriesMixin):
         )
         doc = DocumentFactory(content="ambiguous content")
 
-        call_command("document_retagger", "--correspondent", *use_first_flag)
+        call_command(
+            "document_retagger",
+            "--correspondent",
+            *use_first_flag,
+            skip_checks=True,
+        )
 
         doc.refresh_from_db()
         assert (doc.correspondent is not None) is expects_assignment
@@ -326,7 +354,7 @@ class TestRetaggerStoragePath(DirectoriesMixin):
         THEN matching documents get the correct path; existing path is unchanged
         """
         sp1, sp2, sp3 = storage_paths
-        call_command("document_retagger", "--storage_path")
+        call_command("document_retagger", "--storage_path", skip_checks=True)
         d_first, d_second, d_unrelated, d_auto = _get_docs()
 
         assert d_first.storage_path == sp2
@@ -342,7 +370,12 @@ class TestRetaggerStoragePath(DirectoriesMixin):
         THEN the existing path is replaced by the newly matched path
         """
         sp1, sp2, _ = storage_paths
-        call_command("document_retagger", "--storage_path", "--overwrite")
+        call_command(
+            "document_retagger",
+            "--storage_path",
+            "--overwrite",
+            skip_checks=True,
+        )
         d_first, d_second, d_unrelated, d_auto = _get_docs()
 
         assert d_first.storage_path == sp2
@@ -373,7 +406,12 @@ class TestRetaggerStoragePath(DirectoriesMixin):
         )
         doc = DocumentFactory(content="ambiguous content")
 
-        call_command("document_retagger", "--storage_path", *use_first_flag)
+        call_command(
+            "document_retagger",
+            "--storage_path",
+            *use_first_flag,
+            skip_checks=True,
+        )
 
         doc.refresh_from_db()
         assert (doc.storage_path is not None) is expects_assignment
@@ -402,7 +440,13 @@ class TestRetaggerIdRange(DirectoriesMixin):
         expected_count: int,
     ) -> None:
         DocumentFactory(content="NOT the first document")
-        call_command("document_retagger", "--tags", "--id-range", *id_range_args)
+        call_command(
+            "document_retagger",
+            "--tags",
+            "--id-range",
+            *id_range_args,
+            skip_checks=True,
+        )
         tag_first, *_ = tags
         assert Document.objects.filter(tags__id=tag_first.id).count() == expected_count
 
@@ -416,7 +460,7 @@ class TestRetaggerIdRange(DirectoriesMixin):
     )
     def test_id_range_invalid_arguments_raise(self, args: list[str]) -> None:
         with pytest.raises((CommandError, SystemExit)):
-            call_command("document_retagger", *args)
+            call_command("document_retagger", *args, skip_checks=True)
 
 
 # ---------------------------------------------------------------------------
@@ -430,12 +474,12 @@ class TestRetaggerEdgeCases(DirectoriesMixin):
     @pytest.mark.usefixtures("documents")
     def test_no_targets_exits_cleanly(self) -> None:
         """Calling the retagger with no classifier targets should not raise."""
-        call_command("document_retagger")
+        call_command("document_retagger", skip_checks=True)
 
     @pytest.mark.usefixtures("documents")
     def test_inbox_only_skips_non_inbox_documents(self) -> None:
         """--inbox-only must restrict processing to documents with an inbox tag."""
-        call_command("document_retagger", "--tags", "--inbox-only")
+        call_command("document_retagger", "--tags", "--inbox-only", skip_checks=True)
         d_first, _, d_unrelated, _ = _get_docs()
 
         assert d_first.tags.count() == 0

@@ -151,10 +151,6 @@ class PaperlessCommand(RichCommand):
         supports_progress_bar: Adds --no-progress-bar argument (default: True)
         supports_multiprocessing: Adds --processes argument (default: False)
 
-    System checks are skipped by default (requires_system_checks = []) because
-    these commands run post-startup where checks have already been performed by
-    the application server. Subclasses that genuinely need checks can override.
-
     Example usage:
 
         class Command(PaperlessCommand):
@@ -192,8 +188,6 @@ class PaperlessCommand(RichCommand):
                     result = import_item(item)
                     stats.imported += 1
     """
-
-    requires_system_checks: ClassVar[list] = []
 
     supports_progress_bar: ClassVar[bool] = True
     supports_multiprocessing: ClassVar[bool] = False

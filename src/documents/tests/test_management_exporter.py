@@ -180,7 +180,7 @@ class TestExportImport(
         if data_only:
             args += ["--data-only"]
 
-        call_command(*args)
+        call_command(*args, skip_checks=True)
 
         with (self.target / "manifest.json").open() as f:
             manifest = json.load(f)
@@ -272,7 +272,12 @@ class TestExportImport(
             GroupObjectPermission.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
 
-            call_command("document_importer", "--no-progress-bar", self.target)
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                self.target,
+                skip_checks=True,
+            )
             self.assertEqual(Document.objects.count(), 4)
             self.assertEqual(Tag.objects.count(), 1)
             self.assertEqual(Correspondent.objects.count(), 1)
@@ -438,7 +443,8 @@ class TestExportImport(
             filename="0000010.pdf",
             mime_type="application/pdf",
         )
-        self.assertRaises(FileNotFoundError, call_command, "document_exporter", target)
+        with self.assertRaises(FileNotFoundError):
+            call_command("document_exporter", target, skip_checks=True)
 
     def test_export_zipped(self) -> None:
         """
@@ -458,7 +464,7 @@ class TestExportImport(
 
         args = ["document_exporter", self.target, "--zip"]
 
-        call_command(*args)
+        call_command(*args, skip_checks=True)
 
         expected_file = str(
             self.target / f"export-{timezone.localdate().isoformat()}.zip",
@@ -493,7 +499,7 @@ class TestExportImport(
         with override_settings(
             FILENAME_FORMAT="{created_year}/{correspondent}/{title}",
         ):
-            call_command(*args)
+            call_command(*args, skip_checks=True)
 
         expected_file = str(
             self.target / f"export-{timezone.localdate().isoformat()}.zip",
@@ -538,7 +544,7 @@ class TestExportImport(
 
         args = ["document_exporter", self.target, "--zip", "--delete"]
 
-        call_command(*args)
+        call_command(*args, skip_checks=True)
 
         expected_file = str(
             self.target / f"export-{timezone.localdate().isoformat()}.zip",
@@ -565,7 +571,7 @@ class TestExportImport(
         args = ["document_exporter", "/tmp/foo/bar"]
 
         with self.assertRaises(CommandError) as e:
-            call_command(*args)
+            call_command(*args, skip_checks=True)
 
         self.assertEqual("That path doesn't exist", str(e.exception))
 
@@ -583,7 +589,7 @@ class TestExportImport(
             args = ["document_exporter", tmp_file.name]
 
             with self.assertRaises(CommandError) as e:
-                call_command(*args)
+                call_command(*args, skip_checks=True)
 
             self.assertEqual("That path isn't a directory", str(e.exception))
 
@@ -602,7 +608,7 @@ class TestExportImport(
             args = ["document_exporter", tmp_dir]
 
             with self.assertRaises(CommandError) as e:
-                call_command(*args)
+                call_command(*args, skip_checks=True)
 
             self.assertEqual(
                 "That path doesn't appear to be writable",
@@ -647,7 +653,12 @@ class TestExportImport(
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", "--no-progress-bar", self.target)
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                self.target,
+                skip_checks=True,
+            )
             self.assertEqual(Document.objects.count(), 4)
 
     def test_no_thumbnail(self) -> None:
@@ -690,7 +701,12 @@ class TestExportImport(
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", "--no-progress-bar", self.target)
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                self.target,
+                skip_checks=True,
+            )
             self.assertEqual(Document.objects.count(), 4)
 
     def test_split_manifest(self) -> None:
@@ -721,7 +737,12 @@ class TestExportImport(
             Document.objects.all().delete()
             CustomFieldInstance.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", "--no-progress-bar", self.target)
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                self.target,
+                skip_checks=True,
+            )
             self.assertEqual(Document.objects.count(), 4)
             self.assertEqual(CustomFieldInstance.objects.count(), 1)
 
@@ -746,7 +767,12 @@ class TestExportImport(
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", "--no-progress-bar", self.target)
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                self.target,
+                skip_checks=True,
+            )
             self.assertEqual(Document.objects.count(), 4)
 
     def test_folder_prefix_with_split(self) -> None:
@@ -771,7 +797,12 @@ class TestExportImport(
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", "--no-progress-bar", self.target)
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                self.target,
+                skip_checks=True,
+            )
             self.assertEqual(Document.objects.count(), 4)
 
     def test_import_db_transaction_failed(self) -> None:
@@ -813,7 +844,12 @@ class TestExportImport(
             self.user = User.objects.create(username="temp_admin")
 
             with self.assertRaises(IntegrityError):
-                call_command("document_importer", "--no-progress-bar", self.target)
+                call_command(
+                    "document_importer",
+                    "--no-progress-bar",
+                    self.target,
+                    skip_checks=True,
+                )
 
             self.assertEqual(ContentType.objects.count(), num_content_type_objects)
             self.assertEqual(Permission.objects.count(), num_permission_objects + 1)
@@ -864,6 +900,7 @@ class TestExportImport(
             "--no-progress-bar",
             "--data-only",
             self.target,
+            skip_checks=True,
         )
 
         self.assertEqual(Document.objects.all().count(), 4)
@@ -923,6 +960,7 @@ class TestCryptExportImport(
             "--passphrase",
             "securepassword",
             self.target,
+            skip_checks=True,
         )
 
         self.assertIsFile(self.target / "metadata.json")
@@ -948,6 +986,7 @@ class TestCryptExportImport(
             "--passphrase",
             "securepassword",
             self.target,
+            skip_checks=True,
         )
 
         account = MailAccount.objects.first()
@@ -976,6 +1015,7 @@ class TestCryptExportImport(
             "--passphrase",
             "securepassword",
             self.target,
+            skip_checks=True,
         )
 
         with self.assertRaises(CommandError) as err:
@@ -983,6 +1023,7 @@ class TestCryptExportImport(
                 "document_importer",
                 "--no-progress-bar",
                 self.target,
+                skip_checks=True,
             )
             self.assertEqual(
                 err.msg,
@@ -1014,6 +1055,7 @@ class TestCryptExportImport(
             "--no-progress-bar",
             str(self.target),
             stdout=stdout,
+            skip_checks=True,
         )
         stdout.seek(0)
         self.assertIn(
