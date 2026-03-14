@@ -1990,6 +1990,19 @@ class BulkEditSerializer(
             raise serializers.ValidationError("password must be a string")
 
     def validate(self, attrs):
+        attrs = super().validate(attrs)
+
+        if attrs.get("all", False) and attrs["method"] in [
+            bulk_edit.merge,
+            bulk_edit.split,
+            bulk_edit.delete_pages,
+            bulk_edit.edit_pdf,
+            bulk_edit.remove_password,
+        ]:
+            raise serializers.ValidationError(
+                "This method does not support all=true.",
+            )
+
         method = attrs["method"]
         parameters = attrs["parameters"]
 
