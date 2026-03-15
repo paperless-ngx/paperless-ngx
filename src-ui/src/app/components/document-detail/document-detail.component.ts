@@ -1722,6 +1722,11 @@ export class DocumentDetailComponent
 
   private updateFormForCustomFields(emitEvent: boolean = false) {
     this.customFieldFormFields.clear({ emitEvent: false })
+    this.document.custom_fields?.sort((a, b) =>
+      (this.getCustomFieldFromInstance(a)?.name ?? '').localeCompare(
+        this.getCustomFieldFromInstance(b)?.name ?? ''
+      )
+    )
     this.document.custom_fields?.forEach((fieldInstance) => {
       this.customFieldFormFields.push(
         new FormGroup({

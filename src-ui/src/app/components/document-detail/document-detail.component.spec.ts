@@ -1320,7 +1320,11 @@ describe('DocumentDetailComponent', () => {
     const patchSpy = jest.spyOn(documentService, 'patch')
     component.save(true)
     expect(patchSpy.mock.lastCall[0].custom_fields).toHaveLength(2)
-    expect(patchSpy.mock.lastCall[0].custom_fields[1]).toEqual({
+    expect(
+      patchSpy.mock.lastCall[0].custom_fields.find(
+        (cf) => cf.field === customFields[1].id
+      )
+    ).toEqual({
       field: customFields[1].id,
       value: null,
     })
@@ -1330,7 +1334,11 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     const initialLength = doc.custom_fields.length
     expect(component.customFieldFormFields).toHaveLength(initialLength)
-    component.removeField(doc.custom_fields[0])
+    component.removeField(
+      component.document.custom_fields.find(
+        (cf) => cf.field === customFields[0].id
+      )
+    )
     fixture.detectChanges()
     expect(component.document.custom_fields).toHaveLength(initialLength - 1)
     expect(component.customFieldFormFields).toHaveLength(initialLength - 1)
@@ -1342,6 +1350,82 @@ describe('DocumentDetailComponent', () => {
     expect(patchSpy.mock.lastCall[0].custom_fields).toHaveLength(
       initialLength - 1
     )
+  })
+
+  it('should sort custom fields by name on load and after save', () => {
+    var docCustomFields = [
+      ...customFields,
+      {
+        id: 2,
+        name: 'Even More Custom Field',
+        data_type: CustomFieldDataType.String,
+        created: new Date(),
+      },
+    ]
+    const docWithMultipleFields = Object.assign({}, doc, {
+      custom_fields: [
+        {
+          field: docCustomFields[0].id, // 'Field 1'
+          document: doc.id,
+          created: new Date(),
+          value: 'Test value',
+        },
+        {
+          field: docCustomFields[1].id, // 'Custom Field 2'
+          document: doc.id,
+          created: new Date(),
+          value: 'More test value',
+        },
+        {
+          field: docCustomFields[2].id, // 'Even More Custom Field'
+          document: doc.id,
+          created: new Date(),
+          value: 'Yet another test value',
+        },
+      ],
+    })
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
+    jest
+      .spyOn(documentService, 'get')
+      .mockReturnValue(of(Object.assign({}, docWithMultipleFields)))
+    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(null)
+    jest
+      .spyOn(openDocumentsService, 'openDocument')
+      .mockReturnValueOnce(of(true))
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({
+        count: docCustomFields.length,
+        all: docCustomFields.map((f) => f.id),
+        results: docCustomFields,
+      })
+    )
+    fixture.detectChanges()
+    // After load, fields should be sorted
+    expect(
+      component.document.custom_fields
+        .map((cf) => component.getCustomFieldFromInstance(cf))
+        .map((cf) => ({ id: cf.id, name: cf.name }))
+    ).toEqual([
+      { id: 1, name: 'Custom Field 2' },
+      { id: 2, name: 'Even More Custom Field' },
+      { id: 0, name: 'Field 1' },
+    ])
+    // After save, fields should remain sorted
+    jest
+      .spyOn(documentService, 'patch')
+      .mockReturnValue(of(Object.assign({}, docWithMultipleFields)))
+    component.save(true)
+    expect(
+      component.document.custom_fields
+        .map((cf) => component.getCustomFieldFromInstance(cf))
+        .map((cf) => ({ id: cf.id, name: cf.name }))
+    ).toEqual([
+      { id: 1, name: 'Custom Field 2' },
+      { id: 2, name: 'Even More Custom Field' },
+      { id: 0, name: 'Field 1' },
+    ])
   })
 
   it('should correctly determine changed fields', () => {
