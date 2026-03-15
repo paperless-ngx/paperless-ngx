@@ -69,6 +69,58 @@ describe('CustomFieldEditDialogComponent', () => {
     expect(component.objectForm.get('data_type').disabled).toBeTruthy()
   })
 
+  it('should sort existing select options by label on edit', () => {
+    component.dialogMode = EditDialogMode.EDIT
+    component.object = {
+      id: 1,
+      name: 'Starship Model',
+      data_type: CustomFieldDataType.Select,
+      extra_data: {
+        select_options: [
+          { label: 'X-Wing', id: 'x-id' },
+          { label: 'B-Wing', id: 'b-id' },
+          { label: 'Y-Wing', id: 'y-id' },
+          { label: 'A-Wing', id: 'a-id' },
+        ],
+      },
+    }
+    fixture.detectChanges()
+    component.ngOnInit()
+    expect(component.allSelectOptions).toEqual([
+      { label: 'A-Wing', id: 'a-id' },
+      { label: 'B-Wing', id: 'b-id' },
+      { label: 'X-Wing', id: 'x-id' },
+      { label: 'Y-Wing', id: 'y-id' },
+    ])
+  })
+
+  it('should append new select options at the end without sorting', () => {
+    component.dialogMode = EditDialogMode.EDIT
+    component.object = {
+      id: 1,
+      name: 'Starship Model',
+      data_type: CustomFieldDataType.Select,
+      extra_data: {
+        select_options: [
+          { label: 'A-Wing', id: 'a-id' },
+          { label: 'B-Wing', id: 'b-id' },
+          { label: 'X-Wing', id: 'x-id' },
+          { label: 'Y-Wing', id: 'y-id' },
+        ],
+      },
+    }
+    fixture.detectChanges()
+    component.ngOnInit()
+    component.addSelectOption()
+    expect(component.allSelectOptions).toEqual([
+      { label: 'A-Wing', id: 'a-id' },
+      { label: 'B-Wing', id: 'b-id' },
+      { label: 'X-Wing', id: 'x-id' },
+      { label: 'Y-Wing', id: 'y-id' },
+      { label: null, id: null },
+    ])
+  })
+
   it('should initialize select options on edit', () => {
     component.dialogMode = EditDialogMode.EDIT
     component.object = {
@@ -139,6 +191,7 @@ describe('CustomFieldEditDialogComponent', () => {
     }
     fixture.detectChanges()
     component.ngOnInit()
+    // modify first item on page 2, after sort this is "Option 17"
     component.selectOptionsPage = 2
     fixture.detectChanges()
     component.objectForm
@@ -146,19 +199,21 @@ describe('CustomFieldEditDialogComponent', () => {
       .get('select_options')
       .get('0')
       .get('label')
-      .setValue('Updated Option 9')
+      .setValue('Edited Option 17')
+    // navigate beyond page 2
+    component.selectOptionsPage = 3
     const formValues = (component as any).getFormValues()
     // first item unchanged
     expect(formValues.extra_data.select_options[0]).toEqual({
       label: 'Option 1',
       id: '1-xyz',
     })
-    // page 2 first item updated
+    // page 2 first item updated with initial option sort
     expect(
       formValues.extra_data.select_options[component.SELECT_OPTION_PAGE_SIZE]
     ).toEqual({
-      label: 'Updated Option 9',
-      id: '9-xyz',
+      label: 'Edited Option 17',
+      id: '17-xyz',
     })
   })
 })

@@ -88,7 +88,7 @@ export class CustomFieldEditDialogComponent
     if (this.object?.data_type === CustomFieldDataType.Select) {
       this._allSelectOptions = [
         ...(this.object.extra_data.select_options ?? []),
-      ]
+      ].sort((a, b) => a.label.localeCompare(b.label))
       this.selectOptionsPage = 1
     }
   }
@@ -139,7 +139,10 @@ export class CustomFieldEditDialogComponent
       this.objectForm.get('data_type')?.value === CustomFieldDataType.Select
     ) {
       // Make sure we send all select options, with updated values
-      formValues.extra_data.select_options = this._allSelectOptions
+      // Filter out any options with empty labels (e.g. added but not filled in)
+      formValues.extra_data.select_options = this._allSelectOptions.filter(
+        (o) => o.label
+      )
     }
     return formValues
   }

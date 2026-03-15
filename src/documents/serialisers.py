@@ -752,7 +752,7 @@ class CustomFieldSerializer(serializers.ModelSerializer):
                 or not isinstance(attrs["extra_data"]["select_options"], list)
                 or len(attrs["extra_data"]["select_options"]) == 0
                 or not all(
-                    len(option.get("label", "")) > 0
+                    len(option.get("label") or "") > 0
                     for option in attrs["extra_data"]["select_options"]
                 )
             ):

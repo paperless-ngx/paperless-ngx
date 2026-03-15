@@ -150,6 +150,38 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
+        # Option with null label
+        resp = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "data_type": "select",
+                    "name": "Select Field",
+                    "extra_data": {
+                        "select_options": [{"label": None, "id": None}],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Option with empty label
+        resp = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "data_type": "select",
+                    "name": "Select Field",
+                    "extra_data": {
+                        "select_options": [{"label": "", "id": None}],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_custom_field_select_unique_ids(self) -> None:
         """
         GIVEN:
