@@ -1201,10 +1201,11 @@ export class DocumentDetailComponent
           this.closeIncomingUpdateModal()
           this.lastLocalSaveModified = docValues.modified ?? null
           // in case data changed while saving eg removing inbox_tags
+          this.document.custom_fields = docValues.custom_fields
+          this.updateFormForCustomFields()
           this.documentForm.patchValue(docValues)
-          const newValues = Object.assign({}, this.documentForm.value)
+          const newValues = Object.assign({}, this.documentForm.getRawValue())
           newValues.tags = [...docValues.tags]
-          newValues.custom_fields = [...docValues.custom_fields]
           this.store.next(newValues)
           this.openDocumentService.setDirty(this.document, false)
           this.openDocumentService.save()

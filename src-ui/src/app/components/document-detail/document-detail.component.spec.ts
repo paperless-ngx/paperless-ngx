@@ -1362,34 +1362,35 @@ describe('DocumentDetailComponent', () => {
         created: new Date(),
       },
     ]
-    const docWithMultipleFields = Object.assign({}, doc, {
-      custom_fields: [
-        {
-          field: docCustomFields[0].id, // 'Field 1'
-          document: doc.id,
-          created: new Date(),
-          value: 'Test value',
-        },
-        {
-          field: docCustomFields[1].id, // 'Custom Field 2'
-          document: doc.id,
-          created: new Date(),
-          value: 'More test value',
-        },
-        {
-          field: docCustomFields[2].id, // 'Even More Custom Field'
-          document: doc.id,
-          created: new Date(),
-          value: 'Yet another test value',
-        },
-      ],
-    })
+    const docCustomFieldValues = [
+      {
+        field: docCustomFields[0].id, // 'Field 1'
+        document: doc.id,
+        created: new Date(),
+        value: 'Test value',
+      },
+      {
+        field: docCustomFields[1].id, // 'Custom Field 2'
+        document: doc.id,
+        created: new Date(),
+        value: 'More test value',
+      },
+      {
+        field: docCustomFields[2].id, // 'Even More Custom Field'
+        document: doc.id,
+        created: new Date(),
+        value: 'Yet another test value',
+      },
+    ]
+    const docWithMultipleFields = of(
+      Object.assign({}, doc, {
+        custom_fields: docCustomFieldValues.map((cf) => ({ ...cf })),
+      })
+    )
     jest
       .spyOn(activatedRoute, 'paramMap', 'get')
       .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
-    jest
-      .spyOn(documentService, 'get')
-      .mockReturnValue(of(Object.assign({}, docWithMultipleFields)))
+    jest.spyOn(documentService, 'get').mockReturnValue(docWithMultipleFields)
     jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(null)
     jest
       .spyOn(openDocumentsService, 'openDocument')
@@ -1412,10 +1413,21 @@ describe('DocumentDetailComponent', () => {
       { id: 2, name: 'Even More Custom Field' },
       { id: 0, name: 'Field 1' },
     ])
+    expect(
+      component.customFieldFormFields.controls.map((c) => c.get('field').value)
+    ).toEqual([
+      docCustomFields[1].id, // 'Custom Field 2'
+      docCustomFields[2].id, // 'Even More Custom Field'
+      docCustomFields[0].id, // 'Field 1'
+    ])
     // After save, fields should remain sorted
-    jest
-      .spyOn(documentService, 'patch')
-      .mockReturnValue(of(Object.assign({}, docWithMultipleFields)))
+    jest.spyOn(documentService, 'patch').mockReturnValue(
+      of(
+        Object.assign({}, doc, {
+          custom_fields: docCustomFieldValues.map((cf) => ({ ...cf })),
+        })
+      )
+    )
     component.save(true)
     expect(
       component.document.custom_fields
@@ -1425,6 +1437,13 @@ describe('DocumentDetailComponent', () => {
       { id: 1, name: 'Custom Field 2' },
       { id: 2, name: 'Even More Custom Field' },
       { id: 0, name: 'Field 1' },
+    ])
+    expect(
+      component.customFieldFormFields.controls.map((c) => c.get('field').value)
+    ).toEqual([
+      docCustomFields[1].id, // 'Custom Field 2'
+      docCustomFields[2].id, // 'Even More Custom Field'
+      docCustomFields[0].id, // 'Field 1'
     ])
   })
 
