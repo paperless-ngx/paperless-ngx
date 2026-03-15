@@ -79,7 +79,11 @@ export class CustomFieldsBulkEditDialogComponent {
 
   public form: FormGroup = new FormGroup({})
 
-  public documents: DocumentSelectionQuery = { documents: [] }
+  public selection: DocumentSelectionQuery = { documents: [] }
+
+  public get documents(): number[] {
+    return this.selection.documents
+  }
 
   initForm() {
     Object.keys(this.form.controls).forEach((key) => {
@@ -94,7 +98,7 @@ export class CustomFieldsBulkEditDialogComponent {
 
   public save() {
     this.documentService
-      .bulkEdit(this.documents, 'modify_custom_fields', {
+      .bulkEdit(this.selection, 'modify_custom_fields', {
         add_custom_fields: this.form.value,
         remove_custom_fields: this.fieldsToRemoveIds,
       })

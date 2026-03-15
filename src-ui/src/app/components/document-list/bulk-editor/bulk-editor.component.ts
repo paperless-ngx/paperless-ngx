@@ -999,7 +999,7 @@ export class BulkEditorComponent
       (item) => item.id
     )
 
-    dialog.documents = this.getSelectionQuery()
+    dialog.selection = this.getSelectionQuery()
     dialog.succeeded.subscribe((result) => {
       this.toastService.showInfo($localize`Custom fields updated.`)
       this.list.reload()
