@@ -1529,7 +1529,8 @@ describe('BulkEditorComponent', () => {
 
     expect(modal.componentInstance.customFields.length).toEqual(2)
     expect(modal.componentInstance.fieldsToAddIds).toEqual([1, 2])
-    expect(modal.componentInstance.documents).toEqual({ documents: [3, 4] })
+    expect(modal.componentInstance.selection).toEqual({ documents: [3, 4] })
+    expect(modal.componentInstance.documents).toEqual([3, 4])
 
     modal.componentInstance.failed.emit()
     expect(toastServiceShowErrorSpy).toHaveBeenCalled()
