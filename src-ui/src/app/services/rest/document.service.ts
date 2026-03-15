@@ -68,6 +68,12 @@ export interface RemovePasswordDocumentsRequest {
   source_mode?: BulkEditSourceMode
 }
 
+export interface DocumentSelectionQuery {
+  documents?: number[]
+  all?: boolean
+  filters?: { [key: string]: any }
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -325,33 +331,37 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     return this.http.get<DocumentMetadata>(url.toString())
   }
 
-  bulkEdit(ids: number[], method: DocumentBulkEditMethod, args: any) {
+  bulkEdit(
+    selection: DocumentSelectionQuery,
+    method: DocumentBulkEditMethod,
+    args: any
+  ) {
     return this.http.post(this.getResourceUrl(null, 'bulk_edit'), {
-      documents: ids,
+      ...selection,
       method: method,
       parameters: args,
     })
   }
 
-  deleteDocuments(ids: number[]) {
+  deleteDocuments(selection: DocumentSelectionQuery) {
     return this.http.post(this.getResourceUrl(null, 'delete'), {
-      documents: ids,
+      ...selection,
     })
   }
 
-  reprocessDocuments(ids: number[]) {
+  reprocessDocuments(selection: DocumentSelectionQuery) {
     return this.http.post(this.getResourceUrl(null, 'reprocess'), {
-      documents: ids,
+      ...selection,
     })
   }
 
   rotateDocuments(
-    ids: number[],
+    selection: DocumentSelectionQuery,
     degrees: number,
     sourceMode: BulkEditSourceMode = BulkEditSourceMode.LATEST_VERSION
   ) {
     return this.http.post(this.getResourceUrl(null, 'rotate'), {
-      documents: ids,
+      ...selection,
       degrees,
       source_mode: sourceMode,
     })
@@ -399,14 +409,14 @@ export class DocumentService extends AbstractPaperlessService<Document> {
   }
 
   bulkDownload(
-    ids: number[],
+    selection: DocumentSelectionQuery,
     content = 'both',
     useFilenameFormatting: boolean = false
   ) {
     return this.http.post(
       this.getResourceUrl(null, 'bulk_download'),
       {
-        documents: ids,
+        ...selection,
         content: content,
         follow_formatting: useFilenameFormatting,
       },
