@@ -1694,7 +1694,14 @@ export class DocumentDetailComponent
     this.customFieldsService
       .listAll()
       .pipe(first(), takeUntil(this.unsubscribeNotifier))
-      .subscribe((result) => (this.customFields = result.results))
+      .subscribe((result) => {
+        this.customFields = result.results
+        for (const field of this.customFields) {
+          field.extra_data?.select_options?.sort((a, b) =>
+            a.label.localeCompare(b.label)
+          )
+        }
+      })
   }
 
   public refreshCustomFields() {

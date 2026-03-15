@@ -1261,6 +1261,51 @@ describe('DocumentDetailComponent', () => {
     )
   })
 
+  it('should sort custom field select options by label on load', () => {
+    const selectField = {
+      id: 2,
+      name: 'Starship Type',
+      data_type: CustomFieldDataType.Select,
+      created: new Date(),
+      extra_data: {
+        select_options: [
+          { label: 'Y-Wing', id: 'y' },
+          { label: 'A-Wing', id: 'a' },
+          { label: 'X-Wing', id: 'x' },
+          { label: 'B-Wing', id: 'b' },
+        ],
+      },
+    }
+    const allFields = [...customFields, selectField]
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
+    jest.spyOn(documentService, 'get').mockReturnValueOnce(of(doc))
+    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(null)
+    jest
+      .spyOn(openDocumentsService, 'openDocument')
+      .mockReturnValueOnce(of(true))
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({
+        count: allFields.length,
+        all: allFields.map((f) => f.id),
+        results: allFields,
+      })
+    )
+    fixture.detectChanges()
+    const loadedField = component.getCustomFieldFromInstance({
+      created: new Date(),
+      document: 3,
+      field: 2,
+    })
+    expect(loadedField.extra_data.select_options).toEqual([
+      { label: 'A-Wing', id: 'a' },
+      { label: 'B-Wing', id: 'b' },
+      { label: 'X-Wing', id: 'x' },
+      { label: 'Y-Wing', id: 'y' },
+    ])
+  })
+
   it('should support add custom field, correctly send via post', () => {
     initNormally()
     const initialLength = doc.custom_fields.length
