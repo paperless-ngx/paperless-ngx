@@ -240,7 +240,7 @@ export class DocumentListComponent
   }
 
   get isBulkEditing(): boolean {
-    return this.list.selected.size > 0
+    return this.list.hasSelection
   }
 
   toggleDisplayField(field: DisplayField) {
@@ -327,7 +327,7 @@ export class DocumentListComponent
       })
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        if (this.list.selected.size > 0) {
+        if (this.list.hasSelection) {
           this.list.selectNone()
         } else if (this.isFiltered) {
           this.resetFilters()
@@ -356,7 +356,7 @@ export class DocumentListComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         if (this.list.documents.length > 0) {
-          if (this.list.selected.size > 0) {
+          if (this.list.hasSelection) {
             this.openDocumentDetail(Array.from(this.list.selected)[0])
           } else {
             this.openDocumentDetail(this.list.documents[0])
