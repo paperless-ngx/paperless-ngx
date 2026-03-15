@@ -37,12 +37,12 @@ const customFields = [
   },
   {
     id: 2,
-    name: 'Test Select Field',
+    name: 'Earlier Alphabetically Sorted Field',
     data_type: CustomFieldDataType.Select,
     extra_data: {
       select_options: [
-        { label: 'Option 1', id: 'abc-123' },
-        { label: 'Option 2', id: 'def-456' },
+        { label: 'Millennium Falcon', id: 'thx-1138' },
+        { label: 'Aluminum Falcon', id: 'aa-23' },
       ],
     },
   },
@@ -83,8 +83,11 @@ describe('CustomFieldsQueryDropdownComponent', () => {
     fixture.detectChanges()
   })
 
-  it('should initialize custom fields on creation', () => {
-    expect(component.customFields).toEqual(customFields)
+  it('should initialize custom fields on creation, sorted by name', () => {
+    expect(component.customFields).toEqual([
+      customFields[1], // Test Field
+      customFields[0], // Earlier Alphabetically Sorted Field
+    ])
   })
 
   it('should add an expression when opened if queries are empty', () => {
@@ -123,7 +126,7 @@ describe('CustomFieldsQueryDropdownComponent', () => {
     )
 
     // Fallback to basic operators if field is not found
-    const operators2 = component.getOperatorsForField(2)
+    const operators2 = component.getOperatorsForField(3)
     expect(operators2.length).toEqual(
       CUSTOM_FIELD_QUERY_OPERATORS_BY_GROUP[
         CustomFieldQueryOperatorGroups.Basic
@@ -131,27 +134,15 @@ describe('CustomFieldsQueryDropdownComponent', () => {
     )
   })
 
-  it('should get select options for a field', () => {
-    const field: CustomField = {
-      id: 1,
-      name: 'Test Field',
-      data_type: CustomFieldDataType.Select,
-      extra_data: {
-        select_options: [
-          { label: 'Option 1', id: 'abc-123' },
-          { label: 'Option 2', id: 'def-456' },
-        ],
-      },
-    }
-    component.customFields = [field]
-    const options = component.getSelectOptionsForField(1)
+  it('should get select options for a field, sorted by label', () => {
+    const options = component.getSelectOptionsForField(2)
     expect(options).toEqual([
-      { label: 'Option 1', id: 'abc-123' },
-      { label: 'Option 2', id: 'def-456' },
+      { label: 'Aluminum Falcon', id: 'aa-23' },
+      { label: 'Millennium Falcon', id: 'thx-1138' },
     ])
 
     // Fallback to empty array if field is not found
-    const options2 = component.getSelectOptionsForField(2)
+    const options2 = component.getSelectOptionsForField(99)
     expect(options2).toEqual([])
   })
 
@@ -202,7 +193,10 @@ describe('CustomFieldsQueryDropdownComponent', () => {
   })
 
   it('should support getting a custom field by ID', () => {
-    expect(component.getCustomFieldByID(1)).toEqual(customFields[0])
+    expect(component.getCustomFieldByID(1)?.name).toEqual('Test Field')
+    expect(component.getCustomFieldByID(2)?.name).toEqual(
+      'Earlier Alphabetically Sorted Field'
+    )
   })
 
   it('should sanitize name from title', () => {

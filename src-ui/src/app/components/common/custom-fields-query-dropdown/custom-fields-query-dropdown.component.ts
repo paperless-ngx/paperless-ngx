@@ -317,6 +317,13 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
       .pipe(first(), takeUntil(this.unsubscribeNotifier))
       .subscribe((result) => {
         this.customFields = result.results
+          .slice()
+          .sort((a, b) => a.name.localeCompare(b.name))
+        for (const field of this.customFields) {
+          field.extra_data?.['select_options']?.sort((a, b) =>
+            a.label.localeCompare(b.label)
+          )
+        }
       })
   }
 
