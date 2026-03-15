@@ -17,7 +17,10 @@ import { SelectComponent } from 'src/app/components/common/input/select/select.c
 import { TextComponent } from 'src/app/components/common/input/text/text.component'
 import { UrlComponent } from 'src/app/components/common/input/url/url.component'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
-import { DocumentService } from 'src/app/services/rest/document.service'
+import {
+  DocumentSelectionQuery,
+  DocumentService,
+} from 'src/app/services/rest/document.service'
 import { TextAreaComponent } from '../../../common/input/textarea/textarea.component'
 
 @Component({
@@ -76,7 +79,7 @@ export class CustomFieldsBulkEditDialogComponent {
 
   public form: FormGroup = new FormGroup({})
 
-  public documents: number[] = []
+  public documents: DocumentSelectionQuery = { documents: [] }
 
   initForm() {
     Object.keys(this.form.controls).forEach((key) => {
