@@ -529,6 +529,8 @@ export class WorkflowEditDialogComponent
       .pipe(first())
       .subscribe((result) => {
         this.customFields = result.results
+          .slice()
+          .sort((a, b) => a.name.localeCompare(b.name))
         this.dateCustomFields = this.customFields?.filter(
           (f) => f.data_type === CustomFieldDataType.Date
         )

@@ -168,12 +168,22 @@ describe('WorkflowEditDialogComponent', () => {
                 results: [
                   {
                     id: 1,
-                    name: 'cf1',
+                    name: 'Planet',
                     data_type: CustomFieldDataType.String,
                   },
                   {
                     id: 2,
-                    name: 'cf2',
+                    name: 'Starship',
+                    data_type: CustomFieldDataType.String,
+                  },
+                  {
+                    id: 3,
+                    name: 'Credits',
+                    data_type: CustomFieldDataType.Integer,
+                  },
+                  {
+                    id: 4,
+                    name: 'Release Date',
                     data_type: CustomFieldDataType.Date,
                   },
                 ],
@@ -994,6 +1004,15 @@ describe('WorkflowEditDialogComponent', () => {
 
     component.removeSelectedCustomField(3, formGroup)
     expect(formGroup.get('assign_custom_fields').value).toEqual([])
+  })
+
+  it('should sort custom fields by name on load', () => {
+    expect(component.customFields.map((f) => f.name)).toEqual([
+      'Credits',
+      'Planet',
+      'Release Date',
+      'Starship',
+    ])
   })
 
   it('should handle parsing of passwords from array to string and back on save', () => {
