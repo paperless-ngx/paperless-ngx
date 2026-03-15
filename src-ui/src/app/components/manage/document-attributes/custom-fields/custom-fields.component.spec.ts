@@ -103,6 +103,30 @@ describe('CustomFieldsComponent', () => {
     jest.advanceTimersByTime(100)
   })
 
+  it('should display fields sorted by name', () => {
+    const unsortedFields: CustomField[] = [
+      { id: 23, name: 'Cell Block', data_type: CustomFieldDataType.String },
+      { id: 1138, name: 'THX', data_type: CustomFieldDataType.Boolean },
+      { id: 1977, name: 'Release Date', data_type: CustomFieldDataType.Date },
+      { id: 2187, name: 'Credits', data_type: CustomFieldDataType.Monetary },
+    ]
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({
+        count: unsortedFields.length,
+        all: unsortedFields.map((f) => f.id),
+        results: unsortedFields,
+      })
+    )
+    component.reload()
+    jest.advanceTimersByTime(100)
+    expect(component.fields.map((f) => f.name)).toEqual([
+      'Cell Block',
+      'Credits',
+      'Release Date',
+      'THX',
+    ])
+  })
+
   it('should support create, show notification on error / success', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))

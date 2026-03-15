@@ -64,6 +64,8 @@ export class CustomFieldsComponent
         takeUntil(this.unsubscribeNotifier),
         tap((r) => {
           this.fields = r.results
+            .slice()
+            .sort((a, b) => a.name.localeCompare(b.name))
         }),
         delay(100)
       )
