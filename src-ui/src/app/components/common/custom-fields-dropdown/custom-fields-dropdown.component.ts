@@ -95,6 +95,8 @@ export class CustomFieldsDropdownComponent extends LoadingComponentWithPermissio
       .pipe(first(), takeUntil(this.unsubscribeNotifier))
       .subscribe((result) => {
         this.customFields = result.results
+          .slice()
+          .sort((a, b) => a.name.localeCompare(b.name))
         this.updateUnusedFields()
       })
   }

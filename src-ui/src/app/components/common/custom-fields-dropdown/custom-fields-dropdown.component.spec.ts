@@ -80,6 +80,27 @@ describe('CustomFieldsDropdownComponent', () => {
     fixture.detectChanges()
   })
 
+  it('should display fields sorted by name', () => {
+    const unsortedFields: CustomField[] = [
+      { id: 2, name: 'Release Date', data_type: CustomFieldDataType.Date },
+      { id: 3, name: 'Film Title', data_type: CustomFieldDataType.Integer },
+    ]
+    jest.spyOn(customFieldService, 'listAll').mockReturnValue(
+      of({
+        count: unsortedFields.length,
+        all: unsortedFields.map((f) => f.id),
+        results: unsortedFields,
+      })
+    )
+    fixture = TestBed.createComponent(CustomFieldsDropdownComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+    expect(component.filteredFields).toEqual([
+      { id: 3, name: 'Film Title', data_type: CustomFieldDataType.Integer },
+      { id: 2, name: 'Release Date', data_type: CustomFieldDataType.Date },
+    ])
+  })
+
   it('should support add field', () => {
     let addedField
     component.added.subscribe((f) => (addedField = f))
