@@ -12,7 +12,12 @@ class TestApiSchema(APITestCase):
         Test that the schema is valid
         """
         try:
-            call_command("spectacular", "--validate", "--fail-on-warn")
+            call_command(
+                "spectacular",
+                "--validate",
+                "--fail-on-warn",
+                skip_checks=True,
+            )
         except CommandError as e:
             self.fail(f"Schema validation failed: {e}")
 

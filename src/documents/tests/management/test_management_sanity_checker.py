@@ -163,13 +163,23 @@ class TestRenderResultsSummary:
 class TestDocumentSanityCheckerCommand:
     def test_no_issues(self, sample_doc: Document) -> None:
         out = StringIO()
-        call_command("document_sanity_checker", "--no-progress-bar", stdout=out)
+        call_command(
+            "document_sanity_checker",
+            "--no-progress-bar",
+            stdout=out,
+            skip_checks=True,
+        )
         assert "No issues detected" in out.getvalue()
 
     def test_missing_original(self, sample_doc: Document) -> None:
         Path(sample_doc.source_path).unlink()
         out = StringIO()
-        call_command("document_sanity_checker", "--no-progress-bar", stdout=out)
+        call_command(
+            "document_sanity_checker",
+            "--no-progress-bar",
+            stdout=out,
+            skip_checks=True,
+        )
         output = out.getvalue()
         assert "ERROR" in output
         assert "Original of document does not exist" in output
@@ -187,7 +197,12 @@ class TestDocumentSanityCheckerCommand:
         Path(doc.thumbnail_path).touch()
 
         out = StringIO()
-        call_command("document_sanity_checker", "--no-progress-bar", stdout=out)
+        call_command(
+            "document_sanity_checker",
+            "--no-progress-bar",
+            stdout=out,
+            skip_checks=True,
+        )
         output = out.getvalue()
         assert "ERROR" in output
         assert "Checksum mismatch. Stored: abc, actual:" in output

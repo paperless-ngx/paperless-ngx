@@ -3927,7 +3927,7 @@ class CustomFieldViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
     document_count_through = CustomFieldInstance
     document_count_source_field = "field_id"
 
-    queryset = CustomField.objects.all().order_by("-created")
+    queryset = CustomField.objects.all().order_by("name")
 
 
 @extend_schema_view(

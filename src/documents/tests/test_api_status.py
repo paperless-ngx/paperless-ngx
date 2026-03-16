@@ -26,6 +26,23 @@ class TestSystemStatus(APITestCase):
         self.override = override_settings(MEDIA_ROOT=self.tmp_dir)
         self.override.enable()
 
+        # Mock slow network calls so tests don't block on real Redis/Celery timeouts.
+        # Individual tests that care about specific behaviour override these with
+        # their own @mock.patch decorators (which take precedence).
+        redis_patcher = mock.patch(
+            "redis.Redis.execute_command",
+            side_effect=Exception("Redis not available"),
+        )
+        self.mock_redis = redis_patcher.start()
+        self.addCleanup(redis_patcher.stop)
+
+        celery_patcher = mock.patch(
+            "celery.app.control.Inspect.ping",
+            side_effect=Exception("Celery not available"),
+        )
+        self.mock_celery_ping = celery_patcher.start()
+        self.addCleanup(celery_patcher.stop)
+
     def tearDown(self) -> None:
         super().tearDown()
 
