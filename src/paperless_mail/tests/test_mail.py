@@ -1665,7 +1665,7 @@ class TestManagementCommand(TestCase):
         "paperless_mail.management.commands.mail_fetcher.tasks.process_mail_accounts",
     )
     def test_mail_fetcher(self, m) -> None:
-        call_command("mail_fetcher")
+        call_command("mail_fetcher", skip_checks=True)
 
         m.assert_called_once()
 

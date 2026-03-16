@@ -28,6 +28,7 @@ from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 
 from documents.file_handling import create_source_path_directory
+from documents.file_handling import generate_filename
 from documents.file_handling import generate_unique_filename
 from documents.signals.handlers import run_workflows
 from documents.workflows.webhooks import send_webhook
@@ -904,6 +905,63 @@ class TestWorkflows(
 
         expected_str = f"Document matched {trigger} from {w}"
         self.assertIn(expected_str, cm.output[0])
+
+    def test_workflow_assign_custom_field_keeps_storage_filename_in_sync(self) -> None:
+        """
+        GIVEN:
+            - Existing document with a storage path template that depends on a custom field
+            - Existing workflow triggered on document update assigning that custom field
+        WHEN:
+            - Workflow runs for the document
+        THEN:
+            - The database filename remains aligned with the moved file on disk
+        """
+        storage_path = StoragePath.objects.create(
+            name="workflow-custom-field-path",
+            path="{{ custom_fields|get_cf_value('Custom Field 1', 'none') }}/{{ title }}",
+        )
+        doc = Document.objects.create(
+            title="workflow custom field sync",
+            mime_type="application/pdf",
+            checksum="workflow-custom-field-sync",
+            storage_path=storage_path,
+            original_filename="workflow-custom-field-sync.pdf",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=self.cf1,
+            value_text="initial",
+        )
+
+        generated = generate_unique_filename(doc)
+        destination = (settings.ORIGINALS_DIR / generated).resolve()
+        create_source_path_directory(destination)
+        shutil.copy(self.SAMPLE_DIR / "simple.pdf", destination)
+        Document.objects.filter(pk=doc.pk).update(filename=generated.as_posix())
+        doc.refresh_from_db()
+
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.ASSIGNMENT,
+            assign_custom_fields_values={self.cf1.pk: "cars"},
+        )
+        action.assign_custom_fields.add(self.cf1.pk)
+        workflow = Workflow.objects.create(
+            name="Workflow custom field filename sync",
+            order=0,
+        )
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+        workflow.save()
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        doc.refresh_from_db()
+        expected_filename = generate_filename(doc)
+        self.assertEqual(Path(doc.filename), expected_filename)
+        self.assertTrue(doc.source_path.is_file())
 
     def test_document_added_workflow(self) -> None:
         trigger = WorkflowTrigger.objects.create(

@@ -576,8 +576,8 @@ def merge(
         except Exception:
             restore_archive_serial_numbers(backup)
             raise
-        else:
-            consume_task.delay()
+    else:
+        consume_task.delay()
 
     return "OK"
 
