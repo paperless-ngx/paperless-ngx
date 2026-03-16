@@ -932,6 +932,8 @@ def run_workflows(
             if not use_overrides:
                 # limit title to 128 characters
                 document.title = document.title[:128]
+                # Make sure the filename and archive filename are accurate
+                document.refresh_from_db(fields=["filename", "archive_filename"])
                 # save first before setting tags
                 document.save()
                 document.tags.set(doc_tag_ids)
