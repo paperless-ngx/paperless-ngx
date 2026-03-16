@@ -643,6 +643,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         )
 
         mock_consume_file.assert_called()
+        consume_sig = mock_consume_file.return_value
+        consume_sig.delay.assert_called_once()
         consume_file_args, _ = mock_consume_file.call_args
         self.assertEqual(
             Path(consume_file_args[0].original_file).name,
@@ -722,6 +724,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_delete_documents.assert_called()
         consume_sig = mock_consume_file.return_value
         consume_sig.apply_async.assert_called_once()
+        consume_sig.delay.assert_not_called()
 
         consume_file_args, _ = mock_consume_file.call_args
         self.assertEqual(
