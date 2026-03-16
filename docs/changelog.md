@@ -2,6 +2,10 @@
 
 ## paperless-ngx 2.20.11
 
+### Security
+
+-   Resolve [GHSA-59xh-5vwx-4c4q](https://github.com/paperless-ngx/paperless-ngx/security/advisories/GHSA-59xh-5vwx-4c4q)
+
 ### Bug Fixes
 
 -   Fix: correct dropdown list active color in dark mode [@shamoon](https://github.com/shamoon) ([#12328](https://github.com/paperless-ngx/paperless-ngx/pull/12328))
