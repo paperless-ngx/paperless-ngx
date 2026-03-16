@@ -57,7 +57,7 @@ class TestSystemStatus(APITestCase):
         """
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertNotIn("WWW-Authenticate", response)
+        self.assertEqual(response["WWW-Authenticate"], "Token")
         normal_user = User.objects.create_user(username="normal_user")
         self.client.force_login(normal_user)
         response = self.client.get(self.ENDPOINT)

@@ -89,4 +89,5 @@ class PaperlessBasicAuthentication(authentication.BasicAuthentication):
         if auth_header.lower().startswith("basic "):
             return super().authenticate_header(request)
 
-        return None
+        # Still 401 for anonymous API access
+        return authentication.TokenAuthentication.keyword
