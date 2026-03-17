@@ -2410,6 +2410,7 @@ class TasksViewSerializer(OwnedObjectSerializer):
         duplicates = _get_viewable_duplicates(document, user)
         return list(duplicates.values("id", "title", "deleted_at"))
 
+
 class RetryTaskSerializer(serializers.Serializer):
     clean = serializers.BooleanField(
         default=False,

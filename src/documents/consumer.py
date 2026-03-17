@@ -924,6 +924,7 @@ class ConsumerPlugin(
         except Exception:  # pragma: no cover
             pass
 
+
 class ConsumerPreflightPlugin(
     NoCleanupPluginMixin,
     NoSetupPluginMixin,
