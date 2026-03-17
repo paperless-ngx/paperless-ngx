@@ -57,10 +57,17 @@ class TestSystemStatus(APITestCase):
         """
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response["WWW-Authenticate"], "Token")
         normal_user = User.objects.create_user(username="normal_user")
         self.client.force_login(normal_user)
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_system_status_with_bad_basic_auth_challenges(self) -> None:
+        self.client.credentials(HTTP_AUTHORIZATION="Basic invalid")
+        response = self.client.get(self.ENDPOINT)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response["WWW-Authenticate"], 'Basic realm="api"')
 
     def test_system_status_container_detection(self):
         """

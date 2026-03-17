@@ -83,3 +83,11 @@ class PaperlessBasicAuthentication(authentication.BasicAuthentication):
             raise exceptions.AuthenticationFailed("MFA required")
 
         return user_tuple
+
+    def authenticate_header(self, request):
+        auth_header = request.META.get("HTTP_AUTHORIZATION", "")
+        if auth_header.lower().startswith("basic "):
+            return super().authenticate_header(request)
+
+        # Still 401 for anonymous API access
+        return authentication.TokenAuthentication.keyword
