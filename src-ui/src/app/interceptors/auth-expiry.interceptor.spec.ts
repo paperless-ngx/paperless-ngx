@@ -6,6 +6,7 @@ import { AuthExpiryInterceptor } from './auth-expiry.interceptor'
 
 describe('AuthExpiryInterceptor', () => {
   let interceptor: AuthExpiryInterceptor
+  let dateNowSpy: jest.SpiedFunction<typeof Date.now>
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -13,6 +14,11 @@ describe('AuthExpiryInterceptor', () => {
     })
 
     interceptor = TestBed.inject(AuthExpiryInterceptor)
+    dateNowSpy = jest.spyOn(Date, 'now').mockReturnValue(1000)
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
   })
 
   it('reloads when an API request returns 401', () => {
@@ -109,5 +115,40 @@ describe('AuthExpiryInterceptor', () => {
     })
 
     expect(reloadSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('retries reload after cooldown for repeated API 401 responses', () => {
+    const reloadSpy = jest
+      .spyOn(navUtils, 'locationReload')
+      .mockImplementation(() => {})
+
+    dateNowSpy
+      .mockReturnValueOnce(1000)
+      .mockReturnValueOnce(2500)
+      .mockReturnValueOnce(3501)
+
+    const request = new HttpRequest('GET', '/api/documents/')
+    const handler = {
+      handle: (_request) =>
+        throwError(
+          () =>
+            new HttpErrorResponse({
+              status: 401,
+              url: '/api/documents/',
+            })
+        ),
+    }
+
+    interceptor.intercept(request, handler).subscribe({
+      error: () => undefined,
+    })
+    interceptor.intercept(request, handler).subscribe({
+      error: () => undefined,
+    })
+    interceptor.intercept(request, handler).subscribe({
+      error: () => undefined,
+    })
+
+    expect(reloadSpy).toHaveBeenCalledTimes(2)
   })
 })

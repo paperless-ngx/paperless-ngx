@@ -11,7 +11,7 @@ import { locationReload } from '../utils/navigation'
 
 @Injectable()
 export class AuthExpiryInterceptor implements HttpInterceptor {
-  private reloadTriggered = false
+  private lastReloadAttempt = Number.NEGATIVE_INFINITY
 
   intercept(
     request: HttpRequest<unknown>,
@@ -20,13 +20,15 @@ export class AuthExpiryInterceptor implements HttpInterceptor {
     return next.handle(request).pipe(
       catchError((error: unknown) => {
         if (
-          !this.reloadTriggered &&
           error instanceof HttpErrorResponse &&
           error.status === 401 &&
           request.url.includes('/api/')
         ) {
-          this.reloadTriggered = true
-          locationReload()
+          const now = Date.now()
+          if (now - this.lastReloadAttempt >= 2000) {
+            this.lastReloadAttempt = now
+            locationReload()
+          }
         }
 
         return throwError(() => error)
