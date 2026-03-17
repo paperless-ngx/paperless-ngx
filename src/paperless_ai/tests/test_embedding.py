@@ -15,6 +15,7 @@ from paperless_ai.embedding import get_embedding_model
 @pytest.fixture
 def mock_ai_config():
     with patch("paperless_ai.embedding.AIConfig") as MockAIConfig:
+        MockAIConfig.return_value.llm_allow_internal_endpoints = True
         yield MockAIConfig
 
 
@@ -75,6 +76,19 @@ def test_get_embedding_model_openai(mock_ai_config):
             api_base="http://test-url",
         )
         assert model == MockOpenAIEmbedding.return_value
+
+
+def test_get_embedding_model_openai_blocks_internal_endpoint_when_disallowed(
+    mock_ai_config,
+):
+    mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OPENAI
+    mock_ai_config.return_value.llm_embedding_model = "text-embedding-3-small"
+    mock_ai_config.return_value.llm_api_key = "test_api_key"
+    mock_ai_config.return_value.llm_endpoint = "http://127.0.0.1:11434"
+    mock_ai_config.return_value.llm_allow_internal_endpoints = False
+
+    with pytest.raises(ValueError, match="non-public address"):
+        get_embedding_model()
 
 
 def test_get_embedding_model_huggingface(mock_ai_config):

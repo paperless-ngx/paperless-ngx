@@ -1947,6 +1947,12 @@ current backend. If not supplied, defaults to "gpt-3.5-turbo" for OpenAI and "ll
 
     Defaults to None.
 
+#### [`PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS=<bool>`](#PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS) {#PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS}
+
+: If set to false, Paperless blocks AI endpoint URLs that resolve to non-public addresses (e.g., localhost, etc).
+
+    Defaults to true, which allows internal endpoints.
+
 #### [`PAPERLESS_AI_LLM_INDEX_TASK_CRON=<cron expression>`](#PAPERLESS_AI_LLM_INDEX_TASK_CRON) {#PAPERLESS_AI_LLM_INDEX_TASK_CRON}
 
 : Configures the schedule to update the AI embeddings of text content and metadata for all documents. Only performed if

@@ -12,6 +12,7 @@ from paperless_ai.client import AIClient
 def mock_ai_config():
     with patch("paperless_ai.client.AIConfig") as MockAIConfig:
         mock_config = MagicMock()
+        mock_config.llm_allow_internal_endpoints = True
         MockAIConfig.return_value = mock_config
         yield mock_config
 
@@ -57,6 +58,17 @@ def test_get_llm_openai(mock_ai_config, mock_openai_llm):
         api_key="test_api_key",
     )
     assert client.llm == mock_openai_llm.return_value
+
+
+def test_get_llm_openai_blocks_internal_endpoint_when_disallowed(mock_ai_config):
+    mock_ai_config.llm_backend = "openai"
+    mock_ai_config.llm_model = "test_model"
+    mock_ai_config.llm_api_key = "test_api_key"
+    mock_ai_config.llm_endpoint = "http://127.0.0.1:1234"
+    mock_ai_config.llm_allow_internal_endpoints = False
+
+    with pytest.raises(ValueError, match="non-public address"):
+        AIClient()
 
 
 def test_get_llm_unsupported_backend(mock_ai_config):
