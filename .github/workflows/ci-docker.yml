@@ -119,7 +119,7 @@ jobs:
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
       - name: Docker metadata
         id: docker-meta
-        uses: docker/metadata-action@v5.10.0
+        uses: docker/metadata-action@v6.0.0
         with:
           images: |
             ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}
@@ -130,7 +130,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
       - name: Build and push by digest
         id: build
-        uses: docker/build-push-action@v6.19.2
+        uses: docker/build-push-action@v7.0.0
         with:
           context: .
           file: ./Dockerfile
@@ -201,7 +201,7 @@ jobs:
           password: ${{ secrets.QUAY_ROBOT_TOKEN }}
       - name: Docker metadata
         id: docker-meta
-        uses: docker/metadata-action@v5.10.0
+        uses: docker/metadata-action@v6.0.0
         with:
           images: |
             ${{ env.REGISTRY }}/${{ needs.build-arch.outputs.repository }}
