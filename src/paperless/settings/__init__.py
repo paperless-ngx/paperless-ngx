@@ -98,7 +98,7 @@ CONSUMPTION_DIR = get_path_from_env(
     BASE_DIR.parent / "consume",
 )
 
-CONSUMPTION_FAILED_DIR = __get_path(
+CONSUMPTION_FAILED_DIR = get_path_from_env(
     "PAPERLESS_CONSUMPTION_FAILED_DIR",
     CONSUMPTION_DIR / "failed",
 )
