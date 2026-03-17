@@ -1,11 +1,13 @@
-import ipaddress
 import logging
-import socket
-from urllib.parse import urlparse
 
 import httpx
 from celery import shared_task
 from django.conf import settings
+
+from paperless.network import format_host_for_url
+from paperless.network import is_public_ip
+from paperless.network import resolve_hostname_ips
+from paperless.network import validate_outbound_http_url
 
 logger = logging.getLogger("paperless.workflows.webhooks")
 
@@ -34,23 +36,19 @@ class WebhookTransport(httpx.HTTPTransport):
             raise httpx.ConnectError("No hostname in request URL")
 
         try:
-            addr_info = socket.getaddrinfo(hostname, None)
-        except socket.gaierror as e:
-            raise httpx.ConnectError(f"Could not resolve hostname: {hostname}") from e
-
-        ips = [info[4][0] for info in addr_info if info and info[4]]
-        if not ips:
-            raise httpx.ConnectError(f"Could not resolve hostname: {hostname}")
+            ips = resolve_hostname_ips(hostname)
+        except ValueError as e:
+            raise httpx.ConnectError(str(e)) from e
 
         if not self.allow_internal:
             for ip_str in ips:
-                if not WebhookTransport.is_public_ip(ip_str):
+                if not is_public_ip(ip_str):
                     raise httpx.ConnectError(
                         f"Connection blocked: {hostname} resolves to a non-public address",
                     )
 
         ip_str = ips[0]
-        formatted_ip = self._format_ip_for_url(ip_str)
+        formatted_ip = format_host_for_url(ip_str)
 
         new_headers = httpx.Headers(request.headers)
         if "host" in new_headers:
@@ -69,40 +67,6 @@ class WebhookTransport(httpx.HTTPTransport):
 
         return super().handle_request(request)
 
-    def _format_ip_for_url(self, ip: str) -> str:
-        """
-        Format IP address for use in URL (wrap IPv6 in brackets)
-        """
-        try:
-            ip_obj = ipaddress.ip_address(ip)
-            if ip_obj.version == 6:
-                return f"[{ip}]"
-            return ip
-        except ValueError:
-            return ip
-
-    @staticmethod
-    def is_public_ip(ip: str | int) -> bool:
-        try:
-            obj = ipaddress.ip_address(ip)
-            return not (
-                obj.is_private
-                or obj.is_loopback
-                or obj.is_link_local
-                or obj.is_multicast
-                or obj.is_unspecified
-            )
-        except ValueError:  # pragma: no cover
-            return False
-
-    @staticmethod
-    def resolve_first_ip(host: str) -> str | None:
-        try:
-            info = socket.getaddrinfo(host, None)
-            return info[0][4][0] if info else None
-        except Exception:  # pragma: no cover
-            return None
-
 
 @shared_task(
     retry_backoff=True,
@@ -118,21 +82,24 @@ def send_webhook(
     *,
     as_json: bool = False,
 ):
-    p = urlparse(url)
-    if p.scheme.lower() not in settings.WEBHOOKS_ALLOWED_SCHEMES or not p.hostname:
-        logger.warning("Webhook blocked: invalid scheme/hostname")
+    try:
+        parsed = validate_outbound_http_url(
+            url,
+            allowed_schemes=settings.WEBHOOKS_ALLOWED_SCHEMES,
+            allowed_ports=settings.WEBHOOKS_ALLOWED_PORTS,
+            # Internal-address checks happen in transport to preserve ConnectError behavior.
+            allow_internal=True,
+        )
+    except ValueError as e:
+        logger.warning("Webhook blocked: %s", e)
+        raise
+
+    hostname = parsed.hostname
+    if hostname is None:  # pragma: no cover
         raise ValueError("Invalid URL scheme or hostname.")
 
-    port = p.port or (443 if p.scheme == "https" else 80)
-    if (
-        len(settings.WEBHOOKS_ALLOWED_PORTS) > 0
-        and port not in settings.WEBHOOKS_ALLOWED_PORTS
-    ):
-        logger.warning("Webhook blocked: port not permitted")
-        raise ValueError("Destination port not permitted.")
-
     transport = WebhookTransport(
-        hostname=p.hostname,
+        hostname=hostname,
         allow_internal=settings.WEBHOOKS_ALLOW_INTERNAL_REQUESTS,
     )
 

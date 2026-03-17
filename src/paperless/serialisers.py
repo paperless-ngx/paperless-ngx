@@ -6,6 +6,7 @@ from allauth.mfa.models import Authenticator
 from allauth.mfa.totp.internal.auth import TOTP
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.models import SocialApp
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
@@ -15,6 +16,7 @@ from rest_framework import serializers
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 
 from paperless.models import ApplicationConfiguration
+from paperless.network import validate_outbound_http_url
 from paperless.validators import reject_dangerous_svg
 from paperless_mail.serialisers import ObfuscatedPasswordField
 
@@ -235,6 +237,20 @@ class ApplicationConfigurationSerializer(serializers.ModelSerializer):
         if file and magic.from_buffer(file.read(2048), mime=True) == "image/svg+xml":
             reject_dangerous_svg(file)
         return file
+
+    def validate_llm_endpoint(self, value: str | None) -> str | None:
+        if not value:
+            return value
+
+        try:
+            validate_outbound_http_url(
+                value,
+                allow_internal=settings.LLM_ALLOW_INTERNAL_ENDPOINTS,
+            )
+        except ValueError as e:
+            raise serializers.ValidationError(str(e)) from e
+
+        return value
 
     class Meta:
         model = ApplicationConfiguration

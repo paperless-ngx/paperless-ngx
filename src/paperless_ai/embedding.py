@@ -12,6 +12,7 @@ from documents.models import Document
 from documents.models import Note
 from paperless.config import AIConfig
 from paperless.models import LLMEmbeddingBackend
+from paperless.network import validate_outbound_http_url
 
 
 def get_embedding_model() -> "BaseEmbedding":
@@ -21,10 +22,16 @@ def get_embedding_model() -> "BaseEmbedding":
         case LLMEmbeddingBackend.OPENAI:
             from llama_index.embeddings.openai import OpenAIEmbedding
 
+            endpoint = config.llm_endpoint or None
+            if endpoint:
+                validate_outbound_http_url(
+                    endpoint,
+                    allow_internal=config.llm_allow_internal_endpoints,
+                )
             return OpenAIEmbedding(
                 model=config.llm_embedding_model or "text-embedding-3-small",
                 api_key=config.llm_api_key,
-                api_base=config.llm_endpoint or None,
+                api_base=endpoint,
             )
         case LLMEmbeddingBackend.HUGGINGFACE:
             from llama_index.embeddings.huggingface import HuggingFaceEmbedding
