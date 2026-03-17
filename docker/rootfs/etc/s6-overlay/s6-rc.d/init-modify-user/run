@@ -2,6 +2,17 @@
 # shellcheck shell=bash
 declare -r log_prefix="[init-user]"
 
+# When the container is started as a non-root user (e.g. via `user: 999:999`
+# in Docker Compose), usermod/groupmod require root and are meaningless.
+# USERMAP_* variables only apply to the root-started path.
+if [[ -n "${USER_IS_NON_ROOT}" ]]; then
+	if [[ -n "${USERMAP_UID}" || -n "${USERMAP_GID}" ]]; then
+		echo "${log_prefix} WARNING: USERMAP_UID/USERMAP_GID are set but have no effect when the container is started as a non-root user"
+	fi
+	echo "${log_prefix} Running as non-root user ($(id --user):$(id --group)), skipping UID/GID remapping"
+	exit 0
+fi
+
 declare -r usermap_original_uid=$(id -u paperless)
 declare -r usermap_original_gid=$(id -g paperless)
 declare -r usermap_new_uid=${USERMAP_UID:-$usermap_original_uid}
