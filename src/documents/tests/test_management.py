@@ -41,7 +41,7 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         doc = self.make_models()
         shutil.copy(sample_file, Path(self.dirs.originals_dir) / f"{doc.id:07}.pdf")
 
-        call_command("document_archiver", "--processes", "1")
+        call_command("document_archiver", "--processes", "1", skip_checks=True)
 
     def test_handle_document(self) -> None:
         doc = self.make_models()
@@ -106,12 +106,12 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 class TestMakeIndex(TestCase):
     @mock.patch("documents.management.commands.document_index.index_reindex")
     def test_reindex(self, m) -> None:
-        call_command("document_index", "reindex")
+        call_command("document_index", "reindex", skip_checks=True)
         m.assert_called_once()
 
     @mock.patch("documents.management.commands.document_index.index_optimize")
     def test_optimize(self, m) -> None:
-        call_command("document_index", "optimize")
+        call_command("document_index", "optimize", skip_checks=True)
         m.assert_called_once()
 
 
@@ -128,7 +128,7 @@ class TestRenamer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         Path(doc.archive_path).touch()
 
         with override_settings(FILENAME_FORMAT="{correspondent}/{title}"):
-            call_command("document_renamer")
+            call_command("document_renamer", skip_checks=True)
 
         doc2 = Document.objects.get(id=doc.id)
 
@@ -147,7 +147,7 @@ class TestCreateClassifier:
             "documents.management.commands.document_create_classifier.train_classifier",
         )
 
-        call_command("document_create_classifier", "--skip-checks")
+        call_command("document_create_classifier", skip_checks=True)
 
         m.assert_called_once_with(scheduled=False, status_callback=mocker.ANY)
         assert callable(m.call_args.kwargs["status_callback"])
@@ -164,7 +164,7 @@ class TestCreateClassifier:
         m.side_effect = invoke_callback
 
         stdout = StringIO()
-        call_command("document_create_classifier", "--skip-checks", stdout=stdout)
+        call_command("document_create_classifier", skip_checks=True, stdout=stdout)
 
         assert "Vectorizing document content..." in stdout.getvalue()
 
@@ -176,7 +176,7 @@ class TestConvertMariaDBUUID(TestCase):
         m.alter_field.return_value = None
 
         stdout = StringIO()
-        call_command("convert_mariadb_uuid", stdout=stdout)
+        call_command("convert_mariadb_uuid", stdout=stdout, skip_checks=True)
 
         m.assert_called_once()
 
@@ -191,6 +191,6 @@ class TestPruneAuditLogs(TestCase):
             object_id=1,
             action=LogEntry.Action.CREATE,
         )
-        call_command("prune_audit_logs")
+        call_command("prune_audit_logs", skip_checks=True)
 
         self.assertEqual(LogEntry.objects.count(), 0)
