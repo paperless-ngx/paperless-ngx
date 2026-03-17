@@ -194,8 +194,10 @@ class ParserRegistry:
         at runtime regardless of registration order.
         """
         from paperless.parsers.text import TextDocumentParser
+        from paperless.parsers.tika import TikaDocumentParser
 
         self.register_builtin(TextDocumentParser)
+        self.register_builtin(TikaDocumentParser)
 
     # ------------------------------------------------------------------
     # Discovery

@@ -52,6 +52,7 @@ from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
 from paperless.parsers.text import TextDocumentParser
+from paperless.parsers.tika import TikaDocumentParser
 from paperless_mail.parsers import MailDocumentParser
 
 LOGGING_NAME: Final[str] = "paperless.consumer"
@@ -67,7 +68,7 @@ def _parser_cleanup(parser: DocumentParser) -> None:
 
     TODO(stumpylog): Remove me in the future
     """
-    if isinstance(parser, TextDocumentParser):
+    if isinstance(parser, (TextDocumentParser, TikaDocumentParser)):
         parser.__exit__(None, None, None)
     else:
         parser.cleanup()
@@ -448,6 +449,12 @@ class ConsumerPlugin(
             progress_callback=progress_callback,
         )
 
+        # New-style parsers use __enter__/__exit__ for resource management.
+        # _parser_cleanup (below) handles __exit__; call __enter__ here.
+        # TODO(stumpylog): Remove me in the future
+        if isinstance(document_parser, (TextDocumentParser, TikaDocumentParser)):
+            document_parser.__enter__()
+
         self.log.debug(f"Parser: {type(document_parser).__name__}")
 
         # Parse the document. This may take some time.
@@ -476,7 +483,7 @@ class ConsumerPlugin(
                     self.filename,
                     self.input_doc.mailrule_id,
                 )
-            elif isinstance(document_parser, TextDocumentParser):
+            elif isinstance(document_parser, (TextDocumentParser, TikaDocumentParser)):
                 # TODO(stumpylog): Remove me in the future
                 document_parser.parse(self.working_copy, mime_type)
             else:
@@ -489,7 +496,7 @@ class ConsumerPlugin(
                 ProgressStatusOptions.WORKING,
                 ConsumerStatusShortMessage.GENERATING_THUMBNAIL,
             )
-            if isinstance(document_parser, TextDocumentParser):
+            if isinstance(document_parser, (TextDocumentParser, TikaDocumentParser)):
                 # TODO(stumpylog): Remove me in the future
                 thumbnail = document_parser.get_thumbnail(self.working_copy, mime_type)
             else:
