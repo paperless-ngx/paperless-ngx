@@ -133,8 +133,21 @@ def get_boolean(boolstr: str) -> bool:
 
 def compute_checksum(path: Path, chunk_size: int = 65536) -> str:
     """
-    Return the SHA256 hex digest of the file at *path*, reading in chunks
-    of *chunk_size* bytes to avoid loading the entire file into memory.
+    Compute the SHA-256 checksum of a file.
+
+    Reads the file in chunks to avoid loading the entire file into memory.
+
+    Args:
+        path (Path): Path to the file to hash.
+        chunk_size (int, optional): Number of bytes to read per chunk.
+            Defaults to 65536.
+
+    Returns:
+        str: Hexadecimal SHA-256 digest of the file contents.
+
+    Raises:
+        FileNotFoundError: If the file does not exist.
+        OSError: If the file cannot be read.
     """
     h = hashlib.sha256()
     with path.open("rb") as f:
