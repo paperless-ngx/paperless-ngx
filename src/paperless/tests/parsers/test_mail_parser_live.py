@@ -159,7 +159,7 @@ class TestParserLive:
             - The returned thumbnail image file shall match the expected hash
         """
         mock_generate_pdf = mocker.patch(
-            "paperless_mail.parsers.MailDocumentParser.generate_pdf",
+            "paperless.parsers.mail.MailDocumentParser.generate_pdf",
         )
         mock_generate_pdf.return_value = simple_txt_email_pdf_file
 
@@ -216,10 +216,10 @@ class TestParserLive:
             - The merged PDF shall contain text from both source PDFs
         """
         mock_generate_pdf_from_html = mocker.patch(
-            "paperless_mail.parsers.MailDocumentParser.generate_pdf_from_html",
+            "paperless.parsers.mail.MailDocumentParser.generate_pdf_from_html",
         )
         mock_generate_pdf_from_mail = mocker.patch(
-            "paperless_mail.parsers.MailDocumentParser.generate_pdf_from_mail",
+            "paperless.parsers.mail.MailDocumentParser.generate_pdf_from_mail",
         )
         mock_generate_pdf_from_mail.return_value = merged_pdf_first
         mock_generate_pdf_from_html.return_value = merged_pdf_second

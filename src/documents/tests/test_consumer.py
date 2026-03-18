@@ -35,8 +35,8 @@ from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import GetConsumerMixin
+from paperless.parsers.mail import MailDocumentParser
 from paperless_mail.models import MailRule
-from paperless_mail.parsers import MailDocumentParser
 
 
 class _BaseTestParser(DocumentParser):
@@ -1091,7 +1091,7 @@ class TestConsumer(
             self.assertEqual(command[1], "--replace-input")
 
     @mock.patch("paperless_mail.models.MailRule.objects.get")
-    @mock.patch("paperless_mail.parsers.MailDocumentParser.parse")
+    @mock.patch("paperless.parsers.mail.MailDocumentParser.parse")
     @mock.patch("documents.parsers.document_consumer_declaration.send")
     def test_mail_parser_receives_mailrule(
         self,
@@ -1123,9 +1123,10 @@ class TestConsumer(
         with self.get_consumer(
             filepath=(
                 Path(__file__).parent.parent.parent
-                / Path("paperless_mail")
+                / Path("paperless")
                 / Path("tests")
                 / Path("samples")
+                / Path("mail")
             ).resolve()
             / "html.eml",
             source=DocumentSource.MailFetch,

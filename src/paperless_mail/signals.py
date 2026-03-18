@@ -1,5 +1,5 @@
 def get_parser(*args, **kwargs):
-    from paperless_mail.parsers import MailDocumentParser
+    from paperless.parsers.mail import MailDocumentParser
 
     return MailDocumentParser(*args, **kwargs)
 

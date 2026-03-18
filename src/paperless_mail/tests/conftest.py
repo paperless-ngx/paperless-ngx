@@ -3,14 +3,20 @@ from pathlib import Path
 
 import pytest
 
+from paperless.parsers.mail import MailDocumentParser
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.models import MailAccount
-from paperless_mail.parsers import MailDocumentParser
 
 
 @pytest.fixture(scope="session")
 def sample_dir() -> Path:
-    return (Path(__file__).parent / Path("samples")).resolve()
+    return (
+        Path(__file__).parent.parent.parent
+        / Path("paperless")
+        / Path("tests")
+        / Path("samples")
+        / Path("mail")
+    ).resolve()
 
 
 @pytest.fixture(scope="session")
@@ -64,8 +70,9 @@ def merged_pdf_second(sample_dir: Path) -> Path:
 
 
 @pytest.fixture()
-def mail_parser() -> MailDocumentParser:
-    return MailDocumentParser(logging_group=None)
+def mail_parser() -> Generator[MailDocumentParser, None, None]:
+    with MailDocumentParser() as parser:
+        yield parser
 
 
 @pytest.fixture()

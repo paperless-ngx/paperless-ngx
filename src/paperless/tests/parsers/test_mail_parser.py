@@ -24,7 +24,7 @@ class TestEmailFileParsing:
     def test_parse_error_missing_file(
         self,
         mail_parser: MailDocumentParser,
-        sample_dir: Path,
+        mail_samples_dir: Path,
     ) -> None:
         """
         GIVEN:
@@ -35,7 +35,7 @@ class TestEmailFileParsing:
             - An Exception is thrown
         """
         # Check if exception is raised when parsing fails.
-        test_file = sample_dir / "doesntexist.eml"
+        test_file = mail_samples_dir / "doesntexist.eml"
 
         assert not test_file.exists()
 
@@ -246,12 +246,12 @@ class TestEmailThumbnailGenerate:
         """
         mocked_return = "Passing the return value through.."
         mock_make_thumbnail_from_pdf = mocker.patch(
-            "paperless_mail.parsers.make_thumbnail_from_pdf",
+            "paperless.parsers.mail.make_thumbnail_from_pdf",
         )
         mock_make_thumbnail_from_pdf.return_value = mocked_return
 
         mock_generate_pdf = mocker.patch(
-            "paperless_mail.parsers.MailDocumentParser.generate_pdf",
+            "paperless.parsers.mail.MailDocumentParser.generate_pdf",
         )
         mock_generate_pdf.return_value = "Mocked return value.."
 
@@ -260,8 +260,7 @@ class TestEmailThumbnailGenerate:
         mock_generate_pdf.assert_called_once()
         mock_make_thumbnail_from_pdf.assert_called_once_with(
             "Mocked return value..",
-            mail_parser.tempdir,
-            None,
+            mail_parser._tempdir,
         )
 
         assert mocked_return == thumb
@@ -373,7 +372,7 @@ class TestParser:
         """
         # Validate parsing returns the expected results
         mock_generate_pdf = mocker.patch(
-            "paperless_mail.parsers.MailDocumentParser.generate_pdf",
+            "paperless.parsers.mail.MailDocumentParser.generate_pdf",
         )
 
         mail_parser.parse(simple_txt_email_file, "message/rfc822")
@@ -385,7 +384,7 @@ class TestParser:
             "BCC: fdf@fvf.de\n\n"
             "\n\nThis is just a simple Text Mail."
         )
-        assert text_expected == mail_parser.text
+        assert text_expected == mail_parser.get_text()
         assert (
             datetime.datetime(
                 2022,
@@ -396,7 +395,7 @@ class TestParser:
                 43,
                 tzinfo=datetime.timezone(datetime.timedelta(seconds=7200)),
             )
-            == mail_parser.date
+            == mail_parser.get_date()
         )
 
         # Just check if tried to generate archive, the unittest for generate_pdf() goes deeper.
@@ -419,7 +418,7 @@ class TestParser:
         """
 
         mock_generate_pdf = mocker.patch(
-            "paperless_mail.parsers.MailDocumentParser.generate_pdf",
+            "paperless.parsers.mail.MailDocumentParser.generate_pdf",
         )
 
         # Validate parsing returns the expected results
@@ -443,7 +442,7 @@ class TestParser:
         mail_parser.parse(html_email_file, "message/rfc822")
 
         mock_generate_pdf.assert_called_once()
-        assert text_expected == mail_parser.text
+        assert text_expected == mail_parser.get_text()
         assert (
             datetime.datetime(
                 2022,
@@ -454,7 +453,7 @@ class TestParser:
                 19,
                 tzinfo=datetime.timezone(datetime.timedelta(seconds=7200)),
             )
-            == mail_parser.date
+            == mail_parser.get_date()
         )
 
     def test_generate_pdf_parse_error(
@@ -501,7 +500,7 @@ class TestParser:
 
         mail_parser.parse(simple_txt_email_file, "message/rfc822")
 
-        assert mail_parser.archive_path is not None
+        assert mail_parser.get_archive_path() is not None
 
     @pytest.mark.httpx_mock(can_send_already_matched_responses=True)
     def test_generate_pdf_html_email(
@@ -542,7 +541,7 @@ class TestParser:
         )
         mail_parser.parse(html_email_file, "message/rfc822")
 
-        assert mail_parser.archive_path is not None
+        assert mail_parser.get_archive_path() is not None
 
     def test_generate_pdf_html_email_html_to_pdf_failure(
         self,
@@ -712,10 +711,10 @@ class TestParser:
 
         def test_layout_option(layout_option, expected_calls, expected_pdf_names):
             mock_mailrule_get.return_value = mock.Mock(pdf_layout=layout_option)
+            mail_parser.mailrule_id = 1
             mail_parser.parse(
                 document_path=html_email_file,
                 mime_type="message/rfc822",
-                mailrule_id=1,
             )
             args, _ = mock_merge_route.call_args
             assert len(args[0]) == expected_calls
