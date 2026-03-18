@@ -35,7 +35,6 @@ from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import GetConsumerMixin
-from paperless.parsers.mail import MailDocumentParser
 from paperless_mail.models import MailRule
 
 
@@ -1107,11 +1106,13 @@ class TestConsumer(
         THEN:
             - The mail parser should receive the mail rule
         """
+        from paperless_mail.signals import get_parser as mail_get_parser
+
         mock_consumer_declaration_send.return_value = [
             (
                 None,
                 {
-                    "parser": MailDocumentParser,
+                    "parser": mail_get_parser,
                     "mime_types": {"message/rfc822": ".eml"},
                     "weight": 0,
                 },
@@ -1137,12 +1138,10 @@ class TestConsumer(
                 ConsumerError,
             ):
                 consumer.run()
-                mock_mail_parser_parse.assert_called_once_with(
-                    consumer.working_copy,
-                    "message/rfc822",
-                    file_name="sample.pdf",
-                    mailrule=mock_mailrule_get.return_value,
-                )
+            mock_mail_parser_parse.assert_called_once_with(
+                consumer.working_copy,
+                "message/rfc822",
+            )
 
 
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
