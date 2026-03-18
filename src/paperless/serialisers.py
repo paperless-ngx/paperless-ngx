@@ -248,7 +248,9 @@ class ApplicationConfigurationSerializer(serializers.ModelSerializer):
                 allow_internal=settings.LLM_ALLOW_INTERNAL_ENDPOINTS,
             )
         except ValueError as e:
-            raise serializers.ValidationError(str(e)) from e
+            raise serializers.ValidationError(
+                f"Invalid LLM endpoint: {e.args[0]}, see logs for details",
+            ) from e
 
         return value
 
