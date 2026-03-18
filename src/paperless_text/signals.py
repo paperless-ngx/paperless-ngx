@@ -1,4 +1,9 @@
-def get_parser(*args, **kwargs):
+from __future__ import annotations
+
+from typing import Any
+
+
+def get_parser(*args: Any, **kwargs: Any) -> Any:
     from paperless.parsers.text import TextDocumentParser
 
     # TextDocumentParser accepts logging_group for constructor compatibility but
@@ -9,10 +14,10 @@ def get_parser(*args, **kwargs):
     # path with the new ParserRegistry so the shim can be removed at that point.
     kwargs.pop("logging_group", None)
     kwargs.pop("progress_callback", None)
-    return TextDocumentParser()
+    return TextDocumentParser(*args, **kwargs)
 
 
-def text_consumer_declaration(sender, **kwargs):
+def text_consumer_declaration(sender: Any, **kwargs: Any) -> dict[str, Any]:
     return {
         "parser": get_parser,
         "weight": 10,
