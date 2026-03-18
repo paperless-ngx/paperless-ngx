@@ -12,7 +12,7 @@ from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
 
 from documents.parsers import ParseError
-from paperless_mail.parsers import MailDocumentParser
+from paperless.parsers.mail import MailDocumentParser
 
 
 class TestEmailFileParsing:

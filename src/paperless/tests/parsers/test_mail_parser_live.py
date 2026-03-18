@@ -11,7 +11,7 @@ from PIL import Image
 from pytest_mock import MockerFixture
 
 from documents.tests.utils import util_call_with_backoff
-from paperless_mail.parsers import MailDocumentParser
+from paperless.parsers.mail import MailDocumentParser
 
 
 def extract_text(pdf_path: Path) -> str:
