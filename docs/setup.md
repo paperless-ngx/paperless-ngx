@@ -140,24 +140,17 @@ a [superuser](usage.md#superusers) account.
 
 !!! warning
 
-    It is currently not possible to run the container rootless if additional languages are specified via `PAPERLESS_OCR_LANGUAGES`.
+    It is not possible to run the container rootless if additional languages are specified via `PAPERLESS_OCR_LANGUAGES`.
 
-If you want to run Paperless as a rootless container, make this
-change in `docker-compose.yml`:
+If you want to run Paperless as a rootless container, set `user:` in `docker-compose.yml` to the UID and GID of your host user (use `id -u` and `id -g` to find these values). The container process starts directly as that user with no internal privilege remapping:
 
--   Set the `user` running the container to map to the `paperless`
-    user in the container. This value (`user_id` below) should be
-    the same ID that `USERMAP_UID` and `USERMAP_GID` are set to in
-    `docker-compose.env`. See `USERMAP_UID` and `USERMAP_GID`
-    [here](configuration.md#docker).
+```yaml
+webserver:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    user: '1000:1000'
+```
 
-Your entry for Paperless should contain something like:
-
-> ```
-> webserver:
->   image: ghcr.io/paperless-ngx/paperless-ngx:latest
->   user: <user_id>
-> ```
+Do not combine this with `USERMAP_UID` or `USERMAP_GID`, which are intended for the non-rootless case described in step 3.
 
 **File systems without inotify support (e.g. NFS)**
 
