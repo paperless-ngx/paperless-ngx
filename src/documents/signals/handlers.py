@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import logging
 import shutil
 from pathlib import Path
@@ -391,6 +392,14 @@ class CannotMoveFilesException(Exception):
     pass
 
 
+def _path_matches_checksum(path: Path, checksum: str | None) -> bool:
+    if checksum is None or not path.is_file():
+        return False
+
+    with path.open("rb") as f:
+        return hashlib.md5(f.read()).hexdigest() == checksum
+
+
 def _filename_template_uses_custom_fields(doc: Document) -> bool:
     template = None
     if doc.storage_path is not None:
@@ -461,10 +470,12 @@ def update_filename_and_move_files(
             old_filename = instance.filename
             old_source_path = instance.source_path
             move_original = False
+            original_already_moved = False
 
             old_archive_filename = instance.archive_filename
             old_archive_path = instance.archive_path
             move_archive = False
+            archive_already_moved = False
 
             candidate_filename = generate_filename(instance)
             if len(str(candidate_filename)) > Document.MAX_STORED_FILENAME_LENGTH:
@@ -485,14 +496,23 @@ def update_filename_and_move_files(
                 candidate_source_path.exists()
                 and candidate_source_path != old_source_path
             ):
-                # Only fall back to unique search when there is an actual conflict
-                new_filename = generate_unique_filename(instance)
+                if not old_source_path.is_file() and _path_matches_checksum(
+                    candidate_source_path,
+                    instance.checksum,
+                ):
+                    new_filename = candidate_filename
+                    original_already_moved = True
+                else:
+                    # Only fall back to unique search when there is an actual conflict
+                    new_filename = generate_unique_filename(instance)
             else:
                 new_filename = candidate_filename
 
             # Need to convert to string to be able to save it to the db
             instance.filename = str(new_filename)
-            move_original = old_filename != instance.filename
+            move_original = (
+                old_filename != instance.filename and not original_already_moved
+            )
 
             if instance.has_archive_version:
                 archive_candidate = generate_filename(instance, archive_filename=True)
@@ -513,24 +533,38 @@ def update_filename_and_move_files(
                     archive_candidate_path.exists()
                     and archive_candidate_path != old_archive_path
                 ):
-                    new_archive_filename = generate_unique_filename(
-                        instance,
-                        archive_filename=True,
-                    )
+                    if not old_archive_path.is_file() and _path_matches_checksum(
+                        archive_candidate_path,
+                        instance.archive_checksum,
+                    ):
+                        new_archive_filename = archive_candidate
+                        archive_already_moved = True
+                    else:
+                        new_archive_filename = generate_unique_filename(
+                            instance,
+                            archive_filename=True,
+                        )
                 else:
                     new_archive_filename = archive_candidate
 
                 instance.archive_filename = str(new_archive_filename)
 
-                move_archive = old_archive_filename != instance.archive_filename
+                move_archive = (
+                    old_archive_filename != instance.archive_filename
+                    and not archive_already_moved
+                )
             else:
                 move_archive = False
 
             if not move_original and not move_archive:
-                # Just update modified. Also, don't save() here to prevent infinite recursion.
-                Document.objects.filter(pk=instance.pk).update(
-                    modified=timezone.now(),
-                )
+                updates = {"modified": timezone.now()}
+                if old_filename != instance.filename:
+                    updates["filename"] = instance.filename
+                if old_archive_filename != instance.archive_filename:
+                    updates["archive_filename"] = instance.archive_filename
+
+                # Don't save() here to prevent infinite recursion.
+                Document.objects.filter(pk=instance.pk).update(**updates)
                 return
 
             if move_original:
