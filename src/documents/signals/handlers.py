@@ -833,10 +833,25 @@ def run_workflows(
             if not use_overrides:
                 # limit title to 128 characters
                 document.title = document.title[:128]
-                # Make sure the filename and archive filename are accurate
-                document.refresh_from_db(fields=["filename", "archive_filename"])
-                # save first before setting tags
-                document.save()
+                # Save only the fields that workflow actions can set directly.
+                # Deliberately excludes filename and archive_filename — those are
+                # managed exclusively by update_filename_and_move_files via the
+                # post_save signal. Writing stale in-memory values here would revert
+                # a concurrent update_filename_and_move_files DB write, leaving the
+                # DB pointing at the old path while the file is already at the new
+                # one (see: https://github.com/paperless-ngx/paperless-ngx/issues/12386).
+                # modified has auto_now=True but is not auto-added when update_fields
+                # is specified, so it must be listed explicitly.
+                document.save(
+                    update_fields=[
+                        "title",
+                        "correspondent",
+                        "document_type",
+                        "storage_path",
+                        "owner",
+                        "modified",
+                    ],
+                )
                 document.tags.set(doc_tag_ids)
 
             WorkflowRun.objects.create(

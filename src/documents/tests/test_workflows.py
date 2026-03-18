@@ -956,6 +956,64 @@ class TestWorkflows(
         self.assertEqual(Path(doc.filename), expected_filename)
         self.assertTrue(doc.source_path.is_file())
 
+    def test_workflow_document_updated_does_not_overwrite_filename(self) -> None:
+        """
+        GIVEN:
+            - A document whose filename has been updated in the DB by a concurrent
+              bulk_update_documents task (simulating update_filename_and_move_files
+              completing and writing the new filename to the DB)
+            - A stale in-memory document instance still holding the old filename
+            - An active DOCUMENT_UPDATED workflow
+        WHEN:
+            - run_workflows is called with the stale in-memory instance
+              (as would happen in the second concurrent bulk_update_documents task)
+        THEN:
+            - The DB filename is NOT overwritten with the stale in-memory value
+              (regression test for GH #12386 — the race window between
+              refresh_from_db and document.save in run_workflows)
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.ASSIGNMENT,
+            assign_title="Updated by workflow",
+        )
+        workflow = Workflow.objects.create(name="Race condition test workflow", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+        workflow.save()
+
+        doc = Document.objects.create(
+            title="race condition test",
+            mime_type="application/pdf",
+            checksum="racecondition123",
+            original_filename="old.pdf",
+            filename="old/path/old.pdf",
+        )
+
+        # Simulate BUD-1 completing update_filename_and_move_files:
+        # the DB now holds the new filename while BUD-2's in-memory instance is stale.
+        new_filename = "new/path/new.pdf"
+        Document.global_objects.filter(pk=doc.pk).update(filename=new_filename)
+
+        # The stale instance still has filename="old/path/old.pdf" in memory.
+        # Mock refresh_from_db so the stale value persists through run_workflows,
+        # replicating the race window between refresh and save.
+        # Mock update_filename_and_move_files to prevent file-not-found errors
+        # since we are only testing DB state here.
+        with (
+            mock.patch(
+                "documents.signals.handlers.update_filename_and_move_files",
+            ),
+            mock.patch.object(Document, "refresh_from_db"),
+        ):
+            run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        # The DB filename must not have been reverted to the stale old value.
+        doc.refresh_from_db()
+        self.assertEqual(doc.filename, new_filename)
+
     def test_document_added_workflow(self):
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
