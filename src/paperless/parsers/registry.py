@@ -195,9 +195,11 @@ class ParserRegistry:
         """
         from paperless.parsers.remote import RemoteDocumentParser
         from paperless.parsers.text import TextDocumentParser
+        from paperless.parsers.tika import TikaDocumentParser
 
         self.register_builtin(TextDocumentParser)
         self.register_builtin(RemoteDocumentParser)
+        self.register_builtin(TikaDocumentParser)
 
     # ------------------------------------------------------------------
     # Discovery

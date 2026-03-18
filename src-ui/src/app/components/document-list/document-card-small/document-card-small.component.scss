@@ -72,4 +72,14 @@ a {
   max-width: 80%;
   row-gap: .2rem;
   line-height: 1;
+
+  &.tags-no-wrap {
+    ::ng-deep .badge {
+      display: inline-block;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
 }

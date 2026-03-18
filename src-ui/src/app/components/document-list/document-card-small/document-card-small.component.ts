@@ -126,6 +126,7 @@ export class DocumentCardSmallComponent
       this.moreTags = this.document.tags.length - (limit - 1)
       return this.document.tags.slice(0, limit - 1)
     } else {
+      this.moreTags = null
       return this.document.tags
     }
   }

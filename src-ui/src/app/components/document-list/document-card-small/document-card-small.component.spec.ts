@@ -82,6 +82,16 @@ describe('DocumentCardSmallComponent', () => {
     ).toHaveLength(6)
   })
 
+  it('should clear hidden tag counter when tag count falls below the limit', () => {
+    expect(component.moreTags).toEqual(3)
+
+    component.document.tags = [1, 2, 3, 4, 5, 6]
+    fixture.detectChanges()
+
+    expect(component.moreTags).toBeNull()
+    expect(fixture.nativeElement.textContent).not.toContain('+ 3')
+  })
+
   it('should try to close the preview on mouse leave', () => {
     component.popupPreview = {
       close: jest.fn(),
