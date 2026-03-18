@@ -1,4 +1,5 @@
 import datetime
+import hashlib
 import logging
 import tempfile
 from pathlib import Path
@@ -165,6 +166,52 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 settings.ORIGINALS_DIR / "none" / "none.pdf",
             )
             self.assertEqual(document.filename, "none/none.pdf")
+
+    @override_settings(FILENAME_FORMAT=None)
+    def test_stale_save_recovers_already_moved_files(self) -> None:
+        old_storage_path = StoragePath.objects.create(
+            name="old-path",
+            path="old/{{title}}",
+        )
+        new_storage_path = StoragePath.objects.create(
+            name="new-path",
+            path="new/{{title}}",
+        )
+        original_bytes = b"original"
+        archive_bytes = b"archive"
+
+        doc = Document.objects.create(
+            title="document",
+            mime_type="application/pdf",
+            checksum=hashlib.md5(original_bytes).hexdigest(),
+            archive_checksum=hashlib.md5(archive_bytes).hexdigest(),
+            filename="old/document.pdf",
+            archive_filename="old/document.pdf",
+            storage_path=old_storage_path,
+        )
+        create_source_path_directory(doc.source_path)
+        doc.source_path.write_bytes(original_bytes)
+        create_source_path_directory(doc.archive_path)
+        doc.archive_path.write_bytes(archive_bytes)
+
+        stale_doc = Document.objects.get(pk=doc.pk)
+        fresh_doc = Document.objects.get(pk=doc.pk)
+        fresh_doc.storage_path = new_storage_path
+        fresh_doc.save()
+        doc.refresh_from_db()
+        self.assertEqual(doc.filename, "new/document.pdf")
+        self.assertEqual(doc.archive_filename, "new/document.pdf")
+
+        stale_doc.storage_path = new_storage_path
+        stale_doc.save()
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.filename, "new/document.pdf")
+        self.assertEqual(doc.archive_filename, "new/document.pdf")
+        self.assertIsFile(doc.source_path)
+        self.assertIsFile(doc.archive_path)
+        self.assertIsNotFile(settings.ORIGINALS_DIR / "old" / "document.pdf")
+        self.assertIsNotFile(settings.ARCHIVE_DIR / "old" / "document.pdf")
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_document_delete(self):
