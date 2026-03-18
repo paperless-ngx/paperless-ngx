@@ -50,7 +50,7 @@ repos:
           - 'prettier-plugin-organize-imports@4.3.0'
   # Python hooks
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.5
+    rev: v0.15.6
     hooks:
       - id: ruff-check
       - id: ruff-format
