@@ -314,3 +314,11 @@ def mail_parser() -> Generator[MailDocumentParser, None, None]:
     """
     with MailDocumentParser() as parser:
         yield parser
+
+
+@pytest.fixture(scope="session")
+def nginx_base_url() -> Generator[str, None, None]:
+    """
+    The base URL for the nginx HTTP server we expect to be alive
+    """
+    yield "http://localhost:8080"
