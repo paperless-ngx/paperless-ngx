@@ -1,9 +1,10 @@
 import json
+from pathlib import Path
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
-from django.conf import settings
+from pytest_django.fixtures import SettingsWrapper
 
 from documents.models import Document
 from paperless.models import LLMEmbeddingBackend
@@ -20,11 +21,9 @@ def mock_ai_config():
 
 
 @pytest.fixture
-def temp_llm_index_dir(tmp_path):
-    original_dir = settings.LLM_INDEX_DIR
+def temp_llm_index_dir(tmp_path: Path, settings: SettingsWrapper):
     settings.LLM_INDEX_DIR = tmp_path
-    yield tmp_path
-    settings.LLM_INDEX_DIR = original_dir
+    return tmp_path
 
 
 @pytest.fixture
