@@ -13,7 +13,63 @@ from pytest_mock import MockerFixture
 
 from documents.parsers import ParseError
 from paperless.parsers import ParserContext
+from paperless.parsers import ParserProtocol
 from paperless.parsers.mail import MailDocumentParser
+
+
+class TestMailParserProtocol:
+    """Verify that MailDocumentParser satisfies the ParserProtocol contract."""
+
+    def test_isinstance_satisfies_protocol(
+        self,
+        mail_parser: MailDocumentParser,
+    ) -> None:
+        assert isinstance(mail_parser, ParserProtocol)
+
+    def test_supported_mime_types(self) -> None:
+        mime_types = MailDocumentParser.supported_mime_types()
+        assert isinstance(mime_types, dict)
+        assert "message/rfc822" in mime_types
+
+    @pytest.mark.parametrize(
+        ("mime_type", "expected"),
+        [
+            ("message/rfc822", 10),
+            ("application/pdf", None),
+            ("text/plain", None),
+        ],
+    )
+    def test_score(self, mime_type: str, expected: int | None) -> None:
+        assert MailDocumentParser.score(mime_type, "email.eml") == expected
+
+    def test_can_produce_archive_is_false(
+        self,
+        mail_parser: MailDocumentParser,
+    ) -> None:
+        assert mail_parser.can_produce_archive is False
+
+    def test_requires_pdf_rendition_is_true(
+        self,
+        mail_parser: MailDocumentParser,
+    ) -> None:
+        assert mail_parser.requires_pdf_rendition is True
+
+    def test_get_page_count_returns_none_without_archive(
+        self,
+        mail_parser: MailDocumentParser,
+        html_email_file: Path,
+    ) -> None:
+        assert mail_parser.get_page_count(html_email_file, "message/rfc822") is None
+
+    def test_get_page_count_returns_int_with_pdf_archive(
+        self,
+        mail_parser: MailDocumentParser,
+        simple_txt_email_pdf_file: Path,
+    ) -> None:
+        mail_parser._archive_path = simple_txt_email_pdf_file
+        count = mail_parser.get_page_count(simple_txt_email_pdf_file, "message/rfc822")
+        assert isinstance(count, int)
+        assert count > 0
 
 
 class TestEmailFileParsing:
