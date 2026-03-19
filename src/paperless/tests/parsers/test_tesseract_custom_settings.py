@@ -2,7 +2,6 @@ import json
 
 from django.test import TestCase
 from django.test import override_settings
-from paperless_tesseract.parsers import RasterisedDocumentParser
 
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
@@ -11,6 +10,7 @@ from paperless.models import CleanChoices
 from paperless.models import ColorConvertChoices
 from paperless.models import ModeChoices
 from paperless.models import OutputTypeChoices
+from paperless.parsers.tesseract import RasterisedDocumentParser
 
 
 class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCase):

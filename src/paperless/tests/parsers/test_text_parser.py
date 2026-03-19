@@ -256,6 +256,9 @@ class TestTextParserRegistry:
         from paperless.parsers.registry import get_parser_registry
 
         registry = get_parser_registry()
-        parser_cls = registry.get_parser_for_file("application/pdf", "doc.pdf")
+        parser_cls = registry.get_parser_for_file(
+            "application/x-unknown-format",
+            "doc.xyz",
+        )
 
         assert parser_cls is None
