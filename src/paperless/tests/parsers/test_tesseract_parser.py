@@ -8,13 +8,13 @@ from unittest import mock
 from django.test import TestCase
 from django.test import override_settings
 from ocrmypdf import SubprocessOutputError
+from paperless_tesseract.parsers import RasterisedDocumentParser
+from paperless_tesseract.parsers import post_process_text
 
 from documents.parsers import ParseError
 from documents.parsers import run_convert
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
-from paperless_tesseract.parsers import RasterisedDocumentParser
-from paperless_tesseract.parsers import post_process_text
 
 
 class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
@@ -35,8 +35,8 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             ("simple     string", "simple string"),
             ("simple    newline\n   testing string", "simple newline\ntesting string"),
             (
-                "utf-8   строка с пробелами в конце  ",
-                "utf-8 строка с пробелами в конце",
+                "utf-8   строка с пробелами в конце  ",  # noqa: RUF001
+                "utf-8 строка с пробелами в конце",  # noqa: RUF001
             ),
         ]
 
@@ -690,10 +690,10 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertContainsStrings(
             parser.get_text(),
             [
-                "This is the text that appears on the first page. It’s a lot of text.",
+                "This is the text that appears on the first page. It\u2019s a lot of text.",
                 "Even if the pages are rotated, OCRmyPDF still gets the job done.",
                 "This is a really weird file with lots of nonsense text.",
-                "If you read this, it’s your own fault. Also check your screen orientation.",
+                "If you read this, it\u2019s your own fault. Also check your screen orientation.",
             ],
         )
 

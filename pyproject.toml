@@ -248,9 +248,7 @@ lint.per-file-ignores."docker/wait-for-redis.py" = [
 lint.per-file-ignores."src/documents/models.py" = [
   "SIM115",
 ]
-lint.per-file-ignores."src/paperless_tesseract/tests/test_parser.py" = [
-  "RUF001",
-]
+
 lint.isort.force-single-line = true
 
 [tool.codespell]
