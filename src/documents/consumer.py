@@ -51,6 +51,7 @@ from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
+from paperless.parsers import ParserContext
 from paperless.parsers.mail import MailDocumentParser
 from paperless.parsers.text import TextDocumentParser
 from paperless.parsers.tika import TikaDocumentParser
@@ -473,16 +474,14 @@ class ConsumerPlugin(
                 ConsumerStatusShortMessage.PARSING_DOCUMENT,
             )
             self.log.debug(f"Parsing {self.filename}...")
-            if (
-                isinstance(document_parser, MailDocumentParser)
-                and self.input_doc.mailrule_id
-            ):
-                document_parser.mailrule_id = self.input_doc.mailrule_id
             if isinstance(
                 document_parser,
                 (MailDocumentParser, TextDocumentParser, TikaDocumentParser),
             ):
                 # TODO(stumpylog): Remove me in the future when all parsers use new protocol
+                document_parser.configure(
+                    ParserContext(mailrule_id=self.input_doc.mailrule_id),
+                )
                 document_parser.parse(self.working_copy, mime_type)
             else:
                 document_parser.parse(self.working_copy, mime_type, self.filename)

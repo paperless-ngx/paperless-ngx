@@ -27,6 +27,7 @@ if TYPE_CHECKING:
     from types import TracebackType
 
     from paperless.parsers import MetadataEntry
+    from paperless.parsers import ParserContext
 
 logger = logging.getLogger("paperless.parsing.text")
 
@@ -155,6 +156,9 @@ class TextDocumentParser:
     # ------------------------------------------------------------------
     # Core parsing interface
     # ------------------------------------------------------------------
+
+    def configure(self, context: ParserContext) -> None:
+        pass
 
     def parse(
         self,

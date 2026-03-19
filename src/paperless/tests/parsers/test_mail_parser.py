@@ -12,6 +12,7 @@ from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
 
 from documents.parsers import ParseError
+from paperless.parsers import ParserContext
 from paperless.parsers.mail import MailDocumentParser
 
 
@@ -711,7 +712,7 @@ class TestParser:
 
         def test_layout_option(layout_option, expected_calls, expected_pdf_names):
             mock_mailrule_get.return_value = mock.Mock(pdf_layout=layout_option)
-            mail_parser.mailrule_id = 1
+            mail_parser.configure(ParserContext(mailrule_id=1))
             mail_parser.parse(
                 document_path=html_email_file,
                 mime_type="message/rfc822",

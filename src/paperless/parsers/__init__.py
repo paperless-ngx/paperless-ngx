@@ -35,6 +35,7 @@ Usage example (third-party parser)::
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 from typing import Protocol
 from typing import Self
@@ -48,6 +49,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     "MetadataEntry",
+    "ParserContext",
     "ParserProtocol",
 ]
 
@@ -71,6 +73,44 @@ class MetadataEntry(TypedDict):
 
     value: str
     """String representation of the field value."""
+
+
+@dataclass(frozen=True, slots=True)
+class ParserContext:
+    """Immutable context passed to a parser before parse().
+
+    The consumer assembles this from the ingestion event and Django
+    settings, then calls ``parser.configure(context)`` before
+    ``parser.parse()``.  Parsers read only the fields relevant to them;
+    unneeded fields are ignored.
+
+    ``frozen=True`` prevents accidental mutation after the consumer
+    hands the context off.  ``slots=True`` keeps instances lightweight.
+
+    Fields
+    ------
+    mailrule_id : int | None
+        Primary key of the ``MailRule`` that triggered this ingestion,
+        or ``None`` when the document did not arrive via a mail rule.
+        Used by ``MailDocumentParser`` to select the PDF layout.
+
+    Notes
+    -----
+    Future fields (not yet implemented):
+
+    * ``output_type`` — PDF/A variant for archive generation
+      (replaces ``settings.OCR_OUTPUT_TYPE`` reads inside parsers).
+    * ``ocr_mode`` — skip-text, redo, force, etc.
+      (replaces ``settings.OCR_MODE`` reads inside parsers).
+    * ``ocr_language`` — Tesseract language string.
+      (replaces ``settings.OCR_LANGUAGE`` reads inside parsers).
+
+    When those fields are added the consumer will read from Django
+    settings once and populate them here, decoupling parsers from
+    ``settings.*`` entirely.
+    """
+
+    mailrule_id: int | None = None
 
 
 @runtime_checkable
@@ -190,6 +230,21 @@ class ParserProtocol(Protocol):
     # ------------------------------------------------------------------
     # Core parsing interface
     # ------------------------------------------------------------------
+
+    def configure(self, context: ParserContext) -> None:
+        """Apply source context before parse().
+
+        Called by the consumer after instantiation and before parse().
+        The default implementation is a no-op; parsers override only the
+        fields they need.
+
+        Parameters
+        ----------
+        context:
+            Immutable context assembled by the consumer for this
+            specific ingestion event.
+        """
+        ...
 
     def parse(
         self,

@@ -50,6 +50,7 @@ if TYPE_CHECKING:
     from types import TracebackType
 
     from paperless.parsers import MetadataEntry
+    from paperless.parsers import ParserContext
 
 logger = logging.getLogger("paperless.parsing.mail")
 
@@ -66,10 +67,10 @@ class MailDocumentParser:
     EML files cannot be rendered natively in a browser, the parser always
     produces a PDF rendition (requires_pdf_rendition=True).
 
-    The mailrule_id instance attribute may be set by the consumer before
-    calling parse() to apply mail-rule-specific PDF layout options:
+    Pass a ``ParserContext`` to ``configure()`` before ``parse()`` to
+    apply mail-rule-specific PDF layout options:
 
-        parser.mailrule_id = rule.pk
+        parser.configure(ParserContext(mailrule_id=rule.pk))
         parser.parse(path, mime_type)
 
     Class attributes
@@ -172,7 +173,7 @@ class MailDocumentParser:
         self._text: str | None = None
         self._date: datetime.datetime | None = None
         self._archive_path: Path | None = None
-        self.mailrule_id: int | None = None
+        self._mailrule_id: int | None = None
 
     def __enter__(self) -> Self:
         return self
@@ -190,6 +191,9 @@ class MailDocumentParser:
     # Core parsing interface
     # ------------------------------------------------------------------
 
+    def configure(self, context: ParserContext) -> None:
+        self._mailrule_id = context.mailrule_id
+
     def parse(
         self,
         document_path: Path,
@@ -199,7 +203,7 @@ class MailDocumentParser:
     ) -> None:
         """Parse the given .eml into formatted text and a PDF archive.
 
-        The consumer may set ``self.mailrule_id`` before calling this method
+        Call ``configure(ParserContext(mailrule_id=...))`` before this method
         to apply mail-rule-specific PDF layout options.  The ``produce_archive``
         flag is accepted for protocol compatibility but is always honoured —
         the mail parser always produces a PDF since EML files cannot be
@@ -269,8 +273,8 @@ class MailDocumentParser:
             self._date = mail.date
 
         logger.debug("Creating a PDF from the email")
-        if self.mailrule_id:
-            rule = MailRule.objects.get(pk=self.mailrule_id)
+        if self._mailrule_id:
+            rule = MailRule.objects.get(pk=self._mailrule_id)
             self._archive_path = self.generate_pdf(mail, rule.pdf_layout)
         else:
             self._archive_path = self.generate_pdf(mail)
