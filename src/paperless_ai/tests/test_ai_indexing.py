@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
@@ -8,17 +7,10 @@ from celery import states
 from django.test import override_settings
 from django.utils import timezone
 from llama_index.core.base.embeddings.base import BaseEmbedding
-from pytest_django.fixtures import SettingsWrapper
 
 from documents.models import Document
 from documents.models import PaperlessTask
 from paperless_ai import indexing
-
-
-@pytest.fixture
-def temp_llm_index_dir(tmp_path: Path, settings: SettingsWrapper):
-    settings.LLM_INDEX_DIR = tmp_path
-    return tmp_path
 
 
 @pytest.fixture
