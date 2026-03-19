@@ -101,13 +101,17 @@ class TestSystemStatus(APITestCase):
             - The response contains the correct install type
         """
         self.client.force_login(self.user)
-        os.environ["PNGX_CONTAINERIZED"] = "1"
-        response = self.client.get(self.ENDPOINT)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["install_type"], "docker")
-        os.environ["KUBERNETES_SERVICE_HOST"] = "http://localhost"
-        response = self.client.get(self.ENDPOINT)
-        self.assertEqual(response.data["install_type"], "kubernetes")
+        with mock.patch.dict(os.environ, {"PNGX_CONTAINERIZED": "1"}, clear=False):
+            response = self.client.get(self.ENDPOINT)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(response.data["install_type"], "docker")
+        with mock.patch.dict(
+            os.environ,
+            {"PNGX_CONTAINERIZED": "1", "KUBERNETES_SERVICE_HOST": "http://localhost"},
+            clear=False,
+        ):
+            response = self.client.get(self.ENDPOINT)
+            self.assertEqual(response.data["install_type"], "kubernetes")
 
     @mock.patch("redis.Redis.execute_command")
     def test_system_status_redis_ping(self, mock_ping) -> None:

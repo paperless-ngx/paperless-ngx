@@ -14,14 +14,6 @@ from paperless_ai import indexing
 
 
 @pytest.fixture
-def temp_llm_index_dir(tmp_path):
-    original_dir = indexing.settings.LLM_INDEX_DIR
-    indexing.settings.LLM_INDEX_DIR = tmp_path
-    yield tmp_path
-    indexing.settings.LLM_INDEX_DIR = original_dir
-
-
-@pytest.fixture
 def real_document(db):
     return Document.objects.create(
         title="Test Document",
