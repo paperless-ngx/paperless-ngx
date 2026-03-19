@@ -459,13 +459,20 @@ class ConsumerPlugin(
             progress_callback=progress_callback,
         )
 
+        parser_is_new_style = isinstance(
+            document_parser,
+            (
+                MailDocumentParser,
+                RemoteDocumentParser,
+                TextDocumentParser,
+                TikaDocumentParser,
+            ),
+        )
+
         # New-style parsers use __enter__/__exit__ for resource management.
         # _parser_cleanup (below) handles __exit__; call __enter__ here.
         # TODO(stumpylog): Remove me in the future
-        if isinstance(
-            document_parser,
-            (TextDocumentParser, RemoteDocumentParser, TikaDocumentParser),
-        ):
+        if parser_is_new_style:
             document_parser.__enter__()
 
         self.log.debug(f"Parser: {type(document_parser).__name__}")
@@ -488,15 +495,7 @@ class ConsumerPlugin(
             self.log.debug(f"Parsing {self.filename}...")
 
             # TODO(stumpylog): Remove me in the future when all parsers use new protocol
-            if isinstance(
-                document_parser,
-                (
-                    MailDocumentParser,
-                    RemoteDocumentParser,
-                    TextDocumentParser,
-                    TikaDocumentParser,
-                ),
-            ):
+            if parser_is_new_style:
                 document_parser.configure(
                     ParserContext(mailrule_id=self.input_doc.mailrule_id),
                 )
@@ -513,15 +512,7 @@ class ConsumerPlugin(
                 ConsumerStatusShortMessage.GENERATING_THUMBNAIL,
             )
             # TODO(stumpylog): Remove me in the future when all parsers use new protocol
-            if isinstance(
-                document_parser,
-                (
-                    MailDocumentParser,
-                    RemoteDocumentParser,
-                    TextDocumentParser,
-                    TikaDocumentParser,
-                ),
-            ):
+            if parser_is_new_style:
                 thumbnail = document_parser.get_thumbnail(self.working_copy, mime_type)
             else:
                 thumbnail = document_parser.get_thumbnail(

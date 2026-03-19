@@ -67,6 +67,7 @@ from documents.workflows.utils import get_workflows_for_trigger
 from paperless.config import AIConfig
 from paperless.parsers import ParserContext
 from paperless.parsers.mail import MailDocumentParser
+from paperless.parsers.remote import RemoteDocumentParser
 from paperless.parsers.text import TextDocumentParser
 from paperless.parsers.tika import TikaDocumentParser
 from paperless_ai.indexing import llm_index_add_or_update_document
@@ -319,16 +320,23 @@ def update_document_content_maybe_archive_file(document_id) -> None:
 
     parser: DocumentParser = parser_class(logging_group=uuid.uuid4())
 
+    parser_is_new_style = isinstance(
+        parser,
+        (
+            MailDocumentParser,
+            RemoteDocumentParser,
+            TextDocumentParser,
+            TikaDocumentParser,
+        ),
+    )
+
     # TODO(stumpylog): Remove branch in the future when all parsers use new protocol
-    if isinstance(parser, (TextDocumentParser, TikaDocumentParser)):
+    if parser_is_new_style:
         parser.__enter__()
 
     try:
         # TODO(stumpylog): Remove branch in the future when all parsers use new protocol
-        if isinstance(
-            parser,
-            (MailDocumentParser, TextDocumentParser, TikaDocumentParser),
-        ):
+        if parser_is_new_style:
             parser.configure(ParserContext())
             parser.parse(document.source_path, mime_type)
         else:
@@ -339,10 +347,7 @@ def update_document_content_maybe_archive_file(document_id) -> None:
             )
 
         # TODO(stumpylog): Remove branch in the future when all parsers use new protocol
-        if isinstance(
-            parser,
-            (MailDocumentParser, TextDocumentParser, TikaDocumentParser),
-        ):
+        if parser_is_new_style:
             thumbnail = parser.get_thumbnail(document.source_path, mime_type)
         else:
             thumbnail = parser.get_thumbnail(
