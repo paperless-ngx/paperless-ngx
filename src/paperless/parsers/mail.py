@@ -126,11 +126,10 @@ class MailDocumentParser:
         Returns
         -------
         int | None
-            20 if the MIME type is supported (higher than the default 10 to
-            give the mail parser clear priority), otherwise None.
+            10 if the MIME type is supported, otherwise None.
         """
         if mime_type in _SUPPORTED_MIME_TYPES:
-            return 20
+            return 10
         return None
 
     # ------------------------------------------------------------------
