@@ -3,7 +3,6 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
-from django.conf import settings
 
 from documents.models import Document
 from paperless.models import LLMEmbeddingBackend
@@ -17,14 +16,6 @@ def mock_ai_config():
     with patch("paperless_ai.embedding.AIConfig") as MockAIConfig:
         MockAIConfig.return_value.llm_allow_internal_endpoints = True
         yield MockAIConfig
-
-
-@pytest.fixture
-def temp_llm_index_dir(tmp_path):
-    original_dir = settings.LLM_INDEX_DIR
-    settings.LLM_INDEX_DIR = tmp_path
-    yield tmp_path
-    settings.LLM_INDEX_DIR = original_dir
 
 
 @pytest.fixture
