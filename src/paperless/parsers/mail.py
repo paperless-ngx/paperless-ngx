@@ -233,7 +233,7 @@ class MailDocumentParser:
         def build_formatted_text(mail_message: MailMessage) -> str:
             """Constructs a formatted string based on the given email."""
             fmt_text = f"Subject: {mail_message.subject}\n\n"
-            fmt_text += f"From: {mail_message.from_values.full}\n\n"
+            fmt_text += f"From: {mail_message.from_values.full if mail_message.from_values else ''}\n\n"
             to_list = [address.full for address in mail_message.to_values]
             fmt_text += f"To: {', '.join(to_list)}\n\n"
             if mail_message.cc_values:
@@ -274,7 +274,10 @@ class MailDocumentParser:
         logger.debug("Creating a PDF from the email")
         if self._mailrule_id:
             rule = MailRule.objects.get(pk=self._mailrule_id)
-            self._archive_path = self.generate_pdf(mail, rule.pdf_layout)
+            self._archive_path = self.generate_pdf(
+                mail,
+                MailRule.PdfLayout(rule.pdf_layout),
+            )
         else:
             self._archive_path = self.generate_pdf(mail)
 
@@ -400,8 +403,8 @@ class MailDocumentParser:
             )
             return result
 
-        for key, value in mail.headers.items():
-            value = ", ".join(i for i in value)
+        for key, header_values in mail.headers.items():
+            value = ", ".join(header_values)
             try:
                 value.encode("utf-8")
             except UnicodeEncodeError as e:  # pragma: no cover
@@ -555,7 +558,8 @@ class MailDocumentParser:
 
         mail_pdf_file = self.generate_pdf_from_mail(mail_message)
 
-        pdf_layout = pdf_layout or settings.EMAIL_PARSE_DEFAULT_LAYOUT
+        if pdf_layout is None:
+            pdf_layout = MailRule.PdfLayout(settings.EMAIL_PARSE_DEFAULT_LAYOUT)
 
         # If no HTML content, create the PDF from the message.
         # Otherwise, create 2 PDFs and merge them with Gotenberg.
@@ -632,7 +636,7 @@ class MailDocumentParser:
         data["subject"] = clean_html(mail.subject)
         if data["subject"]:
             data["subject_label"] = "Subject"
-        data["from"] = clean_html(mail.from_values.full)
+        data["from"] = clean_html(mail.from_values.full if mail.from_values else "")
         if data["from"]:
             data["from_label"] = "From"
         data["to"] = clean_html(", ".join(address.full for address in mail.to_values))
