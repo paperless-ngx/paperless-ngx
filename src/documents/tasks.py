@@ -309,7 +309,9 @@ def update_document_content_maybe_archive_file(document_id) -> None:
 
     mime_type = document.mime_type
 
-    parser_class: type[DocumentParser] = get_parser_class_for_mime_type(mime_type)
+    parser_class: type[DocumentParser] | None = get_parser_class_for_mime_type(
+        mime_type,
+    )
 
     if not parser_class:
         logger.error(
