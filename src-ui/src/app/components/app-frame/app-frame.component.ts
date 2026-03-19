@@ -16,6 +16,7 @@ import {
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { DeviceDetectorService } from 'ngx-device-detector'
 import { TourNgBootstrap } from 'ngx-ui-tour-ng-bootstrap'
 import { Observable } from 'rxjs'
 import { first } from 'rxjs/operators'
@@ -50,6 +51,8 @@ import { DocumentDetailComponent } from '../document-detail/document-detail.comp
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { GlobalSearchComponent } from './global-search/global-search.component'
 import { ToastsDropdownComponent } from './toasts-dropdown/toasts-dropdown.component'
+
+const SCROLL_THRESHOLD = 16
 
 @Component({
   selector: 'pngx-app-frame',
@@ -87,12 +90,17 @@ export class AppFrameComponent
   private modalService = inject(NgbModal)
   permissionsService = inject(PermissionsService)
   private djangoMessagesService = inject(DjangoMessagesService)
+  private deviceDetectorService = inject(DeviceDetectorService)
 
   appRemoteVersion: AppRemoteVersion
 
   isMenuCollapsed: boolean = true
 
   slimSidebarAnimating: boolean = false
+
+  public mobileSearchHidden: boolean = false
+
+  private lastScrollY: number = 0
 
   constructor() {
     super()
@@ -111,6 +119,8 @@ export class AppFrameComponent
   }
 
   ngOnInit(): void {
+    this.lastScrollY = window.scrollY
+
     if (this.settingsService.get(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED)) {
       this.checkForUpdates()
     }
@@ -261,6 +271,37 @@ export class AppFrameComponent
 
   get aiEnabled(): boolean {
     return this.settingsService.get(SETTINGS_KEYS.AI_ENABLED)
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    if (!this.deviceDetectorService.isMobile()) {
+      this.mobileSearchHidden = false
+    }
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    const currentScrollY = window.scrollY
+
+    if (
+      !this.deviceDetectorService.isMobile() ||
+      this.isMenuCollapsed === false
+    ) {
+      this.mobileSearchHidden = false
+      this.lastScrollY = currentScrollY
+      return
+    }
+
+    const delta = currentScrollY - this.lastScrollY
+
+    if (currentScrollY <= 0 || delta < -SCROLL_THRESHOLD) {
+      this.mobileSearchHidden = false
+    } else if (currentScrollY > SCROLL_THRESHOLD && delta > SCROLL_THRESHOLD) {
+      this.mobileSearchHidden = true
+    }
+
+    this.lastScrollY = currentScrollY
   }
 
   closeMenu() {

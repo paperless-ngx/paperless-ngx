@@ -16,6 +16,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import { NgbModal, NgbModalModule, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { DeviceDetectorService } from 'ngx-device-detector'
 import { provideUiTour } from 'ngx-ui-tour-ng-bootstrap'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
@@ -97,6 +98,7 @@ describe('AppFrameComponent', () => {
   let savedViewSpy
   let modalService: NgbModal
   let maybeRefreshSpy
+  let deviceDetectorService: DeviceDetectorService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -174,6 +176,7 @@ describe('AppFrameComponent', () => {
     openDocumentsService = TestBed.inject(OpenDocumentsService)
     modalService = TestBed.inject(NgbModal)
     router = TestBed.inject(Router)
+    deviceDetectorService = TestBed.inject(DeviceDetectorService)
 
     jest
       .spyOn(settingsService, 'displayName', 'get')
@@ -291,6 +294,49 @@ describe('AppFrameComponent', () => {
     expect(component.isMenuCollapsed).toBeFalsy()
     component.closeMenu()
     expect(component.isMenuCollapsed).toBeTruthy()
+  })
+
+  it('should hide mobile search when scrolling down and show it when scrolling up', () => {
+    jest.spyOn(deviceDetectorService, 'isMobile').mockReturnValue(true)
+
+    component.ngOnInit()
+
+    Object.defineProperty(globalThis, 'scrollY', {
+      configurable: true,
+      value: 40,
+    })
+    component.onWindowScroll()
+    expect(component.mobileSearchHidden).toBe(true)
+
+    Object.defineProperty(globalThis, 'scrollY', {
+      configurable: true,
+      value: 0,
+    })
+    component.onWindowScroll()
+    expect(component.mobileSearchHidden).toBe(false)
+  })
+
+  it('should keep mobile search visible on desktop scroll', () => {
+    jest.spyOn(deviceDetectorService, 'isMobile').mockReturnValue(false)
+    component.mobileSearchHidden = true
+
+    component.onWindowScroll()
+
+    expect(component.mobileSearchHidden).toBe(false)
+  })
+
+  it('should keep mobile search visible while the mobile menu is expanded', () => {
+    jest.spyOn(deviceDetectorService, 'isMobile').mockReturnValue(true)
+    component.ngOnInit()
+    component.isMenuCollapsed = false
+
+    Object.defineProperty(globalThis, 'scrollY', {
+      configurable: true,
+      value: 40,
+    })
+    component.onWindowScroll()
+
+    expect(component.mobileSearchHidden).toBe(false)
   })
 
   it('should support close document & navigate on close current doc', () => {
