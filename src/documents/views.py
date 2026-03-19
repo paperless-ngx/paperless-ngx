@@ -7,7 +7,6 @@ import tempfile
 import zipfile
 from collections import defaultdict
 from collections import deque
-from contextlib import nullcontext
 from datetime import datetime
 from pathlib import Path
 from time import mktime
@@ -226,7 +225,6 @@ from paperless.celery import app as celery_app
 from paperless.config import AIConfig
 from paperless.config import GeneralConfig
 from paperless.models import ApplicationConfiguration
-from paperless.parsers import ParserProtocol
 from paperless.serialisers import GroupSerializer
 from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
@@ -1085,15 +1083,11 @@ class DocumentViewSet(
 
         parser_class = get_parser_class_for_mime_type(mime_type)
         if parser_class:
-            parser = parser_class(progress_callback=None, logging_group=None)
-            cm = parser if isinstance(parser, ParserProtocol) else nullcontext(parser)
-
             try:
-                with cm:
+                with parser_class() as parser:
                     return parser.extract_metadata(file, mime_type)
             except Exception:  # pragma: no cover
                 logger.exception(f"Issue getting metadata for {file}")
-                # TODO: cover GPG errors, remove later.
                 return []
         else:  # pragma: no cover
             logger.warning(f"No parser for {mime_type}")

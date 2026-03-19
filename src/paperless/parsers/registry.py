@@ -305,6 +305,23 @@ class ParserRegistry:
             )
 
     # ------------------------------------------------------------------
+    # Inspection helpers
+    # ------------------------------------------------------------------
+
+    def all_parsers(self) -> list[type[ParserProtocol]]:
+        """Return all registered parser classes (external first, then builtins).
+
+        Used by compatibility wrappers that need to iterate every parser to
+        compute the full set of supported MIME types and file extensions.
+
+        Returns
+        -------
+        list[type[ParserProtocol]]
+            External parsers followed by built-in parsers.
+        """
+        return [*self._external, *self._builtins]
+
+    # ------------------------------------------------------------------
     # Parser resolution
     # ------------------------------------------------------------------
 

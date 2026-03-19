@@ -7,19 +7,20 @@ import re
 import shutil
 import subprocess
 import tempfile
-from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 from django.conf import settings
 
 from documents.loggers import LoggingMixin
-from documents.signals import document_consumer_declaration
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
+from paperless.parsers.registry import get_parser_registry
 
 if TYPE_CHECKING:
     import datetime
+
+    from paperless.parsers import ParserProtocol
 
 # This regular expression will try to find dates in the document at
 # hand and will match the following formats:
@@ -52,7 +53,6 @@ DATE_REGEX = re.compile(
 logger = logging.getLogger("paperless.parsing")
 
 
-@lru_cache(maxsize=8)
 def is_mime_type_supported(mime_type: str) -> bool:
     """
     Returns True if the mime type is supported, False otherwise
@@ -60,27 +60,21 @@ def is_mime_type_supported(mime_type: str) -> bool:
     return get_parser_class_for_mime_type(mime_type) is not None
 
 
-@lru_cache(maxsize=8)
 def get_default_file_extension(mime_type: str) -> str:
     """
     Returns the default file extension for a mimetype, or
     an empty string if it could not be determined
     """
-    for response in document_consumer_declaration.send(None):
-        parser_declaration = response[1]
-        supported_mime_types = parser_declaration["mime_types"]
-
-        if mime_type in supported_mime_types:
-            return supported_mime_types[mime_type]
+    parser_class = get_parser_class_for_mime_type(mime_type)
+    if parser_class is not None:
+        supported = parser_class.supported_mime_types()
+        if mime_type in supported:
+            return supported[mime_type]
 
     ext = mimetypes.guess_extension(mime_type)
-    if ext:
-        return ext
-    else:
-        return ""
+    return ext if ext else ""
 
 
-@lru_cache(maxsize=8)
 def is_file_ext_supported(ext: str) -> bool:
     """
     Returns True if the file extension is supported, False otherwise
@@ -94,42 +88,22 @@ def is_file_ext_supported(ext: str) -> bool:
 
 def get_supported_file_extensions() -> set[str]:
     extensions = set()
-    for response in document_consumer_declaration.send(None):
-        parser_declaration = response[1]
-        supported_mime_types = parser_declaration["mime_types"]
-
-        for mime_type in supported_mime_types:
+    for parser_class in get_parser_registry().all_parsers():
+        for mime_type, ext in parser_class.supported_mime_types().items():
             extensions.update(mimetypes.guess_all_extensions(mime_type))
             # Python's stdlib might be behind, so also add what the parser
             # says is the default extension
             # This makes image/webp supported on Python < 3.11
-            extensions.add(supported_mime_types[mime_type])
+            extensions.add(ext)
 
     return extensions
 
 
-def get_parser_class_for_mime_type(mime_type: str) -> type[DocumentParser] | None:
+def get_parser_class_for_mime_type(mime_type: str) -> type[ParserProtocol] | None:
     """
-    Returns the best parser (by weight) for the given mimetype or
-    None if no parser exists
+    Returns the best parser for the given mimetype or None if no parser exists.
     """
-
-    options = []
-
-    for response in document_consumer_declaration.send(None):
-        parser_declaration = response[1]
-        supported_mime_types = parser_declaration["mime_types"]
-
-        if mime_type in supported_mime_types:
-            options.append(parser_declaration)
-
-    if not options:
-        return None
-
-    best_parser = sorted(options, key=lambda _: _["weight"], reverse=True)[0]
-
-    # Return the parser with the highest weight.
-    return best_parser["parser"]
+    return get_parser_registry().get_parser_for_file(mime_type, "")
 
 
 def run_convert(
