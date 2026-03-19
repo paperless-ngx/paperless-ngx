@@ -7,6 +7,7 @@ import shutil
 import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import Any
 from typing import Self
 
 from django.conf import settings
@@ -170,7 +171,7 @@ class RasterisedDocumentParser:
 
         return extract_pdf_metadata(Path(document_path), log=self.log)
 
-    def is_image(self, mime_type) -> bool:
+    def is_image(self, mime_type: str) -> bool:
         return mime_type in [
             "image/png",
             "image/jpeg",
@@ -181,25 +182,25 @@ class RasterisedDocumentParser:
             "image/heic",
         ]
 
-    def has_alpha(self, image) -> bool:
+    def has_alpha(self, image: Path) -> bool:
         with Image.open(image) as im:
             return im.mode in ("RGBA", "LA")
 
-    def remove_alpha(self, image_path: str) -> Path:
+    def remove_alpha(self, image_path: Path) -> Path:
         no_alpha_image = Path(self.tempdir) / "image-no-alpha"
         run_subprocess(
             [
                 settings.CONVERT_BINARY,
                 "-alpha",
                 "off",
-                image_path,
-                no_alpha_image,
+                str(image_path),
+                str(no_alpha_image),
             ],
             logger=self.log,
         )
         return no_alpha_image
 
-    def get_dpi(self, image) -> int | None:
+    def get_dpi(self, image: Path) -> int | None:
         try:
             with Image.open(image) as im:
                 x, _ = im.info["dpi"]
@@ -208,7 +209,7 @@ class RasterisedDocumentParser:
             self.log.warning(f"Error while getting DPI from image {image}: {e}")
             return None
 
-    def calculate_a4_dpi(self, image) -> int | None:
+    def calculate_a4_dpi(self, image: Path) -> int | None:
         try:
             with Image.open(image) as im:
                 width, _ = im.size
@@ -226,6 +227,7 @@ class RasterisedDocumentParser:
         sidecar_file: Path | None,
         pdf_file: Path,
     ) -> str | None:
+        text: str | None = None
         # When re-doing OCR, the sidecar contains ONLY the new text, not
         # the whole text, so do not utilize it in that case
         if (
@@ -261,7 +263,7 @@ class RasterisedDocumentParser:
                         "-layout",
                         "-enc",
                         "UTF-8",
-                        pdf_file,
+                        str(pdf_file),
                         tmp.name,
                     ],
                     logger=self.log,
@@ -281,14 +283,14 @@ class RasterisedDocumentParser:
 
     def construct_ocrmypdf_parameters(
         self,
-        input_file,
-        mime_type,
-        output_file,
-        sidecar_file,
+        input_file: Path,
+        mime_type: str,
+        output_file: Path,
+        sidecar_file: Path,
         *,
-        safe_fallback=False,
-    ):
-        ocrmypdf_args = {
+        safe_fallback: bool = False,
+    ) -> dict[str, Any]:
+        ocrmypdf_args: dict[str, Any] = {
             "input_file_or_options": input_file,
             "output_file": output_file,
             # need to use threads, since this will be run in daemonized
@@ -532,7 +534,7 @@ class RasterisedDocumentParser:
                 self.text = ""
 
 
-def post_process_text(text):
+def post_process_text(text: str | None) -> str | None:
     if not text:
         return None
 
