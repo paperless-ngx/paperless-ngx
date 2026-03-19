@@ -11,12 +11,15 @@ from typing import TYPE_CHECKING
 import pytest
 
 from paperless.parsers.mail import MailDocumentParser
+from paperless.parsers.remote import RemoteDocumentParser
 from paperless.parsers.text import TextDocumentParser
 from paperless.parsers.tika import TikaDocumentParser
 
 if TYPE_CHECKING:
     from collections.abc import Generator
     from pathlib import Path
+
+    from pytest_django.fixtures import SettingsWrapper
 
 
 # ------------------------------------------------------------------
@@ -76,6 +79,92 @@ def text_parser() -> Generator[TextDocumentParser, None, None]:
     """
     with TextDocumentParser() as parser:
         yield parser
+
+
+# ------------------------------------------------------------------
+# Remote parser sample files
+# ------------------------------------------------------------------
+
+
+@pytest.fixture(scope="session")
+def remote_samples_dir(samples_dir: Path) -> Path:
+    """Absolute path to the remote parser sample files directory.
+
+    Returns
+    -------
+    Path
+        ``<samples_dir>/remote/``
+    """
+    return samples_dir / "remote"
+
+
+@pytest.fixture(scope="session")
+def sample_pdf_file(remote_samples_dir: Path) -> Path:
+    """Path to a simple digital PDF sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``remote/simple-digital.pdf``.
+    """
+    return remote_samples_dir / "simple-digital.pdf"
+
+
+# ------------------------------------------------------------------
+# Remote parser instance
+# ------------------------------------------------------------------
+
+
+@pytest.fixture()
+def remote_parser() -> Generator[RemoteDocumentParser, None, None]:
+    """Yield a RemoteDocumentParser and clean up its temporary directory afterwards.
+
+    Yields
+    ------
+    RemoteDocumentParser
+        A ready-to-use parser instance.
+    """
+    with RemoteDocumentParser() as parser:
+        yield parser
+
+
+# ------------------------------------------------------------------
+# Remote parser settings helpers
+# ------------------------------------------------------------------
+
+
+@pytest.fixture()
+def azure_settings(settings: SettingsWrapper) -> SettingsWrapper:
+    """Configure Django settings for a valid Azure AI OCR engine.
+
+    Sets ``REMOTE_OCR_ENGINE``, ``REMOTE_OCR_API_KEY``, and
+    ``REMOTE_OCR_ENDPOINT`` to test values.  Settings are restored
+    automatically after the test by pytest-django.
+
+    Returns
+    -------
+    SettingsWrapper
+        The modified settings object (for chaining further overrides).
+    """
+    settings.REMOTE_OCR_ENGINE = "azureai"
+    settings.REMOTE_OCR_API_KEY = "test-api-key"
+    settings.REMOTE_OCR_ENDPOINT = "https://test.cognitiveservices.azure.com"
+    return settings
+
+
+@pytest.fixture()
+def no_engine_settings(settings: SettingsWrapper) -> SettingsWrapper:
+    """Configure Django settings with no remote engine configured.
+
+    Returns
+    -------
+    SettingsWrapper
+        The modified settings object.
+    """
+    settings.REMOTE_OCR_ENGINE = None
+    settings.REMOTE_OCR_API_KEY = None
+    settings.REMOTE_OCR_ENDPOINT = None
+    return settings
 
 
 # ------------------------------------------------------------------

@@ -53,6 +53,7 @@ from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
 from paperless.parsers import ParserContext
 from paperless.parsers.mail import MailDocumentParser
+from paperless.parsers.remote import RemoteDocumentParser
 from paperless.parsers.text import TextDocumentParser
 from paperless.parsers.tika import TikaDocumentParser
 
@@ -69,7 +70,15 @@ def _parser_cleanup(parser: DocumentParser) -> None:
 
     TODO(stumpylog): Remove me in the future
     """
-    if isinstance(parser, (MailDocumentParser, TextDocumentParser, TikaDocumentParser)):
+    if isinstance(
+        parser,
+        (
+            MailDocumentParser,
+            RemoteDocumentParser,
+            TextDocumentParser,
+            TikaDocumentParser,
+        ),
+    ):
         parser.__exit__(None, None, None)
     else:
         parser.cleanup()
@@ -453,7 +462,10 @@ class ConsumerPlugin(
         # New-style parsers use __enter__/__exit__ for resource management.
         # _parser_cleanup (below) handles __exit__; call __enter__ here.
         # TODO(stumpylog): Remove me in the future
-        if isinstance(document_parser, (TextDocumentParser, TikaDocumentParser)):
+        if isinstance(
+            document_parser,
+            (TextDocumentParser, RemoteDocumentParser, TikaDocumentParser),
+        ):
             document_parser.__enter__()
 
         self.log.debug(f"Parser: {type(document_parser).__name__}")
@@ -474,14 +486,21 @@ class ConsumerPlugin(
                 ConsumerStatusShortMessage.PARSING_DOCUMENT,
             )
             self.log.debug(f"Parsing {self.filename}...")
+
+            # TODO(stumpylog): Remove me in the future when all parsers use new protocol
             if isinstance(
                 document_parser,
-                (MailDocumentParser, TextDocumentParser, TikaDocumentParser),
+                (
+                    MailDocumentParser,
+                    RemoteDocumentParser,
+                    TextDocumentParser,
+                    TikaDocumentParser,
+                ),
             ):
-                # TODO(stumpylog): Remove me in the future when all parsers use new protocol
                 document_parser.configure(
                     ParserContext(mailrule_id=self.input_doc.mailrule_id),
                 )
+                # TODO(stumpylog): Remove me in the future
                 document_parser.parse(self.working_copy, mime_type)
             else:
                 document_parser.parse(self.working_copy, mime_type, self.filename)
@@ -493,11 +512,16 @@ class ConsumerPlugin(
                 ProgressStatusOptions.WORKING,
                 ConsumerStatusShortMessage.GENERATING_THUMBNAIL,
             )
+            # TODO(stumpylog): Remove me in the future when all parsers use new protocol
             if isinstance(
                 document_parser,
-                (MailDocumentParser, TextDocumentParser, TikaDocumentParser),
+                (
+                    MailDocumentParser,
+                    RemoteDocumentParser,
+                    TextDocumentParser,
+                    TikaDocumentParser,
+                ),
             ):
-                # TODO(stumpylog): Remove me in the future when all parsers use new protocol
                 thumbnail = document_parser.get_thumbnail(self.working_copy, mime_type)
             else:
                 thumbnail = document_parser.get_thumbnail(
