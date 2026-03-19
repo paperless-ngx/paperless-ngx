@@ -20,6 +20,34 @@ if TYPE_CHECKING:
 logger = logging.getLogger("paperless.parsers.utils")
 
 
+def read_file_handle_unicode_errors(
+    filepath: Path,
+    log: logging.Logger | None = None,
+) -> str:
+    """Read a file as UTF-8 text, replacing invalid bytes rather than raising.
+
+    Parameters
+    ----------
+    filepath:
+        Absolute path to the file to read.
+    log:
+        Logger to use for warnings.  Falls back to the module-level logger
+        when omitted.
+
+    Returns
+    -------
+    str
+        File content as a string, with any invalid UTF-8 sequences replaced
+        by the Unicode replacement character.
+    """
+    _log = log or logger
+    try:
+        return filepath.read_text(encoding="utf-8")
+    except UnicodeDecodeError as e:
+        _log.warning("Unicode error during text reading, continuing: %s", e)
+        return filepath.read_bytes().decode("utf-8", errors="replace")
+
+
 def get_page_count_for_pdf(
     document_path: Path,
     log: logging.Logger | None = None,
