@@ -74,7 +74,6 @@ def get_parser_registry() -> ParserRegistry:
     1. Creates a new ParserRegistry.
     2. Calls register_defaults to install built-in parsers.
     3. Calls discover to load third-party plugins via importlib.metadata entrypoints.
-    4. Calls log_summary to emit a startup summary.
 
     Subsequent calls return the same instance immediately.
 
@@ -91,7 +90,6 @@ def get_parser_registry() -> ParserRegistry:
 
     if not _discovery_complete:
         _registry.discover()
-        _registry.log_summary()
         _discovery_complete = True
 
     return _registry
