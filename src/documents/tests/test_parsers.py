@@ -4,7 +4,6 @@ from unittest import mock
 from django.apps import apps
 from django.test import TestCase
 from django.test import override_settings
-from paperless_tesseract.parsers import RasterisedDocumentParser
 
 from documents.parsers import get_default_file_extension
 from documents.parsers import get_parser_class_for_mime_type
