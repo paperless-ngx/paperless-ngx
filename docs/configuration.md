@@ -674,6 +674,9 @@ See the corresponding [django-allauth documentation](https://docs.allauth.org/en
 for a list of provider configurations. You will also need to include the relevant Django 'application' inside the
 [PAPERLESS_APPS](#PAPERLESS_APPS) setting to activate that specific authentication provider (e.g. `allauth.socialaccount.providers.openid_connect` for the [OIDC Connect provider](https://docs.allauth.org/en/latest/socialaccount/providers/openid_connect.html)).
 
+: For OpenID Connect providers, set `settings.token_auth_method` if your identity provider
+requires a specific token endpoint authentication method.
+
     Defaults to None, which does not enable any third party authentication systems.
 
 #### [`PAPERLESS_SOCIAL_AUTO_SIGNUP=<bool>`](#PAPERLESS_SOCIAL_AUTO_SIGNUP) {#PAPERLESS_SOCIAL_AUTO_SIGNUP}
