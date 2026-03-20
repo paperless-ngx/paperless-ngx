@@ -481,12 +481,17 @@ class TestRemoteParserRegistry:
         assert parser_cls is RemoteDocumentParser
 
     @pytest.mark.usefixtures("no_engine_settings")
-    def test_get_parser_returns_none_for_pdf_when_not_configured(self) -> None:
-        """With no tesseract parser registered yet, PDF has no handler if remote is off."""
+    def test_get_parser_returns_none_for_unsupported_type_when_not_configured(
+        self,
+    ) -> None:
+        """With remote off and a truly unsupported MIME type, registry returns None."""
         from paperless.parsers.registry import ParserRegistry
 
         registry = ParserRegistry()
         registry.register_defaults()
-        parser_cls = registry.get_parser_for_file("application/pdf", "doc.pdf")
+        parser_cls = registry.get_parser_for_file(
+            "application/x-unknown-format",
+            "doc.xyz",
+        )
 
         assert parser_cls is None

@@ -6,20 +6,29 @@ so it is easy to see which files belong to which test module.
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 from typing import TYPE_CHECKING
 
 import pytest
+from django.test import override_settings
 
 from paperless.parsers.mail import MailDocumentParser
 from paperless.parsers.remote import RemoteDocumentParser
+from paperless.parsers.tesseract import RasterisedDocumentParser
 from paperless.parsers.text import TextDocumentParser
 from paperless.parsers.tika import TikaDocumentParser
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from collections.abc import Generator
     from pathlib import Path
+    from unittest.mock import MagicMock
 
     from pytest_django.fixtures import SettingsWrapper
+    from pytest_mock import MockerFixture
+
+    #: Type for the ``make_tesseract_parser`` fixture factory.
+    MakeTesseractParser = Callable[..., Generator[RasterisedDocumentParser, None, None]]
 
 
 # ------------------------------------------------------------------
@@ -411,3 +420,381 @@ def nginx_base_url() -> Generator[str, None, None]:
     The base URL for the nginx HTTP server we expect to be alive
     """
     yield "http://localhost:8080"
+
+
+# ------------------------------------------------------------------
+# Tesseract parser sample files
+# ------------------------------------------------------------------
+
+
+@pytest.fixture(scope="session")
+def tesseract_samples_dir(samples_dir: Path) -> Path:
+    """Absolute path to the tesseract parser sample files directory.
+
+    Returns
+    -------
+    Path
+        ``<samples_dir>/tesseract/``
+    """
+    return samples_dir / "tesseract"
+
+
+@pytest.fixture(scope="session")
+def document_webp_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a WebP document sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/document.webp``.
+    """
+    return tesseract_samples_dir / "document.webp"
+
+
+@pytest.fixture(scope="session")
+def encrypted_pdf_file(tesseract_samples_dir: Path) -> Path:
+    """Path to an encrypted PDF sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/encrypted.pdf``.
+    """
+    return tesseract_samples_dir / "encrypted.pdf"
+
+
+@pytest.fixture(scope="session")
+def multi_page_digital_pdf_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a multi-page digital PDF sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/multi-page-digital.pdf``.
+    """
+    return tesseract_samples_dir / "multi-page-digital.pdf"
+
+
+@pytest.fixture(scope="session")
+def multi_page_images_alpha_rgb_tiff_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a multi-page TIFF with alpha channel in RGB.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/multi-page-images-alpha-rgb.tiff``.
+    """
+    return tesseract_samples_dir / "multi-page-images-alpha-rgb.tiff"
+
+
+@pytest.fixture(scope="session")
+def multi_page_images_alpha_tiff_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a multi-page TIFF with alpha channel.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/multi-page-images-alpha.tiff``.
+    """
+    return tesseract_samples_dir / "multi-page-images-alpha.tiff"
+
+
+@pytest.fixture(scope="session")
+def multi_page_images_pdf_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a multi-page PDF with images.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/multi-page-images.pdf``.
+    """
+    return tesseract_samples_dir / "multi-page-images.pdf"
+
+
+@pytest.fixture(scope="session")
+def multi_page_images_tiff_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a multi-page TIFF sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/multi-page-images.tiff``.
+    """
+    return tesseract_samples_dir / "multi-page-images.tiff"
+
+
+@pytest.fixture(scope="session")
+def multi_page_mixed_pdf_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a multi-page mixed PDF sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/multi-page-mixed.pdf``.
+    """
+    return tesseract_samples_dir / "multi-page-mixed.pdf"
+
+
+@pytest.fixture(scope="session")
+def no_text_alpha_png_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a PNG with alpha channel and no text.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/no-text-alpha.png``.
+    """
+    return tesseract_samples_dir / "no-text-alpha.png"
+
+
+@pytest.fixture(scope="session")
+def rotated_pdf_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a rotated PDF sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/rotated.pdf``.
+    """
+    return tesseract_samples_dir / "rotated.pdf"
+
+
+@pytest.fixture(scope="session")
+def rtl_test_pdf_file(tesseract_samples_dir: Path) -> Path:
+    """Path to an RTL test PDF sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/rtl-test.pdf``.
+    """
+    return tesseract_samples_dir / "rtl-test.pdf"
+
+
+@pytest.fixture(scope="session")
+def signed_pdf_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a signed PDF sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/signed.pdf``.
+    """
+    return tesseract_samples_dir / "signed.pdf"
+
+
+@pytest.fixture(scope="session")
+def simple_alpha_png_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a simple PNG with alpha channel.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/simple-alpha.png``.
+    """
+    return tesseract_samples_dir / "simple-alpha.png"
+
+
+@pytest.fixture(scope="session")
+def simple_digital_pdf_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a simple digital PDF sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/simple-digital.pdf``.
+    """
+    return tesseract_samples_dir / "simple-digital.pdf"
+
+
+@pytest.fixture(scope="session")
+def simple_no_dpi_png_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a simple PNG without DPI information.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/simple-no-dpi.png``.
+    """
+    return tesseract_samples_dir / "simple-no-dpi.png"
+
+
+@pytest.fixture(scope="session")
+def simple_bmp_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a simple BMP sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/simple.bmp``.
+    """
+    return tesseract_samples_dir / "simple.bmp"
+
+
+@pytest.fixture(scope="session")
+def simple_gif_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a simple GIF sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/simple.gif``.
+    """
+    return tesseract_samples_dir / "simple.gif"
+
+
+@pytest.fixture(scope="session")
+def simple_heic_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a simple HEIC sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/simple.heic``.
+    """
+    return tesseract_samples_dir / "simple.heic"
+
+
+@pytest.fixture(scope="session")
+def simple_jpg_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a simple JPG sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/simple.jpg``.
+    """
+    return tesseract_samples_dir / "simple.jpg"
+
+
+@pytest.fixture(scope="session")
+def simple_png_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a simple PNG sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/simple.png``.
+    """
+    return tesseract_samples_dir / "simple.png"
+
+
+@pytest.fixture(scope="session")
+def simple_tif_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a simple TIF sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/simple.tif``.
+    """
+    return tesseract_samples_dir / "simple.tif"
+
+
+@pytest.fixture(scope="session")
+def single_page_mixed_pdf_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a single-page mixed PDF sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/single-page-mixed.pdf``.
+    """
+    return tesseract_samples_dir / "single-page-mixed.pdf"
+
+
+@pytest.fixture(scope="session")
+def with_form_pdf_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a PDF with form sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/with-form.pdf``.
+    """
+    return tesseract_samples_dir / "with-form.pdf"
+
+
+# ------------------------------------------------------------------
+# Tesseract parser instance and settings helpers
+# ------------------------------------------------------------------
+
+
+@pytest.fixture()
+def null_app_config(mocker: MockerFixture) -> MagicMock:
+    """Return a MagicMock with all OcrConfig fields set to None.
+
+    This allows the parser to fall back to Django settings instead of
+    hitting the database.
+
+    Returns
+    -------
+    MagicMock
+        Mock config with all fields as None
+    """
+    return mocker.MagicMock(
+        output_type=None,
+        pages=None,
+        language=None,
+        mode=None,
+        skip_archive_file=None,
+        image_dpi=None,
+        unpaper_clean=None,
+        deskew=None,
+        rotate_pages=None,
+        rotate_pages_threshold=None,
+        max_image_pixels=None,
+        color_conversion_strategy=None,
+        user_args=None,
+    )
+
+
+@pytest.fixture()
+def tesseract_parser(
+    mocker: MockerFixture,
+    null_app_config: MagicMock,
+) -> Generator[RasterisedDocumentParser, None, None]:
+    """Yield a RasterisedDocumentParser and clean up its temporary directory afterwards.
+
+    Patches the config system to avoid database access.
+
+    Yields
+    ------
+    RasterisedDocumentParser
+        A ready-to-use parser instance.
+    """
+    mocker.patch(
+        "paperless.config.BaseConfig._get_config_instance",
+        return_value=null_app_config,
+    )
+    with RasterisedDocumentParser() as parser:
+        yield parser
+
+
+@pytest.fixture()
+def make_tesseract_parser(
+    mocker: MockerFixture,
+    null_app_config: MagicMock,
+) -> MakeTesseractParser:
+    """Return a factory for creating RasterisedDocumentParser with Django settings overrides.
+
+    This fixture is useful for tests that need to create parsers with different
+    settings configurations.
+
+    Returns
+    -------
+    Callable[..., contextmanager[RasterisedDocumentParser]]
+        A context manager factory that accepts Django settings overrides
+    """
+    mocker.patch(
+        "paperless.config.BaseConfig._get_config_instance",
+        return_value=null_app_config,
+    )
+
+    @contextmanager
+    def _make_parser(**django_settings_overrides):
+        with override_settings(**django_settings_overrides):
+            with RasterisedDocumentParser() as parser:
+                yield parser
+
+    return _make_parser

@@ -9,9 +9,9 @@ from documents.parsers import get_default_file_extension
 from documents.parsers import get_parser_class_for_mime_type
 from documents.parsers import get_supported_file_extensions
 from documents.parsers import is_file_ext_supported
+from paperless.parsers.tesseract import RasterisedDocumentParser
 from paperless.parsers.text import TextDocumentParser
 from paperless.parsers.tika import TikaDocumentParser
-from paperless_tesseract.parsers import RasterisedDocumentParser
 
 
 class TestParserDiscovery(TestCase):

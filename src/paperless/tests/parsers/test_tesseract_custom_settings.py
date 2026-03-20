@@ -10,7 +10,7 @@ from paperless.models import CleanChoices
 from paperless.models import ColorConvertChoices
 from paperless.models import ModeChoices
 from paperless.models import OutputTypeChoices
-from paperless_tesseract.parsers import RasterisedDocumentParser
+from paperless.parsers.tesseract import RasterisedDocumentParser
 
 
 class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCase):

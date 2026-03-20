@@ -54,6 +54,7 @@ from documents.utils import run_subprocess
 from paperless.parsers import ParserContext
 from paperless.parsers.mail import MailDocumentParser
 from paperless.parsers.remote import RemoteDocumentParser
+from paperless.parsers.tesseract import RasterisedDocumentParser
 from paperless.parsers.text import TextDocumentParser
 from paperless.parsers.tika import TikaDocumentParser
 
@@ -74,6 +75,7 @@ def _parser_cleanup(parser: DocumentParser) -> None:
         parser,
         (
             MailDocumentParser,
+            RasterisedDocumentParser,
             RemoteDocumentParser,
             TextDocumentParser,
             TikaDocumentParser,
@@ -463,6 +465,7 @@ class ConsumerPlugin(
             document_parser,
             (
                 MailDocumentParser,
+                RasterisedDocumentParser,
                 RemoteDocumentParser,
                 TextDocumentParser,
                 TikaDocumentParser,

@@ -68,6 +68,7 @@ from paperless.config import AIConfig
 from paperless.parsers import ParserContext
 from paperless.parsers.mail import MailDocumentParser
 from paperless.parsers.remote import RemoteDocumentParser
+from paperless.parsers.tesseract import RasterisedDocumentParser
 from paperless.parsers.text import TextDocumentParser
 from paperless.parsers.tika import TikaDocumentParser
 from paperless_ai.indexing import llm_index_add_or_update_document
@@ -326,6 +327,7 @@ def update_document_content_maybe_archive_file(document_id) -> None:
         parser,
         (
             MailDocumentParser,
+            RasterisedDocumentParser,
             RemoteDocumentParser,
             TextDocumentParser,
             TikaDocumentParser,
@@ -440,7 +442,13 @@ def update_document_content_maybe_archive_file(document_id) -> None:
         # TODO(stumpylog): Remove branch in the future when all parsers use new protocol
         if isinstance(
             parser,
-            (MailDocumentParser, TextDocumentParser, TikaDocumentParser),
+            (
+                MailDocumentParser,
+                RasterisedDocumentParser,
+                RemoteDocumentParser,
+                TextDocumentParser,
+                TikaDocumentParser,
+            ),
         ):
             parser.__exit__(None, None, None)
         else:
