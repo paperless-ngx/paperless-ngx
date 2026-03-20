@@ -16,7 +16,6 @@ import {
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { DeviceDetectorService } from 'ngx-device-detector'
 import { TourNgBootstrap } from 'ngx-ui-tour-ng-bootstrap'
 import { Observable } from 'rxjs'
 import { first } from 'rxjs/operators'
@@ -90,7 +89,6 @@ export class AppFrameComponent
   private modalService = inject(NgbModal)
   permissionsService = inject(PermissionsService)
   private djangoMessagesService = inject(DjangoMessagesService)
-  private deviceDetectorService = inject(DeviceDetectorService)
 
   appRemoteVersion: AppRemoteVersion
 
@@ -275,7 +273,7 @@ export class AppFrameComponent
 
   @HostListener('window:resize')
   onWindowResize(): void {
-    if (!this.deviceDetectorService.isMobile()) {
+    if (!this.isMobileViewport()) {
       this.mobileSearchHidden = false
     }
   }
@@ -284,10 +282,7 @@ export class AppFrameComponent
   onWindowScroll(): void {
     const currentScrollY = window.scrollY
 
-    if (
-      !this.deviceDetectorService.isMobile() ||
-      this.isMenuCollapsed === false
-    ) {
+    if (!this.isMobileViewport() || this.isMenuCollapsed === false) {
       this.mobileSearchHidden = false
       this.lastScrollY = currentScrollY
       return
@@ -302,6 +297,10 @@ export class AppFrameComponent
     }
 
     this.lastScrollY = currentScrollY
+  }
+
+  private isMobileViewport(): boolean {
+    return window.innerWidth < 768
   }
 
   closeMenu() {

@@ -16,7 +16,6 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import { NgbModal, NgbModalModule, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { DeviceDetectorService } from 'ngx-device-detector'
 import { provideUiTour } from 'ngx-ui-tour-ng-bootstrap'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
@@ -98,7 +97,6 @@ describe('AppFrameComponent', () => {
   let savedViewSpy
   let modalService: NgbModal
   let maybeRefreshSpy
-  let deviceDetectorService: DeviceDetectorService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -176,7 +174,6 @@ describe('AppFrameComponent', () => {
     openDocumentsService = TestBed.inject(OpenDocumentsService)
     modalService = TestBed.inject(NgbModal)
     router = TestBed.inject(Router)
-    deviceDetectorService = TestBed.inject(DeviceDetectorService)
 
     jest
       .spyOn(settingsService, 'displayName', 'get')
@@ -297,7 +294,9 @@ describe('AppFrameComponent', () => {
   })
 
   it('should hide mobile search when scrolling down and show it when scrolling up', () => {
-    jest.spyOn(deviceDetectorService, 'isMobile').mockReturnValue(true)
+    Object.defineProperty(globalThis, 'innerWidth', {
+      value: 767,
+    })
 
     component.ngOnInit()
 
@@ -317,7 +316,10 @@ describe('AppFrameComponent', () => {
   })
 
   it('should keep mobile search visible on desktop scroll', () => {
-    jest.spyOn(deviceDetectorService, 'isMobile').mockReturnValue(false)
+    Object.defineProperty(globalThis, 'innerWidth', {
+      value: 1024,
+    })
+    component.ngOnInit()
     component.mobileSearchHidden = true
 
     component.onWindowScroll()
@@ -326,7 +328,9 @@ describe('AppFrameComponent', () => {
   })
 
   it('should keep mobile search visible while the mobile menu is expanded', () => {
-    jest.spyOn(deviceDetectorService, 'isMobile').mockReturnValue(true)
+    Object.defineProperty(globalThis, 'innerWidth', {
+      value: 767,
+    })
     component.ngOnInit()
     component.isMenuCollapsed = false
 
