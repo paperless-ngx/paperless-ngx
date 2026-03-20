@@ -84,7 +84,9 @@ class _BaseNewStyleParser:
             shutil.rmtree(self._tmpdir, ignore_errors=True)
 
     def configure(self, context) -> None:
-        pass
+        """
+        Test parser doesn't do anything with context
+        """
 
     def parse(self, document_path, mime_type, *, produce_archive: bool = True) -> None:
         raise NotImplementedError
