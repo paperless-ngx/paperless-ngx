@@ -51,10 +51,11 @@ from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
+from paperless.parsers import ParserContext
+from paperless.parsers.mail import MailDocumentParser
 from paperless.parsers.remote import RemoteDocumentParser
 from paperless.parsers.text import TextDocumentParser
 from paperless.parsers.tika import TikaDocumentParser
-from paperless_mail.parsers import MailDocumentParser
 
 LOGGING_NAME: Final[str] = "paperless.consumer"
 
@@ -71,7 +72,12 @@ def _parser_cleanup(parser: DocumentParser) -> None:
     """
     if isinstance(
         parser,
-        (TextDocumentParser, RemoteDocumentParser, TikaDocumentParser),
+        (
+            MailDocumentParser,
+            RemoteDocumentParser,
+            TextDocumentParser,
+            TikaDocumentParser,
+        ),
     ):
         parser.__exit__(None, None, None)
     else:
@@ -453,13 +459,20 @@ class ConsumerPlugin(
             progress_callback=progress_callback,
         )
 
+        parser_is_new_style = isinstance(
+            document_parser,
+            (
+                MailDocumentParser,
+                RemoteDocumentParser,
+                TextDocumentParser,
+                TikaDocumentParser,
+            ),
+        )
+
         # New-style parsers use __enter__/__exit__ for resource management.
         # _parser_cleanup (below) handles __exit__; call __enter__ here.
         # TODO(stumpylog): Remove me in the future
-        if isinstance(
-            document_parser,
-            (TextDocumentParser, RemoteDocumentParser, TikaDocumentParser),
-        ):
+        if parser_is_new_style:
             document_parser.__enter__()
 
         self.log.debug(f"Parser: {type(document_parser).__name__}")
@@ -480,20 +493,12 @@ class ConsumerPlugin(
                 ConsumerStatusShortMessage.PARSING_DOCUMENT,
             )
             self.log.debug(f"Parsing {self.filename}...")
-            if (
-                isinstance(document_parser, MailDocumentParser)
-                and self.input_doc.mailrule_id
-            ):
-                document_parser.parse(
-                    self.working_copy,
-                    mime_type,
-                    self.filename,
-                    self.input_doc.mailrule_id,
+
+            # TODO(stumpylog): Remove me in the future when all parsers use new protocol
+            if parser_is_new_style:
+                document_parser.configure(
+                    ParserContext(mailrule_id=self.input_doc.mailrule_id),
                 )
-            elif isinstance(
-                document_parser,
-                (TextDocumentParser, RemoteDocumentParser, TikaDocumentParser),
-            ):
                 # TODO(stumpylog): Remove me in the future
                 document_parser.parse(self.working_copy, mime_type)
             else:
@@ -506,11 +511,8 @@ class ConsumerPlugin(
                 ProgressStatusOptions.WORKING,
                 ConsumerStatusShortMessage.GENERATING_THUMBNAIL,
             )
-            if isinstance(
-                document_parser,
-                (TextDocumentParser, RemoteDocumentParser, TikaDocumentParser),
-            ):
-                # TODO(stumpylog): Remove me in the future
+            # TODO(stumpylog): Remove me in the future when all parsers use new protocol
+            if parser_is_new_style:
                 thumbnail = document_parser.get_thumbnail(self.working_copy, mime_type)
             else:
                 thumbnail = document_parser.get_thumbnail(

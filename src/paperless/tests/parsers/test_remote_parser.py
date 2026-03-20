@@ -20,6 +20,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from paperless.parsers import ParserContext
 from paperless.parsers import ParserProtocol
 from paperless.parsers.remote import RemoteDocumentParser
 
@@ -302,6 +303,7 @@ class TestRemoteParserParse:
         sample_pdf_file: Path,
         azure_client: Mock,
     ) -> None:
+        remote_parser.configure(ParserContext())
         remote_parser.parse(sample_pdf_file, "application/pdf")
 
         azure_client.close.assert_called_once()

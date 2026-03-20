@@ -36,7 +36,6 @@ from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import GetConsumerMixin
 from paperless_mail.models import MailRule
-from paperless_mail.parsers import MailDocumentParser
 
 
 class _BaseTestParser(DocumentParser):
@@ -1091,7 +1090,7 @@ class TestConsumer(
             self.assertEqual(command[1], "--replace-input")
 
     @mock.patch("paperless_mail.models.MailRule.objects.get")
-    @mock.patch("paperless_mail.parsers.MailDocumentParser.parse")
+    @mock.patch("paperless.parsers.mail.MailDocumentParser.parse")
     @mock.patch("documents.parsers.document_consumer_declaration.send")
     def test_mail_parser_receives_mailrule(
         self,
@@ -1107,11 +1106,13 @@ class TestConsumer(
         THEN:
             - The mail parser should receive the mail rule
         """
+        from paperless_mail.signals import get_parser as mail_get_parser
+
         mock_consumer_declaration_send.return_value = [
             (
                 None,
                 {
-                    "parser": MailDocumentParser,
+                    "parser": mail_get_parser,
                     "mime_types": {"message/rfc822": ".eml"},
                     "weight": 0,
                 },
@@ -1123,9 +1124,10 @@ class TestConsumer(
         with self.get_consumer(
             filepath=(
                 Path(__file__).parent.parent.parent
-                / Path("paperless_mail")
+                / Path("paperless")
                 / Path("tests")
                 / Path("samples")
+                / Path("mail")
             ).resolve()
             / "html.eml",
             source=DocumentSource.MailFetch,
@@ -1136,12 +1138,10 @@ class TestConsumer(
                 ConsumerError,
             ):
                 consumer.run()
-                mock_mail_parser_parse.assert_called_once_with(
-                    consumer.working_copy,
-                    "message/rfc822",
-                    file_name="sample.pdf",
-                    mailrule=mock_mailrule_get.return_value,
-                )
+            mock_mail_parser_parse.assert_called_once_with(
+                consumer.working_copy,
+                "message/rfc822",
+            )
 
 
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)

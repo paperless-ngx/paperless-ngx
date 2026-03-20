@@ -12,7 +12,64 @@ from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
 
 from documents.parsers import ParseError
-from paperless_mail.parsers import MailDocumentParser
+from paperless.parsers import ParserContext
+from paperless.parsers import ParserProtocol
+from paperless.parsers.mail import MailDocumentParser
+
+
+class TestMailParserProtocol:
+    """Verify that MailDocumentParser satisfies the ParserProtocol contract."""
+
+    def test_isinstance_satisfies_protocol(
+        self,
+        mail_parser: MailDocumentParser,
+    ) -> None:
+        assert isinstance(mail_parser, ParserProtocol)
+
+    def test_supported_mime_types(self) -> None:
+        mime_types = MailDocumentParser.supported_mime_types()
+        assert isinstance(mime_types, dict)
+        assert "message/rfc822" in mime_types
+
+    @pytest.mark.parametrize(
+        ("mime_type", "expected"),
+        [
+            ("message/rfc822", 10),
+            ("application/pdf", None),
+            ("text/plain", None),
+        ],
+    )
+    def test_score(self, mime_type: str, expected: int | None) -> None:
+        assert MailDocumentParser.score(mime_type, "email.eml") == expected
+
+    def test_can_produce_archive_is_false(
+        self,
+        mail_parser: MailDocumentParser,
+    ) -> None:
+        assert mail_parser.can_produce_archive is False
+
+    def test_requires_pdf_rendition_is_true(
+        self,
+        mail_parser: MailDocumentParser,
+    ) -> None:
+        assert mail_parser.requires_pdf_rendition is True
+
+    def test_get_page_count_returns_none_without_archive(
+        self,
+        mail_parser: MailDocumentParser,
+        html_email_file: Path,
+    ) -> None:
+        assert mail_parser.get_page_count(html_email_file, "message/rfc822") is None
+
+    def test_get_page_count_returns_int_with_pdf_archive(
+        self,
+        mail_parser: MailDocumentParser,
+        simple_txt_email_pdf_file: Path,
+    ) -> None:
+        mail_parser._archive_path = simple_txt_email_pdf_file
+        count = mail_parser.get_page_count(simple_txt_email_pdf_file, "message/rfc822")
+        assert isinstance(count, int)
+        assert count > 0
 
 
 class TestEmailFileParsing:
@@ -24,7 +81,7 @@ class TestEmailFileParsing:
     def test_parse_error_missing_file(
         self,
         mail_parser: MailDocumentParser,
-        sample_dir: Path,
+        mail_samples_dir: Path,
     ) -> None:
         """
         GIVEN:
@@ -35,7 +92,7 @@ class TestEmailFileParsing:
             - An Exception is thrown
         """
         # Check if exception is raised when parsing fails.
-        test_file = sample_dir / "doesntexist.eml"
+        test_file = mail_samples_dir / "doesntexist.eml"
 
         assert not test_file.exists()
 
@@ -246,12 +303,12 @@ class TestEmailThumbnailGenerate:
         """
         mocked_return = "Passing the return value through.."
         mock_make_thumbnail_from_pdf = mocker.patch(
-            "paperless_mail.parsers.make_thumbnail_from_pdf",
+            "paperless.parsers.mail.make_thumbnail_from_pdf",
         )
         mock_make_thumbnail_from_pdf.return_value = mocked_return
 
         mock_generate_pdf = mocker.patch(
-            "paperless_mail.parsers.MailDocumentParser.generate_pdf",
+            "paperless.parsers.mail.MailDocumentParser.generate_pdf",
         )
         mock_generate_pdf.return_value = "Mocked return value.."
 
@@ -260,8 +317,7 @@ class TestEmailThumbnailGenerate:
         mock_generate_pdf.assert_called_once()
         mock_make_thumbnail_from_pdf.assert_called_once_with(
             "Mocked return value..",
-            mail_parser.tempdir,
-            None,
+            mail_parser._tempdir,
         )
 
         assert mocked_return == thumb
@@ -373,7 +429,7 @@ class TestParser:
         """
         # Validate parsing returns the expected results
         mock_generate_pdf = mocker.patch(
-            "paperless_mail.parsers.MailDocumentParser.generate_pdf",
+            "paperless.parsers.mail.MailDocumentParser.generate_pdf",
         )
 
         mail_parser.parse(simple_txt_email_file, "message/rfc822")
@@ -385,7 +441,7 @@ class TestParser:
             "BCC: fdf@fvf.de\n\n"
             "\n\nThis is just a simple Text Mail."
         )
-        assert text_expected == mail_parser.text
+        assert text_expected == mail_parser.get_text()
         assert (
             datetime.datetime(
                 2022,
@@ -396,7 +452,7 @@ class TestParser:
                 43,
                 tzinfo=datetime.timezone(datetime.timedelta(seconds=7200)),
             )
-            == mail_parser.date
+            == mail_parser.get_date()
         )
 
         # Just check if tried to generate archive, the unittest for generate_pdf() goes deeper.
@@ -419,7 +475,7 @@ class TestParser:
         """
 
         mock_generate_pdf = mocker.patch(
-            "paperless_mail.parsers.MailDocumentParser.generate_pdf",
+            "paperless.parsers.mail.MailDocumentParser.generate_pdf",
         )
 
         # Validate parsing returns the expected results
@@ -443,7 +499,7 @@ class TestParser:
         mail_parser.parse(html_email_file, "message/rfc822")
 
         mock_generate_pdf.assert_called_once()
-        assert text_expected == mail_parser.text
+        assert text_expected == mail_parser.get_text()
         assert (
             datetime.datetime(
                 2022,
@@ -454,7 +510,7 @@ class TestParser:
                 19,
                 tzinfo=datetime.timezone(datetime.timedelta(seconds=7200)),
             )
-            == mail_parser.date
+            == mail_parser.get_date()
         )
 
     def test_generate_pdf_parse_error(
@@ -501,7 +557,7 @@ class TestParser:
 
         mail_parser.parse(simple_txt_email_file, "message/rfc822")
 
-        assert mail_parser.archive_path is not None
+        assert mail_parser.get_archive_path() is not None
 
     @pytest.mark.httpx_mock(can_send_already_matched_responses=True)
     def test_generate_pdf_html_email(
@@ -542,7 +598,7 @@ class TestParser:
         )
         mail_parser.parse(html_email_file, "message/rfc822")
 
-        assert mail_parser.archive_path is not None
+        assert mail_parser.get_archive_path() is not None
 
     def test_generate_pdf_html_email_html_to_pdf_failure(
         self,
@@ -712,10 +768,10 @@ class TestParser:
 
         def test_layout_option(layout_option, expected_calls, expected_pdf_names):
             mock_mailrule_get.return_value = mock.Mock(pdf_layout=layout_option)
+            mail_parser.configure(ParserContext(mailrule_id=1))
             mail_parser.parse(
                 document_path=html_email_file,
                 mime_type="message/rfc822",
-                mailrule_id=1,
             )
             args, _ = mock_merge_route.call_args
             assert len(args[0]) == expected_calls

@@ -35,6 +35,7 @@ if TYPE_CHECKING:
     from types import TracebackType
 
     from paperless.parsers import MetadataEntry
+    from paperless.parsers import ParserContext
 
 logger = logging.getLogger("paperless.parsing.tika")
 
@@ -205,6 +206,9 @@ class TikaDocumentParser:
     # Core parsing interface
     # ------------------------------------------------------------------
 
+    def configure(self, context: ParserContext) -> None:
+        pass
+
     def parse(
         self,
         document_path: Path,
@@ -340,11 +344,19 @@ class TikaDocumentParser:
     ) -> int | None:
         """Return the number of pages in the document.
 
+        Counts pages in the archive PDF produced by a preceding parse()
+        call.  Returns ``None`` if parse() has not been called yet or if
+        no archive was produced.
+
         Returns
         -------
         int | None
-            Always None — page count is not available from Tika.
+            Page count of the archive PDF, or ``None``.
         """
+        if self._archive_path is not None:
+            from paperless.parsers.utils import get_page_count_for_pdf
+
+            return get_page_count_for_pdf(self._archive_path, log=logger)
         return None
 
     def extract_metadata(

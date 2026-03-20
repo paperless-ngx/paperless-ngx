@@ -9,6 +9,7 @@ from pytest_django.fixtures import SettingsWrapper
 from pytest_httpx import HTTPXMock
 
 from documents.parsers import ParseError
+from paperless.parsers import ParserContext
 from paperless.parsers import ParserProtocol
 from paperless.parsers.tika import TikaDocumentParser
 
@@ -60,6 +61,29 @@ class TestTikaParserRegistryInterface:
     def test_requires_pdf_rendition_is_true(self) -> None:
         assert TikaDocumentParser().requires_pdf_rendition is True
 
+    def test_get_page_count_returns_none_without_archive(
+        self,
+        tika_parser: TikaDocumentParser,
+        sample_odt_file: Path,
+    ) -> None:
+        assert (
+            tika_parser.get_page_count(
+                sample_odt_file,
+                "application/vnd.oasis.opendocument.text",
+            )
+            is None
+        )
+
+    def test_get_page_count_returns_int_with_pdf_archive(
+        self,
+        tika_parser: TikaDocumentParser,
+        sample_pdf_file: Path,
+    ) -> None:
+        tika_parser._archive_path = sample_pdf_file
+        count = tika_parser.get_page_count(sample_pdf_file, "application/pdf")
+        assert isinstance(count, int)
+        assert count > 0
+
 
 @pytest.mark.django_db()
 class TestTikaParser:
@@ -83,6 +107,7 @@ class TestTikaParser:
         # Pretend convert to PDF response
         httpx_mock.add_response(content=b"PDF document")
 
+        tika_parser.configure(ParserContext())
         tika_parser.parse(sample_odt_file, "application/vnd.oasis.opendocument.text")
 
         assert tika_parser.get_text() == "the content"

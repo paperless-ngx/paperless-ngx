@@ -65,6 +65,11 @@ from documents.signals.handlers import run_workflows
 from documents.signals.handlers import send_websocket_document_updated
 from documents.workflows.utils import get_workflows_for_trigger
 from paperless.config import AIConfig
+from paperless.parsers import ParserContext
+from paperless.parsers.mail import MailDocumentParser
+from paperless.parsers.remote import RemoteDocumentParser
+from paperless.parsers.text import TextDocumentParser
+from paperless.parsers.tika import TikaDocumentParser
 from paperless_ai.indexing import llm_index_add_or_update_document
 from paperless_ai.indexing import llm_index_remove_document
 from paperless_ai.indexing import update_llm_index
@@ -304,7 +309,9 @@ def update_document_content_maybe_archive_file(document_id) -> None:
 
     mime_type = document.mime_type
 
-    parser_class: type[DocumentParser] = get_parser_class_for_mime_type(mime_type)
+    parser_class: type[DocumentParser] | None = get_parser_class_for_mime_type(
+        mime_type,
+    )
 
     if not parser_class:
         logger.error(
@@ -315,14 +322,41 @@ def update_document_content_maybe_archive_file(document_id) -> None:
 
     parser: DocumentParser = parser_class(logging_group=uuid.uuid4())
 
-    try:
-        parser.parse(document.source_path, mime_type, document.get_public_filename())
+    parser_is_new_style = isinstance(
+        parser,
+        (
+            MailDocumentParser,
+            RemoteDocumentParser,
+            TextDocumentParser,
+            TikaDocumentParser,
+        ),
+    )
 
-        thumbnail = parser.get_thumbnail(
-            document.source_path,
-            mime_type,
-            document.get_public_filename(),
-        )
+    # TODO(stumpylog): Remove branch in the future when all parsers use new protocol
+    if parser_is_new_style:
+        parser.__enter__()
+
+    try:
+        # TODO(stumpylog): Remove branch in the future when all parsers use new protocol
+        if parser_is_new_style:
+            parser.configure(ParserContext())
+            parser.parse(document.source_path, mime_type)
+        else:
+            parser.parse(
+                document.source_path,
+                mime_type,
+                document.get_public_filename(),
+            )
+
+        # TODO(stumpylog): Remove branch in the future when all parsers use new protocol
+        if parser_is_new_style:
+            thumbnail = parser.get_thumbnail(document.source_path, mime_type)
+        else:
+            thumbnail = parser.get_thumbnail(
+                document.source_path,
+                mime_type,
+                document.get_public_filename(),
+            )
 
         with transaction.atomic():
             oldDocument = Document.objects.get(pk=document.pk)
@@ -403,8 +437,14 @@ def update_document_content_maybe_archive_file(document_id) -> None:
             f"Error while parsing document {document} (ID: {document_id})",
         )
     finally:
-        # TODO(stumpylog): Cleanup once all parsers are handled
-        parser.cleanup()
+        # TODO(stumpylog): Remove branch in the future when all parsers use new protocol
+        if isinstance(
+            parser,
+            (MailDocumentParser, TextDocumentParser, TikaDocumentParser),
+        ):
+            parser.__exit__(None, None, None)
+        else:
+            parser.cleanup()
 
 
 @shared_task

@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+from paperless.parsers.mail import MailDocumentParser
 from paperless.parsers.remote import RemoteDocumentParser
 from paperless.parsers.text import TextDocumentParser
 from paperless.parsers.tika import TikaDocumentParser
@@ -247,3 +248,166 @@ def tika_parser() -> Generator[TikaDocumentParser, None, None]:
     """
     with TikaDocumentParser() as parser:
         yield parser
+
+
+# ------------------------------------------------------------------
+# Mail parser sample files
+# ------------------------------------------------------------------
+
+
+@pytest.fixture(scope="session")
+def mail_samples_dir(samples_dir: Path) -> Path:
+    """Absolute path to the mail parser sample files directory.
+
+    Returns
+    -------
+    Path
+        ``<samples_dir>/mail/``
+    """
+    return samples_dir / "mail"
+
+
+@pytest.fixture(scope="session")
+def broken_email_file(mail_samples_dir: Path) -> Path:
+    """Path to a broken/malformed EML sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``mail/broken.eml``.
+    """
+    return mail_samples_dir / "broken.eml"
+
+
+@pytest.fixture(scope="session")
+def simple_txt_email_file(mail_samples_dir: Path) -> Path:
+    """Path to a plain-text email sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``mail/simple_text.eml``.
+    """
+    return mail_samples_dir / "simple_text.eml"
+
+
+@pytest.fixture(scope="session")
+def simple_txt_email_pdf_file(mail_samples_dir: Path) -> Path:
+    """Path to the expected PDF rendition of the plain-text email.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``mail/simple_text.eml.pdf``.
+    """
+    return mail_samples_dir / "simple_text.eml.pdf"
+
+
+@pytest.fixture(scope="session")
+def simple_txt_email_thumbnail_file(mail_samples_dir: Path) -> Path:
+    """Path to the expected thumbnail for the plain-text email.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``mail/simple_text.eml.pdf.webp``.
+    """
+    return mail_samples_dir / "simple_text.eml.pdf.webp"
+
+
+@pytest.fixture(scope="session")
+def html_email_file(mail_samples_dir: Path) -> Path:
+    """Path to an HTML email sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``mail/html.eml``.
+    """
+    return mail_samples_dir / "html.eml"
+
+
+@pytest.fixture(scope="session")
+def html_email_pdf_file(mail_samples_dir: Path) -> Path:
+    """Path to the expected PDF rendition of the HTML email.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``mail/html.eml.pdf``.
+    """
+    return mail_samples_dir / "html.eml.pdf"
+
+
+@pytest.fixture(scope="session")
+def html_email_thumbnail_file(mail_samples_dir: Path) -> Path:
+    """Path to the expected thumbnail for the HTML email.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``mail/html.eml.pdf.webp``.
+    """
+    return mail_samples_dir / "html.eml.pdf.webp"
+
+
+@pytest.fixture(scope="session")
+def html_email_html_file(mail_samples_dir: Path) -> Path:
+    """Path to the HTML body of the HTML email sample.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``mail/html.eml.html``.
+    """
+    return mail_samples_dir / "html.eml.html"
+
+
+@pytest.fixture(scope="session")
+def merged_pdf_first(mail_samples_dir: Path) -> Path:
+    """Path to the first PDF used in PDF-merge tests.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``mail/first.pdf``.
+    """
+    return mail_samples_dir / "first.pdf"
+
+
+@pytest.fixture(scope="session")
+def merged_pdf_second(mail_samples_dir: Path) -> Path:
+    """Path to the second PDF used in PDF-merge tests.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``mail/second.pdf``.
+    """
+    return mail_samples_dir / "second.pdf"
+
+
+# ------------------------------------------------------------------
+# Mail parser instance
+# ------------------------------------------------------------------
+
+
+@pytest.fixture()
+def mail_parser() -> Generator[MailDocumentParser, None, None]:
+    """Yield a MailDocumentParser and clean up its temporary directory afterwards.
+
+    Yields
+    ------
+    MailDocumentParser
+        A ready-to-use parser instance.
+    """
+    with MailDocumentParser() as parser:
+        yield parser
+
+
+@pytest.fixture(scope="session")
+def nginx_base_url() -> Generator[str, None, None]:
+    """
+    The base URL for the nginx HTTP server we expect to be alive
+    """
+    yield "http://localhost:8080"

@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 
+from paperless.parsers import ParserContext
 from paperless.parsers import ParserProtocol
 from paperless.parsers.text import TextDocumentParser
 
@@ -93,6 +94,7 @@ class TestTextParserParse:
         text_parser: TextDocumentParser,
         sample_txt_file: Path,
     ) -> None:
+        text_parser.configure(ParserContext())
         text_parser.parse(sample_txt_file, "text/plain")
 
         assert text_parser.get_text() == "This is a test file.\n"
@@ -102,6 +104,7 @@ class TestTextParserParse:
         text_parser: TextDocumentParser,
         sample_txt_file: Path,
     ) -> None:
+        text_parser.configure(ParserContext())
         text_parser.parse(sample_txt_file, "text/plain")
 
         assert text_parser.get_archive_path() is None
@@ -111,6 +114,7 @@ class TestTextParserParse:
         text_parser: TextDocumentParser,
         sample_txt_file: Path,
     ) -> None:
+        text_parser.configure(ParserContext())
         text_parser.parse(sample_txt_file, "text/plain")
 
         assert text_parser.get_date() is None
@@ -129,6 +133,7 @@ class TestTextParserParse:
             - Parsing succeeds
             - Invalid bytes are replaced with the Unicode replacement character
         """
+        text_parser.configure(ParserContext())
         text_parser.parse(malformed_txt_file, "text/plain")
 
         assert text_parser.get_text() == "Pantothens\ufffdure\n"
