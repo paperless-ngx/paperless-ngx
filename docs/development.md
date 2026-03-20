@@ -722,38 +722,11 @@ class XmlDocumentParser:
         return []
 ```
 
-## Using Visual Studio Code devcontainer
-
-Another easy way to get started with development is to use Visual Studio
-Code devcontainers. This approach will create a preconfigured development
-environment with all of the required tools and dependencies.
-[Learn more about devcontainers](https://code.visualstudio.com/docs/devcontainers/containers).
-The .devcontainer/vscode/tasks.json and .devcontainer/vscode/launch.json files
-contain more information about the specific tasks and launch configurations (see the
-non-standard "description" field).
-
-To get started:
-
-1. Clone the repository on your machine and open the Paperless-ngx folder in VS Code.
-
-2. VS Code will prompt you with "Reopen in container". Do so and wait for the environment to start.
-
-3. In case your host operating system is Windows:
-   - The Source Control view in Visual Studio Code might show: "The detected Git repository is potentially unsafe as the folder is owned by someone other than the current user." Use "Manage Unsafe Repositories" to fix this.
-   - Git might have detecteded modifications for all files, because Windows is using CRLF line endings. Run `git checkout .` in the containers terminal to fix this issue.
-
-4. Initialize the project by running the task **Project Setup: Run all Init Tasks**. This
-   will initialize the database tables and create a superuser. Then you can compile the front end
-   for production or run the frontend in debug mode.
-
-5. The project is ready for debugging, start either run the fullstack debug or individual debug
-   processes. Yo spin up the project without debugging run the task **Project Start: Run all Services**
-
-## Developing Date Parser Plugins
+### Developing date parser plugins
 
 Paperless-ngx uses a plugin system for date parsing, allowing you to extend or replace the default date parsing behavior. Plugins are discovered using [Python entry points](https://setuptools.pypa.io/en/latest/userguide/entry_point.html).
 
-### Creating a Date Parser Plugin
+#### Creating a Date Parser Plugin
 
 To create a custom date parser plugin, you need to:
 
@@ -761,7 +734,7 @@ To create a custom date parser plugin, you need to:
 2. Implement the required abstract method
 3. Register your plugin via an entry point
 
-#### 1. Implementing the Parser Class
+##### 1. Implementing the Parser Class
 
 Your parser must extend `documents.plugins.date_parsing.DateParserPluginBase` and implement the `parse` method:
 
@@ -801,7 +774,7 @@ class MyDateParserPlugin(DateParserPluginBase):
         yield another_datetime
 ```
 
-#### 2. Configuration and Helper Methods
+##### 2. Configuration and Helper Methods
 
 Your parser instance is initialized with a `DateParserConfig` object accessible via `self.config`. This provides:
 
@@ -834,11 +807,11 @@ def _filter_date(
     """
 ```
 
-#### 3. Resource Management (Optional)
+##### 3. Resource Management (Optional)
 
 If your plugin needs to acquire or release resources (database connections, API clients, etc.), override the context manager methods. Paperless-ngx will always use plugins as context managers, ensuring resources can be released even in the event of errors.
 
-#### 4. Registering Your Plugin
+##### 4. Registering Your Plugin
 
 Register your plugin using a setuptools entry point in your package's `pyproject.toml`:
 
@@ -849,7 +822,7 @@ my_parser = "my_package.parsers:MyDateParserPlugin"
 
 The entry point name (e.g., `"my_parser"`) is used for sorting when multiple plugins are found. Paperless-ngx will use the first plugin alphabetically by name if multiple plugins are discovered.
 
-### Plugin Discovery
+#### Plugin Discovery
 
 Paperless-ngx automatically discovers and loads date parser plugins at runtime. The discovery process:
 
@@ -860,7 +833,7 @@ Paperless-ngx automatically discovers and loads date parser plugins at runtime. 
 
 If multiple plugins are installed, a warning is logged indicating which plugin was selected.
 
-### Example: Simple Date Parser
+#### Example: Simple Date Parser
 
 Here's a minimal example that only looks for ISO 8601 dates:
 
@@ -892,3 +865,30 @@ class ISODateParserPlugin(DateParserPluginBase):
             if filtered_date is not None:
                 yield filtered_date
 ```
+
+## Using Visual Studio Code devcontainer
+
+Another easy way to get started with development is to use Visual Studio
+Code devcontainers. This approach will create a preconfigured development
+environment with all of the required tools and dependencies.
+[Learn more about devcontainers](https://code.visualstudio.com/docs/devcontainers/containers).
+The .devcontainer/vscode/tasks.json and .devcontainer/vscode/launch.json files
+contain more information about the specific tasks and launch configurations (see the
+non-standard "description" field).
+
+To get started:
+
+1. Clone the repository on your machine and open the Paperless-ngx folder in VS Code.
+
+2. VS Code will prompt you with "Reopen in container". Do so and wait for the environment to start.
+
+3. In case your host operating system is Windows:
+   - The Source Control view in Visual Studio Code might show: "The detected Git repository is potentially unsafe as the folder is owned by someone other than the current user." Use "Manage Unsafe Repositories" to fix this.
+   - Git might have detecteded modifications for all files, because Windows is using CRLF line endings. Run `git checkout .` in the containers terminal to fix this issue.
+
+4. Initialize the project by running the task **Project Setup: Run all Init Tasks**. This
+   will initialize the database tables and create a superuser. Then you can compile the front end
+   for production or run the frontend in debug mode.
+
+5. The project is ready for debugging, start either run the fullstack debug or individual debug
+   processes. Yo spin up the project without debugging run the task **Project Start: Run all Services**
