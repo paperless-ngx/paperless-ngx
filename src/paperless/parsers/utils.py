@@ -135,7 +135,7 @@ def extract_pdf_metadata(
             try:
                 namespace.encode("utf-8")
                 key_value.encode("utf-8")
-            except UnicodeEncodeError as enc_err:
+            except UnicodeEncodeError as enc_err:  # pragma: no cover
                 _log.debug("Skipping metadata key %s: %s", key, enc_err)
                 continue
 
