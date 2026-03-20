@@ -277,20 +277,20 @@ class TestRemoteParserParse:
     def test_parse_returns_text_from_azure(
         self,
         remote_parser: RemoteDocumentParser,
-        sample_pdf_file: Path,
+        simple_digital_pdf_file: Path,
         azure_client: Mock,
     ) -> None:
-        remote_parser.parse(sample_pdf_file, "application/pdf")
+        remote_parser.parse(simple_digital_pdf_file, "application/pdf")
 
         assert remote_parser.get_text() == _DEFAULT_TEXT
 
     def test_parse_sets_archive_path(
         self,
         remote_parser: RemoteDocumentParser,
-        sample_pdf_file: Path,
+        simple_digital_pdf_file: Path,
         azure_client: Mock,
     ) -> None:
-        remote_parser.parse(sample_pdf_file, "application/pdf")
+        remote_parser.parse(simple_digital_pdf_file, "application/pdf")
 
         archive = remote_parser.get_archive_path()
         assert archive is not None
@@ -300,11 +300,11 @@ class TestRemoteParserParse:
     def test_parse_closes_client_on_success(
         self,
         remote_parser: RemoteDocumentParser,
-        sample_pdf_file: Path,
+        simple_digital_pdf_file: Path,
         azure_client: Mock,
     ) -> None:
         remote_parser.configure(ParserContext())
-        remote_parser.parse(sample_pdf_file, "application/pdf")
+        remote_parser.parse(simple_digital_pdf_file, "application/pdf")
 
         azure_client.close.assert_called_once()
 
@@ -312,9 +312,9 @@ class TestRemoteParserParse:
     def test_parse_sets_empty_text_when_not_configured(
         self,
         remote_parser: RemoteDocumentParser,
-        sample_pdf_file: Path,
+        simple_digital_pdf_file: Path,
     ) -> None:
-        remote_parser.parse(sample_pdf_file, "application/pdf")
+        remote_parser.parse(simple_digital_pdf_file, "application/pdf")
 
         assert remote_parser.get_text() == ""
         assert remote_parser.get_archive_path() is None
@@ -328,10 +328,10 @@ class TestRemoteParserParse:
     def test_get_date_always_none(
         self,
         remote_parser: RemoteDocumentParser,
-        sample_pdf_file: Path,
+        simple_digital_pdf_file: Path,
         azure_client: Mock,
     ) -> None:
-        remote_parser.parse(sample_pdf_file, "application/pdf")
+        remote_parser.parse(simple_digital_pdf_file, "application/pdf")
 
         assert remote_parser.get_date() is None
 
@@ -345,33 +345,33 @@ class TestRemoteParserParseError:
     def test_parse_returns_none_on_azure_error(
         self,
         remote_parser: RemoteDocumentParser,
-        sample_pdf_file: Path,
+        simple_digital_pdf_file: Path,
         failing_azure_client: Mock,
     ) -> None:
-        remote_parser.parse(sample_pdf_file, "application/pdf")
+        remote_parser.parse(simple_digital_pdf_file, "application/pdf")
 
         assert remote_parser.get_text() is None
 
     def test_parse_closes_client_on_error(
         self,
         remote_parser: RemoteDocumentParser,
-        sample_pdf_file: Path,
+        simple_digital_pdf_file: Path,
         failing_azure_client: Mock,
     ) -> None:
-        remote_parser.parse(sample_pdf_file, "application/pdf")
+        remote_parser.parse(simple_digital_pdf_file, "application/pdf")
 
         failing_azure_client.close.assert_called_once()
 
     def test_parse_logs_error_on_azure_failure(
         self,
         remote_parser: RemoteDocumentParser,
-        sample_pdf_file: Path,
+        simple_digital_pdf_file: Path,
         failing_azure_client: Mock,
         mocker: MockerFixture,
     ) -> None:
         mock_log = mocker.patch("paperless.parsers.remote.logger")
 
-        remote_parser.parse(sample_pdf_file, "application/pdf")
+        remote_parser.parse(simple_digital_pdf_file, "application/pdf")
 
         mock_log.error.assert_called_once()
         assert "Azure AI Vision parsing failed" in mock_log.error.call_args[0][0]
@@ -386,18 +386,18 @@ class TestRemoteParserPageCount:
     def test_page_count_for_pdf(
         self,
         remote_parser: RemoteDocumentParser,
-        sample_pdf_file: Path,
+        simple_digital_pdf_file: Path,
     ) -> None:
-        count = remote_parser.get_page_count(sample_pdf_file, "application/pdf")
+        count = remote_parser.get_page_count(simple_digital_pdf_file, "application/pdf")
         assert isinstance(count, int)
         assert count >= 1
 
     def test_page_count_returns_none_for_image_mime(
         self,
         remote_parser: RemoteDocumentParser,
-        sample_pdf_file: Path,
+        simple_digital_pdf_file: Path,
     ) -> None:
-        count = remote_parser.get_page_count(sample_pdf_file, "image/png")
+        count = remote_parser.get_page_count(simple_digital_pdf_file, "image/png")
         assert count is None
 
     def test_page_count_returns_none_for_invalid_pdf(
@@ -420,25 +420,31 @@ class TestRemoteParserMetadata:
     def test_extract_metadata_non_pdf_returns_empty(
         self,
         remote_parser: RemoteDocumentParser,
-        sample_pdf_file: Path,
+        simple_digital_pdf_file: Path,
     ) -> None:
-        result = remote_parser.extract_metadata(sample_pdf_file, "image/png")
+        result = remote_parser.extract_metadata(simple_digital_pdf_file, "image/png")
         assert result == []
 
     def test_extract_metadata_pdf_returns_list(
         self,
         remote_parser: RemoteDocumentParser,
-        sample_pdf_file: Path,
+        simple_digital_pdf_file: Path,
     ) -> None:
-        result = remote_parser.extract_metadata(sample_pdf_file, "application/pdf")
+        result = remote_parser.extract_metadata(
+            simple_digital_pdf_file,
+            "application/pdf",
+        )
         assert isinstance(result, list)
 
     def test_extract_metadata_pdf_entries_have_required_keys(
         self,
         remote_parser: RemoteDocumentParser,
-        sample_pdf_file: Path,
+        simple_digital_pdf_file: Path,
     ) -> None:
-        result = remote_parser.extract_metadata(sample_pdf_file, "application/pdf")
+        result = remote_parser.extract_metadata(
+            simple_digital_pdf_file,
+            "application/pdf",
+        )
         for entry in result:
             assert "namespace" in entry
             assert "prefix" in entry
