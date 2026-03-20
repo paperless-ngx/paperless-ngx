@@ -33,6 +33,7 @@ name, version, author, url, supported_mime_types (callable), score (callable).
 from __future__ import annotations
 
 import logging
+import threading
 from importlib.metadata import entry_points
 from typing import TYPE_CHECKING
 
@@ -49,6 +50,7 @@ logger = logging.getLogger("paperless.parsers.registry")
 
 _registry: ParserRegistry | None = None
 _discovery_complete: bool = False
+_lock = threading.Lock()
 
 # Attribute names that every registered external parser class must expose.
 _REQUIRED_ATTRS: tuple[str, ...] = (
@@ -84,13 +86,15 @@ def get_parser_registry() -> ParserRegistry:
     """
     global _registry, _discovery_complete
 
-    if _registry is None:
-        _registry = ParserRegistry()
-        _registry.register_defaults()
+    with _lock:
+        if _registry is None:
+            r = ParserRegistry()
+            r.register_defaults()
+            _registry = r
 
-    if not _discovery_complete:
-        _registry.discover()
-        _discovery_complete = True
+        if not _discovery_complete:
+            _registry.discover()
+            _discovery_complete = True
 
     return _registry
 
@@ -111,9 +115,11 @@ def init_builtin_parsers() -> None:
     """
     global _registry
 
-    if _registry is None:
-        _registry = ParserRegistry()
-        _registry.register_defaults()
+    with _lock:
+        if _registry is None:
+            r = ParserRegistry()
+            r.register_defaults()
+            _registry = r
 
 
 def reset_parser_registry() -> None:
