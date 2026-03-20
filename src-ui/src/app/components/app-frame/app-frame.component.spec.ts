@@ -315,7 +315,7 @@ describe('AppFrameComponent', () => {
     expect(component.mobileSearchHidden).toBe(false)
   })
 
-  it('should keep mobile search visible on desktop scroll', () => {
+  it('should keep mobile search visible on desktop scroll or resize', () => {
     Object.defineProperty(globalThis, 'innerWidth', {
       value: 1024,
     })
@@ -325,6 +325,9 @@ describe('AppFrameComponent', () => {
     component.onWindowScroll()
 
     expect(component.mobileSearchHidden).toBe(false)
+
+    component.mobileSearchHidden = true
+    component.onWindowResize()
   })
 
   it('should keep mobile search visible while the mobile menu is expanded', () => {
