@@ -483,15 +483,21 @@ class BarcodePlugin(ConsumeTaskPlugin):
                             continue
 
                         field_name = re.sub(
-                            regex, field_name_tpl, barcode_value, flags=re.IGNORECASE
+                            regex,
+                            field_name_tpl,
+                            barcode_value,
+                            flags=re.IGNORECASE,
                         )
                         field_value = re.sub(
-                            regex, field_value_tpl, barcode_value, flags=re.IGNORECASE
+                            regex,
+                            field_value_tpl,
+                            barcode_value,
+                            flags=re.IGNORECASE,
                         )
 
                         try:
                             custom_field = CustomField.objects.get(
-                                name__iexact=field_name
+                                name__iexact=field_name,
                             )
                         except CustomField.DoesNotExist:
                             logger.warning(

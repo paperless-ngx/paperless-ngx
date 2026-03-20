@@ -854,8 +854,8 @@ Unlike tags, custom fields must already exist in the system before using this fe
 Use the Paperless UI or API to create custom fields first.
 
 !!! info
-    If multiple barcodes match the same pattern, the custom fields derived from
-    the last matching barcode in the document take precedence.
+If multiple barcodes match the same pattern, the custom fields derived from
+the last matching barcode in the document take precedence.
 
 #### Mapping Format
 

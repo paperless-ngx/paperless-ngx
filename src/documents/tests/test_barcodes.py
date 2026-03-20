@@ -15,7 +15,6 @@ from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.models import CustomField
-from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import Tag
 from documents.plugins.base import StopConsumeTaskError
@@ -1162,7 +1161,8 @@ class TestCustomFieldBarcode(
             - Custom field is assigned the correct value
         """
         CustomField.objects.create(
-            name="Test Field", data_type=CustomField.FieldDataType.STRING
+            name="Test Field",
+            data_type=CustomField.FieldDataType.STRING,
         )
         test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-custom-prefix.pdf"
         with self.get_reader(test_file) as reader:
@@ -1212,7 +1212,8 @@ class TestCustomFieldBarcode(
             - No custom field has been assigned
         """
         CustomField.objects.create(
-            name="Test Field", data_type=CustomField.FieldDataType.STRING
+            name="Test Field",
+            data_type=CustomField.FieldDataType.STRING,
         )
         test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-custom-prefix.pdf"
         with self.get_reader(test_file) as reader:
@@ -1287,10 +1288,12 @@ class TestCustomFieldBarcode(
             - Multiple custom fields are assigned (if they exist)
         """
         field1 = CustomField.objects.create(
-            name="Field 1", data_type=CustomField.FieldDataType.STRING
+            name="Field 1",
+            data_type=CustomField.FieldDataType.STRING,
         )
         field2 = CustomField.objects.create(
-            name="Field 2", data_type=CustomField.FieldDataType.STRING
+            name="Field 2",
+            data_type=CustomField.FieldDataType.STRING,
         )
         test_file = self.BARCODE_SAMPLE_DIR / "split-by-tag-mixed-asn.pdf"
         with self.get_reader(test_file) as reader:
@@ -1319,7 +1322,8 @@ class TestCustomFieldBarcode(
             - Last barcode matching the pattern wins
         """
         existing_field = CustomField.objects.create(
-            name="Test Field", data_type=CustomField.FieldDataType.STRING
+            name="Test Field",
+            data_type=CustomField.FieldDataType.STRING,
         )
         test_file = self.BARCODE_SAMPLE_DIR / "split-by-tag-basic.pdf"
         with override_settings(
@@ -1400,10 +1404,12 @@ class TestCustomFieldBarcode(
             - Multiple custom fields are assigned values
         """
         CustomField.objects.create(
-            name="Invoice Number", data_type=CustomField.FieldDataType.STRING
+            name="Invoice Number",
+            data_type=CustomField.FieldDataType.STRING,
         )
         CustomField.objects.create(
-            name="Invoice Source", data_type=CustomField.FieldDataType.STRING
+            name="Invoice Source",
+            data_type=CustomField.FieldDataType.STRING,
         )
         test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-custom-prefix.pdf"
         with self.get_reader(test_file) as reader:
