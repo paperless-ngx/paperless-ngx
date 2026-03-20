@@ -103,3 +103,30 @@ Multiple options are combined in a single value:
 ```bash
 PAPERLESS_DB_OPTIONS="sslmode=require;sslrootcert=/certs/ca.pem;pool.max_size=10"
 ```
+
+## OpenID Connect Token Endpoint Authentication
+
+Some existing OpenID Connect setups may require an explicit token endpoint authentication method after upgrading to v3.
+
+#### Action Required
+
+If OIDC login fails at the callback with an `invalid_client` error, add `token_auth_method` to the provider `settings` in
+[`PAPERLESS_SOCIALACCOUNT_PROVIDERS`](configuration.md#PAPERLESS_SOCIALACCOUNT_PROVIDERS).
+
+For example:
+
+```json
+{
+  "openid_connect": {
+    "APPS": [
+      {
+        ...
+        "settings": {
+          "server_url": "https://login.example.com",
+          "token_auth_method": "client_secret_basic"
+        }
+      }
+    ]
+  }
+}
+```
