@@ -191,9 +191,9 @@ class TestConsumer(
     def setUp(self) -> None:
         super().setUp()
 
-        patcher = mock.patch("documents.consumer.get_parser_class_for_mime_type")
-        m = patcher.start()
-        m.return_value = DummyParser
+        patcher = mock.patch("documents.consumer.get_parser_registry")
+        mock_registry = patcher.start()
+        mock_registry.return_value.get_parser_for_file.return_value = DummyParser
         self.addCleanup(patcher.stop)
 
     def get_test_file(self):
@@ -562,9 +562,9 @@ class TestConsumer(
             ) as consumer:
                 consumer.run()
 
-    @mock.patch("documents.consumer.get_parser_class_for_mime_type")
+    @mock.patch("documents.consumer.get_parser_registry")
     def testNoParsers(self, m) -> None:
-        m.return_value = None
+        m.return_value.get_parser_for_file.return_value = None
 
         with self.assertRaisesMessage(
             ConsumerError,
@@ -575,9 +575,9 @@ class TestConsumer(
 
         self._assert_first_last_send_progress(last_status="FAILED")
 
-    @mock.patch("documents.consumer.get_parser_class_for_mime_type")
+    @mock.patch("documents.consumer.get_parser_registry")
     def testFaultyParser(self, m) -> None:
-        m.return_value = FaultyParser
+        m.return_value.get_parser_for_file.return_value = FaultyParser
 
         with self.get_consumer(self.get_test_file()) as consumer:
             with self.assertRaisesMessage(
@@ -588,9 +588,9 @@ class TestConsumer(
 
         self._assert_first_last_send_progress(last_status="FAILED")
 
-    @mock.patch("documents.consumer.get_parser_class_for_mime_type")
+    @mock.patch("documents.consumer.get_parser_registry")
     def testGenericParserException(self, m) -> None:
-        m.return_value = FaultyGenericExceptionParser
+        m.return_value.get_parser_for_file.return_value = FaultyGenericExceptionParser
 
         with self.get_consumer(self.get_test_file()) as consumer:
             with self.assertRaisesMessage(
@@ -1014,7 +1014,7 @@ class TestConsumer(
         self._assert_first_last_send_progress()
 
     @override_settings(FILENAME_FORMAT="{title}")
-    @mock.patch("documents.consumer.get_parser_class_for_mime_type")
+    @mock.patch("documents.consumer.get_parser_registry")
     def test_similar_filenames(self, m) -> None:
         shutil.copy(
             Path(__file__).parent / "samples" / "simple.pdf",
@@ -1028,7 +1028,7 @@ class TestConsumer(
             Path(__file__).parent / "samples" / "simple-noalpha.png",
             settings.CONSUMPTION_DIR / "simple.png.pdf",
         )
-        m.return_value = CopyParser
+        m.return_value.get_parser_for_file.return_value = CopyParser
 
         with self.get_consumer(settings.CONSUMPTION_DIR / "simple.png") as consumer:
             consumer.run()
@@ -1056,9 +1056,10 @@ class TestConsumer(
 
         sanity_check()
 
-    @mock.patch("documents.consumer.get_parser_class_for_mime_type", return_value=None)
+    @mock.patch("documents.consumer.get_parser_registry")
     @mock.patch("documents.consumer.run_subprocess")
-    def test_try_to_clean_invalid_pdf(self, m, _) -> None:
+    def test_try_to_clean_invalid_pdf(self, m, mock_registry) -> None:
+        mock_registry.return_value.get_parser_for_file.return_value = None
         shutil.copy(
             Path(__file__).parent / "samples" / "invalid_pdf.pdf",
             settings.CONSUMPTION_DIR / "invalid_pdf.pdf",
@@ -1080,10 +1081,10 @@ class TestConsumer(
 
     @mock.patch("paperless_mail.models.MailRule.objects.get")
     @mock.patch("paperless.parsers.mail.MailDocumentParser.parse")
-    @mock.patch("documents.consumer.get_parser_class_for_mime_type")
+    @mock.patch("documents.consumer.get_parser_registry")
     def test_mail_parser_receives_mailrule(
         self,
-        mock_get_parser_class: mock.Mock,
+        mock_get_parser_registry: mock.Mock,
         mock_mail_parser_parse: mock.Mock,
         mock_mailrule_get: mock.Mock,
     ) -> None:
@@ -1097,7 +1098,9 @@ class TestConsumer(
         """
         from paperless.parsers.mail import MailDocumentParser
 
-        mock_get_parser_class.return_value = MailDocumentParser
+        mock_get_parser_registry.return_value.get_parser_for_file.return_value = (
+            MailDocumentParser
+        )
         mock_mailrule_get.return_value = mock.Mock(
             pdf_layout=MailRule.PdfLayout.HTML_ONLY,
         )

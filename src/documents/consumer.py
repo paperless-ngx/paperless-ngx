@@ -33,7 +33,6 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import WorkflowTrigger
 from documents.parsers import ParseError
-from documents.parsers import get_parser_class_for_mime_type
 from documents.permissions import set_permissions_for_object
 from documents.plugins.base import AlwaysRunPluginMixin
 from documents.plugins.base import ConsumeTaskPlugin
@@ -52,6 +51,7 @@ from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
 from paperless.parsers import ParserContext
 from paperless.parsers import ParserProtocol
+from paperless.parsers.registry import get_parser_registry
 
 LOGGING_NAME: Final[str] = "paperless.consumer"
 
@@ -392,8 +392,12 @@ class ConsumerPlugin(
                     self.log.error(f"Error attempting to clean PDF: {e}")
 
             # Based on the mime type, get the parser for that type
-            parser_class: type[ParserProtocol] | None = get_parser_class_for_mime_type(
-                mime_type,
+            parser_class: type[ParserProtocol] | None = (
+                get_parser_registry().get_parser_for_file(
+                    mime_type,
+                    self.filename,
+                    self.working_copy,
+                )
             )
             if not parser_class:
                 tempdir.cleanup()

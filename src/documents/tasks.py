@@ -52,7 +52,6 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
-from documents.parsers import get_parser_class_for_mime_type
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import ProgressManager
 from documents.plugins.base import StopConsumeTaskError
@@ -65,6 +64,7 @@ from documents.signals.handlers import send_websocket_document_updated
 from documents.workflows.utils import get_workflows_for_trigger
 from paperless.config import AIConfig
 from paperless.parsers import ParserContext
+from paperless.parsers.registry import get_parser_registry
 from paperless_ai.indexing import llm_index_add_or_update_document
 from paperless_ai.indexing import llm_index_remove_document
 from paperless_ai.indexing import update_llm_index
@@ -304,7 +304,11 @@ def update_document_content_maybe_archive_file(document_id) -> None:
 
     mime_type = document.mime_type
 
-    parser_class = get_parser_class_for_mime_type(mime_type)
+    parser_class = get_parser_registry().get_parser_for_file(
+        mime_type,
+        document.original_filename or "",
+        document.source_path,
+    )
 
     if not parser_class:
         logger.error(

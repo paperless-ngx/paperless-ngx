@@ -351,7 +351,7 @@ class ParserRegistry:
         mime_type:
             The detected MIME type of the file.
         filename:
-            The original filename, including extension.
+            The original filename, including extension.  May be empty in some cases
         path:
             Optional filesystem path to the file. Forwarded to each
             parser's score method.

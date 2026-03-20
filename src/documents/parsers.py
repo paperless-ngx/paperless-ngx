@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 import mimetypes
 import os
-import re
 import shutil
 import subprocess
 import tempfile
@@ -20,36 +19,6 @@ from paperless.parsers.registry import get_parser_registry
 if TYPE_CHECKING:
     import datetime
 
-    from paperless.parsers import ParserProtocol
-
-# This regular expression will try to find dates in the document at
-# hand and will match the following formats:
-# - XX.YY.ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
-# - XX/YY/ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
-# - XX-YY-ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
-# - ZZZZ.XX.YY with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
-# - ZZZZ/XX/YY with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
-# - ZZZZ-XX-YY with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
-# - XX. MONTH ZZZZ with XX being 1 or 2 and ZZZZ being 2 or 4 digits
-# - MONTH ZZZZ, with ZZZZ being 4 digits
-# - MONTH XX, ZZZZ with XX being 1 or 2 and ZZZZ being 4 digits
-# - XX MON ZZZZ with XX being 1 or 2 and ZZZZ being 4 digits. MONTH is 3 letters
-# - XXPP MONTH ZZZZ with XX being 1 or 2 and PP being 2 letters and ZZZZ being 4 digits
-
-# TODO: isn't there a date parsing library for this?
-
-DATE_REGEX = re.compile(
-    r"(\b|(?!=([_-])))(\d{1,2})[\.\/-](\d{1,2})[\.\/-](\d{4}|\d{2})(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))(\d{4}|\d{2})[\.\/-](\d{1,2})[\.\/-](\d{1,2})(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))(\d{1,2}[\. ]+[a-zéûäëčžúřěáíóńźçŞğü]{3,9} \d{4}|[a-zéûäëčžúřěáíóńźçŞğü]{3,9} \d{1,2}, \d{4})(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))([^\W\d_]{3,9} \d{1,2}, (\d{4}))(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))([^\W\d_]{3,9} \d{4})(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))(\d{1,2}[^ 0-9]{2}[\. ]+[^ ]{3,9}[ \.\/-]\d{4})(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))(\b\d{1,2}[ \.\/-][a-zéûäëčžúřěáíóńźçŞğü]{3}[ \.\/-]\d{4})(\b|(?=([_-])))",
-    re.IGNORECASE,
-)
-
-
 logger = logging.getLogger("paperless.parsing")
 
 
@@ -57,7 +26,7 @@ def is_mime_type_supported(mime_type: str) -> bool:
     """
     Returns True if the mime type is supported, False otherwise
     """
-    return get_parser_class_for_mime_type(mime_type) is not None
+    return get_parser_registry().get_parser_for_file(mime_type, "") is not None
 
 
 def get_default_file_extension(mime_type: str) -> str:
@@ -65,7 +34,7 @@ def get_default_file_extension(mime_type: str) -> str:
     Returns the default file extension for a mimetype, or
     an empty string if it could not be determined
     """
-    parser_class = get_parser_class_for_mime_type(mime_type)
+    parser_class = get_parser_registry().get_parser_for_file(mime_type, "")
     if parser_class is not None:
         supported = parser_class.supported_mime_types()
         if mime_type in supported:
@@ -97,13 +66,6 @@ def get_supported_file_extensions() -> set[str]:
             extensions.add(ext)
 
     return extensions
-
-
-def get_parser_class_for_mime_type(mime_type: str) -> type[ParserProtocol] | None:
-    """
-    Returns the best parser for the given mimetype or None if no parser exists.
-    """
-    return get_parser_registry().get_parser_for_file(mime_type, "")
 
 
 def run_convert(
