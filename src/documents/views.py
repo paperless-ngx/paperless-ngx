@@ -2112,13 +2112,21 @@ class GlobalSearchView(PassUserMixin):
         )
         groups = groups[:OBJECT_LIMIT]
         mail_rules = (
-            MailRule.objects.filter(name__icontains=query)
+            get_objects_for_user_owner_aware(
+                request.user,
+                "view_mailrule",
+                MailRule,
+            ).filter(name__icontains=query)
             if request.user.has_perm("paperless_mail.view_mailrule")
             else []
         )
         mail_rules = mail_rules[:OBJECT_LIMIT]
         mail_accounts = (
-            MailAccount.objects.filter(name__icontains=query)
+            get_objects_for_user_owner_aware(
+                request.user,
+                "view_mailaccount",
+                MailAccount,
+            ).filter(name__icontains=query)
             if request.user.has_perm("paperless_mail.view_mailaccount")
             else []
         )

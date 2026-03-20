@@ -1357,6 +1357,83 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(results["custom_fields"][0]["id"], custom_field1.id)
         self.assertEqual(results["workflows"][0]["id"], workflow1.id)
 
+    def test_global_search_filters_owned_mail_objects(self):
+        user1 = User.objects.create_user("mail-search-user")
+        user2 = User.objects.create_user("other-mail-search-user")
+        user1.user_permissions.add(
+            Permission.objects.get(codename="view_mailaccount"),
+            Permission.objects.get(codename="view_mailrule"),
+        )
+
+        own_account = MailAccount.objects.create(
+            name="bank owned account",
+            username="owner@example.com",
+            password="secret",
+            imap_server="imap.owner.example.com",
+            imap_port=993,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            character_set="UTF-8",
+            owner=user1,
+        )
+        other_account = MailAccount.objects.create(
+            name="bank other account",
+            username="other@example.com",
+            password="secret",
+            imap_server="imap.other.example.com",
+            imap_port=993,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            character_set="UTF-8",
+            owner=user2,
+        )
+        unowned_account = MailAccount.objects.create(
+            name="bank shared account",
+            username="shared@example.com",
+            password="secret",
+            imap_server="imap.shared.example.com",
+            imap_port=993,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            character_set="UTF-8",
+        )
+        own_rule = MailRule.objects.create(
+            name="bank owned rule",
+            account=own_account,
+            action=MailRule.MailAction.MOVE,
+            owner=user1,
+        )
+        other_rule = MailRule.objects.create(
+            name="bank other rule",
+            account=other_account,
+            action=MailRule.MailAction.MOVE,
+            owner=user2,
+        )
+        unowned_rule = MailRule.objects.create(
+            name="bank shared rule",
+            account=unowned_account,
+            action=MailRule.MailAction.MOVE,
+        )
+
+        self.client.force_authenticate(user1)
+
+        response = self.client.get("/api/search/?query=bank")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertCountEqual(
+            [account["id"] for account in response.data["mail_accounts"]],
+            [own_account.id, unowned_account.id],
+        )
+        self.assertCountEqual(
+            [rule["id"] for rule in response.data["mail_rules"]],
+            [own_rule.id, unowned_rule.id],
+        )
+        self.assertNotIn(
+            other_account.id,
+            [account["id"] for account in response.data["mail_accounts"]],
+        )
+        self.assertNotIn(
+            other_rule.id,
+            [rule["id"] for rule in response.data["mail_rules"]],
+        )
+
     def test_global_search_bad_request(self):
         """
         WHEN:
