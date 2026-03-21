@@ -702,6 +702,40 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(correction, None)
 
+    def test_search_spelling_suggestion_suppressed_for_private_terms(self):
+        owner = User.objects.create_user("owner")
+        attacker = User.objects.create_user("attacker")
+        attacker.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
+
+        with AsyncWriter(index.open_index()) as writer:
+            for i in range(55):
+                private_doc = Document.objects.create(
+                    checksum=f"p{i}",
+                    pk=100 + i,
+                    title=f"Private Document {i + 1}",
+                    content=f"treasury document {i + 1}",
+                    owner=owner,
+                )
+                visible_doc = Document.objects.create(
+                    checksum=f"v{i}",
+                    pk=200 + i,
+                    title=f"Visible Document {i + 1}",
+                    content=f"public ledger {i + 1}",
+                    owner=attacker,
+                )
+                index.update_document(writer, private_doc)
+                index.update_document(writer, visible_doc)
+
+        self.client.force_authenticate(user=attacker)
+
+        response = self.client.get("/api/documents/?query=treasurx")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 0)
+        self.assertIsNone(response.data["corrected_query"])
+
     @mock.patch(
         "whoosh.searching.Searcher.correct_query",
         side_effect=Exception("Test error"),
