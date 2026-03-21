@@ -1601,6 +1601,61 @@ assigns or creates tags if a properly formatted barcode is detected.
 
     Defaults to false.
 
+#### [`PAPERLESS_CONSUMER_ENABLE_CUSTOM_FIELD_BARCODE=<bool>`](#PAPERLESS_CONSUMER_ENABLE_CUSTOM_FIELD_BARCODE) {#PAPERLESS_CONSUMER_ENABLE_CUSTOM_FIELD_BARCODE}
+
+: Enables the detection of barcodes in the scanned document and
+assigns values to existing custom fields if a properly formatted barcode is detected.
+
+    The barcode must match one of the (configurable) regular expressions
+    in `PAPERLESS_CONSUMER_CUSTOM_FIELD_BARCODE_MAPPING`.
+
+    Note: Custom fields must already exist in the system - they will not be created
+    automatically. Use the UI or API to create custom fields before configuring this feature.
+
+    Matching is case insensitive.
+
+    Defaults to false.
+
+#### [`PAPERLESS_CONSUMER_CUSTOM_FIELD_BARCODE_MAPPING=<json dict>`](#PAPERLESS_CONSUMER_CUSTOM_FIELD_BARCODE_MAPPING) {#PAPERLESS_CONSUMER_CUSTOM_FIELD_BARCODE_MAPPING}
+
+: Defines a dictionary mapping regex patterns to custom field names and values.
+
+    Syntax: `{"<regex>": {"<custom_field_name>": "<custom_field_value>" [,...]} [,...]}`
+
+    A barcode is considered for custom field assignment if its text matches at
+    least one of the provided `<regex>` patterns.
+
+    When a match occurs, all associated <custom_field_name> and
+    <custom_field_value> pairs defined for that pattern are assigned to the
+    document.
+
+    Both <custom_field_name> and <custom_field_value> may include substitutions
+    based on capture groups from the matching <regex>. This enables flexible
+    mapping of barcode patterns to custom field assignments.
+
+    The value is always treated as a string. You may need to use custom fields with
+    appropriate data types or use the string type.
+
+    Defaults to `{}` (empty, no custom fields are assigned).
+
+    Example:
+
+    `{"INVOICE:(.*)": {"Invoice Number": "\\g<1>"}`
+
+    This maps barcodes like `INVOICE:12345` to an existing custom field named "Invoice Number"
+    with value `12345`.
+
+    More examples:
+
+    `{"DATE:(.*)": {"Document Date": "\\g<1>"}}` maps `DATE:2024-01-15` to custom field "Document Date"
+
+    `{"RECEIPT:(\\d+\\.\\d{2})@(.*)": {"Price": "\\g<1>", "Store": "\\g<2>"}}` maps `RECEIPT:10.55@CIRCLEK`
+    to two custom fields "Price" and "Store" with values "10.55" and "CIRCLEK".
+
+    `{"FIELD1:(.*)": {"Field 1": "\\g<1>"}, "FIELD2:(.*)": {"Field 2": "\\g<1>"}}` maps multiple barcodes to different fields.
+
+    Please refer to the Python regex documentation for more information.
+
 ## Audit Trail
 
 #### [`PAPERLESS_AUDIT_LOG_ENABLED=<bool>`](#PAPERLESS_AUDIT_LOG_ENABLED) {#PAPERLESS_AUDIT_LOG_ENABLED}

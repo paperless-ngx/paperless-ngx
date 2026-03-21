@@ -14,6 +14,7 @@ from documents.consumer import ConsumerError
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
+from documents.models import CustomField
 from documents.models import Document
 from documents.models import Tag
 from documents.plugins.base import StopConsumeTaskError
@@ -1121,3 +1122,302 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
 
             document_list = reader.separate_pages(separator_pages)
             self.assertEqual(len(document_list), 3)
+
+
+class TestCustomFieldBarcode(
+    DirectoriesMixin,
+    SampleDirMixin,
+    GetReaderPluginMixin,
+    TestCase,
+):
+    @contextmanager
+    def get_reader(self, filepath: Path) -> Generator[BarcodePlugin, None, None]:
+        reader = BarcodePlugin(
+            ConsumableDocument(DocumentSource.ConsumeFolder, original_file=filepath),
+            DocumentMetadataOverrides(),
+            DummyProgressManager(filepath.name, None),
+            self.dirs.scratch_dir,
+            "task-id",
+        )
+        reader.setup()
+        yield reader
+        reader.cleanup()
+
+    @override_settings(
+        CONSUMER_ENABLE_CUSTOM_FIELD_BARCODE=True,
+        CONSUMER_CUSTOM_FIELD_BARCODE_MAPPING={
+            "CUSTOM-PREFIX-(.*)": {"Test Field": "Test Value"},
+        },
+    )
+    def test_scan_file_for_custom_field_string(self) -> None:
+        """
+        GIVEN:
+            - PDF containing a barcode with FIELD: prefix
+            - Custom field mapping configured for FIELD: prefix
+            - Custom field 'Test Field' exists in the system
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - Custom field is assigned the correct value
+        """
+        CustomField.objects.create(
+            name="Test Field",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-custom-prefix.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.run()
+            custom_fields = reader.metadata.custom_fields
+            self.assertIsNotNone(custom_fields)
+            self.assertEqual(len(custom_fields), 1)
+            field = CustomField.objects.get(name="Test Field")
+            self.assertEqual(custom_fields[field.pk], "Test Value")
+
+    @override_settings(
+        CONSUMER_ENABLE_CUSTOM_FIELD_BARCODE=True,
+        CONSUMER_CUSTOM_FIELD_BARCODE_MAPPING={
+            "INVOICE:(.*)": {"Invoice Number": "\\g<1>"},
+        },
+    )
+    def test_scan_file_without_matching_custom_field_barcodes(self) -> None:
+        """
+        GIVEN:
+            - PDF containing barcodes but none with matching prefix
+            - Custom field mapping configured for INVOICE: prefix only
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - No custom field has been assigned
+        """
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-custom-prefix.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.run()
+            custom_fields = reader.metadata.custom_fields
+            self.assertIsNone(custom_fields)
+
+    @override_settings(
+        CONSUMER_ENABLE_CUSTOM_FIELD_BARCODE=False,
+        CONSUMER_CUSTOM_FIELD_BARCODE_MAPPING={
+            "CUSTOM-PREFIX-(.*)": {"Test Field": "\\g<1>"},
+        },
+    )
+    def test_scan_file_with_matching_custom_field_but_disabled(self) -> None:
+        """
+        GIVEN:
+            - PDF containing a custom field barcode with matching prefix
+            - The custom field barcode functionality is disabled
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - No custom field has been assigned
+        """
+        CustomField.objects.create(
+            name="Test Field",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-custom-prefix.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.run()
+            custom_fields = reader.metadata.custom_fields
+            self.assertIsNone(custom_fields)
+
+    @override_settings(
+        CONSUMER_ENABLE_CUSTOM_FIELD_BARCODE=True,
+        CONSUMER_CUSTOM_FIELD_BARCODE_MAPPING={
+            "CUSTOM-PREFIX-(.*)": {"Test Field": "\\g<1>"},
+        },
+    )
+    def test_scan_file_custom_field_not_exists(self) -> None:
+        """
+        GIVEN:
+            - Custom field mapping configured
+            - Custom field does NOT exist in the system
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - Custom field is skipped, warning is logged
+        """
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-custom-prefix.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.run()
+            custom_fields = reader.metadata.custom_fields
+            self.assertIsNone(custom_fields)
+
+    @override_settings(
+        CONSUMER_ENABLE_CUSTOM_FIELD_BARCODE=True,
+        CONSUMER_CUSTOM_FIELD_BARCODE_MAPPING={
+            "CUSTOM-(.*)-(.*)": {"Field \\g<1>": "\\g<2>"},
+        },
+    )
+    def test_scan_file_custom_field_dynamic_name_and_value(self) -> None:
+        """
+        GIVEN:
+            - PDF containing a barcode with CUSTOM-PREFIX- prefix
+            - Custom field mapping configured
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - Custom field with substituted name is assigned the substituted value
+        """
+        field = CustomField.objects.create(
+            name="Field PREFIX",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-custom-prefix.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.run()
+            custom_fields = reader.metadata.custom_fields
+            self.assertIsNotNone(custom_fields)
+            self.assertEqual(custom_fields[field.pk], "00123")
+
+    @override_settings(
+        CONSUMER_ENABLE_CUSTOM_FIELD_BARCODE=True,
+        CONSUMER_CUSTOM_FIELD_BARCODE_MAPPING={
+            "ASN(.*)": {"Field 1": "\\g<1>"},
+            "TAG:(.*)": {"Field 2": "\\g<1>"},
+        },
+    )
+    def test_scan_file_for_multiple_custom_fields(self) -> None:
+        """
+        GIVEN:
+            - PDF containing multiple matching barcodes
+            - Multiple custom field mappings configured
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - Multiple custom fields are assigned (if they exist)
+        """
+        field1 = CustomField.objects.create(
+            name="Field 1",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        field2 = CustomField.objects.create(
+            name="Field 2",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        test_file = self.BARCODE_SAMPLE_DIR / "split-by-tag-mixed-asn.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.run()
+            custom_fields = reader.metadata.custom_fields
+            self.assertIsNotNone(custom_fields)
+            self.assertEqual(len(custom_fields), 2)
+            self.assertEqual(custom_fields[field1.pk], "13456")
+            self.assertEqual(custom_fields[field2.pk], "business")
+
+    @override_settings(
+        CONSUMER_ENABLE_CUSTOM_FIELD_BARCODE=True,
+        CONSUMER_CUSTOM_FIELD_BARCODE_MAPPING={
+            "TAG:(.*)": {"Test Field": "\\g<1>"},
+        },
+    )
+    def test_custom_field_with_existing_tag_mapping(self) -> None:
+        """
+        GIVEN:
+            - Both tag and custom field barcode are enabled
+            - PDF containing matching barcode
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - Both tags and custom field are assigned
+            - Last barcode matching the pattern wins
+        """
+        existing_field = CustomField.objects.create(
+            name="Test Field",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        test_file = self.BARCODE_SAMPLE_DIR / "split-by-tag-basic.pdf"
+        with override_settings(
+            CONSUMER_ENABLE_TAG_BARCODE=True,
+            CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
+        ):
+            with self.get_reader(test_file) as reader:
+                reader.run()
+                tags = reader.metadata.tag_ids
+                custom_fields = reader.metadata.custom_fields
+                self.assertIsNotNone(tags)
+                self.assertEqual(len(tags), 2)
+                self.assertIsNotNone(custom_fields)
+                self.assertEqual(len(custom_fields), 1)
+                self.assertEqual(custom_fields[existing_field.pk], "receipt")
+
+    @override_settings(
+        CONSUMER_ENABLE_CUSTOM_FIELD_BARCODE=True,
+        CONSUMER_CUSTOM_FIELD_BARCODE_MAPPING={
+            "CUSTOM-PREFIX-(.*)": {"Test Field": "\\g<1>"},
+        },
+    )
+    def test_barcode_is_custom_field_property(self) -> None:
+        """
+        GIVEN:
+            - A barcode that matches custom field pattern
+        WHEN:
+            - is_custom_field property is checked
+        THEN:
+            - Returns True
+        """
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-custom-prefix.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.detect()
+            self.assertGreater(len(reader.barcodes), 0)
+            barcode = reader.barcodes[0]
+            self.assertTrue(barcode.is_custom_field)
+
+    @override_settings(
+        CONSUMER_ENABLE_CUSTOM_FIELD_BARCODE=True,
+        CONSUMER_CUSTOM_FIELD_BARCODE_MAPPING={
+            "NOTMATCH:(.*)": {"Test Field": "\\g<1>"},
+        },
+    )
+    def test_barcode_is_custom_field_property_no_match(self) -> None:
+        """
+        GIVEN:
+            - A barcode that does NOT match custom field pattern
+        WHEN:
+            - is_custom_field property is checked
+        THEN:
+            - Returns False
+        """
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-custom-prefix.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.detect()
+            self.assertGreater(len(reader.barcodes), 0)
+            barcode = reader.barcodes[0]
+            self.assertFalse(barcode.is_custom_field)
+
+    @override_settings(
+        CONSUMER_ENABLE_CUSTOM_FIELD_BARCODE=True,
+        CONSUMER_CUSTOM_FIELD_BARCODE_MAPPING={
+            "CUSTOM-PREFIX-(.*)": {
+                "Invoice Number": "\\g<1>",
+                "Invoice Source": "Scan-\\g<1>",
+            },
+        },
+    )
+    def test_scan_file_custom_field_multiple_fields_per_barcode(self) -> None:
+        """
+        GIVEN:
+            - PDF containing a barcode with FIELD: prefix
+            - Custom field mapping configured with multiple fields for single regex
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - Multiple custom fields are assigned values
+        """
+        CustomField.objects.create(
+            name="Invoice Number",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        CustomField.objects.create(
+            name="Invoice Source",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-custom-prefix.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.run()
+            custom_fields = reader.metadata.custom_fields
+            self.assertIsNotNone(custom_fields)
+            self.assertEqual(len(custom_fields), 2)
+            invoice_num = CustomField.objects.get(name="Invoice Number")
+            invoice_src = CustomField.objects.get(name="Invoice Source")
+            self.assertEqual(custom_fields[invoice_num.pk], "00123")
+            self.assertEqual(custom_fields[invoice_src.pk], "Scan-00123")

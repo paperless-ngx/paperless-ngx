@@ -16,6 +16,7 @@ from pikepdf import Pdf
 from documents.converters import convert_from_tiff_to_pdf
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
+from documents.models import CustomField
 from documents.models import Document
 from documents.models import Tag
 from documents.plugins.base import ConsumeTaskPlugin
@@ -73,6 +74,20 @@ class Barcode:
                 return True
         return False
 
+    @property
+    def is_custom_field(self) -> bool:
+        """
+        Returns True if the barcode value matches any configured custom field mapping
+        pattern, False otherwise.
+
+        Note: This does NOT exclude ASN, separator, or tag barcodes - they can also be
+        used as custom fields if they match a custom field mapping pattern.
+        """
+        for regex in self.settings.barcode_custom_field_mapping:
+            if re.match(regex, self.value, flags=re.IGNORECASE):
+                return True
+        return False
+
 
 class BarcodePlugin(ConsumeTaskPlugin):
     NAME: str = "BarcodePlugin"
@@ -82,7 +97,9 @@ class BarcodePlugin(ConsumeTaskPlugin):
         """
         Able to run if:
           - ASN from barcode detection is enabled or
-          - Barcode support is enabled and the mime type is supported
+          - Barcode support is enabled and the mime type is supported or
+          - Tag barcode feature is enabled or
+          - Custom field barcode feature is enabled
         """
         if self.settings.barcode_enable_tiff_support:
             supported_mimes: set[str] = {"application/pdf", "image/tiff"}
@@ -93,6 +110,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
             self.settings.barcode_enable_asn
             or self.settings.barcodes_enabled
             or self.settings.barcode_enable_tag
+            or self.settings.barcode_enable_custom_field
         ) and self.input_doc.mime_type in supported_mimes
 
     def get_settings(self) -> BarcodeConfig:
@@ -220,6 +238,18 @@ class BarcodePlugin(ConsumeTaskPlugin):
 
             # Request the consume task stops
             raise StopConsumeTaskError(msg)
+
+        # try reading custom fields from barcodes
+        if (
+            self.settings.barcode_enable_custom_field
+            and (custom_fields := self.custom_fields) is not None
+            and len(custom_fields) > 0
+        ):
+            if self.metadata.custom_fields:
+                self.metadata.custom_fields.update(custom_fields)
+            else:
+                self.metadata.custom_fields = custom_fields
+            logger.info(f"Found custom fields in barcode: {custom_fields}")
 
         # Update/overwrite an ASN if possible
         # After splitting, as otherwise each split document gets the same ASN
@@ -421,6 +451,77 @@ class BarcodePlugin(ConsumeTaskPlugin):
                     )
 
         return tags
+
+    @property
+    def custom_fields(self) -> dict:
+        """
+        Search the parsed barcodes for any custom fields.
+        Returns a dict of custom field id -> value (or empty dict).
+
+        Custom fields must already exist in the system - they are not created
+        automatically. Both field names and values support regex substitution.
+        """
+        custom_fields: dict = {}
+
+        mapping = self.settings.barcode_custom_field_mapping
+        if not mapping:
+            return custom_fields
+
+        # Ensure the barcodes have been read
+        self.detect()
+
+        for bc in self.barcodes:
+            barcode_value: str = bc.value
+
+            try:
+                for regex, field_map in mapping.items():
+                    if not re.match(regex, barcode_value, flags=re.IGNORECASE):
+                        continue
+
+                    for field_name_tpl, field_value_tpl in field_map.items():
+                        if not field_value_tpl:
+                            continue
+
+                        field_name = re.sub(
+                            regex,
+                            field_name_tpl,
+                            barcode_value,
+                            flags=re.IGNORECASE,
+                        )
+                        field_value = re.sub(
+                            regex,
+                            field_value_tpl,
+                            barcode_value,
+                            flags=re.IGNORECASE,
+                        )
+
+                        try:
+                            custom_field = CustomField.objects.get(
+                                name__iexact=field_name,
+                            )
+                        except CustomField.DoesNotExist:
+                            logger.warning(
+                                f"Custom field '{field_name}' does not exist, "
+                                f"skipping barcode '{barcode_value}'.",
+                            )
+                            continue
+
+                        logger.debug(
+                            f"Found Custom Field Barcode '{barcode_value}', substituted "
+                            f"to custom field #{custom_field.pk} with name '{field_name}' "
+                            f"and value '{field_value}'.",
+                        )
+                        custom_fields[custom_field.pk] = field_value
+
+                    break
+
+            except Exception as e:
+                logger.error(
+                    f"Failed to process custom field from barcode '{barcode_value}' "
+                    f"because: {e}",
+                )
+
+        return custom_fields
 
     def get_separation_pages(self) -> dict[int, bool]:
         """

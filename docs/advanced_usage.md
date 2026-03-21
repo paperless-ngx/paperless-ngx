@@ -842,6 +842,55 @@ documents to both separate and categorize them in a single operation.
 **Example:** A 6-page scan with TAG:invoice on page 3 and TAG:receipt on page 5 will create
 three documents: pages 1-2 (no tags), pages 3-4 (tagged "invoice"), and pages 5-6 (tagged "receipt").
 
+### Custom Field Assignment
+
+When enabled, Paperless will parse barcodes and attempt to assign values to existing custom fields.
+
+See the relevant settings [`PAPERLESS_CONSUMER_ENABLE_CUSTOM_FIELD_BARCODE`](configuration.md#PAPERLESS_CONSUMER_ENABLE_CUSTOM_FIELD_BARCODE)
+and [`PAPERLESS_CONSUMER_CUSTOM_FIELD_BARCODE_MAPPING`](configuration.md#PAPERLESS_CONSUMER_CUSTOM_FIELD_BARCODE_MAPPING)
+for more information.
+
+Unlike tags, custom fields must already exist in the system before using this feature.
+Use the Paperless UI or API to create custom fields first.
+
+!!! info
+If multiple barcodes match the same pattern, the custom fields derived from
+the last matching barcode in the document take precedence.
+
+#### Mapping Format
+
+The mapping format supports assigning multiple fields from a single barcode:
+
+```json
+{
+  "FIELD:(.*)": {
+    "Field Name": "Field value \\g<1>",
+    "Another Field": "Prefix \\g<1> suffix"
+  }
+}
+```
+
+Both field names and values support regex substitution using `\g<1>` for captured groups.
+
+**Example:** Given a barcode `INVOICE:12345,Paperless Ltd.` and mapping:
+
+```json
+{
+  "INVOICE:(\\d+),(.*)": {
+    "Invoice Number": "\\g<1>",
+    "Invoice Source": "\\g<2>"
+  }
+}
+```
+
+This will assign:
+
+- Custom field "Invoice Number" with value "12345"
+- Custom field "Invoice Source" with value "Paperless Ltd."
+
+Note: If a custom field with the computed name does not exist, it will be skipped
+and a warning will be logged.
+
 ## Automatic collation of double-sided documents {#collate}
 
 !!! note

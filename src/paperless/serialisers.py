@@ -208,6 +208,7 @@ class ProfileSerializer(PasswordValidationMixin, serializers.ModelSerializer):
 class ApplicationConfigurationSerializer(serializers.ModelSerializer):
     user_args = serializers.JSONField(binary=True, allow_null=True)
     barcode_tag_mapping = serializers.JSONField(binary=True, allow_null=True)
+    barcode_custom_field_mapping = serializers.JSONField(binary=True, allow_null=True)
     llm_api_key = ObfuscatedPasswordField(
         required=False,
         allow_null=True,
@@ -219,6 +220,11 @@ class ApplicationConfigurationSerializer(serializers.ModelSerializer):
             data["user_args"] = None
         if "barcode_tag_mapping" in data and data["barcode_tag_mapping"] == "":
             data["barcode_tag_mapping"] = None
+        if (
+            "barcode_custom_field_mapping" in data
+            and data["barcode_custom_field_mapping"] == ""
+        ):
+            data["barcode_custom_field_mapping"] = None
         if "language" in data and data["language"] == "":
             data["language"] = None
         if "llm_api_key" in data and data["llm_api_key"] is not None:
