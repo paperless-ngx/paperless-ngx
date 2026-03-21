@@ -772,6 +772,58 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(results[0]["id"], d3.id)
         self.assertEqual(results[1]["id"], d1.id)
 
+    def test_search_more_like_requires_view_permission_on_seed_document(self):
+        """
+        GIVEN:
+            - A user can search documents they own
+            - Another user's private document exists with similar content
+        WHEN:
+            - The user requests more-like-this for the private seed document
+        THEN:
+            - The request is rejected
+        """
+        owner = User.objects.create_user("owner")
+        attacker = User.objects.create_user("attacker")
+        attacker.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
+
+        private_seed = Document.objects.create(
+            title="private bank statement",
+            content="quarterly treasury bank statement wire transfer",
+            checksum="seed",
+            owner=owner,
+            pk=10,
+        )
+        visible_doc = Document.objects.create(
+            title="attacker-visible match",
+            content="quarterly treasury bank statement wire transfer summary",
+            checksum="visible",
+            owner=attacker,
+            pk=11,
+        )
+        other_doc = Document.objects.create(
+            title="unrelated",
+            content="completely different topic",
+            checksum="other",
+            owner=attacker,
+            pk=12,
+        )
+
+        with AsyncWriter(index.open_index()) as writer:
+            index.update_document(writer, private_seed)
+            index.update_document(writer, visible_doc)
+            index.update_document(writer, other_doc)
+
+        self.client.force_authenticate(user=attacker)
+
+        response = self.client.get(
+            f"/api/documents/?more_like_id={private_seed.id}",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.content, b"Insufficient permissions.")
+
     def test_search_filtering(self):
         t = Tag.objects.create(name="tag")
         t2 = Tag.objects.create(name="tag2")
