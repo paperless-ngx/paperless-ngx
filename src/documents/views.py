@@ -49,6 +49,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.timezone import make_aware
 from django.utils.translation import get_language
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import condition
@@ -70,6 +71,7 @@ from rest_framework import parsers
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.exceptions import ValidationError
 from rest_framework.filters import OrderingFilter
 from rest_framework.filters import SearchFilter
@@ -1369,11 +1371,28 @@ class UnifiedSearchViewSet(DocumentViewSet):
         filtered_queryset = super().filter_queryset(queryset)
 
         if self._is_search_request():
-            from documents import index
-
             if "query" in self.request.query_params:
+                from documents import index
+
                 query_class = index.DelayedFullTextQuery
             elif "more_like_id" in self.request.query_params:
+                try:
+                    more_like_doc_id = int(self.request.query_params["more_like_id"])
+                    more_like_doc = Document.objects.select_related("owner").get(
+                        pk=more_like_doc_id,
+                    )
+                except (TypeError, ValueError, Document.DoesNotExist):
+                    raise PermissionDenied(_("Invalid more_like_id"))
+
+                if not has_perms_owner_aware(
+                    self.request.user,
+                    "view_document",
+                    more_like_doc,
+                ):
+                    raise PermissionDenied(_("Insufficient permissions."))
+
+                from documents import index
+
                 query_class = index.DelayedMoreLikeThisQuery
             else:
                 raise ValueError
@@ -1409,6 +1428,8 @@ class UnifiedSearchViewSet(DocumentViewSet):
                     return response
             except NotFound:
                 raise
+            except PermissionDenied as e:
+                return HttpResponseForbidden(str(e.detail))
             except Exception as e:
                 logger.warning(f"An error occurred listing search results: {e!s}")
                 return HttpResponseBadRequest(
