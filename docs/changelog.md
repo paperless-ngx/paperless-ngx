@@ -1,5 +1,7 @@
 # Changelog
 
+## paperless-ngx 2.20.13
+
 ## paperless-ngx 2.20.12
 
 ### Security
