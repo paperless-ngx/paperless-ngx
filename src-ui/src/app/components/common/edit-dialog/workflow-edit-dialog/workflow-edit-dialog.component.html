@@ -164,7 +164,7 @@
           <pngx-input-text i18n-title title="Filter path" formControlName="filter_path" horizontal="true" i18n-hint hint="Apply to documents that match this path. Wildcards specified as * are allowed. Case-normalized." [error]="error?.filter_path"></pngx-input-text>
           <pngx-input-select i18n-title title="Filter mail rule" [items]="mailRules" horizontal="true" [allowNull]="true" formControlName="filter_mailrule" i18n-hint hint="Apply to documents consumed via this mail rule." [error]="error?.filter_mailrule"></pngx-input-select>
         }
-        @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated || formGroup.get('type').value === WorkflowTriggerType.Scheduled) {
+        @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated || formGroup.get('type').value === WorkflowTriggerType.Scheduled || formGroup.get('type').value === WorkflowTriggerType.VersionAdded) {
           <pngx-input-select i18n-title title="Content matching algorithm" horizontal="true" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></pngx-input-select>
           @if (matchingPatternRequired(formGroup)) {
             <pngx-input-text i18n-title title="Content matching pattern" horizontal="true" formControlName="match" [error]="error?.match"></pngx-input-text>
@@ -175,7 +175,7 @@
         }
       </div>
     </div>
-    @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated || formGroup.get('type').value === WorkflowTriggerType.Scheduled) {
+    @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated || formGroup.get('type').value === WorkflowTriggerType.Scheduled || formGroup.get('type').value === WorkflowTriggerType.VersionAdded) {
       <div class="row mt-3">
         <div class="col">
           <div class="trigger-filters mb-3">

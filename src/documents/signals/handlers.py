@@ -783,6 +783,19 @@ def run_workflows_added(
     )
 
 
+def run_workflows_version_added(
+    sender,
+    document: Document,
+    logging_group: uuid.UUID | None = None,
+    **kwargs,
+) -> None:
+    run_workflows(
+        trigger_type=WorkflowTrigger.WorkflowTriggerType.VERSION_ADDED,
+        document=document.root_document,
+        logging_group=logging_group,
+    )
+
+
 def run_workflows_updated(
     sender,
     document: Document,

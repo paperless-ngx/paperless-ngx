@@ -457,7 +457,7 @@ fields and permissions, which will be merged.
 
 #### Types {#workflow-trigger-types}
 
-Currently, there are four events that correspond to workflow trigger 'types':
+Currently, there are five events that correspond to workflow trigger 'types':
 
 1. **Consumption Started**: _before_ a document is consumed, so events can include filters by source (mail, consumption
    folder or API), file path, file name, mail rule
@@ -469,8 +469,10 @@ Currently, there are four events that correspond to workflow trigger 'types':
 4. **Scheduled**: a scheduled trigger that can be used to run workflows at a specific time. The date used can be either the document
    added, created, updated date or you can specify a (date) custom field. You can also specify a day offset from the date (positive
    offsets will trigger after the date, negative offsets will trigger before).
+5. **Version Added**: when a new version is added for an existing document. This trigger evaluates filters against the root document
+   and applies actions to the root document.
 
-The following flow diagram illustrates the four document trigger types:
+The following flow diagram illustrates the document trigger types:
 
 ```mermaid
 flowchart TD
@@ -484,6 +486,10 @@ flowchart TD
 
     updated{"Matching
     'Updated'
+    trigger(s)"}
+
+    version{"Matching
+    'Version Added'
     trigger(s)"}
 
     scheduled{"Documents
@@ -502,11 +508,15 @@ flowchart TD
     updated --> |Yes| J[Workflow Actions Run]
     updated --> |No| K
     J --> K[Document Saved]
-    L[Scheduled Task Check<br/>hourly at :05] --> M[Get All Scheduled Triggers]
-    M --> scheduled
-    scheduled --> |Yes| N[Workflow Actions Run]
-    scheduled --> |No| O[Document Saved]
-    N --> O
+    L[New Document Version Added] --> version
+    version --> |Yes| V[Workflow Actions Run]
+    version --> |No| W
+    V --> W[Document Saved]
+    X[Scheduled Task Check<br/>hourly at :05] --> Y[Get All Scheduled Triggers]
+    Y --> scheduled
+    scheduled --> |Yes| Z[Workflow Actions Run]
+    scheduled --> |No| AA[Document Saved]
+    Z --> AA
 ```
 
 #### Filters {#workflow-trigger-filters}

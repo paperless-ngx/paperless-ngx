@@ -61,6 +61,7 @@ from documents.models import WorkflowTrigger
 from documents.plugins.base import StopConsumeTaskError
 from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_consumption_finished
+from documents.signals import document_version_added
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
@@ -1842,6 +1843,53 @@ class TestWorkflows(
                 type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
                 document=version_doc,
             ).exists(),
+        )
+
+    def test_version_added_workflow_runs_on_root_document(self) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.VERSION_ADDED,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Updated by version",
+            assign_owner=self.user2,
+        )
+        workflow = Workflow.objects.create(
+            name="Version workflow",
+            order=0,
+        )
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        root_doc = Document.objects.create(
+            title="root",
+            correspondent=self.c,
+            original_filename="root.pdf",
+        )
+        version_doc = Document.objects.create(
+            title="version",
+            correspondent=self.c,
+            original_filename="version.pdf",
+            root_document=root_doc,
+        )
+
+        document_version_added.send(
+            sender=self.__class__,
+            document=version_doc,
+        )
+
+        root_doc.refresh_from_db()
+        version_doc.refresh_from_db()
+
+        self.assertEqual(root_doc.title, "Updated by version")
+        self.assertEqual(root_doc.owner, self.user2)
+        self.assertIsNone(version_doc.owner)
+        self.assertEqual(
+            WorkflowRun.objects.filter(
+                workflow=workflow,
+                type=WorkflowTrigger.WorkflowTriggerType.VERSION_ADDED,
+                document=root_doc,
+            ).count(),
+            1,
         )
 
     def test_document_updated_workflow(self) -> None:

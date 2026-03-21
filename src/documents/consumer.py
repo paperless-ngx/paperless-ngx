@@ -46,6 +46,7 @@ from documents.plugins.helpers import ProgressStatusOptions
 from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
 from documents.signals import document_updated
+from documents.signals import document_version_added
 from documents.signals.handlers import run_workflows
 from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.utils import copy_basic_file_stats
@@ -650,6 +651,12 @@ class ConsumerPlugin(
                     if self.unmodified_original
                     else self.working_copy,
                 )
+                if document.root_document_id:
+                    document_version_added.send(
+                        sender=self.__class__,
+                        document=document,
+                        logging_group=self.logging_group,
+                    )
 
                 # After everything is in the database, copy the files into
                 # place. If this fails, we'll also rollback the transaction.
