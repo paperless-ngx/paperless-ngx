@@ -1425,7 +1425,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(results[0]["document_count"], 0)
-        
+
     def test_patch_document_invalid_date_custom_field_returns_validation_error(self):
         """
         GIVEN:
@@ -1463,4 +1463,3 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("custom_fields", response.data)
         self.assertEqual(CustomFieldInstance.objects.count(), 0)
-
