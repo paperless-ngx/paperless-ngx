@@ -1,5 +1,8 @@
+from django.utils.translation import gettext as _
 from rest_framework import serializers
+from rest_framework.exceptions import PermissionDenied
 
+from documents.permissions import has_perms_owner_aware
 from documents.serialisers import CorrespondentField
 from documents.serialisers import DocumentTypeField
 from documents.serialisers import OwnedObjectSerializer
@@ -126,6 +129,18 @@ class MailRuleSerializer(OwnedObjectSerializer):
             raise serializers.ValidationError("An action parameter is required.")
 
         return attrs
+
+    def validate_account(self, account):
+        if self.user is not None and has_perms_owner_aware(
+            self.user,
+            "change_mailaccount",
+            account,
+        ):
+            return account
+
+        raise PermissionDenied(
+            _("Insufficient permissions."),
+        )
 
     def validate_maximum_age(self, value):
         if value > 36500:  # ~100 years
