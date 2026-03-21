@@ -263,6 +263,50 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(kwargs["remove_custom_fields"], [self.cf2.id])
 
     @mock.patch("documents.serialisers.bulk_edit.modify_custom_fields")
+    def test_api_modify_custom_fields_documentlink_forbidden_for_unpermitted_target(
+        self,
+        m,
+    ) -> None:
+        self.setup_mock(m, "modify_custom_fields")
+        user = User.objects.create_user(username="doc-owner")
+        user.user_permissions.add(Permission.objects.get(codename="change_document"))
+        other_user = User.objects.create_user(username="other-user")
+        source_doc = Document.objects.create(
+            checksum="source",
+            title="Source",
+            owner=user,
+        )
+        target_doc = Document.objects.create(
+            checksum="target",
+            title="Target",
+            owner=other_user,
+        )
+        doclink_field = CustomField.objects.create(
+            name="doclink",
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        )
+
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [source_doc.id],
+                    "method": "modify_custom_fields",
+                    "parameters": {
+                        "add_custom_fields": {doclink_field.id: [target_doc.id]},
+                        "remove_custom_fields": [],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        m.assert_not_called()
+
+    @mock.patch("documents.serialisers.bulk_edit.modify_custom_fields")
     def test_api_modify_custom_fields_with_values(self, m) -> None:
         self.setup_mock(m, "modify_custom_fields")
         response = self.client.post(

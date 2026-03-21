@@ -154,6 +154,7 @@ import { DirtyDocGuard } from './app/guards/dirty-doc.guard'
 import { DirtySavedViewGuard } from './app/guards/dirty-saved-view.guard'
 import { PermissionsGuard } from './app/guards/permissions.guard'
 import { withApiVersionInterceptor } from './app/interceptors/api-version.interceptor'
+import { withAuthExpiryInterceptor } from './app/interceptors/auth-expiry.interceptor'
 import { withCsrfInterceptor } from './app/interceptors/csrf.interceptor'
 import { DocumentTitlePipe } from './app/pipes/document-title.pipe'
 import { FilterPipe } from './app/pipes/filter.pipe'
@@ -399,7 +400,11 @@ bootstrapApplication(AppComponent, {
     StoragePathNamePipe,
     provideHttpClient(
       withInterceptorsFromDi(),
-      withInterceptors([withCsrfInterceptor, withApiVersionInterceptor]),
+      withInterceptors([
+        withCsrfInterceptor,
+        withApiVersionInterceptor,
+        withAuthExpiryInterceptor,
+      ]),
       withFetch()
     ),
     provideUiTour({

@@ -154,6 +154,11 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     --bs-list-group-action-active-color: var(--bs-body-color);
     --bs-list-group-action-active-bg: var(--pngx-bg-darker);
   }
+
+  .form-control:hover::file-selector-button {
+    background-color:var(--pngx-bg-dark) !important
+  }
+
   .search-container {
     input, input:focus, i-bs[name="search"] , ::placeholder {
       color: var(--pngx-primary-text-contrast) !important;

@@ -632,6 +632,116 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_rule1.name, "Updated Name 1")
         self.assertEqual(returned_rule1.action, MailRule.MailAction.DELETE)
 
+    def test_create_mail_rule_forbidden_for_unpermitted_account(self) -> None:
+        other_user = User.objects.create_user(username="mail-owner")
+        foreign_account = MailAccount.objects.create(
+            name="ForeignEmail",
+            username="username1",
+            password="password1",
+            imap_server="server.example.com",
+            imap_port=443,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            character_set="UTF-8",
+            owner=other_user,
+        )
+
+        response = self.client.post(
+            self.ENDPOINT,
+            data={
+                "name": "Rule1",
+                "account": foreign_account.pk,
+                "folder": "INBOX",
+                "filter_from": "from@example.com",
+                "maximum_age": 30,
+                "action": MailRule.MailAction.MARK_READ,
+                "assign_title_from": MailRule.TitleSource.FROM_SUBJECT,
+                "assign_correspondent_from": MailRule.CorrespondentSource.FROM_NOTHING,
+                "order": 0,
+                "attachment_type": MailRule.AttachmentProcessing.ATTACHMENTS_ONLY,
+            },
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(MailRule.objects.count(), 0)
+
+    def test_create_mail_rule_allowed_for_granted_account_change_permission(
+        self,
+    ) -> None:
+        other_user = User.objects.create_user(username="mail-owner")
+        foreign_account = MailAccount.objects.create(
+            name="ForeignEmail",
+            username="username1",
+            password="password1",
+            imap_server="server.example.com",
+            imap_port=443,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            character_set="UTF-8",
+            owner=other_user,
+        )
+        assign_perm("change_mailaccount", self.user, foreign_account)
+
+        response = self.client.post(
+            self.ENDPOINT,
+            data={
+                "name": "Rule1",
+                "account": foreign_account.pk,
+                "folder": "INBOX",
+                "filter_from": "from@example.com",
+                "maximum_age": 30,
+                "action": MailRule.MailAction.MARK_READ,
+                "assign_title_from": MailRule.TitleSource.FROM_SUBJECT,
+                "assign_correspondent_from": MailRule.CorrespondentSource.FROM_NOTHING,
+                "order": 0,
+                "attachment_type": MailRule.AttachmentProcessing.ATTACHMENTS_ONLY,
+            },
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(MailRule.objects.get().account, foreign_account)
+
+    def test_update_mail_rule_forbidden_for_unpermitted_account(self) -> None:
+        own_account = MailAccount.objects.create(
+            name="Email1",
+            username="username1",
+            password="password1",
+            imap_server="server.example.com",
+            imap_port=443,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            character_set="UTF-8",
+        )
+        other_user = User.objects.create_user(username="mail-owner")
+        foreign_account = MailAccount.objects.create(
+            name="ForeignEmail",
+            username="username2",
+            password="password2",
+            imap_server="server.example.com",
+            imap_port=443,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            character_set="UTF-8",
+            owner=other_user,
+        )
+        rule1 = MailRule.objects.create(
+            name="Rule1",
+            account=own_account,
+            folder="INBOX",
+            filter_from="from@example.com",
+            maximum_age=30,
+            action=MailRule.MailAction.MARK_READ,
+            assign_title_from=MailRule.TitleSource.FROM_SUBJECT,
+            assign_correspondent_from=MailRule.CorrespondentSource.FROM_NOTHING,
+            order=0,
+            attachment_type=MailRule.AttachmentProcessing.ATTACHMENTS_ONLY,
+        )
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{rule1.pk}/",
+            data={"account": foreign_account.pk},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        rule1.refresh_from_db()
+        self.assertEqual(rule1.account, own_account)
+
     def test_get_mail_rules_owner_aware(self) -> None:
         """
         GIVEN:
