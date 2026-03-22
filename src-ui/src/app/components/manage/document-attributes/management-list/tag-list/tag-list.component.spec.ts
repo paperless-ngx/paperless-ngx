@@ -41,7 +41,6 @@ describe('TagListComponent', () => {
     listFilteredSpy = jest.spyOn(tagService, 'listFiltered').mockReturnValue(
       of({
         count: 3,
-        all: [1, 2, 3],
         results: [
           {
             id: 1,

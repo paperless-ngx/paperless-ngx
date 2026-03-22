@@ -90,7 +90,8 @@ export abstract class ManagementListComponent<T extends MatchingModel>
 
   public data: T[] = []
   private unfilteredData: T[] = []
-  private allIDs: number[] = []
+  private currentExtraParams: { [key: string]: any } = null
+  private allSelectionActive = false
 
   public page = 1
 
@@ -106,6 +107,16 @@ export abstract class ManagementListComponent<T extends MatchingModel>
 
   public selectedObjects: Set<number> = new Set()
   public togggleAll: boolean = false
+
+  public get hasSelection(): boolean {
+    return this.selectedObjects.size > 0 || this.allSelectionActive
+  }
+
+  public get selectedCount(): number {
+    return this.allSelectionActive
+      ? this.displayCollectionSize
+      : this.selectedObjects.size
+  }
 
   ngOnInit(): void {
     this.reloadData()
@@ -150,11 +161,11 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   }
 
   protected getCollectionSize(results: Results<T>): number {
-    return results.all?.length ?? results.count
+    return results.count
   }
 
   protected getDisplayCollectionSize(results: Results<T>): number {
-    return this.getCollectionSize(results)
+    return results.display_count ?? this.getCollectionSize(results)
   }
 
   getDocumentCount(object: MatchingModel): number {
@@ -171,6 +182,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
 
   reloadData(extraParams: { [key: string]: any } = null) {
     this.loading = true
+    this.currentExtraParams = extraParams
     this.clearSelection()
     this.service
       .listFiltered(
@@ -189,7 +201,6 @@ export abstract class ManagementListComponent<T extends MatchingModel>
           this.data = this.filterData(c.results)
           this.collectionSize = this.getCollectionSize(c)
           this.displayCollectionSize = this.getDisplayCollectionSize(c)
-          this.allIDs = c.all
         }),
         delay(100)
       )
@@ -346,7 +357,16 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     return objects.map((o) => o.id)
   }
 
+  private getBulkEditFilters(): { [key: string]: any } {
+    const filters = { ...this.currentExtraParams }
+    if (this._nameFilter?.length) {
+      filters['name__icontains'] = this._nameFilter
+    }
+    return filters
+  }
+
   clearSelection() {
+    this.allSelectionActive = false
     this.togggleAll = false
     this.selectedObjects.clear()
   }
@@ -356,6 +376,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   }
 
   selectPage() {
+    this.allSelectionActive = false
     this.selectedObjects = new Set(this.getSelectableIDs(this.data))
     this.togggleAll = this.areAllPageItemsSelected()
   }
@@ -365,11 +386,16 @@ export abstract class ManagementListComponent<T extends MatchingModel>
       this.clearSelection()
       return
     }
-    this.selectedObjects = new Set(this.allIDs)
+
+    this.allSelectionActive = true
+    this.selectedObjects = new Set(this.getSelectableIDs(this.data))
     this.togggleAll = this.areAllPageItemsSelected()
   }
 
   toggleSelected(object) {
+    if (this.allSelectionActive) {
+      this.allSelectionActive = false
+    }
     this.selectedObjects.has(object.id)
       ? this.selectedObjects.delete(object.id)
       : this.selectedObjects.add(object.id)
@@ -377,6 +403,9 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   }
 
   protected areAllPageItemsSelected(): boolean {
+    if (this.allSelectionActive) {
+      return this.data.length > 0
+    }
     const ids = this.getSelectableIDs(this.data)
     return ids.length > 0 && ids.every((id) => this.selectedObjects.has(id))
   }
@@ -390,10 +419,12 @@ export abstract class ManagementListComponent<T extends MatchingModel>
         modal.componentInstance.buttonsEnabled = false
         this.service
           .bulk_edit_objects(
-            Array.from(this.selectedObjects),
+            this.allSelectionActive ? [] : Array.from(this.selectedObjects),
             BulkEditObjectOperation.SetPermissions,
             permissions,
-            merge
+            merge,
+            this.allSelectionActive,
+            this.allSelectionActive ? this.getBulkEditFilters() : null
           )
           .subscribe({
             next: () => {
@@ -428,8 +459,12 @@ export abstract class ManagementListComponent<T extends MatchingModel>
       modal.componentInstance.buttonsEnabled = false
       this.service
         .bulk_edit_objects(
-          Array.from(this.selectedObjects),
-          BulkEditObjectOperation.Delete
+          this.allSelectionActive ? [] : Array.from(this.selectedObjects),
+          BulkEditObjectOperation.Delete,
+          null,
+          null,
+          this.allSelectionActive,
+          this.allSelectionActive ? this.getBulkEditFilters() : null
         )
         .subscribe({
           next: () => {

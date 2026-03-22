@@ -1558,6 +1558,41 @@ class DocumentListSerializer(serializers.Serializer):
         return documents
 
 
+class DocumentSelectionSerializer(DocumentListSerializer):
+    documents = serializers.ListField(
+        required=False,
+        label="Documents",
+        write_only=True,
+        child=serializers.IntegerField(),
+    )
+
+    all = serializers.BooleanField(
+        default=False,
+        required=False,
+        write_only=True,
+    )
+
+    filters = serializers.DictField(
+        required=False,
+        allow_empty=True,
+        write_only=True,
+    )
+
+    def validate(self, attrs):
+        if attrs.get("all", False):
+            attrs.setdefault("documents", [])
+            return attrs
+
+        if "documents" not in attrs:
+            raise serializers.ValidationError(
+                "documents is required unless all is true.",
+            )
+
+        documents = attrs["documents"]
+        self._validate_document_id_list(documents)
+        return attrs
+
+
 class SourceModeValidationMixin:
     def validate_source_mode(self, source_mode: str) -> str:
         if source_mode not in bulk_edit.SourceModeChoices.__dict__.values():
@@ -1565,7 +1600,7 @@ class SourceModeValidationMixin:
         return source_mode
 
 
-class RotateDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
+class RotateDocumentsSerializer(DocumentSelectionSerializer, SourceModeValidationMixin):
     degrees = serializers.IntegerField(required=True)
     source_mode = serializers.CharField(
         required=False,
@@ -1648,17 +1683,17 @@ class RemovePasswordDocumentsSerializer(
     )
 
 
-class DeleteDocumentsSerializer(DocumentListSerializer):
+class DeleteDocumentsSerializer(DocumentSelectionSerializer):
     pass
 
 
-class ReprocessDocumentsSerializer(DocumentListSerializer):
+class ReprocessDocumentsSerializer(DocumentSelectionSerializer):
     pass
 
 
 class BulkEditSerializer(
     SerializerWithPerms,
-    DocumentListSerializer,
+    DocumentSelectionSerializer,
     SetPermissionsMixin,
     SourceModeValidationMixin,
 ):
@@ -1986,6 +2021,19 @@ class BulkEditSerializer(
             raise serializers.ValidationError("password must be a string")
 
     def validate(self, attrs):
+        attrs = super().validate(attrs)
+
+        if attrs.get("all", False) and attrs["method"] in [
+            bulk_edit.merge,
+            bulk_edit.split,
+            bulk_edit.delete_pages,
+            bulk_edit.edit_pdf,
+            bulk_edit.remove_password,
+        ]:
+            raise serializers.ValidationError(
+                "This method does not support all=true.",
+            )
+
         method = attrs["method"]
         parameters = attrs["parameters"]
 
@@ -2243,7 +2291,7 @@ class DocumentVersionLabelSerializer(serializers.Serializer):
         return normalized or None
 
 
-class BulkDownloadSerializer(DocumentListSerializer):
+class BulkDownloadSerializer(DocumentSelectionSerializer):
     content = serializers.ChoiceField(
         choices=["archive", "originals", "both"],
         default="archive",
@@ -2602,11 +2650,23 @@ class ShareLinkBundleSerializer(OwnedObjectSerializer):
 
 class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
     objects = serializers.ListField(
-        required=True,
-        allow_empty=False,
+        required=False,
+        allow_empty=True,
         label="Objects",
         write_only=True,
         child=serializers.IntegerField(),
+    )
+
+    all = serializers.BooleanField(
+        default=False,
+        required=False,
+        write_only=True,
+    )
+
+    filters = serializers.DictField(
+        required=False,
+        allow_empty=True,
+        write_only=True,
     )
 
     object_type = serializers.ChoiceField(
@@ -2681,10 +2741,20 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
 
     def validate(self, attrs):
         object_type = attrs["object_type"]
-        objects = attrs["objects"]
+        objects = attrs.get("objects")
+        apply_to_all = attrs.get("all", False)
         operation = attrs.get("operation")
 
-        self._validate_objects(objects, object_type)
+        if apply_to_all:
+            attrs.setdefault("objects", [])
+        else:
+            if objects is None:
+                raise serializers.ValidationError(
+                    "objects is required unless all is true.",
+                )
+            if len(objects) == 0:
+                raise serializers.ValidationError("objects must not be empty")
+            self._validate_objects(objects, object_type)
 
         if operation == "set_permissions":
             permissions = attrs.get("permissions")

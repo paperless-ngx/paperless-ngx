@@ -1119,21 +1119,19 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             [u1_doc1.id],
         )
 
-    def test_pagination_all(self) -> None:
+    def test_pagination_results(self) -> None:
         """
         GIVEN:
             - A set of 50 documents
         WHEN:
             - API request for document filtering
         THEN:
-            - Results are paginated (25 items) and response["all"] returns all ids (50 items)
+            - Results are paginated (25 items) and count reflects all results (50 items)
         """
         t = Tag.objects.create(name="tag")
-        docs = []
         for i in range(50):
             d = Document.objects.create(checksum=i, content=f"test{i}")
             d.tags.add(t)
-            docs.append(d)
 
         response = self.client.get(
             f"/api/documents/?tags__id__in={t.id}",
@@ -1141,8 +1139,83 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results), 25)
-        self.assertEqual(len(response.data["all"]), 50)
+        self.assertEqual(response.data["count"], 50)
+        self.assertNotIn("all", response.data)
+
+    def test_pagination_all_for_api_version_9(self) -> None:
+        """
+        GIVEN:
+            - A set of documents matching a filter
+        WHEN:
+            - API request uses legacy version 9
+        THEN:
+            - Response includes "all" for backward compatibility
+        """
+        t = Tag.objects.create(name="tag")
+        docs = []
+        for i in range(4):
+            d = Document.objects.create(checksum=i, content=f"test{i}")
+            d.tags.add(t)
+            docs.append(d)
+
+        response = self.client.get(
+            f"/api/documents/?tags__id__in={t.id}",
+            headers={"Accept": "application/json; version=9"},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("all", response.data)
         self.assertCountEqual(response.data["all"], [d.id for d in docs])
+
+    def test_list_with_include_selection_data(self) -> None:
+        correspondent = Correspondent.objects.create(name="c1")
+        doc_type = DocumentType.objects.create(name="dt1")
+        storage_path = StoragePath.objects.create(name="sp1")
+        tag = Tag.objects.create(name="tag")
+
+        matching_doc = Document.objects.create(
+            checksum="A",
+            correspondent=correspondent,
+            document_type=doc_type,
+            storage_path=storage_path,
+        )
+        matching_doc.tags.add(tag)
+
+        non_matching_doc = Document.objects.create(checksum="B")
+        non_matching_doc.tags.add(Tag.objects.create(name="other"))
+
+        response = self.client.get(
+            f"/api/documents/?tags__id__in={tag.id}&include_selection_data=true",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("selection_data", response.data)
+
+        selected_correspondent = next(
+            item
+            for item in response.data["selection_data"]["selected_correspondents"]
+            if item["id"] == correspondent.id
+        )
+        selected_tag = next(
+            item
+            for item in response.data["selection_data"]["selected_tags"]
+            if item["id"] == tag.id
+        )
+        selected_type = next(
+            item
+            for item in response.data["selection_data"]["selected_document_types"]
+            if item["id"] == doc_type.id
+        )
+        selected_storage_path = next(
+            item
+            for item in response.data["selection_data"]["selected_storage_paths"]
+            if item["id"] == storage_path.id
+        )
+
+        self.assertEqual(selected_correspondent["document_count"], 1)
+        self.assertEqual(selected_tag["document_count"], 1)
+        self.assertEqual(selected_type["document_count"], 1)
+        self.assertEqual(selected_storage_path["document_count"], 1)
 
     def test_statistics(self) -> None:
         doc1 = Document.objects.create(
