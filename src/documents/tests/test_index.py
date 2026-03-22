@@ -1,3 +1,4 @@
+import importlib
 from datetime import datetime
 from unittest import mock
 
@@ -10,8 +11,14 @@ from django.utils.timezone import get_current_timezone
 from django.utils.timezone import timezone
 
 from documents import index
+from documents.db import Unaccent
+from documents.db import strip_accents
 from documents.models import Document
 from documents.tests.utils import DirectoriesMixin
+
+_migration_0017 = importlib.import_module(
+    "documents.migrations.0017_pg_unaccent_extension",
+)
 
 
 class TestAutoComplete(DirectoriesMixin, TestCase):
@@ -40,6 +47,36 @@ class TestAutoComplete(DirectoriesMixin, TestCase):
         )
         self.assertListEqual(index.autocomplete(ix, "tes", limit=1), [b"test2"])
         self.assertListEqual(index.autocomplete(ix, "tes", limit=0), [])
+
+    def test_auto_complete_accent_folding(self) -> None:
+        """
+        GIVEN:
+            - Documents with accented content (e.g. "étudiant", "résumé")
+        WHEN:
+            - Autocomplete is queried with non-accented prefix
+        THEN:
+            - Folded terms are returned (e.g. "etudiant" from "étudiant")
+        """
+        doc1 = Document.objects.create(
+            title="doc1",
+            checksum="A",
+            content="naïve résumé café",
+        )
+        index.add_or_update_document(doc1)
+
+        ix = index.open_index()
+
+        # "nai" should match "naive" (folded from "naïve")
+        results = index.autocomplete(ix, "nai")
+        self.assertIn(b"naive", results)
+
+        # "naï" (with accent) should also match the folded term
+        results = index.autocomplete(ix, "naï")
+        self.assertIn(b"naive", results)
+
+        # "res" should match "resume" (folded from "résumé")
+        results = index.autocomplete(ix, "res")
+        self.assertIn(b"resume", results)
 
     def test_archive_serial_number_ranging(self) -> None:
         """
@@ -369,3 +406,75 @@ class TestIndexResilience(DirectoriesMixin, SimpleTestCase):
             "Error while opening the index, recreating.",
             cm.output[0],
         )
+
+
+class TestStripAccents(SimpleTestCase):
+    def test_strip_accents_basic(self) -> None:
+        self.assertEqual(strip_accents("café"), "cafe")
+        self.assertEqual(strip_accents("résumé"), "resume")
+        self.assertEqual(strip_accents("naïve"), "naive")
+
+    def test_strip_accents_none(self) -> None:
+        self.assertEqual(strip_accents(None), "")
+
+    def test_strip_accents_no_accents(self) -> None:
+        self.assertEqual(strip_accents("hello"), "hello")
+
+
+class TestUnaccentTransform(SimpleTestCase):
+    def _make_transform(self):
+        lhs = mock.MagicMock()
+        return Unaccent(lhs)
+
+    def _make_compiler(self):
+        compiler = mock.MagicMock()
+        compiler.compile.return_value = ('"documents_document"."title"', [])
+        return compiler
+
+    def test_as_postgresql(self) -> None:
+        transform = self._make_transform()
+        sql, params = transform.as_postgresql(self._make_compiler(), mock.MagicMock())
+        self.assertEqual(sql, 'unaccent("documents_document"."title")')
+        self.assertEqual(params, [])
+
+    def test_as_sqlite(self) -> None:
+        transform = self._make_transform()
+        sql, params = transform.as_sqlite(self._make_compiler(), mock.MagicMock())
+        self.assertEqual(sql, 'paperless_unaccent("documents_document"."title")')
+        self.assertEqual(params, [])
+
+    def test_as_sql_passthrough(self) -> None:
+        transform = self._make_transform()
+        sql, params = transform.as_sql(self._make_compiler(), mock.MagicMock())
+        self.assertEqual(sql, '"documents_document"."title"')
+        self.assertEqual(params, [])
+
+
+class TestUnaccentMigration(SimpleTestCase):
+    def test_install_unaccent_postgresql(self) -> None:
+        schema_editor = mock.MagicMock()
+        schema_editor.connection.vendor = "postgresql"
+        _migration_0017.install_unaccent(None, schema_editor)
+        schema_editor.execute.assert_called_once_with(
+            "CREATE EXTENSION IF NOT EXISTS unaccent",
+        )
+
+    def test_install_unaccent_sqlite_noop(self) -> None:
+        schema_editor = mock.MagicMock()
+        schema_editor.connection.vendor = "sqlite"
+        _migration_0017.install_unaccent(None, schema_editor)
+        schema_editor.execute.assert_not_called()
+
+    def test_remove_unaccent_postgresql(self) -> None:
+        schema_editor = mock.MagicMock()
+        schema_editor.connection.vendor = "postgresql"
+        _migration_0017.remove_unaccent(None, schema_editor)
+        schema_editor.execute.assert_called_once_with(
+            "DROP EXTENSION IF EXISTS unaccent",
+        )
+
+    def test_remove_unaccent_sqlite_noop(self) -> None:
+        schema_editor = mock.MagicMock()
+        schema_editor.connection.vendor = "sqlite"
+        _migration_0017.remove_unaccent(None, schema_editor)
+        schema_editor.execute.assert_not_called()

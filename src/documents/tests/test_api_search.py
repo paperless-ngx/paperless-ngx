@@ -89,6 +89,79 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(len(results), 0)
         self.assertCountEqual(response.data["all"], [])
 
+    def test_search_accent_folding(self) -> None:
+        """
+        GIVEN:
+            - Documents with accented characters in title and content
+        WHEN:
+            - Searching with and without accents
+        THEN:
+            - Both accented and non-accented queries match the documents
+        """
+        d1 = Document.objects.create(
+            title="A naïve résumé",
+            content="The café served a crème brûlée dessert",
+            checksum="A",
+            pk=1,
+        )
+        d2 = Document.objects.create(
+            title="Plain menu",
+            content="The shop offers a variety of beverages",
+            checksum="B",
+            pk=2,
+        )
+        with AsyncWriter(index.open_index()) as writer:
+            index.update_document(writer, d1)
+            index.update_document(writer, d2)
+
+        # Search without accent should match accented content
+        response = self.client.get("/api/documents/?query=naive")
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], d1.id)
+
+        # Search with accent should also match
+        response = self.client.get("/api/documents/?query=naïve")
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], d1.id)
+
+        # Search without accent should match accented content
+        response = self.client.get("/api/documents/?query=resume")
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], d1.id)
+
+        # Search without accent should match accented content
+        response = self.client.get("/api/documents/?query=cafe")
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], d1.id)
+
+    @override_settings(INDEX_ACCENT_FOLD=False)
+    def test_search_accent_folding_disabled(self) -> None:
+        """
+        GIVEN:
+            - Accent folding is disabled via settings
+            - Documents with accented characters
+        WHEN:
+            - Searching without accents
+        THEN:
+            - Non-accented query does NOT match accented content
+        """
+        d1 = Document.objects.create(
+            title="A naïve résumé",
+            content="The café served crème brûlée",
+            checksum="A",
+            pk=1,
+        )
+        with AsyncWriter(index.open_index()) as writer:
+            index.update_document(writer, d1)
+
+        # Without accent folding, non-accented search should NOT match
+        response = self.client.get("/api/documents/?query=naive")
+        self.assertEqual(response.data["count"], 0)
+
+        # But accented search should still match
+        response = self.client.get("/api/documents/?query=naïve")
+        self.assertEqual(response.data["count"], 1)
+
     def test_search_custom_field_ordering(self) -> None:
         custom_field = CustomField.objects.create(
             name="Sortable field",

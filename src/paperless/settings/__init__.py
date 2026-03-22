@@ -85,6 +85,7 @@ EMPTY_TRASH_DIR = (
 # threads.
 MEDIA_LOCK = MEDIA_ROOT / "media.lock"
 INDEX_DIR = DATA_DIR / "index"
+INDEX_ACCENT_FOLD = get_bool_from_env("PAPERLESS_INDEX_ACCENT_FOLD", "YES")
 MODEL_FILE = get_path_from_env(
     "PAPERLESS_MODEL_FILE",
     DATA_DIR / "classification_model.pickle",

@@ -1103,6 +1103,24 @@ should be a valid crontab(5) expression describing when to run.
 
     Defaults to `0 0 * * *` or daily at midnight.
 
+#### [`PAPERLESS_INDEX_ACCENT_FOLD=<bool>`](#PAPERLESS_INDEX_ACCENT_FOLD) {#PAPERLESS_INDEX_ACCENT_FOLD}
+
+: Enables accent/diacritic folding in the full-text search index.
+When enabled, searching for "etudiant" will also match "étudiant",
+"cafe" will match "café", "resume" will match "résumé", etc.
+This is especially useful for documents in languages that use
+accented characters (French, Spanish, Portuguese, German, etc.).
+
+    !!! note
+
+        Changing this setting requires a full search index rebuild:
+
+        ```
+        document_index reindex
+        ```
+
+    Defaults to `true`.
+
 #### [`PAPERLESS_SANITY_TASK_CRON=<cron expression>`](#PAPERLESS_SANITY_TASK_CRON) {#PAPERLESS_SANITY_TASK_CRON}
 
 : Configures the scheduled sanity checker frequency. The value should be a
