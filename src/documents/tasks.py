@@ -52,8 +52,6 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
-from documents.parsers import DocumentParser
-from documents.parsers import get_parser_class_for_mime_type
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import ProgressManager
 from documents.plugins.base import StopConsumeTaskError
@@ -66,11 +64,7 @@ from documents.signals.handlers import send_websocket_document_updated
 from documents.workflows.utils import get_workflows_for_trigger
 from paperless.config import AIConfig
 from paperless.parsers import ParserContext
-from paperless.parsers.mail import MailDocumentParser
-from paperless.parsers.remote import RemoteDocumentParser
-from paperless.parsers.tesseract import RasterisedDocumentParser
-from paperless.parsers.text import TextDocumentParser
-from paperless.parsers.tika import TikaDocumentParser
+from paperless.parsers.registry import get_parser_registry
 from paperless_ai.indexing import llm_index_add_or_update_document
 from paperless_ai.indexing import llm_index_remove_document
 from paperless_ai.indexing import update_llm_index
@@ -310,8 +304,10 @@ def update_document_content_maybe_archive_file(document_id) -> None:
 
     mime_type = document.mime_type
 
-    parser_class: type[DocumentParser] | None = get_parser_class_for_mime_type(
+    parser_class = get_parser_registry().get_parser_for_file(
         mime_type,
+        document.original_filename or "",
+        document.source_path,
     )
 
     if not parser_class:
@@ -321,138 +317,92 @@ def update_document_content_maybe_archive_file(document_id) -> None:
         )
         return
 
-    parser: DocumentParser = parser_class(logging_group=uuid.uuid4())
+    with parser_class() as parser:
+        parser.configure(ParserContext())
 
-    parser_is_new_style = isinstance(
-        parser,
-        (
-            MailDocumentParser,
-            RasterisedDocumentParser,
-            RemoteDocumentParser,
-            TextDocumentParser,
-            TikaDocumentParser,
-        ),
-    )
-
-    # TODO(stumpylog): Remove branch in the future when all parsers use new protocol
-    if parser_is_new_style:
-        parser.__enter__()
-
-    try:
-        # TODO(stumpylog): Remove branch in the future when all parsers use new protocol
-        if parser_is_new_style:
-            parser.configure(ParserContext())
+        try:
             parser.parse(document.source_path, mime_type)
-        else:
-            parser.parse(
-                document.source_path,
-                mime_type,
-                document.get_public_filename(),
-            )
 
-        # TODO(stumpylog): Remove branch in the future when all parsers use new protocol
-        if parser_is_new_style:
             thumbnail = parser.get_thumbnail(document.source_path, mime_type)
-        else:
-            thumbnail = parser.get_thumbnail(
-                document.source_path,
-                mime_type,
-                document.get_public_filename(),
-            )
 
-        with transaction.atomic():
-            oldDocument = Document.objects.get(pk=document.pk)
-            if parser.get_archive_path():
-                with Path(parser.get_archive_path()).open("rb") as f:
-                    checksum = hashlib.md5(f.read()).hexdigest()
-                # I'm going to save first so that in case the file move
-                # fails, the database is rolled back.
-                # We also don't use save() since that triggers the filehandling
-                # logic, and we don't want that yet (file not yet in place)
-                document.archive_filename = generate_unique_filename(
-                    document,
-                    archive_filename=True,
-                )
-                Document.objects.filter(pk=document.pk).update(
-                    archive_checksum=checksum,
-                    content=parser.get_text(),
-                    archive_filename=document.archive_filename,
-                )
-                newDocument = Document.objects.get(pk=document.pk)
-                if settings.AUDIT_LOG_ENABLED:
-                    LogEntry.objects.log_create(
-                        instance=oldDocument,
-                        changes={
-                            "content": [oldDocument.content, newDocument.content],
-                            "archive_checksum": [
-                                oldDocument.archive_checksum,
-                                newDocument.archive_checksum,
-                            ],
-                            "archive_filename": [
-                                oldDocument.archive_filename,
-                                newDocument.archive_filename,
-                            ],
-                        },
-                        additional_data={
-                            "reason": "Update document content",
-                        },
-                        action=LogEntry.Action.UPDATE,
-                    )
-            else:
-                Document.objects.filter(pk=document.pk).update(
-                    content=parser.get_text(),
-                )
-
-                if settings.AUDIT_LOG_ENABLED:
-                    LogEntry.objects.log_create(
-                        instance=oldDocument,
-                        changes={
-                            "content": [oldDocument.content, parser.get_text()],
-                        },
-                        additional_data={
-                            "reason": "Update document content",
-                        },
-                        action=LogEntry.Action.UPDATE,
-                    )
-
-            with FileLock(settings.MEDIA_LOCK):
+            with transaction.atomic():
+                oldDocument = Document.objects.get(pk=document.pk)
                 if parser.get_archive_path():
-                    create_source_path_directory(document.archive_path)
-                    shutil.move(parser.get_archive_path(), document.archive_path)
-                shutil.move(thumbnail, document.thumbnail_path)
+                    with Path(parser.get_archive_path()).open("rb") as f:
+                        checksum = hashlib.md5(f.read()).hexdigest()
+                    # I'm going to save first so that in case the file move
+                    # fails, the database is rolled back.
+                    # We also don't use save() since that triggers the filehandling
+                    # logic, and we don't want that yet (file not yet in place)
+                    document.archive_filename = generate_unique_filename(
+                        document,
+                        archive_filename=True,
+                    )
+                    Document.objects.filter(pk=document.pk).update(
+                        archive_checksum=checksum,
+                        content=parser.get_text(),
+                        archive_filename=document.archive_filename,
+                    )
+                    newDocument = Document.objects.get(pk=document.pk)
+                    if settings.AUDIT_LOG_ENABLED:
+                        LogEntry.objects.log_create(
+                            instance=oldDocument,
+                            changes={
+                                "content": [oldDocument.content, newDocument.content],
+                                "archive_checksum": [
+                                    oldDocument.archive_checksum,
+                                    newDocument.archive_checksum,
+                                ],
+                                "archive_filename": [
+                                    oldDocument.archive_filename,
+                                    newDocument.archive_filename,
+                                ],
+                            },
+                            additional_data={
+                                "reason": "Update document content",
+                            },
+                            action=LogEntry.Action.UPDATE,
+                        )
+                else:
+                    Document.objects.filter(pk=document.pk).update(
+                        content=parser.get_text(),
+                    )
 
-        document.refresh_from_db()
-        logger.info(
-            f"Updating index for document {document_id} ({document.archive_checksum})",
-        )
-        with index.open_index_writer() as writer:
-            index.update_document(writer, document)
+                    if settings.AUDIT_LOG_ENABLED:
+                        LogEntry.objects.log_create(
+                            instance=oldDocument,
+                            changes={
+                                "content": [oldDocument.content, parser.get_text()],
+                            },
+                            additional_data={
+                                "reason": "Update document content",
+                            },
+                            action=LogEntry.Action.UPDATE,
+                        )
 
-        ai_config = AIConfig()
-        if ai_config.llm_index_enabled:
-            llm_index_add_or_update_document(document)
+                with FileLock(settings.MEDIA_LOCK):
+                    if parser.get_archive_path():
+                        create_source_path_directory(document.archive_path)
+                        shutil.move(parser.get_archive_path(), document.archive_path)
+                    shutil.move(thumbnail, document.thumbnail_path)
 
-        clear_document_caches(document.pk)
+            document.refresh_from_db()
+            logger.info(
+                f"Updating index for document {document_id} ({document.archive_checksum})",
+            )
+            with index.open_index_writer() as writer:
+                index.update_document(writer, document)
 
-    except Exception:
-        logger.exception(
-            f"Error while parsing document {document} (ID: {document_id})",
-        )
-    finally:
-        # TODO(stumpylog): Remove branch in the future when all parsers use new protocol
-        if isinstance(
-            parser,
-            (
-                MailDocumentParser,
-                RasterisedDocumentParser,
-                RemoteDocumentParser,
-                TextDocumentParser,
-                TikaDocumentParser,
-            ),
-        ):
-            parser.__exit__(None, None, None)
-        else:
-            parser.cleanup()
+            ai_config = AIConfig()
+            if ai_config.llm_index_enabled:
+                llm_index_add_or_update_document(document)
+
+            clear_document_caches(document.pk)
+
+        except Exception:
+            logger.exception(
+                f"Error while parsing document {document} (ID: {document_id})",
+            )
 
 
 @shared_task

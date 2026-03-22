@@ -121,10 +121,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "paperless",
     "documents.apps.DocumentsConfig",
-    "paperless_tesseract.apps.PaperlessTesseractConfig",
-    "paperless_text.apps.PaperlessTextConfig",
     "paperless_mail.apps.PaperlessMailConfig",
-    "paperless_remote.apps.PaperlessRemoteParserConfig",
     "django.contrib.admin",
     "rest_framework",
     "rest_framework.authtoken",
@@ -974,8 +971,8 @@ TIKA_GOTENBERG_ENDPOINT = os.getenv(
     "http://localhost:3000",
 )
 
-if TIKA_ENABLED:
-    INSTALLED_APPS.append("paperless_tika.apps.PaperlessTikaConfig")
+# Tika parser is now integrated into the main parser registry
+# No separate Django app needed
 
 AUDIT_LOG_ENABLED = get_bool_from_env("PAPERLESS_AUDIT_LOG_ENABLED", "true")
 if AUDIT_LOG_ENABLED:

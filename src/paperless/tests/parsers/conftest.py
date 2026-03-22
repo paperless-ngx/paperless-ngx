@@ -91,35 +91,6 @@ def text_parser() -> Generator[TextDocumentParser, None, None]:
 
 
 # ------------------------------------------------------------------
-# Remote parser sample files
-# ------------------------------------------------------------------
-
-
-@pytest.fixture(scope="session")
-def remote_samples_dir(samples_dir: Path) -> Path:
-    """Absolute path to the remote parser sample files directory.
-
-    Returns
-    -------
-    Path
-        ``<samples_dir>/remote/``
-    """
-    return samples_dir / "remote"
-
-
-@pytest.fixture(scope="session")
-def sample_pdf_file(remote_samples_dir: Path) -> Path:
-    """Path to a simple digital PDF sample file.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``remote/simple-digital.pdf``.
-    """
-    return remote_samples_dir / "simple-digital.pdf"
-
-
-# ------------------------------------------------------------------
 # Remote parser instance
 # ------------------------------------------------------------------
 

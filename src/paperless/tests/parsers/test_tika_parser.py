@@ -77,10 +77,10 @@ class TestTikaParserRegistryInterface:
     def test_get_page_count_returns_int_with_pdf_archive(
         self,
         tika_parser: TikaDocumentParser,
-        sample_pdf_file: Path,
+        simple_digital_pdf_file: Path,
     ) -> None:
-        tika_parser._archive_path = sample_pdf_file
-        count = tika_parser.get_page_count(sample_pdf_file, "application/pdf")
+        tika_parser._archive_path = simple_digital_pdf_file
+        count = tika_parser.get_page_count(simple_digital_pdf_file, "application/pdf")
         assert isinstance(count, int)
         assert count > 0
 

@@ -13,8 +13,10 @@ class TestDocumentChecks(TestCase):
     def test_parser_check(self) -> None:
         self.assertEqual(parser_check(None), [])
 
-        with mock.patch("documents.checks.document_consumer_declaration.send") as m:
-            m.return_value = []
+        with mock.patch("documents.checks.get_parser_registry") as mock_registry_fn:
+            mock_registry = mock.MagicMock()
+            mock_registry.all_parsers.return_value = []
+            mock_registry_fn.return_value = mock_registry
 
             self.assertEqual(
                 parser_check(None),

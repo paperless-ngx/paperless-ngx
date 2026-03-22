@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest import mock
 
 import pytest
+from django.core.checks import ERROR
 from django.core.checks import Error
 from django.core.checks import Warning
 from pytest_django.fixtures import SettingsWrapper
@@ -12,7 +13,9 @@ from pytest_mock import MockerFixture
 
 from paperless.checks import audit_log_check
 from paperless.checks import binaries_check
+from paperless.checks import check_default_language_available
 from paperless.checks import check_deprecated_db_settings
+from paperless.checks import check_remote_parser_configured
 from paperless.checks import check_v3_minimum_upgrade_version
 from paperless.checks import debug_mode_check
 from paperless.checks import paths_check
@@ -626,3 +629,116 @@ class TestV3MinimumUpgradeVersionCheck:
         conn.introspection.table_names.side_effect = OperationalError("DB unavailable")
         mocker.patch.dict("paperless.checks.connections", {"default": conn})
         assert check_v3_minimum_upgrade_version(None) == []
+
+
+class TestRemoteParserChecks:
+    def test_no_engine(self, settings: SettingsWrapper) -> None:
+        settings.REMOTE_OCR_ENGINE = None
+        msgs = check_remote_parser_configured(None)
+
+        assert len(msgs) == 0
+
+    def test_azure_no_endpoint(self, settings: SettingsWrapper) -> None:
+
+        settings.REMOTE_OCR_ENGINE = "azureai"
+        settings.REMOTE_OCR_API_KEY = "somekey"
+        settings.REMOTE_OCR_ENDPOINT = None
+
+        msgs = check_remote_parser_configured(None)
+
+        assert len(msgs) == 1
+
+        msg = msgs[0]
+
+        assert (
+            "Azure AI remote parser requires endpoint and API key to be configured."
+            in msg.msg
+        )
+
+
+class TestTesseractChecks:
+    def test_default_language(self) -> None:
+        check_default_language_available(None)
+
+    def test_no_language(self, settings: SettingsWrapper) -> None:
+
+        settings.OCR_LANGUAGE = ""
+
+        msgs = check_default_language_available(None)
+
+        assert len(msgs) == 1
+        msg = msgs[0]
+
+        assert (
+            "No OCR language has been specified with PAPERLESS_OCR_LANGUAGE" in msg.msg
+        )
+
+    def test_invalid_language(
+        self,
+        settings: SettingsWrapper,
+        mocker: MockerFixture,
+    ) -> None:
+
+        settings.OCR_LANGUAGE = "ita"
+
+        tesser_lang_mock = mocker.patch("paperless.checks.get_tesseract_langs")
+        tesser_lang_mock.return_value = ["deu", "eng"]
+
+        msgs = check_default_language_available(None)
+
+        assert len(msgs) == 1
+        msg = msgs[0]
+
+        assert msg.level == ERROR
+        assert "The selected ocr language ita is not installed" in msg.msg
+
+    def test_multi_part_language(
+        self,
+        settings: SettingsWrapper,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - An OCR language which is multi part (ie chi-sim)
+            - The language is correctly formatted
+        WHEN:
+            - Installed packages are checked
+        THEN:
+            - No errors are reported
+        """
+
+        settings.OCR_LANGUAGE = "chi_sim"
+
+        tesser_lang_mock = mocker.patch("paperless.checks.get_tesseract_langs")
+        tesser_lang_mock.return_value = ["chi_sim", "eng"]
+
+        msgs = check_default_language_available(None)
+
+        assert len(msgs) == 0
+
+    def test_multi_part_language_bad_format(
+        self,
+        settings: SettingsWrapper,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - An OCR language which is multi part (ie chi-sim)
+            - The language is correctly NOT formatted
+        WHEN:
+            - Installed packages are checked
+        THEN:
+            - No errors are reported
+        """
+        settings.OCR_LANGUAGE = "chi-sim"
+
+        tesser_lang_mock = mocker.patch("paperless.checks.get_tesseract_langs")
+        tesser_lang_mock.return_value = ["chi_sim", "eng"]
+
+        msgs = check_default_language_available(None)
+
+        assert len(msgs) == 1
+        msg = msgs[0]
+
+        assert msg.level == ERROR
+        assert "The selected ocr language chi-sim is not installed" in msg.msg
