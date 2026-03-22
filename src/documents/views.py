@@ -7,7 +7,6 @@ import tempfile
 import zipfile
 from collections import defaultdict
 from collections import deque
-from contextlib import nullcontext
 from datetime import datetime
 from pathlib import Path
 from time import mktime
@@ -154,7 +153,6 @@ from documents.models import UiSettings
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
-from documents.parsers import get_parser_class_for_mime_type
 from documents.permissions import AcknowledgeTasksPermissions
 from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessNotePermissions
@@ -221,7 +219,7 @@ from paperless import version
 from paperless.config import AIConfig
 from paperless.config import GeneralConfig
 from paperless.models import ApplicationConfiguration
-from paperless.parsers import ParserProtocol
+from paperless.parsers.registry import get_parser_registry
 from paperless.serialisers import GroupSerializer
 from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
@@ -1075,17 +1073,17 @@ class DocumentViewSet(
         if not Path(file).is_file():
             return None
 
-        parser_class = get_parser_class_for_mime_type(mime_type)
+        parser_class = get_parser_registry().get_parser_for_file(
+            mime_type,
+            Path(file).name,
+            Path(file),
+        )
         if parser_class:
-            parser = parser_class(progress_callback=None, logging_group=None)
-            cm = parser if isinstance(parser, ParserProtocol) else nullcontext(parser)
-
             try:
-                with cm:
+                with parser_class() as parser:
                     return parser.extract_metadata(file, mime_type)
             except Exception:  # pragma: no cover
                 logger.exception(f"Issue getting metadata for {file}")
-                # TODO: cover GPG errors, remove later.
                 return []
         else:  # pragma: no cover
             logger.warning(f"No parser for {mime_type}")

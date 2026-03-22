@@ -3,25 +3,20 @@ from django.core.checks import Error
 from django.core.checks import Warning
 from django.core.checks import register
 
-from documents.signals import document_consumer_declaration
 from documents.templating.utils import convert_format_str_to_template_format
+from paperless.parsers.registry import get_parser_registry
 
 
 @register()
 def parser_check(app_configs, **kwargs):
-    parsers = []
-    for response in document_consumer_declaration.send(None):
-        parsers.append(response[1])
-
-    if len(parsers) == 0:
+    if not get_parser_registry().all_parsers():
         return [
             Error(
                 "No parsers found. This is a bug. The consumer won't be "
                 "able to consume any documents without parsers.",
             ),
         ]
-    else:
-        return []
+    return []
 
 
 @register()

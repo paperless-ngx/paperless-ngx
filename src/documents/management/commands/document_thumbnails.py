@@ -3,19 +3,18 @@ import shutil
 
 from documents.management.commands.base import PaperlessCommand
 from documents.models import Document
-from documents.parsers import get_parser_class_for_mime_type
-from paperless.parsers.mail import MailDocumentParser
-from paperless.parsers.remote import RemoteDocumentParser
-from paperless.parsers.tesseract import RasterisedDocumentParser
-from paperless.parsers.text import TextDocumentParser
-from paperless.parsers.tika import TikaDocumentParser
+from paperless.parsers.registry import get_parser_registry
 
 logger = logging.getLogger("paperless.management.thumbnails")
 
 
 def _process_document(doc_id: int) -> None:
     document: Document = Document.objects.get(id=doc_id)
-    parser_class = get_parser_class_for_mime_type(document.mime_type)
+    parser_class = get_parser_registry().get_parser_for_file(
+        document.mime_type,
+        document.original_filename or "",
+        document.source_path,
+    )
 
     if parser_class is None:
         logger.warning(
@@ -25,40 +24,9 @@ def _process_document(doc_id: int) -> None:
         )
         return
 
-    parser = parser_class(logging_group=None)
-
-    parser_is_new_style = isinstance(
-        parser,
-        (
-            MailDocumentParser,
-            RasterisedDocumentParser,
-            RemoteDocumentParser,
-            TextDocumentParser,
-            TikaDocumentParser,
-        ),
-    )
-
-    # TODO(stumpylog): Remove branch in the future when all parsers use new protocol
-    if parser_is_new_style:
-        parser.__enter__()
-
-    try:
-        # TODO(stumpylog): Remove branch in the future when all parsers use new protocol
-        if parser_is_new_style:
-            thumb = parser.get_thumbnail(document.source_path, document.mime_type)
-        else:
-            thumb = parser.get_thumbnail(
-                document.source_path,
-                document.mime_type,
-                document.get_public_filename(),
-            )
+    with parser_class() as parser:
+        thumb = parser.get_thumbnail(document.source_path, document.mime_type)
         shutil.move(thumb, document.thumbnail_path)
-    finally:
-        # TODO(stumpylog): Cleanup once all parsers are handled
-        if parser_is_new_style:
-            parser.__exit__(None, None, None)
-        else:
-            parser.cleanup()
 
 
 class Command(PaperlessCommand):
