@@ -117,7 +117,6 @@ describe('ManagementListComponent', () => {
             : tags
           return of({
             count: results.length,
-            all: results.map((o) => o.id),
             results,
           })
         }
@@ -231,11 +230,11 @@ describe('ManagementListComponent', () => {
     expect(reloadSpy).toHaveBeenCalled()
   })
 
-  it('should use API count for pagination and all ids for displayed total', fakeAsync(() => {
+  it('should use API count for pagination and nested ids for displayed total', fakeAsync(() => {
     jest.spyOn(tagService, 'listFiltered').mockReturnValueOnce(
       of({
         count: 1,
-        all: [1, 2, 3],
+        display_count: 3,
         results: tags.slice(0, 1),
       })
     )
@@ -315,13 +314,17 @@ describe('ManagementListComponent', () => {
     expect(component.togggleAll).toBe(false)
   })
 
-  it('selectAll should use all IDs when collection size exists', () => {
-    ;(component as any).allIDs = [1, 2, 3, 4]
-    component.collectionSize = 4
+  it('selectAll should activate all-selection mode', () => {
+    ;(tagService.listFiltered as jest.Mock).mockClear()
+    component.collectionSize = tags.length
 
     component.selectAll()
 
-    expect(component.selectedObjects).toEqual(new Set([1, 2, 3, 4]))
+    expect(tagService.listFiltered).not.toHaveBeenCalled()
+    expect(component.selectedObjects).toEqual(new Set(tags.map((t) => t.id)))
+    expect((component as any).allSelectionActive).toBe(true)
+    expect(component.hasSelection).toBe(true)
+    expect(component.selectedCount).toBe(tags.length)
     expect(component.togggleAll).toBe(true)
   })
 
@@ -395,6 +398,33 @@ describe('ManagementListComponent', () => {
     expect(successToastSpy).toHaveBeenCalled()
   })
 
+  it('should support bulk edit permissions for all filtered items', () => {
+    const bulkEditPermsSpy = jest
+      .spyOn(tagService, 'bulk_edit_objects')
+      .mockReturnValue(of('OK'))
+    component.selectAll()
+
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
+    fixture.detectChanges()
+    component.setPermissions()
+    expect(modal).not.toBeUndefined()
+
+    modal.componentInstance.confirmClicked.emit({
+      permissions: {},
+      merge: true,
+    })
+
+    expect(bulkEditPermsSpy).toHaveBeenCalledWith(
+      [],
+      BulkEditObjectOperation.SetPermissions,
+      {},
+      true,
+      true,
+      { is_root: true }
+    )
+  })
+
   it('should support bulk delete objects', () => {
     const bulkEditSpy = jest.spyOn(tagService, 'bulk_edit_objects')
     component.toggleSelected(tags[0])
@@ -415,7 +445,11 @@ describe('ManagementListComponent', () => {
     modal.componentInstance.confirmClicked.emit(null)
     expect(bulkEditSpy).toHaveBeenCalledWith(
       Array.from(selected),
-      BulkEditObjectOperation.Delete
+      BulkEditObjectOperation.Delete,
+      null,
+      null,
+      false,
+      null
     )
     expect(errorToastSpy).toHaveBeenCalled()
 
@@ -424,6 +458,29 @@ describe('ManagementListComponent', () => {
     modal.componentInstance.confirmClicked.emit(null)
     expect(bulkEditSpy).toHaveBeenCalled()
     expect(successToastSpy).toHaveBeenCalled()
+  })
+
+  it('should support bulk delete for all filtered items', () => {
+    const bulkEditSpy = jest
+      .spyOn(tagService, 'bulk_edit_objects')
+      .mockReturnValue(of('OK'))
+
+    component.selectAll()
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
+    fixture.detectChanges()
+    component.delete()
+    expect(modal).not.toBeUndefined()
+
+    modal.componentInstance.confirmClicked.emit(null)
+    expect(bulkEditSpy).toHaveBeenCalledWith(
+      [],
+      BulkEditObjectOperation.Delete,
+      null,
+      null,
+      true,
+      { is_root: true }
+    )
   })
 
   it('should disallow bulk permissions or delete objects if no global perms', () => {

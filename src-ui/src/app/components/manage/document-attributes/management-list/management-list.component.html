@@ -65,8 +65,8 @@
     @if (displayCollectionSize > 0) {
       <div>
         <ng-container i18n>{displayCollectionSize, plural, =1 {One {{typeName}}} other {{{displayCollectionSize || 0}} total {{typeNamePlural}}}}</ng-container>
-        @if (selectedObjects.size > 0) {
-          &nbsp;({{selectedObjects.size}} selected)
+        @if (hasSelection) {
+          &nbsp;({{selectedCount}} selected)
         }
       </div>
     }
