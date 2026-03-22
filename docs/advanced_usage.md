@@ -689,6 +689,31 @@ services:
 1. Note the `:ro` tag means the file will be mounted as read only.
 2. By default, Flower runs on port 5555, but this can be configured.
 
+## Prometheus Metrics {#prometheus-metrics}
+
+Paperless-ngx can expose system status metrics in
+[Prometheus](https://prometheus.io/) exposition format at the `/metrics/`
+endpoint. This is useful for monitoring the health of your Paperless-ngx
+instance and setting up alerts.
+
+### Enabling the endpoint
+
+Set the environment variable
+[PAPERLESS_PROMETHEUS_METRICS_ENABLED](configuration.md#PAPERLESS_PROMETHEUS_METRICS_ENABLED)
+to `true`.
+
+### Authentication
+
+The `/metrics/` endpoint requires authentication with a **staff** account, using
+the same methods available for the REST API (Token, Basic or Session
+authentication). See [API Authorization](api.md#authorization) for details.
+
+Example using Token authentication:
+
+```bash
+curl -H "Authorization: Token <your-token>" http://localhost:8000/metrics/
+```
+
 ## Custom Container Initialization
 
 The Docker image includes the ability to run custom user scripts during
