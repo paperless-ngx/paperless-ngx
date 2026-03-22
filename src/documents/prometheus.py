@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import logging
 
+from django.conf import settings
 from django.http import HttpResponse
 from django.http import HttpResponseForbidden
+from django.http import HttpResponseNotFound
 from prometheus_client import generate_latest
 from prometheus_client.core import GaugeMetricFamily
 from prometheus_client.registry import Collector
@@ -135,8 +137,8 @@ class PrometheusMetricsView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        # if not settings.PROMETHEUS_METRICS_ENABLED:
-        #    return HttpResponseNotFound("Metrics endpoint is disabled")
+        if not settings.PROMETHEUS_METRICS_ENABLED:
+            return HttpResponseNotFound("Metrics endpoint is disabled")
 
         if not request.user.is_staff:
             return HttpResponseForbidden("Insufficient permissions")
