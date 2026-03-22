@@ -982,6 +982,10 @@ if AUDIT_LOG_ENABLED:
     INSTALLED_APPS.append("auditlog")
     MIDDLEWARE.append("auditlog.middleware.AuditlogMiddleware")
 
+PROMETHEUS_METRICS_ENABLED = get_bool_from_env(
+    "PAPERLESS_PROMETHEUS_METRICS_ENABLED",
+    "NO",
+)
 
 # List dates that should be ignored when trying to parse date from document text
 IGNORE_DATES: set[datetime.date] = set()

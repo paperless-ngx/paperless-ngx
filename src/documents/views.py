@@ -27,9 +27,6 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
-from django.db import connections
-from django.db.migrations.loader import MigrationLoader
-from django.db.migrations.recorder import MigrationRecorder
 from django.db.models import Case
 from django.db.models import Count
 from django.db.models import F
@@ -57,7 +54,6 @@ from django.http import StreamingHttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.utils.timezone import make_aware
 from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 from django.views import View
@@ -77,7 +73,6 @@ from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
 from langdetect import detect
 from packaging import version as packaging_version
-from redis import Redis
 from rest_framework import parsers
 from rest_framework import serializers
 from rest_framework import status
@@ -223,7 +218,6 @@ from documents.versioning import get_request_version_param
 from documents.versioning import get_root_document
 from documents.versioning import resolve_requested_version_for_root
 from paperless import version
-from paperless.celery import app as celery_app
 from paperless.config import AIConfig
 from paperless.config import GeneralConfig
 from paperless.models import ApplicationConfiguration
@@ -974,8 +968,6 @@ class DocumentViewSet(
             response_data["content"] = content_doc.content
         response = Response(response_data)
 
-        from documents import index
-
         index.add_or_update_document(refreshed_doc)
 
         document_updated.send(
@@ -986,7 +978,6 @@ class DocumentViewSet(
         return response
 
     def destroy(self, request, *args, **kwargs):
-        from documents import index
 
         index.remove_document_from_index(self.get_object())
         try:
@@ -1745,8 +1736,6 @@ class DocumentViewSet(
             return HttpResponseBadRequest(
                 "Cannot delete the root/original version. Delete the document instead.",
             )
-
-        from documents import index
 
         index.remove_document_from_index(version_doc)
         version_doc_id = version_doc.id
@@ -2814,8 +2803,6 @@ class SearchAutoCompleteView(GenericAPIView):
                 return HttpResponseBadRequest("Invalid limit")
         else:
             limit = 10
-
-        from documents import index
 
         ix = index.open_index()
 
@@ -4047,124 +4034,18 @@ class SystemStatusView(PassUserMixin):
         elif os.environ.get("PNGX_CONTAINERIZED") == "1":
             install_type = "docker"
 
-        db_conn = connections["default"]
-        db_url = str(db_conn.settings_dict["NAME"])
-        db_error = None
+        from documents.status import get_system_status
 
-        try:
-            db_conn.ensure_connection()
-            db_status = "OK"
-            loader = MigrationLoader(connection=db_conn)
-            all_migrations = [f"{app}.{name}" for app, name in loader.graph.nodes]
-            applied_migrations = [
-                f"{m.app}.{m.name}"
-                for m in MigrationRecorder.Migration.objects.all().order_by("id")
-            ]
-        except Exception as e:  # pragma: no cover
-            applied_migrations = []
-            db_status = "ERROR"
-            logger.exception(
-                f"System status detected a possible problem while connecting to the database: {e}",
-            )
-            db_error = "Error connecting to database, check logs for more detail."
+        sys_status = get_system_status()
 
-        media_stats = os.statvfs(settings.MEDIA_ROOT)
-
+        # Build display-only Redis URL (strip credentials)
         redis_url = settings._CHANNELS_REDIS_URL
         redis_url_parsed = urlparse(redis_url)
         redis_constructed_url = f"{redis_url_parsed.scheme}://{redis_url_parsed.path or redis_url_parsed.hostname}"
         if redis_url_parsed.hostname is not None:
             redis_constructed_url += f":{redis_url_parsed.port}"
-        redis_error = None
-        with Redis.from_url(url=redis_url) as client:
-            try:
-                client.ping()
-                redis_status = "OK"
-            except Exception as e:
-                redis_status = "ERROR"
-                logger.exception(
-                    f"System status detected a possible problem while connecting to redis: {e}",
-                )
-                redis_error = "Error connecting to redis, check logs for more detail."
 
-        celery_error = None
-        celery_url = None
-        try:
-            celery_ping = celery_app.control.inspect().ping()
-            celery_url = next(iter(celery_ping.keys()))
-            first_worker_ping = celery_ping[celery_url]
-            if first_worker_ping["ok"] == "pong":
-                celery_active = "OK"
-        except Exception as e:
-            celery_active = "ERROR"
-            logger.exception(
-                f"System status detected a possible problem while connecting to celery: {e}",
-            )
-            celery_error = "Error connecting to celery, check logs for more detail."
-
-        index_error = None
-        try:
-            ix = index.open_index()
-            index_status = "OK"
-            index_last_modified = make_aware(
-                datetime.fromtimestamp(ix.last_modified()),
-            )
-        except Exception as e:
-            index_status = "ERROR"
-            index_error = "Error opening index, check logs for more detail."
-            logger.exception(
-                f"System status detected a possible problem while opening the index: {e}",
-            )
-            index_last_modified = None
-
-        last_trained_task = (
-            PaperlessTask.objects.filter(
-                task_name=PaperlessTask.TaskName.TRAIN_CLASSIFIER,
-                status__in=[
-                    states.SUCCESS,
-                    states.FAILURE,
-                    states.REVOKED,
-                ],  # ignore running tasks
-            )
-            .order_by("-date_done")
-            .first()
-        )
-        classifier_status = "OK"
-        classifier_error = None
-        if last_trained_task is None:
-            classifier_status = "WARNING"
-            classifier_error = "No classifier training tasks found"
-        elif last_trained_task and last_trained_task.status != states.SUCCESS:
-            classifier_status = "ERROR"
-            classifier_error = last_trained_task.result
-        classifier_last_trained = (
-            last_trained_task.date_done if last_trained_task else None
-        )
-
-        last_sanity_check = (
-            PaperlessTask.objects.filter(
-                task_name=PaperlessTask.TaskName.CHECK_SANITY,
-                status__in=[
-                    states.SUCCESS,
-                    states.FAILURE,
-                    states.REVOKED,
-                ],  # ignore running tasks
-            )
-            .order_by("-date_done")
-            .first()
-        )
-        sanity_check_status = "OK"
-        sanity_check_error = None
-        if last_sanity_check is None:
-            sanity_check_status = "WARNING"
-            sanity_check_error = "No sanity check tasks found"
-        elif last_sanity_check and last_sanity_check.status != states.SUCCESS:
-            sanity_check_status = "ERROR"
-            sanity_check_error = last_sanity_check.result
-        sanity_check_last_run = (
-            last_sanity_check.date_done if last_sanity_check else None
-        )
-
+        # LLM index status (not part of shared status module)
         ai_config = AIConfig()
         if not ai_config.llm_index_enabled:
             llmindex_status = "DISABLED"
@@ -4196,37 +4077,35 @@ class SystemStatusView(PassUserMixin):
                 "server_os": platform.platform(),
                 "install_type": install_type,
                 "storage": {
-                    "total": media_stats.f_frsize * media_stats.f_blocks,
-                    "available": media_stats.f_frsize * media_stats.f_bavail,
+                    "total": sys_status.storage.total_bytes,
+                    "available": sys_status.storage.available_bytes,
                 },
                 "database": {
-                    "type": db_conn.vendor,
-                    "url": db_url,
-                    "status": db_status,
-                    "error": db_error,
+                    "type": sys_status.database.db_vendor,
+                    "url": sys_status.database.db_url,
+                    "status": sys_status.database.status,
+                    "error": sys_status.database.error,
                     "migration_status": {
-                        "latest_migration": applied_migrations[-1],
-                        "unapplied_migrations": [
-                            m for m in all_migrations if m not in applied_migrations
-                        ],
+                        "latest_migration": sys_status.database.applied_migrations[-1],
+                        "unapplied_migrations": sys_status.database.unapplied_migrations,
                     },
                 },
                 "tasks": {
                     "redis_url": redis_constructed_url,
-                    "redis_status": redis_status,
-                    "redis_error": redis_error,
-                    "celery_status": celery_active,
-                    "celery_url": celery_url,
-                    "celery_error": celery_error,
-                    "index_status": index_status,
-                    "index_last_modified": index_last_modified,
-                    "index_error": index_error,
-                    "classifier_status": classifier_status,
-                    "classifier_last_trained": classifier_last_trained,
-                    "classifier_error": classifier_error,
-                    "sanity_check_status": sanity_check_status,
-                    "sanity_check_last_run": sanity_check_last_run,
-                    "sanity_check_error": sanity_check_error,
+                    "redis_status": sys_status.redis.status,
+                    "redis_error": sys_status.redis.error,
+                    "celery_status": sys_status.celery.status,
+                    "celery_url": sys_status.celery.celery_url,
+                    "celery_error": sys_status.celery.error,
+                    "index_status": sys_status.index.status,
+                    "index_last_modified": sys_status.index.last_modified,
+                    "index_error": sys_status.index.error,
+                    "classifier_status": sys_status.classifier.status,
+                    "classifier_last_trained": sys_status.classifier.last_run,
+                    "classifier_error": sys_status.classifier.error,
+                    "sanity_check_status": sys_status.sanity_check.status,
+                    "sanity_check_last_run": sys_status.sanity_check.last_run,
+                    "sanity_check_error": sys_status.sanity_check.error,
                     "llmindex_status": llmindex_status,
                     "llmindex_last_modified": llmindex_last_modified,
                     "llmindex_error": llmindex_error,
