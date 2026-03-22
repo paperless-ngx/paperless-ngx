@@ -51,6 +51,8 @@ import { ComponentWithPermissions } from '../with-permissions/with-permissions.c
 import { GlobalSearchComponent } from './global-search/global-search.component'
 import { ToastsDropdownComponent } from './toasts-dropdown/toasts-dropdown.component'
 
+const SCROLL_THRESHOLD = 16
+
 @Component({
   selector: 'pngx-app-frame',
   templateUrl: './app-frame.component.html',
@@ -94,6 +96,10 @@ export class AppFrameComponent
 
   slimSidebarAnimating: boolean = false
 
+  public mobileSearchHidden: boolean = false
+
+  private lastScrollY: number = 0
+
   constructor() {
     super()
     const permissionsService = this.permissionsService
@@ -111,6 +117,8 @@ export class AppFrameComponent
   }
 
   ngOnInit(): void {
+    this.lastScrollY = window.scrollY
+
     if (this.settingsService.get(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED)) {
       this.checkForUpdates()
     }
@@ -261,6 +269,38 @@ export class AppFrameComponent
 
   get aiEnabled(): boolean {
     return this.settingsService.get(SETTINGS_KEYS.AI_ENABLED)
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    if (!this.isMobileViewport()) {
+      this.mobileSearchHidden = false
+    }
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    const currentScrollY = window.scrollY
+
+    if (!this.isMobileViewport() || this.isMenuCollapsed === false) {
+      this.mobileSearchHidden = false
+      this.lastScrollY = currentScrollY
+      return
+    }
+
+    const delta = currentScrollY - this.lastScrollY
+
+    if (currentScrollY <= 0 || delta < -SCROLL_THRESHOLD) {
+      this.mobileSearchHidden = false
+    } else if (currentScrollY > SCROLL_THRESHOLD && delta > SCROLL_THRESHOLD) {
+      this.mobileSearchHidden = true
+    }
+
+    this.lastScrollY = currentScrollY
+  }
+
+  private isMobileViewport(): boolean {
+    return window.innerWidth < 768
   }
 
   closeMenu() {
