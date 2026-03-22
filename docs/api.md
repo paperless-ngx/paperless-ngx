@@ -60,6 +60,15 @@ The REST api provides five different forms of authentication.
     [here](advanced_usage.md#openid-connect-and-social-authentication) for more
     information on social accounts.
 
+## Prometheus metrics endpoint {#prometheus-metrics}
+
+Paperless-ngx provides a `/metrics/` endpoint that exposes system status
+metrics in Prometheus exposition format. This endpoint requires authentication
+with a staff account and must be enabled via configuration.
+
+For details on enabling, configuring Prometheus scraping, and the full list of
+available metrics, see [Advanced Usage - Prometheus Metrics](advanced_usage.md#prometheus-metrics).
+
 ## Searching for documents
 
 Full text searching is available on the `/api/documents/` endpoint. Two

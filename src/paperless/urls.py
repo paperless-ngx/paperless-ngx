@@ -15,6 +15,7 @@ from drf_spectacular.views import SpectacularAPIView
 from drf_spectacular.views import SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 
+from documents.prometheus import PrometheusMetricsView
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
@@ -313,6 +314,8 @@ urlpatterns = [
     ),
     # App logo
     re_path(r"^logo(?:/(?P<filename>.+))?/?$", serve_logo, name="app_logo"),
+    # Prometheus metrics
+    path("metrics/", PrometheusMetricsView.as_view(), name="prometheus-metrics"),
     # allauth
     path(
         "accounts/",
