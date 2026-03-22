@@ -477,7 +477,14 @@ class DelayedFullTextQuery(DelayedQuery):
         try:
             corrected = self.searcher.correct_query(q, q_str)
             if corrected.string != q_str:
-                suggested_correction = corrected.string
+                corrected_results = self.searcher.search(
+                    corrected.query,
+                    limit=1,
+                    filter=MappedDocIdSet(self.filter_queryset, self.searcher.ixreader),
+                    scored=False,
+                )
+                if len(corrected_results) > 0:
+                    suggested_correction = corrected.string
         except Exception as e:
             logger.info(
                 "Error while correcting query %s: %s",
