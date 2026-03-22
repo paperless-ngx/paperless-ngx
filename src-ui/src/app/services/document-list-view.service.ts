@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core'
 import { ParamMap, Router, UrlTree } from '@angular/router'
-import { Observable, Subject, first, takeUntil } from 'rxjs'
+import { Observable, Subject, takeUntil } from 'rxjs'
 import {
   DEFAULT_DISPLAY_FIELDS,
   DisplayField,
@@ -8,6 +8,7 @@ import {
   Document,
 } from '../data/document'
 import { FilterRule } from '../data/filter-rule'
+import { DocumentResults, SelectionData } from '../data/results'
 import { SavedView } from '../data/saved-view'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
 import { SETTINGS_KEYS } from '../data/ui-settings'
@@ -17,7 +18,7 @@ import {
   isFullTextFilterRule,
 } from '../utils/filter-rules'
 import { paramsFromViewState, paramsToViewState } from '../utils/query-params'
-import { DocumentService, SelectionData } from './rest/document.service'
+import { DocumentService } from './rest/document.service'
 import { SettingsService } from './settings.service'
 
 const LIST_DEFAULT_DISPLAY_FIELDS: DisplayField[] = DEFAULT_DISPLAY_FIELDS.map(
@@ -260,27 +261,17 @@ export class DocumentListViewService {
         activeListViewState.sortField,
         activeListViewState.sortReverse,
         activeListViewState.filterRules,
-        { truncate_content: true }
+        { truncate_content: true, include_selection_data: true }
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (result) => {
+          const resultWithSelectionData = result as DocumentResults
           this.initialized = true
           this.isReloading = false
           activeListViewState.collectionSize = result.count
           activeListViewState.documents = result.results
-
-          this.documentService
-            .getSelectionData(result.all)
-            .pipe(first())
-            .subscribe({
-              next: (selectionData) => {
-                this.selectionData = selectionData
-              },
-              error: () => {
-                this.selectionData = null
-              },
-            })
+          this.selectionData = resultWithSelectionData.selection_data ?? null
 
           if (updateQueryParams && !this._activeSavedViewId) {
             let base = ['/documents']
