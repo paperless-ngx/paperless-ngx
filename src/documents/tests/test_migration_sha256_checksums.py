@@ -18,6 +18,7 @@ class TestSha256ChecksumDataMigration(TestMigrations):
 
     migrate_from = "0015_document_version_index_and_more"
     migrate_to = "0016_sha256_checksums"
+    reset_sequences = True
 
     ORIGINAL_CONTENT = b"original file content for sha256 migration test"
     ARCHIVE_CONTENT = b"archive file content for sha256 migration test"
