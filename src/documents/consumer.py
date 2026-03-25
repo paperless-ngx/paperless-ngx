@@ -638,7 +638,9 @@ class ConsumerPlugin(
                                 document.archive_path,
                             )
 
-                            document.archive_checksum = compute_checksum(document.archive_path)
+                            document.archive_checksum = compute_checksum(
+                                document.archive_path,
+                            )
 
                     # Don't save with the lock active. Saving will cause the file
                     # renaming logic to acquire the lock as well.
