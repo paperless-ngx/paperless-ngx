@@ -4,6 +4,7 @@ import tempfile
 from pathlib import Path
 
 from django.conf import settings
+from django.db import connection
 from django.test import override_settings
 
 from documents.tests.utils import TestMigrations
@@ -83,6 +84,17 @@ class TestSha256ChecksumDataMigration(TestMigrations):
             archive_filename=None,
             archive_checksum=None,
         ).pk
+
+    def _fixture_teardown(self) -> None:
+        super()._fixture_teardown()
+        # Django's SQLite backend returns [] from sequence_reset_sql(), so
+        # reset_sequences=True flushes rows but never clears sqlite_sequence.
+        # Explicitly delete the entry so subsequent tests start from pk=1.
+        if connection.vendor == "sqlite":
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "DELETE FROM sqlite_sequence WHERE name='documents_document'",
+                )
 
     def tearDown(self) -> None:
         super().tearDown()
