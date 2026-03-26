@@ -294,6 +294,41 @@ def check_deprecated_db_settings(
 
 
 @register()
+def check_deprecated_v2_ocr_env_vars(
+    app_configs: object,
+    **kwargs: object,
+) -> list[Warning]:
+    """Warn when deprecated v2 OCR environment variables are set.
+
+    Users upgrading from v2 may still have these in their environment or
+    config files, where they are now silently ignored.
+    """
+    warnings: list[Warning] = []
+
+    if os.environ.get("PAPERLESS_OCR_SKIP_ARCHIVE_FILE"):
+        warnings.append(
+            Warning(
+                "PAPERLESS_OCR_SKIP_ARCHIVE_FILE is set but has no effect. "
+                "Use PAPERLESS_ARCHIVE_FILE_GENERATION=never/always/auto instead.",
+                id="paperless.W002",
+            ),
+        )
+
+    ocr_mode = os.environ.get("PAPERLESS_OCR_MODE", "")
+    if ocr_mode in {"skip", "skip_noarchive"}:
+        warnings.append(
+            Warning(
+                f"PAPERLESS_OCR_MODE={ocr_mode!r} is not a valid value. "
+                f"Use PAPERLESS_OCR_MODE=auto (and PAPERLESS_ARCHIVE_FILE_GENERATION=never "
+                f"if you used skip_noarchive) instead.",
+                id="paperless.W003",
+            ),
+        )
+
+    return warnings
+
+
+@register()
 def check_remote_parser_configured(app_configs, **kwargs) -> list[Error]:
     if settings.REMOTE_OCR_ENGINE == "azureai" and not (
         settings.REMOTE_OCR_ENDPOINT and settings.REMOTE_OCR_API_KEY
