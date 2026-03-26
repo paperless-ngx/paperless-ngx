@@ -1126,6 +1126,7 @@ class TestConsumer(
             mock_mail_parser_parse.assert_called_once_with(
                 consumer.working_copy,
                 "message/rfc822",
+                produce_archive=True,
             )
 
 
@@ -1273,7 +1274,14 @@ class PreConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
     def test_no_pre_consume_script(self, m) -> None:
         with self.get_consumer(self.test_file) as c:
             c.run()
-            m.assert_not_called()
+            # Verify no pre-consume script subprocess was invoked
+            # (run_subprocess may still be called by _extract_text_for_archive_check)
+            script_calls = [
+                call
+                for call in m.call_args_list
+                if call.args and call.args[0] and call.args[0][0] not in ("pdftotext",)
+            ]
+            self.assertEqual(script_calls, [])
 
     @mock.patch("documents.consumer.run_subprocess")
     @override_settings(PRE_CONSUME_SCRIPT="does-not-exist")
@@ -1289,9 +1297,16 @@ class PreConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                 with self.get_consumer(self.test_file) as c:
                     c.run()
 
-                    m.assert_called_once()
+                    self.assertTrue(m.called)
 
-                    args, _ = m.call_args
+                    # Find the call that invoked the pre-consume script
+                    # (run_subprocess may also be called by _extract_text_for_archive_check)
+                    script_call = next(
+                        call
+                        for call in m.call_args_list
+                        if call.args and call.args[0] and call.args[0][0] == script.name
+                    )
+                    args, _ = script_call
 
                     command = args[0]
                     environment = args[1]

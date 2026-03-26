@@ -1,5 +1,6 @@
 import datetime
 import hashlib
+import logging
 import os
 import shutil
 import tempfile
@@ -50,6 +51,8 @@ from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
+from paperless.config import OcrConfig
+from paperless.models import ArchiveFileGenerationChoices
 from paperless.parsers import ParserContext
 from paperless.parsers import ParserProtocol
 from paperless.parsers.registry import get_parser_registry
@@ -103,6 +106,70 @@ class ConsumerStatusShortMessage(StrEnum):
     SAVE_DOCUMENT = "save_document"
     FINISHED = "finished"
     FAILED = "failed"
+
+
+_VALID_TEXT_LENGTH_FOR_ARCHIVE_CHECK = 50
+
+
+def _extract_text_for_archive_check(path: Path) -> str | None:
+    """Run pdftotext on *path* and return the text, or None on any failure.
+
+    Used only for the ARCHIVE_FILE_GENERATION=auto born-digital detection.
+    """
+    try:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            out_path = Path(tmpdir) / "text.txt"
+            run_subprocess(
+                [
+                    "pdftotext",
+                    "-q",
+                    "-layout",
+                    "-enc",
+                    "UTF-8",
+                    str(path),
+                    str(out_path),
+                ],
+                logger=logging.getLogger(__name__),
+            )
+            return out_path.read_text(encoding="utf-8", errors="replace") or None
+    except Exception:
+        return None
+
+
+def _should_produce_archive(
+    parser: "ParserProtocol",
+    mime_type: str,
+    working_copy: Path,
+) -> bool:
+    """Return True if the consumer should request a PDF/A archive from the parser.
+
+    IMPORTANT: *parser* must be an instantiated parser, not the class.
+    ``requires_pdf_rendition`` and ``can_produce_archive`` are instance
+    ``@property`` methods — accessing them on the class returns the descriptor
+    (always truthy).
+    """
+    # Must produce a PDF so the frontend can display the original format at all.
+    if parser.requires_pdf_rendition:
+        return True
+
+    # Parser cannot produce an archive (e.g. TextDocumentParser).
+    if not parser.can_produce_archive:
+        return False
+
+    generation = OcrConfig().archive_file_generation
+
+    if generation == ArchiveFileGenerationChoices.ALWAYS:
+        return True
+    if generation == ArchiveFileGenerationChoices.NEVER:
+        return False
+
+    # auto: produce archives for scanned/image documents; skip for born-digital PDFs.
+    if mime_type.startswith("image/"):
+        return True
+    if mime_type == "application/pdf":
+        text = _extract_text_for_archive_check(working_copy)
+        return text is None or len(text) <= _VALID_TEXT_LENGTH_FOR_ARCHIVE_CHECK
+    return False
 
 
 class ConsumerPluginMixin:
@@ -440,7 +507,16 @@ class ConsumerPlugin(
                     )
                     self.log.debug(f"Parsing {self.filename}...")
 
-                    document_parser.parse(self.working_copy, mime_type)
+                    should_produce_archive = _should_produce_archive(
+                        document_parser,
+                        mime_type,
+                        self.working_copy,
+                    )
+                    document_parser.parse(
+                        self.working_copy,
+                        mime_type,
+                        produce_archive=should_produce_archive,
+                    )
 
                     self.log.debug(f"Generating thumbnail for {self.filename}...")
                     self._send_progress(
