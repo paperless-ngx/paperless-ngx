@@ -64,14 +64,9 @@ class OcrConfig(OutputTypeConfig):
         self.pages = app_config.pages or settings.OCR_PAGES
         self.language = app_config.language or settings.OCR_LANGUAGE
         self.mode = app_config.mode or settings.OCR_MODE
-        # Task 4 renames the DB field from skip_archive_file to archive_file_generation.
-        # Until that migration runs, fall back to the old field name.
-        _db_archive = getattr(
-            app_config,
-            "archive_file_generation",
-            None,
-        ) or getattr(app_config, "skip_archive_file", None)
-        self.archive_file_generation = _db_archive or settings.ARCHIVE_FILE_GENERATION
+        self.archive_file_generation = (
+            app_config.archive_file_generation or settings.ARCHIVE_FILE_GENERATION
+        )
         self.image_dpi = app_config.image_dpi or settings.OCR_IMAGE_DPI
         self.clean = app_config.unpaper_clean or settings.OCR_CLEAN
         self.deskew = (

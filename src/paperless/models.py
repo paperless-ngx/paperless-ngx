@@ -126,11 +126,11 @@ class ApplicationConfiguration(AbstractSingletonModel):
         choices=ModeChoices.choices,
     )
 
-    skip_archive_file = models.CharField(
-        verbose_name=_("Controls the generation of an archive file"),
+    archive_file_generation = models.CharField(
+        verbose_name=_("Controls archive file generation"),
         null=True,
         blank=True,
-        max_length=16,
+        max_length=8,
         choices=ArchiveFileGenerationChoices.choices,
     )
 
