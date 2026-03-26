@@ -708,6 +708,7 @@ def null_app_config(mocker: MockerFixture) -> MagicMock:
         pages=None,
         language=None,
         mode=None,
+        archive_file_generation=None,
         skip_archive_file=None,
         image_dpi=None,
         unpaper_clean=None,
