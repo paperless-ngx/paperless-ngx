@@ -785,7 +785,7 @@ class DocumentViewSet(
     def get_queryset(self):
         return (
             Document.objects.distinct()
-            .order_by("-created")
+            .order_by("-created", "-id")
             .annotate(num_notes=Count("notes"))
             .select_related("correspondent", "storage_path", "document_type", "owner")
             .prefetch_related("tags", "custom_fields", "notes")
