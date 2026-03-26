@@ -1087,6 +1087,43 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(len(response.data["all"]), 50)
         self.assertCountEqual(response.data["all"], [d.id for d in docs])
 
+    def test_default_ordering_uses_id_as_tiebreaker(self):
+        """
+        GIVEN:
+            - Documents sharing the same created date
+        WHEN:
+            - API request for documents without an explicit ordering
+        THEN:
+            - Results are correctly ordered by created > id
+        """
+        older_doc = Document.objects.create(
+            checksum="older",
+            content="older",
+            created=date(2024, 1, 1),
+        )
+        first_same_date_doc = Document.objects.create(
+            checksum="same-date-1",
+            content="same-date-1",
+            created=date(2024, 1, 2),
+        )
+        second_same_date_doc = Document.objects.create(
+            checksum="same-date-2",
+            content="same-date-2",
+            created=date(2024, 1, 2),
+        )
+
+        response = self.client.get("/api/documents/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            [result["id"] for result in response.data["results"]],
+            [
+                second_same_date_doc.id,
+                first_same_date_doc.id,
+                older_doc.id,
+            ],
+        )
+
     def test_statistics(self):
         doc1 = Document.objects.create(
             title="none1",
