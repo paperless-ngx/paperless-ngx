@@ -1,5 +1,4 @@
 import datetime
-import hashlib
 import logging
 import shutil
 import uuid
@@ -61,6 +60,7 @@ from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
 from documents.signals.handlers import run_workflows
 from documents.signals.handlers import send_websocket_document_updated
+from documents.utils import compute_checksum
 from documents.workflows.utils import get_workflows_for_trigger
 from paperless.config import AIConfig
 from paperless.parsers import ParserContext
@@ -328,8 +328,7 @@ def update_document_content_maybe_archive_file(document_id) -> None:
             with transaction.atomic():
                 oldDocument = Document.objects.get(pk=document.pk)
                 if parser.get_archive_path():
-                    with Path(parser.get_archive_path()).open("rb") as f:
-                        checksum = hashlib.md5(f.read()).hexdigest()
+                    checksum = compute_checksum(parser.get_archive_path())
                     # I'm going to save first so that in case the file move
                     # fails, the database is rolled back.
                     # We also don't use save() since that triggers the filehandling
