@@ -1,6 +1,7 @@
 import datetime
 import hashlib
 import os
+import shutil
 import tempfile
 from enum import StrEnum
 from pathlib import Path
@@ -824,7 +825,7 @@ class ConsumerPlugin(
             self.metadata.view_users is not None
             or self.metadata.view_groups is not None
             or self.metadata.change_users is not None
-            or self.metadata.change_users is not None
+            or self.metadata.change_groups is not None
         ):
             permissions = {
                 "view": {
@@ -857,7 +858,7 @@ class ConsumerPlugin(
             Path(source).open("rb") as read_file,
             Path(target).open("wb") as write_file,
         ):
-            write_file.write(read_file.read())
+            shutil.copyfileobj(read_file, write_file)
 
         # Attempt to copy file's original stats, but it's ok if we can't
         try:
