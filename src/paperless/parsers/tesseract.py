@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.resources
 import logging
 import os
 import re
@@ -18,7 +19,6 @@ from documents.parsers import make_thumbnail_from_pdf
 from documents.utils import maybe_override_pixel_limit
 from documents.utils import run_subprocess
 from paperless.config import OcrConfig
-from paperless.models import ArchiveFileGenerationChoices
 from paperless.models import CleanChoices
 from paperless.models import ModeChoices
 from paperless.parsers.utils import read_file_handle_unicode_errors
@@ -289,6 +289,7 @@ class RasterisedDocumentParser:
         sidecar_file: Path,
         *,
         safe_fallback: bool = False,
+        skip_text: bool = False,
     ) -> dict[str, Any]:
         ocrmypdf_args: dict[str, Any] = {
             "input_file_or_options": input_file,
@@ -307,12 +308,14 @@ class RasterisedDocumentParser:
                 self.settings.color_conversion_strategy
             )
 
-        if self.settings.mode == ModeChoices.FORCE or safe_fallback:
+        if safe_fallback or self.settings.mode == ModeChoices.FORCE:
             ocrmypdf_args["force_ocr"] = True
-        elif self.settings.mode == ModeChoices.AUTO:
-            ocrmypdf_args["skip_text"] = True
         elif self.settings.mode == ModeChoices.REDO:
             ocrmypdf_args["redo_ocr"] = True
+        elif skip_text or self.settings.mode == ModeChoices.OFF:
+            ocrmypdf_args["skip_text"] = True
+        elif self.settings.mode == ModeChoices.AUTO:
+            pass  # no extra flag: normal OCR (text not found case)
         else:  # pragma: no cover
             raise ParseError(f"Invalid ocr mode: {self.settings.mode}")
 
@@ -397,6 +400,62 @@ class RasterisedDocumentParser:
 
         return ocrmypdf_args
 
+    def _convert_image_to_pdfa(self, document_path: Path, mime_type: str) -> Path:
+        """Convert an image to a PDF/A-2b file without invoking the OCR engine.
+
+        Uses img2pdf for the initial image->PDF wrapping, then pikepdf to stamp
+        PDF/A-2b conformance metadata.
+
+        No Tesseract and no Ghostscript are invoked.
+        """
+        import img2pdf
+        import pikepdf
+
+        plain_pdf_path = Path(self.tempdir) / "image_plain.pdf"
+        try:
+            layout_fun = None
+            if self.settings.image_dpi is not None:
+                layout_fun = img2pdf.get_fixed_dpi_layout_fun(
+                    (self.settings.image_dpi, self.settings.image_dpi),
+                )
+            plain_pdf_path.write_bytes(
+                img2pdf.convert(str(document_path), layout_fun=layout_fun),
+            )
+        except Exception as e:
+            raise ParseError(
+                f"img2pdf conversion failed for {document_path}: {e!s}",
+            ) from e
+
+        icc_data = (
+            importlib.resources.files("ocrmypdf.data").joinpath("sRGB.icc").read_bytes()
+        )
+
+        pdfa_path = Path(self.tempdir) / "archive.pdf"
+        try:
+            with pikepdf.open(plain_pdf_path) as pdf:
+                cs = pdf.make_stream(icc_data)
+                cs["/N"] = 3
+                output_intent = pikepdf.Dictionary(
+                    Type=pikepdf.Name("/OutputIntent"),
+                    S=pikepdf.Name("/GTS_PDFA1"),
+                    OutputConditionIdentifier=pikepdf.String("sRGB"),
+                    DestOutputProfile=cs,
+                )
+                pdf.Root["/OutputIntents"] = pdf.make_indirect(
+                    pikepdf.Array([output_intent]),
+                )
+                meta = pdf.open_metadata(set_pikepdf_as_editor=False)
+                meta["pdfaid:part"] = "2"
+                meta["pdfaid:conformance"] = "B"
+                pdf.save(pdfa_path)
+        except Exception as e:
+            self.log.warning(
+                f"PDF/A metadata stamping failed ({e!s}); falling back to plain PDF.",
+            )
+            pdfa_path.write_bytes(plain_pdf_path.read_bytes())
+
+        return pdfa_path
+
     def parse(
         self,
         document_path: Path,
@@ -417,48 +476,96 @@ class RasterisedDocumentParser:
             text_original = None
             original_has_text = False
 
-        # If the original has text, and the user doesn't want an archive,
-        # we're done here (but not when force/redo mode is explicitly requested)
-        skip_archive_for_text = self.settings.mode not in {
-            ModeChoices.FORCE,
-            ModeChoices.REDO,
-        } and self.settings.archive_file_generation in {
-            ArchiveFileGenerationChoices.NEVER,
-            ArchiveFileGenerationChoices.AUTO,
-        }
-        if skip_archive_for_text and original_has_text:
-            self.log.debug("Document has text, skipping OCRmyPDF entirely.")
+        # --- OCR_MODE=off: never invoke OCR engine ---
+        if self.settings.mode == ModeChoices.OFF:
+            if not produce_archive:
+                self.text = text_original or ""
+                return
+            if self.is_image(mime_type):
+                try:
+                    self.archive_path = self._convert_image_to_pdfa(
+                        document_path,
+                        mime_type,
+                    )
+                    self.text = ""
+                except Exception as e:
+                    raise ParseError(
+                        f"Image to PDF/A conversion failed: {e!s}",
+                    ) from e
+                return
+            # PDFs in off mode: PDF/A conversion only via skip_text
+            import ocrmypdf
+            from ocrmypdf import SubprocessOutputError
+
+            archive_path = Path(self.tempdir) / "archive.pdf"
+            sidecar_file = Path(self.tempdir) / "sidecar.txt"
+            args = self.construct_ocrmypdf_parameters(
+                document_path,
+                mime_type,
+                archive_path,
+                sidecar_file,
+                skip_text=True,
+            )
+            try:
+                self.log.debug(
+                    f"Calling OCRmyPDF (off mode, PDF/A conversion only): {args}",
+                )
+                ocrmypdf.ocr(**args)
+                self.archive_path = archive_path
+                self.text = self.extract_text(None, archive_path) or text_original or ""
+            except SubprocessOutputError as e:
+                if "Ghostscript PDF/A rendering" in str(e):
+                    self.log.warning(
+                        "Ghostscript PDF/A rendering failed, consider setting "
+                        "PAPERLESS_OCR_USER_ARGS: "
+                        "'{\"continue_on_soft_render_error\": true}'",
+                    )
+                raise ParseError(
+                    f"SubprocessOutputError: {e!s}. See logs for more information.",
+                ) from e
+            except Exception as e:
+                raise ParseError(f"{e.__class__.__name__}: {e!s}") from e
+            return
+
+        # --- OCR_MODE=auto: skip ocrmypdf entirely if text exists and no archive needed ---
+        if (
+            self.settings.mode == ModeChoices.AUTO
+            and original_has_text
+            and not produce_archive
+        ):
+            self.log.debug(
+                "Document has text and no archive requested; skipping OCRmyPDF entirely.",
+            )
             self.text = text_original
             return
 
-        # Either no text was in the original or there should be an archive
-        # file created, so OCR the file and create an archive with any
-        # text located via OCR
-
+        # --- All other paths: run ocrmypdf ---
         import ocrmypdf
         from ocrmypdf import EncryptedPdfError
         from ocrmypdf import InputFileError
         from ocrmypdf import SubprocessOutputError
         from ocrmypdf.exceptions import DigitalSignatureError
+        from ocrmypdf.exceptions import PriorOcrFoundError
 
         archive_path = Path(self.tempdir) / "archive.pdf"
         sidecar_file = Path(self.tempdir) / "sidecar.txt"
+
+        # auto mode with existing text: PDF/A conversion only (no OCR).
+        skip_text = self.settings.mode == ModeChoices.AUTO and original_has_text
 
         args = self.construct_ocrmypdf_parameters(
             document_path,
             mime_type,
             archive_path,
             sidecar_file,
+            skip_text=skip_text,
         )
 
         try:
             self.log.debug(f"Calling OCRmyPDF with args: {args}")
             ocrmypdf.ocr(**args)
 
-            if (
-                self.settings.archive_file_generation
-                != ArchiveFileGenerationChoices.NEVER
-            ):
+            if produce_archive:
                 self.archive_path = archive_path
 
             self.text = self.extract_text(sidecar_file, archive_path)
@@ -478,11 +585,10 @@ class RasterisedDocumentParser:
                     "Ghostscript PDF/A rendering failed, consider setting "
                     "PAPERLESS_OCR_USER_ARGS: '{\"continue_on_soft_render_error\": true}'",
                 )
-
             raise ParseError(
                 f"SubprocessOutputError: {e!s}. See logs for more information.",
             ) from e
-        except (NoTextFoundException, InputFileError) as e:
+        except (NoTextFoundException, InputFileError, PriorOcrFoundError) as e:
             self.log.warning(
                 f"Encountered an error while running OCR: {e!s}. "
                 f"Attempting force OCR to get the text.",
@@ -490,8 +596,6 @@ class RasterisedDocumentParser:
 
             archive_path_fallback = Path(self.tempdir) / "archive-fallback.pdf"
             sidecar_file_fallback = Path(self.tempdir) / "sidecar-fallback.txt"
-
-            # Attempt to run OCR with safe settings.
 
             args = self.construct_ocrmypdf_parameters(
                 document_path,
@@ -504,25 +608,16 @@ class RasterisedDocumentParser:
             try:
                 self.log.debug(f"Fallback: Calling OCRmyPDF with args: {args}")
                 ocrmypdf.ocr(**args)
-
-                # Don't return the archived file here, since this file
-                # is bigger and blurry due to --force-ocr.
-
                 self.text = self.extract_text(
                     sidecar_file_fallback,
                     archive_path_fallback,
                 )
-
             except Exception as e:
-                # If this fails, we have a serious issue at hand.
                 raise ParseError(f"{e.__class__.__name__}: {e!s}") from e
 
         except Exception as e:
-            # Anything else is probably serious.
             raise ParseError(f"{e.__class__.__name__}: {e!s}") from e
 
-        # As a last resort, if we still don't have any text for any reason,
-        # try to extract the text from the original document.
         if not self.text:
             if original_has_text:
                 self.text = text_original

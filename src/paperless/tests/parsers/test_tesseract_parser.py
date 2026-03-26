@@ -370,15 +370,26 @@ class TestParsePdf:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
+        """
+        GIVEN:
+            - Multi-page digital PDF with sufficient text layer
+            - Default settings (mode=auto, produce_archive=True)
+        WHEN:
+            - Document is parsed
+        THEN:
+            - Archive is created (AUTO mode + text present + produce_archive=True
+              → PDF/A conversion via skip_text)
+            - Text is extracted
+        """
         tesseract_parser.parse(
-            tesseract_samples_dir / "simple-digital.pdf",
+            tesseract_samples_dir / "multi-page-digital.pdf",
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
         assert tesseract_parser.archive_path.is_file()
         assert_ordered_substrings(
-            tesseract_parser.get_text(),
-            ["This is a test document."],
+            tesseract_parser.get_text().lower(),
+            ["page 1", "page 2", "page 3"],
         )
 
     def test_with_form_default(
@@ -738,16 +749,18 @@ class TestSkipArchive:
         """
         GIVEN:
             - File with existing text layer
-            - Mode: auto, skip_archive_file: auto
+            - Mode: auto, produce_archive=False
         WHEN:
             - Document is parsed
         THEN:
-            - Text extracted; no archive created (text exists, auto skips OCR)
+            - Text extracted from original; no archive created (text exists +
+              produce_archive=False skips OCRmyPDF entirely)
         """
         tesseract_parser.settings.mode = "auto"
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-digital.pdf",
             "application/pdf",
+            produce_archive=False,
         )
         assert tesseract_parser.archive_path is None
         assert_ordered_substrings(
@@ -781,46 +794,58 @@ class TestSkipArchive:
         )
 
     @pytest.mark.parametrize(
-        ("skip_archive_file", "filename", "expect_archive"),
+        ("produce_archive", "filename", "expect_archive"),
         [
             pytest.param(
-                "always",
+                True,
                 "multi-page-digital.pdf",
                 True,
-                id="always-with-text",
-            ),
-            pytest.param("always", "multi-page-images.pdf", True, id="always-no-text"),
-            pytest.param(
-                "auto",
-                "multi-page-digital.pdf",
-                False,
-                id="auto-with-text-layer",
+                id="produce-archive-with-text",
             ),
             pytest.param(
-                "auto",
+                True,
                 "multi-page-images.pdf",
                 True,
-                id="auto-no-text-layer",
+                id="produce-archive-no-text",
             ),
             pytest.param(
-                "never",
+                False,
                 "multi-page-digital.pdf",
                 False,
-                id="never-with-text",
+                id="no-archive-with-text-layer",
             ),
-            pytest.param("never", "multi-page-images.pdf", False, id="never-no-text"),
+            pytest.param(
+                False,
+                "multi-page-images.pdf",
+                False,
+                id="no-archive-no-text-layer",
+            ),
         ],
     )
-    def test_skip_archive_file_setting(
+    def test_produce_archive_flag(
         self,
-        skip_archive_file: str,
+        produce_archive: bool,  # noqa: FBT001
         filename: str,
-        expect_archive: str,
+        expect_archive: bool,  # noqa: FBT001
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        tesseract_parser.settings.archive_file_generation = skip_archive_file
-        tesseract_parser.parse(tesseract_samples_dir / filename, "application/pdf")
+        """
+        GIVEN:
+            - Various PDFs (with and without text layers)
+            - produce_archive flag set to True or False
+        WHEN:
+            - Document is parsed
+        THEN:
+            - archive_path is set if and only if produce_archive=True
+            - Text is always extracted
+        """
+        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.parse(
+            tesseract_samples_dir / filename,
+            "application/pdf",
+            produce_archive=produce_archive,
+        )
         text = tesseract_parser.get_text().lower()
         assert_ordered_substrings(text, ["page 1", "page 2", "page 3"])
         if expect_archive:
@@ -907,17 +932,18 @@ class TestParseMixed:
     ) -> None:
         """
         GIVEN:
-            - File with mixed pages
-            - Mode: auto, skip_archive_file: auto
+            - File with mixed pages (some with text, some image-only)
+            - Mode: auto, produce_archive=False
         WHEN:
             - Document is parsed
         THEN:
-            - No archive created (file has text layer); later-page text present
+            - No archive created (produce_archive=False); text from text layer present
         """
         tesseract_parser.settings.mode = "auto"
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-mixed.pdf",
             "application/pdf",
+            produce_archive=False,
         )
         assert tesseract_parser.archive_path is None
         assert_ordered_substrings(
@@ -964,12 +990,19 @@ class TestParseRtl:
     ) -> None:
         """
         GIVEN:
-            - PDF with RTL Arabic text
+            - PDF with RTL Arabic text in its text layer (short: 18 chars)
+            - mode=off, produce_archive=True: PDF/A conversion via skip_text, no OCR engine
         WHEN:
             - Document is parsed
         THEN:
-            - Arabic content is extracted (normalised for bidi)
+            - Arabic content is extracted from the PDF text layer (normalised for bidi)
+
+        Note: The RTL PDF has a short text layer (< VALID_TEXT_LENGTH=50) so AUTO mode
+        would attempt full OCR, which fails due to PriorOcrFoundError and falls back to
+        force-ocr with English Tesseract (producing garbage).  Using mode="off" forces
+        skip_text=True so the Arabic text layer is preserved through PDF/A conversion.
         """
+        tesseract_parser.settings.mode = "off"
         tesseract_parser.parse(
             tesseract_samples_dir / "rtl-test.pdf",
             "application/pdf",
