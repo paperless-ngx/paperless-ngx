@@ -132,8 +132,8 @@ class TestOcrSettingsChecks:
             pytest.param(
                 "OCR_MODE",
                 "skip_noarchive",
-                "deprecated",
-                id="deprecated-mode",
+                'OCR output mode "skip_noarchive"',
+                id="deprecated-mode-now-invalid",
             ),
             pytest.param(
                 "OCR_SKIP_ARCHIVE_FILE",

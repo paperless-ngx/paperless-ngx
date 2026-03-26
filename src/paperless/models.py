@@ -36,20 +36,20 @@ class ModeChoices(models.TextChoices):
     and our own custom setting
     """
 
-    SKIP = ("skip", _("skip"))
-    REDO = ("redo", _("redo"))
+    AUTO = ("auto", _("auto"))
     FORCE = ("force", _("force"))
-    SKIP_NO_ARCHIVE = ("skip_noarchive", _("skip_noarchive"))
+    REDO = ("redo", _("redo"))
+    OFF = ("off", _("off"))
 
 
-class ArchiveFileChoices(models.TextChoices):
+class ArchiveFileGenerationChoices(models.TextChoices):
     """
     Settings to control creation of an archive PDF file
     """
 
-    NEVER = ("never", _("never"))
-    WITH_TEXT = ("with_text", _("with_text"))
+    AUTO = ("auto", _("auto"))
     ALWAYS = ("always", _("always"))
+    NEVER = ("never", _("never"))
 
 
 class CleanChoices(models.TextChoices):
@@ -131,7 +131,7 @@ class ApplicationConfiguration(AbstractSingletonModel):
         null=True,
         blank=True,
         max_length=16,
-        choices=ArchiveFileChoices.choices,
+        choices=ArchiveFileGenerationChoices.choices,
     )
 
     image_dpi = models.PositiveSmallIntegerField(

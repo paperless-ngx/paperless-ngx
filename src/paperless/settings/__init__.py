@@ -21,6 +21,7 @@ from paperless.settings.custom import parse_hosting_settings
 from paperless.settings.custom import parse_ignore_dates
 from paperless.settings.custom import parse_redis_url
 from paperless.settings.parsers import get_bool_from_env
+from paperless.settings.parsers import get_choice_from_env
 from paperless.settings.parsers import get_float_from_env
 from paperless.settings.parsers import get_int_from_env
 from paperless.settings.parsers import get_list_from_env
@@ -874,10 +875,17 @@ OCR_LANGUAGE = os.getenv("PAPERLESS_OCR_LANGUAGE", "eng")
 # OCRmyPDF --output-type options are available.
 OCR_OUTPUT_TYPE = os.getenv("PAPERLESS_OCR_OUTPUT_TYPE", "pdfa")
 
-# skip. redo, force
-OCR_MODE = os.getenv("PAPERLESS_OCR_MODE", "skip")
+OCR_MODE = get_choice_from_env(
+    "PAPERLESS_OCR_MODE",
+    {"auto", "force", "redo", "off"},
+    default="auto",
+)
 
-OCR_SKIP_ARCHIVE_FILE = os.getenv("PAPERLESS_OCR_SKIP_ARCHIVE_FILE", "never")
+OCR_SKIP_ARCHIVE_FILE = get_choice_from_env(
+    "PAPERLESS_OCR_SKIP_ARCHIVE_FILE",
+    {"auto", "always", "never"},
+    default="auto",
+)
 
 OCR_IMAGE_DPI = get_int_from_env("PAPERLESS_OCR_IMAGE_DPI")
 

@@ -18,7 +18,7 @@ from documents.parsers import make_thumbnail_from_pdf
 from documents.utils import maybe_override_pixel_limit
 from documents.utils import run_subprocess
 from paperless.config import OcrConfig
-from paperless.models import ArchiveFileChoices
+from paperless.models import ArchiveFileGenerationChoices
 from paperless.models import CleanChoices
 from paperless.models import ModeChoices
 from paperless.parsers.utils import read_file_handle_unicode_errors
@@ -309,10 +309,7 @@ class RasterisedDocumentParser:
 
         if self.settings.mode == ModeChoices.FORCE or safe_fallback:
             ocrmypdf_args["force_ocr"] = True
-        elif self.settings.mode in {
-            ModeChoices.SKIP,
-            ModeChoices.SKIP_NO_ARCHIVE,
-        }:
+        elif self.settings.mode == ModeChoices.AUTO:
             ocrmypdf_args["skip_text"] = True
         elif self.settings.mode == ModeChoices.REDO:
             ocrmypdf_args["redo_ocr"] = True
@@ -421,15 +418,14 @@ class RasterisedDocumentParser:
             original_has_text = False
 
         # If the original has text, and the user doesn't want an archive,
-        # we're done here
-        skip_archive_for_text = (
-            self.settings.mode == ModeChoices.SKIP_NO_ARCHIVE
-            or self.settings.skip_archive_file
-            in {
-                ArchiveFileChoices.WITH_TEXT,
-                ArchiveFileChoices.ALWAYS,
-            }
-        )
+        # we're done here (but not when force/redo mode is explicitly requested)
+        skip_archive_for_text = self.settings.mode not in {
+            ModeChoices.FORCE,
+            ModeChoices.REDO,
+        } and self.settings.skip_archive_file in {
+            ArchiveFileGenerationChoices.NEVER,
+            ArchiveFileGenerationChoices.AUTO,
+        }
         if skip_archive_for_text and original_has_text:
             self.log.debug("Document has text, skipping OCRmyPDF entirely.")
             self.text = text_original
@@ -459,7 +455,7 @@ class RasterisedDocumentParser:
             self.log.debug(f"Calling OCRmyPDF with args: {args}")
             ocrmypdf.ocr(**args)
 
-            if self.settings.skip_archive_file != ArchiveFileChoices.ALWAYS:
+            if self.settings.skip_archive_file != ArchiveFileGenerationChoices.NEVER:
                 self.archive_path = archive_path
 
             self.text = self.extract_text(sidecar_file, archive_path)

@@ -93,7 +93,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         """
         with override_settings(OCR_MODE="redo"):
             instance = ApplicationConfiguration.objects.all().first()
-            instance.mode = ModeChoices.SKIP
+            instance.mode = ModeChoices.AUTO
             instance.save()
 
             params = self.get_params()

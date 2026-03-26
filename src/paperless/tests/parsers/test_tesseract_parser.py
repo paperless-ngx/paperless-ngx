@@ -386,6 +386,7 @@ class TestParsePdf:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
+        tesseract_parser.settings.skip_archive_file = "always"
         tesseract_parser.parse(
             tesseract_samples_dir / "with-form.pdf",
             "application/pdf",
@@ -433,7 +434,7 @@ class TestParsePdf:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        tesseract_parser.settings.mode = "skip"
+        tesseract_parser.settings.mode = "auto"
         tesseract_parser.parse(tesseract_samples_dir / "signed.pdf", "application/pdf")
         assert tesseract_parser.archive_path is None
         assert_ordered_substrings(
@@ -449,7 +450,7 @@ class TestParsePdf:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        tesseract_parser.settings.mode = "skip"
+        tesseract_parser.settings.mode = "auto"
         tesseract_parser.parse(
             tesseract_samples_dir / "encrypted.pdf",
             "application/pdf",
@@ -545,6 +546,7 @@ class TestParseMultiPage:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
+        tesseract_parser.settings.skip_archive_file = "always"
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-digital.pdf",
             "application/pdf",
@@ -559,7 +561,7 @@ class TestParseMultiPage:
     @pytest.mark.parametrize(
         "mode",
         [
-            pytest.param("skip", id="skip"),
+            pytest.param("auto", id="auto"),
             pytest.param("redo", id="redo"),
             pytest.param("force", id="force"),
         ],
@@ -572,6 +574,7 @@ class TestParseMultiPage:
     ) -> None:
         tesseract_parser.settings.pages = 2
         tesseract_parser.settings.mode = mode
+        tesseract_parser.settings.skip_archive_file = "always"
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-digital.pdf",
             "application/pdf",
@@ -587,7 +590,7 @@ class TestParseMultiPage:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        tesseract_parser.settings.mode = "skip"
+        tesseract_parser.settings.mode = "auto"
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-images.pdf",
             "application/pdf",
@@ -735,13 +738,13 @@ class TestSkipArchive:
         """
         GIVEN:
             - File with existing text layer
-            - Mode: skip_noarchive
+            - Mode: auto, skip_archive_file: auto
         WHEN:
             - Document is parsed
         THEN:
-            - Text extracted; no archive created
+            - Text extracted; no archive created (text exists, auto skips OCR)
         """
-        tesseract_parser.settings.mode = "skip_noarchive"
+        tesseract_parser.settings.mode = "auto"
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-digital.pdf",
             "application/pdf",
@@ -760,13 +763,13 @@ class TestSkipArchive:
         """
         GIVEN:
             - File with image-only pages (no text layer)
-            - Mode: skip_noarchive
+            - Mode: auto, skip_archive_file: auto
         WHEN:
             - Document is parsed
         THEN:
-            - Text extracted; archive created (OCR needed)
+            - Text extracted; archive created (OCR needed, no existing text)
         """
-        tesseract_parser.settings.mode = "skip_noarchive"
+        tesseract_parser.settings.mode = "auto"
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-images.pdf",
             "application/pdf",
@@ -780,27 +783,32 @@ class TestSkipArchive:
     @pytest.mark.parametrize(
         ("skip_archive_file", "filename", "expect_archive"),
         [
-            pytest.param("never", "multi-page-digital.pdf", True, id="never-with-text"),
-            pytest.param("never", "multi-page-images.pdf", True, id="never-no-text"),
-            pytest.param(
-                "with_text",
-                "multi-page-digital.pdf",
-                False,
-                id="with-text-layer",
-            ),
-            pytest.param(
-                "with_text",
-                "multi-page-images.pdf",
-                True,
-                id="with-text-no-layer",
-            ),
             pytest.param(
                 "always",
                 "multi-page-digital.pdf",
-                False,
+                True,
                 id="always-with-text",
             ),
-            pytest.param("always", "multi-page-images.pdf", False, id="always-no-text"),
+            pytest.param("always", "multi-page-images.pdf", True, id="always-no-text"),
+            pytest.param(
+                "auto",
+                "multi-page-digital.pdf",
+                False,
+                id="auto-with-text-layer",
+            ),
+            pytest.param(
+                "auto",
+                "multi-page-images.pdf",
+                True,
+                id="auto-no-text-layer",
+            ),
+            pytest.param(
+                "never",
+                "multi-page-digital.pdf",
+                False,
+                id="never-with-text",
+            ),
+            pytest.param("never", "multi-page-images.pdf", False, id="never-no-text"),
         ],
     )
     def test_skip_archive_file_setting(
@@ -835,13 +843,14 @@ class TestParseMixed:
         """
         GIVEN:
             - File with text in some pages (image) and some pages (digital)
-            - Mode: skip
+            - Mode: auto (skip_text), skip_archive_file: always
         WHEN:
             - Document is parsed
         THEN:
             - All pages extracted; archive created; sidecar notes skipped pages
         """
-        tesseract_parser.settings.mode = "skip"
+        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.skip_archive_file = "always"
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-mixed.pdf",
             "application/pdf",
@@ -899,13 +908,13 @@ class TestParseMixed:
         """
         GIVEN:
             - File with mixed pages
-            - Mode: skip_noarchive
+            - Mode: auto, skip_archive_file: auto
         WHEN:
             - Document is parsed
         THEN:
             - No archive created (file has text layer); later-page text present
         """
-        tesseract_parser.settings.mode = "skip_noarchive"
+        tesseract_parser.settings.mode = "auto"
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-mixed.pdf",
             "application/pdf",
@@ -923,12 +932,12 @@ class TestParseMixed:
 
 
 class TestParseRotate:
-    def test_rotate_skip_mode(
+    def test_rotate_auto_mode(
         self,
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        tesseract_parser.settings.mode = "skip"
+        tesseract_parser.settings.mode = "auto"
         tesseract_parser.settings.rotate = True
         tesseract_parser.parse(tesseract_samples_dir / "rotated.pdf", "application/pdf")
         assert_ordered_substrings(
@@ -1023,11 +1032,11 @@ class TestOcrmypdfParameters:
         assert ("clean" in params) == expected_clean
         assert ("clean_final" in params) == expected_clean_final
 
-    def test_clean_final_skip_mode(
+    def test_clean_final_auto_mode(
         self,
         make_tesseract_parser: MakeTesseractParser,
     ) -> None:
-        with make_tesseract_parser(OCR_CLEAN="clean-final", OCR_MODE="skip") as parser:
+        with make_tesseract_parser(OCR_CLEAN="clean-final", OCR_MODE="auto") as parser:
             params = parser.construct_ocrmypdf_parameters("", "", "", "")
         assert params["clean_final"] is True
         assert "clean" not in params
@@ -1044,9 +1053,9 @@ class TestOcrmypdfParameters:
     @pytest.mark.parametrize(
         ("ocr_mode", "ocr_deskew", "expect_deskew"),
         [
-            pytest.param("skip", True, True, id="skip-deskew-on"),
+            pytest.param("auto", True, True, id="auto-deskew-on"),
             pytest.param("redo", True, False, id="redo-deskew-off"),
-            pytest.param("skip", False, False, id="skip-no-deskew"),
+            pytest.param("auto", False, False, id="auto-no-deskew"),
         ],
     )
     def test_deskew_option(
