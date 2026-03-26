@@ -282,7 +282,7 @@ def execute_password_removal_action(
     passwords = action.passwords
     if not passwords:
         logger.warning(
-            "Password removal action %s has no passwords configured",
+            "Workflow action %s has no configured unlock values",
             action.pk,
             extra={"group": logging_group},
         )
@@ -321,22 +321,23 @@ def execute_password_removal_action(
                 user=document.owner,
             )
             logger.info(
-                "Removed password from document %s using workflow action %s",
+                "Unlocked document %s using workflow action %s",
                 document.pk,
                 action.pk,
                 extra={"group": logging_group},
             )
             return
-        except ValueError as e:
+        except ValueError:
             logger.warning(
-                "Password removal failed for document %s with supplied password: %s",
+                "Workflow action %s could not unlock document %s with one configured value",
+                action.pk,
                 document.pk,
-                e,
                 extra={"group": logging_group},
             )
 
     logger.error(
-        "Password removal failed for document %s after trying all provided passwords",
+        "Workflow action %s could not unlock document %s with any configured value",
+        action.pk,
         document.pk,
         extra={"group": logging_group},
     )

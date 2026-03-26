@@ -52,8 +52,8 @@ from documents.models import Tag
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.plugins.base import ConsumeTaskPlugin
-from documents.plugins.base import ProgressManager
 from documents.plugins.base import StopConsumeTaskError
+from documents.plugins.helpers import ProgressManager
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated
@@ -532,13 +532,13 @@ def check_scheduled_workflows() -> None:
                             id__in=matched_ids,
                         )
 
-                if documents.count() > 0:
+                if documents.exists():
                     documents = prefilter_documents_by_workflowtrigger(
                         documents,
                         trigger,
                     )
 
-                if documents.count() > 0:
+                if documents.exists():
                     logger.debug(
                         f"Found {documents.count()} documents for trigger {trigger}",
                     )

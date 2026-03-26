@@ -191,7 +191,10 @@ class TestMailOAuth(
                 ).exists(),
             )
 
-            self.assertIn("Error getting access token: test_error", cm.output[0])
+            self.assertIn(
+                "Error getting access token from OAuth provider",
+                cm.output[0],
+            )
 
     def test_oauth_callback_view_insufficient_permissions(self) -> None:
         """

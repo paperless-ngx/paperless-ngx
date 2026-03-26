@@ -166,6 +166,23 @@ describe('SettingsService', () => {
     expect(settingsService.get(SETTINGS_KEYS.THEME_COLOR)).toEqual('#9fbf2f')
   })
 
+  it('ignores unsafe top-level keys from loaded settings', () => {
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}ui_settings/`
+    )
+    const payload = JSON.parse(
+      JSON.stringify(ui_settings).replace(
+        '"settings":{',
+        '"settings":{"__proto__":{"polluted":"yes"},'
+      )
+    )
+    payload.settings.app_title = 'Safe Title'
+    req.flush(payload)
+
+    expect(settingsService.get(SETTINGS_KEYS.APP_TITLE)).toEqual('Safe Title')
+    expect(({} as any).polluted).toBeUndefined()
+  })
+
   it('correctly allows updating settings of various types', () => {
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}ui_settings/`

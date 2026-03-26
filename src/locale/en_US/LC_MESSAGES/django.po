@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-22 13:54+0000\n"
+"POT-Creation-Date: 2026-03-26 14:37+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1301,7 +1301,7 @@ msgstr ""
 
 #: documents/serialisers.py:463 documents/serialisers.py:815
 #: documents/serialisers.py:2501 documents/views.py:1990
-#: paperless_mail/serialisers.py:143
+#: documents/views.py:2033 paperless_mail/serialisers.py:143
 msgid "Insufficient permissions."
 msgstr ""
 
@@ -1341,7 +1341,7 @@ msgstr ""
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2587 documents/views.py:3596
+#: documents/serialisers.py:2587 documents/views.py:3599
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
@@ -1383,13 +1383,18 @@ msgid "Please sign in."
 msgstr ""
 
 #: documents/templates/account/login.html:12
-#, python-format
-msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
+msgid "Don't have an account yet?"
+msgstr ""
+
+#: documents/templates/account/login.html:12
+#: documents/templates/account/signup.html:43
+#: documents/templates/socialaccount/signup.html:29
+msgid "Sign up"
 msgstr ""
 
 #: documents/templates/account/login.html:25
 #: documents/templates/account/signup.html:22
-#: documents/templates/socialaccount/signup.html:13
+#: documents/templates/socialaccount/signup.html:15
 msgid "Username"
 msgstr ""
 
@@ -1399,6 +1404,7 @@ msgid "Password"
 msgstr ""
 
 #: documents/templates/account/login.html:36
+#: documents/templates/account/signup.html:11
 #: documents/templates/mfa/authenticate.html:23
 msgid "Sign in"
 msgstr ""
@@ -1477,10 +1483,11 @@ msgid "Password reset complete."
 msgstr ""
 
 #: documents/templates/account/password_reset_from_key_done.html:14
-#, python-format
-msgid ""
-"Your new password has been set. You can now <a href=\"%(login_url)s\">log "
-"in</a>"
+msgid "Your new password has been set. You can now"
+msgstr ""
+
+#: documents/templates/account/password_reset_from_key_done.html:14
+msgid "log in"
 msgstr ""
 
 #: documents/templates/account/signup.html:5
@@ -1488,8 +1495,7 @@ msgid "Paperless-ngx sign up"
 msgstr ""
 
 #: documents/templates/account/signup.html:11
-#, python-format
-msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
+msgid "Already have an account?"
 msgstr ""
 
 #: documents/templates/account/signup.html:19
@@ -1499,17 +1505,12 @@ msgid ""
 msgstr ""
 
 #: documents/templates/account/signup.html:23
-#: documents/templates/socialaccount/signup.html:14
+#: documents/templates/socialaccount/signup.html:16
 msgid "Email (optional)"
 msgstr ""
 
 #: documents/templates/account/signup.html:25
 msgid "Password (again)"
-msgstr ""
-
-#: documents/templates/account/signup.html:43
-#: documents/templates/socialaccount/signup.html:27
-msgid "Sign up"
 msgstr ""
 
 #: documents/templates/index.html:61
@@ -1556,18 +1557,21 @@ msgid "Paperless-ngx social account sign in"
 msgstr ""
 
 #: documents/templates/socialaccount/authentication_error.html:10
-#, python-format
 msgid ""
 "An error occurred while attempting to login via your social network account. "
-"Back to the <a href=\"%(login_url)s\">login page</a>"
+"Back to the"
 msgstr ""
 
-#: documents/templates/socialaccount/login.html:10
+#: documents/templates/socialaccount/authentication_error.html:10
+msgid "login page"
+msgstr ""
+
+#: documents/templates/socialaccount/login.html:11
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
 msgstr ""
 
-#: documents/templates/socialaccount/login.html:13
+#: documents/templates/socialaccount/login.html:15
 msgid "Continue"
 msgstr ""
 
@@ -1575,12 +1579,12 @@ msgstr ""
 msgid "Paperless-ngx social account sign up"
 msgstr ""
 
-#: documents/templates/socialaccount/signup.html:10
+#: documents/templates/socialaccount/signup.html:11
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
 msgstr ""
 
-#: documents/templates/socialaccount/signup.html:11
+#: documents/templates/socialaccount/signup.html:13
 msgid "As a final step, please complete the following form:"
 msgstr ""
 
@@ -1605,24 +1609,24 @@ msgstr ""
 msgid "Unable to parse URI {value}"
 msgstr ""
 
-#: documents/views.py:1983
+#: documents/views.py:1983 documents/views.py:2030
 msgid "Invalid more_like_id"
 msgstr ""
 
-#: documents/views.py:3608
+#: documents/views.py:3611
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr ""
 
-#: documents/views.py:3651
+#: documents/views.py:3654
 msgid "Bundle is already being processed."
 msgstr ""
 
-#: documents/views.py:3708
+#: documents/views.py:3711
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr ""
 
-#: documents/views.py:3718
+#: documents/views.py:3721
 msgid "The share link bundle is unavailable."
 msgstr ""
 

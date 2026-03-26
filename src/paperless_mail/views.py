@@ -138,13 +138,16 @@ class MailAccountViewSet(ModelViewSet, PassUserMixin):
                         existing_account.refresh_from_db()
                         account.password = existing_account.password
                     else:
+                        logger.error(
+                            "Mail account connectivity test failed: Unable to refresh oauth token",
+                        )
                         raise MailError("Unable to refresh oauth token")
 
                 mailbox_login(M, account)
                 return Response({"success": True})
-            except MailError as e:
+            except MailError:
                 logger.error(
-                    f"Mail account {account} test failed: {e}",
+                    "Mail account connectivity test failed",
                 )
                 return HttpResponseBadRequest("Unable to connect to server")
 
@@ -218,7 +221,7 @@ class OauthCallbackView(GenericAPIView):
 
         if code is None:
             logger.error(
-                f"Invalid oauth callback request, code: {code}, scope: {scope}",
+                "Invalid oauth callback request: missing code",
             )
             return HttpResponseBadRequest("Invalid request, see logs for more detail")
 
@@ -229,7 +232,7 @@ class OauthCallbackView(GenericAPIView):
         state = request.query_params.get("state", "")
         if not oauth_manager.validate_state(state):
             logger.error(
-                f"Invalid oauth callback request received state: {state}, expected: {oauth_manager.state}",
+                "Invalid oauth callback request: state validation failed",
             )
             return HttpResponseBadRequest("Invalid request, see logs for more detail")
 
@@ -276,8 +279,8 @@ class OauthCallbackView(GenericAPIView):
             return HttpResponseRedirect(
                 f"{oauth_manager.oauth_redirect_url}?oauth_success=1&account_id={account.pk}",
             )
-        except GetAccessTokenError as e:
-            logger.error(f"Error getting access token: {e}")
+        except GetAccessTokenError:
+            logger.error("Error getting access token from OAuth provider")
             return HttpResponseRedirect(
                 f"{oauth_manager.oauth_redirect_url}?oauth_success=0",
             )
