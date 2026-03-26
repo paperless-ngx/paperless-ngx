@@ -21,6 +21,7 @@ import {
   FILTER_HAS_TAGS_ANY,
 } from '../data/filter-rule-type'
 import { SavedView } from '../data/saved-view'
+import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
 import { SETTINGS_KEYS } from '../data/ui-settings'
 import { PermissionsGuard } from '../guards/permissions.guard'
 import { DocumentListViewService } from './document-list-view.service'
@@ -246,6 +247,29 @@ describe('DocumentListViewService', () => {
     )
     expect(req.request.method).toEqual('GET')
     expect(documentListViewService.sortReverse).toBeTruthy()
+  })
+
+  it('restores only known list view state fields from local storage', () => {
+    try {
+      localStorage.setItem(
+        DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG,
+        '{"currentPage":3,"sortField":"title","sortReverse":false,"__proto__":{"polluted":true},"injected":"ignored"}'
+      )
+
+      const restoredService = TestBed.runInInjectionContext(
+        () => new DocumentListViewService()
+      )
+
+      expect(restoredService.currentPage).toEqual(3)
+      expect(restoredService.sortField).toEqual('title')
+      expect(restoredService.sortReverse).toBeFalsy()
+      expect(
+        (restoredService as any).activeListViewState.injected
+      ).toBeUndefined()
+      expect(({} as any).polluted).toBeUndefined()
+    } finally {
+      localStorage.removeItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
+    }
   })
 
   it('should load from query params', () => {

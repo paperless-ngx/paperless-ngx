@@ -24,6 +24,20 @@ const LIST_DEFAULT_DISPLAY_FIELDS: DisplayField[] = DEFAULT_DISPLAY_FIELDS.map(
   (f) => f.id
 ).filter((f) => f !== DisplayField.ADDED)
 
+const RESTORABLE_LIST_VIEW_STATE_KEYS: (keyof ListViewState)[] = [
+  'title',
+  'documents',
+  'currentPage',
+  'collectionSize',
+  'sortField',
+  'sortReverse',
+  'filterRules',
+  'selected',
+  'pageSize',
+  'displayMode',
+  'displayFields',
+]
+
 /**
  * Captures the current state of the list view.
  */
@@ -112,6 +126,32 @@ export class DocumentListViewService {
 
   private displayFieldsInitialized: boolean = false
 
+  private restoreListViewState(savedState: unknown): ListViewState {
+    const newState = this.defaultListViewState()
+
+    if (
+      !savedState ||
+      typeof savedState !== 'object' ||
+      Array.isArray(savedState)
+    ) {
+      return newState
+    }
+
+    const parsedState = savedState as Partial<
+      Record<keyof ListViewState, unknown>
+    >
+    const mutableState = newState as Record<keyof ListViewState, unknown>
+
+    for (const key of RESTORABLE_LIST_VIEW_STATE_KEYS) {
+      const value = parsedState[key]
+      if (value != null) {
+        mutableState[key] = value
+      }
+    }
+
+    return newState
+  }
+
   get activeSavedViewId() {
     return this._activeSavedViewId
   }
@@ -127,14 +167,7 @@ export class DocumentListViewService {
     if (documentListViewConfigJson) {
       try {
         let savedState: ListViewState = JSON.parse(documentListViewConfigJson)
-        // Remove null elements from the restored state
-        Object.keys(savedState).forEach((k) => {
-          if (savedState[k] == null) {
-            delete savedState[k]
-          }
-        })
-        // only use restored state attributes instead of defaults if they are not null
-        let newState = Object.assign(this.defaultListViewState(), savedState)
+        let newState = this.restoreListViewState(savedState)
         this.listViewStates.set(null, newState)
       } catch (e) {
         localStorage.removeItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
