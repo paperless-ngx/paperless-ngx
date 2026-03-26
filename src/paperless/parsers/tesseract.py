@@ -21,6 +21,8 @@ from documents.utils import run_subprocess
 from paperless.config import OcrConfig
 from paperless.models import CleanChoices
 from paperless.models import ModeChoices
+from paperless.parsers.utils import PDF_TEXT_MIN_LENGTH
+from paperless.parsers.utils import extract_pdf_text
 from paperless.parsers.utils import read_file_handle_unicode_errors
 from paperless.version import __full_version_str__
 
@@ -250,36 +252,7 @@ class RasterisedDocumentParser:
         if not Path(pdf_file).is_file():
             return None
 
-        try:
-            text = None
-            with tempfile.NamedTemporaryFile(
-                mode="w+",
-                dir=self.tempdir,
-            ) as tmp:
-                run_subprocess(
-                    [
-                        "pdftotext",
-                        "-q",
-                        "-layout",
-                        "-enc",
-                        "UTF-8",
-                        str(pdf_file),
-                        tmp.name,
-                    ],
-                    logger=self.log,
-                )
-                text = read_file_handle_unicode_errors(Path(tmp.name))
-
-            return post_process_text(text)
-
-        except Exception:
-            #  If pdftotext fails, fall back to OCR.
-            self.log.warning(
-                "Error while getting text from PDF document with pdftotext",
-                exc_info=True,
-            )
-            # probably not a PDF file.
-            return None
+        return post_process_text(extract_pdf_text(Path(pdf_file), log=self.log))
 
     def construct_ocrmypdf_parameters(
         self,
@@ -465,12 +438,11 @@ class RasterisedDocumentParser:
     ) -> None:
         # This forces tesseract to use one core per page.
         os.environ["OMP_THREAD_LIMIT"] = "1"
-        VALID_TEXT_LENGTH = 50
 
         if mime_type == "application/pdf":
             text_original = self.extract_text(None, document_path)
             original_has_text = (
-                text_original is not None and len(text_original) > VALID_TEXT_LENGTH
+                text_original is not None and len(text_original) > PDF_TEXT_MIN_LENGTH
             )
         else:
             text_original = None
@@ -612,6 +584,8 @@ class RasterisedDocumentParser:
                     sidecar_file_fallback,
                     archive_path_fallback,
                 )
+                if produce_archive:
+                    self.archive_path = archive_path_fallback
             except Exception as e:
                 raise ParseError(f"{e.__class__.__name__}: {e!s}") from e
 

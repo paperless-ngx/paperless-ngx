@@ -27,7 +27,10 @@ sample_file: Path = Path(__file__).parent / "samples" / "simple.pdf"
 
 
 @pytest.mark.management
-@override_settings(FILENAME_FORMAT="{correspondent}/{title}")
+@override_settings(
+    FILENAME_FORMAT="{correspondent}/{title}",
+    ARCHIVE_FILE_GENERATION="always",
+)
 class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def make_models(self):
         return Document.objects.create(

@@ -1,4 +1,4 @@
-"""Tests for _should_produce_archive() and _extract_text_for_archive_check()."""
+"""Tests for should_produce_archive()."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from unittest.mock import patch
 import pytest
 from django.test import override_settings
 
-from documents.consumer import _should_produce_archive
+from documents.consumer import should_produce_archive
 
 
 def _parser_instance(
@@ -57,7 +57,7 @@ class TestShouldProduceArchive:
     @override_settings(ARCHIVE_FILE_GENERATION="never")
     def test_never_setting_returns_false(self) -> None:
         parser = _parser_instance(can_produce=True, requires_rendition=False)
-        result = _should_produce_archive(
+        result = should_produce_archive(
             parser,
             "application/pdf",
             Path("/tmp/doc.pdf"),
@@ -67,7 +67,7 @@ class TestShouldProduceArchive:
     @override_settings(ARCHIVE_FILE_GENERATION="always")
     def test_always_setting_returns_true(self) -> None:
         parser = _parser_instance(can_produce=True, requires_rendition=False)
-        result = _should_produce_archive(
+        result = should_produce_archive(
             parser,
             "application/pdf",
             Path("/tmp/doc.pdf"),
@@ -78,7 +78,7 @@ class TestShouldProduceArchive:
     def test_requires_pdf_rendition_overrides_never(self) -> None:
         """requires_pdf_rendition=True forces archive even when setting is never."""
         parser = _parser_instance(can_produce=True, requires_rendition=True)
-        result = _should_produce_archive(
+        result = should_produce_archive(
             parser,
             "application/pdf",
             Path("/tmp/doc.pdf"),
@@ -89,14 +89,14 @@ class TestShouldProduceArchive:
     def test_cannot_produce_archive_overrides_always(self) -> None:
         """can_produce_archive=False prevents archive even when setting is always."""
         parser = _parser_instance(can_produce=False, requires_rendition=False)
-        result = _should_produce_archive(parser, "text/plain", Path("/tmp/doc.txt"))
+        result = should_produce_archive(parser, "text/plain", Path("/tmp/doc.txt"))
         assert result is False
 
     @override_settings(ARCHIVE_FILE_GENERATION="auto")
     def test_auto_image_returns_true(self) -> None:
         """auto mode: image/* MIME types always produce archive (scanned doc)."""
         parser = _parser_instance(can_produce=True, requires_rendition=False)
-        result = _should_produce_archive(parser, "image/tiff", Path("/tmp/scan.tiff"))
+        result = should_produce_archive(parser, "image/tiff", Path("/tmp/scan.tiff"))
         assert result is True
 
     @override_settings(ARCHIVE_FILE_GENERATION="auto")
@@ -105,10 +105,10 @@ class TestShouldProduceArchive:
         parser = _parser_instance(can_produce=True, requires_rendition=False)
         long_text = "This is a born-digital PDF with lots of text content. " * 10
         with patch(
-            "documents.consumer._extract_text_for_archive_check",
+            "documents.consumer.extract_pdf_text",
             return_value=long_text,
         ):
-            result = _should_produce_archive(
+            result = should_produce_archive(
                 parser,
                 "application/pdf",
                 Path("/tmp/doc.pdf"),
@@ -120,10 +120,10 @@ class TestShouldProduceArchive:
         """auto mode: PDF where pdftotext returns None (scanned) produces archive."""
         parser = _parser_instance(can_produce=True, requires_rendition=False)
         with patch(
-            "documents.consumer._extract_text_for_archive_check",
+            "documents.consumer.extract_pdf_text",
             return_value=None,
         ):
-            result = _should_produce_archive(
+            result = should_produce_archive(
                 parser,
                 "application/pdf",
                 Path("/tmp/scan.pdf"),
@@ -135,10 +135,10 @@ class TestShouldProduceArchive:
         """auto mode: PDF with very short text (<=50 chars) is treated as scanned."""
         parser = _parser_instance(can_produce=True, requires_rendition=False)
         with patch(
-            "documents.consumer._extract_text_for_archive_check",
+            "documents.consumer.extract_pdf_text",
             return_value="tiny",
         ):
-            result = _should_produce_archive(
+            result = should_produce_archive(
                 parser,
                 "application/pdf",
                 Path("/tmp/scan.pdf"),
@@ -149,7 +149,7 @@ class TestShouldProduceArchive:
     def test_auto_non_pdf_non_image_returns_false(self) -> None:
         """auto mode: other MIME types (e.g. email) don't produce archive by default."""
         parser = _parser_instance(can_produce=True, requires_rendition=False)
-        result = _should_produce_archive(
+        result = should_produce_archive(
             parser,
             "message/rfc822",
             Path("/tmp/email.eml"),
@@ -160,7 +160,7 @@ class TestShouldProduceArchive:
     def test_requires_rendition_with_can_produce_false_returns_true(self) -> None:
         """requires_pdf_rendition=True always wins, even if can_produce_archive=False."""
         parser = _parser_instance(can_produce=False, requires_rendition=True)
-        result = _should_produce_archive(
+        result = should_produce_archive(
             parser,
             "application/pdf",
             Path("/tmp/doc.pdf"),

@@ -10,14 +10,64 @@ from __future__ import annotations
 
 import logging
 import re
+import tempfile
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     from paperless.parsers import MetadataEntry
 
 logger = logging.getLogger("paperless.parsers.utils")
+
+# Minimum character count for a PDF to be considered "born-digital" (has real text).
+# Used by both the consumer (archive decision) and the tesseract parser (skip-OCR decision).
+PDF_TEXT_MIN_LENGTH = 50
+
+
+def extract_pdf_text(
+    path: Path,
+    log: logging.Logger | None = None,
+) -> str | None:
+    """Run pdftotext on *path* and return the extracted text, or None on failure.
+
+    Parameters
+    ----------
+    path:
+        Absolute path to the PDF file.
+    log:
+        Logger for warnings.  Falls back to the module-level logger when omitted.
+
+    Returns
+    -------
+    str | None
+        Extracted text, or ``None`` if pdftotext fails or the file is not a PDF.
+    """
+    from documents.utils import run_subprocess
+
+    _log = log or logger
+    try:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            out_path = Path(tmpdir) / "text.txt"
+            run_subprocess(
+                [
+                    "pdftotext",
+                    "-q",
+                    "-layout",
+                    "-enc",
+                    "UTF-8",
+                    str(path),
+                    str(out_path),
+                ],
+                logger=_log,
+            )
+            text = read_file_handle_unicode_errors(out_path, log=_log)
+            return text or None
+    except Exception:
+        _log.warning(
+            "Error while getting text from PDF document with pdftotext",
+            exc_info=True,
+        )
+        return None
 
 
 def read_file_handle_unicode_errors(

@@ -35,6 +35,7 @@ from documents.consumer import AsnCheckPlugin
 from documents.consumer import ConsumerPlugin
 from documents.consumer import ConsumerPreflightPlugin
 from documents.consumer import WorkflowTriggerPlugin
+from documents.consumer import should_produce_archive
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.double_sided import CollatePlugin
@@ -321,7 +322,16 @@ def update_document_content_maybe_archive_file(document_id) -> None:
         parser.configure(ParserContext())
 
         try:
-            parser.parse(document.source_path, mime_type)
+            produce_archive = should_produce_archive(
+                parser,
+                mime_type,
+                document.source_path,
+            )
+            parser.parse(
+                document.source_path,
+                mime_type,
+                produce_archive=produce_archive,
+            )
 
             thumbnail = parser.get_thumbnail(document.source_path, mime_type)
 

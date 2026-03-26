@@ -408,7 +408,7 @@ class TestParsePdf:
             ["Please enter your name in here:", "This is a PDF document with a form."],
         )
 
-    def test_with_form_redo_produces_no_archive(
+    def test_with_form_redo_no_archive_when_not_requested(
         self,
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
@@ -417,6 +417,7 @@ class TestParsePdf:
         tesseract_parser.parse(
             tesseract_samples_dir / "with-form.pdf",
             "application/pdf",
+            produce_archive=False,
         )
         assert tesseract_parser.archive_path is None
         assert_ordered_substrings(

@@ -1,6 +1,5 @@
 import datetime
 import hashlib
-import logging
 import os
 import shutil
 import tempfile
@@ -56,6 +55,8 @@ from paperless.models import ArchiveFileGenerationChoices
 from paperless.parsers import ParserContext
 from paperless.parsers import ParserProtocol
 from paperless.parsers.registry import get_parser_registry
+from paperless.parsers.utils import PDF_TEXT_MIN_LENGTH
+from paperless.parsers.utils import extract_pdf_text
 
 LOGGING_NAME: Final[str] = "paperless.consumer"
 
@@ -108,40 +109,12 @@ class ConsumerStatusShortMessage(StrEnum):
     FAILED = "failed"
 
 
-_VALID_TEXT_LENGTH_FOR_ARCHIVE_CHECK = 50
-
-
-def _extract_text_for_archive_check(path: Path) -> str | None:
-    """Run pdftotext on *path* and return the text, or None on any failure.
-
-    Used only for the ARCHIVE_FILE_GENERATION=auto born-digital detection.
-    """
-    try:
-        with tempfile.TemporaryDirectory() as tmpdir:
-            out_path = Path(tmpdir) / "text.txt"
-            run_subprocess(
-                [
-                    "pdftotext",
-                    "-q",
-                    "-layout",
-                    "-enc",
-                    "UTF-8",
-                    str(path),
-                    str(out_path),
-                ],
-                logger=logging.getLogger(__name__),
-            )
-            return out_path.read_text(encoding="utf-8", errors="replace") or None
-    except Exception:
-        return None
-
-
-def _should_produce_archive(
+def should_produce_archive(
     parser: "ParserProtocol",
     mime_type: str,
-    working_copy: Path,
+    document_path: Path,
 ) -> bool:
-    """Return True if the consumer should request a PDF/A archive from the parser.
+    """Return True if a PDF/A archive should be produced for this document.
 
     IMPORTANT: *parser* must be an instantiated parser, not the class.
     ``requires_pdf_rendition`` and ``can_produce_archive`` are instance
@@ -167,8 +140,8 @@ def _should_produce_archive(
     if mime_type.startswith("image/"):
         return True
     if mime_type == "application/pdf":
-        text = _extract_text_for_archive_check(working_copy)
-        return text is None or len(text) <= _VALID_TEXT_LENGTH_FOR_ARCHIVE_CHECK
+        text = extract_pdf_text(document_path)
+        return text is None or len(text) <= PDF_TEXT_MIN_LENGTH
     return False
 
 
@@ -507,7 +480,7 @@ class ConsumerPlugin(
                     )
                     self.log.debug(f"Parsing {self.filename}...")
 
-                    should_produce_archive = _should_produce_archive(
+                    produce_archive = should_produce_archive(
                         document_parser,
                         mime_type,
                         self.working_copy,
@@ -515,7 +488,7 @@ class ConsumerPlugin(
                     document_parser.parse(
                         self.working_copy,
                         mime_type,
-                        produce_archive=should_produce_archive,
+                        produce_archive=produce_archive,
                     )
 
                     self.log.debug(f"Generating thumbnail for {self.filename}...")
