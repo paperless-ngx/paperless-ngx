@@ -881,8 +881,8 @@ OCR_MODE = get_choice_from_env(
     default="auto",
 )
 
-OCR_SKIP_ARCHIVE_FILE = get_choice_from_env(
-    "PAPERLESS_OCR_SKIP_ARCHIVE_FILE",
+ARCHIVE_FILE_GENERATION = get_choice_from_env(
+    "PAPERLESS_ARCHIVE_FILE_GENERATION",
     {"auto", "always", "never"},
     default="auto",
 )

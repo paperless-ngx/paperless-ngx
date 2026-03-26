@@ -386,7 +386,7 @@ class TestParsePdf:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        tesseract_parser.settings.skip_archive_file = "always"
+        tesseract_parser.settings.archive_file_generation = "always"
         tesseract_parser.parse(
             tesseract_samples_dir / "with-form.pdf",
             "application/pdf",
@@ -546,7 +546,7 @@ class TestParseMultiPage:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        tesseract_parser.settings.skip_archive_file = "always"
+        tesseract_parser.settings.archive_file_generation = "always"
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-digital.pdf",
             "application/pdf",
@@ -574,7 +574,7 @@ class TestParseMultiPage:
     ) -> None:
         tesseract_parser.settings.pages = 2
         tesseract_parser.settings.mode = mode
-        tesseract_parser.settings.skip_archive_file = "always"
+        tesseract_parser.settings.archive_file_generation = "always"
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-digital.pdf",
             "application/pdf",
@@ -819,7 +819,7 @@ class TestSkipArchive:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        tesseract_parser.settings.skip_archive_file = skip_archive_file
+        tesseract_parser.settings.archive_file_generation = skip_archive_file
         tesseract_parser.parse(tesseract_samples_dir / filename, "application/pdf")
         text = tesseract_parser.get_text().lower()
         assert_ordered_substrings(text, ["page 1", "page 2", "page 3"])
@@ -850,7 +850,7 @@ class TestParseMixed:
             - All pages extracted; archive created; sidecar notes skipped pages
         """
         tesseract_parser.settings.mode = "auto"
-        tesseract_parser.settings.skip_archive_file = "always"
+        tesseract_parser.settings.archive_file_generation = "always"
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-mixed.pdf",
             "application/pdf",

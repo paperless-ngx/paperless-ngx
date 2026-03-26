@@ -135,11 +135,11 @@ def settings_values_check(app_configs, **kwargs):
         if settings.OCR_MODE not in {"auto", "force", "redo", "off"}:
             msgs.append(Error(f'OCR output mode "{settings.OCR_MODE}" is not valid'))
 
-        if settings.OCR_SKIP_ARCHIVE_FILE not in {"auto", "always", "never"}:
+        if settings.ARCHIVE_FILE_GENERATION not in {"auto", "always", "never"}:
             msgs.append(
                 Error(
-                    "OCR_SKIP_ARCHIVE_FILE setting "
-                    f'"{settings.OCR_SKIP_ARCHIVE_FILE}" is not valid',
+                    "PAPERLESS_ARCHIVE_FILE_GENERATION setting "
+                    f'"{settings.ARCHIVE_FILE_GENERATION}" is not valid',
                 ),
             )
 

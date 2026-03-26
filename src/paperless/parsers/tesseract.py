@@ -422,7 +422,7 @@ class RasterisedDocumentParser:
         skip_archive_for_text = self.settings.mode not in {
             ModeChoices.FORCE,
             ModeChoices.REDO,
-        } and self.settings.skip_archive_file in {
+        } and self.settings.archive_file_generation in {
             ArchiveFileGenerationChoices.NEVER,
             ArchiveFileGenerationChoices.AUTO,
         }
@@ -455,7 +455,10 @@ class RasterisedDocumentParser:
             self.log.debug(f"Calling OCRmyPDF with args: {args}")
             ocrmypdf.ocr(**args)
 
-            if self.settings.skip_archive_file != ArchiveFileGenerationChoices.NEVER:
+            if (
+                self.settings.archive_file_generation
+                != ArchiveFileGenerationChoices.NEVER
+            ):
                 self.archive_path = archive_path
 
             self.text = self.extract_text(sidecar_file, archive_path)
