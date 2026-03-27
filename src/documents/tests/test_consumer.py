@@ -230,7 +230,11 @@ class TestConsumer(
         shutil.copy(src, dst)
         return dst
 
-    @override_settings(FILENAME_FORMAT=None, TIME_ZONE="America/Chicago")
+    @override_settings(
+        FILENAME_FORMAT=None,
+        TIME_ZONE="America/Chicago",
+        ARCHIVE_FILE_GENERATION="always",
+    )
     def testNormalOperation(self) -> None:
         filename = self.get_test_file()
 
@@ -629,7 +633,10 @@ class TestConsumer(
         # Database empty
         self.assertEqual(Document.objects.all().count(), 0)
 
-    @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
+    @override_settings(
+        FILENAME_FORMAT="{correspondent}/{title}",
+        ARCHIVE_FILE_GENERATION="always",
+    )
     def testFilenameHandling(self) -> None:
         with self.get_consumer(
             self.get_test_file(),
@@ -646,7 +653,7 @@ class TestConsumer(
         self._assert_first_last_send_progress()
 
     @mock.patch("documents.consumer.generate_unique_filename")
-    @override_settings(FILENAME_FORMAT="{pk}")
+    @override_settings(FILENAME_FORMAT="{pk}", ARCHIVE_FILE_GENERATION="always")
     def testFilenameHandlingFallsBackWhenGeneratedPathExceedsDbLimit(self, m):
         m.side_effect = lambda doc, archive_filename=False: Path(
             ("a" * 1100 + ".pdf") if not archive_filename else ("b" * 1100 + ".pdf"),
@@ -673,7 +680,10 @@ class TestConsumer(
 
         self._assert_first_last_send_progress()
 
-    @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
+    @override_settings(
+        FILENAME_FORMAT="{correspondent}/{title}",
+        ARCHIVE_FILE_GENERATION="always",
+    )
     @mock.patch("documents.signals.handlers.generate_unique_filename")
     def testFilenameHandlingUnstableFormat(self, m) -> None:
         filenames = ["this", "that", "now this", "i cannot decide"]
@@ -1021,7 +1031,7 @@ class TestConsumer(
         self.assertEqual(Document.objects.count(), 2)
         self._assert_first_last_send_progress()
 
-    @override_settings(FILENAME_FORMAT="{title}")
+    @override_settings(FILENAME_FORMAT="{title}", ARCHIVE_FILE_GENERATION="always")
     @mock.patch("documents.consumer.get_parser_registry")
     def test_similar_filenames(self, m) -> None:
         shutil.copy(
