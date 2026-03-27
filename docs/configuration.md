@@ -853,12 +853,31 @@ for display in the web interface.
         stored. Saves disk space but the web viewer will display the
         original file directly.
 
+    **Behaviour by file type and mode** (`auto` column shows the default):
+
+    | Document type              | `never` | `auto` (default)           | `always` |
+    | -------------------------- | ------- | -------------------------- | -------- |
+    | Scanned image (TIFF, JPEG) | No      | **Yes**                    | Yes      |
+    | Image-based PDF            | No      | **Yes** (short/no text)    | Yes      |
+    | Born-digital PDF           | No      | No (has embedded text)     | Yes      |
+    | Plain text, email, HTML    | No      | No                         | No       |
+    | DOCX / ODT (via Tika)      | Yes\*   | Yes\*                      | Yes\*    |
+
+    \* Tika always produces a PDF rendition for display; this counts as
+    the archive regardless of the setting.
+
     !!! note
 
-        This setting only applies to parsers that can produce archives
-        (e.g. the Tesseract/OCR parser). Parsers that must convert
-        documents to PDF for display (e.g. DOCX, ODT via Tika) will
-        always produce a PDF regardless of this setting.
+        This setting applies to the built-in Tesseract parser. Parsers
+        that must always convert documents to PDF for display (e.g. DOCX,
+        ODT via Tika) will produce a PDF regardless of this setting.
+
+    !!! note
+
+        The **remote OCR parser** (Azure AI) always produces a searchable
+        PDF and stores it as the archive copy, regardless of this setting.
+        `ARCHIVE_FILE_GENERATION=never` has no effect when the remote
+        parser handles a document.
 
 #### [`PAPERLESS_OCR_CLEAN=<mode>`](#PAPERLESS_OCR_CLEAN) {#PAPERLESS_OCR_CLEAN}
 

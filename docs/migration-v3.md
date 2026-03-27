@@ -156,6 +156,13 @@ PAPERLESS_ARCHIVE_FILE_GENERATION=auto
 
 Paperless will emit a startup warning if the old environment variables are still set.
 
+### Remote OCR parser
+
+If you use the **remote OCR parser** (Azure AI), note that it always produces a
+searchable PDF and stores it as the archive copy. `ARCHIVE_FILE_GENERATION=never`
+has no effect for documents handled by the remote parser — the archive is produced
+unconditionally by the remote engine.
+
 ## OpenID Connect Token Endpoint Authentication
 
 Some existing OpenID Connect setups may require an explicit token endpoint authentication method after upgrading to v3.
