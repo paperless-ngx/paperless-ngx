@@ -1,5 +1,4 @@
 import datetime
-import hashlib
 import logging
 import shutil
 import uuid
@@ -53,14 +52,15 @@ from documents.models import Tag
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.plugins.base import ConsumeTaskPlugin
-from documents.plugins.base import ProgressManager
 from documents.plugins.base import StopConsumeTaskError
+from documents.plugins.helpers import ProgressManager
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
 from documents.signals.handlers import run_workflows
 from documents.signals.handlers import send_websocket_document_updated
+from documents.utils import compute_checksum
 from documents.workflows.utils import get_workflows_for_trigger
 from paperless.config import AIConfig
 from paperless.parsers import ParserContext
@@ -328,8 +328,7 @@ def update_document_content_maybe_archive_file(document_id) -> None:
             with transaction.atomic():
                 oldDocument = Document.objects.get(pk=document.pk)
                 if parser.get_archive_path():
-                    with Path(parser.get_archive_path()).open("rb") as f:
-                        checksum = hashlib.md5(f.read()).hexdigest()
+                    checksum = compute_checksum(parser.get_archive_path())
                     # I'm going to save first so that in case the file move
                     # fails, the database is rolled back.
                     # We also don't use save() since that triggers the filehandling
@@ -533,13 +532,13 @@ def check_scheduled_workflows() -> None:
                             id__in=matched_ids,
                         )
 
-                if documents.count() > 0:
+                if documents.exists():
                     documents = prefilter_documents_by_workflowtrigger(
                         documents,
                         trigger,
                     )
 
-                if documents.count() > 0:
+                if documents.exists():
                     logger.debug(
                         f"Found {documents.count()} documents for trigger {trigger}",
                     )

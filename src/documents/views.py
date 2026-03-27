@@ -2027,7 +2027,10 @@ class UnifiedSearchViewSet(DocumentViewSet):
             except NotFound:
                 raise
             except PermissionDenied as e:
-                return HttpResponseForbidden(str(e.detail))
+                invalid_more_like_id_message = _("Invalid more_like_id")
+                if str(e.detail) == str(invalid_more_like_id_message):
+                    return HttpResponseForbidden(invalid_more_like_id_message)
+                return HttpResponseForbidden(_("Insufficient permissions."))
             except Exception as e:
                 logger.warning(f"An error occurred listing search results: {e!s}")
                 return HttpResponseBadRequest(

@@ -11,7 +11,6 @@ is an identity function that adds no overhead.
 
 from __future__ import annotations
 
-import hashlib
 import logging
 import uuid
 from collections import defaultdict
@@ -30,6 +29,7 @@ from django.utils import timezone
 
 from documents.models import Document
 from documents.models import PaperlessTask
+from documents.utils import compute_checksum
 from paperless.config import GeneralConfig
 
 logger = logging.getLogger("paperless.sanity_checker")
@@ -218,7 +218,7 @@ def _check_original(
 
     present_files.discard(source_path)
     try:
-        checksum = hashlib.md5(source_path.read_bytes()).hexdigest()
+        checksum = compute_checksum(source_path)
     except OSError as e:
         messages.error(doc.pk, f"Cannot read original file of document: {e}")
     else:
@@ -255,7 +255,7 @@ def _check_archive(
 
         present_files.discard(archive_path)
         try:
-            checksum = hashlib.md5(archive_path.read_bytes()).hexdigest()
+            checksum = compute_checksum(archive_path)
         except OSError as e:
             messages.error(
                 doc.pk,

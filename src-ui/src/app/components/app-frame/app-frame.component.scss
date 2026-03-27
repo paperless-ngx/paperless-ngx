@@ -44,6 +44,23 @@
   .sidebar {
     top: 3.5rem;
   }
+
+  .search-container {
+    max-height: 4.5rem;
+    overflow: hidden;
+    transition: max-height .2s ease, opacity .2s ease, padding-top .2s ease, padding-bottom .2s ease;
+
+    &.mobile-hidden {
+      max-height: 0;
+      opacity: 0;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+  }
+
+  main.mobile-search-hidden {
+    padding-top: 56px;
+  }
 }
 
 main {
