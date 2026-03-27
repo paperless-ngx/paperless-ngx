@@ -1,5 +1,4 @@
 import datetime
-import hashlib
 import os
 import shutil
 import tempfile
@@ -47,6 +46,7 @@ from documents.signals import document_consumption_started
 from documents.signals import document_updated
 from documents.signals.handlers import run_workflows
 from documents.templating.workflows import parse_w_workflow_placeholders
+from documents.utils import compute_checksum
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
@@ -237,9 +237,7 @@ class ConsumerPlugin(
         version_doc = Document(
             root_document=root_doc_frozen,
             version_index=next_version_index + 1,
-            checksum=hashlib.md5(
-                file_for_checksum.read_bytes(),
-            ).hexdigest(),
+            checksum=compute_checksum(file_for_checksum),
             content=text or "",
             page_count=page_count,
             mime_type=mime_type,
@@ -683,10 +681,9 @@ class ConsumerPlugin(
                                     document.archive_path,
                                 )
 
-                                with Path(archive_path).open("rb") as f:
-                                    document.archive_checksum = hashlib.md5(
-                                        f.read(),
-                                    ).hexdigest()
+                                document.archive_checksum = compute_checksum(
+                                    document.archive_path,
+                                )
 
                         # Don't save with the lock active. Saving will cause the file
                         # renaming logic to acquire the lock as well.
@@ -826,7 +823,7 @@ class ConsumerPlugin(
             title=title[:127],
             content=text,
             mime_type=mime_type,
-            checksum=hashlib.md5(file_for_checksum.read_bytes()).hexdigest(),
+            checksum=compute_checksum(file_for_checksum),
             created=create_date,
             modified=create_date,
             page_count=page_count,
@@ -943,10 +940,9 @@ class ConsumerPreflightPlugin(
 
     def pre_check_duplicate(self) -> None:
         """
-        Using the MD5 of the file, check this exact file doesn't already exist
+        Using the SHA256 of the file, check this exact file doesn't already exist
         """
-        with Path(self.input_doc.original_file).open("rb") as f:
-            checksum = hashlib.md5(f.read()).hexdigest()
+        checksum = compute_checksum(Path(self.input_doc.original_file))
         existing_doc = Document.global_objects.filter(
             Q(checksum=checksum) | Q(archive_checksum=checksum),
         )
