@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
-from unittest.mock import patch
 
 import pytest
 
 from documents.consumer import should_produce_archive
+
+if TYPE_CHECKING:
+    from pytest_mock import MockerFixture
 
 
 def _parser_instance(
@@ -144,14 +147,43 @@ class TestShouldProduceArchive:
     )
     def test_auto_pdf_archive_decision(
         self,
+        mocker: MockerFixture,
         settings,
         extracted_text: str | None,
         expected: bool,  # noqa: FBT001
     ) -> None:
         settings.ARCHIVE_FILE_GENERATION = "auto"
+        mocker.patch("documents.consumer.is_tagged_pdf", return_value=False)
+        mocker.patch("documents.consumer.extract_pdf_text", return_value=extracted_text)
         parser = _parser_instance(can_produce=True, requires_rendition=False)
-        with patch("documents.consumer.extract_pdf_text", return_value=extracted_text):
-            assert (
-                should_produce_archive(parser, "application/pdf", Path("/tmp/doc.pdf"))
-                is expected
-            )
+        assert (
+            should_produce_archive(parser, "application/pdf", Path("/tmp/doc.pdf"))
+            is expected
+        )
+
+    def test_tagged_pdf_skips_archive_in_auto_mode(
+        self,
+        mocker: MockerFixture,
+        settings,
+    ) -> None:
+        """Tagged PDFs (e.g. Word exports) are treated as born-digital regardless of text length."""
+        settings.ARCHIVE_FILE_GENERATION = "auto"
+        mocker.patch("documents.consumer.is_tagged_pdf", return_value=True)
+        parser = _parser_instance(can_produce=True, requires_rendition=False)
+        assert (
+            should_produce_archive(parser, "application/pdf", Path("/tmp/doc.pdf"))
+            is False
+        )
+
+    def test_tagged_pdf_does_not_call_pdftotext(
+        self,
+        mocker: MockerFixture,
+        settings,
+    ) -> None:
+        """When a PDF is tagged, pdftotext is not invoked (fast path)."""
+        settings.ARCHIVE_FILE_GENERATION = "auto"
+        mocker.patch("documents.consumer.is_tagged_pdf", return_value=True)
+        mock_extract = mocker.patch("documents.consumer.extract_pdf_text")
+        parser = _parser_instance(can_produce=True, requires_rendition=False)
+        should_produce_archive(parser, "application/pdf", Path("/tmp/doc.pdf"))
+        mock_extract.assert_not_called()

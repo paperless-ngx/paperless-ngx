@@ -24,6 +24,45 @@ logger = logging.getLogger("paperless.parsers.utils")
 PDF_TEXT_MIN_LENGTH = 50
 
 
+def is_tagged_pdf(
+    path: Path,
+    log: logging.Logger | None = None,
+) -> bool:
+    """Return True if the PDF declares itself as tagged (born-digital indicator).
+
+    Tagged PDFs (e.g. exported from Word or LibreOffice) have ``/MarkInfo``
+    with ``/Marked true`` in the document root.  This is a reliable signal
+    that the document has a logical structure and embedded text — running OCR
+    on it is unnecessary and archive generation can be skipped.
+
+    https://github.com/ocrmypdf/OCRmyPDF/blob/4e974ebd465a5921b2e79004f098f5d203010282/src/ocrmypdf/pdfinfo/info.py#L449
+
+    Parameters
+    ----------
+    path:
+        Absolute path to the PDF file.
+    log:
+        Logger for warnings.  Falls back to the module-level logger when omitted.
+
+    Returns
+    -------
+    bool
+        ``True`` when the PDF is tagged, ``False`` otherwise or on any error.
+    """
+    import pikepdf
+
+    _log = log or logger
+    try:
+        with pikepdf.open(path) as pdf:
+            mark_info = pdf.Root.get("/MarkInfo")
+            if mark_info is None:
+                return False
+            return bool(mark_info.get("/Marked", False))
+    except Exception:
+        _log.warning("Could not check PDF tag status for %s", path, exc_info=True)
+        return False
+
+
 def extract_pdf_text(
     path: Path,
     log: logging.Logger | None = None,

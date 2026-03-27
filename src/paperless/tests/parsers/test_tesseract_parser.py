@@ -851,6 +851,59 @@ class TestSkipArchive:
         else:
             assert tesseract_parser.archive_path is None
 
+    def test_tagged_pdf_skips_ocr_in_auto_mode(
+        self,
+        mocker: MockerFixture,
+        tesseract_parser: RasterisedDocumentParser,
+        tesseract_samples_dir: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - A tagged PDF (e.g. exported from Word, /MarkInfo /Marked true)
+            - Mode: auto, produce_archive=False
+        WHEN:
+            - Document is parsed
+        THEN:
+            - OCRmyPDF is not invoked (tagged ⇒ original_has_text=True)
+            - Text is extracted from the original via pdftotext
+            - No archive is produced
+        """
+        tesseract_parser.settings.mode = "auto"
+        mock_ocr = mocker.patch("ocrmypdf.ocr")
+        tesseract_parser.parse(
+            tesseract_samples_dir / "simple-digital.pdf",
+            "application/pdf",
+            produce_archive=False,
+        )
+        mock_ocr.assert_not_called()
+        assert tesseract_parser.archive_path is None
+        assert tesseract_parser.get_text()
+
+    def test_tagged_pdf_produces_pdfa_archive_without_ocr(
+        self,
+        tesseract_parser: RasterisedDocumentParser,
+        tesseract_samples_dir: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - A tagged PDF (e.g. exported from Word, /MarkInfo /Marked true)
+            - Mode: auto, produce_archive=True
+        WHEN:
+            - Document is parsed
+        THEN:
+            - OCRmyPDF runs with skip_text (PDF/A conversion only, no OCR)
+            - Archive is produced
+            - Text is preserved from the original
+        """
+        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.parse(
+            tesseract_samples_dir / "simple-digital.pdf",
+            "application/pdf",
+            produce_archive=True,
+        )
+        assert tesseract_parser.archive_path is not None
+        assert tesseract_parser.get_text()
+
 
 # ---------------------------------------------------------------------------
 # Parse — mixed pages / sidecar

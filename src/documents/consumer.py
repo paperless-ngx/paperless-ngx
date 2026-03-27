@@ -57,6 +57,7 @@ from paperless.parsers import ParserProtocol
 from paperless.parsers.registry import get_parser_registry
 from paperless.parsers.utils import PDF_TEXT_MIN_LENGTH
 from paperless.parsers.utils import extract_pdf_text
+from paperless.parsers.utils import is_tagged_pdf
 
 LOGGING_NAME: Final[str] = "paperless.consumer"
 
@@ -140,6 +141,8 @@ def should_produce_archive(
     if mime_type.startswith("image/"):
         return True
     if mime_type == "application/pdf":
+        if is_tagged_pdf(document_path):
+            return False
         text = extract_pdf_text(document_path)
         return text is None or len(text) <= PDF_TEXT_MIN_LENGTH
     return False

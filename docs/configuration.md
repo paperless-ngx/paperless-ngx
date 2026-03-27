@@ -858,8 +858,8 @@ for display in the web interface.
     | Document type              | `never` | `auto` (default)           | `always` |
     | -------------------------- | ------- | -------------------------- | -------- |
     | Scanned image (TIFF, JPEG) | No      | **Yes**                    | Yes      |
-    | Image-based PDF            | No      | **Yes** (short/no text)    | Yes      |
-    | Born-digital PDF           | No      | No (has embedded text)     | Yes      |
+    | Image-based PDF            | No      | **Yes** (short/no text, untagged) | Yes |
+    | Born-digital PDF           | No      | No (tagged or has embedded text)  | Yes |
     | Plain text, email, HTML    | No      | No                         | No       |
     | DOCX / ODT (via Tika)      | Yes\*   | Yes\*                      | Yes\*    |
 

@@ -23,6 +23,7 @@ from paperless.models import CleanChoices
 from paperless.models import ModeChoices
 from paperless.parsers.utils import PDF_TEXT_MIN_LENGTH
 from paperless.parsers.utils import extract_pdf_text
+from paperless.parsers.utils import is_tagged_pdf
 from paperless.parsers.utils import read_file_handle_unicode_errors
 from paperless.version import __full_version_str__
 
@@ -441,7 +442,7 @@ class RasterisedDocumentParser:
 
         if mime_type == "application/pdf":
             text_original = self.extract_text(None, document_path)
-            original_has_text = (
+            original_has_text = is_tagged_pdf(document_path, log=self.log) or (
                 text_original is not None and len(text_original) > PDF_TEXT_MIN_LENGTH
             )
         else:
