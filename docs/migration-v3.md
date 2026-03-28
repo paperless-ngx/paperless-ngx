@@ -106,7 +106,7 @@ PAPERLESS_DB_OPTIONS="sslmode=require;sslrootcert=/certs/ca.pem;pool.max_size=10
 
 ## OCR and Archive File Generation Settings
 
-The settings that control OCR behaviour and archive file generation have been redesigned. The old settings that coupled these two concerns together are **removed** — there are no migration shims.
+The settings that control OCR behaviour and archive file generation have been redesigned. The old settings that coupled these two concerns together are **removed** — old values are not silently honoured; a startup warning is logged if any removed variable is still set in your environment.
 
 ### Removed settings
 
@@ -153,8 +153,6 @@ PAPERLESS_OCR_SKIP_ARCHIVE_FILE=with_text
 # v3: equivalent (auto is the new default)
 PAPERLESS_ARCHIVE_FILE_GENERATION=auto
 ```
-
-Paperless will emit a startup warning if the old environment variables are still set.
 
 ### Remote OCR parser
 

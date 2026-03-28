@@ -833,7 +833,8 @@ modes are available:
 
     The default is `auto`.
 
-    Read more about this in the [OCRmyPDF
+    For the `skip`, `redo`, and `force` modes, read more about OCR
+    behaviour in the [OCRmyPDF
     documentation](https://ocrmypdf.readthedocs.io/en/latest/advanced.html#when-ocr-is-skipped).
 
 #### [`PAPERLESS_ARCHIVE_FILE_GENERATION=<mode>`](#PAPERLESS_ARCHIVE_FILE_GENERATION) {#PAPERLESS_ARCHIVE_FILE_GENERATION}
