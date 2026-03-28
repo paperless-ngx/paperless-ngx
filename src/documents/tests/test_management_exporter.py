@@ -871,13 +871,12 @@ class TestExportImport(
     def test_export_import_soft_deleted_document(self) -> None:
         """
         GIVEN:
-            - A document has been soft-deleted
+            - A document with a note and custom field instance has been soft-deleted
         WHEN:
             - Export and re-import are performed
         THEN:
-            - The soft-deleted document is included in the manifest
-            - The soft-deleted document is re-imported successfully
-            - The deleted_at timestamp is preserved after import
+            - The soft-deleted document, note, and custom field instance
+              survive the round-trip with deleted_at preserved
         """
         shutil.rmtree(Path(self.dirs.media_dir) / "documents")
         shutil.copytree(
@@ -885,32 +884,16 @@ class TestExportImport(
             Path(self.dirs.media_dir) / "documents",
         )
 
-        # Soft-delete one document
-        self.d2.delete()
-        self.d2.refresh_from_db()
-        self.assertIsNotNone(self.d2.deleted_at)
+        # d1 has self.note and self.cfi1 attached via setUp
+        self.d1.delete()
 
-        # Non-deleted documents visible via .objects should be 3
-        self.assertEqual(Document.objects.count(), 3)
-        # All documents including soft-deleted should be 4
-        self.assertEqual(Document.global_objects.count(), 4)
+        self._do_export()
 
-        manifest = self._do_export()
-
-        # Manifest must contain all 4 documents, including the soft-deleted one
-        doc_records = [e for e in manifest if e["model"] == "documents.document"]
-        self.assertEqual(len(doc_records), 4)
-
-        exported_pks = {r["pk"] for r in doc_records}
-        self.assertIn(self.d2.pk, exported_pks)
-
-        # Re-import
         with paperless_environment():
             Document.global_objects.all().hard_delete()
             Correspondent.objects.all().delete()
             DocumentType.objects.all().delete()
             Tag.objects.all().delete()
-            self.assertEqual(Document.global_objects.count(), 0)
 
             call_command(
                 "document_importer",
@@ -920,9 +903,16 @@ class TestExportImport(
             )
 
             self.assertEqual(Document.global_objects.count(), 4)
-            # The soft-deleted document should still have deleted_at set
-            reimported = Document.global_objects.get(pk=self.d2.pk)
-            self.assertIsNotNone(reimported.deleted_at)
+            reimported_doc = Document.global_objects.get(pk=self.d1.pk)
+            self.assertIsNotNone(reimported_doc.deleted_at)
+
+            self.assertEqual(Note.global_objects.count(), 1)
+            reimported_note = Note.global_objects.get(pk=self.note.pk)
+            self.assertIsNotNone(reimported_note.deleted_at)
+
+            self.assertEqual(CustomFieldInstance.global_objects.count(), 1)
+            reimported_cfi = CustomFieldInstance.global_objects.get(pk=self.cfi1.pk)
+            self.assertIsNotNone(reimported_cfi.deleted_at)
 
     def test_export_data_only(self) -> None:
         """
