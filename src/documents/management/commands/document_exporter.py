@@ -388,7 +388,7 @@ class Command(CryptMixin, PaperlessCommand):
             "custom_field_instances": CustomFieldInstance.objects.all(),
             "app_configs": ApplicationConfiguration.objects.all(),
             "notes": Note.objects.all(),
-            "documents": Document.objects.order_by("id").all(),
+            "documents": Document.global_objects.order_by("id").all(),
             "social_accounts": SocialAccount.objects.all(),
             "social_apps": SocialApp.objects.all(),
             "social_tokens": SocialToken.objects.all(),
@@ -443,7 +443,7 @@ class Command(CryptMixin, PaperlessCommand):
                             writer.write_batch(batch)
 
             document_map: dict[int, Document] = {
-                d.pk: d for d in Document.objects.order_by("id")
+                d.pk: d for d in Document.global_objects.order_by("id")
             }
 
             # 3. Export files from each document

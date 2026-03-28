@@ -389,7 +389,7 @@ class TestExportImport(
         self.assertIsFile(
             str(self.target / doc_from_manifest[EXPORTER_FILE_NAME]),
         )
-        self.d3.delete()
+        self.d3.hard_delete()
 
         manifest = self._do_export()
         self.assertRaises(
@@ -867,6 +867,62 @@ class TestExportImport(
             manifest = self._do_export(use_filename_format=True)
             for obj in manifest:
                 self.assertNotEqual(obj["model"], "auditlog.logentry")
+
+    def test_export_import_soft_deleted_document(self) -> None:
+        """
+        GIVEN:
+            - A document has been soft-deleted
+        WHEN:
+            - Export and re-import are performed
+        THEN:
+            - The soft-deleted document is included in the manifest
+            - The soft-deleted document is re-imported successfully
+            - The deleted_at timestamp is preserved after import
+        """
+        shutil.rmtree(Path(self.dirs.media_dir) / "documents")
+        shutil.copytree(
+            Path(__file__).parent / "samples" / "documents",
+            Path(self.dirs.media_dir) / "documents",
+        )
+
+        # Soft-delete one document
+        self.d2.delete()
+        self.d2.refresh_from_db()
+        self.assertIsNotNone(self.d2.deleted_at)
+
+        # Non-deleted documents visible via .objects should be 3
+        self.assertEqual(Document.objects.count(), 3)
+        # All documents including soft-deleted should be 4
+        self.assertEqual(Document.global_objects.count(), 4)
+
+        manifest = self._do_export()
+
+        # Manifest must contain all 4 documents, including the soft-deleted one
+        doc_records = [e for e in manifest if e["model"] == "documents.document"]
+        self.assertEqual(len(doc_records), 4)
+
+        exported_pks = {r["pk"] for r in doc_records}
+        self.assertIn(self.d2.pk, exported_pks)
+
+        # Re-import
+        with paperless_environment():
+            Document.global_objects.all().hard_delete()
+            Correspondent.objects.all().delete()
+            DocumentType.objects.all().delete()
+            Tag.objects.all().delete()
+            self.assertEqual(Document.global_objects.count(), 0)
+
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                self.target,
+                skip_checks=True,
+            )
+
+            self.assertEqual(Document.global_objects.count(), 4)
+            # The soft-deleted document should still have deleted_at set
+            reimported = Document.global_objects.get(pk=self.d2.pk)
+            self.assertIsNotNone(reimported.deleted_at)
 
     def test_export_data_only(self) -> None:
         """
