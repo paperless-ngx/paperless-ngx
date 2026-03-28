@@ -1808,6 +1808,16 @@ started by the container.
 
     You can read more about this in the [advanced documentation](advanced_usage.md#celery-monitoring).
 
+#### [`PAPERLESS_PROMETHEUS_METRICS_ENABLED=<bool>`](#PAPERLESS_PROMETHEUS_METRICS_ENABLED) {#PAPERLESS_PROMETHEUS_METRICS_ENABLED}
+
+: Enables the Prometheus metrics endpoint at `/metrics/`. When enabled,
+system status metrics are exposed in Prometheus exposition format.
+Requires authentication with a staff account.
+
+    You can read more about this in the [advanced documentation](advanced_usage.md#prometheus-metrics).
+
+    Defaults to `false`.
+
 #### [`PAPERLESS_SUPERVISORD_WORKING_DIR=<defined>`](#PAPERLESS_SUPERVISORD_WORKING_DIR) {#PAPERLESS_SUPERVISORD_WORKING_DIR}
 
 !!! warning
