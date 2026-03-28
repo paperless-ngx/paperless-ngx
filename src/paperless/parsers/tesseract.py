@@ -9,6 +9,8 @@ import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
+from typing import Final
+from typing import NoReturn
 from typing import Self
 
 from django.conf import settings
@@ -36,7 +38,11 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("paperless.parsing.tesseract")
 
-_SUPPORTED_MIME_TYPES: dict[str, str] = {
+_SRGB_ICC_DATA: Final[bytes] = (
+    importlib.resources.files("ocrmypdf.data").joinpath("sRGB.icc").read_bytes()
+)
+
+_SUPPORTED_MIME_TYPES: Final[dict[str, str]] = {
     "application/pdf": ".pdf",
     "image/jpeg": ".jpg",
     "image/png": ".png",
@@ -102,7 +108,7 @@ class RasterisedDocumentParser:
     # Lifecycle
     # ------------------------------------------------------------------
 
-    def __init__(self, logging_group: object = None) -> None:
+    def __init__(self, logging_group: object | None = None) -> None:
         settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
         self.tempdir = Path(
             tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR),
@@ -236,7 +242,7 @@ class RasterisedDocumentParser:
         if (
             sidecar_file is not None
             and sidecar_file.is_file()
-            and self.settings.mode != "redo"
+            and self.settings.mode != ModeChoices.REDO
         ):
             text = read_file_handle_unicode_errors(sidecar_file)
 
@@ -374,7 +380,7 @@ class RasterisedDocumentParser:
 
         return ocrmypdf_args
 
-    def _convert_image_to_pdfa(self, document_path: Path, mime_type: str) -> Path:
+    def _convert_image_to_pdfa(self, document_path: Path) -> Path:
         """Convert an image to a PDF/A-2b file without invoking the OCR engine.
 
         Uses img2pdf for the initial image->PDF wrapping, then pikepdf to stamp
@@ -400,14 +406,10 @@ class RasterisedDocumentParser:
                 f"img2pdf conversion failed for {document_path}: {e!s}",
             ) from e
 
-        icc_data = (
-            importlib.resources.files("ocrmypdf.data").joinpath("sRGB.icc").read_bytes()
-        )
-
         pdfa_path = Path(self.tempdir) / "archive.pdf"
         try:
             with pikepdf.open(plain_pdf_path) as pdf:
-                cs = pdf.make_stream(icc_data)
+                cs = pdf.make_stream(_SRGB_ICC_DATA)
                 cs["/N"] = 3
                 output_intent = pikepdf.Dictionary(
                     Type=pikepdf.Name("/OutputIntent"),
@@ -430,6 +432,22 @@ class RasterisedDocumentParser:
 
         return pdfa_path
 
+    def _handle_subprocess_output_error(self, e: Exception) -> NoReturn:
+        """Log context for Ghostscript failures and raise ParseError.
+
+        Called from the SubprocessOutputError handlers in parse() to avoid
+        duplicating the Ghostscript hint and re-raise logic.
+        """
+        if "Ghostscript PDF/A rendering" in str(e):
+            self.log.warning(
+                "Ghostscript PDF/A rendering failed, consider setting "
+                "PAPERLESS_OCR_USER_ARGS: "
+                "'{\"continue_on_soft_render_error\": true}'",
+            )
+        raise ParseError(
+            f"SubprocessOutputError: {e!s}. See logs for more information.",
+        ) from e
+
     def parse(
         self,
         document_path: Path,
@@ -439,6 +457,13 @@ class RasterisedDocumentParser:
     ) -> None:
         # This forces tesseract to use one core per page.
         os.environ["OMP_THREAD_LIMIT"] = "1"
+
+        import ocrmypdf
+        from ocrmypdf import EncryptedPdfError
+        from ocrmypdf import InputFileError
+        from ocrmypdf import SubprocessOutputError
+        from ocrmypdf.exceptions import DigitalSignatureError
+        from ocrmypdf.exceptions import PriorOcrFoundError
 
         if mime_type == "application/pdf":
             text_original = self.extract_text(None, document_path)
@@ -458,7 +483,6 @@ class RasterisedDocumentParser:
                 try:
                     self.archive_path = self._convert_image_to_pdfa(
                         document_path,
-                        mime_type,
                     )
                     self.text = ""
                 except Exception as e:
@@ -467,9 +491,6 @@ class RasterisedDocumentParser:
                     ) from e
                 return
             # PDFs in off mode: PDF/A conversion only via skip_text
-            import ocrmypdf
-            from ocrmypdf import SubprocessOutputError
-
             archive_path = Path(self.tempdir) / "archive.pdf"
             sidecar_file = Path(self.tempdir) / "sidecar.txt"
             args = self.construct_ocrmypdf_parameters(
@@ -487,15 +508,7 @@ class RasterisedDocumentParser:
                 self.archive_path = archive_path
                 self.text = self.extract_text(None, archive_path) or text_original or ""
             except SubprocessOutputError as e:
-                if "Ghostscript PDF/A rendering" in str(e):
-                    self.log.warning(
-                        "Ghostscript PDF/A rendering failed, consider setting "
-                        "PAPERLESS_OCR_USER_ARGS: "
-                        "'{\"continue_on_soft_render_error\": true}'",
-                    )
-                raise ParseError(
-                    f"SubprocessOutputError: {e!s}. See logs for more information.",
-                ) from e
+                self._handle_subprocess_output_error(e)
             except Exception as e:
                 raise ParseError(f"{e.__class__.__name__}: {e!s}") from e
             return
@@ -513,13 +526,6 @@ class RasterisedDocumentParser:
             return
 
         # --- All other paths: run ocrmypdf ---
-        import ocrmypdf
-        from ocrmypdf import EncryptedPdfError
-        from ocrmypdf import InputFileError
-        from ocrmypdf import SubprocessOutputError
-        from ocrmypdf.exceptions import DigitalSignatureError
-        from ocrmypdf.exceptions import PriorOcrFoundError
-
         archive_path = Path(self.tempdir) / "archive.pdf"
         sidecar_file = Path(self.tempdir) / "sidecar.txt"
 
@@ -553,14 +559,7 @@ class RasterisedDocumentParser:
             if original_has_text:
                 self.text = text_original
         except SubprocessOutputError as e:
-            if "Ghostscript PDF/A rendering" in str(e):
-                self.log.warning(
-                    "Ghostscript PDF/A rendering failed, consider setting "
-                    "PAPERLESS_OCR_USER_ARGS: '{\"continue_on_soft_render_error\": true}'",
-                )
-            raise ParseError(
-                f"SubprocessOutputError: {e!s}. See logs for more information.",
-            ) from e
+            self._handle_subprocess_output_error(e)
         except (NoTextFoundException, InputFileError, PriorOcrFoundError) as e:
             self.log.warning(
                 f"Encountered an error while running OCR: {e!s}. "

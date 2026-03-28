@@ -839,7 +839,7 @@ class ConsumerPlugin(
 
         return document
 
-    def apply_overrides(self, document) -> None:
+    def apply_overrides(self, document: Document) -> None:
         if self.metadata.correspondent_id:
             document.correspondent = Correspondent.objects.get(
                 pk=self.metadata.correspondent_id,

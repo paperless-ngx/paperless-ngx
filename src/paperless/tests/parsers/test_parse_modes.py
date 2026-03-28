@@ -354,7 +354,7 @@ class TestOffModeImage:
         tesseract_parser.settings.mode = "off"
         tesseract_parser.parse(simple_png_file, "image/png", produce_archive=True)
 
-        mock_convert.assert_called_once_with(simple_png_file, "image/png")
+        mock_convert.assert_called_once_with(simple_png_file)
         mock_ocr.assert_not_called()
         assert tesseract_parser.archive_path == fake_archive
         assert tesseract_parser.get_text() == ""

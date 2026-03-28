@@ -13,6 +13,7 @@ import re
 import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import Final
 
 if TYPE_CHECKING:
     from paperless.parsers import MetadataEntry
@@ -21,7 +22,7 @@ logger = logging.getLogger("paperless.parsers.utils")
 
 # Minimum character count for a PDF to be considered "born-digital" (has real text).
 # Used by both the consumer (archive decision) and the tesseract parser (skip-OCR decision).
-PDF_TEXT_MIN_LENGTH = 50
+PDF_TEXT_MIN_LENGTH: Final[int] = 50
 
 
 def is_tagged_pdf(

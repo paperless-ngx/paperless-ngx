@@ -5,6 +5,7 @@ import shutil
 import stat
 import subprocess
 from pathlib import Path
+from typing import Any
 
 from django.conf import settings
 from django.core.checks import Error
@@ -22,7 +23,7 @@ writeable_hint = (
 )
 
 
-def path_check(var, directory: Path) -> list[Error]:
+def path_check(var: str, directory: Path) -> list[Error]:
     messages: list[Error] = []
     if directory:
         if not directory.is_dir():
@@ -59,7 +60,7 @@ def path_check(var, directory: Path) -> list[Error]:
 
 
 @register()
-def paths_check(app_configs, **kwargs) -> list[Error]:
+def paths_check(app_configs: Any, **kwargs: Any) -> list[Error]:
     """
     Check the various paths for existence, readability and writeability
     """
@@ -73,7 +74,7 @@ def paths_check(app_configs, **kwargs) -> list[Error]:
 
 
 @register()
-def binaries_check(app_configs, **kwargs):
+def binaries_check(app_configs: Any, **kwargs: Any) -> list[Error]:
     """
     Paperless requires the existence of a few binaries, so we do some checks
     for those here.
@@ -93,7 +94,7 @@ def binaries_check(app_configs, **kwargs):
 
 
 @register()
-def debug_mode_check(app_configs, **kwargs):
+def debug_mode_check(app_configs: Any, **kwargs: Any) -> list[Warning]:
     if settings.DEBUG:
         return [
             Warning(
@@ -109,7 +110,7 @@ def debug_mode_check(app_configs, **kwargs):
 
 
 @register()
-def settings_values_check(app_configs, **kwargs):
+def settings_values_check(app_configs: Any, **kwargs: Any) -> list[Error | Warning]:
     """
     Validates at least some of the user provided settings
     """
@@ -182,7 +183,7 @@ def settings_values_check(app_configs, **kwargs):
 
 
 @register()
-def audit_log_check(app_configs, **kwargs):
+def audit_log_check(app_configs: Any, **kwargs: Any) -> list[Error]:
     db_conn = connections["default"]
     all_tables = db_conn.introspection.table_names()
     result = []
@@ -329,7 +330,7 @@ def check_deprecated_v2_ocr_env_vars(
 
 
 @register()
-def check_remote_parser_configured(app_configs, **kwargs) -> list[Error]:
+def check_remote_parser_configured(app_configs: Any, **kwargs: Any) -> list[Error]:
     if settings.REMOTE_OCR_ENGINE == "azureai" and not (
         settings.REMOTE_OCR_ENDPOINT and settings.REMOTE_OCR_API_KEY
     ):
@@ -355,7 +356,7 @@ def get_tesseract_langs():
 
 
 @register()
-def check_default_language_available(app_configs, **kwargs):
+def check_default_language_available(app_configs: Any, **kwargs: Any) -> list[Error]:
     errs = []
 
     if not settings.OCR_LANGUAGE:
