@@ -360,7 +360,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "path/Something")
+        self.assertEqual(response.data, "path/Something.pdf")
 
     def test_test_storage_path_respects_none_placeholder_setting(self) -> None:
         """
@@ -390,7 +390,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "folder/none/Something")
+        self.assertEqual(response.data, "folder/none/Something.pdf")
 
         with override_settings(FILENAME_FORMAT_REMOVE_NONE=True):
             response = self.client.post(
@@ -399,7 +399,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
                 content_type="application/json",
             )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "folder/Something")
+        self.assertEqual(response.data, "folder/Something.pdf")
 
     def test_test_storage_path_requires_document_view_permission(self) -> None:
         owner = User.objects.create_user(username="owner")
@@ -447,7 +447,27 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "path/Shared")
+        self.assertEqual(response.data, "path/Shared.pdf")
+
+    def test_test_storage_path_prefers_existing_filename_extension(self) -> None:
+        document = Document.objects.create(
+            mime_type="image/jpeg",
+            filename="existing/Document.jpeg",
+            title="Something",
+            checksum="123",
+        )
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "document": document.id,
+                    "path": "path/{{ title }}",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, "path/Something.jpeg")
 
     def test_test_storage_path_exposes_basic_document_context_but_not_sensitive_owner_data(
         self,
@@ -478,12 +498,12 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "owner")
+        self.assertEqual(response.data, "owner.pdf")
 
         for expression, expected in (
-            ("{{ document.content }}", "Top secret content"),
-            ("{{ document.id }}", str(document.id)),
-            ("{{ document.page_count }}", "2"),
+            ("{{ document.content }}", "Top secret content.pdf"),
+            ("{{ document.id }}", f"{document.id}.pdf"),
+            ("{{ document.page_count }}", "2.pdf"),
         ):
             response = self.client.post(
                 f"{self.ENDPOINT}test/",
@@ -545,7 +565,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "Private Correspondent")
+        self.assertEqual(response.data, "Private Correspondent.pdf")
 
         response = self.client.post(
             f"{self.ENDPOINT}test/",
@@ -560,7 +580,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "Private Correspondent")
+        self.assertEqual(response.data, "Private Correspondent.pdf")
 
     def test_test_storage_path_superuser_can_view_private_related_objects(self) -> None:
         owner = User.objects.create_user(username="owner")
@@ -589,7 +609,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "Private Correspondent")
+        self.assertEqual(response.data, "Private Correspondent.pdf")
 
     def test_test_storage_path_includes_doc_type_storage_path_and_tags(
         self,
@@ -636,7 +656,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "Private Type/private/path/Private Tag")
+        self.assertEqual(response.data, "Private Type/private/path/Private Tag.pdf")
 
         response = self.client.post(
             f"{self.ENDPOINT}test/",
@@ -649,7 +669,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "Private Type/Private Tag")
+        self.assertEqual(response.data, "Private Type/Private Tag.pdf")
 
     def test_test_storage_path_includes_custom_fields_for_visible_document(
         self,
@@ -685,7 +705,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "42")
+        self.assertEqual(response.data, "42.pdf")
 
 
 class TestBulkEditObjects(APITestCase):
