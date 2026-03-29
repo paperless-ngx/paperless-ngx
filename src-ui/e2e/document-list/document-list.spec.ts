@@ -16,7 +16,7 @@ test('basic filtering', async ({ page }) => {
   await expect(page).toHaveURL(/tags__id__all=9/)
   await expect(page.locator('pngx-document-list')).toHaveText(/8 documents/)
   await page.getByRole('button', { name: 'Document type' }).click()
-  await page.getByRole('menuitem', { name: 'Invoice Test 3' }).click()
+  await page.getByRole('menuitem', { name: /^Invoice Test/ }).click()
   await expect(page).toHaveURL(/document_type__id__in=1/)
   await expect(page.locator('pngx-document-list')).toHaveText(/3 documents/)
   await page.getByRole('button', { name: 'Reset filters' }).first().click()
