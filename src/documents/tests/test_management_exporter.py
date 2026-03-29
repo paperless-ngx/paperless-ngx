@@ -2,6 +2,7 @@ import hashlib
 import json
 import shutil
 import tempfile
+from datetime import timedelta
 from io import StringIO
 from pathlib import Path
 from unittest import mock
@@ -11,6 +12,7 @@ import pytest
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.models import SocialApp
 from allauth.socialaccount.models import SocialToken
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
@@ -31,6 +33,8 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
+from documents.models import ShareLink
+from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import User
@@ -39,6 +43,7 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.sanity_checker import check_sanity
 from documents.settings import EXPORTER_FILE_NAME
+from documents.settings import EXPORTER_SHARE_LINK_BUNDLE_NAME
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
@@ -305,6 +310,108 @@ class TestExportImport(
             FILENAME_FORMAT="{created_year}/{correspondent}/{title}",
         ):
             self.test_exporter(use_filename_format=True)
+
+    def test_exporter_includes_share_links_and_bundles(self) -> None:
+        shutil.rmtree(Path(self.dirs.media_dir) / "documents")
+        shutil.copytree(
+            Path(__file__).parent / "samples" / "documents",
+            Path(self.dirs.media_dir) / "documents",
+        )
+
+        share_link = ShareLink.objects.create(
+            slug="share-link-slug",
+            document=self.d1,
+            owner=self.user,
+            file_version=ShareLink.FileVersion.ORIGINAL,
+            expiration=timezone.now() + timedelta(days=7),
+        )
+
+        bundle_relative_path = Path("nested") / "share-bundle.zip"
+        bundle_source_path = settings.SHARE_LINK_BUNDLE_DIR / bundle_relative_path
+        bundle_source_path.parent.mkdir(parents=True, exist_ok=True)
+        bundle_source_path.write_bytes(b"share-bundle-contents")
+        bundle = ShareLinkBundle.objects.create(
+            slug="share-bundle-slug",
+            owner=self.user,
+            file_version=ShareLink.FileVersion.ARCHIVE,
+            expiration=timezone.now() + timedelta(days=7),
+            status=ShareLinkBundle.Status.READY,
+            size_bytes=bundle_source_path.stat().st_size,
+            file_path=str(bundle_relative_path),
+            built_at=timezone.now(),
+        )
+        bundle.documents.set([self.d1, self.d2])
+
+        manifest = self._do_export()
+
+        share_link_records = [
+            record for record in manifest if record["model"] == "documents.sharelink"
+        ]
+        self.assertEqual(len(share_link_records), 1)
+        self.assertEqual(share_link_records[0]["pk"], share_link.pk)
+        self.assertEqual(share_link_records[0]["fields"]["document"], self.d1.pk)
+        self.assertEqual(share_link_records[0]["fields"]["owner"], self.user.pk)
+
+        share_link_bundle_records = [
+            record
+            for record in manifest
+            if record["model"] == "documents.sharelinkbundle"
+        ]
+        self.assertEqual(len(share_link_bundle_records), 1)
+        bundle_record = share_link_bundle_records[0]
+        self.assertEqual(bundle_record["pk"], bundle.pk)
+        self.assertEqual(
+            bundle_record["fields"]["documents"],
+            [self.d1.pk, self.d2.pk],
+        )
+        self.assertEqual(
+            bundle_record[EXPORTER_SHARE_LINK_BUNDLE_NAME],
+            "share_link_bundles/nested/share-bundle.zip",
+        )
+        self.assertEqual(
+            bundle_record["fields"]["file_path"],
+            "nested/share-bundle.zip",
+        )
+        self.assertIsFile(self.target / bundle_record[EXPORTER_SHARE_LINK_BUNDLE_NAME])
+
+        with paperless_environment():
+            ShareLink.objects.all().delete()
+            ShareLinkBundle.objects.all().delete()
+            shutil.rmtree(settings.SHARE_LINK_BUNDLE_DIR, ignore_errors=True)
+
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                self.target,
+                skip_checks=True,
+            )
+
+            imported_share_link = ShareLink.objects.get(pk=share_link.pk)
+            self.assertEqual(imported_share_link.document_id, self.d1.pk)
+            self.assertEqual(imported_share_link.owner_id, self.user.pk)
+            self.assertEqual(
+                imported_share_link.file_version,
+                ShareLink.FileVersion.ORIGINAL,
+            )
+
+            imported_bundle = ShareLinkBundle.objects.get(pk=bundle.pk)
+            imported_bundle_path = imported_bundle.absolute_file_path
+            self.assertEqual(imported_bundle.owner_id, self.user.pk)
+            self.assertEqual(
+                list(
+                    imported_bundle.documents.order_by("pk").values_list(
+                        "pk",
+                        flat=True,
+                    ),
+                ),
+                [self.d1.pk, self.d2.pk],
+            )
+            self.assertEqual(imported_bundle.file_path, "nested/share-bundle.zip")
+            self.assertIsNotNone(imported_bundle_path)
+            self.assertEqual(
+                imported_bundle_path.read_bytes(),
+                b"share-bundle-contents",
+            )
 
     def test_update_export_changed_time(self) -> None:
         shutil.rmtree(Path(self.dirs.media_dir) / "documents")
