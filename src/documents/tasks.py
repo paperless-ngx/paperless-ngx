@@ -20,9 +20,7 @@ from django.db import transaction
 from django.db.models.signals import post_save
 from django.utils import timezone
 from filelock import FileLock
-from whoosh.writing import AsyncWriter
 
-from documents import index
 from documents import sanity_checker
 from documents.barcodes import BarcodePlugin
 from documents.bulk_download import ArchiveOnlyStrategy
@@ -84,12 +82,20 @@ def _identity(iterable: Iterable[_T]) -> Iterable[_T]:
 
 @shared_task
 def index_optimize() -> None:
+    from whoosh.writing import AsyncWriter
+
+    from documents import index
+
     ix = index.open_index()
     writer = AsyncWriter(ix)
     writer.commit(optimize=True)
 
 
 def index_reindex(*, iter_wrapper: IterWrapper[Document] = _identity) -> None:
+    from whoosh.writing import AsyncWriter
+
+    from documents import index
+
     documents = Document.objects.all()
 
     ix = index.open_index(recreate=True)
@@ -270,6 +276,10 @@ def sanity_check(*, scheduled=True, raise_on_error=True):
 
 @shared_task
 def bulk_update_documents(document_ids) -> None:
+    from whoosh.writing import AsyncWriter
+
+    from documents import index
+
     documents = Document.objects.filter(id__in=document_ids)
 
     ix = index.open_index()
@@ -300,6 +310,8 @@ def update_document_content_maybe_archive_file(document_id) -> None:
     Re-creates OCR content and thumbnail for a document, and archive file if
     it exists.
     """
+    from documents import index
+
     document = Document.objects.get(id=document_id)
 
     mime_type = document.mime_type

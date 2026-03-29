@@ -35,7 +35,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from documents.index import DelayedQuery
 from documents.permissions import PaperlessObjectPermissions
 from documents.tasks import llmindex_index
 from paperless.filters import GroupFilterSet
@@ -72,6 +71,8 @@ class StandardPagination(PageNumberPagination):
         )
 
     def get_all_result_ids(self):
+        from documents.index import DelayedQuery  # removed with Whoosh in Task 14
+
         query = self.page.paginator.object_list
         if isinstance(query, DelayedQuery):
             try:
