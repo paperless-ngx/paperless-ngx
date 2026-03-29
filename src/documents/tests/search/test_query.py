@@ -214,11 +214,10 @@ class TestPermissionFilter:
     """build_permission_filter tests use an in-memory index — no DB access needed."""
 
     @pytest.fixture
-    def perm_index(self, tmp_path) -> tantivy.Index:
-        # Use a temporary directory instead of in-memory index to avoid tokenizer issues
+    def perm_index(self) -> tantivy.Index:
         schema = build_schema()
-        idx = tantivy.Index(schema, path=str(tmp_path))
-        register_tokenizers(idx, "en")
+        idx = tantivy.Index(schema, path=None)
+        register_tokenizers(idx, "")
         return idx
 
     def _add_doc(

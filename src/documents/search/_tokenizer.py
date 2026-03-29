@@ -52,11 +52,18 @@ SUPPORTED_LANGUAGES: frozenset[str] = frozenset(_LANGUAGE_MAP)
 def register_tokenizers(index: tantivy.Index, language: str) -> None:
     """
     Register all custom tokenizers on *index*. Must be called on every Index
-    instance - tantivy requires re-registration at each open.
+    instance — tantivy requires re-registration at each open.
+
+    simple_analyzer is also registered as a fast-field tokenizer because the
+    sort shadow fields (title_sort, correspondent_sort, type_sort) use fast=True.
+    Tantivy writes default values for fast columns on every commit, even for
+    documents that omit those fields, so the fast-field tokenizer must exist.
     """
     index.register_tokenizer("paperless_text", _paperless_text(language))
     index.register_tokenizer("simple_analyzer", _simple_analyzer())
     index.register_tokenizer("bigram_analyzer", _bigram_analyzer())
+    # Fast-field tokenizer required for fast=True text fields in the schema
+    index.register_fast_field_tokenizer("simple_analyzer", _simple_analyzer())
 
 
 def _paperless_text(language: str) -> tantivy.TextAnalyzer:
