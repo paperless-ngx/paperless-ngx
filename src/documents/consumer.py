@@ -50,9 +50,14 @@ from documents.utils import compute_checksum
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
+from paperless.config import OcrConfig
+from paperless.models import ArchiveFileGenerationChoices
 from paperless.parsers import ParserContext
 from paperless.parsers import ParserProtocol
 from paperless.parsers.registry import get_parser_registry
+from paperless.parsers.utils import PDF_TEXT_MIN_LENGTH
+from paperless.parsers.utils import extract_pdf_text
+from paperless.parsers.utils import is_tagged_pdf
 
 LOGGING_NAME: Final[str] = "paperless.consumer"
 
@@ -103,6 +108,44 @@ class ConsumerStatusShortMessage(StrEnum):
     SAVE_DOCUMENT = "save_document"
     FINISHED = "finished"
     FAILED = "failed"
+
+
+def should_produce_archive(
+    parser: "ParserProtocol",
+    mime_type: str,
+    document_path: Path,
+) -> bool:
+    """Return True if a PDF/A archive should be produced for this document.
+
+    IMPORTANT: *parser* must be an instantiated parser, not the class.
+    ``requires_pdf_rendition`` and ``can_produce_archive`` are instance
+    ``@property`` methods — accessing them on the class returns the descriptor
+    (always truthy).
+    """
+    # Must produce a PDF so the frontend can display the original format at all.
+    if parser.requires_pdf_rendition:
+        return True
+
+    # Parser cannot produce an archive (e.g. TextDocumentParser).
+    if not parser.can_produce_archive:
+        return False
+
+    generation = OcrConfig().archive_file_generation
+
+    if generation == ArchiveFileGenerationChoices.ALWAYS:
+        return True
+    if generation == ArchiveFileGenerationChoices.NEVER:
+        return False
+
+    # auto: produce archives for scanned/image documents; skip for born-digital PDFs.
+    if mime_type.startswith("image/"):
+        return True
+    if mime_type == "application/pdf":
+        if is_tagged_pdf(document_path):
+            return False
+        text = extract_pdf_text(document_path)
+        return text is None or len(text) <= PDF_TEXT_MIN_LENGTH
+    return False
 
 
 class ConsumerPluginMixin:
@@ -438,7 +481,16 @@ class ConsumerPlugin(
                     )
                     self.log.debug(f"Parsing {self.filename}...")
 
-                    document_parser.parse(self.working_copy, mime_type)
+                    produce_archive = should_produce_archive(
+                        document_parser,
+                        mime_type,
+                        self.working_copy,
+                    )
+                    document_parser.parse(
+                        self.working_copy,
+                        mime_type,
+                        produce_archive=produce_archive,
+                    )
 
                     self.log.debug(f"Generating thumbnail for {self.filename}...")
                     self._send_progress(
@@ -787,7 +839,7 @@ class ConsumerPlugin(
 
         return document
 
-    def apply_overrides(self, document) -> None:
+    def apply_overrides(self, document: Document) -> None:
         if self.metadata.correspondent_id:
             document.correspondent = Correspondent.objects.get(
                 pk=self.metadata.correspondent_id,

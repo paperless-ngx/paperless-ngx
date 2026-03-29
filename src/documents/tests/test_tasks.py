@@ -232,6 +232,7 @@ class TestEmptyTrashTask(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertEqual(Document.global_objects.count(), 0)
 
 
+@override_settings(ARCHIVE_FILE_GENERATION="always")
 class TestUpdateContent(DirectoriesMixin, TestCase):
     def test_update_content_maybe_archive_file(self) -> None:
         """

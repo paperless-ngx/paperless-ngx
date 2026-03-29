@@ -89,15 +89,35 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         WHEN:
             - OCR parameters are constructed
         THEN:
-            - Configuration from database is utilized
+            - Configuration from database is utilized (AUTO mode with skip_text=True
+              triggers skip_text; AUTO mode alone does not add any extra flag)
         """
+        # AUTO mode with skip_text=True explicitly passed: skip_text is set
         with override_settings(OCR_MODE="redo"):
             instance = ApplicationConfiguration.objects.all().first()
-            instance.mode = ModeChoices.SKIP
+            instance.mode = ModeChoices.AUTO
+            instance.save()
+
+            params = RasterisedDocumentParser(None).construct_ocrmypdf_parameters(
+                input_file="input.pdf",
+                output_file="output.pdf",
+                sidecar_file="sidecar.txt",
+                mime_type="application/pdf",
+                safe_fallback=False,
+                skip_text=True,
+            )
+        self.assertTrue(params["skip_text"])
+        self.assertNotIn("redo_ocr", params)
+        self.assertNotIn("force_ocr", params)
+
+        # AUTO mode alone (no skip_text): no extra OCR flag is set
+        with override_settings(OCR_MODE="redo"):
+            instance = ApplicationConfiguration.objects.all().first()
+            instance.mode = ModeChoices.AUTO
             instance.save()
 
             params = self.get_params()
-        self.assertTrue(params["skip_text"])
+        self.assertNotIn("skip_text", params)
         self.assertNotIn("redo_ocr", params)
         self.assertNotIn("force_ocr", params)
 

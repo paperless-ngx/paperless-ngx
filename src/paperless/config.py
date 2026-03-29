@@ -4,6 +4,11 @@ import json
 from django.conf import settings
 
 from paperless.models import ApplicationConfiguration
+from paperless.models import ArchiveFileGenerationChoices
+from paperless.models import CleanChoices
+from paperless.models import ColorConvertChoices
+from paperless.models import ModeChoices
+from paperless.models import OutputTypeChoices
 
 
 @dataclasses.dataclass
@@ -28,7 +33,7 @@ class OutputTypeConfig(BaseConfig):
     Almost all parsers care about the chosen PDF output format
     """
 
-    output_type: str = dataclasses.field(init=False)
+    output_type: OutputTypeChoices = dataclasses.field(init=False)
 
     def __post_init__(self) -> None:
         app_config = self._get_config_instance()
@@ -45,15 +50,17 @@ class OcrConfig(OutputTypeConfig):
 
     pages: int | None = dataclasses.field(init=False)
     language: str = dataclasses.field(init=False)
-    mode: str = dataclasses.field(init=False)
-    skip_archive_file: str = dataclasses.field(init=False)
+    mode: ModeChoices = dataclasses.field(init=False)
+    archive_file_generation: ArchiveFileGenerationChoices = dataclasses.field(
+        init=False,
+    )
     image_dpi: int | None = dataclasses.field(init=False)
-    clean: str = dataclasses.field(init=False)
+    clean: CleanChoices = dataclasses.field(init=False)
     deskew: bool = dataclasses.field(init=False)
     rotate: bool = dataclasses.field(init=False)
     rotate_threshold: float = dataclasses.field(init=False)
     max_image_pixel: float | None = dataclasses.field(init=False)
-    color_conversion_strategy: str = dataclasses.field(init=False)
+    color_conversion_strategy: ColorConvertChoices = dataclasses.field(init=False)
     user_args: dict[str, str] | None = dataclasses.field(init=False)
 
     def __post_init__(self) -> None:
@@ -64,8 +71,8 @@ class OcrConfig(OutputTypeConfig):
         self.pages = app_config.pages or settings.OCR_PAGES
         self.language = app_config.language or settings.OCR_LANGUAGE
         self.mode = app_config.mode or settings.OCR_MODE
-        self.skip_archive_file = (
-            app_config.skip_archive_file or settings.OCR_SKIP_ARCHIVE_FILE
+        self.archive_file_generation = (
+            app_config.archive_file_generation or settings.ARCHIVE_FILE_GENERATION
         )
         self.image_dpi = app_config.image_dpi or settings.OCR_IMAGE_DPI
         self.clean = app_config.unpaper_clean or settings.OCR_CLEAN
