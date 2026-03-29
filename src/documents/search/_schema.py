@@ -31,7 +31,7 @@ def build_schema() -> tantivy.Schema:
     ):
         sb.add_text_field(field, stored=True, tokenizer_name="paperless_text")
 
-    # Shadow sort fields — fast, not stored/indexed
+    # Shadow sort fields - fast, not stored/indexed
     for field in ("title_sort", "correspondent_sort", "type_sort"):
         sb.add_text_field(
             field,
@@ -40,10 +40,10 @@ def build_schema() -> tantivy.Schema:
             fast=True,
         )
 
-    # CJK support — not stored, indexed only
+    # CJK support - not stored, indexed only
     sb.add_text_field("bigram_content", stored=False, tokenizer_name="bigram_analyzer")
 
-    # Autocomplete prefix scan — stored, not indexed
+    # Autocomplete prefix scan - stored, not indexed
     sb.add_text_field("autocomplete_word", stored=True, tokenizer_name="raw")
 
     sb.add_text_field("tag", stored=True, tokenizer_name="paperless_text")
@@ -75,17 +75,17 @@ def _needs_rebuild(index_dir: Path) -> bool:
         return True
     try:
         if int(version_file.read_text().strip()) != SCHEMA_VERSION:
-            logger.info("Search index schema version mismatch — rebuilding.")
+            logger.info("Search index schema version mismatch - rebuilding.")
             return True
     except ValueError:
         return True
 
     language_file = index_dir / ".schema_language"
     if not language_file.exists():
-        logger.info("Search index language sentinel missing — rebuilding.")
+        logger.info("Search index language sentinel missing - rebuilding.")
         return True
     if language_file.read_text().strip() != settings.SEARCH_LANGUAGE:
-        logger.info("Search index language changed — rebuilding.")
+        logger.info("Search index language changed - rebuilding.")
         return True
 
     return False

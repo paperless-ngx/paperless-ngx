@@ -6,7 +6,7 @@ import tantivy
 
 logger = logging.getLogger("paperless.search")
 
-# Mapping of ISO 639-1 codes (and common aliases) → Tantivy Snowball name
+# Mapping of ISO 639-1 codes (and common aliases) -> Tantivy Snowball name
 _LANGUAGE_MAP: dict[str, str] = {
     "ar": "Arabic",
     "arabic": "Arabic",
@@ -52,7 +52,7 @@ SUPPORTED_LANGUAGES: frozenset[str] = frozenset(_LANGUAGE_MAP)
 def register_tokenizers(index: tantivy.Index, language: str) -> None:
     """
     Register all custom tokenizers on *index*. Must be called on every Index
-    instance — tantivy requires re-registration at each open.
+    instance - tantivy requires re-registration at each open.
     """
     index.register_tokenizer("paperless_text", _paperless_text(language))
     index.register_tokenizer("simple_analyzer", _simple_analyzer())
@@ -60,7 +60,7 @@ def register_tokenizers(index: tantivy.Index, language: str) -> None:
 
 
 def _paperless_text(language: str) -> tantivy.TextAnalyzer:
-    """simple → remove_long(65) → lowercase → ascii_fold [→ stemmer]"""
+    """simple -> remove_long(65) -> lowercase -> ascii_fold [-> stemmer]"""
     builder = (
         tantivy.TextAnalyzerBuilder(tantivy.Tokenizer.simple())
         .filter(tantivy.Filter.remove_long(65))
@@ -73,7 +73,7 @@ def _paperless_text(language: str) -> tantivy.TextAnalyzer:
             builder = builder.filter(tantivy.Filter.stemmer(tantivy_lang))
         else:
             logger.warning(
-                "Unsupported search language '%s' — stemming disabled. Supported: %s",
+                "Unsupported search language '%s' - stemming disabled. Supported: %s",
                 language,
                 ", ".join(sorted(SUPPORTED_LANGUAGES)),
             )
@@ -81,7 +81,7 @@ def _paperless_text(language: str) -> tantivy.TextAnalyzer:
 
 
 def _simple_analyzer() -> tantivy.TextAnalyzer:
-    """simple → lowercase → ascii_fold. Used for shadow sort fields."""
+    """simple -> lowercase -> ascii_fold. Used for shadow sort fields."""
     return (
         tantivy.TextAnalyzerBuilder(tantivy.Tokenizer.simple())
         .filter(tantivy.Filter.lowercase())
@@ -91,7 +91,7 @@ def _simple_analyzer() -> tantivy.TextAnalyzer:
 
 
 def _bigram_analyzer() -> tantivy.TextAnalyzer:
-    """ngram(2,2) → lowercase. CJK / no-whitespace language support."""
+    """ngram(2,2) -> lowercase. CJK / no-whitespace language support."""
     return (
         tantivy.TextAnalyzerBuilder(
             tantivy.Tokenizer.ngram(min_gram=2, max_gram=2, prefix_only=False),
