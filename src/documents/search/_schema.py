@@ -16,6 +16,7 @@ SCHEMA_VERSION = 1
 
 
 def build_schema() -> tantivy.Schema:
+    """Build the Tantivy schema for the paperless document index."""
     sb = tantivy.SchemaBuilder()
 
     sb.add_unsigned_field("id", stored=True, indexed=True, fast=True)
@@ -70,6 +71,7 @@ def build_schema() -> tantivy.Schema:
 
 
 def _needs_rebuild(index_dir: Path) -> bool:
+    """Check if the search index needs rebuilding by comparing schema version and language sentinel files."""
     version_file = index_dir / ".schema_version"
     if not version_file.exists():
         return True
@@ -92,6 +94,7 @@ def _needs_rebuild(index_dir: Path) -> bool:
 
 
 def _wipe_index(index_dir: Path) -> None:
+    """Delete all children in the index directory to prepare for rebuild."""
     for child in list(index_dir.iterdir()):
         if child.is_dir():
             shutil.rmtree(child)
@@ -100,6 +103,7 @@ def _wipe_index(index_dir: Path) -> None:
 
 
 def _write_sentinels(index_dir: Path) -> None:
+    """Write schema version and language sentinel files so the next index open can skip rebuilding."""
     (index_dir / ".schema_version").write_text(str(SCHEMA_VERSION))
     (index_dir / ".schema_language").write_text(settings.SEARCH_LANGUAGE)
 

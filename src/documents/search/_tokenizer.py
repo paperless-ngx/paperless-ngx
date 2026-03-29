@@ -67,7 +67,7 @@ def register_tokenizers(index: tantivy.Index, language: str) -> None:
 
 
 def _paperless_text(language: str) -> tantivy.TextAnalyzer:
-    """simple -> remove_long(65) -> lowercase -> ascii_fold [-> stemmer]"""
+    """Main full-text tokenizer for content, title, etc: simple -> remove_long(65) -> lowercase -> ascii_fold [-> stemmer]"""
     builder = (
         tantivy.TextAnalyzerBuilder(tantivy.Tokenizer.simple())
         .filter(tantivy.Filter.remove_long(65))
@@ -88,7 +88,7 @@ def _paperless_text(language: str) -> tantivy.TextAnalyzer:
 
 
 def _simple_analyzer() -> tantivy.TextAnalyzer:
-    """simple -> lowercase -> ascii_fold. Used for shadow sort fields."""
+    """Tokenizer for shadow sort fields (title_sort, correspondent_sort, type_sort): simple -> lowercase -> ascii_fold."""
     return (
         tantivy.TextAnalyzerBuilder(tantivy.Tokenizer.simple())
         .filter(tantivy.Filter.lowercase())
@@ -98,7 +98,7 @@ def _simple_analyzer() -> tantivy.TextAnalyzer:
 
 
 def _bigram_analyzer() -> tantivy.TextAnalyzer:
-    """ngram(2,2) -> lowercase. CJK / no-whitespace language support."""
+    """Enables substring search in CJK text: ngram(2,2) -> lowercase. CJK / no-whitespace language support."""
     return (
         tantivy.TextAnalyzerBuilder(
             tantivy.Tokenizer.ngram(min_gram=2, max_gram=2, prefix_only=False),

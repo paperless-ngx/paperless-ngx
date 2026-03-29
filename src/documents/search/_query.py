@@ -7,8 +7,13 @@ from datetime import datetime
 from datetime import timedelta
 from typing import TYPE_CHECKING
 
+import tantivy
+from django.conf import settings
+
 if TYPE_CHECKING:
     from datetime import tzinfo
+
+    from django.contrib.auth.base_user import AbstractBaseUser
 
 _DATE_ONLY_FIELDS = frozenset({"created"})
 
@@ -36,10 +41,12 @@ _RELATIVE_RANGE_RE = re.compile(
 
 
 def _fmt(dt: datetime) -> str:
+    """Format a datetime as an ISO 8601 UTC string for use in Tantivy range queries."""
     return dt.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _iso_range(lo: datetime, hi: datetime) -> str:
+    """Format a [lo TO hi] range string in ISO 8601 for Tantivy query syntax."""
     return f"[{_fmt(lo)} TO {_fmt(hi)}]"
 
 
@@ -144,7 +151,9 @@ def _datetime_range(keyword: str, tz: tzinfo) -> str:
 
 
 def _rewrite_compact_date(query: str) -> str:
-    def _sub(m: re.Match) -> str:
+    """Rewrite Whoosh compact date tokens (14-digit YYYYMMDDHHmmss) to ISO 8601."""
+
+    def _sub(m: re.Match[str]) -> str:
         raw = m.group(1)
         try:
             dt = datetime(
@@ -158,13 +167,15 @@ def _rewrite_compact_date(query: str) -> str:
             )
             return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
         except ValueError:
-            return m.group(0)
+            return str(m.group(0))
 
     return _COMPACT_DATE_RE.sub(_sub, query)
 
 
 def _rewrite_relative_range(query: str) -> str:
-    def _sub(m: re.Match) -> str:
+    """Rewrite Whoosh relative ranges ([now-7d TO now]) to concrete ISO 8601 UTC boundaries."""
+
+    def _sub(m: re.Match[str]) -> str:
         now = datetime.now(UTC)
 
         def _offset(s: str | None) -> timedelta:
@@ -198,7 +209,7 @@ def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
     query = _rewrite_compact_date(query)
     query = _rewrite_relative_range(query)
 
-    def _replace(m: re.Match) -> str:
+    def _replace(m: re.Match[str]) -> str:
         field, keyword = m.group(1), m.group(2)
         if field in _DATE_ONLY_FIELDS:
             return f"{field}:{_date_only_range(keyword, tz)}"
@@ -216,7 +227,7 @@ def normalize_query(query: str) -> str:
     tag:foo,bar → tag:foo AND tag:bar
     """
 
-    def _expand(m: re.Match) -> str:
+    def _expand(m: re.Match[str]) -> str:
         field = m.group(1)
         values = [v.strip() for v in m.group(2).split(",") if v.strip()]
         return " AND ".join(f"{field}:{v}" for v in values)
@@ -230,7 +241,10 @@ def normalize_query(query: str) -> str:
 _MAX_U64 = 2**64 - 1  # u64 max — used as inclusive upper bound for "any owner" range
 
 
-def build_permission_filter(schema, user):
+def build_permission_filter(
+    schema: tantivy.Schema,
+    user: AbstractBaseUser,
+) -> tantivy.Query:
     """
     Returns a Query matching documents visible to user:
     - no owner (public)      → owner_id field absent (NULL in Django)
@@ -251,36 +265,34 @@ def build_permission_filter(schema, user):
     simplify this to MustNot(exists_query("owner_id")) once released.
     See: https://github.com/quickwit-oss/tantivy-py/blob/master/tantivy/tantivy.pyi
     """
-    import tantivy as _tantivy
-
-    owner_any = _tantivy.Query.range_query(
+    owner_any = tantivy.Query.range_query(
         schema,
         "owner_id",
-        _tantivy.FieldType.Unsigned,
+        tantivy.FieldType.Unsigned,
         1,
         _MAX_U64,
     )
-    no_owner = _tantivy.Query.boolean_query(
+    no_owner = tantivy.Query.boolean_query(
         [
-            (_tantivy.Occur.Must, _tantivy.Query.all_query()),
-            (_tantivy.Occur.MustNot, owner_any),
+            (tantivy.Occur.Must, tantivy.Query.all_query()),
+            (tantivy.Occur.MustNot, owner_any),
         ],
     )
-    owned = _tantivy.Query.range_query(
+    owned = tantivy.Query.range_query(
         schema,
         "owner_id",
-        _tantivy.FieldType.Unsigned,
+        tantivy.FieldType.Unsigned,
         user.pk,
         user.pk,
     )
-    shared = _tantivy.Query.range_query(
+    shared = tantivy.Query.range_query(
         schema,
         "viewer_id",
-        _tantivy.FieldType.Unsigned,
+        tantivy.FieldType.Unsigned,
         user.pk,
         user.pk,
     )
-    return _tantivy.Query.disjunction_max_query([no_owner, owned, shared])
+    return tantivy.Query.disjunction_max_query([no_owner, owned, shared])
 
 
 # ── parse_user_query (full pipeline) ─────────────────────────────────────────
@@ -297,8 +309,13 @@ DEFAULT_SEARCH_FIELDS = [
 _FIELD_BOOSTS = {"title": 2.0}
 
 
-def parse_user_query(index, schema, raw_query: str, tz: tzinfo):
-    from django.conf import settings
+def parse_user_query(
+    index: tantivy.Index,
+    schema: tantivy.Schema,
+    raw_query: str,
+    tz: tzinfo,
+) -> tantivy.Query:
+    """Run the full query preprocessing pipeline: date rewriting → normalisation → Tantivy parse. Adds fuzzy blend if ADVANCED_FUZZY_SEARCH_THRESHOLD is set."""
 
     query_str = rewrite_natural_date_keywords(raw_query, tz)
     query_str = normalize_query(query_str)
@@ -311,8 +328,6 @@ def parse_user_query(index, schema, raw_query: str, tz: tzinfo):
 
     threshold = getattr(settings, "ADVANCED_FUZZY_SEARCH_THRESHOLD", None)
     if threshold is not None:
-        import tantivy
-
         fuzzy = index.parse_query(
             query_str,
             DEFAULT_SEARCH_FIELDS,
