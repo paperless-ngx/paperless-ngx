@@ -85,6 +85,13 @@ EMPTY_TRASH_DIR = (
 # threads.
 MEDIA_LOCK = MEDIA_ROOT / "media.lock"
 INDEX_DIR = DATA_DIR / "index"
+
+SEARCH_LANGUAGE: str = os.getenv("PAPERLESS_SEARCH_LANGUAGE", "")
+
+ADVANCED_FUZZY_SEARCH_THRESHOLD: float | None = get_float_from_env(
+    "PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD",
+)
+
 MODEL_FILE = get_path_from_env(
     "PAPERLESS_MODEL_FILE",
     DATA_DIR / "classification_model.pickle",
