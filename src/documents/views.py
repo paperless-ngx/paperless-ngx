@@ -556,7 +556,9 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         response = self.get_paginated_response(serializer.data)
-        if descendant_pks:
+        response.data["display_count"] = len(children_source)
+        api_version = int(request.version or settings.REST_FRAMEWORK["DEFAULT_VERSION"])
+        if descendant_pks and api_version < 10:
             # Include children in the "all" field, if needed
             response.data["all"] = [tag.pk for tag in children_source]
         return response
@@ -836,6 +838,61 @@ class DocumentViewSet(
         "custom_field_",
     )
 
+    def _get_selection_data_for_queryset(self, queryset):
+        correspondents = Correspondent.objects.annotate(
+            document_count=Count(
+                "documents",
+                filter=Q(documents__in=queryset),
+                distinct=True,
+            ),
+        )
+        tags = Tag.objects.annotate(
+            document_count=Count(
+                "documents",
+                filter=Q(documents__in=queryset),
+                distinct=True,
+            ),
+        )
+        document_types = DocumentType.objects.annotate(
+            document_count=Count(
+                "documents",
+                filter=Q(documents__in=queryset),
+                distinct=True,
+            ),
+        )
+        storage_paths = StoragePath.objects.annotate(
+            document_count=Count(
+                "documents",
+                filter=Q(documents__in=queryset),
+                distinct=True,
+            ),
+        )
+        custom_fields = CustomField.objects.annotate(
+            document_count=Count(
+                "fields__document",
+                filter=Q(fields__document__in=queryset),
+                distinct=True,
+            ),
+        )
+
+        return {
+            "selected_correspondents": [
+                {"id": t.id, "document_count": t.document_count} for t in correspondents
+            ],
+            "selected_tags": [
+                {"id": t.id, "document_count": t.document_count} for t in tags
+            ],
+            "selected_document_types": [
+                {"id": t.id, "document_count": t.document_count} for t in document_types
+            ],
+            "selected_storage_paths": [
+                {"id": t.id, "document_count": t.document_count} for t in storage_paths
+            ],
+            "selected_custom_fields": [
+                {"id": t.id, "document_count": t.document_count} for t in custom_fields
+            ],
+        }
+
     def get_queryset(self):
         latest_version_content = Subquery(
             Document.objects.filter(root_document=OuterRef("pk"))
@@ -982,6 +1039,25 @@ class DocumentViewSet(
         )
 
         return response
+
+    def list(self, request, *args, **kwargs):
+        if not get_boolean(
+            str(request.query_params.get("include_selection_data", "false")),
+        ):
+            return super().list(request, *args, **kwargs)
+
+        queryset = self.filter_queryset(self.get_queryset())
+        selection_data = self._get_selection_data_for_queryset(queryset)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            response = self.get_paginated_response(serializer.data)
+            response.data["selection_data"] = selection_data
+            return response
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({"results": serializer.data, "selection_data": selection_data})
 
     def destroy(self, request, *args, **kwargs):
         from documents import index
@@ -2022,6 +2098,21 @@ class UnifiedSearchViewSet(DocumentViewSet):
                         if hasattr(queryset, "suggested_correction")
                         else None
                     )
+
+                    if get_boolean(
+                        str(
+                            request.query_params.get(
+                                "include_selection_data",
+                                "false",
+                            ),
+                        ),
+                    ):
+                        result_ids = queryset.get_result_ids()
+                        response.data["selection_data"] = (
+                            self._get_selection_data_for_queryset(
+                                Document.objects.filter(pk__in=result_ids),
+                            )
+                        )
 
                     return response
             except NotFound:
@@ -3830,20 +3921,55 @@ class BulkEditObjectsView(PassUserMixin):
         user = self.request.user
         object_type = serializer.validated_data.get("object_type")
         object_ids = serializer.validated_data.get("objects")
+        apply_to_all = serializer.validated_data.get("all")
         object_class = serializer.get_object_class(object_type)
         operation = serializer.validated_data.get("operation")
+        model_name = object_class._meta.model_name
+        perm_codename = (
+            f"change_{model_name}"
+            if operation == "set_permissions"
+            else f"delete_{model_name}"
+        )
 
-        objs = object_class.objects.select_related("owner").filter(pk__in=object_ids)
+        if apply_to_all:
+            # Support all to avoid sending large lists of ids for bulk operations, with optional filters
+            filters = serializer.validated_data.get("filters") or {}
+            filterset_class = {
+                "tags": TagFilterSet,
+                "correspondents": CorrespondentFilterSet,
+                "document_types": DocumentTypeFilterSet,
+                "storage_paths": StoragePathFilterSet,
+            }[object_type]
+            user_permitted_objects = get_objects_for_user_owner_aware(
+                user,
+                perm_codename,
+                object_class,
+            )
+            objs = filterset_class(
+                data=filters,
+                queryset=user_permitted_objects,
+            ).qs
+            if object_type == "tags":
+                editable_ids = set(user_permitted_objects.values_list("pk", flat=True))
+                all_ids = set(objs.values_list("pk", flat=True))
+                for tag in objs:
+                    all_ids.update(
+                        descendant.pk
+                        for descendant in tag.get_descendants()
+                        if descendant.pk in editable_ids
+                    )
+                objs = object_class.objects.filter(pk__in=all_ids)
+            objs = objs.select_related("owner")
+            object_ids = list(objs.values_list("pk", flat=True))
+        else:
+            objs = object_class.objects.select_related("owner").filter(
+                pk__in=object_ids,
+            )
 
         if not user.is_superuser:
-            model_name = object_class._meta.model_name
-            perm = (
-                f"documents.change_{model_name}"
-                if operation == "set_permissions"
-                else f"documents.delete_{model_name}"
-            )
+            perm = f"documents.{perm_codename}"
             has_perms = user.has_perm(perm) and all(
-                (obj.owner == user or obj.owner is None) for obj in objs
+                has_perms_owner_aware(user, perm_codename, obj) for obj in objs
             )
 
             if not has_perms:
