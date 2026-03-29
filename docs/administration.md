@@ -464,6 +464,15 @@ of the index and usually makes queries faster and also ensures that the
 autocompletion works properly. This command is regularly invoked by the
 task scheduler.
 
+!!! tip "Accent folding"
+
+    By default, the search index folds accented characters so that
+    searching for "etudiant" also matches "étudiant", "cafe" matches
+    "café", etc. This is controlled by the
+    [`PAPERLESS_INDEX_ACCENT_FOLD`](configuration.md#PAPERLESS_INDEX_ACCENT_FOLD)
+    setting. If you change this setting, you must run `document_index reindex`
+    for the change to take effect.
+
 ### Clearing the database read cache
 
 If the database read cache is enabled, **you must run this command** after making any changes to the database outside the application context.

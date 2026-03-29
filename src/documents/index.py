@@ -23,6 +23,8 @@ from guardian.shortcuts import get_users_with_perms
 from whoosh import classify
 from whoosh import highlight
 from whoosh import query
+from whoosh.analysis import CharsetFilter
+from whoosh.analysis import StandardAnalyzer
 from whoosh.fields import BOOLEAN
 from whoosh.fields import DATETIME
 from whoosh.fields import KEYWORD
@@ -43,6 +45,7 @@ from whoosh.qparser.dateparse import DateParserPlugin
 from whoosh.qparser.dateparse import English
 from whoosh.qparser.plugins import FieldsPlugin
 from whoosh.scoring import TF_IDF
+from whoosh.support.charset import accent_map
 from whoosh.util.times import timespan
 from whoosh.writing import AsyncWriter
 
@@ -61,39 +64,48 @@ logger = logging.getLogger("paperless.index")
 
 
 def get_schema() -> Schema:
+    analyzer = None
+    if settings.INDEX_ACCENT_FOLD:
+        analyzer = StandardAnalyzer() | CharsetFilter(accent_map)
+
+    def text_field(**kwargs) -> TEXT:
+        if analyzer is not None:
+            kwargs["analyzer"] = analyzer
+        return TEXT(**kwargs)
+
     return Schema(
         id=NUMERIC(stored=True, unique=True),
-        title=TEXT(sortable=True),
-        content=TEXT(),
+        title=text_field(sortable=True),
+        content=text_field(),
         asn=NUMERIC(sortable=True, signed=False),
-        correspondent=TEXT(sortable=True),
+        correspondent=text_field(sortable=True),
         correspondent_id=NUMERIC(),
         has_correspondent=BOOLEAN(),
         tag=KEYWORD(commas=True, scorable=True, lowercase=True),
         tag_id=KEYWORD(commas=True, scorable=True),
         has_tag=BOOLEAN(),
-        type=TEXT(sortable=True),
+        type=text_field(sortable=True),
         type_id=NUMERIC(),
         has_type=BOOLEAN(),
         created=DATETIME(sortable=True),
         modified=DATETIME(sortable=True),
         added=DATETIME(sortable=True),
-        path=TEXT(sortable=True),
+        path=text_field(sortable=True),
         path_id=NUMERIC(),
         has_path=BOOLEAN(),
-        notes=TEXT(),
+        notes=text_field(),
         num_notes=NUMERIC(sortable=True, signed=False),
-        custom_fields=TEXT(),
+        custom_fields=text_field(),
         custom_field_count=NUMERIC(sortable=True, signed=False),
         has_custom_fields=BOOLEAN(),
         custom_fields_id=KEYWORD(commas=True),
-        owner=TEXT(),
+        owner=text_field(),
         owner_id=NUMERIC(),
         has_owner=BOOLEAN(),
         viewer_id=KEYWORD(commas=True),
         checksum=TEXT(),
         page_count=NUMERIC(sortable=True),
-        original_filename=TEXT(sortable=True),
+        original_filename=text_field(sortable=True),
         is_shared=BOOLEAN(),
     )
 
