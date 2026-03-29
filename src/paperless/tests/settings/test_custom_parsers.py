@@ -79,6 +79,16 @@ class TestRedisSocketConversion:
                 ),
                 id="celery_style_socket_with_credentials",
             ),
+            # Empty username, password only: unix://:SECRET@/path.sock
+            # Regression test for https://github.com/paperless-ngx/paperless-ngx/pull/12239
+            pytest.param(
+                "unix://:SECRET@/run/redis/paperless.sock",
+                (
+                    "redis+socket://:SECRET@/run/redis/paperless.sock",
+                    "unix://:SECRET@/run/redis/paperless.sock",
+                ),
+                id="redis_py_style_socket_with_password_only",
+            ),
         ],
     )
     def test_redis_socket_parsing(
