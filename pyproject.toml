@@ -75,11 +75,11 @@ dependencies = [
   "scikit-learn~=1.8.0",
   "sentence-transformers>=4.1",
   "setproctitle~=1.3.4",
+  "tantivy>=0.25.1",
   "tika-client~=0.10.0",
   "torch~=2.10.0",
   "watchfiles>=1.1.1",
   "whitenoise~=6.11",
-  "whoosh-reloaded>=2.7.5",
   "zxing-cpp~=3.0.0",
 ]
 
@@ -123,6 +123,7 @@ testing = [
   "pytest-rerunfailures~=16.1",
   "pytest-sugar",
   "pytest-xdist~=3.8.0",
+  "time-machine>=2.13",
 ]
 
 lint = [
@@ -299,6 +300,7 @@ markers = [
   "greenmail: Tests requiring Greenmail service",
   "date_parsing: Tests which cover date parsing from content or filename",
   "management: Tests which cover management commands/functionality",
+  "search: Tests for the Tantivy search backend",
 ]
 
 [tool.pytest_env]
