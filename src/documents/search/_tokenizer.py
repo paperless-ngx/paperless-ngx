@@ -1,0 +1,101 @@
+from __future__ import annotations
+
+import logging
+
+import tantivy
+
+logger = logging.getLogger("paperless.search")
+
+# Mapping of ISO 639-1 codes (and common aliases) → Tantivy Snowball name
+_LANGUAGE_MAP: dict[str, str] = {
+    "ar": "Arabic",
+    "arabic": "Arabic",
+    "da": "Danish",
+    "danish": "Danish",
+    "nl": "Dutch",
+    "dutch": "Dutch",
+    "en": "English",
+    "english": "English",
+    "fi": "Finnish",
+    "finnish": "Finnish",
+    "fr": "French",
+    "french": "French",
+    "de": "German",
+    "german": "German",
+    "el": "Greek",
+    "greek": "Greek",
+    "hu": "Hungarian",
+    "hungarian": "Hungarian",
+    "it": "Italian",
+    "italian": "Italian",
+    "no": "Norwegian",
+    "norwegian": "Norwegian",
+    "pt": "Portuguese",
+    "portuguese": "Portuguese",
+    "ro": "Romanian",
+    "romanian": "Romanian",
+    "ru": "Russian",
+    "russian": "Russian",
+    "es": "Spanish",
+    "spanish": "Spanish",
+    "sv": "Swedish",
+    "swedish": "Swedish",
+    "ta": "Tamil",
+    "tamil": "Tamil",
+    "tr": "Turkish",
+    "turkish": "Turkish",
+}
+
+SUPPORTED_LANGUAGES: frozenset[str] = frozenset(_LANGUAGE_MAP)
+
+
+def register_tokenizers(index: tantivy.Index, language: str) -> None:
+    """
+    Register all custom tokenizers on *index*. Must be called on every Index
+    instance — tantivy requires re-registration at each open.
+    """
+    index.register_tokenizer("paperless_text", _paperless_text(language))
+    index.register_tokenizer("simple_analyzer", _simple_analyzer())
+    index.register_tokenizer("bigram_analyzer", _bigram_analyzer())
+
+
+def _paperless_text(language: str) -> tantivy.TextAnalyzer:
+    """simple → remove_long(65) → lowercase → ascii_fold [→ stemmer]"""
+    builder = (
+        tantivy.TextAnalyzerBuilder(tantivy.Tokenizer.simple())
+        .filter(tantivy.Filter.remove_long(65))
+        .filter(tantivy.Filter.lowercase())
+        .filter(tantivy.Filter.ascii_fold())
+    )
+    if language:
+        tantivy_lang = _LANGUAGE_MAP.get(language.lower())
+        if tantivy_lang:
+            builder = builder.filter(tantivy.Filter.stemmer(tantivy_lang))
+        else:
+            logger.warning(
+                "Unsupported search language '%s' — stemming disabled. Supported: %s",
+                language,
+                ", ".join(sorted(SUPPORTED_LANGUAGES)),
+            )
+    return builder.build()
+
+
+def _simple_analyzer() -> tantivy.TextAnalyzer:
+    """simple → lowercase → ascii_fold. Used for shadow sort fields."""
+    return (
+        tantivy.TextAnalyzerBuilder(tantivy.Tokenizer.simple())
+        .filter(tantivy.Filter.lowercase())
+        .filter(tantivy.Filter.ascii_fold())
+        .build()
+    )
+
+
+def _bigram_analyzer() -> tantivy.TextAnalyzer:
+    """ngram(2,2) → lowercase. CJK / no-whitespace language support."""
+    return (
+        tantivy.TextAnalyzerBuilder(
+            tantivy.Tokenizer.ngram(min_gram=2, max_gram=2, prefix_only=False),
+        )
+        .filter(tantivy.Filter.lowercase())
+        .build()
+    )
