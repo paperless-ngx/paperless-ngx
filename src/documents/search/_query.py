@@ -205,3 +205,125 @@ def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
         return f"{field}:{_datetime_range(keyword, tz)}"
 
     return _FIELD_DATE_RE.sub(_replace, query)
+
+
+# ── normalize_query ──────────────────────────────────────────────────────────
+
+
+def normalize_query(query: str) -> str:
+    """
+    Join comma-separated field values with AND, collapse whitespace.
+    tag:foo,bar → tag:foo AND tag:bar
+    """
+
+    def _expand(m: re.Match) -> str:
+        field = m.group(1)
+        values = [v.strip() for v in m.group(2).split(",") if v.strip()]
+        return " AND ".join(f"{field}:{v}" for v in values)
+
+    query = re.sub(r"(\w+):([^\s\[\]]+(?:,[^\s\[\]]+)+)", _expand, query)
+    return re.sub(r" {2,}", " ", query).strip()
+
+
+# ── build_permission_filter ──────────────────────────────────────────────────
+
+_MAX_U64 = 2**64 - 1  # u64 max — used as inclusive upper bound for "any owner" range
+
+
+def build_permission_filter(schema, user):
+    """
+    Returns a Query matching documents visible to user:
+    - no owner (public)      → owner_id field absent (NULL in Django)
+    - owned by user          → owner_id = user.pk
+    - shared with user       → viewer_id = user.pk
+
+    Uses disjunction_max_query — boolean Should-only would match all docs.
+
+    NOTE: all integer queries use range_query, not term_query, to avoid the
+    unsigned type-detection bug in tantivy-py 0.25 (lib.rs#L190 infers i64
+    before u64; confirmed empirically — term_query returns 0 for u64 fields).
+    Same root cause as issue #47 (from_dict) but the term_query path unfixed.
+    See: https://github.com/quickwit-oss/tantivy-py/blob/f51d851e857385ad2907241fbce8cf08309c3078/src/lib.rs#L190
+         https://github.com/quickwit-oss/tantivy-py/issues/47
+
+    NOTE: no_owner uses boolean_query([Must(all), MustNot(range)]) because
+    exists_query is not available in 0.25.1. It is present in master and can
+    simplify this to MustNot(exists_query("owner_id")) once released.
+    See: https://github.com/quickwit-oss/tantivy-py/blob/master/tantivy/tantivy.pyi
+    """
+    import tantivy as _tantivy
+
+    owner_any = _tantivy.Query.range_query(
+        schema,
+        "owner_id",
+        _tantivy.FieldType.Unsigned,
+        1,
+        _MAX_U64,
+    )
+    no_owner = _tantivy.Query.boolean_query(
+        [
+            (_tantivy.Occur.Must, _tantivy.Query.all_query()),
+            (_tantivy.Occur.MustNot, owner_any),
+        ],
+    )
+    owned = _tantivy.Query.range_query(
+        schema,
+        "owner_id",
+        _tantivy.FieldType.Unsigned,
+        user.pk,
+        user.pk,
+    )
+    shared = _tantivy.Query.range_query(
+        schema,
+        "viewer_id",
+        _tantivy.FieldType.Unsigned,
+        user.pk,
+        user.pk,
+    )
+    return _tantivy.Query.disjunction_max_query([no_owner, owned, shared])
+
+
+# ── parse_user_query (full pipeline) ─────────────────────────────────────────
+
+DEFAULT_SEARCH_FIELDS = [
+    "title",
+    "content",
+    "correspondent",
+    "document_type",
+    "tag",
+    "notes",
+    "custom_fields",
+]
+_FIELD_BOOSTS = {"title": 2.0}
+
+
+def parse_user_query(index, schema, raw_query: str, tz: tzinfo):
+    from django.conf import settings
+
+    query_str = rewrite_natural_date_keywords(raw_query, tz)
+    query_str = normalize_query(query_str)
+
+    exact = index.parse_query(
+        query_str,
+        DEFAULT_SEARCH_FIELDS,
+        field_boosts=_FIELD_BOOSTS,
+    )
+
+    threshold = getattr(settings, "ADVANCED_FUZZY_SEARCH_THRESHOLD", None)
+    if threshold is not None:
+        import tantivy
+
+        fuzzy = index.parse_query(
+            query_str,
+            DEFAULT_SEARCH_FIELDS,
+            field_boosts=_FIELD_BOOSTS,
+            fuzzy_fields={f: (True, 1, True) for f in DEFAULT_SEARCH_FIELDS},
+        )
+        return tantivy.Query.boolean_query(
+            [
+                (tantivy.Occur.Should, exact),
+                (tantivy.Occur.Should, tantivy.Query.boost_query(fuzzy, 0.1)),
+            ],
+        )
+
+    return exact
