@@ -389,7 +389,7 @@ class TestExportImport(
         self.assertIsFile(
             str(self.target / doc_from_manifest[EXPORTER_FILE_NAME]),
         )
-        self.d3.delete()
+        self.d3.hard_delete()
 
         manifest = self._do_export()
         self.assertRaises(
@@ -867,6 +867,52 @@ class TestExportImport(
             manifest = self._do_export(use_filename_format=True)
             for obj in manifest:
                 self.assertNotEqual(obj["model"], "auditlog.logentry")
+
+    def test_export_import_soft_deleted_document(self) -> None:
+        """
+        GIVEN:
+            - A document with a note and custom field instance has been soft-deleted
+        WHEN:
+            - Export and re-import are performed
+        THEN:
+            - The soft-deleted document, note, and custom field instance
+              survive the round-trip with deleted_at preserved
+        """
+        shutil.rmtree(Path(self.dirs.media_dir) / "documents")
+        shutil.copytree(
+            Path(__file__).parent / "samples" / "documents",
+            Path(self.dirs.media_dir) / "documents",
+        )
+
+        # d1 has self.note and self.cfi1 attached via setUp
+        self.d1.delete()
+
+        self._do_export()
+
+        with paperless_environment():
+            Document.global_objects.all().hard_delete()
+            Correspondent.objects.all().delete()
+            DocumentType.objects.all().delete()
+            Tag.objects.all().delete()
+
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                self.target,
+                skip_checks=True,
+            )
+
+            self.assertEqual(Document.global_objects.count(), 4)
+            reimported_doc = Document.global_objects.get(pk=self.d1.pk)
+            self.assertIsNotNone(reimported_doc.deleted_at)
+
+            self.assertEqual(Note.global_objects.count(), 1)
+            reimported_note = Note.global_objects.get(pk=self.note.pk)
+            self.assertIsNotNone(reimported_note.deleted_at)
+
+            self.assertEqual(CustomFieldInstance.global_objects.count(), 1)
+            reimported_cfi = CustomFieldInstance.global_objects.get(pk=self.cfi1.pk)
+            self.assertIsNotNone(reimported_cfi.deleted_at)
 
     def test_export_data_only(self) -> None:
         """

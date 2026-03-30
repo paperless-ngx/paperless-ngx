@@ -12,7 +12,7 @@ import {
 import { DocumentMetadata } from 'src/app/data/document-metadata'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
 import { FilterRule } from 'src/app/data/filter-rule'
-import { Results } from 'src/app/data/results'
+import { Results, SelectionData } from 'src/app/data/results'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { queryParamsFromFilterRules } from '../../utils/query-params'
 import {
@@ -23,19 +23,6 @@ import {
 import { SettingsService } from '../settings.service'
 import { AbstractPaperlessService } from './abstract-paperless-service'
 import { CustomFieldsService } from './custom-fields.service'
-
-export interface SelectionDataItem {
-  id: number
-  document_count: number
-}
-
-export interface SelectionData {
-  selected_storage_paths: SelectionDataItem[]
-  selected_correspondents: SelectionDataItem[]
-  selected_tags: SelectionDataItem[]
-  selected_document_types: SelectionDataItem[]
-  selected_custom_fields: SelectionDataItem[]
-}
 
 export enum BulkEditSourceMode {
   LATEST_VERSION = 'latest_version',

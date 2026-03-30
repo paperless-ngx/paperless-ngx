@@ -385,10 +385,10 @@ class Command(CryptMixin, PaperlessCommand):
             "workflow_webhook_actions": WorkflowActionWebhook.objects.all(),
             "workflows": Workflow.objects.all(),
             "custom_fields": CustomField.objects.all(),
-            "custom_field_instances": CustomFieldInstance.objects.all(),
+            "custom_field_instances": CustomFieldInstance.global_objects.all(),
             "app_configs": ApplicationConfiguration.objects.all(),
-            "notes": Note.objects.all(),
-            "documents": Document.objects.order_by("id").all(),
+            "notes": Note.global_objects.all(),
+            "documents": Document.global_objects.order_by("id").all(),
             "social_accounts": SocialAccount.objects.all(),
             "social_apps": SocialApp.objects.all(),
             "social_tokens": SocialToken.objects.all(),
@@ -443,7 +443,7 @@ class Command(CryptMixin, PaperlessCommand):
                             writer.write_batch(batch)
 
             document_map: dict[int, Document] = {
-                d.pk: d for d in Document.objects.order_by("id")
+                d.pk: d for d in Document.global_objects.order_by("id")
             }
 
             # 3. Export files from each document
@@ -619,12 +619,15 @@ class Command(CryptMixin, PaperlessCommand):
         """Write per-document manifest file for --split-manifest mode."""
         content = [document_dict]
         content.extend(
-            serializers.serialize("python", Note.objects.filter(document=document)),
+            serializers.serialize(
+                "python",
+                Note.global_objects.filter(document=document),
+            ),
         )
         content.extend(
             serializers.serialize(
                 "python",
-                CustomFieldInstance.objects.filter(document=document),
+                CustomFieldInstance.global_objects.filter(document=document),
             ),
         )
         manifest_name = base_name.with_name(f"{base_name.stem}-manifest.json")
