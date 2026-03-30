@@ -1,11 +1,8 @@
 import logging
 import shutil
-from collections.abc import Callable
-from collections.abc import Iterable
 from datetime import timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING
-from typing import TypeVar
 
 from celery import states
 from django.conf import settings
@@ -13,20 +10,15 @@ from django.utils import timezone
 
 from documents.models import Document
 from documents.models import PaperlessTask
+from documents.utils import IterWrapper
+from documents.utils import identity
 from paperless_ai.embedding import build_llm_index_text
 from paperless_ai.embedding import get_embedding_dim
 from paperless_ai.embedding import get_embedding_model
 
-_T = TypeVar("_T")
-IterWrapper = Callable[[Iterable[_T]], Iterable[_T]]
-
 if TYPE_CHECKING:
     from llama_index.core import VectorStoreIndex
     from llama_index.core.schema import BaseNode
-
-
-def _identity(iterable: Iterable[_T]) -> Iterable[_T]:
-    return iterable
 
 
 logger = logging.getLogger("paperless_ai.indexing")
@@ -176,7 +168,7 @@ def vector_store_file_exists():
 
 def update_llm_index(
     *,
-    iter_wrapper: IterWrapper[Document] = _identity,
+    iter_wrapper: IterWrapper[Document] = identity,
     rebuild=False,
 ) -> str:
     """

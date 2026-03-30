@@ -26,10 +26,10 @@ from documents.search._schema import build_schema
 from documents.search._schema import open_or_rebuild_index
 from documents.search._schema import wipe_index
 from documents.search._tokenizer import register_tokenizers
+from documents.utils import identity
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-    from collections.abc import Iterable
     from pathlib import Path
 
     from django.contrib.auth.base_user import AbstractBaseUser
@@ -43,11 +43,6 @@ _WORD_RE = regex.compile(r"\w+")
 _AUTOCOMPLETE_REGEX_TIMEOUT = 1.0  # seconds; guards against ReDoS on untrusted content
 
 T = TypeVar("T")
-
-
-def _identity(iterable: Iterable[T]) -> Iterable[T]:
-    """Default iter_wrapper that passes documents through unchanged for indexing."""
-    return iterable
 
 
 def _ascii_fold(s: str) -> str:
@@ -764,7 +759,7 @@ class TantivyBackend:
         self._ensure_open()
         return WriteBatch(self, lock_timeout)
 
-    def rebuild(self, documents: QuerySet, iter_wrapper: Callable = _identity) -> None:
+    def rebuild(self, documents: QuerySet, iter_wrapper: Callable = identity) -> None:
         """
         Rebuild the entire search index from scratch.
 

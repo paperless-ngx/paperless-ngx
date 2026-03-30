@@ -4,11 +4,9 @@ import shutil
 import uuid
 import zipfile
 from collections.abc import Callable
-from collections.abc import Iterable
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from tempfile import mkstemp
-from typing import TypeVar
 
 from celery import Task
 from celery import shared_task
@@ -58,7 +56,9 @@ from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
 from documents.signals.handlers import run_workflows
 from documents.signals.handlers import send_websocket_document_updated
+from documents.utils import IterWrapper
 from documents.utils import compute_checksum
+from documents.utils import identity
 from documents.workflows.utils import get_workflows_for_trigger
 from paperless.config import AIConfig
 from paperless.parsers import ParserContext
@@ -67,17 +67,9 @@ from paperless_ai.indexing import llm_index_add_or_update_document
 from paperless_ai.indexing import llm_index_remove_document
 from paperless_ai.indexing import update_llm_index
 
-_T = TypeVar("_T")
-IterWrapper = Callable[[Iterable[_T]], Iterable[_T]]
-
-
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
 logger = logging.getLogger("paperless.tasks")
-
-
-def _identity(iterable: Iterable[_T]) -> Iterable[_T]:
-    return iterable
 
 
 @shared_task
@@ -622,7 +614,7 @@ def update_document_parent_tags(tag: Tag, new_parent: Tag) -> None:
 @shared_task
 def llmindex_index(
     *,
-    iter_wrapper: IterWrapper[Document] = _identity,
+    iter_wrapper: IterWrapper[Document] = identity,
     rebuild=False,
     scheduled=True,
     auto=False,
