@@ -538,11 +538,11 @@ class TantivyBackend:
             if "autocomplete_word" in doc_dict:
                 word_counts.update(doc_dict["autocomplete_word"])
 
-        # Filter to prefix matches, then sort by document frequency descending
-        # so the most-used matching word comes first.
+        # Filter to prefix matches, sort by document frequency descending;
+        # break ties alphabetically for stable, deterministic output.
         matches = sorted(
             (w for w in word_counts if w.startswith(normalized_term)),
-            key=lambda w: -word_counts[w],
+            key=lambda w: (-word_counts[w], w),
         )
 
         return matches[:limit]
