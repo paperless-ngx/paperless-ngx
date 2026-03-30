@@ -6,6 +6,8 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import Note
 from documents.search._backend import TantivyBackend
+from documents.search._backend import get_backend
+from documents.search._backend import reset_backend
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
 
@@ -159,6 +161,37 @@ class TestMoreLikeThis:
         results = backend.more_like_this(doc_id=50, user=None, page=1, page_size=10)
         returned_ids = [hit["id"] for hit in results.hits]
         assert 50 not in returned_ids  # Original document excluded
+
+
+class TestSingleton:
+    """Test get_backend() and reset_backend() singleton lifecycle."""
+
+    @pytest.fixture(autouse=True)
+    def _clean(self):
+        reset_backend()
+        yield
+        reset_backend()
+
+    def test_returns_same_instance_on_repeated_calls(self, index_dir):
+        assert get_backend() is get_backend()
+
+    def test_reinitializes_when_index_dir_changes(self, tmp_path, settings):
+        settings.INDEX_DIR = tmp_path / "a"
+        (tmp_path / "a").mkdir()
+        b1 = get_backend()
+
+        settings.INDEX_DIR = tmp_path / "b"
+        (tmp_path / "b").mkdir()
+        b2 = get_backend()
+
+        assert b1 is not b2
+        assert b2._path == tmp_path / "b"
+
+    def test_reset_forces_new_instance(self, index_dir):
+        b1 = get_backend()
+        reset_backend()
+        b2 = get_backend()
+        assert b1 is not b2
 
 
 class TestFieldHandling:

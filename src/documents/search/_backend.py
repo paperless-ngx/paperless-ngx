@@ -30,6 +30,7 @@ from documents.search._tokenizer import register_tokenizers
 if TYPE_CHECKING:
     from collections.abc import Callable
     from collections.abc import Iterable
+    from pathlib import Path
 
     from django.contrib.auth.base_user import AbstractBaseUser
     from django.db.models import QuerySet
@@ -124,17 +125,18 @@ class WriteBatch:
         self._backend = backend
         self._lock_timeout = lock_timeout
         self._writer = None
+        self._lock = None
 
     def __enter__(self) -> Self:
-        lock_path = settings.INDEX_DIR / ".tantivy.lock"
-        self._lock = filelock.FileLock(str(lock_path))
-
-        try:
-            self._lock.acquire(timeout=self._lock_timeout)
-        except filelock.Timeout as e:
-            raise SearchIndexLockError(
-                f"Could not acquire index lock within {self._lock_timeout}s",
-            ) from e
+        if self._backend._path is not None:
+            lock_path = self._backend._path / ".tantivy.lock"
+            self._lock = filelock.FileLock(str(lock_path))
+            try:
+                self._lock.acquire(timeout=self._lock_timeout)
+            except filelock.Timeout as e:
+                raise SearchIndexLockError(
+                    f"Could not acquire index lock within {self._lock_timeout}s",
+                ) from e
 
         self._writer = self._backend._index.writer()
         return self
@@ -154,7 +156,7 @@ class WriteBatch:
                 del self._writer
                 self._writer = None
         finally:
-            if hasattr(self, "_lock") and self._lock:
+            if self._lock is not None:
                 self._lock.release()
 
     def add_or_update(
@@ -187,21 +189,35 @@ class WriteBatch:
 
 
 class TantivyBackend:
-    """Tantivy search backend with context manager interface."""
+    """Tantivy search backend with explicit lifecycle management."""
 
-    def __init__(self):
+    def __init__(self, path: Path | None = None):
+        # path=None → in-memory index (for tests)
+        # path=some_dir → on-disk index (for production)
+        self._path = path
         self._index = None
         self._schema = None
 
-    def __enter__(self) -> Self:
-        self._index = open_or_rebuild_index()
+    def open(self) -> None:
+        """Open or rebuild the index. Idempotent."""
+        if self._index is not None:
+            return
+        if self._path is not None:
+            self._index = open_or_rebuild_index(self._path)
+        else:
+            self._index = tantivy.Index(build_schema())
         register_tokenizers(self._index, settings.SEARCH_LANGUAGE)
         self._schema = self._index.schema
-        return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        # Index doesn't need explicit close
-        pass
+    def close(self) -> None:
+        """Close the index. Idempotent."""
+        self._index = None
+        self._schema = None
+
+    def _ensure_open(self) -> None:
+        """Ensure the index is open before operations."""
+        if self._index is None:
+            self.open()
 
     def _build_tantivy_doc(
         self,
@@ -331,11 +347,13 @@ class TantivyBackend:
         effective_content: str | None = None,
     ) -> None:
         """Add or update a single document with file locking."""
+        self._ensure_open()
         with self.batch_update(lock_timeout=5.0) as batch:
             batch.add_or_update(document, effective_content)
 
     def remove(self, doc_id: int) -> None:
         """Remove a single document with file locking."""
+        self._ensure_open()
         with self.batch_update(lock_timeout=5.0) as batch:
             batch.remove(doc_id)
 
@@ -350,6 +368,7 @@ class TantivyBackend:
         sort_reverse: bool,
     ) -> SearchResults:
         """Search the index."""
+        self._ensure_open()
         tz = get_current_timezone()
         user_query = parse_user_query(self._index, query, tz)
 
@@ -491,6 +510,7 @@ class TantivyBackend:
         user: AbstractBaseUser | None = None,
     ) -> list[str]:
         """Get autocomplete suggestions, optionally filtered by user visibility."""
+        self._ensure_open()
         normalized_term = _ascii_fold(term.lower())
 
         searcher = self._index.searcher()
@@ -543,6 +563,7 @@ class TantivyBackend:
         page_size: int,
     ) -> SearchResults:
         """Find documents similar to the given document."""
+        self._ensure_open()
         searcher = self._index.searcher()
 
         # First find the document address
@@ -630,18 +651,20 @@ class TantivyBackend:
 
     def batch_update(self, lock_timeout: float = 30.0) -> WriteBatch:
         """Get a batch context manager for bulk operations."""
+        self._ensure_open()
         return WriteBatch(self, lock_timeout)
 
     def rebuild(self, documents: QuerySet, iter_wrapper: Callable = _identity) -> None:
         """Rebuild the entire search index."""
         from documents.search._tokenizer import register_tokenizers
 
-        index_dir = settings.INDEX_DIR
-
-        # Create new index
-        wipe_index(index_dir)
-        new_index = tantivy.Index(build_schema(), path=str(index_dir))
-        _write_sentinels(index_dir)
+        # Create new index (on-disk or in-memory)
+        if self._path is not None:
+            wipe_index(self._path)
+            new_index = tantivy.Index(build_schema(), path=str(self._path))
+            _write_sentinels(self._path)
+        else:
+            new_index = tantivy.Index(build_schema())
         register_tokenizers(new_index, settings.SEARCH_LANGUAGE)
 
         # Index all documents using the new index
@@ -672,30 +695,47 @@ class TantivyBackend:
 
 # Module-level singleton with proper thread safety
 _backend: TantivyBackend | None = None
+_backend_path: Path | None = None  # tracks which INDEX_DIR the singleton uses
 _backend_lock = threading.RLock()
 
 
 def get_backend() -> TantivyBackend:
-    """Get the global backend instance with thread safety."""
-    global _backend
+    """Get the global backend instance with thread safety.
 
-    # Fast path for already initialized backend
-    if _backend is not None:
+    Automatically reinitializes when settings.INDEX_DIR changes — this fixes
+    the xdist/override_settings isolation issue where each test may set a
+    different INDEX_DIR but would otherwise share a stale singleton.
+    """
+    global _backend, _backend_path
+
+    current_path: Path = settings.INDEX_DIR
+
+    # Fast path: backend is initialized and path hasn't changed (no lock needed)
+    if _backend is not None and _backend_path == current_path:
         return _backend
 
-    # Slow path with locking
+    # Slow path: first call, or INDEX_DIR changed between calls
     with _backend_lock:
-        if _backend is None:
-            _backend = TantivyBackend()
-            _backend.__enter__()
+        # Double-check after acquiring lock — another thread may have beaten us
+        if _backend is not None and _backend_path == current_path:
+            return _backend
+
+        if _backend is not None:
+            _backend.close()
+
+        _backend = TantivyBackend(path=current_path)
+        _backend.open()
+        _backend_path = current_path
+
         return _backend
 
 
 def reset_backend() -> None:
     """Reset the global backend instance with thread safety."""
-    global _backend
+    global _backend, _backend_path
 
     with _backend_lock:
         if _backend is not None:
-            _backend.__exit__(None, None, None)
+            _backend.close()
         _backend = None
+        _backend_path = None

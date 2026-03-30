@@ -23,8 +23,11 @@ def index_dir(tmp_path: Path, settings: SettingsWrapper) -> Path:
 
 
 @pytest.fixture
-def backend(index_dir: Path) -> Generator[TantivyBackend, None, None]:
-    b = TantivyBackend()
-    with b:
+def backend() -> Generator[TantivyBackend, None, None]:
+    b = TantivyBackend()  # path=None → in-memory index
+    b.open()
+    try:
         yield b
-    reset_backend()
+    finally:
+        b.close()
+        reset_backend()

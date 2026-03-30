@@ -116,12 +116,14 @@ def _write_sentinels(index_dir: Path) -> None:
     (index_dir / ".schema_language").write_text(settings.SEARCH_LANGUAGE)
 
 
-def open_or_rebuild_index() -> tantivy.Index:
+def open_or_rebuild_index(index_dir: Path | None = None) -> tantivy.Index:
     """
-    Open the Tantivy index at settings.INDEX_DIR, creating or rebuilding as needed.
+    Open the Tantivy index at index_dir (defaults to settings.INDEX_DIR),
+    creating or rebuilding as needed.
     Caller must register custom tokenizers after receiving the Index.
     """
-    index_dir: Path = settings.INDEX_DIR
+    if index_dir is None:
+        index_dir = settings.INDEX_DIR
     if _needs_rebuild(index_dir):
         wipe_index(index_dir)
         idx = tantivy.Index(build_schema(), path=str(index_dir))
