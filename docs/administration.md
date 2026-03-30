@@ -180,6 +180,17 @@ following:
     This might not actually do anything. Not every new paperless version
     comes with new database migrations.
 
+4.  Rebuild the search index.
+
+    ```shell-session
+    cd src
+    python3 manage.py document_index reindex
+    ```
+
+    This is required when the search backend has changed (e.g. the upgrade
+    to Tantivy). It is safe to run on every upgrade — if the index is already
+    current it completes quickly.
+
 ### Database Upgrades
 
 Paperless-ngx is compatible with Django-supported versions of PostgreSQL and MariaDB and it is generally
@@ -469,9 +480,20 @@ task scheduler.
 
 !!! note
 
-    On first startup after upgrading from a previous version, paperless detects
-    that the index format has changed and automatically performs a one-time full
-    reindex. No manual migration step is required.
+    **Docker users:** On first startup after upgrading, the container automatically
+    detects the index format change and runs a full reindex before starting the
+    webserver. No manual step is required.
+
+    **Bare metal users:** After upgrading, run the following command once to rebuild
+    the search index in the new format:
+
+    ```shell-session
+    cd src
+    python3 manage.py document_index reindex
+    ```
+
+    Changing `PAPERLESS_SEARCH_LANGUAGE` also requires a manual reindex on bare
+    metal (Docker handles this automatically).
 
 ### Clearing the database read cache
 
