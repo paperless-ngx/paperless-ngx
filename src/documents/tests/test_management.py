@@ -103,36 +103,45 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
 
 @pytest.mark.management
-class TestMakeIndex(TestCase):
-    @mock.patch("documents.management.commands.document_index.index_reindex")
-    def test_reindex(self, m) -> None:
+@pytest.mark.django_db
+class TestMakeIndex:
+    def test_reindex(self, mocker: MockerFixture) -> None:
+        mock_get_backend = mocker.patch(
+            "documents.management.commands.document_index.get_backend",
+        )
         call_command("document_index", "reindex", skip_checks=True)
-        m.assert_called_once()
+        mock_get_backend.return_value.rebuild.assert_called_once()
 
-    @mock.patch("documents.management.commands.document_index.index_optimize")
-    def test_optimize(self, m) -> None:
+    def test_optimize(self) -> None:
         call_command("document_index", "optimize", skip_checks=True)
-        m.assert_called_once()
 
-    @mock.patch("documents.management.commands.document_index.index_reindex")
-    @mock.patch("documents.search._schema._needs_rebuild", return_value=False)
     def test_reindex_if_needed_skips_when_up_to_date(
         self,
-        _needs_rebuild,
-        reindex,
+        mocker: MockerFixture,
     ) -> None:
+        mocker.patch(
+            "documents.management.commands.document_index.needs_rebuild",
+            return_value=False,
+        )
+        mock_get_backend = mocker.patch(
+            "documents.management.commands.document_index.get_backend",
+        )
         call_command("document_index", "reindex", if_needed=True, skip_checks=True)
-        reindex.assert_not_called()
+        mock_get_backend.return_value.rebuild.assert_not_called()
 
-    @mock.patch("documents.management.commands.document_index.index_reindex")
-    @mock.patch("documents.search._schema._needs_rebuild", return_value=True)
     def test_reindex_if_needed_runs_when_rebuild_needed(
         self,
-        _needs_rebuild,
-        reindex,
+        mocker: MockerFixture,
     ) -> None:
+        mocker.patch(
+            "documents.management.commands.document_index.needs_rebuild",
+            return_value=True,
+        )
+        mock_get_backend = mocker.patch(
+            "documents.management.commands.document_index.get_backend",
+        )
         call_command("document_index", "reindex", if_needed=True, skip_checks=True)
-        reindex.assert_called_once()
+        mock_get_backend.return_value.rebuild.assert_called_once()
 
 
 @pytest.mark.management

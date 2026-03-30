@@ -78,7 +78,7 @@ def build_schema() -> tantivy.Schema:
     return sb.build()
 
 
-def _needs_rebuild(index_dir: Path) -> bool:
+def needs_rebuild(index_dir: Path) -> bool:
     """Check if the search index needs rebuilding by comparing schema version and language sentinel files."""
     version_file = index_dir / ".schema_version"
     if not version_file.exists():
@@ -124,7 +124,7 @@ def open_or_rebuild_index(index_dir: Path | None = None) -> tantivy.Index:
     """
     if index_dir is None:
         index_dir = settings.INDEX_DIR
-    if _needs_rebuild(index_dir):
+    if needs_rebuild(index_dir):
         wipe_index(index_dir)
         idx = tantivy.Index(build_schema(), path=str(index_dir))
         _write_sentinels(index_dir)

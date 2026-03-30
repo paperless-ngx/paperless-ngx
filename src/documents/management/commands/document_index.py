@@ -1,9 +1,16 @@
+import logging
+
 from django.conf import settings
 from django.db import transaction
 
 from documents.management.commands.base import PaperlessCommand
-from documents.tasks import index_optimize
-from documents.tasks import index_reindex
+from documents.models import Document
+from documents.search import get_backend
+from documents.search import needs_rebuild
+from documents.search import reset_backend
+from documents.search import wipe_index
+
+logger = logging.getLogger("paperless.management.document_index")
 
 
 class Command(PaperlessCommand):
@@ -35,21 +42,29 @@ class Command(PaperlessCommand):
     def handle(self, *args, **options):
         with transaction.atomic():
             if options["command"] == "reindex":
-                if options.get("if_needed"):
-                    from documents.search._schema import _needs_rebuild
-
-                    if not _needs_rebuild(settings.INDEX_DIR):
-                        self.stdout.write("Search index is up to date.")
-                        return
+                if options.get("if_needed") and not needs_rebuild(settings.INDEX_DIR):
+                    self.stdout.write("Search index is up to date.")
+                    return
                 if options.get("recreate"):
-                    from documents.search import wipe_index
-
                     wipe_index(settings.INDEX_DIR)
-                index_reindex(
+
+                documents = Document.objects.select_related(
+                    "correspondent",
+                    "document_type",
+                    "storage_path",
+                    "owner",
+                ).prefetch_related("tags", "notes", "custom_fields", "versions")
+                get_backend().rebuild(
+                    documents,
                     iter_wrapper=lambda docs: self.track(
                         docs,
                         description="Indexing documents...",
                     ),
                 )
+                reset_backend()
+
             elif options["command"] == "optimize":
-                index_optimize()
+                logger.info(
+                    "document_index optimize is a no-op — Tantivy manages "
+                    "segment merging automatically.",
+                )

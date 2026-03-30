@@ -88,20 +88,6 @@ def index_optimize() -> None:
     )
 
 
-def index_reindex(*, iter_wrapper: IterWrapper[Document] = _identity) -> None:
-    from documents.search import get_backend
-    from documents.search import reset_backend
-
-    documents = Document.objects.select_related(
-        "correspondent",
-        "document_type",
-        "storage_path",
-        "owner",
-    ).prefetch_related("tags", "notes", "custom_fields", "versions")
-    get_backend().rebuild(documents, iter_wrapper=iter_wrapper)
-    reset_backend()
-
-
 @shared_task
 def train_classifier(
     *,

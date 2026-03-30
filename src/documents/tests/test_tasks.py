@@ -23,29 +23,8 @@ from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 
 
-class TestIndexReindex(DirectoriesMixin, TestCase):
-    def test_index_reindex(self) -> None:
-        Document.objects.create(
-            title="test",
-            content="my document",
-            checksum="wow",
-            added=timezone.now(),
-            created=timezone.now(),
-            modified=timezone.now(),
-        )
-
-        tasks.index_reindex()
-
+class TestIndexOptimize(TestCase):
     def test_index_optimize(self) -> None:
-        Document.objects.create(
-            title="test",
-            content="my document",
-            checksum="wow",
-            added=timezone.now(),
-            created=timezone.now(),
-            modified=timezone.now(),
-        )
-
         tasks.index_optimize()
 
 
