@@ -76,6 +76,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.filters import OrderingFilter
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import GenericAPIView
+from rest_framework.mixins import CreateModelMixin
 from rest_framework.mixins import DestroyModelMixin
 from rest_framework.mixins import ListModelMixin
 from rest_framework.mixins import RetrieveModelMixin
@@ -2702,7 +2703,14 @@ class TasksViewSet(ReadOnlyModelViewSet):
             )
 
 
-class ShareLinkViewSet(ModelViewSet, PassUserMixin):
+class ShareLinkViewSet(
+    PassUserMixin,
+    CreateModelMixin,
+    RetrieveModelMixin,
+    DestroyModelMixin,
+    ListModelMixin,
+    GenericViewSet,
+):
     model = ShareLink
 
     queryset = ShareLink.objects.all()
