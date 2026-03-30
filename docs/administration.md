@@ -459,10 +459,19 @@ document_index {reindex,optimize}
 Specify `reindex` to have the index created from scratch. This may take
 some time.
 
-Specify `optimize` to optimize the index. This updates certain aspects
-of the index and usually makes queries faster and also ensures that the
-autocompletion works properly. This command is regularly invoked by the
+Specify `optimize` to optimize the index. This command is regularly invoked by the
 task scheduler.
+
+!!! note
+
+    The `optimize` subcommand is deprecated and is now a no-op. Tantivy manages
+    segment merging automatically; no manual optimization step is needed.
+
+!!! note
+
+    On first startup after upgrading from a previous version, paperless detects
+    that the index format has changed and automatically performs a one-time full
+    reindex. No manual migration step is required.
 
 ### Clearing the database read cache
 

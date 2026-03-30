@@ -1103,6 +1103,23 @@ should be a valid crontab(5) expression describing when to run.
 
     Defaults to `0 0 * * *` or daily at midnight.
 
+#### [`PAPERLESS_SEARCH_LANGUAGE=<language>`](#PAPERLESS_SEARCH_LANGUAGE) {#PAPERLESS_SEARCH_LANGUAGE}
+
+: Sets the stemmer language for the full-text search index (e.g. `en`, `de`, `fr`).
+Stemming improves recall by matching word variants (e.g. "running" matches "run").
+Changing this setting causes the index to be rebuilt automatically on next startup.
+Supported values are the language names accepted by Tantivy's built-in stemmer.
+
+    Defaults to `""` (no stemming).
+
+#### [`PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD=<float>`](#PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD) {#PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD}
+
+: When set to a float value, approximate/fuzzy matching is applied alongside exact
+matching. Fuzzy results rank below exact matches. A value of `0.5` is a reasonable
+starting point. Leave unset to disable fuzzy matching entirely.
+
+    Defaults to unset (disabled).
+
 #### [`PAPERLESS_SANITY_TASK_CRON=<cron expression>`](#PAPERLESS_SANITY_TASK_CRON) {#PAPERLESS_SANITY_TASK_CRON}
 
 : Configures the scheduled sanity checker frequency. The value should be a

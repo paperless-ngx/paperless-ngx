@@ -839,18 +839,28 @@ Matching inexact words:
 produ*name
 ```
 
-!!! note
+Matching natural date keywords:
 
-    Inexact terms are hard for search indexes. These queries might take a
-    while to execute. That's why paperless offers auto complete and query
-    correction.
+```
+added:today
+modified:yesterday
+created:this_week
+added:last_month
+modified:this_year
+```
+
+Supported date keywords: `today`, `yesterday`, `this_week`, `last_week`,
+`this_month`, `last_month`, `this_year`, `last_year`.
 
 All of these constructs can be combined as you see fit. If you want to
-learn more about the query language used by paperless, paperless uses
-Whoosh's default query language. Head over to [Whoosh query
-language](https://whoosh.readthedocs.io/en/latest/querylang.html). For
-details on what date parsing utilities are available, see [Date
-parsing](https://whoosh.readthedocs.io/en/latest/dates.html#parsing-date-queries).
+learn more about the query language used by paperless, see the
+[Tantivy query language documentation](https://docs.rs/tantivy/latest/tantivy/query/struct.QueryParser.html).
+
+!!! note
+
+    Fuzzy (approximate) matching can be enabled by setting
+    [`PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD`](configuration.md#PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD).
+    When enabled, paperless will include near-miss results ranked below exact matches.
 
 ## Keyboard shortcuts / hotkeys
 
