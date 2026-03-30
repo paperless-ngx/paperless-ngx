@@ -1105,12 +1105,21 @@ should be a valid crontab(5) expression describing when to run.
 
 #### [`PAPERLESS_SEARCH_LANGUAGE=<language>`](#PAPERLESS_SEARCH_LANGUAGE) {#PAPERLESS_SEARCH_LANGUAGE}
 
-: Sets the stemmer language for the full-text search index (e.g. `en`, `de`, `fr`).
+: Sets the stemmer language for the full-text search index.
 Stemming improves recall by matching word variants (e.g. "running" matches "run").
 Changing this setting causes the index to be rebuilt automatically on next startup.
-Supported values are the language names accepted by Tantivy's built-in stemmer.
+An invalid value raises an error at startup.
 
-    Defaults to `""` (no stemming).
+: Use the ISO 639-1 two-letter code (e.g. `en`, `de`, `fr`). Lowercase full names
+(e.g. `english`, `german`, `french`) are also accepted. The capitalized names shown
+in the [Tantivy Language enum](https://docs.rs/tantivy/latest/tantivy/tokenizer/enum.Language.html)
+documentation are **not** valid — use the lowercase equivalent.
+
+: If not set, paperless infers the language from
+[`PAPERLESS_OCR_LANGUAGE`](#PAPERLESS_OCR_LANGUAGE). If the OCR language has no
+Tantivy stemmer equivalent, stemming is disabled.
+
+    Defaults to unset (inferred from `PAPERLESS_OCR_LANGUAGE`).
 
 #### [`PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD=<float>`](#PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD) {#PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD}
 

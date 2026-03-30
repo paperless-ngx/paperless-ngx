@@ -94,7 +94,7 @@ def _needs_rebuild(index_dir: Path) -> bool:
     if not language_file.exists():
         logger.info("Search index language sentinel missing - rebuilding.")
         return True
-    if language_file.read_text().strip() != settings.SEARCH_LANGUAGE:
+    if language_file.read_text().strip() != (settings.SEARCH_LANGUAGE or ""):
         logger.info("Search index language changed - rebuilding.")
         return True
 
@@ -113,7 +113,7 @@ def wipe_index(index_dir: Path) -> None:
 def _write_sentinels(index_dir: Path) -> None:
     """Write schema version and language sentinel files so the next index open can skip rebuilding."""
     (index_dir / ".schema_version").write_text(str(SCHEMA_VERSION))
-    (index_dir / ".schema_language").write_text(settings.SEARCH_LANGUAGE)
+    (index_dir / ".schema_language").write_text(settings.SEARCH_LANGUAGE or "")
 
 
 def open_or_rebuild_index(index_dir: Path | None = None) -> tantivy.Index:

@@ -49,7 +49,7 @@ _LANGUAGE_MAP: dict[str, str] = {
 SUPPORTED_LANGUAGES: frozenset[str] = frozenset(_LANGUAGE_MAP)
 
 
-def register_tokenizers(index: tantivy.Index, language: str) -> None:
+def register_tokenizers(index: tantivy.Index, language: str | None) -> None:
     """
     Register all custom tokenizers on *index*. Must be called on every Index
     instance — tantivy requires re-registration at each open.
@@ -66,7 +66,7 @@ def register_tokenizers(index: tantivy.Index, language: str) -> None:
     index.register_fast_field_tokenizer("simple_analyzer", _simple_analyzer())
 
 
-def _paperless_text(language: str) -> tantivy.TextAnalyzer:
+def _paperless_text(language: str | None) -> tantivy.TextAnalyzer:
     """Main full-text tokenizer for content, title, etc: simple -> remove_long(65) -> lowercase -> ascii_fold [-> stemmer]"""
     builder = (
         tantivy.TextAnalyzerBuilder(tantivy.Tokenizer.simple())

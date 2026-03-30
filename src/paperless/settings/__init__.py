@@ -21,6 +21,7 @@ from paperless.settings.custom import parse_hosting_settings
 from paperless.settings.custom import parse_ignore_dates
 from paperless.settings.custom import parse_redis_url
 from paperless.settings.parsers import get_bool_from_env
+from paperless.settings.parsers import get_choice_from_env
 from paperless.settings.parsers import get_float_from_env
 from paperless.settings.parsers import get_int_from_env
 from paperless.settings.parsers import get_list_from_env
@@ -85,8 +86,6 @@ EMPTY_TRASH_DIR = (
 # threads.
 MEDIA_LOCK = MEDIA_ROOT / "media.lock"
 INDEX_DIR = DATA_DIR / "index"
-
-SEARCH_LANGUAGE: str = os.getenv("PAPERLESS_SEARCH_LANGUAGE", "")
 
 ADVANCED_FUZZY_SEARCH_THRESHOLD: float | None = get_float_from_env(
     "PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD",
@@ -1040,9 +1039,54 @@ def _get_nltk_language_setting(ocr_lang: str) -> str | None:
     return iso_code_to_nltk.get(ocr_lang)
 
 
+def _get_search_language_setting(ocr_lang: str) -> str | None:
+    """
+    Determine the Tantivy stemmer language.
+
+    If PAPERLESS_SEARCH_LANGUAGE is explicitly set, it is validated against
+    the languages supported by Tantivy's built-in stemmer and returned as-is.
+    Otherwise the primary Tesseract language code from PAPERLESS_OCR_LANGUAGE
+    is mapped to the corresponding ISO 639-1 code understood by Tantivy.
+    Returns None when unset and the OCR language has no Tantivy stemmer.
+    """
+    explicit = os.environ.get("PAPERLESS_SEARCH_LANGUAGE")
+    if explicit is not None:
+        # Lazy import avoids any app-loading order concerns; _tokenizer has no
+        # Django dependencies so this is safe.
+        from documents.search._tokenizer import SUPPORTED_LANGUAGES
+
+        return get_choice_from_env("PAPERLESS_SEARCH_LANGUAGE", SUPPORTED_LANGUAGES)
+
+    # Infer from the primary Tesseract language code (ISO 639-2/T → ISO 639-1)
+    primary = ocr_lang.split("+", maxsplit=1)[0].lower()
+    _ocr_to_search: dict[str, str] = {
+        "ara": "ar",
+        "dan": "da",
+        "nld": "nl",
+        "eng": "en",
+        "fin": "fi",
+        "fra": "fr",
+        "deu": "de",
+        "ell": "el",
+        "hun": "hu",
+        "ita": "it",
+        "nor": "no",
+        "por": "pt",
+        "ron": "ro",
+        "rus": "ru",
+        "spa": "es",
+        "swe": "sv",
+        "tam": "ta",
+        "tur": "tr",
+    }
+    return _ocr_to_search.get(primary)
+
+
 NLTK_ENABLED: Final[bool] = get_bool_from_env("PAPERLESS_ENABLE_NLTK", "yes")
 
 NLTK_LANGUAGE: str | None = _get_nltk_language_setting(OCR_LANGUAGE)
+
+SEARCH_LANGUAGE: str | None = _get_search_language_setting(OCR_LANGUAGE)
 
 ###############################################################################
 # Email Preprocessors                                                         #
