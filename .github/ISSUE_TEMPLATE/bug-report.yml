@@ -121,7 +121,5 @@ body:
           required: true
         - label: I have already searched for relevant existing issues and discussions before opening this report.
           required: true
-        - label: I have reproduced this issue with all third-party parser plugins removed. I understand that issues caused by third-party plugins will be closed without investigation.
-          required: true
         - label: I have updated the title field above with a concise description.
           required: true

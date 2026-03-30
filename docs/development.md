@@ -433,15 +433,16 @@ def supported_mime_types(cls) -> dict[str, str]:
 **Scoring**
 
 When more than one parser can handle a file, the registry calls `score()` on
-each candidate and picks the one with the highest result. Return `None` to
+each candidate and picks the one with the highest result and equal scores favor third-party parsers over built-ins.. Return `None` to
 decline handling a file even though the MIME type is listed as supported (for
 example, when a required external service is not configured).
 
-| Score  | Meaning                                           |
-| ------ | ------------------------------------------------- |
-| `None` | Decline — do not handle this file                 |
-| `10`   | Default priority used by all built-in parsers     |
-| `> 10` | Override a built-in parser for the same MIME type |
+| Score  | Meaning                                                                           |
+| ------ | --------------------------------------------------------------------------------- |
+| `None` | Decline — do not handle this file                                                 |
+| `10`   | Default priority used by all built-in parsers                                     |
+| `20`   | Priority used by the remote OCR built-in parser, allowing it to replace Tesseract |
+| `> 10` | Override a built-in parser for the same MIME type                                 |
 
 ```python
 @classmethod
@@ -562,6 +563,11 @@ def get_date(self) -> "datetime.datetime | None":
 
 def get_archive_path(self) -> Path | None:
     return self._archive_path
+
+def get_page_count(self, document_path: Path, mime_type: str) -> int | None:
+    # If the format doesn't have the concept of pages, return None
+    return count_pages(document_path)
+
 ```
 
 **Thumbnail**
@@ -584,8 +590,6 @@ Implement them if your format supports the information; otherwise return
 `None` / `[]`.
 
 ```python
-def get_page_count(self, document_path: Path, mime_type: str) -> int | None:
-    return count_pages(document_path)
 
 def extract_metadata(
     self,
