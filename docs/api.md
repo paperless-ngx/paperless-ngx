@@ -167,8 +167,8 @@ Query parameters:
 - `term`: The incomplete term.
 - `limit`: Amount of results. Defaults to 10.
 
-Results are ordered alphabetically by prefix match. The first result is
-the lexicographically first word in the index that starts with the given term.
+Results are ordered by how many of the user's visible documents contain
+each matching word. The first result is the word that appears in the most documents.
 
 ```json
 ["term1", "term3", "term6", "term4"]

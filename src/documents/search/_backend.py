@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import bisect
 import logging
 import threading
 import unicodedata
+from collections import Counter
 from dataclasses import dataclass
 from datetime import UTC
 from datetime import datetime
@@ -524,8 +524,11 @@ class TantivyBackend:
 
         results = searcher.search(base_query, limit=10000)
 
-        # Collect all autocomplete words
-        words = set()
+        # Count how many visible documents each word appears in.
+        # Using Counter (not set) preserves per-word document frequency so
+        # we can rank suggestions by how commonly they occur — the same
+        # signal Whoosh used for Tf/Idf-based autocomplete ordering.
+        word_counts: Counter[str] = Counter()
         for hit in results.hits:
             # hits are (score, doc_address) tuples
             doc_address = hit[1] if len(hit) == 2 else hit[0]
@@ -533,27 +536,16 @@ class TantivyBackend:
             stored_doc = searcher.doc(doc_address)
             doc_dict = stored_doc.to_dict()
             if "autocomplete_word" in doc_dict:
-                for word in doc_dict["autocomplete_word"]:
-                    words.add(word)
+                word_counts.update(doc_dict["autocomplete_word"])
 
-        # Sort and find matches
-        sorted_words = sorted(words)
+        # Filter to prefix matches, then sort by document frequency descending
+        # so the most-used matching word comes first.
+        matches = sorted(
+            (w for w in word_counts if w.startswith(normalized_term)),
+            key=lambda w: -word_counts[w],
+        )
 
-        # Use binary search to find starting position
-        start_idx = bisect.bisect_left(sorted_words, normalized_term)
-
-        # Collect matching words
-        matches = []
-        for i in range(start_idx, len(sorted_words)):
-            word = sorted_words[i]
-            if word.startswith(normalized_term):
-                matches.append(word)
-                if len(matches) >= limit:
-                    break
-            else:
-                break
-
-        return matches
+        return matches[:limit]
 
     def more_like_this(
         self,

@@ -137,6 +137,30 @@ class TestAutocomplete:
         results = backend.autocomplete("micro", limit=10)
         assert "microsoft" in results
 
+    def test_results_ordered_by_document_frequency(self, backend: TantivyBackend):
+        """Most-used prefix match should rank first."""
+        # "payment" appears in 3 docs; "payslip" in 1 — "pay" prefix should
+        # return "payment" before "payslip".
+        for i, (title, checksum) in enumerate(
+            [
+                ("payment invoice", "AF1"),
+                ("payment receipt", "AF2"),
+                ("payment confirmation", "AF3"),
+                ("payslip march", "AF4"),
+            ],
+            start=41,
+        ):
+            doc = Document.objects.create(
+                title=title,
+                content="details",
+                checksum=checksum,
+                pk=i,
+            )
+            backend.add_or_update(doc)
+
+        results = backend.autocomplete("pay", limit=10)
+        assert results.index("payment") < results.index("payslip")
+
 
 class TestMoreLikeThis:
     """Test more like this functionality."""
