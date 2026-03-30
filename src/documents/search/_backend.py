@@ -144,14 +144,10 @@ class WriteBatch:
     def __exit__(self, exc_type, exc_val, exc_tb):
         try:
             if exc_type is None:
-                # Success case - commit changes
                 self._writer.commit()
                 self._backend._index.reload()
-            else:
-                # Exception occurred - discard changes
-                # Writer is automatically discarded when it goes out of scope
-                pass
-            # Explicitly delete writer to release tantivy's internal lock
+            # Explicitly delete writer to release tantivy's internal lock.
+            # On exception the uncommitted writer is simply discarded.
             if self._writer is not None:
                 del self._writer
                 self._writer = None
@@ -264,10 +260,12 @@ class TantivyBackend:
             doc.add_text("storage_path", document.storage_path.name)
             doc.add_unsigned("storage_path_id", document.storage_path_id)
 
-        # Tags
+        # Tags — collect names for autocomplete in the same pass
+        tag_names: list[str] = []
         for tag in document.tags.all():
             doc.add_text("tag", tag.name)
             doc.add_unsigned("tag_id", tag.pk)
+            tag_names.append(tag.name)
 
         # Notes — JSON for structured queries (notes.user:alice, notes.note:text),
         # companion text field for default full-text search.
@@ -290,7 +288,7 @@ class TantivyBackend:
             )
             doc.add_text("custom_field", str(cfi.value))
 
-        # Dates - created is date-only, others are full datetime
+        # Dates
         created_date = datetime(
             document.created.year,
             document.created.month,
@@ -301,15 +299,12 @@ class TantivyBackend:
         doc.add_date("modified", document.modified)
         doc.add_date("added", document.added)
 
-        # ASN - skip entirely when None (0 is valid)
         if document.archive_serial_number is not None:
             doc.add_unsigned("asn", document.archive_serial_number)
 
-        # Page count - only add if not None
         if document.page_count is not None:
             doc.add_unsigned("page_count", document.page_count)
 
-        # Number of notes
         doc.add_unsigned("num_notes", document.notes.count())
 
         # Owner
@@ -324,19 +319,15 @@ class TantivyBackend:
         for user in users_with_perms:
             doc.add_unsigned("viewer_id", user.pk)
 
-        # Autocomplete words with NLTK stopword filtering
+        # Autocomplete words
         text_sources = [document.title, content]
         if document.correspondent:
             text_sources.append(document.correspondent.name)
         if document.document_type:
             text_sources.append(document.document_type.name)
-        for tag in document.tags.all():
-            text_sources.append(tag.name)
+        text_sources.extend(tag_names)
 
-        autocomplete_words = _extract_autocomplete_words(text_sources)
-
-        # Add sorted deduplicated words
-        for word in sorted(autocomplete_words):
+        for word in sorted(_extract_autocomplete_words(text_sources)):
             doc.add_text("autocomplete_word", word)
 
         return doc
@@ -404,43 +395,32 @@ class TantivyBackend:
         if sort_field and sort_field in sort_field_map:
             mapped_field = sort_field_map[sort_field]
             if sort_reverse:
-                # For reverse sort, we need to use a different approach
-                # tantivy doesn't directly support reverse field sorting in the Python API
-                # We'll search for more results and sort in Python
+                # tantivy-py doesn't support reverse field sorting;
+                # fetch extra results and let Python slice handle ordering
                 results = searcher.search(final_query, limit=offset + page_size * 10)
-                # For field sorting: just DocAddress (no score)
-                all_hits = [
-                    (hit, 0.0) for hit in results.hits
-                ]  # score is 0 for field sorts
             else:
                 results = searcher.search(
                     final_query,
                     limit=offset + page_size,
                     order_by_field=mapped_field,
                 )
-                # For field sorting: just DocAddress (no score)
-                all_hits = [
-                    (hit, 0.0) for hit in results.hits
-                ]  # score is 0 for field sorts
+            # Field sorting: hits are bare DocAddress (no score)
+            all_hits = [(hit, 0.0) for hit in results.hits]
         else:
-            # Score-based search returns: (score, doc_address) tuple
+            # Score-based search: hits are (score, doc_address) tuples
             results = searcher.search(final_query, limit=offset + page_size)
-            # Convert to (doc_address, score) for consistency
             all_hits = [(hit[1], hit[0]) for hit in results.hits]
 
         total = results.count
 
         # Normalize scores for score-based searches
         if not sort_field and all_hits:
-            scores = [hit[1] for hit in all_hits]
-            max_score = max(scores) if scores else 1.0
+            max_score = max(hit[1] for hit in all_hits) or 1.0
             all_hits = [(hit[0], hit[1] / max_score) for hit in all_hits]
 
-        # Apply threshold filter if configured
+        # Apply threshold filter if configured (score-based search only)
         threshold = getattr(settings, "ADVANCED_FUZZY_SEARCH_THRESHOLD", None)
-        if (
-            threshold is not None and not sort_field
-        ):  # Only apply threshold to score-based search
+        if threshold is not None and not sort_field:
             all_hits = [hit for hit in all_hits if hit[1] >= threshold]
 
         # Get the page's hits
@@ -485,8 +465,8 @@ class TantivyBackend:
                         if notes_snippet:
                             highlights["notes"] = str(notes_snippet)
 
-                except Exception as e:
-                    logger.debug(f"Failed to generate highlights for doc {doc_id}: {e}")
+                except Exception:
+                    logger.debug("Failed to generate highlights for doc %s", doc_id)
 
             hits.append(
                 SearchHit(
@@ -529,10 +509,7 @@ class TantivyBackend:
         # we can rank suggestions by how commonly they occur — the same
         # signal Whoosh used for Tf/Idf-based autocomplete ordering.
         word_counts: Counter[str] = Counter()
-        for hit in results.hits:
-            # hits are (score, doc_address) tuples
-            doc_address = hit[1] if len(hit) == 2 else hit[0]
-
+        for _score, doc_address in results.hits:
             stored_doc = searcher.doc(doc_address)
             doc_dict = stored_doc.to_dict()
             if "autocomplete_word" in doc_dict:
@@ -648,8 +625,6 @@ class TantivyBackend:
 
     def rebuild(self, documents: QuerySet, iter_wrapper: Callable = _identity) -> None:
         """Rebuild the entire search index."""
-        from documents.search._tokenizer import register_tokenizers
-
         # Create new index (on-disk or in-memory)
         if self._path is not None:
             wipe_index(self._path)
@@ -659,30 +634,23 @@ class TantivyBackend:
             new_index = tantivy.Index(build_schema())
         register_tokenizers(new_index, settings.SEARCH_LANGUAGE)
 
-        # Index all documents using the new index
-        writer = new_index.writer()
-
-        for document in iter_wrapper(documents):
-            # Temporarily use new index for document building
-            old_index = self._index
-            old_schema = self._schema
-            self._index = new_index
-            self._schema = new_index.schema
-
-            try:
-                doc = self._build_tantivy_doc(document)
-                writer.add_document(doc)
-            finally:
-                # Restore old index
-                self._index = old_index
-                self._schema = old_schema
-
-        writer.commit()
-
-        # Swap to new index
+        # Point instance at the new index so _build_tantivy_doc uses it
+        old_index, old_schema = self._index, self._schema
         self._index = new_index
         self._schema = new_index.schema
-        self._index.reload()
+
+        try:
+            writer = new_index.writer()
+            for document in iter_wrapper(documents):
+                doc = self._build_tantivy_doc(document)
+                writer.add_document(doc)
+            writer.commit()
+            new_index.reload()
+        except BaseException:
+            # Restore old index on failure so the backend remains usable
+            self._index = old_index
+            self._schema = old_schema
+            raise
 
 
 # Module-level singleton with proper thread safety

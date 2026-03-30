@@ -83,8 +83,7 @@ def _identity(iterable: Iterable[_T]) -> Iterable[_T]:
 @shared_task
 def index_optimize() -> None:
     logger.info(
-        "document_index optimize is deprecated — Tantivy manages "
-        "segment merging automatically.",
+        "index_optimize is a no-op — Tantivy manages segment merging automatically.",
     )
 
 
