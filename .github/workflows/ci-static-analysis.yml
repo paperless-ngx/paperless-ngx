@@ -14,7 +14,7 @@ permissions:
   contents: read
 jobs:
   zizmor:
-    name: GitHub Actions Security Analysis
+    name: Run zizmor
     runs-on: ubuntu-24.04
     permissions:
       contents: read
