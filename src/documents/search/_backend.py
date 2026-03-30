@@ -269,7 +269,9 @@ class TantivyBackend:
 
         # Notes — JSON for structured queries (notes.user:alice, notes.note:text),
         # companion text field for default full-text search.
+        num_notes = 0
         for note in document.notes.all():
+            num_notes += 1
             note_data: dict[str, str] = {"note": note.note}
             if note.user:
                 note_data["user"] = note.user.username
@@ -305,7 +307,7 @@ class TantivyBackend:
         if document.page_count is not None:
             doc.add_unsigned("page_count", document.page_count)
 
-        doc.add_unsigned("num_notes", document.notes.count())
+        doc.add_unsigned("num_notes", num_notes)
 
         # Owner
         if document.owner_id:
