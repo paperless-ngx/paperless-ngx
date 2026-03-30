@@ -161,6 +161,7 @@ def open_or_rebuild_index(index_dir: Path | None = None) -> tantivy.Index:
     """
     if index_dir is None:
         index_dir = settings.INDEX_DIR
+    index_dir.mkdir(parents=True, exist_ok=True)
     if needs_rebuild(index_dir):
         wipe_index(index_dir)
         idx = tantivy.Index(build_schema(), path=str(index_dir))

@@ -11,10 +11,12 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.serialisers import TagSerializer
 from documents.signals.handlers import run_workflows
+from documents.tests.utils import DirectoriesMixin
 
 
-class TestTagHierarchy(APITestCase):
+class TestTagHierarchy(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
+        super().setUp()
         self.user = User.objects.create_superuser(username="admin")
         self.client.force_authenticate(user=self.user)
 

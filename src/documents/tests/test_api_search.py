@@ -768,8 +768,8 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             checksum="C",
         )
         d4 = Document.objects.create(
-            title="Monty Python & the Holy Grail",
-            content="And now for something completely different",
+            title="Quarterly Report",
+            content="quarterly revenue profit margin earnings growth",
             pk=4,
             checksum="ABC",
         )
