@@ -13,6 +13,7 @@ from typing import TypedDict
 from typing import TypeVar
 
 import filelock
+import regex
 import tantivy
 from django.conf import settings
 from django.utils.timezone import get_current_timezone
@@ -37,6 +38,9 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("paperless.search")
 
+_WORD_RE = regex.compile(r"\w+")
+_AUTOCOMPLETE_REGEX_TIMEOUT = 1.0  # seconds; guards against ReDoS on untrusted content
+
 T = TypeVar("T")
 
 
@@ -51,89 +55,27 @@ def _ascii_fold(s: str) -> str:
 
 
 def _extract_autocomplete_words(text_sources: list[str]) -> set[str]:
-    """Extract and normalize words for autocomplete, filtering stopwords."""
+    """Extract and normalize words for autocomplete.
+
+    Splits on non-word characters (matching Tantivy's simple tokenizer), lowercases,
+    and ascii-folds each token. Uses the regex library with a timeout to guard against
+    ReDoS on untrusted document content.
+    """
     words = set()
-
-    # Use NLTK if enabled
-    if settings.NLTK_ENABLED and settings.NLTK_LANGUAGE:
+    for text in text_sources:
+        if not text:
+            continue
         try:
-            import nltk
-            from nltk.corpus import stopwords
-            from nltk.tokenize import word_tokenize
-
-            # Set NLTK data path
-            nltk.data.path = [settings.NLTK_DIR]
-
-            # Get stopwords for the configured language
-            try:
-                stopwords.ensure_loaded()
-                stop_words = frozenset(stopwords.words(settings.NLTK_LANGUAGE))
-            except (AttributeError, OSError) as e:
-                logger.debug(f"Could not load NLTK stopwords: {e}")
-                stop_words = frozenset()
-
-            for text in text_sources:
-                if text:
-                    try:
-                        tokens = word_tokenize(
-                            text.lower(),
-                            language=settings.NLTK_LANGUAGE,
-                        )
-                        for token in tokens:
-                            if (
-                                token.isalpha()
-                                and len(token) > 2
-                                and token not in stop_words
-                            ):
-                                normalized = _ascii_fold(token)
-                                if normalized:
-                                    words.add(normalized)
-                    except Exception as e:
-                        logger.debug(f"NLTK tokenization failed: {e}")
-                        # Fallback to regex
-                        import re
-
-                        tokens = re.findall(r"\b[a-zA-Z]{3,}\b", text)
-                        for token in tokens:
-                            normalized = _ascii_fold(token.lower())
-                            if normalized and normalized not in stop_words:
-                                words.add(normalized)
-
-        except ImportError:
-            logger.debug("NLTK not available, using fallback tokenization")
-            # Fall through to basic tokenization
-        except Exception as e:
-            logger.debug(f"NLTK initialization failed: {e}")
-            # Fall through to basic tokenization
-
-    # Fallback tokenization when NLTK is disabled or unavailable
-    if not words:  # Only use fallback if NLTK didn't produce results
-        import re
-
-        basic_stopwords = {
-            "the",
-            "a",
-            "an",
-            "and",
-            "or",
-            "but",
-            "in",
-            "on",
-            "at",
-            "to",
-            "for",
-            "of",
-            "with",
-            "by",
-        }
-        for text in text_sources:
-            if text:
-                tokens = re.findall(r"\b[a-zA-Z]{3,}\b", text)
-                for token in tokens:
-                    normalized = _ascii_fold(token.lower())
-                    if normalized and normalized not in basic_stopwords:
-                        words.add(normalized)
-
+            tokens = _WORD_RE.findall(text, timeout=_AUTOCOMPLETE_REGEX_TIMEOUT)
+        except regex.TimeoutError:
+            logger.warning(
+                "Autocomplete word extraction timed out for a text source; skipping.",
+            )
+            continue
+        for token in tokens:
+            normalized = _ascii_fold(token.lower())
+            if normalized:
+                words.add(normalized)
     return words
 
 
