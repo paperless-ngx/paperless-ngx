@@ -291,9 +291,6 @@ def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
     return _FIELD_DATE_RE.sub(_replace, query)
 
 
-# ── normalize_query ──────────────────────────────────────────────────────────
-
-
 def normalize_query(query: str) -> str:
     """
     Join comma-separated field values with AND, collapse whitespace.
@@ -308,8 +305,6 @@ def normalize_query(query: str) -> str:
     query = re.sub(r"(\w+):([^\s\[\]]+(?:,[^\s\[\]]+)+)", _expand, query)
     return re.sub(r" {2,}", " ", query).strip()
 
-
-# ── build_permission_filter ──────────────────────────────────────────────────
 
 _MAX_U64 = 2**64 - 1  # u64 max — used as inclusive upper bound for "any owner" range
 
@@ -367,8 +362,6 @@ def build_permission_filter(
     )
     return tantivy.Query.disjunction_max_query([no_owner, owned, shared])
 
-
-# ── parse_user_query (full pipeline) ─────────────────────────────────────────
 
 DEFAULT_SEARCH_FIELDS = [
     "title",
