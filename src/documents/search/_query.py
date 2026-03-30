@@ -303,19 +303,24 @@ DEFAULT_SEARCH_FIELDS = [
     "correspondent",
     "document_type",
     "tag",
-    "notes",
-    "custom_fields",
+    "note",  # companion text field for notes content (notes JSON for structured: notes.user:x)
+    "custom_field",  # companion text field for CF values (custom_fields JSON for structured: custom_fields.name:x)
 ]
 _FIELD_BOOSTS = {"title": 2.0}
 
 
 def parse_user_query(
     index: tantivy.Index,
-    schema: tantivy.Schema,
     raw_query: str,
     tz: tzinfo,
 ) -> tantivy.Query:
-    """Run the full query preprocessing pipeline: date rewriting → normalisation → Tantivy parse. Adds fuzzy blend if ADVANCED_FUZZY_SEARCH_THRESHOLD is set."""
+    """Run the full query preprocessing pipeline: date rewriting → normalisation → Tantivy parse.
+
+    When ADVANCED_FUZZY_SEARCH_THRESHOLD is set (any float), a fuzzy query is blended in as a
+    Should clause boosted at 0.1 — keeping fuzzy hits ranked below exact matches. The fuzzy
+    query uses edit-distance=1, prefix=True, transposition_cost_one=True on all search fields.
+    The threshold float is a post-search minimum-score filter applied in the backend layer, not here.
+    """
 
     query_str = rewrite_natural_date_keywords(raw_query, tz)
     query_str = normalize_query(query_str)
@@ -332,11 +337,13 @@ def parse_user_query(
             query_str,
             DEFAULT_SEARCH_FIELDS,
             field_boosts=_FIELD_BOOSTS,
+            # (prefix=True, distance=1, transposition_cost_one=True) — edit-distance fuzziness
             fuzzy_fields={f: (True, 1, True) for f in DEFAULT_SEARCH_FIELDS},
         )
         return tantivy.Query.boolean_query(
             [
                 (tantivy.Occur.Should, exact),
+                # 0.1 boost keeps fuzzy hits ranked below exact matches (intentional)
                 (tantivy.Occur.Should, tantivy.Query.boost_query(fuzzy, 0.1)),
             ],
         )

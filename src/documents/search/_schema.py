@@ -48,8 +48,16 @@ def build_schema() -> tantivy.Schema:
     sb.add_text_field("autocomplete_word", stored=True, tokenizer_name="raw")
 
     sb.add_text_field("tag", stored=True, tokenizer_name="paperless_text")
+
+    # JSON fields — structured queries: notes.user:alice, custom_fields.name:invoice
+    # tantivy-py 0.25 does not support dotted paths in parse_query default_field_names,
+    # so companion text fields (note, custom_field) carry content for default full-text search.
     sb.add_json_field("notes", stored=True, tokenizer_name="paperless_text")
     sb.add_json_field("custom_fields", stored=True, tokenizer_name="paperless_text")
+
+    # Companion text fields for default full-text search (not stored — no extra disk cost)
+    sb.add_text_field("note", stored=False, tokenizer_name="paperless_text")
+    sb.add_text_field("custom_field", stored=False, tokenizer_name="paperless_text")
 
     for field in (
         "correspondent_id",
