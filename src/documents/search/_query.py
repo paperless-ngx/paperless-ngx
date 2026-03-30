@@ -273,9 +273,24 @@ def _rewrite_8digit_date(query: str, tz: tzinfo) -> str:
 
 def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
     """
-    Preprocessing stage 1: rewrite Whoosh compact dates, relative ranges,
-    and natural date keywords (field:today etc.) to ISO 8601.
-    Bare keywords without a field: prefix pass through unchanged.
+    Rewrite natural date syntax to ISO 8601 format for Tantivy compatibility.
+
+    Performs the first stage of query preprocessing, converting various date
+    formats and keywords to ISO 8601 datetime ranges that Tantivy can parse:
+    - Compact 14-digit dates (YYYYMMDDHHmmss)
+    - Whoosh relative ranges ([-7 days to now], [now-1h TO now+2h])
+    - 8-digit dates with field awareness (created:20240115)
+    - Natural keywords (field:today, field:last_week, etc.)
+
+    Args:
+        query: Raw user query string
+        tz: Timezone for converting local date boundaries to UTC
+
+    Returns:
+        Query with date syntax rewritten to ISO 8601 ranges
+
+    Note:
+        Bare keywords without field prefixes pass through unchanged.
     """
     query = _rewrite_compact_date(query)
     query = _rewrite_whoosh_relative_range(query)
@@ -293,8 +308,18 @@ def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
 
 def normalize_query(query: str) -> str:
     """
-    Join comma-separated field values with AND, collapse whitespace.
-    tag:foo,bar → tag:foo AND tag:bar
+    Normalize query syntax for better search behavior.
+
+    Expands comma-separated field values to explicit AND clauses and
+    collapses excessive whitespace for cleaner parsing:
+    - tag:foo,bar → tag:foo AND tag:bar
+    - multiple spaces → single spaces
+
+    Args:
+        query: Query string after date rewriting
+
+    Returns:
+        Normalized query string ready for Tantivy parsing
     """
 
     def _expand(m: re.Match[str]) -> str:
@@ -314,24 +339,27 @@ def build_permission_filter(
     user: AbstractBaseUser,
 ) -> tantivy.Query:
     """
-    Returns a Query matching documents visible to user:
-    - no owner (public)      → owner_id field absent (NULL in Django)
-    - owned by user          → owner_id = user.pk
-    - shared with user       → viewer_id = user.pk
+    Build a query filter for user document permissions.
 
-    Uses disjunction_max_query — boolean Should-only would match all docs.
+    Creates a query that matches only documents visible to the specified user
+    according to paperless-ngx permission rules:
+    - Public documents (no owner) are visible to all users
+    - Private documents are visible to their owner
+    - Documents explicitly shared with the user are visible
 
-    NOTE: all integer queries use range_query, not term_query, to avoid the
-    unsigned type-detection bug in tantivy-py 0.25 (lib.rs#L190 infers i64
-    before u64; confirmed empirically — term_query returns 0 for u64 fields).
-    Same root cause as issue #47 (from_dict) but the term_query path unfixed.
-    See: https://github.com/quickwit-oss/tantivy-py/blob/f51d851e857385ad2907241fbce8cf08309c3078/src/lib.rs#L190
-         https://github.com/quickwit-oss/tantivy-py/issues/47
+    Args:
+        schema: Tantivy schema for field validation
+        user: User to check permissions for
 
-    NOTE: no_owner uses boolean_query([Must(all), MustNot(range)]) because
-    exists_query is not available in 0.25.1. It is present in master and can
-    simplify this to MustNot(exists_query("owner_id")) once released.
-    See: https://github.com/quickwit-oss/tantivy-py/blob/master/tantivy/tantivy.pyi
+    Returns:
+        Tantivy query that filters results to visible documents
+
+    Implementation Notes:
+        - Uses range_query instead of term_query to work around unsigned integer
+          type detection bug in tantivy-py 0.25
+        - Uses boolean_query for "no owner" check since exists_query is not
+          available in tantivy-py 0.25.1 (available in master)
+        - Uses disjunction_max_query to combine permission clauses with OR logic
     """
     owner_any = tantivy.Query.range_query(
         schema,
@@ -380,12 +408,28 @@ def parse_user_query(
     raw_query: str,
     tz: tzinfo,
 ) -> tantivy.Query:
-    """Run the full query preprocessing pipeline: date rewriting → normalisation → Tantivy parse.
+    """
+    Parse user query through the complete preprocessing pipeline.
 
-    When ADVANCED_FUZZY_SEARCH_THRESHOLD is set (any float), a fuzzy query is blended in as a
-    Should clause boosted at 0.1 — keeping fuzzy hits ranked below exact matches. The fuzzy
-    query uses edit-distance=1, prefix=True, transposition_cost_one=True on all search fields.
-    The threshold float is a post-search minimum-score filter applied in the backend layer, not here.
+    Transforms the raw user query through multiple stages:
+    1. Date keyword rewriting (today → ISO 8601 ranges)
+    2. Query normalization (comma expansion, whitespace cleanup)
+    3. Tantivy parsing with field boosts
+    4. Optional fuzzy query blending (if ADVANCED_FUZZY_SEARCH_THRESHOLD set)
+
+    Args:
+        index: Tantivy index with registered tokenizers
+        raw_query: Original user query string
+        tz: Timezone for date boundary calculations
+
+    Returns:
+        Parsed Tantivy query ready for execution
+
+    Note:
+        When ADVANCED_FUZZY_SEARCH_THRESHOLD is configured, adds a low-priority
+        fuzzy query as a Should clause (0.1 boost) to catch approximate matches
+        while keeping exact matches ranked higher. The threshold value is applied
+        as a post-search score filter, not during query construction.
     """
 
     query_str = rewrite_natural_date_keywords(raw_query, tz)

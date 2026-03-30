@@ -45,7 +45,7 @@ class TestTokenizers:
         self,
         content_index: tantivy.Index,
     ) -> None:
-        """paperless_text normalises diacritics so café is findable as cafe."""
+        """ASCII folding allows searching accented text with plain ASCII queries."""
         writer = content_index.writer()
         doc = tantivy.Document()
         doc.add_text("content", "café résumé")
@@ -56,7 +56,7 @@ class TestTokenizers:
         assert content_index.searcher().search(q, limit=5).count == 1
 
     def test_bigram_finds_cjk_substring(self, bigram_index: tantivy.Index) -> None:
-        """bigram_analyzer makes CJK substrings searchable without whitespace."""
+        """Bigram tokenizer enables substring search in CJK languages without whitespace delimiters."""
         writer = bigram_index.writer()
         doc = tantivy.Document()
         doc.add_text("bigram_content", "東京都")
@@ -67,6 +67,7 @@ class TestTokenizers:
         assert bigram_index.searcher().search(q, limit=5).count == 1
 
     def test_unsupported_language_logs_warning(self, caplog: LogCaptureFixture) -> None:
+        """Unsupported language codes should log a warning and disable stemming gracefully."""
         sb = tantivy.SchemaBuilder()
         sb.add_text_field("content", stored=True, tokenizer_name="paperless_text")
         schema = sb.build()

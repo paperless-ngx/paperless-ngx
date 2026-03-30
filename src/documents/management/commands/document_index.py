@@ -14,6 +14,13 @@ logger = logging.getLogger("paperless.management.document_index")
 
 
 class Command(PaperlessCommand):
+    """
+    Django management command for search index operations.
+
+    Provides subcommands for reindexing documents and optimizing the search index.
+    Supports conditional reindexing based on schema version and language changes.
+    """
+
     help = "Manages the document index."
 
     supports_progress_bar = True

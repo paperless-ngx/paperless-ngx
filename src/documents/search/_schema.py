@@ -16,7 +16,16 @@ SCHEMA_VERSION = 1
 
 
 def build_schema() -> tantivy.Schema:
-    """Build the Tantivy schema for the paperless document index."""
+    """
+    Build the Tantivy schema for the paperless document index.
+
+    Creates a comprehensive schema supporting full-text search, filtering,
+    sorting, and autocomplete functionality. Includes fields for document
+    content, metadata, permissions, custom fields, and notes.
+
+    Returns:
+        Configured Tantivy schema ready for index creation
+    """
     sb = tantivy.SchemaBuilder()
 
     sb.add_unsigned_field("id", stored=True, indexed=True, fast=True)
@@ -79,7 +88,19 @@ def build_schema() -> tantivy.Schema:
 
 
 def needs_rebuild(index_dir: Path) -> bool:
-    """Check if the search index needs rebuilding by comparing schema version and language sentinel files."""
+    """
+    Check if the search index needs rebuilding.
+
+    Compares the current schema version and search language configuration
+    against sentinel files to determine if the index is compatible with
+    the current paperless-ngx version and settings.
+
+    Args:
+        index_dir: Path to the search index directory
+
+    Returns:
+        True if the index needs rebuilding, False if it's up to date
+    """
     version_file = index_dir / ".schema_version"
     if not version_file.exists():
         return True
@@ -102,7 +123,15 @@ def needs_rebuild(index_dir: Path) -> bool:
 
 
 def wipe_index(index_dir: Path) -> None:
-    """Delete all children in the index directory to prepare for rebuild."""
+    """
+    Delete all contents of the index directory to prepare for rebuild.
+
+    Recursively removes all files and subdirectories within the index
+    directory while preserving the directory itself.
+
+    Args:
+        index_dir: Path to the search index directory to clear
+    """
     for child in list(index_dir.iterdir()):
         if child.is_dir():
             shutil.rmtree(child)
@@ -118,9 +147,17 @@ def _write_sentinels(index_dir: Path) -> None:
 
 def open_or_rebuild_index(index_dir: Path | None = None) -> tantivy.Index:
     """
-    Open the Tantivy index at index_dir (defaults to settings.INDEX_DIR),
-    creating or rebuilding as needed.
-    Caller must register custom tokenizers after receiving the Index.
+    Open the Tantivy index, creating or rebuilding as needed.
+
+    Checks if the index needs rebuilding due to schema version or language
+    changes. If rebuilding is needed, wipes the directory and creates a fresh
+    index with the current schema and configuration.
+
+    Args:
+        index_dir: Path to index directory (defaults to settings.INDEX_DIR)
+
+    Returns:
+        Opened Tantivy index (caller must register custom tokenizers)
     """
     if index_dir is None:
         index_dir = settings.INDEX_DIR

@@ -23,8 +23,10 @@ from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 
 
-class TestIndexOptimize(TestCase):
+@pytest.mark.django_db
+class TestIndexOptimize:
     def test_index_optimize(self) -> None:
+        """Index optimization task must execute without error (Tantivy handles optimization automatically)."""
         tasks.index_optimize()
 
 

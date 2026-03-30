@@ -16,7 +16,7 @@ class TestWriteBatch:
     """Test WriteBatch context manager functionality."""
 
     def test_rolls_back_on_exception(self, backend: TantivyBackend):
-        """Data integrity: a mid-batch exception must not corrupt the index."""
+        """Batch operations must rollback on exception to preserve index integrity."""
         doc = Document.objects.create(
             title="Rollback Target",
             content="should survive",
@@ -47,7 +47,7 @@ class TestSearch:
     """Test search functionality."""
 
     def test_scores_normalised_top_hit_is_one(self, backend: TantivyBackend):
-        """UI score bar depends on the top hit being 1.0."""
+        """Search scores must be normalized so top hit has score 1.0 for UI consistency."""
         for i, title in enumerate(["bank invoice", "bank statement", "bank receipt"]):
             doc = Document.objects.create(
                 title=title,
@@ -68,7 +68,7 @@ class TestSearch:
         assert all(0.0 <= h["score"] <= 1.0 for h in r.hits)
 
     def test_owner_filter(self, backend: TantivyBackend):
-        """Owner can find their document; other user cannot."""
+        """Document owners can search their private documents; other users cannot access them."""
         owner = User.objects.create_user("owner")
         other = User.objects.create_user("other")
         doc = Document.objects.create(
@@ -108,7 +108,7 @@ class TestRebuild:
     """Test index rebuilding functionality."""
 
     def test_with_iter_wrapper_called(self, backend: TantivyBackend):
-        """rebuild() must pass documents through iter_wrapper."""
+        """Index rebuild must pass documents through iter_wrapper for progress tracking."""
         seen = []
 
         def wrapper(docs):
@@ -125,7 +125,7 @@ class TestAutocomplete:
     """Test autocomplete functionality."""
 
     def test_basic_functionality(self, backend: TantivyBackend):
-        """Autocomplete should find word prefixes."""
+        """Autocomplete must return words matching the given prefix."""
         doc = Document.objects.create(
             title="Invoice from Microsoft Corporation",
             content="payment details",
@@ -138,7 +138,7 @@ class TestAutocomplete:
         assert "microsoft" in results
 
     def test_results_ordered_by_document_frequency(self, backend: TantivyBackend):
-        """Most-used prefix match should rank first."""
+        """Autocomplete results must be ordered by document frequency to prioritize common terms."""
         # "payment" appears in 3 docs; "payslip" in 1 — "pay" prefix should
         # return "payment" before "payslip".
         for i, (title, checksum) in enumerate(
@@ -166,7 +166,7 @@ class TestMoreLikeThis:
     """Test more like this functionality."""
 
     def test_excludes_original(self, backend: TantivyBackend):
-        """More like this should not return the original document."""
+        """More like this queries must exclude the reference document from results."""
         doc1 = Document.objects.create(
             title="Important document",
             content="financial information",
@@ -197,9 +197,11 @@ class TestSingleton:
         reset_backend()
 
     def test_returns_same_instance_on_repeated_calls(self, index_dir):
+        """Singleton pattern: repeated calls to get_backend() must return the same instance."""
         assert get_backend() is get_backend()
 
     def test_reinitializes_when_index_dir_changes(self, tmp_path, settings):
+        """Backend singleton must reinitialize when INDEX_DIR setting changes for test isolation."""
         settings.INDEX_DIR = tmp_path / "a"
         (tmp_path / "a").mkdir()
         b1 = get_backend()
@@ -212,6 +214,7 @@ class TestSingleton:
         assert b2._path == tmp_path / "b"
 
     def test_reset_forces_new_instance(self, index_dir):
+        """reset_backend() must force creation of a new backend instance on next get_backend() call."""
         b1 = get_backend()
         reset_backend()
         b2 = get_backend()
@@ -222,7 +225,7 @@ class TestFieldHandling:
     """Test handling of various document fields."""
 
     def test_none_values_handled_correctly(self, backend: TantivyBackend):
-        """Test that None values for original_filename and page_count are handled properly."""
+        """Document fields with None values must not cause indexing errors."""
         doc = Document.objects.create(
             title="Test Doc",
             content="test content",
@@ -245,7 +248,7 @@ class TestFieldHandling:
         assert results.total == 1
 
     def test_custom_fields_include_name_and_value(self, backend: TantivyBackend):
-        """Custom field indexing should include both name and value."""
+        """Custom fields must be indexed with both field name and value for structured queries."""
         # Create a custom field
         field = CustomField.objects.create(
             name="Invoice Number",
@@ -277,7 +280,7 @@ class TestFieldHandling:
         assert results.total == 1
 
     def test_notes_include_user_information(self, backend: TantivyBackend):
-        """Notes should include user information when available."""
+        """Notes must be indexed with user information when available for structured queries."""
         user = User.objects.create_user("notewriter")
         doc = Document.objects.create(
             title="Doc with notes",

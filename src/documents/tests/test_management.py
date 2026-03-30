@@ -106,6 +106,7 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 @pytest.mark.django_db
 class TestMakeIndex:
     def test_reindex(self, mocker: MockerFixture) -> None:
+        """Reindex command must call the backend rebuild method to recreate the index."""
         mock_get_backend = mocker.patch(
             "documents.management.commands.document_index.get_backend",
         )
@@ -113,12 +114,14 @@ class TestMakeIndex:
         mock_get_backend.return_value.rebuild.assert_called_once()
 
     def test_optimize(self) -> None:
+        """Optimize command must execute without error (Tantivy handles optimization automatically)."""
         call_command("document_index", "optimize", skip_checks=True)
 
     def test_reindex_if_needed_skips_when_up_to_date(
         self,
         mocker: MockerFixture,
     ) -> None:
+        """Conditional reindex must skip rebuild when schema version and language match."""
         mocker.patch(
             "documents.management.commands.document_index.needs_rebuild",
             return_value=False,
@@ -133,6 +136,7 @@ class TestMakeIndex:
         self,
         mocker: MockerFixture,
     ) -> None:
+        """Conditional reindex must proceed with rebuild when schema version or language changed."""
         mocker.patch(
             "documents.management.commands.document_index.needs_rebuild",
             return_value=True,

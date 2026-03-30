@@ -46,12 +46,17 @@ T = TypeVar("T")
 
 
 def _identity(iterable: Iterable[T]) -> Iterable[T]:
-    """Default iter_wrapper that passes through unchanged."""
+    """Default iter_wrapper that passes documents through unchanged for indexing."""
     return iterable
 
 
 def _ascii_fold(s: str) -> str:
-    """Normalize unicode to ASCII equivalent characters."""
+    """
+    Normalize unicode to ASCII equivalent characters for search consistency.
+
+    Converts accented characters (e.g., "café") to their ASCII base forms ("cafe")
+    to enable cross-language searching without requiring exact diacritic matching.
+    """
     return unicodedata.normalize("NFD", s).encode("ascii", "ignore").decode()
 
 
@@ -91,17 +96,33 @@ class SearchHit(TypedDict):
 
 @dataclass(frozen=True, slots=True)
 class SearchResults:
+    """
+    Container for search results with pagination metadata.
+
+    Attributes:
+        hits: List of search results with scores and highlights
+        total: Total matching documents across all pages (for pagination)
+        query: Preprocessed query string after date/syntax rewriting
+    """
+
     hits: list[SearchHit]
     total: int  # total matching documents (for pagination)
     query: str  # preprocessed query string
 
 
 class TantivyRelevanceList:
-    """DRF-compatible list wrapper for Tantivy search hits.
+    """
+    DRF-compatible list wrapper for Tantivy search hits.
 
-    __len__ returns the total hit count (for pagination); __getitem__ slices
-    the hit list.  Stores ALL post-filter hits so that get_all_result_ids()
-    can return every matching doc ID without a second query.
+    Provides paginated access to search results while storing all hits in memory
+    for efficient ID retrieval. Used by Django REST framework for pagination.
+
+    Methods:
+        __len__: Returns total hit count for pagination calculations
+        __getitem__: Slices the hit list for page-specific results
+
+    Note: Stores ALL post-filter hits so get_all_result_ids() can return
+    every matching document ID without requiring a second search query.
     """
 
     def __init__(self, hits: list[SearchHit]) -> None:
@@ -115,11 +136,22 @@ class TantivyRelevanceList:
 
 
 class SearchIndexLockError(Exception):
-    pass
+    """Raised when the search index file lock cannot be acquired within the timeout."""
 
 
 class WriteBatch:
-    """Context manager for bulk index operations with file locking."""
+    """
+    Context manager for bulk index operations with file locking.
+
+    Provides transactional batch updates to the search index with proper
+    concurrency control via file locking. All operations within the batch
+    are committed atomically or rolled back on exception.
+
+    Usage:
+        with backend.batch_update() as batch:
+            batch.add_or_update(document)
+            batch.remove(doc_id)
+    """
 
     def __init__(self, backend: TantivyBackend, lock_timeout: float):
         self._backend = backend
@@ -160,18 +192,29 @@ class WriteBatch:
         document: Document,
         effective_content: str | None = None,
     ) -> None:
-        """Add or update a document in the batch.
+        """
+        Add or update a document in the batch.
 
-        Tantivy has no native upsert — we delete by id then re-add so
-        stale copies (e.g. after a permission change) don't linger.
-        ``effective_content`` overrides ``document.content`` for indexing.
+        Implements upsert behavior by deleting any existing document with the same ID
+        and adding the new version. This ensures stale document data (e.g., after
+        permission changes) doesn't persist in the index.
+
+        Args:
+            document: Django Document instance to index
+            effective_content: Override document.content for indexing (used when
+                re-indexing with newer OCR text from document versions)
         """
         self.remove(document.pk)
         doc = self._backend._build_tantivy_doc(document, effective_content)
         self._writer.add_document(doc)
 
     def remove(self, doc_id: int) -> None:
-        """Remove a document from the batch."""
+        """
+        Remove a document from the batch by its primary key.
+
+        Uses range query instead of term query to work around unsigned integer
+        type detection bug in tantivy-py 0.25.
+        """
         # Use range query to work around u64 deletion bug
         self._writer.delete_documents_by_query(
             tantivy.Query.range_query(
@@ -185,7 +228,17 @@ class WriteBatch:
 
 
 class TantivyBackend:
-    """Tantivy search backend with explicit lifecycle management."""
+    """
+    Tantivy search backend with explicit lifecycle management.
+
+    Provides full-text search capabilities using the Tantivy search engine.
+    Supports in-memory indexes (for testing) and persistent on-disk indexes
+    (for production use). Handles document indexing, search queries, autocompletion,
+    and "more like this" functionality.
+
+    The backend manages its own connection lifecycle and can be reset when
+    the underlying index directory changes (e.g., during test isolation).
+    """
 
     def __init__(self, path: Path | None = None):
         # path=None → in-memory index (for tests)
@@ -195,7 +248,13 @@ class TantivyBackend:
         self._schema = None
 
     def open(self) -> None:
-        """Open or rebuild the index. Idempotent."""
+        """
+        Open or rebuild the index as needed.
+
+        For disk-based indexes, checks if rebuilding is needed due to schema
+        version or language changes. Registers custom tokenizers after opening.
+        Safe to call multiple times - subsequent calls are no-ops.
+        """
         if self._index is not None:
             return
         if self._path is not None:
@@ -206,7 +265,11 @@ class TantivyBackend:
         self._schema = self._index.schema
 
     def close(self) -> None:
-        """Close the index. Idempotent."""
+        """
+        Close the index and release resources.
+
+        Safe to call multiple times - subsequent calls are no-ops.
+        """
         self._index = None
         self._schema = None
 
@@ -339,13 +402,30 @@ class TantivyBackend:
         document: Document,
         effective_content: str | None = None,
     ) -> None:
-        """Add or update a single document with file locking."""
+        """
+        Add or update a single document with file locking.
+
+        Convenience method for single-document updates. For bulk operations,
+        use batch_update() context manager for better performance.
+
+        Args:
+            document: Django Document instance to index
+            effective_content: Override document.content for indexing
+        """
         self._ensure_open()
         with self.batch_update(lock_timeout=5.0) as batch:
             batch.add_or_update(document, effective_content)
 
     def remove(self, doc_id: int) -> None:
-        """Remove a single document with file locking."""
+        """
+        Remove a single document from the index with file locking.
+
+        Convenience method for single-document removal. For bulk operations,
+        use batch_update() context manager for better performance.
+
+        Args:
+            doc_id: Primary key of the document to remove
+        """
         self._ensure_open()
         with self.batch_update(lock_timeout=5.0) as batch:
             batch.remove(doc_id)
@@ -360,7 +440,24 @@ class TantivyBackend:
         *,
         sort_reverse: bool,
     ) -> SearchResults:
-        """Search the index."""
+        """
+        Execute a search query against the document index.
+
+        Processes the user query through date rewriting, normalization, and
+        permission filtering before executing against Tantivy. Supports both
+        relevance-based and field-based sorting.
+
+        Args:
+            query: User's search query (supports natural date keywords, field filters)
+            user: User for permission filtering (None for superuser/no filtering)
+            page: Page number (1-indexed) for pagination
+            page_size: Number of results per page
+            sort_field: Field to sort by (None for relevance ranking)
+            sort_reverse: Whether to reverse the sort order
+
+        Returns:
+            SearchResults with hits, total count, and processed query
+        """
         self._ensure_open()
         tz = get_current_timezone()
         user_query = parse_user_query(self._index, query, tz)
@@ -491,7 +588,21 @@ class TantivyBackend:
         limit: int,
         user: AbstractBaseUser | None = None,
     ) -> list[str]:
-        """Get autocomplete suggestions, optionally filtered by user visibility."""
+        """
+        Get autocomplete suggestions for search queries.
+
+        Returns words that start with the given term prefix, ranked by document
+        frequency (how many documents contain each word). Optionally filters
+        results to only words from documents visible to the specified user.
+
+        Args:
+            term: Prefix to match against autocomplete words
+            limit: Maximum number of suggestions to return
+            user: User for permission filtering (None for no filtering)
+
+        Returns:
+            List of word suggestions ordered by frequency, then alphabetically
+        """
         self._ensure_open()
         normalized_term = _ascii_fold(term.lower())
 
@@ -533,7 +644,21 @@ class TantivyBackend:
         page: int,
         page_size: int,
     ) -> SearchResults:
-        """Find documents similar to the given document."""
+        """
+        Find documents similar to the given document using content analysis.
+
+        Uses Tantivy's "more like this" query to find documents with similar
+        content patterns. The original document is excluded from results.
+
+        Args:
+            doc_id: Primary key of the reference document
+            user: User for permission filtering (None for no filtering)
+            page: Page number (1-indexed) for pagination
+            page_size: Number of results per page
+
+        Returns:
+            SearchResults with similar documents (excluding the original)
+        """
         self._ensure_open()
         searcher = self._index.searcher()
 
@@ -621,12 +746,36 @@ class TantivyBackend:
         )
 
     def batch_update(self, lock_timeout: float = 30.0) -> WriteBatch:
-        """Get a batch context manager for bulk operations."""
+        """
+        Get a batch context manager for bulk index operations.
+
+        Use this for efficient bulk document updates/deletions. All operations
+        within the batch are committed atomically at the end of the context.
+
+        Args:
+            lock_timeout: Seconds to wait for file lock acquisition
+
+        Returns:
+            WriteBatch context manager
+
+        Raises:
+            SearchIndexLockError: If lock cannot be acquired within timeout
+        """
         self._ensure_open()
         return WriteBatch(self, lock_timeout)
 
     def rebuild(self, documents: QuerySet, iter_wrapper: Callable = _identity) -> None:
-        """Rebuild the entire search index."""
+        """
+        Rebuild the entire search index from scratch.
+
+        Wipes the existing index and re-indexes all provided documents.
+        On failure, restores the previous index state to keep the backend usable.
+
+        Args:
+            documents: QuerySet of Document instances to index
+            iter_wrapper: Optional wrapper function for progress tracking
+                (e.g., progress bar). Should yield each document unchanged.
+        """
         # Create new index (on-disk or in-memory)
         if self._path is not None:
             wipe_index(self._path)
@@ -662,11 +811,15 @@ _backend_lock = threading.RLock()
 
 
 def get_backend() -> TantivyBackend:
-    """Get the global backend instance with thread safety.
+    """
+    Get the global backend instance with thread safety.
 
-    Automatically reinitializes when settings.INDEX_DIR changes — this fixes
-    the xdist/override_settings isolation issue where each test may set a
-    different INDEX_DIR but would otherwise share a stale singleton.
+    Returns a singleton TantivyBackend instance, automatically reinitializing
+    when settings.INDEX_DIR changes. This ensures proper test isolation when
+    using pytest-xdist or @override_settings that change the index directory.
+
+    Returns:
+        Thread-safe singleton TantivyBackend instance
     """
     global _backend, _backend_path
 
@@ -693,7 +846,12 @@ def get_backend() -> TantivyBackend:
 
 
 def reset_backend() -> None:
-    """Reset the global backend instance with thread safety."""
+    """
+    Reset the global backend instance with thread safety.
+
+    Forces creation of a new backend instance on the next get_backend() call.
+    Used for test isolation and when switching between different index directories.
+    """
     global _backend, _backend_path
 
     with _backend_lock:
