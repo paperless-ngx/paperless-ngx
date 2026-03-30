@@ -1293,22 +1293,18 @@ class SearchResultSerializer(DocumentSerializer):
         documents = self.context.get("documents")
         # Otherwise we fetch this document.
         if documents is None:  # pragma: no cover
-            # In practice we only serialize **lists** of whoosh.searching.Hit.
-            # I'm keeping this check for completeness but marking it no cover for now.
+            # In practice we only serialize **lists** of SearchHit dicts.
+            # Keeping this check for completeness but marking it no cover for now.
             documents = self.fetch_documents([hit["id"]])
         document = documents[hit["id"]]
 
-        notes = ",".join(
-            [str(c.note) for c in document.notes.all()],
-        )
+        highlights = hit.get("highlights", {})
         r = super().to_representation(document)
         r["__search_hit__"] = {
-            "score": hit.score,
-            "highlights": hit.highlights("content", text=document.content),
-            "note_highlights": (
-                hit.highlights("notes", text=notes) if document else None
-            ),
-            "rank": hit.rank,
+            "score": hit["score"],
+            "highlights": highlights.get("content", ""),
+            "note_highlights": highlights.get("notes") or None,
+            "rank": hit["rank"],
         }
 
         return r

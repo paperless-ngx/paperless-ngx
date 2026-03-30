@@ -21,10 +21,10 @@ from guardian.shortcuts import get_users_with_perms
 
 from documents.search._query import build_permission_filter
 from documents.search._query import parse_user_query
-from documents.search._schema import _wipe_index
 from documents.search._schema import _write_sentinels
 from documents.search._schema import build_schema
 from documents.search._schema import open_or_rebuild_index
+from documents.search._schema import wipe_index
 from documents.search._tokenizer import register_tokenizers
 
 if TYPE_CHECKING:
@@ -95,6 +95,24 @@ class SearchResults:
     query: str  # preprocessed query string
 
 
+class TantivyRelevanceList:
+    """DRF-compatible list wrapper for Tantivy search hits.
+
+    __len__ returns the total hit count (for pagination); __getitem__ slices
+    the hit list.  Stores ALL post-filter hits so that get_all_result_ids()
+    can return every matching doc ID without a second query.
+    """
+
+    def __init__(self, hits: list[SearchHit]) -> None:
+        self._hits = hits
+
+    def __len__(self) -> int:
+        return len(self._hits)
+
+    def __getitem__(self, key: slice) -> list[SearchHit]:
+        return self._hits[key]
+
+
 class SearchIndexLockError(Exception):
     pass
 
@@ -139,9 +157,19 @@ class WriteBatch:
             if hasattr(self, "_lock") and self._lock:
                 self._lock.release()
 
-    def add_or_update(self, document: Document) -> None:
-        """Add or update a document in the batch."""
-        doc = self._backend._build_tantivy_doc(document)
+    def add_or_update(
+        self,
+        document: Document,
+        effective_content: str | None = None,
+    ) -> None:
+        """Add or update a document in the batch.
+
+        Tantivy has no native upsert — we delete by id then re-add so
+        stale copies (e.g. after a permission change) don't linger.
+        ``effective_content`` overrides ``document.content`` for indexing.
+        """
+        self.remove(document.pk)
+        doc = self._backend._build_tantivy_doc(document, effective_content)
         self._writer.add_document(doc)
 
     def remove(self, doc_id: int) -> None:
@@ -175,8 +203,20 @@ class TantivyBackend:
         # Index doesn't need explicit close
         pass
 
-    def _build_tantivy_doc(self, document: Document) -> tantivy.Document:
-        """Build a tantivy Document from a Django Document instance."""
+    def _build_tantivy_doc(
+        self,
+        document: Document,
+        effective_content: str | None = None,
+    ) -> tantivy.Document:
+        """Build a tantivy Document from a Django Document instance.
+
+        ``effective_content`` overrides ``document.content`` for indexing —
+        used when re-indexing a root document with a newer version's OCR text.
+        """
+        content = (
+            effective_content if effective_content is not None else document.content
+        )
+
         doc = tantivy.Document()
 
         # Basic fields
@@ -184,8 +224,8 @@ class TantivyBackend:
         doc.add_text("checksum", document.checksum)
         doc.add_text("title", document.title)
         doc.add_text("title_sort", document.title)
-        doc.add_text("content", document.content)
-        doc.add_text("bigram_content", document.content)
+        doc.add_text("content", content)
+        doc.add_text("bigram_content", content)
 
         # Original filename - only add if not None/empty
         if document.original_filename:
@@ -269,7 +309,7 @@ class TantivyBackend:
             doc.add_unsigned("viewer_id", user.pk)
 
         # Autocomplete words with NLTK stopword filtering
-        text_sources = [document.title, document.content]
+        text_sources = [document.title, content]
         if document.correspondent:
             text_sources.append(document.correspondent.name)
         if document.document_type:
@@ -285,10 +325,14 @@ class TantivyBackend:
 
         return doc
 
-    def add_or_update(self, document: Document) -> None:
+    def add_or_update(
+        self,
+        document: Document,
+        effective_content: str | None = None,
+    ) -> None:
         """Add or update a single document with file locking."""
         with self.batch_update(lock_timeout=5.0) as batch:
-            batch.add_or_update(document)
+            batch.add_or_update(document, effective_content)
 
     def remove(self, doc_id: int) -> None:
         """Remove a single document with file locking."""
@@ -440,19 +484,30 @@ class TantivyBackend:
             query=query,
         )
 
-    def autocomplete(self, term: str, limit: int) -> list[str]:
-        """Get autocomplete suggestions."""
+    def autocomplete(
+        self,
+        term: str,
+        limit: int,
+        user: AbstractBaseUser | None = None,
+    ) -> list[str]:
+        """Get autocomplete suggestions, optionally filtered by user visibility."""
         normalized_term = _ascii_fold(term.lower())
 
         searcher = self._index.searcher()
-        # Search all documents to collect autocomplete words
-        all_query = tantivy.Query.all_query()
-        results = searcher.search(all_query, limit=10000)  # High limit to get all docs
+
+        # Apply permission filter for non-superusers so autocomplete words
+        # from invisible documents don't leak to other users.
+        if user is not None and not user.is_superuser:
+            base_query = build_permission_filter(self._schema, user)
+        else:
+            base_query = tantivy.Query.all_query()
+
+        results = searcher.search(base_query, limit=10000)
 
         # Collect all autocomplete words
         words = set()
         for hit in results.hits:
-            # For all_query, hit is (score, doc_address)
+            # hits are (score, doc_address) tuples
             doc_address = hit[1] if len(hit) == 2 else hit[0]
 
             stored_doc = searcher.doc(doc_address)
@@ -584,7 +639,7 @@ class TantivyBackend:
         index_dir = settings.INDEX_DIR
 
         # Create new index
-        _wipe_index(index_dir)
+        wipe_index(index_dir)
         new_index = tantivy.Index(build_schema(), path=str(index_dir))
         _write_sentinels(index_dir)
         register_tokenizers(new_index, settings.SEARCH_LANGUAGE)

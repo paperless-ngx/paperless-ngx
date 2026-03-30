@@ -8,6 +8,7 @@ from datetime import timedelta
 from typing import TYPE_CHECKING
 
 import tantivy
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 
 if TYPE_CHECKING:
@@ -38,6 +39,13 @@ _RELATIVE_RANGE_RE = re.compile(
     r"\[now([+-]\d+[dhm])?\s+TO\s+now([+-]\d+[dhm])?\]",
     re.IGNORECASE,
 )
+# Whoosh-style relative date range: e.g. [-1 week to now], [-7 days to now]
+_WHOOSH_REL_RANGE_RE = re.compile(
+    r"\[-(?P<n>\d+)\s+(?P<unit>second|minute|hour|day|week|month|year)s?\s+to\s+now\]",
+    re.IGNORECASE,
+)
+# Whoosh-style 8-digit date: field:YYYYMMDD — field-aware so timezone can be applied correctly
+_DATE8_RE = re.compile(r"(?P<field>\w+):(?P<date8>\d{8})\b")
 
 
 def _fmt(dt: datetime) -> str:
@@ -200,6 +208,69 @@ def _rewrite_relative_range(query: str) -> str:
     return _RELATIVE_RANGE_RE.sub(_sub, query)
 
 
+def _rewrite_whoosh_relative_range(query: str) -> str:
+    """Rewrite Whoosh-style relative date ranges ([-N unit to now]) to ISO 8601.
+
+    Supports: second, minute, hour, day, week, month, year (singular and plural).
+    Example: ``added:[-1 week to now]`` → ``added:[2025-01-01T… TO 2025-01-08T…]``
+    """
+    now = datetime.now(UTC)
+
+    def _sub(m: re.Match[str]) -> str:
+        n = int(m.group("n"))
+        unit = m.group("unit").lower()
+        delta_map: dict[str, timedelta | relativedelta] = {
+            "second": timedelta(seconds=n),
+            "minute": timedelta(minutes=n),
+            "hour": timedelta(hours=n),
+            "day": timedelta(days=n),
+            "week": timedelta(weeks=n),
+            "month": relativedelta(months=n),
+            "year": relativedelta(years=n),
+        }
+        lo = now - delta_map[unit]
+        return f"[{_fmt(lo)} TO {_fmt(now)}]"
+
+    return _WHOOSH_REL_RANGE_RE.sub(_sub, query)
+
+
+def _rewrite_8digit_date(query: str, tz: tzinfo) -> str:
+    """Rewrite field:YYYYMMDD date tokens to an ISO 8601 day range.
+
+    Runs after ``_rewrite_compact_date`` so 14-digit timestamps are already
+    converted and won't spuriously match here.
+
+    For DateField fields (e.g. ``created``) uses UTC midnight boundaries.
+    For DateTimeField fields (e.g. ``added``, ``modified``) uses local TZ
+    midnight boundaries converted to UTC — matching the ``_datetime_range``
+    behaviour for keyword dates.
+    """
+
+    def _sub(m: re.Match[str]) -> str:
+        field = m.group("field")
+        raw = m.group("date8")
+        try:
+            year, month, day = int(raw[0:4]), int(raw[4:6]), int(raw[6:8])
+            d = date(year, month, day)
+            if field in _DATE_ONLY_FIELDS:
+                lo = datetime(d.year, d.month, d.day, tzinfo=UTC)
+                hi = lo + timedelta(days=1)
+            else:
+                # DateTimeField: use local-timezone midnight → UTC
+                lo = datetime(d.year, d.month, d.day, tzinfo=tz).astimezone(UTC)
+                hi = datetime(
+                    (d + timedelta(days=1)).year,
+                    (d + timedelta(days=1)).month,
+                    (d + timedelta(days=1)).day,
+                    tzinfo=tz,
+                ).astimezone(UTC)
+            return f"{field}:[{_fmt(lo)} TO {_fmt(hi)}]"
+        except ValueError:
+            return m.group(0)
+
+    return _DATE8_RE.sub(_sub, query)
+
+
 def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
     """
     Preprocessing stage 1: rewrite Whoosh compact dates, relative ranges,
@@ -207,6 +278,8 @@ def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
     Bare keywords without a field: prefix pass through unchanged.
     """
     query = _rewrite_compact_date(query)
+    query = _rewrite_whoosh_relative_range(query)
+    query = _rewrite_8digit_date(query, tz)
     query = _rewrite_relative_range(query)
 
     def _replace(m: re.Match[str]) -> str:

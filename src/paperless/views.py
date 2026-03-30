@@ -71,22 +71,12 @@ class StandardPagination(PageNumberPagination):
         )
 
     def get_all_result_ids(self):
-        from documents.index import DelayedQuery  # removed with Whoosh in Task 14
+        from documents.search import TantivyRelevanceList
 
         query = self.page.paginator.object_list
-        if isinstance(query, DelayedQuery):
-            try:
-                ids = [
-                    query.searcher.ixreader.stored_fields(
-                        doc_num,
-                    )["id"]
-                    for doc_num in query.saved_results.get(0).results.docs()
-                ]
-            except Exception:
-                pass
-        else:
-            ids = self.page.paginator.object_list.values_list("pk", flat=True)
-        return ids
+        if isinstance(query, TantivyRelevanceList):
+            return [h["id"] for h in query._hits]
+        return self.page.paginator.object_list.values_list("pk", flat=True)
 
     def get_paginated_response_schema(self, schema):
         response_schema = super().get_paginated_response_schema(schema)

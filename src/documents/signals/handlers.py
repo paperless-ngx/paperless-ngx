@@ -790,12 +790,12 @@ def cleanup_user_deletion(sender, instance: User | Group, **kwargs) -> None:
 
 
 def add_to_index(sender, document, **kwargs) -> None:
-    from documents import index
+    from documents.search import get_backend
 
-    index.add_or_update_document(document)
+    get_backend().add_or_update(document)
     if document.root_document_id is not None and document.root_document is not None:
         # keep in sync when a new version is consumed.
-        index.add_or_update_document(
+        get_backend().add_or_update(
             document.root_document,
             effective_content=document.content,
         )

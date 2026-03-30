@@ -109,7 +109,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
             mime_type="application/pdf",
         )
 
-        with mock.patch("documents.index.remove_document_from_index"):
+        with mock.patch("documents.search.get_backend"):
             resp = self.client.delete(f"/api/documents/{root.id}/versions/{root.id}/")
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
@@ -137,10 +137,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
             content="v2-content",
         )
 
-        with (
-            mock.patch("documents.index.remove_document_from_index"),
-            mock.patch("documents.index.add_or_update_document"),
-        ):
+        with mock.patch("documents.search.get_backend"):
             resp = self.client.delete(f"/api/documents/{root.id}/versions/{v2.id}/")
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -149,10 +146,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         root.refresh_from_db()
         self.assertEqual(root.content, "root-content")
 
-        with (
-            mock.patch("documents.index.remove_document_from_index"),
-            mock.patch("documents.index.add_or_update_document"),
-        ):
+        with mock.patch("documents.search.get_backend"):
             resp = self.client.delete(f"/api/documents/{root.id}/versions/{v1.id}/")
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -175,10 +169,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         )
         version_id = version.id
 
-        with (
-            mock.patch("documents.index.remove_document_from_index"),
-            mock.patch("documents.index.add_or_update_document"),
-        ):
+        with mock.patch("documents.search.get_backend"):
             resp = self.client.delete(
                 f"/api/documents/{root.id}/versions/{version_id}/",
             )
@@ -225,7 +216,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
             root_document=other_root,
         )
 
-        with mock.patch("documents.index.remove_document_from_index"):
+        with mock.patch("documents.search.get_backend"):
             resp = self.client.delete(
                 f"/api/documents/{root.id}/versions/{other_version.id}/",
             )
@@ -245,10 +236,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
             root_document=root,
         )
 
-        with (
-            mock.patch("documents.index.remove_document_from_index"),
-            mock.patch("documents.index.add_or_update_document"),
-        ):
+        with mock.patch("documents.search.get_backend"):
             resp = self.client.delete(
                 f"/api/documents/{version.id}/versions/{version.id}/",
             )
@@ -275,18 +263,17 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
             root_document=root,
         )
 
-        with (
-            mock.patch("documents.index.remove_document_from_index") as remove_index,
-            mock.patch("documents.index.add_or_update_document") as add_or_update,
-        ):
+        with mock.patch("documents.search.get_backend") as mock_get_backend:
+            mock_backend = mock.MagicMock()
+            mock_get_backend.return_value = mock_backend
             resp = self.client.delete(
                 f"/api/documents/{root.id}/versions/{version.id}/",
             )
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        remove_index.assert_called_once_with(version)
-        add_or_update.assert_called_once()
-        self.assertEqual(add_or_update.call_args[0][0].id, root.id)
+        mock_backend.remove.assert_called_once_with(version.pk)
+        mock_backend.add_or_update.assert_called_once()
+        self.assertEqual(mock_backend.add_or_update.call_args[0][0].id, root.id)
 
     def test_delete_version_returns_403_without_permission(self) -> None:
         owner = User.objects.create_user(username="owner")

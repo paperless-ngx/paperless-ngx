@@ -82,27 +82,24 @@ def _identity(iterable: Iterable[_T]) -> Iterable[_T]:
 
 @shared_task
 def index_optimize() -> None:
-    from whoosh.writing import AsyncWriter
-
-    from documents import index
-
-    ix = index.open_index()
-    writer = AsyncWriter(ix)
-    writer.commit(optimize=True)
+    logger.info(
+        "document_index optimize is deprecated — Tantivy manages "
+        "segment merging automatically.",
+    )
 
 
 def index_reindex(*, iter_wrapper: IterWrapper[Document] = _identity) -> None:
-    from whoosh.writing import AsyncWriter
+    from documents.search import get_backend
+    from documents.search import reset_backend
 
-    from documents import index
-
-    documents = Document.objects.all()
-
-    ix = index.open_index(recreate=True)
-
-    with AsyncWriter(ix) as writer:
-        for document in iter_wrapper(documents):
-            index.update_document(writer, document)
+    documents = Document.objects.select_related(
+        "correspondent",
+        "document_type",
+        "storage_path",
+        "owner",
+    ).prefetch_related("tags", "notes", "custom_fields")
+    get_backend().rebuild(documents, iter_wrapper=iter_wrapper)
+    reset_backend()
 
 
 @shared_task
@@ -276,13 +273,9 @@ def sanity_check(*, scheduled=True, raise_on_error=True):
 
 @shared_task
 def bulk_update_documents(document_ids) -> None:
-    from whoosh.writing import AsyncWriter
-
-    from documents import index
+    from documents.search import get_backend
 
     documents = Document.objects.filter(id__in=document_ids)
-
-    ix = index.open_index()
 
     for doc in documents:
         clear_document_caches(doc.pk)
@@ -293,9 +286,9 @@ def bulk_update_documents(document_ids) -> None:
         )
         post_save.send(Document, instance=doc, created=False)
 
-    with AsyncWriter(ix) as writer:
+    with get_backend().batch_update() as batch:
         for doc in documents:
-            index.update_document(writer, doc)
+            batch.add_or_update(doc)
 
     ai_config = AIConfig()
     if ai_config.llm_index_enabled:
@@ -310,8 +303,6 @@ def update_document_content_maybe_archive_file(document_id) -> None:
     Re-creates OCR content and thumbnail for a document, and archive file if
     it exists.
     """
-    from documents import index
-
     document = Document.objects.get(id=document_id)
 
     mime_type = document.mime_type
@@ -401,8 +392,9 @@ def update_document_content_maybe_archive_file(document_id) -> None:
             logger.info(
                 f"Updating index for document {document_id} ({document.archive_checksum})",
             )
-            with index.open_index_writer() as writer:
-                index.update_document(writer, document)
+            from documents.search import get_backend
+
+            get_backend().add_or_update(document)
 
             ai_config = AIConfig()
             if ai_config.llm_index_enabled:

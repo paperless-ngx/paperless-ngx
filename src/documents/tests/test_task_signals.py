@@ -208,10 +208,12 @@ class TestTaskSignalHandler(DirectoriesMixin, TestCase):
             mime_type="application/pdf",
         )
 
-        with mock.patch("documents.index.add_or_update_document") as add:
+        with mock.patch("documents.search.get_backend") as mock_get_backend:
+            mock_backend = mock.MagicMock()
+            mock_get_backend.return_value = mock_backend
             add_to_index(sender=None, document=root)
 
-        add.assert_called_once_with(root)
+        mock_backend.add_or_update.assert_called_once_with(root)
 
     def test_add_to_index_reindexes_root_for_version_documents(self) -> None:
         root = Document.objects.create(
@@ -226,13 +228,21 @@ class TestTaskSignalHandler(DirectoriesMixin, TestCase):
             root_document=root,
         )
 
-        with mock.patch("documents.index.add_or_update_document") as add:
+        with mock.patch("documents.search.get_backend") as mock_get_backend:
+            mock_backend = mock.MagicMock()
+            mock_get_backend.return_value = mock_backend
             add_to_index(sender=None, document=version)
 
-        self.assertEqual(add.call_count, 2)
-        self.assertEqual(add.call_args_list[0].args[0].id, version.id)
-        self.assertEqual(add.call_args_list[1].args[0].id, root.id)
+        self.assertEqual(mock_backend.add_or_update.call_count, 2)
         self.assertEqual(
-            add.call_args_list[1].kwargs,
+            mock_backend.add_or_update.call_args_list[0].args[0].id,
+            version.id,
+        )
+        self.assertEqual(
+            mock_backend.add_or_update.call_args_list[1].args[0].id,
+            root.id,
+        )
+        self.assertEqual(
+            mock_backend.add_or_update.call_args_list[1].kwargs,
             {"effective_content": version.content},
         )

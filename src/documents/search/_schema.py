@@ -101,7 +101,7 @@ def _needs_rebuild(index_dir: Path) -> bool:
     return False
 
 
-def _wipe_index(index_dir: Path) -> None:
+def wipe_index(index_dir: Path) -> None:
     """Delete all children in the index directory to prepare for rebuild."""
     for child in list(index_dir.iterdir()):
         if child.is_dir():
@@ -123,7 +123,7 @@ def open_or_rebuild_index() -> tantivy.Index:
     """
     index_dir: Path = settings.INDEX_DIR
     if _needs_rebuild(index_dir):
-        _wipe_index(index_dir)
+        wipe_index(index_dir)
         idx = tantivy.Index(build_schema(), path=str(index_dir))
         _write_sentinels(index_dir)
         return idx
