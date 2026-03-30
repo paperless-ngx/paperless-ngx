@@ -114,6 +114,26 @@ class TestMakeIndex(TestCase):
         call_command("document_index", "optimize", skip_checks=True)
         m.assert_called_once()
 
+    @mock.patch("documents.management.commands.document_index.index_reindex")
+    @mock.patch("documents.search._schema._needs_rebuild", return_value=False)
+    def test_reindex_if_needed_skips_when_up_to_date(
+        self,
+        _needs_rebuild,
+        reindex,
+    ) -> None:
+        call_command("document_index", "reindex", if_needed=True, skip_checks=True)
+        reindex.assert_not_called()
+
+    @mock.patch("documents.management.commands.document_index.index_reindex")
+    @mock.patch("documents.search._schema._needs_rebuild", return_value=True)
+    def test_reindex_if_needed_runs_when_rebuild_needed(
+        self,
+        _needs_rebuild,
+        reindex,
+    ) -> None:
+        call_command("document_index", "reindex", if_needed=True, skip_checks=True)
+        reindex.assert_called_once()
+
 
 @pytest.mark.management
 class TestRenamer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
