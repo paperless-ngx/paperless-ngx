@@ -180,16 +180,15 @@ following:
     This might not actually do anything. Not every new paperless version
     comes with new database migrations.
 
-4.  Rebuild the search index.
+4.  Rebuild the search index if needed.
 
     ```shell-session
     cd src
-    python3 manage.py document_index reindex
+    python3 manage.py document_index reindex --if-needed
     ```
 
-    This is required when the search backend has changed (e.g. the upgrade
-    to Tantivy). It is safe to run on every upgrade — if the index is already
-    current it completes quickly.
+    This is a no-op if the index is already up to date, so it is safe to
+    run on every upgrade.
 
 ### Database Upgrades
 
@@ -480,20 +479,19 @@ task scheduler.
 
 !!! note
 
-    **Docker users:** On first startup after upgrading, the container automatically
-    detects the index format change and runs a full reindex before starting the
-    webserver. No manual step is required.
+    **Docker users:** On every startup, the container runs
+    `document_index reindex --if-needed` automatically. Schema changes, language
+    changes, and missing indexes are all detected and rebuilt before the webserver
+    starts. No manual step is required.
 
-    **Bare metal users:** After upgrading, run the following command once to rebuild
-    the search index in the new format:
+    **Bare metal users:** Run the following command after each upgrade (and after
+    changing `PAPERLESS_SEARCH_LANGUAGE`). It is a no-op if the index is already
+    up to date:
 
     ```shell-session
     cd src
-    python3 manage.py document_index reindex
+    python3 manage.py document_index reindex --if-needed
     ```
-
-    Changing `PAPERLESS_SEARCH_LANGUAGE` also requires a manual reindex on bare
-    metal (Docker handles this automatically).
 
 ### Clearing the database read cache
 

@@ -21,10 +21,26 @@ class Command(PaperlessCommand):
             default=False,
             help="Wipe and recreate the index from scratch (only used with reindex).",
         )
+        parser.add_argument(
+            "--if-needed",
+            action="store_true",
+            default=False,
+            help=(
+                "Skip reindex if the index is already up to date. "
+                "Checks schema version and search language sentinels. "
+                "Safe to run on every startup or upgrade."
+            ),
+        )
 
     def handle(self, *args, **options):
         with transaction.atomic():
             if options["command"] == "reindex":
+                if options.get("if_needed"):
+                    from documents.search._schema import _needs_rebuild
+
+                    if not _needs_rebuild(settings.INDEX_DIR):
+                        self.stdout.write("Search index is up to date.")
+                        return
                 if options.get("recreate"):
                     from documents.search import wipe_index
 
