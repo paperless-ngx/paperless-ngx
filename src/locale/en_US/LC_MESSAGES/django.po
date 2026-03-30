@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-26 14:37+0000\n"
+"POT-Creation-Date: 2026-03-28 20:59+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1341,7 +1341,7 @@ msgstr ""
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2587 documents/views.py:3599
+#: documents/serialisers.py:2587 documents/views.py:3605
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
@@ -1613,20 +1613,20 @@ msgstr ""
 msgid "Invalid more_like_id"
 msgstr ""
 
-#: documents/views.py:3611
+#: documents/views.py:3617
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr ""
 
-#: documents/views.py:3654
+#: documents/views.py:3660
 msgid "Bundle is already being processed."
 msgstr ""
 
-#: documents/views.py:3711
+#: documents/views.py:3717
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr ""
 
-#: documents/views.py:3721
+#: documents/views.py:3727
 msgid "The share link bundle is unavailable."
 msgstr ""
 

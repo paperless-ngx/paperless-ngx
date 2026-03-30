@@ -3290,6 +3290,12 @@ class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
         path = serializer.validated_data.get("path")
 
         result = format_filename(document, path)
+        if result:
+            extension = (
+                Path(str(document.filename)).suffix if document.filename else ""
+            ) or document.file_type
+            result_path = Path(result)
+            result = str(result_path.with_name(f"{result_path.name}{extension}"))
         return Response(result)
 
 
