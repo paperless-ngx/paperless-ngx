@@ -4802,6 +4802,7 @@ class TestWebhookSecurity:
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("_search_index")
 class TestDateWorkflowLocalization(
     SampleDirMixin,
 ):
