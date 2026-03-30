@@ -12,6 +12,7 @@ import time_machine
 
 from documents.search._query import build_permission_filter
 from documents.search._query import normalize_query
+from documents.search._query import parse_user_query
 from documents.search._query import rewrite_natural_date_keywords
 from documents.search._schema import build_schema
 from documents.search._tokenizer import register_tokenizers
@@ -162,12 +163,11 @@ class TestDateTimeFields:
         assert hi == "2026-03-29T00:00:00Z"
 
 
-class TestWhooshCompatShims:
-    """Whoosh compact dates and relative ranges must be converted to ISO format."""
+class TestWhooshQueryRewriting:
+    """All Whoosh query syntax variants must be rewritten to ISO 8601 before Tantivy parses them."""
 
     @time_machine.travel(datetime(2026, 3, 28, 15, 0, tzinfo=UTC), tick=False)
     def test_compact_date_shim_rewrites_to_iso(self) -> None:
-        # Whoosh compact: YYYYMMDDHHmmss
         result = rewrite_natural_date_keywords("created:20240115120000", UTC)
         assert "2024-01-15" in result
         assert "20240115120000" not in result
@@ -177,6 +177,117 @@ class TestWhooshCompatShims:
         result = rewrite_natural_date_keywords("added:[now-7d TO now]", UTC)
         assert "now" not in result
         assert "2026-03-" in result
+
+    @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
+    def test_bracket_minus_7_days(self) -> None:
+        lo, hi = _range(
+            rewrite_natural_date_keywords("added:[-7 days to now]", UTC),
+            "added",
+        )
+        assert lo == "2026-03-21T12:00:00Z"
+        assert hi == "2026-03-28T12:00:00Z"
+
+    @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
+    def test_bracket_minus_1_week(self) -> None:
+        lo, hi = _range(
+            rewrite_natural_date_keywords("added:[-1 week to now]", UTC),
+            "added",
+        )
+        assert lo == "2026-03-21T12:00:00Z"
+        assert hi == "2026-03-28T12:00:00Z"
+
+    @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
+    def test_bracket_minus_1_month_uses_relativedelta(self) -> None:
+        # relativedelta(months=1) from 2026-03-28 = 2026-02-28 (not 29)
+        lo, hi = _range(
+            rewrite_natural_date_keywords("created:[-1 month to now]", UTC),
+            "created",
+        )
+        assert lo == "2026-02-28T12:00:00Z"
+        assert hi == "2026-03-28T12:00:00Z"
+
+    @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
+    def test_bracket_minus_1_year(self) -> None:
+        lo, hi = _range(
+            rewrite_natural_date_keywords("modified:[-1 year to now]", UTC),
+            "modified",
+        )
+        assert lo == "2025-03-28T12:00:00Z"
+        assert hi == "2026-03-28T12:00:00Z"
+
+    @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
+    def test_bracket_plural_unit_hours(self) -> None:
+        lo, hi = _range(
+            rewrite_natural_date_keywords("added:[-3 hours to now]", UTC),
+            "added",
+        )
+        assert lo == "2026-03-28T09:00:00Z"
+        assert hi == "2026-03-28T12:00:00Z"
+
+    @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
+    def test_bracket_case_insensitive(self) -> None:
+        result = rewrite_natural_date_keywords("added:[-1 WEEK TO NOW]", UTC)
+        assert "now" not in result.lower()
+        lo, hi = _range(result, "added")
+        assert lo == "2026-03-21T12:00:00Z"
+        assert hi == "2026-03-28T12:00:00Z"
+
+    def test_8digit_created_date_field_always_uses_utc_midnight(self) -> None:
+        # created is a DateField: boundaries are always UTC midnight, no TZ offset
+        result = rewrite_natural_date_keywords("created:20231201", EASTERN)
+        lo, hi = _range(result, "created")
+        assert lo == "2023-12-01T00:00:00Z"
+        assert hi == "2023-12-02T00:00:00Z"
+
+    def test_8digit_added_datetime_field_converts_local_midnight_to_utc(self) -> None:
+        # added is DateTimeField: midnight Dec 1 Eastern (EST = UTC-5) = 05:00 UTC
+        result = rewrite_natural_date_keywords("added:20231201", EASTERN)
+        lo, hi = _range(result, "added")
+        assert lo == "2023-12-01T05:00:00Z"
+        assert hi == "2023-12-02T05:00:00Z"
+
+    def test_8digit_modified_datetime_field_converts_local_midnight_to_utc(
+        self,
+    ) -> None:
+        result = rewrite_natural_date_keywords("modified:20231201", EASTERN)
+        lo, hi = _range(result, "modified")
+        assert lo == "2023-12-01T05:00:00Z"
+        assert hi == "2023-12-02T05:00:00Z"
+
+    def test_8digit_invalid_date_passes_through_unchanged(self) -> None:
+        assert rewrite_natural_date_keywords("added:20231340", UTC) == "added:20231340"
+
+
+class TestParseUserQuery:
+    """parse_user_query runs the full preprocessing pipeline."""
+
+    @pytest.fixture
+    def query_index(self) -> tantivy.Index:
+        schema = build_schema()
+        idx = tantivy.Index(schema, path=None)
+        register_tokenizers(idx, "")
+        return idx
+
+    def test_returns_tantivy_query(self, query_index: tantivy.Index) -> None:
+        assert isinstance(parse_user_query(query_index, "invoice", UTC), tantivy.Query)
+
+    def test_fuzzy_mode_does_not_raise(
+        self,
+        query_index: tantivy.Index,
+        settings,
+    ) -> None:
+        settings.ADVANCED_FUZZY_SEARCH_THRESHOLD = 0.5
+        assert isinstance(parse_user_query(query_index, "invoice", UTC), tantivy.Query)
+
+    def test_date_rewriting_applied_before_tantivy_parse(
+        self,
+        query_index: tantivy.Index,
+    ) -> None:
+        # created:today must be rewritten to an ISO range before Tantivy parses it;
+        # if passed raw, Tantivy would reject "today" as an invalid date value
+        with time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False):
+            q = parse_user_query(query_index, "created:today", UTC)
+        assert isinstance(q, tantivy.Query)
 
 
 class TestPassthrough:
@@ -189,9 +300,6 @@ class TestPassthrough:
 
     def test_unrelated_query_unchanged(self) -> None:
         assert rewrite_natural_date_keywords("title:invoice", UTC) == "title:invoice"
-
-
-# ── Task 6: normalize_query and build_permission_filter ─────────────────────
 
 
 class TestNormalizeQuery:
