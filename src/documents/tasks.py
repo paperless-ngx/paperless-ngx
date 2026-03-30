@@ -97,7 +97,7 @@ def index_reindex(*, iter_wrapper: IterWrapper[Document] = _identity) -> None:
         "document_type",
         "storage_path",
         "owner",
-    ).prefetch_related("tags", "notes", "custom_fields")
+    ).prefetch_related("tags", "notes", "custom_fields", "versions")
     get_backend().rebuild(documents, iter_wrapper=iter_wrapper)
     reset_backend()
 

@@ -804,13 +804,20 @@ contract you signed 8 years ago).
 
 When you search paperless for a document, it tries to match this query
 against your documents. Paperless will look for matching documents by
-inspecting their content, title, correspondent, type and tags. Paperless
-returns a scored list of results, so that documents matching your query
-better will appear further up in the search results.
+inspecting their content, title, correspondent, type, tags, notes, and
+custom field values. Paperless returns a scored list of results, so that
+documents matching your query better will appear further up in the search
+results.
 
 By default, paperless returns only documents which contain all words
-typed in the search bar. However, paperless also offers advanced search
-syntax if you want to drill down the results further.
+typed in the search bar. A few things to know about how matching works:
+
+- **Word-order-independent**: "invoice unpaid" and "unpaid invoice" return the same results.
+- **Accent-insensitive**: searching `resume` also finds `résumé`, `cafe` finds `café`.
+- **Separator-agnostic**: punctuation and separators are stripped during indexing, so
+  searching a partial number like `1312` finds documents containing `A-1312/B`.
+
+Paperless also offers advanced search syntax if you want to drill down further.
 
 Matching documents with logical expressions:
 
@@ -851,6 +858,47 @@ modified:this_year
 
 Supported date keywords: `today`, `yesterday`, `this_week`, `last_week`,
 `this_month`, `last_month`, `this_year`, `last_year`.
+
+#### Searching custom fields
+
+Custom field values are included in the full-text index, so a plain search
+already matches documents whose custom field values contain your search terms.
+To narrow by field name or value specifically:
+
+```
+custom_fields.value:policy
+custom_fields.name:"Contract Number"
+custom_fields.name:Insurance custom_fields.value:policy
+```
+
+- `custom_fields.value` matches against the value of any custom field.
+- `custom_fields.name` matches the name of the field (use quotes for multi-word names).
+- Combine both to find documents where a specific named field contains a specific value.
+
+Because separators are stripped during indexing, individual parts of formatted
+codes are searchable on their own. A value stored as `A-1312/99.50` produces the
+tokens `a`, `1312`, `99`, `50` — each searchable independently:
+
+```
+custom_fields.value:1312
+custom_fields.name:"Contract Number" custom_fields.value:1312
+```
+
+!!! note
+
+    Custom date fields do not support relative date syntax (e.g. `[now to 2 weeks]`).
+    For date ranges on custom date fields, use the document list filters in the web UI.
+
+#### Searching notes
+
+Notes content is included in full-text search automatically. To search
+by note author or content specifically:
+
+```
+notes.user:alice
+notes.note:reminder
+notes.user:alice notes.note:insurance
+```
 
 All of these constructs can be combined as you see fit. If you want to
 learn more about the query language used by paperless, see the
