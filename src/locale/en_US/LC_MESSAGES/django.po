@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-31 14:56+0000\n"
+"POT-Creation-Date: 2026-03-31 18:24+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1300,7 +1300,7 @@ msgid "workflow runs"
 msgstr ""
 
 #: documents/serialisers.py:463 documents/serialisers.py:815
-#: documents/serialisers.py:2501 documents/views.py:2066
+#: documents/serialisers.py:2549 documents/views.py:2066
 #: documents/views.py:2124 paperless_mail/serialisers.py:143
 msgid "Insufficient permissions."
 msgstr ""
@@ -1309,39 +1309,39 @@ msgstr ""
 msgid "Invalid color."
 msgstr ""
 
-#: documents/serialisers.py:2124
+#: documents/serialisers.py:2172
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
 
-#: documents/serialisers.py:2168
+#: documents/serialisers.py:2216
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr ""
 
-#: documents/serialisers.py:2175
+#: documents/serialisers.py:2223
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr ""
 
-#: documents/serialisers.py:2192 documents/serialisers.py:2202
+#: documents/serialisers.py:2240 documents/serialisers.py:2250
 msgid ""
 "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr ""
 
-#: documents/serialisers.py:2197
+#: documents/serialisers.py:2245
 msgid "Some custom fields don't exist or were specified twice."
 msgstr ""
 
-#: documents/serialisers.py:2344
+#: documents/serialisers.py:2392
 msgid "Invalid variable detected."
 msgstr ""
 
-#: documents/serialisers.py:2557
+#: documents/serialisers.py:2605
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2587 documents/views.py:3696
+#: documents/serialisers.py:2635 documents/views.py:3738
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
@@ -1613,20 +1613,20 @@ msgstr ""
 msgid "Invalid more_like_id"
 msgstr ""
 
-#: documents/views.py:3708
+#: documents/views.py:3750
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr ""
 
-#: documents/views.py:3751
+#: documents/views.py:3793
 msgid "Bundle is already being processed."
 msgstr ""
 
-#: documents/views.py:3808
+#: documents/views.py:3850
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr ""
 
-#: documents/views.py:3818
+#: documents/views.py:3860
 msgid "The share link bundle is unavailable."
 msgstr ""
 
