@@ -1,5 +1,6 @@
 import shutil
 import zoneinfo
+from collections.abc import Generator
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -93,7 +94,10 @@ def sample_doc(
 
 
 @pytest.fixture()
-def _search_index(tmp_path: Path, settings: SettingsWrapper) -> None:
+def _search_index(
+    tmp_path: Path,
+    settings: SettingsWrapper,
+) -> Generator[None, None, None]:
     """Create a temp index directory and point INDEX_DIR at it.
 
     Resets the backend singleton before and after so each test gets a clean
