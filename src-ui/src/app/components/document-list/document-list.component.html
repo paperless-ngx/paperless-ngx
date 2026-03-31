@@ -2,8 +2,8 @@
   <div ngbDropdown class="btn-group flex-fill d-sm-none">
     <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle>
       <i-bs name="text-indent-left"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Select</ng-container></div>
-      @if (list.selected.size > 0) {
-        <pngx-clearable-badge [selected]="list.selected.size > 0" [number]="list.selected.size" (cleared)="list.selectNone()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
+      @if (list.hasSelection) {
+        <pngx-clearable-badge [selected]="list.hasSelection" [number]="list.selectedCount" (cleared)="list.selectNone()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
       }
     </button>
     <div ngbDropdownMenu aria-labelledby="dropdownSelectMobile" class="shadow">
@@ -17,7 +17,7 @@
       <span class="input-group-text border-0" i18n>Select:</span>
     </div>
     <div class="btn-group btn-group-sm flex-nowrap">
-      @if (list.selected.size > 0) {
+      @if (list.hasSelection) {
         <button class="btn btn-sm btn-outline-secondary" (click)="list.selectNone()">
           <i-bs name="slash-circle" class="me-1"></i-bs><ng-container i18n>None</ng-container>
         </button>
@@ -127,11 +127,11 @@
         <div class="spinner-border spinner-border-sm me-2" role="status"></div>
         <ng-container i18n>Loading...</ng-container>
       }
-      @if (list.selected.size > 0) {
-        <span i18n>{list.collectionSize, plural, =1 {Selected {{list.selected.size}} of one document} other {Selected {{list.selected.size}} of {{list.collectionSize || 0}} documents}}</span>
+      @if (list.hasSelection) {
+        <span i18n>{list.collectionSize, plural, =1 {Selected {{list.selectedCount}} of one document} other {Selected {{list.selectedCount}} of {{list.collectionSize || 0}} documents}}</span>
       }
       @if (!list.isReloading) {
-        @if (list.selected.size === 0) {
+        @if (!list.hasSelection) {
           <span i18n>{list.collectionSize, plural, =1 {One document} other {{{list.collectionSize || 0}} documents}}</span>
           }&nbsp;@if (isFiltered) {
             &nbsp;<span i18n>(filtered)</span>
@@ -142,7 +142,7 @@
           <i-bs width="1em" height="1em" name="x"></i-bs><small i18n>Reset filters</small>
         </button>
       }
-      @if (!list.isReloading && list.selected.size > 0) {
+      @if (!list.isReloading && list.hasSelection) {
         <button class="btn btn-link py-0" (click)="list.selectNone()">
           <i-bs width="1em" height="1em" name="slash-circle" class="me-1"></i-bs><small i18n>Clear selection</small>
         </button>
