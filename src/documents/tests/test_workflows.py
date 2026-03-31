@@ -3512,6 +3512,60 @@ class TestWorkflows(
             as_json=False,
         )
 
+    @mock.patch("documents.signals.handlers.execute_webhook_action")
+    def test_workflow_webhook_action_does_not_overwrite_concurrent_tags(
+        self,
+        mock_execute_webhook_action,
+    ):
+        """
+        GIVEN:
+            - A document updated workflow with only a webhook action
+            - A tag update that happens after run_workflows
+        WHEN:
+            - The workflow runs
+        THEN:
+            - The concurrent tag update is preserved
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        webhook_action = WorkflowActionWebhook.objects.create(
+            use_params=False,
+            body="Test message: {{doc_url}}",
+            url="http://paperless-ngx.com",
+            include_document=False,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.WEBHOOK,
+            webhook=webhook_action,
+        )
+        w = Workflow.objects.create(
+            name="Webhook workflow",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        inbox_tag = Tag.objects.create(name="inbox")
+        error_tag = Tag.objects.create(name="error")
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        doc.tags.add(inbox_tag)
+
+        def add_error_tag(*args, **kwargs):
+            Document.objects.get(pk=doc.pk).tags.add(error_tag)
+
+        mock_execute_webhook_action.side_effect = add_error_tag
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        doc.refresh_from_db()
+        self.assertCountEqual(doc.tags.all(), [inbox_tag, error_tag])
+
     @override_settings(
         PAPERLESS_URL="http://localhost:8000",
     )

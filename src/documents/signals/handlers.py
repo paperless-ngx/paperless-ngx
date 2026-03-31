@@ -813,6 +813,7 @@ def run_workflows(
     workflows = get_workflows_for_trigger(trigger_type, workflow_to_run)
 
     for workflow in workflows:
+        tags_modified = False
         if not use_overrides:
             # This can be called from bulk_update_documents, which may be running multiple times
             # Refresh this so the matching data is fresh and instance fields are re-freshed
@@ -833,6 +834,7 @@ def run_workflows(
                     if use_overrides and overrides:
                         apply_assignment_to_overrides(action, overrides)
                     else:
+                        tags_modified = tags_modified or action.has_assign_tags
                         apply_assignment_to_document(
                             action,
                             document,
@@ -843,6 +845,9 @@ def run_workflows(
                     if use_overrides and overrides:
                         apply_removal_to_overrides(action, overrides)
                     else:
+                        tags_modified = tags_modified or (
+                            action.remove_all_tags or action.remove_tags.exists()
+                        )
                         apply_removal_to_document(action, document, doc_tag_ids)
                 elif action.type == WorkflowAction.WorkflowActionType.EMAIL:
                     context = build_workflow_action_context(document, overrides)
@@ -886,7 +891,8 @@ def run_workflows(
                         "modified",
                     ],
                 )
-                document.tags.set(doc_tag_ids)
+                if tags_modified:
+                    document.tags.set(doc_tag_ids)
 
             WorkflowRun.objects.create(
                 workflow=workflow,
