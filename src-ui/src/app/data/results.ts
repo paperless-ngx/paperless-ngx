@@ -3,9 +3,9 @@ import { Document } from './document'
 export interface Results<T> {
   count: number
 
-  results: T[]
+  display_count?: number
 
-  all: number[]
+  results: T[]
 }
 
 export interface SelectionDataItem {

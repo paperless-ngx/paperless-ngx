@@ -388,8 +388,8 @@ describe('DocumentListComponent', () => {
   it('should support select all, none, page & range', () => {
     jest.spyOn(documentListService, 'documents', 'get').mockReturnValue(docs)
     jest
-      .spyOn(documentService, 'listAllFilteredIds')
-      .mockReturnValue(of(docs.map((d) => d.id)))
+      .spyOn(documentListService, 'collectionSize', 'get')
+      .mockReturnValue(docs.length)
     fixture.detectChanges()
     expect(documentListService.selected.size).toEqual(0)
     const docCards = fixture.debugElement.queryAll(
@@ -403,7 +403,8 @@ describe('DocumentListComponent', () => {
     displayModeButtons[2].triggerEventHandler('click')
     expect(selectAllSpy).toHaveBeenCalled()
     fixture.detectChanges()
-    expect(documentListService.selected.size).toEqual(3)
+    expect(documentListService.allSelected).toBeTruthy()
+    expect(documentListService.selectedCount).toEqual(3)
     docCards.forEach((card) => {
       expect(card.context.selected).toBeTruthy()
     })

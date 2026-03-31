@@ -81,6 +81,11 @@ export interface ListViewState {
   selected?: Set<number>
 
   /**
+   * True if the full filtered result set is selected.
+   */
+  allSelected?: boolean
+
+  /**
    * The page size of the list view.
    */
   pageSize?: number
@@ -199,6 +204,20 @@ export class DocumentListViewService {
       sortReverse: true,
       filterRules: [],
       selected: new Set<number>(),
+      allSelected: false,
+    }
+  }
+
+  private syncSelectedToCurrentPage() {
+    if (!this.allSelected) {
+      return
+    }
+
+    this.selected.clear()
+    this.documents?.forEach((doc) => this.selected.add(doc.id))
+
+    if (!this.collectionSize) {
+      this.selectNone()
     }
   }
 
@@ -305,6 +324,7 @@ export class DocumentListViewService {
           activeListViewState.collectionSize = result.count
           activeListViewState.documents = result.results
           this.selectionData = resultWithSelectionData.selection_data ?? null
+          this.syncSelectedToCurrentPage()
 
           if (updateQueryParams && !this._activeSavedViewId) {
             let base = ['/documents']
@@ -435,6 +455,20 @@ export class DocumentListViewService {
 
   get selected(): Set<number> {
     return this.activeListViewState.selected
+  }
+
+  get allSelected(): boolean {
+    return this.activeListViewState.allSelected ?? false
+  }
+
+  get selectedCount(): number {
+    return this.allSelected
+      ? (this.collectionSize ?? this.selected.size)
+      : this.selected.size
+  }
+
+  get hasSelection(): boolean {
+    return this.allSelected || this.selected.size > 0
   }
 
   setSort(field: string, reverse: boolean) {
@@ -591,11 +625,16 @@ export class DocumentListViewService {
   }
 
   selectNone() {
+    this.activeListViewState.allSelected = false
     this.selected.clear()
     this.rangeSelectionAnchorIndex = this.lastRangeSelectionToIndex = null
   }
 
   reduceSelectionToFilter() {
+    if (this.allSelected) {
+      return
+    }
+
     if (this.selected.size > 0) {
       this.documentService
         .listAllFilteredIds(this.filterRules)
@@ -610,12 +649,12 @@ export class DocumentListViewService {
   }
 
   selectAll() {
-    this.documentService
-      .listAllFilteredIds(this.filterRules)
-      .subscribe((ids) => ids.forEach((id) => this.selected.add(id)))
+    this.activeListViewState.allSelected = true
+    this.syncSelectedToCurrentPage()
   }
 
   selectPage() {
+    this.activeListViewState.allSelected = false
     this.selected.clear()
     this.documents.forEach((doc) => {
       this.selected.add(doc.id)
@@ -623,10 +662,13 @@ export class DocumentListViewService {
   }
 
   isSelected(d: Document) {
-    return this.selected.has(d.id)
+    return this.allSelected || this.selected.has(d.id)
   }
 
   toggleSelected(d: Document): void {
+    if (this.allSelected) {
+      this.activeListViewState.allSelected = false
+    }
     if (this.selected.has(d.id)) this.selected.delete(d.id)
     else this.selected.add(d.id)
     this.rangeSelectionAnchorIndex = this.documentIndexInCurrentView(d.id)
@@ -634,6 +676,10 @@ export class DocumentListViewService {
   }
 
   selectRangeTo(d: Document) {
+    if (this.allSelected) {
+      this.activeListViewState.allSelected = false
+    }
+
     if (this.rangeSelectionAnchorIndex !== null) {
       const documentToIndex = this.documentIndexInCurrentView(d.id)
       const fromIndex = Math.min(

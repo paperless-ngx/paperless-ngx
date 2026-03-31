@@ -436,3 +436,6 @@ Initial API version.
   moved from the bulk edit endpoint to their own individual endpoints. Using these methods via
   the bulk edit endpoint is still supported for compatibility with versions < 10 until support
   for API v9 is dropped.
+- The `all` parameter of list endpoints is now deprecated and will be removed in a future version.
+- The bulk edit objects endpoint now supports `all` and `filters` parameters to avoid having to send
+  large lists of object IDs for operations affecting many objects.

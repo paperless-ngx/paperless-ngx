@@ -9,6 +9,7 @@ from allauth.mfa.recovery_codes.internal.flows import auto_generate_recovery_cod
 from allauth.mfa.totp.internal import auth as totp_auth
 from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.models import SocialAccount
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -57,17 +58,27 @@ class StandardPagination(PageNumberPagination):
     page_size_query_param = "page_size"
     max_page_size = 100000
 
+    def _get_api_version(self) -> int:
+        request = getattr(self, "request", None)
+        default_version = settings.REST_FRAMEWORK["DEFAULT_VERSION"]
+        return int(request.version if request else default_version)
+
+    def _should_include_all(self) -> bool:
+        # TODO: remove legacy `all` support when API v9 is dropped.
+        return self._get_api_version() < 10
+
     def get_paginated_response(self, data):
+        response_data = [
+            ("count", self.page.paginator.count),
+            ("next", self.get_next_link()),
+            ("previous", self.get_previous_link()),
+        ]
+        if self._should_include_all():
+            response_data.append(("all", self.get_all_result_ids()))
+        response_data.append(("results", data))
+
         return Response(
-            OrderedDict(
-                [
-                    ("count", self.page.paginator.count),
-                    ("next", self.get_next_link()),
-                    ("previous", self.get_previous_link()),
-                    ("all", self.get_all_result_ids()),
-                    ("results", data),
-                ],
-            ),
+            OrderedDict(response_data),
         )
 
     def get_all_result_ids(self):
@@ -80,11 +91,14 @@ class StandardPagination(PageNumberPagination):
 
     def get_paginated_response_schema(self, schema):
         response_schema = super().get_paginated_response_schema(schema)
-        response_schema["properties"]["all"] = {
-            "type": "array",
-            "example": "[1, 2, 3]",
-            "items": {"type": "integer"},
-        }
+        if self._should_include_all():
+            response_schema["properties"]["all"] = {
+                "type": "array",
+                "example": "[1, 2, 3]",
+                "items": {"type": "integer"},
+            }
+        else:
+            response_schema["properties"].pop("all", None)
         return response_schema
 
 

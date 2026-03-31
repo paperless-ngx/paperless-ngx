@@ -92,7 +92,7 @@
           <button ngbDropdownItem (click)="rotateSelected()" [disabled]="!userOwnsAll && !userCanEditAll">
             <i-bs name="arrow-clockwise" class="me-1"></i-bs><ng-container i18n>Rotate</ng-container>
           </button>
-          <button ngbDropdownItem (click)="mergeSelected()" [disabled]="!userCanAdd || list.selected.size < 2">
+          <button ngbDropdownItem (click)="mergeSelected()" [disabled]="!userCanAdd || list.allSelected || list.selectedCount < 2">
             <i-bs name="journals" class="me-1"></i-bs><ng-container i18n>Merge</ng-container>
           </button>
         </div>
@@ -103,13 +103,13 @@
         class="btn btn-sm btn-outline-primary"
         id="dropdownSend"
         ngbDropdownToggle
-        [disabled]="disabled || list.selected.size === 0"
+        [disabled]="disabled || !list.hasSelection || list.allSelected"
       >
         <i-bs name="send"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Send</ng-container>
         </div>
       </button>
       <div ngbDropdownMenu aria-labelledby="dropdownSend" class="shadow">
-        <button ngbDropdownItem (click)="createShareLinkBundle()">
+        <button ngbDropdownItem (click)="createShareLinkBundle()" [disabled]="list.allSelected">
           <i-bs name="link" class="me-1"></i-bs><ng-container i18n>Create a share link bundle</ng-container>
         </button>
         <button ngbDropdownItem (click)="manageShareLinkBundles()">
@@ -117,7 +117,7 @@
         </button>
         <div class="dropdown-divider"></div>
         @if (emailEnabled) {
-          <button ngbDropdownItem (click)="emailSelected()">
+          <button ngbDropdownItem (click)="emailSelected()" [disabled]="list.allSelected">
             <i-bs name="envelope" class="me-1"></i-bs><ng-container i18n>Email</ng-container>
           </button>
         }

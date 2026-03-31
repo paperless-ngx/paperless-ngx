@@ -534,12 +534,16 @@ describe('DocumentListViewService', () => {
   })
 
   it('should support select all', () => {
-    documentListViewService.selectAll()
-    const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
+    documentListViewService.reload()
+    const reloadReq = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
     )
-    expect(req.request.method).toEqual('GET')
-    req.flush(full_results)
+    expect(reloadReq.request.method).toEqual('GET')
+    reloadReq.flush(full_results)
+
+    documentListViewService.selectAll()
+    expect(documentListViewService.allSelected).toBeTruthy()
+    expect(documentListViewService.selectedCount).toEqual(documents.length)
     expect(documentListViewService.selected.size).toEqual(documents.length)
     expect(documentListViewService.isSelected(documents[0])).toBeTruthy()
     documentListViewService.selectNone()
@@ -575,26 +579,62 @@ describe('DocumentListViewService', () => {
     expect(documentListViewService.isSelected(documents[3])).toBeTruthy()
   })
 
-  it('should support selection range reduction', () => {
+  it('should clear all-selected mode when toggling a single document', () => {
+    documentListViewService.reload()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+    )
+    req.flush(full_results)
+
     documentListViewService.selectAll()
+    expect(documentListViewService.allSelected).toBeTruthy()
+
+    documentListViewService.toggleSelected(documents[0])
+
+    expect(documentListViewService.allSelected).toBeFalsy()
+    expect(documentListViewService.isSelected(documents[0])).toBeFalsy()
+  })
+
+  it('should clear all-selected mode when selecting a range', () => {
+    documentListViewService.reload()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+    )
+    req.flush(full_results)
+
+    documentListViewService.selectAll()
+    documentListViewService.toggleSelected(documents[1])
+    documentListViewService.selectAll()
+    expect(documentListViewService.allSelected).toBeTruthy()
+
+    documentListViewService.selectRangeTo(documents[3])
+
+    expect(documentListViewService.allSelected).toBeFalsy()
+    expect(documentListViewService.isSelected(documents[1])).toBeTruthy()
+    expect(documentListViewService.isSelected(documents[2])).toBeTruthy()
+    expect(documentListViewService.isSelected(documents[3])).toBeTruthy()
+  })
+
+  it('should support selection range reduction', () => {
+    documentListViewService.reload()
     let req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
     )
     expect(req.request.method).toEqual('GET')
     req.flush(full_results)
+
+    documentListViewService.selectAll()
     expect(documentListViewService.selected.size).toEqual(6)
 
     documentListViewService.setFilterRules(filterRules)
-    httpTestingController.expectOne(
+    req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true&tags__id__all=9`
     )
-    const reqs = httpTestingController.match(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id&tags__id__all=9`
-    )
-    reqs[0].flush({
+    req.flush({
       count: 3,
       results: documents.slice(0, 3),
     })
+    expect(documentListViewService.allSelected).toBeTruthy()
     expect(documentListViewService.selected.size).toEqual(3)
   })
 

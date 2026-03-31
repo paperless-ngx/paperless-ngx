@@ -1119,21 +1119,19 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             [u1_doc1.id],
         )
 
-    def test_pagination_all(self) -> None:
+    def test_pagination_results(self) -> None:
         """
         GIVEN:
             - A set of 50 documents
         WHEN:
             - API request for document filtering
         THEN:
-            - Results are paginated (25 items) and response["all"] returns all ids (50 items)
+            - Results are paginated (25 items) and count reflects all results (50 items)
         """
         t = Tag.objects.create(name="tag")
-        docs = []
         for i in range(50):
             d = Document.objects.create(checksum=i, content=f"test{i}")
             d.tags.add(t)
-            docs.append(d)
 
         response = self.client.get(
             f"/api/documents/?tags__id__in={t.id}",
@@ -1141,7 +1139,32 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results), 25)
-        self.assertEqual(len(response.data["all"]), 50)
+        self.assertEqual(response.data["count"], 50)
+        self.assertNotIn("all", response.data)
+
+    def test_pagination_all_for_api_version_9(self) -> None:
+        """
+        GIVEN:
+            - A set of documents matching a filter
+        WHEN:
+            - API request uses legacy version 9
+        THEN:
+            - Response includes "all" for backward compatibility
+        """
+        t = Tag.objects.create(name="tag")
+        docs = []
+        for i in range(4):
+            d = Document.objects.create(checksum=i, content=f"test{i}")
+            d.tags.add(t)
+            docs.append(d)
+
+        response = self.client.get(
+            f"/api/documents/?tags__id__in={t.id}",
+            headers={"Accept": "application/json; version=9"},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("all", response.data)
         self.assertCountEqual(response.data["all"], [d.id for d in docs])
 
     def test_list_with_include_selection_data(self) -> None:
