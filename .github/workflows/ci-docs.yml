@@ -23,7 +23,7 @@ jobs:
       docs_changed: ${{ steps.force.outputs.run_all == 'true' || steps.filter.outputs.docs == 'true' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
       - name: Decide run mode
@@ -51,7 +51,7 @@ jobs:
       - name: Detect changes
         id: filter
         if: steps.force.outputs.run_all != 'true'
-        uses: dorny/paths-filter@v3.0.2
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
         with:
           base: ${{ steps.range.outputs.base }}
           ref: ${{ steps.range.outputs.ref }}
@@ -68,16 +68,16 @@ jobs:
     name: Build Documentation
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/configure-pages@v5.0.0
+      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Set up Python
         id: setup-python
-        uses: actions/setup-python@v6.2.0
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       - name: Install uv
-        uses: astral-sh/setup-uv@v7.3.1
+        uses: astral-sh/setup-uv@5a095e7a2014a4212f075830d4f7277575a9d098 # v7.3.1
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
@@ -93,7 +93,7 @@ jobs:
             --frozen \
             zensical build --clean
       - name: Upload GitHub Pages artifact
-        uses: actions/upload-pages-artifact@v4.0.0
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
         with:
           path: site
           name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
@@ -107,7 +107,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy GitHub Pages
-        uses: actions/deploy-pages@v4.0.5
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
         id: deployment
         with:
           artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}

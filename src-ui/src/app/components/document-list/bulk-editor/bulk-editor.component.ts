@@ -16,6 +16,7 @@ import { first, map, Observable, Subject, switchMap, takeUntil } from 'rxjs'
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
 import { CustomField } from 'src/app/data/custom-field'
 import { MatchingModel } from 'src/app/data/matching-model'
+import { SelectionDataItem } from 'src/app/data/results'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
@@ -32,7 +33,6 @@ import {
   DocumentBulkEditMethod,
   DocumentService,
   MergeDocumentsRequest,
-  SelectionDataItem,
 } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.service'
