@@ -68,7 +68,7 @@ def _extract_autocomplete_words(text_sources: list[str]) -> set[str]:
             continue
         try:
             tokens = _WORD_RE.findall(text, timeout=_AUTOCOMPLETE_REGEX_TIMEOUT)
-        except regex.TimeoutError:
+        except TimeoutError:
             logger.warning(
                 "Autocomplete word extraction timed out for a text source; skipping.",
             )
