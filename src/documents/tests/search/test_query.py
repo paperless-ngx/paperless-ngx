@@ -4,6 +4,7 @@ import re
 from datetime import UTC
 from datetime import datetime
 from datetime import tzinfo
+from typing import TYPE_CHECKING
 from zoneinfo import ZoneInfo
 
 import pytest
@@ -17,9 +18,11 @@ from documents.search._query import rewrite_natural_date_keywords
 from documents.search._schema import build_schema
 from documents.search._tokenizer import register_tokenizers
 
+if TYPE_CHECKING:
+    from django.contrib.auth.base_user import AbstractBaseUser
+
 pytestmark = pytest.mark.search
 
-UTC = UTC
 EASTERN = ZoneInfo("America/New_York")  # UTC-5 / UTC-4 (DST)
 AUCKLAND = ZoneInfo("Pacific/Auckland")  # UTC+13 in southern-hemisphere summer
 
@@ -422,7 +425,12 @@ class TestNormalizeQuery:
 
 
 class TestPermissionFilter:
-    """build_permission_filter tests use an in-memory index — no DB access needed."""
+    """
+    build_permission_filter tests use an in-memory index — no DB access needed.
+
+    Users are constructed as unsaved model instances (django_user_model(pk=N))
+    so no database round-trip occurs; only .pk is read by build_permission_filter.
+    """
 
     @pytest.fixture
     def perm_index(self) -> tantivy.Index:
@@ -450,36 +458,58 @@ class TestPermissionFilter:
         writer.commit()
         idx.reload()
 
-    def test_perm_no_owner_visible_to_any_user(self, perm_index: tantivy.Index) -> None:
+    def test_perm_no_owner_visible_to_any_user(
+        self,
+        perm_index: tantivy.Index,
+        django_user_model: type[AbstractBaseUser],
+    ) -> None:
+        """Documents with no owner must be visible to every user."""
         self._add_doc(perm_index, doc_id=1, owner_id=None)
-        user = type("U", (), {"pk": 99})()
-        perm = build_permission_filter(perm_index.schema, user)  # .schema is a property
-        assert perm_index.searcher().search(perm, limit=10).count == 1
-
-    def test_perm_owned_by_user_is_visible(self, perm_index: tantivy.Index) -> None:
-        self._add_doc(perm_index, doc_id=2, owner_id=42)
-        user = type("U", (), {"pk": 42})()
+        user = django_user_model(pk=99)
         perm = build_permission_filter(perm_index.schema, user)
         assert perm_index.searcher().search(perm, limit=10).count == 1
 
-    def test_perm_owned_by_other_not_visible(self, perm_index: tantivy.Index) -> None:
+    def test_perm_owned_by_user_is_visible(
+        self,
+        perm_index: tantivy.Index,
+        django_user_model: type[AbstractBaseUser],
+    ) -> None:
+        """A document owned by the requesting user must be visible."""
+        self._add_doc(perm_index, doc_id=2, owner_id=42)
+        user = django_user_model(pk=42)
+        perm = build_permission_filter(perm_index.schema, user)
+        assert perm_index.searcher().search(perm, limit=10).count == 1
+
+    def test_perm_owned_by_other_not_visible(
+        self,
+        perm_index: tantivy.Index,
+        django_user_model: type[AbstractBaseUser],
+    ) -> None:
+        """A document owned by a different user must not be visible."""
         self._add_doc(perm_index, doc_id=3, owner_id=42)
-        user = type("U", (), {"pk": 99})()
+        user = django_user_model(pk=99)
         perm = build_permission_filter(perm_index.schema, user)
         assert perm_index.searcher().search(perm, limit=10).count == 0
 
-    def test_perm_shared_viewer_is_visible(self, perm_index: tantivy.Index) -> None:
+    def test_perm_shared_viewer_is_visible(
+        self,
+        perm_index: tantivy.Index,
+        django_user_model: type[AbstractBaseUser],
+    ) -> None:
+        """A document explicitly shared with a user must be visible to that user."""
         self._add_doc(perm_index, doc_id=4, owner_id=42, viewer_ids=(99,))
-        user = type("U", (), {"pk": 99})()
+        user = django_user_model(pk=99)
         perm = build_permission_filter(perm_index.schema, user)
         assert perm_index.searcher().search(perm, limit=10).count == 1
 
     def test_perm_only_owned_docs_hidden_from_others(
         self,
         perm_index: tantivy.Index,
+        django_user_model: type[AbstractBaseUser],
     ) -> None:
+        """Only unowned documents appear when the user owns none of them."""
         self._add_doc(perm_index, doc_id=5, owner_id=10)  # owned by 10
         self._add_doc(perm_index, doc_id=6, owner_id=None)  # unowned
-        user = type("U", (), {"pk": 20})()
+        user = django_user_model(pk=20)
         perm = build_permission_filter(perm_index.schema, user)
         assert perm_index.searcher().search(perm, limit=10).count == 1  # only unowned
