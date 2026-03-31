@@ -498,8 +498,8 @@ class TantivyBackend:
                     limit=offset + page_size,
                     order_by_field=mapped_field,
                 )
-            # Field sorting: hits are bare DocAddress (no score)
-            all_hits = [(hit, 0.0) for hit in results.hits]
+            # Field sorting: hits are still (score, DocAddress) tuples; score unused
+            all_hits = [(hit[1], 0.0) for hit in results.hits]
         else:
             # Score-based search: hits are (score, doc_address) tuples
             results = searcher.search(final_query, limit=offset + page_size)
