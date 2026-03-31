@@ -11,6 +11,9 @@ import pytest
 import tantivy
 import time_machine
 
+from documents.search._query import _date_only_range
+from documents.search._query import _datetime_range
+from documents.search._query import _rewrite_compact_date
 from documents.search._query import build_permission_filter
 from documents.search._query import normalize_query
 from documents.search._query import parse_user_query
@@ -154,6 +157,10 @@ class TestCreatedDateField:
         assert lo == "2025-12-01T00:00:00Z"
         assert hi == "2026-01-01T00:00:00Z"
 
+    def test_unknown_keyword_raises(self) -> None:
+        with pytest.raises(ValueError, match="Unknown keyword"):
+            _date_only_range("bogus_keyword", UTC)
+
 
 class TestDateTimeFields:
     """
@@ -257,6 +264,10 @@ class TestDateTimeFields:
         lo, hi = _range(rewrite_natural_date_keywords("added:last_month", UTC), "added")
         assert lo == "2025-12-01T00:00:00Z"
         assert hi == "2026-01-01T00:00:00Z"
+
+    def test_unknown_keyword_raises(self) -> None:
+        with pytest.raises(ValueError, match="Unknown keyword"):
+            _datetime_range("bogus_keyword", UTC)
 
 
 class TestWhooshQueryRewriting:
@@ -362,6 +373,10 @@ class TestWhooshQueryRewriting:
 
     def test_8digit_invalid_date_passes_through_unchanged(self) -> None:
         assert rewrite_natural_date_keywords("added:20231340", UTC) == "added:20231340"
+
+    def test_compact_14digit_invalid_date_passes_through_unchanged(self) -> None:
+        # Month=13 makes datetime() raise ValueError; the token must be left as-is
+        assert _rewrite_compact_date("20231300120000") == "20231300120000"
 
 
 class TestParseUserQuery:

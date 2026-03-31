@@ -280,6 +280,12 @@ class TestMoreLikeThis:
         # private_doc is owned by other, so viewer cannot see it
         assert 53 not in returned_ids
 
+    def test_document_not_in_index_returns_empty(self, backend: TantivyBackend):
+        """more_like_this for a doc_id absent from the index must return empty results."""
+        results = backend.more_like_this(doc_id=9999, user=None, page=1, page_size=10)
+        assert results.hits == []
+        assert results.total == 0
+
 
 class TestSingleton:
     """Test get_backend() and reset_backend() singleton lifecycle."""
