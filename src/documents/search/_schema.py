@@ -132,7 +132,7 @@ def wipe_index(index_dir: Path) -> None:
     Args:
         index_dir: Path to the search index directory to clear
     """
-    for child in list(index_dir.iterdir()):
+    for child in index_dir.iterdir():
         if child.is_dir():
             shutil.rmtree(child)
         else:
