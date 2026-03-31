@@ -463,11 +463,17 @@ the search yields non-existing documents or won't find anything, you
 may need to recreate the index manually.
 
 ```
-document_index {reindex,optimize}
+document_index {reindex,optimize} [--recreate] [--if-needed]
 ```
 
-Specify `reindex` to have the index created from scratch. This may take
-some time.
+Specify `reindex` to rebuild the index from all documents in the database. This
+may take some time.
+
+Pass `--recreate` to wipe the existing index before rebuilding. Use this when the
+index is corrupted or you want a fully clean rebuild.
+
+Pass `--if-needed` to skip the rebuild if the index is already up to date (schema
+version and search language match). Safe to run on every startup or upgrade.
 
 Specify `optimize` to optimize the index. This command is regularly invoked by the
 task scheduler.

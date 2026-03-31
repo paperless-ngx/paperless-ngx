@@ -117,6 +117,32 @@ class TestMakeIndex:
         """Optimize command must execute without error (Tantivy handles optimization automatically)."""
         call_command("document_index", "optimize", skip_checks=True)
 
+    def test_reindex_recreate_wipes_index(self, mocker: MockerFixture) -> None:
+        """Reindex with --recreate must wipe the index before rebuilding."""
+        mock_wipe = mocker.patch(
+            "documents.management.commands.document_index.wipe_index",
+        )
+        mock_get_backend = mocker.patch(
+            "documents.management.commands.document_index.get_backend",
+        )
+        call_command("document_index", "reindex", recreate=True, skip_checks=True)
+        mock_wipe.assert_called_once()
+        mock_get_backend.return_value.rebuild.assert_called_once()
+
+    def test_reindex_without_recreate_does_not_wipe_index(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """Reindex without --recreate must not wipe the index."""
+        mock_wipe = mocker.patch(
+            "documents.management.commands.document_index.wipe_index",
+        )
+        mocker.patch(
+            "documents.management.commands.document_index.get_backend",
+        )
+        call_command("document_index", "reindex", skip_checks=True)
+        mock_wipe.assert_not_called()
+
     def test_reindex_if_needed_skips_when_up_to_date(
         self,
         mocker: MockerFixture,
