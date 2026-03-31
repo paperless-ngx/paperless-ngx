@@ -26,10 +26,10 @@ from documents.search._schema import build_schema
 from documents.search._schema import open_or_rebuild_index
 from documents.search._schema import wipe_index
 from documents.search._tokenizer import register_tokenizers
+from documents.utils import IterWrapper
 from documents.utils import identity
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
     from pathlib import Path
 
     from django.contrib.auth.base_user import AbstractBaseUser
@@ -759,7 +759,11 @@ class TantivyBackend:
         self._ensure_open()
         return WriteBatch(self, lock_timeout)
 
-    def rebuild(self, documents: QuerySet, iter_wrapper: Callable = identity) -> None:
+    def rebuild(
+        self,
+        documents: QuerySet[Document],
+        iter_wrapper: IterWrapper[Document] = identity,
+    ) -> None:
         """
         Rebuild the entire search index from scratch.
 
