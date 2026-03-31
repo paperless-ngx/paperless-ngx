@@ -479,7 +479,7 @@ def parse_user_query(
         field_boosts=_FIELD_BOOSTS,
     )
 
-    threshold = getattr(settings, "ADVANCED_FUZZY_SEARCH_THRESHOLD", None)
+    threshold = settings.ADVANCED_FUZZY_SEARCH_THRESHOLD
     if threshold is not None:
         fuzzy = index.parse_query(
             query_str,

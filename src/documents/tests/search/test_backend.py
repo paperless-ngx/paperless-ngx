@@ -379,6 +379,84 @@ class TestFieldHandling:
         )
         assert results.total == 1
 
+    def test_select_custom_field_indexes_label_not_id(self, backend: TantivyBackend):
+        """SELECT custom fields must index the human-readable label, not the opaque option ID."""
+        field = CustomField.objects.create(
+            name="Category",
+            data_type=CustomField.FieldDataType.SELECT,
+            extra_data={
+                "select_options": [
+                    {"id": "opt_abc", "label": "Invoice"},
+                    {"id": "opt_def", "label": "Receipt"},
+                ],
+            },
+        )
+        doc = Document.objects.create(
+            title="Categorised doc",
+            content="test",
+            checksum="SEL1",
+            pk=71,
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=field,
+            value_select="opt_abc",
+        )
+        backend.add_or_update(doc)
+
+        # Label should be findable
+        results = backend.search(
+            "custom_fields.value:invoice",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+        )
+        assert results.total == 1
+
+        # Opaque ID must not appear in the index
+        results = backend.search(
+            "custom_fields.value:opt_abc",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+        )
+        assert results.total == 0
+
+    def test_none_custom_field_value_not_indexed(self, backend: TantivyBackend):
+        """Custom field instances with no value set must not produce an index entry."""
+        field = CustomField.objects.create(
+            name="Optional",
+            data_type=CustomField.FieldDataType.SELECT,
+            extra_data={"select_options": [{"id": "opt_1", "label": "Yes"}]},
+        )
+        doc = Document.objects.create(
+            title="Unset field doc",
+            content="test",
+            checksum="SEL2",
+            pk=72,
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=field,
+            value_select=None,
+        )
+        backend.add_or_update(doc)
+
+        # The string "none" must not appear as an indexed value
+        results = backend.search(
+            "custom_fields.value:none",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+        )
+        assert results.total == 0
+
     def test_notes_include_user_information(self, backend: TantivyBackend):
         """Notes must be indexed with user information when available for structured queries."""
         user = User.objects.create_user("notewriter")

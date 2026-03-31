@@ -339,14 +339,17 @@ class TantivyBackend:
         # Custom fields — JSON for structured queries (custom_fields.name:x, custom_fields.value:y),
         # companion text field for default full-text search.
         for cfi in document.custom_fields.all():
+            search_value = cfi.value_for_search
+            if search_value is None:
+                continue
             doc.add_json(
                 "custom_fields",
                 {
                     "name": cfi.field.name,
-                    "value": str(cfi.value),
+                    "value": search_value,
                 },
             )
-            doc.add_text("custom_field", str(cfi.value))
+            doc.add_text("custom_field", str(cfi))
 
         # Dates
         created_date = datetime(
@@ -513,7 +516,7 @@ class TantivyBackend:
             all_hits = [(hit[0], hit[1] / max_score) for hit in all_hits]
 
         # Apply threshold filter if configured (score-based search only)
-        threshold = getattr(settings, "ADVANCED_FUZZY_SEARCH_THRESHOLD", None)
+        threshold = settings.ADVANCED_FUZZY_SEARCH_THRESHOLD
         if threshold is not None and not sort_field:
             all_hits = [hit for hit in all_hits if hit[1] >= threshold]
 
