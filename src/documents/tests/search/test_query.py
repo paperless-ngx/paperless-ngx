@@ -131,6 +131,26 @@ class TestCreatedDateField:
         assert lo == expected_lo
         assert hi == expected_hi
 
+    @time_machine.travel(datetime(2026, 12, 15, 12, 0, tzinfo=UTC), tick=False)
+    def test_this_month_december_wraps_to_next_year(self) -> None:
+        # December: next month must roll over to January 1 of next year
+        lo, hi = _range(
+            rewrite_natural_date_keywords("created:this_month", UTC),
+            "created",
+        )
+        assert lo == "2026-12-01T00:00:00Z"
+        assert hi == "2027-01-01T00:00:00Z"
+
+    @time_machine.travel(datetime(2026, 1, 15, 12, 0, tzinfo=UTC), tick=False)
+    def test_last_month_january_wraps_to_previous_year(self) -> None:
+        # January: last month must roll back to December 1 of previous year
+        lo, hi = _range(
+            rewrite_natural_date_keywords("created:last_month", UTC),
+            "created",
+        )
+        assert lo == "2025-12-01T00:00:00Z"
+        assert hi == "2026-01-01T00:00:00Z"
+
 
 class TestDateTimeFields:
     """
@@ -161,6 +181,79 @@ class TestDateTimeFields:
         )
         assert lo == "2026-03-28T00:00:00Z"
         assert hi == "2026-03-29T00:00:00Z"
+
+    @pytest.mark.parametrize(
+        ("keyword", "expected_lo", "expected_hi"),
+        [
+            pytest.param(
+                "yesterday",
+                "2026-03-27T00:00:00Z",
+                "2026-03-28T00:00:00Z",
+                id="yesterday",
+            ),
+            pytest.param(
+                "this_week",
+                "2026-03-23T00:00:00Z",
+                "2026-03-30T00:00:00Z",
+                id="this_week",
+            ),
+            pytest.param(
+                "last_week",
+                "2026-03-16T00:00:00Z",
+                "2026-03-23T00:00:00Z",
+                id="last_week",
+            ),
+            pytest.param(
+                "this_month",
+                "2026-03-01T00:00:00Z",
+                "2026-04-01T00:00:00Z",
+                id="this_month",
+            ),
+            pytest.param(
+                "last_month",
+                "2026-02-01T00:00:00Z",
+                "2026-03-01T00:00:00Z",
+                id="last_month",
+            ),
+            pytest.param(
+                "this_year",
+                "2026-01-01T00:00:00Z",
+                "2027-01-01T00:00:00Z",
+                id="this_year",
+            ),
+            pytest.param(
+                "last_year",
+                "2025-01-01T00:00:00Z",
+                "2026-01-01T00:00:00Z",
+                id="last_year",
+            ),
+        ],
+    )
+    @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
+    def test_datetime_keywords_utc(
+        self,
+        keyword: str,
+        expected_lo: str,
+        expected_hi: str,
+    ) -> None:
+        # 2026-03-28 is Saturday; weekday()==5 so Monday=2026-03-23
+        lo, hi = _range(rewrite_natural_date_keywords(f"added:{keyword}", UTC), "added")
+        assert lo == expected_lo
+        assert hi == expected_hi
+
+    @time_machine.travel(datetime(2026, 12, 15, 12, 0, tzinfo=UTC), tick=False)
+    def test_this_month_december_wraps_to_next_year(self) -> None:
+        # December: next month wraps to January of next year
+        lo, hi = _range(rewrite_natural_date_keywords("added:this_month", UTC), "added")
+        assert lo == "2026-12-01T00:00:00Z"
+        assert hi == "2027-01-01T00:00:00Z"
+
+    @time_machine.travel(datetime(2026, 1, 15, 12, 0, tzinfo=UTC), tick=False)
+    def test_last_month_january_wraps_to_previous_year(self) -> None:
+        # January: last month wraps back to December of previous year
+        lo, hi = _range(rewrite_natural_date_keywords("added:last_month", UTC), "added")
+        assert lo == "2025-12-01T00:00:00Z"
+        assert hi == "2026-01-01T00:00:00Z"
 
 
 class TestWhooshQueryRewriting:
@@ -231,6 +324,16 @@ class TestWhooshQueryRewriting:
         lo, hi = _range(result, "added")
         assert lo == "2026-03-21T12:00:00Z"
         assert hi == "2026-03-28T12:00:00Z"
+
+    @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
+    def test_relative_range_swaps_bounds_when_lo_exceeds_hi(self) -> None:
+        # [now+1h TO now-1h] has lo > hi before substitution; they must be swapped
+        lo, hi = _range(
+            rewrite_natural_date_keywords("added:[now+1h TO now-1h]", UTC),
+            "added",
+        )
+        assert lo == "2026-03-28T11:00:00Z"
+        assert hi == "2026-03-28T13:00:00Z"
 
     def test_8digit_created_date_field_always_uses_utc_midnight(self) -> None:
         # created is a DateField: boundaries are always UTC midnight, no TZ offset
