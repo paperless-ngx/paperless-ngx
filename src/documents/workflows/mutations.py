@@ -16,7 +16,6 @@ logger = logging.getLogger("paperless.workflows.mutations")
 def apply_assignment_to_document(
     action: WorkflowAction,
     document: Document,
-    doc_tag_ids: list[int],
     logging_group,
 ):
     """
@@ -25,12 +24,7 @@ def apply_assignment_to_document(
     action: WorkflowAction, annotated with 'has_assign_*' boolean fields
     """
     if action.has_assign_tags:
-        tag_ids_to_add: set[int] = set()
-        for tag in action.assign_tags.all():
-            tag_ids_to_add.add(tag.pk)
-            tag_ids_to_add.update(int(pk) for pk in tag.get_ancestors_pks())
-
-        doc_tag_ids[:] = list(set(doc_tag_ids) | tag_ids_to_add)
+        document.add_nested_tags(action.assign_tags.all())
 
     if action.assign_correspondent:
         document.correspondent = action.assign_correspondent
@@ -197,7 +191,6 @@ def apply_assignment_to_overrides(
 def apply_removal_to_document(
     action: WorkflowAction,
     document: Document,
-    doc_tag_ids: list[int],
 ):
     """
     Apply removal actions to a Document instance.
@@ -206,14 +199,15 @@ def apply_removal_to_document(
     """
 
     if action.remove_all_tags:
-        doc_tag_ids.clear()
+        document.tags.clear()
     else:
         tag_ids_to_remove: set[int] = set()
         for tag in action.remove_tags.all():
             tag_ids_to_remove.add(tag.pk)
             tag_ids_to_remove.update(int(pk) for pk in tag.get_descendants_pks())
 
-        doc_tag_ids[:] = [t for t in doc_tag_ids if t not in tag_ids_to_remove]
+        if tag_ids_to_remove:
+            document.tags.remove(*tag_ids_to_remove)
 
     if action.remove_all_correspondents or (
         document.correspondent
