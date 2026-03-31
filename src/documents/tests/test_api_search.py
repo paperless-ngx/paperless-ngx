@@ -68,26 +68,48 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(response.data["count"], 3)
         self.assertEqual(len(results), 3)
-        self.assertCountEqual(response.data["all"], [d1.id, d2.id, d3.id])
 
         response = self.client.get("/api/documents/?query=september")
         results = response.data["results"]
         self.assertEqual(response.data["count"], 1)
         self.assertEqual(len(results), 1)
-        self.assertCountEqual(response.data["all"], [d3.id])
         self.assertEqual(results[0]["original_file_name"], "someepdf.pdf")
 
         response = self.client.get("/api/documents/?query=statement")
         results = response.data["results"]
         self.assertEqual(response.data["count"], 2)
         self.assertEqual(len(results), 2)
-        self.assertCountEqual(response.data["all"], [d2.id, d3.id])
 
         response = self.client.get("/api/documents/?query=sfegdfg")
         results = response.data["results"]
         self.assertEqual(response.data["count"], 0)
         self.assertEqual(len(results), 0)
-        self.assertCountEqual(response.data["all"], [])
+
+    def test_search_returns_all_for_api_version_9(self) -> None:
+        d1 = Document.objects.create(
+            title="invoice",
+            content="bank payment",
+            checksum="A",
+            pk=1,
+        )
+        d2 = Document.objects.create(
+            title="bank statement",
+            content="bank transfer",
+            checksum="B",
+            pk=2,
+        )
+        with AsyncWriter(index.open_index()) as writer:
+            index.update_document(writer, d1)
+            index.update_document(writer, d2)
+
+        response = self.client.get(
+            "/api/documents/?query=bank",
+            headers={"Accept": "application/json; version=9"},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("all", response.data)
+        self.assertCountEqual(response.data["all"], [d1.id, d2.id])
 
     def test_search_with_include_selection_data(self) -> None:
         correspondent = Correspondent.objects.create(name="c1")
