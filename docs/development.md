@@ -433,7 +433,7 @@ def supported_mime_types(cls) -> dict[str, str]:
 **Scoring**
 
 When more than one parser can handle a file, the registry calls `score()` on
-each candidate and picks the one with the highest result and equal scores favor third-party parsers over built-ins.. Return `None` to
+each candidate and picks the one with the highest result and equal scores favor third-party parsers over built-ins. Return `None` to
 decline handling a file even though the MIME type is listed as supported (for
 example, when a required external service is not configured).
 
