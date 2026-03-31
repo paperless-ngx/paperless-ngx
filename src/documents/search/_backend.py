@@ -160,7 +160,7 @@ class WriteBatch:
             self._lock = filelock.FileLock(str(lock_path))
             try:
                 self._lock.acquire(timeout=self._lock_timeout)
-            except filelock.Timeout as e:
+            except filelock.Timeout as e:  # pragma: no cover
                 raise SearchIndexLockError(
                     f"Could not acquire index lock within {self._lock_timeout}s",
                 ) from e
