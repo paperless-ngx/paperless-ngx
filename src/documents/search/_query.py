@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-import re
 from datetime import UTC
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
 from typing import TYPE_CHECKING
+from typing import Final
 
+import regex
 import tantivy
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -15,6 +16,10 @@ if TYPE_CHECKING:
     from datetime import tzinfo
 
     from django.contrib.auth.base_user import AbstractBaseUser
+
+# Maximum seconds any single regex substitution may run.
+# Prevents ReDoS on adversarial user-supplied query strings.
+_REGEX_TIMEOUT: Final[float] = 1.0
 
 _DATE_ONLY_FIELDS = frozenset({"created"})
 
@@ -31,21 +36,21 @@ _DATE_KEYWORDS = frozenset(
     },
 )
 
-_FIELD_DATE_RE = re.compile(
+_FIELD_DATE_RE = regex.compile(
     r"(\w+):(" + "|".join(_DATE_KEYWORDS) + r")\b",
 )
-_COMPACT_DATE_RE = re.compile(r"\b(\d{14})\b")
-_RELATIVE_RANGE_RE = re.compile(
+_COMPACT_DATE_RE = regex.compile(r"\b(\d{14})\b")
+_RELATIVE_RANGE_RE = regex.compile(
     r"\[now([+-]\d+[dhm])?\s+TO\s+now([+-]\d+[dhm])?\]",
-    re.IGNORECASE,
+    regex.IGNORECASE,
 )
 # Whoosh-style relative date range: e.g. [-1 week to now], [-7 days to now]
-_WHOOSH_REL_RANGE_RE = re.compile(
+_WHOOSH_REL_RANGE_RE = regex.compile(
     r"\[-(?P<n>\d+)\s+(?P<unit>second|minute|hour|day|week|month|year)s?\s+to\s+now\]",
-    re.IGNORECASE,
+    regex.IGNORECASE,
 )
 # Whoosh-style 8-digit date: field:YYYYMMDD — field-aware so timezone can be applied correctly
-_DATE8_RE = re.compile(r"(?P<field>\w+):(?P<date8>\d{8})\b")
+_DATE8_RE = regex.compile(r"(?P<field>\w+):(?P<date8>\d{8})\b")
 
 
 def _fmt(dt: datetime) -> str:
@@ -161,7 +166,7 @@ def _datetime_range(keyword: str, tz: tzinfo) -> str:
 def _rewrite_compact_date(query: str) -> str:
     """Rewrite Whoosh compact date tokens (14-digit YYYYMMDDHHmmss) to ISO 8601."""
 
-    def _sub(m: re.Match[str]) -> str:
+    def _sub(m: regex.Match[str]) -> str:
         raw = m.group(1)
         try:
             dt = datetime(
@@ -177,13 +182,18 @@ def _rewrite_compact_date(query: str) -> str:
         except ValueError:
             return str(m.group(0))
 
-    return _COMPACT_DATE_RE.sub(_sub, query)
+    try:
+        return _COMPACT_DATE_RE.sub(_sub, query, timeout=_REGEX_TIMEOUT)
+    except TimeoutError:  # pragma: no cover
+        raise ValueError(
+            "Query too complex to process (compact date rewrite timed out)",
+        )
 
 
 def _rewrite_relative_range(query: str) -> str:
     """Rewrite Whoosh relative ranges ([now-7d TO now]) to concrete ISO 8601 UTC boundaries."""
 
-    def _sub(m: re.Match[str]) -> str:
+    def _sub(m: regex.Match[str]) -> str:
         now = datetime.now(UTC)
 
         def _offset(s: str | None) -> timedelta:
@@ -205,7 +215,12 @@ def _rewrite_relative_range(query: str) -> str:
             lo, hi = hi, lo
         return f"[{_fmt(lo)} TO {_fmt(hi)}]"
 
-    return _RELATIVE_RANGE_RE.sub(_sub, query)
+    try:
+        return _RELATIVE_RANGE_RE.sub(_sub, query, timeout=_REGEX_TIMEOUT)
+    except TimeoutError:  # pragma: no cover
+        raise ValueError(
+            "Query too complex to process (relative range rewrite timed out)",
+        )
 
 
 def _rewrite_whoosh_relative_range(query: str) -> str:
@@ -216,7 +231,7 @@ def _rewrite_whoosh_relative_range(query: str) -> str:
     """
     now = datetime.now(UTC)
 
-    def _sub(m: re.Match[str]) -> str:
+    def _sub(m: regex.Match[str]) -> str:
         n = int(m.group("n"))
         unit = m.group("unit").lower()
         delta_map: dict[str, timedelta | relativedelta] = {
@@ -231,7 +246,12 @@ def _rewrite_whoosh_relative_range(query: str) -> str:
         lo = now - delta_map[unit]
         return f"[{_fmt(lo)} TO {_fmt(now)}]"
 
-    return _WHOOSH_REL_RANGE_RE.sub(_sub, query)
+    try:
+        return _WHOOSH_REL_RANGE_RE.sub(_sub, query, timeout=_REGEX_TIMEOUT)
+    except TimeoutError:  # pragma: no cover
+        raise ValueError(
+            "Query too complex to process (Whoosh relative range rewrite timed out)",
+        )
 
 
 def _rewrite_8digit_date(query: str, tz: tzinfo) -> str:
@@ -246,7 +266,7 @@ def _rewrite_8digit_date(query: str, tz: tzinfo) -> str:
     behaviour for keyword dates.
     """
 
-    def _sub(m: re.Match[str]) -> str:
+    def _sub(m: regex.Match[str]) -> str:
         field = m.group("field")
         raw = m.group("date8")
         try:
@@ -268,7 +288,12 @@ def _rewrite_8digit_date(query: str, tz: tzinfo) -> str:
         except ValueError:
             return m.group(0)
 
-    return _DATE8_RE.sub(_sub, query)
+    try:
+        return _DATE8_RE.sub(_sub, query, timeout=_REGEX_TIMEOUT)
+    except TimeoutError:  # pragma: no cover
+        raise ValueError(
+            "Query too complex to process (8-digit date rewrite timed out)",
+        )
 
 
 def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
@@ -297,13 +322,18 @@ def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
     query = _rewrite_8digit_date(query, tz)
     query = _rewrite_relative_range(query)
 
-    def _replace(m: re.Match[str]) -> str:
+    def _replace(m: regex.Match[str]) -> str:
         field, keyword = m.group(1), m.group(2)
         if field in _DATE_ONLY_FIELDS:
             return f"{field}:{_date_only_range(keyword, tz)}"
         return f"{field}:{_datetime_range(keyword, tz)}"
 
-    return _FIELD_DATE_RE.sub(_replace, query)
+    try:
+        return _FIELD_DATE_RE.sub(_replace, query, timeout=_REGEX_TIMEOUT)
+    except TimeoutError:  # pragma: no cover
+        raise ValueError(
+            "Query too complex to process (date keyword rewrite timed out)",
+        )
 
 
 def normalize_query(query: str) -> str:
@@ -322,13 +352,21 @@ def normalize_query(query: str) -> str:
         Normalized query string ready for Tantivy parsing
     """
 
-    def _expand(m: re.Match[str]) -> str:
+    def _expand(m: regex.Match[str]) -> str:
         field = m.group(1)
         values = [v.strip() for v in m.group(2).split(",") if v.strip()]
         return " AND ".join(f"{field}:{v}" for v in values)
 
-    query = re.sub(r"(\w+):([^\s\[\]]+(?:,[^\s\[\]]+)+)", _expand, query)
-    return re.sub(r" {2,}", " ", query).strip()
+    try:
+        query = regex.sub(
+            r"(\w+):([^\s\[\]]+(?:,[^\s\[\]]+)+)",
+            _expand,
+            query,
+            timeout=_REGEX_TIMEOUT,
+        )
+        return regex.sub(r" {2,}", " ", query, timeout=_REGEX_TIMEOUT).strip()
+    except TimeoutError:  # pragma: no cover
+        raise ValueError("Query too complex to process (normalization timed out)")
 
 
 _MAX_U64 = 2**64 - 1  # u64 max — used as inclusive upper bound for "any owner" range
