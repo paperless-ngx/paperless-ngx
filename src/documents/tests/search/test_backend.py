@@ -67,6 +67,75 @@ class TestSearch:
         assert r.hits[0]["score"] == pytest.approx(1.0)
         assert all(0.0 <= h["score"] <= 1.0 for h in r.hits)
 
+    def test_sort_field_ascending(self, backend: TantivyBackend):
+        """Searching with a valid sort_field and sort_reverse=False must use field-based ordering."""
+        for i, title in enumerate(["Charlie", "Alpha", "Bravo"]):
+            doc = Document.objects.create(
+                title=title,
+                content="sortable content",
+                checksum=f"SFA{i}",
+                pk=100 + i,
+            )
+            backend.add_or_update(doc)
+
+        r = backend.search(
+            "sortable",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field="title",
+            sort_reverse=False,
+        )
+        assert r.total == 3
+        assert len(r.hits) == 3
+
+    def test_sort_field_descending(self, backend: TantivyBackend):
+        """Searching with sort_field and sort_reverse=True must fetch extra results for Python-side slicing."""
+        for i, title in enumerate(["Charlie", "Alpha", "Bravo"]):
+            doc = Document.objects.create(
+                title=title,
+                content="sortable content",
+                checksum=f"SFD{i}",
+                pk=110 + i,
+            )
+            backend.add_or_update(doc)
+
+        r = backend.search(
+            "sortable",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field="title",
+            sort_reverse=True,
+        )
+        assert r.total == 3
+
+    def test_fuzzy_threshold_filters_low_score_hits(
+        self,
+        backend: TantivyBackend,
+        settings,
+    ):
+        """When ADVANCED_FUZZY_SEARCH_THRESHOLD exceeds all normalized scores, hits must be filtered out."""
+        doc = Document.objects.create(
+            title="Invoice document",
+            content="financial report",
+            checksum="FT1",
+            pk=120,
+        )
+        backend.add_or_update(doc)
+
+        # Threshold above 1.0 filters every hit (normalized scores top out at 1.0)
+        settings.ADVANCED_FUZZY_SEARCH_THRESHOLD = 1.1
+        r = backend.search(
+            "invoice",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+        )
+        assert r.hits == []
+
     def test_owner_filter(self, backend: TantivyBackend):
         """Document owners can search their private documents; other users cannot access them."""
         owner = User.objects.create_user("owner")
@@ -185,6 +254,31 @@ class TestMoreLikeThis:
         results = backend.more_like_this(doc_id=50, user=None, page=1, page_size=10)
         returned_ids = [hit["id"] for hit in results.hits]
         assert 50 not in returned_ids  # Original document excluded
+
+    def test_with_user_applies_permission_filter(self, backend: TantivyBackend):
+        """more_like_this with a user must exclude documents that user cannot see."""
+        viewer = User.objects.create_user("mlt_viewer")
+        other = User.objects.create_user("mlt_other")
+        public_doc = Document.objects.create(
+            title="Public financial document",
+            content="quarterly financial analysis report figures",
+            checksum="MLT3",
+            pk=52,
+        )
+        private_doc = Document.objects.create(
+            title="Private financial document",
+            content="quarterly financial analysis report figures",
+            checksum="MLT4",
+            pk=53,
+            owner=other,
+        )
+        backend.add_or_update(public_doc)
+        backend.add_or_update(private_doc)
+
+        results = backend.more_like_this(doc_id=52, user=viewer, page=1, page_size=10)
+        returned_ids = [hit["id"] for hit in results.hits]
+        # private_doc is owned by other, so viewer cannot see it
+        assert 53 not in returned_ids
 
 
 class TestSingleton:
