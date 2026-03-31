@@ -579,6 +579,42 @@ describe('DocumentListViewService', () => {
     expect(documentListViewService.isSelected(documents[3])).toBeTruthy()
   })
 
+  it('should clear all-selected mode when toggling a single document', () => {
+    documentListViewService.reload()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+    )
+    req.flush(full_results)
+
+    documentListViewService.selectAll()
+    expect(documentListViewService.allSelected).toBeTruthy()
+
+    documentListViewService.toggleSelected(documents[0])
+
+    expect(documentListViewService.allSelected).toBeFalsy()
+    expect(documentListViewService.isSelected(documents[0])).toBeFalsy()
+  })
+
+  it('should clear all-selected mode when selecting a range', () => {
+    documentListViewService.reload()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+    )
+    req.flush(full_results)
+
+    documentListViewService.selectAll()
+    documentListViewService.toggleSelected(documents[1])
+    documentListViewService.selectAll()
+    expect(documentListViewService.allSelected).toBeTruthy()
+
+    documentListViewService.selectRangeTo(documents[3])
+
+    expect(documentListViewService.allSelected).toBeFalsy()
+    expect(documentListViewService.isSelected(documents[1])).toBeTruthy()
+    expect(documentListViewService.isSelected(documents[2])).toBeTruthy()
+    expect(documentListViewService.isSelected(documents[3])).toBeTruthy()
+  })
+
   it('should support selection range reduction', () => {
     documentListViewService.reload()
     let req = httpTestingController.expectOne(

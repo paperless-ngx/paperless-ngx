@@ -292,6 +292,74 @@ describe('BulkEditorComponent', () => {
     expect(component.tagSelectionModel.selectionSize()).toEqual(1)
   })
 
+  it('should apply list selection data to document types menu when all filtered documents are selected', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    fixture.detectChanges()
+    jest
+      .spyOn(documentListViewService, 'allSelected', 'get')
+      .mockReturnValue(true)
+    documentListViewService.selectionData = selectionData
+    const getSelectionDataSpy = jest.spyOn(documentService, 'getSelectionData')
+
+    component.openDocumentTypeDropdown()
+
+    expect(getSelectionDataSpy).not.toHaveBeenCalled()
+    expect(component.documentTypeDocumentCounts).toEqual(
+      selectionData.selected_document_types
+    )
+  })
+
+  it('should apply list selection data to correspondents menu when all filtered documents are selected', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    fixture.detectChanges()
+    jest
+      .spyOn(documentListViewService, 'allSelected', 'get')
+      .mockReturnValue(true)
+    documentListViewService.selectionData = selectionData
+    const getSelectionDataSpy = jest.spyOn(documentService, 'getSelectionData')
+
+    component.openCorrespondentDropdown()
+
+    expect(getSelectionDataSpy).not.toHaveBeenCalled()
+    expect(component.correspondentDocumentCounts).toEqual(
+      selectionData.selected_correspondents
+    )
+  })
+
+  it('should apply list selection data to storage paths menu when all filtered documents are selected', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    fixture.detectChanges()
+    jest
+      .spyOn(documentListViewService, 'allSelected', 'get')
+      .mockReturnValue(true)
+    documentListViewService.selectionData = selectionData
+    const getSelectionDataSpy = jest.spyOn(documentService, 'getSelectionData')
+
+    component.openStoragePathDropdown()
+
+    expect(getSelectionDataSpy).not.toHaveBeenCalled()
+    expect(component.storagePathDocumentCounts).toEqual(
+      selectionData.selected_storage_paths
+    )
+  })
+
+  it('should apply list selection data to custom fields menu when all filtered documents are selected', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    fixture.detectChanges()
+    jest
+      .spyOn(documentListViewService, 'allSelected', 'get')
+      .mockReturnValue(true)
+    documentListViewService.selectionData = selectionData
+    const getSelectionDataSpy = jest.spyOn(documentService, 'getSelectionData')
+
+    component.openCustomFieldsDropdown()
+
+    expect(getSelectionDataSpy).not.toHaveBeenCalled()
+    expect(component.customFieldDocumentCounts).toEqual(
+      selectionData.selected_custom_fields
+    )
+  })
+
   it('should execute modify tags bulk operation', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     jest
