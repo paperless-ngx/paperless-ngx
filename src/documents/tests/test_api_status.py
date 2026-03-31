@@ -26,6 +26,23 @@ class TestSystemStatus(APITestCase):
         self.override = override_settings(MEDIA_ROOT=self.tmp_dir)
         self.override.enable()
 
+        # Mock slow network calls so tests don't block on real Redis/Celery timeouts.
+        # Individual tests that care about specific behaviour override these with
+        # their own @mock.patch decorators (which take precedence).
+        redis_patcher = mock.patch(
+            "redis.Redis.execute_command",
+            side_effect=Exception("Redis not available"),
+        )
+        self.mock_redis = redis_patcher.start()
+        self.addCleanup(redis_patcher.stop)
+
+        celery_patcher = mock.patch(
+            "celery.app.control.Inspect.ping",
+            side_effect=Exception("Celery not available"),
+        )
+        self.mock_celery_ping = celery_patcher.start()
+        self.addCleanup(celery_patcher.stop)
+
     def tearDown(self) -> None:
         super().tearDown()
 
@@ -69,10 +86,17 @@ class TestSystemStatus(APITestCase):
         """
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response["WWW-Authenticate"], "Token")
         normal_user = User.objects.create_user(username="normal_user")
         self.client.force_login(normal_user)
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_system_status_with_bad_basic_auth_challenges(self) -> None:
+        self.client.credentials(HTTP_AUTHORIZATION="Basic invalid")
+        response = self.client.get(self.ENDPOINT)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response["WWW-Authenticate"], 'Basic realm="api"')
 
     def test_system_status_container_detection(self) -> None:
         """
@@ -84,13 +108,17 @@ class TestSystemStatus(APITestCase):
             - The response contains the correct install type
         """
         self.client.force_login(self.user)
-        os.environ["PNGX_CONTAINERIZED"] = "1"
-        response = self.client.get(self.ENDPOINT)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["install_type"], "docker")
-        os.environ["KUBERNETES_SERVICE_HOST"] = "http://localhost"
-        response = self.client.get(self.ENDPOINT)
-        self.assertEqual(response.data["install_type"], "kubernetes")
+        with mock.patch.dict(os.environ, {"PNGX_CONTAINERIZED": "1"}, clear=False):
+            response = self.client.get(self.ENDPOINT)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(response.data["install_type"], "docker")
+        with mock.patch.dict(
+            os.environ,
+            {"PNGX_CONTAINERIZED": "1", "KUBERNETES_SERVICE_HOST": "http://localhost"},
+            clear=False,
+        ):
+            response = self.client.get(self.ENDPOINT)
+            self.assertEqual(response.data["install_type"], "kubernetes")
 
     @mock.patch("redis.Redis.execute_command")
     def test_system_status_redis_ping(self, mock_ping) -> None:

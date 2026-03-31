@@ -125,7 +125,7 @@ class Command(CryptMixin, PaperlessCommand):
                         "Found existing user(s), this might indicate a non-empty installation",
                     ),
                 )
-            if Document.objects.count() != 0:
+            if Document.global_objects.count() != 0:
                 self.stdout.write(
                     self.style.WARNING(
                         "Found existing documents(s), this might indicate a non-empty installation",
@@ -205,7 +205,7 @@ class Command(CryptMixin, PaperlessCommand):
                 ContentType.objects.all().delete()
                 Permission.objects.all().delete()
                 for manifest_path in self.manifest_paths:
-                    call_command("loaddata", manifest_path)
+                    call_command("loaddata", manifest_path, skip_checks=True)
         except (FieldDoesNotExist, DeserializationError, IntegrityError) as e:
             self.stdout.write(self.style.ERROR("Database import failed"))
             if (
@@ -376,7 +376,7 @@ class Command(CryptMixin, PaperlessCommand):
         ]
 
         for record in self.track(document_records, description="Copying files..."):
-            document = Document.objects.get(pk=record["pk"])
+            document = Document.global_objects.get(pk=record["pk"])
 
             doc_file = record[EXPORTER_FILE_NAME]
             document_path = self.source / doc_file

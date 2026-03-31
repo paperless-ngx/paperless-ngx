@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-12 15:43+0000\n"
+"POT-Creation-Date: 2026-03-31 14:56+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1299,7 +1299,9 @@ msgstr ""
 msgid "workflow runs"
 msgstr ""
 
-#: documents/serialisers.py:463 documents/serialisers.py:2470
+#: documents/serialisers.py:463 documents/serialisers.py:815
+#: documents/serialisers.py:2501 documents/views.py:2066
+#: documents/views.py:2124 paperless_mail/serialisers.py:143
 msgid "Insufficient permissions."
 msgstr ""
 
@@ -1307,39 +1309,39 @@ msgstr ""
 msgid "Invalid color."
 msgstr ""
 
-#: documents/serialisers.py:2093
+#: documents/serialisers.py:2124
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
 
-#: documents/serialisers.py:2137
+#: documents/serialisers.py:2168
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr ""
 
-#: documents/serialisers.py:2144
+#: documents/serialisers.py:2175
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr ""
 
-#: documents/serialisers.py:2161 documents/serialisers.py:2171
+#: documents/serialisers.py:2192 documents/serialisers.py:2202
 msgid ""
 "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr ""
 
-#: documents/serialisers.py:2166
+#: documents/serialisers.py:2197
 msgid "Some custom fields don't exist or were specified twice."
 msgstr ""
 
-#: documents/serialisers.py:2313
+#: documents/serialisers.py:2344
 msgid "Invalid variable detected."
 msgstr ""
 
-#: documents/serialisers.py:2526
+#: documents/serialisers.py:2557
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2556 documents/views.py:3565
+#: documents/serialisers.py:2587 documents/views.py:3696
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
@@ -1381,13 +1383,18 @@ msgid "Please sign in."
 msgstr ""
 
 #: documents/templates/account/login.html:12
-#, python-format
-msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
+msgid "Don't have an account yet?"
+msgstr ""
+
+#: documents/templates/account/login.html:12
+#: documents/templates/account/signup.html:43
+#: documents/templates/socialaccount/signup.html:29
+msgid "Sign up"
 msgstr ""
 
 #: documents/templates/account/login.html:25
 #: documents/templates/account/signup.html:22
-#: documents/templates/socialaccount/signup.html:13
+#: documents/templates/socialaccount/signup.html:15
 msgid "Username"
 msgstr ""
 
@@ -1397,6 +1404,7 @@ msgid "Password"
 msgstr ""
 
 #: documents/templates/account/login.html:36
+#: documents/templates/account/signup.html:11
 #: documents/templates/mfa/authenticate.html:23
 msgid "Sign in"
 msgstr ""
@@ -1475,10 +1483,11 @@ msgid "Password reset complete."
 msgstr ""
 
 #: documents/templates/account/password_reset_from_key_done.html:14
-#, python-format
-msgid ""
-"Your new password has been set. You can now <a href=\"%(login_url)s\">log "
-"in</a>"
+msgid "Your new password has been set. You can now"
+msgstr ""
+
+#: documents/templates/account/password_reset_from_key_done.html:14
+msgid "log in"
 msgstr ""
 
 #: documents/templates/account/signup.html:5
@@ -1486,8 +1495,7 @@ msgid "Paperless-ngx sign up"
 msgstr ""
 
 #: documents/templates/account/signup.html:11
-#, python-format
-msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
+msgid "Already have an account?"
 msgstr ""
 
 #: documents/templates/account/signup.html:19
@@ -1497,17 +1505,12 @@ msgid ""
 msgstr ""
 
 #: documents/templates/account/signup.html:23
-#: documents/templates/socialaccount/signup.html:14
+#: documents/templates/socialaccount/signup.html:16
 msgid "Email (optional)"
 msgstr ""
 
 #: documents/templates/account/signup.html:25
 msgid "Password (again)"
-msgstr ""
-
-#: documents/templates/account/signup.html:43
-#: documents/templates/socialaccount/signup.html:27
-msgid "Sign up"
 msgstr ""
 
 #: documents/templates/index.html:61
@@ -1554,18 +1557,21 @@ msgid "Paperless-ngx social account sign in"
 msgstr ""
 
 #: documents/templates/socialaccount/authentication_error.html:10
-#, python-format
 msgid ""
 "An error occurred while attempting to login via your social network account. "
-"Back to the <a href=\"%(login_url)s\">login page</a>"
+"Back to the"
 msgstr ""
 
-#: documents/templates/socialaccount/login.html:10
+#: documents/templates/socialaccount/authentication_error.html:10
+msgid "login page"
+msgstr ""
+
+#: documents/templates/socialaccount/login.html:11
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
 msgstr ""
 
-#: documents/templates/socialaccount/login.html:13
+#: documents/templates/socialaccount/login.html:15
 msgid "Continue"
 msgstr ""
 
@@ -1573,12 +1579,12 @@ msgstr ""
 msgid "Paperless-ngx social account sign up"
 msgstr ""
 
-#: documents/templates/socialaccount/signup.html:10
+#: documents/templates/socialaccount/signup.html:11
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
 msgstr ""
 
-#: documents/templates/socialaccount/signup.html:11
+#: documents/templates/socialaccount/signup.html:13
 msgid "As a final step, please complete the following form:"
 msgstr ""
 
@@ -1603,20 +1609,24 @@ msgstr ""
 msgid "Unable to parse URI {value}"
 msgstr ""
 
-#: documents/views.py:3577
+#: documents/views.py:2059 documents/views.py:2121
+msgid "Invalid more_like_id"
+msgstr ""
+
+#: documents/views.py:3708
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr ""
 
-#: documents/views.py:3620
+#: documents/views.py:3751
 msgid "Bundle is already being processed."
 msgstr ""
 
-#: documents/views.py:3677
+#: documents/views.py:3808
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr ""
 
-#: documents/views.py:3687
+#: documents/views.py:3818
 msgid "The share link bundle is unavailable."
 msgstr ""
 
@@ -1856,151 +1866,151 @@ msgstr ""
 msgid "paperless application settings"
 msgstr ""
 
-#: paperless/settings/__init__.py:521
+#: paperless/settings/__init__.py:518
 msgid "English (US)"
 msgstr ""
 
-#: paperless/settings/__init__.py:522
+#: paperless/settings/__init__.py:519
 msgid "Arabic"
 msgstr ""
 
-#: paperless/settings/__init__.py:523
+#: paperless/settings/__init__.py:520
 msgid "Afrikaans"
 msgstr ""
 
-#: paperless/settings/__init__.py:524
+#: paperless/settings/__init__.py:521
 msgid "Belarusian"
 msgstr ""
 
-#: paperless/settings/__init__.py:525
+#: paperless/settings/__init__.py:522
 msgid "Bulgarian"
 msgstr ""
 
-#: paperless/settings/__init__.py:526
+#: paperless/settings/__init__.py:523
 msgid "Catalan"
 msgstr ""
 
-#: paperless/settings/__init__.py:527
+#: paperless/settings/__init__.py:524
 msgid "Czech"
 msgstr ""
 
-#: paperless/settings/__init__.py:528
+#: paperless/settings/__init__.py:525
 msgid "Danish"
 msgstr ""
 
-#: paperless/settings/__init__.py:529
+#: paperless/settings/__init__.py:526
 msgid "German"
 msgstr ""
 
-#: paperless/settings/__init__.py:530
+#: paperless/settings/__init__.py:527
 msgid "Greek"
 msgstr ""
 
-#: paperless/settings/__init__.py:531
+#: paperless/settings/__init__.py:528
 msgid "English (GB)"
 msgstr ""
 
-#: paperless/settings/__init__.py:532
+#: paperless/settings/__init__.py:529
 msgid "Spanish"
 msgstr ""
 
-#: paperless/settings/__init__.py:533
+#: paperless/settings/__init__.py:530
 msgid "Persian"
 msgstr ""
 
-#: paperless/settings/__init__.py:534
+#: paperless/settings/__init__.py:531
 msgid "Finnish"
 msgstr ""
 
-#: paperless/settings/__init__.py:535
+#: paperless/settings/__init__.py:532
 msgid "French"
 msgstr ""
 
-#: paperless/settings/__init__.py:536
+#: paperless/settings/__init__.py:533
 msgid "Hungarian"
 msgstr ""
 
-#: paperless/settings/__init__.py:537
+#: paperless/settings/__init__.py:534
 msgid "Indonesian"
 msgstr ""
 
-#: paperless/settings/__init__.py:538
+#: paperless/settings/__init__.py:535
 msgid "Italian"
 msgstr ""
 
-#: paperless/settings/__init__.py:539
+#: paperless/settings/__init__.py:536
 msgid "Japanese"
 msgstr ""
 
-#: paperless/settings/__init__.py:540
+#: paperless/settings/__init__.py:537
 msgid "Korean"
 msgstr ""
 
-#: paperless/settings/__init__.py:541
+#: paperless/settings/__init__.py:538
 msgid "Luxembourgish"
 msgstr ""
 
-#: paperless/settings/__init__.py:542
+#: paperless/settings/__init__.py:539
 msgid "Norwegian"
 msgstr ""
 
-#: paperless/settings/__init__.py:543
+#: paperless/settings/__init__.py:540
 msgid "Dutch"
 msgstr ""
 
-#: paperless/settings/__init__.py:544
+#: paperless/settings/__init__.py:541
 msgid "Polish"
 msgstr ""
 
-#: paperless/settings/__init__.py:545
+#: paperless/settings/__init__.py:542
 msgid "Portuguese (Brazil)"
 msgstr ""
 
-#: paperless/settings/__init__.py:546
+#: paperless/settings/__init__.py:543
 msgid "Portuguese"
 msgstr ""
 
-#: paperless/settings/__init__.py:547
+#: paperless/settings/__init__.py:544
 msgid "Romanian"
 msgstr ""
 
-#: paperless/settings/__init__.py:548
+#: paperless/settings/__init__.py:545
 msgid "Russian"
 msgstr ""
 
-#: paperless/settings/__init__.py:549
+#: paperless/settings/__init__.py:546
 msgid "Slovak"
 msgstr ""
 
-#: paperless/settings/__init__.py:550
+#: paperless/settings/__init__.py:547
 msgid "Slovenian"
 msgstr ""
 
-#: paperless/settings/__init__.py:551
+#: paperless/settings/__init__.py:548
 msgid "Serbian"
 msgstr ""
 
-#: paperless/settings/__init__.py:552
+#: paperless/settings/__init__.py:549
 msgid "Swedish"
 msgstr ""
 
-#: paperless/settings/__init__.py:553
+#: paperless/settings/__init__.py:550
 msgid "Turkish"
 msgstr ""
 
-#: paperless/settings/__init__.py:554
+#: paperless/settings/__init__.py:551
 msgid "Ukrainian"
 msgstr ""
 
-#: paperless/settings/__init__.py:555
+#: paperless/settings/__init__.py:552
 msgid "Vietnamese"
 msgstr ""
 
-#: paperless/settings/__init__.py:556
+#: paperless/settings/__init__.py:553
 msgid "Chinese Simplified"
 msgstr ""
 
-#: paperless/settings/__init__.py:557
+#: paperless/settings/__init__.py:554
 msgid "Chinese Traditional"
 msgstr ""
 
@@ -2046,7 +2056,7 @@ msgid ""
 "process all matching rules that you have defined."
 msgstr ""
 
-#: paperless_mail/apps.py:11
+#: paperless_mail/apps.py:8
 msgid "Paperless mail"
 msgstr ""
 

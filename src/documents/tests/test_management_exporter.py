@@ -63,8 +63,8 @@ class TestExportImport(
 
         self.d1 = Document.objects.create(
             content="Content",
-            checksum="42995833e01aea9b3edee44bbfdd7ce1",
-            archive_checksum="62acb0bcbfbcaa62ca6ad3668e4e404b",
+            checksum="1093cf6e32adbd16b06969df09215d42c4a3a8938cc18b39455953f08d1ff2ab",
+            archive_checksum="706124ecde3c31616992fa979caed17a726b1c9ccdba70e82a4ff796cea97ccf",
             title="wow1",
             filename="0000001.pdf",
             mime_type="application/pdf",
@@ -72,21 +72,21 @@ class TestExportImport(
         )
         self.d2 = Document.objects.create(
             content="Content",
-            checksum="9c9691e51741c1f4f41a20896af31770",
+            checksum="550d1bae0f746d4f7c6be07054eb20cc2f11988a58ef64ceae45e98f85e92a5b",
             title="wow2",
             filename="0000002.pdf",
             mime_type="application/pdf",
         )
         self.d3 = Document.objects.create(
             content="Content",
-            checksum="d38d7ed02e988e072caf924e0f3fcb76",
+            checksum="f1ba6b7ff8548214a75adec228f5468a14fe187f445bc0b9485cbf1c35b15915",
             title="wow2",
             filename="0000003.pdf",
             mime_type="application/pdf",
         )
         self.d4 = Document.objects.create(
             content="Content",
-            checksum="82186aaa94f0b98697d704b90fd1c072",
+            checksum="a81b16b6b313cfd7e60eb7b12598d1343b58622b4030cfa19a2724a02e98db1b",
             title="wow_dec",
             filename="0000004.pdf",
             mime_type="application/pdf",
@@ -180,7 +180,7 @@ class TestExportImport(
         if data_only:
             args += ["--data-only"]
 
-        call_command(*args)
+        call_command(*args, skip_checks=True)
 
         with (self.target / "manifest.json").open() as f:
             manifest = json.load(f)
@@ -239,7 +239,7 @@ class TestExportImport(
                 )
 
                 with Path(fname).open("rb") as f:
-                    checksum = hashlib.md5(f.read()).hexdigest()
+                    checksum = hashlib.sha256(f.read()).hexdigest()
                 self.assertEqual(checksum, element["fields"]["checksum"])
 
                 # Generated field "content_length" should not be exported,
@@ -253,7 +253,7 @@ class TestExportImport(
                     self.assertIsFile(fname)
 
                     with Path(fname).open("rb") as f:
-                        checksum = hashlib.md5(f.read()).hexdigest()
+                        checksum = hashlib.sha256(f.read()).hexdigest()
                     self.assertEqual(checksum, element["fields"]["archive_checksum"])
 
             elif element["model"] == "documents.note":
@@ -272,7 +272,12 @@ class TestExportImport(
             GroupObjectPermission.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
 
-            call_command("document_importer", "--no-progress-bar", self.target)
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                self.target,
+                skip_checks=True,
+            )
             self.assertEqual(Document.objects.count(), 4)
             self.assertEqual(Tag.objects.count(), 1)
             self.assertEqual(Correspondent.objects.count(), 1)
@@ -384,7 +389,7 @@ class TestExportImport(
         self.assertIsFile(
             str(self.target / doc_from_manifest[EXPORTER_FILE_NAME]),
         )
-        self.d3.delete()
+        self.d3.hard_delete()
 
         manifest = self._do_export()
         self.assertRaises(
@@ -438,7 +443,8 @@ class TestExportImport(
             filename="0000010.pdf",
             mime_type="application/pdf",
         )
-        self.assertRaises(FileNotFoundError, call_command, "document_exporter", target)
+        with self.assertRaises(FileNotFoundError):
+            call_command("document_exporter", target, skip_checks=True)
 
     def test_export_zipped(self) -> None:
         """
@@ -458,7 +464,7 @@ class TestExportImport(
 
         args = ["document_exporter", self.target, "--zip"]
 
-        call_command(*args)
+        call_command(*args, skip_checks=True)
 
         expected_file = str(
             self.target / f"export-{timezone.localdate().isoformat()}.zip",
@@ -493,7 +499,7 @@ class TestExportImport(
         with override_settings(
             FILENAME_FORMAT="{created_year}/{correspondent}/{title}",
         ):
-            call_command(*args)
+            call_command(*args, skip_checks=True)
 
         expected_file = str(
             self.target / f"export-{timezone.localdate().isoformat()}.zip",
@@ -538,7 +544,7 @@ class TestExportImport(
 
         args = ["document_exporter", self.target, "--zip", "--delete"]
 
-        call_command(*args)
+        call_command(*args, skip_checks=True)
 
         expected_file = str(
             self.target / f"export-{timezone.localdate().isoformat()}.zip",
@@ -565,7 +571,7 @@ class TestExportImport(
         args = ["document_exporter", "/tmp/foo/bar"]
 
         with self.assertRaises(CommandError) as e:
-            call_command(*args)
+            call_command(*args, skip_checks=True)
 
         self.assertEqual("That path doesn't exist", str(e.exception))
 
@@ -583,7 +589,7 @@ class TestExportImport(
             args = ["document_exporter", tmp_file.name]
 
             with self.assertRaises(CommandError) as e:
-                call_command(*args)
+                call_command(*args, skip_checks=True)
 
             self.assertEqual("That path isn't a directory", str(e.exception))
 
@@ -602,7 +608,7 @@ class TestExportImport(
             args = ["document_exporter", tmp_dir]
 
             with self.assertRaises(CommandError) as e:
-                call_command(*args)
+                call_command(*args, skip_checks=True)
 
             self.assertEqual(
                 "That path doesn't appear to be writable",
@@ -647,7 +653,12 @@ class TestExportImport(
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", "--no-progress-bar", self.target)
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                self.target,
+                skip_checks=True,
+            )
             self.assertEqual(Document.objects.count(), 4)
 
     def test_no_thumbnail(self) -> None:
@@ -690,7 +701,12 @@ class TestExportImport(
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", "--no-progress-bar", self.target)
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                self.target,
+                skip_checks=True,
+            )
             self.assertEqual(Document.objects.count(), 4)
 
     def test_split_manifest(self) -> None:
@@ -721,7 +737,12 @@ class TestExportImport(
             Document.objects.all().delete()
             CustomFieldInstance.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", "--no-progress-bar", self.target)
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                self.target,
+                skip_checks=True,
+            )
             self.assertEqual(Document.objects.count(), 4)
             self.assertEqual(CustomFieldInstance.objects.count(), 1)
 
@@ -746,7 +767,12 @@ class TestExportImport(
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", "--no-progress-bar", self.target)
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                self.target,
+                skip_checks=True,
+            )
             self.assertEqual(Document.objects.count(), 4)
 
     def test_folder_prefix_with_split(self) -> None:
@@ -771,7 +797,12 @@ class TestExportImport(
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", "--no-progress-bar", self.target)
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                self.target,
+                skip_checks=True,
+            )
             self.assertEqual(Document.objects.count(), 4)
 
     def test_import_db_transaction_failed(self) -> None:
@@ -813,7 +844,12 @@ class TestExportImport(
             self.user = User.objects.create(username="temp_admin")
 
             with self.assertRaises(IntegrityError):
-                call_command("document_importer", "--no-progress-bar", self.target)
+                call_command(
+                    "document_importer",
+                    "--no-progress-bar",
+                    self.target,
+                    skip_checks=True,
+                )
 
             self.assertEqual(ContentType.objects.count(), num_content_type_objects)
             self.assertEqual(Permission.objects.count(), num_permission_objects + 1)
@@ -831,6 +867,52 @@ class TestExportImport(
             manifest = self._do_export(use_filename_format=True)
             for obj in manifest:
                 self.assertNotEqual(obj["model"], "auditlog.logentry")
+
+    def test_export_import_soft_deleted_document(self) -> None:
+        """
+        GIVEN:
+            - A document with a note and custom field instance has been soft-deleted
+        WHEN:
+            - Export and re-import are performed
+        THEN:
+            - The soft-deleted document, note, and custom field instance
+              survive the round-trip with deleted_at preserved
+        """
+        shutil.rmtree(Path(self.dirs.media_dir) / "documents")
+        shutil.copytree(
+            Path(__file__).parent / "samples" / "documents",
+            Path(self.dirs.media_dir) / "documents",
+        )
+
+        # d1 has self.note and self.cfi1 attached via setUp
+        self.d1.delete()
+
+        self._do_export()
+
+        with paperless_environment():
+            Document.global_objects.all().hard_delete()
+            Correspondent.objects.all().delete()
+            DocumentType.objects.all().delete()
+            Tag.objects.all().delete()
+
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                self.target,
+                skip_checks=True,
+            )
+
+            self.assertEqual(Document.global_objects.count(), 4)
+            reimported_doc = Document.global_objects.get(pk=self.d1.pk)
+            self.assertIsNotNone(reimported_doc.deleted_at)
+
+            self.assertEqual(Note.global_objects.count(), 1)
+            reimported_note = Note.global_objects.get(pk=self.note.pk)
+            self.assertIsNotNone(reimported_note.deleted_at)
+
+            self.assertEqual(CustomFieldInstance.global_objects.count(), 1)
+            reimported_cfi = CustomFieldInstance.global_objects.get(pk=self.cfi1.pk)
+            self.assertIsNotNone(reimported_cfi.deleted_at)
 
     def test_export_data_only(self) -> None:
         """
@@ -864,6 +946,7 @@ class TestExportImport(
             "--no-progress-bar",
             "--data-only",
             self.target,
+            skip_checks=True,
         )
 
         self.assertEqual(Document.objects.all().count(), 4)
@@ -923,6 +1006,7 @@ class TestCryptExportImport(
             "--passphrase",
             "securepassword",
             self.target,
+            skip_checks=True,
         )
 
         self.assertIsFile(self.target / "metadata.json")
@@ -948,6 +1032,7 @@ class TestCryptExportImport(
             "--passphrase",
             "securepassword",
             self.target,
+            skip_checks=True,
         )
 
         account = MailAccount.objects.first()
@@ -976,6 +1061,7 @@ class TestCryptExportImport(
             "--passphrase",
             "securepassword",
             self.target,
+            skip_checks=True,
         )
 
         with self.assertRaises(CommandError) as err:
@@ -983,6 +1069,7 @@ class TestCryptExportImport(
                 "document_importer",
                 "--no-progress-bar",
                 self.target,
+                skip_checks=True,
             )
             self.assertEqual(
                 err.msg,
@@ -1014,6 +1101,7 @@ class TestCryptExportImport(
             "--no-progress-bar",
             str(self.target),
             stdout=stdout,
+            skip_checks=True,
         )
         stdout.seek(0)
         self.assertIn(

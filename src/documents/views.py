@@ -82,6 +82,7 @@ from rest_framework import serializers
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.exceptions import ValidationError
 from rest_framework.filters import OrderingFilter
 from rest_framework.filters import SearchFilter
@@ -157,7 +158,6 @@ from documents.models import UiSettings
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
-from documents.parsers import get_parser_class_for_mime_type
 from documents.permissions import AcknowledgeTasksPermissions
 from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessNotePermissions
@@ -225,6 +225,7 @@ from paperless.celery import app as celery_app
 from paperless.config import AIConfig
 from paperless.config import GeneralConfig
 from paperless.models import ApplicationConfiguration
+from paperless.parsers.registry import get_parser_registry
 from paperless.serialisers import GroupSerializer
 from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
@@ -1157,15 +1158,17 @@ class DocumentViewSet(
         if not Path(file).is_file():
             return None
 
-        parser_class = get_parser_class_for_mime_type(mime_type)
+        parser_class = get_parser_registry().get_parser_for_file(
+            mime_type,
+            Path(file).name,
+            Path(file),
+        )
         if parser_class:
-            parser = parser_class(progress_callback=None, logging_group=None)
-
             try:
-                return parser.extract_metadata(file, mime_type)
+                with parser_class() as parser:
+                    return parser.extract_metadata(file, mime_type)
             except Exception:  # pragma: no cover
                 logger.exception(f"Issue getting metadata for {file}")
-                # TODO: cover GPG errors, remove later.
                 return []
         else:  # pragma: no cover
             logger.warning(f"No parser for {mime_type}")
@@ -1404,6 +1407,7 @@ class DocumentViewSet(
         methods=["get", "post", "delete"],
         detail=True,
         permission_classes=[PaperlessNotePermissions],
+        pagination_class=None,
         filter_backends=[],
     )
     def notes(self, request, pk=None):
@@ -2041,11 +2045,28 @@ class UnifiedSearchViewSet(DocumentViewSet):
         filtered_queryset = super().filter_queryset(queryset)
 
         if self._is_search_request():
-            from documents import index
-
             if "query" in self.request.query_params:
+                from documents import index
+
                 query_class = index.DelayedFullTextQuery
             elif "more_like_id" in self.request.query_params:
+                try:
+                    more_like_doc_id = int(self.request.query_params["more_like_id"])
+                    more_like_doc = Document.objects.select_related("owner").get(
+                        pk=more_like_doc_id,
+                    )
+                except (TypeError, ValueError, Document.DoesNotExist):
+                    raise PermissionDenied(_("Invalid more_like_id"))
+
+                if not has_perms_owner_aware(
+                    self.request.user,
+                    "view_document",
+                    more_like_doc,
+                ):
+                    raise PermissionDenied(_("Insufficient permissions."))
+
+                from documents import index
+
                 query_class = index.DelayedMoreLikeThisQuery
             else:
                 raise ValueError
@@ -2096,6 +2117,11 @@ class UnifiedSearchViewSet(DocumentViewSet):
                     return response
             except NotFound:
                 raise
+            except PermissionDenied as e:
+                invalid_more_like_id_message = _("Invalid more_like_id")
+                if str(e.detail) == str(invalid_more_like_id_message):
+                    return HttpResponseForbidden(invalid_more_like_id_message)
+                return HttpResponseForbidden(_("Insufficient permissions."))
             except Exception as e:
                 logger.warning(f"An error occurred listing search results: {e!s}")
                 return HttpResponseBadRequest(
@@ -3073,13 +3099,21 @@ class GlobalSearchView(PassUserMixin):
         )
         groups = groups[:OBJECT_LIMIT]
         mail_rules = (
-            MailRule.objects.filter(name__icontains=query)
+            get_objects_for_user_owner_aware(
+                request.user,
+                "view_mailrule",
+                MailRule,
+            ).filter(name__icontains=query)
             if request.user.has_perm("paperless_mail.view_mailrule")
             else []
         )
         mail_rules = mail_rules[:OBJECT_LIMIT]
         mail_accounts = (
-            MailAccount.objects.filter(name__icontains=query)
+            get_objects_for_user_owner_aware(
+                request.user,
+                "view_mailaccount",
+                MailAccount,
+            ).filter(name__icontains=query)
             if request.user.has_perm("paperless_mail.view_mailaccount")
             else []
         )
@@ -3389,6 +3423,12 @@ class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
         path = serializer.validated_data.get("path")
 
         result = format_filename(document, path)
+        if result:
+            extension = (
+                Path(str(document.filename)).suffix if document.filename else ""
+            ) or document.file_type
+            result_path = Path(result)
+            result = str(result_path.with_name(f"{result_path.name}{extension}"))
         return Response(result)
 
 
@@ -4091,7 +4131,7 @@ class CustomFieldViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
     document_count_through = CustomFieldInstance
     document_count_source_field = "field_id"
 
-    queryset = CustomField.objects.all().order_by("-created")
+    queryset = CustomField.objects.all().order_by("name")
 
 
 @extend_schema_view(

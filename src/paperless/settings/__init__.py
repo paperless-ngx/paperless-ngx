@@ -121,10 +121,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "paperless",
     "documents.apps.DocumentsConfig",
-    "paperless_tesseract.apps.PaperlessTesseractConfig",
-    "paperless_text.apps.PaperlessTextConfig",
     "paperless_mail.apps.PaperlessMailConfig",
-    "paperless_remote.apps.PaperlessRemoteParserConfig",
     "django.contrib.admin",
     "rest_framework",
     "rest_framework.authtoken",
@@ -974,8 +971,8 @@ TIKA_GOTENBERG_ENDPOINT = os.getenv(
     "http://localhost:3000",
 )
 
-if TIKA_ENABLED:
-    INSTALLED_APPS.append("paperless_tika.apps.PaperlessTikaConfig")
+# Tika parser is now integrated into the main parser registry
+# No separate Django app needed
 
 AUDIT_LOG_ENABLED = get_bool_from_env("PAPERLESS_AUDIT_LOG_ENABLED", "true")
 if AUDIT_LOG_ENABLED:
@@ -1112,3 +1109,7 @@ LLM_BACKEND = os.getenv("PAPERLESS_AI_LLM_BACKEND")  # "ollama" or "openai"
 LLM_MODEL = os.getenv("PAPERLESS_AI_LLM_MODEL")
 LLM_API_KEY = os.getenv("PAPERLESS_AI_LLM_API_KEY")
 LLM_ENDPOINT = os.getenv("PAPERLESS_AI_LLM_ENDPOINT")
+LLM_ALLOW_INTERNAL_ENDPOINTS = get_bool_from_env(
+    "PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS",
+    "true",
+)

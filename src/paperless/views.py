@@ -26,6 +26,8 @@ from drf_spectacular.utils import extend_schema_view
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
+from rest_framework.fields import BooleanField
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import GenericAPIView
 from rest_framework.pagination import PageNumberPagination
@@ -119,6 +121,7 @@ class FaviconView(View):
 
 
 class UserViewSet(ModelViewSet):
+    _BOOL_NOT_PROVIDED = object()
     model = User
 
     queryset = User.objects.exclude(
@@ -132,26 +135,64 @@ class UserViewSet(ModelViewSet):
     filterset_class = UserFilterSet
     ordering_fields = ("username",)
 
+    @staticmethod
+    def _parse_requested_bool(data, key: str):
+        if key not in data:
+            return UserViewSet._BOOL_NOT_PROVIDED
+        try:
+            return BooleanField().to_internal_value(data.get(key))
+        except ValidationError:
+            # Let serializer validation report invalid values as 400 responses
+            return UserViewSet._BOOL_NOT_PROVIDED
+
     def create(self, request, *args, **kwargs):
-        if not request.user.is_superuser and request.data.get("is_superuser") is True:
-            return HttpResponseForbidden(
-                "Superuser status can only be granted by a superuser",
-            )
+        requested_is_superuser = self._parse_requested_bool(
+            request.data,
+            "is_superuser",
+        )
+        requested_is_staff = self._parse_requested_bool(request.data, "is_staff")
+
+        if not request.user.is_superuser:
+            if requested_is_superuser is True:
+                return HttpResponseForbidden(
+                    "Superuser status can only be granted by a superuser",
+                )
+            if requested_is_staff is True:
+                return HttpResponseForbidden(
+                    "Staff status can only be granted by a superuser",
+                )
+
         return super().create(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         user_to_update: User = self.get_object()
+
         if not request.user.is_superuser and user_to_update.is_superuser:
             return HttpResponseForbidden(
                 "Superusers can only be modified by other superusers",
             )
+
+        requested_is_superuser = self._parse_requested_bool(
+            request.data,
+            "is_superuser",
+        )
+        requested_is_staff = self._parse_requested_bool(request.data, "is_staff")
+
         if (
             not request.user.is_superuser
-            and request.data.get("is_superuser") is not None
-            and request.data.get("is_superuser") != user_to_update.is_superuser
+            and requested_is_superuser is not self._BOOL_NOT_PROVIDED
+            and requested_is_superuser != user_to_update.is_superuser
         ):
             return HttpResponseForbidden(
                 "Superuser status can only be changed by a superuser",
+            )
+        if (
+            not request.user.is_superuser
+            and requested_is_staff is not self._BOOL_NOT_PROVIDED
+            and requested_is_staff != user_to_update.is_staff
+        ):
+            return HttpResponseForbidden(
+                "Staff status can only be changed by a superuser",
             )
         return super().update(request, *args, **kwargs)
 

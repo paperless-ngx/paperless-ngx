@@ -9,7 +9,80 @@ from pytest_django.fixtures import SettingsWrapper
 from pytest_httpx import HTTPXMock
 
 from documents.parsers import ParseError
-from paperless_tika.parsers import TikaDocumentParser
+from paperless.parsers import ParserContext
+from paperless.parsers import ParserProtocol
+from paperless.parsers.tika import TikaDocumentParser
+
+
+class TestTikaParserRegistryInterface:
+    """Verify that TikaDocumentParser satisfies the ParserProtocol contract."""
+
+    def test_satisfies_parser_protocol(self) -> None:
+        assert isinstance(TikaDocumentParser(), ParserProtocol)
+
+    def test_supported_mime_types_is_classmethod(self) -> None:
+        mime_types = TikaDocumentParser.supported_mime_types()
+        assert isinstance(mime_types, dict)
+        assert len(mime_types) > 0
+
+    def test_score_returns_none_when_tika_disabled(
+        self,
+        settings: SettingsWrapper,
+    ) -> None:
+        settings.TIKA_ENABLED = False
+        result = TikaDocumentParser.score(
+            "application/vnd.oasis.opendocument.text",
+            "sample.odt",
+        )
+        assert result is None
+
+    def test_score_returns_int_when_tika_enabled(
+        self,
+        settings: SettingsWrapper,
+    ) -> None:
+        settings.TIKA_ENABLED = True
+        result = TikaDocumentParser.score(
+            "application/vnd.oasis.opendocument.text",
+            "sample.odt",
+        )
+        assert isinstance(result, int)
+
+    def test_score_returns_none_for_unsupported_mime(
+        self,
+        settings: SettingsWrapper,
+    ) -> None:
+        settings.TIKA_ENABLED = True
+        result = TikaDocumentParser.score("application/pdf", "doc.pdf")
+        assert result is None
+
+    def test_can_produce_archive_is_false(self) -> None:
+        assert TikaDocumentParser().can_produce_archive is False
+
+    def test_requires_pdf_rendition_is_true(self) -> None:
+        assert TikaDocumentParser().requires_pdf_rendition is True
+
+    def test_get_page_count_returns_none_without_archive(
+        self,
+        tika_parser: TikaDocumentParser,
+        sample_odt_file: Path,
+    ) -> None:
+        assert (
+            tika_parser.get_page_count(
+                sample_odt_file,
+                "application/vnd.oasis.opendocument.text",
+            )
+            is None
+        )
+
+    def test_get_page_count_returns_int_with_pdf_archive(
+        self,
+        tika_parser: TikaDocumentParser,
+        simple_digital_pdf_file: Path,
+    ) -> None:
+        tika_parser._archive_path = simple_digital_pdf_file
+        count = tika_parser.get_page_count(simple_digital_pdf_file, "application/pdf")
+        assert isinstance(count, int)
+        assert count > 0
 
 
 @pytest.mark.django_db()
@@ -34,14 +107,15 @@ class TestTikaParser:
         # Pretend convert to PDF response
         httpx_mock.add_response(content=b"PDF document")
 
+        tika_parser.configure(ParserContext())
         tika_parser.parse(sample_odt_file, "application/vnd.oasis.opendocument.text")
 
-        assert tika_parser.text == "the content"
-        assert tika_parser.archive_path is not None
-        with Path(tika_parser.archive_path).open("rb") as f:
+        assert tika_parser.get_text() == "the content"
+        assert tika_parser.get_archive_path() is not None
+        with Path(tika_parser.get_archive_path()).open("rb") as f:
             assert f.read() == b"PDF document"
 
-        assert tika_parser.date == datetime.datetime(
+        assert tika_parser.get_date() == datetime.datetime(
             2020,
             11,
             21,
@@ -89,7 +163,7 @@ class TestTikaParser:
         httpx_mock.add_response(status_code=HTTPStatus.INTERNAL_SERVER_ERROR)
 
         with pytest.raises(ParseError):
-            tika_parser.convert_to_pdf(sample_odt_file, None)
+            tika_parser._convert_to_pdf(sample_odt_file)
 
     @pytest.mark.parametrize(
         ("setting_value", "expected_form_value"),
@@ -106,7 +180,6 @@ class TestTikaParser:
         expected_form_value: str,
         httpx_mock: HTTPXMock,
         settings: SettingsWrapper,
-        tika_parser: TikaDocumentParser,
         sample_odt_file: Path,
     ) -> None:
         """
@@ -117,6 +190,8 @@ class TestTikaParser:
         THEN:
             - Request to Gotenberg contains the expected PDF/A format string
         """
+        # Parser must be created after the setting is changed so that
+        # OutputTypeConfig reads the correct value at __init__ time.
         settings.OCR_OUTPUT_TYPE = setting_value
         httpx_mock.add_response(
             status_code=codes.OK,
@@ -124,7 +199,8 @@ class TestTikaParser:
             method="POST",
         )
 
-        tika_parser.convert_to_pdf(sample_odt_file, None)
+        with TikaDocumentParser() as parser:
+            parser._convert_to_pdf(sample_odt_file)
 
         request = httpx_mock.get_request()
 

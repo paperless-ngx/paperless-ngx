@@ -41,7 +41,7 @@ jobs:
       ref-name: ${{ steps.ref.outputs.name }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Determine ref name
         id: ref
         run: |
@@ -104,9 +104,9 @@ jobs:
           echo "repository=${repo_name}"
           echo "name=${repo_name}" >> $GITHUB_OUTPUT
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4.0.0
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v4.0.0
+        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -119,7 +119,7 @@ jobs:
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
       - name: Docker metadata
         id: docker-meta
-        uses: docker/metadata-action@v5.10.0
+        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
         with:
           images: |
             ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}
@@ -130,7 +130,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
       - name: Build and push by digest
         id: build
-        uses: docker/build-push-action@v6.19.2
+        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
         with:
           context: .
           file: ./Dockerfile
@@ -152,7 +152,7 @@ jobs:
           echo "${digest}" > "/tmp/digests/digest-${{ matrix.arch }}.txt"
       - name: Upload digest
         if: steps.check-push.outputs.should-push == 'true'
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: digests-${{ matrix.arch }}
           path: /tmp/digests/digest-${{ matrix.arch }}.txt
@@ -169,7 +169,7 @@ jobs:
       packages: write
     steps:
       - name: Download digests
-        uses: actions/download-artifact@v8.0.0
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
         with:
           path: /tmp/digests
           pattern: digest-*.txt
@@ -179,29 +179,29 @@ jobs:
           echo "Downloaded digests:"
           ls -la /tmp/digests/
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4.0.0
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v4.0.0
+        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Login to Docker Hub
         if: needs.build-arch.outputs.push-external == 'true'
-        uses: docker/login-action@v4.0.0
+        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Login to Quay.io
         if: needs.build-arch.outputs.push-external == 'true'
-        uses: docker/login-action@v4.0.0
+        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
         with:
           registry: quay.io
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_ROBOT_TOKEN }}
       - name: Docker metadata
         id: docker-meta
-        uses: docker/metadata-action@v5.10.0
+        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
         with:
           images: |
             ${{ env.REGISTRY }}/${{ needs.build-arch.outputs.repository }}

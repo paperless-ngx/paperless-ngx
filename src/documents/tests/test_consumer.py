@@ -27,7 +27,6 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.tasks import sanity_check
@@ -36,65 +35,108 @@ from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import GetConsumerMixin
 from paperless_mail.models import MailRule
-from paperless_mail.parsers import MailDocumentParser
 
 
-class _BaseTestParser(DocumentParser):
-    def get_settings(self) -> None:
+class _BaseNewStyleParser:
+    """Minimal ParserProtocol implementation for use in consumer tests."""
+
+    name: str = "test-parser"
+    version: str = "0.1"
+    author: str = "test"
+    url: str = "test"
+
+    @classmethod
+    def supported_mime_types(cls) -> dict:
+        return {
+            "application/pdf": ".pdf",
+            "image/png": ".png",
+            "message/rfc822": ".eml",
+        }
+
+    @classmethod
+    def score(cls, mime_type: str, filename: str, path=None):
+        return 0 if mime_type in cls.supported_mime_types() else None
+
+    @property
+    def can_produce_archive(self) -> bool:
+        return True
+
+    @property
+    def requires_pdf_rendition(self) -> bool:
+        return False
+
+    def __init__(self) -> None:
+        self._tmpdir: Path | None = None
+        self._text: str | None = None
+        self._archive: Path | None = None
+        self._thumb: Path | None = None
+
+    def __enter__(self):
+        self._tmpdir = Path(
+            tempfile.mkdtemp(prefix="paperless-test-", dir=settings.SCRATCH_DIR),
+        )
+        _, thumb = tempfile.mkstemp(suffix=".webp", dir=self._tmpdir)
+        self._thumb = Path(thumb)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        if self._tmpdir and self._tmpdir.exists():
+            shutil.rmtree(self._tmpdir, ignore_errors=True)
+
+    def configure(self, context) -> None:
         """
-        This parser does not implement additional settings yet
+        Test parser doesn't do anything with context
         """
+
+    def parse(self, document_path, mime_type, *, produce_archive: bool = True) -> None:
+        raise NotImplementedError
+
+    def get_text(self) -> str | None:
+        return self._text
+
+    def get_date(self):
         return None
 
+    def get_archive_path(self):
+        return self._archive
 
-class DummyParser(_BaseTestParser):
-    def __init__(self, logging_group, scratch_dir, archive_path) -> None:
-        super().__init__(logging_group, None)
-        _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=scratch_dir)
-        self.archive_path = archive_path
+    def get_thumbnail(self, document_path, mime_type) -> Path:
+        return self._thumb
 
-    def get_thumbnail(self, document_path, mime_type, file_name=None):
-        return self.fake_thumb
+    def get_page_count(self, document_path, mime_type):
+        return None
 
-    def parse(self, document_path, mime_type, file_name=None) -> None:
-        self.text = "The Text"
-
-
-class CopyParser(_BaseTestParser):
-    def get_thumbnail(self, document_path, mime_type, file_name=None):
-        return self.fake_thumb
-
-    def __init__(self, logging_group, progress_callback=None) -> None:
-        super().__init__(logging_group, progress_callback)
-        _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=self.tempdir)
-
-    def parse(self, document_path, mime_type, file_name=None) -> None:
-        self.text = "The text"
-        self.archive_path = Path(self.tempdir / "archive.pdf")
-        shutil.copy(document_path, self.archive_path)
+    def extract_metadata(self, document_path, mime_type) -> list:
+        return []
 
 
-class FaultyParser(_BaseTestParser):
-    def __init__(self, logging_group, scratch_dir) -> None:
-        super().__init__(logging_group)
-        _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=scratch_dir)
+class DummyParser(_BaseNewStyleParser):
+    _ARCHIVE_SRC = (
+        Path(__file__).parent / "samples" / "documents" / "archive" / "0000001.pdf"
+    )
 
-    def get_thumbnail(self, document_path, mime_type, file_name=None):
-        return self.fake_thumb
+    def parse(self, document_path, mime_type, *, produce_archive: bool = True) -> None:
+        self._text = "The Text"
+        if produce_archive and self._tmpdir:
+            self._archive = self._tmpdir / "archive.pdf"
+            shutil.copy(self._ARCHIVE_SRC, self._archive)
 
-    def parse(self, document_path, mime_type, file_name=None):
+
+class CopyParser(_BaseNewStyleParser):
+    def parse(self, document_path, mime_type, *, produce_archive: bool = True) -> None:
+        self._text = "The text"
+        if produce_archive and self._tmpdir:
+            self._archive = self._tmpdir / "archive.pdf"
+            shutil.copy(document_path, self._archive)
+
+
+class FaultyParser(_BaseNewStyleParser):
+    def parse(self, document_path, mime_type, *, produce_archive: bool = True) -> None:
         raise ParseError("Does not compute.")
 
 
-class FaultyGenericExceptionParser(_BaseTestParser):
-    def __init__(self, logging_group, scratch_dir) -> None:
-        super().__init__(logging_group)
-        _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=scratch_dir)
-
-    def get_thumbnail(self, document_path, mime_type, file_name=None):
-        return self.fake_thumb
-
-    def parse(self, document_path, mime_type, file_name=None):
+class FaultyGenericExceptionParser(_BaseNewStyleParser):
+    def parse(self, document_path, mime_type, *, produce_archive: bool = True) -> None:
         raise Exception("Generic exception.")
 
 
@@ -148,38 +190,12 @@ class TestConsumer(
         self.assertEqual(payload["data"]["max_progress"], last_progress_max)
         self.assertEqual(payload["data"]["status"], last_status)
 
-    def make_dummy_parser(self, logging_group, progress_callback=None):
-        return DummyParser(
-            logging_group,
-            self.dirs.scratch_dir,
-            self.get_test_archive_file(),
-        )
-
-    def make_faulty_parser(self, logging_group, progress_callback=None):
-        return FaultyParser(logging_group, self.dirs.scratch_dir)
-
-    def make_faulty_generic_exception_parser(
-        self,
-        logging_group,
-        progress_callback=None,
-    ):
-        return FaultyGenericExceptionParser(logging_group, self.dirs.scratch_dir)
-
     def setUp(self) -> None:
         super().setUp()
 
-        patcher = mock.patch("documents.parsers.document_consumer_declaration.send")
-        m = patcher.start()
-        m.return_value = [
-            (
-                None,
-                {
-                    "parser": self.make_dummy_parser,
-                    "mime_types": {"application/pdf": ".pdf"},
-                    "weight": 0,
-                },
-            ),
-        ]
+        patcher = mock.patch("documents.consumer.get_parser_registry")
+        mock_registry = patcher.start()
+        mock_registry.return_value.get_parser_for_file.return_value = DummyParser
         self.addCleanup(patcher.stop)
 
     def get_test_file(self):
@@ -245,8 +261,14 @@ class TestConsumer(
 
         self.assertIsFile(document.archive_path)
 
-        self.assertEqual(document.checksum, "42995833e01aea9b3edee44bbfdd7ce1")
-        self.assertEqual(document.archive_checksum, "62acb0bcbfbcaa62ca6ad3668e4e404b")
+        self.assertEqual(
+            document.checksum,
+            "1093cf6e32adbd16b06969df09215d42c4a3a8938cc18b39455953f08d1ff2ab",
+        )
+        self.assertEqual(
+            document.archive_checksum,
+            "706124ecde3c31616992fa979caed17a726b1c9ccdba70e82a4ff796cea97ccf",
+        )
 
         self.assertIsNotFile(filename)
 
@@ -548,9 +570,9 @@ class TestConsumer(
             ) as consumer:
                 consumer.run()
 
-    @mock.patch("documents.parsers.document_consumer_declaration.send")
+    @mock.patch("documents.consumer.get_parser_registry")
     def testNoParsers(self, m) -> None:
-        m.return_value = []
+        m.return_value.get_parser_for_file.return_value = None
 
         with self.assertRaisesMessage(
             ConsumerError,
@@ -561,18 +583,9 @@ class TestConsumer(
 
         self._assert_first_last_send_progress(last_status="FAILED")
 
-    @mock.patch("documents.parsers.document_consumer_declaration.send")
+    @mock.patch("documents.consumer.get_parser_registry")
     def testFaultyParser(self, m) -> None:
-        m.return_value = [
-            (
-                None,
-                {
-                    "parser": self.make_faulty_parser,
-                    "mime_types": {"application/pdf": ".pdf"},
-                    "weight": 0,
-                },
-            ),
-        ]
+        m.return_value.get_parser_for_file.return_value = FaultyParser
 
         with self.get_consumer(self.get_test_file()) as consumer:
             with self.assertRaisesMessage(
@@ -583,18 +596,9 @@ class TestConsumer(
 
         self._assert_first_last_send_progress(last_status="FAILED")
 
-    @mock.patch("documents.parsers.document_consumer_declaration.send")
+    @mock.patch("documents.consumer.get_parser_registry")
     def testGenericParserException(self, m) -> None:
-        m.return_value = [
-            (
-                None,
-                {
-                    "parser": self.make_faulty_generic_exception_parser,
-                    "mime_types": {"application/pdf": ".pdf"},
-                    "weight": 0,
-                },
-            ),
-        ]
+        m.return_value.get_parser_for_file.return_value = FaultyGenericExceptionParser
 
         with self.get_consumer(self.get_test_file()) as consumer:
             with self.assertRaisesMessage(
@@ -642,6 +646,7 @@ class TestConsumer(
         self._assert_first_last_send_progress()
 
     @mock.patch("documents.consumer.generate_unique_filename")
+    @override_settings(FILENAME_FORMAT="{pk}")
     def testFilenameHandlingFallsBackWhenGeneratedPathExceedsDbLimit(self, m):
         m.side_effect = lambda doc, archive_filename=False: Path(
             ("a" * 1100 + ".pdf") if not archive_filename else ("b" * 1100 + ".pdf"),
@@ -1017,7 +1022,7 @@ class TestConsumer(
         self._assert_first_last_send_progress()
 
     @override_settings(FILENAME_FORMAT="{title}")
-    @mock.patch("documents.parsers.document_consumer_declaration.send")
+    @mock.patch("documents.consumer.get_parser_registry")
     def test_similar_filenames(self, m) -> None:
         shutil.copy(
             Path(__file__).parent / "samples" / "simple.pdf",
@@ -1031,16 +1036,7 @@ class TestConsumer(
             Path(__file__).parent / "samples" / "simple-noalpha.png",
             settings.CONSUMPTION_DIR / "simple.png.pdf",
         )
-        m.return_value = [
-            (
-                None,
-                {
-                    "parser": CopyParser,
-                    "mime_types": {"application/pdf": ".pdf", "image/png": ".png"},
-                    "weight": 0,
-                },
-            ),
-        ]
+        m.return_value.get_parser_for_file.return_value = CopyParser
 
         with self.get_consumer(settings.CONSUMPTION_DIR / "simple.png") as consumer:
             consumer.run()
@@ -1068,8 +1064,10 @@ class TestConsumer(
 
         sanity_check()
 
+    @mock.patch("documents.consumer.get_parser_registry")
     @mock.patch("documents.consumer.run_subprocess")
-    def test_try_to_clean_invalid_pdf(self, m) -> None:
+    def test_try_to_clean_invalid_pdf(self, m, mock_registry) -> None:
+        mock_registry.return_value.get_parser_for_file.return_value = None
         shutil.copy(
             Path(__file__).parent / "samples" / "invalid_pdf.pdf",
             settings.CONSUMPTION_DIR / "invalid_pdf.pdf",
@@ -1090,11 +1088,11 @@ class TestConsumer(
             self.assertEqual(command[1], "--replace-input")
 
     @mock.patch("paperless_mail.models.MailRule.objects.get")
-    @mock.patch("paperless_mail.parsers.MailDocumentParser.parse")
-    @mock.patch("documents.parsers.document_consumer_declaration.send")
+    @mock.patch("paperless.parsers.mail.MailDocumentParser.parse")
+    @mock.patch("documents.consumer.get_parser_registry")
     def test_mail_parser_receives_mailrule(
         self,
-        mock_consumer_declaration_send: mock.Mock,
+        mock_get_parser_registry: mock.Mock,
         mock_mail_parser_parse: mock.Mock,
         mock_mailrule_get: mock.Mock,
     ) -> None:
@@ -1106,25 +1104,21 @@ class TestConsumer(
         THEN:
             - The mail parser should receive the mail rule
         """
-        mock_consumer_declaration_send.return_value = [
-            (
-                None,
-                {
-                    "parser": MailDocumentParser,
-                    "mime_types": {"message/rfc822": ".eml"},
-                    "weight": 0,
-                },
-            ),
-        ]
+        from paperless.parsers.mail import MailDocumentParser
+
+        mock_get_parser_registry.return_value.get_parser_for_file.return_value = (
+            MailDocumentParser
+        )
         mock_mailrule_get.return_value = mock.Mock(
             pdf_layout=MailRule.PdfLayout.HTML_ONLY,
         )
         with self.get_consumer(
             filepath=(
                 Path(__file__).parent.parent.parent
-                / Path("paperless_mail")
+                / Path("paperless")
                 / Path("tests")
                 / Path("samples")
+                / Path("mail")
             ).resolve()
             / "html.eml",
             source=DocumentSource.MailFetch,
@@ -1135,12 +1129,10 @@ class TestConsumer(
                 ConsumerError,
             ):
                 consumer.run()
-                mock_mail_parser_parse.assert_called_once_with(
-                    consumer.working_copy,
-                    "message/rfc822",
-                    file_name="sample.pdf",
-                    mailrule=mock_mailrule_get.return_value,
-                )
+            mock_mail_parser_parse.assert_called_once_with(
+                consumer.working_copy,
+                "message/rfc822",
+            )
 
 
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)

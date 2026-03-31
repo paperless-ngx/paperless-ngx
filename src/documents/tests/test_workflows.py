@@ -28,6 +28,7 @@ from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 
 from documents.file_handling import create_source_path_directory
+from documents.file_handling import generate_filename
 from documents.file_handling import generate_unique_filename
 from documents.signals.handlers import run_workflows
 from documents.workflows.webhooks import send_webhook
@@ -904,6 +905,121 @@ class TestWorkflows(
 
         expected_str = f"Document matched {trigger} from {w}"
         self.assertIn(expected_str, cm.output[0])
+
+    def test_workflow_assign_custom_field_keeps_storage_filename_in_sync(self) -> None:
+        """
+        GIVEN:
+            - Existing document with a storage path template that depends on a custom field
+            - Existing workflow triggered on document update assigning that custom field
+        WHEN:
+            - Workflow runs for the document
+        THEN:
+            - The database filename remains aligned with the moved file on disk
+        """
+        storage_path = StoragePath.objects.create(
+            name="workflow-custom-field-path",
+            path="{{ custom_fields|get_cf_value('Custom Field 1', 'none') }}/{{ title }}",
+        )
+        doc = Document.objects.create(
+            title="workflow custom field sync",
+            mime_type="application/pdf",
+            checksum="workflow-custom-field-sync",
+            storage_path=storage_path,
+            original_filename="workflow-custom-field-sync.pdf",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=self.cf1,
+            value_text="initial",
+        )
+
+        generated = generate_unique_filename(doc)
+        destination = (settings.ORIGINALS_DIR / generated).resolve()
+        create_source_path_directory(destination)
+        shutil.copy(self.SAMPLE_DIR / "simple.pdf", destination)
+        Document.objects.filter(pk=doc.pk).update(filename=generated.as_posix())
+        doc.refresh_from_db()
+
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.ASSIGNMENT,
+            assign_custom_fields_values={self.cf1.pk: "cars"},
+        )
+        action.assign_custom_fields.add(self.cf1.pk)
+        workflow = Workflow.objects.create(
+            name="Workflow custom field filename sync",
+            order=0,
+        )
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+        workflow.save()
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        doc.refresh_from_db()
+        expected_filename = generate_filename(doc)
+        self.assertEqual(Path(doc.filename), expected_filename)
+        self.assertTrue(doc.source_path.is_file())
+
+    def test_workflow_document_updated_does_not_overwrite_filename(self) -> None:
+        """
+        GIVEN:
+            - A document whose filename has been updated in the DB by a concurrent
+              bulk_update_documents task (simulating update_filename_and_move_files
+              completing and writing the new filename to the DB)
+            - A stale in-memory document instance still holding the old filename
+            - An active DOCUMENT_UPDATED workflow
+        WHEN:
+            - run_workflows is called with the stale in-memory instance
+              (as would happen in the second concurrent bulk_update_documents task)
+        THEN:
+            - The DB filename is NOT overwritten with the stale in-memory value
+              (regression test for GH #12386 — the race window between
+              refresh_from_db and document.save in run_workflows)
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.ASSIGNMENT,
+            assign_title="Updated by workflow",
+        )
+        workflow = Workflow.objects.create(name="Race condition test workflow", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+        workflow.save()
+
+        doc = Document.objects.create(
+            title="race condition test",
+            mime_type="application/pdf",
+            checksum="racecondition123",
+            original_filename="old.pdf",
+            filename="old/path/old.pdf",
+        )
+
+        # Simulate BUD-1 completing update_filename_and_move_files:
+        # the DB now holds the new filename while BUD-2's in-memory instance is stale.
+        new_filename = "new/path/new.pdf"
+        Document.global_objects.filter(pk=doc.pk).update(filename=new_filename)
+
+        # The stale instance still has filename="old/path/old.pdf" in memory.
+        # Mock refresh_from_db so the stale value persists through run_workflows,
+        # replicating the race window between refresh and save.
+        # Mock update_filename_and_move_files to prevent file-not-found errors
+        # since we are only testing DB state here.
+        with (
+            mock.patch(
+                "documents.signals.handlers.update_filename_and_move_files",
+            ),
+            mock.patch.object(Document, "refresh_from_db"),
+        ):
+            run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        # The DB filename must not have been reverted to the stale old value.
+        doc.refresh_from_db()
+        self.assertEqual(doc.filename, new_filename)
 
     def test_document_added_workflow(self) -> None:
         trigger = WorkflowTrigger.objects.create(

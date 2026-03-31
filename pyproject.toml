@@ -1,6 +1,6 @@
 [project]
 name = "paperless-ngx"
-version = "2.20.10"
+version = "2.20.13"
 description = "A community-supported supercharged document management system: scan, index and archive all your physical documents"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -26,7 +26,7 @@ dependencies = [
   # WARNING: django does not use semver.
   #          Only patch versions are guaranteed to not introduce breaking changes.
   "django~=5.2.10",
-  "django-allauth[mfa,socialaccount]~=65.14.0",
+  "django-allauth[mfa,socialaccount]~=65.15.0",
   "django-auditlog~=3.4.1",
   "django-cachalot~=2.9.0",
   "django-celery-results~=2.6.0",
@@ -60,7 +60,7 @@ dependencies = [
   "llama-index-llms-openai>=0.6.13",
   "llama-index-vector-stores-faiss>=0.5.2",
   "nltk~=3.9.1",
-  "ocrmypdf~=16.13.0",
+  "ocrmypdf~=17.3.0",
   "openai>=1.76",
   "pathvalidate~=3.3.1",
   "pdf2image~=1.17.0",
@@ -248,15 +248,13 @@ lint.per-file-ignores."docker/wait-for-redis.py" = [
 lint.per-file-ignores."src/documents/models.py" = [
   "SIM115",
 ]
-lint.per-file-ignores."src/paperless_tesseract/tests/test_parser.py" = [
-  "RUF001",
-]
+
 lint.isort.force-single-line = true
 
 [tool.codespell]
 write-changes = true
 ignore-words-list = "criterias,afterall,valeu,ureue,equest,ure,assertIn,Oktober,commitish"
-skip = "src-ui/src/locale/*,src-ui/pnpm-lock.yaml,src-ui/e2e/*,src/paperless_mail/tests/samples/*,src/documents/tests/samples/*,*.po,*.json"
+skip = "src-ui/src/locale/*,src-ui/pnpm-lock.yaml,src-ui/e2e/*,src/paperless_mail/tests/samples/*,src/paperless/tests/samples/mail/*,src/documents/tests/samples/*,*.po,*.json"
 
 [tool.pytest]
 minversion = "9.0"
@@ -271,10 +269,6 @@ testpaths = [
   "src/documents/tests/",
   "src/paperless/tests/",
   "src/paperless_mail/tests/",
-  "src/paperless_tesseract/tests/",
-  "src/paperless_tika/tests",
-  "src/paperless_text/tests/",
-  "src/paperless_remote/tests/",
   "src/paperless_ai/tests",
 ]
 

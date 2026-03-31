@@ -674,6 +674,9 @@ See the corresponding [django-allauth documentation](https://docs.allauth.org/en
 for a list of provider configurations. You will also need to include the relevant Django 'application' inside the
 [PAPERLESS_APPS](#PAPERLESS_APPS) setting to activate that specific authentication provider (e.g. `allauth.socialaccount.providers.openid_connect` for the [OIDC Connect provider](https://docs.allauth.org/en/latest/socialaccount/providers/openid_connect.html)).
 
+: For OpenID Connect providers, set `settings.token_auth_method` if your identity provider
+requires a specific token endpoint authentication method.
+
     Defaults to None, which does not enable any third party authentication systems.
 
 #### [`PAPERLESS_SOCIAL_AUTO_SIGNUP=<bool>`](#PAPERLESS_SOCIAL_AUTO_SIGNUP) {#PAPERLESS_SOCIAL_AUTO_SIGNUP}
@@ -1946,6 +1949,12 @@ current backend. If not supplied, defaults to "gpt-3.5-turbo" for OpenAI and "ll
 : The endpoint / url to use for the AI backend. This is required for the Ollama backend (optional for others).
 
     Defaults to None.
+
+#### [`PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS=<bool>`](#PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS) {#PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS}
+
+: If set to false, Paperless blocks AI endpoint URLs that resolve to non-public addresses (e.g., localhost, etc).
+
+    Defaults to true, which allows internal endpoints.
 
 #### [`PAPERLESS_AI_LLM_INDEX_TASK_CRON=<cron expression>`](#PAPERLESS_AI_LLM_INDEX_TASK_CRON) {#PAPERLESS_AI_LLM_INDEX_TASK_CRON}
 
