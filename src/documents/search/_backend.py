@@ -22,6 +22,7 @@ from guardian.shortcuts import get_users_with_perms
 
 from documents.search._query import build_permission_filter
 from documents.search._query import parse_simple_text_query
+from documents.search._query import parse_simple_title_query
 from documents.search._query import parse_user_query
 from documents.search._schema import _write_sentinels
 from documents.search._schema import build_schema
@@ -50,6 +51,7 @@ T = TypeVar("T")
 class SearchMode(StrEnum):
     QUERY = "query"
     TEXT = "text"
+    TITLE = "title"
 
 
 def _ascii_fold(s: str) -> str:
@@ -460,7 +462,8 @@ class TantivyBackend:
             sort_field: Field to sort by (None for relevance ranking)
             sort_reverse: Whether to reverse the sort order
             search_mode: "query" for advanced Tantivy syntax, "text" for
-                plain-text search over title and content only
+                plain-text search over title and content only, "title" for
+                plain-text search over title only
 
         Returns:
             SearchResults with hits, total count, and processed query
@@ -469,6 +472,8 @@ class TantivyBackend:
         tz = get_current_timezone()
         if search_mode is SearchMode.TEXT:
             user_query = parse_simple_text_query(self._index, query)
+        elif search_mode is SearchMode.TITLE:
+            user_query = parse_simple_title_query(self._index, query)
         else:
             user_query = parse_user_query(self._index, query, tz)
 

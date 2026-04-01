@@ -438,6 +438,7 @@ DEFAULT_SEARCH_FIELDS = [
     "tag",
 ]
 SIMPLE_SEARCH_FIELDS = ["title", "content"]
+TITLE_SEARCH_FIELDS = ["title"]
 _FIELD_BOOSTS = {"title": 2.0}
 
 
@@ -499,12 +500,13 @@ def parse_user_query(
     return exact
 
 
-def parse_simple_text_query(
+def parse_simple_query(
     index: tantivy.Index,
     raw_query: str,
+    fields: list[str],
 ) -> tantivy.Query:
     """
-    Parse a plain-text query using Tantivy's default parser over title/content.
+    Parse a plain-text query using Tantivy over a restricted field set.
 
     Query string is escaped and normalized to be treated as "simple" text query.
     """
@@ -519,6 +521,28 @@ def parse_simple_text_query(
     query_str = regex.sub(r" {2,}", " ", query_str, timeout=_REGEX_TIMEOUT).strip()
     return index.parse_query(
         query_str,
-        SIMPLE_SEARCH_FIELDS,
+        fields,
         field_boosts=_FIELD_BOOSTS,
     )
+
+
+def parse_simple_text_query(
+    index: tantivy.Index,
+    raw_query: str,
+) -> tantivy.Query:
+    """
+    Parse a plain-text query over title/content for simple search inputs.
+    """
+
+    return parse_simple_query(index, raw_query, SIMPLE_SEARCH_FIELDS)
+
+
+def parse_simple_title_query(
+    index: tantivy.Index,
+    raw_query: str,
+) -> tantivy.Query:
+    """
+    Parse a plain-text query over the title field only.
+    """
+
+    return parse_simple_query(index, raw_query, TITLE_SEARCH_FIELDS)
