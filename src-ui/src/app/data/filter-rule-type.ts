@@ -3,7 +3,7 @@ import { DataType } from './datatype'
 export const NEGATIVE_NULL_FILTER_VALUE = -1
 
 // These correspond to src/documents/models.py and changes here require a DB migration (and vice versa)
-export const FILTER_TITLE = 0
+export const FILTER_TITLE = 0 // Deprecated in favor of Tantivy-backed `title_search`. Keep for now for existing saved views
 export const FILTER_CONTENT = 1
 
 export const FILTER_ASN = 2
@@ -46,7 +46,7 @@ export const FILTER_ADDED_FROM = 46
 export const FILTER_MODIFIED_BEFORE = 15
 export const FILTER_MODIFIED_AFTER = 16
 
-export const FILTER_TITLE_CONTENT = 19
+export const FILTER_TITLE_CONTENT = 19 // Deprecated in favor of Tantivy-backed `text` filtervar. Keep for now for existing saved views
 export const FILTER_SIMPLE_TITLE = 48
 export const FILTER_SIMPLE_TEXT = 49
 export const FILTER_FULLTEXT_QUERY = 20
@@ -58,7 +58,7 @@ export const FILTER_OWNER_ISNULL = 34
 export const FILTER_OWNER_DOES_NOT_INCLUDE = 35
 export const FILTER_SHARED_BY_USER = 37
 
-export const FILTER_CUSTOM_FIELDS_TEXT = 36
+export const FILTER_CUSTOM_FIELDS_TEXT = 36 // Deprecated. UI no longer includes CF text-search mode. Keep for now for existing saved views
 export const FILTER_HAS_CUSTOM_FIELDS_ALL = 38
 export const FILTER_HAS_CUSTOM_FIELDS_ANY = 39
 export const FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS = 40
@@ -70,7 +70,6 @@ export const FILTER_MIME_TYPE = 47
 
 export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
-    // Deprecated. UI now uses Tantivy-backed `title_search` filtervar, keep for now for existing saved views
     id: FILTER_TITLE,
     filtervar: 'title__icontains',
     datatype: 'string',
@@ -284,7 +283,6 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     multi: false,
   },
   {
-    // Deprecated. UI now uses Tantivy-backed `text` filtervar
     id: FILTER_TITLE_CONTENT,
     filtervar: 'title_content',
     datatype: 'string',
@@ -340,7 +338,6 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
   },
   {
     id: FILTER_CUSTOM_FIELDS_TEXT,
-    // Deprecated. UI no longer includes CF text-search mode, but keep for now for existing saved views
     filtervar: 'custom_fields__icontains',
     datatype: 'string',
     multi: false,
