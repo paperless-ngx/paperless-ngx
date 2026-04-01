@@ -21,6 +21,8 @@ def send_email(
     body: str,
     to: list[str],
     attachments: list[EmailAttachment],
+    cc: list[str] | None = None,
+    bcc: list[str] | None = None,
 ) -> int:
     """
     Send an email with attachments.
@@ -30,6 +32,8 @@ def send_email(
         body: Email body text
         to: List of recipient email addresses
         attachments: List of attachments
+        cc: List of CC email addresses
+        bcc: List of BCC email addresses
 
     Returns:
         Number of emails sent
@@ -40,6 +44,8 @@ def send_email(
         subject=subject,
         body=body,
         to=to,
+        cc=cc or [],
+        bcc=bcc or [],
     )
 
     used_filenames: set[str] = set()

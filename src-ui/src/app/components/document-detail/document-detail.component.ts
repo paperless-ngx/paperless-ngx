@@ -1920,8 +1920,10 @@ export class DocumentDetailComponent
   public openEmailDocument() {
     const modal = this.modalService.open(EmailDocumentDialogComponent, {
       backdrop: 'static',
+      size: 'lg',
     })
     modal.componentInstance.documentIds = [this.document.id]
+    modal.componentInstance.documents = [this.document]
     modal.componentInstance.hasArchiveVersion =
       this.metadata?.has_archive_version ?? !!this.document?.archived_file_name
   }

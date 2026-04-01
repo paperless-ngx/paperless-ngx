@@ -212,6 +212,7 @@ describe('DocumentDetailComponent', () => {
                   },
                 ],
               }),
+            getCached: (id: number) => of({ id: 11, name: 'Correspondent11' }),
           },
         },
         {
@@ -226,6 +227,7 @@ describe('DocumentDetailComponent', () => {
                   },
                 ],
               }),
+            getCached: (id: number) => of({ id: 21, name: 'DocumentType21' }),
           },
         },
         {
@@ -258,6 +260,7 @@ describe('DocumentDetailComponent', () => {
                   },
                 ],
               }),
+            getCached: (id: number) => of({ id: 1, username: 'user1' }),
           },
         },
         CustomFieldsService,

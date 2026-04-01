@@ -39,6 +39,8 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import EmailContact
+from documents.models import EmailTemplate
 from documents.models import PaperlessTask
 from documents.models import ShareLink
 from documents.models import ShareLinkBundle
@@ -1031,3 +1033,20 @@ class DocumentsOrderingFilter(OrderingFilter):
             )
 
         return super().filter_queryset(request, queryset, view)
+
+
+class EmailContactFilterSet(FilterSet):
+    class Meta:
+        model = EmailContact
+        fields = {
+            "name": ["istartswith", "icontains"],
+            "email": ["istartswith", "icontains"],
+        }
+
+
+class EmailTemplateFilterSet(FilterSet):
+    class Meta:
+        model = EmailTemplate
+        fields = {
+            "name": ["istartswith", "icontains"],
+        }

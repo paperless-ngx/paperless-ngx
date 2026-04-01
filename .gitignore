@@ -78,7 +78,16 @@ virtualenv
 .venv/
 /docker-compose.env
 /docker-compose.yml
+/docker-compose.dev.yml
+/.env
 .ruff_cache/
+
+# Temp reference files
+*.ref.txt
+pr-diff.txt
+test-ref.txt
+frontend-test-ref.txt
+upstream-*.txt
 
 # Used for development
 scripts/import-for-development

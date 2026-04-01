@@ -61,6 +61,8 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import EmailContact
+from documents.models import EmailTemplate
 from documents.models import MatchingModel
 from documents.models import Note
 from documents.models import PaperlessTask
@@ -2334,6 +2336,20 @@ class EmailSerializer(DocumentListSerializer):
         label="Email message",
     )
 
+    cc = serializers.CharField(
+        required=False,
+        default="",
+        label="CC addresses",
+        help_text="Comma-separated CC email addresses",
+    )
+
+    bcc = serializers.CharField(
+        required=False,
+        default="",
+        label="BCC addresses",
+        help_text="Comma-separated BCC email addresses",
+    )
+
     use_archive_version = serializers.BooleanField(
         default=True,
         label="Use archive version",
@@ -3314,3 +3330,32 @@ class StoragePathTestSerializer(SerializerWithPerms):
                 "documents.view_document",
                 Document,
             )
+
+
+class EmailContactSerializer(OwnedObjectSerializer):
+    class Meta:
+        model = EmailContact
+        fields = (
+            "id",
+            "name",
+            "email",
+            "owner",
+            "permissions",
+            "user_can_change",
+            "set_permissions",
+        )
+
+
+class EmailTemplateSerializer(OwnedObjectSerializer):
+    class Meta:
+        model = EmailTemplate
+        fields = (
+            "id",
+            "name",
+            "subject",
+            "body",
+            "owner",
+            "permissions",
+            "user_can_change",
+            "set_permissions",
+        )

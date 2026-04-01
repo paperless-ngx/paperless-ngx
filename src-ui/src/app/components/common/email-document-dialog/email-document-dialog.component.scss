@@ -1,0 +1,47 @@
+.recipient-field {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  padding: 0.25rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  background: var(--bs-body-bg);
+  min-height: 2.5rem;
+  align-items: center;
+  cursor: text;
+
+  &:focus-within {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+  }
+}
+
+.recipient-input {
+  border: none;
+  outline: none;
+  box-shadow: none !important;
+  flex: 1 1 120px;
+  min-width: 120px;
+  padding: 0.15rem 0.35rem;
+  background: transparent;
+}
+
+.recipient-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: normal;
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+
+  .btn-close {
+    font-size: 0.55rem;
+    padding: 0;
+    margin-left: 0.3rem;
+    opacity: 0.8;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}

@@ -7,33 +7,129 @@
     <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
 </div>
 <div class="modal-body">
-    <div class="mb-1">
-        <label for="email" class="form-label" i18n>Email address(es)</label>
-        <input type="email" class="form-control" id="email" [(ngModel)]="emailAddress">
+    <!-- To -->
+    <div class="mb-2">
+        <label for="toInput" class="form-label" i18n="@@email-to-label">Recipient(s)</label>
+        <div class="recipient-field">
+            @for (addr of toRecipients; track addr; let i = $index) {
+                <span class="badge bg-primary recipient-chip">
+                    {{ addr }}
+                    <button type="button" class="btn-close btn-close-white btn-close-sm ms-1" (click)="removeRecipient('to', i)"></button>
+                </span>
+            }
+            <input type="text" class="form-control recipient-input" id="toInput"
+                   name="recipient-search"
+                   autocomplete="off"
+                   #toTypeahead="ngbTypeahead"
+                   [(ngModel)]="toInput"
+                   [ngbTypeahead]="searchContacts"
+                   [resultFormatter]="contactFormatter"
+                   [inputFormatter]="contactInputFormatter"
+                   (selectItem)="addRecipient('to', $event)"
+                   (keydown)="onInputKeydown('to', $event)"
+                   (focus)="onFocus($event)"
+                   [focusFirst]="false"
+                   placeholder="Search contacts or enter email" i18n-placeholder="@@email-search-contacts">
+        </div>
     </div>
-    <div class="mb-1">
-        <label for="email" class="form-label" i18n>Subject</label>
-        <input type="email" class="form-control" id="subject" [(ngModel)]="emailSubject">
+
+    <!-- CC / BCC toggle -->
+    @if (!showCcBcc) {
+        <div class="mb-2">
+            <button type="button" class="btn btn-link btn-sm p-0" (click)="showCcBcc = true" i18n>Show CC / BCC</button>
+        </div>
+    }
+
+    <!-- CC -->
+    @if (showCcBcc) {
+        <div class="mb-2">
+            <label for="ccInput" class="form-label">CC</label>
+            <div class="recipient-field">
+                @for (addr of ccRecipients; track addr; let i = $index) {
+                    <span class="badge bg-secondary recipient-chip">
+                        {{ addr }}
+                        <button type="button" class="btn-close btn-close-white btn-close-sm ms-1" (click)="removeRecipient('cc', i)"></button>
+                    </span>
+                }
+                <input type="text" class="form-control recipient-input" id="ccInput"
+                       name="cc-search"
+                       autocomplete="off"
+                       #ccTypeahead="ngbTypeahead"
+                       [(ngModel)]="ccInput"
+                       [ngbTypeahead]="searchContacts"
+                       [resultFormatter]="contactFormatter"
+                       [inputFormatter]="contactInputFormatter"
+                       (selectItem)="addRecipient('cc', $event)"
+                       (keydown)="onInputKeydown('cc', $event)"
+                       (focus)="onFocus($event)"
+                       [focusFirst]="false"
+                       placeholder="CC recipients" i18n-placeholder="@@email-cc-placeholder">
+            </div>
+        </div>
+
+        <!-- BCC -->
+        <div class="mb-2">
+            <label for="bccInput" class="form-label">BCC</label>
+            <div class="recipient-field">
+                @for (addr of bccRecipients; track addr; let i = $index) {
+                    <span class="badge bg-secondary recipient-chip">
+                        {{ addr }}
+                        <button type="button" class="btn-close btn-close-white btn-close-sm ms-1" (click)="removeRecipient('bcc', i)"></button>
+                    </span>
+                }
+                <input type="text" class="form-control recipient-input" id="bccInput"
+                       name="bcc-search"
+                       autocomplete="off"
+                       #bccTypeahead="ngbTypeahead"
+                       [(ngModel)]="bccInput"
+                       [ngbTypeahead]="searchContacts"
+                       [resultFormatter]="contactFormatter"
+                       [inputFormatter]="contactInputFormatter"
+                       (selectItem)="addRecipient('bcc', $event)"
+                       (keydown)="onInputKeydown('bcc', $event)"
+                       (focus)="onFocus($event)"
+                       [focusFirst]="false"
+                       placeholder="BCC recipients" i18n-placeholder="@@email-bcc-placeholder">
+            </div>
+        </div>
+    }
+
+    <!-- Template -->
+    <div class="mb-2">
+        <label for="template" class="form-label" i18n>Template</label>
+        <select class="form-select" id="template" (change)="applyTemplate(templates[$any($event.target).value])" [value]="''">
+            <option value="" disabled selected i18n>Select a template...</option>
+            @for (template of templates; track template.id; let i = $index) {
+                <option [value]="i">{{ template.name }}</option>
+            }
+        </select>
     </div>
-    <div>
+    <div class="mb-2">
+        <label for="subject" class="form-label" i18n>Subject</label>
+        <input type="text" class="form-control" id="subject" [(ngModel)]="emailSubject">
+    </div>
+    <div class="mb-2">
         <label for="message" class="form-label" i18n>Message</label>
-        <textarea class="form-control" id="message" rows="3" [(ngModel)]="emailMessage"></textarea>
+        <textarea class="form-control" id="message" rows="6" [(ngModel)]="emailMessage"></textarea>
     </div>
 </div>
-<div class="modal-footer">
+<div class="modal-footer flex-column align-items-stretch">
     <div class="input-group">
         <div class="input-group-text flex-grow-1">
             <input class="form-check-input mt-0 me-2" type="checkbox" role="switch" id="useArchiveVersion" [disabled]="!hasArchiveVersion" [(ngModel)]="useArchiveVersion">
             <label class="form-check-label w-100 text-start" for="useArchiveVersion" i18n>Use archive version</label>
         </div>
-        <button type="submit" class="btn btn-outline-primary" (click)="emailDocuments()" [disabled]="loading || emailAddress.length === 0 || emailMessage.length === 0 || emailSubject.length === 0">
+        <button type="submit" class="btn btn-outline-primary" (click)="emailDocuments()" [disabled]="!canSend">
             @if (loading) {
                 <div class="spinner-border spinner-border-sm me-2" role="status"></div>
             }
             <ng-container i18n>Send email</ng-container>
         </button>
     </div>
-    <div class="text-light fst-italic small mt-2">
+    <div class="text-muted fst-italic small mt-2">
         <ng-container i18n>Some email servers may reject messages with large attachments.</ng-container>
+    </div>
+    <div class="text-muted small mt-1">
+        <ng-container i18n="@@email-admin-hint">Manage contacts and templates via <a href="/admin/" target="_blank">Django Admin</a>.</ng-container>
     </div>
 </div>

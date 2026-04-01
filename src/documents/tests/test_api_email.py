@@ -437,3 +437,211 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
         self.assertIn("Error emailing documents", response.content.decode())
+
+    @override_settings(
+        EMAIL_ENABLED=True,
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    )
+    def test_email_cc_bcc(self) -> None:
+        """
+        GIVEN:
+            - Existing documents
+        WHEN:
+            - API request is made with cc and bcc fields
+        THEN:
+            - Email is sent with correct CC and BCC headers
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "documents": [self.doc1.pk],
+                    "addresses": "to@example.com",
+                    "subject": "CC/BCC Test",
+                    "message": "Test message",
+                    "cc": "cc1@example.com,cc2@example.com",
+                    "bcc": "bcc@example.com",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(mail.outbox), 1)
+
+        email = mail.outbox[0]
+        self.assertEqual(email.to, ["to@example.com"])
+        self.assertEqual(email.cc, ["cc1@example.com", "cc2@example.com"])
+        self.assertEqual(email.bcc, ["bcc@example.com"])
+
+    @override_settings(
+        EMAIL_ENABLED=True,
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    )
+    def test_email_empty_cc_bcc(self) -> None:
+        """
+        GIVEN:
+            - Existing documents
+        WHEN:
+            - API request is made without cc and bcc fields
+        THEN:
+            - Email is sent without CC and BCC headers
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "documents": [self.doc1.pk],
+                    "addresses": "to@example.com",
+                    "subject": "No CC/BCC Test",
+                    "message": "Test message",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(mail.outbox), 1)
+
+        email = mail.outbox[0]
+        self.assertEqual(email.to, ["to@example.com"])
+        self.assertEqual(email.cc, [])
+        self.assertEqual(email.bcc, [])
+
+
+class TestEmailContacts(DirectoriesMixin, APITestCase):
+    ENDPOINT = "/api/email_contacts/"
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_authenticate(user=self.user)
+
+    def test_create_contact(self) -> None:
+        response = self.client.post(
+            self.ENDPOINT,
+            {"name": "John Doe", "email": "john@example.com"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["name"], "John Doe")
+        self.assertEqual(response.data["email"], "john@example.com")
+
+    def test_list_contacts(self) -> None:
+        from documents.models import EmailContact
+
+        EmailContact.objects.create(
+            name="Alice",
+            email="alice@example.com",
+            owner=self.user,
+        )
+        EmailContact.objects.create(
+            name="Bob",
+            email="bob@example.com",
+            owner=self.user,
+        )
+
+        response = self.client.get(self.ENDPOINT)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 2)
+
+    def test_update_contact(self) -> None:
+        from documents.models import EmailContact
+
+        contact = EmailContact.objects.create(
+            name="Old Name",
+            email="old@example.com",
+            owner=self.user,
+        )
+        response = self.client.patch(
+            f"{self.ENDPOINT}{contact.pk}/",
+            {"name": "New Name"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["name"], "New Name")
+
+    def test_delete_contact(self) -> None:
+        from documents.models import EmailContact
+
+        contact = EmailContact.objects.create(
+            name="Delete Me",
+            email="del@example.com",
+            owner=self.user,
+        )
+        response = self.client.delete(f"{self.ENDPOINT}{contact.pk}/")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(EmailContact.objects.filter(pk=contact.pk).exists())
+
+
+class TestEmailTemplates(DirectoriesMixin, APITestCase):
+    ENDPOINT = "/api/email_templates/"
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_authenticate(user=self.user)
+
+    def test_create_template(self) -> None:
+        response = self.client.post(
+            self.ENDPOINT,
+            {
+                "name": "Welcome",
+                "subject": "Hello {{ doc_title }}",
+                "body": "Please find attached.",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["name"], "Welcome")
+        self.assertEqual(response.data["subject"], "Hello {{ doc_title }}")
+
+    def test_list_templates(self) -> None:
+        from documents.models import EmailTemplate
+
+        EmailTemplate.objects.create(
+            name="T1",
+            subject="S1",
+            body="B1",
+            owner=self.user,
+        )
+        EmailTemplate.objects.create(
+            name="T2",
+            subject="S2",
+            body="B2",
+            owner=self.user,
+        )
+
+        response = self.client.get(self.ENDPOINT)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 2)
+
+    def test_update_template(self) -> None:
+        from documents.models import EmailTemplate
+
+        template = EmailTemplate.objects.create(
+            name="Old",
+            subject="S",
+            body="B",
+            owner=self.user,
+        )
+        response = self.client.patch(
+            f"{self.ENDPOINT}{template.pk}/",
+            {"name": "Updated"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["name"], "Updated")
+
+    def test_delete_template(self) -> None:
+        from documents.models import EmailTemplate
+
+        template = EmailTemplate.objects.create(
+            name="Del",
+            subject="S",
+            body="B",
+            owner=self.user,
+        )
+        response = self.client.delete(f"{self.ENDPOINT}{template.pk}/")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(EmailTemplate.objects.filter(pk=template.pk).exists())

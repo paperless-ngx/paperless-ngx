@@ -8,6 +8,8 @@ import { of, throwError } from 'rxjs'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import { EmailContactService } from 'src/app/services/rest/email-contact.service'
+import { EmailTemplateService } from 'src/app/services/rest/email-template.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { EmailDocumentDialogComponent } from './email-document-dialog.component'
 
@@ -29,6 +31,14 @@ describe('EmailDocumentDialogComponent', () => {
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
         NgbActiveModal,
+        {
+          provide: EmailContactService,
+          useValue: { listAll: () => of({ results: [] }) },
+        },
+        {
+          provide: EmailTemplateService,
+          useValue: { listAll: () => of({ results: [] }) },
+        },
       ],
     }).compileComponents()
 
@@ -53,7 +63,7 @@ describe('EmailDocumentDialogComponent', () => {
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastSuccessSpy = jest.spyOn(toastService, 'showInfo')
     component.documentIds = [1]
-    component.emailAddress = 'hello@paperless-ngx.com'
+    component.toRecipients = ['hello@paperless-ngx.com']
     component.emailSubject = 'Hello'
     component.emailMessage = 'World'
     jest
@@ -74,7 +84,7 @@ describe('EmailDocumentDialogComponent', () => {
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastSuccessSpy = jest.spyOn(toastService, 'showInfo')
     component.documentIds = [1, 2, 3]
-    component.emailAddress = 'hello@paperless-ngx.com'
+    component.toRecipients = ['hello@paperless-ngx.com']
     component.emailSubject = 'Hello'
     component.emailMessage = 'World'
     jest
@@ -89,6 +99,26 @@ describe('EmailDocumentDialogComponent', () => {
     jest.spyOn(documentService, 'emailDocuments').mockReturnValue(of(true))
     component.emailDocuments()
     expect(toastSuccessSpy).toHaveBeenCalledWith('Email sent')
+  })
+
+  it('should add and remove recipients', () => {
+    component.addRecipient('to', {
+      item: { email: 'test@example.com' },
+      preventDefault: () => {},
+    })
+    expect(component.toRecipients).toContain('test@example.com')
+
+    component.removeRecipient('to', 0)
+    expect(component.toRecipients.length).toBe(0)
+  })
+
+  it('should report canSend correctly', () => {
+    expect(component.canSend).toBeFalsy()
+
+    component.toRecipients = ['test@example.com']
+    component.emailSubject = 'Subject'
+    component.emailMessage = 'Body'
+    expect(component.canSend).toBeTruthy()
   })
 
   it('should close the dialog', () => {

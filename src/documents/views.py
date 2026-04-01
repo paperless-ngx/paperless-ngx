@@ -129,6 +129,8 @@ from documents.filters import CustomFieldFilterSet
 from documents.filters import DocumentFilterSet
 from documents.filters import DocumentsOrderingFilter
 from documents.filters import DocumentTypeFilterSet
+from documents.filters import EmailContactFilterSet
+from documents.filters import EmailTemplateFilterSet
 from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
 from documents.filters import ObjectOwnedPermissionsFilter
 from documents.filters import PaperlessTaskFilterSet
@@ -147,6 +149,8 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import EmailContact
+from documents.models import EmailTemplate
 from documents.models import Note
 from documents.models import PaperlessTask
 from documents.models import SavedView
@@ -183,7 +187,9 @@ from documents.serialisers import DocumentTypeSerializer
 from documents.serialisers import DocumentVersionLabelSerializer
 from documents.serialisers import DocumentVersionSerializer
 from documents.serialisers import EditPdfDocumentsSerializer
+from documents.serialisers import EmailContactSerializer
 from documents.serialisers import EmailSerializer
+from documents.serialisers import EmailTemplateSerializer
 from documents.serialisers import MergeDocumentsSerializer
 from documents.serialisers import NotesSerializer
 from documents.serialisers import PostDocumentSerializer
@@ -1638,12 +1644,28 @@ class DocumentViewSet(
         validated_data = serializer.validated_data
         document_ids = validated_data.get("documents")
         addresses = validated_data.get("addresses").split(",")
-        addresses = [addr.strip() for addr in addresses]
+        addresses = [addr.strip() for addr in addresses if addr.strip()]
+        cc_raw = validated_data.get("cc", "")
+        cc = (
+            [addr.strip() for addr in cc_raw.split(",") if addr.strip()]
+            if cc_raw
+            else []
+        )
+        bcc_raw = validated_data.get("bcc", "")
+        bcc = (
+            [addr.strip() for addr in bcc_raw.split(",") if addr.strip()]
+            if bcc_raw
+            else []
+        )
         subject = validated_data.get("subject")
         message = validated_data.get("message")
         use_archive_version = validated_data.get("use_archive_version", True)
 
-        documents = Document.objects.select_related("owner").filter(pk__in=document_ids)
+        documents = Document.objects.select_related(
+            "owner",
+            "correspondent",
+            "document_type",
+        ).filter(pk__in=document_ids)
         for document in documents:
             if request.user is not None and not has_perms_owner_aware(
                 request.user,
@@ -1651,6 +1673,55 @@ class DocumentViewSet(
                 document,
             ):
                 return HttpResponseForbidden("Insufficient permissions")
+
+        # Resolve Jinja2 placeholders using the first document's metadata
+        if documents.exists():
+            first_doc = documents.first()
+            try:
+                from documents.templating.workflows import parse_w_workflow_placeholders
+
+                subject = parse_w_workflow_placeholders(
+                    text=subject,
+                    correspondent_name=(
+                        first_doc.correspondent.name if first_doc.correspondent else ""
+                    ),
+                    doc_type_name=(
+                        first_doc.document_type.name if first_doc.document_type else ""
+                    ),
+                    owner_username=(
+                        first_doc.owner.username if first_doc.owner else ""
+                    ),
+                    local_added=timezone.localtime(first_doc.added),
+                    original_filename=first_doc.original_filename or "",
+                    filename=first_doc.filename or "",
+                    created=first_doc.created,
+                    doc_title=first_doc.title,
+                    doc_url=first_doc.get_public_filename(),
+                    doc_id=first_doc.id,
+                )
+                message = parse_w_workflow_placeholders(
+                    text=message,
+                    correspondent_name=(
+                        first_doc.correspondent.name if first_doc.correspondent else ""
+                    ),
+                    doc_type_name=(
+                        first_doc.document_type.name if first_doc.document_type else ""
+                    ),
+                    owner_username=(
+                        first_doc.owner.username if first_doc.owner else ""
+                    ),
+                    local_added=timezone.localtime(first_doc.added),
+                    original_filename=first_doc.original_filename or "",
+                    filename=first_doc.filename or "",
+                    created=first_doc.created,
+                    doc_title=first_doc.title,
+                    doc_url=first_doc.get_public_filename(),
+                    doc_id=first_doc.id,
+                )
+            except Exception:
+                logger.debug(
+                    "Could not resolve template placeholders, using raw text",
+                )
 
         try:
             attachments: list[EmailAttachment] = []
@@ -1674,6 +1745,8 @@ class DocumentViewSet(
                 subject=subject,
                 body=message,
                 to=addresses,
+                cc=cc,
+                bcc=bcc,
                 attachments=attachments,
             )
 
@@ -4473,3 +4546,37 @@ def serve_logo(request: HttpRequest, filename: str | None = None) -> FileRespons
         filename=app_logo.name,
         as_attachment=True,
     )
+
+
+class EmailContactViewSet(ModelViewSet, PassUserMixin):
+    model = EmailContact
+
+    queryset = EmailContact.objects.select_related("owner").order_by(Lower("name"))
+
+    serializer_class = EmailContactSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
+    filterset_class = EmailContactFilterSet
+    ordering_fields = ("name", "email")
+
+
+class EmailTemplateViewSet(ModelViewSet, PassUserMixin):
+    model = EmailTemplate
+
+    queryset = EmailTemplate.objects.select_related("owner").order_by(Lower("name"))
+
+    serializer_class = EmailTemplateSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
+    filterset_class = EmailTemplateFilterSet
+    ordering_fields = ("name",)

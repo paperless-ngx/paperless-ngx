@@ -1803,3 +1803,74 @@ class WorkflowRun(SoftDeleteModel):
 
     def __str__(self) -> str:
         return f"WorkflowRun of {self.workflow} at {self.run_at} on {self.document}"
+
+
+class EmailContact(models.Model):
+    name = models.CharField(
+        _("name"),
+        max_length=256,
+    )
+
+    email = models.EmailField(
+        _("email address"),
+    )
+
+    owner = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("owner"),
+    )
+
+    class Meta:
+        verbose_name = _("email contact")
+        verbose_name_plural = _("email contacts")
+        ordering = ("name",)
+
+    def __str__(self):
+        return f"{self.name} <{self.email}>"
+
+
+class EmailTemplate(models.Model):
+    name = models.CharField(
+        _("name"),
+        max_length=256,
+    )
+
+    subject = models.CharField(
+        _("email subject"),
+        max_length=256,
+        blank=True,
+        default="",
+        help_text=_(
+            "The subject of the email, can include Jinja2 placeholders, "
+            "see documentation.",
+        ),
+    )
+
+    body = models.TextField(
+        _("email body"),
+        blank=True,
+        default="",
+        help_text=_(
+            "The body (message) of the email, can include Jinja2 placeholders, "
+            "see documentation.",
+        ),
+    )
+
+    owner = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("owner"),
+    )
+
+    class Meta:
+        verbose_name = _("email template")
+        verbose_name_plural = _("email templates")
+        ordering = ("name",)
+
+    def __str__(self):
+        return self.name

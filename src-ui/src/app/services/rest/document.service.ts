@@ -437,14 +437,19 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     addresses: string,
     subject: string,
     message: string,
-    useArchiveVersion: boolean
+    useArchiveVersion: boolean,
+    cc?: string,
+    bcc?: string
   ): Observable<any> {
-    return this.http.post(this.getResourceUrl(null, 'email'), {
+    const body: any = {
       documents: documentIds,
       addresses: addresses,
       subject: subject,
       message: message,
       use_archive_version: useArchiveVersion,
-    })
+    }
+    if (cc) body.cc = cc
+    if (bcc) body.bcc = bcc
+    return this.http.post(this.getResourceUrl(null, 'email'), body)
   }
 }

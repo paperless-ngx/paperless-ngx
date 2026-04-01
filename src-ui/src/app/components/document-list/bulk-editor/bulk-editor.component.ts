@@ -1079,8 +1079,12 @@ export class BulkEditorComponent
 
     const modal = this.modalService.open(EmailDocumentDialogComponent, {
       backdrop: 'static',
+      size: 'lg',
     })
     modal.componentInstance.documentIds = Array.from(this.list.selected)
+    modal.componentInstance.documents = this.list.documents.filter((d) =>
+      this.list.selected.has(d.id)
+    )
     modal.componentInstance.hasArchiveVersion = allHaveArchiveVersion
   }
 }
