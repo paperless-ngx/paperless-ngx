@@ -7,6 +7,7 @@ from collections import Counter
 from dataclasses import dataclass
 from datetime import UTC
 from datetime import datetime
+from enum import StrEnum
 from typing import TYPE_CHECKING
 from typing import Self
 from typing import TypedDict
@@ -20,6 +21,7 @@ from django.utils.timezone import get_current_timezone
 from guardian.shortcuts import get_users_with_perms
 
 from documents.search._query import build_permission_filter
+from documents.search._query import parse_simple_text_query
 from documents.search._query import parse_user_query
 from documents.search._schema import _write_sentinels
 from documents.search._schema import build_schema
@@ -43,6 +45,11 @@ _WORD_RE = regex.compile(r"\w+")
 _AUTOCOMPLETE_REGEX_TIMEOUT = 1.0  # seconds; guards against ReDoS on untrusted content
 
 T = TypeVar("T")
+
+
+class SearchMode(StrEnum):
+    QUERY = "query"
+    TEXT = "text"
 
 
 def _ascii_fold(s: str) -> str:
@@ -433,6 +440,7 @@ class TantivyBackend:
         sort_field: str | None,
         *,
         sort_reverse: bool,
+        search_mode: SearchMode = SearchMode.QUERY,
     ) -> SearchResults:
         """
         Execute a search query against the document index.
@@ -441,20 +449,28 @@ class TantivyBackend:
         permission filtering before executing against Tantivy. Supports both
         relevance-based and field-based sorting.
 
+        QUERY search mode supports natural date keywords, field filters, etc.
+        TEXT search mode treats the query as plain text to search for in title and content
+
         Args:
-            query: User's search query (supports natural date keywords, field filters)
+            query: User's search query
             user: User for permission filtering (None for superuser/no filtering)
             page: Page number (1-indexed) for pagination
             page_size: Number of results per page
             sort_field: Field to sort by (None for relevance ranking)
             sort_reverse: Whether to reverse the sort order
+            search_mode: "query" for advanced Tantivy syntax, "text" for
+                plain-text search over title and content only
 
         Returns:
             SearchResults with hits, total count, and processed query
         """
         self._ensure_open()
         tz = get_current_timezone()
-        user_query = parse_user_query(self._index, query, tz)
+        if search_mode is SearchMode.TEXT:
+            user_query = parse_simple_text_query(self._index, query)
+        else:
+            user_query = parse_user_query(self._index, query, tz)
 
         # Apply permission filter if user is not None (not superuser)
         if user is not None:

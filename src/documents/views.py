@@ -1996,6 +1996,12 @@ class ChatStreamingView(GenericAPIView):
         description="Document views including search",
         parameters=[
             OpenApiParameter(
+                name="text",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                description="Simple text search query string",
+            ),
+            OpenApiParameter(
                 name="query",
                 type=OpenApiTypes.STR,
                 location=OpenApiParameter.QUERY,
@@ -2033,7 +2039,8 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
     def _is_search_request(self):
         return (
-            "query" in self.request.query_params
+            "text" in self.request.query_params
+            or "query" in self.request.query_params
             or "more_like_id" in self.request.query_params
         )
 
@@ -2043,6 +2050,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
         from documents.search import TantivyRelevanceList
         from documents.search import get_backend
+        from documents.search._backend import SearchMode
 
         try:
             backend = get_backend()
@@ -2051,8 +2059,15 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
             user = None if request.user.is_superuser else request.user
 
-            if "query" in request.query_params:
-                query_str = request.query_params["query"]
+            if "text" in request.query_params or "query" in request.query_params:
+                search_mode = (
+                    SearchMode.TEXT
+                    if "text" in request.query_params
+                    else SearchMode.QUERY
+                )
+                query_str = (
+                    request.query_params.get("text") or request.query_params["query"]
+                )
                 results = backend.search(
                     query_str,
                     user=user,
@@ -2060,6 +2075,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
                     page_size=10000,
                     sort_field=None,
                     sort_reverse=False,
+                    search_mode=search_mode,
                 )
             else:
                 # more_like_id — validate permission on the seed document first

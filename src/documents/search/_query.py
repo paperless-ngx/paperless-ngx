@@ -51,6 +51,7 @@ _WHOOSH_REL_RANGE_RE = regex.compile(
 )
 # Whoosh-style 8-digit date: field:YYYYMMDD — field-aware so timezone can be applied correctly
 _DATE8_RE = regex.compile(r"(?P<field>\w+):(?P<date8>\d{8})\b")
+_SIMPLE_QUERY_SPECIAL_CHARS_RE = regex.compile(r'([+\-!(){}\[\]^"~*?:\\/])')
 
 
 def _fmt(dt: datetime) -> str:
@@ -436,6 +437,7 @@ DEFAULT_SEARCH_FIELDS = [
     "document_type",
     "tag",
 ]
+SIMPLE_SEARCH_FIELDS = ["title", "content"]
 _FIELD_BOOSTS = {"title": 2.0}
 
 
@@ -495,3 +497,28 @@ def parse_user_query(
         )
 
     return exact
+
+
+def parse_simple_text_query(
+    index: tantivy.Index,
+    raw_query: str,
+) -> tantivy.Query:
+    """
+    Parse a plain-text query using Tantivy's default parser over title/content.
+
+    Query string is escaped and normalized to be treated as "simple" text query.
+    """
+    # strips special characters that would be interpreted as syntax by the parser
+    query_str = regex.sub(
+        _SIMPLE_QUERY_SPECIAL_CHARS_RE,
+        r"\\\1",
+        raw_query,
+        timeout=_REGEX_TIMEOUT,
+    )
+    # collapse multiple spaces to a single space for cleaner parsing (and to prevent ReDoS on excessive whitespace)
+    query_str = regex.sub(r" {2,}", " ", query_str, timeout=_REGEX_TIMEOUT).strip()
+    return index.parse_query(
+        query_str,
+        SIMPLE_SEARCH_FIELDS,
+        field_boosts=_FIELD_BOOSTS,
+    )
