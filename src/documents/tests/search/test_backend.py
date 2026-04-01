@@ -5,6 +5,7 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import Note
+from documents.search._backend import SearchMode
 from documents.search._backend import TantivyBackend
 from documents.search._backend import get_backend
 from documents.search._backend import reset_backend
@@ -45,6 +46,76 @@ class TestWriteBatch:
 
 class TestSearch:
     """Test search functionality."""
+
+    def test_text_mode_limits_default_search_to_title_and_content(
+        self,
+        backend: TantivyBackend,
+    ):
+        """Simple text mode must not match metadata-only fields."""
+        doc = Document.objects.create(
+            title="Invoice document",
+            content="monthly statement",
+            checksum="TXT1",
+            pk=9,
+        )
+        backend.add_or_update(doc)
+
+        metadata_only = backend.search(
+            "document_type:invoice",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TEXT,
+        )
+        assert metadata_only.total == 0
+
+        content_match = backend.search(
+            "monthly",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TEXT,
+        )
+        assert content_match.total == 1
+
+    def test_title_mode_limits_default_search_to_title_only(
+        self,
+        backend: TantivyBackend,
+    ):
+        """Title mode must not match content-only terms."""
+        doc = Document.objects.create(
+            title="Invoice document",
+            content="monthly statement",
+            checksum="TXT2",
+            pk=10,
+        )
+        backend.add_or_update(doc)
+
+        content_only = backend.search(
+            "monthly",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TITLE,
+        )
+        assert content_only.total == 0
+
+        title_match = backend.search(
+            "invoice",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TITLE,
+        )
+        assert title_match.total == 1
 
     def test_scores_normalised_top_hit_is_one(self, backend: TantivyBackend):
         """Search scores must be normalized so top hit has score 1.0 for UI consistency."""

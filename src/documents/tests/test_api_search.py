@@ -91,6 +91,60 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.data["count"], 0)
         self.assertEqual(len(results), 0)
 
+    def test_simple_text_search(self) -> None:
+        tagged = Tag.objects.create(name="invoice")
+        matching_doc = Document.objects.create(
+            title="Quarterly summary",
+            content="Monthly bank report",
+            checksum="T1",
+            pk=11,
+        )
+        matching_doc.tags.add(tagged)
+
+        metadata_only_doc = Document.objects.create(
+            title="Completely unrelated",
+            content="No matching terms here",
+            checksum="T2",
+            pk=12,
+        )
+        metadata_only_doc.tags.add(tagged)
+
+        backend = get_backend()
+        backend.add_or_update(matching_doc)
+        backend.add_or_update(metadata_only_doc)
+
+        response = self.client.get("/api/documents/?text=monthly")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], matching_doc.id)
+
+        response = self.client.get("/api/documents/?text=tag:invoice")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 0)
+
+    def test_simple_title_search(self) -> None:
+        title_match = Document.objects.create(
+            title="Quarterly summary",
+            content="No matching content here",
+            checksum="T3",
+            pk=13,
+        )
+        content_only = Document.objects.create(
+            title="Completely unrelated",
+            content="Quarterly summary appears only in content",
+            checksum="T4",
+            pk=14,
+        )
+
+        backend = get_backend()
+        backend.add_or_update(title_match)
+        backend.add_or_update(content_only)
+
+        response = self.client.get("/api/documents/?title_search=quarterly")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], title_match.id)
+
     def test_search_returns_all_for_api_version_9(self) -> None:
         d1 = Document.objects.create(
             title="invoice",
@@ -1492,6 +1546,31 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(results["mail_rules"][0]["id"], mail_rule1.id)
         self.assertEqual(results["custom_fields"][0]["id"], custom_field1.id)
         self.assertEqual(results["workflows"][0]["id"], workflow1.id)
+
+    def test_global_search_db_only_limits_documents_to_title_matches(self) -> None:
+        title_match = Document.objects.create(
+            title="bank statement",
+            content="no additional terms",
+            checksum="GS1",
+            pk=21,
+        )
+        content_only = Document.objects.create(
+            title="not a title match",
+            content="bank appears only in content",
+            checksum="GS2",
+            pk=22,
+        )
+
+        backend = get_backend()
+        backend.add_or_update(title_match)
+        backend.add_or_update(content_only)
+
+        self.client.force_authenticate(self.user)
+
+        response = self.client.get("/api/search/?query=bank&db_only=true")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["documents"]), 1)
+        self.assertEqual(response.data["documents"][0]["id"], title_match.id)
 
     def test_global_search_filters_owned_mail_objects(self) -> None:
         user1 = User.objects.create_user("mail-search-user")
