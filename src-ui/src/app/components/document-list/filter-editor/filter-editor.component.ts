@@ -195,14 +195,18 @@ const DEFAULT_TEXT_FILTER_TARGET_OPTIONS = [
     name: $localize`Title & content`,
   },
   { id: TEXT_FILTER_TARGET_ASN, name: $localize`ASN` },
-  {
-    id: TEXT_FILTER_TARGET_CUSTOM_FIELDS,
-    name: $localize`Custom fields`,
-  },
   { id: TEXT_FILTER_TARGET_MIME_TYPE, name: $localize`File type` },
   {
     id: TEXT_FILTER_TARGET_FULLTEXT_QUERY,
     name: $localize`Advanced search`,
+  },
+]
+
+const LEGACY_TEXT_FILTER_TARGET_OPTIONS = [
+  {
+    id: TEXT_FILTER_TARGET_CUSTOM_FIELDS,
+    // Kept only so legacy saved views can render and be edited away from.
+    name: $localize`Custom fields (Deprecated)`,
   },
 ]
 
@@ -353,12 +357,14 @@ export class FilterEditorComponent
   _moreLikeDoc: Document
 
   get textFilterTargets() {
+    let targets = DEFAULT_TEXT_FILTER_TARGET_OPTIONS
     if (this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_MORELIKE) {
-      return DEFAULT_TEXT_FILTER_TARGET_OPTIONS.concat([
-        TEXT_FILTER_TARGET_MORELIKE_OPTION,
-      ])
+      targets = targets.concat([TEXT_FILTER_TARGET_MORELIKE_OPTION])
     }
-    return DEFAULT_TEXT_FILTER_TARGET_OPTIONS
+    if (this.textFilterTarget == TEXT_FILTER_TARGET_CUSTOM_FIELDS) {
+      targets = targets.concat(LEGACY_TEXT_FILTER_TARGET_OPTIONS)
+    }
+    return targets
   }
 
   textFilterTarget = TEXT_FILTER_TARGET_TITLE_CONTENT

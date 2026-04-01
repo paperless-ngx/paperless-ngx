@@ -1250,30 +1250,12 @@ describe('FilterEditorComponent', () => {
     ])
   }))
 
-  it('should convert user input to correct filter rules on custom fields query', fakeAsync(() => {
-    component.textFilterInput.nativeElement.value = 'foo'
-    component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
-    const textFieldTargetDropdown = fixture.debugElement.queryAll(
-      By.directive(NgbDropdownItem)
-    )[3]
-    textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_CUSTOM_FIELDS
-    fixture.detectChanges()
-    tick(400)
-    expect(component.textFilterTarget).toEqual('custom-fields')
-    expect(component.filterRules).toEqual([
-      {
-        rule_type: FILTER_CUSTOM_FIELDS_TEXT,
-        value: 'foo',
-      },
-    ])
-  }))
-
   it('should convert user input to correct filter rules on mime type', fakeAsync(() => {
     component.textFilterInput.nativeElement.value = 'pdf'
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
       By.directive(NgbDropdownItem)
-    )[4]
+    )[3]
     textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_MIME_TYPE
     fixture.detectChanges()
     tick(400)
@@ -1291,8 +1273,8 @@ describe('FilterEditorComponent', () => {
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
       By.directive(NgbDropdownItem)
-    )[5]
-    textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_ASN
+    )[4]
+    textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_FULLTEXT_QUERY
     fixture.detectChanges()
     tick(400)
     expect(component.textFilterTarget).toEqual('fulltext-query')
@@ -1701,7 +1683,7 @@ describe('FilterEditorComponent', () => {
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
       By.directive(NgbDropdownItem)
-    )[5]
+    )[4]
     textFieldTargetDropdown.triggerEventHandler('click')
     fixture.detectChanges()
     tick(400)
@@ -2155,6 +2137,36 @@ describe('FilterEditorComponent', () => {
       name: $localize`More like`,
     })
   })
+
+  it('should hide deprecated custom fields target from default text filter targets', () => {
+    expect(component.textFilterTargets).not.toContainEqual({
+      id: 'custom-fields',
+      name: $localize`Custom fields (Deprecated)`,
+    })
+  })
+
+  it('should keep deprecated custom fields target available for legacy filters', fakeAsync(() => {
+    component.filterRules = [
+      {
+        rule_type: FILTER_CUSTOM_FIELDS_TEXT,
+        value: 'foo',
+      },
+    ]
+    fixture.detectChanges()
+    tick()
+
+    expect(component.textFilterTarget).toEqual('custom-fields')
+    expect(component.textFilterTargets).toContainEqual({
+      id: 'custom-fields',
+      name: $localize`Custom fields (Deprecated)`,
+    })
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_CUSTOM_FIELDS_TEXT,
+        value: 'foo',
+      },
+    ])
+  }))
 
   it('should call autocomplete endpoint on input', fakeAsync(() => {
     component.textFilterTarget = 'fulltext-query' // TEXT_FILTER_TARGET_FULLTEXT_QUERY
