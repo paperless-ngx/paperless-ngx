@@ -9,6 +9,8 @@ import {
   FILTER_HAS_CUSTOM_FIELDS_ALL,
   FILTER_HAS_CUSTOM_FIELDS_ANY,
   FILTER_RULE_TYPES,
+  FILTER_SIMPLE_TEXT,
+  FILTER_SIMPLE_TITLE,
   FILTER_TITLE,
   FILTER_TITLE_CONTENT,
   FilterRuleType,
@@ -103,20 +105,6 @@ export function filterRulesFromQueryParams(
 ): FilterRule[] {
   let filterRulesFromQueryParams: FilterRule[] = []
 
-  if (queryParams.has(SIMPLE_TEXT_PARAMETER)) {
-    filterRulesFromQueryParams.push({
-      rule_type: FILTER_TITLE_CONTENT,
-      value: queryParams.get(SIMPLE_TEXT_PARAMETER),
-    })
-  }
-
-  if (queryParams.has(SIMPLE_TITLE_PARAMETER)) {
-    filterRulesFromQueryParams.push({
-      rule_type: FILTER_TITLE,
-      value: queryParams.get(SIMPLE_TITLE_PARAMETER),
-    })
-  }
-
   const allFilterRuleQueryParams: string[] = FILTER_RULE_TYPES.map(
     (rt) => rt.filtervar
   )
@@ -165,9 +153,15 @@ export function queryParamsFromFilterRules(filterRules: FilterRule[]): Params {
     let params = {}
     for (let rule of filterRules) {
       let ruleType = FILTER_RULE_TYPES.find((t) => t.id == rule.rule_type)
-      if (rule.rule_type === FILTER_TITLE_CONTENT) {
+      if (
+        rule.rule_type === FILTER_TITLE_CONTENT ||
+        rule.rule_type === FILTER_SIMPLE_TEXT
+      ) {
         params[SIMPLE_TEXT_PARAMETER] = rule.value
-      } else if (rule.rule_type === FILTER_TITLE) {
+      } else if (
+        rule.rule_type === FILTER_TITLE ||
+        rule.rule_type === FILTER_SIMPLE_TITLE
+      ) {
         params[SIMPLE_TITLE_PARAMETER] = rule.value
       } else if (ruleType.isnull_filtervar && rule.value == null) {
         params[ruleType.isnull_filtervar] = 1

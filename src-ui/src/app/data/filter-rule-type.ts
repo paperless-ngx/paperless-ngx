@@ -47,6 +47,8 @@ export const FILTER_MODIFIED_BEFORE = 15
 export const FILTER_MODIFIED_AFTER = 16
 
 export const FILTER_TITLE_CONTENT = 19
+export const FILTER_SIMPLE_TITLE = 48
+export const FILTER_SIMPLE_TEXT = 49
 export const FILTER_FULLTEXT_QUERY = 20
 export const FILTER_FULLTEXT_MORELIKE = 21
 
@@ -68,8 +70,16 @@ export const FILTER_MIME_TYPE = 47
 
 export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
+    // Deprecated. UI now uses Tantivy-backed `title_search` filtervar, keep for now for existing saved views
     id: FILTER_TITLE,
     filtervar: 'title__icontains',
+    datatype: 'string',
+    multi: false,
+    default: '',
+  },
+  {
+    id: FILTER_SIMPLE_TITLE,
+    filtervar: 'title_search',
     datatype: 'string',
     multi: false,
     default: '',
@@ -277,6 +287,12 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     // Deprecated. UI now uses Tantivy-backed `text` filtervar
     id: FILTER_TITLE_CONTENT,
     filtervar: 'title_content',
+    datatype: 'string',
+    multi: false,
+  },
+  {
+    id: FILTER_SIMPLE_TEXT,
+    filtervar: 'text',
     datatype: 'string',
     multi: false,
   },

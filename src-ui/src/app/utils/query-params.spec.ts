@@ -8,6 +8,8 @@ import {
   FILTER_HAS_CUSTOM_FIELDS_ALL,
   FILTER_HAS_CUSTOM_FIELDS_ANY,
   FILTER_HAS_TAGS_ALL,
+  FILTER_SIMPLE_TEXT,
+  FILTER_SIMPLE_TITLE,
   FILTER_TITLE,
   FILTER_TITLE_CONTENT,
   NEGATIVE_NULL_FILTER_VALUE,
@@ -176,7 +178,7 @@ describe('QueryParams Utils', () => {
     )
     expect(rules).toEqual([
       {
-        rule_type: FILTER_TITLE_CONTENT,
+        rule_type: FILTER_SIMPLE_TEXT,
         value: 'bank statement',
       },
     ])
@@ -188,7 +190,7 @@ describe('QueryParams Utils', () => {
     )
     expect(rules).toEqual([
       {
-        rule_type: FILTER_TITLE,
+        rule_type: FILTER_SIMPLE_TITLE,
         value: 'invoice',
       },
     ])
