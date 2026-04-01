@@ -2002,6 +2002,12 @@ class ChatStreamingView(GenericAPIView):
                 description="Simple text search query string",
             ),
             OpenApiParameter(
+                name="title_search",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                description="Simple title-only search query string",
+            ),
+            OpenApiParameter(
                 name="query",
                 type=OpenApiTypes.STR,
                 location=OpenApiParameter.QUERY,
@@ -2040,6 +2046,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
     def _is_search_request(self):
         return (
             "text" in self.request.query_params
+            or "title_search" in self.request.query_params
             or "query" in self.request.query_params
             or "more_like_id" in self.request.query_params
         )
@@ -2059,15 +2066,20 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
             user = None if request.user.is_superuser else request.user
 
-            if "text" in request.query_params or "query" in request.query_params:
-                search_mode = (
-                    SearchMode.TEXT
-                    if "text" in request.query_params
-                    else SearchMode.QUERY
-                )
-                query_str = (
-                    request.query_params.get("text") or request.query_params["query"]
-                )
+            if (
+                "text" in request.query_params
+                or "title_search" in request.query_params
+                or "query" in request.query_params
+            ):
+                if "text" in request.query_params:
+                    search_mode = SearchMode.TEXT
+                    query_str = request.query_params["text"]
+                elif "title_search" in request.query_params:
+                    search_mode = SearchMode.TITLE
+                    query_str = request.query_params["title_search"]
+                else:
+                    search_mode = SearchMode.QUERY
+                    query_str = request.query_params["query"]
                 results = backend.search(
                     query_str,
                     user=user,
