@@ -8,6 +8,8 @@ import {
   FILTER_HAS_CUSTOM_FIELDS_ALL,
   FILTER_HAS_CUSTOM_FIELDS_ANY,
   FILTER_HAS_TAGS_ALL,
+  FILTER_TITLE,
+  FILTER_TITLE_CONTENT,
   NEGATIVE_NULL_FILTER_VALUE,
 } from '../data/filter-rule-type'
 import {
@@ -130,6 +132,26 @@ describe('QueryParams Utils', () => {
 
     params = queryParamsFromFilterRules([
       {
+        rule_type: FILTER_TITLE_CONTENT,
+        value: 'bank statement',
+      },
+    ])
+    expect(params).toEqual({
+      text: 'bank statement',
+    })
+
+    params = queryParamsFromFilterRules([
+      {
+        rule_type: FILTER_TITLE,
+        value: 'invoice',
+      },
+    ])
+    expect(params).toEqual({
+      title_search: 'invoice',
+    })
+
+    params = queryParamsFromFilterRules([
+      {
         rule_type: FILTER_HAS_TAGS_ALL,
         value: tags__id__all,
       },
@@ -148,6 +170,30 @@ describe('QueryParams Utils', () => {
 
   it('should convert filter rules to query params', () => {
     let rules = filterRulesFromQueryParams(
+      convertToParamMap({
+        text: 'bank statement',
+      })
+    )
+    expect(rules).toEqual([
+      {
+        rule_type: FILTER_TITLE_CONTENT,
+        value: 'bank statement',
+      },
+    ])
+
+    rules = filterRulesFromQueryParams(
+      convertToParamMap({
+        title_search: 'invoice',
+      })
+    )
+    expect(rules).toEqual([
+      {
+        rule_type: FILTER_TITLE,
+        value: 'invoice',
+      },
+    ])
+
+    rules = filterRulesFromQueryParams(
       convertToParamMap({
         tags__id__all,
       })

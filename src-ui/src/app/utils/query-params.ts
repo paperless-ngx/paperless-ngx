@@ -9,6 +9,8 @@ import {
   FILTER_HAS_CUSTOM_FIELDS_ALL,
   FILTER_HAS_CUSTOM_FIELDS_ANY,
   FILTER_RULE_TYPES,
+  FILTER_TITLE,
+  FILTER_TITLE_CONTENT,
   FilterRuleType,
   NEGATIVE_NULL_FILTER_VALUE,
 } from '../data/filter-rule-type'
@@ -17,6 +19,8 @@ import { ListViewState } from '../services/document-list-view.service'
 const SORT_FIELD_PARAMETER = 'sort'
 const SORT_REVERSE_PARAMETER = 'reverse'
 const PAGE_PARAMETER = 'page'
+const SIMPLE_TEXT_PARAMETER = 'text'
+const SIMPLE_TITLE_PARAMETER = 'title_search'
 
 export function paramsFromViewState(
   viewState: ListViewState,
@@ -97,6 +101,22 @@ export function transformLegacyFilterRules(
 export function filterRulesFromQueryParams(
   queryParams: ParamMap
 ): FilterRule[] {
+  let filterRulesFromQueryParams: FilterRule[] = []
+
+  if (queryParams.has(SIMPLE_TEXT_PARAMETER)) {
+    filterRulesFromQueryParams.push({
+      rule_type: FILTER_TITLE_CONTENT,
+      value: queryParams.get(SIMPLE_TEXT_PARAMETER),
+    })
+  }
+
+  if (queryParams.has(SIMPLE_TITLE_PARAMETER)) {
+    filterRulesFromQueryParams.push({
+      rule_type: FILTER_TITLE,
+      value: queryParams.get(SIMPLE_TITLE_PARAMETER),
+    })
+  }
+
   const allFilterRuleQueryParams: string[] = FILTER_RULE_TYPES.map(
     (rt) => rt.filtervar
   )
@@ -104,7 +124,6 @@ export function filterRulesFromQueryParams(
     .filter((rt) => rt !== undefined)
 
   // transform query params to filter rules
-  let filterRulesFromQueryParams: FilterRule[] = []
   allFilterRuleQueryParams
     .filter((frqp) => queryParams.has(frqp))
     .forEach((filterQueryParamName) => {
@@ -146,7 +165,11 @@ export function queryParamsFromFilterRules(filterRules: FilterRule[]): Params {
     let params = {}
     for (let rule of filterRules) {
       let ruleType = FILTER_RULE_TYPES.find((t) => t.id == rule.rule_type)
-      if (ruleType.isnull_filtervar && rule.value == null) {
+      if (rule.rule_type === FILTER_TITLE_CONTENT) {
+        params[SIMPLE_TEXT_PARAMETER] = rule.value
+      } else if (rule.rule_type === FILTER_TITLE) {
+        params[SIMPLE_TITLE_PARAMETER] = rule.value
+      } else if (ruleType.isnull_filtervar && rule.value == null) {
         params[ruleType.isnull_filtervar] = 1
       } else if (
         ruleType.isnull_filtervar &&
