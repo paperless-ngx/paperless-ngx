@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import unicodedata
 from datetime import UTC
 from datetime import date
 from datetime import datetime
@@ -51,7 +52,7 @@ _WHOOSH_REL_RANGE_RE = regex.compile(
 )
 # Whoosh-style 8-digit date: field:YYYYMMDD — field-aware so timezone can be applied correctly
 _DATE8_RE = regex.compile(r"(?P<field>\w+):(?P<date8>\d{8})\b")
-_SIMPLE_QUERY_SPECIAL_CHARS_RE = regex.compile(r'([+\-!(){}\[\]^"~*?:\\/])')
+_SIMPLE_QUERY_TOKEN_RE = regex.compile(r"\S+")
 
 
 def _fmt(dt: datetime) -> str:
@@ -437,9 +438,38 @@ DEFAULT_SEARCH_FIELDS = [
     "document_type",
     "tag",
 ]
-SIMPLE_SEARCH_FIELDS = ["title", "content"]
-TITLE_SEARCH_FIELDS = ["title"]
+SIMPLE_SEARCH_FIELDS = ["simple_title", "simple_content"]
+TITLE_SEARCH_FIELDS = ["simple_title"]
 _FIELD_BOOSTS = {"title": 2.0}
+_SIMPLE_FIELD_BOOSTS = {"simple_title": 2.0}
+
+
+def _normalize_simple_token(token: str) -> str:
+    return (
+        unicodedata.normalize("NFD", token.lower())
+        .encode(
+            "ascii",
+            "ignore",
+        )
+        .decode()
+    )
+
+
+def _build_simple_field_query(
+    index: tantivy.Index,
+    field: str,
+    tokens: list[str],
+) -> tantivy.Query:
+    patterns = [f".*{regex.escape(token)}.*" for token in tokens]
+    if len(patterns) == 1:
+        query = tantivy.Query.regex_query(index.schema, field, patterns[0])
+    else:
+        query = tantivy.Query.regex_phrase_query(index.schema, field, patterns)
+
+    boost = _SIMPLE_FIELD_BOOSTS.get(field, 1.0)
+    if boost != 1.0:
+        return tantivy.Query.boost_query(query, boost)
+    return query
 
 
 def parse_user_query(
@@ -510,20 +540,21 @@ def parse_simple_query(
 
     Query string is escaped and normalized to be treated as "simple" text query.
     """
-    # strips special characters that would be interpreted as syntax by the parser
-    query_str = regex.sub(
-        _SIMPLE_QUERY_SPECIAL_CHARS_RE,
-        r"\\\1",
-        raw_query,
-        timeout=_REGEX_TIMEOUT,
-    )
-    # collapse multiple spaces to a single space for cleaner parsing (and to prevent ReDoS on excessive whitespace)
-    query_str = regex.sub(r" {2,}", " ", query_str, timeout=_REGEX_TIMEOUT).strip()
-    return index.parse_query(
-        query_str,
-        fields,
-        field_boosts=_FIELD_BOOSTS,
-    )
+    tokens = [
+        _normalize_simple_token(token)
+        for token in _SIMPLE_QUERY_TOKEN_RE.findall(raw_query, timeout=_REGEX_TIMEOUT)
+    ]
+    tokens = [token for token in tokens if token]
+    if not tokens:
+        return tantivy.Query.empty_query()
+
+    field_queries = [
+        (tantivy.Occur.Should, _build_simple_field_query(index, field, tokens))
+        for field in fields
+    ]
+    if len(field_queries) == 1:
+        return field_queries[0][1]
+    return tantivy.Query.boolean_query(field_queries)
 
 
 def parse_simple_text_query(

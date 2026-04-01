@@ -303,8 +303,10 @@ class TantivyBackend:
         doc.add_text("checksum", document.checksum)
         doc.add_text("title", document.title)
         doc.add_text("title_sort", document.title)
+        doc.add_text("simple_title", document.title)
         doc.add_text("content", content)
         doc.add_text("bigram_content", content)
+        doc.add_text("simple_content", content)
 
         # Original filename - only add if not None/empty
         if document.original_filename:

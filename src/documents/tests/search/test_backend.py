@@ -117,6 +117,122 @@ class TestSearch:
         )
         assert title_match.total == 1
 
+    def test_text_mode_matches_partial_term_substrings(
+        self,
+        backend: TantivyBackend,
+    ):
+        """Simple text mode should support substring matching within tokens."""
+        doc = Document.objects.create(
+            title="Account access",
+            content="password reset instructions",
+            checksum="TXT3",
+            pk=11,
+        )
+        backend.add_or_update(doc)
+
+        prefix_match = backend.search(
+            "pass",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TEXT,
+        )
+        assert prefix_match.total == 1
+
+        infix_match = backend.search(
+            "sswo",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TEXT,
+        )
+        assert infix_match.total == 1
+
+        phrase_match = backend.search(
+            "sswo re",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TEXT,
+        )
+        assert phrase_match.total == 1
+
+    def test_text_mode_does_not_match_on_partial_term_overlap(
+        self,
+        backend: TantivyBackend,
+    ):
+        """Simple text mode should not match documents that merely share partial fragments."""
+        doc = Document.objects.create(
+            title="Adobe Acrobat PDF Files",
+            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            checksum="TXT7",
+            pk=13,
+        )
+        backend.add_or_update(doc)
+
+        non_match = backend.search(
+            "raptor",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TEXT,
+        )
+        assert non_match.total == 0
+
+    def test_title_mode_matches_partial_term_substrings(
+        self,
+        backend: TantivyBackend,
+    ):
+        """Title mode should support substring matching within title tokens."""
+        doc = Document.objects.create(
+            title="Password guide",
+            content="reset instructions",
+            checksum="TXT4",
+            pk=12,
+        )
+        backend.add_or_update(doc)
+
+        prefix_match = backend.search(
+            "pass",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TITLE,
+        )
+        assert prefix_match.total == 1
+
+        infix_match = backend.search(
+            "sswo",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TITLE,
+        )
+        assert infix_match.total == 1
+
+        phrase_match = backend.search(
+            "sswo gu",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TITLE,
+        )
+        assert phrase_match.total == 1
+
     def test_scores_normalised_top_hit_is_one(self, backend: TantivyBackend):
         """Search scores must be normalized so top hit has score 1.0 for UI consistency."""
         for i, title in enumerate(["bank invoice", "bank statement", "bank receipt"]):

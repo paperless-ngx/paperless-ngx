@@ -122,6 +122,47 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 0)
 
+    def test_simple_text_search_matches_substrings(self) -> None:
+        matching_doc = Document.objects.create(
+            title="Quarterly summary",
+            content="Password reset instructions",
+            checksum="T5",
+            pk=15,
+        )
+
+        backend = get_backend()
+        backend.add_or_update(matching_doc)
+
+        response = self.client.get("/api/documents/?text=pass")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], matching_doc.id)
+
+        response = self.client.get("/api/documents/?text=sswo")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], matching_doc.id)
+
+        response = self.client.get("/api/documents/?text=sswo re")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], matching_doc.id)
+
+    def test_simple_text_search_does_not_match_on_partial_term_overlap(self) -> None:
+        non_matching_doc = Document.objects.create(
+            title="Adobe Acrobat PDF Files",
+            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            checksum="T7",
+            pk=17,
+        )
+
+        backend = get_backend()
+        backend.add_or_update(non_matching_doc)
+
+        response = self.client.get("/api/documents/?text=raptor")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 0)
+
     def test_simple_title_search(self) -> None:
         title_match = Document.objects.create(
             title="Quarterly summary",
@@ -141,6 +182,32 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         backend.add_or_update(content_only)
 
         response = self.client.get("/api/documents/?title_search=quarterly")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], title_match.id)
+
+    def test_simple_title_search_matches_substrings(self) -> None:
+        title_match = Document.objects.create(
+            title="Password handbook",
+            content="No matching content here",
+            checksum="T6",
+            pk=16,
+        )
+
+        backend = get_backend()
+        backend.add_or_update(title_match)
+
+        response = self.client.get("/api/documents/?title_search=pass")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], title_match.id)
+
+        response = self.client.get("/api/documents/?title_search=sswo")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], title_match.id)
+
+        response = self.client.get("/api/documents/?title_search=sswo hand")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 1)
         self.assertEqual(response.data["results"][0]["id"], title_match.id)
