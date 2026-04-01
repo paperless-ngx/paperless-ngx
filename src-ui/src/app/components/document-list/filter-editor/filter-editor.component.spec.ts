@@ -67,9 +67,10 @@ import {
   FILTER_OWNER_DOES_NOT_INCLUDE,
   FILTER_OWNER_ISNULL,
   FILTER_SHARED_BY_USER,
+  FILTER_SIMPLE_TEXT,
+  FILTER_SIMPLE_TITLE,
   FILTER_STORAGE_PATH,
   FILTER_TITLE,
-  FILTER_TITLE_CONTENT,
   NEGATIVE_NULL_FILTER_VALUE,
 } from 'src/app/data/filter-rule-type'
 import { StoragePath } from 'src/app/data/storage-path'
@@ -312,7 +313,7 @@ describe('FilterEditorComponent', () => {
     expect(component.textFilter).toEqual(null)
     component.filterRules = [
       {
-        rule_type: FILTER_TITLE_CONTENT,
+        rule_type: FILTER_SIMPLE_TEXT,
         value: 'foo',
       },
     ]
@@ -1117,7 +1118,7 @@ describe('FilterEditorComponent', () => {
     expect(component.textFilter).toEqual('foo')
     expect(component.filterRules).toEqual([
       {
-        rule_type: FILTER_TITLE_CONTENT,
+        rule_type: FILTER_SIMPLE_TEXT,
         value: 'foo',
       },
     ])
@@ -1136,7 +1137,7 @@ describe('FilterEditorComponent', () => {
     expect(component.textFilterTarget).toEqual('title')
     expect(component.filterRules).toEqual([
       {
-        rule_type: FILTER_TITLE,
+        rule_type: FILTER_SIMPLE_TITLE,
         value: 'foo',
       },
     ])
@@ -2013,7 +2014,7 @@ describe('FilterEditorComponent', () => {
 
     component.filterRules = [
       {
-        rule_type: FILTER_TITLE,
+        rule_type: FILTER_SIMPLE_TITLE,
         value: 'foo',
       },
     ]

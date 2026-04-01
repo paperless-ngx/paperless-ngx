@@ -71,6 +71,8 @@ import {
   FILTER_OWNER_DOES_NOT_INCLUDE,
   FILTER_OWNER_ISNULL,
   FILTER_SHARED_BY_USER,
+  FILTER_SIMPLE_TEXT,
+  FILTER_SIMPLE_TITLE,
   FILTER_STORAGE_PATH,
   FILTER_TITLE,
   FILTER_TITLE_CONTENT,
@@ -322,7 +324,12 @@ export class FilterEditorComponent
           return $localize`Custom fields query`
 
         case FILTER_TITLE:
+        case FILTER_SIMPLE_TITLE:
           return $localize`Title: ${rule.value}`
+
+        case FILTER_TITLE_CONTENT:
+        case FILTER_SIMPLE_TEXT:
+          return $localize`Title & content: ${rule.value}`
 
         case FILTER_ASN:
           return $localize`ASN: ${rule.value}`
@@ -443,10 +450,12 @@ export class FilterEditorComponent
     value.forEach((rule) => {
       switch (rule.rule_type) {
         case FILTER_TITLE:
+        case FILTER_SIMPLE_TITLE:
           this._textFilter = rule.value
           this.textFilterTarget = TEXT_FILTER_TARGET_TITLE
           break
         case FILTER_TITLE_CONTENT:
+        case FILTER_SIMPLE_TEXT:
           this._textFilter = rule.value
           this.textFilterTarget = TEXT_FILTER_TARGET_TITLE_CONTENT
           break
@@ -768,12 +777,15 @@ export class FilterEditorComponent
       this.textFilterTarget == TEXT_FILTER_TARGET_TITLE_CONTENT
     ) {
       filterRules.push({
-        rule_type: FILTER_TITLE_CONTENT,
+        rule_type: FILTER_SIMPLE_TEXT,
         value: this._textFilter.trim(),
       })
     }
     if (this._textFilter && this.textFilterTarget == TEXT_FILTER_TARGET_TITLE) {
-      filterRules.push({ rule_type: FILTER_TITLE, value: this._textFilter })
+      filterRules.push({
+        rule_type: FILTER_SIMPLE_TITLE,
+        value: this._textFilter,
+      })
     }
     if (this.textFilterTarget == TEXT_FILTER_TARGET_ASN) {
       if (
@@ -1015,7 +1027,10 @@ export class FilterEditorComponent
       ) {
         existingRule = filterRules.find(
           (fr) =>
-            fr.rule_type == FILTER_TITLE_CONTENT || fr.rule_type == FILTER_TITLE
+            fr.rule_type == FILTER_TITLE_CONTENT ||
+            fr.rule_type == FILTER_SIMPLE_TEXT ||
+            fr.rule_type == FILTER_TITLE ||
+            fr.rule_type == FILTER_SIMPLE_TITLE
         )
         existingRule.rule_type = FILTER_FULLTEXT_QUERY
       }
