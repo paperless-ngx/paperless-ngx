@@ -162,6 +162,7 @@ class InboxFilter(Filter):
 
 @extend_schema_field(serializers.CharField)
 class TitleContentFilter(Filter):
+    # Deprecated but retained for existing saved views. UI uses Tantivy-backed `text` / `title_search` params.
     def filter(self, qs: Any, value: Any) -> Any:
         value = value.strip() if isinstance(value, str) else value
         if value:
@@ -747,6 +748,7 @@ class DocumentFilterSet(FilterSet):
 
     is_in_inbox = InboxFilter()
 
+    # Deprecated, but keep for now for existing saved views
     title_content = TitleContentFilter()
 
     content__istartswith = EffectiveContentFilter(lookup_expr="istartswith")
@@ -756,6 +758,7 @@ class DocumentFilterSet(FilterSet):
 
     owner__id__none = ObjectFilter(field_name="owner", exclude=True)
 
+    # Deprecated, UI no longer includes CF text-search mode, but keep for now for existing saved views
     custom_fields__icontains = CustomFieldsFilter()
 
     custom_fields__id__all = ObjectFilter(field_name="custom_fields__field")

@@ -1999,19 +1999,19 @@ class ChatStreamingView(GenericAPIView):
                 name="text",
                 type=OpenApiTypes.STR,
                 location=OpenApiParameter.QUERY,
-                description="Simple text search query string",
+                description="Simple Tantivy-backed text search query string",
             ),
             OpenApiParameter(
                 name="title_search",
                 type=OpenApiTypes.STR,
                 location=OpenApiParameter.QUERY,
-                description="Simple title-only search query string",
+                description="Simple Tantivy-backed title-only search query string",
             ),
             OpenApiParameter(
                 name="query",
                 type=OpenApiTypes.STR,
                 location=OpenApiParameter.QUERY,
-                description="Advanced search query string",
+                description="Advanced Tantivy search query string",
             ),
             OpenApiParameter(
                 name="full_perms",

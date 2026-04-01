@@ -274,6 +274,7 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     multi: false,
   },
   {
+    // Deprecated. UI now uses Tantivy-backed `text` filtervar
     id: FILTER_TITLE_CONTENT,
     filtervar: 'title_content',
     datatype: 'string',
@@ -323,6 +324,7 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
   },
   {
     id: FILTER_CUSTOM_FIELDS_TEXT,
+    // Deprecated. UI no longer includes CF text-search mode, but keep for now for existing saved views
     filtervar: 'custom_fields__icontains',
     datatype: 'string',
     multi: false,
