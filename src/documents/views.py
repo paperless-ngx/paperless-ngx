@@ -3031,6 +3031,9 @@ class GlobalSearchView(PassUserMixin):
     serializer_class = SearchResultSerializer
 
     def get(self, request, *args, **kwargs):
+        from documents.search import get_backend
+        from documents.search._backend import SearchMode
+
         query = request.query_params.get("query", None)
         if query is None:
             return HttpResponseBadRequest("Query required")
@@ -3047,25 +3050,25 @@ class GlobalSearchView(PassUserMixin):
                 "view_document",
                 Document,
             )
-            # First search by title
-            docs = all_docs.filter(title__icontains=query)
-            if not db_only and len(docs) < OBJECT_LIMIT:
-                # If we don't have enough results, search by content.
-                # Over-fetch from Tantivy (no permission filter) and rely on
-                # the ORM all_docs queryset for authoritative permission gating.
-                from documents.search import get_backend
-
+            if db_only:
+                docs = all_docs.filter(title__icontains=query)[:OBJECT_LIMIT]
+            else:
+                user = None if request.user.is_superuser else request.user
                 fts_results = get_backend().search(
                     query,
-                    user=None,
+                    user=user,
                     page=1,
                     page_size=1000,
                     sort_field=None,
                     sort_reverse=False,
+                    search_mode=SearchMode.TEXT,
                 )
-                fts_ids = {h["id"] for h in fts_results.hits}
-                docs = docs | all_docs.filter(id__in=fts_ids)
-            docs = docs[:OBJECT_LIMIT]
+                docs_by_id = all_docs.in_bulk([hit["id"] for hit in fts_results.hits])
+                docs = [
+                    docs_by_id[hit["id"]]
+                    for hit in fts_results.hits
+                    if hit["id"] in docs_by_id
+                ][:OBJECT_LIMIT]
         saved_views = (
             get_objects_for_user_owner_aware(
                 request.user,
