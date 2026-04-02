@@ -187,6 +187,48 @@ class TestSearch:
         )
         assert non_match.total == 0
 
+    def test_text_mode_anchors_later_query_tokens_to_token_starts(
+        self,
+        backend: TantivyBackend,
+    ):
+        """Multi-token simple search should not match later tokens in the middle of a word."""
+        exact_doc = Document.objects.create(
+            title="Z-Berichte 6",
+            content="monthly report",
+            checksum="TXT9",
+            pk=15,
+        )
+        prefix_doc = Document.objects.create(
+            title="Z-Berichte 60",
+            content="monthly report",
+            checksum="TXT10",
+            pk=16,
+        )
+        false_positive = Document.objects.create(
+            title="Z-Berichte 16",
+            content="monthly report",
+            checksum="TXT11",
+            pk=17,
+        )
+        backend.add_or_update(exact_doc)
+        backend.add_or_update(prefix_doc)
+        backend.add_or_update(false_positive)
+
+        results = backend.search(
+            "Z-Berichte 6",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TEXT,
+        )
+        result_ids = {hit["id"] for hit in results.hits}
+
+        assert exact_doc.id in result_ids
+        assert prefix_doc.id in result_ids
+        assert false_positive.id not in result_ids
+
     def test_text_mode_ignores_queries_without_searchable_tokens(
         self,
         backend: TantivyBackend,

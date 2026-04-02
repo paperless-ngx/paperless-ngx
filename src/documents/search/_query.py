@@ -450,7 +450,17 @@ def _build_simple_field_query(
     field: str,
     tokens: list[str],
 ) -> tantivy.Query:
-    patterns = [f".*{regex.escape(token)}.*" for token in tokens]
+    patterns = []
+    for idx, token in enumerate(tokens):
+        escaped = regex.escape(token)
+        # For multi-token substring search, only the first token can begin mid-word.
+        # Later tokens follow a whitespace boundary in the original query, so anchor
+        # them to the start of the next indexed token to reduce false positives like
+        # matching "Z-Berichte 16" for the query "Z-Berichte 6".
+        if idx == 0:
+            patterns.append(f".*{escaped}.*")
+        else:
+            patterns.append(f"{escaped}.*")
     if len(patterns) == 1:
         query = tantivy.Query.regex_query(index.schema, field, patterns[0])
     else:
