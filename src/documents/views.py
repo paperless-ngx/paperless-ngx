@@ -2037,19 +2037,22 @@ class ChatStreamingView(GenericAPIView):
     ),
 )
 class UnifiedSearchViewSet(DocumentViewSet):
+    SEARCH_PARAM_NAMES = ("text", "title_search", "query", "more_like_id")
+
     def get_serializer_class(self):
         if self._is_search_request():
             return SearchResultSerializer
         else:
             return DocumentSerializer
 
+    def _get_active_search_params(self, request: Request | None = None) -> list[str]:
+        request = request or self.request
+        return [
+            param for param in self.SEARCH_PARAM_NAMES if param in request.query_params
+        ]
+
     def _is_search_request(self):
-        return (
-            "text" in self.request.query_params
-            or "title_search" in self.request.query_params
-            or "query" in self.request.query_params
-            or "more_like_id" in self.request.query_params
-        )
+        return bool(self._get_active_search_params())
 
     def list(self, request, *args, **kwargs):
         if not self._is_search_request():
@@ -2065,6 +2068,16 @@ class UnifiedSearchViewSet(DocumentViewSet):
             filtered_qs = self.filter_queryset(self.get_queryset())
 
             user = None if request.user.is_superuser else request.user
+            active_search_params = self._get_active_search_params(request)
+
+            if len(active_search_params) > 1:
+                raise ValidationError(
+                    {
+                        "detail": _(
+                            "Specify only one of text, title_search, query, or more_like_id.",
+                        ),
+                    },
+                )
 
             if (
                 "text" in request.query_params
@@ -2160,6 +2173,8 @@ class UnifiedSearchViewSet(DocumentViewSet):
             if str(e.detail) == str(invalid_more_like_id_message):
                 return HttpResponseForbidden(invalid_more_like_id_message)
             return HttpResponseForbidden(_("Insufficient permissions."))
+        except ValidationError:
+            raise
         except Exception as e:
             logger.warning(f"An error occurred listing search results: {e!s}")
             return HttpResponseBadRequest(

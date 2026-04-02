@@ -212,6 +212,14 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.data["count"], 1)
         self.assertEqual(response.data["results"][0]["id"], title_match.id)
 
+    def test_search_rejects_multiple_search_modes(self) -> None:
+        response = self.client.get("/api/documents/?text=bank&query=bank")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.data["detail"],
+            "Specify only one of text, title_search, query, or more_like_id.",
+        )
+
     def test_search_returns_all_for_api_version_9(self) -> None:
         d1 = Document.objects.create(
             title="invoice",
