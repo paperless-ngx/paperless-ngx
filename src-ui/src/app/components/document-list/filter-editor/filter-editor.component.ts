@@ -204,13 +204,11 @@ const DEFAULT_TEXT_FILTER_TARGET_OPTIONS = [
   },
 ]
 
-const LEGACY_TEXT_FILTER_TARGET_OPTIONS = [
-  {
-    id: TEXT_FILTER_TARGET_CUSTOM_FIELDS,
-    // Kept only so legacy saved views can render and be edited away from.
-    name: $localize`Custom fields (Deprecated)`,
-  },
-]
+const DEPRECATED_CUSTOM_FIELDS_TEXT_FILTER_TARGET_OPTION = {
+  // Kept only so legacy saved views can render and be edited away from, remove me eventually
+  id: TEXT_FILTER_TARGET_CUSTOM_FIELDS,
+  name: $localize`Custom fields (Deprecated)`,
+}
 
 const TEXT_FILTER_TARGET_MORELIKE_OPTION = {
   id: TEXT_FILTER_TARGET_FULLTEXT_MORELIKE,
@@ -369,7 +367,9 @@ export class FilterEditorComponent
       targets = targets.concat([TEXT_FILTER_TARGET_MORELIKE_OPTION])
     }
     if (this.textFilterTarget == TEXT_FILTER_TARGET_CUSTOM_FIELDS) {
-      targets = targets.concat(LEGACY_TEXT_FILTER_TARGET_OPTIONS)
+      targets = targets.concat([
+        DEPRECATED_CUSTOM_FIELDS_TEXT_FILTER_TARGET_OPTION,
+      ])
     }
     return targets
   }
