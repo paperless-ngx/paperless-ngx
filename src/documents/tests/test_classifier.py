@@ -385,6 +385,22 @@ class TestClassifier(DirectoriesMixin, TestCase):
 
         self.assertIsNone(load_classifier())
 
+    def test_load_corrupt_pickle_valid_hmac(self) -> None:
+        """
+        GIVEN:
+            - A classifier file with valid HMAC but unparsable pickle data
+        WHEN:
+            - An attempt is made to load the classifier
+        THEN:
+            - The ClassifierModelCorruptError is raised
+        """
+        garbage_data = b"this is not valid pickle data"
+        signature = DocumentClassifier._compute_hmac(garbage_data)
+        Path(settings.MODEL_FILE).write_bytes(signature + garbage_data)
+
+        with self.assertRaises(ClassifierModelCorruptError):
+            self.classifier.load()
+
     def test_load_tampered_file(self) -> None:
         """
         GIVEN:
