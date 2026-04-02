@@ -465,7 +465,7 @@ SECURE_PROXY_SSL_HEADER = (
 )
 
 SECRET_KEY = os.getenv("PAPERLESS_SECRET_KEY", "")
-if not SECRET_KEY:
+if not SECRET_KEY:  # pragma: no cover
     raise ImproperlyConfigured(
         "PAPERLESS_SECRET_KEY is not set. "
         "A unique, secret key is required for secure operation. "
