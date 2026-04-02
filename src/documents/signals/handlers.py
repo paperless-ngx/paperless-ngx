@@ -818,7 +818,6 @@ def run_workflows(
             # Refresh this so the matching data is fresh and instance fields are re-freshed
             # Otherwise, this instance might be behind and overwrite the work another process did
             document.refresh_from_db()
-            doc_tag_ids = list(document.tags.values_list("pk", flat=True))
 
         if matching.document_matches_workflow(document, workflow, trigger_type):
             action: WorkflowAction
@@ -836,14 +835,13 @@ def run_workflows(
                         apply_assignment_to_document(
                             action,
                             document,
-                            doc_tag_ids,
                             logging_group,
                         )
                 elif action.type == WorkflowAction.WorkflowActionType.REMOVAL:
                     if use_overrides and overrides:
                         apply_removal_to_overrides(action, overrides)
                     else:
-                        apply_removal_to_document(action, document, doc_tag_ids)
+                        apply_removal_to_document(action, document)
                 elif action.type == WorkflowAction.WorkflowActionType.EMAIL:
                     context = build_workflow_action_context(document, overrides)
                     execute_email_action(
@@ -886,7 +884,6 @@ def run_workflows(
                         "modified",
                     ],
                 )
-                document.tags.set(doc_tag_ids)
 
             WorkflowRun.objects.create(
                 workflow=workflow,
