@@ -484,9 +484,10 @@ class TestFieldHandling:
             f"Expected 1, got {results.total}. Document content should be searchable."
         )
 
-        # Test notes search
+        # Test notes search — must use structured JSON syntax now that note
+        # is no longer in DEFAULT_SEARCH_FIELDS
         results = backend.search(
-            "important",
+            "notes.note:important",
             user=None,
             page=1,
             page_size=10,
@@ -494,5 +495,5 @@ class TestFieldHandling:
             sort_reverse=False,
         )
         assert results.total == 1, (
-            f"Expected 1, got {results.total}. Note content should be searchable."
+            f"Expected 1, got {results.total}. Note content should be searchable via notes.note: prefix."
         )

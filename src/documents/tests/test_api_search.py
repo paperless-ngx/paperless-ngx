@@ -2,6 +2,7 @@ import datetime
 from datetime import timedelta
 from unittest import mock
 
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
@@ -28,6 +29,8 @@ from documents.search import reset_backend
 from documents.tests.utils import DirectoriesMixin
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+
+pytestmark = pytest.mark.search
 
 
 class TestDocumentSearchApi(DirectoriesMixin, APITestCase):

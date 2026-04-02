@@ -330,16 +330,13 @@ class TantivyBackend:
         num_notes = 0
         for note in document.notes.all():
             num_notes += 1
-            note_data: dict[str, str] = {"note": note.note}
-            if note.user:
-                note_data["user"] = note.user.username
-            doc.add_json("notes", note_data)
-            doc.add_text("note", note.note)
+            doc.add_json("notes", {"note": note.note, "user": note.user.username})
 
         # Custom fields — JSON for structured queries (custom_fields.name:x, custom_fields.value:y),
         # companion text field for default full-text search.
         for cfi in document.custom_fields.all():
             search_value = cfi.value_for_search
+            # Skip fields where there is no value yet
             if search_value is None:
                 continue
             doc.add_json(
@@ -349,7 +346,6 @@ class TantivyBackend:
                     "value": search_value,
                 },
             )
-            doc.add_text("custom_field", str(cfi))
 
         # Dates
         created_date = datetime(

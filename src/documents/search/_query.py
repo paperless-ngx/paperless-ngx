@@ -435,8 +435,6 @@ DEFAULT_SEARCH_FIELDS = [
     "correspondent",
     "document_type",
     "tag",
-    "note",  # companion text field for notes content (notes JSON for structured: notes.user:x)
-    "custom_field",  # companion text field for CF values (custom_fields JSON for structured: custom_fields.name:x)
 ]
 _FIELD_BOOSTS = {"title": 2.0}
 

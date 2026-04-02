@@ -64,10 +64,6 @@ def build_schema() -> tantivy.Schema:
     sb.add_json_field("notes", stored=True, tokenizer_name="paperless_text")
     sb.add_json_field("custom_fields", stored=True, tokenizer_name="paperless_text")
 
-    # Companion text fields for default full-text search (not stored — no extra disk cost)
-    sb.add_text_field("note", stored=False, tokenizer_name="paperless_text")
-    sb.add_text_field("custom_field", stored=False, tokenizer_name="paperless_text")
-
     for field in (
         "correspondent_id",
         "document_type_id",
