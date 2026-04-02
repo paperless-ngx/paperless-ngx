@@ -1679,6 +1679,50 @@ describe('FilterEditorComponent', () => {
     ])
   }))
 
+  it('should convert legacy title filters into full text query when adding a created relative date', fakeAsync(() => {
+    component.filterRules = [
+      {
+        rule_type: FILTER_TITLE,
+        value: 'foo',
+      },
+    ]
+    const dateCreatedDropdown = fixture.debugElement.queryAll(
+      By.directive(DatesDropdownComponent)
+    )[0]
+    component.dateCreatedRelativeDate = RelativeDate.WITHIN_1_WEEK
+    dateCreatedDropdown.triggerEventHandler('datesSet')
+    fixture.detectChanges()
+    tick(400)
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'foo,created:[-1 week to now]',
+      },
+    ])
+  }))
+
+  it('should convert simple title filters into full text query when adding a created relative date', fakeAsync(() => {
+    component.filterRules = [
+      {
+        rule_type: FILTER_SIMPLE_TITLE,
+        value: 'foo',
+      },
+    ]
+    const dateCreatedDropdown = fixture.debugElement.queryAll(
+      By.directive(DatesDropdownComponent)
+    )[0]
+    component.dateCreatedRelativeDate = RelativeDate.WITHIN_1_WEEK
+    dateCreatedDropdown.triggerEventHandler('datesSet')
+    fixture.detectChanges()
+    tick(400)
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'foo,created:[-1 week to now]',
+      },
+    ])
+  }))
+
   it('should leave relative dates not in quick list intact', fakeAsync(() => {
     component.textFilterInput.nativeElement.value = 'created:[-2 week to now]'
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
@@ -2019,6 +2063,14 @@ describe('FilterEditorComponent', () => {
       },
     ]
     expect(component.generateFilterName()).toEqual('Title: foo')
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_SIMPLE_TEXT,
+        value: 'foo',
+      },
+    ]
+    expect(component.generateFilterName()).toEqual('Title & content: foo')
 
     component.filterRules = [
       {
