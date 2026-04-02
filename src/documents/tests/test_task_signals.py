@@ -2,6 +2,7 @@ import uuid
 from unittest import mock
 
 import celery
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 from documents.data_models import ConsumableDocument
@@ -20,6 +21,11 @@ from documents.tests.utils import DirectoriesMixin
 
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
 class TestTaskSignalHandler(DirectoriesMixin, TestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        super().setUpTestData()
+        cls.user = get_user_model().objects.create_user(username="testuser")
+
     def util_call_before_task_publish_handler(
         self,
         headers_to_use,
@@ -57,7 +63,7 @@ class TestTaskSignalHandler(DirectoriesMixin, TestCase):
                 ),
                 DocumentMetadataOverrides(
                     title="Hello world",
-                    owner_id=1,
+                    owner_id=self.user.id,
                 ),
             ),
             # kwargs
@@ -75,7 +81,7 @@ class TestTaskSignalHandler(DirectoriesMixin, TestCase):
         self.assertEqual(headers["id"], task.task_id)
         self.assertEqual("hello-999.pdf", task.task_file_name)
         self.assertEqual(PaperlessTask.TaskName.CONSUME_FILE, task.task_name)
-        self.assertEqual(1, task.owner_id)
+        self.assertEqual(self.user.id, task.owner_id)
         self.assertEqual(celery.states.PENDING, task.status)
 
     def test_task_prerun_handler(self) -> None:

@@ -16,7 +16,7 @@ class TestMigrateFulltextQueryFieldPrefixes(TestMigrations):
 
         user = User.objects.create(username="testuser")
 
-        def make_rule(value):
+        def make_rule(value: str):
             view = SavedView.objects.create(
                 owner=user,
                 name=f"view-{value}",
