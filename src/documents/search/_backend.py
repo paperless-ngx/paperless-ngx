@@ -791,7 +791,10 @@ class TantivyBackend:
         try:
             writer = new_index.writer()
             for document in iter_wrapper(documents):
-                doc = self._build_tantivy_doc(document)
+                doc = self._build_tantivy_doc(
+                    document,
+                    document.get_effective_content(),
+                )
                 writer.add_document(doc)
             writer.commit()
             new_index.reload()
