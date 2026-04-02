@@ -219,7 +219,7 @@ class TestTaskSignalHandler(DirectoriesMixin, TestCase):
             mock_get_backend.return_value = mock_backend
             add_to_index(sender=None, document=root)
 
-        mock_backend.add_or_update.assert_called_once_with(root)
+        mock_backend.add_or_update.assert_called_once_with(root, effective_content="")
 
     def test_add_to_index_reindexes_root_for_version_documents(self) -> None:
         root = Document.objects.create(
