@@ -161,6 +161,9 @@ REST_FRAMEWORK = {
     "ALLOWED_VERSIONS": ["9", "10"],
     # DRF Spectacular default schema
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_THROTTLE_RATES": {
+        "login": os.getenv("PAPERLESS_TOKEN_THROTTLE_RATE", "5/min"),
+    },
 }
 
 if DEBUG:

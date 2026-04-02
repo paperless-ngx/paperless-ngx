@@ -770,6 +770,14 @@ If both the [PAPERLESS_ACCOUNT_DEFAULT_GROUPS](#PAPERLESS_ACCOUNT_DEFAULT_GROUPS
 
     Defaults to 1209600 (2 weeks)
 
+#### [`PAPERLESS_TOKEN_THROTTLE_RATE=<rate>`](#PAPERLESS_TOKEN_THROTTLE_RATE) {#PAPERLESS_TOKEN_THROTTLE_RATE}
+
+: Rate limit for the API token authentication endpoint (`/api/token/`), used to mitigate brute-force login attempts.
+Uses Django REST Framework's [throttle rate format](https://www.django-rest-framework.org/api-guide/throttling/#setting-the-throttling-policy),
+e.g. `5/min`, `100/hour`, `1000/day`.
+
+    Defaults to `5/min`
+
 ## OCR settings {#ocr}
 
 Paperless uses [OCRmyPDF](https://ocrmypdf.readthedocs.io/en/latest/)
