@@ -13,7 +13,6 @@ classifiers = [
 ]
 # TODO: Move certain things to groups and then utilize that further
 # This will allow testing to not install a webserver, mysql, etc
-
 dependencies = [
   "azure-ai-documentintelligence>=1.0.2",
   "babel>=2.17",
@@ -82,32 +81,33 @@ dependencies = [
   "whitenoise~=6.11",
   "zxing-cpp~=3.0.0",
 ]
-
-optional-dependencies.mariadb = [
+[project.optional-dependencies]
+mariadb = [
   "mysqlclient~=2.2.7",
 ]
-optional-dependencies.postgres = [
+postgres = [
   "psycopg[c,pool]==3.3",
   # Direct dependency for proper resolution of the pre-built wheels
   "psycopg-c==3.3",
   "psycopg-pool==3.3",
 ]
-optional-dependencies.webserver = [
+webserver = [
   "granian[uvloop]~=2.7.0",
 ]
 
 [dependency-groups]
-
 dev = [
-  { "include-group" = "docs" },
-  { "include-group" = "testing" },
-  { "include-group" = "lint" },
+  { include-group = "docs" },
+  { include-group = "lint" },
+  { include-group = "testing" },
 ]
-
 docs = [
   "zensical>=0.0.21",
 ]
-
+lint = [
+  "prek~=0.3.0",
+  "ruff~=0.15.0",
+]
 testing = [
   "daphne",
   "factory-boy~=3.3.1",
@@ -119,18 +119,12 @@ testing = [
   "pytest-env~=1.5.0",
   "pytest-httpx",
   "pytest-mock~=3.15.1",
-  #"pytest-randomly~=4.0.1",
+  # "pytest-randomly~=4.0.1",
   "pytest-rerunfailures~=16.1",
   "pytest-sugar",
   "pytest-xdist~=3.8.0",
   "time-machine>=2.13",
 ]
-
-lint = [
-  "prek~=0.3.0",
-  "ruff~=0.15.0",
-]
-
 typing = [
   "celery-types",
   "django-filter-stubs",
@@ -155,24 +149,21 @@ typing = [
 
 [tool.uv]
 required-version = ">=0.9.0"
-package = false
 environments = [
   "sys_platform == 'darwin'",
   "sys_platform == 'linux'",
 ]
-
+package = false
 [[tool.uv.index]]
 name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
 explicit = true
-
 [tool.uv.sources]
 # Markers are chosen to select these almost exclusively when building the Docker image
 psycopg-c = [
   { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.0/psycopg_c-3.3.0-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
   { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.0/psycopg_c-3.3.0-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
 ]
-
 torch = [
   { index = "pytorch-cpu" },
 ]
@@ -187,10 +178,10 @@ respect-gitignore = true
 # https://docs.astral.sh/ruff/settings/
 fix = true
 show-fixes = true
-
 output-format = "grouped"
+[tool.ruff.lint]
 # https://docs.astral.sh/ruff/rules/
-lint.extend-select = [
+extend-select = [
   "COM",  # https://docs.astral.sh/ruff/rules/#flake8-commas-com
   "DJ",   # https://docs.astral.sh/ruff/rules/#flake8-django-dj
   "EXE",  # https://docs.astral.sh/ruff/rules/#flake8-executable-exe
@@ -215,64 +206,87 @@ lint.extend-select = [
   "UP",   # https://docs.astral.sh/ruff/rules/#pyupgrade-up
   "W",    # https://docs.astral.sh/ruff/rules/#pycodestyle-e-w
 ]
-lint.ignore = [
+ignore = [
   "DJ001",
   "PLC0415",
   "RUF012",
   "SIM105",
 ]
 # Migrations
-lint.per-file-ignores."*/migrations/*.py" = [
+per-file-ignores."*/migrations/*.py" = [
   "E501",
   "SIM",
   "T201",
 ]
 # Testing
-lint.per-file-ignores."*/tests/*.py" = [
+per-file-ignores."*/tests/*.py" = [
   "E501",
   "SIM117",
 ]
-lint.per-file-ignores.".github/scripts/*.py" = [
+per-file-ignores.".github/scripts/*.py" = [
   "E501",
   "INP001",
   "SIM117",
 ]
 # Docker specific
-lint.per-file-ignores."docker/rootfs/usr/local/bin/wait-for-redis.py" = [
+per-file-ignores."docker/rootfs/usr/local/bin/wait-for-redis.py" = [
   "INP001",
   "T201",
 ]
-lint.per-file-ignores."docker/wait-for-redis.py" = [
+per-file-ignores."docker/wait-for-redis.py" = [
   "INP001",
   "T201",
 ]
-lint.per-file-ignores."src/documents/models.py" = [
+per-file-ignores."src/documents/models.py" = [
   "SIM115",
 ]
-
-lint.isort.force-single-line = true
+isort.force-single-line = true
 
 [tool.codespell]
 write-changes = true
 ignore-words-list = "criterias,afterall,valeu,ureue,equest,ure,assertIn,Oktober,commitish"
-skip = "src-ui/src/locale/*,src-ui/pnpm-lock.yaml,src-ui/e2e/*,src/paperless_mail/tests/samples/*,src/paperless/tests/samples/mail/*,src/documents/tests/samples/*,*.po,*.json"
+skip = """\
+  src-ui/src/locale/*,src-ui/pnpm-lock.yaml,src-ui/e2e/*,src/paperless_mail/tests/samples/*,src/paperless/tests/samples\
+  /mail/*,src/documents/tests/samples/*,*.po,*.json\
+  """
+
+[tool.pyproject-fmt]
+table_format = "long"
+
+[tool.mypy]
+mypy_path = "src"
+plugins = [
+  "mypy_django_plugin.main",
+  "mypy_drf_plugin.main",
+]
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[tool.pyrefly]
+search-path = [ "src" ]
+baseline = ".pyrefly-baseline.json"
+python-platform = "linux"
+
+[tool.django-stubs]
+django_settings_module = "paperless.settings"
 
 [tool.pytest]
 minversion = "9.0"
 pythonpath = [ "src" ]
-
 strict_config = true
 strict_markers = true
 strict_parametrization_ids = true
 strict_xfail = true
-
 testpaths = [
   "src/documents/tests/",
   "src/paperless/tests/",
   "src/paperless_mail/tests/",
   "src/paperless_ai/tests",
 ]
-
 addopts = [
   "--pythonwarnings=all",
   "--cov",
@@ -287,11 +301,8 @@ addopts = [
   "-o",
   "junit_family=legacy",
 ]
-
 norecursedirs = [ "src/locale/", ".venv/", "src-ui/" ]
-
 DJANGO_SETTINGS_MODULE = "paperless.settings"
-
 markers = [
   "live: Integration tests requiring external services (Gotenberg, Tika, nginx, etc)",
   "nginx: Tests that make HTTP requests to the local nginx service",
@@ -314,7 +325,6 @@ exclude_also = [
   "if AUDIT_LOG_ENABLED:",
   "if TYPE_CHECKING:",
 ]
-
 [tool.coverage.run]
 source = [
   "src/",
@@ -325,27 +335,6 @@ omit = [
   "paperless/wsgi.py",
   "paperless/auth.py",
 ]
-
-[tool.mypy]
-mypy_path = "src"
-plugins = [
-  "mypy_django_plugin.main",
-  "mypy_drf_plugin.main",
-]
-check_untyped_defs = true
-disallow_any_generics = true
-disallow_incomplete_defs = true
-disallow_untyped_defs = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-
-[tool.pyrefly]
-search-path = [ "src" ]
-baseline = ".pyrefly-baseline.json"
-python-platform = "linux"
-
-[tool.django-stubs]
-django_settings_module = "paperless.settings"
 
 [tool.mypy-baseline]
 baseline_path = ".mypy-baseline.txt"
