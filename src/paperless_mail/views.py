@@ -120,12 +120,12 @@ class MailAccountViewSet(ModelViewSet, PassUserMixin):
             serializer.validated_data["expiration"] = existing_account.expiration
 
         account = MailAccount(**serializer.validated_data)
-        with get_mailbox(
-            account.imap_server,
-            account.imap_port,
-            account.imap_security,
-        ) as M:
-            try:
+        try:
+            with get_mailbox(
+                account.imap_server,
+                account.imap_port,
+                account.imap_security,
+            ) as M:
                 if (
                     existing_account is not None
                     and account.is_token
@@ -145,11 +145,11 @@ class MailAccountViewSet(ModelViewSet, PassUserMixin):
 
                 mailbox_login(M, account)
                 return Response({"success": True})
-            except MailError:
-                logger.error(
-                    "Mail account connectivity test failed",
-                )
-                return HttpResponseBadRequest("Unable to connect to server")
+        except MailError:
+            logger.error(
+                "Mail account connectivity test failed",
+            )
+            return HttpResponseBadRequest("Unable to connect to server")
 
     @action(methods=["post"], detail=True)
     def process(self, request, pk=None):

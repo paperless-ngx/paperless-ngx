@@ -497,6 +497,10 @@ SESSION_COOKIE_NAME = f"{COOKIE_PREFIX}sessionid"
 LANGUAGE_COOKIE_NAME = f"{COOKIE_PREFIX}django_language"
 
 EMAIL_CERTIFICATE_FILE = get_path_from_env("PAPERLESS_EMAIL_CERTIFICATE_LOCATION")
+EMAIL_ALLOW_INTERNAL_HOSTS = get_bool_from_env(
+    "PAPERLESS_EMAIL_ALLOW_INTERNAL_HOSTS",
+    "true",
+)
 
 
 ###############################################################################

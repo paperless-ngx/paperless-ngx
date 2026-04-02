@@ -1420,6 +1420,14 @@ ports.
 
 ## Incoming Mail {#incoming_mail}
 
+#### [`PAPERLESS_EMAIL_ALLOW_INTERNAL_HOSTS=<bool>`](#PAPERLESS_EMAIL_ALLOW_INTERNAL_HOSTS) {#PAPERLESS_EMAIL_ALLOW_INTERNAL_HOSTS}
+
+: If set to false, incoming mail account connections are blocked when the
+configured IMAP hostname resolves to a non-public address (for example,
+localhost, link-local, or RFC1918 private ranges).
+
+    Defaults to true, which allows internal hosts.
+
 ### Email OAuth {#email_oauth}
 
 #### [`PAPERLESS_OAUTH_CALLBACK_BASE_URL=<str>`](#PAPERLESS_OAUTH_CALLBACK_BASE_URL) {#PAPERLESS_OAUTH_CALLBACK_BASE_URL}
