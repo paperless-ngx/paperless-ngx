@@ -454,6 +454,7 @@ class TantivyBackend:
         relevance-based and field-based sorting.
 
         QUERY search mode supports natural date keywords, field filters, etc.
+        TITLE search mode treats the query as plain text to search for in title only
         TEXT search mode treats the query as plain text to search for in title and content
 
         Args:
