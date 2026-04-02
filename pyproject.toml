@@ -315,9 +315,12 @@ markers = [
 ]
 
 [tool.pytest_env]
+PAPERLESS_SECRET_KEY = "test-secret-key-do-not-use-in-production"
 PAPERLESS_DISABLE_DBHANDLER = "true"
 PAPERLESS_CACHE_BACKEND = "django.core.cache.backends.locmem.LocMemCache"
 PAPERLESS_CHANNELS_BACKEND = "channels.layers.InMemoryChannelLayer"
+# I don't think anything hits this, but just in case, basically infinite
+PAPERLESS_TOKEN_THROTTLE_RATE = "1000/min"
 
 [tool.coverage.report]
 exclude_also = [

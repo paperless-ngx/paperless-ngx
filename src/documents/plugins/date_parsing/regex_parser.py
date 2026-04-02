@@ -1,9 +1,11 @@
 import datetime
-import re
 from collections.abc import Iterator
-from re import Match
+
+import regex
+from regex import Match
 
 from documents.plugins.date_parsing.base import DateParserPluginBase
+from documents.regex import safe_regex_finditer
 
 
 class RegexDateParserPlugin(DateParserPluginBase):
@@ -14,7 +16,7 @@ class RegexDateParserPlugin(DateParserPluginBase):
     passed to its constructor.
     """
 
-    DATE_REGEX = re.compile(
+    DATE_REGEX = regex.compile(
         r"(\b|(?!=([_-])))(\d{1,2})[\.\/-](\d{1,2})[\.\/-](\d{4}|\d{2})(\b|(?=([_-])))|"
         r"(\b|(?!=([_-])))(\d{4}|\d{2})[\.\/-](\d{1,2})[\.\/-](\d{1,2})(\b|(?=([_-])))|"
         r"(\b|(?!=([_-])))(\d{1,2}[\. ]+[a-zéûäëčžúřěáíóńźçŞğü]{3,9} \d{4}|[a-zéûäëčžúřěáíóńźçŞğü]{3,9} \d{1,2}, \d{4})(\b|(?=([_-])))|"
@@ -22,7 +24,7 @@ class RegexDateParserPlugin(DateParserPluginBase):
         r"(\b|(?!=([_-])))([^\W\d_]{3,9} \d{4})(\b|(?=([_-])))|"
         r"(\b|(?!=([_-])))(\d{1,2}[^ 0-9]{2}[\. ]+[^ ]{3,9}[ \.\/-]\d{4})(\b|(?=([_-])))|"
         r"(\b|(?!=([_-])))(\b\d{1,2}[ \.\/-][a-zéûäëčžúřěáíóńźçŞğü]{3}[ \.\/-]\d{4})(\b|(?=([_-])))",
-        re.IGNORECASE,
+        regex.IGNORECASE,
     )
 
     def _process_match(
@@ -45,7 +47,7 @@ class RegexDateParserPlugin(DateParserPluginBase):
         """
         Finds all regex matches in content and yields valid dates.
         """
-        for m in re.finditer(self.DATE_REGEX, content):
+        for m in safe_regex_finditer(self.DATE_REGEX, content):
             date = self._process_match(m, date_order)
             if date is not None:
                 yield date
