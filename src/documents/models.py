@@ -1114,19 +1114,7 @@ class CustomFieldInstance(SoftDeleteModel):
         ]
 
     def __str__(self) -> str:
-        value = (
-            next(
-                option.get("label")
-                for option in self.field.extra_data["select_options"]
-                if option.get("id") == self.value_select
-            )
-            if (
-                self.field.data_type == CustomField.FieldDataType.SELECT
-                and self.value_select is not None
-            )
-            else self.value
-        )
-        return str(self.field.name) + f" : {value}"
+        return str(self.field.name) + f" : {self.value_for_search}"
 
     @classmethod
     def get_value_field_name(cls, data_type: CustomField.FieldDataType):
@@ -1143,6 +1131,25 @@ class CustomFieldInstance(SoftDeleteModel):
         """
         value_field_name = self.get_value_field_name(self.field.data_type)
         return getattr(self, value_field_name)
+
+    @property
+    def value_for_search(self) -> str | None:
+        """
+        Return the value suitable for full-text indexing and display, or None
+        if the value is unset.
+
+        For SELECT fields, resolves the human-readable label rather than the
+        opaque option ID stored in value_select.
+        """
+        if self.value is None:
+            return None
+        if self.field.data_type == CustomField.FieldDataType.SELECT:
+            options = (self.field.extra_data or {}).get("select_options", [])
+            return next(
+                (o["label"] for o in options if o.get("id") == self.value),
+                None,
+            )
+        return str(self.value)
 
 
 if settings.AUDIT_LOG_ENABLED:

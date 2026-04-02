@@ -180,6 +180,16 @@ following:
     This might not actually do anything. Not every new paperless version
     comes with new database migrations.
 
+4.  Rebuild the search index if needed.
+
+    ```shell-session
+    cd src
+    python3 manage.py document_index reindex --if-needed
+    ```
+
+    This is a no-op if the index is already up to date, so it is safe to
+    run on every upgrade.
+
 ### Database Upgrades
 
 Paperless-ngx is compatible with Django-supported versions of PostgreSQL and MariaDB and it is generally
@@ -453,16 +463,41 @@ the search yields non-existing documents or won't find anything, you
 may need to recreate the index manually.
 
 ```
-document_index {reindex,optimize}
+document_index {reindex,optimize} [--recreate] [--if-needed]
 ```
 
-Specify `reindex` to have the index created from scratch. This may take
-some time.
+Specify `reindex` to rebuild the index from all documents in the database. This
+may take some time.
 
-Specify `optimize` to optimize the index. This updates certain aspects
-of the index and usually makes queries faster and also ensures that the
-autocompletion works properly. This command is regularly invoked by the
+Pass `--recreate` to wipe the existing index before rebuilding. Use this when the
+index is corrupted or you want a fully clean rebuild.
+
+Pass `--if-needed` to skip the rebuild if the index is already up to date (schema
+version and search language match). Safe to run on every startup or upgrade.
+
+Specify `optimize` to optimize the index. This command is regularly invoked by the
 task scheduler.
+
+!!! note
+
+    The `optimize` subcommand is deprecated and is now a no-op. Tantivy manages
+    segment merging automatically; no manual optimization step is needed.
+
+!!! note
+
+    **Docker users:** On every startup, the container runs
+    `document_index reindex --if-needed` automatically. Schema changes, language
+    changes, and missing indexes are all detected and rebuilt before the webserver
+    starts. No manual step is required.
+
+    **Bare metal users:** Run the following command after each upgrade (and after
+    changing `PAPERLESS_SEARCH_LANGUAGE`). It is a no-op if the index is already
+    up to date:
+
+    ```shell-session
+    cd src
+    python3 manage.py document_index reindex --if-needed
+    ```
 
 ### Clearing the database read cache
 

@@ -1,6 +1,7 @@
 import types
 from unittest.mock import patch
 
+import tantivy
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
@@ -8,24 +9,42 @@ from django.test import TestCase
 from django.utils import timezone
 from rest_framework import status
 
-from documents import index
 from documents.admin import DocumentAdmin
 from documents.admin import TagAdmin
 from documents.models import Document
 from documents.models import Tag
+from documents.search import get_backend
+from documents.search import reset_backend
 from documents.tests.utils import DirectoriesMixin
 from paperless.admin import PaperlessUserAdmin
 
 
 class TestDocumentAdmin(DirectoriesMixin, TestCase):
     def get_document_from_index(self, doc):
-        ix = index.open_index()
-        with ix.searcher() as searcher:
-            return searcher.document(id=doc.id)
+        backend = get_backend()
+        searcher = backend._index.searcher()
+        results = searcher.search(
+            tantivy.Query.range_query(
+                backend._schema,
+                "id",
+                tantivy.FieldType.Unsigned,
+                doc.pk,
+                doc.pk,
+            ),
+            limit=1,
+        )
+        if results.hits:
+            return searcher.doc(results.hits[0][1]).to_dict()
+        return None
 
     def setUp(self) -> None:
         super().setUp()
+        reset_backend()
         self.doc_admin = DocumentAdmin(model=Document, admin_site=AdminSite())
+
+    def tearDown(self) -> None:
+        reset_backend()
+        super().tearDown()
 
     def test_save_model(self) -> None:
         doc = Document.objects.create(title="test")
@@ -33,11 +52,11 @@ class TestDocumentAdmin(DirectoriesMixin, TestCase):
         doc.title = "new title"
         self.doc_admin.save_model(None, doc, None, None)
         self.assertEqual(Document.objects.get(id=doc.id).title, "new title")
-        self.assertEqual(self.get_document_from_index(doc)["id"], doc.id)
+        self.assertEqual(self.get_document_from_index(doc)["id"], [doc.id])
 
     def test_delete_model(self) -> None:
         doc = Document.objects.create(title="test")
-        index.add_or_update_document(doc)
+        get_backend().add_or_update(doc)
         self.assertIsNotNone(self.get_document_from_index(doc))
 
         self.doc_admin.delete_model(None, doc)
@@ -53,7 +72,7 @@ class TestDocumentAdmin(DirectoriesMixin, TestCase):
                 checksum=f"{i:02}",
             )
             docs.append(doc)
-            index.add_or_update_document(doc)
+            get_backend().add_or_update(doc)
 
         self.assertEqual(Document.objects.count(), 42)
 

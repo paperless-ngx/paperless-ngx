@@ -1,5 +1,6 @@
 import shutil
 import zoneinfo
+from collections.abc import Generator
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -90,6 +91,26 @@ def sample_doc(
         mime_type="application/pdf",
         archive_filename="0000001.pdf",
     )
+
+
+@pytest.fixture()
+def _search_index(
+    tmp_path: Path,
+    settings: SettingsWrapper,
+) -> Generator[None, None, None]:
+    """Create a temp index directory and point INDEX_DIR at it.
+
+    Resets the backend singleton before and after so each test gets a clean
+    index rather than reusing a stale singleton from another test.
+    """
+    from documents.search import reset_backend
+
+    index_dir = tmp_path / "index"
+    index_dir.mkdir()
+    settings.INDEX_DIR = index_dir
+    reset_backend()
+    yield
+    reset_backend()
 
 
 @pytest.fixture()

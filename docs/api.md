@@ -167,9 +167,8 @@ Query parameters:
 - `term`: The incomplete term.
 - `limit`: Amount of results. Defaults to 10.
 
-Results returned by the endpoint are ordered by importance of the term
-in the document index. The first result is the term that has the highest
-[Tf/Idf](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) score in the index.
+Results are ordered by how many of the user's visible documents contain
+each matching word. The first result is the word that appears in the most documents.
 
 ```json
 ["term1", "term3", "term6", "term4"]
