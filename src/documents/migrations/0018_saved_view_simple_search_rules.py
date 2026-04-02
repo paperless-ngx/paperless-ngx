@@ -32,7 +32,7 @@ def migrate_saved_view_rules_backward(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "0016_sha256_checksums"),
+        ("documents", "0017_migrate_fulltext_query_field_prefixes"),
     ]
 
     operations = [
