@@ -71,6 +71,7 @@ import {
   FILTER_SIMPLE_TITLE,
   FILTER_STORAGE_PATH,
   FILTER_TITLE,
+  FILTER_TITLE_CONTENT,
   NEGATIVE_NULL_FILTER_VALUE,
 } from 'src/app/data/filter-rule-type'
 import { StoragePath } from 'src/app/data/storage-path'
@@ -318,6 +319,18 @@ describe('FilterEditorComponent', () => {
       },
     ]
     expect(component.textFilter).toEqual('foo')
+    expect(component.textFilterTarget).toEqual('title-content') // TEXT_FILTER_TARGET_TITLE_CONTENT
+  }))
+
+  it('should ingest legacy text filter rules for doc title + content', fakeAsync(() => {
+    expect(component.textFilter).toEqual(null)
+    component.filterRules = [
+      {
+        rule_type: FILTER_TITLE_CONTENT,
+        value: 'legacy foo',
+      },
+    ]
+    expect(component.textFilter).toEqual('legacy foo')
     expect(component.textFilterTarget).toEqual('title-content') // TEXT_FILTER_TARGET_TITLE_CONTENT
   }))
 
@@ -2063,6 +2076,16 @@ describe('FilterEditorComponent', () => {
       },
     ]
     expect(component.generateFilterName()).toEqual('Title: foo')
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_TITLE_CONTENT,
+        value: 'legacy foo',
+      },
+    ]
+    expect(component.generateFilterName()).toEqual(
+      'Title & content: legacy foo'
+    )
 
     component.filterRules = [
       {
