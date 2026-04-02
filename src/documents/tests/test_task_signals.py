@@ -239,16 +239,12 @@ class TestTaskSignalHandler(DirectoriesMixin, TestCase):
             mock_get_backend.return_value = mock_backend
             add_to_index(sender=None, document=version)
 
-        self.assertEqual(mock_backend.add_or_update.call_count, 2)
+        self.assertEqual(mock_backend.add_or_update.call_count, 1)
         self.assertEqual(
             mock_backend.add_or_update.call_args_list[0].args[0].id,
             version.id,
         )
         self.assertEqual(
-            mock_backend.add_or_update.call_args_list[1].args[0].id,
-            root.id,
-        )
-        self.assertEqual(
-            mock_backend.add_or_update.call_args_list[1].kwargs,
+            mock_backend.add_or_update.call_args_list[0].kwargs,
             {"effective_content": version.content},
         )

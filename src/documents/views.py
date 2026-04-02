@@ -2087,7 +2087,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
             hits_by_id = {h["id"]: h for h in results.hits}
 
-            # Determine sort order: no ordering param → Tantivy relevance; otherwise → ORM order
+            # Determine sort order: no ordering param -> Tantivy relevance; otherwise -> ORM order
             ordering_param = request.query_params.get("ordering", "").lstrip("-")
             if not ordering_param:
                 # Preserve Tantivy relevance order; intersect with ORM-visible IDs
