@@ -106,16 +106,75 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
 
 @pytest.mark.management
-class TestMakeIndex(TestCase):
-    @mock.patch("documents.management.commands.document_index.index_reindex")
-    def test_reindex(self, m) -> None:
+@pytest.mark.django_db
+class TestMakeIndex:
+    def test_reindex(self, mocker: MockerFixture) -> None:
+        """Reindex command must call the backend rebuild method to recreate the index."""
+        mock_get_backend = mocker.patch(
+            "documents.management.commands.document_index.get_backend",
+        )
         call_command("document_index", "reindex", skip_checks=True)
-        m.assert_called_once()
+        mock_get_backend.return_value.rebuild.assert_called_once()
 
-    @mock.patch("documents.management.commands.document_index.index_optimize")
-    def test_optimize(self, m) -> None:
+    def test_optimize(self) -> None:
+        """Optimize command must execute without error (Tantivy handles optimization automatically)."""
         call_command("document_index", "optimize", skip_checks=True)
-        m.assert_called_once()
+
+    def test_reindex_recreate_wipes_index(self, mocker: MockerFixture) -> None:
+        """Reindex with --recreate must wipe the index before rebuilding."""
+        mock_wipe = mocker.patch(
+            "documents.management.commands.document_index.wipe_index",
+        )
+        mock_get_backend = mocker.patch(
+            "documents.management.commands.document_index.get_backend",
+        )
+        call_command("document_index", "reindex", recreate=True, skip_checks=True)
+        mock_wipe.assert_called_once()
+        mock_get_backend.return_value.rebuild.assert_called_once()
+
+    def test_reindex_without_recreate_does_not_wipe_index(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """Reindex without --recreate must not wipe the index."""
+        mock_wipe = mocker.patch(
+            "documents.management.commands.document_index.wipe_index",
+        )
+        mocker.patch(
+            "documents.management.commands.document_index.get_backend",
+        )
+        call_command("document_index", "reindex", skip_checks=True)
+        mock_wipe.assert_not_called()
+
+    def test_reindex_if_needed_skips_when_up_to_date(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """Conditional reindex must skip rebuild when schema version and language match."""
+        mocker.patch(
+            "documents.management.commands.document_index.needs_rebuild",
+            return_value=False,
+        )
+        mock_get_backend = mocker.patch(
+            "documents.management.commands.document_index.get_backend",
+        )
+        call_command("document_index", "reindex", if_needed=True, skip_checks=True)
+        mock_get_backend.return_value.rebuild.assert_not_called()
+
+    def test_reindex_if_needed_runs_when_rebuild_needed(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """Conditional reindex must proceed with rebuild when schema version or language changed."""
+        mocker.patch(
+            "documents.management.commands.document_index.needs_rebuild",
+            return_value=True,
+        )
+        mock_get_backend = mocker.patch(
+            "documents.management.commands.document_index.get_backend",
+        )
+        call_command("document_index", "reindex", if_needed=True, skip_checks=True)
+        mock_get_backend.return_value.rebuild.assert_called_once()
 
 
 @pytest.mark.management

@@ -1141,6 +1141,32 @@ should be a valid crontab(5) expression describing when to run.
 
     Defaults to `0 0 * * *` or daily at midnight.
 
+#### [`PAPERLESS_SEARCH_LANGUAGE=<language>`](#PAPERLESS_SEARCH_LANGUAGE) {#PAPERLESS_SEARCH_LANGUAGE}
+
+: Sets the stemmer language for the full-text search index.
+Stemming improves recall by matching word variants (e.g. "running" matches "run").
+Changing this setting causes the index to be rebuilt automatically on next startup.
+An invalid value raises an error at startup.
+
+: Use the ISO 639-1 two-letter code (e.g. `en`, `de`, `fr`). Lowercase full names
+(e.g. `english`, `german`, `french`) are also accepted. The capitalized names shown
+in the [Tantivy Language enum](https://docs.rs/tantivy/latest/tantivy/tokenizer/enum.Language.html)
+documentation are **not** valid — use the lowercase equivalent.
+
+: If not set, paperless infers the language from
+[`PAPERLESS_OCR_LANGUAGE`](#PAPERLESS_OCR_LANGUAGE). If the OCR language has no
+Tantivy stemmer equivalent, stemming is disabled.
+
+    Defaults to unset (inferred from `PAPERLESS_OCR_LANGUAGE`).
+
+#### [`PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD=<float>`](#PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD) {#PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD}
+
+: When set to a float value, approximate/fuzzy matching is applied alongside exact
+matching. Fuzzy results rank below exact matches. A value of `0.5` is a reasonable
+starting point. Leave unset to disable fuzzy matching entirely.
+
+    Defaults to unset (disabled).
+
 #### [`PAPERLESS_SANITY_TASK_CRON=<cron expression>`](#PAPERLESS_SANITY_TASK_CRON) {#PAPERLESS_SANITY_TASK_CRON}
 
 : Configures the scheduled sanity checker frequency. The value should be a

@@ -157,11 +157,17 @@ class DirectoriesMixin:
     """
 
     def setUp(self) -> None:
+        from documents.search import reset_backend
+
+        reset_backend()
         self.dirs = setup_directories()
         super().setUp()
 
     def tearDown(self) -> None:
+        from documents.search import reset_backend
+
         super().tearDown()
+        reset_backend()
         remove_dirs(self.dirs)
 
 

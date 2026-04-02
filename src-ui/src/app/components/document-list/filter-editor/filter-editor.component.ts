@@ -76,6 +76,7 @@ import {
   FILTER_TITLE_CONTENT,
   NEGATIVE_NULL_FILTER_VALUE,
 } from 'src/app/data/filter-rule-type'
+import { SelectionData, SelectionDataItem } from 'src/app/data/results'
 import {
   PermissionAction,
   PermissionType,
@@ -84,11 +85,7 @@ import {
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
-import {
-  DocumentService,
-  SelectionData,
-  SelectionDataItem,
-} from 'src/app/services/rest/document.service'
+import { DocumentService } from 'src/app/services/rest/document.service'
 import { SearchService } from 'src/app/services/rest/search.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'

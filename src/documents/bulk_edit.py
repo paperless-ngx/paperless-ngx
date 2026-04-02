@@ -349,11 +349,11 @@ def delete(doc_ids: list[int]) -> Literal["OK"]:
 
         Document.objects.filter(id__in=delete_ids).delete()
 
-        from documents import index
+        from documents.search import get_backend
 
-        with index.open_index_writer() as writer:
+        with get_backend().batch_update() as batch:
             for id in delete_ids:
-                index.remove_document_by_id(writer, id)
+                batch.remove(id)
 
         status_mgr = DocumentsStatusManager()
         status_mgr.send_documents_deleted(delete_ids)

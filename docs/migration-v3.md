@@ -161,6 +161,37 @@ searchable PDF and stores it as the archive copy. `ARCHIVE_FILE_GENERATION=never
 has no effect for documents handled by the remote parser — the archive is produced
 unconditionally by the remote engine.
 
+# Search Index (Whoosh -> Tantivy)
+
+The full-text search backend has been replaced with [Tantivy](https://github.com/quickwit-oss/tantivy).
+The index format is incompatible with Whoosh, so **the search index is automatically rebuilt from
+scratch on first startup after upgrading**. No manual action is required for the rebuild itself.
+
+### Note and custom field search syntax
+
+The old Whoosh index exposed `note` and `custom_field` as flat text fields that were included in
+unqualified searches (e.g. just typing `invoice` would match note content). With Tantivy these are
+now structured JSON fields accessed via dotted paths:
+
+| Old syntax           | New syntax                  |
+| -------------------- | --------------------------- |
+| `note:query`         | `notes.note:query`          |
+| `custom_field:query` | `custom_fields.value:query` |
+
+**Saved views are migrated automatically.** Any saved view filter rule that used an explicit
+`note:` or `custom_field:` field prefix in a fulltext query is rewritten to the new syntax by a
+data migration that runs on upgrade.
+
+**Unqualified queries are not migrated.** If you had a saved view with a plain search term (e.g.
+`invoice`) that happened to match note content or custom field values, it will no longer return
+those matches. Update those queries to use the explicit prefix, for example:
+
+```
+invoice OR notes.note:invoice OR custom_fields.value:invoice
+```
+
+Custom field names can also be searched with `custom_fields.name:fieldname`.
+
 ## OpenID Connect Token Endpoint Authentication
 
 Some existing OpenID Connect setups may require an explicit token endpoint authentication method after upgrading to v3.

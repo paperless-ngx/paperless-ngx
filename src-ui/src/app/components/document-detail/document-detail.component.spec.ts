@@ -959,7 +959,7 @@ describe('DocumentDetailComponent', () => {
     component.reprocess()
     const modalCloseSpy = jest.spyOn(openModal, 'close')
     openModal.componentInstance.confirmClicked.next()
-    expect(reprocessSpy).toHaveBeenCalledWith([doc.id])
+    expect(reprocessSpy).toHaveBeenCalledWith({ documents: [doc.id] })
     expect(modalSpy).toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalled()
     expect(modalCloseSpy).toHaveBeenCalled()

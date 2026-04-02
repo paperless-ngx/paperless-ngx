@@ -10,7 +10,7 @@ jobs:
       issues: read
       pull-requests: write
     steps:
-      - uses: peakoss/anti-slop@v0.2.1
+      - uses: peakoss/anti-slop@85daca1880e9e1af197fc06ea03349daf08f4202 # v0.2.1
         with:
           max-failures: 4
           failure-add-pr-labels: 'ai'
@@ -23,11 +23,11 @@ jobs:
     steps:
       - name: Label PR by file path or branch name
         # see .github/labeler.yml for the labeler config
-        uses: actions/labeler@v6.0.1
+        uses: actions/labeler@634933edcd8ababfe52f92936142cc22ac488b1b # v6.0.1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Label by size
-        uses: Gascon1/pr-size-labeler@v1.3.0
+        uses: Gascon1/pr-size-labeler@deff8ed00a76639a7c0f197525bafa3350ba4c36 # v1.3.0
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           xs_label: 'small-change'
@@ -37,7 +37,7 @@ jobs:
           fail_if_xl: 'false'
           excluded_files: /\.lock$/ /\.txt$/ ^src-ui/pnpm-lock\.yaml$ ^src-ui/messages\.xlf$ ^src/locale/en_US/LC_MESSAGES/django\.po$
       - name: Label by PR title
-        uses: actions/github-script@v8.0.0
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         with:
           script: |
             const pr = context.payload.pull_request;
@@ -63,7 +63,7 @@ jobs:
             }
       - name: Label bot-generated PRs
         if: ${{ contains(github.actor, 'dependabot') || contains(github.actor, 'crowdin-bot') }}
-        uses: actions/github-script@v8.0.0
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         with:
           script: |
             const pr = context.payload.pull_request;
@@ -88,7 +88,7 @@ jobs:
             }
       - name: Welcome comment
         if: ${{ !contains(github.actor, 'bot') }}
-        uses: actions/github-script@v8.0.0
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         with:
           script: |
             const pr = context.payload.pull_request;
