@@ -187,6 +187,30 @@ class TestSearch:
         )
         assert non_match.total == 0
 
+    def test_text_mode_ignores_queries_without_searchable_tokens(
+        self,
+        backend: TantivyBackend,
+    ):
+        """Simple text mode should safely return no hits for symbol-only strings."""
+        doc = Document.objects.create(
+            title="Guide",
+            content="This is a guide.",
+            checksum="TXT8",
+            pk=14,
+        )
+        backend.add_or_update(doc)
+
+        no_tokens = backend.search(
+            "!!!",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TEXT,
+        )
+        assert no_tokens.total == 0
+
     def test_title_mode_matches_partial_term_substrings(
         self,
         backend: TantivyBackend,

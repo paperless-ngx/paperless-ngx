@@ -457,7 +457,7 @@ def _build_simple_field_query(
         query = tantivy.Query.regex_phrase_query(index.schema, field, patterns)
 
     boost = _SIMPLE_FIELD_BOOSTS.get(field, 1.0)
-    if boost != 1.0:
+    if boost > 1.0:
         return tantivy.Query.boost_query(query, boost)
     return query
 
