@@ -402,6 +402,12 @@ Defaults to `/usr/share/nltk_data`
 
 : This is where paperless will store the classification model.
 
+    !!! warning
+
+        The classification model uses Python's pickle serialization format.
+        Ensure this file is only writable by the paperless user, as a
+        maliciously crafted model file could execute arbitrary code when loaded.
+
     Defaults to `PAPERLESS_DATA_DIR/classification_model.pickle`.
 
 ## Logging

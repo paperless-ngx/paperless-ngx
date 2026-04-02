@@ -1,5 +1,6 @@
+import pickle
 import re
-import shutil
+import warnings
 from pathlib import Path
 from unittest import mock
 
@@ -366,8 +367,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
 
         self.assertCountEqual(new_classifier.predict_tags(self.doc2.content), [45, 12])
 
-    @mock.patch("documents.classifier.pickle.load")
-    def test_load_corrupt_file(self, patched_pickle_load: mock.MagicMock) -> None:
+    def test_load_corrupt_file(self) -> None:
         """
         GIVEN:
             - Corrupted classifier pickle file
@@ -378,36 +378,90 @@ class TestClassifier(DirectoriesMixin, TestCase):
         """
         self.generate_train_and_save()
 
-        # First load is the schema version,allow it
-        patched_pickle_load.side_effect = [DocumentClassifier.FORMAT_VERSION, OSError()]
+        # Write garbage data (valid HMAC length but invalid content)
+        Path(settings.MODEL_FILE).write_bytes(b"\x00" * 64)
 
         with self.assertRaises(ClassifierModelCorruptError):
             self.classifier.load()
-            patched_pickle_load.assert_called()
-
-        patched_pickle_load.reset_mock()
-        patched_pickle_load.side_effect = [
-            DocumentClassifier.FORMAT_VERSION,
-            ClassifierModelCorruptError(),
-        ]
 
         self.assertIsNone(load_classifier())
-        patched_pickle_load.assert_called()
+
+    def test_load_tampered_file(self) -> None:
+        """
+        GIVEN:
+            - A classifier model file whose data has been modified
+        WHEN:
+            - An attempt is made to load the classifier
+        THEN:
+            - The ClassifierModelCorruptError is raised due to HMAC mismatch
+        """
+        self.generate_train_and_save()
+
+        raw = Path(settings.MODEL_FILE).read_bytes()
+        # Flip a byte in the data portion (after the 32-byte HMAC)
+        tampered = raw[:32] + bytes([raw[32] ^ 0xFF]) + raw[33:]
+        Path(settings.MODEL_FILE).write_bytes(tampered)
+
+        with self.assertRaises(ClassifierModelCorruptError):
+            self.classifier.load()
+
+    def test_load_wrong_secret_key(self) -> None:
+        """
+        GIVEN:
+            - A classifier model file signed with a different SECRET_KEY
+        WHEN:
+            - An attempt is made to load the classifier
+        THEN:
+            - The ClassifierModelCorruptError is raised due to HMAC mismatch
+        """
+        self.generate_train_and_save()
+
+        with override_settings(SECRET_KEY="different-secret-key"):
+            with self.assertRaises(ClassifierModelCorruptError):
+                self.classifier.load()
+
+    def test_load_truncated_file(self) -> None:
+        """
+        GIVEN:
+            - A classifier model file that is too short to contain an HMAC
+        WHEN:
+            - An attempt is made to load the classifier
+        THEN:
+            - The ClassifierModelCorruptError is raised
+        """
+        Path(settings.MODEL_FILE).write_bytes(b"\x00" * 16)
+
+        with self.assertRaises(ClassifierModelCorruptError):
+            self.classifier.load()
 
     def test_load_new_scikit_learn_version(self) -> None:
         """
         GIVEN:
-            - classifier pickle file created with a different scikit-learn version
+            - classifier pickle file triggers an InconsistentVersionWarning
         WHEN:
             - An attempt is made to load the classifier
         THEN:
-            - The classifier reports the warning was captured and processed
+            - IncompatibleClassifierVersionError is raised
         """
-        # TODO: This wasn't testing the warning anymore, as the schema changed
-        # but as it was implemented, it would require installing an old version
-        # rebuilding the file and committing that.  Not developer friendly
-        # Need to rethink how to pass the load through to a file with a single
-        # old model?
+        from sklearn.exceptions import InconsistentVersionWarning
+
+        self.generate_train_and_save()
+
+        real_loads = pickle.loads
+
+        def loads_with_warning(data):
+            warnings.warn(
+                "Trying to unpickle estimator from version 0.0 when using version 1.0.",
+                InconsistentVersionWarning,
+            )
+            return real_loads(data)
+
+        with mock.patch(
+            "documents.classifier.pickle.loads",
+            side_effect=loads_with_warning,
+        ):
+            with self.assertRaises(IncompatibleClassifierVersionError):
+                self.classifier.load()
 
     def test_one_correspondent_predict(self) -> None:
         c1 = Correspondent.objects.create(
@@ -684,17 +738,6 @@ class TestClassifier(DirectoriesMixin, TestCase):
         load.side_effect = OSError()
         self.assertIsNone(load_classifier())
         self.assertTrue(Path(settings.MODEL_FILE).exists())
-
-    def test_load_old_classifier_version(self) -> None:
-        shutil.copy(
-            Path(__file__).parent / "data" / "v1.17.4.model.pickle",
-            self.dirs.scratch_dir,
-        )
-        with override_settings(
-            MODEL_FILE=self.dirs.scratch_dir / "v1.17.4.model.pickle",
-        ):
-            classifier = load_classifier()
-            self.assertIsNone(classifier)
 
     @mock.patch("documents.classifier.DocumentClassifier.load")
     def test_load_classifier_raise_exception(self, mock_load) -> None:
