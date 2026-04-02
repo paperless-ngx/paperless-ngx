@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import threading
-import unicodedata
 from collections import Counter
 from dataclasses import dataclass
 from datetime import UTC
@@ -20,6 +19,7 @@ from django.conf import settings
 from django.utils.timezone import get_current_timezone
 from guardian.shortcuts import get_users_with_perms
 
+from documents.search._normalize import ascii_fold
 from documents.search._query import build_permission_filter
 from documents.search._query import parse_simple_text_query
 from documents.search._query import parse_simple_title_query
@@ -54,16 +54,6 @@ class SearchMode(StrEnum):
     TITLE = "title"
 
 
-def _ascii_fold(s: str) -> str:
-    """
-    Normalize unicode to ASCII equivalent characters for search consistency.
-
-    Converts accented characters (e.g., "café") to their ASCII base forms ("cafe")
-    to enable cross-language searching without requiring exact diacritic matching.
-    """
-    return unicodedata.normalize("NFD", s).encode("ascii", "ignore").decode()
-
-
 def _extract_autocomplete_words(text_sources: list[str]) -> set[str]:
     """Extract and normalize words for autocomplete.
 
@@ -83,7 +73,7 @@ def _extract_autocomplete_words(text_sources: list[str]) -> set[str]:
             )
             continue
         for token in tokens:
-            normalized = _ascii_fold(token.lower())
+            normalized = ascii_fold(token.lower())
             if normalized:
                 words.add(normalized)
     return words
@@ -618,7 +608,7 @@ class TantivyBackend:
             List of word suggestions ordered by frequency, then alphabetically
         """
         self._ensure_open()
-        normalized_term = _ascii_fold(term.lower())
+        normalized_term = ascii_fold(term.lower())
 
         searcher = self._index.searcher()
 

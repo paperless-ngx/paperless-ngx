@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import unicodedata
 from datetime import UTC
 from datetime import date
 from datetime import datetime
@@ -12,6 +11,8 @@ import regex
 import tantivy
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+
+from documents.search._normalize import ascii_fold
 
 if TYPE_CHECKING:
     from datetime import tzinfo
@@ -444,17 +445,6 @@ _FIELD_BOOSTS = {"title": 2.0}
 _SIMPLE_FIELD_BOOSTS = {"simple_title": 2.0}
 
 
-def _normalize_simple_token(token: str) -> str:
-    return (
-        unicodedata.normalize("NFD", token.lower())
-        .encode(
-            "ascii",
-            "ignore",
-        )
-        .decode()
-    )
-
-
 def _build_simple_field_query(
     index: tantivy.Index,
     field: str,
@@ -541,7 +531,7 @@ def parse_simple_query(
     Query string is escaped and normalized to be treated as "simple" text query.
     """
     tokens = [
-        _normalize_simple_token(token)
+        ascii_fold(token.lower())
         for token in _SIMPLE_QUERY_TOKEN_RE.findall(raw_query, timeout=_REGEX_TIMEOUT)
     ]
     tokens = [token for token in tokens if token]
