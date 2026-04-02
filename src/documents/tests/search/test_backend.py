@@ -68,13 +68,13 @@ class TestSearch:
         assert all(0.0 <= h["score"] <= 1.0 for h in r.hits)
 
     def test_sort_field_ascending(self, backend: TantivyBackend):
-        """Searching with a valid sort_field and sort_reverse=False must use field-based ordering."""
-        for i, title in enumerate(["Charlie", "Alpha", "Bravo"]):
+        """Searching with sort_reverse=False must return results in ascending ASN order."""
+        for asn in [30, 10, 20]:
             doc = Document.objects.create(
-                title=title,
+                title="sortable",
                 content="sortable content",
-                checksum=f"SFA{i}",
-                pk=100 + i,
+                checksum=f"SFA{asn}",
+                archive_serial_number=asn,
             )
             backend.add_or_update(doc)
 
@@ -83,20 +83,21 @@ class TestSearch:
             user=None,
             page=1,
             page_size=10,
-            sort_field="title",
+            sort_field="archive_serial_number",
             sort_reverse=False,
         )
         assert r.total == 3
-        assert len(r.hits) == 3
+        asns = [Document.objects.get(pk=h["id"]).archive_serial_number for h in r.hits]
+        assert asns == [10, 20, 30]
 
     def test_sort_field_descending(self, backend: TantivyBackend):
-        """Searching with sort_field and sort_reverse=True must fetch extra results for Python-side slicing."""
-        for i, title in enumerate(["Charlie", "Alpha", "Bravo"]):
+        """Searching with sort_reverse=True must return results in descending ASN order."""
+        for asn in [30, 10, 20]:
             doc = Document.objects.create(
-                title=title,
+                title="sortable",
                 content="sortable content",
-                checksum=f"SFD{i}",
-                pk=110 + i,
+                checksum=f"SFD{asn}",
+                archive_serial_number=asn,
             )
             backend.add_or_update(doc)
 
@@ -105,10 +106,12 @@ class TestSearch:
             user=None,
             page=1,
             page_size=10,
-            sort_field="title",
+            sort_field="archive_serial_number",
             sort_reverse=True,
         )
         assert r.total == 3
+        asns = [Document.objects.get(pk=h["id"]).archive_serial_number for h in r.hits]
+        assert asns == [30, 20, 10]
 
     def test_fuzzy_threshold_filters_low_score_hits(
         self,

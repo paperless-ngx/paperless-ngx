@@ -487,20 +487,16 @@ class TantivyBackend:
         # Perform search
         if sort_field and sort_field in sort_field_map:
             mapped_field = sort_field_map[sort_field]
-            if sort_reverse:
-                # tantivy-py doesn't support reverse field sorting;
-                # fetch extra results and let Python slice handle ordering
-                results = searcher.search(final_query, limit=offset + page_size * 10)
-            else:
-                results = searcher.search(
-                    final_query,
-                    limit=offset + page_size,
-                    order_by_field=mapped_field,
-                )
+            results = searcher.search(
+                final_query,
+                limit=offset + page_size,
+                order_by_field=mapped_field,
+                order=tantivy.Order.Desc if sort_reverse else tantivy.Order.Asc,
+            )
             # Field sorting: hits are still (score, DocAddress) tuples; score unused
             all_hits = [(hit[1], 0.0) for hit in results.hits]
         else:
-            # Score-based search: hits are (score, doc_address) tuples
+            # Score-based search: hits are (score, DocAddress) tuples
             results = searcher.search(final_query, limit=offset + page_size)
             all_hits = [(hit[1], hit[0]) for hit in results.hits]
 
