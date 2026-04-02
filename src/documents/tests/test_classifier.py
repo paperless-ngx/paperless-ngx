@@ -1,4 +1,3 @@
-import pickle
 import re
 import warnings
 from pathlib import Path
@@ -447,18 +446,28 @@ class TestClassifier(DirectoriesMixin, TestCase):
 
         self.generate_train_and_save()
 
-        real_loads = pickle.loads
+        fake_warning = warnings.WarningMessage(
+            message=InconsistentVersionWarning(
+                estimator_name="MLPClassifier",
+                current_sklearn_version="1.0",
+                original_sklearn_version="0.9",
+            ),
+            category=InconsistentVersionWarning,
+            filename="",
+            lineno=0,
+        )
 
-        def loads_with_warning(data):
-            warnings.warn(
-                "Trying to unpickle estimator from version 0.0 when using version 1.0.",
-                InconsistentVersionWarning,
-            )
-            return real_loads(data)
+        real_catch_warnings = warnings.catch_warnings
+
+        class PatchedCatchWarnings(real_catch_warnings):
+            def __enter__(self):
+                w = super().__enter__()
+                w.append(fake_warning)
+                return w
 
         with mock.patch(
-            "documents.classifier.pickle.loads",
-            side_effect=loads_with_warning,
+            "documents.classifier.warnings.catch_warnings",
+            PatchedCatchWarnings,
         ):
             with self.assertRaises(IncompatibleClassifierVersionError):
                 self.classifier.load()
