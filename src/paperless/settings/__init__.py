@@ -11,6 +11,7 @@ from typing import Final
 from urllib.parse import urlparse
 
 from compression_middleware.middleware import CompressionMiddleware
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
@@ -463,13 +464,13 @@ SECURE_PROXY_SSL_HEADER = (
     else None
 )
 
-# The secret key has a default that should be fine so long as you're hosting
-# Paperless on a closed network.  However, if you're putting this anywhere
-# public, you should change the key to something unique and verbose.
-SECRET_KEY = os.getenv(
-    "PAPERLESS_SECRET_KEY",
-    "e11fl1oa-*ytql8p)(06fbj4ukrlo+n7k&q5+$1md7i+mge=ee",
-)
+SECRET_KEY = os.getenv("PAPERLESS_SECRET_KEY", "")
+if not SECRET_KEY:
+    raise ImproperlyConfigured(
+        "PAPERLESS_SECRET_KEY is not set. "
+        "A unique, secret key is required for secure operation. "
+        'Generate one with: python3 -c "import secrets; print(secrets.token_urlsafe(64))"',
+    )
 
 AUTH_PASSWORD_VALIDATORS = [
     {

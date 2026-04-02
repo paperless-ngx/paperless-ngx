@@ -428,14 +428,20 @@ Defaults to `/usr/share/nltk_data`
 
 #### [`PAPERLESS_SECRET_KEY=<key>`](#PAPERLESS_SECRET_KEY) {#PAPERLESS_SECRET_KEY}
 
-: Paperless uses this to make session tokens. If you expose paperless
-on the internet, you need to change this, since the default secret
-is well known.
+: **Required.** Paperless uses this to make session tokens and sign
+sensitive data. Paperless will refuse to start if this is not set.
 
     Use any sequence of characters. The more, the better. You don't
-    need to remember this. Just face-roll your keyboard.
+    need to remember this. You can generate a suitable key with:
 
-    Default is listed in the file `src/paperless/settings.py`.
+        python3 -c "import secrets; print(secrets.token_urlsafe(64))"
+
+    !!! warning
+
+        This setting has no default value. You **must** set it before
+        starting Paperless. Existing installations that relied on the
+        previous default value should set `PAPERLESS_SECRET_KEY` to
+        that value to avoid invalidating existing sessions and tokens.
 
 #### [`PAPERLESS_URL=<url>`](#PAPERLESS_URL) {#PAPERLESS_URL}
 
