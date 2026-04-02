@@ -20,16 +20,6 @@ def migrate_saved_view_rules_forward(apps, schema_editor):
     )
 
 
-def migrate_saved_view_rules_backward(apps, schema_editor):
-    SavedViewFilterRule = apps.get_model("documents", "SavedViewFilterRule")
-    SavedViewFilterRule.objects.filter(rule_type=NEW_SIMPLE_TITLE_RULE).update(
-        rule_type=OLD_TITLE_RULE,
-    )
-    SavedViewFilterRule.objects.filter(rule_type=NEW_SIMPLE_TEXT_RULE).update(
-        rule_type=OLD_TITLE_CONTENT_RULE,
-    )
-
-
 class Migration(migrations.Migration):
     dependencies = [
         ("documents", "0017_migrate_fulltext_query_field_prefixes"),
@@ -97,6 +87,6 @@ class Migration(migrations.Migration):
         ),
         migrations.RunPython(
             migrate_saved_view_rules_forward,
-            migrate_saved_view_rules_backward,
+            migrations.RunPython.noop,
         ),
     ]
