@@ -15,14 +15,14 @@ import {
   FILTER_TITLE_CONTENT,
   FilterRuleType,
   NEGATIVE_NULL_FILTER_VALUE,
+  SIMPLE_TEXT_PARAMETER,
+  SIMPLE_TITLE_PARAMETER,
 } from '../data/filter-rule-type'
 import { ListViewState } from '../services/document-list-view.service'
 
 const SORT_FIELD_PARAMETER = 'sort'
 const SORT_REVERSE_PARAMETER = 'reverse'
 const PAGE_PARAMETER = 'page'
-const SIMPLE_TEXT_PARAMETER = 'text'
-const SIMPLE_TITLE_PARAMETER = 'title_search'
 
 export function paramsFromViewState(
   viewState: ListViewState,

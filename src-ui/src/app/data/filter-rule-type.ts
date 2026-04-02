@@ -68,6 +68,9 @@ export const FILTER_CUSTOM_FIELDS_QUERY = 42
 
 export const FILTER_MIME_TYPE = 47
 
+export const SIMPLE_TEXT_PARAMETER = 'text'
+export const SIMPLE_TITLE_PARAMETER = 'title_search'
+
 export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
     id: FILTER_TITLE,
@@ -78,7 +81,7 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
   },
   {
     id: FILTER_SIMPLE_TITLE,
-    filtervar: 'title_search',
+    filtervar: SIMPLE_TITLE_PARAMETER,
     datatype: 'string',
     multi: false,
     default: '',
@@ -290,7 +293,7 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
   },
   {
     id: FILTER_SIMPLE_TEXT,
-    filtervar: 'text',
+    filtervar: SIMPLE_TEXT_PARAMETER,
     datatype: 'string',
     multi: false,
   },
