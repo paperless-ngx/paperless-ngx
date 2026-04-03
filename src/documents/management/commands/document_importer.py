@@ -32,10 +32,12 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
+from documents.models import ShareLinkBundle
 from documents.models import Tag
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_CRYPTO_SETTINGS_NAME
 from documents.settings import EXPORTER_FILE_NAME
+from documents.settings import EXPORTER_SHARE_LINK_BUNDLE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
 from documents.signals.handlers import check_paths_and_prune_custom_fields
 from documents.signals.handlers import update_filename_and_move_files
@@ -348,18 +350,42 @@ class Command(CryptMixin, PaperlessCommand):
                         f"Failed to read from archive file {doc_archive_path}",
                     ) from e
 
+        def check_share_link_bundle_validity(bundle_record: dict) -> None:
+            if EXPORTER_SHARE_LINK_BUNDLE_NAME not in bundle_record:
+                return
+
+            bundle_file = bundle_record[EXPORTER_SHARE_LINK_BUNDLE_NAME]
+            bundle_path: Path = self.source / bundle_file
+            if not bundle_path.exists():
+                raise CommandError(
+                    f'The manifest file refers to "{bundle_file}" which does not '
+                    "appear to be in the source directory.",
+                )
+            try:
+                with bundle_path.open(mode="rb"):
+                    pass
+            except Exception as e:
+                raise CommandError(
+                    f"Failed to read from share link bundle file {bundle_path}",
+                ) from e
+
         self.stdout.write("Checking the manifest")
         for manifest_path in self.manifest_paths:
             for record in iter_manifest_records(manifest_path):
                 # Only check if the document files exist if this is not data only
                 # We don't care about documents for a data only import
-                if not self.data_only and record["model"] == "documents.document":
+                if self.data_only:
+                    continue
+                if record["model"] == "documents.document":
                     check_document_validity(record)
+                elif record["model"] == "documents.sharelinkbundle":
+                    check_share_link_bundle_validity(record)
 
     def _import_files_from_manifest(self) -> None:
         settings.ORIGINALS_DIR.mkdir(parents=True, exist_ok=True)
         settings.THUMBNAIL_DIR.mkdir(parents=True, exist_ok=True)
         settings.ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
+        settings.SHARE_LINK_BUNDLE_DIR.mkdir(parents=True, exist_ok=True)
 
         self.stdout.write("Copy files into paperless...")
 
@@ -373,6 +399,18 @@ class Command(CryptMixin, PaperlessCommand):
             for manifest_path in self.manifest_paths
             for record in iter_manifest_records(manifest_path)
             if record["model"] == "documents.document"
+        ]
+        share_link_bundle_records = [
+            {
+                "pk": record["pk"],
+                EXPORTER_SHARE_LINK_BUNDLE_NAME: record.get(
+                    EXPORTER_SHARE_LINK_BUNDLE_NAME,
+                ),
+            }
+            for manifest_path in self.manifest_paths
+            for record in iter_manifest_records(manifest_path)
+            if record["model"] == "documents.sharelinkbundle"
+            and record.get(EXPORTER_SHARE_LINK_BUNDLE_NAME)
         ]
 
         for record in self.track(document_records, description="Copying files..."):
@@ -415,6 +453,26 @@ class Command(CryptMixin, PaperlessCommand):
                     copy_file_with_basic_stats(archive_path, document.archive_path)
 
             document.save()
+
+        for record in self.track(
+            share_link_bundle_records,
+            description="Copying share link bundles...",
+        ):
+            bundle = ShareLinkBundle.objects.get(pk=record["pk"])
+            bundle_file = record[EXPORTER_SHARE_LINK_BUNDLE_NAME]
+            bundle_source_path = (self.source / bundle_file).resolve()
+            bundle_target_path = bundle.absolute_file_path
+            if bundle_target_path is None:
+                raise CommandError(
+                    f"Share link bundle {bundle.pk} does not have a valid file path.",
+                )
+
+            with FileLock(settings.MEDIA_LOCK):
+                bundle_target_path.parent.mkdir(parents=True, exist_ok=True)
+                copy_file_with_basic_stats(
+                    bundle_source_path,
+                    bundle_target_path,
+                )
 
     def _decrypt_record_if_needed(self, record: dict) -> dict:
         fields = self.CRYPT_FIELDS_BY_MODEL.get(record.get("model", ""))
