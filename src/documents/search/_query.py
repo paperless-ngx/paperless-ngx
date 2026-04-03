@@ -12,6 +12,8 @@ import tantivy
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 
+from documents.search._normalize import ascii_fold
+
 if TYPE_CHECKING:
     from datetime import tzinfo
 
@@ -51,6 +53,7 @@ _WHOOSH_REL_RANGE_RE = regex.compile(
 )
 # Whoosh-style 8-digit date: field:YYYYMMDD — field-aware so timezone can be applied correctly
 _DATE8_RE = regex.compile(r"(?P<field>\w+):(?P<date8>\d{8})\b")
+_SIMPLE_QUERY_TOKEN_RE = regex.compile(r"\S+")
 
 
 def _fmt(dt: datetime) -> str:
@@ -436,7 +439,37 @@ DEFAULT_SEARCH_FIELDS = [
     "document_type",
     "tag",
 ]
+SIMPLE_SEARCH_FIELDS = ["simple_title", "simple_content"]
+TITLE_SEARCH_FIELDS = ["simple_title"]
 _FIELD_BOOSTS = {"title": 2.0}
+_SIMPLE_FIELD_BOOSTS = {"simple_title": 2.0}
+
+
+def _build_simple_field_query(
+    index: tantivy.Index,
+    field: str,
+    tokens: list[str],
+) -> tantivy.Query:
+    patterns = []
+    for idx, token in enumerate(tokens):
+        escaped = regex.escape(token)
+        # For multi-token substring search, only the first token can begin mid-word.
+        # Later tokens follow a whitespace boundary in the original query, so anchor
+        # them to the start of the next indexed token to reduce false positives like
+        # matching "Z-Berichte 16" for the query "Z-Berichte 6".
+        if idx == 0:
+            patterns.append(f".*{escaped}.*")
+        else:
+            patterns.append(f"{escaped}.*")
+    if len(patterns) == 1:
+        query = tantivy.Query.regex_query(index.schema, field, patterns[0])
+    else:
+        query = tantivy.Query.regex_phrase_query(index.schema, field, patterns)
+
+    boost = _SIMPLE_FIELD_BOOSTS.get(field, 1.0)
+    if boost > 1.0:
+        return tantivy.Query.boost_query(query, boost)
+    return query
 
 
 def parse_user_query(
@@ -495,3 +528,52 @@ def parse_user_query(
         )
 
     return exact
+
+
+def parse_simple_query(
+    index: tantivy.Index,
+    raw_query: str,
+    fields: list[str],
+) -> tantivy.Query:
+    """
+    Parse a plain-text query using Tantivy over a restricted field set.
+
+    Query string is escaped and normalized to be treated as "simple" text query.
+    """
+    tokens = [
+        ascii_fold(token.lower())
+        for token in _SIMPLE_QUERY_TOKEN_RE.findall(raw_query, timeout=_REGEX_TIMEOUT)
+    ]
+    tokens = [token for token in tokens if token]
+    if not tokens:
+        return tantivy.Query.empty_query()
+
+    field_queries = [
+        (tantivy.Occur.Should, _build_simple_field_query(index, field, tokens))
+        for field in fields
+    ]
+    if len(field_queries) == 1:
+        return field_queries[0][1]
+    return tantivy.Query.boolean_query(field_queries)
+
+
+def parse_simple_text_query(
+    index: tantivy.Index,
+    raw_query: str,
+) -> tantivy.Query:
+    """
+    Parse a plain-text query over title/content for simple search inputs.
+    """
+
+    return parse_simple_query(index, raw_query, SIMPLE_SEARCH_FIELDS)
+
+
+def parse_simple_title_query(
+    index: tantivy.Index,
+    raw_query: str,
+) -> tantivy.Query:
+    """
+    Parse a plain-text query over the title field only.
+    """
+
+    return parse_simple_query(index, raw_query, TITLE_SEARCH_FIELDS)

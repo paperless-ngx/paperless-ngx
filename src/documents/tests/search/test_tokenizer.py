@@ -8,6 +8,7 @@ import tantivy
 
 from documents.search._tokenizer import _bigram_analyzer
 from documents.search._tokenizer import _paperless_text
+from documents.search._tokenizer import _simple_search_analyzer
 from documents.search._tokenizer import register_tokenizers
 
 if TYPE_CHECKING:
@@ -41,6 +42,20 @@ class TestTokenizers:
         idx.register_tokenizer("bigram_analyzer", _bigram_analyzer())
         return idx
 
+    @pytest.fixture
+    def simple_search_index(self) -> tantivy.Index:
+        """Index with simple-search field for Latin substring tests."""
+        sb = tantivy.SchemaBuilder()
+        sb.add_text_field(
+            "simple_content",
+            stored=False,
+            tokenizer_name="simple_search_analyzer",
+        )
+        schema = sb.build()
+        idx = tantivy.Index(schema, path=None)
+        idx.register_tokenizer("simple_search_analyzer", _simple_search_analyzer())
+        return idx
+
     def test_ascii_fold_finds_accented_content(
         self,
         content_index: tantivy.Index,
@@ -65,6 +80,24 @@ class TestTokenizers:
         bigram_index.reload()
         q = bigram_index.parse_query("東京", ["bigram_content"])
         assert bigram_index.searcher().search(q, limit=5).count == 1
+
+    def test_simple_search_analyzer_supports_regex_substrings(
+        self,
+        simple_search_index: tantivy.Index,
+    ) -> None:
+        """Whitespace-preserving simple search analyzer supports substring regex matching."""
+        writer = simple_search_index.writer()
+        doc = tantivy.Document()
+        doc.add_text("simple_content", "tag:invoice password-reset")
+        writer.add_document(doc)
+        writer.commit()
+        simple_search_index.reload()
+        q = tantivy.Query.regex_query(
+            simple_search_index.schema,
+            "simple_content",
+            ".*sswo.*",
+        )
+        assert simple_search_index.searcher().search(q, limit=5).count == 1
 
     def test_unsupported_language_logs_warning(self, caplog: LogCaptureFixture) -> None:
         """Unsupported language codes should log a warning and disable stemming gracefully."""

@@ -62,10 +62,14 @@ The REST api provides five different forms of authentication.
 
 ## Searching for documents
 
-Full text searching is available on the `/api/documents/` endpoint. Two
-specific query parameters cause the API to return full text search
+Full text searching is available on the `/api/documents/` endpoint. The
+following query parameters cause the API to return Tantivy-backed search
 results:
 
+- `/api/documents/?text=your%20search%20query`: Search title and content
+  using simple substring-style search.
+- `/api/documents/?title_search=your%20search%20query`: Search title only
+  using simple substring-style search.
 - `/api/documents/?query=your%20search%20query`: Search for a document
   using a full text query. For details on the syntax, see [Basic Usage - Searching](usage.md#basic-usage_searching).
 - `/api/documents/?more_like_id=1234`: Search for documents similar to
@@ -439,3 +443,5 @@ Initial API version.
 - The `all` parameter of list endpoints is now deprecated and will be removed in a future version.
 - The bulk edit objects endpoint now supports `all` and `filters` parameters to avoid having to send
   large lists of object IDs for operations affecting many objects.
+- The legacy `title_content` document search parameter is deprecated and will be removed in a future version.
+  Clients should use `text` for simple title-and-content search and `title_search` for title-only search.

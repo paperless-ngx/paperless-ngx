@@ -25,7 +25,7 @@ import {
   FILTER_HAS_DOCUMENT_TYPE_ANY,
   FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_HAS_TAGS_ALL,
-  FILTER_TITLE_CONTENT,
+  FILTER_SIMPLE_TEXT,
 } from 'src/app/data/filter-rule-type'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { GlobalSearchType, SETTINGS_KEYS } from 'src/app/data/ui-settings'
@@ -410,7 +410,7 @@ export class GlobalSearchComponent implements OnInit {
   public runFullSearch() {
     const ruleType = this.useAdvancedForFullSearch
       ? FILTER_FULLTEXT_QUERY
-      : FILTER_TITLE_CONTENT
+      : FILTER_SIMPLE_TEXT
     this.documentService.searchQuery = this.useAdvancedForFullSearch
       ? this.query
       : ''

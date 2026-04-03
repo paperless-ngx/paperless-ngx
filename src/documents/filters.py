@@ -3,6 +3,7 @@ from __future__ import annotations
 import functools
 import inspect
 import json
+import logging
 import operator
 from contextlib import contextmanager
 from typing import TYPE_CHECKING
@@ -76,6 +77,8 @@ DATETIME_KWARGS = [
 
 CUSTOM_FIELD_QUERY_MAX_DEPTH = 10
 CUSTOM_FIELD_QUERY_MAX_ATOMS = 20
+
+logger = logging.getLogger("paperless.api")
 
 
 class CorrespondentFilterSet(FilterSet):
@@ -162,9 +165,13 @@ class InboxFilter(Filter):
 
 @extend_schema_field(serializers.CharField)
 class TitleContentFilter(Filter):
+    # Deprecated but retained for existing saved views. UI uses Tantivy-backed `text` / `title_search` params.
     def filter(self, qs: Any, value: Any) -> Any:
         value = value.strip() if isinstance(value, str) else value
         if value:
+            logger.warning(
+                "Deprecated document filter parameter 'title_content' used; use `text` instead.",
+            )
             try:
                 return qs.filter(
                     Q(title__icontains=value) | Q(effective_content__icontains=value),
@@ -243,6 +250,9 @@ class CustomFieldsFilter(Filter):
     def filter(self, qs, value):
         value = value.strip() if isinstance(value, str) else value
         if value:
+            logger.warning(
+                "Deprecated document filter parameter 'custom_fields__icontains' used; use `custom_field_query` or advanced Tantivy field syntax instead.",
+            )
             fields_with_matching_selects = CustomField.objects.filter(
                 extra_data__icontains=value,
             )
@@ -747,6 +757,7 @@ class DocumentFilterSet(FilterSet):
 
     is_in_inbox = InboxFilter()
 
+    # Deprecated, but keep for now for existing saved views
     title_content = TitleContentFilter()
 
     content__istartswith = EffectiveContentFilter(lookup_expr="istartswith")
@@ -756,6 +767,7 @@ class DocumentFilterSet(FilterSet):
 
     owner__id__none = ObjectFilter(field_name="owner", exclude=True)
 
+    # Deprecated, UI no longer includes CF text-search mode, but keep for now for existing saved views
     custom_fields__icontains = CustomFieldsFilter()
 
     custom_fields__id__all = ObjectFilter(field_name="custom_fields__field")

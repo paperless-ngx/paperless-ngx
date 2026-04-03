@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import logging
 import threading
-import unicodedata
 from collections import Counter
 from dataclasses import dataclass
 from datetime import UTC
 from datetime import datetime
+from enum import StrEnum
 from typing import TYPE_CHECKING
 from typing import Self
 from typing import TypedDict
@@ -19,7 +19,10 @@ from django.conf import settings
 from django.utils.timezone import get_current_timezone
 from guardian.shortcuts import get_users_with_perms
 
+from documents.search._normalize import ascii_fold
 from documents.search._query import build_permission_filter
+from documents.search._query import parse_simple_text_query
+from documents.search._query import parse_simple_title_query
 from documents.search._query import parse_user_query
 from documents.search._schema import _write_sentinels
 from documents.search._schema import build_schema
@@ -45,14 +48,10 @@ _AUTOCOMPLETE_REGEX_TIMEOUT = 1.0  # seconds; guards against ReDoS on untrusted 
 T = TypeVar("T")
 
 
-def _ascii_fold(s: str) -> str:
-    """
-    Normalize unicode to ASCII equivalent characters for search consistency.
-
-    Converts accented characters (e.g., "café") to their ASCII base forms ("cafe")
-    to enable cross-language searching without requiring exact diacritic matching.
-    """
-    return unicodedata.normalize("NFD", s).encode("ascii", "ignore").decode()
+class SearchMode(StrEnum):
+    QUERY = "query"
+    TEXT = "text"
+    TITLE = "title"
 
 
 def _extract_autocomplete_words(text_sources: list[str]) -> set[str]:
@@ -74,7 +73,7 @@ def _extract_autocomplete_words(text_sources: list[str]) -> set[str]:
             )
             continue
         for token in tokens:
-            normalized = _ascii_fold(token.lower())
+            normalized = ascii_fold(token.lower())
             if normalized:
                 words.add(normalized)
     return words
@@ -294,8 +293,10 @@ class TantivyBackend:
         doc.add_text("checksum", document.checksum)
         doc.add_text("title", document.title)
         doc.add_text("title_sort", document.title)
+        doc.add_text("simple_title", document.title)
         doc.add_text("content", content)
         doc.add_text("bigram_content", content)
+        doc.add_text("simple_content", content)
 
         # Original filename - only add if not None/empty
         if document.original_filename:
@@ -433,6 +434,7 @@ class TantivyBackend:
         sort_field: str | None,
         *,
         sort_reverse: bool,
+        search_mode: SearchMode = SearchMode.QUERY,
     ) -> SearchResults:
         """
         Execute a search query against the document index.
@@ -441,20 +443,32 @@ class TantivyBackend:
         permission filtering before executing against Tantivy. Supports both
         relevance-based and field-based sorting.
 
+        QUERY search mode supports natural date keywords, field filters, etc.
+        TITLE search mode treats the query as plain text to search for in title only
+        TEXT search mode treats the query as plain text to search for in title and content
+
         Args:
-            query: User's search query (supports natural date keywords, field filters)
+            query: User's search query
             user: User for permission filtering (None for superuser/no filtering)
             page: Page number (1-indexed) for pagination
             page_size: Number of results per page
             sort_field: Field to sort by (None for relevance ranking)
             sort_reverse: Whether to reverse the sort order
+            search_mode: "query" for advanced Tantivy syntax, "text" for
+                plain-text search over title and content only, "title" for
+                plain-text search over title only
 
         Returns:
             SearchResults with hits, total count, and processed query
         """
         self._ensure_open()
         tz = get_current_timezone()
-        user_query = parse_user_query(self._index, query, tz)
+        if search_mode is SearchMode.TEXT:
+            user_query = parse_simple_text_query(self._index, query)
+        elif search_mode is SearchMode.TITLE:
+            user_query = parse_simple_title_query(self._index, query)
+        else:
+            user_query = parse_user_query(self._index, query, tz)
 
         # Apply permission filter if user is not None (not superuser)
         if user is not None:
@@ -594,7 +608,7 @@ class TantivyBackend:
             List of word suggestions ordered by frequency, then alphabetically
         """
         self._ensure_open()
-        normalized_term = _ascii_fold(term.lower())
+        normalized_term = ascii_fold(term.lower())
 
         searcher = self._index.searcher()
 
