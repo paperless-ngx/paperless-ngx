@@ -1434,14 +1434,14 @@ wheels = [
 
 [[package]]
 name = "gotenberg-client"
-version = "0.13.1"
+version = "0.14.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx", extra = ["http2"], marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e4/6c/aaadd6657ca42fbd148b1c00604b98c1ead5a22552f4e5365ce5f0632430/gotenberg_client-0.13.1.tar.gz", hash = "sha256:cdd6bbb535cd739b87446cd1b4f6347ed7f9af6a0d4b19baf7c064b75528ee54", size = 1211143, upload-time = "2025-12-04T20:45:24.151Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f5/34/8e3be3a6a1b654d2a3bfa3e5d201183aeff6d50c42199ac0b8ed912c01c5/gotenberg_client-0.14.0.tar.gz", hash = "sha256:a853700c6b01c3372871264c4eb9ae3375addafbcbbfd3341e411f4217a8088c", size = 1214438, upload-time = "2026-03-11T17:23:11.122Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/79/f6/7a6e6785295332d2538f729ae19516cef712273a5ab8b90d015f08e37a45/gotenberg_client-0.13.1-py3-none-any.whl", hash = "sha256:613f7083a5e8a81699dd8d715c97e5806a424ac48920aad25d7c11b600cdfaf3", size = 51058, upload-time = "2025-12-04T20:45:22.603Z" },
+    { url = "https://files.pythonhosted.org/packages/55/1a/67ff4cca162ae4195bd6f1a107779898b6f2977cc33ae7e05a5178a395fa/gotenberg_client-0.14.0-py3-none-any.whl", hash = "sha256:868f1be46d1ed0f327ca3efeb1888b4fe35641c35bfa39684d23a59365703156", size = 50977, upload-time = "2026-03-11T17:23:09.397Z" },
 ]
 
 [[package]]
@@ -2775,7 +2775,7 @@ wheels = [
 
 [[package]]
 name = "ocrmypdf"
-version = "17.3.0"
+version = "17.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "deprecation", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -2792,9 +2792,9 @@ dependencies = [
     { name = "rich", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "uharfbuzz", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/fa/fe/60bdc79529be1ad8b151d426ed2020d5ac90328c54e9ba92bd808e1535c1/ocrmypdf-17.3.0.tar.gz", hash = "sha256:4022f13aad3f405e330056a07aa8bd63714b48b414693831b56e2cf2c325f52d", size = 7378015, upload-time = "2026-02-21T09:30:07.207Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/88/b9/01f5cbd062f680af8a3f8f883f8e71de8be7979c3256f509661c1e2e2065/ocrmypdf-17.4.0.tar.gz", hash = "sha256:4bbc53249f3981599565f670c5de774d6440832eede87c515e6608880fa02a34", size = 7378592, upload-time = "2026-03-21T19:06:50.966Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3d/b1/b7ae057a1bcb1495067ee3c4d48c1ce5fc66addd9492307c5a0ff799a7f2/ocrmypdf-17.3.0-py3-none-any.whl", hash = "sha256:c8882e7864954d3db6bcee49cc9f261b65bff66b7e5925eb68a1c281f41cad23", size = 488130, upload-time = "2026-02-21T09:30:05.236Z" },
+    { url = "https://files.pythonhosted.org/packages/ff/b7/71ae51a11669e63f1fea76153db4475079ea8d7b60802faf080f25b4a262/ocrmypdf-17.4.0-py3-none-any.whl", hash = "sha256:b93fd4d736a71a241e44d1b48e1305b9bf4581cd2ae9a96fcd89f4db1051dd87", size = 488312, upload-time = "2026-03-21T19:06:48.456Z" },
 ]
 
 [[package]]
@@ -3022,7 +3022,7 @@ requires-dist = [
     { name = "faiss-cpu", specifier = ">=1.10" },
     { name = "filelock", specifier = "~=3.25.2" },
     { name = "flower", specifier = "~=2.0.1" },
-    { name = "gotenberg-client", specifier = "~=0.13.1" },
+    { name = "gotenberg-client", specifier = "~=0.14.0" },
     { name = "granian", extras = ["uvloop"], marker = "extra == 'webserver'", specifier = "~=2.7.0" },
     { name = "httpx-oauth", specifier = "~=0.16" },
     { name = "ijson", specifier = ">=3.2" },
@@ -3037,7 +3037,7 @@ requires-dist = [
     { name = "llama-index-vector-stores-faiss", specifier = ">=0.5.2" },
     { name = "mysqlclient", marker = "extra == 'mariadb'", specifier = "~=2.2.7" },
     { name = "nltk", specifier = "~=3.9.1" },
-    { name = "ocrmypdf", specifier = "~=17.3.0" },
+    { name = "ocrmypdf", specifier = "~=17.4.0" },
     { name = "openai", specifier = ">=1.76" },
     { name = "pathvalidate", specifier = "~=3.3.1" },
     { name = "pdf2image", specifier = "~=1.17.0" },
@@ -3058,7 +3058,7 @@ requires-dist = [
     { name = "sentence-transformers", specifier = ">=4.1" },
     { name = "setproctitle", specifier = "~=1.3.4" },
     { name = "tantivy", specifier = ">=0.25.1" },
-    { name = "tika-client", specifier = "~=0.10.0" },
+    { name = "tika-client", specifier = "~=0.11.0" },
     { name = "torch", specifier = "~=2.10.0", index = "https://download.pytorch.org/whl/cpu" },
     { name = "watchfiles", specifier = ">=1.1.1" },
     { name = "whitenoise", specifier = "~=6.11" },
@@ -4716,15 +4716,15 @@ wheels = [
 
 [[package]]
 name = "tika-client"
-version = "0.10.0"
+version = "0.11.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "httpx", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/21/be/65bfc47e4689ecd5ead20cf47dc0084fd767b7e71e8cfabf5fddc42aae3c/tika_client-0.10.0.tar.gz", hash = "sha256:3101e8b2482ae4cb7f87be13ada970ff691bdc3404d94cd52f5e57a09c99370c", size = 2178257, upload-time = "2025-08-04T17:47:30.414Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4d/d9/01f2049240dacf67c9be61d9c59e72b6827a862e8fd87e77e458e0a3b797/tika_client-0.11.0.tar.gz", hash = "sha256:c741caaca08bbd715a8db3fe6f0430a54d075fef3d59a441e8b8d810f58de4f0", size = 2178828, upload-time = "2026-03-11T16:50:25.865Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b1/31/002e0fa5bca67d6a19da8c294273486f6c46cbcc83d6879719a38a181461/tika_client-0.10.0-py3-none-any.whl", hash = "sha256:f5486cc884e4522575662aa295bda761bf9f101ac8d92840155b58ab8b96f6e2", size = 18237, upload-time = "2025-08-04T17:47:28.966Z" },
+    { url = "https://files.pythonhosted.org/packages/53/04/5a433d621ec559d1d216d200eea43b0ac63435beb5dd52bbc75f4aaef465/tika_client-0.11.0-py3-none-any.whl", hash = "sha256:461903ccbe705d84dd3e4a1ca83e04174776d4b06dc57b902f9281633a3836e6", size = 18470, upload-time = "2026-03-11T16:50:24.672Z" },
 ]
 
 [[package]]
