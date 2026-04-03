@@ -2058,9 +2058,9 @@ class UnifiedSearchViewSet(DocumentViewSet):
         if not self._is_search_request():
             return super().list(request)
 
+        from documents.search import SearchMode
         from documents.search import TantivyRelevanceList
         from documents.search import get_backend
-        from documents.search._backend import SearchMode
 
         try:
             backend = get_backend()
@@ -3046,8 +3046,8 @@ class GlobalSearchView(PassUserMixin):
     serializer_class = SearchResultSerializer
 
     def get(self, request, *args, **kwargs):
+        from documents.search import SearchMode
         from documents.search import get_backend
-        from documents.search._backend import SearchMode
 
         query = request.query_params.get("query", None)
         if query is None:
