@@ -61,6 +61,7 @@ from documents.utils import compute_checksum
 from documents.utils import identity
 from documents.workflows.utils import get_workflows_for_trigger
 from paperless.config import AIConfig
+from paperless.logging import consume_task_id
 from paperless.parsers import ParserContext
 from paperless.parsers.registry import get_parser_registry
 from paperless_ai.indexing import llm_index_add_or_update_document
@@ -147,76 +148,85 @@ def consume_file(
     input_doc: ConsumableDocument,
     overrides: DocumentMetadataOverrides | None = None,
 ):
-    # Default no overrides
-    if overrides is None:
-        overrides = DocumentMetadataOverrides()
+    token = consume_task_id.set((self.request.id or "")[:8])
+    try:
+        # Default no overrides
+        if overrides is None:
+            overrides = DocumentMetadataOverrides()
 
-    plugins: list[type[ConsumeTaskPlugin]] = (
-        [
-            ConsumerPreflightPlugin,
-            ConsumerPlugin,
-        ]
-        if input_doc.root_document_id is not None
-        else [
-            ConsumerPreflightPlugin,
-            AsnCheckPlugin,
-            CollatePlugin,
-            BarcodePlugin,
-            AsnCheckPlugin,  # Re-run ASN check after barcode reading
-            WorkflowTriggerPlugin,
-            ConsumerPlugin,
-        ]
-    )
+        plugins: list[type[ConsumeTaskPlugin]] = (
+            [
+                ConsumerPreflightPlugin,
+                ConsumerPlugin,
+            ]
+            if input_doc.root_document_id is not None
+            else [
+                ConsumerPreflightPlugin,
+                AsnCheckPlugin,
+                CollatePlugin,
+                BarcodePlugin,
+                AsnCheckPlugin,  # Re-run ASN check after barcode reading
+                WorkflowTriggerPlugin,
+                ConsumerPlugin,
+            ]
+        )
 
-    with (
-        ProgressManager(
-            overrides.filename or input_doc.original_file.name,
-            self.request.id,
-        ) as status_mgr,
-        TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir,
-    ):
-        tmp_dir = Path(tmp_dir)
-        for plugin_class in plugins:
-            plugin_name = plugin_class.NAME
-
-            plugin = plugin_class(
-                input_doc,
-                overrides,
-                status_mgr,
-                tmp_dir,
+        with (
+            ProgressManager(
+                overrides.filename or input_doc.original_file.name,
                 self.request.id,
-            )
+            ) as status_mgr,
+            TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir,
+        ):
+            tmp_dir = Path(tmp_dir)
+            for plugin_class in plugins:
+                plugin_name = plugin_class.NAME
 
-            if not plugin.able_to_run:
-                logger.debug(f"Skipping plugin {plugin_name}")
-                continue
+                plugin = plugin_class(
+                    input_doc,
+                    overrides,
+                    status_mgr,
+                    tmp_dir,
+                    self.request.id,
+                )
 
-            try:
-                logger.debug(f"Executing plugin {plugin_name}")
-                plugin.setup()
+                if not plugin.able_to_run:
+                    logger.debug(f"Skipping plugin {plugin_name}")
+                    continue
 
-                msg = plugin.run()
+                try:
+                    logger.debug(f"Executing plugin {plugin_name}")
+                    plugin.setup()
 
-                if msg is not None:
-                    logger.info(f"{plugin_name} completed with: {msg}")
-                else:
-                    logger.info(f"{plugin_name} completed with no message")
+                    msg = plugin.run()
 
-                overrides = plugin.metadata
+                    if msg is not None:
+                        logger.info(f"{plugin_name} completed with: {msg}")
+                    else:
+                        logger.info(f"{plugin_name} completed with no message")
 
-            except StopConsumeTaskError as e:
-                logger.info(f"{plugin_name} requested task exit: {e.message}")
-                return e.message
+                    overrides = plugin.metadata
 
-            except Exception as e:
-                logger.exception(f"{plugin_name} failed: {e}")
-                status_mgr.send_progress(ProgressStatusOptions.FAILED, f"{e}", 100, 100)
-                raise
+                except StopConsumeTaskError as e:
+                    logger.info(f"{plugin_name} requested task exit: {e.message}")
+                    return e.message
 
-            finally:
-                plugin.cleanup()
+                except Exception as e:
+                    logger.exception(f"{plugin_name} failed: {e}")
+                    status_mgr.send_progress(
+                        ProgressStatusOptions.FAILED,
+                        f"{e}",
+                        100,
+                        100,
+                    )
+                    raise
 
-    return msg
+                finally:
+                    plugin.cleanup()
+
+        return msg
+    finally:
+        consume_task_id.reset(token)
 
 
 @shared_task

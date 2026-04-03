@@ -5,6 +5,7 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import Note
+from documents.search._backend import SearchMode
 from documents.search._backend import TantivyBackend
 from documents.search._backend import get_backend
 from documents.search._backend import reset_backend
@@ -45,6 +46,258 @@ class TestWriteBatch:
 
 class TestSearch:
     """Test search functionality."""
+
+    def test_text_mode_limits_default_search_to_title_and_content(
+        self,
+        backend: TantivyBackend,
+    ):
+        """Simple text mode must not match metadata-only fields."""
+        doc = Document.objects.create(
+            title="Invoice document",
+            content="monthly statement",
+            checksum="TXT1",
+            pk=9,
+        )
+        backend.add_or_update(doc)
+
+        metadata_only = backend.search(
+            "document_type:invoice",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TEXT,
+        )
+        assert metadata_only.total == 0
+
+        content_match = backend.search(
+            "monthly",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TEXT,
+        )
+        assert content_match.total == 1
+
+    def test_title_mode_limits_default_search_to_title_only(
+        self,
+        backend: TantivyBackend,
+    ):
+        """Title mode must not match content-only terms."""
+        doc = Document.objects.create(
+            title="Invoice document",
+            content="monthly statement",
+            checksum="TXT2",
+            pk=10,
+        )
+        backend.add_or_update(doc)
+
+        content_only = backend.search(
+            "monthly",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TITLE,
+        )
+        assert content_only.total == 0
+
+        title_match = backend.search(
+            "invoice",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TITLE,
+        )
+        assert title_match.total == 1
+
+    def test_text_mode_matches_partial_term_substrings(
+        self,
+        backend: TantivyBackend,
+    ):
+        """Simple text mode should support substring matching within tokens."""
+        doc = Document.objects.create(
+            title="Account access",
+            content="password reset instructions",
+            checksum="TXT3",
+            pk=11,
+        )
+        backend.add_or_update(doc)
+
+        prefix_match = backend.search(
+            "pass",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TEXT,
+        )
+        assert prefix_match.total == 1
+
+        infix_match = backend.search(
+            "sswo",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TEXT,
+        )
+        assert infix_match.total == 1
+
+        phrase_match = backend.search(
+            "sswo re",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TEXT,
+        )
+        assert phrase_match.total == 1
+
+    def test_text_mode_does_not_match_on_partial_term_overlap(
+        self,
+        backend: TantivyBackend,
+    ):
+        """Simple text mode should not match documents that merely share partial fragments."""
+        doc = Document.objects.create(
+            title="Adobe Acrobat PDF Files",
+            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            checksum="TXT7",
+            pk=13,
+        )
+        backend.add_or_update(doc)
+
+        non_match = backend.search(
+            "raptor",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TEXT,
+        )
+        assert non_match.total == 0
+
+    def test_text_mode_anchors_later_query_tokens_to_token_starts(
+        self,
+        backend: TantivyBackend,
+    ):
+        """Multi-token simple search should not match later tokens in the middle of a word."""
+        exact_doc = Document.objects.create(
+            title="Z-Berichte 6",
+            content="monthly report",
+            checksum="TXT9",
+            pk=15,
+        )
+        prefix_doc = Document.objects.create(
+            title="Z-Berichte 60",
+            content="monthly report",
+            checksum="TXT10",
+            pk=16,
+        )
+        false_positive = Document.objects.create(
+            title="Z-Berichte 16",
+            content="monthly report",
+            checksum="TXT11",
+            pk=17,
+        )
+        backend.add_or_update(exact_doc)
+        backend.add_or_update(prefix_doc)
+        backend.add_or_update(false_positive)
+
+        results = backend.search(
+            "Z-Berichte 6",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TEXT,
+        )
+        result_ids = {hit["id"] for hit in results.hits}
+
+        assert exact_doc.id in result_ids
+        assert prefix_doc.id in result_ids
+        assert false_positive.id not in result_ids
+
+    def test_text_mode_ignores_queries_without_searchable_tokens(
+        self,
+        backend: TantivyBackend,
+    ):
+        """Simple text mode should safely return no hits for symbol-only strings."""
+        doc = Document.objects.create(
+            title="Guide",
+            content="This is a guide.",
+            checksum="TXT8",
+            pk=14,
+        )
+        backend.add_or_update(doc)
+
+        no_tokens = backend.search(
+            "!!!",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TEXT,
+        )
+        assert no_tokens.total == 0
+
+    def test_title_mode_matches_partial_term_substrings(
+        self,
+        backend: TantivyBackend,
+    ):
+        """Title mode should support substring matching within title tokens."""
+        doc = Document.objects.create(
+            title="Password guide",
+            content="reset instructions",
+            checksum="TXT4",
+            pk=12,
+        )
+        backend.add_or_update(doc)
+
+        prefix_match = backend.search(
+            "pass",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TITLE,
+        )
+        assert prefix_match.total == 1
+
+        infix_match = backend.search(
+            "sswo",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TITLE,
+        )
+        assert infix_match.total == 1
+
+        phrase_match = backend.search(
+            "sswo gu",
+            user=None,
+            page=1,
+            page_size=10,
+            sort_field=None,
+            sort_reverse=False,
+            search_mode=SearchMode.TITLE,
+        )
+        assert phrase_match.total == 1
 
     def test_scores_normalised_top_hit_is_one(self, backend: TantivyBackend):
         """Search scores must be normalized so top hit has score 1.0 for UI consistency."""

@@ -53,6 +53,18 @@ def build_schema() -> tantivy.Schema:
     # CJK support - not stored, indexed only
     sb.add_text_field("bigram_content", stored=False, tokenizer_name="bigram_analyzer")
 
+    # Simple substring search support for title/content - not stored, indexed only
+    sb.add_text_field(
+        "simple_title",
+        stored=False,
+        tokenizer_name="simple_search_analyzer",
+    )
+    sb.add_text_field(
+        "simple_content",
+        stored=False,
+        tokenizer_name="simple_search_analyzer",
+    )
+
     # Autocomplete prefix scan - stored, not indexed
     sb.add_text_field("autocomplete_word", stored=True, tokenizer_name="raw")
 
