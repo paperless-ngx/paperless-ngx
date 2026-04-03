@@ -592,8 +592,7 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "verbose": {
-            "format": "[{asctime}] [{levelname}] [{name}] {message}",
-            "style": "{",
+            "()": "paperless.logging.ConsumeTaskFormatter",
         },
         "simple": {
             "format": "{levelname} {message}",
