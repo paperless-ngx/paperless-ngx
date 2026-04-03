@@ -10,7 +10,7 @@ import {
   DOCUMENT_SORT_FIELDS,
   DOCUMENT_SORT_FIELDS_FULLTEXT,
 } from 'src/app/data/document'
-import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
+import { FILTER_SIMPLE_TITLE } from 'src/app/data/filter-rule-type'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { environment } from 'src/environments/environment'
 import { PermissionsService } from '../permissions.service'
@@ -138,13 +138,13 @@ describe(`DocumentService`, () => {
     subscription = service
       .listAllFilteredIds([
         {
-          rule_type: FILTER_TITLE,
+          rule_type: FILTER_SIMPLE_TITLE,
           value: 'apple',
         },
       ])
       .subscribe()
     const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000&fields=id&title__icontains=apple`
+      `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000&fields=id&title_search=apple`
     )
     expect(req.request.method).toEqual('GET')
   })
