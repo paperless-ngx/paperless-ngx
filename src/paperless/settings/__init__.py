@@ -11,6 +11,7 @@ from typing import Final
 from urllib.parse import urlparse
 
 from compression_middleware.middleware import CompressionMiddleware
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
@@ -161,6 +162,9 @@ REST_FRAMEWORK = {
     "ALLOWED_VERSIONS": ["9", "10"],
     # DRF Spectacular default schema
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_THROTTLE_RATES": {
+        "login": os.getenv("PAPERLESS_TOKEN_THROTTLE_RATE", "5/min"),
+    },
 }
 
 if DEBUG:
@@ -460,13 +464,13 @@ SECURE_PROXY_SSL_HEADER = (
     else None
 )
 
-# The secret key has a default that should be fine so long as you're hosting
-# Paperless on a closed network.  However, if you're putting this anywhere
-# public, you should change the key to something unique and verbose.
-SECRET_KEY = os.getenv(
-    "PAPERLESS_SECRET_KEY",
-    "e11fl1oa-*ytql8p)(06fbj4ukrlo+n7k&q5+$1md7i+mge=ee",
-)
+SECRET_KEY = os.getenv("PAPERLESS_SECRET_KEY", "")
+if not SECRET_KEY:  # pragma: no cover
+    raise ImproperlyConfigured(
+        "PAPERLESS_SECRET_KEY is not set. "
+        "A unique, secret key is required for secure operation. "
+        'Generate one with: python3 -c "import secrets; print(secrets.token_urlsafe(64))"',
+    )
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -497,6 +501,10 @@ SESSION_COOKIE_NAME = f"{COOKIE_PREFIX}sessionid"
 LANGUAGE_COOKIE_NAME = f"{COOKIE_PREFIX}django_language"
 
 EMAIL_CERTIFICATE_FILE = get_path_from_env("PAPERLESS_EMAIL_CERTIFICATE_LOCATION")
+EMAIL_ALLOW_INTERNAL_HOSTS = get_bool_from_env(
+    "PAPERLESS_EMAIL_ALLOW_INTERNAL_HOSTS",
+    "true",
+)
 
 
 ###############################################################################
@@ -667,9 +675,11 @@ CELERY_RESULT_BACKEND = "django-db"
 CELERY_CACHE_BACKEND = "default"
 
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#task-serializer
-CELERY_TASK_SERIALIZER = "pickle"
+# Uses HMAC-signed pickle to prevent RCE via malicious messages on an exposed Redis broker.
+# The signed-pickle serializer is registered in paperless/celery.py.
+CELERY_TASK_SERIALIZER = "signed-pickle"
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#std-setting-accept_content
-CELERY_ACCEPT_CONTENT = ["application/json", "application/x-python-serialize"]
+CELERY_ACCEPT_CONTENT = ["application/json", "application/x-signed-pickle"]
 
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#beat-schedule
 CELERY_BEAT_SCHEDULE = parse_beat_schedule()
