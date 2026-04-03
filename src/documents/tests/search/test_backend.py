@@ -509,6 +509,82 @@ class TestSearch:
             assert "content" in hit["highlights"]
 
 
+class TestSearchIds:
+    """Test lightweight ID-only search."""
+
+    def test_returns_matching_ids(self, backend: TantivyBackend):
+        """search_ids must return IDs of all matching documents."""
+        docs = []
+        for i in range(5):
+            doc = Document.objects.create(
+                title=f"findable doc {i}",
+                content="common keyword",
+                checksum=f"SI{i}",
+            )
+            backend.add_or_update(doc)
+            docs.append(doc)
+        other = Document.objects.create(
+            title="unrelated",
+            content="nothing here",
+            checksum="SI_other",
+        )
+        backend.add_or_update(other)
+
+        ids = backend.search_ids(
+            "common keyword",
+            user=None,
+            search_mode=SearchMode.QUERY,
+        )
+        assert set(ids) == {d.pk for d in docs}
+        assert other.pk not in ids
+
+    def test_respects_permission_filter(self, backend: TantivyBackend):
+        """search_ids must respect user permission filtering."""
+        owner = User.objects.create_user("ids_owner")
+        other = User.objects.create_user("ids_other")
+        doc = Document.objects.create(
+            title="private doc",
+            content="secret keyword",
+            checksum="SIP1",
+            owner=owner,
+        )
+        backend.add_or_update(doc)
+
+        assert backend.search_ids(
+            "secret",
+            user=owner,
+            search_mode=SearchMode.QUERY,
+        ) == [doc.pk]
+        assert (
+            backend.search_ids("secret", user=other, search_mode=SearchMode.QUERY) == []
+        )
+
+    def test_respects_fuzzy_threshold(self, backend: TantivyBackend, settings):
+        """search_ids must apply the same fuzzy threshold as search()."""
+        doc = Document.objects.create(
+            title="threshold test",
+            content="unique term",
+            checksum="SIT1",
+        )
+        backend.add_or_update(doc)
+
+        settings.ADVANCED_FUZZY_SEARCH_THRESHOLD = 1.1
+        ids = backend.search_ids("unique", user=None, search_mode=SearchMode.QUERY)
+        assert ids == []
+
+    def test_returns_ids_for_text_mode(self, backend: TantivyBackend):
+        """search_ids must work with TEXT search mode."""
+        doc = Document.objects.create(
+            title="text mode doc",
+            content="findable phrase",
+            checksum="SIM1",
+        )
+        backend.add_or_update(doc)
+
+        ids = backend.search_ids("findable", user=None, search_mode=SearchMode.TEXT)
+        assert ids == [doc.pk]
+
+
 class TestRebuild:
     """Test index rebuilding functionality."""
 
@@ -621,6 +697,27 @@ class TestMoreLikeThis:
         results = backend.more_like_this(doc_id=9999, user=None, page=1, page_size=10)
         assert results.hits == []
         assert results.total == 0
+
+    def test_more_like_this_ids_excludes_original(self, backend: TantivyBackend):
+        """more_like_this_ids must return IDs of similar documents, excluding the original."""
+        doc1 = Document.objects.create(
+            title="Important document",
+            content="financial information report",
+            checksum="MLTI1",
+            pk=150,
+        )
+        doc2 = Document.objects.create(
+            title="Another document",
+            content="financial information report",
+            checksum="MLTI2",
+            pk=151,
+        )
+        backend.add_or_update(doc1)
+        backend.add_or_update(doc2)
+
+        ids = backend.more_like_this_ids(doc_id=150, user=None)
+        assert 150 not in ids
+        assert 151 in ids
 
 
 class TestSingleton:

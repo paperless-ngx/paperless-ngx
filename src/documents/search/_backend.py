@@ -598,6 +598,68 @@ class TantivyBackend:
             query=query,
         )
 
+    def search_ids(
+        self,
+        query: str,
+        user: AbstractBaseUser | None,
+        *,
+        search_mode: SearchMode = SearchMode.QUERY,
+        limit: int = 10000,
+    ) -> list[int]:
+        """
+        Return document IDs matching a query — no highlights, no stored doc fetches.
+
+        This is the lightweight companion to search(). Use it when you need the
+        full set of matching IDs (e.g. for ``selection_data``) but don't need
+        scores, ranks, or highlights.
+
+        Args:
+            query: User's search query
+            user: User for permission filtering (None for superuser/no filtering)
+            search_mode: Query parsing mode (QUERY, TEXT, or TITLE)
+            limit: Maximum number of IDs to return
+
+        Returns:
+            List of document IDs in relevance order
+        """
+        self._ensure_open()
+        tz = get_current_timezone()
+        if search_mode is SearchMode.TEXT:
+            user_query = parse_simple_text_query(self._index, query)
+        elif search_mode is SearchMode.TITLE:
+            user_query = parse_simple_title_query(self._index, query)
+        else:
+            user_query = parse_user_query(self._index, query, tz)
+
+        if user is not None:
+            permission_filter = build_permission_filter(self._schema, user)
+            final_query = tantivy.Query.boolean_query(
+                [
+                    (tantivy.Occur.Must, user_query),
+                    (tantivy.Occur.Must, permission_filter),
+                ],
+            )
+        else:
+            final_query = user_query
+
+        searcher = self._index.searcher()
+        results = searcher.search(final_query, limit=limit)
+
+        all_hits = [(hit[1], hit[0]) for hit in results.hits]
+
+        # Normalize scores and apply threshold (same logic as search())
+        if all_hits:
+            max_score = max(hit[1] for hit in all_hits) or 1.0
+            all_hits = [(hit[0], hit[1] / max_score) for hit in all_hits]
+
+        threshold = settings.ADVANCED_FUZZY_SEARCH_THRESHOLD
+        if threshold is not None:
+            all_hits = [hit for hit in all_hits if hit[1] >= threshold]
+
+        return [
+            searcher.doc(doc_addr).to_dict()["id"][0] for doc_addr, _score in all_hits
+        ]
+
     def autocomplete(
         self,
         term: str,
@@ -760,6 +822,74 @@ class TantivyBackend:
             total=max(0, total - 1),  # Subtract 1 for the original document
             query=f"more_like:{doc_id}",
         )
+
+    def more_like_this_ids(
+        self,
+        doc_id: int,
+        user: AbstractBaseUser | None,
+        *,
+        limit: int = 10000,
+    ) -> list[int]:
+        """
+        Return IDs of documents similar to the given document — no highlights.
+
+        Lightweight companion to more_like_this(). The original document is
+        excluded from results.
+
+        Args:
+            doc_id: Primary key of the reference document
+            user: User for permission filtering (None for no filtering)
+            limit: Maximum number of IDs to return
+
+        Returns:
+            List of similar document IDs (excluding the original)
+        """
+        self._ensure_open()
+        searcher = self._index.searcher()
+
+        id_query = tantivy.Query.range_query(
+            self._schema,
+            "id",
+            tantivy.FieldType.Unsigned,
+            doc_id,
+            doc_id,
+        )
+        results = searcher.search(id_query, limit=1)
+
+        if not results.hits:
+            return []
+
+        doc_address = results.hits[0][1]
+        mlt_query = tantivy.Query.more_like_this_query(
+            doc_address,
+            min_doc_frequency=1,
+            max_doc_frequency=None,
+            min_term_frequency=1,
+            max_query_terms=12,
+            min_word_length=None,
+            max_word_length=None,
+            boost_factor=None,
+        )
+
+        if user is not None:
+            permission_filter = build_permission_filter(self._schema, user)
+            final_query = tantivy.Query.boolean_query(
+                [
+                    (tantivy.Occur.Must, mlt_query),
+                    (tantivy.Occur.Must, permission_filter),
+                ],
+            )
+        else:
+            final_query = mlt_query
+
+        results = searcher.search(final_query, limit=limit)
+
+        ids = []
+        for _score, doc_address in results.hits:
+            result_doc_id = searcher.doc(doc_address).to_dict()["id"][0]
+            if result_doc_id != doc_id:
+                ids.append(result_doc_id)
+        return ids
 
     def batch_update(self, lock_timeout: float = 30.0) -> WriteBatch:
         """
