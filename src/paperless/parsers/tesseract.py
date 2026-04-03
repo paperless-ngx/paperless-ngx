@@ -474,12 +474,28 @@ class RasterisedDocumentParser:
             text_original = None
             original_has_text = False
 
+        self.log.debug(
+            "Text detection: original_has_text=%s (text_length=%d, mode=%s, produce_archive=%s)",
+            original_has_text,
+            len(text_original) if text_original else 0,
+            self.settings.mode,
+            produce_archive,
+        )
+
         # --- OCR_MODE=off: never invoke OCR engine ---
         if self.settings.mode == ModeChoices.OFF:
             if not produce_archive:
+                self.log.debug(
+                    "OCR: skipped — OCR_MODE=off, no archive requested;"
+                    " returning pdftotext content only",
+                )
                 self.text = text_original or ""
                 return
             if self.is_image(mime_type):
+                self.log.debug(
+                    "OCR: skipped — OCR_MODE=off, image input;"
+                    " converting to PDF/A without OCR",
+                )
                 try:
                     self.archive_path = self._convert_image_to_pdfa(
                         document_path,
@@ -531,6 +547,14 @@ class RasterisedDocumentParser:
 
         # auto mode with existing text: PDF/A conversion only (no OCR).
         skip_text = self.settings.mode == ModeChoices.AUTO and original_has_text
+
+        if skip_text:
+            self.log.debug(
+                "OCR strategy: PDF/A conversion only (skip_text)"
+                " — OCR_MODE=auto, document already has text",
+            )
+        else:
+            self.log.debug("OCR strategy: full OCR — OCR_MODE=%s", self.settings.mode)
 
         args = self.construct_ocrmypdf_parameters(
             document_path,
