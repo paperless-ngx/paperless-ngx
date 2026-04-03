@@ -23,7 +23,8 @@
 
 # Security and hosting
 
-#PAPERLESS_SECRET_KEY=change-me
+# Required. Generate with: python3 -c "import secrets; print(secrets.token_urlsafe(64))"
+PAPERLESS_SECRET_KEY=change-me
 #PAPERLESS_URL=https://example.com
 #PAPERLESS_CSRF_TRUSTED_ORIGINS=https://example.com # can be set using PAPERLESS_URL
 #PAPERLESS_ALLOWED_HOSTS=example.com,www.example.com # can be set using PAPERLESS_URL
