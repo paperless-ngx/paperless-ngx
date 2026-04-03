@@ -139,14 +139,12 @@ class ConsumerPluginMixin:
             message,
             current_progress,
             max_progress,
-            extra_args={
-                "document_id": document_id,
-                "owner_id": self.metadata.owner_id if self.metadata.owner_id else None,
-                "users_can_view": (self.metadata.view_users or [])
-                + (self.metadata.change_users or []),
-                "groups_can_view": (self.metadata.view_groups or [])
-                + (self.metadata.change_groups or []),
-            },
+            document_id=document_id,
+            owner_id=self.metadata.owner_id if self.metadata.owner_id else None,
+            users_can_view=(self.metadata.view_users or [])
+            + (self.metadata.change_users or []),
+            groups_can_view=(self.metadata.view_groups or [])
+            + (self.metadata.change_groups or []),
         )
 
     def _fail(
