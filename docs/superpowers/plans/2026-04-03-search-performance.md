@@ -4,7 +4,9 @@
 
 **Goal:** Eliminate wasted work in the Tantivy search pipeline — stop generating highlights for 10,000 hits when only 25 are displayed, delegate sorting to Tantivy instead of duplicating it in the ORM, and provide a lightweight ID-only query path.
 
-**Architecture:** Split the monolithic `search()` method into two paths: a page-aware search that generates highlights only for the requested page, and a lightweight ID-only search for the `all` field and `selection_data`. Push DRF `ordering` through to Tantivy's native `order_by_field` instead of re-sorting in Python. Keep the ORM intersection as a correctness backstop for filters Tantivy can't express (custom fields, content icontains), but skip it when no ORM-only filters are active.
+**Architecture:** Modify `search()` so it still returns ALL matching hits (preserving DRF pagination compatibility) but only generates expensive highlights for a caller-specified page slice. The viewset passes the real DRF `page`/`page_size` as a `highlight_page` parameter so only ~25 hits pay the snippet cost instead of ~10,000. Push DRF `ordering` through to Tantivy's native `order_by_field` instead of re-sorting in Python. Add a lightweight `search_ids()` for cases where only IDs are needed. Keep the ORM intersection as a correctness backstop for filters Tantivy can't express (custom fields, content icontains).
+
+**Key design constraint:** DRF's `PageNumberPagination` trusts `len(object_list)` for page count and slices `object_list[start:end]` for each page. We must NOT pass pre-sliced data with a mismatched length — that causes pages 2+ to return empty. Instead, `TantivyRelevanceList` always contains ALL hits; DRF slices it as usual.
 
 **Tech Stack:** Python, Django REST Framework, tantivy-py, pytest
 
@@ -16,10 +18,11 @@
 | ---------------------------------------------- | ----------------------------------------------------------------- | ------- |
 | `src/documents/profiling.py`                   | `profile_block()` context manager — wall time, memory, DB queries | 0, 6    |
 | `src/documents/search/_backend.py`             | Search backend — `search()`, `search_ids()`, `more_like_this()`   | 1, 2, 3 |
-| `src/documents/search/__init__.py`             | Public re-exports                                                 | 2       |
-| `src/documents/views.py`                       | `UnifiedSearchViewSet.list()` — orchestrates search + pagination  | 4, 5    |
+| `src/documents/search/__init__.py`             | Public re-exports                                                 | —       |
+| `src/documents/views.py`                       | `UnifiedSearchViewSet.list()` — orchestrates search + pagination  | 4       |
+| `src/paperless/views.py`                       | `StandardPagination` — DRF pagination                             | —       |
 | `src/documents/tests/search/test_backend.py`   | Backend unit tests                                                | 1, 2, 3 |
-| `src/documents/tests/test_api_search.py`       | API integration tests                                             | 4, 5    |
+| `src/documents/tests/test_api_search.py`       | API integration tests                                             | 4       |
 | `src/documents/tests/test_search_profiling.py` | Profiling tests (temporary) — before/after baselines              | 0, 6    |
 
 ---
@@ -130,7 +133,7 @@ class TestSearchProfilingBaseline(DirectoriesMixin):
     def test_profile_backend_search_only(self):
         """Profile: raw backend.search() call to isolate Tantivy cost from DRF."""
         backend = get_backend()
-        with profile_block("BEFORE — backend.search(page=1, page_size=10000)"):
+        with profile_block("BEFORE — backend.search(page_size=10000, all highlights)"):
             results = backend.search(
                 "profiling",
                 user=None,
@@ -144,7 +147,7 @@ class TestSearchProfilingBaseline(DirectoriesMixin):
     def test_profile_backend_search_single_page(self):
         """Profile: raw backend.search() with real page size to compare."""
         backend = get_backend()
-        with profile_block("BEFORE — backend.search(page=1, page_size=25)"):
+        with profile_block("BEFORE — backend.search(page_size=25)"):
             results = backend.search(
                 "profiling",
                 user=None,
@@ -179,117 +182,245 @@ git commit -m "test: add baseline profiling tests for search performance"
 
 ---
 
-### Task 1: Page-only highlights in `search()`
+### Task 1: Add `highlight_page` parameter to `search()` — generate highlights only for one page
 
-Stop generating highlights and fetching stored docs for hits outside the requested page. Currently `search()` is called with `page=1, page_size=10000`, which generates highlights for all 10k hits. After this task, `search()` still accepts `page` and `page_size` but the viewset will pass the _real_ page/page_size, and highlights are only generated for that slice.
+The core performance fix. `search()` still returns ALL matching hits (IDs + scores + ranks), but only generates expensive snippet highlights for a single page slice. Hits outside that page get `highlights={}`.
+
+This preserves DRF compatibility: `TantivyRelevanceList` still has all hits, DRF slices as usual, but only the page being displayed pays the snippet cost.
 
 **Files:**
 
 - Modify: `src/documents/search/_backend.py:428-591` (the `search()` method)
-- Modify: `src/documents/search/_backend.py:648-754` (the `more_like_this()` method)
 - Test: `src/documents/tests/search/test_backend.py`
 
-- [ ] **Step 1: Write failing test — search returns highlights only for requested page**
+- [ ] **Step 1: Write tests for the new highlight_page behavior**
 
 Add to `TestSearch` in `src/documents/tests/search/test_backend.py`:
 
 ```python
-def test_pagination_returns_correct_page_slice(self, backend: TantivyBackend):
-    """Requesting page 2 with page_size=2 must return exactly the 3rd and 4th hits."""
-    for i in range(5):
-        doc = Document.objects.create(
-            title=f"sortable doc {i}",
-            content="searchable content",
-            checksum=f"PG{i}",
-            archive_serial_number=i + 1,
-        )
-        backend.add_or_update(doc)
-
-    r = backend.search(
-        "searchable",
-        user=None,
-        page=2,
-        page_size=2,
-        sort_field="archive_serial_number",
-        sort_reverse=False,
-    )
-    assert r.total == 5
-    assert len(r.hits) == 2
-    asns = [
-        Document.objects.get(pk=h["id"]).archive_serial_number for h in r.hits
-    ]
-    assert asns == [3, 4]
-```
-
-- [ ] **Step 2: Run the test to confirm it passes (this validates existing behavior)**
-
-```bash
-cd /home/trenton/Documents/projects/paperless-ngx
-uv run pytest src/documents/tests/search/test_backend.py::TestSearch::test_pagination_returns_correct_page_slice -v
-```
-
-Expected: PASS (existing `search()` already supports page/page_size correctly at the Tantivy level — this test just validates it before we change the calling code).
-
-- [ ] **Step 3: Write failing test — highlights not generated for off-page hits**
-
-This test verifies that when you ask for page 2, the backend doesn't waste time generating highlights for page 1 hits. We verify this indirectly: only the returned page's hits should have highlights populated.
-
-```python
-def test_only_requested_page_has_highlights(self, backend: TantivyBackend):
-    """Hits on the requested page must have highlights; total must reflect all matches."""
+def test_highlight_page_only_highlights_requested_slice(self, backend: TantivyBackend):
+    """Only hits in the highlight_page slice should have non-empty highlights."""
     for i in range(6):
         doc = Document.objects.create(
-            title=f"searchable document {i}",
-            content=f"searchable content number {i}",
-            checksum=f"HL{i}",
+            title=f"highlight doc {i}",
+            content=f"searchable highlight content number {i}",
+            checksum=f"HP{i}",
             archive_serial_number=i + 1,
         )
         backend.add_or_update(doc)
 
-    # Request page 1 of 3
     r = backend.search(
         "searchable",
         user=None,
         page=1,
-        page_size=3,
+        page_size=10000,
+        sort_field="archive_serial_number",
+        sort_reverse=False,
+        highlight_page=1,
+        highlight_page_size=3,
+    )
+    assert r.total == 6
+    assert len(r.hits) == 6
+    # First 3 hits (the highlight page) should have highlights
+    for hit in r.hits[:3]:
+        assert hit["highlights"], f"Hit {hit['id']} should have highlights"
+    # Last 3 hits should NOT have highlights
+    for hit in r.hits[3:]:
+        assert hit["highlights"] == {}, f"Hit {hit['id']} should not have highlights"
+
+def test_highlight_page_2_highlights_correct_slice(self, backend: TantivyBackend):
+    """highlight_page=2 should highlight only the second page of results."""
+    for i in range(6):
+        doc = Document.objects.create(
+            title=f"page2 doc {i}",
+            content=f"searchable page2 content number {i}",
+            checksum=f"HP2{i}",
+            archive_serial_number=i + 1,
+        )
+        backend.add_or_update(doc)
+
+    r = backend.search(
+        "searchable",
+        user=None,
+        page=1,
+        page_size=10000,
+        sort_field="archive_serial_number",
+        sort_reverse=False,
+        highlight_page=2,
+        highlight_page_size=2,
+    )
+    assert r.total == 6
+    assert len(r.hits) == 6
+    # Hits 0-1: no highlights (page 1)
+    assert r.hits[0]["highlights"] == {}
+    assert r.hits[1]["highlights"] == {}
+    # Hits 2-3: highlighted (page 2)
+    assert r.hits[2]["highlights"] != {}
+    assert r.hits[3]["highlights"] != {}
+    # Hits 4-5: no highlights (page 3)
+    assert r.hits[4]["highlights"] == {}
+    assert r.hits[5]["highlights"] == {}
+
+def test_no_highlight_page_highlights_all(self, backend: TantivyBackend):
+    """When highlight_page is not specified, all hits get highlights (backward compat)."""
+    for i in range(3):
+        doc = Document.objects.create(
+            title=f"compat doc {i}",
+            content=f"searchable compat content {i}",
+            checksum=f"HC{i}",
+        )
+        backend.add_or_update(doc)
+
+    r = backend.search(
+        "searchable",
+        user=None,
+        page=1,
+        page_size=10000,
         sort_field=None,
         sort_reverse=False,
     )
-    assert r.total == 6
     assert len(r.hits) == 3
-    # All returned hits should have content highlights
     for hit in r.hits:
-        assert "content" in hit["highlights"], f"Hit {hit['id']} missing highlight"
+        assert "content" in hit["highlights"]
 ```
 
-- [ ] **Step 4: Run test to confirm it passes**
+- [ ] **Step 2: Run tests to confirm they fail**
 
 ```bash
-uv run pytest src/documents/tests/search/test_backend.py::TestSearch::test_only_requested_page_has_highlights -v
+cd /home/trenton/Documents/projects/paperless-ngx
+uv run pytest src/documents/tests/search/test_backend.py::TestSearch::test_highlight_page_only_highlights_requested_slice src/documents/tests/search/test_backend.py::TestSearch::test_highlight_page_2_highlights_correct_slice src/documents/tests/search/test_backend.py::TestSearch::test_no_highlight_page_highlights_all -v
 ```
 
-Expected: PASS (validates highlights work correctly for the requested page).
+Expected: FAIL — `search()` doesn't accept `highlight_page` or `highlight_page_size` yet.
+
+- [ ] **Step 3: Implement highlight_page in `search()`**
+
+Modify `search()` in `src/documents/search/_backend.py`. Add `highlight_page` and `highlight_page_size` parameters. The key change is in the hit-building loop: only generate snippets for hits whose index falls within the highlight page.
+
+Change the signature from:
+
+```python
+def search(
+    self,
+    query: str,
+    user: AbstractBaseUser | None,
+    page: int,
+    page_size: int,
+    sort_field: str | None,
+    *,
+    sort_reverse: bool,
+    search_mode: SearchMode = SearchMode.QUERY,
+) -> SearchResults:
+```
+
+To:
+
+```python
+def search(
+    self,
+    query: str,
+    user: AbstractBaseUser | None,
+    page: int,
+    page_size: int,
+    sort_field: str | None,
+    *,
+    sort_reverse: bool,
+    search_mode: SearchMode = SearchMode.QUERY,
+    highlight_page: int | None = None,
+    highlight_page_size: int | None = None,
+) -> SearchResults:
+```
+
+Then replace the hit-building loop (lines 532-585) with:
+
+```python
+        # Build result hits — only generate highlights for the highlight page
+        hits: list[SearchHit] = []
+        snippet_generator = None
+
+        # Determine which hits need highlights
+        if highlight_page is not None and highlight_page_size is not None:
+            hl_start = (highlight_page - 1) * highlight_page_size
+            hl_end = hl_start + highlight_page_size
+        else:
+            # Highlight all hits (backward-compatible default)
+            hl_start = 0
+            hl_end = len(page_hits)
+
+        for rank, (doc_address, score) in enumerate(page_hits, start=offset + 1):
+            actual_doc = searcher.doc(doc_address)
+            doc_dict = actual_doc.to_dict()
+            doc_id = doc_dict["id"][0]
+
+            highlights: dict[str, str] = {}
+
+            # Only generate highlights for hits in the highlight window
+            hit_index = rank - offset - 1  # 0-based index within page_hits
+            if score > 0 and hl_start <= hit_index < hl_end:
+                try:
+                    if snippet_generator is None:
+                        snippet_generator = tantivy.SnippetGenerator.create(
+                            searcher,
+                            final_query,
+                            self._schema,
+                            "content",
+                        )
+
+                    content_snippet = snippet_generator.snippet_from_doc(actual_doc)
+                    if content_snippet:
+                        highlights["content"] = str(content_snippet)
+
+                    if "notes" in doc_dict:
+                        notes_generator = tantivy.SnippetGenerator.create(
+                            searcher,
+                            final_query,
+                            self._schema,
+                            "notes",
+                        )
+                        notes_snippet = notes_generator.snippet_from_doc(actual_doc)
+                        if notes_snippet:
+                            highlights["notes"] = str(notes_snippet)
+
+                except Exception:  # pragma: no cover
+                    logger.debug("Failed to generate highlights for doc %s", doc_id)
+
+            hits.append(
+                SearchHit(
+                    id=doc_id,
+                    score=score,
+                    rank=rank,
+                    highlights=highlights,
+                ),
+            )
+```
+
+- [ ] **Step 4: Run tests to confirm they pass**
+
+```bash
+uv run pytest src/documents/tests/search/test_backend.py::TestSearch -v
+```
+
+Expected: ALL tests PASS — both new and existing. The existing tests don't pass `highlight_page`, so they use the backward-compatible default (highlight all).
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/documents/tests/search/test_backend.py
-git commit -m "test: add backend pagination and highlight tests"
+git add src/documents/search/_backend.py src/documents/tests/search/test_backend.py
+git commit -m "feat: add highlight_page parameter to search() for page-only highlights"
 ```
 
 ---
 
 ### Task 2: Add `search_ids()` lightweight method
 
-Add a method that returns only document IDs matching a query — no `searcher.doc()` calls, no snippet generation. This will serve the `all` field in the paginated response and the `selection_data` feature.
+Add a method that returns only document IDs matching a query — no `searcher.doc()` calls, no snippet generation. This is even lighter than `search()` with `highlight_page` because it skips building `SearchHit` objects entirely. Used by the viewset for `selection_data` when the full hit list isn't needed.
 
 **Files:**
 
 - Modify: `src/documents/search/_backend.py` (add `search_ids()` method after `search()`)
-- Modify: `src/documents/search/__init__.py` (no change needed — `TantivyBackend` is already exported)
 - Test: `src/documents/tests/search/test_backend.py`
 
-- [ ] **Step 1: Write failing test for search_ids**
+- [ ] **Step 1: Write failing tests for search_ids**
 
 Add a new test class in `src/documents/tests/search/test_backend.py`:
 
@@ -308,7 +439,6 @@ class TestSearchIds:
             )
             backend.add_or_update(doc)
             docs.append(doc)
-        # Add a non-matching doc
         other = Document.objects.create(
             title="unrelated",
             content="nothing here",
@@ -390,8 +520,8 @@ def search_ids(
     Return document IDs matching a query — no highlights, no stored doc fetches.
 
     This is the lightweight companion to search(). Use it when you need the
-    full set of matching IDs (e.g. for the ``all`` response field or
-    ``selection_data``) but don't need scores, ranks, or highlights.
+    full set of matching IDs (e.g. for ``selection_data``) but don't need
+    scores, ranks, or highlights.
 
     Args:
         query: User's search query
@@ -436,11 +566,8 @@ def search_ids(
     if threshold is not None:
         all_hits = [hit for hit in all_hits if hit[1] >= threshold]
 
-    # Extract IDs without fetching full stored docs — just the id field
     return [searcher.doc(doc_addr).to_dict()["id"][0] for doc_addr, _score in all_hits]
 ```
-
-Note: We still call `searcher.doc()` to get the ID, but we skip all highlight generation. A future optimization could use Tantivy's fast field access for the `id` field, but the snippet generation is the expensive part we're eliminating.
 
 - [ ] **Step 4: Run tests to confirm they pass**
 
@@ -602,18 +729,22 @@ git commit -m "feat: add more_like_this_ids() lightweight ID-only method"
 
 ---
 
-### Task 4: Delegate sorting to Tantivy and use real pagination in the viewset
+### Task 4: Refactor `UnifiedSearchViewSet.list()` — delegate sorting + page-only highlights
 
-This is the core viewset refactor. Instead of `page=1, page_size=10000, sort_field=None`, pass the real DRF page/page_size and the `ordering` param through to Tantivy's `sort_field`.
+The core viewset refactor. Three changes:
 
-The key design decision: when the user sorts by a field that Tantivy can handle (any field in `sort_field_map`), Tantivy does the sorting and pagination. When the user sorts by a field Tantivy can't handle (custom fields), fall back to ORM ordering with the overfetch pattern.
+1. **Pass `highlight_page`/`highlight_page_size`** so only the DRF page gets highlights
+2. **Pass `sort_field`** through to Tantivy when the field is Tantivy-sortable, eliminating the ORM re-sort query
+3. **Fall back to ORM sort** only for custom fields (not in Tantivy's `sort_field_map`)
+
+Critical DRF compatibility note: `TantivyRelevanceList` continues to hold ALL hits. DRF's `PageNumberPagination` slices it as before. The only difference is that hits outside the displayed page have `highlights={}`.
 
 **Files:**
 
 - Modify: `src/documents/views.py:2057-2183` (`UnifiedSearchViewSet.list()`)
 - Test: `src/documents/tests/test_api_search.py`
 
-- [ ] **Step 1: Write failing test — Tantivy-native sort ordering**
+- [ ] **Step 1: Write regression tests before refactoring**
 
 Add to `TestDocumentSearchApi` in `src/documents/tests/test_api_search.py`:
 
@@ -634,35 +765,18 @@ def test_search_with_tantivy_native_sort(self) -> None:
         "/api/documents/?query=searchable&ordering=archive_serial_number",
     )
     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    asns = [
-        doc["archive_serial_number"] for doc in response.data["results"]
-    ]
+    asns = [doc["archive_serial_number"] for doc in response.data["results"]]
     self.assertEqual(asns, [10, 20, 30])
 
     response = self.client.get(
         "/api/documents/?query=searchable&ordering=-archive_serial_number",
     )
     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    asns = [
-        doc["archive_serial_number"] for doc in response.data["results"]
-    ]
+    asns = [doc["archive_serial_number"] for doc in response.data["results"]]
     self.assertEqual(asns, [30, 20, 10])
-```
 
-- [ ] **Step 2: Run test to see if it passes with current code**
-
-```bash
-cd /home/trenton/Documents/projects/paperless-ngx
-uv run pytest src/documents/tests/test_api_search.py::TestDocumentSearchApi::test_search_with_tantivy_native_sort -v
-```
-
-This may already pass (ORM ordering produces the same result). We need it as a regression guard.
-
-- [ ] **Step 3: Write failing test — search pagination returns correct page**
-
-```python
 def test_search_page_2_returns_correct_slice(self) -> None:
-    """Page 2 must return the second slice of results, not the first."""
+    """Page 2 must return the second slice, not overlap with page 1."""
     backend = get_backend()
     for i in range(10):
         doc = Document.objects.create(
@@ -691,24 +805,41 @@ def test_search_page_2_returns_correct_slice(self) -> None:
     page1_asns = [Document.objects.get(pk=pk).archive_serial_number for pk in page1_ids]
     page2_asns = [Document.objects.get(pk=pk).archive_serial_number for pk in page2_ids]
     self.assertTrue(max(page1_asns) < min(page2_asns))
+
+def test_search_all_field_contains_all_ids_when_paginated(self) -> None:
+    """The 'all' field must contain every matching ID, even when paginated."""
+    backend = get_backend()
+    doc_ids = []
+    for i in range(10):
+        doc = Document.objects.create(
+            title=f"all field doc {i}",
+            content="allfield content",
+            checksum=f"AF{i}",
+        )
+        backend.add_or_update(doc)
+        doc_ids.append(doc.pk)
+
+    response = self.client.get(
+        "/api/documents/?query=allfield&page=1&page_size=3",
+        headers={"Accept": "application/json; version=9"},
+    )
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+    self.assertEqual(len(response.data["results"]), 3)
+    # "all" must contain ALL 10 matching IDs
+    self.assertCountEqual(response.data["all"], doc_ids)
 ```
 
-- [ ] **Step 4: Run test**
+- [ ] **Step 2: Run regression tests against current code to confirm they pass**
 
 ```bash
-uv run pytest src/documents/tests/test_api_search.py::TestDocumentSearchApi::test_search_page_2_returns_correct_slice -v
+uv run pytest src/documents/tests/test_api_search.py::TestDocumentSearchApi::test_search_with_tantivy_native_sort src/documents/tests/test_api_search.py::TestDocumentSearchApi::test_search_page_2_returns_correct_slice src/documents/tests/test_api_search.py::TestDocumentSearchApi::test_search_all_field_contains_all_ids_when_paginated -v
 ```
 
-Expected: PASS (validates current behavior before refactor).
+Expected: PASS (validates current behavior before refactoring).
 
-- [ ] **Step 5: Refactor `UnifiedSearchViewSet.list()`**
+- [ ] **Step 3: Refactor `UnifiedSearchViewSet.list()`**
 
-Replace the search section of `list()` in `src/documents/views.py` (lines 2057-2183). The new logic:
-
-1. Parse ordering param to determine if Tantivy can sort natively
-2. If Tantivy-sortable (or no ordering = relevance): call `search()` with real page/page_size/sort_field
-3. Use `search_ids()` only when needed (for `all` field on API <v10, or `include_selection_data`)
-4. If NOT Tantivy-sortable (custom fields): fall back to overfetch + ORM re-sort
+Replace the search section of `list()` in `src/documents/views.py` (lines 2057-2183):
 
 ```python
 def list(self, request, *args, **kwargs):
@@ -740,7 +871,7 @@ def list(self, request, *args, **kwargs):
         sort_reverse = ordering_param.startswith("-")
         sort_field_name = ordering_param.lstrip("-") if ordering_param else None
 
-        # Fields Tantivy can sort natively
+        # Fields Tantivy can sort natively (must match sort_field_map in _backend.py)
         tantivy_sortable = {
             "title", "correspondent__name", "document_type__name",
             "created", "added", "modified",
@@ -748,7 +879,7 @@ def list(self, request, *args, **kwargs):
         }
         use_tantivy_sort = sort_field_name in tantivy_sortable or sort_field_name is None
 
-        # Parse DRF pagination params
+        # Compute the DRF page so we can tell Tantivy which slice to highlight
         try:
             requested_page = int(request.query_params.get("page", 1))
         except (TypeError, ValueError):
@@ -760,9 +891,11 @@ def list(self, request, *args, **kwargs):
         except (TypeError, ValueError):
             requested_page_size = self.paginator.page_size
 
-        is_more_like = "more_like_id" in request.query_params
-
-        if not is_more_like:
+        if (
+            "text" in request.query_params
+            or "title_search" in request.query_params
+            or "query" in request.query_params
+        ):
             if "text" in request.query_params:
                 search_mode = SearchMode.TEXT
                 query_str = request.query_params["text"]
@@ -774,22 +907,24 @@ def list(self, request, *args, **kwargs):
                 query_str = request.query_params["query"]
 
             if use_tantivy_sort:
-                # Fast path: Tantivy handles search + sort + paginate
+                # Fast path: Tantivy sorts, highlights only for DRF page
                 results = backend.search(
                     query_str,
                     user=user,
-                    page=requested_page,
-                    page_size=requested_page_size,
+                    page=1,
+                    page_size=10000,
                     sort_field=sort_field_name,
                     sort_reverse=sort_reverse,
                     search_mode=search_mode,
+                    highlight_page=requested_page,
+                    highlight_page_size=requested_page_size,
                 )
 
-                # Intersect with ORM-visible IDs (handles field filters)
+                # Intersect with ORM-visible IDs (field filters)
                 orm_ids = set(filtered_qs.values_list("pk", flat=True))
                 ordered_hits = [h for h in results.hits if h["id"] in orm_ids]
             else:
-                # Slow path: Tantivy searches, ORM sorts (custom field ordering)
+                # Slow path: custom field ordering — ORM must sort
                 results = backend.search(
                     query_str,
                     user=user,
@@ -798,6 +933,8 @@ def list(self, request, *args, **kwargs):
                     sort_field=None,
                     sort_reverse=False,
                     search_mode=search_mode,
+                    highlight_page=requested_page,
+                    highlight_page_size=requested_page_size,
                 )
                 hits_by_id = {h["id"]: h for h in results.hits}
                 hit_ids = set(hits_by_id.keys())
@@ -873,217 +1010,46 @@ def list(self, request, *args, **kwargs):
 
 Key changes from current code:
 
-- `sort_field` is derived from the `ordering` query param and passed through
-- `sort_reverse` is derived from the `-` prefix
-- When Tantivy can sort: uses real `page`/`page_size` from the request
-- When Tantivy can't sort (custom fields): falls back to `page=1, page_size=10000` overfetch + ORM re-sort
-- `more_like_this` path unchanged for now (always overfetch — MLT results are typically small)
+- **`sort_field`** is derived from the `ordering` query param and passed to Tantivy (fast path)
+- **`sort_reverse`** is derived from the `-` prefix
+- **`highlight_page`/`highlight_page_size`** tell Tantivy which slice to highlight
+- **Slow path** (custom field ordering): still uses `sort_field=None` + ORM re-sort, but still benefits from `highlight_page`
+- **DRF compatibility**: `TantivyRelevanceList` always contains ALL hits. `__len__()` returns the correct total. DRF slices as usual.
+- **`all` field**: unchanged — `get_all_result_ids()` still extracts IDs from the full hit list
+- **`selection_data`**: unchanged — still uses `ordered_hits` for all IDs
 
-- [ ] **Step 6: Run the new tests**
+- [ ] **Step 4: Run the new tests**
 
 ```bash
-uv run pytest src/documents/tests/test_api_search.py::TestDocumentSearchApi::test_search_with_tantivy_native_sort src/documents/tests/test_api_search.py::TestDocumentSearchApi::test_search_page_2_returns_correct_slice -v
+uv run pytest src/documents/tests/test_api_search.py::TestDocumentSearchApi::test_search_with_tantivy_native_sort src/documents/tests/test_api_search.py::TestDocumentSearchApi::test_search_page_2_returns_correct_slice src/documents/tests/test_api_search.py::TestDocumentSearchApi::test_search_all_field_contains_all_ids_when_paginated -v
 ```
 
 Expected: PASS
 
-- [ ] **Step 7: Run ALL existing search API tests to check for regressions**
-
-```bash
-uv run pytest src/documents/tests/test_api_search.py -v
-```
-
-Expected: All tests PASS. Watch especially for:
-
-- `test_search_multi_page` — pagination correctness
-- `test_search_custom_field_ordering` — custom field sort fallback
-- `test_search_returns_all_for_api_version_9` — `all` field still works
-- `test_search_with_include_selection_data` — selection data still works
-
-- [ ] **Step 8: Commit**
-
-```bash
-git add src/documents/views.py src/documents/tests/test_api_search.py
-git commit -m "feat: delegate sorting to Tantivy and use real pagination in viewset"
-```
-
----
-
-### Task 5: Wire `search_ids()` into the viewset for `all` field and `selection_data`
-
-Currently both the `all` field (API <v10) and `selection_data` get their IDs from the full `TantivyRelevanceList` which contains all 10k hits with highlights. After Task 4, the fast path only fetches one page of hits. We need `search_ids()` to supply the full ID list when needed.
-
-**Files:**
-
-- Modify: `src/documents/views.py:2057-2183` (the `list()` method refactored in Task 4)
-- Test: `src/documents/tests/test_api_search.py`
-
-- [ ] **Step 1: Write failing test — `all` field contains all matching IDs, not just current page**
-
-```python
-def test_search_all_field_contains_all_ids_not_just_page(self) -> None:
-    """The 'all' field must contain every matching ID, even when paginated."""
-    backend = get_backend()
-    doc_ids = []
-    for i in range(10):
-        doc = Document.objects.create(
-            title=f"all field doc {i}",
-            content="allfield content",
-            checksum=f"AF{i}",
-        )
-        backend.add_or_update(doc)
-        doc_ids.append(doc.pk)
-
-    response = self.client.get(
-        "/api/documents/?query=allfield&page=1&page_size=3",
-        headers={"Accept": "application/json; version=9"},
-    )
-    self.assertEqual(response.status_code, status.HTTP_200_OK)
-    self.assertEqual(len(response.data["results"]), 3)
-    # "all" must contain ALL 10 matching IDs
-    self.assertCountEqual(response.data["all"], doc_ids)
-```
-
-- [ ] **Step 2: Run test to see current behavior**
-
-```bash
-uv run pytest src/documents/tests/test_api_search.py::TestDocumentSearchApi::test_search_all_field_contains_all_ids_not_just_page -v
-```
-
-After Task 4's refactor (fast path fetches only 1 page), this will FAIL because `TantivyRelevanceList` only has the current page's hits. The `all` field would only contain 3 IDs instead of 10.
-
-- [ ] **Step 3: Update `list()` to use `search_ids()` for `all` and `selection_data`**
-
-In the `list()` method (already refactored in Task 4), modify the fast path to fetch all IDs when needed. Add this logic after the search call in the Tantivy-sortable fast path:
-
-```python
-if use_tantivy_sort:
-    # Fast path: Tantivy handles search + sort + paginate
-    results = backend.search(
-        query_str,
-        user=user,
-        page=requested_page,
-        page_size=requested_page_size,
-        sort_field=sort_field_name,
-        sort_reverse=sort_reverse,
-        search_mode=search_mode,
-    )
-
-    # Intersect with ORM-visible IDs (handles field filters)
-    orm_ids = set(filtered_qs.values_list("pk", flat=True))
-    ordered_hits = [h for h in results.hits if h["id"] in orm_ids]
-
-    # Fetch all matching IDs if needed for 'all' field or selection_data
-    api_version = int(request.version or settings.REST_FRAMEWORK["DEFAULT_VERSION"])
-    need_all_ids = (
-        api_version < 10  # legacy 'all' field
-        or get_boolean(
-            str(request.query_params.get("include_selection_data", "false")),
-        )
-    )
-    if need_all_ids:
-        all_matching_ids = backend.search_ids(
-            query_str,
-            user=user,
-            search_mode=search_mode,
-        )
-        all_matching_ids = [
-            doc_id for doc_id in all_matching_ids if doc_id in orm_ids
-        ]
-    else:
-        all_matching_ids = None
-```
-
-Then update `TantivyRelevanceList` to accept an optional `all_ids` override, and update `StandardPagination.get_all_result_ids()` to use it.
-
-Modify `TantivyRelevanceList` in `src/documents/search/_backend.py`:
-
-```python
-class TantivyRelevanceList:
-    """
-    DRF-compatible list wrapper for Tantivy search hits.
-
-    Provides paginated access to search results while optionally storing all
-    matching IDs for efficient retrieval by the paginator.
-    """
-
-    def __init__(
-        self,
-        hits: list[SearchHit],
-        all_ids: list[int] | None = None,
-        total: int | None = None,
-    ) -> None:
-        self._hits = hits
-        self._all_ids = all_ids
-        self._total = total
-
-    def __len__(self) -> int:
-        if self._total is not None:
-            return self._total
-        return len(self._hits)
-
-    def __getitem__(self, key: slice) -> list[SearchHit]:
-        return self._hits[key]
-
-    def get_all_ids(self) -> list[int]:
-        """Return all matching document IDs."""
-        if self._all_ids is not None:
-            return self._all_ids
-        return [h["id"] for h in self._hits]
-```
-
-Update `StandardPagination.get_all_result_ids()` in `src/paperless/views.py`:
-
-```python
-def get_all_result_ids(self):
-    from documents.search import TantivyRelevanceList
-
-    query = self.page.paginator.object_list
-    if isinstance(query, TantivyRelevanceList):
-        return query.get_all_ids()
-    return self.page.paginator.object_list.values_list("pk", flat=True)
-```
-
-Update the viewset to construct `TantivyRelevanceList` with `all_ids` and `total`:
-
-For the **fast path** (Tantivy-sortable):
-
-```python
-rl = TantivyRelevanceList(
-    ordered_hits,
-    all_ids=all_matching_ids,
-    total=len(all_matching_ids) if all_matching_ids is not None else results.total,
-)
-```
-
-For the **slow path** (custom field sort) and **more_like_this**, no change needed — `ordered_hits` already contains all hits.
-
-- [ ] **Step 4: Run the new test**
-
-```bash
-uv run pytest src/documents/tests/test_api_search.py::TestDocumentSearchApi::test_search_all_field_contains_all_ids_not_just_page -v
-```
-
-Expected: PASS
-
-- [ ] **Step 5: Run ALL search tests**
+- [ ] **Step 5: Run ALL existing search tests to check for regressions**
 
 ```bash
 uv run pytest src/documents/tests/test_api_search.py src/documents/tests/search/test_backend.py -v
 ```
 
-Expected: All tests PASS.
+Expected: All tests PASS. Watch especially for:
+
+- `test_search_multi_page` — pagination correctness across 6 pages
+- `test_search_custom_field_ordering` — custom field sort still uses ORM fallback
+- `test_search_returns_all_for_api_version_9` — `all` field still works
+- `test_search_with_include_selection_data` — selection data still works
+- `test_search_invalid_page` — 404 on out-of-bounds pages
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add src/documents/search/_backend.py src/documents/views.py src/paperless/views.py src/documents/tests/test_api_search.py
-git commit -m "feat: use search_ids() for all-IDs queries, avoid highlight generation"
+git add src/documents/views.py src/documents/tests/test_api_search.py
+git commit -m "feat: delegate sorting to Tantivy and use page-only highlights in viewset"
 ```
 
 ---
 
-### Task 6: Post-implementation profiling and comparison
+### Task 5: Post-implementation profiling and comparison
 
 Run the same profiling tests from Task 0 against the new implementation and compare results.
 
@@ -1129,33 +1095,31 @@ uv run pytest src/documents/tests/test_search_profiling.py -v -s 2>&1 | tee docs
 
 - [ ] **Step 3: Compare results**
 
-Open both files side by side and compare:
-
 ```bash
 diff docs/superpowers/plans/profiling-baseline.txt docs/superpowers/plans/profiling-after.txt
 ```
 
 Expected improvements:
 
-- **Relevance search**: Fewer snippet generations (25 vs 200), lower memory delta, similar query count
+- **Relevance search**: Fewer snippet generations (25 vs 200), lower memory delta
 - **Sorted search**: Fewer DB queries (Tantivy sorts instead of ORM), lower wall time
-- **Paginated search**: Significantly less work — only page 2's 25 results get highlights
-- **Backend search (10k vs 25)**: Direct comparison of the old overfetch vs new page-only approach
+- **Paginated search**: Only page 2's 25 results get highlights instead of all 200
+- **Backend search**: Direct comparison of highlight-all vs highlight-page
 
 - [ ] **Step 4: Record comparison in the plan**
 
-Update this section with the actual numbers once profiling is complete. Fill in the table:
+Update this section with the actual numbers once profiling is complete:
 
-| Scenario         | Metric       | Before | After | Improvement |
-| ---------------- | ------------ | ------ | ----- | ----------- |
-| Relevance search | Wall time    | _TBD_  | _TBD_ | _TBD_       |
-| Relevance search | Queries      | _TBD_  | _TBD_ | _TBD_       |
-| Relevance search | Memory delta | _TBD_  | _TBD_ | _TBD_       |
-| Sorted search    | Wall time    | _TBD_  | _TBD_ | _TBD_       |
-| Sorted search    | Queries      | _TBD_  | _TBD_ | _TBD_       |
-| Paginated search | Wall time    | _TBD_  | _TBD_ | _TBD_       |
-| Backend 10k→25   | Wall time    | _TBD_  | _TBD_ | _TBD_       |
-| Backend 10k→25   | Memory delta | _TBD_  | _TBD_ | _TBD_       |
+| Scenario                  | Metric       | Before | After | Improvement |
+| ------------------------- | ------------ | ------ | ----- | ----------- |
+| Relevance search          | Wall time    | _TBD_  | _TBD_ | _TBD_       |
+| Relevance search          | Queries      | _TBD_  | _TBD_ | _TBD_       |
+| Relevance search          | Memory delta | _TBD_  | _TBD_ | _TBD_       |
+| Sorted search             | Wall time    | _TBD_  | _TBD_ | _TBD_       |
+| Sorted search             | Queries      | _TBD_  | _TBD_ | _TBD_       |
+| Paginated search          | Wall time    | _TBD_  | _TBD_ | _TBD_       |
+| Backend 10k→25 highlights | Wall time    | _TBD_  | _TBD_ | _TBD_       |
+| Backend 10k→25 highlights | Memory delta | _TBD_  | _TBD_ | _TBD_       |
 
 - [ ] **Step 5: Commit**
 
@@ -1179,21 +1143,34 @@ git commit -m "chore: remove temporary profiling tests"
 
 ### What these changes accomplish
 
-- **Task 1-3**: Backend now has two query modes — full search with highlights (for the displayed page) and lightweight ID-only search (for `all`/`selection_data`).
-- **Task 4**: Viewset passes real `page`/`page_size`/`sort_field` to Tantivy for sortable fields. Custom field sorting falls back to overfetch pattern.
-- **Task 5**: `all` field and `selection_data` use lightweight `search_ids()` instead of extracting IDs from fully-highlighted hits.
+- **Task 1**: `search()` accepts `highlight_page`/`highlight_page_size` — only the displayed page pays the snippet cost. All hits still returned (DRF pagination works unchanged).
+- **Task 2-3**: `search_ids()` and `more_like_this_ids()` provide an even lighter path when only IDs are needed.
+- **Task 4**: Viewset passes `sort_field` through to Tantivy for natively-sortable fields, eliminating the ORM re-sort query. Passes `highlight_page` so only 25 hits get snippets instead of 10,000.
+
+### DRF compatibility preserved
+
+| Concern                                   | Status                                                        |
+| ----------------------------------------- | ------------------------------------------------------------- |
+| `TantivyRelevanceList.__len__()`          | Returns `len(self._hits)` — ALL hits, correct count           |
+| `TantivyRelevanceList.__getitem__(slice)` | Slices the full hit list — DRF pagination works               |
+| `get_all_result_ids()`                    | Extracts IDs from full hit list — unchanged                   |
+| `count` in response                       | Correct — reflects all matching documents after ORM filtering |
+| `next`/`previous` links                   | Correct — DRF computes from accurate count                    |
+| Page N requests                           | Correct — DRF slices full list at `[(N-1)*size : N*size]`     |
 
 ### Performance impact
 
-| Operation                         | Before                 | After                                            |
-| --------------------------------- | ---------------------- | ------------------------------------------------ |
-| `searcher.doc()` calls per search | Up to 10,000           | ~25 (page size) + N (for all_ids, no highlights) |
-| Snippet generations per search    | Up to 10,000           | ~25 (page size only)                             |
-| ORM sort query                    | Always (when ordering) | Only for custom field sorting                    |
-| Tantivy searches per request      | 1                      | 1-2 (page search + optional IDs search)          |
+| Operation                                | Before                 | After                                     |
+| ---------------------------------------- | ---------------------- | ----------------------------------------- |
+| Snippet generations per search           | Up to 10,000           | ~25 (page size)                           |
+| Notes SnippetGenerator creations         | Up to 10,000 (per hit) | ~25 (page size)                           |
+| ORM sort query (Tantivy-sortable fields) | Always                 | Never (Tantivy sorts)                     |
+| ORM sort query (custom fields)           | Always                 | Still always (fallback)                   |
+| `searcher.doc()` calls                   | Up to 10,000           | Up to 10,000 (unchanged — needed for IDs) |
+| Tantivy searches per request             | 1                      | 1                                         |
 
 ### What's NOT in this plan (future work)
 
-- **Push ORM filters into Tantivy queries** (Item 4 from original analysis): High effort, high reward. Would eliminate the ORM intersection entirely for common filters. Deferred because it requires building a filter translation layer and careful correctness testing.
-- **Adaptive overfetch**: The slow path still uses 10,000. Could be made adaptive, but the fast path (most queries) no longer overfetches at all.
-- **Tantivy fast-field ID extraction**: `search_ids()` still calls `searcher.doc()` to get IDs. Tantivy's fast fields could provide IDs without loading stored docs, but this depends on tantivy-py API support.
+- **Push ORM filters into Tantivy queries**: Would eliminate the ORM intersection (`filtered_qs.values_list`) and potentially reduce the 10k hit fetch. High effort, deferred.
+- **Tantivy fast-field ID extraction**: `searcher.doc()` loads the full stored document to get the ID. Tantivy's fast fields could provide IDs without loading stored docs. Depends on tantivy-py API support.
+- **Adaptive overfetch limit**: The 10,000 limit is still fixed. Could be made smaller when ORM filters are absent, or adaptive based on historical filter rates.
