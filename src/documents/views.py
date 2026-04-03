@@ -2059,6 +2059,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
             return super().list(request)
 
         from documents.search import SearchMode
+        from documents.search import TantivyBackend
         from documents.search import TantivyRelevanceList
         from documents.search import get_backend
 
@@ -2083,20 +2084,9 @@ class UnifiedSearchViewSet(DocumentViewSet):
             sort_reverse = ordering_param.startswith("-")
             sort_field_name = ordering_param.lstrip("-") if ordering_param else None
 
-            # Fields Tantivy can sort natively — only numeric/date fast fields.
-            # Text-based sorts (title, correspondent__name, document_type__name)
-            # use a tokenized fast field whose ordering may differ from the ORM,
-            # so they fall back to the ORM sort path.
-            tantivy_sortable = {
-                "created",
-                "added",
-                "modified",
-                "archive_serial_number",
-                "page_count",
-                "num_notes",
-            }
             use_tantivy_sort = (
-                sort_field_name in tantivy_sortable or sort_field_name is None
+                sort_field_name in TantivyBackend.SORTABLE_FIELDS
+                or sort_field_name is None
             )
 
             # Compute the DRF page so we can tell Tantivy which slice to highlight

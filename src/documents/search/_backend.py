@@ -234,6 +234,34 @@ class TantivyBackend:
     the underlying index directory changes (e.g., during test isolation).
     """
 
+    # Maps DRF ordering field names to Tantivy index field names.
+    SORT_FIELD_MAP: dict[str, str] = {
+        "title": "title_sort",
+        "correspondent__name": "correspondent_sort",
+        "document_type__name": "type_sort",
+        "created": "created",
+        "added": "added",
+        "modified": "modified",
+        "archive_serial_number": "asn",
+        "page_count": "page_count",
+        "num_notes": "num_notes",
+    }
+
+    # Fields where Tantivy's sort order matches the ORM's sort order.
+    # Text-based fields (title, correspondent__name, document_type__name)
+    # are excluded because Tantivy's tokenized fast fields produce different
+    # ordering than the ORM's collation-based ordering.
+    SORTABLE_FIELDS: frozenset[str] = frozenset(
+        {
+            "created",
+            "added",
+            "modified",
+            "archive_serial_number",
+            "page_count",
+            "num_notes",
+        },
+    )
+
     def __init__(self, path: Path | None = None):
         # path=None → in-memory index (for tests)
         # path=some_dir → on-disk index (for production)
@@ -487,22 +515,9 @@ class TantivyBackend:
         searcher = self._index.searcher()
         offset = (page - 1) * page_size
 
-        # Map sort fields
-        sort_field_map = {
-            "title": "title_sort",
-            "correspondent__name": "correspondent_sort",
-            "document_type__name": "type_sort",
-            "created": "created",
-            "added": "added",
-            "modified": "modified",
-            "archive_serial_number": "asn",
-            "page_count": "page_count",
-            "num_notes": "num_notes",
-        }
-
         # Perform search
-        if sort_field and sort_field in sort_field_map:
-            mapped_field = sort_field_map[sort_field]
+        if sort_field and sort_field in self.SORT_FIELD_MAP:
+            mapped_field = self.SORT_FIELD_MAP[sort_field]
             results = searcher.search(
                 final_query,
                 limit=offset + page_size,
