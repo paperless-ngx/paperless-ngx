@@ -2064,7 +2064,6 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
         try:
             backend = get_backend()
-            # ORM-filtered queryset: permissions + field filters + ordering (DRF backends applied)
             filtered_qs = self.filter_queryset(self.get_queryset())
 
             user = None if request.user.is_superuser else request.user
@@ -2078,6 +2077,39 @@ class UnifiedSearchViewSet(DocumentViewSet):
                         ),
                     },
                 )
+
+            # Parse ordering param
+            ordering_param = request.query_params.get("ordering", "")
+            sort_reverse = ordering_param.startswith("-")
+            sort_field_name = ordering_param.lstrip("-") if ordering_param else None
+
+            # Fields Tantivy can sort natively — only numeric/date fast fields.
+            # Text-based sorts (title, correspondent__name, document_type__name)
+            # use a tokenized fast field whose ordering may differ from the ORM,
+            # so they fall back to the ORM sort path.
+            tantivy_sortable = {
+                "created",
+                "added",
+                "modified",
+                "archive_serial_number",
+                "page_count",
+                "num_notes",
+            }
+            use_tantivy_sort = (
+                sort_field_name in tantivy_sortable or sort_field_name is None
+            )
+
+            # Compute the DRF page so we can tell Tantivy which slice to highlight
+            try:
+                requested_page = int(request.query_params.get("page", 1))
+            except (TypeError, ValueError):
+                requested_page = 1
+            try:
+                requested_page_size = int(
+                    request.query_params.get("page_size", self.paginator.page_size),
+                )
+            except (TypeError, ValueError):
+                requested_page_size = self.paginator.page_size
 
             if (
                 "text" in request.query_params
@@ -2093,17 +2125,48 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 else:
                     search_mode = SearchMode.QUERY
                     query_str = request.query_params["query"]
-                results = backend.search(
-                    query_str,
-                    user=user,
-                    page=1,
-                    page_size=10000,
-                    sort_field=None,
-                    sort_reverse=False,
-                    search_mode=search_mode,
-                )
+
+                if use_tantivy_sort:
+                    # Fast path: Tantivy sorts, highlights only for DRF page
+                    results = backend.search(
+                        query_str,
+                        user=user,
+                        page=1,
+                        page_size=10000,
+                        sort_field=sort_field_name,
+                        sort_reverse=sort_reverse,
+                        search_mode=search_mode,
+                        highlight_page=requested_page,
+                        highlight_page_size=requested_page_size,
+                    )
+
+                    # Intersect with ORM-visible IDs (field filters)
+                    orm_ids = set(filtered_qs.values_list("pk", flat=True))
+                    ordered_hits = [h for h in results.hits if h["id"] in orm_ids]
+                else:
+                    # Slow path: custom field ordering — ORM must sort
+                    results = backend.search(
+                        query_str,
+                        user=user,
+                        page=1,
+                        page_size=10000,
+                        sort_field=None,
+                        sort_reverse=False,
+                        search_mode=search_mode,
+                        highlight_page=requested_page,
+                        highlight_page_size=requested_page_size,
+                    )
+                    hits_by_id = {h["id"]: h for h in results.hits}
+                    hit_ids = set(hits_by_id.keys())
+                    orm_ordered_ids = filtered_qs.filter(id__in=hit_ids).values_list(
+                        "pk",
+                        flat=True,
+                    )
+                    ordered_hits = [
+                        hits_by_id[pk] for pk in orm_ordered_ids if pk in hits_by_id
+                    ]
             else:
-                # more_like_id — validate permission on the seed document first
+                # more_like_id path
                 try:
                     more_like_doc_id = int(request.query_params["more_like_id"])
                     more_like_doc = Document.objects.select_related("owner").get(
@@ -2125,25 +2188,8 @@ class UnifiedSearchViewSet(DocumentViewSet):
                     page=1,
                     page_size=10000,
                 )
-
-            hits_by_id = {h["id"]: h for h in results.hits}
-
-            # Determine sort order: no ordering param -> Tantivy relevance; otherwise -> ORM order
-            ordering_param = request.query_params.get("ordering", "").lstrip("-")
-            if not ordering_param:
-                # Preserve Tantivy relevance order; intersect with ORM-visible IDs
                 orm_ids = set(filtered_qs.values_list("pk", flat=True))
                 ordered_hits = [h for h in results.hits if h["id"] in orm_ids]
-            else:
-                # Use ORM ordering (already applied by DocumentsOrderingFilter)
-                hit_ids = set(hits_by_id.keys())
-                orm_ordered_ids = filtered_qs.filter(id__in=hit_ids).values_list(
-                    "pk",
-                    flat=True,
-                )
-                ordered_hits = [
-                    hits_by_id[pk] for pk in orm_ordered_ids if pk in hits_by_id
-                ]
 
             rl = TantivyRelevanceList(ordered_hits)
             page = self.paginate_queryset(rl)
