@@ -435,6 +435,8 @@ class TantivyBackend:
         *,
         sort_reverse: bool,
         search_mode: SearchMode = SearchMode.QUERY,
+        highlight_page: int | None = None,
+        highlight_page_size: int | None = None,
     ) -> SearchResults:
         """
         Execute a search query against the document index.
@@ -533,6 +535,15 @@ class TantivyBackend:
         hits: list[SearchHit] = []
         snippet_generator = None
 
+        # Determine which hits need highlights
+        if highlight_page is not None and highlight_page_size is not None:
+            hl_start = (highlight_page - 1) * highlight_page_size
+            hl_end = hl_start + highlight_page_size
+        else:
+            # Highlight all hits (backward-compatible default)
+            hl_start = 0
+            hl_end = len(page_hits)
+
         for rank, (doc_address, score) in enumerate(page_hits, start=offset + 1):
             # Get the actual document from the searcher using the doc address
             actual_doc = searcher.doc(doc_address)
@@ -541,8 +552,9 @@ class TantivyBackend:
 
             highlights: dict[str, str] = {}
 
-            # Generate highlights if score > 0
-            if score > 0:
+            # Generate highlights if score > 0 and hit is in the highlight window
+            hit_index = rank - offset - 1  # 0-based index within page_hits
+            if score > 0 and hl_start <= hit_index < hl_end:
                 try:
                     if snippet_generator is None:
                         snippet_generator = tantivy.SnippetGenerator.create(

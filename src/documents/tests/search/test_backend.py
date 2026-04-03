@@ -428,6 +428,86 @@ class TestSearch:
             == 0
         )
 
+    def test_highlight_page_only_highlights_requested_slice(
+        self,
+        backend: TantivyBackend,
+    ):
+        """Only hits in the highlight_page slice should have non-empty highlights."""
+        for i in range(6):
+            doc = Document.objects.create(
+                title=f"highlight doc {i}",
+                content=f"searchable highlight content number {i}",
+                checksum=f"HP{i}",
+            )
+            backend.add_or_update(doc)
+
+        r = backend.search(
+            "searchable",
+            user=None,
+            page=1,
+            page_size=10000,
+            sort_field=None,
+            sort_reverse=False,
+            highlight_page=1,
+            highlight_page_size=3,
+        )
+        assert r.total == 6
+        assert len(r.hits) == 6
+        highlighted = [h for h in r.hits if h["highlights"]]
+        not_highlighted = [h for h in r.hits if not h["highlights"]]
+        assert len(highlighted) == 3
+        assert len(not_highlighted) == 3
+
+    def test_highlight_page_2_highlights_correct_slice(self, backend: TantivyBackend):
+        """highlight_page=2 should highlight only the second page of results."""
+        for i in range(6):
+            doc = Document.objects.create(
+                title=f"page2 doc {i}",
+                content=f"searchable page2 content number {i}",
+                checksum=f"HP2{i}",
+            )
+            backend.add_or_update(doc)
+
+        r = backend.search(
+            "searchable",
+            user=None,
+            page=1,
+            page_size=10000,
+            sort_field=None,
+            sort_reverse=False,
+            highlight_page=2,
+            highlight_page_size=2,
+        )
+        assert r.total == 6
+        assert len(r.hits) == 6
+        highlighted = [h for h in r.hits if h["highlights"]]
+        not_highlighted = [h for h in r.hits if not h["highlights"]]
+        # Only 2 hits (the second page) should have highlights
+        assert len(highlighted) == 2
+        assert len(not_highlighted) == 4
+
+    def test_no_highlight_page_highlights_all(self, backend: TantivyBackend):
+        """When highlight_page is not specified, all hits get highlights (backward compat)."""
+        for i in range(3):
+            doc = Document.objects.create(
+                title=f"compat doc {i}",
+                content=f"searchable compat content {i}",
+                checksum=f"HC{i}",
+            )
+            backend.add_or_update(doc)
+
+        r = backend.search(
+            "searchable",
+            user=None,
+            page=1,
+            page_size=10000,
+            sort_field=None,
+            sort_reverse=False,
+        )
+        assert len(r.hits) == 3
+        for hit in r.hits:
+            assert "content" in hit["highlights"]
+
 
 class TestRebuild:
     """Test index rebuilding functionality."""
