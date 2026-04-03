@@ -393,13 +393,13 @@ class RasterisedDocumentParser:
 
         plain_pdf_path = Path(self.tempdir) / "image_plain.pdf"
         try:
-            layout_fun = None
+            convert_kwargs: dict = {}
             if self.settings.image_dpi is not None:
-                layout_fun = img2pdf.get_fixed_dpi_layout_fun(
+                convert_kwargs["layout_fun"] = img2pdf.get_fixed_dpi_layout_fun(
                     (self.settings.image_dpi, self.settings.image_dpi),
                 )
             plain_pdf_path.write_bytes(
-                img2pdf.convert(str(document_path), layout_fun=layout_fun),
+                img2pdf.convert(str(document_path), **convert_kwargs),
             )
         except Exception as e:
             raise ParseError(
