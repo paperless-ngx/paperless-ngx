@@ -118,11 +118,12 @@ def _bigram_analyzer() -> tantivy.TextAnalyzer:
 
 
 def _simple_search_analyzer() -> tantivy.TextAnalyzer:
-    """Tokenizer for simple substring search fields: non-whitespace chunks -> lowercase -> ascii_fold."""
+    """Tokenizer for simple substring search fields: non-whitespace chunks -> remove_long(65) -> lowercase -> ascii_fold."""
     return (
         tantivy.TextAnalyzerBuilder(
             tantivy.Tokenizer.regex(r"\S+"),
         )
+        .filter(tantivy.Filter.remove_long(65))
         .filter(tantivy.Filter.lowercase())
         .filter(tantivy.Filter.ascii_fold())
         .build()
