@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import regex as regex_mod
 from django.conf import settings
 from pdf2image import convert_from_path
 from pikepdf import Page
@@ -22,6 +23,8 @@ from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import StopConsumeTaskError
 from documents.plugins.helpers import ProgressManager
 from documents.plugins.helpers import ProgressStatusOptions
+from documents.regex import safe_regex_match
+from documents.regex import safe_regex_sub
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import maybe_override_pixel_limit
@@ -68,8 +71,8 @@ class Barcode:
         Note: This does NOT exclude ASN or separator barcodes - they can also be used
         as tags if they match a tag mapping pattern (e.g., {"ASN12.*": "JOHN"}).
         """
-        for regex in self.settings.barcode_tag_mapping:
-            if re.match(regex, self.value, flags=re.IGNORECASE):
+        for pattern in self.settings.barcode_tag_mapping:
+            if safe_regex_match(pattern, self.value, flags=regex_mod.IGNORECASE):
                 return True
         return False
 
@@ -392,11 +395,16 @@ class BarcodePlugin(ConsumeTaskPlugin):
             for raw in tag_texts.split(","):
                 try:
                     tag_str: str | None = None
-                    for regex in self.settings.barcode_tag_mapping:
-                        if re.match(regex, raw, flags=re.IGNORECASE):
-                            sub = self.settings.barcode_tag_mapping[regex]
+                    for pattern in self.settings.barcode_tag_mapping:
+                        if safe_regex_match(pattern, raw, flags=regex_mod.IGNORECASE):
+                            sub = self.settings.barcode_tag_mapping[pattern]
                             tag_str = (
-                                re.sub(regex, sub, raw, flags=re.IGNORECASE)
+                                safe_regex_sub(
+                                    pattern,
+                                    sub,
+                                    raw,
+                                    flags=regex_mod.IGNORECASE,
+                                )
                                 if sub
                                 else raw
                             )

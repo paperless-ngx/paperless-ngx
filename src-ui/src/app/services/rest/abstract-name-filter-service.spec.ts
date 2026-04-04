@@ -96,6 +96,30 @@ export const commonAbstractNameFilterPaperlessServiceTests = (
       })
       req.flush([])
     })
+
+    test('should call appropriate api endpoint for bulk delete on all filtered objects', () => {
+      subscription = service
+        .bulk_edit_objects(
+          [],
+          BulkEditObjectOperation.Delete,
+          null,
+          null,
+          true,
+          { name__icontains: 'hello' }
+        )
+        .subscribe()
+      const req = httpTestingController.expectOne(
+        `${environment.apiBaseUrl}bulk_edit_objects/`
+      )
+      expect(req.request.method).toEqual('POST')
+      expect(req.request.body).toEqual({
+        object_type: endpoint,
+        operation: BulkEditObjectOperation.Delete,
+        all: true,
+        filters: { name__icontains: 'hello' },
+      })
+      req.flush([])
+    })
   })
 
   beforeEach(() => {

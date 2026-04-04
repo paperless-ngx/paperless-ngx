@@ -4,11 +4,9 @@ import shutil
 import uuid
 import zipfile
 from collections.abc import Callable
-from collections.abc import Iterable
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from tempfile import mkstemp
-from typing import TypeVar
 
 from celery import Task
 from celery import shared_task
@@ -20,9 +18,7 @@ from django.db import transaction
 from django.db.models.signals import post_save
 from django.utils import timezone
 from filelock import FileLock
-from whoosh.writing import AsyncWriter
 
-from documents import index
 from documents import sanity_checker
 from documents.barcodes import BarcodePlugin
 from documents.bulk_download import ArchiveOnlyStrategy
@@ -60,43 +56,28 @@ from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
 from documents.signals.handlers import run_workflows
 from documents.signals.handlers import send_websocket_document_updated
+from documents.utils import IterWrapper
 from documents.utils import compute_checksum
+from documents.utils import identity
 from documents.workflows.utils import get_workflows_for_trigger
 from paperless.config import AIConfig
+from paperless.logging import consume_task_id
 from paperless.parsers import ParserContext
 from paperless.parsers.registry import get_parser_registry
 from paperless_ai.indexing import llm_index_add_or_update_document
 from paperless_ai.indexing import llm_index_remove_document
 from paperless_ai.indexing import update_llm_index
 
-_T = TypeVar("_T")
-IterWrapper = Callable[[Iterable[_T]], Iterable[_T]]
-
-
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
 logger = logging.getLogger("paperless.tasks")
 
 
-def _identity(iterable: Iterable[_T]) -> Iterable[_T]:
-    return iterable
-
-
 @shared_task
 def index_optimize() -> None:
-    ix = index.open_index()
-    writer = AsyncWriter(ix)
-    writer.commit(optimize=True)
-
-
-def index_reindex(*, iter_wrapper: IterWrapper[Document] = _identity) -> None:
-    documents = Document.objects.all()
-
-    ix = index.open_index(recreate=True)
-
-    with AsyncWriter(ix) as writer:
-        for document in iter_wrapper(documents):
-            index.update_document(writer, document)
+    logger.info(
+        "index_optimize is a no-op — Tantivy manages segment merging automatically.",
+    )
 
 
 @shared_task
@@ -167,76 +148,85 @@ def consume_file(
     input_doc: ConsumableDocument,
     overrides: DocumentMetadataOverrides | None = None,
 ):
-    # Default no overrides
-    if overrides is None:
-        overrides = DocumentMetadataOverrides()
+    token = consume_task_id.set((self.request.id or "")[:8])
+    try:
+        # Default no overrides
+        if overrides is None:
+            overrides = DocumentMetadataOverrides()
 
-    plugins: list[type[ConsumeTaskPlugin]] = (
-        [
-            ConsumerPreflightPlugin,
-            ConsumerPlugin,
-        ]
-        if input_doc.root_document_id is not None
-        else [
-            ConsumerPreflightPlugin,
-            AsnCheckPlugin,
-            CollatePlugin,
-            BarcodePlugin,
-            AsnCheckPlugin,  # Re-run ASN check after barcode reading
-            WorkflowTriggerPlugin,
-            ConsumerPlugin,
-        ]
-    )
+        plugins: list[type[ConsumeTaskPlugin]] = (
+            [
+                ConsumerPreflightPlugin,
+                ConsumerPlugin,
+            ]
+            if input_doc.root_document_id is not None
+            else [
+                ConsumerPreflightPlugin,
+                AsnCheckPlugin,
+                CollatePlugin,
+                BarcodePlugin,
+                AsnCheckPlugin,  # Re-run ASN check after barcode reading
+                WorkflowTriggerPlugin,
+                ConsumerPlugin,
+            ]
+        )
 
-    with (
-        ProgressManager(
-            overrides.filename or input_doc.original_file.name,
-            self.request.id,
-        ) as status_mgr,
-        TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir,
-    ):
-        tmp_dir = Path(tmp_dir)
-        for plugin_class in plugins:
-            plugin_name = plugin_class.NAME
-
-            plugin = plugin_class(
-                input_doc,
-                overrides,
-                status_mgr,
-                tmp_dir,
+        with (
+            ProgressManager(
+                overrides.filename or input_doc.original_file.name,
                 self.request.id,
-            )
+            ) as status_mgr,
+            TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir,
+        ):
+            tmp_dir = Path(tmp_dir)
+            for plugin_class in plugins:
+                plugin_name = plugin_class.NAME
 
-            if not plugin.able_to_run:
-                logger.debug(f"Skipping plugin {plugin_name}")
-                continue
+                plugin = plugin_class(
+                    input_doc,
+                    overrides,
+                    status_mgr,
+                    tmp_dir,
+                    self.request.id,
+                )
 
-            try:
-                logger.debug(f"Executing plugin {plugin_name}")
-                plugin.setup()
+                if not plugin.able_to_run:
+                    logger.debug(f"Skipping plugin {plugin_name}")
+                    continue
 
-                msg = plugin.run()
+                try:
+                    logger.debug(f"Executing plugin {plugin_name}")
+                    plugin.setup()
 
-                if msg is not None:
-                    logger.info(f"{plugin_name} completed with: {msg}")
-                else:
-                    logger.info(f"{plugin_name} completed with no message")
+                    msg = plugin.run()
 
-                overrides = plugin.metadata
+                    if msg is not None:
+                        logger.info(f"{plugin_name} completed with: {msg}")
+                    else:
+                        logger.info(f"{plugin_name} completed with no message")
 
-            except StopConsumeTaskError as e:
-                logger.info(f"{plugin_name} requested task exit: {e.message}")
-                return e.message
+                    overrides = plugin.metadata
 
-            except Exception as e:
-                logger.exception(f"{plugin_name} failed: {e}")
-                status_mgr.send_progress(ProgressStatusOptions.FAILED, f"{e}", 100, 100)
-                raise
+                except StopConsumeTaskError as e:
+                    logger.info(f"{plugin_name} requested task exit: {e.message}")
+                    return e.message
 
-            finally:
-                plugin.cleanup()
+                except Exception as e:
+                    logger.exception(f"{plugin_name} failed: {e}")
+                    status_mgr.send_progress(
+                        ProgressStatusOptions.FAILED,
+                        f"{e}",
+                        100,
+                        100,
+                    )
+                    raise
 
-    return msg
+                finally:
+                    plugin.cleanup()
+
+        return msg
+    finally:
+        consume_task_id.reset(token)
 
 
 @shared_task
@@ -270,9 +260,9 @@ def sanity_check(*, scheduled=True, raise_on_error=True):
 
 @shared_task
 def bulk_update_documents(document_ids) -> None:
-    documents = Document.objects.filter(id__in=document_ids)
+    from documents.search import get_backend
 
-    ix = index.open_index()
+    documents = Document.objects.filter(id__in=document_ids)
 
     for doc in documents:
         clear_document_caches(doc.pk)
@@ -283,9 +273,9 @@ def bulk_update_documents(document_ids) -> None:
         )
         post_save.send(Document, instance=doc, created=False)
 
-    with AsyncWriter(ix) as writer:
+    with get_backend().batch_update() as batch:
         for doc in documents:
-            index.update_document(writer, doc)
+            batch.add_or_update(doc)
 
     ai_config = AIConfig()
     if ai_config.llm_index_enabled:
@@ -389,8 +379,9 @@ def update_document_content_maybe_archive_file(document_id) -> None:
             logger.info(
                 f"Updating index for document {document_id} ({document.archive_checksum})",
             )
-            with index.open_index_writer() as writer:
-                index.update_document(writer, document)
+            from documents.search import get_backend
+
+            get_backend().add_or_update(document)
 
             ai_config = AIConfig()
             if ai_config.llm_index_enabled:
@@ -633,7 +624,7 @@ def update_document_parent_tags(tag: Tag, new_parent: Tag) -> None:
 @shared_task
 def llmindex_index(
     *,
-    iter_wrapper: IterWrapper[Document] = _identity,
+    iter_wrapper: IterWrapper[Document] = identity,
     rebuild=False,
     scheduled=True,
     auto=False,

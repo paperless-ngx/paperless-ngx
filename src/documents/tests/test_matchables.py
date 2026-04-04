@@ -452,7 +452,10 @@ class TestDocumentConsumptionFinishedSignal(TestCase):
     """
 
     def setUp(self) -> None:
+        from documents.search import reset_backend
+
         TestCase.setUp(self)
+        reset_backend()
         User.objects.create_user(username="test_consumer", password="12345")
         self.doc_contains = Document.objects.create(
             content="I contain the keyword.",
@@ -464,6 +467,9 @@ class TestDocumentConsumptionFinishedSignal(TestCase):
         override_settings(INDEX_DIR=self.index_dir).enable()
 
     def tearDown(self) -> None:
+        from documents.search import reset_backend
+
+        reset_backend()
         shutil.rmtree(self.index_dir, ignore_errors=True)
 
     def test_tag_applied_any(self) -> None:

@@ -260,7 +260,7 @@ def get_list_from_env(
 
 def get_choice_from_env(
     env_key: str,
-    choices: set[str],
+    choices: set[str] | frozenset[str],
     default: str | None = None,
 ) -> str:
     """

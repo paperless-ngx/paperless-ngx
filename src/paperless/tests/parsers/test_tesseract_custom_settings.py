@@ -14,6 +14,11 @@ from paperless.parsers.tesseract import RasterisedDocumentParser
 
 
 class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        super().setUpTestData()
+        ApplicationConfiguration.objects.get_or_create()
+
     @staticmethod
     def get_params():
         """

@@ -46,7 +46,7 @@ jobs:
       - name: Detect changes
         id: filter
         if: steps.force.outputs.run_all != 'true'
-        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
         with:
           base: ${{ steps.range.outputs.base }}
           ref: ${{ steps.range.outputs.ref }}
@@ -65,7 +65,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
         with:
           version: 10
       - name: Use Node.js 24
@@ -76,7 +76,7 @@ jobs:
           cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       - name: Cache frontend dependencies
         id: cache-frontend-deps
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: |
             ~/.pnpm-store
@@ -95,7 +95,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
         with:
           version: 10
       - name: Use Node.js 24
@@ -105,7 +105,7 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       - name: Cache frontend dependencies
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: |
             ~/.pnpm-store
@@ -132,7 +132,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
         with:
           version: 10
       - name: Use Node.js 24
@@ -142,7 +142,7 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       - name: Cache frontend dependencies
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: |
             ~/.pnpm-store
@@ -185,7 +185,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
         with:
           version: 10
       - name: Use Node.js 24
@@ -195,7 +195,7 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       - name: Cache frontend dependencies
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: |
             ~/.pnpm-store
@@ -219,7 +219,7 @@ jobs:
           fetch-depth: 2
           persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
         with:
           version: 10
       - name: Use Node.js 24
@@ -229,7 +229,7 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       - name: Cache frontend dependencies
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: |
             ~/.pnpm-store

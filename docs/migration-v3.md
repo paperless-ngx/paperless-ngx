@@ -1,5 +1,24 @@
 # v3 Migration Guide
 
+## Secret Key is Now Required
+
+The `PAPERLESS_SECRET_KEY` environment variable is now required. This is a critical security setting used for cryptographic signing and should be set to a long, random value.
+
+### Action Required
+
+If you are upgrading an existing installation, you must now set `PAPERLESS_SECRET_KEY` explicitly.
+
+If your installation was relying on the previous built-in default key, you have two options:
+
+- Set `PAPERLESS_SECRET_KEY` to that previous value to preserve existing sessions and tokens.
+- Set `PAPERLESS_SECRET_KEY` to a new random value to improve security, understanding that this will invalidate existing sessions and other signed tokens.
+
+For new installations, or if you choose to rotate the key, you may generate a new secret key with:
+
+```bash
+python3 -c "import secrets; print(secrets.token_urlsafe(64))"
+```
+
 ## Consumer Settings Changes
 
 The v3 consumer command uses a [different library](https://watchfiles.helpmanual.io/) to unify
@@ -103,6 +122,37 @@ Multiple options are combined in a single value:
 ```bash
 PAPERLESS_DB_OPTIONS="sslmode=require;sslrootcert=/certs/ca.pem;pool.max_size=10"
 ```
+
+## Search Index (Whoosh -> Tantivy)
+
+The full-text search backend has been replaced with [Tantivy](https://github.com/quickwit-oss/tantivy).
+The index format is incompatible with Whoosh, so **the search index is automatically rebuilt from
+scratch on first startup after upgrading**. No manual action is required for the rebuild itself.
+
+### Note and custom field search syntax
+
+The old Whoosh index exposed `note` and `custom_field` as flat text fields that were included in
+unqualified searches (e.g. just typing `invoice` would match note content). With Tantivy these are
+now structured JSON fields accessed via dotted paths:
+
+| Old syntax           | New syntax                  |
+| -------------------- | --------------------------- |
+| `note:query`         | `notes.note:query`          |
+| `custom_field:query` | `custom_fields.value:query` |
+
+**Saved views are migrated automatically.** Any saved view filter rule that used an explicit
+`note:` or `custom_field:` field prefix in a fulltext query is rewritten to the new syntax by a
+data migration that runs on upgrade.
+
+**Unqualified queries are not migrated.** If you had a saved view with a plain search term (e.g.
+`invoice`) that happened to match note content or custom field values, it will no longer return
+those matches. Update those queries to use the explicit prefix, for example:
+
+```
+invoice OR notes.note:invoice OR custom_fields.value:invoice
+```
+
+Custom field names can also be searched with `custom_fields.name:fieldname`.
 
 ## OpenID Connect Token Endpoint Authentication
 

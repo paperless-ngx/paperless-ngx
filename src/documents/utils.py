@@ -1,13 +1,26 @@
 import hashlib
 import logging
 import shutil
+from collections.abc import Callable
+from collections.abc import Iterable
 from os import utime
 from pathlib import Path
 from subprocess import CompletedProcess
 from subprocess import run
+from typing import TypeVar
 
 from django.conf import settings
 from PIL import Image
+
+_T = TypeVar("_T")
+
+# A function that wraps an iterable — typically used to inject a progress bar.
+IterWrapper = Callable[[Iterable[_T]], Iterable[_T]]
+
+
+def identity(iterable: Iterable[_T]) -> Iterable[_T]:
+    """Return the iterable unchanged; the no-op default for IterWrapper."""
+    return iterable
 
 
 def _coerce_to_path(

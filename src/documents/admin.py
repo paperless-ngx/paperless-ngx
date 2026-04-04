@@ -100,24 +100,23 @@ class DocumentAdmin(GuardedModelAdmin):
         return Document.global_objects.all()
 
     def delete_queryset(self, request, queryset):
-        from documents import index
+        from documents.search import get_backend
 
-        with index.open_index_writer() as writer:
+        with get_backend().batch_update() as batch:
             for o in queryset:
-                index.remove_document(writer, o)
-
+                batch.remove(o.pk)
         super().delete_queryset(request, queryset)
 
     def delete_model(self, request, obj):
-        from documents import index
+        from documents.search import get_backend
 
-        index.remove_document_from_index(obj)
+        get_backend().remove(obj.pk)
         super().delete_model(request, obj)
 
     def save_model(self, request, obj, form, change):
-        from documents import index
+        from documents.search import get_backend
 
-        index.add_or_update_document(obj)
+        get_backend().add_or_update(obj)
         super().save_model(request, obj, form, change)
 
 

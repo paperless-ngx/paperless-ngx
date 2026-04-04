@@ -52,7 +52,7 @@ jobs:
       - name: Detect changes
         id: filter
         if: steps.force.outputs.run_all != 'true'
-        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
         with:
           base: ${{ steps.range.outputs.base }}
           ref: ${{ steps.range.outputs.ref }}
@@ -69,7 +69,7 @@ jobs:
     name: Build Documentation
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -110,7 +110,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy GitHub Pages
-        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
         id: deployment
         with:
           artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}

@@ -200,7 +200,10 @@ class TestWebSockets:
                 "Test message",
                 1,
                 10,
-                extra_args={"foo": "bar"},
+                document_id=42,
+                owner_id=1,
+                users_can_view=[2, 3],
+                groups_can_view=[4],
             )
 
         assert mock_group_send.call_args[0][1] == {
@@ -212,7 +215,10 @@ class TestWebSockets:
                 "max_progress": 10,
                 "status": ProgressStatusOptions.STARTED,
                 "message": "Test message",
-                "foo": "bar",
+                "document_id": 42,
+                "owner_id": 1,
+                "users_can_view": [2, 3],
+                "groups_can_view": [4],
             },
         }
 

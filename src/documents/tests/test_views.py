@@ -31,6 +31,11 @@ from paperless.models import ApplicationConfiguration
 
 
 class TestViews(DirectoriesMixin, TestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        super().setUpTestData()
+        ApplicationConfiguration.objects.get_or_create()
+
     def setUp(self) -> None:
         self.user = User.objects.create_user("testuser")
         super().setUp()

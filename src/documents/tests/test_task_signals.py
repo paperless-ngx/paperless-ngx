@@ -2,6 +2,7 @@ import uuid
 from unittest import mock
 
 import celery
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 from documents.data_models import ConsumableDocument
@@ -20,6 +21,11 @@ from documents.tests.utils import DirectoriesMixin
 
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
 class TestTaskSignalHandler(DirectoriesMixin, TestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        super().setUpTestData()
+        cls.user = get_user_model().objects.create_user(username="testuser")
+
     def util_call_before_task_publish_handler(
         self,
         headers_to_use,
@@ -57,7 +63,7 @@ class TestTaskSignalHandler(DirectoriesMixin, TestCase):
                 ),
                 DocumentMetadataOverrides(
                     title="Hello world",
-                    owner_id=1,
+                    owner_id=self.user.id,
                 ),
             ),
             # kwargs
@@ -75,7 +81,7 @@ class TestTaskSignalHandler(DirectoriesMixin, TestCase):
         self.assertEqual(headers["id"], task.task_id)
         self.assertEqual("hello-999.pdf", task.task_file_name)
         self.assertEqual(PaperlessTask.TaskName.CONSUME_FILE, task.task_name)
-        self.assertEqual(1, task.owner_id)
+        self.assertEqual(self.user.id, task.owner_id)
         self.assertEqual(celery.states.PENDING, task.status)
 
     def test_task_prerun_handler(self) -> None:
@@ -208,10 +214,12 @@ class TestTaskSignalHandler(DirectoriesMixin, TestCase):
             mime_type="application/pdf",
         )
 
-        with mock.patch("documents.index.add_or_update_document") as add:
+        with mock.patch("documents.search.get_backend") as mock_get_backend:
+            mock_backend = mock.MagicMock()
+            mock_get_backend.return_value = mock_backend
             add_to_index(sender=None, document=root)
 
-        add.assert_called_once_with(root)
+        mock_backend.add_or_update.assert_called_once_with(root, effective_content="")
 
     def test_add_to_index_reindexes_root_for_version_documents(self) -> None:
         root = Document.objects.create(
@@ -226,13 +234,17 @@ class TestTaskSignalHandler(DirectoriesMixin, TestCase):
             root_document=root,
         )
 
-        with mock.patch("documents.index.add_or_update_document") as add:
+        with mock.patch("documents.search.get_backend") as mock_get_backend:
+            mock_backend = mock.MagicMock()
+            mock_get_backend.return_value = mock_backend
             add_to_index(sender=None, document=version)
 
-        self.assertEqual(add.call_count, 2)
-        self.assertEqual(add.call_args_list[0].args[0].id, version.id)
-        self.assertEqual(add.call_args_list[1].args[0].id, root.id)
+        self.assertEqual(mock_backend.add_or_update.call_count, 1)
         self.assertEqual(
-            add.call_args_list[1].kwargs,
+            mock_backend.add_or_update.call_args_list[0].args[0].id,
+            version.id,
+        )
+        self.assertEqual(
+            mock_backend.add_or_update.call_args_list[0].kwargs,
             {"effective_content": version.content},
         )

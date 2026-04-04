@@ -13,6 +13,7 @@ from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.db import DatabaseError
 from django.test import TestCase
+from django.test import override_settings
 from django.utils import timezone
 from imap_tools import NOT
 from imap_tools import EmailAddress
@@ -1839,6 +1840,25 @@ class TestMailAccountTestView(APITestCase):
             "imap_security": MailAccount.ImapSecurity.SSL,
             "username": "admin",
             "password": "wrong",
+            "account_type": MailAccount.MailAccountType.IMAP,
+            "is_token": False,
+        }
+        response = self.client.post(self.url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.content.decode(), "Unable to connect to server")
+
+    @override_settings(EMAIL_ALLOW_INTERNAL_HOSTS=False)
+    @mock.patch("paperless_mail.mail.resolve_hostname_ips", return_value=["127.0.0.1"])
+    def test_mail_account_test_view_blocks_internal_host_when_disabled(
+        self,
+        _mock_resolve_hostname_ips,
+    ) -> None:
+        data = {
+            "imap_server": "internal.example",
+            "imap_port": 993,
+            "imap_security": MailAccount.ImapSecurity.SSL,
+            "username": "admin",
+            "password": "secret",
             "account_type": MailAccount.MailAccountType.IMAP,
             "is_token": False,
         }

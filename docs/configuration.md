@@ -402,6 +402,12 @@ Defaults to `/usr/share/nltk_data`
 
 : This is where paperless will store the classification model.
 
+    !!! warning
+
+        The classification model uses Python's pickle serialization format.
+        Ensure this file is only writable by the paperless user, as a
+        maliciously crafted model file could execute arbitrary code when loaded.
+
     Defaults to `PAPERLESS_DATA_DIR/classification_model.pickle`.
 
 ## Logging
@@ -422,14 +428,20 @@ Defaults to `/usr/share/nltk_data`
 
 #### [`PAPERLESS_SECRET_KEY=<key>`](#PAPERLESS_SECRET_KEY) {#PAPERLESS_SECRET_KEY}
 
-: Paperless uses this to make session tokens. If you expose paperless
-on the internet, you need to change this, since the default secret
-is well known.
+: **Required.** Paperless uses this to make session tokens and sign
+sensitive data. Paperless will refuse to start if this is not set.
 
     Use any sequence of characters. The more, the better. You don't
-    need to remember this. Just face-roll your keyboard.
+    need to remember this. You can generate a suitable key with:
 
-    Default is listed in the file `src/paperless/settings.py`.
+        python3 -c "import secrets; print(secrets.token_urlsafe(64))"
+
+    !!! warning
+
+        This setting has no default value. You **must** set it before
+        starting Paperless. Existing installations that relied on the
+        previous default value should set `PAPERLESS_SECRET_KEY` to
+        that value to avoid invalidating existing sessions and tokens.
 
 #### [`PAPERLESS_URL=<url>`](#PAPERLESS_URL) {#PAPERLESS_URL}
 
@@ -770,6 +782,14 @@ If both the [PAPERLESS_ACCOUNT_DEFAULT_GROUPS](#PAPERLESS_ACCOUNT_DEFAULT_GROUPS
 
     Defaults to 1209600 (2 weeks)
 
+#### [`PAPERLESS_TOKEN_THROTTLE_RATE=<rate>`](#PAPERLESS_TOKEN_THROTTLE_RATE) {#PAPERLESS_TOKEN_THROTTLE_RATE}
+
+: Rate limit for the API token authentication endpoint (`/api/token/`), used to mitigate brute-force login attempts.
+Uses Django REST Framework's [throttle rate format](https://www.django-rest-framework.org/api-guide/throttling/#setting-the-throttling-policy),
+e.g. `5/min`, `100/hour`, `1000/day`.
+
+    Defaults to `5/min`
+
 ## OCR settings {#ocr}
 
 Paperless uses [OCRmyPDF](https://ocrmypdf.readthedocs.io/en/latest/)
@@ -1103,6 +1123,32 @@ should be a valid crontab(5) expression describing when to run.
 
     Defaults to `0 0 * * *` or daily at midnight.
 
+#### [`PAPERLESS_SEARCH_LANGUAGE=<language>`](#PAPERLESS_SEARCH_LANGUAGE) {#PAPERLESS_SEARCH_LANGUAGE}
+
+: Sets the stemmer language for the full-text search index.
+Stemming improves recall by matching word variants (e.g. "running" matches "run").
+Changing this setting causes the index to be rebuilt automatically on next startup.
+An invalid value raises an error at startup.
+
+: Use the ISO 639-1 two-letter code (e.g. `en`, `de`, `fr`). Lowercase full names
+(e.g. `english`, `german`, `french`) are also accepted. The capitalized names shown
+in the [Tantivy Language enum](https://docs.rs/tantivy/latest/tantivy/tokenizer/enum.Language.html)
+documentation are **not** valid — use the lowercase equivalent.
+
+: If not set, paperless infers the language from
+[`PAPERLESS_OCR_LANGUAGE`](#PAPERLESS_OCR_LANGUAGE). If the OCR language has no
+Tantivy stemmer equivalent, stemming is disabled.
+
+    Defaults to unset (inferred from `PAPERLESS_OCR_LANGUAGE`).
+
+#### [`PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD=<float>`](#PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD) {#PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD}
+
+: When set to a float value, approximate/fuzzy matching is applied alongside exact
+matching. Fuzzy results rank below exact matches. A value of `0.5` is a reasonable
+starting point. Leave unset to disable fuzzy matching entirely.
+
+    Defaults to unset (disabled).
+
 #### [`PAPERLESS_SANITY_TASK_CRON=<cron expression>`](#PAPERLESS_SANITY_TASK_CRON) {#PAPERLESS_SANITY_TASK_CRON}
 
 : Configures the scheduled sanity checker frequency. The value should be a
@@ -1393,6 +1439,14 @@ ports.
     Defaults to true, which allows internal requests.
 
 ## Incoming Mail {#incoming_mail}
+
+#### [`PAPERLESS_EMAIL_ALLOW_INTERNAL_HOSTS=<bool>`](#PAPERLESS_EMAIL_ALLOW_INTERNAL_HOSTS) {#PAPERLESS_EMAIL_ALLOW_INTERNAL_HOSTS}
+
+: If set to false, incoming mail account connections are blocked when the
+configured IMAP hostname resolves to a non-public address (for example,
+localhost, link-local, or RFC1918 private ranges).
+
+    Defaults to true, which allows internal hosts.
 
 ### Email OAuth {#email_oauth}
 

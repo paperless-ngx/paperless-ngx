@@ -9,6 +9,7 @@ from allauth.mfa.recovery_codes.internal.flows import auto_generate_recovery_cod
 from allauth.mfa.totp.internal import auth as totp_auth
 from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.models import SocialAccount
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -33,9 +34,9 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.viewsets import ModelViewSet
 
-from documents.index import DelayedQuery
 from documents.permissions import PaperlessObjectPermissions
 from documents.tasks import llmindex_index
 from paperless.filters import GroupFilterSet
@@ -51,6 +52,8 @@ from paperless_ai.indexing import vector_store_file_exists
 
 class PaperlessObtainAuthTokenView(ObtainAuthToken):
     serializer_class = PaperlessAuthTokenSerializer
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "login"
 
 
 class StandardPagination(PageNumberPagination):
@@ -58,42 +61,47 @@ class StandardPagination(PageNumberPagination):
     page_size_query_param = "page_size"
     max_page_size = 100000
 
+    def _get_api_version(self) -> int:
+        request = getattr(self, "request", None)
+        default_version = settings.REST_FRAMEWORK["DEFAULT_VERSION"]
+        return int(request.version if request else default_version)
+
+    def _should_include_all(self) -> bool:
+        # TODO: remove legacy `all` support when API v9 is dropped.
+        return self._get_api_version() < 10
+
     def get_paginated_response(self, data):
+        response_data = [
+            ("count", self.page.paginator.count),
+            ("next", self.get_next_link()),
+            ("previous", self.get_previous_link()),
+        ]
+        if self._should_include_all():
+            response_data.append(("all", self.get_all_result_ids()))
+        response_data.append(("results", data))
+
         return Response(
-            OrderedDict(
-                [
-                    ("count", self.page.paginator.count),
-                    ("next", self.get_next_link()),
-                    ("previous", self.get_previous_link()),
-                    ("all", self.get_all_result_ids()),
-                    ("results", data),
-                ],
-            ),
+            OrderedDict(response_data),
         )
 
     def get_all_result_ids(self):
+        from documents.search import TantivyRelevanceList
+
         query = self.page.paginator.object_list
-        if isinstance(query, DelayedQuery):
-            try:
-                ids = [
-                    query.searcher.ixreader.stored_fields(
-                        doc_num,
-                    )["id"]
-                    for doc_num in query.saved_results.get(0).results.docs()
-                ]
-            except Exception:
-                pass
-        else:
-            ids = self.page.paginator.object_list.values_list("pk", flat=True)
-        return ids
+        if isinstance(query, TantivyRelevanceList):
+            return [h["id"] for h in query._hits]
+        return self.page.paginator.object_list.values_list("pk", flat=True)
 
     def get_paginated_response_schema(self, schema):
         response_schema = super().get_paginated_response_schema(schema)
-        response_schema["properties"]["all"] = {
-            "type": "array",
-            "example": "[1, 2, 3]",
-            "items": {"type": "integer"},
-        }
+        if self._should_include_all():
+            response_schema["properties"]["all"] = {
+                "type": "array",
+                "example": "[1, 2, 3]",
+                "items": {"type": "integer"},
+            }
+        else:
+            response_schema["properties"].pop("all", None)
         return response_schema
 
 

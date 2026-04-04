@@ -157,11 +157,17 @@ class DirectoriesMixin:
     """
 
     def setUp(self) -> None:
+        from documents.search import reset_backend
+
+        reset_backend()
         self.dirs = setup_directories()
         super().setUp()
 
     def tearDown(self) -> None:
+        from documents.search import reset_backend
+
         super().tearDown()
+        reset_backend()
         remove_dirs(self.dirs)
 
 
@@ -429,7 +435,11 @@ class DummyProgressManager:
         message: str,
         current_progress: int,
         max_progress: int,
-        extra_args: dict[str, str | int] | None = None,
+        *,
+        document_id: int | None = None,
+        owner_id: int | None = None,
+        users_can_view: list[int] | None = None,
+        groups_can_view: list[int] | None = None,
     ) -> None:
         # Ensure the layer is open
         self.open()
@@ -443,9 +453,10 @@ class DummyProgressManager:
                 "max_progress": max_progress,
                 "status": status,
                 "message": message,
+                "document_id": document_id,
+                "owner_id": owner_id,
+                "users_can_view": users_can_view or [],
+                "groups_can_view": groups_can_view or [],
             },
         }
-        if extra_args is not None:
-            payload["data"].update(extra_args)
-
         self.payloads.append(payload)

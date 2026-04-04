@@ -2,6 +2,9 @@ import os
 from unittest import TestCase
 from unittest import mock
 
+import pytest
+
+from paperless.settings import _get_search_language_setting
 from paperless.settings import _parse_paperless_url
 from paperless.settings import default_threads_per_worker
 
@@ -30,6 +33,48 @@ class TestThreadCalculation(TestCase):
                 self.assertGreaterEqual(default_threads, 1)
 
                 self.assertLessEqual(default_workers * default_threads, i)
+
+
+@pytest.mark.parametrize(
+    ("env_value", "expected"),
+    [
+        ("en", "en"),
+        ("de", "de"),
+        ("fr", "fr"),
+        ("swedish", "swedish"),
+    ],
+)
+def test_get_search_language_setting_explicit_valid(
+    monkeypatch: pytest.MonkeyPatch,
+    env_value: str,
+    expected: str,
+) -> None:
+    """
+    GIVEN:
+        - PAPERLESS_SEARCH_LANGUAGE is set to a valid Tantivy stemmer language
+    WHEN:
+        - _get_search_language_setting is called
+    THEN:
+        - The explicit value is returned regardless of the OCR language
+    """
+    monkeypatch.setenv("PAPERLESS_SEARCH_LANGUAGE", env_value)
+    assert _get_search_language_setting("deu") == expected
+
+
+def test_get_search_language_setting_explicit_invalid(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """
+    GIVEN:
+        - PAPERLESS_SEARCH_LANGUAGE is set to an unsupported language code
+    WHEN:
+        - _get_search_language_setting is called
+    THEN:
+        - ValueError is raised
+    """
+    monkeypatch.setenv("PAPERLESS_SEARCH_LANGUAGE", "klingon")
+    with pytest.raises(ValueError, match="klingon"):
+        _get_search_language_setting("eng")
 
 
 class TestPaperlessURLSettings(TestCase):
