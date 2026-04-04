@@ -532,6 +532,7 @@ class TantivyBackend:
         # Build result hits with highlights
         hits: list[SearchHit] = []
         snippet_generator = None
+        notes_snippet_generator = None
 
         for rank, (doc_address, score) in enumerate(page_hits, start=offset + 1):
             # Get the actual document from the searcher using the doc address
@@ -558,13 +559,16 @@ class TantivyBackend:
 
                     # Try notes highlights
                     if "notes" in doc_dict:
-                        notes_generator = tantivy.SnippetGenerator.create(
-                            searcher,
-                            final_query,
-                            self._schema,
-                            "notes",
+                        if notes_snippet_generator is None:
+                            notes_snippet_generator = tantivy.SnippetGenerator.create(
+                                searcher,
+                                final_query,
+                                self._schema,
+                                "notes",
+                            )
+                        notes_snippet = notes_snippet_generator.snippet_from_doc(
+                            actual_doc,
                         )
-                        notes_snippet = notes_generator.snippet_from_doc(actual_doc)
                         if notes_snippet:
                             highlights["notes"] = str(notes_snippet)
 
