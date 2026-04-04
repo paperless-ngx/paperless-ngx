@@ -145,6 +145,22 @@ class TestApiObjects(DirectoriesMixin, APITestCase):
             response.data["last_correspondence"],
         )
 
+    def test_paginated_objects_include_all_only_for_legacy_version(self) -> None:
+        response_v10 = self.client.get("/api/correspondents/")
+        self.assertEqual(response_v10.status_code, status.HTTP_200_OK)
+        self.assertNotIn("all", response_v10.data)
+
+        response_v9 = self.client.get(
+            "/api/correspondents/",
+            headers={"Accept": "application/json; version=9"},
+        )
+        self.assertEqual(response_v9.status_code, status.HTTP_200_OK)
+        self.assertIn("all", response_v9.data)
+        self.assertCountEqual(
+            response_v9.data["all"],
+            [self.c1.id, self.c2.id, self.c3.id],
+        )
+
 
 class TestApiStoragePaths(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/storage_paths/"
@@ -360,7 +376,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "path/Something")
+        self.assertEqual(response.data, "path/Something.pdf")
 
     def test_test_storage_path_respects_none_placeholder_setting(self) -> None:
         """
@@ -390,7 +406,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "folder/none/Something")
+        self.assertEqual(response.data, "folder/none/Something.pdf")
 
         with override_settings(FILENAME_FORMAT_REMOVE_NONE=True):
             response = self.client.post(
@@ -399,7 +415,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
                 content_type="application/json",
             )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "folder/Something")
+        self.assertEqual(response.data, "folder/Something.pdf")
 
     def test_test_storage_path_requires_document_view_permission(self) -> None:
         owner = User.objects.create_user(username="owner")
@@ -447,7 +463,27 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "path/Shared")
+        self.assertEqual(response.data, "path/Shared.pdf")
+
+    def test_test_storage_path_prefers_existing_filename_extension(self) -> None:
+        document = Document.objects.create(
+            mime_type="image/jpeg",
+            filename="existing/Document.jpeg",
+            title="Something",
+            checksum="123",
+        )
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "document": document.id,
+                    "path": "path/{{ title }}",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, "path/Something.jpeg")
 
     def test_test_storage_path_exposes_basic_document_context_but_not_sensitive_owner_data(
         self,
@@ -478,12 +514,12 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "owner")
+        self.assertEqual(response.data, "owner.pdf")
 
         for expression, expected in (
-            ("{{ document.content }}", "Top secret content"),
-            ("{{ document.id }}", str(document.id)),
-            ("{{ document.page_count }}", "2"),
+            ("{{ document.content }}", "Top secret content.pdf"),
+            ("{{ document.id }}", f"{document.id}.pdf"),
+            ("{{ document.page_count }}", "2.pdf"),
         ):
             response = self.client.post(
                 f"{self.ENDPOINT}test/",
@@ -545,7 +581,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "Private Correspondent")
+        self.assertEqual(response.data, "Private Correspondent.pdf")
 
         response = self.client.post(
             f"{self.ENDPOINT}test/",
@@ -560,7 +596,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "Private Correspondent")
+        self.assertEqual(response.data, "Private Correspondent.pdf")
 
     def test_test_storage_path_superuser_can_view_private_related_objects(self) -> None:
         owner = User.objects.create_user(username="owner")
@@ -589,7 +625,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "Private Correspondent")
+        self.assertEqual(response.data, "Private Correspondent.pdf")
 
     def test_test_storage_path_includes_doc_type_storage_path_and_tags(
         self,
@@ -636,7 +672,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "Private Type/private/path/Private Tag")
+        self.assertEqual(response.data, "Private Type/private/path/Private Tag.pdf")
 
         response = self.client.post(
             f"{self.ENDPOINT}test/",
@@ -649,7 +685,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "Private Type/Private Tag")
+        self.assertEqual(response.data, "Private Type/Private Tag.pdf")
 
     def test_test_storage_path_includes_custom_fields_for_visible_document(
         self,
@@ -685,7 +721,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "42")
+        self.assertEqual(response.data, "42.pdf")
 
 
 class TestBulkEditObjects(APITestCase):
@@ -774,6 +810,62 @@ class TestBulkEditObjects(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(StoragePath.objects.count(), 0)
 
+    def test_bulk_objects_delete_all_filtered(self) -> None:
+        """
+        GIVEN:
+            - Existing objects that can be filtered by name
+        WHEN:
+            - bulk_edit_objects API endpoint is called with all=true and filters
+        THEN:
+            - Matching objects are deleted without passing explicit IDs
+        """
+        Correspondent.objects.create(name="c2")
+
+        response = self.client.post(
+            "/api/bulk_edit_objects/",
+            json.dumps(
+                {
+                    "all": True,
+                    "filters": {"name__icontains": "c"},
+                    "object_type": "correspondents",
+                    "operation": "delete",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Correspondent.objects.count(), 0)
+
+    def test_bulk_objects_delete_all_filtered_tags_includes_descendants(self) -> None:
+        """
+        GIVEN:
+            - Root tag with descendants
+        WHEN:
+            - bulk_edit_objects API endpoint is called with all=true
+        THEN:
+            - Root tags and descendants are deleted
+        """
+        parent = Tag.objects.create(name="parent")
+        child = Tag.objects.create(name="child", tn_parent=parent)
+
+        response = self.client.post(
+            "/api/bulk_edit_objects/",
+            json.dumps(
+                {
+                    "all": True,
+                    "filters": {"is_root": True},
+                    "object_type": "tags",
+                    "operation": "delete",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(Tag.objects.filter(id=parent.id).exists())
+        self.assertFalse(Tag.objects.filter(id=child.id).exists())
+
     def test_bulk_edit_object_permissions_insufficient_global_perms(self) -> None:
         """
         GIVEN:
@@ -861,3 +953,40 @@ class TestBulkEditObjects(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(response.content, b"Insufficient permissions")
+
+    def test_bulk_edit_all_filtered_permissions_insufficient_object_perms(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - Filter-matching objects include one that the user cannot edit
+        WHEN:
+            - bulk_edit_objects API endpoint is called with all=true
+        THEN:
+            - Operation applies only to editable objects
+        """
+        self.t2.owner = User.objects.get(username="temp_admin")
+        self.t2.save()
+
+        self.user1.user_permissions.add(
+            *Permission.objects.filter(codename="delete_tag"),
+        )
+        self.user1.save()
+        self.client.force_authenticate(user=self.user1)
+
+        response = self.client.post(
+            "/api/bulk_edit_objects/",
+            json.dumps(
+                {
+                    "all": True,
+                    "filters": {"name__icontains": "t"},
+                    "object_type": "tags",
+                    "operation": "delete",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(Tag.objects.filter(id=self.t2.id).exists())
+        self.assertFalse(Tag.objects.filter(id=self.t1.id).exists())

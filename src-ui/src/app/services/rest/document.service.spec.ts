@@ -10,7 +10,7 @@ import {
   DOCUMENT_SORT_FIELDS,
   DOCUMENT_SORT_FIELDS_FULLTEXT,
 } from 'src/app/data/document'
-import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
+import { FILTER_SIMPLE_TITLE } from 'src/app/data/filter-rule-type'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { environment } from 'src/environments/environment'
 import { PermissionsService } from '../permissions.service'
@@ -138,13 +138,13 @@ describe(`DocumentService`, () => {
     subscription = service
       .listAllFilteredIds([
         {
-          rule_type: FILTER_TITLE,
+          rule_type: FILTER_SIMPLE_TITLE,
           value: 'apple',
         },
       ])
       .subscribe()
     const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000&fields=id&title__icontains=apple`
+      `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000&fields=id&title_search=apple`
     )
     expect(req.request.method).toEqual('GET')
   })
@@ -198,7 +198,7 @@ describe(`DocumentService`, () => {
     const content = 'both'
     const useFilenameFormatting = false
     subscription = service
-      .bulkDownload(ids, content, useFilenameFormatting)
+      .bulkDownload({ documents: ids }, content, useFilenameFormatting)
       .subscribe()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}${endpoint}/bulk_download/`
@@ -218,7 +218,9 @@ describe(`DocumentService`, () => {
       add_tags: [15],
       remove_tags: [6],
     }
-    subscription = service.bulkEdit(ids, method, parameters).subscribe()
+    subscription = service
+      .bulkEdit({ documents: ids }, method, parameters)
+      .subscribe()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}${endpoint}/bulk_edit/`
     )
@@ -230,9 +232,32 @@ describe(`DocumentService`, () => {
     })
   })
 
+  it('should call appropriate api endpoint for bulk edit with all and filters', () => {
+    const method = 'modify_tags'
+    const parameters = {
+      add_tags: [15],
+      remove_tags: [6],
+    }
+    const selection = {
+      all: true,
+      filters: { title__icontains: 'apple' },
+    }
+    subscription = service.bulkEdit(selection, method, parameters).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/bulk_edit/`
+    )
+    expect(req.request.method).toEqual('POST')
+    expect(req.request.body).toEqual({
+      all: true,
+      filters: { title__icontains: 'apple' },
+      method,
+      parameters,
+    })
+  })
+
   it('should call appropriate api endpoint for delete documents', () => {
     const ids = [1, 2, 3]
-    subscription = service.deleteDocuments(ids).subscribe()
+    subscription = service.deleteDocuments({ documents: ids }).subscribe()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}${endpoint}/delete/`
     )
@@ -244,7 +269,7 @@ describe(`DocumentService`, () => {
 
   it('should call appropriate api endpoint for reprocess documents', () => {
     const ids = [1, 2, 3]
-    subscription = service.reprocessDocuments(ids).subscribe()
+    subscription = service.reprocessDocuments({ documents: ids }).subscribe()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}${endpoint}/reprocess/`
     )
@@ -256,7 +281,7 @@ describe(`DocumentService`, () => {
 
   it('should call appropriate api endpoint for rotate documents', () => {
     const ids = [1, 2, 3]
-    subscription = service.rotateDocuments(ids, 90).subscribe()
+    subscription = service.rotateDocuments({ documents: ids }, 90).subscribe()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}${endpoint}/rotate/`
     )

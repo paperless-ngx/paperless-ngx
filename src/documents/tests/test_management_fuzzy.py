@@ -21,6 +21,7 @@ class TestFuzzyMatchCommand(TestCase):
             *args,
             stdout=stdout,
             stderr=stderr,
+            skip_checks=True,
             **kwargs,
         )
         return stdout.getvalue(), stderr.getvalue()

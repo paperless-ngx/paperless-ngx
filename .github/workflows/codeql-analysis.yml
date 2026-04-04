@@ -34,10 +34,12 @@ jobs:
         # Learn more about CodeQL language support at https://git.io/codeql-language-support
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v4.32.5
+        uses: github/codeql-action/init@c793b717bc78562f491db7b0e93a3a178b099162 # v4.32.5
         with:
           languages: ${{ matrix.language }}
           # If you wish to specify custom queries, you can do so here or in a config file.
@@ -45,4 +47,4 @@ jobs:
           # Prefix the list here with "+" to use these queries and those in the config file.
           # queries: ./path/to/local/query, your-org/your-repo/queries@main
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v4.32.5
+        uses: github/codeql-action/analyze@c793b717bc78562f491db7b0e93a3a178b099162 # v4.32.5

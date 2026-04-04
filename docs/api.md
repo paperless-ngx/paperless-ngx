@@ -62,10 +62,14 @@ The REST api provides five different forms of authentication.
 
 ## Searching for documents
 
-Full text searching is available on the `/api/documents/` endpoint. Two
-specific query parameters cause the API to return full text search
+Full text searching is available on the `/api/documents/` endpoint. The
+following query parameters cause the API to return Tantivy-backed search
 results:
 
+- `/api/documents/?text=your%20search%20query`: Search title and content
+  using simple substring-style search.
+- `/api/documents/?title_search=your%20search%20query`: Search title only
+  using simple substring-style search.
 - `/api/documents/?query=your%20search%20query`: Search for a document
   using a full text query. For details on the syntax, see [Basic Usage - Searching](usage.md#basic-usage_searching).
 - `/api/documents/?more_like_id=1234`: Search for documents similar to
@@ -167,9 +171,8 @@ Query parameters:
 - `term`: The incomplete term.
 - `limit`: Amount of results. Defaults to 10.
 
-Results returned by the endpoint are ordered by importance of the term
-in the document index. The first result is the term that has the highest
-[Tf/Idf](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) score in the index.
+Results are ordered by how many of the user's visible documents contain
+each matching word. The first result is the word that appears in the most documents.
 
 ```json
 ["term1", "term3", "term6", "term4"]
@@ -437,3 +440,8 @@ Initial API version.
   moved from the bulk edit endpoint to their own individual endpoints. Using these methods via
   the bulk edit endpoint is still supported for compatibility with versions < 10 until support
   for API v9 is dropped.
+- The `all` parameter of list endpoints is now deprecated and will be removed in a future version.
+- The bulk edit objects endpoint now supports `all` and `filters` parameters to avoid having to send
+  large lists of object IDs for operations affecting many objects.
+- The legacy `title_content` document search parameter is deprecated and will be removed in a future version.
+  Clients should use `text` for simple title-and-content search and `title_search` for title-only search.

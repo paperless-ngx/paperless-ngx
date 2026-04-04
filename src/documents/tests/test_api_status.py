@@ -26,6 +26,23 @@ class TestSystemStatus(APITestCase):
         self.override = override_settings(MEDIA_ROOT=self.tmp_dir)
         self.override.enable()
 
+        # Mock slow network calls so tests don't block on real Redis/Celery timeouts.
+        # Individual tests that care about specific behaviour override these with
+        # their own @mock.patch decorators (which take precedence).
+        redis_patcher = mock.patch(
+            "redis.Redis.execute_command",
+            side_effect=Exception("Redis not available"),
+        )
+        self.mock_redis = redis_patcher.start()
+        self.addCleanup(redis_patcher.stop)
+
+        celery_patcher = mock.patch(
+            "celery.app.control.Inspect.ping",
+            side_effect=Exception("Celery not available"),
+        )
+        self.mock_celery_ping = celery_patcher.start()
+        self.addCleanup(celery_patcher.stop)
+
     def tearDown(self) -> None:
         super().tearDown()
 
@@ -69,10 +86,17 @@ class TestSystemStatus(APITestCase):
         """
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response["WWW-Authenticate"], "Token")
         normal_user = User.objects.create_user(username="normal_user")
         self.client.force_login(normal_user)
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_system_status_with_bad_basic_auth_challenges(self) -> None:
+        self.client.credentials(HTTP_AUTHORIZATION="Basic invalid")
+        response = self.client.get(self.ENDPOINT)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response["WWW-Authenticate"], 'Basic realm="api"')
 
     def test_system_status_container_detection(self) -> None:
         """
@@ -84,13 +108,17 @@ class TestSystemStatus(APITestCase):
             - The response contains the correct install type
         """
         self.client.force_login(self.user)
-        os.environ["PNGX_CONTAINERIZED"] = "1"
-        response = self.client.get(self.ENDPOINT)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["install_type"], "docker")
-        os.environ["KUBERNETES_SERVICE_HOST"] = "http://localhost"
-        response = self.client.get(self.ENDPOINT)
-        self.assertEqual(response.data["install_type"], "kubernetes")
+        with mock.patch.dict(os.environ, {"PNGX_CONTAINERIZED": "1"}, clear=False):
+            response = self.client.get(self.ENDPOINT)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(response.data["install_type"], "docker")
+        with mock.patch.dict(
+            os.environ,
+            {"PNGX_CONTAINERIZED": "1", "KUBERNETES_SERVICE_HOST": "http://localhost"},
+            clear=False,
+        ):
+            response = self.client.get(self.ENDPOINT)
+            self.assertEqual(response.data["install_type"], "kubernetes")
 
     @mock.patch("redis.Redis.execute_command")
     def test_system_status_redis_ping(self, mock_ping) -> None:
@@ -163,40 +191,42 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["tasks"]["celery_status"], "OK")
 
-    @override_settings(INDEX_DIR=Path("/tmp/index"))
-    @mock.patch("whoosh.index.FileIndex.last_modified")
-    def test_system_status_index_ok(self, mock_last_modified) -> None:
+    @mock.patch("documents.search.get_backend")
+    def test_system_status_index_ok(self, mock_get_backend) -> None:
         """
         GIVEN:
-            - The index last modified time is set
+            - The index is accessible
         WHEN:
             - The user requests the system status
         THEN:
             - The response contains the correct index status
         """
-        mock_last_modified.return_value = 1707839087
-        self.client.force_login(self.user)
-        response = self.client.get(self.ENDPOINT)
+        mock_get_backend.return_value = mock.MagicMock()
+        # Use the temp dir created in setUp (self.tmp_dir) as a real INDEX_DIR
+        # with a real file so the mtime lookup works
+        sentinel = self.tmp_dir / "sentinel.txt"
+        sentinel.write_text("ok")
+        with self.settings(INDEX_DIR=self.tmp_dir):
+            self.client.force_login(self.user)
+            response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["tasks"]["index_status"], "OK")
         self.assertIsNotNone(response.data["tasks"]["index_last_modified"])
 
-    @override_settings(INDEX_DIR=Path("/tmp/index/"))
-    @mock.patch("documents.index.open_index", autospec=True)
-    def test_system_status_index_error(self, mock_open_index) -> None:
+    @mock.patch("documents.search.get_backend")
+    def test_system_status_index_error(self, mock_get_backend) -> None:
         """
         GIVEN:
-            - The index is not found
+            - The index cannot be opened
         WHEN:
             - The user requests the system status
         THEN:
             - The response contains the correct index status
         """
-        mock_open_index.return_value = None
-        mock_open_index.side_effect = Exception("Index error")
+        mock_get_backend.side_effect = Exception("Index error")
         self.client.force_login(self.user)
         response = self.client.get(self.ENDPOINT)
-        mock_open_index.assert_called_once()
+        mock_get_backend.assert_called_once()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["tasks"]["index_status"], "ERROR")
         self.assertIsNotNone(response.data["tasks"]["index_error"])

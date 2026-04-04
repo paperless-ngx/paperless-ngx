@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core'
 import { ParamMap, Router, UrlTree } from '@angular/router'
-import { Observable, Subject, first, takeUntil } from 'rxjs'
+import { Observable, Subject, takeUntil } from 'rxjs'
 import {
   DEFAULT_DISPLAY_FIELDS,
   DisplayField,
@@ -8,6 +8,7 @@ import {
   Document,
 } from '../data/document'
 import { FilterRule } from '../data/filter-rule'
+import { DocumentResults, SelectionData } from '../data/results'
 import { SavedView } from '../data/saved-view'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
 import { SETTINGS_KEYS } from '../data/ui-settings'
@@ -17,12 +18,26 @@ import {
   isFullTextFilterRule,
 } from '../utils/filter-rules'
 import { paramsFromViewState, paramsToViewState } from '../utils/query-params'
-import { DocumentService, SelectionData } from './rest/document.service'
+import { DocumentService } from './rest/document.service'
 import { SettingsService } from './settings.service'
 
 const LIST_DEFAULT_DISPLAY_FIELDS: DisplayField[] = DEFAULT_DISPLAY_FIELDS.map(
   (f) => f.id
 ).filter((f) => f !== DisplayField.ADDED)
+
+const RESTORABLE_LIST_VIEW_STATE_KEYS: (keyof ListViewState)[] = [
+  'title',
+  'documents',
+  'currentPage',
+  'collectionSize',
+  'sortField',
+  'sortReverse',
+  'filterRules',
+  'selected',
+  'pageSize',
+  'displayMode',
+  'displayFields',
+]
 
 /**
  * Captures the current state of the list view.
@@ -64,6 +79,11 @@ export interface ListViewState {
    * Contains the IDs of all selected documents.
    */
   selected?: Set<number>
+
+  /**
+   * True if the full filtered result set is selected.
+   */
+  allSelected?: boolean
 
   /**
    * The page size of the list view.
@@ -112,6 +132,32 @@ export class DocumentListViewService {
 
   private displayFieldsInitialized: boolean = false
 
+  private restoreListViewState(savedState: unknown): ListViewState {
+    const newState = this.defaultListViewState()
+
+    if (
+      !savedState ||
+      typeof savedState !== 'object' ||
+      Array.isArray(savedState)
+    ) {
+      return newState
+    }
+
+    const parsedState = savedState as Partial<
+      Record<keyof ListViewState, unknown>
+    >
+    const mutableState = newState as Record<keyof ListViewState, unknown>
+
+    for (const key of RESTORABLE_LIST_VIEW_STATE_KEYS) {
+      const value = parsedState[key]
+      if (value != null) {
+        mutableState[key] = value
+      }
+    }
+
+    return newState
+  }
+
   get activeSavedViewId() {
     return this._activeSavedViewId
   }
@@ -127,14 +173,7 @@ export class DocumentListViewService {
     if (documentListViewConfigJson) {
       try {
         let savedState: ListViewState = JSON.parse(documentListViewConfigJson)
-        // Remove null elements from the restored state
-        Object.keys(savedState).forEach((k) => {
-          if (savedState[k] == null) {
-            delete savedState[k]
-          }
-        })
-        // only use restored state attributes instead of defaults if they are not null
-        let newState = Object.assign(this.defaultListViewState(), savedState)
+        let newState = this.restoreListViewState(savedState)
         this.listViewStates.set(null, newState)
       } catch (e) {
         localStorage.removeItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
@@ -165,6 +204,20 @@ export class DocumentListViewService {
       sortReverse: true,
       filterRules: [],
       selected: new Set<number>(),
+      allSelected: false,
+    }
+  }
+
+  private syncSelectedToCurrentPage() {
+    if (!this.allSelected) {
+      return
+    }
+
+    this.selected.clear()
+    this.documents?.forEach((doc) => this.selected.add(doc.id))
+
+    if (!this.collectionSize) {
+      this.selectNone()
     }
   }
 
@@ -260,27 +313,18 @@ export class DocumentListViewService {
         activeListViewState.sortField,
         activeListViewState.sortReverse,
         activeListViewState.filterRules,
-        { truncate_content: true }
+        { truncate_content: true, include_selection_data: true }
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (result) => {
+          const resultWithSelectionData = result as DocumentResults
           this.initialized = true
           this.isReloading = false
           activeListViewState.collectionSize = result.count
           activeListViewState.documents = result.results
-
-          this.documentService
-            .getSelectionData(result.all)
-            .pipe(first())
-            .subscribe({
-              next: (selectionData) => {
-                this.selectionData = selectionData
-              },
-              error: () => {
-                this.selectionData = null
-              },
-            })
+          this.selectionData = resultWithSelectionData.selection_data ?? null
+          this.syncSelectedToCurrentPage()
 
           if (updateQueryParams && !this._activeSavedViewId) {
             let base = ['/documents']
@@ -411,6 +455,20 @@ export class DocumentListViewService {
 
   get selected(): Set<number> {
     return this.activeListViewState.selected
+  }
+
+  get allSelected(): boolean {
+    return this.activeListViewState.allSelected ?? false
+  }
+
+  get selectedCount(): number {
+    return this.allSelected
+      ? (this.collectionSize ?? this.selected.size)
+      : this.selected.size
+  }
+
+  get hasSelection(): boolean {
+    return this.allSelected || this.selected.size > 0
   }
 
   setSort(field: string, reverse: boolean) {
@@ -567,11 +625,16 @@ export class DocumentListViewService {
   }
 
   selectNone() {
+    this.activeListViewState.allSelected = false
     this.selected.clear()
     this.rangeSelectionAnchorIndex = this.lastRangeSelectionToIndex = null
   }
 
   reduceSelectionToFilter() {
+    if (this.allSelected) {
+      return
+    }
+
     if (this.selected.size > 0) {
       this.documentService
         .listAllFilteredIds(this.filterRules)
@@ -586,12 +649,12 @@ export class DocumentListViewService {
   }
 
   selectAll() {
-    this.documentService
-      .listAllFilteredIds(this.filterRules)
-      .subscribe((ids) => ids.forEach((id) => this.selected.add(id)))
+    this.activeListViewState.allSelected = true
+    this.syncSelectedToCurrentPage()
   }
 
   selectPage() {
+    this.activeListViewState.allSelected = false
     this.selected.clear()
     this.documents.forEach((doc) => {
       this.selected.add(doc.id)
@@ -599,10 +662,13 @@ export class DocumentListViewService {
   }
 
   isSelected(d: Document) {
-    return this.selected.has(d.id)
+    return this.allSelected || this.selected.has(d.id)
   }
 
   toggleSelected(d: Document): void {
+    if (this.allSelected) {
+      this.activeListViewState.allSelected = false
+    }
     if (this.selected.has(d.id)) this.selected.delete(d.id)
     else this.selected.add(d.id)
     this.rangeSelectionAnchorIndex = this.documentIndexInCurrentView(d.id)
@@ -610,6 +676,10 @@ export class DocumentListViewService {
   }
 
   selectRangeTo(d: Document) {
+    if (this.allSelected) {
+      this.activeListViewState.allSelected = false
+    }
+
     if (this.rangeSelectionAnchorIndex !== null) {
       const documentToIndex = this.documentIndexInCurrentView(d.id)
       const fromIndex = Math.min(

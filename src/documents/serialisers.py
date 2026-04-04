@@ -797,6 +797,25 @@ class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
         return {self.field_name: data}
 
 
+def validate_documentlink_targets(user, doc_ids):
+    if Document.objects.filter(id__in=doc_ids).count() != len(doc_ids):
+        raise serializers.ValidationError(
+            "Some documents in value don't exist or were specified twice.",
+        )
+
+    if user is None:
+        return
+
+    target_documents = Document.objects.filter(id__in=doc_ids).select_related("owner")
+    if not all(
+        has_perms_owner_aware(user, "change_document", document)
+        for document in target_documents
+    ):
+        raise PermissionDenied(
+            _("Insufficient permissions."),
+        )
+
+
 class CustomFieldInstanceSerializer(serializers.ModelSerializer):
     field = serializers.PrimaryKeyRelatedField(queryset=CustomField.objects.all())
     value = ReadWriteSerializerMethodField(allow_null=True)
@@ -887,12 +906,11 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
                         "Value must be a list",
                     )
                 doc_ids = data["value"]
-                if Document.objects.filter(id__in=doc_ids).count() != len(
-                    data["value"],
-                ):
-                    raise serializers.ValidationError(
-                        "Some documents in value don't exist or were specified twice.",
-                    )
+                request = self.context.get("request")
+                validate_documentlink_targets(
+                    getattr(request, "user", None) if request is not None else None,
+                    doc_ids,
+                )
 
         return data
 
@@ -1275,22 +1293,18 @@ class SearchResultSerializer(DocumentSerializer):
         documents = self.context.get("documents")
         # Otherwise we fetch this document.
         if documents is None:  # pragma: no cover
-            # In practice we only serialize **lists** of whoosh.searching.Hit.
-            # I'm keeping this check for completeness but marking it no cover for now.
+            # In practice we only serialize **lists** of SearchHit dicts.
+            # Keeping this check for completeness but marking it no cover for now.
             documents = self.fetch_documents([hit["id"]])
         document = documents[hit["id"]]
 
-        notes = ",".join(
-            [str(c.note) for c in document.notes.all()],
-        )
+        highlights = hit.get("highlights", {})
         r = super().to_representation(document)
         r["__search_hit__"] = {
-            "score": hit.score,
-            "highlights": hit.highlights("content", text=document.content),
-            "note_highlights": (
-                hit.highlights("notes", text=notes) if document else None
-            ),
-            "rank": hit.rank,
+            "score": hit["score"],
+            "highlights": highlights.get("content", ""),
+            "note_highlights": highlights.get("notes") or None,
+            "rank": hit["rank"],
         }
 
         return r
@@ -1540,6 +1554,41 @@ class DocumentListSerializer(serializers.Serializer):
         return documents
 
 
+class DocumentSelectionSerializer(DocumentListSerializer):
+    documents = serializers.ListField(
+        required=False,
+        label="Documents",
+        write_only=True,
+        child=serializers.IntegerField(),
+    )
+
+    all = serializers.BooleanField(
+        default=False,
+        required=False,
+        write_only=True,
+    )
+
+    filters = serializers.DictField(
+        required=False,
+        allow_empty=True,
+        write_only=True,
+    )
+
+    def validate(self, attrs):
+        if attrs.get("all", False):
+            attrs.setdefault("documents", [])
+            return attrs
+
+        if "documents" not in attrs:
+            raise serializers.ValidationError(
+                "documents is required unless all is true.",
+            )
+
+        documents = attrs["documents"]
+        self._validate_document_id_list(documents)
+        return attrs
+
+
 class SourceModeValidationMixin:
     def validate_source_mode(self, source_mode: str) -> str:
         if source_mode not in bulk_edit.SourceModeChoices.__dict__.values():
@@ -1547,7 +1596,7 @@ class SourceModeValidationMixin:
         return source_mode
 
 
-class RotateDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
+class RotateDocumentsSerializer(DocumentSelectionSerializer, SourceModeValidationMixin):
     degrees = serializers.IntegerField(required=True)
     source_mode = serializers.CharField(
         required=False,
@@ -1630,17 +1679,17 @@ class RemovePasswordDocumentsSerializer(
     )
 
 
-class DeleteDocumentsSerializer(DocumentListSerializer):
+class DeleteDocumentsSerializer(DocumentSelectionSerializer):
     pass
 
 
-class ReprocessDocumentsSerializer(DocumentListSerializer):
+class ReprocessDocumentsSerializer(DocumentSelectionSerializer):
     pass
 
 
 class BulkEditSerializer(
     SerializerWithPerms,
-    DocumentListSerializer,
+    DocumentSelectionSerializer,
     SetPermissionsMixin,
     SourceModeValidationMixin,
 ):
@@ -1712,6 +1761,19 @@ class BulkEditSerializer(
             raise serializers.ValidationError(
                 f"Some custom fields in {name} don't exist or were specified twice.",
             )
+
+        if isinstance(custom_fields, dict):
+            custom_field_map = CustomField.objects.in_bulk(ids)
+            for raw_field_id, value in custom_fields.items():
+                field = custom_field_map.get(int(raw_field_id))
+                if (
+                    field is not None
+                    and field.data_type == CustomField.FieldDataType.DOCUMENTLINK
+                    and value is not None
+                ):
+                    if not isinstance(value, list):
+                        raise serializers.ValidationError("Value must be a list")
+                    validate_documentlink_targets(self.user, value)
 
     def validate_method(self, method):
         if method == "set_correspondent":
@@ -1955,6 +2017,19 @@ class BulkEditSerializer(
             raise serializers.ValidationError("password must be a string")
 
     def validate(self, attrs):
+        attrs = super().validate(attrs)
+
+        if attrs.get("all", False) and attrs["method"] in [
+            bulk_edit.merge,
+            bulk_edit.split,
+            bulk_edit.delete_pages,
+            bulk_edit.edit_pdf,
+            bulk_edit.remove_password,
+        ]:
+            raise serializers.ValidationError(
+                "This method does not support all=true.",
+            )
+
         method = attrs["method"]
         parameters = attrs["parameters"]
 
@@ -2212,7 +2287,7 @@ class DocumentVersionLabelSerializer(serializers.Serializer):
         return normalized or None
 
 
-class BulkDownloadSerializer(DocumentListSerializer):
+class BulkDownloadSerializer(DocumentSelectionSerializer):
     content = serializers.ChoiceField(
         choices=["archive", "originals", "both"],
         default="archive",
@@ -2571,11 +2646,23 @@ class ShareLinkBundleSerializer(OwnedObjectSerializer):
 
 class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
     objects = serializers.ListField(
-        required=True,
-        allow_empty=False,
+        required=False,
+        allow_empty=True,
         label="Objects",
         write_only=True,
         child=serializers.IntegerField(),
+    )
+
+    all = serializers.BooleanField(
+        default=False,
+        required=False,
+        write_only=True,
+    )
+
+    filters = serializers.DictField(
+        required=False,
+        allow_empty=True,
+        write_only=True,
     )
 
     object_type = serializers.ChoiceField(
@@ -2650,10 +2737,20 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
 
     def validate(self, attrs):
         object_type = attrs["object_type"]
-        objects = attrs["objects"]
+        objects = attrs.get("objects")
+        apply_to_all = attrs.get("all", False)
         operation = attrs.get("operation")
 
-        self._validate_objects(objects, object_type)
+        if apply_to_all:
+            attrs.setdefault("objects", [])
+        else:
+            if objects is None:
+                raise serializers.ValidationError(
+                    "objects is required unless all is true.",
+                )
+            if len(objects) == 0:
+                raise serializers.ValidationError("objects must not be empty")
+            self._validate_objects(objects, object_type)
 
         if operation == "set_permissions":
             permissions = attrs.get("permissions")

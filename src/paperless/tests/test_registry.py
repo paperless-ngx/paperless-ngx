@@ -18,6 +18,7 @@ from unittest.mock import patch
 
 import pytest
 
+from paperless.parsers import ParserContext
 from paperless.parsers import ParserProtocol
 from paperless.parsers.registry import ParserRegistry
 from paperless.parsers.registry import get_parser_registry
@@ -103,6 +104,11 @@ def dummy_parser_cls() -> type:
         ) -> list:
             return []
 
+        def configure(self, context: ParserContext) -> None:
+            """
+            Required to exist, but doesn't need to do anything
+            """
+
         def __enter__(self) -> Self:
             return self
 
@@ -144,6 +150,7 @@ class TestParserProtocol:
     @pytest.mark.parametrize(
         "missing_method",
         [
+            pytest.param("configure", id="missing-configure"),
             pytest.param("parse", id="missing-parse"),
             pytest.param("get_text", id="missing-get_text"),
             pytest.param("get_thumbnail", id="missing-get_thumbnail"),

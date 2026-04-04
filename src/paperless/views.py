@@ -9,6 +9,7 @@ from allauth.mfa.recovery_codes.internal.flows import auto_generate_recovery_cod
 from allauth.mfa.totp.internal import auth as totp_auth
 from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.models import SocialAccount
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -25,15 +26,17 @@ from drf_spectacular.utils import extend_schema_view
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
+from rest_framework.fields import BooleanField
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import GenericAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.viewsets import ModelViewSet
 
-from documents.index import DelayedQuery
 from documents.permissions import PaperlessObjectPermissions
 from documents.tasks import llmindex_index
 from paperless.filters import GroupFilterSet
@@ -49,6 +52,8 @@ from paperless_ai.indexing import vector_store_file_exists
 
 class PaperlessObtainAuthTokenView(ObtainAuthToken):
     serializer_class = PaperlessAuthTokenSerializer
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "login"
 
 
 class StandardPagination(PageNumberPagination):
@@ -56,42 +61,47 @@ class StandardPagination(PageNumberPagination):
     page_size_query_param = "page_size"
     max_page_size = 100000
 
+    def _get_api_version(self) -> int:
+        request = getattr(self, "request", None)
+        default_version = settings.REST_FRAMEWORK["DEFAULT_VERSION"]
+        return int(request.version if request else default_version)
+
+    def _should_include_all(self) -> bool:
+        # TODO: remove legacy `all` support when API v9 is dropped.
+        return self._get_api_version() < 10
+
     def get_paginated_response(self, data):
+        response_data = [
+            ("count", self.page.paginator.count),
+            ("next", self.get_next_link()),
+            ("previous", self.get_previous_link()),
+        ]
+        if self._should_include_all():
+            response_data.append(("all", self.get_all_result_ids()))
+        response_data.append(("results", data))
+
         return Response(
-            OrderedDict(
-                [
-                    ("count", self.page.paginator.count),
-                    ("next", self.get_next_link()),
-                    ("previous", self.get_previous_link()),
-                    ("all", self.get_all_result_ids()),
-                    ("results", data),
-                ],
-            ),
+            OrderedDict(response_data),
         )
 
     def get_all_result_ids(self):
+        from documents.search import TantivyRelevanceList
+
         query = self.page.paginator.object_list
-        if isinstance(query, DelayedQuery):
-            try:
-                ids = [
-                    query.searcher.ixreader.stored_fields(
-                        doc_num,
-                    )["id"]
-                    for doc_num in query.saved_results.get(0).results.docs()
-                ]
-            except Exception:
-                pass
-        else:
-            ids = self.page.paginator.object_list.values_list("pk", flat=True)
-        return ids
+        if isinstance(query, TantivyRelevanceList):
+            return [h["id"] for h in query._hits]
+        return self.page.paginator.object_list.values_list("pk", flat=True)
 
     def get_paginated_response_schema(self, schema):
         response_schema = super().get_paginated_response_schema(schema)
-        response_schema["properties"]["all"] = {
-            "type": "array",
-            "example": "[1, 2, 3]",
-            "items": {"type": "integer"},
-        }
+        if self._should_include_all():
+            response_schema["properties"]["all"] = {
+                "type": "array",
+                "example": "[1, 2, 3]",
+                "items": {"type": "integer"},
+            }
+        else:
+            response_schema["properties"].pop("all", None)
         return response_schema
 
 
@@ -105,6 +115,7 @@ class FaviconView(View):
 
 
 class UserViewSet(ModelViewSet):
+    _BOOL_NOT_PROVIDED = object()
     model = User
 
     queryset = User.objects.exclude(
@@ -118,26 +129,64 @@ class UserViewSet(ModelViewSet):
     filterset_class = UserFilterSet
     ordering_fields = ("username",)
 
+    @staticmethod
+    def _parse_requested_bool(data, key: str):
+        if key not in data:
+            return UserViewSet._BOOL_NOT_PROVIDED
+        try:
+            return BooleanField().to_internal_value(data.get(key))
+        except ValidationError:
+            # Let serializer validation report invalid values as 400 responses
+            return UserViewSet._BOOL_NOT_PROVIDED
+
     def create(self, request, *args, **kwargs):
-        if not request.user.is_superuser and request.data.get("is_superuser") is True:
-            return HttpResponseForbidden(
-                "Superuser status can only be granted by a superuser",
-            )
+        requested_is_superuser = self._parse_requested_bool(
+            request.data,
+            "is_superuser",
+        )
+        requested_is_staff = self._parse_requested_bool(request.data, "is_staff")
+
+        if not request.user.is_superuser:
+            if requested_is_superuser is True:
+                return HttpResponseForbidden(
+                    "Superuser status can only be granted by a superuser",
+                )
+            if requested_is_staff is True:
+                return HttpResponseForbidden(
+                    "Staff status can only be granted by a superuser",
+                )
+
         return super().create(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         user_to_update: User = self.get_object()
+
         if not request.user.is_superuser and user_to_update.is_superuser:
             return HttpResponseForbidden(
                 "Superusers can only be modified by other superusers",
             )
+
+        requested_is_superuser = self._parse_requested_bool(
+            request.data,
+            "is_superuser",
+        )
+        requested_is_staff = self._parse_requested_bool(request.data, "is_staff")
+
         if (
             not request.user.is_superuser
-            and request.data.get("is_superuser") is not None
-            and request.data.get("is_superuser") != user_to_update.is_superuser
+            and requested_is_superuser is not self._BOOL_NOT_PROVIDED
+            and requested_is_superuser != user_to_update.is_superuser
         ):
             return HttpResponseForbidden(
                 "Superuser status can only be changed by a superuser",
+            )
+        if (
+            not request.user.is_superuser
+            and requested_is_staff is not self._BOOL_NOT_PROVIDED
+            and requested_is_staff != user_to_update.is_staff
+        ):
+            return HttpResponseForbidden(
+                "Staff status can only be changed by a superuser",
             )
         return super().update(request, *args, **kwargs)
 

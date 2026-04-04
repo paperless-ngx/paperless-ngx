@@ -1,6 +1,6 @@
 import datetime
-import hashlib
 import os
+import shutil
 import tempfile
 from enum import StrEnum
 from pathlib import Path
@@ -32,9 +32,7 @@ from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import WorkflowTrigger
-from documents.parsers import DocumentParser
 from documents.parsers import ParseError
-from documents.parsers import get_parser_class_for_mime_type
 from documents.permissions import set_permissions_for_object
 from documents.plugins.base import AlwaysRunPluginMixin
 from documents.plugins.base import ConsumeTaskPlugin
@@ -49,29 +47,15 @@ from documents.signals import document_updated
 from documents.signals import document_version_added
 from documents.signals.handlers import run_workflows
 from documents.templating.workflows import parse_w_workflow_placeholders
+from documents.utils import compute_checksum
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
-from paperless.parsers.text import TextDocumentParser
-from paperless_mail.parsers import MailDocumentParser
+from paperless.parsers import ParserContext
+from paperless.parsers import ParserProtocol
+from paperless.parsers.registry import get_parser_registry
 
 LOGGING_NAME: Final[str] = "paperless.consumer"
-
-
-def _parser_cleanup(parser: DocumentParser) -> None:
-    """
-    Call cleanup on a parser, handling the new-style context-manager parsers.
-
-    New-style parsers (e.g. TextDocumentParser) use __exit__ for teardown
-    instead of a cleanup() method.  This shim will be removed once all existing parsers
-    have switched to the new style and this consumer is updated to use it
-
-    TODO(stumpylog): Remove me in the future
-    """
-    if isinstance(parser, TextDocumentParser):
-        parser.__exit__(None, None, None)
-    else:
-        parser.cleanup()
 
 
 class WorkflowTriggerPlugin(
@@ -156,14 +140,12 @@ class ConsumerPluginMixin:
             message,
             current_progress,
             max_progress,
-            extra_args={
-                "document_id": document_id,
-                "owner_id": self.metadata.owner_id if self.metadata.owner_id else None,
-                "users_can_view": (self.metadata.view_users or [])
-                + (self.metadata.change_users or []),
-                "groups_can_view": (self.metadata.view_groups or [])
-                + (self.metadata.change_groups or []),
-            },
+            document_id=document_id,
+            owner_id=self.metadata.owner_id if self.metadata.owner_id else None,
+            users_can_view=(self.metadata.view_users or [])
+            + (self.metadata.change_users or []),
+            groups_can_view=(self.metadata.view_groups or [])
+            + (self.metadata.change_groups or []),
         )
 
     def _fail(
@@ -214,9 +196,7 @@ class ConsumerPlugin(
         version_doc = Document(
             root_document=root_doc_frozen,
             version_index=next_version_index + 1,
-            checksum=hashlib.md5(
-                file_for_checksum.read_bytes(),
-            ).hexdigest(),
+            checksum=compute_checksum(file_for_checksum),
             content=text or "",
             page_count=page_count,
             mime_type=mime_type,
@@ -356,18 +336,15 @@ class ConsumerPlugin(
         Return the document object if it was successfully created.
         """
 
-        tempdir = None
+        # Preflight has already run including progress update to 0%
+        self.log.info(f"Consuming {self.filename}")
 
-        try:
-            # Preflight has already run including progress update to 0%
-            self.log.info(f"Consuming {self.filename}")
-
-            # For the actual work, copy the file into a tempdir
-            tempdir = tempfile.TemporaryDirectory(
-                prefix="paperless-ngx",
-                dir=settings.SCRATCH_DIR,
-            )
-            self.working_copy = Path(tempdir.name) / Path(self.filename)
+        # For the actual work, copy the file into a tempdir
+        with tempfile.TemporaryDirectory(
+            prefix="paperless-ngx",
+            dir=settings.SCRATCH_DIR,
+        ) as tmpdir:
+            self.working_copy = Path(tmpdir) / Path(self.filename)
             copy_file_with_basic_stats(self.input_doc.original_file, self.working_copy)
             self.unmodified_original = None
 
@@ -399,7 +376,7 @@ class ConsumerPlugin(
                     self.log.debug(f"Detected mime type after qpdf: {mime_type}")
                     # Save the original file for later
                     self.unmodified_original = (
-                        Path(tempdir.name) / Path("uo") / Path(self.filename)
+                        Path(tmpdir) / Path("uo") / Path(self.filename)
                     )
                     self.unmodified_original.parent.mkdir(exist_ok=True)
                     copy_file_with_basic_stats(
@@ -410,11 +387,14 @@ class ConsumerPlugin(
                     self.log.error(f"Error attempting to clean PDF: {e}")
 
             # Based on the mime type, get the parser for that type
-            parser_class: type[DocumentParser] | None = get_parser_class_for_mime_type(
-                mime_type,
+            parser_class: type[ParserProtocol] | None = (
+                get_parser_registry().get_parser_for_file(
+                    mime_type,
+                    self.filename,
+                    self.working_copy,
+                )
             )
             if not parser_class:
-                tempdir.cleanup()
                 self._fail(
                     ConsumerStatusShortMessage.UNSUPPORTED_TYPE,
                     f"Unsupported mime type {mime_type}",
@@ -429,312 +409,281 @@ class ConsumerPlugin(
             )
 
             self.run_pre_consume_script()
-        except:
-            if tempdir:
-                tempdir.cleanup()
-            raise
 
-        def progress_callback(
-            current_progress,
-            max_progress,
-        ) -> None:  # pragma: no cover
-            # recalculate progress to be within 20 and 80
-            p = int((current_progress / max_progress) * 50 + 20)
-            self._send_progress(p, 100, ProgressStatusOptions.WORKING)
-
-        # This doesn't parse the document yet, but gives us a parser.
-
-        document_parser: DocumentParser = parser_class(
-            self.logging_group,
-            progress_callback=progress_callback,
-        )
-
-        self.log.debug(f"Parser: {type(document_parser).__name__}")
-
-        # Parse the document. This may take some time.
-
-        text = None
-        date = None
-        thumbnail = None
-        archive_path = None
-        page_count = None
-
-        try:
-            self._send_progress(
-                20,
-                100,
-                ProgressStatusOptions.WORKING,
-                ConsumerStatusShortMessage.PARSING_DOCUMENT,
-            )
-            self.log.debug(f"Parsing {self.filename}...")
-            if (
-                isinstance(document_parser, MailDocumentParser)
-                and self.input_doc.mailrule_id
-            ):
-                document_parser.parse(
-                    self.working_copy,
-                    mime_type,
-                    self.filename,
-                    self.input_doc.mailrule_id,
-                )
-            elif isinstance(document_parser, TextDocumentParser):
-                # TODO(stumpylog): Remove me in the future
-                document_parser.parse(self.working_copy, mime_type)
-            else:
-                document_parser.parse(self.working_copy, mime_type, self.filename)
-
-            self.log.debug(f"Generating thumbnail for {self.filename}...")
-            self._send_progress(
-                70,
-                100,
-                ProgressStatusOptions.WORKING,
-                ConsumerStatusShortMessage.GENERATING_THUMBNAIL,
-            )
-            if isinstance(document_parser, TextDocumentParser):
-                # TODO(stumpylog): Remove me in the future
-                thumbnail = document_parser.get_thumbnail(self.working_copy, mime_type)
-            else:
-                thumbnail = document_parser.get_thumbnail(
-                    self.working_copy,
-                    mime_type,
-                    self.filename,
+            # This doesn't parse the document yet, but gives us a parser.
+            with parser_class() as document_parser:
+                document_parser.configure(
+                    ParserContext(mailrule_id=self.input_doc.mailrule_id),
                 )
 
-            text = document_parser.get_text()
-            date = document_parser.get_date()
-            if date is None:
+                self.log.debug(
+                    f"Parser: {document_parser.name} v{document_parser.version}",
+                )
+
+                # Parse the document. This may take some time.
+
+                text = None
+                date = None
+                thumbnail = None
+                archive_path = None
+                page_count = None
+
+                try:
+                    self._send_progress(
+                        20,
+                        100,
+                        ProgressStatusOptions.WORKING,
+                        ConsumerStatusShortMessage.PARSING_DOCUMENT,
+                    )
+                    self.log.debug(f"Parsing {self.filename}...")
+
+                    document_parser.parse(self.working_copy, mime_type)
+
+                    self.log.debug(f"Generating thumbnail for {self.filename}...")
+                    self._send_progress(
+                        70,
+                        100,
+                        ProgressStatusOptions.WORKING,
+                        ConsumerStatusShortMessage.GENERATING_THUMBNAIL,
+                    )
+                    thumbnail = document_parser.get_thumbnail(
+                        self.working_copy,
+                        mime_type,
+                    )
+
+                    text = document_parser.get_text()
+                    date = document_parser.get_date()
+                    if date is None:
+                        self._send_progress(
+                            90,
+                            100,
+                            ProgressStatusOptions.WORKING,
+                            ConsumerStatusShortMessage.PARSE_DATE,
+                        )
+                        with get_date_parser() as date_parser:
+                            date = next(date_parser.parse(self.filename, text), None)
+                    archive_path = document_parser.get_archive_path()
+                    page_count = document_parser.get_page_count(
+                        self.working_copy,
+                        mime_type,
+                    )
+
+                except ParseError as e:
+                    self._fail(
+                        str(e),
+                        f"Error occurred while consuming document {self.filename}: {e}",
+                        exc_info=True,
+                        exception=e,
+                    )
+                except Exception as e:
+                    self._fail(
+                        str(e),
+                        f"Unexpected error while consuming document {self.filename}: {e}",
+                        exc_info=True,
+                        exception=e,
+                    )
+
+                # Prepare the document classifier.
+
+                # TODO: I don't really like to do this here, but this way we avoid
+                #   reloading the classifier multiple times, since there are multiple
+                #   post-consume hooks that all require the classifier.
+
+                classifier = load_classifier()
+
                 self._send_progress(
-                    90,
+                    95,
                     100,
                     ProgressStatusOptions.WORKING,
-                    ConsumerStatusShortMessage.PARSE_DATE,
+                    ConsumerStatusShortMessage.SAVE_DOCUMENT,
                 )
-                with get_date_parser() as date_parser:
-                    date = next(date_parser.parse(self.filename, text), None)
-            archive_path = document_parser.get_archive_path()
-            page_count = document_parser.get_page_count(self.working_copy, mime_type)
-
-        except ParseError as e:
-            _parser_cleanup(document_parser)
-            if tempdir:
-                tempdir.cleanup()
-            self._fail(
-                str(e),
-                f"Error occurred while consuming document {self.filename}: {e}",
-                exc_info=True,
-                exception=e,
-            )
-        except Exception as e:
-            _parser_cleanup(document_parser)
-            if tempdir:
-                tempdir.cleanup()
-            self._fail(
-                str(e),
-                f"Unexpected error while consuming document {self.filename}: {e}",
-                exc_info=True,
-                exception=e,
-            )
-
-        # Prepare the document classifier.
-
-        # TODO: I don't really like to do this here, but this way we avoid
-        #   reloading the classifier multiple times, since there are multiple
-        #   post-consume hooks that all require the classifier.
-
-        classifier = load_classifier()
-
-        self._send_progress(
-            95,
-            100,
-            ProgressStatusOptions.WORKING,
-            ConsumerStatusShortMessage.SAVE_DOCUMENT,
-        )
-        # now that everything is done, we can start to store the document
-        # in the system. This will be a transaction and reasonably fast.
-        try:
-            with transaction.atomic():
-                # store the document.
-                if self.input_doc.root_document_id:
-                    # If this is a new version of an existing document, we need
-                    # to make sure we're not creating a new document, but updating
-                    # the existing one.
-                    root_doc = Document.objects.get(
-                        pk=self.input_doc.root_document_id,
-                    )
-                    original_document = self._create_version_from_root(
-                        root_doc,
-                        text=text,
-                        page_count=page_count,
-                        mime_type=mime_type,
-                    )
-                    actor = None
-
-                    # Save the new version, potentially creating an audit log entry for the version addition if enabled.
-                    if (
-                        settings.AUDIT_LOG_ENABLED
-                        and self.metadata.actor_id is not None
-                    ):
-                        actor = User.objects.filter(pk=self.metadata.actor_id).first()
-                        if actor is not None:
-                            from auditlog.context import (  # type: ignore[import-untyped]
-                                set_actor,
+                # now that everything is done, we can start to store the document
+                # in the system. This will be a transaction and reasonably fast.
+                try:
+                    with transaction.atomic():
+                        # store the document.
+                        if self.input_doc.root_document_id:
+                            # If this is a new version of an existing document, we need
+                            # to make sure we're not creating a new document, but updating
+                            # the existing one.
+                            root_doc = Document.objects.get(
+                                pk=self.input_doc.root_document_id,
                             )
+                            original_document = self._create_version_from_root(
+                                root_doc,
+                                text=text,
+                                page_count=page_count,
+                                mime_type=mime_type,
+                            )
+                            actor = None
 
-                            with set_actor(actor):
+                            # Save the new version, potentially creating an audit log entry for the version addition if enabled.
+                            if (
+                                settings.AUDIT_LOG_ENABLED
+                                and self.metadata.actor_id is not None
+                            ):
+                                actor = User.objects.filter(
+                                    pk=self.metadata.actor_id,
+                                ).first()
+                                if actor is not None:
+                                    from auditlog.context import (  # type: ignore[import-untyped]
+                                        set_actor,
+                                    )
+
+                                    with set_actor(actor):
+                                        original_document.save()
+                                else:
+                                    original_document.save()
+                            else:
                                 original_document.save()
+
+                            # Create a log entry for the version addition, if enabled
+                            if settings.AUDIT_LOG_ENABLED:
+                                from auditlog.models import (  # type: ignore[import-untyped]
+                                    LogEntry,
+                                )
+
+                                LogEntry.objects.log_create(
+                                    instance=root_doc,
+                                    changes={
+                                        "Version Added": ["None", original_document.id],
+                                    },
+                                    action=LogEntry.Action.UPDATE,
+                                    actor=actor,
+                                    additional_data={
+                                        "reason": "Version added",
+                                        "version_id": original_document.id,
+                                    },
+                                )
+                            document = original_document
                         else:
-                            original_document.save()
-                    else:
-                        original_document.save()
-
-                    # Create a log entry for the version addition, if enabled
-                    if settings.AUDIT_LOG_ENABLED:
-                        from auditlog.models import (  # type: ignore[import-untyped]
-                            LogEntry,
-                        )
-
-                        LogEntry.objects.log_create(
-                            instance=root_doc,
-                            changes={
-                                "Version Added": ["None", original_document.id],
-                            },
-                            action=LogEntry.Action.UPDATE,
-                            actor=actor,
-                            additional_data={
-                                "reason": "Version added",
-                                "version_id": original_document.id,
-                            },
-                        )
-                    document = original_document
-                else:
-                    document = self._store(
-                        text=text,
-                        date=date,
-                        page_count=page_count,
-                        mime_type=mime_type,
-                    )
-
-                # If we get here, it was successful. Proceed with post-consume
-                # hooks. If they fail, nothing will get changed.
-
-                document_consumption_finished.send(
-                    sender=self.__class__,
-                    document=document,
-                    logging_group=self.logging_group,
-                    classifier=classifier,
-                    original_file=self.unmodified_original
-                    if self.unmodified_original
-                    else self.working_copy,
-                )
-                if document.root_document_id:
-                    document_version_added.send(
-                        sender=self.__class__,
-                        document=document,
-                        logging_group=self.logging_group,
-                    )
-
-                # After everything is in the database, copy the files into
-                # place. If this fails, we'll also rollback the transaction.
-                with FileLock(settings.MEDIA_LOCK):
-                    generated_filename = generate_unique_filename(document)
-                    if (
-                        len(str(generated_filename))
-                        > Document.MAX_STORED_FILENAME_LENGTH
-                    ):
-                        self.log.warning(
-                            "Generated source filename exceeds db path limit, falling back to default naming",
-                        )
-                        generated_filename = generate_filename(
-                            document,
-                            use_format=False,
-                        )
-                    document.filename = generated_filename
-                    create_source_path_directory(document.source_path)
-
-                    self._write(
-                        self.unmodified_original
-                        if self.unmodified_original is not None
-                        else self.working_copy,
-                        document.source_path,
-                    )
-
-                    self._write(
-                        thumbnail,
-                        document.thumbnail_path,
-                    )
-
-                    if archive_path and Path(archive_path).is_file():
-                        generated_archive_filename = generate_unique_filename(
-                            document,
-                            archive_filename=True,
-                        )
-                        if (
-                            len(str(generated_archive_filename))
-                            > Document.MAX_STORED_FILENAME_LENGTH
-                        ):
-                            self.log.warning(
-                                "Generated archive filename exceeds db path limit, falling back to default naming",
+                            document = self._store(
+                                text=text,
+                                date=date,
+                                page_count=page_count,
+                                mime_type=mime_type,
                             )
-                            generated_archive_filename = generate_filename(
-                                document,
-                                archive_filename=True,
-                                use_format=False,
-                            )
-                        document.archive_filename = generated_archive_filename
-                        create_source_path_directory(document.archive_path)
-                        self._write(
-                            archive_path,
-                            document.archive_path,
+
+                        # If we get here, it was successful. Proceed with post-consume
+                        # hooks. If they fail, nothing will get changed.
+
+                        document_consumption_finished.send(
+                            sender=self.__class__,
+                            document=document,
+                            logging_group=self.logging_group,
+                            classifier=classifier,
+                            original_file=self.unmodified_original
+                            if self.unmodified_original
+                            else self.working_copy,
                         )
 
-                        with Path(archive_path).open("rb") as f:
-                            document.archive_checksum = hashlib.md5(
-                                f.read(),
-                            ).hexdigest()
+                        if document.root_document_id:
+                            document_version_added.send(
+                                sender=self.__class__,
+                                document=document,
+                                logging_group=self.logging_group,
+                            )
 
-                # Don't save with the lock active. Saving will cause the file
-                # renaming logic to acquire the lock as well.
-                # This triggers things like file renaming
-                document.save()
+                        # After everything is in the database, copy the files into
+                        # place. If this fails, we'll also rollback the transaction.
+                        with FileLock(settings.MEDIA_LOCK):
+                            generated_filename = generate_unique_filename(document)
+                            if (
+                                len(str(generated_filename))
+                                > Document.MAX_STORED_FILENAME_LENGTH
+                            ):
+                                self.log.warning(
+                                    "Generated source filename exceeds db path limit, falling back to default naming",
+                                )
+                                generated_filename = generate_filename(
+                                    document,
+                                    use_format=False,
+                                )
+                            document.filename = generated_filename
+                            create_source_path_directory(document.source_path)
 
-                if document.root_document_id:
-                    document_updated.send(
-                        sender=self.__class__,
-                        document=document.root_document,
+                            self._write(
+                                self.unmodified_original
+                                if self.unmodified_original is not None
+                                else self.working_copy,
+                                document.source_path,
+                            )
+
+                            self._write(
+                                thumbnail,
+                                document.thumbnail_path,
+                            )
+
+                            if archive_path and Path(archive_path).is_file():
+                                generated_archive_filename = generate_unique_filename(
+                                    document,
+                                    archive_filename=True,
+                                )
+                                if (
+                                    len(str(generated_archive_filename))
+                                    > Document.MAX_STORED_FILENAME_LENGTH
+                                ):
+                                    self.log.warning(
+                                        "Generated archive filename exceeds db path limit, falling back to default naming",
+                                    )
+                                    generated_archive_filename = generate_filename(
+                                        document,
+                                        archive_filename=True,
+                                        use_format=False,
+                                    )
+                                document.archive_filename = generated_archive_filename
+                                create_source_path_directory(document.archive_path)
+                                self._write(
+                                    archive_path,
+                                    document.archive_path,
+                                )
+
+                                document.archive_checksum = compute_checksum(
+                                    document.archive_path,
+                                )
+
+                        # Don't save with the lock active. Saving will cause the file
+                        # renaming logic to acquire the lock as well.
+                        # This triggers things like file renaming
+                        document.save()
+
+                        if document.root_document_id:
+                            document_updated.send(
+                                sender=self.__class__,
+                                document=document.root_document,
+                            )
+
+                        # Delete the file only if it was successfully consumed
+                        self.log.debug(
+                            f"Deleting original file {self.input_doc.original_file}",
+                        )
+                        self.input_doc.original_file.unlink()
+                        self.log.debug(f"Deleting working copy {self.working_copy}")
+                        self.working_copy.unlink()
+                        if self.unmodified_original is not None:  # pragma: no cover
+                            self.log.debug(
+                                f"Deleting unmodified original file {self.unmodified_original}",
+                            )
+                            self.unmodified_original.unlink()
+
+                        # https://github.com/jonaswinkler/paperless-ng/discussions/1037
+                        shadow_file = (
+                            Path(self.input_doc.original_file).parent
+                            / f"._{Path(self.input_doc.original_file).name}"
+                        )
+
+                        if Path(shadow_file).is_file():
+                            self.log.debug(f"Deleting shadow file {shadow_file}")
+                            Path(shadow_file).unlink()
+
+                except Exception as e:
+                    self._fail(
+                        str(e),
+                        f"The following error occurred while storing document "
+                        f"{self.filename} after parsing: {e}",
+                        exc_info=True,
+                        exception=e,
                     )
-
-                # Delete the file only if it was successfully consumed
-                self.log.debug(f"Deleting original file {self.input_doc.original_file}")
-                self.input_doc.original_file.unlink()
-                self.log.debug(f"Deleting working copy {self.working_copy}")
-                self.working_copy.unlink()
-                if self.unmodified_original is not None:  # pragma: no cover
-                    self.log.debug(
-                        f"Deleting unmodified original file {self.unmodified_original}",
-                    )
-                    self.unmodified_original.unlink()
-
-                # https://github.com/jonaswinkler/paperless-ng/discussions/1037
-                shadow_file = (
-                    Path(self.input_doc.original_file).parent
-                    / f"._{Path(self.input_doc.original_file).name}"
-                )
-
-                if Path(shadow_file).is_file():
-                    self.log.debug(f"Deleting shadow file {shadow_file}")
-                    Path(shadow_file).unlink()
-
-        except Exception as e:
-            self._fail(
-                str(e),
-                f"The following error occurred while storing document "
-                f"{self.filename} after parsing: {e}",
-                exc_info=True,
-                exception=e,
-            )
-        finally:
-            _parser_cleanup(document_parser)
-            tempdir.cleanup()
 
         self.run_post_consume_script(document)
 
@@ -831,7 +780,7 @@ class ConsumerPlugin(
             title=title[:127],
             content=text,
             mime_type=mime_type,
-            checksum=hashlib.md5(file_for_checksum.read_bytes()).hexdigest(),
+            checksum=compute_checksum(file_for_checksum),
             created=create_date,
             modified=create_date,
             page_count=page_count,
@@ -879,7 +828,7 @@ class ConsumerPlugin(
             self.metadata.view_users is not None
             or self.metadata.view_groups is not None
             or self.metadata.change_users is not None
-            or self.metadata.change_users is not None
+            or self.metadata.change_groups is not None
         ):
             permissions = {
                 "view": {
@@ -912,7 +861,7 @@ class ConsumerPlugin(
             Path(source).open("rb") as read_file,
             Path(target).open("wb") as write_file,
         ):
-            write_file.write(read_file.read())
+            shutil.copyfileobj(read_file, write_file)
 
         # Attempt to copy file's original stats, but it's ok if we can't
         try:
@@ -948,10 +897,9 @@ class ConsumerPreflightPlugin(
 
     def pre_check_duplicate(self) -> None:
         """
-        Using the MD5 of the file, check this exact file doesn't already exist
+        Using the SHA256 of the file, check this exact file doesn't already exist
         """
-        with Path(self.input_doc.original_file).open("rb") as f:
-            checksum = hashlib.md5(f.read()).hexdigest()
+        checksum = compute_checksum(Path(self.input_doc.original_file))
         existing_doc = Document.global_objects.filter(
             Q(checksum=checksum) | Q(archive_checksum=checksum),
         )

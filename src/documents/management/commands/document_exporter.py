@@ -45,6 +45,8 @@ from documents.models import DocumentType
 from documents.models import Note
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
+from documents.models import ShareLink
+from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import UiSettings
@@ -55,7 +57,9 @@ from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowTrigger
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
+from documents.settings import EXPORTER_SHARE_LINK_BUNDLE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
+from documents.utils import compute_checksum
 from documents.utils import copy_file_with_basic_stats
 from paperless import version
 from paperless.models import ApplicationConfiguration
@@ -384,10 +388,12 @@ class Command(CryptMixin, PaperlessCommand):
             "workflow_webhook_actions": WorkflowActionWebhook.objects.all(),
             "workflows": Workflow.objects.all(),
             "custom_fields": CustomField.objects.all(),
-            "custom_field_instances": CustomFieldInstance.objects.all(),
+            "custom_field_instances": CustomFieldInstance.global_objects.all(),
             "app_configs": ApplicationConfiguration.objects.all(),
-            "notes": Note.objects.all(),
-            "documents": Document.objects.order_by("id").all(),
+            "notes": Note.global_objects.all(),
+            "documents": Document.global_objects.order_by("id").all(),
+            "share_links": ShareLink.global_objects.all(),
+            "share_link_bundles": ShareLinkBundle.objects.order_by("id").all(),
             "social_accounts": SocialAccount.objects.all(),
             "social_apps": SocialApp.objects.all(),
             "social_tokens": SocialToken.objects.all(),
@@ -408,6 +414,7 @@ class Command(CryptMixin, PaperlessCommand):
             )
 
         document_manifest: list[dict] = []
+        share_link_bundle_manifest: list[dict] = []
         manifest_path = (self.target / "manifest.json").resolve()
 
         with StreamingManifestWriter(
@@ -426,6 +433,15 @@ class Command(CryptMixin, PaperlessCommand):
                             for record in batch:
                                 self._encrypt_record_inline(record)
                             document_manifest.extend(batch)
+                    elif key == "share_link_bundles":
+                        # Accumulate for file-copy loop; written to manifest after
+                        for batch in serialize_queryset_batched(
+                            qs,
+                            batch_size=self.batch_size,
+                        ):
+                            for record in batch:
+                                self._encrypt_record_inline(record)
+                            share_link_bundle_manifest.extend(batch)
                     elif self.split_manifest and key in (
                         "notes",
                         "custom_field_instances",
@@ -442,7 +458,13 @@ class Command(CryptMixin, PaperlessCommand):
                             writer.write_batch(batch)
 
             document_map: dict[int, Document] = {
-                d.pk: d for d in Document.objects.order_by("id")
+                d.pk: d for d in Document.global_objects.order_by("id")
+            }
+            share_link_bundle_map: dict[int, ShareLinkBundle] = {
+                b.pk: b
+                for b in ShareLinkBundle.objects.order_by("id").prefetch_related(
+                    "documents",
+                )
             }
 
             # 3. Export files from each document
@@ -476,6 +498,19 @@ class Command(CryptMixin, PaperlessCommand):
                     self._write_split_manifest(document_dict, document, base_name)
                 else:
                     writer.write_record(document_dict)
+
+            for bundle_dict in share_link_bundle_manifest:
+                bundle = share_link_bundle_map[bundle_dict["pk"]]
+
+                bundle_target = self.generate_share_link_bundle_target(
+                    bundle,
+                    bundle_dict,
+                )
+
+                if not self.data_only and bundle_target is not None:
+                    self.copy_share_link_bundle_file(bundle, bundle_target)
+
+                writer.write_record(bundle_dict)
 
         # 4.2 write version information to target folder
         extra_metadata_path = (self.target / "metadata.json").resolve()
@@ -597,6 +632,48 @@ class Command(CryptMixin, PaperlessCommand):
                 archive_target,
             )
 
+    def generate_share_link_bundle_target(
+        self,
+        bundle: ShareLinkBundle,
+        bundle_dict: dict,
+    ) -> Path | None:
+        """
+        Generates the export target for a share link bundle file, when present.
+        """
+        if not bundle.file_path:
+            return None
+
+        stored_bundle_path = Path(bundle.file_path)
+        portable_bundle_path = (
+            stored_bundle_path
+            if not stored_bundle_path.is_absolute()
+            else Path(stored_bundle_path.name)
+        )
+        export_bundle_path = Path("share_link_bundles") / portable_bundle_path
+
+        bundle_dict["fields"]["file_path"] = portable_bundle_path.as_posix()
+        bundle_dict[EXPORTER_SHARE_LINK_BUNDLE_NAME] = export_bundle_path.as_posix()
+
+        return (self.target / export_bundle_path).resolve()
+
+    def copy_share_link_bundle_file(
+        self,
+        bundle: ShareLinkBundle,
+        bundle_target: Path,
+    ) -> None:
+        """
+        Copies a share link bundle ZIP into the export directory.
+        """
+        bundle_source_path = bundle.absolute_file_path
+        if bundle_source_path is None:
+            raise FileNotFoundError(f"Share link bundle {bundle.pk} has no file path")
+
+        self.check_and_copy(
+            bundle_source_path,
+            None,
+            bundle_target,
+        )
+
     def _encrypt_record_inline(self, record: dict) -> None:
         """Encrypt sensitive fields in a single record, if passphrase is set."""
         if not self.passphrase:
@@ -618,12 +695,15 @@ class Command(CryptMixin, PaperlessCommand):
         """Write per-document manifest file for --split-manifest mode."""
         content = [document_dict]
         content.extend(
-            serializers.serialize("python", Note.objects.filter(document=document)),
+            serializers.serialize(
+                "python",
+                Note.global_objects.filter(document=document),
+            ),
         )
         content.extend(
             serializers.serialize(
                 "python",
-                CustomFieldInstance.objects.filter(document=document),
+                CustomFieldInstance.global_objects.filter(document=document),
             ),
         )
         manifest_name = base_name.with_name(f"{base_name.stem}-manifest.json")
@@ -693,7 +773,7 @@ class Command(CryptMixin, PaperlessCommand):
             source_stat = source.stat()
             target_stat = target.stat()
             if self.compare_checksums and source_checksum:
-                target_checksum = hashlib.md5(target.read_bytes()).hexdigest()
+                target_checksum = compute_checksum(target)
                 perform_copy = target_checksum != source_checksum
             elif (
                 source_stat.st_mtime != target_stat.st_mtime

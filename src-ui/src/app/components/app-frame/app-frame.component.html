@@ -1,7 +1,7 @@
 <nav class="navbar navbar-dark fixed-top bg-primary flex-md-nowrap p-0 shadow-sm">
   <button class="navbar-toggler d-md-none collapsed border-0" type="button" data-toggle="collapse"
     data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation"
-    (click)="isMenuCollapsed = !isMenuCollapsed">
+    (click)="mobileSearchHidden = false; isMenuCollapsed = !isMenuCollapsed">
     <span class="navbar-toggler-icon"></span>
   </button>
   <a class="navbar-brand d-flex align-items-center me-0 px-3 py-3 order-sm-0"
@@ -24,7 +24,8 @@
       }
     </div>
   </a>
-  <div class="search-container flex-grow-1 py-2 pb-3 pb-sm-2 px-3 ps-md-4 me-sm-auto order-3 order-sm-1">
+  <div class="search-container flex-grow-1 py-2 pb-3 pb-sm-2 px-3 ps-md-4 me-sm-auto order-3 order-sm-1"
+    [class.mobile-hidden]="mobileSearchHidden">
     <div class="col-12 col-md-7">
       <pngx-global-search></pngx-global-search>
     </div>
@@ -378,7 +379,7 @@
       </div>
     </nav>
 
-    <main role="main" class="ms-sm-auto px-md-4"
+    <main role="main" class="ms-sm-auto px-md-4" [class.mobile-search-hidden]="mobileSearchHidden"
       [ngClass]="slimSidebarEnabled ? 'col-slim' : 'col-md-9 col-lg-10 col-xxxl-11'">
       <router-outlet></router-outlet>
     </main>

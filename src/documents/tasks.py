@@ -1,15 +1,12 @@
 import datetime
-import hashlib
 import logging
 import shutil
 import uuid
 import zipfile
 from collections.abc import Callable
-from collections.abc import Iterable
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from tempfile import mkstemp
-from typing import TypeVar
 
 from celery import Task
 from celery import shared_task
@@ -21,9 +18,7 @@ from django.db import transaction
 from django.db.models.signals import post_save
 from django.utils import timezone
 from filelock import FileLock
-from whoosh.writing import AsyncWriter
 
-from documents import index
 from documents import sanity_checker
 from documents.barcodes import BarcodePlugin
 from documents.bulk_download import ArchiveOnlyStrategy
@@ -52,55 +47,45 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
-from documents.parsers import DocumentParser
-from documents.parsers import get_parser_class_for_mime_type
 from documents.plugins.base import ConsumeTaskPlugin
-from documents.plugins.base import ProgressManager
 from documents.plugins.base import StopConsumeTaskError
+from documents.plugins.helpers import ProgressManager
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
 from documents.signals.handlers import run_workflows
 from documents.signals.handlers import send_websocket_document_updated
+from documents.utils import IterWrapper
+from documents.utils import compute_checksum
+from documents.utils import identity
 from documents.workflows.utils import get_workflows_for_trigger
 from paperless.config import AIConfig
+from paperless.logging import consume_task_id
+from paperless.parsers import ParserContext
+from paperless.parsers.registry import get_parser_registry
 from paperless_ai.indexing import llm_index_add_or_update_document
 from paperless_ai.indexing import llm_index_remove_document
 from paperless_ai.indexing import update_llm_index
-
-_T = TypeVar("_T")
-IterWrapper = Callable[[Iterable[_T]], Iterable[_T]]
-
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
 logger = logging.getLogger("paperless.tasks")
 
 
-def _identity(iterable: Iterable[_T]) -> Iterable[_T]:
-    return iterable
-
-
 @shared_task
 def index_optimize() -> None:
-    ix = index.open_index()
-    writer = AsyncWriter(ix)
-    writer.commit(optimize=True)
-
-
-def index_reindex(*, iter_wrapper: IterWrapper[Document] = _identity) -> None:
-    documents = Document.objects.all()
-
-    ix = index.open_index(recreate=True)
-
-    with AsyncWriter(ix) as writer:
-        for document in iter_wrapper(documents):
-            index.update_document(writer, document)
+    logger.info(
+        "index_optimize is a no-op — Tantivy manages segment merging automatically.",
+    )
 
 
 @shared_task
-def train_classifier(*, scheduled=True) -> None:
+def train_classifier(
+    *,
+    scheduled=True,
+    status_callback: Callable[[str], None] | None = None,
+) -> None:
     task = PaperlessTask.objects.create(
         type=PaperlessTask.TaskType.SCHEDULED_TASK
         if scheduled
@@ -136,7 +121,7 @@ def train_classifier(*, scheduled=True) -> None:
         classifier = DocumentClassifier()
 
     try:
-        if classifier.train():
+        if classifier.train(status_callback=status_callback):
             logger.info(
                 f"Saving updated classifier model to {settings.MODEL_FILE}...",
             )
@@ -163,76 +148,85 @@ def consume_file(
     input_doc: ConsumableDocument,
     overrides: DocumentMetadataOverrides | None = None,
 ):
-    # Default no overrides
-    if overrides is None:
-        overrides = DocumentMetadataOverrides()
+    token = consume_task_id.set((self.request.id or "")[:8])
+    try:
+        # Default no overrides
+        if overrides is None:
+            overrides = DocumentMetadataOverrides()
 
-    plugins: list[type[ConsumeTaskPlugin]] = (
-        [
-            ConsumerPreflightPlugin,
-            ConsumerPlugin,
-        ]
-        if input_doc.root_document_id is not None
-        else [
-            ConsumerPreflightPlugin,
-            AsnCheckPlugin,
-            CollatePlugin,
-            BarcodePlugin,
-            AsnCheckPlugin,  # Re-run ASN check after barcode reading
-            WorkflowTriggerPlugin,
-            ConsumerPlugin,
-        ]
-    )
+        plugins: list[type[ConsumeTaskPlugin]] = (
+            [
+                ConsumerPreflightPlugin,
+                ConsumerPlugin,
+            ]
+            if input_doc.root_document_id is not None
+            else [
+                ConsumerPreflightPlugin,
+                AsnCheckPlugin,
+                CollatePlugin,
+                BarcodePlugin,
+                AsnCheckPlugin,  # Re-run ASN check after barcode reading
+                WorkflowTriggerPlugin,
+                ConsumerPlugin,
+            ]
+        )
 
-    with (
-        ProgressManager(
-            overrides.filename or input_doc.original_file.name,
-            self.request.id,
-        ) as status_mgr,
-        TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir,
-    ):
-        tmp_dir = Path(tmp_dir)
-        for plugin_class in plugins:
-            plugin_name = plugin_class.NAME
-
-            plugin = plugin_class(
-                input_doc,
-                overrides,
-                status_mgr,
-                tmp_dir,
+        with (
+            ProgressManager(
+                overrides.filename or input_doc.original_file.name,
                 self.request.id,
-            )
+            ) as status_mgr,
+            TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir,
+        ):
+            tmp_dir = Path(tmp_dir)
+            for plugin_class in plugins:
+                plugin_name = plugin_class.NAME
 
-            if not plugin.able_to_run:
-                logger.debug(f"Skipping plugin {plugin_name}")
-                continue
+                plugin = plugin_class(
+                    input_doc,
+                    overrides,
+                    status_mgr,
+                    tmp_dir,
+                    self.request.id,
+                )
 
-            try:
-                logger.debug(f"Executing plugin {plugin_name}")
-                plugin.setup()
+                if not plugin.able_to_run:
+                    logger.debug(f"Skipping plugin {plugin_name}")
+                    continue
 
-                msg = plugin.run()
+                try:
+                    logger.debug(f"Executing plugin {plugin_name}")
+                    plugin.setup()
 
-                if msg is not None:
-                    logger.info(f"{plugin_name} completed with: {msg}")
-                else:
-                    logger.info(f"{plugin_name} completed with no message")
+                    msg = plugin.run()
 
-                overrides = plugin.metadata
+                    if msg is not None:
+                        logger.info(f"{plugin_name} completed with: {msg}")
+                    else:
+                        logger.info(f"{plugin_name} completed with no message")
 
-            except StopConsumeTaskError as e:
-                logger.info(f"{plugin_name} requested task exit: {e.message}")
-                return e.message
+                    overrides = plugin.metadata
 
-            except Exception as e:
-                logger.exception(f"{plugin_name} failed: {e}")
-                status_mgr.send_progress(ProgressStatusOptions.FAILED, f"{e}", 100, 100)
-                raise
+                except StopConsumeTaskError as e:
+                    logger.info(f"{plugin_name} requested task exit: {e.message}")
+                    return e.message
 
-            finally:
-                plugin.cleanup()
+                except Exception as e:
+                    logger.exception(f"{plugin_name} failed: {e}")
+                    status_mgr.send_progress(
+                        ProgressStatusOptions.FAILED,
+                        f"{e}",
+                        100,
+                        100,
+                    )
+                    raise
 
-    return msg
+                finally:
+                    plugin.cleanup()
+
+        return msg
+    finally:
+        consume_task_id.reset(token)
 
 
 @shared_task
@@ -266,9 +260,9 @@ def sanity_check(*, scheduled=True, raise_on_error=True):
 
 @shared_task
 def bulk_update_documents(document_ids) -> None:
-    documents = Document.objects.filter(id__in=document_ids)
+    from documents.search import get_backend
 
-    ix = index.open_index()
+    documents = Document.objects.filter(id__in=document_ids)
 
     for doc in documents:
         clear_document_caches(doc.pk)
@@ -279,9 +273,9 @@ def bulk_update_documents(document_ids) -> None:
         )
         post_save.send(Document, instance=doc, created=False)
 
-    with AsyncWriter(ix) as writer:
+    with get_backend().batch_update() as batch:
         for doc in documents:
-            index.update_document(writer, doc)
+            batch.add_or_update(doc)
 
     ai_config = AIConfig()
     if ai_config.llm_index_enabled:
@@ -300,7 +294,11 @@ def update_document_content_maybe_archive_file(document_id) -> None:
 
     mime_type = document.mime_type
 
-    parser_class: type[DocumentParser] = get_parser_class_for_mime_type(mime_type)
+    parser_class = get_parser_registry().get_parser_for_file(
+        mime_type,
+        document.original_filename or "",
+        document.source_path,
+    )
 
     if not parser_class:
         logger.error(
@@ -309,98 +307,92 @@ def update_document_content_maybe_archive_file(document_id) -> None:
         )
         return
 
-    parser: DocumentParser = parser_class(logging_group=uuid.uuid4())
+    with parser_class() as parser:
+        parser.configure(ParserContext())
 
-    try:
-        parser.parse(document.source_path, mime_type, document.get_public_filename())
+        try:
+            parser.parse(document.source_path, mime_type)
 
-        thumbnail = parser.get_thumbnail(
-            document.source_path,
-            mime_type,
-            document.get_public_filename(),
-        )
+            thumbnail = parser.get_thumbnail(document.source_path, mime_type)
 
-        with transaction.atomic():
-            oldDocument = Document.objects.get(pk=document.pk)
-            if parser.get_archive_path():
-                with Path(parser.get_archive_path()).open("rb") as f:
-                    checksum = hashlib.md5(f.read()).hexdigest()
-                # I'm going to save first so that in case the file move
-                # fails, the database is rolled back.
-                # We also don't use save() since that triggers the filehandling
-                # logic, and we don't want that yet (file not yet in place)
-                document.archive_filename = generate_unique_filename(
-                    document,
-                    archive_filename=True,
-                )
-                Document.objects.filter(pk=document.pk).update(
-                    archive_checksum=checksum,
-                    content=parser.get_text(),
-                    archive_filename=document.archive_filename,
-                )
-                newDocument = Document.objects.get(pk=document.pk)
-                if settings.AUDIT_LOG_ENABLED:
-                    LogEntry.objects.log_create(
-                        instance=oldDocument,
-                        changes={
-                            "content": [oldDocument.content, newDocument.content],
-                            "archive_checksum": [
-                                oldDocument.archive_checksum,
-                                newDocument.archive_checksum,
-                            ],
-                            "archive_filename": [
-                                oldDocument.archive_filename,
-                                newDocument.archive_filename,
-                            ],
-                        },
-                        additional_data={
-                            "reason": "Update document content",
-                        },
-                        action=LogEntry.Action.UPDATE,
-                    )
-            else:
-                Document.objects.filter(pk=document.pk).update(
-                    content=parser.get_text(),
-                )
-
-                if settings.AUDIT_LOG_ENABLED:
-                    LogEntry.objects.log_create(
-                        instance=oldDocument,
-                        changes={
-                            "content": [oldDocument.content, parser.get_text()],
-                        },
-                        additional_data={
-                            "reason": "Update document content",
-                        },
-                        action=LogEntry.Action.UPDATE,
-                    )
-
-            with FileLock(settings.MEDIA_LOCK):
+            with transaction.atomic():
+                oldDocument = Document.objects.get(pk=document.pk)
                 if parser.get_archive_path():
-                    create_source_path_directory(document.archive_path)
-                    shutil.move(parser.get_archive_path(), document.archive_path)
-                shutil.move(thumbnail, document.thumbnail_path)
+                    checksum = compute_checksum(parser.get_archive_path())
+                    # I'm going to save first so that in case the file move
+                    # fails, the database is rolled back.
+                    # We also don't use save() since that triggers the filehandling
+                    # logic, and we don't want that yet (file not yet in place)
+                    document.archive_filename = generate_unique_filename(
+                        document,
+                        archive_filename=True,
+                    )
+                    Document.objects.filter(pk=document.pk).update(
+                        archive_checksum=checksum,
+                        content=parser.get_text(),
+                        archive_filename=document.archive_filename,
+                    )
+                    newDocument = Document.objects.get(pk=document.pk)
+                    if settings.AUDIT_LOG_ENABLED:
+                        LogEntry.objects.log_create(
+                            instance=oldDocument,
+                            changes={
+                                "content": [oldDocument.content, newDocument.content],
+                                "archive_checksum": [
+                                    oldDocument.archive_checksum,
+                                    newDocument.archive_checksum,
+                                ],
+                                "archive_filename": [
+                                    oldDocument.archive_filename,
+                                    newDocument.archive_filename,
+                                ],
+                            },
+                            additional_data={
+                                "reason": "Update document content",
+                            },
+                            action=LogEntry.Action.UPDATE,
+                        )
+                else:
+                    Document.objects.filter(pk=document.pk).update(
+                        content=parser.get_text(),
+                    )
 
-        document.refresh_from_db()
-        logger.info(
-            f"Updating index for document {document_id} ({document.archive_checksum})",
-        )
-        with index.open_index_writer() as writer:
-            index.update_document(writer, document)
+                    if settings.AUDIT_LOG_ENABLED:
+                        LogEntry.objects.log_create(
+                            instance=oldDocument,
+                            changes={
+                                "content": [oldDocument.content, parser.get_text()],
+                            },
+                            additional_data={
+                                "reason": "Update document content",
+                            },
+                            action=LogEntry.Action.UPDATE,
+                        )
 
-        ai_config = AIConfig()
-        if ai_config.llm_index_enabled:
-            llm_index_add_or_update_document(document)
+                with FileLock(settings.MEDIA_LOCK):
+                    if parser.get_archive_path():
+                        create_source_path_directory(document.archive_path)
+                        shutil.move(parser.get_archive_path(), document.archive_path)
+                    shutil.move(thumbnail, document.thumbnail_path)
 
-        clear_document_caches(document.pk)
+            document.refresh_from_db()
+            logger.info(
+                f"Updating index for document {document_id} ({document.archive_checksum})",
+            )
+            from documents.search import get_backend
 
-    except Exception:
-        logger.exception(
-            f"Error while parsing document {document} (ID: {document_id})",
-        )
-    finally:
-        # TODO(stumpylog): Cleanup once all parsers are handled
-        parser.cleanup()
+            get_backend().add_or_update(document)
+
+            ai_config = AIConfig()
+            if ai_config.llm_index_enabled:
+                llm_index_add_or_update_document(document)
+
+            clear_document_caches(document.pk)
+
+        except Exception:
+            logger.exception(
+                f"Error while parsing document {document} (ID: {document_id})",
+            )
 
 
 @shared_task
@@ -531,13 +523,13 @@ def check_scheduled_workflows() -> None:
                             id__in=matched_ids,
                         )
 
-                if documents.count() > 0:
+                if documents.exists():
                     documents = prefilter_documents_by_workflowtrigger(
                         documents,
                         trigger,
                     )
 
-                if documents.count() > 0:
+                if documents.exists():
                     logger.debug(
                         f"Found {documents.count()} documents for trigger {trigger}",
                     )
@@ -632,7 +624,7 @@ def update_document_parent_tags(tag: Tag, new_parent: Tag) -> None:
 @shared_task
 def llmindex_index(
     *,
-    iter_wrapper: IterWrapper[Document] = _identity,
+    iter_wrapper: IterWrapper[Document] = identity,
     rebuild=False,
     scheduled=True,
     auto=False,

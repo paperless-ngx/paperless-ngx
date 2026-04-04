@@ -9,20 +9,14 @@ to wrap the document queryset (e.g., with a progress bar). The default
 is an identity function that adds no overhead.
 """
 
-from __future__ import annotations
-
-import hashlib
 import logging
 import uuid
 from collections import defaultdict
-from collections.abc import Callable
-from collections.abc import Iterable
 from collections.abc import Iterator
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Final
 from typing import TypedDict
-from typing import TypeVar
 
 from celery import states
 from django.conf import settings
@@ -30,12 +24,12 @@ from django.utils import timezone
 
 from documents.models import Document
 from documents.models import PaperlessTask
+from documents.utils import IterWrapper
+from documents.utils import compute_checksum
+from documents.utils import identity
 from paperless.config import GeneralConfig
 
 logger = logging.getLogger("paperless.sanity_checker")
-
-_T = TypeVar("_T")
-IterWrapper = Callable[[Iterable[_T]], Iterable[_T]]
 
 
 class MessageEntry(TypedDict):
@@ -43,11 +37,6 @@ class MessageEntry(TypedDict):
 
     level: int
     message: str
-
-
-def _identity(iterable: Iterable[_T]) -> Iterable[_T]:
-    """Pass through an iterable unchanged (default iter_wrapper)."""
-    return iterable
 
 
 class SanityCheckMessages:
@@ -218,7 +207,7 @@ def _check_original(
 
     present_files.discard(source_path)
     try:
-        checksum = hashlib.md5(source_path.read_bytes()).hexdigest()
+        checksum = compute_checksum(source_path)
     except OSError as e:
         messages.error(doc.pk, f"Cannot read original file of document: {e}")
     else:
@@ -255,7 +244,7 @@ def _check_archive(
 
         present_files.discard(archive_path)
         try:
-            checksum = hashlib.md5(archive_path.read_bytes()).hexdigest()
+            checksum = compute_checksum(archive_path)
         except OSError as e:
             messages.error(
                 doc.pk,
@@ -296,7 +285,7 @@ def _check_document(
 def check_sanity(
     *,
     scheduled: bool = True,
-    iter_wrapper: IterWrapper[Document] = _identity,
+    iter_wrapper: IterWrapper[Document] = identity,
 ) -> SanityCheckMessages:
     """Run a full sanity check on the document archive.
 

@@ -723,6 +723,81 @@ services:
 
 1. Note the `:ro` tag means the folder will be mounted as read only. This is for extra security against changes
 
+## Installing third-party parser plugins {#parser-plugins}
+
+Third-party parser plugins extend Paperless-ngx to support additional file
+formats. A plugin is a Python package that advertises itself under the
+`paperless_ngx.parsers` entry point group. Refer to the
+[developer documentation](development.md#making-custom-parsers) for how to
+create one.
+
+!!! warning "Third-party plugins are not officially supported"
+
+    The Paperless-ngx maintainers do not provide support for third-party
+    plugins. Issues caused by or requiring changes to a third-party plugin
+    will be closed without further investigation. Always reproduce problems
+    with all plugins removed before filing a bug report.
+
+### Docker
+
+Use a [custom container initialization script](#custom-container-initialization)
+to install the package before the webserver starts. Create a shell script and
+mount it into `/custom-cont-init.d`:
+
+```bash
+#!/bin/bash
+# /path/to/my/scripts/install-parsers.sh
+
+pip install my-paperless-parser-package
+```
+
+Mount it in your `docker-compose.yml`:
+
+```yaml
+services:
+  webserver:
+    # ...
+    volumes:
+      - /path/to/my/scripts:/custom-cont-init.d:ro
+```
+
+The script runs as `root` before the webserver starts, so the package will be
+available when Paperless-ngx discovers plugins at startup.
+
+### Bare metal
+
+Install the package into the same Python environment that runs Paperless-ngx.
+If you followed the standard bare-metal install guide, that is the `paperless`
+user's environment:
+
+```bash
+sudo -Hu paperless pip3 install my-paperless-parser-package
+```
+
+If you are using `uv` or a virtual environment, activate it first and then run:
+
+```bash
+uv pip install my-paperless-parser-package
+# or
+pip install my-paperless-parser-package
+```
+
+Restart all Paperless-ngx services after installation so the new plugin is
+discovered.
+
+### Verifying installation
+
+On the next startup, check the application logs for a line confirming
+discovery:
+
+```
+Loaded third-party parser 'My Parser' v1.0.0 by Acme Corp (entrypoint: 'my_parser').
+```
+
+If this line does not appear, verify that the package is installed in the
+correct environment and that its `pyproject.toml` declares the
+`paperless_ngx.parsers` entry point.
+
 ## MySQL Caveats {#mysql-caveats}
 
 ### Case Sensitivity

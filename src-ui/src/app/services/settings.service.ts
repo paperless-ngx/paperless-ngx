@@ -276,6 +276,8 @@ const ISO_LANGUAGE_OPTION: LanguageOption = {
   dateInputFormat: 'yyyy-mm-dd',
 }
 
+const UNSAFE_OBJECT_KEYS = new Set(['__proto__', 'prototype', 'constructor'])
+
 @Injectable({
   providedIn: 'root',
 })
@@ -291,7 +293,7 @@ export class SettingsService {
 
   protected baseUrl: string = environment.apiBaseUrl + 'ui_settings/'
 
-  private settings: Object = {}
+  private settings: Record<string, any> = {}
   currentUser: User
 
   public settingsSaved: EventEmitter<any> = new EventEmitter()
@@ -320,6 +322,21 @@ export class SettingsService {
     this._renderer = rendererFactory.createRenderer(null, null)
   }
 
+  private isSafeObjectKey(key: string): boolean {
+    return !UNSAFE_OBJECT_KEYS.has(key)
+  }
+
+  private assignSafeSettings(source: Record<string, any>) {
+    if (!source || typeof source !== 'object' || Array.isArray(source)) {
+      return
+    }
+
+    for (const key of Object.keys(source)) {
+      if (!this.isSafeObjectKey(key)) continue
+      this.settings[key] = source[key]
+    }
+  }
+
   // this is called by the app initializer in app.module
   public initializeSettings(): Observable<UiSettings> {
     return this.http.get<UiSettings>(this.baseUrl).pipe(
@@ -338,7 +355,7 @@ export class SettingsService {
         })
       }),
       tap((uisettings) => {
-        Object.assign(this.settings, uisettings.settings)
+        this.assignSafeSettings(uisettings.settings)
         if (this.get(SETTINGS_KEYS.APP_TITLE)?.length) {
           environment.appTitle = this.get(SETTINGS_KEYS.APP_TITLE)
         }
@@ -533,7 +550,11 @@ export class SettingsService {
     let settingObj = this.settings
     keys.forEach((keyPart, index) => {
       keyPart = keyPart.replace(/-/g, '_')
-      if (!settingObj.hasOwnProperty(keyPart)) return
+      if (
+        !this.isSafeObjectKey(keyPart) ||
+        !Object.prototype.hasOwnProperty.call(settingObj, keyPart)
+      )
+        return
       if (index == keys.length - 1) value = settingObj[keyPart]
       else settingObj = settingObj[keyPart]
     })
@@ -579,7 +600,9 @@ export class SettingsService {
     const keys = key.replace('general-settings:', '').split(':')
     keys.forEach((keyPart, index) => {
       keyPart = keyPart.replace(/-/g, '_')
-      if (!settingObj.hasOwnProperty(keyPart)) settingObj[keyPart] = {}
+      if (!this.isSafeObjectKey(keyPart)) return
+      if (!Object.prototype.hasOwnProperty.call(settingObj, keyPart))
+        settingObj[keyPart] = {}
       if (index == keys.length - 1) settingObj[keyPart] = value
       else settingObj = settingObj[keyPart]
     })
@@ -602,7 +625,10 @@ export class SettingsService {
 
   maybeMigrateSettings() {
     if (
-      !this.settings.hasOwnProperty('documentListSize') &&
+      !Object.prototype.hasOwnProperty.call(
+        this.settings,
+        'documentListSize'
+      ) &&
       localStorage.getItem(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)
     ) {
       // lets migrate
@@ -610,8 +636,7 @@ export class SettingsService {
       const errorMessage = $localize`Unable to migrate settings to the database, please try saving manually.`
 
       try {
-        for (const setting in SETTINGS_KEYS) {
-          const key = SETTINGS_KEYS[setting]
+        for (const key of Object.values(SETTINGS_KEYS)) {
           const value = localStorage.getItem(key)
           this.set(key, value)
         }

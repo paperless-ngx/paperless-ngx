@@ -1,7 +1,6 @@
 from datetime import timedelta
 from unittest import mock
 
-from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -16,6 +15,13 @@ from paperless_mail.models import MailAccount
 from paperless_mail.oauth import PaperlessMailOAuth2Manager
 
 
+@override_settings(
+    OAUTH_CALLBACK_BASE_URL="http://localhost:8000",
+    GMAIL_OAUTH_CLIENT_ID="test_gmail_client_id",
+    GMAIL_OAUTH_CLIENT_SECRET="test_gmail_client_secret",
+    OUTLOOK_OAUTH_CLIENT_ID="test_outlook_client_id",
+    OUTLOOK_OAUTH_CLIENT_SECRET="test_outlook_client_secret",
+)
 class TestMailOAuth(
     TestCase,
 ):
@@ -31,12 +37,6 @@ class TestMailOAuth(
         self.user.save()
         self.client.force_login(self.user)
         self.mail_account_handler = MailAccountHandler()
-        # Mock settings
-        settings.OAUTH_CALLBACK_BASE_URL = "http://localhost:8000"
-        settings.GMAIL_OAUTH_CLIENT_ID = "test_gmail_client_id"
-        settings.GMAIL_OAUTH_CLIENT_SECRET = "test_gmail_client_secret"
-        settings.OUTLOOK_OAUTH_CLIENT_ID = "test_outlook_client_id"
-        settings.OUTLOOK_OAUTH_CLIENT_SECRET = "test_outlook_client_secret"
         super().setUp()
 
     def test_generate_paths(self) -> None:
@@ -191,7 +191,10 @@ class TestMailOAuth(
                 ).exists(),
             )
 
-            self.assertIn("Error getting access token: test_error", cm.output[0])
+            self.assertIn(
+                "Error getting access token from OAuth provider",
+                cm.output[0],
+            )
 
     def test_oauth_callback_view_insufficient_permissions(self) -> None:
         """

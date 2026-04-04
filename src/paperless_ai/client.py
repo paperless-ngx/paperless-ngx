@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from llama_index.llms.openai import OpenAI
 
 from paperless.config import AIConfig
+from paperless.network import validate_outbound_http_url
 from paperless_ai.base_model import DocumentClassifierSchema
 
 logger = logging.getLogger("paperless_ai.client")
@@ -25,17 +26,28 @@ class AIClient:
         if self.settings.llm_backend == "ollama":
             from llama_index.llms.ollama import Ollama
 
+            endpoint = self.settings.llm_endpoint or "http://localhost:11434"
+            validate_outbound_http_url(
+                endpoint,
+                allow_internal=self.settings.llm_allow_internal_endpoints,
+            )
             return Ollama(
                 model=self.settings.llm_model or "llama3.1",
-                base_url=self.settings.llm_endpoint or "http://localhost:11434",
+                base_url=endpoint,
                 request_timeout=120,
             )
         elif self.settings.llm_backend == "openai":
             from llama_index.llms.openai import OpenAI
 
+            endpoint = self.settings.llm_endpoint or None
+            if endpoint:
+                validate_outbound_http_url(
+                    endpoint,
+                    allow_internal=self.settings.llm_allow_internal_endpoints,
+                )
             return OpenAI(
                 model=self.settings.llm_model or "gpt-3.5-turbo",
-                api_base=self.settings.llm_endpoint or None,
+                api_base=endpoint,
                 api_key=self.settings.llm_api_key,
             )
         else:

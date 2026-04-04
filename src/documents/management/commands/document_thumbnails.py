@@ -3,14 +3,18 @@ import shutil
 
 from documents.management.commands.base import PaperlessCommand
 from documents.models import Document
-from documents.parsers import get_parser_class_for_mime_type
+from paperless.parsers.registry import get_parser_registry
 
 logger = logging.getLogger("paperless.management.thumbnails")
 
 
 def _process_document(doc_id: int) -> None:
     document: Document = Document.objects.get(id=doc_id)
-    parser_class = get_parser_class_for_mime_type(document.mime_type)
+    parser_class = get_parser_registry().get_parser_for_file(
+        document.mime_type,
+        document.original_filename or "",
+        document.source_path,
+    )
 
     if parser_class is None:
         logger.warning(
@@ -20,18 +24,9 @@ def _process_document(doc_id: int) -> None:
         )
         return
 
-    parser = parser_class(logging_group=None)
-
-    try:
-        thumb = parser.get_thumbnail(
-            document.source_path,
-            document.mime_type,
-            document.get_public_filename(),
-        )
+    with parser_class() as parser:
+        thumb = parser.get_thumbnail(document.source_path, document.mime_type)
         shutil.move(thumb, document.thumbnail_path)
-    finally:
-        # TODO(stumpylog): Cleanup once all parsers are handled
-        parser.cleanup()
 
 
 class Command(PaperlessCommand):

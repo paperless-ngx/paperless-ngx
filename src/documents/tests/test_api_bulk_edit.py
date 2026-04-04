@@ -263,6 +263,50 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(kwargs["remove_custom_fields"], [self.cf2.id])
 
     @mock.patch("documents.serialisers.bulk_edit.modify_custom_fields")
+    def test_api_modify_custom_fields_documentlink_forbidden_for_unpermitted_target(
+        self,
+        m,
+    ) -> None:
+        self.setup_mock(m, "modify_custom_fields")
+        user = User.objects.create_user(username="doc-owner")
+        user.user_permissions.add(Permission.objects.get(codename="change_document"))
+        other_user = User.objects.create_user(username="other-user")
+        source_doc = Document.objects.create(
+            checksum="source",
+            title="Source",
+            owner=user,
+        )
+        target_doc = Document.objects.create(
+            checksum="target",
+            title="Target",
+            owner=other_user,
+        )
+        doclink_field = CustomField.objects.create(
+            name="doclink",
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        )
+
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [source_doc.id],
+                    "method": "modify_custom_fields",
+                    "parameters": {
+                        "add_custom_fields": {doclink_field.id: [target_doc.id]},
+                        "remove_custom_fields": [],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        m.assert_not_called()
+
+    @mock.patch("documents.serialisers.bulk_edit.modify_custom_fields")
     def test_api_modify_custom_fields_with_values(self, m) -> None:
         self.setup_mock(m, "modify_custom_fields")
         response = self.client.post(
@@ -569,6 +613,63 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Document.objects.count(), 5)
+
+    def test_api_requires_documents_unless_all_is_true(self) -> None:
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "method": "set_storage_path",
+                    "parameters": {"storage_path": self.sp1.id},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"documents is required unless all is true", response.content)
+
+    @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
+    def test_api_bulk_edit_with_all_true_resolves_documents_from_filters(
+        self,
+        m,
+    ) -> None:
+        self.setup_mock(m, "set_storage_path")
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "all": True,
+                    "filters": {"title__icontains": "B"},
+                    "method": "set_storage_path",
+                    "parameters": {"storage_path": self.sp1.id},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertEqual(args[0], [self.doc2.id])
+        self.assertEqual(kwargs["storage_path"], self.sp1.id)
+
+    def test_api_bulk_edit_with_all_true_rejects_unsupported_methods(self) -> None:
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "all": True,
+                    "method": "merge",
+                    "parameters": {"metadata_document_id": self.doc2.id},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"This method does not support all=true", response.content)
 
     def test_api_invalid_method(self) -> None:
         self.assertEqual(Document.objects.count(), 5)

@@ -13,11 +13,12 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           token: ${{ secrets.PNGX_BOT_PAT }}
+          persist-credentials: false
       - name: crowdin action
-        uses: crowdin/github-action@v2.15.0
+        uses: crowdin/github-action@8818ff65bfc4322384f983ea37e3926948c11745 # v2.15.0
         with:
           upload_translations: false
           download_translations: true

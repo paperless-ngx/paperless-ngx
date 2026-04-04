@@ -39,6 +39,8 @@ from documents.loggers import LoggingMixin
 from documents.models import Correspondent
 from documents.parsers import is_mime_type_supported
 from documents.tasks import consume_file
+from paperless.network import is_public_ip
+from paperless.network import resolve_hostname_ips
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
@@ -412,6 +414,13 @@ def get_mailbox(server, port, security) -> MailBox:
     """
     Returns the correct MailBox instance for the given configuration.
     """
+    if not settings.EMAIL_ALLOW_INTERNAL_HOSTS:
+        for ip_str in resolve_hostname_ips(server):
+            if not is_public_ip(ip_str):
+                raise MailError(
+                    f"Connection blocked: {server} resolves to a non-public address",
+                )
+
     ssl_context = ssl.create_default_context()
     if settings.EMAIL_CERTIFICATE_FILE is not None:  # pragma: no cover
         ssl_context.load_verify_locations(cafile=settings.EMAIL_CERTIFICATE_FILE)

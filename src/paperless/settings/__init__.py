@@ -11,6 +11,7 @@ from typing import Final
 from urllib.parse import urlparse
 
 from compression_middleware.middleware import CompressionMiddleware
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
@@ -21,6 +22,7 @@ from paperless.settings.custom import parse_hosting_settings
 from paperless.settings.custom import parse_ignore_dates
 from paperless.settings.custom import parse_redis_url
 from paperless.settings.parsers import get_bool_from_env
+from paperless.settings.parsers import get_choice_from_env
 from paperless.settings.parsers import get_float_from_env
 from paperless.settings.parsers import get_int_from_env
 from paperless.settings.parsers import get_list_from_env
@@ -85,6 +87,11 @@ EMPTY_TRASH_DIR = (
 # threads.
 MEDIA_LOCK = MEDIA_ROOT / "media.lock"
 INDEX_DIR = DATA_DIR / "index"
+
+ADVANCED_FUZZY_SEARCH_THRESHOLD: float | None = get_float_from_env(
+    "PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD",
+)
+
 MODEL_FILE = get_path_from_env(
     "PAPERLESS_MODEL_FILE",
     DATA_DIR / "classification_model.pickle",
@@ -121,10 +128,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "paperless",
     "documents.apps.DocumentsConfig",
-    "paperless_tesseract.apps.PaperlessTesseractConfig",
-    "paperless_text.apps.PaperlessTextConfig",
     "paperless_mail.apps.PaperlessMailConfig",
-    "paperless_remote.apps.PaperlessRemoteParserConfig",
     "django.contrib.admin",
     "rest_framework",
     "rest_framework.authtoken",
@@ -158,6 +162,9 @@ REST_FRAMEWORK = {
     "ALLOWED_VERSIONS": ["9", "10"],
     # DRF Spectacular default schema
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_THROTTLE_RATES": {
+        "login": os.getenv("PAPERLESS_TOKEN_THROTTLE_RATE", "5/min"),
+    },
 }
 
 if DEBUG:
@@ -457,13 +464,13 @@ SECURE_PROXY_SSL_HEADER = (
     else None
 )
 
-# The secret key has a default that should be fine so long as you're hosting
-# Paperless on a closed network.  However, if you're putting this anywhere
-# public, you should change the key to something unique and verbose.
-SECRET_KEY = os.getenv(
-    "PAPERLESS_SECRET_KEY",
-    "e11fl1oa-*ytql8p)(06fbj4ukrlo+n7k&q5+$1md7i+mge=ee",
-)
+SECRET_KEY = os.getenv("PAPERLESS_SECRET_KEY", "")
+if not SECRET_KEY:  # pragma: no cover
+    raise ImproperlyConfigured(
+        "PAPERLESS_SECRET_KEY is not set. "
+        "A unique, secret key is required for secure operation. "
+        'Generate one with: python3 -c "import secrets; print(secrets.token_urlsafe(64))"',
+    )
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -494,6 +501,10 @@ SESSION_COOKIE_NAME = f"{COOKIE_PREFIX}sessionid"
 LANGUAGE_COOKIE_NAME = f"{COOKIE_PREFIX}django_language"
 
 EMAIL_CERTIFICATE_FILE = get_path_from_env("PAPERLESS_EMAIL_CERTIFICATE_LOCATION")
+EMAIL_ALLOW_INTERNAL_HOSTS = get_bool_from_env(
+    "PAPERLESS_EMAIL_ALLOW_INTERNAL_HOSTS",
+    "true",
+)
 
 
 ###############################################################################
@@ -581,8 +592,7 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "verbose": {
-            "format": "[{asctime}] [{levelname}] [{name}] {message}",
-            "style": "{",
+            "()": "paperless.logging.ConsumeTaskFormatter",
         },
         "simple": {
             "format": "{levelname} {message}",
@@ -664,9 +674,11 @@ CELERY_RESULT_BACKEND = "django-db"
 CELERY_CACHE_BACKEND = "default"
 
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#task-serializer
-CELERY_TASK_SERIALIZER = "pickle"
+# Uses HMAC-signed pickle to prevent RCE via malicious messages on an exposed Redis broker.
+# The signed-pickle serializer is registered in paperless/celery.py.
+CELERY_TASK_SERIALIZER = "signed-pickle"
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#std-setting-accept_content
-CELERY_ACCEPT_CONTENT = ["application/json", "application/x-python-serialize"]
+CELERY_ACCEPT_CONTENT = ["application/json", "application/x-signed-pickle"]
 
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#beat-schedule
 CELERY_BEAT_SCHEDULE = parse_beat_schedule()
@@ -974,8 +986,8 @@ TIKA_GOTENBERG_ENDPOINT = os.getenv(
     "http://localhost:3000",
 )
 
-if TIKA_ENABLED:
-    INSTALLED_APPS.append("paperless_tika.apps.PaperlessTikaConfig")
+# Tika parser is now integrated into the main parser registry
+# No separate Django app needed
 
 AUDIT_LOG_ENABLED = get_bool_from_env("PAPERLESS_AUDIT_LOG_ENABLED", "true")
 if AUDIT_LOG_ENABLED:
@@ -1036,9 +1048,54 @@ def _get_nltk_language_setting(ocr_lang: str) -> str | None:
     return iso_code_to_nltk.get(ocr_lang)
 
 
+def _get_search_language_setting(ocr_lang: str) -> str | None:
+    """
+    Determine the Tantivy stemmer language.
+
+    If PAPERLESS_SEARCH_LANGUAGE is explicitly set, it is validated against
+    the languages supported by Tantivy's built-in stemmer and returned as-is.
+    Otherwise the primary Tesseract language code from PAPERLESS_OCR_LANGUAGE
+    is mapped to the corresponding ISO 639-1 code understood by Tantivy.
+    Returns None when unset and the OCR language has no Tantivy stemmer.
+    """
+    explicit = os.environ.get("PAPERLESS_SEARCH_LANGUAGE")
+    if explicit is not None:
+        # Lazy import avoids any app-loading order concerns; _tokenizer has no
+        # Django dependencies so this is safe.
+        from documents.search._tokenizer import SUPPORTED_LANGUAGES
+
+        return get_choice_from_env("PAPERLESS_SEARCH_LANGUAGE", SUPPORTED_LANGUAGES)
+
+    # Infer from the primary Tesseract language code (ISO 639-2/T → ISO 639-1)
+    primary = ocr_lang.split("+", maxsplit=1)[0].lower()
+    _ocr_to_search: dict[str, str] = {
+        "ara": "ar",
+        "dan": "da",
+        "nld": "nl",
+        "eng": "en",
+        "fin": "fi",
+        "fra": "fr",
+        "deu": "de",
+        "ell": "el",
+        "hun": "hu",
+        "ita": "it",
+        "nor": "no",
+        "por": "pt",
+        "ron": "ro",
+        "rus": "ru",
+        "spa": "es",
+        "swe": "sv",
+        "tam": "ta",
+        "tur": "tr",
+    }
+    return _ocr_to_search.get(primary)
+
+
 NLTK_ENABLED: Final[bool] = get_bool_from_env("PAPERLESS_ENABLE_NLTK", "yes")
 
 NLTK_LANGUAGE: str | None = _get_nltk_language_setting(OCR_LANGUAGE)
+
+SEARCH_LANGUAGE: str | None = _get_search_language_setting(OCR_LANGUAGE)
 
 ###############################################################################
 # Email Preprocessors                                                         #
@@ -1112,3 +1169,7 @@ LLM_BACKEND = os.getenv("PAPERLESS_AI_LLM_BACKEND")  # "ollama" or "openai"
 LLM_MODEL = os.getenv("PAPERLESS_AI_LLM_MODEL")
 LLM_API_KEY = os.getenv("PAPERLESS_AI_LLM_API_KEY")
 LLM_ENDPOINT = os.getenv("PAPERLESS_AI_LLM_ENDPOINT")
+LLM_ALLOW_INTERNAL_ENDPOINTS = get_bool_from_env(
+    "PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS",
+    "true",
+)
