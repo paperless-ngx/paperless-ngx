@@ -6,7 +6,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "0015_document_version_index_and_more"),
+        ("documents", "0018_saved_view_simple_search_rules"),
     ]
 
     operations = [
