@@ -334,6 +334,36 @@ class TantivyBackend:
         if self._index is None:
             self.open()  # pragma: no cover
 
+    def _parse_query(
+        self,
+        query: str,
+        search_mode: SearchMode,
+    ) -> tantivy.Query:
+        """Parse a user query string into a Tantivy Query object."""
+        tz = get_current_timezone()
+        if search_mode is SearchMode.TEXT:
+            return parse_simple_text_query(self._index, query)
+        elif search_mode is SearchMode.TITLE:
+            return parse_simple_title_query(self._index, query)
+        else:
+            return parse_user_query(self._index, query, tz)
+
+    def _apply_permission_filter(
+        self,
+        query: tantivy.Query,
+        user: AbstractBaseUser | None,
+    ) -> tantivy.Query:
+        """Wrap a query with a permission filter if the user is not a superuser."""
+        if user is not None:
+            permission_filter = build_permission_filter(self._schema, user)
+            return tantivy.Query.boolean_query(
+                [
+                    (tantivy.Occur.Must, query),
+                    (tantivy.Occur.Must, permission_filter),
+                ],
+            )
+        return query
+
     def _build_tantivy_doc(
         self,
         document: Document,
@@ -526,25 +556,8 @@ class TantivyBackend:
             SearchResults with hits, total count, and processed query
         """
         self._ensure_open()
-        tz = get_current_timezone()
-        if search_mode is SearchMode.TEXT:
-            user_query = parse_simple_text_query(self._index, query)
-        elif search_mode is SearchMode.TITLE:
-            user_query = parse_simple_title_query(self._index, query)
-        else:
-            user_query = parse_user_query(self._index, query, tz)
-
-        # Apply permission filter if user is not None (not superuser)
-        if user is not None:
-            permission_filter = build_permission_filter(self._schema, user)
-            final_query = tantivy.Query.boolean_query(
-                [
-                    (tantivy.Occur.Must, user_query),
-                    (tantivy.Occur.Must, permission_filter),
-                ],
-            )
-        else:
-            final_query = user_query
+        user_query = self._parse_query(query, search_mode)
+        final_query = self._apply_permission_filter(user_query, user)
 
         searcher = self._index.searcher()
         offset = (page - 1) * page_size
@@ -666,6 +679,11 @@ class TantivyBackend:
         Use this when you already know which documents to display (from
         search_ids + ORM filtering) and just need highlight data.
 
+        Note: Each doc_id requires an individual index lookup because tantivy-py
+        does not expose a batch doc-address-by-ID API. This is acceptable for
+        page-sized batches (typically 25 docs) but should not be called with
+        thousands of IDs.
+
         Args:
             query: The search query (used for snippet generation)
             doc_ids: Ordered list of document IDs to generate hits for
@@ -678,13 +696,7 @@ class TantivyBackend:
             return []
 
         self._ensure_open()
-        tz = get_current_timezone()
-        if search_mode is SearchMode.TEXT:
-            user_query = parse_simple_text_query(self._index, query)
-        elif search_mode is SearchMode.TITLE:
-            user_query = parse_simple_title_query(self._index, query)
-        else:
-            user_query = parse_user_query(self._index, query, tz)
+        user_query = self._parse_query(query, search_mode)
 
         searcher = self._index.searcher()
         snippet_generator = None
@@ -776,24 +788,8 @@ class TantivyBackend:
             List of document IDs in the requested order
         """
         self._ensure_open()
-        tz = get_current_timezone()
-        if search_mode is SearchMode.TEXT:
-            user_query = parse_simple_text_query(self._index, query)
-        elif search_mode is SearchMode.TITLE:
-            user_query = parse_simple_title_query(self._index, query)
-        else:
-            user_query = parse_user_query(self._index, query, tz)
-
-        if user is not None:
-            permission_filter = build_permission_filter(self._schema, user)
-            final_query = tantivy.Query.boolean_query(
-                [
-                    (tantivy.Occur.Must, user_query),
-                    (tantivy.Occur.Must, permission_filter),
-                ],
-            )
-        else:
-            final_query = user_query
+        user_query = self._parse_query(query, search_mode)
+        final_query = self._apply_permission_filter(user_query, user)
 
         searcher = self._index.searcher()
         effective_limit = limit if limit is not None else searcher.num_docs
@@ -931,17 +927,7 @@ class TantivyBackend:
             boost_factor=None,
         )
 
-        # Apply permission filter
-        if user is not None:
-            permission_filter = build_permission_filter(self._schema, user)
-            final_query = tantivy.Query.boolean_query(
-                [
-                    (tantivy.Occur.Must, mlt_query),
-                    (tantivy.Occur.Must, permission_filter),
-                ],
-            )
-        else:
-            final_query = mlt_query
+        final_query = self._apply_permission_filter(mlt_query, user)
 
         # Search
         offset = (page - 1) * page_size
@@ -1033,16 +1019,7 @@ class TantivyBackend:
             boost_factor=None,
         )
 
-        if user is not None:
-            permission_filter = build_permission_filter(self._schema, user)
-            final_query = tantivy.Query.boolean_query(
-                [
-                    (tantivy.Occur.Must, mlt_query),
-                    (tantivy.Occur.Must, permission_filter),
-                ],
-            )
-        else:
-            final_query = mlt_query
+        final_query = self._apply_permission_filter(mlt_query, user)
 
         effective_limit = limit if limit is not None else searcher.num_docs
         results = searcher.search(final_query, limit=effective_limit)
