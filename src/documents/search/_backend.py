@@ -573,6 +573,7 @@ class TantivyBackend:
         # Build result hits with highlights
         hits: list[SearchHit] = []
         snippet_generator = None
+        notes_snippet_generator = None
 
         # Determine which hits need highlights
         if highlight_page is not None and highlight_page_size is not None:
@@ -609,13 +610,16 @@ class TantivyBackend:
 
                     # Try notes highlights
                     if "notes" in doc_dict:
-                        notes_generator = tantivy.SnippetGenerator.create(
-                            searcher,
-                            final_query,
-                            self._schema,
-                            "notes",
+                        if notes_snippet_generator is None:
+                            notes_snippet_generator = tantivy.SnippetGenerator.create(
+                                searcher,
+                                final_query,
+                                self._schema,
+                                "notes",
+                            )
+                        notes_snippet = notes_snippet_generator.snippet_from_doc(
+                            actual_doc,
                         )
-                        notes_snippet = notes_generator.snippet_from_doc(actual_doc)
                         if notes_snippet:
                             highlights["notes"] = str(notes_snippet)
 
