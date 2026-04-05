@@ -889,15 +889,14 @@ OCR_LANGUAGE = os.getenv("PAPERLESS_OCR_LANGUAGE", "eng")
 # OCRmyPDF --output-type options are available.
 OCR_OUTPUT_TYPE = os.getenv("PAPERLESS_OCR_OUTPUT_TYPE", "pdfa")
 
-_ocr_mode_raw = os.environ.get("PAPERLESS_OCR_MODE", "")
-if _ocr_mode_raw in ("skip", "skip_noarchive"):
-    os.environ["PAPERLESS_OCR_MODE"] = "auto"
-
-OCR_MODE = get_choice_from_env(
-    "PAPERLESS_OCR_MODE",
-    {"auto", "force", "redo", "off"},
-    default="auto",
-)
+if os.environ.get("PAPERLESS_OCR_MODE", "") in ("skip", "skip_noarchive"):
+    OCR_MODE = "auto"
+else:
+    OCR_MODE = get_choice_from_env(
+        "PAPERLESS_OCR_MODE",
+        {"auto", "force", "redo", "off"},
+        default="auto",
+    )
 
 ARCHIVE_FILE_GENERATION = get_choice_from_env(
     "PAPERLESS_ARCHIVE_FILE_GENERATION",
