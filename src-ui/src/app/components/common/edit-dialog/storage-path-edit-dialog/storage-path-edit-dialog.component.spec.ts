@@ -4,7 +4,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { NgbAccordionButton, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { of, throwError } from 'rxjs'
-import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
+import { FILTER_SIMPLE_TITLE } from 'src/app/data/filter-rule-type'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -105,7 +105,7 @@ describe('StoragePathEditDialogComponent', () => {
       null,
       'created',
       true,
-      [{ rule_type: FILTER_TITLE, value: 'bar' }],
+      [{ rule_type: FILTER_SIMPLE_TITLE, value: 'bar' }],
       { truncate_content: true }
     )
     listSpy.mockReturnValueOnce(

@@ -28,7 +28,7 @@ import {
   tap,
 } from 'rxjs'
 import { Document } from 'src/app/data/document'
-import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
+import { FILTER_SIMPLE_TITLE } from 'src/app/data/filter-rule-type'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { AbstractInputComponent } from '../abstract-input'
@@ -121,7 +121,7 @@ export class DocumentLinkComponent
               null,
               'created',
               true,
-              [{ rule_type: FILTER_TITLE, value: title }],
+              [{ rule_type: FILTER_SIMPLE_TITLE, value: title }],
               { truncate_content: true }
             )
             .pipe(

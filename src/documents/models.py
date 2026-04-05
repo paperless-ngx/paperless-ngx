@@ -623,6 +623,8 @@ class SavedViewFilterRule(models.Model):
         (45, _("added to")),
         (46, _("added from")),
         (47, _("mime type is")),
+        (48, _("simple title search")),
+        (49, _("simple text search")),
     ]
 
     saved_view = models.ForeignKey(

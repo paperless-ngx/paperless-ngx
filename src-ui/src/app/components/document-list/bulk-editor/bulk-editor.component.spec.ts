@@ -428,7 +428,7 @@ describe('BulkEditorComponent', () => {
     req.flush(true)
     expect(req.request.body).toEqual({
       all: true,
-      filters: { title__icontains: 'apple' },
+      filters: { title_search: 'apple' },
       method: 'modify_tags',
       parameters: { add_tags: [101], remove_tags: [] },
     })

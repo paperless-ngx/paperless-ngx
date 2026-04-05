@@ -1,5 +1,24 @@
 # v3 Migration Guide
 
+## Secret Key is Now Required
+
+The `PAPERLESS_SECRET_KEY` environment variable is now required. This is a critical security setting used for cryptographic signing and should be set to a long, random value.
+
+### Action Required
+
+If you are upgrading an existing installation, you must now set `PAPERLESS_SECRET_KEY` explicitly.
+
+If your installation was relying on the previous built-in default key, you have two options:
+
+- Set `PAPERLESS_SECRET_KEY` to that previous value to preserve existing sessions and tokens.
+- Set `PAPERLESS_SECRET_KEY` to a new random value to improve security, understanding that this will invalidate existing sessions and other signed tokens.
+
+For new installations, or if you choose to rotate the key, you may generate a new secret key with:
+
+```bash
+python3 -c "import secrets; print(secrets.token_urlsafe(64))"
+```
+
 ## Consumer Settings Changes
 
 The v3 consumer command uses a [different library](https://watchfiles.helpmanual.io/) to unify
