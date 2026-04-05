@@ -133,7 +133,17 @@ class TantivyRelevanceList:
     def __len__(self) -> int:
         return len(self._ordered_ids)
 
-    def __getitem__(self, key: slice) -> list[SearchHit]:
+    def __getitem__(self, key: int | slice) -> SearchHit | list[SearchHit]:
+        if isinstance(key, int):
+            idx = key if key >= 0 else len(self._ordered_ids) + key
+            if self._page_offset <= idx < self._page_offset + len(self._page_hits):
+                return self._page_hits[idx - self._page_offset]
+            return SearchHit(
+                id=self._ordered_ids[key],
+                score=0.0,
+                rank=idx + 1,
+                highlights={},
+            )
         start = key.start or 0
         stop = key.stop or len(self._ordered_ids)
         # DRF slices to extract the current page.  If the slice aligns
@@ -748,7 +758,7 @@ class TantivyBackend:
         limit: int | None = None,
     ) -> list[int]:
         """
-        Return document IDs matching a query — no highlights, no stored doc fetches.
+        Return document IDs matching a query — no highlights or scores.
 
         This is the lightweight companion to search(). Use it when you need the
         full set of matching IDs (e.g. for ``selection_data``) but don't need

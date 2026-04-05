@@ -2083,7 +2083,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
             # Parse ordering param
             ordering_param = request.query_params.get("ordering", "")
             sort_reverse = ordering_param.startswith("-")
-            sort_field_name = ordering_param.lstrip("-") if ordering_param else None
+            sort_field_name = ordering_param.lstrip("-") or None
 
             use_tantivy_sort = (
                 sort_field_name in TantivyBackend.SORTABLE_FIELDS
