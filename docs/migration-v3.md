@@ -146,6 +146,10 @@ The new settings are independent:
 - [`PAPERLESS_OCR_MODE`](configuration.md#PAPERLESS_OCR_MODE) controls OCR: `auto` (default), `force`, `redo`, `off`.
 - [`PAPERLESS_ARCHIVE_FILE_GENERATION`](configuration.md#PAPERLESS_ARCHIVE_FILE_GENERATION) controls archive production: `auto` (default), `always`, `never`.
 
+### Database configuration
+
+If you changed OCR settings via the admin UI (ApplicationConfiguration), the database values are **migrated automatically** during the upgrade. `mode` values (`skip` / `skip_noarchive`) are mapped to their new equivalents and `skip_archive_file` values are converted to the new `archive_file_generation` field. After upgrading, review the OCR settings in the admin UI to confirm the migrated values match your intent.
+
 ### Action Required
 
 Remove any `PAPERLESS_OCR_SKIP_ARCHIVE_FILE` variable from your environment. If you relied on `OCR_MODE=skip` or `OCR_MODE=skip_noarchive`, update accordingly:
