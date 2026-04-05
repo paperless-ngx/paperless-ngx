@@ -2058,6 +2058,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
         if not self._is_search_request():
             return super().list(request)
 
+        from documents.search import SearchHit
         from documents.search import SearchMode
         from documents.search import TantivyBackend
         from documents.search import TantivyRelevanceList
@@ -2116,45 +2117,41 @@ class UnifiedSearchViewSet(DocumentViewSet):
                     search_mode = SearchMode.QUERY
                     query_str = request.query_params["query"]
 
+                # Step 1: Get all matching IDs (lightweight, no highlights)
+                all_ids = backend.search_ids(
+                    query_str,
+                    user=user,
+                    sort_field=sort_field_name if use_tantivy_sort else None,
+                    sort_reverse=sort_reverse,
+                    search_mode=search_mode,
+                )
+
+                # Step 2: Intersect with ORM-visible IDs (field filters)
+                orm_ids = set(filtered_qs.values_list("pk", flat=True))
+
                 if use_tantivy_sort:
-                    # Fast path: Tantivy sorts, highlights only for DRF page
-                    results = backend.search(
-                        query_str,
-                        user=user,
-                        page=1,
-                        page_size=10000,
-                        sort_field=sort_field_name,
-                        sort_reverse=sort_reverse,
-                        search_mode=search_mode,
-                        highlight_page=requested_page,
-                        highlight_page_size=requested_page_size,
+                    # Fast path: Tantivy already ordered the IDs
+                    ordered_ids = [doc_id for doc_id in all_ids if doc_id in orm_ids]
+                else:
+                    # Slow path: ORM must re-sort
+                    id_set = set(all_ids) & orm_ids
+                    ordered_ids = list(
+                        filtered_qs.filter(id__in=id_set).values_list(
+                            "pk",
+                            flat=True,
+                        ),
                     )
 
-                    # Intersect with ORM-visible IDs (field filters)
-                    orm_ids = set(filtered_qs.values_list("pk", flat=True))
-                    ordered_hits = [h for h in results.hits if h["id"] in orm_ids]
-                else:
-                    # Slow path: custom field ordering — ORM must sort
-                    results = backend.search(
-                        query_str,
-                        user=user,
-                        page=1,
-                        page_size=10000,
-                        sort_field=None,
-                        sort_reverse=False,
-                        search_mode=search_mode,
-                        highlight_page=requested_page,
-                        highlight_page_size=requested_page_size,
-                    )
-                    hits_by_id = {h["id"]: h for h in results.hits}
-                    hit_ids = set(hits_by_id.keys())
-                    orm_ordered_ids = filtered_qs.filter(id__in=hit_ids).values_list(
-                        "pk",
-                        flat=True,
-                    )
-                    ordered_hits = [
-                        hits_by_id[pk] for pk in orm_ordered_ids if pk in hits_by_id
-                    ]
+                # Step 3: Fetch highlights for the displayed page only
+                page_offset = (requested_page - 1) * requested_page_size
+                page_ids = ordered_ids[page_offset : page_offset + requested_page_size]
+
+                page_hits = backend.highlight_hits(
+                    query_str,
+                    page_ids,
+                    search_mode=search_mode,
+                )
+
             else:
                 # more_like_id path
                 try:
@@ -2172,16 +2169,24 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 ):
                     raise PermissionDenied(_("Insufficient permissions."))
 
-                results = backend.more_like_this(
+                # Step 1: Get all matching IDs (lightweight)
+                all_ids = backend.more_like_this_ids(
                     more_like_doc_id,
                     user=user,
-                    page=1,
-                    page_size=10000,
                 )
                 orm_ids = set(filtered_qs.values_list("pk", flat=True))
-                ordered_hits = [h for h in results.hits if h["id"] in orm_ids]
+                ordered_ids = [doc_id for doc_id in all_ids if doc_id in orm_ids]
 
-            rl = TantivyRelevanceList(ordered_hits)
+                # Step 2: Build hit dicts for the displayed page
+                # MLT has no text query, so no highlights needed
+                page_offset = (requested_page - 1) * requested_page_size
+                page_ids = ordered_ids[page_offset : page_offset + requested_page_size]
+                page_hits = [
+                    SearchHit(id=doc_id, score=0.0, rank=rank, highlights={})
+                    for rank, doc_id in enumerate(page_ids, start=page_offset + 1)
+                ]
+
+            rl = TantivyRelevanceList(ordered_ids, page_hits, page_offset)
             page = self.paginate_queryset(rl)
 
             if page is not None:
@@ -2191,15 +2196,14 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 if get_boolean(
                     str(request.query_params.get("include_selection_data", "false")),
                 ):
-                    all_ids = [h["id"] for h in ordered_hits]
                     response.data["selection_data"] = (
                         self._get_selection_data_for_queryset(
-                            filtered_qs.filter(pk__in=all_ids),
+                            filtered_qs.filter(pk__in=ordered_ids),
                         )
                     )
                 return response
 
-            serializer = self.get_serializer(ordered_hits, many=True)
+            serializer = self.get_serializer(page_hits, many=True)
             return Response(serializer.data)
 
         except NotFound:

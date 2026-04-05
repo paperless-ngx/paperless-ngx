@@ -1,3 +1,4 @@
+from documents.search._backend import SearchHit
 from documents.search._backend import SearchIndexLockError
 from documents.search._backend import SearchMode
 from documents.search._backend import SearchResults
@@ -10,6 +11,7 @@ from documents.search._schema import needs_rebuild
 from documents.search._schema import wipe_index
 
 __all__ = [
+    "SearchHit",
     "SearchIndexLockError",
     "SearchMode",
     "SearchResults",
