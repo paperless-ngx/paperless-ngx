@@ -1106,36 +1106,34 @@ Expected improvements:
 - **Paginated search**: Only page 2's 25 results get highlights instead of all 200
 - **Backend search**: Direct comparison of highlight-all vs highlight-page
 
-- [ ] **Step 4: Record comparison in the plan**
+- [x] **Step 4: Record comparison in the plan**
 
-Update this section with the actual numbers once profiling is complete:
+Profiling results (200-document test corpus):
 
-| Scenario                  | Metric       | Before | After | Improvement |
-| ------------------------- | ------------ | ------ | ----- | ----------- |
-| Relevance search          | Wall time    | _TBD_  | _TBD_ | _TBD_       |
-| Relevance search          | Queries      | _TBD_  | _TBD_ | _TBD_       |
-| Relevance search          | Memory delta | _TBD_  | _TBD_ | _TBD_       |
-| Sorted search             | Wall time    | _TBD_  | _TBD_ | _TBD_       |
-| Sorted search             | Queries      | _TBD_  | _TBD_ | _TBD_       |
-| Paginated search          | Wall time    | _TBD_  | _TBD_ | _TBD_       |
-| Backend 10k→25 highlights | Wall time    | _TBD_  | _TBD_ | _TBD_       |
-| Backend 10k→25 highlights | Memory delta | _TBD_  | _TBD_ | _TBD_       |
+| Scenario               | Metric       | Before     | After      | Improvement |
+| ---------------------- | ------------ | ---------- | ---------- | ----------- |
+| Relevance search       | Wall time    | 0.962s     | 0.917s     | -5%         |
+| Relevance search       | Queries      | 33         | 33         | same        |
+| Relevance search       | Memory delta | 16,557 KiB | 16,478 KiB | -0.5%       |
+| Sorted search          | Wall time    | 0.132s     | 0.138s     | ~same       |
+| Sorted search          | Queries      | 32         | 32         | same        |
+| Sorted search          | Memory delta | 881 KiB    | 792 KiB    | -10%        |
+| Paginated search       | Wall time    | 0.140s     | 0.132s     | -6%         |
+| Paginated search       | Memory delta | 868 KiB    | 788 KiB    | -9%         |
+| Selection data         | Wall time    | 0.166s     | 0.157s     | -5%         |
+| Selection data         | Memory delta | 927 KiB    | 837 KiB    | -10%        |
+| Backend 10k highlights | Wall time    | 0.018s     | 0.019s     | same        |
+| Backend 10k highlights | Memory delta | 89 KiB     | 89 KiB     | same        |
+| Backend 25 highlights  | Wall time    | 0.007s     | 0.005s     | -29%        |
+| Backend 25 highlights  | Memory delta | 5.9 KiB    | 5.9 KiB    | same        |
 
-- [ ] **Step 5: Commit**
+Notes: Relevance search is dominated by first-request import overhead (~16 MiB).
+Memory savings scale with document count. The 10,000 hardcoded limit has been
+removed entirely; search_ids() now returns all matches.
 
-```bash
-git add src/documents/tests/test_search_profiling.py docs/superpowers/plans/profiling-after.txt
-git commit -m "test: add post-implementation profiling results"
-```
+- [x] **Step 5: Commit** — Done (profiling data saved to `docs/superpowers/plans/profiling-after-option1.txt`)
 
-- [ ] **Step 6: Clean up profiling artifacts**
-
-The profiling test file and `profiling.py` are temporary. Remove them:
-
-```bash
-git rm src/documents/tests/test_search_profiling.py src/documents/profiling.py
-git commit -m "chore: remove temporary profiling tests"
-```
+- [x] **Step 6: Clean up profiling artifacts** — Done (removed `profiling.py` and `test_search_profiling.py`)
 
 ---
 
@@ -1143,34 +1141,44 @@ git commit -m "chore: remove temporary profiling tests"
 
 ### What these changes accomplish
 
-- **Task 1**: `search()` accepts `highlight_page`/`highlight_page_size` — only the displayed page pays the snippet cost. All hits still returned (DRF pagination works unchanged).
-- **Task 2-3**: `search_ids()` and `more_like_this_ids()` provide an even lighter path when only IDs are needed.
-- **Task 4**: Viewset passes `sort_field` through to Tantivy for natively-sortable fields, eliminating the ORM re-sort query. Passes `highlight_page` so only 25 hits get snippets instead of 10,000.
+- **Task 1**: `search()` accepts `highlight_page`/`highlight_page_size` for backward compatibility.
+- **Task 2-3**: `search_ids()` and `more_like_this_ids()` provide lightweight ID-only paths with no arbitrary cap.
+- **Task 4**: Viewset passes `sort_field` through to Tantivy for natively-sortable fields, eliminating the ORM re-sort query.
+- **Option 1 refactor** (post-plan): Replaced the `page_size=10000` overfetch entirely. The viewset now calls `search_ids()` for the full ID set (ints only, no cap), intersects with ORM, then calls `highlight_hits()` for just the displayed page (~25 docs). `TantivyRelevanceList` holds ordered IDs for count/selection_data and a small page of rich `SearchHit` dicts for serialization.
+- **Code review fixes**: `_parse_query()` and `_apply_permission_filter()` helpers extracted to deduplicate 3+4 call sites. `SORT_FIELD_MAP`/`SORTABLE_FIELDS` promoted to class constants. `__getitem__` handles int keys. Empty ordering param handled correctly.
 
 ### DRF compatibility preserved
 
-| Concern                                   | Status                                                        |
-| ----------------------------------------- | ------------------------------------------------------------- |
-| `TantivyRelevanceList.__len__()`          | Returns `len(self._hits)` — ALL hits, correct count           |
-| `TantivyRelevanceList.__getitem__(slice)` | Slices the full hit list — DRF pagination works               |
-| `get_all_result_ids()`                    | Extracts IDs from full hit list — unchanged                   |
-| `count` in response                       | Correct — reflects all matching documents after ORM filtering |
-| `next`/`previous` links                   | Correct — DRF computes from accurate count                    |
-| Page N requests                           | Correct — DRF slices full list at `[(N-1)*size : N*size]`     |
+| Concern                                   | Status                                                             |
+| ----------------------------------------- | ------------------------------------------------------------------ |
+| `TantivyRelevanceList.__len__()`          | Returns `len(self._ordered_ids)` — ALL matching IDs, correct count |
+| `TantivyRelevanceList.__getitem__(slice)` | Returns pre-fetched page_hits when aligned, stubs otherwise        |
+| `TantivyRelevanceList.__getitem__(int)`   | Returns single SearchHit (from page_hits or stub)                  |
+| `get_all_result_ids()`                    | Returns `ordered_ids` directly — no dict iteration                 |
+| `count` in response                       | Correct — reflects all matching documents after ORM filtering      |
+| `next`/`previous` links                   | Correct — DRF computes from accurate count                         |
+| Page N requests                           | Correct — DRF slices, gets pre-fetched page hits                   |
 
 ### Performance impact
 
-| Operation                                | Before                 | After                                     |
-| ---------------------------------------- | ---------------------- | ----------------------------------------- |
-| Snippet generations per search           | Up to 10,000           | ~25 (page size)                           |
-| Notes SnippetGenerator creations         | Up to 10,000 (per hit) | ~25 (page size)                           |
-| ORM sort query (Tantivy-sortable fields) | Always                 | Never (Tantivy sorts)                     |
-| ORM sort query (custom fields)           | Always                 | Still always (fallback)                   |
-| `searcher.doc()` calls                   | Up to 10,000           | Up to 10,000 (unchanged — needed for IDs) |
-| Tantivy searches per request             | 1                      | 1                                         |
+| Operation                                | Before                 | After                                             |
+| ---------------------------------------- | ---------------------- | ------------------------------------------------- |
+| Snippet generations per search           | Up to 10,000           | ~25 (page size) via `highlight_hits()`            |
+| `searcher.doc()` calls for IDs           | Up to 10,000           | All matches via `search_ids()` (ints, not dicts)  |
+| `searcher.doc()` calls for highlights    | Up to 10,000           | ~25 via `highlight_hits()` (N individual lookups) |
+| ORM sort query (Tantivy-sortable fields) | Always                 | Never (Tantivy sorts via `search_ids()`)          |
+| ORM sort query (custom fields)           | Always                 | Still always (fallback)                           |
+| Tantivy searches per request             | 1                      | 2 (`search_ids` + `highlight_hits`)               |
+| Hardcoded result cap                     | 10,000                 | None (`searcher.num_docs`)                        |
+| Memory per result (non-page hits)        | ~100 bytes (SearchHit) | ~28 bytes (int)                                   |
+
+### Known limitations
+
+- **`highlight_hits()` does N individual ID lookups**: tantivy-py does not expose a batch doc-address-by-ID API, so each page doc requires a separate `searcher.search(id_query, limit=1)`. Acceptable for page-sized batches (~25) but should not be called with thousands of IDs.
+- **Text-based sort fields fall back to ORM**: `title`, `correspondent__name`, `document_type__name` produce different ordering in Tantivy (tokenized) vs ORM (collation), so they use the ORM sort path.
 
 ### What's NOT in this plan (future work)
 
-- **Push ORM filters into Tantivy queries**: Would eliminate the ORM intersection (`filtered_qs.values_list`) and potentially reduce the 10k hit fetch. High effort, deferred.
+- **Push ORM filters into Tantivy queries**: Would eliminate the ORM intersection (`filtered_qs.values_list`). High effort (~30 filter expressions to translate), deferred. Assessed as weeks of work.
 - **Tantivy fast-field ID extraction**: `searcher.doc()` loads the full stored document to get the ID. Tantivy's fast fields could provide IDs without loading stored docs. Depends on tantivy-py API support.
-- **Adaptive overfetch limit**: The 10,000 limit is still fixed. Could be made smaller when ORM filters are absent, or adaptive based on historical filter rates.
+- **Batch doc-address lookup**: Would eliminate the N individual lookups in `highlight_hits()`. Requires tantivy-py API changes or a workaround using term_set_query.
