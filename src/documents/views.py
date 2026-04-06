@@ -2219,6 +2219,10 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 if get_boolean(
                     str(request.query_params.get("include_selection_data", "false")),
                 ):
+                    # NOTE: pk__in=ordered_ids generates a large SQL IN clause
+                    # for big result sets.  Acceptable today but may need a temp
+                    # table or chunked approach if selection_data becomes slow
+                    # at scale (tens of thousands of matching documents).
                     response.data["selection_data"] = (
                         self._get_selection_data_for_queryset(
                             filtered_qs.filter(pk__in=ordered_ids),
