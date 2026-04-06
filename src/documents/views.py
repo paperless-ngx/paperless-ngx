@@ -3109,20 +3109,16 @@ class GlobalSearchView(PassUserMixin):
                 docs = all_docs.filter(title__icontains=query)[:OBJECT_LIMIT]
             else:
                 user = None if request.user.is_superuser else request.user
-                fts_results = get_backend().search(
+                matching_ids = get_backend().search_ids(
                     query,
                     user=user,
-                    page=1,
-                    page_size=1000,
-                    sort_field=None,
-                    sort_reverse=False,
                     search_mode=SearchMode.TEXT,
                 )
-                docs_by_id = all_docs.in_bulk([hit["id"] for hit in fts_results.hits])
+                docs_by_id = all_docs.in_bulk(matching_ids)
                 docs = [
-                    docs_by_id[hit["id"]]
-                    for hit in fts_results.hits
-                    if hit["id"] in docs_by_id
+                    docs_by_id[doc_id]
+                    for doc_id in matching_ids
+                    if doc_id in docs_by_id
                 ][:OBJECT_LIMIT]
         saved_views = (
             get_objects_for_user_owner_aware(
