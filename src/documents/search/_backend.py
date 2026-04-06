@@ -536,6 +536,7 @@ class TantivyBackend:
 
         searcher = self._index.searcher()
         snippet_generator = None
+        notes_snippet_generator = None
         hits: list[SearchHit] = []
 
         for rank, doc_id in enumerate(doc_ids, start=1):
@@ -571,13 +572,14 @@ class TantivyBackend:
                     highlights["content"] = str(content_snippet)
 
                 if "notes" in doc_dict:
-                    notes_generator = tantivy.SnippetGenerator.create(
-                        searcher,
-                        user_query,
-                        self._schema,
-                        "notes",
-                    )
-                    notes_snippet = notes_generator.snippet_from_doc(actual_doc)
+                    if notes_snippet_generator is None:
+                        notes_snippet_generator = tantivy.SnippetGenerator.create(
+                            searcher,
+                            user_query,
+                            self._schema,
+                            "notes",
+                        )
+                    notes_snippet = notes_snippet_generator.snippet_from_doc(actual_doc)
                     if notes_snippet:
                         highlights["notes"] = str(notes_snippet)
 
