@@ -59,3 +59,11 @@ rules:
       - ci-release.yml:237
       - ci-release.yml:245
       - ci-release.yml:248
+  dangerous-triggers:
+    ignore:
+      # Both workflows use pull_request_target solely to label/comment on fork PRs
+      # (requires write-back access unavailable to pull_request). Neither workflow
+      # checks out PR code or executes anything from the fork — only reads PR
+      # metadata via context/API. Permissions are scoped to pull-requests: write.
+      - pr-bot.yml:2
+      - project-actions.yml:2
