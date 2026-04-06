@@ -6,6 +6,9 @@ on:
   push:
     paths: ['src/locale/**', 'src-ui/messages.xlf', 'src-ui/src/locale/**']
     branches: [dev]
+permissions:
+  contents: write
+  pull-requests: write
 jobs:
   synchronize-with-crowdin:
     name: Crowdin Sync

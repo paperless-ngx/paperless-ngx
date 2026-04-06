@@ -10,10 +10,14 @@ concurrency:
 env:
   DEFAULT_UV_VERSION: "0.10.x"
   DEFAULT_PYTHON_VERSION: "3.12"
+permissions: {}
 jobs:
   wait-for-docker:
     name: Wait for Docker Build
     runs-on: ubuntu-24.04
+    permissions:
+      checks: read
+      statuses: read
     steps:
       - name: Wait for Docker build
         uses: lewagon/wait-on-check-action@74049309dfeff245fe8009a0137eacf28136cb3c # v1.5.0
@@ -26,6 +30,8 @@ jobs:
     name: Build Release
     needs: wait-for-docker
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -129,6 +135,9 @@ jobs:
     name: Publish Release
     needs: build-release
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
     outputs:
       prerelease: ${{ steps.get-version.outputs.prerelease }}
       changelog: ${{ steps.create-release.outputs.body }}
@@ -176,6 +185,9 @@ jobs:
     needs: publish-release
     if: needs.publish-release.outputs.prerelease == 'false'
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2

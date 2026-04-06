@@ -13,6 +13,8 @@ concurrency:
 env:
   DEFAULT_UV_VERSION: "0.10.x"
   NLTK_DATA: "/usr/share/nltk_data"
+permissions:
+  contents: read
 jobs:
   changes:
     name: Detect Backend Changes
