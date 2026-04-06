@@ -123,7 +123,68 @@ Multiple options are combined in a single value:
 PAPERLESS_DB_OPTIONS="sslmode=require;sslrootcert=/certs/ca.pem;pool.max_size=10"
 ```
 
-## Search Index (Whoosh -> Tantivy)
+## OCR and Archive File Generation Settings
+
+The settings that control OCR behaviour and archive file generation have been redesigned. The old settings that coupled these two concerns together are **removed** — old values are not silently honoured; a startup warning is logged if any removed variable is still set in your environment.
+
+### Removed settings
+
+| Removed Setting                             | Replacement                                                           |
+| ------------------------------------------- | --------------------------------------------------------------------- |
+| `PAPERLESS_OCR_MODE=skip`                   | `PAPERLESS_OCR_MODE=auto` (new default)                               |
+| `PAPERLESS_OCR_MODE=skip_noarchive`         | `PAPERLESS_OCR_MODE=auto` + `PAPERLESS_ARCHIVE_FILE_GENERATION=never` |
+| `PAPERLESS_OCR_SKIP_ARCHIVE_FILE=never`     | `PAPERLESS_ARCHIVE_FILE_GENERATION=always`                            |
+| `PAPERLESS_OCR_SKIP_ARCHIVE_FILE=with_text` | `PAPERLESS_ARCHIVE_FILE_GENERATION=auto` (new default)                |
+| `PAPERLESS_OCR_SKIP_ARCHIVE_FILE=always`    | `PAPERLESS_ARCHIVE_FILE_GENERATION=never`                             |
+
+### What changed and why
+
+Previously, `OCR_MODE` conflated two independent concerns: whether to run OCR and whether to produce an archive. `skip` meant "skip OCR if text exists, but always produce an archive". `skip_noarchive` meant "skip OCR if text exists, and also skip the archive". This made it impossible to, for example, disable OCR entirely while still producing archives.
+
+The new settings are independent:
+
+- [`PAPERLESS_OCR_MODE`](configuration.md#PAPERLESS_OCR_MODE) controls OCR: `auto` (default), `force`, `redo`, `off`.
+- [`PAPERLESS_ARCHIVE_FILE_GENERATION`](configuration.md#PAPERLESS_ARCHIVE_FILE_GENERATION) controls archive production: `auto` (default), `always`, `never`.
+
+### Database configuration
+
+If you changed OCR settings via the admin UI (ApplicationConfiguration), the database values are **migrated automatically** during the upgrade. `mode` values (`skip` / `skip_noarchive`) are mapped to their new equivalents and `skip_archive_file` values are converted to the new `archive_file_generation` field. After upgrading, review the OCR settings in the admin UI to confirm the migrated values match your intent.
+
+### Action Required
+
+Remove any `PAPERLESS_OCR_SKIP_ARCHIVE_FILE` variable from your environment. If you relied on `OCR_MODE=skip` or `OCR_MODE=skip_noarchive`, update accordingly:
+
+```bash
+# v2: skip OCR when text present, always archive
+PAPERLESS_OCR_MODE=skip
+# v3: equivalent (auto is the new default)
+# No change needed — auto is the default
+
+# v2: skip OCR when text present, skip archive too
+PAPERLESS_OCR_MODE=skip_noarchive
+# v3: equivalent
+PAPERLESS_OCR_MODE=auto
+PAPERLESS_ARCHIVE_FILE_GENERATION=never
+
+# v2: always skip archive
+PAPERLESS_OCR_SKIP_ARCHIVE_FILE=always
+# v3: equivalent
+PAPERLESS_ARCHIVE_FILE_GENERATION=never
+
+# v2: skip archive only for born-digital docs
+PAPERLESS_OCR_SKIP_ARCHIVE_FILE=with_text
+# v3: equivalent (auto is the new default)
+PAPERLESS_ARCHIVE_FILE_GENERATION=auto
+```
+
+### Remote OCR parser
+
+If you use the **remote OCR parser** (Azure AI), note that it always produces a
+searchable PDF and stores it as the archive copy. `ARCHIVE_FILE_GENERATION=never`
+has no effect for documents handled by the remote parser — the archive is produced
+unconditionally by the remote engine.
+
+# Search Index (Whoosh -> Tantivy)
 
 The full-text search backend has been replaced with [Tantivy](https://github.com/quickwit-oss/tantivy).
 The index format is incompatible with Whoosh, so **the search index is automatically rebuilt from

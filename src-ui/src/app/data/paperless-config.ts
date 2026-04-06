@@ -11,16 +11,16 @@ export enum OutputTypeConfig {
 }
 
 export enum ModeConfig {
-  SKIP = 'skip',
-  REDO = 'redo',
+  AUTO = 'auto',
   FORCE = 'force',
-  SKIP_NO_ARCHIVE = 'skip_noarchive',
+  REDO = 'redo',
+  OFF = 'off',
 }
 
 export enum ArchiveFileConfig {
-  NEVER = 'never',
-  WITH_TEXT = 'with_text',
+  AUTO = 'auto',
   ALWAYS = 'always',
+  NEVER = 'never',
 }
 
 export enum CleanConfig {
@@ -115,11 +115,11 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     category: ConfigCategory.OCR,
   },
   {
-    key: 'skip_archive_file',
-    title: $localize`Skip Archive File`,
+    key: 'archive_file_generation',
+    title: $localize`Archive File Generation`,
     type: ConfigOptionType.Select,
     choices: mapToItems(ArchiveFileConfig),
-    config_key: 'PAPERLESS_OCR_SKIP_ARCHIVE_FILE',
+    config_key: 'PAPERLESS_ARCHIVE_FILE_GENERATION',
     category: ConfigCategory.OCR,
   },
   {
@@ -337,7 +337,7 @@ export interface PaperlessConfig extends ObjectWithId {
   pages: number
   language: string
   mode: ModeConfig
-  skip_archive_file: ArchiveFileConfig
+  archive_file_generation: ArchiveFileConfig
   image_dpi: number
   unpaper_clean: CleanConfig
   deskew: boolean

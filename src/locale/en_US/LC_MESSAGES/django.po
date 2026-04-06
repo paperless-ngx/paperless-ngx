@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-03 20:54+0000\n"
+"POT-Creation-Date: 2026-04-06 22:51+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1666,32 +1666,28 @@ msgstr ""
 msgid "pdfa-3"
 msgstr ""
 
-#: paperless/models.py:39
-msgid "skip"
+#: paperless/models.py:39 paperless/models.py:50
+msgid "auto"
 msgstr ""
 
 #: paperless/models.py:40
-msgid "redo"
-msgstr ""
-
-#: paperless/models.py:41
 msgid "force"
 msgstr ""
 
-#: paperless/models.py:42
-msgid "skip_noarchive"
+#: paperless/models.py:41
+msgid "redo"
 msgstr ""
 
-#: paperless/models.py:50
-msgid "never"
+#: paperless/models.py:42
+msgid "off"
 msgstr ""
 
 #: paperless/models.py:51
-msgid "with_text"
+msgid "always"
 msgstr ""
 
 #: paperless/models.py:52
-msgid "always"
+msgid "never"
 msgstr ""
 
 #: paperless/models.py:60
@@ -1755,7 +1751,7 @@ msgid "Sets the OCR mode"
 msgstr ""
 
 #: paperless/models.py:130
-msgid "Controls the generation of an archive file"
+msgid "Controls archive file generation"
 msgstr ""
 
 #: paperless/models.py:138

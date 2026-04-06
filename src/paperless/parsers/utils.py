@@ -10,14 +10,104 @@ from __future__ import annotations
 
 import logging
 import re
+import tempfile
+from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import Final
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     from paperless.parsers import MetadataEntry
 
 logger = logging.getLogger("paperless.parsers.utils")
+
+# Minimum character count for a PDF to be considered "born-digital" (has real text).
+# Used by both the consumer (archive decision) and the tesseract parser (skip-OCR decision).
+PDF_TEXT_MIN_LENGTH: Final[int] = 50
+
+
+def is_tagged_pdf(
+    path: Path,
+    log: logging.Logger | None = None,
+) -> bool:
+    """Return True if the PDF declares itself as tagged (born-digital indicator).
+
+    Tagged PDFs (e.g. exported from Word or LibreOffice) have ``/MarkInfo``
+    with ``/Marked true`` in the document root.  This is a reliable signal
+    that the document has a logical structure and embedded text — running OCR
+    on it is unnecessary and archive generation can be skipped.
+
+    https://github.com/ocrmypdf/OCRmyPDF/blob/4e974ebd465a5921b2e79004f098f5d203010282/src/ocrmypdf/pdfinfo/info.py#L449
+
+    Parameters
+    ----------
+    path:
+        Absolute path to the PDF file.
+    log:
+        Logger for warnings.  Falls back to the module-level logger when omitted.
+
+    Returns
+    -------
+    bool
+        ``True`` when the PDF is tagged, ``False`` otherwise or on any error.
+    """
+    import pikepdf
+
+    _log = log or logger
+    try:
+        with pikepdf.open(path) as pdf:
+            mark_info = pdf.Root.get("/MarkInfo")
+            if mark_info is None:
+                return False
+            return bool(mark_info.get("/Marked", False))
+    except Exception:
+        _log.warning("Could not check PDF tag status for %s", path, exc_info=True)
+        return False
+
+
+def extract_pdf_text(
+    path: Path,
+    log: logging.Logger | None = None,
+) -> str | None:
+    """Run pdftotext on *path* and return the extracted text, or None on failure.
+
+    Parameters
+    ----------
+    path:
+        Absolute path to the PDF file.
+    log:
+        Logger for warnings.  Falls back to the module-level logger when omitted.
+
+    Returns
+    -------
+    str | None
+        Extracted text, or ``None`` if pdftotext fails or the file is not a PDF.
+    """
+    from documents.utils import run_subprocess
+
+    _log = log or logger
+    try:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            out_path = Path(tmpdir) / "text.txt"
+            run_subprocess(
+                [
+                    "pdftotext",
+                    "-q",
+                    "-layout",
+                    "-enc",
+                    "UTF-8",
+                    str(path),
+                    str(out_path),
+                ],
+                logger=_log,
+            )
+            text = read_file_handle_unicode_errors(out_path, log=_log)
+            return text or None
+    except Exception:
+        _log.warning(
+            "Error while getting text from PDF document with pdftotext",
+            exc_info=True,
+        )
+        return None
 
 
 def read_file_handle_unicode_errors(
