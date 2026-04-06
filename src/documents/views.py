@@ -38,6 +38,7 @@ from django.db.models import Model
 from django.db.models import OuterRef
 from django.db.models import Prefetch
 from django.db.models import Q
+from django.db.models import QuerySet
 from django.db.models import Subquery
 from django.db.models import Sum
 from django.db.models import When
@@ -2064,14 +2065,10 @@ class UnifiedSearchViewSet(DocumentViewSet):
         from documents.search import TantivyRelevanceList
         from documents.search import get_backend
 
-        try:
-            backend = get_backend()
-            filtered_qs = self.filter_queryset(self.get_queryset())
-
-            user = None if request.user.is_superuser else request.user
-            active_search_params = self._get_active_search_params(request)
-
-            if len(active_search_params) > 1:
+        def parse_search_params() -> tuple[str | None, bool, bool, int, int]:
+            """Extract query string, search mode, and ordering from request."""
+            active = self._get_active_search_params(request)
+            if len(active) > 1:
                 raise ValidationError(
                     {
                         "detail": _(
@@ -2080,111 +2077,137 @@ class UnifiedSearchViewSet(DocumentViewSet):
                     },
                 )
 
-            # Parse ordering param
             ordering_param = request.query_params.get("ordering", "")
             sort_reverse = ordering_param.startswith("-")
             sort_field_name = ordering_param.lstrip("-") or None
-
             use_tantivy_sort = (
                 sort_field_name in TantivyBackend.SORTABLE_FIELDS
                 or sort_field_name is None
             )
 
-            # Compute the DRF page so we can tell Tantivy which slice to highlight
             try:
-                requested_page = int(request.query_params.get("page", 1))
+                page_num = int(request.query_params.get("page", 1))
             except (TypeError, ValueError):
-                requested_page = 1
+                page_num = 1
             try:
-                requested_page_size = int(
+                page_size = int(
                     request.query_params.get("page_size", self.paginator.page_size),
                 )
             except (TypeError, ValueError):
-                requested_page_size = self.paginator.page_size
+                page_size = self.paginator.page_size
 
-            if (
-                "text" in request.query_params
-                or "title_search" in request.query_params
-                or "query" in request.query_params
-            ):
-                if "text" in request.query_params:
-                    search_mode = SearchMode.TEXT
-                    query_str = request.query_params["text"]
-                elif "title_search" in request.query_params:
-                    search_mode = SearchMode.TITLE
-                    query_str = request.query_params["title_search"]
-                else:
-                    search_mode = SearchMode.QUERY
-                    query_str = request.query_params["query"]
+            return sort_field_name, sort_reverse, use_tantivy_sort, page_num, page_size
 
-                # Step 1: Get all matching IDs (lightweight, no highlights)
-                all_ids = backend.search_ids(
-                    query_str,
-                    user=user,
-                    sort_field=sort_field_name if use_tantivy_sort else None,
-                    sort_reverse=sort_reverse,
-                    search_mode=search_mode,
-                )
+        def intersect_and_order(
+            all_ids: list[int],
+            filtered_qs: QuerySet[Document],
+            *,
+            use_tantivy_sort: bool,
+        ) -> list[int]:
+            """Intersect search IDs with ORM-visible IDs, preserving order."""
+            orm_ids = set(filtered_qs.values_list("pk", flat=True))
+            if use_tantivy_sort:
+                return [doc_id for doc_id in all_ids if doc_id in orm_ids]
+            id_set = set(all_ids) & orm_ids
+            return list(
+                filtered_qs.filter(id__in=id_set).values_list("pk", flat=True),
+            )
 
-                # Step 2: Intersect with ORM-visible IDs (field filters)
-                orm_ids = set(filtered_qs.values_list("pk", flat=True))
-
-                if use_tantivy_sort:
-                    # Fast path: Tantivy already ordered the IDs
-                    ordered_ids = [doc_id for doc_id in all_ids if doc_id in orm_ids]
-                else:
-                    # Slow path: ORM must re-sort
-                    id_set = set(all_ids) & orm_ids
-                    ordered_ids = list(
-                        filtered_qs.filter(id__in=id_set).values_list(
-                            "pk",
-                            flat=True,
-                        ),
-                    )
-
-                # Step 3: Fetch highlights for the displayed page only
-                page_offset = (requested_page - 1) * requested_page_size
-                page_ids = ordered_ids[page_offset : page_offset + requested_page_size]
-
-                page_hits = backend.highlight_hits(
-                    query_str,
-                    page_ids,
-                    search_mode=search_mode,
-                )
-
+        def run_text_search(
+            backend: TantivyBackend,
+            user: User | None,
+            filtered_qs: QuerySet[Document],
+        ) -> tuple[list[int], list[SearchHit], int]:
+            """Handle text/title/query search: IDs, ORM intersection, page highlights."""
+            if "text" in request.query_params:
+                search_mode = SearchMode.TEXT
+                query_str = request.query_params["text"]
+            elif "title_search" in request.query_params:
+                search_mode = SearchMode.TITLE
+                query_str = request.query_params["title_search"]
             else:
-                # more_like_id path
-                try:
-                    more_like_doc_id = int(request.query_params["more_like_id"])
-                    more_like_doc = Document.objects.select_related("owner").get(
-                        pk=more_like_doc_id,
-                    )
-                except (TypeError, ValueError, Document.DoesNotExist):
-                    raise PermissionDenied(_("Invalid more_like_id"))
+                search_mode = SearchMode.QUERY
+                query_str = request.query_params["query"]
 
-                if not has_perms_owner_aware(
-                    request.user,
-                    "view_document",
-                    more_like_doc,
-                ):
-                    raise PermissionDenied(_("Insufficient permissions."))
+            all_ids = backend.search_ids(
+                query_str,
+                user=user,
+                sort_field=sort_field_name if use_tantivy_sort else None,
+                sort_reverse=sort_reverse,
+                search_mode=search_mode,
+            )
+            ordered_ids = intersect_and_order(
+                all_ids,
+                filtered_qs,
+                use_tantivy_sort=use_tantivy_sort,
+            )
 
-                # Step 1: Get all matching IDs (lightweight)
-                all_ids = backend.more_like_this_ids(
-                    more_like_doc_id,
-                    user=user,
+            page_offset = (page_num - 1) * page_size
+            page_ids = ordered_ids[page_offset : page_offset + page_size]
+            page_hits = backend.highlight_hits(
+                query_str,
+                page_ids,
+                search_mode=search_mode,
+            )
+            return ordered_ids, page_hits, page_offset
+
+        def run_more_like_this(
+            backend: TantivyBackend,
+            user: User | None,
+            filtered_qs: QuerySet[Document],
+        ) -> tuple[list[int], list[SearchHit], int]:
+            """Handle more_like_id search: permission check, IDs, stub hits."""
+            try:
+                more_like_doc_id = int(request.query_params["more_like_id"])
+                more_like_doc = Document.objects.select_related("owner").get(
+                    pk=more_like_doc_id,
                 )
-                orm_ids = set(filtered_qs.values_list("pk", flat=True))
-                ordered_ids = [doc_id for doc_id in all_ids if doc_id in orm_ids]
+            except (TypeError, ValueError, Document.DoesNotExist):
+                raise PermissionDenied(_("Invalid more_like_id"))
 
-                # Step 2: Build hit dicts for the displayed page
-                # MLT has no text query, so no highlights needed
-                page_offset = (requested_page - 1) * requested_page_size
-                page_ids = ordered_ids[page_offset : page_offset + requested_page_size]
-                page_hits = [
-                    SearchHit(id=doc_id, score=0.0, rank=rank, highlights={})
-                    for rank, doc_id in enumerate(page_ids, start=page_offset + 1)
-                ]
+            if not has_perms_owner_aware(
+                request.user,
+                "view_document",
+                more_like_doc,
+            ):
+                raise PermissionDenied(_("Insufficient permissions."))
+
+            all_ids = backend.more_like_this_ids(more_like_doc_id, user=user)
+            ordered_ids = intersect_and_order(
+                all_ids,
+                filtered_qs,
+                use_tantivy_sort=True,
+            )
+
+            page_offset = (page_num - 1) * page_size
+            page_ids = ordered_ids[page_offset : page_offset + page_size]
+            page_hits = [
+                SearchHit(id=doc_id, score=0.0, rank=rank, highlights={})
+                for rank, doc_id in enumerate(page_ids, start=page_offset + 1)
+            ]
+            return ordered_ids, page_hits, page_offset
+
+        try:
+            sort_field_name, sort_reverse, use_tantivy_sort, page_num, page_size = (
+                parse_search_params()
+            )
+
+            backend = get_backend()
+            filtered_qs = self.filter_queryset(self.get_queryset())
+            user = None if request.user.is_superuser else request.user
+
+            if "more_like_id" in request.query_params:
+                ordered_ids, page_hits, page_offset = run_more_like_this(
+                    backend,
+                    user,
+                    filtered_qs,
+                )
+            else:
+                ordered_ids, page_hits, page_offset = run_text_search(
+                    backend,
+                    user,
+                    filtered_qs,
+                )
 
             rl = TantivyRelevanceList(ordered_ids, page_hits, page_offset)
             page = self.paginate_queryset(rl)
