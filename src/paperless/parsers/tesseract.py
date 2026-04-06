@@ -432,6 +432,47 @@ class RasterisedDocumentParser:
 
         return pdfa_path
 
+    def _convert_pdf_to_pdfa(
+        self,
+        input_path: Path,
+        output_path: Path,
+    ) -> None:
+        """Convert a PDF to PDF/A using Ghostscript directly, without OCR.
+
+        Respects the user's output_type, color_conversion_strategy, and
+        continue_on_soft_render_error settings.
+        """
+        from ocrmypdf._exec.ghostscript import generate_pdfa
+        from ocrmypdf.pdfa import generate_pdfa_ps
+
+        output_type = self.settings.output_type
+        if output_type == "pdf":
+            # No PDF/A requested — just copy the original
+            shutil.copy2(input_path, output_path)
+            return
+
+        # Map output_type to pdfa_part: pdfa→2, pdfa-1→1, pdfa-2→2, pdfa-3→3
+        pdfa_part = "2" if output_type == "pdfa" else output_type.split("-")[-1]
+
+        pdfmark = Path(self.tempdir) / "pdfa.ps"
+        generate_pdfa_ps(pdfmark)
+
+        color_strategy = self.settings.color_conversion_strategy or "RGB"
+
+        self.log.debug(
+            "Converting PDF to PDF/A-%s via Ghostscript (no OCR): %s",
+            pdfa_part,
+            input_path,
+        )
+
+        generate_pdfa(
+            pdf_pages=[pdfmark, input_path],
+            output_file=output_path,
+            compression="auto",
+            color_conversion_strategy=color_strategy,
+            pdfa_part=pdfa_part,
+        )
+
     def _handle_subprocess_output_error(self, e: Exception) -> NoReturn:
         """Log context for Ghostscript failures and raise ParseError.
 
@@ -506,23 +547,12 @@ class RasterisedDocumentParser:
                         f"Image to PDF/A conversion failed: {e!s}",
                     ) from e
                 return
-            # PDFs in off mode: PDF/A conversion only via skip_text
+            # PDFs in off mode: PDF/A conversion via Ghostscript, no OCR
             archive_path = Path(self.tempdir) / "archive.pdf"
-            sidecar_file = Path(self.tempdir) / "sidecar.txt"
-            args = self.construct_ocrmypdf_parameters(
-                document_path,
-                mime_type,
-                archive_path,
-                sidecar_file,
-                skip_text=True,
-            )
             try:
-                self.log.debug(
-                    f"Calling OCRmyPDF (off mode, PDF/A conversion only): {args}",
-                )
-                ocrmypdf.ocr(**args)
+                self._convert_pdf_to_pdfa(document_path, archive_path)
                 self.archive_path = archive_path
-                self.text = self.extract_text(None, archive_path) or text_original or ""
+                self.text = text_original or ""
             except SubprocessOutputError as e:
                 self._handle_subprocess_output_error(e)
             except Exception as e:

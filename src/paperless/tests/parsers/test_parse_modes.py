@@ -254,7 +254,7 @@ class TestOffModePdf:
         assert tesseract_parser.archive_path is None
         assert tesseract_parser.get_text() == _LONG_TEXT
 
-    def test_off_with_archive_calls_ocrmypdf_skip_text(
+    def test_off_with_archive_uses_ghostscript_not_ocr(
         self,
         mocker: MockerFixture,
         tesseract_parser: RasterisedDocumentParser,
@@ -267,8 +267,10 @@ class TestOffModePdf:
         WHEN:
             - parse() is called
         THEN:
-            - ocrmypdf.ocr IS called with skip_text=True (PDF/A conversion only)
+            - ocrmypdf.ocr is NOT called
+            - Ghostscript generate_pdfa IS called (PDF/A conversion without OCR)
             - archive_path is set
+            - text comes from pdftotext, not OCR
         """
         mocker.patch.object(
             tesseract_parser,
@@ -276,6 +278,10 @@ class TestOffModePdf:
             return_value=_LONG_TEXT,
         )
         mock_ocr = mocker.patch("ocrmypdf.ocr")
+        mock_gs = mocker.patch(
+            "ocrmypdf._exec.ghostscript.generate_pdfa",
+        )
+        mocker.patch("ocrmypdf.pdfa.generate_pdfa_ps")
 
         tesseract_parser.settings.mode = "off"
         tesseract_parser.parse(
@@ -284,12 +290,10 @@ class TestOffModePdf:
             produce_archive=True,
         )
 
-        mock_ocr.assert_called_once()
-        call_kwargs = mock_ocr.call_args.kwargs
-        assert call_kwargs.get("skip_text") is True
-        assert "force_ocr" not in call_kwargs
-        assert "redo_ocr" not in call_kwargs
+        mock_ocr.assert_not_called()
+        mock_gs.assert_called_once()
         assert tesseract_parser.archive_path is not None
+        assert tesseract_parser.get_text() == _LONG_TEXT
 
 
 # ---------------------------------------------------------------------------

@@ -1063,7 +1063,8 @@ class TestParseRtl:
             if unicodedata.category(ch) != "Cf" and not ch.isspace()
         )
         assert "ةرازو" in normalised
-        assert any(token in normalised for token in ("ةیلخادلا", "الاخليد"))
+        # pdftotext uses Arabic Yeh (U+064A) where ocrmypdf used Farsi Yeh (U+06CC)
+        assert any(token in normalised for token in ("ةیلخادلا", "الاخليد", "ةيلخادال"))
 
 
 # ---------------------------------------------------------------------------
