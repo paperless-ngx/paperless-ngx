@@ -670,6 +670,10 @@ class TantivyBackend:
         frequency (how many documents contain each word). Optionally filters
         results to only words from documents visible to the specified user.
 
+        NOTE: This is the hottest search path (called per keystroke).
+        A future improvement would be to cache results in Redis, keyed by
+        (prefix, user_id), and invalidate on index writes.
+
         Args:
             term: Prefix to match against autocomplete words
             limit: Maximum number of suggestions to return
