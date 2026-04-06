@@ -762,14 +762,16 @@ class TantivyBackend:
         final_query = self._apply_permission_filter(mlt_query, user)
 
         effective_limit = limit if limit is not None else searcher.num_docs
-        results = searcher.search(final_query, limit=effective_limit)
+        # Fetch one extra to account for excluding the original document
+        results = searcher.search(final_query, limit=effective_limit + 1)
 
         ids = []
         for _score, doc_address in results.hits:
             result_doc_id = searcher.doc(doc_address).to_dict()["id"][0]
             if result_doc_id != doc_id:
                 ids.append(result_doc_id)
-        return ids
+
+        return ids[:limit] if limit is not None else ids
 
     def batch_update(self, lock_timeout: float = 30.0) -> WriteBatch:
         """

@@ -3136,6 +3136,7 @@ class GlobalSearchView(PassUserMixin):
                     query,
                     user=user,
                     search_mode=SearchMode.TEXT,
+                    limit=OBJECT_LIMIT * 3,
                 )
                 docs_by_id = all_docs.in_bulk(matching_ids)
                 docs = [
