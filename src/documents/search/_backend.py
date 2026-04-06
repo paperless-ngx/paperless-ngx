@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 import threading
 from collections import Counter
-from dataclasses import dataclass
 from datetime import UTC
 from datetime import datetime
 from enum import StrEnum
@@ -86,22 +85,6 @@ class SearchHit(TypedDict):
     score: float
     rank: int
     highlights: dict[str, str]
-
-
-@dataclass(frozen=True, slots=True)
-class SearchResults:
-    """
-    Container for search results with pagination metadata.
-
-    Attributes:
-        hits: List of search results with scores and highlights
-        total: Total matching documents across all pages (for pagination)
-        query: Preprocessed query string after date/syntax rewriting
-    """
-
-    hits: list[SearchHit]
-    total: int  # total matching documents (for pagination)
-    query: str  # preprocessed query string
 
 
 class TantivyRelevanceList:
@@ -516,153 +499,6 @@ class TantivyBackend:
         self._ensure_open()
         with self.batch_update(lock_timeout=5.0) as batch:
             batch.remove(doc_id)
-
-    def search(
-        self,
-        query: str,
-        user: AbstractBaseUser | None,
-        page: int,
-        page_size: int,
-        sort_field: str | None,
-        *,
-        sort_reverse: bool,
-        search_mode: SearchMode = SearchMode.QUERY,
-        highlight_page: int | None = None,
-        highlight_page_size: int | None = None,
-    ) -> SearchResults:
-        """
-        Execute a search query against the document index.
-
-        Processes the user query through date rewriting, normalization, and
-        permission filtering before executing against Tantivy. Supports both
-        relevance-based and field-based sorting.
-
-        QUERY search mode supports natural date keywords, field filters, etc.
-        TITLE search mode treats the query as plain text to search for in title only
-        TEXT search mode treats the query as plain text to search for in title and content
-
-        Args:
-            query: User's search query
-            user: User for permission filtering (None for superuser/no filtering)
-            page: Page number (1-indexed) for pagination
-            page_size: Number of results per page
-            sort_field: Field to sort by (None for relevance ranking)
-            sort_reverse: Whether to reverse the sort order
-            search_mode: "query" for advanced Tantivy syntax, "text" for
-                plain-text search over title and content only, "title" for
-                plain-text search over title only
-
-        Returns:
-            SearchResults with hits, total count, and processed query
-        """
-        self._ensure_open()
-        user_query = self._parse_query(query, search_mode)
-        final_query = self._apply_permission_filter(user_query, user)
-
-        searcher = self._index.searcher()
-        offset = (page - 1) * page_size
-
-        # Perform search
-        if sort_field and sort_field in self.SORT_FIELD_MAP:
-            mapped_field = self.SORT_FIELD_MAP[sort_field]
-            results = searcher.search(
-                final_query,
-                limit=offset + page_size,
-                order_by_field=mapped_field,
-                order=tantivy.Order.Desc if sort_reverse else tantivy.Order.Asc,
-            )
-            # Field sorting: hits are still (score, DocAddress) tuples; score unused
-            all_hits = [(hit[1], 0.0) for hit in results.hits]
-        else:
-            # Score-based search: hits are (score, DocAddress) tuples
-            results = searcher.search(final_query, limit=offset + page_size)
-            all_hits = [(hit[1], hit[0]) for hit in results.hits]
-
-        total = results.count
-
-        # Normalize scores for score-based searches
-        if not sort_field and all_hits:
-            max_score = max(hit[1] for hit in all_hits) or 1.0
-            all_hits = [(hit[0], hit[1] / max_score) for hit in all_hits]
-
-        # Apply threshold filter if configured (score-based search only)
-        threshold = settings.ADVANCED_FUZZY_SEARCH_THRESHOLD
-        if threshold is not None and not sort_field:
-            all_hits = [hit for hit in all_hits if hit[1] >= threshold]
-
-        # Get the page's hits
-        page_hits = all_hits[offset : offset + page_size]
-
-        # Build result hits with highlights
-        hits: list[SearchHit] = []
-        snippet_generator = None
-        notes_snippet_generator = None
-
-        # Determine which hits need highlights
-        if highlight_page is not None and highlight_page_size is not None:
-            hl_start = (highlight_page - 1) * highlight_page_size
-            hl_end = hl_start + highlight_page_size
-        else:
-            # Highlight all hits (backward-compatible default)
-            hl_start = 0
-            hl_end = len(page_hits)
-
-        for rank, (doc_address, score) in enumerate(page_hits, start=offset + 1):
-            # Get the actual document from the searcher using the doc address
-            actual_doc = searcher.doc(doc_address)
-            doc_dict = actual_doc.to_dict()
-            doc_id = doc_dict["id"][0]
-
-            highlights: dict[str, str] = {}
-
-            # Generate highlights if score > 0 and hit is in the highlight window
-            hit_index = rank - offset - 1  # 0-based index within page_hits
-            if score > 0 and hl_start <= hit_index < hl_end:
-                try:
-                    if snippet_generator is None:
-                        snippet_generator = tantivy.SnippetGenerator.create(
-                            searcher,
-                            final_query,
-                            self._schema,
-                            "content",
-                        )
-
-                    content_snippet = snippet_generator.snippet_from_doc(actual_doc)
-                    if content_snippet:
-                        highlights["content"] = str(content_snippet)
-
-                    # Try notes highlights
-                    if "notes" in doc_dict:
-                        if notes_snippet_generator is None:
-                            notes_snippet_generator = tantivy.SnippetGenerator.create(
-                                searcher,
-                                final_query,
-                                self._schema,
-                                "notes",
-                            )
-                        notes_snippet = notes_snippet_generator.snippet_from_doc(
-                            actual_doc,
-                        )
-                        if notes_snippet:
-                            highlights["notes"] = str(notes_snippet)
-
-                except Exception:  # pragma: no cover
-                    logger.debug("Failed to generate highlights for doc %s", doc_id)
-
-            hits.append(
-                SearchHit(
-                    id=doc_id,
-                    score=score,
-                    rank=rank,
-                    highlights=highlights,
-                ),
-            )
-
-        return SearchResults(
-            hits=hits,
-            total=total,
-            query=query,
-        )
 
     def highlight_hits(
         self,
