@@ -19,11 +19,16 @@ from django.conf import settings
 from django.utils.timezone import get_current_timezone
 from guardian.shortcuts import get_users_with_perms
 
+from documents.caching import bump_search_cache_generation
+from documents.caching import get_search_results_cache
+from documents.caching import set_search_results_cache
 from documents.search._normalize import ascii_fold
 from documents.search._query import build_permission_filter
+from documents.search._query import normalize_query
 from documents.search._query import parse_simple_text_query
 from documents.search._query import parse_simple_title_query
 from documents.search._query import parse_user_query
+from documents.search._query import rewrite_natural_date_keywords
 from documents.search._schema import _write_sentinels
 from documents.search._schema import build_schema
 from documents.search._schema import open_or_rebuild_index
@@ -96,12 +101,12 @@ class SearchResults:
     Attributes:
         hits: List of search results with scores and highlights
         total: Total matching documents across all pages (for pagination)
-        query: Preprocessed query string after date/syntax rewriting
+        query: Raw query string as entered by the user
     """
 
     hits: list[SearchHit]
     total: int  # total matching documents (for pagination)
-    query: str  # preprocessed query string
+    query: str  # raw query string as entered by the user
 
 
 class TantivyRelevanceList:
@@ -172,6 +177,7 @@ class WriteBatch:
             if exc_type is None:
                 self._writer.commit()
                 self._backend._index.reload()
+                bump_search_cache_generation()
             # Explicitly delete writer to release tantivy's internal lock.
             # On exception the uncommitted writer is simply discarded.
             if self._writer is not None:
@@ -459,16 +465,32 @@ class TantivyBackend:
                 plain-text search over title only
 
         Returns:
-            SearchResults with hits, total count, and processed query
+            SearchResults with hits, total count, and the raw query string
         """
         self._ensure_open()
+
+        user_id = user.pk if user is not None else None
         tz = get_current_timezone()
+
         if search_mode is SearchMode.TEXT:
             user_query = parse_simple_text_query(self._index, query)
+            # TEXT/TITLE are plain-text searches — tantivy lowercases tokens, so
+            # "Rechnung" and "rechnung" return identical results.  Lowercase the
+            # key so both map to the same cache entry.
+            effective_query_key = query.lower()
         elif search_mode is SearchMode.TITLE:
             user_query = parse_simple_title_query(self._index, query)
+            effective_query_key = query.lower()
         else:
             user_query = parse_user_query(self._index, query, tz)
+            # QUERY mode rewrites relative date keywords (e.g. "today", "[-7 days to now]")
+            # to absolute ISO 8601 ranges at parse time.  Cache by the rewritten string so
+            # that "created:today" tomorrow does not return yesterday's cached results.
+            # We do not lowercase here because boolean operators (AND, OR, NOT) are
+            # case-sensitive in tantivy's query parser.
+            effective_query_key = normalize_query(
+                rewrite_natural_date_keywords(query, tz),
+            )
 
         # Apply permission filter if user is not None (not superuser)
         if user is not None:
@@ -482,10 +504,72 @@ class TantivyBackend:
         else:
             final_query = user_query
 
-        searcher = self._index.searcher()
-        offset = (page - 1) * page_size
+        full_results = self._fetch_all_hits(
+            query,
+            effective_query_key,
+            search_mode,
+            user_id,
+            final_query,
+            sort_field,
+            sort_reverse=sort_reverse,
+        )
 
-        # Map sort fields
+        # Cache hit path: slice only — zero tantivy calls.
+        offset = (page - 1) * page_size
+        return SearchResults(
+            hits=full_results.hits[offset : offset + page_size],
+            total=full_results.total,
+            query=full_results.query,
+        )
+
+    def _fetch_all_hits(
+        self,
+        query: str,
+        effective_query_key: str,
+        search_mode: str,
+        user_id: int | None,
+        final_query: tantivy.Query,
+        sort_field: str | None,
+        *,
+        sort_reverse: bool,
+    ) -> SearchResults:
+        """Fetch, score, and build all matching hits for a query.
+
+        Results are cached keyed by (effective_query_key, search_mode, user_id,
+        sort_field, sort_reverse) with no pagination parameters — the full hit
+        list including precomputed highlights is stored once and sliced per page
+        by the caller.
+
+        Highlights are generated here, not in ``search()``, because
+        ``SnippetGenerator.create()`` is the expensive step — it loads posting
+        lists for all query terms across every segment regardless of how many
+        docs you ultimately call ``snippet_from_doc()`` on.  Paying that cost
+        once on cache miss and storing the result strings means cache hits are a
+        free list slice with zero tantivy work.
+
+        All stored field types are plain Python (int, float, str, dict) — safely
+        picklable by Redis or any other Django cache backend.
+
+        ``effective_query_key`` ensures QUERY mode date expressions like
+        "created:today" resolve to an absolute ISO range and never return stale
+        results across day boundaries.
+
+        ``total`` is clamped to ``len(all_hits)`` after filtering so pagination
+        stays consistent with the hard ``_MAX_HITS`` cap.
+        """
+        cached: SearchResults | None = get_search_results_cache(
+            effective_query_key,
+            search_mode,
+            user_id,
+            sort_field,
+            sort_reverse=sort_reverse,
+        )
+        if cached is not None:
+            return cached
+
+        searcher = self._index.searcher()
+
+        _MAX_HITS = 10_000
         sort_field_map = {
             "title": "title_sort",
             "correspondent__name": "correspondent_sort",
@@ -498,23 +582,20 @@ class TantivyBackend:
             "num_notes": "num_notes",
         }
 
-        # Perform search
         if sort_field and sort_field in sort_field_map:
             mapped_field = sort_field_map[sort_field]
             results = searcher.search(
                 final_query,
-                limit=offset + page_size,
+                limit=_MAX_HITS,
                 order_by_field=mapped_field,
                 order=tantivy.Order.Desc if sort_reverse else tantivy.Order.Asc,
             )
-            # Field sorting: hits are still (score, DocAddress) tuples; score unused
+            # Field sorting: hits are (score, DocAddress) tuples; score unused
             all_hits = [(hit[1], 0.0) for hit in results.hits]
         else:
             # Score-based search: hits are (score, DocAddress) tuples
-            results = searcher.search(final_query, limit=offset + page_size)
+            results = searcher.search(final_query, limit=_MAX_HITS)
             all_hits = [(hit[1], hit[0]) for hit in results.hits]
-
-        total = results.count
 
         # Normalize scores for score-based searches
         if not sort_field and all_hits:
@@ -526,23 +607,22 @@ class TantivyBackend:
         if threshold is not None and not sort_field:
             all_hits = [hit for hit in all_hits if hit[1] >= threshold]
 
-        # Get the page's hits
-        page_hits = all_hits[offset : offset + page_size]
+        # total is clamped to the number of hits we can actually serve.
+        # results.count may exceed _MAX_HITS; reporting it would produce empty
+        # pages beyond the cap while the UI shows a misleadingly large total.
+        total = len(all_hits)
 
-        # Build result hits with highlights
         hits: list[SearchHit] = []
         snippet_generator = None
         notes_snippet_generator = None
 
-        for rank, (doc_address, score) in enumerate(page_hits, start=offset + 1):
-            # Get the actual document from the searcher using the doc address
+        for rank, (doc_address, score) in enumerate(all_hits, start=1):
             actual_doc = searcher.doc(doc_address)
             doc_dict = actual_doc.to_dict()
             doc_id = doc_dict["id"][0]
 
             highlights: dict[str, str] = {}
 
-            # Generate highlights if score > 0
             if score > 0:
                 try:
                     if snippet_generator is None:
@@ -557,7 +637,6 @@ class TantivyBackend:
                     if content_snippet:
                         highlights["content"] = str(content_snippet)
 
-                    # Try notes highlights
                     if "notes" in doc_dict:
                         if notes_snippet_generator is None:
                             notes_snippet_generator = tantivy.SnippetGenerator.create(
@@ -584,11 +663,16 @@ class TantivyBackend:
                 ),
             )
 
-        return SearchResults(
-            hits=hits,
-            total=total,
-            query=query,
+        full_results = SearchResults(hits=hits, total=total, query=query)
+        set_search_results_cache(
+            effective_query_key,
+            search_mode,
+            user_id,
+            sort_field,
+            sort_reverse=sort_reverse,
+            results=full_results,
         )
+        return full_results
 
     def autocomplete(
         self,
@@ -812,6 +896,7 @@ class TantivyBackend:
                 writer.add_document(doc)
             writer.commit()
             new_index.reload()
+            bump_search_cache_generation()
         except BaseException:  # pragma: no cover
             # Restore old index on failure so the backend remains usable
             self._index = old_index

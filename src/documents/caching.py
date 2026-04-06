@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import logging
 import pickle
 from binascii import hexlify
@@ -19,6 +20,7 @@ if TYPE_CHECKING:
     from django.core.cache.backends.base import BaseCache
 
     from documents.classifier import DocumentClassifier
+    from documents.search._backend import SearchResults
 
 logger = logging.getLogger("paperless.caching")
 
@@ -343,3 +345,92 @@ def clear_document_caches(document_id: int) -> None:
             get_thumbnail_modified_key(document_id),
         ],
     )
+
+
+# ---------------------------------------------------------------------------
+# Tantivy search result cache
+# ---------------------------------------------------------------------------
+# Uses a generation counter stored in read_cache.  Every search result key
+# embeds the current generation.  When the index changes (write commit or
+# rebuild), the generation is bumped and all previous entries become
+# unreachable — they expire naturally at their TTL without needing explicit
+# enumeration or prefix-deletion.
+# ---------------------------------------------------------------------------
+
+SEARCH_GENERATION_KEY: Final[str] = "tantivy_search_generation"
+
+
+def _get_search_generation() -> int:
+    return read_cache.get(SEARCH_GENERATION_KEY, default=0)
+
+
+def bump_search_cache_generation() -> None:
+    """Invalidate all cached search results by advancing the generation counter.
+
+    The generation key is stored without expiration (timeout=None) so it can
+    never silently reset to 0.  If the key expired before this call (e.g. on a
+    freshly flushed cache), incr() raises ValueError and we initialise it to 1
+    with no TTL.  After a successful incr() we explicitly clear the TTL via
+    touch() because the key may have been created with a finite TTL during a
+    previous ValueError path in an older deployment.
+    """
+    try:
+        read_cache.incr(SEARCH_GENERATION_KEY)
+    except ValueError:
+        read_cache.set(SEARCH_GENERATION_KEY, 1, None)
+    else:
+        read_cache.touch(SEARCH_GENERATION_KEY, None)
+
+
+def _search_cache_key(
+    query: str,
+    search_mode: str,
+    user_id: int | None,
+    sort_field: str | None,
+    *,
+    sort_reverse: bool,
+) -> str:
+    generation = _get_search_generation()
+    # Hash the query to keep key length bounded and avoid special-character issues.
+    query_hash = hashlib.sha256(query.encode()).hexdigest()
+    uid = user_id if user_id is not None else "__superuser__"
+    return f"tantivy_search:{generation}:{search_mode}:{uid}:{sort_field}:{sort_reverse}:{query_hash}"
+
+
+def get_search_results_cache(
+    query: str,
+    search_mode: str,
+    user_id: int | None,
+    sort_field: str | None,
+    *,
+    sort_reverse: bool,
+) -> SearchResults | None:
+    """Return cached SearchResults for the given parameters, or None on a miss."""
+    key = _search_cache_key(
+        query,
+        search_mode,
+        user_id,
+        sort_field,
+        sort_reverse=sort_reverse,
+    )
+    return read_cache.get(key)
+
+
+def set_search_results_cache(
+    query: str,
+    search_mode: str,
+    user_id: int | None,
+    sort_field: str | None,
+    *,
+    sort_reverse: bool,
+    results: SearchResults,
+) -> None:
+    """Store SearchResults in the cache."""
+    key = _search_cache_key(
+        query,
+        search_mode,
+        user_id,
+        sort_field,
+        sort_reverse=sort_reverse,
+    )
+    read_cache.set(key, results, settings.CACHALOT_TIMEOUT)
