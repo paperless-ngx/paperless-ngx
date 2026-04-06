@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import re
 import threading
 from collections import Counter
 from datetime import UTC
@@ -682,30 +683,60 @@ class TantivyBackend:
 
         searcher = self._index.searcher()
 
-        # Apply permission filter for non-superusers so autocomplete words
-        # from invisible documents don't leak to other users.
+        # Build a prefix query on autocomplete_word so we only scan docs
+        # containing words that start with the prefix, not the entire index.
+        # tantivy regex is implicitly anchored; .+ avoids the empty-match
+        # error that .* triggers.  We OR with term_query to also match the
+        # exact prefix as a complete word.
+        escaped = re.escape(normalized_term)
+        prefix_query = tantivy.Query.boolean_query(
+            [
+                (
+                    tantivy.Occur.Should,
+                    tantivy.Query.term_query(
+                        self._schema,
+                        "autocomplete_word",
+                        normalized_term,
+                    ),
+                ),
+                (
+                    tantivy.Occur.Should,
+                    tantivy.Query.regex_query(
+                        self._schema,
+                        "autocomplete_word",
+                        f"{escaped}.+",
+                    ),
+                ),
+            ],
+        )
+
+        # Intersect with permission filter so autocomplete words from
+        # invisible documents don't leak to other users.
         if user is not None and not user.is_superuser:
-            base_query = build_permission_filter(self._schema, user)
+            final_query = tantivy.Query.boolean_query(
+                [
+                    (tantivy.Occur.Must, prefix_query),
+                    (tantivy.Occur.Must, build_permission_filter(self._schema, user)),
+                ],
+            )
         else:
-            base_query = tantivy.Query.all_query()
+            final_query = prefix_query
 
-        results = searcher.search(base_query, limit=searcher.num_docs)
+        results = searcher.search(final_query, limit=searcher.num_docs)
 
-        # Count how many visible documents each word appears in.
-        # Using Counter (not set) preserves per-word document frequency so
-        # we can rank suggestions by how commonly they occur — the same
-        # signal Whoosh used for Tf/Idf-based autocomplete ordering.
+        # Count how many visible documents each matching word appears in.
         word_counts: Counter[str] = Counter()
         for _score, doc_address in results.hits:
             stored_doc = searcher.doc(doc_address)
             doc_dict = stored_doc.to_dict()
             if "autocomplete_word" in doc_dict:
-                word_counts.update(doc_dict["autocomplete_word"])
+                for word in doc_dict["autocomplete_word"]:
+                    if word.startswith(normalized_term):
+                        word_counts[word] += 1
 
-        # Filter to prefix matches, sort by document frequency descending;
-        # break ties alphabetically for stable, deterministic output.
+        # Sort by document frequency descending; break ties alphabetically.
         matches = sorted(
-            (w for w in word_counts if w.startswith(normalized_term)),
+            word_counts,
             key=lambda w: (-word_counts[w], w),
         )
 
