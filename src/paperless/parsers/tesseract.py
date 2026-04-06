@@ -18,11 +18,13 @@ from PIL import Image
 
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
+from documents.utils import copy_file_with_basic_stats
 from documents.utils import maybe_override_pixel_limit
 from documents.utils import run_subprocess
 from paperless.config import OcrConfig
 from paperless.models import CleanChoices
 from paperless.models import ModeChoices
+from paperless.models import OutputTypeChoices
 from paperless.parsers.utils import PDF_TEXT_MIN_LENGTH
 from paperless.parsers.utils import extract_pdf_text
 from paperless.parsers.utils import is_tagged_pdf
@@ -446,9 +448,9 @@ class RasterisedDocumentParser:
         from ocrmypdf.pdfa import generate_pdfa_ps
 
         output_type = self.settings.output_type
-        if output_type == "pdf":
+        if output_type == OutputTypeChoices.PDF:
             # No PDF/A requested — just copy the original
-            shutil.copy2(input_path, output_path)
+            copy_file_with_basic_stats(input_path, output_path)
             return
 
         # Map output_type to pdfa_part: pdfa→2, pdfa-1→1, pdfa-2→2, pdfa-3→3
