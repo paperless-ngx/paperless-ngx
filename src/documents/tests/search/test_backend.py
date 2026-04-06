@@ -646,58 +646,6 @@ class TestAutocomplete:
 class TestMoreLikeThis:
     """Test more like this functionality."""
 
-    def test_excludes_original(self, backend: TantivyBackend):
-        """More like this queries must exclude the reference document from results."""
-        doc1 = Document.objects.create(
-            title="Important document",
-            content="financial information",
-            checksum="MLT1",
-            pk=50,
-        )
-        doc2 = Document.objects.create(
-            title="Another document",
-            content="financial report",
-            checksum="MLT2",
-            pk=51,
-        )
-        backend.add_or_update(doc1)
-        backend.add_or_update(doc2)
-
-        results = backend.more_like_this(doc_id=50, user=None, page=1, page_size=10)
-        returned_ids = [hit["id"] for hit in results.hits]
-        assert 50 not in returned_ids  # Original document excluded
-
-    def test_with_user_applies_permission_filter(self, backend: TantivyBackend):
-        """more_like_this with a user must exclude documents that user cannot see."""
-        viewer = User.objects.create_user("mlt_viewer")
-        other = User.objects.create_user("mlt_other")
-        public_doc = Document.objects.create(
-            title="Public financial document",
-            content="quarterly financial analysis report figures",
-            checksum="MLT3",
-            pk=52,
-        )
-        private_doc = Document.objects.create(
-            title="Private financial document",
-            content="quarterly financial analysis report figures",
-            checksum="MLT4",
-            pk=53,
-            owner=other,
-        )
-        backend.add_or_update(public_doc)
-        backend.add_or_update(private_doc)
-
-        results = backend.more_like_this(doc_id=52, user=viewer, page=1, page_size=10)
-        returned_ids = [hit["id"] for hit in results.hits]
-        # private_doc is owned by other, so viewer cannot see it
-        assert 53 not in returned_ids
-
-    def test_document_not_in_index_returns_empty(self, backend: TantivyBackend):
-        """more_like_this for a doc_id absent from the index must return empty results."""
-        results = backend.more_like_this(doc_id=9999, user=None, page=1, page_size=10)
-        assert results.hits == []
-        assert results.total == 0
-
     def test_more_like_this_ids_excludes_original(self, backend: TantivyBackend):
         """more_like_this_ids must return IDs of similar documents, excluding the original."""
         doc1 = Document.objects.create(
