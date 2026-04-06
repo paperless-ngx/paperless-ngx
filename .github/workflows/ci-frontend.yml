@@ -10,10 +10,13 @@ on:
 concurrency:
   group: frontend-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+permissions: {}
 jobs:
   changes:
     name: Detect Frontend Changes
     runs-on: ubuntu-slim
+    permissions:
+      contents: read
     outputs:
       frontend_changed: ${{ steps.force.outputs.run_all == 'true' || steps.filter.outputs.frontend == 'true' }}
     steps:
@@ -21,6 +24,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Decide run mode
         id: force
         run: |
@@ -59,6 +63,8 @@ jobs:
     if: needs.changes.outputs.frontend_changed == 'true'
     name: Install Dependencies
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -89,6 +95,8 @@ jobs:
     needs: [changes, install-dependencies]
     if: needs.changes.outputs.frontend_changed == 'true'
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -120,6 +128,8 @@ jobs:
     needs: [changes, install-dependencies]
     if: needs.changes.outputs.frontend_changed == 'true'
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -169,6 +179,8 @@ jobs:
     needs: [changes, install-dependencies]
     if: needs.changes.outputs.frontend_changed == 'true'
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     container: mcr.microsoft.com/playwright:v1.58.2-noble
     env:
       PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
@@ -212,6 +224,8 @@ jobs:
     needs: [changes, unit-tests, e2e-tests]
     if: needs.changes.outputs.frontend_changed == 'true'
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2

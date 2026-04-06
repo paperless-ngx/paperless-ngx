@@ -9,6 +9,8 @@ on:
 concurrency:
   group: lint-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+permissions:
+  contents: read
 jobs:
   lint:
     name: Linting via prek

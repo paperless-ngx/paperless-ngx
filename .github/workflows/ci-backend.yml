@@ -13,10 +13,13 @@ concurrency:
 env:
   DEFAULT_UV_VERSION: "0.10.x"
   NLTK_DATA: "/usr/share/nltk_data"
+permissions: {}
 jobs:
   changes:
     name: Detect Backend Changes
     runs-on: ubuntu-slim
+    permissions:
+      contents: read
     outputs:
       backend_changed: ${{ steps.force.outputs.run_all == 'true' || steps.filter.outputs.backend == 'true' }}
     steps:
@@ -66,6 +69,8 @@ jobs:
     if: needs.changes.outputs.backend_changed == 'true'
     name: "Python ${{ matrix.python-version }}"
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     strategy:
       matrix:
         python-version: ['3.11', '3.12', '3.13', '3.14']
@@ -143,6 +148,8 @@ jobs:
     if: needs.changes.outputs.backend_changed == 'true'
     name: Check project typing
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     env:
       DEFAULT_PYTHON: "3.12"
     steps:

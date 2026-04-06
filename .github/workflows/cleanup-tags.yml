@@ -12,6 +12,7 @@ on:
 concurrency:
   group: registry-tags-cleanup
   cancel-in-progress: false
+permissions: {}
 jobs:
   cleanup-images:
     name: Cleanup Image Tags for ${{ matrix.primary-name }}
