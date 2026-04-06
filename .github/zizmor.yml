@@ -6,4 +6,56 @@ rules:
       # attack vector here.
       - ci-release.yml:46
       - ci-release.yml:62
-      - ci-release.yml:203
+      - ci-release.yml:205
+  template-injection:
+    ignore:
+      # github.event_name is a GitHub-internal constant (push/pull_request/etc.),
+      # not attacker-controllable.
+      - ci-backend.yml:35
+      - ci-docker.yml:74
+      - ci-docs.yml:33
+      - ci-frontend.yml:31
+      # github.event.repository.default_branch refers to the target repo's setting,
+      # which only admins can change; not influenced by fork PR authors.
+      - ci-backend.yml:47
+      - ci-docs.yml:45
+      - ci-frontend.yml:43
+      # steps.setup-python.outputs.python-version is always a semver string (e.g. "3.12.0")
+      # produced by actions/setup-python from a hardcoded env var input.
+      - ci-backend.yml:106
+      - ci-backend.yml:121
+      - ci-backend.yml:169
+      - ci-docs.yml:88
+      - ci-docs.yml:92
+      - ci-release.yml:69
+      - ci-release.yml:78
+      - ci-release.yml:90
+      - ci-release.yml:96
+      - ci-release.yml:229
+      # needs.*.result is always one of: success/failure/cancelled/skipped.
+      - ci-backend.yml:211
+      - ci-backend.yml:212
+      - ci-backend.yml:216
+      - ci-docs.yml:131
+      - ci-docs.yml:132
+      - ci-frontend.yml:259
+      - ci-frontend.yml:260
+      - ci-frontend.yml:264
+      - ci-frontend.yml:269
+      - ci-frontend.yml:274
+      - ci-frontend.yml:279
+      # needs.changes.outputs.* is always "true" or "false".
+      - ci-backend.yml:206
+      - ci-docs.yml:126
+      - ci-frontend.yml:254
+      # steps.build.outputs.digest is always a SHA256 digest (sha256:[a-f0-9]{64}).
+      - ci-docker.yml:152
+      # needs.publish-release.outputs.version is the git tag name (e.g. v2.14.0);
+      # only maintainers can push tags upstream, and the tag pattern excludes
+      # shell metacharacters. Used in git commands and github-script JS, not eval.
+      - ci-release.yml:215
+      - ci-release.yml:216
+      - ci-release.yml:231
+      - ci-release.yml:237
+      - ci-release.yml:245
+      - ci-release.yml:248

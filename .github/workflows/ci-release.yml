@@ -150,9 +150,11 @@ jobs:
           path: ./
       - name: Get version info
         id: get-version
+        env:
+          REF_NAME: ${{ github.ref_name }}
         run: |
-          echo "version=${{ github.ref_name }}" >> $GITHUB_OUTPUT
-          if [[ "${{ github.ref_name }}" == *"-beta.rc"* ]]; then
+          echo "version=${REF_NAME}" >> $GITHUB_OUTPUT
+          if [[ "${REF_NAME}" == *"-beta.rc"* ]]; then
             echo "prerelease=true" >> $GITHUB_OUTPUT
           else
             echo "prerelease=false" >> $GITHUB_OUTPUT
@@ -207,11 +209,13 @@ jobs:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       - name: Update changelog
         working-directory: docs
+        env:
+          CHANGELOG: ${{ needs.publish-release.outputs.changelog }}
         run: |
           git branch ${{ needs.publish-release.outputs.version }}-changelog
           git checkout ${{ needs.publish-release.outputs.version }}-changelog
 
-          echo -e "# Changelog\n\n${{ needs.publish-release.outputs.changelog }}\n" > changelog-new.md
+          printf '# Changelog\n\n%s\n' "${CHANGELOG}" > changelog-new.md
 
           echo "Manually linking usernames"
           sed -i -r 's|@([a-zA-Z0-9_]+) \(\[#|[@\1](https://github.com/\1) ([#|g' changelog-new.md
