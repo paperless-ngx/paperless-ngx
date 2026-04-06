@@ -46,8 +46,7 @@ jobs:
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: 24.x
-          cache: 'pnpm'
-          cache-dependency-path: 'src-ui/pnpm-lock.yaml'
+          package-manager-cache: false
       - name: Install frontend dependencies
         run: cd src-ui && pnpm install
       - name: Build frontend
@@ -62,7 +61,7 @@ jobs:
         uses: astral-sh/setup-uv@5a095e7a2014a4212f075830d4f7277575a9d098 # v7.3.1
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
-          enable-cache: true
+          enable-cache: false
           python-version: ${{ steps.setup-python.outputs.python-version }}
       - name: Install Python dependencies
         run: |
@@ -205,7 +204,7 @@ jobs:
         uses: astral-sh/setup-uv@5a095e7a2014a4212f075830d4f7277575a9d098 # v7.3.1
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
-          enable-cache: true
+          enable-cache: false
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       - name: Update changelog
         working-directory: docs

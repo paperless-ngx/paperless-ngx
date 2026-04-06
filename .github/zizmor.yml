@@ -1,12 +1,4 @@
 rules:
-  cache-poisoning:
-    ignore:
-      # Release workflow: triggered only on maintainer-pushed tags; cache keys are
-      # hash-locked to lockfiles, so cross-branch cache poisoning is not a viable
-      # attack vector here.
-      - ci-release.yml:46
-      - ci-release.yml:62
-      - ci-release.yml:205
   template-injection:
     ignore:
       # github.event_name is a GitHub-internal constant (push/pull_request/etc.),
