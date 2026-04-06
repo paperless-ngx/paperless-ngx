@@ -1020,7 +1020,7 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         CONSUMER_TAG_BARCODE_SPLIT=True,
         CONSUMER_TAG_BARCODE_MAPPING={"TAG:(.*)": "\\g<1>"},
         CELERY_TASK_ALWAYS_EAGER=True,
-        OCR_MODE="skip",
+        OCR_MODE="auto",
     )
     def test_consume_barcode_file_tag_split_and_assignment(self) -> None:
         """

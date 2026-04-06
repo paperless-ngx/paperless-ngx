@@ -633,12 +633,11 @@ hardware, but a few settings can improve performance:
   consumption, so you might want to lower these settings (example: 2
   workers and 1 thread to always have some computing power left for
   other tasks).
-- Keep [`PAPERLESS_OCR_MODE`](configuration.md#PAPERLESS_OCR_MODE) at its default value `skip` and consider
+- Keep [`PAPERLESS_OCR_MODE`](configuration.md#PAPERLESS_OCR_MODE) at its default value `auto` and consider
   OCRing your documents before feeding them into Paperless. Some
   scanners are able to do this!
-- Set [`PAPERLESS_OCR_SKIP_ARCHIVE_FILE`](configuration.md#PAPERLESS_OCR_SKIP_ARCHIVE_FILE) to `with_text` to skip archive
-  file generation for already OCRed documents, or `always` to skip it
-  for all documents.
+- Set [`PAPERLESS_ARCHIVE_FILE_GENERATION`](configuration.md#PAPERLESS_ARCHIVE_FILE_GENERATION) to `never` to skip archive
+  file generation entirely, saving disk space at the cost of in-browser PDF/A viewing.
 - If you want to perform OCR on the device, consider using
   `PAPERLESS_OCR_CLEAN=none`. This will speed up OCR times and use
   less memory at the expense of slightly worse OCR results.

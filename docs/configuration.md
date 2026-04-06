@@ -821,11 +821,14 @@ parsing documents.
 
 #### [`PAPERLESS_OCR_MODE=<mode>`](#PAPERLESS_OCR_MODE) {#PAPERLESS_OCR_MODE}
 
-: Tell paperless when and how to perform ocr on your documents. Three
+: Tell paperless when and how to perform ocr on your documents. Four
 modes are available:
 
-    -   `skip`: Paperless skips all pages and will perform ocr only on
-        pages where no text is present. This is the safest option.
+    -   `auto` (default): Paperless detects whether a document already
+        has embedded text via pdftotext. If sufficient text is found,
+        OCR is skipped for that document (`--skip-text`). If no text is
+        present, OCR runs normally. This is the safest option for mixed
+        document collections.
 
     -   `redo`: Paperless will OCR all pages of your documents and
         attempt to replace any existing text layers with new text. This
@@ -843,24 +846,59 @@ modes are available:
         significantly larger and text won't appear as sharp when zoomed
         in.
 
-    The default is `skip`, which only performs OCR when necessary and
-    always creates archived documents.
+    -   `off`: Paperless never invokes the OCR engine. For PDFs, text
+        is extracted via pdftotext only. For image documents, text will
+        be empty. Archive file generation still works via format
+        conversion (no Tesseract or Ghostscript required).
 
-    Read more about this in the [OCRmyPDF
+    The default is `auto`.
+
+    For the `skip`, `redo`, and `force` modes, read more about OCR
+    behaviour in the [OCRmyPDF
     documentation](https://ocrmypdf.readthedocs.io/en/latest/advanced.html#when-ocr-is-skipped).
 
-#### [`PAPERLESS_OCR_SKIP_ARCHIVE_FILE=<mode>`](#PAPERLESS_OCR_SKIP_ARCHIVE_FILE) {#PAPERLESS_OCR_SKIP_ARCHIVE_FILE}
+#### [`PAPERLESS_ARCHIVE_FILE_GENERATION=<mode>`](#PAPERLESS_ARCHIVE_FILE_GENERATION) {#PAPERLESS_ARCHIVE_FILE_GENERATION}
 
-: Specify when you would like paperless to skip creating an archived
-version of your documents. This is useful if you don't want to have two
-almost-identical versions of your documents in the media folder.
+: Controls when paperless creates a PDF/A archive version of your
+documents. Archive files are stored alongside the original and are used
+for display in the web interface.
 
-    -   `never`: Never skip creating an archived version.
-    -   `with_text`: Skip creating an archived version for documents
-    that already have embedded text.
-    -   `always`: Always skip creating an archived version.
+    -   `auto` (default): Produce archives for scanned or image-based
+        documents. Skip archive generation for born-digital PDFs that
+        already contain embedded text. This is the recommended setting
+        for mixed document collections.
+    -   `always`: Always produce a PDF/A archive when the parser
+        supports it, regardless of whether the document already has
+        text.
+    -   `never`: Never produce an archive. Only the original file is
+        stored. Saves disk space but the web viewer will display the
+        original file directly.
 
-    The default is `never`.
+    **Behaviour by file type and mode** (`auto` column shows the default):
+
+    | Document type              | `never` | `auto` (default)           | `always` |
+    | -------------------------- | ------- | -------------------------- | -------- |
+    | Scanned image (TIFF, JPEG) | No      | **Yes**                    | Yes      |
+    | Image-based PDF            | No      | **Yes** (short/no text, untagged) | Yes |
+    | Born-digital PDF           | No      | No (tagged or has embedded text)  | Yes |
+    | Plain text, email, HTML    | No      | No                         | No       |
+    | DOCX / ODT (via Tika)      | Yes\*   | Yes\*                      | Yes\*    |
+
+    \* Tika always produces a PDF rendition for display; this counts as
+    the archive regardless of the setting.
+
+    !!! note
+
+        This setting applies to the built-in Tesseract parser. Parsers
+        that must always convert documents to PDF for display (e.g. DOCX,
+        ODT via Tika) will produce a PDF regardless of this setting.
+
+    !!! note
+
+        The **remote OCR parser** (Azure AI) always produces a searchable
+        PDF and stores it as the archive copy, regardless of this setting.
+        `ARCHIVE_FILE_GENERATION=never` has no effect when the remote
+        parser handles a document.
 
 #### [`PAPERLESS_OCR_CLEAN=<mode>`](#PAPERLESS_OCR_CLEAN) {#PAPERLESS_OCR_CLEAN}
 
