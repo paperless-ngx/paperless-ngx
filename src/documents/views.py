@@ -3267,11 +3267,11 @@ class StatisticsView(GenericAPIView):
 
     def get(self, request, format=None):
         user = request.user if request.user is not None else None
-        has_aggregate_access = has_global_statistics_permission(user)
+        can_view_global_stats = has_global_statistics_permission(user) or user is None
 
         documents = (
             Document.objects.all()
-            if has_aggregate_access or user is None
+            if can_view_global_stats
             else get_objects_for_user_owner_aware(
                 user,
                 "documents.view_document",
@@ -3280,12 +3280,12 @@ class StatisticsView(GenericAPIView):
         )
         tags = (
             Tag.objects.all()
-            if has_aggregate_access or user is None
+            if can_view_global_stats
             else get_objects_for_user_owner_aware(user, "documents.view_tag", Tag)
         ).only("id", "is_inbox_tag")
         correspondent_count = (
             Correspondent.objects.count()
-            if has_aggregate_access or user is None
+            if can_view_global_stats
             else get_objects_for_user_owner_aware(
                 user,
                 "documents.view_correspondent",
@@ -3294,7 +3294,7 @@ class StatisticsView(GenericAPIView):
         )
         document_type_count = (
             DocumentType.objects.count()
-            if has_aggregate_access or user is None
+            if can_view_global_stats
             else get_objects_for_user_owner_aware(
                 user,
                 "documents.view_documenttype",
@@ -3303,7 +3303,7 @@ class StatisticsView(GenericAPIView):
         )
         storage_path_count = (
             StoragePath.objects.count()
-            if has_aggregate_access or user is None
+            if can_view_global_stats
             else get_objects_for_user_owner_aware(
                 user,
                 "documents.view_storagepath",
