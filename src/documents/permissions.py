@@ -61,7 +61,7 @@ def has_global_statistics_permission(user: User | None) -> bool:
         return False
 
     return getattr(user, "is_superuser", False) or user.has_perm(
-        "documents.view_global_statistics",
+        "paperless.view_global_statistics",
     )
 
 
@@ -72,7 +72,7 @@ def has_system_status_permission(user: User | None) -> bool:
     return (
         getattr(user, "is_superuser", False)
         or getattr(user, "is_staff", False)
-        or user.has_perm("documents.view_system_status")
+        or user.has_perm("paperless.view_system_status")
     )
 
 
