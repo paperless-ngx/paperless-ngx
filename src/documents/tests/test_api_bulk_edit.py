@@ -934,14 +934,8 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertCountEqual(
-            response.data["selected_tags"],
-            [
-                {"id": self.t1.id, "document_count": 1},
-                {"id": self.t2.id, "document_count": 0},
-            ],
-        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.content, b"Insufficient permissions")
 
     @mock.patch("documents.serialisers.bulk_edit.set_permissions")
     def test_set_permissions(self, m) -> None:

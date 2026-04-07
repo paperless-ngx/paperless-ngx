@@ -167,6 +167,7 @@ from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_global_statistics_permission
 from documents.permissions import has_perms_owner_aware
+from documents.permissions import has_system_status_permission
 from documents.permissions import set_permissions_for_object
 from documents.plugins.date_parsing import get_date_parser
 from documents.schema import generate_object_with_permissions_schema
@@ -4259,9 +4260,7 @@ class SystemStatusView(PassUserMixin):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        if not (
-            request.user.is_staff or has_global_statistics_permission(request.user)
-        ):
+        if not has_system_status_permission(request.user):
             return HttpResponseForbidden("Insufficient permissions")
 
         current_version = version.__full_version_str__

@@ -133,4 +133,32 @@ describe('PermissionsSelectComponent', () => {
     expect(addInput.nativeElement.disabled).toBeTruthy()
     expect(viewInput.nativeElement.disabled).toBeFalsy()
   })
+
+  it('should treat system status as view-only', () => {
+    component.ngOnInit()
+    fixture.detectChanges()
+
+    expect(
+      component.isActionSupported(
+        PermissionType.SystemStatus,
+        PermissionAction.View
+      )
+    ).toBeTruthy()
+    expect(
+      component.isActionSupported(
+        PermissionType.SystemStatus,
+        PermissionAction.Change
+      )
+    ).toBeFalsy()
+
+    const changeInput = fixture.debugElement.query(
+      By.css('input#SystemStatus_Change')
+    )
+    const viewInput = fixture.debugElement.query(
+      By.css('input#SystemStatus_View')
+    )
+
+    expect(changeInput.nativeElement.disabled).toBeTruthy()
+    expect(viewInput.nativeElement.disabled).toBeFalsy()
+  })
 })

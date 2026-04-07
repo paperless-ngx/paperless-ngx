@@ -65,6 +65,17 @@ def has_global_statistics_permission(user: User | None) -> bool:
     )
 
 
+def has_system_status_permission(user: User | None) -> bool:
+    if user is None or not getattr(user, "is_authenticated", False):
+        return False
+
+    return (
+        getattr(user, "is_superuser", False)
+        or getattr(user, "is_staff", False)
+        or user.has_perm("documents.view_system_status")
+    )
+
+
 def get_groups_with_only_permission(obj, codename):
     ctype = ContentType.objects.get_for_model(obj)
     permission = Permission.objects.get(content_type=ctype, codename=codename)

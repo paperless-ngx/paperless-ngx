@@ -102,6 +102,17 @@ class TestSystemStatus(APITestCase):
         self.client.force_login(user)
         response = self.client.get(self.ENDPOINT)
 
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_system_status_with_system_status_permission(self) -> None:
+        user = User.objects.create_user(username="status_user")
+        user.user_permissions.add(
+            Permission.objects.get(codename="view_system_status"),
+        )
+
+        self.client.force_login(user)
+        response = self.client.get(self.ENDPOINT)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_system_status_with_bad_basic_auth_challenges(self) -> None:
