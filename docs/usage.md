@@ -381,7 +381,7 @@ still have "object-level" permissions.
 | StoragePath   | Add, edit, delete or view Storage Paths.                                                                                                                                                                                        |
 | Tag           | Add, edit, delete or view Tags.                                                                                                                                                                                                 |
 | UISettings    | Add, edit, delete or view the UI settings that are used by the web app.<br/>:warning: **Users that will access the web UI must be granted at least _View_ permissions.**                                                        |
-| User          | Add, edit, delete or view Users.                                                                                                                                                                                                |
+| User          | Add, edit, delete or view other user accounts via Settings > Users & Groups and `/api/users/`. These permissions are not needed for users to edit their own profile via "My Profile" or `/api/profile/`.                        |
 | Workflow      | Add, edit, delete or view Workflows.<br/>Note that Workflows are global; all users who can access workflows see the same set. Workflows have other permission implications — see [Workflow permissions](#workflow-permissions). |
 
 #### Detailed Explanation of Object Permissions {#object-permissions}
