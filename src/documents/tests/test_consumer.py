@@ -230,7 +230,11 @@ class TestConsumer(
         shutil.copy(src, dst)
         return dst
 
-    @override_settings(FILENAME_FORMAT=None, TIME_ZONE="America/Chicago")
+    @override_settings(
+        FILENAME_FORMAT=None,
+        TIME_ZONE="America/Chicago",
+        ARCHIVE_FILE_GENERATION="always",
+    )
     def testNormalOperation(self) -> None:
         filename = self.get_test_file()
 
@@ -629,7 +633,10 @@ class TestConsumer(
         # Database empty
         self.assertEqual(Document.objects.all().count(), 0)
 
-    @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
+    @override_settings(
+        FILENAME_FORMAT="{correspondent}/{title}",
+        ARCHIVE_FILE_GENERATION="always",
+    )
     def testFilenameHandling(self) -> None:
         with self.get_consumer(
             self.get_test_file(),
@@ -646,7 +653,7 @@ class TestConsumer(
         self._assert_first_last_send_progress()
 
     @mock.patch("documents.consumer.generate_unique_filename")
-    @override_settings(FILENAME_FORMAT="{pk}")
+    @override_settings(FILENAME_FORMAT="{pk}", ARCHIVE_FILE_GENERATION="always")
     def testFilenameHandlingFallsBackWhenGeneratedPathExceedsDbLimit(self, m):
         m.side_effect = lambda doc, archive_filename=False: Path(
             ("a" * 1100 + ".pdf") if not archive_filename else ("b" * 1100 + ".pdf"),
@@ -673,7 +680,10 @@ class TestConsumer(
 
         self._assert_first_last_send_progress()
 
-    @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
+    @override_settings(
+        FILENAME_FORMAT="{correspondent}/{title}",
+        ARCHIVE_FILE_GENERATION="always",
+    )
     @mock.patch("documents.signals.handlers.generate_unique_filename")
     def testFilenameHandlingUnstableFormat(self, m) -> None:
         filenames = ["this", "that", "now this", "i cannot decide"]
@@ -1021,7 +1031,7 @@ class TestConsumer(
         self.assertEqual(Document.objects.count(), 2)
         self._assert_first_last_send_progress()
 
-    @override_settings(FILENAME_FORMAT="{title}")
+    @override_settings(FILENAME_FORMAT="{title}", ARCHIVE_FILE_GENERATION="always")
     @mock.patch("documents.consumer.get_parser_registry")
     def test_similar_filenames(self, m) -> None:
         shutil.copy(
@@ -1132,6 +1142,7 @@ class TestConsumer(
             mock_mail_parser_parse.assert_called_once_with(
                 consumer.working_copy,
                 "message/rfc822",
+                produce_archive=True,
             )
 
 
@@ -1279,7 +1290,14 @@ class PreConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
     def test_no_pre_consume_script(self, m) -> None:
         with self.get_consumer(self.test_file) as c:
             c.run()
-            m.assert_not_called()
+            # Verify no pre-consume script subprocess was invoked
+            # (run_subprocess may still be called by _extract_text_for_archive_check)
+            script_calls = [
+                call
+                for call in m.call_args_list
+                if call.args and call.args[0] and call.args[0][0] not in ("pdftotext",)
+            ]
+            self.assertEqual(script_calls, [])
 
     @mock.patch("documents.consumer.run_subprocess")
     @override_settings(PRE_CONSUME_SCRIPT="does-not-exist")
@@ -1295,9 +1313,16 @@ class PreConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                 with self.get_consumer(self.test_file) as c:
                     c.run()
 
-                    m.assert_called_once()
+                    self.assertTrue(m.called)
 
-                    args, _ = m.call_args
+                    # Find the call that invoked the pre-consume script
+                    # (run_subprocess may also be called by _extract_text_for_archive_check)
+                    script_call = next(
+                        call
+                        for call in m.call_args_list
+                        if call.args and call.args[0] and call.args[0][0] == script.name
+                    )
+                    args, _ = script_call
 
                     command = args[0]
                     environment = args[1]

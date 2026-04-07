@@ -134,9 +134,9 @@ following operations on your documents:
 !!! tip
 
     This process can be configured to fit your needs. If you don't want
-    paperless to create archived versions for digital documents, you can
-    configure that by configuring
-    `PAPERLESS_OCR_SKIP_ARCHIVE_FILE=with_text`. Please read the
+    paperless to create archived versions for born-digital documents, set
+    [`PAPERLESS_ARCHIVE_FILE_GENERATION=auto`](configuration.md#PAPERLESS_ARCHIVE_FILE_GENERATION)
+    (the default). To skip archives entirely, use `never`. Please read the
     [relevant section in the documentation](configuration.md#ocr).
 
 !!! note

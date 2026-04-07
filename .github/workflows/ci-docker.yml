@@ -89,7 +89,7 @@ jobs:
                 push_external="true"
                 ;;
             esac
-            case "${{ github.ref }}" in
+            case "${GITHUB_REF}" in
               refs/tags/v*|*beta.rc*)
                 push_external="true"
                 ;;
@@ -230,8 +230,10 @@ jobs:
 
           docker buildx imagetools create ${tags} ${digests}
       - name: Inspect image
+        env:
+          FIRST_TAG: ${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}
         run: |
-          docker buildx imagetools inspect ${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}
+          docker buildx imagetools inspect "${FIRST_TAG}"
       - name: Copy to Docker Hub
         if: needs.build-arch.outputs.push-external == 'true'
         env:

@@ -1,4 +1,5 @@
 import datetime
+import logging
 import os
 import shutil
 import tempfile
@@ -50,9 +51,14 @@ from documents.utils import compute_checksum
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
+from paperless.config import OcrConfig
+from paperless.models import ArchiveFileGenerationChoices
 from paperless.parsers import ParserContext
 from paperless.parsers import ParserProtocol
 from paperless.parsers.registry import get_parser_registry
+from paperless.parsers.utils import PDF_TEXT_MIN_LENGTH
+from paperless.parsers.utils import extract_pdf_text
+from paperless.parsers.utils import is_tagged_pdf
 
 LOGGING_NAME: Final[str] = "paperless.consumer"
 
@@ -103,6 +109,74 @@ class ConsumerStatusShortMessage(StrEnum):
     SAVE_DOCUMENT = "save_document"
     FINISHED = "finished"
     FAILED = "failed"
+
+
+def should_produce_archive(
+    parser: "ParserProtocol",
+    mime_type: str,
+    document_path: Path,
+    log: logging.Logger | None = None,
+) -> bool:
+    """Return True if a PDF/A archive should be produced for this document.
+
+    IMPORTANT: *parser* must be an instantiated parser, not the class.
+    ``requires_pdf_rendition`` and ``can_produce_archive`` are instance
+    ``@property`` methods — accessing them on the class returns the descriptor
+    (always truthy).
+    """
+    _log = log or logging.getLogger(LOGGING_NAME)
+
+    # Must produce a PDF so the frontend can display the original format at all.
+    if parser.requires_pdf_rendition:
+        _log.debug("Archive: yes — parser requires PDF rendition for frontend display")
+        return True
+
+    # Parser cannot produce an archive (e.g. TextDocumentParser).
+    if not parser.can_produce_archive:
+        _log.debug("Archive: no — parser cannot produce archives")
+        return False
+
+    generation = OcrConfig().archive_file_generation
+
+    if generation == ArchiveFileGenerationChoices.ALWAYS:
+        _log.debug("Archive: yes — ARCHIVE_FILE_GENERATION=always")
+        return True
+    if generation == ArchiveFileGenerationChoices.NEVER:
+        _log.debug("Archive: no — ARCHIVE_FILE_GENERATION=never")
+        return False
+
+    # auto: produce archives for scanned/image documents; skip for born-digital PDFs.
+    if mime_type.startswith("image/"):
+        _log.debug("Archive: yes — image document, ARCHIVE_FILE_GENERATION=auto")
+        return True
+    if mime_type == "application/pdf":
+        if is_tagged_pdf(document_path):
+            _log.debug(
+                "Archive: no — born-digital PDF (structure tags detected),"
+                " ARCHIVE_FILE_GENERATION=auto",
+            )
+            return False
+        text = extract_pdf_text(document_path)
+        if text is None or len(text) <= PDF_TEXT_MIN_LENGTH:
+            _log.debug(
+                "Archive: yes — scanned PDF (text_length=%d ≤ %d),"
+                " ARCHIVE_FILE_GENERATION=auto",
+                len(text) if text else 0,
+                PDF_TEXT_MIN_LENGTH,
+            )
+            return True
+        _log.debug(
+            "Archive: no — born-digital PDF (text_length=%d > %d),"
+            " ARCHIVE_FILE_GENERATION=auto",
+            len(text),
+            PDF_TEXT_MIN_LENGTH,
+        )
+        return False
+    _log.debug(
+        "Archive: no — MIME type %r not eligible for auto archive generation",
+        mime_type,
+    )
+    return False
 
 
 class ConsumerPluginMixin:
@@ -436,7 +510,17 @@ class ConsumerPlugin(
                     )
                     self.log.debug(f"Parsing {self.filename}...")
 
-                    document_parser.parse(self.working_copy, mime_type)
+                    produce_archive = should_produce_archive(
+                        document_parser,
+                        mime_type,
+                        self.working_copy,
+                        self.log,
+                    )
+                    document_parser.parse(
+                        self.working_copy,
+                        mime_type,
+                        produce_archive=produce_archive,
+                    )
 
                     self.log.debug(f"Generating thumbnail for {self.filename}...")
                     self._send_progress(
@@ -785,7 +869,7 @@ class ConsumerPlugin(
 
         return document
 
-    def apply_overrides(self, document) -> None:
+    def apply_overrides(self, document: Document) -> None:
         if self.metadata.correspondent_id:
             document.correspondent = Correspondent.objects.get(
                 pk=self.metadata.correspondent_id,
