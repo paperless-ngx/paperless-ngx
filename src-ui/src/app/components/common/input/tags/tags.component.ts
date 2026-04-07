@@ -153,11 +153,13 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   }
 
   public onAdd(tag: Tag) {
-    if (tag.parent) {
+    if (tag?.parent) {
       // add all parents recursively
       const parent = this.getTag(tag.parent)
-      this.value = [...this.value, parent.id]
-      this.onAdd(parent)
+      if (parent && !this.value.includes(parent.id)) {
+        this.value = [...this.value, parent.id]
+        this.onAdd(parent)
+      }
     }
   }
 
