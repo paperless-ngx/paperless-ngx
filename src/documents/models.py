@@ -339,10 +339,6 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         ordering = ("-created",)
         verbose_name = _("document")
         verbose_name_plural = _("documents")
-        permissions = [
-            ("view_global_statistics", "Can view global object counts"),
-            ("view_system_status", "Can view system status information"),
-        ]
         constraints = [
             models.UniqueConstraint(
                 fields=["root_document", "version_index"],
