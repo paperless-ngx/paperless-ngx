@@ -247,6 +247,13 @@ if settings.AUDIT_LOG_ENABLED:
 
 logger = logging.getLogger("paperless.api")
 
+# Crossover point for intersect_and_order: below this count use a targeted
+# IN-clause query; at or above this count fall back to a full-table scan +
+# Python set intersection.  The IN-clause is faster for small result sets but
+# degrades on SQLite with thousands of parameters.  PostgreSQL handles large IN
+# clauses efficiently, so this threshold mainly protects SQLite users.
+_TANTIVY_INTERSECT_THRESHOLD = 5_000
+
 
 class IndexView(TemplateView):
     template_name = "index.html"
@@ -2089,12 +2096,9 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 page_num = int(request.query_params.get("page", 1))
             except (TypeError, ValueError):
                 page_num = 1
-            try:
-                page_size = int(
-                    request.query_params.get("page_size", self.paginator.page_size),
-                )
-            except (TypeError, ValueError):
-                page_size = self.paginator.page_size
+            page_size = (
+                self.paginator.get_page_size(request) or self.paginator.page_size
+            )
 
             return sort_field_name, sort_reverse, use_tantivy_sort, page_num, page_size
 
@@ -2105,12 +2109,23 @@ class UnifiedSearchViewSet(DocumentViewSet):
             use_tantivy_sort: bool,
         ) -> list[int]:
             """Intersect search IDs with ORM-visible IDs, preserving order."""
-            orm_ids = set(filtered_qs.values_list("pk", flat=True))
+            if not all_ids:
+                return []
             if use_tantivy_sort:
-                return [doc_id for doc_id in all_ids if doc_id in orm_ids]
-            id_set = set(all_ids) & orm_ids
+                if len(all_ids) <= _TANTIVY_INTERSECT_THRESHOLD:
+                    # Small result set: targeted IN-clause avoids a full-table scan.
+                    visible_ids = set(
+                        filtered_qs.filter(pk__in=all_ids).values_list("pk", flat=True),
+                    )
+                else:
+                    # Large result set: full-table scan + Python intersection is faster
+                    # than a large IN-clause on SQLite.
+                    visible_ids = set(
+                        filtered_qs.values_list("pk", flat=True),
+                    )
+                return [doc_id for doc_id in all_ids if doc_id in visible_ids]
             return list(
-                filtered_qs.filter(id__in=id_set).values_list("pk", flat=True),
+                filtered_qs.filter(id__in=all_ids).values_list("pk", flat=True),
             )
 
         def run_text_search(
@@ -2148,6 +2163,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 query_str,
                 page_ids,
                 search_mode=search_mode,
+                rank_start=page_offset + 1,
             )
             return ordered_ids, page_hits, page_offset
 

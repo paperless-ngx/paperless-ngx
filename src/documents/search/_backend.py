@@ -132,9 +132,9 @@ class TantivyRelevanceList:
         stop = key.stop or len(self._ordered_ids)
         # DRF slices to extract the current page.  If the slice aligns
         # with our pre-fetched page_hits, return them directly.
-        if start == self._page_offset and stop <= self._page_offset + len(
-            self._page_hits,
-        ):
+        # We only check start — DRF always slices with stop=start+page_size,
+        # which exceeds page_hits length on the last page.
+        if start == self._page_offset:
             return self._page_hits[: stop - start]
         # Fallback: return stub dicts (no highlights).
         return [
@@ -507,6 +507,7 @@ class TantivyBackend:
         doc_ids: list[int],
         *,
         search_mode: SearchMode = SearchMode.QUERY,
+        rank_start: int = 1,
     ) -> list[SearchHit]:
         """
         Generate SearchHit dicts with highlights for specific document IDs.
@@ -525,6 +526,8 @@ class TantivyBackend:
             query: The search query (used for snippet generation)
             doc_ids: Ordered list of document IDs to generate hits for
             search_mode: Query parsing mode (for building the snippet query)
+            rank_start: Starting rank value (1-based absolute position in the
+                full result set; pass ``page_offset + 1`` for paginated calls)
 
         Returns:
             List of SearchHit dicts in the same order as doc_ids
@@ -540,8 +543,9 @@ class TantivyBackend:
         notes_snippet_generator = None
         hits: list[SearchHit] = []
 
-        for rank, doc_id in enumerate(doc_ids, start=1):
-            # Look up document by ID
+        for rank, doc_id in enumerate(doc_ids, start=rank_start):
+            # Look up document by ID, scoring against the user query so that
+            # the returned SearchHit carries a real BM25 relevance score.
             id_query = tantivy.Query.range_query(
                 self._schema,
                 "id",
@@ -549,12 +553,18 @@ class TantivyBackend:
                 doc_id,
                 doc_id,
             )
-            results = searcher.search(id_query, limit=1)
+            scored_query = tantivy.Query.boolean_query(
+                [
+                    (tantivy.Occur.Must, user_query),
+                    (tantivy.Occur.Must, id_query),
+                ],
+            )
+            results = searcher.search(scored_query, limit=1)
 
             if not results.hits:
                 continue
 
-            doc_address = results.hits[0][1]
+            score, doc_address = results.hits[0]
             actual_doc = searcher.doc(doc_address)
             doc_dict = actual_doc.to_dict()
 
@@ -590,7 +600,7 @@ class TantivyBackend:
             hits.append(
                 SearchHit(
                     id=doc_id,
-                    score=0.0,
+                    score=score,
                     rank=rank,
                     highlights=highlights,
                 ),
@@ -684,6 +694,8 @@ class TantivyBackend:
         """
         self._ensure_open()
         normalized_term = ascii_fold(term.lower())
+        if not normalized_term:
+            return []
 
         searcher = self._index.searcher()
 
