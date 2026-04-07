@@ -340,7 +340,7 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         verbose_name = _("document")
         verbose_name_plural = _("documents")
         permissions = [
-            ("can_view_statistics", "Can view system statistics and object counts"),
+            ("view_global_statistics", "Can view system statistics and object counts"),
         ]
         constraints = [
             models.UniqueConstraint(

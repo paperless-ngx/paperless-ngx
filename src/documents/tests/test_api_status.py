@@ -96,7 +96,7 @@ class TestSystemStatus(APITestCase):
     def test_system_status_with_statistics_permission(self) -> None:
         user = User.objects.create_user(username="stats_user")
         user.user_permissions.add(
-            Permission.objects.get(codename="can_view_statistics"),
+            Permission.objects.get(codename="view_global_statistics"),
         )
 
         self.client.force_login(user)

@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
                 "ordering": ("-created",),
                 "permissions": [
                     (
-                        "can_view_statistics",
+                        "view_global_statistics",
                         "Can view system statistics and object counts",
                     ),
                 ],

@@ -61,7 +61,7 @@ def has_statistics_permission(user: User | None) -> bool:
         return False
 
     return getattr(user, "is_superuser", False) or user.has_perm(
-        "documents.can_view_statistics",
+        "documents.view_global_statistics",
     )
 
 

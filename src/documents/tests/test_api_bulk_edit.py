@@ -924,7 +924,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
         stats_user = User.objects.create(username="stats_user")
         stats_user.user_permissions.add(
-            Permission.objects.get(codename="can_view_statistics"),
+            Permission.objects.get(codename="view_global_statistics"),
         )
         self.client.force_authenticate(user=stats_user)
 

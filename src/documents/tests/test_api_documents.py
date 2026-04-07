@@ -1318,7 +1318,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         owner = User.objects.create_user("owner")
         stats_user = User.objects.create_user("stats-user")
         stats_user.user_permissions.add(
-            Permission.objects.get(codename="can_view_statistics"),
+            Permission.objects.get(codename="view_global_statistics"),
         )
 
         inbox_tag = Tag.objects.create(
@@ -1353,7 +1353,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         owner = User.objects.create_user("owner")
         stats_user = User.objects.create_user("stats-user")
         stats_user.user_permissions.add(
-            Permission.objects.get(codename="can_view_statistics"),
+            Permission.objects.get(codename="view_global_statistics"),
             Permission.objects.get(codename="view_tag"),
         )
 
