@@ -56,6 +56,15 @@ class PaperlessAdminPermissions(BasePermission):
         return request.user.is_staff
 
 
+def has_statistics_permission(user: User | None) -> bool:
+    if user is None or not getattr(user, "is_authenticated", False):
+        return False
+
+    return getattr(user, "is_superuser", False) or user.has_perm(
+        "documents.can_view_statistics",
+    )
+
+
 def get_groups_with_only_permission(obj, codename):
     ctype = ContentType.objects.get_for_model(obj)
     permission = Permission.objects.get(content_type=ctype, codename=codename)
@@ -156,7 +165,7 @@ def _permitted_document_ids(user):
         # Just Anonymous user e.g. for drf-spectacular
         return base_docs.filter(owner__isnull=True).values_list("id", flat=True)
 
-    if getattr(user, "is_superuser", False):
+    if has_statistics_permission(user):
         return base_docs.values_list("id", flat=True)
 
     document_ct = ContentType.objects.get_for_model(Document)
@@ -192,7 +201,7 @@ def get_document_count_filter_for_user(user):
     document IDs to keep the generated SQL simple and avoid large OR clauses.
     """
 
-    if getattr(user, "is_superuser", False):
+    if has_statistics_permission(user):
         # Superuser: no permission filtering needed
         return Q(documents__deleted_at__isnull=True)
 

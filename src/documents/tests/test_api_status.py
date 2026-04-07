@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest import mock
 
 from celery import states
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import override_settings
 from rest_framework import status
@@ -91,6 +92,17 @@ class TestSystemStatus(APITestCase):
         self.client.force_login(normal_user)
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_system_status_with_statistics_permission(self) -> None:
+        user = User.objects.create_user(username="stats_user")
+        user.user_permissions.add(
+            Permission.objects.get(codename="can_view_statistics"),
+        )
+
+        self.client.force_login(user)
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_system_status_with_bad_basic_auth_challenges(self) -> None:
         self.client.credentials(HTTP_AUTHORIZATION="Basic invalid")
