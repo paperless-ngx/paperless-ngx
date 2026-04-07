@@ -7,6 +7,7 @@ jobs:
   generate-translate-strings:
     name: Generate Translation Strings
     runs-on: ubuntu-latest
+    environment: translation-sync
     permissions:
       contents: write
     steps:

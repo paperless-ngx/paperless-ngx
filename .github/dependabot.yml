@@ -164,6 +164,8 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "monthly"
+    cooldown:
+      default-days: 7
     groups:
       pre-commit-dependencies:
         patterns:
