@@ -2886,14 +2886,13 @@ class SelectionDataView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         ids = serializer.validated_data.get("documents")
-        if not has_global_statistics_permission(request.user):
-            permitted_documents = get_objects_for_user_owner_aware(
-                request.user,
-                "documents.view_document",
-                Document,
-            )
-            if permitted_documents.filter(pk__in=ids).count() != len(ids):
-                return HttpResponseForbidden("Insufficient permissions")
+        permitted_documents = get_objects_for_user_owner_aware(
+            request.user,
+            "documents.view_document",
+            Document,
+        )
+        if permitted_documents.filter(pk__in=ids).count() != len(ids):
+            return HttpResponseForbidden("Insufficient permissions")
 
         correspondents = Correspondent.objects.annotate(
             document_count=Count(
