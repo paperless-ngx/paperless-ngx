@@ -26,7 +26,6 @@ const inheritedPermissions = ['change_tag', 'view_documenttype']
 describe('PermissionsSelectComponent', () => {
   let component: PermissionsSelectComponent
   let fixture: ComponentFixture<PermissionsSelectComponent>
-  let permissionsChangeResult: Permissions
   let settingsService: SettingsService
 
   beforeEach(async () => {
@@ -45,7 +44,7 @@ describe('PermissionsSelectComponent', () => {
     fixture = TestBed.createComponent(PermissionsSelectComponent)
     fixture.debugElement.injector.get(NG_VALUE_ACCESSOR)
     component = fixture.componentInstance
-    component.registerOnChange((r) => (permissionsChangeResult = r))
+    component.registerOnChange((r) => r)
     fixture.detectChanges()
   })
 

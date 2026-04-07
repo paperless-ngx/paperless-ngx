@@ -154,10 +154,11 @@ export class PermissionsSelectComponent
       Object.entries(newValue).forEach(([typeKey, typeValue]) => {
         const selectedActions = Object.entries(typeValue).filter(
           ([actionKey, actionValue]) =>
+            actionValue &&
             this.isActionSupported(
               PermissionType[typeKey],
               PermissionAction[actionKey]
-            ) && actionValue == true
+            )
         )
 
         selectedActions.forEach(([actionKey]) => {
@@ -276,7 +277,7 @@ export class PermissionsSelectComponent
           PermissionAction[action]
         )
       )
-      .every((action) => this.form.get(typeKey)?.get(action)?.value == true)
+      .every((action) => !!this.form.get(typeKey)?.get(action)?.value)
   }
 
   public sortActions = (
