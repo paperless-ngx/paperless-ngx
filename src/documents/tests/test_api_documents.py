@@ -1349,31 +1349,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.data["document_type_count"], 1)
         self.assertEqual(response.data["storage_path_count"], 1)
 
-    def test_tag_document_count_with_statistics_permission(self) -> None:
-        owner = User.objects.create_user("owner")
-        stats_user = User.objects.create_user("stats-user")
-        stats_user.user_permissions.add(
-            Permission.objects.get(codename="view_global_statistics"),
-            Permission.objects.get(codename="view_tag"),
-        )
-
-        tag = Tag.objects.create(name="count-tag")
-        Document.objects.create(
-            title="owned-doc",
-            checksum="stats-B",
-            mime_type="application/pdf",
-            owner=owner,
-        ).tags.add(tag)
-
-        self.client.force_authenticate(user=stats_user)
-        response = self.client.get("/api/tags/")
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        returned_tag = next(
-            item for item in response.data["results"] if item["id"] == tag.id
-        )
-        self.assertEqual(returned_tag["document_count"], 1)
-
     def test_upload(self) -> None:
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),

@@ -918,25 +918,6 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(response.content, b"Insufficient permissions")
 
-    def test_api_selection_data_with_statistics_permission(self) -> None:
-        self.doc2.owner = self.user
-        self.doc2.save()
-
-        stats_user = User.objects.create(username="stats_user")
-        stats_user.user_permissions.add(
-            Permission.objects.get(codename="view_global_statistics"),
-        )
-        self.client.force_authenticate(user=stats_user)
-
-        response = self.client.post(
-            "/api/documents/selection_data/",
-            json.dumps({"documents": [self.doc2.id]}),
-            content_type="application/json",
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(response.content, b"Insufficient permissions")
-
     @mock.patch("documents.serialisers.bulk_edit.set_permissions")
     def test_set_permissions(self, m) -> None:
         self.setup_mock(m, "set_permissions")

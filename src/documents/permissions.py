@@ -176,7 +176,7 @@ def _permitted_document_ids(user):
         # Just Anonymous user e.g. for drf-spectacular
         return base_docs.filter(owner__isnull=True).values_list("id", flat=True)
 
-    if has_global_statistics_permission(user):
+    if getattr(user, "is_superuser", False):
         return base_docs.values_list("id", flat=True)
 
     document_ct = ContentType.objects.get_for_model(Document)
@@ -212,7 +212,7 @@ def get_document_count_filter_for_user(user):
     document IDs to keep the generated SQL simple and avoid large OR clauses.
     """
 
-    if has_global_statistics_permission(user):
+    if getattr(user, "is_superuser", False):
         # Superuser: no permission filtering needed
         return Q(documents__deleted_at__isnull=True)
 

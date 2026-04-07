@@ -93,18 +93,10 @@ class TestSystemStatus(APITestCase):
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_system_status_with_statistics_permission(self) -> None:
-        user = User.objects.create_user(username="stats_user")
-        user.user_permissions.add(
-            Permission.objects.get(codename="view_global_statistics"),
-        )
-
-        self.client.force_login(user)
-        response = self.client.get(self.ENDPOINT)
-
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
     def test_system_status_with_system_status_permission(self) -> None:
+        response = self.client.get(self.ENDPOINT)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
         user = User.objects.create_user(username="status_user")
         user.user_permissions.add(
             Permission.objects.get(codename="view_system_status"),
