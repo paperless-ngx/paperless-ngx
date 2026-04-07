@@ -1309,7 +1309,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         # Test as user without access to the document
         non_superuser = User.objects.create_user(username="non_superuser")
         non_superuser.user_permissions.add(
-            *Permission.objects.all(),
+            *Permission.objects.exclude(codename="can_view_statistics"),
         )
         non_superuser.save()
         self.client.force_authenticate(user=non_superuser)
