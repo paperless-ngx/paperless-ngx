@@ -253,7 +253,10 @@ export class PermissionsSelectComponent
     })
   }
 
-  isActionSupported(type: PermissionType, action: PermissionAction): boolean {
+  public isActionSupported(
+    type: PermissionType,
+    action: PermissionAction
+  ): boolean {
     // Global statistics only supports view permissions
     if (type === PermissionType.GlobalStatistics) {
       return action === PermissionAction.View
@@ -273,7 +276,7 @@ export class PermissionsSelectComponent
       .every((action) => this.form.get(typeKey)?.get(action)?.value == true)
   }
 
-  sortActions = (
+  public sortActions = (
     a: KeyValue<string, PermissionAction>,
     b: KeyValue<string, PermissionAction>
   ): number =>
