@@ -224,10 +224,13 @@ class WriteBatch:
         """
         Remove a document from the batch by its primary key.
 
-        Uses range query instead of term query to work around unsigned integer
-        type detection bug in tantivy-py 0.25.
+        Uses range_query instead of term_query to work around a tantivy-py bug
+        where Python integers are inferred as i64, producing Terms that never
+        match u64 fields.
+
+        TODO: Replace with term_query("id", doc_id) once
+        https://github.com/quickwit-oss/tantivy-py/pull/642 lands.
         """
-        # Use range query to work around u64 deletion bug
         self._writer.delete_documents_by_query(
             tantivy.Query.range_query(
                 self._backend._schema,
@@ -518,9 +521,13 @@ class TantivyBackend:
         search_ids + ORM filtering) and just need highlight data.
 
         Note: Each doc_id requires an individual index lookup because tantivy-py
-        does not expose a batch doc-address-by-ID API. This is acceptable for
+        does not yet expose a batch fast-field read API. This is acceptable for
         page-sized batches (typically 25 docs) but should not be called with
         thousands of IDs.
+
+        TODO: When https://github.com/quickwit-oss/tantivy-py/pull/641 lands,
+        the per-doc range_query lookups here can be replaced with a single
+        collect_u64_fast_field("id", doc_addresses) call.
 
         Args:
             query: The search query (used for snippet generation)
@@ -665,6 +672,9 @@ class TantivyBackend:
             if threshold is not None:
                 all_hits = [hit for hit in all_hits if hit[1] >= threshold]
 
+        # TODO: Replace with searcher.collect_u64_fast_field("id", addrs) once
+        # https://github.com/quickwit-oss/tantivy-py/pull/641 lands — eliminates
+        # one stored-doc fetch per result (~80% reduction in search_ids latency).
         return [searcher.doc(doc_addr).to_dict()["id"][0] for doc_addr, *_ in all_hits]
 
     def autocomplete(
@@ -812,6 +822,8 @@ class TantivyBackend:
         # Fetch one extra to account for excluding the original document
         results = searcher.search(final_query, limit=effective_limit + 1)
 
+        # TODO: Replace with collect_u64_fast_field("id", addrs) once
+        # https://github.com/quickwit-oss/tantivy-py/pull/641 lands.
         ids = []
         for _score, doc_address in results.hits:
             result_doc_id = searcher.doc(doc_address).to_dict()["id"][0]

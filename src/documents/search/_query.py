@@ -396,10 +396,17 @@ def build_permission_filter(
         Tantivy query that filters results to visible documents
 
     Implementation Notes:
-        - Uses range_query instead of term_query to work around unsigned integer
-          type detection bug in tantivy-py 0.25
-        - Uses boolean_query for "no owner" check since exists_query is not
-          available in tantivy-py 0.25.1 (available in master)
+        - Uses range_query instead of term_query for owner_id/viewer_id to work
+          around a tantivy-py bug where Python ints are inferred as i64, causing
+          term_query to return no hits on u64 fields.
+          TODO: Replace with term_query once
+          https://github.com/quickwit-oss/tantivy-py/pull/642 lands.
+
+        - Uses range_query(owner_id, 1, MAX_U64) as an "owner exists" check
+          because exists_query is not yet available in tantivy-py 0.25.
+          TODO: Replace with exists_query("owner_id") once that is exposed in
+          a tantivy-py release.
+
         - Uses disjunction_max_query to combine permission clauses with OR logic
     """
     owner_any = tantivy.Query.range_query(
