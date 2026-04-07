@@ -12,6 +12,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.models import PaperlessTask
+from documents.permissions import has_system_status_permission
 from paperless import version
 
 
@@ -92,6 +93,8 @@ class TestSystemStatus(APITestCase):
         self.client.force_login(normal_user)
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # test the permission helper function directly for good measure
+        self.assertFalse(has_system_status_permission(None))
 
     def test_system_status_with_system_status_permission(self) -> None:
         response = self.client.get(self.ENDPOINT)
