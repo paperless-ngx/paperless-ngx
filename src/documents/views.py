@@ -165,8 +165,8 @@ from documents.permissions import ViewDocumentsPermissions
 from documents.permissions import annotate_document_count_for_related_queryset
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_objects_for_user_owner_aware
+from documents.permissions import has_global_statistics_permission
 from documents.permissions import has_perms_owner_aware
-from documents.permissions import has_statistics_permission
 from documents.permissions import set_permissions_for_object
 from documents.plugins.date_parsing import get_date_parser
 from documents.schema import generate_object_with_permissions_schema
@@ -2886,7 +2886,7 @@ class SelectionDataView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         ids = serializer.validated_data.get("documents")
-        if not has_statistics_permission(request.user):
+        if not has_global_statistics_permission(request.user):
             permitted_documents = get_objects_for_user_owner_aware(
                 request.user,
                 "documents.view_document",
@@ -3267,7 +3267,7 @@ class StatisticsView(GenericAPIView):
 
     def get(self, request, format=None):
         user = request.user if request.user is not None else None
-        has_aggregate_access = has_statistics_permission(user)
+        has_aggregate_access = has_global_statistics_permission(user)
 
         documents = (
             Document.objects.all()
@@ -4260,7 +4260,9 @@ class SystemStatusView(PassUserMixin):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        if not (request.user.is_staff or has_statistics_permission(request.user)):
+        if not (
+            request.user.is_staff or has_global_statistics_permission(request.user)
+        ):
             return HttpResponseForbidden("Insufficient permissions")
 
         current_version = version.__full_version_str__
