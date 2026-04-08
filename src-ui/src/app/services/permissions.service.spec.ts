@@ -6,6 +6,11 @@ import {
   PermissionsService,
 } from './permissions.service'
 
+const VIEW_ONLY_PERMISSION_TYPES = new Set<PermissionType>([
+  PermissionType.GlobalStatistics,
+  PermissionType.SystemStatus,
+])
+
 describe('PermissionsService', () => {
   let permissionsService: PermissionsService
 
@@ -264,6 +269,8 @@ describe('PermissionsService', () => {
         'change_applicationconfiguration',
         'delete_applicationconfiguration',
         'view_applicationconfiguration',
+        'view_global_statistics',
+        'view_system_status',
       ],
       {
         username: 'testuser',
@@ -274,7 +281,10 @@ describe('PermissionsService', () => {
 
     Object.values(PermissionType).forEach((type) => {
       Object.values(PermissionAction).forEach((action) => {
-        expect(permissionsService.currentUserCan(action, type)).toBeTruthy()
+        expect(permissionsService.currentUserCan(action, type)).toBe(
+          !VIEW_ONLY_PERMISSION_TYPES.has(type) ||
+            action === PermissionAction.View
+        )
       })
     })
 

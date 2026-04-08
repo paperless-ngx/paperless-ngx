@@ -27,10 +27,13 @@ jobs:
           persist-credentials: false
       - name: Decide run mode
         id: force
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          if [[ "${EVENT_NAME}" == "workflow_dispatch" ]]; then
             echo "run_all=true" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event_name }}" == "push" && ( "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "dev" ) ]]; then
+          elif [[ "${EVENT_NAME}" == "push" && ( "${REF_NAME}" == "main" || "${REF_NAME}" == "dev" ) ]]; then
             echo "run_all=true" >> "$GITHUB_OUTPUT"
           else
             echo "run_all=false" >> "$GITHUB_OUTPUT"
@@ -38,15 +41,22 @@ jobs:
       - name: Set diff range
         id: range
         if: steps.force.outputs.run_all != 'true'
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          EVENT_CREATED: ${{ github.event.created }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          SHA: ${{ github.sha }}
         run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "base=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event.created }}" == "true" ]]; then
-            echo "base=${{ github.event.repository.default_branch }}" >> "$GITHUB_OUTPUT"
+          if [[ "${EVENT_NAME}" == "pull_request" ]]; then
+            echo "base=${PR_BASE_SHA}" >> "$GITHUB_OUTPUT"
+          elif [[ "${EVENT_CREATED}" == "true" ]]; then
+            echo "base=${DEFAULT_BRANCH}" >> "$GITHUB_OUTPUT"
           else
-            echo "base=${{ github.event.before }}" >> "$GITHUB_OUTPUT"
+            echo "base=${BEFORE_SHA}" >> "$GITHUB_OUTPUT"
           fi
-          echo "ref=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          echo "ref=${SHA}" >> "$GITHUB_OUTPUT"
       - name: Detect changes
         id: filter
         if: steps.force.outputs.run_all != 'true'
@@ -181,7 +191,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-    container: mcr.microsoft.com/playwright:v1.58.2-noble
+    container: mcr.microsoft.com/playwright:v1.59.0-noble
     env:
       PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
@@ -224,6 +234,7 @@ jobs:
     needs: [changes, unit-tests, e2e-tests]
     if: needs.changes.outputs.frontend_changed == 'true'
     runs-on: ubuntu-24.04
+    environment: bundle-analysis
     permissions:
       contents: read
     steps:
@@ -262,34 +273,41 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Check gate
+        env:
+          BUNDLE_ANALYSIS_RESULT: ${{ needs['bundle-analysis'].result }}
+          E2E_RESULT: ${{ needs['e2e-tests'].result }}
+          FRONTEND_CHANGED: ${{ needs.changes.outputs.frontend_changed }}
+          INSTALL_RESULT: ${{ needs['install-dependencies'].result }}
+          LINT_RESULT: ${{ needs.lint.result }}
+          UNIT_RESULT: ${{ needs['unit-tests'].result }}
         run: |
-          if [[ "${{ needs.changes.outputs.frontend_changed }}" != "true" ]]; then
+          if [[ "${FRONTEND_CHANGED}" != "true" ]]; then
             echo "No frontend-relevant changes detected."
             exit 0
           fi
 
-          if [[ "${{ needs['install-dependencies'].result }}" != "success" ]]; then
-            echo "::error::Frontend install job result: ${{ needs['install-dependencies'].result }}"
+          if [[ "${INSTALL_RESULT}" != "success" ]]; then
+            echo "::error::Frontend install job result: ${INSTALL_RESULT}"
             exit 1
           fi
 
-          if [[ "${{ needs.lint.result }}" != "success" ]]; then
-            echo "::error::Frontend lint job result: ${{ needs.lint.result }}"
+          if [[ "${LINT_RESULT}" != "success" ]]; then
+            echo "::error::Frontend lint job result: ${LINT_RESULT}"
             exit 1
           fi
 
-          if [[ "${{ needs['unit-tests'].result }}" != "success" ]]; then
-            echo "::error::Frontend unit-tests job result: ${{ needs['unit-tests'].result }}"
+          if [[ "${UNIT_RESULT}" != "success" ]]; then
+            echo "::error::Frontend unit-tests job result: ${UNIT_RESULT}"
             exit 1
           fi
 
-          if [[ "${{ needs['e2e-tests'].result }}" != "success" ]]; then
-            echo "::error::Frontend e2e-tests job result: ${{ needs['e2e-tests'].result }}"
+          if [[ "${E2E_RESULT}" != "success" ]]; then
+            echo "::error::Frontend e2e-tests job result: ${E2E_RESULT}"
             exit 1
           fi
 
-          if [[ "${{ needs['bundle-analysis'].result }}" != "success" ]]; then
-            echo "::error::Frontend bundle-analysis job result: ${{ needs['bundle-analysis'].result }}"
+          if [[ "${BUNDLE_ANALYSIS_RESULT}" != "success" ]]; then
+            echo "::error::Frontend bundle-analysis job result: ${BUNDLE_ANALYSIS_RESULT}"
             exit 1
           fi
 
