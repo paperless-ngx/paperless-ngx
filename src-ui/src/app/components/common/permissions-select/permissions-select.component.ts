@@ -258,7 +258,7 @@ export class PermissionsSelectComponent
     type: PermissionType,
     action: PermissionAction
   ): boolean {
-    // Global statistics and system status only support view permissions
+    // Global statistics and system status only support view
     if (
       type === PermissionType.GlobalStatistics ||
       type === PermissionType.SystemStatus
