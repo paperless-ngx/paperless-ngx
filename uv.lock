@@ -1016,15 +1016,15 @@ wheels = [
 
 [[package]]
 name = "django-guardian"
-version = "3.3.0"
+version = "3.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "typing-extensions", marker = "(python_full_version < '3.13' and sys_platform == 'darwin') or (python_full_version < '3.13' and sys_platform == 'linux')" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d5/eb/bbeb4efd10d6cca8993697f571f17574e9fa7a912cead3ab39ce1d3793cd/django_guardian-3.3.0.tar.gz", hash = "sha256:abf1487399212cffdce7b3c909182a26fbe7e89746007299a8cab99f3d5ff009", size = 107443, upload-time = "2026-02-24T19:43:28.819Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5f/9a/e332f886bc38dd8bb7b0cdf7305d8dcf6acc376459b87b1ce73697666d55/django_guardian-3.3.1.tar.gz", hash = "sha256:7a50eada72161e355a9dbf9fe0838855c0ec851dd9b39f4f16e2decb5f4c7988", size = 109557, upload-time = "2026-03-30T09:44:59.008Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7c/3c/6517c5e27c6f9c165f989a5884f8798d66d25ce86fe44bf8c19aa4120351/django_guardian-3.3.0-py3-none-any.whl", hash = "sha256:4dca4fce104c7306e41b947a57d1cd6be46d9982548bef194ac8a6ad61d83686", size = 144003, upload-time = "2026-02-24T19:43:27Z" },
+    { url = "https://files.pythonhosted.org/packages/4f/4f/f798f8a2cb2f84def1fd2bf38f497c45a2ebd093f6bdb1f349eb52faa466/django_guardian-3.3.1-py3-none-any.whl", hash = "sha256:2a3a4b94cdc7e8fc99b74eef163db69d17703dc397c3e9085c7231f2b2bcf431", size = 146125, upload-time = "2026-03-30T09:44:57.599Z" },
 ]
 
 [[package]]
