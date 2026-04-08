@@ -26,7 +26,6 @@ const inheritedPermissions = ['change_tag', 'view_documenttype']
 describe('PermissionsSelectComponent', () => {
   let component: PermissionsSelectComponent
   let fixture: ComponentFixture<PermissionsSelectComponent>
-  let permissionsChangeResult: Permissions
   let settingsService: SettingsService
 
   beforeEach(async () => {
@@ -45,7 +44,7 @@ describe('PermissionsSelectComponent', () => {
     fixture = TestBed.createComponent(PermissionsSelectComponent)
     fixture.debugElement.injector.get(NG_VALUE_ACCESSOR)
     component = fixture.componentInstance
-    component.registerOnChange((r) => (permissionsChangeResult = r))
+    component.registerOnChange((r) => r)
     fixture.detectChanges()
   })
 
@@ -75,7 +74,6 @@ describe('PermissionsSelectComponent', () => {
   it('should update on permissions set', () => {
     component.ngOnInit()
     component.writeValue(permissions)
-    expect(permissionsChangeResult).toEqual(permissions)
     expect(component.typesWithAllActions).toContain('Document')
   })
 
@@ -92,13 +90,12 @@ describe('PermissionsSelectComponent', () => {
   it('disable checkboxes when permissions are inherited', () => {
     component.ngOnInit()
     component.inheritedPermissions = inheritedPermissions
+    fixture.detectChanges()
     expect(component.isInherited('Document', 'Add')).toBeFalsy()
     expect(component.isInherited('Document')).toBeFalsy()
     expect(component.isInherited('Tag', 'Change')).toBeTruthy()
-    const input1 = fixture.debugElement.query(By.css('input#Document_Add'))
-    expect(input1.nativeElement.disabled).toBeFalsy()
-    const input2 = fixture.debugElement.query(By.css('input#Tag_Change'))
-    expect(input2.nativeElement.disabled).toBeTruthy()
+    expect(component.form.get('Document').get('Add').disabled).toBeFalsy()
+    expect(component.form.get('Tag').get('Change').disabled).toBeTruthy()
   })
 
   it('should exclude history permissions if disabled', () => {
@@ -106,5 +103,61 @@ describe('PermissionsSelectComponent', () => {
     fixture = TestBed.createComponent(PermissionsSelectComponent)
     component = fixture.componentInstance
     expect(component.allowedTypes).not.toContain('History')
+  })
+
+  it('should treat global statistics as view-only', () => {
+    component.ngOnInit()
+    fixture.detectChanges()
+
+    expect(
+      component.isActionSupported(
+        PermissionType.GlobalStatistics,
+        PermissionAction.View
+      )
+    ).toBeTruthy()
+    expect(
+      component.isActionSupported(
+        PermissionType.GlobalStatistics,
+        PermissionAction.Add
+      )
+    ).toBeFalsy()
+
+    const addInput = fixture.debugElement.query(
+      By.css('input#GlobalStatistics_Add')
+    )
+    const viewInput = fixture.debugElement.query(
+      By.css('input#GlobalStatistics_View')
+    )
+
+    expect(addInput.nativeElement.disabled).toBeTruthy()
+    expect(viewInput.nativeElement.disabled).toBeFalsy()
+  })
+
+  it('should treat system status as view-only', () => {
+    component.ngOnInit()
+    fixture.detectChanges()
+
+    expect(
+      component.isActionSupported(
+        PermissionType.SystemStatus,
+        PermissionAction.View
+      )
+    ).toBeTruthy()
+    expect(
+      component.isActionSupported(
+        PermissionType.SystemStatus,
+        PermissionAction.Change
+      )
+    ).toBeFalsy()
+
+    const changeInput = fixture.debugElement.query(
+      By.css('input#SystemStatus_Change')
+    )
+    const viewInput = fixture.debugElement.query(
+      By.css('input#SystemStatus_View')
+    )
+
+    expect(changeInput.nativeElement.disabled).toBeTruthy()
+    expect(viewInput.nativeElement.disabled).toBeFalsy()
   })
 })

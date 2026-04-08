@@ -29,7 +29,11 @@ import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
-import { PermissionsService } from 'src/app/services/permissions.service'
+import {
+  PermissionAction,
+  PermissionType,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { UserService } from 'src/app/services/rest/user.service'
@@ -328,7 +332,13 @@ describe('SettingsComponent', () => {
 
   it('should load system status on initialize, show errors if needed', () => {
     jest.spyOn(systemStatusService, 'get').mockReturnValue(of(status))
-    jest.spyOn(permissionsService, 'isAdmin').mockReturnValue(true)
+    jest
+      .spyOn(permissionsService, 'currentUserCan')
+      .mockImplementation(
+        (action, type) =>
+          action === PermissionAction.View &&
+          type === PermissionType.SystemStatus
+      )
     completeSetup()
     expect(component['systemStatus']).toEqual(status) // private
     expect(component.systemStatusHasErrors).toBeTruthy()
@@ -344,7 +354,13 @@ describe('SettingsComponent', () => {
   it('should open system status dialog', () => {
     const modalOpenSpy = jest.spyOn(modalService, 'open')
     jest.spyOn(systemStatusService, 'get').mockReturnValue(of(status))
-    jest.spyOn(permissionsService, 'isAdmin').mockReturnValue(true)
+    jest
+      .spyOn(permissionsService, 'currentUserCan')
+      .mockImplementation(
+        (action, type) =>
+          action === PermissionAction.View &&
+          type === PermissionType.SystemStatus
+      )
     completeSetup()
     component.showSystemStatus()
     expect(modalOpenSpy).toHaveBeenCalledWith(SystemStatusDialogComponent, {

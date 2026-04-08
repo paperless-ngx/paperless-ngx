@@ -429,7 +429,7 @@ export class SettingsComponent
       this.settingsForm.patchValue(currentFormValue)
     }
 
-    if (this.permissionsService.isAdmin()) {
+    if (this.canViewSystemStatus) {
       this.systemStatusService.get().subscribe((status) => {
         this.systemStatus = status
       })
@@ -645,6 +645,16 @@ export class SettingsComponent
     this.settingsForm
       .get('documentDetailsHiddenFields')
       .setValue(Array.from(hiddenFields))
+  }
+
+  public get canViewSystemStatus(): boolean {
+    return (
+      this.permissionsService.isAdmin() ||
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.SystemStatus
+      )
+    )
   }
 
   showSystemStatus() {

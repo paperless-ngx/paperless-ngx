@@ -341,6 +341,10 @@ class ApplicationConfiguration(AbstractSingletonModel):
 
     class Meta:
         verbose_name = _("paperless application settings")
+        permissions = [
+            ("view_global_statistics", "Can view global object counts"),
+            ("view_system_status", "Can view system status information"),
+        ]
 
     def __str__(self) -> str:  # pragma: no cover
         return "ApplicationConfiguration"
