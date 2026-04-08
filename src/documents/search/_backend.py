@@ -405,12 +405,17 @@ class TantivyBackend:
             doc.add_unsigned("tag_id", tag.pk)
             tag_names.append(tag.name)
 
-        # Notes — JSON for structured queries (notes.user:alice, notes.note:text),
-        # companion text field for default full-text search.
+        # Notes — JSON for structured queries (notes.user:alice, notes.note:text).
+        # notes_text is a plain-text companion for snippet/highlight generation;
+        # tantivy's SnippetGenerator does not support JSON fields.
         num_notes = 0
+        note_texts: list[str] = []
         for note in document.notes.all():
             num_notes += 1
             doc.add_json("notes", {"note": note.note, "user": note.user.username})
+            note_texts.append(note.note)
+        if note_texts:
+            doc.add_text("notes_text", " ".join(note_texts))
 
         # Custom fields — JSON for structured queries (custom_fields.name:x, custom_fields.value:y),
         # companion text field for default full-text search.
@@ -545,6 +550,22 @@ class TantivyBackend:
         self._ensure_open()
         user_query = self._parse_query(query, search_mode)
 
+        # For notes_text snippet generation, we need a query that targets the
+        # notes_text field directly. user_query may contain JSON-field terms
+        # (e.g. notes.note:urgent) that the SnippetGenerator cannot resolve
+        # against a text field. Strip field:value prefixes so bare terms like
+        # "urgent" are re-parsed against notes_text, producing highlights even
+        # when the original query used structured syntax.
+        bare_query = re.sub(r"\w[\w.]*:", "", query).strip()
+        try:
+            notes_text_query = (
+                self._index.parse_query(bare_query, ["notes_text"])
+                if bare_query
+                else user_query
+            )
+        except Exception:
+            notes_text_query = user_query
+
         searcher = self._index.searcher()
         snippet_generator = None
         notes_snippet_generator = None
@@ -585,21 +606,25 @@ class TantivyBackend:
                         "content",
                     )
 
-                content_snippet = snippet_generator.snippet_from_doc(actual_doc)
-                if content_snippet:
-                    highlights["content"] = str(content_snippet)
+                content_html = snippet_generator.snippet_from_doc(actual_doc).to_html()
+                if content_html:
+                    highlights["content"] = content_html
 
-                if "notes" in doc_dict:
+                if "notes_text" in doc_dict:
+                    # Use notes_text (plain text) for snippet generation — tantivy's
+                    # SnippetGenerator does not support JSON fields.
                     if notes_snippet_generator is None:
                         notes_snippet_generator = tantivy.SnippetGenerator.create(
                             searcher,
-                            user_query,
+                            notes_text_query,
                             self._schema,
-                            "notes",
+                            "notes_text",
                         )
-                    notes_snippet = notes_snippet_generator.snippet_from_doc(actual_doc)
-                    if notes_snippet:
-                        highlights["notes"] = str(notes_snippet)
+                    notes_html = notes_snippet_generator.snippet_from_doc(
+                        actual_doc,
+                    ).to_html()
+                    if notes_html:
+                        highlights["notes"] = notes_html
 
             except Exception:  # pragma: no cover
                 logger.debug("Failed to generate highlights for doc %s", doc_id)

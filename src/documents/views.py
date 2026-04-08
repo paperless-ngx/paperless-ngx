@@ -2087,9 +2087,13 @@ class UnifiedSearchViewSet(DocumentViewSet):
             ordering_param = request.query_params.get("ordering", "")
             sort_reverse = ordering_param.startswith("-")
             sort_field_name = ordering_param.lstrip("-") or None
+            # "score" means relevance order — Tantivy handles it natively,
+            # so treat it as a Tantivy sort to preserve the ranked order through
+            # the ORM intersection step.
             use_tantivy_sort = (
                 sort_field_name in TantivyBackend.SORTABLE_FIELDS
                 or sort_field_name is None
+                or sort_field_name == "score"
             )
 
             try:
@@ -2144,10 +2148,15 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 search_mode = SearchMode.QUERY
                 query_str = request.query_params["query"]
 
+            # "score" is not a real Tantivy sort field — it means relevance order,
+            # which is Tantivy's default when no sort field is specified.
+            is_score_sort = sort_field_name == "score"
             all_ids = backend.search_ids(
                 query_str,
                 user=user,
-                sort_field=sort_field_name if use_tantivy_sort else None,
+                sort_field=(
+                    None if (not use_tantivy_sort or is_score_sort) else sort_field_name
+                ),
                 sort_reverse=sort_reverse,
                 search_mode=search_mode,
             )
@@ -2156,6 +2165,10 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 filtered_qs,
                 use_tantivy_sort=use_tantivy_sort,
             )
+            # Tantivy returns relevance results best-first (descending score).
+            # ordering=score (ascending, worst-first) requires a reversal.
+            if is_score_sort and not sort_reverse:
+                ordered_ids = list(reversed(ordered_ids))
 
             page_offset = (page_num - 1) * page_size
             page_ids = ordered_ids[page_offset : page_offset + page_size]

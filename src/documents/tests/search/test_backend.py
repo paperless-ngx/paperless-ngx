@@ -558,3 +558,85 @@ class TestFieldHandling:
         assert len(ids) == 1, (
             f"Expected 1, got {len(ids)}. Note content should be searchable via notes.note: prefix."
         )
+
+
+class TestHighlightHits:
+    """Test highlight_hits returns proper HTML strings, not raw Snippet objects."""
+
+    def test_highlights_content_returns_html_string(self, backend: TantivyBackend):
+        """highlight_hits must return HTML strings (from Snippet.to_html()), not Snippet objects."""
+        doc = Document.objects.create(
+            title="Highlight Test",
+            content="The quick brown fox jumps over the lazy dog",
+            checksum="HH1",
+            pk=90,
+        )
+        backend.add_or_update(doc)
+
+        hits = backend.highlight_hits("quick", [doc.pk])
+
+        assert len(hits) == 1
+        highlights = hits[0]["highlights"]
+        assert "content" in highlights
+        content_highlight = highlights["content"]
+        assert isinstance(content_highlight, str), (
+            f"Expected str, got {type(content_highlight)}: {content_highlight!r}"
+        )
+        # Tantivy wraps matched terms in <b> tags
+        assert "<b>" in content_highlight, (
+            f"Expected HTML with <b> tags, got: {content_highlight!r}"
+        )
+
+    def test_highlights_notes_returns_html_string(self, backend: TantivyBackend):
+        """Note highlights must be HTML strings via notes_text companion field.
+
+        The notes JSON field does not support tantivy SnippetGenerator; the
+        notes_text plain-text field is used instead.  We use the full-text
+        query "urgent" (not notes.note:) because notes_text IS in
+        DEFAULT_SEARCH_FIELDS via the normal search path… actually, we use
+        notes.note: prefix so the query targets notes content directly, but
+        the snippet is generated from notes_text which stores the same text.
+        """
+        user = User.objects.create_user("hl_noteuser")
+        doc = Document.objects.create(
+            title="Doc with matching note",
+            content="unrelated content",
+            checksum="HH2",
+            pk=91,
+        )
+        Note.objects.create(document=doc, note="urgent payment required", user=user)
+        backend.add_or_update(doc)
+
+        # Use notes.note: prefix so the document matches the query and the
+        # notes_text snippet generator can produce highlights.
+        hits = backend.highlight_hits("notes.note:urgent", [doc.pk])
+
+        assert len(hits) == 1
+        highlights = hits[0]["highlights"]
+        assert "notes" in highlights
+        note_highlight = highlights["notes"]
+        assert isinstance(note_highlight, str), (
+            f"Expected str, got {type(note_highlight)}: {note_highlight!r}"
+        )
+        assert "<b>" in note_highlight, (
+            f"Expected HTML with <b> tags, got: {note_highlight!r}"
+        )
+
+    def test_empty_doc_list_returns_empty_hits(self, backend: TantivyBackend):
+        """highlight_hits with no doc IDs must return an empty list."""
+        hits = backend.highlight_hits("anything", [])
+        assert hits == []
+
+    def test_no_highlights_when_no_match(self, backend: TantivyBackend):
+        """Documents not matching the query should not appear in results."""
+        doc = Document.objects.create(
+            title="Unrelated",
+            content="completely different text",
+            checksum="HH3",
+            pk=92,
+        )
+        backend.add_or_update(doc)
+
+        hits = backend.highlight_hits("quick", [doc.pk])
+
+        assert len(hits) == 0

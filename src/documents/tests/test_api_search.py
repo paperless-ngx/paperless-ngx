@@ -1503,6 +1503,43 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             [d2.id, d1.id, d3.id],
         )
 
+    def test_search_ordering_by_score(self) -> None:
+        """ordering=-score must return results in descending relevance order (best first)."""
+        backend = get_backend()
+        # doc_high has more occurrences of the search term → higher BM25 score
+        doc_low = Document.objects.create(
+            title="score sort low",
+            content="apple",
+            checksum="SCL1",
+        )
+        doc_high = Document.objects.create(
+            title="score sort high",
+            content="apple apple apple apple apple",
+            checksum="SCH1",
+        )
+        backend.add_or_update(doc_low)
+        backend.add_or_update(doc_high)
+
+        # -score = descending = best first (highest score)
+        response = self.client.get("/api/documents/?query=apple&ordering=-score")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        ids = [r["id"] for r in response.data["results"]]
+        self.assertEqual(
+            ids[0],
+            doc_high.id,
+            "Most relevant doc should be first for -score",
+        )
+
+        # score = ascending = worst first (lowest score)
+        response = self.client.get("/api/documents/?query=apple&ordering=score")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        ids = [r["id"] for r in response.data["results"]]
+        self.assertEqual(
+            ids[0],
+            doc_low.id,
+            "Least relevant doc should be first for +score",
+        )
+
     def test_search_with_tantivy_native_sort(self) -> None:
         """When ordering by a Tantivy-sortable field, results must be correctly sorted."""
         backend = get_backend()
