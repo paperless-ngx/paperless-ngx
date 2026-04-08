@@ -165,7 +165,9 @@ from documents.permissions import ViewDocumentsPermissions
 from documents.permissions import annotate_document_count_for_related_queryset
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_objects_for_user_owner_aware
+from documents.permissions import has_global_statistics_permission
 from documents.permissions import has_perms_owner_aware
+from documents.permissions import has_system_status_permission
 from documents.permissions import set_permissions_for_object
 from documents.plugins.date_parsing import get_date_parser
 from documents.schema import generate_object_with_permissions_schema
@@ -3265,10 +3267,11 @@ class StatisticsView(GenericAPIView):
 
     def get(self, request, format=None):
         user = request.user if request.user is not None else None
+        can_view_global_stats = has_global_statistics_permission(user) or user is None
 
         documents = (
             Document.objects.all()
-            if user is None
+            if can_view_global_stats
             else get_objects_for_user_owner_aware(
                 user,
                 "documents.view_document",
@@ -3277,12 +3280,12 @@ class StatisticsView(GenericAPIView):
         )
         tags = (
             Tag.objects.all()
-            if user is None
+            if can_view_global_stats
             else get_objects_for_user_owner_aware(user, "documents.view_tag", Tag)
         ).only("id", "is_inbox_tag")
         correspondent_count = (
             Correspondent.objects.count()
-            if user is None
+            if can_view_global_stats
             else get_objects_for_user_owner_aware(
                 user,
                 "documents.view_correspondent",
@@ -3291,7 +3294,7 @@ class StatisticsView(GenericAPIView):
         )
         document_type_count = (
             DocumentType.objects.count()
-            if user is None
+            if can_view_global_stats
             else get_objects_for_user_owner_aware(
                 user,
                 "documents.view_documenttype",
@@ -3300,7 +3303,7 @@ class StatisticsView(GenericAPIView):
         )
         storage_path_count = (
             StoragePath.objects.count()
-            if user is None
+            if can_view_global_stats
             else get_objects_for_user_owner_aware(
                 user,
                 "documents.view_storagepath",
@@ -4257,7 +4260,7 @@ class SystemStatusView(PassUserMixin):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        if not request.user.is_staff:
+        if not has_system_status_permission(request.user):
             return HttpResponseForbidden("Insufficient permissions")
 
         current_version = version.__full_version_str__

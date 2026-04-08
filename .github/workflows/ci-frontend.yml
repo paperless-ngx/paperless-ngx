@@ -273,34 +273,41 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Check gate
+        env:
+          BUNDLE_ANALYSIS_RESULT: ${{ needs['bundle-analysis'].result }}
+          E2E_RESULT: ${{ needs['e2e-tests'].result }}
+          FRONTEND_CHANGED: ${{ needs.changes.outputs.frontend_changed }}
+          INSTALL_RESULT: ${{ needs['install-dependencies'].result }}
+          LINT_RESULT: ${{ needs.lint.result }}
+          UNIT_RESULT: ${{ needs['unit-tests'].result }}
         run: |
-          if [[ "${{ needs.changes.outputs.frontend_changed }}" != "true" ]]; then
+          if [[ "${FRONTEND_CHANGED}" != "true" ]]; then
             echo "No frontend-relevant changes detected."
             exit 0
           fi
 
-          if [[ "${{ needs['install-dependencies'].result }}" != "success" ]]; then
-            echo "::error::Frontend install job result: ${{ needs['install-dependencies'].result }}"
+          if [[ "${INSTALL_RESULT}" != "success" ]]; then
+            echo "::error::Frontend install job result: ${INSTALL_RESULT}"
             exit 1
           fi
 
-          if [[ "${{ needs.lint.result }}" != "success" ]]; then
-            echo "::error::Frontend lint job result: ${{ needs.lint.result }}"
+          if [[ "${LINT_RESULT}" != "success" ]]; then
+            echo "::error::Frontend lint job result: ${LINT_RESULT}"
             exit 1
           fi
 
-          if [[ "${{ needs['unit-tests'].result }}" != "success" ]]; then
-            echo "::error::Frontend unit-tests job result: ${{ needs['unit-tests'].result }}"
+          if [[ "${UNIT_RESULT}" != "success" ]]; then
+            echo "::error::Frontend unit-tests job result: ${UNIT_RESULT}"
             exit 1
           fi
 
-          if [[ "${{ needs['e2e-tests'].result }}" != "success" ]]; then
-            echo "::error::Frontend e2e-tests job result: ${{ needs['e2e-tests'].result }}"
+          if [[ "${E2E_RESULT}" != "success" ]]; then
+            echo "::error::Frontend e2e-tests job result: ${E2E_RESULT}"
             exit 1
           fi
 
-          if [[ "${{ needs['bundle-analysis'].result }}" != "success" ]]; then
-            echo "::error::Frontend bundle-analysis job result: ${{ needs['bundle-analysis'].result }}"
+          if [[ "${BUNDLE_ANALYSIS_RESULT}" != "success" ]]; then
+            echo "::error::Frontend bundle-analysis job result: ${BUNDLE_ANALYSIS_RESULT}"
             exit 1
           fi
 

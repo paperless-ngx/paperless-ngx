@@ -5,12 +5,14 @@ from pathlib import Path
 from unittest import mock
 
 from celery import states
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.models import PaperlessTask
+from documents.permissions import has_system_status_permission
 from paperless import version
 
 
@@ -91,6 +93,22 @@ class TestSystemStatus(APITestCase):
         self.client.force_login(normal_user)
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # test the permission helper function directly for good measure
+        self.assertFalse(has_system_status_permission(None))
+
+    def test_system_status_with_system_status_permission(self) -> None:
+        response = self.client.get(self.ENDPOINT)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        user = User.objects.create_user(username="status_user")
+        user.user_permissions.add(
+            Permission.objects.get(codename="view_system_status"),
+        )
+
+        self.client.force_login(user)
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_system_status_with_bad_basic_auth_challenges(self) -> None:
         self.client.credentials(HTTP_AUTHORIZATION="Basic invalid")
