@@ -66,6 +66,7 @@ from paperless_mail.views import MailAccountViewSet
 from paperless_mail.views import MailRuleViewSet
 from paperless_mail.views import OauthCallbackView
 from paperless_mail.views import ProcessedMailViewSet
+import paperless_discord.urls as discord_urls
 
 api_router = DefaultRouter()
 api_router.register(r"correspondents", CorrespondentViewSet)
@@ -394,6 +395,8 @@ urlpatterns = [
             ],
         ),
     ),
+    # Discord OAuth
+    path("", include(discord_urls)),
     # Root of the Frontend
     re_path(
         r".*",

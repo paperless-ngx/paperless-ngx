@@ -129,6 +129,7 @@ INSTALLED_APPS = [
     "paperless",
     "documents.apps.DocumentsConfig",
     "paperless_mail.apps.PaperlessMailConfig",
+    "paperless_discord.apps.PaperlessDiscordConfig",
     "django.contrib.admin",
     "rest_framework",
     "rest_framework.authtoken",
@@ -308,7 +309,25 @@ AUTHENTICATION_BACKENDS = [
     "guardian.backends.ObjectPermissionBackend",
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
+    "paperless_discord.auth.DiscordAuthenticationBackend",
 ]
+
+###############################################################################
+# Discord OAuth                                                               #
+###############################################################################
+DISCORD_CLIENT_ID = os.getenv("DISCORD_CLIENT_ID")
+DISCORD_CLIENT_SECRET = os.getenv("DISCORD_CLIENT_SECRET")
+DISCORD_GUILD_ID = os.getenv("DISCORD_GUILD_ID")
+DISCORD_AUTH_URL = os.getenv("DISCORD_AUTH_URL", "https://discord.com/oauth2/authorize")
+DISCORD_API_URL = os.getenv("DISCORD_API_URL", "https://discord.com/api")
+DISCORD_REDIRECT_URI = os.getenv("DISCORD_REDIRECT_URI")
+DISCORD_RESPONSE_TYPE = os.getenv("DISCORD_RESPONSE_TYPE", "code")
+DISCORD_GRANT_TYPE = os.getenv("DISCORD_GRANT_TYPE", "authorization_code")
+DISCORD_SCOPES = get_list_from_env(
+    "DISCORD_SCOPES",
+    default=["identify", "email"],
+)
+DISCORD_ALLOWED_ROLES = get_list_from_env("DISCORD_ALLOWED_ROLES", default=[])
 
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv(
