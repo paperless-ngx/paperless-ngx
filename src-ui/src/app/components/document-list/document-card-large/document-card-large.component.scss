@@ -65,7 +65,9 @@
   }
 }
 
-span ::ng-deep .match {
+.card-text ::ng-deep .match,
+.card-text ::ng-deep b {
+  font-weight: normal;
   color: black;
   background-color: rgb(255, 211, 66);
 }
