@@ -166,6 +166,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs: build-arch
     if: needs.build-arch.outputs.should-push == 'true'
+    environment: image-publishing
     permissions:
       contents: read
       packages: write

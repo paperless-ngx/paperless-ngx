@@ -1,4 +1,4 @@
-import { KeyValuePipe } from '@angular/common'
+import { KeyValue, KeyValuePipe } from '@angular/common'
 import { Component, forwardRef, inject, Input, OnInit } from '@angular/core'
 import {
   AbstractControl,
@@ -58,6 +58,13 @@ export class PermissionsSelectComponent
 
   typesWithAllActions: Set<string> = new Set()
 
+  private readonly actionOrder = [
+    PermissionAction.Add,
+    PermissionAction.Change,
+    PermissionAction.Delete,
+    PermissionAction.View,
+  ]
+
   _inheritedPermissions: string[] = []
 
   @Input()
@@ -86,7 +93,7 @@ export class PermissionsSelectComponent
     }
     this.allowedTypes.forEach((type) => {
       const control = new FormGroup({})
-      for (const action in PermissionAction) {
+      for (const action of Object.keys(PermissionAction)) {
         control.addControl(action, new FormControl(null))
       }
       this.form.addControl(type, control)
@@ -106,18 +113,14 @@ export class PermissionsSelectComponent
         this.permissionsService.getPermissionKeys(permissionStr)
 
       if (actionKey && typeKey) {
-        if (this.form.get(typeKey)?.get(actionKey)) {
-          this.form
-            .get(typeKey)
-            .get(actionKey)
-            .patchValue(true, { emitEvent: false })
-        }
+        this.form
+          .get(typeKey)
+          ?.get(actionKey)
+          ?.patchValue(true, { emitEvent: false })
       }
     })
     this.allowedTypes.forEach((type) => {
-      if (
-        Object.values(this.form.get(type).value).every((val) => val == true)
-      ) {
+      if (this.typeHasAllActionsSelected(type)) {
         this.typesWithAllActions.add(type)
       } else {
         this.typesWithAllActions.delete(type)
@@ -149,12 +152,16 @@ export class PermissionsSelectComponent
     this.form.valueChanges.subscribe((newValue) => {
       let permissions = []
       Object.entries(newValue).forEach(([typeKey, typeValue]) => {
-        // e.g. [Document, { Add: true, View: true ... }]
         const selectedActions = Object.entries(typeValue).filter(
-          ([actionKey, actionValue]) => actionValue == true
+          ([actionKey, actionValue]) =>
+            actionValue &&
+            this.isActionSupported(
+              PermissionType[typeKey],
+              PermissionAction[actionKey]
+            )
         )
 
-        selectedActions.forEach(([actionKey, actionValue]) => {
+        selectedActions.forEach(([actionKey]) => {
           permissions.push(
             (PermissionType[typeKey] as string).replace(
               '%s',
@@ -163,7 +170,7 @@ export class PermissionsSelectComponent
           )
         })
 
-        if (selectedActions.length == Object.entries(typeValue).length) {
+        if (this.typeHasAllActionsSelected(typeKey)) {
           this.typesWithAllActions.add(typeKey)
         } else {
           this.typesWithAllActions.delete(typeKey)
@@ -174,19 +181,23 @@ export class PermissionsSelectComponent
         permissions.filter((p) => !this._inheritedPermissions.includes(p))
       )
     })
+
+    this.updateDisabledStates()
   }
 
   toggleAll(event, type) {
     const typeGroup = this.form.get(type)
-    if (event.target.checked) {
-      Object.keys(PermissionAction).forEach((action) => {
-        typeGroup.get(action).patchValue(true)
+    Object.keys(PermissionAction)
+      .filter((action) =>
+        this.isActionSupported(PermissionType[type], PermissionAction[action])
+      )
+      .forEach((action) => {
+        typeGroup.get(action).patchValue(event.target.checked)
       })
+
+    if (this.typeHasAllActionsSelected(type)) {
       this.typesWithAllActions.add(type)
     } else {
-      Object.keys(PermissionAction).forEach((action) => {
-        typeGroup.get(action).patchValue(false)
-      })
       this.typesWithAllActions.delete(type)
     }
   }
@@ -201,14 +212,21 @@ export class PermissionsSelectComponent
         )
       )
     } else {
-      return Object.values(PermissionAction).every((action) => {
-        return this._inheritedPermissions.includes(
-          this.permissionsService.getPermissionCode(
-            action as PermissionAction,
-            PermissionType[typeKey]
+      return Object.keys(PermissionAction)
+        .filter((action) =>
+          this.isActionSupported(
+            PermissionType[typeKey],
+            PermissionAction[action]
           )
         )
-      })
+        .every((action) => {
+          return this._inheritedPermissions.includes(
+            this.permissionsService.getPermissionCode(
+              PermissionAction[action],
+              PermissionType[typeKey]
+            )
+          )
+        })
     }
   }
 
@@ -216,12 +234,55 @@ export class PermissionsSelectComponent
     this.allowedTypes.forEach((type) => {
       const control = this.form.get(type)
       let actionControl: AbstractControl
-      for (const action in PermissionAction) {
+      for (const action of Object.keys(PermissionAction)) {
         actionControl = control.get(action)
+        if (
+          !this.isActionSupported(
+            PermissionType[type],
+            PermissionAction[action]
+          )
+        ) {
+          actionControl.patchValue(false, { emitEvent: false })
+          actionControl.disable({ emitEvent: false })
+          continue
+        }
+
         this.isInherited(type, action) || this.disabled
-          ? actionControl.disable()
-          : actionControl.enable()
+          ? actionControl.disable({ emitEvent: false })
+          : actionControl.enable({ emitEvent: false })
       }
     })
   }
+
+  public isActionSupported(
+    type: PermissionType,
+    action: PermissionAction
+  ): boolean {
+    // Global statistics and system status only support view
+    if (
+      type === PermissionType.GlobalStatistics ||
+      type === PermissionType.SystemStatus
+    ) {
+      return action === PermissionAction.View
+    }
+
+    return true
+  }
+
+  private typeHasAllActionsSelected(typeKey: string): boolean {
+    return Object.keys(PermissionAction)
+      .filter((action) =>
+        this.isActionSupported(
+          PermissionType[typeKey],
+          PermissionAction[action]
+        )
+      )
+      .every((action) => !!this.form.get(typeKey)?.get(action)?.value)
+  }
+
+  public sortActions = (
+    a: KeyValue<string, PermissionAction>,
+    b: KeyValue<string, PermissionAction>
+  ): number =>
+    this.actionOrder.indexOf(a.value) - this.actionOrder.indexOf(b.value)
 }

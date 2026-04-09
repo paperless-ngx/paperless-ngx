@@ -73,7 +73,7 @@ describe('LocalizedDateParserFormatter', () => {
 
   it('should handle years when current year % 100 < 50', () => {
     jest.useFakeTimers()
-    jest.setSystemTime(new Date(2026, 5, 15))
+    jest.setSystemTime(new Date(2026, 5, 15).getTime())
     let val = dateParserFormatter.parse('5/4/26')
     expect(val).toEqual({ day: 4, month: 5, year: 2026 })
 
@@ -87,7 +87,7 @@ describe('LocalizedDateParserFormatter', () => {
 
   it('should handle years when current year % 100 >= 50', () => {
     jest.useFakeTimers()
-    jest.setSystemTime(new Date(2076, 5, 15))
+    jest.setSystemTime(new Date(2076, 5, 15).getTime())
     const val = dateParserFormatter.parse('5/4/00')
     expect(val).toEqual({ day: 4, month: 5, year: 2100 })
     jest.useRealTimers()
