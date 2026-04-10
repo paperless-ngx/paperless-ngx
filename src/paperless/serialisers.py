@@ -1,4 +1,5 @@
 import logging
+from io import BytesIO
 
 import magic
 from allauth.mfa.adapter import get_adapter as get_mfa_adapter
@@ -11,13 +12,16 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.files.uploadedfile import UploadedFile
+from PIL import Image
 from rest_framework import serializers
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 
 from paperless.models import ApplicationConfiguration
 from paperless.network import validate_outbound_http_url
 from paperless.validators import reject_dangerous_svg
+from paperless.validators import validate_raster_image
 from paperless_mail.serialisers import ObfuscatedPasswordField
 
 logger = logging.getLogger("paperless.settings")
@@ -233,9 +237,39 @@ class ApplicationConfigurationSerializer(serializers.ModelSerializer):
             instance.app_logo.delete()
         return super().update(instance, validated_data)
 
+    def _sanitize_raster_image(self, file: UploadedFile) -> UploadedFile:
+        try:
+            data = BytesIO()
+            image = Image.open(file)
+            image.save(data, format=image.format)
+            data.seek(0)
+
+            return InMemoryUploadedFile(
+                file=data,
+                field_name=file.field_name,
+                name=file.name,
+                content_type=file.content_type,
+                size=data.getbuffer().nbytes,
+                charset=getattr(file, "charset", None),
+            )
+        finally:
+            image.close()
+
     def validate_app_logo(self, file: UploadedFile):
-        if file and magic.from_buffer(file.read(2048), mime=True) == "image/svg+xml":
+        if not file:
+            return file
+
+        mime_type = magic.from_buffer(file.read(2048), mime=True)
+
+        if mime_type == "image/svg+xml":
             reject_dangerous_svg(file)
+            return file
+
+        validate_raster_image(file)
+
+        if mime_type in {"image/jpeg", "image/png"}:
+            file = self._sanitize_raster_image(file)
+
         return file
 
     def validate_llm_endpoint(self, value: str | None) -> str | None:

@@ -6,6 +6,8 @@ from unittest.mock import patch
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
+from PIL import Image
+from PIL.PngImagePlugin import PngInfo
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -200,6 +202,125 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
             },
         )
         self.assertFalse(Path(old_logo.path).exists())
+
+    def test_api_strips_exif_data_from_uploaded_logo(self) -> None:
+        """
+        GIVEN:
+            - A JPEG logo upload containing EXIF metadata
+        WHEN:
+            - Uploaded via PATCH to app config
+        THEN:
+            - Stored logo image has EXIF metadata removed
+        """
+        image = Image.new("RGB", (12, 12), "blue")
+        exif = Image.Exif()
+        exif[315] = "Paperless Test Author"
+
+        logo = BytesIO()
+        image.save(logo, format="JPEG", exif=exif)
+        logo.seek(0)
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            {
+                "app_logo": SimpleUploadedFile(
+                    name="logo-with-exif.jpg",
+                    content=logo.getvalue(),
+                    content_type="image/jpeg",
+                ),
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        config = ApplicationConfiguration.objects.first()
+        with Image.open(config.app_logo.path) as stored_logo:
+            stored_exif = stored_logo.getexif()
+
+        self.assertEqual(len(stored_exif), 0)
+
+    def test_api_strips_png_metadata_from_uploaded_logo(self) -> None:
+        """
+        GIVEN:
+            - A PNG logo upload containing text metadata
+        WHEN:
+            - Uploaded via PATCH to app config
+        THEN:
+            - Stored logo image has metadata removed
+        """
+        image = Image.new("RGB", (12, 12), "green")
+        pnginfo = PngInfo()
+        pnginfo.add_text("Author", "Paperless Test Author")
+
+        logo = BytesIO()
+        image.save(logo, format="PNG", pnginfo=pnginfo)
+        logo.seek(0)
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            {
+                "app_logo": SimpleUploadedFile(
+                    name="logo-with-metadata.png",
+                    content=logo.getvalue(),
+                    content_type="image/png",
+                ),
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        config = ApplicationConfiguration.objects.first()
+        with Image.open(config.app_logo.path) as stored_logo:
+            stored_text = stored_logo.text
+
+        self.assertEqual(stored_text, {})
+
+    def test_api_accepts_valid_gif_logo(self) -> None:
+        """
+        GIVEN:
+            - A valid GIF logo upload
+        WHEN:
+            - Uploaded via PATCH to app config
+        THEN:
+            - Upload succeeds
+        """
+        image = Image.new("RGB", (12, 12), "red")
+
+        logo = BytesIO()
+        image.save(logo, format="GIF", comment=b"Paperless Test Comment")
+        logo.seek(0)
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            {
+                "app_logo": SimpleUploadedFile(
+                    name="logo.gif",
+                    content=logo.getvalue(),
+                    content_type="image/gif",
+                ),
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_api_rejects_invalid_raster_logo(self) -> None:
+        """
+        GIVEN:
+            - A file named as a JPEG but containing non-image payload data
+        WHEN:
+            - Uploaded via PATCH to app config
+        THEN:
+            - Upload is rejected with 400
+        """
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            {
+                "app_logo": SimpleUploadedFile(
+                    name="not-an-image.jpg",
+                    content=b"<script>alert('xss')</script>",
+                    content_type="image/jpeg",
+                ),
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("invalid logo image", str(response.data).lower())
 
     def test_api_rejects_malicious_svg_logo(self) -> None:
         """
