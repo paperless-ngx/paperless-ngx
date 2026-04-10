@@ -281,7 +281,7 @@ def validate_raster_image(file: UploadedFile) -> None:
                 raise ValidationError(
                     "Uploaded logo exceeds the maximum allowed image size.",
                 )
-            if image.format is None:
+            if image.format is None:  # pragma: no cover
                 raise ValidationError("Invalid logo image.")
     except (OSError, Image.DecompressionBombError) as e:
         raise ValidationError("Invalid logo image.") from e
