@@ -264,7 +264,7 @@ def validate_raster_image(file: UploadedFile) -> None:
     """
     Validates that the uploaded file is a valid raster image (JPEG, PNG, etc.)
     and does not exceed maximum pixel limits.
-    Raises ValidationError if the image is invalid or potentially dangerous.
+    Raises ValidationError if the image is invalid or exceeds the allowed size.
     """
 
     file.seek(0)
