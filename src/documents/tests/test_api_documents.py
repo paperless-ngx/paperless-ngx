@@ -18,6 +18,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.core import mail
 from django.core.cache import cache
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import DataError
 from django.test import override_settings
 from django.utils import timezone
@@ -1376,6 +1377,79 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.correspondent_id)
         self.assertIsNone(overrides.document_type_id)
         self.assertIsNone(overrides.tag_ids)
+
+    def test_upload_with_path_traversal_filename_is_reduced_to_basename(self) -> None:
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
+
+        payload = SimpleUploadedFile(
+            "../../outside.pdf",
+            (Path(__file__).parent / "samples" / "simple.pdf").read_bytes(),
+            content_type="application/pdf",
+        )
+
+        response = self.client.post(
+            "/api/documents/post_document/",
+            {"document": payload},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.consume_file_mock.assert_called_once()
+
+        input_doc, overrides = self.get_last_consume_delay_call_args()
+
+        self.assertEqual(input_doc.original_file.name, "outside.pdf")
+        self.assertEqual(overrides.filename, "outside.pdf")
+        self.assertNotIn("..", input_doc.original_file.name)
+        self.assertNotIn("..", overrides.filename)
+        self.assertTrue(
+            input_doc.original_file.resolve(strict=False).is_relative_to(
+                Path(settings.SCRATCH_DIR).resolve(strict=False),
+            ),
+        )
+
+    def test_upload_with_path_traversal_content_disposition_filename_is_reduced_to_basename(
+        self,
+    ) -> None:
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
+
+        pdf_bytes = (Path(__file__).parent / "samples" / "simple.pdf").read_bytes()
+        boundary = "paperless-boundary"
+        payload = (
+            (
+                f"--{boundary}\r\n"
+                'Content-Disposition: form-data; name="document"; '
+                'filename="../../outside.pdf"\r\n'
+                "Content-Type: application/pdf\r\n\r\n"
+            ).encode()
+            + pdf_bytes
+            + f"\r\n--{boundary}--\r\n".encode()
+        )
+
+        response = self.client.generic(
+            "POST",
+            "/api/documents/post_document/",
+            payload,
+            content_type=f"multipart/form-data; boundary={boundary}",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.consume_file_mock.assert_called_once()
+
+        input_doc, overrides = self.get_last_consume_delay_call_args()
+
+        self.assertEqual(input_doc.original_file.name, "outside.pdf")
+        self.assertEqual(overrides.filename, "outside.pdf")
+        self.assertNotIn("..", input_doc.original_file.name)
+        self.assertNotIn("..", overrides.filename)
+        self.assertTrue(
+            input_doc.original_file.resolve(strict=False).is_relative_to(
+                Path(settings.SCRATCH_DIR).resolve(strict=False),
+            ),
+        )
 
     def test_document_filters_use_latest_version_content(self) -> None:
         root = Document.objects.create(
