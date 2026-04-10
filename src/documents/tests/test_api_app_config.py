@@ -322,6 +322,37 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("invalid logo image", str(response.data).lower())
 
+    @override_settings(MAX_IMAGE_PIXELS=100)
+    def test_api_rejects_logo_exceeding_max_image_pixels(self) -> None:
+        """
+        GIVEN:
+            - A raster logo larger than the configured MAX_IMAGE_PIXELS limit
+        WHEN:
+            - Uploaded via PATCH to app config
+        THEN:
+            - Upload is rejected with 400
+        """
+        image = Image.new("RGB", (12, 12), "purple")
+        logo = BytesIO()
+        image.save(logo, format="PNG")
+        logo.seek(0)
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            {
+                "app_logo": SimpleUploadedFile(
+                    name="too-large.png",
+                    content=logo.getvalue(),
+                    content_type="image/png",
+                ),
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            "uploaded logo exceeds the maximum allowed image size",
+            str(response.data).lower(),
+        )
+
     def test_api_rejects_malicious_svg_logo(self) -> None:
         """
         GIVEN:
