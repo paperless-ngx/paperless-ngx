@@ -265,12 +265,11 @@ class ApplicationConfigurationSerializer(serializers.ModelSerializer):
 
             if mime_type == "image/svg+xml":
                 reject_dangerous_svg(file)
-                return file
+            else:
+                validate_raster_image(file)
 
-            validate_raster_image(file)
-
-            if mime_type in {"image/jpeg", "image/png"}:
-                file = self._sanitize_raster_image(file)
+                if mime_type in {"image/jpeg", "image/png"}:
+                    file = self._sanitize_raster_image(file)
 
         return file
 
