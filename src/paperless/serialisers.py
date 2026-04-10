@@ -258,7 +258,7 @@ class ApplicationConfigurationSerializer(serializers.ModelSerializer):
     def validate_app_logo(self, file: UploadedFile):
         """
         Validates and sanitizes the uploaded app logo image. Model field already restricts to
-        jpg/png/gif/svg see src/paperless/models.py#L200
+        jpg/png/gif/svg.
         """
         if file:
             mime_type = magic.from_buffer(file.read(2048), mime=True)
