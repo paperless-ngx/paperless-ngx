@@ -703,8 +703,6 @@ class TestExportImport(
             - No files are written under SCRATCH_DIR during the export
               (the old workaround used a temp dir there)
         """
-        from django.conf import settings
-
         shutil.rmtree(Path(self.dirs.media_dir) / "documents")
         shutil.copytree(
             Path(__file__).parent / "samples" / "documents",

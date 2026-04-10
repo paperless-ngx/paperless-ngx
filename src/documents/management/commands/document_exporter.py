@@ -373,7 +373,7 @@ class Command(CryptMixin, PaperlessCommand):
 
                 self.dump()
 
-                if self.zip_export and self.zip_file is not None:
+                if self.zip_file is not None:
                     self.zip_file.close()
                     self.zip_file = None
                     self.zip_tmp_path.rename(self.zip_path)
@@ -792,31 +792,23 @@ class Command(CryptMixin, PaperlessCommand):
             return
 
         target = target.resolve()
+        json_str = json.dumps(
+            content,
+            cls=DjangoJSONEncoder,
+            indent=2,
+            ensure_ascii=False,
+        )
         perform_write = True
         if target in self.files_in_export_dir:
             self.files_in_export_dir.remove(target)
             if self.compare_json:
                 target_checksum = hashlib.blake2b(target.read_bytes()).hexdigest()
-                src_str = json.dumps(
-                    content,
-                    cls=DjangoJSONEncoder,
-                    indent=2,
-                    ensure_ascii=False,
-                )
-                src_checksum = hashlib.blake2b(src_str.encode("utf-8")).hexdigest()
+                src_checksum = hashlib.blake2b(json_str.encode("utf-8")).hexdigest()
                 if src_checksum == target_checksum:
                     perform_write = False
 
         if perform_write:
-            target.write_text(
-                json.dumps(
-                    content,
-                    cls=DjangoJSONEncoder,
-                    indent=2,
-                    ensure_ascii=False,
-                ),
-                encoding="utf-8",
-            )
+            target.write_text(json_str, encoding="utf-8")
 
     def check_and_copy(
         self,
