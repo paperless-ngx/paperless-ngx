@@ -313,7 +313,6 @@ class ConsumerPlugin(
             run_subprocess(
                 [
                     settings.PRE_CONSUME_SCRIPT,
-                    original_file_path,
                 ],
                 script_env,
                 self.log,
@@ -383,14 +382,6 @@ class ConsumerPlugin(
             run_subprocess(
                 [
                     settings.POST_CONSUME_SCRIPT,
-                    str(document.pk),
-                    document.get_public_filename(),
-                    os.path.normpath(document.source_path),
-                    os.path.normpath(document.thumbnail_path),
-                    reverse("document-download", kwargs={"pk": document.pk}),
-                    reverse("document-thumb", kwargs={"pk": document.pk}),
-                    str(document.correspondent),
-                    str(",".join(document.tags.all().values_list("name", flat=True))),
                 ],
                 script_env,
                 self.log,
