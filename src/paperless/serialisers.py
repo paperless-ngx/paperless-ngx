@@ -74,7 +74,7 @@ class PaperlessAuthTokenSerializer(AuthTokenSerializer):
         return attrs
 
 
-class UserSerializer(PasswordValidationMixin, serializers.ModelSerializer):
+class UserSerializer(PasswordValidationMixin, serializers.ModelSerializer[User]):
     password = ObfuscatedPasswordField(required=False)
     user_permissions = serializers.SlugRelatedField(
         many=True,
@@ -142,7 +142,7 @@ class UserSerializer(PasswordValidationMixin, serializers.ModelSerializer):
         return user
 
 
-class GroupSerializer(serializers.ModelSerializer):
+class GroupSerializer(serializers.ModelSerializer[Group]):
     permissions = serializers.SlugRelatedField(
         many=True,
         queryset=Permission.objects.exclude(content_type__app_label="admin"),
@@ -158,7 +158,7 @@ class GroupSerializer(serializers.ModelSerializer):
         )
 
 
-class SocialAccountSerializer(serializers.ModelSerializer):
+class SocialAccountSerializer(serializers.ModelSerializer[SocialAccount]):
     name = serializers.SerializerMethodField()
 
     class Meta:
@@ -176,7 +176,7 @@ class SocialAccountSerializer(serializers.ModelSerializer):
             return "Unknown App"
 
 
-class ProfileSerializer(PasswordValidationMixin, serializers.ModelSerializer):
+class ProfileSerializer(PasswordValidationMixin, serializers.ModelSerializer[User]):
     email = serializers.EmailField(allow_blank=True, required=False)
     password = ObfuscatedPasswordField(required=False, allow_null=False)
     auth_token = serializers.SlugRelatedField(read_only=True, slug_field="key")
@@ -209,7 +209,9 @@ class ProfileSerializer(PasswordValidationMixin, serializers.ModelSerializer):
         )
 
 
-class ApplicationConfigurationSerializer(serializers.ModelSerializer):
+class ApplicationConfigurationSerializer(
+    serializers.ModelSerializer[ApplicationConfiguration],
+):
     user_args = serializers.JSONField(binary=True, allow_null=True)
     barcode_tag_mapping = serializers.JSONField(binary=True, allow_null=True)
     llm_api_key = ObfuscatedPasswordField(

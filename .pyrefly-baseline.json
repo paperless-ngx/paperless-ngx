@@ -2245,9 +2245,9 @@
       "severity": "error"
     },
     {
-      "line": 2894,
+      "line": 2896,
       "column": 11,
-      "stop_line": 2894,
+      "stop_line": 2896,
       "stop_column": 15,
       "path": "src/documents/serialisers.py",
       "code": -2,
@@ -2257,9 +2257,9 @@
       "severity": "error"
     },
     {
-      "line": 2917,
+      "line": 2919,
       "column": 11,
-      "stop_line": 2917,
+      "stop_line": 2919,
       "stop_column": 15,
       "path": "src/documents/serialisers.py",
       "code": -2,
@@ -2269,9 +2269,9 @@
       "severity": "error"
     },
     {
-      "line": 3036,
+      "line": 3038,
       "column": 11,
-      "stop_line": 3036,
+      "stop_line": 3038,
       "stop_column": 15,
       "path": "src/documents/serialisers.py",
       "code": -2,
@@ -2281,9 +2281,9 @@
       "severity": "error"
     },
     {
-      "line": 3218,
+      "line": 3220,
       "column": 16,
-      "stop_line": 3218,
+      "stop_line": 3220,
       "stop_column": 33,
       "path": "src/documents/serialisers.py",
       "code": -2,
@@ -2293,9 +2293,9 @@
       "severity": "error"
     },
     {
-      "line": 3222,
+      "line": 3224,
       "column": 16,
-      "stop_line": 3222,
+      "stop_line": 3224,
       "stop_column": 32,
       "path": "src/documents/serialisers.py",
       "code": -2,
@@ -2305,9 +2305,9 @@
       "severity": "error"
     },
     {
-      "line": 3237,
+      "line": 3239,
       "column": 52,
-      "stop_line": 3237,
+      "stop_line": 3239,
       "stop_column": 60,
       "path": "src/documents/serialisers.py",
       "code": -2,
@@ -2317,9 +2317,9 @@
       "severity": "error"
     },
     {
-      "line": 3237,
+      "line": 3239,
       "column": 62,
-      "stop_line": 3237,
+      "stop_line": 3239,
       "stop_column": 69,
       "path": "src/documents/serialisers.py",
       "code": -2,
@@ -12565,9 +12565,9 @@
       "severity": "error"
     },
     {
-      "line": 220,
+      "line": 222,
       "column": 9,
-      "stop_line": 220,
+      "stop_line": 222,
       "stop_column": 23,
       "path": "src/paperless/serialisers.py",
       "code": -2,
@@ -12577,9 +12577,9 @@
       "severity": "error"
     },
     {
-      "line": 249,
+      "line": 251,
       "column": 28,
-      "stop_line": 249,
+      "stop_line": 251,
       "stop_column": 43,
       "path": "src/paperless/serialisers.py",
       "code": -2,
@@ -12589,9 +12589,9 @@
       "severity": "error"
     },
     {
-      "line": 292,
+      "line": 294,
       "column": 11,
-      "stop_line": 292,
+      "stop_line": 294,
       "stop_column": 15,
       "path": "src/paperless/serialisers.py",
       "code": -2,
