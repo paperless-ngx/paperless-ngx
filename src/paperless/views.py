@@ -116,7 +116,7 @@ class FaviconView(View):
 
 
 class ManifestView(View):
-    def get(self, request, *args, **kwargs):
+    def get(self, _request, *_args, **_kwargs):
         from paperless.config import GeneralConfig
 
         general_config = GeneralConfig()
