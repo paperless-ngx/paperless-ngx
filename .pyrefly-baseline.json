@@ -11048,8 +11048,8 @@
       "path": "src/documents/views.py",
       "code": -2,
       "name": "bad-argument-type",
-      "description": "Argument `TantivyRelevanceList` is not assignable to parameter `queryset` with type `QuerySet[Unknown, @_]` in function `rest_framework.generics.GenericAPIView.paginate_queryset`",
-      "concise_description": "Argument `TantivyRelevanceList` is not assignable to parameter `queryset` with type `QuerySet[Unknown, @_]` in function `rest_framework.generics.GenericAPIView.paginate_queryset`",
+      "description": "Argument `TantivyRelevanceList` is not assignable to parameter `queryset` with type `QuerySet[Any, @_]` in function `rest_framework.generics.GenericAPIView.paginate_queryset`",
+      "concise_description": "Argument `TantivyRelevanceList` is not assignable to parameter `queryset` with type `QuerySet[Any, @_]` in function `rest_framework.generics.GenericAPIView.paginate_queryset`",
       "severity": "error"
     },
     {
@@ -16009,9 +16009,9 @@
       "severity": "error"
     },
     {
-      "line": 267,
+      "line": 268,
       "column": 28,
-      "stop_line": 267,
+      "stop_line": 268,
       "stop_column": 34,
       "path": "src/paperless_mail/views.py",
       "code": -2,
@@ -16021,9 +16021,9 @@
       "severity": "error"
     },
     {
-      "line": 273,
+      "line": 274,
       "column": 29,
-      "stop_line": 273,
+      "stop_line": 274,
       "stop_column": 40,
       "path": "src/paperless_mail/views.py",
       "code": -2,
@@ -16033,9 +16033,9 @@
       "severity": "error"
     },
     {
-      "line": 277,
+      "line": 278,
       "column": 26,
-      "stop_line": 277,
+      "stop_line": 278,
       "stop_column": 34,
       "path": "src/paperless_mail/views.py",
       "code": -2,
