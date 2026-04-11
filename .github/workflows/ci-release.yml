@@ -88,6 +88,7 @@ jobs:
           uv export --quiet --no-dev --all-extras --format requirements-txt --output-file requirements.txt
       - name: Compile messages
         env:
+          PAPERLESS_SECRET_KEY: "ci-release-not-a-real-secret"
           PYTHON_VERSION: ${{ steps.setup-python.outputs.python-version }}
         run: |
           cd src/
@@ -96,6 +97,7 @@ jobs:
             manage.py compilemessages
       - name: Collect static files
         env:
+          PAPERLESS_SECRET_KEY: "ci-release-not-a-real-secret"
           PYTHON_VERSION: ${{ steps.setup-python.outputs.python-version }}
         run: |
           cd src/
