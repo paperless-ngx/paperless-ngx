@@ -64,9 +64,10 @@ def test_manifest_view_custom_title_from_settings(
 def test_manifest_view_custom_title_from_db(
     client: Client,
 ) -> None:
-    config = ApplicationConfiguration.objects.first()
-    config.app_title = "DB Custom Title"
-    config.save()
+    ApplicationConfiguration.objects.update_or_create(
+        pk=1,
+        defaults={"app_title": "DB Custom Title"},
+    )
     response = client.get("/manifest.webmanifest")
     data = json.loads(response.content)
     assert data["name"] == "DB Custom Title"
