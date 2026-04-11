@@ -3,7 +3,7 @@ Temporary profiling utilities for comparing implementations.
 
 Usage in a management command or shell::
 
-    from documents.profiling import profile_block
+    from profiling import profile_block, profile_cpu, measure_memory
 
     with profile_block("new check_sanity"):
         messages = check_sanity()
@@ -17,13 +17,11 @@ Drop this file when done.
 from __future__ import annotations
 
 import tracemalloc
+from collections.abc import Callable  # noqa: TC003
+from collections.abc import Generator  # noqa: TC003
 from contextlib import contextmanager
 from time import perf_counter
-from typing import TYPE_CHECKING
 from typing import Any
-
-if TYPE_CHECKING:
-    from collections.abc import Generator
 
 from django.db import connection
 from django.db import reset_queries
@@ -73,7 +71,7 @@ def profile_block(label: str = "block") -> Generator[None, None, None]:
 
 
 def profile_cpu(
-    fn,
+    fn: Callable[[], Any],
     *,
     label: str,
     top: int = 30,
@@ -114,7 +112,7 @@ def profile_cpu(
     return result, elapsed
 
 
-def measure_memory(fn, *, label: str) -> tuple[Any, float, float]:
+def measure_memory(fn: Callable[[], Any], *, label: str) -> tuple[Any, float, float]:
     """Run *fn()* under tracemalloc, print allocation report.
 
     Args:
