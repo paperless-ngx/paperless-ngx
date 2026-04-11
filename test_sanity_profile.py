@@ -76,7 +76,7 @@ def sanity_corpus(tmp_path_factory, module_db):
     docs = []
     for i in range(NUM_DOCS):
         content = f"document content for doc {i}"
-        checksum = hashlib.md5(content.encode(), usedforsecurity=False).hexdigest()
+        checksum = hashlib.sha256(content.encode()).hexdigest()
 
         orig_filename = f"{i:07d}.pdf"
         arch_filename = f"{i:07d}.pdf"
