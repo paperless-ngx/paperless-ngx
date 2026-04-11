@@ -57,6 +57,7 @@ from paperless.views import DisconnectSocialAccountView
 from paperless.views import FaviconView
 from paperless.views import GenerateAuthTokenView
 from paperless.views import GroupViewSet
+from paperless.views import ManifestView
 from paperless.views import PaperlessObtainAuthTokenView
 from paperless.views import ProfileView
 from paperless.views import SocialAccountProvidersView
@@ -277,6 +278,11 @@ urlpatterns = [
     ),
     re_path(r"share/(?P<slug>\w+)/?$", SharedLinkView.as_view()),
     re_path(r"^favicon.ico$", FaviconView.as_view(), name="favicon"),
+    re_path(
+        r"^(?:.+/)?manifest.webmanifest$",
+        ManifestView.as_view(),
+        name="manifest",
+    ),
     re_path(r"admin/", admin.site.urls),
     re_path(
         r"^fetch/",

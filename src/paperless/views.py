@@ -18,6 +18,7 @@ from django.http import FileResponse
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseNotFound
+from django.http import JsonResponse
 from django.views.generic import View
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
@@ -112,6 +113,32 @@ class FaviconView(View):
             return FileResponse(path.open("rb"), content_type="image/x-icon")
         except FileNotFoundError:
             return HttpResponseNotFound("favicon.ico not found")
+
+
+class ManifestView(View):
+    def get(self, request, *args, **kwargs):
+        from paperless.config import GeneralConfig
+
+        general_config = GeneralConfig()
+
+        app_title = settings.APP_TITLE
+        if general_config.app_title is not None and len(general_config.app_title) > 0:
+            app_title = general_config.app_title
+        app_title = app_title or "Paperless-ngx"
+
+        manifest = {
+            "background_color": "white",
+            "description": "A supercharged version of paperless: scan, index and archive all your physical documents",
+            "display": "standalone",
+            "icons": [
+                {"src": "favicon.ico", "sizes": "256x256"},
+                {"src": "assets/logo-notext.svg", "sizes": "any"},
+            ],
+            "name": app_title,
+            "short_name": app_title,
+            "start_url": "/",
+        }
+        return JsonResponse(manifest, content_type="application/manifest+json")
 
 
 class UserViewSet(ModelViewSet):
