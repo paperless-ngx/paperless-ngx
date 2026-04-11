@@ -3,7 +3,7 @@
 cProfile + tracemalloc classifier profiling test.
 
 Run with:
-    uv run pytest src/documents/tests/test_classifier_profile.py \
+    uv run pytest ../test_classifier_profile.py \
         -m profiling --override-ini="addopts=" -s -v
 
 Corpus: 5 000 documents, 40 correspondents (25 AUTO), 25 doc types (15 AUTO),

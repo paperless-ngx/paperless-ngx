@@ -3,7 +3,7 @@
 cProfile-based search pipeline profiling with a 20k-document dataset.
 
 Run with:
-    uv run pytest src/documents/tests/search/test_backend_profile.py \
+    uv run pytest ../test_backend_profile.py \
         -m profiling --override-ini="addopts=" -s -v
 
 Each scenario prints:
