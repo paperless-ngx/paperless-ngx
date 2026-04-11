@@ -10717,9 +10717,9 @@
       "severity": "error"
     },
     {
-      "line": 484,
+      "line": 487,
       "column": 29,
-      "stop_line": 484,
+      "stop_line": 487,
       "stop_column": 51,
       "path": "src/documents/views.py",
       "code": -2,
@@ -10729,9 +10729,9 @@
       "severity": "error"
     },
     {
-      "line": 490,
+      "line": 493,
       "column": 25,
-      "stop_line": 490,
+      "stop_line": 493,
       "stop_column": 47,
       "path": "src/documents/views.py",
       "code": -2,
@@ -10741,39 +10741,15 @@
       "severity": "error"
     },
     {
-      "line": 554,
+      "line": 557,
       "column": 13,
-      "stop_line": 554,
+      "stop_line": 557,
       "stop_column": 65,
       "path": "src/documents/views.py",
       "code": -2,
       "name": "missing-attribute",
       "description": "Object of class `NoneType` has no attribute `append`",
       "concise_description": "Object of class `NoneType` has no attribute `append`",
-      "severity": "error"
-    },
-    {
-      "line": 881,
-      "column": 48,
-      "stop_line": 881,
-      "stop_column": 64,
-      "path": "src/documents/views.py",
-      "code": -2,
-      "name": "missing-attribute",
-      "description": "Object of class `Correspondent` has no attribute `document_count`",
-      "concise_description": "Object of class `Correspondent` has no attribute `document_count`",
-      "severity": "error"
-    },
-    {
-      "line": 884,
-      "column": 48,
-      "stop_line": 884,
-      "stop_column": 64,
-      "path": "src/documents/views.py",
-      "code": -2,
-      "name": "missing-attribute",
-      "description": "Object of class `Tag` has no attribute `document_count`",
-      "concise_description": "Object of class `Tag` has no attribute `document_count`",
       "severity": "error"
     },
     {
@@ -10784,8 +10760,8 @@
       "path": "src/documents/views.py",
       "code": -2,
       "name": "missing-attribute",
-      "description": "Object of class `DocumentType` has no attribute `document_count`",
-      "concise_description": "Object of class `DocumentType` has no attribute `document_count`",
+      "description": "Object of class `Correspondent` has no attribute `document_count`",
+      "concise_description": "Object of class `Correspondent` has no attribute `document_count`",
       "severity": "error"
     },
     {
@@ -10796,8 +10772,8 @@
       "path": "src/documents/views.py",
       "code": -2,
       "name": "missing-attribute",
-      "description": "Object of class `StoragePath` has no attribute `document_count`",
-      "concise_description": "Object of class `StoragePath` has no attribute `document_count`",
+      "description": "Object of class `Tag` has no attribute `document_count`",
+      "concise_description": "Object of class `Tag` has no attribute `document_count`",
       "severity": "error"
     },
     {
@@ -10808,14 +10784,38 @@
       "path": "src/documents/views.py",
       "code": -2,
       "name": "missing-attribute",
+      "description": "Object of class `DocumentType` has no attribute `document_count`",
+      "concise_description": "Object of class `DocumentType` has no attribute `document_count`",
+      "severity": "error"
+    },
+    {
+      "line": 896,
+      "column": 48,
+      "stop_line": 896,
+      "stop_column": 64,
+      "path": "src/documents/views.py",
+      "code": -2,
+      "name": "missing-attribute",
+      "description": "Object of class `StoragePath` has no attribute `document_count`",
+      "concise_description": "Object of class `StoragePath` has no attribute `document_count`",
+      "severity": "error"
+    },
+    {
+      "line": 899,
+      "column": 48,
+      "stop_line": 899,
+      "stop_column": 64,
+      "path": "src/documents/views.py",
+      "code": -2,
+      "name": "missing-attribute",
       "description": "Object of class `CustomField` has no attribute `document_count`",
       "concise_description": "Object of class `CustomField` has no attribute `document_count`",
       "severity": "error"
     },
     {
-      "line": 1063,
+      "line": 1069,
       "column": 9,
-      "stop_line": 1063,
+      "stop_line": 1069,
       "stop_column": 16,
       "path": "src/documents/views.py",
       "code": -2,
@@ -10825,9 +10825,9 @@
       "severity": "error"
     },
     {
-      "line": 1217,
+      "line": 1223,
       "column": 37,
-      "stop_line": 1217,
+      "stop_line": 1223,
       "stop_column": 54,
       "path": "src/documents/views.py",
       "code": -2,
@@ -10837,9 +10837,9 @@
       "severity": "error"
     },
     {
-      "line": 1328,
+      "line": 1334,
       "column": 45,
-      "stop_line": 1328,
+      "stop_line": 1334,
       "stop_column": 57,
       "path": "src/documents/views.py",
       "code": -2,
@@ -10849,9 +10849,9 @@
       "severity": "error"
     },
     {
-      "line": 1341,
+      "line": 1347,
       "column": 61,
-      "stop_line": 1341,
+      "stop_line": 1347,
       "stop_column": 71,
       "path": "src/documents/views.py",
       "code": -2,
@@ -10861,9 +10861,9 @@
       "severity": "error"
     },
     {
-      "line": 1343,
+      "line": 1349,
       "column": 56,
-      "stop_line": 1343,
+      "stop_line": 1349,
       "stop_column": 66,
       "path": "src/documents/views.py",
       "code": -2,
@@ -10873,9 +10873,9 @@
       "severity": "error"
     },
     {
-      "line": 1345,
+      "line": 1351,
       "column": 63,
-      "stop_line": 1345,
+      "stop_line": 1351,
       "stop_column": 73,
       "path": "src/documents/views.py",
       "code": -2,
@@ -10885,9 +10885,9 @@
       "severity": "error"
     },
     {
-      "line": 1348,
+      "line": 1354,
       "column": 62,
-      "stop_line": 1348,
+      "stop_line": 1354,
       "stop_column": 72,
       "path": "src/documents/views.py",
       "code": -2,
@@ -10897,9 +10897,9 @@
       "severity": "error"
     },
     {
-      "line": 1462,
+      "line": 1468,
       "column": 21,
-      "stop_line": 1462,
+      "stop_line": 1468,
       "stop_column": 48,
       "path": "src/documents/views.py",
       "code": -2,
@@ -10909,9 +10909,9 @@
       "severity": "error"
     },
     {
-      "line": 1497,
+      "line": 1503,
       "column": 17,
-      "stop_line": 1497,
+      "stop_line": 1503,
       "stop_column": 44,
       "path": "src/documents/views.py",
       "code": -2,
@@ -10921,9 +10921,9 @@
       "severity": "error"
     },
     {
-      "line": 1524,
+      "line": 1530,
       "column": 5,
-      "stop_line": 1524,
+      "stop_line": 1530,
       "stop_column": 62,
       "path": "src/documents/views.py",
       "code": -2,
@@ -10933,9 +10933,9 @@
       "severity": "error"
     },
     {
-      "line": 1581,
+      "line": 1587,
       "column": 26,
-      "stop_line": 1581,
+      "stop_line": 1587,
       "stop_column": 57,
       "path": "src/documents/views.py",
       "code": -2,
@@ -10945,9 +10945,9 @@
       "severity": "error"
     },
     {
-      "line": 1587,
+      "line": 1593,
       "column": 22,
-      "stop_line": 1587,
+      "stop_line": 1593,
       "stop_column": 54,
       "path": "src/documents/views.py",
       "code": -2,
@@ -10957,9 +10957,9 @@
       "severity": "error"
     },
     {
-      "line": 1588,
+      "line": 1594,
       "column": 13,
-      "stop_line": 1588,
+      "stop_line": 1594,
       "stop_column": 30,
       "path": "src/documents/views.py",
       "code": -2,
@@ -10969,9 +10969,9 @@
       "severity": "error"
     },
     {
-      "line": 1626,
+      "line": 1632,
       "column": 36,
-      "stop_line": 1626,
+      "stop_line": 1632,
       "stop_column": 64,
       "path": "src/documents/views.py",
       "code": -2,
@@ -10981,9 +10981,9 @@
       "severity": "error"
     },
     {
-      "line": 1666,
+      "line": 1672,
       "column": 30,
-      "stop_line": 1666,
+      "stop_line": 1672,
       "stop_column": 45,
       "path": "src/documents/views.py",
       "code": -2,
@@ -10993,9 +10993,9 @@
       "severity": "error"
     },
     {
-      "line": 1835,
+      "line": 1841,
       "column": 13,
-      "stop_line": 1835,
+      "stop_line": 1841,
       "stop_column": 40,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11005,9 +11005,9 @@
       "severity": "error"
     },
     {
-      "line": 1914,
+      "line": 1920,
       "column": 13,
-      "stop_line": 1914,
+      "stop_line": 1920,
       "stop_column": 40,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11017,9 +11017,9 @@
       "severity": "error"
     },
     {
-      "line": 1990,
+      "line": 1996,
       "column": 70,
-      "stop_line": 1990,
+      "stop_line": 1996,
       "stop_column": 79,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11029,9 +11029,9 @@
       "severity": "error"
     },
     {
-      "line": 2059,
+      "line": 2065,
       "column": 9,
-      "stop_line": 2059,
+      "stop_line": 2065,
       "stop_column": 13,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11041,9 +11041,9 @@
       "severity": "error"
     },
     {
-      "line": 2151,
+      "line": 2157,
       "column": 43,
-      "stop_line": 2151,
+      "stop_line": 2157,
       "stop_column": 45,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11053,9 +11053,9 @@
       "severity": "error"
     },
     {
-      "line": 2193,
+      "line": 2199,
       "column": 25,
-      "stop_line": 2193,
+      "stop_line": 2199,
       "stop_column": 36,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11065,9 +11065,9 @@
       "severity": "error"
     },
     {
-      "line": 2421,
+      "line": 2427,
       "column": 18,
-      "stop_line": 2421,
+      "stop_line": 2427,
       "stop_column": 35,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11077,27 +11077,15 @@
       "severity": "error"
     },
     {
-      "line": 2435,
+      "line": 2441,
       "column": 18,
-      "stop_line": 2435,
+      "stop_line": 2441,
       "stop_column": 22,
       "path": "src/documents/views.py",
       "code": -2,
       "name": "bad-argument-type",
       "description": "Argument `AbstractBaseUser | AnonymousUser` is not assignable to parameter `user` with type `User` in function `DocumentOperationPermissionMixin._has_document_permissions`",
       "concise_description": "Argument `AbstractBaseUser | AnonymousUser` is not assignable to parameter `user` with type `User` in function `DocumentOperationPermissionMixin._has_document_permissions`",
-      "severity": "error"
-    },
-    {
-      "line": 2517,
-      "column": 18,
-      "stop_line": 2517,
-      "stop_column": 22,
-      "path": "src/documents/views.py",
-      "code": -2,
-      "name": "bad-argument-type",
-      "description": "Argument `AbstractBaseUser | AnonymousUser` is not assignable to parameter `user` with type `User` in function `DocumentSelectionMixin._resolve_document_ids`",
-      "concise_description": "Argument `AbstractBaseUser | AnonymousUser` is not assignable to parameter `user` with type `User` in function `DocumentSelectionMixin._resolve_document_ids`",
       "severity": "error"
     },
     {
@@ -11108,14 +11096,26 @@
       "path": "src/documents/views.py",
       "code": -2,
       "name": "bad-argument-type",
+      "description": "Argument `AbstractBaseUser | AnonymousUser` is not assignable to parameter `user` with type `User` in function `DocumentSelectionMixin._resolve_document_ids`",
+      "concise_description": "Argument `AbstractBaseUser | AnonymousUser` is not assignable to parameter `user` with type `User` in function `DocumentSelectionMixin._resolve_document_ids`",
+      "severity": "error"
+    },
+    {
+      "line": 2529,
+      "column": 18,
+      "stop_line": 2529,
+      "stop_column": 22,
+      "path": "src/documents/views.py",
+      "code": -2,
+      "name": "bad-argument-type",
       "description": "Argument `AbstractBaseUser | AnonymousUser` is not assignable to parameter `user` with type `User` in function `DocumentOperationPermissionMixin._has_document_permissions`",
       "concise_description": "Argument `AbstractBaseUser | AnonymousUser` is not assignable to parameter `user` with type `User` in function `DocumentOperationPermissionMixin._has_document_permissions`",
       "severity": "error"
     },
     {
-      "line": 2552,
+      "line": 2558,
       "column": 33,
-      "stop_line": 2552,
+      "stop_line": 2558,
       "stop_column": 46,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11125,9 +11125,9 @@
       "severity": "error"
     },
     {
-      "line": 2562,
+      "line": 2568,
       "column": 21,
-      "stop_line": 2562,
+      "stop_line": 2568,
       "stop_column": 48,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11137,39 +11137,15 @@
       "severity": "error"
     },
     {
-      "line": 2937,
+      "line": 2943,
       "column": 52,
-      "stop_line": 2937,
+      "stop_line": 2943,
       "stop_column": 68,
       "path": "src/documents/views.py",
       "code": -2,
       "name": "missing-attribute",
       "description": "Object of class `Correspondent` has no attribute `document_count`",
       "concise_description": "Object of class `Correspondent` has no attribute `document_count`",
-      "severity": "error"
-    },
-    {
-      "line": 2941,
-      "column": 52,
-      "stop_line": 2941,
-      "stop_column": 68,
-      "path": "src/documents/views.py",
-      "code": -2,
-      "name": "missing-attribute",
-      "description": "Object of class `Tag` has no attribute `document_count`",
-      "concise_description": "Object of class `Tag` has no attribute `document_count`",
-      "severity": "error"
-    },
-    {
-      "line": 2944,
-      "column": 52,
-      "stop_line": 2944,
-      "stop_column": 68,
-      "path": "src/documents/views.py",
-      "code": -2,
-      "name": "missing-attribute",
-      "description": "Object of class `DocumentType` has no attribute `document_count`",
-      "concise_description": "Object of class `DocumentType` has no attribute `document_count`",
       "severity": "error"
     },
     {
@@ -11180,14 +11156,38 @@
       "path": "src/documents/views.py",
       "code": -2,
       "name": "missing-attribute",
+      "description": "Object of class `Tag` has no attribute `document_count`",
+      "concise_description": "Object of class `Tag` has no attribute `document_count`",
+      "severity": "error"
+    },
+    {
+      "line": 2950,
+      "column": 52,
+      "stop_line": 2950,
+      "stop_column": 68,
+      "path": "src/documents/views.py",
+      "code": -2,
+      "name": "missing-attribute",
+      "description": "Object of class `DocumentType` has no attribute `document_count`",
+      "concise_description": "Object of class `DocumentType` has no attribute `document_count`",
+      "severity": "error"
+    },
+    {
+      "line": 2953,
+      "column": 52,
+      "stop_line": 2953,
+      "stop_column": 68,
+      "path": "src/documents/views.py",
+      "code": -2,
+      "name": "missing-attribute",
       "description": "Object of class `StoragePath` has no attribute `document_count`",
       "concise_description": "Object of class `StoragePath` has no attribute `document_count`",
       "severity": "error"
     },
     {
-      "line": 2951,
+      "line": 2957,
       "column": 52,
-      "stop_line": 2951,
+      "stop_line": 2957,
       "stop_column": 68,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11197,9 +11197,9 @@
       "severity": "error"
     },
     {
-      "line": 3004,
+      "line": 3010,
       "column": 65,
-      "stop_line": 3004,
+      "stop_line": 3010,
       "stop_column": 69,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11209,9 +11209,9 @@
       "severity": "error"
     },
     {
-      "line": 3724,
+      "line": 3730,
       "column": 32,
-      "stop_line": 3724,
+      "stop_line": 3730,
       "stop_column": 43,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11221,9 +11221,9 @@
       "severity": "error"
     },
     {
-      "line": 3724,
+      "line": 3730,
       "column": 32,
-      "stop_line": 3724,
+      "stop_line": 3730,
       "stop_column": 43,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11233,9 +11233,9 @@
       "severity": "error"
     },
     {
-      "line": 4016,
+      "line": 4022,
       "column": 24,
-      "stop_line": 4016,
+      "stop_line": 4022,
       "stop_column": 51,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11245,9 +11245,9 @@
       "severity": "error"
     },
     {
-      "line": 4035,
+      "line": 4041,
       "column": 17,
-      "stop_line": 4035,
+      "stop_line": 4041,
       "stop_column": 21,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11257,9 +11257,9 @@
       "severity": "error"
     },
     {
-      "line": 4060,
+      "line": 4066,
       "column": 16,
-      "stop_line": 4060,
+      "stop_line": 4066,
       "stop_column": 33,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11269,9 +11269,9 @@
       "severity": "error"
     },
     {
-      "line": 4062,
+      "line": 4068,
       "column": 25,
-      "stop_line": 4062,
+      "stop_line": 4068,
       "stop_column": 38,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11281,9 +11281,9 @@
       "severity": "error"
     },
     {
-      "line": 4117,
+      "line": 4123,
       "column": 9,
-      "stop_line": 4117,
+      "stop_line": 4123,
       "stop_column": 23,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11293,9 +11293,9 @@
       "severity": "error"
     },
     {
-      "line": 4142,
+      "line": 4148,
       "column": 9,
-      "stop_line": 4142,
+      "stop_line": 4148,
       "stop_column": 23,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11305,9 +11305,9 @@
       "severity": "error"
     },
     {
-      "line": 4318,
+      "line": 4324,
       "column": 36,
-      "stop_line": 4318,
+      "stop_line": 4324,
       "stop_column": 52,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11317,9 +11317,9 @@
       "severity": "error"
     },
     {
-      "line": 4319,
+      "line": 4325,
       "column": 33,
-      "stop_line": 4319,
+      "stop_line": 4325,
       "stop_column": 56,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11329,9 +11329,9 @@
       "severity": "error"
     },
     {
-      "line": 4440,
+      "line": 4446,
       "column": 40,
-      "stop_line": 4440,
+      "stop_line": 4446,
       "stop_column": 54,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11341,9 +11341,9 @@
       "severity": "error"
     },
     {
-      "line": 4448,
+      "line": 4454,
       "column": 38,
-      "stop_line": 4448,
+      "stop_line": 4454,
       "stop_column": 51,
       "path": "src/documents/views.py",
       "code": -2,
@@ -11353,9 +11353,9 @@
       "severity": "error"
     },
     {
-      "line": 4517,
+      "line": 4523,
       "column": 16,
-      "stop_line": 4517,
+      "stop_line": 4523,
       "stop_column": 31,
       "path": "src/documents/views.py",
       "code": -2,
