@@ -69,6 +69,7 @@ SEED = 42
 
 @pytest.fixture(scope="module")
 def module_db(django_db_setup, django_db_blocker):
+    """Unlock the DB for the whole module (module-scoped)."""
     with django_db_blocker.unblock():
         yield
 
@@ -77,7 +78,7 @@ def module_db(django_db_setup, django_db_blocker):
 def doclist_corpus(module_db):
     """
     Build a 5 000-document corpus with tags, notes, custom fields, correspondents,
-    doc types, and storage paths.  All objects are deleted on teardown.
+    and doc types.  All objects are deleted on teardown.
     """
     fake = Faker()
     Faker.seed(SEED)
