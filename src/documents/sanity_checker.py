@@ -314,7 +314,15 @@ def check_sanity(
     messages = SanityCheckMessages()
     present_files = _build_present_files()
 
-    documents = Document.global_objects.all()
+    documents = Document.global_objects.only(
+        "pk",
+        "filename",
+        "mime_type",
+        "checksum",
+        "archive_checksum",
+        "archive_filename",
+        "content",
+    ).iterator(chunk_size=500)
     for doc in iter_wrapper(documents):
         _check_document(doc, messages, present_files)
 
