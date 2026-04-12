@@ -182,8 +182,9 @@ def _check_thumbnail(
     present_files: set[Path],
 ) -> None:
     """Verify the thumbnail exists and is readable."""
-    thumbnail_path: Final[Path] = Path(doc.thumbnail_path).resolve()
-    if not thumbnail_path.exists() or not thumbnail_path.is_file():
+    # doc.thumbnail_path already returns a resolved Path; no need to re-resolve.
+    thumbnail_path: Final[Path] = doc.thumbnail_path
+    if not thumbnail_path.is_file():
         messages.error(doc.pk, "Thumbnail of document does not exist.")
         return
 
@@ -200,8 +201,9 @@ def _check_original(
     present_files: set[Path],
 ) -> None:
     """Verify the original file exists, is readable, and has matching checksum."""
-    source_path: Final[Path] = Path(doc.source_path).resolve()
-    if not source_path.exists() or not source_path.is_file():
+    # doc.source_path already returns a resolved Path; no need to re-resolve.
+    source_path: Final[Path] = doc.source_path
+    if not source_path.is_file():
         messages.error(doc.pk, "Original of document does not exist.")
         return
 
@@ -237,8 +239,9 @@ def _check_archive(
     elif doc.has_archive_version:
         if TYPE_CHECKING:
             assert isinstance(doc.archive_path, Path)
-        archive_path: Final[Path] = Path(doc.archive_path).resolve()
-        if not archive_path.exists() or not archive_path.is_file():
+        # doc.archive_path already returns a resolved Path; no need to re-resolve.
+        archive_path: Final[Path] = doc.archive_path  # type: ignore[assignment]
+        if not archive_path.is_file():
             messages.error(doc.pk, "Archived version of document does not exist.")
             return
 
