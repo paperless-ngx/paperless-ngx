@@ -81,6 +81,22 @@ export class OcrTemplateEditorComponent
   testResults: any[] | null = null
   testing = false
 
+  // Quick create field
+  showQuickCreate = false
+  quickCreateName = ''
+  quickCreateType = 'string'
+  quickCreateForZoneIndex: number | null = null
+  quickCreateTypes = [
+    { id: 'string', name: $localize`String` },
+    { id: 'integer', name: $localize`Integer` },
+    { id: 'float', name: $localize`Float` },
+    { id: 'date', name: $localize`Date` },
+    { id: 'monetary', name: $localize`Monetary` },
+    { id: 'boolean', name: $localize`Boolean` },
+    { id: 'url', name: $localize`URL` },
+    { id: 'longtext', name: $localize`Long Text` },
+  ]
+
   ngOnInit() {
     // Load custom fields and document types
     this.customFieldsService
@@ -351,6 +367,46 @@ export class OcrTemplateEditorComponent
   getDocumentTypeName(id: number): string {
     const dt = this.documentTypes.find((d) => d.id === id)
     return dt ? dt.name : `Type #${id}`
+  }
+
+  openQuickCreate(zoneIndex: number) {
+    this.quickCreateForZoneIndex = zoneIndex
+    this.quickCreateName = this.template.zones[zoneIndex]?.name || ''
+    this.quickCreateType = 'string'
+    this.showQuickCreate = true
+  }
+
+  cancelQuickCreate() {
+    this.showQuickCreate = false
+    this.quickCreateForZoneIndex = null
+  }
+
+  submitQuickCreate() {
+    if (!this.quickCreateName.trim()) return
+
+    this.templateService
+      .quickCreateField(this.quickCreateName.trim(), this.quickCreateType)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (result) => {
+          // Refresh custom fields list
+          this.customFieldsService
+            .listAll()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((r) => {
+              this.customFields = r.results
+              // Assign the new field to the zone
+              if (this.quickCreateForZoneIndex !== null) {
+                this.template.zones[this.quickCreateForZoneIndex].custom_field = result.id
+              }
+              this.showQuickCreate = false
+              this.quickCreateForZoneIndex = null
+            })
+        },
+        error: (err) => {
+          alert(err.error?.error || 'Failed to create custom field')
+        },
+      })
   }
 
   ngOnDestroy() {

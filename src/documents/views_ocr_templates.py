@@ -13,8 +13,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from documents.models import CustomField
 from documents.models import Document
 from documents.models_ocr_templates import OcrTemplate
+from documents.permissions import PaperlessObjectPermissions
 from documents.serialisers_ocr_templates import OcrTemplateSerializer
 from documents.zone_ocr import run_zone_extraction
 
@@ -27,7 +29,7 @@ class OcrTemplateViewSet(ModelViewSet):
         "zones__custom_field",
     ).order_by("name")
     serializer_class = OcrTemplateSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
 
     @action(
         detail=False,
@@ -136,3 +138,66 @@ class OcrTemplateViewSet(ModelViewSet):
             })
 
         return Response({"results": results})
+
+    @action(detail=False, methods=["post"], url_path="quick-create-field")
+    def quick_create_field(self, request):
+        """Create a custom field inline from the template editor.
+
+        Accepts: {"name": "Invoice Number", "data_type": "string"}
+        Returns the created field so the frontend can immediately use it.
+        """
+        name = request.data.get("name", "").strip()
+        data_type = request.data.get("data_type", "").strip()
+
+        if not name:
+            return Response(
+                {"error": "Field name is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        valid_types = {
+            CustomField.FieldDataType.STRING,
+            CustomField.FieldDataType.URL,
+            CustomField.FieldDataType.DATE,
+            CustomField.FieldDataType.INT,
+            CustomField.FieldDataType.FLOAT,
+            CustomField.FieldDataType.MONETARY,
+            CustomField.FieldDataType.LONG_TEXT,
+            CustomField.FieldDataType.BOOL,
+        }
+        if data_type not in valid_types:
+            return Response(
+                {
+                    "error": f"Unsupported data type '{data_type}'. "
+                    f"Supported: {', '.join(sorted(t.value for t in valid_types))}",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Check if field already exists
+        existing = CustomField.objects.filter(name=name).first()
+        if existing:
+            return Response({
+                "id": existing.pk,
+                "name": existing.name,
+                "data_type": existing.data_type,
+                "created": False,
+            })
+
+        # Check user has permission to create custom fields
+        if not request.user.has_perm("documents.add_customfield"):
+            return Response(
+                {"error": "You don't have permission to create custom fields"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        field = CustomField.objects.create(name=name, data_type=data_type)
+        return Response(
+            {
+                "id": field.pk,
+                "name": field.name,
+                "data_type": field.data_type,
+                "created": True,
+            },
+            status=status.HTTP_201_CREATED,
+        )

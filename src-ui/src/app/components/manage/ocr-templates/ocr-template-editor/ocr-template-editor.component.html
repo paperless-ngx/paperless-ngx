@@ -136,14 +136,24 @@
 
               <div class="mb-2">
                 <label class="form-label small" i18n>Custom Field</label>
-                <select
-                  class="form-select form-select-sm"
-                  [(ngModel)]="zone.custom_field"
-                >
-                  @for (cf of customFields; track cf.id) {
-                    <option [ngValue]="cf.id">{{ cf.name }} ({{ cf.data_type }})</option>
-                  }
-                </select>
+                <div class="input-group input-group-sm">
+                  <select
+                    class="form-select form-select-sm"
+                    [(ngModel)]="zone.custom_field"
+                  >
+                    @for (cf of customFields; track cf.id) {
+                      <option [ngValue]="cf.id">{{ cf.name }} ({{ cf.data_type }})</option>
+                    }
+                  </select>
+                  <button
+                    class="btn btn-outline-secondary btn-sm"
+                    type="button"
+                    (click)="openQuickCreate(i); $event.stopPropagation()"
+                    title="Create new field"
+                  >
+                    <i-bs name="plus"></i-bs>
+                  </button>
+                </div>
               </div>
 
               <div class="mb-2">
@@ -175,6 +185,37 @@
           }
         </div>
       </div>
+
+      <!-- Quick create field -->
+      @if (showQuickCreate) {
+        <div class="card mb-3 border-primary">
+          <div class="card-body">
+            <h6 class="card-title" i18n>Create Custom Field</h6>
+            <div class="mb-2">
+              <label class="form-label small" i18n>Field Name</label>
+              <input type="text" class="form-control form-control-sm"
+                [(ngModel)]="quickCreateName" placeholder="e.g. Invoice Number" />
+            </div>
+            <div class="mb-2">
+              <label class="form-label small" i18n>Field Type</label>
+              <select class="form-select form-select-sm" [(ngModel)]="quickCreateType">
+                @for (t of quickCreateTypes; track t.id) {
+                  <option [ngValue]="t.id">{{ t.name }}</option>
+                }
+              </select>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-primary btn-sm" (click)="submitQuickCreate()"
+                [disabled]="!quickCreateName.trim()" i18n>
+                Create & Assign
+              </button>
+              <button class="btn btn-outline-secondary btn-sm" (click)="cancelQuickCreate()" i18n>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      }
 
       <!-- Actions -->
       <div class="d-flex gap-2 mb-3">

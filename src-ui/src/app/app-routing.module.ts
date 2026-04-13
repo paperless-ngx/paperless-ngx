@@ -279,14 +279,24 @@ export const routes: Routes = [
       {
         path: 'ocr-templates',
         component: OcrTemplatesComponent,
+        canActivate: [PermissionsGuard],
         data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.OcrTemplate,
+          },
           componentName: 'OcrTemplatesComponent',
         },
       },
       {
         path: 'ocr-templates/:id',
         component: OcrTemplateEditorComponent,
+        canActivate: [PermissionsGuard],
         data: {
+          requiredPermission: {
+            action: PermissionAction.Change,
+            type: PermissionType.OcrTemplate,
+          },
           componentName: 'OcrTemplateEditorComponent',
         },
       },

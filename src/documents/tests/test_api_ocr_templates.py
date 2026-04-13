@@ -320,3 +320,55 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         self.client.logout()
         resp = self.client.get(self.ENDPOINT)
         self.assertIn(resp.status_code, (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN))
+
+    # --- Quick create field ---
+
+    def test_quick_create_field(self):
+        """Creating a custom field inline from the template editor."""
+        resp = self.client.post(
+            f"{self.ENDPOINT}quick-create-field/",
+            data=json.dumps({"name": "New Field", "data_type": "string"}),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        data = resp.json()
+        self.assertEqual(data["name"], "New Field")
+        self.assertEqual(data["data_type"], "string")
+        self.assertTrue(data["created"])
+        self.assertTrue(CustomField.objects.filter(name="New Field").exists())
+
+    def test_quick_create_field_existing(self):
+        """If a field with the same name exists, return it without creating."""
+        resp = self.client.post(
+            f"{self.ENDPOINT}quick-create-field/",
+            data=json.dumps({"name": "Invoice Number", "data_type": "string"}),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.json()
+        self.assertEqual(data["id"], self.custom_field_text.pk)
+        self.assertFalse(data["created"])
+
+    def test_quick_create_field_empty_name_rejected(self):
+        resp = self.client.post(
+            f"{self.ENDPOINT}quick-create-field/",
+            data=json.dumps({"name": "", "data_type": "string"}),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_quick_create_field_unsupported_type_rejected(self):
+        resp = self.client.post(
+            f"{self.ENDPOINT}quick-create-field/",
+            data=json.dumps({"name": "Bad Field", "data_type": "documentlink"}),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_quick_create_field_select_type_rejected(self):
+        resp = self.client.post(
+            f"{self.ENDPOINT}quick-create-field/",
+            data=json.dumps({"name": "Bad Field", "data_type": "select"}),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
