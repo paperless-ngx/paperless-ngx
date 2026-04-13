@@ -381,7 +381,10 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
             if isinstance(prefetched_cache, dict)
             else None
         )
-        if prefetched_versions:
+        if prefetched_versions is not None:
+            # Empty list means prefetch ran and found no versions — use own content.
+            if not prefetched_versions:
+                return self.content
             latest_prefetched = max(prefetched_versions, key=lambda doc: doc.id)
             return latest_prefetched.content
 

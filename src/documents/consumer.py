@@ -650,6 +650,10 @@ class ConsumerPlugin(
                         # If we get here, it was successful. Proceed with post-consume
                         # hooks. If they fail, nothing will get changed.
 
+                        document = Document.objects.prefetch_related("versions").get(
+                            pk=document.pk,
+                        )
+
                         document_consumption_finished.send(
                             sender=self.__class__,
                             document=document,
