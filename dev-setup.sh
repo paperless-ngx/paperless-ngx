@@ -12,7 +12,7 @@ export PATH="/home/linuxbrew/.linuxbrew/bin:/home/artie/.nvm/versions/node/v24.1
 echo ""
 echo "--- Checking system dependencies ---"
 MISSING=""
-for cmd in tesseract redis-server pdftoppm ghostscript; do
+for cmd in tesseract pdftoppm ghostscript docker; do
     if ! command -v $cmd &>/dev/null; then
         MISSING="$MISSING $cmd"
     else
@@ -23,43 +23,70 @@ done
 if [ -n "$MISSING" ]; then
     echo ""
     echo "Missing:$MISSING"
-    echo "Install with: sudo apt install -y tesseract-ocr tesseract-ocr-deu tesseract-ocr-eng redis-server poppler-utils ghostscript unpaper qpdf imagemagick libmagic-dev libpq-dev"
+    echo "Install with: sudo apt install -y tesseract-ocr tesseract-ocr-deu tesseract-ocr-eng poppler-utils ghostscript unpaper qpdf imagemagick libmagic-dev libpq-dev docker.io"
     echo ""
     read -p "Install now? (y/n) " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        sudo apt install -y tesseract-ocr tesseract-ocr-deu tesseract-ocr-eng redis-server poppler-utils ghostscript unpaper qpdf imagemagick libmagic-dev libpq-dev
+        sudo apt install -y tesseract-ocr tesseract-ocr-deu tesseract-ocr-eng poppler-utils ghostscript unpaper qpdf imagemagick libmagic-dev libpq-dev docker.io
     else
         echo "Skipping — some tests may fail without these."
     fi
 fi
 
-# 2. Python dependencies
+# 2. Start Postgres + Redis via Docker Compose
+echo ""
+echo "--- Starting Postgres & Redis ---"
+docker compose -f docker/compose/docker-compose.dev.yml up -d
+echo "  Waiting for Postgres..."
+until docker compose -f docker/compose/docker-compose.dev.yml exec -T postgres pg_isready -U paperless &>/dev/null; do
+    sleep 1
+done
+echo "  ✓ Postgres ready"
+echo "  ✓ Redis ready"
+
+# 3. Python dependencies
 echo ""
 echo "--- Setting up Python environment ---"
-cd src/
 uv sync --group dev
 echo "  ✓ Python deps installed"
 
-# 3. Database setup (SQLite for dev)
+# 4. Configure paperless
 echo ""
-echo "--- Setting up database ---"
-if [ ! -f ../paperless.conf ]; then
-    cat > ../paperless.conf <<CONF
+echo "--- Configuring paperless ---"
+if [ ! -f paperless.conf ]; then
+    cat > paperless.conf <<CONF
 PAPERLESS_DEBUG=true
-PAPERLESS_CONSUMPTION_DIR=../consume
-PAPERLESS_DATA_DIR=../data
-PAPERLESS_MEDIA_ROOT=../media
-PAPERLESS_STATICDIR=../static
+PAPERLESS_CONSUMPTION_DIR=./consume
+PAPERLESS_DATA_DIR=./data
+PAPERLESS_MEDIA_ROOT=./media
+PAPERLESS_STATICDIR=./static
+PAPERLESS_DBHOST=localhost
+PAPERLESS_DBNAME=paperless
+PAPERLESS_DBUSER=paperless
+PAPERLESS_DBPASS=paperless
+PAPERLESS_REDIS=redis://localhost:6379
 CONF
     echo "  ✓ Created paperless.conf"
+else
+    echo "  ✓ paperless.conf exists"
 fi
 
-mkdir -p ../consume ../media ../data ../static
+mkdir -p consume media data static
 
-# Run migrations (includes our OCR template tables)
-uv run manage.py migrate --run-syncdb
+# 5. Run migrations
+echo ""
+echo "--- Running migrations ---"
+cd src/
+uv run manage.py migrate
 echo "  ✓ Database migrated"
+
+# Generate migration for OCR templates if needed
+uv run manage.py makemigrations documents --name ocr_templates 2>/dev/null || true
+
+# Apply any new migrations
+uv run manage.py migrate
+echo "  ✓ OCR template migration applied"
 
 # Create superuser if none exists
 uv run manage.py shell -c "
@@ -71,10 +98,12 @@ else:
     print('  ✓ Superuser already exists')
 "
 
-# 4. Frontend dependencies
+cd ..
+
+# 6. Frontend dependencies
 echo ""
 echo "--- Setting up frontend ---"
-cd ../src-ui/
+cd src-ui/
 
 if ! command -v pnpm &>/dev/null; then
     echo "  Installing pnpm..."
@@ -83,22 +112,27 @@ fi
 
 pnpm install
 echo "  ✓ Frontend deps installed"
+cd ..
 
-# 5. Summary
+# 7. Summary
 echo ""
 echo "=== Setup complete ==="
 echo ""
-echo "To run backend tests (our feature only):"
+echo "Services running:"
+echo "  PostgreSQL: localhost:5432 (paperless/paperless)"
+echo "  Redis:      localhost:6379"
+echo ""
+echo "Run backend tests (our feature only):"
 echo "  cd src/ && uv run pytest documents/tests/test_zone_ocr.py documents/tests/test_api_ocr_templates.py -v"
 echo ""
-echo "To run ALL backend tests:"
+echo "Run ALL backend tests:"
 echo "  cd src/ && uv run pytest"
 echo ""
-echo "To run backend dev server:"
+echo "Start backend dev server:"
 echo "  cd src/ && uv run manage.py runserver"
 echo ""
-echo "To run frontend dev server:"
+echo "Start frontend dev server:"
 echo "  cd src-ui/ && pnpm ng serve"
 echo ""
-echo "To run frontend tests:"
-echo "  cd src-ui/ && pnpm run test"
+echo "Stop dev services:"
+echo "  docker compose -f docker/compose/docker-compose.dev.yml down"
