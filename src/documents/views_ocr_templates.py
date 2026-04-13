@@ -19,6 +19,7 @@ from documents.models_ocr_templates import OcrTemplate
 from documents.permissions import PaperlessObjectPermissions
 from documents.serialisers_ocr_templates import OcrTemplateSerializer
 from documents.zone_ocr import run_zone_extraction
+from paperless.views import StandardPagination
 
 
 class OcrTemplateViewSet(ModelViewSet):
@@ -30,6 +31,7 @@ class OcrTemplateViewSet(ModelViewSet):
     ).order_by("name")
     serializer_class = OcrTemplateSerializer
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    pagination_class = StandardPagination
 
     @action(
         detail=False,
