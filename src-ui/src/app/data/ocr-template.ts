@@ -12,6 +12,8 @@ export interface OcrTemplateZone {
   ocr_language: string
   transform: string
   order: number
+  zone_source_width?: number
+  zone_source_height?: number
 }
 
 export const TRANSFORM_OPTIONS = [

@@ -22,6 +22,8 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer):
             "ocr_language",
             "transform",
             "order",
+            "zone_source_width",
+            "zone_source_height",
         ]
 
     def validate_width(self, value):

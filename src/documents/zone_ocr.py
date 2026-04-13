@@ -134,11 +134,15 @@ def _process_template(
                 )
                 continue
 
+            # Use per-zone source dimensions if set, otherwise template default
+            src_w = zone.zone_source_width or template.source_width
+            src_h = zone.zone_source_height or template.source_height
+
             extracted = _extract_zone(
                 page_images[page_idx],
                 zone,
-                template.source_width,
-                template.source_height,
+                src_w,
+                src_h,
                 tmp_path,
             )
 

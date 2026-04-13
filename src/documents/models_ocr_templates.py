@@ -117,6 +117,26 @@ class OcrTemplateZone(models.Model):
         help_text=_("Zone height (px)"),
     )
 
+    # Per-zone source dimensions for coordinate scaling.
+    # Stored from the page image the zone was drawn on.
+    # If null, falls back to the template's source_width/source_height.
+    # This handles PDFs with mixed page sizes (e.g. landscape + portrait,
+    # or different paper formats across pages).
+    zone_source_width = models.PositiveIntegerField(
+        _("zone source width"),
+        null=True,
+        blank=True,
+        help_text=_("Width of the page image this zone was drawn on (px). "
+                     "Falls back to template source_width if unset."),
+    )
+    zone_source_height = models.PositiveIntegerField(
+        _("zone source height"),
+        null=True,
+        blank=True,
+        help_text=_("Height of the page image this zone was drawn on (px). "
+                     "Falls back to template source_height if unset."),
+    )
+
     ocr_language = models.CharField(
         _("OCR language"),
         max_length=20,

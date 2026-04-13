@@ -211,6 +211,10 @@ export class OcrTemplateEditorComponent
       ocr_language: 'deu+eng',
       transform: 'strip',
       order: this.template.zones.length,
+      // Store per-zone source dimensions from the current page image
+      // Handles mixed page sizes in PDFs (landscape/portrait, different formats)
+      zone_source_width: img.naturalWidth,
+      zone_source_height: img.naturalHeight,
     }
 
     this.template.zones.push(zone)
@@ -224,11 +228,13 @@ export class OcrTemplateEditorComponent
     const img = this.imageRef.nativeElement
     if (!img.naturalWidth) return null
 
-    const scaleX = canvas.width / img.naturalWidth
-    const scaleY = canvas.height / img.naturalHeight
-
     for (let i = this.template.zones.length - 1; i >= 0; i--) {
       const z = this.template.zones[i]
+      // Use per-zone source dimensions if available, otherwise current image
+      const srcW = z.zone_source_width || img.naturalWidth
+      const srcH = z.zone_source_height || img.naturalHeight
+      const scaleX = canvas.width / srcW
+      const scaleY = canvas.height / srcH
       const zx = z.x * scaleX
       const zy = z.y * scaleY
       const zw = z.width * scaleX
@@ -257,9 +263,6 @@ export class OcrTemplateEditorComponent
 
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-    const scaleX = canvas.width / img.naturalWidth
-    const scaleY = canvas.height / img.naturalHeight
-
     // Draw existing zones
     const colors = [
       '#4f8ff7',
@@ -274,6 +277,11 @@ export class OcrTemplateEditorComponent
 
     this.template.zones.forEach((zone, idx) => {
       const color = colors[idx % colors.length]
+      // Use per-zone source dimensions for correct scaling
+      const srcW = zone.zone_source_width || img.naturalWidth
+      const srcH = zone.zone_source_height || img.naturalHeight
+      const scaleX = canvas.width / srcW
+      const scaleY = canvas.height / srcH
       const x = zone.x * scaleX
       const y = zone.y * scaleY
       const w = zone.width * scaleX
