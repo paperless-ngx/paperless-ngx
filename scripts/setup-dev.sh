@@ -71,7 +71,7 @@ systemctl start redis-server 2>/dev/null || redis-server --daemonize yes 2>/dev/
 # DB credentials — intentionally different from the "paperless" system user
 DB_USER="paperlessdev"
 DB_PASS="paperlessdev"
-DB_NAME="paperless"
+DB_NAME="paperlessdev"
 
 # Create Postgres user + database if needed
 sudo -u postgres psql -tc "SELECT 1 FROM pg_roles WHERE rolname='$DB_USER'" | grep -q 1 \
@@ -102,7 +102,7 @@ if [ ! -f paperless.conf ]; then
     cat >> paperless.conf <<CONF
 PAPERLESS_DEBUG=true
 PAPERLESS_DBHOST=localhost
-PAPERLESS_DBNAME=paperless
+PAPERLESS_DBNAME=paperlessdev
 PAPERLESS_DBUSER=paperlessdev
 PAPERLESS_DBPASS=paperlessdev
 PAPERLESS_REDIS=redis://localhost:6379
