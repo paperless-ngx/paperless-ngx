@@ -403,7 +403,8 @@ export class OcrTemplateEditorComponent
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (result) => {
-          // Refresh custom fields list
+          // Clear cache and refresh custom fields list
+          this.customFieldsService.clearCache()
           this.customFieldsService
             .listAll()
             .pipe(takeUntil(this.destroy$))
