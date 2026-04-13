@@ -875,15 +875,15 @@ wheels = [
 
 [[package]]
 name = "django"
-version = "5.2.12"
+version = "5.2.13"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asgiref", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "sqlparse", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/bd/55/b9445fc0695b03746f355c05b2eecc54c34e05198c686f4fc4406b722b52/django-5.2.12.tar.gz", hash = "sha256:6b809af7165c73eff5ce1c87fdae75d4da6520d6667f86401ecf55b681eb1eeb", size = 10860574, upload-time = "2026-03-03T13:56:05.509Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1f/c5/c69e338eb2959f641045802e5ea87ca4bf5ac90c5fd08953ca10742fad51/django-5.2.13.tar.gz", hash = "sha256:a31589db5188d074c63f0945c3888fad104627dfcc236fb2b97f71f89da33bc4", size = 10890368, upload-time = "2026-04-07T14:02:15.072Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4e/32/4b144e125678efccf5d5b61581de1c4088d6b0286e46096e3b8de0d556c8/django-5.2.12-py3-none-any.whl", hash = "sha256:4853482f395c3a151937f6991272540fcbf531464f254a347bf7c89f53c8cff7", size = 8310245, upload-time = "2026-03-03T13:56:01.174Z" },
+    { url = "https://files.pythonhosted.org/packages/59/b1/51ab36b2eefcf8cdb9338c7188668a157e29e30306bfc98a379704c9e10d/django-5.2.13-py3-none-any.whl", hash = "sha256:5788fce61da23788a8ce6f02583765ab060d396720924789f97fa42119d37f7a", size = 8310982, upload-time = "2026-04-07T14:02:08.883Z" },
 ]
 
 [[package]]
@@ -3014,7 +3014,7 @@ requires-dist = [
     { name = "channels-redis", specifier = "~=4.2" },
     { name = "concurrent-log-handler", specifier = "~=0.9.25" },
     { name = "dateparser", specifier = "~=1.2" },
-    { name = "django", specifier = "~=5.2.10" },
+    { name = "django", specifier = "~=5.2.13" },
     { name = "django-allauth", extras = ["mfa", "socialaccount"], specifier = "~=65.15.0" },
     { name = "django-auditlog", specifier = "~=3.4.1" },
     { name = "django-cachalot", specifier = "~=2.9.0" },
