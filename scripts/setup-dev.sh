@@ -71,6 +71,18 @@ systemctl start redis-server 2>/dev/null || redis-server --daemonize yes 2>/dev/
 # Create Postgres user + database if needed
 su - postgres -c "psql -tc \"SELECT 1 FROM pg_roles WHERE rolname='paperless'\" | grep -q 1 || psql -c \"CREATE USER paperless WITH PASSWORD 'paperless' CREATEDB;\"" 2>/dev/null
 su - postgres -c "psql -tc \"SELECT 1 FROM pg_database WHERE datname='paperless'\" | grep -q 1 || psql -c \"CREATE DATABASE paperless OWNER paperless;\"" 2>/dev/null
+
+# Ensure password auth works for local connections (default is peer)
+PG_HBA=$(su - postgres -c "psql -t -c 'SHOW hba_file'" 2>/dev/null | xargs)
+if [ -n "$PG_HBA" ] && [ -f "$PG_HBA" ]; then
+    if ! grep -q "host.*paperless.*md5\|host.*paperless.*scram" "$PG_HBA" 2>/dev/null; then
+        # Add password auth rule before any existing host rules
+        sed -i '/^# IPv4 local connections/a host    paperless       paperless       127.0.0.1/32            scram-sha-256' "$PG_HBA"
+        sed -i '/^# IPv6 local connections/a host    paperless       paperless       ::1/128                 scram-sha-256' "$PG_HBA"
+        su - postgres -c "psql -c 'SELECT pg_reload_conf()'" >/dev/null 2>&1
+        echo "  ✓ pg_hba.conf updated for password auth"
+    fi
+fi
 echo "  ✓ PostgreSQL ready (paperless/paperless)"
 echo "  ✓ Redis ready"
 
