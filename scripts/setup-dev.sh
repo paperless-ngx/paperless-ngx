@@ -99,7 +99,15 @@ mkdir -p consume media
 # --- Python dependencies ---
 echo ""
 echo "--- Installing Python dependencies ---"
+# Remove stale venv (e.g. from a previous run with a different Python version)
+rm -rf .venv
 uv sync --group dev
+# Ensure psycopg is available — the upstream psycopg-c wheel overrides may
+# not cover every platform. Install the binary fallback if psycopg is missing.
+if ! uv run python -c "import psycopg" 2>/dev/null; then
+    echo "  ⚠ psycopg not found, installing binary fallback..."
+    uv pip install "psycopg[binary,pool]==3.3"
+fi
 echo "  ✓ Python deps installed"
 
 # --- Pre-commit hooks ---
