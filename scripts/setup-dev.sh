@@ -68,22 +68,28 @@ echo "--- Starting services ---"
 systemctl start postgresql 2>/dev/null || pg_ctlcluster $(pg_lsclusters -h | head -1 | awk '{print $1, $2}') start 2>/dev/null || true
 systemctl start redis-server 2>/dev/null || redis-server --daemonize yes 2>/dev/null || true
 
-# Create Postgres user + database if needed
-su - postgres -c "psql -tc \"SELECT 1 FROM pg_roles WHERE rolname='paperless'\" | grep -q 1 || psql -c \"CREATE USER paperless WITH PASSWORD 'paperless' CREATEDB;\"" 2>/dev/null
-su - postgres -c "psql -tc \"SELECT 1 FROM pg_database WHERE datname='paperless'\" | grep -q 1 || psql -c \"CREATE DATABASE paperless OWNER paperless;\"" 2>/dev/null
+# DB credentials — intentionally different from the "paperless" system user
+DB_USER="paperlessdev"
+DB_PASS="paperlessdev"
+DB_NAME="paperless"
 
-# Ensure password auth works for local connections (default is peer)
-PG_HBA=$(su - postgres -c "psql -t -c 'SHOW hba_file'" 2>/dev/null | xargs)
+# Create Postgres user + database if needed
+sudo -u postgres psql -tc "SELECT 1 FROM pg_roles WHERE rolname='$DB_USER'" | grep -q 1 \
+    || sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASS' CREATEDB;"
+sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'" | grep -q 1 \
+    || sudo -u postgres psql -c "CREATE DATABASE $DB_NAME OWNER $DB_USER;"
+
+# Ensure password auth works for local TCP connections (Debian defaults to peer)
+PG_HBA=$(sudo -u postgres psql -t -c 'SHOW hba_file' 2>/dev/null | xargs)
 if [ -n "$PG_HBA" ] && [ -f "$PG_HBA" ]; then
-    if ! grep -q "host.*paperless.*md5\|host.*paperless.*scram" "$PG_HBA" 2>/dev/null; then
-        # Add password auth rule before any existing host rules
-        sed -i '/^# IPv4 local connections/a host    paperless       paperless       127.0.0.1/32            scram-sha-256' "$PG_HBA"
-        sed -i '/^# IPv6 local connections/a host    paperless       paperless       ::1/128                 scram-sha-256' "$PG_HBA"
-        su - postgres -c "psql -c 'SELECT pg_reload_conf()'" >/dev/null 2>&1
+    if ! grep -q "host.*all.*all.*127.0.0.1.*md5\|host.*all.*all.*127.0.0.1.*scram" "$PG_HBA" 2>/dev/null; then
+        sed -i 's/^\(host\s\+all\s\+all\s\+127\.0\.0\.1\/32\s\+\).*/\1md5/' "$PG_HBA"
+        sed -i 's/^\(host\s\+all\s\+all\s\+::1\/128\s\+\).*/\1md5/' "$PG_HBA"
+        sudo -u postgres psql -c 'SELECT pg_reload_conf()' >/dev/null 2>&1
         echo "  ✓ pg_hba.conf updated for password auth"
     fi
 fi
-echo "  ✓ PostgreSQL ready (paperless/paperless)"
+echo "  ✓ PostgreSQL ready ($DB_USER/$DB_NAME)"
 echo "  ✓ Redis ready"
 
 # --- Configure paperless ---
@@ -97,8 +103,8 @@ if [ ! -f paperless.conf ]; then
 PAPERLESS_DEBUG=true
 PAPERLESS_DBHOST=localhost
 PAPERLESS_DBNAME=paperless
-PAPERLESS_DBUSER=paperless
-PAPERLESS_DBPASS=paperless
+PAPERLESS_DBUSER=paperlessdev
+PAPERLESS_DBPASS=paperlessdev
 PAPERLESS_REDIS=redis://localhost:6379
 CONF
     echo "  ✓ Created paperless.conf (debug + Postgres + Redis)"
