@@ -9,7 +9,6 @@ import { first } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { Group } from 'src/app/data/group'
 import { User } from 'src/app/data/user'
-import { PermissionsService } from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -39,7 +38,6 @@ export class UserEditDialogComponent
   implements OnInit
 {
   private toastService = inject(ToastService)
-  private permissionsService = inject(PermissionsService)
   private groupsService: GroupService
 
   groups: Group[]
