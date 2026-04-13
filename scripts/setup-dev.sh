@@ -36,6 +36,13 @@ else
     echo "  ✓ uv already installed"
 fi
 
+# Pin Python 3.12 — psycopg-c has pre-built wheels only for 3.12
+echo ""
+echo "--- Ensuring Python 3.12 ---"
+uv python install 3.12 2>/dev/null
+export UV_PYTHON=3.12
+echo "  ✓ Python 3.12 pinned"
+
 # --- Install Node.js + pnpm ---
 if ! command -v node &>/dev/null; then
     echo ""
