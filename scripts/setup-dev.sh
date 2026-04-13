@@ -21,7 +21,6 @@ apt-get install -y -qq \
     tesseract-ocr tesseract-ocr-eng tesseract-ocr-deu \
     poppler-utils ghostscript unpaper qpdf \
     imagemagick libmagic-dev libpq-dev \
-    postgresql postgresql-client redis-server \
     >/dev/null
 echo "  ✓ System packages installed"
 
@@ -62,35 +61,38 @@ else
     echo "  ✓ pnpm already installed"
 fi
 
-# --- Start Postgres + Redis ---
+# --- Check services ---
 echo ""
-echo "--- Starting services ---"
-systemctl start postgresql 2>/dev/null || pg_ctlcluster $(pg_lsclusters -h | head -1 | awk '{print $1, $2}') start 2>/dev/null || true
-systemctl start redis-server 2>/dev/null || redis-server --daemonize yes 2>/dev/null || true
+echo "--- Checking services ---"
+SERVICES_OK=true
 
-# DB credentials — intentionally different from the "paperless" system user
-DB_USER="paperlessdev"
-DB_PASS="paperlessdev"
-DB_NAME="paperlessdev"
-
-# Create Postgres user + database if needed
-sudo -u postgres psql -tc "SELECT 1 FROM pg_roles WHERE rolname='$DB_USER'" | grep -q 1 \
-    || sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASS' CREATEDB;"
-sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'" | grep -q 1 \
-    || sudo -u postgres psql -c "CREATE DATABASE $DB_NAME OWNER $DB_USER;"
-
-# Ensure password auth works for local TCP connections (Debian defaults to peer)
-PG_HBA=$(sudo -u postgres psql -t -c 'SHOW hba_file' 2>/dev/null | xargs)
-if [ -n "$PG_HBA" ] && [ -f "$PG_HBA" ]; then
-    if ! grep -q "host.*all.*all.*127.0.0.1.*md5\|host.*all.*all.*127.0.0.1.*scram" "$PG_HBA" 2>/dev/null; then
-        sed -i 's/^\(host\s\+all\s\+all\s\+127\.0\.0\.1\/32\s\+\).*/\1md5/' "$PG_HBA"
-        sed -i 's/^\(host\s\+all\s\+all\s\+::1\/128\s\+\).*/\1md5/' "$PG_HBA"
-        sudo -u postgres psql -c 'SELECT pg_reload_conf()' >/dev/null 2>&1
-        echo "  ✓ pg_hba.conf updated for password auth"
+# PostgreSQL — must be >= 14
+if command -v psql &>/dev/null; then
+    PG_VER=$(psql --version | grep -oP '\d+' | head -1)
+    if [ "$PG_VER" -lt 14 ] 2>/dev/null; then
+        echo "  ✗ PostgreSQL $PG_VER found — need 14+. Install from https://www.postgresql.org/download/"
+        SERVICES_OK=false
+    else
+        echo "  ✓ PostgreSQL $PG_VER"
     fi
+else
+    echo "  ✗ PostgreSQL not found. Install it and create a database before running this script."
+    SERVICES_OK=false
 fi
-echo "  ✓ PostgreSQL ready ($DB_USER/$DB_NAME)"
-echo "  ✓ Redis ready"
+
+# Redis
+if redis-cli ping &>/dev/null; then
+    echo "  ✓ Redis"
+else
+    echo "  ✗ Redis not reachable on localhost:6379"
+    SERVICES_OK=false
+fi
+
+if [ "$SERVICES_OK" = false ]; then
+    echo ""
+    echo "ERROR: Required services missing or too old. Fix the above and rerun."
+    exit 1
+fi
 
 # --- Configure paperless ---
 echo ""
@@ -101,13 +103,13 @@ if [ ! -f paperless.conf ]; then
     # Enable debug and configure services
     cat >> paperless.conf <<CONF
 PAPERLESS_DEBUG=true
-PAPERLESS_DBHOST=localhost
-PAPERLESS_DBNAME=paperlessdev
-PAPERLESS_DBUSER=paperlessdev
-PAPERLESS_DBPASS=paperlessdev
-PAPERLESS_REDIS=redis://localhost:6379
+PAPERLESS_DBHOST=${PAPERLESS_DBHOST:-localhost}
+PAPERLESS_DBNAME=${PAPERLESS_DBNAME:-paperless}
+PAPERLESS_DBUSER=${PAPERLESS_DBUSER:-paperless}
+PAPERLESS_DBPASS=${PAPERLESS_DBPASS:-paperless}
+PAPERLESS_REDIS=${PAPERLESS_REDIS:-redis://localhost:6379}
 CONF
-    echo "  ✓ Created paperless.conf (debug + Postgres + Redis)"
+    echo "  ✓ Created paperless.conf (debug enabled, configure DB credentials if needed)"
 else
     echo "  ✓ paperless.conf already exists"
 fi
