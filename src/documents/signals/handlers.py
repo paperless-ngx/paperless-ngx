@@ -1355,6 +1355,39 @@ def run_zone_ocr_extraction(sender, document, original_file=None, **kwargs):
         )
 
 
+def run_zone_ocr_on_type_change(sender, instance, created=False, **kwargs):
+    """
+    After a document is saved, check if its type has OCR templates and run
+    zone extraction. Skips newly created documents (handled by consumption signal).
+    """
+    if created or not instance.pk or not instance.document_type_id:
+        return
+
+    from documents.models_ocr_templates import OcrTemplate
+
+    if not OcrTemplate.objects.filter(
+        document_type_id=instance.document_type_id, enabled=True,
+    ).exists():
+        return
+
+    try:
+        from documents.zone_ocr import run_zone_extraction
+
+        doc_path = instance.archive_path or instance.source_path
+        if doc_path and Path(doc_path).is_file():
+            logger.info(
+                "Zone OCR: running extraction for document %d (type %d)",
+                instance.pk,
+                instance.document_type_id,
+            )
+            run_zone_extraction(instance, None)
+    except Exception:
+        logger.exception(
+            "Zone OCR extraction failed for document %s",
+            instance.pk,
+        )
+
+
 def add_or_update_document_in_llm_index(sender, document, **kwargs):
     """
     Add or update a document in the LLM index when it is created or updated.
