@@ -2,7 +2,10 @@
 # Automates the "General setup" steps from docs/development.md.
 # Run from the repo root: bash scripts/setup-dev.sh
 #
-# Installs all prerequisites automatically on Debian/Ubuntu.
+# Two phases:
+#   1. System packages (requires sudo — skipped if already installed)
+#   2. Project setup (runs as current user)
+#
 # Designed to run inside a clean container (LXC, VM, etc.).
 set -euo pipefail
 
@@ -11,11 +14,14 @@ cd "$REPO_ROOT"
 
 echo "=== paperless-ngx dev setup ==="
 
-# --- Install system packages ---
+# ============================================================
+# Phase 1: System packages (sudo)
+# ============================================================
+
 echo ""
-echo "--- Installing system packages ---"
-apt-get update -qq
-apt-get install -y -qq \
+echo "--- Installing system packages (requires sudo) ---"
+sudo apt-get update -qq
+sudo apt-get install -y -qq \
     build-essential pkg-config git curl \
     python3 python3-dev \
     tesseract-ocr tesseract-ocr-eng tesseract-ocr-deu \
@@ -23,6 +29,28 @@ apt-get install -y -qq \
     imagemagick libmagic-dev libpq-dev \
     >/dev/null
 echo "  ✓ System packages installed"
+
+if ! command -v node &>/dev/null; then
+    echo ""
+    echo "--- Installing Node.js (requires sudo) ---"
+    curl -fsSL https://deb.nodesource.com/setup_24.x | sudo bash - >/dev/null 2>&1
+    sudo apt-get install -y -qq nodejs >/dev/null
+    echo "  ✓ Node.js $(node --version) installed"
+else
+    echo "  ✓ Node.js $(node --version) already installed"
+fi
+
+if ! command -v pnpm &>/dev/null; then
+    echo "--- Installing pnpm ---"
+    sudo npm install -g pnpm >/dev/null 2>&1
+    echo "  ✓ pnpm installed"
+else
+    echo "  ✓ pnpm already installed"
+fi
+
+# ============================================================
+# Phase 2: User-level setup (no sudo from here on)
+# ============================================================
 
 # --- Install uv ---
 if ! command -v uv &>/dev/null; then
@@ -41,25 +69,6 @@ echo "--- Ensuring Python 3.12 ---"
 uv python install 3.12 2>/dev/null
 export UV_PYTHON=3.12
 echo "  ✓ Python 3.12 pinned"
-
-# --- Install Node.js + pnpm ---
-if ! command -v node &>/dev/null; then
-    echo ""
-    echo "--- Installing Node.js ---"
-    curl -fsSL https://deb.nodesource.com/setup_24.x | bash - >/dev/null 2>&1
-    apt-get install -y -qq nodejs >/dev/null
-    echo "  ✓ Node.js $(node --version) installed"
-else
-    echo "  ✓ Node.js $(node --version) already installed"
-fi
-
-if ! command -v pnpm &>/dev/null; then
-    echo "--- Installing pnpm ---"
-    npm install -g pnpm >/dev/null 2>&1
-    echo "  ✓ pnpm installed"
-else
-    echo "  ✓ pnpm already installed"
-fi
 
 # --- Check services ---
 echo ""
