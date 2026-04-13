@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from pathlib import Path
+from typing import Any
 
 from allauth.mfa import signals
 from allauth.mfa.adapter import get_adapter as get_mfa_adapter
@@ -114,7 +115,7 @@ class FaviconView(View):
             return HttpResponseNotFound("favicon.ico not found")
 
 
-class UserViewSet(ModelViewSet):
+class UserViewSet(ModelViewSet[User]):
     _BOOL_NOT_PROVIDED = object()
     model = User
 
@@ -216,7 +217,7 @@ class UserViewSet(ModelViewSet):
             return HttpResponseNotFound("TOTP not found")
 
 
-class GroupViewSet(ModelViewSet):
+class GroupViewSet(ModelViewSet[Group]):
     model = Group
 
     queryset = Group.objects.order_by(Lower("name"))
@@ -229,7 +230,7 @@ class GroupViewSet(ModelViewSet):
     ordering_fields = ("name",)
 
 
-class ProfileView(GenericAPIView):
+class ProfileView(GenericAPIView[Any]):
     """
     User profile view, only available when logged in
     """
@@ -288,7 +289,7 @@ class ProfileView(GenericAPIView):
         },
     ),
 )
-class TOTPView(GenericAPIView):
+class TOTPView(GenericAPIView[Any]):
     """
     TOTP views
     """
@@ -368,7 +369,7 @@ class TOTPView(GenericAPIView):
         },
     ),
 )
-class GenerateAuthTokenView(GenericAPIView):
+class GenerateAuthTokenView(GenericAPIView[Any]):
     """
     Generates (or re-generates) an auth token, requires a logged in user
     unlike the default DRF endpoint
@@ -397,7 +398,7 @@ class GenerateAuthTokenView(GenericAPIView):
         },
     ),
 )
-class ApplicationConfigurationViewSet(ModelViewSet):
+class ApplicationConfigurationViewSet(ModelViewSet[ApplicationConfiguration]):
     model = ApplicationConfiguration
 
     queryset = ApplicationConfiguration.objects
@@ -450,7 +451,7 @@ class ApplicationConfigurationViewSet(ModelViewSet):
         },
     ),
 )
-class DisconnectSocialAccountView(GenericAPIView):
+class DisconnectSocialAccountView(GenericAPIView[Any]):
     """
     Disconnects a social account provider from the user account
     """
@@ -476,7 +477,7 @@ class DisconnectSocialAccountView(GenericAPIView):
         },
     ),
 )
-class SocialAccountProvidersView(GenericAPIView):
+class SocialAccountProvidersView(GenericAPIView[Any]):
     """
     List of social account providers
     """

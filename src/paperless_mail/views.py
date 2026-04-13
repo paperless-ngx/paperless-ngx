@@ -1,6 +1,7 @@
 import datetime
 import logging
 from datetime import timedelta
+from typing import Any
 
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
@@ -65,7 +66,7 @@ from paperless_mail.tasks import process_mail_accounts
         },
     ),
 )
-class MailAccountViewSet(ModelViewSet, PassUserMixin):
+class MailAccountViewSet(PassUserMixin, ModelViewSet[MailAccount]):
     model = MailAccount
 
     queryset = MailAccount.objects.all().order_by("pk")
@@ -159,7 +160,7 @@ class MailAccountViewSet(ModelViewSet, PassUserMixin):
         return Response({"result": "OK"})
 
 
-class ProcessedMailViewSet(ReadOnlyModelViewSet, PassUserMixin):
+class ProcessedMailViewSet(PassUserMixin, ReadOnlyModelViewSet[ProcessedMail]):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     serializer_class = ProcessedMailSerializer
     pagination_class = StandardPagination
@@ -187,7 +188,7 @@ class ProcessedMailViewSet(ReadOnlyModelViewSet, PassUserMixin):
         return Response({"result": "OK", "deleted_mail_ids": mail_ids})
 
 
-class MailRuleViewSet(ModelViewSet, PassUserMixin):
+class MailRuleViewSet(PassUserMixin, ModelViewSet[MailRule]):
     model = MailRule
 
     queryset = MailRule.objects.all().order_by("order")
@@ -203,7 +204,7 @@ class MailRuleViewSet(ModelViewSet, PassUserMixin):
         responses={200: None},
     ),
 )
-class OauthCallbackView(GenericAPIView):
+class OauthCallbackView(GenericAPIView[Any]):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):

@@ -57,7 +57,7 @@ class MailAccountSerializer(OwnedObjectSerializer):
         return instance
 
 
-class AccountField(serializers.PrimaryKeyRelatedField):
+class AccountField(serializers.PrimaryKeyRelatedField[MailAccount]):
     def get_queryset(self):
         return MailAccount.objects.all().order_by("-id")
 

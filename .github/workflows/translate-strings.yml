@@ -36,6 +36,8 @@ jobs:
             --group dev \
             --frozen
       - name: Generate backend translation strings
+        env:
+          PAPERLESS_SECRET_KEY: "ci-translate-not-a-real-secret"
         run: cd src/ && uv run manage.py makemessages -l en_US -i "samples*"
       - name: Install pnpm
         uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
