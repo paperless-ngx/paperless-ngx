@@ -18,6 +18,7 @@ import { ObjectWithId } from 'src/app/data/object-with-id'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { User } from 'src/app/data/user'
+import { PermissionsService } from 'src/app/services/permissions.service'
 import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -42,6 +43,7 @@ export abstract class EditDialogComponent<
   protected activeModal = inject(NgbActiveModal)
   protected userService = inject(UserService)
   protected settingsService = inject(SettingsService)
+  protected permissionsService = inject(PermissionsService)
 
   users: User[]
 
@@ -69,10 +71,6 @@ export abstract class EditDialogComponent<
 
   ngOnInit(): void {
     if (this.object != null && this.dialogMode !== EditDialogMode.CREATE) {
-      if ((this.object as ObjectWithPermissions).permissions) {
-        this.object['set_permissions'] = this.object['permissions']
-      }
-
       this.object['permissions_form'] = {
         owner: (this.object as ObjectWithPermissions).owner,
         set_permissions: (this.object as ObjectWithPermissions).permissions,
@@ -151,18 +149,28 @@ export abstract class EditDialogComponent<
     return Object.assign({}, this.objectForm.value)
   }
 
+  protected shouldSubmitPermissions(): boolean {
+    return (
+      this.dialogMode === EditDialogMode.CREATE ||
+      this.permissionsService.currentUserOwnsObject(this.object)
+    )
+  }
+
   save() {
     this.error = null
     const formValues = this.getFormValues()
     const permissionsObject: PermissionsFormObject =
       this.objectForm.get('permissions_form')?.value
-    if (permissionsObject) {
+    if (permissionsObject && this.shouldSubmitPermissions()) {
       formValues.owner = permissionsObject.owner
       formValues.set_permissions = permissionsObject.set_permissions
-      delete formValues.permissions_form
     }
+    delete formValues.permissions_form
 
     var newObject = Object.assign(Object.assign({}, this.object), formValues)
+    if (!this.shouldSubmitPermissions()) {
+      delete newObject['set_permissions']
+    }
     var serverResponse: Observable<T>
     switch (this.dialogMode) {
       case EditDialogMode.CREATE:

@@ -26,6 +26,7 @@ import {
 } from 'src/app/data/matching-model'
 import { Tag } from 'src/app/data/tag'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { PermissionsService } from 'src/app/services/permissions.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -87,6 +88,7 @@ describe('EditDialogComponent', () => {
   let component: TestComponent
   let fixture: ComponentFixture<TestComponent>
   let tagService: TagService
+  let permissionsService: PermissionsService
   let settingsService: SettingsService
   let activeModal: NgbActiveModal
   let httpTestingController: HttpTestingController
@@ -118,8 +120,10 @@ describe('EditDialogComponent', () => {
     }).compileComponents()
 
     tagService = TestBed.inject(TagService)
+    permissionsService = TestBed.inject(PermissionsService)
     settingsService = TestBed.inject(SettingsService)
     settingsService.currentUser = currentUser
+    permissionsService.initialize([], currentUser as any)
     activeModal = TestBed.inject(NgbActiveModal)
     httpTestingController = TestBed.inject(HttpTestingController)
 
@@ -224,6 +228,25 @@ describe('EditDialogComponent', () => {
     component.dialogMode = EditDialogMode.EDIT
     component.save()
     expect(updateSpy).toHaveBeenCalled()
+  })
+
+  it('should not submit owner or permissions for non-owner edits', () => {
+    component.object = tag
+    component.dialogMode = EditDialogMode.EDIT
+    component.ngOnInit()
+
+    component.objectForm.get('name').setValue('Updated tag')
+    component.save()
+
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}tags/${tag.id}/`
+    )
+    expect(req.request.method).toEqual('PUT')
+    expect(req.request.body.name).toEqual('Updated tag')
+    expect(req.request.body.owner).toEqual(tag.owner)
+    expect(req.request.body.set_permissions).toBeUndefined()
+
+    req.flush({})
   })
 
   it('should create an object on save in edit mode', () => {
