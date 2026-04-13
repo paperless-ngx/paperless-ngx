@@ -5,10 +5,11 @@ import tempfile
 from pathlib import Path
 
 from django.conf import settings
-from django.http import FileResponse
 from django.http import Http404
+from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
@@ -21,10 +22,18 @@ from documents.zone_ocr import run_zone_extraction
 class OcrTemplateViewSet(ModelViewSet):
     """CRUD for OCR templates with zone definitions."""
 
-    queryset = OcrTemplate.objects.all().prefetch_related("zones").order_by("name")
+    queryset = OcrTemplate.objects.all().prefetch_related(
+        "zones",
+        "zones__custom_field",
+    ).order_by("name")
     serializer_class = OcrTemplateSerializer
+    permission_classes = [IsAuthenticated]
 
-    @action(detail=False, methods=["get"], url_path="document-page-image/(?P<doc_id>[0-9]+)/(?P<page>[0-9]+)")
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path=r"document-page-image/(?P<doc_id>[0-9]+)/(?P<page>[0-9]+)",
+    )
     def document_page_image(self, request, doc_id=None, page=None):
         """Render a specific page of a document as a PNG image.
 
@@ -37,10 +46,21 @@ class OcrTemplateViewSet(ModelViewSet):
             raise Http404("Document not found")
 
         page_num = int(page)
-        doc_path = document.archive_path or document.source_path
 
-        if not doc_path or not Path(doc_path).exists():
+        # Validate page number
+        if document.page_count and page_num >= document.page_count:
+            raise Http404(
+                f"Page {page_num} out of range (document has {document.page_count} pages)"
+            )
+
+        doc_path = document.archive_path or document.source_path
+        if not doc_path or not Path(doc_path).is_file():
             raise Http404("Document file not found")
+
+        # Check if document is an image (single page, no PDF rendering needed)
+        if document.mime_type and document.mime_type.startswith("image/"):
+            content = Path(doc_path).read_bytes()
+            return HttpResponse(content, content_type=document.mime_type)
 
         with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
             output_prefix = Path(tmp_dir) / "page"
@@ -59,26 +79,32 @@ class OcrTemplateViewSet(ModelViewSet):
                     capture_output=True,
                     timeout=30,
                 )
-            except (subprocess.CalledProcessError, FileNotFoundError):
-                raise Http404("Failed to render page")
+            except subprocess.CalledProcessError as e:
+                raise Http404(
+                    f"Failed to render page: {e.stderr.decode(errors='replace')[:200]}"
+                )
+            except FileNotFoundError:
+                raise Http404("pdftoppm not available — is poppler-utils installed?")
 
-            rendered = list(Path(tmp_dir).glob("page-*.png"))
+            rendered = sorted(Path(tmp_dir).glob("page-*.png"))
             if not rendered:
                 raise Http404("No rendered page found")
 
-            # Read into memory since tmp_dir will be cleaned up
             content = rendered[0].read_bytes()
 
-        response = FileResponse(
-            content_type="image/png",
-            streaming_content=iter([content]),
-        )
-        response["Content-Disposition"] = f'inline; filename="page_{page_num}.png"'
-        return response
+        return HttpResponse(content, content_type="image/png")
 
-    @action(detail=True, methods=["post"], url_path="test/(?P<doc_id>[0-9]+)")
+    @action(
+        detail=True,
+        methods=["post"],
+        url_path=r"test/(?P<doc_id>[0-9]+)",
+    )
     def test_extraction(self, request, pk=None, doc_id=None):
-        """Run zone extraction on a specific document and return results without saving."""
+        """Run zone extraction on a specific document and return results.
+
+        This writes the extracted values to the document's custom fields
+        (via update_or_create) so the results are immediately visible.
+        """
         template = self.get_object()
 
         try:
@@ -90,22 +116,22 @@ class OcrTemplateViewSet(ModelViewSet):
             )
 
         doc_path = document.archive_path or document.source_path
-        if not doc_path or not Path(doc_path).exists():
+        if not doc_path or not Path(doc_path).is_file():
             return Response(
                 {"error": "Document file not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        # Run extraction (this writes to custom fields)
         run_zone_extraction(document, Path(doc_path))
 
-        # Return the extracted values
+        # Refresh and return the extracted values
         results = []
         for zone in template.zones.all():
             cf_instance = document.custom_fields.filter(field=zone.custom_field).first()
             results.append({
                 "zone": zone.name,
                 "custom_field": zone.custom_field.name,
+                "custom_field_type": zone.custom_field.data_type,
                 "value": cf_instance.value if cf_instance else None,
             })
 

@@ -6,6 +6,7 @@ each zone in the template is cropped from the document image and OCR'd separatel
 The extracted text is written to the configured custom field.
 """
 
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -26,24 +27,25 @@ class OcrTemplate(models.Model):
         on_delete=models.CASCADE,
         related_name="ocr_templates",
         verbose_name=_("document type"),
+        db_index=True,
     )
 
-    # Which page to extract from (0-indexed, -1 = last page)
     default_page = models.IntegerField(
         _("default page"),
         default=0,
         help_text=_("Default page index for zones (0-indexed, -1 for last page)"),
     )
 
-    # Source image dimensions the zones were drawn on (for coordinate scaling)
-    source_width = models.IntegerField(
+    source_width = models.PositiveIntegerField(
         _("source width"),
-        help_text=_("Width of the image the zones were drawn on"),
+        validators=[MinValueValidator(1)],
+        help_text=_("Width of the image the zones were drawn on (px)"),
     )
 
-    source_height = models.IntegerField(
+    source_height = models.PositiveIntegerField(
         _("source height"),
-        help_text=_("Height of the image the zones were drawn on"),
+        validators=[MinValueValidator(1)],
+        help_text=_("Height of the image the zones were drawn on (px)"),
     )
 
     enabled = models.BooleanField(_("enabled"), default=True)
@@ -51,6 +53,7 @@ class OcrTemplate(models.Model):
     created = models.DateTimeField(
         _("created"),
         default=timezone.now,
+        db_index=True,
         editable=False,
     )
 
@@ -87,7 +90,6 @@ class OcrTemplateZone(models.Model):
         help_text=_("Descriptive name for this zone (e.g. 'Invoice Number')"),
     )
 
-    # Target custom field to write the extracted value to
     custom_field = models.ForeignKey(
         "documents.CustomField",
         on_delete=models.CASCADE,
@@ -95,7 +97,6 @@ class OcrTemplateZone(models.Model):
         verbose_name=_("custom field"),
     )
 
-    # Page override (None = use template default)
     page = models.IntegerField(
         _("page"),
         null=True,
@@ -103,13 +104,19 @@ class OcrTemplateZone(models.Model):
         help_text=_("Page index override (leave blank to use template default)"),
     )
 
-    # Zone coordinates (pixels relative to source_width/source_height)
-    x = models.IntegerField(_("x"), help_text=_("Left edge (px)"))
-    y = models.IntegerField(_("y"), help_text=_("Top edge (px)"))
-    width = models.IntegerField(_("width"), help_text=_("Zone width (px)"))
-    height = models.IntegerField(_("height"), help_text=_("Zone height (px)"))
+    x = models.PositiveIntegerField(_("x"), help_text=_("Left edge (px)"))
+    y = models.PositiveIntegerField(_("y"), help_text=_("Top edge (px)"))
+    width = models.PositiveIntegerField(
+        _("width"),
+        validators=[MinValueValidator(1)],
+        help_text=_("Zone width (px)"),
+    )
+    height = models.PositiveIntegerField(
+        _("height"),
+        validators=[MinValueValidator(1)],
+        help_text=_("Zone height (px)"),
+    )
 
-    # OCR configuration per zone
     ocr_language = models.CharField(
         _("OCR language"),
         max_length=20,
@@ -117,25 +124,23 @@ class OcrTemplateZone(models.Model):
         help_text=_("Tesseract language code(s), e.g. 'deu+eng'"),
     )
 
-    # Optional post-processing
-    TRANSFORM_CHOICES = [
-        ("none", _("None")),
-        ("strip", _("Strip whitespace")),
-        ("uppercase", _("Uppercase")),
-        ("lowercase", _("Lowercase")),
-        ("numeric", _("Numeric only")),
-        ("date_dmy", _("Parse date (DD.MM.YYYY)")),
-        ("date_ymd", _("Parse date (YYYY-MM-DD)")),
-    ]
+    class TransformType(models.TextChoices):
+        NONE = ("none", _("None"))
+        STRIP = ("strip", _("Strip whitespace"))
+        UPPERCASE = ("uppercase", _("Uppercase"))
+        LOWERCASE = ("lowercase", _("Lowercase"))
+        NUMERIC = ("numeric", _("Numeric only"))
+        DATE_DMY = ("date_dmy", _("Parse date (DD.MM.YYYY)"))
+        DATE_YMD = ("date_ymd", _("Parse date (YYYY-MM-DD)"))
 
     transform = models.CharField(
         _("transform"),
         max_length=20,
-        choices=TRANSFORM_CHOICES,
-        default="strip",
+        choices=TransformType.choices,
+        default=TransformType.STRIP,
     )
 
-    order = models.IntegerField(_("order"), default=0)
+    order = models.PositiveIntegerField(_("order"), default=0)
 
     class Meta:
         ordering = ("template", "order")
