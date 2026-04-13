@@ -141,56 +141,6 @@ class OcrTemplateViewSet(ModelViewSet):
 
         return Response({"results": results})
 
-    @action(
-        detail=False,
-        methods=["post"],
-        url_path=r"run/(?P<doc_id>[0-9]+)",
-    )
-    def run_extraction(self, request, doc_id=None):
-        """Run zone OCR on a document using all matching templates for its type."""
-        try:
-            document = Document.objects.get(pk=doc_id)
-        except Document.DoesNotExist:
-            return Response(
-                {"error": "Document not found"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        if not document.document_type_id:
-            return Response(
-                {"error": "Document has no type assigned"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        doc_path = document.archive_path or document.source_path
-        if not doc_path or not Path(doc_path).is_file():
-            return Response(
-                {"error": "Document file not found"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        run_zone_extraction(document, None)
-
-        # Collect results from all templates
-        templates = OcrTemplate.objects.filter(
-            document_type=document.document_type, enabled=True,
-        ).prefetch_related("zones", "zones__custom_field")
-
-        results = []
-        for template in templates:
-            for zone in template.zones.all():
-                cf_instance = document.custom_fields.filter(
-                    field=zone.custom_field,
-                ).first()
-                results.append({
-                    "template": template.name,
-                    "zone": zone.name,
-                    "custom_field": zone.custom_field.name,
-                    "value": cf_instance.value if cf_instance else None,
-                })
-
-        return Response({"results": results})
-
     @action(detail=False, methods=["post"], url_path="quick-create-field")
     def quick_create_field(self, request):
         """Create a custom field inline from the template editor.

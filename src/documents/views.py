@@ -2016,6 +2016,58 @@ class DocumentViewSet(
             },
         ),
     )
+    @action(methods=["post"], detail=True, url_path="run-zone-ocr")
+    def run_zone_ocr(self, request, pk=None):
+        """Run zone-based OCR extraction on this document."""
+        try:
+            document = Document.objects.get(pk=pk)
+        except Document.DoesNotExist:
+            raise Http404
+
+        if not document.document_type_id:
+            return Response(
+                {"error": "Document has no type assigned"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        from documents.models_ocr_templates import OcrTemplate
+
+        templates = OcrTemplate.objects.filter(
+            document_type_id=document.document_type_id, enabled=True,
+        )
+        if not templates.exists():
+            return Response(
+                {"error": "No OCR templates found for this document type"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        doc_path = document.archive_path or document.source_path
+        if not doc_path or not Path(doc_path).is_file():
+            return Response(
+                {"error": "Document file not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        from documents.zone_ocr import run_zone_extraction
+
+        run_zone_extraction(document, None)
+
+        # Collect results
+        results = []
+        for template in templates.prefetch_related("zones", "zones__custom_field"):
+            for zone in template.zones.all():
+                cf_instance = document.custom_fields.filter(
+                    field=zone.custom_field,
+                ).first()
+                results.append({
+                    "template": template.name,
+                    "zone": zone.name,
+                    "custom_field": zone.custom_field.name,
+                    "value": cf_instance.value if cf_instance else None,
+                })
+
+        return Response({"results": results})
+
     @action(
         methods=["delete"],
         detail=True,
