@@ -1,0 +1,68 @@
+<div class="container-fluid">
+  <div class="row mb-3">
+    <div class="col">
+      <h3 i18n>OCR Templates</h3>
+      <p class="text-muted" i18n>
+        Define extraction zones on document types to automatically populate custom fields via OCR.
+      </p>
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-primary" (click)="createTemplate()">
+        <i-bs name="plus-circle"></i-bs>&nbsp;
+        <span i18n>Create Template</span>
+      </button>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden" i18n>Loading...</span>
+    </div>
+  } @else if (templates.length === 0) {
+    <div class="alert alert-info" i18n>
+      No OCR templates defined yet. Create one to start extracting structured data from your documents.
+    </div>
+  } @else {
+    <table class="table table-striped align-middle">
+      <thead>
+        <tr>
+          <th i18n>Name</th>
+          <th i18n>Document Type</th>
+          <th i18n>Zones</th>
+          <th i18n>Status</th>
+          <th i18n>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (t of templates; track t.id) {
+          <tr>
+            <td>
+              <a [routerLink]="['/ocr-templates', t.id]">{{ t.name }}</a>
+            </td>
+            <td>{{ t.document_type }}</td>
+            <td>{{ t.zones?.length || 0 }}</td>
+            <td>
+              @if (t.enabled) {
+                <span class="badge bg-success" i18n>Enabled</span>
+              } @else {
+                <span class="badge bg-secondary" i18n>Disabled</span>
+              }
+            </td>
+            <td>
+              <button class="btn btn-sm btn-outline-secondary me-1" (click)="editTemplate(t)" title="Edit">
+                <i-bs name="pencil"></i-bs>
+              </button>
+              <button class="btn btn-sm btn-outline-secondary me-1" (click)="toggleTemplate(t)"
+                [title]="t.enabled ? 'Disable' : 'Enable'">
+                <i-bs [name]="t.enabled ? 'toggle-on' : 'toggle-off'"></i-bs>
+              </button>
+              <button class="btn btn-sm btn-outline-danger" (click)="deleteTemplate(t)" title="Delete">
+                <i-bs name="trash"></i-bs>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

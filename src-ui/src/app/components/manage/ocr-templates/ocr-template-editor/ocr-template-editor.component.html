@@ -1,0 +1,258 @@
+<div class="container-fluid">
+  <div class="row mb-3">
+    <div class="col">
+      <h3>
+        @if (isNew) {
+          <span i18n>New OCR Template</span>
+        } @else {
+          <span i18n>Edit OCR Template</span>: {{ template.name }}
+        }
+      </h3>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Left column: Template settings + Zone list -->
+    <div class="col-md-4">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title" i18n>Template Settings</h5>
+
+          <div class="mb-3">
+            <label class="form-label" i18n>Name</label>
+            <input type="text" class="form-control" [(ngModel)]="template.name" />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" i18n>Document Type</label>
+            <select class="form-select" [(ngModel)]="template.document_type">
+              <option [ngValue]="null" i18n>-- Select --</option>
+              @for (dt of documentTypes; track dt.id) {
+                <option [ngValue]="dt.id">{{ dt.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" i18n>Default Page</label>
+            <input
+              type="number"
+              class="form-control"
+              [(ngModel)]="template.default_page"
+              min="0"
+            />
+            <small class="text-muted" i18n>0 = first page, -1 = last page</small>
+          </div>
+
+          <div class="form-check mb-3">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              id="templateEnabled"
+              [(ngModel)]="template.enabled"
+            />
+            <label class="form-check-label" for="templateEnabled" i18n>Enabled</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview controls -->
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title" i18n>Document Preview</h5>
+          <div class="mb-3">
+            <label class="form-label" i18n>Document ID</label>
+            <div class="input-group">
+              <input
+                type="number"
+                class="form-control"
+                [(ngModel)]="previewDocId"
+                placeholder="Enter document ID"
+              />
+              <button class="btn btn-outline-secondary" (click)="loadPreview()" i18n>
+                Load
+              </button>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" i18n>Page</label>
+            <div class="input-group">
+              <input
+                type="number"
+                class="form-control"
+                [(ngModel)]="previewPage"
+                min="0"
+              />
+              <button class="btn btn-outline-secondary" (click)="loadPreview()" i18n>
+                Go
+              </button>
+            </div>
+          </div>
+          <small class="text-muted" i18n>
+            Draw rectangles on the preview to define extraction zones.
+          </small>
+        </div>
+      </div>
+
+      <!-- Zone list -->
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title" i18n>
+            Zones ({{ template.zones.length }})
+          </h5>
+
+          @if (template.zones.length === 0) {
+            <p class="text-muted" i18n>
+              No zones defined. Load a document preview and draw rectangles to add zones.
+            </p>
+          }
+
+          @for (zone of template.zones; track $index; let i = $index) {
+            <div
+              class="border rounded p-2 mb-2"
+              [class.border-primary]="selectedZoneIndex === i"
+              [style.cursor]="'pointer'"
+              (click)="selectZone(i)"
+            >
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <strong>{{ zone.name }}</strong>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="removeZone(i); $event.stopPropagation()"
+                >
+                  <i-bs name="trash"></i-bs>
+                </button>
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label small" i18n>Zone Name</label>
+                <input
+                  type="text"
+                  class="form-control form-control-sm"
+                  [(ngModel)]="zone.name"
+                  (ngModelChange)="redrawCanvas()"
+                />
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label small" i18n>Custom Field</label>
+                <select
+                  class="form-select form-select-sm"
+                  [(ngModel)]="zone.custom_field"
+                >
+                  @for (cf of customFields; track cf.id) {
+                    <option [ngValue]="cf.id">{{ cf.name }} ({{ cf.data_type }})</option>
+                  }
+                </select>
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label small" i18n>OCR Language</label>
+                <input
+                  type="text"
+                  class="form-control form-control-sm"
+                  [(ngModel)]="zone.ocr_language"
+                  placeholder="deu+eng"
+                />
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label small" i18n>Transform</label>
+                <select
+                  class="form-select form-select-sm"
+                  [(ngModel)]="zone.transform"
+                >
+                  @for (opt of transformOptions; track opt.id) {
+                    <option [ngValue]="opt.id">{{ opt.name }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="text-muted small">
+                {{ zone.x }}, {{ zone.y }} — {{ zone.width }}×{{ zone.height }}px
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="d-flex gap-2 mb-3">
+        <button class="btn btn-primary" (click)="save()" [disabled]="saving">
+          @if (saving) {
+            <span class="spinner-border spinner-border-sm"></span>
+          }
+          <span i18n>Save</span>
+        </button>
+        @if (!isNew && previewDocId) {
+          <button
+            class="btn btn-outline-secondary"
+            (click)="testOnDocument()"
+            [disabled]="testing"
+          >
+            @if (testing) {
+              <span class="spinner-border spinner-border-sm"></span>
+            }
+            <span i18n>Test Extraction</span>
+          </button>
+        }
+        <a routerLink="/ocr-templates" class="btn btn-outline-secondary" i18n>Cancel</a>
+      </div>
+
+      <!-- Test results -->
+      @if (testResults) {
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5 class="card-title" i18n>Test Results</h5>
+            @for (r of testResults; track $index) {
+              <div class="mb-2">
+                <strong>{{ r.zone }}</strong> → {{ r.custom_field }}:
+                <code>{{ r.value ?? '(empty)' }}</code>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Right column: Document preview with zone overlay -->
+    <div class="col-md-8">
+      @if (pageImageUrl) {
+        <div class="position-relative" style="display: inline-block; width: 100%;">
+          <img
+            #pageImage
+            [src]="pageImageUrl"
+            (load)="onImageLoad()"
+            style="width: 100%; display: block;"
+            [style.visibility]="imageLoaded ? 'visible' : 'hidden'"
+            crossorigin="use-credentials"
+          />
+          @if (imageLoaded) {
+            <canvas
+              #zoneCanvas
+              class="position-absolute top-0 start-0"
+              style="width: 100%; height: 100%; cursor: crosshair;"
+              (mousedown)="onCanvasMouseDown($event)"
+              (mousemove)="onCanvasMouseMove($event)"
+              (mouseup)="onCanvasMouseUp($event)"
+            ></canvas>
+          }
+          @if (!imageLoaded) {
+            <div class="d-flex justify-content-center p-5">
+              <div class="spinner-border" role="status">
+                <span class="visually-hidden" i18n>Loading page...</span>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="border rounded p-5 text-center text-muted">
+          <i-bs name="file-earmark-image" width="48" height="48"></i-bs>
+          <p class="mt-3" i18n>
+            Enter a document ID and click "Load" to preview a page and draw extraction zones.
+          </p>
+        </div>
+      }
+    </div>
+  </div>
+</div>

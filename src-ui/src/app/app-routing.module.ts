@@ -15,6 +15,8 @@ import { DocumentAttributesComponent } from './components/manage/document-attrib
 import { MailComponent } from './components/manage/mail/mail.component'
 import { SavedViewsComponent } from './components/manage/saved-views/saved-views.component'
 import { WorkflowsComponent } from './components/manage/workflows/workflows.component'
+import { OcrTemplatesComponent } from './components/manage/ocr-templates/ocr-templates.component'
+import { OcrTemplateEditorComponent } from './components/manage/ocr-templates/ocr-template-editor/ocr-template-editor.component'
 import { NotFoundComponent } from './components/not-found/not-found.component'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
 import { DirtyFormGuard } from './guards/dirty-form.guard'
@@ -272,6 +274,20 @@ export const routes: Routes = [
             type: PermissionType.Workflow,
           },
           componentName: 'WorkflowsComponent',
+        },
+      },
+      {
+        path: 'ocr-templates',
+        component: OcrTemplatesComponent,
+        data: {
+          componentName: 'OcrTemplatesComponent',
+        },
+      },
+      {
+        path: 'ocr-templates/:id',
+        component: OcrTemplateEditorComponent,
+        data: {
+          componentName: 'OcrTemplateEditorComponent',
         },
       },
       {
