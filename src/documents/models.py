@@ -1236,6 +1236,11 @@ class CustomFieldInstance(SoftDeleteModel):
         return str(self.value)
 
 
+# Import OCR template models so Django discovers them
+from documents.models_ocr_templates import OcrTemplate  # noqa: E402, F401
+from documents.models_ocr_templates import OcrTemplateZone  # noqa: E402, F401
+
+
 if settings.AUDIT_LOG_ENABLED:
     auditlog.register(
         Document,

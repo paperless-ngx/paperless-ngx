@@ -1340,6 +1340,21 @@ def close_connection_pool_on_worker_init(**kwargs) -> None:
             conn.close_pool()
 
 
+def run_zone_ocr_extraction(sender, document, original_file=None, **kwargs):
+    """
+    Run zone-based OCR extraction if the document's type has an active template.
+    """
+    try:
+        from documents.zone_ocr import run_zone_extraction
+
+        run_zone_extraction(document, Path(original_file) if original_file else None)
+    except Exception:
+        logger.exception(
+            "Zone OCR extraction failed for document %s",
+            document.pk,
+        )
+
+
 def add_or_update_document_in_llm_index(sender, document, **kwargs):
     """
     Add or update a document in the LLM index when it is created or updated.

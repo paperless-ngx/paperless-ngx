@@ -21,6 +21,7 @@ from documents.views import BulkEditView
 from documents.views import ChatStreamingView
 from documents.views import CorrespondentViewSet
 from documents.views import CustomFieldViewSet
+from documents.views_ocr_templates import OcrTemplateViewSet
 from documents.views import DeleteDocumentsView
 from documents.views import DocumentTypeViewSet
 from documents.views import EditPdfDocumentsView
@@ -86,6 +87,7 @@ api_router.register(r"workflow_triggers", WorkflowTriggerViewSet)
 api_router.register(r"workflow_actions", WorkflowActionViewSet)
 api_router.register(r"workflows", WorkflowViewSet)
 api_router.register(r"custom_fields", CustomFieldViewSet)
+api_router.register(r"ocr_templates", OcrTemplateViewSet)
 api_router.register(r"config", ApplicationConfigurationViewSet)
 api_router.register(r"processed_mail", ProcessedMailViewSet)
 
