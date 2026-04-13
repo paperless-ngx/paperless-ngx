@@ -48,6 +48,16 @@ class OcrTemplate(models.Model):
         help_text=_("Height of the image the zones were drawn on (px)"),
     )
 
+    sample_document = models.ForeignKey(
+        "documents.Document",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name=_("sample document"),
+        help_text=_("Document used for previewing zones in the editor"),
+    )
+
     enabled = models.BooleanField(_("enabled"), default=True)
 
     created = models.DateTimeField(

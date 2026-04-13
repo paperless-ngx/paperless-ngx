@@ -61,6 +61,7 @@ class OcrTemplateSerializer(serializers.ModelSerializer):
             "default_page",
             "source_width",
             "source_height",
+            "sample_document",
             "enabled",
             "created",
             "updated",

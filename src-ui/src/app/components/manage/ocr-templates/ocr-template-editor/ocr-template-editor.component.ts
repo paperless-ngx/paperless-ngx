@@ -53,6 +53,7 @@ export class OcrTemplateEditorComponent
     id: null,
     name: '',
     document_type: null,
+    sample_document: null,
     default_page: 0,
     source_width: 0,
     source_height: 0,
@@ -118,6 +119,10 @@ export class OcrTemplateEditorComponent
         .pipe(takeUntil(this.destroy$))
         .subscribe((t) => {
           this.template = t
+          if (t.sample_document) {
+            this.previewDocId = t.sample_document
+            this.loadPreview()
+          }
         })
     }
   }
@@ -334,6 +339,7 @@ export class OcrTemplateEditorComponent
 
   save() {
     this.saving = true
+    this.template.sample_document = this.previewDocId
     const obs = this.isNew
       ? this.templateService.create(this.template)
       : this.templateService.update(this.template)
