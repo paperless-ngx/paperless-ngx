@@ -24,6 +24,7 @@ export const TRANSFORM_OPTIONS = [
   { id: 'numeric', name: $localize`Numeric only` },
   { id: 'date_dmy', name: $localize`Parse date (DD.MM.YYYY)` },
   { id: 'date_ymd', name: $localize`Parse date (YYYY-MM-DD)` },
+  { id: 'date_auto', name: $localize`Parse date (auto-detect)` },
 ]
 
 export interface OcrTemplate extends ObjectWithId {
