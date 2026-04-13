@@ -152,6 +152,7 @@ class OcrTemplateZone(models.Model):
         NUMERIC = ("numeric", _("Numeric only"))
         DATE_DMY = ("date_dmy", _("Parse date (DD.MM.YYYY)"))
         DATE_YMD = ("date_ymd", _("Parse date (YYYY-MM-DD)"))
+        DATE_AUTO = ("date_auto", _("Parse date (auto-detect)"))
 
     transform = models.CharField(
         _("transform"),

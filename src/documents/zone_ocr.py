@@ -329,6 +329,19 @@ def _apply_transform(text: str, transform: str) -> str:
             except ValueError:
                 pass
         return text
+    elif transform == "date_auto":
+        import dateparser
+
+        parsed = dateparser.parse(
+            text,
+            settings={
+                "PREFER_DAY_OF_MONTH": "first",
+                "RETURN_AS_TIMEZONE_AWARE": False,
+            },
+        )
+        if parsed:
+            return parsed.date().isoformat()
+        return text
     return text
 
 
