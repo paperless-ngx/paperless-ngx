@@ -78,6 +78,12 @@ export class OcrTemplateEditorComponent
   currentRect: DrawingRect | null = null
   selectedZoneIndex: number | null = null
 
+  // Resize state
+  isResizing = false
+  resizeHandle: string | null = null // 'n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'
+  resizeZoneIndex: number | null = null
+  private readonly HANDLE_SIZE = 8
+
   // Test results
   testResults: any[] | null = null
   testing = false
@@ -124,6 +130,18 @@ export class OcrTemplateEditorComponent
             this.loadPreview()
           }
         })
+    } else {
+      // Pre-fill from query params (e.g. "Create OCR Template" from document detail)
+      const qp = this.route.snapshot.queryParams
+      if (qp['document_type']) {
+        this.template.document_type = parseInt(qp['document_type'])
+      }
+      if (qp['sample_document']) {
+        const docId = parseInt(qp['sample_document'])
+        this.template.sample_document = docId
+        this.previewDocId = docId
+        this.loadPreview()
+      }
     }
   }
 
@@ -153,6 +171,17 @@ export class OcrTemplateEditorComponent
     const x = event.clientX - rect.left
     const y = event.clientY - rect.top
 
+    // Check if clicking on a resize handle of the selected zone
+    if (this.selectedZoneIndex !== null) {
+      const handle = this.findHandleAt(x, y, this.selectedZoneIndex)
+      if (handle) {
+        this.isResizing = true
+        this.resizeHandle = handle
+        this.resizeZoneIndex = this.selectedZoneIndex
+        return
+      }
+    }
+
     // Check if clicking on an existing zone
     const clickedIdx = this.findZoneAt(x, y)
     if (clickedIdx !== null && !event.shiftKey) {
@@ -168,14 +197,47 @@ export class OcrTemplateEditorComponent
   }
 
   onCanvasMouseMove(event: MouseEvent) {
-    if (!this.isDrawing || !this.currentRect) return
     const rect = this.canvasRef.nativeElement.getBoundingClientRect()
-    this.currentRect.endX = event.clientX - rect.left
-    this.currentRect.endY = event.clientY - rect.top
-    this.redrawCanvas()
+    const mx = event.clientX - rect.left
+    const my = event.clientY - rect.top
+
+    if (this.isResizing && this.resizeZoneIndex !== null && this.resizeHandle) {
+      this.applyResize(mx, my)
+      this.redrawCanvas()
+      return
+    }
+
+    if (this.isDrawing && this.currentRect) {
+      this.currentRect.endX = mx
+      this.currentRect.endY = my
+      this.redrawCanvas()
+      return
+    }
+
+    // Update cursor based on handle proximity
+    if (this.selectedZoneIndex !== null) {
+      const handle = this.findHandleAt(mx, my, this.selectedZoneIndex)
+      const canvas = this.canvasRef.nativeElement
+      if (handle) {
+        const cursorMap: Record<string, string> = {
+          nw: 'nw-resize', ne: 'ne-resize', sw: 'sw-resize', se: 'se-resize',
+          n: 'n-resize', s: 's-resize', w: 'w-resize', e: 'e-resize',
+        }
+        canvas.style.cursor = cursorMap[handle] || 'crosshair'
+      } else {
+        canvas.style.cursor = 'crosshair'
+      }
+    }
   }
 
   onCanvasMouseUp(event: MouseEvent) {
+    if (this.isResizing) {
+      this.isResizing = false
+      this.resizeHandle = null
+      this.resizeZoneIndex = null
+      return
+    }
+
     if (!this.isDrawing || !this.currentRect) return
     this.isDrawing = false
 
@@ -215,9 +277,8 @@ export class OcrTemplateEditorComponent
       height: h,
       ocr_language: 'deu+eng',
       transform: 'strip',
+      validation_regex: '',
       order: this.template.zones.length,
-      // Store per-zone source dimensions from the current page image
-      // Handles mixed page sizes in PDFs (landscape/portrait, different formats)
       zone_source_width: img.naturalWidth,
       zone_source_height: img.naturalHeight,
     }
@@ -226,6 +287,70 @@ export class OcrTemplateEditorComponent
     this.selectedZoneIndex = this.template.zones.length - 1
     this.currentRect = null
     this.redrawCanvas()
+  }
+
+  private getZoneDisplayRect(zoneIdx: number): { x: number; y: number; w: number; h: number } | null {
+    const canvas = this.canvasRef?.nativeElement
+    const img = this.imageRef?.nativeElement
+    if (!canvas || !img || !img.naturalWidth) return null
+    const zone = this.template.zones[zoneIdx]
+    if (!zone) return null
+    const srcW = zone.zone_source_width || img.naturalWidth
+    const srcH = zone.zone_source_height || img.naturalHeight
+    const scaleX = canvas.width / srcW
+    const scaleY = canvas.height / srcH
+    return {
+      x: zone.x * scaleX,
+      y: zone.y * scaleY,
+      w: zone.width * scaleX,
+      h: zone.height * scaleY,
+    }
+  }
+
+  private findHandleAt(mx: number, my: number, zoneIdx: number): string | null {
+    const r = this.getZoneDisplayRect(zoneIdx)
+    if (!r) return null
+    const hs = this.HANDLE_SIZE
+    const handles: [string, number, number][] = [
+      ['nw', r.x, r.y], ['n', r.x + r.w / 2, r.y], ['ne', r.x + r.w, r.y],
+      ['w', r.x, r.y + r.h / 2], ['e', r.x + r.w, r.y + r.h / 2],
+      ['sw', r.x, r.y + r.h], ['s', r.x + r.w / 2, r.y + r.h], ['se', r.x + r.w, r.y + r.h],
+    ]
+    for (const [name, hx, hy] of handles) {
+      if (Math.abs(mx - hx) <= hs && Math.abs(my - hy) <= hs) return name
+    }
+    return null
+  }
+
+  private applyResize(mx: number, my: number) {
+    const canvas = this.canvasRef.nativeElement
+    const img = this.imageRef.nativeElement
+    const zone = this.template.zones[this.resizeZoneIndex]
+    if (!zone) return
+    const srcW = zone.zone_source_width || img.naturalWidth
+    const srcH = zone.zone_source_height || img.naturalHeight
+    const scaleX = srcW / canvas.width
+    const scaleY = srcH / canvas.height
+    const imgX = Math.round(mx * scaleX)
+    const imgY = Math.round(my * scaleY)
+    const handle = this.resizeHandle
+
+    if (handle.includes('w')) {
+      const right = zone.x + zone.width
+      zone.x = Math.max(0, Math.min(imgX, right - 10))
+      zone.width = right - zone.x
+    }
+    if (handle.includes('e')) {
+      zone.width = Math.max(10, imgX - zone.x)
+    }
+    if (handle.includes('n')) {
+      const bottom = zone.y + zone.height
+      zone.y = Math.max(0, Math.min(imgY, bottom - 10))
+      zone.height = bottom - zone.y
+    }
+    if (handle.includes('s')) {
+      zone.height = Math.max(10, imgY - zone.y)
+    }
   }
 
   private findZoneAt(displayX: number, displayY: number): number | null {
@@ -303,6 +428,20 @@ export class OcrTemplateEditorComponent
       ctx.fillStyle = color
       ctx.font = '12px sans-serif'
       ctx.fillText(zone.name, x + 4, y + 14)
+
+      // Draw resize handles on selected zone
+      if (idx === this.selectedZoneIndex) {
+        const hs = this.HANDLE_SIZE
+        ctx.fillStyle = color
+        const handles = [
+          [x, y], [x + w / 2, y], [x + w, y],
+          [x, y + h / 2], [x + w, y + h / 2],
+          [x, y + h], [x + w / 2, y + h], [x + w, y + h],
+        ]
+        for (const [hx, hy] of handles) {
+          ctx.fillRect(hx - hs / 2, hy - hs / 2, hs, hs)
+        }
+      }
     })
 
     // Draw current selection rect

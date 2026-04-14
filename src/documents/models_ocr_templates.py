@@ -163,12 +163,22 @@ class OcrTemplateZone(models.Model):
         DATE_DMY = ("date_dmy", _("Parse date (DD.MM.YYYY)"))
         DATE_YMD = ("date_ymd", _("Parse date (YYYY-MM-DD)"))
         DATE_AUTO = ("date_auto", _("Parse date (auto-detect)"))
+        QR_CODE = ("qr_code", _("Read QR/barcode"))
+        QR_CODE_RAW = ("qr_code_raw", _("Read QR/barcode (raw)"))
 
     transform = models.CharField(
         _("transform"),
         max_length=20,
         choices=TransformType.choices,
         default=TransformType.STRIP,
+    )
+
+    validation_regex = models.CharField(
+        _("validation regex"),
+        max_length=256,
+        blank=True,
+        default="",
+        help_text=_("Optional regex pattern — extracted text is only accepted if it matches"),
     )
 
     order = models.PositiveIntegerField(_("order"), default=0)

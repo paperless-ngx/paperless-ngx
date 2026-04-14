@@ -147,6 +147,17 @@ def _process_template(
             )
 
             if extracted is not None:
+                # Validate against regex if configured
+                if zone.validation_regex:
+                    if not re.fullmatch(zone.validation_regex, extracted):
+                        logger.info(
+                            "Zone OCR: '%s' value %r rejected by regex '%s'",
+                            zone.name,
+                            extracted[:100],
+                            zone.validation_regex,
+                        )
+                        continue
+
                 _write_custom_field(document, zone.custom_field, extracted)
                 logger.info(
                     "Zone OCR: '%s' → %s = %r",
@@ -218,14 +229,14 @@ def _render_pages(
     return result
 
 
-def _extract_zone(
+def _crop_zone(
     page_img: Path,
     zone: OcrTemplateZone,
     source_width: int,
     source_height: int,
     tmp_dir: Path,
-) -> str | None:
-    """Crop a zone from the page image and OCR it."""
+) -> "Image.Image | None":
+    """Crop a zone from the page image and return the PIL Image."""
     from PIL import Image
 
     try:
@@ -251,14 +262,37 @@ def _extract_zone(
                 logger.warning("Zone OCR: crop too small for zone '%s'", zone.name)
                 return None
 
-            cropped = img.crop((crop_left, crop_top, crop_right, crop_bottom))
-            crop_path = tmp_dir / f"zone_{zone.pk}.png"
-            cropped.save(crop_path)
+            return img.crop((crop_left, crop_top, crop_right, crop_bottom)).copy()
     except Exception:
         logger.exception("Zone OCR: crop failed for zone '%s'", zone.name)
         return None
 
-    # OCR the cropped image with Tesseract
+
+def _read_barcode(cropped: "Image.Image", zone_name: str) -> str | None:
+    """Read QR/barcode from a cropped image using zxingcpp."""
+    try:
+        import zxingcpp
+
+        results = zxingcpp.read_barcodes(cropped)
+        if results:
+            text = results[0].text
+            logger.debug("Zone OCR: barcode found in zone '%s': %s", zone_name, text[:100])
+            return text
+        logger.debug("Zone OCR: no barcode found in zone '%s'", zone_name)
+        return None
+    except ImportError:
+        logger.error("Zone OCR: zxingcpp not available — install zxing-cpp")
+        return None
+    except Exception:
+        logger.exception("Zone OCR: barcode read failed for zone '%s'", zone_name)
+        return None
+
+
+def _ocr_text(cropped: "Image.Image", zone: OcrTemplateZone, tmp_dir: Path) -> str | None:
+    """OCR a cropped image with Tesseract."""
+    crop_path = tmp_dir / f"zone_{zone.pk}.png"
+    cropped.save(crop_path)
+
     try:
         proc = subprocess.run(
             [
@@ -273,7 +307,7 @@ def _extract_zone(
             timeout=30,
             check=True,
         )
-        text = proc.stdout.strip()
+        return proc.stdout.strip() or None
     except subprocess.TimeoutExpired:
         logger.error("Zone OCR: Tesseract timed out for zone '%s'", zone.name)
         return None
@@ -288,6 +322,28 @@ def _extract_zone(
         logger.error("Zone OCR: Tesseract not found — is tesseract-ocr installed?")
         return None
 
+
+def _extract_zone(
+    page_img: Path,
+    zone: OcrTemplateZone,
+    source_width: int,
+    source_height: int,
+    tmp_dir: Path,
+) -> str | None:
+    """Crop a zone from the page image and extract text via OCR or barcode reader."""
+    cropped = _crop_zone(page_img, zone, source_width, source_height, tmp_dir)
+    if cropped is None:
+        return None
+
+    # QR/barcode zones skip Tesseract entirely
+    if zone.transform in ("qr_code", "qr_code_raw"):
+        text = _read_barcode(cropped, zone.name)
+        if not text:
+            return None
+        return _apply_transform(text, zone.transform)
+
+    # Standard OCR path
+    text = _ocr_text(cropped, zone, tmp_dir)
     if not text:
         return None
 
@@ -341,6 +397,12 @@ def _apply_transform(text: str, transform: str) -> str:
         )
         if parsed:
             return parsed.date().isoformat()
+        return text
+    elif transform == "qr_code":
+        # Return the full barcode/QR content as-is (already read by _read_barcode)
+        return text
+    elif transform == "qr_code_raw":
+        # Return raw barcode content unmodified
         return text
     return text
 

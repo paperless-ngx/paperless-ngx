@@ -1405,6 +1405,33 @@ export class DocumentDetailComponent
     })
   }
 
+  runZoneOcr() {
+    this.http
+      .post(`${this.documentsService.getResourceUrl(this.document.id)}run-zone-ocr/`, {})
+      .subscribe({
+        next: (res: any) => {
+          if (res.results?.length) {
+            const summary = res.results.map((r: any) => `${r.zone}: ${r.value ?? '(empty)'}`).join(', ')
+            this.toastService.showInfo($localize`Zone OCR complete: ${summary}`)
+          } else {
+            this.toastService.showInfo($localize`Zone OCR ran but no results extracted.`)
+          }
+        },
+        error: (error) => {
+          this.toastService.showError($localize`Zone OCR failed`, error)
+        },
+      })
+  }
+
+  createOcrTemplate() {
+    this.router.navigate(['/ocr-templates', 'new'], {
+      queryParams: {
+        document_type: this.document.document_type,
+        sample_document: this.document.id,
+      },
+    })
+  }
+
   private getSelectedNonLatestVersionId(): number | null {
     const versions = this.document?.versions ?? []
     if (!versions.length || !this.selectedVersionId) {

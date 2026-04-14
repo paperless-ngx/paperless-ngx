@@ -11,6 +11,7 @@ export interface OcrTemplateZone {
   height: number
   ocr_language: string
   transform: string
+  validation_regex: string
   order: number
   zone_source_width?: number
   zone_source_height?: number
@@ -25,6 +26,8 @@ export const TRANSFORM_OPTIONS = [
   { id: 'date_dmy', name: $localize`Parse date (DD.MM.YYYY)` },
   { id: 'date_ymd', name: $localize`Parse date (YYYY-MM-DD)` },
   { id: 'date_auto', name: $localize`Parse date (auto-detect)` },
+  { id: 'qr_code', name: $localize`Read QR/barcode` },
+  { id: 'qr_code_raw', name: $localize`Read QR/barcode (raw)` },
 ]
 
 export interface OcrTemplate extends ObjectWithId {

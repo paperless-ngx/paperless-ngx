@@ -178,6 +178,16 @@
                 </select>
               </div>
 
+              <div class="mb-1">
+                <label class="form-label small" i18n>Validation Regex</label>
+                <input
+                  type="text"
+                  class="form-control form-control-sm font-monospace"
+                  [(ngModel)]="zone.validation_regex"
+                  placeholder="e.g. \d{2}\.\d{2}\.\d{4}"
+                >
+              </div>
+
               <div class="text-muted small">
                 {{ zone.x }}, {{ zone.y }} — {{ zone.width }}×{{ zone.height }}px
               </div>
