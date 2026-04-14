@@ -4,6 +4,9 @@ from typing import Final
 
 import rapidfuzz
 from django.core.management import CommandError
+from rich.panel import Panel
+from rich.table import Table
+from rich.text import Text
 
 from documents.management.commands.base import PaperlessCommand
 from documents.models import Document
@@ -64,21 +67,93 @@ class Command(PaperlessCommand):
             help="If set, one document of matches above the ratio WILL BE DELETED",
         )
 
+    def _render_results(
+        self,
+        matches: list[_WorkResult],
+        *,
+        opt_ratio: float,
+        do_delete: bool,
+    ) -> list[int]:
+        """Render match results as a Rich table. Returns list of PKs to delete."""
+        if not matches:
+            self.console.print(
+                Panel(
+                    "[green]No duplicate documents found.[/green]",
+                    title="Fuzzy Match",
+                    border_style="green",
+                ),
+            )
+            return []
+
+        # Fetch titles for matched documents in a single query.
+        all_pks = {pk for m in matches for pk in (m.doc_one_pk, m.doc_two_pk)}
+        titles: dict[int, str] = dict(
+            Document.objects.filter(pk__in=all_pks)
+            .only("pk", "title")
+            .values_list("pk", "title"),
+        )
+
+        table = Table(
+            title=f"Fuzzy Matches (threshold: {opt_ratio:.1f}%)",
+            show_lines=True,
+            title_style="bold",
+        )
+        table.add_column("#", style="dim", width=4, no_wrap=True)
+        table.add_column("Document A", min_width=24)
+        table.add_column("Document B", min_width=24)
+        table.add_column("Similarity", width=11, justify="right")
+
+        maybe_delete_ids: list[int] = []
+
+        for i, match_result in enumerate(matches, 1):
+            pk_a = match_result.doc_one_pk
+            pk_b = match_result.doc_two_pk
+            ratio = match_result.ratio
+
+            if ratio >= 97.0:
+                ratio_style = "bold red"
+            elif ratio >= 92.0:
+                ratio_style = "red"
+            elif ratio >= 88.0:
+                ratio_style = "yellow"
+            else:
+                ratio_style = "dim"
+
+            table.add_row(
+                str(i),
+                f"[dim]#{pk_a}[/dim] {titles.get(pk_a, 'Unknown')}",
+                f"[dim]#{pk_b}[/dim] {titles.get(pk_b, 'Unknown')}",
+                Text(f"{ratio:.1f}%", style=ratio_style),
+            )
+            maybe_delete_ids.append(pk_b)
+
+        self.console.print(table)
+
+        summary = f"Found [bold]{len(matches)}[/bold] matching pair(s)."
+        if do_delete:
+            summary += f" [yellow]{len(maybe_delete_ids)}[/yellow] document(s) will be deleted."
+        self.console.print(summary)
+
+        return maybe_delete_ids
+
     def handle(self, *args, **options):
         RATIO_MIN: Final[float] = 0.0
         RATIO_MAX: Final[float] = 100.0
-
-        if options["delete"]:
-            self.stdout.write(
-                self.style.WARNING(
-                    "The command is configured to delete documents.  Use with caution",
-                ),
-            )
 
         opt_ratio = options["ratio"]
 
         if opt_ratio < RATIO_MIN or opt_ratio > RATIO_MAX:
             raise CommandError("The ratio must be between 0 and 100")
+
+        if options["delete"]:
+            self.console.print(
+                Panel(
+                    "[bold yellow]WARNING:[/bold yellow] This run is configured to delete"
+                    " documents. One document from each matched pair WILL BE PERMANENTLY DELETED.",
+                    title="Delete Mode",
+                    border_style="red",
+                ),
+            )
 
         # Load only the fields we need -- avoids fetching title, archive_checksum, etc.
         slim_docs: list[tuple[int, str]] = list(
@@ -116,26 +191,16 @@ class Command(PaperlessCommand):
                     ):
                         yield proc_result.result
 
-        messages: list[str] = []
-        maybe_delete_ids: list[int] = []
-        for match_result in sorted(_iter_matches()):
-            messages.append(
-                self.style.NOTICE(
-                    f"Document {match_result.doc_one_pk} fuzzy match"
-                    f" to {match_result.doc_two_pk}"
-                    f" (confidence {match_result.ratio:.3f})\n",
-                ),
-            )
-            maybe_delete_ids.append(match_result.doc_two_pk)
+        matches = sorted(_iter_matches())
+        maybe_delete_ids = self._render_results(
+            matches,
+            opt_ratio=opt_ratio,
+            do_delete=options["delete"],
+        )
 
-        if not messages:
-            messages.append(self.style.SUCCESS("No matches found\n"))
-        self.stdout.writelines(messages)
-
-        if options["delete"]:
-            self.stdout.write(
-                self.style.NOTICE(
-                    f"Deleting {len(maybe_delete_ids)} documents based on ratio matches",
-                ),
+        if options["delete"] and maybe_delete_ids:
+            self.console.print(
+                f"[red]Deleting {len(maybe_delete_ids)} document(s)...[/red]",
             )
             Document.objects.filter(pk__in=maybe_delete_ids).delete()
+            self.console.print("[green]Done.[/green]")

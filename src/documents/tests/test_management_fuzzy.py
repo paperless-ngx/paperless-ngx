@@ -10,8 +10,6 @@ from documents.models import Document
 
 @pytest.mark.management
 class TestFuzzyMatchCommand(TestCase):
-    MSG_REGEX = r"Document \d fuzzy match to \d \(confidence \d\d\.\d\d\d\)"
-
     def call_command(self, *args, **kwargs):
         stdout = StringIO()
         stderr = StringIO()
@@ -77,7 +75,7 @@ class TestFuzzyMatchCommand(TestCase):
             filename="other_test.pdf",
         )
         stdout, _ = self.call_command()
-        self.assertIn("No matches found", stdout)
+        self.assertIn("No duplicate documents found", stdout)
 
     def test_with_matches(self) -> None:
         """
@@ -106,7 +104,7 @@ class TestFuzzyMatchCommand(TestCase):
             filename="other_test.pdf",
         )
         stdout, _ = self.call_command("--processes", "1")
-        self.assertRegex(stdout, self.MSG_REGEX)
+        self.assertIn("Found 1 matching pair(s)", stdout)
 
     def test_with_3_matches(self) -> None:
         """
@@ -142,10 +140,8 @@ class TestFuzzyMatchCommand(TestCase):
             filename="final_test.pdf",
         )
         stdout, _ = self.call_command("--no-progress-bar", "--processes", "1")
-        lines = [x.strip() for x in stdout.splitlines() if x.strip()]
-        self.assertEqual(len(lines), 3)
-        for line in lines:
-            self.assertRegex(line, self.MSG_REGEX)
+        # 3 docs -> 3 unique pairs; summary confirms count and no duplication
+        self.assertIn("Found 3 matching pair(s)", stdout)
 
     def test_document_deletion(self) -> None:
         """
@@ -191,12 +187,9 @@ class TestFuzzyMatchCommand(TestCase):
             "1",
         )
 
-        self.assertIn(
-            "The command is configured to delete documents.  Use with caution",
-            stdout,
-        )
-        self.assertRegex(stdout, self.MSG_REGEX)
-        self.assertIn("Deleting 1 documents based on ratio matches", stdout)
+        self.assertIn("Delete Mode", stdout)
+        self.assertIn("Found 1 matching pair(s)", stdout)
+        self.assertIn("Deleting 1 document(s)", stdout)
 
         self.assertEqual(Document.objects.count(), 2)
         self.assertIsNotNone(Document.objects.get(pk=1))
@@ -226,4 +219,4 @@ class TestFuzzyMatchCommand(TestCase):
             filename="other_test.pdf",
         )
         stdout, _ = self.call_command()
-        self.assertIn("No matches found", stdout)
+        self.assertIn("No duplicate documents found", stdout)
