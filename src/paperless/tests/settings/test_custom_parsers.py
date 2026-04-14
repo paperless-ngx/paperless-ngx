@@ -354,7 +354,7 @@ class TestParseDbSettings:
                         },
                     },
                 },
-                id="sqlite-init-command-override",
+                id="sqlite-options-override",
             ),
             pytest.param(
                 {

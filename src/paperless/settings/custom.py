@@ -235,7 +235,7 @@ def parse_db_settings(data_dir: Path) -> dict[str, dict[str, Any]]:
                     "PRAGMA temp_store=MEMORY;"
                     "PRAGMA mmap_size=134217728;"
                     "PRAGMA journal_size_limit=67108864;"
-                    "PRAGMA cache_size=-8000"
+                    "PRAGMA cache_size=-8000"  # negative = KiB; -8000 ≈ 8 MB
                 ),
                 # IMMEDIATE acquires the write lock at BEGIN, ensuring
                 # busy_timeout is respected from the start of the transaction.
@@ -285,6 +285,9 @@ def parse_db_settings(data_dir: Path) -> dict[str, dict[str, Any]]:
                     "key": os.getenv("PAPERLESS_DBSSLKEY"),
                 },
                 # READ COMMITTED eliminates gap locking and reduces deadlocks.
+                # Django also defaults to "read committed" for MySQL/MariaDB, but
+                # we set it explicitly so the intent is clear and survives any
+                # future changes to Django's default.
                 # Requires binlog_format=ROW if binary logging is enabled.
                 "isolation_level": "read committed",
             }
