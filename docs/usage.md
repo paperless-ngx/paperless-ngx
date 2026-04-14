@@ -392,6 +392,8 @@ still have "object-level" permissions.
 | View  | Confers the ability to view (not edit) a document, tag, etc.<br/>Users without 'view' (or higher) permissions will be shown _'Private'_ in place of the object name for example when viewing a document with a tag for which the user doesn't have permissions.                                                                          |
 | Edit  | Confers the ability to edit (and view) a document, tag, etc.                                                                                                                                                                                                                                                                             |
 
+For related metadata such as tags, correspondents, document types, and storage paths, object visibility and document assignment are intentionally distinct. A user may still retain or submit a known object ID when editing a document even if that related object is displayed as _Private_ or omitted from search and selection results. This allows documents to preserve existing assignments that the current user cannot necessarily inspect in detail.
+
 ### Password reset
 
 In order to enable the password reset feature you will need to setup an SMTP backend, see
