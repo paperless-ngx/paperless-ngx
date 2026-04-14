@@ -66,6 +66,12 @@ class Command(PaperlessCommand):
             action="store_true",
             help="If set, one document of matches above the ratio WILL BE DELETED",
         )
+        parser.add_argument(
+            "--yes",
+            default=False,
+            action="store_true",
+            help="Skip the confirmation prompt when used with --delete",
+        )
 
     def _render_results(
         self,
@@ -199,8 +205,21 @@ class Command(PaperlessCommand):
         )
 
         if options["delete"] and maybe_delete_ids:
-            self.console.print(
-                f"[red]Deleting {len(maybe_delete_ids)} document(s)...[/red]",
-            )
-            Document.objects.filter(pk__in=maybe_delete_ids).delete()
-            self.console.print("[green]Done.[/green]")
+            confirmed = options["yes"]
+            if not confirmed:
+                self.console.print(
+                    f"\nDelete [bold]{len(maybe_delete_ids)}[/bold] document(s)? "
+                    "[bold]\\[y/N][/bold] ",
+                    end="",
+                )
+                answer = input().strip().lower()
+                confirmed = answer in {"y", "yes"}
+
+            if confirmed:
+                self.console.print(
+                    f"[red]Deleting {len(maybe_delete_ids)} document(s)...[/red]",
+                )
+                Document.objects.filter(pk__in=maybe_delete_ids).delete()
+                self.console.print("[green]Done.[/green]")
+            else:
+                self.console.print("[yellow]Deletion cancelled.[/yellow]")

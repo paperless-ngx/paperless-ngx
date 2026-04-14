@@ -1,4 +1,5 @@
 from io import StringIO
+from unittest.mock import patch
 
 import pytest
 from django.core.management import CommandError
@@ -182,6 +183,7 @@ class TestFuzzyMatchCommand(TestCase):
 
         stdout, _ = self.call_command(
             "--delete",
+            "--yes",
             "--no-progress-bar",
             "--processes",
             "1",
@@ -194,6 +196,51 @@ class TestFuzzyMatchCommand(TestCase):
         self.assertEqual(Document.objects.count(), 2)
         self.assertIsNotNone(Document.objects.get(pk=1))
         self.assertIsNotNone(Document.objects.get(pk=2))
+
+    def test_document_deletion_cancelled(self) -> None:
+        """
+        GIVEN:
+            - 3 documents exist
+            - Document 1 to document 3 has a similarity over 85.0
+        WHEN:
+            - Command is called with --delete but user answers "n" at the prompt
+        THEN:
+            - No documents are deleted
+        """
+        Document.objects.create(
+            checksum="BEEFCAFE",
+            title="A",
+            content="first document scanned by bob",
+            mime_type="application/pdf",
+            filename="test.pdf",
+        )
+        Document.objects.create(
+            checksum="DEADBEAF",
+            title="A",
+            content="second document scanned by alice",
+            mime_type="application/pdf",
+            filename="other_test.pdf",
+        )
+        Document.objects.create(
+            checksum="CATTLE",
+            title="A",
+            content="first document scanned by pete",
+            mime_type="application/pdf",
+            filename="final_test.pdf",
+        )
+
+        self.assertEqual(Document.objects.count(), 3)
+
+        with patch("builtins.input", return_value="n"):
+            stdout, _ = self.call_command(
+                "--delete",
+                "--no-progress-bar",
+                "--processes",
+                "1",
+            )
+
+        self.assertIn("Deletion cancelled", stdout)
+        self.assertEqual(Document.objects.count(), 3)
 
     def test_empty_content(self) -> None:
         """
