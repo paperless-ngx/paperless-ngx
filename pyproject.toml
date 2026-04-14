@@ -113,7 +113,7 @@ testing = [
   "factory-boy~=3.3.1",
   "faker~=40.12.0",
   "imagehash",
-  "pytest~=9.0.0",
+  "pytest~=9.0.3",
   "pytest-cov~=7.1.0",
   "pytest-django~=4.12.0",
   "pytest-env~=1.6.0",
