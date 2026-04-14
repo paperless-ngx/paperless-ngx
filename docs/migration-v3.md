@@ -120,7 +120,7 @@ Users with any of the deprecated variables set should migrate to `PAPERLESS_DB_O
 Multiple options are combined in a single value:
 
 ```bash
-PAPERLESS_DB_OPTIONS="sslmode=require;sslrootcert=/certs/ca.pem;pool.max_size=10"
+PAPERLESS_DB_OPTIONS="sslmode=require,sslrootcert=/certs/ca.pem,pool.max_size=10"
 ```
 
 ## OCR and Archive File Generation Settings
