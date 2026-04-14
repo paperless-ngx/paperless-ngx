@@ -1,4 +1,5 @@
 import dataclasses
+from itertools import combinations
 from typing import Final
 
 import rapidfuzz
@@ -10,8 +11,11 @@ from documents.models import Document
 
 @dataclasses.dataclass(frozen=True, slots=True)
 class _WorkPackage:
-    first_doc: Document
-    second_doc: Document
+    pk_a: int
+    content_a: str
+    pk_b: int
+    content_b: str
+    score_cutoff: float
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -26,15 +30,17 @@ class _WorkResult:
 
 def _process_and_match(work: _WorkPackage) -> _WorkResult:
     """
-    Does basic processing of document content, gets the basic ratio
-    and returns the result package.
+    Process document content and compute the fuzzy ratio.
+    score_cutoff lets rapidfuzz short-circuit when the score cannot reach the threshold.
     """
-    first_string = rapidfuzz.utils.default_process(work.first_doc.content)
-    second_string = rapidfuzz.utils.default_process(work.second_doc.content)
-
-    match = rapidfuzz.fuzz.ratio(first_string, second_string)
-
-    return _WorkResult(work.first_doc.pk, work.second_doc.pk, match)
+    first_string = rapidfuzz.utils.default_process(work.content_a)
+    second_string = rapidfuzz.utils.default_process(work.content_b)
+    ratio = rapidfuzz.fuzz.ratio(
+        first_string,
+        second_string,
+        score_cutoff=work.score_cutoff,
+    )
+    return _WorkResult(work.pk_a, work.pk_b, ratio)
 
 
 class Command(PaperlessCommand):
@@ -70,58 +76,59 @@ class Command(PaperlessCommand):
             )
 
         opt_ratio = options["ratio"]
-        checked_pairs: set[tuple[int, int]] = set()
-        work_pkgs: list[_WorkPackage] = []
 
         if opt_ratio < RATIO_MIN or opt_ratio > RATIO_MAX:
             raise CommandError("The ratio must be between 0 and 100")
 
-        all_docs = Document.objects.all().order_by("id")
+        # Load only the fields we need -- avoids fetching title, archive_checksum, etc.
+        slim_docs: list[tuple[int, str]] = list(
+            Document.objects.only("id", "content")
+            .order_by("id")
+            .values_list("id", "content"),
+        )
 
-        for first_doc in all_docs:
-            for second_doc in all_docs:
-                if first_doc.pk == second_doc.pk:
-                    continue
-                if first_doc.content.strip() == "" or second_doc.content.strip() == "":
-                    continue
-                doc_1_to_doc_2 = (first_doc.pk, second_doc.pk)
-                doc_2_to_doc_1 = doc_1_to_doc_2[::-1]
-                if doc_1_to_doc_2 in checked_pairs or doc_2_to_doc_1 in checked_pairs:
-                    continue
-                checked_pairs.update([doc_1_to_doc_2, doc_2_to_doc_1])
-                work_pkgs.append(_WorkPackage(first_doc, second_doc))
+        # combinations() generates each unique pair exactly once -- no checked_pairs set needed.
+        work_pkgs: list[_WorkPackage] = [
+            _WorkPackage(pk_a, ca, pk_b, cb, opt_ratio)
+            for (pk_a, ca), (pk_b, cb) in combinations(slim_docs, 2)
+            if ca.strip() and cb.strip()
+        ]
 
-        results: list[_WorkResult] = []
-        if self.process_count == 1:
-            for work in self.track(work_pkgs, description="Matching..."):
-                results.append(_process_and_match(work))
-        else:  # pragma: no cover
-            for proc_result in self.process_parallel(
-                _process_and_match,
-                work_pkgs,
-                description="Matching...",
-            ):
-                if proc_result.error:
-                    self.console.print(
-                        f"[red]Failed: {proc_result.error}[/red]",
-                    )
-                elif proc_result.result is not None:
-                    results.append(proc_result.result)
+        def _iter_matches():
+            if self.process_count == 1:
+                for work in self.track(work_pkgs, description="Matching..."):
+                    result = _process_and_match(work)
+                    if result.ratio >= opt_ratio:
+                        yield result
+            else:  # pragma: no cover
+                for proc_result in self.process_parallel(
+                    _process_and_match,
+                    work_pkgs,
+                    description="Matching...",
+                ):
+                    if proc_result.error:
+                        self.console.print(
+                            f"[red]Failed: {proc_result.error}[/red]",
+                        )
+                    elif (
+                        proc_result.result is not None
+                        and proc_result.result.ratio >= opt_ratio
+                    ):
+                        yield proc_result.result
 
         messages: list[str] = []
         maybe_delete_ids: list[int] = []
-        for match_result in sorted(results):
-            if match_result.ratio >= opt_ratio:
-                messages.append(
-                    self.style.NOTICE(
-                        f"Document {match_result.doc_one_pk} fuzzy match"
-                        f" to {match_result.doc_two_pk}"
-                        f" (confidence {match_result.ratio:.3f})\n",
-                    ),
-                )
-                maybe_delete_ids.append(match_result.doc_two_pk)
+        for match_result in sorted(_iter_matches()):
+            messages.append(
+                self.style.NOTICE(
+                    f"Document {match_result.doc_one_pk} fuzzy match"
+                    f" to {match_result.doc_two_pk}"
+                    f" (confidence {match_result.ratio:.3f})\n",
+                ),
+            )
+            maybe_delete_ids.append(match_result.doc_two_pk)
 
-        if len(messages) == 0:
+        if not messages:
             messages.append(self.style.SUCCESS("No matches found\n"))
         self.stdout.writelines(messages)
 
