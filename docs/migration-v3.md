@@ -241,3 +241,66 @@ For example:
   }
 }
 ```
+
+## Consume Script Positional Arguments Removed
+
+Pre- and post-consumption scripts no longer receive positional arguments. All information is
+now passed exclusively via environment variables, which have been available since earlier versions.
+
+### Pre-consumption script
+
+Previously, the original file path was passed as `$1`. It is now only available as
+`DOCUMENT_SOURCE_PATH`.
+
+**Before:**
+
+```bash
+#!/usr/bin/env bash
+# $1 was the original file path
+process_document "$1"
+```
+
+**After:**
+
+```bash
+#!/usr/bin/env bash
+process_document "${DOCUMENT_SOURCE_PATH}"
+```
+
+### Post-consumption script
+
+Previously, document metadata was passed as positional arguments `$1` through `$8`:
+
+| Argument | Environment Variable Equivalent |
+| -------- | ------------------------------- |
+| `$1`     | `DOCUMENT_ID`                   |
+| `$2`     | `DOCUMENT_FILE_NAME`            |
+| `$3`     | `DOCUMENT_SOURCE_PATH`          |
+| `$4`     | `DOCUMENT_THUMBNAIL_PATH`       |
+| `$5`     | `DOCUMENT_DOWNLOAD_URL`         |
+| `$6`     | `DOCUMENT_THUMBNAIL_URL`        |
+| `$7`     | `DOCUMENT_CORRESPONDENT`        |
+| `$8`     | `DOCUMENT_TAGS`                 |
+
+**Before:**
+
+```bash
+#!/usr/bin/env bash
+DOCUMENT_ID=$1
+CORRESPONDENT=$7
+TAGS=$8
+```
+
+**After:**
+
+```bash
+#!/usr/bin/env bash
+# Use environment variables directly
+echo "Document ${DOCUMENT_ID} from ${DOCUMENT_CORRESPONDENT} tagged: ${DOCUMENT_TAGS}"
+```
+
+### Action Required
+
+Update any pre- or post-consumption scripts that read `$1`, `$2`, etc. to use the
+corresponding environment variables instead. Environment variables have been the preferred
+option since v1.8.0.

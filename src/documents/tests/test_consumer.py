@@ -1328,7 +1328,7 @@ class PreConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                     environment = args[1]
 
                     self.assertEqual(command[0], script.name)
-                    self.assertEqual(command[1], str(self.test_file))
+                    self.assertEqual(len(command), 1)
 
                     subset = {
                         "DOCUMENT_SOURCE_PATH": str(c.input_doc.original_file),
@@ -1478,11 +1478,7 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                 environment = args[1]
 
                 self.assertEqual(command[0], script.name)
-                self.assertEqual(command[1], str(doc.pk))
-                self.assertEqual(command[5], f"/api/documents/{doc.pk}/download/")
-                self.assertEqual(command[6], f"/api/documents/{doc.pk}/thumb/")
-                self.assertEqual(command[7], "my_bank")
-                self.assertCountEqual(command[8].split(","), ["a", "b"])
+                self.assertEqual(len(command), 1)
 
                 subset = {
                     "DOCUMENT_ID": str(doc.pk),
