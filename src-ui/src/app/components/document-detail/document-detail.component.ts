@@ -1,5 +1,6 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
 import { HttpClient, HttpResponse } from '@angular/common/http'
+import { environment } from 'src/environments/environment'
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import {
   FormArray,
@@ -1407,7 +1408,7 @@ export class DocumentDetailComponent
 
   runZoneOcr() {
     this.http
-      .post(`${this.documentsService.getResourceUrl(this.document.id)}run-zone-ocr/`, {})
+      .post(`${environment.apiBaseUrl}documents/${this.document.id}/run-zone-ocr/`, {})
       .subscribe({
         next: (res: any) => {
           if (res.results?.length) {
