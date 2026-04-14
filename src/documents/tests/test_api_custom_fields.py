@@ -1320,3 +1320,41 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(results[0]["document_count"], 0)
+
+    def test_patch_document_invalid_date_custom_field_returns_validation_error(self):
+        """
+        GIVEN:
+            - A date custom field
+            - A document
+        WHEN:
+            - Patching the document with a date string in the wrong format
+        THEN:
+            - HTTP 400 is returned instead of an internal server error
+            - No custom field instance is created
+        """
+        cf_date = CustomField.objects.create(
+            name="datefield",
+            data_type=CustomField.FieldDataType.DATE,
+        )
+        doc = Document.objects.create(
+            title="Doc",
+            checksum="123",
+            mime_type="application/pdf",
+        )
+
+        response = self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            {
+                "custom_fields": [
+                    {
+                        "field": cf_date.pk,
+                        "value": "10.03.2026",
+                    },
+                ],
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("custom_fields", response.data)
+        self.assertEqual(CustomFieldInstance.objects.count(), 0)
