@@ -26,8 +26,10 @@ from django.db.models.functions import Cast
 from django.utils.translation import gettext_lazy as _
 from django_filters import DateFilter
 from django_filters.rest_framework import BooleanFilter
+from django_filters.rest_framework import DateTimeFilter
 from django_filters.rest_framework import Filter
 from django_filters.rest_framework import FilterSet
+from django_filters.rest_framework import MultipleChoiceFilter
 from drf_spectacular.utils import extend_schema_field
 from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
@@ -862,18 +864,56 @@ class ShareLinkBundleFilterSet(FilterSet):
 
 
 class PaperlessTaskFilterSet(FilterSet):
+    task_type = MultipleChoiceFilter(
+        choices=PaperlessTask.TaskType.choices,
+        label="Task Type",
+    )
+
+    trigger_source = MultipleChoiceFilter(
+        choices=PaperlessTask.TriggerSource.choices,
+        label="Trigger Source",
+    )
+
+    status = MultipleChoiceFilter(
+        choices=PaperlessTask.Status.choices,
+        label="Status",
+    )
+
+    is_complete = BooleanFilter(
+        method="filter_is_complete",
+        label="Is Complete",
+    )
+
     acknowledged = BooleanFilter(
         label="Acknowledged",
         field_name="acknowledged",
     )
 
+    date_created_after = DateTimeFilter(
+        field_name="date_created",
+        lookup_expr="gte",
+        label="Created After",
+    )
+
+    date_created_before = DateTimeFilter(
+        field_name="date_created",
+        lookup_expr="lte",
+        label="Created Before",
+    )
+
     class Meta:
         model = PaperlessTask
-        fields = {
-            "task_type": ["exact"],
-            "trigger_source": ["exact"],
-            "status": ["exact"],
-        }
+        fields = ["task_type", "trigger_source", "status", "acknowledged", "owner"]
+
+    def filter_is_complete(self, queryset, name, value):
+        complete = [
+            PaperlessTask.Status.SUCCESS,
+            PaperlessTask.Status.FAILURE,
+            PaperlessTask.Status.REVOKED,
+        ]
+        if value:
+            return queryset.filter(status__in=complete)
+        return queryset.exclude(status__in=complete)
 
 
 class ObjectOwnedOrGrantedPermissionsFilter(ObjectPermissionsFilter):

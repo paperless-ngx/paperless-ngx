@@ -8,6 +8,7 @@ import zipfile
 from collections import defaultdict
 from collections import deque
 from datetime import datetime
+from datetime import timedelta
 from pathlib import Path
 from time import mktime
 from typing import TYPE_CHECKING
@@ -192,7 +193,7 @@ from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import RemovePasswordDocumentsSerializer
 from documents.serialisers import ReprocessDocumentsSerializer
 from documents.serialisers import RotateDocumentsSerializer
-from documents.serialisers import RunTaskViewSerializer
+from documents.serialisers import RunTaskSerializer
 from documents.serialisers import SavedViewSerializer
 from documents.serialisers import SearchResultSerializer
 from documents.serialisers import SerializerWithPerms
@@ -201,7 +202,9 @@ from documents.serialisers import ShareLinkSerializer
 from documents.serialisers import StoragePathSerializer
 from documents.serialisers import StoragePathTestSerializer
 from documents.serialisers import TagSerializer
-from documents.serialisers import TasksViewSerializer
+from documents.serialisers import TaskSerializerV9
+from documents.serialisers import TaskSerializerV10
+from documents.serialisers import TaskSummarySerializer
 from documents.serialisers import TrashSerializer
 from documents.serialisers import UiSettingsViewSerializer
 from documents.serialisers import WorkflowActionSerializer
@@ -3767,35 +3770,50 @@ class RemoteVersionView(GenericAPIView[Any]):
 )
 class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
-    serializer_class = TasksViewSerializer
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
         ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = PaperlessTaskFilterSet
+    ordering_fields = [
+        "date_created",
+        "date_done",
+        "status",
+        "task_type",
+        "duration_seconds",
+        "wait_time_seconds",
+    ]
+    ordering = ["-date_created"]
 
-    TASK_AND_ARGS_BY_NAME = {
-        PaperlessTask.TaskType.INDEX_OPTIMIZE: (index_optimize, {}),
-        PaperlessTask.TaskType.TRAIN_CLASSIFIER: (
-            train_classifier,
-            {"scheduled": False},
-        ),
-        PaperlessTask.TaskType.SANITY_CHECK: (
-            sanity_check,
-            {"scheduled": False, "raise_on_error": False},
-        ),
-        PaperlessTask.TaskType.LLM_INDEX: (
-            llmindex_index,
-            {"scheduled": False, "rebuild": False},
-        ),
-    }
+    def get_serializer_class(self):
+        # v9: use backwards-compatible serializer with old field names
+        if self.request.version and int(self.request.version) < 10:
+            return TaskSerializerV9
+        return TaskSerializerV10
 
     def get_queryset(self):
-        queryset = PaperlessTask.objects.all().order_by("-date_created")
+        queryset = PaperlessTask.objects.all()
+        # v9 backwards compat: map old query params to new field names
+        if self.request.version and int(self.request.version) < 10:
+            task_name = self.request.query_params.get("task_name")
+            if task_name is not None:
+                queryset = queryset.filter(task_type=task_name)
+            task_type_old = self.request.query_params.get("type")
+            if task_type_old is not None:
+                # Old type values: AUTO_TASK -> SYSTEM, SCHEDULED_TASK -> SCHEDULED, MANUAL_TASK -> MANUAL
+                old_to_new = {
+                    "AUTO_TASK": PaperlessTask.TriggerSource.SYSTEM,
+                    "SCHEDULED_TASK": PaperlessTask.TriggerSource.SCHEDULED,
+                    "MANUAL_TASK": PaperlessTask.TriggerSource.MANUAL,
+                }
+                new_source = old_to_new.get(task_type_old)
+                if new_source:
+                    queryset = queryset.filter(trigger_source=new_source)
+        # v10+: direct task_id param for backwards compat
         task_id = self.request.query_params.get("task_id")
         if task_id is not None:
-            queryset = PaperlessTask.objects.filter(task_id=task_id)
+            queryset = queryset.filter(task_id=task_id)
         return queryset
 
     @action(
@@ -3807,33 +3825,120 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
         serializer = AcknowledgeTasksViewSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         task_ids = serializer.validated_data.get("tasks")
+        tasks = self.get_queryset().filter(id__in=task_ids)
+        count = tasks.update(acknowledged=True)
+        return Response({"result": count})
 
-        try:
-            tasks = PaperlessTask.objects.filter(id__in=task_ids)
-            if request.user is not None and not request.user.is_superuser:
-                tasks = tasks.filter(owner=request.user) | tasks.filter(owner=None)
-            result = tasks.update(
-                acknowledged=True,
+    @action(
+        methods=["post"],
+        detail=False,
+        permission_classes=[IsAuthenticated, AcknowledgeTasksPermissions],
+    )
+    def acknowledge_all(self, request):
+        """Acknowledge all completed tasks visible to the requesting user."""
+        count = (
+            self.get_queryset()
+            .filter(
+                acknowledged=False,
+                status__in=[
+                    PaperlessTask.Status.SUCCESS,
+                    PaperlessTask.Status.FAILURE,
+                    PaperlessTask.Status.REVOKED,
+                ],
             )
-            return Response({"result": result})
-        except Exception:
-            return HttpResponseBadRequest()
+            .update(acknowledged=True)
+        )
+        return Response({"result": count})
+
+    @action(methods=["get"], detail=False)
+    def summary(self, request):
+        """Aggregated task statistics per task_type over the last N days (default 30)."""
+        from django.db.models import Avg
+        from django.db.models import Count
+        from django.db.models import Max
+        from django.db.models import Q
+
+        days = int(request.query_params.get("days", 30))
+        cutoff = timezone.now() - timedelta(days=days)
+        queryset = self.get_queryset().filter(date_created__gte=cutoff)
+
+        data = queryset.values("task_type").annotate(
+            total_count=Count("id"),
+            pending_count=Count("id", filter=Q(status=PaperlessTask.Status.PENDING)),
+            success_count=Count("id", filter=Q(status=PaperlessTask.Status.SUCCESS)),
+            failure_count=Count("id", filter=Q(status=PaperlessTask.Status.FAILURE)),
+            avg_duration_seconds=Avg(
+                "duration_seconds",
+                filter=Q(duration_seconds__isnull=False),
+            ),
+            avg_wait_time_seconds=Avg(
+                "wait_time_seconds",
+                filter=Q(wait_time_seconds__isnull=False),
+            ),
+            last_run=Max("date_created"),
+            last_success=Max(
+                "date_done",
+                filter=Q(status=PaperlessTask.Status.SUCCESS),
+            ),
+            last_failure=Max(
+                "date_done",
+                filter=Q(status=PaperlessTask.Status.FAILURE),
+            ),
+        )
+        serializer = TaskSummarySerializer(data, many=True)
+        return Response(serializer.data)
+
+    @action(methods=["get"], detail=False)
+    def active(self, request):
+        """Currently pending and running tasks (capped at 50)."""
+        queryset = (
+            self.get_queryset()
+            .filter(
+                status__in=[PaperlessTask.Status.PENDING, PaperlessTask.Status.STARTED],
+            )
+            .order_by("-date_created")[:50]
+        )
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @action(methods=["post"], detail=False)
     def run(self, request):
-        serializer = RunTaskViewSerializer(data=request.data)
+        """Manually dispatch a background task. Superuser only."""
+        serializer = RunTaskSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         task_type = serializer.validated_data.get("task_type")
 
         if not request.user.is_superuser:
             return HttpResponseForbidden("Insufficient permissions")
 
+        task_func_map = {
+            PaperlessTask.TaskType.INDEX_OPTIMIZE: (index_optimize, {}),
+            PaperlessTask.TaskType.TRAIN_CLASSIFIER: (train_classifier, {}),
+            PaperlessTask.TaskType.SANITY_CHECK: (
+                sanity_check,
+                {"raise_on_error": False},
+            ),
+            PaperlessTask.TaskType.LLM_INDEX: (
+                llmindex_index,
+                {"rebuild": False},
+            ),
+        }
+
+        if task_type not in task_func_map:
+            return Response(
+                {"error": f"Task type '{task_type}' cannot be manually triggered"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         try:
-            task_func, task_args = self.TASK_AND_ARGS_BY_NAME[task_type]
-            result = task_func(**task_args)
-            return Response({"result": result})
+            task_func, task_kwargs = task_func_map[task_type]
+            async_result = task_func.apply_async(
+                kwargs=task_kwargs,
+                headers={"trigger_source": "manual"},
+            )
+            return Response({"task_id": async_result.id})
         except Exception as e:
-            logger.warning(f"An error occurred running task: {e!s}")
+            logger.warning(f"Error running task: {e!s}")
             return HttpResponseServerError(
                 "Error running task, check logs for more detail.",
             )

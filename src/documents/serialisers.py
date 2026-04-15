@@ -2430,45 +2430,138 @@ class UiSettingsViewSerializer(serializers.ModelSerializer[UiSettings]):
         return ui_settings
 
 
-class TasksViewSerializer(OwnedObjectSerializer):
+class TaskSerializerV10(OwnedObjectSerializer):
+    """Task serializer for API v10+ using new field names."""
+
+    related_document_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        read_only=True,
+        source="related_document_ids",
+    )
+    task_type_display = serializers.CharField(
+        source="get_task_type_display",
+        read_only=True,
+    )
+    trigger_source_display = serializers.CharField(
+        source="get_trigger_source_display",
+        read_only=True,
+    )
+    status_display = serializers.CharField(
+        source="get_status_display",
+        read_only=True,
+    )
+
     class Meta:
         model = PaperlessTask
         fields = (
             "id",
             "task_id",
             "task_type",
+            "task_type_display",
             "trigger_source",
+            "trigger_source_display",
+            "status",
+            "status_display",
+            "date_created",
+            "date_started",
+            "date_done",
+            "duration_seconds",
+            "wait_time_seconds",
+            "input_data",
+            "result_data",
+            "result_message",
+            "related_document_ids",
+            "acknowledged",
+            "owner",
+        )
+        read_only_fields = fields
+
+
+class TaskSerializerV9(serializers.ModelSerializer):
+    """Task serializer for API v9 backwards compatibility.
+
+    Maps old field names to the new model fields so existing clients continue
+    to work unchanged.
+    """
+
+    # v9 field: task_name -> task_type
+    task_name = serializers.CharField(source="task_type", read_only=True)
+
+    # v9 field: task_file_name -> input_data.filename
+    task_file_name = serializers.SerializerMethodField()
+
+    # v9 field: type -> trigger_source (mapped to old enum labels)
+    type = serializers.SerializerMethodField()
+
+    # v9 field: result -> result_message (with legacy format fallback)
+    result = serializers.CharField(
+        source="result_message",
+        read_only=True,
+        allow_null=True,
+    )
+
+    # v9 field: related_document -> first document ID from result_data
+    related_document = serializers.SerializerMethodField()
+
+    # v9 field: duplicate_documents -> list of duplicate IDs from result_data
+    duplicate_documents = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PaperlessTask
+        fields = (
+            "id",
+            "task_id",
+            "task_name",
+            "task_file_name",
+            "type",
+            "status",
             "date_created",
             "date_done",
-            "status",
-            "result_message",
-            "result_data",
+            "result",
             "acknowledged",
             "related_document",
             "duplicate_documents",
             "owner",
         )
 
-    related_document = serializers.SerializerMethodField()
-    duplicate_documents = serializers.SerializerMethodField()
+    def get_task_file_name(self, obj: PaperlessTask) -> str | None:
+        if not obj.input_data:
+            return None
+        return obj.input_data.get("filename")
 
-    def get_related_document(self, obj) -> int | None:
-        doc_ids = obj.related_document_ids
-        return doc_ids[0] if doc_ids else None
+    def get_type(self, obj: PaperlessTask) -> str:
+        # Old type values: AUTO_TASK, SCHEDULED_TASK, MANUAL_TASK
+        source_to_old_type = {
+            PaperlessTask.TriggerSource.SCHEDULED: "SCHEDULED_TASK",
+            PaperlessTask.TriggerSource.SYSTEM: "AUTO_TASK",
+        }
+        return source_to_old_type.get(obj.trigger_source, "MANUAL_TASK")
 
-    @extend_schema_field(DuplicateDocumentSummarySerializer(many=True))
-    def get_duplicate_documents(self, obj):
-        related_document = self.get_related_document(obj)
-        request = self.context.get("request")
-        user = request.user if request else None
-        document = Document.global_objects.filter(pk=related_document).first()
-        if not related_document or not user or not document:
+    def get_related_document(self, obj: PaperlessTask) -> int | None:
+        ids = obj.related_document_ids
+        return ids[0] if ids else None
+
+    def get_duplicate_documents(self, obj: PaperlessTask) -> list[int]:
+        if not obj.result_data:
             return []
-        duplicates = _get_viewable_duplicates(document, user)
-        return list(duplicates.values("id", "title", "deleted_at"))
+        dup_of = obj.result_data.get("duplicate_of")
+        return [dup_of] if dup_of is not None else []
 
 
-class RunTaskViewSerializer(serializers.Serializer[dict[str, Any]]):
+class TaskSummarySerializer(serializers.Serializer):
+    task_type = serializers.CharField()
+    total_count = serializers.IntegerField()
+    pending_count = serializers.IntegerField()
+    success_count = serializers.IntegerField()
+    failure_count = serializers.IntegerField()
+    avg_duration_seconds = serializers.FloatField(allow_null=True)
+    avg_wait_time_seconds = serializers.FloatField(allow_null=True)
+    last_run = serializers.DateTimeField(allow_null=True)
+    last_success = serializers.DateTimeField(allow_null=True)
+    last_failure = serializers.DateTimeField(allow_null=True)
+
+
+class RunTaskSerializer(serializers.Serializer):
     task_type = serializers.ChoiceField(
         choices=PaperlessTask.TaskType.choices,
         label="Task Type",
