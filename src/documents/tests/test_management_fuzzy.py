@@ -7,6 +7,7 @@ from django.core.management import call_command
 from django.test import TestCase
 
 from documents.models import Document
+from documents.tests.factories import DocumentFactory
 
 
 @pytest.mark.management
@@ -207,27 +208,9 @@ class TestFuzzyMatchCommand(TestCase):
         THEN:
             - No documents are deleted
         """
-        Document.objects.create(
-            checksum="BEEFCAFE",
-            title="A",
-            content="first document scanned by bob",
-            mime_type="application/pdf",
-            filename="test.pdf",
-        )
-        Document.objects.create(
-            checksum="DEADBEAF",
-            title="A",
-            content="second document scanned by alice",
-            mime_type="application/pdf",
-            filename="other_test.pdf",
-        )
-        Document.objects.create(
-            checksum="CATTLE",
-            title="A",
-            content="first document scanned by pete",
-            mime_type="application/pdf",
-            filename="final_test.pdf",
-        )
+        DocumentFactory(content="first document scanned by bob")
+        DocumentFactory(content="second document scanned by alice")
+        DocumentFactory(content="first document scanned by pete")
 
         self.assertEqual(Document.objects.count(), 3)
 
