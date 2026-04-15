@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import logging
+import re as _re
 import shutil
+import traceback as _tb
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
@@ -1009,12 +1011,28 @@ TRACKED_TASKS: dict[str, PaperlessTask.TaskType] = {
     "paperless_mail.tasks.process_mail_accounts": PaperlessTask.TaskType.MAIL_FETCH,
 }
 
-_DOCUMENT_SOURCE_TO_TRIGGER: dict[Any, PaperlessTask.TriggerSource] = {
+_CELERY_STATE_TO_STATUS: dict[str, PaperlessTask.Status] = {
+    "SUCCESS": PaperlessTask.Status.SUCCESS,
+    "FAILURE": PaperlessTask.Status.FAILURE,
+    "REVOKED": PaperlessTask.Status.REVOKED,
+}
+
+_DOCUMENT_SOURCE_TO_TRIGGER: dict[DocumentSource, PaperlessTask.TriggerSource] = {
     DocumentSource.ConsumeFolder: PaperlessTask.TriggerSource.FOLDER_CONSUME,
     DocumentSource.ApiUpload: PaperlessTask.TriggerSource.API_UPLOAD,
     DocumentSource.MailFetch: PaperlessTask.TriggerSource.EMAIL_CONSUME,
     DocumentSource.WebUI: PaperlessTask.TriggerSource.WEB_UI,
 }
+
+
+def _get_consume_args(
+    args: tuple,
+    task_kwargs: dict,
+) -> tuple[Any | None, Any | None]:
+    """Extract (input_doc, overrides) from consume_file task arguments."""
+    input_doc = args[0] if args else task_kwargs.get("input_doc")
+    overrides = args[1] if len(args) >= 2 else task_kwargs.get("overrides")
+    return input_doc, overrides
 
 
 def _extract_input_data(
@@ -1023,8 +1041,7 @@ def _extract_input_data(
     task_kwargs: dict,
 ) -> dict:
     if task_type == PaperlessTask.TaskType.CONSUME_FILE:
-        input_doc = args[0] if args else task_kwargs.get("input_doc")
-        overrides = args[1] if len(args) >= 2 else task_kwargs.get("overrides")
+        input_doc, overrides = _get_consume_args(args, task_kwargs)
         if input_doc is None:
             return {}
         data: dict = {
@@ -1066,7 +1083,7 @@ def _determine_trigger_source(
         return PaperlessTask.TriggerSource.SYSTEM
 
     if task_type == PaperlessTask.TaskType.CONSUME_FILE:
-        input_doc = args[0] if args else task_kwargs.get("input_doc")
+        input_doc, _ = _get_consume_args(args, task_kwargs)
         if input_doc is not None:
             return _DOCUMENT_SOURCE_TO_TRIGGER.get(
                 input_doc.source,
@@ -1083,15 +1100,13 @@ def _extract_owner_id(
 ) -> int | None:
     if task_type != PaperlessTask.TaskType.CONSUME_FILE:
         return None
-    overrides = args[1] if len(args) >= 2 else task_kwargs.get("overrides")
+    _, overrides = _get_consume_args(args, task_kwargs)
     if overrides and hasattr(overrides, "owner_id"):
         return overrides.owner_id
     return None
 
 
 def _parse_legacy_result(result: str) -> dict | None:
-    import re as _re
-
     if match := _re.search(r"New document id (\d+) created", result):
         return {"document_id": int(match.group(1))}
     if match := _re.search(r"It is a duplicate of .* \(#(\d+)\)", result):
@@ -1187,12 +1202,7 @@ def task_postrun_handler(
     try:
         close_old_connections()
 
-        status_map = {
-            "SUCCESS": PaperlessTask.Status.SUCCESS,
-            "FAILURE": PaperlessTask.Status.FAILURE,
-            "REVOKED": PaperlessTask.Status.REVOKED,
-        }
-        new_status = status_map.get(state, PaperlessTask.Status.FAILURE)
+        new_status = _CELERY_STATE_TO_STATUS.get(state, PaperlessTask.Status.FAILURE)
 
         result_data: dict | None = None
         result_message: str | None = None
@@ -1252,8 +1262,6 @@ def task_failure_handler(
             "error_message": str(exception) if exception else "Unknown error",
         }
         if traceback:
-            import traceback as _tb
-
             tb_str = "".join(_tb.format_tb(traceback))
             result_data["traceback"] = tb_str[:5000]
 

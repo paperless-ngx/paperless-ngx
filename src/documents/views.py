@@ -29,6 +29,7 @@ from django.core.cache import cache
 from django.db import connections
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
+from django.db.models import Avg
 from django.db.models import Case
 from django.db.models import Count
 from django.db.models import F
@@ -3787,6 +3788,20 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
     ]
     ordering = ["-date_created"]
 
+    # v9 backwards compat: maps old "type" query param values to new TriggerSource
+    _V9_TYPE_TO_TRIGGER_SOURCE = {
+        "AUTO_TASK": PaperlessTask.TriggerSource.SYSTEM,
+        "SCHEDULED_TASK": PaperlessTask.TriggerSource.SCHEDULED,
+        "MANUAL_TASK": PaperlessTask.TriggerSource.MANUAL,
+    }
+
+    _RUNNABLE_TASKS = {
+        PaperlessTask.TaskType.INDEX_OPTIMIZE: (index_optimize, {}),
+        PaperlessTask.TaskType.TRAIN_CLASSIFIER: (train_classifier, {}),
+        PaperlessTask.TaskType.SANITY_CHECK: (sanity_check, {"raise_on_error": False}),
+        PaperlessTask.TaskType.LLM_INDEX: (llmindex_index, {"rebuild": False}),
+    }
+
     def get_serializer_class(self):
         # v9: use backwards-compatible serializer with old field names
         if self.request.version and int(self.request.version) < 10:
@@ -3802,13 +3817,7 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
                 queryset = queryset.filter(task_type=task_name)
             task_type_old = self.request.query_params.get("type")
             if task_type_old is not None:
-                # Old type values: AUTO_TASK -> SYSTEM, SCHEDULED_TASK -> SCHEDULED, MANUAL_TASK -> MANUAL
-                old_to_new = {
-                    "AUTO_TASK": PaperlessTask.TriggerSource.SYSTEM,
-                    "SCHEDULED_TASK": PaperlessTask.TriggerSource.SCHEDULED,
-                    "MANUAL_TASK": PaperlessTask.TriggerSource.MANUAL,
-                }
-                new_source = old_to_new.get(task_type_old)
+                new_source = self._V9_TYPE_TO_TRIGGER_SOURCE.get(task_type_old)
                 if new_source:
                     queryset = queryset.filter(trigger_source=new_source)
         # v10+: direct task_id param for backwards compat
@@ -3841,11 +3850,7 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
             self.get_queryset()
             .filter(
                 acknowledged=False,
-                status__in=[
-                    PaperlessTask.Status.SUCCESS,
-                    PaperlessTask.Status.FAILURE,
-                    PaperlessTask.Status.REVOKED,
-                ],
+                status__in=PaperlessTask.COMPLETE_STATUSES,
             )
             .update(acknowledged=True)
         )
@@ -3854,11 +3859,6 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
     @action(methods=["get"], detail=False)
     def summary(self, request):
         """Aggregated task statistics per task_type over the last N days (default 30)."""
-        from django.db.models import Avg
-        from django.db.models import Count
-        from django.db.models import Max
-        from django.db.models import Q
-
         days = int(request.query_params.get("days", 30))
         cutoff = timezone.now() - timedelta(days=days)
         queryset = self.get_queryset().filter(date_created__gte=cutoff)
@@ -3909,27 +3909,14 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
         serializer.is_valid(raise_exception=True)
         task_type = serializer.validated_data.get("task_type")
 
-        task_func_map = {
-            PaperlessTask.TaskType.INDEX_OPTIMIZE: (index_optimize, {}),
-            PaperlessTask.TaskType.TRAIN_CLASSIFIER: (train_classifier, {}),
-            PaperlessTask.TaskType.SANITY_CHECK: (
-                sanity_check,
-                {"raise_on_error": False},
-            ),
-            PaperlessTask.TaskType.LLM_INDEX: (
-                llmindex_index,
-                {"rebuild": False},
-            ),
-        }
-
-        if task_type not in task_func_map:
+        if task_type not in self._RUNNABLE_TASKS:
             return Response(
                 {"error": f"Task type '{task_type}' cannot be manually triggered"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         try:
-            task_func, task_kwargs = task_func_map[task_type]
+            task_func, task_kwargs = self._RUNNABLE_TASKS[task_type]
             async_result = task_func.apply_async(
                 kwargs=task_kwargs,
                 headers={"trigger_source": "manual"},
@@ -4569,11 +4556,7 @@ class SystemStatusView(PassUserMixin):
         last_trained_task = (
             PaperlessTask.objects.filter(
                 task_type=PaperlessTask.TaskType.TRAIN_CLASSIFIER,
-                status__in=[
-                    PaperlessTask.Status.SUCCESS,
-                    PaperlessTask.Status.FAILURE,
-                    PaperlessTask.Status.REVOKED,
-                ],  # ignore running tasks
+                status__in=PaperlessTask.COMPLETE_STATUSES,  # ignore running tasks
             )
             .order_by("-date_done")
             .first()
@@ -4583,10 +4566,7 @@ class SystemStatusView(PassUserMixin):
         if last_trained_task is None:
             classifier_status = "WARNING"
             classifier_error = "No classifier training tasks found"
-        elif (
-            last_trained_task
-            and last_trained_task.status != PaperlessTask.Status.SUCCESS
-        ):
+        elif last_trained_task.status != PaperlessTask.Status.SUCCESS:
             classifier_status = "ERROR"
             classifier_error = last_trained_task.result_message
         classifier_last_trained = (
@@ -4596,11 +4576,7 @@ class SystemStatusView(PassUserMixin):
         last_sanity_check = (
             PaperlessTask.objects.filter(
                 task_type=PaperlessTask.TaskType.SANITY_CHECK,
-                status__in=[
-                    PaperlessTask.Status.SUCCESS,
-                    PaperlessTask.Status.FAILURE,
-                    PaperlessTask.Status.REVOKED,
-                ],  # ignore running tasks
+                status__in=PaperlessTask.COMPLETE_STATUSES,  # ignore running tasks
             )
             .order_by("-date_done")
             .first()
@@ -4610,10 +4586,7 @@ class SystemStatusView(PassUserMixin):
         if last_sanity_check is None:
             sanity_check_status = "WARNING"
             sanity_check_error = "No sanity check tasks found"
-        elif (
-            last_sanity_check
-            and last_sanity_check.status != PaperlessTask.Status.SUCCESS
-        ):
+        elif last_sanity_check.status != PaperlessTask.Status.SUCCESS:
             sanity_check_status = "ERROR"
             sanity_check_error = last_sanity_check.result_message
         sanity_check_last_run = (
@@ -4638,10 +4611,7 @@ class SystemStatusView(PassUserMixin):
             if last_llmindex_update is None:
                 llmindex_status = "WARNING"
                 llmindex_error = "No LLM index update tasks found"
-            elif (
-                last_llmindex_update
-                and last_llmindex_update.status == PaperlessTask.Status.FAILURE
-            ):
+            elif last_llmindex_update.status == PaperlessTask.Status.FAILURE:
                 llmindex_status = "ERROR"
                 llmindex_error = last_llmindex_update.result_message
             llmindex_last_modified = (

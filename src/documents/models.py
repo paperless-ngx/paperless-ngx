@@ -687,16 +687,19 @@ class PaperlessTask(ModelWithOwner):
         MAIL_FETCH = "mail_fetch", _("Mail Fetch")
         LLM_INDEX = "llm_index", _("LLM Index")
 
+    COMPLETE_STATUSES = (
+        Status.SUCCESS,
+        Status.FAILURE,
+        Status.REVOKED,
+    )
+
     class TriggerSource(models.TextChoices):
         SCHEDULED = "scheduled", _("Scheduled")  # Celery beat
         WEB_UI = "web_ui", _("Web UI")  # Document uploaded via web
         API_UPLOAD = "api_upload", _("API Upload")  # Document uploaded via API
         FOLDER_CONSUME = "folder_consume", _("Folder Consume")  # Consume folder
         EMAIL_CONSUME = "email_consume", _("Email Consume")  # Email attachment
-        SYSTEM = (
-            "system",
-            _("System"),
-        )  # Auto-triggered by system (self-heal, config side-effect)
+        SYSTEM = "system", _("System")  # Auto-triggered (self-heal, config side-effect)
         MANUAL = "manual", _("Manual")  # User explicitly ran via /api/tasks/run/
 
     # Identification
@@ -811,11 +814,7 @@ class PaperlessTask(ModelWithOwner):
 
     @property
     def is_complete(self) -> bool:
-        return self.status in (
-            self.Status.SUCCESS,
-            self.Status.FAILURE,
-            self.Status.REVOKED,
-        )
+        return self.status in self.COMPLETE_STATUSES
 
     @property
     def related_document_ids(self) -> list[int]:

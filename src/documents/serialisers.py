@@ -2529,13 +2529,13 @@ class TaskSerializerV9(serializers.ModelSerializer):
             return None
         return obj.input_data.get("filename")
 
+    _TRIGGER_SOURCE_TO_V9_TYPE = {
+        PaperlessTask.TriggerSource.SCHEDULED: "SCHEDULED_TASK",
+        PaperlessTask.TriggerSource.SYSTEM: "AUTO_TASK",
+    }
+
     def get_type(self, obj: PaperlessTask) -> str:
-        # Old type values: AUTO_TASK, SCHEDULED_TASK, MANUAL_TASK
-        source_to_old_type = {
-            PaperlessTask.TriggerSource.SCHEDULED: "SCHEDULED_TASK",
-            PaperlessTask.TriggerSource.SYSTEM: "AUTO_TASK",
-        }
-        return source_to_old_type.get(obj.trigger_source, "MANUAL_TASK")
+        return self._TRIGGER_SOURCE_TO_V9_TYPE.get(obj.trigger_source, "MANUAL_TASK")
 
     def get_related_document(self, obj: PaperlessTask) -> int | None:
         ids = obj.related_document_ids

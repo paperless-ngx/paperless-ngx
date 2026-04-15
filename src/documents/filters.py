@@ -906,14 +906,9 @@ class PaperlessTaskFilterSet(FilterSet):
         fields = ["task_type", "trigger_source", "status", "acknowledged", "owner"]
 
     def filter_is_complete(self, queryset, name, value):
-        complete = [
-            PaperlessTask.Status.SUCCESS,
-            PaperlessTask.Status.FAILURE,
-            PaperlessTask.Status.REVOKED,
-        ]
         if value:
-            return queryset.filter(status__in=complete)
-        return queryset.exclude(status__in=complete)
+            return queryset.filter(status__in=PaperlessTask.COMPLETE_STATUSES)
+        return queryset.exclude(status__in=PaperlessTask.COMPLETE_STATUSES)
 
 
 class ObjectOwnedOrGrantedPermissionsFilter(ObjectPermissionsFilter):
