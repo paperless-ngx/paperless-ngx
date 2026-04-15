@@ -20,7 +20,6 @@ from urllib.parse import urlparse
 import httpx
 import magic
 import pathvalidate
-from celery import states
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
@@ -3777,16 +3776,16 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
     filterset_class = PaperlessTaskFilterSet
 
     TASK_AND_ARGS_BY_NAME = {
-        PaperlessTask.TaskName.INDEX_OPTIMIZE: (index_optimize, {}),
-        PaperlessTask.TaskName.TRAIN_CLASSIFIER: (
+        PaperlessTask.TaskType.INDEX_OPTIMIZE: (index_optimize, {}),
+        PaperlessTask.TaskType.TRAIN_CLASSIFIER: (
             train_classifier,
             {"scheduled": False},
         ),
-        PaperlessTask.TaskName.CHECK_SANITY: (
+        PaperlessTask.TaskType.SANITY_CHECK: (
             sanity_check,
             {"scheduled": False, "raise_on_error": False},
         ),
-        PaperlessTask.TaskName.LLMINDEX_UPDATE: (
+        PaperlessTask.TaskType.LLM_INDEX: (
             llmindex_index,
             {"scheduled": False, "rebuild": False},
         ),
@@ -3824,13 +3823,13 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
     def run(self, request):
         serializer = RunTaskViewSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        task_name = serializer.validated_data.get("task_name")
+        task_type = serializer.validated_data.get("task_type")
 
         if not request.user.is_superuser:
             return HttpResponseForbidden("Insufficient permissions")
 
         try:
-            task_func, task_args = self.TASK_AND_ARGS_BY_NAME[task_name]
+            task_func, task_args = self.TASK_AND_ARGS_BY_NAME[task_type]
             result = task_func(**task_args)
             return Response({"result": result})
         except Exception as e:
@@ -4466,11 +4465,11 @@ class SystemStatusView(PassUserMixin):
 
         last_trained_task = (
             PaperlessTask.objects.filter(
-                task_name=PaperlessTask.TaskName.TRAIN_CLASSIFIER,
+                task_type=PaperlessTask.TaskType.TRAIN_CLASSIFIER,
                 status__in=[
-                    states.SUCCESS,
-                    states.FAILURE,
-                    states.REVOKED,
+                    PaperlessTask.Status.SUCCESS,
+                    PaperlessTask.Status.FAILURE,
+                    PaperlessTask.Status.REVOKED,
                 ],  # ignore running tasks
             )
             .order_by("-date_done")
@@ -4481,20 +4480,23 @@ class SystemStatusView(PassUserMixin):
         if last_trained_task is None:
             classifier_status = "WARNING"
             classifier_error = "No classifier training tasks found"
-        elif last_trained_task and last_trained_task.status != states.SUCCESS:
+        elif (
+            last_trained_task
+            and last_trained_task.status != PaperlessTask.Status.SUCCESS
+        ):
             classifier_status = "ERROR"
-            classifier_error = last_trained_task.result
+            classifier_error = last_trained_task.result_message
         classifier_last_trained = (
             last_trained_task.date_done if last_trained_task else None
         )
 
         last_sanity_check = (
             PaperlessTask.objects.filter(
-                task_name=PaperlessTask.TaskName.CHECK_SANITY,
+                task_type=PaperlessTask.TaskType.SANITY_CHECK,
                 status__in=[
-                    states.SUCCESS,
-                    states.FAILURE,
-                    states.REVOKED,
+                    PaperlessTask.Status.SUCCESS,
+                    PaperlessTask.Status.FAILURE,
+                    PaperlessTask.Status.REVOKED,
                 ],  # ignore running tasks
             )
             .order_by("-date_done")
@@ -4505,9 +4507,12 @@ class SystemStatusView(PassUserMixin):
         if last_sanity_check is None:
             sanity_check_status = "WARNING"
             sanity_check_error = "No sanity check tasks found"
-        elif last_sanity_check and last_sanity_check.status != states.SUCCESS:
+        elif (
+            last_sanity_check
+            and last_sanity_check.status != PaperlessTask.Status.SUCCESS
+        ):
             sanity_check_status = "ERROR"
-            sanity_check_error = last_sanity_check.result
+            sanity_check_error = last_sanity_check.result_message
         sanity_check_last_run = (
             last_sanity_check.date_done if last_sanity_check else None
         )
@@ -4520,7 +4525,7 @@ class SystemStatusView(PassUserMixin):
         else:
             last_llmindex_update = (
                 PaperlessTask.objects.filter(
-                    task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
+                    task_type=PaperlessTask.TaskType.LLM_INDEX,
                 )
                 .order_by("-date_done")
                 .first()
@@ -4530,9 +4535,12 @@ class SystemStatusView(PassUserMixin):
             if last_llmindex_update is None:
                 llmindex_status = "WARNING"
                 llmindex_error = "No LLM index update tasks found"
-            elif last_llmindex_update and last_llmindex_update.status == states.FAILURE:
+            elif (
+                last_llmindex_update
+                and last_llmindex_update.status == PaperlessTask.Status.FAILURE
+            ):
                 llmindex_status = "ERROR"
-                llmindex_error = last_llmindex_update.result
+                llmindex_error = last_llmindex_update.result_message
             llmindex_last_modified = (
                 last_llmindex_update.date_done if last_llmindex_update else None
             )

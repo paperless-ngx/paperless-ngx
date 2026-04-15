@@ -144,18 +144,19 @@ class StoragePathAdmin(GuardedModelAdmin):
 
 
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ("task_id", "task_file_name", "task_name", "date_done", "status")
-    list_filter = ("status", "date_done", "task_name")
-    search_fields = ("task_name", "task_id", "status", "task_file_name")
+    list_display = ("task_id", "task_type", "trigger_source", "date_done", "status")
+    list_filter = ("status", "date_done", "task_type")
+    search_fields = ("task_type", "task_id", "status", "trigger_source")
     readonly_fields = (
         "task_id",
-        "task_file_name",
-        "task_name",
+        "task_type",
+        "trigger_source",
         "status",
         "date_created",
         "date_started",
         "date_done",
-        "result",
+        "result_message",
+        "result_data",
     )
 
 

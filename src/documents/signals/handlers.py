@@ -1021,12 +1021,11 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs) 
         user_id = overrides.owner_id if overrides else None
 
         PaperlessTask.objects.create(
-            type=PaperlessTask.TaskType.AUTO,
+            trigger_source=PaperlessTask.TriggerSource.FOLDER_CONSUME,
             task_id=headers["id"],
-            status=states.PENDING,
-            task_file_name=task_file_name,
-            task_name=PaperlessTask.TaskName.CONSUME_FILE,
-            result=None,
+            status=PaperlessTask.Status.PENDING,
+            input_data={"filename": task_file_name},
+            task_type=PaperlessTask.TaskType.CONSUME_FILE,
             date_created=timezone.now(),
             date_started=None,
             date_done=None,
@@ -1052,7 +1051,7 @@ def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs) -> None:
         task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
 
         if task_instance is not None:
-            task_instance.status = states.STARTED
+            task_instance.status = PaperlessTask.Status.STARTED
             task_instance.date_started = timezone.now()
             task_instance.save()
     except Exception:  # pragma: no cover
@@ -1080,8 +1079,19 @@ def task_postrun_handler(
         task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
 
         if task_instance is not None:
-            task_instance.status = state or states.FAILURE
-            task_instance.result = retval
+            _CELERY_STATE_MAP = {
+                states.SUCCESS: PaperlessTask.Status.SUCCESS,
+                states.FAILURE: PaperlessTask.Status.FAILURE,
+                states.REVOKED: PaperlessTask.Status.REVOKED,
+                states.STARTED: PaperlessTask.Status.STARTED,
+                states.PENDING: PaperlessTask.Status.PENDING,
+            }
+            task_instance.status = _CELERY_STATE_MAP.get(
+                state,
+                PaperlessTask.Status.FAILURE,
+            )
+            if isinstance(retval, str):
+                task_instance.result_message = retval
             task_instance.date_done = timezone.now()
             task_instance.save()
     except Exception:  # pragma: no cover
@@ -1108,9 +1118,9 @@ def task_failure_handler(
         close_old_connections()
         task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
 
-        if task_instance is not None and task_instance.result is None:
-            task_instance.status = states.FAILURE
-            task_instance.result = traceback
+        if task_instance is not None and task_instance.result_message is None:
+            task_instance.status = PaperlessTask.Status.FAILURE
+            task_instance.result_message = str(traceback) if traceback else None
             task_instance.date_done = timezone.now()
             task_instance.save()
     except Exception:  # pragma: no cover

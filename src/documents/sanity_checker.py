@@ -18,7 +18,6 @@ from typing import TYPE_CHECKING
 from typing import Final
 from typing import TypedDict
 
-from celery import states
 from django.conf import settings
 from django.utils import timezone
 
@@ -303,13 +302,13 @@ def check_sanity(
     """
     paperless_task = PaperlessTask.objects.create(
         task_id=uuid.uuid4(),
-        type=(
-            PaperlessTask.TaskType.SCHEDULED_TASK
+        trigger_source=(
+            PaperlessTask.TriggerSource.SCHEDULED
             if scheduled
-            else PaperlessTask.TaskType.MANUAL_TASK
+            else PaperlessTask.TriggerSource.MANUAL
         ),
-        task_name=PaperlessTask.TaskName.CHECK_SANITY,
-        status=states.STARTED,
+        task_type=PaperlessTask.TaskType.SANITY_CHECK,
+        status=PaperlessTask.Status.STARTED,
         date_created=timezone.now(),
         date_started=timezone.now(),
     )
@@ -332,9 +331,13 @@ def check_sanity(
     for extra_file in present_files:
         messages.warning(None, f"Orphaned file in media dir: {extra_file}")
 
-    paperless_task.status = states.SUCCESS if not messages.has_error else states.FAILURE
+    paperless_task.status = (
+        PaperlessTask.Status.SUCCESS
+        if not messages.has_error
+        else PaperlessTask.Status.FAILURE
+    )
     if messages.total_issue_count == 0:
-        paperless_task.result = "No issues found."
+        paperless_task.result_message = "No issues found."
     else:
         parts: list[str] = []
         if messages.document_error_count:
@@ -343,11 +346,11 @@ def check_sanity(
             parts.append(f"{messages.document_warning_count} document(s) with warnings")
         if messages.global_warning_count:
             parts.append(f"{messages.global_warning_count} global warning(s)")
-        paperless_task.result = ", ".join(parts) + " found."
+        paperless_task.result_message = ", ".join(parts) + " found."
         if messages.has_error:
-            paperless_task.result += " Check logs for details."
+            paperless_task.result_message += " Check logs for details."
 
     paperless_task.date_done = timezone.now()
-    paperless_task.save(update_fields=["status", "result", "date_done"])
+    paperless_task.save(update_fields=["status", "result_message", "date_done"])
 
     return messages

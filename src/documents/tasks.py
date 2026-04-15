@@ -10,7 +10,6 @@ from tempfile import mkstemp
 
 from celery import Task
 from celery import shared_task
-from celery import states
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -88,12 +87,12 @@ def train_classifier(
     status_callback: Callable[[str], None] | None = None,
 ) -> None:
     task = PaperlessTask.objects.create(
-        type=PaperlessTask.TaskType.SCHEDULED_TASK
+        trigger_source=PaperlessTask.TriggerSource.SCHEDULED
         if scheduled
-        else PaperlessTask.TaskType.MANUAL_TASK,
+        else PaperlessTask.TriggerSource.MANUAL,
         task_id=uuid.uuid4(),
-        task_name=PaperlessTask.TaskName.TRAIN_CLASSIFIER,
-        status=states.STARTED,
+        task_type=PaperlessTask.TaskType.TRAIN_CLASSIFIER,
+        status=PaperlessTask.Status.STARTED,
         date_created=timezone.now(),
         date_started=timezone.now(),
     )
@@ -110,8 +109,8 @@ def train_classifier(
         if settings.MODEL_FILE.exists():
             logger.info(f"Removing {settings.MODEL_FILE} so it won't be used")
             settings.MODEL_FILE.unlink()
-        task.status = states.SUCCESS
-        task.result = result
+        task.status = PaperlessTask.Status.SUCCESS
+        task.result_message = result
         task.date_done = timezone.now()
         task.save()
         return
@@ -127,20 +126,20 @@ def train_classifier(
                 f"Saving updated classifier model to {settings.MODEL_FILE}...",
             )
             classifier.save()
-            task.result = "Training completed successfully"
+            task.result_message = "Training completed successfully"
         else:
             logger.debug("Training data unchanged.")
-            task.result = "Training data unchanged"
+            task.result_message = "Training data unchanged"
 
-        task.status = states.SUCCESS
+        task.status = PaperlessTask.Status.SUCCESS
 
     except Exception as e:
         logger.warning("Classifier error: " + str(e))
-        task.status = states.FAILURE
-        task.result = str(e)
+        task.status = PaperlessTask.Status.FAILURE
+        task.result_message = str(e)
 
     task.date_done = timezone.now()
-    task.save(update_fields=["status", "result", "date_done"])
+    task.save(update_fields=["status", "result_message", "date_done"])
 
 
 @shared_task(bind=True)
@@ -642,14 +641,14 @@ def llmindex_index(
     ai_config = AIConfig()
     if ai_config.llm_index_enabled:
         task = PaperlessTask.objects.create(
-            type=PaperlessTask.TaskType.SCHEDULED_TASK
+            trigger_source=PaperlessTask.TriggerSource.SCHEDULED
             if scheduled
-            else PaperlessTask.TaskType.AUTO
+            else PaperlessTask.TriggerSource.SYSTEM
             if auto
-            else PaperlessTask.TaskType.MANUAL_TASK,
+            else PaperlessTask.TriggerSource.MANUAL,
             task_id=uuid.uuid4(),
-            task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
-            status=states.STARTED,
+            task_type=PaperlessTask.TaskType.LLM_INDEX,
+            status=PaperlessTask.Status.STARTED,
             date_created=timezone.now(),
             date_started=timezone.now(),
         )
@@ -660,15 +659,15 @@ def llmindex_index(
                 iter_wrapper=iter_wrapper,
                 rebuild=rebuild,
             )
-            task.status = states.SUCCESS
-            task.result = result
+            task.status = PaperlessTask.Status.SUCCESS
+            task.result_message = result
         except Exception as e:
             logger.error("LLM index error: " + str(e))
-            task.status = states.FAILURE
-            task.result = str(e)
+            task.status = PaperlessTask.Status.FAILURE
+            task.result_message = str(e)
 
         task.date_done = timezone.now()
-        task.save(update_fields=["status", "result", "date_done"])
+        task.save(update_fields=["status", "result_message", "date_done"])
     else:
         logger.info("LLM index is disabled, skipping update.")
 

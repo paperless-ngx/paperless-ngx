@@ -4,7 +4,6 @@ from datetime import timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from celery import states
 from django.conf import settings
 from django.utils import timezone
 
@@ -28,11 +27,11 @@ def queue_llm_index_update_if_needed(*, rebuild: bool, reason: str) -> bool:
     from documents.tasks import llmindex_index
 
     has_running = PaperlessTask.objects.filter(
-        task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
-        status__in=[states.PENDING, states.STARTED],
+        task_type=PaperlessTask.TaskType.LLM_INDEX,
+        status__in=[PaperlessTask.Status.PENDING, PaperlessTask.Status.STARTED],
     ).exists()
     has_recent = PaperlessTask.objects.filter(
-        task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
+        task_type=PaperlessTask.TaskType.LLM_INDEX,
         date_created__gte=(timezone.now() - timedelta(minutes=5)),
     ).exists()
     if has_running or has_recent:

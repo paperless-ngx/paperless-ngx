@@ -12,7 +12,6 @@ from typing import Literal
 from typing import TypedDict
 
 import magic
-from celery import states
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
@@ -2437,13 +2436,13 @@ class TasksViewSerializer(OwnedObjectSerializer):
         fields = (
             "id",
             "task_id",
-            "task_name",
-            "task_file_name",
+            "task_type",
+            "trigger_source",
             "date_created",
             "date_done",
-            "type",
             "status",
-            "result",
+            "result_message",
+            "result_data",
             "acknowledged",
             "related_document",
             "duplicate_documents",
@@ -2452,29 +2451,10 @@ class TasksViewSerializer(OwnedObjectSerializer):
 
     related_document = serializers.SerializerMethodField()
     duplicate_documents = serializers.SerializerMethodField()
-    created_doc_re = re.compile(r"New document id (\d+) created")
-    duplicate_doc_re = re.compile(r"It is a duplicate of .* \(#(\d+)\)")
 
-    def get_related_document(self, obj) -> str | None:
-        result = None
-        re = None
-        if obj.result:
-            match obj.status:
-                case states.SUCCESS:
-                    re = self.created_doc_re
-                case states.FAILURE:
-                    re = (
-                        self.duplicate_doc_re
-                        if "existing document is in the trash" not in obj.result
-                        else None
-                    )
-            if re is not None:
-                try:
-                    result = re.search(obj.result).group(1)
-                except Exception:
-                    pass
-
-        return result
+    def get_related_document(self, obj) -> int | None:
+        doc_ids = obj.related_document_ids
+        return doc_ids[0] if doc_ids else None
 
     @extend_schema_field(DuplicateDocumentSummarySerializer(many=True))
     def get_duplicate_documents(self, obj):
@@ -2489,9 +2469,9 @@ class TasksViewSerializer(OwnedObjectSerializer):
 
 
 class RunTaskViewSerializer(serializers.Serializer[dict[str, Any]]):
-    task_name = serializers.ChoiceField(
-        choices=PaperlessTask.TaskName.choices,
-        label="Task Name",
+    task_type = serializers.ChoiceField(
+        choices=PaperlessTask.TaskType.choices,
+        label="Task Type",
         write_only=True,
     )
 

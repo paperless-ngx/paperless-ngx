@@ -870,8 +870,8 @@ class PaperlessTaskFilterSet(FilterSet):
     class Meta:
         model = PaperlessTask
         fields = {
-            "type": ["exact"],
-            "task_name": ["exact"],
+            "task_type": ["exact"],
+            "trigger_source": ["exact"],
             "status": ["exact"],
         }
 
