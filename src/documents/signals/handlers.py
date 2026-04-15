@@ -14,6 +14,7 @@ from celery.signals import before_task_publish
 from celery.signals import task_failure
 from celery.signals import task_postrun
 from celery.signals import task_prerun
+from celery.signals import task_revoked
 from celery.signals import worker_process_init
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -1008,6 +1009,9 @@ TRACKED_TASKS: dict[str, PaperlessTask.TaskType] = {
     "documents.tasks.sanity_check": PaperlessTask.TaskType.SANITY_CHECK,
     "documents.tasks.index_optimize": PaperlessTask.TaskType.INDEX_OPTIMIZE,
     "documents.tasks.llmindex_index": PaperlessTask.TaskType.LLM_INDEX,
+    "documents.tasks.empty_trash": PaperlessTask.TaskType.EMPTY_TRASH,
+    "documents.tasks.check_scheduled_workflows": PaperlessTask.TaskType.CHECK_WORKFLOWS,
+    "documents.tasks.cleanup_expired_share_link_bundles": PaperlessTask.TaskType.CLEANUP_SHARE_LINKS,
     "paperless_mail.tasks.process_mail_accounts": PaperlessTask.TaskType.MAIL_FETCH,
 }
 
@@ -1218,6 +1222,11 @@ def task_postrun_handler(
     """
     Records task completion and result data.
 
+    task_failure also fires when a task raises an exception, and it writes
+    richer structured error data.  To avoid a race where this handler
+    overwrites that data, result_data and result_message are left untouched
+    when the final state is FAILURE — task_failure_handler owns those fields.
+
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-postrun
     """
     if task_id is None:
@@ -1226,14 +1235,6 @@ def task_postrun_handler(
         close_old_connections()
 
         new_status = _CELERY_STATE_TO_STATUS.get(state, PaperlessTask.Status.FAILURE)
-
-        result_data: dict | None = None
-        result_message: str | None = None
-        if isinstance(retval, dict):
-            result_data = retval
-        elif isinstance(retval, str):
-            result_message = retval
-            result_data = _parse_consume_result(retval)
 
         now = timezone.now()
         task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
@@ -1249,14 +1250,23 @@ def task_postrun_handler(
                 task_instance.date_started - task_instance.date_created
             ).total_seconds()
 
-        PaperlessTask.objects.filter(task_id=task_id).update(
-            status=new_status,
-            result_data=result_data,
-            result_message=result_message,
-            date_done=now,
-            duration_seconds=duration_seconds,
-            wait_time_seconds=wait_time_seconds,
-        )
+        update_fields: dict = {
+            "status": new_status,
+            "date_done": now,
+            "duration_seconds": duration_seconds,
+            "wait_time_seconds": wait_time_seconds,
+        }
+
+        # Only write result data for non-failure outcomes; task_failure_handler
+        # owns result_data/result_message for FAILURE states.
+        if new_status != PaperlessTask.Status.FAILURE:
+            if isinstance(retval, dict):
+                update_fields["result_data"] = retval
+            elif isinstance(retval, str):
+                update_fields["result_message"] = retval
+                update_fields["result_data"] = _parse_consume_result(retval)
+
+        PaperlessTask.objects.filter(task_id=task_id).update(**update_fields)
     except Exception:
         logger.exception("Updating PaperlessTask failed")
 
@@ -1296,6 +1306,39 @@ def task_failure_handler(
         )
     except Exception:
         logger.exception("Updating PaperlessTask on failure failed")
+
+
+@task_revoked.connect
+def task_revoked_handler(
+    sender=None,
+    request=None,
+    *,
+    terminated: bool = False,
+    signum=None,
+    expired: bool = False,
+    **kwargs,
+) -> None:
+    """
+    Marks the task REVOKED when it is cancelled before or during execution.
+
+    This fires for tasks revoked while still queued (before task_prerun) as
+    well as for tasks terminated mid-run.  task_postrun does NOT fire for
+    pre-start revocations, so this handler is the only way to move those
+    records out of PENDING.
+
+    https://docs.celeryq.dev/en/stable/userguide/signals.html#task-revoked
+    """
+    task_id = request.id if request else None
+    if task_id is None:
+        return
+    try:
+        close_old_connections()
+        PaperlessTask.objects.filter(task_id=task_id).update(
+            status=PaperlessTask.Status.REVOKED,
+            date_done=timezone.now(),
+        )
+    except Exception:
+        logger.exception("Updating PaperlessTask on revocation failed")
 
 
 @worker_process_init.connect

@@ -163,12 +163,12 @@ class TestGetTasksV10:
         ids = [t["task_id"] for t in response.data]
         assert ids == [t3.task_id, t2.task_id, t1.task_id]
 
-    def test_list_is_owner_aware(
+    def test_list_scoped_to_own_tasks_for_regular_user(
         self,
         admin_user: User,
         regular_user: User,
     ) -> None:
-        """The task list only shows tasks the user owns or that are unowned."""
+        """Regular users see only tasks they own; tasks owned by others or unowned are hidden."""
         regular_user.user_permissions.add(
             Permission.objects.get(codename="view_paperlesstask"),
         )
@@ -177,17 +177,31 @@ class TestGetTasksV10:
         client.force_authenticate(user=regular_user)
         client.credentials(HTTP_ACCEPT=ACCEPT_V10)
 
-        PaperlessTaskFactory(owner=admin_user)
-        shared_task = PaperlessTaskFactory()
+        PaperlessTaskFactory(owner=admin_user)  # other user — not visible
+        PaperlessTaskFactory()  # unowned (system task) — not visible
         own_task = PaperlessTaskFactory(owner=regular_user)
 
         response = client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 2
-        returned_task_ids = {t["task_id"] for t in response.data}
-        assert shared_task.task_id in returned_task_ids
-        assert own_task.task_id in returned_task_ids
+        assert len(response.data) == 1
+        assert response.data[0]["task_id"] == own_task.task_id
+
+    def test_list_admin_sees_all_tasks(
+        self,
+        admin_client: APIClient,
+        admin_user: User,
+        regular_user: User,
+    ) -> None:
+        """Admin users see all tasks regardless of owner."""
+        PaperlessTaskFactory(owner=admin_user)
+        PaperlessTaskFactory()  # unowned system task
+        PaperlessTaskFactory(owner=regular_user)
+
+        response = admin_client.get(ENDPOINT)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) == 3
 
 
 @pytest.mark.django_db()

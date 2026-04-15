@@ -683,9 +683,11 @@ class PaperlessTask(ModelWithOwner):
         TRAIN_CLASSIFIER = "train_classifier", _("Train Classifier")
         SANITY_CHECK = "sanity_check", _("Sanity Check")
         INDEX_OPTIMIZE = "index_optimize", _("Index Optimize")
-        INDEX_REBUILD = "index_rebuild", _("Index Rebuild")
         MAIL_FETCH = "mail_fetch", _("Mail Fetch")
         LLM_INDEX = "llm_index", _("LLM Index")
+        EMPTY_TRASH = "empty_trash", _("Empty Trash")
+        CHECK_WORKFLOWS = "check_workflows", _("Check Workflows")
+        CLEANUP_SHARE_LINKS = "cleanup_share_links", _("Cleanup Share Links")
 
     COMPLETE_STATUSES = (
         Status.SUCCESS,

@@ -212,14 +212,15 @@ class TestTaskPostrunHandler:
         assert task.result_data["document_id"] == 42
         assert task.result_message == "New document id 42 created"
 
-    def test_parses_legacy_duplicate_string(self):
+    def test_parses_duplicate_string(self):
+        """Duplicate detection returns a string with SUCCESS state (StopConsumeTaskError is caught and returned, not raised)."""
         task = self._started_task()
         from documents.signals.handlers import task_postrun_handler
 
         task_postrun_handler(
             task_id=task.task_id,
             retval="It is a duplicate of some document (#99).",
-            state="FAILURE",
+            state="SUCCESS",
         )
         task.refresh_from_db()
         assert task.result_data["duplicate_of"] == 99

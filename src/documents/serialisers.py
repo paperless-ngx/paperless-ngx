@@ -2532,6 +2532,9 @@ class TaskSerializerV9(serializers.ModelSerializer):
     _TRIGGER_SOURCE_TO_V9_TYPE = {
         PaperlessTask.TriggerSource.SCHEDULED: "SCHEDULED_TASK",
         PaperlessTask.TriggerSource.SYSTEM: "AUTO_TASK",
+        # Email and folder-consumer documents are system-initiated, not manually triggered
+        PaperlessTask.TriggerSource.EMAIL_CONSUME: "AUTO_TASK",
+        PaperlessTask.TriggerSource.FOLDER_CONSUME: "AUTO_TASK",
     }
 
     def get_type(self, obj: PaperlessTask) -> str:

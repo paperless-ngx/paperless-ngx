@@ -3775,7 +3775,6 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = PaperlessTaskFilterSet
     ordering_fields = [
@@ -3809,7 +3808,12 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
         return TaskSerializerV10
 
     def get_queryset(self):
-        queryset = PaperlessTask.objects.all()
+        # Staff see all tasks; regular users see only tasks they own.
+        # Unowned tasks (system/scheduled) are admin-only.
+        if self.request.user.is_staff:
+            queryset = PaperlessTask.objects.all()
+        else:
+            queryset = PaperlessTask.objects.filter(owner=self.request.user)
         # v9 backwards compat: map old query params to new field names
         if self.request.version and int(self.request.version) < 10:
             task_name = self.request.query_params.get("task_name")
@@ -3859,7 +3863,13 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
     @action(methods=["get"], detail=False)
     def summary(self, request):
         """Aggregated task statistics per task_type over the last N days (default 30)."""
-        days = int(request.query_params.get("days", 30))
+        try:
+            days = max(1, int(request.query_params.get("days", 30)))
+        except (TypeError, ValueError):
+            return Response(
+                {"days": "Must be a positive integer."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         cutoff = timezone.now() - timedelta(days=days)
         queryset = self.get_queryset().filter(date_created__gte=cutoff)
 
