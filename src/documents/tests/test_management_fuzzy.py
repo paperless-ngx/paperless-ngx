@@ -250,3 +250,29 @@ class TestFuzzyMatchCommand(TestCase):
         )
         stdout, _ = self.call_command()
         self.assertIn("No duplicate documents found", stdout)
+
+
+@pytest.mark.management
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("content_a", "content_b"),
+    [
+        pytest.param("x" * 90 + "y" * 10, "x" * 100, id="yellow-90pct"),  # 88-92%
+        pytest.param("x" * 94 + "y" * 6, "x" * 100, id="red-94pct"),  # 92-97%
+        pytest.param("x" * 99 + "y", "x" * 100, id="bold-red-99pct"),  # ≥97%
+    ],
+)
+def test_similarity_color_band(content_a: str, content_b: str) -> None:
+    """Each parametrized case exercises one color branch in _render_results."""
+    DocumentFactory(content=content_a)
+    DocumentFactory(content=content_b)
+    stdout = StringIO()
+    call_command(
+        "document_fuzzy_match",
+        "--no-progress-bar",
+        "--processes",
+        "1",
+        stdout=stdout,
+        skip_checks=True,
+    )
+    assert "Found 1 matching pair(s)" in stdout.getvalue()
