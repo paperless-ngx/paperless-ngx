@@ -1040,6 +1040,13 @@ def _extract_input_data(
     args: tuple,
     task_kwargs: dict,
 ) -> dict:
+    """Build the input_data dict stored on the PaperlessTask record.
+
+    For consume_file tasks this includes the filename, MIME type, and any
+    non-null overrides from the DocumentMetadataOverrides object.  For
+    mail_fetch tasks it captures the account_ids list.  All other task
+    types store no input data and return {}.
+    """
     if task_type == PaperlessTask.TaskType.CONSUME_FILE:
         input_doc, overrides = _get_consume_args(args, task_kwargs)
         if input_doc is None:
@@ -1075,6 +1082,13 @@ def _determine_trigger_source(
     task_kwargs: dict,
     headers: dict,
 ) -> PaperlessTask.TriggerSource:
+    """Resolve the TriggerSource for a task being published to the broker.
+
+    Priority order:
+    1. Explicit trigger_source header (set by beat schedule or apply_async callers).
+    2. For consume_file tasks, the DocumentSource on the input document.
+    3. MANUAL as the catch-all for all other cases.
+    """
     # Explicit header takes priority -- covers beat ("scheduled") and system auto-runs ("system")
     header_source = headers.get("trigger_source")
     if header_source == "scheduled":
@@ -1098,6 +1112,7 @@ def _extract_owner_id(
     args: tuple,
     task_kwargs: dict,
 ) -> int | None:
+    """Return the owner_id from consume_file overrides, or None for all other task types."""
     if task_type != PaperlessTask.TaskType.CONSUME_FILE:
         return None
     _, overrides = _get_consume_args(args, task_kwargs)
@@ -1106,7 +1121,15 @@ def _extract_owner_id(
     return None
 
 
-def _parse_legacy_result(result: str) -> dict | None:
+def _parse_consume_result(result: str) -> dict | None:
+    """Parse a consume_file string result into a structured dict.
+
+    consume_file returns human-readable strings rather than dicts (e.g.
+    "Success. New document id 42 created" or "It is a duplicate of foo (#7)").
+    This function extracts the document ID or duplicate reference so the
+    result can be stored as structured data on the PaperlessTask record.
+    Returns None when the string does not match any known pattern.
+    """
     if match := _re.search(r"New document id (\d+) created", result):
         return {"document_id": int(match.group(1))}
     if match := _re.search(r"It is a duplicate of .* \(#(\d+)\)", result):
@@ -1210,7 +1233,7 @@ def task_postrun_handler(
             result_data = retval
         elif isinstance(retval, str):
             result_message = retval
-            result_data = _parse_legacy_result(retval)
+            result_data = _parse_consume_result(retval)
 
         now = timezone.now()
         task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
