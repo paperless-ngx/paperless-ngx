@@ -72,6 +72,9 @@ def build_schema() -> tantivy.Schema:
 
     # JSON fields — structured queries: notes.user:alice, custom_fields.name:invoice
     sb.add_json_field("notes", stored=True, tokenizer_name="paperless_text")
+    # Plain-text companion for notes — tantivy's SnippetGenerator does not support
+    # JSON fields, so highlights require a text field with the same content.
+    sb.add_text_field("notes_text", stored=True, tokenizer_name="paperless_text")
     sb.add_json_field("custom_fields", stored=True, tokenizer_name="paperless_text")
 
     for field in (

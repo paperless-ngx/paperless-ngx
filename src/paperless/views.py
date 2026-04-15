@@ -90,7 +90,7 @@ class StandardPagination(PageNumberPagination):
 
         query = self.page.paginator.object_list
         if isinstance(query, TantivyRelevanceList):
-            return [h["id"] for h in query._hits]
+            return query.get_all_ids()
         return self.page.paginator.object_list.values_list("pk", flat=True)
 
     def get_paginated_response_schema(self, schema):

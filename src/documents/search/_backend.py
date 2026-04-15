@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import logging
+import re
 import threading
 from collections import Counter
-from dataclasses import dataclass
 from datetime import UTC
 from datetime import datetime
 from enum import StrEnum
@@ -88,45 +88,63 @@ class SearchHit(TypedDict):
     highlights: dict[str, str]
 
 
-@dataclass(frozen=True, slots=True)
-class SearchResults:
-    """
-    Container for search results with pagination metadata.
-
-    Attributes:
-        hits: List of search results with scores and highlights
-        total: Total matching documents across all pages (for pagination)
-        query: Preprocessed query string after date/syntax rewriting
-    """
-
-    hits: list[SearchHit]
-    total: int  # total matching documents (for pagination)
-    query: str  # preprocessed query string
-
-
 class TantivyRelevanceList:
     """
-    DRF-compatible list wrapper for Tantivy search hits.
+    DRF-compatible list wrapper for Tantivy search results.
 
-    Provides paginated access to search results while storing all hits in memory
-    for efficient ID retrieval. Used by Django REST framework for pagination.
+    Holds a lightweight ordered list of IDs (for pagination count and
+    ``selection_data``) together with a small page of rich ``SearchHit``
+    dicts (for serialization).  DRF's ``PageNumberPagination`` calls
+    ``__len__`` to compute the total page count and ``__getitem__`` to
+    slice the displayed page.
 
-    Methods:
-        __len__: Returns total hit count for pagination calculations
-        __getitem__: Slices the hit list for page-specific results
-
-    Note: Stores ALL post-filter hits so get_all_result_ids() can return
-    every matching document ID without requiring a second search query.
+    Args:
+        ordered_ids: All matching document IDs in display order.
+        page_hits: Rich SearchHit dicts for the requested DRF page only.
+        page_offset: Index into *ordered_ids* where *page_hits* starts.
     """
 
-    def __init__(self, hits: list[SearchHit]) -> None:
-        self._hits = hits
+    def __init__(
+        self,
+        ordered_ids: list[int],
+        page_hits: list[SearchHit],
+        page_offset: int = 0,
+    ) -> None:
+        self._ordered_ids = ordered_ids
+        self._page_hits = page_hits
+        self._page_offset = page_offset
 
     def __len__(self) -> int:
-        return len(self._hits)
+        return len(self._ordered_ids)
 
-    def __getitem__(self, key: slice) -> list[SearchHit]:
-        return self._hits[key]
+    def __getitem__(self, key: int | slice) -> SearchHit | list[SearchHit]:
+        if isinstance(key, int):
+            idx = key if key >= 0 else len(self._ordered_ids) + key
+            if self._page_offset <= idx < self._page_offset + len(self._page_hits):
+                return self._page_hits[idx - self._page_offset]
+            return SearchHit(
+                id=self._ordered_ids[key],
+                score=0.0,
+                rank=idx + 1,
+                highlights={},
+            )
+        start = key.start or 0
+        stop = key.stop or len(self._ordered_ids)
+        # DRF slices to extract the current page.  If the slice aligns
+        # with our pre-fetched page_hits, return them directly.
+        # We only check start — DRF always slices with stop=start+page_size,
+        # which exceeds page_hits length on the last page.
+        if start == self._page_offset:
+            return self._page_hits[: stop - start]
+        # Fallback: return stub dicts (no highlights).
+        return [
+            SearchHit(id=doc_id, score=0.0, rank=start + i + 1, highlights={})
+            for i, doc_id in enumerate(self._ordered_ids[key])
+        ]
+
+    def get_all_ids(self) -> list[int]:
+        """Return all matching document IDs in display order."""
+        return self._ordered_ids
 
 
 class SearchIndexLockError(Exception):
@@ -206,10 +224,13 @@ class WriteBatch:
         """
         Remove a document from the batch by its primary key.
 
-        Uses range query instead of term query to work around unsigned integer
-        type detection bug in tantivy-py 0.25.
+        Uses range_query instead of term_query to work around a tantivy-py bug
+        where Python integers are inferred as i64, producing Terms that never
+        match u64 fields.
+
+        TODO: Replace with term_query("id", doc_id) once
+        https://github.com/quickwit-oss/tantivy-py/pull/642 lands.
         """
-        # Use range query to work around u64 deletion bug
         self._writer.delete_documents_by_query(
             tantivy.Query.range_query(
                 self._backend._schema,
@@ -233,6 +254,34 @@ class TantivyBackend:
     The backend manages its own connection lifecycle and can be reset when
     the underlying index directory changes (e.g., during test isolation).
     """
+
+    # Maps DRF ordering field names to Tantivy index field names.
+    SORT_FIELD_MAP: dict[str, str] = {
+        "title": "title_sort",
+        "correspondent__name": "correspondent_sort",
+        "document_type__name": "type_sort",
+        "created": "created",
+        "added": "added",
+        "modified": "modified",
+        "archive_serial_number": "asn",
+        "page_count": "page_count",
+        "num_notes": "num_notes",
+    }
+
+    # Fields where Tantivy's sort order matches the ORM's sort order.
+    # Text-based fields (title, correspondent__name, document_type__name)
+    # are excluded because Tantivy's tokenized fast fields produce different
+    # ordering than the ORM's collation-based ordering.
+    SORTABLE_FIELDS: frozenset[str] = frozenset(
+        {
+            "created",
+            "added",
+            "modified",
+            "archive_serial_number",
+            "page_count",
+            "num_notes",
+        },
+    )
 
     def __init__(self, path: Path | None = None):
         # path=None → in-memory index (for tests)
@@ -271,6 +320,36 @@ class TantivyBackend:
         """Ensure the index is open before operations."""
         if self._index is None:
             self.open()  # pragma: no cover
+
+    def _parse_query(
+        self,
+        query: str,
+        search_mode: SearchMode,
+    ) -> tantivy.Query:
+        """Parse a user query string into a Tantivy Query object."""
+        tz = get_current_timezone()
+        if search_mode is SearchMode.TEXT:
+            return parse_simple_text_query(self._index, query)
+        elif search_mode is SearchMode.TITLE:
+            return parse_simple_title_query(self._index, query)
+        else:
+            return parse_user_query(self._index, query, tz)
+
+    def _apply_permission_filter(
+        self,
+        query: tantivy.Query,
+        user: AbstractBaseUser | None,
+    ) -> tantivy.Query:
+        """Wrap a query with a permission filter if the user is not a superuser."""
+        if user is not None:
+            permission_filter = build_permission_filter(self._schema, user)
+            return tantivy.Query.boolean_query(
+                [
+                    (tantivy.Occur.Must, query),
+                    (tantivy.Occur.Must, permission_filter),
+                ],
+            )
+        return query
 
     def _build_tantivy_doc(
         self,
@@ -326,12 +405,17 @@ class TantivyBackend:
             doc.add_unsigned("tag_id", tag.pk)
             tag_names.append(tag.name)
 
-        # Notes — JSON for structured queries (notes.user:alice, notes.note:text),
-        # companion text field for default full-text search.
+        # Notes — JSON for structured queries (notes.user:alice, notes.note:text).
+        # notes_text is a plain-text companion for snippet/highlight generation;
+        # tantivy's SnippetGenerator does not support JSON fields.
         num_notes = 0
+        note_texts: list[str] = []
         for note in document.notes.all():
             num_notes += 1
             doc.add_json("notes", {"note": note.note, "user": note.user.username})
+            note_texts.append(note.note)
+        if note_texts:
+            doc.add_text("notes_text", " ".join(note_texts))
 
         # Custom fields — JSON for structured queries (custom_fields.name:x, custom_fields.value:y),
         # companion text field for default full-text search.
@@ -425,155 +509,125 @@ class TantivyBackend:
         with self.batch_update(lock_timeout=5.0) as batch:
             batch.remove(doc_id)
 
-    def search(
+    def highlight_hits(
         self,
         query: str,
-        user: AbstractBaseUser | None,
-        page: int,
-        page_size: int,
-        sort_field: str | None,
+        doc_ids: list[int],
         *,
-        sort_reverse: bool,
         search_mode: SearchMode = SearchMode.QUERY,
-    ) -> SearchResults:
+        rank_start: int = 1,
+    ) -> list[SearchHit]:
         """
-        Execute a search query against the document index.
+        Generate SearchHit dicts with highlights for specific document IDs.
 
-        Processes the user query through date rewriting, normalization, and
-        permission filtering before executing against Tantivy. Supports both
-        relevance-based and field-based sorting.
+        Unlike search(), this does not execute a ranked query — it looks up
+        each document by ID and generates snippets against the provided query.
+        Use this when you already know which documents to display (from
+        search_ids + ORM filtering) and just need highlight data.
 
-        QUERY search mode supports natural date keywords, field filters, etc.
-        TITLE search mode treats the query as plain text to search for in title only
-        TEXT search mode treats the query as plain text to search for in title and content
+        Note: Each doc_id requires an individual index lookup because tantivy-py
+        does not yet expose a batch fast-field read API. This is acceptable for
+        page-sized batches (typically 25 docs) but should not be called with
+        thousands of IDs.
+
+        TODO: When https://github.com/quickwit-oss/tantivy-py/pull/641 lands,
+        the per-doc range_query lookups here can be replaced with a single
+        collect_u64_fast_field("id", doc_addresses) call.
 
         Args:
-            query: User's search query
-            user: User for permission filtering (None for superuser/no filtering)
-            page: Page number (1-indexed) for pagination
-            page_size: Number of results per page
-            sort_field: Field to sort by (None for relevance ranking)
-            sort_reverse: Whether to reverse the sort order
-            search_mode: "query" for advanced Tantivy syntax, "text" for
-                plain-text search over title and content only, "title" for
-                plain-text search over title only
+            query: The search query (used for snippet generation)
+            doc_ids: Ordered list of document IDs to generate hits for
+            search_mode: Query parsing mode (for building the snippet query)
+            rank_start: Starting rank value (1-based absolute position in the
+                full result set; pass ``page_offset + 1`` for paginated calls)
 
         Returns:
-            SearchResults with hits, total count, and processed query
+            List of SearchHit dicts in the same order as doc_ids
         """
-        self._ensure_open()
-        tz = get_current_timezone()
-        if search_mode is SearchMode.TEXT:
-            user_query = parse_simple_text_query(self._index, query)
-        elif search_mode is SearchMode.TITLE:
-            user_query = parse_simple_title_query(self._index, query)
-        else:
-            user_query = parse_user_query(self._index, query, tz)
+        if not doc_ids:
+            return []
 
-        # Apply permission filter if user is not None (not superuser)
-        if user is not None:
-            permission_filter = build_permission_filter(self._schema, user)
-            final_query = tantivy.Query.boolean_query(
-                [
-                    (tantivy.Occur.Must, user_query),
-                    (tantivy.Occur.Must, permission_filter),
-                ],
+        self._ensure_open()
+        user_query = self._parse_query(query, search_mode)
+
+        # For notes_text snippet generation, we need a query that targets the
+        # notes_text field directly. user_query may contain JSON-field terms
+        # (e.g. notes.note:urgent) that the SnippetGenerator cannot resolve
+        # against a text field. Strip field:value prefixes so bare terms like
+        # "urgent" are re-parsed against notes_text, producing highlights even
+        # when the original query used structured syntax.
+        bare_query = re.sub(r"\w[\w.]*:", "", query).strip()
+        try:
+            notes_text_query = (
+                self._index.parse_query(bare_query, ["notes_text"])
+                if bare_query
+                else user_query
             )
-        else:
-            final_query = user_query
+        except Exception:
+            notes_text_query = user_query
 
         searcher = self._index.searcher()
-        offset = (page - 1) * page_size
-
-        # Map sort fields
-        sort_field_map = {
-            "title": "title_sort",
-            "correspondent__name": "correspondent_sort",
-            "document_type__name": "type_sort",
-            "created": "created",
-            "added": "added",
-            "modified": "modified",
-            "archive_serial_number": "asn",
-            "page_count": "page_count",
-            "num_notes": "num_notes",
-        }
-
-        # Perform search
-        if sort_field and sort_field in sort_field_map:
-            mapped_field = sort_field_map[sort_field]
-            results = searcher.search(
-                final_query,
-                limit=offset + page_size,
-                order_by_field=mapped_field,
-                order=tantivy.Order.Desc if sort_reverse else tantivy.Order.Asc,
-            )
-            # Field sorting: hits are still (score, DocAddress) tuples; score unused
-            all_hits = [(hit[1], 0.0) for hit in results.hits]
-        else:
-            # Score-based search: hits are (score, DocAddress) tuples
-            results = searcher.search(final_query, limit=offset + page_size)
-            all_hits = [(hit[1], hit[0]) for hit in results.hits]
-
-        total = results.count
-
-        # Normalize scores for score-based searches
-        if not sort_field and all_hits:
-            max_score = max(hit[1] for hit in all_hits) or 1.0
-            all_hits = [(hit[0], hit[1] / max_score) for hit in all_hits]
-
-        # Apply threshold filter if configured (score-based search only)
-        threshold = settings.ADVANCED_FUZZY_SEARCH_THRESHOLD
-        if threshold is not None and not sort_field:
-            all_hits = [hit for hit in all_hits if hit[1] >= threshold]
-
-        # Get the page's hits
-        page_hits = all_hits[offset : offset + page_size]
-
-        # Build result hits with highlights
-        hits: list[SearchHit] = []
         snippet_generator = None
         notes_snippet_generator = None
+        hits: list[SearchHit] = []
 
-        for rank, (doc_address, score) in enumerate(page_hits, start=offset + 1):
-            # Get the actual document from the searcher using the doc address
+        for rank, doc_id in enumerate(doc_ids, start=rank_start):
+            # Look up document by ID, scoring against the user query so that
+            # the returned SearchHit carries a real BM25 relevance score.
+            id_query = tantivy.Query.range_query(
+                self._schema,
+                "id",
+                tantivy.FieldType.Unsigned,
+                doc_id,
+                doc_id,
+            )
+            scored_query = tantivy.Query.boolean_query(
+                [
+                    (tantivy.Occur.Must, user_query),
+                    (tantivy.Occur.Must, id_query),
+                ],
+            )
+            results = searcher.search(scored_query, limit=1)
+
+            if not results.hits:
+                continue
+
+            score, doc_address = results.hits[0]
             actual_doc = searcher.doc(doc_address)
             doc_dict = actual_doc.to_dict()
-            doc_id = doc_dict["id"][0]
 
             highlights: dict[str, str] = {}
+            try:
+                if snippet_generator is None:
+                    snippet_generator = tantivy.SnippetGenerator.create(
+                        searcher,
+                        user_query,
+                        self._schema,
+                        "content",
+                    )
 
-            # Generate highlights if score > 0
-            if score > 0:
-                try:
-                    if snippet_generator is None:
-                        snippet_generator = tantivy.SnippetGenerator.create(
+                content_html = snippet_generator.snippet_from_doc(actual_doc).to_html()
+                if content_html:
+                    highlights["content"] = content_html
+
+                if "notes_text" in doc_dict:
+                    # Use notes_text (plain text) for snippet generation — tantivy's
+                    # SnippetGenerator does not support JSON fields.
+                    if notes_snippet_generator is None:
+                        notes_snippet_generator = tantivy.SnippetGenerator.create(
                             searcher,
-                            final_query,
+                            notes_text_query,
                             self._schema,
-                            "content",
+                            "notes_text",
                         )
+                    notes_html = notes_snippet_generator.snippet_from_doc(
+                        actual_doc,
+                    ).to_html()
+                    if notes_html:
+                        highlights["notes"] = notes_html
 
-                    content_snippet = snippet_generator.snippet_from_doc(actual_doc)
-                    if content_snippet:
-                        highlights["content"] = str(content_snippet)
-
-                    # Try notes highlights
-                    if "notes" in doc_dict:
-                        if notes_snippet_generator is None:
-                            notes_snippet_generator = tantivy.SnippetGenerator.create(
-                                searcher,
-                                final_query,
-                                self._schema,
-                                "notes",
-                            )
-                        notes_snippet = notes_snippet_generator.snippet_from_doc(
-                            actual_doc,
-                        )
-                        if notes_snippet:
-                            highlights["notes"] = str(notes_snippet)
-
-                except Exception:  # pragma: no cover
-                    logger.debug("Failed to generate highlights for doc %s", doc_id)
+            except Exception:  # pragma: no cover
+                logger.debug("Failed to generate highlights for doc %s", doc_id)
 
             hits.append(
                 SearchHit(
@@ -584,11 +638,69 @@ class TantivyBackend:
                 ),
             )
 
-        return SearchResults(
-            hits=hits,
-            total=total,
-            query=query,
-        )
+        return hits
+
+    def search_ids(
+        self,
+        query: str,
+        user: AbstractBaseUser | None,
+        *,
+        sort_field: str | None = None,
+        sort_reverse: bool = False,
+        search_mode: SearchMode = SearchMode.QUERY,
+        limit: int | None = None,
+    ) -> list[int]:
+        """
+        Return document IDs matching a query — no highlights or scores.
+
+        This is the lightweight companion to search(). Use it when you need the
+        full set of matching IDs (e.g. for ``selection_data``) but don't need
+        scores, ranks, or highlights.
+
+        Args:
+            query: User's search query
+            user: User for permission filtering (None for superuser/no filtering)
+            sort_field: Field to sort by (None for relevance ranking)
+            sort_reverse: Whether to reverse the sort order
+            search_mode: Query parsing mode (QUERY, TEXT, or TITLE)
+            limit: Maximum number of IDs to return (None = all matching docs)
+
+        Returns:
+            List of document IDs in the requested order
+        """
+        self._ensure_open()
+        user_query = self._parse_query(query, search_mode)
+        final_query = self._apply_permission_filter(user_query, user)
+
+        searcher = self._index.searcher()
+        effective_limit = limit if limit is not None else searcher.num_docs
+
+        if sort_field and sort_field in self.SORT_FIELD_MAP:
+            mapped_field = self.SORT_FIELD_MAP[sort_field]
+            results = searcher.search(
+                final_query,
+                limit=effective_limit,
+                order_by_field=mapped_field,
+                order=tantivy.Order.Desc if sort_reverse else tantivy.Order.Asc,
+            )
+            all_hits = [(hit[1],) for hit in results.hits]
+        else:
+            results = searcher.search(final_query, limit=effective_limit)
+            all_hits = [(hit[1], hit[0]) for hit in results.hits]
+
+            # Normalize scores and apply threshold (relevance search only)
+            if all_hits:
+                max_score = max(hit[1] for hit in all_hits) or 1.0
+                all_hits = [(hit[0], hit[1] / max_score) for hit in all_hits]
+
+            threshold = settings.ADVANCED_FUZZY_SEARCH_THRESHOLD
+            if threshold is not None:
+                all_hits = [hit for hit in all_hits if hit[1] >= threshold]
+
+        # TODO: Replace with searcher.collect_u64_fast_field("id", addrs) once
+        # https://github.com/quickwit-oss/tantivy-py/pull/641 lands — eliminates
+        # one stored-doc fetch per result (~80% reduction in search_ids latency).
+        return [searcher.doc(doc_addr).to_dict()["id"][0] for doc_addr, *_ in all_hits]
 
     def autocomplete(
         self,
@@ -603,6 +715,10 @@ class TantivyBackend:
         frequency (how many documents contain each word). Optionally filters
         results to only words from documents visible to the specified user.
 
+        NOTE: This is the hottest search path (called per keystroke).
+        A future improvement would be to cache results in Redis, keyed by
+        (prefix, user_id), and invalidate on index writes.
+
         Args:
             term: Prefix to match against autocomplete words
             limit: Maximum number of suggestions to return
@@ -613,64 +729,94 @@ class TantivyBackend:
         """
         self._ensure_open()
         normalized_term = ascii_fold(term.lower())
+        if not normalized_term:
+            return []
 
         searcher = self._index.searcher()
 
-        # Apply permission filter for non-superusers so autocomplete words
-        # from invisible documents don't leak to other users.
+        # Build a prefix query on autocomplete_word so we only scan docs
+        # containing words that start with the prefix, not the entire index.
+        # tantivy regex is implicitly anchored; .+ avoids the empty-match
+        # error that .* triggers.  We OR with term_query to also match the
+        # exact prefix as a complete word.
+        escaped = re.escape(normalized_term)
+        prefix_query = tantivy.Query.boolean_query(
+            [
+                (
+                    tantivy.Occur.Should,
+                    tantivy.Query.term_query(
+                        self._schema,
+                        "autocomplete_word",
+                        normalized_term,
+                    ),
+                ),
+                (
+                    tantivy.Occur.Should,
+                    tantivy.Query.regex_query(
+                        self._schema,
+                        "autocomplete_word",
+                        f"{escaped}.+",
+                    ),
+                ),
+            ],
+        )
+
+        # Intersect with permission filter so autocomplete words from
+        # invisible documents don't leak to other users.
         if user is not None and not user.is_superuser:
-            base_query = build_permission_filter(self._schema, user)
+            final_query = tantivy.Query.boolean_query(
+                [
+                    (tantivy.Occur.Must, prefix_query),
+                    (tantivy.Occur.Must, build_permission_filter(self._schema, user)),
+                ],
+            )
         else:
-            base_query = tantivy.Query.all_query()
+            final_query = prefix_query
 
-        results = searcher.search(base_query, limit=10000)
+        results = searcher.search(final_query, limit=searcher.num_docs)
 
-        # Count how many visible documents each word appears in.
-        # Using Counter (not set) preserves per-word document frequency so
-        # we can rank suggestions by how commonly they occur — the same
-        # signal Whoosh used for Tf/Idf-based autocomplete ordering.
+        # Count how many visible documents each matching word appears in.
         word_counts: Counter[str] = Counter()
         for _score, doc_address in results.hits:
             stored_doc = searcher.doc(doc_address)
             doc_dict = stored_doc.to_dict()
             if "autocomplete_word" in doc_dict:
-                word_counts.update(doc_dict["autocomplete_word"])
+                for word in doc_dict["autocomplete_word"]:
+                    if word.startswith(normalized_term):
+                        word_counts[word] += 1
 
-        # Filter to prefix matches, sort by document frequency descending;
-        # break ties alphabetically for stable, deterministic output.
+        # Sort by document frequency descending; break ties alphabetically.
         matches = sorted(
-            (w for w in word_counts if w.startswith(normalized_term)),
+            word_counts,
             key=lambda w: (-word_counts[w], w),
         )
 
         return matches[:limit]
 
-    def more_like_this(
+    def more_like_this_ids(
         self,
         doc_id: int,
         user: AbstractBaseUser | None,
-        page: int,
-        page_size: int,
-    ) -> SearchResults:
+        *,
+        limit: int | None = None,
+    ) -> list[int]:
         """
-        Find documents similar to the given document using content analysis.
+        Return IDs of documents similar to the given document — no highlights.
 
-        Uses Tantivy's "more like this" query to find documents with similar
-        content patterns. The original document is excluded from results.
+        Lightweight companion to more_like_this(). The original document is
+        excluded from results.
 
         Args:
             doc_id: Primary key of the reference document
             user: User for permission filtering (None for no filtering)
-            page: Page number (1-indexed) for pagination
-            page_size: Number of results per page
+            limit: Maximum number of IDs to return (None = all matching docs)
 
         Returns:
-            SearchResults with similar documents (excluding the original)
+            List of similar document IDs (excluding the original)
         """
         self._ensure_open()
         searcher = self._index.searcher()
 
-        # First find the document address
         id_query = tantivy.Query.range_query(
             self._schema,
             "id",
@@ -681,13 +827,9 @@ class TantivyBackend:
         results = searcher.search(id_query, limit=1)
 
         if not results.hits:
-            # Document not found
-            return SearchResults(hits=[], total=0, query=f"more_like:{doc_id}")
+            return []
 
-        # Extract doc_address from (score, doc_address) tuple
         doc_address = results.hits[0][1]
-
-        # Build more like this query
         mlt_query = tantivy.Query.more_like_this_query(
             doc_address,
             min_doc_frequency=1,
@@ -699,59 +841,21 @@ class TantivyBackend:
             boost_factor=None,
         )
 
-        # Apply permission filter
-        if user is not None:
-            permission_filter = build_permission_filter(self._schema, user)
-            final_query = tantivy.Query.boolean_query(
-                [
-                    (tantivy.Occur.Must, mlt_query),
-                    (tantivy.Occur.Must, permission_filter),
-                ],
-            )
-        else:
-            final_query = mlt_query
+        final_query = self._apply_permission_filter(mlt_query, user)
 
-        # Search
-        offset = (page - 1) * page_size
-        results = searcher.search(final_query, limit=offset + page_size)
+        effective_limit = limit if limit is not None else searcher.num_docs
+        # Fetch one extra to account for excluding the original document
+        results = searcher.search(final_query, limit=effective_limit + 1)
 
-        total = results.count
-        # Convert from (score, doc_address) to (doc_address, score)
-        all_hits = [(hit[1], hit[0]) for hit in results.hits]
+        # TODO: Replace with collect_u64_fast_field("id", addrs) once
+        # https://github.com/quickwit-oss/tantivy-py/pull/641 lands.
+        ids = []
+        for _score, doc_address in results.hits:
+            result_doc_id = searcher.doc(doc_address).to_dict()["id"][0]
+            if result_doc_id != doc_id:
+                ids.append(result_doc_id)
 
-        # Normalize scores
-        if all_hits:
-            max_score = max(hit[1] for hit in all_hits) or 1.0
-            all_hits = [(hit[0], hit[1] / max_score) for hit in all_hits]
-
-        # Get page hits
-        page_hits = all_hits[offset : offset + page_size]
-
-        # Build results
-        hits: list[SearchHit] = []
-        for rank, (doc_address, score) in enumerate(page_hits, start=offset + 1):
-            actual_doc = searcher.doc(doc_address)
-            doc_dict = actual_doc.to_dict()
-            result_doc_id = doc_dict["id"][0]
-
-            # Skip the original document
-            if result_doc_id == doc_id:
-                continue
-
-            hits.append(
-                SearchHit(
-                    id=result_doc_id,
-                    score=score,
-                    rank=rank,
-                    highlights={},  # MLT doesn't generate highlights
-                ),
-            )
-
-        return SearchResults(
-            hits=hits,
-            total=max(0, total - 1),  # Subtract 1 for the original document
-            query=f"more_like:{doc_id}",
-        )
+        return ids[:limit] if limit is not None else ids
 
     def batch_update(self, lock_timeout: float = 30.0) -> WriteBatch:
         """

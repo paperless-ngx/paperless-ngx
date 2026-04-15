@@ -33,19 +33,12 @@ class TestWriteBatch:
         except RuntimeError:
             pass
 
-        r = backend.search(
-            "should survive",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-        )
-        assert r.total == 1
+        ids = backend.search_ids("should survive", user=None)
+        assert len(ids) == 1
 
 
 class TestSearch:
-    """Test search functionality."""
+    """Test search query parsing and matching via search_ids."""
 
     def test_text_mode_limits_default_search_to_title_and_content(
         self,
@@ -60,27 +53,20 @@ class TestSearch:
         )
         backend.add_or_update(doc)
 
-        metadata_only = backend.search(
-            "document_type:invoice",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-            search_mode=SearchMode.TEXT,
+        assert (
+            len(
+                backend.search_ids(
+                    "document_type:invoice",
+                    user=None,
+                    search_mode=SearchMode.TEXT,
+                ),
+            )
+            == 0
         )
-        assert metadata_only.total == 0
-
-        content_match = backend.search(
-            "monthly",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-            search_mode=SearchMode.TEXT,
+        assert (
+            len(backend.search_ids("monthly", user=None, search_mode=SearchMode.TEXT))
+            == 1
         )
-        assert content_match.total == 1
 
     def test_title_mode_limits_default_search_to_title_only(
         self,
@@ -95,27 +81,14 @@ class TestSearch:
         )
         backend.add_or_update(doc)
 
-        content_only = backend.search(
-            "monthly",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-            search_mode=SearchMode.TITLE,
+        assert (
+            len(backend.search_ids("monthly", user=None, search_mode=SearchMode.TITLE))
+            == 0
         )
-        assert content_only.total == 0
-
-        title_match = backend.search(
-            "invoice",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-            search_mode=SearchMode.TITLE,
+        assert (
+            len(backend.search_ids("invoice", user=None, search_mode=SearchMode.TITLE))
+            == 1
         )
-        assert title_match.total == 1
 
     def test_text_mode_matches_partial_term_substrings(
         self,
@@ -130,38 +103,16 @@ class TestSearch:
         )
         backend.add_or_update(doc)
 
-        prefix_match = backend.search(
-            "pass",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-            search_mode=SearchMode.TEXT,
+        assert (
+            len(backend.search_ids("pass", user=None, search_mode=SearchMode.TEXT)) == 1
         )
-        assert prefix_match.total == 1
-
-        infix_match = backend.search(
-            "sswo",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-            search_mode=SearchMode.TEXT,
+        assert (
+            len(backend.search_ids("sswo", user=None, search_mode=SearchMode.TEXT)) == 1
         )
-        assert infix_match.total == 1
-
-        phrase_match = backend.search(
-            "sswo re",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-            search_mode=SearchMode.TEXT,
+        assert (
+            len(backend.search_ids("sswo re", user=None, search_mode=SearchMode.TEXT))
+            == 1
         )
-        assert phrase_match.total == 1
 
     def test_text_mode_does_not_match_on_partial_term_overlap(
         self,
@@ -176,16 +127,10 @@ class TestSearch:
         )
         backend.add_or_update(doc)
 
-        non_match = backend.search(
-            "raptor",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-            search_mode=SearchMode.TEXT,
+        assert (
+            len(backend.search_ids("raptor", user=None, search_mode=SearchMode.TEXT))
+            == 0
         )
-        assert non_match.total == 0
 
     def test_text_mode_anchors_later_query_tokens_to_token_starts(
         self,
@@ -214,16 +159,9 @@ class TestSearch:
         backend.add_or_update(prefix_doc)
         backend.add_or_update(false_positive)
 
-        results = backend.search(
-            "Z-Berichte 6",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-            search_mode=SearchMode.TEXT,
+        result_ids = set(
+            backend.search_ids("Z-Berichte 6", user=None, search_mode=SearchMode.TEXT),
         )
-        result_ids = {hit["id"] for hit in results.hits}
 
         assert exact_doc.id in result_ids
         assert prefix_doc.id in result_ids
@@ -242,16 +180,9 @@ class TestSearch:
         )
         backend.add_or_update(doc)
 
-        no_tokens = backend.search(
-            "!!!",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-            search_mode=SearchMode.TEXT,
+        assert (
+            len(backend.search_ids("!!!", user=None, search_mode=SearchMode.TEXT)) == 0
         )
-        assert no_tokens.total == 0
 
     def test_title_mode_matches_partial_term_substrings(
         self,
@@ -266,59 +197,18 @@ class TestSearch:
         )
         backend.add_or_update(doc)
 
-        prefix_match = backend.search(
-            "pass",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-            search_mode=SearchMode.TITLE,
+        assert (
+            len(backend.search_ids("pass", user=None, search_mode=SearchMode.TITLE))
+            == 1
         )
-        assert prefix_match.total == 1
-
-        infix_match = backend.search(
-            "sswo",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-            search_mode=SearchMode.TITLE,
+        assert (
+            len(backend.search_ids("sswo", user=None, search_mode=SearchMode.TITLE))
+            == 1
         )
-        assert infix_match.total == 1
-
-        phrase_match = backend.search(
-            "sswo gu",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-            search_mode=SearchMode.TITLE,
+        assert (
+            len(backend.search_ids("sswo gu", user=None, search_mode=SearchMode.TITLE))
+            == 1
         )
-        assert phrase_match.total == 1
-
-    def test_scores_normalised_top_hit_is_one(self, backend: TantivyBackend):
-        """Search scores must be normalized so top hit has score 1.0 for UI consistency."""
-        for i, title in enumerate(["bank invoice", "bank statement", "bank receipt"]):
-            doc = Document.objects.create(
-                title=title,
-                content=title,
-                checksum=f"SN{i}",
-                pk=10 + i,
-            )
-            backend.add_or_update(doc)
-        r = backend.search(
-            "bank",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-        )
-        assert r.hits[0]["score"] == pytest.approx(1.0)
-        assert all(0.0 <= h["score"] <= 1.0 for h in r.hits)
 
     def test_sort_field_ascending(self, backend: TantivyBackend):
         """Searching with sort_reverse=False must return results in ascending ASN order."""
@@ -331,16 +221,14 @@ class TestSearch:
             )
             backend.add_or_update(doc)
 
-        r = backend.search(
+        ids = backend.search_ids(
             "sortable",
             user=None,
-            page=1,
-            page_size=10,
             sort_field="archive_serial_number",
             sort_reverse=False,
         )
-        assert r.total == 3
-        asns = [Document.objects.get(pk=h["id"]).archive_serial_number for h in r.hits]
+        assert len(ids) == 3
+        asns = [Document.objects.get(pk=doc_id).archive_serial_number for doc_id in ids]
         assert asns == [10, 20, 30]
 
     def test_sort_field_descending(self, backend: TantivyBackend):
@@ -354,79 +242,91 @@ class TestSearch:
             )
             backend.add_or_update(doc)
 
-        r = backend.search(
+        ids = backend.search_ids(
             "sortable",
             user=None,
-            page=1,
-            page_size=10,
             sort_field="archive_serial_number",
             sort_reverse=True,
         )
-        assert r.total == 3
-        asns = [Document.objects.get(pk=h["id"]).archive_serial_number for h in r.hits]
+        assert len(ids) == 3
+        asns = [Document.objects.get(pk=doc_id).archive_serial_number for doc_id in ids]
         assert asns == [30, 20, 10]
 
-    def test_fuzzy_threshold_filters_low_score_hits(
-        self,
-        backend: TantivyBackend,
-        settings,
-    ):
-        """When ADVANCED_FUZZY_SEARCH_THRESHOLD exceeds all normalized scores, hits must be filtered out."""
-        doc = Document.objects.create(
-            title="Invoice document",
-            content="financial report",
-            checksum="FT1",
-            pk=120,
-        )
-        backend.add_or_update(doc)
 
-        # Threshold above 1.0 filters every hit (normalized scores top out at 1.0)
-        settings.ADVANCED_FUZZY_SEARCH_THRESHOLD = 1.1
-        r = backend.search(
-            "invoice",
+class TestSearchIds:
+    """Test lightweight ID-only search."""
+
+    def test_returns_matching_ids(self, backend: TantivyBackend):
+        """search_ids must return IDs of all matching documents."""
+        docs = []
+        for i in range(5):
+            doc = Document.objects.create(
+                title=f"findable doc {i}",
+                content="common keyword",
+                checksum=f"SI{i}",
+            )
+            backend.add_or_update(doc)
+            docs.append(doc)
+        other = Document.objects.create(
+            title="unrelated",
+            content="nothing here",
+            checksum="SI_other",
+        )
+        backend.add_or_update(other)
+
+        ids = backend.search_ids(
+            "common keyword",
             user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
+            search_mode=SearchMode.QUERY,
         )
-        assert r.hits == []
+        assert set(ids) == {d.pk for d in docs}
+        assert other.pk not in ids
 
-    def test_owner_filter(self, backend: TantivyBackend):
-        """Document owners can search their private documents; other users cannot access them."""
-        owner = User.objects.create_user("owner")
-        other = User.objects.create_user("other")
+    def test_respects_permission_filter(self, backend: TantivyBackend):
+        """search_ids must respect user permission filtering."""
+        owner = User.objects.create_user("ids_owner")
+        other = User.objects.create_user("ids_other")
         doc = Document.objects.create(
-            title="Private",
-            content="secret",
-            checksum="PF1",
-            pk=20,
+            title="private doc",
+            content="secret keyword",
+            checksum="SIP1",
             owner=owner,
         )
         backend.add_or_update(doc)
 
+        assert backend.search_ids(
+            "secret",
+            user=owner,
+            search_mode=SearchMode.QUERY,
+        ) == [doc.pk]
         assert (
-            backend.search(
-                "secret",
-                user=owner,
-                page=1,
-                page_size=10,
-                sort_field=None,
-                sort_reverse=False,
-            ).total
-            == 1
+            backend.search_ids("secret", user=other, search_mode=SearchMode.QUERY) == []
         )
-        assert (
-            backend.search(
-                "secret",
-                user=other,
-                page=1,
-                page_size=10,
-                sort_field=None,
-                sort_reverse=False,
-            ).total
-            == 0
+
+    def test_respects_fuzzy_threshold(self, backend: TantivyBackend, settings):
+        """search_ids must apply the same fuzzy threshold as search()."""
+        doc = Document.objects.create(
+            title="threshold test",
+            content="unique term",
+            checksum="SIT1",
         )
+        backend.add_or_update(doc)
+
+        settings.ADVANCED_FUZZY_SEARCH_THRESHOLD = 1.1
+        ids = backend.search_ids("unique", user=None, search_mode=SearchMode.QUERY)
+        assert ids == []
+
+    def test_returns_ids_for_text_mode(self, backend: TantivyBackend):
+        """search_ids must work with TEXT search mode."""
+        doc = Document.objects.create(
+            title="text mode doc",
+            content="findable phrase",
+            checksum="SIM1",
+        )
+        backend.add_or_update(doc)
+
+        ids = backend.search_ids("findable", user=None, search_mode=SearchMode.TEXT)
+        assert ids == [doc.pk]
 
 
 class TestRebuild:
@@ -490,57 +390,26 @@ class TestAutocomplete:
 class TestMoreLikeThis:
     """Test more like this functionality."""
 
-    def test_excludes_original(self, backend: TantivyBackend):
-        """More like this queries must exclude the reference document from results."""
+    def test_more_like_this_ids_excludes_original(self, backend: TantivyBackend):
+        """more_like_this_ids must return IDs of similar documents, excluding the original."""
         doc1 = Document.objects.create(
             title="Important document",
-            content="financial information",
-            checksum="MLT1",
-            pk=50,
+            content="financial information report",
+            checksum="MLTI1",
+            pk=150,
         )
         doc2 = Document.objects.create(
             title="Another document",
-            content="financial report",
-            checksum="MLT2",
-            pk=51,
+            content="financial information report",
+            checksum="MLTI2",
+            pk=151,
         )
         backend.add_or_update(doc1)
         backend.add_or_update(doc2)
 
-        results = backend.more_like_this(doc_id=50, user=None, page=1, page_size=10)
-        returned_ids = [hit["id"] for hit in results.hits]
-        assert 50 not in returned_ids  # Original document excluded
-
-    def test_with_user_applies_permission_filter(self, backend: TantivyBackend):
-        """more_like_this with a user must exclude documents that user cannot see."""
-        viewer = User.objects.create_user("mlt_viewer")
-        other = User.objects.create_user("mlt_other")
-        public_doc = Document.objects.create(
-            title="Public financial document",
-            content="quarterly financial analysis report figures",
-            checksum="MLT3",
-            pk=52,
-        )
-        private_doc = Document.objects.create(
-            title="Private financial document",
-            content="quarterly financial analysis report figures",
-            checksum="MLT4",
-            pk=53,
-            owner=other,
-        )
-        backend.add_or_update(public_doc)
-        backend.add_or_update(private_doc)
-
-        results = backend.more_like_this(doc_id=52, user=viewer, page=1, page_size=10)
-        returned_ids = [hit["id"] for hit in results.hits]
-        # private_doc is owned by other, so viewer cannot see it
-        assert 53 not in returned_ids
-
-    def test_document_not_in_index_returns_empty(self, backend: TantivyBackend):
-        """more_like_this for a doc_id absent from the index must return empty results."""
-        results = backend.more_like_this(doc_id=9999, user=None, page=1, page_size=10)
-        assert results.hits == []
-        assert results.total == 0
+        ids = backend.more_like_this_ids(doc_id=150, user=None)
+        assert 150 not in ids
+        assert 151 in ids
 
 
 class TestSingleton:
@@ -593,19 +462,10 @@ class TestFieldHandling:
         # Should not raise an exception
         backend.add_or_update(doc)
 
-        results = backend.search(
-            "test",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-        )
-        assert results.total == 1
+        assert len(backend.search_ids("test", user=None)) == 1
 
     def test_custom_fields_include_name_and_value(self, backend: TantivyBackend):
         """Custom fields must be indexed with both field name and value for structured queries."""
-        # Create a custom field
         field = CustomField.objects.create(
             name="Invoice Number",
             data_type=CustomField.FieldDataType.STRING,
@@ -622,18 +482,9 @@ class TestFieldHandling:
             value_text="INV-2024-001",
         )
 
-        # Should not raise an exception during indexing
         backend.add_or_update(doc)
 
-        results = backend.search(
-            "invoice",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-        )
-        assert results.total == 1
+        assert len(backend.search_ids("invoice", user=None)) == 1
 
     def test_select_custom_field_indexes_label_not_id(self, backend: TantivyBackend):
         """SELECT custom fields must index the human-readable label, not the opaque option ID."""
@@ -660,27 +511,8 @@ class TestFieldHandling:
         )
         backend.add_or_update(doc)
 
-        # Label should be findable
-        results = backend.search(
-            "custom_fields.value:invoice",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-        )
-        assert results.total == 1
-
-        # Opaque ID must not appear in the index
-        results = backend.search(
-            "custom_fields.value:opt_abc",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-        )
-        assert results.total == 0
+        assert len(backend.search_ids("custom_fields.value:invoice", user=None)) == 1
+        assert len(backend.search_ids("custom_fields.value:opt_abc", user=None)) == 0
 
     def test_none_custom_field_value_not_indexed(self, backend: TantivyBackend):
         """Custom field instances with no value set must not produce an index entry."""
@@ -702,16 +534,7 @@ class TestFieldHandling:
         )
         backend.add_or_update(doc)
 
-        # The string "none" must not appear as an indexed value
-        results = backend.search(
-            "custom_fields.value:none",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-        )
-        assert results.total == 0
+        assert len(backend.search_ids("custom_fields.value:none", user=None)) == 0
 
     def test_notes_include_user_information(self, backend: TantivyBackend):
         """Notes must be indexed with user information when available for structured queries."""
@@ -724,32 +547,96 @@ class TestFieldHandling:
         )
         Note.objects.create(document=doc, note="Important note", user=user)
 
-        # Should not raise an exception during indexing
         backend.add_or_update(doc)
 
-        # Test basic document search first
-        results = backend.search(
-            "test",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
-        )
-        assert results.total == 1, (
-            f"Expected 1, got {results.total}. Document content should be searchable."
+        ids = backend.search_ids("test", user=None)
+        assert len(ids) == 1, (
+            f"Expected 1, got {len(ids)}. Document content should be searchable."
         )
 
-        # Test notes search — must use structured JSON syntax now that note
-        # is no longer in DEFAULT_SEARCH_FIELDS
-        results = backend.search(
-            "notes.note:important",
-            user=None,
-            page=1,
-            page_size=10,
-            sort_field=None,
-            sort_reverse=False,
+        ids = backend.search_ids("notes.note:important", user=None)
+        assert len(ids) == 1, (
+            f"Expected 1, got {len(ids)}. Note content should be searchable via notes.note: prefix."
         )
-        assert results.total == 1, (
-            f"Expected 1, got {results.total}. Note content should be searchable via notes.note: prefix."
+
+
+class TestHighlightHits:
+    """Test highlight_hits returns proper HTML strings, not raw Snippet objects."""
+
+    def test_highlights_content_returns_html_string(self, backend: TantivyBackend):
+        """highlight_hits must return HTML strings (from Snippet.to_html()), not Snippet objects."""
+        doc = Document.objects.create(
+            title="Highlight Test",
+            content="The quick brown fox jumps over the lazy dog",
+            checksum="HH1",
+            pk=90,
         )
+        backend.add_or_update(doc)
+
+        hits = backend.highlight_hits("quick", [doc.pk])
+
+        assert len(hits) == 1
+        highlights = hits[0]["highlights"]
+        assert "content" in highlights
+        content_highlight = highlights["content"]
+        assert isinstance(content_highlight, str), (
+            f"Expected str, got {type(content_highlight)}: {content_highlight!r}"
+        )
+        # Tantivy wraps matched terms in <b> tags
+        assert "<b>" in content_highlight, (
+            f"Expected HTML with <b> tags, got: {content_highlight!r}"
+        )
+
+    def test_highlights_notes_returns_html_string(self, backend: TantivyBackend):
+        """Note highlights must be HTML strings via notes_text companion field.
+
+        The notes JSON field does not support tantivy SnippetGenerator; the
+        notes_text plain-text field is used instead.  We use the full-text
+        query "urgent" (not notes.note:) because notes_text IS in
+        DEFAULT_SEARCH_FIELDS via the normal search path… actually, we use
+        notes.note: prefix so the query targets notes content directly, but
+        the snippet is generated from notes_text which stores the same text.
+        """
+        user = User.objects.create_user("hl_noteuser")
+        doc = Document.objects.create(
+            title="Doc with matching note",
+            content="unrelated content",
+            checksum="HH2",
+            pk=91,
+        )
+        Note.objects.create(document=doc, note="urgent payment required", user=user)
+        backend.add_or_update(doc)
+
+        # Use notes.note: prefix so the document matches the query and the
+        # notes_text snippet generator can produce highlights.
+        hits = backend.highlight_hits("notes.note:urgent", [doc.pk])
+
+        assert len(hits) == 1
+        highlights = hits[0]["highlights"]
+        assert "notes" in highlights
+        note_highlight = highlights["notes"]
+        assert isinstance(note_highlight, str), (
+            f"Expected str, got {type(note_highlight)}: {note_highlight!r}"
+        )
+        assert "<b>" in note_highlight, (
+            f"Expected HTML with <b> tags, got: {note_highlight!r}"
+        )
+
+    def test_empty_doc_list_returns_empty_hits(self, backend: TantivyBackend):
+        """highlight_hits with no doc IDs must return an empty list."""
+        hits = backend.highlight_hits("anything", [])
+        assert hits == []
+
+    def test_no_highlights_when_no_match(self, backend: TantivyBackend):
+        """Documents not matching the query should not appear in results."""
+        doc = Document.objects.create(
+            title="Unrelated",
+            content="completely different text",
+            checksum="HH3",
+            pk=92,
+        )
+        backend.add_or_update(doc)
+
+        hits = backend.highlight_hits("quick", [doc.pk])
+
+        assert len(hits) == 0

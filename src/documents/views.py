@@ -38,6 +38,7 @@ from django.db.models import Model
 from django.db.models import OuterRef
 from django.db.models import Prefetch
 from django.db.models import Q
+from django.db.models import QuerySet
 from django.db.models import Subquery
 from django.db.models import Sum
 from django.db.models import When
@@ -248,6 +249,13 @@ if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
 
 logger = logging.getLogger("paperless.api")
+
+# Crossover point for intersect_and_order: below this count use a targeted
+# IN-clause query; at or above this count fall back to a full-table scan +
+# Python set intersection.  The IN-clause is faster for small result sets but
+# degrades on SQLite with thousands of parameters.  PostgreSQL handles large IN
+# clauses efficiently, so this threshold mainly protects SQLite users.
+_TANTIVY_INTERSECT_THRESHOLD = 5_000
 
 
 class IndexView(TemplateView):
@@ -2077,19 +2085,16 @@ class UnifiedSearchViewSet(DocumentViewSet):
         if not self._is_search_request():
             return super().list(request)
 
+        from documents.search import SearchHit
         from documents.search import SearchMode
+        from documents.search import TantivyBackend
         from documents.search import TantivyRelevanceList
         from documents.search import get_backend
 
-        try:
-            backend = get_backend()
-            # ORM-filtered queryset: permissions + field filters + ordering (DRF backends applied)
-            filtered_qs = self.filter_queryset(self.get_queryset())
-
-            user = None if request.user.is_superuser else request.user
-            active_search_params = self._get_active_search_params(request)
-
-            if len(active_search_params) > 1:
+        def parse_search_params() -> tuple[str | None, bool, bool, int, int]:
+            """Extract query string, search mode, and ordering from request."""
+            active = self._get_active_search_params(request)
+            if len(active) > 1:
                 raise ValidationError(
                     {
                         "detail": _(
@@ -2098,73 +2103,161 @@ class UnifiedSearchViewSet(DocumentViewSet):
                     },
                 )
 
-            if (
-                "text" in request.query_params
-                or "title_search" in request.query_params
-                or "query" in request.query_params
-            ):
-                if "text" in request.query_params:
-                    search_mode = SearchMode.TEXT
-                    query_str = request.query_params["text"]
-                elif "title_search" in request.query_params:
-                    search_mode = SearchMode.TITLE
-                    query_str = request.query_params["title_search"]
-                else:
-                    search_mode = SearchMode.QUERY
-                    query_str = request.query_params["query"]
-                results = backend.search(
-                    query_str,
-                    user=user,
-                    page=1,
-                    page_size=10000,
-                    sort_field=None,
-                    sort_reverse=False,
-                    search_mode=search_mode,
-                )
-            else:
-                # more_like_id — validate permission on the seed document first
-                try:
-                    more_like_doc_id = int(request.query_params["more_like_id"])
-                    more_like_doc = Document.objects.select_related("owner").get(
-                        pk=more_like_doc_id,
+            ordering_param = request.query_params.get("ordering", "")
+            sort_reverse = ordering_param.startswith("-")
+            sort_field_name = ordering_param.lstrip("-") or None
+            # "score" means relevance order — Tantivy handles it natively,
+            # so treat it as a Tantivy sort to preserve the ranked order through
+            # the ORM intersection step.
+            use_tantivy_sort = (
+                sort_field_name in TantivyBackend.SORTABLE_FIELDS
+                or sort_field_name is None
+                or sort_field_name == "score"
+            )
+
+            try:
+                page_num = int(request.query_params.get("page", 1))
+            except (TypeError, ValueError):
+                page_num = 1
+            page_size = (
+                self.paginator.get_page_size(request) or self.paginator.page_size
+            )
+
+            return sort_field_name, sort_reverse, use_tantivy_sort, page_num, page_size
+
+        def intersect_and_order(
+            all_ids: list[int],
+            filtered_qs: QuerySet[Document],
+            *,
+            use_tantivy_sort: bool,
+        ) -> list[int]:
+            """Intersect search IDs with ORM-visible IDs, preserving order."""
+            if not all_ids:
+                return []
+            if use_tantivy_sort:
+                if len(all_ids) <= _TANTIVY_INTERSECT_THRESHOLD:
+                    # Small result set: targeted IN-clause avoids a full-table scan.
+                    visible_ids = set(
+                        filtered_qs.filter(pk__in=all_ids).values_list("pk", flat=True),
                     )
-                except (TypeError, ValueError, Document.DoesNotExist):
-                    raise PermissionDenied(_("Invalid more_like_id"))
+                else:
+                    # Large result set: full-table scan + Python intersection is faster
+                    # than a large IN-clause on SQLite.
+                    visible_ids = set(
+                        filtered_qs.values_list("pk", flat=True),
+                    )
+                return [doc_id for doc_id in all_ids if doc_id in visible_ids]
+            return list(
+                filtered_qs.filter(id__in=all_ids).values_list("pk", flat=True),
+            )
 
-                if not has_perms_owner_aware(
-                    request.user,
-                    "view_document",
-                    more_like_doc,
-                ):
-                    raise PermissionDenied(_("Insufficient permissions."))
-
-                results = backend.more_like_this(
-                    more_like_doc_id,
-                    user=user,
-                    page=1,
-                    page_size=10000,
-                )
-
-            hits_by_id = {h["id"]: h for h in results.hits}
-
-            # Determine sort order: no ordering param -> Tantivy relevance; otherwise -> ORM order
-            ordering_param = request.query_params.get("ordering", "").lstrip("-")
-            if not ordering_param:
-                # Preserve Tantivy relevance order; intersect with ORM-visible IDs
-                orm_ids = set(filtered_qs.values_list("pk", flat=True))
-                ordered_hits = [h for h in results.hits if h["id"] in orm_ids]
+        def run_text_search(
+            backend: TantivyBackend,
+            user: User | None,
+            filtered_qs: QuerySet[Document],
+        ) -> tuple[list[int], list[SearchHit], int]:
+            """Handle text/title/query search: IDs, ORM intersection, page highlights."""
+            if "text" in request.query_params:
+                search_mode = SearchMode.TEXT
+                query_str = request.query_params["text"]
+            elif "title_search" in request.query_params:
+                search_mode = SearchMode.TITLE
+                query_str = request.query_params["title_search"]
             else:
-                # Use ORM ordering (already applied by DocumentsOrderingFilter)
-                hit_ids = set(hits_by_id.keys())
-                orm_ordered_ids = filtered_qs.filter(id__in=hit_ids).values_list(
-                    "pk",
-                    flat=True,
-                )
-                ordered_hits = [
-                    hits_by_id[pk] for pk in orm_ordered_ids if pk in hits_by_id
-                ]
+                search_mode = SearchMode.QUERY
+                query_str = request.query_params["query"]
 
-            rl = TantivyRelevanceList(ordered_hits)
+            # "score" is not a real Tantivy sort field — it means relevance order,
+            # which is Tantivy's default when no sort field is specified.
+            is_score_sort = sort_field_name == "score"
+            all_ids = backend.search_ids(
+                query_str,
+                user=user,
+                sort_field=(
+                    None if (not use_tantivy_sort or is_score_sort) else sort_field_name
+                ),
+                sort_reverse=sort_reverse,
+                search_mode=search_mode,
+            )
+            ordered_ids = intersect_and_order(
+                all_ids,
+                filtered_qs,
+                use_tantivy_sort=use_tantivy_sort,
+            )
+            # Tantivy returns relevance results best-first (descending score).
+            # ordering=score (ascending, worst-first) requires a reversal.
+            if is_score_sort and not sort_reverse:
+                ordered_ids = list(reversed(ordered_ids))
+
+            page_offset = (page_num - 1) * page_size
+            page_ids = ordered_ids[page_offset : page_offset + page_size]
+            page_hits = backend.highlight_hits(
+                query_str,
+                page_ids,
+                search_mode=search_mode,
+                rank_start=page_offset + 1,
+            )
+            return ordered_ids, page_hits, page_offset
+
+        def run_more_like_this(
+            backend: TantivyBackend,
+            user: User | None,
+            filtered_qs: QuerySet[Document],
+        ) -> tuple[list[int], list[SearchHit], int]:
+            """Handle more_like_id search: permission check, IDs, stub hits."""
+            try:
+                more_like_doc_id = int(request.query_params["more_like_id"])
+                more_like_doc = Document.objects.select_related("owner").get(
+                    pk=more_like_doc_id,
+                )
+            except (TypeError, ValueError, Document.DoesNotExist):
+                raise PermissionDenied(_("Invalid more_like_id"))
+
+            if not has_perms_owner_aware(
+                request.user,
+                "view_document",
+                more_like_doc,
+            ):
+                raise PermissionDenied(_("Insufficient permissions."))
+
+            all_ids = backend.more_like_this_ids(more_like_doc_id, user=user)
+            ordered_ids = intersect_and_order(
+                all_ids,
+                filtered_qs,
+                use_tantivy_sort=True,
+            )
+
+            page_offset = (page_num - 1) * page_size
+            page_ids = ordered_ids[page_offset : page_offset + page_size]
+            page_hits = [
+                SearchHit(id=doc_id, score=0.0, rank=rank, highlights={})
+                for rank, doc_id in enumerate(page_ids, start=page_offset + 1)
+            ]
+            return ordered_ids, page_hits, page_offset
+
+        try:
+            sort_field_name, sort_reverse, use_tantivy_sort, page_num, page_size = (
+                parse_search_params()
+            )
+
+            backend = get_backend()
+            filtered_qs = self.filter_queryset(self.get_queryset())
+            user = None if request.user.is_superuser else request.user
+
+            if "more_like_id" in request.query_params:
+                ordered_ids, page_hits, page_offset = run_more_like_this(
+                    backend,
+                    user,
+                    filtered_qs,
+                )
+            else:
+                ordered_ids, page_hits, page_offset = run_text_search(
+                    backend,
+                    user,
+                    filtered_qs,
+                )
+
+            rl = TantivyRelevanceList(ordered_ids, page_hits, page_offset)
             page = self.paginate_queryset(rl)
 
             if page is not None:
@@ -2174,15 +2267,18 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 if get_boolean(
                     str(request.query_params.get("include_selection_data", "false")),
                 ):
-                    all_ids = [h["id"] for h in ordered_hits]
+                    # NOTE: pk__in=ordered_ids generates a large SQL IN clause
+                    # for big result sets.  Acceptable today but may need a temp
+                    # table or chunked approach if selection_data becomes slow
+                    # at scale (tens of thousands of matching documents).
                     response.data["selection_data"] = (
                         self._get_selection_data_for_queryset(
-                            filtered_qs.filter(pk__in=all_ids),
+                            filtered_qs.filter(pk__in=ordered_ids),
                         )
                     )
                 return response
 
-            serializer = self.get_serializer(ordered_hits, many=True)
+            serializer = self.get_serializer(page_hits, many=True)
             return Response(serializer.data)
 
         except NotFound:
@@ -3088,20 +3184,17 @@ class GlobalSearchView(PassUserMixin):
                 docs = all_docs.filter(title__icontains=query)[:OBJECT_LIMIT]
             else:
                 user = None if request.user.is_superuser else request.user
-                fts_results = get_backend().search(
+                matching_ids = get_backend().search_ids(
                     query,
                     user=user,
-                    page=1,
-                    page_size=1000,
-                    sort_field=None,
-                    sort_reverse=False,
                     search_mode=SearchMode.TEXT,
+                    limit=OBJECT_LIMIT * 3,
                 )
-                docs_by_id = all_docs.in_bulk([hit["id"] for hit in fts_results.hits])
+                docs_by_id = all_docs.in_bulk(matching_ids)
                 docs = [
-                    docs_by_id[hit["id"]]
-                    for hit in fts_results.hits
-                    if hit["id"] in docs_by_id
+                    docs_by_id[doc_id]
+                    for doc_id in matching_ids
+                    if doc_id in docs_by_id
                 ][:OBJECT_LIMIT]
         saved_views = (
             get_objects_for_user_owner_aware(
