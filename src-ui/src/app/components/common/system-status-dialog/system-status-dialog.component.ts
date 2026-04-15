@@ -8,7 +8,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, takeUntil } from 'rxjs'
-import { PaperlessTaskName } from 'src/app/data/paperless-task'
+import { PaperlessTaskType } from 'src/app/data/paperless-task'
 import {
   SystemStatus,
   SystemStatusItemStatus,
@@ -49,14 +49,14 @@ export class SystemStatusDialogComponent implements OnInit, OnDestroy {
   private settingsService = inject(SettingsService)
 
   public SystemStatusItemStatus = SystemStatusItemStatus
-  public PaperlessTaskName = PaperlessTaskName
+  public PaperlessTaskType = PaperlessTaskType
   public status: SystemStatus
   public frontendVersion: string = environment.version
   public versionMismatch: boolean = false
 
   public copied: boolean = false
 
-  private runningTasks: Set<PaperlessTaskName> = new Set()
+  private runningTasks: Set<PaperlessTaskType> = new Set()
   private unsubscribeNotifier: Subject<any> = new Subject()
 
   get currentUserIsSuperUser(): boolean {
@@ -107,11 +107,11 @@ export class SystemStatusDialogComponent implements OnInit, OnDestroy {
     return now.getTime() - date.getTime() > hours * 60 * 60 * 1000
   }
 
-  public isRunning(taskName: PaperlessTaskName): boolean {
+  public isRunning(taskName: PaperlessTaskType): boolean {
     return this.runningTasks.has(taskName)
   }
 
-  public runTask(taskName: PaperlessTaskName) {
+  public runTask(taskName: PaperlessTaskType) {
     this.runningTasks.add(taskName)
     this.toastService.showInfo(`Task ${taskName} started`)
     this.tasksService.run(taskName).subscribe({

@@ -25,7 +25,7 @@ import {
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject, of, throwError } from 'rxjs'
-import { PaperlessTaskName } from 'src/app/data/paperless-task'
+import { PaperlessTaskType } from 'src/app/data/paperless-task'
 import {
   InstallType,
   SystemStatus,
@@ -138,9 +138,9 @@ describe('SystemStatusDialogComponent', () => {
   })
 
   it('should check if task is running', () => {
-    component.runTask(PaperlessTaskName.IndexOptimize)
-    expect(component.isRunning(PaperlessTaskName.IndexOptimize)).toBeTruthy()
-    expect(component.isRunning(PaperlessTaskName.SanityCheck)).toBeFalsy()
+    component.runTask(PaperlessTaskType.IndexOptimize)
+    expect(component.isRunning(PaperlessTaskType.IndexOptimize)).toBeTruthy()
+    expect(component.isRunning(PaperlessTaskType.SanityCheck)).toBeFalsy()
   })
 
   it('should support running tasks, refresh status and show toasts', () => {
@@ -151,22 +151,22 @@ describe('SystemStatusDialogComponent', () => {
 
     // fail first
     runSpy.mockReturnValue(throwError(() => new Error('error')))
-    component.runTask(PaperlessTaskName.IndexOptimize)
-    expect(runSpy).toHaveBeenCalledWith(PaperlessTaskName.IndexOptimize)
+    component.runTask(PaperlessTaskType.IndexOptimize)
+    expect(runSpy).toHaveBeenCalledWith(PaperlessTaskType.IndexOptimize)
     expect(toastErrorSpy).toHaveBeenCalledWith(
-      `Failed to start task ${PaperlessTaskName.IndexOptimize}, see the logs for more details`,
+      `Failed to start task ${PaperlessTaskType.IndexOptimize}, see the logs for more details`,
       expect.any(Error)
     )
 
     // succeed
     runSpy.mockReturnValue(of({}))
     getStatusSpy.mockReturnValue(of(status))
-    component.runTask(PaperlessTaskName.IndexOptimize)
-    expect(runSpy).toHaveBeenCalledWith(PaperlessTaskName.IndexOptimize)
+    component.runTask(PaperlessTaskType.IndexOptimize)
+    expect(runSpy).toHaveBeenCalledWith(PaperlessTaskType.IndexOptimize)
 
     expect(getStatusSpy).toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalledWith(
-      `Task ${PaperlessTaskName.IndexOptimize} started`
+      `Task ${PaperlessTaskType.IndexOptimize} started`
     )
   })
 

@@ -5,11 +5,7 @@ import {
 } from '@angular/common/http/testing'
 import { TestBed } from '@angular/core/testing'
 import { environment } from 'src/environments/environment'
-import {
-  PaperlessTaskName,
-  PaperlessTaskStatus,
-  PaperlessTaskType,
-} from '../data/paperless-task'
+import { PaperlessTaskStatus, PaperlessTaskType } from '../data/paperless-task'
 import { TasksService } from './tasks.service'
 
 describe('TasksService', () => {
@@ -37,7 +33,7 @@ describe('TasksService', () => {
   it('calls tasks api endpoint on reload', () => {
     tasksService.reload()
     const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}tasks/?task_name=consume_file&acknowledged=false`
+      `${environment.apiBaseUrl}tasks/?task_type=consume_file&acknowledged=false`
     )
     expect(req.request.method).toEqual('GET')
   })
@@ -46,7 +42,7 @@ describe('TasksService', () => {
     tasksService.loading = true
     tasksService.reload()
     httpTestingController.expectNone(
-      `${environment.apiBaseUrl}tasks/?task_name=consume_file&acknowledged=false`
+      `${environment.apiBaseUrl}tasks/?task_type=consume_file&acknowledged=false`
     )
   })
 
@@ -63,7 +59,7 @@ describe('TasksService', () => {
     // reload is then called
     httpTestingController
       .expectOne(
-        `${environment.apiBaseUrl}tasks/?task_name=consume_file&acknowledged=false`
+        `${environment.apiBaseUrl}tasks/?task_type=consume_file&acknowledged=false`
       )
       .flush([])
   })
@@ -72,56 +68,56 @@ describe('TasksService', () => {
     expect(tasksService.total).toEqual(0)
     const mockTasks = [
       {
-        type: PaperlessTaskType.Auto,
-        task_name: PaperlessTaskName.ConsumeFile,
-        status: PaperlessTaskStatus.Complete,
+        task_type: PaperlessTaskType.ConsumeFile,
+        status: PaperlessTaskStatus.Success,
         acknowledged: false,
         task_id: '1234',
-        task_file_name: 'file1.pdf',
+        input_data: { filename: 'file1.pdf' },
         date_created: new Date(),
+        related_document_ids: [],
       },
       {
-        type: PaperlessTaskType.Auto,
-        task_name: PaperlessTaskName.ConsumeFile,
-        status: PaperlessTaskStatus.Failed,
+        task_type: PaperlessTaskType.ConsumeFile,
+        status: PaperlessTaskStatus.Failure,
         acknowledged: false,
         task_id: '1235',
-        task_file_name: 'file2.pdf',
+        input_data: { filename: 'file2.pdf' },
         date_created: new Date(),
+        related_document_ids: [],
       },
       {
-        type: PaperlessTaskType.Auto,
-        task_name: PaperlessTaskName.ConsumeFile,
+        task_type: PaperlessTaskType.ConsumeFile,
         status: PaperlessTaskStatus.Pending,
         acknowledged: false,
         task_id: '1236',
-        task_file_name: 'file3.pdf',
+        input_data: { filename: 'file3.pdf' },
         date_created: new Date(),
+        related_document_ids: [],
       },
       {
-        type: PaperlessTaskType.Auto,
-        task_name: PaperlessTaskName.ConsumeFile,
+        task_type: PaperlessTaskType.ConsumeFile,
         status: PaperlessTaskStatus.Started,
         acknowledged: false,
         task_id: '1237',
-        task_file_name: 'file4.pdf',
+        input_data: { filename: 'file4.pdf' },
         date_created: new Date(),
+        related_document_ids: [],
       },
       {
-        type: PaperlessTaskType.Auto,
-        task_name: PaperlessTaskName.ConsumeFile,
-        status: PaperlessTaskStatus.Complete,
+        task_type: PaperlessTaskType.ConsumeFile,
+        status: PaperlessTaskStatus.Success,
         acknowledged: false,
         task_id: '1238',
-        task_file_name: 'file5.pdf',
+        input_data: { filename: 'file5.pdf' },
         date_created: new Date(),
+        related_document_ids: [],
       },
     ]
 
     tasksService.reload()
 
     const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}tasks/?task_name=consume_file&acknowledged=false`
+      `${environment.apiBaseUrl}tasks/?task_type=consume_file&acknowledged=false`
     )
 
     req.flush(mockTasks)
@@ -134,9 +130,9 @@ describe('TasksService', () => {
   })
 
   it('supports running tasks', () => {
-    tasksService.run(PaperlessTaskName.SanityCheck).subscribe((res) => {
+    tasksService.run(PaperlessTaskType.SanityCheck).subscribe((res) => {
       expect(res).toEqual({
-        result: 'success',
+        task_id: 'abc-123',
       })
     })
     const req = httpTestingController.expectOne(
@@ -144,7 +140,7 @@ describe('TasksService', () => {
     )
     expect(req.request.method).toEqual('POST')
     req.flush({
-      result: 'success',
+      task_id: 'abc-123',
     })
   })
 })
