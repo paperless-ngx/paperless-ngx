@@ -3786,6 +3786,8 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
         "wait_time_seconds",
     ]
     ordering = ["-date_created"]
+    # Needed for drf-spectacular schema generation (get_queryset touches request.user)
+    queryset = PaperlessTask.objects.none()
 
     # v9 backwards compat: maps old "type" query param values to new TriggerSource
     _V9_TYPE_TO_TRIGGER_SOURCE = {
