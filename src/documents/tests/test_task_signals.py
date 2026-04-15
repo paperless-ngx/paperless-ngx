@@ -80,6 +80,12 @@ class TestBeforeTaskPublishHandler:
         assert task.task_type == PaperlessTask.TaskType.MAIL_FETCH
         assert task.input_data["account_ids"] == [1, 2]
 
+    def test_mail_fetch_no_account_ids_stores_empty_input(self):
+        """Beat-scheduled mail checks pass no account_ids; input_data should be {} not {"account_ids": None}."""
+        task_id = send_publish("paperless_mail.tasks.process_mail_accounts", (), {})
+        task = PaperlessTask.objects.get(task_id=task_id)
+        assert task.input_data == {}
+
     def test_scheduled_header_sets_trigger_source(self):
         task_id = send_publish(
             "documents.tasks.train_classifier",

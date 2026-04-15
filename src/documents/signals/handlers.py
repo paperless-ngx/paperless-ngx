@@ -1075,7 +1075,9 @@ def _extract_input_data(
 
     if task_type == PaperlessTask.TaskType.MAIL_FETCH:
         account_ids = args[0] if args else task_kwargs.get("account_ids")
-        return {"account_ids": account_ids}
+        if account_ids is not None:
+            return {"account_ids": account_ids}
+        return {}
 
     return {}
 
@@ -1237,36 +1239,38 @@ def task_postrun_handler(
         new_status = _CELERY_STATE_TO_STATUS.get(state, PaperlessTask.Status.FAILURE)
 
         now = timezone.now()
-        task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
-        if task_instance is None:
+        try:
+            task_instance = PaperlessTask.objects.get(task_id=task_id)
+        except PaperlessTask.DoesNotExist:
             return
 
-        duration_seconds: float | None = None
-        wait_time_seconds: float | None = None
+        task_instance.status = new_status
+        task_instance.date_done = now
+        changed_fields = ["status", "date_done"]
+
         if task_instance.date_started:
-            duration_seconds = (now - task_instance.date_started).total_seconds()
+            task_instance.duration_seconds = (
+                now - task_instance.date_started
+            ).total_seconds()
+            changed_fields.append("duration_seconds")
         if task_instance.date_started and task_instance.date_created:
-            wait_time_seconds = (
+            task_instance.wait_time_seconds = (
                 task_instance.date_started - task_instance.date_created
             ).total_seconds()
-
-        update_fields: dict = {
-            "status": new_status,
-            "date_done": now,
-            "duration_seconds": duration_seconds,
-            "wait_time_seconds": wait_time_seconds,
-        }
+            changed_fields.append("wait_time_seconds")
 
         # Only write result data for non-failure outcomes; task_failure_handler
         # owns result_data/result_message for FAILURE states.
         if new_status != PaperlessTask.Status.FAILURE:
             if isinstance(retval, dict):
-                update_fields["result_data"] = retval
+                task_instance.result_data = retval
+                changed_fields.append("result_data")
             elif isinstance(retval, str):
-                update_fields["result_message"] = retval
-                update_fields["result_data"] = _parse_consume_result(retval)
+                task_instance.result_message = retval
+                task_instance.result_data = _parse_consume_result(retval)
+                changed_fields.extend(["result_message", "result_data"])
 
-        PaperlessTask.objects.filter(task_id=task_id).update(**update_fields)
+        task_instance.save(update_fields=changed_fields)
     except Exception:
         logger.exception("Updating PaperlessTask failed")
 
