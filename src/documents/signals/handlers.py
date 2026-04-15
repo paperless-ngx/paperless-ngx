@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING
 from typing import Any
 
 from celery import shared_task
-from celery import states
 from celery.signals import before_task_publish
 from celery.signals import task_failure
 from celery.signals import task_postrun
@@ -31,6 +30,7 @@ from documents import matching
 from documents.caching import clear_document_caches
 from documents.caching import invalidate_llm_suggestions_cache
 from documents.data_models import ConsumableDocument
+from documents.data_models import DocumentSource
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_filename
@@ -996,67 +996,175 @@ def run_workflows(
         return overrides, "\n".join(messages)
 
 
+# ---------------------------------------------------------------------------
+# Task tracking -- Celery signal handlers
+# ---------------------------------------------------------------------------
+
+TRACKED_TASKS: dict[str, PaperlessTask.TaskType] = {
+    "documents.tasks.consume_file": PaperlessTask.TaskType.CONSUME_FILE,
+    "documents.tasks.train_classifier": PaperlessTask.TaskType.TRAIN_CLASSIFIER,
+    "documents.tasks.sanity_check": PaperlessTask.TaskType.SANITY_CHECK,
+    "documents.tasks.index_optimize": PaperlessTask.TaskType.INDEX_OPTIMIZE,
+    "documents.tasks.llmindex_index": PaperlessTask.TaskType.LLM_INDEX,
+    "paperless_mail.tasks.process_mail_accounts": PaperlessTask.TaskType.MAIL_FETCH,
+}
+
+_DOCUMENT_SOURCE_TO_TRIGGER: dict[Any, PaperlessTask.TriggerSource] = {
+    DocumentSource.ConsumeFolder: PaperlessTask.TriggerSource.FOLDER_CONSUME,
+    DocumentSource.ApiUpload: PaperlessTask.TriggerSource.API_UPLOAD,
+    DocumentSource.MailFetch: PaperlessTask.TriggerSource.EMAIL_CONSUME,
+    DocumentSource.WebUI: PaperlessTask.TriggerSource.WEB_UI,
+}
+
+
+def _extract_input_data(
+    task_type: PaperlessTask.TaskType,
+    args: tuple,
+    task_kwargs: dict,
+) -> dict:
+    if task_type == PaperlessTask.TaskType.CONSUME_FILE:
+        input_doc = args[0] if args else task_kwargs.get("input_doc")
+        overrides = args[1] if len(args) >= 2 else task_kwargs.get("overrides")
+        if input_doc is None:
+            return {}
+        data: dict = {
+            "filename": input_doc.original_file.name,
+            "mime_type": input_doc.mime_type,
+        }
+        if input_doc.original_path:
+            data["source_path"] = str(input_doc.original_path)
+        if input_doc.mailrule_id:
+            data["mailrule_id"] = input_doc.mailrule_id
+        if overrides:
+            override_dict = {
+                k: v
+                for k, v in vars(overrides).items()
+                if v is not None and not k.startswith("_")
+            }
+            if override_dict:
+                data["overrides"] = override_dict
+        return data
+
+    if task_type == PaperlessTask.TaskType.MAIL_FETCH:
+        account_ids = args[0] if args else task_kwargs.get("account_ids")
+        return {"account_ids": account_ids}
+
+    return {}
+
+
+def _determine_trigger_source(
+    task_type: PaperlessTask.TaskType,
+    args: tuple,
+    task_kwargs: dict,
+    headers: dict,
+) -> PaperlessTask.TriggerSource:
+    # Explicit header takes priority -- covers beat ("scheduled") and system auto-runs ("system")
+    header_source = headers.get("trigger_source")
+    if header_source == "scheduled":
+        return PaperlessTask.TriggerSource.SCHEDULED
+    if header_source == "system":
+        return PaperlessTask.TriggerSource.SYSTEM
+
+    if task_type == PaperlessTask.TaskType.CONSUME_FILE:
+        input_doc = args[0] if args else task_kwargs.get("input_doc")
+        if input_doc is not None:
+            return _DOCUMENT_SOURCE_TO_TRIGGER.get(
+                input_doc.source,
+                PaperlessTask.TriggerSource.API_UPLOAD,
+            )
+
+    return PaperlessTask.TriggerSource.MANUAL
+
+
+def _extract_owner_id(
+    task_type: PaperlessTask.TaskType,
+    args: tuple,
+    task_kwargs: dict,
+) -> int | None:
+    if task_type != PaperlessTask.TaskType.CONSUME_FILE:
+        return None
+    overrides = args[1] if len(args) >= 2 else task_kwargs.get("overrides")
+    if overrides and hasattr(overrides, "owner_id"):
+        return overrides.owner_id
+    return None
+
+
+def _parse_legacy_result(result: str) -> dict | None:
+    import re as _re
+
+    if match := _re.search(r"New document id (\d+) created", result):
+        return {"document_id": int(match.group(1))}
+    if match := _re.search(r"It is a duplicate of .* \(#(\d+)\)", result):
+        return {
+            "duplicate_of": int(match.group(1)),
+            "duplicate_in_trash": "existing document is in the trash" in result,
+        }
+    return None
+
+
 @before_task_publish.connect
-def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs) -> None:
+def before_task_publish_handler(
+    sender=None,
+    headers=None,
+    body=None,
+    **kwargs,
+) -> None:
     """
-    Creates the PaperlessTask object in a pending state.  This is sent before
-    the task reaches the broker, but before it begins executing on a worker.
+    Creates the PaperlessTask record when the task is published to broker.
 
     https://docs.celeryq.dev/en/stable/userguide/signals.html#before-task-publish
-
     https://docs.celeryq.dev/en/stable/internals/protocol.html#version-2
-
     """
-    if "task" not in headers or headers["task"] != "documents.tasks.consume_file":
-        # Assumption: this is only ever a v2 message
+    if headers is None or body is None:
+        return
+
+    task_name = headers.get("task", "")
+    task_type = TRACKED_TASKS.get(task_name)
+    if task_type is None:
         return
 
     try:
         close_old_connections()
+        args, task_kwargs, _ = body
+        task_id = headers["id"]
 
-        task_args = body[0]
-        input_doc, overrides = task_args
-
-        task_file_name = input_doc.original_file.name
-        user_id = overrides.owner_id if overrides else None
+        input_data = _extract_input_data(task_type, args, task_kwargs)
+        trigger_source = _determine_trigger_source(
+            task_type,
+            args,
+            task_kwargs,
+            headers,
+        )
+        owner_id = _extract_owner_id(task_type, args, task_kwargs)
 
         PaperlessTask.objects.create(
-            trigger_source=PaperlessTask.TriggerSource.FOLDER_CONSUME,
-            task_id=headers["id"],
+            task_id=task_id,
+            task_type=task_type,
+            trigger_source=trigger_source,
             status=PaperlessTask.Status.PENDING,
-            input_data={"filename": task_file_name},
-            task_type=PaperlessTask.TaskType.CONSUME_FILE,
-            date_created=timezone.now(),
-            date_started=None,
-            date_done=None,
-            owner_id=user_id,
+            input_data=input_data,
+            owner_id=owner_id,
         )
-    except Exception:  # pragma: no cover
-        # Don't let an exception in the signal handlers prevent
-        # a document from being consumed.
+    except Exception:
         logger.exception("Creating PaperlessTask failed")
 
 
 @task_prerun.connect
 def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs) -> None:
     """
-
-    Updates the PaperlessTask to be started.  Sent before the task begins execution
-    on a worker.
+    Marks the task STARTED when execution begins on a worker.
 
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-prerun
     """
+    if task_id is None:
+        return
     try:
         close_old_connections()
-        task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
-
-        if task_instance is not None:
-            task_instance.status = PaperlessTask.Status.STARTED
-            task_instance.date_started = timezone.now()
-            task_instance.save()
-    except Exception:  # pragma: no cover
-        # Don't let an exception in the signal handlers prevent
-        # a document from being consumed.
+        PaperlessTask.objects.filter(task_id=task_id).update(
+            status=PaperlessTask.Status.STARTED,
+            date_started=timezone.now(),
+        )
+    except Exception:
         logger.exception("Setting PaperlessTask started failed")
 
 
@@ -1070,33 +1178,53 @@ def task_postrun_handler(
     **kwargs,
 ) -> None:
     """
-    Updates the result of the PaperlessTask.
+    Records task completion and result data.
 
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-postrun
     """
+    if task_id is None:
+        return
     try:
         close_old_connections()
-        task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
 
-        if task_instance is not None:
-            _CELERY_STATE_MAP = {
-                states.SUCCESS: PaperlessTask.Status.SUCCESS,
-                states.FAILURE: PaperlessTask.Status.FAILURE,
-                states.REVOKED: PaperlessTask.Status.REVOKED,
-                states.STARTED: PaperlessTask.Status.STARTED,
-                states.PENDING: PaperlessTask.Status.PENDING,
-            }
-            task_instance.status = _CELERY_STATE_MAP.get(
-                state,
-                PaperlessTask.Status.FAILURE,
-            )
-            if isinstance(retval, str):
-                task_instance.result_message = retval
-            task_instance.date_done = timezone.now()
-            task_instance.save()
-    except Exception:  # pragma: no cover
-        # Don't let an exception in the signal handlers prevent
-        # a document from being consumed.
+        status_map = {
+            "SUCCESS": PaperlessTask.Status.SUCCESS,
+            "FAILURE": PaperlessTask.Status.FAILURE,
+            "REVOKED": PaperlessTask.Status.REVOKED,
+        }
+        new_status = status_map.get(state, PaperlessTask.Status.FAILURE)
+
+        result_data: dict | None = None
+        result_message: str | None = None
+        if isinstance(retval, dict):
+            result_data = retval
+        elif isinstance(retval, str):
+            result_message = retval
+            result_data = _parse_legacy_result(retval)
+
+        now = timezone.now()
+        task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
+        if task_instance is None:
+            return
+
+        duration_seconds: float | None = None
+        wait_time_seconds: float | None = None
+        if task_instance.date_started:
+            duration_seconds = (now - task_instance.date_started).total_seconds()
+        if task_instance.date_started and task_instance.date_created:
+            wait_time_seconds = (
+                task_instance.date_started - task_instance.date_created
+            ).total_seconds()
+
+        PaperlessTask.objects.filter(task_id=task_id).update(
+            status=new_status,
+            result_data=result_data,
+            result_message=result_message,
+            date_done=now,
+            duration_seconds=duration_seconds,
+            wait_time_seconds=wait_time_seconds,
+        )
+    except Exception:
         logger.exception("Updating PaperlessTask failed")
 
 
@@ -1110,21 +1238,33 @@ def task_failure_handler(
     **kwargs,
 ) -> None:
     """
-    Updates the result of a failed PaperlessTask.
+    Records failure details when a task raises an exception.
 
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-failure
     """
+    if task_id is None:
+        return
     try:
         close_old_connections()
-        task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
 
-        if task_instance is not None and task_instance.result_message is None:
-            task_instance.status = PaperlessTask.Status.FAILURE
-            task_instance.result_message = str(traceback) if traceback else None
-            task_instance.date_done = timezone.now()
-            task_instance.save()
-    except Exception:  # pragma: no cover
-        logger.exception("Updating PaperlessTask failed")
+        result_data: dict = {
+            "error_type": type(exception).__name__ if exception else "Unknown",
+            "error_message": str(exception) if exception else "Unknown error",
+        }
+        if traceback:
+            import traceback as _tb
+
+            tb_str = "".join(_tb.format_tb(traceback))
+            result_data["traceback"] = tb_str[:5000]
+
+        PaperlessTask.objects.filter(task_id=task_id).update(
+            status=PaperlessTask.Status.FAILURE,
+            result_data=result_data,
+            result_message=str(exception) if exception else None,
+            date_done=timezone.now(),
+        )
+    except Exception:
+        logger.exception("Updating PaperlessTask on failure failed")
 
 
 @worker_process_init.connect
