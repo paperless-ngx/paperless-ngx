@@ -112,6 +112,20 @@ class TestGetTasksV10:
         assert response.status_code == status.HTTP_200_OK
         assert response.data[0]["related_document_ids"] == [7]
 
+    def test_related_document_ids_includes_duplicate_of(
+        self,
+        admin_client: APIClient,
+    ) -> None:
+        PaperlessTaskFactory(
+            status=PaperlessTask.Status.SUCCESS,
+            result_data={"duplicate_of": 12},
+        )
+
+        response = admin_client.get(ENDPOINT)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data[0]["related_document_ids"] == [12]
+
     def test_filter_by_task_type(self, admin_client: APIClient) -> None:
         PaperlessTaskFactory(task_type=PaperlessTask.TaskType.CONSUME_FILE)
         PaperlessTaskFactory(task_type=PaperlessTask.TaskType.TRAIN_CLASSIFIER)
@@ -194,6 +208,32 @@ class TestGetTasksV10:
         task_data = response.data[0]
         assert "task_name" not in task_data
         assert "task_file_name" not in task_data
+
+    def test_list_is_owner_aware(
+        self,
+        superuser: User,
+        regular_user: User,
+    ) -> None:
+        """The task list only shows tasks the user owns or that are unowned."""
+        regular_user.user_permissions.add(
+            Permission.objects.get(codename="view_paperlesstask"),
+        )
+
+        client = APIClient()
+        client.force_authenticate(user=regular_user)
+        client.credentials(HTTP_ACCEPT=ACCEPT_V10)
+
+        PaperlessTaskFactory(owner=superuser)
+        shared_task = PaperlessTaskFactory()
+        own_task = PaperlessTaskFactory(owner=regular_user)
+
+        response = client.get(ENDPOINT)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) == 2
+        returned_task_ids = {t["task_id"] for t in response.data}
+        assert shared_task.task_id in returned_task_ids
+        assert own_task.task_id in returned_task_ids
 
 
 # ---------------------------------------------------------------------------
@@ -411,32 +451,6 @@ class TestAcknowledge:
         )
 
         assert response.status_code == status.HTTP_200_OK
-
-    def test_list_is_owner_aware(
-        self,
-        superuser: User,
-        regular_user: User,
-    ) -> None:
-        """The task list only shows tasks the user owns or that are unowned."""
-        regular_user.user_permissions.add(
-            Permission.objects.get(codename="view_paperlesstask"),
-        )
-
-        client = APIClient()
-        client.force_authenticate(user=regular_user)
-        client.credentials(HTTP_ACCEPT=ACCEPT_V10)
-
-        PaperlessTaskFactory(owner=superuser)
-        shared_task = PaperlessTaskFactory()
-        own_task = PaperlessTaskFactory(owner=regular_user)
-
-        response = client.get(ENDPOINT)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 2
-        returned_task_ids = {t["task_id"] for t in response.data}
-        assert shared_task.task_id in returned_task_ids
-        assert own_task.task_id in returned_task_ids
 
 
 # ---------------------------------------------------------------------------
