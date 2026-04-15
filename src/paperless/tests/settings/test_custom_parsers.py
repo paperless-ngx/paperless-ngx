@@ -186,42 +186,66 @@ def make_expected_schedule(
         "Check all e-mail accounts": {
             "task": "paperless_mail.tasks.process_mail_accounts",
             "schedule": crontab(minute="*/10"),
-            "options": {"expires": mail_expire},
+            "options": {
+                "expires": mail_expire,
+                "headers": {"trigger_source": "scheduled"},
+            },
         },
         "Train the classifier": {
             "task": "documents.tasks.train_classifier",
             "schedule": crontab(minute="5", hour="*/1"),
-            "options": {"expires": classifier_expire},
+            "options": {
+                "expires": classifier_expire,
+                "headers": {"trigger_source": "scheduled"},
+            },
         },
         "Optimize the index": {
             "task": "documents.tasks.index_optimize",
             "schedule": crontab(minute=0, hour=0),
-            "options": {"expires": index_expire},
+            "options": {
+                "expires": index_expire,
+                "headers": {"trigger_source": "scheduled"},
+            },
         },
         "Perform sanity check": {
             "task": "documents.tasks.sanity_check",
             "schedule": crontab(minute=30, hour=0, day_of_week="sun"),
-            "options": {"expires": sanity_expire},
+            "options": {
+                "expires": sanity_expire,
+                "headers": {"trigger_source": "scheduled"},
+            },
         },
         "Empty trash": {
             "task": "documents.tasks.empty_trash",
             "schedule": crontab(minute=0, hour="1"),
-            "options": {"expires": empty_trash_expire},
+            "options": {
+                "expires": empty_trash_expire,
+                "headers": {"trigger_source": "scheduled"},
+            },
         },
         "Check and run scheduled workflows": {
             "task": "documents.tasks.check_scheduled_workflows",
             "schedule": crontab(minute="5", hour="*/1"),
-            "options": {"expires": workflow_expire},
+            "options": {
+                "expires": workflow_expire,
+                "headers": {"trigger_source": "scheduled"},
+            },
         },
         "Rebuild LLM index": {
             "task": "documents.tasks.llmindex_index",
             "schedule": crontab(minute="10", hour="2"),
-            "options": {"expires": llm_index_expire},
+            "options": {
+                "expires": llm_index_expire,
+                "headers": {"trigger_source": "scheduled"},
+            },
         },
         "Cleanup expired share link bundles": {
             "task": "documents.tasks.cleanup_expired_share_link_bundles",
             "schedule": crontab(minute=0, hour="2"),
-            "options": {"expires": share_link_cleanup_expire},
+            "options": {
+                "expires": share_link_cleanup_expire,
+                "headers": {"trigger_source": "scheduled"},
+            },
         },
     }
 
@@ -283,6 +307,16 @@ class TestParseBeatSchedule:
         mocker.patch.dict(os.environ, env, clear=False)
         schedule = parse_beat_schedule()
         assert schedule == expected
+
+    def test_parse_beat_schedule_all_entries_have_trigger_source_header(self) -> None:
+        """Every beat entry must carry trigger_source=scheduled so the task signal
+        handler can identify scheduler-originated tasks."""
+        schedule = parse_beat_schedule()
+        for name, entry in schedule.items():
+            headers = entry.get("options", {}).get("headers", {})
+            assert headers.get("trigger_source") == "scheduled", (
+                f"Beat entry '{name}' is missing trigger_source header"
+            )
 
 
 class TestParseDbSettings:
