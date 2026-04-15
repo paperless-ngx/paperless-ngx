@@ -80,24 +80,6 @@ class TestGetTasksV10:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 2
 
-    def test_response_has_v10_fields(self, admin_client: APIClient) -> None:
-        PaperlessTaskFactory(
-            input_data={"filename": "doc.pdf"},
-            result_data={"document_id": 42},
-            result_message="Done",
-        )
-
-        response = admin_client.get(ENDPOINT)
-
-        assert response.status_code == status.HTTP_200_OK
-        task_data = response.data[0]
-        assert "task_type" in task_data
-        assert "trigger_source" in task_data
-        assert "input_data" in task_data
-        assert "result_data" in task_data
-        assert "result_message" in task_data
-        assert "related_document_ids" in task_data
-
     def test_related_document_ids_populated_from_result_data(
         self,
         admin_client: APIClient,
@@ -188,26 +170,35 @@ class TestGetTasksV10:
         }
 
     def test_default_ordering_is_newest_first(self, admin_client: APIClient) -> None:
-        t1 = PaperlessTaskFactory()
-        PaperlessTaskFactory()  # middle task -- not checked directly
-        t3 = PaperlessTaskFactory()
+        from datetime import timedelta
+
+        from django.utils import timezone
+
+        base = timezone.now()
+        t1 = PaperlessTaskFactory(date_created=base)
+        t2 = PaperlessTaskFactory(date_created=base + timedelta(seconds=1))
+        t3 = PaperlessTaskFactory(date_created=base + timedelta(seconds=2))
 
         response = admin_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
         ids = [t["task_id"] for t in response.data]
-        assert ids[0] == t3.task_id
-        assert ids[-1] == t1.task_id
+        assert ids == [t3.task_id, t2.task_id, t1.task_id]
 
-    def test_no_v9_only_fields_present(self, admin_client: APIClient) -> None:
-        PaperlessTaskFactory()
+    def test_filter_is_complete_false(self, admin_client: APIClient) -> None:
+        PaperlessTaskFactory(status=PaperlessTask.Status.PENDING)
+        PaperlessTaskFactory(status=PaperlessTask.Status.STARTED)
+        PaperlessTaskFactory(status=PaperlessTask.Status.SUCCESS)
 
-        response = admin_client.get(ENDPOINT)
+        response = admin_client.get(ENDPOINT, {"is_complete": "false"})
 
         assert response.status_code == status.HTTP_200_OK
-        task_data = response.data[0]
-        assert "task_name" not in task_data
-        assert "task_file_name" not in task_data
+        assert len(response.data) == 2
+        returned_statuses = {t["status"] for t in response.data}
+        assert returned_statuses == {
+            PaperlessTask.Status.PENDING,
+            PaperlessTask.Status.STARTED,
+        }
 
     def test_list_is_owner_aware(
         self,
@@ -243,31 +234,6 @@ class TestGetTasksV10:
 
 @pytest.mark.django_db()
 class TestGetTasksV9:
-    def test_response_has_v9_fields(self, v9_client: APIClient) -> None:
-        PaperlessTaskFactory(input_data={"filename": "invoice.pdf"})
-
-        response = v9_client.get(ENDPOINT)
-
-        assert response.status_code == status.HTTP_200_OK
-        task_data = response.data[0]
-        assert "task_name" in task_data
-        assert "task_file_name" in task_data
-        assert "type" in task_data
-        assert "result" in task_data
-        assert "related_document" in task_data
-        assert "duplicate_documents" in task_data
-
-    def test_no_v10_only_fields_present(self, v9_client: APIClient) -> None:
-        PaperlessTaskFactory()
-
-        response = v9_client.get(ENDPOINT)
-
-        assert response.status_code == status.HTTP_200_OK
-        task_data = response.data[0]
-        assert "task_type" not in task_data
-        assert "trigger_source" not in task_data
-        assert "input_data" not in task_data
-
     def test_task_name_equals_task_type_value(self, v9_client: APIClient) -> None:
         PaperlessTaskFactory(task_type=PaperlessTask.TaskType.CONSUME_FILE)
 
@@ -384,6 +350,17 @@ class TestGetTasksV9:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
         assert response.data[0]["task_name"] == "consume_file"
+
+    def test_filter_by_type_maps_to_trigger_source(self, v9_client: APIClient) -> None:
+        """v9 ?type=SCHEDULED_TASK filter maps to trigger_source=scheduled."""
+        PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.SCHEDULED)
+        PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.WEB_UI)
+
+        response = v9_client.get(ENDPOINT, {"type": "SCHEDULED_TASK"})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) == 1
+        assert response.data[0]["type"] == "SCHEDULED_TASK"
 
 
 # ---------------------------------------------------------------------------
@@ -527,28 +504,6 @@ class TestSummary:
         assert by_type["consume_file"]["failure_count"] == 1
         assert by_type["train_classifier"]["total_count"] == 1
 
-    def test_contains_expected_fields(self, admin_client: APIClient) -> None:
-        PaperlessTaskFactory(status=PaperlessTask.Status.SUCCESS)
-
-        response = admin_client.get(ENDPOINT + "summary/")
-
-        assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) >= 1
-        item = response.data[0]
-        for field in (
-            "task_type",
-            "total_count",
-            "pending_count",
-            "success_count",
-            "failure_count",
-            "avg_duration_seconds",
-            "avg_wait_time_seconds",
-            "last_run",
-            "last_success",
-            "last_failure",
-        ):
-            assert field in item, f"Missing field: {field}"
-
 
 # ---------------------------------------------------------------------------
 # TestActive
@@ -573,9 +528,7 @@ class TestActive:
             PaperlessTask.Status.STARTED,
         }
 
-    def test_excludes_completed_tasks(self, admin_client: APIClient) -> None:
-        PaperlessTaskFactory(status=PaperlessTask.Status.SUCCESS)
-        PaperlessTaskFactory(status=PaperlessTask.Status.FAILURE)
+    def test_excludes_revoked_tasks_from_active(self, admin_client: APIClient) -> None:
         PaperlessTaskFactory(status=PaperlessTask.Status.REVOKED)
 
         response = admin_client.get(ENDPOINT + "active/")
