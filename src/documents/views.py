@@ -93,6 +93,7 @@ from rest_framework.mixins import DestroyModelMixin
 from rest_framework.mixins import ListModelMixin
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.mixins import UpdateModelMixin
+from rest_framework.permissions import IsAdminUser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -3901,15 +3902,12 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(methods=["post"], detail=False)
+    @action(methods=["post"], detail=False, permission_classes=[IsAdminUser])
     def run(self, request):
-        """Manually dispatch a background task. Superuser only."""
+        """Manually dispatch a background task. Superuser (admin) only."""
         serializer = RunTaskSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         task_type = serializer.validated_data.get("task_type")
-
-        if not request.user.is_superuser:
-            return HttpResponseForbidden("Insufficient permissions")
 
         task_func_map = {
             PaperlessTask.TaskType.INDEX_OPTIMIZE: (index_optimize, {}),

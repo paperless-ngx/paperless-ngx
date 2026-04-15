@@ -2523,6 +2523,7 @@ class TaskSerializerV9(serializers.ModelSerializer):
             "duplicate_documents",
             "owner",
         )
+        read_only_fields = fields
 
     def get_task_file_name(self, obj: PaperlessTask) -> str | None:
         if not obj.input_data:
