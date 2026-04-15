@@ -1506,9 +1506,10 @@ class DocumentViewSet(
             if not note_id:
                 raise ValidationError({"id": "This field is required."})
             try:
-                note = Note.objects.get(id=int(note_id), document=doc)
-            except (Note.DoesNotExist, ValueError):
-                raise NotFound(f"Note {note_id} does not exist.")
+                note_id_int = int(note_id)
+            except ValueError:
+                raise ValidationError({"id": "A valid integer is required."})
+            note = get_object_or_404(Note, id=note_id_int, document=doc)
             if settings.AUDIT_LOG_ENABLED:
                 LogEntry.objects.log_create(
                     instance=doc,
