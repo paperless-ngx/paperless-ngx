@@ -3174,6 +3174,27 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_delete_note_invalid_id(self) -> None:
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - API DELETE request to notes endpoint with a non-integer note id
+        THEN:
+            - HTTP 400 is returned
+        """
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document",
+        )
+
+        response = self.client.delete(
+            f"/api/documents/{doc.pk}/notes/?id=notaninteger",
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_delete_note_nonexistent_id(self) -> None:
         """
         GIVEN:
