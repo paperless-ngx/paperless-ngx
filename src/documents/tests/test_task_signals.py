@@ -234,6 +234,14 @@ class TestTaskPostrunHandler:
             state="SUCCESS",
         )  # must not raise
 
+    def test_records_revoked_state(self):
+        task = self._started_task()
+        from documents.signals.handlers import task_postrun_handler
+
+        task_postrun_handler(task_id=task.task_id, retval=None, state="REVOKED")
+        task.refresh_from_db()
+        assert task.status == PaperlessTask.Status.REVOKED
+
 
 @pytest.mark.django_db
 class TestTaskFailureHandler:
@@ -259,6 +267,34 @@ class TestTaskFailureHandler:
         assert task.result_data["error_type"] == "ValueError"
         assert task.result_data["error_message"] == "PDF parse failed"
         assert task.date_done is not None
+
+    def test_records_traceback_when_provided(self):
+        import sys
+
+        from django.utils import timezone
+
+        task = PaperlessTask.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_type=PaperlessTask.TaskType.CONSUME_FILE,
+            trigger_source=PaperlessTask.TriggerSource.WEB_UI,
+            status=PaperlessTask.Status.STARTED,
+            date_started=timezone.now(),
+        )
+        try:
+            raise ValueError("test error")
+        except ValueError:
+            tb = sys.exc_info()[2]
+
+        from documents.signals.handlers import task_failure_handler
+
+        task_failure_handler(
+            task_id=task.task_id,
+            exception=ValueError("test error"),
+            traceback=tb,
+        )
+        task.refresh_from_db()
+        assert "traceback" in task.result_data
+        assert len(task.result_data["traceback"]) <= 5000
 
     def test_ignores_none_task_id(self):
         from documents.signals.handlers import task_failure_handler
