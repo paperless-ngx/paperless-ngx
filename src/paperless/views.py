@@ -427,10 +427,9 @@ class ApplicationConfigurationViewSet(ModelViewSet[ApplicationConfiguration]):
             and not vector_store_file_exists()
         ):
             # AI index was just enabled and vector store file does not exist
-            llmindex_index.delay(
-                rebuild=True,
-                scheduled=False,
-                auto=True,
+            llmindex_index.apply_async(
+                kwargs={"rebuild": True},
+                headers={"trigger_source": "system"},
             )
 
 

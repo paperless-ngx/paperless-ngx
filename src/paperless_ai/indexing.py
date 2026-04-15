@@ -37,7 +37,10 @@ def queue_llm_index_update_if_needed(*, rebuild: bool, reason: str) -> bool:
     if has_running or has_recent:
         return False
 
-    llmindex_index.delay(rebuild=rebuild, scheduled=False, auto=True)
+    llmindex_index.apply_async(
+        kwargs={"rebuild": rebuild},
+        headers={"trigger_source": "system"},
+    )
     logger.warning(
         "Queued LLM index update%s: %s",
         " (rebuild)" if rebuild else "",

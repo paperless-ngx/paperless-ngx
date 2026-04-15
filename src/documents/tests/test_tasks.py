@@ -4,7 +4,6 @@ from pathlib import Path
 from unittest import mock
 
 import pytest
-from celery import states
 from django.conf import settings
 from django.test import TestCase
 from django.test import override_settings
@@ -14,7 +13,6 @@ from documents import tasks
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
-from documents.models import PaperlessTask
 from documents.models import Tag
 from documents.sanity_checker import SanityCheckFailedException
 from documents.sanity_checker import SanityCheckMessages
@@ -40,7 +38,8 @@ class TestClassifier(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def test_train_classifier_with_auto_tag(self, load_classifier) -> None:
         load_classifier.return_value = None
         Tag.objects.create(matching_algorithm=Tag.MATCH_AUTO, name="test")
-        tasks.train_classifier()
+        with self.assertRaises(ValueError):
+            tasks.train_classifier()
         load_classifier.assert_called_once()
         self.assertIsNotFile(settings.MODEL_FILE)
 
@@ -48,7 +47,8 @@ class TestClassifier(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def test_train_classifier_with_auto_type(self, load_classifier) -> None:
         load_classifier.return_value = None
         DocumentType.objects.create(matching_algorithm=Tag.MATCH_AUTO, name="test")
-        tasks.train_classifier()
+        with self.assertRaises(ValueError):
+            tasks.train_classifier()
         load_classifier.assert_called_once()
         self.assertIsNotFile(settings.MODEL_FILE)
 
@@ -56,7 +56,8 @@ class TestClassifier(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def test_train_classifier_with_auto_correspondent(self, load_classifier) -> None:
         load_classifier.return_value = None
         Correspondent.objects.create(matching_algorithm=Tag.MATCH_AUTO, name="test")
-        tasks.train_classifier()
+        with self.assertRaises(ValueError):
+            tasks.train_classifier()
         load_classifier.assert_called_once()
         self.assertIsNotFile(settings.MODEL_FILE)
 
@@ -298,7 +299,7 @@ class TestAIIndex(DirectoriesMixin, TestCase):
         WHEN:
             - llmindex_index task is called
         THEN:
-            - update_llm_index is called, and the task is marked as success
+            - update_llm_index is called and its result is returned
         """
         Document.objects.create(
             title="test",
@@ -308,13 +309,9 @@ class TestAIIndex(DirectoriesMixin, TestCase):
         # lazy-loaded so mock the actual function
         with mock.patch("paperless_ai.indexing.update_llm_index") as update_llm_index:
             update_llm_index.return_value = "LLM index updated successfully."
-            tasks.llmindex_index()
+            result = tasks.llmindex_index()
             update_llm_index.assert_called_once()
-            task = PaperlessTask.objects.get(
-                task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
-            )
-            self.assertEqual(task.status, states.SUCCESS)
-            self.assertEqual(task.result, "LLM index updated successfully.")
+            self.assertEqual(result, "LLM index updated successfully.")
 
     @override_settings(
         AI_ENABLED=True,
@@ -325,9 +322,9 @@ class TestAIIndex(DirectoriesMixin, TestCase):
         GIVEN:
             - Document exists, AI is enabled, llm index backend is set
         WHEN:
-            - llmindex_index task is called
+            - llmindex_index task is called and update_llm_index raises an exception
         THEN:
-            - update_llm_index raises an exception, and the task is marked as failure
+            - the exception propagates to the caller
         """
         Document.objects.create(
             title="test",
@@ -337,13 +334,9 @@ class TestAIIndex(DirectoriesMixin, TestCase):
         # lazy-loaded so mock the actual function
         with mock.patch("paperless_ai.indexing.update_llm_index") as update_llm_index:
             update_llm_index.side_effect = Exception("LLM index update failed.")
-            tasks.llmindex_index()
+            with self.assertRaises(Exception, msg="LLM index update failed."):
+                tasks.llmindex_index()
             update_llm_index.assert_called_once()
-            task = PaperlessTask.objects.get(
-                task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
-            )
-            self.assertEqual(task.status, states.FAILURE)
-            self.assertIn("LLM index update failed.", task.result)
 
     def test_update_document_in_llm_index(self) -> None:
         """

@@ -17,7 +17,6 @@ class Command(PaperlessCommand):
     def handle(self, *args: Any, **options: Any) -> None:
         llmindex_index(
             rebuild=options["command"] == "rebuild",
-            scheduled=False,
             iter_wrapper=lambda docs: self.track(
                 docs,
                 description="Indexing documents...",

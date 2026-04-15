@@ -40,7 +40,6 @@ from documents.models import Correspondent
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
-from documents.models import PaperlessTask
 from documents.models import ShareLink
 from documents.models import ShareLinkBundle
 from documents.models import StoragePath
@@ -83,19 +82,8 @@ def index_optimize() -> None:
 @shared_task
 def train_classifier(
     *,
-    scheduled=True,
     status_callback: Callable[[str], None] | None = None,
-) -> None:
-    task = PaperlessTask.objects.create(
-        trigger_source=PaperlessTask.TriggerSource.SCHEDULED
-        if scheduled
-        else PaperlessTask.TriggerSource.MANUAL,
-        task_id=uuid.uuid4(),
-        task_type=PaperlessTask.TaskType.TRAIN_CLASSIFIER,
-        status=PaperlessTask.Status.STARTED,
-        date_created=timezone.now(),
-        date_started=timezone.now(),
-    )
+) -> str:
     if (
         not Tag.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
         and not DocumentType.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
@@ -109,37 +97,22 @@ def train_classifier(
         if settings.MODEL_FILE.exists():
             logger.info(f"Removing {settings.MODEL_FILE} so it won't be used")
             settings.MODEL_FILE.unlink()
-        task.status = PaperlessTask.Status.SUCCESS
-        task.result_message = result
-        task.date_done = timezone.now()
-        task.save()
-        return
+        return result
 
     classifier = load_classifier()
 
     if not classifier:
         classifier = DocumentClassifier()
 
-    try:
-        if classifier.train(status_callback=status_callback):
-            logger.info(
-                f"Saving updated classifier model to {settings.MODEL_FILE}...",
-            )
-            classifier.save()
-            task.result_message = "Training completed successfully"
-        else:
-            logger.debug("Training data unchanged.")
-            task.result_message = "Training data unchanged"
-
-        task.status = PaperlessTask.Status.SUCCESS
-
-    except Exception as e:
-        logger.warning("Classifier error: " + str(e))
-        task.status = PaperlessTask.Status.FAILURE
-        task.result_message = str(e)
-
-    task.date_done = timezone.now()
-    task.save(update_fields=["status", "result_message", "date_done"])
+    if classifier.train(status_callback=status_callback):
+        logger.info(
+            f"Saving updated classifier model to {settings.MODEL_FILE}...",
+        )
+        classifier.save()
+        return "Training completed successfully"
+    else:
+        logger.debug("Training data unchanged.")
+        return "Training data unchanged"
 
 
 @shared_task(bind=True)
@@ -230,8 +203,8 @@ def consume_file(
 
 
 @shared_task
-def sanity_check(*, scheduled=True, raise_on_error=True):
-    messages = sanity_checker.check_sanity(scheduled=scheduled)
+def sanity_check(*, raise_on_error: bool = True) -> str:
+    messages = sanity_checker.check_sanity()
     messages.log_messages()
 
     if not messages.has_error and not messages.has_warning and not messages.has_info:
@@ -634,42 +607,19 @@ def update_document_parent_tags(tag: Tag, new_parent: Tag) -> None:
 def llmindex_index(
     *,
     iter_wrapper: IterWrapper[Document] = identity,
-    rebuild=False,
-    scheduled=True,
-    auto=False,
-) -> None:
+    rebuild: bool = False,
+) -> str | None:
     ai_config = AIConfig()
-    if ai_config.llm_index_enabled:
-        task = PaperlessTask.objects.create(
-            trigger_source=PaperlessTask.TriggerSource.SCHEDULED
-            if scheduled
-            else PaperlessTask.TriggerSource.SYSTEM
-            if auto
-            else PaperlessTask.TriggerSource.MANUAL,
-            task_id=uuid.uuid4(),
-            task_type=PaperlessTask.TaskType.LLM_INDEX,
-            status=PaperlessTask.Status.STARTED,
-            date_created=timezone.now(),
-            date_started=timezone.now(),
-        )
-        from paperless_ai.indexing import update_llm_index
-
-        try:
-            result = update_llm_index(
-                iter_wrapper=iter_wrapper,
-                rebuild=rebuild,
-            )
-            task.status = PaperlessTask.Status.SUCCESS
-            task.result_message = result
-        except Exception as e:
-            logger.error("LLM index error: " + str(e))
-            task.status = PaperlessTask.Status.FAILURE
-            task.result_message = str(e)
-
-        task.date_done = timezone.now()
-        task.save(update_fields=["status", "result_message", "date_done"])
-    else:
+    if not ai_config.llm_index_enabled:
         logger.info("LLM index is disabled, skipping update.")
+        return None
+
+    from paperless_ai.indexing import update_llm_index
+
+    return update_llm_index(
+        iter_wrapper=iter_wrapper,
+        rebuild=rebuild,
+    )
 
 
 @shared_task
