@@ -28,7 +28,6 @@ dependencies = [
   "django-allauth[mfa,socialaccount]~=65.15.0",
   "django-auditlog~=3.4.1",
   "django-cachalot~=2.9.0",
-  "django-celery-results~=2.6.0",
   "django-compression-middleware~=0.5.0",
   "django-cors-headers~=4.9.0",
   "django-extensions~=4.1",
