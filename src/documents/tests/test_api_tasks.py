@@ -29,29 +29,24 @@ ACCEPT_V9 = "application/json; version=9"
 
 
 @pytest.fixture()
-def superuser(db) -> User:
-    return User.objects.create_superuser(username="admin", password="admin")
+def regular_user(django_user_model: User) -> User:
+    return django_user_model.objects.create_user(username="regular", password="regular")
 
 
 @pytest.fixture()
-def regular_user(db) -> User:
-    return User.objects.create_user(username="regular", password="regular")
-
-
-@pytest.fixture()
-def admin_client(superuser: User) -> APIClient:
+def admin_client(admin_user: User) -> APIClient:
     """Authenticated admin client sending v10 Accept header."""
     client = APIClient()
-    client.force_authenticate(user=superuser)
+    client.force_authenticate(user=admin_user)
     client.credentials(HTTP_ACCEPT=ACCEPT_V10)
     return client
 
 
 @pytest.fixture()
-def v9_client(superuser: User) -> APIClient:
+def v9_client(admin_user: User) -> APIClient:
     """Authenticated admin client sending v9 Accept header."""
     client = APIClient()
-    client.force_authenticate(user=superuser)
+    client.force_authenticate(user=admin_user)
     client.credentials(HTTP_ACCEPT=ACCEPT_V9)
     return client
 
@@ -63,11 +58,6 @@ def user_client(regular_user: User) -> APIClient:
     client.force_authenticate(user=regular_user)
     client.credentials(HTTP_ACCEPT=ACCEPT_V10)
     return client
-
-
-# ---------------------------------------------------------------------------
-# TestGetTasksV10
-# ---------------------------------------------------------------------------
 
 
 @pytest.mark.django_db()
@@ -202,7 +192,7 @@ class TestGetTasksV10:
 
     def test_list_is_owner_aware(
         self,
-        superuser: User,
+        admin_user: User,
         regular_user: User,
     ) -> None:
         """The task list only shows tasks the user owns or that are unowned."""
@@ -214,7 +204,7 @@ class TestGetTasksV10:
         client.force_authenticate(user=regular_user)
         client.credentials(HTTP_ACCEPT=ACCEPT_V10)
 
-        PaperlessTaskFactory(owner=superuser)
+        PaperlessTaskFactory(owner=admin_user)
         shared_task = PaperlessTaskFactory()
         own_task = PaperlessTaskFactory(owner=regular_user)
 
@@ -225,11 +215,6 @@ class TestGetTasksV10:
         returned_task_ids = {t["task_id"] for t in response.data}
         assert shared_task.task_id in returned_task_ids
         assert own_task.task_id in returned_task_ids
-
-
-# ---------------------------------------------------------------------------
-# TestGetTasksV9
-# ---------------------------------------------------------------------------
 
 
 @pytest.mark.django_db()
@@ -363,11 +348,6 @@ class TestGetTasksV9:
         assert response.data[0]["type"] == "SCHEDULED_TASK"
 
 
-# ---------------------------------------------------------------------------
-# TestAcknowledge
-# ---------------------------------------------------------------------------
-
-
 @pytest.mark.django_db()
 class TestAcknowledge:
     def test_returns_count(self, admin_client: APIClient) -> None:
@@ -430,11 +410,6 @@ class TestAcknowledge:
         assert response.status_code == status.HTTP_200_OK
 
 
-# ---------------------------------------------------------------------------
-# TestAcknowledgeAll
-# ---------------------------------------------------------------------------
-
-
 @pytest.mark.django_db()
 class TestAcknowledgeAll:
     def test_marks_only_completed_tasks(self, admin_client: APIClient) -> None:
@@ -474,11 +449,6 @@ class TestAcknowledgeAll:
         assert response.data == {"result": 1}
 
 
-# ---------------------------------------------------------------------------
-# TestSummary
-# ---------------------------------------------------------------------------
-
-
 @pytest.mark.django_db()
 class TestSummary:
     def test_returns_per_type_totals(self, admin_client: APIClient) -> None:
@@ -503,11 +473,6 @@ class TestSummary:
         assert by_type["consume_file"]["success_count"] == 1
         assert by_type["consume_file"]["failure_count"] == 1
         assert by_type["train_classifier"]["total_count"] == 1
-
-
-# ---------------------------------------------------------------------------
-# TestActive
-# ---------------------------------------------------------------------------
 
 
 @pytest.mark.django_db()
@@ -535,11 +500,6 @@ class TestActive:
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 0
-
-
-# ---------------------------------------------------------------------------
-# TestRun
-# ---------------------------------------------------------------------------
 
 
 @pytest.mark.django_db()

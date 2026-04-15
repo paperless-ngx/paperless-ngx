@@ -831,7 +831,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         config.save()
 
         with (
-            patch("documents.tasks.llmindex_index.delay") as mock_update,
+            patch("documents.tasks.llmindex_index.apply_async") as mock_update,
             patch("paperless_ai.indexing.vector_store_file_exists") as mock_exists,
         ):
             mock_exists.return_value = False
