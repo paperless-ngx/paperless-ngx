@@ -100,7 +100,7 @@ logger = logging.getLogger("paperless.serializers")
 
 
 # https://www.django-rest-framework.org/api-guide/serializers/#example
-class DynamicFieldsModelSerializer(serializers.ModelSerializer):
+class DynamicFieldsModelSerializer(serializers.ModelSerializer[Any]):
     """
     A ModelSerializer that takes an additional `fields` argument that
     controls which fields should be displayed.
@@ -121,7 +121,7 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
                 self.fields.pop(field_name)
 
 
-class MatchingModelSerializer(serializers.ModelSerializer):
+class MatchingModelSerializer(serializers.ModelSerializer[Any]):
     document_count = serializers.IntegerField(read_only=True)
 
     def get_slug(self, obj) -> str:
@@ -261,7 +261,7 @@ class SetPermissionsSerializer(serializers.DictField):
 
 class OwnedObjectSerializer(
     SerializerWithPerms,
-    serializers.ModelSerializer,
+    serializers.ModelSerializer[Any],
     SetPermissionsMixin,
 ):
     def __init__(self, *args, **kwargs) -> None:
@@ -469,7 +469,7 @@ class OwnedObjectSerializer(
         return super().update(instance, validated_data)
 
 
-class OwnedObjectListSerializer(serializers.ListSerializer):
+class OwnedObjectListSerializer(serializers.ListSerializer[Any]):
     def to_representation(self, documents):
         self.child.context["shared_object_pks"] = self.child.get_shared_object_pks(
             documents,
@@ -682,27 +682,27 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         return super().validate(attrs)
 
 
-class CorrespondentField(serializers.PrimaryKeyRelatedField):
+class CorrespondentField(serializers.PrimaryKeyRelatedField[Correspondent]):
     def get_queryset(self):
         return Correspondent.objects.all()
 
 
-class TagsField(serializers.PrimaryKeyRelatedField):
+class TagsField(serializers.PrimaryKeyRelatedField[Tag]):
     def get_queryset(self):
         return Tag.objects.all()
 
 
-class DocumentTypeField(serializers.PrimaryKeyRelatedField):
+class DocumentTypeField(serializers.PrimaryKeyRelatedField[DocumentType]):
     def get_queryset(self):
         return DocumentType.objects.all()
 
 
-class StoragePathField(serializers.PrimaryKeyRelatedField):
+class StoragePathField(serializers.PrimaryKeyRelatedField[StoragePath]):
     def get_queryset(self):
         return StoragePath.objects.all()
 
 
-class CustomFieldSerializer(serializers.ModelSerializer):
+class CustomFieldSerializer(serializers.ModelSerializer[CustomField]):
     data_type = serializers.ChoiceField(
         choices=CustomField.FieldDataType,
         read_only=False,
@@ -816,7 +816,7 @@ def validate_documentlink_targets(user, doc_ids):
         )
 
 
-class CustomFieldInstanceSerializer(serializers.ModelSerializer):
+class CustomFieldInstanceSerializer(serializers.ModelSerializer[CustomFieldInstance]):
     field = serializers.PrimaryKeyRelatedField(queryset=CustomField.objects.all())
     value = ReadWriteSerializerMethodField(allow_null=True)
 
@@ -911,6 +911,8 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
                     getattr(request, "user", None) if request is not None else None,
                     doc_ids,
                 )
+            elif field.data_type == CustomField.FieldDataType.DATE:
+                data["value"] = serializers.DateField().to_internal_value(data["value"])
 
         return data
 
@@ -922,14 +924,14 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         ]
 
 
-class BasicUserSerializer(serializers.ModelSerializer):
+class BasicUserSerializer(serializers.ModelSerializer[User]):
     # Different than paperless.serializers.UserSerializer
     class Meta:
         model = User
         fields = ["id", "username", "first_name", "last_name"]
 
 
-class NotesSerializer(serializers.ModelSerializer):
+class NotesSerializer(serializers.ModelSerializer[Note]):
     user = BasicUserSerializer(read_only=True)
 
     class Meta:
@@ -1256,7 +1258,7 @@ class DocumentSerializer(
         list_serializer_class = OwnedObjectListSerializer
 
 
-class SearchResultListSerializer(serializers.ListSerializer):
+class SearchResultListSerializer(serializers.ListSerializer[Document]):
     def to_representation(self, hits):
         document_ids = [hit["id"] for hit in hits]
         # Fetch all Document objects in the list in one SQL query.
@@ -1313,7 +1315,7 @@ class SearchResultSerializer(DocumentSerializer):
         list_serializer_class = SearchResultListSerializer
 
 
-class SavedViewFilterRuleSerializer(serializers.ModelSerializer):
+class SavedViewFilterRuleSerializer(serializers.ModelSerializer[SavedViewFilterRule]):
     class Meta:
         model = SavedViewFilterRule
         fields = ["rule_type", "value"]
@@ -2401,7 +2403,7 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         return super().update(instance, validated_data)
 
 
-class UiSettingsViewSerializer(serializers.ModelSerializer):
+class UiSettingsViewSerializer(serializers.ModelSerializer[UiSettings]):
     settings = serializers.DictField(required=False, allow_null=True)
 
     class Meta:
@@ -2760,7 +2762,7 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
         return attrs
 
 
-class WorkflowTriggerSerializer(serializers.ModelSerializer):
+class WorkflowTriggerSerializer(serializers.ModelSerializer[WorkflowTrigger]):
     id = serializers.IntegerField(required=False, allow_null=True)
     sources = fields.MultipleChoiceField(
         choices=WorkflowTrigger.DocumentSourceChoices.choices,
@@ -2870,7 +2872,7 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
-class WorkflowActionEmailSerializer(serializers.ModelSerializer):
+class WorkflowActionEmailSerializer(serializers.ModelSerializer[WorkflowActionEmail]):
     id = serializers.IntegerField(allow_null=True, required=False)
 
     class Meta:
@@ -2884,7 +2886,9 @@ class WorkflowActionEmailSerializer(serializers.ModelSerializer):
         ]
 
 
-class WorkflowActionWebhookSerializer(serializers.ModelSerializer):
+class WorkflowActionWebhookSerializer(
+    serializers.ModelSerializer[WorkflowActionWebhook],
+):
     id = serializers.IntegerField(allow_null=True, required=False)
 
     def validate_url(self, url):
@@ -2905,7 +2909,7 @@ class WorkflowActionWebhookSerializer(serializers.ModelSerializer):
         ]
 
 
-class WorkflowActionSerializer(serializers.ModelSerializer):
+class WorkflowActionSerializer(serializers.ModelSerializer[WorkflowAction]):
     id = serializers.IntegerField(required=False, allow_null=True)
     assign_correspondent = CorrespondentField(allow_null=True, required=False)
     assign_tags = TagsField(many=True, allow_null=True, required=False)
@@ -3027,7 +3031,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class WorkflowSerializer(serializers.ModelSerializer):
+class WorkflowSerializer(serializers.ModelSerializer[Workflow]):
     order = serializers.IntegerField(required=False)
 
     triggers = WorkflowTriggerSerializer(many=True)

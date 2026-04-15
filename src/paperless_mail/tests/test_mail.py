@@ -450,7 +450,7 @@ class TestMail(
         c = handler._get_correspondent(message, rule)
         self.assertIsNotNone(c)
         self.assertEqual(c.name, "someone@somewhere.com")
-        self.assertEqual(c.matching_algorithm, MatchingModel.MATCH_ANY)
+        self.assertEqual(c.matching_algorithm, MatchingModel.MATCH_LITERAL)
         self.assertEqual(c.match, "someone@somewhere.com")
         c = handler._get_correspondent(message2, rule)
         self.assertIsNotNone(c)

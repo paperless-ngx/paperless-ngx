@@ -1,6 +1,6 @@
 [project]
 name = "paperless-ngx"
-version = "2.20.13"
+version = "2.20.14"
 description = "A community-supported supercharged document management system: scan, index and archive all your physical documents"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -24,7 +24,7 @@ dependencies = [
   "dateparser~=1.2",
   # WARNING: django does not use semver.
   #          Only patch versions are guaranteed to not introduce breaking changes.
-  "django~=5.2.10",
+  "django~=5.2.13",
   "django-allauth[mfa,socialaccount]~=65.15.0",
   "django-auditlog~=3.4.1",
   "django-cachalot~=2.9.0",
@@ -113,7 +113,7 @@ testing = [
   "factory-boy~=3.3.1",
   "faker~=40.12.0",
   "imagehash",
-  "pytest~=9.0.0",
+  "pytest~=9.0.3",
   "pytest-cov~=7.1.0",
   "pytest-django~=4.12.0",
   "pytest-env~=1.6.0",

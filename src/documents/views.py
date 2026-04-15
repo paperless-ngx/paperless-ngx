@@ -88,6 +88,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.filters import OrderingFilter
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import GenericAPIView
+from rest_framework.mixins import CreateModelMixin
 from rest_framework.mixins import DestroyModelMixin
 from rest_framework.mixins import ListModelMixin
 from rest_framework.mixins import RetrieveModelMixin
@@ -299,7 +300,7 @@ class IndexView(TemplateView):
         return context
 
 
-class PassUserMixin(GenericAPIView):
+class PassUserMixin(GenericAPIView[Any]):
     """
     Pass a user object to serializer
     """
@@ -465,7 +466,10 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
 
 
 @extend_schema_view(**generate_object_with_permissions_schema(CorrespondentSerializer))
-class CorrespondentViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
+class CorrespondentViewSet(
+    PermissionsAwareDocumentCountMixin,
+    ModelViewSet[Correspondent],
+):
     model = Correspondent
 
     queryset = Correspondent.objects.select_related("owner").order_by(Lower("name"))
@@ -502,7 +506,7 @@ class CorrespondentViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
 
 
 @extend_schema_view(**generate_object_with_permissions_schema(TagSerializer))
-class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
+class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Tag]):
     model = Tag
     serializer_class = TagSerializer
     document_count_through = Document.tags.through
@@ -581,7 +585,10 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
 
 
 @extend_schema_view(**generate_object_with_permissions_schema(DocumentTypeSerializer))
-class DocumentTypeViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
+class DocumentTypeViewSet(
+    PermissionsAwareDocumentCountMixin,
+    ModelViewSet[DocumentType],
+):
     model = DocumentType
 
     queryset = DocumentType.objects.select_related("owner").order_by(Lower("name"))
@@ -816,7 +823,7 @@ class DocumentViewSet(
     UpdateModelMixin,
     DestroyModelMixin,
     ListModelMixin,
-    GenericViewSet,
+    GenericViewSet[Document],
 ):
     model = Document
     queryset = Document.objects.all()
@@ -911,7 +918,7 @@ class DocumentViewSet(
         return (
             Document.objects.filter(root_document__isnull=True)
             .distinct()
-            .order_by("-created")
+            .order_by("-created", "-id")
             .annotate(effective_content=Coalesce(latest_version_content, F("content")))
             .annotate(num_notes=Count("notes"))
             .select_related("correspondent", "storage_path", "document_type", "owner")
@@ -1256,7 +1263,10 @@ class DocumentViewSet(
         ),
     )
     def suggestions(self, request, pk=None):
-        doc = get_object_or_404(Document.objects.select_related("owner"), pk=pk)
+        doc = get_object_or_404(
+            Document.objects.select_related("owner").prefetch_related("versions"),
+            pk=pk,
+        )
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "view_document",
@@ -1500,7 +1510,14 @@ class DocumentViewSet(
             ):
                 return HttpResponseForbidden("Insufficient permissions to delete notes")
 
-            note = Note.objects.get(id=int(request.GET.get("id")), document=doc)
+            note_id = request.GET.get("id")
+            if not note_id:
+                raise ValidationError({"id": "This field is required."})
+            try:
+                note_id_int = int(note_id)
+            except ValueError:
+                raise ValidationError({"id": "A valid integer is required."})
+            note = get_object_or_404(Note, id=note_id_int, document=doc)
             if settings.AUDIT_LOG_ENABLED:
                 LogEntry.objects.log_create(
                     instance=doc,
@@ -1960,7 +1977,7 @@ class ChatStreamingSerializer(serializers.Serializer):
     ],
     name="dispatch",
 )
-class ChatStreamingView(GenericAPIView):
+class ChatStreamingView(GenericAPIView[Any]):
     permission_classes = (IsAuthenticated,)
     serializer_class = ChatStreamingSerializer
 
@@ -2374,7 +2391,7 @@ class LogViewSet(ViewSet):
 
 
 @extend_schema_view(**generate_object_with_permissions_schema(SavedViewSerializer))
-class SavedViewViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet):
+class SavedViewViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[SavedView]):
     model = SavedView
 
     queryset = SavedView.objects.select_related("owner").prefetch_related(
@@ -2852,7 +2869,7 @@ class RemovePasswordDocumentsView(DocumentOperationPermissionMixin):
         },
     ),
 )
-class PostDocumentView(GenericAPIView):
+class PostDocumentView(GenericAPIView[Any]):
     permission_classes = (IsAuthenticated,)
     serializer_class = PostDocumentSerializer
     parser_classes = (parsers.MultiPartParser,)
@@ -2973,7 +2990,7 @@ class PostDocumentView(GenericAPIView):
         },
     ),
 )
-class SelectionDataView(GenericAPIView):
+class SelectionDataView(GenericAPIView[Any]):
     permission_classes = (IsAuthenticated,)
     serializer_class = DocumentListSerializer
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser)
@@ -3077,7 +3094,7 @@ class SelectionDataView(GenericAPIView):
         },
     ),
 )
-class SearchAutoCompleteView(GenericAPIView):
+class SearchAutoCompleteView(GenericAPIView[Any]):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
@@ -3355,7 +3372,7 @@ class GlobalSearchView(PassUserMixin):
         },
     ),
 )
-class StatisticsView(GenericAPIView):
+class StatisticsView(GenericAPIView[Any]):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
@@ -3457,7 +3474,7 @@ class StatisticsView(GenericAPIView):
         )
 
 
-class BulkDownloadView(DocumentSelectionMixin, GenericAPIView):
+class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
     permission_classes = (IsAuthenticated,)
     serializer_class = BulkDownloadSerializer
     parser_classes = (parsers.JSONParser,)
@@ -3510,7 +3527,7 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView):
 
 
 @extend_schema_view(**generate_object_with_permissions_schema(StoragePathSerializer))
-class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
+class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[StoragePath]):
     model = StoragePath
 
     queryset = StoragePath.objects.select_related("owner").order_by(
@@ -3574,7 +3591,7 @@ class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
         return Response(result)
 
 
-class UiSettingsView(GenericAPIView):
+class UiSettingsView(GenericAPIView[Any]):
     queryset = UiSettings.objects.all()
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     serializer_class = UiSettingsViewSerializer
@@ -3672,7 +3689,7 @@ class UiSettingsView(GenericAPIView):
         },
     ),
 )
-class RemoteVersionView(GenericAPIView):
+class RemoteVersionView(GenericAPIView[Any]):
     cache_key = "remote_version_view_latest_release"
 
     def get(self, request, format=None):
@@ -3749,7 +3766,7 @@ class RemoteVersionView(GenericAPIView):
         ),
     ],
 )
-class TasksViewSet(ReadOnlyModelViewSet):
+class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     serializer_class = TasksViewSerializer
     filter_backends = (
@@ -3823,7 +3840,14 @@ class TasksViewSet(ReadOnlyModelViewSet):
             )
 
 
-class ShareLinkViewSet(ModelViewSet, PassUserMixin):
+class ShareLinkViewSet(
+    PassUserMixin,
+    CreateModelMixin,
+    RetrieveModelMixin,
+    DestroyModelMixin,
+    ListModelMixin,
+    GenericViewSet,
+):
     model = ShareLink
 
     queryset = ShareLink.objects.all()
@@ -3840,7 +3864,7 @@ class ShareLinkViewSet(ModelViewSet, PassUserMixin):
     ordering_fields = ("created", "expiration", "document")
 
 
-class ShareLinkBundleViewSet(ModelViewSet, PassUserMixin):
+class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
     model = ShareLinkBundle
 
     queryset = ShareLinkBundle.objects.all()
@@ -4197,7 +4221,7 @@ class BulkEditObjectsView(PassUserMixin):
         return Response({"result": "OK"})
 
 
-class WorkflowTriggerViewSet(ModelViewSet):
+class WorkflowTriggerViewSet(ModelViewSet[WorkflowTrigger]):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
 
     serializer_class = WorkflowTriggerSerializer
@@ -4215,7 +4239,7 @@ class WorkflowTriggerViewSet(ModelViewSet):
         return super().partial_update(request, *args, **kwargs)
 
 
-class WorkflowActionViewSet(ModelViewSet):
+class WorkflowActionViewSet(ModelViewSet[WorkflowAction]):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
 
     serializer_class = WorkflowActionSerializer
@@ -4240,7 +4264,7 @@ class WorkflowActionViewSet(ModelViewSet):
         return super().partial_update(request, *args, **kwargs)
 
 
-class WorkflowViewSet(ModelViewSet):
+class WorkflowViewSet(ModelViewSet[Workflow]):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
 
     serializer_class = WorkflowSerializer
@@ -4258,7 +4282,7 @@ class WorkflowViewSet(ModelViewSet):
     )
 
 
-class CustomFieldViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
+class CustomFieldViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[CustomField]):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
 
     serializer_class = CustomFieldSerializer

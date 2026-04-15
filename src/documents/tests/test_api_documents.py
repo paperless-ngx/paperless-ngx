@@ -18,6 +18,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.core import mail
 from django.core.cache import cache
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import DataError
 from django.test import override_settings
 from django.utils import timezone
@@ -1167,6 +1168,43 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIn("all", response.data)
         self.assertCountEqual(response.data["all"], [d.id for d in docs])
 
+    def test_default_ordering_uses_id_as_tiebreaker(self):
+        """
+        GIVEN:
+            - Documents sharing the same created date
+        WHEN:
+            - API request for documents without an explicit ordering
+        THEN:
+            - Results are correctly ordered by created > id
+        """
+        older_doc = Document.objects.create(
+            checksum="older",
+            content="older",
+            created=date(2024, 1, 1),
+        )
+        first_same_date_doc = Document.objects.create(
+            checksum="same-date-1",
+            content="same-date-1",
+            created=date(2024, 1, 2),
+        )
+        second_same_date_doc = Document.objects.create(
+            checksum="same-date-2",
+            content="same-date-2",
+            created=date(2024, 1, 2),
+        )
+
+        response = self.client.get("/api/documents/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            [result["id"] for result in response.data["results"]],
+            [
+                second_same_date_doc.id,
+                first_same_date_doc.id,
+                older_doc.id,
+            ],
+        )
+
     def test_list_with_include_selection_data(self) -> None:
         correspondent = Correspondent.objects.create(name="c1")
         doc_type = DocumentType.objects.create(name="dt1")
@@ -1376,6 +1414,79 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.correspondent_id)
         self.assertIsNone(overrides.document_type_id)
         self.assertIsNone(overrides.tag_ids)
+
+    def test_upload_with_path_traversal_filename_is_reduced_to_basename(self) -> None:
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
+
+        payload = SimpleUploadedFile(
+            "../../outside.pdf",
+            (Path(__file__).parent / "samples" / "simple.pdf").read_bytes(),
+            content_type="application/pdf",
+        )
+
+        response = self.client.post(
+            "/api/documents/post_document/",
+            {"document": payload},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.consume_file_mock.assert_called_once()
+
+        input_doc, overrides = self.get_last_consume_delay_call_args()
+
+        self.assertEqual(input_doc.original_file.name, "outside.pdf")
+        self.assertEqual(overrides.filename, "outside.pdf")
+        self.assertNotIn("..", input_doc.original_file.name)
+        self.assertNotIn("..", overrides.filename)
+        self.assertTrue(
+            input_doc.original_file.resolve(strict=False).is_relative_to(
+                Path(settings.SCRATCH_DIR).resolve(strict=False),
+            ),
+        )
+
+    def test_upload_with_path_traversal_content_disposition_filename_is_reduced_to_basename(
+        self,
+    ) -> None:
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
+
+        pdf_bytes = (Path(__file__).parent / "samples" / "simple.pdf").read_bytes()
+        boundary = "paperless-boundary"
+        payload = (
+            (
+                f"--{boundary}\r\n"
+                'Content-Disposition: form-data; name="document"; '
+                'filename="../../outside.pdf"\r\n'
+                "Content-Type: application/pdf\r\n\r\n"
+            ).encode()
+            + pdf_bytes
+            + f"\r\n--{boundary}--\r\n".encode()
+        )
+
+        response = self.client.generic(
+            "POST",
+            "/api/documents/post_document/",
+            payload,
+            content_type=f"multipart/form-data; boundary={boundary}",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.consume_file_mock.assert_called_once()
+
+        input_doc, overrides = self.get_last_consume_delay_call_args()
+
+        self.assertEqual(input_doc.original_file.name, "outside.pdf")
+        self.assertEqual(overrides.filename, "outside.pdf")
+        self.assertNotIn("..", input_doc.original_file.name)
+        self.assertNotIn("..", overrides.filename)
+        self.assertTrue(
+            input_doc.original_file.resolve(strict=False).is_relative_to(
+                Path(settings.SCRATCH_DIR).resolve(strict=False),
+            ),
+        )
 
     def test_document_filters_use_latest_version_content(self) -> None:
         root = Document.objects.create(
@@ -3035,6 +3146,77 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         # modified was updated to today
         self.assertEqual(doc.modified.day, timezone.now().day)
 
+    def test_delete_note_missing_id(self) -> None:
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - API DELETE request to notes endpoint without an id query param
+            - API DELETE request to notes endpoint with an empty id query param
+        THEN:
+            - HTTP 400 is returned
+        """
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document",
+        )
+
+        response = self.client.delete(
+            f"/api/documents/{doc.pk}/notes/",
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        response = self.client.delete(
+            f"/api/documents/{doc.pk}/notes/?id=",
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_delete_note_invalid_id(self) -> None:
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - API DELETE request to notes endpoint with a non-integer note id
+        THEN:
+            - HTTP 400 is returned
+        """
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document",
+        )
+
+        response = self.client.delete(
+            f"/api/documents/{doc.pk}/notes/?id=notaninteger",
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_delete_note_nonexistent_id(self) -> None:
+        """
+        GIVEN:
+            - Existing document, no notes
+        WHEN:
+            - API DELETE request to notes endpoint with a non-existent note id
+        THEN:
+            - HTTP 404 is returned
+        """
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document",
+        )
+
+        response = self.client.delete(
+            f"/api/documents/{doc.pk}/notes/?id=99999",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_get_notes_no_doc(self) -> None:
         """
         GIVEN:
@@ -3305,7 +3487,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(create_resp.status_code, status.HTTP_201_CREATED)
         self.assertEqual(create_resp.data["document"], doc.pk)
 
-    def test_next_asn(self) -> None:
+    def test_next_asn(self):
         """
         GIVEN:
             - Existing documents with ASNs, highest owned by user2

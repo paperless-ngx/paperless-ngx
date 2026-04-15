@@ -101,7 +101,7 @@ and `mariadb`.
 
 #### [`PAPERLESS_DB_OPTIONS=<options>`](#PAPERLESS_DB_OPTIONS) {#PAPERLESS_DB_OPTIONS}
 
-: Advanced database connection options as a semicolon-delimited key-value string.
+: Advanced database connection options as a comma-delimited key-value string.
 Keys and values are separated by `=`. Dot-notation produces nested option
 dictionaries; for example, `pool.max_size=20` sets
 `OPTIONS["pool"]["max_size"] = 20`.
@@ -123,18 +123,36 @@ dictionaries; for example, `pool.max_size=20` sets
         to handle all pool connections across all workers:
         `(web_workers + celery_workers) * pool.max_size + safety_margin`.
 
+    !!! note "SQLite defaults"
+
+        SQLite connections are pre-configured with WAL journal mode, optimised
+        synchronous and cache settings, and a 5-second busy timeout. These defaults
+        suit most deployments. To override `init_command`, use `;` between PRAGMAs
+        within the value and `,` between options:
+
+        ```bash
+        PAPERLESS_DB_OPTIONS="init_command=PRAGMA journal_mode=DELETE;PRAGMA synchronous=FULL,transaction_mode=DEFERRED"
+        ```
+
+    !!! note "MariaDB: READ COMMITTED isolation level"
+
+        MariaDB connections default to `READ COMMITTED` isolation level, which
+        eliminates gap locking and reduces deadlock frequency. If binary logging is
+        enabled on your MariaDB server, this requires `binlog_format=ROW` (the
+        default for most managed MariaDB instances). Statement-based replication is
+        not compatible with `READ COMMITTED`.
+
     **Examples:**
 
     ```bash title="PostgreSQL: require SSL, set a custom CA certificate, and limit the pool size"
-    PAPERLESS_DB_OPTIONS="sslmode=require;sslrootcert=/certs/ca.pem;pool.max_size=5"
+    PAPERLESS_DB_OPTIONS="sslmode=require,sslrootcert=/certs/ca.pem,pool.max_size=5"
     ```
 
     ```bash title="MariaDB: require SSL with a custom CA certificate"
-    PAPERLESS_DB_OPTIONS="ssl_mode=REQUIRED;ssl.ca=/certs/ca.pem"
+    PAPERLESS_DB_OPTIONS="ssl_mode=REQUIRED,ssl.ca=/certs/ca.pem"
     ```
 
-    ```bash title="SQLite: set a busy timeout of 30 seconds"
-    # PostgreSQL: set a connection timeout
+    ```bash title="PostgreSQL or MariaDB: set a connection timeout"
     PAPERLESS_DB_OPTIONS="connect_timeout=10"
     ```
 

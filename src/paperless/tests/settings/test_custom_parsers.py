@@ -296,8 +296,19 @@ class TestParseDbSettings:
                 {
                     "default": {
                         "ENGINE": "django.db.backends.sqlite3",
-                        "NAME": None,  # Will be replaced with tmp_path
-                        "OPTIONS": {},
+                        "NAME": None,  # replaced with tmp_path in test body
+                        "OPTIONS": {
+                            "init_command": (
+                                "PRAGMA journal_mode=WAL;"
+                                "PRAGMA synchronous=NORMAL;"
+                                "PRAGMA busy_timeout=5000;"
+                                "PRAGMA temp_store=MEMORY;"
+                                "PRAGMA mmap_size=134217728;"
+                                "PRAGMA journal_size_limit=67108864;"
+                                "PRAGMA cache_size=-8000"
+                            ),
+                            "transaction_mode": "IMMEDIATE",
+                        },
                     },
                 },
                 id="default-sqlite",
@@ -310,13 +321,40 @@ class TestParseDbSettings:
                 {
                     "default": {
                         "ENGINE": "django.db.backends.sqlite3",
-                        "NAME": None,  # Will be replaced with tmp_path
+                        "NAME": None,
                         "OPTIONS": {
+                            "init_command": (
+                                "PRAGMA journal_mode=WAL;"
+                                "PRAGMA synchronous=NORMAL;"
+                                "PRAGMA busy_timeout=5000;"
+                                "PRAGMA temp_store=MEMORY;"
+                                "PRAGMA mmap_size=134217728;"
+                                "PRAGMA journal_size_limit=67108864;"
+                                "PRAGMA cache_size=-8000"
+                            ),
+                            "transaction_mode": "IMMEDIATE",
                             "timeout": 30,
                         },
                     },
                 },
                 id="sqlite-with-timeout-override",
+            ),
+            pytest.param(
+                {
+                    "PAPERLESS_DBENGINE": "sqlite",
+                    "PAPERLESS_DB_OPTIONS": "init_command=PRAGMA journal_mode=DELETE;PRAGMA synchronous=FULL,transaction_mode=DEFERRED",
+                },
+                {
+                    "default": {
+                        "ENGINE": "django.db.backends.sqlite3",
+                        "NAME": None,
+                        "OPTIONS": {
+                            "init_command": "PRAGMA journal_mode=DELETE;PRAGMA synchronous=FULL",
+                            "transaction_mode": "DEFERRED",
+                        },
+                    },
+                },
+                id="sqlite-options-override",
             ),
             pytest.param(
                 {
@@ -335,6 +373,7 @@ class TestParseDbSettings:
                             "sslrootcert": None,
                             "sslcert": None,
                             "sslkey": None,
+                            "application_name": "paperless-ngx",
                         },
                     },
                 },
@@ -348,7 +387,7 @@ class TestParseDbSettings:
                     "PAPERLESS_DBNAME": "customdb",
                     "PAPERLESS_DBUSER": "customuser",
                     "PAPERLESS_DBPASS": "custompass",
-                    "PAPERLESS_DB_OPTIONS": "pool.max_size=50;pool.min_size=2;sslmode=require",
+                    "PAPERLESS_DB_OPTIONS": "pool.max_size=50,pool.min_size=2,sslmode=require",
                 },
                 {
                     "default": {
@@ -363,6 +402,7 @@ class TestParseDbSettings:
                             "sslrootcert": None,
                             "sslcert": None,
                             "sslkey": None,
+                            "application_name": "paperless-ngx",
                             "pool": {
                                 "min_size": 2,
                                 "max_size": 50,
@@ -390,6 +430,7 @@ class TestParseDbSettings:
                             "sslrootcert": None,
                             "sslcert": None,
                             "sslkey": None,
+                            "application_name": "paperless-ngx",
                             "pool": {
                                 "min_size": 1,
                                 "max_size": 10,
@@ -419,6 +460,7 @@ class TestParseDbSettings:
                             "sslrootcert": "/certs/ca.crt",
                             "sslcert": None,
                             "sslkey": None,
+                            "application_name": "paperless-ngx",
                             "connect_timeout": 30,
                         },
                     },
@@ -447,6 +489,7 @@ class TestParseDbSettings:
                                 "cert": None,
                                 "key": None,
                             },
+                            "isolation_level": "read committed",
                         },
                     },
                 },
@@ -455,18 +498,17 @@ class TestParseDbSettings:
             pytest.param(
                 {
                     "PAPERLESS_DBENGINE": "mariadb",
-                    "PAPERLESS_DBHOST": "paperless-mariadb-host",
-                    "PAPERLESS_DBPORT": "5555",
+                    "PAPERLESS_DBHOST": "mariahost",
+                    "PAPERLESS_DBNAME": "paperlessdb",
                     "PAPERLESS_DBUSER": "my-cool-user",
                     "PAPERLESS_DBPASS": "my-secure-password",
-                    "PAPERLESS_DB_OPTIONS": "ssl.ca=/path/to/ca.pem;ssl_mode=REQUIRED",
+                    "PAPERLESS_DB_OPTIONS": "ssl_mode=REQUIRED,ssl.ca=/path/to/ca.pem",
                 },
                 {
                     "default": {
                         "ENGINE": "django.db.backends.mysql",
-                        "HOST": "paperless-mariadb-host",
-                        "PORT": 5555,
-                        "NAME": "paperless",
+                        "HOST": "mariahost",
+                        "NAME": "paperlessdb",
                         "USER": "my-cool-user",
                         "PASSWORD": "my-secure-password",
                         "OPTIONS": {
@@ -479,6 +521,7 @@ class TestParseDbSettings:
                                 "cert": None,
                                 "key": None,
                             },
+                            "isolation_level": "read committed",
                         },
                     },
                 },
@@ -512,6 +555,7 @@ class TestParseDbSettings:
                                 "key": "/certs/client.key",
                             },
                             "connect_timeout": 25,
+                            "isolation_level": "read committed",
                         },
                     },
                 },
@@ -527,10 +571,8 @@ class TestParseDbSettings:
         expected_database_settings: dict[str, dict],
     ) -> None:
         """Test various database configurations with defaults and overrides."""
-        # Clear environment and set test vars
         mocker.patch.dict(os.environ, env_vars, clear=True)
 
-        # Update expected paths with actual tmp_path
         if (
             "default" in expected_database_settings
             and expected_database_settings["default"]["NAME"] is None
