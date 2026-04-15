@@ -2436,7 +2436,6 @@ class TaskSerializerV10(OwnedObjectSerializer):
     related_document_ids = serializers.ListField(
         child=serializers.IntegerField(),
         read_only=True,
-        source="related_document_ids",
     )
     task_type_display = serializers.CharField(
         source="get_task_type_display",

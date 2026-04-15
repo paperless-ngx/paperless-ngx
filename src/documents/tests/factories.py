@@ -11,6 +11,7 @@ from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
+from documents.models import PaperlessTask
 from documents.models import StoragePath
 from documents.models import Tag
 
@@ -65,3 +66,17 @@ class DocumentFactory(DjangoModelFactory):
     correspondent = None
     document_type = None
     storage_path = None
+
+
+class PaperlessTaskFactory(DjangoModelFactory):
+    class Meta:
+        model = PaperlessTask
+
+    task_id = factory.LazyFunction(lambda: str(__import__("uuid").uuid4()))
+    task_type = PaperlessTask.TaskType.CONSUME_FILE
+    trigger_source = PaperlessTask.TriggerSource.WEB_UI
+    status = PaperlessTask.Status.PENDING
+    input_data = factory.LazyFunction(dict)
+    result_data = None
+    result_message = None
+    acknowledged = False
