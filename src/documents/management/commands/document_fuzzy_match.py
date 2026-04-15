@@ -27,9 +27,6 @@ class _WorkResult:
     doc_two_pk: int
     ratio: float
 
-    def __lt__(self, other: "_WorkResult") -> bool:
-        return self.doc_one_pk < other.doc_one_pk
-
 
 def _process_and_match(work: _WorkPackage) -> _WorkResult:
     """
@@ -206,7 +203,7 @@ class Command(PaperlessCommand):
                     ):
                         yield proc_result.result
 
-        matches = sorted(_iter_matches())
+        matches = sorted(_iter_matches(), key=lambda m: m.ratio, reverse=True)
         maybe_delete_ids = self._render_results(
             matches,
             opt_ratio=opt_ratio,
