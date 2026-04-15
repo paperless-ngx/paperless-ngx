@@ -224,7 +224,23 @@ def parse_db_settings(data_dir: Path) -> dict[str, dict[str, Any]]:
                 "ENGINE": "django.db.backends.sqlite3",
                 "NAME": str((data_dir / "db.sqlite3").resolve()),
             }
-            base_options = {}
+            base_options = {
+                # Django splits init_command on ";" and calls conn.execute()
+                # once per statement, so multiple PRAGMAs work correctly.
+                # foreign_keys is omitted — Django sets it natively.
+                "init_command": (
+                    "PRAGMA journal_mode=WAL;"
+                    "PRAGMA synchronous=NORMAL;"
+                    "PRAGMA busy_timeout=5000;"
+                    "PRAGMA temp_store=MEMORY;"
+                    "PRAGMA mmap_size=134217728;"
+                    "PRAGMA journal_size_limit=67108864;"
+                    "PRAGMA cache_size=-8000"  # negative = KiB; -8000 ≈ 8 MB
+                ),
+                # IMMEDIATE acquires the write lock at BEGIN, ensuring
+                # busy_timeout is respected from the start of the transaction.
+                "transaction_mode": "IMMEDIATE",
+            }
 
         case "postgresql":
             db_config = {
@@ -240,6 +256,7 @@ def parse_db_settings(data_dir: Path) -> dict[str, dict[str, Any]]:
                 "sslrootcert": os.getenv("PAPERLESS_DBSSLROOTCERT"),
                 "sslcert": os.getenv("PAPERLESS_DBSSLCERT"),
                 "sslkey": os.getenv("PAPERLESS_DBSSLKEY"),
+                "application_name": "paperless-ngx",
             }
 
             if (pool_size := get_int_from_env("PAPERLESS_DB_POOLSIZE")) is not None:
@@ -267,6 +284,12 @@ def parse_db_settings(data_dir: Path) -> dict[str, dict[str, Any]]:
                     "cert": os.getenv("PAPERLESS_DBSSLCERT"),
                     "key": os.getenv("PAPERLESS_DBSSLKEY"),
                 },
+                # READ COMMITTED eliminates gap locking and reduces deadlocks.
+                # Django also defaults to "read committed" for MySQL/MariaDB, but
+                # we set it explicitly so the intent is clear and survives any
+                # future changes to Django's default.
+                # Requires binlog_format=ROW if binary logging is enabled.
+                "isolation_level": "read committed",
             }
         case _:  # pragma: no cover
             raise NotImplementedError(engine)
@@ -287,7 +310,7 @@ def parse_db_settings(data_dir: Path) -> dict[str, dict[str, Any]]:
     db_config["OPTIONS"] = parse_dict_from_str(
         os.getenv("PAPERLESS_DB_OPTIONS"),
         defaults=base_options,
-        separator=";",
+        separator=",",
         type_map={
             # SQLite options
             "timeout": int,
