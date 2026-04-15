@@ -169,19 +169,28 @@ class Command(PaperlessCommand):
         )
 
         # combinations() generates each unique pair exactly once -- no checked_pairs set needed.
-        work_pkgs: list[_WorkPackage] = [
-            _WorkPackage(pk_a, ca, pk_b, cb, opt_ratio)
-            for (pk_a, ca), (pk_b, cb) in combinations(slim_docs, 2)
-            if ca.strip() and cb.strip()
-        ]
+        # The total is computed cheaply so the progress bar can start immediately without
+        # materialising all pairs up front (n*(n-1)/2 can be hundreds of thousands).
+        n = len(slim_docs)
+        total_pairs = n * (n - 1) // 2
+
+        def _work_gen():
+            for (pk_a, ca), (pk_b, cb) in combinations(slim_docs, 2):
+                if ca.strip() and cb.strip():
+                    yield _WorkPackage(pk_a, ca, pk_b, cb, opt_ratio)
 
         def _iter_matches():
             if self.process_count == 1:
-                for work in self.track(work_pkgs, description="Matching..."):
+                for work in self.track(
+                    _work_gen(),
+                    description="Matching...",
+                    total=total_pairs,
+                ):
                     result = _process_and_match(work)
                     if result.ratio >= opt_ratio:
                         yield result
             else:  # pragma: no cover
+                work_pkgs = list(_work_gen())
                 for proc_result in self.process_parallel(
                     _process_and_match,
                     work_pkgs,
