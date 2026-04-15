@@ -1502,7 +1502,13 @@ class DocumentViewSet(
             ):
                 return HttpResponseForbidden("Insufficient permissions to delete notes")
 
-            note = Note.objects.get(id=int(request.GET.get("id")), document=doc)
+            note_id = request.GET.get("id")
+            if not note_id:
+                raise ValidationError({"id": "This field is required."})
+            try:
+                note = Note.objects.get(id=int(note_id), document=doc)
+            except (Note.DoesNotExist, ValueError):
+                raise NotFound(f"Note {note_id} does not exist.")
             if settings.AUDIT_LOG_ENABLED:
                 LogEntry.objects.log_create(
                     instance=doc,
