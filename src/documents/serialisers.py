@@ -911,6 +911,8 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer[CustomFieldInsta
                     getattr(request, "user", None) if request is not None else None,
                     doc_ids,
                 )
+            elif field.data_type == CustomField.FieldDataType.DATE:
+                data["value"] = serializers.DateField().to_internal_value(data["value"])
 
         return data
 

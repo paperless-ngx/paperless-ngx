@@ -205,6 +205,20 @@ describe('TagsComponent', () => {
     expect(component.value).toEqual([2, 1])
   })
 
+  it('should not duplicate parents when adding sibling nested tags', () => {
+    const root: Tag = { id: 1, name: 'root' }
+    const parent: Tag = { id: 2, name: 'parent', parent: 1 }
+    const leafA: Tag = { id: 3, name: 'leaf-a', parent: 2 }
+    const leafB: Tag = { id: 4, name: 'leaf-b', parent: 2 }
+    component.tags = [root, parent, leafA, leafB]
+
+    component.value = []
+    component.addTag(3)
+    component.addTag(4)
+
+    expect(component.value).toEqual([3, 2, 1, 4])
+  })
+
   it('should return ancestors from root to parent using getParentChain', () => {
     const root: Tag = { id: 1, name: 'root' }
     const mid: Tag = { id: 2, name: 'mid', parent: 1 }

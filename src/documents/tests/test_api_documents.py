@@ -1168,6 +1168,43 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIn("all", response.data)
         self.assertCountEqual(response.data["all"], [d.id for d in docs])
 
+    def test_default_ordering_uses_id_as_tiebreaker(self):
+        """
+        GIVEN:
+            - Documents sharing the same created date
+        WHEN:
+            - API request for documents without an explicit ordering
+        THEN:
+            - Results are correctly ordered by created > id
+        """
+        older_doc = Document.objects.create(
+            checksum="older",
+            content="older",
+            created=date(2024, 1, 1),
+        )
+        first_same_date_doc = Document.objects.create(
+            checksum="same-date-1",
+            content="same-date-1",
+            created=date(2024, 1, 2),
+        )
+        second_same_date_doc = Document.objects.create(
+            checksum="same-date-2",
+            content="same-date-2",
+            created=date(2024, 1, 2),
+        )
+
+        response = self.client.get("/api/documents/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            [result["id"] for result in response.data["results"]],
+            [
+                second_same_date_doc.id,
+                first_same_date_doc.id,
+                older_doc.id,
+            ],
+        )
+
     def test_list_with_include_selection_data(self) -> None:
         correspondent = Correspondent.objects.create(name="c1")
         doc_type = DocumentType.objects.create(name="dt1")
@@ -3379,7 +3416,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(create_resp.status_code, status.HTTP_201_CREATED)
         self.assertEqual(create_resp.data["document"], doc.pk)
 
-    def test_next_asn(self) -> None:
+    def test_next_asn(self):
         """
         GIVEN:
             - Existing documents with ASNs, highest owned by user2

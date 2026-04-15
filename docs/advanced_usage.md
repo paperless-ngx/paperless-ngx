@@ -842,7 +842,7 @@ MariaDB: `mariadb-tzinfo-to-sql /usr/share/zoneinfo | mariadb -u root mysql -p`
 
 ## Barcodes {#barcodes}
 
-Paperless is able to utilize barcodes for automatically performing some tasks.
+Paperless is able to utilize barcodes for automatically performing some tasks. Barcodes are only supported for PDF documents or TIFF, [if enabled](configuration.md#PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT).
 
 At this time, the library utilized for detection of barcodes supports the following types:
 

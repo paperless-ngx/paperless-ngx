@@ -87,6 +87,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.filters import OrderingFilter
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import GenericAPIView
+from rest_framework.mixins import CreateModelMixin
 from rest_framework.mixins import DestroyModelMixin
 from rest_framework.mixins import ListModelMixin
 from rest_framework.mixins import RetrieveModelMixin
@@ -909,7 +910,7 @@ class DocumentViewSet(
         return (
             Document.objects.filter(root_document__isnull=True)
             .distinct()
-            .order_by("-created")
+            .order_by("-created", "-id")
             .annotate(effective_content=Coalesce(latest_version_content, F("content")))
             .annotate(num_notes=Count("notes"))
             .select_related("correspondent", "storage_path", "document_type", "owner")
@@ -3739,7 +3740,14 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
             )
 
 
-class ShareLinkViewSet(PassUserMixin, ModelViewSet[ShareLink]):
+class ShareLinkViewSet(
+    PassUserMixin,
+    CreateModelMixin,
+    RetrieveModelMixin,
+    DestroyModelMixin,
+    ListModelMixin,
+    GenericViewSet,
+):
     model = ShareLink
 
     queryset = ShareLink.objects.all()
