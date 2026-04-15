@@ -2,11 +2,14 @@ import uuid
 from unittest import mock
 
 import pytest
+import pytest_mock
 
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.models import PaperlessTask
+from documents.signals.handlers import task_revoked_handler
+from documents.tests.factories import PaperlessTaskFactory
 
 
 @pytest.fixture
@@ -144,12 +147,7 @@ class TestBeforeTaskPublishHandler:
 @pytest.mark.django_db
 class TestTaskPrerunHandler:
     def test_marks_task_started(self):
-        task = PaperlessTask.objects.create(
-            task_id=str(uuid.uuid4()),
-            task_type=PaperlessTask.TaskType.CONSUME_FILE,
-            trigger_source=PaperlessTask.TriggerSource.MANUAL,
-            status=PaperlessTask.Status.PENDING,
-        )
+        task = PaperlessTaskFactory(status=PaperlessTask.Status.PENDING)
         from documents.signals.handlers import task_prerun_handler
 
         task_prerun_handler(task_id=task.task_id)
@@ -173,10 +171,8 @@ class TestTaskPostrunHandler:
     def _started_task(self) -> PaperlessTask:
         from django.utils import timezone
 
-        return PaperlessTask.objects.create(
-            task_id=str(uuid.uuid4()),
+        return PaperlessTaskFactory(
             task_type=PaperlessTask.TaskType.TRAIN_CLASSIFIER,
-            trigger_source=PaperlessTask.TriggerSource.MANUAL,
             status=PaperlessTask.Status.STARTED,
             date_started=timezone.now(),
         )
@@ -255,10 +251,8 @@ class TestTaskFailureHandler:
     def test_records_failure_with_exception(self):
         from django.utils import timezone
 
-        task = PaperlessTask.objects.create(
-            task_id=str(uuid.uuid4()),
+        task = PaperlessTaskFactory(
             task_type=PaperlessTask.TaskType.CONSUME_FILE,
-            trigger_source=PaperlessTask.TriggerSource.WEB_UI,
             status=PaperlessTask.Status.STARTED,
             date_started=timezone.now(),
         )
@@ -280,10 +274,8 @@ class TestTaskFailureHandler:
 
         from django.utils import timezone
 
-        task = PaperlessTask.objects.create(
-            task_id=str(uuid.uuid4()),
+        task = PaperlessTaskFactory(
             task_type=PaperlessTask.TaskType.CONSUME_FILE,
-            trigger_source=PaperlessTask.TriggerSource.WEB_UI,
             status=PaperlessTask.Status.STARTED,
             date_started=timezone.now(),
         )
@@ -307,3 +299,29 @@ class TestTaskFailureHandler:
         from documents.signals.handlers import task_failure_handler
 
         task_failure_handler(task_id=None, exception=ValueError("x"), traceback=None)
+
+
+@pytest.mark.django_db
+class TestTaskRevokedHandler:
+    def test_marks_task_revoked(self, mocker: pytest_mock.MockerFixture):
+        """task_revoked_handler moves a queued task to REVOKED and stamps date_done."""
+        task = PaperlessTaskFactory(status=PaperlessTask.Status.PENDING)
+        request = mocker.MagicMock()
+        request.id = task.task_id
+
+        task_revoked_handler(request=request)
+        task.refresh_from_db()
+        assert task.status == PaperlessTask.Status.REVOKED
+        assert task.date_done is not None
+
+    def test_ignores_none_request(self):
+        """task_revoked_handler must not raise when request is None."""
+
+        task_revoked_handler(request=None)  # must not raise
+
+    def test_ignores_unknown_task_id(self, mocker: pytest_mock.MockerFixture):
+        """task_revoked_handler must not raise for a task_id not in the database."""
+        request = mocker.MagicMock()
+        request.id = "nonexistent-id"
+
+        task_revoked_handler(request=request)  # must not raise

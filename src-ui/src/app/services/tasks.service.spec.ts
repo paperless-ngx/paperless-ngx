@@ -129,6 +129,21 @@ describe('TasksService', () => {
     expect(tasksService.startedFileTasks).toHaveLength(1)
   })
 
+  it('calls acknowledge_all api endpoint on dismissAll and reloads', () => {
+    tasksService.dismissAllTasks().subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}tasks/acknowledge_all/`
+    )
+    expect(req.request.method).toEqual('POST')
+    req.flush({})
+    // reload is then called
+    httpTestingController
+      .expectOne(
+        `${environment.apiBaseUrl}tasks/?task_type=consume_file&acknowledged=false`
+      )
+      .flush([])
+  })
+
   it('supports running tasks', () => {
     tasksService.run(PaperlessTaskType.SanityCheck).subscribe((res) => {
       expect(res).toEqual({

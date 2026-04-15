@@ -481,6 +481,13 @@ class TestSummary:
         assert by_type["consume_file"]["failure_count"] == 1
         assert by_type["train_classifier"]["total_count"] == 1
 
+    def test_rejects_invalid_days_param(self, admin_client: APIClient) -> None:
+        """?days=invalid returns 400 with an error message."""
+        response = admin_client.get(ENDPOINT + "summary/", {"days": "invalid"})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "days" in response.data
+
 
 @pytest.mark.django_db()
 class TestActive:

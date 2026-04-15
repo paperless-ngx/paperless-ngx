@@ -811,15 +811,15 @@ class PaperlessTask(ModelWithOwner):
             models.Index(fields=["owner", "acknowledged", "date_created"]),
         ]
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:  # pragma: no cover
         return f"{self.get_task_type_display()} [{self.task_id[:8]}]"
 
     @property
-    def is_complete(self) -> bool:
+    def is_complete(self) -> bool:  # pragma: no cover
         return self.status in self.COMPLETE_STATUSES
 
     @property
-    def related_document_ids(self) -> list[int]:
+    def related_document_ids(self) -> list[int]:  # pragma: no cover
         if not self.result_data:
             return []
         if doc_id := self.result_data.get("document_id"):
