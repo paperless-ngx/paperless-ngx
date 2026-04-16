@@ -514,9 +514,8 @@ class CustomFieldQueryParser:
         value_field_name = CustomFieldInstance.get_value_field_name(
             custom_field.data_type,
         )
-        if (
-            custom_field.data_type == CustomField.FieldDataType.MONETARY
-            and op in self.EXPR_BY_CATEGORY["arithmetic"]
+        if custom_field.data_type == CustomField.FieldDataType.MONETARY and (
+            op in self.EXPR_BY_CATEGORY["arithmetic"] or op in {"exact", "in"}
         ):
             value_field_name = "value_monetary_amount"
         has_field = Q(custom_fields__field=custom_field)

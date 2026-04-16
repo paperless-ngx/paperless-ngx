@@ -453,6 +453,32 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
             ),
         )
 
+    def test_exact_monetary(self) -> None:
+        # "exact" should match by numeric amount, ignoring currency code prefix.
+        self._assert_query_match_predicate(
+            ["monetary_field", "exact", "100"],
+            lambda document: (
+                "monetary_field" in document
+                and document["monetary_field"] == "USD100.00"
+            ),
+        )
+        self._assert_query_match_predicate(
+            ["monetary_field", "exact", "101"],
+            lambda document: (
+                "monetary_field" in document and document["monetary_field"] == "101.00"
+            ),
+        )
+
+    def test_in_monetary(self) -> None:
+        # "in" should match by numeric amount, ignoring currency code prefix.
+        self._assert_query_match_predicate(
+            ["monetary_field", "in", ["100", "50"]],
+            lambda document: (
+                "monetary_field" in document
+                and document["monetary_field"] in {"USD100.00", "EUR50.00"}
+            ),
+        )
+
     # ==========================================================#
     # Subset check (document link field only)                   #
     # ==========================================================#
