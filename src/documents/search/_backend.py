@@ -21,6 +21,7 @@ from guardian.shortcuts import get_users_with_perms
 
 from documents.search._normalize import ascii_fold
 from documents.search._query import build_permission_filter
+from documents.search._query import parse_simple_highlight_query
 from documents.search._query import parse_simple_text_query
 from documents.search._query import parse_simple_title_query
 from documents.search._query import parse_user_query
@@ -335,6 +336,17 @@ class TantivyBackend:
         else:
             return parse_user_query(self._index, query, tz)
 
+    def _parse_highlight_query(
+        self,
+        query: str,
+        search_mode: SearchMode,
+    ) -> tantivy.Query:
+        if search_mode is SearchMode.TEXT:
+            # title does not supported highlight for now
+            return parse_simple_highlight_query(self._index, query, ["content"])
+        else:
+            return self._parse_query(query, search_mode)
+
     def _apply_permission_filter(
         self,
         query: tantivy.Query,
@@ -549,6 +561,7 @@ class TantivyBackend:
 
         self._ensure_open()
         user_query = self._parse_query(query, search_mode)
+        highlight_query = self._parse_highlight_query(query, search_mode)
 
         # For notes_text snippet generation, we need a query that targets the
         # notes_text field directly. user_query may contain JSON-field terms
@@ -601,7 +614,7 @@ class TantivyBackend:
                 if snippet_generator is None:
                     snippet_generator = tantivy.SnippetGenerator.create(
                         searcher,
-                        user_query,
+                        highlight_query,
                         self._schema,
                         "content",
                     )
@@ -610,7 +623,7 @@ class TantivyBackend:
                 if content_html:
                     highlights["content"] = content_html
 
-                if "notes_text" in doc_dict:
+                if search_mode is SearchMode.QUERY and "notes_text" in doc_dict:
                     # Use notes_text (plain text) for snippet generation — tantivy's
                     # SnippetGenerator does not support JSON fields.
                     if notes_snippet_generator is None:
