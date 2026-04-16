@@ -3951,7 +3951,7 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
             task_func, task_kwargs = self._RUNNABLE_TASKS[task_type]
             async_result = task_func.apply_async(
                 kwargs=task_kwargs,
-                headers={"trigger_source": "manual"},
+                headers={"trigger_source": PaperlessTask.TriggerSource.MANUAL},
             )
             return Response({"task_id": async_result.id})
         except Exception as e:

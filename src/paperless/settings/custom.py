@@ -183,6 +183,7 @@ def parse_beat_schedule() -> dict:
             "schedule": crontab(minute, hour, day_week, day_month, month),
             "options": {
                 **task["options"],
+                # PaperlessTask.TriggerSource.SCHEDULED -- models can't be imported here
                 "headers": {"trigger_source": "scheduled"},
             },
         }

@@ -39,7 +39,7 @@ def queue_llm_index_update_if_needed(*, rebuild: bool, reason: str) -> bool:
 
     llmindex_index.apply_async(
         kwargs={"rebuild": rebuild},
-        headers={"trigger_source": "system"},
+        headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
     )
     logger.warning(
         "Queued LLM index update%s: %s",
