@@ -3746,18 +3746,7 @@ class RemoteVersionView(GenericAPIView[Any]):
     acknowledge=extend_schema(
         operation_id="acknowledge_tasks",
         description="Acknowledge a list of tasks",
-        request={
-            "application/json": {
-                "type": "object",
-                "properties": {
-                    "tasks": {
-                        "type": "array",
-                        "items": {"type": "integer"},
-                    },
-                },
-                "required": ["tasks"],
-            },
-        },
+        request=AcknowledgeTasksViewSerializer,
         responses={
             (200, "application/json"): inline_serializer(
                 name="AcknowledgeTasks",
@@ -3765,7 +3754,33 @@ class RemoteVersionView(GenericAPIView[Any]):
                     "result": serializers.IntegerField(),
                 },
             ),
-            (400, "application/json"): None,
+        },
+    ),
+    acknowledge_all=extend_schema(
+        operation_id="acknowledge_all_tasks",
+        description="Acknowledge all completed tasks visible to the requesting user",
+        responses={
+            (200, "application/json"): inline_serializer(
+                name="AcknowledgeAllTasks",
+                fields={
+                    "result": serializers.IntegerField(),
+                },
+            ),
+        },
+    ),
+    run=extend_schema(
+        operation_id="run_task",
+        description="Manually dispatch a background task. Staff only.",
+        request=RunTaskSerializer,
+        responses={
+            (200, "application/json"): inline_serializer(
+                name="RunTask",
+                fields={"task_id": serializers.CharField()},
+            ),
+            (400, "application/json"): inline_serializer(
+                name="RunTaskError",
+                fields={"error": serializers.CharField()},
+            ),
         },
     ),
     summary=extend_schema(
