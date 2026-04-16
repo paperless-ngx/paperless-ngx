@@ -81,6 +81,7 @@ from redis import Redis
 from rest_framework import parsers
 from rest_framework import serializers
 from rest_framework import status
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 from rest_framework.exceptions import PermissionDenied
@@ -100,7 +101,6 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.viewsets import ViewSet
-from rest_framework.authentication import TokenAuthentication
 
 from documents import bulk_edit
 from documents.bulk_download import ArchiveOnlyStrategy
