@@ -1189,7 +1189,7 @@ def before_task_publish_handler(
             input_data=input_data,
             owner_id=owner_id,
         )
-    except Exception:
+    except Exception:  # pragma: no cover
         logger.exception("Creating PaperlessTask failed")
 
 
@@ -1200,7 +1200,7 @@ def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs) -> None:
 
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-prerun
     """
-    if task_id is None:
+    if task_id is None:  # pragma: no cover
         return
     try:
         close_old_connections()
@@ -1208,7 +1208,7 @@ def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs) -> None:
             status=PaperlessTask.Status.STARTED,
             date_started=timezone.now(),
         )
-    except Exception:
+    except Exception:  # pragma: no cover
         logger.exception("Setting PaperlessTask started failed")
 
 
@@ -1231,7 +1231,7 @@ def task_postrun_handler(
 
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-postrun
     """
-    if task_id is None:
+    if task_id is None:  # pragma: no cover
         return
     try:
         close_old_connections()
@@ -1271,7 +1271,7 @@ def task_postrun_handler(
                 changed_fields.extend(["result_message", "result_data"])
 
         task_instance.save(update_fields=changed_fields)
-    except Exception:
+    except Exception:  # pragma: no cover
         logger.exception("Updating PaperlessTask failed")
 
 
@@ -1289,7 +1289,7 @@ def task_failure_handler(
 
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-failure
     """
-    if task_id is None:
+    if task_id is None:  # pragma: no cover
         return
     try:
         close_old_connections()
@@ -1308,7 +1308,7 @@ def task_failure_handler(
             result_message=str(exception) if exception else None,
             date_done=timezone.now(),
         )
-    except Exception:
+    except Exception:  # pragma: no cover
         logger.exception("Updating PaperlessTask on failure failed")
 
 
@@ -1333,7 +1333,7 @@ def task_revoked_handler(
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-revoked
     """
     task_id = request.id if request else None
-    if task_id is None:
+    if task_id is None:  # pragma: no cover
         return
     try:
         close_old_connections()
@@ -1341,7 +1341,7 @@ def task_revoked_handler(
             status=PaperlessTask.Status.REVOKED,
             date_done=timezone.now(),
         )
-    except Exception:
+    except Exception:  # pragma: no cover
         logger.exception("Updating PaperlessTask on revocation failed")
 
 

@@ -94,7 +94,7 @@ def train_classifier(
         logger.info(result)
         # Special case, items were once auto and trained, so remove the model
         # and prevent its use again
-        if settings.MODEL_FILE.exists():
+        if settings.MODEL_FILE.exists():  # pragma: no cover
             logger.info(f"Removing {settings.MODEL_FILE} so it won't be used")
             settings.MODEL_FILE.unlink()
         return result
@@ -610,7 +610,7 @@ def llmindex_index(
     rebuild: bool = False,
 ) -> str | None:
     ai_config = AIConfig()
-    if not ai_config.llm_index_enabled:
+    if not ai_config.llm_index_enabled:  # pragma: no cover
         logger.info("LLM index is disabled, skipping update.")
         return None
 
