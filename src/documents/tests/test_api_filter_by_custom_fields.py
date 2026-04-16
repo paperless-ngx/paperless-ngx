@@ -448,8 +448,8 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
                 "monetary_field" in document
                 and document["monetary_field"] is not None
                 and (
-                    document["monetary_field"] == "EUR50.00" # With currency symbol
-                    or document["monetary_field"] == "50.00" # No currency symbol
+                    document["monetary_field"] == "EUR50.00"  # With currency symbol
+                    or document["monetary_field"] == "50.00"  # No currency symbol
                 )
             ),
         )
@@ -460,8 +460,8 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
                 "monetary_field" in document
                 and document["monetary_field"] is not None
                 and (
-                    document["monetary_field"] == "EUR101.00" # With currency symbol
-                    or document["monetary_field"] == "101.00" # No currency symbol
+                    document["monetary_field"] == "EUR101.00"  # With currency symbol
+                    or document["monetary_field"] == "101.00"  # No currency symbol
                 )
             ),
         )
