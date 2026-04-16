@@ -138,9 +138,9 @@ describe('SystemStatusDialogComponent', () => {
   })
 
   it('should check if task is running', () => {
-    component.runTask(PaperlessTaskType.IndexOptimize)
-    expect(component.isRunning(PaperlessTaskType.IndexOptimize)).toBeTruthy()
-    expect(component.isRunning(PaperlessTaskType.SanityCheck)).toBeFalsy()
+    component.runTask(PaperlessTaskType.SanityCheck)
+    expect(component.isRunning(PaperlessTaskType.SanityCheck)).toBeTruthy()
+    expect(component.isRunning(PaperlessTaskType.TrainClassifier)).toBeFalsy()
   })
 
   it('should support running tasks, refresh status and show toasts', () => {
@@ -151,22 +151,22 @@ describe('SystemStatusDialogComponent', () => {
 
     // fail first
     runSpy.mockReturnValue(throwError(() => new Error('error')))
-    component.runTask(PaperlessTaskType.IndexOptimize)
-    expect(runSpy).toHaveBeenCalledWith(PaperlessTaskType.IndexOptimize)
+    component.runTask(PaperlessTaskType.SanityCheck)
+    expect(runSpy).toHaveBeenCalledWith(PaperlessTaskType.SanityCheck)
     expect(toastErrorSpy).toHaveBeenCalledWith(
-      `Failed to start task ${PaperlessTaskType.IndexOptimize}, see the logs for more details`,
+      `Failed to start task ${PaperlessTaskType.SanityCheck}, see the logs for more details`,
       expect.any(Error)
     )
 
     // succeed
     runSpy.mockReturnValue(of({}))
     getStatusSpy.mockReturnValue(of(status))
-    component.runTask(PaperlessTaskType.IndexOptimize)
-    expect(runSpy).toHaveBeenCalledWith(PaperlessTaskType.IndexOptimize)
+    component.runTask(PaperlessTaskType.SanityCheck)
+    expect(runSpy).toHaveBeenCalledWith(PaperlessTaskType.SanityCheck)
 
     expect(getStatusSpy).toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalledWith(
-      `Task ${PaperlessTaskType.IndexOptimize} started`
+      `Task ${PaperlessTaskType.SanityCheck} started`
     )
   })
 

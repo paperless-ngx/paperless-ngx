@@ -216,7 +216,6 @@ from documents.signals import document_updated
 from documents.tasks import build_share_link_bundle
 from documents.tasks import consume_file
 from documents.tasks import empty_trash
-from documents.tasks import index_optimize
 from documents.tasks import llmindex_index
 from documents.tasks import sanity_check
 from documents.tasks import train_classifier
@@ -3803,7 +3802,6 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
     }
 
     _RUNNABLE_TASKS = {
-        PaperlessTask.TaskType.INDEX_OPTIMIZE: (index_optimize, {}),
         PaperlessTask.TaskType.TRAIN_CLASSIFIER: (train_classifier, {}),
         PaperlessTask.TaskType.SANITY_CHECK: (sanity_check, {"raise_on_error": False}),
         PaperlessTask.TaskType.LLM_INDEX: (llmindex_index, {"rebuild": False}),

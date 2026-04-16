@@ -59,6 +59,7 @@ class Migration(migrations.Migration):
                             ("consume_file", "Consume File"),
                             ("train_classifier", "Train Classifier"),
                             ("sanity_check", "Sanity Check"),
+                            ("index_optimize", "Index Optimize"),
                             ("mail_fetch", "Mail Fetch"),
                             ("llm_index", "LLM Index"),
                             ("empty_trash", "Empty Trash"),

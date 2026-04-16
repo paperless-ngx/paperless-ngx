@@ -682,6 +682,7 @@ class PaperlessTask(ModelWithOwner):
         CONSUME_FILE = "consume_file", _("Consume File")
         TRAIN_CLASSIFIER = "train_classifier", _("Train Classifier")
         SANITY_CHECK = "sanity_check", _("Sanity Check")
+        INDEX_OPTIMIZE = "index_optimize", _("Index Optimize")
         MAIL_FETCH = "mail_fetch", _("Mail Fetch")
         LLM_INDEX = "llm_index", _("LLM Index")
         EMPTY_TRASH = "empty_trash", _("Empty Trash")

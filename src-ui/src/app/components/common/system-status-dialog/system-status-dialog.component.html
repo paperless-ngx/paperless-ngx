@@ -168,16 +168,6 @@
                     <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
                   }
                 </button>
-                @if (currentUserIsSuperUser) {
-                  @if (isRunning(PaperlessTaskType.IndexOptimize)) {
-                    <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
-                  } @else {
-                    <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskType.IndexOptimize)">
-                      <i-bs name="play-fill" class="me-1"></i-bs>
-                      <ng-container i18n>Run Task</ng-container>
-                    </button>
-                  }
-                }
               </dd>
               <ng-template #indexStatus>
                 @if (status.tasks.index_status === 'OK') {
