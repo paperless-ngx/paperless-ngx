@@ -4502,8 +4502,8 @@ packages:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
-  hono@4.12.12:
-    resolution: {integrity: sha512-p1JfQMKaceuCbpJKAPKVqyqviZdS0eUxH9v82oWo1kb9xjQ5wA6iP3FNVAPDFlz5/p7d45lO+BpSk1tuSZMF4Q==}
+  hono@4.12.14:
+    resolution: {integrity: sha512-am5zfg3yu6sqn5yjKBNqhnTX7Cv+m00ox+7jbaKkrLMRJ4rAdldd1xPd/JzbBWspqaQv6RSTrgFN95EsfhC+7w==}
     engines: {node: '>=16.9.0'}
 
   hosted-git-info@9.0.2:
@@ -8685,9 +8685,9 @@ snapshots:
   '@harperfast/extended-iterable@1.0.3':
     optional: true
 
-  '@hono/node-server@1.19.13(hono@4.12.12)':
+  '@hono/node-server@1.19.13(hono@4.12.14)':
     dependencies:
-      hono: 4.12.12
+      hono: 4.12.14
 
   '@humanfs/core@0.19.1': {}
 
@@ -9270,7 +9270,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.26.0(zod@4.3.6)':
     dependencies:
-      '@hono/node-server': 1.19.13(hono@4.12.12)
+      '@hono/node-server': 1.19.13(hono@4.12.14)
       ajv: 8.18.0
       ajv-formats: 3.0.1(ajv@8.18.0)
       content-type: 1.0.5
@@ -9280,7 +9280,7 @@ snapshots:
       eventsource-parser: 3.0.6
       express: 5.2.1
       express-rate-limit: 8.3.2(express@5.2.1)
-      hono: 4.12.12
+      hono: 4.12.14
       jose: 6.2.2
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
@@ -11553,7 +11553,7 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  hono@4.12.12: {}
+  hono@4.12.14: {}
 
   hosted-git-info@9.0.2:
     dependencies:
