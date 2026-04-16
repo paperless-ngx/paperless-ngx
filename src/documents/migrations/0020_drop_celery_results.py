@@ -19,4 +19,8 @@ class Migration(migrations.Migration):
             sql="DROP TABLE IF EXISTS django_celery_results_chordcounter;",
             reverse_sql=migrations.RunSQL.noop,
         ),
+        migrations.RunSQL(
+            sql="DELETE FROM django_migrations WHERE app = 'django_celery_results';",
+            reverse_sql=migrations.RunSQL.noop,
+        ),
     ]
