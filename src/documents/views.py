@@ -1721,8 +1721,12 @@ class DocumentViewSet(
             200: OpenApiTypes.STR,
         },
     )
-    @action(methods=["post"], detail=True,
-    authentication_classes=[TokenAuthentication], parser_classes=[parsers.MultiPartParser])
+    @action(
+        methods=["post"],
+        detail=True,
+        authentication_classes=[TokenAuthentication],
+        parser_classes=[parsers.MultiPartParser],
+    )
     def update_version(self, request, pk=None):
         serializer = DocumentVersionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
