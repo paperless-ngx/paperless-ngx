@@ -40,6 +40,7 @@ from documents.models import Correspondent
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import PaperlessTask
 from documents.models import ShareLink
 from documents.models import ShareLinkBundle
 from documents.models import StoragePath
@@ -600,7 +601,10 @@ def update_document_parent_tags(tag: Tag, new_parent: Tag) -> None:
         )
 
     if affected:
-        bulk_update_documents.delay(document_ids=list(affected))
+        bulk_update_documents.apply_async(
+            kwargs={"document_ids": list(affected)},
+            headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
+        )
 
 
 @shared_task

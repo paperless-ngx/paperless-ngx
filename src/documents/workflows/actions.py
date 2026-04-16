@@ -253,12 +253,14 @@ def execute_webhook_action(
                         document.mime_type,
                     ),
                 }
-        send_webhook.delay(
-            url=action.webhook.url,
-            data=data,
-            headers=headers,
-            files=files,
-            as_json=action.webhook.as_json,
+        send_webhook.apply_async(
+            kwargs={
+                "url": action.webhook.url,
+                "data": data,
+                "headers": headers,
+                "files": files,
+                "as_json": action.webhook.as_json,
+            },
         )
         logger.debug(
             f"Webhook to {action.webhook.url} queued",

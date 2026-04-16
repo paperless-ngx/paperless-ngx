@@ -1604,6 +1604,7 @@ class RotateDocumentsSerializer(DocumentSelectionSerializer, SourceModeValidatio
         required=False,
         default=bulk_edit.SourceModeChoices.LATEST_VERSION,
     )
+    from_webui = serializers.BooleanField(required=False, default=False)
 
 
 class MergeDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
@@ -1617,6 +1618,7 @@ class MergeDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin
         required=False,
         default=bulk_edit.SourceModeChoices.LATEST_VERSION,
     )
+    from_webui = serializers.BooleanField(required=False, default=False)
 
 
 class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
@@ -1628,6 +1630,7 @@ class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMix
         required=False,
         default=bulk_edit.SourceModeChoices.LATEST_VERSION,
     )
+    from_webui = serializers.BooleanField(required=False, default=False)
 
     def validate(self, attrs):
         documents = attrs["documents"]
@@ -1679,6 +1682,7 @@ class RemovePasswordDocumentsSerializer(
         required=False,
         default=bulk_edit.SourceModeChoices.LATEST_VERSION,
     )
+    from_webui = serializers.BooleanField(required=False, default=False)
 
 
 class DeleteDocumentsSerializer(DocumentSelectionSerializer):
@@ -1726,6 +1730,7 @@ class BulkEditSerializer(
     )
 
     parameters = serializers.DictField(allow_empty=True, default={}, write_only=True)
+    from_webui = serializers.BooleanField(required=False, default=False)
 
     def _validate_tag_id_list(self, tags, name="tags") -> None:
         if not isinstance(tags, list):
@@ -2398,7 +2403,10 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         """
         doc_ids = [doc.id for doc in instance.documents.all()]
         if doc_ids:
-            bulk_edit.bulk_update_documents.delay(doc_ids)
+            bulk_edit.bulk_update_documents.apply_async(
+                kwargs={"document_ids": doc_ids},
+                headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
+            )
 
         return super().update(instance, validated_data)
 

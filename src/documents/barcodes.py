@@ -17,7 +17,9 @@ from pikepdf import Pdf
 from documents.converters import convert_from_tiff_to_pdf
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
+from documents.data_models import DocumentSource
 from documents.models import Document
+from documents.models import PaperlessTask
 from documents.models import Tag
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import StopConsumeTaskError
@@ -193,23 +195,36 @@ class BarcodePlugin(ConsumeTaskPlugin):
 
             from documents import tasks
 
+            _SOURCE_TO_TRIGGER: dict[DocumentSource, PaperlessTask.TriggerSource] = {
+                DocumentSource.ConsumeFolder: PaperlessTask.TriggerSource.FOLDER_CONSUME,
+                DocumentSource.ApiUpload: PaperlessTask.TriggerSource.API_UPLOAD,
+                DocumentSource.MailFetch: PaperlessTask.TriggerSource.EMAIL_CONSUME,
+                DocumentSource.WebUI: PaperlessTask.TriggerSource.WEB_UI,
+            }
+            trigger_source = _SOURCE_TO_TRIGGER.get(
+                self.input_doc.source,
+                PaperlessTask.TriggerSource.MANUAL,
+            )
+
             # Create the split document tasks
             for new_document in self.separate_pages(separator_pages):
                 copy_file_with_basic_stats(new_document, tmp_dir / new_document.name)
 
-                task = tasks.consume_file.delay(
-                    ConsumableDocument(
-                        # Same source, for templates
-                        source=self.input_doc.source,
-                        mailrule_id=self.input_doc.mailrule_id,
-                        # Can't use same folder or the consume might grab it again
-                        original_file=(tmp_dir / new_document.name).resolve(),
-                        # Adding optional original_path for later uses in
-                        # workflow matching
-                        original_path=self.input_doc.original_file,
-                    ),
-                    # All the same metadata
-                    self.metadata,
+                task = tasks.consume_file.apply_async(
+                    kwargs={
+                        "input_doc": ConsumableDocument(
+                            # Same source, for templates
+                            source=self.input_doc.source,
+                            mailrule_id=self.input_doc.mailrule_id,
+                            # Can't use same folder or the consume might grab it again
+                            original_file=(tmp_dir / new_document.name).resolve(),
+                            # Adding optional original_path for later uses in
+                            # workflow matching
+                            original_path=self.input_doc.original_file,
+                        ),
+                        "overrides": self.metadata,
+                    },
+                    headers={"trigger_source": trigger_source},
                 )
                 logger.info(f"Created new task {task.id} for {new_document.name}")
 

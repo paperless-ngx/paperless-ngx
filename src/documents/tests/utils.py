@@ -231,14 +231,16 @@ class ConsumerProgressMixin:
         self.send_progress_patcher.stop()
 
 
-class DocumentConsumeDelayMixin:
+class ConsumeTaskMixin:
     """
     Provides mocking of the consume_file asynchronous task and useful utilities
     for decoding its arguments
     """
 
     def setUp(self) -> None:
-        self.consume_file_patcher = mock.patch("documents.tasks.consume_file.delay")
+        self.consume_file_patcher = mock.patch(
+            "documents.tasks.consume_file.apply_async",
+        )
         self.consume_file_mock = self.consume_file_patcher.start()
         super().setUp()
 
@@ -246,48 +248,22 @@ class DocumentConsumeDelayMixin:
         super().tearDown()
         self.consume_file_patcher.stop()
 
-    def get_last_consume_delay_call_args(
+    def assert_queue_consumption_task_call_args(
         self,
     ) -> tuple[ConsumableDocument, DocumentMetadataOverrides]:
-        """
-        Returns the most recent arguments to the async task
-        """
-        # Must be at least 1 call
-        self.consume_file_mock.assert_called()
+        """Assert the task was queued exactly once and return its call args."""
+        self.consume_file_mock.assert_called_once()
+        task_kwargs = self.consume_file_mock.call_args.kwargs["kwargs"]
+        return (task_kwargs["input_doc"], task_kwargs["overrides"])
 
-        args, _ = self.consume_file_mock.call_args
-        input_doc, overrides = args
-
-        return (input_doc, overrides)
-
-    def get_all_consume_delay_call_args(
+    def get_all_consume_task_call_args(
         self,
     ) -> Iterator[tuple[ConsumableDocument, DocumentMetadataOverrides]]:
-        """
-        Iterates over all calls to the async task and returns the arguments
-        """
-        # Must be at least 1 call
+        """Iterate over all queued consume task calls and yield their call args."""
         self.consume_file_mock.assert_called()
-
-        for args, kwargs in self.consume_file_mock.call_args_list:
-            input_doc, overrides = args
-
-            yield (input_doc, overrides)
-
-    def get_specific_consume_delay_call_args(
-        self,
-        index: int,
-    ) -> tuple[ConsumableDocument, DocumentMetadataOverrides]:
-        """
-        Returns the arguments of a specific call to the async task
-        """
-        # Must be at least 1 call
-        self.consume_file_mock.assert_called()
-
-        args, _ = self.consume_file_mock.call_args_list[index]
-        input_doc, overrides = args
-
-        return (input_doc, overrides)
+        for call in self.consume_file_mock.call_args_list:
+            task_kwargs = call.kwargs["kwargs"]
+            yield (task_kwargs["input_doc"], task_kwargs["overrides"])
 
 
 class TestMigrations(TransactionTestCase):

@@ -359,7 +359,8 @@ class MailMocker(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 consume_tasks,
                 expected_signatures,
             ):
-                input_doc, overrides = consume_task.args
+                input_doc = consume_task.kwargs["input_doc"]
+                overrides = consume_task.kwargs["overrides"]
 
                 # assert the file exists
                 self.assertIsFile(input_doc.original_file)
@@ -2022,7 +2023,7 @@ class TestMailAccountProcess(APITestCase):
         )
         self.url = f"/api/mail_accounts/{self.account.pk}/process/"
 
-    @mock.patch("paperless_mail.tasks.process_mail_accounts.delay")
+    @mock.patch("paperless_mail.tasks.process_mail_accounts.apply_async")
     def test_mail_account_process_view(self, m) -> None:
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -97,12 +97,10 @@ def consumer_filter() -> ConsumerFilter:
 
 @pytest.fixture
 def mock_consume_file_delay(mocker: MockerFixture) -> MagicMock:
-    """Mock the consume_file.delay celery task."""
-    mock_task = mocker.patch(
+    """Mock the consume_file task."""
+    return mocker.patch(
         "documents.management.commands.document_consumer.consume_file",
     )
-    mock_task.delay = mocker.MagicMock()
-    return mock_task
 
 
 @pytest.fixture
@@ -453,9 +451,9 @@ class TestConsumeFile:
             subdirs_as_tags=False,
         )
 
-        mock_consume_file_delay.delay.assert_called_once()
-        call_args = mock_consume_file_delay.delay.call_args
-        consumable_doc = call_args[0][0]
+        mock_consume_file_delay.apply_async.assert_called_once()
+        call_args = mock_consume_file_delay.apply_async.call_args
+        consumable_doc = call_args.kwargs["kwargs"]["input_doc"]
         assert isinstance(consumable_doc, ConsumableDocument)
         assert consumable_doc.original_file == target
         assert consumable_doc.source == DocumentSource.ConsumeFolder
@@ -471,7 +469,7 @@ class TestConsumeFile:
             consumption_dir=consumption_dir,
             subdirs_as_tags=False,
         )
-        mock_consume_file_delay.delay.assert_not_called()
+        mock_consume_file_delay.apply_async.assert_not_called()
 
     def test_consume_directory(
         self,
@@ -487,7 +485,7 @@ class TestConsumeFile:
             consumption_dir=consumption_dir,
             subdirs_as_tags=False,
         )
-        mock_consume_file_delay.delay.assert_not_called()
+        mock_consume_file_delay.apply_async.assert_not_called()
 
     def test_consume_with_permission_error(
         self,
@@ -506,7 +504,7 @@ class TestConsumeFile:
             consumption_dir=consumption_dir,
             subdirs_as_tags=False,
         )
-        mock_consume_file_delay.delay.assert_not_called()
+        mock_consume_file_delay.apply_async.assert_not_called()
 
     def test_consume_with_tags_error(
         self,
@@ -529,9 +527,9 @@ class TestConsumeFile:
             consumption_dir=consumption_dir,
             subdirs_as_tags=True,
         )
-        mock_consume_file_delay.delay.assert_called_once()
-        call_args = mock_consume_file_delay.delay.call_args
-        overrides = call_args[0][1]
+        mock_consume_file_delay.apply_async.assert_called_once()
+        call_args = mock_consume_file_delay.apply_async.call_args
+        overrides = call_args.kwargs["kwargs"]["overrides"]
         assert overrides.tag_ids is None
 
 
@@ -629,7 +627,7 @@ class TestCommandOneshot:
         cmd = Command()
         cmd.handle(directory=str(consumption_dir), oneshot=True, testing=False)
 
-        mock_consume_file_delay.delay.assert_called_once()
+        mock_consume_file_delay.apply_async.assert_called_once()
 
     def test_processes_recursive(
         self,
@@ -652,7 +650,7 @@ class TestCommandOneshot:
         cmd = Command()
         cmd.handle(directory=str(consumption_dir), oneshot=True, testing=False)
 
-        mock_consume_file_delay.delay.assert_called_once()
+        mock_consume_file_delay.apply_async.assert_called_once()
 
     def test_ignores_unsupported_extensions(
         self,
@@ -671,7 +669,7 @@ class TestCommandOneshot:
         cmd = Command()
         cmd.handle(directory=str(consumption_dir), oneshot=True, testing=False)
 
-        mock_consume_file_delay.delay.assert_not_called()
+        mock_consume_file_delay.apply_async.assert_not_called()
 
 
 class ConsumerThread(Thread):
@@ -795,12 +793,12 @@ class TestCommandWatch:
         target = consumption_dir / "document.pdf"
         shutil.copy(sample_pdf, target)
 
-        wait_for_mock_call(mock_consume_file_delay.delay, timeout_s=2.0)
+        wait_for_mock_call(mock_consume_file_delay.apply_async, timeout_s=2.0)
 
         if thread.exception:
             raise thread.exception
 
-        mock_consume_file_delay.delay.assert_called()
+        mock_consume_file_delay.apply_async.assert_called()
 
     def test_detects_moved_file(
         self,
@@ -821,12 +819,12 @@ class TestCommandWatch:
         target = consumption_dir / "document.pdf"
         shutil.move(temp_location, target)
 
-        wait_for_mock_call(mock_consume_file_delay.delay, timeout_s=2.0)
+        wait_for_mock_call(mock_consume_file_delay.apply_async, timeout_s=2.0)
 
         if thread.exception:
             raise thread.exception
 
-        mock_consume_file_delay.delay.assert_called()
+        mock_consume_file_delay.apply_async.assert_called()
 
     def test_handles_slow_write(
         self,
@@ -847,12 +845,12 @@ class TestCommandWatch:
                 f.flush()
                 sleep(0.05)
 
-        wait_for_mock_call(mock_consume_file_delay.delay, timeout_s=2.0)
+        wait_for_mock_call(mock_consume_file_delay.apply_async, timeout_s=2.0)
 
         if thread.exception:
             raise thread.exception
 
-        mock_consume_file_delay.delay.assert_called()
+        mock_consume_file_delay.apply_async.assert_called()
 
     def test_ignores_macos_files(
         self,
@@ -868,13 +866,15 @@ class TestCommandWatch:
         (consumption_dir / "._document.pdf").write_bytes(b"test")
         shutil.copy(sample_pdf, consumption_dir / "valid.pdf")
 
-        wait_for_mock_call(mock_consume_file_delay.delay, timeout_s=2.0)
+        wait_for_mock_call(mock_consume_file_delay.apply_async, timeout_s=2.0)
 
         if thread.exception:
             raise thread.exception
 
-        assert mock_consume_file_delay.delay.call_count == 1
-        call_args = mock_consume_file_delay.delay.call_args[0][0]
+        assert mock_consume_file_delay.apply_async.call_count == 1
+        call_args = mock_consume_file_delay.apply_async.call_args.kwargs["kwargs"][
+            "input_doc"
+        ]
         assert call_args.original_file.name == "valid.pdf"
 
     @pytest.mark.django_db
@@ -924,12 +924,12 @@ class TestCommandWatchPolling:
 
         # Actively wait for consumption
         # Polling needs: interval (0.5s) + stability (0.1s) + next poll (0.5s) + margin
-        wait_for_mock_call(mock_consume_file_delay.delay, timeout_s=5.0)
+        wait_for_mock_call(mock_consume_file_delay.apply_async, timeout_s=5.0)
 
         if thread.exception:
             raise thread.exception
 
-        mock_consume_file_delay.delay.assert_called()
+        mock_consume_file_delay.apply_async.assert_called()
 
 
 @pytest.mark.management
@@ -953,12 +953,12 @@ class TestCommandWatchRecursive:
         target = subdir / "document.pdf"
         shutil.copy(sample_pdf, target)
 
-        wait_for_mock_call(mock_consume_file_delay.delay, timeout_s=2.0)
+        wait_for_mock_call(mock_consume_file_delay.apply_async, timeout_s=2.0)
 
         if thread.exception:
             raise thread.exception
 
-        mock_consume_file_delay.delay.assert_called()
+        mock_consume_file_delay.apply_async.assert_called()
 
     def test_subdirs_as_tags(
         self,
@@ -983,15 +983,15 @@ class TestCommandWatchRecursive:
         target = subdir / "document.pdf"
         shutil.copy(sample_pdf, target)
 
-        wait_for_mock_call(mock_consume_file_delay.delay, timeout_s=2.0)
+        wait_for_mock_call(mock_consume_file_delay.apply_async, timeout_s=2.0)
 
         if thread.exception:
             raise thread.exception
 
-        mock_consume_file_delay.delay.assert_called()
+        mock_consume_file_delay.apply_async.assert_called()
         mock_tags.assert_called()
-        call_args = mock_consume_file_delay.delay.call_args
-        overrides = call_args[0][1]
+        call_args = mock_consume_file_delay.apply_async.call_args
+        overrides = call_args.kwargs["kwargs"]["overrides"]
         assert overrides.tag_ids is not None
         assert len(overrides.tag_ids) == 2
 
@@ -1021,7 +1021,7 @@ class TestCommandWatchEdgeCases:
         if thread.exception:
             raise thread.exception
 
-        mock_consume_file_delay.delay.assert_not_called()
+        mock_consume_file_delay.apply_async.assert_not_called()
 
     @pytest.mark.usefixtures("mock_supported_extensions")
     def test_handles_task_exception(
@@ -1035,7 +1035,7 @@ class TestCommandWatchEdgeCases:
         mock_task = mocker.patch(
             "documents.management.commands.document_consumer.consume_file",
         )
-        mock_task.delay.side_effect = Exception("Task error")
+        mock_task.apply_async.side_effect = Exception("Task error")
 
         thread = ConsumerThread(consumption_dir, scratch_dir)
         try:
