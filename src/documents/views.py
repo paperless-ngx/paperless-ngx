@@ -3732,6 +3732,17 @@ class RemoteVersionView(GenericAPIView[Any]):
 
 
 @extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="task_id",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Filter tasks by Celery UUID",
+            ),
+        ],
+    ),
     acknowledge=extend_schema(
         operation_id="acknowledge_tasks",
         description="Acknowledge a list of tasks",
@@ -3757,17 +3768,17 @@ class RemoteVersionView(GenericAPIView[Any]):
             (400, "application/json"): None,
         },
     ),
-)
-@extend_schema(
-    parameters=[
-        OpenApiParameter(
-            name="task_id",
-            type=str,
-            location=OpenApiParameter.QUERY,
-            required=False,
-            description="Filter tasks by Celery UUID",
-        ),
-    ],
+    summary=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="days",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Number of days to include in aggregation (default 30)",
+            ),
+        ],
+    ),
 )
 class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
