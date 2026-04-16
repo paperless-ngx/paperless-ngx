@@ -100,6 +100,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.viewsets import ViewSet
+from rest_framework.authentication import TokenAuthentication
 
 from documents import bulk_edit
 from documents.bulk_download import ArchiveOnlyStrategy
@@ -1720,7 +1721,8 @@ class DocumentViewSet(
             200: OpenApiTypes.STR,
         },
     )
-    @action(methods=["post"], detail=True, parser_classes=[parsers.MultiPartParser])
+    @action(methods=["post"], detail=True,
+    authentication_classes=[TokenAuthentication], parser_classes=[parsers.MultiPartParser])
     def update_version(self, request, pk=None):
         serializer = DocumentVersionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
