@@ -110,7 +110,7 @@ class TestBeforeTaskPublishHandler:
         assert task.trigger_source == PaperlessTask.TriggerSource.SYSTEM
 
     def test_ignores_untracked_task(self):
-        send_publish("documents.tasks.bulk_update_documents", ([1, 2],), {})
+        send_publish("documents.tasks.some_untracked_task", (), {})
         assert PaperlessTask.objects.count() == 0
 
     def test_ignores_none_headers(self):

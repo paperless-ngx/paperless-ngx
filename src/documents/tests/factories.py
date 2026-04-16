@@ -72,7 +72,7 @@ class PaperlessTaskFactory(DjangoModelFactory):
     class Meta:
         model = PaperlessTask
 
-    task_id = factory.LazyFunction(lambda: str(__import__("uuid").uuid4()))
+    task_id = factory.Faker("uuid4")
     task_type = PaperlessTask.TaskType.CONSUME_FILE
     trigger_source = PaperlessTask.TriggerSource.WEB_UI
     status = PaperlessTask.Status.PENDING

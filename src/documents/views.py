@@ -3789,11 +3789,17 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
     # Needed for drf-spectacular schema generation (get_queryset touches request.user)
     queryset = PaperlessTask.objects.none()
 
+    # v9 backwards compat: maps old task_name values to new task_type values
+    _V9_TASK_NAME_TO_TYPE = {
+        "check_sanity": PaperlessTask.TaskType.SANITY_CHECK,
+        "llmindex_update": PaperlessTask.TaskType.LLM_INDEX,
+    }
+
     # v9 backwards compat: maps old "type" query param values to new TriggerSource
     _V9_TYPE_TO_TRIGGER_SOURCE = {
-        "AUTO_TASK": PaperlessTask.TriggerSource.SYSTEM,
-        "SCHEDULED_TASK": PaperlessTask.TriggerSource.SCHEDULED,
-        "MANUAL_TASK": PaperlessTask.TriggerSource.MANUAL,
+        "auto_task": PaperlessTask.TriggerSource.SYSTEM,
+        "scheduled_task": PaperlessTask.TriggerSource.SCHEDULED,
+        "manual_task": PaperlessTask.TriggerSource.MANUAL,
     }
 
     _RUNNABLE_TASKS = {
@@ -3810,17 +3816,24 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
         return TaskSerializerV10
 
     def get_queryset(self):
-        # Staff see all tasks; regular users see only tasks they own.
-        # Unowned tasks (system/scheduled) are admin-only.
+        # Staff see all tasks.
+        # v9 non-staff: own tasks + unowned tasks (preserves old behavior).
+        # v10 non-staff: own tasks only.
+        is_v9 = self.request.version and int(self.request.version) < 10
         if self.request.user.is_staff:
             queryset = PaperlessTask.objects.all()
+        elif is_v9:
+            queryset = PaperlessTask.objects.filter(
+                Q(owner=self.request.user) | Q(owner__isnull=True),
+            )
         else:
             queryset = PaperlessTask.objects.filter(owner=self.request.user)
         # v9 backwards compat: map old query params to new field names
-        if self.request.version and int(self.request.version) < 10:
+        if is_v9:
             task_name = self.request.query_params.get("task_name")
             if task_name is not None:
-                queryset = queryset.filter(task_type=task_name)
+                mapped = self._V9_TASK_NAME_TO_TYPE.get(task_name, task_name)
+                queryset = queryset.filter(task_type=mapped)
             task_type_old = self.request.query_params.get("type")
             if task_type_old is not None:
                 new_source = self._V9_TYPE_TO_TRIGGER_SOURCE.get(task_type_old)
@@ -3916,7 +3929,7 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
 
     @action(methods=["post"], detail=False, permission_classes=[IsAdminUser])
     def run(self, request):
-        """Manually dispatch a background task. Superuser (admin) only."""
+        """Manually dispatch a background task. Staff only."""
         serializer = RunTaskSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         task_type = serializer.validated_data.get("task_type")

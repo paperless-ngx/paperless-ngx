@@ -682,12 +682,14 @@ class PaperlessTask(ModelWithOwner):
         CONSUME_FILE = "consume_file", _("Consume File")
         TRAIN_CLASSIFIER = "train_classifier", _("Train Classifier")
         SANITY_CHECK = "sanity_check", _("Sanity Check")
-        INDEX_OPTIMIZE = "index_optimize", _("Index Optimize")
         MAIL_FETCH = "mail_fetch", _("Mail Fetch")
         LLM_INDEX = "llm_index", _("LLM Index")
         EMPTY_TRASH = "empty_trash", _("Empty Trash")
         CHECK_WORKFLOWS = "check_workflows", _("Check Workflows")
-        CLEANUP_SHARE_LINKS = "cleanup_share_links", _("Cleanup Share Links")
+        BULK_UPDATE = "bulk_update", _("Bulk Update")
+        REPROCESS_DOCUMENT = "reprocess_document", _("Reprocess Document")
+        BUILD_SHARE_LINK = "build_share_link", _("Build Share Link")
+        BULK_DELETE = "bulk_delete", _("Bulk Delete")
 
     COMPLETE_STATUSES = (
         Status.SUCCESS,
@@ -706,7 +708,7 @@ class PaperlessTask(ModelWithOwner):
 
     # Identification
     task_id = models.CharField(
-        max_length=255,
+        max_length=72,
         unique=True,
         verbose_name=_("Task ID"),
         help_text=_("Celery task ID"),

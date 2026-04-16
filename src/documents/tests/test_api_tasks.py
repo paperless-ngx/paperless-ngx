@@ -18,6 +18,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from documents.models import PaperlessTask
+from documents.tests.factories import DocumentFactory
 from documents.tests.factories import PaperlessTaskFactory
 
 pytestmark = pytest.mark.api
@@ -237,40 +238,40 @@ class TestGetTasksV9:
         assert response.data[0]["task_file_name"] is None
 
     def test_type_scheduled_maps_to_scheduled_task(self, v9_client: APIClient) -> None:
-        """trigger_source=scheduled maps to type='SCHEDULED_TASK' in v9."""
+        """trigger_source=scheduled maps to type='scheduled_task' in v9."""
         PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.SCHEDULED)
 
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["type"] == "SCHEDULED_TASK"
+        assert response.data[0]["type"] == "scheduled_task"
 
     def test_type_system_maps_to_auto_task(self, v9_client: APIClient) -> None:
-        """trigger_source=system maps to type='AUTO_TASK' in v9."""
+        """trigger_source=system maps to type='auto_task' in v9."""
         PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.SYSTEM)
 
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["type"] == "AUTO_TASK"
+        assert response.data[0]["type"] == "auto_task"
 
     def test_type_web_ui_maps_to_manual_task(self, v9_client: APIClient) -> None:
-        """trigger_source=web_ui maps to type='MANUAL_TASK' in v9."""
+        """trigger_source=web_ui maps to type='manual_task' in v9."""
         PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.WEB_UI)
 
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["type"] == "MANUAL_TASK"
+        assert response.data[0]["type"] == "manual_task"
 
     def test_type_manual_maps_to_manual_task(self, v9_client: APIClient) -> None:
-        """trigger_source=manual maps to type='MANUAL_TASK' in v9."""
+        """trigger_source=manual maps to type='manual_task' in v9."""
         PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.MANUAL)
 
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["type"] == "MANUAL_TASK"
+        assert response.data[0]["type"] == "manual_task"
 
     def test_related_document_from_result_data_document_id(
         self,
@@ -301,15 +302,20 @@ class TestGetTasksV9:
 
     def test_duplicate_documents_from_result_data(self, v9_client: APIClient) -> None:
         """duplicate_documents includes duplicate_of from result_data in v9."""
+        doc = DocumentFactory.create(title="Duplicate Target")
         PaperlessTaskFactory(
             status=PaperlessTask.Status.SUCCESS,
-            result_data={"duplicate_of": 55},
+            result_data={"duplicate_of": doc.pk},
         )
 
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["duplicate_documents"] == [55]
+        dupes = response.data[0]["duplicate_documents"]
+        assert len(dupes) == 1
+        assert dupes[0]["id"] == doc.pk
+        assert dupes[0]["title"] == doc.title
+        assert "deleted_at" in dupes[0]
 
     def test_duplicate_documents_empty_when_no_result_data(
         self,
@@ -323,6 +329,88 @@ class TestGetTasksV9:
         assert response.status_code == status.HTTP_200_OK
         assert response.data[0]["duplicate_documents"] == []
 
+    def test_status_remapped_to_uppercase(self, v9_client: APIClient) -> None:
+        """v9 status values are uppercase Celery state strings."""
+        PaperlessTaskFactory(status=PaperlessTask.Status.SUCCESS)
+        PaperlessTaskFactory(status=PaperlessTask.Status.PENDING)
+        PaperlessTaskFactory(status=PaperlessTask.Status.FAILURE)
+
+        response = v9_client.get(ENDPOINT)
+
+        assert response.status_code == status.HTTP_200_OK
+        statuses = {t["status"] for t in response.data}
+        assert statuses == {"SUCCESS", "PENDING", "FAILURE"}
+
+    def test_task_name_remap_sanity_check(self, v9_client: APIClient) -> None:
+        """v9 remaps task_type=sanity_check to task_name=check_sanity."""
+        PaperlessTaskFactory(task_type=PaperlessTask.TaskType.SANITY_CHECK)
+
+        response = v9_client.get(ENDPOINT)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data[0]["task_name"] == "check_sanity"
+
+    def test_task_name_remap_llm_index(self, v9_client: APIClient) -> None:
+        """v9 remaps task_type=llm_index to task_name=llmindex_update."""
+        PaperlessTaskFactory(task_type=PaperlessTask.TaskType.LLM_INDEX)
+
+        response = v9_client.get(ENDPOINT)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data[0]["task_name"] == "llmindex_update"
+
+    def test_type_email_consume_maps_to_auto_task(self, v9_client: APIClient) -> None:
+        """trigger_source=email_consume maps to type='auto_task' in v9."""
+        PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.EMAIL_CONSUME)
+
+        response = v9_client.get(ENDPOINT)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data[0]["type"] == "auto_task"
+
+    def test_type_folder_consume_maps_to_auto_task(self, v9_client: APIClient) -> None:
+        """trigger_source=folder_consume maps to type='auto_task' in v9."""
+        PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.FOLDER_CONSUME)
+
+        response = v9_client.get(ENDPOINT)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data[0]["type"] == "auto_task"
+
+    def test_filter_by_task_name_maps_old_value(self, v9_client: APIClient) -> None:
+        """?task_name=check_sanity maps to task_type=sanity_check in v9."""
+        PaperlessTaskFactory(task_type=PaperlessTask.TaskType.SANITY_CHECK)
+        PaperlessTaskFactory(task_type=PaperlessTask.TaskType.CONSUME_FILE)
+
+        response = v9_client.get(ENDPOINT, {"task_name": "check_sanity"})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) == 1
+        assert response.data[0]["task_name"] == "check_sanity"
+
+    def test_v9_non_staff_sees_own_and_unowned_tasks(
+        self,
+        admin_user: User,
+        regular_user: User,
+    ) -> None:
+        """v9 non-staff users see their own tasks plus unowned tasks."""
+        regular_user.user_permissions.add(
+            Permission.objects.get(codename="view_paperlesstask"),
+        )
+
+        client = APIClient()
+        client.force_authenticate(user=regular_user)
+        client.credentials(HTTP_ACCEPT=ACCEPT_V9)
+
+        PaperlessTaskFactory(owner=admin_user)  # other user, not visible
+        PaperlessTaskFactory(owner=None)  # unowned, visible in v9
+        PaperlessTaskFactory(owner=regular_user)  # own task, visible
+
+        response = client.get(ENDPOINT)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) == 2
+
     def test_filter_by_task_name_maps_to_task_type(self, v9_client: APIClient) -> None:
         """?task_name=consume_file filter maps to the task_type field for v9 compatibility."""
         PaperlessTaskFactory(task_type=PaperlessTask.TaskType.CONSUME_FILE)
@@ -335,15 +423,15 @@ class TestGetTasksV9:
         assert response.data[0]["task_name"] == "consume_file"
 
     def test_filter_by_type_maps_to_trigger_source(self, v9_client: APIClient) -> None:
-        """?type=SCHEDULED_TASK filter maps to trigger_source=scheduled for v9 compatibility."""
+        """?type=scheduled_task filter maps to trigger_source=scheduled for v9 compatibility."""
         PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.SCHEDULED)
         PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.WEB_UI)
 
-        response = v9_client.get(ENDPOINT, {"type": "SCHEDULED_TASK"})
+        response = v9_client.get(ENDPOINT, {"type": "scheduled_task"})
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
-        assert response.data[0]["type"] == "SCHEDULED_TASK"
+        assert response.data[0]["type"] == "scheduled_task"
 
 
 @pytest.mark.django_db()

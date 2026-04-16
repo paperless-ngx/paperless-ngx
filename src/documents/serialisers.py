@@ -2483,14 +2483,17 @@ class TaskSerializerV9(serializers.ModelSerializer):
     to work unchanged.
     """
 
-    # v9 field: task_name -> task_type
-    task_name = serializers.CharField(source="task_type", read_only=True)
+    # v9 field: task_name -> task_type (with value remapping for renamed tasks)
+    task_name = serializers.SerializerMethodField()
 
     # v9 field: task_file_name -> input_data.filename
     task_file_name = serializers.SerializerMethodField()
 
     # v9 field: type -> trigger_source (mapped to old enum labels)
     type = serializers.SerializerMethodField()
+
+    # v9 field: status -> uppercase Celery state strings
+    status = serializers.SerializerMethodField()
 
     # v9 field: result -> result_message (with legacy format fallback)
     result = serializers.CharField(
@@ -2524,31 +2527,61 @@ class TaskSerializerV9(serializers.ModelSerializer):
         )
         read_only_fields = fields
 
+    _TASK_TYPE_TO_V9_NAME = {
+        PaperlessTask.TaskType.SANITY_CHECK: "check_sanity",
+        PaperlessTask.TaskType.LLM_INDEX: "llmindex_update",
+    }
+
+    def get_task_name(self, obj: PaperlessTask) -> str:
+        return self._TASK_TYPE_TO_V9_NAME.get(obj.task_type, obj.task_type)
+
     def get_task_file_name(self, obj: PaperlessTask) -> str | None:
         if not obj.input_data:
             return None
         return obj.input_data.get("filename")
 
+    _STATUS_TO_V9 = {
+        PaperlessTask.Status.PENDING: "PENDING",
+        PaperlessTask.Status.STARTED: "STARTED",
+        PaperlessTask.Status.SUCCESS: "SUCCESS",
+        PaperlessTask.Status.FAILURE: "FAILURE",
+        PaperlessTask.Status.REVOKED: "REVOKED",
+    }
+
+    def get_status(self, obj: PaperlessTask) -> str:
+        return self._STATUS_TO_V9.get(obj.status, obj.status.upper())
+
     _TRIGGER_SOURCE_TO_V9_TYPE = {
-        PaperlessTask.TriggerSource.SCHEDULED: "SCHEDULED_TASK",
-        PaperlessTask.TriggerSource.SYSTEM: "AUTO_TASK",
+        PaperlessTask.TriggerSource.SCHEDULED: "scheduled_task",
+        PaperlessTask.TriggerSource.SYSTEM: "auto_task",
         # Email and folder-consumer documents are system-initiated, not manually triggered
-        PaperlessTask.TriggerSource.EMAIL_CONSUME: "AUTO_TASK",
-        PaperlessTask.TriggerSource.FOLDER_CONSUME: "AUTO_TASK",
+        PaperlessTask.TriggerSource.EMAIL_CONSUME: "auto_task",
+        PaperlessTask.TriggerSource.FOLDER_CONSUME: "auto_task",
     }
 
     def get_type(self, obj: PaperlessTask) -> str:
-        return self._TRIGGER_SOURCE_TO_V9_TYPE.get(obj.trigger_source, "MANUAL_TASK")
+        return self._TRIGGER_SOURCE_TO_V9_TYPE.get(obj.trigger_source, "manual_task")
 
     def get_related_document(self, obj: PaperlessTask) -> int | None:
         ids = obj.related_document_ids
         return ids[0] if ids else None
 
-    def get_duplicate_documents(self, obj: PaperlessTask) -> list[int]:
+    def get_duplicate_documents(
+        self,
+        obj: PaperlessTask,
+    ) -> list[dict[str, Any]]:
         if not obj.result_data:
             return []
         dup_of = obj.result_data.get("duplicate_of")
-        return [dup_of] if dup_of is not None else []
+        if dup_of is None:
+            return []
+        return list(
+            Document.global_objects.filter(pk=dup_of).values(
+                "id",
+                "title",
+                "deleted_at",
+            ),
+        )
 
 
 class TaskSummarySerializer(serializers.Serializer):

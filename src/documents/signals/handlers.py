@@ -1007,12 +1007,14 @@ TRACKED_TASKS: dict[str, PaperlessTask.TaskType] = {
     "documents.tasks.consume_file": PaperlessTask.TaskType.CONSUME_FILE,
     "documents.tasks.train_classifier": PaperlessTask.TaskType.TRAIN_CLASSIFIER,
     "documents.tasks.sanity_check": PaperlessTask.TaskType.SANITY_CHECK,
-    "documents.tasks.index_optimize": PaperlessTask.TaskType.INDEX_OPTIMIZE,
     "documents.tasks.llmindex_index": PaperlessTask.TaskType.LLM_INDEX,
     "documents.tasks.empty_trash": PaperlessTask.TaskType.EMPTY_TRASH,
     "documents.tasks.check_scheduled_workflows": PaperlessTask.TaskType.CHECK_WORKFLOWS,
-    "documents.tasks.cleanup_expired_share_link_bundles": PaperlessTask.TaskType.CLEANUP_SHARE_LINKS,
     "paperless_mail.tasks.process_mail_accounts": PaperlessTask.TaskType.MAIL_FETCH,
+    "documents.tasks.bulk_update_documents": PaperlessTask.TaskType.BULK_UPDATE,
+    "documents.tasks.update_document_content_maybe_archive_file": PaperlessTask.TaskType.REPROCESS_DOCUMENT,
+    "documents.tasks.build_share_link_bundle": PaperlessTask.TaskType.BUILD_SHARE_LINK,
+    "documents.bulk_edit.delete": PaperlessTask.TaskType.BULK_DELETE,
 }
 
 _CELERY_STATE_TO_STATUS: dict[str, PaperlessTask.Status] = {
@@ -1202,6 +1204,8 @@ def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs) -> None:
     """
     if task_id is None:  # pragma: no cover
         return
+    if task and task.name not in TRACKED_TASKS:
+        return
     try:
         close_old_connections()
         PaperlessTask.objects.filter(task_id=task_id).update(
@@ -1227,11 +1231,13 @@ def task_postrun_handler(
     task_failure also fires when a task raises an exception, and it writes
     richer structured error data.  To avoid a race where this handler
     overwrites that data, result_data and result_message are left untouched
-    when the final state is FAILURE — task_failure_handler owns those fields.
+    when the final state is FAILURE. task_failure_handler owns those fields.
 
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-postrun
     """
     if task_id is None:  # pragma: no cover
+        return
+    if task and task.name not in TRACKED_TASKS:
         return
     try:
         close_old_connections()
@@ -1291,6 +1297,8 @@ def task_failure_handler(
     """
     if task_id is None:  # pragma: no cover
         return
+    if sender and sender.name not in TRACKED_TASKS:
+        return
     try:
         close_old_connections()
 
@@ -1334,6 +1342,8 @@ def task_revoked_handler(
     """
     task_id = request.id if request else None
     if task_id is None:  # pragma: no cover
+        return
+    if sender and sender.name not in TRACKED_TASKS:
         return
     try:
         close_old_connections()

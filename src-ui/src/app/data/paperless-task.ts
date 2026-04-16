@@ -4,10 +4,14 @@ export enum PaperlessTaskType {
   ConsumeFile = 'consume_file',
   TrainClassifier = 'train_classifier',
   SanityCheck = 'sanity_check',
-  IndexOptimize = 'index_optimize',
-  IndexRebuild = 'index_rebuild',
   MailFetch = 'mail_fetch',
   LlmIndex = 'llm_index',
+  EmptyTrash = 'empty_trash',
+  CheckWorkflows = 'check_workflows',
+  BulkUpdate = 'bulk_update',
+  ReprocessDocument = 'reprocess_document',
+  BuildShareLink = 'build_share_link',
+  BulkDelete = 'bulk_delete',
 }
 
 export enum PaperlessTaskTriggerSource {
